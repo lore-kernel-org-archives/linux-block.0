@@ -1,28 +1,28 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B67636B0E;
-	Sat,  6 Apr 2024 09:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B050383A6;
+	Sat,  6 Apr 2024 09:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712395074; cv=none; b=GKcK/BhF7BdN1gd5QOdmZg/Y1XAK+61k7AYzYJDCjD3GfQB8RglIvghLcaVYU9xJWJl+E/f3ILO4HhklaY3t8cYSUS98Oio56ZuenMV9Lott5IOheXV3Ae9x6Q9MBcMiMJSkF+RKeDUlz+xk4GI4MMkSpHrOUCoSezrx5wwZXDQ=
+	t=1712395075; cv=none; b=YhOODVPhTcRPIOGwmMZdruF9Nro2sneiO/8DgqL63U7jcgpWgAM3krph8Gi7b8Z1pPwLnoDljMTxsgCofSzSr8akcD8Ddurcqv9baiXNtsTFnZDawmWds4QBC6IgjcY/B9bhxg1Nmvrv+OnbbXoCK+zXTO2quxtpbZFjIoBhKPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712395074; c=relaxed/simple;
-	bh=bCFy/k/FvtAgI9RRhfoHH1YorOQQiJPbNFphSp0CF/c=;
+	s=arc-20240116; t=1712395075; c=relaxed/simple;
+	bh=oITzHCczE+PR9WvzwFwNQD/O6vI0Xdj/12ViSedP+jo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e2XnWv7hUspn+CuMmzDlrfLpHcQ0sKpjs3UGX45R2IA++jh24e6Hwhk6i51Re3sFBi0QcQlEPDZwapvZdfzGmc7Q1sl5wusJ6S2uoT3a5RXpcC31NrbM2omqI5zz+d1K9Kl1mYmjXZVxgkAplCyd2azJfNVtaPF5Qg5M3dP9gHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=Y+UuGJeyh6xgjSGZCT53+CwOqgAtURAS5j7k1tqGeDnmFvN0kybCUfFAOzgXCkBs9zDaoAEUUeBZjH9feFl6E1hbLEqmsMxYNXkuPnizUffVhjB4oHpOKhVFa3wVzuHlRwvuSTzuxPduXGabAZIr/ZatDR9JdZssXCCfC1i5uAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VBVBF5Jqnz4f3khX;
-	Sat,  6 Apr 2024 17:17:41 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVBG2lB7z4f3lgK;
+	Sat,  6 Apr 2024 17:17:42 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 650241A0C9A;
-	Sat,  6 Apr 2024 17:17:48 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id D8DE91A0572;
+	Sat,  6 Apr 2024 17:17:50 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S19;
-	Sat, 06 Apr 2024 17:17:48 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S25;
+	Sat, 06 Apr 2024 17:17:50 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: jack@suse.cz,
 	hch@lst.de,
@@ -34,9 +34,9 @@ Cc: linux-fsdevel@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	yukuai3@huawei.com
-Subject: [PATCH vfs.all 15/26] s390/dasd: use bdev api in dasd_format()
-Date: Sat,  6 Apr 2024 17:09:19 +0800
-Message-Id: <20240406090930.2252838-16-yukuai1@huaweicloud.com>
+Subject: [PATCH vfs.all 21/26] block: fix module reference leakage from bdev_open_by_dev error path
+Date: Sat,  6 Apr 2024 17:09:25 +0800
+Message-Id: <20240406090930.2252838-22-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
@@ -47,10 +47,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S19
-X-Coremail-Antispam: 1UD129KBjvdXoW7XFWrWFWfWw45CFyfZw1xGrg_yoWDJFc_ZF
-	1fKryftr18Cr93Cr1YvF15Zr9Ykr1vgF1fZr9xtr1fWrnrXFsxX3ykurs8JrWkAayUC3s5
-	JFnrXr1Iyr15WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S25
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gr1xurykXrW7uw48ZF17GFg_yoWfGFb_u3
+	WrCry8ur4rA34fCw4ayFyrXrs5t3W8JrWFyayxJF97CFy7Jas7uanxXr95ZF43XayDGw45
+	C3WYqrs8Zr1IgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
 	9fnUUIcSsGvfJTRUUUbSAYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
 	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
 	0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
@@ -61,39 +61,38 @@ X-Coremail-Antispam: 1UD129KBjvdXoW7XFWrWFWfWw45CFyfZw1xGrg_yoWDJFc_ZF
 	bVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x
 	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
 	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY
+	C0I7IYx2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY
 	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aV
 	CY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZo7tUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Avoid to access bd_inode directly, prepare to remove bd_inode from
-block_devcie.
+At the time bdev_may_open() is called, module reference is grabbed
+already, hence module reference should be released if bdev_may_open()
+failed.
 
+This problem is found by code review.
+
+Fixes: ed5cc702d311 ("block: Add config option to not allow writing to mounted devices")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- drivers/s390/block/dasd_ioctl.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/bdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
-index 7e0ed7032f76..c1201590f343 100644
---- a/drivers/s390/block/dasd_ioctl.c
-+++ b/drivers/s390/block/dasd_ioctl.c
-@@ -215,8 +215,9 @@ dasd_format(struct dasd_block *block, struct format_data_t *fdata)
- 	 * enabling the device later.
- 	 */
- 	if (fdata->start_unit == 0) {
--		block->gdp->part0->bd_inode->i_blkbits =
--			blksize_bits(fdata->blksize);
-+		rc = set_blocksize(block->gdp->part0, fdata->blksize);
-+		if (rc)
-+			return rc;
- 	}
- 
- 	rc = base->discipline->format_device(base, fdata, 1);
+diff --git a/block/bdev.c b/block/bdev.c
+index 82fb1688f4c9..86db97b0709e 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -890,7 +890,7 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
+ 		goto abort_claiming;
+ 	ret = -EBUSY;
+ 	if (!bdev_may_open(bdev, mode))
+-		goto abort_claiming;
++		goto put_module;
+ 	if (bdev_is_partition(bdev))
+ 		ret = blkdev_get_part(bdev, mode);
+ 	else
 -- 
 2.39.2
 
