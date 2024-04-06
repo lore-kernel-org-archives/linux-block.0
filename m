@@ -1,27 +1,27 @@
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D864D39FE5;
-	Sat,  6 Apr 2024 09:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A863BBE5;
+	Sat,  6 Apr 2024 09:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712395075; cv=none; b=qhDrcRwU08iow2hK/KG08exWAy45h9YcpJ7iNW4TubKjMxIUD0PTyTJmLBSgZA5NWYiuJCiIhAk3pH3sg7keo9fzcTQxLiBYqHNkDfxdINMiWrq8i/oVCHiOh/n3VL1SH2kMIQytSQ3WaHPF7Fu2I0b9M+Z3lDVpORfttPyd+L4=
+	t=1712395076; cv=none; b=M3+WZoVeefJgAA60vUOqboq6VVOtXpstB5Xb89U7Llt89IKkm83e9BLIRwAcOs0XYHig4ABNAXYNHP3KaBpcTKbGmL1jcKQGF5wnQMO0kJjRgnsEMl4527UZjsi8p1vzZQuJIIANBMqm89t0ZGK7FZNPT4NKyzKkZgs3TOliHSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712395075; c=relaxed/simple;
-	bh=pcjMvX4iWAJQ9J9m7Y1CdP7psXkpgzQlz5ovJqA3F8E=;
+	s=arc-20240116; t=1712395076; c=relaxed/simple;
+	bh=Kh1zow+pxK8H/NTVbdXq3rJd+HWiY01On+hqvTU1d5E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a3adgCiQj3HEKuoKrPRiguIty/YtIJaW3FnLK8KKlaBsABOOJRKFyx/ix5R11RERJjDv96qHdqD9al4EML2o9RZ+2+I7eUCgHKM+IjFh41KjZDCwnT8Qua0BwThbMDsopBpbGwvDbQVsng2gHOaYMtWlSOrIEPmzMRXx/ritBLk=
+	 MIME-Version; b=DaNzT0c6apNxg1LZr3J1dOOvRFVvYEQYA9peLWOLZxAme65QAcXT70cqxKoZKhWoqEyKAbFH8SQL9SSINT7Oju4qtmxqgwgRe5C0s3NsOp/LPZ8iDw3muUMCalD2RjohxgvNc8Rj9gzxKl22aooU87v8iyL066My5+uSSza9Etg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVBL6xfcz4f3jMM;
-	Sat,  6 Apr 2024 17:17:46 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVBH4SN0z4f3lfn;
+	Sat,  6 Apr 2024 17:17:43 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 47F721A058D;
-	Sat,  6 Apr 2024 17:17:51 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 1E2131A0568;
+	Sat,  6 Apr 2024 17:17:52 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S26;
+	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S28;
 	Sat, 06 Apr 2024 17:17:51 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: jack@suse.cz,
@@ -34,9 +34,9 @@ Cc: linux-fsdevel@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	yukuai3@huawei.com
-Subject: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw blcok_device
-Date: Sat,  6 Apr 2024 17:09:26 +0800
-Message-Id: <20240406090930.2252838-23-yukuai1@huaweicloud.com>
+Subject: [PATCH vfs.all 24/26] iomap: convert to use bdev_file
+Date: Sat,  6 Apr 2024 17:09:28 +0800
+Message-Id: <20240406090930.2252838-25-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
@@ -47,10 +47,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S26
-X-Coremail-Antispam: 1UD129KBjvJXoW3Jr4kZF4rKw4DCr4xGF13XFb_yoW7CF48pr
-	Z5GFZ8tryqgas7WFWIqanrur1agw48Jw1UZasxWr9ay3yDtrna9a48KrW5uFy8t34kAF1Y
-	qFW5WryUCFy3CaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S28
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF4UJw1fXFy3Jw4rGFyrCrg_yoW8Gw4kpF
+	n0kFyUKFW8Gr1UuFZrJ3yxZryYywn8G34UZry5W3y5GrWUtr92gFn5CF1jva48XrWvyan8
+	XFyqgry8Cr1rC3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
 	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
@@ -68,208 +68,45 @@ X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-So that iomap and bffer_head can convert to use bdev_file in following
-patches.
+With previous commit both filesystems and raw block device provide
+bdev_file while initializing iomap, it's safe to convert to use
+bdev_file. Prepare to remove bd_inode from block_device after convert
+buffer_head to use bdev_file as well.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bdev.c              | 137 +++++++++++++++++++++++++++++---------
- include/linux/blk_types.h |   1 +
- 2 files changed, 107 insertions(+), 31 deletions(-)
+ include/linux/iomap.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 86db97b0709e..3d300823da6b 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -846,6 +846,101 @@ static void init_bdev_file(struct file *bdev_file, struct block_device *bdev,
- 	bdev_file->private_data = holder;
- }
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 8ae384f0eeb1..1386f3a618fe 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -97,7 +97,7 @@ struct iomap {
+ 	u64			length;	/* length of mapping, bytes */
+ 	u16			type;	/* type of mapping */
+ 	u16			flags;	/* flags for mapping */
+-	struct block_device	*bdev;	/* block device for I/O */
++	struct file		*bdev_file; /* block device for I/O */
+ 	struct dax_device	*dax_dev; /* dax_dev for dax operations */
+ 	void			*inline_data;
+ 	void			*private; /* filesystem private */
+@@ -107,13 +107,13 @@ struct iomap {
  
-+/*
-+ * If BLK_OPEN_WRITE_IOCTL is set then this is a historical quirk
-+ * associated with the floppy driver where it has allowed ioctls if the
-+ * file was opened for writing, but does not allow reads or writes.
-+ * Make sure that this quirk is reflected in @f_flags.
-+ *
-+ * It can also happen if a block device is opened as O_RDWR | O_WRONLY.
-+ */
-+static unsigned blk_to_file_flags(blk_mode_t mode)
-+{
-+	unsigned int flags = 0;
-+
-+	if ((mode & (BLK_OPEN_READ | BLK_OPEN_WRITE)) ==
-+	    (BLK_OPEN_READ | BLK_OPEN_WRITE))
-+		flags |= O_RDWR;
-+	else if (mode & BLK_OPEN_WRITE_IOCTL)
-+		flags |= O_RDWR | O_WRONLY;
-+	else if (mode & BLK_OPEN_WRITE)
-+		flags |= O_WRONLY;
-+	else if (mode & BLK_OPEN_READ)
-+		flags |= O_RDONLY; /* homeopathic, because O_RDONLY is 0 */
-+	else
-+		WARN_ON_ONCE(true);
-+
-+	if (mode & BLK_OPEN_NDELAY)
-+		flags |= O_NDELAY;
-+
-+	return flags;
-+}
-+
-+static int __stash_bdev_file(struct block_device *bdev)
-+{
-+	struct inode *inode = bdev_inode(bdev);
-+	unsigned int flags = blk_to_file_flags(BLK_OPEN_READ | BLK_OPEN_WRITE);
-+	struct file *file;
-+	static struct file_operations stash_fops;
-+
-+	file = inode->i_private;
-+	if (!file) {
-+		/*
-+		 * This file is used for iomap/buffer_head for raw block_device
-+		 * read/write operations to access block_device.
-+		 */
-+		file = alloc_file_pseudo_noaccount(bdev_inode(bdev),
-+				blockdev_mnt, "", flags | O_LARGEFILE,
-+				&stash_fops);
-+
-+		if (IS_ERR(file))
-+			return PTR_ERR(file);
-+
-+		ihold(inode);
-+		init_bdev_file(file, bdev, 0, NULL);
-+
-+		inode->i_private = file;
-+		WARN_ON_ONCE(bdev->stash_count != 0);
-+	}
-+
-+	bdev->stash_count++;
-+	return 0;
-+}
-+
-+static void __unstash_bdev_file(struct block_device *bdev)
-+{
-+
-+	WARN_ON_ONCE(bdev->stash_count <= 0);
-+	if (--bdev->stash_count == 0) {
-+		struct inode *inode = bdev_inode(bdev);
-+		struct file *file = inode->i_private;
-+
-+		inode->i_private = NULL;
-+		fput(file);
-+	}
-+}
-+
-+static int stash_bdev_file(struct block_device *bdev)
-+{
-+	int ret = __stash_bdev_file(bdev);
-+
-+	if (ret || !bdev_is_partition(bdev))
-+		return ret;
-+
-+	ret = __stash_bdev_file(bdev_whole(bdev));
-+	if (ret)
-+		__unstash_bdev_file(bdev);
-+
-+	return ret;
-+}
-+
-+static void unstash_bdev_file(struct block_device *bdev)
-+{
-+	__unstash_bdev_file(bdev);
-+	if (bdev_is_partition(bdev))
-+		__unstash_bdev_file(bdev_whole(bdev));
-+}
-+
- /**
-  * bdev_open - open a block device
-  * @bdev: block device to open
-@@ -891,12 +986,17 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
- 	ret = -EBUSY;
- 	if (!bdev_may_open(bdev, mode))
- 		goto put_module;
-+
-+	ret = stash_bdev_file(bdev);
-+	if (ret)
-+		goto put_module;
-+
- 	if (bdev_is_partition(bdev))
- 		ret = blkdev_get_part(bdev, mode);
- 	else
- 		ret = blkdev_get_whole(bdev, mode);
- 	if (ret)
--		goto put_module;
-+		goto unstash_bdev_file;
- 	bdev_claim_write_access(bdev, mode);
- 	if (holder) {
- 		bd_finish_claiming(bdev, holder, hops);
-@@ -922,6 +1022,9 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
- 	init_bdev_file(bdev_file, bdev, mode, holder);
- 
- 	return 0;
-+
-+unstash_bdev_file:
-+	unstash_bdev_file(bdev);
- put_module:
- 	module_put(disk->fops->owner);
- abort_claiming:
-@@ -932,36 +1035,6 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
- 	return ret;
- }
- 
--/*
-- * If BLK_OPEN_WRITE_IOCTL is set then this is a historical quirk
-- * associated with the floppy driver where it has allowed ioctls if the
-- * file was opened for writing, but does not allow reads or writes.
-- * Make sure that this quirk is reflected in @f_flags.
-- *
-- * It can also happen if a block device is opened as O_RDWR | O_WRONLY.
-- */
--static unsigned blk_to_file_flags(blk_mode_t mode)
--{
--	unsigned int flags = 0;
--
--	if ((mode & (BLK_OPEN_READ | BLK_OPEN_WRITE)) ==
--	    (BLK_OPEN_READ | BLK_OPEN_WRITE))
--		flags |= O_RDWR;
--	else if (mode & BLK_OPEN_WRITE_IOCTL)
--		flags |= O_RDWR | O_WRONLY;
--	else if (mode & BLK_OPEN_WRITE)
--		flags |= O_WRONLY;
--	else if (mode & BLK_OPEN_READ)
--		flags |= O_RDONLY; /* homeopathic, because O_RDONLY is 0 */
--	else
--		WARN_ON_ONCE(true);
--
--	if (mode & BLK_OPEN_NDELAY)
--		flags |= O_NDELAY;
--
--	return flags;
--}
--
- struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
- 				   const struct blk_holder_ops *hops)
+ static inline struct block_device *iomap_bdev(const struct iomap *iomap)
  {
-@@ -1073,6 +1146,8 @@ void bdev_release(struct file *bdev_file)
- 		blkdev_put_part(bdev);
- 	else
- 		blkdev_put_whole(bdev);
-+
-+	unstash_bdev_file(bdev);
- 	mutex_unlock(&disk->open_mutex);
+-	return iomap->bdev;
++	return iomap->bdev_file ? file_bdev(iomap->bdev_file) : NULL;
+ }
  
- 	module_put(disk->fops->owner);
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cb1526ec44b5..22f736908cbe 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -70,6 +70,7 @@ struct block_device {
- #endif
- 	bool			bd_ro_warned;
- 	int			bd_writers;
-+	int			stash_count;
- 	/*
- 	 * keep this out-of-line as it's both big and not needed in the fast
- 	 * path
+ static inline void iomap_set_bdev_file(struct iomap *iomap,
+ 				       struct file *bdev_file)
+ {
+-	iomap->bdev = bdev_file ? file_bdev(bdev_file) : NULL;
++	iomap->bdev_file = bdev_file;
+ }
+ 
+ static inline sector_t iomap_sector(const struct iomap *iomap, loff_t pos)
 -- 
 2.39.2
 
