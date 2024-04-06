@@ -1,28 +1,28 @@
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6534932C96;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB962E652;
 	Sat,  6 Apr 2024 09:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712395071; cv=none; b=Bex5Wc2JpROnz18qAvq4HxU5ddDxjPJrLX8AACafDCOG852gwQuGdBePAw5fkc49HtYEeK+d/HLuoP4dqW55AF6NkfCybEn454gDFyyQVXDN/XT0TuqRYvRkGsXcNF+G1ZRfjQHqeBaEm7ZLcrSEl/1VYe+MD/+yMdB2OdjT+UQ=
+	t=1712395072; cv=none; b=k7cpQ7W5gKQYQ5zows6F8YozHqr/Hs3BrecZy4Hgtz96QOa8W+KN47m9zHWyBJ2KJfbetscEPyqNeZ8DmNEQMhOf4v6GLx0bLHTtyhxw64JocD0yaWn/mlQPkgTPoutCT32yOnfBydA5t7rrCF9Lew1U0ZT0dU8a7Td0wnjLtuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712395071; c=relaxed/simple;
-	bh=yQzU2QHnCpMIuA4/zDVO/ONCg4v2ItF7Sta4U2/L2nk=;
+	s=arc-20240116; t=1712395072; c=relaxed/simple;
+	bh=g8gx/vP7JXR9bQcNllNLkqVOlxmyZfK7k0VNv7WlN94=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SGyQKpzX/lEPpvme5IvxgoILzYUTi3p5QRIhVolTax4GPJ/E2E7czbpnmXswJGEQQRkrIUHzGGHnrPMOJKvT7SpLjzfLhH3Obz+DCOoYLFsN655gcqIIHA4KUWh1O3MalqoMR+KAAJhRz4W+R5vrucvUKdWedXqXhuOmQOqmLJw=
+	 MIME-Version; b=LC+X4X4DTaOBBpcD/oxDs+HObX1D5zLz7eolbqJMI7FcjfcXa/AIQmqBHeHi2iGcMHkdJTUddWZsFSeGlM+OcaRZgxRjEdO9GP88oHSYrvBjR/ClL/c5Y5qBG795LP+3e2DOEc5yR9JtXG1LjUycfvGMJcGk47UpgxjC2S7SVfA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVB967G7z4f3lft;
-	Sat,  6 Apr 2024 17:17:37 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVBH1vVBz4f3kJv;
+	Sat,  6 Apr 2024 17:17:43 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 5759B1A016E;
-	Sat,  6 Apr 2024 17:17:46 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 9017B1A0175;
+	Sat,  6 Apr 2024 17:17:47 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S14;
-	Sat, 06 Apr 2024 17:17:46 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S17;
+	Sat, 06 Apr 2024 17:17:47 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: jack@suse.cz,
 	hch@lst.de,
@@ -34,9 +34,9 @@ Cc: linux-fsdevel@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	yukuai3@huawei.com
-Subject: [PATCH vfs.all 10/26] gfs2: prevent direct access of bd_inode
-Date: Sat,  6 Apr 2024 17:09:14 +0800
-Message-Id: <20240406090930.2252838-11-yukuai1@huaweicloud.com>
+Subject: [PATCH vfs.all 13/26] ext4: prevent direct access of bd_inode
+Date: Sat,  6 Apr 2024 17:09:17 +0800
+Message-Id: <20240406090930.2252838-14-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
@@ -47,10 +47,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S14
-X-Coremail-Antispam: 1UD129KBjvJXoW7uryfury8KrW3tF45Wr1DAwb_yoW8GFy8pF
-	9xJF1UuF4kWFnIgaykZF4ft3WUuaykG3y0v34kZw1YvrsrKw13KrZFkF4DGa15Ja9rJws0
-	ga1ak3yavr1aqrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S17
+X-Coremail-Antispam: 1UD129KBjvJXoWxWFW7WrW8ZF4DWFyDAF1DJrb_yoW5Ww48pa
+	s8AF15Cr4UZFyj9a9xGFZrta47uw18Kayxuryxu34a9rZIqrySvFy8KF1jvFWjqrW8Zr97
+	XF1jkryrCr1FkrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
 	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
@@ -68,43 +68,75 @@ X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Now that all filesystems stash the bdev file, it's ok to get inode
+Now that all filesystems stash the bdev file, it's ok to get mapping
 from the file.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- fs/gfs2/glock.c      | 2 +-
- fs/gfs2/ops_fstype.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/ext4/dir.c       | 2 +-
+ fs/ext4/ext4_jbd2.c | 2 +-
+ fs/ext4/super.c     | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/fs/gfs2/glock.c b/fs/gfs2/glock.c
-index 34540f9d011c..95ade8979f6b 100644
---- a/fs/gfs2/glock.c
-+++ b/fs/gfs2/glock.c
-@@ -1227,7 +1227,7 @@ int gfs2_glock_get(struct gfs2_sbd *sdp, u64 number,
- 	mapping = gfs2_glock2aspace(gl);
- 	if (mapping) {
-                 mapping->a_ops = &gfs2_meta_aops;
--		mapping->host = s->s_bdev->bd_inode;
-+		mapping->host = file_inode(s->s_bdev_file);
- 		mapping->flags = 0;
- 		mapping_set_gfp_mask(mapping, GFP_NOFS);
- 		mapping->i_private_data = NULL;
-diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
-index 572d58e86296..4384cb39b06c 100644
---- a/fs/gfs2/ops_fstype.c
-+++ b/fs/gfs2/ops_fstype.c
-@@ -114,7 +114,7 @@ static struct gfs2_sbd *init_sbd(struct super_block *sb)
+diff --git a/fs/ext4/dir.c b/fs/ext4/dir.c
+index 3985f8c33f95..0733bc1eec7a 100644
+--- a/fs/ext4/dir.c
++++ b/fs/ext4/dir.c
+@@ -192,7 +192,7 @@ static int ext4_readdir(struct file *file, struct dir_context *ctx)
+ 					(PAGE_SHIFT - inode->i_blkbits);
+ 			if (!ra_has_index(&file->f_ra, index))
+ 				page_cache_sync_readahead(
+-					sb->s_bdev->bd_inode->i_mapping,
++					sb->s_bdev_file->f_mapping,
+ 					&file->f_ra, file,
+ 					index, 1);
+ 			file->f_ra.prev_pos = (loff_t)index << PAGE_SHIFT;
+diff --git a/fs/ext4/ext4_jbd2.c b/fs/ext4/ext4_jbd2.c
+index 5d8055161acd..dbb9aff07ac1 100644
+--- a/fs/ext4/ext4_jbd2.c
++++ b/fs/ext4/ext4_jbd2.c
+@@ -206,7 +206,7 @@ static void ext4_journal_abort_handle(const char *caller, unsigned int line,
  
- 	address_space_init_once(mapping);
- 	mapping->a_ops = &gfs2_rgrp_aops;
--	mapping->host = sb->s_bdev->bd_inode;
-+	mapping->host = file_inode(sb->s_bdev_file);
- 	mapping->flags = 0;
- 	mapping_set_gfp_mask(mapping, GFP_NOFS);
- 	mapping->i_private_data = NULL;
+ static void ext4_check_bdev_write_error(struct super_block *sb)
+ {
+-	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
++	struct address_space *mapping = sb->s_bdev_file->f_mapping;
+ 	struct ext4_sb_info *sbi = EXT4_SB(sb);
+ 	int err;
+ 
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index cf4666b04d2e..2a1afe6c77f2 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -244,7 +244,7 @@ static struct buffer_head *__ext4_sb_bread_gfp(struct super_block *sb,
+ struct buffer_head *ext4_sb_bread(struct super_block *sb, sector_t block,
+ 				   blk_opf_t op_flags)
+ {
+-	gfp_t gfp = mapping_gfp_constraint(sb->s_bdev->bd_inode->i_mapping,
++	gfp_t gfp = mapping_gfp_constraint(sb->s_bdev_file->f_mapping,
+ 			~__GFP_FS) | __GFP_MOVABLE;
+ 
+ 	return __ext4_sb_bread_gfp(sb, block, op_flags, gfp);
+@@ -253,7 +253,7 @@ struct buffer_head *ext4_sb_bread(struct super_block *sb, sector_t block,
+ struct buffer_head *ext4_sb_bread_unmovable(struct super_block *sb,
+ 					    sector_t block)
+ {
+-	gfp_t gfp = mapping_gfp_constraint(sb->s_bdev->bd_inode->i_mapping,
++	gfp_t gfp = mapping_gfp_constraint(sb->s_bdev_file->f_mapping,
+ 			~__GFP_FS);
+ 
+ 	return __ext4_sb_bread_gfp(sb, block, 0, gfp);
+@@ -5552,7 +5552,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
+ 	 * used to detect the metadata async write error.
+ 	 */
+ 	spin_lock_init(&sbi->s_bdev_wb_lock);
+-	errseq_check_and_advance(&sb->s_bdev->bd_inode->i_mapping->wb_err,
++	errseq_check_and_advance(&sb->s_bdev_file->f_mapping->wb_err,
+ 				 &sbi->s_bdev_wb_err);
+ 	EXT4_SB(sb)->s_mount_state |= EXT4_ORPHAN_FS;
+ 	ext4_orphan_cleanup(sb, es);
 -- 
 2.39.2
 
