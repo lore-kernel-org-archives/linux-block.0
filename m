@@ -1,28 +1,28 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F2937142;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B67636B0E;
 	Sat,  6 Apr 2024 09:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712395073; cv=none; b=oS0WVoXHYIxd/MMR/EkVYsJCitek9sOgCXhr2PRHrlkwT5q/WaqUKdXm4u05M/+hhNW6O5K3kqHkgcDB4pLokXENbHy8PFLyMjNpuk1g6tg1kNOEfMw2fRYXoIp7Rp5e6VK47cvYsU32pAkZDvkTXqcT3duZeTPcdpMsNasBhWs=
+	t=1712395074; cv=none; b=GKcK/BhF7BdN1gd5QOdmZg/Y1XAK+61k7AYzYJDCjD3GfQB8RglIvghLcaVYU9xJWJl+E/f3ILO4HhklaY3t8cYSUS98Oio56ZuenMV9Lott5IOheXV3Ae9x6Q9MBcMiMJSkF+RKeDUlz+xk4GI4MMkSpHrOUCoSezrx5wwZXDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712395073; c=relaxed/simple;
-	bh=Yy2Aw+6/50D+yEfctlUSXmAe2PKqrekApIQwCQffqrY=;
+	s=arc-20240116; t=1712395074; c=relaxed/simple;
+	bh=bCFy/k/FvtAgI9RRhfoHH1YorOQQiJPbNFphSp0CF/c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bf4+C51gbtSUlCqfuoBSQnIemPaBz0CMIL9w6c7cucwSAKXanOFgIN7F0tCl59yrMDKKexKuKbPKfUZ0K0xXx/cygjOx+rfVqphg4HTR6p3LNNcNdLAgkqBDxh5kkoeWO3P7kVGBBcG3mBEwhd7sMUIWDHzGw5Jt0XHoyyJKeB8=
+	 MIME-Version; b=e2XnWv7hUspn+CuMmzDlrfLpHcQ0sKpjs3UGX45R2IA++jh24e6Hwhk6i51Re3sFBi0QcQlEPDZwapvZdfzGmc7Q1sl5wusJ6S2uoT3a5RXpcC31NrbM2omqI5zz+d1K9Kl1mYmjXZVxgkAplCyd2azJfNVtaPF5Qg5M3dP9gHw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VBVBG46V9z4f3khn;
-	Sat,  6 Apr 2024 17:17:42 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VBVBF5Jqnz4f3khX;
+	Sat,  6 Apr 2024 17:17:41 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 39D911A0172;
-	Sat,  6 Apr 2024 17:17:49 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 650241A0C9A;
+	Sat,  6 Apr 2024 17:17:48 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S21;
-	Sat, 06 Apr 2024 17:17:49 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S19;
+	Sat, 06 Apr 2024 17:17:48 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: jack@suse.cz,
 	hch@lst.de,
@@ -34,9 +34,9 @@ Cc: linux-fsdevel@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	yukuai3@huawei.com
-Subject: [PATCH vfs.all 17/26] block2mtd: prevent direct access of bd_inode
-Date: Sat,  6 Apr 2024 17:09:21 +0800
-Message-Id: <20240406090930.2252838-18-yukuai1@huaweicloud.com>
+Subject: [PATCH vfs.all 15/26] s390/dasd: use bdev api in dasd_format()
+Date: Sat,  6 Apr 2024 17:09:19 +0800
+Message-Id: <20240406090930.2252838-16-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
@@ -47,68 +47,53 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S21
-X-Coremail-Antispam: 1UD129KBjvJXoW7ur15Ww1DJw1kJFy3Zry7Jrb_yoW8XryUpa
-	sxuFWUJryjkr1UWay8XF1DXry0q3Wqya1xuryUA34SgryfXrW2ka9xtas8J34rtFZrC3y5
-	ZF1qkrW8Cr48urJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2
-	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-	vE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1lIxAI
-	cVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2js
-	IEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUFgAwUUUUU
+X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S19
+X-Coremail-Antispam: 1UD129KBjvdXoW7XFWrWFWfWw45CFyfZw1xGrg_yoWDJFc_ZF
+	1fKryftr18Cr93Cr1YvF15Zr9Ykr1vgF1fZr9xtr1fWrnrXFsxX3ykurs8JrWkAayUC3s5
+	JFnrXr1Iyr15WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbSAYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
+	0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2
+	WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkE
+	bVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY
+	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aV
+	CY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZo7tUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Now that block2mtd stash the file of opened bdev, it's ok to get inode
-from the file.
+Avoid to access bd_inode directly, prepare to remove bd_inode from
+block_devcie.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- drivers/mtd/devices/block2mtd.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/s390/block/dasd_ioctl.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/mtd/devices/block2mtd.c b/drivers/mtd/devices/block2mtd.c
-index caacdc0a3819..1834692790a6 100644
---- a/drivers/mtd/devices/block2mtd.c
-+++ b/drivers/mtd/devices/block2mtd.c
-@@ -265,6 +265,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 	struct file *bdev_file;
- 	struct block_device *bdev;
- 	struct block2mtd_dev *dev;
-+	loff_t size;
- 	char *name;
- 
- 	if (!devname)
-@@ -291,7 +292,8 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 		goto err_free_block2mtd;
+diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
+index 7e0ed7032f76..c1201590f343 100644
+--- a/drivers/s390/block/dasd_ioctl.c
++++ b/drivers/s390/block/dasd_ioctl.c
+@@ -215,8 +215,9 @@ dasd_format(struct dasd_block *block, struct format_data_t *fdata)
+ 	 * enabling the device later.
+ 	 */
+ 	if (fdata->start_unit == 0) {
+-		block->gdp->part0->bd_inode->i_blkbits =
+-			blksize_bits(fdata->blksize);
++		rc = set_blocksize(block->gdp->part0, fdata->blksize);
++		if (rc)
++			return rc;
  	}
  
--	if ((long)bdev->bd_inode->i_size % erase_size) {
-+	size = i_size_read(file_inode(bdev_file));
-+	if ((long)size % erase_size) {
- 		pr_err("erasesize must be a divisor of device size\n");
- 		goto err_free_block2mtd;
- 	}
-@@ -309,7 +311,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 
- 	dev->mtd.name = name;
- 
--	dev->mtd.size = bdev->bd_inode->i_size & PAGE_MASK;
-+	dev->mtd.size = size & PAGE_MASK;
- 	dev->mtd.erasesize = erase_size;
- 	dev->mtd.writesize = 1;
- 	dev->mtd.writebufsize = PAGE_SIZE;
+ 	rc = base->discipline->format_device(base, fdata, 1);
 -- 
 2.39.2
 
