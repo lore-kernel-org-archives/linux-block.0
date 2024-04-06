@@ -1,28 +1,28 @@
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ED73BBCE;
-	Sat,  6 Apr 2024 09:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF8522EF4;
+	Sat,  6 Apr 2024 09:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712395076; cv=none; b=okpmqc8lMpMyrhuljCPO/S6ZPYD7XpJ1gKR+6y+cy8g92cj9GWDfK4EhaPkipUE64X0ieWP2GyZSOQnYScrvB7GGQ1U8vsh7GhHhGnWPi3uX7kxMSkWMR/oCU/8Qp/w6IQh49Gizsaje6FI9rN//udBoua6ypx+A0Vew70+ScPI=
+	t=1712395077; cv=none; b=JxnvO5PiQ6kzVxdikMzz1GNwI0si+A/j4L1ui/g3RfYKhwH834BMHW6SXcFc3Ywdh3caYNgxJT9snCEr8ZTJaYOGjUbjic+afanqOKPYC+QjpzIXB1Rt9Eri7TxJuf4iwZStkzUNafDBR3SNSVNyOtj/edpn/1Df4rc48yP7yNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712395076; c=relaxed/simple;
-	bh=sPl5OvusNK1tKYCPnrwI3ydu+x8lrDSjoRqJ2OSjP9M=;
+	s=arc-20240116; t=1712395077; c=relaxed/simple;
+	bh=uuwI0ExCc5LHc3HCq/LUZaJS3kD1vKo2Qex/s185n0c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r48t4DsImJKtylWoaH1JI26dH4mxE8VL5oHnR+Wl2680BFneWpFTlox4zGFQBbEi3qOxOeN4gQeDpk/1dhLTkKHMdxfmHvYVvfdiaeQMGKqGAnttVNTuqvbwGkOCioj57iKTg5+6vkcFRpmH8AfBelQhlYKL1Isv3x69Aakpiq8=
+	 MIME-Version; b=T6fu3aoXN/K0Uvd1W/0JL9/Q0Oc/9LV4+25OtNRd6XVFfNg/c279cMX5Vm2PW7nSbORbcHVQyMfEaUFtC5gt73Q2HWylze/QTOqr1e0fd4cFVLpXMlm1wCnDHHfXs9fHOu6OBsAiDinYT6Cy2zN7LbCxn6DxNI3R0iUCloaXguA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVBM2mltz4f3k6Z;
-	Sat,  6 Apr 2024 17:17:47 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVBJ0JTQz4f3lfx;
+	Sat,  6 Apr 2024 17:17:44 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id ACC8B1A0176;
-	Sat,  6 Apr 2024 17:17:51 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 861671A058D;
+	Sat,  6 Apr 2024 17:17:52 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S27;
-	Sat, 06 Apr 2024 17:17:51 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S29;
+	Sat, 06 Apr 2024 17:17:52 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: jack@suse.cz,
 	hch@lst.de,
@@ -34,9 +34,9 @@ Cc: linux-fsdevel@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	yukuai3@huawei.com
-Subject: [PATCH vfs.all 23/26] iomap: add helpers helpers to get and set bdev
-Date: Sat,  6 Apr 2024 17:09:27 +0800
-Message-Id: <20240406090930.2252838-24-yukuai1@huaweicloud.com>
+Subject: [PATCH vfs.all 25/26] buffer: add helpers to get and set bdev
+Date: Sat,  6 Apr 2024 17:09:29 +0800
+Message-Id: <20240406090930.2252838-26-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
@@ -47,10 +47,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S27
-X-Coremail-Antispam: 1UD129KBjvAXoW3Zr43XFW8Cr4kJFW7Xw1DZFb_yoW8Ww45uo
-	WYqw47Jr48KryUJayrCr4rGFW7X3Zxtw4kAFyUWrZ8Xryftw1Uuw47GanrXa47W3s5KFW7
-	A343t3y5JF4kWFs5n29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S29
+X-Coremail-Antispam: 1UD129KBjvAXoW3KF17XF18uw4ktw15Gr47CFg_yoW8ZrW7Ao
+	Wavw4xXr48t3sFy3yIkryFqFyUJasxtrZ5JF48WFZ8ua4ftr1q9ry3Kw12ya4xGw1FkryY
+	grW5Jw45XF4Uu3ykn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
 	AaLaJ3UjIYCTnIWjp_UUUYu7kC6x804xWl14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK
 	8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF
 	0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
@@ -69,459 +69,567 @@ X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 From: Yu Kuai <yukuai3@huawei.com>
 
 So that we have unified APIs, there are no functional changes and
-prepare to convert iomap to use bdev_file.
+prepare to convert buffer_head to use bdev_file.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/fops.c           |  2 +-
- fs/btrfs/inode.c       |  2 +-
- fs/buffer.c            |  2 +-
- fs/erofs/data.c        | 20 ++++++++++++++++----
- fs/erofs/internal.h    |  1 +
- fs/erofs/zmap.c        |  2 +-
- fs/ext2/inode.c        |  2 +-
- fs/ext4/inode.c        |  2 +-
- fs/f2fs/data.c         | 10 ++++++++--
- fs/f2fs/f2fs.h         |  1 +
- fs/fuse/dax.c          |  2 +-
- fs/gfs2/bmap.c         |  2 +-
- fs/hpfs/file.c         |  2 +-
- fs/iomap/buffered-io.c |  8 ++++----
- fs/iomap/direct-io.c   | 11 ++++++-----
- fs/iomap/swapfile.c    |  2 +-
- fs/iomap/trace.h       |  6 ++++--
- fs/xfs/xfs_iomap.c     |  4 ++--
- fs/zonefs/file.c       |  4 ++--
- include/linux/iomap.h  | 11 +++++++++++
- 20 files changed, 65 insertions(+), 31 deletions(-)
+ block/fops.c                  |  2 +-
+ drivers/md/md-bitmap.c        |  2 +-
+ fs/affs/file.c                |  2 +-
+ fs/buffer.c                   | 10 +++++-----
+ fs/direct-io.c                |  4 ++--
+ fs/ext2/xattr.c               |  2 +-
+ fs/ext4/mmp.c                 |  2 +-
+ fs/ext4/page-io.c             |  5 ++---
+ fs/ext4/xattr.c               |  2 +-
+ fs/gfs2/aops.c                |  2 +-
+ fs/gfs2/meta_io.c             |  2 +-
+ fs/jbd2/commit.c              |  2 +-
+ fs/jbd2/journal.c             |  2 +-
+ fs/jbd2/transaction.c         |  8 ++++----
+ fs/mpage.c                    | 10 +++++-----
+ fs/nilfs2/btnode.c            |  4 ++--
+ fs/nilfs2/gcinode.c           |  2 +-
+ fs/nilfs2/mdt.c               |  2 +-
+ fs/nilfs2/page.c              |  4 ++--
+ fs/ntfs3/inode.c              |  2 +-
+ fs/reiserfs/fix_node.c        |  2 +-
+ fs/reiserfs/journal.c         |  2 +-
+ fs/reiserfs/prints.c          |  4 ++--
+ fs/reiserfs/stree.c           |  2 +-
+ fs/reiserfs/tail_conversion.c |  2 +-
+ include/linux/buffer_head.h   | 20 +++++++++++++++++++-
+ include/trace/events/block.h  |  2 +-
+ 27 files changed, 61 insertions(+), 44 deletions(-)
 
 diff --git a/block/fops.c b/block/fops.c
-index 58b427051c0d..7d177be788cd 100644
+index 7d177be788cd..edae216e31dd 100644
 --- a/block/fops.c
 +++ b/block/fops.c
-@@ -388,7 +388,7 @@ static int blkdev_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 	struct block_device *bdev = I_BDEV(inode);
- 	loff_t isize = i_size_read(inode);
+@@ -407,7 +407,7 @@ static const struct iomap_ops blkdev_iomap_ops = {
+ static int blkdev_get_block(struct inode *inode, sector_t iblock,
+ 		struct buffer_head *bh, int create)
+ {
+-	bh->b_bdev = I_BDEV(inode);
++	bh_set_bdev_file(bh, inode->i_private);
+ 	bh->b_blocknr = iblock;
+ 	set_buffer_mapped(bh);
+ 	return 0;
+diff --git a/drivers/md/md-bitmap.c b/drivers/md/md-bitmap.c
+index 059afc24c08b..fd6c95e0c625 100644
+--- a/drivers/md/md-bitmap.c
++++ b/drivers/md/md-bitmap.c
+@@ -381,7 +381,7 @@ static int read_file_page(struct file *file, unsigned long index,
+ 			}
  
--	iomap->bdev = bdev;
-+	iomap_set_bdev_file(iomap, inode->i_private);
- 	iomap->offset = ALIGN_DOWN(offset, bdev_logical_block_size(bdev));
- 	if (iomap->offset >= isize)
- 		return -EIO;
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 8cf692c708d7..e7495581bc58 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -7709,7 +7709,7 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
- 		iomap->type = IOMAP_MAPPED;
- 	}
- 	iomap->offset = start;
--	iomap->bdev = fs_info->fs_devices->latest_dev->bdev;
-+	iomap_set_bdev_file(iomap, fs_info->fs_devices->latest_dev->bdev_file);
- 	iomap->length = len;
- 	free_extent_map(em);
- 
+ 			bh->b_blocknr = block;
+-			bh->b_bdev = inode->i_sb->s_bdev;
++			bh_set_bdev_file(bh, inode->i_sb->s_bdev_file);
+ 			if (count < blocksize)
+ 				count = 0;
+ 			else
+diff --git a/fs/affs/file.c b/fs/affs/file.c
+index 04c018e19602..f15b24202aab 100644
+--- a/fs/affs/file.c
++++ b/fs/affs/file.c
+@@ -365,7 +365,7 @@ affs_get_block(struct inode *inode, sector_t block, struct buffer_head *bh_resul
+ err_alloc:
+ 	brelse(ext_bh);
+ 	clear_buffer_mapped(bh_result);
+-	bh_result->b_bdev = NULL;
++	bh_set_bdev_file(bh_result, NULL);
+ 	// unlock cache
+ 	affs_unlock_ext(inode);
+ 	return -ENOSPC;
 diff --git a/fs/buffer.c b/fs/buffer.c
-index 4f73d23c2c46..7900720fc54b 100644
+index 7900720fc54b..e4d74eb63265 100644
 --- a/fs/buffer.c
 +++ b/fs/buffer.c
+@@ -129,7 +129,7 @@ static void buffer_io_error(struct buffer_head *bh, char *msg)
+ 	if (!test_bit(BH_Quiet, &bh->b_state))
+ 		printk_ratelimited(KERN_ERR
+ 			"Buffer I/O error on dev %pg, logical block %llu%s\n",
+-			bh->b_bdev, (unsigned long long)bh->b_blocknr, msg);
++			bh_bdev(bh), (unsigned long long)bh->b_blocknr, msg);
+ }
+ 
+ /*
+@@ -1367,7 +1367,7 @@ lookup_bh_lru(struct block_device *bdev, sector_t block, unsigned size)
+ 	for (i = 0; i < BH_LRU_SIZE; i++) {
+ 		struct buffer_head *bh = __this_cpu_read(bh_lrus.bhs[i]);
+ 
+-		if (bh && bh->b_blocknr == block && bh->b_bdev == bdev &&
++		if (bh && bh->b_blocknr == block && bh_bdev(bh) == bdev &&
+ 		    bh->b_size == size) {
+ 			if (i) {
+ 				while (i) {
+@@ -1564,7 +1564,7 @@ static void discard_buffer(struct buffer_head * bh)
+ 
+ 	lock_buffer(bh);
+ 	clear_buffer_dirty(bh);
+-	bh->b_bdev = NULL;
++	bh_set_bdev_file(bh, NULL);
+ 	b_state = READ_ONCE(bh->b_state);
+ 	do {
+ 	} while (!try_cmpxchg(&bh->b_state, &b_state,
 @@ -2005,7 +2005,7 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
  {
  	loff_t offset = (loff_t)block << inode->i_blkbits;
  
--	bh->b_bdev = iomap->bdev;
-+	bh->b_bdev = iomap_bdev(iomap);
+-	bh->b_bdev = iomap_bdev(iomap);
++	bh_set_bdev_file(bh, iomap->bdev_file);
  
  	/*
  	 * Block points to offset in file we need to map, iomap contains
-diff --git a/fs/erofs/data.c b/fs/erofs/data.c
-index b0a55b4d8c30..ea149cfef88e 100644
---- a/fs/erofs/data.c
-+++ b/fs/erofs/data.c
-@@ -204,6 +204,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
- 	int id;
+@@ -2781,7 +2781,7 @@ static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
+ 	if (buffer_prio(bh))
+ 		opf |= REQ_PRIO;
  
- 	map->m_bdev = sb->s_bdev;
-+	map->m_bdev_file = sb->s_bdev_file;
- 	map->m_daxdev = EROFS_SB(sb)->dax_dev;
- 	map->m_dax_part_off = EROFS_SB(sb)->dax_part_off;
- 	map->m_fscache = EROFS_SB(sb)->s_fscache;
-@@ -220,7 +221,13 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
- 			up_read(&devs->rwsem);
- 			return 0;
- 		}
--		map->m_bdev = dif->bdev_file ? file_bdev(dif->bdev_file) : NULL;
-+		if (dif->bdev_file) {
-+			map->m_bdev = file_bdev(dif->bdev_file);
-+			map->m_bdev_file = dif->bdev_file;
-+		} else {
-+			map->m_bdev = NULL;
-+			map->m_bdev_file = NULL;
-+		}
- 		map->m_daxdev = dif->dax_dev;
- 		map->m_dax_part_off = dif->dax_part_off;
- 		map->m_fscache = dif->fscache;
-@@ -238,8 +245,13 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
- 			if (map->m_pa >= startoff &&
- 			    map->m_pa < startoff + length) {
- 				map->m_pa -= startoff;
--				map->m_bdev = dif->bdev_file ?
--					      file_bdev(dif->bdev_file) : NULL;
-+				if (dif->bdev_file) {
-+					map->m_bdev = file_bdev(dif->bdev_file);
-+					map->m_bdev_file = dif->bdev_file;
-+				} else {
-+					map->m_bdev = NULL;
-+					map->m_bdev_file = NULL;
-+				}
- 				map->m_daxdev = dif->dax_dev;
- 				map->m_dax_part_off = dif->dax_part_off;
- 				map->m_fscache = dif->fscache;
-@@ -278,7 +290,7 @@ static int erofs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 	if (flags & IOMAP_DAX)
- 		iomap->dax_dev = mdev.m_daxdev;
- 	else
--		iomap->bdev = mdev.m_bdev;
-+		iomap_set_bdev_file(iomap, mdev.m_bdev_file);
- 	iomap->length = map.m_llen;
- 	iomap->flags = 0;
- 	iomap->private = NULL;
-diff --git a/fs/erofs/internal.h b/fs/erofs/internal.h
-index 39c67119f43b..a91481178876 100644
---- a/fs/erofs/internal.h
-+++ b/fs/erofs/internal.h
-@@ -378,6 +378,7 @@ enum {
- struct erofs_map_dev {
- 	struct erofs_fscache *m_fscache;
- 	struct block_device *m_bdev;
-+	struct file *m_bdev_file;
- 	struct dax_device *m_daxdev;
- 	u64 m_dax_part_off;
+-	bio = bio_alloc(bh->b_bdev, 1, opf, GFP_NOIO);
++	bio = bio_alloc(bh_bdev(bh), 1, opf, GFP_NOIO);
  
-diff --git a/fs/erofs/zmap.c b/fs/erofs/zmap.c
-index e313c936351d..71e6c5342d72 100644
---- a/fs/erofs/zmap.c
-+++ b/fs/erofs/zmap.c
-@@ -739,7 +739,7 @@ static int z_erofs_iomap_begin_report(struct inode *inode, loff_t offset,
- 	if (ret < 0)
- 		return ret;
+ 	fscrypt_set_bio_crypt_ctx_bh(bio, bh, GFP_NOIO);
  
--	iomap->bdev = inode->i_sb->s_bdev;
-+	iomap_set_bdev_file(iomap, inode->i_sb->s_bdev_file);
- 	iomap->offset = map.m_la;
- 	iomap->length = map.m_llen;
- 	if (map.m_flags & EROFS_MAP_MAPPED) {
-diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
-index f3d570a9302b..6286d1578426 100644
---- a/fs/ext2/inode.c
-+++ b/fs/ext2/inode.c
-@@ -842,7 +842,7 @@ static int ext2_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 	if (flags & IOMAP_DAX)
- 		iomap->dax_dev = sbi->s_daxdev;
- 	else
--		iomap->bdev = inode->i_sb->s_bdev;
-+		iomap_set_bdev_file(iomap, inode->i_sb->s_bdev_file);
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 62c97ff9e852..49475f530e0f 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -673,7 +673,7 @@ static inline int dio_new_bio(struct dio *dio, struct dio_submit *sdio,
+ 	sector = start_sector << (sdio->blkbits - 9);
+ 	nr_pages = bio_max_segs(sdio->pages_in_io);
+ 	BUG_ON(nr_pages <= 0);
+-	dio_bio_alloc(dio, sdio, map_bh->b_bdev, sector, nr_pages);
++	dio_bio_alloc(dio, sdio, bh_bdev(map_bh), sector, nr_pages);
+ 	sdio->boundary = 0;
+ out:
+ 	return ret;
+@@ -948,7 +948,7 @@ static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
+ 					map_bh->b_blocknr << sdio->blkfactor;
+ 				if (buffer_new(map_bh)) {
+ 					clean_bdev_aliases(
+-						map_bh->b_bdev,
++						bh_bdev(map_bh),
+ 						map_bh->b_blocknr,
+ 						map_bh->b_size >> i_blkbits);
+ 				}
+diff --git a/fs/ext2/xattr.c b/fs/ext2/xattr.c
+index c885dcc3bd0d..42e595e87a74 100644
+--- a/fs/ext2/xattr.c
++++ b/fs/ext2/xattr.c
+@@ -80,7 +80,7 @@
+ 	} while (0)
+ # define ea_bdebug(bh, f...) do { \
+ 		printk(KERN_DEBUG "block %pg:%lu: ", \
+-			bh->b_bdev, (unsigned long) bh->b_blocknr); \
++			bh_bdev(bh), (unsigned long) bh->b_blocknr); \
+ 		printk(f); \
+ 		printk("\n"); \
+ 	} while (0)
+diff --git a/fs/ext4/mmp.c b/fs/ext4/mmp.c
+index bd946d0c71b7..5641bd34d021 100644
+--- a/fs/ext4/mmp.c
++++ b/fs/ext4/mmp.c
+@@ -384,7 +384,7 @@ int ext4_multi_mount_protect(struct super_block *sb,
  
- 	if (ret == 0) {
- 		/*
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 537803250ca9..588af2604bb8 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3235,7 +3235,7 @@ static void ext4_set_iomap(struct inode *inode, struct iomap *iomap,
- 	if (flags & IOMAP_DAX)
- 		iomap->dax_dev = EXT4_SB(inode->i_sb)->s_daxdev;
- 	else
--		iomap->bdev = inode->i_sb->s_bdev;
-+		iomap_set_bdev_file(iomap, inode->i_sb->s_bdev_file);
- 	iomap->offset = (u64) map->m_lblk << blkbits;
- 	iomap->length = (u64) map->m_len << blkbits;
- 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index d9494b5fc7c1..8002a5b511d9 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -1499,10 +1499,12 @@ static bool f2fs_map_blocks_cached(struct inode *inode,
- 		struct f2fs_dev_info *dev = &sbi->devs[bidx];
- 
- 		map->m_bdev = dev->bdev;
-+		map->m_bdev_file = dev->bdev_file;
- 		map->m_pblk -= dev->start_blk;
- 		map->m_len = min(map->m_len, dev->end_blk + 1 - map->m_pblk);
- 	} else {
- 		map->m_bdev = inode->i_sb->s_bdev;
-+		map->m_bdev_file = inode->i_sb->s_bdev_file;
- 	}
- 	return true;
- }
-@@ -1534,6 +1536,7 @@ int f2fs_map_blocks(struct inode *inode, struct f2fs_map_blocks *map, int flag)
- 		goto out;
- 
- 	map->m_bdev = inode->i_sb->s_bdev;
-+	map->m_bdev_file = inode->i_sb->s_bdev_file;
- 	map->m_multidev_dio =
- 		f2fs_allow_multi_device_dio(F2FS_I_SB(inode), flag);
- 
-@@ -1651,8 +1654,10 @@ int f2fs_map_blocks(struct inode *inode, struct f2fs_map_blocks *map, int flag)
- 		map->m_pblk = blkaddr;
- 		map->m_len = 1;
- 
--		if (map->m_multidev_dio)
-+		if (map->m_multidev_dio) {
- 			map->m_bdev = FDEV(bidx).bdev;
-+			map->m_bdev_file = FDEV(bidx).bdev_file;
-+		}
- 	} else if ((map->m_pblk != NEW_ADDR &&
- 			blkaddr == (map->m_pblk + ofs)) ||
- 			(map->m_pblk == NEW_ADDR && blkaddr == NEW_ADDR) ||
-@@ -1725,6 +1730,7 @@ int f2fs_map_blocks(struct inode *inode, struct f2fs_map_blocks *map, int flag)
- 			bidx = f2fs_target_device_index(sbi, map->m_pblk);
- 
- 			map->m_bdev = FDEV(bidx).bdev;
-+			map->m_bdev_file = FDEV(bidx).bdev_file;
- 			map->m_pblk -= FDEV(bidx).start_blk;
- 
- 			if (map->m_may_create)
-@@ -4189,7 +4195,7 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 		iomap->length = blks_to_bytes(inode, map.m_len);
- 		iomap->type = IOMAP_MAPPED;
- 		iomap->flags |= IOMAP_F_MERGED;
--		iomap->bdev = map.m_bdev;
-+		iomap_set_bdev_file(iomap, map.m_bdev_file);
- 		iomap->addr = blks_to_bytes(inode, map.m_pblk);
- 	} else {
- 		if (flags & IOMAP_WRITE)
-diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
-index fced2b7652f4..49894ac4f7ff 100644
---- a/fs/f2fs/f2fs.h
-+++ b/fs/f2fs/f2fs.h
-@@ -699,6 +699,7 @@ struct extent_tree_info {
- 
- struct f2fs_map_blocks {
- 	struct block_device *m_bdev;	/* for multi-device dio */
-+	struct file *m_bdev_file;	/* for multi-device dio */
- 	block_t m_pblk;
- 	block_t m_lblk;
- 	unsigned int m_len;
-diff --git a/fs/fuse/dax.c b/fs/fuse/dax.c
-index 12ef91d170bb..1fbc1c5688ca 100644
---- a/fs/fuse/dax.c
-+++ b/fs/fuse/dax.c
-@@ -575,7 +575,7 @@ static int fuse_iomap_begin(struct inode *inode, loff_t pos, loff_t length,
- 
- 	iomap->offset = pos;
- 	iomap->flags = 0;
--	iomap->bdev = NULL;
-+	iomap_set_bdev_file(iomap, NULL);
- 	iomap->dax_dev = fc->dax->dev;
+ 	BUILD_BUG_ON(sizeof(mmp->mmp_bdevname) < BDEVNAME_SIZE);
+ 	snprintf(mmp->mmp_bdevname, sizeof(mmp->mmp_bdevname),
+-		 "%pg", bh->b_bdev);
++		 "%pg", bh_bdev(bh));
  
  	/*
-diff --git a/fs/gfs2/bmap.c b/fs/gfs2/bmap.c
-index 789af5c8fade..20eb2db774b0 100644
---- a/fs/gfs2/bmap.c
-+++ b/fs/gfs2/bmap.c
-@@ -926,7 +926,7 @@ static int __gfs2_iomap_get(struct inode *inode, loff_t pos, loff_t length,
- 		iomap->flags |= IOMAP_F_GFS2_BOUNDARY;
+ 	 * Start a kernel thread to update the MMP block periodically.
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 312bc6813357..1b02b6a28eca 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -93,8 +93,7 @@ struct ext4_io_end_vec *ext4_last_io_end_vec(ext4_io_end_t *io_end)
+ static void buffer_io_error(struct buffer_head *bh)
+ {
+ 	printk_ratelimited(KERN_ERR "Buffer I/O error on device %pg, logical block %llu\n",
+-		       bh->b_bdev,
+-			(unsigned long long)bh->b_blocknr);
++			   bh_bdev(bh), (unsigned long long)bh->b_blocknr);
+ }
  
- out:
--	iomap->bdev = inode->i_sb->s_bdev;
-+	iomap_set_bdev_file(iomap, inode->i_sb->s_bdev_file);
- unlock:
- 	up_read(&ip->i_rw_mutex);
- 	return ret;
-diff --git a/fs/hpfs/file.c b/fs/hpfs/file.c
-index 1bb8d97cd9ae..77c01a9252c7 100644
---- a/fs/hpfs/file.c
-+++ b/fs/hpfs/file.c
-@@ -128,7 +128,7 @@ static int hpfs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 	if (WARN_ON_ONCE(flags & (IOMAP_WRITE | IOMAP_ZERO)))
- 		return -EINVAL;
- 
--	iomap->bdev = inode->i_sb->s_bdev;
-+	iomap_set_bdev_file(iomap, inode->i_sb->s_bdev_file);
- 	iomap->offset = offset;
- 
- 	hpfs_lock(sb);
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index 4e8e41c8b3c0..66a83c84d11d 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -415,7 +415,7 @@ static loff_t iomap_readpage_iter(const struct iomap_iter *iter,
- 
- 		if (ctx->rac) /* same as readahead_gfp_mask */
- 			gfp |= __GFP_NORETRY | __GFP_NOWARN;
--		ctx->bio = bio_alloc(iomap->bdev, bio_max_segs(nr_vecs),
-+		ctx->bio = bio_alloc(iomap_bdev(iomap), bio_max_segs(nr_vecs),
- 				     REQ_OP_READ, gfp);
- 		/*
- 		 * If the bio_alloc fails, try it again for a single page to
-@@ -423,7 +423,7 @@ static loff_t iomap_readpage_iter(const struct iomap_iter *iter,
- 		 * what do_mpage_read_folio does.
- 		 */
- 		if (!ctx->bio) {
--			ctx->bio = bio_alloc(iomap->bdev, 1, REQ_OP_READ,
-+			ctx->bio = bio_alloc(iomap_bdev(iomap), 1, REQ_OP_READ,
- 					     orig_gfp);
+ static void ext4_finish_bio(struct bio *bio)
+@@ -397,7 +396,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
+ 	 * bio_alloc will _always_ be able to allocate a bio if
+ 	 * __GFP_DIRECT_RECLAIM is set, see comments for bio_alloc_bioset().
+ 	 */
+-	bio = bio_alloc(bh->b_bdev, BIO_MAX_VECS, REQ_OP_WRITE, GFP_NOIO);
++	bio = bio_alloc(bh_bdev(bh), BIO_MAX_VECS, REQ_OP_WRITE, GFP_NOIO);
+ 	fscrypt_set_bio_crypt_ctx_bh(bio, bh, GFP_NOIO);
+ 	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+ 	bio->bi_end_io = ext4_end_bio;
+diff --git a/fs/ext4/xattr.c b/fs/ext4/xattr.c
+index b67a176bfcf9..005af215e24a 100644
+--- a/fs/ext4/xattr.c
++++ b/fs/ext4/xattr.c
+@@ -68,7 +68,7 @@
+ 	       inode->i_sb->s_id, inode->i_ino, ##__VA_ARGS__)
+ # define ea_bdebug(bh, fmt, ...)					\
+ 	printk(KERN_DEBUG "block %pg:%lu: " fmt "\n",			\
+-	       bh->b_bdev, (unsigned long)bh->b_blocknr, ##__VA_ARGS__)
++	       bh_bdev(bh), (unsigned long)bh->b_blocknr, ##__VA_ARGS__)
+ #else
+ # define ea_idebug(inode, fmt, ...)	no_printk(fmt, ##__VA_ARGS__)
+ # define ea_bdebug(bh, fmt, ...)	no_printk(fmt, ##__VA_ARGS__)
+diff --git a/fs/gfs2/aops.c b/fs/gfs2/aops.c
+index 974aca9c8ea8..24b6cf9021ca 100644
+--- a/fs/gfs2/aops.c
++++ b/fs/gfs2/aops.c
+@@ -622,7 +622,7 @@ static void gfs2_discard(struct gfs2_sbd *sdp, struct buffer_head *bh)
+ 			spin_unlock(&sdp->sd_ail_lock);
  		}
- 		if (ctx->rac)
-@@ -662,7 +662,7 @@ static int iomap_read_folio_sync(loff_t block_start, struct folio *folio,
- 	struct bio_vec bvec;
- 	struct bio bio;
+ 	}
+-	bh->b_bdev = NULL;
++	bh_set_bdev_file(bh, NULL);
+ 	clear_buffer_mapped(bh);
+ 	clear_buffer_req(bh);
+ 	clear_buffer_new(bh);
+diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
+index f814054c8cd0..2052d3fc2c24 100644
+--- a/fs/gfs2/meta_io.c
++++ b/fs/gfs2/meta_io.c
+@@ -218,7 +218,7 @@ static void gfs2_submit_bhs(blk_opf_t opf, struct buffer_head *bhs[], int num)
+ 		struct buffer_head *bh = *bhs;
+ 		struct bio *bio;
  
--	bio_init(&bio, iomap->bdev, &bvec, 1, REQ_OP_READ);
-+	bio_init(&bio, iomap_bdev(iomap), &bvec, 1, REQ_OP_READ);
- 	bio.bi_iter.bi_sector = iomap_sector(iomap, block_start);
- 	bio_add_folio_nofail(&bio, folio, plen, poff);
- 	return submit_bio_wait(&bio);
-@@ -1684,7 +1684,7 @@ static struct iomap_ioend *iomap_alloc_ioend(struct iomap_writepage_ctx *wpc,
- 	struct iomap_ioend *ioend;
- 	struct bio *bio;
+-		bio = bio_alloc(bh->b_bdev, num, opf, GFP_NOIO);
++		bio = bio_alloc(bh_bdev(bh), num, opf, GFP_NOIO);
+ 		bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+ 		while (num > 0) {
+ 			bh = *bhs;
+diff --git a/fs/jbd2/commit.c b/fs/jbd2/commit.c
+index 5e122586e06e..413f32b2f308 100644
+--- a/fs/jbd2/commit.c
++++ b/fs/jbd2/commit.c
+@@ -1014,7 +1014,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
+ 				clear_buffer_mapped(bh);
+ 				clear_buffer_new(bh);
+ 				clear_buffer_req(bh);
+-				bh->b_bdev = NULL;
++				bh_set_bdev_file(bh, NULL);
+ 			}
+ 		}
  
--	bio = bio_alloc_bioset(wpc->iomap.bdev, BIO_MAX_VECS,
-+	bio = bio_alloc_bioset(iomap_bdev(&wpc->iomap), BIO_MAX_VECS,
- 			       REQ_OP_WRITE | wbc_to_write_flags(wbc),
- 			       GFP_NOFS, &iomap_ioend_bioset);
- 	bio->bi_iter.bi_sector = iomap_sector(&wpc->iomap, pos);
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index f3b43d223a46..3e9f54727326 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -56,9 +56,9 @@ static struct bio *iomap_dio_alloc_bio(const struct iomap_iter *iter,
- 		struct iomap_dio *dio, unsigned short nr_vecs, blk_opf_t opf)
- {
- 	if (dio->dops && dio->dops->bio_set)
--		return bio_alloc_bioset(iter->iomap.bdev, nr_vecs, opf,
-+		return bio_alloc_bioset(iomap_bdev(&iter->iomap), nr_vecs, opf,
- 					GFP_KERNEL, dio->dops->bio_set);
--	return bio_alloc(iter->iomap.bdev, nr_vecs, opf, GFP_KERNEL);
-+	return bio_alloc(iomap_bdev(&iter->iomap), nr_vecs, opf, GFP_KERNEL);
+diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
+index abd42a6ccd0e..c1ce32d99267 100644
+--- a/fs/jbd2/journal.c
++++ b/fs/jbd2/journal.c
+@@ -434,7 +434,7 @@ int jbd2_journal_write_metadata_buffer(transaction_t *transaction,
+ 
+ 	folio_set_bh(new_bh, new_folio, new_offset);
+ 	new_bh->b_size = bh_in->b_size;
+-	new_bh->b_bdev = journal->j_dev;
++	bh_set_bdev_file(new_bh, journal->j_dev_file);
+ 	new_bh->b_blocknr = blocknr;
+ 	new_bh->b_private = bh_in;
+ 	set_buffer_mapped(new_bh);
+diff --git a/fs/jbd2/transaction.c b/fs/jbd2/transaction.c
+index cb0b8d6fc0c6..04021f54ca97 100644
+--- a/fs/jbd2/transaction.c
++++ b/fs/jbd2/transaction.c
+@@ -929,7 +929,7 @@ static void warn_dirty_buffer(struct buffer_head *bh)
+ 	       "JBD2: Spotted dirty metadata buffer (dev = %pg, blocknr = %llu). "
+ 	       "There's a risk of filesystem corruption in case of system "
+ 	       "crash.\n",
+-	       bh->b_bdev, (unsigned long long)bh->b_blocknr);
++	       bh_bdev(bh), (unsigned long long)bh->b_blocknr);
  }
  
- static void iomap_dio_submit_bio(const struct iomap_iter *iter,
-@@ -288,8 +288,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
- 	size_t copied = 0;
- 	size_t orig_count;
+ /* Call t_frozen trigger and copy buffer data into jh->b_frozen_data. */
+@@ -990,7 +990,7 @@ do_get_write_access(handle_t *handle, struct journal_head *jh,
+ 	/* If it takes too long to lock the buffer, trace it */
+ 	time_lock = jbd2_time_diff(start_lock, jiffies);
+ 	if (time_lock > HZ/10)
+-		trace_jbd2_lock_buffer_stall(bh->b_bdev->bd_dev,
++		trace_jbd2_lock_buffer_stall(bh_bdev(bh)->bd_dev,
+ 			jiffies_to_msecs(time_lock));
  
--	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1) ||
--	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
-+	if ((pos | length) & (bdev_logical_block_size(iomap_bdev(iomap)) - 1) ||
-+	    !bdev_iter_is_aligned(iomap_bdev(iomap), dio->submit.iter))
- 		return -EINVAL;
- 
- 	if (iomap->type == IOMAP_UNWRITTEN) {
-@@ -316,7 +316,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
- 		 */
- 		if (!(iomap->flags & (IOMAP_F_SHARED|IOMAP_F_DIRTY)) &&
- 		    (dio->flags & IOMAP_DIO_WRITE_THROUGH) &&
--		    (bdev_fua(iomap->bdev) || !bdev_write_cache(iomap->bdev)))
-+		    (bdev_fua(iomap_bdev(iomap)) ||
-+		     !bdev_write_cache(iomap_bdev(iomap))))
- 			use_fua = true;
- 		else if (dio->flags & IOMAP_DIO_NEED_SYNC)
- 			dio->flags &= ~IOMAP_DIO_CALLER_COMP;
-diff --git a/fs/iomap/swapfile.c b/fs/iomap/swapfile.c
-index 5fc0ac36dee3..20bd67e85d15 100644
---- a/fs/iomap/swapfile.c
-+++ b/fs/iomap/swapfile.c
-@@ -116,7 +116,7 @@ static loff_t iomap_swapfile_iter(const struct iomap_iter *iter,
- 		return iomap_swapfile_fail(isi, "has shared extents");
- 
- 	/* Only one bdev per swap file. */
--	if (iomap->bdev != isi->sis->bdev)
-+	if (iomap_bdev(iomap) != isi->sis->bdev)
- 		return iomap_swapfile_fail(isi, "outside the main device");
- 
- 	if (isi->iomap.length == 0) {
-diff --git a/fs/iomap/trace.h b/fs/iomap/trace.h
-index 0a991c4ce87d..39ac91fd4a50 100644
---- a/fs/iomap/trace.h
-+++ b/fs/iomap/trace.h
-@@ -134,7 +134,8 @@ DECLARE_EVENT_CLASS(iomap_class,
- 		__entry->length = iomap->length;
- 		__entry->type = iomap->type;
- 		__entry->flags = iomap->flags;
--		__entry->bdev = iomap->bdev ? iomap->bdev->bd_dev : 0;
-+		__entry->bdev = iomap_bdev(iomap) ?
-+				iomap_bdev(iomap)->bd_dev : 0;
- 	),
- 	TP_printk("dev %d:%d ino 0x%llx bdev %d:%d addr 0x%llx offset 0x%llx "
- 		  "length 0x%llx type %s flags %s",
-@@ -181,7 +182,8 @@ TRACE_EVENT(iomap_writepage_map,
- 		__entry->length = iomap->length;
- 		__entry->type = iomap->type;
- 		__entry->flags = iomap->flags;
--		__entry->bdev = iomap->bdev ? iomap->bdev->bd_dev : 0;
-+		__entry->bdev = iomap_bdev(iomap) ?
-+				iomap_bdev(iomap)->bd_dev : 0;
- 	),
- 	TP_printk("dev %d:%d ino 0x%llx bdev %d:%d pos 0x%llx dirty len 0x%llx "
- 		  "addr 0x%llx offset 0x%llx length 0x%llx type %s flags %s",
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 4087af7f3c9f..cb4ac7129bce 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -129,7 +129,7 @@ xfs_bmbt_to_iomap(
- 	if (mapping_flags & IOMAP_DAX)
- 		iomap->dax_dev = target->bt_daxdev;
- 	else
--		iomap->bdev = target->bt_bdev;
-+		iomap_set_bdev_file(iomap, target->bt_bdev_file);
- 	iomap->flags = iomap_flags;
- 
- 	if (xfs_ipincount(ip) &&
-@@ -154,7 +154,7 @@ xfs_hole_to_iomap(
- 	iomap->type = IOMAP_HOLE;
- 	iomap->offset = XFS_FSB_TO_B(ip->i_mount, offset_fsb);
- 	iomap->length = XFS_FSB_TO_B(ip->i_mount, end_fsb - offset_fsb);
--	iomap->bdev = target->bt_bdev;
-+	iomap_set_bdev_file(iomap, target->bt_bdev_file);
- 	iomap->dax_dev = target->bt_daxdev;
+ 	/* We now hold the buffer lock so it is safe to query the buffer
+@@ -2374,7 +2374,7 @@ static int journal_unmap_buffer(journal_t *journal, struct buffer_head *bh,
+ 			write_unlock(&journal->j_state_lock);
+ 			jbd2_journal_put_journal_head(jh);
+ 			/* Already zapped buffer? Nothing to do... */
+-			if (!bh->b_bdev)
++			if (!bh_bdev(bh))
+ 				return 0;
+ 			return -EBUSY;
+ 		}
+@@ -2428,7 +2428,7 @@ static int journal_unmap_buffer(journal_t *journal, struct buffer_head *bh,
+ 	clear_buffer_new(bh);
+ 	clear_buffer_delay(bh);
+ 	clear_buffer_unwritten(bh);
+-	bh->b_bdev = NULL;
++	bh_set_bdev_file(bh, NULL);
+ 	return may_free;
  }
  
-diff --git a/fs/zonefs/file.c b/fs/zonefs/file.c
-index 3b103715acc9..34100c6e008d 100644
---- a/fs/zonefs/file.c
-+++ b/fs/zonefs/file.c
-@@ -38,7 +38,7 @@ static int zonefs_read_iomap_begin(struct inode *inode, loff_t offset,
- 	 * act as if there is a hole up to the file maximum size.
- 	 */
- 	mutex_lock(&zi->i_truncate_mutex);
--	iomap->bdev = inode->i_sb->s_bdev;
-+	iomap_set_bdev_file(iomap, inode->i_sb->s_bdev_file);
- 	iomap->offset = ALIGN_DOWN(offset, sb->s_blocksize);
- 	isize = i_size_read(inode);
- 	if (iomap->offset >= isize) {
-@@ -88,7 +88,7 @@ static int zonefs_write_iomap_begin(struct inode *inode, loff_t offset,
- 	 * write pointer) and unwriten beyond.
- 	 */
- 	mutex_lock(&zi->i_truncate_mutex);
--	iomap->bdev = inode->i_sb->s_bdev;
-+	iomap_set_bdev_file(iomap, inode->i_sb->s_bdev_file);
- 	iomap->offset = ALIGN_DOWN(offset, sb->s_blocksize);
- 	iomap->addr = (z->z_sector << SECTOR_SHIFT) + iomap->offset;
- 	isize = i_size_read(inode);
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 6fc1c858013d..8ae384f0eeb1 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -105,6 +105,17 @@ struct iomap {
- 	u64			validity_cookie; /* used with .iomap_valid() */
- };
+diff --git a/fs/mpage.c b/fs/mpage.c
+index fa8b99a199fa..40594afa63cb 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -126,7 +126,7 @@ static void map_buffer_to_folio(struct folio *folio, struct buffer_head *bh,
+ 	do {
+ 		if (block == page_block) {
+ 			page_bh->b_state = bh->b_state;
+-			page_bh->b_bdev = bh->b_bdev;
++			bh_copy_bdev_file(page_bh, bh);
+ 			page_bh->b_blocknr = bh->b_blocknr;
+ 			break;
+ 		}
+@@ -216,7 +216,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+ 			page_block++;
+ 			block_in_file++;
+ 		}
+-		bdev = map_bh->b_bdev;
++		bdev = bh_bdev(map_bh);
+ 	}
  
-+static inline struct block_device *iomap_bdev(const struct iomap *iomap)
-+{
-+	return iomap->bdev;
-+}
-+
-+static inline void iomap_set_bdev_file(struct iomap *iomap,
-+				       struct file *bdev_file)
-+{
-+	iomap->bdev = bdev_file ? file_bdev(bdev_file) : NULL;
-+}
-+
- static inline sector_t iomap_sector(const struct iomap *iomap, loff_t pos)
+ 	/*
+@@ -272,7 +272,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+ 			page_block++;
+ 			block_in_file++;
+ 		}
+-		bdev = map_bh->b_bdev;
++		bdev = bh_bdev(map_bh);
+ 	}
+ 
+ 	if (first_hole != blocks_per_page) {
+@@ -515,7 +515,7 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
+ 				boundary_block = bh->b_blocknr;
+ 				boundary_bdev = bh->b_bdev;
+ 			}
+-			bdev = bh->b_bdev;
++			bdev = bh_bdev(bh);
+ 		} while ((bh = bh->b_this_page) != head);
+ 
+ 		if (first_unmapped)
+@@ -565,7 +565,7 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
+ 		}
+ 		page_block++;
+ 		boundary = buffer_boundary(&map_bh);
+-		bdev = map_bh.b_bdev;
++		bdev = bh_bdev(&map_bh);
+ 		if (block_in_file == last_block)
+ 			break;
+ 		block_in_file++;
+diff --git a/fs/nilfs2/btnode.c b/fs/nilfs2/btnode.c
+index 0131d83b912d..3f81d00fc031 100644
+--- a/fs/nilfs2/btnode.c
++++ b/fs/nilfs2/btnode.c
+@@ -59,7 +59,7 @@ nilfs_btnode_create_block(struct address_space *btnc, __u64 blocknr)
+ 		BUG();
+ 	}
+ 	memset(bh->b_data, 0, i_blocksize(inode));
+-	bh->b_bdev = inode->i_sb->s_bdev;
++	bh_set_bdev_file(bh, inode->i_sb->s_bdev_file);
+ 	bh->b_blocknr = blocknr;
+ 	set_buffer_mapped(bh);
+ 	set_buffer_uptodate(bh);
+@@ -118,7 +118,7 @@ int nilfs_btnode_submit_block(struct address_space *btnc, __u64 blocknr,
+ 		goto found;
+ 	}
+ 	set_buffer_mapped(bh);
+-	bh->b_bdev = inode->i_sb->s_bdev;
++	bh_set_bdev_file(bh, inode->i_sb->s_bdev_file);
+ 	bh->b_blocknr = pblocknr; /* set block address for read */
+ 	bh->b_end_io = end_buffer_read_sync;
+ 	get_bh(bh);
+diff --git a/fs/nilfs2/gcinode.c b/fs/nilfs2/gcinode.c
+index bf9a11d58817..83d2b5e034ad 100644
+--- a/fs/nilfs2/gcinode.c
++++ b/fs/nilfs2/gcinode.c
+@@ -84,7 +84,7 @@ int nilfs_gccache_submit_read_data(struct inode *inode, sector_t blkoff,
+ 	}
+ 
+ 	if (!buffer_mapped(bh)) {
+-		bh->b_bdev = inode->i_sb->s_bdev;
++		bh_set_bdev_file(bh, inode->i_sb->s_bdev_file);
+ 		set_buffer_mapped(bh);
+ 	}
+ 	bh->b_blocknr = pbn;
+diff --git a/fs/nilfs2/mdt.c b/fs/nilfs2/mdt.c
+index 4f792a0ad0f0..10f33017a1c9 100644
+--- a/fs/nilfs2/mdt.c
++++ b/fs/nilfs2/mdt.c
+@@ -89,7 +89,7 @@ static int nilfs_mdt_create_block(struct inode *inode, unsigned long block,
+ 	if (buffer_uptodate(bh))
+ 		goto failed_bh;
+ 
+-	bh->b_bdev = sb->s_bdev;
++	bh_set_bdev_file(bh, sb->s_bdev_file);
+ 	err = nilfs_mdt_insert_new_block(inode, block, bh, init_block);
+ 	if (likely(!err)) {
+ 		get_bh(bh);
+diff --git a/fs/nilfs2/page.c b/fs/nilfs2/page.c
+index 14e470fb8870..b6cc95dd13c0 100644
+--- a/fs/nilfs2/page.c
++++ b/fs/nilfs2/page.c
+@@ -111,7 +111,7 @@ void nilfs_copy_buffer(struct buffer_head *dbh, struct buffer_head *sbh)
+ 
+ 	dbh->b_state = sbh->b_state & NILFS_BUFFER_INHERENT_BITS;
+ 	dbh->b_blocknr = sbh->b_blocknr;
+-	dbh->b_bdev = sbh->b_bdev;
++	bh_copy_bdev_file(dbh, sbh);
+ 
+ 	bh = dbh;
+ 	bits = sbh->b_state & (BIT(BH_Uptodate) | BIT(BH_Mapped));
+@@ -216,7 +216,7 @@ static void nilfs_copy_folio(struct folio *dst, struct folio *src,
+ 		lock_buffer(dbh);
+ 		dbh->b_state = sbh->b_state & mask;
+ 		dbh->b_blocknr = sbh->b_blocknr;
+-		dbh->b_bdev = sbh->b_bdev;
++		bh_copy_bdev_file(dbh, sbh);
+ 		sbh = sbh->b_this_page;
+ 		dbh = dbh->b_this_page;
+ 	} while (dbh != dbufs);
+diff --git a/fs/ntfs3/inode.c b/fs/ntfs3/inode.c
+index 3c4c878f6d77..c795fd2000ee 100644
+--- a/fs/ntfs3/inode.c
++++ b/fs/ntfs3/inode.c
+@@ -609,7 +609,7 @@ static noinline int ntfs_get_block_vbo(struct inode *inode, u64 vbo,
+ 	lbo = ((u64)lcn << cluster_bits) + off;
+ 
+ 	set_buffer_mapped(bh);
+-	bh->b_bdev = sb->s_bdev;
++	bh_set_bdev_file(bh, sb->s_bdev_file);
+ 	bh->b_blocknr = lbo >> sb->s_blocksize_bits;
+ 
+ 	valid = ni->i_valid;
+diff --git a/fs/reiserfs/fix_node.c b/fs/reiserfs/fix_node.c
+index 6c13a8d9a73c..2b288b1539d9 100644
+--- a/fs/reiserfs/fix_node.c
++++ b/fs/reiserfs/fix_node.c
+@@ -2332,7 +2332,7 @@ static void tb_buffer_sanity_check(struct super_block *sb,
+ 				       "in tree %s[%d] (%b)",
+ 				       descr, level, bh);
+ 
+-		if (bh->b_bdev != sb->s_bdev)
++		if (bh_bdev(bh) != sb->s_bdev)
+ 			reiserfs_panic(sb, "jmacd-4", "buffer has wrong "
+ 				       "device %s[%d] (%b)",
+ 				       descr, level, bh);
+diff --git a/fs/reiserfs/journal.c b/fs/reiserfs/journal.c
+index e539ccd39e1e..724113cb79d3 100644
+--- a/fs/reiserfs/journal.c
++++ b/fs/reiserfs/journal.c
+@@ -618,7 +618,7 @@ static void reiserfs_end_buffer_io_sync(struct buffer_head *bh, int uptodate)
+ 	if (buffer_journaled(bh)) {
+ 		reiserfs_warning(NULL, "clm-2084",
+ 				 "pinned buffer %lu:%pg sent to disk",
+-				 bh->b_blocknr, bh->b_bdev);
++				 bh->b_blocknr, bh_bdev(bh));
+ 	}
+ 	if (uptodate)
+ 		set_buffer_uptodate(bh);
+diff --git a/fs/reiserfs/prints.c b/fs/reiserfs/prints.c
+index 84a194b77f19..249a458b6e28 100644
+--- a/fs/reiserfs/prints.c
++++ b/fs/reiserfs/prints.c
+@@ -156,7 +156,7 @@ static int scnprintf_buffer_head(char *buf, size_t size, struct buffer_head *bh)
  {
- 	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
+ 	return scnprintf(buf, size,
+ 			 "dev %pg, size %zd, blocknr %llu, count %d, state 0x%lx, page %p, (%s, %s, %s)",
+-			 bh->b_bdev, bh->b_size,
++			 bh_bdev(bh), bh->b_size,
+ 			 (unsigned long long)bh->b_blocknr,
+ 			 atomic_read(&(bh->b_count)),
+ 			 bh->b_state, bh->b_page,
+@@ -561,7 +561,7 @@ static int print_super_block(struct buffer_head *bh)
+ 		return 1;
+ 	}
+ 
+-	printk("%pg\'s super block is in block %llu\n", bh->b_bdev,
++	printk("%pg\'s super block is in block %llu\n", bh_bdev(bh),
+ 	       (unsigned long long)bh->b_blocknr);
+ 	printk("Reiserfs version %s\n", version);
+ 	printk("Block count %u\n", sb_block_count(rs));
+diff --git a/fs/reiserfs/stree.c b/fs/reiserfs/stree.c
+index 5faf702f8d15..23998f071d9c 100644
+--- a/fs/reiserfs/stree.c
++++ b/fs/reiserfs/stree.c
+@@ -331,7 +331,7 @@ static inline int key_in_buffer(
+ 	       || chk_path->path_length > MAX_HEIGHT,
+ 	       "PAP-5050: pointer to the key(%p) is NULL or invalid path length(%d)",
+ 	       key, chk_path->path_length);
+-	RFALSE(!PATH_PLAST_BUFFER(chk_path)->b_bdev,
++	RFALSE(!bh_bdev(PATH_PLAST_BUFFER(chk_path)),
+ 	       "PAP-5060: device must not be NODEV");
+ 
+ 	if (comp_keys(get_lkey(chk_path, sb), key) == 1)
+diff --git a/fs/reiserfs/tail_conversion.c b/fs/reiserfs/tail_conversion.c
+index 2cec61af2a9e..300e6737a0db 100644
+--- a/fs/reiserfs/tail_conversion.c
++++ b/fs/reiserfs/tail_conversion.c
+@@ -187,7 +187,7 @@ void reiserfs_unmap_buffer(struct buffer_head *bh)
+ 	clear_buffer_mapped(bh);
+ 	clear_buffer_req(bh);
+ 	clear_buffer_new(bh);
+-	bh->b_bdev = NULL;
++	bh_set_bdev_file(bh, NULL);
+ 	unlock_buffer(bh);
+ }
+ 
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index d78454a4dd1f..4c6f0d0332c8 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -10,6 +10,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/blk_types.h>
++#include <linux/blkdev.h>
+ #include <linux/fs.h>
+ #include <linux/linkage.h>
+ #include <linux/pagemap.h>
+@@ -136,6 +137,23 @@ BUFFER_FNS(Meta, meta)
+ BUFFER_FNS(Prio, prio)
+ BUFFER_FNS(Defer_Completion, defer_completion)
+ 
++static __always_inline void bh_set_bdev_file(struct buffer_head *bh,
++					     struct file *bdev_file)
++{
++	bh->b_bdev = bdev_file ? file_bdev(bdev_file) : NULL;
++}
++
++static __always_inline void bh_copy_bdev_file(struct buffer_head *dbh,
++					      struct buffer_head *sbh)
++{
++	dbh->b_bdev = sbh->b_bdev;
++}
++
++static __always_inline struct block_device *bh_bdev(struct buffer_head *bh)
++{
++	return bh->b_bdev;
++}
++
+ static __always_inline void set_buffer_uptodate(struct buffer_head *bh)
+ {
+ 	/*
+@@ -377,7 +395,7 @@ static inline void
+ map_bh(struct buffer_head *bh, struct super_block *sb, sector_t block)
+ {
+ 	set_buffer_mapped(bh);
+-	bh->b_bdev = sb->s_bdev;
++	bh_set_bdev_file(bh, sb->s_bdev_file);
+ 	bh->b_blocknr = block;
+ 	bh->b_size = sb->s_blocksize;
+ }
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 0e128ad51460..95d3ed978864 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -26,7 +26,7 @@ DECLARE_EVENT_CLASS(block_buffer,
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= bh->b_bdev->bd_dev;
++		__entry->dev		= bh_bdev(bh)->bd_dev;
+ 		__entry->sector		= bh->b_blocknr;
+ 		__entry->size		= bh->b_size;
+ 	),
 -- 
 2.39.2
 
