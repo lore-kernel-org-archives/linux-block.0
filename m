@@ -1,28 +1,28 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE75E2C868;
-	Sat,  6 Apr 2024 09:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E93236B17;
+	Sat,  6 Apr 2024 09:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712395072; cv=none; b=q8egXkNuWy9O8WAg30VHo6cnX2psNdHgBsITil9vuiVd6BcXNjKrF79y4JzP/23fziEFiBXH4LUxGWSNWazUYLiELTJhLAq/Mr5BIJspLmDCV23ElPP3eji6WgjQP1IQWUym7+L7Ccb0qc8cT82glZmRe4tsueBFLcAz0PE70UM=
+	t=1712395073; cv=none; b=jczoEjb31rCAgtCBjcjl7Br2jJDmQ+knv/E0ygl99PMSi6GL+GqHdCewSOK9+fRyCUc6DEKcqoq60TNVZnvVHpeVMJKiYOGX//xIUVNIDzYSzu3jeBanJvmzmGW+b8P52LYCvuN03X03CEDVxnrg8Q7Azz0ARXb3Wk7niW+JcOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712395072; c=relaxed/simple;
-	bh=zUIO1SUiCKW2XfTdRsFxc2S0V/jDhjXrjWEbfQuXH5E=;
+	s=arc-20240116; t=1712395073; c=relaxed/simple;
+	bh=NbjIZxMOKnTQPzGEJd3Cu63LI5ii2Hm3loSg5zcCzpk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NDLGy7VXIrG6oIa2hLXDiX+5v6BGbxnS/TIzbWh7hokZGMbJwMVFlu5u9JyHNzvIXtLkOs/ipAENhQHWS+T+AUj8lwC6emwMyed/EN9XXEx053EXYutORc+UDZKshEywK0Mc4Az2in1O/FnHJ7GKFSSVYh3MvEgA2+5l4GIq3f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=jUR0j3yBiLVU9NuD0nmxEXDLDZB9jHT4w4MGbXr+0uZhXA/axY8uBqwtsES1NmOfu4ilU9SaQveh2gGEY/DuvecTDvqJ8lziram7kx/3vaJytjW6aYCNJOt//eSgZkQslPDhnrX3vSmDeCZ5WXSalbhmYSCfZpCi7nKRFQhFcBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VBVBD3ZqZz4f3khj;
-	Sat,  6 Apr 2024 17:17:40 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBVBJ3WXKz4f3jkC;
+	Sat,  6 Apr 2024 17:17:44 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 29EF51A0C9B;
-	Sat,  6 Apr 2024 17:17:47 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id C64981A058D;
+	Sat,  6 Apr 2024 17:17:48 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S16;
-	Sat, 06 Apr 2024 17:17:46 +0800 (CST)
+	by APP1 (Coremail) with SMTP id cCh0CgAn+REyExFm0JDpJA--.50223S20;
+	Sat, 06 Apr 2024 17:17:48 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: jack@suse.cz,
 	hch@lst.de,
@@ -34,9 +34,9 @@ Cc: linux-fsdevel@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	yukuai3@huawei.com
-Subject: [PATCH vfs.all 12/26] ext4: remove block_device_ejected()
-Date: Sat,  6 Apr 2024 17:09:16 +0800
-Message-Id: <20240406090930.2252838-13-yukuai1@huaweicloud.com>
+Subject: [PATCH vfs.all 16/26] bcache: prevent direct access of bd_inode
+Date: Sat,  6 Apr 2024 17:09:20 +0800
+Message-Id: <20240406090930.2252838-17-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
@@ -47,10 +47,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S16
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr4UGw1xJF1fWr48KFy3urg_yoW8tF1Up3
-	y3uw1fJrW8urn29ayxJr4xWry0qa92yay0gFyxur1Fgrn7JryIqF4ktr1Iya40vrZ3uw4F
-	qF1UCrWxur1UCrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:cCh0CgAn+REyExFm0JDpJA--.50223S20
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFWrJF4rCw4kZw43KFWUXFb_yoW8XF4fpF
+	9xCayjqrW8Ww48u3yUXr4DuFyrKwnIyayIk34xu34ava9Fqr9Y9FW5GryUuryFqry8Gwsr
+	XF17Kry7Cr1kC3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
 	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
@@ -68,62 +68,47 @@ X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-block_device_ejected() is added by commit bdfe0cbd746a ("Revert
-"ext4: remove block_device_ejected"") in 2015. At that time 'bdi->wb'
-is destroyed synchronized from del_gendisk(), hence if ext4 is still
-mounted, and then mark_buffer_dirty() will reference destroyed 'wb'.
-However, such problem doesn't exist anymore:
-
-- commit d03f6cdc1fc4 ("block: Dynamically allocate and refcount
-backing_dev_info") switch bdi to use refcounting;
-- commit 13eec2363ef0 ("fs: Get proper reference for s_bdi"), will grab
-additional reference of bdi while mounting, so that 'bdi->wb' will not
-be destroyed until generic_shutdown_super().
-
-Hence remove this dead function block_device_ejected().
+Now that all bcache stash the file of opened bdev, it's ok to get
+mapping from the file.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- fs/ext4/super.c | 18 ------------------
- 1 file changed, 18 deletions(-)
+ drivers/md/bcache/super.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 3fce1b80c419..cf4666b04d2e 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -492,22 +492,6 @@ static void ext4_maybe_update_superblock(struct super_block *sb)
- 		schedule_work(&EXT4_SB(sb)->s_sb_upd_work);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 330bcd9ea4a9..be8565691abe 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -163,15 +163,16 @@ static const char *read_super_common(struct cache_sb *sb,  struct block_device *
  }
  
--/*
-- * The del_gendisk() function uninitializes the disk-specific data
-- * structures, including the bdi structure, without telling anyone
-- * else.  Once this happens, any attempt to call mark_buffer_dirty()
-- * (for example, by ext4_commit_super), will cause a kernel OOPS.
-- * This is a kludge to prevent these oops until we can put in a proper
-- * hook in del_gendisk() to inform the VFS and file system layers.
-- */
--static int block_device_ejected(struct super_block *sb)
--{
--	struct inode *bd_inode = sb->s_bdev->bd_inode;
--	struct backing_dev_info *bdi = inode_to_bdi(bd_inode);
--
--	return bdi->dev == NULL;
--}
--
- static void ext4_journal_commit_callback(journal_t *journal, transaction_t *txn)
+ 
+-static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
++static const char *read_super(struct cache_sb *sb, struct file *bdev_file,
+ 			      struct cache_sb_disk **res)
  {
- 	struct super_block		*sb = journal->j_private;
-@@ -6168,8 +6152,6 @@ static int ext4_commit_super(struct super_block *sb)
+ 	const char *err;
++	struct block_device *bdev = file_bdev(bdev_file);
+ 	struct cache_sb_disk *s;
+ 	struct page *page;
+ 	unsigned int i;
  
- 	if (!sbh)
- 		return -EINVAL;
--	if (block_device_ejected(sb))
--		return -ENODEV;
+-	page = read_cache_page_gfp(bdev->bd_inode->i_mapping,
++	page = read_cache_page_gfp(bdev_file->f_mapping,
+ 				   SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
+ 	if (IS_ERR(page))
+ 		return "IO error";
+@@ -2558,7 +2559,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	if (set_blocksize(file_bdev(bdev_file), 4096))
+ 		goto out_blkdev_put;
  
- 	ext4_update_super(sb);
+-	err = read_super(sb, file_bdev(bdev_file), &sb_disk);
++	err = read_super(sb, bdev_file, &sb_disk);
+ 	if (err)
+ 		goto out_blkdev_put;
  
 -- 
 2.39.2
