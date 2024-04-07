@@ -1,94 +1,78 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709E01C0DC3;
-	Sun,  7 Apr 2024 03:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2305717C9
+	for <linux-block@vger.kernel.org>; Sun,  7 Apr 2024 03:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712459186; cv=none; b=u3olQdGEI0DmLBxhgwiSHyjj8yqCiiYSJbWXnwkWKI+BKws4uMPApQWP1nhlrM3qwTzp5GP0sCI4jsYC2OdwCG7MkHa0DSpx06t4CuTFPPIdxV4lKkPfLlcrxDFOQsSLrhUWMjF6i4jJof/IvO3PZ0fhWngpmUPBUtpZWgc/11c=
+	t=1712459845; cv=none; b=XqZHxw84bJJREEn4ml7LnB67HiLf2t9FcSZpBgse9OYONf2rlONr68IHxDh8nTWSr5EOCalnfc7j0qkjh01Ww9XY4H/HKxnw/69GIlv7NigGIzv9eLXOx7BgJD45Cv6L44xXfQ4peGnHSUzbQYfDlaH1ieiOfDcENlG9m85Z4M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712459186; c=relaxed/simple;
-	bh=LxMxC0gWWe8OZQXnt8cp5I2UaKMknVyUH+bEJYGi4n0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SFw4HQfKWH6LxcAU71oQjGNWax7va5VvhwAf4J31zTxVIEA3NExpRuxrl9MvOfNsgHDP5RXQQPne119prcJ2cZRT7vEScHizbv+aGu9ru0+oxchkrVWh/DdoV+u1bP+lk+y8a0kjbo38cOndDnUDk0i65KV3zHr3gLha0wQGkjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=cqNtUitt; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1712459845; c=relaxed/simple;
+	bh=tAeQLjN5dd5JmIr/vYIUhaCJR4Vyfa97merTCqrtI4o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=l3xcOD9eej9gLzXYhvWml7ZftFP1PvD3li20ciLg6m6ir7H5NyWof/EQg9D4NIMuJjgAdqQfPyixKoTgL2wvm73XMQZsoM4UytxaYpKAo3JhYYrSO9FWVIblo2mUoUlyakE0YlQRUbe6LmmlRbaP0A8iwlkL0cBovaxmqZRSN+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TxJK4OVn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="cqNtUitt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2g944MBeo/tBWBRCgWeQA9CcS0zs1LmcvuY+A1PoLRM=; b=cqNtUitterRF1F2a6OkPucbBwQ
-	Ke5h7qSn6fNHqnXTc/eh8mGrLvCaccuMq+P7aLrAEd2Q6T/YXZe5VhpD4X+42ZYqO3O2UZyhRCciT
-	uRk2Gut9VDAk8PZJrsM557+vUZ+kt588pcKCNngwhk8Xm6LnmBYW8zfNs9kNOI75RpYBTUaxLgxXq
-	KFYj9gFuwqAka+hbGLSBE8O/iL0SN+lYibxps3nPOoAe16LibTrAlmnfJK242WQSjcRNEQL+yHpMc
-	uOhj9AyZnOjdFwXZ9jnM8brT61VvjpLUgLYYmweIg+jvtG2AfJu7eLr3qO/ApmXhcoJac08hi9NMA
-	FJfwyW9g==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rtIrC-007Z3c-2Z;
-	Sun, 07 Apr 2024 03:06:10 +0000
-Date: Sun, 7 Apr 2024 04:06:10 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
- blcok_device
-Message-ID: <20240407030610.GI538574@ZenIV>
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-23-yukuai1@huaweicloud.com>
- <20240406194206.GC538574@ZenIV>
- <20240406202947.GD538574@ZenIV>
- <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
- <20240407015149.GG538574@ZenIV>
- <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxJK4OVn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712459843;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=etZFhB5TopIYdY4s3aeiLtKNevD4lArmEoeCIn/eqvM=;
+	b=TxJK4OVniIGl2FJMbaYJMyxN9+i4EJoEc3nJcDuSg37FpqBRmbEgM45ajg/NCNz14zl+wR
+	GXCjsaYNkDgABgmjQ5VT3bg73E+3UGMTx3+2QgmBJkWJKZnXHYAi3MGu6lw4xOl2YaYWj2
+	zWZbss3Hhu8qzNbDNXPYrjXEBgawwPA=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-PfGKzCmeNwa8FHiifp0CyA-1; Sat,
+ 06 Apr 2024 23:17:20 -0400
+X-MC-Unique: PfGKzCmeNwa8FHiifp0CyA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DEB2C3C025C0;
+	Sun,  7 Apr 2024 03:17:19 +0000 (UTC)
+Received: from fedora34.. (unknown [10.66.146.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 41DE341F355;
+	Sun,  7 Apr 2024 03:17:17 +0000 (UTC)
+From: Yi Zhang <yi.zhang@redhat.com>
+To: linux-block@vger.kernel.org
+Cc: dwagner@suse.de,
+	shinichiro.kawasaki@wdc.com
+Subject: [PATCH blktests 1/2] nvme/011: fix filename path
+Date: Sun,  7 Apr 2024 11:17:08 +0800
+Message-Id: <20240407031708.3945702-1-yi.zhang@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Sun, Apr 07, 2024 at 10:34:56AM +0800, Yu Kuai wrote:
+Fixes: e55c4e0 ("nvme: don't assume namespace id")
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+---
+ tests/nvme/011 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Other than raw block_device fops, other filesystems can use the opened
-> bdev_file directly for iomap and buffer_head, and they actually don't
-> need to reference block_device anymore. The point here is that whether
+diff --git a/tests/nvme/011 b/tests/nvme/011
+index eee044c..4810459 100755
+--- a/tests/nvme/011
++++ b/tests/nvme/011
+@@ -29,7 +29,7 @@ test() {
+ 	ns=$(_find_nvme_ns "${def_subsys_uuid}")
+ 
+ 	_run_fio_verify_io --size="${nvme_img_size}" \
+-		--filename="$/dev/{ns}"
++		--filename="/dev/${ns}"
+ 
+ 	_nvme_disconnect_subsys
+ 
+-- 
+2.34.3
 
-What do you mean, "reference"?  The counting reference is to opened
-file; ->s_bdev is a cached pointer to associated struct block_device,
-and neither it nor pointers in buffer_head are valid past the moment
-when you close the file.  Storing (non-counting) pointers to struct
-file in struct buffer_head is not different in that respect - they
-are *still* only valid while the "master" reference is held.
-
-Again, what's the point of storing struct file * in struct buffer_head
-or struct iomap?  In any instances of those structures?
-
-There is a good reason to have it in places that keep a reference to
-opened block device - the kind that _keeps_ the device opened.  Namely,
-there's state that need to be carried from the place where we'd opened
-the sucker to the place where we close it, and that state is better
-carried by opened file.
-
-But neither iomap nor buffer_head contain anything of that sort -
-the lifetime management of the opened device is not in their
-competence.  As the matter of fact, the logics around closing
-those opened devices (bdev_release()) makes sure that no
-instances of buffer_head (or iomap) will outlive them.
-And they don't care about any extra state - everything
-they use is in block_device and coallocated inode.
-
-I could've easily missed something in one of the threads around
-the earlier iterations of the patchset; if that's the case,
-could somebody restate the rationale for that part and/or
-post relevant lore.kernel.org links?  Christian?  hch?
-What am I missing here?
