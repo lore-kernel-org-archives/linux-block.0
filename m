@@ -1,127 +1,95 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C2D11181
-	for <linux-block@vger.kernel.org>; Sun,  7 Apr 2024 19:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2250F2582
+	for <linux-block@vger.kernel.org>; Sun,  7 Apr 2024 21:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712519749; cv=none; b=s+y9XO1s/gxmID7IOhPP5VSR7sqazWiFgnzoMye8i3cDbLWSebjJxTEoXtwY0SxRvmnyKfuyCOC+rTLizJ3wdztIPyKWn7zJjnVHOPt2jlymhuV3cNT30Zku7c/AvJMTQAVI+F/wM8I7qyYWUXiX7ql1SpatuA5UN3LZYEwOjTc=
+	t=1712526657; cv=none; b=OMK16rpskgAa6XTt68S2TxVUjEeUMxHdAFRXCFMw75QoXfOtkzfHJTPZ1miX3dsHzqD7F20Olz5Fs5rfbAUWG/gE2GEcg2ocK/4SAgX+axxRfgUR9VZevb/qkVsUR8B1NwGU8SYdK3pLn7wpAtIlqWfZyYZ3cnbbhTjfNLlaqvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712519749; c=relaxed/simple;
-	bh=v8kCyOI5UZILifWQEvZKNekcPc7lc42ThXOsB2sJhHg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SRuLi5nmENLJWVEQzb+E29laE7paakHnm04XSHrlm8RqMJ1pO8SsZxhLMtmtS5RA/Cbfe0Hj5fqHCUy9E0Re5bMggbeZhXROV4XCfTBk+K2duvNxziormbaO4aQCCs/+IqQzfOIruOGQbLbq3FBMMeB3mS84sibIDGG2HLRqvPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-343c8d7064aso414680f8f.0
-        for <linux-block@vger.kernel.org>; Sun, 07 Apr 2024 12:55:47 -0700 (PDT)
+	s=arc-20240116; t=1712526657; c=relaxed/simple;
+	bh=q3t9G12KIaNKCxbXbi8mOuohdY//ii+H7EUxPmmcejU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=EOAm6mrIcxgSyZit881Rl+CUJ0rPddehNjyXxOIrWp/bG3cGqC625NB8xMQLX3M52qwvoQGwMjaa4rx5C9JPsa4r4swREdBDela4VHhp38VhMryC5RgBDt7KhMR+xhv0x+yHegSRwQkYx2Mu+iveBQmwjf2/u2fNj3zCVOGhJ2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dYsbW06l; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dYsbW06l"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3c5f468a2faso185130b6e.1
+        for <linux-block@vger.kernel.org>; Sun, 07 Apr 2024 14:50:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712526654; x=1713131454; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KlCwhNPPrZWfLl+0FlaQUkC3u0caIJHTkEmz2WE3heM=;
+        b=dYsbW06lGKfLLe0/qZWWH0XvlDOq7ANCbZf8owiXmDJctylIY+7CaJY8XKY7lb1eNr
+         B3aHcCflhY2wnYzgO5zXRZ5z1GuhaMdd2dyrEDmRYpGH5+WJOcRAAOPBZv8TTgo0mhO1
+         KwREYlf/30UoSwdwC/AiMvXJPeWh5HfywwrW9w9+fo4JSDSa7ippheOzCEYU6glkg/sc
+         8u+vVfWUbZi6tLGchOI2mQ8aJkDM4/RlpizeGV1PivEmjbCAO8LjBfI8hxY1Oaw8Ih01
+         qlqD8/w/vJ86LKLFkUOH2S+Kb3SfzjnW9XUwCxCTfBr3w0hD1Bw+qJBoSYvtjgI9qRcV
+         iLCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712519746; x=1713124546;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tzOqCdNS/7KjSOCIXb9Qh7O9B2xLz1vt61F2iFBcJA0=;
-        b=KSKdbiU1w7xjnP8W4H6A/zQx6d43BLKDo3GgPMM4rsKS83ebqkkda0MFwkRDwH3fpi
-         oaRf2sGzqx5CRUnUSJl5oXP+hJPQjGCxf1vvi6dPg37pnqma3Tq2bJ4VPuM/bWHNQHMf
-         PyyQlhCOPl16dgWgWXe6hpJLBEPEUGJK+lWhvI5bXTG6jCsHiqQ2HAoWlRHPPfe2CSYh
-         6aS+lWJ5cPtdNfvG89K8D53gLaTgiAGaNTCNV4+AWNnVRNw+mvhzn6WIiN9XJLnGs9Bc
-         pTfLnB+SNjAVTeFwpdMGmN6ag3GRYJZkyirm2ifoHXUVEpFfHTx9bWcCbMX4o4KuEPr9
-         YAfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVxvK5/y3oaKLyrXlvCxSc9qVR+vBaSd+XDgMNX3d38vL5TUtP6GHJTfrrvmql1QRXbaW+MsBTZ34StIJMFnhAZvyM0o21knsvov1M=
-X-Gm-Message-State: AOJu0Ywbx5C0zVb+J5VhKDkmfxLMgD/WRyCFORMjAigiDyo0ZcQ5iN6F
-	DSsgKqskRv4SgCR6OlHMI3Io22XmLSzKX+u7XVnJ8bTVXExAVjU/
-X-Google-Smtp-Source: AGHT+IFOw9RiCx4Vo7GZIMIZMEC0xFUC5n2BzsBdtK4VVBTn9A3eomE9lcqeQoEj/MmkJ74F3c9rJw==
-X-Received: by 2002:a05:600c:3b8d:b0:416:6b86:861 with SMTP id n13-20020a05600c3b8d00b004166b860861mr865026wms.0.1712519745527;
-        Sun, 07 Apr 2024 12:55:45 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.192.64.dynamic.barak-online.net. [85.65.192.64])
-        by smtp.gmail.com with ESMTPSA id je6-20020a05600c1f8600b0041496734318sm14359460wmb.24.2024.04.07.12.55.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Apr 2024 12:55:45 -0700 (PDT)
-Message-ID: <cd732ee4-4a53-46bd-a9f8-92237a3afbaf@grimberg.me>
-Date: Sun, 7 Apr 2024 22:55:43 +0300
+        d=1e100.net; s=20230601; t=1712526654; x=1713131454;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KlCwhNPPrZWfLl+0FlaQUkC3u0caIJHTkEmz2WE3heM=;
+        b=JCF1IxE0pJsWh3qzSwVFBTj7ID82J+far+Uc7+qTOaJAeT4Fxt3OHY5008HRZW9GDP
+         GctNY4n1hWiiZ95Q7EriO+pocW26CpRed84Ag3XQ7xLh1zuBexvu8UtP08hsMc37Ldk1
+         84acGjHqf/fcFvPMZueR7jHHVqEVr5MCojPVlAXFis3yvM372d1bWWA9EG08TwBhpTDC
+         JdJRwFAEY1HzEDZEXuELlsCL8Qe5RJRDOXkZ8iVUFnXWmsBEu56KrLW1Ob11oen0XZ1H
+         W9Xy2Z2hr0/i3KZCkWdoEPNnhcaimp+TyX6w3/BOgISHTo/qgM6V5Hqcex4xb29ZVUkj
+         1DQA==
+X-Gm-Message-State: AOJu0YzPPiXNb+OojEZUytZWiqznL+bG9z1Bq4lJUO01HW1pc9Uv8gp7
+	jxCh5q0HdqLjezrDhLerJGLp8c+WmthuFjfaxE5kJObRelg5IZcWxph/ZiUeq4s=
+X-Google-Smtp-Source: AGHT+IHSiyRLA5+t0aCs8yEl29UZzKFz89EOC9qaIJHs9OdpZOVnN+X9ITmshMEtMkXM/ACY/JNdRQ==
+X-Received: by 2002:a05:6870:968b:b0:22e:6e96:ed41 with SMTP id o11-20020a056870968b00b0022e6e96ed41mr7120476oaq.2.1712526654155;
+        Sun, 07 Apr 2024 14:50:54 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id lb8-20020a056638950800b004828d99f6aesm540280jab.43.2024.04.07.14.50.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Apr 2024 14:50:53 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>
+In-Reply-To: <20240407125910.4053377-1-ming.lei@redhat.com>
+References: <20240407125910.4053377-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: fix q->blkg_list corruption during disk rebind
+Message-Id: <171252665340.2536241.15987324634129666821.b4-ty@kernel.dk>
+Date: Sun, 07 Apr 2024 15:50:53 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 0/2] block,nvme: latency-based I/O scheduler
-To: Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
-Cc: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
-References: <20240403141756.88233-1-hare@kernel.org>
- <Zg8YNrSnZPjR4kan@kbusch-mbp.dhcp.thefacebook.com>
- <b255fca4-a9da-4364-a3af-eb699eeb4160@suse.de>
- <ZhAS0YKfV07qlUes@kbusch-mbp.dhcp.thefacebook.com>
- <46e26322-a677-4c27-bc22-e2c65ed9d03c@suse.de>
-Content-Language: he-IL, en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <46e26322-a677-4c27-bc22-e2c65ed9d03c@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
+
+
+On Sun, 07 Apr 2024 20:59:10 +0800, Ming Lei wrote:
+> Multiple gendisk instances can allocated/added for single request queue
+> in case of disk rebind. blkg may still stay in q->blkg_list when calling
+> blkcg_init_disk() for rebind, then q->blkg_list becomes corrupted.
+> 
+> Fix the list corruption issue by:
+> 
+> - add blkg_init_queue() to initialize q->blkg_list & q->blkcg_mutex only
+> - move calling blkg_init_queue() into blk_alloc_queue()
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] block: fix q->blkg_list corruption during disk rebind
+      commit: 8b8ace080319a866f5dfe9da8e665ae51d971c54
+
+Best regards,
+-- 
+Jens Axboe
 
 
 
-On 05/04/2024 18:36, Hannes Reinecke wrote:
-> On 4/5/24 17:03, Keith Busch wrote:
->> On Fri, Apr 05, 2024 at 08:21:14AM +0200, Hannes Reinecke wrote:
->>> On 4/4/24 23:14, Keith Busch wrote:
->>>> On Wed, Apr 03, 2024 at 04:17:54PM +0200, Hannes Reinecke wrote:
->>>>> Hi all,
->>>>>
->>>>> there had been several attempts to implement a latency-based I/O
->>>>> scheduler for native nvme multipath, all of which had its issues.
->>>>>
->>>>> So time to start afresh, this time using the QoS framework
->>>>> already present in the block layer.
->>>>> It consists of two parts:
->>>>> - a new 'blk-nlatency' QoS module, which is just a simple per-node
->>>>>     latency tracker
->>>>> - a 'latency' nvme I/O policy
->>>> Whatever happened with the io-depth based path selector? That should
->>>> naturally align with the lower latency path, and that metric is 
->>>> cheaper
->>>> to track.
->>>
->>> Turns out that tracking queue depth (on the NVMe level) always requires
->>> an atomic, and with that a performance impact.
->>> The qos/blk-stat framework is already present, and as the numbers show
->>> actually leads to a performance improvement.
->>>
->>> So I'm not quite sure what the argument 'cheaper to track' buys us 
->>> here...
->>
->> I was considering the blk_stat framework compared to those atomic
->> operations. I usually don't enable stats because all the extra
->> ktime_get_ns() and indirect calls are relatively costly. If you're
->> enabling stats anyway though, then yeah, I guess I don't really have a
->> point and your idea here seems pretty reasonable.
->
-> Pretty much. Of course you need stats to be enabled.
-> And problem with the queue depth is that it's actually quite costly
-> to compute; the while sbitmap thingie is precisely there to _avoid_
-> having to track the queue depth.
-> I can't really see how one could track the queue depth efficiently;
-> the beauty of the blk_stat framework is that it's running async, and
-> only calculated after I/O is completed.
-> We could do a 'mock' queue depth by calculating the difference between
-> submitted and completed I/O, but even then you'd have to inject a call
-> in the hot path to track the number of submissions.
->
-> In the end, the latency tracker did what I wanted to achieve (namely
-> balance out uneven paths), _and_ got faster than round-robin, so I 
-> didn't care about queue depth tracking.
-
-Hey Hannes,
-
-I think its a fair claim that a latency tracker is a valid proxy for 
-io-depth tracker.
-
-I think that we need Ewan to validate if this solves the original issue 
-he was trying
-to solve with his io-depth mpath selector. If so, I don't see any major 
-issues with this
-proposal.
