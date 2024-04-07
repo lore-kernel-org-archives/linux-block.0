@@ -1,141 +1,119 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0598BEA4
-	for <linux-block@vger.kernel.org>; Sun,  7 Apr 2024 00:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC62A34;
+	Sun,  7 Apr 2024 01:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712450330; cv=none; b=J9UTCtpluTNqDZjQnOEy0m9EvtAjVcdsJ0BKUXkhld8khBUzD/ugHOKIldQmmBkDmv4x2Pw/+35Dvz6J2kKEfBGfVm2dm8DOqGXiutajti6wT6Uy7E9KodJvLYCN96uCqLilzJNyOFc/Z2OiNFnNOUV7I5Xy77Pp/z7NuCqeY9Q=
+	t=1712452714; cv=none; b=DwXvxssszavq3jmtZIiQlXG1tqMT5dVF2mro45vQrAeoXaV6Z+kpAH5IPzLbxP1oHyfAj0rse+M7BuS3eYitcME9a76cZKt3U3iCy+sYSTZvj4MX1IbDV6zx4piDZzJcMQHoK7ZKjZXyCnxZDg101Es9HRcbxEa6uilPD8MQDHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712450330; c=relaxed/simple;
-	bh=6CGiEXLT7jPM40/crj7dW/YjqRdVMyeByrmf1EsSKj0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=KhA8IjJz2X/Y2Y6A3dIJNvEAUo6Qj5ktKJnWLXaoGUIYgh0/sEmrLw6JrRXhB89FI+EEVw5QXkntcIF7KbFGpdEmhA3SEZ+9xDojxJpEEiXGAKc7LKj3dGp9c83HhYYmgGmLyucu5trFvu/LT4d45qRIWF2mtN14u8Qaj5pboUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DXBq+q9m; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DXBq+q9m"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712450326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=5vk4SKV6/MxVBF1e0lW7EvQe+xAgZSwGpbhrG/UrULU=;
-	b=DXBq+q9mKzgF/M4nDiyGHI0dtnzkA40rRgyDJM257aSFafBXgfw90JbEGYqnLuZcPjVGD9
-	ZSZ2PQnIq1vL0/XLcTg5lmkJcvMZuedp88kLoIrKj3aQClyi2Nxj6jAE9wvEWcbOS5GVVN
-	YTbZsywuEaGv9bOAEfWMRrG9bgijjhk=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-635-71boEOksMo2HHRisXhLU2w-1; Sat, 06 Apr 2024 20:38:45 -0400
-X-MC-Unique: 71boEOksMo2HHRisXhLU2w-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2a2c3543b85so2955685a91.0
-        for <linux-block@vger.kernel.org>; Sat, 06 Apr 2024 17:38:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712450323; x=1713055123;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5vk4SKV6/MxVBF1e0lW7EvQe+xAgZSwGpbhrG/UrULU=;
-        b=lSfSIGL1Z3mKWNW+5wCK5QQ6gL7YejDJGVjuTkxuAkaqOlehw8WpZWv8UaUcSvOj8q
-         Mp0rDJEGmCpmctFS1bqdPWn8vMQPlCgMWVAxsR899Yh+xbi1r6rLtiFy4swWulyk1iyA
-         qtaKRKZGhIVX2JN+zqHGT3YL5XSK8jkXVbEluK3VD/0CU2bV7LRlkmVzl5O2oqWi2ao+
-         Kjw3dHWCkCfQDJdC1kHkvdpJy0jtmig5JE1vIh3k71GdTFp2nNejc4VGfD9YbgCa7+gH
-         oI2+7IjjYhFM+2W6F8EoadajS10yFqNzhA824CsMSrUvgzQ/n0hsvHMYtnzoP88C1IPt
-         4XgQ==
-X-Gm-Message-State: AOJu0Yx7mS7StZngRMOoLN8mfZHGJd2wI9sbfe1YN1r/rvdm1dYPZgjV
-	mTRG6wrGG7BIKcF0Z4z1Ts+AfLkRvIdtKS7pfbRME9PQGxL8QeLH1hgbmYRrdOxKenc0qOVY/9L
-	hxRpFNJHZgVK9ptCpDW+cFeJOuJGTjcLWGnjpg8BLfMbN4SkT0Hqq9v5p+W6FxUbpuMpp6ggarV
-	tnnMBl3Xizl/9u05iVmQcon4YlpdULImG4Ye5pBlmdqSj2E4rN
-X-Received: by 2002:a17:90b:1056:b0:2a4:752f:b7b7 with SMTP id gq22-20020a17090b105600b002a4752fb7b7mr4383038pjb.26.1712450323218;
-        Sat, 06 Apr 2024 17:38:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGxYxH+o7f3ceWId3hKUNgLZ/izPf6b5eHBpT73903OfPtR7mPlqIFeGcybfig4AsHzUrv9+hI0ZyEWa3x1cvk=
-X-Received: by 2002:a17:90b:1056:b0:2a4:752f:b7b7 with SMTP id
- gq22-20020a17090b105600b002a4752fb7b7mr4383029pjb.26.1712450322886; Sat, 06
- Apr 2024 17:38:42 -0700 (PDT)
+	s=arc-20240116; t=1712452714; c=relaxed/simple;
+	bh=yo0V0OqQ2hLnneGNmwTZyEIXc3U09jfJ3vOcHbJt8ps=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=UQyA7WF+xULVfDBNJvvxkan9JWHdbtn0h2/m1hmCVpbVil9LeWlzvmnLjehDT8dcXYJ8eqScAffJPASl+kLVDFkIPLvzRTQyaMfOVtuS4zQFwqrS2VWPMRqAH4A10rstlovnmf5V6TEtO+oCIixbyj2DYqtXaI8knvoFXIYTjNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBvVd6rbhz4f3jpk;
+	Sun,  7 Apr 2024 09:18:17 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 49AB31A0A1F;
+	Sun,  7 Apr 2024 09:18:22 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgAX5g5c9BFmYvUvJQ--.14156S3;
+	Sun, 07 Apr 2024 09:18:22 +0800 (CST)
+Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
+ blcok_device
+To: Al Viro <viro@zeniv.linux.org.uk>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
+ <20240406090930.2252838-23-yukuai1@huaweicloud.com>
+ <20240406194206.GC538574@ZenIV> <20240406202947.GD538574@ZenIV>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
+Date: Sun, 7 Apr 2024 09:18:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Sun, 7 Apr 2024 08:38:31 +0800
-Message-ID: <CAHj4cs8xbBXm1_SKpNpeB5_bbD28YwhorikQ-OYRtt9-Mf+vsQ@mail.gmail.com>
-Subject: [bug report] kmemleak observed with blktests nvme/tcp
-To: linux-block <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20240406202947.GD538574@ZenIV>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAX5g5c9BFmYvUvJQ--.14156S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr1DCw45Cw1UtF1UGr4xXrb_yoW8ArWrpF
+	WYgFWYkaykCw48Gr4kZw4fJrySk39rJrWUGFnrXr18CrWj9r93WFZ7KF98uFZ5Krs7Xr1v
+	vFWYyFykAF4rXw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hello
+Hi,
 
-I found the kmemleak issue after blktests nvme/tcp tests on the latest
-linux-block/for-next, please help check it and let me know if you need
-any info/testing for it, thanks.
+ÔÚ 2024/04/07 4:29, Al Viro Ð´µÀ:
+> On Sat, Apr 06, 2024 at 08:42:06PM +0100, Al Viro wrote:
+>> On Sat, Apr 06, 2024 at 05:09:26PM +0800, Yu Kuai wrote:
+>>> From: Yu Kuai <yukuai3@huawei.com>
+>>>
+>>> So that iomap and bffer_head can convert to use bdev_file in following
+>>> patches.
+>>
+>> Let me see if I got it straight.  You introduce dummy struct file instances
+>> (no methods, nothing).  The *ONLY* purpose they serve is to correspond to
+>> opened instances of struct bdev.  No other use is possible.
 
-# dmesg | grep kmemleak
-[ 2580.572467] kmemleak: 92 new suspected memory leaks (see
-/sys/kernel/debug/kmemleak)
+Yes, this is the only purpose.
+>>
+>> You shove them into ->i_private of bdevfs inodes.  Lifetime rules are...
+>> odd.
+>>
+>> In bdev_open() you arrange for such beast to be present.  You never
+>> return it anywhere, they only get accessed via ->i_private, exposing
+>> it at least to fs/buffer.c.  Reference to those suckers get stored
+>> (without grabbing refcount) into buffer_head instances.
+>>
+>> And all of that is for... what, exactly?
+> 
+> Put another way, what's the endgame here?  Are you going to try and
+> propagate those beasts down into bio_alloc()?  Because if you do not,
+> you need to keep struct block_device * around anyway.
 
-# cat kmemleak.log
-unreferenced object 0xffff8885a1abe740 (size 32):
-  comm "kworker/40:1H", pid 799, jiffies 4296062986
-  hex dump (first 32 bytes):
-    c2 4a 4a 04 00 ea ff ff 00 00 00 00 00 10 00 00  .JJ.............
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 6328eade):
-    [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
-    [<ffffffffa86a9b1f>] sgl_alloc_order+0x7f/0x360
-    [<ffffffffc261f6c5>] lo_read_simple+0x1d5/0x5b0 [loop]
-    [<ffffffffc26287ef>] 0xffffffffc26287ef
-    [<ffffffffc262a2c4>] 0xffffffffc262a2c4
-    [<ffffffffc262a881>] 0xffffffffc262a881
-    [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
-    [<ffffffffa76b0813>] worker_thread+0x583/0xd20
-    [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
-    [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
-    [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
-unreferenced object 0xffff88a8b03647c0 (size 16):
-  comm "kworker/40:1H", pid 799, jiffies 4296062986
-  hex dump (first 16 bytes):
-    c0 4a 4a 04 00 ea ff ff 00 10 00 00 00 00 00 00  .JJ.............
-  backtrace (crc 860ce62b):
-    [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
-    [<ffffffffc261f805>] lo_read_simple+0x315/0x5b0 [loop]
-    [<ffffffffc26287ef>] 0xffffffffc26287ef
-    [<ffffffffc262a2c4>] 0xffffffffc262a2c4
-    [<ffffffffc262a881>] 0xffffffffc262a881
-    [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
-    [<ffffffffa76b0813>] worker_thread+0x583/0xd20
-    [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
-    [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
-    [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
+Yes, patch 23-26 already do the work to remove the field block_device
+and convert to use bdev_file for iomap and buffer_head.
 
-(gdb) l *(lo_read_simple+0x1d5)
-0x66c5 is in lo_read_simple (drivers/block/loop.c:284).
-279 struct bio_vec bvec;
-280 struct req_iterator iter;
-281 struct iov_iter i;
-282 ssize_t len;
-283
-284 rq_for_each_segment(bvec, rq, iter) {
-285 iov_iter_bvec(&i, ITER_DEST, &bvec, 1, bvec.bv_len);
-286 len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
-287 if (len < 0)
-288 return len;
-(gdb) l *(lo_read_simple+0x315)
-0x6805 is in lo_read_simple (./include/linux/bio.h:120).
-115 iter->bi_sector += bytes >> 9;
-116
-117 if (bio_no_advance_iter(bio))
-118 iter->bi_size -= bytes;
-119 else
-120 bvec_iter_advance_single(bio->bi_io_vec, iter, bytes);
-121 }
-122
-123 void __bio_advance(struct bio *, unsigned bytes);
-124
+Or maybe you prefer the idea from last version to keep the block_device
+field in iomap/buffer_head, and use it for raw block_device fops?
 
+Thanks,
+Kuai
 
--- 
-Best Regards,
-  Yi Zhang
+> 
+> We use ->b_bdev for several things:
+> 	* passing to bio_alloc() (quite a few places)
+> 	* %pg in debugging printks
+> 	* (rare) passing to write_boundary_block().
+> 	* (twice) passing to clean_bdev_aliases().
+> 	* (once) passing to __find_get_block().
+> 	* one irregular use as a key in lookup_bh_lru()
+> 
+> IDGI...
+> .
+> 
 
