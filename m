@@ -1,119 +1,94 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412FA368;
-	Sun,  7 Apr 2024 02:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709E01C0DC3;
+	Sun,  7 Apr 2024 03:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712457436; cv=none; b=QjJ/0Djom9b64gFM73YZMTuvqz0KfiWpCjbOmXAyWqsYAlZ0o4yztOfyqP/WgzpW40GHhtLIvmRnpTEe5vpyjUCKeA+BV9rGYTfwgspmQOL5rBQeVjurHAh1jhUJY9xUNm1c50QFb1GrPOXBDdkwL54m7Ci2c1weYEmQusFQNIw=
+	t=1712459186; cv=none; b=u3olQdGEI0DmLBxhgwiSHyjj8yqCiiYSJbWXnwkWKI+BKws4uMPApQWP1nhlrM3qwTzp5GP0sCI4jsYC2OdwCG7MkHa0DSpx06t4CuTFPPIdxV4lKkPfLlcrxDFOQsSLrhUWMjF6i4jJof/IvO3PZ0fhWngpmUPBUtpZWgc/11c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712457436; c=relaxed/simple;
-	bh=JTX3bajuxlEJLfm3k+IU8/2q1JwcvZhj9x9aaodSxxA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=atH+6j1xmuWhqeYQ00+fj6AEFneHA3zCynZI+JzIpG35EiTW9ibA726kM/39TIPwHAf7keO0undh5RgDIGM0VAxiJ2gYzOtEF7j/NiE//+LyaDIT1iEyvv3cMyGKefgzHE19k3RY5TbYM0IvZdg8GQP3F/vEcR6aAxZeBJuSSSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VBxFY3sZjz4f3jkD;
-	Sun,  7 Apr 2024 10:37:05 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id D725F1A0172;
-	Sun,  7 Apr 2024 10:37:09 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgAn+RHVBhJmk6M1JQ--.44469S3;
-	Sun, 07 Apr 2024 10:37:09 +0800 (CST)
-Subject: Re: [PATCH vfs.all 04/26] block: prevent direct access of bd_inode
-To: Al Viro <viro@zeniv.linux.org.uk>, Yu Kuai <yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1712459186; c=relaxed/simple;
+	bh=LxMxC0gWWe8OZQXnt8cp5I2UaKMknVyUH+bEJYGi4n0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SFw4HQfKWH6LxcAU71oQjGNWax7va5VvhwAf4J31zTxVIEA3NExpRuxrl9MvOfNsgHDP5RXQQPne119prcJ2cZRT7vEScHizbv+aGu9ru0+oxchkrVWh/DdoV+u1bP+lk+y8a0kjbo38cOndDnUDk0i65KV3zHr3gLha0wQGkjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=cqNtUitt; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="cqNtUitt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=2g944MBeo/tBWBRCgWeQA9CcS0zs1LmcvuY+A1PoLRM=; b=cqNtUitterRF1F2a6OkPucbBwQ
+	Ke5h7qSn6fNHqnXTc/eh8mGrLvCaccuMq+P7aLrAEd2Q6T/YXZe5VhpD4X+42ZYqO3O2UZyhRCciT
+	uRk2Gut9VDAk8PZJrsM557+vUZ+kt588pcKCNngwhk8Xm6LnmBYW8zfNs9kNOI75RpYBTUaxLgxXq
+	KFYj9gFuwqAka+hbGLSBE8O/iL0SN+lYibxps3nPOoAe16LibTrAlmnfJK242WQSjcRNEQL+yHpMc
+	uOhj9AyZnOjdFwXZ9jnM8brT61VvjpLUgLYYmweIg+jvtG2AfJu7eLr3qO/ApmXhcoJac08hi9NMA
+	FJfwyW9g==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rtIrC-007Z3c-2Z;
+	Sun, 07 Apr 2024 03:06:10 +0000
+Date: Sun, 7 Apr 2024 04:06:10 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Yu Kuai <yukuai1@huaweicloud.com>
 Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
+ blcok_device
+Message-ID: <20240407030610.GI538574@ZenIV>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-5-yukuai1@huaweicloud.com>
- <20240407022250.GH538574@ZenIV>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <45c32706-b599-d968-4bff-4ad8f0768275@huaweicloud.com>
-Date: Sun, 7 Apr 2024 10:37:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <20240406090930.2252838-23-yukuai1@huaweicloud.com>
+ <20240406194206.GC538574@ZenIV>
+ <20240406202947.GD538574@ZenIV>
+ <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
+ <20240407015149.GG538574@ZenIV>
+ <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240407022250.GH538574@ZenIV>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn+RHVBhJmk6M1JQ--.44469S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tr17WFWxZFWxAr13uF4rXwb_yoW8GFyUpr
-	4UGFW5Cr45XryFgF40vw42vFnIgF17KrW8Z34fJ3WFy3yDtw1vgFy8Cry7AFW7XrykKF4I
-	qF4YyrW8ury7CFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWU
-	JwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUF9a9DUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-Hi,
+On Sun, Apr 07, 2024 at 10:34:56AM +0800, Yu Kuai wrote:
 
-ÔÚ 2024/04/07 10:22, Al Viro Ð´µÀ:
-> On Sat, Apr 06, 2024 at 05:09:08PM +0800, Yu Kuai wrote:
->> @@ -669,7 +669,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
->>   {
->>   	struct file *file = iocb->ki_filp;
->>   	struct block_device *bdev = I_BDEV(file->f_mapping->host);
->> -	struct inode *bd_inode = bdev->bd_inode;
->> +	struct inode *bd_inode = bdev_inode(bdev);
-> 
-> What you want here is this:
-> 
-> 	struct inode *bd_inode = file->f_mapping->host;
-> 	struct block_device *bdev = I_BDEV(bd_inode);
+> Other than raw block_device fops, other filesystems can use the opened
+> bdev_file directly for iomap and buffer_head, and they actually don't
+> need to reference block_device anymore. The point here is that whether
 
-Yes, this way is better, logically.
-> 
-> 
->> --- a/block/ioctl.c
->> +++ b/block/ioctl.c
->> @@ -97,7 +97,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
->>   {
->>   	uint64_t range[2];
->>   	uint64_t start, len;
->> -	struct inode *inode = bdev->bd_inode;
->> +	struct inode *inode = bdev_inode(bdev);
->>   	int err;
-> 
-> The uses of 'inode' in this function are
->          filemap_invalidate_lock(inode->i_mapping);
-> and
->          filemap_invalidate_unlock(inode->i_mapping);
-> 
-> IOW, you want bdev_mapping(bdev), not bdev_inode(bdev).
-> 
->> @@ -166,7 +166,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
->>   {
->>   	uint64_t range[2];
->>   	uint64_t start, end, len;
->> -	struct inode *inode = bdev->bd_inode;
->> +	struct inode *inode = bdev_inode(bdev);
-> 
-> Same story.
+What do you mean, "reference"?  The counting reference is to opened
+file; ->s_bdev is a cached pointer to associated struct block_device,
+and neither it nor pointers in buffer_head are valid past the moment
+when you close the file.  Storing (non-counting) pointers to struct
+file in struct buffer_head is not different in that respect - they
+are *still* only valid while the "master" reference is held.
 
-Yes.
+Again, what's the point of storing struct file * in struct buffer_head
+or struct iomap?  In any instances of those structures?
 
-Thanks for the suggestions!
-Kuai
+There is a good reason to have it in places that keep a reference to
+opened block device - the kind that _keeps_ the device opened.  Namely,
+there's state that need to be carried from the place where we'd opened
+the sucker to the place where we close it, and that state is better
+carried by opened file.
 
-> .
-> 
+But neither iomap nor buffer_head contain anything of that sort -
+the lifetime management of the opened device is not in their
+competence.  As the matter of fact, the logics around closing
+those opened devices (bdev_release()) makes sure that no
+instances of buffer_head (or iomap) will outlive them.
+And they don't care about any extra state - everything
+they use is in block_device and coallocated inode.
 
+I could've easily missed something in one of the threads around
+the earlier iterations of the patchset; if that's the case,
+could somebody restate the rationale for that part and/or
+post relevant lore.kernel.org links?  Christian?  hch?
+What am I missing here?
