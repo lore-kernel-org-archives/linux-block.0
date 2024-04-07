@@ -1,94 +1,142 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B921876;
-	Sun,  7 Apr 2024 05:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252B234CD5
+	for <linux-block@vger.kernel.org>; Sun,  7 Apr 2024 12:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712467303; cv=none; b=jdKBzPH0V3aOw2nfRJRdAldImXn48ZGp0i0Nf2jJ998umPCAmx4BseUMM7xR9SGhR+TxcVqYqQubtNbddgra13nXxbBKj7PEX6/UdBP6smSpadmvE4QzWQEKDSSqsL6ZLfKKiO+WP4BGfKgF7NPguq5jBDaYsq79YHOOGIMVJz8=
+	t=1712494652; cv=none; b=QWsPGNxtQsivR7JJKUAILhH4Ucz1QlnGPpVcmUhSzG7Ch1BbihRcATNdPtGgFcDM80o+rWBZ/oVvXTaxlVo1ViaOq7MTN7+v7vPibfV0BlYrtsmI/Z85Ipmj7cPZBU2abeYuktjr0UTMLqLIfE0QNXlEeDhnzne+hsHDGRsQe9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712467303; c=relaxed/simple;
-	bh=ujk7DSuKVcPRG2wlyqBMd8YB/i8MCyZkjnXuAJsWi4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OszcucS6MBb2Ks8DP21jtVLdy5j73Gh7zxsux+//QkygRv/PdLTEu3/ydrpJqSGYrE84IRFtnEBiDWKVGUe7q9sO2Sw0uK308oeZx4+RDM5JP8GJjvy+DNj0oYBVfXbNqDr2zIrP4WBOZzgVuGtlsfsrtzg/lP3iPp4vAHVuQLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=mqutEJmN; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1712494652; c=relaxed/simple;
+	bh=XxcxhhcGsaMwdC9AnrpW/ZYGkVeOfSvHxjczmROLsZU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iNkQFVy7giJOfdtJ3glTrDemOTl+B/wQvLuhArTvU4+3ezzjpOHlBRUxrE8HuzgA4+SO/As+kHPm6GPC+amJe15XtewIMrvQZXTjFc6m8AVQ4gGmIPxl331jzgNQn6SbODi0Af2b71uGyjDIBGKHLyEIQLpEmR8B3QVwGPcKYvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BJOCPMMM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="mqutEJmN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=huWoGSBEymltKqBrtCrxk2uX4uO2jpl6CW0VFMMyyOc=; b=mqutEJmNFIr2v7gBSjVCMUqcDV
-	xsPe04ijls8Ap0J5IcmyYdK8EZ1tvK2jR/PYBcoBlBgnexAtUkoUTi0T8xZim0fu+LOWPFnV88A+Z
-	CBPgjtnddrY5sTXr7PpFNwL8j7TbJcCt9JvYbCIejzL9+ymRxyYjDywSxZlhbzFtPwuWjVRRn1WAs
-	UVH854MWKDSgR0F+E0hc6+qw4TxQ5Y716cCBeG9M1uQlzNAmK3g3ZZDycn7mIyfBaNy1xOLVb3OIH
-	w8pvQDEs1HG28rdIW6WT8JuhxAktTe/Afy9MaYI3ZRcR882rRrP/Ooq1zVUaHYBmikI9HTxKEVv4O
-	UAoqcHEA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rtKyC-007cdB-33;
-	Sun, 07 Apr 2024 05:21:33 +0000
-Date: Sun, 7 Apr 2024 06:21:32 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
- blcok_device
-Message-ID: <20240407052132.GM538574@ZenIV>
-References: <20240406090930.2252838-23-yukuai1@huaweicloud.com>
- <20240406194206.GC538574@ZenIV>
- <20240406202947.GD538574@ZenIV>
- <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
- <20240407015149.GG538574@ZenIV>
- <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
- <20240407030610.GI538574@ZenIV>
- <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
- <20240407045758.GK538574@ZenIV>
- <20240407051119.GL538574@ZenIV>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJOCPMMM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712494649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=szymyODjETFv2c66DXuyP5VwSQTNs1pd2/QW68OU2L0=;
+	b=BJOCPMMMR9v671E7KP6b7SjC5RHKWlL6uAed/AizZnXuFdk4NP2W1A9FYR6rp/2YJz9vjT
+	k+zPPeEJO9BoYayDWT33AUFx2tIa0yyLEI2m1LcYoh1F2Zj/5mJmtKBZyiDcP579G64GQ7
+	JPn+aUIlLQnrdFuucBboTYyVjSJ5/2c=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-657-I9f6_Zv8N6ujyw7CS758Ig-1; Sun, 07 Apr 2024 08:57:27 -0400
+X-MC-Unique: I9f6_Zv8N6ujyw7CS758Ig-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6221C1887316;
+	Sun,  7 Apr 2024 12:57:27 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6DC7823D61;
+	Sun,  7 Apr 2024 12:57:26 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Changhui Zhong <czhong@redhat.com>
+Subject: [PATCH] block/035: add test to cover blk-cgroup vs. disk rebind
+Date: Sun,  7 Apr 2024 20:57:17 +0800
+Message-ID: <20240407125717.4052964-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240407051119.GL538574@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On Sun, Apr 07, 2024 at 06:11:19AM +0100, Al Viro wrote:
-> On Sun, Apr 07, 2024 at 05:57:58AM +0100, Al Viro wrote:
-> 
-> > PS: in grow_dev_folio() we probably want
-> > 	struct address_space *mapping = bdev->bd_inode->i_mapping;
-> > instead of
-> > 	struct inode *inode = bdev->bd_inode;
-> > as one of the preliminary chunks.
-> > FWIW, it really looks like address_space (== page cache of block device,
-> > not an unreasonably candidate for primitive) and block size (well,
-> > logarithm thereof) cover the majority of what remains, with device
-> > size possibly being (remote) third...
-> 
-> Incidentally, how painful would it be to switch __bread_gfp() and __bread()
-> to passing *logarithm* of block size instead of block size?  And possibly
-> supply the same to clean_bdev_aliases()...
-> 
-> That would reduce fs/buffer.c uses to just "give me the address_space of
-> that block device"...
+Recently it is observed that list corruption is triggered when running
+scsi disk rebind in case of blk-cgroup.
 
-... and from what I've seen in your series, it very much looks like after
-that we could replace ->bd_inode with ->bd_mapping, turning your bdev_mapping()
-into an inline and (hopefully) leaving the few remaining uses of bdev_inode()
-outside of block/bdev.c _not_ on hot paths.  If nothing else, it would
-make it much easier to grep for remaining odd stuff.
+Add one such test case for covering this unusual operation.
 
-Might trim the btrfs parts of the series, at that - a lot of that seems to
-be "how do we propagate opened file instead of just bdev, so that we could
-get to its ->f_mapping deep in call chain"...
+Cc: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ tests/block/035     | 54 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/035.out |  2 ++
+ 2 files changed, 56 insertions(+)
+ create mode 100755 tests/block/035
+ create mode 100644 tests/block/035.out
 
-Again, all of that is only if __bread...() conversion to log(size) is feasible
-without a massive PITA - there might be dragons...
+diff --git a/tests/block/035 b/tests/block/035
+new file mode 100755
+index 0000000..a1057a3
+--- /dev/null
++++ b/tests/block/035
+@@ -0,0 +1,54 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Ming Lei
++#
++# blk-cgroup is usually initialized in disk allocation code, and
++# de-initialized in disk release code. And scsi disk rebind needs
++# to re-allocate/re-add disk, meantime request queue is kept as
++# live during the whole cycle.
++#
++# Add this test for covering blk-cgroup & disk rebind.
++
++. tests/block/rc
++. common/scsi_debug
++. common/cgroup
++
++DESCRIPTION="test cgroup vs. scsi_debug rebind"
++QUICK=1
++
++requires() {
++	_have_cgroup2_controller io
++	_have_scsi_debug
++	_have_fio
++}
++
++scsi_debug_rebind() {
++	if ! _configure_scsi_debug; then
++		return
++	fi
++
++	_init_cgroup2
++
++	echo "+io" > "/sys/fs/cgroup/cgroup.subtree_control"
++	echo "+io" > "$CGROUP2_DIR/cgroup.subtree_control"
++	mkdir -p "$CGROUP2_DIR/${TEST_NAME}"
++
++	local dev dev_path hctl
++	dev=${SCSI_DEBUG_DEVICES[0]}
++	dev_path="$(realpath "/sys/block/${dev}/device")"
++	hctl="$(basename "$dev_path")"
++
++	echo -n "${hctl}" > "/sys/bus/scsi/drivers/sd/unbind"
++	echo -n "${hctl}" > "/sys/bus/scsi/drivers/sd/bind"
++
++	_exit_cgroup2
++	_exit_scsi_debug
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	scsi_debug_rebind
++
++	echo "Test complete"
++}
+diff --git a/tests/block/035.out b/tests/block/035.out
+new file mode 100644
+index 0000000..6ffa504
+--- /dev/null
++++ b/tests/block/035.out
+@@ -0,0 +1,2 @@
++Running block/035
++Test complete
+-- 
+2.41.0
+
