@@ -1,35 +1,35 @@
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244F610795;
-	Sun,  7 Apr 2024 05:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B921876;
+	Sun,  7 Apr 2024 05:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712466691; cv=none; b=EZkONgVxRZ/a3TvrfdPufGrtn4HkQ2O3Iy3fTVHzeLEZs29jywrQoaLVFhGCw7mCCbd2PsKdcvBiEcJGSBBTHevfyPUGCrLNphaaRWcFYRNjpfLrjZHl/MGEid1+Y/tOB77u1rGEA4vk2AaYr7du9N5FvOlb6P6m5hIHc4U/wQg=
+	t=1712467303; cv=none; b=jdKBzPH0V3aOw2nfRJRdAldImXn48ZGp0i0Nf2jJ998umPCAmx4BseUMM7xR9SGhR+TxcVqYqQubtNbddgra13nXxbBKj7PEX6/UdBP6smSpadmvE4QzWQEKDSSqsL6ZLfKKiO+WP4BGfKgF7NPguq5jBDaYsq79YHOOGIMVJz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712466691; c=relaxed/simple;
-	bh=3Roj5F6z8RWZZzGYYmUdoA18hIYipOGJEobJkO3rBK4=;
+	s=arc-20240116; t=1712467303; c=relaxed/simple;
+	bh=ujk7DSuKVcPRG2wlyqBMd8YB/i8MCyZkjnXuAJsWi4k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qlhdgE8EbRQJaNTMvXeizUxdrh7Gq9b1utPbYQqJi7Yspqk/o37OGyOeBYBHjcnpTVGwgUY5Mf5ZEV4bR+bsN1vNpnhxo4Q/+KF44EE/D5G1VvYkhN/7+To66bQ/Vdobvt3/lmuGMfgmU/ISI4bNFUHdJ7jC71RMVgjQIUTzzC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=OQoOiPFG; arc=none smtp.client-ip=62.89.141.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=OszcucS6MBb2Ks8DP21jtVLdy5j73Gh7zxsux+//QkygRv/PdLTEu3/ydrpJqSGYrE84IRFtnEBiDWKVGUe7q9sO2Sw0uK308oeZx4+RDM5JP8GJjvy+DNj0oYBVfXbNqDr2zIrP4WBOZzgVuGtlsfsrtzg/lP3iPp4vAHVuQLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=mqutEJmN; arc=none smtp.client-ip=62.89.141.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="OQoOiPFG"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="mqutEJmN"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
 	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zp1cKIilvWlXGuXBFY98ITzfX3vswqo1RvDkacebwSE=; b=OQoOiPFGJhw7OkHtucAKKdWMA4
-	puoP/y+tjDEcut2nH4CzPu9H1hrXba2vC6IjAAWEF73Fj8haouu/x884r/bHH5FoIATfU1sspqh2n
-	VpKCDEgT4LnIWUV52Ec+VfeAp7DgCQTljAJ9uhkh1rxIsIKCywSIH8avWnySllVCazzDd+BWQHaZZ
-	v3jqa6Y4ZBBuY4Fu/zNPY4W/fHewoSRJnRlY1vtNUfuot/WxJ5fIAmKbG0rmBYIIBICBPjaBn90Hr
-	0a5PDU/+sTyGzzY+T3LYbbOw/RmV2h2g2borR+L/8G6pHO7x7J6bqZPqVQ9waoe8jKe6hfwLwXaeu
-	P+iRs5hg==;
+	bh=huWoGSBEymltKqBrtCrxk2uX4uO2jpl6CW0VFMMyyOc=; b=mqutEJmNFIr2v7gBSjVCMUqcDV
+	xsPe04ijls8Ap0J5IcmyYdK8EZ1tvK2jR/PYBcoBlBgnexAtUkoUTi0T8xZim0fu+LOWPFnV88A+Z
+	CBPgjtnddrY5sTXr7PpFNwL8j7TbJcCt9JvYbCIejzL9+ymRxyYjDywSxZlhbzFtPwuWjVRRn1WAs
+	UVH854MWKDSgR0F+E0hc6+qw4TxQ5Y716cCBeG9M1uQlzNAmK3g3ZZDycn7mIyfBaNy1xOLVb3OIH
+	w8pvQDEs1HG28rdIW6WT8JuhxAktTe/Afy9MaYI3ZRcR882rRrP/Ooq1zVUaHYBmikI9HTxKEVv4O
+	UAoqcHEA==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rtKoJ-007cNA-1i;
-	Sun, 07 Apr 2024 05:11:19 +0000
-Date: Sun, 7 Apr 2024 06:11:19 +0100
+	id 1rtKyC-007cdB-33;
+	Sun, 07 Apr 2024 05:21:33 +0000
+Date: Sun, 7 Apr 2024 06:21:32 +0100
 From: Al Viro <viro@zeniv.linux.org.uk>
 To: Yu Kuai <yukuai1@huaweicloud.com>
 Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
@@ -38,9 +38,8 @@ Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
 	"yukuai (C)" <yukuai3@huawei.com>
 Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
  blcok_device
-Message-ID: <20240407051119.GL538574@ZenIV>
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-23-yukuai1@huaweicloud.com>
+Message-ID: <20240407052132.GM538574@ZenIV>
+References: <20240406090930.2252838-23-yukuai1@huaweicloud.com>
  <20240406194206.GC538574@ZenIV>
  <20240406202947.GD538574@ZenIV>
  <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
@@ -49,6 +48,7 @@ References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
  <20240407030610.GI538574@ZenIV>
  <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
  <20240407045758.GK538574@ZenIV>
+ <20240407051119.GL538574@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,24 +57,38 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240407045758.GK538574@ZenIV>
+In-Reply-To: <20240407051119.GL538574@ZenIV>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Sun, Apr 07, 2024 at 05:57:58AM +0100, Al Viro wrote:
+On Sun, Apr 07, 2024 at 06:11:19AM +0100, Al Viro wrote:
+> On Sun, Apr 07, 2024 at 05:57:58AM +0100, Al Viro wrote:
+> 
+> > PS: in grow_dev_folio() we probably want
+> > 	struct address_space *mapping = bdev->bd_inode->i_mapping;
+> > instead of
+> > 	struct inode *inode = bdev->bd_inode;
+> > as one of the preliminary chunks.
+> > FWIW, it really looks like address_space (== page cache of block device,
+> > not an unreasonably candidate for primitive) and block size (well,
+> > logarithm thereof) cover the majority of what remains, with device
+> > size possibly being (remote) third...
+> 
+> Incidentally, how painful would it be to switch __bread_gfp() and __bread()
+> to passing *logarithm* of block size instead of block size?  And possibly
+> supply the same to clean_bdev_aliases()...
+> 
+> That would reduce fs/buffer.c uses to just "give me the address_space of
+> that block device"...
 
-> PS: in grow_dev_folio() we probably want
-> 	struct address_space *mapping = bdev->bd_inode->i_mapping;
-> instead of
-> 	struct inode *inode = bdev->bd_inode;
-> as one of the preliminary chunks.
-> FWIW, it really looks like address_space (== page cache of block device,
-> not an unreasonably candidate for primitive) and block size (well,
-> logarithm thereof) cover the majority of what remains, with device
-> size possibly being (remote) third...
+... and from what I've seen in your series, it very much looks like after
+that we could replace ->bd_inode with ->bd_mapping, turning your bdev_mapping()
+into an inline and (hopefully) leaving the few remaining uses of bdev_inode()
+outside of block/bdev.c _not_ on hot paths.  If nothing else, it would
+make it much easier to grep for remaining odd stuff.
 
-Incidentally, how painful would it be to switch __bread_gfp() and __bread()
-to passing *logarithm* of block size instead of block size?  And possibly
-supply the same to clean_bdev_aliases()...
+Might trim the btrfs parts of the series, at that - a lot of that seems to
+be "how do we propagate opened file instead of just bdev, so that we could
+get to its ->f_mapping deep in call chain"...
 
-That would reduce fs/buffer.c uses to just "give me the address_space of
-that block device"...
+Again, all of that is only if __bread...() conversion to log(size) is feasible
+without a massive PITA - there might be dragons...
