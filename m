@@ -1,116 +1,177 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C64F4AEF8
-	for <linux-block@vger.kernel.org>; Mon,  8 Apr 2024 09:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34AA53807
+	for <linux-block@vger.kernel.org>; Mon,  8 Apr 2024 10:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712569703; cv=none; b=i63gZmO3wEf4tu9pgMlnYeLOa+4++837Uh9/26HbpfODFLHLMIblVB1oHo3sEsWUFVT+r3+p3PBwEZDqnxF7opOzX6+vVxCgFW5QyJXDHmeQWoQ3KeFwEIrOeIoJZNZ9QXLtScaMx9LDZU4lFBgoWxdPDRD7zJM3e6x9bdC5Ja0=
+	t=1712571863; cv=none; b=ZWu1stoc6CwiRuUSddWga2v1jwJK1SIxIXjKs1dibzFjTe7vJQZt6E8LjmD8YJ90C3yHg5CT0YGVczwkDKCyFDAaxEfN/ryiZ6YnVm60zDeuCrlTUMxG5v1NQQF23EcjKgDXZQJ5LI16hqQd9mgR6nJAdLR0cwv4YTQNTlaC+qA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712569703; c=relaxed/simple;
-	bh=IUp08mqVpzXZ0Ua/UT88n3Tbk8rfXt40q2MuLB1Mj9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X1SQ1AddE22MBTI8T5PJWd8fuD6leyOtVqR+j7+HETT0El+CIR8PX/UJFmnX5FhvQjCmJ4G3oRc2UZx1tKt3+aYYwaSIFPMBfTpRj1RloUIzfrKL1Y/B4JsOBS3pPXx5wwx5TxfLeWERD/i+dBYuq5E+PT02gC+VqzCxhPk6Wzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TAscyzgU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712571863; c=relaxed/simple;
+	bh=AA6NZcYbHPO0zHenWOgHSTgf3cju/SFBdmm93I+Ynhw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AJM0PW9Uxg1+W0dj+PDBgNxmGqfMFwexhi5hWh3faDjXQ9kn90qPcFKEWmNu71f+napGOnWwoFGhtRH0Ip/6LCa/h1nljWzTIs3HxUQsRwjGYbMpqBADsxsBKZIS/OZq+tbLpttOgAHJJ/p8G1vRJvmlpG1+f+q9ouo+sBpvzuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kaZjZVR6; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TAscyzgU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712569701;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bk+qeUpt0NeaYtZeGZHtTJDFgi95opWbJTTRcZV5Uts=;
-	b=TAscyzgUGT6aMiHfL3MV/YNOa9zPs2pMqODIiC7Sk0ZI8yVpj27LsjvnMLztf3846HlDH6
-	uJ9ZO7TSuQGpQ+7rAoOR2lH7oabseyc7BVqIOjI13K6wkasWqDBBICWeNMA2IC594PiQoq
-	5VyqwfooDVb+hcqPJRAbHiV1wBR2iBs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-383-s6smG9LPPne4nc8-Zuj9lA-1; Mon, 08 Apr 2024 05:48:17 -0400
-X-MC-Unique: s6smG9LPPne4nc8-Zuj9lA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 21A491049B82;
-	Mon,  8 Apr 2024 09:48:17 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 80F462026D06;
-	Mon,  8 Apr 2024 09:48:12 +0000 (UTC)
-Date: Mon, 8 Apr 2024 17:48:02 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	janpieter.sollie@edpnet.be, Mike Snitzer <snitzer@kernel.org>,
-	dm-devel@lists.linux.dev, Song Liu <song@kernel.org>,
-	linux-raid@vger.kernel.org
-Subject: Re: [PATCH] block: allow device to have both virt_boundary_mask and
- max segment size
-Message-ID: <ZhO9UrfK4EulTkLo@fedora>
-References: <20240407131931.4055231-1-ming.lei@redhat.com>
- <20240408055542.GA15653@lst.de>
- <ZhOekuZdwlwNSiZV@fedora>
- <20240408084739.GA26968@lst.de>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kaZjZVR6"
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4389vIbL024144;
+	Mon, 8 Apr 2024 10:24:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=9hT6Xo0zh893cHuYQsx0P8EYkjIztutvFofjNunbKl8=;
+ b=kaZjZVR67bknRXJW1/+RG5MEwEA4kuu4D8wEzP9WR2JZzwEKkFJiFpFVVCPjpQ6Impwe
+ uJChZ4tx0YYRoZBJDsjwcHXZ80ZPIJ3BWjepF9xXYi4BAHGUnwUA094uD39C0fAc/yN0
+ HX8js9XMVo3whd4FBgSaPzxXhsTyeeHLt9lUbT0fwzXt86GinEhOIwLASJF6hvyXmayZ
+ hmkQhSpZnn5ycvfkvCbuGn5netzWShF87NehFYW/xjYznM8/WyIMcnoBU2BMLLYPH/+G
+ HhQLFbegc0GN8acqIprLyvwDShHUV4waQGVXVDjsqjOOP36eM294UlKa91Fy747m9ab4 BA== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xceda01sy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 10:24:01 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4388H5Ts022573;
+	Mon, 8 Apr 2024 10:24:00 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbhqnqh9f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 10:24:00 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 438ANugE35782996
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Apr 2024 10:23:58 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 384CB20043;
+	Mon,  8 Apr 2024 10:23:56 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B21E2004B;
+	Mon,  8 Apr 2024 10:23:54 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.231])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Apr 2024 10:23:54 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: kbusch@kernel.org
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, axboe@fb.com,
+        hch@lst.de, gjoyce@ibm.com, Nilay Shroff <nilay@linux.ibm.com>
+Subject: [PATCH] nvme-pci: Fix EEH failure on ppc after subsystem reset
+Date: Mon,  8 Apr 2024 15:53:07 +0530
+Message-ID: <20240408102329.442335-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240408084739.GA26968@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IsKYWhfj9_mCg8HgV8lswmaPCTLMYXIN
+X-Proofpoint-ORIG-GUID: IsKYWhfj9_mCg8HgV8lswmaPCTLMYXIN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-08_08,2024-04-05_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ malwarescore=0 phishscore=0 impostorscore=0 clxscore=1015 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404080080
 
-On Mon, Apr 08, 2024 at 10:47:39AM +0200, Christoph Hellwig wrote:
-> On Mon, Apr 08, 2024 at 03:36:50PM +0800, Ming Lei wrote:
-> > It isn't now we put the limit, and this way has been done for stacking device
-> > since beginning, it is actually added by commit d690cb8ae14b in v6.9-rc1.
-> > 
-> > If max segment size isn't aligned with virt_boundary_mask, bio_split_rw()
-> > will split the bio with max segment size, this way still works, just not
-> > efficiently. And in reality, the two are often aligned.
-> 
-> We've had real bugs due to this, which is why we have the check.  We also
-> had a warning before the commit, it's just it got skipped for
-> stacking.  So even if we want to return to the broken pre-6.9-rc behavior
-> it should only be for stacking.  I don't think that is a good outcome,
-> though.
+If the nvme subsyetm reset causes the loss of communication to the nvme
+adapter then EEH could potnetially recover the adapter. The detection of
+comminication loss to the adapter only happens when the nvme driver
+attempts to read an MMIO register.
 
-The limit is from commit 09324d32d2a0 ("block: force an unlimited segment
-size on queues with a virt boundary") which claims to fix f6970f83ef79
-("block: don't check if adjacent bvecs in one bio can be mergeable").
+The nvme subsystem reset command writes 0x4E564D65 to NSSR register and
+schedule adapter reset.In the case nvme subsystem reset caused the loss
+of communication to the nvme adapter then either IO timeout event or
+adapter reset handler could detect it. If IO timeout event could detect
+loss of communication then EEH handler is able to recover the communication
+to the adapter. This change was implemented in commit 651438bb0af5
+("nvme-pci: Fix EEH failure on ppc"). However if the adapter communication
+loss is detected during nvme reset work then EEH is unable to successfully
+finish the adapter recovery.
 
-However commit f6970f83ef79 only covers merge code which isn't used by
-bio driver at all, so not sure pre-6.9-rc is broken for stacking driver.
+This patch ensures that,
+- nvme reset work can observer pci channel is offline (at-least on the
+  paltfrom which supports EEH recovery) after a failed MMIO read and
+  contains reset work forward progress and marking controller state to
+  DEAD. Thus we give a fair chance to EEH handler to recover the nvme
+  adapter.
 
-Also commit 09324d32d2a0 mentioned that it did not cause problem,
-actually 64K default segment size limits always exists even though the
-device doesn't provide one, so looks there isn't report as 'real bugs',
-or maybe I miss something?
+- if pci channel "frozen" error is detected while controller is already
+  in the RESETTING state then don't try (re-)setting controller state to
+  RESETTING which would otherwise obviously fail and we may prematurely
+  breaks out of the EEH recovery handling.
 
-commit 09324d32d2a0843e66652a087da6f77924358e62
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Tue May 21 09:01:41 2019 +0200
+- if pci channel "frozen" error is detected while reset work is in progress
+  then wait until reset work is finished before proceeding with nvme dev
+  disable. This would ensure that the reset work doesn't race with the
+  pci error handler code and both error handler and reset work forward
+  progress without blocking.
 
-    block: force an unlimited segment size on queues with a virt boundary
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+Changes from v1:
+  - Allow a controller to reset from a connecting state (Keith)
+  - Fix race condition between reset work and pci error handler 
+    code which may contain reset work and EEH recovery from 
+	forward progress (Keith)
 
-    We currently fail to update the front/back segment size in the bio when
-    deciding to allow an otherwise gappy segement to a device with a
-    virt boundary.  The reason why this did not cause problems is that
-    devices with a virt boundary fundamentally don't use segments as we
-    know it and thus don't care.  Make that assumption formal by forcing
-    an unlimited segement size in this case.
+ drivers/nvme/host/core.c |  1 +
+ drivers/nvme/host/pci.c  | 19 ++++++++++++++++---
+ 2 files changed, 17 insertions(+), 3 deletions(-)
 
-    Fixes: f6970f83ef79 ("block: don't check if adjacent bvecs in one bio can be mergeable")
-    Signed-off-by: Christoph Hellwig <hch@lst.de>
-    Reviewed-by: Ming Lei <ming.lei@redhat.com>
-    Reviewed-by: Hannes Reinecke <hare@suse.com>
-    Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-
-Thanks,
-Ming
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 27281a9a8951..b3fe1a02c171 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -557,6 +557,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+ 		switch (old_state) {
+ 		case NVME_CTRL_NEW:
+ 		case NVME_CTRL_LIVE:
++		case NVME_CTRL_CONNECTING:
+ 			changed = true;
+ 			fallthrough;
+ 		default:
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 8e0bb9692685..553bf0ec5f5c 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2776,6 +2776,16 @@ static void nvme_reset_work(struct work_struct *work)
+  out_unlock:
+ 	mutex_unlock(&dev->shutdown_lock);
+  out:
++	/*
++	 * If PCI recovery is ongoing then let it finish first
++	 */
++	if (pci_channel_offline(to_pci_dev(dev->dev))) {
++		if (nvme_ctrl_state(&dev->ctrl) == NVME_CTRL_RESETTING ||
++			nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
++			dev_warn(dev->ctrl.device, "Let pci error recovery finish!\n");
++			return;
++		}
++	}
+ 	/*
+ 	 * Set state to deleting now to avoid blocking nvme_wait_reset(), which
+ 	 * may be holding this pci_dev's device lock.
+@@ -3295,10 +3305,13 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
+ 	case pci_channel_io_frozen:
+ 		dev_warn(dev->ctrl.device,
+ 			"frozen state error detected, reset controller\n");
+-		if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
+-			nvme_dev_disable(dev, true);
+-			return PCI_ERS_RESULT_DISCONNECT;
++		if (nvme_ctrl_state(&dev->ctrl) != NVME_CTRL_RESETTING) {
++			if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
++				nvme_dev_disable(dev, true);
++				return PCI_ERS_RESULT_DISCONNECT;
++			}
+ 		}
++		flush_work(&dev->ctrl.reset_work);
+ 		nvme_dev_disable(dev, false);
+ 		return PCI_ERS_RESULT_NEED_RESET;
+ 	case pci_channel_io_perm_failure:
+-- 
+2.44.0
 
