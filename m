@@ -1,53 +1,32 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790BE51C34
-	for <linux-block@vger.kernel.org>; Mon,  8 Apr 2024 07:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851383A8D0;
+	Mon,  8 Apr 2024 08:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712562158; cv=none; b=GFHG+sYckbKX8So2eof6/bICoC0Prz+Bw2M9XHsVsj/ZhDg62pE/6Fd9/WdzkmSlByDOn/UPCg+LySO7WcqnqiKkrK2cl/qoGP1C6Z0iMRyVRv2GEe3zyFIBXK2l/K1sJL9DThhECv6B3XsbnPMaYHucFXfuFjwGcqHMHjAerLs=
+	t=1712566065; cv=none; b=lh2/vPO+d7MhbTGLC2suZSGnRxlPAQvh4zaTi44fmEQtryp7treXzlqr3PSY53fyJAR44r0XcfluLcMGFp4KEaqsC91H/aPcE0VK0udnWIoA5uAo+xTyCYS4p5Tx3vuB88NHwvLbUFCOkSuXI/Re+e3EJpVy7wbm9Uhu427s7rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712562158; c=relaxed/simple;
-	bh=RNrZ83nHh9K9DQlyMZOl7ilVCR/Flf1Waw9CU4gScus=;
+	s=arc-20240116; t=1712566065; c=relaxed/simple;
+	bh=EG5Qh33XnWG8sBga4neJsOEyn5ZwoQ65oB2l+dt0hMY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tVdfWPfO544dXQG4Pb4Uy+8+1iSe3pm9vHXZNxuKrSmkUGQoTcwPcsSNNHK2QB8k96sGZATbpOdAStkm7WqmHn4i1Lf8+v7MtgSZjOVK6MZvhZUk6IzKdAhMiVcM6UpKmVN+fuXgcNScuS/KfwbV2mjpU+Ks60nLdE4jsQHe71c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YK0fgGee; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YK0fgGee"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712562156;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oUqnUBMC+52eiLqxJ8y1FQYEbDUebxOr1a1G9nKZtno=;
-	b=YK0fgGeeyXOHkomvLwAKE9Vlorv9CQenVuyc4aGTJ5WH+bGK2usky18GH10t4hiHb09g/Y
-	+nF6eM6pOUCBRyU0DbPLTKlK7qxaSe6Y0cl29KJtNmT94pMrRCrgk9FNlad/gdO8Vx67vY
-	UrpPgBHcrg5KwYvQhYXDKHrsqdFKJEc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-A14Zao8jNvSMDF3axh4A9w-1; Mon, 08 Apr 2024 03:42:32 -0400
-X-MC-Unique: A14Zao8jNvSMDF3axh4A9w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9BF2E806603;
-	Mon,  8 Apr 2024 07:42:32 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C9B210FCEE0;
-	Mon,  8 Apr 2024 07:42:29 +0000 (UTC)
-Date: Mon, 8 Apr 2024 15:42:21 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH] block: fix q->blkg_list corruption during disk rebind
-Message-ID: <ZhOf3RxSWgLRZYhP@fedora>
-References: <20240407125910.4053377-1-ming.lei@redhat.com>
- <ZhOHhVlfgj7ngHjH@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8wFyq1mIJ0Z6F8BhlbItIGEZLbMQ/nZJVr3NE95POzPkNiE+b1Hji4UVfolrAd9QdoqgbjxK758MxQJTHpgr3WklBLaMkE1r0Z05U/3BTxYVlTwakswN/ptHWzp7mqkbkM6ezWz9kM1zBeViZuWC+4rV5K92RiPg9/UfAjmLjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 7F41F68BFE; Mon,  8 Apr 2024 10:47:39 +0200 (CEST)
+Date: Mon, 8 Apr 2024 10:47:39 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, janpieter.sollie@edpnet.be,
+	Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
+	Song Liu <song@kernel.org>, linux-raid@vger.kernel.org
+Subject: Re: [PATCH] block: allow device to have both virt_boundary_mask
+ and max segment size
+Message-ID: <20240408084739.GA26968@lst.de>
+References: <20240407131931.4055231-1-ming.lei@redhat.com> <20240408055542.GA15653@lst.de> <ZhOekuZdwlwNSiZV@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,24 +35,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZhOHhVlfgj7ngHjH@infradead.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+In-Reply-To: <ZhOekuZdwlwNSiZV@fedora>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, Apr 07, 2024 at 10:58:29PM -0700, Christoph Hellwig wrote:
-> On Sun, Apr 07, 2024 at 08:59:10PM +0800, Ming Lei wrote:
-> > Multiple gendisk instances can allocated/added for single request queue
-> > in case of disk rebind. blkg may still stay in q->blkg_list when calling
-> > blkcg_init_disk() for rebind, then q->blkg_list becomes corrupted.
-> > 
-> > Fix the list corruption issue by:
+On Mon, Apr 08, 2024 at 03:36:50PM +0800, Ming Lei wrote:
+> It isn't now we put the limit, and this way has been done for stacking device
+> since beginning, it is actually added by commit d690cb8ae14b in v6.9-rc1.
 > 
-> The right fix is to move the blkgs to the gendisk as there is no use
-> for them on a request_queue without a gendisk.
+> If max segment size isn't aligned with virt_boundary_mask, bio_split_rw()
+> will split the bio with max segment size, this way still works, just not
+> efficiently. And in reality, the two are often aligned.
 
-The fix needs to be backported to stable, so it isn't good to fix in
-that aggressive way, especially last time your attempt failed, please see
-the revert commits in my last reply to Yu Kuai.
-
-Thanks,
-Ming
+We've had real bugs due to this, which is why we have the check.  We also
+had a warning before the commit, it's just it got skipped for
+stacking.  So even if we want to return to the broken pre-6.9-rc behavior
+it should only be for stacking.  I don't think that is a good outcome,
+though.
 
