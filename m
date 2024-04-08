@@ -1,118 +1,87 @@
-Received: from wfhigh7-smtp.messagingengine.com (wfhigh7-smtp.messagingengine.com [64.147.123.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1810E433A9;
-	Mon,  8 Apr 2024 18:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCFE142658;
+	Mon,  8 Apr 2024 18:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712599537; cv=none; b=ftfUvZ+x8IXRGAXCvn6qfImCYv/gsq41dkwmCcnSwE3rsnZ0bqWP/3L9Ryf8tZQnQ6NQxdDc01ZMyQ6XeMho3iM1laWCeiDkJgF2RTN+35ku82QsfsKV7wo65gd9xqlBC3KkB3xhtzMBzG8iES7n8ZXzWxChnKyx4RtAa33IMdQ=
+	t=1712601703; cv=none; b=WWVvB8LIJ9mc1FSgS1Y+gSL3wInjrkMZLDuUC8U1wTLRDmbQKyeDwb3imXe25SA7gYwpUIQpGvTtiutLLlqtNS7fX+XgRYs0ZZtcFVVLzR7fwcZtmTSB3PV3MLSSVHaLdt3Ux666l1jgA4X4CU0QkrFtMMS43fox36+r6hMM2i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712599537; c=relaxed/simple;
-	bh=PLP2UVK/7a5fC42DAjpkpGkvVPaV+2lnuMzTDN603l8=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=pQ8jiHRh/1FMXS0jk+F3L6ND1oeGhOWrRzHHllkGWyIefYOCK/MwKalZAFBy1FOIH70EcL0R6p0NaAPzCYR/aVQ2w5GzQ2H1dKkKy/y2vBDy1ZF3FCXtg8d3d7+30/ruuR7Am3dp2Bq/oPTXfy6LhnC4bOFzJ/ThmcFHAHyR1dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Xuzsq5sO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=a76WxLYW; arc=none smtp.client-ip=64.147.123.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1712601703; c=relaxed/simple;
+	bh=kvkQSlddqci/+RUhxhBMoeQfL8gXtcjlyJF3nXAwetw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UtOu0fKWa3UmEHPaa5zveuU46600KaTxJBCdhtMxUi6kAbJwXwDTbm864KbbI8bPbZ7OTYAMD11ne6/54eOQPxUQ+KWV5xgiz/FkkpDWnnFDXssbdEY69gj49JVxjcCqFLQwwqAMr930fRHeiFVoWeTaDaBCXdyPKxxhhAedE5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tPddvwU9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Xuzsq5sO";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="a76WxLYW"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfhigh.west.internal (Postfix) with ESMTP id 8E4F918000FB;
-	Mon,  8 Apr 2024 14:05:34 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Mon, 08 Apr 2024 14:05:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1712599534; x=1712685934; bh=PJwIR6tKpg
-	7jOqh/bzOaK5yAmP9nnbueAasCvlzwCdQ=; b=Xuzsq5sOIPcE9Ql19RZOrsaRi4
-	/9YvSlpm84mODIJZ+NSxNT4N8Cr0GyB3vdYVcwcKGL4MV1GdHaBk5o7kLKtRuNZG
-	xQxEBGacZPI2ixvzqT92TLJOFu60Zp71xoathwjfaTJC0f6YknYmn2NPXQv9E4Gd
-	AwO1j2fziebPrH9KGwETiwlDO0ERPj4mRi5gAjiUhgdk+kO9U3HqVdUiEY1G9qjq
-	So8syYlgtuA28tUs9zL3X10G8llvL1mwVi7yq/QD4wHvLl9yv2NStJOCO19n31x/
-	PMbdZo9gNhTv/jqhK8QXKbqdL+saOrPrxJXWTIOb1o1nY4yzReO2+uhjOE5g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1712599534; x=1712685934; bh=PJwIR6tKpg7jOqh/bzOaK5yAmP9n
-	nbueAasCvlzwCdQ=; b=a76WxLYWJq80MbHVnbTM/cyBUYoWthFRsRk3zN0qwVka
-	WnmY/s+DOwUUnHSUrFKo9cG8j/k5c+CrgQ8BDtkVac7fH2woxwffBT4muiXfsM9Q
-	vtnZrt6da+4WqgLkcCPvL2jGNHyvk6bDnaYxAO5qoNMix3IJVAu/cRZS3zEinKoU
-	joyetow+77DFZQKPnrCV7GGMrGjkqmn6yNLHk7Un8afjKkZkeRMLquZapdmHZnKc
-	M85Hpbx04G/NOmdnDL30K7C8THbNLlusEkUVziS/vRNSw3A6DXq3Aj0A1Cx48czD
-	azPyYZPpJqeHcb9104evNrvMJfObeTJu6e+Gu3+a7g==
-X-ME-Sender: <xms:7TEUZpQqBp7cKqPJm9LG07QBmv6qh_e3gt6oAC8I3QCDwaxzxG6SYA>
-    <xme:7TEUZiw1R7Nu10P4p5UiWT0iAaS7ex_Gsam9N6WxAXZbnxbhWnuoB0pb4tg7uMGMm
-    l-BJSabdNbmfyieAn4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudegiedguddvtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
-    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:7TEUZu2DB3PrzMKXOirHLKim6odGpn5I2LYsdINFtRk1ZRWpPESceA>
-    <xmx:7TEUZhCGGST4MWib6psuVfMAG3TyOVbemIfuux1XV0C-PtEc0js4cA>
-    <xmx:7TEUZig5VADc9K14BlEo4K9NzbjcTGzBvaEJq3Wx2bx8m_RAsibYtg>
-    <xmx:7TEUZlri_LABSW5F2bPs4wjI0Zq1CmQN3i5gxslBpLmmo0bzIpY_eg>
-    <xmx:7jEUZmhi2J3D0s2bmKbWGbla_BytcPaxVLLfRf1DHRzImhNXxEicx95K>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 522B2B6008D; Mon,  8 Apr 2024 14:05:33 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-368-gc733b1d8df-fm-20240402.001-gc733b1d8
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tPddvwU9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA929C433F1;
+	Mon,  8 Apr 2024 18:41:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712601703;
+	bh=kvkQSlddqci/+RUhxhBMoeQfL8gXtcjlyJF3nXAwetw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tPddvwU9dRrZQRHPi6LGS+Yc36cwkojFEvpaSzqJx816Mhy0fSs5APEpMl+Yq2BfC
+	 QN/vDvOismURCY5nOEeX2UVqyE0K6ePgmxxMaXoh7SlsOg0DDVOo49Yq9eBHDOgDaZ
+	 Xt+eRhZingpzg5CWoNMusN4lWjykAp7LmbuIqRPwEI3VmTy9qt+ZrfjGImX9Dz9LI5
+	 B2GJZYzTbW5I/vu5DwZ284Fy6mP9YzSGZKNlEQq2eHeetimCs2kaxJF1uMNizTY83+
+	 SORuj56kSyIuXN3Xur51aW43vHzyNhlobrsTi9pQ/XfY/pWR6V4DiL3Otqf2K8s3mw
+	 LDRXJF9VfJJtw==
+Date: Mon, 8 Apr 2024 12:41:40 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Lennart Poettering <lennart@poettering.net>,
+	linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: API break, sysfs "capability" file
+Message-ID: <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
+References: <ZhQJf8mzq_wipkBH@gardel-login>
+ <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <3cd7ef89-0a41-427c-880f-faa48a9b7d62@app.fastmail.com>
-In-Reply-To: <20240328101422.37e1c4f0@gandalf.local.home>
-References: <20240328140512.4148825-1-arnd@kernel.org>
- <20240328140512.4148825-9-arnd@kernel.org>
- <20240328101422.37e1c4f0@gandalf.local.home>
-Date: Mon, 08 Apr 2024 20:05:12 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Steven Rostedt" <rostedt@goodmis.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, "Jens Axboe" <axboe@kernel.dk>,
- "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
- linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/11] blktrace: convert strncpy() to strscpy_pad()
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
 
-On Thu, Mar 28, 2024, at 15:14, Steven Rostedt wrote:
-> On Thu, 28 Mar 2024 15:04:52 +0100
+On Mon, Apr 08, 2024 at 07:43:04PM +0200, Linux regression tracking (Thorsten Leemhuis) wrote:
+> [adding the culprit's author to the loop; also CCing everyone else in
+> the Signed-off-by chain and a few lists that should be in the loop, too]
+> 
+> On 08.04.24 17:13, Lennart Poettering wrote:
+> > 
+> > So this broke systemd:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e81cd5a983bb35dabd38ee472cf3fea1c63e0f23
 >> 
->> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
->> index d5d94510afd3..95a00160d465 100644
->> --- a/kernel/trace/blktrace.c
->> +++ b/kernel/trace/blktrace.c
->> @@ -524,8 +524,7 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
->>  	if (!buts->buf_size || !buts->buf_nr)
->>  		return -EINVAL;
->>  
->> -	strncpy(buts->name, name, BLKTRACE_BDEV_SIZE);
->> -	buts->name[BLKTRACE_BDEV_SIZE - 1] = '\0';
->> +	strscpy(buts->name, name, BLKTRACE_BDEV_SIZE);
->
-> The commit message says "Using strscpy_pad()" but it doesn't do so in the
-> patch.
->
-> Rule 12 of debugging: "When the comment and the code do not match, they are
->                        probably both wrong"
+> > We use the "capability" sysfs attr to figure out if a block device has
+> > part scanning enabled or not. There seems to be no other API for
+> > this. (We also use it in our test suite to see if devices match are
+> > expectations, and older systemd/udev versions used to match agains it
+> > from udev rules.)
+> > 
+> > The interface was part of sysfs, and documented:
+> > 
+> > https://www.kernel.org/doc/html/v5.5/block/capability.html
+> > 
+> > While it doesn't list the partscan bit it actually does document that
+> > one is supposed to look into include/linux/genhd.h for the various
+> > bits and their meanings. I'd argue that makes them API to some level.
+> > 
+> > Could this please be reverted? Just keeping the relevant bits (i.e. at
+> > least the media change feature bit, and the part scanning bit) is
+> > enough for retaining userspace compat.
+> > 
+> > (Please consider googling or a github code search or so before removing
+> > a public API like this. This compat breakage was very much avoidable
+> > with a tiny bit of googling.)
 
-Thanks for double-checking this, I had a hard time deciding which
-one to use here and ended up with an obviously inconsistent version.
+That is unfortunate wording in the sysfs description.
 
-I've changed it now to strscpy_pad() for v2, which is the slightly
-safer choice here. The non-padding version would still not leak
-kernel data but would write back user-provided data after the
-padding instead of always zeroing it.
-
-    Arnd
+How were keeping in sync with the changing values before? The setting
+you seem to care about is now defined in a different file, with a
+different name, and with a different value. Or are you suggesting all
+those things should have been stable API?
