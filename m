@@ -1,48 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B3D7E580;
-	Tue,  9 Apr 2024 09:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D677D3E8;
+	Tue,  9 Apr 2024 10:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712653217; cv=none; b=oMGHP1wqOfsb3ZN44guURkTFqBHcbFpn4jI2ldNS2owHVzXkpidO16u7gQB2PTumKDGKewvwfKRy7ytr4BZodaYAQaWIVjqW1aji25wle1MA7+ciLFF36w1DJ9E1AP9DTLTxpdVedwReBZj/y0wyQL95lymp5OOUUt9btdZPDFs=
+	t=1712658237; cv=none; b=WCeFBY4/kwrjgr8CFZENTRZwJc/aRk33atNyPhm5i7rxQ3MSUkWKD2dx8YqE+IfP/+aLwynZLBJ9Pl+R0rbusIWSrM/1aiCbT9Er8/sadEXAgU5Y+CKv6HhZI+QypX705YHT4HGe3Ay/N2VfAIwELncB9wMs2637F0UkB8tHvVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712653217; c=relaxed/simple;
-	bh=ibeYyPYUi2eA3S25RuPi3BCQEXm8vl3RMVIg9ekCW/8=;
+	s=arc-20240116; t=1712658237; c=relaxed/simple;
+	bh=LjHYHlvcIvNKOMqgpeBN4KMgJFSPPgeh6oX8HGYd0nU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uG1klpWA5t0avXg1uJMWnwAumFllSd31m+Kurvd9ejVZ5HTs5PtxywubLPNI7WE0GxbR5wfd5900gECNs4CgU7DXPj3lfJhoGFjgFUybTfQTX15gQlGjUzKPQL/PZ9yR5QPYPxSc7W62UedHUYUScwYo3vMnSllyP9MlsRcHBA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1rNTUKn; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nztw8O+skolIhQbBX5UmoDl+bwh1HBpWgmL/7htZwgOr9VGTPhaHbBmZ+1YlxUrP1Xfgyjf4clJMB1K30iUeccZpW+9NZAFNJM8z+7Mcs9t7PIUHV0r1/ISjGR+l++WvLltxz4P0V0PTqVh6TVzN6bI44JAuIAMQT4jJKhSUB+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JwsmimZN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1rNTUKn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66245C433F1;
-	Tue,  9 Apr 2024 09:00:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwsmimZN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA52C433F1;
+	Tue,  9 Apr 2024 10:23:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712653217;
-	bh=ibeYyPYUi2eA3S25RuPi3BCQEXm8vl3RMVIg9ekCW/8=;
+	s=k20201202; t=1712658236;
+	bh=LjHYHlvcIvNKOMqgpeBN4KMgJFSPPgeh6oX8HGYd0nU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E1rNTUKn7xZSUk85/Lt1DaDyaxaq7una+DbDBicibeQdG4YLGPqs/rd2/D+PnnYKw
-	 LfSJ+Qe+G5BnFpKg2ZZV98R0WT/+SnKr/ktAMAjAKP5k6WMVy+FOpnPpyKblsy5OwP
-	 vL7zRR2aoWLBez5qUfCrOSU8ZIkEgfqhEO6ynJCIqP5gt4YY7Be/LPDdg7SILwp0g5
-	 wv80TTTLNzBEkIJJOkGJu5v9bYOoDQbELtpHUU7deZRsJDnxLGsKuSCYaTQ9qah4Sr
-	 aQSqayt3E3Zs3Q1/mg+vYDJ+zzzxZPsMhnzju+z4APMcTj7jc49dyueHTTR2E70TWc
-	 R6q78PXOiVZOA==
-Date: Tue, 9 Apr 2024 11:00:10 +0200
+	b=JwsmimZN1xjKR7+t8bqCf6G2vKD+kLz5TTStcQWP6yQBh44/v9GeLOa49tDZw3NWj
+	 JgzqAvqrWs+3oAuTeahiszjuhF/zWIOAf0zeIlMnmAqnZMX6O59D+jr01XxyLfPBe6
+	 XY3MV7b/QT3y/R6Q1yAecJkOCbsLVpqTUFx0oYw4QV4wyiTU0QqMXumaVXTk98Y66B
+	 Q4gGsYHpXELW9UJnoK1zYKJ3PQBHr7O/YkIzRhK/bxSWzTGxxoPCAuqCvrhEYbdq7s
+	 3D8MBzsBjbw6hFxDA5Y7TnPwWcoFkHHBRatE9Az48SoobYZfoVdnXpfkecZwkTf54q
+	 YxbOn6v4O3Ohw==
+Date: Tue, 9 Apr 2024 12:23:49 +0200
 From: Christian Brauner <brauner@kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de, 
-	axboe@kernel.dk, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
-	yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, hch@lst.de, viro@zeniv.linux.org.uk, axboe@kernel.dk, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, yi.zhang@huawei.com, 
+	yangerkun@huawei.com, yukuai3@huawei.com
 Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
  blcok_device
-Message-ID: <20240409-plural-schusselig-e7fed53aed65@brauner>
+Message-ID: <20240409-pavillon-lohnnebenkosten-8ba65c1fd8e0@brauner>
 References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
  <20240406090930.2252838-23-yukuai1@huaweicloud.com>
- <20240406194206.GC538574@ZenIV>
- <20240406202947.GD538574@ZenIV>
- <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
- <20240407015149.GG538574@ZenIV>
- <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
- <20240407030610.GI538574@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,47 +45,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240407030610.GI538574@ZenIV>
+In-Reply-To: <20240406090930.2252838-23-yukuai1@huaweicloud.com>
 
-On Sun, Apr 07, 2024 at 04:06:10AM +0100, Al Viro wrote:
-> On Sun, Apr 07, 2024 at 10:34:56AM +0800, Yu Kuai wrote:
-> 
-> > Other than raw block_device fops, other filesystems can use the opened
-> > bdev_file directly for iomap and buffer_head, and they actually don't
-> > need to reference block_device anymore. The point here is that whether
-> 
-> What do you mean, "reference"?  The counting reference is to opened
-> file; ->s_bdev is a cached pointer to associated struct block_device,
-> and neither it nor pointers in buffer_head are valid past the moment
-> when you close the file.  Storing (non-counting) pointers to struct
-> file in struct buffer_head is not different in that respect - they
-> are *still* only valid while the "master" reference is held.
-> 
-> Again, what's the point of storing struct file * in struct buffer_head
-> or struct iomap?  In any instances of those structures?
-> 
-> There is a good reason to have it in places that keep a reference to
-> opened block device - the kind that _keeps_ the device opened.  Namely,
-> there's state that need to be carried from the place where we'd opened
-> the sucker to the place where we close it, and that state is better
-> carried by opened file.
-> 
-> But neither iomap nor buffer_head contain anything of that sort -
-> the lifetime management of the opened device is not in their
-> competence.  As the matter of fact, the logics around closing
-> those opened devices (bdev_release()) makes sure that no
-> instances of buffer_head (or iomap) will outlive them.
-> And they don't care about any extra state - everything
-> they use is in block_device and coallocated inode.
-> 
-> I could've easily missed something in one of the threads around
-> the earlier iterations of the patchset; if that's the case,
-> could somebody restate the rationale for that part and/or
-> post relevant lore.kernel.org links?  Christian?  hch?
-> What am I missing here?
+> +static int __stash_bdev_file(struct block_device *bdev)
 
-The original series was a simple RFC/POC to show that struct file could
-be used to remove bd_inode access in a wide variety of situations. But
-as I've mentioned in that thread I wasn't happy with various aspects of
-the approach which is why I never pushed forward with it. The part where
-we pushed struct file into buffer_header was the most obvious one.
+I've said that on the previous version. I think that this is really
+error prone and seems overall like an unpleasant solution. I would
+really like to avoid going down that route.
+
+I think a chunk of this series is good though specicially simple
+conversions of individual filesystems where file_inode() or f_mapping
+makes sense. There's a few exceptions where we might be better of
+replacing the current apis with something else (I think Al touched on
+that somewhere further down the thread.).
+
+I'd suggest the straightforward bd_inode removals into a separate series
+that I can take.
+
+Thanks for working on all of this. It's certainly a contentious area.
