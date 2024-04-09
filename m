@@ -1,92 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950DD12FF72;
-	Tue,  9 Apr 2024 14:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E887112FB0F;
+	Tue,  9 Apr 2024 14:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712671293; cv=none; b=qAfGlXafydH+9QFUKmeB6V/VJ2E9YJnOxjbuEqeyM6LZtgJcM7OhpDeaq+1Fpr4C67+mbefUA3KSkobN0Xx4flVl1ypGwkUTrykKismsrLCo9IFMLeGj4G7GHGHftGdx8Z1skysr2OZZ/SXJDLGhb3cLggibIYnN/TCYmPIejR4=
+	t=1712672138; cv=none; b=bGLUHZXtvOM4NVFcZZbEh9eIaabcbI4KJkV2xO2oGjQbTrmPMj15EvHGJyoDgumliJGxvqk9N8e/RLl2Amy3OHLKJmS9XWCjjVs+6SK9p9ihPGTwXIxnlHI2zhvsqHUwhtFXLEsEgrUJbh/B7as8rxB6xbd7F/L+ogwmyGAEv4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712671293; c=relaxed/simple;
-	bh=KBapuCoet5kfjziaVWML59WbPosua5uheV6EN7HL7cc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m/G94JFVwccTPueFjzUZp8PSydKD5IGEKTnAC1OIDaIqqYIPW5JQXWt5EXFX/i+SI9fixpv9VMuoKMZnXnmfIyFafDfwvBjEpTR8A/j/NndDQ53fMM87KLB/h8vpsasSqEDYVpGGBlWfaqmUA5nKKKvEN0tGfSx8JDydRXvbNJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CI+tE9nq; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CI+tE9nq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5330C43390;
-	Tue,  9 Apr 2024 14:01:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712671293;
-	bh=KBapuCoet5kfjziaVWML59WbPosua5uheV6EN7HL7cc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CI+tE9nqa8mKqJOIqe+CfUonGLG1fsbzMR/Wd7a5I1Vi2laBO5bxr2CoMJV9PXJmW
-	 l3B5LTh7o9wALv4UUWeYM/t6wiBxQSugqqL1qMaxru2tX3syz5zQ1dsosUQsa29l8T
-	 p7IjRvBsv+ejS31ytc4jFbGqhglSJWpDfeCARtT2DuJQwR0l7vlr6MAVUGv1hn/+RL
-	 LYOEYFvgKimhfwTM29K1/o3+OR9G+feE3zRGY+tAuvl6i500jl0QwnR+iS9P/aFQXM
-	 zLfT5yP+z3QnvGF/tWNTahJ46H894mg0QFW7RX22FGXq0UqZrFoQ1e9EbWlVu3+fcI
-	 vfZrusQ178Ykg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	"Richard Russon" <ldm@flatcap.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Robert Moore <robert.moore@intel.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Len Brown <lenb@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	Lin Ming <ming.m.lin@intel.com>,
-	Alexey Starikovskiy <astarikovskiy@suse.de>,
-	linux-ntfs-dev@lists.sourceforge.net,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	acpica-devel@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH 5/5] [v2] kbuild: enable -Wstringop-truncation globally
-Date: Tue,  9 Apr 2024 16:00:58 +0200
-Message-Id: <20240409140059.3806717-6-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240409140059.3806717-1-arnd@kernel.org>
-References: <20240409140059.3806717-1-arnd@kernel.org>
+	s=arc-20240116; t=1712672138; c=relaxed/simple;
+	bh=1Hvn0UUQi7daY6MeWzk+embfXVjNT5NRKIlTZP6dTWo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VM30V1E9KCYCvnUFUQVKk3uq335eW1DXoTlnxs8OTyjFak6mhRCMeQqFuOY0MuCLAbxO5OaMCD3IIJCx4nKPSmi6b3uY+0dgMU9k7F2OOj8gL9zNfYa5HxTHBpwgJGm+wJAPaGCQJs7wF0MOrEogA9B90M3d4HJ2RydsF3RmzvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 65FB468B05; Tue,  9 Apr 2024 16:15:32 +0200 (CEST)
+Date: Tue, 9 Apr 2024 16:15:31 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Lennart Poettering <mzxreary@0pointer.de>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Linux regressions mailing list <regressions@lists.linux.dev>,
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: API break, sysfs "capability" file
+Message-ID: <20240409141531.GB21514@lst.de>
+References: <ZhQJf8mzq_wipkBH@gardel-login> <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info> <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com> <ZhRSVSmNmb_IjCCH@gardel-login> <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com> <ZhT5_fZ9SrM0053p@gardel-login>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZhT5_fZ9SrM0053p@gardel-login>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Tue, Apr 09, 2024 at 10:19:09AM +0200, Lennart Poettering wrote:
+> All I am looking for is a very simple test that returns me a boolean:
+> is there kernel-level partition scanning enabled on this device or
+> not.
 
-The remaining warnings of this type have been addressed, so it can
-now be enabled by default, rather than only for W=1.
+And we can add a trivial sysfs attribute for that.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: no changes
----
- scripts/Makefile.extrawarn | 1 -
- 1 file changed, 1 deletion(-)
+> At this point it's not clear to me if I can write this at all in
+> a way that works reasonably correctly on any kernel since let's say
+> 4.15 (which is systemd's "recommended baseline" right now).
+> 
+> I am really not sure how to salvage this mess at all. AFAICS there's
+> currently no way to write such a test correctly.
 
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index 57edc80661fd..f4d69092698b 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -107,7 +107,6 @@ else
- KBUILD_CFLAGS += $(call cc-disable-warning, format-overflow-non-kprintf)
- KBUILD_CFLAGS += $(call cc-disable-warning, format-truncation-non-kprintf)
- endif
--KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
- 
- KBUILD_CFLAGS += -Wno-override-init # alias for -Wno-initializer-overrides in clang
- 
--- 
-2.39.2
+You can't.  Maybe that's a lesson to not depend on undocumented internal
+flags exposed by accident by a weirdo interface.  Just talk to people.
 
+> I think it would be nice if the "capabilities" thing would be brought
+> back in a limited form. For example, if it would be changed to start
+> to return 0x200|0x1000 for part scanning is off, 0x1000 when it is on.
+> 
+> That would then mean we return to compatibility with Linux <= 5.15,
+> but the new 0x1000 bit would tell us that the information is
+> reliable. i.e. if userspace sees 0x1000 being set we know that the
+> 0x200 bit is definitely correct. That would then just mean that
+> kernels >= 5.16 until today are left in the cold...
+
+At this point we're just better off with a clean new interface.
+And you can use the old hack for < 5.15 if you care strongly enough
+or just talk distros into backporting it to make their lives easier.
