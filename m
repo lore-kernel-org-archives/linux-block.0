@@ -1,59 +1,113 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7F612F38A;
-	Tue,  9 Apr 2024 13:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD5012F38D;
+	Tue,  9 Apr 2024 14:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712671090; cv=none; b=luN6otkmGvRnUbo1HG5KEnZkO7HTVB9b3HmGXQtBvvagkMVMow6A0DJiz1YgPhrwME3qUgrWe5vUrx4MlV5Vkj9dfUGfRzZoftz2RYFEOE3UbwL7MSvSmGCbhQocUPTbih3YA3eCAJTx9OGM29gO1vwCjlvXkFdSjq+SbCKIkAE=
+	t=1712671268; cv=none; b=QMsoU/iHfLeaCRRiwLHzRraDu/6rkc8It85x4VK0POM/7MXBM5A4ltrfVjAe59bzY//mHdsFjRZYHK9hrFi8lgJ+ap3T/rUjnSpV4c8DeDB8/oHe2Sn+q8GexI6XhbGqTEwbHXMnafmdds+zzN/AHVvDJfVUgL2iPTW9pIetyJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712671090; c=relaxed/simple;
-	bh=aup9EyGiaZCY4USFtmk2XO8IJxXlwPpNJ7u1cRpu9U4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=asNv3XXIQuAzhLBMfLuKvEYyCGL7BFKm1mun1x217JYGkq8409XuHsvxwxIHOYNWxRFt9R1AoQSUX1R8CkRbhohSjj3a3ezCR3m268H+yR6V3dUoIqMDB63bX8myorrgdup29TnIe8MFXyQE6LzrSmqq5O91+n0nQmWyHVsbqhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id B03C068B05; Tue,  9 Apr 2024 15:57:58 +0200 (CEST)
-Date: Tue, 9 Apr 2024 15:57:58 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, janpieter.sollie@edpnet.be,
-	Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
-	Song Liu <song@kernel.org>, linux-raid@vger.kernel.org
-Subject: Re: [PATCH] block: allow device to have both virt_boundary_mask
- and max segment size
-Message-ID: <20240409135758.GA20668@lst.de>
-References: <20240407131931.4055231-1-ming.lei@redhat.com> <20240408055542.GA15653@lst.de> <ZhOekuZdwlwNSiZV@fedora> <20240408084739.GA26968@lst.de> <ZhO9UrfK4EulTkLo@fedora>
+	s=arc-20240116; t=1712671268; c=relaxed/simple;
+	bh=OwmOVUjCxv1ceoUcK0JKEZS/f6zK2xJ2fR3OQpIwvAk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UGQgl0mZWrt53GcmeNVpLhbF9VgX3ufS46qTVlT9ZFgsvbg8UIe8zllnDKQSiXb/+AiKEKCdOXtm4XhHFlqgdlna7z7xEiRmDPd747co6EFtXXOXoij+AxgYJBWnq3Exhj8kyzqX81dyMcRZqzk0aXTeRozczoYtm2QgDixh9pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o/vZLIAo; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o/vZLIAo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D32C433F1;
+	Tue,  9 Apr 2024 14:01:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712671268;
+	bh=OwmOVUjCxv1ceoUcK0JKEZS/f6zK2xJ2fR3OQpIwvAk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o/vZLIAowEbtnS5yLJVyXyO73vrmHagQ76P0tGPcQ70MLclvTK2i/UKemgdQ3Nro+
+	 P/xczUtUI+2b3ID1wswWAz7p25VS4eVvJHj9mpZ7i4Pzdska69X+Q5ofmrHEN8SyM1
+	 syUL0xPahY5GjXe4iQ99mDr4Ut3fDHcLJjjz8yRKwoBLahebfCMyqLUiGFo2UojABY
+	 JnQy77wbUltj1iCFq74CbM7s6WoPhAWUzelnqDjAubKqhwaBnuSSvW6fNxUzGAxOXo
+	 qQ4qTT+0Z+JABWRWbiGjufXRHzpEhOY1rbLuhCDh9dby0QgI5Q/OcWG3RK4l2EIecL
+	 VIZSyv6cK7O7g==
+From: Arnd Bergmann <arnd@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"Richard Russon" <ldm@flatcap.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Robert Moore <robert.moore@intel.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Len Brown <lenb@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Lin Ming <ming.m.lin@intel.com>,
+	Alexey Starikovskiy <astarikovskiy@suse.de>,
+	linux-ntfs-dev@lists.sourceforge.net,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	acpica-devel@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org
+Subject: [PATCH 0/5 v2] address remaining stringop-truncation warnings
+Date: Tue,  9 Apr 2024 16:00:53 +0200
+Message-Id: <20240409140059.3806717-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhO9UrfK4EulTkLo@fedora>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 08, 2024 at 05:48:02PM +0800, Ming Lei wrote:
-> The limit is from commit 09324d32d2a0 ("block: force an unlimited segment
-> size on queues with a virt boundary") which claims to fix f6970f83ef79
-> ("block: don't check if adjacent bvecs in one bio can be mergeable").
-> 
-> However commit f6970f83ef79 only covers merge code which isn't used by
-> bio driver at all, so not sure pre-6.9-rc is broken for stacking driver.
+From: Arnd Bergmann <arnd@arndb.de>
 
-We can stack rq drivers as well.
+We are close to being able to turn on -Wstringop-truncation
+unconditionally instead of only at the 'make W=1' level, these five
+warnings remain after the previous round and three patches I sent
+separately for drivers/staging.
 
-> Also commit 09324d32d2a0 mentioned that it did not cause problem,
-> actually 64K default segment size limits always exists even though the
-> device doesn't provide one, so looks there isn't report as 'real bugs',
-> or maybe I miss something?
+I hope I managed to include all the feedback on v1, so please apply
+directly to subsystem trees if v2 looks ok to you.
 
-The problem is when the segment size does not align to the boundary
-mask as you'll now start feeding malformed segments/entris to the
-device.
+     Arnd
+
+Arnd Bergmann (5):
+  [v2] test_hexdump: avoid string truncation warning
+  [v2] acpi: disable -Wstringop-truncation
+  [v2] block/partitions/ldm: convert strncpy() to strscpy()
+  [v2] blktrace: convert strncpy() to strscpy_pad()
+  [v2] kbuild: enable -Wstringop-truncation globally
+
+ block/partitions/ldm.c       | 6 ++----
+ drivers/acpi/acpica/Makefile | 1 +
+ kernel/trace/blktrace.c      | 3 +--
+ lib/test_hexdump.c           | 2 +-
+ scripts/Makefile.extrawarn   | 1 -
+ 5 files changed, 5 insertions(+), 8 deletions(-)
+
+-- 
+2.39.2
+
+Cc: "Richard Russon" <ldm@flatcap.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Robert Moore <robert.moore@intel.com>
+Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc: Len Brown <lenb@kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas@fjasle.eu>
+Cc: Lin Ming <ming.m.lin@intel.com>
+Cc: Alexey Starikovskiy <astarikovskiy@suse.de>
+Cc: linux-ntfs-dev@lists.sourceforge.net
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-acpi@vger.kernel.org
+Cc: acpica-devel@lists.linux.dev
+Cc: linux-trace-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
