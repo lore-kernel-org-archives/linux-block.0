@@ -1,157 +1,141 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAC14C69;
-	Tue,  9 Apr 2024 06:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3995D7CF17;
+	Tue,  9 Apr 2024 06:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712643001; cv=none; b=fx0G8RqHy5IUfNN7HtHqZcEKNF5x1nY/mo+1VJYJqMh6ucPXeiARZlPggNJ3+Eya0lYxvdpwEo9ISyKSAbu90zXDL+rXDRAzcQcqr38STnesy3UdnuEXK6w73aPDXVzcG1+FAa3r2XD7mj+UTIsj1ayY0e7uWPHkvhjbzj4nZfk=
+	t=1712643772; cv=none; b=oRMe87zzUtMxzyaQU0IcDFSkWgSJphSGNypQzaUM+ykV5k/ZJOl5Tggj6rhqO0UuMB5Kri1DW7NsZCRlDJ27IonoN60Bk5Z8bIeskOdyGBblBQTNis9xBb88fumBjz5O+WSkfcTfy8QqNXJdxbhZ99Ub9p4TkDfiXdXPCiXvGmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712643001; c=relaxed/simple;
-	bh=Fco9MlyEHsy7mhFviXbafrMc879Fz3eOcdblRV4eUbE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eQx0NjgpdNTNe9IPJNzmDmDGkjohVIYGgA4L0koNOdbyATXJcBjLzKtRuVTSMfmW7eGBC8lCZ//wMCyAKFVwebC81qb5ZA44mb+DFcNyWCB/iOPG2TTmeN0b3sx40TZW/6iyqCTlBC/hfAAGVGc9T8zJsFAy/2xXUpUj56RkeeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yeK5ttk0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=D+fwt4ZT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yeK5ttk0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=D+fwt4ZT; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yeK5ttk0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="D+fwt4ZT";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yeK5ttk0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="D+fwt4ZT"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 155353382A;
-	Tue,  9 Apr 2024 06:09:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712642998; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hSCcPjYf9Lk4xq7iPI/rjdmipMmPujy9hX6WDaQQGh4=;
-	b=yeK5ttk0JoBlkCZtpZJWXkddSspxkBC326yN+bBMObzYUoMZWKrM+KrKEG+rNi5kRhlcSH
-	XA+S14fUpvxxcPIbq/mp8LVxP8KfbTwdYT3d18xYFk7c7XIhC4ZD5jyxlNvK1O3ffytqkq
-	SpPy0x7wqccgdQprE3NqtOdpbMmTw/Q=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712642998;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hSCcPjYf9Lk4xq7iPI/rjdmipMmPujy9hX6WDaQQGh4=;
-	b=D+fwt4ZTMAh9jvd67LKVhj9vA8GKG1hXKAKzWB3VsKGaME3w45lNoi5yqS0XBTaZYofYMb
-	pRoxqa/VsAJRxfBA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712642998; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hSCcPjYf9Lk4xq7iPI/rjdmipMmPujy9hX6WDaQQGh4=;
-	b=yeK5ttk0JoBlkCZtpZJWXkddSspxkBC326yN+bBMObzYUoMZWKrM+KrKEG+rNi5kRhlcSH
-	XA+S14fUpvxxcPIbq/mp8LVxP8KfbTwdYT3d18xYFk7c7XIhC4ZD5jyxlNvK1O3ffytqkq
-	SpPy0x7wqccgdQprE3NqtOdpbMmTw/Q=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712642998;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hSCcPjYf9Lk4xq7iPI/rjdmipMmPujy9hX6WDaQQGh4=;
-	b=D+fwt4ZTMAh9jvd67LKVhj9vA8GKG1hXKAKzWB3VsKGaME3w45lNoi5yqS0XBTaZYofYMb
-	pRoxqa/VsAJRxfBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C8AD513313;
-	Tue,  9 Apr 2024 06:09:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id rJfbLrXbFGamKQAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 09 Apr 2024 06:09:57 +0000
-Message-ID: <6ef177d7-a565-4ddb-8522-81ffbfb5380e@suse.de>
-Date: Tue, 9 Apr 2024 08:09:57 +0200
+	s=arc-20240116; t=1712643772; c=relaxed/simple;
+	bh=5rARhv3NmHpa1Fdlvzgz/4cyVDMr6pUtaAKtNUhQ6VI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=tAa+AG+dWWVH8yJlrnq/b9pVNdCVPoNiB959C2jobFwr9m9doYoposq6w/SFfXHDTl/96uQ1GWb5VXZP96nE2s4/bx4UGg/AfmD9Vl44CF+tztJBr6ULc7nRWLXx9bhaUjepf6pyYwDg/NnAtQny1bE4JLjZV+jmkw8gLSz34Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VDG8n1WXRz4f3jR1;
+	Tue,  9 Apr 2024 14:22:33 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 0099B1A0568;
+	Tue,  9 Apr 2024 14:22:39 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxCu3hRmAS0CJg--.44389S3;
+	Tue, 09 Apr 2024 14:22:39 +0800 (CST)
+Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
+ blcok_device
+To: Al Viro <viro@zeniv.linux.org.uk>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
+ <20240406090930.2252838-23-yukuai1@huaweicloud.com>
+ <20240406194206.GC538574@ZenIV> <20240406202947.GD538574@ZenIV>
+ <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
+ <20240407015149.GG538574@ZenIV>
+ <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
+ <20240407030610.GI538574@ZenIV>
+ <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
+ <20240409042643.GP538574@ZenIV>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
+Date: Tue, 9 Apr 2024 14:22:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: API break, sysfs "capability" file
-Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>, Lennart Poettering <mzxreary@0pointer.de>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
- Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
-References: <ZhQJf8mzq_wipkBH@gardel-login>
- <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
- <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
- <ZhRSVSmNmb_IjCCH@gardel-login>
- <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-1.52 / 50.00];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	BAYES_HAM(-0.23)[72.47%];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Spam-Score: -1.52
-X-Spam-Flag: NO
+In-Reply-To: <20240409042643.GP538574@ZenIV>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDHlxCu3hRmAS0CJg--.44389S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAw4kWw4rCF4rGrWkKw1rWFg_yoW5GFWkpF
+	ZxKFWqkr4DGry8KrZ2vw43ZF1ayw13A3y5Ca4rW3sIkrZ0gw1IgFWxGr45uF98ur4kWr12
+	qrWagrZ0gry5A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 4/9/24 00:41, Keith Busch wrote:
-> On Mon, Apr 08, 2024 at 10:23:49PM +0200, Lennart Poettering wrote:
->> Not sure how this is salvageable. This is just seriously fucked
->> up. What now?
+Hi,
+
+在 2024/04/09 12:26, Al Viro 写道:
+> On Sun, Apr 07, 2024 at 11:21:56AM +0800, Yu Kuai wrote:
+>> Hi,
 >>
->> It has been proposed to use the "range_ext" sysfs attr instead as a
->> hint if partition scanning is available or not. But it's entirely
->> undocumented. Is this something that will remain stable? (I mean,
->> whether something is documented or not apparently has no effect on the
->> stability of an API anyway, so I guess it's equally shaky as the
->> capability sysattr? Is any of the block device sysfs interfaces
->> actually stable or can they change any time?)
+>> 在 2024/04/07 11:06, Al Viro 写道:
+>>> On Sun, Apr 07, 2024 at 10:34:56AM +0800, Yu Kuai wrote:
+>>>
+>>>> Other than raw block_device fops, other filesystems can use the opened
+>>>> bdev_file directly for iomap and buffer_head, and they actually don't
+>>>> need to reference block_device anymore. The point here is that whether
+>>>
+>>> What do you mean, "reference"?  The counting reference is to opened
+>>> file; ->s_bdev is a cached pointer to associated struct block_device,
+>>> and neither it nor pointers in buffer_head are valid past the moment
+>>> when you close the file.  Storing (non-counting) pointers to struct
+>>> file in struct buffer_head is not different in that respect - they
+>>> are *still* only valid while the "master" reference is held.
+>>>
+>>> Again, what's the point of storing struct file * in struct buffer_head
+>>> or struct iomap?  In any instances of those structures?
+>>
+>> Perhaps this is what you missed, like the title of this set, in order to
+>> remove direct acceess of bdev->bd_inode from fs/buffer, we must store
+>> bdev_file in buffer_head and iomap, and 'bdev->bd_inode' is replaced
+>> with 'file_inode(bdev)' now.
 > 
-> The "ext_range" attribute does look like an appropriate proxy for the
-> attribute, but indeed, it's not well documented.
+> BTW, what does that have to do with iomap?  All it passes ->bdev to is
+> 	1) bio_alloc()
+> 	2) bio_alloc_bioset()
+> 	3) bio_init()
+> 	4) bdev_logical_block_size()
+> 	5) bdev_iter_is_aligned()
+> 	6) bdev_fua()
+> 	7) bdev_write_cache()
 > 
-> Looking at the history of the documentation you had been relying on, it
-> appears that was submitted with good intentions (9243c6f3e012a92d), but
-> it itself changed values, acknowledging the instability of this
-> interface.
+> None of those goes anywhere near fs/buffer.c or uses ->bd_inode, AFAICS.
 > 
-> So what to do? If documentation is all that's preventing "ext_range"
-> from replacing you're previous usage, then let's add it in the
-> Documentation/ABI/stable/sysfs-block. It's been there since 2008, so
-> that seems like a reliable attribute to put there.
+> Again, what's the point?  It feels like you are trying to replace *all*
+> uses of struct block_device with struct file, just because.
 > 
-I'll side with Keith. Our management tools use 'ext_range' to find
-if a device is partitionable, and we've done that since the very
-beginning of sysfs.
+> If that's what's going on, please don't.  Using struct file instead
+> of that bdev_handle crap - sure, makes perfect sense.  But shoving it
+> down into struct bio really, really does not.
+> 
+> I'd suggest to start with adding ->bd_mapping as the first step and
+> converting the places where mapping is all we want to using that.
+> Right at the beginning of your series.  Then let's see what gets
+> left.
 
-Cheers,
+Thanks so much for your advice, in fact, I totally agree with this that
+adding a 'bd_mapping' or expose the helper bdev_mapping().
 
-Hannes
+However, I will let Christoph and Jan to make the decision, when they
+get time to take a look at this.
+
+Thanks!
+Kuai
+
+> 
+> And leave ->bd_inode there for now; don't blindly replace it with
+> ->bd_mapping->host everywhere.  It's much easier to grep for.
+> The point of the exercise is to find what do we really need ->bd_inode
+> for and what primitives are missing, not getting rid of a bad word...
+> .
+> 
 
