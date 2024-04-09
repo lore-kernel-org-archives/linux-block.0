@@ -1,69 +1,141 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E887112FB0F;
-	Tue,  9 Apr 2024 14:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3922D781;
+	Tue,  9 Apr 2024 14:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712672138; cv=none; b=bGLUHZXtvOM4NVFcZZbEh9eIaabcbI4KJkV2xO2oGjQbTrmPMj15EvHGJyoDgumliJGxvqk9N8e/RLl2Amy3OHLKJmS9XWCjjVs+6SK9p9ihPGTwXIxnlHI2zhvsqHUwhtFXLEsEgrUJbh/B7as8rxB6xbd7F/L+ogwmyGAEv4s=
+	t=1712673492; cv=none; b=kt2QrPBUJSqNDnX9dM//y37/PyRMQIRX0k7Mz8lopQ2VYPVhpWsHjxR592/Os8s1Os0j7IDuvFbReaKVqHAdLCASNR9VZkHKXcAnPiF4phLfUb8ukaFErnufzXCunNZIV9FKt+Gj/Eo7TQHUSRlXQrhZFhe1227iLIrzVNFE10E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712672138; c=relaxed/simple;
-	bh=1Hvn0UUQi7daY6MeWzk+embfXVjNT5NRKIlTZP6dTWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VM30V1E9KCYCvnUFUQVKk3uq335eW1DXoTlnxs8OTyjFak6mhRCMeQqFuOY0MuCLAbxO5OaMCD3IIJCx4nKPSmi6b3uY+0dgMU9k7F2OOj8gL9zNfYa5HxTHBpwgJGm+wJAPaGCQJs7wF0MOrEogA9B90M3d4HJ2RydsF3RmzvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+	s=arc-20240116; t=1712673492; c=relaxed/simple;
+	bh=WWYKPGj9czOqLTO0oX9N/l4w+cm5zbzGbk+M3GLZboE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=CXVjGFBfz8bj0v5g6TFgpb/+bZHHFjAgSUioLZuYqvMtTniFuiwjov3wn8SRMXMqs8au1z/ocd8TtfXWVke4+ekf5T+vM6ENVHcGSBAsOUdhAnU2x7ymAR5B8HGNHmIjLItukNkbHFEWKVrqFPq5umDIRX1ylBbzuu39TG5pZ80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fLPg523d; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 65FB468B05; Tue,  9 Apr 2024 16:15:32 +0200 (CEST)
-Date: Tue, 9 Apr 2024 16:15:31 +0200
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fLPg523d"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=X+gXVF78AgUh7bwzkprwZK7b92TFqgltEgDLxNaodqo=; b=fLPg523dfnH0RTzcadCtiXmfuu
+	AJH/gG+ptmJmZHKCEDqSG4SN+IAs+DHm499u3i6VeUPBonHNomz5fUMtA9Z8ylPOpN9fwVRuVKf1w
+	2b5XQs7VUdF64Zaltfk76I9JRy5AxhWAQhuxxPW8Z9xR6IvDn3I7H3QWyeKlzj65fMjiSDMv3tBIq
+	x8KSxddyfEAwixu/wczVt9qaK782OeQj1fFFeh1zjF68xdtS2Fa6i3sHLdh+ouKXMgJs7JN/pD6gl
+	Kv7by94ZotET5HGuW04HYxEc4PWci+vslRktdteqryi4T+CXtjXuVHW8IGoHwDjCHqitv3d5kVl8a
+	sro5b6bQ==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1ruCbn-00000002Ruc-1TRV;
+	Tue, 09 Apr 2024 14:37:59 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Lennart Poettering <mzxreary@0pointer.de>
-Cc: Keith Busch <kbusch@kernel.org>,
-	Linux regressions mailing list <regressions@lists.linux.dev>,
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: API break, sysfs "capability" file
-Message-ID: <20240409141531.GB21514@lst.de>
-References: <ZhQJf8mzq_wipkBH@gardel-login> <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info> <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com> <ZhRSVSmNmb_IjCCH@gardel-login> <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com> <ZhT5_fZ9SrM0053p@gardel-login>
+To: Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Sathya Prakash <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	"Juergen E. Fischer" <fischer@norbit.de>,
+	Xiang Chen <chenxiang66@hisilicon.com>,
+	HighPoint Linux Team <linux@highpoint-tech.com>,
+	Tyrel Datwyler <tyreld@linux.ibm.com>,
+	Brian King <brking@us.ibm.com>,
+	Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Jason Yan <yanaijie@huawei.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux1394-devel@lists.sourceforge.net,
+	MPT-FusionLinux.pdl@broadcom.com,
+	linux-scsi@vger.kernel.org,
+	megaraidlinux.pdl@broadcom.com,
+	mpi3mr-linuxdrv.pdl@broadcom.com,
+	linux-samsung-soc@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	usb-storage@lists.one-eyed-alien.net,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 03/23] mpi3mr: pass queue_limits to bsg_setup_queue
+Date: Tue,  9 Apr 2024 16:37:28 +0200
+Message-Id: <20240409143748.980206-4-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240409143748.980206-1-hch@lst.de>
+References: <20240409143748.980206-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhT5_fZ9SrM0053p@gardel-login>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Apr 09, 2024 at 10:19:09AM +0200, Lennart Poettering wrote:
-> All I am looking for is a very simple test that returns me a boolean:
-> is there kernel-level partition scanning enabled on this device or
-> not.
+Pass the limits to bsg_setup_queue instead of setting them up on the live
+queue.
 
-And we can add a trivial sysfs attribute for that.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: John Garry <john.g.garry@oracle.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/scsi/mpi3mr/mpi3mr_app.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-> At this point it's not clear to me if I can write this at all in
-> a way that works reasonably correctly on any kernel since let's say
-> 4.15 (which is systemd's "recommended baseline" right now).
-> 
-> I am really not sure how to salvage this mess at all. AFAICS there's
-> currently no way to write such a test correctly.
+diff --git a/drivers/scsi/mpi3mr/mpi3mr_app.c b/drivers/scsi/mpi3mr/mpi3mr_app.c
+index a45406fae2629b..3c309e8c3a2bc8 100644
+--- a/drivers/scsi/mpi3mr/mpi3mr_app.c
++++ b/drivers/scsi/mpi3mr/mpi3mr_app.c
+@@ -1845,6 +1845,10 @@ void mpi3mr_bsg_init(struct mpi3mr_ioc *mrioc)
+ {
+ 	struct device *bsg_dev = &mrioc->bsg_dev;
+ 	struct device *parent = &mrioc->shost->shost_gendev;
++	struct queue_limits lim = {
++		.max_hw_sectors		= MPI3MR_MAX_APP_XFER_SECTORS,
++		.max_segments		= MPI3MR_MAX_APP_XFER_SEGMENTS,
++	};
+ 
+ 	device_initialize(bsg_dev);
+ 
+@@ -1860,20 +1864,14 @@ void mpi3mr_bsg_init(struct mpi3mr_ioc *mrioc)
+ 		return;
+ 	}
+ 
+-	mrioc->bsg_queue = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), NULL,
++	mrioc->bsg_queue = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), &lim,
+ 			mpi3mr_bsg_request, NULL, 0);
+ 	if (IS_ERR(mrioc->bsg_queue)) {
+ 		ioc_err(mrioc, "%s: bsg registration failed\n",
+ 		    dev_name(bsg_dev));
+ 		device_del(bsg_dev);
+ 		put_device(bsg_dev);
+-		return;
+ 	}
+-
+-	blk_queue_max_segments(mrioc->bsg_queue, MPI3MR_MAX_APP_XFER_SEGMENTS);
+-	blk_queue_max_hw_sectors(mrioc->bsg_queue, MPI3MR_MAX_APP_XFER_SECTORS);
+-
+-	return;
+ }
+ 
+ /**
+-- 
+2.39.2
 
-You can't.  Maybe that's a lesson to not depend on undocumented internal
-flags exposed by accident by a weirdo interface.  Just talk to people.
-
-> I think it would be nice if the "capabilities" thing would be brought
-> back in a limited form. For example, if it would be changed to start
-> to return 0x200|0x1000 for part scanning is off, 0x1000 when it is on.
-> 
-> That would then mean we return to compatibility with Linux <= 5.15,
-> but the new 0x1000 bit would tell us that the information is
-> reliable. i.e. if userspace sees 0x1000 being set we know that the
-> 0x200 bit is definitely correct. That would then just mean that
-> kernels >= 5.16 until today are left in the cold...
-
-At this point we're just better off with a clean new interface.
-And you can use the old hack for < 5.15 if you care strongly enough
-or just talk distros into backporting it to make their lives easier.
