@@ -1,141 +1,130 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from gardel.0pointer.net (gardel.0pointer.net [85.214.157.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3995D7CF17;
-	Tue,  9 Apr 2024 06:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CD612880F;
+	Tue,  9 Apr 2024 08:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.157.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712643772; cv=none; b=oRMe87zzUtMxzyaQU0IcDFSkWgSJphSGNypQzaUM+ykV5k/ZJOl5Tggj6rhqO0UuMB5Kri1DW7NsZCRlDJ27IonoN60Bk5Z8bIeskOdyGBblBQTNis9xBb88fumBjz5O+WSkfcTfy8QqNXJdxbhZ99Ub9p4TkDfiXdXPCiXvGmg=
+	t=1712650756; cv=none; b=rwgMuRtH2/o0G4KKAra/kYgwDG8XPDQtUZZVGul+Qj3pq5soSq+6gBFdUrtRq+JFExdxPFqtKHbQZcQQ+uxU57MWKvd44+c8g/1trxbgILTXyWYzxtxWrGNu6wxZ0Hqe2x42hLSiaaEuEVeplwrFIbmuzT2/sXMcpbWIsKO0iGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712643772; c=relaxed/simple;
-	bh=5rARhv3NmHpa1Fdlvzgz/4cyVDMr6pUtaAKtNUhQ6VI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=tAa+AG+dWWVH8yJlrnq/b9pVNdCVPoNiB959C2jobFwr9m9doYoposq6w/SFfXHDTl/96uQ1GWb5VXZP96nE2s4/bx4UGg/AfmD9Vl44CF+tztJBr6ULc7nRWLXx9bhaUjepf6pyYwDg/NnAtQny1bE4JLjZV+jmkw8gLSz34Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VDG8n1WXRz4f3jR1;
-	Tue,  9 Apr 2024 14:22:33 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 0099B1A0568;
-	Tue,  9 Apr 2024 14:22:39 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgDHlxCu3hRmAS0CJg--.44389S3;
-	Tue, 09 Apr 2024 14:22:39 +0800 (CST)
-Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
- blcok_device
-To: Al Viro <viro@zeniv.linux.org.uk>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-23-yukuai1@huaweicloud.com>
- <20240406194206.GC538574@ZenIV> <20240406202947.GD538574@ZenIV>
- <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
- <20240407015149.GG538574@ZenIV>
- <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
- <20240407030610.GI538574@ZenIV>
- <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
- <20240409042643.GP538574@ZenIV>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
-Date: Tue, 9 Apr 2024 14:22:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1712650756; c=relaxed/simple;
+	bh=VJyWzBnYyefyTtjqbrovv8c/SufEzmjLtuCvSB1LCCs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dy6KiOsD3DavSKG0Nfikb17Rw6eeUQmv1PB6uf7v1rfnKUrzJJsrJYecdY10GbBa0+WGr/3fpoIAc5PRBVcb8UNWWfkBLRRrXfNnL8VAKbyRaGvwMWPD2cmPioWJgykjo8u7qN+46ewPMTKIEf/qsKpcjRHPQ2ztacitXH/91KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de; spf=pass smtp.mailfrom=0pointer.de; arc=none smtp.client-ip=85.214.157.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0pointer.de
+Received: from gardel-login.0pointer.net (gardel-mail [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
+	by gardel.0pointer.net (Postfix) with ESMTP id F1D32E80204;
+	Tue,  9 Apr 2024 10:19:10 +0200 (CEST)
+Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
+	id 23E6D160433; Tue,  9 Apr 2024 10:19:09 +0200 (CEST)
+Date: Tue, 9 Apr 2024 10:19:09 +0200
+From: Lennart Poettering <mzxreary@0pointer.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: API break, sysfs "capability" file
+Message-ID: <ZhT5_fZ9SrM0053p@gardel-login>
+References: <ZhQJf8mzq_wipkBH@gardel-login>
+ <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
+ <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
+ <ZhRSVSmNmb_IjCCH@gardel-login>
+ <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240409042643.GP538574@ZenIV>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDHlxCu3hRmAS0CJg--.44389S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxAw4kWw4rCF4rGrWkKw1rWFg_yoW5GFWkpF
-	ZxKFWqkr4DGry8KrZ2vw43ZF1ayw13A3y5Ca4rW3sIkrZ0gw1IgFWxGr45uF98ur4kWr12
-	qrWagrZ0gry5A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+In-Reply-To: <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
 
-Hi,
+On Mo, 08.04.24 16:41, Keith Busch (kbusch@kernel.org) wrote:
 
-在 2024/04/09 12:26, Al Viro 写道:
-> On Sun, Apr 07, 2024 at 11:21:56AM +0800, Yu Kuai wrote:
->> Hi,
->>
->> 在 2024/04/07 11:06, Al Viro 写道:
->>> On Sun, Apr 07, 2024 at 10:34:56AM +0800, Yu Kuai wrote:
->>>
->>>> Other than raw block_device fops, other filesystems can use the opened
->>>> bdev_file directly for iomap and buffer_head, and they actually don't
->>>> need to reference block_device anymore. The point here is that whether
->>>
->>> What do you mean, "reference"?  The counting reference is to opened
->>> file; ->s_bdev is a cached pointer to associated struct block_device,
->>> and neither it nor pointers in buffer_head are valid past the moment
->>> when you close the file.  Storing (non-counting) pointers to struct
->>> file in struct buffer_head is not different in that respect - they
->>> are *still* only valid while the "master" reference is held.
->>>
->>> Again, what's the point of storing struct file * in struct buffer_head
->>> or struct iomap?  In any instances of those structures?
->>
->> Perhaps this is what you missed, like the title of this set, in order to
->> remove direct acceess of bdev->bd_inode from fs/buffer, we must store
->> bdev_file in buffer_head and iomap, and 'bdev->bd_inode' is replaced
->> with 'file_inode(bdev)' now.
-> 
-> BTW, what does that have to do with iomap?  All it passes ->bdev to is
-> 	1) bio_alloc()
-> 	2) bio_alloc_bioset()
-> 	3) bio_init()
-> 	4) bdev_logical_block_size()
-> 	5) bdev_iter_is_aligned()
-> 	6) bdev_fua()
-> 	7) bdev_write_cache()
-> 
-> None of those goes anywhere near fs/buffer.c or uses ->bd_inode, AFAICS.
-> 
-> Again, what's the point?  It feels like you are trying to replace *all*
-> uses of struct block_device with struct file, just because.
-> 
-> If that's what's going on, please don't.  Using struct file instead
-> of that bdev_handle crap - sure, makes perfect sense.  But shoving it
-> down into struct bio really, really does not.
-> 
-> I'd suggest to start with adding ->bd_mapping as the first step and
-> converting the places where mapping is all we want to using that.
-> Right at the beginning of your series.  Then let's see what gets
-> left.
+> On Mon, Apr 08, 2024 at 10:23:49PM +0200, Lennart Poettering wrote:
+> > Not sure how this is salvageable. This is just seriously fucked
+> > up. What now?
+> >
+> > It has been proposed to use the "range_ext" sysfs attr instead as a
+> > hint if partition scanning is available or not. But it's entirely
+> > undocumented. Is this something that will remain stable? (I mean,
+> > whether something is documented or not apparently has no effect on the
+> > stability of an API anyway, so I guess it's equally shaky as the
+> > capability sysattr? Is any of the block device sysfs interfaces
+> > actually stable or can they change any time?)
+>
+> The "ext_range" attribute does look like an appropriate proxy for the
+> attribute, but indeed, it's not well documented.
+>
+> Looking at the history of the documentation you had been relying on, it
+> appears that was submitted with good intentions (9243c6f3e012a92d), but
+> it itself changed values, acknowledging the instability of this
+> interface.
+>
+> So what to do? If documentation is all that's preventing "ext_range"
+> from replacing you're previous usage, then let's add it in the
+> Documentation/ABI/stable/sysfs-block. It's been there since 2008, so
+> that seems like a reliable attribute to put there.
 
-Thanks so much for your advice, in fact, I totally agree with this that
-adding a 'bd_mapping' or expose the helper bdev_mapping().
+Well, history so far is telling us that this doesn't stop the block layer
+to change it anyway...
 
-However, I will let Christoph and Jan to make the decision, when they
-get time to take a look at this.
+AFAICS "ext_range" is kinda messy to use for this since it changed
+behaviour – only since
+https://github.com/torvalds/linux/commit/1ebe2e5f9d68e94c524aba876f27b945669a7879
+it actually directly exposes GENHD_FL_NO_PART, before it it did some
+more complex stuff which did *not* take GENHD_FL_NO_PART into
+consideration. It's nasty to hack against that from userspace, since
+we never know on what kernel we are on, and how it has been patched.
 
-Thanks!
-Kuai
+Also "ext_range" is only available on whole block devices afaics. Partition
+block devices do not have it at all, which makes the check userspace
+has to do even more complex.
 
-> 
-> And leave ->bd_inode there for now; don't blindly replace it with
-> ->bd_mapping->host everywhere.  It's much easier to grep for.
-> The point of the exercise is to find what do we really need ->bd_inode
-> for and what primitives are missing, not getting rid of a bad word...
-> .
-> 
+All I am looking for is a very simple test that returns me a boolean:
+is there kernel-level partition scanning enabled on this device or
+not. At this point it's not clear to me if I can write this at all in
+a way that works reasonably correctly on any kernel since let's say
+4.15 (which is systemd's "recommended baseline" right now).
 
+I am really not sure how to salvage this mess at all. AFAICS there's
+currently no way to write such a test correctly.
+
+1. "ext_range" does not work on older kernels, and not on partition
+   block devices
+2. "capabilities" does not work on newer kernels, because it changed
+   meaning and then was amputated to be zero.
+3. There's no way to know if we are on an old or new kernel, as
+   apparently various distros backported the amputation.
+
+So, what now?
+
+I think it would be nice if the "capabilities" thing would be brought
+back in a limited form. For example, if it would be changed to start
+to return 0x200|0x1000 for part scanning is off, 0x1000 when it is on.
+
+That would then mean we return to compatibility with Linux <= 5.15,
+but the new 0x1000 bit would tell us that the information is
+reliable. i.e. if userspace sees 0x1000 being set we know that the
+0x200 bit is definitely correct. That would then just mean that
+kernels >= 5.16 until today are left in the cold...
+
+That would then allow userspace to implement:
+
+1. if "capabilities" has 0x200 set → definitely no partition scanning
+2. if "capabilities" has 0x1000 set → bit 0x200 reliably tells is
+   whether partition scanning on or off
+3. if DEVTYPE=partition → definitely no partition scanning
+4. if "ext_range" is 1 → definitely no partition scanning
+5. if LOOP_GET_STATUS64 works, then .lo_flags' LO_FLAGS_PARTSCAN flag
+   indicates partition scanning on or off.
+6. otherwise: ??? (probably we should assume partition scanning is on?)
+
+Lennart
+
+--
+Lennart Poettering, Berlin
