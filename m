@@ -1,103 +1,194 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1A313B2A0
-	for <linux-block@vger.kernel.org>; Tue,  9 Apr 2024 15:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3561E158846
+	for <linux-block@vger.kernel.org>; Tue,  9 Apr 2024 20:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712678245; cv=none; b=EAp6DubXVCl1wIsaGI2ChEEgd0rrrKd7zv61ZyLLv/647de724OKCmhxGb08VZeS7cldzoFgunblABeZuO+2bYyPwO4shy5Wp2dNR0TvjXj6cwgFjnGdpq8vH3XS5bBNANHAf5/v69xbGoeH2nuSYcPQFesu7OhPl9cigC1onLs=
+	t=1712695152; cv=none; b=kVro0zBnQBkQFK9l8gs369wt5CFAHLSDG1AdXRBJzSjwV6NaFzrQXL9I6txGNKL6XNNZ+e+in5ueA6VWh+4J25n722a2mXMsBf/EZtUNOxBgz4FTYV6tpDnoRBJ8qBcckQ9o/z+qVCW/lbFfsqE2iI7sQMemvFmeKJZYr8YCUZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712678245; c=relaxed/simple;
-	bh=F7wmDJo1CTgLlcMGnB22FbyVjlRMIAGgTDI9EoDph5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZoZbLzx3rteQjdsJYl64Q0PTH2mNQWNMLerdIzN7oVV8plsEqvPC8pBXbhNg/e6qK307cV8LgLifvDPBGIt/yLrmgAKIXunIGo3d3gHT26N30EGEfAYUoardC3mFCEKwfD6HlRp1z8c8EssHjxZ/e2OTITDubW69J81/2OcjNsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z5tLsUx9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712695152; c=relaxed/simple;
+	bh=8jbelJmjK60K89nVSGEJVZ1VFyu5tfUrVQ6MaclgRv8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LnmGfAlhzMOuXicm/F3+H7nKDlA4b/6FB4fgoxcBvq+qr8Rp+B4PbJ5vNLBWiqOw04eP2lh1mquqW04R9Yy3oSZP3vbdcj0Yt6htOZyjJNqy47rg5EmOG9pbdbujuY/v5fK6ElpIX9rcuNaZh9qNNbRvklRakkUhqoyWzMnqoD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iexLxoS4; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5tLsUx9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712678242;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iexLxoS4"
+Message-ID: <ed63d154-fc1f-4207-b994-9dad73eaebdb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712695148;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WzbRqHGt5XInRshA+Pv85lImG4dL2VBw+03B1sBGY9w=;
-	b=Z5tLsUx99Zmzn4A4TmTGoP0n8jfrVkftG+/ITCLjc+euceTBXlO/sXn49I87ELJkRJ9LFa
-	VBDfWKc4KmtvK8eDkAlcHCjbCFC80ot85C96P56ITREM5Stu5qFTl0Gx/R2Bi0y8srO51s
-	f4xOuwf/cfcbKycfp7ATe9p4XnGq2Go=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-679-30-BI5_mNe6hz72sLGltcw-1; Tue,
- 09 Apr 2024 11:57:19 -0400
-X-MC-Unique: 30-BI5_mNe6hz72sLGltcw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88FBA29AA392;
-	Tue,  9 Apr 2024 15:57:18 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DDA347B;
-	Tue,  9 Apr 2024 15:57:13 +0000 (UTC)
-Date: Tue, 9 Apr 2024 23:56:50 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	janpieter.sollie@edpnet.be, Mike Snitzer <snitzer@kernel.org>,
-	dm-devel@lists.linux.dev, Song Liu <song@kernel.org>,
-	linux-raid@vger.kernel.org
-Subject: Re: [PATCH] block: allow device to have both virt_boundary_mask and
- max segment size
-Message-ID: <ZhVlQqtHU+8oP6rD@fedora>
-References: <20240407131931.4055231-1-ming.lei@redhat.com>
- <20240408055542.GA15653@lst.de>
- <ZhOekuZdwlwNSiZV@fedora>
- <20240408084739.GA26968@lst.de>
- <ZhO9UrfK4EulTkLo@fedora>
- <20240409135758.GA20668@lst.de>
+	bh=SVUiOM0QcRqoo/6o1IjJwVcyR3Qxex0Ao2MUyWJnXTc=;
+	b=iexLxoS4HQYGzHW0qQNnXKyYF04/CU/9OoS0xvx8xGCO4Ix16ivK+y9+ymiwAOQEvR/M5J
+	E7KmoPQbVNKAGeF/j1Zitj8/w+qiZ16xWP+z/osg4i8cW3jrYsKI/f8LAzcbFvhn/hf61S
+	3AMT3shrV2uY9XICbFQwXYTvBCoZNUE=
+Date: Tue, 9 Apr 2024 22:39:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240409135758.GA20668@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+ linux-nvme@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+ Bart Van Assche <bvanassche@acm.org>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ Amir Goldstein <amir73il@gmail.com>,
+ "josef@toxicpanda.com" <josef@toxicpanda.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ Dan Williams <dan.j.williams@intel.com>, "jack@suse.com" <jack@suse.com>,
+ Leon Romanovsky <leonro@nvidia.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
+References: <cover.1709635535.git.leon@kernel.org>
+ <afc34f07-ff4c-4947-a203-ef244dcf43e8@linux.dev>
+In-Reply-To: <afc34f07-ff4c-4947-a203-ef244dcf43e8@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Apr 09, 2024 at 03:57:58PM +0200, Christoph Hellwig wrote:
-> On Mon, Apr 08, 2024 at 05:48:02PM +0800, Ming Lei wrote:
-> > The limit is from commit 09324d32d2a0 ("block: force an unlimited segment
-> > size on queues with a virt boundary") which claims to fix f6970f83ef79
-> > ("block: don't check if adjacent bvecs in one bio can be mergeable").
-> > 
-> > However commit f6970f83ef79 only covers merge code which isn't used by
-> > bio driver at all, so not sure pre-6.9-rc is broken for stacking driver.
+
+
+在 2024/3/7 7:01, Zhu Yanjun 写道:
+> 在 2024/3/5 12:18, Leon Romanovsky 写道:
+>> This is complimentary part to the proposed LSF/MM topic.
+>> https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
 > 
-> We can stack rq drivers as well.
+> I am interested in this topic. Hope I can join the meeting to discuss 
+> this topic.
 > 
-> > Also commit 09324d32d2a0 mentioned that it did not cause problem,
-> > actually 64K default segment size limits always exists even though the
-> > device doesn't provide one, so looks there isn't report as 'real bugs',
-> > or maybe I miss something?
+
+With the same idea, in the IDPF driver, the function dma_alloc_coherent 
+which is called in the IDPF driver can be devided into the following 2 
+functions:
+
+iommu_dma_alloc_pages
+
+and
+
+iommu_dma_map_page
+
+So the function iommu_dma_alloc_pages allocates pages, 
+iommu_dma_map_page makes mapping between pages and IOVA.
+
+Now the above idea is implemented in the NIC driver. Currently it can 
+work well.
+
+Next the above idea will be implemented in the block device. Hope this 
+can increase the performance of the block device.
+
+Best Regards,
+Zhu Yanjun
+
+> Zhu Yanjun
 > 
-> The problem is when the segment size does not align to the boundary
-> mask as you'll now start feeding malformed segments/entris to the
-> device.
-
-In case of single bio, this bio will be split with max segment size
-if segment size doesn't align with virt boundary, so the resulted bio
-is still valid because virt-boundary allows the last bvec to be
-unaligned. 
-
-In case of bio merge, bio_will_gap() is always called to make sure
-there isn't gap between the two bios wrt. virt boundary.
-
-Can you explain a bit how one malformed bio is made?
-
-
-
-Thanks, 
-Ming
-
+>>
+>> This is posted as RFC to get a feedback on proposed split, but RDMA, 
+>> VFIO and
+>> DMA patches are ready for review and inclusion, the NVMe patches are 
+>> still in
+>> progress as they require agreement on API first.
+>>
+>> Thanks
+>>
+>> -------------------------------------------------------------------------------
+>> The DMA mapping operation performs two steps at one same time: allocates
+>> IOVA space and actually maps DMA pages to that space. This one shot
+>> operation works perfectly for non-complex scenarios, where callers use
+>> that DMA API in control path when they setup hardware.
+>>
+>> However in more complex scenarios, when DMA mapping is needed in data
+>> path and especially when some sort of specific datatype is involved,
+>> such one shot approach has its drawbacks.
+>>
+>> That approach pushes developers to introduce new DMA APIs for specific
+>> datatype. For example existing scatter-gather mapping functions, or
+>> latest Chuck's RFC series to add biovec related DMA mapping [1] and
+>> probably struct folio will need it too.
+>>
+>> These advanced DMA mapping APIs are needed to calculate IOVA size to
+>> allocate it as one chunk and some sort of offset calculations to know
+>> which part of IOVA to map.
+>>
+>> Instead of teaching DMA to know these specific datatypes, let's separate
+>> existing DMA mapping routine to two steps and give an option to advanced
+>> callers (subsystems) perform all calculations internally in advance and
+>> map pages later when it is needed.
+>>
+>> In this series, three users are converted and each of such conversion
+>> presents different positive gain:
+>> 1. RDMA simplifies and speeds up its pagefault handling for
+>>     on-demand-paging (ODP) mode.
+>> 2. VFIO PCI live migration code saves huge chunk of memory.
+>> 3. NVMe PCI avoids intermediate SG table manipulation and operates
+>>     directly on BIOs.
+>>
+>> Thanks
+>>
+>> [1] 
+>> https://lore.kernel.org/all/169772852492.5232.17148564580779995849.stgit@klimt.1015granger.net
+>>
+>> Chaitanya Kulkarni (2):
+>>    block: add dma_link_range() based API
+>>    nvme-pci: use blk_rq_dma_map() for NVMe SGL
+>>
+>> Leon Romanovsky (14):
+>>    mm/hmm: let users to tag specific PFNs
+>>    dma-mapping: provide an interface to allocate IOVA
+>>    dma-mapping: provide callbacks to link/unlink pages to specific IOVA
+>>    iommu/dma: Provide an interface to allow preallocate IOVA
+>>    iommu/dma: Prepare map/unmap page functions to receive IOVA
+>>    iommu/dma: Implement link/unlink page callbacks
+>>    RDMA/umem: Preallocate and cache IOVA for UMEM ODP
+>>    RDMA/umem: Store ODP access mask information in PFN
+>>    RDMA/core: Separate DMA mapping to caching IOVA and page linkage
+>>    RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
+>>    vfio/mlx5: Explicitly use number of pages instead of allocated length
+>>    vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+>>    vfio/mlx5: Explicitly store page list
+>>    vfio/mlx5: Convert vfio to use DMA link API
+>>
+>>   Documentation/core-api/dma-attributes.rst |   7 +
+>>   block/blk-merge.c                         | 156 ++++++++++++++
+>>   drivers/infiniband/core/umem_odp.c        | 219 +++++++------------
+>>   drivers/infiniband/hw/mlx5/mlx5_ib.h      |   1 +
+>>   drivers/infiniband/hw/mlx5/odp.c          |  59 +++--
+>>   drivers/iommu/dma-iommu.c                 | 129 ++++++++---
+>>   drivers/nvme/host/pci.c                   | 220 +++++--------------
+>>   drivers/vfio/pci/mlx5/cmd.c               | 252 ++++++++++++----------
+>>   drivers/vfio/pci/mlx5/cmd.h               |  22 +-
+>>   drivers/vfio/pci/mlx5/main.c              | 136 +++++-------
+>>   include/linux/blk-mq.h                    |   9 +
+>>   include/linux/dma-map-ops.h               |  13 ++
+>>   include/linux/dma-mapping.h               |  39 ++++
+>>   include/linux/hmm.h                       |   3 +
+>>   include/rdma/ib_umem_odp.h                |  22 +-
+>>   include/rdma/ib_verbs.h                   |  54 +++++
+>>   kernel/dma/debug.h                        |   2 +
+>>   kernel/dma/direct.h                       |   7 +-
+>>   kernel/dma/mapping.c                      |  91 ++++++++
+>>   mm/hmm.c                                  |  34 +--
+>>   20 files changed, 870 insertions(+), 605 deletions(-)
+>>
+> 
