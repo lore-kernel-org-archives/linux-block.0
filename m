@@ -1,144 +1,112 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00F91802CA
-	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 18:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414D017BB11;
+	Wed, 10 Apr 2024 19:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712775550; cv=none; b=LdG/2PSew3yzEGyMDwR/Z8rADPOl68M2F+SymkR9YBdMkIFvcd/Kf83qmQM0AB6j4U1tfhPnR2USdnbV5UDO6fp9oWVLj5zwXEfsOaxtgMpscQkpFVtMPzfOe4FXLNQkTwcCYM3c616nX5MNwOc2TU6i45hAkZEejbTLvEVqqUc=
+	t=1712777819; cv=none; b=ISp6F5k94xhjR0RVCtEwiMcR0VxxF1X5bWYtzISVgFA62ISU2Ce16sV2asvJ+SPnKpxuYpT4gXal/O2b9FQsinAJByJ1200i016cdLqglKNKjHD2gIFJnkyTyarh61TgAE2EyJSyzT3ziGGHvHv0urP205QoZdTj1PQ2dRlRAW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712775550; c=relaxed/simple;
-	bh=HcTvQPAA9NUPS2igJbqEH//WEl4aZTKvJGY0XkzAfiI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c4Aet3pJOIpQA87+HDT34QVKISnoNvJ1z37lVbPSkFPACGEIcDb/r2k4k2Kz1n2Z6M+w4JFYErk0XbJfXFfE7JdO86vzsJEuBZ+5N/w2yvOzSNW5O4lKhjVZUBh11YVxCzR5R3wy5ilH8Eb0/c3QXnwuM7GVZoOx6nsUAy+Xjhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BCnb2Uh6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BCnb2Uh6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712775547;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XxpkuxUnIrOWR5YmuW0AIjNYXGEKvHqlxiu3ZzXtRNg=;
-	b=BCnb2Uh6fMCJOejfHM8WLfYlscTvZuKzJiWVobfJv7cJVzxOuU9xRroooT0BKAQMEIlFXY
-	172KNU43Q6Ivr8DsnqSE7PPIvXn5G2idDfYIEHs6GVPNU733P6NEN9kked83FvjDp/8xg+
-	uv6pWy+/B+dPlDsOj5U0TlE8jlHKJu8=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-ECBE24yKMqiAGUTuF-aQGg-1; Wed, 10 Apr 2024 14:59:05 -0400
-X-MC-Unique: ECBE24yKMqiAGUTuF-aQGg-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-69b09fe4792so49841106d6.1
-        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 11:59:05 -0700 (PDT)
+	s=arc-20240116; t=1712777819; c=relaxed/simple;
+	bh=S5BTEarz0iSmxy+b2TcZC93iyXKdiNlysOtVgmMET4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iBYW9E7W+ar3T6jd0M0vCdAQvRKaSJ0XNW2R++b363D7sKfPTA06LJ0Zi06jiIqO1vjSYYABHLrGJILxmypGLyHjMyvqxUYeftUbz7s4WSS7BG5PgEhzxQRsvEQWV7huZBVjAOynGlHkS3dQhLX6q9BajTEN5hykjJRUVCHANjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a4702457ccbso907962766b.3;
+        Wed, 10 Apr 2024 12:36:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712775545; x=1713380345;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XxpkuxUnIrOWR5YmuW0AIjNYXGEKvHqlxiu3ZzXtRNg=;
-        b=K0DTCg93w6ycNbZS0dDh6rlqJVwrNy7oEJC7nXB5bWeCL5BX6dXdjXZEYQj6liK9hO
-         U2VoKYp5799mXARHrISWnj09bZAMxvDhmUDmLCMd0jPwHe4SmGKbIkX7/Vpr27IVdrwM
-         y+BL5tF+y/WBu6igp1SK9eg8NUP2n16VdXeW0dz7bv4IedpLEWPeg1rBxaoXSqpICm/8
-         vSxZXOnuVqJKn+r9Xx5/aRRnphFNqKRXguWGFMbSqdeWpLYpLvBhNUr+7hXahqox6xAF
-         AKXT2FsT4LaxLJO3IzvIkKKNjKOEZCXBDUffCQJaiMzWTllofNhVu/NJXkji//vxUFyI
-         a8zw==
-X-Forwarded-Encrypted: i=1; AJvYcCV/afybsR/WnH7zeFeiaL9Bbevd3GpLrlHWT2qbCd5dWyqd4TwBns3VWiruavY5BSDvxnVL97/jqBJZI4+xqeW5pj0cPbaAxPJua18=
-X-Gm-Message-State: AOJu0Yyb/x1ktSDeBS8KrcesbyRczR9VyiIw56gDcE+e0hjjTD0W/bDS
-	UZ0czQDllxH0N6L9TY9w+v1H25O6jf3fm9hirGJ2aD0Aroxj0fdr0Ros2zOdkmkZ1q8J9XTNPtZ
-	+anjHpHYnakNazWp98F4uC7E6/mkcCJxEwExK6clvmK48mXhJ06srysVe7WHg
-X-Received: by 2002:a05:6214:4111:b0:69b:1efb:9d42 with SMTP id kc17-20020a056214411100b0069b1efb9d42mr3445944qvb.6.1712775545301;
-        Wed, 10 Apr 2024 11:59:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH1rZzHlFdlKErUaVzaIIBoz+uophffHDufiBosrVM2ScG6c79A0tsfU5q3lB5GUj4EtqyQxA==
-X-Received: by 2002:a05:6214:4111:b0:69b:1efb:9d42 with SMTP id kc17-20020a056214411100b0069b1efb9d42mr3445922qvb.6.1712775544953;
-        Wed, 10 Apr 2024 11:59:04 -0700 (PDT)
-Received: from [192.168.1.165] ([70.22.187.239])
-        by smtp.gmail.com with ESMTPSA id p20-20020a05621415d400b00698d06df322sm5418657qvz.122.2024.04.10.11.59.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 11:59:04 -0700 (PDT)
-Message-ID: <1e344d3b-1e30-6638-83c3-f743546374ec@redhat.com>
-Date: Wed, 10 Apr 2024 14:59:03 -0400
+        d=1e100.net; s=20230601; t=1712777815; x=1713382615;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LV9OTU7lN1JB10Lq12VkN+Km9fa4QtfBk3DiQf/p+wE=;
+        b=H1K+tMJQ4V79Vkp4SGoyvXp9aNOc6H7xOwQ9OuQ/8u5vgD9i73+uHHXw/5HM6bCQtV
+         OoevfthjwAZDzCOZ5c8e8pBHqidMmccI7xhtT3cyVy8UCXlm47jetxeqavF8BTVHxbOb
+         3IhrEOwp/rnznYZq/WYF+yscR/CyHYQOcNqPoq7N98kEaVsz1n6fnq4cBWxccIauvR3y
+         VSCL2M3Y98aMmcDemXCnkqNlDKjokWo3iCaWFF0r/E5GKdJiMqldPBGE2aCtIL9X8QlR
+         srexKP+vyGiO128JlD+y5QjeguAp0SzCzNHtEpOpE2sY4Ef5xJBfw72pS6Uau9PcZ5jo
+         vbCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3YeDC6uQ79JKjaQcTkVVaEX3f2dJf7OsxSF4qrHsu8NDXdVcYVdBYSrttNP6NetDOMchjHbxY4893Deg5p1PLj4WULL8fVnitcsKqnKSyW4Q8Wm+KsF8/LIqzNuuSCMsjY6WkaGs+yuqKrwY/q2IL1Ew/jvwXislk72V9Zgyo9fDW
+X-Gm-Message-State: AOJu0YxFTiD8ghG04cMt6EjePfedYFnnqvefEMWcv+Azx5+FaOfGghD/
+	ErbHQ/5OC9DCUFc2THLzI/TO9IMmaGV0fGzVZOX1slw3tv6XCAl2
+X-Google-Smtp-Source: AGHT+IHr28Czx4c87y8DMCQwDkaWkAuvwyA5LRX41vrj3tkYSdhx1rqHWjUXnt1TtLrm19V+Tc6fRQ==
+X-Received: by 2002:a17:907:6089:b0:a45:ad29:725c with SMTP id ht9-20020a170907608900b00a45ad29725cmr2762322ejc.62.1712777815193;
+        Wed, 10 Apr 2024 12:36:55 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
+        by smtp.gmail.com with ESMTPSA id j5-20020a170906830500b00a4734125fd2sm7268231ejx.31.2024.04.10.12.36.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 12:36:54 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: leit@meta.com,
+	cgroups@vger.kernel.org (open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)),
+	linux-block@vger.kernel.org (open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] blk-iocost: Fix shift-out-of-bounds in iocg_kick_delay()
+Date: Wed, 10 Apr 2024 12:36:41 -0700
+Message-ID: <20240410193642.1303741-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH vfs.all 19/26] dm-vdo: convert to use bdev_file
-Content-Language: en-US
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
- brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- yukuai3@huawei.com, dm-devel@lists.linux.dev
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-20-yukuai1@huaweicloud.com>
- <a8493592-2a9b-ac14-f914-c747aa4455f3@redhat.com>
- <20240410174022.GF2118490@ZenIV>
-From: Matthew Sakai <msakai@redhat.com>
-In-Reply-To: <20240410174022.GF2118490@ZenIV>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+When running iocg_kick_delay(), iocg->delay_at could be way behind "now",
+which causes a huge tdelta difference.
 
+The tdelta value is used to shift some bits around, raising the
+following UBSAN splat:
 
-On 4/10/24 13:40, Al Viro wrote:
-> On Wed, Apr 10, 2024 at 01:26:47PM -0400, Matthew Sakai wrote:
-> 
->>> 'dm_dev->bdev_file', it's ok to get inode from the file.
-> 
-> It can be done much easier, though -
-> 
-> [PATCH] dm-vdo: use bdev_nr_bytes(bdev) instead of i_size_read(bdev->bd_inode)
-> 
-> going to be faster, actually - shift is cheaper than dereference...
+	UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
 
-This does look simpler. And doing this means there's no reason to switch 
-dm-vdo from using struct block_device * to using struct file *, so the 
-rest of the original patch is unnecessary.
+Debugging this, these are some values I got in my machine with 6.9-rc3.
 
-Reviewed-by: Matthew Sakai <msakai@redhat.com>
+ now = 3626064295
+ iocg->delay_at = 3275794093
 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> ---
-> diff --git a/drivers/md/dm-vdo/dm-vdo-target.c b/drivers/md/dm-vdo/dm-vdo-target.c
-> index 5a4b0a927f56..b423bec6458b 100644
-> --- a/drivers/md/dm-vdo/dm-vdo-target.c
-> +++ b/drivers/md/dm-vdo/dm-vdo-target.c
-> @@ -878,7 +878,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
->   	}
->   
->   	if (config->version == 0) {
-> -		u64 device_size = i_size_read(config->owned_device->bdev->bd_inode);
-> +		u64 device_size = bdev_nr_bytes(config->owned_device->bdev);
->   
->   		config->physical_blocks = device_size / VDO_BLOCK_SIZE;
->   	}
-> @@ -1011,7 +1011,7 @@ static void vdo_status(struct dm_target *ti, status_type_t status_type,
->   
->   static block_count_t __must_check get_underlying_device_block_count(const struct vdo *vdo)
->   {
-> -	return i_size_read(vdo_get_backing_device(vdo)->bd_inode) / VDO_BLOCK_SIZE;
-> +	return bdev_nr_bytes(vdo_get_backing_device(vdo)) / VDO_BLOCK_SIZE;
->   }
->   
->   static int __must_check process_vdo_message_locked(struct vdo *vdo, unsigned int argc,
-> diff --git a/drivers/md/dm-vdo/indexer/io-factory.c b/drivers/md/dm-vdo/indexer/io-factory.c
-> index 515765d35794..1bee9d63dc0a 100644
-> --- a/drivers/md/dm-vdo/indexer/io-factory.c
-> +++ b/drivers/md/dm-vdo/indexer/io-factory.c
-> @@ -90,7 +90,7 @@ void uds_put_io_factory(struct io_factory *factory)
->   
->   size_t uds_get_writable_size(struct io_factory *factory)
->   {
-> -	return i_size_read(factory->bdev->bd_inode);
-> +	return bdev_nr_bytes(factory->bdev);
->   }
->   
->   /* Create a struct dm_bufio_client for an index region starting at offset. */
-> 
+Fix this by validating that the shift if valid, otherwise bail out,
+similarly to commit 2a427b49d029 ("blk-iocost: Fix an UBSAN
+shift-out-of-bounds warning")
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ block/blk-iocost.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 9a85bfbbc45a..398fe19db4ca 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1347,7 +1347,7 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
+ {
+ 	struct ioc *ioc = iocg->ioc;
+ 	struct blkcg_gq *blkg = iocg_to_blkg(iocg);
+-	u64 tdelta, delay, new_delay;
++	u64 tdelta, delay, new_delay, shift;
+ 	s64 vover, vover_pct;
+ 	u32 hwa;
+ 
+@@ -1362,8 +1362,13 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
+ 
+ 	/* calculate the current delay in effect - 1/2 every second */
+ 	tdelta = now->now - iocg->delay_at;
++
++	shift = div64_u64(tdelta, USEC_PER_SEC);
++	if (shift >= BITS_PER_LONG)
++		return false;
++
+ 	if (iocg->delay)
+-		delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
++		delay = iocg->delay >> shift;
+ 	else
+ 		delay = 0;
+ 
+-- 
+2.43.0
 
