@@ -1,80 +1,60 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668ED20304;
-	Wed, 10 Apr 2024 06:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BC413D289
+	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 07:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712730044; cv=none; b=O9Mp0poj9kWHym7tiVHOLGZlTwmcqgS/NyAqeVfHRiOUP+NcK4+pLXbKi2i48A73Fv6AUhj2Aty/8beISjwEwfpbbdmLdrBV2jmd2gbvpsxIg9l1YQzxkVWTLD1lU7ohqwuuW5rsdUYi1E74VvozmIHXKeakYwGJrVl10DnvfGQ=
+	t=1712734928; cv=none; b=ot0WpYTi+pcJAt4JFN+JdKsXxyae9TxP8MF+04yQJCIqo5Qk6huhZl1ntBlL0YGEp5kPiZiBhBQy+XNtThFfK40KUqapu4CqSJEaLrLI/+YNhqxZ0cCb5rVMT4IR/4+VsMp5WFy5jGshShj5V596hmSbK0L4AYbX8bYoUY6FYRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712730044; c=relaxed/simple;
-	bh=SVgnyvJn4+dftj5N9qiNFUfNLaC+N6iSxocInF85y/8=;
+	s=arc-20240116; t=1712734928; c=relaxed/simple;
+	bh=6JimvKABjGAhaAunVcg5wLuwEFqMbqXRS1l6okPFEp4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JpTyfPXzWkiF/JUek0khNCnccF2tIkjLKMedKyK21Csq42rDMlIuzkHLrm3KmMT01PRftCn1sIFFcOABCnED/r3bhHHAkgXQ5thCR0cnqJjqgwb8NknwuBQYuk48kFIqqAI7XzICE7Pm3jDXN6/w1I4UGF2Qeuiep8Rez8OQopk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DRH5op6+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0jV/eoo4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DRH5op6+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0jV/eoo4; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 In-Reply-To:Content-Type; b=c1lszYVZqTSJNRYCGgavw6L7nwSG6CE22UUo9W3+3EVVZeWTLk92SRPTgR6KjWMAoRHOPTHWG2Zc67JK2W2I2b6tGts/SLH+rF/vh3jaGHsSyP9ek1/7Kf9wK9gd7FiEXvMNvUpdnjIrE95US61/lUk9VfVkR7na+BusrWH4wt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xrPmfdoq; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DRH5op6+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0jV/eoo4";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DRH5op6+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0jV/eoo4"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8A4D3349E5;
-	Wed, 10 Apr 2024 06:20:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712730040; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yJIujaH3RXIktcRv88URJI4c3MW1XPtMbHZWqI5VmXc=;
-	b=DRH5op6+qgu/ZbeaZUaYpnIYWqjeWpHK8OW0+kwvqDCMEwaguq5aqaXafgAjwJ6zywhusF
-	tsgFsWgaCMMY4NaTEaGk3lDtHCR73mjQ4SRA1LnqLj9EF0l+PnSJ2BlijBLHcS98VKUP8t
-	Vf4bNVGD5TMPNXoHOH52Hod45ruzXX8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712730040;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yJIujaH3RXIktcRv88URJI4c3MW1XPtMbHZWqI5VmXc=;
-	b=0jV/eoo4drBjtHKjxE/GtnE1W1+NVg3WllILQl+VLv9gNYfTXrOGjwpUFYpLOwg0GRsGjF
-	4Wxv4HCZCDpVodDA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712730040; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yJIujaH3RXIktcRv88URJI4c3MW1XPtMbHZWqI5VmXc=;
-	b=DRH5op6+qgu/ZbeaZUaYpnIYWqjeWpHK8OW0+kwvqDCMEwaguq5aqaXafgAjwJ6zywhusF
-	tsgFsWgaCMMY4NaTEaGk3lDtHCR73mjQ4SRA1LnqLj9EF0l+PnSJ2BlijBLHcS98VKUP8t
-	Vf4bNVGD5TMPNXoHOH52Hod45ruzXX8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712730040;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yJIujaH3RXIktcRv88URJI4c3MW1XPtMbHZWqI5VmXc=;
-	b=0jV/eoo4drBjtHKjxE/GtnE1W1+NVg3WllILQl+VLv9gNYfTXrOGjwpUFYpLOwg0GRsGjF
-	4Wxv4HCZCDpVodDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CECBE13691;
-	Wed, 10 Apr 2024 06:20:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id InaALLYvFmaJGQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 10 Apr 2024 06:20:38 +0000
-Message-ID: <94d6d88b-b0e7-491d-94e8-dc9e5fba5620@suse.de>
-Date: Wed, 10 Apr 2024 08:20:37 +0200
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xrPmfdoq"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56c5d05128dso7163501a12.0
+        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 00:42:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1712734923; x=1713339723; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=k3mXYs19jtAC2YbwmDdropY4/qIjzCwyc3vsFS2GcGA=;
+        b=xrPmfdoqalT722GL6FLJ3+UTBNIFGwP1Q4CURE/dJUGeXOZuf9ghUXjZ1jqQ2pjvf9
+         TRs0m8ql8yKJ+6GndJHDuM77rOMh80p6GdkLuedldi9iuvVzj7sGPSn1l5mnl9ZiX6GE
+         7A8zLS7ooUBD0BC5HyazuelJ2xNzIpu8YIXi1LOJD8WxrIM8xc2K0kuLslEddvWGIkLP
+         R9Lk4B2fpScQsDOM6Jw2aB3QPAJpIUyPySAyNvVq4XU/RCfUlp5cysFYX/wo7UYBW5sG
+         lgKNhEHDIrtOrQxGeL8UFcw6yEuiMtS913F+S7t/dircm4yc7Wx/JfkKUvjYTaBwMW+P
+         jcVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712734923; x=1713339723;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k3mXYs19jtAC2YbwmDdropY4/qIjzCwyc3vsFS2GcGA=;
+        b=UTsukZ5DLNdFU9eELcS0rJeuB8BkSIx3F10ou7VpLBuJNAmvqmumygBl2OFNLGwViw
+         //NP6wF5w7SJSOYGfwZ8KdIIXpCGR1Y9Rbq4B6BwHj0yKY44K7mRrtGAcMdq+NMmnElB
+         zZhr23TsGNn2AoRPZwt5PFVjk5plINjSsfIgKvGIL6JS8Ih5hqgnFwd2Is1Rl2Ee6JBu
+         L313EpinO2EE3oaZYTiyB55Z5/4yr5gGyrunMA1m0okgIDZvykwA9uG22X9s74c+/J3m
+         JkT/CbpTS0TczDeZlMDWWXFtOpj5G9kEYLHA/BydAD6qiHACq5y4XtgYOHunkyzjkU/R
+         Qgig==
+X-Forwarded-Encrypted: i=1; AJvYcCWVZ+FkGtcqF0EmDSewjzDGVZeaIG8KUEtGJjK67vAsmW80Vzn8kG/oF+77+N/VO+XUwrtq1pOGVk+KAJe4ivkx8/Vvp9VN+3/5hcg=
+X-Gm-Message-State: AOJu0YwdabrKC/aLkHMi9Gqs7F5AYs12xb6M59oEVgHCOEDXqeiCNg3N
+	npcd2j39eLlBE1bXPNa72pu8Tq/NHxpS5kritpXdUMDobuptUJ4ClGnuTAx4X3Y=
+X-Google-Smtp-Source: AGHT+IHbsaGMHaULq45hB1RQzGJ2jQouzCDk/Qs5dl99Xk4dB9Un2GtOpuqSHCNaJjxWq+FiwtopyQ==
+X-Received: by 2002:a17:907:9914:b0:a51:a688:3e9c with SMTP id ka20-20020a170907991400b00a51a6883e9cmr887114ejc.35.1712734923162;
+        Wed, 10 Apr 2024 00:42:03 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.16])
+        by smtp.gmail.com with ESMTPSA id y6-20020a17090668c600b00a46d049ff63sm6575359ejr.21.2024.04.10.00.41.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Apr 2024 00:42:02 -0700 (PDT)
+Message-ID: <285be63c-8939-495c-8411-ce2a68e25b2b@linaro.org>
+Date: Wed, 10 Apr 2024 09:41:57 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,132 +62,128 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 00/10] block atomic writes
+Subject: Re: [PATCH v2 00/25] virtio: store owner from modules with
+ register_virtio_driver()
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
+ David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Cristian Marussi <cristian.marussi@arm.com>,
+ Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
+ Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
+ <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Daniel Vetter <daniel@ffwll.ch>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
+ Latchesar Ionkov <lucho@ionkov.net>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Christian Schoenebeck <linux_oss@crudebyte.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
+ <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+ Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+ kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
+ linux-sound@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Viresh Kumar <viresh.kumar@linaro.org>
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
 Content-Language: en-US
-To: Matthew Wilcox <willy@infradead.org>, Luis Chamberlain <mcgrof@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>, Pankaj Raghav
- <p.raghav@samsung.com>, Daniel Gomez <da.gomez@samsung.com>,
- =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>, axboe@kernel.dk,
- kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
- martin.petersen@oracle.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
- brauner@kernel.org, dchinner@redhat.com, jack@suse.cz,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
- ojaswin@linux.ibm.com, linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
- io-uring@vger.kernel.org, nilay@linux.ibm.com, ritesh.list@gmail.com
-References: <20240326133813.3224593-1-john.g.garry@oracle.com>
- <ZgOXb_oZjsUU12YL@casper.infradead.org>
- <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
- <Zg7Z4aJtn3SxY5w1@casper.infradead.org>
- <f3c1d321-0dfc-466f-9f6a-fe2f0513d944@oracle.com>
- <ZhQud1NbO4aMt0MH@bombadil.infradead.org>
- <ZhYQANQATz82ytl1@casper.infradead.org>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ZhYQANQATz82ytl1@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.79 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	TAGGED_RCPT(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLusjj3u5c53i6g8q6enupwtij)];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[oracle.com,samsung.com,kernel.dk,kernel.org,lst.de,grimberg.me,linux.ibm.com,zeniv.linux.org.uk,redhat.com,suse.cz,vger.kernel.org,lists.infradead.org,mit.edu,google.com,kvack.org,gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
-X-Spam-Score: -2.79
-X-Spam-Flag: NO
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 4/10/24 06:05, Matthew Wilcox wrote:
-> On Mon, Apr 08, 2024 at 10:50:47AM -0700, Luis Chamberlain wrote:
->> On Fri, Apr 05, 2024 at 11:06:00AM +0100, John Garry wrote:
->>> On 04/04/2024 17:48, Matthew Wilcox wrote:
->>>>>> The thing is that there's no requirement for an interface as complex as
->>>>>> the one you're proposing here.  I've talked to a few database people
->>>>>> and all they want is to increase the untorn write boundary from "one
->>>>>> disc block" to one database block, typically 8kB or 16kB.
->>>>>>
->>>>>> So they would be quite happy with a much simpler interface where they
->>>>>> set the inode block size at inode creation time,
->>>>> We want to support untorn writes for bdev file operations - how can we set
->>>>> the inode block size there? Currently it is based on logical block size.
->>>> ioctl(BLKBSZSET), I guess?  That currently limits to PAGE_SIZE, but I
->>>> think we can remove that limitation with the bs>PS patches.
->>
->> I can say a bit more on this, as I explored that. Essentially Matthew,
->> yes, I got that to work but it requires a set of different patches. We have
->> what we tried and then based on feedback from Chinner we have a
->> direction on what to try next. The last effort on that front was having the
->> iomap aops for bdev be used and lifting the PAGE_SIZE limit up to the
->> page cache limits. The crux on that front was that we end requiring
->> disabling BUFFER_HEAD and that is pretty limitting, so my old
->> implementation had dynamic aops so to let us use the buffer-head aops
->> only when using filesystems which require it and use iomap aops
->> otherwise. But as Chinner noted we learned through the DAX experience
->> that's not a route we want to again try, so the real solution is to
->> extend iomap bdev aops code with buffer-head compatibility.
+On 31/03/2024 10:43, Krzysztof Kozlowski wrote:
+> Changes in v2:
+> - Three new patches: virtio mem+input+balloon
+> - Minor commit msg adjustments
+> - Add tags
+> - Link to v1: https://lore.kernel.org/r/20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org
 > 
-> Have you tried just using the buffer_head code?  I think you heard bad
-> advice at last LSFMM.  Since then I've landed a bunch of patches which
-> remove PAGE_SIZE assumptions throughout the buffer_head code, and while
-> I haven't tried it, it might work.  And it might be easier to make work
-> than adding more BH hacks to the iomap code.
-> 
-> A quick audit for problems ...
-> 
-> __getblk_slow:
->         if (unlikely(size & (bdev_logical_block_size(bdev)-1) ||
->                          (size < 512 || size > PAGE_SIZE))) {
-> 
-> cont_expand_zero (not used by bdev code)
-> cont_write_begin (ditto)
-> 
-> That's all I spot from a quick grep for PAGE, offset_in_page() and kmap.
-> 
-> You can't do a lot of buffer_heads per folio, because you'll overrun
->          struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
-> in block_read_full_folio(), but you can certainly do _one_ buffer_head
-> per folio, and that's all you need for bs>PS.
-> 
-Indeed; I got a patch here to just restart the submission loop if one
-reaches the end of the array. But maybe submitting one bh at a time and
-using plugging should achieve that same thing. Let's see.
+> Merging
+> =======
+> All further patches depend on the first virtio patch, therefore please ack
+> and this should go via one tree: maybe virtio?
 
->> I suspect this is a use case where perhaps the max folio order could be
->> set for the bdev in the future, the logical block size the min order,
->> and max order the large atomic.
-> 
-> No, that's not what we want to do at all!  Minimum writeback size needs
-> to be the atomic size, otherwise we have to keep track of which writes
-> are atomic and which ones aren't.  So, just set the logical block size
-> to the atomic size, and we're done.
-> 
-+1. My thoughts all along.
+Michael, Jason, Xuan,
 
-Cheers,
+Will you be able to take the entire patchset through virtio?
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Best regards,
+Krzysztof
 
