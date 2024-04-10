@@ -1,125 +1,93 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D400B4C94;
-	Wed, 10 Apr 2024 04:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19721BA50;
+	Wed, 10 Apr 2024 04:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712721940; cv=none; b=RKJggihAd7jubdzLs23ck7tNRa/p01TXZlV8G2rr8cSQLqvTMIyXYz6ltKpT8UKGF573CUO/r6XkfGgnNOEF9m+qE8fbKpR/8fNgTnKTNXyQcKiQ78YzcHF9c0CxyW2PFLA34Ib5HP/33LtQREXUkgOOg6D+9oQKrVifHOUPfjE=
+	t=1712723142; cv=none; b=fWAR+Bzb5VLOXNMFUAD8D1RCCs9FRRHbO9654NfN5PwjJ/3DJfM0cZyeI/FuwhSYnI65BVCpbcAxMKtF/s2VsVoxm20jA2qpvBzutK1UvQYHTPcpdg5KLLggxn+AwKZEk78mRXqB4fUfPoV4exxzUhakH1oqZG8VscFZLJrM8tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712721940; c=relaxed/simple;
-	bh=KWJYcJImYSZUHfkkZGcSRS3Vw/Qv1TU4MIWBb6oY7/E=;
+	s=arc-20240116; t=1712723142; c=relaxed/simple;
+	bh=4FBVoUmFN8na8de48F5/iGsG5nPf0m9yzudFippKALs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SdyxgRB2U1vtDZdoPEsaoz6Ww7u5oSGfspOr8Q52/L/oNtkRHo33X641D6CVGo+EyeOMI8n70bH3rJwicGFyebIgPIodLFHBZJXiw13JJtMbPTrA+vIWrkrtb+vn00KUNSQvrC6Ja3BVNxfuQ5oI4wB4OG9QOKXpy/x6zfGHkxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ClEKjZyn; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ClEKjZyn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=qs5zPeAsEcTuuvWHCl8rO9RDQhxhl31TRFIHSeLuueU=; b=ClEKjZyn0q+YoWT29QBVUZv3x4
-	7ISBLoo3ezuPgISr4g1j134YmhOhC3bGqp/zBcIxc/aIa2f1wbY3tEj4KA35QtdzIjwNvWTmykbXZ
-	DFP3fKW2rcC1gxLGBJ4PkcEZIPKb+26gGieZFatmm0nFBXNkjWN3rVkCGdIPy9wmstcMXjWPMILP1
-	oDIIbPGGkcggayy9BUb5XOLhqvRRiJjzZmgA5Ox3pXKzSoPue9vqLgwAQz+r+RAbBwoC+mSzhUM7z
-	xG/FpDxPzMuVfmcrJ8mIaztiG4XhivtLEK/40Tx7XFqq8UKlf/wodX/BukW2wTCz599syOPVXetah
-	7vprz9MQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1ruPD6-00000003bR4-2bWn;
-	Wed, 10 Apr 2024 04:05:20 +0000
-Date: Wed, 10 Apr 2024 05:05:20 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-	axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
-	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-	io-uring@vger.kernel.org, nilay@linux.ibm.com,
-	ritesh.list@gmail.com
-Subject: Re: [PATCH v6 00/10] block atomic writes
-Message-ID: <ZhYQANQATz82ytl1@casper.infradead.org>
-References: <20240326133813.3224593-1-john.g.garry@oracle.com>
- <ZgOXb_oZjsUU12YL@casper.infradead.org>
- <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
- <Zg7Z4aJtn3SxY5w1@casper.infradead.org>
- <f3c1d321-0dfc-466f-9f6a-fe2f0513d944@oracle.com>
- <ZhQud1NbO4aMt0MH@bombadil.infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ml/9KC8c5Vbd31WSq8oCWZK5mgnvF+FTTQqvBlR+amTBRH8xG39d5lVnqlaIhM4LT5rlHYgJFeC7ymkQBLoQvRl/93HbnpE2T8qwpgS5FNgxFn6G7e28LzGToK0oG/izbvJC0AmQ1+evA5wSObEDhlfZt6uGj2+k3XTDXqHVDp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id EF67068B05; Wed, 10 Apr 2024 06:25:32 +0200 (CEST)
+Date: Wed, 10 Apr 2024 06:25:32 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Sathya Prakash <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	"Juergen E. Fischer" <fischer@norbit.de>,
+	Xiang Chen <chenxiang66@hisilicon.com>,
+	HighPoint Linux Team <linux@highpoint-tech.com>,
+	Tyrel Datwyler <tyreld@linux.ibm.com>,
+	Brian King <brking@us.ibm.com>, Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Jason Yan <yanaijie@huawei.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	"GR-QLogic-Storage-Upstream@marvell.com" <GR-QLogic-Storage-Upstream@marvell.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <Avri.Altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
+	"linux1394-devel@lists.sourceforge.net" <linux1394-devel@lists.sourceforge.net>,
+	"MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"megaraidlinux.pdl@broadcom.com" <megaraidlinux.pdl@broadcom.com>,
+	"mpi3mr-linuxdrv.pdl@broadcom.com" <mpi3mr-linuxdrv.pdl@broadcom.com>,
+	"linux-samsung-soc@vger.kernel.org" <linux-samsung-soc@vger.kernel.org>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"usb-storage@lists.one-eyed-alien.net" <usb-storage@lists.one-eyed-alien.net>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 21/23] mpi3mr: switch to using ->device_configure
+Message-ID: <20240410042532.GA2457@lst.de>
+References: <20240409143748.980206-1-hch@lst.de> <20240409143748.980206-22-hch@lst.de> <1e41a8df-2046-45cf-8ab7-caa5839d1718@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZhQud1NbO4aMt0MH@bombadil.infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1e41a8df-2046-45cf-8ab7-caa5839d1718@wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Apr 08, 2024 at 10:50:47AM -0700, Luis Chamberlain wrote:
-> On Fri, Apr 05, 2024 at 11:06:00AM +0100, John Garry wrote:
-> > On 04/04/2024 17:48, Matthew Wilcox wrote:
-> > > > > The thing is that there's no requirement for an interface as complex as
-> > > > > the one you're proposing here.  I've talked to a few database people
-> > > > > and all they want is to increase the untorn write boundary from "one
-> > > > > disc block" to one database block, typically 8kB or 16kB.
-> > > > > 
-> > > > > So they would be quite happy with a much simpler interface where they
-> > > > > set the inode block size at inode creation time,
-> > > > We want to support untorn writes for bdev file operations - how can we set
-> > > > the inode block size there? Currently it is based on logical block size.
-> > > ioctl(BLKBSZSET), I guess?  That currently limits to PAGE_SIZE, but I
-> > > think we can remove that limitation with the bs>PS patches.
+On Tue, Apr 09, 2024 at 03:34:13PM +0000, Johannes Thumshirn wrote:
+> Why did you split this into two functions, with the innermost function 
+> being only called once?
 > 
-> I can say a bit more on this, as I explored that. Essentially Matthew,
-> yes, I got that to work but it requires a set of different patches. We have
-> what we tried and then based on feedback from Chinner we have a
-> direction on what to try next. The last effort on that front was having the
-> iomap aops for bdev be used and lifting the PAGE_SIZE limit up to the
-> page cache limits. The crux on that front was that we end requiring
-> disabling BUFFER_HEAD and that is pretty limitting, so my old
-> implementation had dynamic aops so to let us use the buffer-head aops
-> only when using filesystems which require it and use iomap aops
-> otherwise. But as Chinner noted we learned through the DAX experience
-> that's not a route we want to again try, so the real solution is to
-> extend iomap bdev aops code with buffer-head compatibility.
+> While it's slightly less of a mess to read this would be fully 
+> sufficient and IMHO more readable (please excuse the whitespace damage):
 
-Have you tried just using the buffer_head code?  I think you heard bad
-advice at last LSFMM.  Since then I've landed a bunch of patches which
-remove PAGE_SIZE assumptions throughout the buffer_head code, and while
-I haven't tried it, it might work.  And it might be easier to make work
-than adding more BH hacks to the iomap code.
+Because having a helper for a specific type of device just simply
+is good code struture.  It might not matter too much now, but as
+soon as something else gets added your version turns into a mess
+quickly.
 
-A quick audit for problems ...
-
-__getblk_slow:
-       if (unlikely(size & (bdev_logical_block_size(bdev)-1) ||
-                        (size < 512 || size > PAGE_SIZE))) {
-
-cont_expand_zero (not used by bdev code)
-cont_write_begin (ditto)
-
-That's all I spot from a quick grep for PAGE, offset_in_page() and kmap.
-
-You can't do a lot of buffer_heads per folio, because you'll overrun
-        struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
-in block_read_full_folio(), but you can certainly do _one_ buffer_head
-per folio, and that's all you need for bs>PS.
-
-> I suspect this is a use case where perhaps the max folio order could be
-> set for the bdev in the future, the logical block size the min order,
-> and max order the large atomic.
-
-No, that's not what we want to do at all!  Minimum writeback size needs
-to be the atomic size, otherwise we have to keep track of which writes
-are atomic and which ones aren't.  So, just set the logical block size
-to the atomic size, and we're done.
-
+But it turns out the rebase caused a real mess in this patch as it
+marks a function static that now gets used outside the fіle in the
+scsi tree, and has a weird rename in not actually visible characters,
+so I'm resending it.
