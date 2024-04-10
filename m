@@ -1,132 +1,106 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD77181314
-	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 19:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C54428FD;
+	Wed, 10 Apr 2024 19:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712778038; cv=none; b=byNl+dsMagWUeypHMlTU7Inh2F6XVryJwK02l5HA+hY631xWuuGWQx9uW6ZNFE4uInkMg4fGio0TaMgOzenOYxJkqTQj3aSAEyKFO7iQWEkKpp/TSlCvuImLp91GZ8zCxIjUV8NWM4z6ENyAClln3CGYsUlgV95QA5REgdZCGM4=
+	t=1712778836; cv=none; b=iz07hoVR9Bp692Jm/F8e92CQiBaY5YeqbuNn1/SI1ATxP7mzPtQjx8IYh2Z2tfuIXflY84mWGJopFKcDDJZDfIxSFeq8pU+ksG5piZpha1ortoLzpIRFDVSiP2uSmYpie5SWVNe4rj1NcHxw7zOxKgqQ5wR187qWNnuzFCwIcpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712778038; c=relaxed/simple;
-	bh=dVxNNyiSzc8E8XowZhEOkAqCqO9EkZxsLoTONMIIe+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=ewxxDXnzbzvIKASZIe9e+rXlx/ttMkZ1TChYtf7JDmmr2JK8or81zE2kzqz2b4gfaA2jrPq9lPT/+++xSTh8vKuFwDI/Vq8p4/CKwkpmVYkorK5+VM01mINHt8/vassT+jTb6K1m7pgi8yICfXfirslSFbrYpL8j89Ez0/E+cIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NA/6CZZe; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1712778836; c=relaxed/simple;
+	bh=/gzrab9sjjLCDQ6VDRJrkCIVoiCcc5F44HEM5Lx1Wxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fCcCaZgX8u5YKO7tXhbY62NEGQoQPC8vv2H5pA7AHXVMRZLVDSqBrqRjdL2t0oZwdPcb0/cNPcM+0Iuc8C+/vaUWBM6WZQ/jatxp93kQdPqEbAS+s+kRrEMj+w2wcvuv8s1M+nyZTigyhbmo34fSNd1VIhmBjoN0FpIM5ZMpEMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yxgoha2k; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NA/6CZZe"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240410194032epoutp01edd24e877b81bbce1fd74315067920db~FAovaef3K3003930039epoutp01M
-	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 19:40:32 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240410194032epoutp01edd24e877b81bbce1fd74315067920db~FAovaef3K3003930039epoutp01M
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1712778033;
-	bh=dVxNNyiSzc8E8XowZhEOkAqCqO9EkZxsLoTONMIIe+s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NA/6CZZezOS/R3r3Oqp9YpjBUkbZo20Z1veVjl3NftUryEfuWlLr3pD8sUKJlcFSv
-	 9uK2YVvXaDkmuGJo0uBn2SMAKd+wZTy6ffc3bYGRklUSz+SNjy9T6HeQcoKi4gxklb
-	 z9jSJLCtFVrLOmtldYt0pNir55XurXcZdT6Y9EvM=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240410194031epcas5p15759a46cf252a6fc74571f33bff37830~FAouV0biJ2649326493epcas5p1u;
-	Wed, 10 Apr 2024 19:40:31 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.175]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4VFCq21R0Pz4x9Pt; Wed, 10 Apr
-	2024 19:40:30 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	A7.E4.09666.E2BE6166; Thu, 11 Apr 2024 04:40:30 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240410192515epcas5p1360a731616fca3841c892be310afb109~FAbY8yBzE1911019110epcas5p1H;
-	Wed, 10 Apr 2024 19:25:15 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240410192515epsmtrp26727929e6e890145f149426ceaf426de~FAbY8PYOW2877028770epsmtrp2y;
-	Wed, 10 Apr 2024 19:25:15 +0000 (GMT)
-X-AuditID: b6c32a49-cefff700000025c2-ea-6616eb2e74c0
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	8E.A6.08390.B97E6166; Thu, 11 Apr 2024 04:25:15 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20240410192514epsmtip204f3b35f27f1024b677f3175e2963344~FAbYU9ksV2303223032epsmtip2w;
-	Wed, 10 Apr 2024 19:25:14 +0000 (GMT)
-Date: Thu, 11 Apr 2024 00:48:20 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: convert the debugfs interface to read/write
- iterators
-Message-ID: <20240410191820.krjqmam76jde2j5i@green245>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yxgoha2k"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ed20fb620fso3372588b3a.2;
+        Wed, 10 Apr 2024 12:53:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712778835; x=1713383635; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9LLpYn6RY+9fmh/DEGHkQYLiUAYafku1LckmK98WH34=;
+        b=Yxgoha2kL19hmet5BgDig0Jsj/o9EeLXC5tei1ccue5csVlagoDOoM72hTr667GyWh
+         +0y0epT3YSYL/TQWTCwO7l8cO0+77qXkSljm2MznB4yxlLJ1SCIhr4YjCfxoNYmyTpCb
+         p24Y4qXaZ3iCdg0kLT+9Uayad0sf3jJyUd5V1/tzVaPAIzXk+o4xsg/PmhI+d632mnHB
+         QnJJqSYMTQzfAUoF8iw3MGvjOJLbc1yoDY2DzVl61J6QRq3WpIECX3Ymxp/GsGpJsGG+
+         lHEYkvn7jhVcncwrgsPnetvn/cZIJqN8HXEUETuKbW/aRgfq0m7G5MoiXrbxUhQeR4ZL
+         P8ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712778835; x=1713383635;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9LLpYn6RY+9fmh/DEGHkQYLiUAYafku1LckmK98WH34=;
+        b=SECTIYH5Zo9gKnIVn2A+1+h0sSODWODnc9HYJ3LvTOlM8wUPIBuJcs9y/xIy9jwcl7
+         XXFsxPHw0Oi00J7ZPaUMhkwKiDMxwM3agnO/pP0YLNSVn4pwoMWQwqKot3uu4jWMj8Kd
+         JfBF74lhvnjUMdRhRfG6gFcJ5pSMBbxNpNoeBBUDIOwms+o9tFYnhlBExAjrb9K16X0Q
+         TLYXJTj6Y60rYv6olJHIwq7vpNMryABjNM7Tq1tsYSpAbQyZizeZXmLtTqWDflLy2mBP
+         0ehTnuxjbJtEFbVWbt9qx1SdpVDZoI3WKQUxN4ge6m4eM5QG1l/39DsrKYOnRt/1PlYy
+         rB+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV0PhQ/i/CQ+Qqhs/N2EuRZtehGm7Slzii3i/aN4NJvy7mfYtrDpgzF6r/entqenHXu2dcrstIn6jvj7SppWARUVMp1NWmhSMK2TOlMip/ca4ftf0FhcltyX8ELrBePNmyDifqB81OgvbIy/o2mAfqNsbpOYg+SK2Ggm9lv09JVv5OI
+X-Gm-Message-State: AOJu0YxCl1sUJktteu4HJa8I+5BKu/YDSjrQ9wnGOhATfqZxzDRbaZEu
+	Ety9PMPJzzYEnaGvwOJJZbfn8zu2Ly53eRjRsY/2tYu640wij70J
+X-Google-Smtp-Source: AGHT+IHuPW954ptixzpDzELZzOQ7XNdbd+B9en0dSzEz+zcbSgQ6uda+APwZYb4XeW5oP6FiMtuJxA==
+X-Received: by 2002:a05:6a21:3e0c:b0:1a7:11bf:7b74 with SMTP id bk12-20020a056a213e0c00b001a711bf7b74mr3495432pzc.62.1712778834624;
+        Wed, 10 Apr 2024 12:53:54 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:a5f4])
+        by smtp.gmail.com with ESMTPSA id gx15-20020a056a001e0f00b006e71aec34a8sm15295pfb.167.2024.04.10.12.53.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 12:53:54 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 10 Apr 2024 09:53:52 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	leit@meta.com,
+	"open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)" <cgroups@vger.kernel.org>,
+	"open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)" <linux-block@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] blk-iocost: Fix shift-out-of-bounds in iocg_kick_delay()
+Message-ID: <ZhbuUKXQwBwye1_r@slm.duckdns.org>
+References: <20240410193642.1303741-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <dc58cf1e-cfbc-4771-80b8-4dfdf5d7f0d1@kernel.dk>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrAKsWRmVeSWpSXmKPExsWy7bCmhq7ea7E0g3+7WSxW3+1ns9h7S9uB
-	yePy2VKPz5vkApiism0yUhNTUosUUvOS81My89JtlbyD453jTc0MDHUNLS3MlRTyEnNTbZVc
-	fAJ03TJzgIYrKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgpMCvSKE3OLS/PS9fJS
-	S6wMDQyMTIEKE7IzljV/Yy5oZa2YOPMtcwPjbpYuRk4OCQETif/HjzJ1MXJxCAnsZpTY/HoL
-	I4TziVFi26sJLBDON0aJ8zfXscO0TO95D9Wyl1Fifd99ZgjnGaPE6nl/2UCqWARUJS78mQk0
-	i4ODTUBb4vR/DpCwiICCRM/vlWAlzAL2Eme2T2UFKREWCJY4sbkcJMwrYCYx8+hhFghbUOLk
-	zCdgNqeArcS+j8/AbhAVkJGYsfQr2FoJgX3sEreWHGCGOM5F4uHWHihbWOLV8S1QR0tJfH63
-	lw3CLpdYOWUFG0RzC6PErOuzGCES9hKtp/qZQQ5iFsiQ+HwrHyIsKzH11DomiJv5JHp/P2GC
-	iPNK7JgHYytLrFm/AGq+pMS1741QtofE82sTWCHhM4FRonfeDqYJjPKzkDw3C2HdLLAVVhKd
-	H5pYIcLSEsv/cUCYmhLrd+kvYGRdxSiZWlCcm55abFpgmJdaDo/v5PzcTYzgpKfluYPx7oMP
-	eocYmTgYDzFKcDArifBKa4mmCfGmJFZWpRblxxeV5qQWH2I0BcbURGYp0eR8YNrNK4k3NLE0
-	MDEzMzOxNDYzVBLnfd06N0VIID2xJDU7NbUgtQimj4mDU6qBiftddNKGuplfpHmrtn1I3/Zu
-	4Z5/E3+9OO7Ve/+c65/0+W5XL7syhpk9maf41snixWyPZeW3ljXcenls+wmhpj2V1UILpt3P
-	/VrUcO+mQNIDbwP5lVbblmvMWP1x2h8BDv9FYXqXdjzPvv3+VqOpCPMSrX0G/f8S/k68si9s
-	sliVhvL3O0vP3rU/cKvadVbKqdL/WakFNr4dZiVRja3pqf8Zv9wSqNf59vidX55PUcOfG+4i
-	qlv/cGrevDtR/bHcgpX+xhH6nPElAlFrj12arGxV69i9zHFjwsd1Z3Li35oanLxzhn/lzRXM
-	h/esX395qfy6U9Y6Pr8FJYWFP6bdLvBUrElt5n60RjTLQlEhjkeJpTgj0VCLuag4EQDT0fYZ
-	AwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrILMWRmVeSWpSXmKPExsWy7bCSvO7s52JpBpN/S1qsvtvPZrH3lrYD
-	k8fls6UenzfJBTBFcdmkpOZklqUW6dslcGX8WjSBvWA7U8WaaT9YGhjbmboYOTkkBEwkpve8
-	B7K5OIQEdjNKTLzczAqRkJRY9vcIM4QtLLHy33N2iKInjBJ/T18F62YRUJW48GcmYxcjBweb
-	gLbE6f8cIGERAQWJnt8r2UBsZgF7iTPbp7KClAgLBEuc2FwOEuYVMJOYefQwC4gtJGAjcfPv
-	ZlaIuKDEyZlPWCBazSTmbX7IDNLKLCAtsfwf2HROAVuJfR+fsYPYogIyEjOWfmWewCg4C0n3
-	LCTdsxC6FzAyr2KUTC0ozk3PLTYsMMpLLdcrTswtLs1L10vOz93ECA5VLa0djHtWfdA7xMjE
-	wXiIUYKDWUmEV1pLNE2INyWxsiq1KD++qDQntfgQozQHi5I477fXvSlCAumJJanZqakFqUUw
-	WSYOTqkGpiJJu1V50hc+sb3iqWU6dfJu3PldYcdcLUNkriZ7fmj59r/wwtK2eS4Ptu3T3qcz
-	eU+dzCnPA3skLnUW6Z9+eyrz8esztxvEPH3+vjVdsLFRXWD9M8um19LFX419H6dPWxOV6B8f
-	yKbn3nVazk3u61vrd8s0rWYU19T+4T9enRykc7cmvKrD/vCkEj/Zjd/1Q9b4TKma6BAillMf
-	7RjwysO1XW/Fq7LXPjvlurb1Mr7fM8ks/EjT8jWeZxuX+qyZUbjs+sd8HU//7NITP13Dt/+4
-	7mXvoO9cOSs2Qsc/8MZsl9Ck98/WvK6c0NS+eYl88eSkCl7rExum/pu36UhjwosV6RpSgpZ/
-	nzypMBZ4osRSnJFoqMVcVJwIAFde7gjEAgAA
-X-CMS-MailID: 20240410192515epcas5p1360a731616fca3841c892be310afb109
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240410192515epcas5p1360a731616fca3841c892be310afb109
-References: <dc58cf1e-cfbc-4771-80b8-4dfdf5d7f0d1@kernel.dk>
-	<CGME20240410192515epcas5p1360a731616fca3841c892be310afb109@epcas5p1.samsung.com>
-
-------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240410193642.1303741-1-leitao@debian.org>
 
-On 09/04/24 09:00AM, Jens Axboe wrote:
->Convert the block debugfs interface to use read/write iterators rather
->than the older style ->read()/->write().
->
->No intended functional changes in this patch.
->
->Signed-off-by: Jens Axboe <axboe@kernel.dk>
->
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+Hello, Breno.
 
-------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_
-Content-Type: text/plain; charset="utf-8"
+On Wed, Apr 10, 2024 at 12:36:41PM -0700, Breno Leitao wrote:
+> When running iocg_kick_delay(), iocg->delay_at could be way behind "now",
+> which causes a huge tdelta difference.
+> 
+> The tdelta value is used to shift some bits around, raising the
+> following UBSAN splat:
+> 
+> 	UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
+> 
+> Debugging this, these are some values I got in my machine with 6.9-rc3.
+> 
+>  now = 3626064295
+>  iocg->delay_at = 3275794093
+> 
+> Fix this by validating that the shift if valid, otherwise bail out,
+> similarly to commit 2a427b49d029 ("blk-iocost: Fix an UBSAN
+> shift-out-of-bounds warning")
 
+Rik alreaady sent a fix:
 
-------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_--
+  http://lkml.kernel.org/r/20240404123253.0f58010f@imladris.surriel.com
+
+which got commited as beaa51b36012fad5a4d3c18b88a617aea7a9b96d.
+
+Thanks.
+
+-- 
+tejun
