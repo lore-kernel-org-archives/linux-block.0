@@ -1,105 +1,46 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12ED11779B4;
-	Wed, 10 Apr 2024 17:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E6E31A60;
+	Wed, 10 Apr 2024 17:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712770571; cv=none; b=ufmzr/kxYKt4NTP9Vv/eyTUSMaAz2nDiGNT+ZRYVTmMm1G/mQsE14HMOrFdWgvhHIM5FJDKArOnrFEXbSj0bgtL4EKpga4XvUrbH1K7UQLRwes1vtQswpNIqRC9ztZKUYjB7XbjU8znidFZTGR/kkgr3JHiRrWt6kt9tmREXylg=
+	t=1712770844; cv=none; b=PhTiVQ3cZwwQT+U9PEUaSN2Y/KSIdwO4CqNCuKwh8mIfN4Yh4OW642fe7onpF4J4qS3x8kOUBcZDN5QWl45vMyFkFms6TpmWYraCnGvEWJuX450r0JWjNjixkcJf/Qbr2tOwEftKv6iDfMlZuilgG3f+z3ODhPSm5dGszot6IT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712770571; c=relaxed/simple;
-	bh=s7AlPHnjW1gFs3weqR//JnIAW3hG+/Mp+aTuvYmxgTU=;
+	s=arc-20240116; t=1712770844; c=relaxed/simple;
+	bh=Gjl3wSp7ur8Qunu2dD8FGg1cqgp+5LVBQ1YktW9N5Jg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p2+x3X32CoKrZ801XtkYFNGmkdaDWfFjB3IA9loQOFj+haLX+43yX/Qrqx0UVHKz2mKYkJhVdUEuz67bSAPtr4mMpb+FH5h03XTzcdKa4Z0aPLJ98l6kBSsGYiWHwwnMnpqbGgQrgr1WO8tVj0ye7KrJMr1S9CA6R6ITlRItAw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Wo/su6ux; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pwQ8usD0; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Wo/su6ux; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pwQ8usD0; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=I0B3hfJLEDeBmNWZmgkQfj+xy0KmwVnlwWrmxmzL6AnRHdwgkd3WA2B+POm2d3dFUqBRUTWnDAVbPVyvdiNyN9k63HNT6b0tTbfnNQQT/CiaG+lk5EG4qp55fT1QgFB+A4AJrb83Lebwhq+LHsW32BbELs8m+sYNh5+sc6SabGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=eE3Aw0Mx; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Wo/su6ux";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pwQ8usD0";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Wo/su6ux";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pwQ8usD0"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3395033A89;
-	Wed, 10 Apr 2024 17:36:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1712770567;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0ZHHE5aOwQ1Ezn/ab1buAuDtcCLPcpIIchKLIUxoBbM=;
-	b=Wo/su6uxAz3KDCet7sG1IMbLmZNu/s492NxBN+stUG6oo2qYtuABn+4iFfLZA7KwEty81H
-	IdrOqxowTjwdMcGmvVJuVhd3KhUwlHGwlvUKUWet7620GxVeKx3CiehY9/HodlAMarXBGu
-	QKA3ILsUtN07gfz8aoS5W8ffx3zw7mU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1712770567;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0ZHHE5aOwQ1Ezn/ab1buAuDtcCLPcpIIchKLIUxoBbM=;
-	b=pwQ8usD0NAyGD6U1k6UXV+bVfsviAAMcwHC0rXMTXFxYTDSQht5I5OMD0LYFtofyWnG5ZB
-	JIolcEC5hlnuCvCg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1712770567;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0ZHHE5aOwQ1Ezn/ab1buAuDtcCLPcpIIchKLIUxoBbM=;
-	b=Wo/su6uxAz3KDCet7sG1IMbLmZNu/s492NxBN+stUG6oo2qYtuABn+4iFfLZA7KwEty81H
-	IdrOqxowTjwdMcGmvVJuVhd3KhUwlHGwlvUKUWet7620GxVeKx3CiehY9/HodlAMarXBGu
-	QKA3ILsUtN07gfz8aoS5W8ffx3zw7mU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1712770567;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0ZHHE5aOwQ1Ezn/ab1buAuDtcCLPcpIIchKLIUxoBbM=;
-	b=pwQ8usD0NAyGD6U1k6UXV+bVfsviAAMcwHC0rXMTXFxYTDSQht5I5OMD0LYFtofyWnG5ZB
-	JIolcEC5hlnuCvCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EFAAD13691;
-	Wed, 10 Apr 2024 17:36:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 20hgOgbOFmZrWQAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Wed, 10 Apr 2024 17:36:06 +0000
-Date: Wed, 10 Apr 2024 19:28:37 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Jan Kara <jack@suse.cz>
-Cc: Matthew Wilcox <willy@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>,
-	axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de,
-	kent.overstreet@gmail.com, joern@lazybastard.org,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com,
-	gor@linux.ibm.com, agordeev@linux.ibm.com, jejb@linux.ibm.com,
-	martin.petersen@oracle.com, clm@fb.com, josef@toxicpanda.com,
-	dsterba@suse.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	nico@fluxnic.net, xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-	adilger.kernel@dilger.ca, jack@suse.com, konishi.ryusuke@gmail.com,
-	akpm@linux-foundation.org, hare@suse.de, p.raghav@samsung.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-bcachefs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	linux-nilfs@vger.kernel.org, yukuai3@huawei.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH RFC v3 for-6.8/block 09/17] btrfs: use bdev apis
-Message-ID: <20240410172837.GO3492@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20231221085712.1766333-1-yukuai1@huaweicloud.com>
- <20231221085712.1766333-10-yukuai1@huaweicloud.com>
- <ZYcZi5YYvt5QHrG9@casper.infradead.org>
- <20240104114958.f3cit5q7syp3tn3a@quack3>
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="eE3Aw0Mx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0xwc7/CqYk8fCzFRTxKDO4UHVWB8MLf/q3BVtND24kU=; b=eE3Aw0Mxe6eg7eMz/Z2gDLXvD+
+	d0x3C81beNQrgj1ZTa1RptP4BHKEklNyxZqSTrzymaYPPCUKiS1YZ8/23BRcnA5N4KG9G5PlUEarl
+	l22bvYh3AjPGteN2/lTzyDFegWrZUuJzKIgP8z7mJg4A5402nOv5qzGz8QN0VEtg4ZxNWs4853YHL
+	TTfvt9Ju66nOeA655bxf5pmDJBSPW+p0rRDqyE2hoIECpUa5t1MYq8JfLkR0/td54Krg3yCF6lQ/d
+	y7edX1WuuwwXrl7jgZ/qONzV49M4WL7L9/Se+Ccnq9B9zzvgPLZ3dF3kvzL/0g57muPdYwB44cQO3
+	2hMfi/ig==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rubvq-00A01R-3C;
+	Wed, 10 Apr 2024 17:40:23 +0000
+Date: Wed, 10 Apr 2024 18:40:22 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Matthew Sakai <msakai@redhat.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
+	brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, yukuai3@huawei.com, dm-devel@lists.linux.dev
+Subject: Re: [PATCH vfs.all 19/26] dm-vdo: convert to use bdev_file
+Message-ID: <20240410174022.GF2118490@ZenIV>
+References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
+ <20240406090930.2252838-20-yukuai1@huaweicloud.com>
+ <a8493592-2a9b-ac14-f914-c747aa4455f3@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -108,76 +49,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240104114958.f3cit5q7syp3tn3a@quack3>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Flag: NO
-X-Spam-Score: -2.50
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.50 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLtpaten8pmzgjg419jubxqoa7)];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[infradead.org,huaweicloud.com,kernel.dk,citrix.com,suse.de,gmail.com,lazybastard.org,bootlin.com,nod.at,ti.com,linux.ibm.com,oracle.com,fb.com,toxicpanda.com,suse.com,zeniv.linux.org.uk,kernel.org,fluxnic.net,mit.edu,dilger.ca,linux-foundation.org,samsung.com,vger.kernel.org,lists.xenproject.org,lists.infradead.org,lists.ozlabs.org,huawei.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TAGGED_RCPT(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+In-Reply-To: <a8493592-2a9b-ac14-f914-c747aa4455f3@redhat.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Thu, Jan 04, 2024 at 12:49:58PM +0100, Jan Kara wrote:
-> On Sat 23-12-23 17:31:55, Matthew Wilcox wrote:
-> > On Thu, Dec 21, 2023 at 04:57:04PM +0800, Yu Kuai wrote:
-> > > @@ -3674,16 +3670,17 @@ struct btrfs_super_block *btrfs_read_dev_one_super(struct block_device *bdev,
-> > >  		 * Drop the page of the primary superblock, so later read will
-> > >  		 * always read from the device.
-> > >  		 */
-> > > -		invalidate_inode_pages2_range(mapping,
-> > > -				bytenr >> PAGE_SHIFT,
-> > > +		invalidate_bdev_range(bdev, bytenr >> PAGE_SHIFT,
-> > >  				(bytenr + BTRFS_SUPER_INFO_SIZE) >> PAGE_SHIFT);
-> > >  	}
-> > >  
-> > > -	page = read_cache_page_gfp(mapping, bytenr >> PAGE_SHIFT, GFP_NOFS);
-> > > -	if (IS_ERR(page))
-> > > -		return ERR_CAST(page);
-> > > +	nofs_flag = memalloc_nofs_save();
-> > > +	folio = bdev_read_folio(bdev, bytenr);
-> > > +	memalloc_nofs_restore(nofs_flag);
-> > 
-> > This is the wrong way to use memalloc_nofs_save/restore.  They should be
-> > used at the point that the filesystem takes/releases whatever lock is
-> > also used during reclaim.  I don't know btrfs well enough to suggest
-> > what lock is missing these annotations.
-> 
-> In principle I agree with you but in this particular case I agree the ask
-> is just too big. I suspect it is one of btrfs btree locks or maybe
-> chunk_mutex but I doubt even btrfs developers know and maybe it is just a
-> cargo cult. And it is not like this would be the first occurence of this
-> anti-pattern in btrfs - see e.g. device_list_add(), add_missing_dev(),
-> btrfs_destroy_delalloc_inodes() (here the wrapping around
-> invalidate_inode_pages2() looks really weird), and many others...
+On Wed, Apr 10, 2024 at 01:26:47PM -0400, Matthew Sakai wrote:
 
-The pattern is intentional and a temporary solution before we could
-implement the scoped NOFS. Functions calling allocations get converted
-from GFP_NOFS to GFP_KERNEL but in case they're called from a context
-that either holds big locks or can recursively enter the filesystem then
-it's protected by the memalloc calls. This should not be surprising.
-What may not be obvious is which locks or kmalloc calling functions it
-could be, this depends on the analysis of the function call chain and
-usually there's enough evidence why it's needed.
+> > 'dm_dev->bdev_file', it's ok to get inode from the file.
+
+It can be done much easier, though -
+
+[PATCH] dm-vdo: use bdev_nr_bytes(bdev) instead of i_size_read(bdev->bd_inode)
+
+going to be faster, actually - shift is cheaper than dereference...
+
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+---
+diff --git a/drivers/md/dm-vdo/dm-vdo-target.c b/drivers/md/dm-vdo/dm-vdo-target.c
+index 5a4b0a927f56..b423bec6458b 100644
+--- a/drivers/md/dm-vdo/dm-vdo-target.c
++++ b/drivers/md/dm-vdo/dm-vdo-target.c
+@@ -878,7 +878,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
+ 	}
+ 
+ 	if (config->version == 0) {
+-		u64 device_size = i_size_read(config->owned_device->bdev->bd_inode);
++		u64 device_size = bdev_nr_bytes(config->owned_device->bdev);
+ 
+ 		config->physical_blocks = device_size / VDO_BLOCK_SIZE;
+ 	}
+@@ -1011,7 +1011,7 @@ static void vdo_status(struct dm_target *ti, status_type_t status_type,
+ 
+ static block_count_t __must_check get_underlying_device_block_count(const struct vdo *vdo)
+ {
+-	return i_size_read(vdo_get_backing_device(vdo)->bd_inode) / VDO_BLOCK_SIZE;
++	return bdev_nr_bytes(vdo_get_backing_device(vdo)) / VDO_BLOCK_SIZE;
+ }
+ 
+ static int __must_check process_vdo_message_locked(struct vdo *vdo, unsigned int argc,
+diff --git a/drivers/md/dm-vdo/indexer/io-factory.c b/drivers/md/dm-vdo/indexer/io-factory.c
+index 515765d35794..1bee9d63dc0a 100644
+--- a/drivers/md/dm-vdo/indexer/io-factory.c
++++ b/drivers/md/dm-vdo/indexer/io-factory.c
+@@ -90,7 +90,7 @@ void uds_put_io_factory(struct io_factory *factory)
+ 
+ size_t uds_get_writable_size(struct io_factory *factory)
+ {
+-	return i_size_read(factory->bdev->bd_inode);
++	return bdev_nr_bytes(factory->bdev);
+ }
+ 
+ /* Create a struct dm_bufio_client for an index region starting at offset. */
