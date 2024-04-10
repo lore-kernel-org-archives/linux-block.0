@@ -1,161 +1,189 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBF5160792;
-	Wed, 10 Apr 2024 13:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF5217B517
+	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 17:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712756946; cv=none; b=ezy1cP5dySAsfmZcCXlVWTg16fl6L5wNs5NE4a0m8lu046a824akPuNZR9TjFgxjCVEfgJoz8LJaOR2NzPqToC/8deqDYUagv+17bM4Duw8b+Ek+JMqUDq73C7Q+67ljSWD9XmF5qgKHjgv75zguzwWghalVg2lMQ/tmQD+2iio=
+	t=1712768568; cv=none; b=XaezEL0K0i+98pMnaYzerpP6CZ629doF/6LO0FIhgMdbL+e7n9fhX5i6KTgNqMTE9S88T68/ddssCpnZ86Ah7AJ5nYSBOBRb26QGpJaecVQNjE7daw4DO6Y5SOCy02I2ItlIL3y08+3tCrIcjAmk/rPGMQGT9qyi6H1weXZGLzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712756946; c=relaxed/simple;
-	bh=z7WWEmfGexfSzYypM+C/PDKMr6HcbNcz0JwCfglFf74=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=u5VNLOiodPa+MHxm1f59uaoohc3yugS57gFFJNsIV9+NEdE03eh1BTs+AyH+lmfhju+cLjlb06wxbOdlh3RSYVePyLTDmy4igsmesgu0V+gYH0WFxs+C3M2yce+sr7RxtgdcNDnf3pzeNo9Hz9DXXdSI6LPUmKBDVMxnbdcHR2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJGt5fwT; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712768568; c=relaxed/simple;
+	bh=gJrAzHwiKnhRsGEas0/gkDPsTTR0Nnbek3ovo/OFJF8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Jm39t+72RDwE9+ymwtkG/woppFW9u1YZZPAHKkEzERUvBRvYWTMmpFupMH4rYQI7MxCVp0PDp8iLuCy8mCdsNsBOlw+Y+1Kg+l7076LpZyhUFbI0l9mVO+YHHuinrdu9pPUGWE4u29Nt1i23GSTN8USwNy8kiZZjZonMOGqFC4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--saranyamohan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CvYUG57H; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--saranyamohan.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJGt5fwT"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6edc61d0ff6so499287b3a.2;
-        Wed, 10 Apr 2024 06:49:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CvYUG57H"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5dbddee3694so17227a12.1
+        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 10:02:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712756944; x=1713361744; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ACLCyOatAYHZP8xv0gaT1bpB8I1NWTCVByRXRODXmv0=;
-        b=XJGt5fwTMN6Rf74ILGm9Jrlj0FJq8MY3WEsloe/priEoipmnazSbPFO0IG1aRJvS4v
-         p52WTJVSJHiVZECbngEkXd0pmDK3scfD47tgYAyI1EaTii5/eKd0PiFHoQbtc+ywmvog
-         zxM0t9K4/lTTBW+dZlbYv6oQ0XOK98dFFtEgiLUawsXawX7/pQUYxEoj1/7ap70nSIni
-         q9ltonwAwDh6rKmRBmlz+TXDgUhS5sXF2iMzR+6LpSUJVCtuo9xbrpEDXYAuOLqOAdpr
-         ys+UyVNJ4VIPMtlLS6F6LaC2UnOVqRDA2gm6i8gGf3bpmrqi6HNWXD+ic87XVQ4NIpS1
-         ZNNg==
+        d=google.com; s=20230601; t=1712768565; x=1713373365; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vgQl6sbdgv14zki/MVtNU5Wub4PZeMl5Tu34n9QE4P4=;
+        b=CvYUG57HAsItVdMDpBT4/yeVDcu8hqQXCASqmQOpY/Fof3TJSxjMWhjR0EVo9ERJ+G
+         +efa0i4sQ7E2AR8avT0iz5wt0H4LGU+SCzogz01m5F0tP7uJdK3cYPpz71/TMtVbJ708
+         pH43z+Bl5Ywb8bH2S49QI9jS24jTJPLE9XZVKNOkUGYaDCCRmqr8dD81q03GdxNEWny4
+         4sh4bh0H3OAhVKC5nF/McXHVCOYOonQCLKZnTNzTkqJOB3Pq2O4PyJA7+JaOLPYiizX3
+         DVglBItaAQ7sftraCPH91/iA4UfQCot2IdEWBiQZrL1t9iDyusOiaOOvfrMD7YcsrAcC
+         fjWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712756944; x=1713361744;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ACLCyOatAYHZP8xv0gaT1bpB8I1NWTCVByRXRODXmv0=;
-        b=N4QpI279kPosKBdBBwFVHV2wp3UvxCQ8nmdIOIHli70j0z6Hqloi6hS+P7mkCGYFKR
-         wMX6tOZPoSnWlMXwYzXeLZZZmIGpwYVS2RU6CY1dP/L7Xf9t/MaERcWvBoYWpI/HzQVC
-         jTAxtE4i5evlNBLP3Zp90mJ9Uy6cW6Fo9I0+5OlfKx9r1O7IiDZDJEHQeNw0LC6QK1Tg
-         uhU29I3VbkA3JHc4ELs+tF6UKL1QFNl1TYOXyZpYraxlfGxbuGGRDzeUcGMnBUQzXnia
-         6AeuewWIZRoUmt23CCDo6ZC3froL059GbEWo0NRRO0pDfY/JxLrJSiouLj3mMNKsLeUu
-         s7sw==
-X-Forwarded-Encrypted: i=1; AJvYcCW/tRsC8SLyDQabClJZQXGjv+G5xdeH0JV4994rIRn70JH6X3ZUMeO4/qlmQVn4KMP7u2qV6BBKesF+65d+Wx6DeOfVb0NkXyjnyO4F/4avoBIb1E9SAw0MJnVPvA8SkM/889v1Hh4L+2g=
-X-Gm-Message-State: AOJu0YzutGQ4Mq6zvapQLZgry2KxOyyEQ1pHb2IArDb2DrFHrxI+tWNV
-	l4rn46pHjLM9EwQWjtRbdF1Y3RL/qRtiKWnphvxBDxvDU/FWDCLR
-X-Google-Smtp-Source: AGHT+IHO3kGHgMGpUXi/eSh3m6nOB3bT+ywRDnFn56Xe+Ug77Cp1eZrdh3ySGDZWlrVGM2CK9KMw2g==
-X-Received: by 2002:a05:6a20:324f:b0:1a3:aed1:4d50 with SMTP id hm15-20020a056a20324f00b001a3aed14d50mr2901107pzc.31.1712756943937;
-        Wed, 10 Apr 2024 06:49:03 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id h11-20020a63210b000000b005dcc8a3b26esm9630636pgh.16.2024.04.10.06.49.02
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Apr 2024 06:49:03 -0700 (PDT)
-From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To: Justin Sanders <justin@coraid.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Pavel Emelianov <xemul@openvz.org>,
-	Kirill Korotaev <dev@openvz.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chun-Yi Lee <jlee@suse.com>
-Subject: [PATCH] aoe: fix the potential use-after-free problem in more places
-Date: Wed, 10 Apr 2024 21:48:58 +0800
-Message-Id: <20240410134858.6313-1-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
+        d=1e100.net; s=20230601; t=1712768565; x=1713373365;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vgQl6sbdgv14zki/MVtNU5Wub4PZeMl5Tu34n9QE4P4=;
+        b=jEFGzC/cuNXZUaMdl1iWChsvZ3xE7kphyxiAAc6ejdwGO2Q0dIHvH0XbsJqHlghCo/
+         X/lNyVWlefm2zBs+/7LUx/0gsWXIOWLE3Wlpyr8i9PBgr4RWtyD9nXhiROJnm955DLjv
+         00lMm3l/6CfM9MflTwthlVtXaeqMUK0lU7nWm1625P6EquQ3G2LX8LztBLZ2oyv1qmGw
+         l+sjEURY/wZFa28dmVWp/LRE8rJYy50CqXlMjRcbgXyJWI21v0+qwnndsYlWEWC9tke5
+         5hYujlFA+5uQIJmStPDOA1Zs9x31wTfyuuHmUsFBmgDTQ7kOOmjEAyEOtclddpX/RizR
+         /k6w==
+X-Forwarded-Encrypted: i=1; AJvYcCXVVXv5E4pxJS6yH0bM4l+FPmzfE2YG9n66D00hM4o3zY+NkYKfvLjCd6CiTC+VWtbW2zbL2/R2E8qEoaMVC1fg1CjwJOsrlPvTeSA=
+X-Gm-Message-State: AOJu0YxtDe+4OzIHBTbeNZW1qnSMc/e+Kltcbhwjhn9+pHQQC3akEWzm
+	pelAzzrJnMuuWYXeCxYHUCo8ETPs5lD3B8YSLpE5LCogsZetnWXCfL8IsvrzF4j8WGYOQxPSzyJ
+	qbF36cSHO5k784qvQbHsq3Tva3Q==
+X-Google-Smtp-Source: AGHT+IHIsUkx1v7b51G3r3AafXG0diE9ucWdR5toUUKtU2aqRCz4pbaNB0Xf28tSPcyqBMmVOr9nPbGtK7cxlTIgI84=
+X-Received: from srnym.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2728])
+ (user=saranyamohan job=sendgmr) by 2002:a05:6a02:6a2:b0:5e4:2b26:960a with
+ SMTP id ca34-20020a056a0206a200b005e42b26960amr578pgb.4.1712768565206; Wed,
+ 10 Apr 2024 10:02:45 -0700 (PDT)
+Date: Wed, 10 Apr 2024 17:02:41 +0000
+In-Reply-To: <lfv2rqcpyyeqv7efpc4ozru7daycx4nv5nmc2xh4luzgtk3tjf@oq33dghcnt3j>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+References: <lfv2rqcpyyeqv7efpc4ozru7daycx4nv5nmc2xh4luzgtk3tjf@oq33dghcnt3j>
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
+Message-ID: <20240410170241.66966-1-saranyamohan@google.com>
+Subject: [PATCH blktests] block/035: test return EIO from BLKRRPART
+From: Saranya Muruganandam <saranyamohan@google.com>
+To: shinichiro.kawasaki@wdc.com
+Cc: chaitanyak@nvidia.com, hch@lst.de, linux-block@vger.kernel.org, 
+	saranyamohan@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Chun-Yi Lee <jlee@suse.com>
+When we fail to reread the partition superblock from the disk, due to
+bad sector or bad disk etc, BLKRRPART should fail with EIO.
+Simulate failure for the entire block device and run
+"blockdev --rereadpt" and expect it to fail and return EIO instead of
+pass.
 
-For fixing CVE-2023-6270, f98364e92662 patch moved dev_put() from
-aoecmd_cfg_pkts() to tx() to avoid that the tx() runs into use-after-free.
-
-But Nicolai Stange found more places in aoe have potential use-after-free
-problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
-and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
-packet to tx queue. So they should also use dev_hold() to increase the
-refcnt of skb->dev.
-
-This patch adds dev_hold() to those functions and also uses dev_put()
-when the skb_clone() returns NULL.
-
-Link: https://nvd.nist.gov/vuln/detail/CVE-2023-6270
-Fixes: f98364e92662 ("aoe: fix the potential use-after-free problem in
-aoecmd_cfg_pkts")
-Reported-by: Nicolai Stange <nstange@suse.com>
-Signed-off-by: Chun-Yi Lee <jlee@suse.com>
+Link: https://lore.kernel.org/all/20240405014253.748627-1-saranyamohan@google.com/
+Signed-off-by: Saranya Muruganandam <saranyamohan@google.com>
 ---
- drivers/block/aoe/aoecmd.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ tests/block/035     | 86 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/035.out |  4 +++
+ 2 files changed, 90 insertions(+)
+ create mode 100755 tests/block/035
+ create mode 100644 tests/block/035.out
 
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index cc9077b588d7..fcedbad8e3be 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -361,6 +361,7 @@ ata_rw_frameinit(struct frame *f)
- 	}
- 
- 	ah->cmdstat = ATA_CMD_PIO_READ | writebit | extbit;
-+	dev_hold(t->ifp->nd);
- 	skb->dev = t->ifp->nd;
- }
- 
-@@ -401,7 +402,8 @@ aoecmd_ata_rw(struct aoedev *d)
- 		__skb_queue_head_init(&queue);
- 		__skb_queue_tail(&queue, skb);
- 		aoenet_xmit(&queue);
--	}
-+	} else
-+		dev_put(f->t->ifp->nd);
- 	return 1;
- }
- 
-@@ -483,10 +485,13 @@ resend(struct aoedev *d, struct frame *f)
- 	memcpy(h->dst, t->addr, sizeof h->dst);
- 	memcpy(h->src, t->ifp->nd->dev_addr, sizeof h->src);
- 
-+	dev_hold(t->ifp->nd);
- 	skb->dev = t->ifp->nd;
- 	skb = skb_clone(skb, GFP_ATOMIC);
--	if (skb == NULL)
-+	if (skb == NULL) {
-+		dev_put(t->ifp->nd);
- 		return;
-+	}
- 	f->sent = ktime_get();
- 	__skb_queue_head_init(&queue);
- 	__skb_queue_tail(&queue, skb);
-@@ -617,7 +622,8 @@ probe(struct aoetgt *t)
- 		__skb_queue_head_init(&queue);
- 		__skb_queue_tail(&queue, skb);
- 		aoenet_xmit(&queue);
--	}
-+	} else
-+		dev_put(f->t->ifp->nd);
- }
- 
- static long
-@@ -1395,6 +1401,7 @@ aoecmd_ata_id(struct aoedev *d)
- 	ah->cmdstat = ATA_CMD_ID_ATA;
- 	ah->lba3 = 0xa0;
- 
-+	dev_hold(t->ifp->nd);
- 	skb->dev = t->ifp->nd;
- 
- 	d->rttavg = RTTAVG_INIT;
-@@ -1404,6 +1411,8 @@ aoecmd_ata_id(struct aoedev *d)
- 	skb = skb_clone(skb, GFP_ATOMIC);
- 	if (skb)
- 		f->sent = ktime_get();
+diff --git a/tests/block/035 b/tests/block/035
+new file mode 100755
+index 0000000..0ba6292
+--- /dev/null
++++ b/tests/block/035
+@@ -0,0 +1,86 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Google LLC
++#
++# Regression test for BLKRRPART.
++#
++# If we fail to read the partition table due to bad sector or other IO
++# failures, running "blockdev --rereadpt" should fail and return
++# -EIO.  On a buggy kernel, it passes unexpectedly.
++
++. tests/block/rc
++
++DESCRIPTION="test return EIO from BLKRRPART for whole-dev"
++QUICK=1
++
++DEBUGFS_MNT="/sys/kernel/debug/fail_make_request"
++PROBABILITY=0
++TIMES=0
++VERBOSE=0
++MAKE_FAIL=0
++
++_have_debugfs() {
++	if [[ ! -d "${DEBUGFS_MNT}" ]]; then
++		SKIP_REASONS+=("debugfs does not exist")
++		return 1
++	fi
++	return 0
++}
++
++requires() {
++	_have_debugfs
++}
++
++save_fail_make_request()
++{
++	# Save existing global fail_make_request settings
++	PROBABILITY=$(cat "${DEBUGFS_MNT}"/probability)
++	TIMES=$(cat "${DEBUGFS_MNT}"/times)
++	VERBOSE=$(cat "${DEBUGFS_MNT}"/verbose)
++
++	# Save TEST_DEV make-it-fail setting
++	MAKE_FAIL=$(cat "${TEST_DEV_SYSFS}"/make-it-fail)
++}
++
++allow_fail_make_request()
++{
++	# Allow global fail_make_request feature
++	echo 100 > "${DEBUGFS_MNT}"/probability
++	echo 9999999 > "${DEBUGFS_MNT}"/times
++	echo 0 > "${DEBUGFS_MNT}"/verbose
++
++	# Force TEST_DEV device failure
++	echo 1 > "${TEST_DEV_SYSFS}"/make-it-fail
++}
++
++restore_fail_make_request()
++{
++	echo "${MAKE_FAIL}" > "${TEST_DEV_SYSFS}"/make-it-fail
++
++	# Disallow global fail_make_request feature
++	echo "${PROBABILITY}" > "${DEBUGFS_MNT}"/probability
++	echo "${TIMES}" > "${DEBUGFS_MNT}"/times
++	echo "${VERBOSE}" > "${DEBUGFS_MNT}"/verbose
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++
++	# Save configuration
++	save_fail_make_request
++
++	# set up device for failure
++	allow_fail_make_request
++
++	# Check rereading partitions on bad disk cannot open $TEST_DEV: Input/output error
++	if blockdev --rereadpt "${TEST_DEV}" | grep -q "Input/output error" &> "$FULL"; then
++		echo "Did not return EIO for BLKRRPART on bad disk"
 +	else
-+		dev_put(t->ifp->nd);
- 
- 	return skb;
- }
++		echo "Return EIO for BLKRRPART on bad disk"
++	fi
++
++	# Restore TEST_DEV device to original state
++	restore_fail_make_request
++
++	echo "Test complete"
++}
+diff --git a/tests/block/035.out b/tests/block/035.out
+new file mode 100644
+index 0000000..125f4b8
+--- /dev/null
++++ b/tests/block/035.out
+@@ -0,0 +1,4 @@
++Running block/035
++blockdev: ioctl error on BLKRRPART: Input/output error
++Return EIO for BLKRRPART on bad disk
++Test complete
 -- 
-2.35.3
+2.44.0.683.g7961c838ac-goog
 
