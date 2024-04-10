@@ -1,207 +1,142 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8B6158D6E;
-	Wed, 10 Apr 2024 10:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A33315EFB3
+	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 13:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712746755; cv=none; b=iMW8CpJavdY5exLymZydvLOKQrar8KfftyU0VoyyRQ3h/tEZ96v23KvFFfP6j4uCB2R30zq3FZ4e0/l78fkcbc/XV+JMRH6bd05gOCDM4ao9Q6AYctenxyNvm+c0o8SU95VgI3Ndr78PsGtCIeTVbj0Ms6tIx/6vnEh8CJFh9ZQ=
+	t=1712755082; cv=none; b=mDlCJtcCJLMl1thqHh483j7LAvYWXWNF3f3NN4GA6OETy10pKrdzCirRRo0ZZTcSYSBdeEXEADlAutvPLod1zXGSBCeUKD9OgparBIAdQqpQVrm8kL3b9DoIJjHJk3JCvjDCDUSYnK+VuIGWgbmRywbggPpnzfGejLjl0dS4ARo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712746755; c=relaxed/simple;
-	bh=2uLsqs7h9g6JN7/WqCner9XkbwliGQfhNQv6hCJYe8E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y+SRHP3x7NAcj9CFb++NIS5Bye2x1u57U3S9w4I/XbfGaiHstzzFPzn5aWoQmryuD3IhkGxBuoppNORMHSX31lWsMxCvqGMbJAEZT130QKuowqKKQ1cz73OCWQ0ACIGwtMOQX8C4oipjX1bU/trBNnzY1N7vkUL46M+oCKAXAFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=MfbWO/OQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=W9RbhZTG; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=MfbWO/OQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=W9RbhZTG; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1712755082; c=relaxed/simple;
+	bh=VOgr6VHmhrmiYYoVSszTIXqcLbkSs0q81/guFPLUVaQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rT9AS7mMhLvWOYo/qlN8TbCjgcafeoR821m8PffhA+kZXOMPDCkbBJezIB53DNS2mIIOwjquh2c8CXNImUk3JJw+uPIgGSl1IXeDd2gF7HHMYJWv7wHMziF+xvFmR4Mhxm0huMmLCwFSGyoRc+wGFCGEPEUfVjy+EY3CAWHTSi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nRkwB28A; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="MfbWO/OQ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="W9RbhZTG";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="MfbWO/OQ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="W9RbhZTG"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 9CBD15CB27;
-	Wed, 10 Apr 2024 10:59:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1712746751; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=atBGykmy/ko8XoU5S8lr0267EBdVuJZjJOWDVdyODEg=;
-	b=MfbWO/OQ+5ZQdP1rOfcUvxmJi+cXE3f67wD/MYy7fb1mWiwNg1r6BjIP5NBhDD6nOuLMXQ
-	QwfITj0Pwp1UmbjAPi7MBlrq8N7WXicSgCguvEnAPMo2Z8copavmja19oAYeNygK3/++gp
-	5IPDiDeQUzjNyo9NWZD5hFA05VLI6dg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1712746751;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=atBGykmy/ko8XoU5S8lr0267EBdVuJZjJOWDVdyODEg=;
-	b=W9RbhZTGxbfyWT1upN7SfXR8t1MkncYdLgz7aeOJN36P5E6jskvWcZUIbjg6czdBDsFVQM
-	AisKayHTLg8ns0Dg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1712746751; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=atBGykmy/ko8XoU5S8lr0267EBdVuJZjJOWDVdyODEg=;
-	b=MfbWO/OQ+5ZQdP1rOfcUvxmJi+cXE3f67wD/MYy7fb1mWiwNg1r6BjIP5NBhDD6nOuLMXQ
-	QwfITj0Pwp1UmbjAPi7MBlrq8N7WXicSgCguvEnAPMo2Z8copavmja19oAYeNygK3/++gp
-	5IPDiDeQUzjNyo9NWZD5hFA05VLI6dg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1712746751;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=atBGykmy/ko8XoU5S8lr0267EBdVuJZjJOWDVdyODEg=;
-	b=W9RbhZTGxbfyWT1upN7SfXR8t1MkncYdLgz7aeOJN36P5E6jskvWcZUIbjg6czdBDsFVQM
-	AisKayHTLg8ns0Dg==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 8FE4A1390D;
-	Wed, 10 Apr 2024 10:59:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id e30fI/9wFmYadAAAn2gu4w
-	(envelope-from <jack@suse.cz>); Wed, 10 Apr 2024 10:59:11 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 4A532A06D8; Wed, 10 Apr 2024 12:59:11 +0200 (CEST)
-Date: Wed, 10 Apr 2024 12:59:11 +0200
-From: Jan Kara <jack@suse.cz>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, jack@suse.cz, hch@lst.de,
-	brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
- blcok_device
-Message-ID: <20240410105911.hfxz4qh3n5ekrpqg@quack3>
-References: <20240406090930.2252838-23-yukuai1@huaweicloud.com>
- <20240406194206.GC538574@ZenIV>
- <20240406202947.GD538574@ZenIV>
- <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
- <20240407015149.GG538574@ZenIV>
- <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
- <20240407030610.GI538574@ZenIV>
- <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
- <20240409042643.GP538574@ZenIV>
- <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nRkwB28A"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e694337fffso1352581b3a.1
+        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 06:17:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712755078; x=1713359878; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=njz1AW0Oux+Oa/KGjRNDjX/xkDqdEMgcLJEf5/RjX/U=;
+        b=nRkwB28AJuCbmIcJh2Vn1WUxFD/hyTKlqbwaS9FbeYzCyM1K59thWDX7ikS/2SYy+L
+         jrbFQrwqrfYwV4Xzcs50ySJjTDCNtxgrnwkl/K8mMUFu77q9q7CyoBVnLtV//tUqj9CW
+         bpgFRRT9dNFHnetF1CxiPGk68SxJelfWs7O5xqZiiBW1blvRpJWWI6mjylDHZ79waBtN
+         IjRornVmJO1QBNQQCZKFMzpe+guEs0Qx5Fwr00a+OhsxZIRTvfFgsocd/sHzTU2g5+aS
+         ORRRw1JvM8c6LE23CiK+8r+wZg51HcKma2h0VFCnF91yHzskIeI9HKt7Eet9xSfy9rY9
+         5p2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712755078; x=1713359878;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=njz1AW0Oux+Oa/KGjRNDjX/xkDqdEMgcLJEf5/RjX/U=;
+        b=CHqq/KYb6tvorYZXI6SV8+WGrN2C3m/UNye/Wh9BzzFfgyPxTf6q/ggAI8nG+PFctb
+         YlAwGzxeC1ljEqoHQioTG3xlS/PIHHxuJcv0+2L4KVbWgr+mGrOMbcbpSkIga5ybNauL
+         KTYmgTHZKFiQ2tOEew3KSJWKtXQHPyHFmlKo/oM9rn3ECt0lCMxC8RdhtajhuGaz+bnN
+         YkQh5p8whsnJC/pPxoNNVKjWi+jJV6CUVROol9tSYisZ/UrVRW0wGmzZ1q+97LHaGAuz
+         ill9DNkOwvCMJixaaIDTn8f+PtZ58+f1raIe9CO+Xxz8MXJkVtWt19M0V8mslbZN2MN9
+         dM1w==
+X-Forwarded-Encrypted: i=1; AJvYcCXhEpWEebBRB4UCczJDI2NrtrzyHcPze+aS4GADUNIYIAvM277abf9Igk/KY0Uzp8B+v32dC55zcpHJGvclE47HU2vclekjCNRzzsg=
+X-Gm-Message-State: AOJu0Yzp79S4aq/dYqb4GEGTKhinQF4GncgkiFF5m+dNfkwVNyJOFfbR
+	/sGnFh3bPt5B4oVJXBf8LQuPCx/M1y46gNpoPX0dhfceNM8Dg2mdIAWUIQP3k+k=
+X-Google-Smtp-Source: AGHT+IEIFpsL4LtW0ZbD2Xz5VGwmcWpFzG5evWJ+aq8CnJ6YJSYed8HXZnvFoHPWv77z01hKnhWxeQ==
+X-Received: by 2002:a05:6a00:4785:b0:6ea:6f18:887a with SMTP id dh5-20020a056a00478500b006ea6f18887amr2524844pfb.1.1712755078317;
+        Wed, 10 Apr 2024 06:17:58 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id lb14-20020a056a004f0e00b006ecf3e302ffsm10461581pfb.174.2024.04.10.06.17.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Apr 2024 06:17:57 -0700 (PDT)
+Message-ID: <5a67c4f7-4794-45b4-838c-7b739372d3a5@kernel.dk>
+Date: Wed, 10 Apr 2024 07:17:55 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap2.dmz-prg2.suse.org:helo,imap2.dmz-prg2.suse.org:rdns,suse.com:email]
-X-Spam-Score: -3.80
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: add max_dispatch to sysfs
+Content-Language: en-US
+To: Dongliang Cui <dongliang.cui@unisoc.com>
+Cc: ke.wang@unisoc.com, hongyu.jin.cn@gmail.com, niuzhiguo84@gmail.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cuidongliang390@gmail.com
+References: <20240410101858.1149134-1-dongliang.cui@unisoc.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240410101858.1149134-1-dongliang.cui@unisoc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue 09-04-24 14:22:37, Yu Kuai wrote:
-> Hi,
+On 4/10/24 4:18 AM, Dongliang Cui wrote:
+> The default configuration in the current code is that when the device
+> is not busy, a single dispatch will attempt to pull 'nr_requests'
+> requests out of the schedule queue.
 > 
-> 在 2024/04/09 12:26, Al Viro 写道:
-> > On Sun, Apr 07, 2024 at 11:21:56AM +0800, Yu Kuai wrote:
-> > > Hi,
-> > > 
-> > > 在 2024/04/07 11:06, Al Viro 写道:
-> > > > On Sun, Apr 07, 2024 at 10:34:56AM +0800, Yu Kuai wrote:
-> > > > 
-> > > > > Other than raw block_device fops, other filesystems can use the opened
-> > > > > bdev_file directly for iomap and buffer_head, and they actually don't
-> > > > > need to reference block_device anymore. The point here is that whether
-> > > > 
-> > > > What do you mean, "reference"?  The counting reference is to opened
-> > > > file; ->s_bdev is a cached pointer to associated struct block_device,
-> > > > and neither it nor pointers in buffer_head are valid past the moment
-> > > > when you close the file.  Storing (non-counting) pointers to struct
-> > > > file in struct buffer_head is not different in that respect - they
-> > > > are *still* only valid while the "master" reference is held.
-> > > > 
-> > > > Again, what's the point of storing struct file * in struct buffer_head
-> > > > or struct iomap?  In any instances of those structures?
-> > > 
-> > > Perhaps this is what you missed, like the title of this set, in order to
-> > > remove direct acceess of bdev->bd_inode from fs/buffer, we must store
-> > > bdev_file in buffer_head and iomap, and 'bdev->bd_inode' is replaced
-> > > with 'file_inode(bdev)' now.
-> > 
-> > BTW, what does that have to do with iomap?  All it passes ->bdev to is
-> > 	1) bio_alloc()
-> > 	2) bio_alloc_bioset()
-> > 	3) bio_init()
-> > 	4) bdev_logical_block_size()
-> > 	5) bdev_iter_is_aligned()
-> > 	6) bdev_fua()
-> > 	7) bdev_write_cache()
-> > 
-> > None of those goes anywhere near fs/buffer.c or uses ->bd_inode, AFAICS.
-> > 
-> > Again, what's the point?  It feels like you are trying to replace *all*
-> > uses of struct block_device with struct file, just because.
-> > 
-> > If that's what's going on, please don't.  Using struct file instead
-> > of that bdev_handle crap - sure, makes perfect sense.  But shoving it
-> > down into struct bio really, really does not.
-> > 
-> > I'd suggest to start with adding ->bd_mapping as the first step and
-> > converting the places where mapping is all we want to using that.
-> > Right at the beginning of your series.  Then let's see what gets
-> > left.
+> I tried to track the dispatch process:
 > 
-> Thanks so much for your advice, in fact, I totally agree with this that
-> adding a 'bd_mapping' or expose the helper bdev_mapping().
+> COMM            TYPE    SEC_START       IOPRIO       INDEX
+> fio-17304       R	196798040	0x2005	     0
+> fio-17306       R	197060504	0x2005	     1
+> fio-17307       R	197346904	0x2005	     2
+> fio-17308       R	197609400	0x2005	     3
+> fio-17309       R	197873048	0x2005	     4
+> fio-17310       R	198134936	0x2005	     5
+> ...
+> fio-17237       R	197122936	  0x0	    57
+> fio-17238       R	197384984	  0x0	    58
+> <...>-17239     R	197647128	  0x0	    59
+> fio-17240       R	197909208	  0x0	    60
+> fio-17241       R	198171320	  0x0	    61
+> fio-17242       R	198433432	  0x0	    62
+> fio-17300       R	195744088	0x2005	     0
+> fio-17301       R	196008504	0x2005	     0
 > 
-> However, I will let Christoph and Jan to make the decision, when they
-> get time to take a look at this.
+> The above data is calculated based on the block event trace, with each
+> column containing: process name, request type, sector start address,
+> IO priority.
+> 
+> The INDEX represents the order in which the requests are extracted from
+> the scheduler queue during a single dispatch process.
+> 
+> Some low-speed devices cannot process these requests at once, and they will
+> be requeued to hctx->dispatch and wait for the next issuance.
+> 
+> There will be a problem here, when the IO priority is enabled, if you try
+> to dispatch "nr_request" requests at once, the IO priority will be ignored
+> from the scheduler queue and all requests will be extracted.
+> 
+> In this scenario, if a high priority request is inserted into the scheduler
+> queue, it needs to wait for the low priority request in the hctx->dispatch
+> to be processed first.
+> 
+> --------------------dispatch 1st----------------------
+> fio-17241       R       198171320         0x0       61
+> fio-17242       R       198433432         0x0       62
+> --------------------dispatch 2nd----------------------
+> fio-17300       R       195744088       0x2005       0
+> 
+> In certain scenarios, we hope that requests can be processed in order of io
+> priority as much as possible.
+> 
+> Maybe max_dispatch should not be a fixed value, but can be adjusted
+> according to device conditions.
+> 
+> So we give a interface to control the maximum value of single dispatch
+> so that users can configure it according to devices characteristics.
 
-I agree with Christian and Al - and I think I've expressed that already in
-the previous version of the series [1] but I guess I was not explicit
-enough :). I think the initial part of the series (upto patch 21, perhaps
-excluding patch 20) is a nice cleanup but the latter part playing with
-stashing struct file is not an improvement and seems pointless to me. So
-I'd separate the initial part cleaning up the obvious places and let
-Christian merge it and then we can figure out what (if anything) to do with
-remaining bd_inode uses in fs/buffer.c etc. E.g. what Al suggests with
-bd_mapping makes sense to me but I didn't check what's left after your
-initial patches...
-
-								Honza
-
-[1] https://lore.kernel.org/all/20240322125750.jov4f3alsrkmqnq7@quack3
+I agree that pulling 'nr_requests' out of the scheduler will kind of
+defeat the purpose of the scheduler to some extent. But rather than add
+another knob that nobody knows about or ever will touch (and extra queue
+variables that just take up space), why not just default to something a
+bit saner? Eg we could default to 1/8 or 1/4 of the scheduler depth
+instead.
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
