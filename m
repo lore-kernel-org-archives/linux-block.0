@@ -1,112 +1,132 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414D017BB11;
-	Wed, 10 Apr 2024 19:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD77181314
+	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 19:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712777819; cv=none; b=ISp6F5k94xhjR0RVCtEwiMcR0VxxF1X5bWYtzISVgFA62ISU2Ce16sV2asvJ+SPnKpxuYpT4gXal/O2b9FQsinAJByJ1200i016cdLqglKNKjHD2gIFJnkyTyarh61TgAE2EyJSyzT3ziGGHvHv0urP205QoZdTj1PQ2dRlRAW4=
+	t=1712778038; cv=none; b=byNl+dsMagWUeypHMlTU7Inh2F6XVryJwK02l5HA+hY631xWuuGWQx9uW6ZNFE4uInkMg4fGio0TaMgOzenOYxJkqTQj3aSAEyKFO7iQWEkKpp/TSlCvuImLp91GZ8zCxIjUV8NWM4z6ENyAClln3CGYsUlgV95QA5REgdZCGM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712777819; c=relaxed/simple;
-	bh=S5BTEarz0iSmxy+b2TcZC93iyXKdiNlysOtVgmMET4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iBYW9E7W+ar3T6jd0M0vCdAQvRKaSJ0XNW2R++b363D7sKfPTA06LJ0Zi06jiIqO1vjSYYABHLrGJILxmypGLyHjMyvqxUYeftUbz7s4WSS7BG5PgEhzxQRsvEQWV7huZBVjAOynGlHkS3dQhLX6q9BajTEN5hykjJRUVCHANjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a4702457ccbso907962766b.3;
-        Wed, 10 Apr 2024 12:36:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712777815; x=1713382615;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LV9OTU7lN1JB10Lq12VkN+Km9fa4QtfBk3DiQf/p+wE=;
-        b=H1K+tMJQ4V79Vkp4SGoyvXp9aNOc6H7xOwQ9OuQ/8u5vgD9i73+uHHXw/5HM6bCQtV
-         OoevfthjwAZDzCOZ5c8e8pBHqidMmccI7xhtT3cyVy8UCXlm47jetxeqavF8BTVHxbOb
-         3IhrEOwp/rnznYZq/WYF+yscR/CyHYQOcNqPoq7N98kEaVsz1n6fnq4cBWxccIauvR3y
-         VSCL2M3Y98aMmcDemXCnkqNlDKjokWo3iCaWFF0r/E5GKdJiMqldPBGE2aCtIL9X8QlR
-         srexKP+vyGiO128JlD+y5QjeguAp0SzCzNHtEpOpE2sY4Ef5xJBfw72pS6Uau9PcZ5jo
-         vbCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3YeDC6uQ79JKjaQcTkVVaEX3f2dJf7OsxSF4qrHsu8NDXdVcYVdBYSrttNP6NetDOMchjHbxY4893Deg5p1PLj4WULL8fVnitcsKqnKSyW4Q8Wm+KsF8/LIqzNuuSCMsjY6WkaGs+yuqKrwY/q2IL1Ew/jvwXislk72V9Zgyo9fDW
-X-Gm-Message-State: AOJu0YxFTiD8ghG04cMt6EjePfedYFnnqvefEMWcv+Azx5+FaOfGghD/
-	ErbHQ/5OC9DCUFc2THLzI/TO9IMmaGV0fGzVZOX1slw3tv6XCAl2
-X-Google-Smtp-Source: AGHT+IHr28Czx4c87y8DMCQwDkaWkAuvwyA5LRX41vrj3tkYSdhx1rqHWjUXnt1TtLrm19V+Tc6fRQ==
-X-Received: by 2002:a17:907:6089:b0:a45:ad29:725c with SMTP id ht9-20020a170907608900b00a45ad29725cmr2762322ejc.62.1712777815193;
-        Wed, 10 Apr 2024 12:36:55 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id j5-20020a170906830500b00a4734125fd2sm7268231ejx.31.2024.04.10.12.36.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 12:36:54 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: leit@meta.com,
-	cgroups@vger.kernel.org (open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)),
-	linux-block@vger.kernel.org (open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] blk-iocost: Fix shift-out-of-bounds in iocg_kick_delay()
-Date: Wed, 10 Apr 2024 12:36:41 -0700
-Message-ID: <20240410193642.1303741-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1712778038; c=relaxed/simple;
+	bh=dVxNNyiSzc8E8XowZhEOkAqCqO9EkZxsLoTONMIIe+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=ewxxDXnzbzvIKASZIe9e+rXlx/ttMkZ1TChYtf7JDmmr2JK8or81zE2kzqz2b4gfaA2jrPq9lPT/+++xSTh8vKuFwDI/Vq8p4/CKwkpmVYkorK5+VM01mINHt8/vassT+jTb6K1m7pgi8yICfXfirslSFbrYpL8j89Ez0/E+cIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NA/6CZZe; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NA/6CZZe"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240410194032epoutp01edd24e877b81bbce1fd74315067920db~FAovaef3K3003930039epoutp01M
+	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 19:40:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240410194032epoutp01edd24e877b81bbce1fd74315067920db~FAovaef3K3003930039epoutp01M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1712778033;
+	bh=dVxNNyiSzc8E8XowZhEOkAqCqO9EkZxsLoTONMIIe+s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NA/6CZZezOS/R3r3Oqp9YpjBUkbZo20Z1veVjl3NftUryEfuWlLr3pD8sUKJlcFSv
+	 9uK2YVvXaDkmuGJo0uBn2SMAKd+wZTy6ffc3bYGRklUSz+SNjy9T6HeQcoKi4gxklb
+	 z9jSJLCtFVrLOmtldYt0pNir55XurXcZdT6Y9EvM=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240410194031epcas5p15759a46cf252a6fc74571f33bff37830~FAouV0biJ2649326493epcas5p1u;
+	Wed, 10 Apr 2024 19:40:31 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.175]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4VFCq21R0Pz4x9Pt; Wed, 10 Apr
+	2024 19:40:30 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	A7.E4.09666.E2BE6166; Thu, 11 Apr 2024 04:40:30 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240410192515epcas5p1360a731616fca3841c892be310afb109~FAbY8yBzE1911019110epcas5p1H;
+	Wed, 10 Apr 2024 19:25:15 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240410192515epsmtrp26727929e6e890145f149426ceaf426de~FAbY8PYOW2877028770epsmtrp2y;
+	Wed, 10 Apr 2024 19:25:15 +0000 (GMT)
+X-AuditID: b6c32a49-cefff700000025c2-ea-6616eb2e74c0
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	8E.A6.08390.B97E6166; Thu, 11 Apr 2024 04:25:15 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20240410192514epsmtip204f3b35f27f1024b677f3175e2963344~FAbYU9ksV2303223032epsmtip2w;
+	Wed, 10 Apr 2024 19:25:14 +0000 (GMT)
+Date: Thu, 11 Apr 2024 00:48:20 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: convert the debugfs interface to read/write
+ iterators
+Message-ID: <20240410191820.krjqmam76jde2j5i@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <dc58cf1e-cfbc-4771-80b8-4dfdf5d7f0d1@kernel.dk>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrAKsWRmVeSWpSXmKPExsWy7bCmhq7ea7E0g3+7WSxW3+1ns9h7S9uB
+	yePy2VKPz5vkApiism0yUhNTUosUUvOS81My89JtlbyD453jTc0MDHUNLS3MlRTyEnNTbZVc
+	fAJ03TJzgIYrKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgpMCvSKE3OLS/PS9fJS
+	S6wMDQyMTIEKE7IzljV/Yy5oZa2YOPMtcwPjbpYuRk4OCQETif/HjzJ1MXJxCAnsZpTY/HoL
+	I4TziVFi26sJLBDON0aJ8zfXscO0TO95D9Wyl1Fifd99ZgjnGaPE6nl/2UCqWARUJS78mQk0
+	i4ODTUBb4vR/DpCwiICCRM/vlWAlzAL2Eme2T2UFKREWCJY4sbkcJMwrYCYx8+hhFghbUOLk
+	zCdgNqeArcS+j8/AbhAVkJGYsfQr2FoJgX3sEreWHGCGOM5F4uHWHihbWOLV8S1QR0tJfH63
+	lw3CLpdYOWUFG0RzC6PErOuzGCES9hKtp/qZQQ5iFsiQ+HwrHyIsKzH11DomiJv5JHp/P2GC
+	iPNK7JgHYytLrFm/AGq+pMS1741QtofE82sTWCHhM4FRonfeDqYJjPKzkDw3C2HdLLAVVhKd
+	H5pYIcLSEsv/cUCYmhLrd+kvYGRdxSiZWlCcm55abFpgmJdaDo/v5PzcTYzgpKfluYPx7oMP
+	eocYmTgYDzFKcDArifBKa4mmCfGmJFZWpRblxxeV5qQWH2I0BcbURGYp0eR8YNrNK4k3NLE0
+	MDEzMzOxNDYzVBLnfd06N0VIID2xJDU7NbUgtQimj4mDU6qBiftddNKGuplfpHmrtn1I3/Zu
+	4Z5/E3+9OO7Ve/+c65/0+W5XL7syhpk9maf41snixWyPZeW3ljXcenls+wmhpj2V1UILpt3P
+	/VrUcO+mQNIDbwP5lVbblmvMWP1x2h8BDv9FYXqXdjzPvv3+VqOpCPMSrX0G/f8S/k68si9s
+	sliVhvL3O0vP3rU/cKvadVbKqdL/WakFNr4dZiVRja3pqf8Zv9wSqNf59vidX55PUcOfG+4i
+	qlv/cGrevDtR/bHcgpX+xhH6nPElAlFrj12arGxV69i9zHFjwsd1Z3Li35oanLxzhn/lzRXM
+	h/esX395qfy6U9Y6Pr8FJYWFP6bdLvBUrElt5n60RjTLQlEhjkeJpTgj0VCLuag4EQDT0fYZ
+	AwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrILMWRmVeSWpSXmKPExsWy7bCSvO7s52JpBpN/S1qsvtvPZrH3lrYD
+	k8fls6UenzfJBTBFcdmkpOZklqUW6dslcGX8WjSBvWA7U8WaaT9YGhjbmboYOTkkBEwkpve8
+	B7K5OIQEdjNKTLzczAqRkJRY9vcIM4QtLLHy33N2iKInjBJ/T18F62YRUJW48GcmYxcjBweb
+	gLbE6f8cIGERAQWJnt8r2UBsZgF7iTPbp7KClAgLBEuc2FwOEuYVMJOYefQwC4gtJGAjcfPv
+	ZlaIuKDEyZlPWCBazSTmbX7IDNLKLCAtsfwf2HROAVuJfR+fsYPYogIyEjOWfmWewCg4C0n3
+	LCTdsxC6FzAyr2KUTC0ozk3PLTYsMMpLLdcrTswtLs1L10vOz93ECA5VLa0djHtWfdA7xMjE
+	wXiIUYKDWUmEV1pLNE2INyWxsiq1KD++qDQntfgQozQHi5I477fXvSlCAumJJanZqakFqUUw
+	WSYOTqkGpiJJu1V50hc+sb3iqWU6dfJu3PldYcdcLUNkriZ7fmj59r/wwtK2eS4Ptu3T3qcz
+	eU+dzCnPA3skLnUW6Z9+eyrz8esztxvEPH3+vjVdsLFRXWD9M8um19LFX419H6dPWxOV6B8f
+	yKbn3nVazk3u61vrd8s0rWYU19T+4T9enRykc7cmvKrD/vCkEj/Zjd/1Q9b4TKma6BAillMf
+	7RjwysO1XW/Fq7LXPjvlurb1Mr7fM8ks/EjT8jWeZxuX+qyZUbjs+sd8HU//7NITP13Dt/+4
+	7mXvoO9cOSs2Qsc/8MZsl9Ck98/WvK6c0NS+eYl88eSkCl7rExum/pu36UhjwosV6RpSgpZ/
+	nzypMBZ4osRSnJFoqMVcVJwIAFde7gjEAgAA
+X-CMS-MailID: 20240410192515epcas5p1360a731616fca3841c892be310afb109
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240410192515epcas5p1360a731616fca3841c892be310afb109
+References: <dc58cf1e-cfbc-4771-80b8-4dfdf5d7f0d1@kernel.dk>
+	<CGME20240410192515epcas5p1360a731616fca3841c892be310afb109@epcas5p1.samsung.com>
 
-When running iocg_kick_delay(), iocg->delay_at could be way behind "now",
-which causes a huge tdelta difference.
+------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-The tdelta value is used to shift some bits around, raising the
-following UBSAN splat:
+On 09/04/24 09:00AM, Jens Axboe wrote:
+>Convert the block debugfs interface to use read/write iterators rather
+>than the older style ->read()/->write().
+>
+>No intended functional changes in this patch.
+>
+>Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>
+Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
 
-	UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
+------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_
+Content-Type: text/plain; charset="utf-8"
 
-Debugging this, these are some values I got in my machine with 6.9-rc3.
 
- now = 3626064295
- iocg->delay_at = 3275794093
-
-Fix this by validating that the shift if valid, otherwise bail out,
-similarly to commit 2a427b49d029 ("blk-iocost: Fix an UBSAN
-shift-out-of-bounds warning")
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- block/blk-iocost.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 9a85bfbbc45a..398fe19db4ca 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1347,7 +1347,7 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
- {
- 	struct ioc *ioc = iocg->ioc;
- 	struct blkcg_gq *blkg = iocg_to_blkg(iocg);
--	u64 tdelta, delay, new_delay;
-+	u64 tdelta, delay, new_delay, shift;
- 	s64 vover, vover_pct;
- 	u32 hwa;
- 
-@@ -1362,8 +1362,13 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
- 
- 	/* calculate the current delay in effect - 1/2 every second */
- 	tdelta = now->now - iocg->delay_at;
-+
-+	shift = div64_u64(tdelta, USEC_PER_SEC);
-+	if (shift >= BITS_PER_LONG)
-+		return false;
-+
- 	if (iocg->delay)
--		delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
-+		delay = iocg->delay >> shift;
- 	else
- 		delay = 0;
- 
--- 
-2.43.0
-
+------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_7248a_--
