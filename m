@@ -1,92 +1,134 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1548E4205B
-	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 18:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5566517C6A
+	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 18:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712858686; cv=none; b=P/frnK9fQCl8KPHbDI7ES/VyTBY9UVPgUI7QNO5mokbHatdF4aFqHcq/ydFiBDBrwhACX3EP5h2JFnYexMVjQS74aaARlrr5xHNUSRYhFt0feeKC0TCZP/4nvMFdpFWrf7+CElbrqSw6Ms8+zlX+CQPk9zXnU6QwicO/ucQ2ZAk=
+	t=1712860919; cv=none; b=oOjGVOTkpl+0kLBgGPVcwcSkPJiWVP5tAKT4y5pagdM96vbg7YG3oG1dC9orj6/zBH9xLi/5itwqn9sgYo68MjxTlFnO1r0HMhma8ugSnf7p1ukBfnJ5PAbbrRUqgCYNEzqsKSE/zehDECXHB+lE1Ohu4y/7iW7sKu+zm9HsnQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712858686; c=relaxed/simple;
-	bh=PWnjSbvGhhlbyYHaDQxRSBhJ5yILUieF14Y/8x7tt1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k1ELLLS2dfnZObYHMb87Y0RWP1sW3ZXyENa/vIjxOZ/VKbx2CXqt2A5nOaUnB24gH2KU3EoitFL1LdBv0MthgS/R3DGxSW7WVReD3f5GCT7dfuPq54za66I2faEgQKfqIQ7j3LLzFtxbLoDBURNn13zbXvUigbmzfghZR4pt0dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VnGURPtu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712860919; c=relaxed/simple;
+	bh=MPBVeDkS8JSSeZluNl5KBM2I+calVjOIvBr31tjv2c4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LUdSYlQ9IFj4ueoZf5f3r2Nt2Rp6+FxMVx09HO5qDU3nLcLa88Ecfv5eTEYpufe6Jb9xuAdGa0FfmXwUY+99ItuMyNpWfZvehKzE452jV3zBdA2ZLu/dL4oOR4HoVCG7YLZhRsdpc9Wi0b84WPo1Puoi88irxm3qEmDnDLI6v6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KX6LE7Kr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jpoCZPlx; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KX6LE7Kr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jpoCZPlx; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnGURPtu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712858682;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KX6LE7Kr";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jpoCZPlx";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KX6LE7Kr";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jpoCZPlx"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7A0775D3A1;
+	Thu, 11 Apr 2024 18:41:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712860914; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XpKoRsTU/c/NooRPQViF7RjQEu5sU/PzB15oM6zeiGM=;
-	b=VnGURPtukbMzO0OSEJ2PJnoSzZaN62o7HNCrHPN3n71r7dNfHCspQWkM1N1nifQ2jQ3W7G
-	/V00MPovEvJk/CO6CTTo28OpmBp8TBfJhAtcyHczsvJIbcmzjmds9yVW/B3c3Ruio+1rm3
-	NDok0IMnZnMYigM/LncVDK9Dt0ObYOQ=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-_SSCazPdPAuR6OVS_ifqFA-1; Thu, 11 Apr 2024 14:04:40 -0400
-X-MC-Unique: _SSCazPdPAuR6OVS_ifqFA-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2a2fdf6eb3bso56745a91.1
-        for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 11:04:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712858679; x=1713463479;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XpKoRsTU/c/NooRPQViF7RjQEu5sU/PzB15oM6zeiGM=;
-        b=Z+r+US2W9ObCyg7U31WxzziaCr/UsvWK4Ll1JuvZvNTVss7QW9ZknLgqP0oA32IJmM
-         n/Pce6vbg3kjzx7Fafc03anMX82cfCGnFLWTj8/+SFohrBABu8V8TTZM+s4xH80uNLXB
-         PsL0KX+Katfo9HjFZFGUM/BeXz9eUtdTFtYcYg/BBVWdMt7jW5KAQr6Xxm4n0CtWIrt3
-         AybA8eGheMUipddGQaaN1FmQ9hZJHwyvWyBaE8RIBfXMtdTkSTmrnu27gofYlyurYmqP
-         /xNdAmgAJOtU8XXdnFAZSLTc46IuHy9/0AQqF24fx4aobYCtCXYGUXDX3BgeYBeN1yT+
-         5vQw==
-X-Forwarded-Encrypted: i=1; AJvYcCUneytNY3VkTIHYVJ4dQKoCFvemChyxYhgo6RpGKjW8OPQlElbZ+pCL4DpjkauVmfbV24fdZMiw4omZzckb3jIhix8dY36D7aMi8XA=
-X-Gm-Message-State: AOJu0YwSoY/t3D8i41BXbFFGKQQW45YC7UX6OpyRsDPcWPPO001YGX0Y
-	BqAqs8NfxcxhwbdlMIcFOpeO1QH8OFWZcUf2Te7X20hBqzRf3bPW5mGmUshkAFi0vWcplBtUVkZ
-	Q5zNuUz54UmxoEPo14gM5y3KkP3bb5e2/5SDIBxOsdFQP4X8Wc9/eWF4pZqtQ
-X-Received: by 2002:a17:90a:be16:b0:29d:dd50:afe with SMTP id a22-20020a17090abe1600b0029ddd500afemr281390pjs.30.1712858679611;
-        Thu, 11 Apr 2024 11:04:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG8SxSt4ZqtyVm5bwPyxXKm5Y9LmERV9nLCUAxS9fL8uUPRvmXhhMb7PEAXWVfVp2aUxCLc7g==
-X-Received: by 2002:a17:90a:be16:b0:29d:dd50:afe with SMTP id a22-20020a17090abe1600b0029ddd500afemr281363pjs.30.1712858679162;
-        Thu, 11 Apr 2024 11:04:39 -0700 (PDT)
-Received: from [192.168.1.165] ([70.22.187.239])
-        by smtp.gmail.com with ESMTPSA id s9-20020ad45249000000b0069b1ef5d425sm1232834qvq.134.2024.04.11.11.04.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 11:04:38 -0700 (PDT)
-Message-ID: <87cf3851-b419-a83d-436f-2b23451f07df@redhat.com>
-Date: Thu, 11 Apr 2024 14:04:37 -0400
+	bh=K78E1oDH9QVROobIPW5crd473QiESO6tyz50+xzp+kY=;
+	b=KX6LE7Kr42MPPdCo/oKoU6ca66MlrlRjO3c9YKZ+q0QMUxpYWBiWnsEHB6XK+nNa7cVZsc
+	CHgWwsoglmez044kbC94ZHUuxcMaR8tiAkurCqjlpP090ZSupwrnPf21ay3K+AnAS2RxdW
+	lW1/rceYjqrz4Zi6FQuTPJhznIN4TS0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712860914;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K78E1oDH9QVROobIPW5crd473QiESO6tyz50+xzp+kY=;
+	b=jpoCZPlx1/UPBfzQKlT7QllgURAlWXhuUCHJ156NF4dIAKOvkix0Q1OSttnRDMBhT+GCiS
+	nEAtkNTenbW5PoCw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712860914; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K78E1oDH9QVROobIPW5crd473QiESO6tyz50+xzp+kY=;
+	b=KX6LE7Kr42MPPdCo/oKoU6ca66MlrlRjO3c9YKZ+q0QMUxpYWBiWnsEHB6XK+nNa7cVZsc
+	CHgWwsoglmez044kbC94ZHUuxcMaR8tiAkurCqjlpP090ZSupwrnPf21ay3K+AnAS2RxdW
+	lW1/rceYjqrz4Zi6FQuTPJhznIN4TS0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712860914;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K78E1oDH9QVROobIPW5crd473QiESO6tyz50+xzp+kY=;
+	b=jpoCZPlx1/UPBfzQKlT7QllgURAlWXhuUCHJ156NF4dIAKOvkix0Q1OSttnRDMBhT+GCiS
+	nEAtkNTenbW5PoCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 671081368B;
+	Thu, 11 Apr 2024 18:41:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 9iOxF/IuGGY8GgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 11 Apr 2024 18:41:54 +0000
+Date: Thu, 11 Apr 2024 20:41:53 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH blktests 05/11] nvme/rc: introduce NVMET_TR_TYPES
+Message-ID: <ccnazevlqz6dybzhe6asib3rtlz62ynv24jc22q3cgsf666b4e@6sd6youpsrrb>
+References: <20240411111228.2290407-1-shinichiro.kawasaki@wdc.com>
+ <20240411111228.2290407-6-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 09/11] dm-vdo: use bdev_nr_bytes(bdev) instead of
- i_size_read(bdev->bd_inode)
-Content-Language: en-US
-To: Al Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
- axboe@kernel.dk, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240411144930.GI2118490@ZenIV>
- <20240411145346.2516848-1-viro@zeniv.linux.org.uk>
- <20240411145346.2516848-9-viro@zeniv.linux.org.uk>
-From: Matthew Sakai <msakai@redhat.com>
-In-Reply-To: <20240411145346.2516848-9-viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240411111228.2290407-6-shinichiro.kawasaki@wdc.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.50 / 50.00];
+	BAYES_HAM(-2.70)[98.67%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_THREE(0.00)[4]
+X-Spam-Score: -3.50
+X-Spam-Flag: NO
 
-On 4/11/24 10:53, Al Viro wrote:
-> going to be faster, actually - shift is cheaper than dereference...
+On Thu, Apr 11, 2024 at 08:12:22PM +0900, Shin'ichiro Kawasaki wrote:
+> Some of the test cases in nvme test group can be run under various nvme
+> target transport types. The configuration parameter nvme_trtype
+> specifies the transport to use. But this configuration method has two
+> drawbacks. Firstly, the blktests check script needs to be invoked
+> multiple times to cover multiple transport types. Secondly, the test
+> cases irrelevant to the transport types are executed exactly same
+> conditions in the multiple blktests runs.
 > 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> To avoid the drawbacks, introduce new configuration parameter
+> NVMET_TR_TYPES. This is an array, and multiple transport types can
+> be set like:
+> 
+>     NVMET_TR_TYPES=(loop tcp)
+> 
+> Also introduce _nvmet_set_nvme_trtype() which can be called from the
+> set_conditions() hook of the transport type dependent test cases.
+> Blktests will repeat the test case as many as the number of elements in
+> NVMET_TR_TYPES, and set nvme_trtype for each test case run.
 
-Reviewed-by: Matthew Sakai <msakai@redhat.com>
-
+I suggest to keep the naming of the variable consistent, e.g.
+NVMET_TRTYPES.
