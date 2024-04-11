@@ -1,305 +1,94 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49973148312
-	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 11:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E79D14C5A4;
+	Thu, 11 Apr 2024 11:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712834027; cv=none; b=SzBOe7cyReYVtC8QkFL01/FWmPazn3YCpuW6pNM9uBYEbxcw7ZBIjfKzttgQtQN34Ow56WcBK41qCRMJh+aajJ7XJIvD88NekL5COWjjGhLZ5C437nRBPRwATz9fFetwvBlbMd+Blu7Q1BeeiZtW55f6W5oJ0hTRd6/irpWaNFQ=
+	t=1712836570; cv=none; b=dh1Dm4Ft+lqGk8/VWaIoCK8Fv6osU3Ij8x1u8pjDAs1zQRNONOQVoOrG4zcWtHcX68DnA3+1HyANntNRobACvHa0wP6kQk1ouT2luYkb79WiORJ5mR9RfitFJy6wCGhlUsa8GsDJbwbJ9qWQhzh6CKdm7W8sZVI443E2rDtBDh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712834027; c=relaxed/simple;
-	bh=rzcMOsqH0Im5ddUaeNbwuyBxslay/s5Hc/qroNU+kX4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BuJWqYn/OxTVKXa73USR6ZNLF81V851mmxuj8y8DU8eGVW0Z96aq/pmBbKFKk48QgPHT+L4G1fGphnh6E6YtkzPs0HtXz228bdXc8QTtBDLV8rny8DWCVLUPvg0GhefZZ0mceggSF4+3+u6jbZ4lpZ1mrNMIzqSL0h9BzXSwMOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=nLoNYZlg; arc=none smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1712836570; c=relaxed/simple;
+	bh=NHWm6/QuyChhlZB8R4yFfy0w7knNXtALJG38VFYUIoM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=osU1G496f0yJ/JafUG3cDNVLYasm+LdWm2TIE0hZqaJM+7Hcn7oVb+VpozxOUJWkSGAEtcNwgMHiCmbELaNxj67FYnLwzkPVCZYhG1KYs50vJ1z+kYxzGyVN73S9pv5eHoMSDUgTvayhyfoOFPYlFoVHgo2qqXsklknx3u836RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HLs/6PI8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nLoNYZlg"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1712834025; x=1744370025;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rzcMOsqH0Im5ddUaeNbwuyBxslay/s5Hc/qroNU+kX4=;
-  b=nLoNYZlgJ3TaU8GOZWEtb6EcrWgpqJBsKM2n7mOa/qsxKxBLPWMy4Q7j
-   UCubBtRcxUvvN9SdsieFkDqTfpMxi8hDB1Pi7zvPG916H/bEGt+HW1lYv
-   xhJP8aTJ3VlNGrFXVymOKy9GbdruFGcizAbx5ll6TBYcGHZLKZUztN0M+
-   j8wAnxEydH9U+NDshzHdGJXNF7NmNlif2TDqrKjl8Z80sny7jT2g02lZs
-   VEp0EskOAswOLfAWWSxxhdNYiVHsQOHM7lTeQKCpeRJGt5xTssOcvwlTw
-   4cP8Km2sfcO9ci9QiwlO8JAFEagwKq2rybR+F6RX1mzPF3PwCdvgSIhmU
-   g==;
-X-CSE-ConnectionGUID: haL6C4d0RHGdZxJq5OzEoA==
-X-CSE-MsgGUID: SKsZGPQmTQ+tZbohNy0nCw==
-X-IronPort-AV: E=Sophos;i="6.07,193,1708358400"; 
-   d="scan'208";a="13579888"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Apr 2024 19:12:40 +0800
-IronPort-SDR: nwJtW3WXeQtOpPjpZqZXmhpHEEQvk+juyo3c0Kb+eX2VQBhAQlyd0eP5inrY7amgi0K2BJbhEL
- wWQE9USSbbpg==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Apr 2024 03:15:25 -0700
-IronPort-SDR: w/zvdokllRG3IQ/t8GLr6ZxyQmQjxVix1TTXCZZRY/OOWLRo0n26YBRIBTb5zpsf+XUxhPwPF7
- 2GVy72YuDStw==
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Apr 2024 04:12:39 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Daniel Wagner <dwagern@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH blktests 11/11] nvme/{021,022,025,026,027,028}: do not hard code target blkdev type
-Date: Thu, 11 Apr 2024 20:12:28 +0900
-Message-ID: <20240411111228.2290407-12-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240411111228.2290407-1-shinichiro.kawasaki@wdc.com>
-References: <20240411111228.2290407-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLs/6PI8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4A2BC433C7;
+	Thu, 11 Apr 2024 11:56:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712836570;
+	bh=NHWm6/QuyChhlZB8R4yFfy0w7knNXtALJG38VFYUIoM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HLs/6PI8OburW1pE6HFFn+DvKJRXAdO1bAU6kYyJIsbdlo08puYJUlH8xlA6ok6Pb
+	 H1vHx8jfnRQ02CSXN5VXvKZVqbpVMzt5uu6S9YI5OCDUw7t7NzaPz9uMh0B8Zar6tb
+	 SeLXLBiUTh0P85ncHxZOFov/u5Df9M29JsGt4d/hSle+jeNJP0OowzMY1gTwgg+6Kk
+	 92SjotEqT05Kws/v9B6u41Cmi27yuhGttteixMcthqdt3a0jL2N/wOnTiJQSah9wru
+	 63M+bg3nHv6Ea1omFnJI6KkVScJvPgZJgajCqSL3LrDB/VXcsQ4T+pBjATUOK+DzSG
+	 SBaBpfuQJKTdA==
+Date: Thu, 11 Apr 2024 13:56:03 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, yi.zhang@huawei.com, 
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
+ blcok_device
+Message-ID: <20240411-logik-besorgen-b7d590d6c1e9@brauner>
+References: <20240406202947.GD538574@ZenIV>
+ <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
+ <20240407015149.GG538574@ZenIV>
+ <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
+ <20240407030610.GI538574@ZenIV>
+ <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
+ <20240409042643.GP538574@ZenIV>
+ <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
+ <20240410105911.hfxz4qh3n5ekrpqg@quack3>
+ <20240410223443.GG2118490@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240410223443.GG2118490@ZenIV>
 
-From: Daniel Wagner <dwagner@suse.de>
+On Wed, Apr 10, 2024 at 11:34:43PM +0100, Al Viro wrote:
+> On Wed, Apr 10, 2024 at 12:59:11PM +0200, Jan Kara wrote:
+> 
+> > I agree with Christian and Al - and I think I've expressed that already in
+> > the previous version of the series [1] but I guess I was not explicit
+> > enough :). I think the initial part of the series (upto patch 21, perhaps
+> > excluding patch 20) is a nice cleanup but the latter part playing with
+> > stashing struct file is not an improvement and seems pointless to me. So
+> > I'd separate the initial part cleaning up the obvious places and let
+> > Christian merge it and then we can figure out what (if anything) to do with
+> > remaining bd_inode uses in fs/buffer.c etc. E.g. what Al suggests with
+> > bd_mapping makes sense to me but I didn't check what's left after your
+> > initial patches...
+> 
+> FWIW, experimental on top of -next:
 
-There is no need to hardcode the target blkdev type. This allows
-the user to select different blkdev types via the nvmet_blkdev_type
-environment variable. Also modify set_conditions() hooks to call
-_set_nvme_trtype_and_nvmet_blkdev_type() instead of _set_nvme_trtype(),
-so that the test cases are run for all blkdev types set in
-NVMET_BLKDEV_TYPES.
+Ok, let's move forward with this. I've applied the first 19 patches.
+Patch 20 is the start of what we all disliked. 21 is clearly a bugfix
+for current code so that'll go separately from the rest. I've replaced
+open-code f_mapping access with file_mapping(). The symmetry between
+file_inode() and file_mapping() is quite nice.
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
-[Shin'ichiro: modify set_conditions()]
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/nvme/021 | 8 ++++----
- tests/nvme/022 | 8 ++++----
- tests/nvme/025 | 8 ++++----
- tests/nvme/026 | 8 ++++----
- tests/nvme/027 | 8 ++++----
- tests/nvme/028 | 8 ++++----
- 6 files changed, 24 insertions(+), 24 deletions(-)
+Al, your idea to switch erofs away from buf->inode can go on top of what
+Yu did imho. There's no real reason to throw it away imho.
 
-diff --git a/tests/nvme/021 b/tests/nvme/021
-index 270d90e..d7add6f 100755
---- a/tests/nvme/021
-+++ b/tests/nvme/021
-@@ -2,11 +2,11 @@
- # SPDX-License-Identifier: GPL-2.0+
- # Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
- #
--# Test NVMe list command on NVMeOF with a file-backed ns.
-+# Test NVMe list command.
- 
- . tests/nvme/rc
- 
--DESCRIPTION="test NVMe list command on NVMeOF file-backed ns"
-+DESCRIPTION="test NVMe list command"
- QUICK=1
- 
- requires() {
-@@ -16,7 +16,7 @@ requires() {
- }
- 
- set_conditions() {
--	_set_nvme_trtype "$@"
-+	_set_nvme_trtype_and_nvmet_blkdev_type "$@"
- }
- 
- test() {
-@@ -26,7 +26,7 @@ test() {
- 
- 	local ns
- 
--	_nvmet_target_setup --blkdev file
-+	_nvmet_target_setup
- 
- 	_nvme_connect_subsys
- 
-diff --git a/tests/nvme/022 b/tests/nvme/022
-index adaa765..0f2868c 100755
---- a/tests/nvme/022
-+++ b/tests/nvme/022
-@@ -2,11 +2,11 @@
- # SPDX-License-Identifier: GPL-2.0+
- # Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
- #
--# Test NVMe reset command on NVMeOF with a file-backed ns.
-+# Test NVMe reset command.
- 
- . tests/nvme/rc
- 
--DESCRIPTION="test NVMe reset command on NVMeOF file-backed ns"
-+DESCRIPTION="test NVMe reset command"
- QUICK=1
- 
- requires() {
-@@ -16,7 +16,7 @@ requires() {
- }
- 
- set_conditions() {
--	_set_nvme_trtype "$@"
-+	_set_nvme_trtype_and_nvmet_blkdev_type "$@"
- }
- 
- test() {
-@@ -26,7 +26,7 @@ test() {
- 
- 	local nvmedev
- 
--	_nvmet_target_setup --blkdev file
-+	_nvmet_target_setup
- 
- 	_nvme_connect_subsys
- 
-diff --git a/tests/nvme/025 b/tests/nvme/025
-index 224492b..a171099 100755
---- a/tests/nvme/025
-+++ b/tests/nvme/025
-@@ -2,11 +2,11 @@
- # SPDX-License-Identifier: GPL-2.0+
- # Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
- #
--# Test NVMe effects-log command on NVMeOF with a file-backed ns.
-+# Test NVMe effects-log command.
- 
- . tests/nvme/rc
- 
--DESCRIPTION="test NVMe effects-log command on NVMeOF file-backed ns"
-+DESCRIPTION="test NVMe effects-log"
- QUICK=1
- 
- requires() {
-@@ -16,7 +16,7 @@ requires() {
- }
- 
- set_conditions() {
--	_set_nvme_trtype "$@"
-+	_set_nvme_trtype_and_nvmet_blkdev_type "$@"
- }
- 
- test() {
-@@ -26,7 +26,7 @@ test() {
- 
- 	local ns
- 
--	_nvmet_target_setup --blkdev file
-+	_nvmet_target_setup
- 
- 	_nvme_connect_subsys
- 
-diff --git a/tests/nvme/026 b/tests/nvme/026
-index 6ee6a51..7196c60 100755
---- a/tests/nvme/026
-+++ b/tests/nvme/026
-@@ -2,11 +2,11 @@
- # SPDX-License-Identifier: GPL-2.0+
- # Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
- #
--# Test NVMe ns-descs command on NVMeOF with a file-backed ns.
-+# Test NVMe ns-descs command.
- 
- . tests/nvme/rc
- 
--DESCRIPTION="test NVMe ns-descs command on NVMeOF file-backed ns"
-+DESCRIPTION="test NVMe ns-descs"
- QUICK=1
- 
- requires() {
-@@ -16,7 +16,7 @@ requires() {
- }
- 
- set_conditions() {
--	_set_nvme_trtype "$@"
-+	_set_nvme_trtype_and_nvmet_blkdev_type "$@"
- }
- 
- test() {
-@@ -26,7 +26,7 @@ test() {
- 
- 	local ns
- 
--	_nvmet_target_setup --blkdev file
-+	_nvmet_target_setup
- 
- 	_nvme_connect_subsys
- 
-diff --git a/tests/nvme/027 b/tests/nvme/027
-index a63e42b..b117cc1 100755
---- a/tests/nvme/027
-+++ b/tests/nvme/027
-@@ -2,11 +2,11 @@
- # SPDX-License-Identifier: GPL-2.0+
- # Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
- #
--# Test NVMe ns-rescan command on NVMeOF with a file-backed ns.
-+# Test NVMe ns-rescan command.
- 
- . tests/nvme/rc
- 
--DESCRIPTION="test NVMe ns-rescan command on NVMeOF file-backed ns"
-+DESCRIPTION="test NVMe ns-rescan command"
- QUICK=1
- 
- requires() {
-@@ -16,7 +16,7 @@ requires() {
- }
- 
- set_conditions() {
--	_set_nvme_trtype "$@"
-+	_set_nvme_trtype_and_nvmet_blkdev_type "$@"
- }
- 
- test() {
-@@ -26,7 +26,7 @@ test() {
- 
- 	local nvmedev
- 
--	_nvmet_target_setup --blkdev file
-+	_nvmet_target_setup
- 
- 	_nvme_connect_subsys
- 
-diff --git a/tests/nvme/028 b/tests/nvme/028
-index 65c52a9..d6ffdd6 100755
---- a/tests/nvme/028
-+++ b/tests/nvme/028
-@@ -2,11 +2,11 @@
- # SPDX-License-Identifier: GPL-2.0+
- # Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
- #
--# Test NVMe list-subsys command on NVMeOF with a file-backed ns.
-+# Test NVMe list-subsys command.
- 
- . tests/nvme/rc
- 
--DESCRIPTION="test NVMe list-subsys command on NVMeOF file-backed ns"
-+DESCRIPTION="test NVMe list-subsys"
- QUICK=1
- 
- requires() {
-@@ -16,7 +16,7 @@ requires() {
- }
- 
- set_conditions() {
--	_set_nvme_trtype "$@"
-+	_set_nvme_trtype_and_nvmet_blkdev_type "$@"
- }
- 
- test() {
-@@ -24,7 +24,7 @@ test() {
- 
- 	_setup_nvmet
- 
--	_nvmet_target_setup --blkdev file
-+	_nvmet_target_setup
- 
- 	_nvme_connect_subsys
- 
--- 
-2.44.0
+I've exported bdev_mapping() because it really makes the btrfs change a
+lot slimmer and we don't need to care about messing with a lot of that
+code. I didn't care about making it static inline because that might've
+meant we need to move other stuff into the header as well. Imho, it's
+not that important but if it's a big deal to any of you just do the
+changes on top of it, please.
 
+Pushed to
+https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.super
+
+If I hear no objections that'll show up in -next tomorrow. Al, would be
+nice if you could do your changes on top of this, please.
