@@ -1,125 +1,92 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A943616419;
-	Thu, 11 Apr 2024 19:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465D918635
+	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 20:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712862468; cv=none; b=PxOukDSlGv2paI+DZpOT4F5mqdX2fn4fLq8kn3eMycFGrnYe42zD8bt3aKVj/UxyYBspm6U7JzyG9jGxbnrcIL88awZUBbU/vktrvcBPN9bH5p3eoRJRG0dEz1T4j1eGAhSgofOPad0pqDfK56B6i/7SO+Oy2jhJZguWcM+DpHU=
+	t=1712866543; cv=none; b=f4LHtqyQbQteqq3Yfzg3goQkk+N4Otkie2WyGWVH+fhGCl414uiHxfSckwiSuHSPafKd8bCHgnFDXmLQ5EFbqohX3LBYUF4kWha+31PuC6bTVwjBBH3RIwFsFRETAuawqv+aRNfoWYQ1KeBT3DRRGcSG+IE/A3bSVTduIxm0pUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712862468; c=relaxed/simple;
-	bh=p3xSOxPuATlO71p9cnskaQJETJN0PeGN1xAKog1Qdp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iPnogClrvwI4Po/Gbpg0s0nvtKKBqzrE8scEHcoOj1z8BCQFOJggtvbq9sPblZoak1ugy40S/ensGwBFqiRrEzaZM6XesXqYpQOAztGIr13u4+clwZpj8xwQs/fLDfNP/x/ygJixMVmYPMF1ex/BldR/7npXXUUIXE7NucgCCzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ADyqhdI3; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1712866543; c=relaxed/simple;
+	bh=a77S/efIjrUe8D8VYvkKBhXjsHTJ5PTWISSmL0/UAJ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EofpJJj85DP3eJHkmMcx4vq2PBDRPPfDu/lDOT5tFMGoIPPfSX0dx1JN6EpBkywYxtt3mpHYl6F922nqR+7My/eFfo2sGpRBFdqWVvQ4ILdTICsJLaVj+GPZyqTIFJtzpzQGy8kgCjOLlL4nRJQmIqgRSgrVsmXzUjidXTYbP6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ADyqhdI3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=PcZdbAxSEwXG3C61TyMUijUHCCvRVt8slQPN1FDjo1k=; b=ADyqhdI3aTXSxUH/1EFE7yxMaw
-	Q/QzwIQp/Krx4PAZO26/s23+4WUezyP+nlstWI47eqnw9vZDe7z/lyJIztc/96TDC49tOC1plCsR2
-	zHy/WFYe0Kw56iwPRg64drflom1IXRv9eRYpFdHBk9eGmtNolVadhrxb6suoJ0hIVGWEZhPmZTPYg
-	rosmBvK/anQCPG0g9QahmGRPMjF6Z3lCQfxGj2kLxRhSIrl9CfEqcWT6LUTPP8E9eoliydSsex3HU
-	4j7XG1TVO6TdnYQ//KK/md0lE/EhlDTciT0dgNlRVUCfFA+ZzNSkrDvXI1mmHqQlIfglCNXCKzMvH
-	IzGtMSjA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1ruzls-0000000Dp2X-0ZEf;
-	Thu, 11 Apr 2024 19:07:40 +0000
-Date: Thu, 11 Apr 2024 12:07:40 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Matthew Wilcox <willy@infradead.org>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-	axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
-	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-	io-uring@vger.kernel.org, nilay@linux.ibm.com,
-	ritesh.list@gmail.com
-Subject: Re: [PATCH v6 00/10] block atomic writes
-Message-ID: <Zhg0_Pvlh9zy4zzG@bombadil.infradead.org>
-References: <20240326133813.3224593-1-john.g.garry@oracle.com>
- <ZgOXb_oZjsUU12YL@casper.infradead.org>
- <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
- <Zg7Z4aJtn3SxY5w1@casper.infradead.org>
- <f3c1d321-0dfc-466f-9f6a-fe2f0513d944@oracle.com>
- <ZhQud1NbO4aMt0MH@bombadil.infradead.org>
- <b0789a97-7dcf-48aa-9980-8525942dabfa@oracle.com>
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6ea128e4079so158248a34.3
+        for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 13:15:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712866541; x=1713471341;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E89Ymxr6pBktCBvEVx2AbT0sGVMZ1MopzKCYdw103iQ=;
+        b=ooqq7lt1UJyouxBbTavz+GQVyUtkWTKeKozTUZ0X2J+pokgARQz5t1CxWLld1bxF5y
+         KmbMlRoET7ADzq/DpyLZzeX6/8uZJbIj18PMuoBDwwKrvSkppwaDhJkCOZ92Ad4hMv5r
+         saOHrxuXwmrYScXsxr5lpqSkDEfva+usBcJclXPH3R5jcJeyxPWUJmlmR/z6rOLJEsZb
+         jyRT15fHMOuOrDwIYH/W+m103iTPfDML3QtJ8hp9zEedzC07t9blONetqK/EgDQH25D0
+         RflvZ/ttNJwLuPw+JyIlM/5wnku/vyJsom7mAwZfsbEoOwNTBBDyTVwm1gxgWZS/RVGh
+         v/NA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6nEeIcCg7OuqAWzlOdd8hNZw3/6Kv3HEAwljaGiky3ehfgq4NT4lrSO/WJDXpV4kMZR8CdmLZ5ynHriu9sNrY/Y/AV447R+NpreQ=
+X-Gm-Message-State: AOJu0Yx4AT4b9d9CQMEoxFhdNB7GDud8ov8lSbZ0mo5Oja8MBQlNVLq9
+	vYuHwhPeJayUP5uzOs0cjXXJgxD1GuoJP52Yt01KHS6fotGDo5qwX2PvUDQLzQ==
+X-Google-Smtp-Source: AGHT+IGMfloMnHcVdc0jLN1oWqDbdIKI9CSm7rrlvrKBYp8Xp+7b5Qg3914hRiBhSyMgDd7KUs1q5Q==
+X-Received: by 2002:a9d:6c48:0:b0:6eb:5ac3:6143 with SMTP id g8-20020a9d6c48000000b006eb5ac36143mr106546otq.25.1712866541485;
+        Thu, 11 Apr 2024 13:15:41 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id vr12-20020a05620a55ac00b0078d66d66d82sm1453999qkn.30.2024.04.11.13.15.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 13:15:41 -0700 (PDT)
+From: Mike Snitzer <snitzer@kernel.org>
+To: hch@lst.de
+Cc: axboe@kernel.dk,
+	dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	mpatocka@redhat.com,
+	Abelardo Ricart III <aricart@memnix.com>,
+	Brandon Smith <freedom@reardencode.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>
+Subject: [PATCH for-6.10 0/2] dm: use late bio-splitting and queue_limits_set
+Date: Thu, 11 Apr 2024 16:15:27 -0400
+Message-Id: <20240411201529.44846-1-snitzer@kernel.org>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <ZfDeMn6V8WzRUws3@infradead.org>
+References: <ZfDeMn6V8WzRUws3@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b0789a97-7dcf-48aa-9980-8525942dabfa@oracle.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 10, 2024 at 09:34:36AM +0100, John Garry wrote:
-> On 08/04/2024 18:50, Luis Chamberlain wrote:
-> > I agree that when you don't set the sector size to 16k you are not forcing the
-> > filesystem to use 16k IOs, the metadata can still be 4k. But when you
-> > use a 16k sector size, the 16k IOs should be respected by the
-> > filesystem.
-> > 
-> > Do we break BIOs to below a min order if the sector size is also set to
-> > 16k?  I haven't seen that and its unclear when or how that could happen.
-> 
-> AFAICS, the only guarantee is to not split below LBS.
+Hi,
 
-It would be odd to split a BIO given a inode requirement size spelled
-out, but indeed I don't recall verifying this gaurantee.
+I'd like to get extra review and testing for these changes given how
+DM's use of queue_limits_set broke Linus's dm-crypt on NVMe setup
+during the 6.9 merge window.
 
-> > At least for NVMe we don't need to yell to a device to inform it we want
-> > a 16k IO issued to it to be atomic, if we read that it has the
-> > capability for it, it just does it. The IO verificaiton can be done with
-> > blkalgn [0].
-> > 
-> > Does SCSI*require*  an 16k atomic prep work, or can it be done implicitly?
-> > Does it need WRITE_ATOMIC_16?
-> 
-> physical block size is what we can implicitly write atomically.
+These changes have been staged in linux-next via linux-dm.git and
+while they should apply cleanly on 6.9-rcX they have been applied
+ontop of dm-6.10, see:
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-6.10
 
-Yes, and also on flash to avoid read modify writes.
+Thanks,
+Mike
 
-> So if you
-> have a 4K PBS and 512B LBS, then WRITE_ATOMIC_16 would be required to write
-> 16KB atomically.
+Christoph Hellwig (1):
+  dm: use queue_limits_set
 
-Ugh. Why does SCSI requires a special command for this?
+Mike Snitzer (1):
+  dm-crypt: stop constraining max_segment_size to PAGE_SIZE
 
-Now we know what would be needed to bump the physical block size, it is
-certainly a different feature, however I think it would be good to
-evaluate that world too. For NVMe we don't have such special write
-requirements.
+ drivers/md/dm-crypt.c | 12 ++----------
+ drivers/md/dm-table.c | 27 ++++++++++++---------------
+ 2 files changed, 14 insertions(+), 25 deletions(-)
 
-I put together this kludge with the last patches series of LBS + the
-bdev cache aops stuff (which as I said before needs an alternative
-solution) and just the scsi atomics topology + physical block size
-change to easily experiment to see what would break:
+-- 
+2.40.0
 
-https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20240408-lbs-scsi-kludge
-
-Using a larger sector size works but it does not use the special scsi
-atomic write.
-
-> > > To me, O_ATOMIC would be required for buffered atomic writes IO, as we want
-> > > a fixed-sized IO, so that would mean no mixing of atomic and non-atomic IO.
-> > Would using the same min and max order for the inode work instead?
-> 
-> Maybe, I would need to check further.
-
-I'd be happy to help review too.
-
-  Luis
