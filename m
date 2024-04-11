@@ -1,62 +1,72 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D4D946F;
-	Thu, 11 Apr 2024 00:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6136FD0
+	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 00:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712795925; cv=none; b=Z0gp6J/sxA47O1Ixvev/36tZjnsb5xY0uLFtATuDYmFGUeqWYLzpaRwuUnVkVGrrlUUyZ9ONWgczWsBiubotEcSKaghhntXSDOOddhglih4VoYCtHrSdxleTJwnGpco+Sg5x41ziAMGXSm04xywyTfd9iyUlG9CPNLtEuMXjurU=
+	t=1712796070; cv=none; b=Op+eg+ec8p8FM0bC/EQsLqNWWSG54dMpq81fdFp6eghbo7GX3qrcQbt/AZ8BQsXz/yK6uhldaAAV8unRScBcUPKIccjVUEzxRsMkgNIdnxIMDu/HzX01kxJyzfJeuLLitrOpvCuCSqtaZZzWEC4T0x2Bf0dcBXLoKsUCZACtQdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712795925; c=relaxed/simple;
-	bh=W0yvgk4HYg+/L0IQ8HK3ESN9oPLBuDLxptzYSWkPpc8=;
+	s=arc-20240116; t=1712796070; c=relaxed/simple;
+	bh=e2yYELAoySVzl/I7Xz2PR35QLZU9nbW6o6Okx4SjDBM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IrWKqjaq2qoDVREvY93Zoa/KkDdv7Fc2qpic7931mPs9eQHbimFyMQ4KixJif6/j80KG2kfA0jxdiYFJN4jGTl+749LJTS74vMKy7EbA/d27DgNzDwfIT7+hRXmaoGFaLD7SxJ2Y+K8EwJJwtg7Qs9hgmFZzM1GMQf2PApLiASc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jzSUeYbF; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=XE9DlG+DfQvECwvzFk9mOBy2zxzs7Q0HNWIhmvz9YLRU9qAvRNphpBfdQ9mBLHROrCxG8DxKmFwjKFwgoRxQlHflptYVLlh2/P6Jka07Vky1zr8/9Jp4GZ3Xv7q9n7lPFIJfGD9oT/TWKu8RkeMnjdsPMgYjDOBra4i8Ahr1kXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Ic9D1GvN; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jzSUeYbF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0y/StUI641o9BanPyuvxNVnM75yOu8dqMCwLb08ZeaU=; b=jzSUeYbF76eftu2Uxlpd+g8UyC
-	bCYxXfoUcQkccIgXePFUpxdaD64xV2V+85xXNe01q/k7YMQD0kftP0eIxahavEwTuP7YHE1Y/Jzrd
-	w0qPY5t6CA/16uxsQkLrROrSuORCKI0bg+FCj8ZVmKFW5DWXssbk+H5extAUhDLqB5l7K3IobopA3
-	Hr9Ji3H4tUwQNQ9znK8p6AAsahJ5SyJjBk5Dysa38GRbhIB3BhjzAFV909GHjzTaCO27imevzm8EZ
-	OKbQpsokz0960Fa5N6uzK9kYA4pE9mDE+79A2/SpAxH2wWTvncTA2jSrVUsjXAeNZL8E/2qD1MV8r
-	jrPWnUmg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1ruiSa-00000009h9y-0wFj;
-	Thu, 11 Apr 2024 00:38:36 +0000
-Date: Wed, 10 Apr 2024 17:38:36 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Matthew Wilcox <willy@infradead.org>,
-	John Garry <john.g.garry@oracle.com>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-	axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
-	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-	io-uring@vger.kernel.org, nilay@linux.ibm.com,
-	ritesh.list@gmail.com
-Subject: Re: [PATCH v6 00/10] block atomic writes
-Message-ID: <ZhcxDOWy9j8mzs_u@bombadil.infradead.org>
-References: <20240326133813.3224593-1-john.g.garry@oracle.com>
- <ZgOXb_oZjsUU12YL@casper.infradead.org>
- <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
- <Zg7Z4aJtn3SxY5w1@casper.infradead.org>
- <f3c1d321-0dfc-466f-9f6a-fe2f0513d944@oracle.com>
- <ZhQud1NbO4aMt0MH@bombadil.infradead.org>
- <ZhYQANQATz82ytl1@casper.infradead.org>
- <94d6d88b-b0e7-491d-94e8-dc9e5fba5620@suse.de>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ic9D1GvN"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-36aa0eb4adbso3258395ab.3
+        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 17:41:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1712796065; x=1713400865; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wKgaWymCA7byQ3pP1Edxiucbtgpjbgswg4BKCEuveSs=;
+        b=Ic9D1GvNT7C6A+onUwGFQciJM/gwe3p7RIdKuSbHW7+uETRgPQw0YTNqpYywn7Ek3W
+         F0ziDZWfvh7aymidEt8w5ZtcVlNUvVE2frENUSPuYXnlbCoyxPUEolkCdYl7PAgxxGSZ
+         E7SjfqPSB2BEemOu4Xe7/bKXK1CzMXDwLQPvU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712796065; x=1713400865;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wKgaWymCA7byQ3pP1Edxiucbtgpjbgswg4BKCEuveSs=;
+        b=P4HMyiXMISRP+C8GDm7CN2QqLtxya73sKJ/E+4vDQwvLQdRUlZMkrjQESXvSx0pN5E
+         L/0NOHsTuSuCZ6T88DTw68aJ6SI+0kOLT4sXkAWx4wq8i9nynK7fQLnGV0Itua2gpmPp
+         pte41K5hPeq+VviSjU5jDyAbdw96ooxp7TD6y0Zdt6vciiW5ZB6tdAyOp2mpXsNnUbKF
+         ZooHUlyxgOvVdLaDYzLfDDcXu2Tgip8wJl7U33j626Ob6itkgtNT5ZN+PZeQ7Y2sGPCc
+         4iMSrMCi3VfTi6+16h8kHf5rkwpRViHQV8GuHF/mGpwVLq6WTyfseBxv1SI3kFZ+322G
+         w3yg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSGKoN3pCGU8E0jp6ItlldeCSqqkahbOwcd+EoEuKw//JYeKHBShkWmc/95KlucmsBDuCgQvrEoG3giefQPbcsln5iAM5WxDqPq+A=
+X-Gm-Message-State: AOJu0YykRABextm4PBegLoFtYI05At1LIdJ8a2jibLWXScJGWCDH3zbY
+	SdyUZyCq11NLJzNKYr2ns1nYbCuD6xBDMJuryw6hmZmhy6KKATBwUd7iTAZ6U8m9cGKn88jjDlw
+	=
+X-Google-Smtp-Source: AGHT+IGDAD7dL3LOOrzNCVQ59wj2g9+ChqDyJdjnBAxIhixl0Jwg4vsZhQeHbrM4t+hXEKkQFpikHw==
+X-Received: by 2002:a05:6e02:1cac:b0:36a:1f88:d73a with SMTP id x12-20020a056e021cac00b0036a1f88d73amr5390406ill.15.1712796065348;
+        Wed, 10 Apr 2024 17:41:05 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:f30d:f29e:acb:4140])
+        by smtp.gmail.com with ESMTPSA id o21-20020a639215000000b005e838955bc4sm149920pgd.58.2024.04.10.17.41.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 17:41:04 -0700 (PDT)
+Date: Thu, 11 Apr 2024 09:40:57 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Barry Song <21cnbao@gmail.com>
+Cc: akpm@linux-foundation.org, minchan@kernel.org, senozhatsky@chromium.org,
+	linux-block@vger.kernel.org, axboe@kernel.dk, linux-mm@kvack.org,
+	terrelln@fb.com, chrisl@kernel.org, david@redhat.com,
+	kasong@tencent.com, yuzhao@google.com, yosryahmed@google.com,
+	nphamcs@gmail.com, willy@infradead.org, hannes@cmpxchg.org,
+	ying.huang@intel.com, surenb@google.com, wajdi.k.feghali@intel.com,
+	kanchana.p.sridhar@intel.com, corbet@lwn.net,
+	zhouchengming@bytedance.com,
+	Tangquan Zheng <zhengtangquan@oppo.com>,
+	Barry Song <v-songbaohua@oppo.com>
+Subject: Re: [PATCH RFC 2/2] zram: support compression at the granularity of
+ multi-pages
+Message-ID: <20240411004057.GA8743@google.com>
+References: <20240327214816.31191-1-21cnbao@gmail.com>
+ <20240327214816.31191-3-21cnbao@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,83 +75,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <94d6d88b-b0e7-491d-94e8-dc9e5fba5620@suse.de>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20240327214816.31191-3-21cnbao@gmail.com>
 
-On Wed, Apr 10, 2024 at 08:20:37AM +0200, Hannes Reinecke wrote:
-> On 4/10/24 06:05, Matthew Wilcox wrote:
-> > On Mon, Apr 08, 2024 at 10:50:47AM -0700, Luis Chamberlain wrote:
-> > > On Fri, Apr 05, 2024 at 11:06:00AM +0100, John Garry wrote:
-> > > > On 04/04/2024 17:48, Matthew Wilcox wrote:
-> > > > > > > The thing is that there's no requirement for an interface as complex as
-> > > > > > > the one you're proposing here.  I've talked to a few database people
-> > > > > > > and all they want is to increase the untorn write boundary from "one
-> > > > > > > disc block" to one database block, typically 8kB or 16kB.
-> > > > > > > 
-> > > > > > > So they would be quite happy with a much simpler interface where they
-> > > > > > > set the inode block size at inode creation time,
-> > > > > > We want to support untorn writes for bdev file operations - how can we set
-> > > > > > the inode block size there? Currently it is based on logical block size.
-> > > > > ioctl(BLKBSZSET), I guess?  That currently limits to PAGE_SIZE, but I
-> > > > > think we can remove that limitation with the bs>PS patches.
-> > > 
-> > > I can say a bit more on this, as I explored that. Essentially Matthew,
-> > > yes, I got that to work but it requires a set of different patches. We have
-> > > what we tried and then based on feedback from Chinner we have a
-> > > direction on what to try next. The last effort on that front was having the
-> > > iomap aops for bdev be used and lifting the PAGE_SIZE limit up to the
-> > > page cache limits. The crux on that front was that we end requiring
-> > > disabling BUFFER_HEAD and that is pretty limitting, so my old
-> > > implementation had dynamic aops so to let us use the buffer-head aops
-> > > only when using filesystems which require it and use iomap aops
-> > > otherwise. But as Chinner noted we learned through the DAX experience
-> > > that's not a route we want to again try, so the real solution is to
-> > > extend iomap bdev aops code with buffer-head compatibility.
-> > 
-> > Have you tried just using the buffer_head code?  I think you heard bad
-> > advice at last LSFMM.  Since then I've landed a bunch of patches which
-> > remove PAGE_SIZE assumptions throughout the buffer_head code, and while
-> > I haven't tried it, it might work.  And it might be easier to make work
-> > than adding more BH hacks to the iomap code.
-> > 
-> > A quick audit for problems ...
-> > 
-> > __getblk_slow:
-> >         if (unlikely(size & (bdev_logical_block_size(bdev)-1) ||
-> >                          (size < 512 || size > PAGE_SIZE))) {
-> > 
-> > cont_expand_zero (not used by bdev code)
-> > cont_write_begin (ditto)
-> > 
-> > That's all I spot from a quick grep for PAGE, offset_in_page() and kmap.
-> > 
-> > You can't do a lot of buffer_heads per folio, because you'll overrun
-> >          struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
-> > in block_read_full_folio(), but you can certainly do _one_ buffer_head
-> > per folio, and that's all you need for bs>PS.
-> > 
-> Indeed; I got a patch here to just restart the submission loop if one
-> reaches the end of the array. But maybe submitting one bh at a time and
-> using plugging should achieve that same thing. Let's see.
+On (24/03/28 10:48), Barry Song wrote:
+[..]
+> diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+> index 37bf29f34d26..8481271b3ceb 100644
+> --- a/drivers/block/zram/zram_drv.h
+> +++ b/drivers/block/zram/zram_drv.h
+> @@ -38,7 +38,14 @@
+>   *
+>   * We use BUILD_BUG_ON() to make sure that zram pageflags don't overflow.
+>   */
+> +
+> +#ifdef CONFIG_ZRAM_MULTI_PAGES
+> +#define ZRAM_FLAG_SHIFT (CONT_PTE_SHIFT + 1)
 
-That's great to hear, what about a target filesystem? Without a
-buffer-head filesystem to test I'm not sure we'd get enough test
-coverage.
-
-The block device cache isn't exaclty a great filesystem target to test
-correctness.
-
-> > > I suspect this is a use case where perhaps the max folio order could be
-> > > set for the bdev in the future, the logical block size the min order,
-> > > and max order the large atomic.
-> > 
-> > No, that's not what we want to do at all!  Minimum writeback size needs
-> > to be the atomic size, otherwise we have to keep track of which writes
-> > are atomic and which ones aren't.  So, just set the logical block size
-> > to the atomic size, and we're done.
-> > 
-> +1. My thoughts all along.
-
-Oh, hrm yes, but let's test it out then...
-
-  Luis
+So this is ARM-only?
