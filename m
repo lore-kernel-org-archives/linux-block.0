@@ -1,87 +1,128 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093C614F68;
-	Thu, 11 Apr 2024 15:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8C243171;
+	Thu, 11 Apr 2024 16:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712848931; cv=none; b=r+OD4dga2wOr18s+KdouyY4VzZk4moOGVUoIXBNzSX22bJcOHD+YBBZhN2w0AOB9tvk0HB8snqbXU6+4gU6NpRJ+o1q1Fj3nzVYGDbFcSyQkHWENIBVFbg3RBeia/NighFGJNg+IiL74mGtg/TSjQwjmaZKm+XL58UD8dHyfcjk=
+	t=1712852032; cv=none; b=ftMFbRxq77UckKF3XO1ESlm1HX5BF4/xd5Z9EAVBHQoSF/8iHg1cgxQcfetg4q6pptzpax6NM6fyCS+mqimoCuDQT9K0PuGDu2st+7AOFHdxrN/gDK9dJYC8LEyl46sINp3jWpfwssdIHjQWp8ahotUkXvNY4a181xDypMkz/EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712848931; c=relaxed/simple;
-	bh=SwE0Ntr9Q2DsPczc+O+W8VNP/sF7LKUotga+t8sd6wU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rwlJOJnLs1NUwsiIlpWu7XMBe4/erNmqMGwYaV8ChSFG1LAXK9WhKR4frLp2hXkFlRM3YskSAQLtTPlPFL5Hqan8EAzyYP9gGwpIpPbh6q18ujxvEZqwscOFCBP+yMZ4TYx+4Cwqp4FoW9Luvvf0t2eJLjr1P50OWkGmGiPvPjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=go+W9Que; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1712852032; c=relaxed/simple;
+	bh=evtsIG6x6Yz6zeuupS4HiOT3wfAwZTOiHxGTCrmvKw0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XNuZ5QmSxsD0GhNYW7OBF2bPBhv5+HaQ8qJdGlBdoz5mzHJLb2PChrqDhiPQt7M4/KcdG5Q5rxgmIZdSbrdf9oOvgHVLPokJzSqburUgP6VeX6cKy5DJNQYjXhRoQSCvqUJuAa55CjWCErNSU/+Rpyb9Skud98qGt6g4fzPCDPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pjdyPIsi; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="go+W9Que"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=g5jnVkjaKMI1tklLBllrixUlSBdhkjD2GQ3QccSOE0s=; b=go+W9QueRUU674JkYzgB/7uKSK
-	FVNzAMo2c768uPAYOWpwXKXEbf86O1MGa8wx31MlYbdtFGyTn/LR1UMDQZqPkGgJE2gy34N2cx2kf
-	GJyusbvsOjdbdoLjdEvVFh9jKEx+4oY5v6mOu4T6zAZU9GRbXAkXdwL7FIdcCggeFM+BL+pvJRUpl
-	MxwD/ptBPV6GbmLHW0TsoIBgae1W9vXCy4b0b0R9siXZIFOm4VkBii2eGNS5P/8kks56wFv+u5Fme
-	mrBMjafx48HjeXK/MiUgxtMQL6WoEOgUpnfG1ul4g2l3zp5d4WLAihF/V5mjo2bkgfyAOTH42kMdw
-	sGVS5X9w==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1ruwFY-00000007Ddj-1BGG;
-	Thu, 11 Apr 2024 15:22:04 +0000
-Date: Thu, 11 Apr 2024 16:22:04 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
-	brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
- blcok_device
-Message-ID: <ZhgAHLZr6GZ-xxOM@casper.infradead.org>
-References: <20240406090930.2252838-23-yukuai1@huaweicloud.com>
- <20240406194206.GC538574@ZenIV>
- <20240406202947.GD538574@ZenIV>
- <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
- <20240407015149.GG538574@ZenIV>
- <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
- <20240407030610.GI538574@ZenIV>
- <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
- <20240407045758.GK538574@ZenIV>
- <20240407051119.GL538574@ZenIV>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pjdyPIsi"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712852025; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=i28s5n6Wi5wy2FzpIgLktF1Mrc755I0vQ0l4zk5yxBI=;
+	b=pjdyPIsi86ySuz4iqFOxMv9ZMQN2S9ni8goTD6AN2wtUNaV6jMrrvA3zhSpLy/7s6DFMm+qdGFAUR1AM/2Qekjioz2yxPoAzTfNu8EQL+/ShxJ9IaLJOjZ4/FIWTfyW6IPS3XCPkjXOxCRnCkVpiKzJckNnAzLGm5TleywQ3RcU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W4LiTJx_1712852023;
+Received: from 192.168.3.4(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0W4LiTJx_1712852023)
+          by smtp.aliyun-inc.com;
+          Fri, 12 Apr 2024 00:13:44 +0800
+Message-ID: <a660a238-2b7e-423f-b5aa-6f5777259f4d@linux.alibaba.com>
+Date: Fri, 12 Apr 2024 00:13:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240407051119.GL538574@ZenIV>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH vfs.all 08/26] erofs: prevent direct access of bd_inode
+To: Al Viro <viro@zeniv.linux.org.uk>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com
+References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
+ <20240406090930.2252838-9-yukuai1@huaweicloud.com>
+ <20240407040531.GA1791215@ZenIV>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <20240407040531.GA1791215@ZenIV>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Apr 07, 2024 at 06:11:19AM +0100, Al Viro wrote:
-> On Sun, Apr 07, 2024 at 05:57:58AM +0100, Al Viro wrote:
+Hi Al,
+
+On 2024/4/7 12:05, Al Viro wrote:
+> On Sat, Apr 06, 2024 at 05:09:12PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Now that all filesystems stash the bdev file, it's ok to get inode
+>> for the file.
 > 
-> > PS: in grow_dev_folio() we probably want
-> > 	struct address_space *mapping = bdev->bd_inode->i_mapping;
-> > instead of
-> > 	struct inode *inode = bdev->bd_inode;
-> > as one of the preliminary chunks.
-> > FWIW, it really looks like address_space (== page cache of block device,
-> > not an unreasonably candidate for primitive) and block size (well,
-> > logarithm thereof) cover the majority of what remains, with device
-> > size possibly being (remote) third...
+> Looking at the only user of erofs_buf->inode (erofs_bread())...  We
+> use the inode for two things there - block size calculation (to get
+> from block number to position in bytes) and access to page cache.
+> We read in full pages anyway.  And frankly, looking at the callers,
+> we really would be better off if we passed position in bytes instead
+> of block number.  IOW, it smells like erofs_bread() having wrong type.
 > 
-> Incidentally, how painful would it be to switch __bread_gfp() and __bread()
-> to passing *logarithm* of block size instead of block size?  And possibly
-> supply the same to clean_bdev_aliases()...
+> Look at the callers.  With 3 exceptions it's
+> fs/erofs/super.c:135:   ptr = erofs_bread(buf, erofs_blknr(sb, *offset), EROFS_KMAP);
+> fs/erofs/super.c:151:           ptr = erofs_bread(buf, erofs_blknr(sb, *offset), EROFS_KMAP);
+> fs/erofs/xattr.c:84:    it.kaddr = erofs_bread(&it.buf, erofs_blknr(sb, it.pos), EROFS_KMAP);
+> fs/erofs/xattr.c:105:           it.kaddr = erofs_bread(&it.buf, erofs_blknr(sb, it.pos),
+> fs/erofs/xattr.c:188:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(sb, it->pos),
+> fs/erofs/xattr.c:294:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(sb, it->pos),
+> fs/erofs/xattr.c:339:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(it->sb, it->pos),
+> fs/erofs/xattr.c:378:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(sb, it->pos),
+> fs/erofs/zdata.c:943:           src = erofs_bread(&buf, erofs_blknr(sb, pos), EROFS_KMAP);
+> 
+> and all of them actually want the return value + erofs_offset(...).  IOW,
+> we take a linear position (in bytes).  Divide it by block size (from sb).
+> Pass the factor to erofs_bread(), where we multiply that by block size
+> (from inode), see which page will that be in, get that page and return a
+> pointer *into* that page.  Then we again divide the same position
+> by block size (from sb) and add the remainder to the pointer returned
+> by erofs_bread().
+> 
+> IOW, it would be much easier to pass the position directly and to hell
+> with block size logics.  Three exceptions to that pattern:
+> 
+> fs/erofs/data.c:80:     return erofs_bread(buf, blkaddr, type);
+> fs/erofs/dir.c:66:              de = erofs_bread(&buf, i, EROFS_KMAP);
+> fs/erofs/namei.c:103:           de = erofs_bread(&buf, mid, EROFS_KMAP);
+> 
+> Those could bloody well multiply the argument by block size;
+> the first one (erofs_read_metabuf()) is also interesting - its
+> callers themselves follow the similar pattern.  So it might be
+> worth passing it a position in bytes as well...
+> 
+> In any case, all 3 have superblock reference, so they can convert
+> from blocks to bytes conveniently.  Which means that erofs_bread()
+> doesn't need to mess with block size considerations at all.
+> 
+> IOW, it might make sense to replace erofs_buf->inode with
+> pointer to address space.  And use file_mapping() instead of
+> file_inode() in that patch...
 
-I've looked at it because blksize_bits() was pretty horrid.  But I got
-scared because I couldn't figure out how to make unconverted places
-fail to compile, without doing something ugly like
+Just saw this again by chance, which is unexpected.
 
--__bread(struct block_device *bdev, sector_t block, unsigned size)
-+__bread(unsigned shift, struct block_device *bdev, sector_t block)
+Yeah, I think that is a good idea.  The story is that erofs_bread()
+was derived from a page-based interface:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/erofs/data.c?h=v5.10#n35
 
-I assume you're not talking about changing bh->b_size, just passing in
-the log and comparing bh->b_size to 1<<shift?
+so it was once a page index number.  I think a byte offset will be
+a better interface to clean up these, thanks for your time and work
+on this!
+
+BTW, sightly off the topic:
+
+I'm little confused why I'm not be looped for this version this time
+even:
+
+  1) I explicitly asked to Cc the mailing list so that I could find
+     the latest discussion and respond in time:
+      https://lore.kernel.org/r/5e04a86d-8bbd-41da-95f6-cf1562ed04f9@linux.alibaba.com
+
+  2) I sent my r-v-b tag on RFC v4 (and the tag was added on this
+     version) but I didn't receive this new version.
+
+Thanks,
+Gao Xiang
