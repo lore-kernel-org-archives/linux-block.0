@@ -1,95 +1,93 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D600347A6A
-	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 16:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43801369AE
+	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 17:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712853884; cv=none; b=qx9ThSYBhocM/y7dgFLRGGGsShSaWCP2mrK3baNy7szMeXzpy3jMyi7DXrFjbWW1d7spFtWAgHg8//JYyNCjCmmWzlvO6gZI36DFeYBnKNJXhL6xy74PFPEJA3sv8mOi4h9WoSNw5XEedlubKi8h8o1q34dcZP5IldCshltMJ54=
+	t=1712857773; cv=none; b=sie6GihDBOVH1adYvQ9QcY2xJ/MIVYHi5KUux9W5pOHFVceGCdwPQJvlHGQdyRGaMDJ8+oCoGJe5ibwzp0c9crE6M70KXjt4hcfjZrPs0n80420lwyjMzwkC1e00OvfDI/OQh4/1daWwW+c4L7dX/Db9AKji84DzbbsIhfabtOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712853884; c=relaxed/simple;
-	bh=UnBJFcPPvwWzi0FfiqnRkFfUQdXHP/a35MX/pq5LyAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XpScRiKzJN83gm0fyrO/NaxxkiecoXz/GtGWoOtwYq9f+lYoMP9QqVa+jin2liZcDRsxmKUxtQe+hWkRiqobh9BZB7JjAWLFAPIKdYc7IwTZStTLV75Sx3i+UDQfShSnDmw/r8rTFhMrgL/UAKV10WW66EpHQ9GIK4NSRnnBEyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Fm6vMQyb; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1712857773; c=relaxed/simple;
+	bh=JMTdAGD8MD/pbkdj+J+tnzBU2KPanJ0Go33kBW0D9C0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SeUMhxjCjYayrfBdKWfVmSM12YKMXwA1nS7e4hx0Mobq6/oyTS3Y8d/aEg+AJMR6RlfeSb0ekZis+TwvqmR7QlGCvHIFgb0BPmqFsD3aeMnloXbmDAftuTHzYLP+VTNl2Vo4bCVHdTIOsH14RzMKCcC5VJ2y2iKM88wKlWsDDQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aI/Km0ji; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Fm6vMQyb"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7d6812b37a6so65539f.0
-        for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 09:44:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712853881; x=1713458681; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tbctDn2ebNI1qx8fESTV2MUnI/LKkzIT0RDCKmLmiV4=;
-        b=Fm6vMQybnvgWX4Zj1birgEwefGXabexCFNFeu3nDiW+dKJaQ6x1adpEq/l8hsFAY4X
-         SdCLS4nYpxVIrk7CeO7ZxsigL3KvAYhEPuskgc/XTwCvP+kCLnG4VMvvxnzjA3vICJrR
-         T1ikmXVTfcmTdhUX/q85ZjE/gE8uEWv7DJOtjGKmYRtkvUZoKkqoLhC2i9TOkA+q+6ty
-         ksm497BdKaNudTDbp0VEzSGCz33S1a/XNSmL3+YB7RNLJfO7vepp7KrdolnJGvgaiFXI
-         J3pegBmm+LTN21Tu0KKtTgmQj+9sAyRTzx17eo+0w/NL8VrMtiYKDsF3TLXLyXSk/UT8
-         2FSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712853881; x=1713458681;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tbctDn2ebNI1qx8fESTV2MUnI/LKkzIT0RDCKmLmiV4=;
-        b=d1nnx/pze7FYnY1ok3BJ7QWL1ldMULmXWaOofLKE6Z+7HCUmnpEM41mX4H+hOCPJr2
-         5cAthQN0AMRBTFOMoavbFaBv4oxMioQAtirI/W7h77UpG91rT1UVuczuFM5i86eQOy+B
-         HLQiCa5nOW2AGtPqcrnQd3h4INR3TNL48bWb7mOacMBkl2OHpECYMChS87nLAG+kzSsE
-         RbmDzy6DzYr69MOhrU4/UGMtm/UDnQO5OddA0lZKg3zs3F4/M4zN3BqN96x8Xk+d694b
-         C7f6h5XJ74h/XdR+f5Oa/7WXg/sCtF40fKNaJgwjz9CVH9flPBq1XBCsroAbWYwyOR1y
-         XWnQ==
-X-Gm-Message-State: AOJu0YwgndRa6WgK/FecMR+rkvz/AU0ZZ63WsIuOepjyFooXT1eu+myH
-	LMT0WUZE7oUffIUKKFzhO0TCvGN2hK97MhJfc9tbTQ2KXtPXLStfsXXLuiSvhO0=
-X-Google-Smtp-Source: AGHT+IEUTrM6OumzLR/N7eIq3bgozrwf1Oz1pYJe82O+IuxY0yootlN+7gFIk0CkUsJh86R4wYtIKA==
-X-Received: by 2002:a5e:9907:0:b0:7d6:751f:192 with SMTP id t7-20020a5e9907000000b007d6751f0192mr395259ioj.2.1712853880943;
-        Thu, 11 Apr 2024 09:44:40 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ii8-20020a0566026b8800b007cc7612f093sm492800iob.43.2024.04.11.09.44.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 09:44:40 -0700 (PDT)
-Message-ID: <9a4f8738-6ad5-407e-a938-83395aa1df4f@kernel.dk>
-Date: Thu, 11 Apr 2024 10:44:39 -0600
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aI/Km0ji"
+Date: Thu, 11 Apr 2024 13:49:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712857769;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V/TZdE1FK3O4qkESTbUB1nUL6z8CdzrLZmjris90VHw=;
+	b=aI/Km0jiSMVL4A1tCs8hlsrV66vbuWxJKZ+EgkonCW2LmuJAGBaIivtgu4+3HhSKhbSBh3
+	uS3+3l/YqK0GsHToDiJSOy8jQgouByPKNokiyLYxRwngjkex1lryU/nDL4TDH7+GmcHLtc
+	35AcbG0Y+MpEd8VLadpzkGxeP5lZ1Bo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, roger.pau@citrix.com, colyli@suse.de, 
+	kent.overstreet@gmail.com, joern@lazybastard.org, miquel.raynal@bootlin.com, richard@nod.at, 
+	vigneshr@ti.com, sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com, 
+	gor@linux.ibm.com, agordeev@linux.ibm.com, jejb@linux.ibm.com, 
+	martin.petersen@oracle.com, clm@fb.com, josef@toxicpanda.com, dsterba@suse.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, nico@fluxnic.net, xiang@kernel.org, 
+	chao@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca, jack@suse.com, 
+	konishi.ryusuke@gmail.com, willy@infradead.org, akpm@linux-foundation.org, hare@suse.de, 
+	p.raghav@samsung.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, linux-bcachefs@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+	linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org, yukuai3@huawei.com, 
+	yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH RFC v3 for-6.8/block 07/17] bcachefs: remove dead
+ function bdev_sectors()
+Message-ID: <2pat6ombemqnq5wjl6eb4lbip2pfgg5tkubmbwqphvcvpdc6cu@poiexziaa2q4>
+References: <20231221085712.1766333-1-yukuai1@huaweicloud.com>
+ <20231221085712.1766333-8-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next 1/2] block: fix that blk_time_get_ns() doesn't
- update time after schedule
-Content-Language: en-US
-To: Yu Kuai <yukuai1@huaweicloud.com>, johannes.thumshirn@wdc.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-References: <20240411032349.3051233-1-yukuai1@huaweicloud.com>
- <20240411032349.3051233-2-yukuai1@huaweicloud.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240411032349.3051233-2-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221085712.1766333-8-yukuai1@huaweicloud.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 4/10/24 9:23 PM, Yu Kuai wrote:
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index a16b5abdbbf5..e317d7bc0696 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1195,6 +1195,7 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
->  	if (unlikely(!rq_list_empty(plug->cached_rq)))
->  		blk_mq_free_plug_rqs(plug);
+On Thu, Dec 21, 2023 at 04:57:02PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> bdev_sectors() is not used hence remove it.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+
+Acked-by: Kent Overstreet <kent.overstreet@linux.dev>
+
+> ---
+>  fs/bcachefs/util.h | 5 -----
+>  1 file changed, 5 deletions(-)
+> 
+> diff --git a/fs/bcachefs/util.h b/fs/bcachefs/util.h
+> index 2984b57b2958..22a0acc1704f 100644
+> --- a/fs/bcachefs/util.h
+> +++ b/fs/bcachefs/util.h
+> @@ -516,11 +516,6 @@ static inline unsigned fract_exp_two(unsigned x, unsigned fract_bits)
+>  void bch2_bio_map(struct bio *bio, void *base, size_t);
+>  int bch2_bio_alloc_pages(struct bio *, size_t, gfp_t);
 >  
-> +	plug->cur_ktime = 0;
->  	current->flags &= ~PF_BLOCK_TS;
->  }
-
-We can just use blk_plug_invalidate_ts() here, but not really important.
-I think this one should go into 6.9, and patch 2 should go into 6.10,
-however.
-
--- 
-Jens Axboe
-
+> -static inline sector_t bdev_sectors(struct block_device *bdev)
+> -{
+> -	return bdev->bd_inode->i_size >> 9;
+> -}
+> -
+>  #define closure_bio_submit(bio, cl)					\
+>  do {									\
+>  	closure_get(cl);						\
+> -- 
+> 2.39.2
+> 
