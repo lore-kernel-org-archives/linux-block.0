@@ -1,173 +1,112 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66503E494
-	for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 23:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3518A20;
+	Thu, 11 Apr 2024 00:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712792378; cv=none; b=nR9gcIOu0CowYJCA0sej4W0d/fFEnmi9ppTLfohPixjINmSVLDaDkZBSgCW5cVLa8qioHbcKSPTFuf0SQwao3UVKZPtiHjmEptQruKDdyJb8sDywevHIn3Um0cov17756WEsqayQ/BoDyYDKKB894nPVra2+8yoqhLNrzjkbWnI=
+	t=1712795377; cv=none; b=OjbnGUc+f+vM8EVsYeaBAnMKjESC3k9MprySx3Vlk8IfBrRO7vDiZtCQbTdFQYJ2SpVH9TunYiCWZr0yniy+hyBaUbJxnUX9rJCX6tSa+BPTTe3uVZ5jazTbzn8LBVEalJImyhfnOMvQDI26tx8yqsyjblbqhR0SJ8zdQdFhCBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712792378; c=relaxed/simple;
-	bh=rpYZhj4751iWbkVepEs/ADveztaFsyk2diT8Tk66Dy0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ih4XQSeHbgmAvVryjcb2CYcFKDlG5MIyG/u0TysAsr3fKIji2fNRtmyjq9KADN7TV+83580zr4x6MqXNIGRiJYeneSLOqzOLtFCeSaUM/siOCZDBc81HEbKnjkFIcQFHNT4fp3BewE1z9d5DPeCH8d4Vl61qLKSOzYzMmE+UTAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--saranyamohan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kx8m2IxU; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--saranyamohan.bounces.google.com
+	s=arc-20240116; t=1712795377; c=relaxed/simple;
+	bh=QdsQnt3txY9gDH2lxm3+740bKPbpAPbhqFo4MX60rg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fh07NAQ7bg3Bh/xf23baf5dar/XpKLH/3qjuNI3Eh/1pgnZoQ7tNj16BWiRakWH4O4MXiFYuRJkVHUa/TNyS2yQoupTANqQSfzUyAyy3zzSkzWc4hUt2aTe8A3EsAId+WAr/fcwd8mNqFC6JBp+aC0nRlP3wYXEZwef2EzHgb/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=E1FrgkpT; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kx8m2IxU"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-615110c3472so137947527b3.3
-        for <linux-block@vger.kernel.org>; Wed, 10 Apr 2024 16:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712792376; x=1713397176; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4SMTAjGOOgSyZL6SAfk/454jWeVGNPsPzFKYN6I+I2A=;
-        b=kx8m2IxUksslaQsy0EuQP+yrHMQCYJn/aEUuDYyaZfu2w0pARGuVX8kj/O5NNoMGqN
-         ilAiDIQriwnNEtaK+/zup1xZa3v5T5+Vj0Psntc/Sv7owWQj6Vsoz4+7bpupSIWbd3jD
-         v/EWFyNZpMDM1ay3VHkjm00o+LIljuVK18fCwxzK9PHDzUHokSbJqLA4zXXqVc/qc7v8
-         cKttfTywVHgsKtRtt3hruXUMkF2yBSrlu4Qs3+X3urdGLpJi6yHq5fxZjcExxklMql0d
-         5mR+ATlj5Ds5tx918pOA0tE/vlHG0Of4PWPZPKgFf+RHC9LiB/QlK0QilqrapHXCICki
-         dMzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712792376; x=1713397176;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4SMTAjGOOgSyZL6SAfk/454jWeVGNPsPzFKYN6I+I2A=;
-        b=wA/F2lWFyrfT/3SB77xAHTp7Wq0Of625jl1GvSebSS2nHVHvJKKqB1WHksm0oU9Ef0
-         9DnyeUb9rrwu03L5QsH4RCBaIUGjtVPX379u7mlmA+6rWXnUfcNdQ73K6IGiP+ONaxNz
-         2apR9XC1VyrLefz7A1yEjprijnm8pWSxfHntRIkVsb64KFhClPfyz5Y7lkT6WPDxgT0i
-         clh4t/5ukWtzEdjr2FM1muB9oZNw2GxsUBFXNtP68NMQwexAEJm4sO+3PVK0EswarefE
-         fCl1gmRCM/PEi/aLK3A4woEnjhrW7nbowshJoXxXrPjOA/vJ2zZklJ4V5xfGYGR2urbr
-         mASw==
-X-Forwarded-Encrypted: i=1; AJvYcCXl0o4vo6anUUL9BiIRriaB3BywWxlKykjFEHvYVQ75Zlu4OhHuVZEY7XCL9oIV0PO3Blb6SrWfH6E0Cq2XefWhbBoiPPtJm+exnIc=
-X-Gm-Message-State: AOJu0YxkU4uiH5UeZKJhpKtGSPa6/zVu5p5lr+To4L+vha4snOkXI6L6
-	UEYEJcnJG30v4gea17//22HA5MU4mVWefxhCXR1ep6AUv5YiYxuEfzHFmfzaxgBrbhSLOyna50A
-	8Vk54H17gs8LxwMr9NBlHXrrtHA==
-X-Google-Smtp-Source: AGHT+IEz3DEzce0uPqJwVjrnNB+uWNZ2eHAiKT/SqxfCbrlmeL0MxREerG5nMJtsvzRK08jbC1D4o/ccDyC6C0/RRHM=
-X-Received: from srnym.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2728])
- (user=saranyamohan job=sendgmr) by 2002:a05:6902:20c6:b0:de1:2220:862b with
- SMTP id dj6-20020a05690220c600b00de12220862bmr1000286ybb.12.1712792375931;
- Wed, 10 Apr 2024 16:39:35 -0700 (PDT)
-Date: Wed, 10 Apr 2024 23:39:32 +0000
-In-Reply-To: <tnqg4la2bhbhfbty3aa74uorkfhz76v5sntd3md44lfctjhjb7@7qbx5z2o7hzm>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="E1FrgkpT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
+	bh=OEIc3BFOzXRSk9xarIrXi9oKkK8pwQS/Tvtu7+e+Hyc=; b=E1FrgkpTEZ/tmqWWQoF1YqWZ60
+	poyZ7C2ZyE8mol0NdDa1wrg3P/YePSkGdrYySlPsVUTH81yL4K6Te7hCQEQeiYQK8qIj3UIYw8agA
+	ayvfZ+XayHpqzFEmR/6CIqEgAOCGLl/HSLivl9TAk0FOaBqlcpKaLBJ6+GJYXItLRPuQAX6OFQW/h
+	+QxlwFpdrGDCweYnoNOulSzX0RmvQCJaH/06G7wO+ViF0fp9ZarkXj+HyPYKvMcDVJ09dbmabHyq9
+	jWl38gdjav7aAfRfTZN5KJcHKJo8sEBE/S4E3gg1T0RgasrhZlyY8vwgNKCr3nMIh5f7kE1vt0nei
+	Eg9QFEbA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1ruiJi-00000009fsy-1o2Q;
+	Thu, 11 Apr 2024 00:29:26 +0000
+Date: Wed, 10 Apr 2024 17:29:26 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: John Garry <john.g.garry@oracle.com>,
+	Dan Helmick <dan.helmick@samsung.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
+	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+	io-uring@vger.kernel.org, nilay@linux.ibm.com,
+	ritesh.list@gmail.com, willy@infradead.org,
+	Alan Adamson <alan.adamson@oracle.com>
+Subject: Re: [PATCH v6 10/10] nvme: Atomic write support
+Message-ID: <Zhcu5m8fmwD1W5bG@bombadil.infradead.org>
+References: <20240326133813.3224593-1-john.g.garry@oracle.com>
+ <20240326133813.3224593-11-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <tnqg4la2bhbhfbty3aa74uorkfhz76v5sntd3md44lfctjhjb7@7qbx5z2o7hzm>
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240410233932.256871-1-saranyamohan@google.com>
-Subject: [PATCH] block: Fix BLKRRPART regression
-From: Saranya Muruganandam <saranyamohan@google.com>
-To: shinichiro.kawasaki@wdc.com
-Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, saranyamohan@google.com, stable@vger.kernel.org, 
-	tj@kernel.org, yukuai1@huaweicloud.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240326133813.3224593-11-john.g.garry@oracle.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-The BLKRRPART ioctl used to report errors such as EIO before we changed
-the blkdev_reread_part() logic.
+On Tue, Mar 26, 2024 at 01:38:13PM +0000, John Garry wrote:
+> From: Alan Adamson <alan.adamson@oracle.com>
+> 
+> Add support to set block layer request_queue atomic write limits. The
+> limits will be derived from either the namespace or controller atomic
+> parameters.
+> 
+> NVMe atomic-related parameters are grouped into "normal" and "power-fail"
+> (or PF) class of parameter. For atomic write support, only PF parameters
+> are of interest. The "normal" parameters are concerned with racing reads
+> and writes (which also applies to PF). See NVM Command Set Specification
+> Revision 1.0d section 2.1.4 for reference.
+> 
+> Whether to use per namespace or controller atomic parameters is decided by
+> NSFEAT bit 1 - see Figure 97: Identify – Identify Namespace Data
+> Structure, NVM Command Set.
+> 
+> NVMe namespaces may define an atomic boundary, whereby no atomic guarantees
+> are provided for a write which straddles this per-lba space boundary. The
+> block layer merging policy is such that no merges may occur in which the
+> resultant request would straddle such a boundary.
+> 
+> Unlike SCSI, NVMe specifies no granularity or alignment rules, apart from
+> atomic boundary rule.
 
-Add a flag and capture the errors returned by bdev_disk_changed()
-when the flag is set. Set this flag for the BLKRRPART path when we
-want the errors to be reported when rereading partitions on the disk.
+Larger IU drives a larger alignment *preference*, and it can be multiples
+of the LBA format, it's called Namespace Preferred Write Granularity (NPWG)
+and the NVMe driver already parses it. So say you have a 4k LBA format
+but a 16k NPWG. I suspect this means we'd want atomics writes to align to 16k
+but I can let Dan confirm.
 
-Link: https://lore.kernel.org/all/20240320015134.GA14267@lst.de/
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Tested: Tested by simulating failure to the block device and will
-propose a new test to blktests.
-Fixes: 4601b4b130de ("block: reopen the device in blkdev_reread_part")
-Reported-by: Saranya Muruganandam <saranyamohan@google.com>
-Signed-off-by: Saranya Muruganandam <saranyamohan@google.com>
+> Note on NABSPF:
+> There seems to be some vagueness in the spec as to whether NABSPF applies
+> for NSFEAT bit 1 being unset. Figure 97 does not explicitly mention NABSPF
+> and how it is affected by bit 1. However Figure 4 does tell to check Figure
+> 97 for info about per-namespace parameters, which NABSPF is, so it is
+> implied. However currently nvme_update_disk_info() does check namespace
+> parameter NABO regardless of this bit.
 
-Change-Id: Idf3d97390ed78061556f8468d10d6cab24ae20b1
----
- block/bdev.c           | 29 +++++++++++++++++++----------
- block/ioctl.c          |  3 ++-
- include/linux/blkdev.h |  2 ++
- 3 files changed, 23 insertions(+), 11 deletions(-)
+Yeah that its quirky.
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 7a5f611c3d2e3..cea51dca87531 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -652,6 +652,14 @@ static void blkdev_flush_mapping(struct block_device *bdev)
- 	bdev_write_inode(bdev);
- }
- 
-+static void blkdev_put_whole(struct block_device *bdev)
-+{
-+	if (atomic_dec_and_test(&bdev->bd_openers))
-+		blkdev_flush_mapping(bdev);
-+	if (bdev->bd_disk->fops->release)
-+		bdev->bd_disk->fops->release(bdev->bd_disk);
-+}
-+
- static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode)
- {
- 	struct gendisk *disk = bdev->bd_disk;
-@@ -670,20 +678,21 @@ static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode)
- 
- 	if (!atomic_read(&bdev->bd_openers))
- 		set_init_blocksize(bdev);
--	if (test_bit(GD_NEED_PART_SCAN, &disk->state))
--		bdev_disk_changed(disk, false);
- 	atomic_inc(&bdev->bd_openers);
-+	if (test_bit(GD_NEED_PART_SCAN, &disk->state)) {
-+		/*
-+		 * Only return scanning errors if we are called from contexts
-+		 * that explicitly want them, e.g. the BLKRRPART ioctl.
-+		 */
-+		ret = bdev_disk_changed(disk, false);
-+		if (ret && (mode & BLK_OPEN_STRICT_SCAN)) {
-+			blkdev_put_whole(bdev);
-+			return ret;
-+		}
-+	}
- 	return 0;
- }
- 
--static void blkdev_put_whole(struct block_device *bdev)
--{
--	if (atomic_dec_and_test(&bdev->bd_openers))
--		blkdev_flush_mapping(bdev);
--	if (bdev->bd_disk->fops->release)
--		bdev->bd_disk->fops->release(bdev->bd_disk);
--}
--
- static int blkdev_get_part(struct block_device *part, blk_mode_t mode)
- {
- 	struct gendisk *disk = part->bd_disk;
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 0c76137adcaaa..128f503828cee 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -562,7 +562,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
- 			return -EACCES;
- 		if (bdev_is_partition(bdev))
- 			return -EINVAL;
--		return disk_scan_partitions(bdev->bd_disk, mode);
-+		return disk_scan_partitions(bdev->bd_disk,
-+				mode | BLK_OPEN_STRICT_SCAN);
- 	case BLKTRACESTART:
- 	case BLKTRACESTOP:
- 	case BLKTRACETEARDOWN:
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c3e8f7cf96be9..d16320852c4ba 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -128,6 +128,8 @@ typedef unsigned int __bitwise blk_mode_t;
- #define BLK_OPEN_WRITE_IOCTL	((__force blk_mode_t)(1 << 4))
- /* open is exclusive wrt all other BLK_OPEN_WRITE opens to the device */
- #define BLK_OPEN_RESTRICT_WRITES	((__force blk_mode_t)(1 << 5))
-+/* return partition scanning errors */
-+#define BLK_OPEN_STRICT_SCAN	((__force blk_mode_t)(1 << 6))
- 
- struct gendisk {
- 	/*
--- 
-2.44.0.683.g7961c838ac-goog
+Also today we set the physical block size to min(npwg, atomic) and that
+means for a today's average 4k IU drive if they get 16k atomic the
+physical block size would still be 4k. As the physical block size in
+practice can also lift the sector size filesystems used it would seem
+odd only a larger npwg could lift it. So we may want to revisit this
+eventually, specially if we have an API to do atomics properly across the
+block layer.
 
+  Luis
