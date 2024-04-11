@@ -1,57 +1,57 @@
 Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABE0147C7C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EED1482FC
 	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 11:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712834026; cv=none; b=d+2mvPrp2YfsGcHfvmY6rJr1aSoP50qtafE30vHCgSdI8MrGphoNGWNeGLXKecI3QKgb6fiBprIy6xTo8zmHLdzA9Tt5KokY6f0q+rXnrhFlUfNJYaBDNa63EdypK07gtNgV+lrTbqvcvq2xLKgc4ktaViP9CjKIFe6mpKG0Yz8=
+	t=1712834026; cv=none; b=ZhAicZ6pRdcVqE0JiLfenS0WU8Eo15XLBdwlEI68LC1jf2Pf6rrIax+sichRb/Kgz6pxcu6ewo4HkAbMbQv+5TSfkynGUDUhBhSN25qzYMzLcM2DhotlmllaBdIWCTsLoYvwCuMjA/vHeRGqrC/rjZaM+EuNK5daDoXdtHuEMD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712834026; c=relaxed/simple;
-	bh=SBK3Pk2xC4hSF2vaKeplEtIivVa/MUAt4a7KOe5+oVQ=;
+	bh=oT1EVAZJnb4NrCk2dPNj7oAwzDeLFZ2N2iueMe6JpfU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lNe/5PNlHDKYd9Huc+pzWyREDvQxYakuvD3DHGUu4ItWs+We5c/qCylJx6zb1e29uHiAPvk6Mem4GhQGgPOoNH1jUW4vTHzNSOsL0WvoqUvH5A7A3cVPMVabxpAvxfIEOIQXwyLTJVzl9SRiEhwz6BwD8B9Su4T7r7p8vJ2OhF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Da1TGGrm; arc=none smtp.client-ip=216.71.153.141
+	 MIME-Version; b=F/AHtQjEg5UhulZTyYVgOZv35vl8zKyglruQa/XbfRZoGRX9WLfXNzyiffXrH+KuETj0hzbddl6tR5SrVlCvgMDBIg5opR7BZ2qWL6oBcLD2sZP4ghOlNDPXrktBt+bC329SB31Y2h0S+HTEzvnNCXoGiHj0DhH20YZYhxpLPso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=no2tfkh+; arc=none smtp.client-ip=216.71.153.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Da1TGGrm"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="no2tfkh+"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1712834024; x=1744370024;
+  t=1712834025; x=1744370025;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SBK3Pk2xC4hSF2vaKeplEtIivVa/MUAt4a7KOe5+oVQ=;
-  b=Da1TGGrmGryp/PWDz4zvMxlUnH0t+VVwt74YlkjlzlYgCNucYeDfaubw
-   SOxjarMuPyq7xuaIgLzsQd1czXYJvac/AeSOp1IfqH62vHjor1udv/2IC
-   7vNoGGkJpuItsdJAgoaTtQnf318mJGnOnjiwZ8Ca8++Tqb/iCzarwuIqh
-   uNgOamLyu2Ze4IDa+lZjYrW+pX1rdVBlQS+e7k+/RGqUS0OLG51MbwcJC
-   XxT9XfBst7Ytrdl446vXlau3UtY4DPqaU39KfAsIVRxtLfepg2BAOqyYB
-   iiL/TwiDZNRw0gKvlOtfNeDCL8xtN/ZU8qUAuAzLwh633wFhZ+DH7Y/gF
+  bh=oT1EVAZJnb4NrCk2dPNj7oAwzDeLFZ2N2iueMe6JpfU=;
+  b=no2tfkh+nsRqL+FHpJ8uT685MOUiAsauAK31aK1QyDit01TqpuJzAMSf
+   s+TSJJHSvmsHADXw0YWylnJxm7cfzzF3BbAyrOW1DksYtVtPQFFtVGopJ
+   0DSDsTiV8kzR8LAuZjBekoHnkjPKaVpCaG02UjFo6stiWVREFxjls51jI
+   2YUjLRPiBNsE1CF0aQjpwiI5vJfbunS2NTQFWy5Cvbix3bGJJ8IRBXSwi
+   7YkmaoMnLiApb/+jKDH1VBymk0EZuNK16iD02xQwmIz/zSe3hgm4p/E1U
+   Hd9mjj7E7RQXtmGlVbdOdRVbAonoCAHOO1NqukoYdFHIo3YJNoE+0wV4J
    g==;
-X-CSE-ConnectionGUID: n59+ax8EQeeFlyTk51s6Ug==
-X-CSE-MsgGUID: 67mIgJnJSYCTWBV8uSVRHg==
+X-CSE-ConnectionGUID: dNZFlUAzTmSENsKzmBHcIg==
+X-CSE-MsgGUID: iqQwt1LCSzS3o7CQFZF5Yw==
 X-IronPort-AV: E=Sophos;i="6.07,193,1708358400"; 
-   d="scan'208";a="13579865"
+   d="scan'208";a="13579870"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Apr 2024 19:12:33 +0800
-IronPort-SDR: AX7UjpdTkNmQoN8wOdgBE8FN90ZnFL/VT89caP0xA+2F4DhpwCjwFEiXEBh3bCgJhRr4TNdCH3
- xDbY8clROe0A==
+  by ob1.hgst.iphmx.com with ESMTP; 11 Apr 2024 19:12:34 +0800
+IronPort-SDR: 9K4JZO6pbny1897oS3wCYakhect97Zvr2hXYWmlShVfYTv7EpI8+E9Ja2M199J0I91vL8FvdjX
+ fnwwNEE7htcA==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Apr 2024 03:15:19 -0700
-IronPort-SDR: 1zk0oZJf3QWQAPE0yL/TvZMIPs5Y9ahKHOaEJP6SM6VRM7P5RJTo8NRwuMTGAahkL5jUDcRXhX
- SE94E2prLikg==
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Apr 2024 03:15:20 -0700
+IronPort-SDR: bGUrxeWPs8AWgdiANTGQ3QrQgvAC6b12cva/q/4Cv2N4RHhLlS26xLEn1TIk2m1QF3fVQInAjQ
+ JsK/kzVItxKg==
 WDCIronportException: Internal
 Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Apr 2024 04:12:33 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 11 Apr 2024 04:12:34 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: linux-nvme@lists.infradead.org,
 	Daniel Wagner <dwagern@suse.de>,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH blktests 04/11] meta/{016,017}: add test cases to check repeated test case runs
-Date: Thu, 11 Apr 2024 20:12:21 +0900
-Message-ID: <20240411111228.2290407-5-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 05/11] nvme/rc: introduce NVMET_TR_TYPES
+Date: Thu, 11 Apr 2024 20:12:22 +0900
+Message-ID: <20240411111228.2290407-6-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240411111228.2290407-1-shinichiro.kawasaki@wdc.com>
 References: <20240411111228.2290407-1-shinichiro.kawasaki@wdc.com>
@@ -63,107 +63,93 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add test cases to confirm the feature to repeat test case runs with
-different conditions is working.
+Some of the test cases in nvme test group can be run under various nvme
+target transport types. The configuration parameter nvme_trtype
+specifies the transport to use. But this configuration method has two
+drawbacks. Firstly, the blktests check script needs to be invoked
+multiple times to cover multiple transport types. Secondly, the test
+cases irrelevant to the transport types are executed exactly same
+conditions in the multiple blktests runs.
+
+To avoid the drawbacks, introduce new configuration parameter
+NVMET_TR_TYPES. This is an array, and multiple transport types can
+be set like:
+
+    NVMET_TR_TYPES=(loop tcp)
+
+Also introduce _nvmet_set_nvme_trtype() which can be called from the
+set_conditions() hook of the transport type dependent test cases.
+Blktests will repeat the test case as many as the number of elements in
+NVMET_TR_TYPES, and set nvme_trtype for each test case run.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/meta/016     | 29 +++++++++++++++++++++++++++++
- tests/meta/016.out |  2 ++
- tests/meta/017     | 29 +++++++++++++++++++++++++++++
- tests/meta/017.out |  2 ++
- 4 files changed, 62 insertions(+)
- create mode 100755 tests/meta/016
- create mode 100644 tests/meta/016.out
- create mode 100755 tests/meta/017
- create mode 100644 tests/meta/017.out
+ Documentation/running-tests.md |  6 +++++-
+ tests/nvme/rc                  | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 34 insertions(+), 2 deletions(-)
 
-diff --git a/tests/meta/016 b/tests/meta/016
-new file mode 100755
-index 0000000..caf876d
---- /dev/null
-+++ b/tests/meta/016
-@@ -0,0 +1,29 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Western Digital Corporation or its affiliates.
-+#
-+# Test repeated test() run with set_conditions()
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index ae80860..ede3a81 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -102,8 +102,12 @@ RUN_ZONED_TESTS=1
+ 
+ The NVMe tests can be additionally parameterized via environment variables.
+ 
++- NVMET_TR_TYPES (array)
++  Set up NVME target backends with the specified transport.
++  Valid elements are 'loop', 'tcp', 'rdma' and 'fc'. Default value is '(loop)'.
+ - nvme_trtype: 'loop' (default), 'tcp', 'rdma' and 'fc'
+-  Run the tests with the given transport.
++  Run the tests with the given transport. This parameter is still usable but
++  replaced with NVMET_TR_TYPES. Use NVMET_TR_TYPES instead.
+ - nvme_img_size: '1G' (default)
+   Run the tests with given image size in bytes. 'm', 'M', 'g'
+ 	and 'G' postfix are supported.
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 1f5ff44..df6bf77 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -18,10 +18,38 @@ def_hostid="0f01fb42-9f7f-4856-b0b3-51e60b8de349"
+ def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
+ export def_subsysnqn="blktests-subsystem-1"
+ export def_subsys_uuid="91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+-nvme_trtype=${nvme_trtype:-"loop"}
+ nvme_img_size=${nvme_img_size:-"1G"}
+ nvme_num_iter=${nvme_num_iter:-"1000"}
+ 
++# Check consistency of NVMET_TR_TYPES and nvme_trtype configurations.
++# If neither is configured, set the default value.
++first_call=${first_call:-1}
++if ((first_call)); then
++	if [[ -n $nvme_trtype ]]; then
++		if [[ -n $NVMET_TR_TYPES ]]; then
++			echo "Both nvme_trtype and NVMET_TR_TYPES are specified"
++			exit 1
++		fi
++		NVMET_TR_TYPES=("$nvme_trtype")
++	elif [[ -z ${NVMET_TR_TYPES[*]} ]]; then
++		nvme_trtype="loop"
++		NVMET_TR_TYPES=("$nvme_trtype")
++	fi
++	first_call=0
++fi
 +
-+. tests/meta/rc
-+
-+DESCRIPTION="repeat test()"
-+
-+declare cond_set_index
-+
-+set_conditions() {
++_set_nvme_trtype() {
 +	local index=$1
 +
 +	if [[ -z $index ]]; then
-+		echo 2
++		echo ${#NVMET_TR_TYPES[@]}
 +		return
 +	fi
 +
-+	cond_set_index=$index
-+	COND_DESC="condition set $index"
++	nvme_trtype=${NVMET_TR_TYPES[index]}
++	COND_DESC="nvmet tr=${nvme_trtype}"
 +}
 +
-+test() {
-+	echo "Running ${TEST_NAME}"
-+	echo "condition set $cond_set_index" >> "$FULL"
-+	echo "Test complete"
-+}
-diff --git a/tests/meta/016.out b/tests/meta/016.out
-new file mode 100644
-index 0000000..cccfec4
---- /dev/null
-+++ b/tests/meta/016.out
-@@ -0,0 +1,2 @@
-+Running meta/016
-+Test complete
-diff --git a/tests/meta/017 b/tests/meta/017
-new file mode 100755
-index 0000000..03f92d6
---- /dev/null
-+++ b/tests/meta/017
-@@ -0,0 +1,29 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Western Digital Corporation or its affiliates.
-+#
-+# Test repeated test_device() run with set_conditions()
-+
-+. tests/meta/rc
-+
-+DESCRIPTION="repeat test_device()"
-+
-+declare cond_set_index
-+
-+set_conditions() {
-+	local index=$1
-+
-+	if [[ -z $index ]]; then
-+		echo 2
-+		return
-+	fi
-+
-+	cond_set_index=$index
-+	COND_DESC="condition set $index"
-+}
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+	echo "condition set $cond_set_index" >> "$FULL"
-+	echo "Test complete"
-+}
-diff --git a/tests/meta/017.out b/tests/meta/017.out
-new file mode 100644
-index 0000000..7fc55ff
---- /dev/null
-+++ b/tests/meta/017.out
-@@ -0,0 +1,2 @@
-+Running meta/017
-+Test complete
+ # TMPDIR can not be referred out of test() or test_device() context. Instead of
+ # global variable def_flie_path, use this getter function.
+ _nvme_def_file_path() {
 -- 
 2.44.0
 
