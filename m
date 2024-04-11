@@ -1,236 +1,199 @@
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D1C13C824
-	for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 07:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712821773; cv=none; b=AYmp3Rixuf5FylGTiJ6Kybf4mz6flWK0D0youPWhJPokYto64Z5wZVzMrbb4Qx8ycusP/+cSF8Plv2u/eFaKcLsPcohaAX4R59fzZZdZlBmpPa+Dp7gam1aJY9yqQIFYcxV8PwSu9e7Afex27EOVkXShoW3WJgbRAdrmMFqPsXU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712821773; c=relaxed/simple;
-	bh=uKfasO+V1YcKfip/nXPiQAGSPvWsitLuqDYKoaHdZSA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bLe1sC4OwEH9EIDnAggP7uygvgxNZVHg+whvbx/z5jUi9MZEfPFQwkmRNO6Q2DfiHrQQZ77TQe0AyYETXqUr8lUOhnjcIvwykwjzMk8rrn+l00TE58GNHEhg5vjqfppI5BsnbIHMzs05sTQYATL7NWnfW+jGsa7iS5SHAt2V2OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iGQU4Uio; arc=none smtp.client-ip=209.85.221.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1047C664DD;
+	Thu, 11 Apr 2024 08:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712822823; cv=fail; b=OWhOl82IzjNO8aO7UzAKmEItlUMk6D9rIQkdTnl4Snips3sLQHh1h8RT0/xxoINNkKIEkvSTt0vx06sktXkX6+WqA//JwYhKT6QXKdE+MrVZ/rgmvnPLBZfRAnexJhHvzf5NddNdAAUZ6cl4L04PE52cPifV6xbdDEUqOMjh/fs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712822823; c=relaxed/simple;
+	bh=LZZ9PfwBFY7w/QvSQsKrHpH+bj89pqYkTqy1Xogn+ok=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hx3xUpC4c3x+1ypXVo+jtugztMGYaqUl3d1gWMH22pS6UHiRRbib/sR5CPivjiRQrxkD4eXMUZoBJaSPr3xMFb94ij9BavOi44Z1xszzJac0zjw3NrMHf4FKA7ME3NHSi85Q66NZhdzw6p17vFh6YySO7VjXTcWTPkUZfmD5RTg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=XmROqLru; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=srElMAH9; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iGQU4Uio"
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4dac4791267so1595801e0c.1
-        for <linux-block@vger.kernel.org>; Thu, 11 Apr 2024 00:49:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XmROqLru";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="srElMAH9"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43B70SDY008867;
+	Thu, 11 Apr 2024 08:06:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=vcXcA4ffpHZ/rqS6D2KgwABq1LjKHmq4RdQIs/RJ244=;
+ b=XmROqLrub8kqzFDNd8aSrk+2ISPJmF4FrOn5XqRVM7CG0wVNW4+ZU7WuVJi7j3CTWnXg
+ WoszkLzipczEn5OZEy7p4baaArQV9fFJ2JQ6oB/oCdAE5RYmMPnuCZ82ygyEt2jfGK4P
+ rmtDS4TdblT+rPbkBJE6iwoSDOvQxbgx27R0OwCMVKFaDW7UrCuWxAjJna8iAY8lG4kd
+ Vm04T2Qs/YQJ2Z3D25XKJSd6SR0RXhoAKIMZ5HxwbVDgYSABIkTwYKFhTlrCQVwRbIfJ
+ SmuDraqKJu8wYxsPXtoRVhE+weTP6S2SQ8HBuTjC92WBSoWiTzm3vIllqR3EQ0dP6SkK gA== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xaxxvh28a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Apr 2024 08:06:33 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43B6L4Di010514;
+	Thu, 11 Apr 2024 08:06:32 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xavu97m0u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Apr 2024 08:06:32 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ebOXx6KybQt5GsCwL03jKz64CqacfCMUV9vnVyuxFv3Zu2gn0N7QKSyz+cNOoMhSZRqf70p3bfIHEafwEFRHJecNGIdFFLJN2Dw1mdV9a8vc2zQCYNenbGTP2kKJ/ChAOLml9WfF06ve1lW8it6IoYISxR63+Muw87LoKWyhQqNaIHZRseg9nLHkkLAP2CcbOJPjLw9wq2CnZF+L5hpoqmnQAZept7n0f2IP/pXjaOgTABeMTpeij+h538Xkmn9nzyTJSPe4nWAp0f39gXvuCrm1/Ns+qvw5a5xdfQc35c8wCuq5d9S6ov6H12zEbbWzuAwneVFfxoVufPD9xr9T9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vcXcA4ffpHZ/rqS6D2KgwABq1LjKHmq4RdQIs/RJ244=;
+ b=Kyin0E5ShkfQqliwNTjUUfWfOke2KbaozhOJUwj7hq5RUe14WJNNnVGPTgy45bWLXd5HTNEl4LLXCSewML3+JShJj71x+ykqL7jU3+BDqF3yXNyVRPHZJhuRKpjWqXcd3AwYBhibfI41aLuGSZn1HoI8lxQfttxfOE1d7zhMq6BNWQokr0nCPSGyFCCnjh6sjAEoNLlwefO/MD/oN9lifIKtw5pBT3XLCQHFz26EpNcvtkB1Ki48zJztUjl+mQb7hOeAHpPe8bMj7HZi5Nexzo91KhDLenEhXCwXj5LqfO/R20h9FWIc3NBwL0JuB9HghHmVVwbmVGG6OezG37nyyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712821771; x=1713426571; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NgOGhyO6cgIV85Qu6uWJE0ADxev/ScH0tSyhkHUdhk0=;
-        b=iGQU4UioLykVrJCQmascJbSfUFxfamV+qFl3tdAx/vpa8rpcCnBR3aT8D04zBxCpfn
-         xLj0wIEmLgSVB5P/Vf32+YlnmDPzgzkaoKdyHOGRlGRhkEXJgqyzz8esBD/5xu07fEIu
-         827yQxG0i6n6++CZ/FfepcCCB3UWaLzFVYSUQsTTVpsnnEOSw7E8Sd7JMwDEZ5juZ2Ex
-         URrHvEb+V45Yp0iMwQF5ATv5YH/1sMIJKz0Xs6O8ZDfcLgKFZU+5nuy8BPLerp0MtUeT
-         RHUZjUvLa9dBmGWgEnRoctaVDdftZlf0y0a3gUUGGlaXc2QaauqkBNdUbc/jXBiNfW7x
-         qMhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712821771; x=1713426571;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NgOGhyO6cgIV85Qu6uWJE0ADxev/ScH0tSyhkHUdhk0=;
-        b=UShW0v3Mcty3ypd8mwgADD6uJY6aeoYVjY9PcwIT+dTeBW/7j2muM3zvEA+ibyNxQG
-         GFJjEwiK5bVzBJmQXoBW+UlhP4UAi1TjkJce41rTUVs1IIyz0+tMZLskabFJedaUg2T4
-         WE1GGrgUyUtNEfnubXMETJUcgbfnSYkU92MGwxlrNJ8HJvFjplVyCHImcxQaWJ9LnqTi
-         Hcp2WmScB7xPzmQa/y2Xsca6oVg4XJXPXGd/YvlWouuqI0NzOCAuCJRsb2bALj1QpdW7
-         l3doPIgfX6mmQ5g5EkpiRzpNL8lMyfbLaq8XQX7eGrIUeKMreplrQkSUtYWDfq+W9YR+
-         ffcw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIatgoOFjBjEVx/ssiUclk3Wk/iFfqJ7AcqxTMZysWRyzxWfU2zRjthUsKyUmXOxtWnEb/Oi8aM2km9B8OeR/kjnehrBgB8nY80RM=
-X-Gm-Message-State: AOJu0YxYpGnGmIvAIEe2btHu6HJMt/SFe2+tVFnzBxdBjJzOw7p+tBfZ
-	yWQ1PQ0i8QiGq5dNnU0vwyurWyoVdaiWdDIzODLeMGn/r938TPVumRV4tnGjkeoxA51LFFPy+Au
-	u3kmHNOuNwmtq6V/8GW5BisflREM=
-X-Google-Smtp-Source: AGHT+IEKHwMSh8DfsEiYJBygkbD+8y9BaD1im3rQpj/+3WpWg7RIrW2kftpH+XVf7bzByVZ/h087DAyPy7j43kwVKlM=
-X-Received: by 2002:ac5:c216:0:b0:4d4:1fe2:c398 with SMTP id
- m22-20020ac5c216000000b004d41fe2c398mr4493920vkk.2.1712821770948; Thu, 11 Apr
- 2024 00:49:30 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vcXcA4ffpHZ/rqS6D2KgwABq1LjKHmq4RdQIs/RJ244=;
+ b=srElMAH969J0MWU/HCgKL/6c6FHEW/Sq5vmacWf4VLJVF9/OF3sEwRdk/nNzpJMhpiPBpvKYteb4jzWQrJGzB6swzh7MuHw5KZh9U8bBs7TAc+cnJo85KYVW5ETUnSzE8XR0g7pHs55BfKDINsahgAz7+rQmZUgnyEMaM9n25vE=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by PH0PR10MB5756.namprd10.prod.outlook.com (2603:10b6:510:146::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 11 Apr
+ 2024 08:06:29 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::ae68:7d51:133f:324]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::ae68:7d51:133f:324%4]) with mapi id 15.20.7409.042; Thu, 11 Apr 2024
+ 08:06:29 +0000
+Message-ID: <849639fa-e672-40ed-ad5a-fd1f72f4180c@oracle.com>
+Date: Thu, 11 Apr 2024 09:06:23 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 02/10] block: Call blkdev_dio_unaligned() from
+ blkdev_direct_IO()
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
+        viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+        jack@suse.cz, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+        linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com, linux-aio@kvack.org,
+        linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org,
+        nilay@linux.ibm.com, ritesh.list@gmail.com, willy@infradead.org
+References: <20240326133813.3224593-1-john.g.garry@oracle.com>
+ <20240326133813.3224593-3-john.g.garry@oracle.com>
+ <ZhcYddRtAoMghtvr@bombadil.infradead.org>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <ZhcYddRtAoMghtvr@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0466.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1aa::21) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327214816.31191-1-21cnbao@gmail.com> <20240327214816.31191-3-21cnbao@gmail.com>
- <20240411014237.GB8743@google.com> <CAGsJ_4yKjfr1kgFKufM68yJoTysgT_gri4Dbg-aghj70F0Zf0Q@mail.gmail.com>
- <20240411041429.GC8743@google.com>
-In-Reply-To: <20240411041429.GC8743@google.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Thu, 11 Apr 2024 19:49:19 +1200
-Message-ID: <CAGsJ_4wdBtoBUbwmDs+FnPvinG-PtKKY7SzOinr_6DzrZ22_0A@mail.gmail.com>
-Subject: Re: [PATCH RFC 2/2] zram: support compression at the granularity of multi-pages
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: akpm@linux-foundation.org, minchan@kernel.org, linux-block@vger.kernel.org, 
-	axboe@kernel.dk, linux-mm@kvack.org, terrelln@fb.com, chrisl@kernel.org, 
-	david@redhat.com, kasong@tencent.com, yuzhao@google.com, 
-	yosryahmed@google.com, nphamcs@gmail.com, willy@infradead.org, 
-	hannes@cmpxchg.org, ying.huang@intel.com, surenb@google.com, 
-	wajdi.k.feghali@intel.com, kanchana.p.sridhar@intel.com, corbet@lwn.net, 
-	zhouchengming@bytedance.com, Tangquan Zheng <zhengtangquan@oppo.com>, 
-	Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|PH0PR10MB5756:EE_
+X-MS-Office365-Filtering-Correlation-Id: a586c645-4486-4a6a-a177-08dc59fe4ae0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	0agl5rq83Z7WafSRCVusBu+Y/DuJQeKydTdcUpgl+Kfqj3lJTJJA96eshKh8thj4PAj9I7rspABB7nKSAiF7DOfErrGFP+kvvBro2KJ+IPFJstJ1IRQdkdLYtl+ckS0emFPxPAuIzSyRYkxSUtXMeyFCC1i16Myws85HE7ciyA4xVaVJb1EaJsY7LAEYh/TvMwlr1QDBrqigdVWB/hdAcW98I2rgW/JYtcR2n6Ku32eZYylLJMt9e53+2b5bBygUVYElFYL+l66R3gtMbPXd099ITcLJaJBkGQUiFP/9nM0WKpOP0JLwOBxXFMTL6iMMdDR76eV85tFlCzz8H9YwnT527F7ziPfOhZQSJHdhRNf1sM1YJW5N0BnOIBDHaQ32/P+nWGHVxgdlMNzy1gZC+JuaRJvubQocRw3xBYcNX+8k48wqbrRHjuXekRC4D0eugw5HJLVjdWLiefp8CwK6buI3VCaG6XkEHY4S5NLmnoTd/zv6AK7/YvsMIG+w01HdWigNOSd8O+Mtv6Wwtg8DMb8NO5APwrzAuAlnMBXlcXmQBDqt9n+srAxfnjg07oqICJL/O4yIBzb44wq2MFXlJ4hu9WMHkqyFaUEdQt0JTtP2vXRsgVzKhM4ul65Dlvbl58ydWRR41MpgUwxrNdMynZDQiYanXt7zAIRy2JIUPS4=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?c29Ebk5aM3BLQ0RySXI5QmN2bDcrLy94MHRoaVlLSlNSTmord2l3MUc0T1Ey?=
+ =?utf-8?B?QmxUS1VjNitGMnJqUGN4SFJVQThybSs1aEl4QTA4TzNIT2ZaRTdIemhYRE44?=
+ =?utf-8?B?eGV0NWtPUU9aUERXN01OTG0rMkFCanJNbHQ2SHA0eWwxUm1IS2xEcXdxZzJx?=
+ =?utf-8?B?UDJPQWJMRHgxbzgyOGRrdks4b3RaTXZEZmt6QTZqQmlUSmRKS2hpeUFvTGEw?=
+ =?utf-8?B?b3FHNGJBU0pNNHgyaW9RYXE2VzJxNmJCN3B0dHJjeWJ3bGR2dnlzcXpNMVRj?=
+ =?utf-8?B?b2EyYkJDYXJnMUxCV2lKaFFOSUdrNmNRc1gzMmdnenp5a25wT243b21pS1pS?=
+ =?utf-8?B?UFhONGVieDQrMENDTjNlZk1kSExQMmpVbXB2MjlQZlM1MTQ4UUlYeFljUmJS?=
+ =?utf-8?B?NWpKQW44NnAyVkhrYVZneENBQmFaSjB2a1pTWVBPVHF6bjdHdHdDQjhTVkI3?=
+ =?utf-8?B?bkhZZFRDVEU3Vk5pdG9QMzVCMXI5OCswRWhTbHNBYjZsWDE1OTd2bUtFMlhL?=
+ =?utf-8?B?TDVBT0o0b2pSbTh0eEpMeHNLSFo1M0EvcEEwSitJam1VUzcrVVQ4b2pCL1FD?=
+ =?utf-8?B?TGd6RWEwOGswU1BsRnVFTFZtWnlkNmh4UHFFczFoVS9WcG54OUYxTGd5c09I?=
+ =?utf-8?B?M0tSSjE2TVg1U3psU3hlQTBKbmJPUjQyTGp0OWdYTmJQY3RPcEp0R1g4dERh?=
+ =?utf-8?B?RWE2Q2UwVmljZmtjRUhyS1RZMFNnNlM1ODdyV052RkRuSm1zN3BKSUdXalZm?=
+ =?utf-8?B?US9vT1c2QzlzNUo0d0o1Nzl1d2xDVmJXeUlieGRUZnZCbzNXWml6bHFBYkJh?=
+ =?utf-8?B?TFRaZ2ZUUEFMRTc1dEdBV1lJWVhBM1hWU1RLZzMrMUxjNzhNS05sSEVUR1Vm?=
+ =?utf-8?B?UldNNlp0SllRdkswTFBJbHRZQWlWL3dxWkU2RDBIK0J3N083QXBGUE9DNW93?=
+ =?utf-8?B?dGwvbThZMU5BVkExSDIrdUdEZVZPWFltL1ZNQ1NVQWsxbUNyZS85cEFTMDB3?=
+ =?utf-8?B?SHFZTWVOSWpBMmJPa2ZZZG52aFkwWlU5cFVLR09OUnpadXhkcjdYQlRudHhF?=
+ =?utf-8?B?UlJlSHFPNGtSYnUrRWhnOHVxM3VFNUhqeHBualFFRlhXaktMRnVjTit5SXBO?=
+ =?utf-8?B?S1lMQlBLRVE0dmlSNVJaUHhnYVZhbXpaTnVob0tWUjBBUVhvN2ZYOFVscUxh?=
+ =?utf-8?B?QTlnU09pNFd3SC90MlFHWkhSSFQ5Q0VqK1N1R2ppcnBkRFFqQVlOVHFIYWpm?=
+ =?utf-8?B?alNhTTdRdG02ZWtKOEs1R3NiMjZwWnpvOW5PZDRBckJ0M2FKUUh5UzVBZ2Zi?=
+ =?utf-8?B?UUFZVVV1OTRlNkVQYmsyUVlwQldZa3B1RWYzS0NXY3RLdG5mbERGMVBPREgw?=
+ =?utf-8?B?c1FVTVVXYm1LK0VrRHA0TzBBd0JsTG9ORmhjNWk5YmNLVU93VXNkL3kyN0dF?=
+ =?utf-8?B?QzgxRnBvUEhlYy82cm0xckRNR1BvZDRLQW9HRjRsSlh2WU15enB1amprb3JJ?=
+ =?utf-8?B?QUtKWGlBOTl0R1gvQm9yeVFDaDJnRlhyK3lIRktRdklvekNJRE5Ic2JZSW9Y?=
+ =?utf-8?B?dlpuSEc1QVRjY09KYWNvQ29qU0NTdjRLMzFOMFpEeVZDcEhmOEhvVXBINmov?=
+ =?utf-8?B?ZHZVNFdsVHQ0cEhWMHByOUFDbkNPWSttNHEyaW1sa1lrVlRGeHdOUUl5WTc5?=
+ =?utf-8?B?YnM3SWZVMys2N0U3VTEzKzV6UFlMNVY4cDRWVEVCRE5mWHBnVVRLbXBzd2tk?=
+ =?utf-8?B?cVdwaG9kMjdWUlpFSlYrQjJrTEdILzR6ZFpUYnIrM2hTR0hWVHp3OFdLZk5y?=
+ =?utf-8?B?WkZFUGVDVWVmV2dYZXNnWk1hdFprSndiZnhmZ21mdHN4ZzRlejJLMXV0bkM0?=
+ =?utf-8?B?ZTJoeTN0ZHN4UXRGejB3U1FHbjZOOTdQN3RVb3pEQnVXVlVUbTdkTFIzNExu?=
+ =?utf-8?B?UXpmYnM3bGxpVFlTbEFmUFpxL1orTGFFS3BQNTJCcldpdnoxeDZLSVZ2R3hQ?=
+ =?utf-8?B?a29tRllxUGk2N0ROMHhqUWdpZzVOdnE1ckJvb2hrbFBibGZMTGZTTVJ0QllR?=
+ =?utf-8?B?Tnl0cW5oeUN5RitaK3ZkazJRNlliSk9UekphVzhlMUtnSlJoU2xGWGI3Y3h6?=
+ =?utf-8?Q?0vBIkH34GWI6yIM0mqu+cK1cc?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	6UIn6XtXbwyHzzWqPqhGBeKJvXTA8pYPBbFzO5573QYShIzOjeXKZ/UmrY3rnMUzNYOVd3zJnlL/d/xU0dewgl99BdZsj/0KQiXqEns+l1eY8ijvU63yV78CR65HntgGzsu7s+IMzBPt6tr573li2Qp4su7tt6DyVxvfdQCrkK4hwaDKhrb+4R/ldUEyJnuOxPF/He7yd2F+0i4thnMjqSKaLJQWTAOeh9oZv2ExzKwnEfHz8cKJaC4tkfGQmqdPQQAVdTkeV7ZFaaXsP2Q5DvzdFsFexiqNwUdhct43coPju4hI8AV+vBtuJrQJO516ZwpCO7g3I3R4v9hQwPZYS5NSfowd1sNp2FpcjwwIAorzz4V9uYsT2SzvvfzXLjvdBBv/l/Z5s1Jp4Z21UPaBkCXxxM0LlPXYSlHbvdWPYJhdbHQ4qXGGXoEyqX9L/ms06A18NL+7j3TT7Lzxu2mmW+M+7zqE4X972cSedy980SpzXvYREii7xCyKSMmcfwjpEuwYiAcR6p8hGkKVlSaI7EUg1lyJ69YyUN1+NeaojOF8yVg93IPNYpeFnnLz/wY0E+Etg07a/6cRqY23jOcEF1004hYFyk54RFi+LLumcaI=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a586c645-4486-4a6a-a177-08dc59fe4ae0
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2024 08:06:29.4775
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: W1gdXHF/ihkxwiTxK/DP8AcXfof4brM2e6uvmKExRmlOtRMdOl2PCmCd5o4W6SaGffXudUJbpyDQ/CnBikVLAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5756
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-11_02,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ suspectscore=0 spamscore=0 mlxscore=0 bulkscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404110057
+X-Proofpoint-ORIG-GUID: VPpjFEQ4ZS4Wu9jAR2OgBzJNy7UBd7qK
+X-Proofpoint-GUID: VPpjFEQ4ZS4Wu9jAR2OgBzJNy7UBd7qK
 
-On Thu, Apr 11, 2024 at 4:14=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (24/04/11 14:03), Barry Song wrote:
-> > > [..]
-> > >
-> > > > +static int zram_bvec_write_multi_pages_partial(struct zram *zram, =
-struct bio_vec *bvec,
-> > > > +                                u32 index, int offset, struct bio =
-*bio)
-> > > > +{
-> > > > +     struct page *page =3D alloc_pages(GFP_NOIO | __GFP_COMP, ZCOM=
-P_MULTI_PAGES_ORDER);
-> > > > +     int ret;
-> > > > +     void *src, *dst;
-> > > > +
-> > > > +     if (!page)
-> > > > +             return -ENOMEM;
-> > > > +
-> > > > +     ret =3D zram_read_multi_pages(zram, page, index, bio);
-> > > > +     if (!ret) {
-> > > > +             src =3D kmap_local_page(bvec->bv_page);
-> > > > +             dst =3D kmap_local_page(page);
-> > > > +             memcpy(dst + offset, src + bvec->bv_offset, bvec->bv_=
-len);
-> > > > +             kunmap_local(dst);
-> > > > +             kunmap_local(src);
-> > > > +
-> > > > +             atomic64_inc(&zram->stats.zram_bio_write_multi_pages_=
-partial_count);
-> > > > +             ret =3D zram_write_page(zram, page, index);
-> > > > +     }
-> > > > +     __free_pages(page, ZCOMP_MULTI_PAGES_ORDER);
-> > > > +     return ret;
-> > > > +}
-> > >
-> > > What type of testing you run on it? How often do you see partial
-> > > reads and writes? Because this looks concerning - zsmalloc memory
-> > > usage reduction is one metrics, but this also can be achieved via
-> > > recompression, writeback, or even a different compression algorithm,
-> > > but higher CPU/power usage/higher requirements for physically contig
-> > > pages cannot be offset easily. (Another corner case, assume we have
-> > > partial read requests on every CPU simultaneously.)
-> >
-> > This question brings up an interesting observation. In our actual produ=
-ct,
-> > we've noticed a success rate of over 90% when allocating large folios i=
-n
-> > do_swap_page, but occasionally, we encounter failures. In such cases,
-> > instead of resorting to partial reads, we opt to allocate 16 small foli=
-os and
-> > request zram to fill them all. This strategy effectively minimizes part=
-ial reads
-> > to nearly zero. However, integrating this into the upstream codebase se=
-ems
-> > like a considerable task, and for now, it remains part of our
-> > out-of-tree code[1],
-> > which is also open-source.
-> > We're gradually sending patches for the swap-in process, systematically
-> > cleaning up the product's code.
->
-> I see, thanks for explanation.
-> Does this sound like this series is ahead of its time?
+On 10/04/2024 23:53, Luis Chamberlain wrote:
+> On Tue, Mar 26, 2024 at 01:38:05PM +0000, John Garry wrote:
+>> blkdev_dio_unaligned() is called from __blkdev_direct_IO(),
+>> __blkdev_direct_IO_simple(), and __blkdev_direct_IO_async(), and all these
+>> are only called from blkdev_direct_IO().
+>>
+>> Move the blkdev_dio_unaligned() call to the common callsite,
+>> blkdev_direct_IO().
+>>
+>> Pass those functions the bdev pointer from blkdev_direct_IO() as it is non-
+>> trivial to calculate.
+>>
+>> Reviewed-by: Keith Busch<kbusch@kernel.org>
+>> Reviewed-by: Christoph Hellwig<hch@lst.de>
+>> Signed-off-by: John Garry<john.g.garry@oracle.com>
+> Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
+> 
 
-I feel it is necessary to present the whole picture together with large fol=
-ios
-swp-in series[1]. On the other hand, there is a possibility this can
-land earlier
-before everything is really with default "disable", but for those
-platforms which
-have finely tuned partial read/write, they can enable it.
+cheers
 
-[1] https://lore.kernel.org/linux-mm/20240304081348.197341-1-21cnbao@gmail.=
-com/
+> I think this patch should just be sent separately already and not part
+> of this series.
 
->
-> > To enhance the success rate of large folio allocation, we've reserved s=
-ome
-> > page blocks for mTHP. This approach is currently absent from the mainli=
-ne
-> > codebase as well (Yu Zhao is trying to provide TAO [2]). Consequently, =
-we
-> > anticipate that partial reads may reach 50% or more until this method i=
-s
-> > incorporated upstream.
->
-> These partial reads/writes are difficult to justify - instead of doing
-> comp_op(PAGE_SIZE) we, in the worst case, now can do ZCOMP_MULTI_PAGES_NR
-> of comp_op(ZCOMP_MULTI_PAGES_ORDER) (assuming a access pattern that
-> touches each of multi-pages individually). That is a potentially huge
-> increase in CPU/power usage, which cannot be easily sacrificed. In fact,
-> I'd probably say that power usage is more important here than zspool
-> memory usage (that we have means to deal with).
+That just creates a merge dependency, since I have later changes which 
+depend on this. I suppose that since we're nearly at rc4, I could do that.
 
-Once Ryan's mTHP swapout without splitting [2] is integrated into the
-mainline, this
-patchset certainly gains an advantage for SWPOUT. However, for SWPIN,
-the situation
-is more nuanced. There's a risk of failing to allocate mTHP, which
-could result in the
-allocation of a small folio instead. In such cases, decompressing a
-large folio but
-copying only one subpage leads to inefficiency.
+John
 
-In real-world products, we've addressed this challenge in two ways:
-1. We've enhanced reserved page blocks for mTHP to boost allocation
-success rates.
-2. In instances where we fail to allocate a large folio, we fall back
-to allocating nr_pages
-small folios instead of just one. so we still only decompress once for
-multi-pages.
-
-With these measures in place, we consistently achieve wins in both
-power consumption and
-memory savings. However, it's important to note that these
-optimizations are specific to our
-product, and there's still much work needed to upstream them all.
-
-[2] https://lore.kernel.org/linux-mm/20240408183946.2991168-1-ryan.roberts@=
-arm.com/
-
->
-> Have you evaluated power usage?
->
-> I also wonder if it brings down the number of ZRAM_SAME pages. Suppose
-> when several pages out of ZCOMP_MULTI_PAGES_ORDER are filled with zeroes
-> (or some other recognizable pattern) which previously would have been
-> stored using just unsigned long. Makes me even wonder if ZRAM_SAME test
-> makes sense on multi-page at all, for that matter.
-
-I don't think we need to worry about ZRAM_SAME. ARM64 supports 4KB, 16KB, a=
-nd
-64KB base pages. Even if we configure the base page to 16KB or 64KB,
-there's still
-a possibility of missing out on identifying SAME PAGES that are
-identical at the 4KB
-level but not at the 16/64KB granularity.
-
-In our product, we continue to observe many SAME PAGES using
-multi-page mechanisms.
-Even if we miss some opportunities to identify same pages at the 4KB
-level, the compressed
-data remains relatively small, though not as compact as SAME_PAGE.
-Overall, in typical
-12GiB/16GiB phones, we still achieve a memory saving of around 800MiB
-by this patchset.
-
-mTHP offers a means to emulate a 16KiB/64KiB base page while
-maintaining software
-compatibility with a 4KiB base page. The primary concern here lies in
-partial read/write
-operations. In our product, we've successfully addressed these issues. Howe=
-ver,
-convincing people in the mainline community may take considerable time
-and effort :-)
-
-Thanks
-Barry
