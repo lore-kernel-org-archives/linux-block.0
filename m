@@ -1,104 +1,59 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170E8171C1;
-	Thu, 11 Apr 2024 14:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7562210788;
+	Thu, 11 Apr 2024 14:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712847241; cv=none; b=Vm9HKdJJ17pPk+UTtBKdIhtvrOYZZTljVsWMOAtDAddyQ25WHuZiI7Tp/bFWlpk5dHEtkHxrb4eycLiPeeWhUzBvTqiTnSlPKoloDC09Qp/iLtp+xpND2lFAP5+CaIBzTVSjjx+KgX4z9DWr0xxCvBlYD1PNNlwl6+IEZVm41hM=
+	t=1712847588; cv=none; b=gtVjZffratwH/FhArDKshfbOBEMpTLe20HRP1c9265GoM7y9iyJG/jhM0EOeu48ETAaG6pXBhe4lsD75gP7bfDUdbTMTQ2b4K4TjjGuaOgpmv7pQgGqSQMUyw9cluQmF+ST+8NyxoSWSTvsc/0iA1bNRpeDe/djernXFDmVRtS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712847241; c=relaxed/simple;
-	bh=yz0fPQRur9PF5tZZWJEaNZTXMumF0k9BRteSxFOys5g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LSKrg7eam66rRd09g9ahg4zUeBotc5Mr8WyCW2xKCP4Nnq99NDeZZfCDbY/Om1UnrKh6ByMx+sZpndEXjC7aGHKkXcMz4Rq1FFHB4YKP7H1Z3SYGQ1wKnCZ7LmaqQRkWyk3dQNr3CYwvDS6gqFaekEBVP2B7VR4mQ0L2Zs7XevQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=h/IFe6E8; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1712847588; c=relaxed/simple;
+	bh=bdE3gut+4CKvWaACvPLuBZ9pXayL9LrHXy5w9CPb8IA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FtY6MGWu0NmxABlWRzuIoM3Q+ofTsIqgv79a4UIRi2OkhZh/mmWECQwIMZskHPCiU9e/4gRwGSK5G2rFJtEEOVPRfL6T0iMarS0jGA2450e4KeomHKXXkmiwAjfKLgNzicQ9zUnAQSfzrdm8qdR3YYTcMPpgGXGEOJ2+4Eu0Meo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=usBgIlvD; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="h/IFe6E8"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="usBgIlvD"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=KGEPFBMj+JXg28PqPg3HNRvQWllGw5jqmhRObH4YP4Q=; b=h/IFe6E8nqgPFBpSLeMc2quPJz
-	LlvfJbQ2YH5Qq11qbshqzvC9XHaKtoqez1LscSrKMLU2qVVrbOAafWYA4NeCIVHEnpUPa5+2glugR
-	80ou7qBGAqhhqxEdlKxHClDVuR70UQUT3DkpMQFi9lR4lk04qjg2Dt4YZB656OjAOTglIvzWxxnmg
-	mitg+/VBL6i8d/N1jI2x8K9AFl0+gnlo87EQf/kfTvpB2UVC0Tw0s07spDusM+md8+QscjzooHYDQ
-	Wcu8MjytutH15arB37yDgckTcD2YUFHaD51LhpQ1pgyw17/38aC3lMocB6DGNuJ5NGmyMyp4gMtPC
-	LenHD88w==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1ruvoB-00AYl9-37;
-	Thu, 11 Apr 2024 14:53:48 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>,
-	Yu Kuai <yukuai1@huaweicloud.com>,
-	hch@lst.de,
-	axboe@kernel.dk,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=bdE3gut+4CKvWaACvPLuBZ9pXayL9LrHXy5w9CPb8IA=; b=usBgIlvD1ni/lqwzyLHdTKqQ7g
+	k99Dy4Mtk5Df6WcuXQDPDpWeifO6yPLKsPCeU9ycok1zIHGRzRXrFIoweNOu1Mon64Y8LmFUtYmCx
+	A5UPGT4tVcZ6uR02SM9GcZSxGTPbtOrP5vaIntmSI2Y3yFdr9QDwJ/f1AolUSdyr60P14kk/f49wl
+	BLSOx1EBFB0x4JxswTolxDtChGYkAXrj9TKi/60rVOOz5cCTYqiOMAy+jIJRKt5GXFDtOFrdN5VYY
+	IPCJTOAdTaKx3xdlVN4He2HHyvZEub5LwTFzpmOcJWqh4Vi+IRpFBooxzO2yO0E9EpelRJTJdS3hw
+	S6rdhwdg==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1ruvtq-00000007Ay9-3V1g;
+	Thu, 11 Apr 2024 14:59:38 +0000
+Date: Thu, 11 Apr 2024 15:59:38 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com,
 	"yukuai (C)" <yukuai3@huawei.com>
-Subject: [PATCH 09/11] dm-vdo: use bdev_nr_bytes(bdev) instead of i_size_read(bdev->bd_inode)
-Date: Thu, 11 Apr 2024 15:53:44 +0100
-Message-Id: <20240411145346.2516848-9-viro@zeniv.linux.org.uk>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240411145346.2516848-1-viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH 03/11] grow_dev_folio(): we only want
+ ->bd_inode->i_mapping there
+Message-ID: <Zhf62vtfnMs33pq3@casper.infradead.org>
 References: <20240411144930.GI2118490@ZenIV>
  <20240411145346.2516848-1-viro@zeniv.linux.org.uk>
+ <20240411145346.2516848-3-viro@zeniv.linux.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240411145346.2516848-3-viro@zeniv.linux.org.uk>
 
-going to be faster, actually - shift is cheaper than dereference...
+On Thu, Apr 11, 2024 at 03:53:38PM +0100, Al Viro wrote:
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
- drivers/md/dm-vdo/dm-vdo-target.c      | 4 ++--
- drivers/md/dm-vdo/indexer/io-factory.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/dm-vdo/dm-vdo-target.c b/drivers/md/dm-vdo/dm-vdo-target.c
-index 5a4b0a927f56..b423bec6458b 100644
---- a/drivers/md/dm-vdo/dm-vdo-target.c
-+++ b/drivers/md/dm-vdo/dm-vdo-target.c
-@@ -878,7 +878,7 @@ static int parse_device_config(int argc, char **argv, struct dm_target *ti,
- 	}
- 
- 	if (config->version == 0) {
--		u64 device_size = i_size_read(config->owned_device->bdev->bd_inode);
-+		u64 device_size = bdev_nr_bytes(config->owned_device->bdev);
- 
- 		config->physical_blocks = device_size / VDO_BLOCK_SIZE;
- 	}
-@@ -1011,7 +1011,7 @@ static void vdo_status(struct dm_target *ti, status_type_t status_type,
- 
- static block_count_t __must_check get_underlying_device_block_count(const struct vdo *vdo)
- {
--	return i_size_read(vdo_get_backing_device(vdo)->bd_inode) / VDO_BLOCK_SIZE;
-+	return bdev_nr_bytes(vdo_get_backing_device(vdo)) / VDO_BLOCK_SIZE;
- }
- 
- static int __must_check process_vdo_message_locked(struct vdo *vdo, unsigned int argc,
-diff --git a/drivers/md/dm-vdo/indexer/io-factory.c b/drivers/md/dm-vdo/indexer/io-factory.c
-index 515765d35794..1bee9d63dc0a 100644
---- a/drivers/md/dm-vdo/indexer/io-factory.c
-+++ b/drivers/md/dm-vdo/indexer/io-factory.c
-@@ -90,7 +90,7 @@ void uds_put_io_factory(struct io_factory *factory)
- 
- size_t uds_get_writable_size(struct io_factory *factory)
- {
--	return i_size_read(factory->bdev->bd_inode);
-+	return bdev_nr_bytes(factory->bdev);
- }
- 
- /* Create a struct dm_bufio_client for an index region starting at offset. */
--- 
-2.39.2
-
+Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
