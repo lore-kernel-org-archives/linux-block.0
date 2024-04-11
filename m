@@ -1,94 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E79D14C5A4;
-	Thu, 11 Apr 2024 11:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4D914F9C4;
+	Thu, 11 Apr 2024 13:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712836570; cv=none; b=dh1Dm4Ft+lqGk8/VWaIoCK8Fv6osU3Ij8x1u8pjDAs1zQRNONOQVoOrG4zcWtHcX68DnA3+1HyANntNRobACvHa0wP6kQk1ouT2luYkb79WiORJ5mR9RfitFJy6wCGhlUsa8GsDJbwbJ9qWQhzh6CKdm7W8sZVI443E2rDtBDh0=
+	t=1712842388; cv=none; b=kPVs2v2zHLbVM8d5iq/Oh+IwgTsheeneEzJkysY3wm1xs7yY+q2o/5migwcKvIsIdp+7eTcKKzIxeOrBbKY1Y+hcsNtxRoF7lvnmDChgPvSfuzck1GH1wDu5XK2OCB91nAQ35nVtfI1woDxab4ka/jUC+DK3xGtgMxlOeyTIkYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712836570; c=relaxed/simple;
-	bh=NHWm6/QuyChhlZB8R4yFfy0w7knNXtALJG38VFYUIoM=;
+	s=arc-20240116; t=1712842388; c=relaxed/simple;
+	bh=Hu1xN2JiY9qMgKFHZgQq9iT0bgOzpOMrTuCFIleiTJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=osU1G496f0yJ/JafUG3cDNVLYasm+LdWm2TIE0hZqaJM+7Hcn7oVb+VpozxOUJWkSGAEtcNwgMHiCmbELaNxj67FYnLwzkPVCZYhG1KYs50vJ1z+kYxzGyVN73S9pv5eHoMSDUgTvayhyfoOFPYlFoVHgo2qqXsklknx3u836RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HLs/6PI8; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLs/6PI8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4A2BC433C7;
-	Thu, 11 Apr 2024 11:56:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712836570;
-	bh=NHWm6/QuyChhlZB8R4yFfy0w7knNXtALJG38VFYUIoM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HLs/6PI8OburW1pE6HFFn+DvKJRXAdO1bAU6kYyJIsbdlo08puYJUlH8xlA6ok6Pb
-	 H1vHx8jfnRQ02CSXN5VXvKZVqbpVMzt5uu6S9YI5OCDUw7t7NzaPz9uMh0B8Zar6tb
-	 SeLXLBiUTh0P85ncHxZOFov/u5Df9M29JsGt4d/hSle+jeNJP0OowzMY1gTwgg+6Kk
-	 92SjotEqT05Kws/v9B6u41Cmi27yuhGttteixMcthqdt3a0jL2N/wOnTiJQSah9wru
-	 63M+bg3nHv6Ea1omFnJI6KkVScJvPgZJgajCqSL3LrDB/VXcsQ4T+pBjATUOK+DzSG
-	 SBaBpfuQJKTdA==
-Date: Thu, 11 Apr 2024 13:56:03 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, yi.zhang@huawei.com, 
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
- blcok_device
-Message-ID: <20240411-logik-besorgen-b7d590d6c1e9@brauner>
-References: <20240406202947.GD538574@ZenIV>
- <3567de30-a7ce-b639-fa1f-805a8e043e18@huaweicloud.com>
- <20240407015149.GG538574@ZenIV>
- <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
- <20240407030610.GI538574@ZenIV>
- <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
- <20240409042643.GP538574@ZenIV>
- <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
- <20240410105911.hfxz4qh3n5ekrpqg@quack3>
- <20240410223443.GG2118490@ZenIV>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cPWuSPXnqC29ZMS6bqTuWu2Gt8po9C7OUDZ0gCGtDHit64tsoDbz6DL3HEikCSxTuyjDQNbb6JFJ0bD0cUmTra10u3wtPsV6aFWVFbr6tlEVUPONxFYwG63OIQ0Mnz2p9Y7JnrZI925bzbIqLeo0TMwFfzAF1rqx5E93PFV0F9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d89346eb45so56129561fa.0;
+        Thu, 11 Apr 2024 06:33:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712842385; x=1713447185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VoFgjJ32tsxlVGtTa5gGB28oxhJFPr7M0nD6tH1rarM=;
+        b=PthL68uElizIUQwzTwjN6yt6Z+fgLYo2II/YyW9w9F7lZGndqBecamnVOqaAwcKrND
+         xBOqBXSL241mDE2ugZXfCuHH4FZ9Ddxq+Q3mGT4rvnskW7of55e+W5KvcpQ1YPJnom1I
+         0ssBBHGUf/zxrrrLGlnUJ/5qvPtwDL6tUQlEkGQw7zfqvefBcBlYLKROY/nVBMUJpmyv
+         lKx2n26T0tuqSBt/Sy/ASaxBcgp02s7lyXAjtroA942eVaMHt/C9WgKsfYwtGMGRX5CN
+         dpQ3QMQU46orcXTr5tMevtaJdlrj2InYYkBs421ZIEg76YtQpBhNJJpQ9whc46B1Dp03
+         HObg==
+X-Forwarded-Encrypted: i=1; AJvYcCXUAFWStBALYBLNHU3G4xfitcdID/AgO2mDiYUQnRCXrpLNe5SHC1XIIOPT9PEyzigLnKXaeTm5G3ZDRzsVlARN5ugcPCVsFrMCwjh8KQABSbPzouYU2Pr8K1mmdHId/u05jvkbzGNPqW6hS4KYOfSPG0q83+QXdg7a7ZU4DlZBpQ+1
+X-Gm-Message-State: AOJu0YzUP/9fuTJSr3nvDR9kud+gnYG5VCHHOhgJgFVRtY+L6daVG5k8
+	vvwzMfHkJUxsQSoX1ktQs0qKgxdTH3zv7fUOKTnPgTx4khWI9dRf
+X-Google-Smtp-Source: AGHT+IFByJfC9hbYBeCLoTSUE6m3SAZ56TJRBSVxKGqApn7flbJoLNyy3Sp4kVZ3NmAPlJJgNRuidw==
+X-Received: by 2002:a2e:a9a6:0:b0:2d8:8633:ff70 with SMTP id x38-20020a2ea9a6000000b002d88633ff70mr6469091ljq.30.1712842385060;
+        Thu, 11 Apr 2024 06:33:05 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-119.fbsv.net. [2a03:2880:30ff:77::face:b00c])
+        by smtp.gmail.com with ESMTPSA id k11-20020a170906578b00b00a51be2b75f3sm760606ejq.35.2024.04.11.06.33.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 06:33:04 -0700 (PDT)
+Date: Thu, 11 Apr 2024 06:33:02 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Tejun Heo <tj@kernel.org>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	leit@meta.com,
+	"open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)" <cgroups@vger.kernel.org>,
+	"open list:CONTROL GROUP - BLOCK IO CONTROLLER (BLKIO)" <linux-block@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] blk-iocost: Fix shift-out-of-bounds in iocg_kick_delay()
+Message-ID: <Zhfmjoa2l04fXIVr@gmail.com>
+References: <20240410193642.1303741-1-leitao@debian.org>
+ <ZhbuUKXQwBwye1_r@slm.duckdns.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240410223443.GG2118490@ZenIV>
+In-Reply-To: <ZhbuUKXQwBwye1_r@slm.duckdns.org>
 
-On Wed, Apr 10, 2024 at 11:34:43PM +0100, Al Viro wrote:
-> On Wed, Apr 10, 2024 at 12:59:11PM +0200, Jan Kara wrote:
+On Wed, Apr 10, 2024 at 09:53:52AM -1000, Tejun Heo wrote:
+> Hello, Breno.
 > 
-> > I agree with Christian and Al - and I think I've expressed that already in
-> > the previous version of the series [1] but I guess I was not explicit
-> > enough :). I think the initial part of the series (upto patch 21, perhaps
-> > excluding patch 20) is a nice cleanup but the latter part playing with
-> > stashing struct file is not an improvement and seems pointless to me. So
-> > I'd separate the initial part cleaning up the obvious places and let
-> > Christian merge it and then we can figure out what (if anything) to do with
-> > remaining bd_inode uses in fs/buffer.c etc. E.g. what Al suggests with
-> > bd_mapping makes sense to me but I didn't check what's left after your
-> > initial patches...
+> On Wed, Apr 10, 2024 at 12:36:41PM -0700, Breno Leitao wrote:
+> > When running iocg_kick_delay(), iocg->delay_at could be way behind "now",
+> > which causes a huge tdelta difference.
+> > 
+> > The tdelta value is used to shift some bits around, raising the
+> > following UBSAN splat:
+> > 
+> > 	UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
+> > 
+> > Debugging this, these are some values I got in my machine with 6.9-rc3.
+> > 
+> >  now = 3626064295
+> >  iocg->delay_at = 3275794093
+> > 
+> > Fix this by validating that the shift if valid, otherwise bail out,
+> > similarly to commit 2a427b49d029 ("blk-iocost: Fix an UBSAN
+> > shift-out-of-bounds warning")
 > 
-> FWIW, experimental on top of -next:
+> Rik alreaady sent a fix:
+> 
+>   http://lkml.kernel.org/r/20240404123253.0f58010f@imladris.surriel.com
+> 
+> which got commited as beaa51b36012fad5a4d3c18b88a617aea7a9b96d.
 
-Ok, let's move forward with this. I've applied the first 19 patches.
-Patch 20 is the start of what we all disliked. 21 is clearly a bugfix
-for current code so that'll go separately from the rest. I've replaced
-open-code f_mapping access with file_mapping(). The symmetry between
-file_inode() and file_mapping() is quite nice.
-
-Al, your idea to switch erofs away from buf->inode can go on top of what
-Yu did imho. There's no real reason to throw it away imho.
-
-I've exported bdev_mapping() because it really makes the btrfs change a
-lot slimmer and we don't need to care about messing with a lot of that
-code. I didn't care about making it static inline because that might've
-meant we need to move other stuff into the header as well. Imho, it's
-not that important but if it's a big deal to any of you just do the
-changes on top of it, please.
-
-Pushed to
-https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.super
-
-If I hear no objections that'll show up in -next tomorrow. Al, would be
-nice if you could do your changes on top of this, please.
+Even easier then. Thanks!
