@@ -1,128 +1,146 @@
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8C243171;
-	Thu, 11 Apr 2024 16:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156CA1A0AE7;
+	Thu, 11 Apr 2024 16:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712852032; cv=none; b=ftMFbRxq77UckKF3XO1ESlm1HX5BF4/xd5Z9EAVBHQoSF/8iHg1cgxQcfetg4q6pptzpax6NM6fyCS+mqimoCuDQT9K0PuGDu2st+7AOFHdxrN/gDK9dJYC8LEyl46sINp3jWpfwssdIHjQWp8ahotUkXvNY4a181xDypMkz/EQ=
+	t=1712852604; cv=none; b=oQn7tJgrdFHQ3nqLFBhStEqjZ+u9YqToXIhcoCRtlmAxbBioEDFfAtXBbh9qpc1L0MAPgO2i9jJcbTk7a2AsNrT41MPabIZesFB+7qZV8FKqFnx2vJGq9J/swZM1uJt+7YJRWUqvBbK66Nia+B1YGPy56RwHGjGhJ8dE6kyG8uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712852032; c=relaxed/simple;
-	bh=evtsIG6x6Yz6zeuupS4HiOT3wfAwZTOiHxGTCrmvKw0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XNuZ5QmSxsD0GhNYW7OBF2bPBhv5+HaQ8qJdGlBdoz5mzHJLb2PChrqDhiPQt7M4/KcdG5Q5rxgmIZdSbrdf9oOvgHVLPokJzSqburUgP6VeX6cKy5DJNQYjXhRoQSCvqUJuAa55CjWCErNSU/+Rpyb9Skud98qGt6g4fzPCDPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pjdyPIsi; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1712852604; c=relaxed/simple;
+	bh=nN/Hr+UlT6emx/RUIJVSa74QG/O0VgJ/byKbQpUfmyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VWVaNTMrArzwXpUAPHTmX9pqckVf8Y9iEtFipuXz7cMNaIXCIqHf/GgUa7hmk+GHQ4qVqOJ2dS/2zrRgt0iPNlEDUG7Xtxh9OW7yoVsaz55FTL2ANhPZ2NsqZAxdRf+HPKGhb+VaVxmAouLKeTQP8C3h/UcUXuKOQxqloIgOpy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XIsGPPx3; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pjdyPIsi"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712852025; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=i28s5n6Wi5wy2FzpIgLktF1Mrc755I0vQ0l4zk5yxBI=;
-	b=pjdyPIsi86ySuz4iqFOxMv9ZMQN2S9ni8goTD6AN2wtUNaV6jMrrvA3zhSpLy/7s6DFMm+qdGFAUR1AM/2Qekjioz2yxPoAzTfNu8EQL+/ShxJ9IaLJOjZ4/FIWTfyW6IPS3XCPkjXOxCRnCkVpiKzJckNnAzLGm5TleywQ3RcU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W4LiTJx_1712852023;
-Received: from 192.168.3.4(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0W4LiTJx_1712852023)
-          by smtp.aliyun-inc.com;
-          Fri, 12 Apr 2024 00:13:44 +0800
-Message-ID: <a660a238-2b7e-423f-b5aa-6f5777259f4d@linux.alibaba.com>
-Date: Fri, 12 Apr 2024 00:13:42 +0800
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XIsGPPx3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
+	bh=w8fDcPBM4Ze2RPgrAoXs/w5z2M5QE6GW5bGItfgRyJ8=; b=XIsGPPx3mZgUgXDqmsW3zFEUMM
+	hrAF6AwyKjg5u/7JpKuZqbRzY4v8HjoVwEuBNAQVw14POMEREkb9sOqKwAN3ZchA3+E1NH+q43G9i
+	h89UzTlMT34ILaOSNIjqzh/1hopUZTMHNrak55UHbof7sc3viEOIyBCwxIJ6BThh3W7K7EUlGy4np
+	TJb5EIRDb4TXgd7PW5tv8xQPgKoVmMRy+YgpCoXVAMMOQ9WQZGo/nl38Gs8Cc4AV4c2NEYmM7UFcA
+	N6nfqhSWnnj5rSE7+/wwPBIg+h68sSddrjQYwRJvDbTOvqfFAn0OFruiNIfUzQl1/VooT2EV9uDuG
+	6YpTaT4w==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1ruxCN-0000000D38A-1CHz;
+	Thu, 11 Apr 2024 16:22:51 +0000
+Date: Thu, 11 Apr 2024 09:22:51 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Dan Helmick <dan.helmick@samsung.com>, axboe@kernel.dk,
+	kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
+	martin.petersen@oracle.com, djwong@kernel.org,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
+	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+	io-uring@vger.kernel.org, nilay@linux.ibm.com,
+	ritesh.list@gmail.com, willy@infradead.org,
+	Alan Adamson <alan.adamson@oracle.com>
+Subject: Re: [PATCH v6 10/10] nvme: Atomic write support
+Message-ID: <ZhgOW8yBPuuae4ni@bombadil.infradead.org>
+References: <20240326133813.3224593-1-john.g.garry@oracle.com>
+ <20240326133813.3224593-11-john.g.garry@oracle.com>
+ <Zhcu5m8fmwD1W5bG@bombadil.infradead.org>
+ <143e3d55-773f-4fcb-889c-bb24c0acabba@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH vfs.all 08/26] erofs: prevent direct access of bd_inode
-To: Al Viro <viro@zeniv.linux.org.uk>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-9-yukuai1@huaweicloud.com>
- <20240407040531.GA1791215@ZenIV>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <20240407040531.GA1791215@ZenIV>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <143e3d55-773f-4fcb-889c-bb24c0acabba@oracle.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-Hi Al,
-
-On 2024/4/7 12:05, Al Viro wrote:
-> On Sat, Apr 06, 2024 at 05:09:12PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Now that all filesystems stash the bdev file, it's ok to get inode
->> for the file.
+On Thu, Apr 11, 2024 at 09:59:57AM +0100, John Garry wrote:
+> On 11/04/2024 01:29, Luis Chamberlain wrote:
+> > On Tue, Mar 26, 2024 at 01:38:13PM +0000, John Garry wrote:
+> > > From: Alan Adamson <alan.adamson@oracle.com>
+> > > 
+> > > Add support to set block layer request_queue atomic write limits. The
+> > > limits will be derived from either the namespace or controller atomic
+> > > parameters.
+> > > 
+> > > NVMe atomic-related parameters are grouped into "normal" and "power-fail"
+> > > (or PF) class of parameter. For atomic write support, only PF parameters
+> > > are of interest. The "normal" parameters are concerned with racing reads
+> > > and writes (which also applies to PF). See NVM Command Set Specification
+> > > Revision 1.0d section 2.1.4 for reference.
+> > > 
+> > > Whether to use per namespace or controller atomic parameters is decided by
+> > > NSFEAT bit 1 - see Figure 97: Identify – Identify Namespace Data
+> > > Structure, NVM Command Set.
+> > > 
+> > > NVMe namespaces may define an atomic boundary, whereby no atomic guarantees
+> > > are provided for a write which straddles this per-lba space boundary. The
+> > > block layer merging policy is such that no merges may occur in which the
+> > > resultant request would straddle such a boundary.
+> > > 
+> > > Unlike SCSI, NVMe specifies no granularity or alignment rules, apart from
+> > > atomic boundary rule.
+> > 
+> > Larger IU drives a larger alignment *preference*, and it can be multiples
+> > of the LBA format, it's called Namespace Preferred Write Granularity (NPWG)
+> > and the NVMe driver already parses it. So say you have a 4k LBA format
+> > but a 16k NPWG. I suspect this means we'd want atomics writes to align to 16k
+> > but I can let Dan confirm.
 > 
-> Looking at the only user of erofs_buf->inode (erofs_bread())...  We
-> use the inode for two things there - block size calculation (to get
-> from block number to position in bytes) and access to page cache.
-> We read in full pages anyway.  And frankly, looking at the callers,
-> we really would be better off if we passed position in bytes instead
-> of block number.  IOW, it smells like erofs_bread() having wrong type.
-> 
-> Look at the callers.  With 3 exceptions it's
-> fs/erofs/super.c:135:   ptr = erofs_bread(buf, erofs_blknr(sb, *offset), EROFS_KMAP);
-> fs/erofs/super.c:151:           ptr = erofs_bread(buf, erofs_blknr(sb, *offset), EROFS_KMAP);
-> fs/erofs/xattr.c:84:    it.kaddr = erofs_bread(&it.buf, erofs_blknr(sb, it.pos), EROFS_KMAP);
-> fs/erofs/xattr.c:105:           it.kaddr = erofs_bread(&it.buf, erofs_blknr(sb, it.pos),
-> fs/erofs/xattr.c:188:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(sb, it->pos),
-> fs/erofs/xattr.c:294:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(sb, it->pos),
-> fs/erofs/xattr.c:339:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(it->sb, it->pos),
-> fs/erofs/xattr.c:378:           it->kaddr = erofs_bread(&it->buf, erofs_blknr(sb, it->pos),
-> fs/erofs/zdata.c:943:           src = erofs_bread(&buf, erofs_blknr(sb, pos), EROFS_KMAP);
-> 
-> and all of them actually want the return value + erofs_offset(...).  IOW,
-> we take a linear position (in bytes).  Divide it by block size (from sb).
-> Pass the factor to erofs_bread(), where we multiply that by block size
-> (from inode), see which page will that be in, get that page and return a
-> pointer *into* that page.  Then we again divide the same position
-> by block size (from sb) and add the remainder to the pointer returned
-> by erofs_bread().
-> 
-> IOW, it would be much easier to pass the position directly and to hell
-> with block size logics.  Three exceptions to that pattern:
-> 
-> fs/erofs/data.c:80:     return erofs_bread(buf, blkaddr, type);
-> fs/erofs/dir.c:66:              de = erofs_bread(&buf, i, EROFS_KMAP);
-> fs/erofs/namei.c:103:           de = erofs_bread(&buf, mid, EROFS_KMAP);
-> 
-> Those could bloody well multiply the argument by block size;
-> the first one (erofs_read_metabuf()) is also interesting - its
-> callers themselves follow the similar pattern.  So it might be
-> worth passing it a position in bytes as well...
-> 
-> In any case, all 3 have superblock reference, so they can convert
-> from blocks to bytes conveniently.  Which means that erofs_bread()
-> doesn't need to mess with block size considerations at all.
-> 
-> IOW, it might make sense to replace erofs_buf->inode with
-> pointer to address space.  And use file_mapping() instead of
-> file_inode() in that patch...
+> If we need to be aligned to NPWG, then the min atomic write unit would also
+> need to be NPWG. Any NPWG relation to atomic writes is not defined in the
+> spec, AFAICS.
 
-Just saw this again by chance, which is unexpected.
+NPWG is just a preference, not a requirement, so it is different than
+logical block size. As far as I can tell we have no block topology
+information to represent it. LBS will help users opt-in to align to
+the NPWG, and a respective NAWUPF will ensure you can also atomically
+write the respective sector size.
 
-Yeah, I think that is a good idea.  The story is that erofs_bread()
-was derived from a page-based interface:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/erofs/data.c?h=v5.10#n35
+For atomics, NABSPF is what we want to use.
 
-so it was once a page index number.  I think a byte offset will be
-a better interface to clean up these, thanks for your time and work
-on this!
+The above statement on the commit log just seems a bit misleading then.
 
-BTW, sightly off the topic:
+> We simply use the LBA data size as the min atomic unit in this patch.
 
-I'm little confused why I'm not be looped for this version this time
-even:
+I thought NABSPF is used.
 
-  1) I explicitly asked to Cc the mailing list so that I could find
-     the latest discussion and respond in time:
-      https://lore.kernel.org/r/5e04a86d-8bbd-41da-95f6-cf1562ed04f9@linux.alibaba.com
+> > > Note on NABSPF:
+> > > There seems to be some vagueness in the spec as to whether NABSPF applies
+> > > for NSFEAT bit 1 being unset. Figure 97 does not explicitly mention NABSPF
+> > > and how it is affected by bit 1. However Figure 4 does tell to check Figure
+> > > 97 for info about per-namespace parameters, which NABSPF is, so it is
+> > > implied. However currently nvme_update_disk_info() does check namespace
+> > > parameter NABO regardless of this bit.
+> > 
+> > Yeah that its quirky.
+> > 
+> > Also today we set the physical block size to min(npwg, atomic) and that
+> > means for a today's average 4k IU drive if they get 16k atomic the
+> > physical block size would still be 4k. As the physical block size in
+> > practice can also lift the sector size filesystems used it would seem
+> > odd only a larger npwg could lift it.
+> It seems to me that if you want to provide atomic guarantees for this large
+> "physical block size", then it needs to be based on (N)AWUPF and NPWG.
 
-  2) I sent my r-v-b tag on RFC v4 (and the tag was added on this
-     version) but I didn't receive this new version.
+For atomicity, I read it as needing to use NABSPF. Aligning to NPWG will just
+help performance.
 
-Thanks,
-Gao Xiang
+The NPWG comes from an internal mapping table constructed and kept on
+DRAM on a drive in units of an IU size [0], and so not aligning to the
+IU just causes having to work with entries in the able rather than just
+one, and also incurs a read-modify-write. Contrary to the logical block
+size, a write below NPWG but respecting the logical block size is allowed,
+its just not optimal.
+
+[0] https://kernelnewbies.org/KernelProjects/large-block-size#Indirection_Unit_size_increases
+
+  Luis
