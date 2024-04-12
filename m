@@ -1,58 +1,58 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C0E13C9B9
-	for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 14:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DD51474A0
+	for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 16:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712932417; cv=none; b=GzGO5Afx2KLNKuZiElrOOjwlBTiwxfoOVOU2uS+0+ZAEXtotUIEyfV2dytJLWdcb1CFWWXfOn9h9FSxLBkkdWIZBTRFeKIjKEoNMaQbBahZSywDSBIghQyuRSiYNTS9R6+MBsxvZFEv3YAARkVoeA0c9pFJ/cP2mTTvzToifE2Q=
+	t=1712940506; cv=none; b=FzJ+J/YA36GExg1thp8r2P/lZtKQZPuvJ+OaaaC0+1q8ZwrrOFGOwZzcT8yk44gWKudmB7O5povx7KLY3WhlJccRj464srFJLd1b6PMkq39JaQU9gLoM8vECf0TxaNEJ4XXkqre23a637xhw6tvlKaqW6DgqCbQ1EKpaS3RzAJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712932417; c=relaxed/simple;
-	bh=U2v0xXugGcKnm9y+KSvCKSzUBnL/1h15RrqGsLqlE9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j736AMdcj75vNegO+nc8GZYNH+VxthBxb6DFAlUyDyCqxRSmpkJ/SsFWKWAoMQw7l2dNcQJ1SJfQ4QZqL0H+Mj9YZ5INJh7PI0S8hMBVfl+7q9K0Mv0tDsMUbn/pdQxvZDghAZVmU9JHKH7IMRcI1fiB5gs5lWCKqFldzK4vfO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vwk8NzmV; arc=none smtp.client-ip=209.85.166.50
+	s=arc-20240116; t=1712940506; c=relaxed/simple;
+	bh=iTsH36V306ZXMqMRxtdn2e+83oodpY3xenWhxKl6o30=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=eA2scB+pyPrnlPn02PamLN/30HjFn1HqC8A83McJ8/UG/tk2d5uBiKOefjsOumNXwHRbMJoRDVU+JaXOZI80D87ulL9SPs43S2TDNUDgi+Nv2ZWWzTY7KPpOB9jDakhC/X6cg4ufuutPsDBBldXWw5MqfYt626prC2Db1A0v4lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0MhF526k; arc=none smtp.client-ip=209.85.166.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vwk8NzmV"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7d6112ba6baso7279339f.1
-        for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 07:33:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0MhF526k"
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-36b07e83a76so103475ab.0
+        for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 09:48:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712932414; x=1713537214; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BrT3sFNst7WsOgXv8+8mtDti7gnB6xBN3qOMfMoY1fI=;
-        b=vwk8NzmVhBLtsP7Mp0b2VTfD+/hgD3qlDiNBIbsFw6NANgdZ7PmauiIFsek9Ia1kjo
-         YzeGU+bp2UON9gUeQgCRmFHLA5XOY8X8+mXDlGDJfOAWM1ImlGkhrl1aMRrV2Ua0ABA4
-         wnSrdnxM7eQiDjXQzDwbuIm/mP2SApP+PhBRiTwq6Gu93KQjhV8DHnVN+rgkfAFETTpq
-         POd1elXvhDPpOhOMivrqZnDlDOcSuUZTAi059ML9sPQLb2cJOllUkDIf8NYbQRrgR7GF
-         G78gNBu4ekqG4IQGTi9/bol/Mqk6MP3AW/jw8fNU6J8927NKBc0x8EIswej9eQqeUSst
-         Kswg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712940502; x=1713545302; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BiQw+fvmDG5SW9XRYFQYiidFbbbudx0BfQ1uqiJaUAU=;
+        b=0MhF526k48feukQBQMiWKHM2kI5mtMwsOC2VpQlhZ3qPpMOFw3e+PtL/RQ96U9/sHj
+         XNrZU5jOy0frKl/HH4TjAi0LSJUYvsprEnjaVcN+7Uftt+V8vOq7SN12aiRL8tZz84iI
+         tUFq700Jio7Cf2DOmBUQ0BfPV6ZvWlffYkDtlVqaACTKPaXPe/OIcxRs+YxTuAOu6pfh
+         GPQJsTlgZSl4Wv77KIZ+j6TPlqnZrY7qihP/mvCUFf1ljE5yh00Ry5FrgCE8fcDIUmC+
+         FeKNi78AO4X34iFQPvPagErc6yscHU02XF35nLqg53zv8KDGDU0vL9kbsMUcQZIhK+Wy
+         yDLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712932414; x=1713537214;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BrT3sFNst7WsOgXv8+8mtDti7gnB6xBN3qOMfMoY1fI=;
-        b=MLXdN8/yc4lNSKH8I1wQlzgVWlP2C2s/IY6ucRquuGP9IaxvgXyY/GKM30MoODBwup
-         ra4/8AFpoGIL6AZoYBkJUdEivgPbIWTFnotFHd17x3m6UHAHW21KQz52z6RwOM7vMMjI
-         W30PdtgJ2uQpq02VaML0eDPyq90zdu1KFaKgAOjPHIeTasNrypLgliBj2E3Y8WxVnMm0
-         yhQz8PhdA54Uwn0naf7i8YTJUTxrRgBHR65Xqid22Lmauz3kxUQhnWJ9lUYJvnsV9GWx
-         cfUbWu5HoP840MLzBM/8icIdKvUcWxNMOD+1uVRN30MEKCZpyUKD4F5TMezPXk8Xnd9F
-         GmoQ==
-X-Gm-Message-State: AOJu0YwRViJcdLTT/xiQlRSfiH99gIvaSjVg741UH5jfzkRabEAskkKi
-	SDNjthrHsblXX247PwIqYVGBzZRUqtdgGgLY2g4Gh1dHpWC0QurTc73cWrNjc8w=
-X-Google-Smtp-Source: AGHT+IG2h8sZqNq+N+XfUeoFr1XWCRRgSLSOhk/Zf8KsfRonGD1pAapHFvoxFp+NKFVuVSDKgPRNNA==
-X-Received: by 2002:a6b:cd08:0:b0:7d5:fe3e:90ff with SMTP id d8-20020a6bcd08000000b007d5fe3e90ffmr3147431iog.0.1712932414611;
-        Fri, 12 Apr 2024 07:33:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712940502; x=1713545302;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BiQw+fvmDG5SW9XRYFQYiidFbbbudx0BfQ1uqiJaUAU=;
+        b=PcAFn2VA24KIv7of1pLQnfs8Vi17jnbyNc4wZWIGW531ciegz2JsQtyrWDwHrSciOh
+         RBRlOmbZj8l6d74Bku7S/+Dv9VqW62iJFsA/mrJGhHUnl4xujjNEf0igQwlz8gOxXqkS
+         IunV6Sekx4iVwMb6kMwi+u7UK+IUY0wX+WidQSr0ooc22a8CF8zuUA+nlRaIGNPBT6VW
+         Sao1aR8Yf61g42sjKCuU5gkV6KfOKnE4YcY5ok3WPARyzCG/Z0wBbo/Oe9ubv6UiM31K
+         HZ3mQ1fI1/Snn/oT/Q4OopTnwsWsYLCaeoWsqRM1eSV0tq87kHi1LL6Y0/3Uur3Q/zUa
+         Fhiw==
+X-Gm-Message-State: AOJu0YxzLpeI4QzB5h3aaYKTdopC2ZZKupIL6KNDrDPIMq16uGHX+pDi
+	x4i294CNjtXJ0AlfFc5+QmxWJthJgjkrDmBvVZ215cB4kmZxDthTfz6BaQwvjubNNya6nZrOG3b
+	o
+X-Google-Smtp-Source: AGHT+IEq8R8QYPgD2lAPvFa9DX1o2/4kkbGNniM5xw96Ve11Lc5BaUgzsR1IT4QVuH0a8AKP3j4e/w==
+X-Received: by 2002:a92:4b01:0:b0:368:80b8:36fa with SMTP id m1-20020a924b01000000b0036880b836famr2852949ilg.2.1712940501679;
+        Fri, 12 Apr 2024 09:48:21 -0700 (PDT)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id g6-20020a056602150600b007d5ddee1d4esm1069624iow.49.2024.04.12.07.33.33
+        by smtp.gmail.com with ESMTPSA id ay32-20020a056638412000b004829e8e9456sm1153530jab.20.2024.04.12.09.48.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 07:33:34 -0700 (PDT)
-Message-ID: <d071fa42-df7b-459f-832d-798e6b37184f@kernel.dk>
-Date: Fri, 12 Apr 2024 08:33:33 -0600
+        Fri, 12 Apr 2024 09:48:21 -0700 (PDT)
+Message-ID: <6c52c906-677d-43de-b5bd-a0a213097de2@kernel.dk>
+Date: Fri, 12 Apr 2024 10:48:20 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,46 +60,67 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next 1/2] block: fix that blk_time_get_ns() doesn't
- update time after schedule
 Content-Language: en-US
-To: Yu Kuai <yukuai3@huawei.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- johannes.thumshirn@wdc.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com
-References: <20240411032349.3051233-1-yukuai1@huaweicloud.com>
- <20240411032349.3051233-2-yukuai1@huaweicloud.com>
- <9a4f8738-6ad5-407e-a938-83395aa1df4f@kernel.dk>
- <7baaea10-5a3d-5efa-158b-f10448232031@huawei.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <7baaea10-5a3d-5efa-158b-f10448232031@huawei.com>
+Subject: [GIT PULL] Block fixes for 6.9-rc4
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/11/24 7:24 PM, Yu Kuai wrote:
-> Hi,
-> 
-> ? 2024/04/12 0:44, Jens Axboe ??:
->> On 4/10/24 9:23 PM, Yu Kuai wrote:
->>> diff --git a/block/blk-core.c b/block/blk-core.c
->>> index a16b5abdbbf5..e317d7bc0696 100644
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -1195,6 +1195,7 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
->>>       if (unlikely(!rq_list_empty(plug->cached_rq)))
->>>           blk_mq_free_plug_rqs(plug);
->>>   +    plug->cur_ktime = 0;
->>>       current->flags &= ~PF_BLOCK_TS;
->>>   }
->>
->> We can just use blk_plug_invalidate_ts() here, but not really important.
->> I think this one should go into 6.9, and patch 2 should go into 6.10,
->> however.
-> 
-> This sounds great! Do you want me to update and send them separately?
+Hi Linus,
 
-I've applied 1/2 separately, so just resend 2/2 when -rc4 has been
-tagged and I'll get that one queued for 6.10.
+Some fixes for block storage that should go into the 6.9 kernel release:
+
+- MD pull request via Song
+	- UAF fix (Yu)
+
+- Avoid out-of-bounds shift in blk-iocost (Rik)
+
+- Fix for q->blkg_list corruption (Ming)
+
+- Relax virt boundary mask/size segment checking (Ming)
+
+Please pull!
+
+
+The following changes since commit 9d0e8524204484702234e972a7e9f3015080987c:
+
+  Merge tag 'nvme-6.9-2024-04-04' of git://git.infradead.org/nvme into block-6.9 (2024-04-04 13:23:21 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.9-20240412
+
+for you to fetch changes up to 3ec4848913d695245716ea45ca4872d9dff097a5:
+
+  block: fix that blk_time_get_ns() doesn't update time after schedule (2024-04-12 08:31:54 -0600)
+
+----------------------------------------------------------------
+block-6.9-20240412
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      Merge tag 'md-6.9-20240408' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.9
+
+Ming Lei (2):
+      block: fix q->blkg_list corruption during disk rebind
+      block: allow device to have both virt_boundary_mask and max segment size
+
+Rik van Riel (1):
+      blk-iocost: avoid out of bounds shift
+
+Yu Kuai (2):
+      raid1: fix use-after-free for original bio in raid1_write_request()
+      block: fix that blk_time_get_ns() doesn't update time after schedule
+
+ block/blk-cgroup.c   |  9 ++++++---
+ block/blk-cgroup.h   |  2 ++
+ block/blk-core.c     |  3 +++
+ block/blk-iocost.c   |  7 ++++---
+ block/blk-settings.c | 16 ++++++----------
+ drivers/md/raid1.c   |  2 +-
+ 6 files changed, 22 insertions(+), 17 deletions(-)
 
 -- 
 Jens Axboe
