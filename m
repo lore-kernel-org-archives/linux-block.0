@@ -1,82 +1,87 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEF042069;
-	Fri, 12 Apr 2024 11:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907548174F
+	for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 13:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712921376; cv=none; b=h03N62oRafCta9wf/PJckFxKezIhSlLykLuOmrByLWC2DIodfjmLXttm6Hm2Uaf2CMN1/htkvOsdaYmo0MSL5sHe+tm9GT7Ky55zXpU+BXXvZ1GZVm2IGzFJOZhATEjHkhisARjqus33YvVpaD9cIafTE8tvDkW7yp7p53nTeEA=
+	t=1712927902; cv=none; b=sZlIQHcKxp3iX2WdpwUUhvZPqqQD2DH7u0cWEFDmUsFRA8ECnEXwL/V7uAub/np2n/EbduVnsEwvzFTZMuUwutqMrLASKjR+KRYzxqeIyJhcCHxVBYZ0EQkRDaoDcvabbjGMlHy9c4jfQbhG0mMZHTozikZJx+VZEepOlScL4cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712921376; c=relaxed/simple;
-	bh=kMGYNWu6GFRSJjGCKwdnJ4mn5dBo1RiNBMBClBdUXtI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azp7VYGjRlxXSpvD54FopwGaljMQiCJkAR5HUiaTpveXY6KqXGOwLnFUBk6N8F1CKspXc0umfaZms4VEsr2Fka8igq03o3+zM4nvLp0FbGw59NzuxzI3V9xrT1PDUDXFREwfPaYTOIqheZEDrurR5px2nhF72OYOxQYq14yIyZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=dt2SN8bc; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="dt2SN8bc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=kMGYNWu6GFRSJjGCKwdnJ4mn5dBo1RiNBMBClBdUXtI=; b=dt2SN8bcjqv/LfKAeXM/5V5htV
-	h+eeV78URZQ1NOp41L23kFnPiNryTRrwjKl+DF+oviyAo3ApCOysG5lQKsMOh5FhfjjQdOEyy+Sd5
-	1ktDdwDi4C3QgOFKiCNJMV4FkpR88p2758mI5GVPiz4ih6Me/fKesOC+gGHp69Ap6LdXi1KxSM77e
-	pfqF4e0qO9+5hEHuCxIA2ngYVE/auI8yr4R5Ds46yT+HjidNjkRMs61BvvT9w2FU4+3Q0fg+AfhSx
-	8BwCsYPwZgaPw4UP6WIyDM3zi84uudauNuiHPc0ivHSdCqLDA5w3QCgzjRf+Cib+qiMh9dgSgRqWi
-	9YRX9/EA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rvF5r-00B7tI-0H;
-	Fri, 12 Apr 2024 11:29:19 +0000
-Date: Fri, 12 Apr 2024 12:29:19 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
-	axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH vfs.all 22/26] block: stash a bdev_file to read/write raw
- blcok_device
-Message-ID: <20240412112919.GN2118490@ZenIV>
-References: <21d1bfd6-76f7-7ffb-34a4-2a85644674fe@huaweicloud.com>
- <20240407030610.GI538574@ZenIV>
- <8f414bc5-44c6-fe71-4d04-6aef3de8c5e3@huaweicloud.com>
- <20240409042643.GP538574@ZenIV>
- <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
- <20240410105911.hfxz4qh3n5ekrpqg@quack3>
- <20240410223443.GG2118490@ZenIV>
- <20240411-logik-besorgen-b7d590d6c1e9@brauner>
- <20240411140409.GH2118490@ZenIV>
- <20240412-egalisieren-fernreise-71b1f21f8e64@brauner>
+	s=arc-20240116; t=1712927902; c=relaxed/simple;
+	bh=10LLZDrGOU9wrEZQUx7zq0sXQtH4PdfTYhAVtwrWfek=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sj75DcSRkQT2+6kh1dsSDMoAK4/n9KMje0bEdJUftNIbVLYh4drd158obcz2OkT6bqqeuboVTELXFcckm6jBuyU3RuBUjaBCiO6Av7JZoKoM2YwGWnXfy5Q72UKeZBDRAokIiv6lMZidmy6dv1TPTppyn7UR18+obXAWArtojts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36afb9ef331so9774765ab.1
+        for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 06:18:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712927901; x=1713532701;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q/Mqv+/ZO+3xx7M9EDTPVKDbLutpy3xdH8I/GFId62E=;
+        b=I+k8QuHkPpvmWaEbvJnB18B9YZaqWQ7wq4e/E6VPoN5WeK4ZbV1B6plgw8g20RSMf1
+         kHTNzLcO/qxsvYLPgT+v1Hq6zRPeuEc3i+Jxv7XS2pE0U17CsufLsEAtf0cu+F8NWasV
+         YbLYwFFoXU0Zts5m+X290P9j1ymj00umNAhWIS5KxK5IdadDQQSESzvf8U9QpVuEMk/X
+         c9dL1WghqjbdIOKVRHJvm/NzcvJG11wuXkqUBQwcBv+4UmlDQ6XJ9p4whnbsvJqfKPw6
+         xLoSmENQtwYNxwxG4LLwVysWGOddrno9SSsdJ4KptT/oZLGb4UtWUazj/otN4Ms1dn1P
+         6vzQ==
+X-Gm-Message-State: AOJu0YxILtLaphLokSGAPd7kDnyI9/wPQv9DO+ZLLw+CNpPDJ4/DqsXb
+	c3TGK2p2BBWAQPgJZRboIn4opF1TdVV1Wsmr6rpL8YXYPYFdTO0TCG1G7FWJW6Z6vt2U9d/NAj3
+	UGaOxbMwc5j9usNmLzWgUUuFHeiXVHPtGOaB17QNtTfGSajd4zoymHcY=
+X-Google-Smtp-Source: AGHT+IE8vttjY9NAE6uAnOWzX9Vm1MdDFAe8ZTTMKL/qQ8uy81c+9dwqlhcgD7YXNi0KHYUX52veWeJRJ7fmrUkWYJDoN7o3L58W
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412-egalisieren-fernreise-71b1f21f8e64@brauner>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+X-Received: by 2002:a92:ca47:0:b0:36a:a6c4:2 with SMTP id q7-20020a92ca47000000b0036aa6c40002mr222389ilo.5.1712927900815;
+ Fri, 12 Apr 2024 06:18:20 -0700 (PDT)
+Date: Fri, 12 Apr 2024 06:18:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000de9270615e61b58@google.com>
+Subject: [syzbot] Monthly block report (Apr 2024)
+From: syzbot <syzbot+list813439a47d944440e6fb@syzkaller.appspotmail.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Apr 12, 2024 at 11:21:08AM +0200, Christian Brauner wrote:
+Hello block maintainers/developers,
 
-> Your series just replaces bd_inode in struct block_device with
-> bd_mapping. In a lot of places we do have immediate access to the bdev
-> file without changing any calling conventions whatsoever. IMO it's
-> perfectly fine to just use file_mapping() there. Sure, let's use
-> bdev_mapping() in instances like btrfs where we'd otherwise have to
-> change function signatures I'm not opposed to that. But there's no good
-> reason to just replace everything with bdev->bd_mapping access. And
-> really, why keep that thing in struct block_device when we can avoid it.
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
 
-Because having to have struct file around in the places where we want to
-get to page cache of block device fast is often inconvenient (see fs/buffer.c,
-if nothing else).
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 21 issues are still open and 92 have been fixed so far.
 
-It also simplifies the hell out of the patch series - it's one obviously
-safe automatic change in a single commit.
+Some of the still happening issues:
 
-And AFAICS the flags-related rationale can be dealt with in a much simpler
-way - see #bf_flags in my tree.
+Ref Crashes Repro Title
+<1> 1571    Yes   KMSAN: kernel-infoleak in filemap_read
+                  https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
+<2> 220     Yes   INFO: task hung in blkdev_fallocate
+                  https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+<3> 198     Yes   INFO: task hung in bdev_release
+                  https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
+<4> 25      Yes   INFO: task hung in blk_trace_ioctl (4)
+                  https://syzkaller.appspot.com/bug?extid=ed812ed461471ab17a0c
+<5> 8       Yes   INFO: task hung in blkdev_flush_mapping
+                  https://syzkaller.appspot.com/bug?extid=20e9a5e0dd424a875f55
+<6> 7       Yes   WARNING in validate_chain
+                  https://syzkaller.appspot.com/bug?extid=6647fcd6542faf3abd06
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
