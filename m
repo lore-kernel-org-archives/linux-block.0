@@ -1,127 +1,106 @@
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DD51474A0
-	for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 16:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BE614B08C;
+	Fri, 12 Apr 2024 17:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712940506; cv=none; b=FzJ+J/YA36GExg1thp8r2P/lZtKQZPuvJ+OaaaC0+1q8ZwrrOFGOwZzcT8yk44gWKudmB7O5povx7KLY3WhlJccRj464srFJLd1b6PMkq39JaQU9gLoM8vECf0TxaNEJ4XXkqre23a637xhw6tvlKaqW6DgqCbQ1EKpaS3RzAJo=
+	t=1712943022; cv=none; b=TCi6WjngNeXSHWPi24fEAd0AaDMJvwao5b2BR69hmobSswvZEEv1eSNx1n+HgT8ZjKOtMpNX5vBBx8ufPt4wnRWmSn7+f3srrzwdzUcBF5MY5euhs2bbVVVwlPM9C1XNvPIFLol5taeuANFfqRnMHn2iS9ofJFfIQbWzbG3SXJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712940506; c=relaxed/simple;
-	bh=iTsH36V306ZXMqMRxtdn2e+83oodpY3xenWhxKl6o30=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=eA2scB+pyPrnlPn02PamLN/30HjFn1HqC8A83McJ8/UG/tk2d5uBiKOefjsOumNXwHRbMJoRDVU+JaXOZI80D87ulL9SPs43S2TDNUDgi+Nv2ZWWzTY7KPpOB9jDakhC/X6cg4ufuutPsDBBldXWw5MqfYt626prC2Db1A0v4lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0MhF526k; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1712943022; c=relaxed/simple;
+	bh=3qJ7GhB7zga96XAHaSCPJZvl5n9zOw5sVXvClxshX7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RpUQUyCqTiYADpP3AUmQTc/g1yvdWL/pNdT3HnqfMHOUEOiCbCI6ZSA4kOjtJdy5Qn1VikgIWCl2iC44DHGClZcgn1pJNK2HJSyvxr6k/jqWuGWIZMvk/hPCCk6TbGh1U8dV2vjxn/Vx0X3IpG+hWzh8vRVxxzxxEgR2yIbP89U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K3TMWLHd; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0MhF526k"
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-36b07e83a76so103475ab.0
-        for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 09:48:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3TMWLHd"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so835159a12.1;
+        Fri, 12 Apr 2024 10:30:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712940502; x=1713545302; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BiQw+fvmDG5SW9XRYFQYiidFbbbudx0BfQ1uqiJaUAU=;
-        b=0MhF526k48feukQBQMiWKHM2kI5mtMwsOC2VpQlhZ3qPpMOFw3e+PtL/RQ96U9/sHj
-         XNrZU5jOy0frKl/HH4TjAi0LSJUYvsprEnjaVcN+7Uftt+V8vOq7SN12aiRL8tZz84iI
-         tUFq700Jio7Cf2DOmBUQ0BfPV6ZvWlffYkDtlVqaACTKPaXPe/OIcxRs+YxTuAOu6pfh
-         GPQJsTlgZSl4Wv77KIZ+j6TPlqnZrY7qihP/mvCUFf1ljE5yh00Ry5FrgCE8fcDIUmC+
-         FeKNi78AO4X34iFQPvPagErc6yscHU02XF35nLqg53zv8KDGDU0vL9kbsMUcQZIhK+Wy
-         yDLg==
+        d=gmail.com; s=20230601; t=1712943020; x=1713547820; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7HvIZ4yZMepG+cf7hgtKWjOqNNehIy9rYBxOFPB9Ngs=;
+        b=K3TMWLHdSDKvB6VO2pv3KOET7c6UAMKCL14GDAfhlASun5ZP3nm89ujzVIq9ZXZR2Q
+         RZQEoeXjvOsMzrdGX2oyQDu8VODPdiIotPaNZhPV/ZianruoxiHIdDLmLrnttPgBjc6+
+         DdrDbOskr3zcNPymUIi0sZXBIBVlVloiYNbmwRKNcale4fy6aDsebPpAu0lz53BxivhH
+         KQfnRJOzKy0KVrqIOAgQe/Tw7PNskIi+ubfTn8n0lH5CzwSmsCuQQcz8itS41eSCdI6M
+         qKoXpJAE1hphFaaYCsZ8Zp1GHvjaTnoAC3/EsawDXZczPT2on7/kpgL6FeFtFQIWMKs3
+         GShg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712940502; x=1713545302;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BiQw+fvmDG5SW9XRYFQYiidFbbbudx0BfQ1uqiJaUAU=;
-        b=PcAFn2VA24KIv7of1pLQnfs8Vi17jnbyNc4wZWIGW531ciegz2JsQtyrWDwHrSciOh
-         RBRlOmbZj8l6d74Bku7S/+Dv9VqW62iJFsA/mrJGhHUnl4xujjNEf0igQwlz8gOxXqkS
-         IunV6Sekx4iVwMb6kMwi+u7UK+IUY0wX+WidQSr0ooc22a8CF8zuUA+nlRaIGNPBT6VW
-         Sao1aR8Yf61g42sjKCuU5gkV6KfOKnE4YcY5ok3WPARyzCG/Z0wBbo/Oe9ubv6UiM31K
-         HZ3mQ1fI1/Snn/oT/Q4OopTnwsWsYLCaeoWsqRM1eSV0tq87kHi1LL6Y0/3Uur3Q/zUa
-         Fhiw==
-X-Gm-Message-State: AOJu0YxzLpeI4QzB5h3aaYKTdopC2ZZKupIL6KNDrDPIMq16uGHX+pDi
-	x4i294CNjtXJ0AlfFc5+QmxWJthJgjkrDmBvVZ215cB4kmZxDthTfz6BaQwvjubNNya6nZrOG3b
-	o
-X-Google-Smtp-Source: AGHT+IEq8R8QYPgD2lAPvFa9DX1o2/4kkbGNniM5xw96Ve11Lc5BaUgzsR1IT4QVuH0a8AKP3j4e/w==
-X-Received: by 2002:a92:4b01:0:b0:368:80b8:36fa with SMTP id m1-20020a924b01000000b0036880b836famr2852949ilg.2.1712940501679;
-        Fri, 12 Apr 2024 09:48:21 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ay32-20020a056638412000b004829e8e9456sm1153530jab.20.2024.04.12.09.48.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 09:48:21 -0700 (PDT)
-Message-ID: <6c52c906-677d-43de-b5bd-a0a213097de2@kernel.dk>
-Date: Fri, 12 Apr 2024 10:48:20 -0600
+        d=1e100.net; s=20230601; t=1712943020; x=1713547820;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7HvIZ4yZMepG+cf7hgtKWjOqNNehIy9rYBxOFPB9Ngs=;
+        b=iHj838AH/LsXIGzv6/FbZrMfu84Rz1e8+tx3+SJ92Ttvc8mohZtBvRPSoXTgk+Ja82
+         lMQoeOWrcczJes2xqE5ZZNdlORIutcyb22fIZCZIAbZwzmg/i9zMIOKsRYeAyOWRhX8h
+         XBkjaDx3sQtNSsGuKrdzrAPGU71ofBENUW3GiaJfBOEHhAi8k2m9W7mibUusKIPVQom8
+         egfrxSlTkddTmHlMQneHvkT+OHFAlREctTWMFFCITNHbjxULRFzF7MGv3Vnq2OUuJseg
+         5Ggo1wHGS7J0RVXHEadmETUE0ayMX3xOsAoHuA6b2IrSHfiy1ufgcsqUiKdGhdbGpE1W
+         JE0g==
+X-Forwarded-Encrypted: i=1; AJvYcCU/EKndAdAYOKYHPZpR8Okb/7uwpSAkObTQEH7gOazk6u8S2giw6BBRq/RpmuwuDHr2bmYePwodim8Mt3OSt7xltmDQDPkkOvaJd8xz4O+tkU8/ZD5h/vcSTkyau7J2Mg0KkF2VxJzwTPKhFW10vyklhdxZ4QwcpKVrpY6H6f3gC5Z2
+X-Gm-Message-State: AOJu0YzC7r2PAx8EJ842EKHBMDEieFyCG9jEQC0Gx1d3ginPD4DpH+lj
+	+rNI8ezD45MiCjyDn61YRvwfOZvKWQZqOOmq3aAjzijZYTVjwqdu
+X-Google-Smtp-Source: AGHT+IFOQoE69f87zpD6YQnq234Mfpz5JzC0OB8EMW5zXOYwpclZRKZ6e8Pe0OO53ph+5XZzIgFyYQ==
+X-Received: by 2002:a17:90a:fa08:b0:2a4:7df8:bd71 with SMTP id cm8-20020a17090afa0800b002a47df8bd71mr3093948pjb.13.1712943020326;
+        Fri, 12 Apr 2024 10:30:20 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:a5f4])
+        by smtp.gmail.com with ESMTPSA id z2-20020a17090a6d0200b002a5290ad3d4sm3322636pjj.3.2024.04.12.10.30.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 10:30:19 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 12 Apr 2024 07:30:18 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, chenhuacai@kernel.org, josef@toxicpanda.com,
+	jhs@mojatatu.com, svenjoac@gmx.de, raven@themaw.net,
+	pctammela@mojatatu.com, yukuai3@huawei.com, qde@naccy.de,
+	zhaotianrui@loongson.cn, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH RFC v2 1/6] blk-throttle: remove
+ CONFIG_BLK_DEV_THROTTLING_LOW
+Message-ID: <ZhlvqqtSo_Aw2Hjo@slm.duckdns.org>
+References: <20240406080059.2248314-1-yukuai1@huaweicloud.com>
+ <20240406080059.2248314-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.9-rc4
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240406080059.2248314-2-yukuai1@huaweicloud.com>
 
-Hi Linus,
+On Sat, Apr 06, 2024 at 04:00:54PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> One the one hand, it's marked EXPERIMENTAL since 2017, and looks like
+> there are no users since then, and no testers and no developers, it's
+> just not active at all.
+> 
+> On the other hand, even if the config is disabled, there are still many
+> fields in throtl_grp and throtl_data and many functions that are only
+> used for throtl low.
+> 
+> At last, currently blk-throtl is initialized during disk initialization,
+> and destroyed during disk removal, and it exposes many functions to be
+> called directly from block layer. Hence I'm planning to optimize
+> blk-throtl and finially support building it as kernel module. Remove
+> throtl low will make the work much easier.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-Some fixes for block storage that should go into the 6.9 kernel release:
+Acked-by: Tejun Heo <tj@kernel.org>
 
-- MD pull request via Song
-	- UAF fix (Yu)
+I haven't seen any usage but let's see if anyone complains.
 
-- Avoid out-of-bounds shift in blk-iocost (Rik)
-
-- Fix for q->blkg_list corruption (Ming)
-
-- Relax virt boundary mask/size segment checking (Ming)
-
-Please pull!
-
-
-The following changes since commit 9d0e8524204484702234e972a7e9f3015080987c:
-
-  Merge tag 'nvme-6.9-2024-04-04' of git://git.infradead.org/nvme into block-6.9 (2024-04-04 13:23:21 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.9-20240412
-
-for you to fetch changes up to 3ec4848913d695245716ea45ca4872d9dff097a5:
-
-  block: fix that blk_time_get_ns() doesn't update time after schedule (2024-04-12 08:31:54 -0600)
-
-----------------------------------------------------------------
-block-6.9-20240412
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      Merge tag 'md-6.9-20240408' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.9
-
-Ming Lei (2):
-      block: fix q->blkg_list corruption during disk rebind
-      block: allow device to have both virt_boundary_mask and max segment size
-
-Rik van Riel (1):
-      blk-iocost: avoid out of bounds shift
-
-Yu Kuai (2):
-      raid1: fix use-after-free for original bio in raid1_write_request()
-      block: fix that blk_time_get_ns() doesn't update time after schedule
-
- block/blk-cgroup.c   |  9 ++++++---
- block/blk-cgroup.h   |  2 ++
- block/blk-core.c     |  3 +++
- block/blk-iocost.c   |  7 ++++---
- block/blk-settings.c | 16 ++++++----------
- drivers/md/raid1.c   |  2 +-
- 6 files changed, 22 insertions(+), 17 deletions(-)
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
