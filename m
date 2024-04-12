@@ -1,71 +1,63 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215B114D70E;
-	Fri, 12 Apr 2024 18:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C915514E2E0;
+	Fri, 12 Apr 2024 18:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712945468; cv=none; b=CokQYdeV7SdqSxsSmwq06YAJAk7dh98qCVt1aVUrOzlPBDLw1quLBRxfgDMpI34Lhe1emAiVNSXy07b/FpgySzMWkp6ZP6xnO3IN4tcFNxgyTO2knmaYuao+BMdHciMykuqSn6HAu3D0vZxT6SIvEuQ0Z6IuJTWHTpYvRoXNUoc=
+	t=1712946532; cv=none; b=Yjwwik/8yFHONX3FX+7g4NNsec0lgCUQwvhuLFAM75dCsxooWBMgCygOBsV05PLOM01k4H++fTlKU3D3gq8VCMS5v1NsOfzOcMkKYQG3aGes1uPA/ZFb3c1l9/SJvA29cPGEgBuTPE84CnvRoixQeriJwmXUNrkJtl6UiW2CXlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712945468; c=relaxed/simple;
-	bh=X8JAZ83PISoSih6UqWtdaIMVzQTC/9WJWILUPIQBXJ4=;
+	s=arc-20240116; t=1712946532; c=relaxed/simple;
+	bh=X9j9yFm/65nRAckgOYZMNKOekN37E9FIFTz7phVScao=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRHofX9591XTo6IkeCIZMgIq4ERbH3Y73NlPjlxncuP5el+1cmT8SAqctZIoDHk5Z5TMCYZNoOx0ZnuLFCeLC/cN8gDZ1SGjQhfVW0nmltlxVQH2BmlW34IMYBef/m5ay+grApzhgtz8Fdy3f1bgr6ZJQWFWI/G1tFftC+fwdbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eaV2NFxU; arc=none smtp.client-ip=209.85.214.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=VFMbdsFJLpawZEWS+H6Zz6WLBy2u42TVNfzxw0/i2Y5LDy5ZV0l6Ss2iBjFHIsnod+UE1cE/GCF5Yk2XtApUmYqSiGlZInjlcVPKULkwfUm15N2uNZ2qsVUUtozX3uBvPGbLaMUVViSQfbGik8Rbd/abymDlJfFhcG5Gs3dFDZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=g4enleGk; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eaV2NFxU"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1e4f341330fso11596515ad.0;
-        Fri, 12 Apr 2024 11:11:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712945466; x=1713550266; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0JthIKMm0QudgaXVbOYMQ9cuPyBbvwy6KmupLEHj/Ww=;
-        b=eaV2NFxUKDJhfShgSZOAp/6DbfWsMe8hUifndzvfGFjkq3uEM8bo0NprsQVU5mD44Z
-         gLQRlm0COP6TBPEXO9vgF7XDtyg4NAgmlCfBUKR5bodmO21b3NQy99aBeitRqB6SGJAe
-         Yuf8vrIApbwuM0qWB1OAj9sxFVSOIykR9zVSeCIncia3dVkiJa8zJk7YiYnV79BCbU0w
-         Tcge7+FWwLpFzS9iqrlH8U6FRj5FDlu/xLByivAoGp5ES4S0c1drHd4o1ctQLDwD6RkN
-         iOWYvRSgt96NAtMlvwap7xHhCNZm9ahICbT372yIwddRZk2le51PsHl/fvUB/Ryz+ufi
-         SJMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712945466; x=1713550266;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0JthIKMm0QudgaXVbOYMQ9cuPyBbvwy6KmupLEHj/Ww=;
-        b=VoSJ4bZrWzPfIJRs2ZJM0tqeF0iER6aYfBVuijomx1CFzDHaFskh/QOnpWS4ZU4rOi
-         NKInuPoiRn8WDVSEkr2ci1Uc9anRvJLqeAsC0ntQBzYMBw9JuMEbJ8KLKXNTzBU5jYdW
-         BQU5Y0wej0HezeHBvb6ReSmJKxsEpVnfxZ1PL7kiBtRlHveL0vpL1LhHznUlWSGZ3prE
-         VQ5ujdFyDp41VbHfCGqyGPukz1jC5EUdGkeLJ6KdYm4Q3g0hi3D8wdT5IIJPhxm2S125
-         AfVUSqlctOUBfJtsarVRvH7cOt1db614JHZvxQQ0B7btNigG/Pspm028TMpk4wePul47
-         eq1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWmXPbYaPLI5iYWxIBbZhIf62Fv9JTI4zCwcfwUJD59iwl3U8ki9WorKPqao/nJNkHGvQsQJOjC7AICiVpKHxjE5yUz1iX85naEDgSqpiXVzWSCDBMQMNR/ZL0Az+FThQUFGw+l0mZ+ATSSjCdGyF9AbXNzKe8so6LMoxCraMp8MjDr
-X-Gm-Message-State: AOJu0Ywja89K7vD8WvBWz/90PIJgJNdSLp47OrwErgeytolvYbG4WtD4
-	bYlXueOydfP+OBI4eLhCeNXYwf1gOP7At5gRduL5NdjPLfVAguW4
-X-Google-Smtp-Source: AGHT+IE0PSTDSZKKtsu0hbpf/Klp71X2ePxEwc6wEp4D3GSUygJCRHA20izUrDuTvbH4UoBXRzSJUQ==
-X-Received: by 2002:a17:902:9a08:b0:1e5:870a:b2c0 with SMTP id v8-20020a1709029a0800b001e5870ab2c0mr3134934plp.14.1712945466289;
-        Fri, 12 Apr 2024 11:11:06 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:a5f4])
-        by smtp.gmail.com with ESMTPSA id h11-20020a170902680b00b001e0bcccc800sm1283613plk.35.2024.04.12.11.11.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 11:11:05 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 12 Apr 2024 08:11:04 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, chenhuacai@kernel.org, josef@toxicpanda.com,
-	jhs@mojatatu.com, svenjoac@gmx.de, raven@themaw.net,
-	pctammela@mojatatu.com, yukuai3@huawei.com, qde@naccy.de,
-	zhaotianrui@loongson.cn, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
-	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH RFC v2 6/6] blk-throtl: switch to use rq_qos
-Message-ID: <Zhl5ONFlPg4vqjGj@slm.duckdns.org>
-References: <20240406080059.2248314-1-yukuai1@huaweicloud.com>
- <20240406080059.2248314-7-yukuai1@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g4enleGk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=s9uyMrI2kBzD/jir8Kf5BQ4KLVX7ZmHiKzONe0aRyLQ=; b=g4enleGkCJEEwc71HQKni0x9GL
+	WQaciMczjdvFq3ggaGdSSVerJPZOnRP70tf/jJYONFwjo9AoRzjwNg1jZ9M6ngZW5iMlU+zpXLUW+
+	C9zDOOJMqEmOd6JzljE5sC7YvKO8mFIzOpi+wuvjAXUVr9SZ358OD4vWFo034mtRdmCrH29tnhQbE
+	dlN7RuMr4Fvg37WpbT3NYaYZIyDt4GuGQ41syaaAGsXyHbnvtFukS0XAo6x8EtzXWRmXwg5RtczDq
+	HV/tchkMzR/ZAUM21RhtdRQJLJo86VziZRS8/dEaVWKErEijWWzQNAFfc4tuKo+/zMQHY52RRcbZU
+	tAwukUoA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rvLdf-00000000rhY-0qAo;
+	Fri, 12 Apr 2024 18:28:39 +0000
+Date: Fri, 12 Apr 2024 11:28:39 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: John Garry <john.g.garry@oracle.com>,
+	Dan Helmick <dan.helmick@samsung.com>
+Cc: Matthew Wilcox <willy@infradead.org>,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+	axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
+	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+	io-uring@vger.kernel.org, nilay@linux.ibm.com,
+	ritesh.list@gmail.com
+Subject: Re: [PATCH v6 00/10] block atomic writes
+Message-ID: <Zhl9VxTVxIEYc4cF@bombadil.infradead.org>
+References: <20240326133813.3224593-1-john.g.garry@oracle.com>
+ <ZgOXb_oZjsUU12YL@casper.infradead.org>
+ <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
+ <Zg7Z4aJtn3SxY5w1@casper.infradead.org>
+ <f3c1d321-0dfc-466f-9f6a-fe2f0513d944@oracle.com>
+ <ZhQud1NbO4aMt0MH@bombadil.infradead.org>
+ <b0789a97-7dcf-48aa-9980-8525942dabfa@oracle.com>
+ <Zhg0_Pvlh9zy4zzG@bombadil.infradead.org>
+ <6d8e98bb-24d1-49be-8965-b6afa97dfdaa@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,33 +66,67 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240406080059.2248314-7-yukuai1@huaweicloud.com>
+In-Reply-To: <6d8e98bb-24d1-49be-8965-b6afa97dfdaa@oracle.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-Hello,
++ Dan,
 
-On Sat, Apr 06, 2024 at 04:00:59PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Fri, Apr 12, 2024 at 09:15:57AM +0100, John Garry wrote:
+> On 11/04/2024 20:07, Luis Chamberlain wrote:
+> > > So if you
+> > > have a 4K PBS and 512B LBS, then WRITE_ATOMIC_16 would be required to write
+> > > 16KB atomically.
+> > Ugh. Why does SCSI requires a special command for this?
 > 
-> To avoid exposing blk-throttle internal implementation to general block
-> layer.
-...
-> @@ -832,7 +832,7 @@ void submit_bio_noacct(struct bio *bio)
->  		goto not_supported;
->  	}
->  
-> -	if (blk_throtl_bio(bio))
-> +	if (rq_qos_throttle_bio(q, bio))
->  		return;
->  	submit_bio_noacct_nocheck(bio);
->  	return;
+> The actual question from others is why does NVMe not have a dedicated
+> command for this, like:
+> https://lore.kernel.org/linux-nvme/20240129062035.GB19796@lst.de/
 
-This is a half-way conversion, right? You're adding a dedicated hook to
-rq_qos and none of the other hooks can be used by blk-throtl. Even the name,
-rq_qos_throttle_bio(), becomes a misnomer. I'm not really sure this makes
-things better or worse. It makes certain things a bit cleaner but other
-things nastier. I don't know.
+Because we don't really need it for the hardware that supports it if the
+host does the respective topology checks. For instance the respective
+checks for NVMe are that atomics respect AWUN as the cap as the drive
+already can go up to AWUN, and the limit for power-fail is implicit by
+checking for AWUPF / NAWUPF. The alignment constraints can be dealt with
+by the host software.
 
-Thanks.
+> It's a data integrity feature, and we want to know if it works properly.
 
--- 
-tejun
+For drives which already support this integrity is ensured already for
+you. An NVMe specific atomic write command could be useful for for
+existing drives for other reasons or future uses but its not a requirement
+with the existing use cases if the NVMe alignment / atomic are respected by
+the host.
+
+> > Now we know what would be needed to bump the physical block size, it is
+> > certainly a different feature, however I think it would be good to
+> > evaluate that world too. For NVMe we don't have such special write
+> > requirements.
+> > 
+> > I put together this kludge with the last patches series of LBS + the
+> > bdev cache aops stuff (which as I said before needs an alternative
+> > solution) and just the scsi atomics topology + physical block size
+> > change to easily experiment to see what would break:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20240408-lbs-scsi-kludge
+> > 
+> > Using a larger sector size works but it does not use the special scsi
+> > atomic write.
+> 
+> If you are using scsi_debug driver, then you can just pass the desired
+> physblk_exp and sector_size args - they both default to 512B. Then you don't
+> need bother with sd.c atomic stuff, which I think is what you want.
+> 
+> > 
+> > > > > To me, O_ATOMIC would be required for buffered atomic writes IO, as we want
+> > > > > a fixed-sized IO, so that would mean no mixing of atomic and non-atomic IO.
+> > > > Would using the same min and max order for the inode work instead?
+> > > Maybe, I would need to check further.
+> > I'd be happy to help review too.
+> 
+> Yeah, I'm starting to think that min and max inode would make life easier,
+> as we don't need to deal with the scenario of an atomic write to a folio >
+> atomic write size.
+
+And aligments constraints could be dealt with as well.
+
+  Luis
