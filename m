@@ -1,87 +1,94 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907548174F
-	for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 13:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D905913CA91
+	for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 14:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712927902; cv=none; b=sZlIQHcKxp3iX2WdpwUUhvZPqqQD2DH7u0cWEFDmUsFRA8ECnEXwL/V7uAub/np2n/EbduVnsEwvzFTZMuUwutqMrLASKjR+KRYzxqeIyJhcCHxVBYZ0EQkRDaoDcvabbjGMlHy9c4jfQbhG0mMZHTozikZJx+VZEepOlScL4cI=
+	t=1712932386; cv=none; b=PFFNPmO4szQUK5CpCsrIYb1JhZFLBVgZIShGX20VZJxL4UXd+GGm8H8DJ7iLXcgwJ+PNZLXPY99bqa5feVhumUo3XX4GeXRYQ7fwPKJJQeejtsI2naN3x36WCpPA28ZxPN2ry0jbcHzpkrJQM7x3jDw2PK+c/tFkaQtKvZ8tG0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712927902; c=relaxed/simple;
-	bh=10LLZDrGOU9wrEZQUx7zq0sXQtH4PdfTYhAVtwrWfek=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sj75DcSRkQT2+6kh1dsSDMoAK4/n9KMje0bEdJUftNIbVLYh4drd158obcz2OkT6bqqeuboVTELXFcckm6jBuyU3RuBUjaBCiO6Av7JZoKoM2YwGWnXfy5Q72UKeZBDRAokIiv6lMZidmy6dv1TPTppyn7UR18+obXAWArtojts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36afb9ef331so9774765ab.1
-        for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 06:18:21 -0700 (PDT)
+	s=arc-20240116; t=1712932386; c=relaxed/simple;
+	bh=VVOpT9HwxORdHB2frWGih1hsKfYhPqfrT8OpAak0vH4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mP6x3nB9eA9GI68knZS06tlQ9x6+p2oLEfUqYZJJEhXLSIRb9zqBA0Dvtg1O5Yc+P6Vmm/+7e0nYsRuODChXSxnFg2SUdORcKhWDUFFg1iny5qVOSeoz0h4Mg5EqyF3UYYSUGt2XJd0M61WPVe+PBx6fLJrNkmujpjaiUSLhwTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=XXY4vSI2; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XXY4vSI2"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-36a29832cbdso1417195ab.1
+        for <linux-block@vger.kernel.org>; Fri, 12 Apr 2024 07:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712932383; x=1713537183; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TEvIA01ccEiylf2OqXaKsMDULTARVvUOpRx4F7QaXDY=;
+        b=XXY4vSI22POPx2le/puLBftnv+ghML4JIEzhK6mYRM68xsfxmlQ1Nd8DiDrL4gg83j
+         RuNefdcpRuFXmAS65uv3XSV0A6brP339zPkwLgab10V7nlqe+b3NOLYPmeXCEkb3tsPi
+         N2xxKH+TYNiRgAcQvW/JA1t+0yM7C6+XPA7oiM6eQfqDTtsw11a5ESLVnhBTXvpsJ5O8
+         BBQGQWDr/HNOtd/SfybaJZoX7f2uU51TREFcBU2j7NgBVsn2HUsAr69OpjiO5uaeb4pw
+         B6v4EHSQvrE0JhJmeOkaf65H3/qlDL92/pilgwkAMrHMhcdjNSLoKN7Pd9QZOpTNgXMh
+         HqCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712927901; x=1713532701;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q/Mqv+/ZO+3xx7M9EDTPVKDbLutpy3xdH8I/GFId62E=;
-        b=I+k8QuHkPpvmWaEbvJnB18B9YZaqWQ7wq4e/E6VPoN5WeK4ZbV1B6plgw8g20RSMf1
-         kHTNzLcO/qxsvYLPgT+v1Hq6zRPeuEc3i+Jxv7XS2pE0U17CsufLsEAtf0cu+F8NWasV
-         YbLYwFFoXU0Zts5m+X290P9j1ymj00umNAhWIS5KxK5IdadDQQSESzvf8U9QpVuEMk/X
-         c9dL1WghqjbdIOKVRHJvm/NzcvJG11wuXkqUBQwcBv+4UmlDQ6XJ9p4whnbsvJqfKPw6
-         xLoSmENQtwYNxwxG4LLwVysWGOddrno9SSsdJ4KptT/oZLGb4UtWUazj/otN4Ms1dn1P
-         6vzQ==
-X-Gm-Message-State: AOJu0YxILtLaphLokSGAPd7kDnyI9/wPQv9DO+ZLLw+CNpPDJ4/DqsXb
-	c3TGK2p2BBWAQPgJZRboIn4opF1TdVV1Wsmr6rpL8YXYPYFdTO0TCG1G7FWJW6Z6vt2U9d/NAj3
-	UGaOxbMwc5j9usNmLzWgUUuFHeiXVHPtGOaB17QNtTfGSajd4zoymHcY=
-X-Google-Smtp-Source: AGHT+IE8vttjY9NAE6uAnOWzX9Vm1MdDFAe8ZTTMKL/qQ8uy81c+9dwqlhcgD7YXNi0KHYUX52veWeJRJ7fmrUkWYJDoN7o3L58W
+        d=1e100.net; s=20230601; t=1712932383; x=1713537183;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TEvIA01ccEiylf2OqXaKsMDULTARVvUOpRx4F7QaXDY=;
+        b=CLAxfLRvFuYQh7RI89nhC3jlUF/A2TQZI1jrVwN6HMZmHZn9TssErSLABAuQdkebLV
+         NVOj//FSdSxyYP4YoWFT9xK/MVWI+BC2beEahOiTbToO3d1v3ud/fyPoS3PsHNfp6woh
+         E6eNyxcWyjY8h4KsT7veeZQencYm4xdugKDg4nGG9NPMNDybwZcR7csiKaw46lq9fQfZ
+         UA6Sm6V+di+gp5WaSOvQW2XRePXsyImLDesnzHhJBU2woMFI2lpcxYYEk+YFvnWeeDFQ
+         5pSDTjaZ5NsH2zpaVV+qdKf1xeRjzbYGE5NStCHIJHcivCwmqOVMtgswbh35vXzuasKw
+         nhJQ==
+X-Gm-Message-State: AOJu0YweCcxra9ksJzRkH/PagZYi11jIFqoRk2SX/EpDwqf4leug9vJw
+	PkbprbEjPKS91S99Kt8dOrQ3PdSUQVqyXUqBcSC26PBQ5KeUpADswbynwz2jNHU=
+X-Google-Smtp-Source: AGHT+IFuOwMs94z+EWLqxi54BMVGSTglNGLYHzzX4pMeSJ5gWr1AHUM/fCT7qyUTcJbydYEGfuo6lw==
+X-Received: by 2002:a92:db46:0:b0:368:974b:f7c7 with SMTP id w6-20020a92db46000000b00368974bf7c7mr2877286ilq.0.1712932382948;
+        Fri, 12 Apr 2024 07:33:02 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id b17-20020a920b11000000b0036a19d1e733sm1002825ilf.35.2024.04.12.07.33.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 07:33:02 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: johannes.thumshirn@wdc.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20240411032349.3051233-1-yukuai1@huaweicloud.com>
+References: <20240411032349.3051233-1-yukuai1@huaweicloud.com>
+Subject: Re: (subset) [PATCH -next 0/2] block: fix cached time in plug
+Message-Id: <171293238229.82435.5231159966660263187.b4-ty@kernel.dk>
+Date: Fri, 12 Apr 2024 08:33:02 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca47:0:b0:36a:a6c4:2 with SMTP id q7-20020a92ca47000000b0036aa6c40002mr222389ilo.5.1712927900815;
- Fri, 12 Apr 2024 06:18:20 -0700 (PDT)
-Date: Fri, 12 Apr 2024 06:18:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000de9270615e61b58@google.com>
-Subject: [syzbot] Monthly block report (Apr 2024)
-From: syzbot <syzbot+list813439a47d944440e6fb@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-Hello block maintainers/developers,
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+On Thu, 11 Apr 2024 11:23:47 +0800, Yu Kuai wrote:
+> Yu Kuai (2):
+>   block: fix that blk_time_get_ns() doesn't update time after schedule
+>   block: add plug while submitting IO
+> 
+> block/blk-core.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> [...]
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 21 issues are still open and 92 have been fixed so far.
+Applied, thanks!
 
-Some of the still happening issues:
+[1/2] block: fix that blk_time_get_ns() doesn't update time after schedule
+      commit: 3ec4848913d695245716ea45ca4872d9dff097a5
 
-Ref Crashes Repro Title
-<1> 1571    Yes   KMSAN: kernel-infoleak in filemap_read
-                  https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
-<2> 220     Yes   INFO: task hung in blkdev_fallocate
-                  https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<3> 198     Yes   INFO: task hung in bdev_release
-                  https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<4> 25      Yes   INFO: task hung in blk_trace_ioctl (4)
-                  https://syzkaller.appspot.com/bug?extid=ed812ed461471ab17a0c
-<5> 8       Yes   INFO: task hung in blkdev_flush_mapping
-                  https://syzkaller.appspot.com/bug?extid=20e9a5e0dd424a875f55
-<6> 7       Yes   WARNING in validate_chain
-                  https://syzkaller.appspot.com/bug?extid=6647fcd6542faf3abd06
+Best regards,
+-- 
+Jens Axboe
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
