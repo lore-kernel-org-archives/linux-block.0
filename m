@@ -1,28 +1,28 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31604A31;
-	Sat, 13 Apr 2024 00:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA4B4C7D;
+	Sat, 13 Apr 2024 00:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712969767; cv=none; b=UcvL+XEqZ2rzJ+NrmDRU2sPgQaFx8a14vdC8T4UqI5FIPmpWSKp5ErMRodgco5sHXSlH1pm8P4NHWIFX7pOu3/U6eraYslor5fxDfsDdmDNulxtmCG5n8m73ON/4AEKkyCcGl3eTceMqMkYFc7HJlJLAZQncHPs8ncObYZGBK+A=
+	t=1712969767; cv=none; b=EWK/UaZkQysOeRNpSrLc7aHiZaUwR6SrSiTTp3vqSK9VDtqdYFihT7w1AwVCOH1TCLKtWw6YLFaBiSIiGQERnk/VjPwxMbLXxPIzsiX0uQs+mmnlI2lXqQkjSRIb4XZxnwAdk1gvKhinTaFKFk/xKHXrbwQsKCdaC8/WSkcOoRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712969767; c=relaxed/simple;
-	bh=zSH+16UFgnroTmY3CH9ifexvAXXSOPhT76XaoocKK4s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=QMuWctwowZF8p1DHO46TNQvTq+Aw+yqYkEnNpxZ+zrNrXIkLMW4pUXAm/kSgG0HUh3eVeGGF3Jf6Nr0gm028tz47JcTnTQIN3ugzq8+XcVzRSnmkMOusmzi+Ryx3EuOwjINv+oiecwYuZYELLqNGuT4K453r/mLiNMozPlY0dWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ow1wgNq/; arc=none smtp.client-ip=13.77.154.182
+	bh=R4sB2NRxqqmPn0LzToyw522VX/sFNkiYUmj3X8sxnSs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=qQHSLY/Fk0KNlvdcanJhZYv0ZmUWGz0/2GI084Uwn9DUNuBPXyMbI92KfD60lnKswnrG5w9beNlvz0C/A5ghHjJxkZb14XID59jM/jUwC8z6cg05TDRjsBd8M3hpwZQ8KDyrr5JJYWs+2g7bwRdSxX9ylZDOkppXBheTk2ujT58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=p8iJDzwa; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ow1wgNq/"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="p8iJDzwa"
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-	id 82BC120F2687; Fri, 12 Apr 2024 17:56:05 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 82BC120F2687
+	id 9FA6320F26A7; Fri, 12 Apr 2024 17:56:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9FA6320F26A7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
 	s=default; t=1712969765;
-	bh=vuy/C/IHX8DZR9bX8mCHnZBlRDsV8pGfigebuT0GufY=;
+	bh=NvRurcaFRXUYjPMNWZ1HLWsxsPj8712oUc6g78Rln9Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ow1wgNq/QsiFS0sQaoHIGxgZfiA7fbL+YHibOh7uctIxgpmSgu4K0x8InPgpqpYSh
-	 BLfH3XCitg1qdMQC0WsI05kIMhss1/bSvEKEQKZyNJKsF+u8r4EOnRUUmCsHAk8Qus
-	 9QHOW4xq7beevpDFWC1uAR/poM21fdtFMpsNrwJE=
+	b=p8iJDzwahCSnLprGuAUAM3EJNHaNgBkU7nBSVUyuCyAXPhhBkwqfqGrkqnNgCPLlY
+	 pSCsFXT/O0X8/19BuybQ6lhXeB+zl1aQD1ptsXqwv1b0lvgx7ikW5rVjb/aQE0zjLQ
+	 u8MsSQ2AGwahmxV1UQOOPuNt0Nu9OUzBcRLOcNzw=
 From: Fan Wu <wufan@linux.microsoft.com>
 To: corbet@lwn.net,
 	zohar@linux.ibm.com,
@@ -45,9 +45,9 @@ Cc: linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Deven Bowers <deven.desai@linux.microsoft.com>,
 	Fan Wu <wufan@linux.microsoft.com>
-Subject: [PATCH v17 01/21] security: add ipe lsm
-Date: Fri, 12 Apr 2024 17:55:44 -0700
-Message-Id: <1712969764-31039-2-git-send-email-wufan@linux.microsoft.com>
+Subject: [PATCH v17 03/21] ipe: add evaluation loop
+Date: Fri, 12 Apr 2024 17:55:46 -0700
+Message-Id: <1712969764-31039-4-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1712969764-31039-1-git-send-email-wufan@linux.microsoft.com>
 References: <1712969764-31039-1-git-send-email-wufan@linux.microsoft.com>
@@ -59,300 +59,239 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
 From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Integrity Policy Enforcement (IPE) is an LSM that provides an
-complimentary approach to Mandatory Access Control than existing LSMs
-today.
-
-Existing LSMs have centered around the concept of access to a resource
-should be controlled by the current user's credentials. IPE's approach,
-is that access to a resource should be controlled by the system's trust
-of a current resource.
-
-The basis of this approach is defining a global policy to specify which
-resource can be trusted.
+Introduce a core evaluation function in IPE that will be triggered by
+various security hooks (e.g., mmap, bprm_check, kexec). This function
+systematically assesses actions against the defined IPE policy, by
+iterating over rules specific to the action being taken. This critical
+addition enables IPE to enforce its security policies effectively,
+ensuring that actions intercepted by these hooks are scrutinized for policy
+compliance before they are allowed to proceed.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+
 ---
 v2:
-  + Split evaluation loop, access control hooks,
-    and evaluation loop from policy parser and userspace
-    interface to pass mailing list character limit
++ Split evaluation loop, access control hooks, and evaluation loop from policy parser and userspace interface to pass mailing list character limit
 
 v3:
-  + Move ipe_load_properties to patch 04.
-  + Remove useless 0-initializations
-  + Prefix extern variables with ipe_
-  + Remove kernel module parameters, as these are
-    exposed through sysctls.
-  + Add more prose to the IPE base config option
-    help text.
-  + Use GFP_KERNEL for audit_log_start.
-  + Remove unnecessary caching system.
-  + Remove comments from headers
-  + Use rcu_access_pointer for rcu-pointer null check
-  + Remove usage of reqprot; use prot only.
-  + Move policy load and activation audit event to 03/12
++ Move ipe_load_properties to patch 04.
++ Remove useless 0-initializations Prefix extern variables with ipe_
++ Remove kernel module parameters, as these are exposed through sysctls.
++ Add more prose to the IPE base config option help text.
++ Use GFP_KERNEL for audit_log_start.
++ Remove unnecessary caching system.
++ Remove comments from headers
++ Use rcu_access_pointer for rcu-pointer null check
++ Remove usage of reqprot; use prot only.
++Move policy load and activation audit event to 03/12
 
 v4:
-  + Remove sysctls in favor of securityfs nodes
-  + Re-add kernel module parameters, as these are now
-    exposed through securityfs.
-  + Refactor property audit loop to a separate function.
++ Remove sysctls in favor of securityfs nodes
++ Re-add kernel module parameters, as these are now exposed through securityfs.
++ Refactor property audit loop to a separate function.
 
 v5:
-  + fix minor grammatical errors
-  + do not group rule by curly-brace in audit record,
-    reconstruct the exact rule.
++ fix minor grammatical errors
++ do not group rule by curly-brace in audit record,
++ reconstruct the exact rule.
 
 v6:
-  + No changes
++ No changes
 
 v7:
-  + Further split lsm creation into a separate commit from the
-    evaluation loop and audit system, for easier review.
-
-  + Introduce the concept of an ipe_context, a scoped way to
-    introduce execution policies, used initially for allowing for
-    kunit tests in isolation.
++ Further split lsm creation into a separate commit from the evaluation loop and audit system, for easier review.
++ Propagating changes to support the new ipe_context structure in the evaluation loop.
 
 v8:
-  + Follow lsmname_hook_name convention for lsm hooks.
-  + Move LSM blob accessors to ipe.c and mark LSM blobs as static.
++ Remove ipe_hook enumeration; hooks can be correlated via syscall record.
 
 v9:
-  + Remove ipe_context for simplification
++ Remove ipe_context related code and simplify the evaluation loop.
 
 v10:
-  + Add github url
++ Split eval part and boot_verified part
 
 v11:
-  + Correct github url
-  + Move ipe before bpf
++ Fix code style issues
 
 v12:
-  + Switch to use lsm_id instead of string for lsm name
++ Correct an rcu_read_unlock usage
++ Add a WARN to unknown op during evaluation
 
 v13:
-  + No changes
++ No changes
 
 v14:
-  + No changes
++ No changes
 
 v15:
-  + Add missing code in tools/testing/selftests/lsm/lsm_list_modules_test.c
++ No changes
 
 v16:
-  + No changes
++ No changes
 
 v17:
-  + Add years to license header
-  + Fix code and documentation style issues
++ Add years to license header
++ Fix code and documentation style issues
 ---
- include/uapi/linux/lsm.h                      |  1 +
- security/Kconfig                              | 11 ++---
- security/Makefile                             |  1 +
- security/ipe/Kconfig                          | 17 ++++++++
- security/ipe/Makefile                         |  9 ++++
- security/ipe/ipe.c                            | 42 +++++++++++++++++++
- security/ipe/ipe.h                            | 16 +++++++
- security/security.c                           |  3 +-
- .../selftests/lsm/lsm_list_modules_test.c     |  3 ++
- 9 files changed, 97 insertions(+), 6 deletions(-)
- create mode 100644 security/ipe/Kconfig
- create mode 100644 security/ipe/Makefile
- create mode 100644 security/ipe/ipe.c
- create mode 100644 security/ipe/ipe.h
+ security/ipe/Makefile |   1 +
+ security/ipe/eval.c   | 102 ++++++++++++++++++++++++++++++++++++++++++
+ security/ipe/eval.h   |  24 ++++++++++
+ 3 files changed, 127 insertions(+)
+ create mode 100644 security/ipe/eval.c
+ create mode 100644 security/ipe/eval.h
 
-diff --git a/include/uapi/linux/lsm.h b/include/uapi/linux/lsm.h
-index 33d8c9f4aa6b..938593dfd5da 100644
---- a/include/uapi/linux/lsm.h
-+++ b/include/uapi/linux/lsm.h
-@@ -64,6 +64,7 @@ struct lsm_ctx {
- #define LSM_ID_LANDLOCK		110
- #define LSM_ID_IMA		111
- #define LSM_ID_EVM		112
-+#define LSM_ID_IPE		113
- 
- /*
-  * LSM_ATTR_XXX definitions identify different LSM attributes
-diff --git a/security/Kconfig b/security/Kconfig
-index 412e76f1575d..9fb8f9b14972 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -192,6 +192,7 @@ source "security/yama/Kconfig"
- source "security/safesetid/Kconfig"
- source "security/lockdown/Kconfig"
- source "security/landlock/Kconfig"
-+source "security/ipe/Kconfig"
- 
- source "security/integrity/Kconfig"
- 
-@@ -231,11 +232,11 @@ endchoice
- 
- config LSM
- 	string "Ordered list of enabled LSMs"
--	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
--	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
--	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
--	default "landlock,lockdown,yama,loadpin,safesetid,bpf" if DEFAULT_SECURITY_DAC
--	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,bpf"
-+	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,ipe,bpf" if DEFAULT_SECURITY_SMACK
-+	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,ipe,bpf" if DEFAULT_SECURITY_APPARMOR
-+	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,ipe,bpf" if DEFAULT_SECURITY_TOMOYO
-+	default "landlock,lockdown,yama,loadpin,safesetid,ipe,bpf" if DEFAULT_SECURITY_DAC
-+	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,ipe,bpf"
- 	help
- 	  A comma-separated list of LSMs, in initialization order.
- 	  Any LSMs left off this list, except for those with order
-diff --git a/security/Makefile b/security/Makefile
-index 59f238490665..cc0982214b84 100644
---- a/security/Makefile
-+++ b/security/Makefile
-@@ -25,6 +25,7 @@ obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
- obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
- obj-$(CONFIG_BPF_LSM)			+= bpf/
- obj-$(CONFIG_SECURITY_LANDLOCK)		+= landlock/
-+obj-$(CONFIG_SECURITY_IPE)		+= ipe/
- 
- # Object integrity file lists
- obj-$(CONFIG_INTEGRITY)			+= integrity/
-diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
-new file mode 100644
-index 000000000000..e4875fb04883
---- /dev/null
-+++ b/security/ipe/Kconfig
-@@ -0,0 +1,17 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Integrity Policy Enforcement (IPE) configuration
-+#
-+
-+menuconfig SECURITY_IPE
-+	bool "Integrity Policy Enforcement (IPE)"
-+	depends on SECURITY && SECURITYFS
-+	select PKCS7_MESSAGE_PARSER
-+	select SYSTEM_DATA_VERIFICATION
-+	help
-+	  This option enables the Integrity Policy Enforcement LSM
-+	  allowing users to define a policy to enforce a trust-based access
-+	  control. A key feature of IPE is a customizable policy to allow
-+	  admins to reconfigure trust requirements on the fly.
-+
-+	  If unsure, answer N.
 diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-new file mode 100644
-index 000000000000..5486398a69e9
---- /dev/null
+index 3093de1afd3e..4cc17eb92060 100644
+--- a/security/ipe/Makefile
 +++ b/security/ipe/Makefile
-@@ -0,0 +1,9 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (C) 2020-2024 Microsoft Corporation. All rights reserved.
-+#
-+# Makefile for building the IPE module as part of the kernel tree.
-+#
-+
-+obj-$(CONFIG_SECURITY_IPE) += \
-+	ipe.o \
-diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+@@ -6,6 +6,7 @@
+ #
+ 
+ obj-$(CONFIG_SECURITY_IPE) += \
++	eval.o \
+ 	ipe.o \
+ 	policy.o \
+ 	policy_parser.o \
+diff --git a/security/ipe/eval.c b/security/ipe/eval.c
 new file mode 100644
-index 000000000000..8d4ea372873e
+index 000000000000..41331afdef7c
 --- /dev/null
-+++ b/security/ipe/ipe.c
-@@ -0,0 +1,42 @@
++++ b/security/ipe/eval.c
+@@ -0,0 +1,102 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2020-2024 Microsoft Corporation. All rights reserved.
 + */
-+#include <uapi/linux/lsm.h>
++
++#include <linux/fs.h>
++#include <linux/types.h>
++#include <linux/slab.h>
++#include <linux/file.h>
++#include <linux/sched.h>
++#include <linux/rcupdate.h>
 +
 +#include "ipe.h"
++#include "eval.h"
++#include "policy.h"
 +
-+static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
-+};
-+
-+static const struct lsm_id ipe_lsmid = {
-+	.name = "ipe",
-+	.id = LSM_ID_IPE,
-+};
-+
-+static struct security_hook_list ipe_hooks[] __ro_after_init = {
-+};
++struct ipe_policy __rcu *ipe_active_policy;
 +
 +/**
-+ * ipe_init() - Entry point of IPE.
++ * evaluate_property() - Analyze @ctx against a rule property.
++ * @ctx: Supplies a pointer to the context to be evaluated.
++ * @p: Supplies a pointer to the property to be evaluated.
 + *
-+ * This is called at LSM init, which happens occurs early during kernel
-+ * start up. During this phase, IPE registers its hooks and loads the
-+ * builtin boot policy.
++ * This is a placeholder. The actual function will be introduced in the
++ * latter commits.
 + *
 + * Return:
-+ * * %0		- OK
-+ * * %-ENOMEM	- Out of memory (OOM)
++ * * %true	- The current @ctx match the @p
++ * * %false	- The current @ctx doesn't match the @p
 + */
-+static int __init ipe_init(void)
++static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
++			      struct ipe_prop *p)
 +{
-+	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), &ipe_lsmid);
++	return false;
++}
++
++/**
++ * ipe_evaluate_event() - Analyze @ctx against the current active policy.
++ * @ctx: Supplies a pointer to the context to be evaluated.
++ *
++ * This is the loop where all policy evaluation happens against IPE policy.
++ *
++ * Return:
++ * * %0		- Success
++ * * %-EACCES	- @ctx did not pass evaluation
++ */
++int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
++{
++	const struct ipe_op_table *rules = NULL;
++	const struct ipe_rule *rule = NULL;
++	struct ipe_policy *pol = NULL;
++	struct ipe_prop *prop = NULL;
++	enum ipe_action_type action;
++	bool match = false;
++
++	rcu_read_lock();
++
++	pol = rcu_dereference(ipe_active_policy);
++	if (!pol) {
++		rcu_read_unlock();
++		return 0;
++	}
++
++	if (ctx->op == IPE_OP_INVALID) {
++		if (pol->parsed->global_default_action == IPE_ACTION_DENY) {
++			rcu_read_unlock();
++			return -EACCES;
++		}
++		if (pol->parsed->global_default_action == IPE_ACTION_INVALID)
++			WARN(1, "no default rule set for unknown op, ALLOW it");
++		rcu_read_unlock();
++		return 0;
++	}
++
++	rules = &pol->parsed->rules[ctx->op];
++
++	list_for_each_entry(rule, &rules->rules, next) {
++		match = true;
++
++		list_for_each_entry(prop, &rule->props, next) {
++			match = evaluate_property(ctx, prop);
++			if (!match)
++				break;
++		}
++
++		if (match)
++			break;
++	}
++
++	if (match)
++		action = rule->action;
++	else if (rules->default_action != IPE_ACTION_INVALID)
++		action = rules->default_action;
++	else
++		action = pol->parsed->global_default_action;
++
++	rcu_read_unlock();
++	if (action == IPE_ACTION_DENY)
++		return -EACCES;
 +
 +	return 0;
 +}
-+
-+DEFINE_LSM(ipe) = {
-+	.name = "ipe",
-+	.init = ipe_init,
-+	.blobs = &ipe_blobs,
-+};
-diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
+diff --git a/security/ipe/eval.h b/security/ipe/eval.h
 new file mode 100644
-index 000000000000..adc3c45e9f53
+index 000000000000..b137f2107852
 --- /dev/null
-+++ b/security/ipe/ipe.h
-@@ -0,0 +1,16 @@
++++ b/security/ipe/eval.h
+@@ -0,0 +1,24 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + * Copyright (C) 2020-2024 Microsoft Corporation. All rights reserved.
 + */
 +
-+#ifndef _IPE_H
-+#define _IPE_H
++#ifndef _IPE_EVAL_H
++#define _IPE_EVAL_H
 +
-+#ifdef pr_fmt
-+#undef pr_fmt
-+#endif
-+#define pr_fmt(fmt) "ipe: " fmt
++#include <linux/file.h>
++#include <linux/types.h>
 +
-+#include <linux/lsm_hooks.h>
++#include "policy.h"
 +
-+#endif /* _IPE_H */
-diff --git a/security/security.c b/security/security.c
-index 0a9a0ac3f266..820e0d437452 100644
---- a/security/security.c
-+++ b/security/security.c
-@@ -51,7 +51,8 @@
- 	(IS_ENABLED(CONFIG_BPF_LSM) ? 1 : 0) + \
- 	(IS_ENABLED(CONFIG_SECURITY_LANDLOCK) ? 1 : 0) + \
- 	(IS_ENABLED(CONFIG_IMA) ? 1 : 0) + \
--	(IS_ENABLED(CONFIG_EVM) ? 1 : 0))
-+	(IS_ENABLED(CONFIG_EVM) ? 1 : 0) + \
-+	(IS_ENABLED(CONFIG_SECURITY_IPE) ? 1 : 0))
- 
- /*
-  * These are descriptions of the reasons that can be passed to the
-diff --git a/tools/testing/selftests/lsm/lsm_list_modules_test.c b/tools/testing/selftests/lsm/lsm_list_modules_test.c
-index 06d24d4679a6..1cc8a977c711 100644
---- a/tools/testing/selftests/lsm/lsm_list_modules_test.c
-+++ b/tools/testing/selftests/lsm/lsm_list_modules_test.c
-@@ -128,6 +128,9 @@ TEST(correct_lsm_list_modules)
- 		case LSM_ID_EVM:
- 			name = "evm";
- 			break;
-+		case LSM_ID_IPE:
-+			name = "ipe";
-+			break;
- 		default:
- 			name = "INVALID";
- 			break;
++extern struct ipe_policy __rcu *ipe_active_policy;
++
++struct ipe_eval_ctx {
++	enum ipe_op_type op;
++
++	const struct file *file;
++};
++
++int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx);
++
++#endif /* _IPE_EVAL_H */
 -- 
 2.44.0
 
