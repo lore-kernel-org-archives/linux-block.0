@@ -1,115 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B7E1FA1;
-	Mon, 15 Apr 2024 12:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D08762DC;
+	Mon, 15 Apr 2024 12:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713184523; cv=none; b=FUlmXe9hdhtjqowbYguSvvM4n7TVd4j/NvE3x0ULd9fi5t8OQ18AFNjkMTG0ZJeTYM5k4W/ojJ9ehGGLLo1s/CCX9RP0FFVk6+NV+ZatSJVNoYYqhnvVdvmZh6axoyWLyGMoc/Lrk46SHN+2KJNq4izd4AiCjU0KIS+z5mKeKHQ=
+	t=1713185368; cv=none; b=Ym/gvIKUCeuKlxPgmPl+vncVhtZUOivYfrh7T1t0VQ4E+tSh7dFJJozb020zR1IVNvTEMiDXW3BQegDo509cz5AnLj2+SZyxp20floskbPIgo685PEZxjyE71mMdkz54nqfePYr/pXHqQKhUQebFVxmSVi26ahiM66eNHmFtVGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713184523; c=relaxed/simple;
-	bh=hrnNKsiFl4HrCM3TEdZKXvsxysJvx4sIVZWM4gkhccg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oIkPItrUqxrxpESssdz0ZV888jnObNeYAAtQoGftd39X1i9T+Nl7To7uyC52TtzncTfcGzhWb+HMuP2OpjNJIpHeoClonkE52zoxAoRbxHt7+D+hY5tVBpCV0qNkVYRisvAEBBq20WmSVUGnzPB0Z+7lCgWtpSjVwHd4mv3rSdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=beCzbxVH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713185368; c=relaxed/simple;
+	bh=k3ZZMuQVFwRl1gMlxSorEaL5Mxk0oRTuF99ryI1nZrc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ILW/AtMi4ZMtNgesnfbiDxNL/GEpIshszYQQBBCi0llc+1vP7wIrHomf8mMV2s129EGSfOXI20qlUyqvlkFJxBKFF8DHYX2OfBGBLDS2KcqwjRavWYlNKnKO40m+OZx4SieNTxS/58gVPmYgvNw32gBni90vU7p/7M3RDo+7IeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tu1F0hva; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="beCzbxVH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57D5DC113CC;
-	Mon, 15 Apr 2024 12:35:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tu1F0hva"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B79F0C2BD10;
+	Mon, 15 Apr 2024 12:49:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713184523;
-	bh=hrnNKsiFl4HrCM3TEdZKXvsxysJvx4sIVZWM4gkhccg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=beCzbxVHD0KSF6IlXcqzWnvyQsFgKqqyNa42tkPJ1v0qHbFZOFVacn5vOSsYXFcV9
-	 9FPxAgyB26IPW05giFQmiNz31Lkos5n4MRSy2koozhWoBDIKxjOPP2wExS3IhGpIzR
-	 npoNcbw3dHd5r5ehN0ZCl8xZ0HTwKXY8ZncgiN1bQ1rBGz2tLuZG1GVvHcDaCtVhYh
-	 mlU4sAdQeHAclRp91/9wkljjmrh+1E6GQ2k7zFK1uSKOcEE2UOJGRXtWnKSlVu5B+3
-	 Df9GOwFhz9rkKV8j6Mu2a8WdNX6XmiC+vjG8d7mDkBNzI169I7pkbq3lU+TOJ97WmX
-	 q8jvYITMT5U0w==
-Date: Mon, 15 Apr 2024 14:35:17 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
-	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>, 
-	dm-devel@lists.linux.dev, Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: [PATCH v2 04/34] md: port block device access to file
-Message-ID: <20240415-haufen-demolieren-8c6da8159586@brauner>
-References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
- <20240123-vfs-bdev-file-v2-4-adbd023e19cc@kernel.org>
- <Zhzyu6pQYkSNgvuh@fedora>
+	s=k20201202; t=1713185368;
+	bh=k3ZZMuQVFwRl1gMlxSorEaL5Mxk0oRTuF99ryI1nZrc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tu1F0hvaUkX3tjq0qjmq5z8oshVhxYfV0VGH/pnRXlrIpT1SWFUBZo52Dg/31XFLz
+	 4qqfUbPPhICQ4ySljdg8G2yLrMtvIZ+0+2r5zmJ9R3sRs3ah3NqXTOI0RHDvmEBgfJ
+	 yhx+Antyo85Ldj/IeTtRTx2GZpacd1Vyr0pW1h2EIdAH9KIEVJozbQi1lPTDiCp9vj
+	 T0++4TpO844pgAYvqmBecOUcvTpEoyi50WAkKFhNL9k2J95p2T/mAx1WAo4MhxQkzc
+	 BBcFai/d71jt80+nwPdSvGvyn3a9j45DCI8h5wlEcgAGncZHB5soOFFys+7/oX/eeu
+	 NhrnntWYszJuQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Li Nan <linan122@huawei.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 09/15] block: fix overflow in blk_ioctl_discard()
+Date: Mon, 15 Apr 2024 06:02:49 -0400
+Message-ID: <20240415100311.3126785-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240415100311.3126785-1-sashal@kernel.org>
+References: <20240415100311.3126785-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zhzyu6pQYkSNgvuh@fedora>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.8.6
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 15, 2024 at 05:26:19PM +0800, Ming Lei wrote:
-> Hello,
-> 
-> On Tue, Jan 23, 2024 at 02:26:21PM +0100, Christian Brauner wrote:
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > ---
-> >  drivers/md/dm.c               | 23 +++++++++++++----------
-> >  drivers/md/md.c               | 12 ++++++------
-> >  drivers/md/md.h               |  2 +-
-> >  include/linux/device-mapper.h |  2 +-
-> >  4 files changed, 21 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > index 8dcabf84d866..87de5b5682ad 100644
-> > --- a/drivers/md/dm.c
-> > +++ b/drivers/md/dm.c
-> 
-> ...
-> 
-> > @@ -775,7 +778,7 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
-> >  {
-> >  	if (md->disk->slave_dir)
-> >  		bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
-> > -	bdev_release(td->dm_dev.bdev_handle);
-> > +	fput(td->dm_dev.bdev_file);
-> 
-> The above change caused regression on 'dmsetup remove_all'.
-> 
-> blkdev_release() is delayed because of fput(), so dm_lock_for_deletion
-> returns -EBUSY, then this dm disk is skipped in remove_all().
-> 
-> Force to mark DMF_DEFERRED_REMOVE might solve it, but need our device
-> mapper guys to check if it is safe.
-> 
-> Or other better solution?
+From: Li Nan <linan122@huawei.com>
 
-Yeah, I think there is. You can just switch all fput() instances in
-device mapper to bdev_fput() which is mainline now. This will yield the
-device and make it able to be reclaimed. Should be as simple as the
-patch below. Could you test this and send a patch based on this (I'm on
-a prolonged vacation so I don't have time right now.):
+[ Upstream commit 22d24a544b0d49bbcbd61c8c0eaf77d3c9297155 ]
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 56aa2a8b9d71..0f681a1e70af 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -765,7 +765,7 @@ static struct table_device *open_table_device(struct mapped_device *md,
-        return td;
+There is no check for overflow of 'start + len' in blk_ioctl_discard().
+Hung task occurs if submit an discard ioctl with the following param:
+  start = 0x80000000000ff000, len = 0x8000000000fff000;
+Add the overflow validation now.
 
- out_blkdev_put:
--       fput(bdev_file);
-+       bdev_fput(bdev_file);
- out_free_td:
-        kfree(td);
-        return ERR_PTR(r);
-@@ -778,7 +778,7 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
+Signed-off-by: Li Nan <linan122@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20240329012319.2034550-1-linan666@huaweicloud.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/ioctl.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 438f79c564cfc..24246465e39b6 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -89,7 +89,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 		unsigned long arg)
  {
-        if (md->disk->slave_dir)
-                bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
--       fput(td->dm_dev.bdev_file);
-+       bdev_fput(td->dm_dev.bdev_file);
-        put_dax(td->dm_dev.dax_dev);
-        list_del(&td->list);
-        kfree(td);
+ 	uint64_t range[2];
+-	uint64_t start, len;
++	uint64_t start, len, end;
+ 	struct inode *inode = bdev->bd_inode;
+ 	int err;
+ 
+@@ -110,7 +110,8 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	if (len & 511)
+ 		return -EINVAL;
+ 
+-	if (start + len > bdev_nr_bytes(bdev))
++	if (check_add_overflow(start, len, &end) ||
++	    end > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
+ 
+ 	filemap_invalidate_lock(inode->i_mapping);
+-- 
+2.43.0
 
