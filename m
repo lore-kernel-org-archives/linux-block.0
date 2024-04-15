@@ -1,135 +1,136 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9433F73189
-	for <linux-block@vger.kernel.org>; Mon, 15 Apr 2024 13:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA70F7442E
+	for <linux-block@vger.kernel.org>; Mon, 15 Apr 2024 14:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713189394; cv=none; b=SqmkDJ/YT4Z6CgxTzwWgJ6Z2Ps4BpWJ6/wHASNoSQrEsGC4ZlwdLL8W2Y81i17YfgG/lDKSePGYcCBefFSmLQYhYumbQNMvCUySNBuXjhIQhYO9uDqTaya8mbl+Bn3RbTOUBdxAu4vgZ87AcPg9qQSqD0wConzCUAxCvAAPaQlU=
+	t=1713190108; cv=none; b=aU0kkx015y1tR5vkNacAZmkeRcWlytkp54ttS3NHbB5vSOLGqKJJcHVtzELgqlksDcyn04quE9QvJm2WW/tD4aqcjFozFdmkjbesGhMtS16L3JpX7zo4w8/0z//KViptBMLLCYiPVDIB/ersAFVH3bHBmc+eqnKIbXZTWU6XEew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713189394; c=relaxed/simple;
-	bh=+VVV7sQD/TURqBaQ3o4+GnmR1SYFSqIiY2IQytgOeyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nwS7mrk10ZrBX/XXSuIpYQSZ3bt9mukoTjSvMdnLnU4UC+r6qFm7kvDWQwGS/JStGaoHi1J87MyVKmbY5QXFHSSpGFvyZDGC7VV53i9Act8J7W8oGdfgWRu/1whyj8LsXz4JVP2pTBKK3TIUSVW82GC+1GIyT/VohClBzuQ2Cvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78d6021e2e3so260781885a.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Apr 2024 06:56:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713189390; x=1713794190;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A8W/huyXe05bmHkZ7p3zhmV/PsnRvwctPQtMd0KsVdw=;
-        b=GqMAR5JUfRT3Vgf18R+MWrLKlbgz18pl/0eOKhREt3tHh9W+5l1ZzidMrMH+TbnsOO
-         iZGkzbg0Dq639mgk9kulrUDTDtjnk1ymFC7ZoT3SCyVTHD2TGwpldCEJryyAbzFpAY7w
-         1px17zmwIbP0c9rdOzeW+ArKAFkIRh+DDiBA3jbekBtPe8Vt4vFbErhznP3tBLqUb84a
-         gIdgeyI3UzpRgB8CJLT1N79GsqJxvFutDWR6Boo5TNGALP1epbrnaSFbSUiWTYYskSfL
-         2JVXzPB38NFvxGqyhE+fUHGkruqoB3QLjobPscjU0mP1W/8FBN2WiAil+uREBD8w5kip
-         2adQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW489O91SFGQ+L+RnUd7Aj92t6XrGoNzQVadqnyMQueXZRw5Kf+wBZhu+rUT3ALm6Ib56Yj8VM2ZvZ+E/RpbWu1p3LvSjcctNePwig=
-X-Gm-Message-State: AOJu0YzmkxQjkZSU9jnuOWkFa+WOPjHFcS6yqrGeXmjS+bhOTjs38MpG
-	4Fc8QR//9RsPP1tJtDJrHjGpZd2vg7Rey9DWl7BQAQdagY2+bYK2zthlOUW83u0=
-X-Google-Smtp-Source: AGHT+IGyhwxIGf0/tZcTU4Qo6zY7NFezwol5Iq8ThT/YVXI3g8yDqaQ6a06haDbA8lDnpkm4O991xA==
-X-Received: by 2002:ae9:f718:0:b0:78d:5f83:4f77 with SMTP id s24-20020ae9f718000000b0078d5f834f77mr10863669qkg.37.1713189390431;
-        Mon, 15 Apr 2024 06:56:30 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id x10-20020ae9e90a000000b0078d6d22a0c3sm6383346qkf.90.2024.04.15.06.56.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 06:56:29 -0700 (PDT)
-Date: Mon, 15 Apr 2024 09:56:28 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: [PATCH v2 04/34] md: port block device access to file
-Message-ID: <Zh0yDCvqO8rXcXpz@redhat.com>
-References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
- <20240123-vfs-bdev-file-v2-4-adbd023e19cc@kernel.org>
- <Zhzyu6pQYkSNgvuh@fedora>
- <20240415-haufen-demolieren-8c6da8159586@brauner>
+	s=arc-20240116; t=1713190108; c=relaxed/simple;
+	bh=BQlCSR2pBKBQsRrJ8eRJ7jCIrsC96goMvznhaclK4Ho=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=aCIjGHyOCNig4KQElSx+k8p9h64MOSQVgs8K81GkSphvWYLz9NrtcAs0LPJEJbD1QUq5Bug5PcVyeqUbeG3/FsMuGW93llc4AfcNYf6MKg8EW+nDZ0XMx2cN4U9BgPNxRYE1HANxzALYCooVneArZPFIVu1o9Nct6jgHAZNXhJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CN2VhDzo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CN2VhDzo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713190105;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A4ewC4IHdX9Ac1Zdo5H+mNDvPTNL43IwaWU7wkXn44k=;
+	b=CN2VhDzo/uk50DrkxIUwvLawU97bD7qYDYa/4rSNHcDQDKyB8pjoBzgXGz65TcZ7NfNSzC
+	9tdm/JdwysxNlqHqHIwMzqN+4utN+m5BhKkurZeGfXgGI9CUplVLBJIEwdVuz98ridyc4S
+	O6t6BeWdcHARHPoubEjqah0CFjIbWEY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-640-y39HoyG-P5qxTwOuipouQQ-1; Mon,
+ 15 Apr 2024 10:08:19 -0400
+X-MC-Unique: y39HoyG-P5qxTwOuipouQQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EBFE43806278;
+	Mon, 15 Apr 2024 14:08:17 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 47946C13FA3;
+	Mon, 15 Apr 2024 14:08:17 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id 1B5B530BFEC2; Mon, 15 Apr 2024 14:08:17 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 16D9B3FD51;
+	Mon, 15 Apr 2024 16:08:17 +0200 (CEST)
+Date: Mon, 15 Apr 2024 16:08:17 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Mike Snitzer <snitzer@kernel.org>
+cc: hch@lst.de, axboe@kernel.dk, dm-devel@lists.linux.dev, 
+    linux-block@vger.kernel.org, Abelardo Ricart III <aricart@memnix.com>, 
+    Brandon Smith <freedom@reardencode.com>, 
+    Linus Torvalds <torvalds@linux-foundation.org>, 
+    Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH for-6.10 1/2] dm-crypt: stop constraining max_segment_size
+ to PAGE_SIZE
+In-Reply-To: <20240411201529.44846-2-snitzer@kernel.org>
+Message-ID: <41339ac6-579b-399e-9c60-d4f0628ab09f@redhat.com>
+References: <ZfDeMn6V8WzRUws3@infradead.org> <20240411201529.44846-2-snitzer@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415-haufen-demolieren-8c6da8159586@brauner>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On Mon, Apr 15 2024 at  8:35P -0400,
-Christian Brauner <brauner@kernel.org> wrote:
 
-> On Mon, Apr 15, 2024 at 05:26:19PM +0800, Ming Lei wrote:
-> > Hello,
-> > 
-> > On Tue, Jan 23, 2024 at 02:26:21PM +0100, Christian Brauner wrote:
-> > > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > > ---
-> > >  drivers/md/dm.c               | 23 +++++++++++++----------
-> > >  drivers/md/md.c               | 12 ++++++------
-> > >  drivers/md/md.h               |  2 +-
-> > >  include/linux/device-mapper.h |  2 +-
-> > >  4 files changed, 21 insertions(+), 18 deletions(-)
-> > > 
-> > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > index 8dcabf84d866..87de5b5682ad 100644
-> > > --- a/drivers/md/dm.c
-> > > +++ b/drivers/md/dm.c
-> > 
-> > ...
-> > 
-> > > @@ -775,7 +778,7 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
-> > >  {
-> > >  	if (md->disk->slave_dir)
-> > >  		bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
-> > > -	bdev_release(td->dm_dev.bdev_handle);
-> > > +	fput(td->dm_dev.bdev_file);
-> > 
-> > The above change caused regression on 'dmsetup remove_all'.
-> > 
-> > blkdev_release() is delayed because of fput(), so dm_lock_for_deletion
-> > returns -EBUSY, then this dm disk is skipped in remove_all().
-> > 
-> > Force to mark DMF_DEFERRED_REMOVE might solve it, but need our device
-> > mapper guys to check if it is safe.
-> > 
-> > Or other better solution?
+
+On Thu, 11 Apr 2024, Mike Snitzer wrote:
+
+> This change effectively reverts commit 586b286b110e ("dm crypt:
+> constrain crypt device's max_segment_size to PAGE_SIZE") and relies on
+> block core's late bio-splitting to ensure that dm-crypt's encryption
+> bios are split accordingly if they exceed the underlying device's
+> limits (e.g. max_segment_size).
 > 
-> Yeah, I think there is. You can just switch all fput() instances in
-> device mapper to bdev_fput() which is mainline now. This will yield the
-> device and make it able to be reclaimed. Should be as simple as the
-> patch below. Could you test this and send a patch based on this (I'm on
-> a prolonged vacation so I don't have time right now.):
+> Commit 586b286b110e was applied as a 4.3 fix for the benefit of
+> stable@ kernels 4.0+ just after block core's late bio-splitting was
+> introduced in 4.3 with commit 54efd50bfd873 ("block: make
+> generic_make_request handle arbitrarily sized bios"). Given block
+> core's late bio-splitting it is past time that dm-crypt make use of
+> it.
 > 
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 56aa2a8b9d71..0f681a1e70af 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -765,7 +765,7 @@ static struct table_device *open_table_device(struct mapped_device *md,
->         return td;
+> Also, given the recent need to revert meaningful progress that was
+> attempted during the 6.9 merge window (see commit bff4b74625fe Revert
+> "dm: use queue_limits_set") this change allows DM core to safely make
+> use of queue_limits_set() without risk of breaking dm-crypt on NVMe.
+> Though it should be noted this commit isn't a prereq for reinstating
+> DM core's use of queue_limits_set() because blk_validate_limits() was
+> made less strict with commit b561ea56a264 ("block: allow device to
+> have both virt_boundary_mask and max segment size").
 > 
->  out_blkdev_put:
-> -       fput(bdev_file);
-> +       bdev_fput(bdev_file);
->  out_free_td:
->         kfree(td);
->         return ERR_PTR(r);
-> @@ -778,7 +778,7 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
+> Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+
+Reviewed-by: Mikulas Patocka <mpatocka@redhat.com>
+
+> ---
+>  drivers/md/dm-crypt.c | 12 ++----------
+>  1 file changed, 2 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> index 5bfa35760167..f43a2c0b3d77 100644
+> --- a/drivers/md/dm-crypt.c
+> +++ b/drivers/md/dm-crypt.c
+> @@ -1656,8 +1656,8 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone);
+>  
+>  /*
+>   * Generate a new unfragmented bio with the given size
+> - * This should never violate the device limitations (but only because
+> - * max_segment_size is being constrained to PAGE_SIZE).
+> + * This should never violate the device limitations (but if it did then block
+> + * core should split the bio as needed).
+>   *
+>   * This function may be called concurrently. If we allocate from the mempool
+>   * concurrently, there is a possibility of deadlock. For example, if we have
+> @@ -3717,14 +3717,6 @@ static void crypt_io_hints(struct dm_target *ti, struct queue_limits *limits)
 >  {
->         if (md->disk->slave_dir)
->                 bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
-> -       fput(td->dm_dev.bdev_file);
-> +       bdev_fput(td->dm_dev.bdev_file);
->         put_dax(td->dm_dev.dax_dev);
->         list_del(&td->list);
->         kfree(td);
-> 
+>  	struct crypt_config *cc = ti->private;
+>  
+> -	/*
+> -	 * Unfortunate constraint that is required to avoid the potential
+> -	 * for exceeding underlying device's max_segments limits -- due to
+> -	 * crypt_alloc_buffer() possibly allocating pages for the encryption
+> -	 * bio that are not as physically contiguous as the original bio.
+> -	 */
+> -	limits->max_segment_size = PAGE_SIZE;
+> -
+>  	limits->logical_block_size =
+>  		max_t(unsigned int, limits->logical_block_size, cc->sector_size);
+>  	limits->physical_block_size =
+> -- 
+> 2.40.0
 > 
 
-Thanks. I'll work with Ming and others to take care of it. Have a great vacation!
