@@ -1,109 +1,249 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E714E18E1D;
-	Sun, 14 Apr 2024 20:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7AF1DA5F
+	for <linux-block@vger.kernel.org>; Mon, 15 Apr 2024 06:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713127829; cv=none; b=IdRXfZGti5F40Sw9Fx5EI5/7wL1FmtESzl05rLJzYhpKIV62wbOoyqaq9l2ACQCKXPXNYC6ai0Tqw9TeLUAyz6mlLfuEHUv0iYPUkwjTKDAvAXttYOjzUASRYKIej5cMNGmf1ZonsAV4xk3dFX8RO8ahksvYYE68IgLuwV8NXwk=
+	t=1713161265; cv=none; b=ESzSlMoKwEMXx17ccDoL/czbsBhJqG3HFdUVvFRDnWnZcp4afZtcgR4tMt+OQPSXjY2uObeW4zxFbpLG9MuQudI4XKrooCPGy2AKXIzTXEYxY0gzsKKpRorYVCEDBArIFb5Qi/yDvuomu9c070CyMkCDDJaxR/WEtyVSH7MPTCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713127829; c=relaxed/simple;
-	bh=F4vbb1SRBmgpVZuLjWS+M3TEdCeLFcPYBYURh/MbXT0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mc+exxCff8uAxzVsfms1bpHhD+gtrdzaTw8LUONsKi8xVdZajzJEdyTnXFEi4jXqpnjeV2vJWh9NEfPPlEke5oIzq8kA0Vak4fnZ2sbjAzjWxSiAN8751zo+AyzIxo3SSAiWyRcqMVWWYfK2qdYybbDNE/gR5pQAVm2l9wd74Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PtLHbReA; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PtLHbReA"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Fsqo+TcihzvYrlHKzsufMdVp0+RBP5LCcQAVZASLf7k=; b=PtLHbReA2YowMxzMDhLrmIA2MJ
-	yJYbXJQ0ZbYLQ/SMNhgGTcDpPfRZkAI6xThUkPM1wevXaJ7rbvA4AFVvUeDD2joY6ZUCHJixCmCkY
-	MtEJo+KT6LUT2oeZUpWWvQI56Tf3GWsYHPZC0y3thYyQsc4k8zFKAALCBBtX1nj08Tcjt934Qn5aX
-	IQBVwS55vs5QwynPLaqOgWi+bNbOwhZlCW1uLtVUmtpsSsoROR/XJVSnkNDkIxnmmyET8yFI9D7Ao
-	CAQnNJFsm/ei3C4lwrxQUPQXwOKDDNL9R21DHi4SjGA0B05DcPMAs9lPAxPMAgoT1j5Z+as759b6W
-	g95FC3eg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rw6no-00000006NUn-3vr6;
-	Sun, 14 Apr 2024 20:50:17 +0000
-Date: Sun, 14 Apr 2024 13:50:16 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: John Garry <john.g.garry@oracle.com>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-	axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
-	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-	io-uring@vger.kernel.org, nilay@linux.ibm.com,
-	ritesh.list@gmail.com
-Subject: Re: [PATCH v6 00/10] block atomic writes
-Message-ID: <ZhxBiLSHuW35aoLB@bombadil.infradead.org>
-References: <20240326133813.3224593-1-john.g.garry@oracle.com>
- <ZgOXb_oZjsUU12YL@casper.infradead.org>
- <c4c0dad5-41a4-44b4-8f40-2a250571180b@oracle.com>
- <Zg7Z4aJtn3SxY5w1@casper.infradead.org>
- <f3c1d321-0dfc-466f-9f6a-fe2f0513d944@oracle.com>
- <ZhQud1NbO4aMt0MH@bombadil.infradead.org>
- <ZhYQANQATz82ytl1@casper.infradead.org>
+	s=arc-20240116; t=1713161265; c=relaxed/simple;
+	bh=bPj6QlcLi4XrRHYufTRYNiCGvg+NUZoj2xCvdt9IAsc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pOjoQoKFThsG8x2g2xDdJVXfLRm+wUD+I/DUGTajVz3aGWsFHXUyHk3qgL8PyBG/jXv0yWEUTpGixy/6xhQHDvGuT/VJXYTXS/2vrV/P+UjVyKo6XS+HZOLR4yQofFvCPtTGL7q3MBucNuopAX7pft93M5LVVdV7mzm7F9aRGRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 43F67PNl023199;
+	Mon, 15 Apr 2024 14:07:25 +0800 (+08)
+	(envelope-from Dongliang.Cui@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4VHxTs55Y8z2K6J0J;
+	Mon, 15 Apr 2024 14:05:05 +0800 (CST)
+Received: from tj10379pcu.spreadtrum.com (10.5.32.15) by
+ BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Mon, 15 Apr 2024 14:07:23 +0800
+From: Dongliang Cui <dongliang.cui@unisoc.com>
+To: <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
+        <mathieu.desnoyers@efficios.com>, <ebiggers@kernel.org>
+CC: <ke.wang@unisoc.com>, <hongyu.jin.cn@gmail.com>, <niuzhiguo84@gmail.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <cuidongliang390@gmail.com>, Dongliang Cui <dongliang.cui@unisoc.com>
+Subject: [PATCH RESEND] block: Add ioprio to block_rq tracepoint
+Date: Mon, 15 Apr 2024 14:07:10 +0800
+Message-ID: <20240415060710.1199009-1-dongliang.cui@unisoc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhYQANQATz82ytl1@casper.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX02.spreadtrum.com (10.0.64.8)
+X-MAIL:SHSQR01.spreadtrum.com 43F67PNl023199
 
-On Wed, Apr 10, 2024 at 05:05:20AM +0100, Matthew Wilcox wrote:
-> On Mon, Apr 08, 2024 at 10:50:47AM -0700, Luis Chamberlain wrote:
-> > On Fri, Apr 05, 2024 at 11:06:00AM +0100, John Garry wrote:
-> > > On 04/04/2024 17:48, Matthew Wilcox wrote:
-> > > > > > The thing is that there's no requirement for an interface as complex as
-> > > > > > the one you're proposing here.  I've talked to a few database people
-> > > > > > and all they want is to increase the untorn write boundary from "one
-> > > > > > disc block" to one database block, typically 8kB or 16kB.
-> > > > > > 
-> > > > > > So they would be quite happy with a much simpler interface where they
-> > > > > > set the inode block size at inode creation time,
-> > > > > We want to support untorn writes for bdev file operations - how can we set
-> > > > > the inode block size there? Currently it is based on logical block size.
-> > > > ioctl(BLKBSZSET), I guess?  That currently limits to PAGE_SIZE, but I
-> > > > think we can remove that limitation with the bs>PS patches.
-> > 
-> > I can say a bit more on this, as I explored that. Essentially Matthew,
-> > yes, I got that to work but it requires a set of different patches. We have
-> > what we tried and then based on feedback from Chinner we have a
-> > direction on what to try next. The last effort on that front was having the
-> > iomap aops for bdev be used and lifting the PAGE_SIZE limit up to the
-> > page cache limits. The crux on that front was that we end requiring
-> > disabling BUFFER_HEAD and that is pretty limitting, so my old
-> > implementation had dynamic aops so to let us use the buffer-head aops
-> > only when using filesystems which require it and use iomap aops
-> > otherwise. But as Chinner noted we learned through the DAX experience
-> > that's not a route we want to again try, so the real solution is to
-> > extend iomap bdev aops code with buffer-head compatibility.
-> 
-> Have you tried just using the buffer_head code?  I think you heard bad
-> advice at last LSFMM.  Since then I've landed a bunch of patches which
-> remove PAGE_SIZE assumptions throughout the buffer_head code, and while
-> I haven't tried it, it might work.  And it might be easier to make work
-> than adding more BH hacks to the iomap code.
+Sometimes we need to track the processing order of requests with
+ioprio set. So the ioprio of request can be useful information.
 
-I have considered it but the issue is that *may work* isn't good enough and
-without a test plan for buffer-heads on a real filesystem this may never
-suffice. Addressing a buffere-head iomap compat for the block device cache
-is less error prone here for now.
+Example：
 
-  Luis
+block_rq_insert: 8,0 WS 4096 () 16573296 + 8 rt,4 [highpool[1]]
+block_rq_issue: 8,0 WS 4096 () 16573296 + 8 rt,4 [kworker/7:0H]
+block_rq_complete: 8,0 WS () 16573296 + 8 rt,4 [0]
+
+Signed-off-by: Dongliang Cui <dongliang.cui@unisoc.com>
+---
+ include/linux/blktrace_api.h |  2 ++
+ include/trace/events/block.h | 63 ++++++++++++++++++++++--------------
+ kernel/trace/blktrace.c      | 11 +++++++
+ 3 files changed, 51 insertions(+), 25 deletions(-)
+
+diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+index 122c62e561fc..adb0333efbdb 100644
+--- a/include/linux/blktrace_api.h
++++ b/include/linux/blktrace_api.h
+@@ -112,6 +112,8 @@ struct compat_blk_user_trace_setup {
+ 
+ void blk_fill_rwbs(char *rwbs, blk_opf_t opf);
+ 
++void blk_fill_ioprio(u32 ioprio, char *ioprio_class, u32 *ioprio_value);
++
+ static inline sector_t blk_rq_trace_sector(struct request *rq)
+ {
+ 	/*
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 0e128ad51460..1d41fade160a 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -10,7 +10,8 @@
+ #include <linux/buffer_head.h>
+ #include <linux/tracepoint.h>
+ 
+-#define RWBS_LEN	8
++#define RWBS_LEN		8
++#define IOPRIO_CLASS_LEN	8
+ 
+ #ifdef CONFIG_BUFFER_HEAD
+ DECLARE_EVENT_CLASS(block_buffer,
+@@ -79,11 +80,13 @@ TRACE_EVENT(block_rq_requeue,
+ 	TP_ARGS(rq),
+ 
+ 	TP_STRUCT__entry(
+-		__field(  dev_t,	dev			)
+-		__field(  sector_t,	sector			)
+-		__field(  unsigned int,	nr_sector		)
+-		__array(  char,		rwbs,	RWBS_LEN	)
+-		__dynamic_array( char,	cmd,	1		)
++		__field(  dev_t,	dev				)
++		__field(  sector_t,	sector				)
++		__field(  unsigned int,	nr_sector			)
++		__array(  char,		rwbs,	RWBS_LEN		)
++		__array(  char,		ioprio_class, IOPRIO_CLASS_LEN	)
++		__field(  unsigned int, ioprio_value			)
++		__dynamic_array( char,	cmd,	1			)
+ 	),
+ 
+ 	TP_fast_assign(
+@@ -92,14 +95,16 @@ TRACE_EVENT(block_rq_requeue,
+ 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
++		blk_fill_ioprio(rq->ioprio, __entry->ioprio_class, &__entry->ioprio_value);
+ 		__get_str(cmd)[0] = '\0';
+ 	),
+ 
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u %s,%u [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+ 		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, 0)
++		  __entry->nr_sector, __entry->ioprio_class,
++		  __entry->ioprio_value, 0)
+ );
+ 
+ DECLARE_EVENT_CLASS(block_rq_completion,
+@@ -109,12 +114,14 @@ DECLARE_EVENT_CLASS(block_rq_completion,
+ 	TP_ARGS(rq, error, nr_bytes),
+ 
+ 	TP_STRUCT__entry(
+-		__field(  dev_t,	dev			)
+-		__field(  sector_t,	sector			)
+-		__field(  unsigned int,	nr_sector		)
+-		__field(  int	,	error			)
+-		__array(  char,		rwbs,	RWBS_LEN	)
+-		__dynamic_array( char,	cmd,	1		)
++		__field(  dev_t,	dev				)
++		__field(  sector_t,	sector				)
++		__field(  unsigned int,	nr_sector			)
++		__field(  int,		error				)
++		__array(  char,		rwbs,	RWBS_LEN		)
++		__array(  char,		ioprio_class, IOPRIO_CLASS_LEN	)
++		__field(  unsigned int,	ioprio_value			)
++		__dynamic_array( char,	cmd,	1			)
+ 	),
+ 
+ 	TP_fast_assign(
+@@ -124,14 +131,16 @@ DECLARE_EVENT_CLASS(block_rq_completion,
+ 		__entry->error     = blk_status_to_errno(error);
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
++		blk_fill_ioprio(rq->ioprio, __entry->ioprio_class, &__entry->ioprio_value);
+ 		__get_str(cmd)[0] = '\0';
+ 	),
+ 
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u %s,%u [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+ 		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->error)
++		  __entry->nr_sector, __entry->ioprio_class,
++		  __entry->ioprio_value, __entry->error)
+ );
+ 
+ /**
+@@ -176,13 +185,15 @@ DECLARE_EVENT_CLASS(block_rq,
+ 	TP_ARGS(rq),
+ 
+ 	TP_STRUCT__entry(
+-		__field(  dev_t,	dev			)
+-		__field(  sector_t,	sector			)
+-		__field(  unsigned int,	nr_sector		)
+-		__field(  unsigned int,	bytes			)
+-		__array(  char,		rwbs,	RWBS_LEN	)
+-		__array(  char,         comm,   TASK_COMM_LEN   )
+-		__dynamic_array( char,	cmd,	1		)
++		__field(  dev_t,	dev				)
++		__field(  sector_t,	sector				)
++		__field(  unsigned int,	nr_sector			)
++		__field(  unsigned int,	bytes				)
++		__array(  char,		rwbs,	RWBS_LEN		)
++		__array(  char,		ioprio_class, IOPRIO_CLASS_LEN	)
++		__field(  unsigned int,	ioprio_value			)
++		__array(  char,		comm,   TASK_COMM_LEN		)
++		__dynamic_array( char,	cmd,	1			)
+ 	),
+ 
+ 	TP_fast_assign(
+@@ -192,15 +203,17 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		__entry->bytes     = blk_rq_bytes(rq);
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
++		blk_fill_ioprio(rq->ioprio, __entry->ioprio_class, &__entry->ioprio_value);
+ 		__get_str(cmd)[0] = '\0';
+ 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+ 	),
+ 
+-	TP_printk("%d,%d %s %u (%s) %llu + %u [%s]",
++	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u [%s]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __entry->bytes, __get_str(cmd),
+ 		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->comm)
++		  __entry->nr_sector, __entry->ioprio_class,
++		  __entry->ioprio_value, __entry->comm)
+ );
+ 
+ /**
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index d5d94510afd3..e55aa49f94db 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -19,6 +19,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/list.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/ioprio.h>
+ 
+ #include "../../block/blk.h"
+ 
+@@ -26,6 +27,9 @@
+ 
+ #include "trace_output.h"
+ 
++/* Type of ioprio */
++static char *classes[] = {"none", "rt", "be", "idle"};
++
+ #ifdef CONFIG_BLK_DEV_IO_TRACE
+ 
+ static unsigned int blktrace_seq __read_mostly = 1;
+@@ -1914,5 +1918,12 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
+ }
+ EXPORT_SYMBOL_GPL(blk_fill_rwbs);
+ 
++void blk_fill_ioprio(u32 ioprio, char *ioprio_class, u32 *ioprio_value)
++{
++	memcpy(ioprio_class, classes[(ioprio >> IOPRIO_CLASS_SHIFT) & 0x3], IOPRIO_CLASS_LEN);
++	*ioprio_value = ioprio & 0xff;
++}
++EXPORT_SYMBOL_GPL(blk_fill_ioprio);
++
+ #endif /* CONFIG_EVENT_TRACING */
+ 
+-- 
+2.25.1
+
