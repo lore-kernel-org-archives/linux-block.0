@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D08762DC;
-	Mon, 15 Apr 2024 12:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1216127E04;
+	Mon, 15 Apr 2024 12:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713185368; cv=none; b=Ym/gvIKUCeuKlxPgmPl+vncVhtZUOivYfrh7T1t0VQ4E+tSh7dFJJozb020zR1IVNvTEMiDXW3BQegDo509cz5AnLj2+SZyxp20floskbPIgo685PEZxjyE71mMdkz54nqfePYr/pXHqQKhUQebFVxmSVi26ahiM66eNHmFtVGU=
+	t=1713185414; cv=none; b=hnFZS3WwH2gTFqQHffp7C4KSbe8MoPnfhXrLHNluNZqCWbke1yx/t0OVQBbcxqZcAmqh4IEg9yOFl+RYqWDy1/gpsu42N7nKret5RVA7RpiVd0p/K0eONP+KTmIBIZcKG8z43fUqNh2LlOvZcbjsqd3tsl5R99veS3ygVAS7h64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713185368; c=relaxed/simple;
-	bh=k3ZZMuQVFwRl1gMlxSorEaL5Mxk0oRTuF99ryI1nZrc=;
+	s=arc-20240116; t=1713185414; c=relaxed/simple;
+	bh=TmsmNj7bRkz5rFs75rWI7SSlKnqyyER7J97nLh86c7o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ILW/AtMi4ZMtNgesnfbiDxNL/GEpIshszYQQBBCi0llc+1vP7wIrHomf8mMV2s129EGSfOXI20qlUyqvlkFJxBKFF8DHYX2OfBGBLDS2KcqwjRavWYlNKnKO40m+OZx4SieNTxS/58gVPmYgvNw32gBni90vU7p/7M3RDo+7IeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tu1F0hva; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=BH0vBAEjdPCupU9rfeNU6t481+8oBZNr9cwrDHOeEfuuc7fHfKM515fYrBDXam1xhqGG0EFCtfadfs+lbCDPSOxorJUjztLonGqxitGd648uz52rKcNU+ObHW9Z6ZZtAgb+c+W6nMq9XNd6ZOWkFJPC/iCYTzVhUBqv8R011xGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EoBAD1Nx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tu1F0hva"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B79F0C2BD10;
-	Mon, 15 Apr 2024 12:49:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EoBAD1Nx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60706C4AF08;
+	Mon, 15 Apr 2024 12:50:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713185368;
-	bh=k3ZZMuQVFwRl1gMlxSorEaL5Mxk0oRTuF99ryI1nZrc=;
+	s=k20201202; t=1713185414;
+	bh=TmsmNj7bRkz5rFs75rWI7SSlKnqyyER7J97nLh86c7o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tu1F0hvaUkX3tjq0qjmq5z8oshVhxYfV0VGH/pnRXlrIpT1SWFUBZo52Dg/31XFLz
-	 4qqfUbPPhICQ4ySljdg8G2yLrMtvIZ+0+2r5zmJ9R3sRs3ah3NqXTOI0RHDvmEBgfJ
-	 yhx+Antyo85Ldj/IeTtRTx2GZpacd1Vyr0pW1h2EIdAH9KIEVJozbQi1lPTDiCp9vj
-	 T0++4TpO844pgAYvqmBecOUcvTpEoyi50WAkKFhNL9k2J95p2T/mAx1WAo4MhxQkzc
-	 BBcFai/d71jt80+nwPdSvGvyn3a9j45DCI8h5wlEcgAGncZHB5soOFFys+7/oX/eeu
-	 NhrnntWYszJuQ==
+	b=EoBAD1NxA/0PJZvMaKYqkypifDbbfMqBuIO6/1x3UYMEEPWQoD3JOLzmpEr8DYnyA
+	 Rj/KcZelrtzLvyGDR4Z1AE3KTwUMbk1s+oL9SrCyZ4eUU33YMjVc64JXvTnwEiuaFm
+	 M2GMMS3ZSB0nWOX8Fup5WgPdrEmxWV3l0c1gy5NHZLmDPk3/aC3+/B6FfSxaQFTDTs
+	 gcSSbk3CIB6VYQNIJgRbGubzUB6diirVaXTYdvOGTQ5Xzt2iJ2ZS2z2/HkSzwDdmx0
+	 IGYl3ttKsZEsTRHFktwEeMsFjZAnFw+OkJUWCYtMY4Ke0OE4u5M21HL2c0Vs7E3YfW
+	 5NROqKJL8VLfA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -34,12 +34,12 @@ Cc: Li Nan <linan122@huawei.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 09/15] block: fix overflow in blk_ioctl_discard()
-Date: Mon, 15 Apr 2024 06:02:49 -0400
-Message-ID: <20240415100311.3126785-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 08/12] block: fix overflow in blk_ioctl_discard()
+Date: Mon, 15 Apr 2024 06:03:43 -0400
+Message-ID: <20240415100358.3127162-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240415100311.3126785-1-sashal@kernel.org>
-References: <20240415100311.3126785-1-sashal@kernel.org>
+In-Reply-To: <20240415100358.3127162-1-sashal@kernel.org>
+References: <20240415100358.3127162-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,7 +48,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.8.6
+X-stable-base: Linux 6.6.27
 Content-Transfer-Encoding: 8bit
 
 From: Li Nan <linan122@huawei.com>
@@ -70,7 +70,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/block/ioctl.c b/block/ioctl.c
-index 438f79c564cfc..24246465e39b6 100644
+index d1d8e8391279a..68265f914c27b 100644
 --- a/block/ioctl.c
 +++ b/block/ioctl.c
 @@ -89,7 +89,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
