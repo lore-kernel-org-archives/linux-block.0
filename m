@@ -1,152 +1,120 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D0F74E25
-	for <linux-block@vger.kernel.org>; Mon, 15 Apr 2024 14:28:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51961D52B
+	for <linux-block@vger.kernel.org>; Mon, 15 Apr 2024 14:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713191291; cv=none; b=hCLiNTOwPXvasaBPNv6Q2iqx1ZcHqpW7ooJc1MChu8w1P8wGaUEegVpC/uxlC3U7vzP3MbP0Xxilol4ENYXBUuQUNs0K7gad+Rfg2rM57GNfVKyml1F62d9QUkHQMXh1eI5snDGB3Bw8axvQSYuih+vK3iukJ6Bdth2rB2vwuzw=
+	t=1713191773; cv=none; b=e3acFlapZ4FEH0sOTsTXvz60o3BcF8o3wdxSPXAbZJ5dMVf6MU1fO5RGg5hJxE4Uwr1ubZ5iGCklIAAe4oDbIaTuPMNLAF8SJst3BKF+WBfqBKyvnkx1sbKbfnsaFPShNtNoDd/+x0CZzvLqG0Pf6kSnDDeloeRxvZK50Z+Phyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713191291; c=relaxed/simple;
-	bh=C9k/67mNDu9JZZVlkC9+YGlA+Pct1REeiGOvVkMO3pA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ud1/n5OqY9R0kTNNCjRnkT2JJNfUPak8DaL2//A8wijA3pv5GqTHSOVa8dNL1Oc9+Eia8IcsqN1hF4dM9KLwiRsgy4JKzrNKowpazlsOFo3VwifIzVuLTKa8++xsumitmFUx/zRbwCI6brSlPL8hhC+wX4zNENniTc4+L4hkGTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZwaRd+QA; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1713191773; c=relaxed/simple;
+	bh=YMv48aXULq+P+Zfe6u92CCqGqs7nverst/BByaD+MJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=chbgxmviCbs5kT8rRfJ3KZ/b+CkqUZiBhTK7oc/7qXGTxoit8VWkcarzqVpzlhxth2Egeo3t3FLd6YrgNzWC3DJBgrpY+NxXB454tVn9d9M2h2wNjLHsOBZDNvbqHqkVCS1vErx/HtJXNt61Mh9toCOzxTeYS3pssk8gw8QPcBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PzgsGIgO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZwaRd+QA"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7d6112ba6baso51928639f.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Apr 2024 07:28:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713191287; x=1713796087; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QRTtIzWUyjRN105mYcVMSMyn4DDl5DBhcJ+d/09l5DA=;
-        b=ZwaRd+QAV1Zg7nCnYoPm+xsW2fjhoj2IwOdp6t5ZsiWBbmQ2TnJfQmvogfG68PUDEq
-         oSOp8FeA43rwUUvHfHP88+AGpvWHAG3cRjPSDQHVpXf9HdMPS8xKqCmoq0llg1cE8Vyh
-         KZ322nXqc+KVuhIlHOBd8zKahTPP/qeKqJXlckJn6QFUqJR/UA4c1LhtwdvyHLdMGieb
-         OTiejAPZI9NG7TDloOX8zbHa0TXUJz58ckG+Eh0xnEXggEEoUvGOhKwYhxZWTKQcwVoi
-         E4KU/geNfQAv8dsMeMv2kBw5pGdZ3XzPNNe5qX3XZm6xzB1zXfCyEcmpMQ/WDQ5Vl9qW
-         1Vjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713191287; x=1713796087;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QRTtIzWUyjRN105mYcVMSMyn4DDl5DBhcJ+d/09l5DA=;
-        b=GIiWv64sel7UINSbUtdfywCB3okYRT5/9Rj3QhUGARZOcSUfpiE2NWkjE61WkOLkcC
-         FgoUgClGyiTm65fAaV6gGseVcWMJx+nb7WDxcA703WhM1FhUW92v0ve0KAI/ZqcJtiGH
-         Z37Uzq59t8ACXnE8/QXgS3kbfWgj99DGtm453E0M6cgjmsM0//M96XtMi8vVe9xdaLAd
-         WHPXyKRdmsCEIGJLecvzJlBkThZre9+mGyv2DvRQ/TzK4hz07AB0j07p8OeIuYHvhTWa
-         3fbwu9B4cKAlNDrgTVAQSU+pl5D8KMcA0yBQJdVuFmlQ4Q5bwkSpnQtQ2Zxd7w/x3anQ
-         n5og==
-X-Forwarded-Encrypted: i=1; AJvYcCUUWdtxEYapIxJtvCuN98JZK1CQ3n9PNOlGhucq5AmU6MLTA1bCL0a6wIsBdf929Ngmm7Khb1Mbap4aGlk6Sn0sC52V3uFAnrikiSs=
-X-Gm-Message-State: AOJu0Yw7bYpEWc/EhjMqrCddfTDfQKa2HOJiPrFIHzAu9PF/KUhUmWFt
-	bdoXuRMNic/YENEJsZl8HV2UXn7n6ZI47zl2xfQhVj+Tc3DLGCuJP5ifRBzOc6/qg97h4KqSzB3
-	Z
-X-Google-Smtp-Source: AGHT+IFS4o4jmGBf7fTJRFTFvKYCXRsjG7/VSIpfAgV2pmxk5gnwG+fVz4MURdY5JJ2zdnPuVAiw0g==
-X-Received: by 2002:a05:6602:38d:b0:7d6:513b:254 with SMTP id f13-20020a056602038d00b007d6513b0254mr10548400iov.2.1713191286983;
-        Mon, 15 Apr 2024 07:28:06 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id f17-20020a05660215d100b007d5e05cef76sm2852977iow.33.2024.04.15.07.28.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 07:28:06 -0700 (PDT)
-Message-ID: <06b1c052-cbd4-4b8c-bc58-175fe6d41d72@kernel.dk>
-Date: Mon, 15 Apr 2024 08:28:05 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PzgsGIgO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713191770;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2Fpco6JyEqxSHVCGXvAnj47X9HVqOOy7QTJFx9DYGrE=;
+	b=PzgsGIgODAYbgmfYTSW2HJi3oW63GuinZlNBA01TVUW6EzYiQ6+6aYWmw2vokpsy4q5esn
+	Etx/Mga8ZYBbuSl6T/aqGQZPx1K4wDRwEesXgoAVE07Xqm3qhos25gI3E5pv19H6zw/PIU
+	3bEe95Y3EjMW6j8A/7xH5kMqVwY8P0w=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-O5C2w4qgPzGIwjnOkYKvtQ-1; Mon,
+ 15 Apr 2024 10:36:07 -0400
+X-MC-Unique: O5C2w4qgPzGIwjnOkYKvtQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B3F4A380350C;
+	Mon, 15 Apr 2024 14:36:06 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FC5F51EF;
+	Mon, 15 Apr 2024 14:36:01 +0000 (UTC)
+Date: Mon, 15 Apr 2024 22:35:53 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: [PATCH v2 04/34] md: port block device access to file
+Message-ID: <Zh07Sc3lYStOWK8J@fedora>
+References: <20240123-vfs-bdev-file-v2-0-adbd023e19cc@kernel.org>
+ <20240123-vfs-bdev-file-v2-4-adbd023e19cc@kernel.org>
+ <Zhzyu6pQYkSNgvuh@fedora>
+ <20240415-haufen-demolieren-8c6da8159586@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] WARNING: CPU: 5 PID: 679 at io_uring/io_uring.c:2835
- io_ring_exit_work+0x2b6/0x2e0
-Content-Language: en-US
-To: Changhui Zhong <czhong@redhat.com>,
- Linux Block Devices <linux-block@vger.kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-References: <CAGVVp+WzC1yKiLHf8z0PnNWutse7BgY9HuwgQwwsvT4UYbUZXQ@mail.gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAGVVp+WzC1yKiLHf8z0PnNWutse7BgY9HuwgQwwsvT4UYbUZXQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415-haufen-demolieren-8c6da8159586@brauner>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 4/15/24 3:14 AM, Changhui Zhong wrote:
-> Hello,
+On Mon, Apr 15, 2024 at 02:35:17PM +0200, Christian Brauner wrote:
+> On Mon, Apr 15, 2024 at 05:26:19PM +0800, Ming Lei wrote:
+> > Hello,
+> > 
+> > On Tue, Jan 23, 2024 at 02:26:21PM +0100, Christian Brauner wrote:
+> > > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> > > ---
+> > >  drivers/md/dm.c               | 23 +++++++++++++----------
+> > >  drivers/md/md.c               | 12 ++++++------
+> > >  drivers/md/md.h               |  2 +-
+> > >  include/linux/device-mapper.h |  2 +-
+> > >  4 files changed, 21 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > > index 8dcabf84d866..87de5b5682ad 100644
+> > > --- a/drivers/md/dm.c
+> > > +++ b/drivers/md/dm.c
+> > 
+> > ...
+> > 
+> > > @@ -775,7 +778,7 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
+> > >  {
+> > >  	if (md->disk->slave_dir)
+> > >  		bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
+> > > -	bdev_release(td->dm_dev.bdev_handle);
+> > > +	fput(td->dm_dev.bdev_file);
+> > 
+> > The above change caused regression on 'dmsetup remove_all'.
+> > 
+> > blkdev_release() is delayed because of fput(), so dm_lock_for_deletion
+> > returns -EBUSY, then this dm disk is skipped in remove_all().
+> > 
+> > Force to mark DMF_DEFERRED_REMOVE might solve it, but need our device
+> > mapper guys to check if it is safe.
+> > 
+> > Or other better solution?
 > 
-> repo:https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-> branch:for-next
-> commit HEAD:f2738f2440eb573094ef6f09cca915ae37f2f8bc
-> 
-> hit this issue on recent upstream，reproduced with ubdsrv, trigger this
-> issue on "running generic/005" and "running generic/006",
-> 
-> # cd ubdsrv
-> # make test T=generic
-> 
-> [  993.347470] WARNING: CPU: 13 PID: 4628 at io_uring/io_uring.c:2835
-> io_ring_exit_work+0x2b6/0x2e0
-> [  993.357304] Modules linked in: ext4 mbcache jbd2 rfkill sunrpc
-> dm_multipath intel_rapl_msr intel_rapl_common intel_uncore_frequency
-> intel_uncore_frequency_common i10nm_edac nfit libnvdimm
-> x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm ipmi_ssif
-> rapl intel_cstate mgag200 iTCO_wdt dax_hmem iTCO_vendor_support
-> cxl_acpi mei_me i2c_algo_bit cxl_core i2c_i801 drm_shmem_helper
-> isst_if_mmio isst_if_mbox_pci drm_kms_helper intel_uncore mei einj
-> ioatdma pcspkr i2c_smbus isst_if_common intel_vsec intel_pch_thermal
-> ipmi_si dca ipmi_devintf ipmi_msghandler acpi_pad acpi_power_meter drm
-> fuse xfs libcrc32c sd_mod t10_pi sg ahci crct10dif_pclmul libahci
-> crc32_pclmul crc32c_intel libata tg3 ghash_clmulni_intel wmi dm_mirror
-> dm_region_hash dm_log dm_mod
-> [  993.431516] CPU: 13 PID: 4628 Comm: kworker/u96:2 Not tainted 6.9.0-rc3+ #1
-> [  993.439297] Hardware name: Lenovo ThinkSystem SR650 V2/7Z73CTO1WW,
-> BIOS AFE120G-1.40 09/20/2022
-> [  993.449015] Workqueue: iou_exit io_ring_exit_work
-> [  993.454275] RIP: 0010:io_ring_exit_work+0x2b6/0x2e0
-> [  993.459729] Code: 89 e7 e8 6d de ff ff 48 8b 44 24 58 65 48 2b 04
-> 25 28 00 00 00 75 2e 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc
-> cc cc cc <0f> 0b 41 be 60 ea 00 00 e9 45 fe ff ff 0f 0b e9 1d ff ff ff
-> e8 c1
-> [  993.480695] RSP: 0018:ff70b0c247657dd0 EFLAGS: 00010287
-> [  993.486533] RAX: 00000001000a94c0 RBX: ff26a781c5b48448 RCX: 0000000000000000
-> [  993.494506] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ff26a781c5b48040
-> [  993.502475] RBP: ff70b0c247657e60 R08: 0000000000000000 R09: ffffffffbb254ca0
-> [  993.510445] R10: 0000000000000000 R11: 0000000000000000 R12: ff26a781c5b48000
-> [  993.518415] R13: ff26a781c5b48040 R14: 0000000000000032 R15: 0000000000000000
-> [  993.526387] FS:  0000000000000000(0000) GS:ff26a784efa80000(0000)
-> knlGS:0000000000000000
-> [  993.535427] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  993.541848] CR2: 00007ff5a794f004 CR3: 000000003ea20006 CR4: 0000000000771ef0
-> [  993.549820] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [  993.557790] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [  993.565761] PKRU: 55555554
-> [  993.568787] Call Trace:
-> [  993.571523]  <TASK>
-> [  993.573871]  ? __warn+0x7f/0x130
-> [  993.577486]  ? io_ring_exit_work+0x2b6/0x2e0
-> [  993.582259]  ? report_bug+0x18a/0x1a0
-> [  993.586358]  ? handle_bug+0x3c/0x70
-> [  993.590262]  ? exc_invalid_op+0x14/0x70
-> [  993.594551]  ? asm_exc_invalid_op+0x16/0x20
-> [  993.599234]  ? io_ring_exit_work+0x2b6/0x2e0
-> [  993.604006]  ? try_to_wake_up+0x21e/0x600
-> [  993.608490]  process_one_work+0x193/0x3d0
-> [  993.612969]  worker_thread+0x2fc/0x410
-> [  993.617161]  ? __pfx_worker_thread+0x10/0x10
-> [  993.621934]  kthread+0xdc/0x110
-> [  993.625448]  ? __pfx_kthread+0x10/0x10
-> [  993.629640]  ret_from_fork+0x2d/0x50
-> [  993.633640]  ? __pfx_kthread+0x10/0x10
-> [  993.637830]  ret_from_fork_asm+0x1a/0x30
-> [  993.642219]  </TASK>
-> [  993.644661] ---[ end trace 0000000000000000 ]---
+> Yeah, I think there is. You can just switch all fput() instances in
+> device mapper to bdev_fput() which is mainline now. This will yield the
+> device and make it able to be reclaimed. Should be as simple as the
+> patch below. Could you test this and send a patch based on this (I'm on
+> a prolonged vacation so I don't have time right now.):
 
-I can't reproduce this here, fwiw. Ming, something you've seen?
+Unfortunately it doesn't work.
 
--- 
-Jens Axboe
+Here the problem is that blkdev_release() is delayed, which changes
+'dmsetup remove_all' behavior, and causes that some of dm disks aren't
+removed.
 
+Please see dm_lock_for_deletion() and dm_blk_open()/dm_blk_close().
+
+Thanks,
+Ming
 
