@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1216127E04;
-	Mon, 15 Apr 2024 12:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319AD12CD9B;
+	Mon, 15 Apr 2024 12:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713185414; cv=none; b=hnFZS3WwH2gTFqQHffp7C4KSbe8MoPnfhXrLHNluNZqCWbke1yx/t0OVQBbcxqZcAmqh4IEg9yOFl+RYqWDy1/gpsu42N7nKret5RVA7RpiVd0p/K0eONP+KTmIBIZcKG8z43fUqNh2LlOvZcbjsqd3tsl5R99veS3ygVAS7h64=
+	t=1713185434; cv=none; b=Z2u/PZmLmoPwcI1fgJS+GDMaa2iar62vf8A9Y+nuIMKZHgyd+1WYlo/CIvryx20dIOd4i5dkqL8L6TOyQisCvPn5EoxUL6suo6mXjqfX1TPK2aLVsWpGqBcu3DbqAmt2ZhF+OREQgnKgt0p2XEDJ9CtXUkOCv/r8oyVBWL390OU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713185414; c=relaxed/simple;
-	bh=TmsmNj7bRkz5rFs75rWI7SSlKnqyyER7J97nLh86c7o=;
+	s=arc-20240116; t=1713185434; c=relaxed/simple;
+	bh=qJFLwLTWIkULEQF7YdcZkviaFR/ZQF8zdPoalJhmabs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BH0vBAEjdPCupU9rfeNU6t481+8oBZNr9cwrDHOeEfuuc7fHfKM515fYrBDXam1xhqGG0EFCtfadfs+lbCDPSOxorJUjztLonGqxitGd648uz52rKcNU+ObHW9Z6ZZtAgb+c+W6nMq9XNd6ZOWkFJPC/iCYTzVhUBqv8R011xGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EoBAD1Nx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TbnSB+hniQZnYJma+K8Hnhhr8pY/NyQh0UQH2zuh+1LuWdBxRHmIMVKDjuKHC03m7m1VDachXweJznjLgISrlkuGzHGk4n9EbC5Qy3ZBrWSltE4dbMJy6bcHU2OLfaKp0rwreSsYT1xcpyeh96SjPFWfQyWsFzeYyDx0qp5wZmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bQWCcfU5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EoBAD1Nx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60706C4AF08;
-	Mon, 15 Apr 2024 12:50:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQWCcfU5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F78FC3277B;
+	Mon, 15 Apr 2024 12:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713185414;
-	bh=TmsmNj7bRkz5rFs75rWI7SSlKnqyyER7J97nLh86c7o=;
+	s=k20201202; t=1713185434;
+	bh=qJFLwLTWIkULEQF7YdcZkviaFR/ZQF8zdPoalJhmabs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EoBAD1NxA/0PJZvMaKYqkypifDbbfMqBuIO6/1x3UYMEEPWQoD3JOLzmpEr8DYnyA
-	 Rj/KcZelrtzLvyGDR4Z1AE3KTwUMbk1s+oL9SrCyZ4eUU33YMjVc64JXvTnwEiuaFm
-	 M2GMMS3ZSB0nWOX8Fup5WgPdrEmxWV3l0c1gy5NHZLmDPk3/aC3+/B6FfSxaQFTDTs
-	 gcSSbk3CIB6VYQNIJgRbGubzUB6diirVaXTYdvOGTQ5Xzt2iJ2ZS2z2/HkSzwDdmx0
-	 IGYl3ttKsZEsTRHFktwEeMsFjZAnFw+OkJUWCYtMY4Ke0OE4u5M21HL2c0Vs7E3YfW
-	 5NROqKJL8VLfA==
+	b=bQWCcfU50nY+70t3+VvDap2KO+Q6C1XrGn8XwONh62Sz5xebRe3K92BgQ1b1MmfQX
+	 s21CLfknJ7UDIQMnIp/ezeO+b1uns7HB9y/wGidu8Q1g9WvaSNFsFJtJyEbgWSInra
+	 OPd43fXJ2ysXgXIjo8B2q0OhTnu9ko8Mrb6BbVTHV5otjgGqi5k8YUrZPUcXeDLyP7
+	 +xw3zbUVAZ+fU8iopHARtKS6uDQMGaltQ5Q3YbuJ+iCjAoI0W8vp5RqK5blUa1RAp0
+	 BfmM4sp/KIAJR5zm3ntDBQAtGrhHvFzw2fY1rt3rAYt+LyYcYY2TvwWs4OQuIZ4kN6
+	 bfaDd7QpmLA8Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -34,12 +34,12 @@ Cc: Li Nan <linan122@huawei.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 08/12] block: fix overflow in blk_ioctl_discard()
-Date: Mon, 15 Apr 2024 06:03:43 -0400
-Message-ID: <20240415100358.3127162-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 3/6] block: fix overflow in blk_ioctl_discard()
+Date: Mon, 15 Apr 2024 06:04:24 -0400
+Message-ID: <20240415100433.3127434-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240415100358.3127162-1-sashal@kernel.org>
-References: <20240415100358.3127162-1-sashal@kernel.org>
+In-Reply-To: <20240415100433.3127434-1-sashal@kernel.org>
+References: <20240415100433.3127434-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,7 +48,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.27
+X-stable-base: Linux 6.1.86
 Content-Transfer-Encoding: 8bit
 
 From: Li Nan <linan122@huawei.com>
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/block/ioctl.c b/block/ioctl.c
-index d1d8e8391279a..68265f914c27b 100644
+index 47567ba1185a6..99b8e2e448729 100644
 --- a/block/ioctl.c
 +++ b/block/ioctl.c
-@@ -89,7 +89,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+@@ -89,7 +89,7 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
  		unsigned long arg)
  {
  	uint64_t range[2];
@@ -82,7 +82,7 @@ index d1d8e8391279a..68265f914c27b 100644
  	struct inode *inode = bdev->bd_inode;
  	int err;
  
-@@ -110,7 +110,8 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+@@ -110,7 +110,8 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
  	if (len & 511)
  		return -EINVAL;
  
