@@ -1,142 +1,100 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F020F12AAE6
-	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 14:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFF612DDAE;
+	Tue, 16 Apr 2024 14:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713277992; cv=none; b=lTlA0KVFAPZfAkIei9kw9XA4sUhCOwBV2NTQyTqTIJw2rSacpA6vtMqQ1Kj4NBQW0W5s6EX9cQZWl3NkoBPez+nr5EddMILuGPqOxqa5PePbFA4MS3VgVfe/i73p7XoY//liIWG7Xf68c9uqxS80yzWSH0/aQ1W5eT/38RdekhE=
+	t=1713278699; cv=none; b=VICOpnNeJGMctGrfrAfUAw7zn1Zhr+ws5Csd4kdb3HsE9jI8gkMra8q/MlPqAtAfQAKfq4RF0Dy6vmAEdgSVKfzbNBbvaaYsltwe9h/Q01BDDN5F5gLCr4jRSk9Ug6ZZVzfjyOrxF88oeyMGluBGnXiZvY+/Yz7LAuxyV+BNgTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713277992; c=relaxed/simple;
-	bh=tQt0h4/JJzNUSt7YJAw13nbwhiLd1bvHD0j7b+rfdIA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZkOwoOQagwnUu+89DwmCr6Pq+ObdAZOUv1pJQ2ZbcXgFmq+wFhGUOlNE9qYINHLBDQbW4xWPRw61YXdZi7hIKTCNRr3UhRQ+FcN3IGm6gEfJfch8yyA5WKCkvrNjDZP7HlsKef6NIE3JoipLbqwNef6H3QgLo7he+4vfH2EifDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Y0jDybLz; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1713278699; c=relaxed/simple;
+	bh=RsDtzCi/AC/WSg7s2RwFMDLB7cfQ+Jn7MP8sUhas0/s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A4L+A9MScEqRSIQKlKDv3TZjk3v4vWi7+flrfNIXn5vt+w68qMbx/3QXRzvCahGapf7ErhkC8UGuA0/NjcW1wtSjaNDrTdu+4eKSyjbv5fNm8JXbSQ9bphCpaN2y6UH9YodB4cD0gjS0RrtEj7TsmIvOD8GT07uECzHannFDsnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dsMLJDN7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Y0jDybLz"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7d5ed700c2dso20741239f.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 07:33:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713277990; x=1713882790; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4USUkCePqO/DUZZKKDjSqTMfiwj3FB1TFFvhdvW85WE=;
-        b=Y0jDybLznBKfu4Gr4cWBmYDvU2Kf/t+w+kavoCMkvtciH9Rzz914YhuGxPpUicDGaN
-         F5oVYS3H7yxGO86YBpdbU1cCt7ImshCUAy8oa+SJJwDoxvIeXysU4ywq881QulFxAgPA
-         ioTlmJ9dqoF/d1tLeGfEJbbkbetW/+OooUEjGcLRthiY19ZZYzMzrs738idvIhRb25GX
-         7HkhJy9lrZEVdIuWELzihj8aBr/nuwecaeSjjmUGj/wpqu+1AIBoC8cLblGoRqfDo0MF
-         Y0N7vnOoPdL635dp+xt2ZNHtSfPaUW9p61i0PIMWM0BS07Q3NCIxwLfCOcsiBFYRqrEY
-         2ccg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713277990; x=1713882790;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4USUkCePqO/DUZZKKDjSqTMfiwj3FB1TFFvhdvW85WE=;
-        b=IKXIlN1T5KCJN/9P68N3cf48q62YaMW/rSkOBiDoEZNYx7PdaPo87cDE/F5nnL41dY
-         Sw/TynLQvN54Xqp+Oi3AY9Nv2SOvDRznRRcdg6lS8+o90IATSdnFYnxZArlsIwprgBzd
-         YhM6KnHxvcJGvXc41SvyraM6VjJKtjIJ/u1G9JXakbkQwxKgdbWxByM8er7fW32NHHmc
-         7s8AqimmTqCzlMGPwY8C0LU4nej+r2tfO0Vg1Phu8nOMwavNAGa52rWKTn3dELl8YlVV
-         NE61DdXPvN902awrDvKupK5NrtCiEHj9BA1rXcdnkQkYfyKj+9shIeuLXprdr4RsbrDr
-         k0xg==
-X-Forwarded-Encrypted: i=1; AJvYcCXywK+cYrIqaWLBxQjcw9ubC2NmhLT4d4GlvGXm1N7EEpMMt6xJzCY9b8FJZ3w9hlknTqK6K/xN7EKohnPPjejcwtemJTt10IeDhqk=
-X-Gm-Message-State: AOJu0YyORGDZO2Bmb6YE33g++B+IKcseQ5Y5Cw9PrQbdeuO5XByv+5MY
-	NOG6L6B/8ZlsqY88NVwTkLqG+QaddXwnt6WiorPdlqixv/OC1wkkoGhQ2hk7ZL0=
-X-Google-Smtp-Source: AGHT+IEFdSzzJPNEuBYNeCsLyyZ+pPblusmvyciDSgRZZSqKohbfOFFV+4drEx+cUWKBoEDWOFDJFg==
-X-Received: by 2002:a05:6602:38d:b0:7d6:513b:254 with SMTP id f13-20020a056602038d00b007d6513b0254mr13722190iov.2.1713277990087;
-        Tue, 16 Apr 2024 07:33:10 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id v7-20020a056638250700b0047f1ac1bfd2sm3909914jat.163.2024.04.16.07.33.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Apr 2024 07:33:09 -0700 (PDT)
-Message-ID: <c3a6a639-bf15-4f8b-abbd-978d9836d93c@kernel.dk>
-Date: Tue, 16 Apr 2024 08:33:07 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dsMLJDN7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 515E5C113CE;
+	Tue, 16 Apr 2024 14:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713278698;
+	bh=RsDtzCi/AC/WSg7s2RwFMDLB7cfQ+Jn7MP8sUhas0/s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dsMLJDN7maRAxcb09mjajne7GLFzZEMR7vrx8x6Ba3SC23G8CuNg3qVDsmGfAcJdq
+	 Ou/Tf+uCqkBveUDsaf+0s81sEJNMZKvLVqzAn4UiVI2b+Iy53V4uHOq+1lpSBciuhd
+	 R6IFI98ogEHxf8bYS6xrdQR+CWah8hja17628/4rZT9tDmEujDm/w1XjTliqeyYmzn
+	 yIaTl5QHtKOIULhyFgETY/9tHp9WzR/Qew6aUGQgCJiOD5r3yU0legUw8TCrzkas70
+	 J8jlJLkSUVNVGiKbzHs/pomYtn98llYwdOO5D/m9QQUp5bfZJUzRPTRx+rE/whm/SQ
+	 iPK6AD3TLzTQg==
+Date: Tue, 16 Apr 2024 08:44:55 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Lennart Poettering <mzxreary@0pointer.de>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Linux regressions mailing list <regressions@lists.linux.dev>,
+	linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: API break, sysfs "capability" file
+Message-ID: <Zh6O5zTBs5JtV4D2@kbusch-mbp>
+References: <ZhQJf8mzq_wipkBH@gardel-login>
+ <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
+ <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
+ <ZhRSVSmNmb_IjCCH@gardel-login>
+ <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
+ <ZhT5_fZ9SrM0053p@gardel-login>
+ <20240409141531.GB21514@lst.de>
+ <Zh6J75OrcMY3dAjY@gardel-login>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: API break, sysfs "capability" file
-Content-Language: en-US
-To: Lennart Poettering <mzxreary@0pointer.de>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-References: <ZhQJf8mzq_wipkBH@gardel-login>
- <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
- <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
- <ZhRSVSmNmb_IjCCH@gardel-login>
- <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
- <ZhT5_fZ9SrM0053p@gardel-login> <20240409141531.GB21514@lst.de>
- <d7a2b07c-26eb-4d55-8aa7-137168bd0b49@kernel.dk>
- <Zh6IpqnSfGHXMjVa@gardel-login>
- <b74f99e8-5a50-4e93-987f-0bcfc0c27959@kernel.dk>
- <Zh6KZ7ynHuOd0mgQ@gardel-login>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Zh6KZ7ynHuOd0mgQ@gardel-login>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zh6J75OrcMY3dAjY@gardel-login>
 
-On 4/16/24 8:25 AM, Lennart Poettering wrote:
-> On Di, 16.04.24 08:22, Jens Axboe (axboe@kernel.dk) wrote:
+On Tue, Apr 16, 2024 at 04:23:43PM +0200, Lennart Poettering wrote:
+> On Di, 09.04.24 16:15, Christoph Hellwig (hch@lst.de) wrote:
+> 11;rgb:1717/1414/2121
+> > On Tue, Apr 09, 2024 at 10:19:09AM +0200, Lennart Poettering wrote:
+> > > All I am looking for is a very simple test that returns me a boolean:
+> > > is there kernel-level partition scanning enabled on this device or
+> > > not.
+> >
+> > And we can add a trivial sysfs attribute for that.
+> >
+> > > At this point it's not clear to me if I can write this at all in
+> > > a way that works reasonably correctly on any kernel since let's say
+> > > 4.15 (which is systemd's "recommended baseline" right now).
+> > >
+> > > I am really not sure how to salvage this mess at all. AFAICS there's
+> > > currently no way to write such a test correctly.
+> >
+> > You can't.  Maybe that's a lesson to not depend on undocumented internal
+> > flags exposed by accident by a weirdo interface.  Just talk to
+> > people.
 > 
->> On 4/16/24 8:18 AM, Lennart Poettering wrote:
->>> On Di, 09.04.24 09:17, Jens Axboe (axboe@kernel.dk) wrote:
->>>
->>>> On 4/9/24 8:15 AM, Christoph Hellwig wrote:
->>>>> On Tue, Apr 09, 2024 at 10:19:09AM +0200, Lennart Poettering wrote:
->>>>>> All I am looking for is a very simple test that returns me a boolean:
->>>>>> is there kernel-level partition scanning enabled on this device or
->>>>>> not.
->>>>>
->>>>> And we can add a trivial sysfs attribute for that.
->>>>
->>>> And I think we should. I don't know what was being smoked adding a sysfs
->>>> interface that exposed internal flag values - and honestly what was
->>>> being smoked to rely on that, but I think it's fair to say that the
->>>> majority of the fuckup here is on the kernel side.
->>>
->>> Yeah, it's a shitty interface, the kernel is rich in that. But it was
->>> excessively well documented, better in fact than almost all other
->>> kernel interfaces:
->>>
->>> ? https://www.kernel.org/doc/html/v5.16/block/capability.html ?
->>>
->>> If you document something on so much detail in the API docs, how do
->>> you expect this *not* to be relied on by userspace.
->>
->> This is _internal_ documentation, not user ABI documentation. The fact
->> that it's talking about internal flag values should make that clear,
->> though I can definitely see how that's just badly exposed along with
->> other things that document things that users/admins could care about.
+> Undocumented? Internal?
 > 
-> The text begins with:
+> It's was actually one of the *best* documented kernel *public* APIs I
+> ever came across:
 > 
->     "This file documents the sysfs file block/<disk>/capability."
+>    https://www.kernel.org/doc/html/v5.16/block/capability.html
 > 
-> So it makes very clear this is about the sysfs interface.
-> 
-> Are you saying that sysfs of the block layer should be considered an
-> *internal* kernel API? That's a wild definition, if I may say so.
+> So much detail, I love it!
+>
+> I mean, you did good work here, documented it, with all flags in all
+> details. I think that's great work! You should take pride in this, not
+> try to deny its existance!
 
-No I missed that - to me it's clearly internal documentation as it's
-talking about the flags, but yeah you are right it's being presented as
-sysfs documentation for the 'capability' file. That should never have
-gone into the tree as ABI documentation.
+The patch that introduced this was submitted not because the API was
+stable; it was committed to encourage developers to update it as it
+changed because it is *not* stable. That's not the kind of interface you
+want exported for users to rely on, but no one should have to search
+commit logs to understand why the doc exists, so I think exporting it
+was just a mistake on the kernel side. To say this doc is "good"
+misunderstands what it was trying to accomplish, and what it ultimately
+created instead: technical debt.
 
-Doesn't really change my conclusion from earlier. As mentioned, this is
-clearly a kernel fuckup, and honestly since it's being presented as ABI,
-we definitely need to rectify this and provide an alternative. Even
-though I'm not a huge fan of it, might just be best to re-introduce
-'capability' and just have conversions of the flags so we retain the
-user side of it the same. That can then also go into stable, so we'll
-end up with something that at least looks cohesive on the user side.
-
--- 
-Jens Axboe
-
+The block interfaces documented in Documetation/ABI/stable/ are reliably
+stable, though.
