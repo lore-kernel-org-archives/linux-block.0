@@ -1,63 +1,63 @@
 Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F62127B7D
-	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 10:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE98127E20
+	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 10:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713263534; cv=none; b=trBD8wlz7dc41H5XqmGzMR2gS+DAS0/LnyhVcsUnb8E73NbUrBhhuoIYIdV5Gq3JK/7O9BFHgh4dxMkQPcf+5aVPhcvONn4PubiQ7fW79iBhUpYI5x08GmP34/LmB2KXJcneVZyCMc1C27SDw/jg627xrmyvr9y7q5TTaEkcdUM=
+	t=1713263535; cv=none; b=cVdj3LNlb+dao7hpKKxW4YS7f8/AmrbAkWZyAinv5buMsdUywAp4754QoaM8NlHPiSyS2w25/SkoiZE4ZvhSyfa5fXrP8cSwPtqSPYF2kQN+AazKvz6K1GJpYpNaCHBEJpQbShTqA3ttp9P8w8Po7SoXhGGwSxqgxc5tw6yXx7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713263534; c=relaxed/simple;
-	bh=OULd77odMzihZqoRtAKAJByG8IrF0EFlmFWrGigNWSg=;
+	s=arc-20240116; t=1713263535; c=relaxed/simple;
+	bh=HncKKmC+QVZ0Aq+UWgdlyuRlINtlt7Qu9LbWVThxhGE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ad4fkhjWNyJPUf0a1MTCK5Mo2P6mY6/ipWVOEYPxXbviNDC1DPdceTjU/IaaTqTo++YdtAHaHInZuRU9Mg5TdYtRtaTs2T3pkkUX2UwfhkTHPlYKKKzgtvpRNBAgC1Km5X0x4uMWf1LkcfYu4U8FMkSzQ2o9LuTSs+KWNpvhoOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=NWM64oZ9; arc=none smtp.client-ip=68.232.141.245
+	 MIME-Version; b=K3J2hEyhHeK2JMgeM9U5ZcTu7MKXXWmttZrT7iS/Y2H57b8ik3+oWal4b/tWs+iiSUQ9G2ADgQein5meiyn/dPsOeP8b2UkL5yxxGvy2CfEFTVDs+B5/+Z7vtJsbtcwT8Gut4WjC4Ghsq1ki8F7LuTKGIKOjG8YaIXbEC19o9Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=AcOc0yXW; arc=none smtp.client-ip=68.232.141.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NWM64oZ9"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AcOc0yXW"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1713263532; x=1744799532;
+  t=1713263533; x=1744799533;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OULd77odMzihZqoRtAKAJByG8IrF0EFlmFWrGigNWSg=;
-  b=NWM64oZ9I+RDu5mzcDOiIMEKBgeHblw4n7yV9j8rZugQinLCWh9/Tygu
-   zf7sCugnh5rfGs0J6caRDoLz35eU+iNM+EmFtpCOzPBtlQ5/tE0YiI4hn
-   TSuOCRenWTvQh8wQSLvvPGTCI+1bootfhUFuZb2N/++bkJlMwx9SWs2th
-   2QmhLVX8ZVU+bt2VQW2JSbSa5aN9+KhUY5V8SZOsC+4ixwB5613eTmYww
-   ouBR/FFCzn4BxU33+sAs1NkInqbALcgd1UR9KVVxvi//F0z/cFSZr21tF
-   RSC57Yi80uCj7Wk6e+5IFlGSVuIyWLjc+LaM3/LbJ/k0s8zim0lu346MA
+  bh=HncKKmC+QVZ0Aq+UWgdlyuRlINtlt7Qu9LbWVThxhGE=;
+  b=AcOc0yXWlz+fkhWIw+YsqcObwFjauU3qbDneqCsDCIwqy1LahE9Icrq4
+   sHZzvu8FUs67Lne6kM8pnGI7cpN1LPkFnLN1xO5UUf7W1CPoHfHJ0b6Ke
+   y/Aq9Cr4tV9g2teYZBlsOjwzZ2YEav+peGLKDk7xQiWMEyEPFnHYDyNs6
+   xRU76T8ob81SpD4pW36ChPRqP02nVLTOJyoqLRi4yVbK4GQ3AMwoa4spK
+   qimr7kbj1qSH5mgBiqivcQemEgnb68w8Z+z05sRb/bzRBMM5nghk6nXFE
+   ALQ/P55rA3cEeAepM4IzpfY/Pt/ttS5wLqQ5swQiX1hxo6CkLKP1EfoBj
    A==;
-X-CSE-ConnectionGUID: C8UuPGZqRpuVHha1b3BZzw==
-X-CSE-MsgGUID: jBq0kIapRVOkViUP99Mh6Q==
+X-CSE-ConnectionGUID: uJuc4bWIRluTdy+oXsI8LQ==
+X-CSE-MsgGUID: dK14PW2hTnOv7W5ynMbvCA==
 X-IronPort-AV: E=Sophos;i="6.07,205,1708358400"; 
-   d="scan'208";a="14322612"
+   d="scan'208";a="14322615"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Apr 2024 18:32:11 +0800
-IronPort-SDR: HGFr86W74vaiT0TDhLB6PLyDn1w6VeXWeKV19jiLydGFzUngq4I1FrvxTOFnq1yiFE86pGkoQi
- Skv/B1h6YNyYE1zAax36F4OZVG6Q1xmeXhHXGgoN7SppnoZm7oeDCr/LsmQDPHX/MHglPmlirK
- y7sh+905RiyM5IgoZjsGPf2Y+ucmimoaXTezL5SSpLBdjSXA7Jq9tZkdXs48+QcLNAy2Eat0k1
- pdzuhqarkk7Nzgv41AmVQA5ZFNttMXmx5LhuiMdAAPECCxEkNuApX6lbjdPNOsjK/hCdNzTBU9
- u+8=
+  by ob1.hgst.iphmx.com with ESMTP; 16 Apr 2024 18:32:13 +0800
+IronPort-SDR: rTUoevyEJTM63QYF+xt1Gwa3At16xwM+PrEXJrldok1XAshudk0TdHmP2hSO4VIBaUZCbiWmex
+ FD7b2hDFUOl0vUXtanaYWNUzIVsyLjOhlUOVjEEiqLOMxT0wfId8PyyNVM5ZjpkdjtmOnEBwn5
+ 7nIdylGrM3TmojTzozwxlRbB4jhN7uWb9MPC7k0pWH4yKAyVOoQ6LbLO+OLUsvHMfYbh5eqoMy
+ YERSz8V5It7BJCLEzghowY8mkwI2h9xrgKL89uxSZPS3hbdUsjlTdaXj1Xfbyjw34XPFruLU5l
+ t2Q=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Apr 2024 02:40:32 -0700
-IronPort-SDR: OG1vlJXPg0nZfzFnr5t+P0MJNu7zY0MN9sHkwwcmMhvsjurQ6nF0hZKU8OxwH0yG8KrY8TzM9i
- whTBqJuB44od0II4cRIdAuvgBtTK138HWVC5lznWmOMor08QF1M1K1p0RdcoIH0W8lrltLrlL9
- ZchcUuPSbAiG1BLc7KzXCZI2hSNsia7wR2v9+/6PdlmkynMN8HtnMN/ZzMSLsB1Q4U+OXXEcaN
- 2Pc3SeIjVXP5krRKcdlLIh5oGG0Za33bKQw4IaEXfTeyO/tIeUr+9nPZLY6S6pVXeJrZX5Ujdd
- 5fs=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Apr 2024 02:40:33 -0700
+IronPort-SDR: TWn9qJPK8wwIoU3pfmqgYjZgyT2caZ0FA+Uu97wqqnlxYe6AAb9VFPpzeequb7v3j8cnKcrCDB
+ QT5GPF7sCcc4y6DkZ2NhXYrpYgGoZ0X7sjgZRdzF3Hu59XoshxpJcum4qvJKPia/HR+eDqs2eR
+ tzLrpRQW+gdgudTtnP0WwLiEuDWNA6RcY4M1StY+khtk6QQSOjkmJIZ+oV2RsSu1poep/+fNUn
+ VdpY2OpgafU7KhgNSLumFkDvHKJUivjDwyaRPD4Aw9ivVoaYA2uHzblH1AANIEzCagqbE3S396
+ G44=
 WDCIronportException: Internal
 Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 16 Apr 2024 03:32:11 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 16 Apr 2024 03:32:13 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: linux-nvme@lists.infradead.org,
 	Daniel Wagner <dwagern@suse.de>,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH blktests v2 03/11] check: use set_conditions() for the CAN_BE_ZONED test cases
-Date: Tue, 16 Apr 2024 19:31:59 +0900
-Message-ID: <20240416103207.2754778-4-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 05/11] nvme/rc: introduce NVMET_TRTYPES
+Date: Tue, 16 Apr 2024 19:32:01 +0900
+Message-ID: <20240416103207.2754778-6-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
 References: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
@@ -69,108 +69,110 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the test case with test() function is marked as CAN_BE_ZONED,
-blktests runs the test case twice: once for non-zoned device, and the
-second for zoned device. This is now implemented as a special logic in
-the check script.
+Some of the test cases in nvme test group can be run under various nvme
+target transport types. The configuration parameter nvme_trtype
+specifies the transport to use. But this configuration method has two
+drawbacks. Firstly, the blktests check script needs to be invoked
+multiple times to cover multiple transport types. Secondly, the test
+cases irrelevant to the transport types are executed exactly same
+conditions in the multiple blktests runs.
 
-To simplify the implementation, use the feature to repeat test cases
-with different conditions. Use set_conditions() and move out the special
-logic from the check script to the common/zoned script file.
+To avoid the drawbacks, introduce the new configuration parameter
+NVMET_TRTYPES. This parameter can take multiple transport types like:
+
+    NVMET_TRTYPES="loop tcp"
+
+Also introduce _nvmet_set_nvme_trtype() which can be called from the
+set_conditions() hook of the transport type dependent test cases.
+Blktests will repeat the test case as many as the number of elements in
+NVMET_TRTYPES, and set nvme_trtype for each test case run.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- check        | 19 ++++++++-----------
- common/zoned | 22 ++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 11 deletions(-)
- create mode 100644 common/zoned
+ Documentation/running-tests.md | 11 ++++++++---
+ tests/nvme/rc                  | 33 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/check b/check
-index edc421d..3ed4510 100755
---- a/check
-+++ b/check
-@@ -56,6 +56,11 @@ _found_test() {
- 		return 1
- 	fi
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index ae80860..144acd1 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -102,8 +102,13 @@ RUN_ZONED_TESTS=1
  
-+	if [[ -n $CAN_BE_ZONED ]] && declare -fF test >/dev/null && declare -fF set_conditions >/dev/null; then
-+		_warning "${test_name} defines both CAN_BE_ZONED and set_conditions()"
-+		return 1
-+	fi
-+
- 	if (( QUICK && TIMED )); then
- 		_warning "${test_name} cannot be both QUICK and TIMED"
- 		return 1
-@@ -194,7 +199,6 @@ _output_status() {
- 	local status="$2"
- 	local str="${test} "
+ The NVMe tests can be additionally parameterized via environment variables.
  
--	(( RUN_FOR_ZONED )) && str="$str(zoned) "
- 	[[ ${COND_DESC:-} ]] && str="$str(${COND_DESC}) "
- 	[[ ${DESCRIPTION:-} ]] && str="$str(${DESCRIPTION})"
- 	printf '%-60s' "${str}"
-@@ -464,7 +468,6 @@ _unload_modules() {
++- NVMET_TRTYPES: 'loop' (default), 'tcp', 'rdma' and 'fc'
++  Set up NVME target backends with the specified transport. Multiple transports
++  can be listed with separating spaces, e.g., "loop tcp rdma". In this case, the
++  tests are repeated to cover all of the transports specified.
+ - nvme_trtype: 'loop' (default), 'tcp', 'rdma' and 'fc'
+-  Run the tests with the given transport.
++  Run the tests with the given transport. This parameter is still usable but
++  replaced with NVMET_TRTYPES. Use NVMET_TRTYPES instead.
+ - nvme_img_size: '1G' (default)
+   Run the tests with given image size in bytes. 'm', 'M', 'g'
+ 	and 'G' postfix are supported.
+@@ -117,11 +122,11 @@ These tests will use the siw (soft-iWARP) driver by default. The rdma_rxe
  
- _check_and_call_test() {
- 	local postfix
--	local ret
+ ```sh
+ To use the siw driver:
+-nvme_trtype=rdma ./check nvme/
++NVMET_TRTYPES=rdma ./check nvme/
+ ./check srp/
  
- 	if declare -fF requires >/dev/null; then
- 		requires
-@@ -473,15 +476,6 @@ _check_and_call_test() {
- 	[[ -n $COND_DESC ]] && postfix=_${COND_DESC//[ =]/_}
- 	RESULTS_DIR="$OUTPUT/nodev${postfix}"
- 	_call_test test
--	ret=$?
--	if (( RUN_ZONED_TESTS && CAN_BE_ZONED )); then
--		RESULTS_DIR="$OUTPUT/nodev_zoned${postfix}"
--		RUN_FOR_ZONED=1
--		_call_test test
--		ret=$(( ret || $? ))
--	fi
--
--	return $ret
- }
+ To use the rdma_rxe driver:
+-use_rxe=1 nvme_trtype=rdma ./check nvme/
++use_rxe=1 NVMET_TRTYPES=rdma ./check nvme/
+ use_rxe=1 ./check srp/
+ ```
  
- _check_and_call_test_device() {
-@@ -540,6 +534,9 @@ _run_test() {
- 	. "tests/${TEST_NAME}"
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 1f5ff44..34ecdde 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -18,10 +18,41 @@ def_hostid="0f01fb42-9f7f-4856-b0b3-51e60b8de349"
+ def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
+ export def_subsysnqn="blktests-subsystem-1"
+ export def_subsys_uuid="91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+-nvme_trtype=${nvme_trtype:-"loop"}
+ nvme_img_size=${nvme_img_size:-"1G"}
+ nvme_num_iter=${nvme_num_iter:-"1000"}
  
- 	if declare -fF test >/dev/null; then
-+		if ((RUN_ZONED_TESTS && CAN_BE_ZONED)); then
-+			. "common/zoned"
++# Check consistency of NVMET_TRTYPES and nvme_trtype configurations.
++# If neither is configured, set the default value.
++first_call=${first_call:-1}
++if ((first_call)); then
++	if [[ -n $nvme_trtype ]]; then
++		if [[ -n $NVMET_TRTYPES ]]; then
++			echo "Both nvme_trtype and NVMET_TRTYPES are specified"
++			exit 1
 +		fi
- 		if declare -fF set_conditions >/dev/null; then
- 			nr_conds=$(set_conditions)
- 			for ((cond_i = 0; cond_i < nr_conds; cond_i++)); do
-diff --git a/common/zoned b/common/zoned
-new file mode 100644
-index 0000000..6a8f1e5
---- /dev/null
-+++ b/common/zoned
-@@ -0,0 +1,22 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Western Digital Corporation or its affiliates.
++		NVMET_TRTYPES="$nvme_trtype"
++	elif [[ -z $NVMET_TRTYPES ]]; then
++		nvme_trtype="loop"
++		NVMET_TRTYPES="$nvme_trtype"
++	fi
++	first_call=0
++fi
 +
-+# The helper function for test cases with CAN_BE_ZONED flag and test()
-+# function. Run the test case twice for non-zoned and zoned conditions.
-+set_conditions() {
++_set_nvme_trtype() {
 +	local index=$1
++	local -a types
++
++	read -r -a types <<< "$NVMET_TRTYPES"
 +
 +	if [[ -z $index ]]; then
-+		echo 2
++		echo ${#types[@]}
 +		return
 +	fi
 +
-+	if ((index == 0)); then
-+		export RUN_FOR_ZONED=0
-+		export COND_DESC=
-+	elif ((index == 1)); then
-+		export RUN_FOR_ZONED=1
-+		export COND_DESC="zoned"
-+	fi
++	nvme_trtype=${types[index]}
++	COND_DESC="nvmet tr=${nvme_trtype}"
 +}
++
+ # TMPDIR can not be referred out of test() or test_device() context. Instead of
+ # global variable def_flie_path, use this getter function.
+ _nvme_def_file_path() {
 -- 
 2.44.0
 
