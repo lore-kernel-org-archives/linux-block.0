@@ -1,116 +1,101 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gardel.0pointer.net (gardel.0pointer.net [85.214.157.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F43112D771
-	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 14:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50A5128805;
+	Tue, 16 Apr 2024 14:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.157.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713277378; cv=none; b=Mqnw7R24ryRXcrjRR7LypOfLmwkldXvl/2h2nEfBbi3cjsq2pCe0mL8XHEeEsPGlW/9mgmW8ZLsv49q2pFuj5XPmh5fsbDuCb8JyBPdIKEc4hKvv8v5hTt9UPigWxeBwneEeFJawyayUjwncFVWYMDl8S7PFm7k7kTffu9KoIKc=
+	t=1713277427; cv=none; b=SdtGdvlUFxIIIbJyxa3ls+fJiJrZATqc+jc5R51kzsbGn8NcsV0Tn6DdieY8HHtjADOMi7fAHgKf3WsM0jxTnu6T4rQmZpqQa/snQ/qTWjeOg+tUlmKC9hW8lu4EQP9iOmbAgZcJCagEMqhJv/1Xp3GpJ2s08yF9h/NPT/NT5bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713277378; c=relaxed/simple;
-	bh=KkhLAavCbkxsrMJ/g+XwkIEHN5YZSrFkpEyCXUbE+yw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eWE2nzZ1ESzx8xxoCmjy68EqHB7Pp1BaODvLkyWSOrxed2oPeIgvqm2PETx1PGa0hKq433DPXn8YGCvdMpmLhDzuicS67Ny6Ky7r6sYoveXgtK8/9L3SWjgUyxv/qRcsekCkHLOgfSCU/EWg6bUVhA87+o8WtYAnLy28gN99cf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=f/jiEdZ+; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="f/jiEdZ+"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7d9c78d7f98so3453739f.2
-        for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 07:22:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713277375; x=1713882175; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f2fMNvEI24QOeRYU2Q7J/gXsOX3YqVKsrm8shQ/4hw8=;
-        b=f/jiEdZ+puxc2vACOmS4yHpNeRWkI3dQKzuHhOJ2Jm4NtOW0nZnQEL1lpRX0w+U7Lw
-         Y53F6Xsx+Tfqu+B9B+ooeOqUXGWeDkb7vw4o8hlJNQ9sJjj4izUqJCleldgaN/EN+6rs
-         AXeYUqSIb7zRWPMygyCD2UZ2STWah8pJjpmHOODYVqxkQDnSxrtDr77gsYjRFNUdtdFK
-         015mqTE0d8V7vc4EL9iXMpwrTAw8HzwH43XyLqolx1nAIv4eu66vIt4swyujee/K7MNr
-         EC3rKLEM/mdxK/tZOLTlgAiZFr68CEiVx9uAZvzzmCeMZX/UKUBn2P/95uycq0i+4O7v
-         r/xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713277375; x=1713882175;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f2fMNvEI24QOeRYU2Q7J/gXsOX3YqVKsrm8shQ/4hw8=;
-        b=J27wPB6yO71a1+rbo7F/N0hXAGyXvTvJ+wOCbK2olt7loN+/OSDyFsG8+2lEe210Xz
-         EVuz4+LGXRvQNDBsty+J7Z+1DrLtLLSQApnq+yEVfGpvtLGvjbZwkNyhX9h4PqcvIbkB
-         iRPw3CnOQwjl2nyTVjjAZm6aeGRnGQP+Hy1z7OQ99rs5V4jHjczN3arJqO35okBCvA9O
-         Ont4MF9YLpqMRIw3xE55uMCnkSPD/BDRUQ4sroD/tngYNKAGQp5Bq7aogUetYrj/8sCV
-         LwAzMQpFQcsB5dvLcmOj7cVRtAy/wmQkSnHonlrX2qO1JB3GKm4nwbnMBTu4qlr1HK7g
-         240Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU2NKpPXxOZb4emWfEomAA14yBYkdFwpd9SAqN0aLP/LPnJqpnfeh0qCKtU5p0wPm8Lh2h43fw7QmwL4H2FRTDjGIUK4M/j4hoeP6s=
-X-Gm-Message-State: AOJu0YxnT5HNmFyVUD5jzsw5T7gwasAPWBDHHYdDtaZ2cVrWSdrKwob7
-	y6LwULMEZ1HPCtuwjtbYbIzWY34CYQCP8tUZZpiswfP4Dov/+HcARAtvsaQaS3GTRaSXXUd47IG
-	Q
-X-Google-Smtp-Source: AGHT+IFHQy//HeRmRxLtJ547eHKcIHb0Q1z3xF2183VnfWuSC2U/dBI0HyNuCFx3DBhEW9NP4bivYA==
-X-Received: by 2002:a05:6602:4ed7:b0:7d5:ddc8:504d with SMTP id gk23-20020a0566024ed700b007d5ddc8504dmr12062089iob.0.1713277375372;
-        Tue, 16 Apr 2024 07:22:55 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id b9-20020a05660214c900b007d95d6ef5c0sm1671531iow.9.2024.04.16.07.22.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Apr 2024 07:22:54 -0700 (PDT)
-Message-ID: <b74f99e8-5a50-4e93-987f-0bcfc0c27959@kernel.dk>
-Date: Tue, 16 Apr 2024 08:22:54 -0600
+	s=arc-20240116; t=1713277427; c=relaxed/simple;
+	bh=QHU5zAV46hH4gPdF4wTQVl7/aVr6MuGxxpWelAUaaRI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kI1/MKQvi5z+R7g94qtNbZNUpT48SQqttiYW7kRcnihlgfObqPZaUH10/ivC+QIgQCFZ3ntIFdH5QuDd2GjyFDIxMdncEZVauYUSX1k+6t+KiM/cAAj4VKrNV8ekhfgbunD6jkI1GILP6py8pj1YSt8Rkuyb1lr+duXcE5wtc3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de; spf=pass smtp.mailfrom=0pointer.de; arc=none smtp.client-ip=85.214.157.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0pointer.de
+Received: from gardel-login.0pointer.net (gardel-mail [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
+	by gardel.0pointer.net (Postfix) with ESMTP id B93ABE803C0;
+	Tue, 16 Apr 2024 16:23:43 +0200 (CEST)
+Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
+	id 6F69F1602F7; Tue, 16 Apr 2024 16:23:43 +0200 (CEST)
+Date: Tue, 16 Apr 2024 16:23:43 +0200
+From: Lennart Poettering <mzxreary@0pointer.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Linux regressions mailing list <regressions@lists.linux.dev>,
+	linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: API break, sysfs "capability" file
+Message-ID: <Zh6J75OrcMY3dAjY@gardel-login>
+References: <ZhQJf8mzq_wipkBH@gardel-login>
+ <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
+ <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
+ <ZhRSVSmNmb_IjCCH@gardel-login>
+ <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
+ <ZhT5_fZ9SrM0053p@gardel-login>
+ <20240409141531.GB21514@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: API break, sysfs "capability" file
-Content-Language: en-US
-To: Lennart Poettering <mzxreary@0pointer.de>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-References: <ZhQJf8mzq_wipkBH@gardel-login>
- <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
- <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
- <ZhRSVSmNmb_IjCCH@gardel-login>
- <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
- <ZhT5_fZ9SrM0053p@gardel-login> <20240409141531.GB21514@lst.de>
- <d7a2b07c-26eb-4d55-8aa7-137168bd0b49@kernel.dk>
- <Zh6IpqnSfGHXMjVa@gardel-login>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Zh6IpqnSfGHXMjVa@gardel-login>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240409141531.GB21514@lst.de>
 
-On 4/16/24 8:18 AM, Lennart Poettering wrote:
-> On Di, 09.04.24 09:17, Jens Axboe (axboe@kernel.dk) wrote:
-> 
->> On 4/9/24 8:15 AM, Christoph Hellwig wrote:
->>> On Tue, Apr 09, 2024 at 10:19:09AM +0200, Lennart Poettering wrote:
->>>> All I am looking for is a very simple test that returns me a boolean:
->>>> is there kernel-level partition scanning enabled on this device or
->>>> not.
->>>
->>> And we can add a trivial sysfs attribute for that.
->>
->> And I think we should. I don't know what was being smoked adding a sysfs
->> interface that exposed internal flag values - and honestly what was
->> being smoked to rely on that, but I think it's fair to say that the
->> majority of the fuckup here is on the kernel side.
-> 
-> Yeah, it's a shitty interface, the kernel is rich in that. But it was
-> excessively well documented, better in fact than almost all other
-> kernel interfaces:
-> 
-> ? https://www.kernel.org/doc/html/v5.16/block/capability.html ?
-> 
-> If you document something on so much detail in the API docs, how do
-> you expect this *not* to be relied on by userspace.
+On Di, 09.04.24 16:15, Christoph Hellwig (hch@lst.de) wrote:
+11;rgb:1717/1414/2121
+> On Tue, Apr 09, 2024 at 10:19:09AM +0200, Lennart Poettering wrote:
+> > All I am looking for is a very simple test that returns me a boolean:
+> > is there kernel-level partition scanning enabled on this device or
+> > not.
+>
+> And we can add a trivial sysfs attribute for that.
+>
+> > At this point it's not clear to me if I can write this at all in
+> > a way that works reasonably correctly on any kernel since let's say
+> > 4.15 (which is systemd's "recommended baseline" right now).
+> >
+> > I am really not sure how to salvage this mess at all. AFAICS there's
+> > currently no way to write such a test correctly.
+>
+> You can't.  Maybe that's a lesson to not depend on undocumented internal
+> flags exposed by accident by a weirdo interface.  Just talk to
+> people.
 
-This is _internal_ documentation, not user ABI documentation. The fact
-that it's talking about internal flag values should make that clear,
-though I can definitely see how that's just badly exposed along with
-other things that document things that users/admins could care about.
+Undocumented? Internal?
 
--- 
-Jens Axboe
+It's was actually one of the *best* documented kernel *public* APIs I
+ever came across:
 
+   https://www.kernel.org/doc/html/v5.16/block/capability.html
+
+So much detail, I love it!
+
+I mean, you did good work here, documented it, with all flags in all
+details. I think that's great work! You should take pride in this, not
+try to deny its existance!
+
+> > I think it would be nice if the "capabilities" thing would be brought
+> > back in a limited form. For example, if it would be changed to start
+> > to return 0x200|0x1000 for part scanning is off, 0x1000 when it is on.
+> >
+> > That would then mean we return to compatibility with Linux <= 5.15,
+> > but the new 0x1000 bit would tell us that the information is
+> > reliable. i.e. if userspace sees 0x1000 being set we know that the
+> > 0x200 bit is definitely correct. That would then just mean that
+> > kernels >= 5.16 until today are left in the cold...
+>
+> At this point we're just better off with a clean new interface.
+> And you can use the old hack for < 5.15 if you care strongly enough
+> or just talk distros into backporting it to make their lives easier.
+
+I'll take what I can get. If API compatibility is not coming back,
+then sure, a new sysattr is better than nothing.
+
+Lennart
+
+--
+Lennart Poettering, Berlin
