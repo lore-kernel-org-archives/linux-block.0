@@ -1,121 +1,137 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DF6130A63
-	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 15:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175A51311B5;
+	Tue, 16 Apr 2024 15:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713281348; cv=none; b=TbdrmQKRUyA9jWT/PvZf0HbaTbSqEMq7E1PU08rYrzIKsO8di5KYZW9Eh3ne45Hno/sCIR2lbx22FOD46GvIwmwaq+jR9CDU/6CVphOOSMJes+lJ6x7wMQnIYgPFVS3EQYxMNk+pqBkBkkKbVtM+L5UxtD89DhxiYsJCUKUdx6s=
+	t=1713282483; cv=none; b=NUWDHA1XEsGhOHKtzYCkxjwW7d0SmdeGPSGnFaHDAWk72W0zQeBzdxNEbZi3T2HJO7vg3TlQbP0KpVSIbPBh8caJ6z3/f8m2YK0EzhetaCEUSjmjVklAv2yFQQwfXrZRLWiXSj9pwwObqlhdfeRbV4P6dw0WXYJG9rwIsT+lu4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713281348; c=relaxed/simple;
-	bh=04LmKJy9tv3jnf8es510u+F1veLrMcBHefejr9yQqoU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dNH8qZ9QtnMNfK4JBucwW1KWgb98451x7nd4EyACSMw1RLpnQu1iD72HiVayl9sCeU3TsjfeTHst8En3youj4TgsRancmR4a9v4VHDb9RebLdQs9SVgRMo+wcSX6YLpRijm1cvO940h22qbWGl0Xo7Oib60GoQVi+u6v+Eir0Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-436c149d910so4577281cf.0
-        for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 08:29:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713281345; x=1713886145;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TNYj7H9P7fHg2UmrKFO+txY1tWvttbrM2kjJrAop9rQ=;
-        b=E0giUnseg55ahXPuB6ODklWh7WWstLG7CdIGX3Wer7Jx8vQvqotR1OsNjRegpqqY4E
-         j6yEVxhYBCOBqZ0kwNQ0n8fM/ooI/gOxAUZ68v3+an8YSC3BqJTqfUHRJ26JtT2pjPAZ
-         gIeZoX73IYdZxiuHo++3OCkHLENGAhgfsCvpO2wK8f7bSvmfa3YTh0mEFgRdhkXQ+9ct
-         DLrrXWPYHSA+jXqtKdOeKoR9aW2YsB5KXqz+VHqw/xhR2QcDc0B26+YcFYGaycJ9UIiT
-         bdByKfUD7lYCz5n4awahEb1ctB3OKIuwTIjnTTdJjcswmNAvcT8gNwj+LFUiKo2feUUb
-         jOcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVxRgnKzSKNWoZOXwTi4Dmt199nh0SIYkiop6UOUS+ZxhLLJv7lt4+vxj2jXVPseOVWLh1nNn9bgqzEwX9V3A3U/kiposp6wUqYKdc=
-X-Gm-Message-State: AOJu0Yyn4JIbDj+UT90S1s5r5qavmGrF6PzKCg26Bb9LBX9zprY4FqyS
-	4Lao6kTsaSxZNXDeLbBQUQXgx9G1UybMpX7wGiJSNGRGliOjraycdzoT5E+30A==
-X-Google-Smtp-Source: AGHT+IF6tklWOylUTS1UEDno/7QyHEfpcQ9UJz6XptzNyZPKu+upsSY/4Wln6nxMJzW7adK8zA6cVA==
-X-Received: by 2002:ac8:5747:0:b0:432:ec1e:efc3 with SMTP id 7-20020ac85747000000b00432ec1eefc3mr15876571qtx.7.1713281345362;
-        Tue, 16 Apr 2024 08:29:05 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id x26-20020ac84d5a000000b00436c05b12a6sm4509361qtv.60.2024.04.16.08.29.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 08:29:04 -0700 (PDT)
-From: Mike Snitzer <snitzer@kernel.org>
-To: ming.lei@redhat.com
-Cc: brauner@kernel.org,
-	czhong@redhat.com,
-	dm-devel@lists.linux.dev,
-	jack@suse.cz,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Mike Snitzer <snitzer@kernel.org>
-Subject: [PATCH v2] dm: restore synchronous close of device mapper block device
-Date: Tue, 16 Apr 2024 11:28:42 -0400
-Message-Id: <20240416152842.13933-1-snitzer@kernel.org>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20240416005633.877153-1-ming.lei@redhat.com>
-References: <20240416005633.877153-1-ming.lei@redhat.com>
+	s=arc-20240116; t=1713282483; c=relaxed/simple;
+	bh=NZbRBNmAfMK+3yRMDzPReQ4j2EbQWHeftMW0C5d1kgM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lg7mPM7erFgzAJcCQzR/T7ERjNpKJX0gjMZkw+phKyV2QZLZs1nxlhDtCbnqwOLaNiPSJbQ23Apd4Z5917sScKPTBFJhYZMgvFY37xomiP91G/2u9wKAMwdDI2O/kI8BseZdcxm4CIUplJtcMmQ0mMGrDsQp4ArLX1HnsF29bhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=gf1F0DdC; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=gf1F0DdC; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="gf1F0DdC";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="gf1F0DdC"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4E1741F839;
+	Tue, 16 Apr 2024 15:47:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1713282478; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XhHu6jDC7cPxVBgNGim8Ty4Xl/VPDyVPLXO3H+HEHLU=;
+	b=gf1F0DdCsPbSyTZntqKQhmd1fCFIF5GAMuucKYL9GyW+Rl53AIgDWqiFxtvWkMRvUg5ejE
+	AydMtfUHF8EbREB0/xk6Mna8SKL1XOvzTdKGeRFR+MHKvPFSLExHedp+wgBRSHGaavDk7o
+	bRNQoP9gKBZKvBgTS3LUcwfPUlR1PuI=
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1713282478; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XhHu6jDC7cPxVBgNGim8Ty4Xl/VPDyVPLXO3H+HEHLU=;
+	b=gf1F0DdCsPbSyTZntqKQhmd1fCFIF5GAMuucKYL9GyW+Rl53AIgDWqiFxtvWkMRvUg5ejE
+	AydMtfUHF8EbREB0/xk6Mna8SKL1XOvzTdKGeRFR+MHKvPFSLExHedp+wgBRSHGaavDk7o
+	bRNQoP9gKBZKvBgTS3LUcwfPUlR1PuI=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2F83813931;
+	Tue, 16 Apr 2024 15:47:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Fo7uCq6dHmZKDwAAD6G6ig
+	(envelope-from <mkoutny@suse.com>); Tue, 16 Apr 2024 15:47:58 +0000
+Date: Tue, 16 Apr 2024 17:47:48 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, chenhuacai@kernel.org, tj@kernel.org, 
+	josef@toxicpanda.com, jhs@mojatatu.com, svenjoac@gmx.de, raven@themaw.net, 
+	pctammela@mojatatu.com, yukuai3@huawei.com, qde@naccy.de, zhaotianrui@loongson.cn, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
+	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH RFC v2 1/6] blk-throttle: remove
+ CONFIG_BLK_DEV_THROTTLING_LOW
+Message-ID: <f3jd5hflezlknl2np2ybrcmqpqohcsow2ldoh53xdzfe2vieti@zkd7e4oj4cgm>
+References: <20240406080059.2248314-1-yukuai1@huaweicloud.com>
+ <20240406080059.2248314-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xrzldp3lzaugn3vy"
+Content-Disposition: inline
+In-Reply-To: <20240406080059.2248314-2-yukuai1@huaweicloud.com>
+X-Spam-Flag: NO
+X-Spam-Score: -5.80
+X-Spam-Level: 
+X-Spamd-Result: default: False [-5.80 / 50.00];
+	BAYES_HAM(-2.90)[99.57%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmx.de];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,toxicpanda.com,mojatatu.com,gmx.de,themaw.net,huawei.com,naccy.de,loongson.cn,vger.kernel.org,lists.linux.dev];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
 
-From: Ming Lei <ming.lei@redhat.com>
 
-'dmsetup remove' and 'dmsetup remove_all' require synchronous bdev
-release. Otherwise dm_lock_for_deletion() may return -EBUSY if the open
-count is > 0, because the open count is dropped in dm_blk_close()
-which occurs after fput() completes.
+--xrzldp3lzaugn3vy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-So if dm_blk_close() is delayed because of asynchronous fput(), this
-device mapper device is skipped during remove, which is a regression.
+On Sat, Apr 06, 2024 at 04:00:54PM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>  Documentation/ABI/stable/sysfs-block       |  12 -
+>  arch/loongarch/configs/loongson3_defconfig |   1 -
+>  block/Kconfig                              |  11 -
+>  block/bio.c                                |   1 -
+>  block/blk-stat.c                           |   3 -
+>  block/blk-sysfs.c                          |   7 -
+>  block/blk-throttle.c                       | 901 +--------------------
+>  block/blk-throttle.h                       |  26 +-
+>  block/blk.h                                |  11 -
+>  9 files changed, 45 insertions(+), 928 deletions(-)
 
-Fix the issue by using __fput_sync().
+I'm (also) not aware of any users of (be)low throttling.
+I like this cleanup.
 
-Also: DM device removal has long supported being made asynchronous by
-setting the DMF_DEFERRED_REMOVE flag on the DM device. So leverage
-using async fput() in close_table_device() if DMF_DEFERRED_REMOVE flag
-is set.
+Michal
 
-Reported-by: Zhong Changhui <czhong@redhat.com>
-Fixes: a28d893eb327 ("md: port block device access to file")
-Suggested-by: Christian Brauner <brauner@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-[snitzer: editted commit header, use fput() if DMF_DEFERRED_REMOVE set]
-Signed-off-by: Mike Snitzer <snitzer@kernel.org>
----
- drivers/md/dm.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+--xrzldp3lzaugn3vy
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 56aa2a8b9d71..7d0746b37c8e 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -765,7 +765,7 @@ static struct table_device *open_table_device(struct mapped_device *md,
- 	return td;
- 
- out_blkdev_put:
--	fput(bdev_file);
-+	__fput_sync(bdev_file);
- out_free_td:
- 	kfree(td);
- 	return ERR_PTR(r);
-@@ -778,7 +778,13 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
- {
- 	if (md->disk->slave_dir)
- 		bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
--	fput(td->dm_dev.bdev_file);
-+
-+	/* Leverage async fput() if DMF_DEFERRED_REMOVE set */
-+	if (unlikely(test_bit(DMF_DEFERRED_REMOVE, &md->flags)))
-+		fput(td->dm_dev.bdev_file);
-+	else
-+		__fput_sync(td->dm_dev.bdev_file);
-+
- 	put_dax(td->dm_dev.dax_dev);
- 	list_del(&td->list);
- 	kfree(td);
--- 
-2.40.0
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZh6dogAKCRAGvrMr/1gc
+jmjlAPwLwNkZQJFhrEDRQd2UPVOTYJsmlBNuzIDoL+vMV1NMgAEAq01YDiSpW/+Z
+V1EP2A64wd4WcjGJKLfZ/x4r2l/8iA4=
+=cgb7
+-----END PGP SIGNATURE-----
+
+--xrzldp3lzaugn3vy--
