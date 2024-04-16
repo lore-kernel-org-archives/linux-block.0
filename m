@@ -1,90 +1,97 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E49C81F;
-	Tue, 16 Apr 2024 01:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EBBFC1F
+	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 02:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713231362; cv=none; b=Imjdvu+KMn50lWQXdJ0unLpdL4soV5rqEOmQfKq+egYRRsuqkbera42MR8QZVFhy0kUqiAxjvoE31e2txoyGmDBNXSVGea386W/wJTt8HxE+fFkUpLr6fXvu/X/NaGj6UWy1QEgYykuaP7RN1Pn09zgTGW94vMgKnHoEWr1na/g=
+	t=1713233378; cv=none; b=HT1m+jsLGy90mA3RlhcdvHXHJpl0ToGUNK2OOyfzgTpa2q2Ssm5mJtbibFZ7899Wqd4ycflsbf3cIlkzcbW68NZVn3hE5aRoFkvIaXaAQSzMLv6pzERcohHALo3q0gmlCAbC9lz82XUiWI5jrF9DZaN0P02+7aWIoNP9HcbPr0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713231362; c=relaxed/simple;
-	bh=jsmBFiYdJ39p4AypnhPt3gVPTdgbWiZEaDsPwo+slsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LABVkaIpLp586EnC5Qm+ny/LdcCNdTUmvrjDMaJAK7zKyTWTiE76DEq9oUvru3KhC1ayz/vU9lSkmQHA02an/bYlqdN4l3RngALK1wNp16ELPHcEhVHFwbt46rAQlMMkzu67F+4o2WWqllEVb8/9ubFVC9qTuTa7suZrWnkNerw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=aFDOW72q; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="aFDOW72q"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Skx+tWSgaqX1mfAd0brbPN+dNPOOuoIWRe8tqmg9+LI=; b=aFDOW72qa1X3x4T+c2iWWA9TlW
-	GA7brWjDSCVTdtzXKiDUwxpgxm4PPrFE7vl41OKWKh+CCk4LwpOcxVMKIKNPz6WW9sXNeNOKseI6c
-	N44wNxjJweVL/Y9kR0PjIZBtgUb81EySL63ClnFcGxZrFxN8uDxIGzX6HNIIOzqiQVfO3EWDnxm/N
-	9A7yyGQRDuy8x7oZmOq5xjRRJ/tmZedksRxsVB0myYcPZACStuTAgvbkNmOQlkZDK7noBVZzWmEkB
-	swHBzq1BnhjrQckigMCU8aviNzoxfDIVN/zCi4pKX8MebF6H/v/RxDp7q1aumPFaAdP+wAaHeBXo4
-	ba5KPXsw==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rwXjn-00D8Ru-2Y;
-	Tue, 16 Apr 2024 01:35:55 +0000
-Date: Tue, 16 Apr 2024 02:35:55 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: linux-s390@vger.kernel.org
-Cc: jack@suse.cz, hch@lst.de, brauner@kernel.org, axboe@kernel.dk,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com,
-	Yu Kuai <yukuai1@huaweicloud.com>
-Subject: Re: [PATCH vfs.all 15/26] s390/dasd: use bdev api in dasd_format()
-Message-ID: <20240416013555.GZ2118490@ZenIV>
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-16-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1713233378; c=relaxed/simple;
+	bh=gT1RK5wOvK16xzytI47o2nmxt06m/wf/d1TPLf8n5MY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tzMYEmdqrG/Nsqb3wgVNxGmvbyjzfF3SdZk88XUpytpWbFcokgkUFVSMR1zng5q1cvGUn9GEn/yrCxoxJklBvEg0jPgyaJb/CtyzmRWf7Oja3k8rkgHsKijc1LoVkGxS6P7fzaiWNjl87ykEKkthbjTD4NMmN4AawGq5dJwIm3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VJSCK5q1Yz4f3nJf
+	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 10:09:17 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id ABCEA1A10A9
+	for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 10:09:26 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgAX5g7U3R1mMNVnKA--.11112S4;
+	Tue, 16 Apr 2024 10:09:26 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: linux-block@vger.kernel.org,
+	saranyamohan@google.com,
+	axboe@kernel.dk,
+	tj@kernel.org
+Cc: yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yangerkun@huawei.com
+Subject: [PATCH blktests 0/5] add new tests for blk-throttle
+Date: Tue, 16 Apr 2024 10:00:37 +0800
+Message-Id: <20240416020042.509291-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240406090930.2252838-16-yukuai1@huaweicloud.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAX5g7U3R1mMNVnKA--.11112S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4DCrW5CFW3tF1kGw4xCrg_yoW8JF4fpa
+	yUtF45ta1xJFnrJr13Ga17GayrXw4rCr47Aw17Xr1YvFy0v3y7Gr12gw1UtFWrAF17XryU
+	A3Wktr4rGF1UZrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+	xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sat, Apr 06, 2024 at 05:09:19PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Avoid to access bd_inode directly, prepare to remove bd_inode from
-> block_devcie.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> ---
->  drivers/s390/block/dasd_ioctl.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
-> index 7e0ed7032f76..c1201590f343 100644
-> --- a/drivers/s390/block/dasd_ioctl.c
-> +++ b/drivers/s390/block/dasd_ioctl.c
-> @@ -215,8 +215,9 @@ dasd_format(struct dasd_block *block, struct format_data_t *fdata)
->  	 * enabling the device later.
->  	 */
->  	if (fdata->start_unit == 0) {
-> -		block->gdp->part0->bd_inode->i_blkbits =
-> -			blksize_bits(fdata->blksize);
-> +		rc = set_blocksize(block->gdp->part0, fdata->blksize);
+From: Yu Kuai <yukuai3@huawei.com>
 
-Could somebody (preferably s390 folks) explain what is going on in
-dasd_format()?  The change in this commit is *NOT* an equivalent
-transformation - mainline does not evict the page cache of device.
+Yu Kuai (5):
+  tests/throtl: add first test for blk-throttle
+  tests/throtl: add a new test 002
+  tests/throtl: add a new test 003
+  tests/throtl: add a new test 004
+  tests/throtl: add a new test 005
 
-Is that
-	* intentional behaviour in mainline version, possibly broken
-by this patch
-	* a bug in mainline accidentally fixed by this patch
-	* something else?
+ tests/throtl/001     | 84 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/001.out |  6 ++++
+ tests/throtl/002     | 81 ++++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/002.out |  4 +++
+ tests/throtl/003     | 82 ++++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/003.out |  4 +++
+ tests/throtl/004     | 79 +++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/004.out |  4 +++
+ tests/throtl/005     | 83 +++++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/005.out |  3 ++
+ tests/throtl/rc      | 15 ++++++++
+ 11 files changed, 445 insertions(+)
+ create mode 100755 tests/throtl/001
+ create mode 100644 tests/throtl/001.out
+ create mode 100755 tests/throtl/002
+ create mode 100644 tests/throtl/002.out
+ create mode 100755 tests/throtl/003
+ create mode 100644 tests/throtl/003.out
+ create mode 100755 tests/throtl/004
+ create mode 100644 tests/throtl/004.out
+ create mode 100755 tests/throtl/005
+ create mode 100644 tests/throtl/005.out
+ create mode 100644 tests/throtl/rc
 
-And shouldn't there be an exclusion between that and having a filesystem
-on a partition of that disk currently mounted?
+-- 
+2.39.2
+
