@@ -1,186 +1,211 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E48524BC
-	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 07:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DA112837C
+	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 09:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713337308; cv=none; b=HQonDEFk0AmzRmhXlL2Z/UXualxb+bU3LQTRRSFSF8U6XbXWqMnBZs/6cDph/hBHfB78RR7wrN1UBVSmpJM4Q5fQZbv7fAT2j9YU+BxgLgUscvPfcpyxJeHZ3F5sNQwuSx30J1Fylc7rV1BstkUUeHSkHTK8M1zgJkKilTSMaKY=
+	t=1713344737; cv=none; b=ZO/4qNWapGudYyMnat8xKkBsf7YEuEkwdvbuH/3DhtcCcJJDX1IWRHU9skkzlHKNUC3XX3VPFVm2N1Oav9F6bMgWWPOWX8JN9QvJW/9Zr35ry/pjDYOjYdbwiJU4DDF2/ZBlisKvEN4pTSE6zCNFzRGZNuSVvjAg0jeNXj/BbZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713337308; c=relaxed/simple;
-	bh=Xiab43kCAgAU4r306YrPDP7WzbXhfdmbyaMBW/qturg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J7jzMONwo+eP6uiTvFPayYWQDnXMB66hwwF178XMvBIHArYfle6yeLKOF26GClcrLSH3kzDujU17pvczlODKB/5EcJ9sLsYYzlAH5U3vWsxdIXvD1LozbmGq9ZbmryPXZgGF1RmJkKR1lMeC7XxV0GARKuL58HIrThrqxdwqez4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z7MpAtEa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UIwVVata; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z7MpAtEa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UIwVVata; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1713344737; c=relaxed/simple;
+	bh=dzLuLNR+JHkFKMGMqRUn0tXcCa7nTBGisy6FkCnmdfM=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=gOc1y8FIv5hYvHQvhHlaGavR/1dMMQs6wJDIXjcMhEwUix/lkJJfgGqjg7o3y/kvt5dv4dZgjEB5M0cHZz7a6R3yNIlYZLXJpgTBrziMmx6k5sizRS7RtvBDzje2QPTSZ4L+akfjTMsJchNWfRIBF/XiiaCZtu4p+5l/lklIqUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hDdczSok; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z7MpAtEa";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UIwVVata";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z7MpAtEa";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UIwVVata"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hDdczSok"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713344735;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=FgizP1W9wYXJTXddAvpCsKugaMlz1Qb6hK6QhZ7rS64=;
+	b=hDdczSokBrhJCtYcIXUi9lR5YR7GoPbYr0+cxzrAsKK3bJ34NvSyiLTdJ2G/Lz8V/Yz0Es
+	XzQRdbvT/X52rnMPoO6FAyRLcF+UGw5YT44WLGV2+JU6qsmCaPiublSIWG1jjU6OOHbMBe
+	H0lRWeZ8YuhH7DlK17Me32UXuyDXA1Q=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-P-AHZvDuO-eELP6h9QJRxQ-1; Wed,
+ 17 Apr 2024 05:05:31 -0400
+X-MC-Unique: P-AHZvDuO-eELP6h9QJRxQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 4675720467;
-	Wed, 17 Apr 2024 07:01:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1713337301; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=723+iop/jpMlbqP404QRDp8M6ornsQdj+lpTCspHE0I=;
-	b=Z7MpAtEaBQPrW4LXVJtv/XRD6qze5zv8rQNLDVZp3YpdDC2duRz/OKz8/cJk4uyVIBRQLQ
-	CdXyvl7J0Xk/pLfEaYpxqcG2NuEL3cdZMSrf1AtO8ndjPTQgOGqZUJ24G9eEA6UzkyGANN
-	32QzgmYFKSYZehuY6jFpZay0bnBcOa0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1713337301;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=723+iop/jpMlbqP404QRDp8M6ornsQdj+lpTCspHE0I=;
-	b=UIwVVatayKjJ7Z0+/jpuwu4sH0WhBtwx1I+ZiVKBVvrtvl6H4e5HYLpgT+n/coSC8TCH9o
-	QS4xo4o0F3SvEeAQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Z7MpAtEa;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=UIwVVata
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1713337301; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=723+iop/jpMlbqP404QRDp8M6ornsQdj+lpTCspHE0I=;
-	b=Z7MpAtEaBQPrW4LXVJtv/XRD6qze5zv8rQNLDVZp3YpdDC2duRz/OKz8/cJk4uyVIBRQLQ
-	CdXyvl7J0Xk/pLfEaYpxqcG2NuEL3cdZMSrf1AtO8ndjPTQgOGqZUJ24G9eEA6UzkyGANN
-	32QzgmYFKSYZehuY6jFpZay0bnBcOa0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1713337301;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=723+iop/jpMlbqP404QRDp8M6ornsQdj+lpTCspHE0I=;
-	b=UIwVVatayKjJ7Z0+/jpuwu4sH0WhBtwx1I+ZiVKBVvrtvl6H4e5HYLpgT+n/coSC8TCH9o
-	QS4xo4o0F3SvEeAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 34F8813957;
-	Wed, 17 Apr 2024 07:01:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id RjuCC9VzH2YfIwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 17 Apr 2024 07:01:41 +0000
-Date: Wed, 17 Apr 2024 09:01:40 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH blktests v2 00/11] support test case repeat by different
- conditions
-Message-ID: <undnwuhrsdoawhnmfwyata5ukod275hl762qckiohxq4d6a3aj@nbmci2nialjm>
-References: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7044628EC11A;
+	Wed, 17 Apr 2024 09:05:31 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 248A3490DD;
+	Wed, 17 Apr 2024 09:05:31 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id ECC8330C2BF7; Wed, 17 Apr 2024 09:05:30 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id E80903FD7A;
+	Wed, 17 Apr 2024 11:05:30 +0200 (CEST)
+Date: Wed, 17 Apr 2024 11:05:30 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Mike Snitzer <msnitzer@redhat.com>, Damien Le Moal <dlemoal@kernel.org>
+cc: Guangwu Zhang <guazhang@redhat.com>, dm-devel@lists.linux.dev, 
+    Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [PATCH v3] dm-io: don't warn if flush takes too long time
+Message-ID: <754d1973-31cb-d3ca-1f6f-2d35b96364db@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
-X-Spam-Flag: NO
-X-Spam-Score: -4.01
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 4675720467
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email]
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On Tue, Apr 16, 2024 at 07:31:56PM +0900, Shin'ichiro Kawasaki wrote:
-> In the recent discussion for nvme test group [1], two pain points were mentioned
-> regarding the test case runs.
-> 
-> 1) Several test cases in nvme test group do exactly the same test except the
->    NVME transport backend set up condition difference (device vs. file). This
->    results in duplicate test script codes. It is desired to unify the test cases
->    and run them repeatedly with the different conditions.
-> 
-> 2) NVME transport types can be specified with nvme_trtype parameter so that the
->    same tests can be run for various transport types. However, some test cases
->    do not depend on the transport types. They are repeated in multiple runs for
->    the various transport types under the exact same conditions. It is desired to
->    repeat the test cases only when such repetition is required.
-> 
-> [1] https://lore.kernel.org/linux-block/w2eaegjopbah5qbjsvpnrwln2t5dr7mv3v4n2e63m5tjqiochm@uonrjm2i2g72/
-> 
-> One idea to address these pain points is to add the test repeat feature to the
-> nvme test group. However, Daniel questioned if the feature could be implemented
-> in the blktests framework. Actually, a similar feature has already been
-> implemented to repeat some test cases for non-zoned block devices and zoned
-> block devices. However, this feature is implemented only for the zoned and non-
-> zoned device conditions. It can not fulfill the desires for nvme test group.
-> 
-> This series proposes to generalize the feature in the blktests framework to
-> repeat the test cases with different conditions. Introduce a new function
-> set_conditions() that each test case can define and instruct the framework to
-> repeat the test case. The first four patches introduce the feature and apply it
-> to the repetition for non-zoned and zoned block devices. The following seven
-> patches apply the feature to nvme test group so that the test cases can be
-> repeated for NVME transport types and backend types in the ideal way. Two of the
-> seven patches are reused from the work by Daniel. The all patches are listed in
-> the order that does not lose the test coverage with the default set up.
-> 
-> This series introduces new config parameters NVMET_TRTYPES and
-> NVMET_BLKDEV_TYPES, which can take multiple values with space separators. When
-> they are defined in the config file as follows,
-> 
->   NVMET_TRTYPES="loop rdma tcp"
->   NVMET_BLKDEV_TYPES="device file"
-> 
-> the test cases which depend on these parameters are repeated 3 x 2 = 6 times.
-> For example, nvme/006 is repeated as follows.
-> 
-> nvme/006 (nvmet bd=device tr=loop) (create an NVMeOF target) [passed]
->     runtime  0.148s  ...  0.165s
-> nvme/006 (nvmet bd=device tr=rdma) (create an NVMeOF target) [passed]
->     runtime  0.273s  ...  0.235s
-> nvme/006 (nvmet bd=device tr=tcp) (create an NVMeOF target)  [passed]
->     runtime  0.162s  ...  0.164s
-> nvme/006 (nvmet bd=file tr=loop) (create an NVMeOF target)   [passed]
->     runtime  0.138s  ...  0.134s
-> nvme/006 (nvmet bd=file tr=rdma) (create an NVMeOF target)   [passed]
->     runtime  0.216s  ...  0.201s
-> nvme/006 (nvmet bd=file tr=tcp) (create an NVMeOF target)    [passed]
->     runtime  0.154s  ...  0.146s
+There was reported hang warning when using dm-integrity on the top of loop
+device on XFS on a rotational disk. The warning was triggered because
+flush on the loop device was too slow.
 
-Looks all good to me. I also run the nvme part of blktests. The
-framework works fine but as expected we have a bunch of new errors
-reported because of the additional test coverage this change brings.
-Thanks a lot for your work!
+There's no easy way to reduce the latency, so I made a patch that shuts
+the warning up.
 
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
+There's already a function blk_wait_io that avoids the hung task warning.
+This commit moves this function from block/blk.h to
+include/linux/completion.h, renames it to wait_for_completion_long_io
+(because it is not dependent on the block layer at all) and uses it in
+dm-io instead of wait_for_completion_io.
+
+[ 1352.586981] INFO: task kworker/1:2:14820 blocked for more than 120 seconds.
+[ 1352.593951] Not tainted 4.18.0-552.el8_10.x86_64 #1
+[ 1352.599358] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[ 1352.607202] Call Trace:
+[ 1352.609670] __schedule+0x2d1/0x870
+[ 1352.613173] ? update_load_avg+0x7e/0x710
+[ 1352.617193] ? update_load_avg+0x7e/0x710
+[ 1352.621214] schedule+0x55/0xf0
+[ 1352.624371] schedule_timeout+0x281/0x320
+[ 1352.628393] ? __schedule+0x2d9/0x870
+[ 1352.632065] io_schedule_timeout+0x19/0x40
+[ 1352.636176] wait_for_completion_io+0x96/0x100
+[ 1352.640639] sync_io+0xcc/0x120 [dm_mod]
+[ 1352.644592] dm_io+0x209/0x230 [dm_mod]
+[ 1352.648436] ? bit_wait_timeout+0xa0/0xa0
+[ 1352.652461] ? vm_next_page+0x20/0x20 [dm_mod]
+[ 1352.656924] ? km_get_page+0x60/0x60 [dm_mod]
+[ 1352.661298] dm_bufio_issue_flush+0xa0/0xd0 [dm_bufio]
+[ 1352.666448] dm_bufio_write_dirty_buffers+0x1a0/0x1e0 [dm_bufio]
+[ 1352.672462] dm_integrity_flush_buffers+0x32/0x140 [dm_integrity]
+[ 1352.678567] ? lock_timer_base+0x67/0x90
+[ 1352.682505] ? __timer_delete.part.36+0x5c/0x90
+[ 1352.687050] integrity_commit+0x31a/0x330 [dm_integrity]
+[ 1352.692368] ? __switch_to+0x10c/0x430
+[ 1352.696131] process_one_work+0x1d3/0x390
+[ 1352.700152] ? process_one_work+0x390/0x390
+[ 1352.704348] worker_thread+0x30/0x390
+[ 1352.708019] ? process_one_work+0x390/0x390
+[ 1352.712214] kthread+0x134/0x150
+[ 1352.715459] ? set_kthread_struct+0x50/0x50
+[ 1352.719659] ret_from_fork+0x1f/0x40 
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+
+---
+ block/bio.c                |    2 +-
+ block/blk-mq.c             |    2 +-
+ block/blk.h                |   12 ------------
+ drivers/md/dm-io.c         |    2 +-
+ include/linux/completion.h |   17 +++++++++++++++++
+ 5 files changed, 20 insertions(+), 15 deletions(-)
+
+Index: linux-2.6/block/blk.h
+===================================================================
+--- linux-2.6.orig/block/blk.h	2024-04-15 15:54:22.000000000 +0200
++++ linux-2.6/block/blk.h	2024-04-15 15:54:21.000000000 +0200
+@@ -72,18 +72,6 @@ static inline int bio_queue_enter(struct
+ 	return __bio_queue_enter(q, bio);
+ }
+ 
+-static inline void blk_wait_io(struct completion *done)
+-{
+-	/* Prevent hang_check timer from firing at us during very long I/O */
+-	unsigned long timeout = sysctl_hung_task_timeout_secs * HZ / 2;
+-
+-	if (timeout)
+-		while (!wait_for_completion_io_timeout(done, timeout))
+-			;
+-	else
+-		wait_for_completion_io(done);
+-}
+-
+ #define BIO_INLINE_VECS 4
+ struct bio_vec *bvec_alloc(mempool_t *pool, unsigned short *nr_vecs,
+ 		gfp_t gfp_mask);
+Index: linux-2.6/drivers/md/dm-io.c
+===================================================================
+--- linux-2.6.orig/drivers/md/dm-io.c	2024-04-15 15:54:22.000000000 +0200
++++ linux-2.6/drivers/md/dm-io.c	2024-04-15 15:54:21.000000000 +0200
+@@ -450,7 +450,7 @@ static int sync_io(struct dm_io_client *
+ 
+ 	dispatch_io(opf, num_regions, where, dp, io, 1, ioprio);
+ 
+-	wait_for_completion_io(&sio.wait);
++	wait_for_completion_long_io(&sio.wait);
+ 
+ 	if (error_bits)
+ 		*error_bits = sio.error_bits;
+Index: linux-2.6/include/linux/completion.h
+===================================================================
+--- linux-2.6.orig/include/linux/completion.h	2024-04-15 15:54:22.000000000 +0200
++++ linux-2.6/include/linux/completion.h	2024-04-15 15:57:14.000000000 +0200
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <linux/swait.h>
++#include <linux/sched/sysctl.h>
+ 
+ /*
+  * struct completion - structure used to maintain state for a "completion"
+@@ -119,4 +120,20 @@ extern void complete(struct completion *
+ extern void complete_on_current_cpu(struct completion *x);
+ extern void complete_all(struct completion *);
+ 
++/**
++ * wait_for_completion_long_io - this is like wait_for_completion_io,
++ * but it doesn't warn if the wait takes too long.
++ */
++static inline void wait_for_completion_long_io(struct completion *done)
++{
++	/* Prevent hang_check timer from firing at us during very long I/O */
++	unsigned long timeout = sysctl_hung_task_timeout_secs * HZ / 2;
++
++	if (timeout)
++		while (!wait_for_completion_io_timeout(done, timeout))
++			;
++	else
++		wait_for_completion_io(done);
++}
++
+ #endif
+Index: linux-2.6/block/bio.c
+===================================================================
+--- linux-2.6.orig/block/bio.c	2024-03-30 20:07:03.000000000 +0100
++++ linux-2.6/block/bio.c	2024-04-15 15:55:13.000000000 +0200
+@@ -1378,7 +1378,7 @@ int submit_bio_wait(struct bio *bio)
+ 	bio->bi_end_io = submit_bio_wait_endio;
+ 	bio->bi_opf |= REQ_SYNC;
+ 	submit_bio(bio);
+-	blk_wait_io(&done);
++	wait_for_completion_long_io(&done);
+ 
+ 	return blk_status_to_errno(bio->bi_status);
+ }
+Index: linux-2.6/block/blk-mq.c
+===================================================================
+--- linux-2.6.orig/block/blk-mq.c	2024-03-30 20:07:03.000000000 +0100
++++ linux-2.6/block/blk-mq.c	2024-04-15 15:55:05.000000000 +0200
+@@ -1407,7 +1407,7 @@ blk_status_t blk_execute_rq(struct reque
+ 	if (blk_rq_is_poll(rq))
+ 		blk_rq_poll_completion(rq, &wait.done);
+ 	else
+-		blk_wait_io(&wait.done);
++		wait_for_completion_long_io(&wait.done);
+ 
+ 	return wait.ret;
+ }
+
