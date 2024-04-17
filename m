@@ -1,76 +1,71 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B758C13A258;
-	Wed, 17 Apr 2024 10:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D26E13B29C;
+	Wed, 17 Apr 2024 10:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713348342; cv=none; b=aKotXkkS9xCcP0POe5Kk0jopAB7BOFPVzZQjBY5ItccajdNy7IPztNuyUrw+3d8oFv4JcGlXSkTzt6NOmq6P9+yMLtVbVzIZZXlO9N9EuEGG5kSFsU0V9bik0qNB8++Zkksa4e1mH7s7eL4PjnzNqLWTNS1pm7Sr1vzzFS5qKtU=
+	t=1713349547; cv=none; b=XR9QdWVBLjAx3aFAMeYtWjER4GDDR3MqPeggeDvG1zlirrJke1h9/PJPx1N/bBw5bIpTGpal0qIabEZFs7MJQtFYS27pnBAnqNQSrF1iFE6u6TdXvIiYbimzl88adak9W7Qixh++lTSHv7Puc2afEmte160ZtTrBaAKCpmEdbic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713348342; c=relaxed/simple;
-	bh=1gRmg87JIr+AbQO3Esc+cHkCY63QUm02iWl6ErooOoI=;
+	s=arc-20240116; t=1713349547; c=relaxed/simple;
+	bh=NDbI6G+PFcKfCE8LvuHVfp8HdKCGX9NVA8UfW64rwDM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F1gfO8ucyMfydlTHUFuf9SDLrFAoOZtjhQTv9e5gmJ0MS085w7yKlIvYGQM0CH3QHioEMnV8t4QcSG0PHBqo5XXIysRhL3KK8ee57DyzH8JykzQcBsQVJWdAXRlcUk7wutKUgbASxupaZd8yiGqEocxZFgAJ5kU99suoVpVtCpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AAzs3ZuR; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=PgkZmWckaX4nbUn2OOQFc8rlpHec1gf32DhrbbKE6hm3PAkGjgfbJKumM/pt0YeF9Y7AKV7yaH+TLVbOPsC5L0JzEihUvnlby0UTIn3SQGDnQ0GzZm992xIGi1KH/aciseFaeG/S8Ct4SppVxR1XWJU9aLdcKeC5fJxv2N5hakI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=g4qEvNbO; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=g4qEvNbO; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAzs3ZuR"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5d8b887bb0cso4045939a12.2;
-        Wed, 17 Apr 2024 03:05:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713348340; x=1713953140; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1gRmg87JIr+AbQO3Esc+cHkCY63QUm02iWl6ErooOoI=;
-        b=AAzs3ZuRJX7XDEU/S31apMVw0w4s7Q7KO0FdVCxGcPYSQYxeRSY28pC1eu3Nrio5c1
-         /8hlCKRtkZAgyv8u2ZkQRGfxaZJMq1OWpJiBVcvOqdTd2WBLQIZ2kjfFBum4N2R8Isih
-         f2SkFV+0ugaXXipJ2Nlmu4lZAs98Uu7pgtHxn5StoZ+osrPawfSsDoFTHgEoyq2Tt6Q8
-         NRjLJNg4pvoJ5WApc/OPQ4IAFhbQ7RH2Kz3RT5CY8e2rwsQ/E1wXGXRIyVxPAPyHxqu0
-         xXjLmG+nWpVe8EKo2OzaEGE6HiF4EW+wqWYp7nr6UxxOhqD0p14pNRRYbP31JFxGWdYJ
-         BuPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713348340; x=1713953140;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1gRmg87JIr+AbQO3Esc+cHkCY63QUm02iWl6ErooOoI=;
-        b=iIRsi31AfcqzDKUNNO6o9d3ib8xGzePLs9voX9qMDY78+WB0gtQYpo7kXPOBnw2WTm
-         YzYRwT+Oo0gI3yiO4xGWx6DR+eU0urjiDqvVEdgaDP/jcMcgDaLBdIH6/wDsRP3KCpgl
-         Pz+utAPk2ispxU0TLWkBdG2f4Y4/LM1n+AfVbxPPAGTpgEf9i0JxbOqcd4fZCsMHsSE0
-         pmro/RaRuyLVSEcdLlg9r7LgoRzpd4G5HWENm4VxUvcuRbrI2iiRiJTACsZIVfN12aSC
-         5gZk7AoirKe21tUqOoK9HMtPad2H4a5jwUjYz7cl5xmXvftqdXkjqWsHFMN08st5+AzW
-         qHEA==
-X-Forwarded-Encrypted: i=1; AJvYcCX7IS6j45Gfqpkz+GTYOT1w1GCNrANLl/xhNlogdKJkw3K3EqUqgFKkc2TgQcow4QdjzjHAuB5G3fNaypVxqolnIJrRwppo7MhG2zZs9+/T/Nbl7SXr3Y2gQvvWRjUjEaiFSkIs1YjlyYKaPbKoSs+JVjxeDE6jhEgRQPQzpZbQHKVI10sX1XjmInTqEUNM70jCiOsLvZiLojjq55CPA52TGCgxr5GK93NyY2kPva240GtdGqkSCf2ItMR1qGvwAKhKpy4rGF4SeQ==
-X-Gm-Message-State: AOJu0Yy7solfZwT8Xrej9ZNsZNk0qeXZSEkViORqFlj1vWa7k1MVELAA
-	SlxwR+1FqfC8+ES8QkGdUbyMlj4fEsK0Id+6u0iD26wAp++h3IEJ
-X-Google-Smtp-Source: AGHT+IHoSQwgWNaYYN9PHfJ92Leu3dCSJnPJtoI+4IJ8iitgaNIncK7hpg/lzzZCpwVd83QGt3/Z2Q==
-X-Received: by 2002:a17:90a:108:b0:2aa:7057:437b with SMTP id b8-20020a17090a010800b002aa7057437bmr6040509pjb.16.1713348339921;
-        Wed, 17 Apr 2024 03:05:39 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id t12-20020a17090a5d8c00b002a474e2d7d8sm1019325pji.15.2024.04.17.03.05.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 03:05:38 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 1682E18462BA0; Wed, 17 Apr 2024 17:05:35 +0700 (WIB)
-Date: Wed, 17 Apr 2024 17:05:35 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Randy Dunlap <rdunlap@infradead.org>,
-	Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net,
-	zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
-	tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com,
-	snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com
-Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	audit@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH v17 20/21] Documentation: add ipe documentation
-Message-ID: <Zh-e7945DM6f2u9T@archie.me>
-References: <1712969764-31039-1-git-send-email-wufan@linux.microsoft.com>
- <1712969764-31039-21-git-send-email-wufan@linux.microsoft.com>
- <Zh0Zh3-xraVl85Lm@archie.me>
- <a2266217-c3ad-4bb2-8188-498a2c8ae36c@infradead.org>
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="g4qEvNbO";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="g4qEvNbO"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 359F9206F4;
+	Wed, 17 Apr 2024 10:25:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1713349544; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NDbI6G+PFcKfCE8LvuHVfp8HdKCGX9NVA8UfW64rwDM=;
+	b=g4qEvNbOw9Ygwp5FSKied5syvo6aREx4Kys21vR69y+oE6P02Rq+sm75q+9wMf5kgsMfGT
+	e/PODIsb3w7aGYYQf/+RKKdBGoalzFxHkqOMjPQLV1jb6D9eQOpgC4P/rXEZyIfiOtXaKG
+	53i1WFVxMmvgX0WlniHtMATq5JOm2BQ=
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=g4qEvNbO
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1713349544; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NDbI6G+PFcKfCE8LvuHVfp8HdKCGX9NVA8UfW64rwDM=;
+	b=g4qEvNbOw9Ygwp5FSKied5syvo6aREx4Kys21vR69y+oE6P02Rq+sm75q+9wMf5kgsMfGT
+	e/PODIsb3w7aGYYQf/+RKKdBGoalzFxHkqOMjPQLV1jb6D9eQOpgC4P/rXEZyIfiOtXaKG
+	53i1WFVxMmvgX0WlniHtMATq5JOm2BQ=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 223101384C;
+	Wed, 17 Apr 2024 10:25:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id yDgjCKijH2aPbQAAD6G6ig
+	(envelope-from <mkoutny@suse.com>); Wed, 17 Apr 2024 10:25:44 +0000
+Date: Wed, 17 Apr 2024 12:25:42 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, chenhuacai@kernel.org, tj@kernel.org, 
+	josef@toxicpanda.com, jhs@mojatatu.com, svenjoac@gmx.de, raven@themaw.net, 
+	pctammela@mojatatu.com, qde@naccy.de, zhaotianrui@loongson.cn, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
+	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: Re: [PATCH RFC v2 0/6] blk-throttle: support enable and disable
+ during runtime
+Message-ID: <unns4jtkiqdde3v7hzmd4yi2y7ylh4fh545dsn3imytgbg4x72@iq3mwwemygh5>
+References: <20240406080059.2248314-1-yukuai1@huaweicloud.com>
+ <4exmes2ilp2cmfj3evf3jhhhq6tapfzgfzuasjejrxbj6a3327@3ecptofffblf>
+ <f721f06e-e2c8-608e-0dd0-41f41e948f0d@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,47 +73,75 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="0nWDRmFxn5oWDUvp"
+	protocol="application/pgp-signature"; boundary="mv5ylurrtbwdd6xr"
 Content-Disposition: inline
-In-Reply-To: <a2266217-c3ad-4bb2-8188-498a2c8ae36c@infradead.org>
+In-Reply-To: <f721f06e-e2c8-608e-0dd0-41f41e948f0d@huaweicloud.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-5.89 / 50.00];
+	BAYES_HAM(-2.78)[99.06%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmx.de];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,toxicpanda.com,mojatatu.com,gmx.de,themaw.net,naccy.de,loongson.cn,vger.kernel.org,lists.linux.dev,huawei.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:dkim];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 359F9206F4
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -5.89
 
 
---0nWDRmFxn5oWDUvp
-Content-Type: text/plain; charset=utf-8
+--mv5ylurrtbwdd6xr
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 15, 2024 at 07:56:16AM -0700, Randy Dunlap wrote:
->=20
-> On 4/15/24 5:11 AM, Bagas Sanjaya wrote:
-> > The doc LGTM, thanks!
-> >=20
-> > Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
->=20
-> Hi,
-> Please see netiquette, section "Trim replies".
-> Thanks.
->=20
->=20
-> --=20
-> #Randy
-> https://people.kernel.org/tglx/notes-about-netiquette
-> https://subspace.kernel.org/etiquette.html
+On Wed, Apr 17, 2024 at 09:09:07AM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> Yes, bfq already support that,
 
-Thanks for the tip!
+I've never noticed CONFIG_IOSCHED_BFQ is a tristate that explains (me) a
+lot. Thanks!
 
---=20
-An old man doll... just what I always wanted! - Clara
+> First of all, users can only load these policies when they need, and
+> reduce kernel size; Then, when these policies is not loaded, IO fast
+> path will be slightly shorter, and save some memory overhead for each
+> disk.
 
---0nWDRmFxn5oWDUvp
+...and there is no new complexity thanks to the above.
+
+(I'm only catching up with subthread of patch 5/6.)
+It seems the old complexity could be simplified by the way of lazy
+inits. Intereseting...
+
+Michal
+
+--mv5ylurrtbwdd6xr
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZh+e6wAKCRD2uYlJVVFO
-o4TXAPwN11FytsnDX/+gFpUvWYFc3CxPaaA7sJCuHF5qVYQtGAEA6GP0hs+AljG4
-tOsfo209C7he+IJJJUnxDpScnZoh/wc=
-=jvcJ
+iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZh+jpAAKCRAGvrMr/1gc
+jtkfAP9yEajBdW3z7w7kWBfYAteHAXasz7VRVK4JZFJIWxNyeQD+Ii7z6SSsfVG5
+K3EEHsVXHAgD9UkHeoqy9ADSNVIGZQc=
+=l0yD
 -----END PGP SIGNATURE-----
 
---0nWDRmFxn5oWDUvp--
+--mv5ylurrtbwdd6xr--
