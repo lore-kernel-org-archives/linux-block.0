@@ -1,128 +1,92 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60FC79FE
-	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 02:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AACA79C8
+	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 03:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713320944; cv=none; b=BGYmx+FReWge5HhaHer+6JfAUO/+0JqhXLGcdVDmHZrrRytejiTvhTm2E1IjKXFlIAzJE0iiZOzqL4IkKrMuGX4kUrNExxrgPe5+hadQIU2P4FMAS5femhZdsaZRgTlXXIRHVlyCaFrUhVDlEW+Vb8GdHoA08+i66HNqFg4/M0Y=
+	t=1713324453; cv=none; b=GU91WsaWwJWdpFBBXvbX0STasE1Hd7+jQsWyabpCQ3j5Ick40zpCYL6NDdWit/CRFvEegpQbKsnHi1ZTsczOkPmfupfjz5xdYi/trqV4cRVDNrvW/W6T/S9e8QD8ze7INJRe46YYsOHJKymrT9a51V8zdH2wle1Q9XwEWyEanKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713320944; c=relaxed/simple;
-	bh=ZilNktfcTDIwUUPk10/qrvvnUQE4wcKVythWlrnq1Ew=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CLeGxjJZplq+6dwrqOUUSCAvYz7hGtm1C/q1Q1crmGvVGSE+rmT8i7UMGzgQEwp4K8yD+rFNQUE/vgLy51JnEmySN3gkHYhL8GBYeVoCXaDrOULkSbTZT4Z3H+rDyOKZvzlN35qlXeYU93tWsWDSX3XelFGIt1X3n3lfrz/DUos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VK4bL0YQHz4f3jJD
-	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 10:28:46 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 411F71A0BE2
-	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 10:28:53 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgBHGBHiMx9mtJvAKA--.38748S6;
-	Wed, 17 Apr 2024 10:28:53 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: saranyamohan@google.com,
-	tj@kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yangerkun@huawei.com
-Subject: [PATCH v2 blktests 2/5] tests/throtl: add a new test 002
-Date: Wed, 17 Apr 2024 10:20:02 +0800
-Message-Id: <20240417022005.1410525-3-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240417022005.1410525-1-yukuai1@huaweicloud.com>
-References: <20240417022005.1410525-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1713324453; c=relaxed/simple;
+	bh=Uw2R24Py98brGt7b/weB6cxxd4FY06m8YxBoSEGLooU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bm7cE6pDWTJctu+V1urMWQT4ZtGz4PQHRHv2Mzcy5xS/U2elzgkptVf9e+ZYEXECmD0K34DDZT/o0uPZo5/3PFyuD+7tKuYh30Uy9Plu+9YTL62H3HIgT+Gaj1AoDUyxaLzgWw8NnW8G04L8CQ0jgsnrZj6cyBJjqslXr+F6rg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-78f02c96c52so980485a.1
+        for <linux-block@vger.kernel.org>; Tue, 16 Apr 2024 20:27:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713324451; x=1713929251;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EtdjqEfW/2woy7OCdpCAz+N9Ae1HYHEY3m85tFluymc=;
+        b=X2R6KcmfPR6Xyb19VH71DJlU/qmocszHjX4xG6A6Vou9sWiwmRu6XJJ1pZawNw+Pj9
+         PPv3KSVQ3Cpg2aSHBBY/hRF+1Mz8cu4hrvN8fWWVGI76n99OjY+orPobatG9jVWpeiIl
+         09+D9dtI8P2A2HC+otzpPTnRxyz5FmO23f0b8kpKl9MGmq+op2Iy5uZhZUFRb6WMZRZu
+         aYdUxUZPzm9bPte4i+io/YPL9LHkOdDPyHzRRyZi2WYy2P/b9E4U96ffh2mZaueFuNUm
+         GVIlbarOhb3LHStCgptYccodlr/ak/J6pfOnEjtFtWqtxy9PyabJYnOaS6FfEcz1/SaF
+         qLQA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2lJw26kF/BgePwg90Rv7gBG3K9RlAdDVqKhVSO8FVPy6gd6G+0AgTfsgn3Xmwek3YWChbzdcgq81PdXTH87C1w4hOxxweS4be/d8=
+X-Gm-Message-State: AOJu0YyH2eBzDs0NbLFX2XHSzeU0mcz2OKIAyjicLcmW8f0Uv2pkYJNY
+	D65CK94etSDIbB2Y5yyN1CrvS4gq6E7xQsskQHapA5/HS8i2kGj6Yhy+c7FC8HHWaNT++FJbIt8
+	=
+X-Google-Smtp-Source: AGHT+IFhhJCgtb+aKD5SydFS1pgunohDDskmrkf47yrZS5w+D0UxN/7lafCWrHzapkwk+JUyh4goAg==
+X-Received: by 2002:a05:620a:1094:b0:78d:5d99:953c with SMTP id g20-20020a05620a109400b0078d5d99953cmr14893635qkk.28.1713324451268;
+        Tue, 16 Apr 2024 20:27:31 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id d14-20020a05620a240e00b0078ec3f23519sm7644803qkn.8.2024.04.16.20.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 20:27:30 -0700 (PDT)
+Date: Tue, 16 Apr 2024 23:27:29 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: brauner@kernel.org, czhong@redhat.com, dm-devel@lists.linux.dev,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v2] dm: restore synchronous close of device mapper block
+ device
+Message-ID: <Zh9BoXRYu_ZWrOsg@redhat.com>
+References: <20240416005633.877153-1-ming.lei@redhat.com>
+ <20240416152842.13933-1-snitzer@kernel.org>
+ <Zh8mx4yIGyv2InCq@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHGBHiMx9mtJvAKA--.38748S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4DZw1DXF1fuw4UurWUXFb_yoW8GF47pa
-	y7KayFkF4xWFnrJry3G3W29a4rZws5Zr47A343Wr15ZFyqqw17KF1Iyr1SyFZ3JrW29r1F
-	93WvqFZ5GF4DAa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9m14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxGrwCFx2
-	IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
-	6r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
-	AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IY
-	s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
-	0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUc6pPUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zh8mx4yIGyv2InCq@fedora>
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Wed, Apr 17, 2024 at 09:32:55AM +0800, Ming Lei wrote:
+> On Tue, Apr 16, 2024 at 11:28:42AM -0400, Mike Snitzer wrote:
+> > From: Ming Lei <ming.lei@redhat.com>
+> > 
+> > 'dmsetup remove' and 'dmsetup remove_all' require synchronous bdev
+> > release. Otherwise dm_lock_for_deletion() may return -EBUSY if the open
+> > count is > 0, because the open count is dropped in dm_blk_close()
+> > which occurs after fput() completes.
+> > 
+> > So if dm_blk_close() is delayed because of asynchronous fput(), this
+> > device mapper device is skipped during remove, which is a regression.
+> > 
+> > Fix the issue by using __fput_sync().
+> > 
+> > Also: DM device removal has long supported being made asynchronous by
+> > setting the DMF_DEFERRED_REMOVE flag on the DM device. So leverage
+> > using async fput() in close_table_device() if DMF_DEFERRED_REMOVE flag
+> > is set.
+> 
+> IMO, this way isn't necessary, because the patch is one bug fix, and we are
+> supposed to recover into exact previous behavior before commit a28d893eb327
+> ("md: port block device access to file") for minimizing regression risk.
+> 
+> But the extra change seems work.
 
-Test iops limit over IO split, regression tests for:
+I normally would agree but I see no real reason to avoid leveraging
+async fput() for the async DM device removal use-case ;)
 
-commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- tests/throtl/002     | 30 ++++++++++++++++++++++++++++++
- tests/throtl/002.out |  4 ++++
- 2 files changed, 34 insertions(+)
- create mode 100755 tests/throtl/002
- create mode 100644 tests/throtl/002.out
-
-diff --git a/tests/throtl/002 b/tests/throtl/002
-new file mode 100755
-index 0000000..83cd27f
---- /dev/null
-+++ b/tests/throtl/002
-@@ -0,0 +1,30 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Yu Kuai
-+#
-+# Test iops limit work correctly for big IO of blk-throttle, regression test
-+# for commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-+
-+. tests/throtl/rc
-+
-+DESCRIPTION="iops limit over IO split"
-+QUICK=1
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _set_up_test max_sectors=8; then
-+		return 1;
-+	fi
-+
-+	_set_limits wiops=256
-+	_test_io write 1M 1
-+	_remove_limits
-+
-+	_set_limits riops=256
-+	_test_io read 1M 1
-+	_remove_limits
-+
-+	_clean_up_test
-+	echo "Test complete"
-+}
-diff --git a/tests/throtl/002.out b/tests/throtl/002.out
-new file mode 100644
-index 0000000..7e1ae85
---- /dev/null
-+++ b/tests/throtl/002.out
-@@ -0,0 +1,4 @@
-+Running throtl/002
-+1
-+1
-+Test complete
--- 
-2.39.2
-
+Mike
