@@ -1,107 +1,76 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A068172BCF
-	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 18:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF5644C7B;
+	Wed, 17 Apr 2024 20:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713376830; cv=none; b=f/t/hUnBTg6jQ8RhUzX9glzV+6D0qbdsV1MfIVjjSWuLA9WjC5AAI5M2YbnOwfibGVY5KJXHnJRD63RUz+YgOFQy89sxUOdNDX+NjR8T4y3mmcPy8cZChRkDjjiabkh9RwxrV6aJU6UIDihGtsoCJYMf9etYGK0kr2VuzxUASec=
+	t=1713386717; cv=none; b=jDH5xuLJbG6r20B3n2TKYje3AqesRpXvVO14WZOltwBqFmWSrGieeypIul6zYr4obzIm9UsTZfK1hbSttOatNxUrlXYfb4wDfqXFh5SB9OKbazGHR0Qv8cYc2CjVcsw1TVNJqKyTaL7jKNhspz1P8qk62sGOCCizqbMbr2RzEzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713376830; c=relaxed/simple;
-	bh=Dq26QfCgnNaI2tOpF1lMZEHiWUNQ/2Uht7UQhqKYR3g=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=UGerNZppCnhCCKQSDs6T1mGeUzx2rvBmg6cRI17DxCteNnCoFOLUl0AhxrVbrUwmgGSbyGXd52vGoIZmPSkP1SArk83k5+NruvZgv9zmNf+u9Pw+ue86yuZ5Nw+zW+DJGarH9iUSNmltqKFE/QIApZADSZoPV6irMosAahJYk44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g9K/RXMI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1713386717; c=relaxed/simple;
+	bh=wlIgsqiPUF9bkmZTjmmRjmIDrDC3JSbRWMjul89Oki8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgeGLye2Tw3wUn1nzHJysjkfFWAkQgSmpsg/C1WZjyEWIHQd8rYTYpFrEmV8jeiIV7a0QZr9kotucruZyFeLKSZk3BGNWE2sPvPY8fSKIQQW63oUy0jE6qLnau5DJL4VAp+hfSPeF8OdERoP+3Oqq3h9+tIOj8xvvixHnW6YJ8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=au2DcBRj; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9K/RXMI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713376826;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4CqEU9pkrruCGPgaK3aKCqLwJU0gMOcZXnjX2G2B4QE=;
-	b=g9K/RXMI5gRd3LQx1R01T1v5WCWW2lcDf1Oi2go9gCCdNi6ZLPkf9xHCDSZ9MRpoznbe9D
-	I0vjBk0AyDKQytyo5JRhpfU1CPvTMsglRkYbyeDOE1sdOhihfV1fXlLXoB5ZeYEizFSgdi
-	EeTAPYiP+EUFjmqLq177vEGY8tQqNOk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-79-RXnpd9TUMWycQMsvV3WMKA-1; Wed, 17 Apr 2024 14:00:23 -0400
-X-MC-Unique: RXnpd9TUMWycQMsvV3WMKA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9583618A8260;
-	Wed, 17 Apr 2024 18:00:22 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5522D4011FF7;
-	Wed, 17 Apr 2024 18:00:22 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id 392F330C2BF7; Wed, 17 Apr 2024 18:00:22 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 3583C3FA97;
-	Wed, 17 Apr 2024 20:00:22 +0200 (CEST)
-Date: Wed, 17 Apr 2024 20:00:22 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Peter Zijlstra <peterz@infradead.org>
-cc: Mike Snitzer <msnitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-    Damien Le Moal <dlemoal@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-    Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-    Guangwu Zhang <guazhang@redhat.com>, dm-devel@lists.linux.dev, 
-    linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] completion: move blk_wait_io to
- kernel/sched/completion.c
-In-Reply-To: <20240417175538.GP40213@noisy.programming.kicks-ass.net>
-Message-ID: <546473fd-ca4b-3c64-349d-cc739088b748@redhat.com>
-References: <31b118f3-bc8d-b18b-c4b9-e57d74a73f@redhat.com> <20240417175538.GP40213@noisy.programming.kicks-ass.net>
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="au2DcBRj"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=BvHSSwDgZvfid1sqlQ1o/inIrOdXBqnLwTqg0dZSKDY=; b=au2DcBRjLagu7riDaYwmuhQlr8
+	1sN/vD6VJwfFlUQEDBtksahdUlaFRNeq7KD8l4pO+a5xnsn7CYm6uxK4mZwvxxnTuPJYYfWH3RssR
+	8ZOZRlGfQvUTbuxz8mQT596e8AQZX2nQp+ZEDi1Vd0wVmAvquUPxnbz5uYoyBna+UIW8vTzgFF08w
+	YZr7C+F35vr+O+nLFUUSktfpoEgGd4IVaVwIt+zV6HsNapeXMGxQZWV+rK0FWrIzgrFHAhD7xmeh6
+	S+T8rLkiEcNIReTcDGXGCwqddPljPoZKqnn3BLcn/N01SZOcICi1zTgx1IsnQb84lk0Btz9r/tWM4
+	4zSWze/w==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rxC9P-00EdzQ-24;
+	Wed, 17 Apr 2024 20:45:03 +0000
+Date: Wed, 17 Apr 2024 21:45:03 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
+	axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>,
+	Christian Brauner <brauner@kernel.org>, linux-pm@vger.kernel.org
+Subject: [RFC] set_blocksize() in kernel/power/swap.c (was Re: [PATCH vfs.all
+ 22/26] block: stash a bdev_file to read/write raw blcok_device)
+Message-ID: <20240417204503.GD2118490@ZenIV>
+References: <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
+ <20240410105911.hfxz4qh3n5ekrpqg@quack3>
+ <20240410223443.GG2118490@ZenIV>
+ <20240411-logik-besorgen-b7d590d6c1e9@brauner>
+ <20240411140409.GH2118490@ZenIV>
+ <20240412-egalisieren-fernreise-71b1f21f8e64@brauner>
+ <20240412112919.GN2118490@ZenIV>
+ <20240413-hievt-zweig-2e40ac6443aa@brauner>
+ <20240415204511.GV2118490@ZenIV>
+ <20240416063253.GA2118490@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240416063253.GA2118490@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
+On Tue, Apr 16, 2024 at 07:32:53AM +0100, Al Viro wrote:
 
+> kernel/power/swap.c:371:        res = set_blocksize(file_bdev(hib_resume_bdev_file), PAGE_SIZE);
+> kernel/power/swap.c:1577:               set_blocksize(file_bdev(hib_resume_bdev_file), PAGE_SIZE);
+> 	Special cases (for obvious reasons); said that, why do we bother
+> with set_blocksize() on those anyway?
 
-On Wed, 17 Apr 2024, Peter Zijlstra wrote:
+AFAICS, we really don't need either - all IO is done via hib_submit_io(),
+which sets a single-page bio and feeds it to submit_bio{,_wait}()
+directly.  We are *not* using the page cache of the block device
+in question, let alone any buffer_head instances.
 
-> On Wed, Apr 17, 2024 at 07:49:17PM +0200, Mikulas Patocka wrote:
-> > Index: linux-2.6/kernel/sched/completion.c
-> > ===================================================================
-> > --- linux-2.6.orig/kernel/sched/completion.c	2024-04-17 19:41:14.000000000 +0200
-> > +++ linux-2.6/kernel/sched/completion.c	2024-04-17 19:41:14.000000000 +0200
-> > @@ -290,6 +290,26 @@ wait_for_completion_killable_timeout(str
-> >  EXPORT_SYMBOL(wait_for_completion_killable_timeout);
-> >  
-> >  /**
-> > + * wait_for_completion_long_io - waits for completion of a task
-> > + * @x:  holds the state of this particular completion
-> > + *
-> > + * This is like wait_for_completion_io, but it doesn't warn if the wait takes
-> > + * too long.
-> > + */
-> > +void wait_for_completion_long_io(struct completion *x)
-> > +{
-> > +	/* Prevent hang_check timer from firing at us during very long I/O */
-> > +	unsigned long timeout = sysctl_hung_task_timeout_secs * HZ / 2;
-> > +
-> > +	if (timeout)
-> > +		while (!wait_for_completion_io_timeout(x, timeout))
-> > +			;
-> > +	else
-> > +		wait_for_completion_io(x);
-> > +}
-> > +EXPORT_SYMBOL(wait_for_completion_long_io);
-> 
-> Urgh, why is it a sane thing to circumvent the hang check timer? 
-
-The block layer already does it - the bios can have arbitrary size, so 
-waiting for them takes arbitrary time.
-
-Mikulas
-
+Could swsusp folks comment?
