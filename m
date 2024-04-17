@@ -1,79 +1,97 @@
-Received: from gardel.0pointer.net (gardel.0pointer.net [85.214.157.71])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED29C1411E5;
-	Wed, 17 Apr 2024 16:26:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.157.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0EB1649D2
+	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 16:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713371222; cv=none; b=aFDKshMZouvXJa7aMbdG1y8dwyyYu7IVEpJYcbz8zFIEflWkaOZxCYs0HZjpFeRk7Bjy/pp9EfGWXqh0bU9iElUxkiJ97YckAINjGcQmcz7XJuOu2hTB/tMxpJXzIC7MsYOixQ0Hyg0Lc1yMbresGiqHQdnw9KkA0m1IyyJkq4o=
+	t=1713371489; cv=none; b=SkCxuoDIbkmm4SI89RQG7+S40w0B362GnLGQfNAIjHCFERETuP5JSzJEdIevePkqZh6kK/t5SFeGke6s7a2dN/Gzblt+UZJJKPTfSChgRI2sanHzbVGzHr/YaLTbq1sMZ/20hWO5O/G2aYokP4kFFf6LlAh7PhZydl8TVsA8ZkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713371222; c=relaxed/simple;
-	bh=Kfk/+PMXTSlj8X88Ks9ci1e34mQJ52fS/4pU0B16Qjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BN0r4foFkYFD44lTu0vhWyA4brhMUXjjXABxJTPQDGCYIbefSPcOkNsTMvqYvoXhetoV0nSpWWT6x8Z1KqqL1eSH1qtSUi9/9uYzKka5iLXLb25uBtvjvpKCLY7MDwgdmKRslfKp9k68e6dn00RmRfBII3hxYmWLOY9215TkYdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de; spf=pass smtp.mailfrom=0pointer.de; arc=none smtp.client-ip=85.214.157.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0pointer.de
-Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
-	by gardel.0pointer.net (Postfix) with ESMTP id CB2E6E803A9;
-	Wed, 17 Apr 2024 18:26:57 +0200 (CEST)
-Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-	id 51EDF1602F7; Wed, 17 Apr 2024 18:26:57 +0200 (CEST)
-Date: Wed, 17 Apr 2024 18:26:57 +0200
-From: Lennart Poettering <mzxreary@0pointer.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>,
-	Linux regressions mailing list <regressions@lists.linux.dev>,
-	linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: API break, sysfs "capability" file
-Message-ID: <Zh_4UbT0m12EAFc3@gardel-login>
-References: <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
- <ZhT5_fZ9SrM0053p@gardel-login>
- <20240409141531.GB21514@lst.de>
- <Zh6J75OrcMY3dAjY@gardel-login>
- <Zh6O5zTBs5JtV4D2@kbusch-mbp>
- <20240417151350.GB2167@lst.de>
- <Zh_vQG9EyVt34p16@gardel-login>
- <20240417155913.GA6447@lst.de>
- <Zh_0bfqBsJFyJKgT@gardel-login>
- <20240417162257.GA8098@lst.de>
+	s=arc-20240116; t=1713371489; c=relaxed/simple;
+	bh=oRJmJDBnbb7cE2brR6dl76P5LK2zQCvp0LZZTKWwo/0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=TsUPOjFu3qO8N4shEeNkRRI5UJVXrZd/Q4tiWem5sa6AoSal14I2duip/aiahRVhoxiQ6ySvcL7KW1bSfzl5b2fHWI0Es83+jOzoWiVmNd7cFyyInhyqATpzL4dsbvBgvjD7piYKS2WH328eJGTWGNJ6qA9G1xzr676JonHHQ6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iBuesZBJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iBuesZBJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713371486;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZlPQpTKDhE0AxETHvxS2mC29zGtgspnJJkZTl/Ld1zA=;
+	b=iBuesZBJlDvNWAf1aJN4rkp0+2uBqECN4+fMLtSI29sO5JKxobcN01A+kVbLHp1x+FooES
+	vZDqqtG4qmfGM7aEvon8UAb0O86FPaqPjy/yzoM+T2R1wZOclUjmybQcVdS+Mr6vpGY1yZ
+	WYFx97jtuBNm6Z0dNG3TNU2eyMZq6eo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-Pj2DAvCNP16DJBya_ASzjA-1; Wed, 17 Apr 2024 12:31:23 -0400
+X-MC-Unique: Pj2DAvCNP16DJBya_ASzjA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16D35830E7F;
+	Wed, 17 Apr 2024 16:31:23 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 101B751EF;
+	Wed, 17 Apr 2024 16:31:23 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id EC50830BFED5; Wed, 17 Apr 2024 16:31:22 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id E63363FB54;
+	Wed, 17 Apr 2024 18:31:22 +0200 (CEST)
+Date: Wed, 17 Apr 2024 18:31:22 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+cc: Mike Snitzer <msnitzer@redhat.com>, Damien Le Moal <dlemoal@kernel.org>, 
+    Guangwu Zhang <guazhang@redhat.com>, dm-devel@lists.linux.dev, 
+    linux-block@vger.kernel.org
+Subject: Re: [PATCH v3] dm-io: don't warn if flush takes too long time
+In-Reply-To: <e86c972f-4acc-4b89-9872-b5f92606cfd9@kernel.dk>
+Message-ID: <cb981b28-40c9-d175-ad13-4bee1a1422eb@redhat.com>
+References: <754d1973-31cb-d3ca-1f6f-2d35b96364db@redhat.com> <e86c972f-4acc-4b89-9872-b5f92606cfd9@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240417162257.GA8098@lst.de>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-eOn Mi, 17.04.24 18:22, Christoph Hellwig (hch@lst.de) wrote:
 
-> On Wed, Apr 17, 2024 at 06:10:21PM +0200, Lennart Poettering wrote:
-> > Well, there are plenty of other block devices with part scanning off,
-> > such as DM, including dm-crypt, dm-integrity and so on. And that's
-> > certainly stuff we want to cover for this.
->
-> But there is no good reason to prohibit scanning for them.  We can't
-> scan by default as that would probably break a few expectations in
-> userspace, but we can trivially allow manual scanning.
 
-Hmm, so you want to generically allow toggling the flag from
-userspace? I mean that'd be fine with me, but it would feel a bit
-weird if you let's say have a partition block device, where you'd
-toggle this, and then you have two levels of part scanning, and then
-you toggle it on one of the part block devices there and so on, and so
-on. Could that work at all with the major/minor allocation stuff?
+On Wed, 17 Apr 2024, Jens Axboe wrote:
 
-But let's say you add such a user-controlled thing, if you'd add that
-I figure you really also need a way to query the current state, right?
-which is basically what I originally was looking for...
+> On 4/17/24 3:05 AM, Mikulas Patocka wrote:
+> > There was reported hang warning when using dm-integrity on the top of loop
+> > device on XFS on a rotational disk. The warning was triggered because
+> > flush on the loop device was too slow.
+> > 
+> > There's no easy way to reduce the latency, so I made a patch that shuts
+> > the warning up.
+> > 
+> > There's already a function blk_wait_io that avoids the hung task warning.
+> > This commit moves this function from block/blk.h to
+> > include/linux/completion.h, renames it to wait_for_completion_long_io
+> > (because it is not dependent on the block layer at all) and uses it in
+> > dm-io instead of wait_for_completion_io.
+> 
+> Change looks fine to me, but while at it, let's just move it into
+> blk-core.c and make it public, no need for this function to be a static
+> inline.
+> 
+> -- 
+> Jens Axboe
 
-i.e. it would be really weird if we could set the flag, but not query
-it in the first place.
+I think we should move it to ./kernel/sched/completion.c. Because the 
+function has no dependency on the block layer.
 
-Lennart
+I'll send a patch that does it.
 
---
-Lennart Poettering, Berlin
+Mikulas
+
