@@ -1,45 +1,31 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C3414290C;
-	Wed, 17 Apr 2024 14:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FE51411E0;
+	Wed, 17 Apr 2024 15:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713365457; cv=none; b=XBOVWGkcq1RkflY4RAJzafolio1/o9Vszatwb3Esss/nilp/75W6qKeL2iwZXOOoQPiz2f1yHQVzOT+UQQVZLO7qo2vgcQorzNaNinz49heZEw64XuyZuOym9GtURthp63UmQK3AnJf7gzE9J6qUTE96V95W6ecMZQDc/NY+A4o=
+	t=1713366453; cv=none; b=Dwwtka40sSFGxnD2kvA4DDsjkmON0CVee3JuFMWf1lzDR9C/z3LaPVtz9XRIEPesI1Yb4z/Jmbrcg4ju5tFwws/trR1ExbYo2/CwaX9bwMa1jyvCPEOjeuMneXGmaF7nBGwlvg3DKne5YcItMtREPZmvPL0MJHKprEk0/r50Ae8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713365457; c=relaxed/simple;
-	bh=KXyYkQguWhYNZJ8K2JdqO4nXcxU/vy0kD22Tcik71DI=;
+	s=arc-20240116; t=1713366453; c=relaxed/simple;
+	bh=kBogYfm5nOEPb+ypTh9NJYuntKX4VEdwSGzKKuCcKv0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VjoLvUPOLZMnra1YwVte3SgQFHD6lNMIlrwayWGkHeoV8Ysp6SBeS7DAn3CW4awhwpUj99PC0TyEUljyI+7uzhwXbTyOFeXov9CRAU5h2fB4KP/Rqak1Qwy78oyh3i3ZWrIj5onOpEARD6G5BQYOI82tcEEsGlpq7lbU7FO4AoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lkxRgT4c; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lkxRgT4c"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9szQsyAow1UDlIBLINoaPCqHbjIeUQuqhnIQmSRpz7U=; b=lkxRgT4c8zqJVjT2K8LtF4hNF8
-	wSGVpFUfoPWN5EzgvbBKxUp4am4UiAM+e93ytHsXNApOPZAdlnI9Sgink2+IsSPBlSxvs8TGA/dnR
-	vJOsSMBPQQaMiVvj0/8pUYnWx4DX3kQQ8/ypbbECqWfof9QFfXHmazimmrzP71Ow8kxyv1CJkyQh7
-	k6V83SuUULeavYY+AF/y1AxLmzLFFgfawk9E9hh3qXPu48UYuZruGXov3B3/c544JI6W88RV0LRMU
-	fCROVak1JR7rT8kjB+kvCNl/ienrDKw6FKB9Ft8c9Efcyyv2Ne94bx/9ow6T4zdgKCCoQ0IbKmS/v
-	lZiDp7Bg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rx6cg-0000000GRJS-2pw6;
-	Wed, 17 Apr 2024 14:50:54 +0000
-Date: Wed, 17 Apr 2024 07:50:54 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Mike Snitzer <msnitzer@redhat.com>, Damien Le Moal <dlemoal@kernel.org>,
-	Guangwu Zhang <guazhang@redhat.com>, dm-devel@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] dm-io: don't warn if flush takes too long time
-Message-ID: <Zh_hzvgnY-VbkdO5@infradead.org>
-References: <754d1973-31cb-d3ca-1f6f-2d35b96364db@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JZsZsGolZS9sPNufgmMy/ttT1QNhGEDN6U7uUTTMbOmd34H9Ws2tjDZLStMBtm6LS8L2YvbW5bC2rXR8wcIWsH3amlsvTzSv6R1d14vkFExk/VgmAA7QTuEoxFLJhJkTBJF0WEQ25o1DqDWf2Yj0f3/vRmX8nXZ6XrthE0nNtFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 0FD50227A88; Wed, 17 Apr 2024 17:07:28 +0200 (CEST)
+Date: Wed, 17 Apr 2024 17:07:27 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Lennart Poettering <mzxreary@0pointer.de>
+Subject: Re: API break, sysfs "capability" file
+Message-ID: <20240417150727.GA2167@lst.de>
+References: <ZhQJf8mzq_wipkBH@gardel-login> <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info> <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com> <ZhRSVSmNmb_IjCCH@gardel-login> <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com> <ZhT5_fZ9SrM0053p@gardel-login> <20240409141531.GB21514@lst.de> <d7a2b07c-26eb-4d55-8aa7-137168bd0b49@kernel.dk> <1bf9be9a-4d05-4d3b-ab76-13a825cd1758@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,76 +34,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <754d1973-31cb-d3ca-1f6f-2d35b96364db@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1bf9be9a-4d05-4d3b-ab76-13a825cd1758@leemhuis.info>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-> --- linux-2.6.orig/include/linux/completion.h	2024-04-15 15:54:22.000000000 +0200
-> +++ linux-2.6/include/linux/completion.h	2024-04-15 15:57:14.000000000 +0200
-> @@ -10,6 +10,7 @@
->   */
->  
->  #include <linux/swait.h>
-> +#include <linux/sched/sysctl.h>
+On Tue, Apr 16, 2024 at 11:26:40AM +0200, Linux regression tracking (Thorsten Leemhuis) wrote:
+> I might have missed something, but it seems nothing has happened since a
+> week. Sure, this is hardly a new regression, so it's not that urgent;
 
-If you're touching completion.h you need to CC lkml and the people
-who wrote/maintain it even if we don't have a proper maintainer.
-
-I don't think adding yet another include into it is a good idea.
-
-As is this whole hack here.  Pleas just add the proper TASK_STATE for
-task that can legitimately sleep for very long times  instead of
-extending this hack again and again, just like I told Kent when he messed with the timeout.
-
->  
->  /*
->   * struct completion - structure used to maintain state for a "completion"
-> @@ -119,4 +120,20 @@ extern void complete(struct completion *
->  extern void complete_on_current_cpu(struct completion *x);
->  extern void complete_all(struct completion *);
->  
-> +/**
-> + * wait_for_completion_long_io - this is like wait_for_completion_io,
-> + * but it doesn't warn if the wait takes too long.
-> + */
-> +static inline void wait_for_completion_long_io(struct completion *done)
-> +{
-> +	/* Prevent hang_check timer from firing at us during very long I/O */
-> +	unsigned long timeout = sysctl_hung_task_timeout_secs * HZ / 2;
-> +
-> +	if (timeout)
-> +		while (!wait_for_completion_io_timeout(done, timeout))
-> +			;
-> +	else
-> +		wait_for_completion_io(done);
-> +}
-> +
->  #endif
-> Index: linux-2.6/block/bio.c
-> ===================================================================
-> --- linux-2.6.orig/block/bio.c	2024-03-30 20:07:03.000000000 +0100
-> +++ linux-2.6/block/bio.c	2024-04-15 15:55:13.000000000 +0200
-> @@ -1378,7 +1378,7 @@ int submit_bio_wait(struct bio *bio)
->  	bio->bi_end_io = submit_bio_wait_endio;
->  	bio->bi_opf |= REQ_SYNC;
->  	submit_bio(bio);
-> -	blk_wait_io(&done);
-> +	wait_for_completion_long_io(&done);
->  
->  	return blk_status_to_errno(bio->bi_status);
->  }
-> Index: linux-2.6/block/blk-mq.c
-> ===================================================================
-> --- linux-2.6.orig/block/blk-mq.c	2024-03-30 20:07:03.000000000 +0100
-> +++ linux-2.6/block/blk-mq.c	2024-04-15 15:55:05.000000000 +0200
-> @@ -1407,7 +1407,7 @@ blk_status_t blk_execute_rq(struct reque
->  	if (blk_rq_is_poll(rq))
->  		blk_rq_poll_completion(rq, &wait.done);
->  	else
-> -		blk_wait_io(&wait.done);
-> +		wait_for_completion_long_io(&wait.done);
->  
->  	return wait.ret;
->  }
-> 
-> 
----end quoted text---
+It is not a regression at all.  Userspace poked into completely internal
+bits that changed frequently before and now it changed again.
