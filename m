@@ -1,43 +1,31 @@
-Received: from gardel.0pointer.net (gardel.0pointer.net [85.214.157.71])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE52114EC79;
-	Wed, 17 Apr 2024 16:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.157.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528DE1487ED;
+	Wed, 17 Apr 2024 16:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713370226; cv=none; b=c7Ll6oRj7NjruDlNb54Z+6qQOe1wdzpQr4bE+fSH+o6P/f7CsbOSMldH2xizsl5xCdmvXGBFboLdpvQgBY8kL7IsrhQaeykYT42VjXOQb6eWC58p6aABaCCjkRaqwSx+ej+DhsU+gGtxmkelbrW2/4HK/n2x+mU0UYr7yy6F8aU=
+	t=1713370983; cv=none; b=a+IB9ezKbBBYIsLAQ9M4zuhFaLlAY0MGjO7QdvFJMXAdRRHIMK+vZG/ZlsG3YPy/1j7s0yYU7ZRm67LQ5+tBjLwBiKMWlHvQQNK4xVX9B6uOpjfGvgUhYoa12Gm1516dlY6no/Ex6ZtNHhRx7gaA0KFD41mBq6fw/mCcCjBKcfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713370226; c=relaxed/simple;
-	bh=gSfe2mh9bkp+vU+sT4Snqq3+U6upnEe1SHDBCsuBkkk=;
+	s=arc-20240116; t=1713370983; c=relaxed/simple;
+	bh=pNpAR6fUyvIyqKi57y6ZYwGyUeQlHqA/Ixs/InAdn10=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e15exCaT8DqaXmuNjmJyZzyPFW7tWlfPnP2WiBhA15aNX5R+hSN2EtE1tOvuTk3f2JfsrDfMnNxtf/5oDb+RPmeuXVB8cRBvgtDmfj+uhlbQn4Br/+k7FqDJ5zf+QZ8hP+YmHWliKxWy9/wTNdfz1KiRkP+gFsVRQ9UU/tFerhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de; spf=pass smtp.mailfrom=0pointer.de; arc=none smtp.client-ip=85.214.157.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0pointer.de
-Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
-	by gardel.0pointer.net (Postfix) with ESMTP id 8987CE803C0;
-	Wed, 17 Apr 2024 18:10:21 +0200 (CEST)
-Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-	id 430131602F7; Wed, 17 Apr 2024 18:10:21 +0200 (CEST)
-Date: Wed, 17 Apr 2024 18:10:21 +0200
-From: Lennart Poettering <mzxreary@0pointer.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=a7ildxWrvJfTlz0MsJIhLbrvmaxI5fE0/TryQ9vsrJoGmASJoww5JPQW1A8dt8thMNn8PfstzYA+QHhgwWeoymP7IKIP50rLJvnOuzsAAigaBFFe/5XdBvYyWsBX4KH/0CKxoqzLtP4O9hBIzgR7aHbo7h9TpWqVfPm3cyQs+Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 513CD227A88; Wed, 17 Apr 2024 18:22:57 +0200 (CEST)
+Date: Wed, 17 Apr 2024 18:22:57 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Lennart Poettering <mzxreary@0pointer.de>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
 	Linux regressions mailing list <regressions@lists.linux.dev>,
 	linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
 	Jens Axboe <axboe@kernel.dk>
 Subject: Re: API break, sysfs "capability" file
-Message-ID: <Zh_0bfqBsJFyJKgT@gardel-login>
-References: <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
- <ZhRSVSmNmb_IjCCH@gardel-login>
- <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
- <ZhT5_fZ9SrM0053p@gardel-login>
- <20240409141531.GB21514@lst.de>
- <Zh6J75OrcMY3dAjY@gardel-login>
- <Zh6O5zTBs5JtV4D2@kbusch-mbp>
- <20240417151350.GB2167@lst.de>
- <Zh_vQG9EyVt34p16@gardel-login>
- <20240417155913.GA6447@lst.de>
+Message-ID: <20240417162257.GA8098@lst.de>
+References: <ZhRSVSmNmb_IjCCH@gardel-login> <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com> <ZhT5_fZ9SrM0053p@gardel-login> <20240409141531.GB21514@lst.de> <Zh6J75OrcMY3dAjY@gardel-login> <Zh6O5zTBs5JtV4D2@kbusch-mbp> <20240417151350.GB2167@lst.de> <Zh_vQG9EyVt34p16@gardel-login> <20240417155913.GA6447@lst.de> <Zh_0bfqBsJFyJKgT@gardel-login>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,29 +34,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240417155913.GA6447@lst.de>
+In-Reply-To: <Zh_0bfqBsJFyJKgT@gardel-login>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mi, 17.04.24 17:59, Christoph Hellwig (hch@lst.de) wrote:
+On Wed, Apr 17, 2024 at 06:10:21PM +0200, Lennart Poettering wrote:
+> Well, there are plenty of other block devices with part scanning off,
+> such as DM, including dm-crypt, dm-integrity and so on. And that's
+> certainly stuff we want to cover for this.
 
-> On Wed, Apr 17, 2024 at 05:48:16PM +0200, Lennart Poettering wrote:
-> > Block devices with part scanning off are quite common after all,
-> > i.e. "losetup" creates them by default like that, and partition block
-> > devices themselves have no part scanning on and so on, hence we have
-> > to be ablet to operate sanely with them.
->
-> Maybe and ioctl to turn on partition scanning if it is currently disabled
-> or return an error otherwise would be the better thing?  It would
-> do the right thing for the most common loop case, and with a bit more
-> work could do the right thing for those that more or less disable it
-> graciously (ubiblock, drbd, zram) and would just fail for those who are
-> so grotty old code and slow devices that we never want to do a partition
-> scan (basically old floppy drivers and the Nintendo N64 cartridge driver)
+But there is no good reason to prohibit scanning for them.  We can't
+scan by default as that would probably break a few expectations in
+userspace, but we can trivially allow manual scanning.
 
-Well, there are plenty of other block devices with part scanning off,
-such as DM, including dm-crypt, dm-integrity and so on. And that's
-certainly stuff we want to cover for this.
-
-Lennart
-
---
-Lennart Poettering, Berlin
