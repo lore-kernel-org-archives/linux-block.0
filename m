@@ -1,55 +1,90 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C651170F;
-	Wed, 17 Apr 2024 04:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD5257870
+	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 06:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713328542; cv=none; b=vA43f+n3+epl0nCbGg+4eQ3HZPfSYP58cC9PE2tYEAkYFXDIQCcYfAsatQsmwXEREUhHtTqlJIZvQc3vD40Ng+jgV0VTwWl4ERfXSWygEcznDBthWPqtDaQjLndfnZEWojP0pSImi2/cd3DVYTbW1Zzk0Ru9sctW850eRSMz0F0=
+	t=1713334000; cv=none; b=YW/9td6mVFsy0ZkH15IznfaGMfx3aODSYcN98peHOHd63KrfCenStDgD5ywdVv0j0vZjCJ0t2DKUg+L5KA19fgdGsCH9n2PdgUEfWL1sW92SnvYgGVRCbPYDh7CBpekmXOqwLUUYA1/7QtAakf5dnCV/bLgNs/cPWWXVdKxG3mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713328542; c=relaxed/simple;
-	bh=+iCfkqjUsgO1ZDGIbFr8GYdF2Rs6z6Z+S4k3UrB9408=;
+	s=arc-20240116; t=1713334000; c=relaxed/simple;
+	bh=UqUQcCoHiNNv3/Pi4mn9m0MPupDA3wLpMfsjhFKSGyk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VHpu8YnCs1HLy3Jj/iMdRu1ROc3cAUyx5qmcZbp0eFjRGcDAGTeZdZT91neQLWzckeY1rBFCq/7ZQpg9/GVzkzOF7bpLAwhQYg5yFmG5PF4Qq7e+T7QP3TU8ZR2zNh9YCFh4M9prDJGhZ5nG61ZjJ/RlGQUxQLrMXhXdR0k1cDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=mzUxtU4l; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	 Content-Type:Content-Disposition:In-Reply-To; b=YO3zPuksvd5vUceUVHgA7vTfYmdhT7V8YDyMBoPvSEJf0YD5FN9e7dl13NErNxJwxkUFqpUcGk1cJ03Gwf3WlbomVcdP15lMou2kveF2b9cnzNy4W9OdkkXmL6WboY0ZCoy+xzlm8uWI9mR24KvfKIR3v7oiz1LwZRCo1mAeAfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JxGMZvx0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KmKdM8tw; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NpmVy94t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BX435Fk6; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="mzUxtU4l"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=iXIykWGQJpDXFJ+SQPt3FgFx7ryUGPRR4FBRYWESyMI=; b=mzUxtU4l0NNFUHX5mkoyXWNs8U
-	GyEONlam9xOofQDVKIWaFGXjTyicdEu+M9CWxSsgz1+y0DdCcmXUCsqUYcXHbz0RbDk15FgCiVv/Y
-	H0RSxN/J0QQ7am8VWK8V0alKv+w1DxQl2VesZTzdPbJNwdgI9uw86qyqj0v/en2FpqDKsWrOaZQnK
-	o97xHh/bkoNxY8vNj4c8/JDB/9jKc+08tueOnQ2W+Y5CnrW7OLuqjonJGZoRx/cJ2GYGNJ5DbYIdi
-	OgwrhfG/FYajJh2429fYyy4cEmyFEK8hqBqE21ErTCZX13036z7HIu37KaidENnny15/C+9QjCsp8
-	U1/XnnAg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rwx1A-00E2jv-0T;
-	Wed, 17 Apr 2024 04:35:32 +0000
-Date: Wed, 17 Apr 2024 05:35:32 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: axboe@kernel.dk
-Cc: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>,
-	Christian Brauner <brauner@kernel.org>
-Subject: [PATCH][RFC] set_blocksize() in pktcdvd (was Re: [PATCH vfs.all
- 22/26] block: stash a bdev_file to read/write raw blcok_device)
-Message-ID: <20240417043532.GA3337808@ZenIV>
-References: <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
- <20240410105911.hfxz4qh3n5ekrpqg@quack3>
- <20240410223443.GG2118490@ZenIV>
- <20240411-logik-besorgen-b7d590d6c1e9@brauner>
- <20240411140409.GH2118490@ZenIV>
- <20240412-egalisieren-fernreise-71b1f21f8e64@brauner>
- <20240412112919.GN2118490@ZenIV>
- <20240413-hievt-zweig-2e40ac6443aa@brauner>
- <20240415204511.GV2118490@ZenIV>
- <20240416063253.GA2118490@ZenIV>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JxGMZvx0";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KmKdM8tw";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NpmVy94t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BX435Fk6"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id F10A33384D;
+	Wed, 17 Apr 2024 06:06:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713333997; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sLjKYanurTnvfwqLGBxQ/2npi+bl/AEythjFRUTp+ew=;
+	b=JxGMZvx0ffYPtg584mgRn6rpGB2dflyRkLBcxOyz5JznlECEa7GGSjqYNImmTgC2W/7YpT
+	b0DgxHVmqqv0wdLE5NpmcbxPjZi63BaE6RzncXDg6YiI/QfkUp/z0IhcxBeAFd3OXhCO42
+	KspPy9gc4llgtuKakXAbJqBplzYio54=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713333997;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sLjKYanurTnvfwqLGBxQ/2npi+bl/AEythjFRUTp+ew=;
+	b=KmKdM8tw1e7EBPpI63PB4ySi/OwRd8nQKWViDr7VUDxxzO10ZVsg0ybZcShA/FeR76ATba
+	APEUeNk3+h4HMYCQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=NpmVy94t;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=BX435Fk6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713333996; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sLjKYanurTnvfwqLGBxQ/2npi+bl/AEythjFRUTp+ew=;
+	b=NpmVy94tdnhN34sCsR3mMeldk507d3OvI7+fQWTYBNPiMDubuwkMqCREWZErO5rIe52gUC
+	E/kS+Q5VV99vaEKX7ORi8Witm7XlMCokZm2SYQe4bviEZmTbB0nxUEb73K3wa/NVe97gjJ
+	75vOkmmAqLIJivfHqLMUWaigmD3FfSk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713333996;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sLjKYanurTnvfwqLGBxQ/2npi+bl/AEythjFRUTp+ew=;
+	b=BX435Fk6F0Ho4gJzSyFoNCMq2+kkffyysLobZzDLkYEhWvPKn9/RQtppEDpXh5AkZX7WUY
+	mvtiwv/4CvCaThAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DE8991384C;
+	Wed, 17 Apr 2024 06:06:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id rXbbNOxmH2bqEAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 17 Apr 2024 06:06:36 +0000
+Date: Wed, 17 Apr 2024 08:06:36 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH blktests 05/11] nvme/rc: introduce NVMET_TR_TYPES
+Message-ID: <extncf2en5xoiov5mhnaglwd33nmffx2u2mw3zlnrxuty3zurx@nij7avtahebv>
+References: <20240411111228.2290407-1-shinichiro.kawasaki@wdc.com>
+ <20240411111228.2290407-6-shinichiro.kawasaki@wdc.com>
+ <7okerxv2q5k6d2jl4ehdvido37rmycxopqalkt3xcouxeuxxe7@q73je25fv33y>
+ <x5xlzl6g3riybq4uuoznt47yp2ieixtltq2sw7w5uodpcosln5@pmx2vne4qgjq>
+ <fact36d4ueuna534ktaafuel4uqkexmlkrwasky6ytvpmi33bq@x26qccgbqbnw>
+ <b159e306-2b08-4880-96c0-2ff7d5c3023e@nvidia.com>
+ <epbj4opovczrfrs3o3mdodjs2dtekl4jsxgbwhtnqhq5bjhjnl@54b5mo6wixsk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,91 +93,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240416063253.GA2118490@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <epbj4opovczrfrs3o3mdodjs2dtekl4jsxgbwhtnqhq5bjhjnl@54b5mo6wixsk>
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: F10A33384D
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	BAYES_HAM(-2.99)[99.94%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	DKIM_TRACE(0.00)[suse.de:+]
 
-On Tue, Apr 16, 2024 at 07:32:53AM +0100, Al Viro wrote:
+On Wed, Apr 17, 2024 at 12:58:53AM +0000, Shinichiro Kawasaki wrote:
+> Yes, "mark them they are injected from the environment" was the one reason to
+> have the parameters in upper cases. The other reason was the consistency across
+> the all parameters described in Documentation/running-tests.md.
+> 
+> > can we please keep the small letter similar to nvme_trtype ?
+> 
+> I'm fine to have small letter, lower cases for the new parameter, but I would
+> like to clarify the reason to have lower cases. Do you mean to indicate that
+> "the parameters are test group local" using the lower cases?
 
-> drivers/block/pktcdvd.c:2285:           set_blocksize(disk->part0, CD_FRAMESIZE);
+Lower cased environment variables are not very common, in fact
+POSIX.1-2017 mandates upper cased environment variables [1]. Also only
+the nvme part of the framework is using the lower case ones, thus I
+agree with Shinichiro to streamline these nvme variables to upper cased
+versions.
 
-	We had hardsect_size set to that 2Kb from the very beginning
-(well, logical_block_size these days).	And the first ->open() is
-(and had been since before the pktcdvd went into mainline) followed by
-setting block size anyway, so any effects of that set_blocksize() had
-always been lost.  Candidate block sizes start at logical_block_size...
-Rudiment of something from 2000--2004 when it existed out of tree?
-<checks>  That logic into the tree in 2.5.13; May 2002...
-
-	AFAICS, this one can be simply removed.  Jens, do you have
-any objections to that?  It's safe, but really pointless...
-
-> drivers/block/pktcdvd.c:2529:   set_blocksize(file_bdev(bdev_file), CD_FRAMESIZE);
-
-	This, OTOH, is not safe at all - we don't have the underlying device
-exclusive, and it's possible that it is in use with e.g. 4Kb block size (e.g.
-from ext* read-only mount, with 4Kb blocks).  This set_blocksize() will screw
-the filesystem very badly - block numbers mapping to LBA will change, for starters.
-
-	We are setting a pktcdvd device up here, and that set_blocksize()
-is done to the underlying device.  It does *not* prevent changes of block
-size of the underlying device by the time we actually open the device
-we'd set up - set_blocksize() in ->open() is done to pktcdvd device,
-not the underlying one.  So... what is it for?
-
-	It might make sense to move it into ->open(), where we do have
-the underlying device claimed.	But doing that at the setup time looks
-very odd...
-
-	Do you have any objections against this:
-
-commit d1d93f2c26f70fbcd714615d1a3ea7a104fc0f43
-Author: Al Viro <viro@zeniv.linux.org.uk>
-Date:   Wed Apr 17 00:28:03 2024 -0400
-
-    pktcdvd: sort set_blocksize() calls out
-    
-    1) it doesn't make any sense to have ->open() call set_blocksize() on the
-    device being opened - the caller will override that anyway.
-    
-    2) setting block size on underlying device, OTOH, ought to be done when
-    we are opening it exclusive - i.e. as part of pkt_open_dev().  Having
-    it done at setup time doesn't guarantee us anything about the state
-    at the time we start talking to it.  Worse, if you happen to have
-    the underlying device containing e.g. ext2 with 4Kb blocks that
-    is currently mounted r/o, that set_blocksize() will confuse the hell
-    out of filesystem.
-    
-    Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 21728e9ea5c3..05933f25b397 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2215,6 +2215,7 @@ static int pkt_open_dev(struct pktcdvd_device *pd, bool write)
- 		}
- 		dev_info(ddev, "%lukB available on disc\n", lba << 1);
- 	}
-+	set_blocksize(file_bdev(bdev_file), CD_FRAMESIZE);
- 
- 	return 0;
- 
-@@ -2278,11 +2279,6 @@ static int pkt_open(struct gendisk *disk, blk_mode_t mode)
- 		ret = pkt_open_dev(pd, mode & BLK_OPEN_WRITE);
- 		if (ret)
- 			goto out_dec;
--		/*
--		 * needed here as well, since ext2 (among others) may change
--		 * the blocksize at mount time
--		 */
--		set_blocksize(disk->part0, CD_FRAMESIZE);
- 	}
- 	mutex_unlock(&ctl_mutex);
- 	mutex_unlock(&pktcdvd_mutex);
-@@ -2526,7 +2522,6 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 	__module_get(THIS_MODULE);
- 
- 	pd->bdev_file = bdev_file;
--	set_blocksize(file_bdev(bdev_file), CD_FRAMESIZE);
- 
- 	atomic_set(&pd->cdrw.pending_bios, 0);
- 	pd->cdrw.thread = kthread_run(kcdrwd, pd, "%s", pd->disk->disk_name);
+[1] https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
