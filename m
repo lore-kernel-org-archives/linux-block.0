@@ -1,147 +1,99 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D26E13B29C;
-	Wed, 17 Apr 2024 10:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC1C13C67B
+	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 10:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713349547; cv=none; b=XR9QdWVBLjAx3aFAMeYtWjER4GDDR3MqPeggeDvG1zlirrJke1h9/PJPx1N/bBw5bIpTGpal0qIabEZFs7MJQtFYS27pnBAnqNQSrF1iFE6u6TdXvIiYbimzl88adak9W7Qixh++lTSHv7Puc2afEmte160ZtTrBaAKCpmEdbic=
+	t=1713350534; cv=none; b=fV73W6a62n4v+LDbxYMrm/pDSXamcaYSwydAd5J4+SKQ+LgV92pRzRhsy5aK5KtWV3cCTenwqiMJqyPUm4dEt4xJHso47NPOWkLEqptQ6zSYMc3Qtn3oJ7HxSnxe8Q2FNMFunDYpM9Ekc4AuPpRwAK5eDGtm+C/B0pCjBSQ8QUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713349547; c=relaxed/simple;
-	bh=NDbI6G+PFcKfCE8LvuHVfp8HdKCGX9NVA8UfW64rwDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PgkZmWckaX4nbUn2OOQFc8rlpHec1gf32DhrbbKE6hm3PAkGjgfbJKumM/pt0YeF9Y7AKV7yaH+TLVbOPsC5L0JzEihUvnlby0UTIn3SQGDnQ0GzZm992xIGi1KH/aciseFaeG/S8Ct4SppVxR1XWJU9aLdcKeC5fJxv2N5hakI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=g4qEvNbO; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=g4qEvNbO; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1713350534; c=relaxed/simple;
+	bh=c9I8MKTorsqgSs+cuc1YuXPtLTUYdZF/snt/sNrGyYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UljN1llkgkBXO9DHQPjOW7g/t1bv3zqEHeNejj+Ot26wuzED2RZo6PxlOTJRF7OpGHa3uECTYRggG6Xg57NDmreIQ/gOCT80qpAhErO3taqGYJifL1y/viPcwkwbSqQE9n/JbfPn4zZU4KTn2jJt5mJFZDCC6r8UxBbZBdmjp/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=h2mHWzEs; arc=none smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="g4qEvNbO";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="g4qEvNbO"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 359F9206F4;
-	Wed, 17 Apr 2024 10:25:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1713349544; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NDbI6G+PFcKfCE8LvuHVfp8HdKCGX9NVA8UfW64rwDM=;
-	b=g4qEvNbOw9Ygwp5FSKied5syvo6aREx4Kys21vR69y+oE6P02Rq+sm75q+9wMf5kgsMfGT
-	e/PODIsb3w7aGYYQf/+RKKdBGoalzFxHkqOMjPQLV1jb6D9eQOpgC4P/rXEZyIfiOtXaKG
-	53i1WFVxMmvgX0WlniHtMATq5JOm2BQ=
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=g4qEvNbO
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1713349544; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NDbI6G+PFcKfCE8LvuHVfp8HdKCGX9NVA8UfW64rwDM=;
-	b=g4qEvNbOw9Ygwp5FSKied5syvo6aREx4Kys21vR69y+oE6P02Rq+sm75q+9wMf5kgsMfGT
-	e/PODIsb3w7aGYYQf/+RKKdBGoalzFxHkqOMjPQLV1jb6D9eQOpgC4P/rXEZyIfiOtXaKG
-	53i1WFVxMmvgX0WlniHtMATq5JOm2BQ=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 223101384C;
-	Wed, 17 Apr 2024 10:25:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id yDgjCKijH2aPbQAAD6G6ig
-	(envelope-from <mkoutny@suse.com>); Wed, 17 Apr 2024 10:25:44 +0000
-Date: Wed, 17 Apr 2024 12:25:42 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, chenhuacai@kernel.org, tj@kernel.org, 
-	josef@toxicpanda.com, jhs@mojatatu.com, svenjoac@gmx.de, raven@themaw.net, 
-	pctammela@mojatatu.com, qde@naccy.de, zhaotianrui@loongson.cn, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
-	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: Re: [PATCH RFC v2 0/6] blk-throttle: support enable and disable
- during runtime
-Message-ID: <unns4jtkiqdde3v7hzmd4yi2y7ylh4fh545dsn3imytgbg4x72@iq3mwwemygh5>
-References: <20240406080059.2248314-1-yukuai1@huaweicloud.com>
- <4exmes2ilp2cmfj3evf3jhhhq6tapfzgfzuasjejrxbj6a3327@3ecptofffblf>
- <f721f06e-e2c8-608e-0dd0-41f41e948f0d@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="h2mHWzEs"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1713350532; x=1744886532;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=c9I8MKTorsqgSs+cuc1YuXPtLTUYdZF/snt/sNrGyYE=;
+  b=h2mHWzEsBk7n9pjhLpsi8YsIBhD5rg5kKaED+7LAsFEQH29453A7cOLY
+   e07mXLO+akY0m3t6bwsRScZx7Zg1kVw0Nz4avG5TVQeNojnhceotihvlN
+   ksakh/INouP2RbAL45aO6CROK+nUaKgcUbpCYLU1+1Q7jmTCz0DxzmwPs
+   YyLcygPvdDuAN5VL9ti7ujMPvFqJZUA/beiPjrBIuKPt5+cQYYmuMg5oH
+   ov1SL6iym7BjRBFSEA9yWw6C4xyWxpk02RA0S0rM5XOKZrL4V+S0BOik9
+   y2dup7m8V0v5N0bhSANgY3KMSmZMOBw2yqW7E4ivo1D5QIjrHytrHoBAX
+   Q==;
+X-CSE-ConnectionGUID: wcSzcvXdRJW7yZbl6U0H2Q==
+X-CSE-MsgGUID: VgBMNodVR0SfO6mGMzCMYw==
+X-IronPort-AV: E=Sophos;i="6.07,209,1708358400"; 
+   d="scan'208";a="14913458"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Apr 2024 18:42:11 +0800
+IronPort-SDR: TkVIrZvQ/9or2m237iwVdSVrzSoELPk2SkV2YY5HIFlSujaxCPQ7iIl24MqXxx7JmVGfDipE3u
+ WcQm095WWZCaR0O7TQU/bxQXfn16xuNl+M2knM0OMt5EgAz+LTJiqhVBPbi00YSKm+lOdtNZ1z
+ QyyktyoGW4DnyRnXgksvtD+voNeVlK40V3PDWzCXgBRe1ei8r2fWPAhqNeyKqHBzquhkXKY0tL
+ m6N+bAeGQwHCeWltSceeIylehdTcxmHPVa5UEHP+HmrXWLzbVF/ov4v4hHOP0tCskhQ6SjkHjN
+ /74=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Apr 2024 02:44:49 -0700
+IronPort-SDR: nhvOm7+mm9Tu8HVUa41b97RB9gTP8gKbsbU2gNAH9ZqYsnPEVz5fpNaOiQE0qgZDhbtp7qIN3X
+ zj6uZNCS4dQm1mlia1X3CMNoIdJuxtK1nNU+m/1KLw6DSKl0tUO5+qg03nZtNo9qnxn8ApL+lr
+ kyquhx1wmVen0tiswwkkglseDKUAUzjEU1NxahT9KbgELqDCmvKoEqI0KotL0xyh1sMJ5uxrvP
+ CWmysnvhax1HoFQTCct243yWUIfErij0iOQnRUA9KF5Q5LMtPnamnPmzuidE0f4nA57L+P6zQj
+ +Y4=
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip01.wdc.com with ESMTP; 17 Apr 2024 03:42:10 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: nbd@other.debian.org,
+	Josef Bacik <josef@toxicpanda.com>,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 0/2] fix nbd/002
+Date: Wed, 17 Apr 2024 19:42:07 +0900
+Message-ID: <20240417104209.2898526-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mv5ylurrtbwdd6xr"
-Content-Disposition: inline
-In-Reply-To: <f721f06e-e2c8-608e-0dd0-41f41e948f0d@huaweicloud.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.89 / 50.00];
-	BAYES_HAM(-2.78)[99.06%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_TLS_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmx.de];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,toxicpanda.com,mojatatu.com,gmx.de,themaw.net,naccy.de,loongson.cn,vger.kernel.org,lists.linux.dev,huawei.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:dkim];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+]
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 359F9206F4
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Score: -5.89
+Content-Transfer-Encoding: 8bit
 
+Recently, CKI project found blktests nbd/002 failure. The test case sets up the
+connection to the nbd device, then checks partition existence in the device to
+confirm that the kernel reads the partition table in the device. Usually, this
+partition read by kernel is completed before the test script checks the
+partition existence. However, the partition read often completes after the
+partition existence check, then the test case fails. I think the test script
+checks the partition existence too early, and this should be fixed in the test
+script.
 
---mv5ylurrtbwdd6xr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+During this investigation, I noticed that the test case nbd/002 handles the
+ioctl interface and the netlink interface opposite. The first patch fixes this
+wrong interface handling. The second patch addresses the too early partition
+existence check issue.
 
-On Wed, Apr 17, 2024 at 09:09:07AM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
-> Yes, bfq already support that,
+Link to v1 patch: https://lore.kernel.org/linux-block/20240319085015.3901051-1-shinichiro.kawasaki@wdc.com/
 
-I've never noticed CONFIG_IOSCHED_BFQ is a tristate that explains (me) a
-lot. Thanks!
+Changes from v1:
+* Added another patch to fix ioctl/netlink interface handling mistake
+* Avoid the nbd/002 failure by repeating the partition existence check
 
-> First of all, users can only load these policies when they need, and
-> reduce kernel size; Then, when these policies is not loaded, IO fast
-> path will be slightly shorter, and save some memory overhead for each
-> disk.
+Shin'ichiro Kawasaki (2):
+  nbd/002: fix wrong -L/-nonetlink option usage
+  nbd/002: repeat partition existence check for ioctl interface
 
-...and there is no new complexity thanks to the above.
+ tests/nbd/002 | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
 
-(I'm only catching up with subthread of patch 5/6.)
-It seems the old complexity could be simplified by the way of lazy
-inits. Intereseting...
+-- 
+2.44.0
 
-Michal
-
---mv5ylurrtbwdd6xr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZh+jpAAKCRAGvrMr/1gc
-jtkfAP9yEajBdW3z7w7kWBfYAteHAXasz7VRVK4JZFJIWxNyeQD+Ii7z6SSsfVG5
-K3EEHsVXHAgD9UkHeoqy9ADSNVIGZQc=
-=l0yD
------END PGP SIGNATURE-----
-
---mv5ylurrtbwdd6xr--
