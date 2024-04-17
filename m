@@ -1,77 +1,55 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B94AEBB;
-	Wed, 17 Apr 2024 01:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CC2A47
+	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 01:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713316928; cv=none; b=X+jNaBoV90tPSZIwYTvnd5Iszjdr7ArwT1CaSJJVu2RUs/mCXHAQFtf8gZEw7FFFucnQ+vCrKwjBalzml2ssZ6OpNQhAwH5AEXM3jkMkhCbjJCyFz+ax3l2ZT9oQ+jpRH2AtYV6RCt4bQHrD/WWNO3Wp4FK+lIH7B871asIDCSA=
+	t=1713317610; cv=none; b=CBkb57q2A0hyspjMA7QzB3Yb40ctKTpEOnxFnJaYx0+wfkx8p5VHWVsxnWy5ODDZaOO6NzcltC4xixZP8XR+D74V+zJTTjCLIWr70weUaMLkX0m9U6C/1wKN9Mlwmrgv0cIuqsSMo/aHw0ude3zQqf42hH6m7QFfEak9elzcBIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713316928; c=relaxed/simple;
-	bh=DUYFWX4LWKaLj5DBHUFDv8Fo12atozH9lyEhZH1CAuI=;
+	s=arc-20240116; t=1713317610; c=relaxed/simple;
+	bh=8TUspfH/j0jB+NGyXeFKCYbXQ5gmKtDRLbtYjogjHFA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nmbPKVjxUT9JMipy9dUHKLycQ5TJ0bAMGnuhg+J9g0Klqryp8af+u3DloQ9KAJv5HhTkUXSJWpjotnBTUj+0t9T4UcPe0TmIAipyncZQncgsHF0ajv5KeU6PMZ622mjia8yCGsFp4RXef+tiG3LEOmLaZlRiNIMBdNTJVMIyeHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDuDcOSX; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=FHE5Zk84JJjzQJmQAGt50ESR8MzFJZg6xA26EtJaJy1kORa4pnTsA+4bRH7hqKpDsL99mguSvP/CTdbDXxfi4UbG0Mlka4IFyLPJII2Bbl4ZJTmpUAfeN+1Li6hGVTRo3QI1Fh/CPeMYE45iwvTaFhpFYl9KXtN1/Qvhv9IRri8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P5bqvebF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDuDcOSX"
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-2330f85c2ebso3334075fac.1;
-        Tue, 16 Apr 2024 18:22:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713316926; x=1713921726; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LnX24HJPnbW9GAV5sbrmRceYLlMBy8M9WyMVqDoxp/w=;
-        b=EDuDcOSXKdmYeresZNQ1ht08joplx98WZYA+MhCOBa7mieaYlS+8tiwMnBUy04/2rx
-         mOkR8iz8MULqGqavAb+gA1pXAI+uFGJMWTGwvUVio+z2CiwwsF6YXQk+SBXMNCcjwncM
-         2qrGEcG8T608pn86lU+x3RwPvKXO3iWbMhvM+rHRF/iPxa1AylLwnr3qh0CQO44E8HdX
-         reri7yCFi5AiYQVfVB1NdcKH5iWnHdEq6dsyptJznkhRJ64uAhROOKFGm2fsVlZ0LZzr
-         L6HlhhpD6mGAAV6Q/uOKRNqp+gjeYWNPkgh6FvwOpbK5SF81/Y1ies869pFrrJtI2dz5
-         LSrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713316926; x=1713921726;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LnX24HJPnbW9GAV5sbrmRceYLlMBy8M9WyMVqDoxp/w=;
-        b=BIVL+q9jCdGWnHljVhUwp87xWbWvsVyN5YE0pxJWcDcpS6VN3DKPNbpT6GgBxsMISU
-         B+VLv1arejyRUV3koa0swnwXKw6dCzyydCyhuRNVNIOYA2BIo5+yVKJfNGUuCskr0unL
-         4oTDZl9mPmi36ctaFsHsO5iDWZun7Ach4u3gxDITRfDA7qHisydAfFJgAFeSNJu9+b17
-         t6kvm53qd7QHfGwbh5y+OxZcOWevoGY2bnPqOjeELzXOE1H4cWtDj7ifmhaC5aM7MuOH
-         YwGsmDAO/xWhVls9O9ZyA3KdkXIzAXIUc4EnB6IYtXtYsibHptLfrj4L3XBX2Z1v76iZ
-         jr6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUIIYcaWlQIxtl+nJF2bMXJbumrhnjbCP8PPml36AT5NDyIDTbmkSOwiLLiGpUWr4PF8dWfaRV81TIF8pQAxuPw9cDc5/9VyaN7czX2F1X35Nb0N01/98DWT6yR4zWtkoL3amTGaFz6ExEQ2itohlpKtk7+HLM3xsgaOS9BxBSCHJKA
-X-Gm-Message-State: AOJu0Yx0fshlTLzyIWndMXKasaXNpytPB63j9VE9bGO6V28dbRyvQTdp
-	0MvwM55oLOiUm7spfRITt23Df1darMoJPuzC0O0l8baI89HjETg4
-X-Google-Smtp-Source: AGHT+IFQN2WvDvVvDfE7SiVQ/ZNnoEulyk0oTfQIzF72qCPjRTZocptPi/+XMX8fSvsGmb3tvGg4Ow==
-X-Received: by 2002:a05:6871:5224:b0:221:a881:df51 with SMTP id ht36-20020a056871522400b00221a881df51mr16998129oac.44.1713316926264;
-        Tue, 16 Apr 2024 18:22:06 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:6f51])
-        by smtp.gmail.com with ESMTPSA id x17-20020a056a00271100b006ed3509ecd0sm9665987pfv.56.2024.04.16.18.22.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 18:22:05 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 16 Apr 2024 15:22:04 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, chenhuacai@kernel.org, josef@toxicpanda.com,
-	jhs@mojatatu.com, svenjoac@gmx.de, raven@themaw.net,
-	pctammela@mojatatu.com, qde@naccy.de, zhaotianrui@loongson.cn,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, cgroups@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH RFC v2 5/6] blk-throttle: support to destroy throtl_data
- when blk-throttle is disabled
-Message-ID: <Zh8kPGAu2TG4Su2M@slm.duckdns.org>
-References: <20240406080059.2248314-1-yukuai1@huaweicloud.com>
- <20240406080059.2248314-6-yukuai1@huaweicloud.com>
- <Zhl37slglnnTSMO7@slm.duckdns.org>
- <1bb85208-1224-77dc-f0b2-7b7a228ef70b@huaweicloud.com>
- <Zh6wx4mXZy_EOViH@slm.duckdns.org>
- <19086c09-3060-a4ce-4ac6-811a29653979@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P5bqvebF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713317608;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uZ28i7wR4++HF1LOz4QwDQAvkWeiJgqz8eW7WOEsp2M=;
+	b=P5bqvebFA8VevX6aLK6otctUSZnAD1hbiXHoIFhGUtzNLeCbWI8PKSWsf83AlPuqkr2LuN
+	1OevNH70lIq0UtMlZkGOB5pLpOpqXbXTllFvJKKsn+ohki8UjpKxTQcfG5H0SS6qhLX/Kh
+	pwFFRkVbcQvCewPb7NnfIe0BlV/rXJw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-46-hDWIjlT2M4GKdodIpbQEuA-1; Tue, 16 Apr 2024 21:33:23 -0400
+X-MC-Unique: hDWIjlT2M4GKdodIpbQEuA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5F403188ACA0;
+	Wed, 17 Apr 2024 01:33:23 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.46])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 93FF040C6CB2;
+	Wed, 17 Apr 2024 01:33:19 +0000 (UTC)
+Date: Wed, 17 Apr 2024 09:32:55 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: brauner@kernel.org, czhong@redhat.com, dm-devel@lists.linux.dev,
+	jack@suse.cz, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v2] dm: restore synchronous close of device mapper block
+ device
+Message-ID: <Zh8mx4yIGyv2InCq@fedora>
+References: <20240416005633.877153-1-ming.lei@redhat.com>
+ <20240416152842.13933-1-snitzer@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,34 +58,34 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <19086c09-3060-a4ce-4ac6-811a29653979@huaweicloud.com>
+In-Reply-To: <20240416152842.13933-1-snitzer@kernel.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Hello,
-
-On Wed, Apr 17, 2024 at 09:13:34AM +0800, Yu Kuai wrote:
-> > Probably a better interface is for unloading to force blk-throtl to be
-> > deactivated rather than asking the user to nuke all configs.
+On Tue, Apr 16, 2024 at 11:28:42AM -0400, Mike Snitzer wrote:
+> From: Ming Lei <ming.lei@redhat.com>
 > 
-> I was thinking that rmmod in this case should return busy, for example,
-> if bfq is currently used for some disk, rmmod bfq will return busy.
+> 'dmsetup remove' and 'dmsetup remove_all' require synchronous bdev
+> release. Otherwise dm_lock_for_deletion() may return -EBUSY if the open
+> count is > 0, because the open count is dropped in dm_blk_close()
+> which occurs after fput() completes.
 > 
-> Is there any example that unloading will deactivate resources that users
-> are still using?
+> So if dm_blk_close() is delayed because of asynchronous fput(), this
+> device mapper device is skipped during remove, which is a regression.
+> 
+> Fix the issue by using __fput_sync().
+> 
+> Also: DM device removal has long supported being made asynchronous by
+> setting the DMF_DEFERRED_REMOVE flag on the DM device. So leverage
+> using async fput() in close_table_device() if DMF_DEFERRED_REMOVE flag
+> is set.
 
-Hmm... yeah, I'm not sure. Pinning the module while in use is definitely
-more conventional, so let's stick with that. It's usually achieved by
-inc'ing the module's ref on each usage, so here, the module refs would be
-counting the number of active rules, I guess.
+IMO, this way isn't necessary, because the patch is one bug fix, and we are
+supposed to recover into exact previous behavior before commit a28d893eb327
+("md: port block device access to file") for minimizing regression risk.
 
-I'm not sure about modularization tho mostly because we've historically had
-a lot of lifetime issues around block and blkcg data structures and the
-supposed gain here is rather minimal. We only have a handful of these
-policies and they aren't that big.
+But the extra change seems work.
 
-If hot path overhead when not being used is concern, lazy init solves most
-of it, no?
 
-Thanks.
+thanks, 
+Ming
 
--- 
-tejun
