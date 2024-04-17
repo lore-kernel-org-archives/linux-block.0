@@ -1,64 +1,67 @@
 Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC1C13C67B
-	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 10:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933CD13C669
+	for <linux-block@vger.kernel.org>; Wed, 17 Apr 2024 10:42:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713350534; cv=none; b=fV73W6a62n4v+LDbxYMrm/pDSXamcaYSwydAd5J4+SKQ+LgV92pRzRhsy5aK5KtWV3cCTenwqiMJqyPUm4dEt4xJHso47NPOWkLEqptQ6zSYMc3Qtn3oJ7HxSnxe8Q2FNMFunDYpM9Ekc4AuPpRwAK5eDGtm+C/B0pCjBSQ8QUk=
+	t=1713350535; cv=none; b=SeLFu3gKp8j2xG9O7InbSKeVdGam/u1pm8kWKkGx9+YTkKdO5Nze2P6WGhR2t5kua6spIfJrYA0Z6e1stJSu6jXg69pGmwiZlEfCPHLde/oVKVFuDIPHLDNzrfNM1YRbSG4RcBGNCqsx7/JSsI5BmdoY9DxJJ1kVMSOmn1rRU0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713350534; c=relaxed/simple;
-	bh=c9I8MKTorsqgSs+cuc1YuXPtLTUYdZF/snt/sNrGyYE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UljN1llkgkBXO9DHQPjOW7g/t1bv3zqEHeNejj+Ot26wuzED2RZo6PxlOTJRF7OpGHa3uECTYRggG6Xg57NDmreIQ/gOCT80qpAhErO3taqGYJifL1y/viPcwkwbSqQE9n/JbfPn4zZU4KTn2jJt5mJFZDCC6r8UxBbZBdmjp/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=h2mHWzEs; arc=none smtp.client-ip=216.71.153.144
+	s=arc-20240116; t=1713350535; c=relaxed/simple;
+	bh=g3fx1ZTkHRAoDOZOkdg+UOQMZLU5smY4eolMVN8yWPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i7VMcPfqhOO27dNtu80Lixa1H3kk0MQj6hx+8/L0DpMraLxkfcCIB0xNilgef/RhbTuBaoHGWEvThIvZ20P7aQN1X74yL140FWDr0kMbk+7QcLGFTwxMgMomRfejOARgQdX9SauuRALZaHHnNwcQdzAaaqbdtM8jAQC31NnD4Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=RXBDiRyl; arc=none smtp.client-ip=216.71.153.144
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="h2mHWzEs"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RXBDiRyl"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1713350532; x=1744886532;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=c9I8MKTorsqgSs+cuc1YuXPtLTUYdZF/snt/sNrGyYE=;
-  b=h2mHWzEsBk7n9pjhLpsi8YsIBhD5rg5kKaED+7LAsFEQH29453A7cOLY
-   e07mXLO+akY0m3t6bwsRScZx7Zg1kVw0Nz4avG5TVQeNojnhceotihvlN
-   ksakh/INouP2RbAL45aO6CROK+nUaKgcUbpCYLU1+1Q7jmTCz0DxzmwPs
-   YyLcygPvdDuAN5VL9ti7ujMPvFqJZUA/beiPjrBIuKPt5+cQYYmuMg5oH
-   ov1SL6iym7BjRBFSEA9yWw6C4xyWxpk02RA0S0rM5XOKZrL4V+S0BOik9
-   y2dup7m8V0v5N0bhSANgY3KMSmZMOBw2yqW7E4ivo1D5QIjrHytrHoBAX
-   Q==;
-X-CSE-ConnectionGUID: wcSzcvXdRJW7yZbl6U0H2Q==
-X-CSE-MsgGUID: VgBMNodVR0SfO6mGMzCMYw==
+  t=1713350533; x=1744886533;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=g3fx1ZTkHRAoDOZOkdg+UOQMZLU5smY4eolMVN8yWPg=;
+  b=RXBDiRylX1HF6Io2bzZ3ug36wbY+7WlcW7IgLMkUhwPs/lzyABH5gHaz
+   A5BFtFdqUeVHLdbuTrTxtBhqrwOTAKyrqcFCXrrDE7tafngWytCpoBQ2G
+   uqyJrRQKFJC8YcnpXabpFwK4z+in55xKGXIfLKtEXypQbdVQss9GCquE2
+   WL0wYkojFr1IXNEyJMIIb7yJsXUzXDiqWSUZjNaJRV1WS8vZ/b2e/XV2x
+   spw4H9jyumFIV+D/bxM1sFedYZedWTNThQNiWx9JMz3kVEKZpkaxLJGo9
+   TiDENAvKXnKhiRqa+/uw6ORjWcH/BboDxmV4IsMco8/wPpf3yXJ/nEm95
+   A==;
+X-CSE-ConnectionGUID: crJ0WLQMT8GXPGiltpLZxQ==
+X-CSE-MsgGUID: seLPxtj4Q7yB601KdFMt8Q==
 X-IronPort-AV: E=Sophos;i="6.07,209,1708358400"; 
-   d="scan'208";a="14913458"
+   d="scan'208";a="14913462"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Apr 2024 18:42:11 +0800
-IronPort-SDR: TkVIrZvQ/9or2m237iwVdSVrzSoELPk2SkV2YY5HIFlSujaxCPQ7iIl24MqXxx7JmVGfDipE3u
- WcQm095WWZCaR0O7TQU/bxQXfn16xuNl+M2knM0OMt5EgAz+LTJiqhVBPbi00YSKm+lOdtNZ1z
- QyyktyoGW4DnyRnXgksvtD+voNeVlK40V3PDWzCXgBRe1ei8r2fWPAhqNeyKqHBzquhkXKY0tL
- m6N+bAeGQwHCeWltSceeIylehdTcxmHPVa5UEHP+HmrXWLzbVF/ov4v4hHOP0tCskhQ6SjkHjN
- /74=
+  by ob1.hgst.iphmx.com with ESMTP; 17 Apr 2024 18:42:12 +0800
+IronPort-SDR: s0MLqSAiP9XP86Or1h9WNdkaZky1JDhb/Q+qFnXaO8SlhieqVpFm9mwPh5RQsy/wK6PhvQ69ZO
+ L2hsb5dVPjJ1qCbtMknOSmxC9B7hlM9y7ktcXerDKs1l0XfFQJbansaC+qfaUxtYISaX098uqL
+ O1m+2kdG0MsYNkhxerCy59ChflC0fOWMgl8ybWycUm1Karu9/AqsE/3c02OM0ZJCVDC9m2XFIe
+ 8GgxwMhuaJS6iyZ4biEoMEfw9/1Y8jJ/VbkuF4kZ3VyH6HUAuzAa/RQlFLnqX3I5BPfdO1fhOb
+ mDw=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Apr 2024 02:44:49 -0700
-IronPort-SDR: nhvOm7+mm9Tu8HVUa41b97RB9gTP8gKbsbU2gNAH9ZqYsnPEVz5fpNaOiQE0qgZDhbtp7qIN3X
- zj6uZNCS4dQm1mlia1X3CMNoIdJuxtK1nNU+m/1KLw6DSKl0tUO5+qg03nZtNo9qnxn8ApL+lr
- kyquhx1wmVen0tiswwkkglseDKUAUzjEU1NxahT9KbgELqDCmvKoEqI0KotL0xyh1sMJ5uxrvP
- CWmysnvhax1HoFQTCct243yWUIfErij0iOQnRUA9KF5Q5LMtPnamnPmzuidE0f4nA57L+P6zQj
- +Y4=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Apr 2024 02:44:50 -0700
+IronPort-SDR: TgN2iPQSnxWxnpydXPHereC4u1YXV0HsheYkj204Wsc1vXCoUPopvgdAkz/ZYWifaxsk3Ui0UC
+ u+BhJIfslqPozNamHXM3+uFE+6w1nLrR3mmsdu3qBf6e9u4RK/LNqS/m7oojriPRh/QmcD2fCU
+ RxCrYjLIiLD4NtbYu15OU+GA1MVGtpjppTzZ0jf+BgJmYJotTsH+j1fhJh6jcfmyNgeAocLIq+
+ c/UIvwLREBZQatUW4vsadPXm+3/TtegnCwucqFUdCEtq0GEs7BEHG8mrL/6ZBF3H9cSn3AEBMW
+ vnQ=
 WDCIronportException: Internal
 Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip01.wdc.com with ESMTP; 17 Apr 2024 03:42:10 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 17 Apr 2024 03:42:11 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: nbd@other.debian.org,
 	Josef Bacik <josef@toxicpanda.com>,
 	Yi Zhang <yi.zhang@redhat.com>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v2 0/2] fix nbd/002
-Date: Wed, 17 Apr 2024 19:42:07 +0900
-Message-ID: <20240417104209.2898526-1-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 1/2] nbd/002: fix wrong -L/-nonetlink option usage
+Date: Wed, 17 Apr 2024 19:42:08 +0900
+Message-ID: <20240417104209.2898526-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240417104209.2898526-1-shinichiro.kawasaki@wdc.com>
+References: <20240417104209.2898526-1-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,33 +70,88 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Recently, CKI project found blktests nbd/002 failure. The test case sets up the
-connection to the nbd device, then checks partition existence in the device to
-confirm that the kernel reads the partition table in the device. Usually, this
-partition read by kernel is completed before the test script checks the
-partition existence. However, the partition read often completes after the
-partition existence check, then the test case fails. I think the test script
-checks the partition existence too early, and this should be fixed in the test
-script.
+As the commit 3c014acd5171 ("nbd/001: use -L for nbd-client") explains,
+the nbd-client command uses the netlink interface instead of the ioctl
+interface. The default interface changed at nbd version 3.17 in March
+2018. Before that, the default was ioctl. After the change, the
+nbd-client command requires -L or -nonetlink option to use the ioctl
+interface.
 
-During this investigation, I noticed that the test case nbd/002 handles the
-ioctl interface and the netlink interface opposite. The first patch fixes this
-wrong interface handling. The second patch addresses the too early partition
-existence check issue.
+The commit 3c014acd5171 adjusted nbd/001 test script to the default
+interface change. However, it is not reflected to nbd/002. This caused
+mismatch between the comments in the test case and the actual test. The
+comments describe the first half as "Do it with ioctls", and the last
+half as "Do it with netlink". However, the test script does opposite. It
+specifies no option for the first half, then tests with netlink
+interface. It specifies -L option for the last half, then tests with the
+ioctl interface.
 
-Link to v1 patch: https://lore.kernel.org/linux-block/20240319085015.3901051-1-shinichiro.kawasaki@wdc.com/
+This makes it difficult to debug the failure of the test case. Fix the
+nbd-client command option to match the comments. Also, use the long
+option -nonetlink instead of -L for easier reading.
 
-Changes from v1:
-* Added another patch to fix ioctl/netlink interface handling mistake
-* Avoid the nbd/002 failure by repeating the partition existence check
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/nbd/002 | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Shin'ichiro Kawasaki (2):
-  nbd/002: fix wrong -L/-nonetlink option usage
-  nbd/002: repeat partition existence check for ioctl interface
-
- tests/nbd/002 | 26 ++++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
-
+diff --git a/tests/nbd/002 b/tests/nbd/002
+index fd992a0..968c9fa 100755
+--- a/tests/nbd/002
++++ b/tests/nbd/002
+@@ -53,11 +53,11 @@ test() {
+ 
+ 	echo "Testing IOCTL path"
+ 
+-	nbd-client -N export localhost /dev/nbd0 >> "$FULL" 2>&1
++	nbd-client -nonetlink -N export localhost /dev/nbd0 >> "$FULL" 2>&1
+ 
+ 	if ! _wait_for_nbd_connect; then
+ 		echo "Connect didn't happen?"
+-		nbd-client -d /dev/nbd0 >> "$FULL" 2>&1
++		nbd-client -nonetlink -d /dev/nbd0 >> "$FULL" 2>&1
+ 		_stop_nbd_server
+ 		return 1
+ 	fi
+@@ -66,12 +66,12 @@ test() {
+ 
+ 	if ! stat /dev/nbd0p1 >> "$FULL" 2>&1; then
+ 		echo "Didn't have partition on ioctl path"
+-		nbd-client -d /dev/nbd0 >> "$FULL" 2>&1
++		nbd-client -nonetlink -d /dev/nbd0 >> "$FULL" 2>&1
+ 		_stop_nbd_server
+ 		return 1
+ 	fi
+ 
+-	nbd-client -d /dev/nbd0 >> "$FULL" 2>&1
++	nbd-client -nonetlink -d /dev/nbd0 >> "$FULL" 2>&1
+ 
+ 	udevadm settle
+ 
+@@ -83,7 +83,7 @@ test() {
+ 
+ 	# Do it with netlink
+ 	echo "Testing the netlink path"
+-	nbd-client -L -N export localhost /dev/nbd0 >> "$FULL" 2>&1
++	nbd-client -N export localhost /dev/nbd0 >> "$FULL" 2>&1
+ 
+ 	if ! _wait_for_nbd_connect; then
+ 		echo "Connect didn't happen?"
+@@ -96,12 +96,12 @@ test() {
+ 
+ 	if  ! stat /dev/nbd0p1 >/dev/null 2>&1; then
+ 		echo "Didn't have partition on the netlink path"
+-		nbd-client -L -d /dev/nbd0 >> "$FULL" 2>&1
++		nbd-client -d /dev/nbd0 >> "$FULL" 2>&1
+ 		_stop_nbd_server
+ 		return 1
+ 	fi
+ 
+-	nbd-client -L -d /dev/nbd0 >> "$FULL" 2>&1
++	nbd-client -d /dev/nbd0 >> "$FULL" 2>&1
+ 
+ 	if ! _wait_for_nbd_disconnect; then
+ 		echo "Disconnect didn't happen?"
 -- 
 2.44.0
 
