@@ -1,232 +1,98 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DCB15AAD9
-	for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 09:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B452315D5D6;
+	Thu, 18 Apr 2024 12:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713433237; cv=none; b=t99phDNaf9QDAcRaVzcIw/+JZ31N+KFm8F+1iw+DBMGMxy0oOFsFxzzaG18PZ3vcCWPG8zIMsShkr+1GNrIUA3SVIZXR6LyzWwYmzMOeQlo9my1xFzPw7vZoaPHmK9sVZhRY187wVl9CHZaw0EV5u1KFs7ISwdwVpJFZCRSyLjA=
+	t=1713442922; cv=none; b=RLCVsceEVS5bP3qYNRXUDrUDL8WunkIY1k7XRd2bslEffsL53YSc73qGnO7vAic1uc6vTaS3xEwP4l7N1JOoXWAIrtn1QsuB/JdmxZhN8QyNohuQIjzBfofC7DdyyzfPD6Kzb2cAhMdCgQGBvrLb6G+CyXWGRBcROWZDzd5pXww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713433237; c=relaxed/simple;
-	bh=B19ra6ymuww+Itx69NRLFd+YZQxXUGZCttieHFzO9Yw=;
+	s=arc-20240116; t=1713442922; c=relaxed/simple;
+	bh=PKFSX9CcoLcO4YzC9BdJPuOUBdQy9VE5vwvKjPYtrUc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AWdIbGwggQ2HCN0HcyOj8/gIEXGPREjTRTIX0yb+vEKkCd401yH+s+CDk0rAxsJjhbTXRtlN2dkl5bazJ20nKP+bKOmdPW1CbuPTbfLp3Oxg2jxS4OO79s8S8NbGoBL/wFX0JqIKQzrwRjF5u67dskzcpeE4aaccEfk08HOfjXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-349a35aba9dso110013f8f.3
-        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 02:40:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713433234; x=1714038034;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5llpMVxmM62RdSoWzXTrV3xrLt8zZBi93xYenMpXorQ=;
-        b=ZoHOGsZY5kCMoKiUJGPfbLBGy5JjotAL9DlY8fcExr3V9qn0jKo8w3zEmSk9uOpm/0
-         KpGEaV6opBkh+3V4NHclAjWNL8aJOWPNwVzxeBmgNSK12fXyjtch8o95lc44syqYJTbk
-         Rvvhb8urRBxIsSJ//7vugIgpEQgxcg/sRWj13nbnTpz3f/1YwacuE8pBRdhqJSvGcIHZ
-         GUWnLceEFW1k4FVDGsQN6JkWKRLVdadASxmdkgrwolkc+pI2/EvdL2PpyUXqg5aHmc9P
-         1rOQ/RCRTKCDykb96Q0xhse1bb98I1H0Ax11QJ8dFi/10xj2eXx/7b4nD3RALDpbmMux
-         OUqw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6lf/fX4QJjqHqmOQY0X1PrrKaxqKrTJWCodzanKzCnLczzNyF7Oe2f9V2o2J+ldbbnqIdwRxvYL81Nyg30+jShw2/LqLxTCnUaqE=
-X-Gm-Message-State: AOJu0Yx5VCp1FNPGvMiA/AHOMSVfiXovlr5jbdB73CKSJKiiYm/c2EPl
-	ahScesYAvpJ6vsS3JznnmWjqg4GoPhTZKVfRVbcN2JrIx7SKPeA/
-X-Google-Smtp-Source: AGHT+IGSqUYFbSGDXtQK/T2DesnT8E+l/6A5w8bR0mNdPx7XbKYpU4thJO/DZ+r/+okT2pxvFyuDCw==
-X-Received: by 2002:a05:600c:474b:b0:416:ac21:9666 with SMTP id w11-20020a05600c474b00b00416ac219666mr1496537wmo.4.1713433233848;
-        Thu, 18 Apr 2024 02:40:33 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.192.64.dynamic.barak-online.net. [85.65.192.64])
-        by smtp.gmail.com with ESMTPSA id d15-20020a05600c34cf00b0041897c6171dsm5806870wmq.16.2024.04.18.02.40.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Apr 2024 02:40:33 -0700 (PDT)
-Message-ID: <85380369-b7d1-4cc3-859d-d56c4491c39c@grimberg.me>
-Date: Thu, 18 Apr 2024 12:40:32 +0300
+	 In-Reply-To:Content-Type; b=GXGOhH0S+0YWka33BYsBC0rd3qZ+fKfUSUcmSVaX4+0UXWdjE5A07+HhI3BcnR1Y81lWMLUI7XAR2QqA4pYYr4dhZEev9PGjHiEdVCz4sxUdJv8LbpFD8ACSRiIM16zcjUKtH6zkD3fPKKA0KW2W/7mLdjKWTc5X4CeyFimf3U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VKxjB70BDz4f3k6G;
+	Thu, 18 Apr 2024 20:21:50 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 9F4221A0572;
+	Thu, 18 Apr 2024 20:21:55 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP2 (Coremail) with SMTP id Syh0CgBHaw5hECFmjeUnKg--.20914S3;
+	Thu, 18 Apr 2024 20:21:55 +0800 (CST)
+Message-ID: <f9a65bb0-70ce-f79f-916d-0dddfd88f9e9@huaweicloud.com>
+Date: Thu, 18 Apr 2024 20:21:53 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2 00/11] support test case repeat by different
- conditions
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, Daniel Wagner <dwagern@suse.de>,
- Chaitanya Kulkarni <kch@nvidia.com>
-References: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
-Content-Language: he-IL, en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] blk-iocost: do not WARNING if iocg has already offlined
+To: Yu Kuai <yukuai1@huaweicloud.com>, linan666@huaweicloud.com,
+ tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc: hch@lst.de, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, houtao1@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240418072340.2090877-1-linan666@huaweicloud.com>
+ <75a8212a-a6ff-416c-7bce-0f4036a4abc0@huaweicloud.com>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <75a8212a-a6ff-416c-7bce-0f4036a4abc0@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgBHaw5hECFmjeUnKg--.20914S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrZr1xJFW5Zr13tryxGFWxJFb_yoWfXFbEy3
+	Wvywn7KrnrtayI9anYyws0qws3CayYkay0qwn5XwnxZ3WftFWDGFs3Gr98X3Z8Ca9xG3Wa
+	kFyqqF42yw4akjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbS8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
+	M4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQZ23UUUUU=
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
 
 
-On 16/04/2024 13:31, Shin'ichiro Kawasaki wrote:
-> In the recent discussion for nvme test group [1], two pain points were mentioned
-> regarding the test case runs.
->
-> 1) Several test cases in nvme test group do exactly the same test except the
->     NVME transport backend set up condition difference (device vs. file). This
->     results in duplicate test script codes. It is desired to unify the test cases
->     and run them repeatedly with the different conditions.
->
-> 2) NVME transport types can be specified with nvme_trtype parameter so that the
->     same tests can be run for various transport types. However, some test cases
->     do not depend on the transport types. They are repeated in multiple runs for
->     the various transport types under the exact same conditions. It is desired to
->     repeat the test cases only when such repetition is required.
->
-> [1] https://lore.kernel.org/linux-block/w2eaegjopbah5qbjsvpnrwln2t5dr7mv3v4n2e63m5tjqiochm@uonrjm2i2g72/
->
-> One idea to address these pain points is to add the test repeat feature to the
-> nvme test group. However, Daniel questioned if the feature could be implemented
-> in the blktests framework. Actually, a similar feature has already been
-> implemented to repeat some test cases for non-zoned block devices and zoned
-> block devices. However, this feature is implemented only for the zoned and non-
-> zoned device conditions. It can not fulfill the desires for nvme test group.
->
-> This series proposes to generalize the feature in the blktests framework to
-> repeat the test cases with different conditions. Introduce a new function
-> set_conditions() that each test case can define and instruct the framework to
-> repeat the test case. The first four patches introduce the feature and apply it
-> to the repetition for non-zoned and zoned block devices. The following seven
-> patches apply the feature to nvme test group so that the test cases can be
-> repeated for NVME transport types and backend types in the ideal way. Two of the
-> seven patches are reused from the work by Daniel. The all patches are listed in
-> the order that does not lose the test coverage with the default set up.
+在 2024/4/18 16:52, Yu Kuai 写道:
+> 
+> 
+> 在 2024/04/18 15:23, linan666@huaweicloud.com 写道:
+>> From: Li Nan <linan122@huawei.com>
+>>
+>> In iocg_pay_debt(), warn is triggered if 'active_list' is empty, which
+>> is intended to confirm iocg is avitve when it has debt. However, warn
+>> can be triggered during removing cgroup controller, as
+>> iocg_waitq_timer_fn() is awakened at that time.
+>>
+>>    WARNING: CPU: 0 PID: 2344971 at block/blk-iocost.c:1402 
+>> iocg_pay_debt+0x14c/0x190
+> 
+> This line doesn't match the code from mainline, please mention that
+> which kernel release you're testing.
+> 
 
-Nice idea!
+Thanks for your review.
+I tested at 5.10, but mainline has the same issue.
 
-> This series introduces new config parameters NVMET_TRTYPES and
-> NVMET_BLKDEV_TYPES, which can take multiple values with space separators. When
-> they are defined in the config file as follows,
->
->    NVMET_TRTYPES="loop rdma tcp"
->    NVMET_BLKDEV_TYPES="device file"
->
-> the test cases which depend on these parameters are repeated 3 x 2 = 6 times.
-> For example, nvme/006 is repeated as follows.
->
-> nvme/006 (nvmet bd=device tr=loop) (create an NVMeOF target) [passed]
->      runtime  0.148s  ...  0.165s
-> nvme/006 (nvmet bd=device tr=rdma) (create an NVMeOF target) [passed]
->      runtime  0.273s  ...  0.235s
-> nvme/006 (nvmet bd=device tr=tcp) (create an NVMeOF target)  [passed]
->      runtime  0.162s  ...  0.164s
-> nvme/006 (nvmet bd=file tr=loop) (create an NVMeOF target)   [passed]
->      runtime  0.138s  ...  0.134s
-> nvme/006 (nvmet bd=file tr=rdma) (create an NVMeOF target)   [passed]
->      runtime  0.216s  ...  0.201s
-> nvme/006 (nvmet bd=file tr=tcp) (create an NVMeOF target)    [passed]
->      runtime  0.154s  ...  0.146s
->
->
-> Changes from v1:
-> * Renamed NVMET_TR_TYPES to NVMET_TRTYPES
-> * 1st patch: reflected comments on the list and added Reviewed-by tag
-> * 5th patch: changed NVMET_TRTYPES from array to variable
-> * 7th patch: changed NVMET_BLKDEV_TYPES from array to variable
-> * Reflected other comments on the list
->
->
-> Daniel Wagner (3):
->    nvme/rc: add blkdev type environment variable
->    nvme/{007,009,011,013,015,020,024}: drop duplicate nvmet blkdev type
->      tests
->    nvme/{021,022,025,026,027,028}: do not hard code target blkdev type
->
-> Shin'ichiro Kawasaki (8):
->    check: factor out _run_test()
->    check: support test case repeat by different conditions
->    check: use set_conditions() for the CAN_BE_ZONED test cases
->    meta/{016,017}: add test cases to check repeated test case runs
->    nvme/rc: introduce NVMET_TRTYPES
->    nvme/rc: introduce NVMET_BLKDEV_TYPES
->    nvme/{002-031,033-038,040-045,047,048}: support NMVET_TRTYPES
->    nvme/{006,008,010,012,014,019,023}: support NVMET_BLKDEV_TYPES
->
->   Documentation/running-tests.md |  16 +++-
->   Makefile                       |   3 +-
->   check                          | 129 ++++++++++++++++++++++-----------
->   common/shellcheck              |   2 +-
->   common/zoned                   |  22 ++++++
->   new                            |  21 ++++++
->   tests/meta/016                 |  29 ++++++++
->   tests/meta/016.out             |   2 +
->   tests/meta/017                 |  29 ++++++++
->   tests/meta/017.out             |   2 +
->   tests/nvme/002                 |   4 +
->   tests/nvme/003                 |   4 +
->   tests/nvme/004                 |   4 +
->   tests/nvme/005                 |   4 +
->   tests/nvme/006                 |   9 ++-
->   tests/nvme/007                 |  28 -------
->   tests/nvme/007.out             |   2 -
->   tests/nvme/008                 |   8 +-
->   tests/nvme/009                 |  36 ---------
->   tests/nvme/009.out             |   3 -
->   tests/nvme/010                 |   8 +-
->   tests/nvme/011                 |  39 ----------
->   tests/nvme/011.out             |   3 -
->   tests/nvme/012                 |   8 +-
->   tests/nvme/013                 |  43 -----------
->   tests/nvme/013.out             |   3 -
->   tests/nvme/014                 |   8 +-
->   tests/nvme/015                 |  48 ------------
->   tests/nvme/015.out             |   4 -
->   tests/nvme/016                 |   4 +
->   tests/nvme/017                 |   4 +
->   tests/nvme/018                 |   4 +
->   tests/nvme/019                 |   8 +-
->   tests/nvme/020                 |  40 ----------
->   tests/nvme/020.out             |   4 -
->   tests/nvme/021                 |  10 ++-
->   tests/nvme/022                 |  10 ++-
->   tests/nvme/023                 |   8 +-
->   tests/nvme/024                 |  40 ----------
->   tests/nvme/024.out             |   2 -
->   tests/nvme/025                 |  10 ++-
->   tests/nvme/026                 |  10 ++-
->   tests/nvme/027                 |  10 ++-
->   tests/nvme/028                 |  10 ++-
->   tests/nvme/029                 |   4 +
->   tests/nvme/030                 |   4 +
->   tests/nvme/031                 |   4 +
->   tests/nvme/033                 |   4 +
->   tests/nvme/034                 |   4 +
->   tests/nvme/035                 |   4 +
->   tests/nvme/036                 |   4 +
->   tests/nvme/037                 |   4 +
->   tests/nvme/038                 |   4 +
->   tests/nvme/040                 |   4 +
->   tests/nvme/041                 |   3 +
->   tests/nvme/042                 |   3 +
->   tests/nvme/043                 |   3 +
->   tests/nvme/044                 |   3 +
->   tests/nvme/045                 |   3 +
->   tests/nvme/047                 |   4 +
->   tests/nvme/048                 |   4 +
->   tests/nvme/rc                  |  58 ++++++++++++++-
->   62 files changed, 437 insertions(+), 379 deletions(-)
->   create mode 100644 common/zoned
->   create mode 100755 tests/meta/016
->   create mode 100644 tests/meta/016.out
->   create mode 100755 tests/meta/017
->   create mode 100644 tests/meta/017.out
->   delete mode 100755 tests/nvme/007
->   delete mode 100644 tests/nvme/007.out
->   delete mode 100755 tests/nvme/009
->   delete mode 100644 tests/nvme/009.out
->   delete mode 100755 tests/nvme/011
->   delete mode 100644 tests/nvme/011.out
->   delete mode 100755 tests/nvme/013
->   delete mode 100644 tests/nvme/013.out
->   delete mode 100755 tests/nvme/015
->   delete mode 100644 tests/nvme/015.out
->   delete mode 100755 tests/nvme/020
->   delete mode 100644 tests/nvme/020.out
->   delete mode 100755 tests/nvme/024
->   delete mode 100644 tests/nvme/024.out
->
+> Other than that, ioc_pd_free() indeed clear 'active_list' before
+> canceling the timer, this patch looks good to me.
+> 
+> Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+
+-- 
+Thanks,
+Nan
 
