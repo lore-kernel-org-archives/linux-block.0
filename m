@@ -1,107 +1,98 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BA416ABE3
-	for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 15:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC91C168B06
+	for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 15:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713452952; cv=none; b=AEFq17OJlYTFLJUWCq2n6TWa8FXZxPev4CI6IkxSQTcovm4bnKrIaLRukeO/AEUan8PWPSxP3qRr93A9WmR00SEa5sa/ioSnH+FKcQsCilsQCkcxq+QHXBz1rA4/nGqIAuw0VInJ7bTjHxXSkuTzy5Y0qnKHtAVra/yQhHWNrMY=
+	t=1713454495; cv=none; b=iWhyepcFwFNbslH0i8JK5r3FHRG6wlahI5ovRi9L5WD6loZripSex+iZ7gNi/GvYvIhgLs7c2K9JU9yvA92coQo+MqNlFKuuX158O8UNx6VIzVtR3AULAwU8EB7bwHLRI5KMOvMpg6/VTD8uzXhpNd2/cp8ebZLppFcpdlgu4nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713452952; c=relaxed/simple;
-	bh=k+6r0GGg1vUggBFS1HFE+EGyXIm1V66bbTL8/78gpIg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tWO2oHltiCCvYjADwAT8PqunQeYV1/NOE+buCWiPELR/ImPXRryICqLb5hNkY3JE4eF8dN5z/nZJwP7IlcqtR5O7e1GEYPnYwlml490LD4bXxJ3k/20tRJgd7nBEr2xkWfYDWbhzS/dbFJW6uhoqg0FvekccWeQVKc22a+js2TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=B1LZJjoU; arc=none smtp.client-ip=209.85.216.52
+	s=arc-20240116; t=1713454495; c=relaxed/simple;
+	bh=RbKeH6m/60YxVDWb4xXr4DtSZxDRH9TvDchql+4hSX0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=m/bAd81hgofGPXOZHuiDaUu7HQzcH01JkqdKeWGJg5tju39LkK6dBY1d6bpHJCd2HHVtg8qmoSW39FzG2B3XZt0ajq094kOPcEatrXYma0eCfSfEpvvDGGNSBP3N5SymOnMkNXesp7sUhEfjWX1Zy7UqLraygLx4z8TRnew5xwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dFI/2LXA; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="B1LZJjoU"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ac074ba920so14810a91.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 08:09:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dFI/2LXA"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6f055602a7bso204593b3a.3
+        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 08:34:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713452950; x=1714057750; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=p9O3FV94jh7vQc95L9k9nvefdNDVfaT9ibGX8CYdkE0=;
-        b=B1LZJjoUCtuOlGcn9U1cjNB8sFIjuVv1mQmVusLC7U5bSe2BDxPeb7PGK/33ad+bqU
-         ko/ZJ8dY9HhSS6fdKjasdd4PV7gPyYyQgDlre+82dSCb/pmvMzXwQagxGYMz+Co+69wi
-         ycdVvJKuCA3aw+qds9laOO3L3eEkCWoW7tdngejNkRT7gEqFxB0GuVo3ZLJ3lo8YqMgM
-         2jTDaScUD5Ca7toegrIE/OZ7gvt6wBA2oikW4pt+IU8Pv3EK2PEVjm7d3x7QKGmKcxWI
-         iucju/+lE0j7ZW+3LaMz7tFKFpMSJ92Q5E+fehRyMVRNx4LADj2qVaDI6fHUvlFNqfSK
-         Of5w==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713454491; x=1714059291; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QtyMTrDAAeLUAVKK4p39pOuDxuloCsZgvVfvLhHVqFQ=;
+        b=dFI/2LXAEIOTWr+rwt3QXcjZnzhjkKijdEMA2QTwddYC5VVuEY7v64jYi8Xa8P4yol
+         hW8qmB6x8SAqrOM74QOUp2y6zOtO5eRmFcmZmF3zdmptULTty/0e2kDhLNwqx4T8PdRo
+         P6mwA87zpUcOthL1nHYi6AVLdKQ57r0xtnNE2TtkBTU0LATCm7x3Pku8GKCscl0NLNUu
+         KDYW53zlEtTFo8EQ/AgGQPA6Nuj4hug0zSlzOsXfPe54mdjA9RMzK6d1rff5zCu2QDwF
+         AYm929UxToajOhUR9SnY51KOAmNsyWHaOtU0PYPe3ignV/PR8Sown3U5g35hHnRo2BDG
+         rVjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713452950; x=1714057750;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p9O3FV94jh7vQc95L9k9nvefdNDVfaT9ibGX8CYdkE0=;
-        b=IFdAjLv39lGYccZnUxlX2G7oPW+kAj6NZHCCE+1SuMQ4WC34ZIS+es5x3lE/ERcXEb
-         pofNkiQ234CMLoTUSp/0TXVBkShwLzB+UJT10hsxMtW8Ag+8IOphoTv1tfB2/bW7Xm1M
-         O2iAt/O2QjG81XiQ62sDIe/PcBlO+ad9NzQ7z7QSkuCQcIWPW/WY+8zlvbKaxARbiQYk
-         pEKvUr+8HjY/sJRyY8Zo3HhS1ZjdYjEgjZmrefftjccgPSbybUqqRGyFHctVOfeWATUD
-         nuX4/PBEs9n+nBPDjnfojG3Z/ByQQl7Vg8S/s9usXg6JWa9LQGN5zmVLCRzTb3W136dx
-         uSuw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMfwRv4cGP6hhPwRezNgU5MLWFt7Zzg4K0NXoS7VEbNGp4eaUijJtOv999hv9XyKHwciMVBr/EbHKsI1rbkLjzG7MMWsAUC2eGpVU=
-X-Gm-Message-State: AOJu0Yw4nu9d64alIZYAvu+8OBTzRE3AIEq32TmOHo7V2fLCbJkU4jdS
-	1yHOX1S7LgpgKWajx9tvKvbXRR7CA+u6g5zY3izfqyT0zqbZrHBCbM5jXpb7Fdw=
-X-Google-Smtp-Source: AGHT+IEpDI3SLb6DK8eESf91mbfRxTkqd15fvUPDNtPee/hawli5VCPVwcKmvtkaX2PmBdDDW5btOg==
-X-Received: by 2002:a17:90a:7e0e:b0:2a3:be48:23f3 with SMTP id i14-20020a17090a7e0e00b002a3be4823f3mr2885933pjl.4.1713452949760;
-        Thu, 18 Apr 2024 08:09:09 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id s22-20020a17090aa11600b002ab664e5e17sm1547775pjp.1.2024.04.18.08.09.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Apr 2024 08:09:09 -0700 (PDT)
-Message-ID: <362c3c63-6fd9-401c-9281-e2e0c7efc14a@kernel.dk>
-Date: Thu, 18 Apr 2024 09:09:07 -0600
+        d=1e100.net; s=20230601; t=1713454491; x=1714059291;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QtyMTrDAAeLUAVKK4p39pOuDxuloCsZgvVfvLhHVqFQ=;
+        b=rNRadQWnrnui9+yxUCgRUrbgVJlXzgJn7hfKkfuAc8KuMHX4ppbfRkigE0o2En+e+z
+         83G+27sSqiPkv9lsFWFlyIpTW1LVkGIg4gThbgiWd8nRpoNmnVtnABBNhXerH2nPuvBK
+         FcjFT6AXgr9+UCUfmOwUytWABqKxhjE5fZJMf6wLOTxqrzZUbDIDLLBnZiQcqzQCzhJj
+         DysP68aQJfM9NTClFY1+CNTRFjH5X7kDZg4iBCaA0tKtsfc+dvzbzjVAo0z9OCDfxVvc
+         /3TUuIuzlgGF9ie1SZSXYOUrrfYGrrpFoRabS4FOjB3Gfs3mKPWZ8ywC3I0zywZv/qDA
+         eXMA==
+X-Gm-Message-State: AOJu0YxHZ05K90S/ZYMyPFtDMF1K9L95kNUlSLBNs2D9bnyoxVuFAPfk
+	/7ZcPUifP92wiHRVheuGSDIf9u8Zh1TxBTXuhuKZUX3bwVKbmOkKudO382iw4cGXw65hGNVghyx
+	r
+X-Google-Smtp-Source: AGHT+IHPAyQqOdq7gsbQjinvOYY9ex6ui3WquoEH41gImSXT65fYaLXbN3XZI7/0yfr2TOxlG+4sQA==
+X-Received: by 2002:a05:6a20:1581:b0:1a7:94ba:7b03 with SMTP id h1-20020a056a20158100b001a794ba7b03mr4195480pzj.6.1713454491665;
+        Thu, 18 Apr 2024 08:34:51 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id k73-20020a636f4c000000b005dc4fc80b21sm1559816pgc.70.2024.04.18.08.34.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 08:34:51 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, saranyamohan@google.com, 
+ shinichiro.kawasaki@wdc.com
+In-Reply-To: <20240417144743.2277601-1-hch@lst.de>
+References: <20240417144743.2277601-1-hch@lst.de>
+Subject: Re: [PATCH v2] block: propagate partition scanning errors to the
+ BLKRRPART ioctl
+Message-Id: <171345449077.438677.10984470002252005040.b4-ty@kernel.dk>
+Date: Thu, 18 Apr 2024 09:34:50 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] completion: move blk_wait_io to
- kernel/sched/completion.c
-Content-Language: en-US
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Mike Snitzer <msnitzer@redhat.com>,
- Damien Le Moal <dlemoal@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
- Guangwu Zhang <guazhang@redhat.com>, dm-devel@lists.linux.dev,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <31b118f3-bc8d-b18b-c4b9-e57d74a73f@redhat.com>
- <20240417175538.GP40213@noisy.programming.kicks-ass.net>
- <546473fd-ca4b-3c64-349d-cc739088b748@redhat.com>
- <ZiCoIHFLAzCva2lU@infradead.org>
- <5f3d434b-e05c-445f-bee5-2bb1f11a5946@kernel.dk>
- <ZiEyLvL6Pq_RB-Eh@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZiEyLvL6Pq_RB-Eh@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 4/18/24 8:46 AM, Christoph Hellwig wrote:
-> On Thu, Apr 18, 2024 at 08:30:14AM -0600, Jens Axboe wrote:
->> It certainly is a hack/work-around, but unless there are a lot more that
->> should be using something like this, I don't think adding extra core
->> complexity in terms of a special task state (or per-task flag, at least
->> that would be easier) is really warranted.
+
+On Wed, 17 Apr 2024 16:47:43 +0200, Christoph Hellwig wrote:
+> Commit 4601b4b130de ("block: reopen the device in blkdev_reread_part")
+> lost the propagation of I/O errors from the low-level read of the
+> partition table to the user space caller of the BLKRRPART.
 > 
-> Basically any kernel thread doing on-demand work has the same problem.
-> It just has an easier workaround hack, as the kernel threads can simply
-> claim to do an interruptible sleep to not trigger the softlockup
-> warnings.
+> Apparently some user space relies on, so restore the propagation.  This
+> isn't exactly pretty as other block device open calls explicitly do not
+> are about these errors, so add a new BLK_OPEN_STRICT_SCAN to opt into
+> the error propagation.
+> 
+> [...]
 
-A kernel thread can just use TASK_INTERRUPTIBLE, as it doesn't take
-signals anyway. But yeah, I guess you could view that as a work-around
-as well.
+Applied, thanks!
 
-Outside of that, mostly only a block problem, where our sleep is always
-uninterruptible. Unless there are similar hacks elsewhere in the kernel
-that I'm not aware of?
+[1/1] block: propagate partition scanning errors to the BLKRRPART ioctl
+      commit: 752863bddacab6b5c5164b1df8c8b2e3a175ee28
 
+Best regards,
 -- 
 Jens Axboe
+
+
 
