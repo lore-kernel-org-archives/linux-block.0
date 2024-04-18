@@ -1,112 +1,120 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33894EB45;
-	Thu, 18 Apr 2024 07:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDB42E403;
+	Thu, 18 Apr 2024 08:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713425557; cv=none; b=RDZowdvyT5tQ+r72HtqpbWoysihIxuynTU1Dg4/M10bCrbIy7do5vgG/4Zj24GMHwUwMkvATDbcO+DblC5XvTchYsydJ1Ss+KN705ZvXOPudXXid51qSnvxnXhe7AhutQoDSrZZyfm+cFjzme56gf362LwMeedNyV4Iu7FHLI/s=
+	t=1713430352; cv=none; b=EQXAVFi36fX0OKKV1liKFvEUehO17aG/Uj7tcPeND2ImLAJVg+Y1QXXcIIvTBoS19dUJcySe9hLHGkIYWxLlmnjYOoKIfeJJBVs/H1yzUasn+2Cy89lpoonGgyVIz1TohLHEowEi5fu//MjPj6gpFHi8atphpF+b4B3uxpB2V8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713425557; c=relaxed/simple;
-	bh=h7PVw/s5YkA2E6D/+aBzDZKszhArG5Oeh3JVPlHIBSI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r3XEftZ7kDOOl90od4ifQE5nUYYmY4gcHUbNysmZUYwNMTxFnIFNSSGAK6wAfzyCNHxEakiFQDwwnpD4u1jwW+Z4KM9pIANLDg1oAC38/VTqgTqCoiv6q2qrwg5e65WdfKTpsHI83VoC6TpoEY0izMCdjXztV55+q1V9WxC8LiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1713430352; c=relaxed/simple;
+	bh=/9FaQAMTMG4Df8jyveTTcRCul4tuZb79MWaz9DUKm8g=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=h4zD6ihhOp6jStYyK+D/OUOTFNlR4qDlQRQX45AMp33t9LY4hFsgxvYXoKmF7Ut7QGXz2NILFyn5GOniXfYcj91OJrbYTXe4wMdDPAzKx5d8xck1tlCnyq75zKS4KFoAjQHsnnmNOTbQHAzW5nGH8iJzZZAwhcrYmkAtjcsTz6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VKqHD6cJ3z4f3kFb;
-	Thu, 18 Apr 2024 15:32:24 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VKs3P2grlz4f3p0g;
+	Thu, 18 Apr 2024 16:52:17 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 27D831A0175;
-	Thu, 18 Apr 2024 15:32:32 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgDHlxCOzCBmBygqKQ--.12535S4;
-	Thu, 18 Apr 2024 15:32:31 +0800 (CST)
-From: linan666@huaweicloud.com
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: hch@lst.de,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linan666@huaweicloud.com,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	houtao1@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH] blk-iocost: do not WARNING if iocg has already offlined
-Date: Thu, 18 Apr 2024 15:23:40 +0800
-Message-Id: <20240418072340.2090877-1-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	by mail.maildlp.com (Postfix) with ESMTP id 527981A0568;
+	Thu, 18 Apr 2024 16:52:26 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgAn9g5I3yBmNfwuKQ--.33271S3;
+	Thu, 18 Apr 2024 16:52:26 +0800 (CST)
+Subject: Re: [PATCH] blk-iocost: do not WARNING if iocg has already offlined
+To: linan666@huaweicloud.com, tj@kernel.org, josef@toxicpanda.com,
+ axboe@kernel.dk
+Cc: hch@lst.de, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, houtao1@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240418072340.2090877-1-linan666@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <75a8212a-a6ff-416c-7bce-0f4036a4abc0@huaweicloud.com>
+Date: Thu, 18 Apr 2024 16:52:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20240418072340.2090877-1-linan666@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDHlxCOzCBmBygqKQ--.12535S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7WryxtrW3tryUXFWxJr4rGrg_yoW8WFWDpF
-	4agwnFkF1jqr13KF4kK3Z2q348uan5Wws3Jw4fWrZ8Za4fur1xX3Z7Zr4YyFySqrn5AFs3
-	ZF48G3y7Aa1UWaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAKI4
-	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
-	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
-	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
-	Y4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUBSoJUUUUU=
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-CM-TRANSID:cCh0CgAn9g5I3yBmNfwuKQ--.33271S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF17Gw13KFW7Wr4Uury5CFg_yoW8Zw1DpF
+	45KwnrCF1jqr12kan2q3Z2q348uan5Xws3Jws3Wr15ZFyfur1Iq3Wkur4YqFy0vrn5AFsx
+	ZF4xK3yxJa1UuaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UWE__UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Li Nan <linan122@huawei.com>
 
-In iocg_pay_debt(), warn is triggered if 'active_list' is empty, which
-is intended to confirm iocg is avitve when it has debt. However, warn
-can be triggered during removing cgroup controller, as
-iocg_waitq_timer_fn() is awakened at that time.
 
-  WARNING: CPU: 0 PID: 2344971 at block/blk-iocost.c:1402 iocg_pay_debt+0x14c/0x190
-  Call trace:
-  iocg_pay_debt+0x14c/0x190
-  iocg_kick_waitq+0x438/0x4c0
-  iocg_waitq_timer_fn+0xd8/0x130
-  __run_hrtimer+0x144/0x45c
-  __hrtimer_run_queues+0x16c/0x244
-  hrtimer_interrupt+0x2cc/0x7b0
+ÔÚ 2024/04/18 15:23, linan666@huaweicloud.com Ð´µÀ:
+> From: Li Nan <linan122@huawei.com>
+> 
+> In iocg_pay_debt(), warn is triggered if 'active_list' is empty, which
+> is intended to confirm iocg is avitve when it has debt. However, warn
+> can be triggered during removing cgroup controller, as
+> iocg_waitq_timer_fn() is awakened at that time.
+> 
+>    WARNING: CPU: 0 PID: 2344971 at block/blk-iocost.c:1402 iocg_pay_debt+0x14c/0x190
 
-The warn in this situation is meaningless. Since this iocg is being
-removed, the state of the 'active_list' is irrelevant, and 'waitq_timer'
-is canceled after removing 'active_list' in ioc_pd_free(), which ensure
-iocg is freed after iocg_waitq_timer_fn() returns.
+This line doesn't match the code from mainline, please mention that
+which kernel release you're testing.
 
-Therefore, add the check if iocg has already offlined to avoid warn
-when removing cgroup controller.
+Other than that, ioc_pd_free() indeed clear 'active_list' before
+canceling the timer, this patch looks good to me.
 
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- block/blk-iocost.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index baa20c85799d..2e109c016a39 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1440,7 +1440,7 @@ static void iocg_pay_debt(struct ioc_gq *iocg, u64 abs_vpay,
- 	lockdep_assert_held(&iocg->waitq.lock);
- 
- 	/* make sure that nobody messed with @iocg */
--	WARN_ON_ONCE(list_empty(&iocg->active_list));
-+	WARN_ON_ONCE(list_empty(&iocg->active_list) && iocg->pd.online);
- 	WARN_ON_ONCE(iocg->inuse > 1);
- 
- 	iocg->abs_vdebt -= min(abs_vpay, iocg->abs_vdebt);
--- 
-2.39.2
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+>    Call trace:
+>    iocg_pay_debt+0x14c/0x190
+>    iocg_kick_waitq+0x438/0x4c0
+>    iocg_waitq_timer_fn+0xd8/0x130
+>    __run_hrtimer+0x144/0x45c
+>    __hrtimer_run_queues+0x16c/0x244
+>    hrtimer_interrupt+0x2cc/0x7b0
+> 
+> The warn in this situation is meaningless. Since this iocg is being
+> removed, the state of the 'active_list' is irrelevant, and 'waitq_timer'
+> is canceled after removing 'active_list' in ioc_pd_free(), which ensure
+> iocg is freed after iocg_waitq_timer_fn() returns.
+> 
+> Therefore, add the check if iocg has already offlined to avoid warn
+> when removing cgroup controller.
+> 
+> Signed-off-by: Li Nan <linan122@huawei.com>
+> ---
+>   block/blk-iocost.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index baa20c85799d..2e109c016a39 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -1440,7 +1440,7 @@ static void iocg_pay_debt(struct ioc_gq *iocg, u64 abs_vpay,
+>   	lockdep_assert_held(&iocg->waitq.lock);
+>   
+>   	/* make sure that nobody messed with @iocg */
+> -	WARN_ON_ONCE(list_empty(&iocg->active_list));
+> +	WARN_ON_ONCE(list_empty(&iocg->active_list) && iocg->pd.online);
+>   	WARN_ON_ONCE(iocg->inuse > 1);
+>   
+>   	iocg->abs_vdebt -= min(abs_vpay, iocg->abs_vdebt);
+> 
 
