@@ -1,98 +1,131 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC91C168B06
-	for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 15:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C73156F54;
+	Thu, 18 Apr 2024 16:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713454495; cv=none; b=iWhyepcFwFNbslH0i8JK5r3FHRG6wlahI5ovRi9L5WD6loZripSex+iZ7gNi/GvYvIhgLs7c2K9JU9yvA92coQo+MqNlFKuuX158O8UNx6VIzVtR3AULAwU8EB7bwHLRI5KMOvMpg6/VTD8uzXhpNd2/cp8ebZLppFcpdlgu4nI=
+	t=1713456873; cv=none; b=Y/Vpjy+ifdg0dze4F+88AptmgZakR4AKMKLhiKQcUzN1c17gB+8q/BpMCQrNVpAvIOsUDU9c8UAahIsC6mjm9f+64GR5YWYr2knqA3kXZ8dd9G2m6jjMdnmJ20+blxBS1isYam/YeAWfOZ8K3hlMgh027gYIKwXC12HczuA3Pug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713454495; c=relaxed/simple;
-	bh=RbKeH6m/60YxVDWb4xXr4DtSZxDRH9TvDchql+4hSX0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=m/bAd81hgofGPXOZHuiDaUu7HQzcH01JkqdKeWGJg5tju39LkK6dBY1d6bpHJCd2HHVtg8qmoSW39FzG2B3XZt0ajq094kOPcEatrXYma0eCfSfEpvvDGGNSBP3N5SymOnMkNXesp7sUhEfjWX1Zy7UqLraygLx4z8TRnew5xwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dFI/2LXA; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1713456873; c=relaxed/simple;
+	bh=9r4p8A+grzt9+R6tG2B3r+bIJI41c+ksyzkS1k6re2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hpwsWFJWQZlF+qnl/ybwYpAFtqpVU3WMWGRs4P4k9/kJldBMn+vlpsQ4hSGzb+8TcBp7mawF5zB43ateccHY3T/Geu8fj3GRYqEFkqW4GDL9tMB+nVL5J04B4lhQYSjTCeus+x4mIOsCKqgGMx72i5u3jVKmGj/QlSrxHeTn2KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gDVYX5TI; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dFI/2LXA"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6f055602a7bso204593b3a.3
-        for <linux-block@vger.kernel.org>; Thu, 18 Apr 2024 08:34:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gDVYX5TI"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e40042c13eso8650525ad.2;
+        Thu, 18 Apr 2024 09:14:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713454491; x=1714059291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QtyMTrDAAeLUAVKK4p39pOuDxuloCsZgvVfvLhHVqFQ=;
-        b=dFI/2LXAEIOTWr+rwt3QXcjZnzhjkKijdEMA2QTwddYC5VVuEY7v64jYi8Xa8P4yol
-         hW8qmB6x8SAqrOM74QOUp2y6zOtO5eRmFcmZmF3zdmptULTty/0e2kDhLNwqx4T8PdRo
-         P6mwA87zpUcOthL1nHYi6AVLdKQ57r0xtnNE2TtkBTU0LATCm7x3Pku8GKCscl0NLNUu
-         KDYW53zlEtTFo8EQ/AgGQPA6Nuj4hug0zSlzOsXfPe54mdjA9RMzK6d1rff5zCu2QDwF
-         AYm929UxToajOhUR9SnY51KOAmNsyWHaOtU0PYPe3ignV/PR8Sown3U5g35hHnRo2BDG
-         rVjw==
+        d=gmail.com; s=20230601; t=1713456870; x=1714061670; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hz5AqVbMIQVzagVfr43mCYrmlccOEhqDHxOQ5R4Qr/E=;
+        b=gDVYX5TIIEl+Kx4MhzpPKClTswucuZYXmJvfeTWcT0+7p5Epf9n2Cq2dgBWcYPhL48
+         shwZE8RZO1GCRmN3awT+MPCBEu4KEc99dgubD/0GIzXIWRBdstxJI2bH2C3jg8A9pw6w
+         ogJUWw7LmUVn4rvo597SmF6bqB17gAxBVsxnjp2zaNGhEUe7Fg+fXtY8P9TVFzE1O3E5
+         3W32Q8Y9Wv02VBBkDM1Ep4Nfcya/dCm2kVcOu9fUGHongZWPyaar6prv55atK/rcNU0n
+         jq6oRyBhszwKOC+YNa/TvOxOtaNKjriehlC6zyp63c1Sd5kIFlL4pE1acRL7q4XwJFYP
+         MaAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713454491; x=1714059291;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713456870; x=1714061670;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QtyMTrDAAeLUAVKK4p39pOuDxuloCsZgvVfvLhHVqFQ=;
-        b=rNRadQWnrnui9+yxUCgRUrbgVJlXzgJn7hfKkfuAc8KuMHX4ppbfRkigE0o2En+e+z
-         83G+27sSqiPkv9lsFWFlyIpTW1LVkGIg4gThbgiWd8nRpoNmnVtnABBNhXerH2nPuvBK
-         FcjFT6AXgr9+UCUfmOwUytWABqKxhjE5fZJMf6wLOTxqrzZUbDIDLLBnZiQcqzQCzhJj
-         DysP68aQJfM9NTClFY1+CNTRFjH5X7kDZg4iBCaA0tKtsfc+dvzbzjVAo0z9OCDfxVvc
-         /3TUuIuzlgGF9ie1SZSXYOUrrfYGrrpFoRabS4FOjB3Gfs3mKPWZ8ywC3I0zywZv/qDA
-         eXMA==
-X-Gm-Message-State: AOJu0YxHZ05K90S/ZYMyPFtDMF1K9L95kNUlSLBNs2D9bnyoxVuFAPfk
-	/7ZcPUifP92wiHRVheuGSDIf9u8Zh1TxBTXuhuKZUX3bwVKbmOkKudO382iw4cGXw65hGNVghyx
-	r
-X-Google-Smtp-Source: AGHT+IHPAyQqOdq7gsbQjinvOYY9ex6ui3WquoEH41gImSXT65fYaLXbN3XZI7/0yfr2TOxlG+4sQA==
-X-Received: by 2002:a05:6a20:1581:b0:1a7:94ba:7b03 with SMTP id h1-20020a056a20158100b001a794ba7b03mr4195480pzj.6.1713454491665;
-        Thu, 18 Apr 2024 08:34:51 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id k73-20020a636f4c000000b005dc4fc80b21sm1559816pgc.70.2024.04.18.08.34.50
+        bh=hz5AqVbMIQVzagVfr43mCYrmlccOEhqDHxOQ5R4Qr/E=;
+        b=mfP1Xkpryo6fN5ojqGj3aqMjUMeUJhTeXX6JVKQhuSy4+Lrsqc9nJDygAtZBojOjBw
+         vUpO9oqL31exUPHmZ12ouyVclCPDVQnfokItcIjMKoEb8OxIT4riQ72OAPZc1RkIdRTO
+         Gf4RMXnpTSxvrbaGEywyeX2vtxswYHCAS39+wE2RhZRNucpwrHAK8byLxdSODRlwGxnK
+         cE7ZTwGgJKRECgm6gsOHwxL/U4V0hH7iCJu2PvrtpSRCzhKRuXvsZoY9W/ZXYvCv5WBL
+         QnufYy0jJAzs2A0zUW6ldJ9Sqw38eFh7ZqrQytR8nnHhrFEZcS5RUxixsAM56ZevsHlH
+         aRYw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvMtvtEmjiMiRCvyqvWnTpRDF+wBqrzNszQMwv5yqIbM4F9ckRooARQ0og0ghjC0byAM9QMz4DIUAWaacNX7dJC7Gl9IyLX+2zXtd0lHZXyGl53r0TjlJxUiyQtP8Afm+H12Ca42WdFTyxojvcLFgtQrpU+pPsT16KhdbvaaD1XN4i
+X-Gm-Message-State: AOJu0Yz+MsxDlzyeR2Y8w9b9dRHwDQwyiEuiWGE3+VHe3X2XtPdXOJBl
+	gZ1hxBbXCW0RgDMQ9tEqZZlu6mWnccDNHnIN154fyX0y/e0wzNOx
+X-Google-Smtp-Source: AGHT+IEMg34T9/sHL1htsox4qC0LnWXh8YAzs15J15MH+wNZC7UiWdVMZSp+B14Rj9cBheMe3xORLg==
+X-Received: by 2002:a17:902:ec92:b0:1e4:9ac6:1f3f with SMTP id x18-20020a170902ec9200b001e49ac61f3fmr4223968plg.5.1713456869965;
+        Thu, 18 Apr 2024 09:14:29 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:6f51])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170902a50a00b001e0da190a07sm1707307plq.167.2024.04.18.09.14.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 08:34:51 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, saranyamohan@google.com, 
- shinichiro.kawasaki@wdc.com
-In-Reply-To: <20240417144743.2277601-1-hch@lst.de>
-References: <20240417144743.2277601-1-hch@lst.de>
-Subject: Re: [PATCH v2] block: propagate partition scanning errors to the
- BLKRRPART ioctl
-Message-Id: <171345449077.438677.10984470002252005040.b4-ty@kernel.dk>
-Date: Thu, 18 Apr 2024 09:34:50 -0600
+        Thu, 18 Apr 2024 09:14:29 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Thu, 18 Apr 2024 06:14:28 -1000
+From: Tejun Heo <tj@kernel.org>
+To: linan666@huaweicloud.com
+Cc: josef@toxicpanda.com, axboe@kernel.dk, hch@lst.de,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+	yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH] blk-iocost: do not WARNING if iocg has already offlined
+Message-ID: <ZiFG5KtGGpYdOmnY@slm.duckdns.org>
+References: <20240418072340.2090877-1-linan666@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418072340.2090877-1-linan666@huaweicloud.com>
 
+Hello,
 
-On Wed, 17 Apr 2024 16:47:43 +0200, Christoph Hellwig wrote:
-> Commit 4601b4b130de ("block: reopen the device in blkdev_reread_part")
-> lost the propagation of I/O errors from the low-level read of the
-> partition table to the user space caller of the BLKRRPART.
+On Thu, Apr 18, 2024 at 03:23:40PM +0800, linan666@huaweicloud.com wrote:
+> From: Li Nan <linan122@huawei.com>
 > 
-> Apparently some user space relies on, so restore the propagation.  This
-> isn't exactly pretty as other block device open calls explicitly do not
-> are about these errors, so add a new BLK_OPEN_STRICT_SCAN to opt into
-> the error propagation.
+> In iocg_pay_debt(), warn is triggered if 'active_list' is empty, which
+> is intended to confirm iocg is avitve when it has debt. However, warn
+> can be triggered during removing cgroup controller, as
+
+Maybe saying "a blkcg is being removed" is clearer?
+
+> iocg_waitq_timer_fn() is awakened at that time.
 > 
-> [...]
+>   WARNING: CPU: 0 PID: 2344971 at block/blk-iocost.c:1402 iocg_pay_debt+0x14c/0x190
+>   Call trace:
+>   iocg_pay_debt+0x14c/0x190
+>   iocg_kick_waitq+0x438/0x4c0
+>   iocg_waitq_timer_fn+0xd8/0x130
+>   __run_hrtimer+0x144/0x45c
+>   __hrtimer_run_queues+0x16c/0x244
+>   hrtimer_interrupt+0x2cc/0x7b0
+> 
+> The warn in this situation is meaningless. Since this iocg is being
+> removed, the state of the 'active_list' is irrelevant, and 'waitq_timer'
+> is canceled after removing 'active_list' in ioc_pd_free(), which ensure
+> iocg is freed after iocg_waitq_timer_fn() returns.
+> 
+> Therefore, add the check if iocg has already offlined to avoid warn
+> when removing cgroup controller.
+> 
+> Signed-off-by: Li Nan <linan122@huawei.com>
+> ---
+>  block/blk-iocost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index baa20c85799d..2e109c016a39 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -1440,7 +1440,7 @@ static void iocg_pay_debt(struct ioc_gq *iocg, u64 abs_vpay,
+>  	lockdep_assert_held(&iocg->waitq.lock);
+>  
+>  	/* make sure that nobody messed with @iocg */
+> -	WARN_ON_ONCE(list_empty(&iocg->active_list));
+> +	WARN_ON_ONCE(list_empty(&iocg->active_list) && iocg->pd.online);
 
-Applied, thanks!
+Can you add a comment explaining why we need the pd.online test?
 
-[1/1] block: propagate partition scanning errors to the BLKRRPART ioctl
-      commit: 752863bddacab6b5c5164b1df8c8b2e3a175ee28
+Other than the above nits, looks great to me. Please feel free to add
 
-Best regards,
+  Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-Jens Axboe
-
-
-
+tejun
