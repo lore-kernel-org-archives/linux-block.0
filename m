@@ -1,55 +1,79 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF5644C7B;
-	Wed, 17 Apr 2024 20:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C726FA7;
+	Thu, 18 Apr 2024 02:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713386717; cv=none; b=jDH5xuLJbG6r20B3n2TKYje3AqesRpXvVO14WZOltwBqFmWSrGieeypIul6zYr4obzIm9UsTZfK1hbSttOatNxUrlXYfb4wDfqXFh5SB9OKbazGHR0Qv8cYc2CjVcsw1TVNJqKyTaL7jKNhspz1P8qk62sGOCCizqbMbr2RzEzw=
+	t=1713405918; cv=none; b=p7fqcBu9PztgeT+Mlz0OwuN9feBNT7BfGhidY3trEmst6SvB0m8H4Ph4DdasKXBoB/6qGyzz/RNARBEwE6CWIYMNwsV+OXVKsv60uQjaLUqC/z8BNueUCbmRQNg1R4aM+HsGubh6Xqav9pq1jH02fXZ8lLs6gqv5ZRzWpq15cxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713386717; c=relaxed/simple;
-	bh=wlIgsqiPUF9bkmZTjmmRjmIDrDC3JSbRWMjul89Oki8=;
+	s=arc-20240116; t=1713405918; c=relaxed/simple;
+	bh=73LVQrfjmvrDVO+kAsF3UE4WMxKTnsJSv1IvmJzeqnM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KgeGLye2Tw3wUn1nzHJysjkfFWAkQgSmpsg/C1WZjyEWIHQd8rYTYpFrEmV8jeiIV7a0QZr9kotucruZyFeLKSZk3BGNWE2sPvPY8fSKIQQW63oUy0jE6qLnau5DJL4VAp+hfSPeF8OdERoP+3Oqq3h9+tIOj8xvvixHnW6YJ8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=au2DcBRj; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	 Content-Type:Content-Disposition:In-Reply-To; b=s/20haU11nwrJ4rUzpsk8F0oLWkbVLvVTaohdIHVjp3tbMLbFXIL195KJ6kJyFrDN3gZFrgoc4roVTbCOD21NpFR1P7/TEhWsOAVJZPiOuAUBXSSJR82UidZpWnYsFEyTMtZLB3zwhp9ZvhZwGacttKV9cXyJEeEplJmMaKrGus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Plf0jScj; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="au2DcBRj"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=BvHSSwDgZvfid1sqlQ1o/inIrOdXBqnLwTqg0dZSKDY=; b=au2DcBRjLagu7riDaYwmuhQlr8
-	1sN/vD6VJwfFlUQEDBtksahdUlaFRNeq7KD8l4pO+a5xnsn7CYm6uxK4mZwvxxnTuPJYYfWH3RssR
-	8ZOZRlGfQvUTbuxz8mQT596e8AQZX2nQp+ZEDi1Vd0wVmAvquUPxnbz5uYoyBna+UIW8vTzgFF08w
-	YZr7C+F35vr+O+nLFUUSktfpoEgGd4IVaVwIt+zV6HsNapeXMGxQZWV+rK0FWrIzgrFHAhD7xmeh6
-	S+T8rLkiEcNIReTcDGXGCwqddPljPoZKqnn3BLcn/N01SZOcICi1zTgx1IsnQb84lk0Btz9r/tWM4
-	4zSWze/w==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rxC9P-00EdzQ-24;
-	Wed, 17 Apr 2024 20:45:03 +0000
-Date: Wed, 17 Apr 2024 21:45:03 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
-	axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>,
-	Christian Brauner <brauner@kernel.org>, linux-pm@vger.kernel.org
-Subject: [RFC] set_blocksize() in kernel/power/swap.c (was Re: [PATCH vfs.all
- 22/26] block: stash a bdev_file to read/write raw blcok_device)
-Message-ID: <20240417204503.GD2118490@ZenIV>
-References: <49f99e7b-3983-8074-bb09-4b093c1269d1@huaweicloud.com>
- <20240410105911.hfxz4qh3n5ekrpqg@quack3>
- <20240410223443.GG2118490@ZenIV>
- <20240411-logik-besorgen-b7d590d6c1e9@brauner>
- <20240411140409.GH2118490@ZenIV>
- <20240412-egalisieren-fernreise-71b1f21f8e64@brauner>
- <20240412112919.GN2118490@ZenIV>
- <20240413-hievt-zweig-2e40ac6443aa@brauner>
- <20240415204511.GV2118490@ZenIV>
- <20240416063253.GA2118490@ZenIV>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Plf0jScj"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ecf8ebff50so265378b3a.1;
+        Wed, 17 Apr 2024 19:05:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713405916; x=1714010716; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dav8LT6ZkkrV7Xf+PoaKXV2rDAf6ehRkqp4ZSiFp8Pw=;
+        b=Plf0jScj9/RJij99whXZri6LT+ABti5q77T/LGzxC/Oqp3hxfmqAUwhFlbPTK7bpqz
+         batTTtbYzmw0FMiclbfsc+cMPs3WIexEwggq2OVpAxZ/g08dJy0jE+p4fzyQSNstyI1a
+         hPEtaVLdKUWpXuVj6clEFFvHVYSoYuW48XnpbKSgv8LW3ix4oImd/DmbVuAN+TKDZYwp
+         57LTkShShZ9pq4z6HKlDW1oqug5rrT+YFyfQwU7stqoapLXO/BVSO9GXU/2ObYjNJFkj
+         yobZ2X7thuATGMCva2Bw5rMchcJxrQoiEzqOdxsJqZDU3qfPUfdYQUTnFbeTy7572TOW
+         laMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713405916; x=1714010716;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dav8LT6ZkkrV7Xf+PoaKXV2rDAf6ehRkqp4ZSiFp8Pw=;
+        b=es0qaIztMqPnLr0SgvI1g9kOukgmMQoAE9szrBCLjB+3VtRCh+FgND3YUb0WcZwM5x
+         bFM3E7kEhrO3f1Vto10AvCJLiUGScMhMd7UANPOWDDwoTi6F0KYoKJE5weXHuxuCEV1z
+         0FDMMElcxmPbIrY7FQNGqlTAQsrBVqrWncd2m0RxJDSjWbWTgmOy/U3+ZtYM9CNI7GEC
+         feyaMLoXoRppLxkqVqw2kVjFath9Mty/1dOTnYv+2NeNUR4oFaWEkwdQOSiwugVXILb0
+         v8KN/pm1O2TpgZtCaOCaQakt82C0/+KSyM44J9ALjzTa5sxq0hryA+t4QZExEW/l3XQ7
+         s5Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZMCFiwHgbKH9U33+fmwX46EfpigrvDlO0P7e/CzJpGX4Fgf90mieVGqssO7OyMW70NoI6oB49dOPkNOu/XEqy+c2WzSrsD3CjVVyNnDeMVey7STIj8/0GoWQ/trusigo5uITrRu0My1to0Va5ZeOHp3HjgVzPS9t3E31pdunS29o7
+X-Gm-Message-State: AOJu0YyOD8XxleZqPCwuNHySQSaAtSSQYXJORm9aJhUjg9YYm8XVBxwS
+	R23K9nG3u7CjbZUwzyhcc/KhoNXok2HoDiA/mG7gCa63PhInze6p
+X-Google-Smtp-Source: AGHT+IG5SxIK07Q/miAgOz8egYZfpCoEBFkaUYGR29gIiRkZu7799/SYMMBv2tExbxkUjc8I2ntfzA==
+X-Received: by 2002:a05:6a00:2789:b0:6ed:4b2d:a764 with SMTP id bd9-20020a056a00278900b006ed4b2da764mr1361359pfb.11.1713405916495;
+        Wed, 17 Apr 2024 19:05:16 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:6f51])
+        by smtp.gmail.com with ESMTPSA id k26-20020aa7821a000000b006ed8379fe7csm350584pfi.75.2024.04.17.19.05.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 19:05:16 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 17 Apr 2024 16:05:14 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, chenhuacai@kernel.org, josef@toxicpanda.com,
+	jhs@mojatatu.com, svenjoac@gmx.de, raven@themaw.net,
+	pctammela@mojatatu.com, qde@naccy.de, zhaotianrui@loongson.cn,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, cgroups@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH RFC v2 5/6] blk-throttle: support to destroy throtl_data
+ when blk-throttle is disabled
+Message-ID: <ZiB_2ryBOxq2_IyG@slm.duckdns.org>
+References: <20240406080059.2248314-1-yukuai1@huaweicloud.com>
+ <20240406080059.2248314-6-yukuai1@huaweicloud.com>
+ <Zhl37slglnnTSMO7@slm.duckdns.org>
+ <1bb85208-1224-77dc-f0b2-7b7a228ef70b@huaweicloud.com>
+ <Zh6wx4mXZy_EOViH@slm.duckdns.org>
+ <19086c09-3060-a4ce-4ac6-811a29653979@huaweicloud.com>
+ <Zh8kPGAu2TG4Su2M@slm.duckdns.org>
+ <1ed63126-d2e6-f0b6-42ef-127ecb464955@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,19 +82,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240416063253.GA2118490@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <1ed63126-d2e6-f0b6-42ef-127ecb464955@huaweicloud.com>
 
-On Tue, Apr 16, 2024 at 07:32:53AM +0100, Al Viro wrote:
+Hello,
 
-> kernel/power/swap.c:371:        res = set_blocksize(file_bdev(hib_resume_bdev_file), PAGE_SIZE);
-> kernel/power/swap.c:1577:               set_blocksize(file_bdev(hib_resume_bdev_file), PAGE_SIZE);
-> 	Special cases (for obvious reasons); said that, why do we bother
-> with set_blocksize() on those anyway?
+On Wed, Apr 17, 2024 at 09:39:43AM +0800, Yu Kuai wrote:
+...
+> I guess I'll do lazy init first, and then modularization for rq_qos,
+> and leave blk-throtl there for now. Perhaps add a new throtl model in
+> iocost can replace blk-throtl in the future.
 
-AFAICS, we really don't need either - all IO is done via hib_submit_io(),
-which sets a single-page bio and feeds it to submit_bio{,_wait}()
-directly.  We are *not* using the page cache of the block device
-in question, let alone any buffer_head instances.
+That sounds like a plan.
 
-Could swsusp folks comment?
+> BTW, currently during test of iocost, I found that iocost can already
+> achieve that, for example, by following configure:
+> 
+> echo "$dev enable=1 min=100 max=100" > qos
+> echo "$dev wbps=4096 wseqiops=1 wrandiops=1" > model
+> 
+> In the test, I found that wbps and iops is actually limited to the
+> set value.
+
+Yeah, it shouldn't be too difficult to add .max support to iocost so that
+you can say something like "this cgroup subtree can't use more than 60% of
+available capacity". That'd be really cool to have.
+
+Thanks.
+
+-- 
+tejun
