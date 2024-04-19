@@ -1,110 +1,105 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC90712BEBE;
-	Fri, 19 Apr 2024 13:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A8C12D759
+	for <linux-block@vger.kernel.org>; Fri, 19 Apr 2024 14:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713534144; cv=none; b=eng2nG/D6iD+39DNu9lGmZjYhvVN34eq+rJhjsJXIHuMhUIz/oNZapnpx93q3BGzSS5dNK7abGrxe7rpoizK5e8/68Sa8HA+lKgjdrE/+/1s4UnrySLcP7LdZfy6afRABXvQvOAxXpJpA8OF9YqaJy7hs8m/NySCEd5X6RokLfw=
+	t=1713535684; cv=none; b=pAqRMWC/E4xf3LXS/F85Simosl0R4m58V/WqA1MLzs8N8myrMNpw4yN5Pnu3TOIl8tw4SoYUlV2fgJIa90AP0RrOpo/vW9yuKKzTmydj48FtXxetrysLD33qs8/kbLkQFce6axJkKnTSHYYkatfTz7ycC4t6y1qkx9WU47qhto8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713534144; c=relaxed/simple;
-	bh=2Th4AlJNiK8G7lYUCJU5ZRC6UwKwfk2DPXWCgGmkaZI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a74iCjzKaglIZvskSIfOUNkF8XGDJmgMKuqf86pPYCDInm8v0sNrzFmHCe1wfiCExs6Usrsyt7FAcMxkOm452ZvCj0Rl8C6S0xBf3kmNOezNN5rwAtSzjdY+BpUlEYmEd+WA/2bZ6s8eQw3Z4E3gGhy0GLn14Om3eClbRroMlGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6AAE6339;
-	Fri, 19 Apr 2024 06:42:50 -0700 (PDT)
-Received: from [10.1.30.55] (e133047.arm.com [10.1.30.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D05DF3F64C;
-	Fri, 19 Apr 2024 06:42:18 -0700 (PDT)
-Message-ID: <d99fd27a-dac5-4c71-b644-1213f51f2ba0@arm.com>
-Date: Fri, 19 Apr 2024 14:42:16 +0100
+	s=arc-20240116; t=1713535684; c=relaxed/simple;
+	bh=xyu03HDQ5HqUivNlWzij0bKqi/bLZ6SmDe0+HX8RqMo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=d98yrPU8nRZJr4T5+Af+Gk6cl4DL0hVDmZsWkAxD4FuFp5wZhEt7W9MXV+FnoevjmupVR/WVO4UZyNyfuChVWYL6hem81jZ0dYDjCTpbiEMOPfPrkeuTPktDKPNqEC52NRRAdNpl4RhsfyurYlXA3AG8kDw77eDGli+dmy9LjTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OgRlcTBz; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OgRlcTBz"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1e825c89532so2050925ad.2
+        for <linux-block@vger.kernel.org>; Fri, 19 Apr 2024 07:08:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713535681; x=1714140481; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KSDKTiByg68gLYMeDYGEiSgE2cD3L++faVxv3kdVgt4=;
+        b=OgRlcTBzvFxJSkSv9T9WJe4Rjc1Bp014KuSuZFS5tKt6EaZdRrb7uIQrnFCKAqjDRr
+         Y6XcLiqT4hRCfnPP3hMo2vEzylfikAFg75VHOhhIlJ+QNIkYIuPwNV3gslciIPwPLFiz
+         lXacW/5XE/mcJZgP9XXWwl2nGxcvYzCw7YqR74xsPjnkNtDxO3LHmDpPAYNBJtK9w6fJ
+         vXjnKP2yLMpV9lGk1M9VolZNNi0A1TLrwyvrHTK0zPCjzjwR2f6Hm9kUF9U35yLkhV4u
+         nkhiDQ9RSAYvtYrFw5PylVndPGK/rP5SmwB66IN2zAnjx3M/MgOCsdeOgIVzaCGD1d4t
+         UV6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713535681; x=1714140481;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KSDKTiByg68gLYMeDYGEiSgE2cD3L++faVxv3kdVgt4=;
+        b=CpohhMcvmfy6bG+c7i6xTPY7fIHMK2yBaWtzeuuzfRgt1hqWMUWNXUJECr0G2ABcHT
+         qwfL+s8XVHYQQqbX2MRMaZXK3J/g94kJvpQTCwKEjzivlEJs1Dl4JN1t8+wbjI3Jgk6/
+         DdN/fPij3F6R+KVRpLFzCZ70W5lxOwVzPJAXhn4qAzsrwzWFmLPkLbks1rXzFD5hNAVU
+         tVIYC+d1Sa0Y9EvTaerFUAIdKWbT8UXFwBT6+eE8x5JEpZ+Fn7OrOlrd0wpNH5VMoY9t
+         +9vxitDlrCpJPb+zHjjiCYYz751M0myw5FSdEbABLKfdstkl0oSfBi9P3pg7Yg5ars1Y
+         oCJg==
+X-Forwarded-Encrypted: i=1; AJvYcCUrwTqq+oInklubhYsn/JA3MuaN/lLG2HNuECbKGdRBug1j8fpMeYPIgQBpIqLvpItx3OhhtDm45JgU5c75X9t6YR92B1ND6Imdu+I=
+X-Gm-Message-State: AOJu0YwGagygrXMGnCgFmx7ZDq4yackVsutmgl9ov059UO3Iyg82nWAJ
+	+3XVDlEB+4QfED6dd4cbnAhpsalXyNrlMUfLnYsgYl9D0rZCUTHrj8/Uqmmcez0=
+X-Google-Smtp-Source: AGHT+IE9KKSYVwG72VSDmoU2t2kLvppf7ICd7Pg14moTxUpcllBJ1abOnSOdZ8iLgrSUhwkRCTMeHw==
+X-Received: by 2002:a17:902:ec84:b0:1e8:4063:6ded with SMTP id x4-20020a170902ec8400b001e840636dedmr2404122plg.1.1713535681289;
+        Fri, 19 Apr 2024 07:08:01 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id jj1-20020a170903048100b001e2526a5cc3sm3365406plb.307.2024.04.19.07.07.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 07:08:00 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: tj@kernel.org, josef@toxicpanda.com, linan666@huaweicloud.com
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
+ houtao1@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20240419093257.3004211-1-linan666@huaweicloud.com>
+References: <20240419093257.3004211-1-linan666@huaweicloud.com>
+Subject: Re: [PATCH v2] blk-iocost: do not WARNING if iocg has already
+ offlined
+Message-Id: <171353567968.448662.8909505678465861389.b4-ty@kernel.dk>
+Date: Fri, 19 Apr 2024 08:07:59 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/2] cpufreq/schedutil: Remove iowait boost
-To: Qais Yousef <qyousef@layalina.io>, "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: linux-kernel@vger.kernel.org, peterz@infradead.org,
- juri.lelli@redhat.com, mingo@redhat.com, dietmar.eggemann@arm.com,
- vschneid@redhat.com, vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
- adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de,
- asml.silence@gmail.com, linux-pm@vger.kernel.org,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <20240304201625.100619-1-christian.loehle@arm.com>
- <20240304201625.100619-3-christian.loehle@arm.com>
- <CAJZ5v0gMni0QJTBJXoVOav=kOtQ9W--NyXAgq+dXA+m-bciG8w@mail.gmail.com>
- <5060c335-e90a-430f-bca5-c0ee46a49249@arm.com>
- <CAJZ5v0janPrWRkjcLkFeP9gmTC-nVRF-NQCh6CTET6ENy-_knQ@mail.gmail.com>
- <20240325023726.itkhlg66uo5kbljx@airbuntu>
-Content-Language: en-US
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <20240325023726.itkhlg66uo5kbljx@airbuntu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 25/03/2024 02:37, Qais Yousef wrote:
-> On 03/18/24 18:08, Rafael J. Wysocki wrote:
->> On Mon, Mar 18, 2024 at 5:40 PM Christian Loehle
->> <christian.loehle@arm.com> wrote:
->>>
->>> On 18/03/2024 14:07, Rafael J. Wysocki wrote:
->>>> On Mon, Mar 4, 2024 at 9:17 PM Christian Loehle
->>>> <christian.loehle@arm.com> wrote:
->>>>>
->>>>> The previous commit provides a new cpu_util_cfs_boost_io interface for
->>>>> schedutil which uses the io boosted utilization of the per-task
->>>>> tracking strategy. Schedutil iowait boosting is therefore no longer
->>>>> necessary so remove it.
->>>>
->>>> I'm wondering about the cases when schedutil is used without EAS.
->>>>
->>>> Are they still going to be handled as before after this change?
->>>
->>> Well they should still get boosted (under the new conditions) and according
->>> to my tests that does work.
->>
->> OK
->>
->>> Anything in particular you're worried about?
->>
->> It is not particularly clear to me how exactly the boost is taken into
->> account without EAS.
->>
->>> So in terms of throughput I see similar results with EAS and CAS+sugov.
->>> I'm happy including numbers in the cover letter for future versions, too.
->>> So far my intuition was that nobody would care enough to include them
->>> (as long as it generally still works).
->>
->> Well, IMV clear understanding of the changes is more important.
+
+On Fri, 19 Apr 2024 17:32:57 +0800, linan666@huaweicloud.com wrote:
+> In iocg_pay_debt(), warn is triggered if 'active_list' is empty, which
+> is intended to confirm iocg is avitve when it has debt. However, warn
+> can be triggered during a blkcg or disk is being removed, as
+> iocg_waitq_timer_fn() is awakened at that time.
 > 
-> I think the major thing we need to be careful about is the behavior when the
-> task is sleeping. I think the boosting will be removed when the task is
-> dequeued and I can bet there will be systems out there where the BLOCK softirq
-> being boosted when the task is sleeping will matter.
-
-Currently I see this mainly protected by the sugov rate_limit_us.
-With the enqueue's being the dominating cpufreq updates it's not really an
-issue, the boost is expected to survive the sleep duration, during which it
-wouldn't be active.
-I did experiment with some sort of 'stickiness' of the boost to the rq, but
-it is somewhat of a pain to deal with if we want to remove it once enqueued
-on a different rq. A sugov 1ms timer is much simpler of course.
-Currently it's not necessary IMO, but for the sake of being future-proof in
-terms of more frequent freq updates I might include it in v2.
-
+>   WARNING: CPU: 0 PID: 2344971 at block/blk-iocost.c:1402 iocg_pay_debt+0x14c/0x190
+>   Call trace:
+>   iocg_pay_debt+0x14c/0x190
+>   iocg_kick_waitq+0x438/0x4c0
+>   iocg_waitq_timer_fn+0xd8/0x130
+>   __run_hrtimer+0x144/0x45c
+>   __hrtimer_run_queues+0x16c/0x244
+>   hrtimer_interrupt+0x2cc/0x7b0
+> ps: This issue was got in linux 5.10, but it also exists in the mainline.
 > 
-> FWIW I do have an implementation for per-task iowait boost where I went a step
-> further and converted intel_pstate too and like Christian didn't notice
-> a regression. But I am not sure (rather don't think) I triggered this use case.
-> I can't tell when the systems truly have per-cpu cpufreq control or just appear
-> so and they are actually shared but not visible at linux level.
+> [...]
 
-Please do share your intel_pstate proposal!
+Applied, thanks!
 
-Kind Regards,
-Christian
+[1/1] blk-iocost: do not WARNING if iocg has already offlined
+      commit: 01bc4fda9ea0a6b52f12326486f07a4910666cf6
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
