@@ -1,209 +1,304 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6825546453
-	for <linux-block@vger.kernel.org>; Fri, 19 Apr 2024 08:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628D14AECF
+	for <linux-block@vger.kernel.org>; Fri, 19 Apr 2024 08:02:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713513630; cv=none; b=a2A2bIsJGpZfo7kDq/NIoHKmRzEwj84VEjygPVOHsE6tOjiv3x0nGcIivu+u27aW8p6rpoT4Jz8lIFL03T8j1643sJkzLU0uOr88g4Twkt5I/oUCYRnWFqywkm6Sc0prcm37oS8lJyHWPbe0/5jKEiLrQh89EX4kAqDUcAiOQxs=
+	t=1713513727; cv=none; b=qpAfppJfA07WYnBkabosAe05Eo4xTZ/Ag4Aj4sVAoQrpwajNwbSX9npVJ8BjtINklcmUUZQbEmbWrnVJW+Gn8rLI4y/uZa+5+r5bxNFoejzRSgCympp9nID1MJvlx6p7Q5demrsGEHYJw1UVWG4HXX3KuTHvonwK2Jw9eHwZS94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713513630; c=relaxed/simple;
-	bh=yEY3xhvFM6ChrsX2KIiFJR/YJOBJT4SpzWzNl0Ujqx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=DZDgH2vy12ofpUudw7CkDfvGwnOaHIQs0va3wVZ55Mmam3hEWonSnKeTjELM2ZNSHC8U23YJ20TS9Kr4BoDzd/N3ZQpj+mQPBQHmf3bG4CNR4/n6IGNlWnzBylU25i7KB7zeA30gX6M3+6npT/pOsr0C7GIdl8rzTf7yR15Zm7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=M12pFF9u; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="M12pFF9u"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240419080025epoutp037617b6aba639df1f8e9d65adc1398b08~Hn5BG9zh_3110731107epoutp03I
-	for <linux-block@vger.kernel.org>; Fri, 19 Apr 2024 08:00:25 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240419080025epoutp037617b6aba639df1f8e9d65adc1398b08~Hn5BG9zh_3110731107epoutp03I
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1713513625;
-	bh=W+VPZlBEtIkTjLj1Oh3TQ3pUDN00LGEiywwTXx1HGmM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M12pFF9u7dNc1OPmGKZ+29b6vF1p79iP8Ro7/ztKQs7EGtQzHdfN+Go3ErtP4D/UG
-	 0mayMrfjSaCSd3/+KzF5F/kR2/eXuOKom6XfiJOi6QvSa6uhqvXnVUYnLpGa7ycW9T
-	 /qn9rYSCKk2M7Juwk4bsC8JlZ8Qe49b25aboeLVc=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240419080025epcas5p2665e5c53faa5dbc846c2aa538bc64284~Hn5A8xxvY1082610826epcas5p27;
-	Fri, 19 Apr 2024 08:00:25 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4VLRs32C9Sz4x9QY; Fri, 19 Apr
-	2024 08:00:23 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	5D.94.09688.79422266; Fri, 19 Apr 2024 17:00:23 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240418194325epcas5p2c88282729c2cb0715d7343428217de8d~Hd1irdNTa0307403074epcas5p29;
-	Thu, 18 Apr 2024 19:43:25 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240418194325epsmtrp122bd6807d6848440a1955b1553136ebe~Hd1iq0Jnv0347303473epsmtrp1B;
-	Thu, 18 Apr 2024 19:43:25 +0000 (GMT)
-X-AuditID: b6c32a4a-5dbff700000025d8-1a-66222497e101
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	7B.90.07541.DD771266; Fri, 19 Apr 2024 04:43:25 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20240418194324epsmtip11ec6f81e4cb2e6651686bc000b81d91e~Hd1hpe-o50627206272epsmtip1I;
-	Thu, 18 Apr 2024 19:43:24 +0000 (GMT)
-Date: Fri, 19 Apr 2024 01:06:34 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, Daniel
-	Wagner <dwagern@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH blktests v2 00/11] support test case repeat by different
- conditions
-Message-ID: <20240418193634.lw4k5ab24rplclad@green245>
+	s=arc-20240116; t=1713513727; c=relaxed/simple;
+	bh=qU84fd/nn5v+UHmdShRHw10J0OENH9/JnmAr54mvoi0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=cuqkg6DtqEh4iMfaYf0ngi+bE1CeI7WnnDn+Ni/A2IXe4cJfnu8rlJ4rEz2svFdBWSKPF4fSGmvfNS1c/wlTtmjQxq5P4g7gLLpnc9qP58py+kF7/G2VofKMtxCEHd1hJ91qeVsQr9QIxnJ6Oes/CmH3bsmb9XqSH15HDRto5xI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VLRtj1hTnz4f3kp0
+	for <linux-block@vger.kernel.org>; Fri, 19 Apr 2024 16:01:49 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id E699E1A0175
+	for <linux-block@vger.kernel.org>; Fri, 19 Apr 2024 16:01:53 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgAX5g7wJCJmlO2FKQ--.7858S3;
+	Fri, 19 Apr 2024 16:01:53 +0800 (CST)
+Subject: Re: [PATCH v2 blktests 1/5] tests/throtl: add first test for
+ blk-throttle
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Yu Kuai <yukuai1@huaweicloud.com>
+Cc: "saranyamohan@google.com" <saranyamohan@google.com>,
+ "tj@kernel.org" <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "yangerkun@huawei.com" <yangerkun@huawei.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240417022005.1410525-1-yukuai1@huaweicloud.com>
+ <20240417022005.1410525-2-yukuai1@huaweicloud.com>
+ <vx5xlimpl5znnqzwjwevtl4yj3yaxyaebaqfxkdi6ndztzu4hs@6fddxhpmqfhg>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <a680d187-3711-8b29-4638-fa303e64edf8@huaweicloud.com>
+Date: Fri, 19 Apr 2024 16:01:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphk+LIzCtJLcpLzFFi42LZdlhTXXe6ilKawZI9fBZXHyxjs3h6dRaT
-	xd5b2hbzlz1lt9g3y9OB1WPzknqP3uZ3bB6bT1d7fN4k59F+oJspgDUq2yYjNTEltUghNS85
-	PyUzL91WyTs43jne1MzAUNfQ0sJcSSEvMTfVVsnFJ0DXLTMHaLGSQlliTilQKCCxuFhJ386m
-	KL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtj3Ym5bAWdKhU//l5g
-	a2C8I9vFyMkhIWAicfLzfKYuRi4OIYHdjBLrnt5jAkkICXxilJizWBMi8Y1RYtWMRhaYjk3d
-	j1kgEnsZJdb8ecUI4TxjlHj/qZERpIpFQFVi39ND7F2MHBxsAtoSp/9zgIRFBMwkrhx7ww5S
-	zyzQzijxYPFlsKnCApESv/8dZAOxeYGKnjw9zAxhC0qcnPkErIZTwFni8deFYHFRARmJGUu/
-	MoMMkhB4yS5x8clnNojzXCQOzH7ACGELS7w6voUdwpaSeNnfBmWXS6ycsoINormFUWLW9VlQ
-	DfYSraf6mUGuZhbIkLh6ThciLCsx9dQ6cLgwC/BJ9P5+wgQR55XYMQ/GVpZYs34B1A2SEte+
-	N7KBjJEQ8JBY/dYeEkDTGCVur2xlmsAoPwvJb7MQts0C22Al0fmhiRUiLC2x/B8HhKkpsX6X
-	/gJG1lWMkqkFxbnpqcWmBUZ5qeXw+E7Oz93ECE6WWl47GB8++KB3iJGJg/EQowQHs5IIrxmH
-	YpoQb0piZVVqUX58UWlOavEhRlNgVE1klhJNzgem67ySeEMTSwMTMzMzE0tjM0Mlcd7XrXNT
-	hATSE0tSs1NTC1KLYPqYODilGpgs0japNCtpL597vflP8lPbZ075eie/Jhc4P9zB6yRbosa5
-	146piFvwpFr/70lSzOtdUy5Hvg3XPxPTeOd4+VznO9rLN+zw3y393km4MHa237I/k5s9N8wW
-	T7t3T/atiOT2fZriD3d4n/QoP1T3/8jKHy66Wn8uHvs57U5MU97J6vv/Tkhcy5M8fj39o3Km
-	v3z5cc7VNtkP41XLDl1lOx4z9Wb/qb7c+A/+L2vX7vr6q9Pd2vnU75IAub1+glrP1aqSm6R8
-	N9t+Lrzk9zilQmKtO/8Hv/M2q86GHH4icUjkxSz7fcnnz/fP8tjedmHu5cwJ7DPqtSbINnTM
-	nSQTzX56c6bCeh6HokvFrN46r1qUWIozEg21mIuKEwGjLvtkHwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPLMWRmVeSWpSXmKPExsWy7bCSnO7dcsU0gy3PdCyuPljGZvH06iwm
-	i723tC3mL3vKbrFvlqcDq8fmJfUevc3v2Dw2n672+LxJzqP9QDdTAGsUl01Kak5mWWqRvl0C
-	V8aMC1dYCnYrVnSdms3YwLhCuouRk0NCwERiU/djli5GLg4hgd2MEs0LZjJDJCQllv09AmUL
-	S6z895wdougJo8TO5YvYQBIsAqoS+54eAkpwcLAJaEuc/s8BEhYRMJO4cuwNWD2zQCejxJ7e
-	m2D1wgKREr//HQSzeYGKnjw9DLZASMBJ4njvAWaIuKDEyZlPWEBsZqCaeZsfMoPMZxaQllj+
-	D2w+p4CzxOOvC8HKRQVkJGYs/co8gVFwFpLuWUi6ZyF0L2BkXsUomVpQnJuem2xYYJiXWq5X
-	nJhbXJqXrpecn7uJERzmWho7GO/N/6d3iJGJg/EQowQHs5IIrxmHYpoQb0piZVVqUX58UWlO
-	avEhRmkOFiVxXsMZs1OEBNITS1KzU1MLUotgskwcnFINTHYXrx53yziwJrWa5WiU13Jj0fzw
-	1C31TRm9uw0VVvw5Zrt0Smft9UOPl/78Fr79vsUs5q7OS4t5HytFs17UqbxVJKX0e9rW9a5C
-	mW/2n0lSYLTZfu2vkzjH+4Z9/QFnH0rIXmE6v0ucMTXsvq/mokrZee/XRzRJLdPVXHwz+XnI
-	vw1fYwoWHNyyZJpf0Bnb/wtOK8x1nREhI6cX3BQY4hQ8RXvFe9NZnTmTs5p+bGN1Srw9N27h
-	hXarwp/n3tw5nM6QtJSvvE+x3N5neYpJxJqz/4s/ZWxMP1AZ6b19m+YK9QM5u2N/avh8XBFr
-	LCPzh6t8/iz13gPzW287LeDrXn5hl5jkrP0xrF0aH9ZMYVZiKc5INNRiLipOBADHJjRM4gIA
-	AA==
-X-CMS-MailID: 20240418194325epcas5p2c88282729c2cb0715d7343428217de8d
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_96e99_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240418194325epcas5p2c88282729c2cb0715d7343428217de8d
-References: <20240416103207.2754778-1-shinichiro.kawasaki@wdc.com>
-	<CGME20240418194325epcas5p2c88282729c2cb0715d7343428217de8d@epcas5p2.samsung.com>
+In-Reply-To: <vx5xlimpl5znnqzwjwevtl4yj3yaxyaebaqfxkdi6ndztzu4hs@6fddxhpmqfhg>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAX5g7wJCJmlO2FKQ--.7858S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxKF4DWFy5Zr1UZryfuFyxuFg_yoWxWr1rpF
+	W7GF4YyF1kGF17Ar13ta13Za4fZw48ArW7Cr17Kr1YyrsIvryxtF12yr45GrWrXF47Wa1F
+	va18Xa4fG3WjyrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+	UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_96e99_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+Hi,
 
-On 16/04/24 07:31PM, Shin'ichiro Kawasaki wrote:
->In the recent discussion for nvme test group [1], two pain points were mentioned
->regarding the test case runs.
->
->1) Several test cases in nvme test group do exactly the same test except the
->   NVME transport backend set up condition difference (device vs. file). This
->   results in duplicate test script codes. It is desired to unify the test cases
->   and run them repeatedly with the different conditions.
->
->2) NVME transport types can be specified with nvme_trtype parameter so that the
->   same tests can be run for various transport types. However, some test cases
->   do not depend on the transport types. They are repeated in multiple runs for
->   the various transport types under the exact same conditions. It is desired to
->   repeat the test cases only when such repetition is required.
->
->[1] https://lore.kernel.org/linux-block/w2eaegjopbah5qbjsvpnrwln2t5dr7mv3v4n2e63m5tjqiochm@uonrjm2i2g72/
->
->One idea to address these pain points is to add the test repeat feature to the
->nvme test group. However, Daniel questioned if the feature could be implemented
->in the blktests framework. Actually, a similar feature has already been
->implemented to repeat some test cases for non-zoned block devices and zoned
->block devices. However, this feature is implemented only for the zoned and non-
->zoned device conditions. It can not fulfill the desires for nvme test group.
->
->This series proposes to generalize the feature in the blktests framework to
->repeat the test cases with different conditions. Introduce a new function
->set_conditions() that each test case can define and instruct the framework to
->repeat the test case. The first four patches introduce the feature and apply it
->to the repetition for non-zoned and zoned block devices. The following seven
->patches apply the feature to nvme test group so that the test cases can be
->repeated for NVME transport types and backend types in the ideal way. Two of the
->seven patches are reused from the work by Daniel. The all patches are listed in
->the order that does not lose the test coverage with the default set up.
->
->This series introduces new config parameters NVMET_TRTYPES and
->NVMET_BLKDEV_TYPES, which can take multiple values with space separators. When
->they are defined in the config file as follows,
->
->  NVMET_TRTYPES="loop rdma tcp"
->  NVMET_BLKDEV_TYPES="device file"
->
->the test cases which depend on these parameters are repeated 3 x 2 = 6 times.
->For example, nvme/006 is repeated as follows.
->
->nvme/006 (nvmet bd=device tr=loop) (create an NVMeOF target) [passed]
->    runtime  0.148s  ...  0.165s
->nvme/006 (nvmet bd=device tr=rdma) (create an NVMeOF target) [passed]
->    runtime  0.273s  ...  0.235s
->nvme/006 (nvmet bd=device tr=tcp) (create an NVMeOF target)  [passed]
->    runtime  0.162s  ...  0.164s
->nvme/006 (nvmet bd=file tr=loop) (create an NVMeOF target)   [passed]
->    runtime  0.138s  ...  0.134s
->nvme/006 (nvmet bd=file tr=rdma) (create an NVMeOF target)   [passed]
->    runtime  0.216s  ...  0.201s
->nvme/006 (nvmet bd=file tr=tcp) (create an NVMeOF target)    [passed]
->    runtime  0.154s  ...  0.146s
->
->
->Changes from v1:
->* Renamed NVMET_TR_TYPES to NVMET_TRTYPES
->* 1st patch: reflected comments on the list and added Reviewed-by tag
->* 5th patch: changed NVMET_TRTYPES from array to variable
->* 7th patch: changed NVMET_BLKDEV_TYPES from array to variable
->* Reflected other comments on the list
->
->
->Daniel Wagner (3):
->  nvme/rc: add blkdev type environment variable
->  nvme/{007,009,011,013,015,020,024}: drop duplicate nvmet blkdev type
->    tests
->  nvme/{021,022,025,026,027,028}: do not hard code target blkdev type
->
->Shin'ichiro Kawasaki (8):
->  check: factor out _run_test()
->  check: support test case repeat by different conditions
->  check: use set_conditions() for the CAN_BE_ZONED test cases
->  meta/{016,017}: add test cases to check repeated test case runs
->  nvme/rc: introduce NVMET_TRTYPES
->  nvme/rc: introduce NVMET_BLKDEV_TYPES
->  nvme/{002-031,033-038,040-045,047,048}: support NMVET_TRTYPES
->  nvme/{006,008,010,012,014,019,023}: support NVMET_BLKDEV_TYPES
->
+ÔÚ 2024/04/19 12:29, Shinichiro Kawasaki Ð´µÀ:
+> On Apr 17, 2024 / 10:20, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Hi Yu, thank you for this series. It is great to expand the test coverage and
+> cover a number of regressions!
+> 
+> Please find my comments in line, and consider if they make sense for you or not.
+> I ran the test cases on my test machine and observed that e new test cases
+> passed except throtl/004. I will note the failure for the 4th patch.
+> 
+>>
+>> Test basic functionality.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   tests/throtl/001     | 39 ++++++++++++++++++++++++
+>>   tests/throtl/001.out |  6 ++++
+>>   tests/throtl/rc      | 71 ++++++++++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 116 insertions(+)
+>>   create mode 100755 tests/throtl/001
+>>   create mode 100644 tests/throtl/001.out
+>>   create mode 100644 tests/throtl/rc
+>>
+>> diff --git a/tests/throtl/001 b/tests/throtl/001
+>> new file mode 100755
+>> index 0000000..739efe2
+>> --- /dev/null
+>> +++ b/tests/throtl/001
+>> @@ -0,0 +1,39 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2024 Yu Kuai
+>> +#
+>> +# Test basic functionality of blk-throttle
+>> +
+>> +. tests/throtl/rc
+>> +
+>> +DESCRIPTION="basic functionality"
+>> +QUICK=1
+>> +
+>> +test() {
+>> +	echo "Running ${TEST_NAME}"
+>> +
+>> +	if ! _set_up_test nr_devices=1; then
+>> +		return 1;
+>> +	fi
+>> +
+>> +	bps_limit=$((1024 * 1024))
+>> +
+>> +	_set_limits wbps=$bps_limit
+>> +	_test_io write 4k 256
+>> +	_remove_limits
+>> +
+>> +	_set_limits wiops=256
+>> +	_test_io write 4k 256
+>> +	_remove_limits
+>> +
+>> +	_set_limits rbps=$bps_limit
+>> +	_test_io read 4k 256
+>> +	_remove_limits
+>> +
+>> +	_set_limits riops=256
+>> +	_test_io read 4k 256
+>> +	_remove_limits
+>> +
+>> +	_clean_up_test
+>> +	echo "Test complete"
+>> +}
+>> diff --git a/tests/throtl/001.out b/tests/throtl/001.out
+>> new file mode 100644
+>> index 0000000..a3edfdd
+>> --- /dev/null
+>> +++ b/tests/throtl/001.out
+>> @@ -0,0 +1,6 @@
+>> +Running throtl/001
+>> +1
+>> +1
+>> +1
+>> +1
+>> +Test complete
+>> diff --git a/tests/throtl/rc b/tests/throtl/rc
+>> new file mode 100644
+>> index 0000000..871102c
+>> --- /dev/null
+>> +++ b/tests/throtl/rc
+>> @@ -0,0 +1,71 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2024 Yu Kuai
+>> +#
+>> +# Tests for blk-throttle
+>> +
+>> +. common/rc
+>> +. common/null_blk
+>> +
+>> +CG=/sys/fs/cgroup
+>> +TEST_DIR=$CG/blktests_throtl
+> 
+> The names of these two global variables sounds too geneic for me. I think they
+> have risk to have name conflict in the future. I suggest to drop them and use
+> the function and the global variable defined in common/cgroup, as follows.
+> 
+>    $CG -> "$(_cgroup2_base_dir)"
+>    $TEST_DIR -> "$CGROUP2_DIR"
+> 
+> For this change, "mkdir $TEST_DIR" in _set_up_test() needs to be replaced with
+> _init_cgroup2 call. Same for "rmdir $TEST_DIR" in _clean_up_test() with
+> _exit_cgroup2. This change will add some new shellcheck warns then some more
+> double quotations will be required around $(_cgroup2_base_dir) and $CGROUP2_DIR.
 
-Acked-by: Nitesh Shetty <nj.shetty@samsung.com>
+Ok, sounds good.
+> 
+>> +devname=nullb0
+> 
+> The global variable name devname is too generic, too. I suggest to use prefix
+> "_thr" or "THR" for the global variables and functions defined in
+> tests/throtl/rc. This devname can be "THR_DEV" or something like that.
+> 
+> Also, I suggest to use "thr_nullb" as the device name because null_blk device
+> name nullb0 can not be used when the null_blk driver is built-in. In short,
+> I suggest,
 
-------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_96e99_
-Content-Type: text/plain; charset="utf-8"
+I'll try with built-in null_blk, and switch the name.
 
+> 
+>     THR_DEV=dev_nullb
+> 
+>> +
+>> +group_requires() {
+>> +	_have_root
+>> +	_have_null_blk
+>> +	_have_kernel_option BLK_DEV_THROTTLING
+>> +	_have_cgroup2_controller io
+> 
+> This rc file introduces the dependency to the bc command. I suggest to check the
+> requirement by adding one more check here:
+> 
+>      _have_proggram bc
 
-------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_96e99_--
+Ok, and perhaps also check dd as well?
+
+> 
+>> +}
+>> +
+>> +# Create a new null_blk device, and create a new blk-cgroup for test.
+>> +_set_up_test() {
+>> +	if ! _init_null_blk "$*"; then
+> 
+> _configure_null_blk is the better than _init_null_blk, because _init_null_blk
+> requires loadable null_blk and does not work with built-in null_blk. Some
+> blktests users run tests with built-in modules, so it is the better to avoid
+> dependencies to built-in drivers. Then I suggest as follows.
+> 
+>         if ! _configure_null_blk $THR_DEV "$@" power=1; then
+> 
+> Please note that "$@" should be used in place of "$*" to pass positional
+> parameters correctly. With this change, _set_up_test_by_configfs() that the 4th
+> patch introduced will not be required. nr_device=1 and power=1 options in
+> throtl/00x will not be required either.
+> 
+> Regarding other functions, I can think of renames as follows:
+> 
+>      _set_up_test -> _setup_thr
+>      _clean_up_test -> _cleanup_thr (or _exit_thr ?)
+>      _set_limits -> _thr_set_limits
+>      _remove_limits -> _thr_remove_limits
+>      _issue_io -> _thr_issue_io
+>      _test_io -> _thr_test_io
+
+Will update in the next version.
+
+Thanks,
+Kuai
+> 
+>> +		return 1;
+>> +	fi
+>> +
+>> +	echo +io > $CG/cgroup.subtree_control
+>> +	mkdir $TEST_DIR
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +_clean_up_test() {
+>> +	rmdir $TEST_DIR
+>> +	echo -io > $CG/cgroup.subtree_control
+>> +	_exit_null_blk
+>> +}
+>> +
+>> +_set_limits() {
+> 
+> Nit: local variable declaration "local dev" will make the code a bit more
+> robust. Same for other functions in this file.
+> 
+>> +	dev=$(cat /sys/block/$devname/dev)
+>> +	echo "$dev $*" > $TEST_DIR/io.max
+>> +}
+>> +
+>> +_remove_limits() {
+>> +	dev=$(cat /sys/block/$devname/dev)
+>> +	echo "$dev rbps=max wbps=max riops=max wiops=max" > $TEST_DIR/io.max
+>> +}
+>> +
+>> +# Create an asynchronous thread and bind it to the specified blk-cgroup, issue
+>> +# IO and then print time elapsed to the second, blk-throttle limits should be
+>> +# set before this function.
+>> +_test_io() {
+>> +	{
+>> +		sleep 0.1
+>> +		start_time=$(date +%s.%N)
+>> +
+>> +		if [ "$1" == "read" ]; then
+>> +			dd if=/dev/$devname of=/dev/null bs="$2" count="$3" iflag=direct status=none
+>> +		elif [ "$1" == "write" ]; then
+>> +			dd of=/dev/$devname if=/dev/zero bs="$2" count="$3" oflag=direct status=none
+>> +		fi
+>> +
+>> +		end_time=$(date +%s.%N)
+>> +		elapsed=$(echo "$end_time - $start_time" | bc)
+>> +		printf "%.0f\n" "$elapsed"
+>> +	} &
+>> +
+>> +	pid=$!
+>> +	echo "$pid" > $TEST_DIR/cgroup.procs
+>> +	wait $pid
+>> +}
+>> -- 
+>> 2.39.2
+>> .
+> 
+
