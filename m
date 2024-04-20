@@ -1,135 +1,110 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6310F14A98
-	for <linux-block@vger.kernel.org>; Sat, 20 Apr 2024 08:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3FBDF43
+	for <linux-block@vger.kernel.org>; Sat, 20 Apr 2024 15:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713603249; cv=none; b=rkxuIgU2oTVmQAxNSmCW7hTCpv3nMcPZWRordvH270MfFYS71g2mBjPlhRlsPlYj5LW7SHfSR9EnNH4ra3QvYzOSc6OQrL5sHxp81YStrfas5rjlNTKNQe0VqRE67Yq7aOyqBp7SWGapm4HZ1EsjLhySfTRfCRtwbzwVyIbF/PU=
+	t=1713626903; cv=none; b=CGObMt+ODQ4YnHrkeI8vo7kA7abuHl+G+WeeINvxcQZPP0ET5smU7tFrtYL5NS8nQOykwMKzZJuXHrvbSB4gEuYUzhqzpXSou5K6XAU1l9bPXTtUBYXjhuLlX4uRhERJbl0uFEDv1WdfSIDp0sVN+jvFrLpnYS8QSj14BMv1+vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713603249; c=relaxed/simple;
-	bh=JX7BtuFfZ7/4NyL0YAncpwD7Gm2nyvXz8Lsh2PXvbMo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Dxa2ne/Kq1CpFhFQ2ClqNqTBv705SW8mbKwi5WxwwWDQM2RvVEJIzJPL3ach4JOazER+xxpnb6Zn0lckWU5ioh89Y67m+GUZS0pR2XuwWA62SPMQmo0HPIGYHejYshhumZBRDvWq1rilfLq6e/StQLsQX5H1325fKD69ogr3RxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VM50P5y6Nz4f3khy
-	for <linux-block@vger.kernel.org>; Sat, 20 Apr 2024 16:53:57 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 2EE281A0175
-	for <linux-block@vger.kernel.org>; Sat, 20 Apr 2024 16:54:05 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgBHGBGqgiNmW_HiKQ--.35908S9;
-	Sat, 20 Apr 2024 16:54:05 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: saranyamohan@google.com,
-	tj@kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yangerkun@huawei.com
-Subject: [PATCH v3 blktests 5/5] tests/throtl: add a new test 005
-Date: Sat, 20 Apr 2024 16:45:05 +0800
-Message-Id: <20240420084505.3624763-6-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240420084505.3624763-1-yukuai1@huaweicloud.com>
-References: <20240420084505.3624763-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1713626903; c=relaxed/simple;
+	bh=kqwxwr8lhGIBarP6yXHThjWf/eXdjVdTxyTxUaMZocM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=KbDxC70F96KdnfOqL7rimRhRlFDOUmcHrLCMMje5M+ptunoC98JTy3H64yO5C1fR5IdJbSz3pMF1uAPhutvI0pm2aim1LqK45sih2HoIid7aj6e2aKkWejgFlOXaJmtxMH4ewvj4CKXp/wKrNNoDmsALVt3qzuYtfQDTyn0QkSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lBwvhog2; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lBwvhog2"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1e45f339708so3740785ad.0
+        for <linux-block@vger.kernel.org>; Sat, 20 Apr 2024 08:28:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713626900; x=1714231700; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mUia4dqOR/YS9n55gIhyP76XMs3k0eQSUBs1x7S1i7A=;
+        b=lBwvhog2tZKoGqVVo8vZQ3tuY0J0ALpXju7q4Koq013kR8Ci5I6hsvs2ACVDJTewJs
+         QoknuO1VFQfOYDCVfn4xwuuBI7N6Iz8dmpwMbrTpQ6eZH+kNfXBxcOiWjcfL2E7lnSmS
+         J8Br3l6cTE66M/LSVOgdWvFQsWatJ91e4vQcFWeMxJsMMpcA402/NWWHXv5jhooKDOP3
+         pt6IPZ6mfdhATBim2hJx63zG5kDIBusPQpjLtMSOffBX0i2m714+nRkfgo8ZdnstMrrb
+         dMGACc0zCC/C+iM1o2qQXZn+Fqc5HnbkJy2zxsjflnAzfrq97XfGamw9LvFdBpUJkCcx
+         f66g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713626900; x=1714231700;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mUia4dqOR/YS9n55gIhyP76XMs3k0eQSUBs1x7S1i7A=;
+        b=J38LFdty+L7QZ9S+oBsAFWeWym+XRZsw1j3w7VvgmGC4ZOzNXMCz2bAO/+OOgYqqUo
+         quZaMgeiLnlTp9PiMLpFcbZMPJF4tWEyzg/oHrLfUhnXa9hkVhrFL1sBWKDzQULcxj0I
+         VKuy/unk787wIcXyclj+meU0TdPOdmEA6uwDduRj+wz/vvWIkA9IbCqT5xjN0KqTeTGo
+         pn84yj0CpKNoO7zaXrihyNAaVqGPI+dAURY9tLKQ5HMo+jMCjaBRSgzN6scmycoTZZyC
+         cKuXwoh5t42SBqmBkJg9pyExNCF0dq6YA4wjJKumJAUoCYs533IN1BfFjnp8s76EAKnp
+         bMXA==
+X-Gm-Message-State: AOJu0YwSUBbgeESGkXGAGggkq4TB/SjJs99EjF098iuULMwb43wzytQF
+	oms0PjGoD9r2EWC6LEa6VHSOVmbx//7QWghhPr9u1KskSW4B7hsSS60bWmcIG7g2z+Zy1roKuqQ
+	t
+X-Google-Smtp-Source: AGHT+IHP3UqdIIthzAxo+X18sxLzHmrXvHLLYZwSW+fwlc9fB56Nv47QEqIMO+eIHoxz7DbvF9XGZA==
+X-Received: by 2002:a05:6a20:3202:b0:1ac:3efb:2889 with SMTP id hl2-20020a056a20320200b001ac3efb2889mr5614459pzc.0.1713626899726;
+        Sat, 20 Apr 2024 08:28:19 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id t8-20020a056a0021c800b006ecffb316ccsm4986850pfj.202.2024.04.20.08.28.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Apr 2024 08:28:18 -0700 (PDT)
+Message-ID: <b3c34e74-a86c-4595-954d-e73ef31e8cb8@kernel.dk>
+Date: Sat, 20 Apr 2024 09:28:17 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHGBGqgiNmW_HiKQ--.35908S9
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw13KryrJF48Wr4xtrWfAFb_yoW8XFWDpa
-	y2ka1rKw4xWFnrKr1fGa17WFWrAw4kZr47A347Wr13ZFyjq3yUGr129w1IyFZ3tFnrZryx
-	uF10qrW8KF4UA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUGVWUXwAv7VCY1x0262k0Y48FwI0_Jr0_Gr1lYx0Ex4A2jsIE14v26r1j
-	6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI
-	8I648v4I1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOa0P
-	DUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.9-rc5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Yu Kuai <yukuai3@huawei.com>
+Hi Linus,
 
-Test change config while IO is throttled, regression test for:
+Just two minor fixes that should go into the 6.9 kernel release, one
+fixing a regression with partition scanning errors, and one fixing a
+WARN_ON() that can get triggered if we race with a timer.
 
-commit a880ae93e5b5 ("blk-throttle: fix io hung due to configuration updates")
+Please pull!
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- tests/throtl/005     | 37 +++++++++++++++++++++++++++++++++++++
- tests/throtl/005.out |  3 +++
- 2 files changed, 40 insertions(+)
- create mode 100755 tests/throtl/005
- create mode 100644 tests/throtl/005.out
 
-diff --git a/tests/throtl/005 b/tests/throtl/005
-new file mode 100755
-index 0000000..0778258
---- /dev/null
-+++ b/tests/throtl/005
-@@ -0,0 +1,37 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Yu Kuai
-+#
-+# Test change config while IO is throttled, regression test for
-+# commit a880ae93e5b5 ("blk-throttle: fix io hung due to configuration updates")
-+
-+. tests/throtl/rc
-+
-+DESCRIPTION="change config with throttled IO"
-+QUICK=1
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _set_up_throtl; then
-+		return 1;
-+	fi
-+
-+	_throtl_set_limits wbps=$((512 * 1024))
-+
-+	{
-+		sleep 0.1
-+		_throtl_issue_io write 1M 1
-+	} &
-+
-+	local pid=$!
-+	echo "$pid" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
-+
-+	sleep 1
-+	_throtl_set_limits wbps=$((256 * 1024))
-+	wait $pid
-+	_throtl_remove_limits
-+
-+	_clean_up_throtl
-+	echo "Test complete"
-+}
-diff --git a/tests/throtl/005.out b/tests/throtl/005.out
-new file mode 100644
-index 0000000..1d23210
---- /dev/null
-+++ b/tests/throtl/005.out
-@@ -0,0 +1,3 @@
-+Running throtl/005
-+3
-+Test complete
+The following changes since commit 3ec4848913d695245716ea45ca4872d9dff097a5:
+
+  block: fix that blk_time_get_ns() doesn't update time after schedule (2024-04-12 08:31:54 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.9-20240420
+
+for you to fetch changes up to 01bc4fda9ea0a6b52f12326486f07a4910666cf6:
+
+  blk-iocost: do not WARN if iocg was already offlined (2024-04-19 08:06:24 -0600)
+
+----------------------------------------------------------------
+block-6.9-20240420
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      block: propagate partition scanning errors to the BLKRRPART ioctl
+
+Li Nan (1):
+      blk-iocost: do not WARN if iocg was already offlined
+
+ block/bdev.c           | 29 +++++++++++++++++++----------
+ block/blk-iocost.c     |  7 +++++--
+ block/ioctl.c          |  3 ++-
+ include/linux/blkdev.h |  2 ++
+ 4 files changed, 28 insertions(+), 13 deletions(-)
+
 -- 
-2.39.2
+Jens Axboe
 
