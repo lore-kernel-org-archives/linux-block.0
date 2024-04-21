@@ -1,117 +1,131 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDC438C
-	for <linux-block@vger.kernel.org>; Sun, 21 Apr 2024 10:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02146D27D
+	for <linux-block@vger.kernel.org>; Sun, 21 Apr 2024 12:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713695491; cv=none; b=CQqHbhfI9HmhQL6JqLYZvTN8zpDttb6Ly5Jof90ozNWPGZyWFQAf8Vc5rjhHdpB8i2/b58g8ZPZApDoVFproovwOB7RMvDz2tfE800hfO1enkn9UzN+lxcJVJkh7KhXdHVcwtJwz5zPz+XGjH9krgCXGsM6DdaltIvYQNe2ccU0=
+	t=1713702576; cv=none; b=uiaVZ2KTrQSpJyuDlJS3y9l0SU2rkiY1LWf6PC39xunTJ25D2w6dv3KaPQthBzfsScvwfqp6/CIL5VBTBok/BDZMUGBdmAZNUcrgiDjDtrEkSVfjmwwvMxBEwuVYjasea//Ann87LW5/WiX+4QnIYs+GUptMerDaqNy5yExt8lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713695491; c=relaxed/simple;
-	bh=46+KsbtoZpc+f0wCgYIYpjd01JpJw+2+O6qfuGc14+s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pBHcWkpu+pXa/EQlcYkhT1DbXhY3EIN+tzfJf627EXsIY/47OpSPYpZo9/+IR5zV2tuFEsBrBQABfdEzZ1jBf4SexIGHtW9MaApnFWp5YXZRSdkJ75iuvBPlnkv1rGjh1Ca2GwvCeIcKb0nQ82AyxPpWOMjFVPUAepsHtL3i3Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-349fd1d3723so720444f8f.0
-        for <linux-block@vger.kernel.org>; Sun, 21 Apr 2024 03:31:29 -0700 (PDT)
+	s=arc-20240116; t=1713702576; c=relaxed/simple;
+	bh=Bam+tnZAFsQcOTabrlruYnZuKosHFKAvgTBudoE1/QY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HEd+vaBB0jsC7rrNrDTjpKHkV69jmf35/xIIcsHmsCKx64CQ0h3Eb1p1pDXnhkzszvWO9k6LUQAoMS8EWCYMnYkq38okujvapXu1L29SOHuXJT/wgNEV81MAGu3Nl7YcFYL9rA+8KAra+4G91cCJ1RNpDyCyz4cHIA2mt9NGdCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TlGn4s+K; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TlGn4s+K"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713702573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sy/e6b7EdMkat/b8vNzmnm5808mkzwgEft7nfqfXnys=;
+	b=TlGn4s+KZtIJfQdWsYY6/KJIpHMS21urQJUBQrUnN/siC1XafZK+XEiQyjMSZsGmDVFXjM
+	LtavpJPrRdbE2nhBaDnhYCZhyqbpU/I5SeWIWebhckQQJITiJGAuWetE1zeD1TVX+EHU7R
+	/bkNPVv3AD1cqXG48cGDyLcDJHJiCxo=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-546-I9qosPunOrSZZQSi2sRLgA-1; Sun, 21 Apr 2024 08:29:32 -0400
+X-MC-Unique: I9qosPunOrSZZQSi2sRLgA-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2a4b48d7a19so3279333a91.1
+        for <linux-block@vger.kernel.org>; Sun, 21 Apr 2024 05:29:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713695488; x=1714300288;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GszQgQpzUTRi5dJxCQXi4tBvNXzSdoVKhpu21Kn30yM=;
-        b=KpYFLl92jzkK+sIiRzv1L5atP9M53s3tFlnCpHW6caIGhGb1ZGc4v1c24ZTUcR4hQc
-         rdFEp6pBvHSVDJ1Df1+6jufNHWodcYSJFlJtUzO0XX1JtflEbZBU0Emu0xYtP7rOOidr
-         AGhJt5T7IkaydZz5tD+1Q450z65v2osps26hIlaE8e8DP271SZ37jGsEEoHGAb21n6TZ
-         n4jFCGD/BDqoazCVLS3vd1n0WmGjYVxMSjMLKHr/HwBeVpJ91GbUN56PMPbgy1R+fXZO
-         xbl0DIj/w557WdjQepOapQ1gjK9ALAU/y63715oYOva/ngNu9ylq7zNQKUmhQPyQvi3d
-         ws5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV93aWqgTHw798COM8t6gadC2p2lL8fW5UhwG6LENQ/yEM7qgWjOOzOrnD+3RZnHNIHkKn4JWmitohnbXUBi/s3BPWClzIsno+KTfU=
-X-Gm-Message-State: AOJu0YyglVAQrj68dZJ1TIgVqzamW7EfP8H3SsLnjNRfO2Y1rzyQi8xR
-	bER6bxxgsko6D5hVV0KNcUus2En1EvWoFbfnxM8FSF5LHtd/j0OC
-X-Google-Smtp-Source: AGHT+IHHsQNnARBtgBiA47qYmYz+T9oXZgOmuinv8K61cf/j6tm3LWYbhboL1FrG6iEexKpWPv51sQ==
-X-Received: by 2002:a05:600c:3b09:b0:418:ef65:4b11 with SMTP id m9-20020a05600c3b0900b00418ef654b11mr5410497wms.2.1713695487651;
-        Sun, 21 Apr 2024 03:31:27 -0700 (PDT)
-Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id fl14-20020a05600c0b8e00b0041a25e1e2fcsm1998202wmb.20.2024.04.21.03.31.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Apr 2024 03:31:27 -0700 (PDT)
-Message-ID: <ede49e66-7a0a-472d-a44c-0c60763ddce0@grimberg.me>
-Date: Sun, 21 Apr 2024 13:31:26 +0300
+        d=1e100.net; s=20230601; t=1713702570; x=1714307370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sy/e6b7EdMkat/b8vNzmnm5808mkzwgEft7nfqfXnys=;
+        b=WfcxnTWzg0MgWlIzyehBNLK2E+zMukiM5CPUhvIqIaBCFrbyFdIif4tc7Z2ZMR5zhB
+         EjhBoXDdbKEzE/zdPANPxuW+vZKMc/xc0yQEpZ8PSEgpSY7sVUUPL4eNEPcdvuMsTvCi
+         EaNjARPyifn4bBsibW/Ag0I6B0TeOZWXW3lcsTDz0272hujmmkv4vtc7OOUMIK7e6/Ia
+         C8Ay50l5BgY38haqcA1xh3KDA+GBkhXPEJ2coxhLR4UQGb1Qk655hrtiv+kSzhwnfjz3
+         2k2qOEPWe+uSEI6OWJnElIZAlE4Y7UTV9I4b/DFbZbwQJPfvjbIX6Az4io8v7eCWodse
+         Z0Bg==
+X-Gm-Message-State: AOJu0Yzrc5pmByiz5lO7ZXlFanLJEjmS92c1Nr+D4zBJzp7rxWtrlEKr
+	4X5WTXPk6is7+PtX9Q5O4WCsJiisrIszKFUcioYYGLwmorRUG5zUyddjxg6NpFU+9YncjFt0Oi2
+	+8USdsijsAzclBVA2F0x1T6Y0reJJ13r2vwBHexVJnvS4ioM1naa/UDtEVazw+kgtSSXX5+vMSV
+	9QCgMHRBhkxWYiIgJBcHXegsd2+CQOmSrOHMjyKDQ/x9Riv79h
+X-Received: by 2002:a17:90a:4a06:b0:2ac:3af6:915b with SMTP id e6-20020a17090a4a0600b002ac3af6915bmr10220353pjh.1.1713702569958;
+        Sun, 21 Apr 2024 05:29:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGT7eZW8lEWSiEo0FoLUFrm4oGZmz7Fw072WAlSkG/kq2pWvC0ypTtHzT6DMUZX+8SH2CZJpOcNjrJFE4dPB7M=
+X-Received: by 2002:a17:90a:4a06:b0:2ac:3af6:915b with SMTP id
+ e6-20020a17090a4a0600b002ac3af6915bmr10220338pjh.1.1713702569603; Sun, 21 Apr
+ 2024 05:29:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] kmemleak observed with blktests nvme/tcp
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>, Yi Zhang <yi.zhang@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-References: <CAHj4cs8xbBXm1_SKpNpeB5_bbD28YwhorikQ-OYRtt9-Mf+vsQ@mail.gmail.com>
- <923a9363-f51b-4fa1-8a0b-003ff46845a2@nvidia.com>
-Content-Language: he-IL, en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <923a9363-f51b-4fa1-8a0b-003ff46845a2@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240417104209.2898526-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20240417104209.2898526-1-shinichiro.kawasaki@wdc.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Sun, 21 Apr 2024 20:29:17 +0800
+Message-ID: <CAHj4cs9W1Ad7Q8axcbDd4tsuPPz3MBxGGqCNPT6efbkgCnGMwA@mail.gmail.com>
+Subject: Re: [PATCH blktests v2 0/2] fix nbd/002
+To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org, nbd@other.debian.org, 
+	Josef Bacik <josef@toxicpanda.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Cannot reproduce the failure within 10000 cycles test now, thanks.
+
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
 
 
-On 16/04/2024 6:19, Chaitanya Kulkarni wrote:
-> +linux-nvme list for awareness ...
->
-> -ck
->
->
-> On 4/6/24 17:38, Yi Zhang wrote:
->> Hello
->>
->> I found the kmemleak issue after blktests nvme/tcp tests on the latest
->> linux-block/for-next, please help check it and let me know if you need
->> any info/testing for it, thanks.
-> it will help others to specify which testcase you are using ...
->
->> # dmesg | grep kmemleak
->> [ 2580.572467] kmemleak: 92 new suspected memory leaks (see
->> /sys/kernel/debug/kmemleak)
->>
->> # cat kmemleak.log
->> unreferenced object 0xffff8885a1abe740 (size 32):
->>     comm "kworker/40:1H", pid 799, jiffies 4296062986
->>     hex dump (first 32 bytes):
->>       c2 4a 4a 04 00 ea ff ff 00 00 00 00 00 10 00 00  .JJ.............
->>       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->>     backtrace (crc 6328eade):
->>       [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
->>       [<ffffffffa86a9b1f>] sgl_alloc_order+0x7f/0x360
->>       [<ffffffffc261f6c5>] lo_read_simple+0x1d5/0x5b0 [loop]
->>       [<ffffffffc26287ef>] 0xffffffffc26287ef
->>       [<ffffffffc262a2c4>] 0xffffffffc262a2c4
->>       [<ffffffffc262a881>] 0xffffffffc262a881
->>       [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
->>       [<ffffffffa76b0813>] worker_thread+0x583/0xd20
->>       [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
->>       [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
->>       [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
->> unreferenced object 0xffff88a8b03647c0 (size 16):
->>     comm "kworker/40:1H", pid 799, jiffies 4296062986
->>     hex dump (first 16 bytes):
->>       c0 4a 4a 04 00 ea ff ff 00 10 00 00 00 00 00 00  .JJ.............
->>     backtrace (crc 860ce62b):
->>       [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
->>       [<ffffffffc261f805>] lo_read_simple+0x315/0x5b0 [loop]
->>       [<ffffffffc26287ef>] 0xffffffffc26287ef
->>       [<ffffffffc262a2c4>] 0xffffffffc262a2c4
->>       [<ffffffffc262a881>] 0xffffffffc262a881
->>       [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
->>       [<ffffffffa76b0813>] worker_thread+0x583/0xd20
->>       [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
->>       [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
->>       [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
 
-kmemleak suggest that the leakage is coming from lo_read_simple() Is 
-this a regression that can be bisected?
+On Wed, Apr 17, 2024 at 6:42=E2=80=AFPM Shin'ichiro Kawasaki
+<shinichiro.kawasaki@wdc.com> wrote:
+>
+> Recently, CKI project found blktests nbd/002 failure. The test case sets =
+up the
+> connection to the nbd device, then checks partition existence in the devi=
+ce to
+> confirm that the kernel reads the partition table in the device. Usually,=
+ this
+> partition read by kernel is completed before the test script checks the
+> partition existence. However, the partition read often completes after th=
+e
+> partition existence check, then the test case fails. I think the test scr=
+ipt
+> checks the partition existence too early, and this should be fixed in the=
+ test
+> script.
+>
+> During this investigation, I noticed that the test case nbd/002 handles t=
+he
+> ioctl interface and the netlink interface opposite. The first patch fixes=
+ this
+> wrong interface handling. The second patch addresses the too early partit=
+ion
+> existence check issue.
+>
+> Link to v1 patch: https://lore.kernel.org/linux-block/20240319085015.3901=
+051-1-shinichiro.kawasaki@wdc.com/
+>
+> Changes from v1:
+> * Added another patch to fix ioctl/netlink interface handling mistake
+> * Avoid the nbd/002 failure by repeating the partition existence check
+>
+> Shin'ichiro Kawasaki (2):
+>   nbd/002: fix wrong -L/-nonetlink option usage
+>   nbd/002: repeat partition existence check for ioctl interface
+>
+>  tests/nbd/002 | 26 ++++++++++++++++++--------
+>  1 file changed, 18 insertions(+), 8 deletions(-)
+>
+> --
+> 2.44.0
+>
+
+
+--
+Best Regards,
+  Yi Zhang
+
