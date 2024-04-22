@@ -1,58 +1,37 @@
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47642154448
-	for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 18:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6889153BFE;
+	Mon, 22 Apr 2024 18:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713810454; cv=none; b=EQVmMHUeZXqDp+8jVBzwdRNCSRI3+yXo+5qcbUEx/rtJNy/hbGYQKEkUqMCORH1ljRJOi/Fw+aXZr382aMWocKA+DSAvGOyMGkKpHZtnxs65GBhM4DV5KBhrDjuslehGwnSfM4NdPaHcg8ELY5PC7Q16R5vj0RjzvLx4YJu4hGY=
+	t=1713811198; cv=none; b=Jm049GjnpidvbvfFd1U5lQetgouePhdr2HCQmnwt7vB5ezkLMjx/Z2YpaPJz2HAou6+Ss+uHvkzSmhvTLIDXPT5glHB0xOh4qwJws4HRCFlzlllOwrM+BtIw8AZHw4/UIYIsT7BIC3XOFDcS9hSw12lJxK0KdqhbU9OrVSIskcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713810454; c=relaxed/simple;
-	bh=NbRPx8U6l7TKqqagb1LOqNTi4gmxfhyfbSWYu4vv1TM=;
+	s=arc-20240116; t=1713811198; c=relaxed/simple;
+	bh=Nyd5CC3+SeZTxf0OJyqVrpGGzfHzAExyfn45MCTlIKo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DBdkRQRlsR1fQGS3c0zI9TvsTNOgy7DBRO5auXltS6RIw52mqXfGpjdjzscXc/OPRqvj/mPveVnhXG9Si/lGMpT3ppTg7xUMNPqqH/NayoPj0bDJjbzsQyaiQVSxqx4F6N8I6xJQhp02XLC0CjlIfUT+B7eVOLIa7Fh1AvqESBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MyvobiZi; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=UUDYwSwS2zg11cVpHijUVXKrlSSoPotYo8kssTZ8UVu9Ge9XmJrr3TvZ71hSYMk6EopoDvmAAxwLDfzSj44QR+AeJoyBlmUGLlhbKCrV0VZJC4MyKnDRueITOmjwECHmAE/6+92eOKIB1qySu0IZJlATXaKIJ8ZMR4hkdFIk+bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ds52ftOk; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MyvobiZi"
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-36c0274c0faso1515435ab.0
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 11:27:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713810450; x=1714415250; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TEICl6bZH7kNUGOlyYtgXN5hM8fFIzE2nunBdbyAu3M=;
-        b=MyvobiZiuV6ubhmjnRSdhNr6+/xWozWzSst85kI2sYtJNQHjj1QX/1rYiwnaX2rIM3
-         Z/dTMq4KLJ1y/nyzqBrdykbNu1Pw2QdaRnDpk4kNNk6rRyMiWFzgb9RqrHHZx7Nrth+h
-         nmwXVbFwBOYWurbpJleNUmZcYNJuoC8fdwA1g++VoJHoeNyhDHSKfaAxqmNRhE9QFp9M
-         Bq7olmm2fsck8SYFsqc98LgZ0dkQ8F48zLquYp6Lp+CDul6hzNa2Aazw38AdSGoOMxVB
-         fZAEnsi1C9PmAnCN8jBqYKnPMwFfvUpnmGl6hg/vuKOdVqJfr8/uCc8SlT2Z11f7XeSE
-         76BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713810450; x=1714415250;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TEICl6bZH7kNUGOlyYtgXN5hM8fFIzE2nunBdbyAu3M=;
-        b=OKKadLQiQhMa5+ZmNBN3aqAWgYdl9RqzMgEQnSRHTrkcjvBmzKZpneID/Stn5vdJUU
-         2DGENKQPLe6u0pq/8sUZoF90DhClaSPYEKNdlzPw+fH/hxD5UKmCVqyhhzGDRzEvh9Ds
-         9X5jfgxjStm/x50g8YZ/ziRbqhAhoPfjnOG8bh7GnHEJ+WtxOJK/oakw0X/zsyEYY2j7
-         ugawBQVF9L7/7FAfp1Esne6eXWRFlhf58DODa725W1nWQNKfPTk8ZsieA/Rtsrqh1fem
-         5Ss2MZ75hPAdh3HkvYGZTxrLszaEccwzTihdRgdi6aqYS4Jg6nIg555MSy+ikKemiFnw
-         Zv5Q==
-X-Gm-Message-State: AOJu0YwNg9Njk3z9z8yoT51kHy5lGpy5aXciuW5+HyL15daG5z4UIPfq
-	snlhXIWwRm0egq2FsVs0NOePzlIcubM8C7a7fnI5i1EFWCD97i17xxNOty1NN1c=
-X-Google-Smtp-Source: AGHT+IFiWPY5KtY+4EEfMUYMPrIExXglEBc8UWOKY8pk+Q1qXqIy9ztYOzurbkWpGi29o5c2nCocaA==
-X-Received: by 2002:a05:6602:1205:b0:7da:693f:d676 with SMTP id y5-20020a056602120500b007da693fd676mr10951210iot.1.1713810450117;
-        Mon, 22 Apr 2024 11:27:30 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ha14-20020a0566386b8e00b0047f1b5975e5sm2994521jab.76.2024.04.22.11.27.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Apr 2024 11:27:29 -0700 (PDT)
-Message-ID: <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
-Date: Mon, 22 Apr 2024 12:27:28 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ds52ftOk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=WvnAsiuZt8H1Zl4oauEZTca+TX5rbK65b3taUhfahhM=; b=ds52ftOk9Au39MxQJzq73CM5N2
+	GyV5+iclVmjhqP8u/seLO1N6Mb+fe9n4Kk5dPhboUvhWAWH83j2jb36JLESOI7gdhv3Ww5LfQdT3M
+	BLRzv/gZMgBEI6yH10yerKdpcnPbG3qVGmIYCXG506Mhx53ceDbSKHZaJhD64l8A7zh+d/WZmmCTq
+	eoH251REzJFUgB+TTUcWu6q55bD6MVHVhOrYGzNdTPh/iy40hqx++1YUmEXCfmzfZsekvAfQ2cdPb
+	7QfNAnodGujKu6nkSSGr5syzGuzSYn1lTpDTK4gdh698bI8dt247N9/uAu/hIwkH86+qL9jLXJNKE
+	1fUiAdFA==;
+Received: from [50.53.4.147] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1ryya3-0000000EdIe-0WYS;
+	Mon, 22 Apr 2024 18:39:55 +0000
+Message-ID: <7d24e1fb-520c-4ec2-a6aa-89856092891a@infradead.org>
+Date: Mon, 22 Apr 2024 11:39:54 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,70 +39,41 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/9] io_uring: support SQE group
+Subject: Re: [PATCH 1/7] block: Init for CBD(CXL Block Device)
+To: Dongsheng Yang <dongsheng.yang@easystack.cn>, dan.j.williams@intel.com,
+ axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-cxl@vger.kernel.org, Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+ <20240422071606.52637-2-dongsheng.yang@easystack.cn>
 Content-Language: en-US
-To: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-6-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240408010322.4104395-6-ming.lei@redhat.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240422071606.52637-2-dongsheng.yang@easystack.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/7/24 7:03 PM, Ming Lei wrote:
-> SQE group is defined as one chain of SQEs starting with the first sqe that
-> has IOSQE_EXT_SQE_GROUP set, and ending with the first subsequent sqe that
-> doesn't have it set, and it is similar with chain of linked sqes.
-> 
-> The 1st SQE is group leader, and the other SQEs are group member. The group
-> leader is always freed after all members are completed. Group members
-> aren't submitted until the group leader is completed, and there isn't any
-> dependency among group members, and IOSQE_IO_LINK can't be set for group
-> members, same with IOSQE_IO_DRAIN.
-> 
-> Typically the group leader provides or makes resource, and the other members
-> consume the resource, such as scenario of multiple backup, the 1st SQE is to
-> read data from source file into fixed buffer, the other SQEs write data from
-> the same buffer into other destination files. SQE group provides very
-> efficient way to complete this task: 1) fs write SQEs and fs read SQE can be
-> submitted in single syscall, no need to submit fs read SQE first, and wait
-> until read SQE is completed, 2) no need to link all write SQEs together, then
-> write SQEs can be submitted to files concurrently. Meantime application is
-> simplified a lot in this way.
-> 
-> Another use case is to for supporting generic device zero copy:
-> 
-> - the lead SQE is for providing device buffer, which is owned by device or
->   kernel, can't be cross userspace, otherwise easy to cause leak for devil
->   application or panic
-> 
-> - member SQEs reads or writes concurrently against the buffer provided by lead
->   SQE
+Hi,
 
-In concept, this looks very similar to "sqe bundles" that I played with
-in the past:
+On 4/22/24 12:16 AM, Dongsheng Yang wrote:
+> diff --git a/drivers/block/cbd/Kconfig b/drivers/block/cbd/Kconfig
+> new file mode 100644
+> index 000000000000..98b2cbcdf895
+> --- /dev/null
+> +++ b/drivers/block/cbd/Kconfig
+> @@ -0,0 +1,4 @@
+> +config BLK_DEV_CBD
+> +	tristate "CXL Block Device"
+> +	help
+> +	  If unsure say 'm'.
 
-https://git.kernel.dk/cgit/linux/log/?h=io_uring-bundle
+I think that needs more help text. checkpatch should have said something
+about that...
 
-Didn't look too closely yet at the implementation, but in spirit it's
-about the same in that the first entry is processed first, and there's
-no ordering implied between the test of the members of the bundle /
-group.
+And why should someone say 'm' to the config question?
+Will lots of (non-server) computers have CXL block device capability?
 
-I do think that's a flexible thing to support, particularly if:
-
-1) We can do it more efficiently than links, which are pretty horrible.
-2) It enables new worthwhile use cases
-3) It's done cleanly 
-4) It's easily understandable and easy to document, so that users will
-   actually understand what this is and what use cases it enable. Part
-   of that is actually naming, it should be readily apparent what a
-   group is, what the lead is, and what the members are. Using your
-   terminology here, definitely worth spending some time on that to get
-   it just right and self evident.
-
+thanks.
 -- 
-Jens Axboe
-
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
