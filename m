@@ -1,117 +1,94 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01749153BF2
-	for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 17:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E005A154428
+	for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 18:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713808603; cv=none; b=C8nU0nxDApGyTA6cxO0Yi+V3yBkNrtqDCxttI2nZ5NF7aOatcZt0t0xAq99EHON2RfBi9/zQGbqVz9olOQ6BDMSgdGrhK2E7b358Z6c75BRfvikRcJTVHa7ctRZ0pWSbI0obCie979iYkQoePGe3PpuG16hQuNnWTqheQ7S5lsQ=
+	t=1713809776; cv=none; b=fz9mlucRBXcMiemRr1Ex3GOL2SiEPbygE+qf2BtT5jyEIj/61yH2KmwSE047M/9PciO6+lSnmKpS62Jj3ALQbZQMmYU5+hjA16R4ILiw6jGJy9NNGZ3sUvhs144o/zsdwO/ue4CKxEirCxHhNpds5W1/8d2VQhs5R0jPlcVe5/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713808603; c=relaxed/simple;
-	bh=CeDKuqZpRK5NjHJewgOWK37JtlkW9wLhfxLAr0U/bcc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R21aMy84CMuNZpzs50KDTrmXhOEC/jtvHP7pSK95S18QSTFP5IeW17GMSBI0ftZIhjd2U9inPEJ4/vvB6xS9H05FG4gHgIBHeVbReInvlvzywFVTqu2eYDNC2hhSNp764GfHzNkQLHtNx1WJ+wgjY1QZfXuTEK/8sAPRPo62hpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=c3KXTOR7; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1713809776; c=relaxed/simple;
+	bh=B5CZ+oTZvPpnGx9k1dUn+OLWXo+guU/qjTe5CjADExA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FwVJgkXHhCYr+u4NJYL041DneVcHAMjVxuhRebNIZewmbTVewZgUqtvO+qPrT+tYolfj9C2zLqO9gFY8pI2kvNFd+ibQQyTXd5sgwjtq9XkQgVHIp4hf859GY3UIVm73BBqlBSdcgBG9Wa6NUz57VnlqHokr1+e1oEtFsTEkF54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DXPGKlr6; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c3KXTOR7"
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-dcd7c526cc0so4884975276.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 10:56:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DXPGKlr6"
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7d9c78d7f97so37398139f.3
+        for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 11:16:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713808600; x=1714413400; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hSNE12RwAhLSsb0j0icuv+XwFCbPVvOY1VkFNRGWJ0k=;
-        b=c3KXTOR73lfzDHYyGvNTs4GWd6b4r3wWVjwvBjGvNDUwEdQhT9E2qfj3VLYN38PFMM
-         fSmBvu1c81FLcLtPwim3S9+x+L/7xrgtoCLbH2YLVZaG8Xtz9cfE2YLkiyNgW75gjCtU
-         KwX99FwVqlg9KEYDPuXTs/ivE0RgntXsCOrYfbYs9eWkFUCOCOv7oRzehoc/gjYIIbJY
-         UvjhD/Hxwh3UWNoWJ1tWhC9R2QHqjaHpuVCsmLd+xHWgwreaDNgjYG8ss7vPchFeZLJM
-         CGn3uuJfQjBuQK8TEcmawjkL75+V2vJg5gLaTgBoFkyEpzTPxODH0psiUKG3V1Yy8PqV
-         jNGQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713809774; x=1714414574; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JewW7W3HTo6e/LmWHxbYyvro6tSYTVzXWjpzdonwN24=;
+        b=DXPGKlr6YdhkOUq1kQ3gNrJHTx0Y+VnjzQkzAz8/+6dSETh8Y9B3TtwEyuPJNwJJOP
+         kFaHGrzNxH14AvigHeCmPShxuq/AwDt4/UwE1DR01exp9qRPRfpE/zlNQe+tlmqnphrx
+         weKUeGypssFpKvaRO83E7gg/JUHXRXoCvMepif1PLkRHhOzMgNuiCp9+V/jm316j+BEa
+         J5RDJjM/XHXzKdfrOUpZvmOYLTkV6jWxPA1VdOe7TCm4Vgnk3K4nNU46CKZ6hQyqQmlu
+         6o1Lxt6vR+KLl7LyZR698GRjg1IO8gQYmWb0JPSiGTuhYr/WGdxc3gfPxw8EN+Syzljp
+         9p+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713808600; x=1714413400;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hSNE12RwAhLSsb0j0icuv+XwFCbPVvOY1VkFNRGWJ0k=;
-        b=iRBHH+W5ZnWQeQfK42JZBKx32zLdtFqxdG55aqPqQnkc/AIhXo4MiIKBTbGCLlgwyW
-         ueVL5Nu1M30RZgMkq/FesHrrNk/Xvdb6fwzrn+uJXiKZasT0cqm1x/GR84zzKVbiGcfn
-         DsRze3U7rXcaUzapsHUyPZ0c6FTezC7jwHdXwDegOaT053IuptiLHzhuuIGDsdi5D/Ve
-         /C8u9iEthUgQz2OoTSaGfDIEleMY1lE2yhOaiNupKAJKyM7h+tj2SxqfRFdXWwkUyiZ/
-         jOuZt51yJwZ1so8lM7ZP4zx2s3o9YlGepRBgyRCqz4dR67qyyAT7R/Esv66HZlpVBdnz
-         3Mow==
-X-Forwarded-Encrypted: i=1; AJvYcCXMPzttu1PG4QmRslqGFtH2DneGdEIhToTXEKlDrZe4DHjw/r1emkRNq4jSb9UohU29Rk1s5R++654Jrfy7ABY8h9LlQ7DBOdzByNQ=
-X-Gm-Message-State: AOJu0YysmeszJ1DqVX2CcAqE+uMeCiAloUbTv8YztaPj3Y8lhNyCOlA3
-	QFlQYI9aG5J5pbXJcW+4iJFMSwHllS8ucZvxnj1S3/95mFaizfuxV2Hw/gCnQkMw6yubG4pWqEV
-	rm6C/kUbTR5Z4PBSQNVy9tWOqDXJKQRJK0or6Fw==
-X-Google-Smtp-Source: AGHT+IHh+dL0ZbMEEZYwmSys0EHDkrAGlP1eanWndxqE2I8DK1sRBuCxrIUDoHPepVykUJYdVg1mxxd/7dT8rQ+SUJk=
-X-Received: by 2002:a25:83ca:0:b0:dcd:13ba:cdd6 with SMTP id
- v10-20020a2583ca000000b00dcd13bacdd6mr9918017ybm.47.1713808600074; Mon, 22
- Apr 2024 10:56:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713809774; x=1714414574;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JewW7W3HTo6e/LmWHxbYyvro6tSYTVzXWjpzdonwN24=;
+        b=vsrKt4pwNnv9W0nYSZyHxyjqWzPH9BL2hiMTrdulaQRZFFir6rJCvFgKZRG5Txtyk6
+         gKHG3lBz+tqTxYq8gP6Z3wWEhdkj8QW81Q64OUTRnthsX8qfLo/lD971qxBRIpsMgUtR
+         uxpj2zCtIuNG8Fv1vk+p3oFY7cWAXmJ1xhPJkOB/zwWTgb1dxzBLRnyGbMNCXMV7bC8o
+         Q/7JxYUCD5zOi3IGoWxvD5fkwlo0xZ66/pP5sPfytwwYnVZy3E3VHD/rJu5VmqhjAvNp
+         yTjnLq7yqtG2cbWwxUo1VX5y4gkDZHOqAvnLaGyDcdu3TKeYVyr7ixMgTk5ms6Rhwenn
+         Vj/Q==
+X-Gm-Message-State: AOJu0YyuzmKIZDvw9VlEEIt6ysnSTnG7W9PeSq5xwGE2bHE2wtm6ezuX
+	Ckteuf0vwQMurWLV+zspJyk8t2KqBZBoPi7FtaJbVvxsoz6+oDlyIk3awZYxVXisLugCbBg1R9B
+	A
+X-Google-Smtp-Source: AGHT+IEYClAeu3ei9D/fFRRhWuam87Jr9e0V4FfrCrQWW87IB3ZIJgWQU3fIECpXh27eQ1tSePlMRQ==
+X-Received: by 2002:a6b:6805:0:b0:7da:7278:be09 with SMTP id d5-20020a6b6805000000b007da7278be09mr9573036ioc.2.1713809773585;
+        Mon, 22 Apr 2024 11:16:13 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id y8-20020a02c008000000b00482f496ade4sm3118588jai.83.2024.04.22.11.16.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Apr 2024 11:16:13 -0700 (PDT)
+Message-ID: <89dac454-6521-4bd8-b8aa-ad329b887396@kernel.dk>
+Date: Mon, 22 Apr 2024 12:16:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422153607.963672-1-saproj@gmail.com>
-In-Reply-To: <20240422153607.963672-1-saproj@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 22 Apr 2024 19:56:29 +0200
-Message-ID: <CACRpkdYoLjXHwN2EKsxZz8FdxNQ8beuqSO6EX9CjZmE0nX3tUw@mail.gmail.com>
-Subject: Re: [PATCH] mmc: moxart: fix handling of sgm->consumed, otherwise
- WARN_ON triggers
-To: Sergei Antonov <saproj@gmail.com>
-Cc: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/9] io_uring: support user sqe ext flags
+Content-Language: en-US
+To: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
+ Kevin Wolf <kwolf@redhat.com>
+References: <20240408010322.4104395-1-ming.lei@redhat.com>
+ <20240408010322.4104395-3-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240408010322.4104395-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 22, 2024 at 5:36=E2=80=AFPM Sergei Antonov <saproj@gmail.com> w=
-rote:
+On 4/7/24 7:03 PM, Ming Lei wrote:
+> sqe->flags is u8, and now we have used 7 bits, so take the last one for
+> extending purpose.
+> 
+> If bit7(IOSQE_HAS_EXT_FLAGS_BIT) is 1, it means this sqe carries ext flags
+> from the last byte(.ext_flags), or bit23~bit16 of sqe->uring_cmd_flags for
+> IORING_OP_URING_CMD.
+> 
+> io_slot_flags() return value is converted to `ULL` because the affected bits
+> are beyond 32bit now.
 
-> When e.g. 8 bytes are to be read, sgm->consumed equals 8 immediately afte=
-r
-> sg_miter_next() call. The driver then increments it as bytes are read,
-> so sgm->consumed becomes 16 and this warning triggers in sg_miter_stop():
-> WARN_ON(miter->consumed > miter->length);
->
-> WARNING: CPU: 0 PID: 28 at lib/scatterlist.c:925 sg_miter_stop+0x2c/0x10c
-> CPU: 0 PID: 28 Comm: kworker/0:2 Tainted: G        W          6.9.0-rc5-d=
-irty #249
-> Hardware name: Generic DT based system
-> Workqueue: events_freezable mmc_rescan
-> Call trace:.
->  unwind_backtrace from show_stack+0x10/0x14
->  show_stack from dump_stack_lvl+0x44/0x5c
->  dump_stack_lvl from __warn+0x78/0x16c
->  __warn from warn_slowpath_fmt+0xb0/0x160
->  warn_slowpath_fmt from sg_miter_stop+0x2c/0x10c
->  sg_miter_stop from moxart_request+0xb0/0x468
->  moxart_request from mmc_start_request+0x94/0xa8
->  mmc_start_request from mmc_wait_for_req+0x60/0xa8
->  mmc_wait_for_req from mmc_app_send_scr+0xf8/0x150
->  mmc_app_send_scr from mmc_sd_setup_card+0x1c/0x420
->  mmc_sd_setup_card from mmc_sd_init_card+0x12c/0x4dc
->  mmc_sd_init_card from mmc_attach_sd+0xf0/0x16c
->  mmc_attach_sd from mmc_rescan+0x1e0/0x298
->  mmc_rescan from process_scheduled_works+0x2e4/0x4ec
->  process_scheduled_works from worker_thread+0x1ec/0x24c
->  worker_thread from kthread+0xd4/0xe0
->  kthread from ret_from_fork+0x14/0x38
->
-> This patch adds initial zeroing of sgm->consumed. It is then incremented
-> as bytes are read or written.
->
-> Signed-off-by: Sergei Antonov <saproj@gmail.com>
-> Cc: Linus Walleij <linus.walleij@linaro.org>
-> Fixes: 3ee0e7c3e67c ("mmc: moxart-mmc: Use sg_miter for PIO")
+If we're extending flags, which is something we arguably need to do at
+some point, I think we should have them be generic and not spread out.
+If uring_cmd needs specific flags and don't have them, then we should
+add it just for that.
 
-Oh it was that simple.
+-- 
+Jens Axboe
 
-Thanks for fixing this Sergei!
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
