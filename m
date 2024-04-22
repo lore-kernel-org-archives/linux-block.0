@@ -1,35 +1,37 @@
-Received: from mail-m105.netease.com (mail-m105.netease.com [154.81.10.5])
+Received: from mail-m11877.qiye.163.com (mail-m11877.qiye.163.com [115.236.118.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB454D9E7;
-	Mon, 22 Apr 2024 07:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=154.81.10.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2956AD27D;
+	Mon, 22 Apr 2024 08:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.236.118.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713772401; cv=none; b=NJHc1vQ85Vwlw9Ou3feaKngZSOmTjTQCsRwxQnrJBAD9+wRTqnEyGVQ6I2ZYHQF/x/VzfC4i3v0V5FJndLVZYfnWHBJCEb0AepwNd7IvKVejXIKRGyx0ntbYoIrKNGUdIn7vi45YbW0OgDpOAeCOzpUiX/D2iIjCMGd0LvMKp6Y=
+	t=1713773892; cv=none; b=eVR//xp3xXjY3V+Mk6+aZNt3gnBL1XyoZ2FPG/nodJ/yYGTLehK27afKoFzRbU8GczV7R7MO17mgAYuWPa3JPmcD2jPe4cBAKdcYaiqZyxAyw0X1/dQdb8VvCKcqeUfRYI41v0OxLRSTYz+Crgm5yJM/ZQNDQOnKxv0eHIpsV/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713772401; c=relaxed/simple;
-	bh=jviW9tZXwPURAzS+xFNnF3nwJL+bik14NRRnL+OpemI=;
+	s=arc-20240116; t=1713773892; c=relaxed/simple;
+	bh=+uhCAuMBch6NqAg0S0WaqlwhFKvYJe1RVreC07HCrK8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ELJiK1g/HJ6nUQPoyGuu5IVFSlkEk0vuRxfmOgkezD+6MvD0WSuMGHBjkb9SxLZuMrVLAsFo23JqjN6N0ogfHgD/CMX3EwxKkxEobDgmWqukWrC+OUNQh+Mgif63arhGjGpegxVLfTd6YxhgYM6iHmUBWx83lRqHxhtWd//eDMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn; spf=none smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=154.81.10.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easystack.cn
+	 MIME-Version; b=D16+GPLr5O//ULilXIYBIPMLj9RwmdPnwDOWnvVXABkI97sMCx8kndzWfhlk6tWcOZk3cQ+XukbNrJ/rvnqnhLKxXHDwqr/OXZwPnsv7kwo5g2C8njQqr3Wwh80pkCIMyL8CInXmbd8DUivRzwyVrJKKkL6lBa9woXTrF8C/gtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=115.236.118.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
 Received: from ubuntu-22-04.. (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 1321286025B;
-	Mon, 22 Apr 2024 15:16:13 +0800 (CST)
+	by smtp.qiye.163.com (Hmail) with ESMTPA id B1F8886025A;
+	Mon, 22 Apr 2024 15:01:34 +0800 (CST)
 From: Dongsheng Yang <dongsheng.yang@easystack.cn>
 To: dan.j.williams@intel.com,
 	axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-cxl@vger.kernel.org,
-	Dongsheng Yang <dongsheng.yang.linux@gmail.com>
-Subject: [PATCH 4/7] cbd: introduce cbd_host
-Date: Mon, 22 Apr 2024 07:16:03 +0000
-Message-Id: <20240422071606.52637-5-dongsheng.yang@easystack.cn>
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>
+Subject: [PATCH 3/3] cxl/memdev: Only show sanitize sysfs files when supported
+Date: Mon, 22 Apr 2024 07:01:25 +0000
+Message-Id: <20240422070125.52519-5-dongsheng.yang@easystack.cn>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
-References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+In-Reply-To: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
+References: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,196 +40,201 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkZSBgeVh8aSkodSkpMHUpPQlUZERMWGhIXJBQOD1
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlDSk9KVh0eTU5NS0xIGUIfQlUZERMWGhIXJBQOD1
 	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8f04a9936e023ckunm1321286025b
+X-HM-Tid: 0a8f049c2c96023ckunmb1f8886025a
 X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6PAw6Igw4LTc6IxwBSDYhCyI0
-	AzgKCgFVSlVKTEpITExLSkxITE5PVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBTkNNTjcG
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Njo6PRw6CDcxARw0IhFKGQIa
+	Fi9PCkhVSlVKTEpITE1CSUJOT0JDVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBTEJJSTcG
 
-From: Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+From: Davidlohr Bueso <dave@stgolabs.net>
 
-The "cbd_host" represents a host node. Each node needs to be registered
-before it can use the "cbd_transport". After registration, the node's
-information, such as its hostname, will be recorded in the "hosts" area
-of this transport. Through this mechanism, we can know which nodes are
-currently using each transport.
+If the device does not support Sanitize or Secure Erase commands,
+hide the respective sysfs interfaces such that the operation can
+never be attempted.
 
-Signed-off-by: Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+In order to be generic, keep track of the enabled security commands
+found in the CEL - the driver does not support Security Passthrough.
+
+Signed-off-by: Davidlohr Bueso <dave@stgolabs.net>
+Link: https://lore.kernel.org/r/20230726051940.3570-4-dave@stgolabs.net
+Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
 ---
- drivers/block/cbd/Makefile        |   2 +-
- drivers/block/cbd/cbd_host.c      | 123 ++++++++++++++++++++++++++++++
- drivers/block/cbd/cbd_transport.c |   8 ++
- 3 files changed, 132 insertions(+), 1 deletion(-)
- create mode 100644 drivers/block/cbd/cbd_host.c
+ Documentation/ABI/testing/sysfs-bus-cxl |  6 ++--
+ drivers/cxl/core/mbox.c                 | 45 ++++++++++++++++++++++++-
+ drivers/cxl/core/memdev.c               | 19 +++++++++++
+ drivers/cxl/cxlmem.h                    | 15 +++++++++
+ 4 files changed, 82 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/cbd/Makefile b/drivers/block/cbd/Makefile
-index c581ae96732b..2389a738b12b 100644
---- a/drivers/block/cbd/Makefile
-+++ b/drivers/block/cbd/Makefile
-@@ -1,3 +1,3 @@
--cbd-y := cbd_main.o cbd_transport.o cbd_channel.o
-+cbd-y := cbd_main.o cbd_transport.o cbd_channel.o cbd_host.o
+diff --git a/Documentation/ABI/testing/sysfs-bus-cxl b/Documentation/ABI/testing/sysfs-bus-cxl
+index c4c4acb1f3b3..087f762ebfd5 100644
+--- a/Documentation/ABI/testing/sysfs-bus-cxl
++++ b/Documentation/ABI/testing/sysfs-bus-cxl
+@@ -86,7 +86,8 @@ Description:
+ 		HPA ranges. This permits avoiding explicit global CPU cache
+ 		management, relying instead for it to be done when a region
+ 		transitions between software programmed and hardware committed
+-		states.
++		states. If this file is not present, then there is no hardware
++		support for the operation.
  
- obj-$(CONFIG_BLK_DEV_CBD) += cbd.o
-diff --git a/drivers/block/cbd/cbd_host.c b/drivers/block/cbd/cbd_host.c
-new file mode 100644
-index 000000000000..892961f5f1b2
---- /dev/null
-+++ b/drivers/block/cbd/cbd_host.c
-@@ -0,0 +1,123 @@
-+#include "cbd_internal.h"
-+
-+static ssize_t cbd_host_name_show(struct device *dev,
-+			       struct device_attribute *attr,
-+			       char *buf)
+ 
+ What            /sys/bus/cxl/devices/memX/security/erase
+@@ -101,7 +102,8 @@ Description:
+ 		HPA ranges. This permits avoiding explicit global CPU cache
+ 		management, relying instead for it to be done when a region
+ 		transitions between software programmed and hardware committed
+-		states.
++		states. If this file is not present, then there is no hardware
++		support for the operation.
+ 
+ 
+ What:		/sys/bus/cxl/devices/memX/firmware/
+diff --git a/drivers/cxl/core/mbox.c b/drivers/cxl/core/mbox.c
+index d6d067fbee97..ca60bb8114f2 100644
+--- a/drivers/cxl/core/mbox.c
++++ b/drivers/cxl/core/mbox.c
+@@ -121,6 +121,45 @@ static bool cxl_is_security_command(u16 opcode)
+ 	return false;
+ }
+ 
++static void cxl_set_security_cmd_enabled(struct cxl_security_state *security,
++					 u16 opcode)
 +{
-+	struct cbd_host_device *host;
-+	struct cbd_host_info *host_info;
-+
-+	host = container_of(dev, struct cbd_host_device, dev);
-+	host_info = host->host_info;
-+
-+	cbdt_flush_range(host->cbdt, host_info, sizeof(*host_info));
-+
-+	if (host_info->state == cbd_host_state_none)
-+		return 0;
-+
-+	if (strlen(host_info->hostname) == 0)
-+		return 0;
-+
-+	return sprintf(buf, "%s\n", host_info->hostname);
++	switch (opcode) {
++	case CXL_MBOX_OP_SANITIZE:
++		set_bit(CXL_SEC_ENABLED_SANITIZE, security->enabled_cmds);
++		break;
++	case CXL_MBOX_OP_SECURE_ERASE:
++		set_bit(CXL_SEC_ENABLED_SECURE_ERASE,
++			security->enabled_cmds);
++		break;
++	case CXL_MBOX_OP_GET_SECURITY_STATE:
++		set_bit(CXL_SEC_ENABLED_GET_SECURITY_STATE,
++			security->enabled_cmds);
++		break;
++	case CXL_MBOX_OP_SET_PASSPHRASE:
++		set_bit(CXL_SEC_ENABLED_SET_PASSPHRASE,
++			security->enabled_cmds);
++		break;
++	case CXL_MBOX_OP_DISABLE_PASSPHRASE:
++		set_bit(CXL_SEC_ENABLED_DISABLE_PASSPHRASE,
++			security->enabled_cmds);
++		break;
++	case CXL_MBOX_OP_UNLOCK:
++		set_bit(CXL_SEC_ENABLED_UNLOCK, security->enabled_cmds);
++		break;
++	case CXL_MBOX_OP_FREEZE_SECURITY:
++		set_bit(CXL_SEC_ENABLED_FREEZE_SECURITY,
++			security->enabled_cmds);
++		break;
++	case CXL_MBOX_OP_PASSPHRASE_SECURE_ERASE:
++		set_bit(CXL_SEC_ENABLED_PASSPHRASE_SECURE_ERASE,
++			security->enabled_cmds);
++		break;
++	default:
++		break;
++	}
 +}
 +
-+static DEVICE_ATTR(hostname, 0400, cbd_host_name_show, NULL);
+ static bool cxl_is_poison_command(u16 opcode)
+ {
+ #define CXL_MBOX_OP_POISON_CMDS 0x43
+@@ -677,7 +716,8 @@ static void cxl_walk_cel(struct cxl_memdev_state *mds, size_t size, u8 *cel)
+ 		u16 opcode = le16_to_cpu(cel_entry[i].opcode);
+ 		struct cxl_mem_command *cmd = cxl_mem_find_command(opcode);
+ 
+-		if (!cmd && !cxl_is_poison_command(opcode)) {
++		if (!cmd && (!cxl_is_poison_command(opcode) ||
++			     !cxl_is_security_command(opcode))) {
+ 			dev_dbg(dev,
+ 				"Opcode 0x%04x unsupported by driver\n", opcode);
+ 			continue;
+@@ -689,6 +729,9 @@ static void cxl_walk_cel(struct cxl_memdev_state *mds, size_t size, u8 *cel)
+ 		if (cxl_is_poison_command(opcode))
+ 			cxl_set_poison_cmd_enabled(&mds->poison, opcode);
+ 
++		if (cxl_is_security_command(opcode))
++			cxl_set_security_cmd_enabled(&mds->security, opcode);
 +
-+CBD_OBJ_HEARTBEAT(host);
-+
-+static struct attribute *cbd_host_attrs[] = {
-+	&dev_attr_hostname.attr,
-+	&dev_attr_alive.attr,
-+	NULL
-+};
-+
-+static struct attribute_group cbd_host_attr_group = {
-+	.attrs = cbd_host_attrs,
-+};
-+
-+static const struct attribute_group *cbd_host_attr_groups[] = {
-+	&cbd_host_attr_group,
-+	NULL
-+};
-+
-+static void cbd_host_release(struct device *dev)
-+{
-+}
-+
-+struct device_type cbd_host_type = {
-+	.name		= "cbd_host",
-+	.groups		= cbd_host_attr_groups,
-+	.release	= cbd_host_release,
-+};
-+
-+struct device_type cbd_hosts_type = {
-+	.name		= "cbd_hosts",
-+	.release	= cbd_host_release,
-+};
-+
-+int cbd_host_register(struct cbd_transport *cbdt, char *hostname)
-+{
-+	struct cbd_host *host;
-+	struct cbd_host_info *host_info;
-+	u32 host_id;
-+	int ret;
-+
-+	if (cbdt->host) {
-+		return -EEXIST;
-+	}
-+
-+	if (strlen(hostname) == 0) {
-+		return -EINVAL;
-+	}
-+
-+	ret = cbdt_get_empty_host_id(cbdt, &host_id);
-+	if (ret < 0) {
-+		return ret;
-+	}
-+
-+	host = kzalloc(sizeof(struct cbd_host), GFP_KERNEL);
-+	if (!host) {
-+		return -ENOMEM;
-+	}
-+
-+	host->host_id = host_id;
-+	host->cbdt = cbdt;
-+	INIT_DELAYED_WORK(&host->hb_work, host_hb_workfn);
-+
-+	host_info = cbdt_get_host_info(cbdt, host_id);
-+	host_info->state = cbd_host_state_running;
-+	memcpy(host_info->hostname, hostname, CBD_NAME_LEN);
-+
-+	cbdt_flush_range(cbdt, host_info, sizeof(*host_info));
-+
-+	host->host_info = host_info;
-+	cbdt->host = host;
-+
-+	queue_delayed_work(cbd_wq, &host->hb_work, 0);
-+
-+	return 0;
-+}
-+
-+int cbd_host_unregister(struct cbd_transport *cbdt)
-+{
-+	struct cbd_host *host = cbdt->host;
-+	struct cbd_host_info *host_info;
-+
-+	if (!host) {
-+		cbd_err("This host is not registered.");
-+		return 0;
-+	}
-+
-+	cancel_delayed_work_sync(&host->hb_work);
-+	host_info = host->host_info;
-+	memset(host_info->hostname, 0, CBD_NAME_LEN);
-+	host_info->alive_ts = 0;
-+	host_info->state = cbd_host_state_none;
-+
-+	cbdt_flush_range(cbdt, host_info, sizeof(*host_info));
-+
-+	cbdt->host = NULL;
-+	kfree(cbdt->host);
-+
-+	return 0;
-+}
-diff --git a/drivers/block/cbd/cbd_transport.c b/drivers/block/cbd/cbd_transport.c
-index 3a4887afab08..682d0f45ce9e 100644
---- a/drivers/block/cbd/cbd_transport.c
-+++ b/drivers/block/cbd/cbd_transport.c
-@@ -571,6 +571,7 @@ int cbdt_unregister(u32 tid)
+ 		dev_dbg(dev, "Opcode 0x%04x enabled\n", opcode);
  	}
- 	mutex_unlock(&cbdt->lock);
+ }
+diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+index f99e7ec3cc40..14b547c07f54 100644
+--- a/drivers/cxl/core/memdev.c
++++ b/drivers/cxl/core/memdev.c
+@@ -477,9 +477,28 @@ static struct attribute_group cxl_memdev_pmem_attribute_group = {
+ 	.attrs = cxl_memdev_pmem_attributes,
+ };
  
-+	cbd_host_unregister(cbdt);
- 	device_unregister(&cbdt->device);
- 	cbdt_dax_release(cbdt);
- 	cbdt_destroy(cbdt);
-@@ -624,8 +625,15 @@ int cbdt_register(struct cbdt_register_options *opts)
- 		goto dax_release;
- 	}
- 
-+	ret = cbd_host_register(cbdt, opts->hostname);
-+	if (ret) {
-+		goto dev_unregister;
-+	}
++static umode_t cxl_memdev_security_visible(struct kobject *kobj,
++					   struct attribute *a, int n)
++{
++	struct device *dev = kobj_to_dev(kobj);
++	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
++	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
 +
- 	return 0;
++	if (a == &dev_attr_security_sanitize.attr &&
++	    !test_bit(CXL_SEC_ENABLED_SANITIZE, mds->security.enabled_cmds))
++		return 0;
++
++	if (a == &dev_attr_security_erase.attr &&
++	    !test_bit(CXL_SEC_ENABLED_SECURE_ERASE, mds->security.enabled_cmds))
++		return 0;
++
++	return a->mode;
++}
++
+ static struct attribute_group cxl_memdev_security_attribute_group = {
+ 	.name = "security",
+ 	.attrs = cxl_memdev_security_attributes,
++	.is_visible = cxl_memdev_security_visible,
+ };
  
-+devs_exit:
-+	cbd_host_unregister(cbdt);
- dev_unregister:
- 	device_unregister(&cbdt->device);
- dax_release:
+ static const struct attribute_group *cxl_memdev_attribute_groups[] = {
+diff --git a/drivers/cxl/cxlmem.h b/drivers/cxl/cxlmem.h
+index f3aca828fbec..706f8a6d1ef4 100644
+--- a/drivers/cxl/cxlmem.h
++++ b/drivers/cxl/cxlmem.h
+@@ -244,6 +244,19 @@ enum poison_cmd_enabled_bits {
+ 	CXL_POISON_ENABLED_MAX
+ };
+ 
++/* Device enabled security commands */
++enum security_cmd_enabled_bits {
++	CXL_SEC_ENABLED_SANITIZE,
++	CXL_SEC_ENABLED_SECURE_ERASE,
++	CXL_SEC_ENABLED_GET_SECURITY_STATE,
++	CXL_SEC_ENABLED_SET_PASSPHRASE,
++	CXL_SEC_ENABLED_DISABLE_PASSPHRASE,
++	CXL_SEC_ENABLED_UNLOCK,
++	CXL_SEC_ENABLED_FREEZE_SECURITY,
++	CXL_SEC_ENABLED_PASSPHRASE_SECURE_ERASE,
++	CXL_SEC_ENABLED_MAX
++};
++
+ /**
+  * struct cxl_poison_state - Driver poison state info
+  *
+@@ -346,6 +359,7 @@ struct cxl_fw_state {
+  * struct cxl_security_state - Device security state
+  *
+  * @state: state of last security operation
++ * @enabled_cmds: All security commands enabled in the CEL
+  * @poll: polling for sanitization is enabled, device has no mbox irq support
+  * @poll_tmo_secs: polling timeout
+  * @poll_dwork: polling work item
+@@ -353,6 +367,7 @@ struct cxl_fw_state {
+  */
+ struct cxl_security_state {
+ 	unsigned long state;
++	DECLARE_BITMAP(enabled_cmds, CXL_SEC_ENABLED_MAX);
+ 	bool poll;
+ 	int poll_tmo_secs;
+ 	struct delayed_work poll_dwork;
 -- 
 2.34.1
 
