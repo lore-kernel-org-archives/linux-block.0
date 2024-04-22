@@ -1,240 +1,95 @@
-Received: from mail-m127104.qiye.163.com (mail-m127104.qiye.163.com [115.236.127.104])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55D14F60D;
-	Mon, 22 Apr 2024 08:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.236.127.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7402E4317E;
+	Mon, 22 Apr 2024 09:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713773895; cv=none; b=U9vbzU94AjeYKX1U2z/78huBo5DyFrayo099kY0Jnxj079t7Q2TQea7frT/RTGtql2iGr9r1/s/lesqe7HlbstYTYow52e9V7v0I5z9Qsm0AvN9JB469Fr7+pHciYDp9ZGGKbFsb3S1aLVPKNDSwuYvzPFTIa89cjVc8uadWQfg=
+	t=1713778946; cv=none; b=MulEGP7W6DiN9/am9TCY38sL6ax8EAPMAB/C48vV17CruWOWZL4JhSewwcw2TdZDzczKipf7zYAyKyf3iPbI4EAjWEdIVxOIBLRHvaZoLCamJDZUHZzT6f8hKtj6kUsWP5So2R4QPCxX3DZJf+WphuWXcV9b8p7qyZb8Rkx5lbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713773895; c=relaxed/simple;
-	bh=+uhCAuMBch6NqAg0S0WaqlwhFKvYJe1RVreC07HCrK8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ltTtoBUU/jtIVbrGW5nDdEcXRABmimXoqFFdO97SDcdSZOmc6umaxDCTbG6n87f3vsO/YVceiQekhzB3fPPx662pAvOXydTrtcRwustKMnQ9I+PhH3wFhxMGTHf9udShMmEbU8Y0pDoLJtmXypoU1g8R4bat7/a2aXF6J43BkRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=115.236.127.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
-Received: from ubuntu-22-04.. (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 11E7B86014C;
-	Mon, 22 Apr 2024 15:01:32 +0800 (CST)
-From: Dongsheng Yang <dongsheng.yang@easystack.cn>
-To: dan.j.williams@intel.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-cxl@vger.kernel.org,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>
-Subject: [PATCH] cxl/memdev: Only show sanitize sysfs files when supported
-Date: Mon, 22 Apr 2024 07:01:22 +0000
-Message-Id: <20240422070125.52519-2-dongsheng.yang@easystack.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
-References: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
+	s=arc-20240116; t=1713778946; c=relaxed/simple;
+	bh=7TlHmQJp8aYautVPKOtFwpAv0Dci5ZNsjmzZvfk2+Ws=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=l3eS2jU81DwcXVsQ+z3gM+rjDzBC05vGu+31WuQJyD2zaXnQFG1LicJiO9557tz9jq5f3ruAnnE8AumfI6qrvxCRqLTBXjXCPurRYNFQomVQ/pDu0Dp86EX97oVaW25AJZgvdfRH2f8tAXLeWQu+3R1m85y6seR/ZtHXBbBVtgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VNKzC32hZz4f3jJK;
+	Mon, 22 Apr 2024 17:42:15 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 363A01A0568;
+	Mon, 22 Apr 2024 17:42:20 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxD6MCZmJOqaKg--.46870S3;
+	Mon, 22 Apr 2024 17:42:20 +0800 (CST)
+Subject: Re: [PATCH] blk-throttle: fix repeat limit on bio with
+ BIO_BPS_THROTTLED
+To: =?UTF-8?B?5ZGo5rOw5a6H?= <zhoutaiyu@kuaishou.com>,
+ Yu Kuai <yukuai1@huaweicloud.com>, "tj@kernel.org" <tj@kernel.org>
+Cc: "josef@toxicpanda.com" <josef@toxicpanda.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240419120747.38031-1-zhoutaiyu@kuaishou.com>
+ <ea781ccc-c29e-894e-c54a-f44ea349edca@huaweicloud.com>
+ <e2d291e6b6ed43d89930eb2a7d459ff8@kuaishou.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <6ab1172f-2c9a-ede3-8020-13c73b91db84@huaweicloud.com>
+Date: Mon, 22 Apr 2024 17:42:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <e2d291e6b6ed43d89930eb2a7d459ff8@kuaishou.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkZHRlDVhhCH0hNHhkfHkgfGFUZERMWGhIXJBQOD1
-	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8f049c224b023ckunm11e7b86014c
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6OE06Ojo6EDc*FRwxSRw#GUJM
-	TDAwFDdVSlVKTEpITE1CSUJJQkNNVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBTEJKTzcG
+X-CM-TRANSID:cCh0CgDHlxD6MCZmJOqaKg--.46870S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw4rtryfZF47Jw17Xr4ruFg_yoWDAFX_ua
+	yUW3W0qr13Aw4vyrykGF13urWjgr4IqwnFvw4j9Fy7JryUArn5GF43XFZ3ZFnxGa1kGr9x
+	JrZ8Xa43Cr1UXjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb4kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+	Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+	UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Davidlohr Bueso <dave@stgolabs.net>
+Hi,
 
-If the device does not support Sanitize or Secure Erase commands,
-hide the respective sysfs interfaces such that the operation can
-never be attempted.
+在 2024/04/22 11:33, 周泰宇 写道:
+>>>                 /* throtl is FIFO - if bios are already queued, should queue */
+>>> -             if (sq->nr_queued[rw])
+>>> +             if (sq->nr_queued[rw] && !bio_flagged(bio, BIO_BPS_THROTTLED))
+>>   No, this change is wrong. Split IO will not be throttled by iops limit
+> anymore.
+> 
+> After this change, the split IO will be throttled by iops limit again if it reaches a tg's iops limit and will not be throttled in any cases if the sq->queue is not empty.
 
-In order to be generic, keep track of the enabled security commands
-found in the CEL - the driver does not support Security Passthrough.
+Forgot to reply here,
 
-Signed-off-by: Davidlohr Bueso <dave@stgolabs.net>
-Link: https://lore.kernel.org/r/20230726051940.3570-4-dave@stgolabs.net
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
----
- Documentation/ABI/testing/sysfs-bus-cxl |  6 ++--
- drivers/cxl/core/mbox.c                 | 45 ++++++++++++++++++++++++-
- drivers/cxl/core/memdev.c               | 19 +++++++++++
- drivers/cxl/cxlmem.h                    | 15 +++++++++
- 4 files changed, 82 insertions(+), 3 deletions(-)
+The ponit here is that you break the rules about FIFO, blk-throttle
+only judge the bio from head if it's within limit. Current code to judge
+if tg iops reaches limit on the condition that no bio is throttled. And
+throtl time is always caculated by first throttled bio. But this patch
+will ignore throttled bio case, and that's why I said IO will not be
+throttled by iops limist anymore. You can test this with bps limit
+disabled.
 
-diff --git a/Documentation/ABI/testing/sysfs-bus-cxl b/Documentation/ABI/testing/sysfs-bus-cxl
-index c4c4acb1f3b3..087f762ebfd5 100644
---- a/Documentation/ABI/testing/sysfs-bus-cxl
-+++ b/Documentation/ABI/testing/sysfs-bus-cxl
-@@ -86,7 +86,8 @@ Description:
- 		HPA ranges. This permits avoiding explicit global CPU cache
- 		management, relying instead for it to be done when a region
- 		transitions between software programmed and hardware committed
--		states.
-+		states. If this file is not present, then there is no hardware
-+		support for the operation.
- 
- 
- What            /sys/bus/cxl/devices/memX/security/erase
-@@ -101,7 +102,8 @@ Description:
- 		HPA ranges. This permits avoiding explicit global CPU cache
- 		management, relying instead for it to be done when a region
- 		transitions between software programmed and hardware committed
--		states.
-+		states. If this file is not present, then there is no hardware
-+		support for the operation.
- 
- 
- What:		/sys/bus/cxl/devices/memX/firmware/
-diff --git a/drivers/cxl/core/mbox.c b/drivers/cxl/core/mbox.c
-index d6d067fbee97..ca60bb8114f2 100644
---- a/drivers/cxl/core/mbox.c
-+++ b/drivers/cxl/core/mbox.c
-@@ -121,6 +121,45 @@ static bool cxl_is_security_command(u16 opcode)
- 	return false;
- }
- 
-+static void cxl_set_security_cmd_enabled(struct cxl_security_state *security,
-+					 u16 opcode)
-+{
-+	switch (opcode) {
-+	case CXL_MBOX_OP_SANITIZE:
-+		set_bit(CXL_SEC_ENABLED_SANITIZE, security->enabled_cmds);
-+		break;
-+	case CXL_MBOX_OP_SECURE_ERASE:
-+		set_bit(CXL_SEC_ENABLED_SECURE_ERASE,
-+			security->enabled_cmds);
-+		break;
-+	case CXL_MBOX_OP_GET_SECURITY_STATE:
-+		set_bit(CXL_SEC_ENABLED_GET_SECURITY_STATE,
-+			security->enabled_cmds);
-+		break;
-+	case CXL_MBOX_OP_SET_PASSPHRASE:
-+		set_bit(CXL_SEC_ENABLED_SET_PASSPHRASE,
-+			security->enabled_cmds);
-+		break;
-+	case CXL_MBOX_OP_DISABLE_PASSPHRASE:
-+		set_bit(CXL_SEC_ENABLED_DISABLE_PASSPHRASE,
-+			security->enabled_cmds);
-+		break;
-+	case CXL_MBOX_OP_UNLOCK:
-+		set_bit(CXL_SEC_ENABLED_UNLOCK, security->enabled_cmds);
-+		break;
-+	case CXL_MBOX_OP_FREEZE_SECURITY:
-+		set_bit(CXL_SEC_ENABLED_FREEZE_SECURITY,
-+			security->enabled_cmds);
-+		break;
-+	case CXL_MBOX_OP_PASSPHRASE_SECURE_ERASE:
-+		set_bit(CXL_SEC_ENABLED_PASSPHRASE_SECURE_ERASE,
-+			security->enabled_cmds);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static bool cxl_is_poison_command(u16 opcode)
- {
- #define CXL_MBOX_OP_POISON_CMDS 0x43
-@@ -677,7 +716,8 @@ static void cxl_walk_cel(struct cxl_memdev_state *mds, size_t size, u8 *cel)
- 		u16 opcode = le16_to_cpu(cel_entry[i].opcode);
- 		struct cxl_mem_command *cmd = cxl_mem_find_command(opcode);
- 
--		if (!cmd && !cxl_is_poison_command(opcode)) {
-+		if (!cmd && (!cxl_is_poison_command(opcode) ||
-+			     !cxl_is_security_command(opcode))) {
- 			dev_dbg(dev,
- 				"Opcode 0x%04x unsupported by driver\n", opcode);
- 			continue;
-@@ -689,6 +729,9 @@ static void cxl_walk_cel(struct cxl_memdev_state *mds, size_t size, u8 *cel)
- 		if (cxl_is_poison_command(opcode))
- 			cxl_set_poison_cmd_enabled(&mds->poison, opcode);
- 
-+		if (cxl_is_security_command(opcode))
-+			cxl_set_security_cmd_enabled(&mds->security, opcode);
-+
- 		dev_dbg(dev, "Opcode 0x%04x enabled\n", opcode);
- 	}
- }
-diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-index f99e7ec3cc40..14b547c07f54 100644
---- a/drivers/cxl/core/memdev.c
-+++ b/drivers/cxl/core/memdev.c
-@@ -477,9 +477,28 @@ static struct attribute_group cxl_memdev_pmem_attribute_group = {
- 	.attrs = cxl_memdev_pmem_attributes,
- };
- 
-+static umode_t cxl_memdev_security_visible(struct kobject *kobj,
-+					   struct attribute *a, int n)
-+{
-+	struct device *dev = kobj_to_dev(kobj);
-+	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
-+	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
-+
-+	if (a == &dev_attr_security_sanitize.attr &&
-+	    !test_bit(CXL_SEC_ENABLED_SANITIZE, mds->security.enabled_cmds))
-+		return 0;
-+
-+	if (a == &dev_attr_security_erase.attr &&
-+	    !test_bit(CXL_SEC_ENABLED_SECURE_ERASE, mds->security.enabled_cmds))
-+		return 0;
-+
-+	return a->mode;
-+}
-+
- static struct attribute_group cxl_memdev_security_attribute_group = {
- 	.name = "security",
- 	.attrs = cxl_memdev_security_attributes,
-+	.is_visible = cxl_memdev_security_visible,
- };
- 
- static const struct attribute_group *cxl_memdev_attribute_groups[] = {
-diff --git a/drivers/cxl/cxlmem.h b/drivers/cxl/cxlmem.h
-index f3aca828fbec..706f8a6d1ef4 100644
---- a/drivers/cxl/cxlmem.h
-+++ b/drivers/cxl/cxlmem.h
-@@ -244,6 +244,19 @@ enum poison_cmd_enabled_bits {
- 	CXL_POISON_ENABLED_MAX
- };
- 
-+/* Device enabled security commands */
-+enum security_cmd_enabled_bits {
-+	CXL_SEC_ENABLED_SANITIZE,
-+	CXL_SEC_ENABLED_SECURE_ERASE,
-+	CXL_SEC_ENABLED_GET_SECURITY_STATE,
-+	CXL_SEC_ENABLED_SET_PASSPHRASE,
-+	CXL_SEC_ENABLED_DISABLE_PASSPHRASE,
-+	CXL_SEC_ENABLED_UNLOCK,
-+	CXL_SEC_ENABLED_FREEZE_SECURITY,
-+	CXL_SEC_ENABLED_PASSPHRASE_SECURE_ERASE,
-+	CXL_SEC_ENABLED_MAX
-+};
-+
- /**
-  * struct cxl_poison_state - Driver poison state info
-  *
-@@ -346,6 +359,7 @@ struct cxl_fw_state {
-  * struct cxl_security_state - Device security state
-  *
-  * @state: state of last security operation
-+ * @enabled_cmds: All security commands enabled in the CEL
-  * @poll: polling for sanitization is enabled, device has no mbox irq support
-  * @poll_tmo_secs: polling timeout
-  * @poll_dwork: polling work item
-@@ -353,6 +367,7 @@ struct cxl_fw_state {
-  */
- struct cxl_security_state {
- 	unsigned long state;
-+	DECLARE_BITMAP(enabled_cmds, CXL_SEC_ENABLED_MAX);
- 	bool poll;
- 	int poll_tmo_secs;
- 	struct delayed_work poll_dwork;
--- 
-2.34.1
+Thanks,
+Kuai
 
