@@ -1,119 +1,887 @@
-Received: from bjm7-spam01.kuaishou.com (smtpcn03.kuaishou.com [103.107.217.217])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61899149C6C;
-	Mon, 22 Apr 2024 13:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.107.217.217
+Received: from mail-m1022.netease.com (mail-m1022.netease.com [154.81.10.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D5415099E;
+	Mon, 22 Apr 2024 14:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=154.81.10.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713791116; cv=none; b=W6UpgEUCxD6KCp83EyhSoOhM3RLPWhPCdKqeRC2WwG3X5lUPhLTrhTKJkhBV2eUEO7Slu7pSIodeLXZKoCHbhI7oIOddNi42K3d1/TYDSgpH8QawfLiEzxSnKuFT2G/UjzgDaQhuBy9qV6VCxgw6QooYt6N4lTapZURcpIkh2HU=
+	t=1713795781; cv=none; b=f7kxxHEI5Pa/1FKbdtBFZX0EXQEC9rBGV7/5ifQ9slBkKduaKnsI1d0cGiJhJZ28PLPdaSfwC1yc4mafAwdc4Zpp400ATDZjYH+HdPpYvkdzKDf9WeGzMP5EzPXzurIn2Ri9raAhgBv5WSwDNWXkqx7ztKPoK/dv5UxDQossOcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713791116; c=relaxed/simple;
-	bh=7IgAqNObdTNIs+v4wPjXNvzjhPKhJtnwoYfAtKltNcI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QOtbGwXzTpAIWsqZ2UfUyFsWYhQghcpq58waFbAhHuj5oi/bu8h/081RSvyNpy9ufhlQEJ0Yui8rk6clsy8Ohe77o1VHU0SvEUcdCWQELDwKBsmY4VS1RQ4KpfHZ117dJ8wuYTNtIXHVZI6evrTyCZ+Mx9FPjCC2+KwNSLdz8YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuaishou.com; spf=pass smtp.mailfrom=kuaishou.com; dkim=pass (1024-bit key) header.d=kuaishou.com header.i=@kuaishou.com header.b=QvGAWxu8; arc=none smtp.client-ip=103.107.217.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuaishou.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuaishou.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kuaishou.com header.i=@kuaishou.com header.b="QvGAWxu8"
-Received: from bjxm-pm-mail04.kuaishou.com (unknown [172.28.128.4])
-	by bjm7-spam01.kuaishou.com (Postfix) with ESMTPS id 19A6218017040;
-	Mon, 22 Apr 2024 21:05:09 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; d=kuaishou.com; s=dkim; c=relaxed/relaxed;
-	t=1713791109; h=from:subject:to:date:message-id;
-	bh=7IgAqNObdTNIs+v4wPjXNvzjhPKhJtnwoYfAtKltNcI=;
-	b=QvGAWxu8ZCuPLfY5WRLtnOjFgU9HIUe19Y2SDiGmXhbgsNUO0wxI216ZhGBQklUOi6B9oeEFRiG
-	fkBjC59yHrY4z6JHhw5HWieaMXcU1YzOeYUEtPJtk3D2IZLxrOQY3keMm/9+vG3KnnrNxxsSXrjTJ
-	S2FkPgjOTLUbvUR9QFQ=
-Received: from bjm7-pm-mail01.kuaishou.com (172.28.1.1) by
- bjxm-pm-mail04.kuaishou.com (172.28.128.4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.20; Mon, 22 Apr 2024 21:05:08 +0800
-Received: from bjm7-pm-mail01.kuaishou.com ([fe80::90df:c4ca:7789:1e31]) by
- bjm7-pm-mail01.kuaishou.com ([fe80::90df:c4ca:7789:1e31%16]) with mapi id
- 15.02.1118.020; Mon, 22 Apr 2024 21:05:08 +0800
-From: =?gb2312?B?1tzMqdPu?= <zhoutaiyu@kuaishou.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>, "tj@kernel.org" <tj@kernel.org>
-CC: "josef@toxicpanda.com" <josef@toxicpanda.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "yukuai (C)"
-	<yukuai3@huawei.com>
-Subject: Re: [PATCH] blk-throttle: fix repeat limit on bio with
- BIO_BPS_THROTTLED
-Thread-Topic: [PATCH] blk-throttle: fix repeat limit on bio with
- BIO_BPS_THROTTLED
-Thread-Index: AQHalLWzslikgOEBQkagU28wACFozA==
-Date: Mon, 22 Apr 2024 13:05:08 +0000
-Message-ID: <2b492386e60c4819ac694a65de9b5846@kuaishou.com>
-References: <20240419120747.38031-1-zhoutaiyu@kuaishou.com>
- <ea781ccc-c29e-894e-c54a-f44ea349edca@huaweicloud.com>
- <e2d291e6b6ed43d89930eb2a7d459ff8@kuaishou.com>,<6ab1172f-2c9a-ede3-8020-13c73b91db84@huaweicloud.com>
-In-Reply-To: <6ab1172f-2c9a-ede3-8020-13c73b91db84@huaweicloud.com>
-Accept-Language: en-AS, zh-CN, en-US
-Content-Language: aa
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1713795781; c=relaxed/simple;
+	bh=eS2SxKIEWVwxVedGljMejQPDPTJL/HhRgUiWZbhE+dI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s3Vu3tFPccGvmyhmD+FjrzaRN+crk4kBX2KVWNge07Zmbx6rm3wsLgAcatskXYLl8NF2sXsKCaP3WYEiPyKcuG6wcfq9XncKXiqplzikDn3Rg/xqlgQTXnrhnhX1CebmdzZXyMlsK3KdAkKTpt+wsmWyfkgMM34MJcFwyC2LleA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=154.81.10.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
+Received: from ubuntu-22-04.. (unknown [218.94.118.90])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id 18D27860264;
+	Mon, 22 Apr 2024 15:16:11 +0800 (CST)
+From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+To: dan.j.williams@intel.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-cxl@vger.kernel.org,
+	Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+Subject: [PATCH 2/7] cbd: introduce cbd_transport
+Date: Mon, 22 Apr 2024 07:16:01 +0000
+Message-Id: <20240422071606.52637-3-dongsheng.yang@easystack.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkZQ0MZVhlIGEwfQhkaSB5KT1UZERMWGhIXJBQOD1
+	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpKS0hKQ1VKS0tVS1kG
+X-HM-Tid: 0a8f04a98bb7023ckunm18d27860264
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6NBQ6UTo*KDcrCRxNCysMCygK
+	F0gwCk1VSlVKTEpITExLSkxJS0tCVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBSU5PT0s3Bg++
 
-SGksIGt1YWkNCg0KVGhhbmsgeW91IHNvIG11Y2ggZm9yIHlvdXIgZmVlZGJhY2suDQoNCj4gVGhl
-IHBvbml0IGhlcmUgaXMgdGhhdCB5b3UgYnJlYWsgdGhlIHJ1bGVzIGFib3V0IEZJRk8sIGJsay10
-aHJvdHRsZQ0KPiBvbmx5IGp1ZGdlIHRoZSBiaW8gZnJvbSBoZWFkIGlmIGl0J3Mgd2l0aGluIGxp
-bWl0LiBDdXJyZW50IGNvZGUgdG8ganVkZ2UNCj4gaWYgdGcgaW9wcyByZWFjaGVzIGxpbWl0IG9u
-IHRoZSBjb25kaXRpb24gdGhhdCBubyBiaW8gaXMgdGhyb3R0bGVkLiBBbmQNCj4gdGhyb3RsIHRp
-bWUgaXMgYWx3YXlzIGNhY3VsYXRlZCBieSBmaXJzdCB0aHJvdHRsZWQgYmlvLiBCdXQgdGhpcyBw
-YXRjaA0KPiB3aWxsIGlnbm9yZSB0aHJvdHRsZWQgYmlvIGNhc2UsIGFuZCB0aGF0J3Mgd2h5IEkg
-c2FpZCBJTyB3aWxsIG5vdCBiZQ0KPiB0aHJvdHRsZWQgYnkgaW9wcyBsaW1pc3QgYW55bW9yZS4g
-WW91IGNhbiB0ZXN0IHRoaXMgd2l0aCBicHMgbGltaXQNCj4gZGlzYWJsZWQuDQoNClNvcnJ5LCBJ
-IGRvbid0IGdldCBpdC4gIFllcywgSSBrbm93IHRoaXMgcGF0Y2ggd2lsbCBicmVhayB0aGUgRklG
-TyBydWxlLg0KQnV0IEkgZGlkbid0IGZpbmQgYW55IHByb2JsZW1zIGFmdGVyIGxldHRpbmcgc3Bs
-aXQgYmlvIGJyZWFrIHRoaXMgcnVsZS4gDQpJIHRoaW5rIHRoZSBzcGxpdCBiaW8gc2hvdWxkIGJl
-IGlnbm9yZWQgaWYgaXQgZG9lcyBub3QNCm1ha2UgdGhlIHRnIG91dCBvZiBpb3BzIGxpbWl0IGFu
-ZCBiZSBqdWRnZWQgaW4gdGdfd2l0aGluX2lvcHNfbGltaXQoKS4NCg0KSW4gdGhlIHBhdGNoLCBz
-cGxpdCBiaW8gd2l0aGluIGlvcHMgbGltaXQgIHdpbGwgYmUgZGlzcGF0Y2hlZCBkaXJlY3RseS4N
-Ckhvd2V2ZXIsIGlmIHRoZSBzcGxpdCBiaW8gbWFrZXMgYSB0ZyBvdXQgb2YgSU9QUyBsaW1pdCwg
-dGhlIHNwbGl0IGJpbyB3aWxsIGJlIHRocm90dGxlZCANCmFuZCBiZSBhZGRlZCB0byB0aGUgdGcn
-cyBzcS0+cXVldWVbcnddIGJ5IGNhbGxpbmcgdGhyb3RsX2FkZF9iaW9fdGcoKS4NCg0KVGhlcmUg
-ZXhpc3RzIHR3byBjYXNlcyBhZnRlciB0aGUgc3BsaXQgYmlvIGlzIGp1ZGdlZCB0byBiZSB0aHJv
-dHRsZWQuDQoNCjEpIFRoZSB0Zy0+c3EtPnF1ZXVlIGlzIGVtcHR5LiBJbiB0aGlzIGNhc2UsIHRo
-ZSBzcGxpdCBiaW8gd2lsbCBiZSB0aGUgZmlyc3QgcXVldWVkIGJpby4gIFRoZSB0ZydzIA0KbGF0
-ZXN0IGRpc3BhdGNoIHRpbWUgaXMgY2FsY3VsYXRlZCBhY2NvcmRpbmcgdG8gdGhlIHNwbGl0IGJp
-byBieSBjYWxsaW5nIHRnX3VwZGF0ZV9kaXNwdGltZSgpLCBhbmQgDQp0aGUgZGlzcGF0Y2ggdGlt
-ZXIgaXMgd2FrZWQgdXAgYnkgY2FsbGluZyB0aHJvdGxfc2NoZWR1bGVfbmV4dF9kaXNwYXRjaCgp
-Lg0KDQoyKSBUaGUgdGctPnNxLT5xdWV1ZSBpcyBub3QgZW1wdHkuIEluIHRoaXMgY2FzZSwgdGhl
-IHRnJ3MgZGlzcGF0Y2ggdGltZSBoYXMgYmVlbiB1cGRhdGVkDQphY2NvcmRpbmcgdG8gdGhlIGZp
-cnN0IHF1ZXVlZCBiaW8gYW5kIHRoZSBkaXNwYXRjaCB0aW1lciBpcyBhbHNvIHdha2VkIHVwLg0K
-U28sIGJsay10aHJvdHRsZSBqdXN0IGFkZHMgdGhlIHNwbGl0IGJpbyB0byB0aGUgdGFpbCBvZiB0
-aGUgc3EtPnF1ZXVlW3J3XSB3aGljaCBhY3RzIGxpa2UNCnRoZSBjdXJyZW50IGNvZGUgKHNwbGl0
-IGJpbyBpcyB0aHJvdHRsZWQgYmVjYXVzZSBzcS0+bnJfcXVldWVbcnddIGlzIG5vdCB6ZXJvKS4N
-Cg0KDQpJIGhhdmUgdGVzdGVkIHRoaXMgcGF0Y2ggYnkgb25seSBzZXR0aW5nIGlvcHMgbGltaXQg
-YXMgeW91IGFkdmlzZWQsIHdpdGggZm9sbG93aW5nIHNjcmlwdHMNCg0KIyEvYmluL2Jhc2gNCg0K
-Q05VTT0zMA0KbWtkaXIgLXAgL3N5cy9mcy9jZ3JvdXAvYmxraW8vdGVzdDANCiNlY2hvICI4OjE2
-IDEwNDg1NzYwIiA+IC9zeXMvZnMvY2dyb3VwL2Jsa2lvL3Rlc3QwL2Jsa2lvLnRocm90dGxlLndy
-aXRlX2Jwc19kZXZpY2UNCmVjaG8gIjg6MTYgNTAiID4gL3N5cy9mcy9jZ3JvdXAvYmxraW8vdGVz
-dDAvYmxraW8udGhyb3R0bGUud3JpdGVfaW9wc19kZXZpY2UNCg0KZm9yICgoaT0wO2k8JENOVU07
-aSsrKSk7ZG8NCiAgICAgICAgZmlvIC1ydz13cml0ZSAtZGlyZWN0PTEgLWJzPTRNIC1pb2RlcHRo
-PTggLXNpemU9MjAwTSAtbnVtam9icz0xIC10aW1lX2Jhc2VkPTEgLXJ1bnRpbWU9MTEwICAtbmFt
-ZT10ZXN0dF8kaSAtZmlsZW5hbWU9dGVzdGZfJGkgID4gL2Rldi9udWxsICYNCiAgICAgICAgZWNo
-byAkISA+IC9zeXMvZnMvY2dyb3VwL2Jsa2lvL3Rlc3QwL3Rhc2tzDQpkb25lDQoNCkkgbW9uaXRv
-ciB0aGUgdy9zIG9uIGlvc3RhdCBhbmQgdGhlIGNoYW5nZSBvZiAvc3lzL2ZzL2Nncm91cC9ibGtp
-by90ZXN0MC9ibGtpby50aHJvdHRsZS5pb19zZXJ2aWNlZCBldmVyeSBzZWNvbmQuDQpJdCBzZWVt
-cyB3b3JrIHBlcmZlY3RseSAoYXJvdW5kIDUwKS4gIA0KDQpJIGFsc28gc2VlIHRoZSBzcGxpdCBi
-aW8gYmUgdGhyb3R0bGVkIHRocm91Z2ggdGhlIHRyYWNlX3BpcGUNCg0KICAgIGt3b3JrZXIvMTk6
-Mi0xNjAzICAgIFswMTldIGQuLjEuICAgNTgzLjU1NjAxMjogICA4LDE2ICAgWCAgV1MgOTc3MTUz
-MjE2IC8gOTc3MTU1Nzc2IFtrd29ya2VyLzE5OjJdDQogICAga3dvcmtlci8xOToyLTE2MDMgICAg
-WzAxOV0gZC4uMS4gICA1ODMuNTU2MDEyOiAgIDgsMTYgIDEsMCAgbSAgIE4gdGhyb3RsIFtXXSBi
-aW8uIGJkaXNwPTAgc3o9MTU3Mjg2NCBicHM9MTg0NDY3NDQwNzM3MDk1NTE2MTUgaW9kaXNwPTUg
-aW9wcz01MCBxdWV1ZWQ9MC8yOA0KICAgIC4uLi4uLg0KICAgIGt3b3JrZXIvMTk6Mi0xNjAzICAg
-IFswMTldIGQuLjEuICAgNTgzLjU1NjAxNzogICA4LDE2ICAgWCAgV1MgMTg3MDQ3MiAvIDE4NzMw
-MzIgW2t3b3JrZXIvMTk6Ml0NCiAgICBrd29ya2VyLzE5OjItMTYwMyAgICBbMDE5XSBkLi4xLiAg
-IDU4My41NTYwMTg6ICAgOCwxNiAgMSwwICBtICAgTiB0aHJvdGwgW1ddIGJpby4gYmRpc3A9MCBz
-ej0xNTcyODY0IGJwcz0xODQ0Njc0NDA3MzcwOTU1MTYxNSBpb2Rpc3A9NSBpb3BzPTUwIHF1ZXVl
-ZD0wLzI5DQoNCldvdWxkIHlvdSBtaW5kIGdpdmUgbWUgbW9yZSBoaW50cyB0byBmaW5kIG91dCB0
-aGUgcHJvYmxlbXMgb2YgbXkgcGF0Y2ggb3IgdHJ5IG15IHBhdGNoPyANCg0KU2luY2VyZWx5LA0K
-VGFpeXUgWmhvdQ==
+From: Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+
+cbd_transport represents the layout of the entire shared memory, as shown below.
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                           cbd transport                                                                                       │
+├────────────────────┬───────────────────────┬───────────────────────┬──────────────────────┬───────────────────────────────────┤
+│                    │       hosts           │      backends         │       blkdevs        │        channels                   │
+│ cbd transport info ├────┬────┬────┬────────┼────┬────┬────┬────────┼────┬────┬────┬───────┼───────┬───────┬───────┬───────────┤
+│                    │    │    │    │  ...   │    │    │    │  ...   │    │    │    │  ...  │       │       │       │   ...     │
+└────────────────────┴────┴────┴────┴────────┴────┴────┴────┴────────┴────┴────┴────┴───────┴───┬───┴───────┴───────┴───────────┘
+                                                                                                │
+                                                                                                │
+                                                                                                │
+                                                                                                │
+          ┌─────────────────────────────────────────────────────────────────────────────────────┘
+          │
+          │
+          ▼
+    ┌───────────────────────────────────────────────────────────┐
+    │                     channel                               │
+    ├────────────────────┬──────────────────────────────────────┤
+    │    channel meta    │              channel data            │
+    └─────────┬──────────┴────────────────────────────────-─────┘
+              │
+              │
+              │
+              ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │                 channel meta                             │
+    ├───────────┬──────────────┬───────────────────────────────┤
+    │ meta ctrl │  comp ring   │       cmd ring                │
+    └───────────┴──────────────┴───────────────────────────────┘
+
+The shared memory is divided into five regions:
+
+    a) Transport_info:
+	Information about the overall transport, including the layout
+of the transport.
+    b) Hosts:
+	Each host wishing to utilize this transport needs to register
+its own information within a host entry in this region.
+    c) Backends:
+	Starting a backend on a host requires filling in information
+in a backend entry within this region.
+    d) Blkdevs:
+	Once a backend is established, it can be mapped to CBD device
+on any associated host. The information about the blkdevs is then
+filled into the blkdevs region.
+    e) Channels:
+	This is the actual data communication area, where communication
+between blkdev and backend occurs. Each queue of a block device uses
+a channel, and each backend has a corresponding handler interacting
+with this queue.
+    f) Channel:
+	Channel is further divided into meta and data regions.
+	The meta region includes cmd rings and comp rings.
+The blkdev converts upper-layer requests into cbd_se and fills
+them into the cmd ring. The handler accepts the cbd_se from
+the cmd ring and sends them to the local actual block device
+of the backend (e.g., sda). After completion, the results are
+formed into cbd_ce and filled into the comp ring. The blkdev
+then receives the cbd_ce and returns the results to the upper-layer
+IO sender.
+
+Signed-off-by: Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+---
+ drivers/block/cbd/Makefile        |   2 +-
+ drivers/block/cbd/cbd_main.c      |   8 +
+ drivers/block/cbd/cbd_transport.c | 721 ++++++++++++++++++++++++++++++
+ 3 files changed, 730 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/block/cbd/cbd_transport.c
+
+diff --git a/drivers/block/cbd/Makefile b/drivers/block/cbd/Makefile
+index 2765325486a2..a22796bfa7db 100644
+--- a/drivers/block/cbd/Makefile
++++ b/drivers/block/cbd/Makefile
+@@ -1,3 +1,3 @@
+-cbd-y := cbd_main.o
++cbd-y := cbd_main.o cbd_transport.o
+ 
+ obj-$(CONFIG_BLK_DEV_CBD) += cbd.o
+diff --git a/drivers/block/cbd/cbd_main.c b/drivers/block/cbd/cbd_main.c
+index 0a87c95d749d..8cfa60dde7c5 100644
+--- a/drivers/block/cbd/cbd_main.c
++++ b/drivers/block/cbd/cbd_main.c
+@@ -109,6 +109,10 @@ static ssize_t transport_unregister_store(const struct bus_type *bus, const char
+ 		return -EINVAL;
+ 	}
+ 
++	ret = cbdt_unregister(transport_id);
++	if (ret < 0)
++		return ret;
++
+ 	return size;
+ }
+ 
+@@ -136,6 +140,10 @@ static ssize_t transport_register_store(const struct bus_type *bus, const char *
+ 	}
+ 	kfree(buf);
+ 
++	ret = cbdt_register(&opts);
++	if (ret < 0)
++		return ret;
++
+ 	return size;
+ }
+ 
+diff --git a/drivers/block/cbd/cbd_transport.c b/drivers/block/cbd/cbd_transport.c
+new file mode 100644
+index 000000000000..3a4887afab08
+--- /dev/null
++++ b/drivers/block/cbd/cbd_transport.c
+@@ -0,0 +1,721 @@
++#include <linux/pfn_t.h>
++
++#include "cbd_internal.h"
++
++#define CBDT_OBJ(OBJ, OBJ_SIZE)							\
++										\
++static inline struct cbd_##OBJ##_info						\
++*__get_##OBJ##_info(struct cbd_transport *cbdt, u32 id)				\
++{										\
++	struct cbd_transport_info *info = cbdt->transport_info;			\
++	void *start = cbdt->transport_info;					\
++										\
++	start += info->OBJ##_area_off;						\
++										\
++	return start + (info->OBJ_SIZE * id);					\
++}										\
++										\
++struct cbd_##OBJ##_info 							\
++*cbdt_get_##OBJ##_info(struct cbd_transport *cbdt, u32 id)			\
++{										\
++	struct cbd_##OBJ##_info *info;						\
++										\
++	mutex_lock(&cbdt->lock);						\
++	info = __get_##OBJ##_info(cbdt, id);					\
++	mutex_unlock(&cbdt->lock);						\
++										\
++	return info;								\
++}										\
++										\
++int cbdt_get_empty_##OBJ##_id(struct cbd_transport *cbdt, u32 *id)		\
++{										\
++	struct cbd_transport_info *info = cbdt->transport_info;			\
++	struct cbd_##OBJ##_info *_info;						\
++	int ret = 0;								\
++	int i;									\
++										\
++	mutex_lock(&cbdt->lock);						\
++	for (i = 0; i < info->OBJ##_num; i++) {					\
++		_info = __get_##OBJ##_info(cbdt, i);				\
++		cbdt_flush_range(cbdt, _info, sizeof(*_info));			\
++		if (_info->state == cbd_##OBJ##_state_none) {			\
++			*id = i;						\
++			goto out;						\
++		}								\
++	}									\
++										\
++	cbdt_err(cbdt, "No available " #OBJ "_id found.");			\
++	ret = -ENOENT;								\
++out:										\
++	mutex_unlock(&cbdt->lock);						\
++										\
++	return ret;								\
++}
++
++CBDT_OBJ(host, host_info_size);
++CBDT_OBJ(backend, backend_info_size);
++CBDT_OBJ(blkdev, blkdev_info_size);
++CBDT_OBJ(channel, channel_size);
++
++static struct cbd_transport *cbd_transports[CBD_TRANSPORT_MAX];
++static DEFINE_IDA(cbd_transport_id_ida);
++static DEFINE_MUTEX(cbd_transport_mutex);
++
++extern struct bus_type cbd_bus_type;
++extern struct device cbd_root_dev;
++
++static ssize_t cbd_myhost_show(struct device *dev,
++			       struct device_attribute *attr,
++			       char *buf)
++{
++	struct cbd_transport *cbdt;
++	struct cbd_host *host;
++
++	cbdt = container_of(dev, struct cbd_transport, device);
++
++	host = cbdt->host;
++	if (!host)
++		return 0;
++
++	return sprintf(buf, "%d\n", host->host_id);
++}
++
++static DEVICE_ATTR(my_host_id, 0400, cbd_myhost_show, NULL);
++
++enum {
++	CBDT_ADM_OPT_ERR		= 0,
++	CBDT_ADM_OPT_OP,
++	CBDT_ADM_OPT_FORCE,
++	CBDT_ADM_OPT_PATH,
++	CBDT_ADM_OPT_BID,
++	CBDT_ADM_OPT_DID,
++	CBDT_ADM_OPT_QUEUES,
++};
++
++enum {
++	CBDT_ADM_OP_B_START,
++	CBDT_ADM_OP_B_STOP,
++	CBDT_ADM_OP_B_CLEAR,
++	CBDT_ADM_OP_DEV_START,
++	CBDT_ADM_OP_DEV_STOP,
++};
++
++static const char *const adm_op_names[] = {
++	[CBDT_ADM_OP_B_START] = "backend-start",
++	[CBDT_ADM_OP_B_STOP] = "backend-stop",
++	[CBDT_ADM_OP_B_CLEAR] = "backend-clear",
++	[CBDT_ADM_OP_DEV_START] = "dev-start",
++	[CBDT_ADM_OP_DEV_STOP] = "dev-stop",
++};
++
++static const match_table_t adm_opt_tokens = {
++	{ CBDT_ADM_OPT_OP,		"op=%s"	},
++	{ CBDT_ADM_OPT_FORCE,		"force=%u" },
++	{ CBDT_ADM_OPT_PATH,		"path=%s" },
++	{ CBDT_ADM_OPT_BID,		"backend_id=%u" },
++	{ CBDT_ADM_OPT_DID,		"devid=%u" },
++	{ CBDT_ADM_OPT_QUEUES,		"queues=%u" },
++	{ CBDT_ADM_OPT_ERR,		NULL	}
++};
++
++
++struct cbd_adm_options {
++	u16 op;
++	u16 force:1;
++	u32 backend_id;
++	union {
++		struct host_options {
++			u32 hid;
++		} host;
++		struct backend_options {
++			char path[CBD_PATH_LEN];
++		} backend;
++		struct channel_options {
++			u32 cid;
++		} channel;
++		struct blkdev_options {
++			u32 devid;
++			u32 queues;
++		} blkdev;
++	};
++};
++
++static int parse_adm_options(struct cbd_transport *cbdt,
++		char *buf,
++		struct cbd_adm_options *opts)
++{
++	substring_t args[MAX_OPT_ARGS];
++	char *o, *p;
++	int token, ret = 0;
++
++	o = buf;
++
++	while ((p = strsep(&o, ",\n")) != NULL) {
++		if (!*p)
++			continue;
++
++		token = match_token(p, adm_opt_tokens, args);
++		switch (token) {
++		case CBDT_ADM_OPT_OP:
++			ret = match_string(adm_op_names, ARRAY_SIZE(adm_op_names), args[0].from);
++			if (ret < 0) {
++				pr_err("unknown op: '%s'\n", args[0].from);
++			        ret = -EINVAL;
++			        break;
++			}
++			opts->op = ret;
++			break;
++		case CBDT_ADM_OPT_PATH:
++			if (match_strlcpy(opts->backend.path, &args[0],
++			        CBD_PATH_LEN) == 0) {
++			        ret = -EINVAL;
++			        break;
++			}
++			break;
++		case CBDT_ADM_OPT_FORCE:
++			if (match_uint(args, &token) || token != 1) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->force = 1;
++			break;
++		case CBDT_ADM_OPT_BID:
++			if (match_uint(args, &token)) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->backend_id = token;
++			break;
++		case CBDT_ADM_OPT_DID:
++			if (match_uint(args, &token)) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->blkdev.devid = token;
++			break;
++		case CBDT_ADM_OPT_QUEUES:
++			if (match_uint(args, &token)) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->blkdev.queues = token;
++			break;
++		default:
++			pr_err("unknown parameter or missing value '%s'\n", p);
++			ret = -EINVAL;
++			goto out;
++		}
++	}
++
++out:
++	return ret;
++}
++
++static void transport_zero_range(struct cbd_transport *cbdt, void *pos, u64 size)
++{
++	memset(pos, 0, size);
++	cbdt_flush_range(cbdt, pos, size);
++}
++
++static void channels_format(struct cbd_transport *cbdt)
++{
++	struct cbd_transport_info *info = cbdt->transport_info;
++	struct cbd_channel_info *channel_info;
++	int i;
++
++	for (i = 0; i < info->channel_num; i++) {
++		channel_info = __get_channel_info(cbdt, i);
++		transport_zero_range(cbdt, channel_info, CBDC_META_SIZE);
++	}
++}
++
++static int cbd_transport_format(struct cbd_transport *cbdt, bool force)
++{
++	struct cbd_transport_info *info = cbdt->transport_info;
++	u64 magic;
++
++	magic = le64_to_cpu(info->magic);
++	if (magic && !force) {
++		return -EEXIST;
++	}
++
++	/* TODO make these configureable */
++	info->magic = cpu_to_le64(CBD_TRANSPORT_MAGIC);
++	info->version = cpu_to_le16(CBD_TRANSPORT_VERSION);
++#if defined(__BYTE_ORDER) ? __BYTE_ORDER == __GIT_ENDIAN : defined(__BIG_ENDIAN)
++	info->flags = cpu_to_le16(CBDT_INFO_F_BIGENDIAN);
++#endif
++	info->host_area_off = CBDT_HOST_AREA_OFF;
++	info->host_info_size = CBDT_HOST_INFO_SIZE;
++	info->host_num = CBDT_HOST_NUM;
++
++	info->backend_area_off = CBDT_BACKEND_AREA_OFF;
++	info->backend_info_size = CBDT_BACKEND_INFO_SIZE;
++	info->backend_num = CBDT_BACKEND_NUM;
++
++	info->blkdev_area_off = CBDT_BLKDEV_AREA_OFF;
++	info->blkdev_info_size = CBDT_BLKDEV_INFO_SIZE;
++	info->blkdev_num = CBDT_BLKDEV_NUM;
++
++	info->channel_area_off = CBDT_CHANNEL_AREA_OFF;
++	info->channel_size = CBDT_CHANNEL_SIZE;
++	info->channel_num = CBDT_CHANNEL_NUM;
++
++	cbdt_flush_range(cbdt, info, sizeof(*info));
++
++	transport_zero_range(cbdt, (void *)info + info->host_area_off,
++			     info->channel_area_off - info->host_area_off);
++
++	channels_format(cbdt);
++
++	return 0;
++}
++
++
++
++static ssize_t cbd_adm_store(struct device *dev,
++				 struct device_attribute *attr,
++				 const char *ubuf,
++				 size_t size)
++{
++	int ret;
++	char *buf;
++	struct cbd_adm_options opts = { 0 };
++	struct cbd_transport *cbdt;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
++	cbdt = container_of(dev, struct cbd_transport, device);
++
++	buf = kmemdup(ubuf, size + 1, GFP_KERNEL);
++	if (IS_ERR(buf)) {
++		pr_err("failed to dup buf for adm option: %d", (int)PTR_ERR(buf));
++		return PTR_ERR(buf);
++	}
++	buf[size] = '\0';
++	ret = parse_adm_options(cbdt, buf, &opts);
++	if (ret < 0) {
++		kfree(buf);
++		return ret;
++	}
++	kfree(buf);
++
++	switch (opts.op) {
++	case CBDT_ADM_OP_B_START:
++		break;
++	case CBDT_ADM_OP_B_STOP:
++		break;
++	case CBDT_ADM_OP_B_CLEAR:
++		break;
++	case CBDT_ADM_OP_DEV_START:
++		break;
++	case CBDT_ADM_OP_DEV_STOP:
++		break;
++	default:
++		pr_err("invalid op: %d\n", opts.op);
++		return -EINVAL;
++	}
++
++	if (ret < 0)
++		return ret;
++
++	return size;
++}
++
++static DEVICE_ATTR(adm, 0200, NULL, cbd_adm_store);
++
++static ssize_t cbd_transport_info(struct cbd_transport *cbdt, char *buf)
++{
++	struct cbd_transport_info *info = cbdt->transport_info;
++	ssize_t ret;
++
++	mutex_lock(&cbdt->lock);
++	info = cbdt->transport_info;
++	mutex_unlock(&cbdt->lock);
++
++	ret = sprintf(buf, "magic: 0x%llx\n"		\
++			"version: %u\n"			\
++			"flags: %x\n\n"			\
++			"host_area_off: %llu\n"		\
++			"bytes_per_host_info: %u\n"	\
++			"host_num: %u\n\n"		\
++			"backend_area_off: %llu\n"	\
++			"bytes_per_backend_info: %u\n"	\
++			"backend_num: %u\n\n"		\
++			"blkdev_area_off: %llu\n"	\
++			"bytes_per_blkdev_info: %u\n"	\
++			"blkdev_num: %u\n\n"		\
++			"channel_area_off: %llu\n"	\
++			"bytes_per_channel: %u\n"	\
++			"channel_num: %u\n",
++			le64_to_cpu(info->magic),
++			le16_to_cpu(info->version),
++			le16_to_cpu(info->flags),
++			info->host_area_off,
++			info->host_info_size,
++			info->host_num,
++			info->backend_area_off,
++			info->backend_info_size,
++			info->backend_num,
++			info->blkdev_area_off,
++			info->blkdev_info_size,
++			info->blkdev_num,
++			info->channel_area_off,
++			info->channel_size,
++			info->channel_num);
++
++	return ret;
++}
++
++static ssize_t cbd_info_show(struct device *dev,
++			       struct device_attribute *attr,
++			       char *buf)
++{
++	struct cbd_transport *cbdt;
++
++	cbdt = container_of(dev, struct cbd_transport, device);
++
++	return cbd_transport_info(cbdt, buf);
++}
++static DEVICE_ATTR(info, 0400, cbd_info_show, NULL);
++
++static struct attribute *cbd_transport_attrs[] = {
++	&dev_attr_adm.attr,
++	&dev_attr_info.attr,
++	&dev_attr_my_host_id.attr,
++	NULL
++};
++
++static struct attribute_group cbd_transport_attr_group = {
++	.attrs = cbd_transport_attrs,
++};
++
++static const struct attribute_group *cbd_transport_attr_groups[] = {
++	&cbd_transport_attr_group,
++	NULL
++};
++
++static void cbd_transport_release(struct device *dev)
++{
++}
++
++struct device_type cbd_transport_type = {
++	.name		= "cbd_transport",
++	.groups		= cbd_transport_attr_groups,
++	.release	= cbd_transport_release,
++};
++
++static int
++cbd_dax_notify_failure(
++	struct dax_device	*dax_devp,
++	u64			offset,
++	u64			len,
++	int			mf_flags)
++{
++
++	pr_err("%s: dax_devp %llx offset %llx len %lld mf_flags %x\n",
++	       __func__, (u64)dax_devp, (u64)offset, (u64)len, mf_flags);
++	return -EOPNOTSUPP;
++}
++
++const struct dax_holder_operations cbd_dax_holder_ops = {
++	.notify_failure		= cbd_dax_notify_failure,
++};
++
++static struct cbd_transport *cbdt_alloc(void)
++{
++	struct cbd_transport *cbdt;
++	int ret;
++
++	cbdt = kzalloc(sizeof(struct cbd_transport), GFP_KERNEL);
++	if (!cbdt) {
++		return NULL;
++	}
++
++	ret = ida_simple_get(&cbd_transport_id_ida, 0, CBD_TRANSPORT_MAX,
++				GFP_KERNEL);
++	if (ret < 0) {
++		goto cbdt_free;
++	}
++
++	cbdt->id = ret;
++	cbd_transports[cbdt->id] = cbdt;
++
++	return cbdt;
++
++cbdt_free:
++	kfree(cbdt);
++	return NULL;
++}
++
++static void cbdt_destroy(struct cbd_transport *cbdt)
++{
++	cbd_transports[cbdt->id] = NULL;
++	ida_simple_remove(&cbd_transport_id_ida, cbdt->id);
++	kfree(cbdt);
++}
++
++static int cbdt_dax_init(struct cbd_transport *cbdt, char *path)
++{
++	struct dax_device *dax_dev = NULL;
++	struct bdev_handle *handle = NULL;
++	long access_size;
++	void *kaddr;
++	u64 nr_pages = CBD_TRASNPORT_SIZE >> PAGE_SHIFT;
++	u64 start_off = 0;
++	int ret;
++
++	handle = bdev_open_by_path(path, BLK_OPEN_READ | BLK_OPEN_WRITE, cbdt, NULL);
++	if (IS_ERR(handle)) {
++		pr_err("%s: failed blkdev_get_by_path(%s)\n", __func__, path);
++		ret = PTR_ERR(handle);
++		goto err;
++	}
++
++	dax_dev = fs_dax_get_by_bdev(handle->bdev, &start_off,
++				     cbdt,
++				     &cbd_dax_holder_ops);
++	if (IS_ERR(dax_dev)) {
++		pr_err("%s: unable to get daxdev from handle->bdev\n", __func__);
++		ret = -ENODEV;
++		goto bdev_release;
++	}
++
++	access_size = dax_direct_access(dax_dev, 0, nr_pages, DAX_ACCESS, &kaddr, NULL);
++	if (access_size != nr_pages) {
++		ret = -EINVAL;
++		goto dax_put;
++	}
++
++	cbdt->bdev_handle = handle;
++	cbdt->dax_dev = dax_dev;
++	cbdt->transport_info = (struct cbd_transport_info *)kaddr;
++
++	return 0;
++
++dax_put:
++	fs_put_dax(dax_dev, cbdt);
++bdev_release:
++	bdev_release(handle);
++err:
++	return ret;
++}
++
++static void cbdt_dax_release(struct cbd_transport *cbdt)
++{
++	if (cbdt->dax_dev)
++		fs_put_dax(cbdt->dax_dev, cbdt);
++
++	if (cbdt->bdev_handle)
++		bdev_release(cbdt->bdev_handle);
++}
++
++static int cbd_transport_init(struct cbd_transport *cbdt)
++{
++	struct device *dev;
++
++	mutex_init(&cbdt->lock);
++	INIT_LIST_HEAD(&cbdt->backends);
++	INIT_LIST_HEAD(&cbdt->devices);
++
++	dev = &cbdt->device;
++	device_initialize(dev);
++	device_set_pm_not_required(dev);
++	dev->bus = &cbd_bus_type;
++	dev->type = &cbd_transport_type;
++	dev->parent = &cbd_root_dev;
++
++	dev_set_name(&cbdt->device, "transport%d", cbdt->id);
++
++	return device_add(&cbdt->device);
++}
++
++
++static int cbdt_validate(struct cbd_transport *cbdt)
++{
++	u16 flags;
++
++	if (le64_to_cpu(cbdt->transport_info->magic) != CBD_TRANSPORT_MAGIC) {
++		return -EINVAL;
++	}
++
++	flags = le16_to_cpu(cbdt->transport_info->flags);
++#if defined(__BYTE_ORDER) ? __BYTE_ORDER == __GIT_ENDIAN : defined(__BIG_ENDIAN)
++	if (!(flags & CBDT_INFO_F_BIGENDIAN)) {
++		return -EINVAL;
++	}
++#else
++	if ((flags & CBDT_INFO_F_BIGENDIAN)) {
++		return -EINVAL;
++	}
++#endif
++
++	return 0;
++}
++
++int cbdt_unregister(u32 tid)
++{
++	struct cbd_transport *cbdt;
++
++	cbdt = cbd_transports[tid];
++	if (!cbdt) {
++		pr_err("tid: %u, is not registered\n", tid);
++		return -EINVAL;
++	}
++
++	mutex_lock(&cbdt->lock);
++	if (!list_empty(&cbdt->backends) || !list_empty(&cbdt->devices)) {
++		mutex_unlock(&cbdt->lock);
++		return -EBUSY;
++	}
++	mutex_unlock(&cbdt->lock);
++
++	device_unregister(&cbdt->device);
++	cbdt_dax_release(cbdt);
++	cbdt_destroy(cbdt);
++	module_put(THIS_MODULE);
++
++	return 0;
++}
++
++
++int cbdt_register(struct cbdt_register_options *opts)
++{
++	struct cbd_transport *cbdt;
++	int ret;
++
++	if (!try_module_get(THIS_MODULE))
++		return -ENODEV;
++
++	/* TODO support /dev/dax */
++	if (!strstr(opts->path, "/dev/pmem")) {
++		pr_err("%s: path (%s) is not pmem\n",
++		       __func__, opts->path);
++		ret = -EINVAL;
++		goto module_put;
++	}
++
++	cbdt = cbdt_alloc();
++	if (!cbdt) {
++		ret = -ENOMEM;
++		goto module_put;
++	}
++
++	ret = cbdt_dax_init(cbdt, opts->path);
++	if (ret) {
++		goto cbdt_destroy;
++	}
++
++	if (opts->format) {
++		ret = cbd_transport_format(cbdt, opts->force);
++		if (ret < 0) {
++			goto dax_release;
++		}
++	}
++
++	ret = cbdt_validate(cbdt);
++	if (ret) {
++		goto dax_release;
++	}
++
++	ret = cbd_transport_init(cbdt);
++	if (ret) {
++		goto dax_release;
++	}
++
++	return 0;
++
++dev_unregister:
++	device_unregister(&cbdt->device);
++dax_release:
++	cbdt_dax_release(cbdt);
++cbdt_destroy:
++	cbdt_destroy(cbdt);
++module_put:
++	module_put(THIS_MODULE);
++
++	return ret;
++}
++
++void cbdt_add_backend(struct cbd_transport *cbdt, struct cbd_backend *cbdb)
++{
++	mutex_lock(&cbdt->lock);
++	list_add(&cbdb->node, &cbdt->backends);
++	mutex_unlock(&cbdt->lock);
++}
++
++void cbdt_del_backend(struct cbd_transport *cbdt, struct cbd_backend *cbdb)
++{
++	if (list_empty(&cbdb->node))
++		return;
++
++	mutex_lock(&cbdt->lock);
++	list_del_init(&cbdb->node);
++	mutex_unlock(&cbdt->lock);
++}
++
++struct cbd_backend *cbdt_get_backend(struct cbd_transport *cbdt, u32 id)
++{
++	struct cbd_backend *backend;
++
++	mutex_lock(&cbdt->lock);
++	list_for_each_entry(backend, &cbdt->backends, node) {
++		if (backend->backend_id == id) {
++			goto out;
++		}
++	}
++	backend = NULL;
++out:
++	mutex_unlock(&cbdt->lock);
++	return backend;
++}
++
++void cbdt_add_blkdev(struct cbd_transport *cbdt, struct cbd_blkdev *blkdev)
++{
++	mutex_lock(&cbdt->lock);
++	list_add(&blkdev->node, &cbdt->devices);
++	mutex_unlock(&cbdt->lock);
++}
++
++struct cbd_blkdev *cbdt_fetch_blkdev(struct cbd_transport *cbdt, u32 id)
++{
++	struct cbd_blkdev *dev;
++
++	mutex_lock(&cbdt->lock);
++	list_for_each_entry(dev, &cbdt->devices, node) {
++		if (dev->blkdev_id == id) {
++			list_del(&dev->node);
++			goto out;
++		}
++	}
++	dev = NULL;
++out:
++	mutex_unlock(&cbdt->lock);
++	return dev;
++}
++
++struct page *cbdt_page(struct cbd_transport *cbdt, u64 transport_off)
++{
++	long access_size;
++	pfn_t pfn;
++
++	access_size = dax_direct_access(cbdt->dax_dev, transport_off >> PAGE_SHIFT, 1, DAX_ACCESS, NULL, &pfn);
++
++	return pfn_t_to_page(pfn);
++}
++
++void cbdt_flush_range(struct cbd_transport *cbdt, void *pos, u64 size)
++{
++	u64 offset = pos - (void *)cbdt->transport_info;
++	u32 off_in_page = (offset & CBD_PAGE_MASK);
++
++	offset -= off_in_page;
++	size = round_up(off_in_page + size, PAGE_SIZE);
++
++	while (size) {
++		flush_dcache_page(cbdt_page(cbdt, offset));
++		offset += PAGE_SIZE;
++		size -= PAGE_SIZE;
++	}
++}
+-- 
+2.34.1
+
