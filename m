@@ -1,79 +1,83 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mail-m12810.netease.com (mail-m12810.netease.com [103.209.128.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6889153BFE;
-	Mon, 22 Apr 2024 18:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE1E1A38EA;
+	Mon, 22 Apr 2024 22:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.209.128.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713811198; cv=none; b=Jm049GjnpidvbvfFd1U5lQetgouePhdr2HCQmnwt7vB5ezkLMjx/Z2YpaPJz2HAou6+Ss+uHvkzSmhvTLIDXPT5glHB0xOh4qwJws4HRCFlzlllOwrM+BtIw8AZHw4/UIYIsT7BIC3XOFDcS9hSw12lJxK0KdqhbU9OrVSIskcE=
+	t=1713826670; cv=none; b=EJm0csPMSKp9hCas4yGcSGtth64PwcGpeDewClMZmX5Rc7CQ4HRI7ttNuy6AeckZ4wI4dUcCnjeH0O1d1mE1jN63xWNSXAGZmASeZBemKdX6SlPU5tdg5Nqk1Vj7SiMTzu9ZA7AHz5IunmDkGn6otgSMcFHrlC+GIk9srt4p2KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713811198; c=relaxed/simple;
-	bh=Nyd5CC3+SeZTxf0OJyqVrpGGzfHzAExyfn45MCTlIKo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UUDYwSwS2zg11cVpHijUVXKrlSSoPotYo8kssTZ8UVu9Ge9XmJrr3TvZ71hSYMk6EopoDvmAAxwLDfzSj44QR+AeJoyBlmUGLlhbKCrV0VZJC4MyKnDRueITOmjwECHmAE/6+92eOKIB1qySu0IZJlATXaKIJ8ZMR4hkdFIk+bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ds52ftOk; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ds52ftOk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=WvnAsiuZt8H1Zl4oauEZTca+TX5rbK65b3taUhfahhM=; b=ds52ftOk9Au39MxQJzq73CM5N2
-	GyV5+iclVmjhqP8u/seLO1N6Mb+fe9n4Kk5dPhboUvhWAWH83j2jb36JLESOI7gdhv3Ww5LfQdT3M
-	BLRzv/gZMgBEI6yH10yerKdpcnPbG3qVGmIYCXG506Mhx53ceDbSKHZaJhD64l8A7zh+d/WZmmCTq
-	eoH251REzJFUgB+TTUcWu6q55bD6MVHVhOrYGzNdTPh/iy40hqx++1YUmEXCfmzfZsekvAfQ2cdPb
-	7QfNAnodGujKu6nkSSGr5syzGuzSYn1lTpDTK4gdh698bI8dt247N9/uAu/hIwkH86+qL9jLXJNKE
-	1fUiAdFA==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1ryya3-0000000EdIe-0WYS;
-	Mon, 22 Apr 2024 18:39:55 +0000
-Message-ID: <7d24e1fb-520c-4ec2-a6aa-89856092891a@infradead.org>
-Date: Mon, 22 Apr 2024 11:39:54 -0700
+	s=arc-20240116; t=1713826670; c=relaxed/simple;
+	bh=ofIIlMvHg01A9vZLcv0ven24tgHk4ZAaRriZRmpl2IY=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=jlVKKa4lrRme8SOnbkOsIKx9el4QTqoCj0n2HdTPmzlUl+hJRblENy/0325EwGR53Yr/Ug7XRYlYn9nIE9QQmRBvSWeLvPDL9bITLuzTbQ+Lo7uD1HmYx4XV3k7Lpl8rbvmv+bc8QS4j74xZkF9l6lSw9cNOKBpCpOPptlucApI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn; spf=none smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=103.209.128.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easystack.cn
+Received: from [192.168.122.189] (unknown [218.94.118.90])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id 20C16860144;
+	Tue, 23 Apr 2024 06:41:13 +0800 (CST)
+Subject: Re: [PATCH 1/7] block: Init for CBD(CXL Block Device)
+To: Randy Dunlap <rdunlap@infradead.org>, dan.j.williams@intel.com,
+ axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-cxl@vger.kernel.org, Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+ <20240422071606.52637-2-dongsheng.yang@easystack.cn>
+ <7d24e1fb-520c-4ec2-a6aa-89856092891a@infradead.org>
+From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Message-ID: <dd1df8f1-f80c-5a3a-f804-3e360bfac339@easystack.cn>
+Date: Tue, 23 Apr 2024 06:41:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/7] block: Init for CBD(CXL Block Device)
-To: Dongsheng Yang <dongsheng.yang@easystack.cn>, dan.j.williams@intel.com,
- axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, Dongsheng Yang <dongsheng.yang.linux@gmail.com>
-References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
- <20240422071606.52637-2-dongsheng.yang@easystack.cn>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240422071606.52637-2-dongsheng.yang@easystack.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <7d24e1fb-520c-4ec2-a6aa-89856092891a@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkaTx5KVk1KTRofGh9KQ0JOQ1UZERMWGhIXJBQOD1
+	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
+X-HM-Tid: 0a8f07f870c6023ckunm20c16860144
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Ojo6MQw5TzcrFRMdFkxPLDwu
+	CggaCk5VSlVKTEpIQ0lOTUxITEpNVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBSU1LSDcG
+
+
+
+在 2024/4/23 星期二 上午 2:39, Randy Dunlap 写道:
+> Hi,
+> 
+> On 4/22/24 12:16 AM, Dongsheng Yang wrote:
+>> diff --git a/drivers/block/cbd/Kconfig b/drivers/block/cbd/Kconfig
+>> new file mode 100644
+>> index 000000000000..98b2cbcdf895
+>> --- /dev/null
+>> +++ b/drivers/block/cbd/Kconfig
+>> @@ -0,0 +1,4 @@
+>> +config BLK_DEV_CBD
+>> +	tristate "CXL Block Device"
+>> +	help
+>> +	  If unsure say 'm'.
+> 
+> I think that needs more help text. checkpatch should have said something
+> about that...
+> 
+> And why should someone say 'm' to the config question?
+> Will lots of (non-server) computers have CXL block device capability?
 
 Hi,
+     Thanx for your review! In this RFC version, I have focused entirely 
+on prototype validation and demonstration, so this aspect has evidently 
+been overlooked. I will supplement the help text in the next version. Of 
+course, this place should be If unsure say "n", not "m".
 
-On 4/22/24 12:16 AM, Dongsheng Yang wrote:
-> diff --git a/drivers/block/cbd/Kconfig b/drivers/block/cbd/Kconfig
-> new file mode 100644
-> index 000000000000..98b2cbcdf895
-> --- /dev/null
-> +++ b/drivers/block/cbd/Kconfig
-> @@ -0,0 +1,4 @@
-> +config BLK_DEV_CBD
-> +	tristate "CXL Block Device"
-> +	help
-> +	  If unsure say 'm'.
-
-I think that needs more help text. checkpatch should have said something
-about that...
-
-And why should someone say 'm' to the config question?
-Will lots of (non-server) computers have CXL block device capability?
-
-thanks.
--- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
+Thanx
+> 
+> thanks.
+> 
