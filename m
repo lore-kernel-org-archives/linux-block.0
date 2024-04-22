@@ -1,108 +1,122 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70154152DEE;
-	Mon, 22 Apr 2024 15:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6D7224D5;
+	Mon, 22 Apr 2024 15:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713798269; cv=none; b=fFKHW225T1FhwsweJ0LgPzfe3gcra84ZJmx8aw3C3+Jefm5SN5c/Bk62YbiUT64T+Rzps6MT4OyUHZo9ydaqzFHvzThW0BI/l4MmTSE/fV9ZU/5lqOrHoPEqtWEdG4MbZty5RxIeo59omZfs8fiGrfP4JSoNHA5zFl9jFOkKTLo=
+	t=1713800173; cv=none; b=nhHgYurnJcA8FkxU7czQgO/bNmmDubrXBXSaQoxTrBxhUxjnA6GjDQCW2SwoDJ2AKAaBATg1ejS9qts5jeE/Gu6xqji0x+zfWuHOqxocGLfYW6npTEAIMwkYoPPnsH67InOg9BiJSYbrq6u667liduvFEtk/duye94iai024thI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713798269; c=relaxed/simple;
-	bh=gY/Fi+RRBpIEtt4g2iWf4ZHqsFPkeoWVasKLGqMuD/g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GLHnnVvn2UiRRfyq78lSbxfiLp2y9TUeMMmWi7PjPE05L1niMBWnPjLUT2Jdei4QOyqDuN2/SxflsWr4tG4RgtHgFuAaWq9zYHVfrLqFkDmQlJZVb7mHGGl7A47d0yUmFuDQmZp4Cmcyp+S3I+J0IQpe1Gi2HLCZICQQ0R79lLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L6oTyXj5; arc=none smtp.client-ip=209.85.208.47
+	s=arc-20240116; t=1713800173; c=relaxed/simple;
+	bh=u9HCdteMB+HMYRjR4arnujnff9oEN5NosNpH3UJ9++w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B/BgzMMDL9sZ/f+Zbo46JYu4W2MaTo2lw207EWO3GPPc37533HL36TxnrAc67eMhats+SUwiJnmR1WXVHBfKVS8kyJMdXTJdb5rWft0prrpqwKVo8plHOkZXHr8zEnoc6de4XpQskSdf6DsEoCODCUYJhA+9qAxTT6VP9JXXncQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jb8bYD4R; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6oTyXj5"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56c5d05128dso4111276a12.0;
-        Mon, 22 Apr 2024 08:04:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jb8bYD4R"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-518a3e0d2ecso6819077e87.3;
+        Mon, 22 Apr 2024 08:36:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713798266; x=1714403066; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gY/Fi+RRBpIEtt4g2iWf4ZHqsFPkeoWVasKLGqMuD/g=;
-        b=L6oTyXj51vKPEeiEMXkPtGzLwNOYhILnNZLSa+ymMCu5L9kTnOo8UE8Iq0/zbAtMSu
-         5rtD9KnU+xFrTaVDM7ZdU5RWYIx9bShMTiHMHTb5ZoAuvS2abKP3ox8sR4wXDz20K49R
-         sKNJXoLvtrkeBrQNKyXZxrid4AI1d9GmnFPFtZ0ankeOqt7GQ68DBZBtH/EhAmeSd5zv
-         5zVr8NGo8ABO1FM80/KxU0oi5QkZ00wUAplGX9k9sN8PkX23vcodSvqjBml3FXfNcrgJ
-         LyMUP6Y1tV2cJ+PEFUBJ0gP6azCSv7eIcJFGVXfALc9+kZqveYEakMmLpc53DHIavoue
-         sjUA==
+        d=gmail.com; s=20230601; t=1713800170; x=1714404970; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Pvm+9Ih6B15UM0NoHUWNBzlKXdp28/1dMYo2uad5Ts=;
+        b=jb8bYD4Rl+pG+Hg2GLGvFcOj2N+1/TbGc6Bh5O/fiVYwq+AaguJLrTlPqhP/VTVxJr
+         7BbMgz0QPDygSc3BUK3cJPeBmkMK+Fba0q3XZCTAbDQ7Wy1v8o5wLhZrPAj45PM31kxk
+         PbBwvjinufHrW/gUjLwcbSPkJBORZg9QFJNKwuXkrHH1GtnHJ5WE9VlWxhX+/IWt0Fjr
+         ksDjAEGqBNpPJXcMDjDeJ7jDKqyVgBG1Z59xmT0UGcI1jIJzJj9iTs+oPuxqivSX0UIB
+         HkU+rLRCkKjYAMrAqXxkDprCW4CFgc8Thn1IZaN3QyehFMZEBHxpMO3D9RvLbNtQ8wKA
+         +N0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713798266; x=1714403066;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1713800170; x=1714404970;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gY/Fi+RRBpIEtt4g2iWf4ZHqsFPkeoWVasKLGqMuD/g=;
-        b=AwGjMiORdJ57OHQJgDnbOJd8KQDQhs3NCWemuXJCZX/GxdBthKT6UTR7vwWRbgfNp8
-         YXwmV+1OiS2Q4M8r1ckagKNCCcyIkrKh8ulUzzzyHk2mvKC7Tx4XygFSagBbpoSG3Zpy
-         hSzYaWMtkx0praCgML4kyfgUZlBcofpRNVZrEqbYXfql9mOWMPgUYWm7cZJQFZl4RLlQ
-         EeJWBYjYRTEjO2yYtmW/D8Dcd8q3vSKUoxqZRNamXBjUefTpkwsS69FcAl8QImGPHluy
-         pS7/5YYIlnVSeE+jqjn//PVCuBPtg6Fn/s2K3rrDDFuhjtqMgZFeGrpuc2t8UD9xYI83
-         H7IA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmlbor7o9ST7iVSr/z7wU+n0t2WATbCDqJSS3Zw0Vw84LedXXQL2C0CrQG5QpEedNuXt+/8TEWUjIoTQZEaZa6kb1LMmvOeQgDtv2x7u4mbbN6VIZ3UX5C2NUcInBYs64ExSYb7gMTLd4=
-X-Gm-Message-State: AOJu0YxfBhAjDhzSeSikHlPqpy4xSQG/OXyofxGXCaHwWE93c+VjrXXT
-	zU6HfawXJykcAzj4ls1PzrR8vSqfvw3f0xOj5y8hqHwMvyMlE1PmbSh85ykngW6rfIJxSfSB4fz
-	yeTpJMxOzpQGrkA/WZT8N6dMtLFk=
-X-Google-Smtp-Source: AGHT+IFjdK0F6Mzl4xHNa8qxjJqTkNZkhrQiips+tPOEjhjdY1XsbD081mImRM2z5k2J0XZ09hqyu8Rz8Tifkr3lZFs=
-X-Received: by 2002:a50:c010:0:b0:56e:e76:6478 with SMTP id
- r16-20020a50c010000000b0056e0e766478mr6177689edb.31.1713798265473; Mon, 22
- Apr 2024 08:04:25 -0700 (PDT)
+        bh=4Pvm+9Ih6B15UM0NoHUWNBzlKXdp28/1dMYo2uad5Ts=;
+        b=laiBG133WfwXkm+DyY0HIwmCujGiilsgvg83UMGd9Cs2JzFgiX0R0RzpxFv/TseQ+7
+         uV+z0GZgn2BBot9gvadbeYbnCoNdupAj3ub46du9Af94LWK6cfRJvEeth3lEsWAK42Tn
+         XmP/x340U1FbVzrnXpEoBGD2/TBuUjc21FhvzasUQfCu6wVML+8J3Y6+s6PSuDbhpUOU
+         qy04UNCfYFi3KnTbvrCdL9GQ1z0PTj3D8Q8T1PZ1k5n/jrodhCCT10pCnFyRAbC5KO84
+         H8rCQEJXbzxlWFXpdkW4gWI6DrBEnXyyh+9mR0symC0V8Sm5OKlDYKHLqGBBEjGFr86W
+         vNNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVirAZX3rXLLUsQHfC1CvYUR4qIo+/dhVqJZGFoKVvIzV9BFNr7RiqKTQEs7vqZD+Z8hRTT50whRyIhGw9o6rQmh9zsU9akM/4ZgJw=
+X-Gm-Message-State: AOJu0YwMusVQu8qwfdxllth2X5FuSLI3QdjpY1cFy8VWezrM8fhkzrgz
+	92uXjKhnd3G9zVlFgOqE/h/yopATYD8v5zwf4UKKx/YDsBbTa3eztPWzBQ==
+X-Google-Smtp-Source: AGHT+IH8oYNV+froVxZZBfVcUz0Gswh4HvKplEEaUMXLrUNqo0BUjkfbera210zCHANfwadlpH/y4Q==
+X-Received: by 2002:a05:6512:3d24:b0:51a:df97:cc8d with SMTP id d36-20020a0565123d2400b0051adf97cc8dmr9213871lfv.26.1713800169781;
+        Mon, 22 Apr 2024 08:36:09 -0700 (PDT)
+Received: from saproj-Latitude-5501.yandex.net ([2a02:6b8:0:51e:bc0d:8fdc:ab42:84e7])
+        by smtp.gmail.com with ESMTPSA id k8-20020a192d08000000b0051ac9a297aasm1269612lfj.141.2024.04.22.08.36.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 08:36:09 -0700 (PDT)
+From: Sergei Antonov <saproj@gmail.com>
+To: linux-mmc@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: linus.walleij@linaro.org,
+	Sergei Antonov <saproj@gmail.com>
+Subject: [PATCH] mmc: moxart: fix handling of sgm->consumed, otherwise WARN_ON triggers
+Date: Mon, 22 Apr 2024 18:36:07 +0300
+Message-Id: <20240422153607.963672-1-saproj@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJg=8jyC1+s80etZgWteps0Q0yEsR2NE23+Bf+Daa7zgJ2qKBA@mail.gmail.com>
- <ZiYDaN7fDzzEyVQr@infradead.org> <ZiYDiptCPKDNwE-J@infradead.org>
-In-Reply-To: <ZiYDiptCPKDNwE-J@infradead.org>
-From: Marius Fleischer <fleischermarius@gmail.com>
-Date: Mon, 22 Apr 2024 08:04:14 -0700
-Message-ID: <CAJg=8jwM30ui5zZuFW9d33oAdKk4uk1i26aoKQ2TrQcv6PGsdw@mail.gmail.com>
-Subject: Re: INFO: task hung in bdev_open
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller@googlegroups.com, 
-	harrisonmichaelgreen@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Christoph,
+When e.g. 8 bytes are to be read, sgm->consumed equals 8 immediately after
+sg_miter_next() call. The driver then increments it as bytes are read,
+so sgm->consumed becomes 16 and this warning triggers in sg_miter_stop():
+WARN_ON(miter->consumed > miter->length);
 
-Thank you so much for your responsel!
+WARNING: CPU: 0 PID: 28 at lib/scatterlist.c:925 sg_miter_stop+0x2c/0x10c
+CPU: 0 PID: 28 Comm: kworker/0:2 Tainted: G        W          6.9.0-rc5-dirty #249
+Hardware name: Generic DT based system
+Workqueue: events_freezable mmc_rescan
+Call trace:.
+ unwind_backtrace from show_stack+0x10/0x14
+ show_stack from dump_stack_lvl+0x44/0x5c
+ dump_stack_lvl from __warn+0x78/0x16c
+ __warn from warn_slowpath_fmt+0xb0/0x160
+ warn_slowpath_fmt from sg_miter_stop+0x2c/0x10c
+ sg_miter_stop from moxart_request+0xb0/0x468
+ moxart_request from mmc_start_request+0x94/0xa8
+ mmc_start_request from mmc_wait_for_req+0x60/0xa8
+ mmc_wait_for_req from mmc_app_send_scr+0xf8/0x150
+ mmc_app_send_scr from mmc_sd_setup_card+0x1c/0x420
+ mmc_sd_setup_card from mmc_sd_init_card+0x12c/0x4dc
+ mmc_sd_init_card from mmc_attach_sd+0xf0/0x16c
+ mmc_attach_sd from mmc_rescan+0x1e0/0x298
+ mmc_rescan from process_scheduled_works+0x2e4/0x4ec
+ process_scheduled_works from worker_thread+0x1ec/0x24c
+ worker_thread from kthread+0xd4/0xe0
+ kthread from ret_from_fork+0x14/0x38
 
-On Sun, 21 Apr 2024 at 23:28, Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Sun, Apr 21, 2024 at 11:27:52PM -0700, Christoph Hellwig wrote:
-> > On Sat, Apr 20, 2024 at 06:19:01PM -0700, Marius Fleischer wrote:
-> > > Hi,
-> > >
-> > > We would like to report the following bug which has been found by our
-> > > modified version of syzkaller.
-> >
-> > For your reports to be useful please make sure your szybot actually
-> > provides the same features as the real one, that is link to the
-> > reproducer, mention the exact git commit reproducing it, provide a way
-> > to submit fixes.
->
-> .. or just feed your modifications to the original one so that
-> everything just works..
->
+This patch adds initial zeroing of sgm->consumed. It is then incremented
+as bytes are read or written.
 
-Please note that the original email does have a reproducer and kernel config
-attached, and specifies the exact git commit of the kernel version on which we
-found this crash. I am happy to manually test any patch attempts. Unfortunately,
-I do not have the infrastructure to host an automated system similar to syzbot.
-Please let me know if there is any additional information in regards
-to this report
-that would be helpful for you!
+Signed-off-by: Sergei Antonov <saproj@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Fixes: 3ee0e7c3e67c ("mmc: moxart-mmc: Use sg_miter for PIO")
+---
+ drivers/mmc/host/moxart-mmc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-As of right now, we are not yet ready to approach the team around syzkaller
-to see if they are interested in our modifications as our work is still ongoing
-research. We are certainly hoping to do this at a later stage!
+diff --git a/drivers/mmc/host/moxart-mmc.c b/drivers/mmc/host/moxart-mmc.c
+index b88d6dec209f..9a5f75163aca 100644
+--- a/drivers/mmc/host/moxart-mmc.c
++++ b/drivers/mmc/host/moxart-mmc.c
+@@ -300,6 +300,7 @@ static void moxart_transfer_pio(struct moxart_host *host)
+ 	remain = sgm->length;
+ 	if (remain > host->data_len)
+ 		remain = host->data_len;
++	sgm->consumed = 0;
+ 
+ 	if (data->flags & MMC_DATA_WRITE) {
+ 		while (remain > 0) {
+-- 
+2.40.1
 
-Wishing you a nice start to the week!
-
-Best,
-Marius
