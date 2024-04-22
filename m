@@ -1,83 +1,124 @@
-Received: from mail-m12810.netease.com (mail-m12810.netease.com [103.209.128.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE1E1A38EA;
-	Mon, 22 Apr 2024 22:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.209.128.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4575157E9E;
+	Mon, 22 Apr 2024 23:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713826670; cv=none; b=EJm0csPMSKp9hCas4yGcSGtth64PwcGpeDewClMZmX5Rc7CQ4HRI7ttNuy6AeckZ4wI4dUcCnjeH0O1d1mE1jN63xWNSXAGZmASeZBemKdX6SlPU5tdg5Nqk1Vj7SiMTzu9ZA7AHz5IunmDkGn6otgSMcFHrlC+GIk9srt4p2KE=
+	t=1713830074; cv=none; b=HNLnE1AjiHp+aoODpqzajRA2OMrvuqqRAVe9AkopYWPh/gHEcd9um9qyEZ/bYlsIE8dGU9ZEsjsmc94moK1cvpPV8xAQ6JP0iBCKM8zqDaurZlYV/Jt8IlYMdYGpRr0cUv9OoY5kAbJYO4FqgBBe6EDYTVKo/EsHcXLujIssqYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713826670; c=relaxed/simple;
-	bh=ofIIlMvHg01A9vZLcv0ven24tgHk4ZAaRriZRmpl2IY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=jlVKKa4lrRme8SOnbkOsIKx9el4QTqoCj0n2HdTPmzlUl+hJRblENy/0325EwGR53Yr/Ug7XRYlYn9nIE9QQmRBvSWeLvPDL9bITLuzTbQ+Lo7uD1HmYx4XV3k7Lpl8rbvmv+bc8QS4j74xZkF9l6lSw9cNOKBpCpOPptlucApI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn; spf=none smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=103.209.128.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easystack.cn
-Received: from [192.168.122.189] (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 20C16860144;
-	Tue, 23 Apr 2024 06:41:13 +0800 (CST)
-Subject: Re: [PATCH 1/7] block: Init for CBD(CXL Block Device)
-To: Randy Dunlap <rdunlap@infradead.org>, dan.j.williams@intel.com,
- axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, Dongsheng Yang <dongsheng.yang.linux@gmail.com>
-References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
- <20240422071606.52637-2-dongsheng.yang@easystack.cn>
- <7d24e1fb-520c-4ec2-a6aa-89856092891a@infradead.org>
-From: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Message-ID: <dd1df8f1-f80c-5a3a-f804-3e360bfac339@easystack.cn>
-Date: Tue, 23 Apr 2024 06:41:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+	s=arc-20240116; t=1713830074; c=relaxed/simple;
+	bh=qyalTRlySVo94DoFJq6NMhigMn6l+of2ZwomjRJIb7M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ViM4NjNVqyMOj2wnoTXJvFOx1NyPRQ5LrPrJz/FcQTPF3/7+nkND7YtlrLFhiIfnpPVfgmlMzAuU3lVn/bwfmUn01oURl+BD2t8m5vbkmKa8Uw5EkOvaL7TxCkk7j82Y3nAno35/+aciS3YzkyzzWcnJHm9FMgNUC3I4bp9LXrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lcj4Glk6; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lcj4Glk6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9194BC2BD11;
+	Mon, 22 Apr 2024 23:54:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713830074;
+	bh=qyalTRlySVo94DoFJq6NMhigMn6l+of2ZwomjRJIb7M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lcj4Glk6dz790n1yidIGQsU+V9MrWI5jZter7p4gzuVQ75m2DS9+x0OLqtUUxC0Dv
+	 MDoOYMKm5ss/83rwHhWXpk3L3hALyrt+FYQJmCJ9bkjYmNWn833tdvtnf7QKU1HPI8
+	 TwDiTyFzY1r3ZBskSNxRnNOVt+Kubr6wvISe8FiNwXKKHiNTzn8rA9QW8oRqP8ID00
+	 E4HTdFrXZT3+0dMjiEs8idniX1YmviEi02IhGcnA3j8jvdVn3Amzehww2O0rBNgJlk
+	 H+5DUH4ygWTm4o3TsO9suCUQMu4CxLGjWLwOOrx27RvqkQlsLSZnzpjEAgblrDQ0lg
+	 xqpR8B4SX6eOQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Rik van Riel <riel@surriel.com>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 16/43] blk-iocost: avoid out of bounds shift
+Date: Mon, 22 Apr 2024 19:14:02 -0400
+Message-ID: <20240422231521.1592991-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240422231521.1592991-1-sashal@kernel.org>
+References: <20240422231521.1592991-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7d24e1fb-520c-4ec2-a6aa-89856092891a@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.8.7
 Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkaTx5KVk1KTRofGh9KQ0JOQ1UZERMWGhIXJBQOD1
-	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8f07f870c6023ckunm20c16860144
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Ojo6MQw5TzcrFRMdFkxPLDwu
-	CggaCk5VSlVKTEpIQ0lOTUxITEpNVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBSU1LSDcG
 
+From: Rik van Riel <riel@surriel.com>
 
+[ Upstream commit beaa51b36012fad5a4d3c18b88a617aea7a9b96d ]
 
-在 2024/4/23 星期二 上午 2:39, Randy Dunlap 写道:
-> Hi,
-> 
-> On 4/22/24 12:16 AM, Dongsheng Yang wrote:
->> diff --git a/drivers/block/cbd/Kconfig b/drivers/block/cbd/Kconfig
->> new file mode 100644
->> index 000000000000..98b2cbcdf895
->> --- /dev/null
->> +++ b/drivers/block/cbd/Kconfig
->> @@ -0,0 +1,4 @@
->> +config BLK_DEV_CBD
->> +	tristate "CXL Block Device"
->> +	help
->> +	  If unsure say 'm'.
-> 
-> I think that needs more help text. checkpatch should have said something
-> about that...
-> 
-> And why should someone say 'm' to the config question?
-> Will lots of (non-server) computers have CXL block device capability?
+UBSAN catches undefined behavior in blk-iocost, where sometimes
+iocg->delay is shifted right by a number that is too large,
+resulting in undefined behavior on some architectures.
 
-Hi,
-     Thanx for your review! In this RFC version, I have focused entirely 
-on prototype validation and demonstration, so this aspect has evidently 
-been overlooked. I will supplement the help text in the next version. Of 
-course, this place should be If unsure say "n", not "m".
+[  186.556576] ------------[ cut here ]------------
+UBSAN: shift-out-of-bounds in block/blk-iocost.c:1366:23
+shift exponent 64 is too large for 64-bit type 'u64' (aka 'unsigned long long')
+CPU: 16 PID: 0 Comm: swapper/16 Tainted: G S          E    N 6.9.0-0_fbk700_debug_rc2_kbuilder_0_gc85af715cac0 #1
+Hardware name: Quanta Twin Lakes MP/Twin Lakes Passive MP, BIOS F09_3A23 12/08/2020
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0x8f/0xe0
+ __ubsan_handle_shift_out_of_bounds+0x22c/0x280
+ iocg_kick_delay+0x30b/0x310
+ ioc_timer_fn+0x2fb/0x1f80
+ __run_timer_base+0x1b6/0x250
+...
 
-Thanx
-> 
-> thanks.
-> 
+Avoid that undefined behavior by simply taking the
+"delay = 0" branch if the shift is too large.
+
+I am not sure what the symptoms of an undefined value
+delay will be, but I suspect it could be more than a
+little annoying to debug.
+
+Signed-off-by: Rik van Riel <riel@surriel.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://lore.kernel.org/r/20240404123253.0f58010f@imladris.surriel.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-iocost.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 04d44f0bcbc85..b1c4c874d4201 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1347,7 +1347,7 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
+ {
+ 	struct ioc *ioc = iocg->ioc;
+ 	struct blkcg_gq *blkg = iocg_to_blkg(iocg);
+-	u64 tdelta, delay, new_delay;
++	u64 tdelta, delay, new_delay, shift;
+ 	s64 vover, vover_pct;
+ 	u32 hwa;
+ 
+@@ -1362,8 +1362,9 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
+ 
+ 	/* calculate the current delay in effect - 1/2 every second */
+ 	tdelta = now->now - iocg->delay_at;
+-	if (iocg->delay)
+-		delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
++	shift = div64_u64(tdelta, USEC_PER_SEC);
++	if (iocg->delay && shift < BITS_PER_LONG)
++		delay = iocg->delay >> shift;
+ 	else
+ 		delay = 0;
+ 
+-- 
+2.43.0
+
