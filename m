@@ -1,21 +1,22 @@
-Received: from mail-m127105.qiye.163.com (mail-m127105.qiye.163.com [115.236.127.105])
+Received: from mail-m12782.qiye.163.com (mail-m12782.qiye.163.com [115.236.127.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256FB4E1CE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E2E4F213;
 	Mon, 22 Apr 2024 08:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.236.127.105
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.236.127.82
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713773892; cv=none; b=gRWqPgWDuUpVwBtOz5N/ktBh4MloBojK2/6Z96jPuBLBAJeZawYjBJz0RJIgCPdYv0DKEB4ju7ctHFKoy+jOoAGUBCY8CfagygAvE6LZD0qlP33o6x7NJlV5IyFrOLXQ+yN/bjqLToKvVNAbSHrsPCyh1QGJqELK4oCW641cinc=
+	t=1713773892; cv=none; b=AjUle09YsIg3+Sf7FVSbFr+kl1SQwkyntBJTX9AVc4CjkIuCH0Z74+f8+auspQDTPQUFJEqvcInrTJ2LkM+F1SxVB4zo+bUznYf51ZFBbIRMU7+4ffZfvCbRdkx15FVaYgep1/8fUC783SS0q1FsiY9u+1+UQdgIks7Lhu78/QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713773892; c=relaxed/simple;
-	bh=GSkHPZSUPFTzOCXW4eKUe6wm5+EVnEO+EwIHJH3hpCE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uqnmt+ut+oupRwUki4dsUa/iM92dnZAWx3s0N06OUvu68AYIrFSREye5JG+JHjAVfbEx+x07wu3Zj7FwS+BZnmL9hyVn3LvcsJ6RjIfR8bR69RmASu+D5Tdcvc1+ttSsAy0rjohRA+IXbau+U9K8NJeydZ6xzJXbep6gKRYA6uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=115.236.127.105
+	bh=hK1pR1teR7regKqZMnBinJhZ56OjV/M+wxIscIgvv5E=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=aqvBqfuJwBY3CnLuKNkWW2P4lRb1UZpVCkRJkrF+mBj+DIs/uNTGddz+MnfClZY9OrgBbL3XxfX5JEXMraM0d+bWkV2M1B6SQGlSpFe5+q7/x5y0E6jL0LUUWtPz6Hw9/yMRs41aSiFcV/N3kCJzYdGmSr2HMVVS8BmxoKipg6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=115.236.127.82
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
 Received: from ubuntu-22-04.. (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 1D103860262;
-	Mon, 22 Apr 2024 15:01:31 +0800 (CST)
+	by smtp.qiye.163.com (Hmail) with ESMTPA id E72FF860209;
+	Mon, 22 Apr 2024 15:01:33 +0800 (CST)
 From: Dongsheng Yang <dongsheng.yang@easystack.cn>
 To: dan.j.williams@intel.com,
 	axboe@kernel.dk
@@ -25,10 +26,12 @@ Cc: linux-block@vger.kernel.org,
 	Davidlohr Bueso <dave@stgolabs.net>,
 	Dave Jiang <dave.jiang@intel.com>,
 	Vishal Verma <vishal.l.verma@intel.com>
-Subject: [PATCH 1/3] cxl/memdev: Improve sanitize ABI descriptions
-Date: Mon, 22 Apr 2024 07:01:21 +0000
-Message-Id: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
+Subject: [PATCH 2/3] cxl/memdev: Document security state in kern-doc
+Date: Mon, 22 Apr 2024 07:01:24 +0000
+Message-Id: <20240422070125.52519-4-dongsheng.yang@easystack.cn>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
+References: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,58 +40,38 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlCGEpDVktOGUpOTR4ZGhlLT1UZERMWGhIXJBQOD1
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkaGUpDVhlDHx0fTENJS0NLGFUZERMWGhIXJBQOD1
 	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8f049c1e81023ckunm1d103860262
+X-HM-Tid: 0a8f049c2988023ckunme72ff860209
 X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6MQg6LAw*GTc9HRw9IhFCGQI9
-	AxxPCh1VSlVKTEpITE1CSUJKQkJLVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBSEtOSzcG
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6MxQ6Fww*Ljc1FRwRMhEtGU8s
+	HU4KCyNVSlVKTEpITE1CSUJPTU9MVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBSUlLQjcG
 
 From: Davidlohr Bueso <dave@stgolabs.net>
 
-Be more detailed about the CPU cache management situation. The same
-goes for both sanitize and secure erase.
+... as is the case with all members of struct cxl_memdev_state.
 
 Signed-off-by: Davidlohr Bueso <dave@stgolabs.net>
-Link: https://lore.kernel.org/r/20230726051940.3570-2-dave@stgolabs.net
+Link: https://lore.kernel.org/r/20230726051940.3570-3-dave@stgolabs.net
 Reviewed-by: Dave Jiang <dave.jiang@intel.com>
 Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
 ---
- Documentation/ABI/testing/sysfs-bus-cxl | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ drivers/cxl/cxlmem.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/ABI/testing/sysfs-bus-cxl b/Documentation/ABI/testing/sysfs-bus-cxl
-index 6350dd82b9a9..c4c4acb1f3b3 100644
---- a/Documentation/ABI/testing/sysfs-bus-cxl
-+++ b/Documentation/ABI/testing/sysfs-bus-cxl
-@@ -82,7 +82,11 @@ Description:
- 		whether it resides in persistent capacity, volatile capacity,
- 		or the LSA, is made permanently unavailable by whatever means
- 		is appropriate for the media type. This functionality requires
--		the device to be not be actively decoding any HPA ranges.
-+		the device to be disabled, that is, not actively decoding any
-+		HPA ranges. This permits avoiding explicit global CPU cache
-+		management, relying instead for it to be done when a region
-+		transitions between software programmed and hardware committed
-+		states.
- 
- 
- What            /sys/bus/cxl/devices/memX/security/erase
-@@ -92,7 +96,12 @@ Contact:        linux-cxl@vger.kernel.org
- Description:
- 		(WO) Write a boolean 'true' string value to this attribute to
- 		secure erase user data by changing the media encryption keys for
--		all user data areas of the device.
-+		all user data areas of the device. This functionality requires
-+		the device to be disabled, that is, not actively decoding any
-+		HPA ranges. This permits avoiding explicit global CPU cache
-+		management, relying instead for it to be done when a region
-+		transitions between software programmed and hardware committed
-+		states.
- 
- 
- What:		/sys/bus/cxl/devices/memX/firmware/
+diff --git a/drivers/cxl/cxlmem.h b/drivers/cxl/cxlmem.h
+index 499113328586..f3aca828fbec 100644
+--- a/drivers/cxl/cxlmem.h
++++ b/drivers/cxl/cxlmem.h
+@@ -434,6 +434,7 @@ struct cxl_dev_state {
+  * @next_persistent_bytes: persistent capacity change pending device reset
+  * @event: event log driver state
+  * @poison: poison driver state info
++ * @security: security driver state info
+  * @fw: firmware upload / activation state
+  * @mbox_send: @dev specific transport for transmitting mailbox commands
+  *
 -- 
 2.34.1
 
