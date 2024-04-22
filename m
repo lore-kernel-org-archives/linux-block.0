@@ -1,67 +1,134 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mail-m17240.xmail.ntesmail.com (mail-m17240.xmail.ntesmail.com [45.195.17.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE88E3FBA0;
-	Mon, 22 Apr 2024 06:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37779482D7;
+	Mon, 22 Apr 2024 07:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.195.17.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713767308; cv=none; b=QIcUTP3gcT/FgCRhSb+v+ohzJTbwu4bBCrnr7tld0D8sF2KTAr5Juo7Xt4IrloaDksZE7fJDwcP5dRPzjBa/ZF2+toIWOMpCdL2OwLHGQS7D9N8rrxGXLGjcEE6MVaa/kfgzrXKFMd9E35mdfq78nb9UcjkHJ1cnLnCDXcrN34M=
+	t=1713769713; cv=none; b=GfqWcyx/08OQH5XTzc2usxxNF7JvfQ2QfTWUy1wauVYep+LeodyRUUR1tSus4zoieH/GdKtWCGVhTMyZvfGtU/wCeAts/1q0ElvEZFgdGI98sB3nc+H4Q7DFrvnp+PVgq6E/Y7E26q9XpFsSHQH9p6JGJEQVyWeR5hQkED/a9nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713767308; c=relaxed/simple;
-	bh=1CXRUi8kECrLxrQwSZnzJQdfh9qu0GY60yrCy+rztNs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rEMmpYWD6pWdrkWdJN284IgpzqpAGaUu8CAKpAn2eYZYsMVjMol5KrxIBoAak5BwHBnPCNIMJ+MR6Jb2fP0inQiaUOAbIASQHy5v2t2x8Lax/7po+6j5+d6t+P6mLNhtKjIgDodj+hDv39nBP0Y1J0SO3HiaMGJ527zGwX/Uqak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hFpEfUjj; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hFpEfUjj"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=aynr/ns6L8RuQzuBfA56RC77v8u4u9ryKPKNAb0jnmc=; b=hFpEfUjjC8Igh6zP7W3i+VGNJc
-	zumLU4Y1rKHn/m6pA+33tNtPvmgiv4/K4dB+jLsBpwUmJHKe3SaOsyeM92Qsm9RuYdgD/5YeIHA49
-	qccolprv3Ybo4yJIbEMUnEcYhexmRXljLAWwwoqWrXW1FF1otOqNb5jKKaA+mGdP7Gb33W5tVAW4e
-	7HycxgtlzVEIDXEadX5ZPrP34ET67rHalqUhPsqUiPL7DLNKrcfL55pykuBwhhns4qPyBSgEZWwQV
-	PBNHEhuMmjRLGRPs13fbMGrAnhJq0+XOG9nhZyChUaZjKUBD5rPI0WEhaYzCjoZY347DTmIyBhYhA
-	1ZHWxVGg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rynAA-0000000CFgP-29a6;
-	Mon, 22 Apr 2024 06:28:26 +0000
-Date: Sun, 21 Apr 2024 23:28:26 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Marius Fleischer <fleischermarius@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller@googlegroups.com,
-	harrisonmichaelgreen@gmail.com
-Subject: Re: INFO: task hung in bdev_open
-Message-ID: <ZiYDiptCPKDNwE-J@infradead.org>
-References: <CAJg=8jyC1+s80etZgWteps0Q0yEsR2NE23+Bf+Daa7zgJ2qKBA@mail.gmail.com>
- <ZiYDaN7fDzzEyVQr@infradead.org>
+	s=arc-20240116; t=1713769713; c=relaxed/simple;
+	bh=rO9wuLUfiR4E6XZ84kDSGhF4Q7qepug3oReICZiQTPs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=aGpzXxb51xeiyrjT0sB/DFez3FPufAxJHSV+cbACJWMtceCY52ex9WdpZ98I/s0y1tp51KTlGHK9ZZebnKxUMDhF5W3aKm+N1rrnntlVPjE3vSx/5THEUxkQ8vTaA5mgp/ud7lZjCGlEOP2KkrqpwWA9wPOomKyawzskf18iaAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=45.195.17.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
+Received: from ubuntu-22-04.. (unknown [218.94.118.90])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id 12BB186026B;
+	Mon, 22 Apr 2024 15:01:33 +0800 (CST)
+From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+To: dan.j.williams@intel.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-cxl@vger.kernel.org,
+	David Gow <davidgow@google.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH] drivers: base: Free devm resources when unregistering a device
+Date: Mon, 22 Apr 2024 07:01:23 +0000
+Message-Id: <20240422070125.52519-3-dongsheng.yang@easystack.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
+References: <20240422070125.52519-1-dongsheng.yang@easystack.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZiYDaN7fDzzEyVQr@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlCGkhKVkgeGUseSkpJGUIdSlUZERMWGhIXJBQOD1
+	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
+X-HM-Tid: 0a8f049c2630023ckunm12bb186026b
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Mgw6Tgw*Czc9LxwBMhELGU8O
+	NygKCQ5VSlVKTEpITE1CSUJIQ01MVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBT0NPQjcG
 
-On Sun, Apr 21, 2024 at 11:27:52PM -0700, Christoph Hellwig wrote:
-> On Sat, Apr 20, 2024 at 06:19:01PM -0700, Marius Fleischer wrote:
-> > Hi,
-> > 
-> > We would like to report the following bug which has been found by our
-> > modified version of syzkaller.
-> 
-> For your reports to be useful please make sure your szybot actually
-> provides the same features as the real one, that is link to the
-> reproducer, mention the exact git commit reproducing it, provide a way
-> to submit fixes.
+From: David Gow <davidgow@google.com>
 
-.. or just feed your modifications to the original one so that
-everything just works..
+In the current code, devres_release_all() only gets called if the device
+has a bus and has been probed.
+
+This leads to issues when using bus-less or driver-less devices where
+the device might never get freed if a managed resource holds a reference
+to the device. This is happening in the DRM framework for example.
+
+We should thus call devres_release_all() in the device_del() function to
+make sure that the device-managed actions are properly executed when the
+device is unregistered, even if it has neither a bus nor a driver.
+
+This is effectively the same change than commit 2f8d16a996da ("devres:
+release resources on device_del()") that got reverted by commit
+a525a3ddeaca ("driver core: free devres in device_release") over
+memory leaks concerns.
+
+This patch effectively combines the two commits mentioned above to
+release the resources both on device_del() and device_release() and get
+the best of both worlds.
+
+Fixes: a525a3ddeaca ("driver core: free devres in device_release")
+Signed-off-by: David Gow <davidgow@google.com>
+Signed-off-by: Maxime Ripard <mripard@kernel.org>
+Link: https://lore.kernel.org/r/20230720-kunit-devm-inconsistencies-test-v3-3-6aa7e074f373@kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/base/core.c                      | 11 +++++++++++
+ drivers/base/test/platform-device-test.c |  2 --
+ drivers/base/test/root-device-test.c     |  2 --
+ 3 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/base/core.c b/drivers/base/core.c
+index 3dff5037943e..6ceaf50f5a67 100644
+--- a/drivers/base/core.c
++++ b/drivers/base/core.c
+@@ -3817,6 +3817,17 @@ void device_del(struct device *dev)
+ 	device_platform_notify_remove(dev);
+ 	device_links_purge(dev);
+ 
++	/*
++	 * If a device does not have a driver attached, we need to clean
++	 * up any managed resources. We do this in device_release(), but
++	 * it's never called (and we leak the device) if a managed
++	 * resource holds a reference to the device. So release all
++	 * managed resources here, like we do in driver_detach(). We
++	 * still need to do so again in device_release() in case someone
++	 * adds a new resource after this point, though.
++	 */
++	devres_release_all(dev);
++
+ 	bus_notify(dev, BUS_NOTIFY_REMOVED_DEVICE);
+ 	kobject_uevent(&dev->kobj, KOBJ_REMOVE);
+ 	glue_dir = get_glue_dir(dev);
+diff --git a/drivers/base/test/platform-device-test.c b/drivers/base/test/platform-device-test.c
+index b6ebf1dcdffb..1ae5ce8bd366 100644
+--- a/drivers/base/test/platform-device-test.c
++++ b/drivers/base/test/platform-device-test.c
+@@ -87,8 +87,6 @@ static void platform_device_devm_register_get_unregister_with_devm_test(struct k
+ 	struct test_priv *priv = test->priv;
+ 	int ret;
+ 
+-	kunit_skip(test, "This needs to be fixed in the core.");
+-
+ 	pdev = platform_device_alloc(DEVICE_NAME, PLATFORM_DEVID_NONE);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, pdev);
+ 
+diff --git a/drivers/base/test/root-device-test.c b/drivers/base/test/root-device-test.c
+index 9a3e6cccae13..780d07455f57 100644
+--- a/drivers/base/test/root-device-test.c
++++ b/drivers/base/test/root-device-test.c
+@@ -78,8 +78,6 @@ static void root_device_devm_register_get_unregister_with_devm_test(struct kunit
+ 	struct test_priv *priv = test->priv;
+ 	int ret;
+ 
+-	kunit_skip(test, "This needs to be fixed in the core.");
+-
+ 	priv->dev = root_device_register(DEVICE_NAME);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, priv->dev);
+ 
+-- 
+2.34.1
 
