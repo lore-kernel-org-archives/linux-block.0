@@ -1,94 +1,150 @@
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEA7819;
-	Mon, 22 Apr 2024 03:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A007B168B1
+	for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 04:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713757675; cv=none; b=m+li5cOijLiNBY10Ae70qj8s8tH8ukCGfWY0N7qTThZ2mPsd5tCtsNkOewggPI4bETQGiXJ3/K+5bU9cl2wfDeahhcbSbKpUKShJVIHX+L2hd+p5OHm2Re4T7Fq8xBcSqAXfvMuJ1WHNNwyu4VS+aRQdHcJHLKbEAaaOTGIL60E=
+	t=1713761988; cv=none; b=iqsfpuUncbaXPXJqGNUO9wgmNedhVSoBaNQA3VXtFm2nH68YOoaJ0AbZNRuzTolQ1jlgX9EAKlIolI9fo4HkW14IYCEv+z0yxxhcCGX9dy2qJrZsDsuZdeMDRZb8xPFEDsyUrRB+Tuga/ntO0QcoyAsVcSXWzRxom7eAfYCK0gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713757675; c=relaxed/simple;
-	bh=dKCOsWmsgjfFo6IO8R3M57gvMEH3lYVCacgWynXwjn8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=XHUnpvW3DLWAPwc6UDImbDywZrUf2R9eI9Y/Bil5gd7E8oxo8gRjtEXmq+IdUvPKSS63aVuo2jFFw6ROUqRVCmVRYulcUIITKp/nEmSNR1HL7NmiapKtpsGtBK44K+aq7X5ozYgOF9gxpcx7a54jlJqnRvOWwDMYGioQvof6LRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VNB602sM9z4f3khV;
-	Mon, 22 Apr 2024 11:47:36 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id CC0A71A0D93;
-	Mon, 22 Apr 2024 11:47:43 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgCXaBHe3SVm89mEKg--.58781S3;
-	Mon, 22 Apr 2024 11:47:43 +0800 (CST)
-Subject: Re: [PATCH] blk-throttle: fix repeat limit on bio with
- BIO_BPS_THROTTLED
-To: =?UTF-8?B?5ZGo5rOw5a6H?= <zhoutaiyu@kuaishou.com>,
- Yu Kuai <yukuai1@huaweicloud.com>, "tj@kernel.org" <tj@kernel.org>
-Cc: "josef@toxicpanda.com" <josef@toxicpanda.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>,
- "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240419120747.38031-1-zhoutaiyu@kuaishou.com>
- <ea781ccc-c29e-894e-c54a-f44ea349edca@huaweicloud.com>
- <e2d291e6b6ed43d89930eb2a7d459ff8@kuaishou.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <fbf135e8-de16-8eb4-9ade-1b979a335e33@huaweicloud.com>
-Date: Mon, 22 Apr 2024 11:47:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1713761988; c=relaxed/simple;
+	bh=R+evDg63IzUd5zapaBryco9bCuVG/AOU6w5P3KAG978=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WkLVbYlcx/bo5HV8HDHqeBgml/Kn42vWXbG3+vuyRaxJHP/RPVZhkhCVCxLUp94CvIWenfUJLYLCTSzdCHuE6mPF8AqctOlImqcIOkRWK+moAK6DeWV6ImyuY/g/nK/GdeElNJd7FOH10yjg5Usp7AtZ2zzo/3h8GnqYwEK+9vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QxQjVsv3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxQjVsv3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713761985;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3feHkqgPPy1+RGpuKoIZf5c3ACEkn4+zXOf51zMJUpk=;
+	b=QxQjVsv3TbcLYIT1VoftYFAZBn+OK7VqhIF+wPhSjPAbnrMQrYMTJkIgKJi+HwUY5L8nl+
+	6rjQNZHx2sFLbXXDT5jTJFuZUWQQs1hohqxZYHOGUA8e4X1kuVJfyiVe07hTiEEZ+y21O2
+	fVPkGjKsVUN+FfLe0aWbxizjnylbQM4=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-93-H36YRleTNqWH1s5aQOMFqw-1; Mon, 22 Apr 2024 00:59:44 -0400
+X-MC-Unique: H36YRleTNqWH1s5aQOMFqw-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2a5d989e820so5400516a91.2
+        for <linux-block@vger.kernel.org>; Sun, 21 Apr 2024 21:59:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713761982; x=1714366782;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3feHkqgPPy1+RGpuKoIZf5c3ACEkn4+zXOf51zMJUpk=;
+        b=WC6b01QPELHJTbx+nOjIeGmXMueAGNukjroJppDvYcCf7X1hh3ahTQGqlc+acZsBHQ
+         iF0Ic/NLkN4372TiLHIVTc4AydJWr1mKLX7lagRFXSv0G3tyBP+271uUNwqkDSgw8tQO
+         n/CTigKaWAhw4kEJUD5a60qLW431+TnQsrMYzfvRrkzCOPM44MmUYwyc5BVnRX+TXO8C
+         ftFUCZfEgJ8GqWbCLewMauIYwx3KFWvc93fGWcFcGNeAjpZ9LnoDw62jkRyjz3NkpnfR
+         zuF10Bz9FNoynkD+j5RH0EfxivhJWjdjWGBp0KIfqbdtYFfM2dU3u3vPWpZO11fvNWoc
+         5GnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4BZGsz26kzt75eiGDkjiCc9L8rJzw/7vey67vDROvjAWTwTncN4Uz5/J2uG92ao5OyE/k7D8+a7eyLjL8uG0cYwQZRPPFJ+EKxwU=
+X-Gm-Message-State: AOJu0Yy6FvKS5lqhMSSWyqThfuPanpIfHTNhrGO5h5od+ELi8VWYKlp9
+	UfFi0hVBuz4ubSUCoH8eOTyXFCixL4ilgmW7WN0LQXOBYkPEafOa41fNtC3JSQjyQOlmfZG8CVk
+	t5L6fcB45S0p/iUjWZ50G1fsWosCZuRc9gzkzOdLVvuV0p0Ml31DHQ4svQKHa3288SsotbFi/3q
+	UisfQMq7VDYn4DUi1wUxWvZ+7bfzgcDgJlSjI+79zzDlc=
+X-Received: by 2002:a17:90a:6389:b0:2ab:a53a:6e52 with SMTP id f9-20020a17090a638900b002aba53a6e52mr7841411pjj.37.1713761981960;
+        Sun, 21 Apr 2024 21:59:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEEkCI65P6txzqz3iyqhbrRVGRMUVMFKgnJxfVOLFXvSKUenWM2+xiSOzJD+8Wc3loMYC1QTZqgf4Pk1IRrkds=
+X-Received: by 2002:a17:90a:6389:b0:2ab:a53a:6e52 with SMTP id
+ f9-20020a17090a638900b002aba53a6e52mr7841400pjj.37.1713761981617; Sun, 21 Apr
+ 2024 21:59:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e2d291e6b6ed43d89930eb2a7d459ff8@kuaishou.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgCXaBHe3SVm89mEKg--.58781S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrZw4xZr13tw4xXry5Gry3Jwb_yoW3ZrX_uF
-	s8Ar1xKrn5Jw4xtr9xKr1Y93ykK3sxuw1qq3ykZF1kX34v9F4kGFW7KFZ7AF1fZanYqws7
-	Ar4UtayFgay7WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb4kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-	Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
-	UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <CAHj4cs8xbBXm1_SKpNpeB5_bbD28YwhorikQ-OYRtt9-Mf+vsQ@mail.gmail.com>
+ <923a9363-f51b-4fa1-8a0b-003ff46845a2@nvidia.com> <ede49e66-7a0a-472d-a44c-0c60763ddce0@grimberg.me>
+In-Reply-To: <ede49e66-7a0a-472d-a44c-0c60763ddce0@grimberg.me>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Mon, 22 Apr 2024 12:59:29 +0800
+Message-ID: <CAHj4cs9UN_pV_raSL2+wNRP9yBeJWkx0_GtHSQ0QoC3jYxhfQA@mail.gmail.com>
+Subject: Re: [bug report] kmemleak observed with blktests nvme/tcp
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi!
+On Sun, Apr 21, 2024 at 6:31=E2=80=AFPM Sagi Grimberg <sagi@grimberg.me> wr=
+ote:
+>
+>
+>
+> On 16/04/2024 6:19, Chaitanya Kulkarni wrote:
+> > +linux-nvme list for awareness ...
+> >
+> > -ck
+> >
+> >
+> > On 4/6/24 17:38, Yi Zhang wrote:
+> >> Hello
+> >>
+> >> I found the kmemleak issue after blktests nvme/tcp tests on the latest
+> >> linux-block/for-next, please help check it and let me know if you need
+> >> any info/testing for it, thanks.
+> > it will help others to specify which testcase you are using ...
+> >
+> >> # dmesg | grep kmemleak
+> >> [ 2580.572467] kmemleak: 92 new suspected memory leaks (see
+> >> /sys/kernel/debug/kmemleak)
+> >>
+> >> # cat kmemleak.log
+> >> unreferenced object 0xffff8885a1abe740 (size 32):
+> >>     comm "kworker/40:1H", pid 799, jiffies 4296062986
+> >>     hex dump (first 32 bytes):
+> >>       c2 4a 4a 04 00 ea ff ff 00 00 00 00 00 10 00 00  .JJ............=
+.
+> >>       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ...............=
+.
+> >>     backtrace (crc 6328eade):
+> >>       [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
+> >>       [<ffffffffa86a9b1f>] sgl_alloc_order+0x7f/0x360
+> >>       [<ffffffffc261f6c5>] lo_read_simple+0x1d5/0x5b0 [loop]
+> >>       [<ffffffffc26287ef>] 0xffffffffc26287ef
+> >>       [<ffffffffc262a2c4>] 0xffffffffc262a2c4
+> >>       [<ffffffffc262a881>] 0xffffffffc262a881
+> >>       [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
+> >>       [<ffffffffa76b0813>] worker_thread+0x583/0xd20
+> >>       [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
+> >>       [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
+> >>       [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
+> >> unreferenced object 0xffff88a8b03647c0 (size 16):
+> >>     comm "kworker/40:1H", pid 799, jiffies 4296062986
+> >>     hex dump (first 16 bytes):
+> >>       c0 4a 4a 04 00 ea ff ff 00 10 00 00 00 00 00 00  .JJ............=
+.
+> >>     backtrace (crc 860ce62b):
+> >>       [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
+> >>       [<ffffffffc261f805>] lo_read_simple+0x315/0x5b0 [loop]
+> >>       [<ffffffffc26287ef>] 0xffffffffc26287ef
+> >>       [<ffffffffc262a2c4>] 0xffffffffc262a2c4
+> >>       [<ffffffffc262a881>] 0xffffffffc262a881
+> >>       [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
+> >>       [<ffffffffa76b0813>] worker_thread+0x583/0xd20
+> >>       [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
+> >>       [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
+> >>       [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
+>
+> kmemleak suggest that the leakage is coming from lo_read_simple() Is
+> this a regression that can be bisected?
+>
 
-在 2024/04/22 11:33, 周泰宇 写道:
-> What I want to do here was to set an easy to reach value to BPS_LIMIT (10M/s in this example) and an unable to reach value to IOPS_LIMIT (100000 in this example).
-> 
-> 
-> Under this setting, the iostat shows that the bps is far less than 10M/s and sometimes is far larger than 10M/s.
+It's not one regression issue, I tried 6.7 and it also can be reproduced.
 
-Yes, I know this behaviour, and this is because blk-throttle works
-before IO split, and io stats is accounting bps for rq-based disk after
-IO split, if you using Q2C for bps you'll see that bps is stable as
-limit.
 
-Hi, Tejun！
-
-Do you think this *phenomenon* need to be fixed? If so, I don't see a
-easy way other than throttle bio after *IO split*. Perhaps ohter than
-bio merge case, this can be another motivation to move blk-throttle to
-rq_qos_throttle().
-
-Thanks,
-Kuai
+--
+Best Regards,
+  Yi Zhang
 
