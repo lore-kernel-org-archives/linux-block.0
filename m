@@ -1,150 +1,203 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A007B168B1
-	for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 04:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAF51BC2A
+	for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 06:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713761988; cv=none; b=iqsfpuUncbaXPXJqGNUO9wgmNedhVSoBaNQA3VXtFm2nH68YOoaJ0AbZNRuzTolQ1jlgX9EAKlIolI9fo4HkW14IYCEv+z0yxxhcCGX9dy2qJrZsDsuZdeMDRZb8xPFEDsyUrRB+Tuga/ntO0QcoyAsVcSXWzRxom7eAfYCK0gs=
+	t=1713766029; cv=none; b=YMeURjrgUVqkHIyxrjDgiX/D6U1itaftqtjJPSpjeDS6ighrUGSC7Z8l306iiDpSGdGjT176YhK9MQk7ofT7nUL7x2jgCFi3SEKdFqFn18vEi/CVLAeBtVqJ2WCi/P3sOJikRjV2gNt4ilb7kknCYdbD7T5Au1dGjkTDKJOmYxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713761988; c=relaxed/simple;
-	bh=R+evDg63IzUd5zapaBryco9bCuVG/AOU6w5P3KAG978=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WkLVbYlcx/bo5HV8HDHqeBgml/Kn42vWXbG3+vuyRaxJHP/RPVZhkhCVCxLUp94CvIWenfUJLYLCTSzdCHuE6mPF8AqctOlImqcIOkRWK+moAK6DeWV6ImyuY/g/nK/GdeElNJd7FOH10yjg5Usp7AtZ2zzo/3h8GnqYwEK+9vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QxQjVsv3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxQjVsv3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713761985;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3feHkqgPPy1+RGpuKoIZf5c3ACEkn4+zXOf51zMJUpk=;
-	b=QxQjVsv3TbcLYIT1VoftYFAZBn+OK7VqhIF+wPhSjPAbnrMQrYMTJkIgKJi+HwUY5L8nl+
-	6rjQNZHx2sFLbXXDT5jTJFuZUWQQs1hohqxZYHOGUA8e4X1kuVJfyiVe07hTiEEZ+y21O2
-	fVPkGjKsVUN+FfLe0aWbxizjnylbQM4=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-93-H36YRleTNqWH1s5aQOMFqw-1; Mon, 22 Apr 2024 00:59:44 -0400
-X-MC-Unique: H36YRleTNqWH1s5aQOMFqw-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2a5d989e820so5400516a91.2
-        for <linux-block@vger.kernel.org>; Sun, 21 Apr 2024 21:59:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713761982; x=1714366782;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3feHkqgPPy1+RGpuKoIZf5c3ACEkn4+zXOf51zMJUpk=;
-        b=WC6b01QPELHJTbx+nOjIeGmXMueAGNukjroJppDvYcCf7X1hh3ahTQGqlc+acZsBHQ
-         iF0Ic/NLkN4372TiLHIVTc4AydJWr1mKLX7lagRFXSv0G3tyBP+271uUNwqkDSgw8tQO
-         n/CTigKaWAhw4kEJUD5a60qLW431+TnQsrMYzfvRrkzCOPM44MmUYwyc5BVnRX+TXO8C
-         ftFUCZfEgJ8GqWbCLewMauIYwx3KFWvc93fGWcFcGNeAjpZ9LnoDw62jkRyjz3NkpnfR
-         zuF10Bz9FNoynkD+j5RH0EfxivhJWjdjWGBp0KIfqbdtYFfM2dU3u3vPWpZO11fvNWoc
-         5GnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4BZGsz26kzt75eiGDkjiCc9L8rJzw/7vey67vDROvjAWTwTncN4Uz5/J2uG92ao5OyE/k7D8+a7eyLjL8uG0cYwQZRPPFJ+EKxwU=
-X-Gm-Message-State: AOJu0Yy6FvKS5lqhMSSWyqThfuPanpIfHTNhrGO5h5od+ELi8VWYKlp9
-	UfFi0hVBuz4ubSUCoH8eOTyXFCixL4ilgmW7WN0LQXOBYkPEafOa41fNtC3JSQjyQOlmfZG8CVk
-	t5L6fcB45S0p/iUjWZ50G1fsWosCZuRc9gzkzOdLVvuV0p0Ml31DHQ4svQKHa3288SsotbFi/3q
-	UisfQMq7VDYn4DUi1wUxWvZ+7bfzgcDgJlSjI+79zzDlc=
-X-Received: by 2002:a17:90a:6389:b0:2ab:a53a:6e52 with SMTP id f9-20020a17090a638900b002aba53a6e52mr7841411pjj.37.1713761981960;
-        Sun, 21 Apr 2024 21:59:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEkCI65P6txzqz3iyqhbrRVGRMUVMFKgnJxfVOLFXvSKUenWM2+xiSOzJD+8Wc3loMYC1QTZqgf4Pk1IRrkds=
-X-Received: by 2002:a17:90a:6389:b0:2ab:a53a:6e52 with SMTP id
- f9-20020a17090a638900b002aba53a6e52mr7841400pjj.37.1713761981617; Sun, 21 Apr
- 2024 21:59:41 -0700 (PDT)
+	s=arc-20240116; t=1713766029; c=relaxed/simple;
+	bh=62mpytka2afKyO5XcFdsGyLPzPjfnlQu9eKZSfYDYx0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u8R5WBWI0t0qxh9lOLIBCKD5dJpJfyRi/iOnDjxpwkgwu2B1yx3gmotUKkXEM4ubIWH00I1k+OMjSkZ8qL2Vz2cb0cHvZXSTIekor7/0GIr74XqoY+WlYFmxcLjS5y6cIpEak2mz5gV3915No4w4QVqNLT5KUvHY/Ym3Uv+bc7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from SHSQR01.spreadtrum.com (localhost [127.0.0.2] (may be forged))
+	by SHSQR01.spreadtrum.com with ESMTP id 43M5jF8K091140
+	for <linux-block@vger.kernel.org>; Mon, 22 Apr 2024 13:45:15 +0800 (+08)
+	(envelope-from Dongliang.Cui@unisoc.com)
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 43M5isUp089400;
+	Mon, 22 Apr 2024 13:44:54 +0800 (+08)
+	(envelope-from Dongliang.Cui@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4VNDfN3lJFz2NK302;
+	Mon, 22 Apr 2024 13:42:20 +0800 (CST)
+Received: from tj10379pcu.spreadtrum.com (10.5.32.15) by
+ BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Mon, 22 Apr 2024 13:44:51 +0800
+From: Dongliang Cui <dongliang.cui@unisoc.com>
+To: <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
+        <mathieu.desnoyers@efficios.com>, <ebiggers@kernel.org>
+CC: <ke.wang@unisoc.com>, <hongyu.jin.cn@gmail.com>, <niuzhiguo84@gmail.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <cuidongliang390@gmail.com>, Dongliang Cui <dongliang.cui@unisoc.com>
+Subject: [PATCH v2] block: Add ioprio to block_rq tracepoint
+Date: Mon, 22 Apr 2024 13:43:17 +0800
+Message-ID: <20240422054317.1779168-1-dongliang.cui@unisoc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHj4cs8xbBXm1_SKpNpeB5_bbD28YwhorikQ-OYRtt9-Mf+vsQ@mail.gmail.com>
- <923a9363-f51b-4fa1-8a0b-003ff46845a2@nvidia.com> <ede49e66-7a0a-472d-a44c-0c60763ddce0@grimberg.me>
-In-Reply-To: <ede49e66-7a0a-472d-a44c-0c60763ddce0@grimberg.me>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Mon, 22 Apr 2024 12:59:29 +0800
-Message-ID: <CAHj4cs9UN_pV_raSL2+wNRP9yBeJWkx0_GtHSQ0QoC3jYxhfQA@mail.gmail.com>
-Subject: Re: [bug report] kmemleak observed with blktests nvme/tcp
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>, Jens Axboe <axboe@kernel.dk>, 
-	linux-block <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SHCAS01.spreadtrum.com (10.0.1.201) To
+ BJMBX02.spreadtrum.com (10.0.64.8)
+X-MAIL:SHSQR01.spreadtrum.com 43M5isUp089400
 
-On Sun, Apr 21, 2024 at 6:31=E2=80=AFPM Sagi Grimberg <sagi@grimberg.me> wr=
-ote:
->
->
->
-> On 16/04/2024 6:19, Chaitanya Kulkarni wrote:
-> > +linux-nvme list for awareness ...
-> >
-> > -ck
-> >
-> >
-> > On 4/6/24 17:38, Yi Zhang wrote:
-> >> Hello
-> >>
-> >> I found the kmemleak issue after blktests nvme/tcp tests on the latest
-> >> linux-block/for-next, please help check it and let me know if you need
-> >> any info/testing for it, thanks.
-> > it will help others to specify which testcase you are using ...
-> >
-> >> # dmesg | grep kmemleak
-> >> [ 2580.572467] kmemleak: 92 new suspected memory leaks (see
-> >> /sys/kernel/debug/kmemleak)
-> >>
-> >> # cat kmemleak.log
-> >> unreferenced object 0xffff8885a1abe740 (size 32):
-> >>     comm "kworker/40:1H", pid 799, jiffies 4296062986
-> >>     hex dump (first 32 bytes):
-> >>       c2 4a 4a 04 00 ea ff ff 00 00 00 00 00 10 00 00  .JJ............=
-.
-> >>       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ...............=
-.
-> >>     backtrace (crc 6328eade):
-> >>       [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
-> >>       [<ffffffffa86a9b1f>] sgl_alloc_order+0x7f/0x360
-> >>       [<ffffffffc261f6c5>] lo_read_simple+0x1d5/0x5b0 [loop]
-> >>       [<ffffffffc26287ef>] 0xffffffffc26287ef
-> >>       [<ffffffffc262a2c4>] 0xffffffffc262a2c4
-> >>       [<ffffffffc262a881>] 0xffffffffc262a881
-> >>       [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
-> >>       [<ffffffffa76b0813>] worker_thread+0x583/0xd20
-> >>       [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
-> >>       [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
-> >>       [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
-> >> unreferenced object 0xffff88a8b03647c0 (size 16):
-> >>     comm "kworker/40:1H", pid 799, jiffies 4296062986
-> >>     hex dump (first 16 bytes):
-> >>       c0 4a 4a 04 00 ea ff ff 00 10 00 00 00 00 00 00  .JJ............=
-.
-> >>     backtrace (crc 860ce62b):
-> >>       [<ffffffffa7f2657c>] __kmalloc+0x37c/0x480
-> >>       [<ffffffffc261f805>] lo_read_simple+0x315/0x5b0 [loop]
-> >>       [<ffffffffc26287ef>] 0xffffffffc26287ef
-> >>       [<ffffffffc262a2c4>] 0xffffffffc262a2c4
-> >>       [<ffffffffc262a881>] 0xffffffffc262a881
-> >>       [<ffffffffa76adf3c>] process_one_work+0x89c/0x19f0
-> >>       [<ffffffffa76b0813>] worker_thread+0x583/0xd20
-> >>       [<ffffffffa76ce2a3>] kthread+0x2f3/0x3e0
-> >>       [<ffffffffa74a804d>] ret_from_fork+0x2d/0x70
-> >>       [<ffffffffa7406e4a>] ret_from_fork_asm+0x1a/0x30
->
-> kmemleak suggest that the leakage is coming from lo_read_simple() Is
-> this a regression that can be bisected?
->
+Sometimes we need to track the processing order of requests with
+ioprio set. So the ioprio of request can be useful information.
 
-It's not one regression issue, I tried 6.7 and it also can be reproduced.
+Example：
 
+block_rq_insert: 8,0 WS 4096 () 16573296 + 8 rt,4 [highpool[1]]
+block_rq_issue: 8,0 WS 4096 () 16573296 + 8 rt,4 [kworker/7:0H]
+block_rq_complete: 8,0 WS () 16573296 + 8 rt,4 [0]
 
---
-Best Regards,
-  Yi Zhang
+Signed-off-by: Dongliang Cui <dongliang.cui@unisoc.com>
+
+Changes history
+Changes in v2:
+Update the printing method of ioprio_class.
+---
+ include/trace/events/block.h | 36 ++++++++++++++++++++++++++----------
+ include/uapi/linux/ioprio.h  |  7 +++++++
+ 2 files changed, 33 insertions(+), 10 deletions(-)
+
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 0e128ad51460..8aa0116077ee 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -9,6 +9,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/buffer_head.h>
+ #include <linux/tracepoint.h>
++#include <uapi/linux/ioprio.h>
+ 
+ #define RWBS_LEN	8
+ 
+@@ -82,6 +83,8 @@ TRACE_EVENT(block_rq_requeue,
+ 		__field(  dev_t,	dev			)
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
++		__field(  unsigned int,	ioprio_class		)
++		__field(  unsigned int, ioprio_value		)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+@@ -90,16 +93,19 @@ TRACE_EVENT(block_rq_requeue,
+ 		__entry->dev	   = rq->q->disk ? disk_devt(rq->q->disk) : 0;
+ 		__entry->sector    = blk_rq_trace_sector(rq);
+ 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
++		__entry->ioprio_class = rq->ioprio >> IOPRIO_CLASS_SHIFT & 0x3;
++		__entry->ioprio_value = rq->ioprio & 0xff;
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+ 		__get_str(cmd)[0] = '\0';
+ 	),
+ 
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u %s,%u [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+-		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, 0)
++		  (unsigned long long)__entry->sector, __entry->nr_sector,
++		  __print_symbolic(__entry->ioprio_class, IOPRIO_CLASS_STRINGS),
++		  __entry->ioprio_value, 0)
+ );
+ 
+ DECLARE_EVENT_CLASS(block_rq_completion,
+@@ -113,6 +119,8 @@ DECLARE_EVENT_CLASS(block_rq_completion,
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
+ 		__field(  int	,	error			)
++		__field(  unsigned int,	ioprio_class		)
++		__field(  unsigned int, ioprio_value		)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+@@ -122,16 +130,19 @@ DECLARE_EVENT_CLASS(block_rq_completion,
+ 		__entry->sector    = blk_rq_pos(rq);
+ 		__entry->nr_sector = nr_bytes >> 9;
+ 		__entry->error     = blk_status_to_errno(error);
++		__entry->ioprio_class = rq->ioprio >> IOPRIO_CLASS_SHIFT & 0x3;
++		__entry->ioprio_value = rq->ioprio & 0xff;
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+ 		__get_str(cmd)[0] = '\0';
+ 	),
+ 
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u %s,%u [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+-		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->error)
++		  (unsigned long long)__entry->sector, __entry->nr_sector,
++		  __print_symbolic(__entry->ioprio_class, IOPRIO_CLASS_STRINGS),
++		  __entry->ioprio_value, __entry->error)
+ );
+ 
+ /**
+@@ -180,8 +191,10 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
+ 		__field(  unsigned int,	bytes			)
++		__field(  unsigned int,	ioprio_class		)
++		__field(  unsigned int, ioprio_value		)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+-		__array(  char,         comm,   TASK_COMM_LEN   )
++		__array(  char,		comm,   TASK_COMM_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+ 
+@@ -190,17 +203,20 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		__entry->sector    = blk_rq_trace_sector(rq);
+ 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
+ 		__entry->bytes     = blk_rq_bytes(rq);
++		__entry->ioprio_class = rq->ioprio >> IOPRIO_CLASS_SHIFT & 0x3;
++		__entry->ioprio_value = rq->ioprio & 0xff;
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+ 		__get_str(cmd)[0] = '\0';
+ 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+ 	),
+ 
+-	TP_printk("%d,%d %s %u (%s) %llu + %u [%s]",
++	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u [%s]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __entry->bytes, __get_str(cmd),
+-		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->comm)
++		  (unsigned long long)__entry->sector, __entry->nr_sector,
++		  __print_symbolic(__entry->ioprio_class, IOPRIO_CLASS_STRINGS),
++		  __entry->ioprio_value, __entry->comm)
+ );
+ 
+ /**
+diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
+index bee2bdb0eedb..9a43ad3a65ab 100644
+--- a/include/uapi/linux/ioprio.h
++++ b/include/uapi/linux/ioprio.h
+@@ -35,6 +35,13 @@ enum {
+ 	IOPRIO_CLASS_INVALID	= 7,
+ };
+ 
++#define IOPRIO_CLASS_STRINGS \
++	{ IOPRIO_CLASS_NONE,	"none" }, \
++	{ IOPRIO_CLASS_RT,	"rt" }, \
++	{ IOPRIO_CLASS_BE,	"be" }, \
++	{ IOPRIO_CLASS_IDLE,	"idle" }, \
++	{ IOPRIO_CLASS_INVALID,	"invalid" }
++
+ /*
+  * The RT and BE priority classes both support up to 8 priority levels that
+  * can be specified using the lower 3-bits of the priority data.
+-- 
+2.25.1
 
