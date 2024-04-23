@@ -1,98 +1,120 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E5C136E01
-	for <linux-block@vger.kernel.org>; Tue, 23 Apr 2024 13:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCF9136E2C
+	for <linux-block@vger.kernel.org>; Tue, 23 Apr 2024 14:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713880661; cv=none; b=eSUEbZTe5a+yhtMgwmLPv2JJXAdlYX0ZDQHWvuOLVkKEhGbEHjp1KLA1p1+9roEv5aPBiXQ6vrJEYUITWTGpVJn4wqr1SgguWvlofwET56+g7lhuoDtVJDvyRAY7Z6jyXVySDsqkWmIG/+uLy5WrMpetCCeBy2Ei0gyHrc4HnOw=
+	t=1713882104; cv=none; b=JKmouixzedFC4+HgBoLI9MS8nNVU64vRVdy2TZ+A6Am/oblyUXoIbiIGCTBmIRvMzORSWj42o/zwGjpCQZwYPy6ILOgdgpfRzbCu9vw7g1/PlSolgbmtoBzcGTGZziFPUhERqqkmrfCvw/emO/YhlMthYU+pUw3h5Vt6JhidcGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713880661; c=relaxed/simple;
-	bh=dzD7j51NO7JNbTCql7NBuFQbGaniSr8gFMxVm8r+tz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CKiXKF7qf5qnRDCQqGNTXuEKlSEI7xPcbZmNhmH+z8LR+cDj6zDLsg3xcnbgL6R/S6p2X2QODviqLTlMVRbUVGjhZw9EnfWDW5dfJjsnWnZUH0558QrCGnGFe40vUwDYMzzDTPsnUZ6iuf9raU0At4gUaT0WxF5PI9hEAb+GMuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MCRJS1wB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1713882104; c=relaxed/simple;
+	bh=9jc2wlB8Ty1q1eIdLrxU3p4Vqn70+aUVShggyt0lGCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=tEsvNZhmc28uyen6UXDiC+vYNMYJENXo7eu4ftu3qwQAhQ1TLRs+Y50K7mOVpwaaxanxx/UgBd0noIbm62EZegYAzuFkgGpcwbUdrPP+ez8YgOE2mA1db+MVOiYSFCy7n396LgferVLJiCBEGBrZzagDIPMFiPwkSNP3qm4gaqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VG/Xx6AW; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MCRJS1wB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713880659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=buoeMniEBD95Z4sRuMDLAYz4w3sm9+AC9UgcFYRX1LM=;
-	b=MCRJS1wBB3U28O5isRktFHLoQfF84iNjpd0u2a4NYfJVNC1rS1BkuZBll4DvCu34Ky/+6O
-	G6zhG+iejVpXk6ehsAr01CpdxINTZ3s/CdZ04M61nil09DOrh8fMeDXHk0T5ewPnJS9TRH
-	DT82wqJ68/I84P5cR2OBgl2JqMD2RnY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-NA1xd7KvP3ujc0E1WCuCNQ-1; Tue, 23 Apr 2024 09:57:35 -0400
-X-MC-Unique: NA1xd7KvP3ujc0E1WCuCNQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA8D78AC2C5;
-	Tue, 23 Apr 2024 13:57:34 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.86])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9073D20296D2;
-	Tue, 23 Apr 2024 13:57:30 +0000 (UTC)
-Date: Tue, 23 Apr 2024 21:57:26 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Kevin Wolf <kwolf@redhat.com>, ming.lei@redhat.com
-Subject: Re: [PATCH 2/9] io_uring: support user sqe ext flags
-Message-ID: <Zie+RlbtckZJVE2J@fedora>
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-3-ming.lei@redhat.com>
- <89dac454-6521-4bd8-b8aa-ad329b887396@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VG/Xx6AW"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7d9a64f140dso53190939f.1
+        for <linux-block@vger.kernel.org>; Tue, 23 Apr 2024 07:21:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713882100; x=1714486900; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zkEm3gK8I1ltgZwxgOuOHJ3qrqHieOTRPEzhZT2FAIM=;
+        b=VG/Xx6AWqQniuyQoF2BMHGVyLZ33EI4kF2nc28fquU7HWoTUqSCgmnZoaXbuxxiVRx
+         wPRM4ZX9wXN+F0j7VPmK1pTzQptsrUPUSJJR7gX6FaREM2CrjzMfFfajPWfVuiL/fivE
+         yD0gcuxGChe0lQp412T3EXKCI4mm4h+dui+YCpWAulvVzJ+eCgzoFycyW9VY9ld+z5b9
+         fbq6jygOWTP/zqB8r0xUuPu0LqrSPefQUT5FF4BWJIknV6yZi5u6IRJ2MWd4dJ4eFZxu
+         enOP6ukGfKVI3hZU3gQwJyM2Y5V6G29qGizbLtLDa2gmSHnvWsKpI1g3WBRefNNaeAen
+         e/xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713882100; x=1714486900;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zkEm3gK8I1ltgZwxgOuOHJ3qrqHieOTRPEzhZT2FAIM=;
+        b=rUkKya9HGze34G/P+rM3tS6lmxXCOVnlOgmD58o0dM6Yy0KSkQIgoH37zoe/bbgc+m
+         hvx9A/9ZuBRNHrDEK3mheAc5yrAdcApPl4jNYSfxqbhyB4RRpdMwi9ToGjrQuU1Ai5ao
+         iLMdRqRHSqVbbD48XB5D56NKfFOtT8o38rMDAbzJOnwqqskjkCmDy3JDlvGiFKq199NY
+         MqMjC3bqOWNgPN/Wgf6xwe2mGtyEF9Tvvzd04TPAulpdIF1AAZkZHUvsIqzG7HVQ03sR
+         bOYOmnwbRUeqRKS0u+uBXCJn3SLYimypQvgnFCsD3cKG1kR4ZN2M7+gjkPU2/u1wSu6W
+         Z30A==
+X-Forwarded-Encrypted: i=1; AJvYcCW6TJlo9R7KRxSELbkN96y4vrqYmpJrqG1KdCFlSja9Vudadov1DehciJLUUXhOxPYxD7EBAVCf8KNVwEMZh9x4MJBg5MbR46lmiRs=
+X-Gm-Message-State: AOJu0YyhKv8U2Avrm8zt7JAxV4yT1/338BD+K4DEsqUO0BTbaqZPp5YG
+	NZQTdoLqysj5uhU+J8IEk4iRt7LJDhV14sDHnaPo3qjooCAy7xNDYWAXoYUTxmqRJqGuf/ZJDe9
+	x
+X-Google-Smtp-Source: AGHT+IFPzMzFKqLRbNpeLKmZbMw6Dzfp+ElklLUQGjcU6l0FQafN1eM9aBnrMeb1eS1IojrZmBcxZA==
+X-Received: by 2002:a05:6602:2572:b0:7dd:88df:b673 with SMTP id dj18-20020a056602257200b007dd88dfb673mr4349056iob.0.1713882099555;
+        Tue, 23 Apr 2024 07:21:39 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id b15-20020a05660214cf00b007d6c052809bsm3009533iow.11.2024.04.23.07.21.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Apr 2024 07:21:39 -0700 (PDT)
+Message-ID: <715fd037-a8e5-4e62-939e-a446087eed2a@kernel.dk>
+Date: Tue, 23 Apr 2024 08:21:38 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89dac454-6521-4bd8-b8aa-ad329b887396@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] block: prevent freeing a zone write plug too early
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+References: <20240420075811.1276893-1-dlemoal@kernel.org>
+ <20240420075811.1276893-2-dlemoal@kernel.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240420075811.1276893-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 22, 2024 at 12:16:12PM -0600, Jens Axboe wrote:
-> On 4/7/24 7:03 PM, Ming Lei wrote:
-> > sqe->flags is u8, and now we have used 7 bits, so take the last one for
-> > extending purpose.
-> > 
-> > If bit7(IOSQE_HAS_EXT_FLAGS_BIT) is 1, it means this sqe carries ext flags
-> > from the last byte(.ext_flags), or bit23~bit16 of sqe->uring_cmd_flags for
-> > IORING_OP_URING_CMD.
-> > 
-> > io_slot_flags() return value is converted to `ULL` because the affected bits
-> > are beyond 32bit now.
+On 4/20/24 1:58 AM, Damien Le Moal wrote:
+> The submission of plugged BIOs is done using a work struct executing the
+> function blk_zone_wplug_bio_work(). This function gets and submits a
+> plugged zone write BIO and is guaranteed to operate on a valid zone
+> write plug (with a reference count higher than 0) on entry as plugged
+> BIOs hold a reference on their zone write plugs. However, once a BIO is
+> submitted with submit_bio_noacct_nocheck(), the BIO may complete before
+> blk_zone_wplug_bio_work(), with the BIO completion trigering a release
+> and freeing of the zone write plug if the BIO is the last write to a
+> zone (making the zone FULL). This potentially can result in the zone
+> write plug being freed while the work is still active.
 > 
-> If we're extending flags, which is something we arguably need to do at
-> some point, I think we should have them be generic and not spread out.
+> Avoid this by calling flush_work() from disk_free_zone_wplug_rcu().
+> 
+> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>  block/blk-zoned.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 3befebe6b319..685f0b9159fd 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -526,6 +526,8 @@ static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
+>  	struct blk_zone_wplug *zwplug =
+>  		container_of(rcu_head, struct blk_zone_wplug, rcu_head);
+>  
+> +	flush_work(&zwplug->bio_work);
+> +
+>  	mempool_free(zwplug, zwplug->disk->zone_wplugs_pool);
+>  }
 
-Sorry, maybe I don't get your idea, and the ext_flag itself is always
-initialized in io_init_req(), like normal sqe->flags, same with its
-usage.
+This is totally backwards. First of all, if you actually had work that
+needed flushing at this point, the kernel would bomb spectacularly.
+Secondly, what's the point of using RCU to protect this, if you're now
+needing to flush work from the RCU callback? That's a clear sign that
+something is very wrong here with your references / RCU usage.. The work
+item should hold a reference to it, trying to paper around it like this
+is not going to work at all.
 
-> If uring_cmd needs specific flags and don't have them, then we should
-> add it just for that.
+Why is the work item racing with RCU freeing?!
 
-The only difference is that bit23~bit16 of sqe->uring_cmd_flags is
-borrowed for uring_cmd's ext flags, because sqe byte0~47 have been taken,
-and can't be reused for generic flag. If we want to use byte48~63, it has
-to be overlapped with uring_cmd's payload, and it is one generic sqe
-flag, which is applied on uring_cmd too.
-
-That is the only way I thought of, or any other suggestion for extending sqe
-flags generically?
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
