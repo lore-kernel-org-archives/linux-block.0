@@ -1,129 +1,138 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF316134CC6
-	for <linux-block@vger.kernel.org>; Tue, 23 Apr 2024 12:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EE8134CCB
+	for <linux-block@vger.kernel.org>; Tue, 23 Apr 2024 13:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713875813; cv=none; b=azGjGp17Vprya6lMlYDTuFAxV+GPKQyLmkiQoBMmr0q91PBiDBJ8V5SMDltq3CpPKkT517huiZBqOsLmEyPKsd8Yvy3vD2YRTFHvVwqnkvTW4GODInzzNwi5e9fAsaG9VT21SVnm+r2X4TQPuApTkinnI4UoTE8yQFuN6ciE+yk=
+	t=1713877744; cv=none; b=P3TNvlEAo4H1K8sertW9vutigwwR2J8xtv3KjGaO9KkIKr86M5MZNk4BkRr2/QrAT7ao9Kkn4Y8tOA++8m6pQ+wD7ghv7eoYHzph77XW2XIW0KLZqKCdHkmqLWq54pTZSEcN9KQv78x/9HOaWylwausFSbet1mdUSx4HxndR330=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713875813; c=relaxed/simple;
-	bh=VvAME1LWxRbvx9VDh/G7d7/s1knb+JtsY3BVP7m4ZaU=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=l94E0an/2TBfqi9zLtmKpmZMDyncqja/vyxa0oS0qdxhqZpl/DIGyZ1DjY1pIyK5S5hdvoCWEdmXMuvL3+nXbRSYIhe93jAAJX6UpXYosEMRetHRnve/QbMz8Wd/pnwbTVuR7P02/cJVM0GdgdqxdO+44eNxsoy19TG2GnAW68M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LdiupYkE; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1713877744; c=relaxed/simple;
+	bh=v1gU3iDXvFB9615CSisd1aIJpJuGfXzjwHbkoGfSKXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B68rBLKksPIkByajU+LriEzNZw/CHfbTsZxB+m+/ClbF1XA+jVtDuXk5n47CeYxs4CtyRdIuCTjaJjIhHf2roeLTzGORFrJqbhyzpHKBXgOUP7DCPr+Evu+oqdYB/KdUigqmByw8Uy3BYd2f+RTT3zZe6V43SbhjXeumXRf7lTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VEMb1cUp; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LdiupYkE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VEMb1cUp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713875810;
+	s=mimecast20190719; t=1713877742;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=m5hTS5Su8xeK74rUb4KJF+eI0XGddiqGV3X2wh7pCMQ=;
-	b=LdiupYkE8xyGzVsgIFhAU4Yo9pXje+iz6uROC2T1R4rI5lC/iixzQqKRRG6VmPbd/d3X+2
-	z7XqcAWcHf/SXe2gjsEOWhUMPOWnStVGGPqQC7KgDedniAuZNVQ32iKUKsTgHDgqC04bJv
-	B6UAO2QpWo+J5cT4w730F0RN1Y5ZOUg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-75-Xj5FVClHMBeSnhEOFqUCew-1; Tue, 23 Apr 2024 08:36:47 -0400
-X-MC-Unique: Xj5FVClHMBeSnhEOFqUCew-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	bh=WlhMbRZb1wmn9lo2JOEuioW89eNr9mYV8YZyWbIWLjA=;
+	b=VEMb1cUpJOtuiNZWWfuB80IW0qqmP5q/cA/9bT2uZEVDxX0mFdUo1ZOP4fcitFDFHrq6Vs
+	tw6fHjXjK09lI9eSYd3FibHV2Gns6lYB+0jRG+SoX4z4giOsbh3L5BO1vtZemocs7Bmw1v
+	tUka/pR4rV5GImagIUus/Ds8R7sfex8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-Zpe06I1xNEGgjVdDDuKRzw-1; Tue,
+ 23 Apr 2024 09:08:58 -0400
+X-MC-Unique: Zpe06I1xNEGgjVdDDuKRzw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8096981F317;
-	Tue, 23 Apr 2024 12:36:46 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D93FC0E7C2;
-	Tue, 23 Apr 2024 12:36:45 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id 883ED30BE3F7; Tue, 23 Apr 2024 12:36:45 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 841A83FA97;
-	Tue, 23 Apr 2024 14:36:45 +0200 (CEST)
-Date: Tue, 23 Apr 2024 14:36:45 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Peter Zijlstra <peterz@infradead.org>
-cc: Christoph Hellwig <hch@infradead.org>, Mike Snitzer <msnitzer@redhat.com>, 
-    Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, 
-    Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, 
-    Waiman Long <longman@redhat.com>, Guangwu Zhang <guazhang@redhat.com>, 
-    dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] completion: move blk_wait_io to
- kernel/sched/completion.c
-In-Reply-To: <20240422105956.GN30852@noisy.programming.kicks-ass.net>
-Message-ID: <8ab5c16e-154-c66-d167-5ce9eb6ea331@redhat.com>
-References: <31b118f3-bc8d-b18b-c4b9-e57d74a73f@redhat.com> <20240417175538.GP40213@noisy.programming.kicks-ass.net> <546473fd-ca4b-3c64-349d-cc739088b748@redhat.com> <ZiCoIHFLAzCva2lU@infradead.org> <20240422105956.GN30852@noisy.programming.kicks-ass.net>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E6AE51C0AF4F;
+	Tue, 23 Apr 2024 13:08:57 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.194.8])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E80BF425375;
+	Tue, 23 Apr 2024 13:08:56 +0000 (UTC)
+Date: Tue, 23 Apr 2024 15:08:55 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>
+Subject: Re: [PATCH 5/9] io_uring: support SQE group
+Message-ID: <Ziey53aADgxDrXZw@redhat.com>
+References: <20240408010322.4104395-1-ming.lei@redhat.com>
+ <20240408010322.4104395-6-ming.lei@redhat.com>
+ <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-
-
-On Mon, 22 Apr 2024, Peter Zijlstra wrote:
-
-> On Wed, Apr 17, 2024 at 09:57:04PM -0700, Christoph Hellwig wrote:
-> > On Wed, Apr 17, 2024 at 08:00:22PM +0200, Mikulas Patocka wrote:
-> > > > > +EXPORT_SYMBOL(wait_for_completion_long_io);
-> > > > 
-> > > > Urgh, why is it a sane thing to circumvent the hang check timer? 
-> > > 
-> > > The block layer already does it - the bios can have arbitrary size, so 
-> > > waiting for them takes arbitrary time.
+Am 22.04.2024 um 20:27 hat Jens Axboe geschrieben:
+> On 4/7/24 7:03 PM, Ming Lei wrote:
+> > SQE group is defined as one chain of SQEs starting with the first sqe that
+> > has IOSQE_EXT_SQE_GROUP set, and ending with the first subsequent sqe that
+> > doesn't have it set, and it is similar with chain of linked sqes.
 > > 
-> > And as mentioned the last few times around, I think we want a task
-> > state to say that task can sleep long or even forever and not propagate
-> > this hack even further.
+> > The 1st SQE is group leader, and the other SQEs are group member. The group
+> > leader is always freed after all members are completed. Group members
+> > aren't submitted until the group leader is completed, and there isn't any
+> > dependency among group members, and IOSQE_IO_LINK can't be set for group
+> > members, same with IOSQE_IO_DRAIN.
+> > 
+> > Typically the group leader provides or makes resource, and the other members
+> > consume the resource, such as scenario of multiple backup, the 1st SQE is to
+> > read data from source file into fixed buffer, the other SQEs write data from
+> > the same buffer into other destination files. SQE group provides very
+> > efficient way to complete this task: 1) fs write SQEs and fs read SQE can be
+> > submitted in single syscall, no need to submit fs read SQE first, and wait
+> > until read SQE is completed, 2) no need to link all write SQEs together, then
+> > write SQEs can be submitted to files concurrently. Meantime application is
+> > simplified a lot in this way.
+> > 
+> > Another use case is to for supporting generic device zero copy:
+> > 
+> > - the lead SQE is for providing device buffer, which is owned by device or
+> >   kernel, can't be cross userspace, otherwise easy to cause leak for devil
+> >   application or panic
+> > 
+> > - member SQEs reads or writes concurrently against the buffer provided by lead
+> >   SQE
 > 
-> A bit like TASK_NOLOAD (which is used to make TASK_IDLE work), but
-> different I suppose.
+> In concept, this looks very similar to "sqe bundles" that I played with
+> in the past:
 > 
-> TASK_NOHUNG would be trivial to add ofc. But is it worth it?
+> https://git.kernel.dk/cgit/linux/log/?h=io_uring-bundle
 > 
-> Anyway, as per the other email, anything like this needs to come with a
-> big fat warning. You get to keep the pieces etc..
+> Didn't look too closely yet at the implementation, but in spirit it's
+> about the same in that the first entry is processed first, and there's
+> no ordering implied between the test of the members of the bundle /
+> group.
 
-This seems better than the blk_wait_io hack.
+When I first read this patch, I wondered if it wouldn't make sense to
+allow linking a group with subsequent requests, e.g. first having a few
+requests that run in parallel and once all of them have completed
+continue with the next linked one sequentially.
 
-Reviewed-by: Mikulas Patocka <mpatocka@redhat.com>
+For SQE bundles, you reused the LINK flag, which doesn't easily allow
+this. Ming's patch uses a new flag for groups, so the interface would be
+more obvious, you simply set the LINK flag on the last member of the
+group (or on the leader, doesn't really matter). Of course, this doesn't
+mean it has to be implemented now, but there is a clear way forward if
+it's wanted.
 
-> ---
-> diff --git a/include/linux/sched.h b/include/linux/sched.h
-> index 3c2abbc587b4..83b25327c233 100644
-> --- a/include/linux/sched.h
-> +++ b/include/linux/sched.h
-> @@ -112,7 +112,8 @@ struct user_event_mm;
->  #define TASK_FREEZABLE			0x00002000
->  #define __TASK_FREEZABLE_UNSAFE	       (0x00004000 * IS_ENABLED(CONFIG_LOCKDEP))
->  #define TASK_FROZEN			0x00008000
-> -#define TASK_STATE_MAX			0x00010000
-> +#define TASK_NOHUNG			0x00010000
-> +#define TASK_STATE_MAX			0x00020000
->  
->  #define TASK_ANY			(TASK_STATE_MAX-1)
->  
-> diff --git a/kernel/hung_task.c b/kernel/hung_task.c
-> index b2fc2727d654..126fac835e5e 100644
-> --- a/kernel/hung_task.c
-> +++ b/kernel/hung_task.c
-> @@ -210,7 +210,8 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
->  		state = READ_ONCE(t->__state);
->  		if ((state & TASK_UNINTERRUPTIBLE) &&
->  		    !(state & TASK_WAKEKILL) &&
-> -		    !(state & TASK_NOLOAD))
-> +		    !(state & TASK_NOLOAD) &&
-> +		    !(state & TASK_NOHUNG))
->  			check_hung_task(t, timeout);
->  	}
->   unlock:
-> 
+The part that looks a bit arbitrary in Ming's patch is that the group
+leader is always completed before the rest starts. It makes perfect
+sense in the context that this series is really after (enabling zero
+copy for ublk), but it doesn't really allow the case you mention in the
+SQE bundle commit message, running everything in parallel and getting a
+single CQE for the whole group.
+
+I suppose you could hack around the sequential nature of the first
+request by using an extra NOP as the group leader - which isn't any
+worse than having an IORING_OP_BUNDLE really, just looks a bit odd - but
+the group completion would still be missing. (Of course, removing the
+sequential first operation would mean that ublk wouldn't have the buffer
+ready any more when the other requests try to use it, so that would
+defeat the purpose of the series...)
+
+I wonder if we can still combine both approaches and create some
+generally useful infrastructure and not something where it's visible
+that it was designed mostly for ublk's special case and other use cases
+just happened to be enabled as a side effect.
+
+Kevin
 
