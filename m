@@ -1,144 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BBF13D8BA
-	for <linux-block@vger.kernel.org>; Tue, 23 Apr 2024 18:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6084A23
+	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 00:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713896386; cv=none; b=TW/y1t5/pB/roI1a2tXQPtUP+fGNuPLvDDKM04kDov+Wdcyh/smx07AW1v2WwvkpTAJVqbwNj4GfBBllaKVoOxbnS5pP925ckTIOjrlubM9I14zmOO8YnjLLMjgYm37JYSBYQ7fbBVdB0P/JHw4yudy0CuDZ4BzEsM8EX4o1nwA=
+	t=1713919615; cv=none; b=hM56gkYT2LKoxFHlXothxxkXIelC9RkLOwVjj94/iIohl0csh669LvjmtIaFSK8DE1FdE3t8H/vNeIeQSHsenNvXasYaaNDUUyJ96Pl8LvTLrzcPVLwPFaKhpjfNGoz3VlvUBBXFOw9w/UaEZRdz67+2WlXpzzuI8d8MY2oALvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713896386; c=relaxed/simple;
-	bh=5GtsW/o+2Diu3fZ1ZwQ7Z9DcvB3qNbZmB2a/wKUP3Ow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=SDKvMKsHrA1i85nnc+Ygg5gT37L8rhFU4D7P/K9AVLKvpDv8m2eBGpV2zm7RY00H5i9iyPmcxWzy+mlDJg8zlUy+EG4/rxGvh8/wlQsLfAOPZYFfTCTzkvDoVkT0atMfscWGeMl40SFMLyxJSizDMhHLtzcKAnxJxudYJhKG8f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jcbw8p1y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713919615; c=relaxed/simple;
+	bh=tYlbw/pKwD/r8Gw5MGbGl8jMwfpelqNv+nZ80pbXq88=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ebalnJ/Hu2PpPLK6rTykGWRC/Xun2mceMdSCCwlNe7TEveKnRIEgZr1Lq0m9FbPh8pDmSVkqAT8WPxfOC+wehKRmdfh+Odm4o0Pc0j71/Llv6dNxseXWSvKCX8t9YplHhmdQtsWjU6DDnxJAo8IvjNSoYUvKsjLXmuaRxHcocc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W3JlSK1/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jcbw8p1y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4C6DC2BD10;
-	Tue, 23 Apr 2024 18:19:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713896385;
-	bh=5GtsW/o+2Diu3fZ1ZwQ7Z9DcvB3qNbZmB2a/wKUP3Ow=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Jcbw8p1ykrrYedLQZb/rbWqEHLJtqITgq2qGNAfirchSG7PZowi0x1WAqZ8zftWps
-	 YLcrA6GCBEmHsMK1sDNJa97q8N5QNTm0pouKc684giWAVmWuzoIJSZOp/TuZjZisXo
-	 mWfF6DdhFImNpUJmYYqBfV14i+zwC+qGy+y6M45aRl4Ihz6pxxDlli+AzFg0w6uaL/
-	 sospSm++cIZgaesIeIoy1Z964EBdvGXjEjGBJbbmtCyCVylxi71zrCFYWBS6qc4tN3
-	 BQFQQeB+SPCOQSvxtlQp+/kb6ZMor9J6m/M9NFf4439jzx+iSLbyJ2eMoNgFXGIcix
-	 v88ANRODrzXWg==
-Message-ID: <61ff5a29-9b16-4a52-b0ae-cfba2ea3c748@kernel.org>
-Date: Wed, 24 Apr 2024 04:19:43 +1000
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W3JlSK1/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713919613;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3j5Urzh+140KLZbwLI03YxQoR4KLY5IJrkFu8L5hfkg=;
+	b=W3JlSK1/UtNzN1a1Lsu7NLZ6Un156LIxs7+CBHNDC6AQICc+qPgFz9okmmMdCMcQDB179L
+	HVJJMiv66eY7V48/uOIs3gMEsSI5cgxMc9Z4PVqYpJUCUL5nRj3grL/ThCNVq2c5yzPMoT
+	WRX8avSgAj3q7fMmE6374fzY/6tqR7w=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-288-rImn7pH6MKayPPuZ6_dZ_g-1; Tue,
+ 23 Apr 2024 20:46:49 -0400
+X-MC-Unique: rImn7pH6MKayPPuZ6_dZ_g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E32103C0008F;
+	Wed, 24 Apr 2024 00:46:48 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.33])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E9CEF3543A;
+	Wed, 24 Apr 2024 00:46:45 +0000 (UTC)
+Date: Wed, 24 Apr 2024 08:46:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 5/9] io_uring: support SQE group
+Message-ID: <ZihWcV8+3rfyYxGI@fedora>
+References: <20240408010322.4104395-1-ming.lei@redhat.com>
+ <20240408010322.4104395-6-ming.lei@redhat.com>
+ <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] block: prevent freeing a zone write plug too early
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20240420075811.1276893-1-dlemoal@kernel.org>
- <20240420075811.1276893-2-dlemoal@kernel.org>
- <715fd037-a8e5-4e62-939e-a446087eed2a@kernel.dk>
- <4530f039-0698-4cc0-94ab-5465d3f0e255@kernel.org>
- <1d4fb854-3151-41f5-b9a5-2a5cf2a37986@kernel.dk>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <1d4fb854-3151-41f5-b9a5-2a5cf2a37986@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 2024/04/24 1:36, Jens Axboe wrote:
-> On 4/23/24 9:16 AM, Damien Le Moal wrote:
->> On 2024/04/24 0:21, Jens Axboe wrote:
->>> On 4/20/24 1:58 AM, Damien Le Moal wrote:
->>>> The submission of plugged BIOs is done using a work struct executing the
->>>> function blk_zone_wplug_bio_work(). This function gets and submits a
->>>> plugged zone write BIO and is guaranteed to operate on a valid zone
->>>> write plug (with a reference count higher than 0) on entry as plugged
->>>> BIOs hold a reference on their zone write plugs. However, once a BIO is
->>>> submitted with submit_bio_noacct_nocheck(), the BIO may complete before
->>>> blk_zone_wplug_bio_work(), with the BIO completion trigering a release
->>>> and freeing of the zone write plug if the BIO is the last write to a
->>>> zone (making the zone FULL). This potentially can result in the zone
->>>> write plug being freed while the work is still active.
->>>>
->>>> Avoid this by calling flush_work() from disk_free_zone_wplug_rcu().
->>>>
->>>> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
->>>> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
->>>> ---
->>>>  block/blk-zoned.c | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->>>> index 3befebe6b319..685f0b9159fd 100644
->>>> --- a/block/blk-zoned.c
->>>> +++ b/block/blk-zoned.c
->>>> @@ -526,6 +526,8 @@ static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
->>>>  	struct blk_zone_wplug *zwplug =
->>>>  		container_of(rcu_head, struct blk_zone_wplug, rcu_head);
->>>>  
->>>> +	flush_work(&zwplug->bio_work);
->>>> +
->>>>  	mempool_free(zwplug, zwplug->disk->zone_wplugs_pool);
->>>>  }
->>>
->>> This is totally backwards. First of all, if you actually had work that
->>> needed flushing at this point, the kernel would bomb spectacularly.
->>> Secondly, what's the point of using RCU to protect this, if you're now
->>> needing to flush work from the RCU callback? That's a clear sign that
->>> something is very wrong here with your references / RCU usage.. The work
->>> item should hold a reference to it, trying to paper around it like this
->>> is not going to work at all.
->>>
->>> Why is the work item racing with RCU freeing?!
->>
->> The work item is a field of the zone write plug. Zone write plugs have
->> references to them as long as BIOs are in flight and and the zone is
->> not full. The zone write plug freeing through rcu is triggered by the
->> last write to a zone that makes the zone full. But the completion of
->> this last write BIO may happen right after the work issued the BIO
->> with submit_bio_noacct_nocheck() and before blk_zone_wplug_bio_work()
->> returns, while the work item is still active.
->>
->> The actual freeing of the plug happens only after the rcu grace
->> period, and I was not entirely sure if this is enough to guarantee
->> that the work thread is finished. But checking how the workqueue code
->> processes the work item by calling the work function
->> (blk_zone_wplug_bio_work() in this case), there is no issue because
->> the work item (struct work_struct) is not touched once the work
->> function is called. So there are no issues/races with freeing the zone
->> write plug. I was overthinking this. My bad. We can drop this patch.
->> Apologies for the noise.
+On Mon, Apr 22, 2024 at 12:27:28PM -0600, Jens Axboe wrote:
+> On 4/7/24 7:03 PM, Ming Lei wrote:
+> > SQE group is defined as one chain of SQEs starting with the first sqe that
+> > has IOSQE_EXT_SQE_GROUP set, and ending with the first subsequent sqe that
+> > doesn't have it set, and it is similar with chain of linked sqes.
+> > 
+> > The 1st SQE is group leader, and the other SQEs are group member. The group
+> > leader is always freed after all members are completed. Group members
+> > aren't submitted until the group leader is completed, and there isn't any
+> > dependency among group members, and IOSQE_IO_LINK can't be set for group
+> > members, same with IOSQE_IO_DRAIN.
+> > 
+> > Typically the group leader provides or makes resource, and the other members
+> > consume the resource, such as scenario of multiple backup, the 1st SQE is to
+> > read data from source file into fixed buffer, the other SQEs write data from
+> > the same buffer into other destination files. SQE group provides very
+> > efficient way to complete this task: 1) fs write SQEs and fs read SQE can be
+> > submitted in single syscall, no need to submit fs read SQE first, and wait
+> > until read SQE is completed, 2) no need to link all write SQEs together, then
+> > write SQEs can be submitted to files concurrently. Meantime application is
+> > simplified a lot in this way.
+> > 
+> > Another use case is to for supporting generic device zero copy:
+> > 
+> > - the lead SQE is for providing device buffer, which is owned by device or
+> >   kernel, can't be cross userspace, otherwise easy to cause leak for devil
+> >   application or panic
+> > 
+> > - member SQEs reads or writes concurrently against the buffer provided by lead
+> >   SQE
 > 
-> I took a closer look at the zone write plug reference handling, and it
-> still doesn't look very good. Why are some just atomic_dec and there's
-> just one spot that does dec_and_test? This again looks like janky
-> referencing, to be honest.
+> In concept, this looks very similar to "sqe bundles" that I played with
+> in the past:
 > 
-> The relationship seems like it should be pretty clear. Any bio inflight
-> against this zone plug should have a reference to it, AND the owner
-> should have a reference to it, otherwise any bio completion (which can
-> happen at ANY time) could free it. Any dropping of the ref should use a
-> helper that does atomic_dec_and_test(), eg what disk_put_zone_wplug()
-> does.
-> 
-> There should be no doubt about the above at all. If the plug has been
-> added to a workqueue, it should be quite obvious that of course it has a
-> reference to it already, outside of the bio's that are in it.
-> 
-> I'd strongly encourage getting this sorted out before the merge window,
-> I'm not at all convinced it's correct as-is. It's certainly not
-> obviously correct, which it should be. The RCU rules are pretty simple
-> if the the references are done in the kernel idiomatic way, but they are
-> not.
+> https://git.kernel.dk/cgit/linux/log/?h=io_uring-bundle
 
-OK. I am traveling this week so I will not be able to send a well-tested cleanup
-patch but I will do so first thing next week.
+Indeed, so looks it is something which io_uring needs.
 
--- 
-Damien Le Moal
-Western Digital Research
+> 
+> Didn't look too closely yet at the implementation, but in spirit it's
+> about the same in that the first entry is processed first, and there's
+> no ordering implied between the test of the members of the bundle /
+> group.
+
+Yeah.
+
+> 
+> I do think that's a flexible thing to support, particularly if:
+> 
+> 1) We can do it more efficiently than links, which are pretty horrible.
+
+Agree, link is hard to use in async/.await of modern language per my
+experience.
+
+Also sqe group won't break link, and the group is thought as a whole
+wrt. linking.
+
+> 2) It enables new worthwhile use cases
+> 3) It's done cleanly 
+> 4) It's easily understandable and easy to document, so that users will
+>    actually understand what this is and what use cases it enable. Part
+>    of that is actually naming, it should be readily apparent what a
+>    group is, what the lead is, and what the members are. Using your
+>    terminology here, definitely worth spending some time on that to get
+>    it just right and self evident.
+
+All are nice suggestions, and I will follow above and make them in V2.
+
+
+Thanks,
+Ming
 
