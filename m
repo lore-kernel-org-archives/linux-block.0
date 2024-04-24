@@ -1,168 +1,134 @@
-Received: from mail-m12824.netease.com (mail-m12824.netease.com [103.209.128.24])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129C11422AF;
-	Wed, 24 Apr 2024 15:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.209.128.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE12516130A
+	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 16:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713973972; cv=none; b=aQoS/t/eF4oSymBar1BGn/3S/FB7iqiiIchXFj83Osme9Eeo+MHsLScYKVpQeDfacejtb3ybTgswEJeLUh/25Isf8+wTVt5/gythGeIxQornJ7Q3X62wY9dnQJy+MfqTlYG4BSolo3b5V4XY+ld/R0esNwA8jL2AIW7z6Srl8kY=
+	t=1713975403; cv=none; b=S9LESzqzdkxsma5WuC7HgFP70s4Zpx+gqwC89/jO75/o0dJDk0he9bJ10KwtKuD0nfjqPhpi5irizxmpuBk4Dlo66LVF/lv4shk+dJQYpHBFUm9lPeEtQJjGoYYglgoo5YE6PfA2oZ1KSgc009Pfxh/8FeP5ECfygSAfZnnJORU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713973972; c=relaxed/simple;
-	bh=qOuZ/FKAj56jtkFL4SdM4vCiYPbiiMS+JV1peJ4ZbiY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=s6/e9+UX1HQUzlpJ7kL1v1dZEPMgmRMqWH5e/CpeJEIFUkLaHhDXrpsaw5NaVAsPXSCGaIUZ4mr+QJdbtpJbPnKktsMbCWAD7uuBy8HuDBFdBFOCefCamNyjuVjx7lA06KSAbmAKfGvpEuKZEByIrV1CEkQebeAhTB3lQXAIpyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=103.209.128.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
-Received: from [192.168.122.189] (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id C5A03860120;
-	Wed, 24 Apr 2024 16:43:48 +0800 (CST)
-Subject: Re: [PATCH 2/7] cbd: introduce cbd_transport
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
- Dongsheng Yang <dongsheng.yang.linux@gmail.com>
-References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
- <20240422071606.52637-3-dongsheng.yang@easystack.cn>
- <780f3ccd-5112-4948-81c3-3144c6779503@nvidia.com>
-From: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Message-ID: <7ec61a75-79ec-94db-ebf9-58679c85edeb@easystack.cn>
-Date: Wed, 24 Apr 2024 16:43:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+	s=arc-20240116; t=1713975403; c=relaxed/simple;
+	bh=1ND+0DqPrxmLp4etmadRhSq/T0iT58deFx+LPhQPlUY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m3xjiK+McbLrXAHA6Crn7YQ9iJcYU6/Ea4RnZY/LzdrlDi/0Kv7ep71o0qATCKCWStE3qcNh6vndBh/2mdCqqQ8snJ7J8GoEFqUPiUSizD42X0zmzsnrnB+bssPapt2O1Yl5hR6li6+J7b3MnnhVFGYJr00iYQ9Yk2KgMi7QWpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZjYUjioO; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZjYUjioO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFD3AC113CD;
+	Wed, 24 Apr 2024 16:16:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713975403;
+	bh=1ND+0DqPrxmLp4etmadRhSq/T0iT58deFx+LPhQPlUY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZjYUjioO/F3iu0Ki6s/WI2XpNu3jJxOrlVOPbzlenMee1LmAnQPEvDIYLWsEDJF7b
+	 o3DYbv/3bfxtMhBENpGebvilf0cewHs6eurmgF9utIsayEI5V6IzrbFQ0icqFbRLq/
+	 J5KNwoVyYG7yVx1kHPjonxhEWkw2+9n6w3PMmvVqkzUlVWFngi8Ppx82KsM2HN8fvT
+	 4n7+qI0B/e2GFLHLDKgNTCmCL/K7XZAQL05FSVtwI9lgU6hk55yDxEKVPWhT5ZdVR5
+	 pm8TbO1fAXNLRLU+iqcESrahsOF4vICxEom8nuGJl6bJp4Y9hIYE0RL3gH8IQo5NUV
+	 ZQ7AHHSRhZL1A==
+Date: Wed, 24 Apr 2024 10:16:40 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, willy@infradead.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH] block : add larger order folio size instead of pages
+Message-ID: <ZikwaBHfP0pTu_AK@kbusch-mbp.dhcp.thefacebook.com>
+References: <CGME20240419092428epcas5p4f63759b0efa1f12dfbcf13c67fa8d0f0@epcas5p4.samsung.com>
+ <20240419091721.1790-1-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <780f3ccd-5112-4948-81c3-3144c6779503@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkZTE1LVkxISElJGE9MSkJDH1UZERMWGhIXJBQOD1
-	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8f0f467de2023ckunmc5a03860120
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6MTI6Iww6Ojc1ThACPToJAgMC
-	LxpPFChVSlVKTEpIQk9DSUlCTk9JVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBT09NSjcG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240419091721.1790-1-kundan.kumar@samsung.com>
 
+On Fri, Apr 19, 2024 at 02:47:21PM +0530, Kundan Kumar wrote:
+> @@ -1289,16 +1291,33 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  
+>  	for (left = size, i = 0; left > 0; left -= len, i++) {
+>  		struct page *page = pages[i];
+> +		folio = page_folio(page);
+> +
+> +		if (!folio_test_large(folio) ||
+> +		   (bio_op(bio) == REQ_OP_ZONE_APPEND)) {
+> +			len = min_t(size_t, PAGE_SIZE - offset, left);
+> +			if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+> +				ret = bio_iov_add_zone_append_page(bio, page,
+> +						len, offset);
+> +				if (ret)
+> +					break;
+> +			} else
+> +				bio_iov_add_page(bio, page, len, offset);
+> +		} else {
+> +			/* See the offset of folio and the size */
+> +			folio_offset = (folio_page_idx(folio, page)
+> +					<< PAGE_SHIFT) + offset;
+> +			size_folio = folio_size(folio);
+>  
+> -		len = min_t(size_t, PAGE_SIZE - offset, left);
+> -		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+> -			ret = bio_iov_add_zone_append_page(bio, page, len,
+> -					offset);
+> -			if (ret)
+> -				break;
+> -		} else
+> -			bio_iov_add_page(bio, page, len, offset);
+> +			/* Calculate the length of folio to be added */
+> +			len = min_t(size_t, (size_folio - folio_offset), left);
+> +
+> +			num_pages = DIV_ROUND_UP(offset + len, PAGE_SIZE);
+>  
+> +			bio_iov_add_page(bio, page, len, offset);
 
+I think there's another optimization to be had here. You only need one
+reference on the folio for all its pages, so I believe you can safely
+drop (num_pages - 1) references right here. Then __bio_release_pages()
+can be further simplified by removing the 'do{...}while()" loop
+releasing individual pages.
 
-在 2024/4/24 星期三 下午 12:08, Chaitanya Kulkarni 写道:
->> +static ssize_t cbd_myhost_show(struct device *dev,
->> +			       struct device_attribute *attr,
->> +			       char *buf)
->> +{
->> +	struct cbd_transport *cbdt;
->> +	struct cbd_host *host;
->> +
->> +	cbdt = container_of(dev, struct cbd_transport, device);
->> +
->> +	host = cbdt->host;
->> +	if (!host)
->> +		return 0;
->> +
->> +	return sprintf(buf, "%d\n", host->host_id);
-> 
-> snprintf() ?
+I tested this atop your patch, and it looks okay so far. This could be
+more efficient if we had access to gup_put_folio() since we already know
+all the pages are part of the same folio (unpin_user_pages()
+recalculates that)
 
-IMO, it will only print a decimal unsigned int, so it shouldn't overflow 
-the buffer.
-> 
->> +}
->> +
->> +static DEVICE_ATTR(my_host_id, 0400, cbd_myhost_show, NULL);
->> +
->> +enum {
-> 
-> [...]
-> 
->> +
->> +static ssize_t cbd_adm_store(struct device *dev,
->> +				 struct device_attribute *attr,
->> +				 const char *ubuf,
->> +				 size_t size)
->> +{
->> +	int ret;
->> +	char *buf;
->> +	struct cbd_adm_options opts = { 0 };
->> +	struct cbd_transport *cbdt;
->> +
-> 
-> reverse tree order that matches rest of your code ?
-
-Agreed,
-> 
->> +	if (!capable(CAP_SYS_ADMIN))
->> +		return -EPERM;
->> +
->> +	cbdt = container_of(dev, struct cbd_transport, device);
->> +
->> +	buf = kmemdup(ubuf, size + 1, GFP_KERNEL);
->> +	if (IS_ERR(buf)) {
->> +		pr_err("failed to dup buf for adm option: %d", (int)PTR_ERR(buf));
->> +		return PTR_ERR(buf);
->> +	}
->> +	buf[size] = '\0';
->> +	ret = parse_adm_options(cbdt, buf, &opts);
->> +	if (ret < 0) {
->> +		kfree(buf);
->> +		return ret;
->> +	}
->> +	kfree(buf);
->> +
-> 
-> standard format is using goto out and having only on kfree()
-> at the end of the function ...
-
-Okey, having a unified error handling path is a good idea, and it's 
-suitable here as well, thanx.
-> 
->> +	switch (opts.op) {
->> +	case CBDT_ADM_OP_B_START:
->> +		break;
->> +	case CBDT_ADM_OP_B_STOP:
->> +		break;
->> +	case CBDT_ADM_OP_B_CLEAR:
->> +		break;
->> +	case CBDT_ADM_OP_DEV_START:
->> +		break;
->> +	case CBDT_ADM_OP_DEV_STOP:
->> +		break;
->> +	default:
->> +		pr_err("invalid op: %d\n", opts.op);
->> +		return -EINVAL;
->> +	}
->> +
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	return size;
->> +}
->> +
-> 
-> [...]
-> 
->> +static struct cbd_transport *cbdt_alloc(void)
->> +{
->> +	struct cbd_transport *cbdt;
->> +	int ret;
->> +
->> +	cbdt = kzalloc(sizeof(struct cbd_transport), GFP_KERNEL);
->> +	if (!cbdt) {
->> +		return NULL;
->> +	}
-> 
-> no braces needed for single statements in if ... applies rest of
-> the code ...
-
-thanx, Iwill remove unnecessary braces next version.
-> 
-> -ck
-> 
-> 
+---
+diff --git a/block/bio.c b/block/bio.c
+index 469606494f8f7..9829c79494108 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1155,7 +1155,6 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ 
+ 	bio_for_each_folio_all(fi, bio) {
+ 		struct page *page;
+-		size_t nr_pages;
+ 
+ 		if (mark_dirty) {
+ 			folio_lock(fi.folio);
+@@ -1163,11 +1162,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ 			folio_unlock(fi.folio);
+ 		}
+ 		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
+-		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
+-			   fi.offset / PAGE_SIZE + 1;
+-		do {
+-			bio_release_page(bio, page++);
+-		} while (--nr_pages != 0);
++		bio_release_page(bio, page);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__bio_release_pages);
+@@ -1315,6 +1310,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 			num_pages = DIV_ROUND_UP(offset + len, PAGE_SIZE);
+ 
+ 			bio_iov_add_page(bio, page, len, offset);
++			if (bio_flagged(bio, BIO_PAGE_PINNED) && num_pages > 1)
++				unpin_user_pages(pages + i, num_pages - 1);
+ 			/* Skip the pages which got added */
+ 			i = i + (num_pages - 1);
+ 		}
+--
