@@ -1,141 +1,110 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05531158DA4
-	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 08:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749AB36D;
+	Wed, 24 Apr 2024 08:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713945615; cv=none; b=pvH8af5BDb0RWrKrBsVDQEYgz1frZUUjyffRwa/NvvWsSnshlfAUevi/Pw7H9ZqjcuEnvDxiFxpLdFG4zGBIxdFNVweasIQURlghh63Lu+zQ+6msmifMIpy1rwx6qmSSiNc8FBg6uec5aQtS6Z3YgJereFc2kqV6bR2srIOI+xU=
+	t=1713946180; cv=none; b=angnFDT+vhtbWCbRGkGEZ8WjcOHs+XR4/rDNVv1DxxVnTAaOWCHxN3Pe+muzThSvDph7/ii30/Pv1oR1rgJOH74pzH8AX3wMQDcN1jMYJgkSz+ZygXWiDBhuYnSqy6B3xeRVM7iliclmGz4z6gtRXtd4staLTXNDfuI6YHU8rT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713945615; c=relaxed/simple;
-	bh=wEETruXenXXhFB3ZAUX4lMN5f17bmvYtqaqOJwjBWaU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YIJFlojsGhHIJfeAXYiXBwFt2PoWkbsM/pIROVCWEYkAqixFMh1kBnEpTZC5gB3LWHaZosExi1PN7/PJgI1KyO+HB6QPvJuywEBKid7AFpPr5xMHrTqvpWU+93QpIKUOPx3Y5Q22bdZpULQVwKFL3j3oPboOO/HdTvpZWvaZQ8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=IjdluCOy; arc=none smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1713946180; c=relaxed/simple;
+	bh=A9OVYBwzn9mh+suuk7UPlPFT2pggBVcyxifse9t5Nh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=idQzWFlyEKhaK9Iec/9LKC8Us8PEpW4ykKkOGqiAJp2xno9dwnUX7bsrAb2ZmazhvEaDFof3wGsKVVd/JkN0Ae8qc/lXvw+TXOPqOnTPDAMz6QFPZdQ5VPx7eYYkP/I5yp031erPnmQwgibpIcEAP9vjibyK9nc8b0QeORi0lYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=pVAmmGFp; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IjdluCOy"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1713945613; x=1745481613;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wEETruXenXXhFB3ZAUX4lMN5f17bmvYtqaqOJwjBWaU=;
-  b=IjdluCOyKdZ3+U0KzdcA1taN9y7D30xkwVnOtxSE03xFwhnAQv9hiQRN
-   /JNio+sPeEVeWh3PIiRe+nXUUZA/doILijVBClfXbIezk/50jiAYXuWPe
-   j7NBLc27jkzN6rljfvbpQyqFbc3wVCUSkZtOLoaXocN/jwOSk3fZz+O8j
-   D9dx9fGLH5M7Y35ktKZcsdahTO37+IQHuOQKPAB5iAzOTjbYvMEykzR08
-   Gr7kWdHgPz+DZW+FqVRSOKr5YeKYyJGh6lURBgKyNcY2/lUBh/vnGGTQo
-   IgtDo58LVrI9wsZjdYRUsnSIScXi0e887GO2aEOkLuy/7kbp0CBOHQdWI
-   g==;
-X-CSE-ConnectionGUID: RjtxjSCZTuy7v0DKgxasCw==
-X-CSE-MsgGUID: LKzjQYnbRyuR9kFwOSANhA==
-X-IronPort-AV: E=Sophos;i="6.07,225,1708358400"; 
-   d="scan'208";a="15465320"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Apr 2024 16:00:11 +0800
-IronPort-SDR: 2Pn4QhDTn2NjbsLHGgavQV/4G3mslQ7Xb+HallPsLFdaxTc0WN1nmfJRs+een3r006LOrH1djp
- IU4UPIixYxltBrHWYFP1bxN2URhybgOeHjpiRIUfOgdpDSiReyR0HfPo8np7mDFJ3PYK1ZqWht
- c53DyRDBf8F9rXdJxrrchvLQzUb4qsgmLPRTuJIl7Wif/LBsmv0sQ+1a9hdM8xN6IhjmgTc9I5
- /TVp+B8m3KhCYjuRiZIKV3uXlOIFCB7aM9g4J4ZDFGSwlg1mkNjo7s+7zpW1jY6s5SgVbxV7Ot
- NS0=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Apr 2024 00:02:41 -0700
-IronPort-SDR: GAVsd/wV3laXdCWYehhnAAsAtGEkkIXAGIRDibzbicOA019uihWuMZDXpGFqAk666VQLCvH6bf
- bImMlth5HdUwcWsvQynflBAwz5IORorxAS6K+ZVS3ep/wonY6WSgDGV3syf5XFLJBHynsCyxVP
- 8ibwMfL/VmQfJc/cW2ltEtBXxQ76nRhMEoc3QChCiTcmCFJNMdDnFJ5aAeBeeCfahLXvD28W9m
- KGkHl603Xr+ZMRyBp4wQ4dpe7pEnDl+1Z4tyUupuvu37P3ejOZH7zWIgnwihI2VUUC1EW7x+9Y
- 6WM=
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 24 Apr 2024 01:00:11 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Daniel Wagner <dwagern@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH blktests v3 14/15] nvme/{rc,016,017}: rename nvme_num_iter to NVME_NUM_ITER
-Date: Wed, 24 Apr 2024 16:59:54 +0900
-Message-ID: <20240424075955.3604997-15-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240424075955.3604997-1-shinichiro.kawasaki@wdc.com>
-References: <20240424075955.3604997-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="pVAmmGFp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=A9OVYBwzn9mh+suuk7UPlPFT2pggBVcyxifse9t5Nh4=;
+	t=1713946178; x=1714378178; b=pVAmmGFpGTWDOzC3+COv2MCZpsvGXNLElvxY5cJN+hdVrMc
+	/ujogRIuor/zod0mOkCh6u02jr4YdwV96/ppUg6sQ4+PmFTSP5pMs1QJ092oXJKFuscrrjb9rs5l8
+	//CqTvGMGpYdT6mjMvmS9WkMO7WGCDarnc8aVQfZgTwwPcqilQ/Cp9cV7SvWv1ymWdVou26gB2OUA
+	f8mx51QmhiPJswFIKfLYo2+vBhTNPvjHDxLlkXika4TNpe/W3xouhhtOlZgOzG04gCSr7fals1oOi
+	RtyoVymK4zviNmevXqfsp0kp3Omde2Pjm1X3sS6dwiaqEOY1CiSaGJch8Ptj11UQ==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1rzXh9-0002qV-QH; Wed, 24 Apr 2024 10:09:35 +0200
+Message-ID: <5ef0ac71-21dd-46d7-a0c1-1b1b391e51a8@leemhuis.info>
+Date: Wed, 24 Apr 2024 10:09:35 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: API break, sysfs "capability" file
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+ Linux regressions mailing list <regressions@lists.linux.dev>,
+ linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ Lennart Poettering <mzxreary@0pointer.de>
+References: <ZhQJf8mzq_wipkBH@gardel-login>
+ <54e3c969-3ee8-40d8-91d9-9b9402001d27@leemhuis.info>
+ <ZhQ6ZBmThBBy_eEX@kbusch-mbp.dhcp.thefacebook.com>
+ <ZhRSVSmNmb_IjCCH@gardel-login>
+ <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com>
+ <ZhT5_fZ9SrM0053p@gardel-login> <20240409141531.GB21514@lst.de>
+ <d7a2b07c-26eb-4d55-8aa7-137168bd0b49@kernel.dk>
+ <Zh6IpqnSfGHXMjVa@gardel-login>
+ <b74f99e8-5a50-4e93-987f-0bcfc0c27959@kernel.dk>
+ <Zh6KZ7ynHuOd0mgQ@gardel-login>
+ <c3a6a639-bf15-4f8b-abbd-978d9836d93c@kernel.dk>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <c3a6a639-bf15-4f8b-abbd-978d9836d93c@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1713946178;73e32188;
+X-HE-SMSGID: 1rzXh9-0002qV-QH
 
-To follow uppercase letter guide of environment variables, rename
-nvme_num_iter to NVME_NUM_ITER.
+On 16.04.24 16:33, Jens Axboe wrote:
+> On 4/16/24 8:25 AM, Lennart Poettering wrote:
+>> On Di, 16.04.24 08:22, Jens Axboe (axboe@kernel.dk) wrote:
+>>> On 4/16/24 8:18 AM, Lennart Poettering wrote:
+>>>> On Di, 09.04.24 09:17, Jens Axboe (axboe@kernel.dk) wrote:
+>>>>
+>>>>> On 4/9/24 8:15 AM, Christoph Hellwig wrote:
+>>>>>> On Tue, Apr 09, 2024 at 10:19:09AM +0200, Lennart Poettering wrote:
+>>>>>>> All I am looking for is a very simple test that returns me a boolean:
+>>>>>>> is there kernel-level partition scanning enabled on this device or
+>>>>>>> not.
+>>>>>> And we can add a trivial sysfs attribute for that.
+>>>>>
+>>>>> And I think we should. I don't know what was being smoked adding a sysfs
+>>>>> interface that exposed internal flag values - and honestly what was
+>>>>> being smoked to rely on that, but I think it's fair to say that the
+>>>>> majority of the fuckup here is on the kernel side.
+> [...]
+> Doesn't really change my conclusion from earlier. As mentioned, this is
+> clearly a kernel fuckup, and honestly since it's being presented as ABI,
+> we definitely need to rectify this and provide an alternative. Even
+> though I'm not a huge fan of it, might just be best to re-introduce
+> 'capability' and just have conversions of the flags so we retain the
+> user side of it the same. That can then also go into stable, so we'll
+> end up with something that at least looks cohesive on the user side.
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- Documentation/running-tests.md | 5 +++--
- tests/nvme/016                 | 2 +-
- tests/nvme/017                 | 2 +-
- tests/nvme/rc                  | 2 +-
- 4 files changed, 6 insertions(+), 5 deletions(-)
+Jens, quick question: what's the plan forward here and who will realize
+what you outlined?
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 736ab48..7bd0885 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -117,8 +117,9 @@ The NVMe tests can be additionally parameterized via environment variables.
-   Run the tests with given image size in bytes. 'm', 'M', 'g' and 'G' postfix
-   are supported. This parameter had an old name 'nvme_img_size'. The old name
-   is still usable, but not recommended.
--- nvme_num_iter: 1000 (default)
--  The number of iterations a test should do.
-+- NVME_NUM_ITER: 1000 (default)
-+  The number of iterations a test should do. This parameter had an old name
-+  'nvme_num_iter'. The old name is still usable, but not recommended.
- 
- ### Running nvme-rdma and SRP tests
- 
-diff --git a/tests/nvme/016 b/tests/nvme/016
-index a65cffd..d1fdb35 100755
---- a/tests/nvme/016
-+++ b/tests/nvme/016
-@@ -23,7 +23,7 @@ test() {
- 	_setup_nvmet
- 
- 	local port
--	local iterations="${nvme_num_iter}"
-+	local iterations="${NVME_NUM_ITER}"
- 	local loop_dev
- 
- 	loop_dev="$(losetup -f)"
-diff --git a/tests/nvme/017 b/tests/nvme/017
-index 4f14471..114be60 100755
---- a/tests/nvme/017
-+++ b/tests/nvme/017
-@@ -23,7 +23,7 @@ test() {
- 	_setup_nvmet
- 
- 	local port
--	local iterations="${nvme_num_iter}"
-+	local iterations="${NVME_NUM_ITER}"
- 
- 	truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
- 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index c018f7f..8762a56 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -20,7 +20,7 @@ export def_subsysnqn="blktests-subsystem-1"
- export def_subsys_uuid="91fdba0d-f87b-4c25-b80f-db7be1418b9e"
- _check_conflict_and_set_default NVMET_TRTYPES nvme_trtype "loop"
- _check_conflict_and_set_default NVME_IMG_SIZE nvme_img_size 1G
--nvme_num_iter=${nvme_num_iter:-"1000"}
-+_check_conflict_and_set_default NVME_NUM_ITER nvme_num_iter 1000
- nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
- NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
- 
--- 
-2.44.0
+I'm asking, as afaics nothing happened for a week (hope I didn't miss
+anything!). Sure, it's not a regression from the last cycle or so, so
+it's not that urgent. But hch's "It is not a regression at all" last
+week made me worry that this in the end might not be solved unless
+somebody has it on the todo list. Normally I would have CCed Linus at
+that point anyway to get his stance, but from your statements it sounds
+like this is unnecessary here.
 
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
