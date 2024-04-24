@@ -1,131 +1,183 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3022115E802;
-	Wed, 24 Apr 2024 14:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0324215F408
+	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 15:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713970460; cv=none; b=p6976yZcqdZSIHT+MpxsqWmAQuiMijsP7ywW3Po4iSxuREPprLn6/k5va9HQHq5EEaCRtDgekpLN5YS79nraw1QZDMz7N5K/X/41jnV3A21uFjVwx+ZHRsPB5+ksvS8unmX1u1J2bKm3qipUh1flaJQxy5k4DflXp4og23joirA=
+	t=1713972427; cv=none; b=AwztbUzsAKvOfhcwXGNCYOpvK7H6cptVusEq97eQsxtG6jpmzB/zNLXTScZ1F8NiFuFF72IVc6nLArs8z0Ukdu0DGu4bDJw0J2+oVLyjrkp4YbNngfuVDmGDijP8bbVqvbJ88vOn6FZlDPdTGDx5qELJtiLLqDu99KjN/bf7AXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713970460; c=relaxed/simple;
-	bh=uXJCumUlxTxHWrN5eeUyifZZYEzii/3yS0/w9Zg/rsU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=egEK5llDM58EnCOjTzLVLknrOveJzTA16wu0/MWPwXtqMdEICxC2I6zWrGbr7wUPI9nX4tFx8ICYDtr/MyYd7k3Ny/Iu2AAIqzMcDsLclqTHis8MYz0ry5ll+a9v1W/yYBv8kmp5xbRhW6pcNzxR1usrrUSriOf9GK2k8idqzJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FB1G3Ttt; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713972427; c=relaxed/simple;
+	bh=aAHGA87W2AEwtVABrITjZKnHcx33HfOIMJrJSMuSJjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=fYMP+eGpKyKuZzqlCMeU849lhQYvmJ76cH1elYxgFZYLDHzQuUPrSNJv5sKgBZYW94dydsMsE3xJeu/Cl5lDWnpjMsJ2yzYYUxiGiC/TfazHDDAwukky5rwEKjea31M9WwEOgfcltXcxE2vA0Fa50eAKerpI9AS2JhuxYG0mitA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=hZu20aP+; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FB1G3Ttt"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57232e47a81so61a12.0;
-        Wed, 24 Apr 2024 07:54:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713970457; x=1714575257; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w+9IQLCN7DH23nxy4mYuyF9NGEY2ALiGsS8ZLweky1c=;
-        b=FB1G3TttSjmMHeaCk0ybMrSKwdrvboaFAgaII5GNMYKVukMwUC1iUKIzXLOyBaSNwv
-         cnyWRSOsf41qF0MDsCRXC1f9ZtNchE5VMZ4zpvgTFrm1cMnJ0T2s7leUkRd1UVYxCm6C
-         aMvJ0mn56RWVXwX9tW1iTiL14r6kBD5Z9qc8UQFHBKaxapVcM3J+HywOQb0dtUCEFPkS
-         dULudyWCwe+LysIsoy9r8CRH9qcldjOTe8XFotsKRaVysxErjMzPZez19qWjsOB7jfLt
-         X0RexRSBZI9qoyXYuYSTB5KeGeRt2Ozph80uE8DC4rvUZrPRXuO0k3K+tn1jwsUy6WqI
-         sB0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713970457; x=1714575257;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w+9IQLCN7DH23nxy4mYuyF9NGEY2ALiGsS8ZLweky1c=;
-        b=Nv3hK2cD33nQ31xHu1Tpc3EVeJq2QRzZpWb2eXJDuP6+h7mUe6z1kG7wFgbyuOEt06
-         ZluN3yLFV/i587Ma0tvECN0hRam/w28JV100ZeNjcaRp2sW4c61SiOTaV0zF6bYdzmKY
-         N+USGOMJSN9Uz77yMtlZQ2iwTvaU4vnEzfNXcHispziXzHefGvcWNTb/4YPHlAYRYH+J
-         MlMfhGw9faT/KOL14HiF7U7KNWaykiLBNQOhMKoiGHNDIEQS9sRVWFZOkAODmrAAtFq5
-         yJTyIBRcqMsOsH+NbaDBCY+kNZQN/e1P5j2fLG3lhhEM9waXewKyBu7kyQf9rd1hJ5tk
-         rxOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTFoEEqnGcZjaDlPpRt5Lx9knhSQ7WzThjXBP/m2vou+MgBIgT5muEKMMXNxQPpfypL/7UjHK/H8+R1agUkmEz8vkiAQ+4zz2b2ZblKKREm9d2LDfaQ/1F+uqgCmijtyxTSb795UxG1vI=
-X-Gm-Message-State: AOJu0Yzx7zPUXzNNpO/3MFUVUclZ9pK6d2whEreKGDv20bNkW1lS0FVA
-	y7NktPKdnDeVe16uK6XWB4M1BLIhdM8eLYD9vG3LuBLpdzv8FVyR9RdqsiihAI5g/+laiqBVi2S
-	JSjXzK5lN5A23c1vFJadrMBll+5I=
-X-Google-Smtp-Source: AGHT+IEAaL8HzUDGp+9KU4r+vu6pC/oTqS8n5nfkqM3dTXstIgOstxWocIe41WpymO7HJ75Msr+qjdwdCh5TnlvAPfs=
-X-Received: by 2002:a50:d490:0:b0:571:b82f:630d with SMTP id
- s16-20020a50d490000000b00571b82f630dmr2916994edi.0.1713970457343; Wed, 24 Apr
- 2024 07:54:17 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hZu20aP+"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240424152702epoutp03eab52c64df6c7cefb5db1ffacd722469~JQNZglcgF1672316723epoutp03V
+	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 15:27:02 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240424152702epoutp03eab52c64df6c7cefb5db1ffacd722469~JQNZglcgF1672316723epoutp03V
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1713972422;
+	bh=+4b5ZBQElcN86bQmR77nOqK52tPmgA25vHU3fWiF47s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hZu20aP+SjRTpSF2km78k+GwYJZ8840N2CNPf09Gm5izMc9TamHXT/gOzRbu2U7tY
+	 GJwZr7leACFGfuNxCQY90ffoQSCFDZV/JSN94dF1TZLIDETZthJInDWHMcydMeWLJX
+	 ux+e9OMhAFBW+sGIMQbtUJwMT8H+uIMmuqIj7AP8=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240424152701epcas5p41abefc2a67c1812e93f3a66be6925595~JQNYmLQuy0784507845epcas5p4D;
+	Wed, 24 Apr 2024 15:27:01 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.175]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4VPjX36xh8z4x9Pp; Wed, 24 Apr
+	2024 15:26:59 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	AE.AE.09688.3C429266; Thu, 25 Apr 2024 00:26:59 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240424132951epcas5p420002a736a4555ac94d3de9fff0ba5f4~JOnFcJ4A61055710557epcas5p4t;
+	Wed, 24 Apr 2024 13:29:51 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240424132951epsmtrp1641d123f828797ba94ac30c8309f3af2~JOnFa_s_g0781307813epsmtrp11;
+	Wed, 24 Apr 2024 13:29:51 +0000 (GMT)
+X-AuditID: b6c32a4a-837fa700000025d8-55-662924c3a36e
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	2E.E0.08924.F4909266; Wed, 24 Apr 2024 22:29:51 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20240424132950epsmtip19b24f98b998e18839310f13037c3af83~JOnD_IM0S0036300363epsmtip1p;
+	Wed, 24 Apr 2024 13:29:50 +0000 (GMT)
+Date: Wed, 24 Apr 2024 18:52:46 +0530
+From: Kundan Kumar <kundan.kumar@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, willy@infradead.org, linux-block@vger.kernel.org,
+	joshi.k@samsung.com, mcgrof@kernel.org, anuj20.g@samsung.com,
+	nj.shetty@samsung.com, c.gameti@samsung.com, gost.dev@samsung.com
+Subject: Re: [PATCH] block : add larger order folio size instead of pages
+Message-ID: <20240424132246.7ny74cec7cvphg5i@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJg=8jyC1+s80etZgWteps0Q0yEsR2NE23+Bf+Daa7zgJ2qKBA@mail.gmail.com>
- <2c9182cc-9d7e-0108-90bc-5e66da966bdb@huaweicloud.com>
-In-Reply-To: <2c9182cc-9d7e-0108-90bc-5e66da966bdb@huaweicloud.com>
-From: Marius Fleischer <fleischermarius@gmail.com>
-Date: Wed, 24 Apr 2024 07:54:06 -0700
-Message-ID: <CAJg=8jwn5NDWmo4=prnFbZJuq7N3kdmt2evkQ9uEJCWi0Bs8dg@mail.gmail.com>
-Subject: Re: INFO: task hung in bdev_open
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller@googlegroups.com, 
-	harrisonmichaelgreen@gmail.com, "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240422111407.GA10989@lst.de>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJJsWRmVeSWpSXmKPExsWy7bCmlu5hFc00gyttBhZNE/4yW6y+289m
+	8X17H4vFzQM7mSxWrj7KZHH0/1s2i723tC1uTHjKaLHt93xmi98/5rA5cHlsXqHlcflsqcem
+	VZ1sHrtvNrB59G1ZxejxeZNcAFtUtk1GamJKapFCal5yfkpmXrqtkndwvHO8qZmBoa6hpYW5
+	kkJeYm6qrZKLT4CuW2YO0F1KCmWJOaVAoYDE4mIlfTubovzSklSFjPziElul1IKUnAKTAr3i
+	xNzi0rx0vbzUEitDAwMjU6DChOyMF7P+sRbcE6rY/mYVUwPjGb4uRg4OCQETidd/K7oYOTmE
+	BHYzSlxbWAhhf2KU2LI9pIuRC8j+xijxaM09NpAESP3K5p3sEIm9jBI/Fvxng+h4xigx+2Mo
+	iM0ioCrxet5dFpAFbAK6Ej+awMIiAkoST1+dZQTpZRY4xShx59s8sF5hAU+JFY+fg9XzCphJ
+	nHvECxLmFRCUODnzCQuIzSmgI3HjVzuYLSogIzFj6VdmkDkSAlM5JK53NLFDHOci8ezaF2YI
+	W1ji1fEtUHEpiZf9bVB2tsShxg1MEHaJxM4jDVBxe4nWU/1gvcwCGRJXV3VBxWUlpp5axwQR
+	55Po/f0EqpdXYsc8GFtNYs67qSwQtozEwkszoOIeEk2ft7FAAmsTo8Sle2/YJzDKz0Ly3Cwk
+	+yBsK4nOD02ss4BhwSwgLbH8HweEqSmxfpf+AkbWVYySqQXFuempxaYFRnmp5fDYTs7P3cQI
+	TrNaXjsYHz74oHeIkYmD8RCjBAezkgjvzY8aaUK8KYmVValF+fFFpTmpxYcYTYFxNZFZSjQ5
+	H5jo80riDU0sDUzMzMxMLI3NDJXEeV+3zk0REkhPLEnNTk0tSC2C6WPi4JRqYJr/M/9wySub
+	9LKn3LubH5xemf+pY2tYmdK82nXvFdlPT25X6wiUj30q+vGEtJvCnWnH6r3nvLZX7/t0/RCD
+	p9An08Vqlt2FswT3M8z01Vnwc/q8aVqPbj/R6k5YPq1G/uyq3uC1NyLl1nLcPtZ+QKL2uJ1n
+	T6fR4a9tO7ksNsld0mM0Kd2s6xLOm3I16fUhtvKZopF9FyOtn++zuqypMEOfyeWP27TQXc1S
+	OZ8nuYdNjatPOXRhQctufd44Qbeib7ZW8bHt6m+2BqaIzhf8emff7CShl/X+MawXmt/NFee5
+	KCt0vpkn+VJA6vILZzojlBx+fNNiPzRBRo3h7Ha2RjH2CR8tV4esO9XnKnmqSImlOCPRUIu5
+	qDgRABsFaZA8BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrLLMWRmVeSWpSXmKPExsWy7bCSnK4/p2aawZe5GhZNE/4yW6y+289m
+	8X17H4vFzQM7mSxWrj7KZHH0/1s2i723tC1uTHjKaLHt93xmi98/5rA5cHlsXqHlcflsqcem
+	VZ1sHrtvNrB59G1ZxejxeZNcAFsUl01Kak5mWWqRvl0CV8bbn11sBRMEKq5s+cfcwDiDp4uR
+	k0NCwERiZfNOdhBbSGA3o8TJvgyIuIzE7rs7WSFsYYmV/54D1XAB1TxhlGg8fRSsgUVAVeL1
+	vLssXYwcHGwCuhI/mkJBwiICShJPX51lBKlnFjjFKHHn2zw2kISwgKfEisfPwep5Bcwkzj3i
+	hZi5iVFi/70LYDW8AoISJ2c+YQGxmYFq5m1+yAxSzywgLbH8HwdImFNAR+LGr3awElGgO2cs
+	/co8gVFwFpLuWUi6ZyF0L2BkXsUomVpQnJueW2xYYJiXWq5XnJhbXJqXrpecn7uJERwjWpo7
+	GLev+qB3iJGJg/EQowQHs5II782PGmlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEecVf9KYICaQn
+	lqRmp6YWpBbBZJk4OKUamFo5L/5QDS2+scjqiXhFwrajvzd5Ri4X6pAQds/TYflu/eyIc/P/
+	w3lcbQGTWO8qOpZmWpS/2HKXKZYr/evhZRm32Nn79s9tKml7evbsKZnbdjyGZxk1/iXeLGMM
+	9MqasGROtwEPk9Pp3ZnG8xniLHNP3OgsV/65UuPr8k8h28SLEvd7/JJ/1LAlVPm7fGiJSTzz
+	1IDLVf+aFtdb39rUu8I4+FDgEvfggOnVy3jvehRVre6fzXL4csQemzlXeF0WKNbaXV/2XHFO
+	mXrtzVvi72a1/GSM+OMvtzH8VSp/9MID4Uv/xQrumBX7YMup2YkL72/fYH+w+k6YzUbfnuXf
+	llV4+jfK/GCd933Jf/eGn0osxRmJhlrMRcWJALibpqsAAwAA
+X-CMS-MailID: 20240424132951epcas5p420002a736a4555ac94d3de9fff0ba5f4
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_b1f9a_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240419092428epcas5p4f63759b0efa1f12dfbcf13c67fa8d0f0
+References: <CGME20240419092428epcas5p4f63759b0efa1f12dfbcf13c67fa8d0f0@epcas5p4.samsung.com>
+	<20240419091721.1790-1-kundan.kumar@samsung.com>
+	<20240422111407.GA10989@lst.de>
 
-Hi Kuai,
+------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_b1f9a_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-I see, thanks so much for the explanation!
+On 22/04/24 01:14PM, Christoph Hellwig wrote:
+>> +		folio = page_folio(page);
+>> +
+>> +		if (!folio_test_large(folio) ||
+>> +		   (bio_op(bio) == REQ_OP_ZONE_APPEND)) {
+>
+>I don't understand why you need this branch.  All the arithmetics
+>below should also work just fine for non-large folios
 
-Best,
-Marius
+The branch helps to skip these calculations for zero order folio:
+A) folio_offset = (folio_page_idx(folio, page) << PAGE_SHIFT) + offset;
+B) folio_size(folio)
 
-On Mon, 22 Apr 2024 at 23:51, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>, and there
+>while the same_page logic in bio_iov_add_zone_append_page probablyg
+>needs to be folio-ized first, it should be handled the same way here
+>as well.
+
+Regarding the same_page logic, if we add same page twice then we release
+the page on second addition. It seemed to me that this logic will work even
+if we merge large order folios. Please let me know if I am missing something.
+
+If we pass a large size of folio to bio_iov_add_zone_append_page then we fail
+early due queue_max_zone_append_sectors limit. This can be modified to add
+lesser pages which are a part of bigger folio. Let me know if I shall proceed
+this way or if it is fine not to add the entire folio.
+
+>bio_iov_add_page should also be moved to take a folio
+>before the (otherwise nice) changes here.
+
+If we convert bio_iov_add_page() to bio_iov_add_folio()/bio_add_folio(),
+we see a decline of about 11% for 4K I/O. When mTHP is enabled we may get
+a large order folio even for a 4K I/O. The folio_offset may become larger
+than 4K and we endup using expensive mempool_alloc during nvme_map_data in
+NVMe driver[1].
+
+[1]
+static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+                struct nvme_command *cmnd)
+{
+...
+...
+                        if (bv.bv_offset + bv.bv_len <= NVME_CTRL_PAGE_SIZE * 2)
+                                return nvme_setup_prp_simple(dev, req,
+                                                             &cmnd->rw, &bv);
+...
+...
+       iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
+...
+...
+}
+
+--
+Kundan
 >
-> Hi,
 >
-> =E5=9C=A8 2024/04/21 9:19, Marius Fleischer =E5=86=99=E9=81=93:
-> > INFO: task syz-executor.2:32444 blocked for more than 143 seconds.
-> >     Not tainted 6.9.0-rc4-dirty #3
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > task:syz-executor.2  state:D stack:25264 pid:32444 tgid:32417
-> > ppid:8232   flags:0x00004006
-> > Call Trace:
-> >   <TASK>
-> >   context_switch kernel/sched/core.c:5409 [inline]
-> >   __schedule+0xd23/0x5bc0 kernel/sched/core.c:6746
-> >   __schedule_loop kernel/sched/core.c:6823 [inline]
-> >   schedule+0xe7/0x350 kernel/sched/core.c:6838
-> >   io_schedule+0xbf/0x130 kernel/sched/core.c:9044
-> >   folio_wait_bit_common+0x397/0x9c0 mm/filemap.c:1283
-> >   folio_put_wait_locked mm/filemap.c:1447 [inline]
-> >   do_read_cache_folio+0x2db/0x520 mm/filemap.c:3729
-> >   read_mapping_folio include/linux/pagemap.h:894 [inline]
-> >   read_part_sector+0xf7/0x440 block/partitions/core.c:715
-> >   adfspart_check_POWERTEC+0x82/0x710 block/partitions/acorn.c:454
-> >   check_partition block/partitions/core.c:138 [inline]
-> >   blk_add_partitions block/partitions/core.c:582 [inline]
-> >   bdev_disk_changed+0x891/0x15f0 block/partitions/core.c:686
-> >   blkdev_get_whole+0x18b/0x260 block/bdev.c:667
-> >   bdev_open+0x2eb/0xe90 block/bdev.c:880
-> >   blkdev_open+0x181/0x200 block/fops.c:620
-> >   do_dentry_open+0x6d3/0x18e0 fs/open.c:955
-> >   do_open fs/namei.c:3642 [inline]
-> >   path_openat+0x1b23/0x2670 fs/namei.c:3799
-> >   do_filp_open+0x1c7/0x410 fs/namei.c:3826
-> >   do_sys_openat2+0x164/0x1d0 fs/open.c:1406
-> >   do_sys_open fs/open.c:1421 [inline]
-> >   __do_sys_openat fs/open.c:1437 [inline]
-> >   __se_sys_openat fs/open.c:1432 [inline]
-> >   __x64_sys_openat+0x140/0x1f0 fs/open.c:1432
-> >   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >   do_syscall_64+0xce/0x250 arch/x86/entry/common.c:83
-> >   entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> So this thread hold 'open_mutex' to issued IO to scan partitons, and
-> such IO never complete, consider that you are using nbd to test, and
-> nbd doesn't handle timeout by default, I really suspect this is not a
-> real issue, and this looks like nbd server side doesn't reply to
-> nbd-client.
->
-> Thanks,
-> Kuai
->
+
+------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_b1f9a_
+Content-Type: text/plain; charset="utf-8"
+
+
+------vz81d6m7j.py-bGO0GPJ08-4LvSGVDQp9Yqo3MxnNZXK7Ax7=_b1f9a_--
