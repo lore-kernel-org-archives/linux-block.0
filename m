@@ -1,172 +1,282 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2044.outbound.protection.outlook.com [40.107.237.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE1DC138
-	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 01:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713922795; cv=none; b=nLUcCoGxzBxvP+Bv/rrNXmB5eEC5sB/BeKs29NJEgVT3OfBbuHSja4b411r48YJS8pfKnG7Aj4c9fwa+xFHWZNrucOnAbZ85suf2fdkuWuqCDHO1GKwKgn6rMevGJ9A1Bl+z9N1Da+HTgy3vYqCEwp70z2w3cvFxuJtmuruHyyo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713922795; c=relaxed/simple;
-	bh=nBWq0/nl7p+r4jZzeXlnnXvRGayO9S0mCF9/Glj+3J4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lazqudaazw5wAAAPebmIZg2IFmTmK07sbFdnOdTGXmLxRTutro4y1n4ss++lMf42LXeEZ7VgLYo4bSgAHGtyHQPbAxZeurXSzUXwJ7YAJ1A4E9tMrxvJE5RapVjEI3/E/aTPiK8/Q+GCiPZ5IYdpq758OJsr72ipOLhiqnWbSQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HCXIoyZT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A185B13048C;
+	Wed, 24 Apr 2024 03:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713931127; cv=fail; b=FPHLkUYcuzt/wmuIIhGicUBErGj32o/0VX3lsgNx5SY8AcaITnXv95ye8/TosGyvk1jh2RlwEQqI273aF1gIIrOzK0Z6wovdJFpqsWn4UFqk2DrlQJ5P+mX/CAs4ySvGUjfSa3GdxwPiFMEgIER+KKdx/7muqC3VoJNtf+72EpI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713931127; c=relaxed/simple;
+	bh=dMZofUkOaerOV0mluL8fOnYAiYWI9u06Tk3bBb9r7Nk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LqQar6ZoRqoAu7Y/06ew2VxCQvl9r2XroAKK2963WJaz6G0PUT6kzMdj12IAaUTLSsP9sHvrw5NgAFGCAPM9oRsrbVOq9S5hfcnHa++G1wnD9IEz8aQtUV3ETyvKr8MmjA4i3p3FDV6Pu11Zv2QyO8eRvOlnet+f53gg8UJHC/o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=drnr29fP; arc=fail smtp.client-ip=40.107.237.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HCXIoyZT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713922792;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Aw7xummt3AxEBlh1tPOSPjycxwKKfpMU9IKieHaf6X8=;
-	b=HCXIoyZTFlc+plGRkWi/WlvPMAuGMkpn9s/nYkcrrFu+wxJUAPaLghnGMoGnpwiCyxmIx3
-	lJT4RyzKsTF+D/ziv3nx3c4kgcRz2kir1ZwOyFwsJuuUc/usG4hDBid7H78bo7rNZjo1N9
-	8nkKqROH+CAn70pdkS/P8OFoluZN5G8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-547-vfanGcmbM7il8z_tJpwDsg-1; Tue, 23 Apr 2024 21:39:50 -0400
-X-MC-Unique: vfanGcmbM7il8z_tJpwDsg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6EDE61005D7C;
-	Wed, 24 Apr 2024 01:39:50 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.33])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B1414400EAC;
-	Wed, 24 Apr 2024 01:39:46 +0000 (UTC)
-Date: Wed, 24 Apr 2024 09:39:42 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>, ming.lei@redhat.com
-Subject: Re: [PATCH 5/9] io_uring: support SQE group
-Message-ID: <Zihi3nDAJg1s7Cws@fedora>
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-6-ming.lei@redhat.com>
- <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
- <Ziey53aADgxDrXZw@redhat.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="drnr29fP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YFg1k8ZNSPlIv0IjofC/SRqMWHUQypCBt8a5P5vXKIoycgd5cGP4GzIYOnIWNLAPDzcI5ebEsJ1hzkDDeX+razamiP08zyJ2yw5vpz6kfFNjv1tJmTESjkHPIGjC8TjYFOEg1n3aOCAEwQlqF0CUi72HNmFzzyhcDBioVIpdF5+9mC1Ql9DJnuX9M3JUpqbYQaOZtUr6GkP6ifH8VDucGfZAE4Dn3B/cnpOggsvxefuLmNZRZzMu3wVmGG8fXRWwZc7ouKWZsjXJk7YSAcpkx76kQNIsOLbp87NNyFa16wu0drB9S3gd328UGmJdJO+SNMqHI/+4cVCGp5e3pXZjpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dMZofUkOaerOV0mluL8fOnYAiYWI9u06Tk3bBb9r7Nk=;
+ b=SLPE1NjBDjM7OwArgJAuCq2du7Ll2/EmhryJPA+I4toiU0DDh8MLm8+v9t4/yQBTWCz5zFyBUr1rP6yL/54flxFzf+ZzVHqczg2rzWyxE1uM+JQfJVnDAmJXMcosT4zj+9ulKfZzqHl1lQLnMqU6UJ1mJy9uYmOVMM5I5iMaYaYh3Uvn+Lp7HVYzJ7xdimo/Wys4heCZ6rxBENM8Q2XMxmW9HquUoCOgBdl6QISm4VJQg1nVF0bN6ytG7gGIkUgLGZCYsaLtSoQOhDMXgHXDVkwdtlToLdemLi1/iO7+BXsIkWjolOOZvsAvs6rxIC9LZIDOaVO1ZnM+wegu+8frTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dMZofUkOaerOV0mluL8fOnYAiYWI9u06Tk3bBb9r7Nk=;
+ b=drnr29fPR1jVgvQm3jUEvhZqRafXIhm/z5vKGkM7HlMpRI6KPTrnubPl0Mc5rVvTsDKMJO9etV+Xp/1LjTNhb6NTG+5Qnev4cUHjLyOAQkARKkvb3ARpSFHKBVrKs48BWL4S+jtT6AtBIugGoZnF3qXv/Fjc4Kq1gOIOHyyGUpXv19s+eM8d4dTPWF7YoFysR5gsXFOVpqGZmxcRX4zebWTkwNtuqUmncGlv6d2BUA6tMmaw7yMUAYiZ3QqG3KRiBavT/fu9MW/Jthn/xsmCt9aMsKWLcWaZ8ehyI5cursxsCSUF8Cx3blW1aM+0C+RRstDaQthnTk19CabgWJu9ag==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by SA1PR12MB7198.namprd12.prod.outlook.com (2603:10b6:806:2bf::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Wed, 24 Apr
+ 2024 03:58:42 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::a1:5ecd:3681:16f2]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::a1:5ecd:3681:16f2%7]) with mapi id 15.20.7519.021; Wed, 24 Apr 2024
+ 03:58:42 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Dongsheng Yang <dongsheng.yang@easystack.cn>, "dan.j.williams@intel.com"
+	<dan.j.williams@intel.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>, Dongsheng Yang
+	<dongsheng.yang.linux@gmail.com>
+Subject: Re: [PATCH 1/7] block: Init for CBD(CXL Block Device)
+Thread-Topic: [PATCH 1/7] block: Init for CBD(CXL Block Device)
+Thread-Index: AQHalKNT5kEtdJPQAEKYoM2HiHOV0LF2zh0A
+Date: Wed, 24 Apr 2024 03:58:42 +0000
+Message-ID: <c345a609-8114-4dc7-a223-186728cac41f@nvidia.com>
+References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+ <20240422071606.52637-2-dongsheng.yang@easystack.cn>
+In-Reply-To: <20240422071606.52637-2-dongsheng.yang@easystack.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SA1PR12MB7198:EE_
+x-ms-office365-filtering-correlation-id: 9afce45d-2156-4423-7ed2-08dc6412d4f6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?d0pSbWk5YkZJeklPTDF5Q0l1ak03c1QzTy9tZ0F0MW1CcTFLVXl4Q2hrSmlH?=
+ =?utf-8?B?VzlHSDUvSlZIOHdUR25kTUJ2K3FSd0VtVXNNc1k5ajBwc1RpcG90bHNnN2t6?=
+ =?utf-8?B?cXh5Y2J4cVo1M2NqSmNMMHJITWNNZ2t1RitHdkRxSGdsaGhmRGRLN1hZZXl0?=
+ =?utf-8?B?K2Zrbm1Gb21LTFpIQ0dBckhjQmRZWWhlQXYvTVVQUnE5TTlqMDlCWmxUOFUw?=
+ =?utf-8?B?SVdJQ3ZoVDErVmVKbVVaM1NWR0pFRUlhYnRDYm9uMG5JZGhGQTg4SVhPQ1FN?=
+ =?utf-8?B?TjRpRzA0ajBaVjVqK1FkeHByVUJVYTNUVFE0RmozZGRnSmV4cUNjaG9UYVFs?=
+ =?utf-8?B?c0R4Ung3cHRhZXZpdzVJQlZHK29kV0RHTzRHR2Y0OWhiMEQ4cjRIelk2RFIz?=
+ =?utf-8?B?aDlrRlJBbDY0SXp5UmRaSUZhdm94RGM1eTV2cHhVN1U3eFRiMkNxUHN1VlIz?=
+ =?utf-8?B?alhENlRwd2ZpVEdBNjlHQ1BBN3hLV25tRDlWUW84ZzhNeFBmZUFEL0tuU3ha?=
+ =?utf-8?B?aGtTd1JNZ0Y1aXFYMXZaSFh5R21mdkJqTFdWakZuUi9YMUVITndCcVdySUVW?=
+ =?utf-8?B?d2U0b0FWbndYdEdwQXFqN1YyQjBhMzRVQUQxeGRwNDVLV2MvOG1ldWRoZDZC?=
+ =?utf-8?B?RTFLRjhWWG1odWtHWmZLcjBTMlVNSEVoWEg2T2puSktqNDNkTy85aDc4SmFT?=
+ =?utf-8?B?VkpsQlpzUWpudUt2ZS9NRFJkSGs4ZHl5SW5BcTlDbUhHR2ZCeDRhLzM5ekFN?=
+ =?utf-8?B?NTlzemhYUjlIU0U0Y21ZSEtQZ1dnMzV0OGk3amdSeDM1NWdOZnhXenF2aDNj?=
+ =?utf-8?B?QVVjeXVNMFdvcHREWWxUd0pOTGUxOVRSVFNXK01GSHBYekVXT2ZwOElZcWZo?=
+ =?utf-8?B?UmZNRlRsZzR2Vmdqa3pmTDJLV1JONEZlQ3htSG5yRTF1bGlqSmR6bUhxMm92?=
+ =?utf-8?B?SDJrSkZVNktKZlVWRCtxYmZHRWIvMjZaWjlRSEl6TnZxcXFjNVFpaDZpc29n?=
+ =?utf-8?B?VGpCN2Y1dHhmUnNOd24rWFFhWUlGZGs2enRiU1o3Z0RpWXJ1UE42QnJxNk4z?=
+ =?utf-8?B?U0lxZGJiVXBlWEFBR21HeDQzTzlWcktBNkYybmpRbnJXWDhXRWxwenhSY2Nt?=
+ =?utf-8?B?aDlzSDNEcTlBZStCWFhWdEJDbDlYVEdydmcrdnQxQ2gwbXE1TEVTRTkxNFE2?=
+ =?utf-8?B?a2pFOHN0WW9aWHR3bCtvTVhTbFd4aHpEVklwRFpRUm5DMU5wUlJ3dUE5WmJC?=
+ =?utf-8?B?NkNCN1dWQ3lPU1ZFbktET3dWVmdFcnBWbUpxamI1Z3VRSVVDbldPQVpxNE12?=
+ =?utf-8?B?aC9FbkJGemNrN0x1TURnY3IrQjVNMXlxL1RUN3lrYS9YU2lOUzh5KzJNQURZ?=
+ =?utf-8?B?dkd5dnhHNTlUc2dnajAwUzhpRVJLdkt3aDZjR3RHcDB6S0Zwa1JUaldXVmJi?=
+ =?utf-8?B?OWpLWlFEUVpzNzlOVTc3VS9YV1NKaks4MHoxeCt1U1FwRGdKNUVqcDdqWUFX?=
+ =?utf-8?B?NzJhaTJPa3ZTYjZySXFBS2xGbytOTW9XQTZHK2xSY05nQVF5S1pLSWRNQnZP?=
+ =?utf-8?B?TlhGaHNqcE1mNkJ2THhMeFdSOGx5NXlzdHlMOWZNK2ZCNXpyVXZub0pndnM2?=
+ =?utf-8?B?WjBSM2hzNFFDeEtKMHVmTVdHS2lvWGdPNWQyOXJEdStoazVZby9JTmh0ckt2?=
+ =?utf-8?B?NXRCZmwxMktxdHRNVlVXV1FrM2ZKdUhoaUMwVEl1NVBkR0JmU3p1cmxaajdN?=
+ =?utf-8?B?aStQbytkOCt0aTU5Z1d5akx4Rzk1QkxlMEQ3dmt0TE9QbmRpUDJoTGJoL0pJ?=
+ =?utf-8?B?VitCSC9BYUx3Y1Z1cmEvZz09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?RWtJZW1xNjFTRlplWUJ2ZkREejE1VE5IQmJmNkFidFpKdUVLYjlaQWhDMkcv?=
+ =?utf-8?B?S3JtN01pSkF4b0E0MUpVN3JMSHVoV2ZzelQ3OUFNZ1BjUS9vMzdFeldVSndj?=
+ =?utf-8?B?UC83UkRTRkRXUnlXNEQ5MWtXYkx6blJaNmIwc3kwald4UFNRS3ZiQlBIVUdU?=
+ =?utf-8?B?d0tQejRla2I1bVZjcFFuUTJJeUJSL3h1YjhScHdQQVp6NllXd3JvRk1xUkhN?=
+ =?utf-8?B?dkc5MTRSUWcwTytJNjcrMjh4ZkpnakVDWUZTY1ljU3UyK21NaUE0N08vSlds?=
+ =?utf-8?B?UWNqNTIvejR4d0dFNW4yejd2czBRVHpCWStQZ2hnTi91WElmY0JOMTBlQ0VV?=
+ =?utf-8?B?eG95TTlYd01iblNZK0p6N0dQSE5ydmVnQ1hFZ0U4V2xzVmZLK0hyckV2dDZi?=
+ =?utf-8?B?aGlvSzF4b29RNUJRS2poTHI3SStjRDI4UlVXR1ppbU9hRnptalRUekRXeFFX?=
+ =?utf-8?B?NndHZm1yMnpWSUZnUkpYZlZPa3RGcUd5b0dnb25OVnFCenFMRnJUMXFabzkr?=
+ =?utf-8?B?MUgzWUZNNHYza3ROTkd1RTR4SWowR2ZQbEk2RzIrbndmdTd4RHpEL0dHeElt?=
+ =?utf-8?B?SXRoN05uOWJoc2lCT245UmNXT085Q3BvYjF2dytWRHlmdzRYQ2thVVAvWnc3?=
+ =?utf-8?B?WG5UaEsvS0tJSlV5ZTNZVEg3VlhIT0M0bitBbTBwNDBmVEpSQkFTaWJJeGl1?=
+ =?utf-8?B?d3ptVnFRbFdpdHhVem44OVYrSGpRbEtqY1UyRGFHMjduQlViS3o0YUxiTzc1?=
+ =?utf-8?B?M2JvbGZESFZCaDZhRUUyNnI4VW8wejVUcWN6Sm42eGR0UG1BZTBBUWxBbXVm?=
+ =?utf-8?B?M0pGYzZSV1V0U2lyZE1raUc2ZHhENk1YQXp4bnhuWEtDemZMNkl3VVNzazhB?=
+ =?utf-8?B?U29hcDB6NUZhWkZWZFJOSkhtRUQwenluenA0Q0NzVS9mVXVzTFZSWnVUUUUy?=
+ =?utf-8?B?ZGczNXJrdGNQSGJaS1hMSjcvc0lwWkU3Q2s4TlBRUy9Tc0MvSEhqQms4T015?=
+ =?utf-8?B?VERGM1M1NGZYVkV1ZVE2dzRaMmNEL3FGTitYNXRZWWJlbktaVEFrRFhqNTc2?=
+ =?utf-8?B?U3UrYmx5ZVUrb2lFRitKVUg1YXhGQmY2VnJVQnVZdmdZM1lZcGFQcFMyQy9w?=
+ =?utf-8?B?UVRqR21lR1FQMHRXSkt2OXJ4cFJYNEtWdVJCZFpyeGRTWVM5Vm1Wc0FhQXBI?=
+ =?utf-8?B?L2Jrai85OUo5QTh1cVhlWjBRdkx4cGpOR3lhYjJoY1hrSzY5WXlSSG54UWhL?=
+ =?utf-8?B?SUZHTW1NdVBhYXdaZ2tZSUVpT1JnK3lJb2lzckNLc2pKM2dMYWw3TjJJbTg2?=
+ =?utf-8?B?S0dDUjNRMHpOYkwxVGVGOVovMDkxcFBoelJ2ai9QWUFzMHBvcHF0cUNEZGVa?=
+ =?utf-8?B?dmlHRXRvRm96WmVyTGRvZU4rWjN2bW1jd25mRklEUms5MjZBMUxHN1lOR0N4?=
+ =?utf-8?B?VFdGT1FvL2YwUyt5OXU0N1pHTWh1WmRrTTNRRWZtMU13UDQ1WktlKytGaW9u?=
+ =?utf-8?B?VUNwdk5QcE94NTJJdjNxNFAxdTZDQ2dNZTVsSWx1VGJVa1ZESE5IekRZSERv?=
+ =?utf-8?B?Nm1vNHF5UTRCakxwUVJCcTZhRzhoS1d1Tm1xWk1CSlF0MmZnR0ZJa3FiSTBi?=
+ =?utf-8?B?WXc5R1FicjdWUmRKcWNHY2phbzNFRHpKY3JCQm5RVktSaDhSVmUvSVptcFJo?=
+ =?utf-8?B?VUN1WmFYYytkcnlJeU41OXJOWFZ0NDk3Tm1zdmkxWWdxb3kvWHFVTzlYaG9T?=
+ =?utf-8?B?SVN2cktSbnJvWTVZL3ZoWmFoUzgwWDkwazhvUGlabWVaMHR6SDJiaWIybTNP?=
+ =?utf-8?B?NElyVGpZNWJkSWZUaHpBV0FSUGxieHp0ZldBNHRoTERqZGNRelhLNkdQYTBl?=
+ =?utf-8?B?cnVodkNWTjJCdzVaa1VBQnV5QmpuMWI1THIwNzZGWW0zWXdsM0hIdnBzRFFJ?=
+ =?utf-8?B?OGVlaTlKU0xqZWlHZUk1VWlwaDZEVWJWVWVsdDM4WXhkdFVaQ2FpVkFBWTRJ?=
+ =?utf-8?B?NFRRcCtybG1jR2pkKzBtZm1xcnp6K040SVRRMUZXM0p5VXJFRllaZWVpK09D?=
+ =?utf-8?B?RXZXVkJSdmk1UmZqWTB6dEFFTkFkQTF3VTU2REtMZmQwY1IwMUhMdzQ2ekpD?=
+ =?utf-8?B?b2NjMkRtd0UrM3lFaWp4SzF5TEhTMzdQaVEvRjdEVGgxWUU1L204SWZvUWhv?=
+ =?utf-8?Q?mbuQGWhT6756knnkFjU6MInm3gwk8+sFoAhzwlUiJWkC?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8A0DE2268C6CA640982F90AEE9B77363@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ziey53aADgxDrXZw@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9afce45d-2156-4423-7ed2-08dc6412d4f6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2024 03:58:42.4789
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lJJCRm3nZ8zxicdx7jI2v8h+G6Hh3yBMP1z5rBURtlqb03ZvAv5GyGNVpg9jx5tJV+UacXsvP8MCdhhXf0NUcQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7198
 
-On Tue, Apr 23, 2024 at 03:08:55PM +0200, Kevin Wolf wrote:
-> Am 22.04.2024 um 20:27 hat Jens Axboe geschrieben:
-> > On 4/7/24 7:03 PM, Ming Lei wrote:
-> > > SQE group is defined as one chain of SQEs starting with the first sqe that
-> > > has IOSQE_EXT_SQE_GROUP set, and ending with the first subsequent sqe that
-> > > doesn't have it set, and it is similar with chain of linked sqes.
-> > > 
-> > > The 1st SQE is group leader, and the other SQEs are group member. The group
-> > > leader is always freed after all members are completed. Group members
-> > > aren't submitted until the group leader is completed, and there isn't any
-> > > dependency among group members, and IOSQE_IO_LINK can't be set for group
-> > > members, same with IOSQE_IO_DRAIN.
-> > > 
-> > > Typically the group leader provides or makes resource, and the other members
-> > > consume the resource, such as scenario of multiple backup, the 1st SQE is to
-> > > read data from source file into fixed buffer, the other SQEs write data from
-> > > the same buffer into other destination files. SQE group provides very
-> > > efficient way to complete this task: 1) fs write SQEs and fs read SQE can be
-> > > submitted in single syscall, no need to submit fs read SQE first, and wait
-> > > until read SQE is completed, 2) no need to link all write SQEs together, then
-> > > write SQEs can be submitted to files concurrently. Meantime application is
-> > > simplified a lot in this way.
-> > > 
-> > > Another use case is to for supporting generic device zero copy:
-> > > 
-> > > - the lead SQE is for providing device buffer, which is owned by device or
-> > >   kernel, can't be cross userspace, otherwise easy to cause leak for devil
-> > >   application or panic
-> > > 
-> > > - member SQEs reads or writes concurrently against the buffer provided by lead
-> > >   SQE
-> > 
-> > In concept, this looks very similar to "sqe bundles" that I played with
-> > in the past:
-> > 
-> > https://git.kernel.dk/cgit/linux/log/?h=io_uring-bundle
-> > 
-> > Didn't look too closely yet at the implementation, but in spirit it's
-> > about the same in that the first entry is processed first, and there's
-> > no ordering implied between the test of the members of the bundle /
-> > group.
-> 
-> When I first read this patch, I wondered if it wouldn't make sense to
-> allow linking a group with subsequent requests, e.g. first having a few
-> requests that run in parallel and once all of them have completed
-> continue with the next linked one sequentially.
-> 
-> For SQE bundles, you reused the LINK flag, which doesn't easily allow
-> this. Ming's patch uses a new flag for groups, so the interface would be
-> more obvious, you simply set the LINK flag on the last member of the
-> group (or on the leader, doesn't really matter). Of course, this doesn't
-> mean it has to be implemented now, but there is a clear way forward if
-> it's wanted.
-
-Reusing LINK for bundle breaks existed link chains(BUNDLE linked to existed
-link chain), so I think it may not work.
-
-The link rule is explicit for sqe group:
-
-- only group leader can set link flag, which is applied on the whole
-group: the next sqe in the link chain won't be started until the
-previous linked sqe group is completed
-
-- link flag can't be set for group members
-
-Also sqe group doesn't limit async for both group leader and member.
-
-sqe group vs link & async is covered in the last liburing test code.
-
-> 
-> The part that looks a bit arbitrary in Ming's patch is that the group
-> leader is always completed before the rest starts. It makes perfect
-> sense in the context that this series is really after (enabling zero
-> copy for ublk), but it doesn't really allow the case you mention in the
-> SQE bundle commit message, running everything in parallel and getting a
-> single CQE for the whole group.
-
-I think it should be easy to cover bundle in this way, such as add one new
-op IORING_OP_BUNDLE as Jens did, and implement the single CQE for whole group/bundle.
-
-> 
-> I suppose you could hack around the sequential nature of the first
-> request by using an extra NOP as the group leader - which isn't any
-> worse than having an IORING_OP_BUNDLE really, just looks a bit odd - but
-> the group completion would still be missing. (Of course, removing the
-> sequential first operation would mean that ublk wouldn't have the buffer
-> ready any more when the other requests try to use it, so that would
-> defeat the purpose of the series...)
-> 
-> I wonder if we can still combine both approaches and create some
-> generally useful infrastructure and not something where it's visible
-> that it was designed mostly for ublk's special case and other use cases
-> just happened to be enabled as a side effect.
-
-sqe group is actually one generic interface, please see the multiple copy(
-copy one file to multiple destinations in single syscall for one range) example
-in the last patch, and it can support generic device zero copy: any device internal
-buffer can be linked with io_uring operations in this way, which can't
-be done by traditional splice/pipe.
-
-I guess it can be used in network Rx zero copy too, but may depend on actual
-network Rx use case.
-
-
-
-Thanks,
-Ming
-
+PiArLyoNCj4gKyAqIEFzIHNoYXJlZCBtZW1vcnkgaXMgc3VwcG9ydGVkIGluIENYTDMuMCBzcGVj
+LCB3ZSBjYW4gdHJhbnNmZXIgZGF0YSB2aWEgQ1hMIHNoYXJlZCBtZW1vcnkuDQo+ICsgKiBDQkQg
+bWVhbnMgQ1hMIGJsb2NrIGRldmljZSwgaXQgdXNlIENYTCBzaGFyZWQgbWVtb3J5IHRvIHRyYW5z
+cG9ydCBjb21tYW5kIGFuZCBkYXRhIHRvDQo+ICsgKiBhY2Nlc3MgYmxvY2sgZGV2aWNlIGluIGRp
+ZmZlcmVudCBob3N0LCBhcyBzaG93biBiZWxvdzoNCj4gKyAqDQo+ICsgKiAgICDilIzilIDilIDi
+lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
+lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilJAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAg4pSM4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSQDQo+ICsgKiAgICDilIIgICAgICAgICAgbm9kZS0xICAgICAgICAgICAgICAg4pSCICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUgiAgICAgICAgICAgICAgbm9kZS0yICAgICAg
+ICAgICAgICAgIOKUgg0KPiArICogICAg4pSc4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSA4pSkICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUnOKUgOKUgOKUgOKUgOKU
+gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
+gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUpA0KPiArICogICAg4pSCICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUgiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICDilIIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICDilIINCj4gKyAqICAg
+IOKUgiAgICAgICAgICAgICAgICAgICAgICAg4pSM4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSkICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUnOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
+gOKUkCAgICAgICAgICAgICAgICAgICAgICAgICAg4pSCDQo+ICsgKiAgICDilIIgICAgICAgICAg
+ICAgICAgICAgICAgIOKUgiBjYmQwICDilIIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+4pSCIGJhY2tlbmQw4pSc4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSA4pSA4pSA4pSQICAgICAgIOKUgg0KPiArICogICAg4pSCICAgICAgICAgICAgICAgICAg
+ICAgICDilJzilIDilIDilIDilIDilIDilIDilIDilKQgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAg4pSc4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSkICAgICAgICAgICAgICAgICAg
+4pSCICAgICAgIOKUgg0KPiArICogICAg4pSCICAgICAgICAgICAgICAgICAgICAgICDilIIgcG1l
+bTAg4pSCICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUgiBwbWVtMCAgIOKUgiAgICAg
+ICAgICAgICAgICAgIOKWvCAgICAgICDilIINCj4gKyAqICAgIOKUgiAgICAgICAgICAgICAgIOKU
+jOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUtOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUpCAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICDilJzilIDilIDilIDilIDilIDilIDilIDilIDilIDilLTi
+lIDilIDilIDilIDilJAgICAgIOKUjOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
+gOKUgOKUgOKUgOKUpA0KPiArICogICAg4pSCICAgICAgICAgICAgICAg4pSCICAgIGN4bCBkcml2
+ZXIg4pSCICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUgiBjeGwgZHJpdmVyICAg4pSC
+ICAgICDilIIgIC9kZXYvc2RhICAgICDilIINCj4gKyAqICAgIOKUlOKUgOKUgOKUgOKUgOKUgOKU
+gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUtOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
+rOKUgOKUgOKUgOKUgOKUgOKUgOKUmCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICDilJTi
+lIDilIDilIDilIDilIDilKzilIDilIDilIDilIDilIDilIDilIDilIDilLTilIDilIDilIDilIDi
+lIDilLTilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilJgNCj4g
+KyAqICAgICAgICAgICAgICAgICAgICAgICAgICAgICDilIIgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIOKUgg0KPiArICogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIOKUgiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg4pSCDQo+
+ICsgKiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg4pSCICAgICAgICBDWEwgICAgICAgICAg
+ICAgICAgICAgICAgICAgQ1hMICAgICDilIINCj4gKyAqICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICDilJTilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
+lJAgICAgICAgICAgICAgICDilIzilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilJgN
+Cj4gKyAqICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUgiAg
+ICAgICAgICAgICAgIOKUgg0KPiArICogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAg4pSCICAgICAgICAgICAgICAg4pSCDQo+ICsgKiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICDilIIgICAgICAgICAgICAgICDilIINCj4gKyAq
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg4pSM4pSA4pSA4pSA4pS0
+4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pS04pSA4pSA4pSA
+4pSA4pSA4pSQDQo+ICsgKiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IOKUgiAgIHNoYXJlZCBtZW1vcnkgZGV2aWNlICDilIINCj4gKyAqICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAg4pSU4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSYDQo+ICsgKg0K
+PiArICogYW55IHJlYWQvd3JpdGUgdG8gY2JkMCBvbiBub2RlLTEgd2lsbCBiZSB0cmFuc2ZlcnJl
+ZCB0byBub2RlLTIgL2Rldi9zZGEuIEl0IHdvcmtzIHNpbWlsYXIgd2l0aA0KPiArICogbmJkIChu
+ZXR3b3JrIGJsb2NrIGRldmljZSksIGJ1dCBpdCB0cmFuc2ZlciBkYXRhIHZpYSBDWEwgc2hhcmVk
+IG1lbW9yeSByYXRoZXIgdGhhbiBuZXR3b3JrLg0KPiArICovDQo+ICsNCj4gKy8qIHByaW50ayAq
+Lw0KDQpJIGRvbid0IHRoaW5rIHlvdSBuZWVkIGFib3ZlIGNvbW1lbnQgLi4NCg0KPiArI2RlZmlu
+ZSBjYmRfZXJyKGZtdCwgLi4uKQkJCQkJCQlcDQo+ICsJcHJfZXJyKCJjYmQ6ICVzOiV1ICIgZm10
+LCBfX2Z1bmNfXywgX19MSU5FX18sICMjX19WQV9BUkdTX18pDQoNCnlvdSBjYW4gdXNlICNkZWZp
+bmUgcHJfZm10IGFuZCByZW1vdmUgY21kOiBwcmVmaXhlcyBpbiBlYWNoIHByX3h4eCBhYm92ZSA/
+DQoNCj4gKyNkZWZpbmUgY2JkX2luZm8oZm10LCAuLi4pCQkJCQkJCVwNCj4gKwlwcl9pbmZvKCJj
+YmQ6ICVzOiV1ICIgZm10LCBfX2Z1bmNfXywgX19MSU5FX18sICMjX19WQV9BUkdTX18pDQo+ICsj
+ZGVmaW5lIGNiZF9kZWJ1ZyhmbXQsIC4uLikJCQkJCQkJXA0KPiArCXByX2RlYnVnKCJjYmQ6ICVz
+OiV1ICIgZm10LCBfX2Z1bmNfXywgX19MSU5FX18sICMjX19WQV9BUkdTX18pDQo+ICsNCj4gKyNk
+ZWZpbmUgY2JkdF9lcnIodHJhbnNwb3J0LCBmbXQsIC4uLikJCQkJCQlcDQo+ICsJY2JkX2Vycigi
+Y2JkX3RyYW5zcG9ydCV1OiAiIGZtdCwJCQkJCVwNCj4gKwkJIHRyYW5zcG9ydC0+aWQsICMjX19W
+QV9BUkdTX18pDQo+ICsjZGVmaW5lIGNiZHRfaW5mbyh0cmFuc3BvcnQsIGZtdCwgLi4uKQkJCQkJ
+CVwNCj4gKwljYmRfaW5mbygiY2JkX3RyYW5zcG9ydCV1OiAiIGZtdCwJCQkJCVwNCj4gKwkJIHRy
+YW5zcG9ydC0+aWQsICMjX19WQV9BUkdTX18pDQo+ICsjZGVmaW5lIGNiZHRfZGVidWcodHJhbnNw
+b3J0LCBmbXQsIC4uLikJCQkJCQlcDQo+ICsJY2JkX2RlYnVnKCJjYmRfdHJhbnNwb3J0JXU6ICIg
+Zm10LAkJCQkJXA0KPiArCQkgdHJhbnNwb3J0LT5pZCwgIyNfX1ZBX0FSR1NfXykNCj4gKw0KPiAr
+I2RlZmluZSBjYmRfYmFja2VuZF9lcnIoYmFja2VuZCwgZm10LCAuLi4pCQkJCQlcDQo+ICsJY2Jk
+dF9lcnIoYmFja2VuZC0+Y2JkdCwgImJhY2tlbmQlZDogIiBmbXQsCQkJCVwNCj4gKwkJIGJhY2tl
+bmQtPmJhY2tlbmRfaWQsICMjX19WQV9BUkdTX18pDQo+ICsjZGVmaW5lIGNiZF9iYWNrZW5kX2lu
+Zm8oYmFja2VuZCwgZm10LCAuLi4pCQkJCQlcDQo+ICsJY2JkdF9pbmZvKGJhY2tlbmQtPmNiZHQs
+ICJiYWNrZW5kJWQ6ICIgZm10LAkJCQlcDQo+ICsJCSBiYWNrZW5kLT5iYWNrZW5kX2lkLCAjI19f
+VkFfQVJHU19fKQ0KPiArI2RlZmluZSBjYmRfYmFja2VuZF9kZWJ1ZyhiYWNrZW5kLCBmbXQsIC4u
+LikJCQkJCVwNCj4gKwljYmR0X2RlYnVnKGJhY2tlbmQtPmNiZHQsICJiYWNrZW5kJWQ6ICIgZm10
+LAkJCQlcDQo+ICsJCSBiYWNrZW5kLT5iYWNrZW5kX2lkLCAjI19fVkFfQVJHU19fKQ0KPiArDQo+
+ICsjZGVmaW5lIGNiZF9oYW5kbGVyX2VycihoYW5kbGVyLCBmbXQsIC4uLikJCQkJCVwNCj4gKwlj
+YmRfYmFja2VuZF9lcnIoaGFuZGxlci0+Y2JkYiwgImhhbmRsZXIlZDogIiBmbXQsCQkJXA0KPiAr
+CQkgaGFuZGxlci0+Y2hhbm5lbC5jaGFubmVsX2lkLCAjI19fVkFfQVJHU19fKQ0KPiArI2RlZmlu
+ZSBjYmRfaGFuZGxlcl9pbmZvKGhhbmRsZXIsIGZtdCwgLi4uKQkJCQkJXA0KPiArCWNiZF9iYWNr
+ZW5kX2luZm8oaGFuZGxlci0+Y2JkYiwgImhhbmRsZXIlZDogIiBmbXQsCQkJXA0KPiArCQkgaGFu
+ZGxlci0+Y2hhbm5lbC5jaGFubmVsX2lkLCAjI19fVkFfQVJHU19fKQ0KPiArI2RlZmluZSBjYmRf
+aGFuZGxlcl9kZWJ1ZyhoYW5kbGVyLCBmbXQsIC4uLikJCQkJCVwNCj4gKwljYmRfYmFja2VuZF9k
+ZWJ1ZyhoYW5kbGVyLT5jYmRiLCAiaGFuZGxlciVkOiAiIGZtdCwJCQlcDQo+ICsJCSBoYW5kbGVy
+LT5jaGFubmVsLmNoYW5uZWxfaWQsICMjX19WQV9BUkdTX18pDQo+ICsNCj4gKyNkZWZpbmUgY2Jk
+X2Jsa19lcnIoZGV2LCBmbXQsIC4uLikJCQkJCQlcDQo+ICsJY2JkdF9lcnIoZGV2LT5jYmR0LCAi
+Y2JkJWQ6ICIgZm10LAkJCQkJXA0KPiArCQkgZGV2LT5tYXBwZWRfaWQsICMjX19WQV9BUkdTX18p
+DQo+ICsjZGVmaW5lIGNiZF9ibGtfaW5mbyhkZXYsIGZtdCwgLi4uKQkJCQkJCVwNCj4gKwljYmR0
+X2luZm8oZGV2LT5jYmR0LCAiY2JkJWQ6ICIgZm10LAkJCQkJXA0KPiArCQkgZGV2LT5tYXBwZWRf
+aWQsICMjX19WQV9BUkdTX18pDQo+ICsjZGVmaW5lIGNiZF9ibGtfZGVidWcoZGV2LCBmbXQsIC4u
+LikJCQkJCQlcDQo+ICsJY2JkdF9kZWJ1ZyhkZXYtPmNiZHQsICJjYmQlZDogIiBmbXQsCQkJCQlc
+DQo+ICsJCSBkZXYtPm1hcHBlZF9pZCwgIyNfX1ZBX0FSR1NfXykNCj4gKw0KPiArI2RlZmluZSBj
+YmRfcXVldWVfZXJyKHF1ZXVlLCBmbXQsIC4uLikJCQkJCQlcDQo+ICsJY2JkX2Jsa19lcnIocXVl
+dWUtPmNiZF9ibGtkZXYsICJxdWV1ZS0lZDogIiBmbXQsCQkJXA0KPiArCQkgICAgIHF1ZXVlLT5p
+bmRleCwgIyNfX1ZBX0FSR1NfXykNCj4gKyNkZWZpbmUgY2JkX3F1ZXVlX2luZm8ocXVldWUsIGZt
+dCwgLi4uKQkJCQkJCVwNCj4gKwljYmRfYmxrX2luZm8ocXVldWUtPmNiZF9ibGtkZXYsICJxdWV1
+ZS0lZDogIiBmbXQsCQkJXA0KPiArCQkgICAgIHF1ZXVlLT5pbmRleCwgIyNfX1ZBX0FSR1NfXykN
+Cj4gKyNkZWZpbmUgY2JkX3F1ZXVlX2RlYnVnKHF1ZXVlLCBmbXQsIC4uLikJCQkJCVwNCj4gKwlj
+YmRfYmxrX2RlYnVnKHF1ZXVlLT5jYmRfYmxrZGV2LCAicXVldWUtJWQ6ICIgZm10LAkJCVwNCj4g
+KwkJICAgICBxdWV1ZS0+aW5kZXgsICMjX19WQV9BUkdTX18pDQo+ICsNCj4gKyNkZWZpbmUgY2Jk
+X2NoYW5uZWxfZXJyKGNoYW5uZWwsIGZtdCwgLi4uKQkJCQkJXA0KPiArCWNiZHRfZXJyKGNoYW5u
+ZWwtPmNiZHQsICJjaGFubmVsJWQ6ICIgZm10LAkJCQlcDQo+ICsJCSBjaGFubmVsLT5jaGFubmVs
+X2lkLCAjI19fVkFfQVJHU19fKQ0KPiArI2RlZmluZSBjYmRfY2hhbm5lbF9pbmZvKGNoYW5uZWws
+IGZtdCwgLi4uKQkJCQkJXA0KPiArCWNiZHRfaW5mbyhjaGFubmVsLT5jYmR0LCAiY2hhbm5lbCVk
+OiAiIGZtdCwJCQkJXA0KPiArCQkgY2hhbm5lbC0+Y2hhbm5lbF9pZCwgIyNfX1ZBX0FSR1NfXykN
+Cj4gKyNkZWZpbmUgY2JkX2NoYW5uZWxfZGVidWcoY2hhbm5lbCwgZm10LCAuLi4pCQkJCQlcDQo+
+ICsJY2JkdF9kZWJ1ZyhjaGFubmVsLT5jYmR0LCAiY2hhbm5lbCVkOiAiIGZtdCwJCQkJXA0KPiAr
+CQkgY2hhbm5lbC0+Y2hhbm5lbF9pZCwgIyNfX1ZBX0FSR1NfXykNCj4gKw0KDQpbLi4uXQ0KDQo+
+ICsNCj4gK3N0cnVjdCBjYmRfc2Ugew0KPiArCXN0cnVjdCBjYmRfc2VfaGRyCWhlYWRlcjsNCj4g
+Kwl1NjQJCQlwcml2X2RhdGE7CS8vIHBvaW50ZXIgdG8gY2JkX3JlcXVlc3QNCg0KdXNlIC8qKi8g
+aW5zdGVhZCAvLw0KDQoNCi1jaw0KDQoNCg==
