@@ -1,95 +1,173 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D3A15DBA3
-	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 13:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B56315AABA
+	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 13:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713966459; cv=none; b=DX0A0FKm0PcQcopmuhUvhLLH9oKGZaTUl+/C5eo7oOArTtCYXMWHrmwvuctRSWnWKfrlprLlMBouyxR/gogWUWDfrYEzrWkR3NGa+IRw3zikyKORNVK7bbZl4ROJTEctAnpKNmFhaHl5n/igUt8ErLLH+df3fD9rBid3xerKoIk=
+	t=1713967108; cv=none; b=i1uuTXoYWKlLYHkhtyRGLsAz/C6pcikdtmvftaAumG5nr3eSOFMi8zltqI+bW/rFptj2Yv4zNpsRcL1tNvX7tD2rbsLQ9TYS2UDkhfRPRg1qrFhtdrsRJ5I/OjRAR2piw99O8f83XVtTlmXJjY4KIM2bivI4hwUn7yJedHe8mk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713966459; c=relaxed/simple;
-	bh=7o+nnc7MxGMd1vDsvNmkcTY18ToPfVmmXKgbEkoiF04=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VxNBRndEKyOTnncdJ5vAiDqHdklrrjBhEcoZ4V+yDUkYLycvqWm/AZMCT+g2k0uEI7jMX40fS2TA0UrF16iP4nP4RAV5UDwW0lj9PDEgHOdhJt6CxcD8yLyBq0QjUQFf7H9++4e0lBuvgYi1s6Hws29VVBS5T2rL3lxsTqO8e80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cM4/+uc9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1713967108; c=relaxed/simple;
+	bh=BW+Pq6GKBfS9eNSmXeTBK6qJ87TVMgIjkpqY+MOrmL0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=APz9qBQScHlSwdA5aTygXvcI2sha1AEYMhoNhIs0MQYVXI4/YlERGAfVUsqlxq0kgK7gZ+2vy5jTPRwn+vyxYNPNjwzgARaafe0Qo7FdncAvHrtpApARLXoqerG1dN/5helr/KEyRYQqwhhzejAv2CM4lcT7oGVDQ4fSZLAm8C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Vmp7wPmO; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cM4/+uc9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713966456;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=KxPeyvpPnd0Z+Xnr2zjKgwwBQbSW39RkQQi8ZSeGLQs=;
-	b=cM4/+uc9TtYJ9A9izOQUUPr+LBqzraGwKdOgeLWrMiS4icGr9s5zKQo6M3UuOu9Lgv0TBd
-	WHHSkmg8NXTFlySMGIOnaXEgoFQH8CcdSgLkS4Ya7kROUgsPzD0WX6tMsOXfxuvq9fLO2S
-	aN18R0Ar18hCXpG18OcsNkt4aaXYKs4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-tFR6Pg2mPPyLwsmXkkNlww-1; Wed, 24 Apr 2024 09:47:33 -0400
-X-MC-Unique: tFR6Pg2mPPyLwsmXkkNlww-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 39862834FBB;
-	Wed, 24 Apr 2024 13:47:33 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C37DD1121312;
-	Wed, 24 Apr 2024 13:47:31 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] block: set default max segment size in case of virt_boundary
-Date: Wed, 24 Apr 2024 21:47:22 +0800
-Message-ID: <20240424134722.2584284-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Vmp7wPmO"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7da9f6c9c17so27542239f.2
+        for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 06:58:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713967104; x=1714571904; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t5AgsSYH2ZXztFqvLT0BzKeyqgnTVgWsg369g6M5uJA=;
+        b=Vmp7wPmOHBBGDV0LjrPHZ9TuOI6w7hunHsYn1M8BhjpmiikFpUce8AXHscl+o0WUHj
+         PtUBIu2eSVSpnW89jrKlSHlnRz6CV7r+wPqIQ4wb7NW6Z9ljGOeTaedW2AVKRwSMInhB
+         N/uFEt5F4zl67uUBJuQySlDc4qungcChi6aV2BLicNEbOO8CQaX6lVyxP36Tq/cgnIqK
+         zBWTH7pc0gF0HW+vK13F8yhdu4VKvgzQn2RR0B9JPzqy++CmE7wAIgfMTupA6oKHkUsa
+         naVOihpQjs+cTBgo7Ynij92VMWzY6SNk5c9HFv8mD/+ANE4ETAalEpO4KSBA5Vaf70+1
+         +EHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713967104; x=1714571904;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t5AgsSYH2ZXztFqvLT0BzKeyqgnTVgWsg369g6M5uJA=;
+        b=LH+ojAt3IEwnVDcKPzcmFxbatyMB5SoiP2NeKH5O1WNwPgu9JReGXIkTntmnjjlncA
+         o5lE6rNAzYhF1bEeqt9NVBG2E3vUxtMQ8yliPGGlF+NM5pKlcAjfQW7k/qrEbK1jjZz0
+         h5DJIMQbJzvPFkJayabjIZR8x+TisD5wzIheD4s6E2R1bl/PtRM6q8pgAd4xVHo/kh/0
+         cJJfvVBWATai+Ze0K+0h60lneCp43UfQ0bF4FUKZS01bie92oypjMqSlRDSAJjg/gsHz
+         q0MY+Gk0OgPAsRsQx1UYXI7MvQluBcXOshsDErXd8oSoiqqfD07JPknJBEVM0x+olXua
+         eiHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJZThtARn+v7Mkuy5DXaLF0ADbk9iomDyQJGdfupFpHofpsrQe70PfZyCJ0b7AF3t0glx/VEjt2OtSxQ13V/zb14wEA91vxM7Y+B8=
+X-Gm-Message-State: AOJu0YwhRh1Szw2J0kvRB5Zq/JaIKXdCa0Nl9Q1piZ8ODKrDrO+VaiwF
+	JwKF3cSoITQGqkiAftG4/GMeNyQHDHqo22bIc8ZPui9wDQqUUFkohoz+aeNSsdYgOHb7Ry3Te7U
+	o
+X-Google-Smtp-Source: AGHT+IHeUYhJ+SVUfItfCo9mtv7Z4FbeAXvXMUi2Pio17o8EpgdLRJLyUkYhl+UgHWqb5yBWCA4WEQ==
+X-Received: by 2002:a5d:954f:0:b0:7da:7278:be09 with SMTP id a15-20020a5d954f000000b007da7278be09mr2753649ios.2.1713967103774;
+        Wed, 24 Apr 2024 06:58:23 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id x5-20020a056638160500b00484f72550ccsm2984056jas.174.2024.04.24.06.58.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 06:58:23 -0700 (PDT)
+Message-ID: <2787b6ed-c5a2-4f5a-9214-3fab75bfe1ee@kernel.dk>
+Date: Wed, 24 Apr 2024 07:58:22 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] block: prevent freeing a zone write plug too early
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+References: <20240420075811.1276893-1-dlemoal@kernel.org>
+ <20240420075811.1276893-2-dlemoal@kernel.org>
+ <715fd037-a8e5-4e62-939e-a446087eed2a@kernel.dk>
+ <4530f039-0698-4cc0-94ab-5465d3f0e255@kernel.org>
+ <1d4fb854-3151-41f5-b9a5-2a5cf2a37986@kernel.dk>
+ <61ff5a29-9b16-4a52-b0ae-cfba2ea3c748@kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <61ff5a29-9b16-4a52-b0ae-cfba2ea3c748@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-For devices with virt_boundary limit, the driver may provide zero max
-segment size, we have to set it as UINT_MAX at default. Otherwise, it
-may cause warning in driver when handling sglist.
+On 4/23/24 12:19 PM, Damien Le Moal wrote:
+> On 2024/04/24 1:36, Jens Axboe wrote:
+>> On 4/23/24 9:16 AM, Damien Le Moal wrote:
+>>> On 2024/04/24 0:21, Jens Axboe wrote:
+>>>> On 4/20/24 1:58 AM, Damien Le Moal wrote:
+>>>>> The submission of plugged BIOs is done using a work struct executing the
+>>>>> function blk_zone_wplug_bio_work(). This function gets and submits a
+>>>>> plugged zone write BIO and is guaranteed to operate on a valid zone
+>>>>> write plug (with a reference count higher than 0) on entry as plugged
+>>>>> BIOs hold a reference on their zone write plugs. However, once a BIO is
+>>>>> submitted with submit_bio_noacct_nocheck(), the BIO may complete before
+>>>>> blk_zone_wplug_bio_work(), with the BIO completion trigering a release
+>>>>> and freeing of the zone write plug if the BIO is the last write to a
+>>>>> zone (making the zone FULL). This potentially can result in the zone
+>>>>> write plug being freed while the work is still active.
+>>>>>
+>>>>> Avoid this by calling flush_work() from disk_free_zone_wplug_rcu().
+>>>>>
+>>>>> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+>>>>> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+>>>>> ---
+>>>>>  block/blk-zoned.c | 2 ++
+>>>>>  1 file changed, 2 insertions(+)
+>>>>>
+>>>>> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+>>>>> index 3befebe6b319..685f0b9159fd 100644
+>>>>> --- a/block/blk-zoned.c
+>>>>> +++ b/block/blk-zoned.c
+>>>>> @@ -526,6 +526,8 @@ static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
+>>>>>  	struct blk_zone_wplug *zwplug =
+>>>>>  		container_of(rcu_head, struct blk_zone_wplug, rcu_head);
+>>>>>  
+>>>>> +	flush_work(&zwplug->bio_work);
+>>>>> +
+>>>>>  	mempool_free(zwplug, zwplug->disk->zone_wplugs_pool);
+>>>>>  }
+>>>>
+>>>> This is totally backwards. First of all, if you actually had work that
+>>>> needed flushing at this point, the kernel would bomb spectacularly.
+>>>> Secondly, what's the point of using RCU to protect this, if you're now
+>>>> needing to flush work from the RCU callback? That's a clear sign that
+>>>> something is very wrong here with your references / RCU usage.. The work
+>>>> item should hold a reference to it, trying to paper around it like this
+>>>> is not going to work at all.
+>>>>
+>>>> Why is the work item racing with RCU freeing?!
+>>>
+>>> The work item is a field of the zone write plug. Zone write plugs have
+>>> references to them as long as BIOs are in flight and and the zone is
+>>> not full. The zone write plug freeing through rcu is triggered by the
+>>> last write to a zone that makes the zone full. But the completion of
+>>> this last write BIO may happen right after the work issued the BIO
+>>> with submit_bio_noacct_nocheck() and before blk_zone_wplug_bio_work()
+>>> returns, while the work item is still active.
+>>>
+>>> The actual freeing of the plug happens only after the rcu grace
+>>> period, and I was not entirely sure if this is enough to guarantee
+>>> that the work thread is finished. But checking how the workqueue code
+>>> processes the work item by calling the work function
+>>> (blk_zone_wplug_bio_work() in this case), there is no issue because
+>>> the work item (struct work_struct) is not touched once the work
+>>> function is called. So there are no issues/races with freeing the zone
+>>> write plug. I was overthinking this. My bad. We can drop this patch.
+>>> Apologies for the noise.
+>>
+>> I took a closer look at the zone write plug reference handling, and it
+>> still doesn't look very good. Why are some just atomic_dec and there's
+>> just one spot that does dec_and_test? This again looks like janky
+>> referencing, to be honest.
+>>
+>> The relationship seems like it should be pretty clear. Any bio inflight
+>> against this zone plug should have a reference to it, AND the owner
+>> should have a reference to it, otherwise any bio completion (which can
+>> happen at ANY time) could free it. Any dropping of the ref should use a
+>> helper that does atomic_dec_and_test(), eg what disk_put_zone_wplug()
+>> does.
+>>
+>> There should be no doubt about the above at all. If the plug has been
+>> added to a workqueue, it should be quite obvious that of course it has a
+>> reference to it already, outside of the bio's that are in it.
+>>
+>> I'd strongly encourage getting this sorted out before the merge window,
+>> I'm not at all convinced it's correct as-is. It's certainly not
+>> obviously correct, which it should be. The RCU rules are pretty simple
+>> if the the references are done in the kernel idiomatic way, but they are
+>> not.
+> 
+> OK. I am traveling this week so I will not be able to send a
+> well-tested cleanup patch but I will do so first thing next week.
 
-Fix it by setting default max segment size as UINT_MAX.
+Sounds good, thanks.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@kernel.org>
-Fixes: b561ea56a264 ("block: allow device to have both virt_boundary_mask and max segment size")
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Closes: https://lore.kernel.org/linux-block/7e38b67c-9372-a42d-41eb-abdce33d3372@linux-m68k.org/
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-settings.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index d2731843f2fc..9d6033e01f2e 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -188,7 +188,10 @@ static int blk_validate_limits(struct queue_limits *lim)
- 	 * bvec and lower layer bio splitting is supposed to handle the two
- 	 * correctly.
- 	 */
--	if (!lim->virt_boundary_mask) {
-+	if (lim->virt_boundary_mask) {
-+		if (!lim->max_segment_size)
-+			lim->max_segment_size = UINT_MAX;
-+	} else {
- 		/*
- 		 * The maximum segment size has an odd historic 64k default that
- 		 * drivers probably should override.  Just like the I/O size we
 -- 
-2.42.0
+Jens Axboe
 
