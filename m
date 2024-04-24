@@ -1,173 +1,131 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B56315AABA
-	for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 13:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3022115E802;
+	Wed, 24 Apr 2024 14:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713967108; cv=none; b=i1uuTXoYWKlLYHkhtyRGLsAz/C6pcikdtmvftaAumG5nr3eSOFMi8zltqI+bW/rFptj2Yv4zNpsRcL1tNvX7tD2rbsLQ9TYS2UDkhfRPRg1qrFhtdrsRJ5I/OjRAR2piw99O8f83XVtTlmXJjY4KIM2bivI4hwUn7yJedHe8mk4=
+	t=1713970460; cv=none; b=p6976yZcqdZSIHT+MpxsqWmAQuiMijsP7ywW3Po4iSxuREPprLn6/k5va9HQHq5EEaCRtDgekpLN5YS79nraw1QZDMz7N5K/X/41jnV3A21uFjVwx+ZHRsPB5+ksvS8unmX1u1J2bKm3qipUh1flaJQxy5k4DflXp4og23joirA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713967108; c=relaxed/simple;
-	bh=BW+Pq6GKBfS9eNSmXeTBK6qJ87TVMgIjkpqY+MOrmL0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=APz9qBQScHlSwdA5aTygXvcI2sha1AEYMhoNhIs0MQYVXI4/YlERGAfVUsqlxq0kgK7gZ+2vy5jTPRwn+vyxYNPNjwzgARaafe0Qo7FdncAvHrtpApARLXoqerG1dN/5helr/KEyRYQqwhhzejAv2CM4lcT7oGVDQ4fSZLAm8C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Vmp7wPmO; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1713970460; c=relaxed/simple;
+	bh=uXJCumUlxTxHWrN5eeUyifZZYEzii/3yS0/w9Zg/rsU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=egEK5llDM58EnCOjTzLVLknrOveJzTA16wu0/MWPwXtqMdEICxC2I6zWrGbr7wUPI9nX4tFx8ICYDtr/MyYd7k3Ny/Iu2AAIqzMcDsLclqTHis8MYz0ry5ll+a9v1W/yYBv8kmp5xbRhW6pcNzxR1usrrUSriOf9GK2k8idqzJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FB1G3Ttt; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Vmp7wPmO"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7da9f6c9c17so27542239f.2
-        for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 06:58:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FB1G3Ttt"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57232e47a81so61a12.0;
+        Wed, 24 Apr 2024 07:54:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1713967104; x=1714571904; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t5AgsSYH2ZXztFqvLT0BzKeyqgnTVgWsg369g6M5uJA=;
-        b=Vmp7wPmOHBBGDV0LjrPHZ9TuOI6w7hunHsYn1M8BhjpmiikFpUce8AXHscl+o0WUHj
-         PtUBIu2eSVSpnW89jrKlSHlnRz6CV7r+wPqIQ4wb7NW6Z9ljGOeTaedW2AVKRwSMInhB
-         N/uFEt5F4zl67uUBJuQySlDc4qungcChi6aV2BLicNEbOO8CQaX6lVyxP36Tq/cgnIqK
-         zBWTH7pc0gF0HW+vK13F8yhdu4VKvgzQn2RR0B9JPzqy++CmE7wAIgfMTupA6oKHkUsa
-         naVOihpQjs+cTBgo7Ynij92VMWzY6SNk5c9HFv8mD/+ANE4ETAalEpO4KSBA5Vaf70+1
-         +EHw==
+        d=gmail.com; s=20230601; t=1713970457; x=1714575257; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w+9IQLCN7DH23nxy4mYuyF9NGEY2ALiGsS8ZLweky1c=;
+        b=FB1G3TttSjmMHeaCk0ybMrSKwdrvboaFAgaII5GNMYKVukMwUC1iUKIzXLOyBaSNwv
+         cnyWRSOsf41qF0MDsCRXC1f9ZtNchE5VMZ4zpvgTFrm1cMnJ0T2s7leUkRd1UVYxCm6C
+         aMvJ0mn56RWVXwX9tW1iTiL14r6kBD5Z9qc8UQFHBKaxapVcM3J+HywOQb0dtUCEFPkS
+         dULudyWCwe+LysIsoy9r8CRH9qcldjOTe8XFotsKRaVysxErjMzPZez19qWjsOB7jfLt
+         X0RexRSBZI9qoyXYuYSTB5KeGeRt2Ozph80uE8DC4rvUZrPRXuO0k3K+tn1jwsUy6WqI
+         sB0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713967104; x=1714571904;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t5AgsSYH2ZXztFqvLT0BzKeyqgnTVgWsg369g6M5uJA=;
-        b=LH+ojAt3IEwnVDcKPzcmFxbatyMB5SoiP2NeKH5O1WNwPgu9JReGXIkTntmnjjlncA
-         o5lE6rNAzYhF1bEeqt9NVBG2E3vUxtMQ8yliPGGlF+NM5pKlcAjfQW7k/qrEbK1jjZz0
-         h5DJIMQbJzvPFkJayabjIZR8x+TisD5wzIheD4s6E2R1bl/PtRM6q8pgAd4xVHo/kh/0
-         cJJfvVBWATai+Ze0K+0h60lneCp43UfQ0bF4FUKZS01bie92oypjMqSlRDSAJjg/gsHz
-         q0MY+Gk0OgPAsRsQx1UYXI7MvQluBcXOshsDErXd8oSoiqqfD07JPknJBEVM0x+olXua
-         eiHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJZThtARn+v7Mkuy5DXaLF0ADbk9iomDyQJGdfupFpHofpsrQe70PfZyCJ0b7AF3t0glx/VEjt2OtSxQ13V/zb14wEA91vxM7Y+B8=
-X-Gm-Message-State: AOJu0YwhRh1Szw2J0kvRB5Zq/JaIKXdCa0Nl9Q1piZ8ODKrDrO+VaiwF
-	JwKF3cSoITQGqkiAftG4/GMeNyQHDHqo22bIc8ZPui9wDQqUUFkohoz+aeNSsdYgOHb7Ry3Te7U
-	o
-X-Google-Smtp-Source: AGHT+IHeUYhJ+SVUfItfCo9mtv7Z4FbeAXvXMUi2Pio17o8EpgdLRJLyUkYhl+UgHWqb5yBWCA4WEQ==
-X-Received: by 2002:a5d:954f:0:b0:7da:7278:be09 with SMTP id a15-20020a5d954f000000b007da7278be09mr2753649ios.2.1713967103774;
-        Wed, 24 Apr 2024 06:58:23 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id x5-20020a056638160500b00484f72550ccsm2984056jas.174.2024.04.24.06.58.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 06:58:23 -0700 (PDT)
-Message-ID: <2787b6ed-c5a2-4f5a-9214-3fab75bfe1ee@kernel.dk>
-Date: Wed, 24 Apr 2024 07:58:22 -0600
+        d=1e100.net; s=20230601; t=1713970457; x=1714575257;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w+9IQLCN7DH23nxy4mYuyF9NGEY2ALiGsS8ZLweky1c=;
+        b=Nv3hK2cD33nQ31xHu1Tpc3EVeJq2QRzZpWb2eXJDuP6+h7mUe6z1kG7wFgbyuOEt06
+         ZluN3yLFV/i587Ma0tvECN0hRam/w28JV100ZeNjcaRp2sW4c61SiOTaV0zF6bYdzmKY
+         N+USGOMJSN9Uz77yMtlZQ2iwTvaU4vnEzfNXcHispziXzHefGvcWNTb/4YPHlAYRYH+J
+         MlMfhGw9faT/KOL14HiF7U7KNWaykiLBNQOhMKoiGHNDIEQS9sRVWFZOkAODmrAAtFq5
+         yJTyIBRcqMsOsH+NbaDBCY+kNZQN/e1P5j2fLG3lhhEM9waXewKyBu7kyQf9rd1hJ5tk
+         rxOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTFoEEqnGcZjaDlPpRt5Lx9knhSQ7WzThjXBP/m2vou+MgBIgT5muEKMMXNxQPpfypL/7UjHK/H8+R1agUkmEz8vkiAQ+4zz2b2ZblKKREm9d2LDfaQ/1F+uqgCmijtyxTSb795UxG1vI=
+X-Gm-Message-State: AOJu0Yzx7zPUXzNNpO/3MFUVUclZ9pK6d2whEreKGDv20bNkW1lS0FVA
+	y7NktPKdnDeVe16uK6XWB4M1BLIhdM8eLYD9vG3LuBLpdzv8FVyR9RdqsiihAI5g/+laiqBVi2S
+	JSjXzK5lN5A23c1vFJadrMBll+5I=
+X-Google-Smtp-Source: AGHT+IEAaL8HzUDGp+9KU4r+vu6pC/oTqS8n5nfkqM3dTXstIgOstxWocIe41WpymO7HJ75Msr+qjdwdCh5TnlvAPfs=
+X-Received: by 2002:a50:d490:0:b0:571:b82f:630d with SMTP id
+ s16-20020a50d490000000b00571b82f630dmr2916994edi.0.1713970457343; Wed, 24 Apr
+ 2024 07:54:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] block: prevent freeing a zone write plug too early
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
-References: <20240420075811.1276893-1-dlemoal@kernel.org>
- <20240420075811.1276893-2-dlemoal@kernel.org>
- <715fd037-a8e5-4e62-939e-a446087eed2a@kernel.dk>
- <4530f039-0698-4cc0-94ab-5465d3f0e255@kernel.org>
- <1d4fb854-3151-41f5-b9a5-2a5cf2a37986@kernel.dk>
- <61ff5a29-9b16-4a52-b0ae-cfba2ea3c748@kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <61ff5a29-9b16-4a52-b0ae-cfba2ea3c748@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAJg=8jyC1+s80etZgWteps0Q0yEsR2NE23+Bf+Daa7zgJ2qKBA@mail.gmail.com>
+ <2c9182cc-9d7e-0108-90bc-5e66da966bdb@huaweicloud.com>
+In-Reply-To: <2c9182cc-9d7e-0108-90bc-5e66da966bdb@huaweicloud.com>
+From: Marius Fleischer <fleischermarius@gmail.com>
+Date: Wed, 24 Apr 2024 07:54:06 -0700
+Message-ID: <CAJg=8jwn5NDWmo4=prnFbZJuq7N3kdmt2evkQ9uEJCWi0Bs8dg@mail.gmail.com>
+Subject: Re: INFO: task hung in bdev_open
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller@googlegroups.com, 
+	harrisonmichaelgreen@gmail.com, "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/23/24 12:19 PM, Damien Le Moal wrote:
-> On 2024/04/24 1:36, Jens Axboe wrote:
->> On 4/23/24 9:16 AM, Damien Le Moal wrote:
->>> On 2024/04/24 0:21, Jens Axboe wrote:
->>>> On 4/20/24 1:58 AM, Damien Le Moal wrote:
->>>>> The submission of plugged BIOs is done using a work struct executing the
->>>>> function blk_zone_wplug_bio_work(). This function gets and submits a
->>>>> plugged zone write BIO and is guaranteed to operate on a valid zone
->>>>> write plug (with a reference count higher than 0) on entry as plugged
->>>>> BIOs hold a reference on their zone write plugs. However, once a BIO is
->>>>> submitted with submit_bio_noacct_nocheck(), the BIO may complete before
->>>>> blk_zone_wplug_bio_work(), with the BIO completion trigering a release
->>>>> and freeing of the zone write plug if the BIO is the last write to a
->>>>> zone (making the zone FULL). This potentially can result in the zone
->>>>> write plug being freed while the work is still active.
->>>>>
->>>>> Avoid this by calling flush_work() from disk_free_zone_wplug_rcu().
->>>>>
->>>>> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
->>>>> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
->>>>> ---
->>>>>  block/blk-zoned.c | 2 ++
->>>>>  1 file changed, 2 insertions(+)
->>>>>
->>>>> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->>>>> index 3befebe6b319..685f0b9159fd 100644
->>>>> --- a/block/blk-zoned.c
->>>>> +++ b/block/blk-zoned.c
->>>>> @@ -526,6 +526,8 @@ static void disk_free_zone_wplug_rcu(struct rcu_head *rcu_head)
->>>>>  	struct blk_zone_wplug *zwplug =
->>>>>  		container_of(rcu_head, struct blk_zone_wplug, rcu_head);
->>>>>  
->>>>> +	flush_work(&zwplug->bio_work);
->>>>> +
->>>>>  	mempool_free(zwplug, zwplug->disk->zone_wplugs_pool);
->>>>>  }
->>>>
->>>> This is totally backwards. First of all, if you actually had work that
->>>> needed flushing at this point, the kernel would bomb spectacularly.
->>>> Secondly, what's the point of using RCU to protect this, if you're now
->>>> needing to flush work from the RCU callback? That's a clear sign that
->>>> something is very wrong here with your references / RCU usage.. The work
->>>> item should hold a reference to it, trying to paper around it like this
->>>> is not going to work at all.
->>>>
->>>> Why is the work item racing with RCU freeing?!
->>>
->>> The work item is a field of the zone write plug. Zone write plugs have
->>> references to them as long as BIOs are in flight and and the zone is
->>> not full. The zone write plug freeing through rcu is triggered by the
->>> last write to a zone that makes the zone full. But the completion of
->>> this last write BIO may happen right after the work issued the BIO
->>> with submit_bio_noacct_nocheck() and before blk_zone_wplug_bio_work()
->>> returns, while the work item is still active.
->>>
->>> The actual freeing of the plug happens only after the rcu grace
->>> period, and I was not entirely sure if this is enough to guarantee
->>> that the work thread is finished. But checking how the workqueue code
->>> processes the work item by calling the work function
->>> (blk_zone_wplug_bio_work() in this case), there is no issue because
->>> the work item (struct work_struct) is not touched once the work
->>> function is called. So there are no issues/races with freeing the zone
->>> write plug. I was overthinking this. My bad. We can drop this patch.
->>> Apologies for the noise.
->>
->> I took a closer look at the zone write plug reference handling, and it
->> still doesn't look very good. Why are some just atomic_dec and there's
->> just one spot that does dec_and_test? This again looks like janky
->> referencing, to be honest.
->>
->> The relationship seems like it should be pretty clear. Any bio inflight
->> against this zone plug should have a reference to it, AND the owner
->> should have a reference to it, otherwise any bio completion (which can
->> happen at ANY time) could free it. Any dropping of the ref should use a
->> helper that does atomic_dec_and_test(), eg what disk_put_zone_wplug()
->> does.
->>
->> There should be no doubt about the above at all. If the plug has been
->> added to a workqueue, it should be quite obvious that of course it has a
->> reference to it already, outside of the bio's that are in it.
->>
->> I'd strongly encourage getting this sorted out before the merge window,
->> I'm not at all convinced it's correct as-is. It's certainly not
->> obviously correct, which it should be. The RCU rules are pretty simple
->> if the the references are done in the kernel idiomatic way, but they are
->> not.
-> 
-> OK. I am traveling this week so I will not be able to send a
-> well-tested cleanup patch but I will do so first thing next week.
+Hi Kuai,
 
-Sounds good, thanks.
+I see, thanks so much for the explanation!
 
--- 
-Jens Axboe
+Best,
+Marius
 
+On Mon, 22 Apr 2024 at 23:51, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>
+> Hi,
+>
+> =E5=9C=A8 2024/04/21 9:19, Marius Fleischer =E5=86=99=E9=81=93:
+> > INFO: task syz-executor.2:32444 blocked for more than 143 seconds.
+> >     Not tainted 6.9.0-rc4-dirty #3
+> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
+e.
+> > task:syz-executor.2  state:D stack:25264 pid:32444 tgid:32417
+> > ppid:8232   flags:0x00004006
+> > Call Trace:
+> >   <TASK>
+> >   context_switch kernel/sched/core.c:5409 [inline]
+> >   __schedule+0xd23/0x5bc0 kernel/sched/core.c:6746
+> >   __schedule_loop kernel/sched/core.c:6823 [inline]
+> >   schedule+0xe7/0x350 kernel/sched/core.c:6838
+> >   io_schedule+0xbf/0x130 kernel/sched/core.c:9044
+> >   folio_wait_bit_common+0x397/0x9c0 mm/filemap.c:1283
+> >   folio_put_wait_locked mm/filemap.c:1447 [inline]
+> >   do_read_cache_folio+0x2db/0x520 mm/filemap.c:3729
+> >   read_mapping_folio include/linux/pagemap.h:894 [inline]
+> >   read_part_sector+0xf7/0x440 block/partitions/core.c:715
+> >   adfspart_check_POWERTEC+0x82/0x710 block/partitions/acorn.c:454
+> >   check_partition block/partitions/core.c:138 [inline]
+> >   blk_add_partitions block/partitions/core.c:582 [inline]
+> >   bdev_disk_changed+0x891/0x15f0 block/partitions/core.c:686
+> >   blkdev_get_whole+0x18b/0x260 block/bdev.c:667
+> >   bdev_open+0x2eb/0xe90 block/bdev.c:880
+> >   blkdev_open+0x181/0x200 block/fops.c:620
+> >   do_dentry_open+0x6d3/0x18e0 fs/open.c:955
+> >   do_open fs/namei.c:3642 [inline]
+> >   path_openat+0x1b23/0x2670 fs/namei.c:3799
+> >   do_filp_open+0x1c7/0x410 fs/namei.c:3826
+> >   do_sys_openat2+0x164/0x1d0 fs/open.c:1406
+> >   do_sys_open fs/open.c:1421 [inline]
+> >   __do_sys_openat fs/open.c:1437 [inline]
+> >   __se_sys_openat fs/open.c:1432 [inline]
+> >   __x64_sys_openat+0x140/0x1f0 fs/open.c:1432
+> >   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >   do_syscall_64+0xce/0x250 arch/x86/entry/common.c:83
+> >   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> So this thread hold 'open_mutex' to issued IO to scan partitons, and
+> such IO never complete, consider that you are using nbd to test, and
+> nbd doesn't handle timeout by default, I really suspect this is not a
+> real issue, and this looks like nbd server side doesn't reply to
+> nbd-client.
+>
+> Thanks,
+> Kuai
+>
