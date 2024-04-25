@@ -1,229 +1,176 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEB283CBE
-	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 09:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714037264; cv=none; b=obG6f4tFkXET9se8u8jk3oNfDSdNi0FO3mOU2pLWsjigeCsENAeT943ItavHN8tupXr0jRSefgS56dD6VeZzw5BPgVV5Wv4er0cCEQiEEgwWjTQoEht0lFg9zJEg244E5Y9WjvEbIK1qwq7tzskRusghw1ZsANd3cPgX4yMRBKQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714037264; c=relaxed/simple;
-	bh=r+3Br1/X9yK4WycqLGInG81xrjTTXLUU0K5UKY+xOu4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8EMt5c4Ajvse6rBfPT/gwCKTcx4GHeNN2HBkP32hVXNhcRrILNbe6AX836WNgW9iqpxOqgZsJLCSftdrakD83u/FGEMR845KACVunE4n+LptQr/H48SeHXI+jIPsqxFfVvCaDdKSk73bTjVvTvWWyXJK+ahYoIZLX/ekvv8Ves=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dP6M7p5/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C3B85274
+	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 11:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714044694; cv=fail; b=VCrenfMeoeo4RNu4OjBYhoBBeORW70qq9WksUqawrbKJFULUkVchMXwJ/S5QRrnXwH2admy4gVkZQ7CcGhj8Jt2zek59FJ0HUMFkBmTsBXF12v4wWvDRk7UbKL7wCsVnkrlsdoaT6YND5J2jTLxKVXsv4IjUANlTBl63iyrWsgI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714044694; c=relaxed/simple;
+	bh=YLowGjtt9aBHFXVypEHe6yB453BEBxd9kXrLCBPADKI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rw4K3+1LD6+B/Q1lKN24zUDg6KjwM/JhVczjm7+uXVY4E1oNutZh3NoqMFzShgJImwX12l8v3pnUj44Ot4hJHL7HS/r737BS0zP8n70oYlD9B+BXQyvExMVzAgMpl7vkf4ECvVjHWFufK5sY3BrO0nIzpkbG9sFbdh2tSZqwjSo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=FHtyqEjG; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=lwxt/Oc6; arc=fail smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dP6M7p5/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714037261;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fKLSBuu032igi1UQCrIS2E/dWk4IoY59TMlvkYqUq/Q=;
-	b=dP6M7p5/zWmzDCP1W6XN5ACgE/bdgSxesllUbnJgFwtHTbjA6Tv6BA8iJHeylDiqYRelHE
-	jILlJ4ZhYWzsrZagPsztoL0Jjq1P6sPFDrEli/IgosNTugQ2q+xVlK77o/v3LFwBiXO7W7
-	UxIl2q5kdU0fHfwjXv7/9NaozqlnXow=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-327-Y8KILmATOimoaXzyt4z9ng-1; Thu, 25 Apr 2024 05:27:35 -0400
-X-MC-Unique: Y8KILmATOimoaXzyt4z9ng-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B95C718065AA;
-	Thu, 25 Apr 2024 09:27:34 +0000 (UTC)
-Received: from redhat.com (unknown [10.39.193.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A70F35C5CCC;
-	Thu, 25 Apr 2024 09:27:33 +0000 (UTC)
-Date: Thu, 25 Apr 2024 11:27:32 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: [PATCH 5/9] io_uring: support SQE group
-Message-ID: <ZioiBLWuPMQ6ywW5@redhat.com>
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-6-ming.lei@redhat.com>
- <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
- <Ziey53aADgxDrXZw@redhat.com>
- <Zihi3nDAJg1s7Cws@fedora>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FHtyqEjG";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="lwxt/Oc6"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1714044692; x=1745580692;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=YLowGjtt9aBHFXVypEHe6yB453BEBxd9kXrLCBPADKI=;
+  b=FHtyqEjGAcws0+/1d64W/sO0PzxzHBDGn18AcenNqIETCqqvAVcc1iVU
+   k0A9J7kWqB3fbqV8d2gZfU6Os/VGdhwjnAxez0VFSQxh+Fpg4qWo42r3w
+   MAbHqxyL8G1GlWD1bXtI4P0LQsFlInYZvSv/koQlhwt66B6hr9vark3VO
+   0Qr9DcdOn12wCufzMDH4OTt3nW8igypTVvwbI9v8z248E56cL5hnV20NY
+   9HMWnu3pSV5byil/4UxLkcWMHn3jsASM+L6pd8dl7fu1vbb/gaBp4ISyA
+   ltcAvivmdLDw91upv14Hk/TZdg99iXdliIhPheY0Na204FtA2QaFOd6sB
+   w==;
+X-CSE-ConnectionGUID: J7nnXNcrSsSB+N3HcfslyA==
+X-CSE-MsgGUID: xFNYsexbTe2QRk6C/xEuIw==
+X-IronPort-AV: E=Sophos;i="6.07,229,1708358400"; 
+   d="scan'208";a="14838695"
+Received: from mail-dm3nam02lp2040.outbound.protection.outlook.com (HELO NAM02-DM3-obe.outbound.protection.outlook.com) ([104.47.56.40])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Apr 2024 19:31:25 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FcYvd7M+c7rgcFpPjr2ZOOtBAwkNl/0WT1ddqP85l5UcbkF3Il9X0kWtBjUHQNQ+/EeTC4zDZDaKXpNaU+QiqCv4+uzdKsfmbUzSuXfpqNFlF7p1TJLBe1MxY1LV5TbUXEj7BBQTtRxRIx7NU7dDiqOP0B3PtbdI8Uytk0NFZN2ZjuxmbeYK+axAwK07dUwDSFTN/p3Av2e2vk0Cf6Z9L/1JDmc6N/sRy9aPgppba47R1RXUYQUGDrG5c4z2siArZBHTypn5Mw+JenzIpT72w7ZoGFzIvx/XfspiF9jHhK0bBBGg1D7BjGXqEtgdoi/A52ft6rNzheVryzt0bGE34g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YLowGjtt9aBHFXVypEHe6yB453BEBxd9kXrLCBPADKI=;
+ b=JB7VfHiMUHJB10Bliv4uxQfPdxj+nvEK72d/Sg6dIZdlfwt/ZLCVeDHWS9ffhnpj3BAGrOw0ffnIQVDkZy8AFjOLZ2KF+zTjKuyvuXZDnmg40Six3Mgs880BXDAob7gzWwSVdPE9rl1Dz4lK6Rgnjls14UUxZGxXsYaC0ozEREb/D2KE/U/TO01rAH2mXfMXChFLxDlOXTfs3dCeRmFiD8csuNZmrob6wQ8Ip7EbJFf19nOxG28WRY7NrnFr4IBDSIPHJvdKPYEaDxEFJZw8+bjmaBe7i7JyO+ljkaolOLfIkjsYS5H9UUpRdnrZCUWwdFiiiwZMqIgZzLlNuppjmw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YLowGjtt9aBHFXVypEHe6yB453BEBxd9kXrLCBPADKI=;
+ b=lwxt/Oc6QWyox5fXIJK6tAzfFyzjYd+1FlqD3thc9aqpJKeNFGiOrSXafP6w72iX0rNtl2A9VjIlRPMut8oaJ9ks3y31+D6pOfks9Zsu4bFHDNc+290BCVZQn6+y9Ixl0cV5KoJEVcAozW037WRH4OOrbF1amKMBql0+C/h15K8=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BY5PR04MB7090.namprd04.prod.outlook.com (2603:10b6:a03:223::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.46; Thu, 25 Apr
+ 2024 11:31:23 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c75d:c682:da15:14f]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c75d:c682:da15:14f%3]) with mapi id 15.20.7519.021; Thu, 25 Apr 2024
+ 11:31:23 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Yi Zhang <yi.zhang@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"nbd@other.debian.org" <nbd@other.debian.org>, Josef Bacik
+	<josef@toxicpanda.com>
+Subject: Re: [PATCH blktests v2 0/2] fix nbd/002
+Thread-Topic: [PATCH blktests v2 0/2] fix nbd/002
+Thread-Index: AQHakLPoQjy1N5XE4061LgLdbSAXmrFyraWAgAY5JQA=
+Date: Thu, 25 Apr 2024 11:31:23 +0000
+Message-ID: <jar6qqlpt3nzva6gfwtrvpmtuujsxhoorowvr2obveczcyno6l@yyjz66stfeko>
+References: <20240417104209.2898526-1-shinichiro.kawasaki@wdc.com>
+ <CAHj4cs9W1Ad7Q8axcbDd4tsuPPz3MBxGGqCNPT6efbkgCnGMwA@mail.gmail.com>
+In-Reply-To:
+ <CAHj4cs9W1Ad7Q8axcbDd4tsuPPz3MBxGGqCNPT6efbkgCnGMwA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BY5PR04MB7090:EE_
+x-ms-office365-filtering-correlation-id: aee153b3-d7d3-427f-fa88-08dc651b3cb2
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?6wD+I83gM1aDTNrG4J01SiC6R9CDgtslE0W7V8N+41XT1QhJk4YXkyH9NmxC?=
+ =?us-ascii?Q?0laXTp9ZkFvEAYCdjMpTJnruynfQ0cNOYU7cvPtI7tzSBgC6AQQog9vkv76S?=
+ =?us-ascii?Q?U8h0DjbeKCElLKHysfZf3/uBiwYph+d3SO6fDRaED9t8FHBQT81V9jyLLczi?=
+ =?us-ascii?Q?yJi5HshKmcJNsMm8E+lxVfrqU2RD/RKQ1BPF56/+RGafkT7Fyl8g1e4lOjIq?=
+ =?us-ascii?Q?EheVFLGPZ+BMxFTBZi+aq/gpFlHV1ozlnNG1K7DHO9I7AT8VnNV5a/KZNi+M?=
+ =?us-ascii?Q?s+l/rF40vuS7Ls2jZHVXwKy5vNinoD96aq/uZqdE/UI/p9SGxvJQP6gl2pGf?=
+ =?us-ascii?Q?8H7PyJ0dQvgPf3BHq3XloIYEiW4rUY0eQYnv/zT0InnDFxfD2hKiHoO9HpU2?=
+ =?us-ascii?Q?RcQdaCFr3VoGuL8cY4fzRBS5/rLO1KxtPAQHttKv1DLe5LFNJmPxLt0LNt7h?=
+ =?us-ascii?Q?2HHh5NLP1LVZSmusU83mYmi7+S+Bb/RkRMWSVc5KTZ2hbqhq28/ZeoNHksJs?=
+ =?us-ascii?Q?zvYQrESRZ3chYD+o0BFjKXOMcQoMQm8yZ8Rx7QK62ljU6e18k8K1T0YFUjjR?=
+ =?us-ascii?Q?W8ffSLJvKuopJYKbSvV0AZN1YsFXphJf+XOjtNkqmjGZJizU1KjlmLsgKJWW?=
+ =?us-ascii?Q?Cf6Cqsb6wO4CKHTGylXIHy3ZB+tJOd8h4bpPoLt9URa4iPJLWIfl6khE500r?=
+ =?us-ascii?Q?Ui3xPJ2Qw4/PWteCvll6yGCWPBLHP1NGkAf7j7h4A9pRdF4cKqHtnwb5/ImU?=
+ =?us-ascii?Q?G9lh3UXd7f6l5E3/bDCxd0C5/WGH2ODHjqOwLuE2+BnkBJlyv6wVAEabpKrp?=
+ =?us-ascii?Q?RnTQS5oIgVoSIfc3aBDgaB3j/ANSuZbMK5bGT/nczX8/zAyAjPjsQwoZi3+j?=
+ =?us-ascii?Q?dCZgpnKifYwgFj1ybw2Po9xWdo7OivXwK0PkinM5ZmEB5LxmgU1/ZKZel5Rm?=
+ =?us-ascii?Q?+Bsmeo9sOSCSGd0O4AVpP9HQiHmSrFGDaxrBAJFnoXZBIeS4aIFwFM6TbJlt?=
+ =?us-ascii?Q?mHGRVjqHJdeh/9xx+nyzsGH1oVwnnfHZC81haqW2dn2wq4GpY3eMuZI/OtPF?=
+ =?us-ascii?Q?0W7QXAS1AN+btKt1PIYeMhGYhEb8B2mwaSuQlCYyeIGZ3sBWo1kQ5zjsxvYI?=
+ =?us-ascii?Q?xOvCLPYvY7BF99hd3bTRTy2DhoLEU9piC8QczhgpOLUg3n2gKQ490/bULjfa?=
+ =?us-ascii?Q?vcXcr53ETq5UgmZIkgWp2NDqww4C3hN436cbywAuC0p95GZoz/xWuH12GRm7?=
+ =?us-ascii?Q?WctPszLId0By6ApTOFQW+SM+BwCR++HUpRsv+9J6x1Zjm6vB0wyJaRf2AkXQ?=
+ =?us-ascii?Q?xecI+SRxZQZO15yJPGbHlCY2iCDrn6WOLYwmvX7yX1/tbQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?q36sjdIk8I2FGUy8iG1M77UwH5w2j5BIJxrR/LcN3sWH0xJPR3FtuzEH4Ojf?=
+ =?us-ascii?Q?lQ38Zdo59pKLp36NpL4/1j+CNOgjkL+c8aC494osjEBrBRqFuUZGpjDKdnbq?=
+ =?us-ascii?Q?S2D/TPcqLMU0bhzQ+DlIW6EJc/sOjIrOI0+5CR8HegmNYRTP38kt2+ehfD87?=
+ =?us-ascii?Q?95qJ8OLsPMpcL65THmqBAM32nCEYER7aJnYhaAPVuSlmZ5GnBDoksswTLEc5?=
+ =?us-ascii?Q?Qu3I+ru0+B4sYefYiNrkTL6W1xuWiqVFkUwkVITMY41Mx5Fe1i9EJ2kqp+8w?=
+ =?us-ascii?Q?ziys2RRvejSUfyxNIydykoIxNTNZNYzVmrTbSopB8Vx6K1H0F1g4qx+Z/ZLN?=
+ =?us-ascii?Q?CyG5BQ8F8qUpyYN/HdtukgZJoqYPqm4HnOpoepgHK//YI3G+LEX17mRkUqFX?=
+ =?us-ascii?Q?MuhbyJwU1G8N0g42OXVkp2CdmJVkDiEXy5LDv8SdRarfrCzg/WB/+vNjD5Nh?=
+ =?us-ascii?Q?IlveG6/HtooxHWodYe/1+uHepP4To7zvUFtgjgpX55lOBFn1WujJygzWe4Ko?=
+ =?us-ascii?Q?pFpC4YZYx1D4ARBf7702laS8VqryfMVuetm4VB/dbfOOrpK7MNBWn4+EFzQX?=
+ =?us-ascii?Q?5UPviSKLFo72UkmxNbhmahIBPHiFWXLF0axb3cxUBFQLt8FWnoXIZv0CGLVD?=
+ =?us-ascii?Q?nFFN8CrKQrqlz6uk+hSrfjTCioygY1q2wNGChbTww+XZ/j9vJ/OK8lctU4Fd?=
+ =?us-ascii?Q?tH/of49HNjfCvjpJXYMZrNQqV978PrnSqVWqcmAOX1fpnG16/SLQIMZfIyFS?=
+ =?us-ascii?Q?oucNp4sM6BHovkZSVNPu+OZN3mUYBxVfivOYLNai3eM5U4SaOd2D6CqABLzy?=
+ =?us-ascii?Q?yyp/nUsbG95bKWOmhptoNQSyKcOQBibGpK8FCiVFSNGHjqD2qA2jG3kVlYt9?=
+ =?us-ascii?Q?+8oFZzNFdHlSYuiGY8BAa++nD9n8mwQ3NmXQWgK2Zf2tXtm2LrseRyLra3zv?=
+ =?us-ascii?Q?o1dqWddwuzjDTQFzaMHZ2TO3l3+AqKe+mwjVjEYAfWKm9/RgphEL+wfruSwz?=
+ =?us-ascii?Q?8/z0MRvmIh7xqqLy6988x+ZSFob6qdnAcAbfyEt4q7SKILZ3e/xy6szBnva4?=
+ =?us-ascii?Q?4HTe/KrYjBdS6xBq1A9DaNaLrVd7D4EH+brV2gqhP5bLqOPcMuJL13HVXBHq?=
+ =?us-ascii?Q?fRWkWR6eYb7G+aWHbGHABwAKfhbMjxLcvxP0DjTuNcWk0PHMXhR5v3P0jtUa?=
+ =?us-ascii?Q?2cxpqAXBbkIWtjs2y2LmYvbyCC5MsMWhidsb5CYHxb62JsAAD+r6O5kTJKa2?=
+ =?us-ascii?Q?t43r2BEdgskjjUbkBcM7LOoCtkMnf9/9BXIeubUGQ6F4tIfnBm5Wi/mQQRN9?=
+ =?us-ascii?Q?XRXOlRusTDZ9WaQGYnFENzVI6oq6IwZFmz0A2c0W0hT6R/zehqrAJmHEmyjL?=
+ =?us-ascii?Q?lRoLIMGK5ikXzqYOZ4HT/k2EB2pqeT0NQU2+ExM82YfTj+nfSilmo/1qw/fY?=
+ =?us-ascii?Q?3fwMUdBVE7BK8gCDQBAxnBRR9YoQgB1zHhxc5ThIQTXsrZE3+uLrSV6ksvwS?=
+ =?us-ascii?Q?2uLynz6Md+pfvF/oH9sxk/KEKL2KwAkKNs9s6bqHTQggriZIJyMAseBtKXq3?=
+ =?us-ascii?Q?UCLa4g66b3AJGiBzDYgiHkWK0NJz+Kf6YxTQTtDwUgKSSa0hmShkjSFnAy1H?=
+ =?us-ascii?Q?X/euQ09RU17A6JHlre6Pd+g=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <C5F3C3E14188F345B23AE6255C41F3D5@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zihi3nDAJg1s7Cws@fedora>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	cNDN6cUmL6yRl+lp2iau9rb42U8X29blVa+bvj2uZpwWG02+ncKLQBNyfV6mweNCYQlnXmneKB5Ihfnmjmee62ce9WSDhVN5Joie1O6+5EvUobWWXM7wCr/hQb/bC+kLRvARn7A/cy61Ktc3IdTMSEp3zquWRJgNsfJjk5cKx0CbshDkgMPQilpYZEllt/PwZpshsBtZ5mGIYDZ0gLw62XObEYXgCgw7ifFO+zHzE/7hS6UL/tjJj6+XMDPJwCi6pFtg83va5Uw7Lac+6kiBkIHeCcyzA3/H3DsvVFHrWFrUFm4ZYoTQOoSoolgAUe0I9knEzD7WpcgTxBr7hSUVijET5nR1NJrfGBC34eMUndw44YYdsQPjO03BU3urI1eACM4idvAZRg51XJdxnj1rtobTZGo1Kjt4cBoFf9hPm3d+axl/rn/Hyrw/dhcA04CeNMFOJGwdpwZE5/oqjudVvFxYEeWXyVxwrQ/dSUt1DMI45jRgqyvkk0u9DlCn/UBZ+LX3qBAg1Thjtzh/9wj+HqtnU23VpiQr+GPOEz46IoSlpKq3MhUcCHwufYE9lQlBcEOBOBvDK5SYIPVMCMuYx/qC4Hl9RwWh6nYW7QTWGrqv1FI/4ERKuiYn6RVCSYfv
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aee153b3-d7d3-427f-fa88-08dc651b3cb2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Apr 2024 11:31:23.6429
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: prRDb8aAjWeTyvMrL4oh5bbxBUkJ9eAd6H1Q1ylBfPpjrDnLkiHITmTId7C94IM1m8njt/Zo1hxj381HtuafJ75fPZNljXSN9c4J+LOYngk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB7090
 
-Am 24.04.2024 um 03:39 hat Ming Lei geschrieben:
-> On Tue, Apr 23, 2024 at 03:08:55PM +0200, Kevin Wolf wrote:
-> > Am 22.04.2024 um 20:27 hat Jens Axboe geschrieben:
-> > > On 4/7/24 7:03 PM, Ming Lei wrote:
-> > > > SQE group is defined as one chain of SQEs starting with the first sqe that
-> > > > has IOSQE_EXT_SQE_GROUP set, and ending with the first subsequent sqe that
-> > > > doesn't have it set, and it is similar with chain of linked sqes.
-> > > > 
-> > > > The 1st SQE is group leader, and the other SQEs are group member. The group
-> > > > leader is always freed after all members are completed. Group members
-> > > > aren't submitted until the group leader is completed, and there isn't any
-> > > > dependency among group members, and IOSQE_IO_LINK can't be set for group
-> > > > members, same with IOSQE_IO_DRAIN.
-> > > > 
-> > > > Typically the group leader provides or makes resource, and the other members
-> > > > consume the resource, such as scenario of multiple backup, the 1st SQE is to
-> > > > read data from source file into fixed buffer, the other SQEs write data from
-> > > > the same buffer into other destination files. SQE group provides very
-> > > > efficient way to complete this task: 1) fs write SQEs and fs read SQE can be
-> > > > submitted in single syscall, no need to submit fs read SQE first, and wait
-> > > > until read SQE is completed, 2) no need to link all write SQEs together, then
-> > > > write SQEs can be submitted to files concurrently. Meantime application is
-> > > > simplified a lot in this way.
-> > > > 
-> > > > Another use case is to for supporting generic device zero copy:
-> > > > 
-> > > > - the lead SQE is for providing device buffer, which is owned by device or
-> > > >   kernel, can't be cross userspace, otherwise easy to cause leak for devil
-> > > >   application or panic
-> > > > 
-> > > > - member SQEs reads or writes concurrently against the buffer provided by lead
-> > > >   SQE
-> > > 
-> > > In concept, this looks very similar to "sqe bundles" that I played with
-> > > in the past:
-> > > 
-> > > https://git.kernel.dk/cgit/linux/log/?h=io_uring-bundle
-> > > 
-> > > Didn't look too closely yet at the implementation, but in spirit it's
-> > > about the same in that the first entry is processed first, and there's
-> > > no ordering implied between the test of the members of the bundle /
-> > > group.
-> > 
-> > When I first read this patch, I wondered if it wouldn't make sense to
-> > allow linking a group with subsequent requests, e.g. first having a few
-> > requests that run in parallel and once all of them have completed
-> > continue with the next linked one sequentially.
-> > 
-> > For SQE bundles, you reused the LINK flag, which doesn't easily allow
-> > this. Ming's patch uses a new flag for groups, so the interface would be
-> > more obvious, you simply set the LINK flag on the last member of the
-> > group (or on the leader, doesn't really matter). Of course, this doesn't
-> > mean it has to be implemented now, but there is a clear way forward if
-> > it's wanted.
-> 
-> Reusing LINK for bundle breaks existed link chains (BUNDLE linked to
-> existed link chain), so I think it may not work.
+On Apr 21, 2024 / 20:29, Yi Zhang wrote:
+> Cannot reproduce the failure within 10000 cycles test now, thanks.
+>=20
+> Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-You can always extend things *somehow*, but it wouldn't fit very
-naturally. That's why I feel your approach on this detail is a little
-better.
-
-> The link rule is explicit for sqe group:
-> 
-> - only group leader can set link flag, which is applied on the whole
-> group: the next sqe in the link chain won't be started until the
-> previous linked sqe group is completed
-> 
-> - link flag can't be set for group members
-> 
-> Also sqe group doesn't limit async for both group leader and member.
-> 
-> sqe group vs link & async is covered in the last liburing test code.
-
-Oh right, I didn't actually notice that you already implement what I
-proposed!
-
-I was expecting the flag on the last SQE and I saw in the code that this
-isn't allowed, but I completely missed your comment that explicitly
-states that it's the group leader that gets the link flag. Of course,
-this is just as good.
-
-> > The part that looks a bit arbitrary in Ming's patch is that the group
-> > leader is always completed before the rest starts. It makes perfect
-> > sense in the context that this series is really after (enabling zero
-> > copy for ublk), but it doesn't really allow the case you mention in the
-> > SQE bundle commit message, running everything in parallel and getting a
-> > single CQE for the whole group.
-> 
-> I think it should be easy to cover bundle in this way, such as add one
-> new op IORING_OP_BUNDLE as Jens did, and implement the single CQE for
-> whole group/bundle.
-
-This requires an extra SQE compared to just creating the group with
-flags, but I suppose this is not a big problem. An alternative might be
-sending the CQE for the group leader only after the whole group has
-completed if we're okay with userspace never knowing when the leader
-itself completed.
-
-However, assuming an IORING_OP_BUNDLE command, if this command only
-completes after the whole group, doesn't that conflict with the
-principle that all other commands are only started after the first one
-has completed?
-
-Maybe we shouldn't wait for the whole group leader request to complete,
-but just give the group leader a chance to prepare the group before all
-requests in the group (including the leader itself) are run in parallel.
-Maybe io_issue_sqe() could just start the rest of the group somewhere
-after calling def->issue() for the leader. Then you can't prepare the
-group buffer asynchronously, but I don't think this is needed, right?
-
-Your example with one read followed by multiple writes would then have
-to be written slightly differently: First the read outside of the group,
-linked to a group of writes. I honestly think this makes more sense as
-an interface, too, because then links are for sequential things and
-groups are (only) for parallel things. This feels clearer than having
-both a sequential and a parallel element in groups.
-
-> > I suppose you could hack around the sequential nature of the first
-> > request by using an extra NOP as the group leader - which isn't any
-> > worse than having an IORING_OP_BUNDLE really, just looks a bit odd - but
-> > the group completion would still be missing. (Of course, removing the
-> > sequential first operation would mean that ublk wouldn't have the buffer
-> > ready any more when the other requests try to use it, so that would
-> > defeat the purpose of the series...)
-> > 
-> > I wonder if we can still combine both approaches and create some
-> > generally useful infrastructure and not something where it's visible
-> > that it was designed mostly for ublk's special case and other use cases
-> > just happened to be enabled as a side effect.
-> 
-> sqe group is actually one generic interface, please see the multiple
-> copy( copy one file to multiple destinations in single syscall for one
-> range) example in the last patch
-
-Yes, that's an example that happens to work well with the model that you
-derived from ublk.
-
-If you have the opposite case, reading a buffer that is spread across
-multiple files and then writing it to one target (i.e. first step
-parallel, second step sequential), you can't represent this well
-currently. You could work around it by having a NOP leader, but that's
-not very elegant.
-
-This asymmetry suggests that it's not the perfect interface yet.
-
-If the whole group runs in parallel instead, including the leader, then
-both examples become symmetrical. You have a group for the parallel I/O
-and a linked single request for the other operation.
-
-Or if both steps are parallel, you can just have two linked groups.
-
-> and it can support generic device zero copy: any device internal
-> buffer can be linked with io_uring operations in this way, which can't
-> be done by traditional splice/pipe.
-
-Is this actually implemented or is it just a potential direction for the
-future?
-
-> I guess it can be used in network Rx zero copy too, but may depend on
-> actual network Rx use case.
-
-Kevin
-
+Thanks for the test. I've applied the patches.=
