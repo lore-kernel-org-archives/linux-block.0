@@ -1,54 +1,95 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B691494B4;
-	Thu, 25 Apr 2024 13:15:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6C51494D1
+	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 13:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714050919; cv=none; b=ZGRKCSqiRxja5a2BJl+sORzXisrpZVvojP04Ng+FdyoM3VTvmbEcKTeBSgeoNdZq6D9O+wWlzsdBUqg2cQPiN0LNlA3zWyL7xjFo0HGXIXoKFTYSERZ1Kx3TXd1ftXKaqI7PzOU0SlXh446/7OlYEk2o3F+ZC3zyKnMnjsWTmmc=
+	t=1714052900; cv=none; b=bKUJe/kQ96SrjL0NVscb5JKye6BLwGpRE12vv0uiU8NC463Va53c+8KV+GOcQB5PF6j7At7+FaBQnQxVf23iGg27D6ajlqajG9UhRrR7DpsAqEZGMT/E/oOqGKUEGfiWeot3hiCyD2+oZp+1WqRreFKIAXAyhNVGxQYR/KQFMsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714050919; c=relaxed/simple;
-	bh=a8oXnegoRuH7QSHKQT/j9X3v7gxfYFvlmdSHuZ9hPO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GnM8YsQexV1J2+WDTqnylwTkUsQVhRJ8GpOm6yc6LPNBc1ohmo8PfeJToyfzxmprQei2dWP6sS+6WDbKGpGJlmf2hi7tA617V+yKJy5fh1eEZM//PTptPWVa4CwDKlZIT622nFI6Vi2WUKqVSc6Gz5MsVUoixp38uJb07/Qtazc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 0B8FA68C4E; Thu, 25 Apr 2024 15:08:45 +0200 (CEST)
-Date: Thu, 25 Apr 2024 15:08:44 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Lennart Poettering <mzxreary@0pointer.de>
-Subject: Re: API break, sysfs "capability" file
-Message-ID: <20240425130844.GA6022@lst.de>
-References: <ZhRSVSmNmb_IjCCH@gardel-login> <ZhRyhDCT5cZCMqYj@kbusch-mbp.dhcp.thefacebook.com> <ZhT5_fZ9SrM0053p@gardel-login> <20240409141531.GB21514@lst.de> <d7a2b07c-26eb-4d55-8aa7-137168bd0b49@kernel.dk> <Zh6IpqnSfGHXMjVa@gardel-login> <b74f99e8-5a50-4e93-987f-0bcfc0c27959@kernel.dk> <Zh6KZ7ynHuOd0mgQ@gardel-login> <c3a6a639-bf15-4f8b-abbd-978d9836d93c@kernel.dk> <5ef0ac71-21dd-46d7-a0c1-1b1b391e51a8@leemhuis.info>
+	s=arc-20240116; t=1714052900; c=relaxed/simple;
+	bh=yijp6mDuEryQSYSEQujTRdi93LxCLeRMH+/iuMy9lvk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=QUHRpkGlq5vtyxUJvirl1AIrmQVs1H3c310NVnA2jGYFjE360XXNgfxQ3uHw+cjRI3rFNmepE4cHvNvCNtTytZaqP13yUadIUV2xphEoKM1vlUR59KSLfoXpoY/4U3j1iNnr2RNFK43HS+pMWfHa85M9uGlMZh7OYbb6dQM97yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pvW4Isqh; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pvW4Isqh"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7da9f6c9c17so7397539f.2
+        for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 06:48:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714052897; x=1714657697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JPHeMhxWq9nFoJQSdKvm8ireF5N0fGXL8+p/dhppbKU=;
+        b=pvW4IsqhMr0Bu9jyZ6vYoHTj9rPpsrK7vXoTcnRavgBO3ARhZBdBi754uJXm7Frbai
+         JCO1tq47p70covhZBWk+6OqJl3S94Go3AEHIjJUWeQCZtqBI8XAWLDQhCeGDjTjtYOVS
+         1GweirISznoqM8WI3p7/sYxfXNrbeC04VOfNm/GKHq3kejKy1+sOp9u32AL50yvSHLoz
+         DEVEZYjDFluMgbkrBSukIDdyXacOjbCGcrNkLx6x/EF0n4raBFzKJKih60m1EoYFmyNH
+         8mIXvG+pcplMvIK9tNBeu4jCwdHJcolou2reSfMW1+lDOwEFP7VqDZb3GhUsH3sW5cUf
+         VVtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714052897; x=1714657697;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JPHeMhxWq9nFoJQSdKvm8ireF5N0fGXL8+p/dhppbKU=;
+        b=raRF95SKI2vGHnh7pRilvMBWtyGHd2KlqwBY+5fSEyldl5w9ieerDB1U76Zg2BJRmp
+         kDAQn2tV0piGV1H5r1jusPk+cHxp60AZu2wDVa1dRa/5iT0cpnJYYAYx0OD0p8eDsBVt
+         EC2uj8UOz7acyq0T/V2cgmUr4ocab+Kd3UMFYhj50YMSENEHcwEAyBWPBL1cqB6RuVB0
+         apZWr4wqUtSr0WRE38lJBSjz/RS/4asofQsqlZWo4bAnWCOuTnC3Be6UxykCisZo6EiW
+         nGAtnFlGsidrsQSTqaM0PjQYo5WFJmmv1QiSJx4fLyRjfeCu/+wAau/g/HxRMBaH+fBN
+         O+ag==
+X-Gm-Message-State: AOJu0YyPHdx29YEKfNOBzSm0vW4SlqnvwHJ6ZG3ArRc4FFoTyX+nx2Xj
+	ZlzvKdahvKRMKMYHZvoEOl078QPJz2BQuquwrAVjtzWJlcYS3krSfsPqoyBaI/4=
+X-Google-Smtp-Source: AGHT+IHqg9KQni4h2e+Fa+0oBBFAhys8L+aTh5tu93cKCQvaNfLZ1u4kK62O9xK/urRkpRAUHPYtAA==
+X-Received: by 2002:a5d:954f:0:b0:7da:7278:be09 with SMTP id a15-20020a5d954f000000b007da7278be09mr6506167ios.2.1714052896720;
+        Thu, 25 Apr 2024 06:48:16 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id i14-20020a02c60e000000b00482fd2a95e8sm5048887jan.43.2024.04.25.06.48.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 06:48:15 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: linux-block@vger.kernel.org, Changhui Zhong <czhong@redhat.com>, 
+ Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <e5fec079dfca448cc21c425cfa5d7b291f5faa67.1714046443.git.johannes.thumshirn@wdc.com>
+References: <e5fec079dfca448cc21c425cfa5d7b291f5faa67.1714046443.git.johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH] block: check if zone_wplugs_hash exists in
+ queue_zone_wplugs_show
+Message-Id: <171405289567.163506.2493622305669607904.b4-ty@kernel.dk>
+Date: Thu, 25 Apr 2024 07:48:15 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5ef0ac71-21dd-46d7-a0c1-1b1b391e51a8@leemhuis.info>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Wed, Apr 24, 2024 at 10:09:35AM +0200, Linux regression tracking (Thorsten Leemhuis) wrote:
-> Jens, quick question: what's the plan forward here and who will realize
-> what you outlined?
+
+On Thu, 25 Apr 2024 05:02:39 -0700, Johannes Thumshirn wrote:
+> Changhui reported a kernel crash when running this simple shell
+> reproducer:
+>  # cd /sys/kernel/debug/block && find  . -type f   -exec grep -aH . {} \;
 > 
-> I'm asking, as afaics nothing happened for a week (hope I didn't miss
-> anything!). Sure, it's not a regression from the last cycle or so, so
-> it's not that urgent. But hch's "It is not a regression at all" last
-> week made me worry that this in the end might not be solved unless
-> somebody has it on the todo list. Normally I would have CCed Linus at
-> that point anyway to get his stance, but from your statements it sounds
-> like this is unnecessary here.
+> The above results in a NULL pointer dereference if a device does not have
+> a zone_wplugs_hash allocated.
+> 
+> [...]
 
-I'll get to adding a real interface in a bit.  Sorry, I've been
-a little too busy the last days.
+Applied, thanks!
+
+[1/1] block: check if zone_wplugs_hash exists in queue_zone_wplugs_show
+      commit: 57787fa42f9fc12fe18938eefc2acb2dc2bde9ae
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
