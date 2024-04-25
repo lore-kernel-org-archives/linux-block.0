@@ -1,191 +1,169 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8A64C98
-	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 01:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0065B10A22;
+	Thu, 25 Apr 2024 01:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714010061; cv=none; b=MVCu8zBu70szwz94FcmYO+NHABtc5DgQKcPQ+Awpc6xH5JHcnNegyuX6lbK2CFB7J457cs/kcbDyTJ8loqJExQjfI03DnhBqOk+DlGxNZpNBkZF5oOHdryLzlP6tptzgpYb7TXTqMmSBx5AcLvZpgGrvpaGk9J2colCpMiDdGRI=
+	t=1714010290; cv=none; b=HzlecLodwPXE/d90PkzKFWa3yEs6PWYcU6qX5eVebTN7EXDa+4BVDfWSRg7or33wkEhVGZCKBrSekG/NZEtiNdhvOeKi7FrCOnJkyQv+j8mV5fWAdDXxdcKE2U2Tenh5pBdi/L0fKI54j4F7jrvVU/ZW6LO1CujXCx7BHvSNzNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714010061; c=relaxed/simple;
-	bh=YiJQQm3WLB1WWnCg6KHdif+jeioO6Q4aOnhRdwHr1rg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=gVh9XWERdF2vpw5JqP3EdELhYUWJ6IExMq1pxRXJBPb97ZoGSyL88DgBRv3lVQOOeWhCAQS43Ep+nuF9gaO10flyjjfScv3O39qCXDVqKMHY+W97+SnOrVfVs8OVFYO/hj7xeYZQ2cUtjKLMqoWO05d1R9Q9mIPcxEW6dh6Zs/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e202B2Bl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1714010290; c=relaxed/simple;
+	bh=FijTadZiQvDrmRmd9+9OK33UEMFnjAkJBXsNPUVx/aQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WwzFXYaU1nn9SysZIgw6Se1hfG+tQbuN8J693wqOVpykE+R06Ex3jlF1dSeWy30H/BiZzEUSByUFYQqEPW+68Unnnk7VegjbRikzWJqQ7WAqlWmNapeWlZmlZvuThhFdnitW312ZupBN8W3GGnQz60F4dXrDhSYNyLNiHBsM99g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=i/VqEWwE; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e202B2Bl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714010058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=KAGedGByEbushDO5nbCtOFuWCCxLdgMCo2UW6xpFwzQ=;
-	b=e202B2BluSzRxiyk8FEE5csZZyeAVhavvfnNri/ReDUYg3EOGQnw90fNqHj43niUn73OdL
-	GmXUgBhJOf5EKNE1/kMyjXTCFQi5gYZ1FWE2rjuHOFBNwHTGGlTbRAS+fXxFtoVvwENEsT
-	4RglK/nva1/AimnLULrKa5mcAcU34r0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-9a8V4pcUPeOrygjwA7WxEg-1; Wed, 24 Apr 2024 21:54:17 -0400
-X-MC-Unique: 9a8V4pcUPeOrygjwA7WxEg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a556121c01aso22227266b.2
-        for <linux-block@vger.kernel.org>; Wed, 24 Apr 2024 18:54:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714010055; x=1714614855;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KAGedGByEbushDO5nbCtOFuWCCxLdgMCo2UW6xpFwzQ=;
-        b=T6N5vQSJTso5y+Yk/WyZhqQsX9BLcH3XH1u4FLcjbSZVxsO/MZyyrCZlP0/b4EWGwe
-         p7FUn0l/UDjC3yyRm/e7uccmw0oCqAbLD8pKaWNhMgOnKs2MwdHpGjuE/emw1oaRMLMT
-         /sjS0YEeCa8Zg3S5ryF0eVpSLxBY9RAhd8okEp9YfNEb95GRP+NGhFFHplV0CnGm+oZu
-         ulGZGT4+hobz5wI7LZncq29Qcudgzg9xB1WLR9/JhPw/9laHViCmWTrqFQBwTbURgvps
-         8jS+yp77XwPLd+Ls2Ce18EI9PgtHdb/R3EvGtNa4/303wlCWiB6uaw9x0DeD2tIlCNjm
-         yCrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdV/GTEscsY+dvsqXjFcQi/WW1kgtQRyRPgB2EWDeV1afoKffsCrN/fy9cB6Hxng44Lv2O8+wilGQRUzFubC6rLegaz/qP7Gk/sU4=
-X-Gm-Message-State: AOJu0YwbxPrL9eN9neTybCRJZ01NSsCfSsADCELkNybJPUJ17ZXgOlYp
-	rc498ZVRX9eILgeLEmxgG40vnIrU5XgOpPFwu93lzjdxy37eE4qdmhBfk2rzolH60AmDVsgH5DJ
-	N6jSKu7BnN2Ng0tf3Iyo4ysELAzMBCA+t6swtxNU6WhFjhCpfHH5U+/MoEix/XMXxqXTTHQd7xR
-	zEQFu+moWOFRsytNc/xknUgcJ95bumaBXM4OrWbCkCmDeVuWm8
-X-Received: by 2002:a17:907:7213:b0:a55:6507:6a35 with SMTP id dr19-20020a170907721300b00a5565076a35mr3563362ejc.49.1714010055622;
-        Wed, 24 Apr 2024 18:54:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGvtiFU55qbSX2FKMazqad263K0VBdlwL6kks2UTCh+/lFxWJoXQR/hyUU7/RxZEe6ZiXXaR1YiYMm29WfWUcQ=
-X-Received: by 2002:a17:907:7213:b0:a55:6507:6a35 with SMTP id
- dr19-20020a170907721300b00a5565076a35mr3563345ejc.49.1714010055287; Wed, 24
- Apr 2024 18:54:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="i/VqEWwE"
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43P0hpPi011500;
+	Thu, 25 Apr 2024 01:57:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2023-11-20;
+ bh=y/IH+dwowyXx6zFMUjLoi6/J7l1DbgA6+TyLeUVYpow=;
+ b=i/VqEWwE+g5lzFaBBrTlaXsQFPJyDPqRZPji2f5GhbtfrkOLHZ1jfE6gj/rf/Kg+itLU
+ qEc8qL/svVJAjWPDTb9Esiq2SnH2Zk1xMJ512efPHJvFRJpvGxTb9TvYNsxJiZMeQDcq
+ 6ckEEpBbksQXGjZM7QTmcg4ZqKCtYGjJ7SJ+JRBBaMTqxozYt7FSDGKzRA4ZvZzzSFyM
+ eYtHjAqBc0U+zL7oOAefbKpLddshEk+sucL/Dhz0XSAmqlGaHJLOBN70svY3/QemTxaJ
+ 6z1S5anqXzjRWJ2SUN2M+2qwTVc2SVpzYaG6hfukVIzJ64BJUZ9GUMHTwATUmJumCJ6S IA== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xm5ausg4x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 25 Apr 2024 01:57:15 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43P0Sks8025252;
+	Thu, 25 Apr 2024 01:57:15 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3xm45fyh23-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 25 Apr 2024 01:57:14 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43P1vCuP009586;
+	Thu, 25 Apr 2024 01:57:13 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3xm45fyh1b-3;
+	Thu, 25 Apr 2024 01:57:13 +0000
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+        Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+        "Juergen E. Fischer" <fischer@norbit.de>,
+        Xiang Chen <chenxiang66@hisilicon.com>,
+        HighPoint Linux Team <linux@highpoint-tech.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>, Brian King <brking@us.ibm.com>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        John Garry <john.g.garry@oracle.com>, Jason Yan <yanaijie@huawei.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        Nilesh Javali <njavali@marvell.com>,
+        GR-QLogic-Storage-Upstream@marvell.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Alan Stern <stern@rowland.harvard.edu>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+        megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net
+Subject: Re: convert SCSI to atomic queue limits, part 1 (v3)
+Date: Wed, 24 Apr 2024 21:57:02 -0400
+Message-ID: <171362345502.571343.9746199181827642774.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240409143748.980206-1-hch@lst.de>
+References: <20240409143748.980206-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Guangwu Zhang <guazhang@redhat.com>
-Date: Thu, 25 Apr 2024 09:54:04 +0800
-Message-ID: <CAGS2=YobBtv0JnQJSYcu9x57y_VqS7-4NemWjsFdaPcpLLVm1Q@mail.gmail.com>
-Subject: [bug report] Format FS failed with ublk device
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-25_01,2024-04-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
+ mlxscore=0 phishscore=0 spamscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404250012
+X-Proofpoint-ORIG-GUID: USRSK6KOfQ5vH9L6gr8AM_aaScaBYiB0
+X-Proofpoint-GUID: USRSK6KOfQ5vH9L6gr8AM_aaScaBYiB0
 
-Hi,
-the format FS command will hung up  with ublk device.
+On Tue, 09 Apr 2024 16:37:25 +0200, Christoph Hellwig wrote:
 
-# ublk --version
-ublksrv 1.1-7-gf01c509
+> this series converts the SCSI midlayer and LLDDs to use atomic queue limits
+> API.  It is pretty straight forward, except for the mpt3mr driver which
+> does really weird and probably already broken things by setting limits
+> from unlocked device iteration callbacks.
+> 
+> I will probably defer the (more complicated) ULD changes to the next
+> merge window as they would heavily conflict with Damien's zone write
+> plugging series.  With that the series could go in through the SCSI
+> tree if Jens' ACKs the core block layer bits.
+> 
+> [...]
 
-kerne: 6.9.0-rc4.kasan
+Applied to 6.10/scsi-queue, thanks!
 
+[01/23] block: add a helper to cancel atomic queue limit updates
+        https://git.kernel.org/mkp/scsi/c/293066264fb4
+[02/23] bsg: pass queue_limits to bsg_setup_queue
+        https://git.kernel.org/mkp/scsi/c/4373d2ecca7f
+[03/23] mpi3mr: pass queue_limits to bsg_setup_queue
+        https://git.kernel.org/mkp/scsi/c/9042fb6d2c08
+[04/23] scsi: initialize scsi midlayer limits before allocating the queue
+        https://git.kernel.org/mkp/scsi/c/afd53a3d8528
+[05/23] scsi_transport_fc: add a max_bsg_segments field to struct fc_function_template
+        https://git.kernel.org/mkp/scsi/c/7eaae991c30d
+[06/23] scsi: add a no_highmem flag to struct Scsi_Host
+        https://git.kernel.org/mkp/scsi/c/6248d7f7714f
+[07/23] scsi: add a dma_alignment field to the host and host template
+        https://git.kernel.org/mkp/scsi/c/5b7dfbeff92a
+[08/23] ufs-exynos: move setting the the dma alignment to the init method
+        https://git.kernel.org/mkp/scsi/c/67144d3c58b4
+[09/23] scsi: use the atomic queue limits API in scsi_add_lun
+        https://git.kernel.org/mkp/scsi/c/693a1e8cbe12
+[10/23] scsi: add a device_configure method to the host template
+        https://git.kernel.org/mkp/scsi/c/b7eefcf11f3f
+[11/23] megaraid_sas: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/b57089d32c2c
+[12/23] mpt3sas: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/8c9289e66be6
+[13/23] sbp2: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/c1f99322fc84
+[14/23] hptiop: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/f65eb761f811
+[15/23] ipr: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/c8bc8392b2bc
+[16/23] pmcraid: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/9ca2dc2f0701
+[17/23] usb-storage: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/70a7949335e5
+[18/23] sata_nv: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/3cfedd59cd55
+[19/23] pata_macio: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/a92041bd5f15
+[20/23] libata: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/a25a9c85d17f
+[21/23] mpi3mr: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/310887f688f7
+[21/23] mpi3mr: switch to using ->device_configure
+        https://git.kernel.org/mkp/scsi/c/30efd3823f2c
+[23/23] block: remove now unused queue limits helpers
+        https://git.kernel.org/mkp/scsi/c/ec84ca4025c0
 
-nvme0n1                     259:1    0   1.5T  0 disk
-=E2=94=94=E2=94=80nvme0n1p1                 259:2    0     5G  0 part
-# ublk add -t loop -f /dev/nvme0n1p1
-dev id 0: nr_hw_queues 1 queue_depth 128 block size 4096 dev_capacity 10485=
-760
-max rq size 524288 daemon pid 3227 flags 0x42 state LIVE
-ublkc: 245:0 ublkb: 259:3 owner: 0:0
-queue 0: tid 3228 affinity(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
-18 19 20 21 22 23 24 25 26 27 28 29 30 31 )
-target {"backing_file":"/dev/nvme0n1p1","dev_size":5368709120,"direct_io":1=
-,"name":"loop","type":1}
-
-# mkfs.xfs -f /dev/ublkb0    << can not finish,  pid 3239
-meta-data=3D/dev/ublkb0            isize=3D512    agcount=3D4, agsize=3D327=
-680 blks
-         =3D                       sectsz=3D4096  attr=3D2, projid32bit=3D1
-         =3D                       crc=3D1        finobt=3D1, sparse=3D1, r=
-mapbt=3D0
-         =3D                       reflink=3D1    bigtime=3D1 inobtcount=3D=
-1 nrext64=3D0
-data     =3D                       bsize=3D4096   blocks=3D1310720, imaxpct=
-=3D25
-         =3D                       sunit=3D0      swidth=3D0 blks
-naming   =3Dversion 2              bsize=3D4096   ascii-ci=3D0, ftype=3D1
-log      =3Dinternal log           bsize=3D4096   blocks=3D16384, version=
-=3D2
-         =3D                       sectsz=3D4096  sunit=3D1 blks, lazy-coun=
-t=3D1
-realtime =3Dnone                   extsz=3D4096   blocks=3D0, rtextents=3D0
-
-# cat /proc/3239/stack
-[<0>] rq_qos_wait+0x12a/0x1f0
-[<0>] wbt_wait+0x11a/0x240
-[<0>] __rq_qos_throttle+0x49/0x90
-[<0>] blk_mq_submit_bio+0x58c/0x19d0
-[<0>] submit_bio_noacct_nocheck+0x40d/0x780
-[<0>] blk_next_bio+0x41/0x50
-[<0>] __blkdev_issue_zero_pages+0x1ba/0x370
-[<0>] blkdev_issue_zeroout+0x1a7/0x390
-[<0>] blkdev_fallocate+0x264/0x3d0
-[<0>] vfs_fallocate+0x2b0/0xad0
-[<0>] __x64_sys_fallocate+0xb4/0x100
-[<0>] do_syscall_64+0x7b/0x160
-[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-[  862.171377] INFO: task mkfs.xfs:3239 blocked for more than 122 seconds.
-[  862.178073]       Not tainted 6.9.0-rc4.kasan+ #1
-[  862.182820] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-disables this message.
-[  862.190721] task:mkfs.xfs        state:D stack:0     pid:3239
-tgid:3239  ppid:1801   flags:0x00004002
-[  862.190733] Call Trace:
-[  862.190737]  <TASK>
-[  862.190742]  __schedule+0x65f/0x15a0
-[  862.190759]  ? blk_mq_flush_plug_list.part.0+0xd7/0x4a0
-[  862.190774]  ? __pfx___schedule+0x10/0x10
-[  862.190779]  ? __blk_flush_plug+0x286/0x4a0
-[  862.190790]  ? __pfx___blk_flush_plug+0x10/0x10
-[  862.190795]  ? kmem_cache_alloc+0x145/0x390
-[  862.190803]  ? __pfx_rq_wait_inc_below+0x10/0x10
-[  862.190812]  ? __pfx_wbt_inflight_cb+0x10/0x10
-[  862.190820]  schedule+0x70/0x1b0
-[  862.190826]  io_schedule+0xc0/0x130
-[  862.190832]  rq_qos_wait+0x12a/0x1f0
-[  862.190840]  ? __pfx_rq_qos_wait+0x10/0x10
-[  862.190845]  ? __pfx_rq_qos_wake_function+0x10/0x10
-[  862.190850]  ? __pfx_wbt_inflight_cb+0x10/0x10
-[  862.190856]  ? submit_bio_noacct_nocheck+0x78/0x780
-[  862.190862]  wbt_wait+0x11a/0x240
-[  862.190868]  ? __pfx_wbt_wait+0x10/0x10
-[  862.190874]  __rq_qos_throttle+0x49/0x90
-[  862.190880]  blk_mq_submit_bio+0x58c/0x19d0
-[  862.190888]  ? __pfx_blk_mq_submit_bio+0x10/0x10
-[  862.190893]  ? bio_associate_blkg_from_css+0x246/0xad0
-[  862.190901]  ? blk_cgroup_bio_start+0x281/0x3e0
-[  862.190908]  submit_bio_noacct_nocheck+0x40d/0x780
-[  862.190912]  ? bio_alloc_bioset+0x43c/0x770
-[  862.190923]  ? __pfx_submit_bio_noacct_nocheck+0x10/0x10
-[  862.190929]  ? submit_bio_noacct+0x210/0x1780
-[  862.190935]  blk_next_bio+0x41/0x50
-[  862.190939]  __blkdev_issue_zero_pages+0x1ba/0x370
-[  862.190948]  ? __pfx_vfs_write+0x10/0x10
-[  862.190957]  blkdev_issue_zeroout+0x1a7/0x390
-[  862.190964]  ? __pfx_blkdev_issue_zeroout+0x10/0x10
-[  862.190974]  blkdev_fallocate+0x264/0x3d0
-[  862.190981]  vfs_fallocate+0x2b0/0xad0
-[  862.190989]  __x64_sys_fallocate+0xb4/0x100
-[  862.190994]  do_syscall_64+0x7b/0x160
-[  862.191005]  ? __vm_munmap+0x139/0x230
-[  862.191012]  ? __pfx___vm_munmap+0x10/0x10
-[  862.191016]  ? fpregs_restore_userregs+0xe3/0x1f0
-[  862.191029]  ? syscall_exit_work+0xff/0x130
-[  862.191037]  ? syscall_exit_to_user_mode+0x78/0x200
-[  862.191045]  ? do_syscall_64+0x87/0x160
-[  862.191050]  ? do_user_addr_fault+0x477/0xad0
-[  862.191061]  ? exc_page_fault+0x59/0xc0
-[  862.191067]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  862.191077] RIP: 0033:0x7f2c9e3025da
-[  862.191083] RSP: 002b:00007ffd2f328b38 EFLAGS: 00000246 ORIG_RAX:
-000000000000011d
-[  862.191089] RAX: ffffffffffffffda RBX: 00000000a0009000 RCX: 00007f2c9e3=
-025da
-[  862.191094] RDX: 00000000a0009000 RSI: 0000000000000010 RDI: 00000000000=
-00004
-[  862.191097] RBP: 0000000000020000 R08: 0000000000000000 R09: 00000000000=
-00000
-[  862.191100] R10: 0000000004000000 R11: 0000000000000246 R12: 00005629d6f=
-66870
-[  862.191104] R13: 00007ffd2f329260 R14: 0000000000000004 R15: 00000000000=
-00002
-[  862.191111]  </TASK
-
+-- 
+Martin K. Petersen	Oracle Linux Engineering
