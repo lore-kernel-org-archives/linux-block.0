@@ -1,70 +1,70 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569E72B9D9
-	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 16:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFA943AA8
+	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 16:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714063088; cv=none; b=ax8W1usmhHl/nwBZJCbT2yje8nAKmFSlKu8ylCs8DXMV5Xg0Z/XjVH1ZDCFuiwMWzVMNjqwTRRuCFjf6PxdsvfWWy8Bge0i2hUGUZ8H6PNGhfM67ofz7v4PblAgRH0rYoNf4RmBxtitaYeqCs3HCC7PZJ/FudHisrG1nxeaZHr0=
+	t=1714063151; cv=none; b=hZAvLhTp6/luXskSA7hIbNi1B7yTPdHSuPzJACqFe2iV0kJEfgb0YnY5slOEK0YAH1TPVXRpfAi2VAVOe2yZR7sMskkscZKZAtSZoipPhk83jXZ/uFix+xepWjzKIsRX7nSkbuoTwg6lxr1SjnAXkDXOUD0uLiFuZkhtkcpZCAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714063088; c=relaxed/simple;
-	bh=GOcXFdIoaieOTPLxWrYGiea+5Ygz/PYkaYEkbRWI71o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p+qy/5wg60yMVPW7b7MNMUp+7vJkPgAaAUY+wufQBliUzKCJ+7fnZFmDQuPew377Ik48JSctYt9cY6nZi2zIh6tKevWOuMr+FXsUXUSyT7jN9189oOvQ5bq1Bnc8zyKQKS1oBcuQ3qXhdaKAXphLfA7d85zXdI+zl++xVa3GOQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UWm4WB3i; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1714063151; c=relaxed/simple;
+	bh=BXSfMFmsmr9TKsuvawCF4dHqk22N7RQNm6RjXnBKiUc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=gD6eig3mglBcvs84h07mbhui8v0O14AJoBjLmjB+2fQngpb7NNjuMgEUk2Mg1XUj8Rygf/el6x1zeuybm52hoC9Bznl1JWY8aK7rhaeL7XOB8jcJHptqmB2r3AdR1nvT1tUdC8AtSGohxqFONOc+6ENugMxKIzgiKRqpraLiQt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uaA5ALfd; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UWm4WB3i"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=hVVRlT6K6VWZVoPCWPADdIgA2mznpXfvQNyQuUc/qFs=; b=UWm4WB3iDjJxivWVTHrd8uAgAB
-	H9f6gQJ9bqq8+CZGrBkTfr/rks84pQxL4VyyrI62UsaTE2QCV1MfEnTGpXydu18yxcnHwSzNjWxbK
-	1Qzh9eEiyneQIu/2evpZqNBf5iuQiDu78QS0T2cj001fU72ZwgxRAWJkd5JAVPyHPBa7hFDoRR2ve
-	vK+wbkGnwL6Ud46AXUK84U1L5jaRCafOeNklRCtcn1TM1NHrj2gu/FB71pTfU584c4Py0k9bY0dzf
-	/rlM9O+A0CNAzarz4ROqe6ylTL0ibRt3338qTszSYUIKXpy+7CRrA0g6yvD5NONugjzaedrLoC702
-	LyRfx5CQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s026j-00000003OT4-26ts;
-	Thu, 25 Apr 2024 16:38:01 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To: David Sterba <dsterba@suse.cz>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH] bio: Export bio_add_folio_nofail to modules
-Date: Thu, 25 Apr 2024 17:37:56 +0100
-Message-ID: <20240425163758.809025-1-willy@infradead.org>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uaA5ALfd"
+Message-ID: <090427ca-85a2-409d-af1f-f41a1735226e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714063146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jFaP/6gx9wrCuKESc0fZKE1isJuUlTsPiSFeS6pVwMY=;
+	b=uaA5ALfdYrH+luH3bdNUxtDzHqZj1hXXPlAu0A+kexCyVl3JNkj+SS/MB9gpyRP7NmAMe+
+	vxGHTUwSycEcpadEDECsy0mIbsA1FSz/Pt+ABHWULrptoPg+XJX+l63fKJ6thL5Z7gc97V
+	SZXdrvdJf/cweiP7SQsph8pQuXTArd4=
+Date: Thu, 25 Apr 2024 18:39:01 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH 1/1] null_blk: Fix the problem "mutex_destroy missing"
+To: Jens Axboe <axboe@kernel.dk>, dlemoal@kernel.org,
+ linux-block@vger.kernel.org
+References: <20240425153844.20016-1-yanjun.zhu@linux.dev>
+ <65f8ef75-0555-47e8-9da9-c5a99892202a@linux.dev>
+ <5f922577-514e-49c8-8046-79f6cf7baab3@kernel.dk>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <5f922577-514e-49c8-8046-79f6cf7baab3@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Several modules use __bio_add_page() today and may need to be converted
-to bio_add_folio_nofail().
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
+在 2024/4/25 18:22, Jens Axboe 写道:
+> On 4/25/24 10:16 AM, Zhu Yanjun wrote:
+>> ? 2024/4/25 17:38, Zhu Yanjun ??:
+>>> When a mutex lock is not used any more, the function mutex_destroy
+>>> should be called to mark the mutex lock uninitialized.
+>>>
+>> Sorry. Fixes tag is missing.
+>> I will send out the V2 with this Fixes tag.
+> Then please also fix the commit title, it's pretty bad. Make it
+> something ala:
 
-diff --git a/block/bio.c b/block/bio.c
-index 38baedb39c6f..3f3977c69997 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1125,6 +1125,7 @@ void bio_add_folio_nofail(struct bio *bio, struct folio *folio, size_t len,
- 	WARN_ON_ONCE(off > UINT_MAX);
- 	__bio_add_page(bio, &folio->page, len, off);
- }
-+EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
- 
- /**
-  * bio_add_folio - Attempt to add part of a folio to a bio.
+Got it.
+
+Zhu Yanjun
+
+> null_blk: fix missing mutex_destroy() at module removal
+>
 -- 
-2.43.0
+I only represent myself.
 
