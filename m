@@ -1,185 +1,229 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC39B12BF24
-	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 09:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEB283CBE
+	for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 09:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714036869; cv=none; b=JU/kZujM6+K2d+MIpYHBVrQxTiXjtRqeBdKv0hetxmy308MCiALlepNW5FW8Hc1ct/4Tx6AKfdf5GjOeeZ3fRFYd+FTxKoLY65HigLAZ8cIGEfb6tm1t2CvNZwpCQpgi3IcY7efQ3vVI7raly6wbvI1+06WeUU4kVTez1k6z4a0=
+	t=1714037264; cv=none; b=obG6f4tFkXET9se8u8jk3oNfDSdNi0FO3mOU2pLWsjigeCsENAeT943ItavHN8tupXr0jRSefgS56dD6VeZzw5BPgVV5Wv4er0cCEQiEEgwWjTQoEht0lFg9zJEg244E5Y9WjvEbIK1qwq7tzskRusghw1ZsANd3cPgX4yMRBKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714036869; c=relaxed/simple;
-	bh=sNYu23+CY4mAle5NzlrXe+1lql4dxPJLcgDCIwb34Ro=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HUOsOK7/EdlkW/qFaBDzvKHBu8ooVhGOGip1bPp6kqB2gaBzRlMl66Uah9DItM1y0YFMUgDbY27drajlWH3JdBKamZA30/sX1XZeXK6pjPDugIwKHOUzaIEWBgsFHY7VWZ/iqTMflOG8xzSLBrc+Xj5FjxF+74fw+WdT4sAn/xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NBFkDwHi; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1714037264; c=relaxed/simple;
+	bh=r+3Br1/X9yK4WycqLGInG81xrjTTXLUU0K5UKY+xOu4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K8EMt5c4Ajvse6rBfPT/gwCKTcx4GHeNN2HBkP32hVXNhcRrILNbe6AX836WNgW9iqpxOqgZsJLCSftdrakD83u/FGEMR845KACVunE4n+LptQr/H48SeHXI+jIPsqxFfVvCaDdKSk73bTjVvTvWWyXJK+ahYoIZLX/ekvv8Ves=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dP6M7p5/; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBFkDwHi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dP6M7p5/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714036866;
+	s=mimecast20190719; t=1714037261;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=YzAszFd64TKlt/jHpOYYh1DwN16UuMVuy5w+n1i2s98=;
-	b=NBFkDwHi0szDLFn+yk3TtxJdfQ/lPKoD/alVGA+lTmtN3sYMffmQi0CykMWmtSwZw/IJIH
-	K43qQpBCnvQngLawnNdwdAJXjwW24QyEUnjWNJ/Vh0lv7PxJfWdgKBAY11SijzD2TYbIit
-	URqTA+KQ+K/LFiR90HdjbL6AIRXk0oQ=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fKLSBuu032igi1UQCrIS2E/dWk4IoY59TMlvkYqUq/Q=;
+	b=dP6M7p5/zWmzDCP1W6XN5ACgE/bdgSxesllUbnJgFwtHTbjA6Tv6BA8iJHeylDiqYRelHE
+	jILlJ4ZhYWzsrZagPsztoL0Jjq1P6sPFDrEli/IgosNTugQ2q+xVlK77o/v3LFwBiXO7W7
+	UxIl2q5kdU0fHfwjXv7/9NaozqlnXow=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-YCSDQ_byM7umzCerKy7Jmg-1; Thu, 25 Apr 2024 05:21:04 -0400
-X-MC-Unique: YCSDQ_byM7umzCerKy7Jmg-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2a5457a8543so974406a91.0
-        for <linux-block@vger.kernel.org>; Thu, 25 Apr 2024 02:21:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714036863; x=1714641663;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YzAszFd64TKlt/jHpOYYh1DwN16UuMVuy5w+n1i2s98=;
-        b=UJGDEXqrSY/6z1BXV2DoPIW3mVj30HTZF7IDODIVDV3g9Kb17qotBdtBg4Qfxls67c
-         gVeQQivwLiFrxSOsCbdeta2wo2thIpscSNB2HgGsYNM9i32DF6JVUa/WmDXsGYFmHJeA
-         /5CE3sR1crym4hWaW7zNNoAMmCkCm1mQ+gxeB/IIl6nlDvRNJsWGV3583MCGP2HL5OA+
-         BG97Ge1eB/EpnzuzE8oQSafMOJmSMXNht+yOYZw4hdgeBIej0VBMZBiO6r/SxHNK3gwl
-         UI4FAC8Qab5cpGavXw8TNPmDwqleyh6wkXsBH9hbl4l+ueiGat5OaRatN44jGftVID5K
-         WOXg==
-X-Gm-Message-State: AOJu0YzafttWs+sZuV1EX82/DUmm7I1FvLvm7lwHdpqHu3SC9qy+FQQG
-	5i3pxvXEHijkOZZY2TOXJ81fRahFf0xs8hgIiA6G62b1sMq/1ncz5OezjIROeVlHoiA3Fx1Z29p
-	yYFXFqYfwoU6h9kaDOtwG3sSTtLLLSwE9MFqhnYg3f99JgbpUWIJ50+vZYWIm8ZaQhsjzSowrW6
-	4/iR+n2RSLIqWha7HuEmff0+f0s+PK0KWRMaj5YHgJmoOJq349
-X-Received: by 2002:a17:90b:3e87:b0:2ae:b8df:89e7 with SMTP id rj7-20020a17090b3e8700b002aeb8df89e7mr5248383pjb.38.1714036862735;
-        Thu, 25 Apr 2024 02:21:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGeJMRms8T7rItq3k/M7/E8Bzwq1Xce+335tpLBUZelAI4KCJKU9L2hCyu0y/8J7ABOpp8CV8eI7BpBHBawKbE=
-X-Received: by 2002:a17:90b:3e87:b0:2ae:b8df:89e7 with SMTP id
- rj7-20020a17090b3e8700b002aeb8df89e7mr5248367pjb.38.1714036862356; Thu, 25
- Apr 2024 02:21:02 -0700 (PDT)
+ us-mta-327-Y8KILmATOimoaXzyt4z9ng-1; Thu, 25 Apr 2024 05:27:35 -0400
+X-MC-Unique: Y8KILmATOimoaXzyt4z9ng-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B95C718065AA;
+	Thu, 25 Apr 2024 09:27:34 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.193.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A70F35C5CCC;
+	Thu, 25 Apr 2024 09:27:33 +0000 (UTC)
+Date: Thu, 25 Apr 2024 11:27:32 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>
+Subject: Re: [PATCH 5/9] io_uring: support SQE group
+Message-ID: <ZioiBLWuPMQ6ywW5@redhat.com>
+References: <20240408010322.4104395-1-ming.lei@redhat.com>
+ <20240408010322.4104395-6-ming.lei@redhat.com>
+ <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
+ <Ziey53aADgxDrXZw@redhat.com>
+ <Zihi3nDAJg1s7Cws@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Changhui Zhong <czhong@redhat.com>
-Date: Thu, 25 Apr 2024 17:20:50 +0800
-Message-ID: <CAGVVp+WphhHnf_2ai2GDcRG9EwRxfDLCYYNUw3Hxho7VE7fFRg@mail.gmail.com>
-Subject: [bug report] RIP: 0010:queue_zone_wplugs_show+0x42/0x100
-To: Linux Block Devices <linux-block@vger.kernel.org>, linux-mm@kvack.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zihi3nDAJg1s7Cws@fedora>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-Hello,
+Am 24.04.2024 um 03:39 hat Ming Lei geschrieben:
+> On Tue, Apr 23, 2024 at 03:08:55PM +0200, Kevin Wolf wrote:
+> > Am 22.04.2024 um 20:27 hat Jens Axboe geschrieben:
+> > > On 4/7/24 7:03 PM, Ming Lei wrote:
+> > > > SQE group is defined as one chain of SQEs starting with the first sqe that
+> > > > has IOSQE_EXT_SQE_GROUP set, and ending with the first subsequent sqe that
+> > > > doesn't have it set, and it is similar with chain of linked sqes.
+> > > > 
+> > > > The 1st SQE is group leader, and the other SQEs are group member. The group
+> > > > leader is always freed after all members are completed. Group members
+> > > > aren't submitted until the group leader is completed, and there isn't any
+> > > > dependency among group members, and IOSQE_IO_LINK can't be set for group
+> > > > members, same with IOSQE_IO_DRAIN.
+> > > > 
+> > > > Typically the group leader provides or makes resource, and the other members
+> > > > consume the resource, such as scenario of multiple backup, the 1st SQE is to
+> > > > read data from source file into fixed buffer, the other SQEs write data from
+> > > > the same buffer into other destination files. SQE group provides very
+> > > > efficient way to complete this task: 1) fs write SQEs and fs read SQE can be
+> > > > submitted in single syscall, no need to submit fs read SQE first, and wait
+> > > > until read SQE is completed, 2) no need to link all write SQEs together, then
+> > > > write SQEs can be submitted to files concurrently. Meantime application is
+> > > > simplified a lot in this way.
+> > > > 
+> > > > Another use case is to for supporting generic device zero copy:
+> > > > 
+> > > > - the lead SQE is for providing device buffer, which is owned by device or
+> > > >   kernel, can't be cross userspace, otherwise easy to cause leak for devil
+> > > >   application or panic
+> > > > 
+> > > > - member SQEs reads or writes concurrently against the buffer provided by lead
+> > > >   SQE
+> > > 
+> > > In concept, this looks very similar to "sqe bundles" that I played with
+> > > in the past:
+> > > 
+> > > https://git.kernel.dk/cgit/linux/log/?h=io_uring-bundle
+> > > 
+> > > Didn't look too closely yet at the implementation, but in spirit it's
+> > > about the same in that the first entry is processed first, and there's
+> > > no ordering implied between the test of the members of the bundle /
+> > > group.
+> > 
+> > When I first read this patch, I wondered if it wouldn't make sense to
+> > allow linking a group with subsequent requests, e.g. first having a few
+> > requests that run in parallel and once all of them have completed
+> > continue with the next linked one sequentially.
+> > 
+> > For SQE bundles, you reused the LINK flag, which doesn't easily allow
+> > this. Ming's patch uses a new flag for groups, so the interface would be
+> > more obvious, you simply set the LINK flag on the last member of the
+> > group (or on the leader, doesn't really matter). Of course, this doesn't
+> > mean it has to be implemented now, but there is a clear way forward if
+> > it's wanted.
+> 
+> Reusing LINK for bundle breaks existed link chains (BUNDLE linked to
+> existed link chain), so I think it may not work.
 
-I hit the kernel panic on recent upstream, please help check it and
-let me know if you need any info/testing for it, thanks.
+You can always extend things *somehow*, but it wouldn't fit very
+naturally. That's why I feel your approach on this detail is a little
+better.
 
+> The link rule is explicit for sqe group:
+> 
+> - only group leader can set link flag, which is applied on the whole
+> group: the next sqe in the link chain won't be started until the
+> previous linked sqe group is completed
+> 
+> - link flag can't be set for group members
+> 
+> Also sqe group doesn't limit async for both group leader and member.
+> 
+> sqe group vs link & async is covered in the last liburing test code.
 
-repo:https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-branch:for-next
-commit HEAD: 12c12fbada5caa262656a46483167b553036a273
+Oh right, I didn't actually notice that you already implement what I
+proposed!
 
-reproducer:
-# cd /sys/kernel/debug/block && find  . -type f   -exec grep -aH . {} \;
+I was expecting the flag on the last SQE and I saw in the code that this
+isn't allowed, but I completely missed your comment that explicitly
+states that it's the group leader that gets the link flag. Of course,
+this is just as good.
 
-dmesg:
-[   29.745943] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[   29.752906] #PF: supervisor read access in kernel mode
-[   29.758044] #PF: error_code(0x0000) - not-present page
-[   29.763186] PGD 0 P4D 0
-[   29.765723] Oops: 0000 [#1] PREEMPT SMP NOPTI
-[   29.770085] CPU: 29 PID: 2248 Comm: grep Not tainted 6.9.0-rc4+ #1
-[   29.776263] Hardware name: Dell Inc. PowerEdge R640/0X45NX, BIOS
-2.19.1 06/04/2023
-[   29.783830] RIP: 0010:queue_zone_wplugs_show+0x42/0x100
-[   29.789064] Code: 47 68 48 89 44 24 10 e8 ec cf b7 ff 48 c7 44 24
-08 00 00 00 00 48 8b 44 24 10 48 8b 4c 24 08 48 8b 80 b8 02 00 00 48
-8d 04 c8 <4c> 8b 38 4d 85 ff 74 6a 49 8d 7f 24 31 db 48 89 3c 24 e8 37
-25 6d
-[   29.807810] RSP: 0018:ffffa7e68750bcb8 EFLAGS: 00010202
-[   29.813035] RAX: 0000000000000000 RBX: ffff8dae04c76528 RCX: 0000000000000000
-[   29.820169] RDX: ffff8dae1505a0c0 RSI: ffff8dae04c76528 RDI: ffff8dacb76c5fe0
-[   29.827302] RBP: ffff8dae04c76528 R08: ffffa7e68750bcb0 R09: ffff8daa860cbdb8
-[   29.834433] R10: ffffa7e68750bd08 R11: ffff8dae0319c000 R12: ffffa7e68750bd98
-[   29.841567] R13: ffffa7e68750bd70 R14: ffff8dae04c76550 R15: 0000000000000001
-[   29.848697] FS:  00007f553ea21740(0000) GS:ffff8db1efd00000(0000)
-knlGS:0000000000000000
-[   29.856784] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   29.862532] CR2: 0000000000000000 CR3: 000000048e000003 CR4: 00000000007706f0
-[   29.869664] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   29.876794] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   29.883928] PKRU: 55555554
-[   29.886642] Call Trace:
-[   29.889095]  <TASK>
-[   29.891201]  ? __die+0x20/0x70
-[   29.894268]  ? page_fault_oops+0x75/0x170
-[   29.898281]  ? exc_page_fault+0x64/0x150
-[   29.902208]  ? asm_exc_page_fault+0x22/0x30
-[   29.906395]  ? queue_zone_wplugs_show+0x42/0x100
-[   29.911012]  ? queue_zone_wplugs_show+0x24/0x100
-[   29.915632]  seq_read_iter+0x11d/0x4d0
-[   29.919383]  seq_read+0xfd/0x140
-[   29.922619]  full_proxy_read+0x59/0x80
-[   29.926379]  vfs_read+0xa7/0x340
-[   29.929611]  ? syscall_exit_work+0xff/0x130
-[   29.933804]  ? syscall_exit_to_user_mode+0x78/0x200
-[   29.938686]  ? do_syscall_64+0x87/0x160
-[   29.942523]  ? __count_memcg_events+0x49/0xb0
-[   29.946882]  ksys_read+0x5f/0xe0
-[   29.950115]  do_syscall_64+0x7b/0x160
-[   29.953783]  ? do_user_addr_fault+0x330/0x6b0
-[   29.958140]  ? clear_bhb_loop+0x45/0xa0
-[   29.961979]  ? clear_bhb_loop+0x45/0xa0
-[   29.965819]  ? clear_bhb_loop+0x45/0xa0
-[   29.969660]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   29.974713] RIP: 0033:0x7f553e8fd9b2
-[   29.978291] Code: c0 e9 b2 fe ff ff 50 48 8d 3d ea 1d 0c 00 e8 c5
-fd 01 00 0f 1f 44 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75
-10 0f 05 <48> 3d 00 f0 ff ff 77 56 c3 0f 1f 44 00 00 48 83 ec 28 48 89
-54 24
-[   29.997036] RSP: 002b:00007fff66c83ba8 EFLAGS: 00000246 ORIG_RAX:
-0000000000000000
-[   30.004601] RAX: ffffffffffffffda RBX: 0000000000018000 RCX: 00007f553e8fd9b2
-[   30.011736] RDX: 0000000000018000 RSI: 000055caa25d0000 RDI: 0000000000000003
-[   30.018866] RBP: 000055caa25d0000 R08: 0000000000019000 R09: 0000000000000001
-[   30.026000] R10: 0000000000000000 R11: 0000000000000246 R12: 00007fff66c83c70
-[   30.033134] R13: 0000000000000003 R14: 0000000000000000 R15: 0000000000000003
-[   30.040267]  </TASK>
-[   30.042457] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4
-dns_resolver nfs lockd grace netfs rfkill sunrpc vfat fat dm_multipath
-intel_rapl_msr intel_rapl_common intel_uncore_frequency ipmi_ssif
-intel_uncore_frequency_common isst_if_common skx_edac nfit libnvdimm
-x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm mgag200
-rapl i2c_algo_bit iTCO_wdt drm_shmem_helper iTCO_vendor_support
-intel_cstate acpi_ipmi drm_kms_helper ipmi_si dcdbas intel_uncore
-mei_me i2c_i801 dell_smbios ipmi_devintf mei dell_wmi_descriptor
-wmi_bmof pcspkr i2c_smbus lpc_ich intel_pch_thermal ipmi_msghandler
-joydev acpi_power_meter drm fuse xfs libcrc32c sd_mod sg ahci
-crct10dif_pclmul nvme libahci crc32_pclmul crc32c_intel bnxt_en
-nvme_core libata ghash_clmulni_intel megaraid_sas tg3 t10_pi wmi
-dm_mirror dm_region_hash dm_log dm_mod
-[   30.115078] CR2: 0000000000000000
-[   30.118398] ---[ end trace 0000000000000000 ]---
-[   30.130544] RIP: 0010:queue_zone_wplugs_show+0x42/0x100
-[   30.135772] Code: 47 68 48 89 44 24 10 e8 ec cf b7 ff 48 c7 44 24
-08 00 00 00 00 48 8b 44 24 10 48 8b 4c 24 08 48 8b 80 b8 02 00 00 48
-8d 04 c8 <4c> 8b 38 4d 85 ff 74 6a 49 8d 7f 24 31 db 48 89 3c 24 e8 37
-25 6d
-[   30.154518] RSP: 0018:ffffa7e68750bcb8 EFLAGS: 00010202
-[   30.159743] RAX: 0000000000000000 RBX: ffff8dae04c76528 RCX: 0000000000000000
-[   30.166875] RDX: ffff8dae1505a0c0 RSI: ffff8dae04c76528 RDI: ffff8dacb76c5fe0
-[   30.174010] RBP: ffff8dae04c76528 R08: ffffa7e68750bcb0 R09: ffff8daa860cbdb8
-[   30.181142] R10: ffffa7e68750bd08 R11: ffff8dae0319c000 R12: ffffa7e68750bd98
-[   30.188274] R13: ffffa7e68750bd70 R14: ffff8dae04c76550 R15: 0000000000000001
-[   30.195408] FS:  00007f553ea21740(0000) GS:ffff8db1efd00000(0000)
-knlGS:0000000000000000
-[   30.203495] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   30.209239] CR2: 0000000000000000 CR3: 000000048e000003 CR4: 00000000007706f0
-[   30.216371] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   30.223505] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   30.230636] PKRU: 55555554
-[   30.233351] Kernel panic - not syncing: Fatal exception
-[   30.238599] Kernel Offset: 0x28200000 from 0xffffffff81000000
-(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[   30.257215] ---[ end Kernel panic - not syncing: Fatal exception ]---
+> > The part that looks a bit arbitrary in Ming's patch is that the group
+> > leader is always completed before the rest starts. It makes perfect
+> > sense in the context that this series is really after (enabling zero
+> > copy for ublk), but it doesn't really allow the case you mention in the
+> > SQE bundle commit message, running everything in parallel and getting a
+> > single CQE for the whole group.
+> 
+> I think it should be easy to cover bundle in this way, such as add one
+> new op IORING_OP_BUNDLE as Jens did, and implement the single CQE for
+> whole group/bundle.
 
---
-Best Regards,
-     Changhui
+This requires an extra SQE compared to just creating the group with
+flags, but I suppose this is not a big problem. An alternative might be
+sending the CQE for the group leader only after the whole group has
+completed if we're okay with userspace never knowing when the leader
+itself completed.
+
+However, assuming an IORING_OP_BUNDLE command, if this command only
+completes after the whole group, doesn't that conflict with the
+principle that all other commands are only started after the first one
+has completed?
+
+Maybe we shouldn't wait for the whole group leader request to complete,
+but just give the group leader a chance to prepare the group before all
+requests in the group (including the leader itself) are run in parallel.
+Maybe io_issue_sqe() could just start the rest of the group somewhere
+after calling def->issue() for the leader. Then you can't prepare the
+group buffer asynchronously, but I don't think this is needed, right?
+
+Your example with one read followed by multiple writes would then have
+to be written slightly differently: First the read outside of the group,
+linked to a group of writes. I honestly think this makes more sense as
+an interface, too, because then links are for sequential things and
+groups are (only) for parallel things. This feels clearer than having
+both a sequential and a parallel element in groups.
+
+> > I suppose you could hack around the sequential nature of the first
+> > request by using an extra NOP as the group leader - which isn't any
+> > worse than having an IORING_OP_BUNDLE really, just looks a bit odd - but
+> > the group completion would still be missing. (Of course, removing the
+> > sequential first operation would mean that ublk wouldn't have the buffer
+> > ready any more when the other requests try to use it, so that would
+> > defeat the purpose of the series...)
+> > 
+> > I wonder if we can still combine both approaches and create some
+> > generally useful infrastructure and not something where it's visible
+> > that it was designed mostly for ublk's special case and other use cases
+> > just happened to be enabled as a side effect.
+> 
+> sqe group is actually one generic interface, please see the multiple
+> copy( copy one file to multiple destinations in single syscall for one
+> range) example in the last patch
+
+Yes, that's an example that happens to work well with the model that you
+derived from ublk.
+
+If you have the opposite case, reading a buffer that is spread across
+multiple files and then writing it to one target (i.e. first step
+parallel, second step sequential), you can't represent this well
+currently. You could work around it by having a NOP leader, but that's
+not very elegant.
+
+This asymmetry suggests that it's not the perfect interface yet.
+
+If the whole group runs in parallel instead, including the leader, then
+both examples become symmetrical. You have a group for the parallel I/O
+and a linked single request for the other operation.
+
+Or if both steps are parallel, you can just have two linked groups.
+
+> and it can support generic device zero copy: any device internal
+> buffer can be linked with io_uring operations in this way, which can't
+> be done by traditional splice/pipe.
+
+Is this actually implemented or is it just a potential direction for the
+future?
+
+> I guess it can be used in network Rx zero copy too, but may depend on
+> actual network Rx use case.
+
+Kevin
 
