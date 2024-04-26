@@ -1,136 +1,122 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail-m3296.qiye.163.com (mail-m3296.qiye.163.com [220.197.32.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04676FA8
-	for <linux-block@vger.kernel.org>; Fri, 26 Apr 2024 01:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD897F8;
+	Fri, 26 Apr 2024 01:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714093811; cv=none; b=gmVgB2KtupXUmdWKTDHqrNIRnTdqZcHsLA4j+10T4JkGOpmkaRzMvA2fOgFEsSYCdDtA7I4GPBP3uY3YkkqwUAPgKY9IfGS784GkkGpEYoHJBw+I6jPG8iEtthHGxIT3ddpEnrQnL2W6TiQuew/PNpcLzkdkRGWsQRvrBhYQkkE=
+	t=1714094799; cv=none; b=gCHkub3ucTTIesU3JFQs4gwPrrfU/8uWh6lgJGC16/ekT5cjfwDyorbyNh2KxOIy1zJPbgTReSENtM/rMm+yAllKvhbXmKNdnadL0VmjQRUDwkpQq4WpxWXthnx38L8vtva5CJ69kGyVAXy7pM6AkXBfdTSdcU/3VAAdDeU+ejM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714093811; c=relaxed/simple;
-	bh=PRvUmOVRZi+gT17s6TtQpkOyxX0WV7G4DYr36r04TJs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJhSQaJ3Feo86cTvciFOmn5RhOwM/y7/ldDjLgGsteBLFc6uBmcv/2E94v6XSC8P674B4oCLs9L7r4HSGjwBysYWpjBrt2X38A8iVNG7W60pcsD5HLQLlXK76kEsDPLxOyfCtoOr0iby6z8HU2djnfmjHMZJJDFwniw3QiGx8qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pds8qYTw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pds8qYTw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714093807;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFZTvPt7J7qdhC763ZbrqlmaiMn4TAxswO3mR8BsFwo=;
-	b=Pds8qYTwUOSykNosNnZm1O9lJHfjPbyjWfgjhRoPH8gceESSt1ESZrrzU3u2hMDekiJ8u7
-	BtVRcvyqVFiGwuuQ3yU4gKtokPtVAhfyOmQAb8Fs1i9UytuJCu8/mZqAc5sXzvVNHretp3
-	UP8oYtvfFSbCpOQqAOLIMNlLZ9wi5vw=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-90-jdZwS-R9PDe1lo4qmV0nnw-1; Thu,
- 25 Apr 2024 21:10:05 -0400
-X-MC-Unique: jdZwS-R9PDe1lo4qmV0nnw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 52B851C068C5
-	for <linux-block@vger.kernel.org>; Fri, 26 Apr 2024 01:10:05 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EB5A5AE081;
-	Fri, 26 Apr 2024 01:10:01 +0000 (UTC)
-Date: Fri, 26 Apr 2024 09:09:57 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Guangwu Zhang <guazhang@redhat.com>
-Cc: linux-block@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [bug report] Format FS failed with ublk device
-Message-ID: <Zir+5VZOgip+HiFU@fedora>
-References: <CAGS2=YobBtv0JnQJSYcu9x57y_VqS7-4NemWjsFdaPcpLLVm1Q@mail.gmail.com>
+	s=arc-20240116; t=1714094799; c=relaxed/simple;
+	bh=3xE+7K7ojONhLEDdZlIdx4TbxDGU7UCPcCuHDWCcDH4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=WyEkKf9kM3Sa+9Bip1uDPbLcZJTjKNKe2Cdbei2HNuusNk2rm3vBpug638GWgHbB1rwNNv3nQTUOodzatXwx085W01/HIQfbWUkw6ORQPRDHKfAflGYHrMyQHDfciTe4+PAVhI6n1OMsZJmR8s5Y3GuI7plpaIIh++FRXM3Cmlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=220.197.32.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
+Received: from [192.168.122.189] (unknown [218.94.118.90])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id 426828601B7;
+	Fri, 26 Apr 2024 09:25:55 +0800 (CST)
+Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
+To: Gregory Price <gregory.price@memverge.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, axboe@kernel.dk,
+ John Groves <John@groves.net>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
+ Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+ <66288ac38b770_a96f294c6@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+ <ef34808b-d25d-c953-3407-aa833ad58e61@easystack.cn>
+ <ZikhwAAIGFG0UU23@memverge.com>
+From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Message-ID: <bbf692ec-2109-baf2-aaae-7859a8315025@easystack.cn>
+Date: Fri, 26 Apr 2024 09:25:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <ZikhwAAIGFG0UU23@memverge.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGS2=YobBtv0JnQJSYcu9x57y_VqS7-4NemWjsFdaPcpLLVm1Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkZSB8dVk1CTkMYSUgeQktDGFUZERMWGhIXJBQOD1
+	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
+X-HM-Tid: 0a8f18024efa023ckunm426828601b7
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6NDI6TDo*HzcwIxY3GFEcNAlL
+	CEhPFEhVSlVKTEpPS0JPTE5NS09NVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBT0JISTcG
 
-Hi Guangwu,
 
-Thanks for the report!
 
-On Thu, Apr 25, 2024 at 09:54:04AM +0800, Guangwu Zhang wrote:
-> Hi,
-> the format FS command will hung up  with ublk device.
+在 2024/4/24 星期三 下午 11:14, Gregory Price 写道:
+> On Wed, Apr 24, 2024 at 02:33:28PM +0800, Dongsheng Yang wrote:
+>>
+>>
+>> 在 2024/4/24 星期三 下午 12:29, Dan Williams 写道:
+>>> Dongsheng Yang wrote:
+>>>> From: Dongsheng Yang <dongsheng.yang.linux@gmail.com>
+>>>>
+>>>> Hi all,
+>>>> 	This patchset introduce cbd (CXL block device). It's based on linux 6.8, and available at:
+>>>> 	https://github.com/DataTravelGuide/linux
+>>>>
+>>> [..]
+>>>> (4) dax is not supported yet:
+>>>> 	same with famfs, dax device is not supported here, because dax device does not support
+>>>> dev_dax_iomap so far. Once dev_dax_iomap is supported, CBD can easily support DAX mode.
+>>>
+>>> I am glad that famfs is mentioned here, it demonstrates you know about
+>>> it. However, unfortunately this cover letter does not offer any analysis
+>>> of *why* the Linux project should consider this additional approach to
+>>> the inter-host shared-memory enabling problem.
+>>>
+>>> To be clear I am neutral at best on some of the initiatives around CXL
+>>> memory sharing vs pooling, but famfs at least jettisons block-devices
+>>> and gets closer to a purpose-built memory semantic.
+>>>
+>>> So my primary question is why would Linux need both famfs and cbd? I am
+>>> sure famfs would love feedback and help vs developing competing efforts.
+>>
+>> Hi,
+>> 	Thanks for your reply, IIUC about FAMfs, the data in famfs is stored in
+>> shared memory, and related nodes can share the data inside this file system;
+>> whereas cbd does not store data in shared memory, it uses shared memory as a
+>> channel for data transmission, and the actual data is stored in the backend
+>> block device of remote nodes. In cbd, shared memory works more like network
+>> to connect different hosts.
+>>
 > 
-> # ublk --version
-> ublksrv 1.1-7-gf01c509
-> 
-> kerne: 6.9.0-rc4.kasan
-> 
-> 
-> nvme0n1                     259:1    0   1.5T  0 disk
-> └─nvme0n1p1                 259:2    0     5G  0 part
-> # ublk add -t loop -f /dev/nvme0n1p1
-> dev id 0: nr_hw_queues 1 queue_depth 128 block size 4096 dev_capacity 10485760
-> max rq size 524288 daemon pid 3227 flags 0x42 state LIVE
-> ublkc: 245:0 ublkb: 259:3 owner: 0:0
-> queue 0: tid 3228 affinity(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
-> 18 19 20 21 22 23 24 25 26 27 28 29 30 31 )
-> target {"backing_file":"/dev/nvme0n1p1","dev_size":5368709120,"direct_io":1,"name":"loop","type":1}
-> 
-> # mkfs.xfs -f /dev/ublkb0    << can not finish,  pid 3239
-> meta-data=/dev/ublkb0            isize=512    agcount=4, agsize=327680 blks
->          =                       sectsz=4096  attr=2, projid32bit=1
->          =                       crc=1        finobt=1, sparse=1, rmapbt=0
->          =                       reflink=1    bigtime=1 inobtcount=1 nrext64=0
-> data     =                       bsize=4096   blocks=1310720, imaxpct=25
->          =                       sunit=0      swidth=0 blks
-> naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
-> log      =internal log           bsize=4096   blocks=16384, version=2
->          =                       sectsz=4096  sunit=1 blks, lazy-count=1
-> realtime =none                   extsz=4096   blocks=0, rtextents=0
-> 
-> # cat /proc/3239/stack
-> [<0>] rq_qos_wait+0x12a/0x1f0
-> [<0>] wbt_wait+0x11a/0x240
-> [<0>] __rq_qos_throttle+0x49/0x90
-> [<0>] blk_mq_submit_bio+0x58c/0x19d0
-> [<0>] submit_bio_noacct_nocheck+0x40d/0x780
-> [<0>] blk_next_bio+0x41/0x50
-> [<0>] __blkdev_issue_zero_pages+0x1ba/0x370
-> [<0>] blkdev_issue_zeroout+0x1a7/0x390
-> [<0>] blkdev_fallocate+0x264/0x3d0
-> [<0>] vfs_fallocate+0x2b0/0xad0
-> [<0>] __x64_sys_fallocate+0xb4/0x100
-> [<0>] do_syscall_64+0x7b/0x160
-> [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> [  862.171377] INFO: task mkfs.xfs:3239 blocked for more than 122 seconds.
-> [  862.178073]       Not tainted 6.9.0-rc4.kasan+ #1
-> [  862.182820] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> disables this message.
+> Couldn't you basically just allocate a file for use as a uni-directional
+> buffer on top of FAMFS and achieve the same thing without the need for
+> additional kernel support? Similar in a sense to allocating a file on
+> network storage and pinging the remote host when it's ready (except now
+> it's fast!)
 
-Looks it might be one blk-wbt issue, and ublk-loop doesn't setup
-write_zero_max_bytes and it may take a bit long for __blkdev_issue_zero_pages
-to complete, but it shouldn't hang.
+I'm not entirely sure I follow your suggestion. I guess it means that 
+cbd would no longer directly manage the pmem device, but allocate files 
+on famfs to transfer data. I didn't do it this way because I considered 
+at least a few points: one of them is, cbd_transport actually requires a 
+DAX device to access shared memory, and cbd has very simple requirements 
+for space management, so there's no need to rely on a file system layer, 
+which would increase architectural complexity.
 
-Can you collect the following bpftrace by starting it before running mkfs?
-And I can't reproduce it in my environment.
+However, we still need cbd_blkdev to provide a block device, so it 
+doesn't achieve "achieve the same without the need for additional kernel 
+support".
 
-#!/usr/bin/bpftrace
-kretfunc:vfs_fallocate
-{
-	printf("vfs_fallocate on %s ret %d (%x %lx %u)\n",
-		str(args->file->f_path.dentry->d_name.name),
-		retval, args->mode, args->offset, args->len);
-}
+Could you please provide more specific details about your suggestion?
+> 
+> (The point here is not "FAMFS is better" or "CBD is better", simply
+> trying to identify the function that will ultimately dictate the form).
 
+Thank you for your clarification. totally aggree with it, discussions 
+always make the issues clearer.
 
-Thanks,
-Ming
-
+Thanx
+> 
+> ~Gregory
+> 
