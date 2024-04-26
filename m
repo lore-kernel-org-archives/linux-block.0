@@ -1,98 +1,86 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9247D147C82
-	for <linux-block@vger.kernel.org>; Fri, 26 Apr 2024 13:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34376147C7D
+	for <linux-block@vger.kernel.org>; Fri, 26 Apr 2024 13:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714138854; cv=none; b=GVfEMOPcPnr83Cq9PKIxZiv+N1pyqXQMNmoVddot1HH7hvPe3K7bvtZTGVHRwHkk0MvZmVxEB4zrCjOL/shQH0zF1mMNym3CoyvedJjZnbZXO8dpDi2vR94vSZBKZcZ1SVM9Oe+zg+rho1Eam0sjRSsA/SZyb45KoJYrD+6GGK8=
+	t=1714138893; cv=none; b=dlLRIysMeAWlQ667UxIXLGdkCrEn3Oo6OnWV/mmkkOkOUa6D/hRdHjzOEe6LBFmlnaf9giXR5d0VAJF3Rxl9bRdKk6iAv3cugyM7z0sKkRD8vfwBqr4iDLQtEJk1BE9njtr5VDfme4wigh1F0qA3fCzTyaXp/WTFq6l4Cr7jVfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714138854; c=relaxed/simple;
-	bh=qSR9KdDtou4elM0dFMdXIBi+jhpmshH2TEdB7PPNUzY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=X/ETkDB5i1MCJmFW4zQF+lw+aIA6q1JMjFEP0EmUxowt77xC1+AI+7G8kT4eg1EssgqqQEbgo1B4LtLJ/etOzfIIKrljuR1NOcY2uozBig0MzKdkMgzU2dhg4B1QzXbLCKlGSXBBE85LbLJRJgZi0jTtt6YREnmXj5XuA4KGgR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=edkAi9YZ; arc=none smtp.client-ip=209.85.166.50
+	s=arc-20240116; t=1714138893; c=relaxed/simple;
+	bh=F9fl+qAuKBl8c5dtpUksdJ39HtNhjXgY+f1Jj+R/xJw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Loq2Kn+i8bq7LZuhE7kSye+t0n55uoT5t8nspje+Fvd51M+/2eMC4An3Vy2M9R0UI86O55lWZu7kQRgqjd47bNHq3QcFBq2/w2yqI2EE1LAKnUqsyi2m88ACeJ4bU6Sx0tQWg1flvhFXEpK2mzNSImGUZwrCURPnABL/6iVVHYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iF6OT+A1; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="edkAi9YZ"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7d9ef422859so17225539f.0
-        for <linux-block@vger.kernel.org>; Fri, 26 Apr 2024 06:40:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iF6OT+A1"
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-36c2cf463e3so484745ab.3
+        for <linux-block@vger.kernel.org>; Fri, 26 Apr 2024 06:41:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714138852; x=1714743652; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+xyNmLTuWEvR72GEYCrL1zsIHBKSa0ehqFFEtMyryas=;
-        b=edkAi9YZffOLOLGTJY1+vu0uEJ6hu+Ubudm0SeI8FWgRiYb0H7QBxEkNOe87Tz+NYI
-         nOLI3UTrmKxU2sYPnU4tYzoA32axjVZPsb5HsMUre5n3cYPA6JlzQlSGKMfNxkSaC+q/
-         ZSt8uKUAFS8P/dWB+3NSCvz+HFIRD1eHAE7A1RQC3dddoYJwLmhQx/kiW0qiez7tCdLE
-         Tx8SHF4t82W81E3Yppw0fdkHLggugAcILU8o8OhLJJvQQltjVe5TKPZjtSzxvWbkoK7u
-         vADQg8opR2CwDHD+dhS02w8mv2L2uI1STlVfK1noTn8TY2f2AMS8YiPcUjBLEkHVclBp
-         u8rA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714138891; x=1714743691; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MW5P3eh5immMHhpJeOXdSmkE8R2IfZGDz7ZFESxxerw=;
+        b=iF6OT+A1L8V7FDrNcxEgIDnrS9pDur95aRXH2K9d7LenNwuZJKw8tg0HhN55tW7Glu
+         PlGD4GxvgLoOL/cj6oz2gitxe3G9Yq2arpuJf3MjHXmiQ83Pf0q4Lf1w0snzmXldw73z
+         ghfVuWbGMeNciCivMOgQ9PWcDuMWlSNLWa+WcZU5EGIzRFMJYJQnM+mbMCoAOY0JXDnD
+         p5Gl1pF356EyKhnKMn/9djXKJiT6+OyQBvDp8oxaAJN/WyAUuXpwAhoAWjqLLZjeq8sb
+         ghmC8mYURDGYdeGnFnFNnfkjdftaQH1KWsOKeKTDI2b35XoSacfmFJB4bhXnYd2yttNp
+         DIHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714138852; x=1714743652;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+xyNmLTuWEvR72GEYCrL1zsIHBKSa0ehqFFEtMyryas=;
-        b=dDIhLkl/Pb57y7822+PN1C5wFdeOB9gciJH+Z4/lFjPYs7tgSNdKr4kLIkLHwhZcS/
-         Gp79L1UcHSMX5gXaknrrArvjArot0K3WNU4/0LS2oo6/eSi6+L17HrmCMAW/8tG3GyY7
-         w7k1RlvUfo8cUaq4ZfDCwoTSl54bUKkmHmSIwjktzyZp1CDaa8qJwb/qLzhJoxNzEo3E
-         p5bx+6Fd8Shwj+SpGK0LTloSErvQvR1BSTHRHKBKtM52voqCamFKjARgq9Ll0wwgsibz
-         F5Xlqpt3qFC/ms0hm1f/rN6ft9Hfl0a8uRiAC9npS+DR8hgCzaLB4DyNsDA0TiiXXxv/
-         O11g==
-X-Forwarded-Encrypted: i=1; AJvYcCW6LSZOunOue8MSmus1Cg//L90zRsjynEMbjgWv6u5/NGpAWOSanq7XNE1eA873AQ0ZBTT4pk8sTMxPCrDlZWt9iGSiWviW5sTOr5Y=
-X-Gm-Message-State: AOJu0YysYw9RdkVK+nOb0uDWt1MgACpQ5A/r6isWylPHbBLD8cn1kCeB
-	7mDRQnyI+KlsUaGMkNNKqIMBFXAEH4o5l18OiGLeBrzTF1My3/tpsnsOxLT/7VLiLe4YI1F2tAk
-	p
-X-Google-Smtp-Source: AGHT+IF3mQB5HbulQg2CkJsEpbjz+y2/5fbhgBJ11VqFeOjJoS9ZZYtH/6hDcxbjMNxULlO5LHj3bw==
-X-Received: by 2002:a5d:8ac8:0:b0:7da:8d35:8a5e with SMTP id e8-20020a5d8ac8000000b007da8d358a5emr3331600iot.2.1714138852673;
-        Fri, 26 Apr 2024 06:40:52 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id j13-20020a0566022ccd00b007dead4fd0efsm255275iow.18.2024.04.26.06.40.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 06:40:51 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linke li <lilinke99@qq.com>
-Cc: xujianhao01@gmail.com, Andrew Morton <akpm@linux-foundation.org>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <tencent_0B517C25E519D3D002194E8445E86C04AD0A@qq.com>
-References: <tencent_0B517C25E519D3D002194E8445E86C04AD0A@qq.com>
-Subject: Re: [PATCH] sbitmap: use READ_ONCE to access map->word
-Message-Id: <171413885096.211722.564458609126458139.b4-ty@kernel.dk>
-Date: Fri, 26 Apr 2024 07:40:50 -0600
+        d=1e100.net; s=20230601; t=1714138891; x=1714743691;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MW5P3eh5immMHhpJeOXdSmkE8R2IfZGDz7ZFESxxerw=;
+        b=YBbqOTaeZVRr5ADWO+xp9WTckYtTdRTriJDDYmEvv8R12jbsYVkijtpqGWsT1j4kal
+         FBOu0M/+pTO7YTQhEvalNNjiHKqViwbclLQqvzHY8rDT/PTkIe0g6eiyGA1YxXI8aCPo
+         sikp1cACtIPc8EohPDtXGsMsAL3M1wQ4lZkpuGvE+lr0pmsqiINF3dgblwwZSKo5zV6I
+         Fhi3AcQWejIpyI2OaLZ8p3yHKOVvL6vCIUIYcPt+VTb/Q2LmsISsnNnoXGHUL43wVDqO
+         YG4PBn+E/fRhKH0zxRJX+TerhqH1qgiqiCep9C+J9zs8YW+3vWpASgkmGjEDhdRNPZuM
+         pDUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqOb1ByonMdmOcu3vgy+lETlU+rzGSuCpr78bIhu7cfdVSytF56j8ReweZ15DSY/fSRghhYf/OkTHNVZr2eU1Xzg8RIqG19n4D2S8=
+X-Gm-Message-State: AOJu0YzXlPxUtzxsBTOkTB4FUy6+kYQKEz/Jb0qd9GyFUq0mlVf2cr8o
+	DW7LIsIHNn4mA5GS9JWYlAKeACdb1xrvbfTNfZuSNlQqFhyzBS0BtYhuPfgqd/4=
+X-Google-Smtp-Source: AGHT+IG8rjUV9ghcwA5zGDKApvtIXKb9CN/7dGdnc0TtxIUPvQYJy77pBAxJ7A1PH3Zn9gWbXK3KCQ==
+X-Received: by 2002:a05:6e02:1fe5:b0:369:f53b:6c2 with SMTP id dt5-20020a056e021fe500b00369f53b06c2mr3275503ilb.1.1714138891168;
+        Fri, 26 Apr 2024 06:41:31 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id x6-20020a92b006000000b0036c01d9ae12sm3259904ilh.46.2024.04.26.06.41.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Apr 2024 06:41:30 -0700 (PDT)
+Message-ID: <aba5fed0-9f0c-4857-927d-d2cdccf8ca88@kernel.dk>
+Date: Fri, 26 Apr 2024 07:41:29 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] bio: Export bio_add_folio_nofail to modules
+Content-Language: en-US
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ David Sterba <dsterba@suse.cz>
+Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ linux-block@vger.kernel.org
+References: <20240425163758.809025-1-willy@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240425163758.809025-1-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
 
+On 4/25/24 10:37 AM, Matthew Wilcox (Oracle) wrote:
+> Several modules use __bio_add_page() today and may need to be converted
+> to bio_add_folio_nofail().
 
-On Fri, 26 Apr 2024 18:34:44 +0800, linke li wrote:
-> In __sbitmap_queue_get_batch(), map->word is read several times, and
-> update atomically using atomic_long_try_cmpxchg(). But the first two read
-> of map->word is not protected.
-> 
-> This patch moves the statement val = READ_ONCE(map->word) forward,
-> eliminating unprotected accesses to map->word within the function.
-> It is aimed at reducing the number of benign races reported by KCSAN in
-> order to focus future debugging effort on harmful races.
-> 
-> [...]
+Confused, we don't have any modular users of this. A change like this
+should be submitted with a conversion.
 
-Applied, thanks!
-
-[1/1] sbitmap: use READ_ONCE to access map->word
-      commit: 6ad0d7e0f4b68f87a98ea2b239123b7d865df86b
-
-Best regards,
 -- 
 Jens Axboe
-
 
 
