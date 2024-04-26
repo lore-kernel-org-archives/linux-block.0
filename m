@@ -1,122 +1,104 @@
-Received: from mail-m3296.qiye.163.com (mail-m3296.qiye.163.com [220.197.32.96])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD897F8;
-	Fri, 26 Apr 2024 01:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948EC1849;
+	Fri, 26 Apr 2024 05:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714094799; cv=none; b=gCHkub3ucTTIesU3JFQs4gwPrrfU/8uWh6lgJGC16/ekT5cjfwDyorbyNh2KxOIy1zJPbgTReSENtM/rMm+yAllKvhbXmKNdnadL0VmjQRUDwkpQq4WpxWXthnx38L8vtva5CJ69kGyVAXy7pM6AkXBfdTSdcU/3VAAdDeU+ejM=
+	t=1714109536; cv=none; b=W0Qw0ad7384otbLXYCULapPx1mf2U+d5S1Mvt6uQcP4r+fbBX60nc9iSJELDsP4g41k62WXZ9gXeifg0qVGkraY+lTpnBlRZy+6xD32asKXzrfRLmmmrWK8XeOQCLdhY9dehsLianpdzfhcu67N5nHal3+pPOLU+SA86pclwwSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714094799; c=relaxed/simple;
-	bh=3xE+7K7ojONhLEDdZlIdx4TbxDGU7UCPcCuHDWCcDH4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=WyEkKf9kM3Sa+9Bip1uDPbLcZJTjKNKe2Cdbei2HNuusNk2rm3vBpug638GWgHbB1rwNNv3nQTUOodzatXwx085W01/HIQfbWUkw6ORQPRDHKfAflGYHrMyQHDfciTe4+PAVhI6n1OMsZJmR8s5Y3GuI7plpaIIh++FRXM3Cmlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=220.197.32.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
-Received: from [192.168.122.189] (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 426828601B7;
-	Fri, 26 Apr 2024 09:25:55 +0800 (CST)
-Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
-To: Gregory Price <gregory.price@memverge.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, axboe@kernel.dk,
- John Groves <John@groves.net>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- Dongsheng Yang <dongsheng.yang.linux@gmail.com>
-References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
- <66288ac38b770_a96f294c6@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <ef34808b-d25d-c953-3407-aa833ad58e61@easystack.cn>
- <ZikhwAAIGFG0UU23@memverge.com>
-From: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Message-ID: <bbf692ec-2109-baf2-aaae-7859a8315025@easystack.cn>
-Date: Fri, 26 Apr 2024 09:25:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+	s=arc-20240116; t=1714109536; c=relaxed/simple;
+	bh=ykHDYdfW+I3pR9qLK4+0CQxC91lHC0AHO4V52GwfavM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bpKXCjEQEhddvOLrsozSrszc9MGPcKb5qi8B1qfoavKwAFmyDBC29WBOC3wNUAZg9prTFFkqhU6XGErkyvRac7B2msX1l/g3kE4pSupwvmy5Mfuh62D4DjJhacYlLpDT0SSFymho66OKheeULrqhuaac7W4duUTjcaKUctUYvcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bQBX29ER; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bQBX29ER"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1714109528; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=UrSzjICOOeYfI55ilLcClDecrSKT9UOi+NvDXzKPfPM=;
+	b=bQBX29ERZE2PTOhhyt3U1LCs9tDHwxI8HwEu9HI+EM2TNhb5AJGtXFZDXUB2egb4pUm4381XD0tUf0UFC8u+VUDf47KqvqBPqy12y1lCzMHEPveSJ3DRoFrX8E1pBNgjQPeEVJIJeeCLZgfdGv87/PYJ6rzcQC6nv18tpyNGTRo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W5I3EcV_1714109525;
+Received: from 30.97.48.164(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0W5I3EcV_1714109525)
+          by smtp.aliyun-inc.com;
+          Fri, 26 Apr 2024 13:32:06 +0800
+Message-ID: <7ba8c1a3-be59-4a2f-b88a-23b6ab23e1c8@linux.alibaba.com>
+Date: Fri, 26 Apr 2024 13:32:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZikhwAAIGFG0UU23@memverge.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkZSB8dVk1CTkMYSUgeQktDGFUZERMWGhIXJBQOD1
-	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8f18024efa023ckunm426828601b7
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6NDI6TDo*HzcwIxY3GFEcNAlL
-	CEhPFEhVSlVKTEpPS0JPTE5NS09NVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBT0JISTcG
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/6] z_erofs_pcluster_begin(): don't bother with rounding
+ position down
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
+ brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ yukuai3@huawei.com
+References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
+ <20240406090930.2252838-9-yukuai1@huaweicloud.com>
+ <20240407040531.GA1791215@ZenIV>
+ <a660a238-2b7e-423f-b5aa-6f5777259f4d@linux.alibaba.com>
+ <20240425195641.GJ2118490@ZenIV> <20240425200017.GF1031757@ZenIV>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <20240425200017.GF1031757@ZenIV>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+Hi Al,
 
-
-在 2024/4/24 星期三 下午 11:14, Gregory Price 写道:
-> On Wed, Apr 24, 2024 at 02:33:28PM +0800, Dongsheng Yang wrote:
->>
->>
->> 在 2024/4/24 星期三 下午 12:29, Dan Williams 写道:
->>> Dongsheng Yang wrote:
->>>> From: Dongsheng Yang <dongsheng.yang.linux@gmail.com>
->>>>
->>>> Hi all,
->>>> 	This patchset introduce cbd (CXL block device). It's based on linux 6.8, and available at:
->>>> 	https://github.com/DataTravelGuide/linux
->>>>
->>> [..]
->>>> (4) dax is not supported yet:
->>>> 	same with famfs, dax device is not supported here, because dax device does not support
->>>> dev_dax_iomap so far. Once dev_dax_iomap is supported, CBD can easily support DAX mode.
->>>
->>> I am glad that famfs is mentioned here, it demonstrates you know about
->>> it. However, unfortunately this cover letter does not offer any analysis
->>> of *why* the Linux project should consider this additional approach to
->>> the inter-host shared-memory enabling problem.
->>>
->>> To be clear I am neutral at best on some of the initiatives around CXL
->>> memory sharing vs pooling, but famfs at least jettisons block-devices
->>> and gets closer to a purpose-built memory semantic.
->>>
->>> So my primary question is why would Linux need both famfs and cbd? I am
->>> sure famfs would love feedback and help vs developing competing efforts.
->>
->> Hi,
->> 	Thanks for your reply, IIUC about FAMfs, the data in famfs is stored in
->> shared memory, and related nodes can share the data inside this file system;
->> whereas cbd does not store data in shared memory, it uses shared memory as a
->> channel for data transmission, and the actual data is stored in the backend
->> block device of remote nodes. In cbd, shared memory works more like network
->> to connect different hosts.
->>
+On 2024/4/26 04:00, Al Viro wrote:
+> ... and be more idiomatic when calculating ->pageofs_in.
 > 
-> Couldn't you basically just allocate a file for use as a uni-directional
-> buffer on top of FAMFS and achieve the same thing without the need for
-> additional kernel support? Similar in a sense to allocating a file on
-> network storage and pinging the remote host when it's ready (except now
-> it's fast!)
-
-I'm not entirely sure I follow your suggestion. I guess it means that 
-cbd would no longer directly manage the pmem device, but allocate files 
-on famfs to transfer data. I didn't do it this way because I considered 
-at least a few points: one of them is, cbd_transport actually requires a 
-DAX device to access shared memory, and cbd has very simple requirements 
-for space management, so there's no need to rely on a file system layer, 
-which would increase architectural complexity.
-
-However, we still need cbd_blkdev to provide a block device, so it 
-doesn't achieve "achieve the same without the need for additional kernel 
-support".
-
-Could you please provide more specific details about your suggestion?
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> ---
+>   fs/erofs/zdata.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> (The point here is not "FAMFS is better" or "CBD is better", simply
-> trying to identify the function that will ultimately dictate the form).
+> diff --git a/fs/erofs/zdata.c b/fs/erofs/zdata.c
+> index d417e189f1a0..a4ff20b54cc1 100644
+> --- a/fs/erofs/zdata.c
+> +++ b/fs/erofs/zdata.c
+> @@ -868,7 +868,7 @@ static int z_erofs_pcluster_begin(struct z_erofs_decompress_frontend *fe)
+>   	} else {
+>   		void *mptr;
+>   
+> -		mptr = erofs_read_metabuf(&map->buf, sb, erofs_pos(sb, blknr), EROFS_NO_KMAP);
+> +		mptr = erofs_read_metabuf(&map->buf, sb, map->m_pa, EROFS_NO_KMAP);
 
-Thank you for your clarification. totally aggree with it, discussions 
-always make the issues clearer.
+This patch caused some corrupted failure, since
+here erofs_read_metabuf() is EROFS_NO_KMAP and
+it's no needed to get a maped-address since only
+a page reference is needed.
 
-Thanx
-> 
-> ~Gregory
-> 
+>   		if (IS_ERR(mptr)) {
+>   			ret = PTR_ERR(mptr);
+>   			erofs_err(sb, "failed to get inline data %d", ret);
+> @@ -876,7 +876,7 @@ static int z_erofs_pcluster_begin(struct z_erofs_decompress_frontend *fe)
+>   		}
+>   		get_page(map->buf.page);
+>   		WRITE_ONCE(fe->pcl->compressed_bvecs[0].page, map->buf.page);
+> -		fe->pcl->pageofs_in = map->m_pa & ~PAGE_MASK;
+> +		fe->pcl->pageofs_in = offset_in_page(mptr);
+
+So it's unnecessary to change this line IMHO.
+
+BTW, would you mind routing this series through erofs tree
+with other erofs patches for -next (as long as this series
+isn't twisted with vfs and block stuffs...)?  Since I may
+need to test more to ensure they don't break anything and
+could fix them immediately by hand...
+
+Thanks,
+Gao Xiang
+
+
+>   		fe->mode = Z_EROFS_PCLUSTER_FOLLOWED_NOINPLACE;
+>   	}
+>   	/* file-backed inplace I/O pages are traversed in reverse order */
