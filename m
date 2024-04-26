@@ -1,104 +1,68 @@
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948EC1849;
-	Fri, 26 Apr 2024 05:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025D875810;
+	Fri, 26 Apr 2024 06:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714109536; cv=none; b=W0Qw0ad7384otbLXYCULapPx1mf2U+d5S1Mvt6uQcP4r+fbBX60nc9iSJELDsP4g41k62WXZ9gXeifg0qVGkraY+lTpnBlRZy+6xD32asKXzrfRLmmmrWK8XeOQCLdhY9dehsLianpdzfhcu67N5nHal3+pPOLU+SA86pclwwSo=
+	t=1714111614; cv=none; b=ZP4lZU3b1v7iu4BDB+f8u7Q0TEcYhJcC2tUOrM4izCNMe9bGnZHz+bKSHAZ8X+08b2WlRAhTwWo8SCcfZtlePUt/3pDdiZgn5Yugx8AI+W6FV/DvZoH0O6bMEZ1DbmUiYFTAkit53AvYhY5MDzMcHJWSkSBoqlUd4940/91Yadk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714109536; c=relaxed/simple;
-	bh=ykHDYdfW+I3pR9qLK4+0CQxC91lHC0AHO4V52GwfavM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bpKXCjEQEhddvOLrsozSrszc9MGPcKb5qi8B1qfoavKwAFmyDBC29WBOC3wNUAZg9prTFFkqhU6XGErkyvRac7B2msX1l/g3kE4pSupwvmy5Mfuh62D4DjJhacYlLpDT0SSFymho66OKheeULrqhuaac7W4duUTjcaKUctUYvcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bQBX29ER; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1714111614; c=relaxed/simple;
+	bh=ScRbr+wIDvRcJVfn/2jmiWQIpjY96kUJbIjeVXhPEgA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OOx1YGNITM0XU50XGj0nZ5kUK/uUzzVH/KaAzOrVxObbACcn7VqSA5hYiFssy109/2oU5HMUOVSUk1nBTuc6PenNmRsPPYmCVfg+PyYwG1QjDL1Mg9Mm8a76WNHd+WodEOObRWt73A6GBsMB6y9l+jilc8AvMaIAN/Z5rEVZ6PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HezeXzpK; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bQBX29ER"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1714109528; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=UrSzjICOOeYfI55ilLcClDecrSKT9UOi+NvDXzKPfPM=;
-	b=bQBX29ERZE2PTOhhyt3U1LCs9tDHwxI8HwEu9HI+EM2TNhb5AJGtXFZDXUB2egb4pUm4381XD0tUf0UFC8u+VUDf47KqvqBPqy12y1lCzMHEPveSJ3DRoFrX8E1pBNgjQPeEVJIJeeCLZgfdGv87/PYJ6rzcQC6nv18tpyNGTRo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W5I3EcV_1714109525;
-Received: from 30.97.48.164(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0W5I3EcV_1714109525)
-          by smtp.aliyun-inc.com;
-          Fri, 26 Apr 2024 13:32:06 +0800
-Message-ID: <7ba8c1a3-be59-4a2f-b88a-23b6ab23e1c8@linux.alibaba.com>
-Date: Fri, 26 Apr 2024 13:32:04 +0800
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HezeXzpK"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cYGc8bgkg5Zpu6slyAM2fZResCr4NoxWh4jC4YTe6Z4=; b=HezeXzpKy+c+nbPtjU9hQ2YON4
+	7NqeGctB0kFJARxdzicRJ9qkqb/LJJPufqo8C9651LqrjVmsH4lClJBWw0/kA46d4v0COqrFTKCZI
+	vfY3Li1ZWeapTu9wB2XZrlPdoQP94e41omYnxHovxmUvi/J+VElrUEGoz9eS4yvIAocfBXQpZWEae
+	oiGOk6bnS6HU1TGP8+ETw7PK1NHE/+5CdO+cbl60JQbcAptfHk+JrXI2uLAQiOqT7tCcM7zKm932S
+	Xbfr0cs334iPsHIUI5lMzyCxUKBtu7IVWV7WgfqlBSwp8c3v9p06+CXnUTQ6G6on2AxvAcGxNfcO1
+	hq6KoMFQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s0EjP-0000000BEyH-28j0;
+	Fri, 26 Apr 2024 06:06:47 +0000
+Date: Thu, 25 Apr 2024 23:06:47 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mike Snitzer <msnitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
+	Guangwu Zhang <guazhang@redhat.com>, dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] completion: move blk_wait_io to
+ kernel/sched/completion.c
+Message-ID: <ZitEd_CzSgqy2Kd0@infradead.org>
+References: <31b118f3-bc8d-b18b-c4b9-e57d74a73f@redhat.com>
+ <20240417175538.GP40213@noisy.programming.kicks-ass.net>
+ <546473fd-ca4b-3c64-349d-cc739088b748@redhat.com>
+ <ZiCoIHFLAzCva2lU@infradead.org>
+ <20240422105956.GN30852@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] z_erofs_pcluster_begin(): don't bother with rounding
- position down
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
- brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- yukuai3@huawei.com
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-9-yukuai1@huaweicloud.com>
- <20240407040531.GA1791215@ZenIV>
- <a660a238-2b7e-423f-b5aa-6f5777259f4d@linux.alibaba.com>
- <20240425195641.GJ2118490@ZenIV> <20240425200017.GF1031757@ZenIV>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <20240425200017.GF1031757@ZenIV>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240422105956.GN30852@noisy.programming.kicks-ass.net>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi Al,
-
-On 2024/4/26 04:00, Al Viro wrote:
-> ... and be more idiomatic when calculating ->pageofs_in.
+On Mon, Apr 22, 2024 at 12:59:56PM +0200, Peter Zijlstra wrote:
+> A bit like TASK_NOLOAD (which is used to make TASK_IDLE work), but
+> different I suppose.
 > 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> ---
->   fs/erofs/zdata.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/erofs/zdata.c b/fs/erofs/zdata.c
-> index d417e189f1a0..a4ff20b54cc1 100644
-> --- a/fs/erofs/zdata.c
-> +++ b/fs/erofs/zdata.c
-> @@ -868,7 +868,7 @@ static int z_erofs_pcluster_begin(struct z_erofs_decompress_frontend *fe)
->   	} else {
->   		void *mptr;
->   
-> -		mptr = erofs_read_metabuf(&map->buf, sb, erofs_pos(sb, blknr), EROFS_NO_KMAP);
-> +		mptr = erofs_read_metabuf(&map->buf, sb, map->m_pa, EROFS_NO_KMAP);
+> TASK_NOHUNG would be trivial to add ofc. But is it worth it?
 
-This patch caused some corrupted failure, since
-here erofs_read_metabuf() is EROFS_NO_KMAP and
-it's no needed to get a maped-address since only
-a page reference is needed.
+Yes.  And it would allow us to kill the horrible existing block hack.
 
->   		if (IS_ERR(mptr)) {
->   			ret = PTR_ERR(mptr);
->   			erofs_err(sb, "failed to get inline data %d", ret);
-> @@ -876,7 +876,7 @@ static int z_erofs_pcluster_begin(struct z_erofs_decompress_frontend *fe)
->   		}
->   		get_page(map->buf.page);
->   		WRITE_ONCE(fe->pcl->compressed_bvecs[0].page, map->buf.page);
-> -		fe->pcl->pageofs_in = map->m_pa & ~PAGE_MASK;
-> +		fe->pcl->pageofs_in = offset_in_page(mptr);
-
-So it's unnecessary to change this line IMHO.
-
-BTW, would you mind routing this series through erofs tree
-with other erofs patches for -next (as long as this series
-isn't twisted with vfs and block stuffs...)?  Since I may
-need to test more to ensure they don't break anything and
-could fix them immediately by hand...
-
-Thanks,
-Gao Xiang
-
-
->   		fe->mode = Z_EROFS_PCLUSTER_FOLLOWED_NOINPLACE;
->   	}
->   	/* file-backed inplace I/O pages are traversed in reverse order */
