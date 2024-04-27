@@ -1,31 +1,45 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25A040841
-	for <linux-block@vger.kernel.org>; Sat, 27 Apr 2024 08:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1297F3A1C7;
+	Sat, 27 Apr 2024 14:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714205668; cv=none; b=oyjfS6boyKpt0prg44lr9haWZwsYGdo57xxKHz/mj7eFpXlNmJV2joQJZrGDcE+k1UsTwqQc12K3wsI9FZdK+nGaizof7VG5zobsIg0o1e2JkqEwGAfzPgcKYruaxoHnGC4W7sfaQr5uSn1t91ezmcsY6M+rqVtbTrvS7GQHpyM=
+	t=1714227416; cv=none; b=PvbY5ow6+Xc0sCkyByzXgxjU6UyFCBjElLXyOoNwSNYN2oMD+6+upw869U37hLa/3EI6r0mcXuOk6GXR4VBzaq8gQbGhIvx2vb8Jx32Aqr9fsA/hH0TNqrEiXsqVlaQitTPlLrUSFmAJ7DNoXzpsW+snr5Mnm1f/DPylCYjpyeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714205668; c=relaxed/simple;
-	bh=8mqNeDr0u3iqIl+g9uy8SsNEbjd1LyySMYp+4lxEDBA=;
+	s=arc-20240116; t=1714227416; c=relaxed/simple;
+	bh=Na+9ra5c6HOeVkjiYeIyIYZNajmyn09tvJZtK9DS1pI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sgex39EmcgRv7YwvvwCQwxcihvEs5aIL9Cuxus7v2eTXhiVp95mqLms8SJ0WUvc5zdwszUVB1F3SDuxQLvZFXseC9LlpaGylJ2hLiK2uz4NFopna73GVmoOD6VVrSas4K2JuwdKs8+e8WSHiupquhe/97oABXUHyFKeBJ4wfvrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id AE1B8227AA8; Sat, 27 Apr 2024 10:14:21 +0200 (CEST)
-Date: Sat, 27 Apr 2024 10:14:21 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kundan Kumar <kundan.kumar@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, willy@infradead.org,
-	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
-	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
-	gost.dev@samsung.com
-Subject: Re: [PATCH] block : add larger order folio size instead of pages
-Message-ID: <20240427081421.GA5666@lst.de>
-References: <CGME20240419092428epcas5p4f63759b0efa1f12dfbcf13c67fa8d0f0@epcas5p4.samsung.com> <20240419091721.1790-1-kundan.kumar@samsung.com> <20240422111407.GA10989@lst.de> <20240424132246.7ny74cec7cvphg5i@green245>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RbdsE119G6+gxYIOOD/G5MGr9mCqfcDJ5BFUH4QWVCOBaF7BYDi4+FdGSVIIodMd3RuAwF8eBjUC9CWm7PLJLD144WuhWIg2wf4N7MuHHwE31UyzZS/748hwB8nvgwfx2qd3gqRwrV9aQ5FkwAvMztvrxoFpFIID/Y6UdUdcTEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3emSUjz; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3emSUjz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC98EC113CE;
+	Sat, 27 Apr 2024 14:16:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714227415;
+	bh=Na+9ra5c6HOeVkjiYeIyIYZNajmyn09tvJZtK9DS1pI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F3emSUjz+0ahZUdDclaFWuMk27w0bn3NKv1d3skqWdCQwWwZ9vfAFLgkbVBHcLYsT
+	 nsCIK+ZaIohpY+msyXGe5LZqLq9r6tDdwpjEgW0l6hwAMIYJuKf/ZBhcUiJI18mKO1
+	 K8QUxvkXALqEXQ27PTQ8PeKnsy0creMzLh01o65ADUJrAfMgmMwkwGkopjOeFf+c/v
+	 RvvBfD19NqoMwCtWC5lcRwLNKIN3kX7HfKC2imxXG8aAVPn/JaRyYNP9B9pjvh1UtL
+	 2IFjsoGPhelUcvqgGmarWsd7xxlpeHwKGolKX/yAsi4np0Xq3qREcZNQsDelxwv2VH
+	 bP7JMXw3tQJ2g==
+Date: Sat, 27 Apr 2024 08:16:52 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk,
+	martin.petersen@oracle.com, brauner@kernel.org,
+	asml.silence@gmail.com, dw@davidwei.uk, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH 01/10] block: set bip_vcnt correctly
+Message-ID: <Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
+References: <20240425183943.6319-1-joshi.k@samsung.com>
+ <CGME20240425184651epcas5p3404f2390d6cf05148eb96e1af093e7bc@epcas5p3.samsung.com>
+ <20240425183943.6319-2-joshi.k@samsung.com>
+ <20240427070214.GA3873@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,44 +48,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240424132246.7ny74cec7cvphg5i@green245>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240427070214.GA3873@lst.de>
 
-On Wed, Apr 24, 2024 at 06:52:46PM +0530, Kundan Kumar wrote:
-> On 22/04/24 01:14PM, Christoph Hellwig wrote:
->>> +		folio = page_folio(page);
->>> +
->>> +		if (!folio_test_large(folio) ||
->>> +		   (bio_op(bio) == REQ_OP_ZONE_APPEND)) {
->>
->> I don't understand why you need this branch.  All the arithmetics
->> below should also work just fine for non-large folios
->
-> The branch helps to skip these calculations for zero order folio:
-> A) folio_offset = (folio_page_idx(folio, page) << PAGE_SHIFT) + offset;
-> B) folio_size(folio)
+On Sat, Apr 27, 2024 at 09:02:14AM +0200, Christoph Hellwig wrote:
+> On Fri, Apr 26, 2024 at 12:09:34AM +0530, Kanchan Joshi wrote:
+> > From: Anuj Gupta <anuj20.g@samsung.com>
+> > 
+> > Set the bip_vcnt correctly in bio_integrity_init_user and
+> > bio_integrity_copy_user. If the bio gets split at a later point,
+> > this value is required to set the right bip_vcnt in the cloned bio.
+> > 
+> > Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> 
+> Looks good:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> Please add a Fixes tag and submit it separately from the features.
+> 
+> I'm actually kinda surprised the direct user mapping of integrity data
+> survived so far without this.
 
-Well, we'll need to just handle folio and stop special casing
-order 0 ones eventually.
-
-> If we convert bio_iov_add_page() to bio_iov_add_folio()/bio_add_folio(),
-> we see a decline of about 11% for 4K I/O. When mTHP is enabled we may get
-> a large order folio even for a 4K I/O. The folio_offset may become larger
-> than 4K and we endup using expensive mempool_alloc during nvme_map_data in
-> NVMe driver[1].
->
-> [1]
-> static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
->                struct nvme_command *cmnd)
-> {
-> ...
-> ...
->                        if (bv.bv_offset + bv.bv_len <= NVME_CTRL_PAGE_SIZE * 2)
-
-We can replace this with:
-
-	if ((bv->bv_offset & (NVME_CTRL_PAGE_SIZE - 1)) + bv.bv_len <=
-	    NVME_CTRL_PAGE_SIZE * 2)
-
-as nvme_setup_prp_simple just masks away the high bits anyway.
-
+The only existing use case for user metadata is REQ_OP_DRV_IN/OUT, which
+never splits, so these initial fixes only really matter after this
+series adds new usage for generic READ/WRITE.
