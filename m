@@ -1,96 +1,96 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01AD145325
-	for <linux-block@vger.kernel.org>; Sat, 27 Apr 2024 21:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F44C4A3D;
+	Sat, 27 Apr 2024 23:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714254044; cv=none; b=GJsi2/9GfjKlYsWTzSfcz+D1of5ayzXmaTioqQpREHWPVOk4RH+t8uZ+y2jWUcuLA0wOcwKo7LTnI7b43cn6z/r7sqweobr1zxrl/uZTWXvaNMj/v09jr8mH3ehtGK59+eJcLqbMB1g1vj8+s5l8vbUtjwfpizeLl8v9xd1R9y0=
+	t=1714261590; cv=none; b=Lg+MWxhfo9EcdYJTApG/6XNLs+f0/igIkS8P6gBtrx87o9YcecZXLoamV3cHD662eDRNRhP5aLutVuxQRB1/RzEzX8AaalhBXxpAPHnIqNU/Qm76ieab6RaEMdgQ+RPnmWQpoxqCX66aQ3alwLQBww9MDSOawEfEqPhumMyDEHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714254044; c=relaxed/simple;
-	bh=IIGshDaph8veGUjCfHMCr5hhSRQX7mrwk6r+2BogNic=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s29OF2DD7kr9iJUpuE37qFhPqDTwLDWsGJ+wj8qEl3eGzcft4q7GIe6aqjwPpOoB5IZGBqwM7pSUqcSUY9OJplInmVYqdlr5JyQpiTz/sLhDpI+nBtal9JeUrEw6AtmMTOD27JXDPKM+mR6aMfRcc1KL4hh8fvtSSkOdHHgikks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=RIkdIDI+; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1714261590; c=relaxed/simple;
+	bh=gJwg9xG8VlL/41boVI9dbukbsm9h734IFRS3g0vDnV0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1/gKabLAl7VGFkV3QGsgadHoetRAfKN2qwConfqzqnffT28+DrZydx50nmbB535v4F48b9k8vrfRm18tgfntnZsx3izzaG+Mg7aOBHwsJ3DjB7EC2T6mbPesuf4mmDYBGhQpy9J/ALVQBGUQ3ZQdapHgVx1BL7C1HLLsNMk3t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=IlrHyZvo; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="RIkdIDI+"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-34665dd7610so1385566f8f.3
-        for <linux-block@vger.kernel.org>; Sat, 27 Apr 2024 14:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1714254041; x=1714858841; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mA6ESoMU41euVvMMgdzVMUo8Y0YkwHfh7I4CxBNPhNU=;
-        b=RIkdIDI+2V8I0wlOlHmqLljoMUNIciP6A7khKduRcYnE9V4tnDUNvaZi/MKweP8W/B
-         idkH6sVzdjp5kc3lCfMLhnyIq5VnxVtydmjeo2jcbtUird1FgWb8lak3l+VfLrOS0rcu
-         3pK2tAQgSS0XYMLqZaXgk7xtqFlmNrdPRBqwg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714254041; x=1714858841;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mA6ESoMU41euVvMMgdzVMUo8Y0YkwHfh7I4CxBNPhNU=;
-        b=XtNycQNkBwGN4QslhygHRrjArj8uaYXMbJ6Za213LjSNliFmikFnQjVfQeUh/rQflf
-         eRbHqUvVev1Kho+WV8ub/rh+AqeR4+GpNFLcG0URoSv9V6BffD/pWU4qv0U1ljlgb8CY
-         nMjhdBtICHgxgEuPIFXXbbUBqGVVfPfBMCyqe7A3It4jc2/QoXQHF4l39SadrAqsxFTu
-         UblwBGdcAwvTvdUF5qBejJro9AYy1rozXhWXzEPCaRcAA2h1sljSdPw4n+je3XeSrLBU
-         pX3VyFIpydzPp1EOFLKlJipc6mxzMURvn6yBFu442pztn0CSv6ZUaSu3YfDEqrg9Mxcl
-         JNBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3RtaxAZqUI5iepDxoMyIrEGUQjM8vdrhyOScWJsK0bfM2KtaXf3ZJ+L8wwU3slV+3qySDM00nw8+HP5GEVUL+UpVgU9efnMblWsM=
-X-Gm-Message-State: AOJu0YwC8AsHJVsUIqcZYHbyLQE3t/hsHepfrQkBQiFWPS0j1nvH8wsz
-	FuYHS9fGh5pJo9dOmr0r9ulaDGcMLwUihe4BMRQTpIR985VrbgInR8LQ4euvQHE/3YgeEObs0hS
-	HjZM=
-X-Google-Smtp-Source: AGHT+IEWVZQe6XZUK1GIyckJtO0sNaaxJ3gs8srFaQbCeLQRoGC9cba5uDpofYgUjawcxd/86c9zkA==
-X-Received: by 2002:a05:600c:358e:b0:41a:446b:10df with SMTP id p14-20020a05600c358e00b0041a446b10dfmr5573218wmq.12.1714254040717;
-        Sat, 27 Apr 2024 14:40:40 -0700 (PDT)
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
-        by smtp.gmail.com with ESMTPSA id k4-20020a50cb84000000b005705bb48307sm11392954edi.42.2024.04.27.14.40.39
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Apr 2024 14:40:39 -0700 (PDT)
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a58f1f36427so32125866b.3
-        for <linux-block@vger.kernel.org>; Sat, 27 Apr 2024 14:40:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW8nlm5YZxDnvYRQ/yQszEwuGG4WQ8nQYBuABxW7zGqGZFRJN3WnO2KydWBbxp0b2vmzKVzISJ+mcCf+WFujPcRO0B+NxCAcakC9kQ=
-X-Received: by 2002:a17:906:22ce:b0:a55:b99d:74a7 with SMTP id
- q14-20020a17090622ce00b00a55b99d74a7mr3773528eja.11.1714254039321; Sat, 27
- Apr 2024 14:40:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="IlrHyZvo"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=GYaIaWc5ozD1igWj/dlah909E8eLQGhxWKN9amtdGrY=; b=IlrHyZvo4caZIVYM3oj/LRaAR9
+	1BzkCio9PHBE7cxaqhG0bieVtoZehI/dmYHvggdzInJTK6GAieUL1ly0ityJmSVSwMOlP0KiyPAHu
+	qv96v4U3LyWtR2ZSnBiC25kJcHKdm93YmhGdUVk8x+Cj0K0bz6LKNiueAIRkPdqBtZCK/2yULeoVy
+	+3NYgTr74TV4nB869rvgfTJWqWFPrYLV07LnzUybdY5+PaLfeDmPKv+H6M7Zpql8HM3R4PNjho5M+
+	4tS9E67clJgHRkbvl7CqRdpBzztly2sBLk9uT++4FI6CXXcZRsMys9pLE1jNyU7PkqtJ7FfxZWfkG
+	s8XsL3Cw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1s0rkN-006M7p-1f;
+	Sat, 27 Apr 2024 23:46:23 +0000
+Date: Sun, 28 Apr 2024 00:46:23 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH 4/7] swapon(2): open swap with O_EXCL
+Message-ID: <20240427234623.GS2118490@ZenIV>
+References: <20240427210920.GR2118490@ZenIV>
+ <20240427211128.GD1495312@ZenIV>
+ <CAHk-=wiag-Dn=7v0tX2UazhMTBzG7P42FkgLSsVc=rfN8_NC2A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240427210920.GR2118490@ZenIV> <20240427211128.GD1495312@ZenIV>
-In-Reply-To: <20240427211128.GD1495312@ZenIV>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 27 Apr 2024 14:40:22 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiag-Dn=7v0tX2UazhMTBzG7P42FkgLSsVc=rfN8_NC2A@mail.gmail.com>
-Message-ID: <CAHk-=wiag-Dn=7v0tX2UazhMTBzG7P42FkgLSsVc=rfN8_NC2A@mail.gmail.com>
-Subject: Re: [PATCH 4/7] swapon(2): open swap with O_EXCL
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>, 
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	linux-btrfs@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiag-Dn=7v0tX2UazhMTBzG7P42FkgLSsVc=rfN8_NC2A@mail.gmail.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Sat, 27 Apr 2024 at 14:11, Al Viro <viro@zeniv.linux.org.uk> wrote:
->
-> ... eliminating the need to reopen block devices so they could be
-> exclusively held.
+On Sat, Apr 27, 2024 at 02:40:22PM -0700, Linus Torvalds wrote:
+> On Sat, 27 Apr 2024 at 14:11, Al Viro <viro@zeniv.linux.org.uk> wrote:
+> >
+> > ... eliminating the need to reopen block devices so they could be
+> > exclusively held.
+> 
+> This looks like a good change, but it raises the question of why we
+> did it this odd way to begin with?
+> 
+> Is it just because O_EXCL without O_CREAT is kind of odd, and only has
+> meaning for block devices?
+> 
+> Or is it just that before we used fiel pointers for block devices, the
+> old model made more sense?
+> 
+> Anyway, I like it, it just makes me go "why didn't we do it that way
+> originally?"
 
-This looks like a good change, but it raises the question of why we
-did it this odd way to begin with?
+Exclusion for swap partitions:
 
-Is it just because O_EXCL without O_CREAT is kind of odd, and only has
-meaning for block devices?
+commit 75e9c9e1bffbe4a1767172855296b94ccba28f71
+Author: Alexander Viro <viro@math.psu.edu>
+Date:   Mon Mar 4 22:56:47 2002 -0800
 
-Or is it just that before we used fiel pointers for block devices, the
-old model made more sense?
+    [PATCH] death of is_mounted() and aother fixes
 
-Anyway, I like it, it just makes me go "why didn't we do it that way
-originally?"
 
-                Linus
+O_EXCL for block devices:
+
+commit c366082d9ed0a0d3c46441d1b3fdf895d8e55ca9
+Author: Andrew Morton <akpm@osdl.org>
+Date:   Wed Aug 20 10:26:57 2003 -0700
+
+    [PATCH] Allow O_EXCL on a block device to claim exclusive use.
+
+IOW, O_EXCL hadn't been available at the time - it had been implemented
+on top of bd_claim()/bd_release() introduced in the same earlier commit.
+
+Switching swap exclusion to O_EXCL could've been done back in 2003 or
+at any later point; it's just that swapon(2)/swapoff(2) is something that
+rarely gets a look...
