@@ -1,218 +1,224 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41E510F1;
-	Sun, 28 Apr 2024 16:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8686E7351A;
+	Sun, 28 Apr 2024 18:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714323315; cv=none; b=WMMUzTimGkEJQypY9cPaVNj+r/X1IQGDSUnN9dBM/xN4/xxiLvJMV3ZQcG2fnBbLGupvVrsNnsX5J5DB4/wWlUaJl5QBBly54fLr6LhxrXLGy6blX5sszE/4R8T8oKuFqi5+iyWW1wHXCTgypojMmBMgLLG+ys0ksUtylj9fBqo=
+	t=1714328382; cv=none; b=Hmrf8+jKsPBPHh92zK+uUDpr+ZrmcqWe3SStY/Y4qWJO2aStWR+FP0Y+50DjgBzdJxzViiab+b/R7xqS6tz8214o/22aS3uiOEHdqpTjdUgd1IXClsQv86O51zNnkAG47oaiR1vXOltTjBM7fRKE8MSxColk72eJi1PdkEoSwiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714323315; c=relaxed/simple;
-	bh=Ami0kmcZDld632bBgXtckLo0jbTRciV/yZarknXwkk0=;
+	s=arc-20240116; t=1714328382; c=relaxed/simple;
+	bh=KHWabH/Dh5y+pJMK4dr1ObQ1jU/r8N2vAS44IfI5sJ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cuyb3qKVFkpo/OuC1TJQjvpTUJBdkibt3MxxKLKU1YLMGtAejZN1SgvvFxEYRAliFeEHd8+EGb7jVP2uayucHoG5d2ewYiYqOu2arwpTMvFZm1bN+mqKn2kMgI28y5Y6kGlRbSjG28Cjyn3kPZwF9BjzT7SfvhhhiQ/MYtIO5iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=groves.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F5yHEN6s; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=groves.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=jkPRUCwsIHnVE8nwTiDy39+mjP/l3FGOF7NnVoloimVOddb0gYwL70pPDdIUhjQ6N20K6ckGjYMNtDwXCQQ/1W9pWa7gJpRpmsj9tCkOKybM0ZABfG1fG4J/nSP3YfJopNQeHYB1EtN03a8s02TKktJw7PQT1vziM5qa7uCZmxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=J6ko6ECE; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F5yHEN6s"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6eb812370a5so2447428a34.0;
-        Sun, 28 Apr 2024 09:55:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714323312; x=1714928112; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G3WwFMuHhBVtoJUHbucJSgPjjuSb7tuNIxOTsjoNK0M=;
-        b=F5yHEN6sNJ7vYBmju47XQUJjOwCFS5YNrkZ29pExw2GAo7JV3OBVu0NyZ0S1EehfFd
-         ith6ObyjGlF3Cq0XU9t+T1Kzr+d7h+YGZKXIowCjZ7D2a8e+IThChmR7vmLd2gH9OZKA
-         0grasOuJizPkeJ9TZZzXc1awsVFhNqTJXoL5jbtnY1bTayKcHRDzOay3K6RjMeM8sRqm
-         7fOSnRG330x6aaodd+PonQTl1K8OeH7EnVmu5p3zoLr2dg8eGIRKXNVwE5lrwPUKAE3/
-         TmFkrXD67c4BGlPRr1vYX0HV+0xInrQ4K+xrnxEbFQwv40PlO0f2jhNONUWREKvgnoOF
-         hp7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714323312; x=1714928112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G3WwFMuHhBVtoJUHbucJSgPjjuSb7tuNIxOTsjoNK0M=;
-        b=OSWoWYGMlRBaCpO0JlRXaPI2j1XjVbLN5jGLBcTcWN602/eUde9bZX0XmIxvhEPu7M
-         n2Euxa7GZr8x0zU3Td8RF5ppev+YSi+lSAyG/rN2Xcegyvh3CnoT0yOftoaU2NTqjEr6
-         haRAhotA4LzFNzCUsuymzS+Lw/QcZ1D8JjM7sBI5AkUrBBjrdbmIuYmJZ1x8lbcvfd2S
-         737Or4tMOzhWK86UsrvVrgo6nqYqGTo2Nk06ISaHVgd35SffWkcCkS5oF185+EaqpN6Q
-         newMJIwL+HeAbTmOK/ovkifMp0wEP0ZTXUl3NKB/LXT5G4vBruM7WT111RWg8LOyGwbT
-         wGIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWz7fdbuFCkl2GQKeprA4jryVLbb3dTX65wlvsyEOD6qIlN2jdGdNR4cLRljOl6eHQGovIk6dlfq5pSJGJioOWX8CRGdQDVaehhWqwLCYA1Ud+bVV8qeYlDNlVtxZJliUAz5YzWLFWC5X1P/g+KQ/Sg6/tqxg7AkENCXgV2wyyXR4YMN6k=
-X-Gm-Message-State: AOJu0YxkIZE2pq9RgD+1Fc16LzJs5OW4HgyOSQbR0wK0FeYMg9oe4Clo
-	ElNHYRW51i5sTLxU4hOckNmFAAlJTG83aO965LoawdYOgJijP23U
-X-Google-Smtp-Source: AGHT+IFjRTjq0wJmFpd2+tz4BEbUANUM9qvQC34J+c24N/aiSVikf090UIEPVBDxgTJS8q0l820i2w==
-X-Received: by 2002:a05:6870:d8cb:b0:23c:74ec:6d23 with SMTP id of11-20020a056870d8cb00b0023c74ec6d23mr1810226oac.18.1714323312541;
-        Sun, 28 Apr 2024 09:55:12 -0700 (PDT)
-Received: from Borg-9.local ([70.114.203.196])
-        by smtp.gmail.com with ESMTPSA id wq18-20020a056871aa1200b0023c8fbe8ad8sm122537oab.47.2024.04.28.09.55.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Apr 2024 09:55:12 -0700 (PDT)
-Sender: John Groves <grovesaustin@gmail.com>
-Date: Sun, 28 Apr 2024 11:55:10 -0500
-From: John Groves <John@groves.net>
-To: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Cc: Gregory Price <gregory.price@memverge.com>, 
-	Dan Williams <dan.j.williams@intel.com>, axboe@kernel.dk, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev
-Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
-Message-ID: <wold3g5ww63cwqo7rlwevqcpmlen3fl3lbtbq3qrmveoh2hale@e7carkmumnub>
-References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
- <66288ac38b770_a96f294c6@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <ef34808b-d25d-c953-3407-aa833ad58e61@easystack.cn>
- <ZikhwAAIGFG0UU23@memverge.com>
- <bbf692ec-2109-baf2-aaae-7859a8315025@easystack.cn>
- <ZiuwyIVaKJq8aC6g@memverge.com>
- <98ae27ff-b01a-761d-c1c6-39911a000268@easystack.cn>
- <ZivS86BrfPHopkru@memverge.com>
- <8f373165-dd2b-906f-96da-41be9f27c208@easystack.cn>
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="J6ko6ECE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=H5pYDAKHCRpClX9jMWalas5W1Jyl6HgR4eTgrthlE7Q=; b=J6ko6ECEXnhOkftsRWA1k6Tac8
+	u3QkzK02ARkqO6LCfpvIfdV/f9xz00AFV6xxjdap8DtC2k/1RTODpuT0/QMMeDfR4Ctb1W6cw1IGr
+	aigdDKJzRHUMMmqxYtaT8pLvtdC/P4N69GuwhoUsBvTLiqY9fIG4axJUt+zWkawdqxS5OEMgdrwhN
+	nUkadOASticQ++AGUCETjl91IgX2RN4aFBd5PJjkaG5JUBeTLgECi2QhnrppKlfgXzA5rJYRiCS/l
+	kLk291G0X2gW96H+9gTTjyciXWaniL91BXjpnvWSc4Ug34s6Hkgo82yJ40GqzwDk9FbsxRtSWt9v6
+	M2fSKWOQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1s197e-006uuH-21;
+	Sun, 28 Apr 2024 18:19:34 +0000
+Date: Sun, 28 Apr 2024 19:19:34 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH 4/7] swapon(2): open swap with O_EXCL
+Message-ID: <20240428181934.GV2118490@ZenIV>
+References: <20240427210920.GR2118490@ZenIV>
+ <20240427211128.GD1495312@ZenIV>
+ <CAHk-=wiag-Dn=7v0tX2UazhMTBzG7P42FkgLSsVc=rfN8_NC2A@mail.gmail.com>
+ <20240427234623.GS2118490@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8f373165-dd2b-906f-96da-41be9f27c208@easystack.cn>
+In-Reply-To: <20240427234623.GS2118490@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On 24/04/28 01:47PM, Dongsheng Yang wrote:
+On Sun, Apr 28, 2024 at 12:46:23AM +0100, Al Viro wrote:
+> On Sat, Apr 27, 2024 at 02:40:22PM -0700, Linus Torvalds wrote:
+> > On Sat, 27 Apr 2024 at 14:11, Al Viro <viro@zeniv.linux.org.uk> wrote:
+> > >
+> > > ... eliminating the need to reopen block devices so they could be
+> > > exclusively held.
+> > 
+> > This looks like a good change, but it raises the question of why we
+> > did it this odd way to begin with?
+> > 
+> > Is it just because O_EXCL without O_CREAT is kind of odd, and only has
+> > meaning for block devices?
+> > 
+> > Or is it just that before we used fiel pointers for block devices, the
+> > old model made more sense?
+> > 
+> > Anyway, I like it, it just makes me go "why didn't we do it that way
+> > originally?"
+> 
+> Exclusion for swap partitions:
+> 
+> commit 75e9c9e1bffbe4a1767172855296b94ccba28f71
+> Author: Alexander Viro <viro@math.psu.edu>
+> Date:   Mon Mar 4 22:56:47 2002 -0800
+> 
+>     [PATCH] death of is_mounted() and aother fixes
 > 
 > 
-> 在 2024/4/27 星期六 上午 12:14, Gregory Price 写道:
-> > On Fri, Apr 26, 2024 at 10:53:43PM +0800, Dongsheng Yang wrote:
-> > > 
-> > > 
-> > > 在 2024/4/26 星期五 下午 9:48, Gregory Price 写道:
-> > > > 
-> > > 
-> > > In (5) of the cover letter, I mentioned that cbd addresses cache coherence
-> > > at the software level:
-> > > 
-> > > (5) How do blkdev and backend interact through the channel?
-> > > 	a) For reader side, before reading the data, if the data in this channel
-> > > may be modified by the other party, then I need to flush the cache before
-> > > reading to ensure that I get the latest data. For example, the blkdev needs
-> > > to flush the cache before obtaining compr_head because compr_head will be
-> > > updated by the backend handler.
-> > > 	b) For writter side, if the written information will be read by others,
-> > > then after writing, I need to flush the cache to let the other party see it
-> > > immediately. For example, after blkdev submits cbd_se, it needs to update
-> > > cmd_head to let the handler have a new cbd_se. Therefore, after updating
-> > > cmd_head, I need to flush the cache to let the backend see it.
-> > > 
-> > 
-> > Flushing the cache is insufficient.  All that cache flushing guarantees
-> > is that the memory has left the writer's CPU cache.  There are potentially
-> > many write buffers between the CPU and the actual backing media that the
-> > CPU has no visibility of and cannot pierce through to force a full
-> > guaranteed flush back to the media.
-> > 
-> > for example:
-> > 
-> > memcpy(some_cacheline, data, 64);
-> > mfence();
-> > 
-> > Will not guarantee that after mfence() completes that the remote host
-> > will have visibility of the data.  mfence() does not guarantee a full
-> > flush back down to the device, it only guarantees it has been pushed out
-> > of the CPU's cache.
-> > 
-> > similarly:
-> > 
-> > memcpy(some_cacheline, data, 64);
-> > mfence();
-> > memcpy(some_other_cacheline, data, 64);
-> > mfence()
-> > 
-> > Will not guarantee that some_cacheline reaches the backing media prior
-> > to some_other_cacheline, as there is no guarantee of write-ordering in
-> > CXL controllers (with the exception of writes to the same cacheline).
-> > 
-> > So this statement:
-> > 
-> > > I need to flush the cache to let the other party see it immediately.
-> > 
-> > Is misleading.  They will not see is "immediately", they will see it
-> > "eventually at some completely unknowable time in the future".
+> O_EXCL for block devices:
 > 
-> This is indeed one of the issues I wanted to discuss at the RFC stage. Thank
-> you for pointing it out.
+> commit c366082d9ed0a0d3c46441d1b3fdf895d8e55ca9
+> Author: Andrew Morton <akpm@osdl.org>
+> Date:   Wed Aug 20 10:26:57 2003 -0700
 > 
-> In my opinion, using "nvdimm_flush" might be one way to address this issue,
-> but it seems to flush the entire nd_region, which might be too heavy.
-> Moreover, it only applies to non-volatile memory.
+>     [PATCH] Allow O_EXCL on a block device to claim exclusive use.
 > 
-> This should be a general problem for cxl shared memory. In theory, FAMFS
-> should also encounter this issue.
+> IOW, O_EXCL hadn't been available at the time - it had been implemented
+> on top of bd_claim()/bd_release() introduced in the same earlier commit.
 > 
-> Gregory, John, and Dan, Any suggestion about it?
-> 
-> Thanx a lot
-> > 
-> > ~Gregory
-> > 
+> Switching swap exclusion to O_EXCL could've been done back in 2003 or
+> at any later point; it's just that swapon(2)/swapoff(2) is something that
+> rarely gets a look...
 
-Hi Dongsheng,
+FWIW, pretty much the same can be done with zram - open with O_EXCL and to
+hell with reopening.  Guys, are there any objections to that?
 
-Gregory is right about the uncertainty around "clflush" operations, but
-let me drill in a bit further.
-
-Say you copy a payload into a "bucket" in a queue and then update an
-index in a metadata structure; I'm thinking of the standard producer/
-consumer queuing model here, with one index mutated by the producer and
-the other mutated by the consumer. 
-
-(I have not reviewed your queueing code, but you *must* be using this
-model - things like linked-lists won't work in shared memory without 
-shared locks/atomics.)
-
-Normal logic says that you should clflush the payload before updating
-the index, then update and clflush the index.
-
-But we still observe in non-cache-coherent shared memory that the payload 
-may become valid *after* the clflush of the queue index.
-
-The famfs user space has a program called pcq.c, which implements a
-producer/consumer queue in a pair of famfs files. The only way to 
-currently guarantee a valid read of a payload is to use sequence numbers 
-and checksums on payloads.  We do observe mismatches with actual shared 
-memory, and the recovery is to clflush and re-read the payload from the 
-client side. (Aside: These file pairs theoretically might work for CBD 
-queues.)
-
-Anoter side note: it would be super-helpful if the CPU gave us an explicit 
-invalidate rather than just clflush, which will write-back before 
-invalidating *if* the cache line is marked as dirty, even when software
-knows this should not happen.
-
-Note that CXL 3.1 provides a way to guarantee that stuff that should not
-be written back can't be written back: read-only mappings. This one of
-the features I got into the spec; using this requires CXL 3.1 DCD, and 
-would require two DCD allocations (i.e. two tagged-capacity dax devices - 
-one writable by the server and one by the client).
-
-Just to make things slightly gnarlier, the MESI cache coherency protocol
-allows a CPU to speculatively convert a line from exclusive to modified,
-meaning it's not clear as of now whether "occasional" clean write-backs
-can be avoided. Meaning those read-only mappings may be more important
-than one might think. (Clean write-backs basically make it
-impossible for software to manage cache coherency.)
-
-Keep in mind that I don't think anybody has cxl 3 devices or CPUs yet, and 
-shared memory is not explicitly legal in cxl 2, so there are things a cpu 
-could do (or not do) in a cxl 2 environment that are not illegal because 
-they should not be observable in a no-shared-memory environment.
-
-CBD is interesting work, though for some of the reasons above I'm somewhat
-skeptical of shared memory as an IPC mechanism.
-
-Regards,
-John
-
-
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+---
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index f0639df6cd18..d882a0c7b522 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -426,11 +426,10 @@ static void reset_bdev(struct zram *zram)
+ 	if (!zram->backing_dev)
+ 		return;
+ 
+-	fput(zram->bdev_file);
+ 	/* hope filp_close flush all of IO */
+ 	filp_close(zram->backing_dev, NULL);
+ 	zram->backing_dev = NULL;
+-	zram->bdev_file = NULL;
++	zram->bdev = NULL;
+ 	zram->disk->fops = &zram_devops;
+ 	kvfree(zram->bitmap);
+ 	zram->bitmap = NULL;
+@@ -473,10 +472,8 @@ static ssize_t backing_dev_store(struct device *dev,
+ 	size_t sz;
+ 	struct file *backing_dev = NULL;
+ 	struct inode *inode;
+-	struct address_space *mapping;
+ 	unsigned int bitmap_sz;
+ 	unsigned long nr_pages, *bitmap = NULL;
+-	struct file *bdev_file = NULL;
+ 	int err;
+ 	struct zram *zram = dev_to_zram(dev);
+ 
+@@ -497,15 +494,14 @@ static ssize_t backing_dev_store(struct device *dev,
+ 	if (sz > 0 && file_name[sz - 1] == '\n')
+ 		file_name[sz - 1] = 0x00;
+ 
+-	backing_dev = filp_open(file_name, O_RDWR|O_LARGEFILE, 0);
++	backing_dev = filp_open(file_name, O_RDWR|O_LARGEFILE|O_EXCL, 0);
+ 	if (IS_ERR(backing_dev)) {
+ 		err = PTR_ERR(backing_dev);
+ 		backing_dev = NULL;
+ 		goto out;
+ 	}
+ 
+-	mapping = backing_dev->f_mapping;
+-	inode = mapping->host;
++	inode = backing_dev->f_mapping->host;
+ 
+ 	/* Support only block device in this moment */
+ 	if (!S_ISBLK(inode->i_mode)) {
+@@ -513,14 +509,6 @@ static ssize_t backing_dev_store(struct device *dev,
+ 		goto out;
+ 	}
+ 
+-	bdev_file = bdev_file_open_by_dev(inode->i_rdev,
+-				BLK_OPEN_READ | BLK_OPEN_WRITE, zram, NULL);
+-	if (IS_ERR(bdev_file)) {
+-		err = PTR_ERR(bdev_file);
+-		bdev_file = NULL;
+-		goto out;
+-	}
+-
+ 	nr_pages = i_size_read(inode) >> PAGE_SHIFT;
+ 	bitmap_sz = BITS_TO_LONGS(nr_pages) * sizeof(long);
+ 	bitmap = kvzalloc(bitmap_sz, GFP_KERNEL);
+@@ -531,7 +519,7 @@ static ssize_t backing_dev_store(struct device *dev,
+ 
+ 	reset_bdev(zram);
+ 
+-	zram->bdev_file = bdev_file;
++	zram->bdev = I_BDEV(inode);
+ 	zram->backing_dev = backing_dev;
+ 	zram->bitmap = bitmap;
+ 	zram->nr_pages = nr_pages;
+@@ -544,9 +532,6 @@ static ssize_t backing_dev_store(struct device *dev,
+ out:
+ 	kvfree(bitmap);
+ 
+-	if (bdev_file)
+-		fput(bdev_file);
+-
+ 	if (backing_dev)
+ 		filp_close(backing_dev, NULL);
+ 
+@@ -587,7 +572,7 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
+ {
+ 	struct bio *bio;
+ 
+-	bio = bio_alloc(file_bdev(zram->bdev_file), 1, parent->bi_opf, GFP_NOIO);
++	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
+ 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
+ 	__bio_add_page(bio, page, PAGE_SIZE, 0);
+ 	bio_chain(bio, parent);
+@@ -703,7 +688,7 @@ static ssize_t writeback_store(struct device *dev,
+ 			continue;
+ 		}
+ 
+-		bio_init(&bio, file_bdev(zram->bdev_file), &bio_vec, 1,
++		bio_init(&bio, zram->bdev, &bio_vec, 1,
+ 			 REQ_OP_WRITE | REQ_SYNC);
+ 		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
+ 		__bio_add_page(&bio, page, PAGE_SIZE, 0);
+@@ -785,7 +770,7 @@ static void zram_sync_read(struct work_struct *work)
+ 	struct bio_vec bv;
+ 	struct bio bio;
+ 
+-	bio_init(&bio, file_bdev(zw->zram->bdev_file), &bv, 1, REQ_OP_READ);
++	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
+ 	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
+ 	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
+ 	zw->error = submit_bio_wait(&bio);
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index 37bf29f34d26..35e322144629 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -132,7 +132,7 @@ struct zram {
+ 	spinlock_t wb_limit_lock;
+ 	bool wb_limit_enable;
+ 	u64 bd_wb_limit;
+-	struct file *bdev_file;
++	struct block_device *bdev;
+ 	unsigned long *bitmap;
+ 	unsigned long nr_pages;
+ #endif
