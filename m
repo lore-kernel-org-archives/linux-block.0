@@ -1,129 +1,131 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from mail-m24108.xmail.ntesmail.com (mail-m24108.xmail.ntesmail.com [45.195.24.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C692C320C;
-	Sun, 28 Apr 2024 05:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049C93E494;
+	Sun, 28 Apr 2024 06:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.195.24.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714281669; cv=none; b=Xb8qR4liojazXd15wvDEv2kSSqdj9vFtZbRQG645TP9IYF7PD5VWNupZ3vJY4ogomfX0amsPlx395qK7bkf8GQhovouEeHeWvMjKhs8YrSPerchDAIFZaBd44pFeOx6xXw7ZU6UDYSbc1h8NSer4DXw1NG44JH3Uec7JUhadInQ=
+	t=1714286578; cv=none; b=g85K5UwsQ4DwGiEztiQngT6/ZVZ78qKOYiI8vF/lwfe6UeroT7ijtXqdkZ35XfPoQ7IvqcGYydDNDJMfO0T9r6dorv3azuk6pMeyeq1Q1ir1hvqMkcR8iMJ9w9wAQpD65WdMGbNepjlxtUewDE4jUShbttrELqhSHZZ2PwUMrP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714281669; c=relaxed/simple;
-	bh=8ZcnS8b0PNCfVGXzTKij4oQxakJ6aMqGuUG1wToqsrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VfosN0EBMChilFn1ZQUjXw/OdDyX44TQ6cCALm5nzVHipS6c2/vL+Ye0kjSGwe2g9+hvWprQOM45tc+R5HHgoJZ5xqB7sGStzMUSxlPGk2iT8Ygr7CsWkm8VqKVeOdpRbx2h8gpQ57qBV5X+RzLuZr4UahqtGjhee8DZo5CpTEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=I+S0MGPk; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="I+S0MGPk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=WJhjreZ4/O1HDJ0IIl3pZkSWylZry442LChV7Q1j9Qw=; b=I+S0MGPkV7JU2xQhB5RVq/zz53
-	QdkOy2mQV73hfCCA44UhZVbqqvFoHnxZMX+sR8OxFLI+2Mmac6sOgnzryxVznSqCoTytLKURa5IDi
-	RBRDWN5/Wen8OAdetOfW4HObyXY0YIYaiJ3qUOuIQ623bij5hKgrR72XZ5SS1xw6/ZsfjVpk8Em3W
-	By5gcWuXd+tqjQ4WOCQEy8FIgUCq4Is3zoD/iFjZp4fvWoCdD3CHbJWmsP9apZOWfz3Bky2k6hzPT
-	eZodscQER1PHxpaCey6YG4IjjoWMnWbbUQTRaoMzo/uqBVkTYUMHbUS+phywAP894uIy9CQC6wWg5
-	np19HTwA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1s0wyI-006VT5-0U;
-	Sun, 28 Apr 2024 05:21:06 +0000
-Date: Sun, 28 Apr 2024 06:21:06 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: linux-fsdevel@vger.kernel.org
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 8/8] bdev: move ->bd_make_it_fail to ->__bd_flags
-Message-ID: <20240428052106.GH1549798@ZenIV>
-References: <20240428051232.GU2118490@ZenIV>
+	s=arc-20240116; t=1714286578; c=relaxed/simple;
+	bh=ij7cu/SamWdL5jSL1fvJ2OvFNNjuQdq94yrLrLdTk24=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=bxHyfwURmQfG9S1K4L22A9Thep58k2zB8gd8iZcpWCiIgfuWqekx9aR7OTRqeG8BsCygqyD/WLuhucoC35Tow4szg1jlmEO8tpaRyASac2UMQk3T5uOBUBXVtwfjG6C8QKOc2PdjfCo0aky7B9XcykS97Gp1LKp+pFLT3WDuWGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=45.195.24.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
+Received: from [192.168.122.189] (unknown [218.94.118.90])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id 153748601AB;
+	Sun, 28 Apr 2024 13:47:31 +0800 (CST)
+Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
+To: Gregory Price <gregory.price@memverge.com>,
+ Dan Williams <dan.j.williams@intel.com>, John Groves <John@groves.net>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
+ nvdimm@lists.linux.dev
+References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+ <66288ac38b770_a96f294c6@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+ <ef34808b-d25d-c953-3407-aa833ad58e61@easystack.cn>
+ <ZikhwAAIGFG0UU23@memverge.com>
+ <bbf692ec-2109-baf2-aaae-7859a8315025@easystack.cn>
+ <ZiuwyIVaKJq8aC6g@memverge.com>
+ <98ae27ff-b01a-761d-c1c6-39911a000268@easystack.cn>
+ <ZivS86BrfPHopkru@memverge.com>
+From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Message-ID: <8f373165-dd2b-906f-96da-41be9f27c208@easystack.cn>
+Date: Sun, 28 Apr 2024 13:47:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240428051232.GU2118490@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <ZivS86BrfPHopkru@memverge.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkZTUNCVkoeTk0fSh5KH09KH1UZERMWGhIXJBQOD1
+	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
+X-HM-Tid: 0a8f233e86d4023ckunm153748601ab
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6ORA6EBw5PDc#NwsISxADSgNM
+	GU4aCk1VSlVKTEpPSUNISU5KTE5LVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBT0JDTjcG
 
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
- block/blk-core.c          |  3 ++-
- block/genhd.c             | 12 ++++++++----
- include/linux/blk_types.h |  6 +++---
- 3 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1be49be9fac4..1076336dd620 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -494,7 +494,8 @@ __setup("fail_make_request=", setup_fail_make_request);
- 
- bool should_fail_request(struct block_device *part, unsigned int bytes)
- {
--	return part->bd_make_it_fail && should_fail(&fail_make_request, bytes);
-+	return bdev_test_flag(part, BD_MAKE_IT_FAIL) &&
-+	       should_fail(&fail_make_request, bytes);
- }
- 
- static int __init fail_make_request_debugfs(void)
-diff --git a/block/genhd.c b/block/genhd.c
-index 19cd1a31fa80..0cce461952f6 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1066,7 +1066,8 @@ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
- ssize_t part_fail_show(struct device *dev,
- 		       struct device_attribute *attr, char *buf)
- {
--	return sprintf(buf, "%d\n", dev_to_bdev(dev)->bd_make_it_fail);
-+	return sprintf(buf, "%d\n",
-+		       bdev_test_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL));
- }
- 
- ssize_t part_fail_store(struct device *dev,
-@@ -1075,9 +1076,12 @@ ssize_t part_fail_store(struct device *dev,
- {
- 	int i;
- 
--	if (count > 0 && sscanf(buf, "%d", &i) > 0)
--		dev_to_bdev(dev)->bd_make_it_fail = i;
--
-+	if (count > 0 && sscanf(buf, "%d", &i) > 0) {
-+		if (i)
-+			bdev_set_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
-+		else
-+			bdev_clear_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
-+	}
- 	return count;
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 59de93913cc4..98e1c2d28d60 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -62,9 +62,6 @@ struct block_device {
- 	struct mutex		bd_fsfreeze_mutex; /* serialize freeze/thaw */
- 
- 	struct partition_meta_info *bd_meta_info;
--#ifdef CONFIG_FAIL_MAKE_REQUEST
--	bool			bd_make_it_fail;
--#endif
- 	int			bd_writers;
- 	/*
- 	 * keep this out-of-line as it's both big and not needed in the fast
-@@ -87,6 +84,9 @@ enum {
- 	BD_WRITE_HOLDER,
- 	BD_HAS_SUBMIT_BIO,
- 	BD_RO_WARNED,
-+#ifdef CONFIG_FAIL_MAKE_REQUEST
-+	BD_MAKE_IT_FAIL,
-+#endif
- };
- 
- /*
--- 
-2.39.2
 
+在 2024/4/27 星期六 上午 12:14, Gregory Price 写道:
+> On Fri, Apr 26, 2024 at 10:53:43PM +0800, Dongsheng Yang wrote:
+>>
+>>
+>> 在 2024/4/26 星期五 下午 9:48, Gregory Price 写道:
+>>>
+>>
+>> In (5) of the cover letter, I mentioned that cbd addresses cache coherence
+>> at the software level:
+>>
+>> (5) How do blkdev and backend interact through the channel?
+>> 	a) For reader side, before reading the data, if the data in this channel
+>> may be modified by the other party, then I need to flush the cache before
+>> reading to ensure that I get the latest data. For example, the blkdev needs
+>> to flush the cache before obtaining compr_head because compr_head will be
+>> updated by the backend handler.
+>> 	b) For writter side, if the written information will be read by others,
+>> then after writing, I need to flush the cache to let the other party see it
+>> immediately. For example, after blkdev submits cbd_se, it needs to update
+>> cmd_head to let the handler have a new cbd_se. Therefore, after updating
+>> cmd_head, I need to flush the cache to let the backend see it.
+>>
+> 
+> Flushing the cache is insufficient.  All that cache flushing guarantees
+> is that the memory has left the writer's CPU cache.  There are potentially
+> many write buffers between the CPU and the actual backing media that the
+> CPU has no visibility of and cannot pierce through to force a full
+> guaranteed flush back to the media.
+> 
+> for example:
+> 
+> memcpy(some_cacheline, data, 64);
+> mfence();
+> 
+> Will not guarantee that after mfence() completes that the remote host
+> will have visibility of the data.  mfence() does not guarantee a full
+> flush back down to the device, it only guarantees it has been pushed out
+> of the CPU's cache.
+> 
+> similarly:
+> 
+> memcpy(some_cacheline, data, 64);
+> mfence();
+> memcpy(some_other_cacheline, data, 64);
+> mfence()
+> 
+> Will not guarantee that some_cacheline reaches the backing media prior
+> to some_other_cacheline, as there is no guarantee of write-ordering in
+> CXL controllers (with the exception of writes to the same cacheline).
+> 
+> So this statement:
+> 
+>> I need to flush the cache to let the other party see it immediately.
+> 
+> Is misleading.  They will not see is "immediately", they will see it
+> "eventually at some completely unknowable time in the future".
+
+This is indeed one of the issues I wanted to discuss at the RFC stage. 
+Thank you for pointing it out.
+
+In my opinion, using "nvdimm_flush" might be one way to address this 
+issue, but it seems to flush the entire nd_region, which might be too 
+heavy. Moreover, it only applies to non-volatile memory.
+
+This should be a general problem for cxl shared memory. In theory, FAMFS 
+should also encounter this issue.
+
+Gregory, John, and Dan, Any suggestion about it?
+
+Thanx a lot
+> 
+> ~Gregory
+> 
