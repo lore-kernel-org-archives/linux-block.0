@@ -1,48 +1,42 @@
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33517E8;
-	Sun, 28 Apr 2024 01:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A71D2F29;
+	Sun, 28 Apr 2024 05:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714267526; cv=none; b=aNE2ksE4kdW5E2uaLu7SliVq8otf8vOsJw1My17S/ffO2GfNA1hlXkJ04BcPwi2wvjoV4WIJbqloBiG9g6jhdK4UmZW2yCyz0jF4o450kDwrQKhvx31t6StriHTsdt9L4gW2J7ANpLMDQIyOk3BgjVnY+GXhCthLfkjQcVbq4ss=
+	t=1714281159; cv=none; b=oIZgX+B9i/3b1B0w/0rSE5gnYb8UhvUH2bcHh8rtowiFiG7CFnv5X8LNzWFADHM+IuzfsjVjaupPhKzvQ5RG9TzgaSwmhDq3/hP125YwClZcC++GoZqSVSmbK/+7VCSG9T4Xk1st35bh4GSNk8poZziaUMnW3SgTlMFOn3YtTuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714267526; c=relaxed/simple;
-	bh=nf4ART+KYv5Dm9DqbyKqYwkXppf5Az2AXqd2VKmooRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WMkimmpFoB7f0Pj9vYkkAF9/A/Rjcq6Z/VDRIx3pnnCrSZsqGuaQHuG2yhs2evWCqI3D2qaNcSt4uNciw7kIurEmTPoRZupZbrRtd4qj/GUE/VIAS6udxzstfU5zuVKl3DvcmBf1XCkQBtKMxbsZJUeGY4ezuPzZddXFgnWcGAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=JGJXEMSW; arc=none smtp.client-ip=62.89.141.173
+	s=arc-20240116; t=1714281159; c=relaxed/simple;
+	bh=r9Ho+KlDjxV0rLDyAx8eIy/g9Dz8gIdf00skoYWcs7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qybfHUJcmmnYVtTKsku+d3YvWNSgcA6+Fpl6yLdCHyUDkiQTWw9nbUtg2Endu+uYX7jV/I4blAR+Nx5LdK/Q7JL+W5HW48sbX5v3dRfkd+3qXh5LS90ote55v4fLiZl0HRResnDGxjzw73gD4J6CVsp67/s4fELfyfG3n7XxxIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=tmqO8hUn; arc=none smtp.client-ip=62.89.141.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="JGJXEMSW"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="tmqO8hUn"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ZIdsTX1y4MugrwR5X85S0zLQbguz18AVqpgbABLPlEI=; b=JGJXEMSWj55q0jSKXBCKyaoHjO
-	0WjSOkz/eraMPl0g7XFT2XN2SlAj4OYSMynpCGb1vSthd3mHcEtkWbcjbfJDcurUN6ez+VKUAQ1yJ
-	db5WJ/qmdoCW6F9GTOhCj+JQqhSVDPLkMF8TbpSG1AxK+WY4cFCBFQYimQEtu3OhxrrrESbrw0kAX
-	jss2sHsvm/q6slamQ+XsLhmMeoNR/adEQcO172ltkKd80tWB6XUfmdoz7hDXJVN7Jlt9Pjr5PcNvL
-	h2VtvFc2Gm117yOSyzS/Uo+z1d2fYUQI1Xm1n+AXx9fKe79ZplXtM2PZKEl30slYR6YruSpZvM9Zg
-	NrP7HMTA==;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=f4+wgDKEDvq7+H7eHvKqVqQR5ySiP6zL0PAvsf8UskI=; b=tmqO8hUnMKUrKzBvG5tFyc98zO
+	4tAqJdZNzb1KQCWAvLaqU6p8pCsD0VlruORLz8KllYfQbQhmPSn6YC8Eg8U9QVqNcxwpmihOqVBm2
+	ldsDbXFZjHWW9DO3DzXOMV8Rw3YvPgcQZCu7wChyQzgBQcElneRO423H+voP5vIh+jAK1zD89xIWm
+	JnZigouBN23x078oro7PVED0suB4QTIwRXvIHHI/zqE83xhdWHjT8Na+87gMvEivJKkEIEtr204zA
+	DcbijkpDW63FjWoecMbVM5nFKBai95PB1PSFdpAHbQ8fm2yEDi6OqwerxKypZsoalVSDXaH2p/AwV
+	EQ9SrFLA==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1s0tI9-006PHB-0V;
-	Sun, 28 Apr 2024 01:25:21 +0000
-Date: Sun, 28 Apr 2024 02:25:21 +0100
+	id 1s0wq0-006V7a-0Z;
+	Sun, 28 Apr 2024 05:12:32 +0000
+Date: Sun, 28 Apr 2024 06:12:32 +0100
 From: Al Viro <viro@zeniv.linux.org.uk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 4/7] swapon(2): open swap with O_EXCL
-Message-ID: <20240428012521.GT2118490@ZenIV>
-References: <20240427210920.GR2118490@ZenIV>
- <20240427211128.GD1495312@ZenIV>
- <CAHk-=wiag-Dn=7v0tX2UazhMTBzG7P42FkgLSsVc=rfN8_NC2A@mail.gmail.com>
- <20240427234623.GS2118490@ZenIV>
+To: linux-fsdevel@vger.kernel.org
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCHES][RFC] packing struct block_device flags
+Message-ID: <20240428051232.GU2118490@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,45 +45,49 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240427234623.GS2118490@ZenIV>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Sun, Apr 28, 2024 at 12:46:23AM +0100, Al Viro wrote:
+	We have several bool members in struct block_device.
+It would be nice to pack that stuff, preferably without
+blowing the cacheline boundaries.
 
-> Switching swap exclusion to O_EXCL could've been done back in 2003 or
-> at any later point; it's just that swapon(2)/swapoff(2) is something that
-> rarely gets a look...
+	That had been suggested a while ago, and initial
+implementation by Yu Kuai <yukuai1@huaweicloud.com> ran into
+objections re atomicity, along with the obvious suggestion to
+use unsigned long and test_bit/set_bit/clear_bit for access.
+Unfortunately, that *does* blow the cacheline boundaries.
 
-BTW, a fun archaeological question: at which point has this
-                /*
-                 * Retrying may succeed; for example the folio may finish   
-                 * writeback, or buffers may be cleaned.  This should not  
-                 * happen very often; maybe we have old buffers attached to
-                 * this blockdev's page cache and we're trying to change
-                 * the block size?
-                 */
-                if (!try_to_free_buffers(folio)) {
-                        end_block = ~0ULL;
-                        goto unlock;
-                }
+	However, it's not hard to do that without bitops;
+we have an 8-bit assign-once partition number nearby, and
+folding it into a 32-bit member leaves us up to 24 bits for
+flags.  Using cmpxchg for setting/clearing flags is not
+hard, and 32bit cmpxchg is supported everywhere.
 
-in grow_dev_folio() (grow_dev_page() in earlier kernels) become unreachable?
-I _think_ it was
-commit fbc139f54fdb7edfec470421c2cc885d3796dfcd
-Author: Linus Torvalds <torvalds@athlon.transmeta.com>
-Date:   Mon Feb 4 20:19:55 2002 -0800
+	Series below does that conversion.  Please, review.
+Individual patches in followups, the branch is in
+git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git #work.bd_flags
 
-    v2.4.10.0.2 -> v2.4.10.0.3
+Shortlog:
+Al Viro (8):
+      Use bdev_is_paritition() instead of open-coding it
+      wrapper for access to ->bd_partno
+      bdev: infrastructure for flags
+      bdev: move ->bd_read_only to ->__bd_flags
+      bdev: move ->bd_write_holder into ->__bd_flags
+      bdev: move ->bd_has_subit_bio to ->__bd_flags
+      bdev: move ->bd_ro_warned to ->__bd_flags
+      bdev: move ->bd_make_it_fail to ->__bd_flags
 
-      - more buffers-in-pagecache coherency
-
-when set_blocksize() started to do
-	sync_buffers(dev, 2);
-	...
-	invalidate_bdev(bdev, 1);
-	truncate_inode_pages(bdev->bd_inode->i_mapping, 0);
-
-at which point the "what if we'd found a page with attached buffers of the
-wrong size?" should've become impossible.
-
-Am I misreading that?
+Diffstat:
+ block/bdev.c              | 17 ++++++++---------
+ block/blk-core.c          | 17 ++++++++++-------
+ block/blk-mq.c            |  2 +-
+ block/early-lookup.c      |  2 +-
+ block/genhd.c             | 15 ++++++++++-----
+ block/ioctl.c             |  5 ++++-
+ block/partitions/core.c   | 12 ++++++------
+ include/linux/blk_types.h | 19 +++++++++++--------
+ include/linux/blkdev.h    | 42 +++++++++++++++++++++++++++++++++++++++---
+ include/linux/part_stat.h |  2 +-
+ lib/vsprintf.c            |  4 ++--
+ 11 files changed, 93 insertions(+), 44 deletions(-)
