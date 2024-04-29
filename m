@@ -1,196 +1,272 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2088.outbound.protection.outlook.com [40.107.220.88])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B968128807
-	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 19:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.88
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714420451; cv=fail; b=sD8If9HRhBzG0GVTucS+lrTs0N9vmdqod7t/NUgmz4eFFxT5FYkHB66MMDqd10/4gWhR8V/DHFlPONe7XpNXyVP3TZP58A2L+fQ2vWf4szSsrZmKdpkUG4zibGNvvu5FH3Sr7SqtaMONMH35uBIJN1lK1asCq8wy4JVPxOVFFK8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714420451; c=relaxed/simple;
-	bh=ycb0AsMUNX0PUodoFUtqdzjZVMvcaLGM4qBcaHH4b0g=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=oTl6XVWKd5Tq40yhIZJ99t3oMKU0cCLfVxOJvVs6vlf27tf57mkoPDKp09PTeDFwtEELAIokrbPo9j4001jaDl9yanl158BR2XcEClap26DaTqWyU2ez1cudpkiO5Q+mGmF2JriRikWQbeW7eBF0MbpJfOmzx2ioXM7LFybQmmY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tflLC3lK; arc=fail smtp.client-ip=40.107.220.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D473F1411D8
+	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 20:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714421503; cv=none; b=hLJgkl9/uqh/5hGQlxoMk2ilp/ypSiACf3ArV7cJmecoVlnU1vQuKTSn0p9zXzt+IBHcOi00V1JrtpgiRshzKmkTnO+Uprmag1YPrKQgfLLRLflH+cFSl0vSQi6r7nw/ngFIEMWEC3ta1l6AqFt7RZq60nqjQ2X8nBqMVECiNMg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714421503; c=relaxed/simple;
+	bh=WEWQN5o56I3YJ/AUz00bONPDVK4LPQhYPThgN0/ZIYE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=Mx2woMEEoNOA9kctX2wkcZDWgQppoYNAl7nyxMcA/hZHMXUsnVs91Man+afENvxt3xHH+eU8ZIg3d6Kxx2/KWmksEt9MrK4h34uxbkgWsLvNzG65k5FvA+DOcm1v/sS2s3Cy0+G7rmo0SZVbGp3u8S6+cGE9fpabLKnlPD8tAJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Xh1KsC9o; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tflLC3lK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jwz090XHaYNisQEOalUs0kdnTPcPt+JMTZuC35VzC2ncGPfgYfrPCl9nZ9aRtZU66EHn2F5HklLUVMtytszmP8uCpIL8u4XbByL1F6jVeCz7tU3NIwQUO/k6Eib/xaCKjKroU+Lb0rOkJlOQ3t5N61XUomTRNVdN0fYRmddeYQCjZhKu7LLYquGaG+vrviVDMH2jymi5BgQ6aqNDChnJyQrdCxQScaGCftzeLkSKbf7jKFCQRX4/iSTb8pelfjDLueAc5a3sYeHHeICKgOMvR/7AauR8wVXWOMoN1Sym2p3zPxsy7r4E5AAhaZGow+x/D/gzBYc9fEKcpHGwnryErw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ycb0AsMUNX0PUodoFUtqdzjZVMvcaLGM4qBcaHH4b0g=;
- b=eINu9cB0Q2aW2zbU7PVj6xbpJ4YXkqXUeIuQFZlXdVe7PyP4Pj2zrnnU8Vro9Z8K/UVsLX2MNJ0ym0xze02EuBv9im8/CMrH6MoF8RLU6Bt9s3+WiJFw1bJmN0j2vNMyq0zlYK08ItRzFpVGJc2zplCMKm3Gnjk2KnCN9pDv1sAO0ho2SP8mdsIyp3klmF+8oTEM3cX7JN6RyJ5Af7xLxOc1FDVYNHu/5fCCWbjrgXH8beDxKiJL31YfLgB5/DDuMKjnY6pMXpPs+/XEUzr4rOMQC30j/Pqy3zXC1xBu85L17YQcAvXuS95+FHExF1kl+5hB5xcmkeBe4TY2ARGWYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ycb0AsMUNX0PUodoFUtqdzjZVMvcaLGM4qBcaHH4b0g=;
- b=tflLC3lKXo8/EXCHkbfpvxV4+ljgPNLcTo9J7cNo+fYA00ahu8US5tqBMC0y5hD8ulZ166aylf05UcLbdaaV9g1KxARt2i8v7sybpcdqG0q57EYvHVg3/+xxfMEkUJ7V9oDIyOB2UXZntie8YRpFwJ99mJRGGcYUFS/cV6tIkJgXM5zMs6zAi8weagT1eztNoeFoy4h2CBaOTgfbh4lP2df3UOYTt7HZY2wua8y95jHqv475IrDkattnCXPfKrTb5r++uEHVwhSUKR4rti3wdgSIm4YKhsKHTJQ54qzXd1AOtYfKsGVvB/7wsmfNPU8q4lbeLC+Y550Ma2zmNXUxQg==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by DM4PR12MB6424.namprd12.prod.outlook.com (2603:10b6:8:be::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.35; Mon, 29 Apr
- 2024 19:54:05 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::a1:5ecd:3681:16f2]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::a1:5ecd:3681:16f2%7]) with mapi id 15.20.7519.031; Mon, 29 Apr 2024
- 19:54:05 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Keith Busch <kbusch@meta.com>
-CC: "axboe@kernel.dk" <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] brd: implement discard support
-Thread-Topic: [PATCH] brd: implement discard support
-Thread-Index: AQHamh9EMQHoQBh+E0mIH8L1GXTcEbF/qbyA
-Date: Mon, 29 Apr 2024 19:54:05 +0000
-Message-ID: <c611759b-7d26-45c2-9655-33eb7bb69024@nvidia.com>
-References: <20240429102308.147627-1-kbusch@meta.com>
-In-Reply-To: <20240429102308.147627-1-kbusch@meta.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|DM4PR12MB6424:EE_
-x-ms-office365-filtering-correlation-id: 8a211ab4-5021-43e3-3682-08dc68862037
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
-x-microsoft-antispam-message-info:
- =?utf-8?B?M1hrMmJZcEQ5UkJFM3dIWnFpdDVtYnRTLzF3eUZpZXlRWTZhMS85RjY1K3Zv?=
- =?utf-8?B?MmRVQmhTWWEwMVVRVlFrM2Jqbk5OTGxyR3ZqQVNoMHFiLzkzdXp5S3JKOTZq?=
- =?utf-8?B?TktvS2lmVFVGVWp3U2F2THcwY2RBUU5Nb2x4U2xjTGJqSEhtcmloajd0cjBy?=
- =?utf-8?B?ZUhjWlFOV2JhQ2hYSHNyNDFLYTFSU0U2cHRGKzlIem9YNmJ5Wk91Q2lta094?=
- =?utf-8?B?VVh2b1E1WmtYcllsU0sxWlR5S0JGY21wWXhqaXdzakJnSGhoZDVqV2hSSzV4?=
- =?utf-8?B?V2FaNFJwaXNPSGxMV3ZYR1lxd0NhN3plTVNKd1pobkFPMlZSNUwxNzBobFVB?=
- =?utf-8?B?LzIvbGNhUC8vNEJXWkYwdkVGTVZiKzZadEIxcjJOMTNIcy9nVG0rc0FlM2tu?=
- =?utf-8?B?WWlRVzNyR2pjRzBkUVUyN2x1R0dxU1V0V0ttY2dMdkhQcXhqdEtWN2lsZXJu?=
- =?utf-8?B?UE5yajZGNlFmNEExTUdINmRPRDhmZm5HYlArUGVIQnJnRjRxcFd3QUFyb2U0?=
- =?utf-8?B?ZTFyU1JsTjZWdXk0cEJVZHBoRjYzWEUxTmpGRWJqdzQ0VDc2bENZT09nYkhI?=
- =?utf-8?B?NjVPTkRCY1lLQ3E3bDdZVEFJSFUrcXZCNlZwQjc3TlhJTnJ6dWdiQjJpN1Ja?=
- =?utf-8?B?TCs5ZVF5WXh1aFR2SUsvL1Vqa2grVnJsU2hLcWgzL0E0Mk4rWkFnc0ZFV2Q0?=
- =?utf-8?B?ZDdFc3I5WUVsLzBFR3BJSlp1R3pYOURRYzNWR2dlS2tpL0xXV04vRHJQS2Z6?=
- =?utf-8?B?blowQ25oeDlZdnlsZ1FXeUNkanhtYjg4T2txQmZaOUVuZlEwT3BzeDJ2ZTRO?=
- =?utf-8?B?ZXoyRFIwNkI5ZnVhdFRROGEvSk1HYWxFZ3hpK3NJaWFlNFNWaDRMWjV2S1Zv?=
- =?utf-8?B?UEdLSWZNU3cyWmVYTkdqSmNyUk5xWGpHOHhueWR1UmJ2UDIyQW5ncGo2ZC93?=
- =?utf-8?B?TUNIVjVrMTljRkZQS1Yram04Q2NRdmRldk43UzMxMm5ZV1hRbnFnOU9idFVW?=
- =?utf-8?B?dERuT0ZvVFREald2VVh4Zk9VZ1VaMlNMbTdvdVJJczN4dnRXRjExTHNCeHF0?=
- =?utf-8?B?Ui9jRnRVTTVKWWxOY0tqS2Z2SittU2pMSHF2TCtBZEo3a1pRREwvTWV4STIz?=
- =?utf-8?B?dUQrdDczaTg5blBYcEpZTVRwYkExZkRicVRTM1pCdEFrU29Tdjg0dFM5SG9D?=
- =?utf-8?B?QklVRzdGVjhQM2laei9KL1hYakxqTzg3RWtGd2RDWWJTbWZzVldMaTJxWG1B?=
- =?utf-8?B?MXhLWHA3WjdlRUdlWkZjNGR6Y3ZZQlhnU1NZN2I4TmZ4ZzIyd0RwakxLbS8v?=
- =?utf-8?B?UVBFL0FyV1pxektmdHRiOFZCd2dGRUV1T0F6SVVWUWN4UkJJOGpqWkFtVGNh?=
- =?utf-8?B?TEc2Z0JwUGgvMUsrV05VUExsa0FpVm5lM1VuUStNUGpkTFNOaTZRenlqNXZB?=
- =?utf-8?B?VkVlYmV6ZWRuS2lETnloemVsN0ZrbFo2QzVpQjBZNXdVWDJvL3FQWFpJdWRI?=
- =?utf-8?B?bThFcUdvU0FQYnBJN3BYSWhjNlY0d2cxV3Vqa20yM1pZRmRvVE41VjE4MmpC?=
- =?utf-8?B?NWlNbzFuUTd3U2Q0RWZhS211N3VjMjc1RUtiUmVyRXBkWWlmY2ZueGpPajAx?=
- =?utf-8?B?ald2NzlsWjJKN1ZRN3N1ZERiVC95WEZuVkhBb3I4NUZnK3c3YWN3ZllLNlhn?=
- =?utf-8?B?aURVR0ViMlVhNFBLY0RCeitqS0JBYzhNRUVLNURwSkJBZzVxOGdVM04vOEl1?=
- =?utf-8?B?TnNQQit2U0UzaEg4L0E1WmFKaVJiOVJlOE80VFN5VDRONjBwZFl1MGl5aFZT?=
- =?utf-8?B?OE4xRTRGNjJhUUpGM1RyQT09?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?MnEybVBkQkZVelVTN0c1WUJBUnliR1QyYy9STER1UGppQlo2cHdhMFk3QU1G?=
- =?utf-8?B?eldNWGgwdm91Y2NuRktrNFlveWpEdThyOXc0dnA3SUtLV3Y3d0tiYXROaWd1?=
- =?utf-8?B?dWlPSy9XWWhObUVWY3BSem9kSWYvbUhsM0hKWkdibWc2bGlkazU2dldQRE03?=
- =?utf-8?B?SFhSU1BCaXZrQVd4ZDlpVlFTVzhKT05PWTRGc25zSWdmYkttNWFjazNiTmN4?=
- =?utf-8?B?d3NEb3NSK256ZHBOQ1BYWXJGQTNDcFZvOFhETjNEZ3Z2NExGVFB2YnJYS0R2?=
- =?utf-8?B?MGVOM2lhMVc4RUUxTENWMUtzSG9EWVlNQnVGd0d5K2F6bHdITDVDNEVUbzJQ?=
- =?utf-8?B?V3NWTnhMZVM0S01hdXRkNVNzM2FHaU43OTVkTHhnb0o3SmRRUEZWZUdicWRy?=
- =?utf-8?B?aS8xdmU5VzhVT0pXTXp0YmVmNkNUSGRhTVlvUzJWK0ZwTEFCS2RKMURpYTN6?=
- =?utf-8?B?bGdPbTgwWC8xU2h0TDlKVGl5aUd4RUpyNklYVVR4Y1dCcDRCczZRcnljUVh5?=
- =?utf-8?B?N2NoL21lT3NEcFNpWnpaYnlwRnRYOEZVKzAyUnd0dnFNdFJkN0pyZE1pVlZV?=
- =?utf-8?B?Y3lKazBHZk50b2VYTXR2VytqZ3lUb1p1b2Z3bTFGM0dLOWlMRHV1UHQ5WHVC?=
- =?utf-8?B?WVVGcHhhUjdzMlJ1U0NXZHQ1MllOUHBSSm94ZWgyV0lnRTJ3U01aaTU4Y0tM?=
- =?utf-8?B?aVFLbzBGN2pUK1lXcUZZMHNxanpwQUdrQUl3ZFJDcUxUWGt3MVpUZmNIcG8v?=
- =?utf-8?B?STFyUWpTZVRWZFdiaFdVb2dodW9IRmN4cXZJSVpHRVhBRmQwSGxjY1ZhWk5p?=
- =?utf-8?B?Sm50YlVYdmUyUHFNM0t5SkVhajVGYXp2NmtYT2JhN3hHR3NCUDEvcmE3RXdN?=
- =?utf-8?B?Y3JTdjkyNTRGZzRqUnQ0MnhXa1JHamxiNk0rcjkyNnc3SmhmbGcrK0Eyemxo?=
- =?utf-8?B?bEhvYUM2MXRaZUdrUnBlMUc0WTJoSE5nMFNSOVEvTkY4OTM3VGt4WjAzZFV1?=
- =?utf-8?B?a01yTXJFNHBpSEJoT0xRejdweFkrMGRONmh3ejBYOFVTb1VjWndIZElhRHNY?=
- =?utf-8?B?cEVvVjFienBSWjZoUS9sb1lJN3dBTmJqcUVLczMyd2RxcTRWT0pDc1RsSFdy?=
- =?utf-8?B?MVhTREk5TDZLbEVsZnFvNndUTERLbGEzSjZ0V3NCRHFHMUUvSW5KNzQyWjFk?=
- =?utf-8?B?dXFjTFc1bk5sY1ZnTlhFdG1HaTRBSEdpY2R0SE1FU0ViYnF3dmo2Y3lKUHNl?=
- =?utf-8?B?anVObExXRmdMTW0wWS84Nkl4SXVSa1lRaUZoaVI1WTUzWDNuQ0NuTlRrYWJV?=
- =?utf-8?B?WWUyV252K1ora2dYa2V4L2g0UERCM3RZcUJnRkFlTWZUQnBGRWhVNEFUQ3d3?=
- =?utf-8?B?YS85enVCcUZpQmRRVFRXY0l2NzJVZGZQU3hnaWRndXZ6SUFlS1hSV3dWTFNW?=
- =?utf-8?B?SDRCa04razJiZHI4ZWhpQXdOM09VTUxTTXl2VjFBSUlCUDJhdE9PdmJmYlVK?=
- =?utf-8?B?N3lMQWZQZ1c5VGdRU2VFdVVQUzV2WllXM1VsenA5c3o4WUNQYlplMGRETnB1?=
- =?utf-8?B?S1lLcnlUS1NVM1ZHTXBuVTdVUStLLzB2Vm9TVEI0d1MrOEszeWFhZVg5Rzlt?=
- =?utf-8?B?dXlZTGZ5NnYyekoxaTVhcXVOdkxqQi94K2NCQTZCNDhKLzZ1SlFsSzU2RmdY?=
- =?utf-8?B?akt3cVl6OVpMT0tCUDhmOXhuZzQxUXZFK3FLYks3V3ZJc0hiZExzVGN4OWps?=
- =?utf-8?B?QitSOTVZZjA1K3pZdTU3SG1IWDNrRFlVRmI4VE9yZzQ5b1ZUYVVDYjNvclNB?=
- =?utf-8?B?a1RZNk1lN2pwMGNPVGRLR1hVaXhrNmFnZ0k0eWZSczc3R1pSREVWRmRudUpq?=
- =?utf-8?B?WkdEMEU3RkZScDN4TEJIUmg1UXN4QWFvdjl1LzlNMmRXY2c0cEdkT0dXRS8z?=
- =?utf-8?B?bW1YSHp4MDJrakNNZ0Zrc3JvOCt1NWowblB6Zk9MWUhwSEMyTURieVFoOXR0?=
- =?utf-8?B?bm5ZNlg4V1drY2xnS1ZweFJOeTJFN1M4ZXBvVVlQT0lncTM1dHI0cnZicm00?=
- =?utf-8?B?elpMNWQ0Mmh4ekwwNUt4Zlk2dTlyaThEMUIwZzJrVmhBd2tGZFh0bkRVMW1N?=
- =?utf-8?Q?vwEOslnYJfbqIF9pKFY4fo9fY?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3A8A087B7A7A244DAFF54DBB47C8F8C5@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Xh1KsC9o"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240429201138epoutp049a59368b5401d13feca9e6f7897619d8~K2UUGFU0E0905009050epoutp04v
+	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 20:11:38 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240429201138epoutp049a59368b5401d13feca9e6f7897619d8~K2UUGFU0E0905009050epoutp04v
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1714421498;
+	bh=NkQa6E/G7D+kT+TNHA4Xlk1TA770QfnquVFmByHOQUU=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=Xh1KsC9oFzpllzHgYkWS36mL2jfZ+3YDhPEgJXQq5wSd45NVbVep3CwisJ8Jzg7CI
+	 E2WCO6Od6oECxuk4ZNLW4O8ONYYshXcqL78GyNc4PW6D9NqbDg41sDdNztQ04EUhGV
+	 mNkdCnbWvaC3Ay7Y+PcOGh0fr+iXdTOqUMTi+QwA=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240429201137epcas5p4b11bc6b16e2594f7e9afcf562e2b0249~K2US0rsN11144111441epcas5p4c;
+	Mon, 29 Apr 2024 20:11:37 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4VSvc80ySdz4x9Pq; Mon, 29 Apr
+	2024 20:11:36 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	6F.B1.09665.7FEFF266; Tue, 30 Apr 2024 05:11:36 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240429201135epcas5p488c04012edb75b73264adf8723a1262c~K2URUWGgj1144011440epcas5p4R;
+	Mon, 29 Apr 2024 20:11:35 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240429201135epsmtrp1af0774e0887d8aa88f1da7c52e04e6fc~K2URTTsDH3109031090epsmtrp1x;
+	Mon, 29 Apr 2024 20:11:35 +0000 (GMT)
+X-AuditID: b6c32a4b-829fa700000025c1-ae-662ffef77070
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	5E.40.08924.7FEFF266; Tue, 30 Apr 2024 05:11:35 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240429201133epsmtip1c7bb2e34e7e468eab43eb387c3b6b37c~K2UPbpOAA2816128161epsmtip1f;
+	Mon, 29 Apr 2024 20:11:33 +0000 (GMT)
+Message-ID: <2e8eb4e8-beb2-51cd-67b5-75e920c9fff4@samsung.com>
+Date: Tue, 30 Apr 2024 01:41:32 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a211ab4-5021-43e3-3682-08dc68862037
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2024 19:54:05.5059
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: w1komipXOa78s+pB+ak7Uut633wgLvjwa5qQQ6EKMzYfsz5suQlTWISuQP5fyx3CL4YxvZUTRPZhS3snLwj0uQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6424
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH 08/10] io_uring/rw: add support to send meta along with
+ read/write
+Content-Language: en-US
+To: Jens Axboe <axboe@kernel.dk>, martin.petersen@oracle.com,
+	kbusch@kernel.org, hch@lst.de, brauner@kernel.org
+Cc: asml.silence@gmail.com, dw@davidwei.uk, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>, Nitesh Shetty
+	<nj.shetty@samsung.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <f3489d0c-2d27-4e27-ae49-df2e9dad2e00@kernel.dk>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJJsWRmVeSWpSXmKPExsWy7bCmlu6Pf/ppBl8OMFk0TfjLbDFn1TZG
+	i9V3+9ksXh/+xGjxasZaNoubB3YyWaxcfZTJ4l3rORaLSYeuMVrsvaVtMX/ZU3aL5cf/MVls
+	+z2f2YHX49qMiSweO2fdZfe4fLbUY9OqTjaPzUvqPXbfbGDz+Pj0FotH35ZVjB6fN8kFcEZl
+	22SkJqakFimk5iXnp2TmpdsqeQfHO8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6ZeYAXa2kUJaY
+	UwoUCkgsLlbSt7Mpyi8tSVXIyC8usVVKLUjJKTAp0CtOzC0uzUvXy0stsTI0MDAyBSpMyM54
+	+fkcc8FzvYqWBXcYGxibVbsYOTkkBEwkXi17ww5iCwnsZpT4vjWji5ELyP7EKHFu/V92COcb
+	o8SWnkdsMB3XZ/5jg0jsZZT4uGMvM4TzllHizNq/YLN4Bewk7q84D9bBIqAqcfTmX2aIuKDE
+	yZlPWEBsUYFkiZ9dB8BqhAUiJB48egNWwywgLnHryXwmEFtEoFBix6mrYNuYBZ4zSlyZ95W1
+	i5GDg01AU+LC5FKQGk4BW4lHl1ewQvTKS2x/OwfsIAmBKxwSP680M0Gc7SLRf/MHC4QtLPHq
+	+BZ2CFtK4mV/G5SdLHFp5jmo+hKJx3sOQtn2Eq2n+plB9jID7V2/Sx9iF59E7+8nTCBhCQFe
+	iY42IYhqRYl7k56yQtjiEg9nLIGyPSTuXJrEDAnqN4wShx4kT2BUmIUUKrOQfD8LyTezEBYv
+	YGRZxSiZWlCcm55abFpgnJdaDo/v5PzcTYzgNK3lvYPx0YMPeocYmTgYDzFKcDArifBOWaif
+	JsSbklhZlVqUH19UmpNafIjRFBg9E5mlRJPzgZkiryTe0MTSwMTMzMzE0tjMUEmc93Xr3BQh
+	gfTEktTs1NSC1CKYPiYOTqkGphPiL0Obazj5JOViA6fybrnQNEFvicG536XP3jW5SQfcXH9y
+	omqib8VR/d6Wyxfmqum0Gc14vdL9lHKaCrP51bCNRg/1+E5LHLtZvbjOUS588l++3U+PiT6v
+	eW/B9ejcFrnqNcJrXnnrNHpcmFZpclI9z6e1MeN7ZcmWJOcErYdncli+7dTz3taVbHIrLkj7
+	Vc9S95WfF5zd3flOIbtohtBsvxjZRwFZe/nXBjVUcW5qKNujdu3acru0GotLnZ9LSjdm+TyU
+	2XH7yMLgIsUv9S8DZn5Pdw87/e1SvXLcVaXdzBuFvwbdnht2s0G++7NT9kbO00eKrh0oe3hW
+	a3KWuHPSpYbfzHZnJK27dlkVKrEUZyQaajEXFScCAGuYoWhcBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrOIsWRmVeSWpSXmKPExsWy7bCSnO73f/ppBl0z5C2aJvxltpizahuj
+	xeq7/WwWrw9/YrR4NWMtm8XNAzuZLFauPspk8a71HIvFpEPXGC323tK2mL/sKbvF8uP/mCy2
+	/Z7P7MDrcW3GRBaPnbPusntcPlvqsWlVJ5vH5iX1HrtvNrB5fHx6i8Wjb8sqRo/Pm+QCOKO4
+	bFJSczLLUov07RK4Ml5+Psdc8FyvomXBHcYGxmbVLkZODgkBE4nrM/+xdTFycQgJ7GaUWDx3
+	JjtEQlyi+doPKFtYYuW/5+wQRa8ZJe6132MESfAK2EncX3GeDcRmEVCVOHrzLzNEXFDi5Mwn
+	LCC2qECyxMs/E8EGCQtESDx49Aashhlowa0n85lAbBGBQonde56DXcEs8JxR4s+vXawQ294w
+	Ssxd1AdUxcHBJqApcWFyKUgDp4CtxKPLK1ghBplJdG3tYoSw5SW2v53DPIFRaBaSO2Yh2TcL
+	ScssJC0LGFlWMUqmFhTnpucWGxYY5qWW6xUn5haX5qXrJefnbmIEx6WW5g7G7as+6B1iZOJg
+	PMQowcGsJMI7ZaF+mhBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFe8Re9KUIC6YklqdmpqQWpRTBZ
+	Jg5OqQamFRclA+/7t6ZtMb958n5b5IcU8YwZTzNPHXFz9WLdUBG86d3ty99+C/btf5C3Oi2q
+	SjjslfDK10/vGk+ML1ikPCvNsuhUw17/f5ejn5zSP9N16ElOT8urvRLWRhf1prorbdE70q1+
+	9qpqu9n+sBWTWxM1jrYt1AgNjnK483iPXqA1f11gkYKg0hHxyTK+JrUmTrnLmVnfF5soRG3Z
+	YdNyf5ZDYlfI3PtVPwo7nkxnnXb7UVCqzNzy7aUrshjMij2Lrjf/Tt6ZtjnNjbsqQLQ140sT
+	q/SV3tdRZbr+O/tE3y5Q4lnPH2k4yUU1c5ldlm7/H4Y/rxUuL/paIDGVP9mA+/fR7EKTOSxd
+	hZdOxSuxFGckGmoxFxUnAgBgGPlyOgMAAA==
+X-CMS-MailID: 20240429201135epcas5p488c04012edb75b73264adf8723a1262c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240425184706epcas5p1d75c19d1d1458c52fc4009f150c7dc7d
+References: <20240425183943.6319-1-joshi.k@samsung.com>
+	<CGME20240425184706epcas5p1d75c19d1d1458c52fc4009f150c7dc7d@epcas5p1.samsung.com>
+	<20240425183943.6319-9-joshi.k@samsung.com>
+	<f3489d0c-2d27-4e27-ae49-df2e9dad2e00@kernel.dk>
 
-T24gNC8yOS8yNCAwMzoyMywgS2VpdGggQnVzY2ggd3JvdGU6DQo+IEZyb206IEtlaXRoIEJ1c2No
-IDxrYnVzY2hAa2VybmVsLm9yZz4NCj4NCj4gVGhlIHJhbWRpc2sgbWVtb3J5IHV0aWxpemF0aW9u
-IGNhbiBvbmx5IGdvIHVwIHdoZW4gZGF0YSBpcyB3cml0dGVuIHRvDQo+IG5ldyBwYWdlcy4gSW1w
-bGVtZW50IGRpc2NhcmQgdG8gcHJvdmlkZSB0aGUgcG9zc2liaWxpdHkgdG8gcmVkdWNlIG1lbW9y
-eQ0KPiB1c2FnZSBmb3IgcGFnZXMgbm8gbG9uZ2VyIGluIHVzZS4gQWxpZ25lZCBkaXNjYXJkcyB3
-aWxsIGZyZWUgdGhlDQo+IGFzc29jaWF0ZWQgcGFnZXMsIGlmIGFueSwgYW5kIGRldGVybWluaXNp
-dGljYWxseSByZXR1cm4gemVyb2VkIGRhdGENCj4gdW50aWwgd3JpdHRlbiBhZ2Fpbi4NCj4NCj4g
-U2lnbmVkLW9mZi1ieTogS2VpdGggQnVzY2ggPGtidXNjaEBrZXJuZWwub3JnPg0KPiAtLS0NCj4g
-ICBkcml2ZXJzL2Jsb2NrL2JyZC5jIHwgMjYgKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4g
-ICAxIGZpbGUgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygrKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9ibG9jay9icmQuYyBiL2RyaXZlcnMvYmxvY2svYnJkLmMNCj4gaW5kZXggZTMyMmNlZjY1
-OTZiZi4uZTc0MWIwYzNhNGY3OSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9ibG9jay9icmQuYw0K
-PiArKysgYi9kcml2ZXJzL2Jsb2NrL2JyZC5jDQo+IEBAIC0yNDAsNiArMjQwLDIzIEBAIHN0YXRp
-YyBpbnQgYnJkX2RvX2J2ZWMoc3RydWN0IGJyZF9kZXZpY2UgKmJyZCwgc3RydWN0IHBhZ2UgKnBh
-Z2UsDQo+ICAgCXJldHVybiBlcnI7DQo+ICAgfQ0KPiAgIA0KPiArc3RhdGljIHZvaWQgYnJkX2Rv
-X2Rpc2NhcmQoc3RydWN0IGJyZF9kZXZpY2UgKmJyZCwgc2VjdG9yX3Qgc2VjdG9yLCB1MzIgc2l6
-ZSkNCj4gK3sNCj4gKwlzZWN0b3JfdCBhbGlnbmVkX3NlY3RvciA9IChzZWN0b3IgKyBQQUdFX1NF
-Q1RPUlMpICYgflBBR0VfU0VDVE9SUzsNCj4gKwlzdHJ1Y3QgcGFnZSAqcGFnZTsNCj4gKw0KPiAr
-CXNpemUgLT0gKGFsaWduZWRfc2VjdG9yIC0gc2VjdG9yKSAqIFNFQ1RPUl9TSVpFOw0KPiArCXhh
-X2xvY2soJmJyZC0+YnJkX3BhZ2VzKTsNCj4gKwl3aGlsZSAoc2l6ZSA+PSBQQUdFX1NJWkUgJiYg
-YWxpZ25lZF9zZWN0b3IgPCByZF9zaXplICogMikgew0KPiArCQlwYWdlID0gX194YV9lcmFzZSgm
-YnJkLT5icmRfcGFnZXMsIGFsaWduZWRfc2VjdG9yID4+IFBBR0VfU0VDVE9SU19TSElGVCk7DQoN
-Cm92ZXJseSBsb25nIGxpbmUgPw0KDQo+ICsJCWlmIChwYWdlKQ0KPiArCQkJX19mcmVlX3BhZ2Uo
-cGFnZSk7DQo+ICsJCWFsaWduZWRfc2VjdG9yICs9IFBBR0VfU0VDVE9SUzsNCj4gKwkJc2l6ZSAt
-PSBQQUdFX1NJWkU7DQo+ICsJfQ0KPiArCXhhX3VubG9jaygmYnJkLT5icmRfcGFnZXMpOw0KPiAr
-fQ0KPiArDQo+ICAgc3RhdGljIHZvaWQgYnJkX3N1Ym1pdF9iaW8oc3RydWN0IGJpbyAqYmlvKQ0K
-PiAgIHsNCj4gICAJc3RydWN0IGJyZF9kZXZpY2UgKmJyZCA9IGJpby0+YmlfYmRldi0+YmRfZGlz
-ay0+cHJpdmF0ZV9kYXRhOw0KPiBAQCAtMjQ3LDYgKzI2NCwxMiBAQCBzdGF0aWMgdm9pZCBicmRf
-c3VibWl0X2JpbyhzdHJ1Y3QgYmlvICpiaW8pDQo+ICAgCXN0cnVjdCBiaW9fdmVjIGJ2ZWM7DQo+
-ICAgCXN0cnVjdCBidmVjX2l0ZXIgaXRlcjsNCj4gICANCj4gKwlpZiAodW5saWtlbHkob3BfaXNf
-ZGlzY2FyZChiaW8tPmJpX29wZikpKSB7DQoNCkkndmUgYmVlbiB0b2xkIHRoYXQgdW5saWtlbHkg
-c2hvdWxkIG5vdCBiZSB1c2VkIHdpdGggZGlzY2FyZCBhcyBpdCBpcw0KYmFkIGZvciBkaXNjYXJk
-IHdvcmtsb2FkcywgaWYgdGhhdCBpcyBzdGlsbCB0cnVlLCB0aGVuIGNhbiB5b3UgcGxlYXNlDQpy
-ZW1vdmUgdW5saWtlbHkgPw0KDQpBbHNvLCBpZiB5b3UgYXJlIGRvaW5nIHRoaXMgY2FuIHlvdSBw
-bGVhc2UgYWxzbyBhZGQgc3VwcG9ydCBmb3INCndyaXRlLXplcm9lcyBmb3IgdGhlIHNha2Ugb2Yg
-Y29tcGxldGVuZXNzID8gdW5sZXNzIHRoYXQgc3VwcG9ydCBpcw0Kbm90IGRlc2lyZWQgZm9yIGJy
-ZCAuLi4NCg0KLWNrDQoNCg0K
+On 4/26/2024 7:55 PM, Jens Axboe wrote:
+>> diff --git a/io_uring/rw.c b/io_uring/rw.c
+>> index 3134a6ece1be..b2c9ac91d5e5 100644
+>> --- a/io_uring/rw.c
+>> +++ b/io_uring/rw.c
+>> @@ -587,6 +623,8 @@ static int kiocb_done(struct io_kiocb *req, ssize_t ret,
+>>   
+>>   		req->flags &= ~REQ_F_REISSUE;
+>>   		iov_iter_restore(&io->iter, &io->iter_state);
+>> +		if (unlikely(rw->kiocb.ki_flags & IOCB_USE_META))
+>> +			iov_iter_restore(&io->meta.iter, &io->iter_meta_state);
+>>   		return -EAGAIN;
+>>   	}
+>>   	return IOU_ISSUE_SKIP_COMPLETE;
+> This puzzles me a bit, why is the restore now dependent on
+> IOCB_USE_META?
+
+Both saving/restore for meta is under this condition (so seemed natural).
+Also, to avoid growing "struct io_async_rw" too much, this patch keeps 
+keeps meta/iter_meta_state in the same memory as wpq. So doing this 
+unconditionally can corrupt wpq for buffered io.
+
+>> @@ -768,7 +806,7 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode)
+>>   	if (!(req->flags & REQ_F_FIXED_FILE))
+>>   		req->flags |= io_file_get_flags(file);
+>>   
+>> -	kiocb->ki_flags = file->f_iocb_flags;
+>> +	kiocb->ki_flags |= file->f_iocb_flags;
+>>   	ret = kiocb_set_rw_flags(kiocb, rw->flags);
+>>   	if (unlikely(ret))
+>>   		return ret;
+>> @@ -787,7 +825,8 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode)
+>>   		if (!(kiocb->ki_flags & IOCB_DIRECT) || !file->f_op->iopoll)
+>>   			return -EOPNOTSUPP;
+>>   
+>> -		kiocb->private = NULL;
+>> +		if (likely(!(kiocb->ki_flags & IOCB_USE_META)))
+>> +			kiocb->private = NULL;
+>>   		kiocb->ki_flags |= IOCB_HIPRI;
+>>   		kiocb->ki_complete = io_complete_rw_iopoll;
+>>   		req->iopoll_completed = 0;
+> 
+> Why don't we just set ->private generically earlier, eg like we do for
+> the ki_flags, rather than have it be a branch in here?
+
+Not sure if I am missing what you have in mind.
+But kiocb->private was set before we reached to this point (in 
+io_rw_meta). So we don't overwrite that here.
+
+>> @@ -853,7 +892,8 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
+>>   	} else if (ret == -EIOCBQUEUED) {
+>>   		return IOU_ISSUE_SKIP_COMPLETE;
+>>   	} else if (ret == req->cqe.res || ret <= 0 || !force_nonblock ||
+>> -		   (req->flags & REQ_F_NOWAIT) || !need_complete_io(req)) {
+>> +		   (req->flags & REQ_F_NOWAIT) || !need_complete_io(req) ||
+>> +		   (kiocb->ki_flags & IOCB_USE_META)) {
+>>   		/* read all, failed, already did sync or don't want to retry */
+>>   		goto done;
+>>   	}
+> 
+> Would it be cleaner to stuff that IOCB_USE_META check in
+> need_complete_io(), as that would closer seem to describe why that check
+> is there in the first place? With a comment.
+
+Yes, will do.
+
+>> @@ -864,6 +904,12 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
+>>   	 * manually if we need to.
+>>   	 */
+>>   	iov_iter_restore(&io->iter, &io->iter_state);
+>> +	if (unlikely(kiocb->ki_flags & IOCB_USE_META)) {
+>> +		/* don't handle partial completion for read + meta */
+>> +		if (ret > 0)
+>> +			goto done;
+>> +		iov_iter_restore(&io->meta.iter, &io->iter_meta_state);
+>> +	}
+> 
+> Also seems a bit odd why we need this check here, surely if this is
+> needed other "don't do retry IOs" conditions would be the same?
+
+Yes, will revisit.
+>> @@ -1053,7 +1099,8 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
+>>   		if (ret2 == -EAGAIN && (req->ctx->flags & IORING_SETUP_IOPOLL))
+>>   			goto ret_eagain;
+>>   
+>> -		if (ret2 != req->cqe.res && ret2 >= 0 && need_complete_io(req)) {
+>> +		if (ret2 != req->cqe.res && ret2 >= 0 && need_complete_io(req)
+>> +				&& !(kiocb->ki_flags & IOCB_USE_META)) {
+>>   			trace_io_uring_short_write(req->ctx, kiocb->ki_pos - ret2,
+>>   						req->cqe.res, ret2);
+> 
+> Same here. Would be nice to integrate this a bit nicer rather than have
+> a bunch of "oh we also need this extra check here" conditions.
+
+Will look into this too.
+>> @@ -1074,12 +1121,33 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
+>>   	} else {
+>>   ret_eagain:
+>>   		iov_iter_restore(&io->iter, &io->iter_state);
+>> +		if (unlikely(kiocb->ki_flags & IOCB_USE_META))
+>> +			iov_iter_restore(&io->meta.iter, &io->iter_meta_state);
+>>   		if (kiocb->ki_flags & IOCB_WRITE)
+>>   			io_req_end_write(req);
+>>   		return -EAGAIN;
+>>   	}
+>>   }
+> 
+> Same question here on the (now) conditional restore.
+
+Did not get the concern. Do you prefer it unconditional.
+
+>> +int io_rw_meta(struct io_kiocb *req, unsigned int issue_flags)
+>> +{
+>> +	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
+>> +	struct io_async_rw *io = req->async_data;
+>> +	struct kiocb *kiocb = &rw->kiocb;
+>> +	int ret;
+>> +
+>> +	if (!(req->file->f_flags & O_DIRECT))
+>> +		return -EOPNOTSUPP;
+> 
+> Why isn't this just caught at init time when IOCB_DIRECT is checked?
+
+io_rw_init_file() gets invoked after this, and IOCB_DIRECT check is only 
+for IOPOLL situation. We want to check/fail it regardless of IOPOLL.
+
+> 
+>> +	kiocb->private = &io->meta;
+>> +	if (req->opcode == IORING_OP_READ_META)
+>> +		ret = io_read(req, issue_flags);
+>> +	else
+>> +		ret = io_write(req, issue_flags);
+>> +
+>> +	return ret;
+>> +}
+> 
+> kiocb->private is a bit of an odd beast, and ownership isn't clear at
+> all. It would make the most sense if the owner of the kiocb (eg io_uring
+> in this case) owned it, but take a look at eg ocfs2 and see what they do
+> with it... I think this would blow up as a result.
+
+Yes, ocfs2 is making use of kiocb->private. But seems that's fine. In 
+io_uring we use the field only to send the information down. ocfs2 (or 
+anything else unaware of this interface) may just overwrite the 
+kiocb->private.
+If the lower layer want to support meta exchange, it is supposed to 
+extract meta-descriptor from kiocb->private before altering it.
+
+This case is same for block direct path too when we are doing polled io.
