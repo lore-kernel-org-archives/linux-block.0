@@ -1,200 +1,141 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48C977F10;
-	Mon, 29 Apr 2024 15:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0211183A14;
+	Mon, 29 Apr 2024 15:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714403922; cv=none; b=OE5xCpxWpc/C1LHEfAtDIC3I4eH+7NVd6DTDz0zvJmrOYTH7V4yAp98judaYZx/Ys4ppGk1yePnmfP+zPpO90H/oKnAe7zkpcXz1PaqShKa7oXt35raJAjREPIiPW3n3Tb/1XCcAzlhfzhlf1x7x2zCFPJBRdFLHpM//i+Wh+b0=
+	t=1714404283; cv=none; b=RUybFP4D4o8fHZOYfYe6PydcsYln+sF/EsZhBIHk7IQyg1uUeRhx9ubsatiklMqyiW1MVh4baDYBQW/eTIkwSdpuP5KtNxQJR4chy2DEp19bN6qZUp9VdJ0uj0+VZPC/g6WPkJVGKruv+AMgjPlB0hAlbh/3BlNulnYHVoy6ie8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714403922; c=relaxed/simple;
-	bh=9BSrIGMt7GgU3+M07CHV10/InLf/tZrxzxknIJ9QNno=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZIfPJrPXvB+dPUUGw47CbRy056v49DLG9rJ12vR7b2kTl+CXDlfpPMZPlXrgE2fuxqKW4Q2j04XKobuCy5dF82lS5juzIU1hA8Z/qUOg4DJGniuO7hKUqfgkbLS+C4zOEOJU5HM3FtQoK+cRmpOVTxSiBLhYU38/QN2A0K0cshA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=PRmbeGke; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kdx9pgDW; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=tGoa0Lh8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=c597n5tO; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1714404283; c=relaxed/simple;
+	bh=Pj2cwpnZJNOaiRDHglRyWPI0gH57KB5SIi8FNggw4Rg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gwOByfTapc0bTomnfT84ZzdKaXM1e41zWo/fKhFmH+EpRRU84ug0CyfigIEO2s+5V/K3IJEMQMn+2wHauPHT86BRW/ozxScib2h8z7zh2UBAUleuijA0jTJ//lyRdYDIEYwlfAMqNaJWZE+eZnDCmoZWbEclCYyJgpV9pJgCSKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WAs7O6n1; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="PRmbeGke";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kdx9pgDW";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="tGoa0Lh8";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="c597n5tO"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D66233389C;
-	Mon, 29 Apr 2024 15:18:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1714403919;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x8b75GpkVFQOdY4wZRWGIsjV3aXBX+Qd/nRtPV9BlNw=;
-	b=PRmbeGkeifRWDpqo4ck1nUZbkwHbMzTbY1KItDl6JZyC+LcGGXpqjfDRCr+SVOhPKmVrKZ
-	rwdAlR2BS5v0t7IiBrOyc9eK172ZJuaaX4ecEEJH6NjGngHrryXY6LhwE9XJimNoQdZoQY
-	zgBtzAdNPLGELktKBM1KrLbtU9D3oyE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1714403919;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x8b75GpkVFQOdY4wZRWGIsjV3aXBX+Qd/nRtPV9BlNw=;
-	b=kdx9pgDWkJUf+sEe3Z3hKBbZI5uYIVvdnCW5fE/uINq4Mwx4SwWz5RwpOyozz8inMbnyoz
-	Rwk5UbOTZTguo5DA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=tGoa0Lh8;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=c597n5tO
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1714403918;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x8b75GpkVFQOdY4wZRWGIsjV3aXBX+Qd/nRtPV9BlNw=;
-	b=tGoa0Lh8ROLyUPeHsF3Tdz+huTXeNboCWaGxFUy4yjjv+kAdf0bP1SU3TjzNCuxkjGoZq3
-	TViVgsOPFTVnviw7nRgCQrUGAoop//cHM/r1m/KympSu4Ift03995PCA/FZDPGTPTDreLN
-	ogTb9n6leDZBS83JqRAEAv+f1BRDaLM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1714403918;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x8b75GpkVFQOdY4wZRWGIsjV3aXBX+Qd/nRtPV9BlNw=;
-	b=c597n5tOZZHFb58CgtAbcEJ2U5m0pq1vntZ5MrweQUDxJTxpl4/W1X0DGz+s9Wossp0MFJ
-	D4joEON5d7HNF2DA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BADF8138A7;
-	Mon, 29 Apr 2024 15:18:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id t2laLU66L2apGwAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Mon, 29 Apr 2024 15:18:38 +0000
-Date: Mon, 29 Apr 2024 17:11:25 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 6/7] btrfs_get_dev_args_from_path(): don't call
- set_blocksize()
-Message-ID: <20240429151124.GC2585@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20240427210920.GR2118490@ZenIV>
- <20240427211230.GF1495312@ZenIV>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAs7O6n1"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41c011bb920so8867405e9.1;
+        Mon, 29 Apr 2024 08:24:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714404280; x=1715009080; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zPLSYoop8c6nPwVtS/cJ+4UmU3dkqJbn52js0JYU+7g=;
+        b=WAs7O6n1IcpbnQi7EWutzHO+AFIPrNrjsd5xyj8BYAQL4xqqM2AVjn8OTDU5fhNs82
+         Xhq7FtSmoRktZZRqd2l7ftspq7Yn3g3M4iT82rhR+Oq+dGQaqffYg/t42E+uKqEBP8sN
+         DjUMv9DmAMoZId2BGilttgK6agVLs86DYtLAfb3mvNWnppjW4sZFrv/zEEwhqQn+Glph
+         ZG/xDEDBzAAoxWzZrJmRgMy5Jer7j6qlkvpef48h4JrmDG8yQPThuhR4uVRC3T7reo85
+         Mos67QwCodkml+DCHxAXkuv1SsdTQMst/fJR52MN4/Xo9pPtnhqSRXyKlFCd6ex/B6jr
+         VvIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714404280; x=1715009080;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zPLSYoop8c6nPwVtS/cJ+4UmU3dkqJbn52js0JYU+7g=;
+        b=TLzsZKJSUt1EG+93ZCskO+ntb3QJGpcQb08eumW0TZEUxvweu5G/R8fyYY9Ta80WEX
+         hyizt62GkTtUztLmRgvEl0NP47yw9tKchbOkqPcFYlMti/mixf5Z7UVo7gHj5bhawj3G
+         LaNh/tt7GGlykiNWpx3EfAjVhOjrqRQCdlzBk1Im43gpMHXobsjNDborpbErJbChIXpJ
+         qc8AppMn7RJBel55QMtjhCZjX3Hk4PMaPUAAy9Q8VfcTLamSsebyCJ0Hzz6SyRrrWOq6
+         qcAkkBrnL4zqMcvYDZIi9p3q4+ZSqNtYqhMQ0hZwwWzDBqI2A6+kKbm8M6nOk1G96ejT
+         4j9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWdveAP9wcyC1BnKhX1CH1kNGBvn4ZlzSV9+w6eofLl6pVaX9kyM8Q1vX4Pb3Dh4HtlKAp/qWz9xhhgmPpqPuxI+RkbFsff9ej5zcE=
+X-Gm-Message-State: AOJu0Ywk0Vl+QHYkL6W81LnF5+ukHI4goPy5RbZ64jg/rJX7N9f1Eqmp
+	WIvbKuRw7vkhRGbsohjzilfnGHSF7tUyIZ72MGdKQMvJavaB8vfh1iGfdA==
+X-Google-Smtp-Source: AGHT+IHnNKwlepaORGq+A1W0g1h8aBUd05TlPcGBYP+FwQpA/Crid1bLmY+CJ5oU/F6QPNA7kTVxrg==
+X-Received: by 2002:adf:ffc2:0:b0:34c:e0d6:bea6 with SMTP id x2-20020adfffc2000000b0034ce0d6bea6mr3697488wrs.29.1714404280157;
+        Mon, 29 Apr 2024 08:24:40 -0700 (PDT)
+Received: from [192.168.42.252] (82-132-212-208.dab.02.net. [82.132.212.208])
+        by smtp.gmail.com with ESMTPSA id p8-20020a5d48c8000000b0034af40b2efdsm21643907wrs.108.2024.04.29.08.24.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Apr 2024 08:24:39 -0700 (PDT)
+Message-ID: <e0d52e3f-f599-42c8-b9f0-8242961291d0@gmail.com>
+Date: Mon, 29 Apr 2024 16:24:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240427211230.GF1495312@ZenIV>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.21 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:replyto];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: D66233389C
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Score: -4.21
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/9] io_uring: support user sqe ext flags
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+ Kevin Wolf <kwolf@redhat.com>
+References: <20240408010322.4104395-1-ming.lei@redhat.com>
+ <20240408010322.4104395-3-ming.lei@redhat.com>
+ <89dac454-6521-4bd8-b8aa-ad329b887396@kernel.dk> <Zie+RlbtckZJVE2J@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <Zie+RlbtckZJVE2J@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Apr 27, 2024 at 10:12:30PM +0100, Al Viro wrote:
-> We don't have bdev opened exclusive there.  And I'm rather dubious
-> about the need to do set_blocksize() anywhere in btrfs, to be
-> honest - there's some access to page cache of underlying block
-> devices in there, but it's nowhere near the hot paths, AFAICT.
-
-Long time ago we fixed a bug that involved set_blocksize(), 6f60cbd3ae44
-("btrfs: access superblock via pagecache in scan_one_device").
-Concurrent access from scan, mount and mkfs could interact and some
-writes would be dropped, but the argument was rather not to use
-set_blocksize.
-
-I do not recall all the details but I think that the problem was when it
-was called in the middle of the other operation in progress. The only
-reason it's ever called is for the super block read and to call it
-explicitly from our code rather than rely on some eventual call from
-block layer.  But it's more than 10 years ago and things have changed,
-we don't use buffer_head for superblock anymore.
-
-> In any case, btrfs_get_dev_args_from_path() only needs to read
-> the on-disk superblock and copy several fields out of it; all
-> callers are only interested in devices that are already opened
-> and brought into per-filesystem set, so setting the block size
-> is redundant for those and actively harmful if we are given
-> a pathname of unrelated device.
-
-Calling set_blocksize on already opened devices will avoid the
-scan/mount/mkfs interactions so this seems safe.
-
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> ---
->  fs/btrfs/volumes.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+On 4/23/24 14:57, Ming Lei wrote:
+> On Mon, Apr 22, 2024 at 12:16:12PM -0600, Jens Axboe wrote:
+>> On 4/7/24 7:03 PM, Ming Lei wrote:
+>>> sqe->flags is u8, and now we have used 7 bits, so take the last one for
+>>> extending purpose.
+>>>
+>>> If bit7(IOSQE_HAS_EXT_FLAGS_BIT) is 1, it means this sqe carries ext flags
+>>> from the last byte(.ext_flags), or bit23~bit16 of sqe->uring_cmd_flags for
+>>> IORING_OP_URING_CMD.
+>>>
+>>> io_slot_flags() return value is converted to `ULL` because the affected bits
+>>> are beyond 32bit now.
+>>
+>> If we're extending flags, which is something we arguably need to do at
+>> some point, I think we should have them be generic and not spread out.
 > 
-> diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-> index f15591f3e54f..43af5a9fb547 100644
-> --- a/fs/btrfs/volumes.c
-> +++ b/fs/btrfs/volumes.c
-> @@ -482,10 +482,12 @@ btrfs_get_bdev_and_sb(const char *device_path, blk_mode_t flags, void *holder,
->  
->  	if (flush)
->  		sync_blockdev(bdev);
-> -	ret = set_blocksize(bdev, BTRFS_BDEV_BLOCKSIZE);
-> -	if (ret) {
-> -		fput(*bdev_file);
-> -		goto error;
-> +	if (holder) {
-> +		ret = set_blocksize(bdev, BTRFS_BDEV_BLOCKSIZE);
-
-The subject mentions a different function, you're removing it from
-btrfs_get_bdev_and_sb() not btrfs_get_dev_args_from_path().
-
-> +		if (ret) {
-> +			fput(*bdev_file);
-> +			goto error;
-> +		}
->  	}
->  	invalidate_bdev(bdev);
->  	*disk_super = btrfs_read_dev_super(bdev);
-> @@ -498,6 +500,7 @@ btrfs_get_bdev_and_sb(const char *device_path, blk_mode_t flags, void *holder,
->  	return 0;
->  
->  error:
-> +	*disk_super = NULL;
->  	*bdev_file = NULL;
->  	return ret;
->  }
-> -- 
-> 2.39.2
+> Sorry, maybe I don't get your idea, and the ext_flag itself is always
+> initialized in io_init_req(), like normal sqe->flags, same with its
+> usage.
 > 
+>> If uring_cmd needs specific flags and don't have them, then we should
+>> add it just for that.
+> 
+> The only difference is that bit23~bit16 of sqe->uring_cmd_flags is
+> borrowed for uring_cmd's ext flags, because sqe byte0~47 have been taken,
+> and can't be reused for generic flag. If we want to use byte48~63, it has
+> to be overlapped with uring_cmd's payload, and it is one generic sqe
+> flag, which is applied on uring_cmd too.
+
+Which is exactly the mess nobody would want to see. And I'd also
+argue 8 extra bits is not enough anyway, otherwise the history will
+repeat itself pretty soon
+
+> That is the only way I thought of, or any other suggestion for extending sqe
+> flags generically?
+
+idea 1: just use the last bit. When we need another one it'd be time
+to think about a long overdue SQE layout v2, this way we can try
+to make flags u32 and clean up other problems.
+
+idea 2: the group assembling flag can move into cmds. Very roughly:
+
+io_cmd_init() {
+	ublk_cmd_init();
+}
+
+ublk_cmd_init() {
+	io_uring_start_grouping(ctx, cmd);
+}
+
+io_uring_start_grouping(ctx, cmd) {
+	ctx->grouping = true;
+	ctx->group_head = cmd->req;
+}
+
+submit_sqe() {
+	if (ctx->grouping) {
+		link_to_group(req, ctx->group_head);
+		if (!(req->flags & REQ_F_LINK))
+			ctx->grouping = false;
+	}
+}
+
+-- 
+Pavel Begunkov
