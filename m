@@ -1,131 +1,140 @@
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A36E2D05D
-	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 10:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657253A28E
+	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 10:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714386196; cv=none; b=h3F2s7rdtCIeDultx6itBfxyyQQ0VOd7mkegOJM6qC9ERKAbE51ii31+BqaqIFuHhxV76J6hNI83yLSqRf1CxJkXoKB6LxZ3x0YT2VBo84pR7qgL54LynxVj4OcNK994EktgIFtLIdxdBTjpmlQpgk9LP03jHD8K76D4CYSG7sA=
+	t=1714388387; cv=none; b=Fj9VU4oaA1VoKPGBpTCJ0Lh93AjL90MttMr+8UQcVJoF1I2n+HvppE4P4YaUdApgTMMvzZC1mDQ4WXnz1pFqTRfQTlJNmhQB6ferARxuU+3dGVDmsX822yWCPNsFEs+UMRLYTRsWVboqHDz8WdfXX9lhzCQ1tez7ainQTiUHcpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714386196; c=relaxed/simple;
-	bh=NPxl741pISNh0AwHUWNeZldFV2a74Kj8QA7vinwmwj0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GsDVc5xp+uc0L/qC4zh7Yelfuxn0SlGBRWV1TonQGUkcyYfeKp4F46mR/ZYcEPHLmr4RuPpzGWd9w0j9slGarKXvSqsUywvfXMXJz/F3bSjT70jIhHOqWo7KhV9esUZ1LQSRVNZE872iWtN1mxYB08VQavmGGwzsuLgzmPyJnxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ZOxcEGFg; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1714388387; c=relaxed/simple;
+	bh=yAB3+LWej9MKVKpCtFaho06TLU9/GZ2naH/2mASmXPQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=KnCo//YXJNM36mDWG1EALg8cHXBe8HzQuGz/VJOLKUhtem4eWkkK8YE6WEyTe7zgCsm5mCdhwlSKFfYESHMgB6fBrL3LhipaOHPsUAOHES+qrEdpxPO+nrbBqF5sKS+VSg90gUB7Ek9oE9bQ8q8GQRx/xlJ7aPlcHNmF9VI3/lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ng3MPmLx; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ZOxcEGFg"
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 43T1kRtE014426
-	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 03:23:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=s2048-2021-q4;
- bh=MAgiSx+jpMavICXqxWgDhqGL6E++1Q5guNHh8ZHS4Ks=;
- b=ZOxcEGFgnR4h1thiVhI/2+N++6KxJwdZR4zHM2jM7AhZwitLkoaNNKGA74rgeRxpBODe
- eFMOUt5qyAsJiSdSOOWWNJUmkGOZ969aHijfz9PnI3W+B0vf8nV+e67Ev/zd/d+Sdylc
- bEUlb+2ytuYoCLfvIRZ39OYwa05WliLzP8gu9I9wHbrGFch/RNLulFvZdAN/xoHccff1
- vupt6sB8QIcYvwBJeNJUnWtivNZcRfbdsByyr2B7EmOqbqGecvhg/PXdxUCC0WAIYVx0
- dbacJdimDt21qYRu9uytK0FAdfWXLtMOy8pJ0iHktWgeWg/nHVSCdEDbIUVNpvSVXZu6 eg== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 3xrw1xy91e-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 03:23:14 -0700
-Received: from twshared19845.02.ash8.facebook.com (2620:10d:c0a8:1b::449c) by
- mail.thefacebook.com (2620:10d:c0a8:83::8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 29 Apr 2024 10:23:11 +0000
-Received: by devbig032.nao3.facebook.com (Postfix, from userid 544533)
-	id 0A4801FF51F3; Mon, 29 Apr 2024 03:23:10 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] brd: implement discard support
-Date: Mon, 29 Apr 2024 03:23:08 -0700
-Message-ID: <20240429102308.147627-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ng3MPmLx"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240429105936epoutp03286034d2098547873114cfcf77c898fc~KuyUX3pQ41405214052epoutp03F
+	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 10:59:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240429105936epoutp03286034d2098547873114cfcf77c898fc~KuyUX3pQ41405214052epoutp03F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1714388376;
+	bh=Az+hRiv5av28fx/NMox4ku8zhbC9n/++KSpp75bjFT8=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=ng3MPmLxV/sEyqlNUj42GGAua8XRgEzOmi6yY4bUogxWit5aLQInBEvSUIjE5pWi5
+	 Gexpj1MzBuL+4ViOMbyomXNiBbcKw9XbDMb8gTXS207mqn6e0g2pTc8Cp0tnVK7gXv
+	 kYIomg+cATYt5W26qHRoJ2ncjunE14rX+v3Ue3lY=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240429105935epcas5p3c89a15e085f6801054e7b7694902dbe7~KuyTzmNpC1482714827epcas5p3w;
+	Mon, 29 Apr 2024 10:59:35 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4VSgM96YZ2z4x9Pv; Mon, 29 Apr
+	2024 10:59:33 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	4A.5E.09665.59D7F266; Mon, 29 Apr 2024 19:59:33 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240429105933epcas5p271bec7690d5e6e2e9264754fab4a7b3d~KuyR2RPLB0104201042epcas5p2p;
+	Mon, 29 Apr 2024 10:59:33 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240429105933epsmtrp145532c8f3c6f5865a68786f88cd3c04b~KuyRxgbZJ0970609706epsmtrp1V;
+	Mon, 29 Apr 2024 10:59:33 +0000 (GMT)
+X-AuditID: b6c32a4b-829fa700000025c1-9c-662f7d954ace
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F4.28.08390.59D7F266; Mon, 29 Apr 2024 19:59:33 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240429105931epsmtip1cc615a2ad8041ab968fb6c42a7a1c350~KuyQCkEtc2520925209epsmtip1Y;
+	Mon, 29 Apr 2024 10:59:31 +0000 (GMT)
+Message-ID: <53be2abc-5a46-fef6-1cb3-cd791e3f42be@samsung.com>
+Date: Mon, 29 Apr 2024 16:29:30 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: Q_qK8q0AsUHzv_9VzOhrEhmAVri9RPZr
-X-Proofpoint-ORIG-GUID: Q_qK8q0AsUHzv_9VzOhrEhmAVri9RPZr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-29_08,2024-04-26_02,2023-05-22_02
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH 01/10] block: set bip_vcnt correctly
+Content-Language: en-US
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, brauner@kernel.org,
+	asml.silence@gmail.com, dw@davidwei.uk, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKJsWRmVeSWpSXmKPExsWy7bCmlu7UWv00g7aJxhZNE/4yW8xZtY3R
+	YvXdfjaL14c/MVq8mrGWzeLmgZ1MFitXH2WyeNd6jsVi0qFrjBZ7b2lbzF/2lN1i+fF/TA48
+	HtdmTGTx2DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx8ent1g8+rasYvT4vEkugDMq2yYjNTEl
+	tUghNS85PyUzL91WyTs43jne1MzAUNfQ0sJcSSEvMTfVVsnFJ0DXLTMH6GAlhbLEnFKgUEBi
+	cbGSvp1NUX5pSapCRn5xia1SakFKToFJgV5xYm5xaV66Xl5qiZWhgYGRKVBhQnbGzhmvWAo2
+	sVb8/rOWtYFxBUsXIyeHhICJxJUv+5lAbCGB3YwSK17zdjFyAdmfGCUu/uxihnC+MUpceHuR
+	Dabj1OrNUIm9jBKLp29mgnDeMko83LGOHaSKV8BO4tSpncwgNouAqsTivvfMEHFBiZMzn4Dt
+	FhVIlvjZdQBsqrCAhcSuf7/B4swC4hK3nswHu0lEwFnib+95sAXMAo1MEhtenAdq4OBgE9CU
+	uDC5FKSGU8BKoqVzKitEr7zE9rdzwK6TEDjDITHvQjc7xNkuEifWToCyhSVeHd8CZUtJvOxv
+	g7KTJS7NPMcEYZdIPN5zEMq2l2g91c8MspcZaO/6XfoQu/gken8/YQIJSwjwSnS0CUFUK0rc
+	m/SUFcIWl3g4YwmU7SHx9/gORkhYdTBJzF62iG0Co8IspGCZheT9WUjemYWweQEjyypGydSC
+	4tz01GLTAuO81HJ4hCfn525iBKdnLe8djI8efNA7xMjEwXiIUYKDWUmEd9Mc7TQh3pTEyqrU
+	ovz4otKc1OJDjKbA+JnILCWanA/MEHkl8YYmlgYmZmZmJpbGZoZK4ryvW+emCAmkJ5akZqem
+	FqQWwfQxcXBKNTA95voZ2jxjjVHYvPJP1rHs+ZHbHFasmrrtuP/jb9GFM/KecLXmvdZYx/NO
+	m786kT1S+liQkMZ0y3lr7Yva83yOyF3LX77+l7tMmI/9v118Rn5qpc++hsev2/s2Z887d8m7
+	JytTejTen4639L6pdVvzX3TAUr2stBNWH5POyGlISPtq8lrsK9La7jPp16b8vwrbvgpZZ1zf
+	6m52+dGsjBKHWWZLfWscXCZX5JXeu+Vn/Gvv6ZDfv6KXrC/evoRL79Gnf3GpK9cuNJi19u3K
+	8PsRdwR5tISyD14+NklL/muCxB/+CUrVd2zLZyx+9Oeb2OcfbvO/cj85wM256o3Ss2DO0Jrn
+	3duKPd8lvlA+GPZMiaU4I9FQi7moOBEANCsywlgEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrAIsWRmVeSWpSXmKPExsWy7bCSnO7UWv00g2+3+SyaJvxltpizahuj
+	xeq7/WwWrw9/YrR4NWMtm8XNAzuZLFauPspk8a71HIvFpEPXGC323tK2mL/sKbvF8uP/mBx4
+	PK7NmMjisXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j49Pb7F49G1ZxejxeZNcAGcUl01Kak5m
+	WWqRvl0CV8bOGa9YCjaxVvz+s5a1gXEFSxcjJ4eEgInEqdWbmUFsIYHdjBK/dxhAxMUlmq/9
+	YIewhSVW/nsOZHMB1bxmlOhZM5UNJMErYCdx6tROsGYWAVWJxX3vmSHighInZz4BWyAqkCzx
+	8s9EsEHCAhYSu/79BoszAy249WQ+E4gtIuAs8bf3PBPIAmaBRiaJpQvmsEBc1MEk8fmMcBcj
+	BwebgKbEhcmlIGFOASuJls6prBBzzCS6tnYxQtjyEtvfzmGewCg0C8kZs5Csm4WkZRaSlgWM
+	LKsYJVMLinPTc4sNC4zyUsv1ihNzi0vz0vWS83M3MYIjUUtrB+OeVR/0DjEycTAeYpTgYFYS
+	4d00RztNiDclsbIqtSg/vqg0J7X4EKM0B4uSOO+3170pQgLpiSWp2ampBalFMFkmDk6pBqYA
+	643qJq/CrzDFcr8L3hq38+dJh7TmLxMsT21SuRsWLdllffjRxMlr3c91pgdttpzQv3uS6q6f
+	ifcFmBdJ/Syye6GtFKTFvHHzPd6v3obPdKb8X6h59AvPPvVsa8NtmZtjKuL3rDjyLK6dM/hN
+	JP9UEW/tCVrWxVm/1JS8Agz7FnHyp9XKGvgu2BZ976uZUflyqSN2K3/rJp1I/OrMOVOe8w6z
+	ic17Y/7coOMb/J43qix+Lb/j+KZbU6YrPbg4R/3i8vssH/V/yltMNVP29+bZLPnqU0O+1QGt
+	NZ2zBLWt2OL+p/B23qzf0FRnI/7+sfGZJ78XcbOy3uX8VC6foWnvkZu/Y7Z59pZ/zy+ZSSqx
+	FGckGmoxFxUnAgAEw6XRMwMAAA==
+X-CMS-MailID: 20240429105933epcas5p271bec7690d5e6e2e9264754fab4a7b3d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240425184651epcas5p3404f2390d6cf05148eb96e1af093e7bc
+References: <20240425183943.6319-1-joshi.k@samsung.com>
+	<CGME20240425184651epcas5p3404f2390d6cf05148eb96e1af093e7bc@epcas5p3.samsung.com>
+	<20240425183943.6319-2-joshi.k@samsung.com> <20240427070214.GA3873@lst.de>
+	<Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
 
-From: Keith Busch <kbusch@kernel.org>
+On 4/27/2024 7:46 PM, Keith Busch wrote:
+>> Looks good:
+>>
+>> Reviewed-by: Christoph Hellwig<hch@lst.de>
+>>
+>> Please add a Fixes tag and submit it separately from the features.
+>>
+>> I'm actually kinda surprised the direct user mapping of integrity data
+>> survived so far without this.
+> The only existing use case for user metadata is REQ_OP_DRV_IN/OUT, which
+> never splits, so these initial fixes only really matter after this
+> series adds new usage for generic READ/WRITE.
+> 
 
-The ramdisk memory utilization can only go up when data is written to
-new pages. Implement discard to provide the possibility to reduce memory
-usage for pages no longer in use. Aligned discards will free the
-associated pages, if any, and determinisitically return zeroed data
-until written again.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/block/brd.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index e322cef6596bf..e741b0c3a4f79 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -240,6 +240,23 @@ static int brd_do_bvec(struct brd_device *brd, struc=
-t page *page,
- 	return err;
- }
-=20
-+static void brd_do_discard(struct brd_device *brd, sector_t sector, u32 =
-size)
-+{
-+	sector_t aligned_sector =3D (sector + PAGE_SECTORS) & ~PAGE_SECTORS;
-+	struct page *page;
-+
-+	size -=3D (aligned_sector - sector) * SECTOR_SIZE;
-+	xa_lock(&brd->brd_pages);
-+	while (size >=3D PAGE_SIZE && aligned_sector < rd_size * 2) {
-+		page =3D __xa_erase(&brd->brd_pages, aligned_sector >> PAGE_SECTORS_SH=
-IFT);
-+		if (page)
-+			__free_page(page);
-+		aligned_sector +=3D PAGE_SECTORS;
-+		size -=3D PAGE_SIZE;
-+	}
-+	xa_unlock(&brd->brd_pages);
-+}
-+
- static void brd_submit_bio(struct bio *bio)
- {
- 	struct brd_device *brd =3D bio->bi_bdev->bd_disk->private_data;
-@@ -247,6 +264,12 @@ static void brd_submit_bio(struct bio *bio)
- 	struct bio_vec bvec;
- 	struct bvec_iter iter;
-=20
-+	if (unlikely(op_is_discard(bio->bi_opf))) {
-+		brd_do_discard(brd, sector, bio->bi_iter.bi_size);
-+		bio_endio(bio);
-+		return;
-+	}
-+
- 	bio_for_each_segment(bvec, bio, iter) {
- 		unsigned int len =3D bvec.bv_len;
- 		int err;
-@@ -327,6 +350,9 @@ static int brd_alloc(int i)
- 		 *  is harmless)
- 		 */
- 		.physical_block_size	=3D PAGE_SIZE,
-+		.max_hw_discard_sectors	=3D UINT_MAX,
-+		.max_discard_segments	=3D 1,
-+		.discard_granularity	=3D PAGE_SIZE,
- 	};
-=20
- 	list_for_each_entry(brd, &brd_devices, brd_list)
---=20
-2.43.0
+Yes. It did not seem that there is any harm due to these missing pieces 
+(first 6 patches).
+Therefore, "Fixes" tag is not there, and patches were not sent 
+separately from the features.
 
