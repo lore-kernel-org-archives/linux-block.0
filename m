@@ -1,189 +1,139 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C96982883;
-	Mon, 29 Apr 2024 15:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA22F8595F;
+	Mon, 29 Apr 2024 17:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714405706; cv=none; b=LRTKxU3GkFuplWjl0wNWnYybiAVnbC5bJYWp6AriGy22g53rBkmyb6+DU03NrOWudr9YdtNQtru83avv27seaBZwiK6+TnocAkz8NdBklYwyh3dWwtTUklnDE0Krd16S/VKAKvVRryId3HLdJAknrNt9+uZ6OiVFICEisgC98sw=
+	t=1714410137; cv=none; b=I+JpNg0AnHoHiKMNRpODicAl0ocZ1OUAmMAollOR6TEg7VLlvi9gZdeqqb9AOfvR0QOsBdxGtaWV4ew/6WNUIJzkQ6PHpjAI1ChFgBBqx3Uo0rORJFfq8zIGiEAkprB+tKT17etUG0gXWRcr7YETg7Ifiksi7ZskuBmy0RFEH+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714405706; c=relaxed/simple;
-	bh=qPCLeREh/UsNAYopgfH6ctKP/eyQkIqnKa8izDu/Vp4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pck7L+KampxMu53TtYcmaekglK+D9blDszXVHAUQmeK2G5vzaLjVMcBjkOFl1eTrNs7KlY2ESGUAJLsctMMcl8lIinGHaAY7vs8jGFobsdbBA8F26yer4YT+MhaT6XW597MFoBumk5NwU2dQ0EYPuqFD04wZwfe2sOu1OIHT7l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aF4agWVB; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714410137; c=relaxed/simple;
+	bh=bSBKbk0dakvui62/1/gpj5Gf+LvIq6ltNpq6o8uujCg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ibg0QbpUUHnyFh34Dzfe6/6W1P1wjmEh8zsbi+NlBesiPGXNUbL05Vo4LMvA89RMOdHmOI/Hi4NaMm0v8+K/OguCo+EnuVYwRrYDDc+lPkDgLxnxW+2/AO3uMk8WD1XeNGmeJgLO3nO5434DWMATPPpdtHQQYTQ7pmrT3PfR+wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=a4NDn8EA; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aF4agWVB"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41c011bb920so9117075e9.1;
-        Mon, 29 Apr 2024 08:48:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714405703; x=1715010503; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=auGjB8n+8u0YZ9tP0kG5HRe5tevFQJeUANJT949K2+s=;
-        b=aF4agWVBWV7tnho4GZy6PMsziq1L9ofVXKn8hsIqhCzBDAU/J8Vy6ZDdlTxquPTUFC
-         dAG3ihzR2XlcRnkfF/7EFQlkOCA8BQ9CaZa5FaO6U67ZmxPt1rpt1VZmxL1q1FOo0Psk
-         mJCQVYigTzOgI33e5P86iWbIBxnUT1UVUoldYEX/9kiklHMCj7P7rmVTsXjg3jAkhbFX
-         aTuoc0Fsu/jxTaiKJ8pmPoLxzaiejnZV0RdjygnkV+vCsUUmD5cAqWZ16iTubjReJ/ha
-         TxT51CtGKRQzuOMPz9uz5HQVToHAWKi+w3YpKUNSnnJOiDfMPI0vLRnRnhq5Gsp7sY07
-         afeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714405703; x=1715010503;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=auGjB8n+8u0YZ9tP0kG5HRe5tevFQJeUANJT949K2+s=;
-        b=o/Pv7lMSAtasnJk499HXVy6C6KGZxyj77rl+B/tPQXR3wcy9fz97vWE8dmVutDp9ui
-         Ng4Q/l8WzfSwW+lXcPlSJjTdVgrfh1JSJOf+8OfAX6A5G0CnL5mDtY12x2BBVf/aNU32
-         yLO82y89cNgcUGy3K5oQ6vyT43hhp9s5e6FJQipfgShJjhPju1NJBewOzM2shVLXGePx
-         vPmcyDtLXH6Sb+XMSrLxr/06I1qR/kyS2ek9rd9HXrQSxACbaWRkm2nHlSqn6NdV3ZR2
-         k4jT+h/01++9O+ddkld+jjlcQ8iGXXS00IgiOazOSFX42RLPkaXMfvxLhEi9uJM2Zm1E
-         MU8w==
-X-Forwarded-Encrypted: i=1; AJvYcCUB6MbPvjogEmG5u7ZkwQKAkQnJuVNPESweSV/ksuenn5Tb/+LBHPeGlfkn4qBjloJNuM4vfVbEkYT75/MfX7oogPQqbc0SzVDBMJtbjja+GLctCHScxDmsMwsz20dVRTFlAMXwOA==
-X-Gm-Message-State: AOJu0YyBN4DQ2d5aOaGDINNLwABEkpV9OQphNTv+nL3OtGs7WUqsOpgA
-	FAj07NoEXWN21uAvONWZ9afa2RDWxZShkqNL3z1hD8UzbZIKJQoBG2x1Bw==
-X-Google-Smtp-Source: AGHT+IFfM34bs8p6dtR1mnQ7pdgt5BgajEoGID9wg4/j7hPDMdPaiyRMVk37QNSEWmxf3QLwh1609A==
-X-Received: by 2002:a05:600c:3ba4:b0:418:9d4a:1ba5 with SMTP id n36-20020a05600c3ba400b004189d4a1ba5mr45758wms.6.1714405702577;
-        Mon, 29 Apr 2024 08:48:22 -0700 (PDT)
-Received: from [192.168.42.252] (82-132-212-208.dab.02.net. [82.132.212.208])
-        by smtp.gmail.com with ESMTPSA id c9-20020a05600c0a4900b0041b43d2d745sm17172235wmq.7.2024.04.29.08.48.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Apr 2024 08:48:22 -0700 (PDT)
-Message-ID: <19de460c-ac83-40ff-8113-3bb7e75f194a@gmail.com>
-Date: Mon, 29 Apr 2024 16:48:37 +0100
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="a4NDn8EA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=yTC+bWVgM4SBE+HjKOSSMptE8ndZVGdRXrI5RUQIhsY=; b=a4NDn8EAViKGB748ph/GzB4yNx
+	EkE+vTWSQuoylM13u+ONh7KVF/Pgil71T79f5ICgoA89/ysBKdIi80oROhm/m0i5bBrLq1YWxmL26
+	i6REVIhwhHnUCr24FrrCSIXAO+OcBDq+/NHZnbktqvrEoMA1VvapdGLUVYkEoODyygxnKe9jJjfZ0
+	8BUWCMVqMiGYFbFVrho7QavIjwkUrtH4fv+TZRI91Q3boVuvA4QctoC3yeT51WfqbKbV9aSSU2HBd
+	BBNpPTXzdcOuoGifoqa2Z5Ff9dWFDs7Jpbu4eo9ZvdEWwh/ftQIHkM4ZOE7493EVMf13X0QBxMkGV
+	Z+XJk1Cw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1s1UOH-007Hz0-1Z;
+	Mon, 29 Apr 2024 17:02:09 +0000
+Date: Mon, 29 Apr 2024 18:02:09 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-fsdevel@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
+	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCHES][RFC] packing struct block_device flags
+Message-ID: <20240429170209.GA2118490@ZenIV>
+References: <20240428051232.GU2118490@ZenIV>
+ <20240429052315.GB32688@lst.de>
+ <20240429073107.GZ2118490@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/9] io_uring: support SQE group
-To: Ming Lei <ming.lei@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-6-ming.lei@redhat.com>
- <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
- <Ziey53aADgxDrXZw@redhat.com> <Zihi3nDAJg1s7Cws@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <Zihi3nDAJg1s7Cws@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240429073107.GZ2118490@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On 4/24/24 02:39, Ming Lei wrote:
-> On Tue, Apr 23, 2024 at 03:08:55PM +0200, Kevin Wolf wrote:
->> Am 22.04.2024 um 20:27 hat Jens Axboe geschrieben:
->>> On 4/7/24 7:03 PM, Ming Lei wrote:
->>>> SQE group is defined as one chain of SQEs starting with the first sqe that
->>>> has IOSQE_EXT_SQE_GROUP set, and ending with the first subsequent sqe that
->>>> doesn't have it set, and it is similar with chain of linked sqes.
->>>>
->>>> The 1st SQE is group leader, and the other SQEs are group member. The group
->>>> leader is always freed after all members are completed. Group members
->>>> aren't submitted until the group leader is completed, and there isn't any
->>>> dependency among group members, and IOSQE_IO_LINK can't be set for group
->>>> members, same with IOSQE_IO_DRAIN.
->>>>
->>>> Typically the group leader provides or makes resource, and the other members
->>>> consume the resource, such as scenario of multiple backup, the 1st SQE is to
->>>> read data from source file into fixed buffer, the other SQEs write data from
->>>> the same buffer into other destination files. SQE group provides very
->>>> efficient way to complete this task: 1) fs write SQEs and fs read SQE can be
->>>> submitted in single syscall, no need to submit fs read SQE first, and wait
->>>> until read SQE is completed, 2) no need to link all write SQEs together, then
->>>> write SQEs can be submitted to files concurrently. Meantime application is
->>>> simplified a lot in this way.
->>>>
->>>> Another use case is to for supporting generic device zero copy:
->>>>
->>>> - the lead SQE is for providing device buffer, which is owned by device or
->>>>    kernel, can't be cross userspace, otherwise easy to cause leak for devil
->>>>    application or panic
->>>>
->>>> - member SQEs reads or writes concurrently against the buffer provided by lead
->>>>    SQE
->>>
->>> In concept, this looks very similar to "sqe bundles" that I played with
->>> in the past:
->>>
->>> https://git.kernel.dk/cgit/linux/log/?h=io_uring-bundle
->>>
->>> Didn't look too closely yet at the implementation, but in spirit it's
->>> about the same in that the first entry is processed first, and there's
->>> no ordering implied between the test of the members of the bundle /
->>> group.
->>
->> When I first read this patch, I wondered if it wouldn't make sense to
->> allow linking a group with subsequent requests, e.g. first having a few
->> requests that run in parallel and once all of them have completed
->> continue with the next linked one sequentially.
->>
->> For SQE bundles, you reused the LINK flag, which doesn't easily allow
->> this. Ming's patch uses a new flag for groups, so the interface would be
->> more obvious, you simply set the LINK flag on the last member of the
->> group (or on the leader, doesn't really matter). Of course, this doesn't
->> mean it has to be implemented now, but there is a clear way forward if
->> it's wanted.
-> 
-> Reusing LINK for bundle breaks existed link chains(BUNDLE linked to existed
-> link chain), so I think it may not work.
-> 
-> The link rule is explicit for sqe group:
-> 
-> - only group leader can set link flag, which is applied on the whole
-> group: the next sqe in the link chain won't be started until the
-> previous linked sqe group is completed
-> 
-> - link flag can't be set for group members
-> 
-> Also sqe group doesn't limit async for both group leader and member.
-> 
-> sqe group vs link & async is covered in the last liburing test code.
-> 
->>
->> The part that looks a bit arbitrary in Ming's patch is that the group
->> leader is always completed before the rest starts. It makes perfect
->> sense in the context that this series is really after (enabling zero
->> copy for ublk), but it doesn't really allow the case you mention in the
->> SQE bundle commit message, running everything in parallel and getting a
->> single CQE for the whole group.
-> 
-> I think it should be easy to cover bundle in this way, such as add one new
-> op IORING_OP_BUNDLE as Jens did, and implement the single CQE for whole group/bundle.
-> 
->>
->> I suppose you could hack around the sequential nature of the first
->> request by using an extra NOP as the group leader - which isn't any
->> worse than having an IORING_OP_BUNDLE really, just looks a bit odd - but
->> the group completion would still be missing. (Of course, removing the
->> sequential first operation would mean that ublk wouldn't have the buffer
->> ready any more when the other requests try to use it, so that would
->> defeat the purpose of the series...)
->>
->> I wonder if we can still combine both approaches and create some
->> generally useful infrastructure and not something where it's visible
->> that it was designed mostly for ublk's special case and other use cases
->> just happened to be enabled as a side effect.
-> 
-> sqe group is actually one generic interface, please see the multiple copy(
-> copy one file to multiple destinations in single syscall for one range) example
-> in the last patch, and it can support generic device zero copy: any device internal
-> buffer can be linked with io_uring operations in this way, which can't
-> be done by traditional splice/pipe.
-> 
-> I guess it can be used in network Rx zero copy too, but may depend on actual
-> network Rx use case.
+On Mon, Apr 29, 2024 at 08:31:07AM +0100, Al Viro wrote:
 
-I doubt. With storage same data can be read twice. Socket recv consumes
-data. Locking a buffer over the duration of another IO doesn't really sound
-plausible, same we returning a buffer back. It'd be different if you can
-read the buffer into the userspace if something goes wrong, but perhaps
-you remember the fused discussion.
+> FWIW, we could go for atomic_t there and use
+> 	atomic_read() & 0xff
+> for partno, with atomic_or()/atomic_and() for set/clear and
+> atomic_read() & constant for test.  That might slightly optimize
+> set/clear on some architectures, but setting/clearing flags is
+> nowhere near hot enough for that to make a difference.
 
--- 
-Pavel Begunkov
+Incremental for that (would be folded into 3/8 if we went that way)
+is below; again, I'm not at all sure it's idiomatic enough to bother
+with, but that should at least show what's going on:
+
+diff --git a/block/bdev.c b/block/bdev.c
+index 9aa23620fe92..fae30eae7741 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -411,7 +411,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+ 	mutex_init(&bdev->bd_fsfreeze_mutex);
+ 	spin_lock_init(&bdev->bd_size_lock);
+ 	mutex_init(&bdev->bd_holder_lock);
+-	bdev->__bd_flags = partno;
++	atomic_set(&bdev->__bd_flags, partno);
+ 	bdev->bd_inode = inode;
+ 	bdev->bd_queue = disk->queue;
+ 	if (partno && bdev_test_flag(disk->part0, BD_HAS_SUBMIT_BIO))
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 98e1c2d28d60..a822911e28e5 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -45,7 +45,7 @@ struct block_device {
+ 	struct request_queue *	bd_queue;
+ 	struct disk_stats __percpu *bd_stats;
+ 	unsigned long		bd_stamp;
+-	u32			__bd_flags;	// partition number + flags
++	atomic_t		__bd_flags;	// partition number + flags
+ 	dev_t			bd_dev;
+ 	struct inode		*bd_inode;	/* will die */
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d556cec9224b..a8271497ac62 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -722,38 +722,22 @@ void disk_uevent(struct gendisk *disk, enum kobject_action action);
+ 
+ static inline u8 bdev_partno(const struct block_device *bdev)
+ {
+-	return bdev->__bd_flags & 0xff;
++	return atomic_read(&bdev->__bd_flags) & 0xff;
+ }
+ 
+ static inline bool bdev_test_flag(const struct block_device *bdev, int flag)
+ {
+-	return bdev->__bd_flags & (1 << (flag + 8));
++	return atomic_read(&bdev->__bd_flags) & (1 << (flag + 8));
+ }
+ 
+ static inline void bdev_set_flag(struct block_device *bdev, int flag)
+ {
+-	u32 v = bdev->__bd_flags;
+-
+-	for (;;) {
+-		u32 w = cmpxchg(&bdev->__bd_flags, v, v | (1 << (flag + 8)));
+-
+-		if (v == w)
+-			return;
+-		v = w;
+-	}
++	atomic_or(1 << (flag + 8), &bdev->__bd_flags);
+ }
+ 
+ static inline void bdev_clear_flag(struct block_device *bdev, int flag)
+ {
+-	u32 v = bdev->__bd_flags;
+-
+-	for (;;) {
+-		u32 w = cmpxchg(&bdev->__bd_flags, v, v & ~(1 << (flag + 8)));
+-
+-		if (v == w)
+-			return;
+-		v = w;
+-	}
++	atomic_and(~(1 << (flag + 8)), &bdev->__bd_flags);
+ }
+ 
+ static inline int get_disk_ro(struct gendisk *disk)
