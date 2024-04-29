@@ -1,111 +1,62 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C5213AC5;
-	Mon, 29 Apr 2024 07:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CB517557;
+	Mon, 29 Apr 2024 08:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714375874; cv=none; b=g+TUG+3Phljeaw7n7IX8YYgRziXFhvcqOWxKTPgxo+m1uJimZ2ovJ7ASYIkKAWfpR00iiSh/wQKBlKbBgArNFNB+mPbo0RYYTiw+3+n6ANcq2aGOr+uHXyC46nIaSy1e6Lfbfzc9eaA6sJUX2ECGFW0fGravCHuu92vQSLC6mUE=
+	t=1714379838; cv=none; b=kIRXpwytpDsdq1gnGeOcZa9Kk2TQlbxP+rCN0GVuvPGh7K23zpAa5MvN7dsPsSsBMLoHNry2W/1VKPUh78kfcgMPD4/PGEdz94N2gvtNIW6WJC0bq5XbLnd88oiC4+S4ugDw3K3r1z0i0wuon/jWnDQxYu/LTs/svrzxUhQ5Voo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714375874; c=relaxed/simple;
-	bh=Rn229G1MrAFSOW7jk1YKb/eSOR4GeySma2G223farvE=;
+	s=arc-20240116; t=1714379838; c=relaxed/simple;
+	bh=wvIMnndAQ3VWmI1jPWw87xltZ8AbQuL9XuVFQeg1mPk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/b6MtnXrC2fpCYdGHXsIhT/HYzOo/wFh3hic3pJfmsvfBYtqvzR+YH2qrR/oY+Dui119ZcnzTdxFq1IfJQbCH16+aoPWiDvAYIgsPW4UO9rzLJ9asJRvGUIWKBBb0S6lQIPQA5oK8enIC1DmHI17MsOhjzKXX3WCzieONBvjHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=l9BvLWjf; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	 Content-Type:Content-Disposition:In-Reply-To; b=DbGPFUjKGYZIJkKy/zC/Ckp4ED6hEsP6B/kNmfNybx2817anQYx9SvnytRJK2SSRZiiYNCb1nJ29SuWANEbAmNnd/dzi+L7OTiKYkewSPrrmlq5ErKo0arG1m6XvwO2I2S0EwJSXkMnlhnuy7AlCpKxDmooPw3QPeH5b0yGrEIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XGIrzxdk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="l9BvLWjf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=WjWH/DEh5Ad+FnR7wUY6bk0viEmvMG0F/8p5Zq3qc/Q=; b=l9BvLWjf8X7yPFoutvd+5bybSE
-	QrvxGEJMXJ2TT0148FLHbGzU9jXqp1PO0XqnBw6kdelCM63iiTq1a0nNwXssFfdQ49pvL8h2U7Kp9
-	avtfP0iqD40QzT7x+Gf9fKiDnX4cO8cW87u3r5Uwnr3eIxk+SKYF96nPU7kfBX+h1RTgSEQ/ovjsk
-	FjuQH5E/fimWfOizGlcPiyFCUfhoNFT3qNwbGS4WYX4x0aacT+m8rucl0aWoopqJDyrHSK1MBKN9l
-	gZgkWBtGgnguN34eycuR6k/aNsknUIQEwzQZ0Zb0m7eWS/LFjw3SdKy+ICRnu5TDnZ6M6bWaQ5EXj
-	UuG9QrIg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1s1LTf-0076pI-1V;
-	Mon, 29 Apr 2024 07:31:07 +0000
-Date: Mon, 29 Apr 2024 08:31:07 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-fsdevel@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
-	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCHES][RFC] packing struct block_device flags
-Message-ID: <20240429073107.GZ2118490@ZenIV>
-References: <20240428051232.GU2118490@ZenIV>
- <20240429052315.GB32688@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XGIrzxdk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4638C113CD;
+	Mon, 29 Apr 2024 08:37:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714379838;
+	bh=wvIMnndAQ3VWmI1jPWw87xltZ8AbQuL9XuVFQeg1mPk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XGIrzxdkuk9JaZVZO15FaSpqdBS7p/5KsEdQWg5fi58DRDSekQ+ZlEAmr9DIqxU1I
+	 672S5rbsFmyx5SjHuSHiJSxzVU3voluSfY3NLVmQIrSRFkZS0HJJShY6vWr5V5Y8ib
+	 jyxkE7IAP45CSll26mobfAsvZ35E9CjTfHJJFpYrxTqtno0MOCwBSA3GQXpTYoAW0S
+	 m7I8tdrb6PKjyKkJJ52fHhLa6TT2Hh47bgEH5LY8P/kiTbF6FLxmfHxf6Gb4xTCx2S
+	 4ftlS6/yfamnbzfhjPXAWT1gYstKsG5dSjD5txGIm8Iy/EU5yEcnPB++0Sx02KJsSH
+	 JxuJ0616F1Vpg==
+Date: Mon, 29 Apr 2024 10:37:12 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH 1/7] bcache_register(): don't bother with set_blocksize()
+Message-ID: <20240429-turnus-posaunen-795cc93151a6@brauner>
+References: <20240427210920.GR2118490@ZenIV>
+ <20240427211007.GA1495312@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240429052315.GB32688@lst.de>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <20240427211007.GA1495312@ZenIV>
 
-On Mon, Apr 29, 2024 at 07:23:15AM +0200, Christoph Hellwig wrote:
-> On Sun, Apr 28, 2024 at 06:12:32AM +0100, Al Viro wrote:
-> > 	We have several bool members in struct block_device.
-> > It would be nice to pack that stuff, preferably without
-> > blowing the cacheline boundaries.
-> > 
-> > 	That had been suggested a while ago, and initial
-> > implementation by Yu Kuai <yukuai1@huaweicloud.com> ran into
-> > objections re atomicity, along with the obvious suggestion to
-> > use unsigned long and test_bit/set_bit/clear_bit for access.
-> > Unfortunately, that *does* blow the cacheline boundaries.
-> > 
-> > 	However, it's not hard to do that without bitops;
-> > we have an 8-bit assign-once partition number nearby, and
-> > folding it into a 32-bit member leaves us up to 24 bits for
-> > flags.  Using cmpxchg for setting/clearing flags is not
-> > hard, and 32bit cmpxchg is supported everywhere.
+On Sat, Apr 27, 2024 at 10:10:07PM +0100, Al Viro wrote:
+> We are not using __bread() anymore and read_cache_page_gfp() doesn't
+> care about block size.  Moreover, we should *not* change block
+> size on a device that is currently held exclusive - filesystems
+> that use buffer cache expect the block numbers to be interpreted
+> in units set by filesystem.
 > 
-> To me this looks pretty complicated and arcane.
+> ACKed-by: Kent Overstreet <kent.overstreet@linux.dev>
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> ---
 
-cmpxchg for setting/clearing a bit in u32 is hardly arcane,
-especially since these bits are rarely modified.  _Reading_
-is done on hot paths, but that's cheap.
-
-For more familiar form,
-static inline void bdev_set_flag(struct block_device *bdev, int flag)
-{
-	u32 *p = &bdev->__bd_flags;
-        u32 c, old;
-
-	c = *p;
-	while ((old = cmpxchg(p, c, c | (1 << (flag + 8)))) != c)
-		c = old;
-}
-
-to keep it closer to e.g. generic_atomic_or() and its ilk (asm-generic/atomic.h)
-or any number of similar places.
-
-FWIW, we could go for atomic_t there and use
-	atomic_read() & 0xff
-for partno, with atomic_or()/atomic_and() for set/clear and
-atomic_read() & constant for test.  That might slightly optimize
-set/clear on some architectures, but setting/clearing flags is
-nowhere near hot enough for that to make a difference.
-
-> How about we just
-> reclaim a little space in the block device and just keep bd_partno
-> and add an unsigned long base flags?
-> 
-> E.g. bd_meta_info is only used in slow path early boot and sysfs code
-> and just set for a few partitions.
-> 
-> Just turn it into a hash/xrray/whatever indexed by bd_dev and we've
-> already reclaimed enough space.
-
-The problem is not the total size, though - it's blowing the first
-cacheline.  With struct device shoved into that thing, a word or two
-in total size is noise; keeping the fields read on the hot paths within
-the first 64 bytes is not.
+Looks good to me,
+Reviewed-by: Christian Brauner <brauner@kernel.org>
