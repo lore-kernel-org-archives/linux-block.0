@@ -1,42 +1,42 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89820129E98
-	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 17:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A25012A154
+	for <linux-block@vger.kernel.org>; Mon, 29 Apr 2024 17:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714412948; cv=none; b=PMQMyOCh2dJGlFegRyF6iQZkMGuUqawEvDY/kLWFd0+yiY/72+mEdSJToPQ9PBgDdIooTi6kl+ZnMBSE9iTEW0H5/8BbdBbjwIQJIgRJUNCSh0LtauUCqrsQsL5Drthtv9C9b845vhibRoToaHP31C44Y6IpC5mQ10pMshOhbUk=
+	t=1714412950; cv=none; b=D7kRTSgHaWSnUtT9UX8h/pElgNduN+BzqlVZNNaEHkkGo6ujvszLroVdKIWlT+KROl+ydfvMbZdC71gENtET5EZ60Wr9vIMNNXclt7UjjGumS+0dEQl46hIlegK+w2sfPlfUuOvpa/zVmys4//Kh+SI1MzUVCaBQKfH68QWYFpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714412948; c=relaxed/simple;
-	bh=1U+Kh3hlSED8HrnAdOsdy60sZC6TEyEX1hh69gbLIYw=;
+	s=arc-20240116; t=1714412950; c=relaxed/simple;
+	bh=61xSSI6EQ1vnhz21pwP8KoztwnvDMKCv/pcK8cpnT+s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pj3T0EPIGTgQYr4FSqHV+DLvj0Vo+l+Jvz8Kgyd2dPbIxV04fz3RSyXT/1KRUKjs8tndb1n8sHF84nhMbIhdhcsEAtSw2ra+EBD6chwRYCMjzPXVjvSzpyjnI8r5fhbS6UJADuEkIQ/XbPwYK7S/m2SZC76h1WRzkIBkvejZ/qM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Qhiue/fi; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=SSSQxI7AbNK5piLedzJD+1BjKGmixy6LTXQ4ULrIguYmn3BDTI3+FQyriJW0pjK9WgspxZYdczNqGER2uzEE+aeLgibSrfljx8Dfac/RR6gqzn3bRXMd3E/udiCU3x8ir1dnoH8sUExZhXr60TshfH6ufAncbdkLvdNMbqubaNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=f209D2gO; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Qhiue/fi"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="f209D2gO"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=XMA0Y4ySVhUqfZ5XnqoqS75sxnrPA9ZX/CVdHty0VuM=; b=Qhiue/fi1p+4FIbi49kGmKITmV
-	te3h8icOukmpTjeoX8zo51K5b4HVpJnNr8+gViJCYkuMxhJqXgXWTOJXrm6a4TKHpfZGv5sKC5Rks
-	ZUw3hpUeWMIUMOcVAu9u7ParUk3z7qo/Ry/uxowT8XqmODbpJXpuMYnLu5lvV4TNITagL9JjznMif
-	bRjNp8Wa008wKETR/+kdKSgJkowZmH3y1K3+gMneuKD57hnXdH2TCkb0+qPpAm8vGRIbjNMw2LqYa
-	0a3JW7dgy/s8i+pYPnFpcXeNL2BU30/uBAhzCGRKOTsBDtjxTfEBmpDHvy8AEilSjy4J0cFIDb+3+
-	cbPQaUWA==;
+	bh=hHybFAQBj9YS9lzxfeccJTe4kQ40qZp6bsRLsL3Ffzs=; b=f209D2gObRqvrG92Fxf8gbCWSC
+	15TRTZaoKmGZLIYcUw57InniBjp+Ba5ranQ2UX6cv9JGvIvFerNL5N3HPFxEcja+fU2QprsYNtp7k
+	2Lr/CzOjgE1i5UgHyEi+v/PxQ9N6Zjj8N54FGe0yktmJX+3RKHwPWDSc2fCzaSEMUaW+TMyi9pKsU
+	nlEE0pQE3WsbJqSUpH8Jxk8Ht6vlM/Eb1/JIzNkq0cGkHyKa9MzVRm4luFwVhpfqP+wTYPWVaRLni
+	VkAeiNSU/y5sZpOX3Y98uxCiIhY87IuxWRH1cGnsLng986up4SRyedZ4rXJrqdeaBssLOqBIW4SSI
+	4zJc9fVg==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s1V7h-00000003mZf-394v;
-	Mon, 29 Apr 2024 17:49:06 +0000
+	id 1s1V7k-00000003mac-0GIR;
+	Mon, 29 Apr 2024 17:49:08 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Lennart Poettering <mzxreary@0pointer.de>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: add a disk_has_partscan helper
-Date: Mon, 29 Apr 2024 19:49:00 +0200
-Message-Id: <20240429174901.1643909-2-hch@lst.de>
+Subject: [PATCH 2/2] block: add a partscan sysfs attribute for disks
+Date: Mon, 29 Apr 2024 19:49:01 +0200
+Message-Id: <20240429174901.1643909-3-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240429174901.1643909-1-hch@lst.de>
 References: <20240429174901.1643909-1-hch@lst.de>
@@ -49,83 +49,68 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Add a helper to check if partition scanning is enabled instead of
-open coding the check in a few places.  This now always checks for
-the hidden flag even if all but one of the callers are never reachable
-for hidden gendisks.
+This attribute reports if partition scanning is enabled for a given disk.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c           |  7 ++-----
- block/partitions/core.c |  5 +----
- include/linux/blkdev.h  | 13 +++++++++++++
- 3 files changed, 16 insertions(+), 9 deletions(-)
+ Documentation/ABI/stable/sysfs-block | 10 ++++++++++
+ block/genhd.c                        |  8 ++++++++
+ 2 files changed, 18 insertions(+)
 
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index 1fe9a553c37b71..db58fdcdff31b0 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -101,6 +101,16 @@ Description:
+ 		devices that support receiving integrity metadata.
+ 
+ 
++What:		/sys/block/<disk>/partscan
++Date:		Atorl 2024
++Contact:	Christoph Hellwig <hch@lst.de>
++Description:
++		The /sys/block/<disk>/partscan files reports if partition
++		scanning is enabled for the disk.  It returns "1" if partition
++		scanning is enabled, or "0" if not.  The value type is a 32-bit
++		unsigned integer, but only "0" and "1" are valid values.
++
++
+ What:		/sys/block/<disk>/<partition>/alignment_offset
+ Date:		April 2009
+ Contact:	Martin K. Petersen <martin.petersen@oracle.com>
 diff --git a/block/genhd.c b/block/genhd.c
-index eb893df56d510e..4b85963d09dbb4 100644
+index 4b85963d09dbb4..dec2ee338fb44a 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -345,9 +345,7 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
- 	struct file *file;
- 	int ret = 0;
- 
--	if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
--		return -EINVAL;
--	if (test_bit(GD_SUPPRESS_PART_SCAN, &disk->state))
-+	if (!disk_has_partscan(disk))
- 		return -EINVAL;
- 	if (disk->open_partitions)
- 		return -EBUSY;
-@@ -503,8 +501,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 			goto out_unregister_bdi;
- 
- 		/* Make sure the first partition scan will be proceed */
--		if (get_capacity(disk) && !(disk->flags & GENHD_FL_NO_PART) &&
--		    !test_bit(GD_SUPPRESS_PART_SCAN, &disk->state))
-+		if (get_capacity(disk) && disk_has_partscan(disk))
- 			set_bit(GD_NEED_PART_SCAN, &disk->state);
- 
- 		bdev_add(disk->part0, ddev->devt);
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index b11e88c82c8cfa..37b5f92d07fec9 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -573,10 +573,7 @@ static int blk_add_partitions(struct gendisk *disk)
- 	struct parsed_partitions *state;
- 	int ret = -EAGAIN, p;
- 
--	if (disk->flags & GENHD_FL_NO_PART)
--		return 0;
--
--	if (test_bit(GD_SUPPRESS_PART_SCAN, &disk->state))
-+	if (!disk_has_partscan(disk))
- 		return 0;
- 
- 	state = check_partition(disk);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 040a22e0eda0ec..3b18a40a1fc109 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -230,6 +230,19 @@ static inline unsigned int disk_openers(struct gendisk *disk)
- 	return atomic_read(&disk->part0->bd_openers);
+@@ -1044,6 +1044,12 @@ static ssize_t diskseq_show(struct device *dev,
+ 	return sprintf(buf, "%llu\n", disk->diskseq);
  }
  
-+/**
-+ * disk_has_partscan - return %true if partition scanning is enabled on a disk
-+ * @disk: disk to check
-+ *
-+ * Returns %true if partitions scanning is enabled for @disk, or %false if
-+ * partition scanning is disabled either permanently or temporarily.
-+ */
-+static inline bool disk_has_partscan(struct gendisk *disk)
++static ssize_t partscan_show(struct device *dev,
++		struct device_attribute *attr, char *buf)
 +{
-+	return !(disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN)) &&
-+		!test_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
++	return sprintf(buf, "%u\n", disk_has_partscan(dev_to_disk(dev)));
 +}
 +
- /*
-  * The gendisk is refcounted by the part0 block_device, and the bd_device
-  * therein is also used for device model presentation in sysfs.
+ static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
+ static DEVICE_ATTR(ext_range, 0444, disk_ext_range_show, NULL);
+ static DEVICE_ATTR(removable, 0444, disk_removable_show, NULL);
+@@ -1057,6 +1063,7 @@ static DEVICE_ATTR(stat, 0444, part_stat_show, NULL);
+ static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
+ static DEVICE_ATTR(badblocks, 0644, disk_badblocks_show, disk_badblocks_store);
+ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
++static DEVICE_ATTR(partscan, 0444, partscan_show, NULL);
+ 
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ ssize_t part_fail_show(struct device *dev,
+@@ -1103,6 +1110,7 @@ static struct attribute *disk_attrs[] = {
+ 	&dev_attr_events_async.attr,
+ 	&dev_attr_events_poll_msecs.attr,
+ 	&dev_attr_diskseq.attr,
++	&dev_attr_partscan.attr,
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ 	&dev_attr_fail.attr,
+ #endif
 -- 
 2.39.2
 
