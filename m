@@ -1,59 +1,44 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1BC12D741;
-	Tue, 30 Apr 2024 12:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A9513D280
+	for <linux-block@vger.kernel.org>; Tue, 30 Apr 2024 12:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714478417; cv=none; b=JL3X2kmG61WL/ZT8nu1WIixzoq/6fbGdP4SxjcgxF2RCUepeHJQmu++XUl3lmMUGX39xd5blUFS25XESZHbia/P8X3ixzv+Nl34ir76Otf4sNv74IYzCptGyZXLkW7tE5XPIP8GePA4BYgPw6zgIBGF2Is0dgMyB7VQ8Xm6ZTHg=
+	t=1714478422; cv=none; b=DteQRpA25+0Uw7BDjQ8ndod+ue3Rz4nkTeWCH7Au9RbZRFrGjsGOtLnUXJANt73TjhFNk26Z4oi3sM1HPWnxCk6JcaZ+/6fQanVpAmXnV5u96IgyAgcY4M3Q0e6jb49y5pDekejrK0f1pLNbq/q3arykXSJ6S0FCip55B0ZuA2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714478417; c=relaxed/simple;
-	bh=BSh9NGc/mQsL8gDMq6Tv3RcdflHNyBd72gHnKSXRn6o=;
+	s=arc-20240116; t=1714478422; c=relaxed/simple;
+	bh=TFMQzQ3KoTmBi0ENmtnDwHecaMcjd3lh5NTw5ECUH3o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g3hOqQW7Ji1fEmw6uFRjrTK8oonz7Yd+q7P8kFMB3iez8e8XgQqIry21yaUDzNgmz5R8Y4hn/eN7pPCua93D87aljYjZ10L/d8AKpRnH8xHzAXOCjmuTSnY+LQSO3cYUaSx/Q9jy9cvkZSDjVMAlOUvm6nz126YFqIhcpGQjOos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ja+zeHMx; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 In-Reply-To:Content-Type; b=XpQ6VzcW1XJuIakvXji1V0WOg5qjF9+PMZ4LVREvcpqDZw+WOiYiRinOn9ywCoeM4WwfqB1ntMK1M/g3kXiYi1S7Pg5bDVIWX7BC2tKG4j9Uhoxrc2/Rck5J/wzOLXwvt7kx0yKM8ILKkMriM1qtIVsniEkGGw9xIfkXwcp677M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ja+zeHMx"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-518a56cdbcfso8902155e87.2;
-        Tue, 30 Apr 2024 05:00:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714478414; x=1715083214; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6wrsZKdSKAtNQDB064U7j9lty8GA8lRB060N34oQaaM=;
-        b=Ja+zeHMxFYZGqXFfqBOVWdZg0I/7XfM1THnQFNmAevmKXCwe+Hin1qVkWPEuli+Mpm
-         IsZ5O0jLZt1NhNnAW7hzZ/jHzV9hlKHoB5FfefaR1T7PsrECInssQlx1BDPZYtwW6zle
-         8yaNONsiLul/kB1SlkpK7dn1bhy4LK3Ez1PptOoEy+0mErCP/7ntkr2kzRErOUk8d7np
-         tHwtzVJzr6w2nMzdYVlNwchVmrTRPj85cBz1f8O2zGvokb5OTb8LHsMZTMpmR/GLurY9
-         6n2myLtCzTbQ7mwgHnhj1mcmB6o1OOSYedBbH1nwwYFGvmxKvkJ2kn29dEOB6OSNzpYG
-         c0JQ==
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-346407b8c9aso1217589f8f.0
+        for <linux-block@vger.kernel.org>; Tue, 30 Apr 2024 05:00:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714478414; x=1715083214;
+        d=1e100.net; s=20230601; t=1714478418; x=1715083218;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wrsZKdSKAtNQDB064U7j9lty8GA8lRB060N34oQaaM=;
-        b=Q7cqeCrXr9FfGPp69hV4uOhBt/NHiPB4cwb7zflgygbZfIE2YtHMGa41F9K6eRVqzS
-         CI4EO0Wrg4ooV6JEWcMt5w62OE9vh0RwW1eUYOKjtYENr9JntBtqfNrUO9JoI9ebMruj
-         02R/5xYSFmDK3FTdve5kWttsHRQ7F0jG9j6nPub/MbgxMx0qC278IHlTmUmjrxWNtUiN
-         o/d/xiiDXSBltOr/cyygvT/9lHl+5P4BNxfHa3f3Twt3vR44HKVkGhfq9eJr/9UJcsA0
-         GpcoXOoSeiqGP9D26w7hw6K/dKqAsUpX5jUklInR03sm4HJo782CibAQei0dw1DDZX0V
-         fJ5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXV9Z5pFwcMFpNYQ76X2/68cCS1mvWPiTEfsDXSoGG2AZFwkdAKNbhAQoFI/cYxVRUyfU6cclYmnt3zIQlB3O4d6vOSTcD1zIwQEgt5jPFekVOibZDYKDzScjwkPqL8FMVzjF7lGg==
-X-Gm-Message-State: AOJu0YxYjWuocT0a9kgkw4/3gPo5AiHcJHlTWl+BkzT6z9oYezEYJrY3
-	li4k3RM3E61PwNE4+BYgpEQRnKO8tKnwsefrqDQhQy62Zv9ysne+0oBslQ==
-X-Google-Smtp-Source: AGHT+IGl+7zlnRmNB7zHxYUznLxVcOl2Yek3qycj3dsGlL5IERowmduUwFCOGRNUNa9MTCZa+76q2Q==
-X-Received: by 2002:ac2:421a:0:b0:51a:e2a2:7262 with SMTP id y26-20020ac2421a000000b0051ae2a27262mr10721892lfh.8.1714478413988;
-        Tue, 30 Apr 2024 05:00:13 -0700 (PDT)
-Received: from [192.168.42.150] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id dk21-20020a170907941500b00a55aee4bf74sm11109225ejc.79.2024.04.30.05.00.13
+        bh=uPbeNwFFvVQVTt9kBGbVaBibbnkr7+pEiNl32W3+iws=;
+        b=cJZp0qQ0NCe/7W7INFE9YmYbV5MMLEuCWzZyDXoDgAW665nqNuzCBRIODJow5j/Xil
+         tDWvmPYXWp7b67+8dGsYIWmFYkwTqzcbt8rjZ4UI56zpENcPKhdphlETujOkkR5K7cKd
+         bZiqFh/7ezyMnYWOQcAXsBytrAtDzTOvQKf1aSJDc2L5jtxkYXU1TMHwgqkoLM8imUzj
+         A/AFBKTVYYdG0+4V206UekkTmulTHQJGwA9f75xkh4XI6YzNk/OutjsYuVsUlZL4QU3a
+         E4t+yRyi5jkmqweXb+XkSUpedVP7q2Eu46cFcmoc31eokO0X85eREqJ1m7AnDr3f9uO9
+         rVUw==
+X-Gm-Message-State: AOJu0Yxa7329p1rkwNIeBZ/NjI14m/LqmVIZpdedXhxuw8ckp2Zm8uiv
+	Yk6PwrWVL2+PEMpTu0EiGghwvW+P7oUlGlzp7OKUIJGDsy4Abk0L
+X-Google-Smtp-Source: AGHT+IHCvPZ4QhLNmWzO2EUJcP6+Q/VtFAhLnOAnwsswtmMF7vi8CXelylUavq4zKECCmZY0HPqn+A==
+X-Received: by 2002:a05:600c:4f05:b0:419:f241:6336 with SMTP id l5-20020a05600c4f0500b00419f2416336mr9436889wmq.1.1714478418528;
+        Tue, 30 Apr 2024 05:00:18 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id l2-20020a05600c4f0200b0041be78ae1f0sm11919724wmq.2.2024.04.30.05.00.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Apr 2024 05:00:13 -0700 (PDT)
-Message-ID: <81bc860f-0801-478b-adba-ea2a90cfe69e@gmail.com>
-Date: Tue, 30 Apr 2024 13:00:30 +0100
+        Tue, 30 Apr 2024 05:00:18 -0700 (PDT)
+Message-ID: <0a21ba7f-4d0e-4368-a215-2b81a8cf562e@grimberg.me>
+Date: Tue, 30 Apr 2024 15:00:17 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,134 +46,97 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] io_uring: support user sqe ext flags
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-3-ming.lei@redhat.com>
- <89dac454-6521-4bd8-b8aa-ad329b887396@kernel.dk> <Zie+RlbtckZJVE2J@fedora>
- <e0d52e3f-f599-42c8-b9f0-8242961291d0@gmail.com> <ZjBozhXCCs46OeWK@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZjBozhXCCs46OeWK@fedora>
+Subject: Re: [PATCH blktests v3 10/15] nvme/{006,008,010,012,014,019,023}:
+ support NVMET_BLKDEV_TYPES
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Daniel Wagner <dwagern@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>
+References: <20240424075955.3604997-1-shinichiro.kawasaki@wdc.com>
+ <20240424075955.3604997-11-shinichiro.kawasaki@wdc.com>
+ <6b55293c-0764-4922-b329-be393c9afc81@grimberg.me>
+ <36jinbbjhzr6erpfpnfqmk2jebf5tlnl26skuak73krwyyu6zi@i5qtgb4bqqgy>
+ <eeee5574-f4de-45a7-837b-74589dab423e@grimberg.me>
+ <sb3syw5ysqvkxvvn7mubzk3n6pfsivq54ownkyju2sgagesxpf@ktfn3333dmt2>
+Content-Language: he-IL, en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <sb3syw5ysqvkxvvn7mubzk3n6pfsivq54ownkyju2sgagesxpf@ktfn3333dmt2>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/30/24 04:43, Ming Lei wrote:
-> On Mon, Apr 29, 2024 at 04:24:54PM +0100, Pavel Begunkov wrote:
->> On 4/23/24 14:57, Ming Lei wrote:
->>> On Mon, Apr 22, 2024 at 12:16:12PM -0600, Jens Axboe wrote:
->>>> On 4/7/24 7:03 PM, Ming Lei wrote:
->>>>> sqe->flags is u8, and now we have used 7 bits, so take the last one for
->>>>> extending purpose.
+
+
+On 29/04/2024 2:58, Shinichiro Kawasaki wrote:
+> On Apr 28, 2024 / 16:12, Sagi Grimberg wrote:
+>>
+>> On 28/04/2024 13:32, Shinichiro Kawasaki wrote:
+>>> On Apr 28, 2024 / 11:58, Sagi Grimberg wrote:
+>>>> On 24/04/2024 10:59, Shin'ichiro Kawasaki wrote:
+>>>>> Enable repeated test runs for the listed test cases for
+>>>>> NVMET_BLKDEV_TYPES. Modify the set_conditions() hooks to call
+>>>>> _set_nvme_trtype_and_nvmet_blkdev_type() instead of _set_nvmet_trtype()
+>>>>> so that the test cases are repeated for listed conditions in
+>>>>> NVMET_BLKDEV_TYPES and NVMET_TRTYPES.
 >>>>>
->>>>> If bit7(IOSQE_HAS_EXT_FLAGS_BIT) is 1, it means this sqe carries ext flags
->>>>> from the last byte(.ext_flags), or bit23~bit16 of sqe->uring_cmd_flags for
->>>>> IORING_OP_URING_CMD.
+>>>>> The default values of NVMET_BLKDEV_TYPES is (device file). With this
+>>>>> default set up, each of the listed test cases are run twice. The second
+>>>>> runs of the test cases for 'file' blkdev type do exact same test as
+>>>>> other test cases nvme/007, 009, 011, 013, 015, 020 and 024.
 >>>>>
->>>>> io_slot_flags() return value is converted to `ULL` because the affected bits
->>>>> are beyond 32bit now.
->>>>
->>>> If we're extending flags, which is something we arguably need to do at
->>>> some point, I think we should have them be generic and not spread out.
->>>
->>> Sorry, maybe I don't get your idea, and the ext_flag itself is always
->>> initialized in io_init_req(), like normal sqe->flags, same with its
->>> usage.
->>>
->>>> If uring_cmd needs specific flags and don't have them, then we should
->>>> add it just for that.
->>>
->>> The only difference is that bit23~bit16 of sqe->uring_cmd_flags is
->>> borrowed for uring_cmd's ext flags, because sqe byte0~47 have been taken,
->>> and can't be reused for generic flag. If we want to use byte48~63, it has
->>> to be overlapped with uring_cmd's payload, and it is one generic sqe
->>> flag, which is applied on uring_cmd too.
->>
->> Which is exactly the mess nobody would want to see. And I'd also
-> 
-> The trouble is introduced by supporting uring_cmd, and solving it by setting
-> ext flags for uring_cmd specially by liburing helper is still reasonable or
-> understandable, IMO.
-> 
->> argue 8 extra bits is not enough anyway, otherwise the history will
->> repeat itself pretty soon
-> 
-> It is started with 8 bits, now doubled when io_uring is basically
-> mature, even though history might repeat, it will take much longer time
+>>>>> Reviewed-by: Daniel Wagner <dwagner@suse.de>
+>>>>> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+>>>>> Acked-by: Nitesh Shetty <nj.shetty@samsung.com>
+>>>>> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>>>> ---
+>>>>>     tests/nvme/006 | 2 +-
+>>>>>     tests/nvme/008 | 2 +-
+>>>>>     tests/nvme/010 | 2 +-
+>>>>>     tests/nvme/012 | 2 +-
+>>>>>     tests/nvme/014 | 2 +-
+>>>>>     tests/nvme/019 | 2 +-
+>>>>>     tests/nvme/023 | 2 +-
+>>>>>     7 files changed, 7 insertions(+), 7 deletions(-)
+>>>>>
+>>>>> diff --git a/tests/nvme/006 b/tests/nvme/006
+>>>>> index ff0a9eb..c543b40 100755
+>>>>> --- a/tests/nvme/006
+>>>>> +++ b/tests/nvme/006
+>>>>> @@ -16,7 +16,7 @@ requires() {
+>>>>>     }
+>>>>>     set_conditions() {
+>>>>> -	_set_nvme_trtype "$@"
+>>>>> +	_set_nvme_trtype_and_nvmet_blkdev_type "$@"
+>>>> Why not calling separate functions? having func do_a_and_b interface is not
+>>>> great.
+>>> In this case, we want to repeat the test cases to cover combination of two
+>>> conditions: M trtypes and N blkdev_types. The test case should be repeated to
+>>> cover all of M x N matrix elements, then the hook set_conditions() should
+>>> iterate the elements. I can not think of the way to handle this iteration with
+>>> separated two functions.
+>> What happens when you add another condition to iterate against, you
+>> introduce set_a_and_b_and_c interface?
+> That is my current intent.
 
-You're mistaken, only 7 bits are taken not because there haven't been
-ideas and need to use them, but because we're out of space and we've
-been saving it for something that might be absolutely necessary.
+I don't think its very maintainable.
 
-POLL_FIRST IMHO should've been a generic feature, but it worked around
-being a send/recv specific flag, same goes for the use of registered
-buffers, not to mention ideas for which we haven't had enough flag space.
+>
+> Another question is how it is likely to have more conditions to add on.
 
->>> That is the only way I thought of, or any other suggestion for extending sqe
->>> flags generically?
->>
->> idea 1: just use the last bit. When we need another one it'd be time
->> to think about a long overdue SQE layout v2, this way we can try
->> to make flags u32 and clean up other problems.
-> 
-> It looks over-kill to invent SQE v2 just for solving the trouble in
-> uring_cmd, and supporting two layouts can be new trouble for io_uring.
-
-Sounds too uring_cmd centric, it's not specifically for uring_cmd, it's
-just one of reasons. As for overkill, that's why I'm not telling you
-to change the layour, but suggesting to take the last bit for the
-group flag and leave future problems for the future.
+I expect that people will want to add more flavors moving forward. For 
+example
+ADDRESS_FAMILIES="ipv4 ipv6" RDMA_TRANSPORT="siw rxe" and possibly other
+features that can grow in the future.
 
 
-> Also I doubt the problem can be solved in layout v2:
-> 
-> - 64 byte is small enough to support everything, same for v2
-> 
-> - uring_cmd has only 16 bytes payload, taking any byte from
-> the payload may cause trouble for drivers
-> 
-> - the only possible change could still be to suppress bytes for OP
-> specific flags, but it might cause trouble for some OPs, such as
-> network.
+>   I guess
+> such many, multiplied conditions will result in combination explosion and long
+> test runtime, so I'm not sure how much it will be useful.
 
-Look up sqe's __pad1, for example
+I think that running multiple flavors of a test suite is a capability 
+that is bound to be
+reused as more test flavors emerge. But that may be just my opinion.
 
+>
+> Do we have potential candidates of the third or fourth conditions?
 
->> idea 2: the group assembling flag can move into cmds. Very roughly:
->>
->> io_cmd_init() {
->> 	ublk_cmd_init();
->> }
->>
->> ublk_cmd_init() {
->> 	io_uring_start_grouping(ctx, cmd);
->> }
->>
->> io_uring_start_grouping(ctx, cmd) {
->> 	ctx->grouping = true;
->> 	ctx->group_head = cmd->req;
->> }
-> 
-> How can you know one group is starting without any flag? Or you still
-> suggest the approach taken in fused command?
-
-That would be ublk's business, e.g. ublk or cmds specific flag
-
-
->> submit_sqe() {
->> 	if (ctx->grouping) {
->> 		link_to_group(req, ctx->group_head);
->> 		if (!(req->flags & REQ_F_LINK))
->> 			ctx->grouping = false;
->> 	}
->> }
-> 
-> The group needs to be linked to existed link chain, so reusing REQ_F_LINK may
-> not doable.
-
-Would it break zero copy feature if you cant?
-
--- 
-Pavel Begunkov
+Yes, see above.
