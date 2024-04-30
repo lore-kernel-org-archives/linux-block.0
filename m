@@ -1,109 +1,214 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A55B172786;
-	Tue, 30 Apr 2024 12:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F31171E4F
+	for <linux-block@vger.kernel.org>; Tue, 30 Apr 2024 12:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714481508; cv=none; b=l4kfPZiLjcj5vNJ4Oz2QqDOlMQGEnsDPY93N2oNdjLONoxp2KuDGc0EdostDA/08U1kH4dlj5BU1kagfOU3EfaNRWRQVc+a9UnzPctj2bknbTWaFTDK/23cNMvR62/QGi7tgr15FTv8Wjki1WOwCpqnIgHRv1Bykar7PjOlX3o0=
+	t=1714481820; cv=none; b=FllNP68ZhnDDdEBYOYiz6Nf3sLb3Y2j3MMt5wylBUA6TEeNF+V2YDksg1k38ts5czNtaeb8rI5HYRK3783/VLl0cYaMsNLbnSQP4XoFrwMFqDvGVghmRwX3ocDw9gWrmSkyF3OjIK7IYLyI9o8dWj7XM9A77TlhXmL0ug4vRH7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714481508; c=relaxed/simple;
-	bh=MRdsW+P27msNbM9tQINbf8dXSKB5x61YZFCUVVelG0s=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cu2WIk0d64GBkeeieeNMv4r6SPkS3/Hs0J99XoNI66Ohbzx8zRmNW4klHiGXYxPh9OKEK/ijbKqZwzwZQ2pTmcWJkD/YJZGSN+h+x90yZJSqlibaIOoHTcoVNoQZWG6Hd+URuWN17uaqkaPQYMnlUTv9sZRawcne151yvHC1iKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c+c0XlHH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714481820; c=relaxed/simple;
+	bh=Wv20oWplSg0tGu8RRHKogQ8m5TUoaW/Q6lGphOdcK1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JbhuTsaUH0XwfWmwSUi/xOExM66C/47Jz00/0N5Wn3FSBa/f0oZPgWEOZmv5cuV0CZtjd0PEo/+64RjuBVk2CSIMxd70ZiptPyJwX+4UBketmVMF1JGK71/GoaFAGrnZOwR6NxBbP04qFIkTKFOYaNAiR5jxLgpZBbAXeaF+2Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dOS4Hwvk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+c0XlHH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 913D6C4AF1A;
-	Tue, 30 Apr 2024 12:51:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714481508;
-	bh=MRdsW+P27msNbM9tQINbf8dXSKB5x61YZFCUVVelG0s=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=c+c0XlHHCFAY3y7MdcnsytME+c7zoExZBJc36mzxXfobcxFBvf3bbsp+10sISLbyN
-	 wUtOm31n+fUVNN0iyxixEbahBWhqOKIRICR0lfE6HR1/TMD/wyQh8qiSMxLMi8YBy9
-	 J8QMdhff6QwkFgrVD8YYVOJIxCnXLVS8teSZ3BPcfNPQozHJ5CmRm+SNBqAhEBWzg8
-	 ItNCD6Gv3Uj5umlql5BtQwx80Y5mniiZtWnEqaVQD3wRZ2YJ7FlrWzqwsQAtNKIW6P
-	 US7ckcadrwnHVVO7VqxgqXV5i7dqPs8nNn+C0xKLTVUzaMaCwAWJlXKvrmpoHvQ2OJ
-	 ww+UuDTqvD5SQ==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	dm-devel@lists.linux.dev,
-	Mike Snitzer <snitzer@redhat.com>
-Subject: [PATCH 13/13] block: Simplify zone write plug BIO abort
-Date: Tue, 30 Apr 2024 21:51:31 +0900
-Message-ID: <20240430125131.668482-14-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240430125131.668482-1-dlemoal@kernel.org>
-References: <20240430125131.668482-1-dlemoal@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dOS4Hwvk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714481818;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uyY6DBPT5jy7KF2IEGx8U7pldZaUUgnYl/UdxFULhCk=;
+	b=dOS4HwvkjOVVcGe4PkH7lSrT7kOh9i8EUTGyFGTUlDh/kaanRpY0HN0nh7sIwhv+1zpdal
+	Yb67Y2LzI8z+mpZNllMNrC3LxyBsaZ231DMUKQlv5QPbnVq0iIXvtOUhq1Y/mcOMOdzv29
+	0wlGVGKi2q19HNCSKUk0Qze08xVwUYs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-199-gi1Wm3sIOBGbpJDLh-0kaQ-1; Tue, 30 Apr 2024 08:56:51 -0400
+X-MC-Unique: gi1Wm3sIOBGbpJDLh-0kaQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2D1B6889F61;
+	Tue, 30 Apr 2024 12:56:23 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.42])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 46B944067A1E;
+	Tue, 30 Apr 2024 12:56:18 +0000 (UTC)
+Date: Tue, 30 Apr 2024 20:56:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
+	ming.lei@redhat.com
+Subject: Re: [PATCH 2/9] io_uring: support user sqe ext flags
+Message-ID: <ZjDqb80OTfb6WzBp@fedora>
+References: <20240408010322.4104395-1-ming.lei@redhat.com>
+ <20240408010322.4104395-3-ming.lei@redhat.com>
+ <89dac454-6521-4bd8-b8aa-ad329b887396@kernel.dk>
+ <Zie+RlbtckZJVE2J@fedora>
+ <e0d52e3f-f599-42c8-b9f0-8242961291d0@gmail.com>
+ <ZjBozhXCCs46OeWK@fedora>
+ <81bc860f-0801-478b-adba-ea2a90cfe69e@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81bc860f-0801-478b-adba-ea2a90cfe69e@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-When BIOs plugged in a zone write plug are aborted,
-blk_zone_wplug_bio_io_error() clears the BIO BIO_ZONE_WRITE_PLUGGING
-flag so that bio_io_error(bio) does not end up calling
-blk_zone_write_plug_bio_endio() and we thus need to manually drop the
-reference on the zone write plug held by the aborted BIO.
+On Tue, Apr 30, 2024 at 01:00:30PM +0100, Pavel Begunkov wrote:
+> On 4/30/24 04:43, Ming Lei wrote:
+> > On Mon, Apr 29, 2024 at 04:24:54PM +0100, Pavel Begunkov wrote:
+> > > On 4/23/24 14:57, Ming Lei wrote:
+> > > > On Mon, Apr 22, 2024 at 12:16:12PM -0600, Jens Axboe wrote:
+> > > > > On 4/7/24 7:03 PM, Ming Lei wrote:
+> > > > > > sqe->flags is u8, and now we have used 7 bits, so take the last one for
+> > > > > > extending purpose.
+> > > > > > 
+> > > > > > If bit7(IOSQE_HAS_EXT_FLAGS_BIT) is 1, it means this sqe carries ext flags
+> > > > > > from the last byte(.ext_flags), or bit23~bit16 of sqe->uring_cmd_flags for
+> > > > > > IORING_OP_URING_CMD.
+> > > > > > 
+> > > > > > io_slot_flags() return value is converted to `ULL` because the affected bits
+> > > > > > are beyond 32bit now.
+> > > > > 
+> > > > > If we're extending flags, which is something we arguably need to do at
+> > > > > some point, I think we should have them be generic and not spread out.
+> > > > 
+> > > > Sorry, maybe I don't get your idea, and the ext_flag itself is always
+> > > > initialized in io_init_req(), like normal sqe->flags, same with its
+> > > > usage.
+> > > > 
+> > > > > If uring_cmd needs specific flags and don't have them, then we should
+> > > > > add it just for that.
+> > > > 
+> > > > The only difference is that bit23~bit16 of sqe->uring_cmd_flags is
+> > > > borrowed for uring_cmd's ext flags, because sqe byte0~47 have been taken,
+> > > > and can't be reused for generic flag. If we want to use byte48~63, it has
+> > > > to be overlapped with uring_cmd's payload, and it is one generic sqe
+> > > > flag, which is applied on uring_cmd too.
+> > > 
+> > > Which is exactly the mess nobody would want to see. And I'd also
+> > 
+> > The trouble is introduced by supporting uring_cmd, and solving it by setting
+> > ext flags for uring_cmd specially by liburing helper is still reasonable or
+> > understandable, IMO.
+> > 
+> > > argue 8 extra bits is not enough anyway, otherwise the history will
+> > > repeat itself pretty soon
+> > 
+> > It is started with 8 bits, now doubled when io_uring is basically
+> > mature, even though history might repeat, it will take much longer time
+> 
+> You're mistaken, only 7 bits are taken not because there haven't been
+> ideas and need to use them, but because we're out of space and we've
+> been saving it for something that might be absolutely necessary.
+> 
+> POLL_FIRST IMHO should've been a generic feature, but it worked around
+> being a send/recv specific flag, same goes for the use of registered
+> buffers, not to mention ideas for which we haven't had enough flag space.
 
-Move the call to disk_put_zone_wplug() that is alwasy following the call
-to blk_zone_wplug_bio_io_error() inside that function to simplify the
-code.
+OK, but I am wondering why not extend flags a bit so that io_uring can
+become extendable, just like this patch.
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- block/blk-zoned.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+> > > > That is the only way I thought of, or any other suggestion for extending sqe
+> > > > flags generically?
+> > > 
+> > > idea 1: just use the last bit. When we need another one it'd be time
+> > > to think about a long overdue SQE layout v2, this way we can try
+> > > to make flags u32 and clean up other problems.
+> > 
+> > It looks over-kill to invent SQE v2 just for solving the trouble in
+> > uring_cmd, and supporting two layouts can be new trouble for io_uring.
+> 
+> Sounds too uring_cmd centric, it's not specifically for uring_cmd, it's
+> just one of reasons. As for overkill, that's why I'm not telling you
+> to change the layour, but suggesting to take the last bit for the
+> group flag and leave future problems for the future.
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index c819e3cc7a20..ed180fdf66f4 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -616,12 +616,14 @@ static struct blk_zone_wplug *disk_get_and_lock_zone_wplug(struct gendisk *disk,
- 	return zwplug;
- }
- 
--static inline void blk_zone_wplug_bio_io_error(struct bio *bio)
-+static inline void blk_zone_wplug_bio_io_error(struct blk_zone_wplug *zwplug,
-+					       struct bio *bio)
- {
--	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-+	struct request_queue *q = zwplug->disk->queue;
- 
- 	bio_clear_flag(bio, BIO_ZONE_WRITE_PLUGGING);
- 	bio_io_error(bio);
-+	disk_put_zone_wplug(zwplug);
- 	blk_queue_exit(q);
- }
- 
-@@ -632,10 +634,8 @@ static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
- {
- 	struct bio *bio;
- 
--	while ((bio = bio_list_pop(&zwplug->bio_list))) {
--		blk_zone_wplug_bio_io_error(bio);
--		disk_put_zone_wplug(zwplug);
--	}
-+	while ((bio = bio_list_pop(&zwplug->bio_list)))
-+		blk_zone_wplug_bio_io_error(zwplug, bio);
- }
- 
- /*
-@@ -655,8 +655,7 @@ static void disk_zone_wplug_abort_unaligned(struct gendisk *disk,
- 		if (wp_offset >= zone_capacity ||
- 		    (bio_op(bio) != REQ_OP_ZONE_APPEND &&
- 		     bio_offset_from_zone_start(bio) != wp_offset)) {
--			blk_zone_wplug_bio_io_error(bio);
--			disk_put_zone_wplug(zwplug);
-+			blk_zone_wplug_bio_io_error(zwplug, bio);
- 			continue;
- 		}
- 
--- 
-2.44.0
+You mentioned 8bit flag is designed from beginning just for saving
+space, so SQE V2 may not help us at all.
+
+If the last bit can be reserved for extend flag, it is still possible
+to extend sqe flags a bit, such as this patch. Otherwise, we just lose
+chance to extend sqe flags in future.
+
+Jens, can you share your idea/option wrt. extending sqe flags?
+
+> 
+> 
+> > Also I doubt the problem can be solved in layout v2:
+> > 
+> > - 64 byte is small enough to support everything, same for v2
+> > 
+> > - uring_cmd has only 16 bytes payload, taking any byte from
+> > the payload may cause trouble for drivers
+> > 
+> > - the only possible change could still be to suppress bytes for OP
+> > specific flags, but it might cause trouble for some OPs, such as
+> > network.
+> 
+> Look up sqe's __pad1, for example
+
+Suppose it is just for uring_cmd, '__pad1' is shared with cmd_op, which is aligned
+with ioctl cmd and is supposed to be 32bit.
+
+Same with 'off' which is used in rw at least, if sqe group is to be
+generic flag.
+
+> 
+> 
+> > > idea 2: the group assembling flag can move into cmds. Very roughly:
+> > > 
+> > > io_cmd_init() {
+> > > 	ublk_cmd_init();
+> > > }
+> > > 
+> > > ublk_cmd_init() {
+> > > 	io_uring_start_grouping(ctx, cmd);
+> > > }
+> > > 
+> > > io_uring_start_grouping(ctx, cmd) {
+> > > 	ctx->grouping = true;
+> > > 	ctx->group_head = cmd->req;
+> > > }
+> > 
+> > How can you know one group is starting without any flag? Or you still
+> > suggest the approach taken in fused command?
+> 
+> That would be ublk's business, e.g. ublk or cmds specific flag
+
+Then it becomes dedicated fused command actually, and last year's main
+concern is that the approach isn't generic.
+
+> 
+> 
+> > > submit_sqe() {
+> > > 	if (ctx->grouping) {
+> > > 		link_to_group(req, ctx->group_head);
+> > > 		if (!(req->flags & REQ_F_LINK))
+> > > 			ctx->grouping = false;
+> > > 	}
+> > > }
+> > 
+> > The group needs to be linked to existed link chain, so reusing REQ_F_LINK may
+> > not doable.
+> 
+> Would it break zero copy feature if you cant?
+
+The whole sqe group needs to be linked to existed link chain, so we
+can't reuse REQ_F_LINK here.
+
+Thanks,
+Ming
 
