@@ -1,256 +1,194 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F091175546;
-	Tue, 30 Apr 2024 14:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714486189; cv=none; b=pr9DFD3nLAC1b7kOx7LaBq2GpMwfnqNqBH4gX4yXCa+CgHvdwNzawkD83BmJMNZ5uV1HuBN/Dml0UF7k7oF64bF7p0JD2NUWeLmaYpA0QIXPyWVn1nEMRz6U7mKIbwh1jp7k/Cz21hhVY6sBuPHAfiUZ3flKkR7mmhMmDFCS20A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714486189; c=relaxed/simple;
-	bh=ywRNwRPhovkbaiHNeMCGe2hhEGjds8H8k0o3to3GLD0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jtFLJROWscRtPEFQuiLBjp6NMTBVEhFrathjuvm75LPJtVydlnY7YP5jrNLCGfpR3Y972tpsgXcVdnC1aTjPGFUVOlJZ+OwvlsTH0lab5rMsWZxuV21wt/EUAVB+lJaGc2efSP7qBvdhKZ+nr1be9f6treY5PG0i+eDsuuC3ifg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPKh3GZa; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A13F14374F
+	for <linux-block@vger.kernel.org>; Tue, 30 Apr 2024 14:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714486234; cv=fail; b=SvKeVLuXLxTD4eQWAaKm26KuZ7tSt9OKqinBjy5HqZpWrQBuNCtl4syufxT8gP7iJoe1jDk4wyh43lwZijCuG49kD3s06XQcOItXA62Hv19U91qiJyLtWtfyWlHWh4b+ftCtchX/JQa6G4GTFtxDzRKZhOcXEC/usrEZRj/K7Es=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714486234; c=relaxed/simple;
+	bh=LZgRqIVaxZnDbY58Q9CIrTIsp1vRuWRqpM1VQWRIt8s=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TnOS04DZnMAkr/KdO64dw9oTiCic/vYjct51e/uHB5MAW9+/rET+geQrAX7gbD1ZEDV188nmHrLSMmqyE32mk1mTSZKjQ34bhH8xxbirbb+3OpsCwVbekSvbjN4Gz9N4CIBsLlbXh+GdL1gIVzLrU3R5x9/y6lc2HrU9MSOyIv0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=NXdG2OjA; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=HwErp3XJ; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPKh3GZa"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a58e7628aeaso411867266b.2;
-        Tue, 30 Apr 2024 07:09:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NXdG2OjA";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="HwErp3XJ"
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43UCcIXm018674;
+	Tue, 30 Apr 2024 14:10:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=NQYd9fsBKqDl9dYu8mvQrqJM4+TY7TXQzAxx3P3+zg4=;
+ b=NXdG2OjAr+ASVB/LN9SM3Ot8Baix32FobJEzvOq16y1MKYT2b5xwmLpDmDHNcvpKuSCo
+ RaXAk2AJqFUa9NZfHr6Xigf6XMPKXOG4aBxaTJeKg+9eiTIMxS6jfWBaW/nW9VcZvlB6
+ A+rAwJuR/JLweCJTbvZDYMLq2dnJsBpovgSp8TCEkAi0U/c7hDlOnQltWbUsiBoopb11
+ zP0RafcCWdLMeUD6a2ERJHaLnR/eAnHolIR2ICOLk71nyi/pLLID51pKmEDBYJ8qwtus
+ 0DAGcW5iNCvdek5sKMWVGlfxiRSlyU0OlnIu7p+00hPUaVBVVDD0RxhERl9xhyuZBDrt lg== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xrr9cn84d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Apr 2024 14:10:19 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43UD0IIn005193;
+	Tue, 30 Apr 2024 14:10:18 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xrqt7fpq9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Apr 2024 14:10:18 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VtNyS+TOaHuABkjcKZ8zAtiuYgKYjRtaw5rKzMhnISkGDFh1hFk0aTGXVm3fa/6EIthEkhnKViAMrE4ue5DD0ZB7TIXxceNdtKE23m+LsUaCNYV/tWj7k8xit09ZbtQWvZz/rx3M0+WImdCLzGujYiwRp2ujvw2GMpFPBFfWl0IkIL5qemIkFORAupNsPiWhm8LM5i1uDUKz77XYwKQ9IGCbVRPaH1OSQX+ZrjyegvIOEHfdNa+rSkEfyMzxbPJix9Q6cGj6rsNGDQc3yZNxzElocDKIj2ZkKXE9f1vHbV0yXfvjegYrJtQFz8Fqter8CF3ijzpDwDHvUfgonmg/1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NQYd9fsBKqDl9dYu8mvQrqJM4+TY7TXQzAxx3P3+zg4=;
+ b=knBatmN0U80WJrnl8wwKRJF2lioXYQ+j6KNxzCHTvuxoPHbY27da/3+2his21qCg1Apk4XOXR6FR9YEV9z2zpskcABLYmNZrYN9yWl7zFvd/nLNX3GHMJWNQMsso9I7ffjKcnHA3aUj+ZfsQI6m7Qxmq48YgIPtSNkevGgT1Qe3dj3Hxh6cTBmEs15GZSkBLl1PAmjnLI172yX8S8sI3ArU9WiueISZLBZvs4UqwEnHg2k5PzLVJ+8HamDtfhwyzRgJ9d9LUMe5sHmnmuoFYUI1oLXyu0gGsXx9RIabW9oaGH73x0HWOQKNAktCL+6Kr5gClxC+XTVf00wJc3ddN/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714486185; x=1715090985; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UIKU5NJILWu96wDQLrVFm+trxEpA0Lo8dt1L+Qv5jKs=;
-        b=RPKh3GZakQBV44ajxS4bsXL3wgTayaVtKgRfPV7QhtXbwV4jDbc3msSGdqLkvpKZ/A
-         mnPIgQ6s3DZAKFEoeIciVnl3/ZXwezMSdQFt+mHShmvrGholZDWLqJadAXkYAv0Xy/QW
-         IDJW+r9nxhmwaULWxNJnML0EkSqKK/Z3oeWrfjglTw3Sml6rUr6PJJBQkozg6XRUfLJ6
-         INSa1OPOM1qcqaN874xulSp4ELor1BF+cTFCWW98rkhUPQ3Exo30Bmg3NmOW/Mtw8TnI
-         b95cnFYNBbtbXSgt/FFzVVq85CpAckQgpbf4uleo9Xqz1oCotplBmjFHXT36wJLRKxAe
-         0ZBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714486185; x=1715090985;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UIKU5NJILWu96wDQLrVFm+trxEpA0Lo8dt1L+Qv5jKs=;
-        b=QEcb54W2rswQIXfIZ4v2d4ydK+RkEggtbP2QhywRxUrI8nA7nhXHw39LxN8TFKit8v
-         8gvUljLFQrViaWM+Om70AXFUSXPm7N14mx82VjVsmkaEXdXIyE/T7CPTjNjIVAJ8QT0B
-         5A2CGFEDlY/vGBtpsON23n5zJkcq+oRs0znbiNIg6ZQ9dm2yEHI8tDFsDzqD85PwyxDh
-         Ea21wRSkSK14AxBQvot7KJW9a3tETUs2fp0mAvCz4AIq0VAEFARudY4G2alx2mw6wTg2
-         b4CKZacn1OgXqEeMdINzGJJsZf7h3swFstc08W2Z/v8vN3YV71KV+YvpRomR7ix9NfAe
-         SuAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvcSX0Re3C5/Vt6ZSY9wIGv6udyT0syG8zlUAvnVnK/nf8Ks6OqfGCL2zhuARAjRqjQNL6mWk8PYZDiSskOeUhzsmc2peXyjkOaDzagrp2uFACUrYsgJ1fRBSlrBZVyqnfGIrSwg==
-X-Gm-Message-State: AOJu0YwNRkURkGCvrlVRBnT9pvF4/A0LQ+HnkJvMkLw2EO0OIO/+4U/u
-	id80uEBKu2YG7LuFdTbL8m72SJXxIOrteXNQ9GYp2ponFEBSQRh1
-X-Google-Smtp-Source: AGHT+IEw4ErQlPCYlAgTLlhRqgVLwnMMvXsVwYIWtEndpAGtCGvt+PQs3IuIoC4RZ8l7vZfMeUI1lg==
-X-Received: by 2002:a17:906:718f:b0:a58:7b47:ad0d with SMTP id h15-20020a170906718f00b00a587b47ad0dmr1927360ejk.41.1714486185019;
-        Tue, 30 Apr 2024 07:09:45 -0700 (PDT)
-Received: from [192.168.42.188] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id gf16-20020a170906e21000b00a526fe5ac61sm15046205ejb.209.2024.04.30.07.09.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Apr 2024 07:09:44 -0700 (PDT)
-Message-ID: <1b5007d4-2cac-4bbb-beb5-a1bad8be918e@gmail.com>
-Date: Tue, 30 Apr 2024 15:10:01 +0100
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NQYd9fsBKqDl9dYu8mvQrqJM4+TY7TXQzAxx3P3+zg4=;
+ b=HwErp3XJ4dFBrkB9ifDDmF1CnBJJvGhLZmUVCXkUgpBY+/oGV8nOabJqYj6QptJ6RNwgqUWfHK0BpWq7J/0n7zg7YWN8o6OLdSZMfHvgDKKlJJI3zVAi/v4u8+ClP1shTb7blLKbFWcPh9Cd32NSHcbSmggPdhBAx1N9d5KpZ3I=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by SJ2PR10MB7785.namprd10.prod.outlook.com (2603:10b6:a03:56b::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Tue, 30 Apr
+ 2024 14:10:16 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088%4]) with mapi id 15.20.7519.031; Tue, 30 Apr 2024
+ 14:10:16 +0000
+Message-ID: <ca4b3634-e6f7-407e-9cb5-c49f59772966@oracle.com>
+Date: Tue, 30 Apr 2024 15:10:12 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] block: add a partscan sysfs attribute for disks
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Lennart Poettering <mzxreary@0pointer.de>, linux-block@vger.kernel.org
+References: <20240429174901.1643909-1-hch@lst.de>
+ <20240429174901.1643909-3-hch@lst.de>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20240429174901.1643909-3-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0241.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a7::12) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] io_uring: support user sqe ext flags
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-3-ming.lei@redhat.com>
- <89dac454-6521-4bd8-b8aa-ad329b887396@kernel.dk> <Zie+RlbtckZJVE2J@fedora>
- <e0d52e3f-f599-42c8-b9f0-8242961291d0@gmail.com> <ZjBozhXCCs46OeWK@fedora>
- <81bc860f-0801-478b-adba-ea2a90cfe69e@gmail.com> <ZjDqb80OTfb6WzBp@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZjDqb80OTfb6WzBp@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|SJ2PR10MB7785:EE_
+X-MS-Office365-Filtering-Correlation-Id: f97edc29-b47e-4b8f-8adf-08dc691f4274
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
+X-Microsoft-Antispam-Message-Info: 
+	=?utf-8?B?c2dWckhqYjFwZEdVNVdoN3RpNDB1S1o1TlVMSkw5RUx4cWV4MWorUUJ4b3Nk?=
+ =?utf-8?B?cFIyUGI0MEhKNVhYTGVEdVZQaHdwSzBZRlR4Ui9FSjVEUWtxTEdoNHN0d0hD?=
+ =?utf-8?B?aVlOOU9Gdnh4R2xVc0RyY01VV1dCK09KVzh4aDF4T3FrNHNVTC9GREZIK1Rh?=
+ =?utf-8?B?UkVjdHRiRE0rRStTR1NJQ2VhZFZsRXd5dzcyL3NaT0F1YmV0YmJxdGtUR3A0?=
+ =?utf-8?B?cjN3MTJuV3R6RUhwZk00TW9NcDJSMnhIdFQrUk4yaXdrUFhqUDcxRjdkeEtS?=
+ =?utf-8?B?K3ZBQm9BZ1B6bGpxbWE2Rmtrb2Q4MWx5UStWRUNGbzZWWG0yczdLMThPbUt5?=
+ =?utf-8?B?VHRDeE8wMFRhS05iM0RxcFVNd00rVHgzZVcvWFR6eDBIVE9wc0lGWW9tc3ZF?=
+ =?utf-8?B?M3JZVWRSQng1bThFYVNBQXp5c1dnSStlYzh4SWlOd09oemg4R3hKenowVERs?=
+ =?utf-8?B?WFpoNEpBT0NZVG1kTERBNkFEemZkb2RlYzlQZS9SZ0ZDcnJuZmxRV3FJa1Mz?=
+ =?utf-8?B?NTVMazJycHB3UDY2WXVvdWZESzFhb0UzNWJXZFlzYVhSalNMVVRKcjJBWDlF?=
+ =?utf-8?B?TmtlYk9aazdzU0hFQjdTOW5ORnpZN1JrTHlZK2h6QzQvck5FcWdlQlZlZkpD?=
+ =?utf-8?B?SmFacUxvOVRKdEZtUUhvamExeTFZU1N6a3VENWlpUDFKSURnbTNSZ2ZLQ28v?=
+ =?utf-8?B?eEYrQUNuQWEzaEtvbThCQ3p4ck05cmthQWVENFMzQjJldUo2NUVEbU9DUys0?=
+ =?utf-8?B?SndQczlwRTlsRVEyU2pvMzNWdzExd1N1dVRITGJzeUNtZFY1eHl2YkVUS3VK?=
+ =?utf-8?B?TldZMFdNUHFwYmFucnJhaHJoWGlZQWJNYmM5Q1FTREZYcis3UTI0SGpTUXR0?=
+ =?utf-8?B?YVI2MnBBRmhsYm8xZHRHRzU5dGsxakhkc3ZzTU1lRC84Y2orc0JhdERHZkdF?=
+ =?utf-8?B?c3BFeVF3bmpZQlQvS0JuNnF1TkRzM3BrSkptSG9NeHhLM1haUE1jejljQSs1?=
+ =?utf-8?B?TjN3dXBXVWQyb0xlNlpZWEh1NnY4TnBXV29UTlppaFJGYmNYTVdUc1F1Q3Jp?=
+ =?utf-8?B?NjV3cUJ5Y0h4SU9RTFVXNlF6Z0gxcDQwc09kc1UzbkJUdkZwL3UzSTJPS0Nk?=
+ =?utf-8?B?bEFZbGpicjU0d3BkT09iRE1OeGMwVjJ6eThIam1kTmFPMFc2VHN0bnF2V0NG?=
+ =?utf-8?B?UE4xWFRua3FMZ0thZGJOZjZ5aEQ5TE5zeWEyaXd3OUs2SkNCZnVESzZGQ3p2?=
+ =?utf-8?B?bkgwSmpVZDF3Uis2dlZ4a2dtMHdqREMxS0t3ek1DN2ROOVVHNHJmamh2N3pl?=
+ =?utf-8?B?Wi9nY3oraWxmZEhUbWZVVGN3Q3Y2K2FyKzkzRHhhbFlRdGlLZ0U3TW1jMVJi?=
+ =?utf-8?B?NysxWGhPU3QvR0ZVM2VmOERRQ1MrN2k0ek8yRTVqS25tbjJnejBRWVNPNEpk?=
+ =?utf-8?B?aEtIeXlUN2ZDbENpMUdxTzB4MEpPRWZHSzV2YWM0Z05MS2VFOHFWMVJyUUh4?=
+ =?utf-8?B?VUdqYVNEdUMwRVkrcUJrTUpyQktjcTNPdlpGQmRJQ1AyaVFrWVZpVGtzRG9K?=
+ =?utf-8?B?eHpRbHZTR1JiTm9hZUNEWEZ2SnRERHQ3LzJHeHZnbWRkUC9ZUDNaaUo1Z3hJ?=
+ =?utf-8?B?dGxHbFpzeHh1N0JJYmZ6c2c1and6cTBpVFhCNTdJRnBzUlU5MGRsRU5aU0lr?=
+ =?utf-8?B?Vjl3b2JhMUV3Yy95aStJR2d1bCtUQ3ZmdU1hNFdwNUxIK2NDcmt6NC9nPT0=?=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?M1I0eTd2OTd2UnlIek5waWZtbmFUS05KRkdzREdGZnI5Rnpqb09mNFFRRkQ4?=
+ =?utf-8?B?NmZTR1RhV2tHd0QzYVJQTkpvRVIrSnkxekJ6c1BnNWc5bmtHTzF4RUhLMy9h?=
+ =?utf-8?B?MDNWWkx4c3JSS1VGYU1LZTh1RllXb3A3czlzZ1dTVGFpZjJEa0lpUVNWOU9U?=
+ =?utf-8?B?U2hFZThYS2dnaGx1aXVlUVBqWHRxalVJSjAwbGxIVUwwNnJYMWxoamhQNDgy?=
+ =?utf-8?B?WVc4cGFVeHRTVW5pNkk5Sk1BQjRUdm9pV2VsWGk1dnQzWEsvWk1ZeHV3aXIr?=
+ =?utf-8?B?WUxpRHF4a3l0OGM1Zkp4UmtYbTJXRW8wYXZOWGZrVEo2eDJwcFdnTVppY2NK?=
+ =?utf-8?B?ZTJpSitVSytBMnAzMGpUbWs5T3dnZ0FwU2JuL04wYXlJN2c3SHVWbExCaFd2?=
+ =?utf-8?B?TTNPL1JRNmwxZ2pQck5nMnJTMzZXVFpYQ3lCZW14TlhITlljdGppQi9TeE5E?=
+ =?utf-8?B?eGhEeE54eHgwOFo4eGFETVVodnhONWZMWW9ZOXc3c3JDVjhwRnk2Q1JubE1k?=
+ =?utf-8?B?eENmSEZTMVpWbWs1UEMyemVDeHBtc0tQUVBDSC80OGpPc1AyOVoxVUNjY25E?=
+ =?utf-8?B?WGxOT09Yajk4eXVBRTFUSjVLYlB6b1N3b2xjNFZYbmRYQTJJQVcwS3YyN2hz?=
+ =?utf-8?B?Yk9hU1BlWTE1SkVyY3FhdUViWklUenQxdzFid3dMVUdDdUd6R3VTUGp4a09t?=
+ =?utf-8?B?eGU2bzBsSVB5TTZuOURySkVnSWFXZHl6Qk16bXJIZnZ3eDR5cUltQ0ZldEtO?=
+ =?utf-8?B?WTNJL3Z5RThDZmFtc0xGR3krVUlwZHNSMnFnSG84bEFtblkyak5GTkkzOFZS?=
+ =?utf-8?B?dlMvSlFPenNXU1o3ZEZJUmg3eVRlUklHUHoreDcvNEhnK2tycHFFUlF3NWJK?=
+ =?utf-8?B?S0MzWmRzNEU3U3dUMHpYeUk3elpYakx6cEtOaXQ5d05YK3o0QnU0V2RuZlpT?=
+ =?utf-8?B?cUhkVnhUUnlkTERXRFlYM2FTVEFKMW1WMzdPbXRUTisrWkFnWGE1ek1LVXB0?=
+ =?utf-8?B?bTNOWGpHZHFaMjNuVExqanhIR3NMamxLMENZcDdjYlB2Z2RCbldXRnBoSGlv?=
+ =?utf-8?B?OC9BWGczTnhjNlRxTjVzYWFRb0Jjd2xEckkvTjM3eURaN3Z4aWZqRUtLd05r?=
+ =?utf-8?B?T05rNmM4VG9YZS9YaXRkTkR3cWJjNytiMjdJdmV4TkdJNlNkN2FySkFCaWdX?=
+ =?utf-8?B?RXJ3RkNVQ2J1UzM0bVRVcENMamtENXkxQkNHd2I0M0NBMmp0UVhFUGpyb0d6?=
+ =?utf-8?B?QzY1ckNseis3N1g4bmlSa0g5bkkybHQ4Q1g3U1dpU3VDby9QVkhVbEZFMkJr?=
+ =?utf-8?B?bHJTNzFZSklManVyRTFRaUNKU0N4WkYyMzBSc0ZROXFBQmxnWlV1RUk3Q0xQ?=
+ =?utf-8?B?bkp1a1RydjhyNi8wN01yaHVSWWc1MDdXcm5vU3BXakxCb0FneGVoYjJRUFZo?=
+ =?utf-8?B?OGxxU3Zqb0tQUVQveVB3amp4bmdHcm80MUE3a05qT0I0SEdFVHZodEp2bGU4?=
+ =?utf-8?B?R1djSGh6M3JVWVE3WkdJV3NteGUwZ0pnNm9TVlhzMGp6cEdDb3l4WElzMUFF?=
+ =?utf-8?B?YTlLN0w5OGN4WTBjUWd0NzlEUTNCU3NjMDM0ck11WXl1VGdGeVNTZnp3c2lI?=
+ =?utf-8?B?Unl1UkFuK2tRSkpZdGt3YzhwS1ZQRmxWMWVJeWtvRE1xM2drYU12RGxnTHBV?=
+ =?utf-8?B?NWFseXRFZWpnQVl5Z28wUkJsZ0d4ZkFYSmxCSys5SWlYbkplb0tDRzN1Y05E?=
+ =?utf-8?B?ZGdiR1RVNVo1UzdtcElpWTFNT2ZsbVBEL3k3R2FKM2F6dFZocHJHTWUrbUx0?=
+ =?utf-8?B?WVZ3YTVRYmRjZ1A2cGswdElLMnRXbG5sakZsb3R4dHh2UXZiTE94ZE1WWno0?=
+ =?utf-8?B?NzJGaXNOWnhSWG5SRVV5QjlBT25vbXBFWDNpblM0L3piQnhBV1h3TUhxUU9L?=
+ =?utf-8?B?RzZIMnFoZFpmWHhINEJ1VHdGWUpUUGlYVWsraVRldVJXT2lDTVBwMDZUQkdr?=
+ =?utf-8?B?LzF6NmduNDFVNzR2NjF2MENOWXRzTTlXelMyS3VoaEdLNzh1cDh5NWR6WTJI?=
+ =?utf-8?B?L1dSMTdMMHVqK0ZDVGtpdklZNmZPU0NkWEFZV2h3RjRqdXhURkVjWHNXdGFD?=
+ =?utf-8?B?OUlQWjhUL3dRT3hLakFRck1yeUlXT1JZUjFqNTlRdWovNTZOY21pMWFjT0V6?=
+ =?utf-8?B?RFE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	5yy51kS2qd0CraJFWjKVY+XVgUqSjA8CkkGlKtNjucVPxVjhvRS211vCqDGhDFQ8VFLiDZp/R3YZmL1MPLLCrBru1UZJhlByuWvmz7WzjN1nlTDUoURiriC/9DcAbaHDIQ+uMHCoWrrchmxfr0z3Oil5npMH1Sjo/E5sm1mxYnaK3O2FrASRFIttH8WibjQCNPqu4z03kZiAl9l6g3gDdkz14D0I5Kg3+HGBeqKzc2GGji8FT+GIDk7UpGAiafl2lAiPMUFekG4OReoRpzdjx/pPuM82ebIXDnTlLbt30famXsQawz1PwyTXhjb6pmBJ92ARHI/T1UbIPHa+F0Ogj1JiS9OkPAeBftQe6QbCU8EU7fiKxWuOPRZ+NQ3A2xQVyjL1GFnpmEFcbkUVAi+wlYoipYI6ivSsf/sWkDKdOu4EGn/GuEErccnCXMUDiksg4UJqFtuVS9FRUd5/pkdJ9+tvgKOG0lgZ+gr3KwbDT8f9I6BP2A5o4xMmvK/Lr6Unryo5prZq+xs8RoWvZX1CkHg/6sHbLCkRPlKRUUii/CuQq3HcJCoLyXZnkIzHI5xT70hdBFKGb1TBXddNr0CC2wQNh5r4yxDBgAS+yvjyV8M=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f97edc29-b47e-4b8f-8adf-08dc691f4274
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2024 14:10:16.3147
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uWo877DCpv95OdAEnmzVLBRu1OmbzGHv7YkcwxCZ7i21g4NhIEbTYJFHXd6eiJx/WiAQ25PqbWGwAiampvUFtQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR10MB7785
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-30_08,2024-04-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 adultscore=0
+ phishscore=0 mlxscore=0 suspectscore=0 mlxlogscore=930 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404300100
+X-Proofpoint-GUID: fCCU4sMvE6RgXC7FYJssq795xctGeGVr
+X-Proofpoint-ORIG-GUID: fCCU4sMvE6RgXC7FYJssq795xctGeGVr
 
-On 4/30/24 13:56, Ming Lei wrote:
-> On Tue, Apr 30, 2024 at 01:00:30PM +0100, Pavel Begunkov wrote:
->> On 4/30/24 04:43, Ming Lei wrote:
->>> On Mon, Apr 29, 2024 at 04:24:54PM +0100, Pavel Begunkov wrote:
->>>> On 4/23/24 14:57, Ming Lei wrote:
->>>>> On Mon, Apr 22, 2024 at 12:16:12PM -0600, Jens Axboe wrote:
->>>>>> On 4/7/24 7:03 PM, Ming Lei wrote:
->>>>>>> sqe->flags is u8, and now we have used 7 bits, so take the last one for
->>>>>>> extending purpose.
->>>>>>>
->>>>>>> If bit7(IOSQE_HAS_EXT_FLAGS_BIT) is 1, it means this sqe carries ext flags
->>>>>>> from the last byte(.ext_flags), or bit23~bit16 of sqe->uring_cmd_flags for
->>>>>>> IORING_OP_URING_CMD.
->>>>>>>
->>>>>>> io_slot_flags() return value is converted to `ULL` because the affected bits
->>>>>>> are beyond 32bit now.
->>>>>>
->>>>>> If we're extending flags, which is something we arguably need to do at
->>>>>> some point, I think we should have them be generic and not spread out.
->>>>>
->>>>> Sorry, maybe I don't get your idea, and the ext_flag itself is always
->>>>> initialized in io_init_req(), like normal sqe->flags, same with its
->>>>> usage.
->>>>>
->>>>>> If uring_cmd needs specific flags and don't have them, then we should
->>>>>> add it just for that.
->>>>>
->>>>> The only difference is that bit23~bit16 of sqe->uring_cmd_flags is
->>>>> borrowed for uring_cmd's ext flags, because sqe byte0~47 have been taken,
->>>>> and can't be reused for generic flag. If we want to use byte48~63, it has
->>>>> to be overlapped with uring_cmd's payload, and it is one generic sqe
->>>>> flag, which is applied on uring_cmd too.
->>>>
->>>> Which is exactly the mess nobody would want to see. And I'd also
->>>
->>> The trouble is introduced by supporting uring_cmd, and solving it by setting
->>> ext flags for uring_cmd specially by liburing helper is still reasonable or
->>> understandable, IMO.
->>>
->>>> argue 8 extra bits is not enough anyway, otherwise the history will
->>>> repeat itself pretty soon
->>>
->>> It is started with 8 bits, now doubled when io_uring is basically
->>> mature, even though history might repeat, it will take much longer time
->>
->> You're mistaken, only 7 bits are taken not because there haven't been
->> ideas and need to use them, but because we're out of space and we've
->> been saving it for something that might be absolutely necessary.
->>
->> POLL_FIRST IMHO should've been a generic feature, but it worked around
->> being a send/recv specific flag, same goes for the use of registered
->> buffers, not to mention ideas for which we haven't had enough flag space.
-> 
-> OK, but I am wondering why not extend flags a bit so that io_uring can
-> become extendable, just like this patch.
+On 29/04/2024 18:49, Christoph Hellwig wrote:
+> +Date:		Atorl 2024
 
-That would be great if can be done cleanly. Even having it
-non contig with the first 8bits is fine, but not conditional
-depending on opcode is too much.
-
-
->>>>> That is the only way I thought of, or any other suggestion for extending sqe
->>>>> flags generically?
->>>>
->>>> idea 1: just use the last bit. When we need another one it'd be time
->>>> to think about a long overdue SQE layout v2, this way we can try
->>>> to make flags u32 and clean up other problems.
->>>
->>> It looks over-kill to invent SQE v2 just for solving the trouble in
->>> uring_cmd, and supporting two layouts can be new trouble for io_uring.
->>
->> Sounds too uring_cmd centric, it's not specifically for uring_cmd, it's
->> just one of reasons. As for overkill, that's why I'm not telling you
->> to change the layour, but suggesting to take the last bit for the
->> group flag and leave future problems for the future.
-> 
-> You mentioned 8bit flag is designed from beginning just for saving
-> space, so SQE V2 may not help us at all.
-
-Not sure what you mean. Retrospectively speaking, u8 for flags was
-an oversight
-
-
-> If the last bit can be reserved for extend flag, it is still possible
-> to extend sqe flags a bit, such as this patch. Otherwise, we just lose
-> chance to extend sqe flags in future.
-
-That's why I mentioned SQE layout v2, i.e. a ctx flag which reshuffles
-sqe fields in a better way. Surely there will be a lot of headache with
-such a migration, but you can make flags a u32 then if you find space
-and wouldn't even need and extending flag.
-
-
-> Jens, can you share your idea/option wrt. extending sqe flags?
-> 
->>
->>
->>> Also I doubt the problem can be solved in layout v2:
->>>
->>> - 64 byte is small enough to support everything, same for v2
->>>
->>> - uring_cmd has only 16 bytes payload, taking any byte from
->>> the payload may cause trouble for drivers
->>>
->>> - the only possible change could still be to suppress bytes for OP
->>> specific flags, but it might cause trouble for some OPs, such as
->>> network.
->>
->> Look up sqe's __pad1, for example
-> 
-> Suppose it is just for uring_cmd, '__pad1' is shared with cmd_op, which is aligned
-> with ioctl cmd and is supposed to be 32bit.
-
-It's not shared with cmd_op, it's in a struct with it, unless you
-use a u32 part of ->addr2/off, it's just that, a completely
-unnecessary created padding. There was also another field left,
-at least in case for nvme.
-
-> Same with 'off' which is used in rw at least, if sqe group is to be
-> generic flag.
-> 
->>
->>
->>>> idea 2: the group assembling flag can move into cmds. Very roughly:
->>>>
->>>> io_cmd_init() {
->>>> 	ublk_cmd_init();
->>>> }
->>>>
->>>> ublk_cmd_init() {
->>>> 	io_uring_start_grouping(ctx, cmd);
->>>> }
->>>>
->>>> io_uring_start_grouping(ctx, cmd) {
->>>> 	ctx->grouping = true;
->>>> 	ctx->group_head = cmd->req;
->>>> }
->>>
->>> How can you know one group is starting without any flag? Or you still
->>> suggest the approach taken in fused command?
->>
->> That would be ublk's business, e.g. ublk or cmds specific flag
-> 
-> Then it becomes dedicated fused command actually, and last year's main
-> concern is that the approach isn't generic.
-
-My concern is anything leaking into hot paths, even if it's a
-generic feature (and I wouldn't call it that). The question is
-rather at what degree. I wouldn't call groups in isolation
-without zc exciting, and making it to look like a generic feature
-just for the sake of it might even be worse than having it opcode
-specific.
-
-Regardless, this approach doesn't forbid some other opcode from
-doing ctx->grouping = true based on some other opcode specific
-flag, doesn't necessarily binds it to cmds/ublk.
-
->>>> submit_sqe() {
->>>> 	if (ctx->grouping) {
->>>> 		link_to_group(req, ctx->group_head);
->>>> 		if (!(req->flags & REQ_F_LINK))
->>>> 			ctx->grouping = false;
->>>> 	}
->>>> }
->>>
->>> The group needs to be linked to existed link chain, so reusing REQ_F_LINK may
->>> not doable.
->>
->> Would it break zero copy feature if you cant?
-> 
-> The whole sqe group needs to be linked to existed link chain, so we
-> can't reuse REQ_F_LINK here.
-
-Why though? You're passing a buffer from the head to all group-linked
-requests, how do normal links come into the picture?
-
--- 
-Pavel Begunkov
+I suppose that this needs to be fixed.. or become May.
