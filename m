@@ -1,47 +1,32 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0C73BBCC;
-	Wed,  1 May 2024 04:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688A44AEF0;
+	Wed,  1 May 2024 07:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714539453; cv=none; b=pvgJ1ZuXf1ek5/F+swWHdxlkZZp1UWHuTSVnRs/j/Q8jk2lPlC5rtrkMi6CHhZpu1xub/eGWM95qb4Nieek/f/YD2o7pP51h7fubD7QB8gKQVQxC8nrJuEQlH7le3W/JUViUSQnCtGmjk2fd2sViuP6G+u6Ja+mLdwOf1ToUeoQ=
+	t=1714549553; cv=none; b=Z9SqnjeDvDdxxvoyC4v0Gl9xkH5e/pG/RLjNm8yzUwklNM0IZ7j8TKslQK6LoAJtSTgvRhmV2QveiL2J/XMo4ruqtHexl62ARdRnSrwEiKLOwlo6dtT9BdDBa1qWG/wws8bDiYcqkf9GOfb14VXRADWxK/GQrHa0tvuuozdzW0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714539453; c=relaxed/simple;
-	bh=o0t9bD3XmHwHQ2Ber0ySXANHMszRsi54P1HtMsjWZCs=;
+	s=arc-20240116; t=1714549553; c=relaxed/simple;
+	bh=0cqJx193OjqEaWVpBvGX2MAx65Um0oXXM2Tpcdxj3lo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Puq7TN9Y0JfeN6lNMDwddDUgo2oKFf5Et2H7yUQEc7wbNtiQkmFw7HrrnQWUGtlK9D0LJJd32YW2cFdRAdMU9GUmYPlc5QcGRz7FQNfHaEYdSMcgw0YsXKD6NV0enSb29RGFp9MMh+yJJzIY7XBsJLoBoOmLxMtvJp/PaMJO374=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hOYoNTWX; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hOYoNTWX"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=8GPE9SW8xhULMy6da8SVZMCcTPEE7DMbEFYgbtz6C8Y=; b=hOYoNTWXb40d/LaLb5dvbl9nh4
-	Af/DZxRdsgoS+VOHhrrnQoR9pvkD55yTd+3owQlm+Z2p1psQQ+cURuSEl4lR+f6mDhTk1Hw9qBUwe
-	IUarGexulcjRAUxiKIWUe2aV3VmkWiS7Powu3TuPKyQBlqJuNTPCDwQ2IRHfJBodtEklLj5Emjagq
-	gFA2UPBgOJnzbz4PvP47zmxwJovSGZCF7NECfoXzSV2rVgAnLvFyUO0JizCSSDlWQa8k/IDKUcYGZ
-	j7yo2vKVOyjnCJyr4HQK+vxpl1lP3iUuBU7Rk9DZZIKTXpJGQWtJYj1xa+FAc0uQIoH3xHsZB5jA7
-	tDsfQctQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s2225-00000008ZjF-2yT1;
-	Wed, 01 May 2024 04:57:29 +0000
-Date: Tue, 30 Apr 2024 21:57:29 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH 02/13] block: Exclude conventional zones when faking max
- open limit
-Message-ID: <ZjHLubxsEVqq4Qgy@infradead.org>
-References: <20240430125131.668482-1-dlemoal@kernel.org>
- <20240430125131.668482-3-dlemoal@kernel.org>
- <ZjENF8spyEWrGwws@infradead.org>
- <4c54e3c8-83ed-46dd-b437-2f01ab1cb866@kernel.dk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qeuWaVkOMXpK7B1QvZsMEYC8aoPkMOsiC7EjDlLbbGRf1bexJwmV2GB96DYcgKS0HC1sJAHmY6lU5qrG+HFCGz/NjJAOOD9uDAcbU4XMzFnoXnvDfuoFQPEqqBQGnfKAzW8VZlc2Kpl+XTcjTqGy+foZf46FLXCBCYhDwEQvVj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A1D9F227A87; Wed,  1 May 2024 09:45:45 +0200 (CEST)
+Date: Wed, 1 May 2024 09:45:44 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
+	axboe@kernel.dk, martin.petersen@oracle.com, brauner@kernel.org,
+	asml.silence@gmail.com, dw@davidwei.uk, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH 01/10] block: set bip_vcnt correctly
+Message-ID: <20240501074544.GA2325@lst.de>
+References: <20240425183943.6319-1-joshi.k@samsung.com> <CGME20240425184651epcas5p3404f2390d6cf05148eb96e1af093e7bc@epcas5p3.samsung.com> <20240425183943.6319-2-joshi.k@samsung.com> <20240427070214.GA3873@lst.de> <Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,23 +35,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4c54e3c8-83ed-46dd-b437-2f01ab1cb866@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Apr 30, 2024 at 01:04:51PM -0600, Jens Axboe wrote:
-> On 4/30/24 9:24 AM, Christoph Hellwig wrote:
-> > On Tue, Apr 30, 2024 at 09:51:20PM +0900, Damien Le Moal wrote:
-> >> +	/* Resize the zone write plug memory pool if needed. */
-> >> +	if (disk->zone_wplugs_pool->min_nr != pool_size)
-> >> +		mempool_resize(disk->zone_wplugs_pool, pool_size);
+On Sat, Apr 27, 2024 at 08:16:52AM -0600, Keith Busch wrote:
+> > Please add a Fixes tag and submit it separately from the features.
 > > 
-> > No need for the if here, mempool_resize is a no-op if called for
-> > the current value.
+> > I'm actually kinda surprised the direct user mapping of integrity data
+> > survived so far without this.
 > 
-> Still cheaper than the function call though, so I think that's
-> the right way to do it.
+> The only existing use case for user metadata is REQ_OP_DRV_IN/OUT, which
+> never splits, so these initial fixes only really matter after this
+> series adds new usage for generic READ/WRITE.
 
-It is only called during device probing and resize.  Try to avoid
-the call and spinlock there is the poster definition of premature
-micro-optimization..
+Well, it matters to keep our contract up, even if we're not hitting it.
 
+And apparently another user just came out of the woods in dm land..
