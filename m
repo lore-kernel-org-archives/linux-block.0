@@ -1,22 +1,22 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688A44AEF0;
-	Wed,  1 May 2024 07:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B614AEF0;
+	Wed,  1 May 2024 07:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714549553; cv=none; b=Z9SqnjeDvDdxxvoyC4v0Gl9xkH5e/pG/RLjNm8yzUwklNM0IZ7j8TKslQK6LoAJtSTgvRhmV2QveiL2J/XMo4ruqtHexl62ARdRnSrwEiKLOwlo6dtT9BdDBa1qWG/wws8bDiYcqkf9GOfb14VXRADWxK/GQrHa0tvuuozdzW0g=
+	t=1714549622; cv=none; b=aAL0hNZHT4H4Cn+5w5fdb8/Zt4b9jASDDxG7r6PxWeiUvLC45HjNX/NoUX2H8jkV+nO9hqTU85y5sNmGe8WpAKA2I3ZmZYeWDLsx3KSdCUCIvTH3Qxad11/Ny2oMWoBg1uAiNpSL9WJ6C8zlAaP7wm+j+QTnN/55WNy74mo4qsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714549553; c=relaxed/simple;
-	bh=0cqJx193OjqEaWVpBvGX2MAx65Um0oXXM2Tpcdxj3lo=;
+	s=arc-20240116; t=1714549622; c=relaxed/simple;
+	bh=1usElGWA7X2IM8yxssewuRUGLgOXecLhs4UNVED7azc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qeuWaVkOMXpK7B1QvZsMEYC8aoPkMOsiC7EjDlLbbGRf1bexJwmV2GB96DYcgKS0HC1sJAHmY6lU5qrG+HFCGz/NjJAOOD9uDAcbU4XMzFnoXnvDfuoFQPEqqBQGnfKAzW8VZlc2Kpl+XTcjTqGy+foZf46FLXCBCYhDwEQvVj4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=AbGxV7dC2ISOvJzUmxCsCRBIU1KtNjc9hvPYkLfTwNmId1zdnkD8kZWjmFN9BFIHQEUXEtTCgGY/C/GnAOH2FFmfK165C8XsC5IXUmy4FcmziBQHi/rk2McUhP5p77vDV7dtpdKHclPBQM2FLF7IFMntZDT03XTp0qo3JHXI5dw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id A1D9F227A87; Wed,  1 May 2024 09:45:45 +0200 (CEST)
-Date: Wed, 1 May 2024 09:45:44 +0200
+	id 16BB2227A87; Wed,  1 May 2024 09:46:56 +0200 (CEST)
+Date: Wed, 1 May 2024 09:46:54 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Keith Busch <kbusch@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
@@ -24,9 +24,10 @@ Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
 	asml.silence@gmail.com, dw@davidwei.uk, io-uring@vger.kernel.org,
 	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
 	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH 01/10] block: set bip_vcnt correctly
-Message-ID: <20240501074544.GA2325@lst.de>
-References: <20240425183943.6319-1-joshi.k@samsung.com> <CGME20240425184651epcas5p3404f2390d6cf05148eb96e1af093e7bc@epcas5p3.samsung.com> <20240425183943.6319-2-joshi.k@samsung.com> <20240427070214.GA3873@lst.de> <Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
+Subject: Re: [PATCH 02/10] block: copy bip_max_vcnt vecs instead of
+ bip_vcnt during clone
+Message-ID: <20240501074654.GB2325@lst.de>
+References: <20240425183943.6319-1-joshi.k@samsung.com> <CGME20240425184653epcas5p28de1473090e0141ae74f8b0a6eb921a7@epcas5p2.samsung.com> <20240425183943.6319-3-joshi.k@samsung.com> <20240427070331.GB3873@lst.de> <73cc82c3-fbf6-ea3e-94ec-3bdce55af541@samsung.com> <Zi-MvOZ_bYVuiuBb@kbusch-mbp.mynextlight.net> <20240429170728.GA31337@lst.de> <ZjCrAkM8oOgLhg8_@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,19 +36,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
+In-Reply-To: <ZjCrAkM8oOgLhg8_@kbusch-mbp.dhcp.thefacebook.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sat, Apr 27, 2024 at 08:16:52AM -0600, Keith Busch wrote:
-> > Please add a Fixes tag and submit it separately from the features.
-> > 
-> > I'm actually kinda surprised the direct user mapping of integrity data
-> > survived so far without this.
+On Tue, Apr 30, 2024 at 09:25:38AM +0100, Keith Busch wrote:
+> > I think we need to do something like that - just hiding the bounce
+> > buffer is not really maintainable once we get multiple levels of stacking
+> > and other creative bio cloning.
 > 
-> The only existing use case for user metadata is REQ_OP_DRV_IN/OUT, which
-> never splits, so these initial fixes only really matter after this
-> series adds new usage for generic READ/WRITE.
+> Not sure I follow that. From patches 2-4 here, I think that pretty much
+> covers it. It's just missing a good code comment, but the implementation
+> side looks complete for any amount of stacking and splitting.
 
-Well, it matters to keep our contract up, even if we're not hitting it.
-
-And apparently another user just came out of the woods in dm land..
+I can't see how it would work, but I'll gladly wait for a better
+description.
