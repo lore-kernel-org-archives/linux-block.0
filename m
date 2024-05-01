@@ -1,72 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE4528DC7;
-	Wed,  1 May 2024 08:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454B150295;
+	Wed,  1 May 2024 09:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714550628; cv=none; b=uJIsLcod4M0eEaC3kUx6EbdP3W73PlEX5Bq2N8ycM7nbCmQLcu9zlEai/CjbCvFN1FE2gItDPE/a8N4nAL+IN3hbkd/co1ksq/HkCExrcynNpoxsbrtp6Rl5DmUPnUy7y9GOaPDqnydH7Vs/WJqvbEEkAdUor6h9nZew8/te+Z0=
+	t=1714554892; cv=none; b=iLBHjOWD0N9CmZYjhnemh5SKUGT5rFOW8oXPCb1iZLq4SL1C/+uRtM/3Oesi8i5srKJc3gI5+muY8giWrBlkIG8RSFSJf+FDMomx1RrQzLHC0tyYCq3nACt5GIUdVvQxeguhOOFr4qQgBqJ/laLgvbXOqYmr+nKfFFG/El36JVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714550628; c=relaxed/simple;
-	bh=nro5vjHEyShkXn1U9q4AMDjdNsY60v/Rv0pskhrbT9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S/kts6xg5lCgqBiKcYmij1q7rVkfB7sI7R/55S9I8x4oUdd3uRHboAQYGpegUOzw4HAXlqd/c968mpqtuW7+DT0qYPTn0Fz5g9CnTs1LapLDuW2HE8pMwbmMT95fIvcGGkG00ZJTY7eEaOfAyIQQsA7wt7r29464bR70P2xF/hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZPCdRwAC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714554892; c=relaxed/simple;
+	bh=rCviM45bUQHCE9Hyo7/+UvbUfQmMgk9qtciStd6Ak0I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KvhaiQmWzVquhJttEmmOeQk+hy/vqsc/Q0b8gcwP+Z5qgzQdb3RKLudPTDDPJRwApBrjuB+xCKDQsa/B4CJrUzfhIwbgqIAYA+NdiGCxzJ4TWbNy/vEAHQsZ60Am9RHe2lHZW6eTmH8BoFXRzzilS2uHnK828GukZQiFwLB3Zyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UwJJS0qX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZPCdRwAC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 018DAC113CC;
-	Wed,  1 May 2024 08:03:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UwJJS0qX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E89FFC113CC;
+	Wed,  1 May 2024 09:14:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714550627;
-	bh=nro5vjHEyShkXn1U9q4AMDjdNsY60v/Rv0pskhrbT9Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZPCdRwACNPQChTwHaH0PpotCCMc4n0IIL1cLvDzUsxvC2zFhp8B5DA2qVE/iFx+4t
-	 ujjdrPeM8b9Eh4ZdFuMQ0pwIXGN1SlrBkirnF+ZQKRViFUFOoivnNyHq5VoiGAYhja
-	 FP/Nr/T0G9249mVeyM8snhZhKyN66NpEJWsbP4EelXBHCNTl7AeRf5PT405qQk+1FC
-	 peFvQZboAolXrFAFOclD2DiMabri5eJ0yIUDvMD+RxnHjXpOHUyQV3uwAJyMQpx445
-	 v+tRQPvtmIGUWRhVwm32EKM06VBQp3gsUp/TdPYu5eV2tPLJtC3Tk/rLuk2RLwKR7g
-	 MpJPuCR1M9cSg==
-Date: Wed, 1 May 2024 09:03:42 +0100
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk,
-	martin.petersen@oracle.com, brauner@kernel.org,
-	asml.silence@gmail.com, dw@davidwei.uk, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH 01/10] block: set bip_vcnt correctly
-Message-ID: <ZjH3XtjNx9I_6OoR@kbusch-mbp.dhcp.thefacebook.com>
-References: <20240425183943.6319-1-joshi.k@samsung.com>
- <CGME20240425184651epcas5p3404f2390d6cf05148eb96e1af093e7bc@epcas5p3.samsung.com>
- <20240425183943.6319-2-joshi.k@samsung.com>
- <20240427070214.GA3873@lst.de>
- <Zi0I1Aa7mIJ9tOht@kbusch-mbp.mynextlight.net>
- <20240501074544.GA2325@lst.de>
+	s=k20201202; t=1714554891;
+	bh=rCviM45bUQHCE9Hyo7/+UvbUfQmMgk9qtciStd6Ak0I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=UwJJS0qX2i+0NSp8C1PviBLjtIIbTDKjZMDw1MIDpwtbY1VwZeuZgv7eUj6BPgN2G
+	 TY7208aebFEV39azGFxzbEQ/ReoRtEP0B3JT+dGRW+GR23og7Bi1Xza2AT5JeWCs7w
+	 kqrG+4hUuYCfrd4Q+8T4DU7chieM0Pg8WN+TG+0R7lBgBTLIvV9+ed3QOWZK5Xbh1m
+	 P5aATNxK9EWJbT8eqKu4pS+76SM4Zz2Nz2qCcUXST5XmbtIitMmaD42d6sUuYsj7CK
+	 UWZEfjdlJGv/nxKMxfXr4iYC+aZwwgW00rhbKtYObSpaItESa2q/y2yGThpljjsx1p
+	 EPP+JIjX0kpZg==
+Message-ID: <49325aa0-4e24-4dc3-9177-917044b94b41@kernel.org>
+Date: Wed, 1 May 2024 18:14:49 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240501074544.GA2325@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/14] dm: Check that a zoned table leads to a valid
+ mapped device
+To: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@redhat.com>
+References: <20240501000935.100534-1-dlemoal@kernel.org>
+ <20240501000935.100534-2-dlemoal@kernel.org> <ZjGx6EpCIx5QnmT5@redhat.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ZjGx6EpCIx5QnmT5@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 01, 2024 at 09:45:44AM +0200, Christoph Hellwig wrote:
-> On Sat, Apr 27, 2024 at 08:16:52AM -0600, Keith Busch wrote:
-> > > Please add a Fixes tag and submit it separately from the features.
-> > > 
-> > > I'm actually kinda surprised the direct user mapping of integrity data
-> > > survived so far without this.
-> > 
-> > The only existing use case for user metadata is REQ_OP_DRV_IN/OUT, which
-> > never splits, so these initial fixes only really matter after this
-> > series adds new usage for generic READ/WRITE.
+On 5/1/24 12:07, Benjamin Marzinski wrote:
+> On Wed, May 01, 2024 at 09:09:22AM +0900, Damien Le Moal wrote:
+>> +static int dm_check_zoned(struct mapped_device *md, struct dm_table *t)
+>> +{
+>> +	struct gendisk *disk = md->disk;
+>> +	unsigned int nr_conv_zones = 0;
+>> +	int ret;
+>> +
+>> +	/* Revalidate only if something changed. */
+>> +	md->zone_revalidate_map = t;
+>> +	ret = dm_blk_report_zones(disk, 0, UINT_MAX,
+>> +				  dm_check_zoned_cb, &nr_conv_zones);
 > 
-> Well, it matters to keep our contract up, even if we're not hitting it.
-> 
-> And apparently another user just came out of the woods in dm land..
+> Aside from not really understanding what that comment is getting at, it
+> looks good.
 
-But the bug report from dm has nothing to do with user mapped metadata.
-That bug existed before that was added, so yeah, patch 5 from this
-series (or something like it) should be applied on its own.
+Oops. Too much copy-paste :)
+I fixed that. Sending V3 shortly.
+
+> Reviewed-by: Benjamin Marzinski <bmarzins@redhat.com>
+
+Thanks.
+
+-- 
+Damien Le Moal
+Western Digital Research
+
