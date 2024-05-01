@@ -1,119 +1,103 @@
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C1B50248
-	for <linux-block@vger.kernel.org>; Wed,  1 May 2024 14:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E6B168B0E;
+	Wed,  1 May 2024 23:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714572544; cv=none; b=LBnmclJLircsdSBIN/9V0C8Jg6+gCKZBunNzAd8cMsVuNml1wrFoK9SqLfk57rc147yVq3KCNW86KOHC4oxnEuIC4wCbOSetN/fxRkAhQG1JIX2kpTzSNxKQVS0sjhmk2440nR4+AtZ2oiJ/9lZPBBqug3oL9rvoOFslj8UPWso=
+	t=1714605384; cv=none; b=IbavUmyKX2Sp1KhEeZ9h8E9YofQKB+/NnQJNMMAJz5dUpqR4TjsSHkGa2OtgiZkPYIaEkdj0AMGFanEjKNNZLnCJtgjyvwfbD/jPUBZFm+sP06pL+l/WQZyp2W/HmGL39+SM4i5Hyx7Ji8imVEAePQJu7jeU3Ipq7lIZnlrP9S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714572544; c=relaxed/simple;
-	bh=zfim7CcucR0BdncVSCbvZAeOm8GEIeOfwzAR5umcIkc=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=M/nVgm6J9q4kgeQBCu3Z7cGIkMo2JtQzJB8TANiDNh9VFtECJVWYCPQDAkuVkwMLxjcU6Lxema417CVdkGj5vVVeFubE0bwm3vmEN/ukgKo+zrN7ak3ZD7a/1KbJJimg0k7Pv5EbcEqQN9kNS5w64gBDT+446gx13v8Pvg4E1i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H+2b3Olw; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1714605384; c=relaxed/simple;
+	bh=LVTRxX7tLq7xv4yBLH62hWiZmad+nFmuL0ld8JvIORw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j9XMhyXFb87shUXVMHRGTB+6cG5TnH5+6NXyxUML9R2iMi5NlF5hbvYFRDIvUPhjSVbi70lWySa4kGA7soYlN3xv1l3LaWFakslzGxQdhtYezl4wGxdg0HCCKHOCmMmrEG5bn9Amkjh9h7zVpz0zayDIxAv+fmJO05HfiF3Uxk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+DaOK4a; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H+2b3Olw"
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7da55194b31so60585439f.3
-        for <linux-block@vger.kernel.org>; Wed, 01 May 2024 07:09:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+DaOK4a"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ed3cafd766so6605345b3a.0;
+        Wed, 01 May 2024 16:16:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714572541; x=1715177341; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fs2eFC9t4Ym2eJACriIJKBgSiMCMgOPbsLq77wPhjyU=;
-        b=H+2b3OlwhuBRPoe9xGFogDkYbiakERxJ4vN9vsCVYyxPhKjknySMs1PyRXIq2iGyAY
-         FF3fDqGcTIqrYX9JpOQfoJEZMKGUT6MdqGwXhfQ5W203Cc3HRt77vTnK2MJkg+W00cQr
-         LlHX0dDNQ2klOFpTKnSOm1Oi23iFRamElWLzW7jwqpsx42NTdOc131R1HLNfX4Wy2JSR
-         UX2lJSj0cd3wHUTKvA1Lop8VpjN5jmP0oiWPhZyiVrwwoyON/mUqiCOQJfLyw0i3rn5z
-         8bC6TP9gyX+4DwI3Ozq2g+pgvh0MM0+Z37E3z7BAasPt5Hcuq8gXxvEo4whJp1sn4bfZ
-         zx6Q==
+        d=gmail.com; s=20230601; t=1714605382; x=1715210182; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kmcu32QBa6xSD4oxR6+wMTBjSGBoEIYCz1OYpSWw4To=;
+        b=D+DaOK4aHuApvGchp9R0IGIaqh34ygppx6eB1TOayy6hXpEyAMzxC4dXCMS1QC74uR
+         u+gN6bZlyyi3KJSSmZ0dLxHB3p07TjUXcfFzaZ4Qww2DWT8zoOifPPyqIGoY/Cr4VxO1
+         fAPbjHIy5HyH2LnTiNGyEw3CQCqv/3r7el3mkk0d3P0HGd4EqJOc8zXmYtMlMWh0Q2RN
+         JwpY3q3k3UOurfzk4caHdtc2V/7BPMVmQMy2ypP7Hja7I6oZ1ZGr4Y3abXF+DQHsFCTp
+         ft2FUuyGi5ZrdaOEZm4hA0ll9/2BLLtaJbuaZwI+28l/9+fOix+aHTLrxhLHXdc5y0A7
+         c4VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714572541; x=1715177341;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fs2eFC9t4Ym2eJACriIJKBgSiMCMgOPbsLq77wPhjyU=;
-        b=ZXWMECA0tmNJGPaHHZFRBKcTJCrdhPDO4/0o00S5zprfmeD54+tQ3jiKY/oo+6rqil
-         4DJVA6J/zQCoE3AoOlggu+YLTNc6VHPwVk8/ij7H9SnJ7dzRzYDpdt34LVm6XqUqOPf3
-         KFJ2EeOiUvdq98ShJBIpRECcDB+zky+SCjecqjolmSSl00CC4ltlbmxUsULSNlr/iddU
-         5LotZklTkIZX3geLVqEdWeY7zaGKxGw4MCUdbIQJpSCWtSdGv3w2N2pP5m+iSCuKrQSe
-         JE7QNl7Am6ua8unufzaYTrCvj6CG6otyfw2y/iRj2LaYRJ0k5htBLajWky6SaRyqt+qq
-         gQrA==
-X-Gm-Message-State: AOJu0YyREyOMxu5AEHnoCs1MCKAGG13IyGa1EkCpLNXs4/F/4S2Y/AzV
-	EfrTYAms9JYdnlUpuUZ2FpfhNKal0q8JIRXbnhQ2ml+qthSE6PzdEmSDOF8f9GM=
-X-Google-Smtp-Source: AGHT+IElsxpRhoKMKje29Pm9oGG2g8KnqwtVCGQmpoAL/6gtj2Nhu59IqcMPZOXKkC2+KcYGUCAizQ==
-X-Received: by 2002:a6b:3113:0:b0:7dd:88df:b673 with SMTP id j19-20020a6b3113000000b007dd88dfb673mr3481150ioa.0.1714572540629;
-        Wed, 01 May 2024 07:09:00 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id m12-20020a056638260c00b004881ff30b22sm260901jat.9.2024.05.01.07.08.59
+        d=1e100.net; s=20230601; t=1714605382; x=1715210182;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Kmcu32QBa6xSD4oxR6+wMTBjSGBoEIYCz1OYpSWw4To=;
+        b=GrZpjYQeUuk5VQd+rzNrBPkGRxcV8Bb4SLSPsgQSWdBEWrlDxor3JAcTh0gZeGgN3C
+         INqyfd/oLj53WxmWhTDcQpa4BpHHNIDderaHcLCUYblwvaWib1Eu6LwAr5O7d3p5g+Hm
+         pbpBivBhVM4k8cGr6YCqaB2q3jEGXTCSen7EuFQWvjGJ1LvN+kkCCi0DjnyX1PjW6QA8
+         2VbLYu1XxOVi327c6GRz4Lzku5UycZMKwWV0s30EBslyt9J9pGjftppUcE97G4WZawxH
+         /HaTiPWqDlVHisSJbgw/w5Kyrg1syLO4ulf3dZYmopubVO7Tj/ilXbbEJ/TGn1AjvQwQ
+         OaZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWrwcIX/RtQM2DlD+a981G0Wbq1R6+v8sHsOf+lEP2JFkKa+WJewOa05szp4DilP2eVbgDrzobBgk5igizDEx5R7oeDLTbsRl6VExbZH8glvShidOu2bdj6lQ7znZ1Iap8ET6b20e0QBGKvlbqJPDejk4MGRyPXQMs8Nwy1Z4UzYw+RENz
+X-Gm-Message-State: AOJu0YwBNKudxFmzZEUph4Y5wZ19aIo9rcMIlUM8obgBp0QCtRdlIH9S
+	20SfJSBBLgGtF4D3pFsLre9TmP6cI5OC4rQ3SZ14Wsof7i9S53F3
+X-Google-Smtp-Source: AGHT+IHnTxtHsZ+glQR9x2lWb15F0oxsmnPv3fVD4DBzufkpvyplQ3E8IYw96+JvLkK9lFLm0fVsAQ==
+X-Received: by 2002:a05:6a00:1390:b0:6e6:ccec:fdc0 with SMTP id t16-20020a056a00139000b006e6ccecfdc0mr494980pfg.33.1714605381730;
+        Wed, 01 May 2024 16:16:21 -0700 (PDT)
+Received: from jbongio9100214.lan (2606-6000-cfc0-0025-4c92-9b61-6920-c02c.res6.spectrum.com. [2606:6000:cfc0:25:4c92:9b61:6920:c02c])
+        by smtp.googlemail.com with ESMTPSA id gs18-20020a056a004d9200b006f3fda86d15sm6323389pfb.78.2024.05.01.16.16.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 07:08:59 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
- Mike Snitzer <snitzer@redhat.com>, Damien Le Moal <dlemoal@kernel.org>
-In-Reply-To: <20240501110907.96950-1-dlemoal@kernel.org>
-References: <20240501110907.96950-1-dlemoal@kernel.org>
-Subject: Re: [PATCH v3 00/14] Zone write plugging fixes and cleanup
-Message-Id: <171457253943.85560.5028649665581943834.b4-ty@kernel.dk>
-Date: Wed, 01 May 2024 08:08:59 -0600
+        Wed, 01 May 2024 16:16:20 -0700 (PDT)
+From: Jeremy Bongio <bongiojp@gmail.com>
+To: Ted Tso <tytso@mit.edu>
+Cc: linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Jeremy Bongio <jbongio@google.com>
+Subject: [RFC PATCH 0/1] Change failover behavior for DIRECT writes in ext4/block fops
+Date: Wed,  1 May 2024 16:15:32 -0700
+Message-ID: <20240501231533.3128797-1-bongiojp@gmail.com>
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Transfer-Encoding: 8bit
 
+From: Jeremy Bongio <jbongio@google.com>
 
-On Wed, 01 May 2024 20:08:53 +0900, Damien Le Moal wrote:
-> Jens, Mike,
-> 
-> With more testing of zone write plugging on more device setups,
-> including weird/test setups (with scsi debug and null_blk), several
-> issues were identified. This patch series addresses them and cleanup the
-> code a little to try to make it more obvious.
-> 
-> [...]
+In kernel 6.9, for an O_DIRECT write:
+xfs - Will fallback to a sync, buffered write for -ENOTBLK (for reflink CoW)
+ext2/3/4 - will fallback to a sync, buffered write for short writes.
+       If iomap returns -ENOTBLK, write will return status of 0.
+block fops - will fallback to a sync, buffered write for short writes.
+zonefs - Will fallback to a sync, buffered write for -ENOTBLK.
+         Will return the bytes written for a short write, no fallback.
 
-Applied, thanks!
+Relevant commit:
+60263d5889e6d "iomap: fall back to buffered writes for invalidation failures"
 
-[01/14] dm: Check that a zoned table leads to a valid mapped device
-        commit: 44cccb3027d4719c9229203233250d73d3192bf9
-[02/14] block: Exclude conventional zones when faking max open limit
-        commit: 6b7593b5fb9eb73be92f78a1abfa502f05ff5e15
-[03/14] block: Fix zone write plug initialization from blk_revalidate_zone_cb()
-        commit: 74b7ae5f48e6f9518a32f50926619eba54be44de
-[04/14] block: Fix reference counting for zone write plugs in error state
-        commit: 19aad274c22b96fc4c0113d87cc8a083c87c467e
-[05/14] block: Hold a reference on zone write plugs to schedule submission
-        commit: 9e78c38ab30b14c1d6a07c61d57ac5e2f12fa568
-[06/14] block: Unhash a zone write plug only if needed
-        commit: 79ae35a4233df5909f8bea0b64eadbebde870de2
-[07/14] block: Do not remove zone write plugs still in use
-        commit: 7b295187287e0006dd1b0b95f995f00878e436c5
-[08/14] block: Fix flush request sector restore
-        commit: af147b740f111730c2e387ee6c0ac3ada7d51117
-[09/14] block: Fix handling of non-empty flush write requests to zones
-        commit: 096bc7ea335bc5dfbaed1d005ff27f008ec9d710
-[10/14] block: Improve blk_zone_write_plug_bio_merged()
-        commit: c4c3ffdab2e26780f6f7c9959a473b2c652f4d13
-[11/14] block: Improve zone write request completion handling
-        commit: 347bde9da10f410b8134a82d6096105cad44e1c1
-[12/14] block: Simplify blk_zone_write_plug_bio_endio()
-        commit: b5a64ec2ea2be2a7f7eb73c243c2381e9fc1c71b
-[13/14] block: Simplify zone write plug BIO abort
-        commit: c9c8aea03c4ac2ea902bc7dd5ba14f5d78af8ece
-[14/14] block: Cleanup blk_revalidate_zone_cb()
-        commit: d7580149efc5c86c4e72f9263b97c062616a84dd
+In most cases, I think users would be surprised if an O_DIRECT write request
+silently resulted in a buffered request.
 
-Best regards,
+The iomap_dio_rw() return code -ENOTBLK means page invalidation failed before
+submitting the bio.
+
+Is falling back to buffered IO for short writes or -ENOTBLK desirable in ext4
+or block fops?
+
+Jeremy Bongio (1):
+  Remove buffered failover for ext4 and block fops direct writes.
+
+ block/fops.c   |  3 ---
+ fs/ext4/file.c | 27 ---------------------------
+ 2 files changed, 30 deletions(-)
+
 -- 
-Jens Axboe
-
-
+2.44.0.769.g3c40516874-goog
 
