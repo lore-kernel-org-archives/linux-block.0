@@ -1,148 +1,119 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E21356754
-	for <linux-block@vger.kernel.org>; Wed,  1 May 2024 13:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C1B50248
+	for <linux-block@vger.kernel.org>; Wed,  1 May 2024 14:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714568582; cv=none; b=SUcyeSgI0ffpTkXAZU0v14u2O96PVJFVbW2eoyh5+YepHuQVIS9hdcQEo9PpKXRxLiSQLdy9fOsDgXgse8PhJMUFGMjGLLEgkeLD65So23KnPjBV9HZE0YD6NUcsDAcsHTJ8310IU4tbBRpfZStfFBpYM/5BWavSEK3A8lW+zlQ=
+	t=1714572544; cv=none; b=LBnmclJLircsdSBIN/9V0C8Jg6+gCKZBunNzAd8cMsVuNml1wrFoK9SqLfk57rc147yVq3KCNW86KOHC4oxnEuIC4wCbOSetN/fxRkAhQG1JIX2kpTzSNxKQVS0sjhmk2440nR4+AtZ2oiJ/9lZPBBqug3oL9rvoOFslj8UPWso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714568582; c=relaxed/simple;
-	bh=e7WlsEVs8y9JfMrLTeMdhRqa3HnHxQwE2pnPEj/p5Fc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=FixC3KcqjVWJ8OkwbAGbTgH2BUjmp5E7/z/djXXSco0AHYij2LOG/8NX8ECHjehJsZAsxILmCiGzKj3h7jhvDjlRcVJ4l+UsOYMWNQKqzAruxtCyYRxMf5/78mHuj+jqi7z+d8r0XgtHHUNzo5yUkXqRK9DulKWnYvKQOaU7PWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ShtHTO3w; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1714572544; c=relaxed/simple;
+	bh=zfim7CcucR0BdncVSCbvZAeOm8GEIeOfwzAR5umcIkc=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=M/nVgm6J9q4kgeQBCu3Z7cGIkMo2JtQzJB8TANiDNh9VFtECJVWYCPQDAkuVkwMLxjcU6Lxema417CVdkGj5vVVeFubE0bwm3vmEN/ukgKo+zrN7ak3ZD7a/1KbJJimg0k7Pv5EbcEqQN9kNS5w64gBDT+446gx13v8Pvg4E1i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H+2b3Olw; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ShtHTO3w"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240501130250epoutp03aceeb1e74b10288d352a49f26620f494~LXwfaiHfY0498704987epoutp03g
-	for <linux-block@vger.kernel.org>; Wed,  1 May 2024 13:02:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240501130250epoutp03aceeb1e74b10288d352a49f26620f494~LXwfaiHfY0498704987epoutp03g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1714568570;
-	bh=ts5/PQQxoYzCnt9UpQpvjostlawKW54bYVKKXkC70bw=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=ShtHTO3wH5mjc/BOM+3BArrQbkYdxhyQtFrc72cfWIKf2JXUY8VGSCSrGiK7yHtxH
-	 5GUPv0tHuklwMVohhMSZ5xe0OgJCfszt1V5/ddL3FAudn8IL0NPJNfsNOLupeFqQ2B
-	 irDM+JdsOVjlAl3oTmz9w+YG3uSe2q+3EQqMwrek=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20240501130249epcas5p4ef1abcc4e2285904cb8902d940320aeb~LXwe7qO1z3209832098epcas5p4e;
-	Wed,  1 May 2024 13:02:49 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.175]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4VTy0S1swlz4x9Pt; Wed,  1 May
-	2024 13:02:48 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	4B.72.09665.87D32366; Wed,  1 May 2024 22:02:48 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240501130247epcas5p3e44f8af41cdf1767853e0f4e6985e013~LXwc_VT7b0981309813epcas5p3A;
-	Wed,  1 May 2024 13:02:47 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240501130247epsmtrp1da9d19b03103afb9e8c6ef249ecd5dcf~LXwc9NDGS2658926589epsmtrp1U;
-	Wed,  1 May 2024 13:02:47 +0000 (GMT)
-X-AuditID: b6c32a4b-5cdff700000025c1-a6-66323d78d635
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	4B.08.07541.77D32366; Wed,  1 May 2024 22:02:47 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240501130245epsmtip112ff708b1ba8feb4c8b34c6907ecf4f4~LXwbO3r731216112161epsmtip1b;
-	Wed,  1 May 2024 13:02:45 +0000 (GMT)
-Message-ID: <ebeca5f1-8d80-e4d4-cf45-9a14ef1413a5@samsung.com>
-Date: Wed, 1 May 2024 18:32:45 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H+2b3Olw"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7da55194b31so60585439f.3
+        for <linux-block@vger.kernel.org>; Wed, 01 May 2024 07:09:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714572541; x=1715177341; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fs2eFC9t4Ym2eJACriIJKBgSiMCMgOPbsLq77wPhjyU=;
+        b=H+2b3OlwhuBRPoe9xGFogDkYbiakERxJ4vN9vsCVYyxPhKjknySMs1PyRXIq2iGyAY
+         FF3fDqGcTIqrYX9JpOQfoJEZMKGUT6MdqGwXhfQ5W203Cc3HRt77vTnK2MJkg+W00cQr
+         LlHX0dDNQ2klOFpTKnSOm1Oi23iFRamElWLzW7jwqpsx42NTdOc131R1HLNfX4Wy2JSR
+         UX2lJSj0cd3wHUTKvA1Lop8VpjN5jmP0oiWPhZyiVrwwoyON/mUqiCOQJfLyw0i3rn5z
+         8bC6TP9gyX+4DwI3Ozq2g+pgvh0MM0+Z37E3z7BAasPt5Hcuq8gXxvEo4whJp1sn4bfZ
+         zx6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714572541; x=1715177341;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fs2eFC9t4Ym2eJACriIJKBgSiMCMgOPbsLq77wPhjyU=;
+        b=ZXWMECA0tmNJGPaHHZFRBKcTJCrdhPDO4/0o00S5zprfmeD54+tQ3jiKY/oo+6rqil
+         4DJVA6J/zQCoE3AoOlggu+YLTNc6VHPwVk8/ij7H9SnJ7dzRzYDpdt34LVm6XqUqOPf3
+         KFJ2EeOiUvdq98ShJBIpRECcDB+zky+SCjecqjolmSSl00CC4ltlbmxUsULSNlr/iddU
+         5LotZklTkIZX3geLVqEdWeY7zaGKxGw4MCUdbIQJpSCWtSdGv3w2N2pP5m+iSCuKrQSe
+         JE7QNl7Am6ua8unufzaYTrCvj6CG6otyfw2y/iRj2LaYRJ0k5htBLajWky6SaRyqt+qq
+         gQrA==
+X-Gm-Message-State: AOJu0YyREyOMxu5AEHnoCs1MCKAGG13IyGa1EkCpLNXs4/F/4S2Y/AzV
+	EfrTYAms9JYdnlUpuUZ2FpfhNKal0q8JIRXbnhQ2ml+qthSE6PzdEmSDOF8f9GM=
+X-Google-Smtp-Source: AGHT+IElsxpRhoKMKje29Pm9oGG2g8KnqwtVCGQmpoAL/6gtj2Nhu59IqcMPZOXKkC2+KcYGUCAizQ==
+X-Received: by 2002:a6b:3113:0:b0:7dd:88df:b673 with SMTP id j19-20020a6b3113000000b007dd88dfb673mr3481150ioa.0.1714572540629;
+        Wed, 01 May 2024 07:09:00 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id m12-20020a056638260c00b004881ff30b22sm260901jat.9.2024.05.01.07.08.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 May 2024 07:08:59 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
+ Mike Snitzer <snitzer@redhat.com>, Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20240501110907.96950-1-dlemoal@kernel.org>
+References: <20240501110907.96950-1-dlemoal@kernel.org>
+Subject: Re: [PATCH v3 00/14] Zone write plugging fixes and cleanup
+Message-Id: <171457253943.85560.5028649665581943834.b4-ty@kernel.dk>
+Date: Wed, 01 May 2024 08:08:59 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH 04/10] block: avoid unpinning/freeing the bio_vec incase
- of cloned bio
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, martin.petersen@oracle.com, kbusch@kernel.org,
-	brauner@kernel.org, asml.silence@gmail.com, dw@davidwei.uk,
-	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
-	<anuj20.g@samsung.com>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20240429170929.GB31337@lst.de>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrCJsWRmVeSWpSXmKPExsWy7bCmlm6FrVGaQe8CboumCX+ZLeas2sZo
-	sfpuP5vF68OfGC1ezVjLZnHzwE4mi5WrjzJZvGs9x2Ix6dA1Rou9t7Qt5i97ym6x/Pg/Jgce
-	j2szJrJ47Jx1l93j8tlSj02rOtk8Ni+p99h9s4HN4+PTWywefVtWMXp83iQXwBmVbZORmpiS
-	WqSQmpecn5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdLCSQlliTilQKCCx
-	uFhJ386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITvj+7sTrAVP
-	OCom7jvD0sD4na2LkYNDQsBEYu7qsC5GLg4hgd2MEutv/2KHcD4xSkxcvI0ZwvnGKLFvwkbG
-	LkZOsI4Xr2awgdhCAnsZJZ5ciYEoesso8fLFMhaQBK+AncTEnm6wIhYBFYlHiw8yQ8QFJU7O
-	fAJWIyqQLPGz6wBYjbBAjMT219PB4swC4hK3nsxnArFFBJQknr46ywiygFlgGpPE2p6pLCB3
-	swloSlyYXApSwymgI9F45wobRK+8xPa3c8CulhA4wyFx5fVJVoirXSSWrdgLZQtLvDq+hR3C
-	lpJ42d8GZSdLXJp5jgnCLpF4vOcglG0v0XqqnxlkLzPQ3vW79CF28Un0/n7CBAlGXomONiGI
-	akWJe5OeQm0Sl3g4YwmU7SHx89FEaOiuZ5LYcu0N0wRGhVlIwTILyfuzkLwzC2HzAkaWVYyS
-	qQXFuempxaYFxnmp5fD4Ts7P3cQITs5a3jsYHz34oHeIkYmD8RCjBAezkgjvlIX6aUK8KYmV
-	ValF+fFFpTmpxYcYTYHxM5FZSjQ5H5gf8kriDU0sDUzMzMxMLI3NDJXEeV+3zk0REkhPLEnN
-	Tk0tSC2C6WPi4JRqYLo5+6BUqUTENcmcWP+pKmdkz+c0lGiJLBd8tXlq9hndrr+n+A69uGWo
-	k1bOVefYcHzOjvlT/r+rumu6+ebkCVckV5aHRzpOYam95abrK20V2Cszo/TjxLu33eetXyVt
-	rSI93zlKVvttoKjakzfCHZtiM+IuVxecVWh7ITt5a9jVmsL5Aiu6vzP/rAl3cK6YGRUuslV6
-	YZ54XHb2P2e7uL+XndN83vDNZrpxWpLTYkqvvpVtRdSuih+CIowT+g65vGEXf1l3xDHL23P1
-	2j/Ghn+22biH3noicyD//YWPB7ZOfHjrsIHoD54p2z/rHGaMLO1cH3FD7qGdY6/q74w9Dwy1
-	f/VZe7pLSUTvfPhMSYmlOCPRUIu5qDgRAADO+rFXBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEIsWRmVeSWpSXmKPExsWy7bCSnG65rVGawdttOhZNE/4yW8xZtY3R
-	YvXdfjaL14c/MVq8mrGWzeLmgZ1MFitXH2WyeNd6jsVi0qFrjBZ7b2lbzF/2lN1i+fF/TA48
-	HtdmTGTx2DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx8ent1g8+rasYvT4vEkugDOKyyYlNSez
-	LLVI3y6BK+P7uxOsBU84KibuO8PSwPidrYuRk0NCwETixasZQDYXh5DAbkaJzVN2sUMkxCWa
-	r/2AsoUlVv57zg5R9JpR4uytG8wgCV4BO4mJPd1gk1gEVCQeLT4IFReUODnzCQuILSqQLPHy
-	z0SwQcICMRLbX08HizMDLbj1ZD4TiC0ioCTx9NVZRpAFzALTmCT6f25mhdi2nkni0pLlQB0c
-	HGwCmhIXJpeCNHAK6Eg03rnCBjHITKJraxcjhC0vsf3tHOYJjEKzkNwxC8m+WUhaZiFpWcDI
-	sopRMrWgODc9N9mwwDAvtVyvODG3uDQvXS85P3cTIzgatTR2MN6b/0/vECMTB+MhRgkOZiUR
-	3ikL9dOEeFMSK6tSi/Lji0pzUosPMUpzsCiJ8xrOmJ0iJJCeWJKanZpakFoEk2Xi4JRqYCq4
-	OeFNUnliAc/qq1X15xe8SefS2L63KW8pP8udmHMTHLNXaAtdC5hUwcI8cVOH2cG0pytfn1bM
-	PHFHehXX1hUS9UGy4q4dM871yDdUL9rfY3DWtm9tyATGmtPTd+2pS3nrxhtQy6Nxbfb+BwI2
-	uy/Ky6neZo/o8NrlUieybHHxYnbbrX3BPCfXreQ1uhO1x3TW/7o7Lz3F9j2YFf+F7fCNe1Ub
-	fwtYmW9ateZPt8ma/S15jm/v32maYjb7xeqEScxZcZkMPxocI1+0mnCu41ZP+WMtZTTLa03m
-	FY8f2gvDQg/qrAwTuHfWNengHIut9v0ui2q12ZtP+F++tZu72mJKsHlF+HXP8Ov6F1sF3iqx
-	FGckGmoxFxUnAgDCrl8xNQMAAA==
-X-CMS-MailID: 20240501130247epcas5p3e44f8af41cdf1767853e0f4e6985e013
-X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240425184658epcas5p2adb6bf01a5c56ffaac3a55ab57afaf8e
-References: <20240425183943.6319-1-joshi.k@samsung.com>
-	<CGME20240425184658epcas5p2adb6bf01a5c56ffaac3a55ab57afaf8e@epcas5p2.samsung.com>
-	<20240425183943.6319-5-joshi.k@samsung.com> <20240427070508.GD3873@lst.de>
-	<03cb6ac3-595f-abb1-324b-647ed84cfe6b@samsung.com>
-	<20240429170929.GB31337@lst.de>
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 4/29/2024 10:39 PM, Christoph Hellwig wrote:
-> On Mon, Apr 29, 2024 at 05:10:59PM +0530, Kanchan Joshi wrote:
->>> This feels wrong.  I suspect the problem is that BIP_COPY_USER is
->>> inherited for clone bios while it shouldn't.
->>>
->>
->> But BIP_COPY_USER flag is really required in the clone bio. So that we
->> can copy the subset of the metadata back (from kernel bounce buffer to
->> user space pinned buffer) in case of read io.
->>
->> Overall, copy-back will happen in installments (for each cloned bio),
->> while the unpin will happen in one shot (for the source bio).
-> 
-> That seems a bit odd compared to the bio data path.  If you think this
-> is better than the version used in the data path let's convert the
-> data path to this scheme first to make sure we don't diverge and get
-> the far better testing on the main data map side.
-> 
 
-Can you please tell what function(s) in bio data path that need this 
-conversion?
-To me data path handling seems similar. Each cloned bio will lead to 
-some amount of data transfer to pinned user-memory. The same is 
-happening for meta transfer here.
+On Wed, 01 May 2024 20:08:53 +0900, Damien Le Moal wrote:
+> Jens, Mike,
+> 
+> With more testing of zone write plugging on more device setups,
+> including weird/test setups (with scsi debug and null_blk), several
+> issues were identified. This patch series addresses them and cleanup the
+> code a little to try to make it more obvious.
+> 
+> [...]
+
+Applied, thanks!
+
+[01/14] dm: Check that a zoned table leads to a valid mapped device
+        commit: 44cccb3027d4719c9229203233250d73d3192bf9
+[02/14] block: Exclude conventional zones when faking max open limit
+        commit: 6b7593b5fb9eb73be92f78a1abfa502f05ff5e15
+[03/14] block: Fix zone write plug initialization from blk_revalidate_zone_cb()
+        commit: 74b7ae5f48e6f9518a32f50926619eba54be44de
+[04/14] block: Fix reference counting for zone write plugs in error state
+        commit: 19aad274c22b96fc4c0113d87cc8a083c87c467e
+[05/14] block: Hold a reference on zone write plugs to schedule submission
+        commit: 9e78c38ab30b14c1d6a07c61d57ac5e2f12fa568
+[06/14] block: Unhash a zone write plug only if needed
+        commit: 79ae35a4233df5909f8bea0b64eadbebde870de2
+[07/14] block: Do not remove zone write plugs still in use
+        commit: 7b295187287e0006dd1b0b95f995f00878e436c5
+[08/14] block: Fix flush request sector restore
+        commit: af147b740f111730c2e387ee6c0ac3ada7d51117
+[09/14] block: Fix handling of non-empty flush write requests to zones
+        commit: 096bc7ea335bc5dfbaed1d005ff27f008ec9d710
+[10/14] block: Improve blk_zone_write_plug_bio_merged()
+        commit: c4c3ffdab2e26780f6f7c9959a473b2c652f4d13
+[11/14] block: Improve zone write request completion handling
+        commit: 347bde9da10f410b8134a82d6096105cad44e1c1
+[12/14] block: Simplify blk_zone_write_plug_bio_endio()
+        commit: b5a64ec2ea2be2a7f7eb73c243c2381e9fc1c71b
+[13/14] block: Simplify zone write plug BIO abort
+        commit: c9c8aea03c4ac2ea902bc7dd5ba14f5d78af8ece
+[14/14] block: Cleanup blk_revalidate_zone_cb()
+        commit: d7580149efc5c86c4e72f9263b97c062616a84dd
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
