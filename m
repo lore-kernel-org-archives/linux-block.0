@@ -1,144 +1,120 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64578152788;
-	Thu,  2 May 2024 14:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2655B37147;
+	Thu,  2 May 2024 14:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714660069; cv=none; b=LJjbUh9DgoUSjyRixYx+llrAwY+hQyWKZoQyU89OJ9Ufnuu8VH+VHNyUnv9tdMoALfbHstIfvoQXRRnHLo/ILsIZWaQUPga8TGrJ2mibBr2rnrShlD5WcEXXM35auWnif7ZqFU1Gijh/M1fsnteuA1Jdv9uVYBfQsOSaHl8ZSGc=
+	t=1714660411; cv=none; b=uRDkDqPjTx3Yj7YFT1V74Eep6f9pZN8cte+PEzkXYRK3c1w1TTWovf2BpqDvrAMffbtfA25f8sJwz81kYspQkamvxqeKq6x0GRfNWRUfQgHs+LYMUk8MmcMqlqj7YNiWa5z6H2u62ncRYukmIwa+Cv0C8ULHMMnfz5W8aXLmmJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714660069; c=relaxed/simple;
-	bh=4qpwOU55Cj3svKWyDsqHKth5mpRdtHN3TfcAGr68iRA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GKfmEOI8p9Yv1bfOiQjf1eHWVKTsFdd6F1lV0XYNAbNjEoCvLEqx9y0apTHzXAnSTHM5uYV/OiZ1Sm2uDO2MvMOtLJyhBVi0E4qA/dyBXYJ03G+KRpaKdcbA8PjNWoCP2aMsGUorp38ao3PN1VonzzV4IMSrKVJo84luFIr5wso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ad4UE0hG; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714660411; c=relaxed/simple;
+	bh=xQdO77CyoJxmK3jhS4es9lNj/n0gLTY4Eehz3lTtN3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dbS+SqVXPupYixcor0qZ0XnPLfLpSRVHaG3xGh2+ARbhNllZZOY5anN69iaYd4w7JYs3PSaPJUvTs2x05xjVddYKGgfCQdPXLIAk6gy5vI+VMPDALq625toDSC6+N5PbpVp1fw/XbwNFOFAz93RQB0BRRfUP8t0c4VHTIhq9Vak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXQsmmDe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ad4UE0hG"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a5557e3ebcaso337881766b.1;
-        Thu, 02 May 2024 07:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714660065; x=1715264865; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mAySpOnIvvcb7FLaOZLYkZNAtElZPGVhaCtcNSkcU7I=;
-        b=Ad4UE0hG74eCf2zqBqtC02TH6OAXuVPas7YuzO0Y9ONy9dT05GZnqXVvT7nsWbeMdF
-         /5tPOz688spJYPW7tdGhi2F5ZMmp0V5rnvP2QeF03pDIlSwBcjpcCmvlgNawbjAW5p2G
-         g6CaOITWD16lvAG5bkFQlxQqqAd7CKrSG0w+5F57hMOzfbkCR8BvmkKQ9UN7CaXnvjAe
-         K7GjT5bqRQH2PngA1pJGfIdLhVpI4M+x3mf7VROXyPzagKMb08AfO2C5vSnb5XYmlKoe
-         jp41DD8Ugs3g0tpHqkn3HV7bGxJDJG9A1PAZaeehoQVCSyxUGJxAMDMUnHaKUWgvueK+
-         H39Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714660065; x=1715264865;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mAySpOnIvvcb7FLaOZLYkZNAtElZPGVhaCtcNSkcU7I=;
-        b=Whb/1uHZ0jLfMQoQUQf+gkqTJ2uf3oTUU2tBMMWCSghJCc1kONOXD0pEuCL6JM171W
-         aKOMMww6/QB1W9hUVj6ywXbAViME8yTon4cHKPV3mb+8Nfbms8rMHj3hPp9QMm1BOeG9
-         eeltWSfx8e7enKzAX2eGW7G73siX7wVVv9/AUwdtgG5wpVPpmi3F3iMfesxuaa/xzrJ6
-         sQQNLQDci1KcO+RSJ9NGy9QQVLrOj8oGMDCLVpjyx4yXdwi+AG/yf+56StTdGctUgTTE
-         fLUw8HRVZngSI54DarKO8GDFYqIuwBUWF+1oz00XOf14MZwpHzplLx3N1PJkhQh1QsAK
-         ITFw==
-X-Forwarded-Encrypted: i=1; AJvYcCVuK4ou6egtMiMK+ECyDa3ZUl3odHwWVGMVpiUD25uI8WmNlc099a+rHG2EesYRKQrHi1uSob/Tc5VEtqT8kpriZCr69OqQResToboet6O2eT6+9FxvHWzud+laSsMZlhdutgPCMA==
-X-Gm-Message-State: AOJu0YxZMCcvJ96dCiWJW7AwJB2HZlNmn4WiaIRebMlsK1AOdZllYacx
-	anjJO+N4F6Gab4Wv9P192nTmlwCioKSU94N8zvnnimmK1P6ipDb4
-X-Google-Smtp-Source: AGHT+IFyNLjJU/9GYulrXG7ugvMoucdugknsp3BO+zV7nVfIZhkl2axrXWYm3wMC44dLcuwPfAr4gg==
-X-Received: by 2002:a17:906:a190:b0:a59:5191:f0bf with SMTP id s16-20020a170906a19000b00a595191f0bfmr2333245ejy.17.1714660065500;
-        Thu, 02 May 2024 07:27:45 -0700 (PDT)
-Received: from [192.168.42.210] (82-132-238-115.dab.02.net. [82.132.238.115])
-        by smtp.gmail.com with ESMTPSA id q3-20020a1709060f8300b00a58a67afd2fsm624824ejj.53.2024.05.02.07.27.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 07:27:45 -0700 (PDT)
-Message-ID: <3f615d94-b1c2-4495-91c4-d74731ba2ab5@gmail.com>
-Date: Thu, 2 May 2024 15:28:01 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXQsmmDe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B05F7C113CC;
+	Thu,  2 May 2024 14:33:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714660410;
+	bh=xQdO77CyoJxmK3jhS4es9lNj/n0gLTY4Eehz3lTtN3Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WXQsmmDeSTzKE3rGnkHOoM5sZK3O37w1lpH6NDzi+rx6ko9CX6VJF4BunjxFSE3W/
+	 IfzOrb/ngK9vNtwXm569S5fDIXmVZUNLuNiyMDeqSSf5HekHGrsIfDpvx4SGVg6hZ9
+	 9XTQ8d0xJqlbKhF+pvhfvNHi4nSYRJpPnxU/y9VieHr2zQR76KuA0xTM3pb3Y2Zp6z
+	 xZ1uFI6bAezUPi7HfRvc/LvfigmmMLGWdg4dL25E4SkY+eO5Lfw3uB9XSqZY4pLIpB
+	 Z7CgkB9gJQeNgRTqrNLiXPwegwrZ5uM8MJMz/76w9cFqTF/3huB+RSpo8DtYyt0+NZ
+	 CYfmWkMOs/NeA==
+Date: Thu, 2 May 2024 07:33:30 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Theodore Ts'o <tytso@mit.edu>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Jeremy Bongio <bongiojp@gmail.com>, linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-block@vger.kernel.org, Jeremy Bongio <jbongio@google.com>
+Subject: Re: [RFC PATCH 1/1] Remove buffered failover for ext4 and block fops
+ direct writes.
+Message-ID: <20240502143330.GA360891@frogsfrogsfrogs>
+References: <20240501231533.3128797-1-bongiojp@gmail.com>
+ <20240501231533.3128797-2-bongiojp@gmail.com>
+ <ZjMoYkUsQnd33mXm@infradead.org>
+ <20240502140139.GE1743554@mit.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/9] io_uring: support SQE group
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20240408010322.4104395-1-ming.lei@redhat.com>
- <20240408010322.4104395-6-ming.lei@redhat.com>
- <e36cc8de-3726-4479-8fbd-f54fd21465a2@kernel.dk>
- <Ziey53aADgxDrXZw@redhat.com>
- <6077165e-a127-489e-9e47-6ec10b9d85d4@gmail.com> <ZjBffAzunso3lhsJ@fedora>
- <0f142448-3702-4be9-aad4-7ae6e1e5e785@gmail.com> <ZjEHhRoGP8z4syuP@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZjEHhRoGP8z4syuP@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240502140139.GE1743554@mit.edu>
 
-On 4/30/24 16:00, Ming Lei wrote:
-> On Tue, Apr 30, 2024 at 01:27:10PM +0100, Pavel Begunkov wrote:
-...
->>>> And what does it achieve? The infra has matured since early days,
->>>> it saves user-kernel transitions at best but not context switching
->>>> overhead, and not even that if you do wait(1) and happen to catch
->>>> middle CQEs. And it disables LAZY_WAKE, so CQ side batching with
->>>> timers and what not is effectively useless with links.
->>>
->>> Not only the context switch, it supports 1:N or N:M dependency which
->>
->> I completely missed, how N:M is supported? That starting to sound
->> terrifying.
+On Thu, May 02, 2024 at 10:01:39AM -0400, Theodore Ts'o wrote:
+> On Wed, May 01, 2024 at 10:45:06PM -0700, Christoph Hellwig wrote:
+> > 
+> > Please don't combine ext4 and block changes in a single patch.  Please
+> > also explain why you want to change things.
+> > 
+> > AFAIK this is simply the historic behavior of the old direct I/O code
+> > that's been around forever.  I think the XFS semantics make a lot more
+> > sense, but people might rely on this one way or another.
 > 
-> N:M is actually from Kevin's idea.
+> I agree that the ext4 and block I/O change should be split into two
+> separate patches.
 > 
-> sqe group can be made to be more flexible by:
-> 
->      Inside the group, all SQEs are submitted in parallel, so there isn't any
->      dependency among SQEs in one group.
->      
->      The 1st SQE is group leader, and the other SQEs are group member. The whole
->      group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
->      the two flags can't be set for group members.
->      
->      When the group is in one link chain, this group isn't submitted until
->      the previous SQE or group is completed. And the following SQE or group
->      can't be started if this group isn't completed.
->      
->      When IOSQE_IO_DRAIN is set for group leader, all requests in this group
->      and previous requests submitted are drained. Given IOSQE_IO_DRAIN can
->      be set for group leader only, we respect IO_DRAIN for SQE group by
->      always completing group leader as the last on in the group.
->      
->      SQE group provides flexible way to support N:M dependency, such as:
->      
->      - group A is chained with group B together by IOSQE_IO_LINK
->      - group A has N SQEs
->      - group B has M SQEs
->      
->      then M SQEs in group B depend on N SQEs in group A.
-> 
-> 
->>
->>> is missing in io_uring, but also makes async application easier to write by
->>> saving extra context switches, which just adds extra intermediate states for
->>> application.
->>
->> You're still executing requests (i.e. ->issue) primarily from the
->> submitter task context, they would still fly back to the task and
->> wake it up. You may save something by completing all of them
->> together via that refcounting, but you might just as well try to
->> batch CQ, which is a more generic issue. It's not clear what
->> context switches you save then.
-> 
-> Wrt. the above N:M example, one io_uring_enter() is enough, and
-> it can't be done in single context switch without sqe group, please
-> see the liburing test code:
+> As for the rest, we discussed this at the weekly ext4 conference call
+> last week and at the, I had indicated that this was indeed the
+> historical Direct I/O behavior.  Darrick mentioned that XFS is only
+> falling back to buffered I/O in one circumstances, which is when there
+> is direct I/O to a file which is reflinked, which since the
 
-Do you mean doing all that in a single system call? The main
-performance problem for io_uring is waiting, i.e. schedule()ing
-the task out and in, that's what I meant by context switching.
+fsblock unaligned directio writes to a reflinked file, specifically.
 
--- 
-Pavel Begunkov
+> application wouldn't know that this might be the case, falling back to
+> buffered I/O was the best of not-so-great alternatives.
+> 
+> It might be a good idea if we could agree on a unfied set of standard
+> semantics for Direct I/O, including what should happen if there is an
+> I/O error in the middle of a DIO request; should the kernel return a
+> short write?
+
+Given the attitude of "if you use directio you're supposed to know what
+you're doing", I think it's fine to return a short write.
+
+>               Should it silently fallback to buffered I/O?  Given that
+> XFS has had a fairly strict "never fall back to buffered" practice,
+> and there haven't been users screaming bloody murder, perhaps it is
+> time that we can leave the old historical Direct I/O semantics behind,
+> and we should just be more strict.
+
+The other thing I've heard, mostly from willy is that directio could be
+done through the pagecache when it is already caching the data.  I've
+also heard about other operating systems <cough> where the mode could
+bleed through to other fds (er...).
+
+> Ext4 can make a decision about what to do on its own, but if we want
+> to unify behavior across all file systems and all of the direct I/O
+> implications in the kernels, then this is a discussion that would need
+> to take place on linux-fsdevel, linux-block, and/or LSF/MM.
+> 
+> With that context, what are folks' thiking about the proposal that we
+> unify Linux's Direct I/O semantics?  I think it would be good if it
+> was (a) clearly documented, and (b) not be surprising for userspace
+> application which they switch beteween file systems, or between a file
+> system and a raw block device.  (Which for certain enterprise
+> database, is mostly only use for benchmarketing, on the back cover of
+> Business Week, but sometimes there might be users who decide to
+> squeeze that last 1% of performance by going to a raw block device,
+> and it might be nice if they see the same behaviour when they make
+> that change.)
+
+Possibly a good idea but how much of LSFMM do we want to spend
+relitigating old {,non-}decisions? ;)
+
+--D
+
+> Cheers,
+> 
+> 					- Ted
+> 
