@@ -1,116 +1,105 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76095824A3
-	for <linux-block@vger.kernel.org>; Thu,  2 May 2024 13:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E161F13C67F
+	for <linux-block@vger.kernel.org>; Thu,  2 May 2024 14:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714654850; cv=none; b=RkVFbtf9SVKW/8fa6/CthQcW6jjRJOKjnfqQy6dB1NvPOkWQ+NK+8fBc+oog1H3QsipEdQ/4j54uZ0UFxePDIkuYRdgyNL+smIARs7K9fgk5AiwxfLc+2KMSovwUIbs8Vce9Vw8riBJBvqvXRNrVAN+im4gAlctzWKMPdaypLlA=
+	t=1714658531; cv=none; b=ivkVaxWMQq+K117MWSCVj1f+Mr84ywbYlwitnE1YiGcUlLEwk5bIWSRJIg4e7n4gwrBrAuI5ndUOR55AuZYi2gmcaPpsgoqDQ+W5VatnyeR5F/r1rYLH6MZ+0RDYFONVtiBL3Uc+KmBFLPPic5JY3gQlhMX4Du+fz7LDcTFfhf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714654850; c=relaxed/simple;
-	bh=IlVurUcckqIQaILGW3zi+vx9jk9UzjCiyVuzyZ66SlQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZkDqQHmJwpc6FvPLnasNr5Dkv1YzkachdiPsNtQWsWnNHlqxfywNDBbkOCyQKbIlR0cXZ+LttOXPC8+HNIXuFbCacnFCtCRRUqH0gBSBfaBb5/7/iz9vHwG6kuzGdoK5scjRzBuuLcU79PqW+rO2WF4CyaM6Y4LYYA1VSwKu8i8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VO4tPv5/; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1714658531; c=relaxed/simple;
+	bh=ZM9T6R7S8K4p4/89PZv5xZTw1drdCyPBkdOVr0adZ8g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GBsLFIJ5jPo+U1PUaAILa5b1b2rhfTwiIBSEHA/btp7r7u1FZJwievJv3/Qf5MxT89ytzVXwtDcFETnYdBEvBzDgJpoRDw1fM0kCuteKob7Gh1Ni8y0ihcT0WFU4Omzlk8uaY1Fq0xH1NNTWlblj8NOZUuPENsrlw6EfaoCYmzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=KGc9K55g; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VO4tPv5/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=mCWB+TUpH4eOaU5rvvDgM+4eio9ryf9cwMSdlgh0lN0=; b=VO4tPv5/jpbA3X0X6ip+GaHcjP
-	yaxfcS+zbHLOv+ExoFxzJUH2EEVQr+6zNp0LMPJ87L9HLZ+S7ddOG0+65Ublua3tiiLpEQLfuT3fS
-	111FbQsGPhWk1Xwtt1RGNsbDs4sMXxA7Z0z16/gRgkvK3wUf2xRAXx4P4LqSGHBYynjJWqGMQhXnp
-	o6ZwWofMMF6rqmOLgHVU/bwhgMtCk/NH+8/6B1ZNiqXUgpgwiM7t4s4LJV/RGe69inSyllWHfmCAX
-	WZ8zRA9yFXy0hY7OkWy3NDFan4AAzFVW0xQkO4X9hyvsH/6gtkRpsde3D72BXdQl76wLfHWLP1ywk
-	qKjq1Wwg==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s2W3E-0000000CjCr-49tm;
-	Thu, 02 May 2024 13:00:41 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Lennart Poettering <mzxreary@0pointer.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] block: add a partscan sysfs attribute for disks
-Date: Thu,  2 May 2024 15:00:33 +0200
-Message-Id: <20240502130033.1958492-3-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240502130033.1958492-1-hch@lst.de>
-References: <20240502130033.1958492-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="KGc9K55g"
+Received: from cwcc.thunk.org (pool-108-26-156-33.bstnma.fios.verizon.net [108.26.156.33])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 442E1dJE031567
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 2 May 2024 10:01:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1714658503; bh=duxA4e5bb2slFBM2DuV5/NyEGX/IrYnPRt/udTa/gnw=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=KGc9K55g0J4WVV/KLX4hsaE3/oSNDDGJwmS0Rs/KFzAk8GdB4T/AEfbm/YQcJDHnX
+	 fDd94sXS8thWudS+1ULE3+F8bKufScI1dIB/ksSscPPcnc0XefU+VZW4Xrf1XdrFWp
+	 Ku4br1qsVqQK/TOhJADvBP5w/rGdTcjaBBnnzLKDM1xdlDETRmCTljdU1Ll/qk/Ees
+	 LW/oeWx5mx+R60ds7qEqnQkYeoFqbZPHYdQvUthiJUtYqXsQusulyUypTXSktVfG7h
+	 cOaPp1JlUucWJ2bXAaD40zjdvnBCO6euqj3ezMzKEjkeaX3xoWC0MZP0gpA2bLXali
+	 B9iOdYYMTG8qw==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id CE6E415C02BB; Thu,  2 May 2024 10:01:39 -0400 (EDT)
+Date: Thu, 2 May 2024 10:01:39 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jeremy Bongio <bongiojp@gmail.com>, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, Jeremy Bongio <jbongio@google.com>
+Subject: Re: [RFC PATCH 1/1] Remove buffered failover for ext4 and block fops
+ direct writes.
+Message-ID: <20240502140139.GE1743554@mit.edu>
+References: <20240501231533.3128797-1-bongiojp@gmail.com>
+ <20240501231533.3128797-2-bongiojp@gmail.com>
+ <ZjMoYkUsQnd33mXm@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjMoYkUsQnd33mXm@infradead.org>
 
-This attribute reports if partition scanning is enabled for a given disk.
+On Wed, May 01, 2024 at 10:45:06PM -0700, Christoph Hellwig wrote:
+> 
+> Please don't combine ext4 and block changes in a single patch.  Please
+> also explain why you want to change things.
+> 
+> AFAIK this is simply the historic behavior of the old direct I/O code
+> that's been around forever.  I think the XFS semantics make a lot more
+> sense, but people might rely on this one way or another.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- Documentation/ABI/stable/sysfs-block | 10 ++++++++++
- block/genhd.c                        |  8 ++++++++
- 2 files changed, 18 insertions(+)
+I agree that the ext4 and block I/O change should be split into two
+separate patches.
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 1fe9a553c37b71..f0025d1c3d5acd 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -101,6 +101,16 @@ Description:
- 		devices that support receiving integrity metadata.
- 
- 
-+What:		/sys/block/<disk>/partscan
-+Date:		May 2024
-+Contact:	Christoph Hellwig <hch@lst.de>
-+Description:
-+		The /sys/block/<disk>/partscan files reports if partition
-+		scanning is enabled for the disk.  It returns "1" if partition
-+		scanning is enabled, or "0" if not.  The value type is a 32-bit
-+		unsigned integer, but only "0" and "1" are valid values.
-+
-+
- What:		/sys/block/<disk>/<partition>/alignment_offset
- Date:		April 2009
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-diff --git a/block/genhd.c b/block/genhd.c
-index 4b85963d09dbb4..dec2ee338fb44a 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1044,6 +1044,12 @@ static ssize_t diskseq_show(struct device *dev,
- 	return sprintf(buf, "%llu\n", disk->diskseq);
- }
- 
-+static ssize_t partscan_show(struct device *dev,
-+		struct device_attribute *attr, char *buf)
-+{
-+	return sprintf(buf, "%u\n", disk_has_partscan(dev_to_disk(dev)));
-+}
-+
- static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
- static DEVICE_ATTR(ext_range, 0444, disk_ext_range_show, NULL);
- static DEVICE_ATTR(removable, 0444, disk_removable_show, NULL);
-@@ -1057,6 +1063,7 @@ static DEVICE_ATTR(stat, 0444, part_stat_show, NULL);
- static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
- static DEVICE_ATTR(badblocks, 0644, disk_badblocks_show, disk_badblocks_store);
- static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
-+static DEVICE_ATTR(partscan, 0444, partscan_show, NULL);
- 
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- ssize_t part_fail_show(struct device *dev,
-@@ -1103,6 +1110,7 @@ static struct attribute *disk_attrs[] = {
- 	&dev_attr_events_async.attr,
- 	&dev_attr_events_poll_msecs.attr,
- 	&dev_attr_diskseq.attr,
-+	&dev_attr_partscan.attr,
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	&dev_attr_fail.attr,
- #endif
--- 
-2.39.2
+As for the rest, we discussed this at the weekly ext4 conference call
+last week and at the, I had indicated that this was indeed the
+historical Direct I/O behavior.  Darrick mentioned that XFS is only
+falling back to buffered I/O in one circumstances, which is when there
+is direct I/O to a file which is reflinked, which since the
+application wouldn't know that this might be the case, falling back to
+buffered I/O was the best of not-so-great alternatives.
 
+It might be a good idea if we could agree on a unfied set of standard
+semantics for Direct I/O, including what should happen if there is an
+I/O error in the middle of a DIO request; should the kernel return a
+short write?  Should it silently fallback to buffered I/O?  Given that
+XFS has had a fairly strict "never fall back to buffered" practice,
+and there haven't been users screaming bloody murder, perhaps it is
+time that we can leave the old historical Direct I/O semantics behind,
+and we should just be more strict.
+
+Ext4 can make a decision about what to do on its own, but if we want
+to unify behavior across all file systems and all of the direct I/O
+implications in the kernels, then this is a discussion that would need
+to take place on linux-fsdevel, linux-block, and/or LSF/MM.
+
+With that context, what are folks' thiking about the proposal that we
+unify Linux's Direct I/O semantics?  I think it would be good if it
+was (a) clearly documented, and (b) not be surprising for userspace
+application which they switch beteween file systems, or between a file
+system and a raw block device.  (Which for certain enterprise
+database, is mostly only use for benchmarketing, on the back cover of
+Business Week, but sometimes there might be users who decide to
+squeeze that last 1% of performance by going to a raw block device,
+and it might be nice if they see the same behaviour when they make
+that change.)
+
+Cheers,
+
+					- Ted
