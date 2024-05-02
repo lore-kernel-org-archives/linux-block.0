@@ -1,54 +1,138 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7575F1CA96;
-	Thu,  2 May 2024 07:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7454F171AA;
+	Thu,  2 May 2024 09:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714633950; cv=none; b=SlkLNhcgu249bvmgsNkN7mNW7gdMMnQNr97GY/WP+knYPJKgUX5r2X82Gx11ErXAgNVYxWbqueKoeoCmue9pYu/8P2Cy4tzUTNSVhu1HSiucVLSsg15n1TMeyg7gZEv4i8fLWcEXUMcRSu5e1O/vhxfy6+/2jDDbdLR+WdgnwDo=
+	t=1714642644; cv=none; b=KjWopG8HkcpK84wpuHaenDH5SZ7ONJeBMCHeMHISwX1vC+TjdscGH7ECP7SFg0EchrD2Is2Y5anHavhNhu/F0IDPuKnknfn7LLad8f4/gObm+xBEqD8ZH9V1nYCSjt5LE94czRHnZ9GVDlbzcA473/VcWCusdj4Pe9KOYz95HG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714633950; c=relaxed/simple;
-	bh=2+xSLSUsby2BC/4YL1v9fwY61kfRQYM6OLvY0e6r1ZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QT9z4CgBUlIps2kKBhKPYhUDwWH066c20gOCnCTk4BxcHepIsDihWcWG7zG9gPFX9quEIn6LFhjtXfQsxMKsW35woF/vAi/9ZOpPuKWAJ2SLCnVMHHOoUQCmRge04B7E82X1NrmcxrU1KnvvLTGqeLD56z/FSHXGPbqY47IQbeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 496A1227A87; Thu,  2 May 2024 09:12:22 +0200 (CEST)
-Date: Thu, 2 May 2024 09:12:21 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-	martin.petersen@oracle.com, kbusch@kernel.org, brauner@kernel.org,
-	asml.silence@gmail.com, dw@davidwei.uk, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH 04/10] block: avoid unpinning/freeing the bio_vec
- incase of cloned bio
-Message-ID: <20240502071221.GA31379@lst.de>
-References: <20240425183943.6319-1-joshi.k@samsung.com> <CGME20240425184658epcas5p2adb6bf01a5c56ffaac3a55ab57afaf8e@epcas5p2.samsung.com> <20240425183943.6319-5-joshi.k@samsung.com> <20240427070508.GD3873@lst.de> <03cb6ac3-595f-abb1-324b-647ed84cfe6b@samsung.com> <20240429170929.GB31337@lst.de> <ebeca5f1-8d80-e4d4-cf45-9a14ef1413a5@samsung.com>
+	s=arc-20240116; t=1714642644; c=relaxed/simple;
+	bh=fbmqAnRpKIuB8APRk5fSKVuC+VT6tJcSKzu30jMaNUY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=aXE9CZLZHc95MBiuczgKMHoMSBc5Hg/uBQb4M4MXexzJ1l0YmEhWxaB6QD5qlktevAjEq85AMADSfaP791SzNahcpU53RuQxFa4VygPeAtqtB//OtNyIxL71TjUA6Eb2dKT5MQO3JElaJQLYO9hzyhEqI0qODrXNQa60kzKw2d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BabjEkXb; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BabjEkXb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BF9C113CC;
+	Thu,  2 May 2024 09:37:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714642644;
+	bh=fbmqAnRpKIuB8APRk5fSKVuC+VT6tJcSKzu30jMaNUY=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=BabjEkXb/mJrL1iGag2p+sMNkAthTYmP6seKrea9kOfrp0A24lUMPO1ap4pOaOTpe
+	 Er0KAVD8KuA2TpxlU5NSO0l0dySQBAwMTtCxHq2GLH4rBb/jEElwjCSRN8yQDabyxN
+	 aAaZiIHOf42o3fZYnLs1yvYTUuf2m7QIjC4hVWV644WMKSU5f7JrvaqLOZHYWg2fCW
+	 T9YWSiRqSK6xBw8eVHa714tMTcQQVI4P2duy54GycVjG8YqhLYJ1awlIPPj61h6Far
+	 xMVQiJ6OnU71gJj26Zh7Zo6b0VXjascfjAC5Z3OtzU3j478hefWU+WTzbY79cG4Fiy
+	 e3MUW7z59tTDg==
+Message-ID: <8116c2dc-dd47-4678-9974-100006ffd0f7@kernel.org>
+Date: Thu, 2 May 2024 18:37:21 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ebeca5f1-8d80-e4d4-cf45-9a14ef1413a5@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/14] block: Fix reference counting for zone write
+ plugs in error state
+To: Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@redhat.com>
+References: <20240501110907.96950-1-dlemoal@kernel.org>
+ <20240501110907.96950-5-dlemoal@kernel.org>
+ <d4f71b64-b2d3-4350-b502-bbcfcc9614ce@suse.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <d4f71b64-b2d3-4350-b502-bbcfcc9614ce@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 01, 2024 at 06:32:45PM +0530, Kanchan Joshi wrote:
-> Can you please tell what function(s) in bio data path that need this 
-> conversion?
-> To me data path handling seems similar. Each cloned bio will lead to 
-> some amount of data transfer to pinned user-memory. The same is 
-> happening for meta transfer here.
+On 5/2/24 15:01, Hannes Reinecke wrote:
+>> +static inline void disk_zone_wplug_set_error(struct gendisk *disk,
+>> +					     struct blk_zone_wplug *zwplug)
+>> +{
+>> +	unsigned long flags;
+>> +
+>> +	if (zwplug->flags & BLK_ZONE_WPLUG_ERROR)
+>> +		return;
+>> +
+> 
+> I still get nervous when I see an unprotected flag being set.
+> Especially in code which is known to race with error handling.
+> Wouldn't it be better to check the flag under the lock or at
+> least use 'test_and_set_bit' here?
 
-Well, everywhere.  e.g. for direct I/O everything is just driven from
-the fs/direct-io.c and and fs/iomap/direct-io.c code without any
-knowledge in the underlying driver if data has been pinned (no bounce
-buffering in this case).  Or for passthrough I/O none of the underlying
-logic knows about the pinning or bounce buffering, everything is handled
-in block/blk-map.c.
+It is protected: this is always called with the zone write plug spinlock being
+locked.
+
+> 
+>> +	/*
+>> +	 * At this point, we already have a reference on the zone write plug.
+>> +	 * However, since we are going to add the plug to the disk zone write
+>> +	 * plugs work list, increase its reference count. This reference will
+>> +	 * be dropped in disk_zone_wplugs_work() once the error state is
+>> +	 * handled, or in disk_zone_wplug_clear_error() if the zone is reset or
+>> +	 * finished.
+>> +	 */
+>> +	zwplug->flags |= BLK_ZONE_WPLUG_ERROR;
+> 
+> And that is even worse. We might have been interrupted between these
+> two lines, invalidating the first check.
+
+Nope: zone write plug spinlock is locked.
+
+> 
+> Please consider using 'test_and_set_bit()' here.
+> 
+>> +	atomic_inc(&zwplug->ref);
+>> +
+>> +	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
+>> +	list_add_tail(&zwplug->link, &disk->zone_wplugs_err_list);
+>> +	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
+>> +}
+>> +
+>> +static inline void disk_zone_wplug_clear_error(struct gendisk *disk,
+>> +					       struct blk_zone_wplug *zwplug)
+>> +{
+>> +	unsigned long flags;
+>> +
+>> +	if (!(zwplug->flags & BLK_ZONE_WPLUG_ERROR))
+>> +		return;
+>> +
+>> +	/*
+>> +	 * We are racing with the error handling work which drops the reference
+>> +	 * on the zone write plug after handling the error state. So remove the
+>> +	 * plug from the error list and drop its reference count only if the
+>> +	 * error handling has not yet started, that is, if the zone write plug
+>> +	 * is still listed.
+>> +	 */
+>> +	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
+>> +	if (!list_empty(&zwplug->link)) {
+>> +		list_del_init(&zwplug->link);
+>> +		zwplug->flags &= ~BLK_ZONE_WPLUG_ERROR;
+>> +		disk_put_zone_wplug(zwplug);
+>> +	}
+>> +	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
+>> +}
+>> +
+> 
+> Similar comments to above: you are clearing the flag under the lock,
+> but don't check or set under the lock...
+
+And similar comment: this is called with the zone write plug spinlock held. So
+no race with the flag handling. What is racy is the error handling because we
+can only hold disk->zone_wplugs_lock at first, and have to release that lock
+before we take the zone write plug spinlock (otherwise we would have lock order
+inversion). And the error hanlding needs to do a report zone, so no zone write
+plug spinlock either, and in the meantime, the user may do a zone reset or reset
+all... Hence the trickery here to look at if the error handling work already
+took the plug out of the list for processing or not. If it has, then the error
+handling will do what is needed with the error flag.
+
+-- 
+Damien Le Moal
+Western Digital Research
+
