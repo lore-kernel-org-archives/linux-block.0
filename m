@@ -1,66 +1,65 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F264D5A5
-	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 15:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAB157C84
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 15:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714748488; cv=none; b=MezH+mmbTo+kQYU1K37+OZjktcpmpxGss4mUdBLwsGRgE/brvHPbJkhLon8IT397Twq5C8AqxYl6+YJTknwvLUiVQtq6kARThufjo4rtRPuXEBbTkF/TWFHjnIP/cyalC3GORrjToPHLC3n7UAebkTJHDFEpvfutNPUdnex0ngw=
+	t=1714748757; cv=none; b=dZybmuXI0lo4knNfq8yfQnX0wTwkgD6VE4UQvMfNlYqBKvkWd/1PGB3NRR1Zq+eMOUZVVCuqsq9jRClY9ydybIHxTRofHi1bz13mkdacP9TOrJhAePJ0RkHQYxmkIxN7BO30ZWsqCymX4+l1Id86ZKgv/9UsPSadc4Tv9pcwMOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714748488; c=relaxed/simple;
-	bh=bLpl+eLC3cHlS0Y9N9cx41AQObMR6LAj7CIJkKPbHdA=;
+	s=arc-20240116; t=1714748757; c=relaxed/simple;
+	bh=aPKuY60LYb8djueqbspXvDA/fp7HMWrUuOnGy+bGaQs=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=XQOMt+PXpsRxTYARO+e7QMXypNN+432O0G7C++SZ3TM3AN6A7a9IZzajlgKNH3oHSSCJ8WkTJTmhdG9FK2pyw0KQqM204moENOpkvQ3O3ygI6+EVguvo5AZfxEhlnCBKUNquJt2RB5pwvt3UqPbONOcNhd/MEc4QTit8EWchnAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2tlIGmoh; arc=none smtp.client-ip=209.85.166.50
+	 MIME-Version:Content-Type; b=aw48AWuvhiIB60vWV0hZiESlA7X90Pygi5QvY2kiAL7gPZ3OfR3kYnnw97VzL8sUHgbXx1XZ9znnwGKTx4KoP3kiSgIGrWzo1lrzqOwNaj76gH8eESYDDH124dkjP1SX6x/OGpy1k7zvzA66H9nFPMDwlUbb53p8ZYlfQeRXWS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AHHzS+VX; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2tlIGmoh"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7dec9c65057so43995239f.1
-        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 08:01:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AHHzS+VX"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7dee044afe7so4571939f.2
+        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 08:05:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714748485; x=1715353285; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714748755; x=1715353555; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W/+W50mIXXR0V6D9VT9w7Mfos9fNAfLYkbxLUUIgBtE=;
-        b=2tlIGmohv35flMaCpQjSMHLyGObI1r0uzW4c+JJosqZzfxWgvtPKGgEjE/Y9EmD3/O
-         GHlYd6sjpQ3WxvU/OqVnGSxyGESG7aAU+LJ8sHcCB3Rk1WZuS3tHkZFEps81kZTC3G7m
-         k+tA9EKM7Q1ZQIOxJ+oJM8dCGjMBfgFsPAPAnTeyOEo06DN/ICoa4zOK2WrvhURd55UR
-         btPjkDvhcly6T/0zJSF5ZB3AWy95NJzOK8fkr80snlJhG3yqv9xguDSqQIstWmvzsPm7
-         3VwJej302Qc/tUCkF4IKSzrUWAIxkk7S2vH9faiuH6T4KRdC1jvKBPJzB+7ADfHKrSJY
-         sYfQ==
+        bh=/rMaRlN91jTTFNhl3+24cdskOndxFw8DNZxZaaue9Vc=;
+        b=AHHzS+VX3OyqyQ4g7ZvpQHuPPlKs20QJc96q4YeJQB6tem4TbnzPd7dhGVH4sAMFjr
+         AtCsaMXVSQxnOYIQSi7zBBoni+J36arcz/oVBMlVM3J7VRud1fmqqQ4FJKedfgdNjyiB
+         vKtuM+g5zORQVn2ZeCk8OtLABuqB54cm5xHt+PyvcUuBpWMfRjdUCmg64seK4ZDEHThg
+         vHM6d0YUQmqeDHVxz2wjgJ7qFd1E68uIg+X5Ov337NAN+j47wY5+OBzK/EFzdvCjBHuV
+         PGzcT8uhAXLFTt11Fi7zTHCKzc/GToPpgIynLckvr6vV/obH3XntOXRMbRkk3jkfFu17
+         bqEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714748485; x=1715353285;
+        d=1e100.net; s=20230601; t=1714748755; x=1715353555;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=W/+W50mIXXR0V6D9VT9w7Mfos9fNAfLYkbxLUUIgBtE=;
-        b=srVMrYoGy8BFuiLIGoQLyhL5K+P+zZeEXnRt0UJjqM2ioIr8tGmp3Ypa/cxAmhes+y
-         qmaiPvX7+aYL0+1WINV44lwwfNfYDtM4sNyNbJZk+Q/121Vjmk0DOXHOkV1x7nKPzFIJ
-         MOWUvUqx6uOj0H5ZJbAHW1BFGtj+Ix4rD6PgOlMcKC8KKrMnaCpyPFI+cvnbNqpLXm7W
-         EF/wkRfMaUi5/xxBl3t8cWv6CPEcx2EvuZzjc1t1kunJOLjHi/I6BPzPghzw58Do4GgW
-         u+qW3hfL+Ux8wiXVjizx1UMOtRhDo7Zx08fjrGZZ0oupu2YAEHv6gpI9j84ZCJFIKI55
-         zy4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXGQx/Wy0u5uCj7r2u/++1C6HDvJVD0CYc2v9GxdnYuCAXuKvwLGmaqOFkAWKU2q9LWUx+5NUeTu+UHQLHvrVYG3nnJQQ2FiWF6U0o=
-X-Gm-Message-State: AOJu0Yxbl0pXq+Inrm2OAVDP1O+RhBgaDjepmAhN2jy6/31Ilj7uLaOe
-	NMfu2iU6tgekc7PzvA+PsAxzD05s7Q17yq1vaAo5nuYjq51MG/vTFO/DRHK4QVzoJA3YdQhBB5Y
-	I
-X-Google-Smtp-Source: AGHT+IE1lmWXQZa1cS7tjNvbCvZtTo6DeWZPyEtnPU/rTj4ojd4A40hom53w34RK7kLLTnHcdDfQ0A==
-X-Received: by 2002:a05:6602:29b3:b0:7da:8d35:8a5e with SMTP id u19-20020a05660229b300b007da8d358a5emr3200030ios.2.1714748484850;
-        Fri, 03 May 2024 08:01:24 -0700 (PDT)
+        bh=/rMaRlN91jTTFNhl3+24cdskOndxFw8DNZxZaaue9Vc=;
+        b=G7tJwZ+2XYK1bNRKYQXPF9dcSTSQJuuP/EBtzDmrPZPqSOVYwIeBGpa4bDwevUrrjV
+         PggvErHn9oR0sJTolXQrGG6ZPha2LzDfKxgnAp17tLbNeSc+1w8nJcplf9gzruDzmGsV
+         vZIkzIvVrE5nKI1B0zz5xENpz5DaMDAjcJCoDrYkjVVdyGT7YVRY/sSwHnHzcihSRyOb
+         pFkbYqpfUqVIaUCnnKGd+mB+D87QLocZZL4KNHO9faUHOgz5jBQElBFTFZpf9GsCujqJ
+         Z87HNo8mkW5YirqW02Sryx7KSQ4jy4RfBmq/vqrbNTrqR0TZVUxs39eApzcaVYSkg7WY
+         dt0A==
+X-Gm-Message-State: AOJu0YyEgFcJ7WMpDhP6A+dpb6WkLd8jK7F5F3/uV03ztasNTdzXuxHB
+	Uci7G0awERqr5E3aL9y7N8ZrJLUPYUDxRm9Mn+GRdZPNr/i2G78RMMUbA3UIHlI=
+X-Google-Smtp-Source: AGHT+IHsgxYjwfisljAlgiytiGBCEg/h/caWKTB9yHrYbIPuYPCYMgLcpshOrfv+Twi+rqTg5ZfYJA==
+X-Received: by 2002:a5d:94c7:0:b0:7de:b4dc:9b8f with SMTP id y7-20020a5d94c7000000b007deb4dc9b8fmr2862572ior.2.1714748754672;
+        Fri, 03 May 2024 08:05:54 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id dv9-20020a056638608900b0048804afe56dsm807988jab.133.2024.05.03.08.01.24
+        by smtp.gmail.com with ESMTPSA id ix20-20020a056638879400b00487cf11342fsm822055jab.102.2024.05.03.08.05.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 08:01:24 -0700 (PDT)
+        Fri, 03 May 2024 08:05:54 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Lennart Poettering <mzxreary@0pointer.de>, linux-block@vger.kernel.org
-In-Reply-To: <20240502130033.1958492-1-hch@lst.de>
-References: <20240502130033.1958492-1-hch@lst.de>
-Subject: Re: add a partscan sysfs attribute v2
-Message-Id: <171474848421.32509.14457923100343769108.b4-ty@kernel.dk>
-Date: Fri, 03 May 2024 09:01:24 -0600
+Cc: linux-block@vger.kernel.org, 
+ syzbot+0a3683a0a6fecf909244@syzkaller.appspotmail.com
+In-Reply-To: <20240503081042.2078062-1-hch@lst.de>
+References: <20240503081042.2078062-1-hch@lst.de>
+Subject: Re: [PATCH] block: refine the EOF check in blkdev_iomap_begin
+Message-Id: <171474875400.33279.6512906060593711937.b4-ty@kernel.dk>
+Date: Fri, 03 May 2024 09:05:54 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,22 +71,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Thu, 02 May 2024 15:00:31 +0200, Christoph Hellwig wrote:
-> this series adds a patscan sysfs attribute so that userspace
-> (e.g. systemd) can check if partition scanning is enabled for a given
-> gendisk.
+On Fri, 03 May 2024 10:10:42 +0200, Christoph Hellwig wrote:
+> blkdev_iomap_begin rounds down the offset to the logical block size
+> before stashing it in iomap->offset and checking that it still is
+> inside the inode size.
 > 
-> Changes since v1:
->  - update the data from the non-existing month of Atorl to May
+> Check the i_size check to the raw pos value so that we don't try a
+> zero size write if iter->pos is unaligned.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/2] block: add a disk_has_partscan helper
-      commit: 140ce28dd3bee8e53acc27f123ae474d69ef66f0
-[2/2] block: add a partscan sysfs attribute for disks
-      commit: a4217c6740dc64a3eb6815868a9260825e8c68c6
+[1/1] block: refine the EOF check in blkdev_iomap_begin
+      commit: 0c12028aec837f5a002009bbf68d179d506510e8
 
 Best regards,
 -- 
