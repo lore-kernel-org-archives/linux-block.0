@@ -1,119 +1,97 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FAA6FB8
-	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 14:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F264D5A5
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 15:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714748361; cv=none; b=iQPXMfT2+mvrhKetsycQTLwQuKTPPO7lFxjJ02+woV3Y94Mb/r59WHVrKSEOQVbr4fOIpOa1+Smwah++YoOWVoQzIaCyrFcqWhAoM/6DeW+TmLdW10XGEWpGuFlq3LwsJB8jM2LSb+i4TpBueoSqRNiRQAAm7Fcuduf9ft45ELU=
+	t=1714748488; cv=none; b=MezH+mmbTo+kQYU1K37+OZjktcpmpxGss4mUdBLwsGRgE/brvHPbJkhLon8IT397Twq5C8AqxYl6+YJTknwvLUiVQtq6kARThufjo4rtRPuXEBbTkF/TWFHjnIP/cyalC3GORrjToPHLC3n7UAebkTJHDFEpvfutNPUdnex0ngw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714748361; c=relaxed/simple;
-	bh=506C0rZsgh+UJUsVM/ClUzQlypxlvYtwRJBpMBC58vs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eqMoBNKFzOxW+jg9IUs2A0CUqtQwpn/UhXTsOwwkrGRm2eV5MjGeqovleDydESC0EUGPBvIoNVR8WyaQyg5vMjIg8CkDOc/Mshb24v/q3ETpxo1ICYJwOL/tYVY1spz6gpKzNKf2dQbM7xXpULCDcmhLXaEo3dxReOwYLbHDyLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HtJXsjUV; arc=none smtp.client-ip=209.85.166.41
+	s=arc-20240116; t=1714748488; c=relaxed/simple;
+	bh=bLpl+eLC3cHlS0Y9N9cx41AQObMR6LAj7CIJkKPbHdA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=XQOMt+PXpsRxTYARO+e7QMXypNN+432O0G7C++SZ3TM3AN6A7a9IZzajlgKNH3oHSSCJ8WkTJTmhdG9FK2pyw0KQqM204moENOpkvQ3O3ygI6+EVguvo5AZfxEhlnCBKUNquJt2RB5pwvt3UqPbONOcNhd/MEc4QTit8EWchnAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2tlIGmoh; arc=none smtp.client-ip=209.85.166.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HtJXsjUV"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7dec82cc833so23128339f.1
-        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 07:59:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2tlIGmoh"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7dec9c65057so43995239f.1
+        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 08:01:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714748358; x=1715353158; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JzqB3oxw7SVo+sxNzL4BsC4FnIdrrwz3k/V7BeYCxB8=;
-        b=HtJXsjUVhgDS7TIRVxl1caBorTxNDr2LFIi0cVSiZvcYfElmCTlO6Gd5WiZsQC/wJU
-         9uURLg5UZvWbudqvSYDEpmdCkUrJJuV95itSzihrfokzeXPEEh/nnuZh52FPeTOQkvVv
-         wtkn0iKhSX1FBm0hx44gkyUOfUmcd1P/Y2ZDVxqIbi0djW3vB2B6birdBRvK8/ktX+NW
-         MrY+9zNiKHC/dz3NTIw5m6D5RWiTDRKcZj1/+cQ4Y0G9EnVCLasOZrng/lehYnuNFAJM
-         t+1ZYEQebvLAddcKcQ/cfwAYuBon23BsmCtgTrsY4pnjweB1iDZxw7yh+vwhcOhGQPkj
-         ccYA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714748485; x=1715353285; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W/+W50mIXXR0V6D9VT9w7Mfos9fNAfLYkbxLUUIgBtE=;
+        b=2tlIGmohv35flMaCpQjSMHLyGObI1r0uzW4c+JJosqZzfxWgvtPKGgEjE/Y9EmD3/O
+         GHlYd6sjpQ3WxvU/OqVnGSxyGESG7aAU+LJ8sHcCB3Rk1WZuS3tHkZFEps81kZTC3G7m
+         k+tA9EKM7Q1ZQIOxJ+oJM8dCGjMBfgFsPAPAnTeyOEo06DN/ICoa4zOK2WrvhURd55UR
+         btPjkDvhcly6T/0zJSF5ZB3AWy95NJzOK8fkr80snlJhG3yqv9xguDSqQIstWmvzsPm7
+         3VwJej302Qc/tUCkF4IKSzrUWAIxkk7S2vH9faiuH6T4KRdC1jvKBPJzB+7ADfHKrSJY
+         sYfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714748358; x=1715353158;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JzqB3oxw7SVo+sxNzL4BsC4FnIdrrwz3k/V7BeYCxB8=;
-        b=Pv2FtbE7TKhcpOpznpnq/lV6murexmmi4gobuQ2PxJpaWnrfiWmPEPvI9GoQvs2f7w
-         00khktPtddoH+dBn3txvFe80yRRQ98WYCChlDuzNSZCOjAFJ5LbxKf5wdNKiDwAykdd6
-         OICBvySaP49QAdM7DGtqe801L6pZyYqLWBqw0lHf5phu/HFROZv5kVpzsFKoDiW5kTdV
-         juRvPYy4FBYVDhrzQ5K3cxo08XLXWFfu9Vdyg1bhFd3rSWwBsgWpkIHaVIs5GQ0W1fOy
-         l+GmR2t1GFIBaf677UpTaOz/U4C8Wi8zhmk/827YUIqiZIAS0rlxepJnc4prK+8FSsW6
-         bbvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKFB3Wh0CGC+koAspiz/A8782KgyBdJ5wQl9jL1/XS3HvlWM4ANTq2vqUIu2/bBHzxshcpaRQYWdIaCnFPbdQwu9VtGxW8+jKI7ug=
-X-Gm-Message-State: AOJu0YwxsLCCqhcLlS9VPp05CvS/bpjcN/j0mxAbHhlJ4KgHdbOCv/Xp
-	FQQERywhW/fWK6YSdfgiJwzhp+gQMeQB3nj3olzGYNLtA29tOMZ/V1NjF3TgVBg=
-X-Google-Smtp-Source: AGHT+IG2qcsTi00u63kGhxLvVvFQDSaWJ9rKfeN2G9vzZ3kLWSyRwloDGFaXRzvsGI2NRS9fdgfQtg==
-X-Received: by 2002:a05:6602:17ca:b0:7de:d808:4b29 with SMTP id z10-20020a05660217ca00b007ded8084b29mr3061846iox.0.1714748358100;
-        Fri, 03 May 2024 07:59:18 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ay32-20020a056638412000b004828f584db0sm829353jab.80.2024.05.03.07.59.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 May 2024 07:59:17 -0700 (PDT)
-Message-ID: <181e2cd7-4433-4598-8d3b-208fe021f6c4@kernel.dk>
-Date: Fri, 3 May 2024 08:59:17 -0600
+        d=1e100.net; s=20230601; t=1714748485; x=1715353285;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W/+W50mIXXR0V6D9VT9w7Mfos9fNAfLYkbxLUUIgBtE=;
+        b=srVMrYoGy8BFuiLIGoQLyhL5K+P+zZeEXnRt0UJjqM2ioIr8tGmp3Ypa/cxAmhes+y
+         qmaiPvX7+aYL0+1WINV44lwwfNfYDtM4sNyNbJZk+Q/121Vjmk0DOXHOkV1x7nKPzFIJ
+         MOWUvUqx6uOj0H5ZJbAHW1BFGtj+Ix4rD6PgOlMcKC8KKrMnaCpyPFI+cvnbNqpLXm7W
+         EF/wkRfMaUi5/xxBl3t8cWv6CPEcx2EvuZzjc1t1kunJOLjHi/I6BPzPghzw58Do4GgW
+         u+qW3hfL+Ux8wiXVjizx1UMOtRhDo7Zx08fjrGZZ0oupu2YAEHv6gpI9j84ZCJFIKI55
+         zy4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXGQx/Wy0u5uCj7r2u/++1C6HDvJVD0CYc2v9GxdnYuCAXuKvwLGmaqOFkAWKU2q9LWUx+5NUeTu+UHQLHvrVYG3nnJQQ2FiWF6U0o=
+X-Gm-Message-State: AOJu0Yxbl0pXq+Inrm2OAVDP1O+RhBgaDjepmAhN2jy6/31Ilj7uLaOe
+	NMfu2iU6tgekc7PzvA+PsAxzD05s7Q17yq1vaAo5nuYjq51MG/vTFO/DRHK4QVzoJA3YdQhBB5Y
+	I
+X-Google-Smtp-Source: AGHT+IE1lmWXQZa1cS7tjNvbCvZtTo6DeWZPyEtnPU/rTj4ojd4A40hom53w34RK7kLLTnHcdDfQ0A==
+X-Received: by 2002:a05:6602:29b3:b0:7da:8d35:8a5e with SMTP id u19-20020a05660229b300b007da8d358a5emr3200030ios.2.1714748484850;
+        Fri, 03 May 2024 08:01:24 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id dv9-20020a056638608900b0048804afe56dsm807988jab.133.2024.05.03.08.01.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 08:01:24 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Lennart Poettering <mzxreary@0pointer.de>, linux-block@vger.kernel.org
+In-Reply-To: <20240502130033.1958492-1-hch@lst.de>
+References: <20240502130033.1958492-1-hch@lst.de>
+Subject: Re: add a partscan sysfs attribute v2
+Message-Id: <171474848421.32509.14457923100343769108.b4-ty@kernel.dk>
+Date: Fri, 03 May 2024 09:01:24 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: add a partscan sysfs attribute for disks
-To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Lennart Poettering <mzxreary@0pointer.de>, linux-block@vger.kernel.org
-References: <20240502130033.1958492-1-hch@lst.de>
- <20240502130033.1958492-3-hch@lst.de>
- <6e70dd3f-381c-4435-a523-588ce2fafb39@kernel.dk>
- <20240503081612.GA24407@lst.de> <ZjSqddKI4cDIgiPd@kbusch-mbp>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZjSqddKI4cDIgiPd@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 5/3/24 3:12 AM, Keith Busch wrote:
-> On Fri, May 03, 2024 at 10:16:12AM +0200, Christoph Hellwig wrote:
->> On Thu, May 02, 2024 at 11:05:54AM -0600, Jens Axboe wrote:
->>> On 5/2/24 7:00 AM, Christoph Hellwig wrote:
->>>> This attribute reports if partition scanning is enabled for a given disk.
->>>
->>> This should, at least, have a reference to Lennart's posting, and
->>> honestly a much better commit message as well. There's no reasoning
->>> given here at all.
->>
->> I'm not sure I can come up with something much better, feel free to
->> throw in what you prefer.
+
+On Thu, 02 May 2024 15:00:31 +0200, Christoph Hellwig wrote:
+> this series adds a patscan sysfs attribute so that userspace
+> (e.g. systemd) can check if partition scanning is enabled for a given
+> gendisk.
 > 
-> I think just explaining the "why" would be usesful for the git history.
-> How about this:
+> Changes since v1:
+>  - update the data from the non-existing month of Atorl to May
 > 
->   Userspace had been unknowingly relying on a non-stable interface of
->   kernel internals to determine if partition scanning is enabled for a
->   given disk. Provide a stable interface for this purpose instead.
-> 
->   Link: https://lore.kernel.org/linux-block/ZhQJf8mzq_wipkBH@gardel-login/
+> [...]
 
-Yep this looks good, I can grab that.
+Applied, thanks!
 
->>> Maybe even a fixes tag and stable notation?
->>
->> This is definitively not a Fixes as nothing it doesn't actually fix
->> any code.  It provides a proper interfaces for what was an abuse
->> of leaking internal bits out.
-> 
-> I kind of agree it's not a "Fixes:" in the traditional sense, but at a
-> "Cc: <stable>" sounds appropriate given the fallout.
+[1/2] block: add a disk_has_partscan helper
+      commit: 140ce28dd3bee8e53acc27f123ae474d69ef66f0
+[2/2] block: add a partscan sysfs attribute for disks
+      commit: a4217c6740dc64a3eb6815868a9260825e8c68c6
 
-It's definitely not a traditional kind of fixes, even a made-up tag
-might be fine for this.
-
-But probably just a Cc: stable@vger.kernel.org # version
-
-and the added link would be good enough.
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
