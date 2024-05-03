@@ -1,32 +1,58 @@
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C3D14267;
-	Fri,  3 May 2024 13:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253A04C6D
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 14:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714741302; cv=none; b=Lv2+REK0tC3Se2T4uuMz0VO+pzlqXV5srUDcQ527+hWG4xantXhtGUNpPHWeFm25eyLlLVxJhCGn2anPtnlWp/AmTOHK2VFSRrJoOP3yZyjFRSh8KqI3SUVdYNi7cfBHfc/WBQFo5Yhtxflfa4gm9o401OVroGZXQaQXRUw3cIk=
+	t=1714746625; cv=none; b=BB4tpI9ZpCYTPbJM7d6clDZf5vp6zbYyi1GBOMAtbUwB1FPZxTz3ayvRXFhc2xzRbmXXI3llNdirdbvIFu/BF8ARRnThekmb5X7POCAMHcJDDSS4hl9R0OKPmdPUMHPRmYcUoCkRMGA+ZpBDRJ9N+AD4/I0yLFTvhCfw4jmUn4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714741302; c=relaxed/simple;
-	bh=tkWOYpBTX1ragk+/y68Re0nzBv9+jwv8Ga7g1pbZG8A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gbI7PIM3DaZWr/1nzmq5hWzNkmciQBOXLiAFsu0jEHpl05SL85gZVqqg33uzhZHZ25Q/kH7Tf4WngYP1OFa7aXl5I2GE/2GYDQKzxRE0wbo25AgtBbm32AX5S9ZKjJeiJHbzu6Dm8j3uK/kbrsDyFi3Jbkk+uZNthhJepvG2GiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ScwgviME; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1714746625; c=relaxed/simple;
+	bh=MSikU1PMU+V/QUKyzwiiAw75Wriw2mH41FxPmVsZA6Q=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=jxKhPt178lnD4sPhwD0u11OSaJJCFvFNnVwpIHXMZyNOfbt/7B0ijgs3LLIAksqNjPYueE15WzXyd4phKJ195QDO3Yo/dkaKGEmeoLbJwzMqcJK95FhwPheblIPU+oFHXXTkEi9slP/znFZIba+j/mPWiDMQRJT3AeyI/u/5M1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Zs879OEi; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ScwgviME"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1714741291; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=EPeFenupyrKpMSg+17T/sYHi2YONSaQ4xhAfluC20hU=;
-	b=ScwgviMETjcDXq7tAFJLALvgA50JAjbCWpZVT6WdTQm4UPlx2dr6DOQZ9l/FvVEvIqOU0GjO9NQiIbdQEb2lsM+PDJnMnobC9kuUF05DzFUNE5neqXwxr9erwxipjfR0j/rNAfwtSwaR07QbZ3gk/qFUVLwrviCKZTNBUnUDouY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W5kRlML_1714741289;
-Received: from 192.168.2.4(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0W5kRlML_1714741289)
-          by smtp.aliyun-inc.com;
-          Fri, 03 May 2024 21:01:30 +0800
-Message-ID: <afe72011-e6d7-4ce6-9157-2d4a998b730f@linux.alibaba.com>
-Date: Fri, 3 May 2024 21:01:25 +0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Zs879OEi"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-7da55194b31so80707239f.3
+        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 07:30:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714746620; x=1715351420; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u75/tE/E9Lgr5AsxzWrQ/IQ9yZAKTRq3TVG8b1s6jiA=;
+        b=Zs879OEiMhuFioF44eCMTLADEBDD3jyk9v/ZgXEQSSpt4WXjOY7CNOlzsOdavvW8D9
+         SKBrZSXW+7PUl8RULWTQVUqR7eYyhN/7xDJlbYSTtyW9+8c6knr2DKRiY1HUhr3zms+6
+         3vtd7OFwTe3o/GfZGbGUd5xpAq5Vfm35B3Ffpp9Kv3QsQHpla9GIySwwPQk0ivb4iERt
+         qPEB5Egg9fnqdHH88KHGe4uFSL9wpJgjaaXjUfovZamzIoJU8JyNNXOicJI2gmgBqOhc
+         kceT+1Y8c76VOnao0lJ3G+UHsmpk8i00BmiY9kokRoHFPDprn2oGzdKl6qrEX/A0In/F
+         7Wwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714746620; x=1715351420;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=u75/tE/E9Lgr5AsxzWrQ/IQ9yZAKTRq3TVG8b1s6jiA=;
+        b=IOepVi4L23Ui7oKR85ptAxkl/GnUWEnF5srvjQfEqHqv7KXZ2/P8ooVdfpC1vkVVdz
+         p406UXfMpkVLJD389cTd4qjRHgfhvu91I7xhqArQ9UdIo79kJPOU5FnwJ3VFDFCSDgK0
+         Qwm+IK6HOXJdnP6AG42Ve7vEHbsdztbXY392edG4xW+rlwq9M21bmjFK+OL6autYGpf+
+         SgTnW9jJe+OBmIPwcu9R9lFOeADyjYxtblheGBxnbr39nBdJhngPKaMBE4PxW8Qcbn9o
+         MWFXptkVUsRiRlWdBoLUc2upbd8/O1/LXcMnS/GcW9VXKMg3TjJ6ZBem0Kh/FadMRZIR
+         8v3Q==
+X-Gm-Message-State: AOJu0YzQOSbDs5qwjDICtq//90ptVdSY8ciUW0aeaK+diupg3ap1M75V
+	Ey7TH0KDLLCXvD388LCWngGowf6S3pHWdqfmA9TZB5gXs94YtiSweCEocWD7eDj9900YLgD2+Y+
+	l
+X-Google-Smtp-Source: AGHT+IFkfRR/Y+SAz9cAdr4v/fRIcQnThKtoRN/vBSJUuAgAMD/z/ezBRLwb94Fj9xcy3spHEr/bDQ==
+X-Received: by 2002:a05:6602:2557:b0:7dd:88df:b673 with SMTP id cg23-20020a056602255700b007dd88dfb673mr3125414iob.0.1714746619947;
+        Fri, 03 May 2024 07:30:19 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id dm2-20020a0566384c0200b00488101433ddsm811877jab.111.2024.05.03.07.30.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 May 2024 07:30:19 -0700 (PDT)
+Message-ID: <442223dc-d734-4c8e-abf8-1e89e92eb1ec@kernel.dk>
+Date: Fri, 3 May 2024 08:30:18 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,87 +60,75 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] z_erofs_pcluster_begin(): don't bother with rounding
- position down
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
- brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- yukuai3@huawei.com
-References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
- <20240406090930.2252838-9-yukuai1@huaweicloud.com>
- <20240407040531.GA1791215@ZenIV>
- <a660a238-2b7e-423f-b5aa-6f5777259f4d@linux.alibaba.com>
- <20240425195641.GJ2118490@ZenIV> <20240425200017.GF1031757@ZenIV>
- <7ba8c1a3-be59-4a2f-b88a-23b6ab23e1c8@linux.alibaba.com>
- <20240503041542.GV2118490@ZenIV>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <20240503041542.GV2118490@ZenIV>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.9-rc7
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+Hi Linus,
+
+Nothing major in here - an nvme pull request with mostly auth/tcp fixes,
+and a single fix for ublk not setting segment count and size limits.
+
+Please pull!
 
 
-On 2024/5/3 12:15, Al Viro wrote:
-> On Fri, Apr 26, 2024 at 01:32:04PM +0800, Gao Xiang wrote:
->> Hi Al,
-> 
->> This patch caused some corrupted failure, since
->> here erofs_read_metabuf() is EROFS_NO_KMAP and
->> it's no needed to get a maped-address since only
->> a page reference is needed.
->>
->>>    		if (IS_ERR(mptr)) {
->>>    			ret = PTR_ERR(mptr);
->>>    			erofs_err(sb, "failed to get inline data %d", ret);
->>> @@ -876,7 +876,7 @@ static int z_erofs_pcluster_begin(struct z_erofs_decompress_frontend *fe)
->>>    		}
->>>    		get_page(map->buf.page);
->>>    		WRITE_ONCE(fe->pcl->compressed_bvecs[0].page, map->buf.page);
->>> -		fe->pcl->pageofs_in = map->m_pa & ~PAGE_MASK;
->>> +		fe->pcl->pageofs_in = offset_in_page(mptr);
->>
->> So it's unnecessary to change this line IMHO.
-> 
-> *nod*
-> 
-> thanks for catching that.
-> 
->> BTW, would you mind routing this series through erofs tree
->> with other erofs patches for -next (as long as this series
->> isn't twisted with vfs and block stuffs...)?  Since I may
->> need to test more to ensure they don't break anything and
->> could fix them immediately by hand...
-> 
-> FWIW, my immediate interest here is the first couple of patches.
+The following changes since commit 01bc4fda9ea0a6b52f12326486f07a4910666cf6:
 
-Yes, the first two patches are fine by me, you could submit
-directly.
+  blk-iocost: do not WARN if iocg was already offlined (2024-04-19 08:06:24 -0600)
 
-> 
-> How about the following variant:
-> 
-> #misc.erofs (the first two commits) is put into never-rebased mode;
-> you pull it into your tree and do whatever's convenient with the rest.
-> I merge the same branch into block_device work; that way it doesn't
-> cause conflicts whatever else happens in our trees.
-> 
-> Are you OK with that?  At the moment I have
-> ; git shortlog v6.9-rc2^..misc.erofs
-> Al Viro (2):
->        erofs: switch erofs_bread() to passing offset instead of block number
->        erofs_buf: store address_space instead of inode
-> 
-> Linus Torvalds (1):
->        Linux 6.9-rc2
-> 
-> IOW, it's those two commits, based at -rc2.  I can rebase that to other
-> starting point if that'd be more convenient for you.
+are available in the Git repository at:
 
-Yeah, thanks for that.  I think I will submit two pull requests for
-the next cycle, and I will send the second pull request after your
-vfs work is landed upstream and it will include the remaining
-patches you sent (a bit off this week since we're on holiday here).
+  git://git.kernel.dk/linux.git tags/block-6.9-20240503
 
-Thanks,
-Gao Xiang
+for you to fetch changes up to fb15ffd06115047689d05897510b423f9d144461:
+
+  Merge commit '50abcc179e0c9ca667feb223b26ea406d5c4c556' of git://git.infradead.org/nvme into block-6.9 (2024-05-02 07:22:51 -0600)
+
+----------------------------------------------------------------
+block-6.9-20240503
+
+----------------------------------------------------------------
+Hannes Reinecke (1):
+      nvme-tcp: strict pdu pacing to avoid send stalls on TLS
+
+Jens Axboe (1):
+      Merge commit '50abcc179e0c9ca667feb223b26ea406d5c4c556' of git://git.infradead.org/nvme into block-6.9
+
+Maurizio Lombardi (2):
+      nvmet-auth: return the error code to the nvmet_auth_host_hash() callers
+      nvmet-auth: replace pr_debug() with pr_err() to report an error.
+
+Nilay Shroff (2):
+      nvme: find numa distance only if controller has valid numa id
+      nvme: cancel pending I/O if nvme controller is in terminal state
+
+Sagi Grimberg (2):
+      nvmet-tcp: fix possible memory leak when tearing down a controller
+      nvmet: fix nvme status code when namespace is disabled
+
+Uday Shankar (1):
+      ublk: remove segment count and size limits
+
+Yi Zhang (1):
+      nvme: fix warn output about shared namespaces without CONFIG_NVME_MULTIPATH
+
+ drivers/block/ublk_drv.c       |  3 ++-
+ drivers/nvme/host/core.c       | 23 +----------------------
+ drivers/nvme/host/multipath.c  |  3 ++-
+ drivers/nvme/host/nvme.h       | 21 +++++++++++++++++++++
+ drivers/nvme/host/pci.c        |  8 +++++++-
+ drivers/nvme/host/tcp.c        | 10 ++++++++--
+ drivers/nvme/target/auth.c     |  8 ++++----
+ drivers/nvme/target/configfs.c | 13 +++++++++++++
+ drivers/nvme/target/core.c     |  5 ++++-
+ drivers/nvme/target/nvmet.h    |  1 +
+ drivers/nvme/target/tcp.c      | 11 ++++-------
+ 11 files changed, 67 insertions(+), 39 deletions(-)
+
+-- 
+Jens Axboe
+
