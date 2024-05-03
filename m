@@ -1,145 +1,109 @@
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE6B1BF47;
-	Fri,  3 May 2024 03:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC16282E5;
+	Fri,  3 May 2024 04:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714706623; cv=none; b=WDc9kHTWVAiW1FqimQafXhx5YSku8Dihx/9i/SB8jvyIXnKB+S4SY8fW4XwPcdKFSQTMooBRwm7ZEex0DGVXRtJoNzYIQUbU11SNBsA3XmkOyK/wM2z5lf+RGgse3rU9IeuXWk+003BAGEYgwCsG4f0OCDtX0b+0+jVQtJjE3T8=
+	t=1714709760; cv=none; b=AOvbwGigY5My+r9leqe0Hx5XZsMqs9Az+NTPM8HXhC5kDDGV1ae8ucf5qQxHZZjDcRpGh7J8cUn2YSb4O1ObWXy2J29dsd9ZvBi6fSTfRynZ2Yz5fFJFGXzxuJWulf0z795J8yzmkZRu8s66sh0JnuBfkWaOqVQpECIga0bQ6Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714706623; c=relaxed/simple;
-	bh=Ny/piFSeo/b8skljYppcXOeFUcUBl2a+DCCTPN5ciBM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gKGb6pquyVEFDnrkvlj+jdSx1Kl9zJ5FPRNRLDj9urWiLLgyA1iYetEeRXbNfs5x89CVB6KF/QTbfjF81Wjo8GNXdMs08sVLWUhDV5DrHzniR80uuUUBYqfGiZSShEo3zGnHb70gNKFyoNYK1r1qXQ4R146asMXaMlLMIol90yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=Cq8g5eR7; arc=none smtp.client-ip=62.89.141.173
+	s=arc-20240116; t=1714709760; c=relaxed/simple;
+	bh=JHozc1lJLorkZUnXT/A9NtPj/VKyF38FLBswt3L8pdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GyRyfy+jIcHNZC4iHAdlapFZgGL558YA5+nHcJWiNjm4wg/l2nriacUhRFG2XyA5bNlJfYbQ2F4PxYQjpTBxwQ91vbdqs+Vhc27yo+loscotSUzRcl0/szR34RvH7SUFwLYHP7nAkrH4sWIpCbBxY05W0axnJR/ZOYx9OevIRL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=NBx+4+Ox; arc=none smtp.client-ip=62.89.141.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="Cq8g5eR7"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="NBx+4+Ox"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=93pWwp0Zz5qYrYHUR6o6Sk8WkFP1Q/YOlDatYiLWcaw=; b=Cq8g5eR7johzHILI0qWZufmuF0
-	sfNlpGtOrp8JpgmQjrBpRpi6jTP0aGXQDUkE8OkIBYCUzAG4gPCE7/LaQqr4a5mVRTg78I2xRt4Er
-	4MBYRguwXyobe35JYEfG3zIIru//QRvnh7/g5xXUF+KSoozVarsYbmHDQy3DO1vRf1UPu0TPT3/3P
-	m8k9lyf356v8bOAk21a9B1i+bp+tdLc/P/YsoXxagd7TTwwGvd929rkypmxabv3ZFVqyE5YL7Pnw1
-	u+aTkeroVrquF41Ujo4ktwmF8e67D+wQ+ojacHfhYmqb5lFQSEAYpKIWp6tOfHl0gByVDQycbo6Au
-	q/44jmQA==;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=KYL496NDtJ3Cfi5LpjPPAG/fu2r2wgakNsf4z3OY2l0=; b=NBx+4+Ox6BbjuUU9X4O948ttH5
+	Bp7V+35CAqOGkTMymDBLcUezlMleSWCFMg/e3lOE9RqqE6pwO0fm6EPNb+/Gu0wRBhLCWtYqCnTa2
+	j6TaTJkdZy725KkbSdwNJ5u5STrUuQq7lurmOJOBSQ989+03Y4y8CKCiIbB1lIMZQj8h+MnZtjaC4
+	Bzo8MLJ3tKKYK+7YZ69+NJoOEGH+RpIe576KtNgblc9iOwczkBPDKJRv6dK1+3RUyDs7H0D2g/Zcv
+	wuZ6Yjfe+JjBkcXDhseCilBXr33F2dANxwLJSVdmeWED6yUfZrSoONxU36Gfq5J3Co4ohjJvy+lgk
+	g6uORDYg==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1s2jWE-00A2Vu-0S;
-	Fri, 03 May 2024 03:23:30 +0000
+	id 1s2kKk-00A5MU-0F;
+	Fri, 03 May 2024 04:15:42 +0000
+Date: Fri, 3 May 2024 05:15:42 +0100
 From: Al Viro <viro@zeniv.linux.org.uk>
-To: linux-fsdevel@vger.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-btrfs@vger.kernel.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v2 3/9] swapon(2)/swapoff(2): don't bother with block size
-Date: Fri,  3 May 2024 04:23:23 +0100
-Message-Id: <20240503032329.2392931-3-viro@zeniv.linux.org.uk>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240503032329.2392931-1-viro@zeniv.linux.org.uk>
-References: <20240503031833.GU2118490@ZenIV>
- <20240503032329.2392931-1-viro@zeniv.linux.org.uk>
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@lst.de,
+	brauner@kernel.org, axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, yukuai3@huawei.com
+Subject: Re: [PATCH 6/6] z_erofs_pcluster_begin(): don't bother with rounding
+ position down
+Message-ID: <20240503041542.GV2118490@ZenIV>
+References: <20240406090930.2252838-1-yukuai1@huaweicloud.com>
+ <20240406090930.2252838-9-yukuai1@huaweicloud.com>
+ <20240407040531.GA1791215@ZenIV>
+ <a660a238-2b7e-423f-b5aa-6f5777259f4d@linux.alibaba.com>
+ <20240425195641.GJ2118490@ZenIV>
+ <20240425200017.GF1031757@ZenIV>
+ <7ba8c1a3-be59-4a2f-b88a-23b6ab23e1c8@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7ba8c1a3-be59-4a2f-b88a-23b6ab23e1c8@linux.alibaba.com>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 
-once upon a time that used to matter; these days we do swap IO for
-swap devices at the level that doesn't give a damn about block size,
-buffer_head or anything of that sort - just attach the page to
-bio, set the location and size (the latter to PAGE_SIZE) and feed
-into queue.
+On Fri, Apr 26, 2024 at 01:32:04PM +0800, Gao Xiang wrote:
+> Hi Al,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
- include/linux/swap.h |  1 -
- mm/swapfile.c        | 12 +-----------
- 2 files changed, 1 insertion(+), 12 deletions(-)
+> This patch caused some corrupted failure, since
+> here erofs_read_metabuf() is EROFS_NO_KMAP and
+> it's no needed to get a maped-address since only
+> a page reference is needed.
+> 
+> >   		if (IS_ERR(mptr)) {
+> >   			ret = PTR_ERR(mptr);
+> >   			erofs_err(sb, "failed to get inline data %d", ret);
+> > @@ -876,7 +876,7 @@ static int z_erofs_pcluster_begin(struct z_erofs_decompress_frontend *fe)
+> >   		}
+> >   		get_page(map->buf.page);
+> >   		WRITE_ONCE(fe->pcl->compressed_bvecs[0].page, map->buf.page);
+> > -		fe->pcl->pageofs_in = map->m_pa & ~PAGE_MASK;
+> > +		fe->pcl->pageofs_in = offset_in_page(mptr);
+> 
+> So it's unnecessary to change this line IMHO.
 
-diff --git a/include/linux/swap.h b/include/linux/swap.h
-index f53d608daa01..a5b640cca459 100644
---- a/include/linux/swap.h
-+++ b/include/linux/swap.h
-@@ -301,7 +301,6 @@ struct swap_info_struct {
- 	struct file *bdev_file;		/* open handle of the bdev */
- 	struct block_device *bdev;	/* swap device or bdev of swap file */
- 	struct file *swap_file;		/* seldom referenced */
--	unsigned int old_block_size;	/* seldom referenced */
- 	struct completion comp;		/* seldom referenced */
- 	spinlock_t lock;		/*
- 					 * protect map scan related fields like
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 4919423cce76..304f74d039f3 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -2417,7 +2417,6 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
- 	struct inode *inode;
- 	struct filename *pathname;
- 	int err, found = 0;
--	unsigned int old_block_size;
- 
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EPERM;
-@@ -2529,7 +2528,6 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
- 	}
- 
- 	swap_file = p->swap_file;
--	old_block_size = p->old_block_size;
- 	p->swap_file = NULL;
- 	p->max = 0;
- 	swap_map = p->swap_map;
-@@ -2553,7 +2551,6 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
- 
- 	inode = mapping->host;
- 	if (p->bdev_file) {
--		set_blocksize(p->bdev, old_block_size);
- 		fput(p->bdev_file);
- 		p->bdev_file = NULL;
- 	}
-@@ -2782,21 +2779,15 @@ static struct swap_info_struct *alloc_swap_info(void)
- 
- static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
- {
--	int error;
--
- 	if (S_ISBLK(inode->i_mode)) {
- 		p->bdev_file = bdev_file_open_by_dev(inode->i_rdev,
- 				BLK_OPEN_READ | BLK_OPEN_WRITE, p, NULL);
- 		if (IS_ERR(p->bdev_file)) {
--			error = PTR_ERR(p->bdev_file);
-+			int error = PTR_ERR(p->bdev_file);
- 			p->bdev_file = NULL;
- 			return error;
- 		}
- 		p->bdev = file_bdev(p->bdev_file);
--		p->old_block_size = block_size(p->bdev);
--		error = set_blocksize(p->bdev, PAGE_SIZE);
--		if (error < 0)
--			return error;
- 		/*
- 		 * Zoned block devices contain zones that have a sequential
- 		 * write only restriction.  Hence zoned block devices are not
-@@ -3235,7 +3226,6 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
- 	free_percpu(p->cluster_next_cpu);
- 	p->cluster_next_cpu = NULL;
- 	if (p->bdev_file) {
--		set_blocksize(p->bdev, p->old_block_size);
- 		fput(p->bdev_file);
- 		p->bdev_file = NULL;
- 	}
--- 
-2.39.2
+*nod*
 
+thanks for catching that.
+
+> BTW, would you mind routing this series through erofs tree
+> with other erofs patches for -next (as long as this series
+> isn't twisted with vfs and block stuffs...)?  Since I may
+> need to test more to ensure they don't break anything and
+> could fix them immediately by hand...
+
+FWIW, my immediate interest here is the first couple of patches.
+
+How about the following variant:
+
+#misc.erofs (the first two commits) is put into never-rebased mode;
+you pull it into your tree and do whatever's convenient with the rest.
+I merge the same branch into block_device work; that way it doesn't
+cause conflicts whatever else happens in our trees.
+
+Are you OK with that?  At the moment I have
+; git shortlog v6.9-rc2^..misc.erofs 
+Al Viro (2):
+      erofs: switch erofs_bread() to passing offset instead of block number
+      erofs_buf: store address_space instead of inode
+
+Linus Torvalds (1):
+      Linux 6.9-rc2
+
+IOW, it's those two commits, based at -rc2.  I can rebase that to other
+starting point if that'd be more convenient for you.
