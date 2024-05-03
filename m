@@ -1,138 +1,148 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA37146A63;
-	Fri,  3 May 2024 07:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C09512B89
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 07:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714722562; cv=none; b=kXZBrMCYA8XL/7C8EpGCnUddlekVwsZ8hCw/EVlAAwodzAkfwJYNiDFSWc+t92WzBCjuToTdlAtvs1FAxZQ1WZZSSRk6vX9WmFC7yyN++byiZRzeWZ2nB4b7sqZc89oqyGqwtrNBtSLoAo1kiAhICujaH4kEm2cN29A10Qcnh1Q=
+	t=1714723195; cv=none; b=W5WKKqlwF3E+Sr03l21nn9FhlkWp6eZPHVUvk/4f80VQsmt1WHK5qhTmzMx4SEc2blOm1eYWk1/iIIiErzL3ahN0Oiasuya+7MiYEOYWWTGCIx7d2MI1te+f547/nD9uc8XSXcACllKkXcGqmgMZZ+jeN+ry3hpkHXAbYNfUxR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714722562; c=relaxed/simple;
-	bh=4QF8U70AN9B9tTKvuL5gDNX37P8EgEKiUun+MstwZHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gZKwS+WzKXeGgYbJK1x8/8soYan04Z6br9RQd5Zv9fRlF+L5XY+AdI5+QxmzryCrtPzgsiZBNt1iu222gblv9QwR6NwkW5N5S0HSak7NBriB+WBjeGrEWAOGClZS/ZzG0n0dX1SP947hZijVzvi88x/vjtJr/kr0YV5e+leepRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MoeVTlqx; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1714723195; c=relaxed/simple;
+	bh=L1iDuclfPlzUe9phzEjoL8oef5jE5ZPehMnRq3fx+eM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AH4TCztb8iWiOEFj8UX+BjumzIxWP42xp+4fzwlrovnEFv6vVv22vFAzas0oAQdXLln95D0+97YbEdqDjwmjSFt3uG/Pn2q12gSP/VQzxNnMPzojjlJOxllkXkAI8iW3m7QvTMbu77KBopPByQYtooKzqFslsOJRXcIhIzKTKNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MoeVTlqx"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-5ce07cf1e5dso6299671a12.2;
-        Fri, 03 May 2024 00:49:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714722560; x=1715327360; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kApy9Rzo6wQrZI2czzyA0vwJXbNC/JWyyMd3bdTRDF8=;
-        b=MoeVTlqxpTOd1t2BtEiLraVmeSid7QbGLI+f7TX4n2TZNO1xJPnTAhrppc7HXU26xr
-         XB5s4BjkcUUA6ZmCrISfYSyK/VdHBMQJI8sI/LYtjDyOP8ofMqHyeUEqtpGUcSo5LAfp
-         Oa05CVB+7HlReY3PbOY4vupO8i4yXnOnz3KapJiPiMfhp+jvn+RFBDgPYsCq3K0ewYOW
-         GQ4ANJXn0vJka/dEluF/k7i8L1jZCO9QeGNFSi1u8ouQoR7WMSyIq7UhpDkI5oF/A9vr
-         1gcb0u36jTFaY6Y7Dw6QEjLZZmQgQPsztZSumW6K4Y0ZmsFkjhMzrFIAQSJIJSmkv79N
-         DPPw==
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4190c2ec557so6114335e9.0
+        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 00:59:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714722560; x=1715327360;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kApy9Rzo6wQrZI2czzyA0vwJXbNC/JWyyMd3bdTRDF8=;
-        b=ppr8pOjRvkMIEPnQIhxXMl3nUnE0lFMMHwamm5wTpBBl8ig69gvOVPFobl34dB1BCn
-         2RJ2AE7685s6Bt+e8ueB+BzJfaGJE0ys9ABrGWy50sT8i9y4PvHyCxDO2TosCTH2/vmf
-         AhFuedMKo24RrCFkmUO8rmtJtGtrj5zXvVhTxIkcNNA8VLufFb3lGAYDu6ALMplemgs5
-         Moc050/y+OYUXJ8nix/BKOQiRLTb8I6jdw+pk7YsYF3yJj/lRAAZTPytcKbty+XD/QTL
-         acVt0qIt6OrRzU4/XZe9p3ZdPu3PUVliiG0K14VOzkPvmFw5oHEka7Uc4Muu6sMz7Aj2
-         XXKg==
-X-Forwarded-Encrypted: i=1; AJvYcCX+eQLAZlRMqAsx3QB4IOq6Rs0YIu+gIAehZovHr7LJFunqlxjq2v7KGeq6W9m5Zft5sFp0WaoPTW6MR1MOeXO7bnI5J8W/MPJE4ADT
-X-Gm-Message-State: AOJu0Yypot9/uXjkY1jOmk2TxkC5OnTPCU9WviPfQVEKpZcbibIulpmo
-	UXUrCyS2EABT2TqBCeDzrHlM1hqULuW0ZWtiQ8o5rK4EcW5/vvuGIoLuR8Hh
-X-Google-Smtp-Source: AGHT+IGtp3Ug6ioWBn98+IKRWbb60loiywGfib6DuJbYFoD3t72QiSlJGqtgbNz8Ssx/fMzxzewuUA==
-X-Received: by 2002:a05:6a20:a122:b0:1af:6a37:3cfd with SMTP id q34-20020a056a20a12200b001af6a373cfdmr2430354pzk.24.1714722559798;
-        Fri, 03 May 2024 00:49:19 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([104.28.245.200])
-        by smtp.gmail.com with ESMTPSA id y14-20020a17090322ce00b001e3d2314f3csm2609836plg.141.2024.05.03.00.49.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 00:49:19 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Xu Panda <xu.panda@zte.com.cn>,
-	Justin Stitt <justinstitt@google.com>,
-	Yang Yang <yang.yang29@zte.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: fix buf size for strscpy()
-Date: Fri,  3 May 2024 15:48:37 +0800
-Message-ID: <20240503074845.12181-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1714723192; x=1715327992;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OzYmbhpRbl8QiRO48tGkM6UvfO30LUVMTm33iagZ46k=;
+        b=X/assQj2KEzA7oEqoeaI/0PvMzsAGj2sXyQJSKmvA8DHfnHV+aI2/SrwUowXj7uFH6
+         u5MTzF2pUzTJQyJcaqJGtQ8D4IuImSmXDLsDMRUY2fTQKWm0E8c8yEKs0dspejIgQNda
+         o+zyvf/8j/D+3ELrXH9Kf8dvZK7aAaO4heu80/rIOV5MBPkw1CgDZBuClxXEPgCdpOcB
+         NJWo/tXGDYRWTpM8XC/aNGF1sNidgyJ3nA46tLSKa29P0Fj7uAOI/XGZG182IhLuWMLx
+         B0zsMWmIhVKJiMcgFRqY0GBuyava8OO+EbiLxvh+c+p9wZPh6Lto1IjmqK3dZPqkxrFh
+         sCVw==
+X-Forwarded-Encrypted: i=1; AJvYcCWt4scpECp8WLWeRALfyXcXvFIjqHEsvMnvIpXNRKeiY98stN2jzUhXTm3HRSB2MV6HcxiFzsNbIISlJo2D/sjRLKSVZXrix+H8v4A=
+X-Gm-Message-State: AOJu0Yz/ei1Z+19BFhjgAy7oQq3iw2YYPq71RozB3+p9XwjAle1Uo+vc
+	xwTMGP2dXGWB20mb3jZ7JxAHEqmJs078NRU9J1NrTo1hi/awJTQK
+X-Google-Smtp-Source: AGHT+IEx8ztqNh3d+bvC/lJPjNz2UsSvUo822Jks9MB10ZCj9tUirEjrifZ1NC+7rP/e2rF1SUTyoQ==
+X-Received: by 2002:a5d:6586:0:b0:346:7f4d:e80f with SMTP id q6-20020a5d6586000000b003467f4de80fmr1514381wru.1.1714723192514;
+        Fri, 03 May 2024 00:59:52 -0700 (PDT)
+Received: from [10.100.102.67] (85.65.192.64.dynamic.barak-online.net. [85.65.192.64])
+        by smtp.gmail.com with ESMTPSA id a10-20020a5d53ca000000b0034a710b6360sm3141726wrw.6.2024.05.03.00.59.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 May 2024 00:59:52 -0700 (PDT)
+Message-ID: <e229f273-e3ec-489c-bf89-0f985212c415@grimberg.me>
+Date: Fri, 3 May 2024 10:59:50 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] RIP: 0010:blk_flush_complete_seq+0x450/0x1060
+ observed during blktests nvme/tcp nvme/012
+To: Yi Zhang <yi.zhang@redhat.com>,
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ Damien Le Moal <dlemoal@kernel.org>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ linux-block <linux-block@vger.kernel.org>,
+ "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+References: <CAHj4cs8X31NnOWGVLniT5OWBRtEphxw-AcYrPaygG_uYaoeENQ@mail.gmail.com>
+ <dcc6150c-d632-4b14-9b0d-1b3b45fb5c24@wdc.com>
+ <aded9da3-347a-4268-8190-6f39692ea8ee@nvidia.com>
+ <25fd1c08-fe6a-48dc-874e-464b2b0e12e5@wdc.com>
+ <CAHj4cs-h7Fi+G_aQiv-q4+ea4uki8Yiw6AHpWdZvaazg11Gd9Q@mail.gmail.com>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <CAHj4cs-h7Fi+G_aQiv-q4+ea4uki8Yiw6AHpWdZvaazg11Gd9Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-strscpy() takes the total size of destination buffer as the argument,
-including the space for the terminating null character.
 
-The actual length of the buffer should be len(str) + 1, which can be
-seen from the indexes where null characters are written in the code
-before the commit in question, and 'sizeof(buf) - 1' right above
-the problematic codes.
 
-Without the additional 1 size and the absence of checkes against -E2BIG,
-strscpy() will angrily eat the last character of the source string. In
-my situation, strscpy() will take away one character before the comma
-"," (which is presumably the right bracket ")") in parse_parts(), making
-parse_subpart() unable to 'strchr(++partdef, ')')' and producing the
-following error message:
+On 4/30/24 17:17, Yi Zhang wrote:
+> On Tue, Apr 30, 2024 at 2:17 PM Johannes Thumshirn
+> <Johannes.Thumshirn@wdc.com> wrote:
+>> On 30.04.24 00:18, Chaitanya Kulkarni wrote:
+>>> On 4/29/24 07:35, Johannes Thumshirn wrote:
+>>>> On 23.04.24 15:18, Yi Zhang wrote:
+>>>>> Hi
+>>>>> I found this issue on the latest linux-block/for-next by blktests
+>>>>> nvme/tcp nvme/012, please help check it and let me know if you need
+>>>>> any info/testing for it, thanks.
+>>>>>
+>>>>> [ 1873.394323] run blktests nvme/012 at 2024-04-23 04:13:47
+>>>>> [ 1873.761900] loop0: detected capacity change from 0 to 2097152
+>>>>> [ 1873.846926] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>>>> [ 1873.987806] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+>>>>> [ 1874.208883] nvmet: creating nvm controller 1 for subsystem
+>>>>> blktests-subsystem-1 for NQN
+>>>>> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+>>>>> [ 1874.243423] nvme nvme0: creating 48 I/O queues.
+>>>>> [ 1874.362383] nvme nvme0: mapped 48/0/0 default/read/poll queues.
+>>>>> [ 1874.517677] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr
+>>>>> 127.0.0.1:4420, hostnqn:
+>>>>> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+>>> [...]
+>>>
+>>>>> [  326.827260] run blktests nvme/012 at 2024-04-29 16:28:31
+>>>>> [  327.475957] loop0: detected capacity change from 0 to 2097152
+>>>>> [  327.538987] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>>>>
+>>>>> [  327.603405] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+>>>>>
+>>>>>
+>>>>> [  327.872343] nvmet: creating nvm controller 1 for subsystem
+>>>>> blktests-subsystem-1 for NQN
+>>>>> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+>>>>>
+>>>>> [  327.877120] nvme nvme0: Please enable CONFIG_NVME_MULTIPATH for full
+>>>>> support of multi-port devices.
+>>> seems like you don't have multipath enabled that is one difference
+>>> I can see in above log posted by Yi, and your log.
+>>
+>> Yup, but even with multipath enabled I can't get the bug to trigger :(
+> It's not one 100% reproduced issue, I tried on my another server and
+> it cannot be reproduced.
 
-  cmdline partition format is invalid.
+Looking at the trace, I think I can see the issue here. In the test 
+case, nvme-mpath fails
+the request upon submission as the queue is not live, and because it is 
+a mpath request, it
+is failed over using nvme_failover_request, which steals the bios from 
+the request to its private
+requeue list.
 
-Fixes: 146afeb235cc ("block: use strscpy() to instead of strncpy()")
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- block/partitions/cmdline.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+The bisected patch, introduces req->bio dereference to a flush request 
+that has no bios (stolen
+by the failover sequence). The reproduction seems to be related to in 
+where in the flush sequence
+the request completion is called.
 
-diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-index c03bc105e575..6d8401ce2943 100644
---- a/block/partitions/cmdline.c
-+++ b/block/partitions/cmdline.c
-@@ -81,7 +81,7 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
- 
- 		length = min_t(int, next - partdef,
- 			       sizeof(new_subpart->name) - 1);
--		strscpy(new_subpart->name, partdef, length);
-+		strscpy(new_subpart->name, partdef, length + 1);
- 
- 		partdef = ++next;
- 	} else
-@@ -139,7 +139,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
- 	}
- 
- 	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
--	strscpy(newparts->name, bdevdef, length);
-+	strscpy(newparts->name, bdevdef, length + 1);
- 	newparts->nr_subparts = 0;
- 
- 	next_subpart = &newparts->subpart;
-@@ -151,7 +151,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
- 		length = (!next) ? (sizeof(buf) - 1) :
- 			min_t(int, next - bdevdef, sizeof(buf) - 1);
- 
--		strscpy(buf, bdevdef, length);
-+		strscpy(buf, bdevdef, length + 1);
- 
- 		ret = parse_subpart(next_subpart, buf);
- 		if (ret)
-@@ -264,7 +264,7 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
- 
- 	label_min = min_t(int, sizeof(info->volname) - 1,
- 			  sizeof(subpart->name));
--	strscpy(info->volname, subpart->name, label_min);
-+	strscpy(info->volname, subpart->name, label_min + 1);
- 
- 	snprintf(tmp, sizeof(tmp), "(%s)", info->volname);
- 	strlcat(state->pp_buf, tmp, PAGE_SIZE);
--- 
-2.43.0
+I am unsure if simply making the dereference is the correct fix or 
+not... Damien?
+--
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 2f58ae018464..c17cf8ed8113 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -130,7 +130,8 @@ static void blk_flush_restore_request(struct request 
+*rq)
+          * original @rq->bio.  Restore it.
+          */
+         rq->bio = rq->biotail;
+-       rq->__sector = rq->bio->bi_iter.bi_sector;
++       if (rq->bio)
++               rq->__sector = rq->bio->bi_iter.bi_sector;
 
+         /* make @rq a normal request */
+         rq->rq_flags &= ~RQF_FLUSH_SEQ;
+--
