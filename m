@@ -1,63 +1,64 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0595B153579
-	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 09:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E17153BD4
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 09:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714727945; cv=none; b=TTdaeDzMMJaWLMDJuJdsBLEtgGgIZJJDZ40B713sUTU5yHLrWVGPEtttRj3GrYJ3tr1RwtBQ8PbUzPw5uump1wofggFoiYb+vdz9z7yL3FvVrfefO/17VZ2zl4+i1jjFP/r0mADomm4IeYh9rxlAbJQxJOh+uaxpjum9koKr3A0=
+	t=1714727948; cv=none; b=HxByNpmx3ikxzU/dk5+xveuElfEbzjIQNBCj/z9zushs558PQ7zwdtH2C2UFCKeSTP5R1M5rzceo8caBHl9oLxC6A+QE2ogjXb1a6w9uCZygSQeQJlIJ0G19wbdANHHJLcVBeXW1NXbIhMxprPPsTTzjA0q8lLVFIVh50WRfWUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714727945; c=relaxed/simple;
-	bh=0st2HobpNox1lw9rfTM0Izpmujgy1vssbMv9Vmn3p4s=;
+	s=arc-20240116; t=1714727948; c=relaxed/simple;
+	bh=eO1aD3GYThTWX8reEG9IHaYxayASI5pIn3ZwxQRjfeY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iVbAjWz6B1L9OBg4sWKjGVsZjetHUbGHSEIIFbFA/9ZAyBRTcbH3qDOYae02dPkvUC4hpgn8uTmg0YvpEez5PcgUON0pyPT0lz344hdBmkpzA2AuSiGIFSnutVjf0Xyh+sThzMZfQBkkeWwWRzUacIJv2Dp+TLNcdY93R+j/1CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=m3ujW7ck; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=Lbdp4fIIOnelIGHqVMf8cXsz5m5ZRgjfgIuErDOQeVpGDQz9QIiOeg69mTq1BXuhOjxH9wIagNw/wzO1/A8ifSVe5+NXZsFHOEjP/eAX36Ytes97kk9yspQtCOBWM4Ro+iNJCtAq5ECUB2vf7KWsNR8lqrubEq9EdBvlJxMZISM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=IwMjDbm/; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="m3ujW7ck"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f447976de7so927426b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 02:19:04 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IwMjDbm/"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5d8b887bb0cso7255966a12.2
+        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 02:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714727943; x=1715332743; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1714727946; x=1715332746; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hkEHTBQxR1IAOMp6Di+8t+w03Mn2F1ACoLhl2VS9uYE=;
-        b=m3ujW7cky9Trd8BhZnN2Ty/1+lBol3GrzKwLLT8nG3zu1O+EsCPWk1XDQXx2RL1l/c
-         EzFFVT2k5mij/RwR78T+7xXqqouQNHiIww4KLmeHE8hGJDyemgV0cxI5AD191P3bU5QN
-         yyyxj+kg5W+9clYqJWmVEnQlO/NiMy27JgFNM=
+        bh=6NlFlAwd7AfzOKAUbFYigEp0/QoNwrE2imVLFTnbDxc=;
+        b=IwMjDbm/hX23VewTatSdy1IiTXYPJ2dKM9Q3QgfqVwsU/O3g8PvK8ZWI8KiVrQc721
+         laVvRAEBVyLUH2nsfE4143F62KA2ei35TwpB4PDhzMNn4Gl4BKf6Oj/0zMJN4azRFA2B
+         knB+MnrNF97nHgYR1Kv8sEO2QZWlZL8wnsMtw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714727943; x=1715332743;
+        d=1e100.net; s=20230601; t=1714727946; x=1715332746;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hkEHTBQxR1IAOMp6Di+8t+w03Mn2F1ACoLhl2VS9uYE=;
-        b=q3U60uXEhd/hV6iK1Xr7iKO+Vm42BO5HRYwdJwdjG3btyxV5xNV/orneXmxy8vWVlH
-         /7tSO6qHWFRRXL/sE341qoZe/b5sY3JyeSd2EQUCa/Vl640yPSB8cV/MTPYE8VWd2M5B
-         La0P1+qHEnLBXOS9W9uMtfGE/k4q6QtVDZCaRDUyW0N63+NTzWOyRFRiol+M/QbOlPsH
-         pLIgzokl2ssQNolxZzpoxEd1hwO/jBlLy7P8gSe541Rt36WG73T/XSXwh/ITWB290tTv
-         eZRSFpmQxax2CYS2C1ex+RbQ6WtaU4InI8t3ICOIVie6LRUS0/ApIgjAef/vyPx87kvJ
-         tZIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVh03O2tet8Jy3C9mv4QSCkRhVqXha21PpqAgkSqzhfu9ybE5zNx1rkla6Keib+6Lw1ZQQZotm/Sm1GgrHUUeZEb9lwwA4Wlk/DhVs=
-X-Gm-Message-State: AOJu0Yw6eZSeaT+v6WFq2/jP+glvTio7huUPJEkjf6d93m2yElHvF6A6
-	4S3sB4QZ0I67TXG1dNuo3Bf3Cfl42I29X2dipjh/fPLpblZc58rqqBQq5b0p4g==
-X-Google-Smtp-Source: AGHT+IHPfkg+X9GkqI+WL5uh/PWaBh9iygZx9qFc257y4/YG1wrDms+rR+hPW8EPaj7MxNhEKY0ihw==
-X-Received: by 2002:a05:6a00:140b:b0:6ed:332:ffbc with SMTP id l11-20020a056a00140b00b006ed0332ffbcmr2011169pfu.20.1714727943515;
-        Fri, 03 May 2024 02:19:03 -0700 (PDT)
+        bh=6NlFlAwd7AfzOKAUbFYigEp0/QoNwrE2imVLFTnbDxc=;
+        b=jnZTPBlr2lS/natzZgkXH3zvTycdLlbej4QYpHQp3XjjwbkSwiQDUV7Pn4zAlCn+qF
+         /e2UQ9Jrv3AST2cVEDnmXuuT0qW8pytaLzBUNWowQMPwoQ8InBWBwMqtdamLq2S034Z+
+         wjkbt42xVHCqQY/rk/sC6gXnWC+qYbzND7ar1hLie6tvGj0JgQRVBlfHSCWVq4N1YttZ
+         5WSw330/oaJiyG9C31/0eSV7to5fl4qxhKqc0PZ075nJXrlhuL4+epTw2beWRUpiNJSl
+         DOQdg0Go7uD7AiMJu2f+vpSS247NAEMREXVD3+Y8LLH/hcQPNa/U18YZFUmwJgS0tDR/
+         0nlg==
+X-Forwarded-Encrypted: i=1; AJvYcCWUnV1B4F7ynUutdv4bLrYtM5PnD0og6blLktFdeZTR8Q60qUS6o4P+v+OjfHRRV3CjVnOjh2N9jhJ6J93nwheqkdtF3RCXPpd/pxw=
+X-Gm-Message-State: AOJu0YyvENHq3Uc9qiaMLgWs2fs3w4aQ0cLEbsT3n+A5EZkZLjNRndu2
+	AMxNL4udMM+lgUAcPJMs7DVhS5BZ76JpzOixlx4s3v5dCirBIYwKyyf9pXZTAJo5LRMfIQOHIVE
+	=
+X-Google-Smtp-Source: AGHT+IEss/I5uy/yYKBxcXXnNraFRQZ56Afeli3+NlY5upIAcfp/ukWooVoWmDX0bG0NTr8rjslCnA==
+X-Received: by 2002:a05:6300:8089:b0:1a7:3d2a:7383 with SMTP id ap9-20020a056300808900b001a73d2a7383mr2348105pzc.18.1714727946298;
+        Fri, 03 May 2024 02:19:06 -0700 (PDT)
 Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:dc60:24a3:e365:f27c])
-        by smtp.gmail.com with ESMTPSA id j6-20020aa78d06000000b006ecec1f4b08sm2621938pfe.118.2024.05.03.02.19.02
+        by smtp.gmail.com with ESMTPSA id j6-20020aa78d06000000b006ecec1f4b08sm2621938pfe.118.2024.05.03.02.19.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 02:19:03 -0700 (PDT)
+        Fri, 03 May 2024 02:19:06 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Minchan Kim <minchan@kernel.org>
 Cc: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH 12/14] zram: add support for dict comp config
-Date: Fri,  3 May 2024 18:17:37 +0900
-Message-ID: <20240503091823.3616962-13-senozhatsky@chromium.org>
+Subject: [PATCH 13/14] zram: add dictionary support to zstd backend
+Date: Fri,  3 May 2024 18:17:38 +0900
+Message-ID: <20240503091823.3616962-14-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 In-Reply-To: <20240503091823.3616962-1-senozhatsky@chromium.org>
 References: <20240503091823.3616962-1-senozhatsky@chromium.org>
@@ -69,110 +70,194 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Handle dict=path param so that we can read a pre-trained
-compression algorithm dictionary which we then pass to the
-backend configuration.
+This adds support for pre-trained zstd dictionaries [1]
+Dictionary is loaded once (per-config) and then loaded to Cctx
+and Dctx by reference, so we don't allocate extra memory.
+
+The patch is a little non-trivial, as it seems that noone
+ever attempted to use dictionaries in the linux kernel
+port of zstd.
+
+It also uses GFP_KERNEL gfp in Cctx customAlloc(). We probably
+would want to do something about it. Either make sure that we
+always (somehow) fully setup all Cctx contexts from non-atomic
+context before we attempt to use them, come up with some sort
+of custom allocator or stop calling zcomp_compress() from atomic
+context.
+
+[1] https://github.com/facebook/zstd/blob/dev/programs/zstd.1.md#dictionary-builder
 
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/zram_drv.c | 35 ++++++++++++++++++++++++++++++-----
- 1 file changed, 30 insertions(+), 5 deletions(-)
+ drivers/block/zram/backend_zstd.c | 119 ++++++++++++++++++++++++------
+ 1 file changed, 96 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 89a2eb37e26c..c50283c7231e 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -33,6 +33,7 @@
- #include <linux/debugfs.h>
- #include <linux/cpuhotplug.h>
- #include <linux/part_stat.h>
-+#include <linux/kernel_read_file.h>
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index b2fb94902bef..6220c154e54e 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -12,23 +12,47 @@ struct zstd_ctx {
+ 	zstd_dctx *dctx;
+ 	void *cctx_mem;
+ 	void *dctx_mem;
++	ZSTD_customMem cctx_cmem;
++	ZSTD_customMem dctx_cmem;
++	ZSTD_CDict *cdict;
++	ZSTD_DDict *ddict;
+ 	s32 level;
+ };
  
- #include "zram_drv.h"
++/*
++ * Cctx allocator.customAlloc() is called from zcom_compress(), which is
++ * called under local-lock (per-CPU compression stream), so we need to
++ * use GFP_ATOMIC here.
++ */
++static void *zstd_cctx_alloc(void *opaque, size_t size)
++{
++	return kvzalloc(size, GFP_ATOMIC);
++}
++
++static void *zstd_dctx_alloc(void *opaque, size_t size)
++{
++	return kvzalloc(size, GFP_KERNEL);
++}
++
++static void zstd_ctx_free(void *opaque, void *address)
++{
++	kvfree(address);
++}
++
+ static void zstd_destroy(void *ctx)
+ {
+ 	struct zstd_ctx *zctx = ctx;
  
-@@ -1013,9 +1014,23 @@ static int __comp_algorithm_store(struct zram *zram, u32 prio, const char *buf)
- 	return 0;
+ 	vfree(zctx->cctx_mem);
+ 	vfree(zctx->dctx_mem);
++	ZSTD_freeCDict(zctx->cdict);
++	ZSTD_freeDDict(zctx->ddict);
+ 	kfree(zctx);
  }
  
--static int comp_config_store(struct zram *zram, u32 prio, s32 level)
-+static int comp_config_store(struct zram *zram, u32 prio, s32 level,
-+			     const char *dict_path)
+ static void *zstd_create(struct zcomp_config *config)
  {
-+	size_t sz = 0;
+-	zstd_parameters params;
+ 	struct zstd_ctx *ctx;
+-	size_t sz;
+ 
+ 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+@@ -39,24 +63,64 @@ static void *zstd_create(struct zcomp_config *config)
+ 	else
+ 		ctx->level = ZSTD_defaultCLevel();
+ 
+-	params = zstd_get_params(ctx->level, PAGE_SIZE);
+-	sz = zstd_cctx_workspace_bound(&params.cParams);
+-	ctx->cctx_mem = vzalloc(sz);
+-	if (!ctx->cctx_mem)
+-		goto error;
+-
+-	ctx->cctx = zstd_init_cctx(ctx->cctx_mem, sz);
+-	if (!ctx->cctx)
+-		goto error;
+-
+-	sz = zstd_dctx_workspace_bound();
+-	ctx->dctx_mem = vzalloc(sz);
+-	if (!ctx->dctx_mem)
+-		goto error;
+-
+-	ctx->dctx = zstd_init_dctx(ctx->dctx_mem, sz);
+-	if (!ctx->dctx)
+-		goto error;
++	ctx->cctx_cmem.customAlloc = zstd_cctx_alloc;
++	ctx->cctx_cmem.customFree = zstd_ctx_free;
++	ctx->dctx_cmem.customAlloc = zstd_dctx_alloc;
++	ctx->dctx_cmem.customFree = zstd_ctx_free;
 +
-+	if (dict_path) {
-+		sz = kernel_read_file_from_path(dict_path, 0,
-+						&zram->configs[prio].dict,
-+						INT_MAX,
-+						NULL,
-+						READING_POLICY);
-+		if (sz < 0)
-+			return -EINVAL;
++	if (config->dict_sz == 0) {
++		zstd_parameters params;
++		size_t sz;
++
++		params = zstd_get_params(ctx->level, PAGE_SIZE);
++		sz = zstd_cctx_workspace_bound(&params.cParams);
++		ctx->cctx_mem = vzalloc(sz);
++		if (!ctx->cctx_mem)
++			goto error;
++
++		ctx->cctx = zstd_init_cctx(ctx->cctx_mem, sz);
++		if (!ctx->cctx)
++			goto error;
++
++		sz = zstd_dctx_workspace_bound();
++		ctx->dctx_mem = vzalloc(sz);
++		if (!ctx->dctx_mem)
++			goto error;
++
++		ctx->dctx = zstd_init_dctx(ctx->dctx_mem, sz);
++		if (!ctx->dctx)
++			goto error;
++	} else {
++		ZSTD_compressionParameters params;
++
++		ctx->cctx = ZSTD_createCCtx_advanced(ctx->cctx_cmem);
++		if (!ctx->cctx)
++			goto error;
++
++		ctx->dctx = ZSTD_createDCtx_advanced(ctx->dctx_cmem);
++		if (!ctx->dctx)
++			goto error;
++
++		params = ZSTD_getCParams(ctx->level, PAGE_SIZE,
++					 config->dict_sz);
++
++		ctx->cdict = ZSTD_createCDict_advanced(config->dict,
++						       config->dict_sz,
++						       ZSTD_dlm_byRef,
++						       ZSTD_dct_auto,
++						       params,
++						       ctx->cctx_cmem);
++		if (!ctx->cdict)
++			goto error;
++
++		ctx->ddict = ZSTD_createDDict_advanced(config->dict,
++						       config->dict_sz,
++						       ZSTD_dlm_byRef,
++						       ZSTD_dct_auto,
++						       ctx->dctx_cmem);
++		if (!ctx->ddict)
++			goto error;
 +	}
-+
- 	zram->configs[prio].level = level;
-+	zram->configs[prio].dict_sz = sz;
+ 
+ 	return ctx;
+ 
+@@ -72,8 +136,12 @@ static int zstd_compress(void *ctx, const unsigned char *src,
+ 	const zstd_parameters params = zstd_get_params(zctx->level, PAGE_SIZE);
+ 	size_t ret;
+ 
+-	ret = zstd_compress_cctx(zctx->cctx, dst, *dst_len,
+-				 src, PAGE_SIZE, &params);
++	if (!zctx->cdict)
++		ret = zstd_compress_cctx(zctx->cctx, dst, *dst_len,
++					 src, PAGE_SIZE, &params);
++	else
++		ret = ZSTD_compress_usingCDict(zctx->cctx, dst, *dst_len,
++					       src, PAGE_SIZE, zctx->cdict);
+ 	if (zstd_is_error(ret))
+ 		return -EINVAL;
+ 	*dst_len = ret;
+@@ -86,7 +154,12 @@ static int zstd_decompress(void *ctx, const unsigned char *src, size_t src_len,
+ 	struct zstd_ctx *zctx = ctx;
+ 	size_t ret;
+ 
+-	ret = zstd_decompress_dctx(zctx->dctx, dst, PAGE_SIZE, src, src_len);
++	if (!zctx->ddict)
++		ret = zstd_decompress_dctx(zctx->dctx, dst, PAGE_SIZE,
++					   src, src_len);
++	else
++		ret = ZSTD_decompress_usingDDict(zctx->dctx, dst, PAGE_SIZE,
++						 src, src_len, zctx->ddict);
+ 	if (zstd_is_error(ret))
+ 		return -EINVAL;
  	return 0;
- }
- 
-@@ -1035,7 +1050,7 @@ static ssize_t comp_algorithm_store(struct device *dev,
- {
- 	struct zram *zram = dev_to_zram(dev);
- 	char *args, *param, *val;
--	char *alg = NULL;
-+	char *alg = NULL, *dict_path = NULL;
- 	s32 level = ZCOMP_CONFIG_NO_LEVEL;
- 	int ret;
- 
-@@ -1063,12 +1078,17 @@ static ssize_t comp_algorithm_store(struct device *dev,
- 				return ret;
- 			continue;
- 		}
-+
-+		if (!strcmp(param, "dict")) {
-+			dict_path = val;
-+			continue;
-+		}
- 	}
- 
- 	if (!alg)
- 		return -EINVAL;
- 
--	ret = comp_config_store(zram, ZRAM_PRIMARY_COMP, level);
-+	ret = comp_config_store(zram, ZRAM_PRIMARY_COMP, level, dict_path);
- 	if (!ret)
- 		ret = __comp_algorithm_store(zram, ZRAM_PRIMARY_COMP, alg);
- 	return ret ? ret : len;
-@@ -1102,7 +1122,7 @@ static ssize_t recomp_algorithm_store(struct device *dev,
- 	struct zram *zram = dev_to_zram(dev);
- 	int prio = ZRAM_SECONDARY_COMP;
- 	char *args, *param, *val;
--	char *alg = NULL;
-+	char *alg = NULL, *dict_path = NULL;
- 	s32 level = ZCOMP_CONFIG_NO_LEVEL;
- 	int ret;
- 
-@@ -1131,6 +1151,11 @@ static ssize_t recomp_algorithm_store(struct device *dev,
- 				return ret;
- 			continue;
- 		}
-+
-+		if (!strcmp(param, "dict")) {
-+			dict_path = val;
-+			continue;
-+		}
- 	}
- 
- 	if (!alg)
-@@ -1139,7 +1164,7 @@ static ssize_t recomp_algorithm_store(struct device *dev,
- 	if (prio < ZRAM_SECONDARY_COMP || prio >= ZRAM_MAX_COMPS)
- 		return -EINVAL;
- 
--	ret = comp_config_store(zram, prio, level);
-+	ret = comp_config_store(zram, prio, level, dict_path);
- 	if (!ret)
- 		ret = __comp_algorithm_store(zram, prio, alg);
- 	return ret ? ret : len;
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
