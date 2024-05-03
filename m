@@ -1,237 +1,136 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A4E152DE2
-	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 11:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE622AF1A
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 12:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714737430; cv=none; b=eAwRyjquyBEKxT7NSc3Q/x09X/9+KCh4bNygwT2o6kc5T+QtW8S2ZSGwLITA1mfM5RwPe7jNAqqTnVBfrx7ovNfN+YeAEEJuwP5wT67EuBmaJU1pmdC+NVJRLvg94cRrHQAjPVjfMpY6EZM4BrWskBn8mgLRPiOith/M1Avo9aA=
+	t=1714737704; cv=none; b=Ze+/Wgz0VmQ0CIEyc+e/K0p/Mf7SPkgNSac4Vx66Uvb6Nye70xD69YVrhesy50dJT37DfhEE6vMQGIx/PAIMNN8UON3QUiaZbntne/6GaWx5wTuxMtDYBFbY5TmTfwoeckXVM7tmlQoBp9XqR5hbOB6DWXPOVWcBRjB+mNLVjk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714737430; c=relaxed/simple;
-	bh=N1UR76ibJXT6KSmjP9DwgMJEalcANwTRYffmZX8HUPM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=illM0FUO26oEuE5ZoA3O+YLZ1P27E8rWI8o8/aXroOElIjh+T7ZA1liMVBE5jcJCEGMBfrQDg1DcwpjwPshUXBJ99pnLjW3EUPxFuseCrNfeN1b45qs3JmE36s1Y95Y+mcNwVjT2MeIWbhQiE6huObBZy42M4iups2BMGJ4ujp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qyB1ISae; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1714737704; c=relaxed/simple;
+	bh=yZbUxRO3Zcmnt7WyYgas9RrUMhCGfA3ShsH1Hycpevk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=gKWQHIWcdr2eWt+7vhVHzf41wz+LVuHPYDBHNKU3XLqVu6trClaYEuZRU4OAghq+47xfk3zHWS9EtiMKczkzltwVY0SRPsiZ1nY5CpVpUsMayjbXUcO4wYkMHrxJ5Lk/wotfOFSLHrE5yT2CKMJ0Xj0d64ws8vJE/3EvtzKDhP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ZRuDE/vv; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qyB1ISae"
-Message-ID: <dcbd4df7-328e-4d28-8098-dca3e8c4f004@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714737425;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QBEy7QkEaMvis9qjHZ5cOY4POeQ4rKqY2XsSXuPCu4U=;
-	b=qyB1ISae7I/P6hByROK73LSERbiL7NzoQZuWyVzVYXd5DEKcWqZ+01n4/u2G94uRlwKdZg
-	pgnNepE8R4vEhrgw3+TI+jbCs12NmD0KobYhO09ypdlc17huPvRqS1WfGm3a/IDhhV2Unp
-	wPw01DbGYiFsnIgrK1nDyTpIy9Rx9YU=
-Date: Fri, 3 May 2024 13:57:00 +0200
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ZRuDE/vv"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240503120135epoutp03371139cba6d6a5c45aad0cdb93b96431~L_NlpV-t90186001860epoutp03T
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 12:01:35 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240503120135epoutp03371139cba6d6a5c45aad0cdb93b96431~L_NlpV-t90186001860epoutp03T
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1714737695;
+	bh=yZbUxRO3Zcmnt7WyYgas9RrUMhCGfA3ShsH1Hycpevk=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=ZRuDE/vvevOuelo3PqwM/uhJ2O4xX05cvtSkwMhmKSITp9Gm6612wiOk4wRzizBa9
+	 XmshWnZMcftEynA37zSRIp9agELYEG+Uk1ObCHYRG0U0jeMwOXTgU/NkWeecGTq0xn
+	 c+W7VDblmYiPNurGIyOpY6I539swxtg4JfrjFMSs=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240503120134epcas5p1b530901e6c8e6e97018c8a8a362e97fb~L_NkRKyXV1236812368epcas5p1B;
+	Fri,  3 May 2024 12:01:34 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4VW8Xr4kZCz4x9Ps; Fri,  3 May
+	2024 12:01:32 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	C5.CE.08600.C12D4366; Fri,  3 May 2024 21:01:32 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240503120132epcas5p125b2e601d193d11756a1d005d2e1a429~L_NiYLymP1236812368epcas5p19;
+	Fri,  3 May 2024 12:01:32 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240503120132epsmtrp19754256807b3711ebbdb93a81b8c424f~L_NiXG-Sk2608826088epsmtrp1P;
+	Fri,  3 May 2024 12:01:32 +0000 (GMT)
+X-AuditID: b6c32a44-6c3ff70000002198-b5-6634d21c5253
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	72.A3.08924.C12D4366; Fri,  3 May 2024 21:01:32 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240503120130epsmtip1930bf82902c1909b6a2e9b3b1c7753a4~L_NglACbP0818808188epsmtip1k;
+	Fri,  3 May 2024 12:01:30 +0000 (GMT)
+Message-ID: <47d71118-5a16-cc28-22ae-0ef6745642d5@samsung.com>
+Date: Fri, 3 May 2024 17:31:29 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-To: "Zeng, Oak" <oak.zeng@intel.com>, "leon@kernel.org" <leon@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- "Brost, Matthew" <matthew.brost@intel.com>,
- "Hellstrom, Thomas" <thomas.hellstrom@intel.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- "Tian, Kevin" <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- Bart Van Assche <bvanassche@acm.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Amir Goldstein <amir73il@gmail.com>,
- "josef@toxicpanda.com" <josef@toxicpanda.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "Williams, Dan J" <dan.j.williams@intel.com>, "jack@suse.com"
- <jack@suse.com>, Leon Romanovsky <leonro@nvidia.com>
-References: <cover.1709635535.git.leon@kernel.org>
- <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH 04/10] block: avoid unpinning/freeing the bio_vec incase
+ of cloned bio
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, kbusch@kernel.org,
+	brauner@kernel.org, asml.silence@gmail.com, dw@davidwei.uk,
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com, Anuj Gupta
+	<anuj20.g@samsung.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240502071221.GA31379@lst.de>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEJsWRmVeSWpSXmKPExsWy7bCmpq7MJZM0g9mLVCyaJvxltpizahuj
+	xeq7/WwWrw9/YrR4NWMtm8XNAzuZLFauPspk8a71HIvFpEPXGC323tK2mL/sKbvF8uP/mBx4
+	PK7NmMjisXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j49Pb7F49G1ZxejxeZNcAGdUtk1GamJK
+	apFCal5yfkpmXrqtkndwvHO8qZmBoa6hpYW5kkJeYm6qrZKLT4CuW2YO0MFKCmWJOaVAoYDE
+	4mIlfTubovzSklSFjPziElul1IKUnAKTAr3ixNzi0rx0vbzUEitDAwMjU6DChOyMRx/TCi4x
+	V3TNu8/YwPiDqYuRk0NCwERi9b5lLF2MXBxCArsZJf6c7GWGcD4xSrTfesMO4XxjlNg87R9Q
+	GQdYy5fj2RDxvYwSiw8thCp6yyixft9rZpC5vAJ2En1/J7GCNLAIqEg03LKDCAtKnJz5hAXE
+	FhVIlvjZdYANxBYWiJHY/no6WJxZQFzi1pP5YOeJCChJPH11lhFkPrPANCaJtT1TwY5gE9CU
+	uDC5FMTkFNCRaDrEBNEqL7H97RywByQEznBIvJnYxgbxpovEhjW/oWxhiVfHt7BD2FISL/vb
+	oOxkiUszz0GDpUTi8Z6DULa9ROupfmaQXcxAa9fv0ofYxSfR+/sJEyRIeCU62oQgqhUl7k16
+	ygphi0s8nLEEyvaQ+PloIjSk2pglTjVeYJ3AqDALKVRmIfl+FpJ3ZiFsXsDIsopRMrWgODc9
+	Ndm0wDAvtRwe28n5uZsYwYlZy2UH4435//QOMTJxMB5ilOBgVhLh1Z5snCbEm5JYWZValB9f
+	VJqTWnyI0RQYOxOZpUST84G5Ia8k3tDE0sDEzMzMxNLYzFBJnPd169wUIYH0xJLU7NTUgtQi
+	mD4mDk6pBqatdVevWRvaunQ3HkjlmNHyyVdUo3lbReYtNzHD567CczcKib8IdXo9c/1CefWT
+	vrGup/a15vau3TKrsun7TD1po2O75Xp7+U6uZuCrKdIJcSw5u0Fat8HTbG/6YR35p9/+f2Zc
+	v+WxcMaJugOvdDkSnkVPe9rBKu+8JOj4wkXv8zjNHnb5nvHK/BQc+nL9NMbiN/ecOVMf3X5b
+	ue6ATtG//NX7cqunfa0R8wyJ0HSz8pbwk89Vtbe9V1ejs3z/hFehea57dCVdl+3ReSDyNOPM
+	nyeZwnkZPclr+5V/lp9y+lQquS7RMoHxjdjkyXtlNZ7HF2wNubPo4LK5HXE/t3YYRvx0bzrk
+	WNSdEJ16TYmlOCPRUIu5qDgRACnDMtFVBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHIsWRmVeSWpSXmKPExsWy7bCSnK7MJZM0gz17WSyaJvxltpizahuj
+	xeq7/WwWrw9/YrR4NWMtm8XNAzuZLFauPspk8a71HIvFpEPXGC323tK2mL/sKbvF8uP/mBx4
+	PK7NmMjisXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j49Pb7F49G1ZxejxeZNcAGcUl01Kak5m
+	WWqRvl0CV8ajj2kFl5gruubdZ2xg/MHUxcjBISFgIvHleHYXIxeHkMBuRomLB3cCxTmB4uIS
+	zdd+sEPYwhIr/z1nhyh6zShxdN0msCJeATuJvr+TWEEGsQioSDTcsoMIC0qcnPmEBcQWFUiW
+	ePlnItgcYYEYie2vp4PFmYHm33oyH2yMiICSxNNXZxlB5jMLTGOS6P+5mRViWRuzxN01W9lB
+	FrAJaEpcmFwKYnIK6Eg0HWKCmGMm0bW1ixHClpfY/nYO8wRGoVlIzpiFZN0sJC2zkLQsYGRZ
+	xSiZWlCcm55bbFhgmJdarlecmFtcmpeul5yfu4kRHIVamjsYt6/6oHeIkYmD8RCjBAezkgiv
+	9mTjNCHelMTKqtSi/Pii0pzU4kOM0hwsSuK84i96U4QE0hNLUrNTUwtSi2CyTBycUg1MXHse
+	HXr+g0toFu9h7r+moie7X+lIxv4/Huc+6532tbMh0yYssa8+Keyy/ZrdFuXuz7OmKfDLlRvd
+	2mfzQ2ntxcsvY1PmfCvXvLMoUPN1f8L5KPa/y+60H7wwbbexEXNYSt/TpiaBk5JFLmcman97
+	GbrjT1Hd+8S1RbIJDO+dItxsVx891r3rcvTivxWv1q8rOFr1K+hY7LyiXQ+cc7Ls3OfkXTqU
+	uLuncd8DNylJr1qzG2Hs0s95JFRmvT06/6vB7OfChodXdM80PFpbdolP02pigezhlIk6s5eu
+	n7v47JykD9bPHzv4iD6RWNZpfm9B/q6mje9PHhOYuvPQljtBwd6SjbPUv+gmrws8eLWPRUGJ
+	pTgj0VCLuag4EQCgn74JMQMAAA==
+X-CMS-MailID: 20240503120132epcas5p125b2e601d193d11756a1d005d2e1a429
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240425184658epcas5p2adb6bf01a5c56ffaac3a55ab57afaf8e
+References: <20240425183943.6319-1-joshi.k@samsung.com>
+	<CGME20240425184658epcas5p2adb6bf01a5c56ffaac3a55ab57afaf8e@epcas5p2.samsung.com>
+	<20240425183943.6319-5-joshi.k@samsung.com> <20240427070508.GD3873@lst.de>
+	<03cb6ac3-595f-abb1-324b-647ed84cfe6b@samsung.com>
+	<20240429170929.GB31337@lst.de>
+	<ebeca5f1-8d80-e4d4-cf45-9a14ef1413a5@samsung.com>
+	<20240502071221.GA31379@lst.de>
 
+On 5/2/2024 12:42 PM, Christoph Hellwig wrote:
+> On Wed, May 01, 2024 at 06:32:45PM +0530, Kanchan Joshi wrote:
+>> Can you please tell what function(s) in bio data path that need this
+>> conversion?
+>> To me data path handling seems similar. Each cloned bio will lead to
+>> some amount of data transfer to pinned user-memory. The same is
+>> happening for meta transfer here.
+> Well, everywhere.
 
-On 03.05.24 01:32, Zeng, Oak wrote:
-> Hi Leon, Jason
->
->> -----Original Message-----
->> From: Leon Romanovsky <leon@kernel.org>
->> Sent: Tuesday, March 5, 2024 6:19 AM
->> To: Christoph Hellwig <hch@lst.de>; Robin Murphy
->> <robin.murphy@arm.com>; Marek Szyprowski
->> <m.szyprowski@samsung.com>; Joerg Roedel <joro@8bytes.org>; Will
->> Deacon <will@kernel.org>; Jason Gunthorpe <jgg@ziepe.ca>; Chaitanya
->> Kulkarni <chaitanyak@nvidia.com>
->> Cc: Jonathan Corbet <corbet@lwn.net>; Jens Axboe <axboe@kernel.dk>;
->> Keith Busch <kbusch@kernel.org>; Sagi Grimberg <sagi@grimberg.me>;
->> Yishai Hadas <yishaih@nvidia.com>; Shameer Kolothum
->> <shameerali.kolothum.thodi@huawei.com>; Kevin Tian
->> <kevin.tian@intel.com>; Alex Williamson <alex.williamson@redhat.com>;
->> Jérôme Glisse <jglisse@redhat.com>; Andrew Morton <akpm@linux-
->> foundation.org>; linux-doc@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linux-block@vger.kernel.org; linux-rdma@vger.kernel.org;
->> iommu@lists.linux.dev; linux-nvme@lists.infradead.org;
->> kvm@vger.kernel.org; linux-mm@kvack.org; Bart Van Assche
->> <bvanassche@acm.org>; Damien Le Moal
->> <damien.lemoal@opensource.wdc.com>; Amir Goldstein
->> <amir73il@gmail.com>; josef@toxicpanda.com; Martin K. Petersen
->> <martin.petersen@oracle.com>; daniel@iogearbox.net; Dan Williams
->> <dan.j.williams@intel.com>; jack@suse.com; Leon Romanovsky
->> <leonro@nvidia.com>; Zhu Yanjun <zyjzyj2000@gmail.com>
->> Subject: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
->> steps
->>
->> This is complimentary part to the proposed LSF/MM topic.
->> https://lore.kernel.org/linux-rdma/22df55f8-cf64-4aa8-8c0b-
->> b556c867b926@linux.dev/T/#m85672c860539fdbbc8fe0f5ccabdc05b40269057
->>
->> This is posted as RFC to get a feedback on proposed split, but RDMA, VFIO
->> and
->> DMA patches are ready for review and inclusion, the NVMe patches are still
->> in
->> progress as they require agreement on API first.
->>
->> Thanks
->>
->> -------------------------------------------------------------------------------
->> The DMA mapping operation performs two steps at one same time: allocates
->> IOVA space and actually maps DMA pages to that space. This one shot
->> operation works perfectly for non-complex scenarios, where callers use
->> that DMA API in control path when they setup hardware.
->>
->> However in more complex scenarios, when DMA mapping is needed in data
->> path and especially when some sort of specific datatype is involved,
->> such one shot approach has its drawbacks.
->>
->> That approach pushes developers to introduce new DMA APIs for specific
->> datatype. For example existing scatter-gather mapping functions, or
->> latest Chuck's RFC series to add biovec related DMA mapping [1] and
->> probably struct folio will need it too.
->>
->> These advanced DMA mapping APIs are needed to calculate IOVA size to
->> allocate it as one chunk and some sort of offset calculations to know
->> which part of IOVA to map.
->>
->> Instead of teaching DMA to know these specific datatypes, let's separate
->> existing DMA mapping routine to two steps and give an option to advanced
->> callers (subsystems) perform all calculations internally in advance and
->> map pages later when it is needed.
-> I looked into how this scheme can be applied to DRM subsystem and GPU drivers.
->
-> I figured RDMA can apply this scheme because RDMA can calculate the iova size. Per my limited knowledge of rdma, user can register a memory region (the reg_user_mr vfunc) and memory region's sized is used to pre-allocate iova space. And in the RDMA use case, it seems the user registered region can be very big, e.g., 512MiB or even GiB
->
-> In GPU driver, we have a few use cases where we need dma-mapping. Just name two:
->
-> 1) userptr: it is user malloc'ed/mmap'ed memory and registers to gpu (in Intel's driver it is through a vm_bind api, similar to mmap). A userptr can be of any random size, depending on user malloc size. Today we use dma-map-sg for this use case. The down side of our approach is, during userptr invalidation, even if user only munmap partially of an userptr, we invalidate the whole userptr from gpu page table, because there is no way for us to partially dma-unmap the whole sg list. I think we can try your new API in this case. The main benefit of the new approach is the partial munmap case.
->
-> We will have to pre-allocate iova for each userptr, and we have many userptrs of random size... So we might be not as efficient as RDMA case where I assume user register a few big memory regions.
->
-> 2) system allocator: it is malloc'ed/mmap'ed memory be used for GPU program directly, without any other extra driver API call. We call this use case system allocator.
->
-> For system allocator, driver have no knowledge of which virtual address range is valid in advance. So when GPU access a malloc'ed/mmap'ed address, we have a page fault. We then look up a CPU vma which contains the fault address. I guess we can use the CPU vma size to allocate the iova space of the same size?
->
-> But there will be a true difficulty to apply your scheme to this use case. It is related to the STICKY flag. As I understand it, the sticky flag is designed for driver to mark "this page/pfn has been populated, no need to re-populate again", roughly...Unlike userptr and RDMA use cases where the backing store of a buffer is always in system memory, in the system allocator use case, the backing store can be changing b/t system memory and GPU's device private memory. Even worse, we have to assume the data migration b/t system and GPU is dynamic. When data is migrated to GPU, we don't need dma-map. And when migration happens to a pfn with STICKY flag, we still need to repopulate this pfn. So you can see, it is not easy to apply this scheme to this use case. At least I can't see an obvious way.
-
-Not sure if GPU peer to peer dma mapping GPU memory for use can use this 
-scheme or not. If I remember it correctly, Intel Gaudi GPU supports peer 
-2 peer dma mapping in GPU Direct RDMA. Not sure if this scheme can be 
-applied in that place or not.
-
-Just my 2 cent suggestions.
-
-Zhu Yanjun
-
->
->
-> Oak
->
->
->> In this series, three users are converted and each of such conversion
->> presents different positive gain:
->> 1. RDMA simplifies and speeds up its pagefault handling for
->>     on-demand-paging (ODP) mode.
->> 2. VFIO PCI live migration code saves huge chunk of memory.
->> 3. NVMe PCI avoids intermediate SG table manipulation and operates
->>     directly on BIOs.
->>
->> Thanks
->>
->> [1]
->> https://lore.kernel.org/all/169772852492.5232.17148564580779995849.stgit@
->> klimt.1015granger.net
->>
->> Chaitanya Kulkarni (2):
->>    block: add dma_link_range() based API
->>    nvme-pci: use blk_rq_dma_map() for NVMe SGL
->>
->> Leon Romanovsky (14):
->>    mm/hmm: let users to tag specific PFNs
->>    dma-mapping: provide an interface to allocate IOVA
->>    dma-mapping: provide callbacks to link/unlink pages to specific IOVA
->>    iommu/dma: Provide an interface to allow preallocate IOVA
->>    iommu/dma: Prepare map/unmap page functions to receive IOVA
->>    iommu/dma: Implement link/unlink page callbacks
->>    RDMA/umem: Preallocate and cache IOVA for UMEM ODP
->>    RDMA/umem: Store ODP access mask information in PFN
->>    RDMA/core: Separate DMA mapping to caching IOVA and page linkage
->>    RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
->>    vfio/mlx5: Explicitly use number of pages instead of allocated length
->>    vfio/mlx5: Rewrite create mkey flow to allow better code reuse
->>    vfio/mlx5: Explicitly store page list
->>    vfio/mlx5: Convert vfio to use DMA link API
->>
->>   Documentation/core-api/dma-attributes.rst |   7 +
->>   block/blk-merge.c                         | 156 ++++++++++++++
->>   drivers/infiniband/core/umem_odp.c        | 219 +++++++------------
->>   drivers/infiniband/hw/mlx5/mlx5_ib.h      |   1 +
->>   drivers/infiniband/hw/mlx5/odp.c          |  59 +++--
->>   drivers/iommu/dma-iommu.c                 | 129 ++++++++---
->>   drivers/nvme/host/pci.c                   | 220 +++++--------------
->>   drivers/vfio/pci/mlx5/cmd.c               | 252 ++++++++++++----------
->>   drivers/vfio/pci/mlx5/cmd.h               |  22 +-
->>   drivers/vfio/pci/mlx5/main.c              | 136 +++++-------
->>   include/linux/blk-mq.h                    |   9 +
->>   include/linux/dma-map-ops.h               |  13 ++
->>   include/linux/dma-mapping.h               |  39 ++++
->>   include/linux/hmm.h                       |   3 +
->>   include/rdma/ib_umem_odp.h                |  22 +-
->>   include/rdma/ib_verbs.h                   |  54 +++++
->>   kernel/dma/debug.h                        |   2 +
->>   kernel/dma/direct.h                       |   7 +-
->>   kernel/dma/mapping.c                      |  91 ++++++++
->>   mm/hmm.c                                  |  34 +--
->>   20 files changed, 870 insertions(+), 605 deletions(-)
->>
->> --
->> 2.44.0
-
--- 
-Best Regards,
-Yanjun.Zhu
-
+Next version will not inherit BIP_COPY_USER for clone bios.
