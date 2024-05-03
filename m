@@ -1,79 +1,54 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6931A219EB
-	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 08:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDAC148313
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 08:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714723847; cv=none; b=qSgws/8NN9vXtuXLyK8JZVquP+o4TyiEQGpwlEcDarj7MSloePFPCRV+r1Nqf3T8UTtmU7cHxaw+xmHEHIdsQ5gYFume2i6IDQTKB6Ptl8QWo/gAjWxcRkCLvCYCOyecu9SL1+Z/LzflZJnj7FpU43SP2vmRIrGGI0+kH+/OLUg=
+	t=1714724188; cv=none; b=bUkybabqq8qFez4nVFtMLUiAiN/Yt92R0sm1ZHe4C0r2PWKHF/absVozv/U4rtLO24ugDcheT4MtkqSPPfLl0DArDvDgwWR0hhJYW+J3xPXgRyni1XrPqVD86tArCKUvDiHX+nwAy4tD0KjlC4nC3+LkuK3FBvjIrgjp/822YR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714723847; c=relaxed/simple;
-	bh=Ro3KWgZHuzwozytdPRVtAug80fm1EqjmjUwSCpXki3E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Co86HzKTimSBiNwP1YmuljLGzbnvHZqThJj4esZDW1qxK1hhuwyK2IGQkRm6pPYIhhYLxMYmqsKd7RDAZ1Q3geniTfEQXtfCU3M//9RKOquOu5jtD2CcOz/8UKaTk+bYg0oyD4G9+ZORE0AgFdKqDre/88sPulNfSwwEEK4tpx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0U5096T9; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1714724188; c=relaxed/simple;
+	bh=yfAhLE9UDrdFj9UrO8Jw4oDVhNPtz2GEcy2TPJdg7uA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DaD4myIkx7ZVsaBRPFbDeBTYzmUFOGuuczLl1vkzmMT8bgfj5EjLHNP2uR1EWGzh4UHRpGFG4Yh0wfQJ4d3niTQOYhApguiRklXreY+rNK8ZSQizv+CEcg9wcyCesnTXowHv/s/lmeHhIiqybCChZjbMJ/j33Whg5UzRwViXizU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0U5096T9"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=5lOxySmfE6/YdtPBH9ro8KriQh8+zawqua1J9iMQF24=; b=0U5096T9qDNtfmMz13wMkf3/rD
-	MYtChd9NdXRmwA+YlRfAawynDvIVvbNsNGi4nv5gBuUd66mPFeZEclHh1LX0iN1aSdQBAS2uJj4rQ
-	UyJlt1Zyl/kN9vZtY1mKyYA4sTkdOrjdGAjMFD5JwtNTMw6k924ZKF8Y6jUDzsAEUMwlwBLLlNcgj
-	qadEAbHttfSNxoq5IKYbN6Ehned+rn0NUAeN6SPwCV6m9/3RT0DIO8lf7rIdOQcOloHKcgvdXCArB
-	wC1WYohx05Gw7QFXgQ1P06kQwMWfYrWCKeoQCZrrM7HcmSqx+rzjhqWU97/R33pQOLsQDGfhblFiD
-	vFN9TJAw==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s2o0C-0000000FaS9-1ijD;
-	Fri, 03 May 2024 08:10:44 +0000
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 805D9227AAC; Fri,  3 May 2024 10:16:13 +0200 (CEST)
+Date: Fri, 3 May 2024 10:16:12 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	syzbot+0a3683a0a6fecf909244@syzkaller.appspotmail.com
-Subject: [PATCH] block: refine the EOF check in blkdev_iomap_begin
-Date: Fri,  3 May 2024 10:10:42 +0200
-Message-Id: <20240503081042.2078062-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: add a partscan sysfs attribute for disks
+Message-ID: <20240503081612.GA24407@lst.de>
+References: <20240502130033.1958492-1-hch@lst.de> <20240502130033.1958492-3-hch@lst.de> <6e70dd3f-381c-4435-a523-588ce2fafb39@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6e70dd3f-381c-4435-a523-588ce2fafb39@kernel.dk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-blkdev_iomap_begin rounds down the offset to the logical block size
-before stashing it in iomap->offset and checking that it still is
-inside the inode size.
+On Thu, May 02, 2024 at 11:05:54AM -0600, Jens Axboe wrote:
+> On 5/2/24 7:00 AM, Christoph Hellwig wrote:
+> > This attribute reports if partition scanning is enabled for a given disk.
+> 
+> This should, at least, have a reference to Lennart's posting, and
+> honestly a much better commit message as well. There's no reasoning
+> given here at all.
 
-Check the i_size check to the raw pos value so that we don't try a
-zero size write if iter->pos is unaligned.
+I'm not sure I can come up with something much better, feel free to
+throw in what you prefer.
 
-Fixes: 487c607df790 ("block: use iomap for writes to block devices")
-Reported-by: syzbot+0a3683a0a6fecf909244@syzkaller.appspotmail.com
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: syzbot+0a3683a0a6fecf909244@syzkaller.appspotmail.com
----
- block/fops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Maybe even a fixes tag and stable notation?
 
-diff --git a/block/fops.c b/block/fops.c
-index 679d9b752fe828..df2c68d3f198e1 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -390,7 +390,7 @@ static int blkdev_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 
- 	iomap->bdev = bdev;
- 	iomap->offset = ALIGN_DOWN(offset, bdev_logical_block_size(bdev));
--	if (iomap->offset >= isize)
-+	if (offset >= isize)
- 		return -EIO;
- 	iomap->type = IOMAP_MAPPED;
- 	iomap->addr = iomap->offset;
--- 
-2.39.2
-
+This is definitively not a Fixes as nothing it doesn't actually fix
+any code.  It provides a proper interfaces for what was an abuse
+of leaking internal bits out.
