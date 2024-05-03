@@ -1,138 +1,244 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D237F7CC
-	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 07:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB05171B49;
+	Wed,  8 May 2024 09:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715154207; cv=none; b=a8iPzIA+jRhPwXZUe3dSEAwQwndqICWe5kSJ9J6vXSU4sCtl03RtevulX3g2Mk27qnotfHddRIWXDVRe/o1notKqQd/IGB88sl9HGdPOHQMPrC7W+RQvXcRyoUnJK7M3TMyl0yK701KPHUWD5yP3+uBJNkgeFQn8/9UapMGGAmA=
+	t=1715159576; cv=none; b=CC90jSLE3u9kYvcajjPU8qrSSdpi4oDBEBhMIHJzoKPT0K71VvEe31toFBcrb5PZqvfIuL50zklBqG8/QA80Ue7OE76BIV5xnjWWWwYwcmsP7eFnSHW9jMzPvmcWqMIPcOZkQ7H7dnfw/BFXL5ZVkBMCYrNxN2H7NrHr4gmz8+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715154207; c=relaxed/simple;
-	bh=0QKD/VRLqE4UJhTMThwx4W0GPaxzgatlvvK+3EE9Gd0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BSfPD5NTAKyeCcKD8ubXUL+JudfjopAiunfn2QEmeaThn18o8l1zzGvVWGkQoJuzJ2tEUqLCpP+PD+zNB3PoaaT7vhtSGyqL4HtUE2rOymIYeVVs73+4yDew0PYe12evhu3HHd41gRT6a4hoa3K/UiZpC/CCEtFEJ99U2Eh6jfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=UGL7O0Si; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UGL7O0Si"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2b4952a1aecso2722587a91.3
-        for <linux-block@vger.kernel.org>; Wed, 08 May 2024 00:43:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715154205; x=1715759005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ow2rUHFnrcYhlTotFbBj4Gwxyq4hSnuB9nn9e+mMxIY=;
-        b=UGL7O0SiV6EoBU3l0lP0gPA1waybDambjYpwsSAgQUqgoCrPnL+Ua8eE+bWKvouG31
-         jUfZDMHyVx1ImFpR4VjxdHwJ5Ix+Y2rebf/zuV8BTXY5pdk7JPvmq5SPjZ5CyaZXMjDO
-         5P76Sb+vvENpJ4XFgtgxGNZl9S5SDghCRGGKQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715154205; x=1715759005;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ow2rUHFnrcYhlTotFbBj4Gwxyq4hSnuB9nn9e+mMxIY=;
-        b=eXBv8HsdfWmkUxjbBkUbq78gEv/As3Pczoc7Zse2J5ZxMSOqitJkRFAHqSRW3ZWtgg
-         AiFJ+QXRoWKDUoF47QY8j+VvXYpUrVra81tVGEbMVV9XSDhUfJ+EQyiW6b93LK3oh0Ib
-         jcQUwQejoDExd+sGJviPUCWJyF84O3tPuU2hWR3ZbFCGhV8cJjixgHnKP0DToOFTMUrt
-         gc4bXAbblrn/j63k8fAVRXy/BNgrrtDwX2QHRr5kGpPjy8Ixy+bOv4+h6mludK3aZ/AC
-         3tbYBixQ3pfx26/bkogINOsmfSxSA++uR06swwV/2XWUmoaO2413kWbdDd9M9aS827v3
-         W5jw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3bMORLi4VZ1za9VwEO9q3dr1riUzyc39lzjLfyTvr27CJWNASAgQess2flPttxPO82pACaIe4XgjylVEugLehvYAr0jeLCrAuSd4=
-X-Gm-Message-State: AOJu0Yzh57caipaXbieAMHWfW1MAX0lb0arzxCepkvrhzn34jqYQPmje
-	ucEaJxU+tHub0x0zUjLCqvwQwZJlpZPnh+QhtTjJwAqM6EqZA5uPMNpOTcswcg==
-X-Google-Smtp-Source: AGHT+IE1GlyzbHlgtHh03vLzDAXZBLlDXZN7nerQilU82pSz8k6bsqpHgAvqZzQ1IEihysz0KtfQbA==
-X-Received: by 2002:a17:90a:440f:b0:2ae:e1e0:3d8f with SMTP id 98e67ed59e1d1-2b6163a22cdmr1679910a91.2.1715154205219;
-        Wed, 08 May 2024 00:43:25 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:ad4d:5f6c:6699:2da4])
-        by smtp.gmail.com with ESMTPSA id l5-20020a17090aec0500b002b328adaa40sm780011pjy.17.2024.05.08.00.43.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 00:43:24 -0700 (PDT)
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCHv3 19/19] Documentation/zram: add documentation for algorithm parameters
-Date: Wed,  8 May 2024 16:42:12 +0900
-Message-ID: <20240508074223.652784-20-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-In-Reply-To: <20240508074223.652784-1-senozhatsky@chromium.org>
-References: <20240508074223.652784-1-senozhatsky@chromium.org>
+	s=arc-20240116; t=1715159576; c=relaxed/simple;
+	bh=6XVaT/rOwjD6l7J+zEX/991xLR3yWl6JEhyuKgB9bEE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Rn1LU82gR4fozlFHz5/VKh5uWP+W4xvUArSkaYBQWJwwNpMsiZ/mlI7DxBmkgdAiqdxbC2qNiscuiQftVxwjoz3xFYvaHngGhkWwsVigKR8nepcUwkvh3yiuxBFevh8kaLztgdzzXBanek9H8ADqsxPApMcvHbprLPzivoIJrPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VZ8VL0CLvz6K63J;
+	Wed,  8 May 2024 17:09:46 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 35040140B2A;
+	Wed,  8 May 2024 17:12:51 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 8 May
+ 2024 10:12:50 +0100
+Date: Fri, 3 May 2024 10:52:45 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: John Groves <John@groves.net>
+CC: Dongsheng Yang <dongsheng.yang@easystack.cn>, Gregory Price
+	<gregory.price@memverge.com>, Dan Williams <dan.j.williams@intel.com>,
+	<axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>
+Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
+Message-ID: <20240503105245.00003676@Huawei.com>
+In-Reply-To: <wold3g5ww63cwqo7rlwevqcpmlen3fl3lbtbq3qrmveoh2hale@e7carkmumnub>
+References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
+	<66288ac38b770_a96f294c6@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+	<ef34808b-d25d-c953-3407-aa833ad58e61@easystack.cn>
+	<ZikhwAAIGFG0UU23@memverge.com>
+	<bbf692ec-2109-baf2-aaae-7859a8315025@easystack.cn>
+	<ZiuwyIVaKJq8aC6g@memverge.com>
+	<98ae27ff-b01a-761d-c1c6-39911a000268@easystack.cn>
+	<ZivS86BrfPHopkru@memverge.com>
+	<8f373165-dd2b-906f-96da-41be9f27c208@easystack.cn>
+	<wold3g5ww63cwqo7rlwevqcpmlen3fl3lbtbq3qrmveoh2hale@e7carkmumnub>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Document brief description of compression algorithms' parameters:
-compression level and pre-trained dictionary.
+On Sun, 28 Apr 2024 11:55:10 -0500
+John Groves <John@groves.net> wrote:
 
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- Documentation/admin-guide/blockdev/zram.rst | 38 ++++++++++++++++-----
- 1 file changed, 29 insertions(+), 9 deletions(-)
+> On 24/04/28 01:47PM, Dongsheng Yang wrote:
+> >=20
+> >=20
+> > =E5=9C=A8 2024/4/27 =E6=98=9F=E6=9C=9F=E5=85=AD =E4=B8=8A=E5=8D=88 12:1=
+4, Gregory Price =E5=86=99=E9=81=93: =20
+> > > On Fri, Apr 26, 2024 at 10:53:43PM +0800, Dongsheng Yang wrote: =20
+> > > >=20
+> > > >=20
+> > > > =E5=9C=A8 2024/4/26 =E6=98=9F=E6=9C=9F=E4=BA=94 =E4=B8=8B=E5=8D=88 =
+9:48, Gregory Price =E5=86=99=E9=81=93: =20
+> > > > >  =20
+> > > >=20
+> > > > In (5) of the cover letter, I mentioned that cbd addresses cache co=
+herence
+> > > > at the software level:
+> > > >=20
+> > > > (5) How do blkdev and backend interact through the channel?
+> > > > 	a) For reader side, before reading the data, if the data in this c=
+hannel
+> > > > may be modified by the other party, then I need to flush the cache =
+before
+> > > > reading to ensure that I get the latest data. For example, the blkd=
+ev needs
+> > > > to flush the cache before obtaining compr_head because compr_head w=
+ill be
+> > > > updated by the backend handler.
+> > > > 	b) For writter side, if the written information will be read by ot=
+hers,
+> > > > then after writing, I need to flush the cache to let the other part=
+y see it
+> > > > immediately. For example, after blkdev submits cbd_se, it needs to =
+update
+> > > > cmd_head to let the handler have a new cbd_se. Therefore, after upd=
+ating
+> > > > cmd_head, I need to flush the cache to let the backend see it.
+> > > >  =20
+> > >=20
+> > > Flushing the cache is insufficient.  All that cache flushing guarante=
+es
+> > > is that the memory has left the writer's CPU cache.  There are potent=
+ially
+> > > many write buffers between the CPU and the actual backing media that =
+the
+> > > CPU has no visibility of and cannot pierce through to force a full
+> > > guaranteed flush back to the media.
+> > >=20
+> > > for example:
+> > >=20
+> > > memcpy(some_cacheline, data, 64);
+> > > mfence();
+> > >=20
+> > > Will not guarantee that after mfence() completes that the remote host
+> > > will have visibility of the data.  mfence() does not guarantee a full
+> > > flush back down to the device, it only guarantees it has been pushed =
+out
+> > > of the CPU's cache.
+> > >=20
+> > > similarly:
+> > >=20
+> > > memcpy(some_cacheline, data, 64);
+> > > mfence();
+> > > memcpy(some_other_cacheline, data, 64);
+> > > mfence()
+> > >=20
+> > > Will not guarantee that some_cacheline reaches the backing media prior
+> > > to some_other_cacheline, as there is no guarantee of write-ordering in
+> > > CXL controllers (with the exception of writes to the same cacheline).
+> > >=20
+> > > So this statement:
+> > >  =20
+> > > > I need to flush the cache to let the other party see it immediately=
+. =20
+> > >=20
+> > > Is misleading.  They will not see is "immediately", they will see it
+> > > "eventually at some completely unknowable time in the future". =20
+> >=20
+> > This is indeed one of the issues I wanted to discuss at the RFC stage. =
+Thank
+> > you for pointing it out.
+> >=20
+> > In my opinion, using "nvdimm_flush" might be one way to address this is=
+sue,
+> > but it seems to flush the entire nd_region, which might be too heavy.
+> > Moreover, it only applies to non-volatile memory.
+> >=20
+> > This should be a general problem for cxl shared memory. In theory, FAMFS
+> > should also encounter this issue.
+> >=20
+> > Gregory, John, and Dan, Any suggestion about it?
+> >=20
+> > Thanx a lot =20
+> > >=20
+> > > ~Gregory
+> > >  =20
+>=20
+> Hi Dongsheng,
+>=20
+> Gregory is right about the uncertainty around "clflush" operations, but
+> let me drill in a bit further.
+>=20
+> Say you copy a payload into a "bucket" in a queue and then update an
+> index in a metadata structure; I'm thinking of the standard producer/
+> consumer queuing model here, with one index mutated by the producer and
+> the other mutated by the consumer.=20
+>=20
+> (I have not reviewed your queueing code, but you *must* be using this
+> model - things like linked-lists won't work in shared memory without=20
+> shared locks/atomics.)
+>=20
+> Normal logic says that you should clflush the payload before updating
+> the index, then update and clflush the index.
+>=20
+> But we still observe in non-cache-coherent shared memory that the payload=
+=20
+> may become valid *after* the clflush of the queue index.
+>=20
+> The famfs user space has a program called pcq.c, which implements a
+> producer/consumer queue in a pair of famfs files. The only way to=20
+> currently guarantee a valid read of a payload is to use sequence numbers=
+=20
+> and checksums on payloads.  We do observe mismatches with actual shared=20
+> memory, and the recovery is to clflush and re-read the payload from the=20
+> client side. (Aside: These file pairs theoretically might work for CBD=20
+> queues.)
+>=20
+> Anoter side note: it would be super-helpful if the CPU gave us an explici=
+t=20
+> invalidate rather than just clflush, which will write-back before=20
+> invalidating *if* the cache line is marked as dirty, even when software
+> knows this should not happen.
+>=20
+> Note that CXL 3.1 provides a way to guarantee that stuff that should not
+> be written back can't be written back: read-only mappings. This one of
+> the features I got into the spec; using this requires CXL 3.1 DCD, and=20
+> would require two DCD allocations (i.e. two tagged-capacity dax devices -=
+=20
+> one writable by the server and one by the client).
+>=20
+> Just to make things slightly gnarlier, the MESI cache coherency protocol
+> allows a CPU to speculatively convert a line from exclusive to modified,
+> meaning it's not clear as of now whether "occasional" clean write-backs
+> can be avoided. Meaning those read-only mappings may be more important
+> than one might think. (Clean write-backs basically make it
+> impossible for software to manage cache coherency.)
 
-diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
-index 091e8bb38887..58d79f9099e3 100644
---- a/Documentation/admin-guide/blockdev/zram.rst
-+++ b/Documentation/admin-guide/blockdev/zram.rst
-@@ -102,15 +102,26 @@ Examples::
- 	#select lzo compression algorithm
- 	echo lzo > /sys/block/zram0/comp_algorithm
- 
--For the time being, the `comp_algorithm` content does not necessarily
--show every compression algorithm supported by the kernel. We keep this
--list primarily to simplify device configuration and one can configure
--a new device with a compression algorithm that is not listed in
--`comp_algorithm`. The thing is that, internally, ZRAM uses Crypto API
--and, if some of the algorithms were built as modules, it's impossible
--to list all of them using, for instance, /proc/crypto or any other
--method. This, however, has an advantage of permitting the usage of
--custom crypto compression modules (implementing S/W or H/W compression).
-+For the time being, the `comp_algorithm` content shows only compression
-+algorithms that are supported by zram.
-+
-+It is also possible to pass algorithm specific configuration parameters::
-+
-+	#set compression level to 8
-+	echo "zstd level=8" > /sys/block/zram0/comp_algorithm
-+
-+Note that `comp_algorithm` also supports `algo=name` format::
-+
-+	#set compression level to 8
-+	echo "algo=zstd level=8" > /sys/block/zram0/comp_algorithm
-+
-+Certain compression algorithms support pre-trained dictionaries, which
-+significantly change algorithms' characteristics. In order to configure
-+compression algorithm to use external pre-trained dictionary, pass full
-+path to the dictionary along with other parameters::
-+
-+	#pass path to pre-trained dictionary
-+	echo "algo=zstd dict=/etc/dictioary" > /sys/block/zram0/comp_algorithm
- 
- 4) Set Disksize
- ===============
-@@ -442,6 +453,15 @@ configuration:::
- 	#select deflate recompression algorithm, priority 2
- 	echo "algo=deflate priority=2" > /sys/block/zramX/recomp_algorithm
- 
-+The `recomp_algorithm` also supports algorithm configuration parameters, e.g.
-+compression level and pre-trained dircionary::
-+
-+	#pass compression level
-+	echo "algo=zstd level=8" > /sys/block/zramX/recomp_algorithm
-+
-+	#pass path to pre-trained dictionary
-+	echo "algo=zstd dict=/etc/dictioary" > /sys/block/zramX/recomp_algorithm
-+
- Another device attribute that CONFIG_ZRAM_MULTI_COMP enables is recompress,
- which controls recompression.
- 
--- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+My understanding is that clean write backs are an implementation specific
+issue that came as a surprise to some CPU arch folk I spoke to, we will
+need some path for a host to say if they can ever do that.
+
+Given this definitely effects one CPU vendor, maybe solutions that
+rely on this not happening are not suitable for upstream.
+
+Maybe this market will be important enough for that CPU vendor to stop
+doing it but if they do it will take a while...
+
+Flushing in general is as CPU architecture problem where each of the
+architectures needs to be clear what they do / specify that their
+licensees do.
+
+I'm with Dan on encouraging all memory vendors to do hardware coherence!
+
+J
+
+>=20
+> Keep in mind that I don't think anybody has cxl 3 devices or CPUs yet, an=
+d=20
+> shared memory is not explicitly legal in cxl 2, so there are things a cpu=
+=20
+> could do (or not do) in a cxl 2 environment that are not illegal because=
+=20
+> they should not be observable in a no-shared-memory environment.
+>=20
+> CBD is interesting work, though for some of the reasons above I'm somewhat
+> skeptical of shared memory as an IPC mechanism.
+>=20
+> Regards,
+> John
+>=20
+>=20
+>=20
 
