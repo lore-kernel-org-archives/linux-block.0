@@ -1,45 +1,79 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB482155381;
-	Fri,  3 May 2024 15:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEA5155307
+	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 15:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714750583; cv=none; b=RUEqI4EUt527ZC/wX8BTJ2ztuIxEFd3apXi/ovlZm0GoTFUJvK/MY4GCr1zZ9Tsmr/Pi5UjjIjfOaAxrmGWq1OvEwBUt2GoVorYEN6exYc+ODIqYiEzqYC4U84w9oz9nk9umqfBN/eq4oTg8/6zfpkZ5KCscr20HoONEN57M/Q4=
+	t=1714751901; cv=none; b=kWKA0bynP0ikK80rN0LEgoYBq6gEEi/Z2aPLQbmCiswdoULYg3LuDYfv4fJJdDYKYmFeqZfSu8OaGSdj5pmaQE69m5Ymbsxucs5714UYzfs1Iu97AoaalsNk3br0Ysl5wCEJr3m13VosEpJ96L9RjcYKpxpF1bKs4tbVFsu481M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714750583; c=relaxed/simple;
-	bh=EEzyDCZSh6ttVm4linWJjoeObBMB6/2+NDDUDhynMBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qX2ySl2J2ZQeCay36CWYWtXSo8uFqNhAvZ21cuLbwzt1v0rgMTlqNoUudlJbUVqR5Lp2WYzByCT3zzTOF3p4vpZ+q50BROo7vTIwQIBfqNfL64NCEORv0VdF2tho+FcHcYUNblz0VYm9K6C6z9IfAM9+JIGJS/H2gFUDSSSuzXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1s2uxF-000000000Qp-259l;
-	Fri, 03 May 2024 15:36:09 +0000
-Date: Fri, 3 May 2024 16:36:06 +0100
-From: Daniel Golle <daniel@makrotopia.org>
+	s=arc-20240116; t=1714751901; c=relaxed/simple;
+	bh=1j/nVkGN8MpSHqLitlu07rdKEK5vrv4/7bOda2FWRuU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=YuqQSbWQJ5clswceaRaFyA2ku+0e45BeKzGYfXyk6N2lQBM52mznbVSPfbFUhOCM6SOE0gkri6tnYtvlKXJKZnLLhmtS4ICmm0kMQg+FCxIYxt7QbK2Xx3CdFCX6Y74FGrKEGxrwQr8TPN0E4EJEz+3YKCtxg+KP1KytYbU2pco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=e0ri/EJl; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="e0ri/EJl"
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7dec82cc833so23760139f.1
+        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 08:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1714751898; x=1715356698; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9IlB+4lrY4mbdOBx+Y/AvUZTSJ+/RHyMsVvlAgNIvx0=;
+        b=e0ri/EJlnB/gD2RdRbXNbHSYzHqF1x4tl20TZV77O5BGRLWjiXlFaZMQcFuSOHybhD
+         PMH/77mstK6BCta7IIf9XFI73a3JRMm0npS4DvuCcfv0klklwMvQFCFIYhn8POmdTmCR
+         WSGffuGFxTKVuxacpffjesQBKsKfIQyKLHP7tcSV9mFuiztWMKygUr2yvLp/hM4ljCIt
+         PmGx6AVUU+GnI1kRK72ZMLk6/LZaovG1ArruKIzbhooO4iAMsHwRWHb0IU49eIOll7pL
+         T0uNeEiYJS//62YSio5q9goNPffvLo361hoBTy7hz9yTJ71n1TR34C6A8O5eaWIgQOQk
+         L2zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714751898; x=1715356698;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9IlB+4lrY4mbdOBx+Y/AvUZTSJ+/RHyMsVvlAgNIvx0=;
+        b=w1HjxWrZFK/evNJxTQy9WvVJUhePM66K2scGbrVHwGBCLPezCea2I+BsLBef1I8C0p
+         rKpL3oe5XCCFy5O70i+JoZS464VAy8QFqSs6eEP91qQSdzE7W4VuBMb5mPEAN+u+/CUO
+         W5VIHRFeEqT3sB7nWGRQZbNUfrEWvd/ZNivgy3RLaEm8vNWheFWODMd8+UmCzaRoa8VL
+         5rEMQZGG2Q9Rgi9iiiPj01sMbEdh91fJu4+9T03Zc4yurCveWNEgvUVNzgTRIOZRodcX
+         5gKQCfFQmULvG8OYEYeVbjPgU+6Zs3a5YOBgU1cBZ8WCXwzum/XPuL6jaPvytJJbhz0L
+         QJqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGYgQjM9K9jE7KeqJToc7hAwYZFuV1g1mDhLr/gbdkV36C5QR6negVNbVYQxBjUbDoOg0xmy4eQC3kFRb/LbSBuU9o0ctnyR2ZfC4=
+X-Gm-Message-State: AOJu0YyfGcMu+wtRi5KHxSpp7zZySRb/qh1GQbGltdoffC2VcHt4Z8Pe
+	1ihLA+aWiNxm9cbfF6gZVY7JhXNx1TxISdPzLh+L9r5rrLNjYLocE87nRWO6K0o=
+X-Google-Smtp-Source: AGHT+IEhq3fMW12MtXv3TpRGKSpVUfgQa6i8Otwhc4OhnFURqdARaxV4bBxz/TUbONpIQSUgDIca0w==
+X-Received: by 2002:a05:6e02:1b0a:b0:36b:2a68:d7ee with SMTP id i10-20020a056e021b0a00b0036b2a68d7eemr3462066ilv.1.1714751898387;
+        Fri, 03 May 2024 08:58:18 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ck9-20020a056e02370900b0036c4c9bb39fsm139184ilb.59.2024.05.03.08.58.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 08:58:17 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
 To: INAGAKI Hiroshi <musashino.open@gmail.com>
-Cc: axboe@kernel.dk, yang.yang29@zte.com, justinstitt@google.com,
-	xu.panda@zte.com.cn, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Naohiro Aota <naota@elisp.net>
-Subject: Re: [PATCH] block: fix and simplify blkdevparts= cmdline parsing
-Message-ID: <ZjUEZtsJTaUt-5Yj@makrotopia.org>
+Cc: yang.yang29@zte.com, justinstitt@google.com, xu.panda@zte.com.cn, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Naohiro Aota <naota@elisp.net>
+In-Reply-To: <20240421074005.565-1-musashino.open@gmail.com>
 References: <20240421074005.565-1-musashino.open@gmail.com>
+Subject: Re: [PATCH] block: fix and simplify blkdevparts= cmdline parsing
+Message-Id: <171475189763.53050.4004560606440063491.b4-ty@kernel.dk>
+Date: Fri, 03 May 2024 09:58:17 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240421074005.565-1-musashino.open@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Sun, Apr 21, 2024 at 04:39:52PM +0900, INAGAKI Hiroshi wrote:
+
+On Sun, 21 Apr 2024 16:39:52 +0900, INAGAKI Hiroshi wrote:
 > Fix the cmdline parsing of the "blkdevparts=" parameter using strsep(),
 > which makes the code simpler.
 > 
@@ -51,191 +85,16 @@ On Sun, Apr 21, 2024 at 04:39:52PM +0900, INAGAKI Hiroshi wrote:
 > without NULL termination ('\0'), strscpy() takes it as a length of the
 > destination buffer, including a NULL termination.
 > 
-> Since the source buffer is not necessarily NULL terminated, the current
-> code copies "length - 1" characters and puts a NULL character in the
-> destination buffer. It replaces the last character with NULL and breaks
-> the parsing.
-> 
-> As an example, that buffer will be passed to parse_parts() and breaks
-> parsing sub-partitions due to the missing ')' at the end, like the
-> following.
-> 
-> example (Check Point V-80 & OpenWrt):
-> 
-> - Linux Kernel 6.6
-> 
->   [    0.000000] Kernel command line: console=ttyS0,115200 earlycon=uart8250,mmio32,0xf0512000 crashkernel=30M mvpp2x.queue_mode=1 blkdevparts=mmcblk1:48M@10M(kernel-1),1M(dtb-1),720M(rootfs-1),48M(kernel-2),1M(dtb-2),720M(rootfs-2),300M(default_sw),650M(logs),1M(preset_cfg),1M(adsl),-(storage) maxcpus=4
->   ...
->   [    0.884016] mmc1: new HS200 MMC card at address 0001
->   [    0.889951] mmcblk1: mmc1:0001 004GA0 3.69 GiB
->   [    0.895043] cmdline partition format is invalid.
->   [    0.895704]  mmcblk1: p1
->   [    0.903447] mmcblk1boot0: mmc1:0001 004GA0 2.00 MiB
->   [    0.908667] mmcblk1boot1: mmc1:0001 004GA0 2.00 MiB
->   [    0.913765] mmcblk1rpmb: mmc1:0001 004GA0 512 KiB, chardev (248:0)
-> 
->   1. "48M@10M(kernel-1),..." is passed to strscpy() with length=17
->      from parse_parts()
->   2. strscpy() returns -E2BIG and the destination buffer has
->      "48M@10M(kernel-1\0"
->   3. "48M@10M(kernel-1\0" is passed to parse_subpart()
->   4. parse_subpart() fails to find ')' when parsing a partition name,
->      and returns error
-> 
-> - Linux Kernel 6.1
-> 
->   [    0.000000] Kernel command line: console=ttyS0,115200 earlycon=uart8250,mmio32,0xf0512000 crashkernel=30M mvpp2x.queue_mode=1 blkdevparts=mmcblk1:48M@10M(kernel-1),1M(dtb-1),720M(rootfs-1),48M(kernel-2),1M(dtb-2),720M(rootfs-2),300M(default_sw),650M(logs),1M(preset_cfg),1M(adsl),-(storage) maxcpus=4
->   ...
->   [    0.953142] mmc1: new HS200 MMC card at address 0001
->   [    0.959114] mmcblk1: mmc1:0001 004GA0 3.69 GiB
->   [    0.964259]  mmcblk1: p1(kernel-1) p2(dtb-1) p3(rootfs-1) p4(kernel-2) p5(dtb-2) 6(rootfs-2) p7(default_sw) p8(logs) p9(preset_cfg) p10(adsl) p11(storage)
->   [    0.979174] mmcblk1boot0: mmc1:0001 004GA0 2.00 MiB
->   [    0.984674] mmcblk1boot1: mmc1:0001 004GA0 2.00 MiB
->   [    0.989926] mmcblk1rpmb: mmc1:0001 004GA0 512 KiB, chardev (248:0
-> 
-> By the way, strscpy() takes a length of destination buffer and it is
-> often confusing when copying characters with a specified length. Using
-> strsep() helps to separate the string by the specified character. Then,
-> we can use strscpy() naturally with the size of the destination buffer.
-> 
-> Separating the string on the fly is also useful to omit the redundant
-> string copy, reducing memory usage and improve the code readability.
-> 
-> Fixes: 146afeb235cc ("block: use strscpy() to instead of strncpy()")
-> Suggested-by: Naohiro Aota <naota@elisp.net>
-> Signed-off-by: INAGAKI Hiroshi <musashino.open@gmail.com>
+> [...]
 
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+Applied, thanks!
 
-> ---
->  block/partitions/cmdline.c | 49 ++++++++++----------------------------
->  1 file changed, 12 insertions(+), 37 deletions(-)
-> 
-> diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-> index c03bc105e575..152c85df92b2 100644
-> --- a/block/partitions/cmdline.c
-> +++ b/block/partitions/cmdline.c
-> @@ -70,8 +70,8 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
->  	}
->  
->  	if (*partdef == '(') {
-> -		int length;
-> -		char *next = strchr(++partdef, ')');
-> +		partdef++;
-> +		char *next = strsep(&partdef, ")");
->  
->  		if (!next) {
->  			pr_warn("cmdline partition format is invalid.");
-> @@ -79,11 +79,7 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
->  			goto fail;
->  		}
->  
-> -		length = min_t(int, next - partdef,
-> -			       sizeof(new_subpart->name) - 1);
-> -		strscpy(new_subpart->name, partdef, length);
-> -
-> -		partdef = ++next;
-> +		strscpy(new_subpart->name, next, sizeof(new_subpart->name));
->  	} else
->  		new_subpart->name[0] = '\0';
->  
-> @@ -117,14 +113,12 @@ static void free_subpart(struct cmdline_parts *parts)
->  	}
->  }
->  
-> -static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
-> +static int parse_parts(struct cmdline_parts **parts, char *bdevdef)
->  {
->  	int ret = -EINVAL;
->  	char *next;
-> -	int length;
->  	struct cmdline_subpart **next_subpart;
->  	struct cmdline_parts *newparts;
-> -	char buf[BDEVNAME_SIZE + 32 + 4];
->  
->  	*parts = NULL;
->  
-> @@ -132,28 +126,19 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
->  	if (!newparts)
->  		return -ENOMEM;
->  
-> -	next = strchr(bdevdef, ':');
-> +	next = strsep(&bdevdef, ":");
->  	if (!next) {
->  		pr_warn("cmdline partition has no block device.");
->  		goto fail;
->  	}
->  
-> -	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
-> -	strscpy(newparts->name, bdevdef, length);
-> +	strscpy(newparts->name, next, sizeof(newparts->name));
->  	newparts->nr_subparts = 0;
->  
->  	next_subpart = &newparts->subpart;
->  
-> -	while (next && *(++next)) {
-> -		bdevdef = next;
-> -		next = strchr(bdevdef, ',');
-> -
-> -		length = (!next) ? (sizeof(buf) - 1) :
-> -			min_t(int, next - bdevdef, sizeof(buf) - 1);
-> -
-> -		strscpy(buf, bdevdef, length);
-> -
-> -		ret = parse_subpart(next_subpart, buf);
-> +	while ((next = strsep(&bdevdef, ","))) {
-> +		ret = parse_subpart(next_subpart, next);
->  		if (ret)
->  			goto fail;
->  
-> @@ -199,24 +184,17 @@ static int cmdline_parts_parse(struct cmdline_parts **parts,
->  
->  	*parts = NULL;
->  
-> -	next = pbuf = buf = kstrdup(cmdline, GFP_KERNEL);
-> +	pbuf = buf = kstrdup(cmdline, GFP_KERNEL);
->  	if (!buf)
->  		return -ENOMEM;
->  
->  	next_parts = parts;
->  
-> -	while (next && *pbuf) {
-> -		next = strchr(pbuf, ';');
-> -		if (next)
-> -			*next = '\0';
-> -
-> -		ret = parse_parts(next_parts, pbuf);
-> +	while ((next = strsep(&pbuf, ";"))) {
-> +		ret = parse_parts(next_parts, next);
->  		if (ret)
->  			goto fail;
->  
-> -		if (next)
-> -			pbuf = ++next;
-> -
->  		next_parts = &(*next_parts)->next_parts;
->  	}
->  
-> @@ -250,7 +228,6 @@ static struct cmdline_parts *bdev_parts;
->  static int add_part(int slot, struct cmdline_subpart *subpart,
->  		struct parsed_partitions *state)
->  {
-> -	int label_min;
->  	struct partition_meta_info *info;
->  	char tmp[sizeof(info->volname) + 4];
->  
-> @@ -262,9 +239,7 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
->  
->  	info = &state->parts[slot].info;
->  
-> -	label_min = min_t(int, sizeof(info->volname) - 1,
-> -			  sizeof(subpart->name));
-> -	strscpy(info->volname, subpart->name, label_min);
-> +	strscpy(info->volname, subpart->name, sizeof(info->volname));
->  
->  	snprintf(tmp, sizeof(tmp), "(%s)", info->volname);
->  	strlcat(state->pp_buf, tmp, PAGE_SIZE);
-> -- 
-> 2.25.1
-> 
-> 
+[1/1] block: fix and simplify blkdevparts= cmdline parsing
+      commit: bc2e07dfd2c49aaa4b52302cf7b55cf94e025f79
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
