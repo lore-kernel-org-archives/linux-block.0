@@ -1,89 +1,138 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578D6146D5B
-	for <linux-block@vger.kernel.org>; Fri,  3 May 2024 07:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA37146A63;
+	Fri,  3 May 2024 07:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714721587; cv=none; b=RjEIvIly5YH7YyyUVUtT8WkaeBqouNzFl9jXfLL5a6s4Qw32DYIuy8fSFKwuh5qEzv6BhnK6qcyzEPV8gvgPmgTELjnge5eck+fidRsAeudJFKi3AlinpfkX0QOAwsj/cOzEnfDFXoiNEBDsDANRttx//zTd9QIOD42akPkCyW0=
+	t=1714722562; cv=none; b=kXZBrMCYA8XL/7C8EpGCnUddlekVwsZ8hCw/EVlAAwodzAkfwJYNiDFSWc+t92WzBCjuToTdlAtvs1FAxZQ1WZZSSRk6vX9WmFC7yyN++byiZRzeWZ2nB4b7sqZc89oqyGqwtrNBtSLoAo1kiAhICujaH4kEm2cN29A10Qcnh1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714721587; c=relaxed/simple;
-	bh=b1XezOORzd5b64d7aiFf9/we/iv9wMSMM7sbsyhJrRs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FoPCj3zTKTb8LHr9As65vdw5vcpdLOoNjSghDOkJELyu/PRHO8Rs4ezOLWeQFvuHxdImgR8khk6G25iERYFGMxi6zi7mnPas08D+UyR7aqb+UrJsHqk+pVYnH5Y6jbePPZzpxtXBw5yEkQ7Q5O73y5L5bx58lJxtAgYcA90AlZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	s=arc-20240116; t=1714722562; c=relaxed/simple;
+	bh=4QF8U70AN9B9tTKvuL5gDNX37P8EgEKiUun+MstwZHY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gZKwS+WzKXeGgYbJK1x8/8soYan04Z6br9RQd5Zv9fRlF+L5XY+AdI5+QxmzryCrtPzgsiZBNt1iu222gblv9QwR6NwkW5N5S0HSak7NBriB+WBjeGrEWAOGClZS/ZzG0n0dX1SP947hZijVzvi88x/vjtJr/kr0YV5e+leepRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MoeVTlqx; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-34cba0d9a3eso527149f8f.1
-        for <linux-block@vger.kernel.org>; Fri, 03 May 2024 00:33:06 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MoeVTlqx"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-5ce07cf1e5dso6299671a12.2;
+        Fri, 03 May 2024 00:49:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714722560; x=1715327360; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kApy9Rzo6wQrZI2czzyA0vwJXbNC/JWyyMd3bdTRDF8=;
+        b=MoeVTlqxpTOd1t2BtEiLraVmeSid7QbGLI+f7TX4n2TZNO1xJPnTAhrppc7HXU26xr
+         XB5s4BjkcUUA6ZmCrISfYSyK/VdHBMQJI8sI/LYtjDyOP8ofMqHyeUEqtpGUcSo5LAfp
+         Oa05CVB+7HlReY3PbOY4vupO8i4yXnOnz3KapJiPiMfhp+jvn+RFBDgPYsCq3K0ewYOW
+         GQ4ANJXn0vJka/dEluF/k7i8L1jZCO9QeGNFSi1u8ouQoR7WMSyIq7UhpDkI5oF/A9vr
+         1gcb0u36jTFaY6Y7Dw6QEjLZZmQgQPsztZSumW6K4Y0ZmsFkjhMzrFIAQSJIJSmkv79N
+         DPPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714721585; x=1715326385;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHdTuzF4WpCRrGciBhyi5PVxTiUH0NEDczsrk1P37l8=;
-        b=lW1v+wAlWIvMgzMz0c1+qnZowkhCqJSHzzfqXQGlu//KY9PqBxKhJSsrHyc7wZUmI3
-         RJzRPmGV630fJFlPVjgfGRmY4G1Y1neKqUBqpxaocr170J4gDkGHe4ZTTqu/QNh4Gz+F
-         mYCQTPhXdWAlu3iTeNX6XsYuW4e9nqYnEuRytwI1JoNkVfDfWd4KuI8i+cGHwSTaIabK
-         0Laulw3wUnC2rZ0LXnHl3S7z9Gpayvmk10fj724yyCtebghZa1zSwBZbJETfe7fuy90w
-         YPkX7Yt6i1pdZdYCRHTN+HzK3rLXqQfNAaG/xWas43HvRPNGlV+Ixu2iz3Ooy8FtmBba
-         P1yw==
-X-Gm-Message-State: AOJu0YxP2wLVePaqm3N7GO+APxn6mZARM6y5rdF2RTeloyk9Dc+P/6O+
-	h7N/fhyqlpYlMUl9qDZOxhJyYC4he89bRZqPDLprG0L0f396bM0Y
-X-Google-Smtp-Source: AGHT+IEYrDbizELqBNPGXfUq4T1W1asKlzoGEoXMAPvPSrWZk7SozGy90kvbazf1CUeajndZ3QJnAg==
-X-Received: by 2002:a5d:558a:0:b0:34d:7d77:36fa with SMTP id i10-20020a5d558a000000b0034d7d7736famr1225974wrv.5.1714721584470;
-        Fri, 03 May 2024 00:33:04 -0700 (PDT)
-Received: from [10.100.102.67] (85.65.192.64.dynamic.barak-online.net. [85.65.192.64])
-        by smtp.gmail.com with ESMTPSA id n12-20020a5d588c000000b0034cfb79220asm3081074wrf.116.2024.05.03.00.33.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 May 2024 00:33:04 -0700 (PDT)
-Message-ID: <3e3f0cdd-0eac-4463-a659-0d0ca9430658@grimberg.me>
-Date: Fri, 3 May 2024 10:33:02 +0300
+        d=1e100.net; s=20230601; t=1714722560; x=1715327360;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kApy9Rzo6wQrZI2czzyA0vwJXbNC/JWyyMd3bdTRDF8=;
+        b=ppr8pOjRvkMIEPnQIhxXMl3nUnE0lFMMHwamm5wTpBBl8ig69gvOVPFobl34dB1BCn
+         2RJ2AE7685s6Bt+e8ueB+BzJfaGJE0ys9ABrGWy50sT8i9y4PvHyCxDO2TosCTH2/vmf
+         AhFuedMKo24RrCFkmUO8rmtJtGtrj5zXvVhTxIkcNNA8VLufFb3lGAYDu6ALMplemgs5
+         Moc050/y+OYUXJ8nix/BKOQiRLTb8I6jdw+pk7YsYF3yJj/lRAAZTPytcKbty+XD/QTL
+         acVt0qIt6OrRzU4/XZe9p3ZdPu3PUVliiG0K14VOzkPvmFw5oHEka7Uc4Muu6sMz7Aj2
+         XXKg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+eQLAZlRMqAsx3QB4IOq6Rs0YIu+gIAehZovHr7LJFunqlxjq2v7KGeq6W9m5Zft5sFp0WaoPTW6MR1MOeXO7bnI5J8W/MPJE4ADT
+X-Gm-Message-State: AOJu0Yypot9/uXjkY1jOmk2TxkC5OnTPCU9WviPfQVEKpZcbibIulpmo
+	UXUrCyS2EABT2TqBCeDzrHlM1hqULuW0ZWtiQ8o5rK4EcW5/vvuGIoLuR8Hh
+X-Google-Smtp-Source: AGHT+IGtp3Ug6ioWBn98+IKRWbb60loiywGfib6DuJbYFoD3t72QiSlJGqtgbNz8Ssx/fMzxzewuUA==
+X-Received: by 2002:a05:6a20:a122:b0:1af:6a37:3cfd with SMTP id q34-20020a056a20a12200b001af6a373cfdmr2430354pzk.24.1714722559798;
+        Fri, 03 May 2024 00:49:19 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([104.28.245.200])
+        by smtp.gmail.com with ESMTPSA id y14-20020a17090322ce00b001e3d2314f3csm2609836plg.141.2024.05.03.00.49.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 00:49:19 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Xu Panda <xu.panda@zte.com.cn>,
+	Justin Stitt <justinstitt@google.com>,
+	Yang Yang <yang.yang29@zte.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: fix buf size for strscpy()
+Date: Fri,  3 May 2024 15:48:37 +0800
+Message-ID: <20240503074845.12181-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v3 10/15] nvme/{006,008,010,012,014,019,023}:
- support NVMET_BLKDEV_TYPES
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Daniel Wagner <dwagern@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>
-References: <20240424075955.3604997-1-shinichiro.kawasaki@wdc.com>
- <20240424075955.3604997-11-shinichiro.kawasaki@wdc.com>
- <6b55293c-0764-4922-b329-be393c9afc81@grimberg.me>
- <36jinbbjhzr6erpfpnfqmk2jebf5tlnl26skuak73krwyyu6zi@i5qtgb4bqqgy>
- <eeee5574-f4de-45a7-837b-74589dab423e@grimberg.me>
- <sb3syw5ysqvkxvvn7mubzk3n6pfsivq54ownkyju2sgagesxpf@ktfn3333dmt2>
- <0a21ba7f-4d0e-4368-a215-2b81a8cf562e@grimberg.me>
- <bxklo2o4onybsamatf2nyhecnkl3wuoz66p7nq2dyndnfc4vxt@hkokvvx4c7jy>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <bxklo2o4onybsamatf2nyhecnkl3wuoz66p7nq2dyndnfc4vxt@hkokvvx4c7jy>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
->>> Another question is how it is likely to have more conditions to add on.
->> I expect that people will want to add more flavors moving forward. For
->> example
->> ADDRESS_FAMILIES="ipv4 ipv6" RDMA_TRANSPORT="siw rxe" and possibly other
->> features that can grow in the future.
->>
->>
->>>    I guess
->>> such many, multiplied conditions will result in combination explosion and long
->>> test runtime, so I'm not sure how much it will be useful.
->> I think that running multiple flavors of a test suite is a capability that
->> is bound to be
->> reused as more test flavors emerge. But that may be just my opinion.
->>
->>> Do we have potential candidates of the third or fourth conditions?
->> Yes, see above.
-> Okay, the candidates look useful in the future. Fortunately, I came up with an
-> idea to make up the condition matrix from multiple set_conditions() hooks. Will
-> try to implement it and respin the series.
+strscpy() takes the total size of destination buffer as the argument,
+including the space for the terminating null character.
 
-Cool.
+The actual length of the buffer should be len(str) + 1, which can be
+seen from the indexes where null characters are written in the code
+before the commit in question, and 'sizeof(buf) - 1' right above
+the problematic codes.
+
+Without the additional 1 size and the absence of checkes against -E2BIG,
+strscpy() will angrily eat the last character of the source string. In
+my situation, strscpy() will take away one character before the comma
+"," (which is presumably the right bracket ")") in parse_parts(), making
+parse_subpart() unable to 'strchr(++partdef, ')')' and producing the
+following error message:
+
+  cmdline partition format is invalid.
+
+Fixes: 146afeb235cc ("block: use strscpy() to instead of strncpy()")
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ block/partitions/cmdline.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
+index c03bc105e575..6d8401ce2943 100644
+--- a/block/partitions/cmdline.c
++++ b/block/partitions/cmdline.c
+@@ -81,7 +81,7 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
+ 
+ 		length = min_t(int, next - partdef,
+ 			       sizeof(new_subpart->name) - 1);
+-		strscpy(new_subpart->name, partdef, length);
++		strscpy(new_subpart->name, partdef, length + 1);
+ 
+ 		partdef = ++next;
+ 	} else
+@@ -139,7 +139,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
+ 	}
+ 
+ 	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
+-	strscpy(newparts->name, bdevdef, length);
++	strscpy(newparts->name, bdevdef, length + 1);
+ 	newparts->nr_subparts = 0;
+ 
+ 	next_subpart = &newparts->subpart;
+@@ -151,7 +151,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
+ 		length = (!next) ? (sizeof(buf) - 1) :
+ 			min_t(int, next - bdevdef, sizeof(buf) - 1);
+ 
+-		strscpy(buf, bdevdef, length);
++		strscpy(buf, bdevdef, length + 1);
+ 
+ 		ret = parse_subpart(next_subpart, buf);
+ 		if (ret)
+@@ -264,7 +264,7 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
+ 
+ 	label_min = min_t(int, sizeof(info->volname) - 1,
+ 			  sizeof(subpart->name));
+-	strscpy(info->volname, subpart->name, label_min);
++	strscpy(info->volname, subpart->name, label_min + 1);
+ 
+ 	snprintf(tmp, sizeof(tmp), "(%s)", info->volname);
+ 	strlcat(state->pp_buf, tmp, PAGE_SIZE);
+-- 
+2.43.0
+
