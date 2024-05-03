@@ -1,492 +1,196 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2041.outbound.protection.outlook.com [40.107.244.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D895379E5;
-	Fri,  3 May 2024 14:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714747287; cv=none; b=Gqj8DAQjrTBRg/jjumaVzUlmPcgdrB/tOqbBumQcFjOXRH6sxto8TYtJzSfxqJRZtDo2mVrZ0FA58si5DdV+IYoGYSdc9EJbmwTYE5Y6wNYU5TpmzLqjdgbo4ese2EERBvqHJaILOi9oKz1Ub55u4HO6XyeGVy5xk8CJIg7fBbg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714747287; c=relaxed/simple;
-	bh=zlHjK/PxE1TRXjUMhkONFHt7Y6Ilexx1/gDIujwhsOw=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UN0h+TguRxctk4Rk86+wRgEBLXill/8yVivDEnoKnaZJJGz+HItN7C7Ec780CCg1BOqJcdPyRmn0VzsIHLgHqek7V0fHq+FvhTpNb5HN/aQXwe++HrixWkN0Fva7DpsssjmA9Q/ctVaiP6YVWeNW9HVXNyvme2V5QxHG9NM2z/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ED4hSxZI; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463516FC7;
+	Fri,  3 May 2024 14:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714748014; cv=fail; b=gh1jKV3LghuGSUrVIt1f+JwEFPKfz35liP9uiVbbNkh2PC8+wAydgNbDe1JaT9IKW/ENXhI5X2XMFOFXS/u96U3ecgf8GJ8C6rjcV9p2m3xg0tqNAl5sreNvEs9i1sOJomwAe70iLuTfuGM1Ab/rHP4SqKKKiuj4/snRNd+0pMw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714748014; c=relaxed/simple;
+	bh=ane7aaZZngHCi4hoQ3AtNpwP0oSP5JEBtpsoFmpWIx4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VozOpLgdoKLhsfojtXu9Gh53NqMjbQF92+I07GwPn6zEWryEjOgU4m5AIyUpDmK+JVjTgE5Mnyj28t887hQAXNnjEl8lj6YySf5H+od0QSBP923m3wqlfnSI+LXR/NWmUcbcLLpDxOZQlGb4YtTNzwzxllblf+A0lbAwEB4qSLs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h4mT+eCI; arc=fail smtp.client-ip=40.107.244.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ED4hSxZI"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41ba1ba55e8so54843065e9.1;
-        Fri, 03 May 2024 07:41:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714747283; x=1715352083; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=azRagsGySzV5eAEs8d+ON6g73h2e/RJB1Lcdlw2LC84=;
-        b=ED4hSxZI+3Cya7T3tRTfOZH0S7rJHdy+gGD+IljMlvQdce3a18AafrVdmCd7eC6af6
-         3bMtf2SvPeZpaqfdAOPQqL5L0RaSNpWebClyfPn6QQNaj4Yn/VJF4LYCIsryb65s/Ott
-         orJ/FjvKHvd6XU27Hq2g9AACrrr+Pq60S1oBUZoMhSJqv4wGuSLmZAFX6kCwiVgMy30C
-         8U9Xbzoo5FOTgJJnizGoedvAJC4JwhWCbwr4awXadspxBeVQb2fdZKoqHKWCyNuJa6Hi
-         T+0lKk5wjplDIsohlNrKuZ7PQICged/MmFXSdIm/muf5wNWLC9HE3YFr4LGWh7R4mpOj
-         ywvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714747283; x=1715352083;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=azRagsGySzV5eAEs8d+ON6g73h2e/RJB1Lcdlw2LC84=;
-        b=Xddk0T2sZ7fHYahJ6ZhA+OVYQE2bNN6tzcnkSpv4A2ROWWCkm/WooMg6jpfw8QzVZ5
-         QRerhFrrrdhGYWhxXOn+rf+nbthBs+a4rO64FF3+fff+kRvhGAvbL0T7CpQdyOHwWFi1
-         TSQjTwcX97vNRoDEoYqtjzRRpbJJbG882nYBlO5cNtDMB6rsN/1HfLdoJh4AqwZyiK1l
-         CuE3Tas1poswUZdHLT5Iojn3Cqmj67YwoHTJpWysxgmJiqZYeHvvixlShnLiMq/5MC8W
-         VXS3uLXlc06kyaK9a//2P9NDsdd+1FDC8mVu2fBlqoI+rNMK3bw1QQbGXid8Jilx1EaX
-         B24Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUBtsTF8MhuOH/K/4Wy56ICFZYaOEdYSgQrdYUKgD1Fk+LZRyBBSioYomlNxupIGL4g9lkNmBnrCn+zGGB0HbL465sfw3+0RIFAdqqLHlU4oEyvNdIXYQriTjCy+zgLmeBJO1mLDGLvKscbF/nas7qfEpGOfxE0hI/Jugk/k2SzJfFEgayMKH8JXwqcQPxYY0ezodPd8n1s5OMppr8asXIzBufgXlPf6vKDjyfS8BofnP7Pob/B
-X-Gm-Message-State: AOJu0YxIVdfTg5NIxTPqYlY6xcAdJEQTjNtpBd+c/9mcggBXXhBuH/r8
-	pk4PjLTjBQieaowS3FtGa3VuU4RLsap2OBVaPGigXkdntRE/6rmy
-X-Google-Smtp-Source: AGHT+IFwwDzx7kiKOowz9Bq/5p6VLgEK7705r0A4XgwNwtMoQjgzKV8U7tRiQEBrFzAOa1zNKfTrDw==
-X-Received: by 2002:a05:600c:458e:b0:41c:83aa:18b7 with SMTP id r14-20020a05600c458e00b0041c83aa18b7mr2241241wmo.33.1714747282852;
-        Fri, 03 May 2024 07:41:22 -0700 (PDT)
-Received: from [10.16.124.60] ([212.227.34.98])
-        by smtp.gmail.com with ESMTPSA id p12-20020adfe60c000000b0034ccd06a6a3sm3935256wrm.18.2024.05.03.07.41.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 May 2024 07:41:22 -0700 (PDT)
-From: Zhu Yanjun <zyjzyj2000@gmail.com>
-X-Google-Original-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-Message-ID: <c9f9e29e-c2e1-4f99-b359-db0babd41dec@linux.dev>
-Date: Fri, 3 May 2024 16:41:21 +0200
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h4mT+eCI"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ex62HpzQ6ziA3+tLAjJD2rGRJNCOosU01X2+kjE9K8IvDNZdPS1KfrYujgbxiXjRiq92eSy6hdh21aiN30dsFPkaQnibPf/+zWCxOuyMg2uhbJVNYbZXw4WKZr91uTZqi/cXCg1FHLetAnb+XWt6x4+Xp0zuYY6smm2RgRjPf/ico8Fro5a0GIeilpCsgs/IJfQJ6hYKuo1suAfHNneWizOtfVD/UDwynci65bxFJIC53UZgBjtoLHq++QBhjd63bNQipFkTHFPtsTYN7XCezvEJodh0oVhe1se+D/93G67LlWb2dYkNANy9MW4HfZr3m1gAg5SPZlJZlegyCEe09w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d5T1n/TKCOb7f7MrPGRkv6VUPD+Jl9L67VvtsemRaTQ=;
+ b=Svxezu268i6kZTubSfcPtrAJ3rIZUjEoDbGE/foQkmS50emH4j5apQqUjfjPgoLHB2JrR+U88OoeOrrddvO8MxQxJgpue8xD4XdsH89UrdZArEYHmfxDCVuEbH0D0RY/5+Vx5GY+GpCTXELu0SY0yKlxDVqRaIVNsH66fn+ykVvU7GRp7OJAuqq9Ae4TWuIS9kNeMBd+27Wa+8ZMacp81F17naGTWwWm8uiv8DFHi3r85rxU/2rBOi5Xdoh8GovZmadvygm3YlIKH7OGyJfKodvMzZbtbKB6MI+gtV/OX0hmJMP2VH8XBrkimDRJrv03M7OK5EoYdxLfHddp5M1SYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d5T1n/TKCOb7f7MrPGRkv6VUPD+Jl9L67VvtsemRaTQ=;
+ b=h4mT+eCIdAw2BsKRIMm3loAxZknVn85SnBXr6+XVK7V0DLHnbYpvIKpDUwh17m3kt15cLsxGeiHLFE+ZzRmdyRePpXbbbzWFml7AP5wDY2c4tmkmgG37tksu2R45eUO13z9KsF4tcPM38Njw7jURTdPRoNL1nPU97ZHN5eOSkJJFyYkfUhBCGhLhZSX7RLbtJI4eEh4Ykk+X01/g3X6ElI4JztMbSUEtjwtwSxA48Q5itW65W+ij2In36SZbxQIAsHh1gZCVyeCCdEhZ7envy3eCl/38sG5vw+TlJa8XKhaSECxQMH1bViVwNPizvC8klVeVJtWxzVgslL+AeH1R4Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB5744.namprd12.prod.outlook.com (2603:10b6:8:73::18) by
+ IA1PR12MB6114.namprd12.prod.outlook.com (2603:10b6:208:3ea::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7544.29; Fri, 3 May 2024 14:53:29 +0000
+Received: from DS7PR12MB5744.namprd12.prod.outlook.com
+ ([fe80::f018:13a9:e165:6b7e]) by DS7PR12MB5744.namprd12.prod.outlook.com
+ ([fe80::f018:13a9:e165:6b7e%3]) with mapi id 15.20.7544.023; Fri, 3 May 2024
+ 14:53:28 +0000
+From: Zi Yan <ziy@nvidia.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: akpm@linux-foundation.org, willy@infradead.org, djwong@kernel.org,
+ brauner@kernel.org, david@fromorbit.com, chandan.babu@oracle.com,
+ hare@suse.de, ritesh.list@gmail.com, john.g.garry@oracle.com,
+ linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, gost.dev@samsung.com, p.raghav@samsung.com,
+ kernel@pankajraghav.com
+Subject: Re: [PATCH v5 05/11] mm: split a folio in minimum folio order chunks
+Date: Fri, 03 May 2024 10:53:26 -0400
+X-Mailer: MailMate (1.14r6030)
+Message-ID: <0AA55BD5-3068-4808-92CA-14AD6DA6E607@nvidia.com>
+In-Reply-To: <20240503095353.3798063-6-mcgrof@kernel.org>
+References: <20240503095353.3798063-1-mcgrof@kernel.org>
+ <20240503095353.3798063-6-mcgrof@kernel.org>
+Content-Type: multipart/signed;
+ boundary="=_MailMate_B3D6D59D-F262-463D-B256-EA25C0831E9A_=";
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+X-ClientProxiedBy: BLAP220CA0010.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::15) To DS7PR12MB5744.namprd12.prod.outlook.com
+ (2603:10b6:8:73::18)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
-To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Robin Murphy <robin.murphy@arm.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
- Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
- linux-nvme@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org,
- Bart Van Assche <bvanassche@acm.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Amir Goldstein <amir73il@gmail.com>,
- "josef@toxicpanda.com" <josef@toxicpanda.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- Dan Williams <dan.j.williams@intel.com>, "jack@suse.com" <jack@suse.com>,
- Leon Romanovsky <leonro@nvidia.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-References: <cover.1709635535.git.leon@kernel.org>
- <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
-Content-Language: en-US
-In-Reply-To: <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB5744:EE_|IA1PR12MB6114:EE_
+X-MS-Office365-Filtering-Correlation-Id: 92072c42-eacf-4b48-1ed1-08dc6b80cb20
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|7416005|366007|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?u9B/Zxp49B2MXgwXMKGLrTBy1D5b8d5X58hgCA1VWK+ntf84M8n8ilfb8Bq0?=
+ =?us-ascii?Q?nTuMEb/lxj1Xx/My88HiiBt2GcfM7xJ0YDk2d1DYaR1mku5K/SBX48VoIp7I?=
+ =?us-ascii?Q?ROhTPbfEh1gadfB4E+eht1lPeONCDbu5rcM4eFc2SDWaKOC+a0TJPoyOM+Oq?=
+ =?us-ascii?Q?uPGnjOFMzDJp15KvdX8WUILiUpHUy8fGmMawXcxt8UPD/jnec/FsHGGmUiBS?=
+ =?us-ascii?Q?DxUmeLGwYYxbMZqtnW/fhPNf3HuOOffxU8eR1Y3ejrRYJIKCKjeKOzyiGDXO?=
+ =?us-ascii?Q?TAsEBOv4S4FggUrhqdAimzYAsEGMT1gR+cGdvd1xo30HaOyQSFJwOYb4c5PH?=
+ =?us-ascii?Q?TAMWW37h/nmoqZax0akS3jCJC4k7d3S7eYxhA7tgEZxBX2bkFwNoya9gGIBi?=
+ =?us-ascii?Q?e/uVno/oQxKUYzHL9SmGtpXzc3KfK3T1WQGmpZT1VDd5Q9Ejvx/nwAHzpjnR?=
+ =?us-ascii?Q?gp9znwcxd7dhaZ4yFAJlMAT9ebMUn/1a26qlqTOLq1kJ7nINqsECSLx52Wi4?=
+ =?us-ascii?Q?dEB/OJL2IZoIOe05ngw+DfUotXyLUIeOncs/2UceXWiocjeAZ1W850W+h8E7?=
+ =?us-ascii?Q?pJzLOWuzd+6gNvL/5Qv5O8/VhWWXp+pTAuKNoBaDU9xDqw2Rul+qCrtnNCi9?=
+ =?us-ascii?Q?96In17OPe0Bebc1tiYWwygEaaFb1uOkq6WD4oXQOmfJWP/Fb0cYwJ+veYFij?=
+ =?us-ascii?Q?b6srMnTbqpcLXGgj2hROkoTxsM6wzRpYW2VAuOzRPog1kPy3Mbd7UROJwPTe?=
+ =?us-ascii?Q?zdOuy+bmbLDckdlirPVE8aKQTXmLuj3hbyqoyhIDWrQpG7v2wTOW/gD+g6jB?=
+ =?us-ascii?Q?V/GdoMLq23bzVxSM0kLo4KUtCJ+DjzjozzDM46rppG/K2rp+qCrTF5mE6HT6?=
+ =?us-ascii?Q?meZWaK+HHngGxGywpAqymzUpeIa7RpqaLe8BDmK14DA6GSXdV5qQdh5OYRaW?=
+ =?us-ascii?Q?Vae4GdaZIkl0Ko1i2LJn6JWBOq/DytyTYplOBY4phQKNyEeyfP5aPdeAojN5?=
+ =?us-ascii?Q?v1jRIs1wsnLJHZHJlDz4FkjfyAp8zwMlZEnNxBse+bQgaowoEdx2ILNVs7Rg?=
+ =?us-ascii?Q?fqIAdIe3Hv4N2CL2tafS2Kjb4UiPqCxTMH019QX4d91VvCBT6txNU/zEa2tW?=
+ =?us-ascii?Q?Kb0S1HrAh4SSdBk2PSGpH/yDFH81nG+t1lZFDRl+FbxLt8iCeUnoUkehCQE1?=
+ =?us-ascii?Q?OAgHGbNqxogjS6NWxjvw2XOP7wkGWH84CcwlWw+3cwid+o758EMwnSX4F2JB?=
+ =?us-ascii?Q?XUyosBaj0Dh1qevBK1buK3+f1clop6TJZR0MPPNjMg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB5744.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(366007)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?38g+hH8+7DaKwV4gOMwJKtYFcrD129gN3qZmNS2fqSkdsGb9QzZPIw90ifcS?=
+ =?us-ascii?Q?KqFPvLFaizvkmaVdIW5BnY8l1Bn98ZocC02LI6hRH8nqI3RxQlksUOWpOtVK?=
+ =?us-ascii?Q?QfdHhYYg1jlFkOPLthM3xqgQoqr9xMP3Nq0K8Ix8Z9qLcPLHOp1XLmBFs0fj?=
+ =?us-ascii?Q?WDb8SONNWVfyL6Ak8hDCvq9uRfBx1e4zrSYQ4FwYpkUoKjsERin11ABVHMu5?=
+ =?us-ascii?Q?1Ca88NJv2TGSTraJbByrQTsU73ZZd+cYZXGvM8ffiaK5oiNyLpHk8OEsFKTC?=
+ =?us-ascii?Q?PKCJ1U6vrK0Hh7JZh42FZwzTP8h14pOAtmIY0XAvYoJHW1Tto7K8WIYZpWaP?=
+ =?us-ascii?Q?WRgVW5xrconQA/fc71wAfvJ5Vel0e59i7vSm27fa5NkJ1JWMKi5WhlIj8+Jq?=
+ =?us-ascii?Q?ijg/4vWM16ePth4m2rZmLrjcahW9bDSFwKDFgwc01GdRDa0ccebTPhuJPaNn?=
+ =?us-ascii?Q?X1sx88PZNe8fzzTAgaUghL6w3cCwNBtFhSJHS3whRfcy9LIGWO4slC/XGce6?=
+ =?us-ascii?Q?xf3GeWwTkxIXQ3JvxSmvJCUqJkRyQcL2QsEF6kVA9Ma26VrRy3fQljys0NGF?=
+ =?us-ascii?Q?2dhiIsMtZOWJFbcy2xkSbkyzK9e3x/rPJwGC2UF95r5AdaQhsoWIoryyij0m?=
+ =?us-ascii?Q?8sROpwG6i0yrTVCIFxfiMZMVtnYdxVrnXIs4e0g+Tg5eFlAeL2A4vOITe1oj?=
+ =?us-ascii?Q?jagwUAWD57xyZMO+Sun0ZMwqi5M2UiSOSWiiSyJ7EpgyTyFxPLV7OdzqbaFn?=
+ =?us-ascii?Q?9UzEfDt9XiqYgduymdWcP14dcqUHznWg9zhMAKlo53U3ssIu/LSr7+Ddnt1W?=
+ =?us-ascii?Q?Zp1Ej327OpddjWfGBJb28A8q/+T/OUCx3OujqtQ+f27JqCwmBzrLDZbzvvpG?=
+ =?us-ascii?Q?rBLBDHnUU6iJNr+uHcUdSxzJ8JZs3QCitFfMbJjWZVyqtK9EIROy5OnYcx78?=
+ =?us-ascii?Q?74KJMiVGRr00me/2KLSGHBMp8x1pbvSbOio3IfKbfGL9+DqknvOsgXYB5hLR?=
+ =?us-ascii?Q?7puCzLRsQ/Y3Tkz0qohuVG0kdQ0M0PBaz36BdsZfytLioWWca5rMC1wtBBZy?=
+ =?us-ascii?Q?7Xb+HLZRCxVr/ISeKYLai401kI7TpKC5eDvSHyIuLBpo6HabImzd/Mk+Vxcw?=
+ =?us-ascii?Q?fZFDE7/ZFEkt4b8oMENLxf9RNo2Up7xz4M8wLBzePBMpNIiLk5kX43BTxPaD?=
+ =?us-ascii?Q?Nk9/gG63hWgFvkR2Curo13uYpOzDF84oKHusX+e2aZCVlGw+fqbk/jZIjazc?=
+ =?us-ascii?Q?KeQZYnOOlXldNHAP+A+C3V3nWu2qAqoFBvIZ3c002pSInH5GIPapRVleHkLG?=
+ =?us-ascii?Q?4GX2VpaR7M7gOuz0d3kEB53Maz5d6SxjBI+Id429AzmxjMaTT/0DBm+w/mWu?=
+ =?us-ascii?Q?rW7j+Kf1lqRtce3IHh29AZ9kI3vezPp6LPxwGJnqBL8nBtcZfUrvn3nCmHXy?=
+ =?us-ascii?Q?s6HI5u6+sy7/nYELOoATz4GenfLMzCwfbvMUsdfoW8qQBA+SM3lADa3JTMWf?=
+ =?us-ascii?Q?Grl1+owp+Q4byWqjNJBZuEEKiY2kQhhIT9879QfLUK/8Pv6LwE8pfEgI4cD0?=
+ =?us-ascii?Q?lNnB3oHiEkeoTUQSoC8=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92072c42-eacf-4b48-1ed1-08dc6b80cb20
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB5744.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2024 14:53:28.9081
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: P0IbefQllICm+k0odSXa92ffMwjUsZjaNnJgrQh0mnf/kHQdSwiX4xfQkFq3ut/9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6114
 
-On 05.03.24 12:18, Leon Romanovsky wrote:
-> From: Chaitanya Kulkarni <kch@nvidia.com>
-> 
-> Update nvme_iod structure to hold iova, list of DMA linked addresses and
-> total linked count, first one is needed in the request submission path
-> to create a request to DMA mapping and last two are needed in the
-> request completion path to remove the DMA mapping. In nvme_map_data()
-> initialize iova with device, direction, and iova dma length with the
-> help of blk_rq_get_dma_length(). Allocate iova using dma_alloc_iova().
-> and call in nvme_pci_setup_sgls().
-> 
-> Call newly added blk_rq_dma_map() to create request to DMA mapping and
-> provide a callback function nvme_pci_sgl_map(). In the callback
-> function initialize NVMe SGL dma addresses.
-> 
-> Finally in nvme_unmap_data() unlink the dma address and free iova.
-> 
-> Full disclosure:-
-> -----------------
-> 
-> This is an RFC to demonstrate the newly added DMA APIs can be used to
-> map/unmap bvecs without the use of sg list, hence I've modified the pci
-> code to only handle SGLs for now. Once we have some agreement on the
-> structure of new DMA API I'll add support for PRPs along with all the
-> optimization that I've removed from the code for this RFC for NVMe SGLs
-> and PRPs.
-> 
-> I was able to run fio verification job successfully :-
-> 
-> $ fio fio/verify.fio --ioengine=io_uring --filename=/dev/nvme0n1
->                       --loops=10
-> write-and-verify: (g=0): rw=randwrite, bs=(R) 8192B-8192B, (W) 8192B-8192B,
-> 	(T) 8192B-8192B, ioengine=io_uring, iodepth=16
-> fio-3.36
-> Starting 1 process
-> Jobs: 1 (f=1): [V(1)][81.6%][r=12.2MiB/s][r=1559 IOPS][eta 03m:00s]
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4435: Mon Mar  4 20:54:48 2024
->    read: IOPS=2789, BW=21.8MiB/s (22.9MB/s)(6473MiB/297008msec)
->      slat (usec): min=4, max=5124, avg=356.51, stdev=604.30
->      clat (nsec): min=1593, max=23376k, avg=5377076.99, stdev=2039189.93
->       lat (usec): min=493, max=23407, avg=5733.58, stdev=2103.22
->      clat percentiles (usec):
->       |  1.00th=[ 1172],  5.00th=[ 2114], 10.00th=[ 2835], 20.00th=[ 3654],
->       | 30.00th=[ 4228], 40.00th=[ 4752], 50.00th=[ 5276], 60.00th=[ 5800],
->       | 70.00th=[ 6325], 80.00th=[ 7046], 90.00th=[ 8094], 95.00th=[ 8979],
->       | 99.00th=[10421], 99.50th=[11076], 99.90th=[12780], 99.95th=[14222],
->       | 99.99th=[16909]
->    write: IOPS=2608, BW=20.4MiB/s (21.4MB/s)(10.0GiB/502571msec); 0 zone resets
->      slat (usec): min=4, max=5787, avg=382.68, stdev=649.01
->      clat (nsec): min=521, max=23650k, avg=5751363.17, stdev=2676065.35
->       lat (usec): min=95, max=23674, avg=6134.04, stdev=2813.48
->      clat percentiles (usec):
->       |  1.00th=[  709],  5.00th=[ 1270], 10.00th=[ 1958], 20.00th=[ 3261],
->       | 30.00th=[ 4228], 40.00th=[ 5014], 50.00th=[ 5800], 60.00th=[ 6521],
->       | 70.00th=[ 7373], 80.00th=[ 8225], 90.00th=[ 9241], 95.00th=[ 9896],
->       | 99.00th=[11469], 99.50th=[11863], 99.90th=[13960], 99.95th=[15270],
->       | 99.99th=[17695]
->     bw (  KiB/s): min= 1440, max=132496, per=99.28%, avg=20715.88, stdev=13123.13, samples=1013
->     iops        : min=  180, max=16562, avg=2589.34, stdev=1640.39, samples=1013
->    lat (nsec)   : 750=0.01%
->    lat (usec)   : 2=0.01%, 4=0.01%, 100=0.01%, 250=0.01%, 500=0.07%
->    lat (usec)   : 750=0.79%, 1000=1.22%
->    lat (msec)   : 2=5.94%, 4=18.87%, 10=69.53%, 20=3.58%, 50=0.01%
->    cpu          : usr=1.01%, sys=98.95%, ctx=1591, majf=0, minf=2286
->    IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=100.0%, 32=0.0%, >=64=0.0%
->       submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
->       complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.1%, 32=0.0%, 64=0.0%, >=64=0.0%
->       issued rwts: total=828524,1310720,0,0 short=0,0,0,0 dropped=0,0,0,0
->       latency   : target=0, window=0, percentile=100.00%, depth=16
-> 
-> Run status group 0 (all jobs):
->     READ: bw=21.8MiB/s (22.9MB/s), 21.8MiB/s-21.8MiB/s (22.9MB/s-22.9MB/s),
-> 	io=6473MiB (6787MB), run=297008-297008msec
->    WRITE: bw=20.4MiB/s (21.4MB/s), 20.4MiB/s-20.4MiB/s (21.4MB/s-21.4MB/s),
-> 	io=10.0GiB (10.7GB), run=502571-502571msec
-> 
-> Disk stats (read/write):
->    nvme0n1: ios=829189/1310720, sectors=13293416/20971520, merge=0/0,
-> 	ticks=836561/1340351, in_queue=2176913, util=99.30%
-> 
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+--=_MailMate_B3D6D59D-F262-463D-B256-EA25C0831E9A_=
+Content-Type: text/plain
+
+On 3 May 2024, at 5:53, Luis Chamberlain wrote:
+
+> split_folio() and split_folio_to_list() assume order 0, to support
+> minorder we must expand these to check the folio mapping order and use
+> that.
+>
+> Set new_order to be at least minimum folio order if it is set in
+> split_huge_page_to_list() so that we can maintain minimum folio order
+> requirement in the page cache.
+>
+> Update the debugfs write files used for testing to ensure the order
+> is respected as well. We simply enforce the min order when a file
+> mapping is used.
+>
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 > ---
->   drivers/nvme/host/pci.c | 220 +++++++++-------------------------------
->   1 file changed, 49 insertions(+), 171 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index e6267a6aa380..140939228409 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -236,7 +236,9 @@ struct nvme_iod {
->   	unsigned int dma_len;	/* length of single DMA segment mapping */
->   	dma_addr_t first_dma;
->   	dma_addr_t meta_dma;
-> -	struct sg_table sgt;
-> +	struct dma_iova_attrs iova;
-> +	dma_addr_t dma_link_address[128];
+>  include/linux/huge_mm.h | 12 ++++++----
+>  mm/huge_memory.c        | 50 ++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 55 insertions(+), 7 deletions(-)
+>
+It makes sense to me. Reviewed-by: Zi Yan <ziy@nvidia.com>
 
-Why the length of this array is 128? Can we increase this length of the 
-array?
+--
+Best Regards,
+Yan, Zi
 
-Thanks,
-Zhu Yanjun
+--=_MailMate_B3D6D59D-F262-463D-B256-EA25C0831E9A_=
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename=signature.asc
+Content-Type: application/pgp-signature; name=signature.asc
 
-> +	u16 nr_dma_link_address;
->   	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
->   };
->   
-> @@ -521,25 +523,10 @@ static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req,
->   	return true;
->   }
->   
-> -static void nvme_free_prps(struct nvme_dev *dev, struct request *req)
-> -{
-> -	const int last_prp = NVME_CTRL_PAGE_SIZE / sizeof(__le64) - 1;
-> -	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> -	dma_addr_t dma_addr = iod->first_dma;
-> -	int i;
-> -
-> -	for (i = 0; i < iod->nr_allocations; i++) {
-> -		__le64 *prp_list = iod->list[i].prp_list;
-> -		dma_addr_t next_dma_addr = le64_to_cpu(prp_list[last_prp]);
-> -
-> -		dma_pool_free(dev->prp_page_pool, prp_list, dma_addr);
-> -		dma_addr = next_dma_addr;
-> -	}
-> -}
-> -
->   static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
->   {
->   	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> +	u16 i;
->   
->   	if (iod->dma_len) {
->   		dma_unmap_page(dev->dev, iod->first_dma, iod->dma_len,
-> @@ -547,9 +534,8 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
->   		return;
->   	}
->   
-> -	WARN_ON_ONCE(!iod->sgt.nents);
-> -
-> -	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
-> +	for (i = 0; i < iod->nr_dma_link_address; i++)
-> +		dma_unlink_range(&iod->iova, iod->dma_link_address[i]);
->   
->   	if (iod->nr_allocations == 0)
->   		dma_pool_free(dev->prp_small_pool, iod->list[0].sg_list,
-> @@ -557,120 +543,15 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
->   	else if (iod->nr_allocations == 1)
->   		dma_pool_free(dev->prp_page_pool, iod->list[0].sg_list,
->   			      iod->first_dma);
-> -	else
-> -		nvme_free_prps(dev, req);
-> -	mempool_free(iod->sgt.sgl, dev->iod_mempool);
-> -}
-> -
-> -static void nvme_print_sgl(struct scatterlist *sgl, int nents)
-> -{
-> -	int i;
-> -	struct scatterlist *sg;
-> -
-> -	for_each_sg(sgl, sg, nents, i) {
-> -		dma_addr_t phys = sg_phys(sg);
-> -		pr_warn("sg[%d] phys_addr:%pad offset:%d length:%d "
-> -			"dma_address:%pad dma_length:%d\n",
-> -			i, &phys, sg->offset, sg->length, &sg_dma_address(sg),
-> -			sg_dma_len(sg));
-> -	}
-> -}
-> -
-> -static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
-> -		struct request *req, struct nvme_rw_command *cmnd)
-> -{
-> -	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> -	struct dma_pool *pool;
-> -	int length = blk_rq_payload_bytes(req);
-> -	struct scatterlist *sg = iod->sgt.sgl;
-> -	int dma_len = sg_dma_len(sg);
-> -	u64 dma_addr = sg_dma_address(sg);
-> -	int offset = dma_addr & (NVME_CTRL_PAGE_SIZE - 1);
-> -	__le64 *prp_list;
-> -	dma_addr_t prp_dma;
-> -	int nprps, i;
-> -
-> -	length -= (NVME_CTRL_PAGE_SIZE - offset);
-> -	if (length <= 0) {
-> -		iod->first_dma = 0;
-> -		goto done;
-> -	}
-> -
-> -	dma_len -= (NVME_CTRL_PAGE_SIZE - offset);
-> -	if (dma_len) {
-> -		dma_addr += (NVME_CTRL_PAGE_SIZE - offset);
-> -	} else {
-> -		sg = sg_next(sg);
-> -		dma_addr = sg_dma_address(sg);
-> -		dma_len = sg_dma_len(sg);
-> -	}
-> -
-> -	if (length <= NVME_CTRL_PAGE_SIZE) {
-> -		iod->first_dma = dma_addr;
-> -		goto done;
-> -	}
-> -
-> -	nprps = DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE);
-> -	if (nprps <= (256 / 8)) {
-> -		pool = dev->prp_small_pool;
-> -		iod->nr_allocations = 0;
-> -	} else {
-> -		pool = dev->prp_page_pool;
-> -		iod->nr_allocations = 1;
-> -	}
-> -
-> -	prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
-> -	if (!prp_list) {
-> -		iod->nr_allocations = -1;
-> -		return BLK_STS_RESOURCE;
-> -	}
-> -	iod->list[0].prp_list = prp_list;
-> -	iod->first_dma = prp_dma;
-> -	i = 0;
-> -	for (;;) {
-> -		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
-> -			__le64 *old_prp_list = prp_list;
-> -			prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
-> -			if (!prp_list)
-> -				goto free_prps;
-> -			iod->list[iod->nr_allocations++].prp_list = prp_list;
-> -			prp_list[0] = old_prp_list[i - 1];
-> -			old_prp_list[i - 1] = cpu_to_le64(prp_dma);
-> -			i = 1;
-> -		}
-> -		prp_list[i++] = cpu_to_le64(dma_addr);
-> -		dma_len -= NVME_CTRL_PAGE_SIZE;
-> -		dma_addr += NVME_CTRL_PAGE_SIZE;
-> -		length -= NVME_CTRL_PAGE_SIZE;
-> -		if (length <= 0)
-> -			break;
-> -		if (dma_len > 0)
-> -			continue;
-> -		if (unlikely(dma_len < 0))
-> -			goto bad_sgl;
-> -		sg = sg_next(sg);
-> -		dma_addr = sg_dma_address(sg);
-> -		dma_len = sg_dma_len(sg);
-> -	}
-> -done:
-> -	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sgt.sgl));
-> -	cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma);
-> -	return BLK_STS_OK;
-> -free_prps:
-> -	nvme_free_prps(dev, req);
-> -	return BLK_STS_RESOURCE;
-> -bad_sgl:
-> -	WARN(DO_ONCE(nvme_print_sgl, iod->sgt.sgl, iod->sgt.nents),
-> -			"Invalid SGL for payload:%d nents:%d\n",
-> -			blk_rq_payload_bytes(req), iod->sgt.nents);
-> -	return BLK_STS_IOERR;
-> +	dma_free_iova(&iod->iova);
->   }
->   
->   static void nvme_pci_sgl_set_data(struct nvme_sgl_desc *sge,
-> -		struct scatterlist *sg)
-> +				 dma_addr_t dma_addr,
-> +				 unsigned int dma_len)
->   {
-> -	sge->addr = cpu_to_le64(sg_dma_address(sg));
-> -	sge->length = cpu_to_le32(sg_dma_len(sg));
-> +	sge->addr = cpu_to_le64(dma_addr);
-> +	sge->length = cpu_to_le32(dma_len);
->   	sge->type = NVME_SGL_FMT_DATA_DESC << 4;
->   }
->   
-> @@ -682,25 +563,37 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
->   	sge->type = NVME_SGL_FMT_LAST_SEG_DESC << 4;
->   }
->   
-> +struct nvme_pci_sgl_map_data {
-> +	struct nvme_iod *iod;
-> +	struct nvme_sgl_desc *sgl_list;
-> +};
-> +
-> +static void nvme_pci_sgl_map(void *data, u32 cnt, dma_addr_t dma_addr,
-> +			    dma_addr_t offset, u32 len)
-> +{
-> +	struct nvme_pci_sgl_map_data *d = data;
-> +	struct nvme_sgl_desc *sgl_list = d->sgl_list;
-> +	struct nvme_iod *iod = d->iod;
-> +
-> +	nvme_pci_sgl_set_data(&sgl_list[cnt], dma_addr, len);
-> +	iod->dma_link_address[cnt] = offset;
-> +	iod->nr_dma_link_address++;
-> +}
-> +
->   static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
->   		struct request *req, struct nvme_rw_command *cmd)
->   {
-> +	unsigned int entries = blk_rq_nr_phys_segments(req);
->   	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> -	struct dma_pool *pool;
->   	struct nvme_sgl_desc *sg_list;
-> -	struct scatterlist *sg = iod->sgt.sgl;
-> -	unsigned int entries = iod->sgt.nents;
-> +	struct dma_pool *pool;
->   	dma_addr_t sgl_dma;
-> -	int i = 0;
-> +	int linked_count;
-> +	struct nvme_pci_sgl_map_data data;
->   
->   	/* setting the transfer type as SGL */
->   	cmd->flags = NVME_CMD_SGL_METABUF;
->   
-> -	if (entries == 1) {
-> -		nvme_pci_sgl_set_data(&cmd->dptr.sgl, sg);
-> -		return BLK_STS_OK;
-> -	}
-> -
->   	if (entries <= (256 / sizeof(struct nvme_sgl_desc))) {
->   		pool = dev->prp_small_pool;
->   		iod->nr_allocations = 0;
-> @@ -718,11 +611,13 @@ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
->   	iod->list[0].sg_list = sg_list;
->   	iod->first_dma = sgl_dma;
->   
-> -	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, entries);
-> -	do {
-> -		nvme_pci_sgl_set_data(&sg_list[i++], sg);
-> -		sg = sg_next(sg);
-> -	} while (--entries > 0);
-> +	data.iod = iod;
-> +	data.sgl_list = sg_list;
-> +
-> +	linked_count = blk_rq_dma_map(req, nvme_pci_sgl_map, &data,
-> +				       &iod->iova);
-> +
-> +	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, linked_count);
->   
->   	return BLK_STS_OK;
->   }
-> @@ -788,36 +683,20 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
->   							     &cmnd->rw, &bv);
->   		}
->   	}
-> -
-> -	iod->dma_len = 0;
-> -	iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
-> -	if (!iod->sgt.sgl)
-> +	iod->iova.dev = dev->dev;
-> +	iod->iova.dir = rq_dma_dir(req);
-> +	iod->iova.attrs = DMA_ATTR_NO_WARN;
-> +	iod->iova.size = blk_rq_get_dma_length(req);
-> +	if (!iod->iova.size)
->   		return BLK_STS_RESOURCE;
-> -	sg_init_table(iod->sgt.sgl, blk_rq_nr_phys_segments(req));
-> -	iod->sgt.orig_nents = blk_rq_map_sg(req->q, req, iod->sgt.sgl);
-> -	if (!iod->sgt.orig_nents)
-> -		goto out_free_sg;
->   
-> -	rc = dma_map_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req),
-> -			     DMA_ATTR_NO_WARN);
-> -	if (rc) {
-> -		if (rc == -EREMOTEIO)
-> -			ret = BLK_STS_TARGET;
-> -		goto out_free_sg;
-> -	}
-> +	rc = dma_alloc_iova(&iod->iova);
-> +	if (rc)
-> +		return BLK_STS_RESOURCE;
->   
-> -	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
-> -		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
-> -	else
-> -		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
-> -	if (ret != BLK_STS_OK)
-> -		goto out_unmap_sg;
-> -	return BLK_STS_OK;
-> +	iod->dma_len = 0;
->   
-> -out_unmap_sg:
-> -	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
-> -out_free_sg:
-> -	mempool_free(iod->sgt.sgl, dev->iod_mempool);
-> +	ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
->   	return ret;
->   }
->   
-> @@ -841,7 +720,6 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
->   
->   	iod->aborted = false;
->   	iod->nr_allocations = -1;
-> -	iod->sgt.nents = 0;
->   
->   	ret = nvme_setup_cmd(req->q->queuedata, req);
->   	if (ret)
+-----BEGIN PGP SIGNATURE-----
 
+iQJDBAEBCgAtFiEE6rR4j8RuQ2XmaZol4n+egRQHKFQFAmY0+mYPHHppeUBudmlk
+aWEuY29tAAoJEOJ/noEUByhUVUcQAJUodcLqGSLkGzRmk5IShYXLTQoF634CbZaG
+VwCopQ3uGq53e2Y9WyCsxrV8M6FbNccVMgrNAcDxd3uWgntTXQb4qczeKP2bSSIm
+Ti1gFlz9Rlr2ZRoJFRqAKWWWssRn3sQqRcSfDo8CJvuEdpTpbIRVsGfwE1HoYYp6
+HjFM0nBpAqv4Jt7yZ5lpgsvilit7EED08b0RtBRO8Qqk9hmBXjBpkHsS2EAYbvEI
+1c+1f/MiE4Kh1jCdW9KTjnuXX2Q/LBUtpjf8A16EC0q5yc0swj8CoAPxfrtRlswu
+wAz7/VamIy8o4habYjYPR5ZFTYiYcdeFTlhsn4waHyXaAazICXRbkkP5UukXkzp8
+jhFiFujfn/7+6ZVDxZkDREzKNvWcS3nOBIu1mjOobontYGDyylFZoNGzc4V5XG8K
+9/wpmBrrtFdNnumCMQdNp7WJff9oYdo+rjXaHtES8G12g2zlWLt6IDz88ffZTLqQ
+WqweHUXElBV8KQJeBRjsuYVeAHzi82NLyjM9RJTchrOgHhkctPeFFWzQDxOh7qfO
+76QytOqcTNBnU/uf4nqFO7colq6666tEigymo3JyuHflai0wMbgT5zLPIpubNuLm
+4N5Hc8vV2KLHZm9JN7eZTUtF0r9KUVkaoTUYUTQ2aWVBfum35bZcFu7cpLoDrGLx
+rHzLLudp
+=TLcB
+-----END PGP SIGNATURE-----
+
+--=_MailMate_B3D6D59D-F262-463D-B256-EA25C0831E9A_=--
