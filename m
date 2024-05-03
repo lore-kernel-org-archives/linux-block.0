@@ -1,49 +1,46 @@
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900791FDA;
-	Fri,  3 May 2024 00:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5149F1B299;
+	Fri,  3 May 2024 03:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714695085; cv=none; b=I8bELIMmPv3NXq531fupUvdaCNdlIJUF5eazlCpDgEbBqI1BYpUe/x7kJrqn+ijdK870GLYACsmYnYuAKjS7a9EV4a5GR24o0pQ25Jp+JOKW/sVfAY2msGBHUGt2Xcp8YoMKPQZa2/N0/iHe3KJINtooX2vULiz924m2LdJb7qE=
+	t=1714706319; cv=none; b=XMq8gt8xe1Ar/hNu2upEM0P4QZPttsQQkbtd5W7xhd/v81gPr1XvCrEduHLLhIhmCJJdDt4DvTpq1HpB61aWKGnDWvK54Y6Gxf0H8J35dg5wWyKd3SiZaUa7ge7DdXcv6O7NOaZomI/VgQ0VlVXt1M1ucT+jlS1gCJAYmtSFmIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714695085; c=relaxed/simple;
-	bh=ZY1QxZtFxBjgqUQAN0MaQZuTJkkcwvtB7mVOVYYdnFs=;
+	s=arc-20240116; t=1714706319; c=relaxed/simple;
+	bh=FUU9iVfjt1Iwtk/vnvoYlu5LlKdIrGnJl89nXQBrA3I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n8PxZSTee4R76CvRn6wfEb7aN0i3MXzEYV7drbyYoHHAUc0jCK2Ck1sY6XUI3tELal2Yg9/egBi8K2kVlUYNQfxNaecDZO0ccR5c5iU75wheDghTu60O1W6clrvRljAMWrRkdaNNBaf02wD1l+lXmm1UhYTDzLQAI4iZrO0cZhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=cxaZe8Cr; arc=none smtp.client-ip=62.89.141.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=ahD2PleZIB0xFkfn82ZnejuFQsh/fr2bzCzzvFIgSFz2SSaBaE8Ko4QvVTA/4L1Iejonm48N352SIlzRFkS6u9GLpWBtfL//eym46EYeD0En+Li9/hCrBI5xCuyG2sE/U0o2n6/7buOojG1KuPNSAPVrxn2N2ixoD94lCkgj+7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=OjgJo//a; arc=none smtp.client-ip=62.89.141.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="cxaZe8Cr"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="OjgJo//a"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
 	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0SS3sTlKK63HL5RcSUatqvwGfSVEL8pnEtH16W529JQ=; b=cxaZe8Cr4qs2myGPzGFUFUVWqZ
-	BRKydz0L060gD+SyJY4gBg2ynwI8EFO5wFzksmb0XwG+zsOZfBul/GGp7QANFuJyTX0q9TS8ueU92
-	wY3Qf/bdaOcR4CYtxUuEA2zw1Orun3m66ZpWY6rRcc6Q1RzVMRg+qWaBRkuW1thXSq+cQX8S2RNdu
-	e7u4o5T7mDff48NBhzSp2M4yUsV/9E/2zm+w9RcMoSAZsaTcjPSpTOvRa8MxjHlI6YdFwZ8tQ4Kvt
-	U3iItwQdcfDLKEg9B2Vaab0SFVWdp65bi1PYSr0dBuJ5mvi+g2DwnmTE3DJhEkxHOjEbe8GHJrb+E
-	Wv2NDKVQ==;
+	bh=AD1DWCmY12Xm6FHUbR56Tj82yPsHjkXdgFTV9BSpp4E=; b=OjgJo//aBsu1n+3YSE8Rq8CrEz
+	uCx2vLqnLAheat0PP105qYxUZm6q+QVvYWx8zjdxoyS7QkVqhYyNU/5+IkvMUmhu3euV39SI0f3hm
+	6U/l7AifaEJs93QL3OeeaOwd3ctDL7ePIHymbvpdwMt8erXL+aVOIvZJ6KvnaSK7txkUqXJ61znt2
+	azsLWNNyxdgOJ9nsfDPTIOl74amCs89DCwhnL3fKYAApNjkc++i4iV2zikDGujpXthd4+EZa0RPDa
+	vT+Xto49R3aUnh8ZbM4m12IpJc5QXjq8qFCBdFus/HCf3JUbDSi0IjJ0T9hypdhF0xd6bSgN7ruqt
+	KFf2JgLQ==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1s2gWI-009tTS-39;
-	Fri, 03 May 2024 00:11:23 +0000
-Date: Fri, 3 May 2024 01:11:22 +0100
+	id 1s2jRR-00A2Fw-0O;
+	Fri, 03 May 2024 03:18:33 +0000
+Date: Fri, 3 May 2024 04:18:33 +0100
 From: Al Viro <viro@zeniv.linux.org.uk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-fsdevel@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
-	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 8/8] bdev: move ->bd_make_it_fail to ->__bd_flags
-Message-ID: <20240503001122.GH2357260@ZenIV>
-References: <20240428051232.GU2118490@ZenIV>
- <20240429052315.GB32688@lst.de>
- <20240429073107.GZ2118490@ZenIV>
- <20240429170209.GA2118490@ZenIV>
- <20240429181300.GB2118490@ZenIV>
- <20240429183041.GC2118490@ZenIV>
- <20240503000647.GQ2118490@ZenIV>
+To: linux-fsdevel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCHES v2][RFC] set_blocksize() rework
+Message-ID: <20240503031833.GU2118490@ZenIV>
+References: <20240427210920.GR2118490@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,84 +49,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240503000647.GQ2118490@ZenIV>
+In-Reply-To: <20240427210920.GR2118490@ZenIV>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
- block/blk-core.c          |  3 ++-
- block/genhd.c             | 12 ++++++++----
- include/linux/blk_types.h |  6 +++---
- 3 files changed, 13 insertions(+), 8 deletions(-)
+On Sat, Apr 27, 2024 at 10:09:20PM +0100, Al Viro wrote:
+> 	Any buffer-cache based filesystem is going to be FUBAR
+> if somebody manages to change block size of device under it,
+> since primitives (sb_bread(), sb_getblk(), etc.) operate in
+> terms of block numbers.  If block size suddenly doubles, so
+> will the offsets from the beginning of device.  Results are
+> not pretty, obviously.
+> 
+> 	The thing that (mostly) prevents that kind of mess
+> is that most of the mechanisms that lead to block size
+> change require the device being opened exclusive.  However,
+> there are several exceptions that allow to do that without
+> an exclusive open.  Fortunately, all of them require
+> CAP_SYS_ADMIN, so it's not a security problem - anyone
+> who already has that level of access can screw the system
+> into the ground in any number of ways.  However, security
+> problems or not, that crap should be fixed.
+> 
+> 	The series below eliminates these calls of set_blocksize()
+> and changes calling conventsion of set_blocksize() so that it
+> uses struct file * instead of struct block_device * to tell
+> which device to act upon.  Unlike struct block_device, struct
+> file has enough information to tell an exclusive open from
+> non-exclusive one, so we can reject the operation in non-exclusive
+> case.
+> 
+> 	The branch is available at
+> git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git #work.set_blocksize
+> Individual patches in followups.
+> 
+> Review (and testing, obviously) would be very welcome.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1be49be9fac4..1076336dd620 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -494,7 +494,8 @@ __setup("fail_make_request=", setup_fail_make_request);
- 
- bool should_fail_request(struct block_device *part, unsigned int bytes)
- {
--	return part->bd_make_it_fail && should_fail(&fail_make_request, bytes);
-+	return bdev_test_flag(part, BD_MAKE_IT_FAIL) &&
-+	       should_fail(&fail_make_request, bytes);
- }
- 
- static int __init fail_make_request_debugfs(void)
-diff --git a/block/genhd.c b/block/genhd.c
-index 19cd1a31fa80..0cce461952f6 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1066,7 +1066,8 @@ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
- ssize_t part_fail_show(struct device *dev,
- 		       struct device_attribute *attr, char *buf)
- {
--	return sprintf(buf, "%d\n", dev_to_bdev(dev)->bd_make_it_fail);
-+	return sprintf(buf, "%d\n",
-+		       bdev_test_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL));
- }
- 
- ssize_t part_fail_store(struct device *dev,
-@@ -1075,9 +1076,12 @@ ssize_t part_fail_store(struct device *dev,
- {
- 	int i;
- 
--	if (count > 0 && sscanf(buf, "%d", &i) > 0)
--		dev_to_bdev(dev)->bd_make_it_fail = i;
--
-+	if (count > 0 && sscanf(buf, "%d", &i) > 0) {
-+		if (i)
-+			bdev_set_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
-+		else
-+			bdev_clear_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
-+	}
- 	return count;
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 4e0c8785090c..5bb7805927ac 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -51,6 +51,9 @@ struct block_device {
- #define BD_WRITE_HOLDER		(1u<<9)
- #define BD_HAS_SUBMIT_BIO	(1u<<10)
- #define BD_RO_WARNED		(1u<<11)
-+#ifdef CONFIG_FAIL_MAKE_REQUEST
-+#define BD_MAKE_IT_FAIL		(1u<<12)
-+#endif
- 	dev_t			bd_dev;
- 	struct inode		*bd_inode;	/* will die */
- 
-@@ -67,9 +70,6 @@ struct block_device {
- 	struct mutex		bd_fsfreeze_mutex; /* serialize freeze/thaw */
- 
- 	struct partition_meta_info *bd_meta_info;
--#ifdef CONFIG_FAIL_MAKE_REQUEST
--	bool			bd_make_it_fail;
--#endif
- 	int			bd_writers;
- 	/*
- 	 * keep this out-of-line as it's both big and not needed in the fast
--- 
-2.39.2
+Branch updated and force-pushed (same place).  Individual patches in
+followups.
 
+Changes:
+* zram elimination of double-open added.
+* hopefully better description of btrfs side of things.
+* final commit split into switch of set_blocksize() to struct file
+  and adding a check for exclusive open.
+* chunk in Documentation/filesystems/porting.rst added.
+
+Shortlog:
+Al Viro (9):
+      bcache_register(): don't bother with set_blocksize()
+      pktcdvd: sort set_blocksize() calls out
+      swapon(2)/swapoff(2): don't bother with block size
+      swapon(2): open swap with O_EXCL
+      zram: don't bother with reopening - just use O_EXCL for open
+      swsusp: don't bother with setting block size
+      btrfs_get_bdev_and_sb(): call set_blocksize() only for exclusive opens
+      set_blocksize(): switch to passing struct file *
+      make set_blocksize() fail unless block device is opened exclusive
+
+Diffstat:
+ Documentation/filesystems/porting.rst |  7 +++++++
+ block/bdev.c                          | 14 ++++++++++----
+ block/ioctl.c                         | 21 ++++++++++++---------
+ drivers/block/pktcdvd.c               |  7 +------
+ drivers/block/zram/zram_drv.c         | 29 +++++++----------------------
+ drivers/block/zram/zram_drv.h         |  2 +-
+ drivers/md/bcache/super.c             |  4 ----
+ fs/btrfs/dev-replace.c                |  2 +-
+ fs/btrfs/volumes.c                    | 13 ++++++++-----
+ fs/ext4/super.c                       |  2 +-
+ fs/reiserfs/journal.c                 |  5 ++---
+ fs/xfs/xfs_buf.c                      |  2 +-
+ include/linux/blkdev.h                |  2 +-
+ include/linux/swap.h                  |  2 --
+ kernel/power/swap.c                   |  7 +------
+ mm/swapfile.c                         | 29 ++---------------------------
+ 16 files changed, 55 insertions(+), 93 deletions(-)
