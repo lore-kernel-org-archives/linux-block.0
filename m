@@ -1,65 +1,68 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FBE4689;
-	Sat,  4 May 2024 06:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF424689
+	for <linux-block@vger.kernel.org>; Sat,  4 May 2024 07:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714805724; cv=none; b=bwDzhRPiP12hhrDu6OBDvD6RCUij60AhQWFAIHOmVN/n5IiXkumoa4nl0AQmvAPabSWYVvI94kNIsWeNDh7akwr5dJN52toCI1GbyoiYHr9lkQ1nRa/Izl/xkgvZ3jMCnmo/xN0zVIH/leZibZ64J6vAgyIvhL7ezAkNYOAJES8=
+	t=1714806883; cv=none; b=ddHRnWJJEnxa8FVjEdzrALgH5YCSwifUIH1u0QB4Plpx/NJkYKrqIgSXqpyfpcDLhTWs+3LA79wlHtOU0PXCo77yf+2rwirGp1V1tYkbSt/VuESM8V1pnFAvVy9seaptBW8vKxvlcmcIenInVsSFq00LaSKN7EiCxQ1pq/McWF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714805724; c=relaxed/simple;
-	bh=Yn0D36pQGFB9Z5N/ogNbWoLa2KEjQsWkGtuLzv3u+O0=;
+	s=arc-20240116; t=1714806883; c=relaxed/simple;
+	bh=JPi5SPuiU0SL02Qqqpcf1D/xtRrzm+mxaCVNvt4+a+4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rVwMHTwTXU1H4IAkwvqGd1dXPpvTOVaeGnjp/khJD1uK6kLWQAyJ5K3uiyCdGHZbhyWzDmSlK30lGHOR7ON1sw+VNOxG/Xggbcd9MnAqHIMfW8HPTmcS5UNadN25XV0Oz2cG5VJYMXnztl3+/51zVdkHDzWDx4PujkrpK0fl2JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FbCPyu5Z; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZpwDAWS+eAkWx0v2Yl3z7n6p4JRpTg3URi3i5AiL58kwn4rdlNsJpCKMKJsFc9+hNSAyFfj4gajpKe4ZVIyHRiWBn1O5Uq3mcx7hBDmbNR8C3D5hvvqxmrrUYhfxfev3VeJWdpeXH5f4rXMV3ctDptrgGgQxslAlFEtgVJ7XkWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=izxKtOKL; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FbCPyu5Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714805723; x=1746341723;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Yn0D36pQGFB9Z5N/ogNbWoLa2KEjQsWkGtuLzv3u+O0=;
-  b=FbCPyu5ZaUzbAamr1MmPgkZGbjfhp3LZ4mHRrK6Yu8UvL5mdOaAz6ZjA
-   oMZoFxd5X/Qw0sCWDW/SpjQY6cBo/NALnEB5W64JcNZ/URyPezSQmjjTB
-   zNMBNeDxmBCihZqmRZlART+Fj3taImqVNYT2XkZXWo3D5n8CVEDAGHVDH
-   WqSMuy7GpdRlByziGEUHfevualvNh5AeO3I1fuvdQ9zrx/Va/pAbeDzBG
-   d6lgD9LtsPQvw5s8IXcdTP4Z56mqXhJzg870Pk0jpLBNWgtqbUT8ixaL/
-   P7P8BFeLrQJ9YE1+qszTQA96brR9Gddk7ImuUNWJBWI3wP+itGcEzvoDS
-   Q==;
-X-CSE-ConnectionGUID: HUGe1w1bTNKRvG0pzEzMsA==
-X-CSE-MsgGUID: zxAZLb1gQs6ZJ0bEvX3b8g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10497685"
-X-IronPort-AV: E=Sophos;i="6.07,253,1708416000"; 
-   d="scan'208";a="10497685"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 23:55:22 -0700
-X-CSE-ConnectionGUID: 3dSA0I9IRgmC/HVcZTBYZw==
-X-CSE-MsgGUID: MG4LmfGMQAOJxy4CtmIt+w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,253,1708416000"; 
-   d="scan'208";a="28243294"
-Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 03 May 2024 23:55:20 -0700
-Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s39Ij-000CW8-0d;
-	Sat, 04 May 2024 06:55:17 +0000
-Date: Sat, 4 May 2024 14:54:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="izxKtOKL"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6f453d2c5a1so414088b3a.2
+        for <linux-block@vger.kernel.org>; Sat, 04 May 2024 00:14:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714806881; x=1715411681; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A4N1i5Pm2LxhMxIRBzRCWAdKMXxb3hPvU+8V8CPs4HE=;
+        b=izxKtOKLOYYO40Npj8wt59QNYqm6xkHahwaDxdmIlmScIGuQxq/y1xmL8ZC7nv78IN
+         WftIbMa1U1XC5ytIUldx+lyvjTRrRW6wp4/G0+1tdh2zW5qgc5bx0QMZhxZjtgKYwpBr
+         +PfKt1UaJAW2bHZ9HoRJQuDjZC5oOY0B6Qzz4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714806881; x=1715411681;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A4N1i5Pm2LxhMxIRBzRCWAdKMXxb3hPvU+8V8CPs4HE=;
+        b=POTeuPTJgioX3TVKiMF8MSB4Lel0Xn05vk97AHd8nZDm53LQknV8fbLLx3CKxjxpO1
+         S8cKAKbg9gJV55sqIQ3sU/1ycrXUMX5BlQ3oTSz06pzqbFmnaOtjmUyA3umTfUdHl0Ty
+         Y1458O56v7xtkFgIAaNgZZB/iSXvSY0f16q2SBZge5NLT426yfi0OJVqW97vhhATrJ7f
+         ksqhw0OuOSXDl5cNyZJhpOD9eW44jUSmH0kuMLRJ5oSnP6LBOCeLzI3BOxZGmeW7VH1F
+         hFcgP14DP3cgg2gT+4I97pBWOCl1lVUVPv6C74t7OIFnEyJoC2lFBWeFBR2+BmZKGtNu
+         8udA==
+X-Forwarded-Encrypted: i=1; AJvYcCXC9bCoNW6ee7b2fKNLF8Bj208BDqO+AUIJC4hJXAUf6Gf3nT7AvfoRVRv7HpWblyc3qdluZJkAYHwxs08AeNbg1SnWbRd/FdGC/0I=
+X-Gm-Message-State: AOJu0YyT4x6ErySg4cb9S00CP/cmrkcDxqzm3hLj3Dope2CrLNr4GNYz
+	WOKAlk+wBzzYCnDKwJKDWPEJgYbl3OZymIsdItA676458r2NxQKCQvqzcb573soWYyOL2SYNn4E
+	=
+X-Google-Smtp-Source: AGHT+IFn79avCXCi7TK4D20lbbR6FREI9JMpMXrAyAVwamxmEgAFymvNjriz4FhRmJ0iOLvNa3EtUQ==
+X-Received: by 2002:a05:6a20:7f84:b0:1a9:c28e:bc17 with SMTP id d4-20020a056a207f8400b001a9c28ebc17mr5550146pzj.45.1714806861314;
+        Sat, 04 May 2024 00:14:21 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:a616:7211:d0ce:9ad9])
+        by smtp.gmail.com with ESMTPSA id b185-20020a6334c2000000b0061f42afa8d0sm1391585pga.6.2024.05.04.00.14.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 May 2024 00:14:20 -0700 (PDT)
+Date: Sat, 4 May 2024 16:14:16 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: kernel test robot <lkp@intel.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Minchan Kim <minchan@kernel.org>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev,
 	Linux Memory Management List <linux-mm@kvack.org>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 08/14] zram: check that backends array has at least one
  backend
-Message-ID: <202405041440.UTBQZAaf-lkp@intel.com>
+Message-ID: <20240504071416.GH14947@google.com>
 References: <20240503091823.3616962-9-senozhatsky@chromium.org>
+ <202405041440.UTBQZAaf-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,107 +71,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240503091823.3616962-9-senozhatsky@chromium.org>
+In-Reply-To: <202405041440.UTBQZAaf-lkp@intel.com>
 
-Hi Sergey,
+On (24/05/04 14:54), kernel test robot wrote:
+>          |                            ~~~~~~~~~~~~~~~~~~~~~~
+> >> drivers/block/zram/zcomp.c:214:2: error: call to '__compiletime_assert_285' declared with 'error' attribute: BUILD_BUG_ON failed: ARRAY_SIZE(backends) <= 1
+>      214 |         BUILD_BUG_ON(ARRAY_SIZE(backends) <= 1);
+>          |         ^
 
-kernel test robot noticed the following build errors:
+So this is what that BUILD_BUG_ON() is supposed to catch. You don't
+have any backends selected in your .config:
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on akpm-mm/mm-everything linus/master v6.9-rc6 next-20240503]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+# CONFIG_ZRAM_BACKEND_LZO is not set
+# CONFIG_ZRAM_BACKEND_LZ4 is not set
+# CONFIG_ZRAM_BACKEND_LZ4HC is not set
+# CONFIG_ZRAM_BACKEND_ZSTD is not set
+# CONFIG_ZRAM_BACKEND_DEFLATE is not set
+CONFIG_ZRAM_DEF_COMP="unset-value"
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sergey-Senozhatsky/zram-move-from-crypto-API-to-custom-comp-backends-API/20240503-172335
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20240503091823.3616962-9-senozhatsky%40chromium.org
-patch subject: [PATCH 08/14] zram: check that backends array has at least one backend
-config: s390-defconfig (https://download.01.org/0day-ci/archive/20240504/202405041440.UTBQZAaf-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 37ae4ad0eef338776c7e2cffb3896153d43dcd90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240504/202405041440.UTBQZAaf-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405041440.UTBQZAaf-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/block/zram/zcomp.c:12:
-   In file included from include/linux/cpu.h:17:
-   In file included from include/linux/node.h:18:
-   In file included from include/linux/device.h:32:
-   In file included from include/linux/device/driver.h:21:
-   In file included from include/linux/module.h:19:
-   In file included from include/linux/elf.h:6:
-   In file included from arch/s390/include/asm/elf.h:173:
-   In file included from arch/s390/include/asm/mmu_context.h:11:
-   In file included from arch/s390/include/asm/pgalloc.h:18:
-   In file included from include/linux/mm.h:2208:
-   include/linux/vmstat.h:508:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     508 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     509 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:515:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     515 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     516 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:527:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     527 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     528 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:536:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     536 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     537 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> drivers/block/zram/zcomp.c:214:2: error: call to '__compiletime_assert_285' declared with 'error' attribute: BUILD_BUG_ON failed: ARRAY_SIZE(backends) <= 1
-     214 |         BUILD_BUG_ON(ARRAY_SIZE(backends) <= 1);
-         |         ^
-   include/linux/build_bug.h:50:2: note: expanded from macro 'BUILD_BUG_ON'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^
-   include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^
-   include/linux/compiler_types.h:449:2: note: expanded from macro 'compiletime_assert'
-     449 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^
-   include/linux/compiler_types.h:437:2: note: expanded from macro '_compiletime_assert'
-     437 |         __compiletime_assert(condition, msg, prefix, suffix)
-         |         ^
-   include/linux/compiler_types.h:430:4: note: expanded from macro '__compiletime_assert'
-     430 |                         prefix ## suffix();                             \
-         |                         ^
-   <scratch space>:97:1: note: expanded from here
-      97 | __compiletime_assert_285
-         | ^
-   5 warnings and 1 error generated.
-
-
-vim +214 drivers/block/zram/zcomp.c
-
-   202	
-   203	struct zcomp *zcomp_create(const char *alg)
-   204	{
-   205		struct zcomp *comp;
-   206		int error;
-   207	
-   208		/*
-   209		 * The backends array has a sentinel NULL value, so the minimum
-   210		 * size is 1. In order to be valid the array, apart from the
-   211		 * sentinel NULL element, should have at least one compression
-   212		 * backend selected.
-   213		 */
- > 214		BUILD_BUG_ON(ARRAY_SIZE(backends) <= 1);
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Which is invalid configuration because it means that zram has no
+compression enabled.
