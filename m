@@ -1,160 +1,176 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CCD12B7D
-	for <linux-block@vger.kernel.org>; Sat,  4 May 2024 08:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FF48F6D
+	for <linux-block@vger.kernel.org>; Sat,  4 May 2024 12:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714810514; cv=none; b=et8PfQAngPGtPCZpQcANSLPyn4WnEWEzEOrEpm+KqhRcmntvVMFmVqOE5OKirvviO3uTHpS9SWs57AHmUiRHPNWY7AmfYt1MR9Ngiajl3fdaiF61R8G0vW7UpQmeJIZ399ybZ4MlW/fP+ldWradR5yB2UpejY+wp5kEZ2uaSMAw=
+	t=1714826119; cv=none; b=MwNpa1RQSbxa4tFTVFjZXBKOHmGdiMb3+RdmEpMh3mWL//b73LrAoGmdcGPJflfswqZ1MC2ps8tYmHt7lIpBU5s1Licz86QLrl153NzWhrqi61lifSHo82NeXKzexFQn/O/IMEzZNOKz6nL9xIt/AfTa7Q/TMIcAB7uxK9wJwq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714810514; c=relaxed/simple;
-	bh=t7G2Ho5WPgwkt3ZFuraW47O0HRzd+FaFO+yo28FOtDU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dJu2iGT8u/IYdfihItUPHMe8MlH2UVevxaeGMbriGUN6Pty+dzwDUV6YudFChwynn48STJwxZOonJM+NOKMmOSbU/cCbquRBI1yhuvH1qujpHxyR9j/1GIJ62gWJW7Pm1BGE95kVyfJwpqJwB6/92aFgBOvnG4feYRpiURxtPe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=M2xFXMiw; arc=none smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1714826119; c=relaxed/simple;
+	bh=j0InEp2r8dWo7g/iIq7o05YPX7Qp1oCfkyyPHF+tP4k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rlIGv8yhilc+uTiKMxoEuWGlS4fpzX+iA/A77Z+4720lRc6rCR9Lot8zRqdqgFY9VGCDsto7oexgf9QYeVzvkdS1xqy8f1aGPIeJAQ3pvQJ9JkR7fdJOeAj99u8biA6UnNOErPvLDKcER1kNNtahxwYwy0VeLQOhRYkQ1EIdJBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mpihq9RY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NQ8YZvI/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mpihq9RY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NQ8YZvI/; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="M2xFXMiw"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1714810512; x=1746346512;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=t7G2Ho5WPgwkt3ZFuraW47O0HRzd+FaFO+yo28FOtDU=;
-  b=M2xFXMiwIEsTcRgxg6uaz952VUOD0l0jB8Ej3kBrYAJEV/bNvd8n2BMM
-   l6x9XaUtwWManRoLJRf+YBHLWU0RShuhMl41jfUtTb+hADOW/QZyfZ5oD
-   qk8der7Dizw5W3z72zjXaEa6yVE8Gc3pP2FOp8q34d+8eigVuEVvdycGE
-   HUHUn3c72CkQTcBCG9tm9tcIkJ4YFZ9OSo1G4tCeQtcyPnZITjWY9Nuy/
-   llWzvT8K1+LysjrQV37DXQ+93ZzOmJ79VilLDf7uZk2gWFV671QolJJTp
-   kHByH1T+TBd2TS+wiaTgemnjnr2EOVO7DH6hMc6acfWPOMwkYfJSkNtNZ
-   A==;
-X-CSE-ConnectionGUID: 6ZLNBTP+SNSsFK/uzc+abw==
-X-CSE-MsgGUID: 96UXMnAoT9qW+4o1WwMybw==
-X-IronPort-AV: E=Sophos;i="6.07,253,1708358400"; 
-   d="scan'208";a="15540358"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 04 May 2024 16:15:12 +0800
-IronPort-SDR: VrXKfzrk8cD8/NTLMxlvfP/pdoe+5/2i49WxCxbGATrYsLgGKtBH/Bj1v714fMtMAHMWAEWGTJ
- JbHYPVWr7KbDpyCEmYCQeGhYs4Kb5Jymazh4p0EmN54gp9zxT5GRjBZ5WJfLe6BxT4xmLTcoFW
- 1eSsmUK3AUxLh5lzZ9/UxvWa7LOgIuGd3pbJHbZgPJ/nuxEhADz/g7UCD/ZBV7ZD8K4LuphthT
- eH0YL7ae3kH81qaE7cpIWth7/aoNagdERRTelctm7f3OeLG7XSISmjrxVz6Yqi1eSIiBUBiLht
- yQw=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 May 2024 00:23:10 -0700
-IronPort-SDR: +VsxZNyaEtyXC2FUTDXm5TSjW5TLuz8wCYTv7CUL+KZNduTEprAmYkX/VO7HR2rylv44ElWF0Z
- eBxqn5/2yhb+ahLhY4we4IulCddX0WCaA/UASNwKJhxrZBaKU9IKpPvW5a1p8AAcXC1I+QLzJg
- J5I4grPWLBdmuzJ8GQcqQCEslrZ+jfdPa2breAqXcY4UYPbKMonUq3LMJCGPLsB6wpDCmZPiQF
- WKp0RdGXoMUYjzj6IBdxL0Fg0OOcNg2MIPOersX0mbTt4jIaogmc75RIi6MTUaCwXFEuJPtKmC
- wyw=
-WDCIronportException: Internal
-Received: from unknown (HELO shinhome.flets-east.jp) ([10.225.163.38])
-  by uls-op-cesaip01.wdc.com with ESMTP; 04 May 2024 01:15:10 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Daniel Wagner <dwagner@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v4 17/17] nvme/rc,srp/rc,common/multipath-over-rdma: rename use_rxe to USE_RXE
-Date: Sat,  4 May 2024 17:14:48 +0900
-Message-ID: <20240504081448.1107562-18-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240504081448.1107562-1-shinichiro.kawasaki@wdc.com>
-References: <20240504081448.1107562-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mpihq9RY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NQ8YZvI/";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mpihq9RY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NQ8YZvI/"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5608934539;
+	Sat,  4 May 2024 12:35:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1714826116; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iLEn0vYnhUOuk7js5RlFqlDimxB3lRT887R/KLwr4Rk=;
+	b=mpihq9RYpM0QlKAUEHN64ecbnrOwBrqzA8oeSTJfJGmoGFS+iyk6irz6FmU3Xb5UoN8LKN
+	0dzSLQO+QziwCKS+UiZ0tknfa3ZhGlvsq4EhWKJj+Qly0Bhv6BjwyRx9ik1DpmQpazPYRJ
+	wSkGNWxGHtPmc0W1wqfd9qYX95F+tJU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1714826116;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iLEn0vYnhUOuk7js5RlFqlDimxB3lRT887R/KLwr4Rk=;
+	b=NQ8YZvI/tvVt/cD17uzJrIyX8SZ44ZgGf5vXYhe2oGw8xRx/ZJO3V8y9rm6Pds15HSUHGM
+	SnD/YqFp4IlS3EBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=mpihq9RY;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="NQ8YZvI/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1714826116; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iLEn0vYnhUOuk7js5RlFqlDimxB3lRT887R/KLwr4Rk=;
+	b=mpihq9RYpM0QlKAUEHN64ecbnrOwBrqzA8oeSTJfJGmoGFS+iyk6irz6FmU3Xb5UoN8LKN
+	0dzSLQO+QziwCKS+UiZ0tknfa3ZhGlvsq4EhWKJj+Qly0Bhv6BjwyRx9ik1DpmQpazPYRJ
+	wSkGNWxGHtPmc0W1wqfd9qYX95F+tJU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1714826116;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iLEn0vYnhUOuk7js5RlFqlDimxB3lRT887R/KLwr4Rk=;
+	b=NQ8YZvI/tvVt/cD17uzJrIyX8SZ44ZgGf5vXYhe2oGw8xRx/ZJO3V8y9rm6Pds15HSUHGM
+	SnD/YqFp4IlS3EBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C18751386E;
+	Sat,  4 May 2024 12:35:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id wNUXLYMrNma+aQAAD6G6ig
+	(envelope-from <hare@suse.de>); Sat, 04 May 2024 12:35:15 +0000
+Message-ID: <89417350-2589-4b7d-831e-eccfe1ce1ae2@suse.de>
+Date: Sat, 4 May 2024 14:35:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block : add larger order folio size instead of pages
+Content-Language: en-US
+To: Matthew Wilcox <willy@infradead.org>, Christoph Hellwig <hch@lst.de>
+Cc: Kundan Kumar <kundan.kumar@samsung.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+ anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+ gost.dev@samsung.com
+References: <CGME20240430175735epcas5p103ac74e1482eda3e393c0034cea8e9ff@epcas5p1.samsung.com>
+ <20240430175014.8276-1-kundan.kumar@samsung.com>
+ <317ce09b-5fec-4ed2-b32c-d098767956d0@suse.de>
+ <20240502125340.GB20610@lst.de> <ZjUCP08UyIGTzpW_@casper.infradead.org>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZjUCP08UyIGTzpW_@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 5608934539
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.50
 
-To follow uppercase letter guide of environment variables, rename
-use_rxe to USE_RXE.
+On 5/3/24 17:26, Matthew Wilcox wrote:
+> On Thu, May 02, 2024 at 02:53:40PM +0200, Christoph Hellwig wrote:
+>> On Thu, May 02, 2024 at 08:45:33AM +0200, Hannes Reinecke wrote:
+>>>> -		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
+>>>> -			   fi.offset / PAGE_SIZE + 1;
+>>>> -		do {
+>>>> -			bio_release_page(bio, page++);
+>>>> -		} while (--nr_pages != 0);
+>>>> +		bio_release_page(bio, page);
+>>>
+>>> Errm. I guess you need to call 'folio_put()' here, otherwise the page
+>>> reference counting will be messed up.
+>>
+>> It shouldn't.  See the rfc patch and explanation that Keith sent in reply
+>> to the previous version.  But as I wrote earlier it should be a separate
+>> prep patch including a commit log clearly explaining the reason for it
+>> and how it works.
+> 
+> I think this is wandering into a minefield.  I'm pretty sure
+> it's considered valid to split the bio, and complete the two halves
+> independently.  Each one will put the refcounts for the pages it touches,
+> and if we do this early putting of references, that's going to fail.
 
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- Documentation/running-tests.md | 6 ++++--
- common/multipath-over-rdma     | 5 +++--
- tests/nvme/rc                  | 2 +-
- tests/srp/rc                   | 2 +-
- 4 files changed, 9 insertions(+), 6 deletions(-)
+Precisesly my worries. Something I want to talk to you about at LSF; 
+refcounting of folios vs refcounting of pages.
+When one takes a refcount on a folio we are actually taking a refcount
+on the first page, which is okay if we stick with using the folio 
+throughout the call chain. But if we start mixing between pages and 
+folios (as we do here) we will be getting the refcount wrong.
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 7bd0885..968702e 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -132,9 +132,11 @@ NVMET_TRTYPES=rdma ./check nvme/
- ./check srp/
- 
- To use the rdma_rxe driver:
--use_rxe=1 NVMET_TRTYPES=rdma ./check nvme/
--use_rxe=1 ./check srp/
-+USE_RXE=1 NVMET_TRTYPES=rdma ./check nvme/
-+USE_RXE=1 ./check srp/
- ```
-+'USE_RXE' had the old name 'use_rxe'. The old name is still usable but not
-+recommended.
- 
- ### Normal user
- 
-diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-index ee05100..d0f4d26 100644
---- a/common/multipath-over-rdma
-+++ b/common/multipath-over-rdma
-@@ -12,12 +12,13 @@ filesystem_type=ext4
- fio_aux_path=/tmp/fio-state-files
- memtotal=$(sed -n 's/^MemTotal:[[:blank:]]*\([0-9]*\)[[:blank:]]*kB$/\1/p' /proc/meminfo)
- max_ramdisk_size=$((1<<25))
--use_rxe=${use_rxe:-""}
- ramdisk_size=$((memtotal*(1024/16)))  # in bytes
- if [ $ramdisk_size -gt $max_ramdisk_size ]; then
- 	ramdisk_size=$max_ramdisk_size
- fi
- 
-+_check_conflict_and_set_default USE_RXE use_rxe ""
-+
- _have_legacy_dm() {
- 	_have_kernel_config_file || return
- 	if ! _check_kernel_option DM_MQ_DEFAULT; then
-@@ -396,7 +397,7 @@ start_soft_rdma() {
- 	local type
- 
- 	{
--	if [ -z "$use_rxe" ]; then
-+	if [ -z "$USE_RXE" ]; then
- 		modprobe siw || return $?
- 		type=siw
- 	else
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 6fc0020..c1ddf41 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -97,7 +97,7 @@ _nvme_requires() {
- 		_have_driver nvmet-rdma
- 		_have_configfs
- 		_have_program rdma
--		if [ -n "$use_rxe" ]; then
-+		if [ -n "$USE_RXE" ]; then
- 			_have_driver rdma_rxe
- 		else
- 			_have_driver siw
-diff --git a/tests/srp/rc b/tests/srp/rc
-index c77ef6c..85bd1dd 100755
---- a/tests/srp/rc
-+++ b/tests/srp/rc
-@@ -51,7 +51,7 @@ group_requires() {
- 	_have_module ib_uverbs
- 	_have_module null_blk
- 	_have_module rdma_cm
--	if [ -n "$use_rxe" ]; then
-+	if [ -n "$USE_RXE" ]; then
- 		_have_module rdma_rxe
- 	else
- 		_have_module siw
+Do you have plans how we could improve the situation?
+Like a warning 'Hey, you've used the folio for taking the reference, but 
+now you are releasing the references for the page'?
+
+Cheers,
+
+Hannes
 -- 
-2.44.0
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
