@@ -1,189 +1,73 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FFE7318A;
-	Sat,  4 May 2024 20:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F171E497;
+	Sat,  4 May 2024 23:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714853604; cv=none; b=XOwf2wIoUOSvjw4wy5YMzkoX3Bkv6CiPFQ11MlfN2N0rZpVq8EbXv8iSKjSS0mLeMYYC8+pSqydZhKgrfN9+PxXesKJSg6t+kyoXr9lpM+jZRSnufsRQIruOc1VCyYUWiTHd5qhbctLotWg+hOsrojJnuYrsrWcuRx0LN6bSwPU=
+	t=1714864218; cv=none; b=kaFnXpFH6/EQUdffKKCavpQvHyBIUfWZ0u1Wy5y0hy/nlPWN1liUkdMv2FqaPZQRz8JEmCf3bVmNAKc8BFonaNGpoSiRXMYPYKjQrITO+2m1xmuXyWxbIcR+mfRrqO2ygFVbcONzpSsfE+sKVRLERxq59avYOUu5HXqX2B7mZak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714853604; c=relaxed/simple;
-	bh=fhto2uEYgU4wqeL/mix3cVjrhwG4PTmSdbCpoGKNje0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aGo6C4MiNswYbj8bQgBmPxE6KlSX+Ng9hCypm3p8iOl94npK3d/rS+6xVcfHRSbKjjH9MCx/Tpd1Vvl1N5jOfpuXbi46YtXJjh5V9WU+5lMggo5vs5L0GO5IBP5ZYlw5JtTrFMaQ9KiTrGl5SajKGqLXpEnvX0bcjJ2308jkON4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AF7a2jdM; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1714864218; c=relaxed/simple;
+	bh=FW6qoHbDHK21pEFQTCdCfOoptYJ3bNepxrOzoRzW6Mc=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=KmWq/E3X66rtUofLihF92QC+LUZxgMLMJS6NluSf+UNDFlwmt1aT1Mtyxf2uoW2XaEBqe63c6LK4UEy2LBDyl97Bxrn0oOw/DU6aE1DxE2V3J00lA9IC1+eeQa9SjcQlKzV/Yo0umFy4u4HnS4MCiMUNiKADf+C22mMq1PQhV1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=cL68Y2fO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AF7a2jdM"
-Received: from [10.137.106.151] (unknown [167.220.2.23])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 79675207DBB5;
-	Sat,  4 May 2024 13:13:16 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 79675207DBB5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1714853596;
-	bh=Xjz+ah6dGJK98fSkhXGcgKoJ+WDVAsQMdYbME8KL/v4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AF7a2jdMT93DQfcuBJJyAee3iRGHkB6sAaFzHW3xa8rmM2fr/yng8b/vuFYOI6r1C
-	 mOake8mf6Ya2UDnxaN+IpyWI8rszWLoz+iix+kLcubqMjZSW2GP9OEzG1RuoPbRQBn
-	 oVcqMwODzceFEk90N4os+slDEJ+rrCu+IqwzfnOM=
-Message-ID: <ab7054cd-affd-47c3-bd98-2cf47d6a6376@linux.microsoft.com>
-Date: Sat, 4 May 2024 13:13:16 -0700
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="cL68Y2fO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF829C072AA;
+	Sat,  4 May 2024 23:10:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1714864217;
+	bh=FW6qoHbDHK21pEFQTCdCfOoptYJ3bNepxrOzoRzW6Mc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cL68Y2fO9JhsUEO7D7shlWzLxPAMDqhELYNeQWDMw2quJz1ADARZOuMJQU8RTRhJN
+	 APHGm25HCCPF9pqXA6rCffBxy5MnZzupzSunL7LONu06Ns4L1VHm2Vcwg1h8S6cnpk
+	 2R7n77vlxal9uoveCagkdkEf9tlk93HQVgqGG9YQ=
+Date: Sat, 4 May 2024 16:10:04 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: kernel test robot <lkp@intel.com>, Minchan Kim <minchan@kernel.org>,
+ llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, Linux Memory
+ Management List <linux-mm@kvack.org>, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org
+Subject: Re: [PATCH 08/14] zram: check that backends array has at least one
+ backend
+Message-Id: <20240504161004.f5a0aab5e5aa1033d4696c20@linux-foundation.org>
+In-Reply-To: <20240504071416.GH14947@google.com>
+References: <20240503091823.3616962-9-senozhatsky@chromium.org>
+	<202405041440.UTBQZAaf-lkp@intel.com>
+	<20240504071416.GH14947@google.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 20/21] Documentation: add ipe documentation
-To: Bagas Sanjaya <bagasdotme@gmail.com>, corbet@lwn.net,
- zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, tytso@mit.edu,
- ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
- eparis@redhat.com, paul@paul-moore.com
-Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
- linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- audit@vger.kernel.org, linux-kernel@vger.kernel.org,
- Deven Bowers <deven.desai@linux.microsoft.com>
-References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com>
- <1714775551-22384-21-git-send-email-wufan@linux.microsoft.com>
- <ZjXsBjAFs-qp9xY4@archie.me>
-Content-Language: en-CA
-From: Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <ZjXsBjAFs-qp9xY4@archie.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+On Sat, 4 May 2024 16:14:16 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 
+> On (24/05/04 14:54), kernel test robot wrote:
+> >          |                            ~~~~~~~~~~~~~~~~~~~~~~
+> > >> drivers/block/zram/zcomp.c:214:2: error: call to '__compiletime_assert_285' declared with 'error' attribute: BUILD_BUG_ON failed: ARRAY_SIZE(backends) <= 1
+> >      214 |         BUILD_BUG_ON(ARRAY_SIZE(backends) <= 1);
+> >          |         ^
+> 
+> So this is what that BUILD_BUG_ON() is supposed to catch. You don't
+> have any backends selected in your .config:
+> 
+> # CONFIG_ZRAM_BACKEND_LZO is not set
+> # CONFIG_ZRAM_BACKEND_LZ4 is not set
+> # CONFIG_ZRAM_BACKEND_LZ4HC is not set
+> # CONFIG_ZRAM_BACKEND_ZSTD is not set
+> # CONFIG_ZRAM_BACKEND_DEFLATE is not set
+> CONFIG_ZRAM_DEF_COMP="unset-value"
+> 
+> Which is invalid configuration because it means that zram has no
+> compression enabled.
 
-On 5/4/2024 1:04 AM, Bagas Sanjaya wrote:
-> On Fri, May 03, 2024 at 03:32:30PM -0700, Fan Wu wrote:
->> +IPE does not mitigate threats arising from malicious but authorized
->> +developers (with access to a signing certificate), or compromised
->> +developer tools used by them (i.e. return-oriented programming attacks).
->> +Additionally, IPE draws hard security boundary between userspace and
->> +kernelspace. As a result, IPE does not provide any protections against a
->> +kernel level exploit, and a kernel-level exploit can disable or tamper
->> +with IPE's protections.
-> 
-> So how to mitigate kernel-level exploits then?
->
-One possible way is to use hypervisor to protect the kernel integrity. 
-https://github.com/heki-linux is one project on this direction. Perhaps 
-I should also add this link to the doc.
+We don't want s390 defconfig to be doing this!
 
->> +Allow only initramfs
->> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> <snipped>...
->> +Allow any signed and validated dm-verity volume and the initramfs
->> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> <snipped>...
-> 
-> htmldocs build reports new warnings:
-> 
-> Documentation/admin-guide/LSM/ipe.rst:694: WARNING: Title underline too short.
-> 
-> Allow any signed and validated dm-verity volume and the initramfs
-> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> Documentation/admin-guide/LSM/ipe.rst:694: WARNING: Title underline too short.
-> 
-> Allow any signed and validated dm-verity volume and the initramfs
-> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> Documentation/arch/x86/resctrl.rst:577: WARNING: Title underline too short.
-> 
-> I have to match these sections underline length:
-> 
-> ---- >8 ----
-> diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admin-guide/LSM/ipe.rst
-> index 1a3bf1d8aa23f0..a47e14e024a90d 100644
-> --- a/Documentation/admin-guide/LSM/ipe.rst
-> +++ b/Documentation/admin-guide/LSM/ipe.rst
-> @@ -681,7 +681,7 @@ Allow all
->      DEFAULT action=ALLOW
->   
->   Allow only initramfs
-> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +~~~~~~~~~~~~~~~~~~~~
->   
->   ::
->   
-> @@ -691,7 +691,7 @@ Allow only initramfs
->      op=EXECUTE boot_verified=TRUE action=ALLOW
->   
->   Allow any signed and validated dm-verity volume and the initramfs
-> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   
->   ::
->   
-> @@ -725,7 +725,7 @@ Allow only a specific dm-verity volume
->      op=EXECUTE dmverity_roothash=sha256:401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
->   
->   Allow any fs-verity file with a valid built-in signature
-> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   
->   ::
->   
-> @@ -735,7 +735,7 @@ Allow any fs-verity file with a valid built-in signature
->      op=EXECUTE fsverity_signature=TRUE action=ALLOW
->   
->   Allow execution of a specific fs-verity file
-> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   
->   ::
->   
-> 
->> +Additional Information
->> +----------------------
->> +
->> +- `Github Repository <https://github.com/microsoft/ipe>`_
->> +- Documentation/security/ipe.rst
-> 
-> Link title to both this admin-side and developer docs can be added for
-> disambiguation (to avoid confusion on readers):
-> 
-> ---- >8 ----
-> diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admin-guide/LSM/ipe.rst
-> index a47e14e024a90d..25b17e11559149 100644
-> --- a/Documentation/admin-guide/LSM/ipe.rst
-> +++ b/Documentation/admin-guide/LSM/ipe.rst
-> @@ -7,7 +7,8 @@ Integrity Policy Enforcement (IPE)
->   
->      This is the documentation for admins, system builders, or individuals
->      attempting to use IPE. If you're looking for more developer-focused
-> -   documentation about IPE please see Documentation/security/ipe.rst
-> +   documentation about IPE please see :doc:`the design docs
-> +   </security/ipe>`.
->   
->   Overview
->   --------
-> @@ -748,7 +749,7 @@ Additional Information
->   ----------------------
->   
->   - `Github Repository <https://github.com/microsoft/ipe>`_
-> -- Documentation/security/ipe.rst
-> +- :doc:`Developer and design docs for IPE </security/ipe>`
->   
->   FAQ
->   ---
-> diff --git a/Documentation/security/ipe.rst b/Documentation/security/ipe.rst
-> index 07e3632241285d..fd1b1a852d2165 100644
-> --- a/Documentation/security/ipe.rst
-> +++ b/Documentation/security/ipe.rst
-> @@ -7,7 +7,7 @@ Integrity Policy Enforcement (IPE) - Kernel Documentation
->   
->      This is documentation targeted at developers, instead of administrators.
->      If you're looking for documentation on the usage of IPE, please see
-> -   Documentation/admin-guide/LSM/ipe.rst
-> +   `IPE admin guide </admin-guide/LSM/ipe.rst>`_.
->   
->   Historical Motivation
->   ---------------------
-> 
-> Thanks.
-> 
-
-My apologies for these format issues and thanks for the suggestions. I 
-will fix them.
--Fan
+I guess just pick one if none were selected.
