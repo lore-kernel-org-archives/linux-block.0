@@ -1,55 +1,55 @@
 Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273E01755C
-	for <linux-block@vger.kernel.org>; Sat,  4 May 2024 08:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CCD12B7D
+	for <linux-block@vger.kernel.org>; Sat,  4 May 2024 08:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714810511; cv=none; b=SjXBReVMYaCM5jbdUm+BN2O1NdTK2FyvqYmZYXpBasyN5EsDjgMxgjUcVKDLAqMjB7a7wZGrE6Ew6U7ZAAkmI2HPAv+yNkhhRiueJ9FwRjRa6Y3VE5XfsAfbiE7jaQXIU6udZt/WPmQNiHwT4bhaAJ+nBXeAqYBz1yLOdcDRNgo=
+	t=1714810514; cv=none; b=et8PfQAngPGtPCZpQcANSLPyn4WnEWEzEOrEpm+KqhRcmntvVMFmVqOE5OKirvviO3uTHpS9SWs57AHmUiRHPNWY7AmfYt1MR9Ngiajl3fdaiF61R8G0vW7UpQmeJIZ399ybZ4MlW/fP+ldWradR5yB2UpejY+wp5kEZ2uaSMAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714810511; c=relaxed/simple;
-	bh=P5q9gL3DmOdRu3GNWoTEQhagzOV4QzL8Rtx94737wF0=;
+	s=arc-20240116; t=1714810514; c=relaxed/simple;
+	bh=t7G2Ho5WPgwkt3ZFuraW47O0HRzd+FaFO+yo28FOtDU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W7UW1AIJbxPGH4GvTHi9yjYEgdwgDWi+EU5NVy5nJS+8gNh40RA1xW98IWcYmkIU/uhc67YfRPr6vRU4hzoMoREUUTDuwVSIa2XXdmC2O9rD/uDGKF2ATW2FwyCqaAf0ORk1cy2ZtTE4f9OtPkkKBF4iQkSoSeYw6/xtABxfuUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=fZftGRPz; arc=none smtp.client-ip=216.71.154.45
+	 MIME-Version; b=dJu2iGT8u/IYdfihItUPHMe8MlH2UVevxaeGMbriGUN6Pty+dzwDUV6YudFChwynn48STJwxZOonJM+NOKMmOSbU/cCbquRBI1yhuvH1qujpHxyR9j/1GIJ62gWJW7Pm1BGE95kVyfJwpqJwB6/92aFgBOvnG4feYRpiURxtPe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=M2xFXMiw; arc=none smtp.client-ip=216.71.154.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fZftGRPz"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="M2xFXMiw"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1714810509; x=1746346509;
+  t=1714810512; x=1746346512;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=P5q9gL3DmOdRu3GNWoTEQhagzOV4QzL8Rtx94737wF0=;
-  b=fZftGRPzU5roLuKA/dIIEKcqTE8LRQakN3TpYPNw+l6lXUbP8W7aujKv
-   8/uErO96/4IBWmLshtvwqA1vAm71LPKjvoU5Jpy0ouEUxZd/vCOLecjVO
-   A1o6meoVuMcEXK1XpMAk50ujdv4ctc0HyL3jwqi30NekG0tIzTytahS4+
-   X8Ag5uNw3AU9QKAkJ+gfZ1Kb58okN3ZHfhINCbGaJyqBycuwZiWUpk4i7
-   2rHNZlCXA/x1h0J1kzw4AhjRfWsl9CPA2e8pOmJkq2TkoTwtNfnXHsAFX
-   jmafBN8F8WeQ4SNW+hkWeTPAyCOXBv5E7bAWAPB8G9hT6ozC9dtgDdSl4
+  bh=t7G2Ho5WPgwkt3ZFuraW47O0HRzd+FaFO+yo28FOtDU=;
+  b=M2xFXMiwIEsTcRgxg6uaz952VUOD0l0jB8Ej3kBrYAJEV/bNvd8n2BMM
+   l6x9XaUtwWManRoLJRf+YBHLWU0RShuhMl41jfUtTb+hADOW/QZyfZ5oD
+   qk8der7Dizw5W3z72zjXaEa6yVE8Gc3pP2FOp8q34d+8eigVuEVvdycGE
+   HUHUn3c72CkQTcBCG9tm9tcIkJ4YFZ9OSo1G4tCeQtcyPnZITjWY9Nuy/
+   llWzvT8K1+LysjrQV37DXQ+93ZzOmJ79VilLDf7uZk2gWFV671QolJJTp
+   kHByH1T+TBd2TS+wiaTgemnjnr2EOVO7DH6hMc6acfWPOMwkYfJSkNtNZ
    A==;
-X-CSE-ConnectionGUID: 60egoB/DRfy36qjNMVjUdw==
-X-CSE-MsgGUID: w04omRyaTduPb97jvwULQg==
+X-CSE-ConnectionGUID: 6ZLNBTP+SNSsFK/uzc+abw==
+X-CSE-MsgGUID: 96UXMnAoT9qW+4o1WwMybw==
 X-IronPort-AV: E=Sophos;i="6.07,253,1708358400"; 
-   d="scan'208";a="15540348"
+   d="scan'208";a="15540358"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 04 May 2024 16:15:09 +0800
-IronPort-SDR: JFqTnlfifxP//rgUIaYo66Iiuu97Cp3psZ//LWM6aVmN/+P3uPoVxS17XlI+HmjGyLTC/pSCBc
- ZNtj5v2C5nJlfGyq/FP2x3j/KuuYE+fW472EnalEZjYiMUBMQ62+uri8nODlMCIgLmFJ4sYdgq
- oIvtZOtB8ZV23+NXZt5Ky5P15jmx1LeCqehl27baccaoGP5emVw1wmxZbOZc5kX8YOFwEluWij
- olBdGuW3/kcIqOWhDuVm9+TXGOnOlO0kGe061ES+gqD2FAGLcjj7eomZ9pyle5wOFioxi035hk
- Ih4=
+  by ob1.hgst.iphmx.com with ESMTP; 04 May 2024 16:15:12 +0800
+IronPort-SDR: VrXKfzrk8cD8/NTLMxlvfP/pdoe+5/2i49WxCxbGATrYsLgGKtBH/Bj1v714fMtMAHMWAEWGTJ
+ JbHYPVWr7KbDpyCEmYCQeGhYs4Kb5Jymazh4p0EmN54gp9zxT5GRjBZ5WJfLe6BxT4xmLTcoFW
+ 1eSsmUK3AUxLh5lzZ9/UxvWa7LOgIuGd3pbJHbZgPJ/nuxEhADz/g7UCD/ZBV7ZD8K4LuphthT
+ eH0YL7ae3kH81qaE7cpIWth7/aoNagdERRTelctm7f3OeLG7XSISmjrxVz6Yqi1eSIiBUBiLht
+ yQw=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 May 2024 00:23:07 -0700
-IronPort-SDR: K+FpRuSxzQ8RzKwVSAclukCTJYrI0z4fPzXf4jwEtUhChsaPqMqqN8h7Sinkg6eHUfNX8qnYLc
- OtlIH7g9gXMd7G2798ifjf6PhCMpqzkzAZAkJLPJSjixuRN1+sszHmCcqOadMm0Seij2n60qZr
- zrTFpRFGcEwmNy080yGkrffv6v7ZSNb4RFoAjdr1gscxvvgewSg1QofUo3je/i2brsoq6QPNL+
- Vxz+MSSHabNXRRFFFvktVUGYTWEoGnT9CmRsMeYy8JGUjHJTIM3Aox87QxX0OqFwl9i7eqU5EU
- dqk=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 May 2024 00:23:10 -0700
+IronPort-SDR: +VsxZNyaEtyXC2FUTDXm5TSjW5TLuz8wCYTv7CUL+KZNduTEprAmYkX/VO7HR2rylv44ElWF0Z
+ eBxqn5/2yhb+ahLhY4we4IulCddX0WCaA/UASNwKJhxrZBaKU9IKpPvW5a1p8AAcXC1I+QLzJg
+ J5I4grPWLBdmuzJ8GQcqQCEslrZ+jfdPa2breAqXcY4UYPbKMonUq3LMJCGPLsB6wpDCmZPiQF
+ WKp0RdGXoMUYjzj6IBdxL0Fg0OOcNg2MIPOersX0mbTt4jIaogmc75RIi6MTUaCwXFEuJPtKmC
+ wyw=
 WDCIronportException: Internal
 Received: from unknown (HELO shinhome.flets-east.jp) ([10.225.163.38])
-  by uls-op-cesaip01.wdc.com with ESMTP; 04 May 2024 01:15:09 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 04 May 2024 01:15:10 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: linux-nvme@lists.infradead.org,
@@ -57,9 +57,9 @@ Cc: linux-nvme@lists.infradead.org,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v4 16/17] nvme/{rc,016,017}: rename nvme_num_iter to NVME_NUM_ITER
-Date: Sat,  4 May 2024 17:14:47 +0900
-Message-ID: <20240504081448.1107562-17-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v4 17/17] nvme/rc,srp/rc,common/multipath-over-rdma: rename use_rxe to USE_RXE
+Date: Sat,  4 May 2024 17:14:48 +0900
+Message-ID: <20240504081448.1107562-18-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240504081448.1107562-1-shinichiro.kawasaki@wdc.com>
 References: <20240504081448.1107562-1-shinichiro.kawasaki@wdc.com>
@@ -72,72 +72,89 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 To follow uppercase letter guide of environment variables, rename
-nvme_num_iter to NVME_NUM_ITER.
+use_rxe to USE_RXE.
 
 Reviewed-by: Daniel Wagner <dwagner@suse.de>
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- Documentation/running-tests.md | 5 +++--
- tests/nvme/016                 | 2 +-
- tests/nvme/017                 | 2 +-
+ Documentation/running-tests.md | 6 ++++--
+ common/multipath-over-rdma     | 5 +++--
  tests/nvme/rc                  | 2 +-
- 4 files changed, 6 insertions(+), 5 deletions(-)
+ tests/srp/rc                   | 2 +-
+ 4 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 736ab48..7bd0885 100644
+index 7bd0885..968702e 100644
 --- a/Documentation/running-tests.md
 +++ b/Documentation/running-tests.md
-@@ -117,8 +117,9 @@ The NVMe tests can be additionally parameterized via environment variables.
-   Run the tests with given image size in bytes. 'm', 'M', 'g' and 'G' postfix
-   are supported. This parameter had an old name 'nvme_img_size'. The old name
-   is still usable, but not recommended.
--- nvme_num_iter: 1000 (default)
--  The number of iterations a test should do.
-+- NVME_NUM_ITER: 1000 (default)
-+  The number of iterations a test should do. This parameter had an old name
-+  'nvme_num_iter'. The old name is still usable, but not recommended.
+@@ -132,9 +132,11 @@ NVMET_TRTYPES=rdma ./check nvme/
+ ./check srp/
  
- ### Running nvme-rdma and SRP tests
+ To use the rdma_rxe driver:
+-use_rxe=1 NVMET_TRTYPES=rdma ./check nvme/
+-use_rxe=1 ./check srp/
++USE_RXE=1 NVMET_TRTYPES=rdma ./check nvme/
++USE_RXE=1 ./check srp/
+ ```
++'USE_RXE' had the old name 'use_rxe'. The old name is still usable but not
++recommended.
  
-diff --git a/tests/nvme/016 b/tests/nvme/016
-index a65cffd..d1fdb35 100755
---- a/tests/nvme/016
-+++ b/tests/nvme/016
-@@ -23,7 +23,7 @@ test() {
- 	_setup_nvmet
+ ### Normal user
  
- 	local port
--	local iterations="${nvme_num_iter}"
-+	local iterations="${NVME_NUM_ITER}"
- 	local loop_dev
+diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
+index ee05100..d0f4d26 100644
+--- a/common/multipath-over-rdma
++++ b/common/multipath-over-rdma
+@@ -12,12 +12,13 @@ filesystem_type=ext4
+ fio_aux_path=/tmp/fio-state-files
+ memtotal=$(sed -n 's/^MemTotal:[[:blank:]]*\([0-9]*\)[[:blank:]]*kB$/\1/p' /proc/meminfo)
+ max_ramdisk_size=$((1<<25))
+-use_rxe=${use_rxe:-""}
+ ramdisk_size=$((memtotal*(1024/16)))  # in bytes
+ if [ $ramdisk_size -gt $max_ramdisk_size ]; then
+ 	ramdisk_size=$max_ramdisk_size
+ fi
  
- 	loop_dev="$(losetup -f)"
-diff --git a/tests/nvme/017 b/tests/nvme/017
-index 4f14471..114be60 100755
---- a/tests/nvme/017
-+++ b/tests/nvme/017
-@@ -23,7 +23,7 @@ test() {
- 	_setup_nvmet
++_check_conflict_and_set_default USE_RXE use_rxe ""
++
+ _have_legacy_dm() {
+ 	_have_kernel_config_file || return
+ 	if ! _check_kernel_option DM_MQ_DEFAULT; then
+@@ -396,7 +397,7 @@ start_soft_rdma() {
+ 	local type
  
- 	local port
--	local iterations="${nvme_num_iter}"
-+	local iterations="${NVME_NUM_ITER}"
- 
- 	truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
- 
+ 	{
+-	if [ -z "$use_rxe" ]; then
++	if [ -z "$USE_RXE" ]; then
+ 		modprobe siw || return $?
+ 		type=siw
+ 	else
 diff --git a/tests/nvme/rc b/tests/nvme/rc
-index ef7b966..6fc0020 100644
+index 6fc0020..c1ddf41 100644
 --- a/tests/nvme/rc
 +++ b/tests/nvme/rc
-@@ -20,7 +20,7 @@ export def_subsysnqn="blktests-subsystem-1"
- export def_subsys_uuid="91fdba0d-f87b-4c25-b80f-db7be1418b9e"
- _check_conflict_and_set_default NVMET_TRTYPES nvme_trtype "loop"
- _check_conflict_and_set_default NVME_IMG_SIZE nvme_img_size 1G
--nvme_num_iter=${nvme_num_iter:-"1000"}
-+_check_conflict_and_set_default NVME_NUM_ITER nvme_num_iter 1000
- nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
- NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
- 
+@@ -97,7 +97,7 @@ _nvme_requires() {
+ 		_have_driver nvmet-rdma
+ 		_have_configfs
+ 		_have_program rdma
+-		if [ -n "$use_rxe" ]; then
++		if [ -n "$USE_RXE" ]; then
+ 			_have_driver rdma_rxe
+ 		else
+ 			_have_driver siw
+diff --git a/tests/srp/rc b/tests/srp/rc
+index c77ef6c..85bd1dd 100755
+--- a/tests/srp/rc
++++ b/tests/srp/rc
+@@ -51,7 +51,7 @@ group_requires() {
+ 	_have_module ib_uverbs
+ 	_have_module null_blk
+ 	_have_module rdma_cm
+-	if [ -n "$use_rxe" ]; then
++	if [ -n "$USE_RXE" ]; then
+ 		_have_module rdma_rxe
+ 	else
+ 		_have_module siw
 -- 
 2.44.0
 
