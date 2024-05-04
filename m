@@ -1,94 +1,189 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD5A1D52D
-	for <linux-block@vger.kernel.org>; Sat,  4 May 2024 16:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FFE7318A;
+	Sat,  4 May 2024 20:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714840334; cv=none; b=bR6LKDI6nyxYNghBHanY80b1YUgt8hshQcDZGPgXTyYYYFCgUax2aNGF7jbBLytd9goU62WWwScYukgndcdhwoHPa9UB4EXkuixCj3YRBpKxwhYT5dqXNnI/8gr59lFFt8ubPIXVzYrKn47oBFKahWgtjfeZdWO6Q4pi3uamfi0=
+	t=1714853604; cv=none; b=XOwf2wIoUOSvjw4wy5YMzkoX3Bkv6CiPFQ11MlfN2N0rZpVq8EbXv8iSKjSS0mLeMYYC8+pSqydZhKgrfN9+PxXesKJSg6t+kyoXr9lpM+jZRSnufsRQIruOc1VCyYUWiTHd5qhbctLotWg+hOsrojJnuYrsrWcuRx0LN6bSwPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714840334; c=relaxed/simple;
-	bh=RvJT9cefv4FcchmE/9sJMsSMqGhSE0uQUs9M/KYv0Cc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qvyIgAH6Sr7d/MpgMb+Tek9qA9Er7wcvm/nw3UxaLoTa3pN/fP0xOmQQ87iQOiNxYWudwmrtcty6fs9jBWLQnTVCwRucgoFQwXasglJTcLtpUiBsbpHAIcyvwClufQVc9Rp/3mUxEt4duQqa59vUxoobn6nkKARhCSqn4cARFUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O6jIu7Nj; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1714853604; c=relaxed/simple;
+	bh=fhto2uEYgU4wqeL/mix3cVjrhwG4PTmSdbCpoGKNje0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aGo6C4MiNswYbj8bQgBmPxE6KlSX+Ng9hCypm3p8iOl94npK3d/rS+6xVcfHRSbKjjH9MCx/Tpd1Vvl1N5jOfpuXbi46YtXJjh5V9WU+5lMggo5vs5L0GO5IBP5ZYlw5JtTrFMaQ9KiTrGl5SajKGqLXpEnvX0bcjJ2308jkON4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AF7a2jdM; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O6jIu7Nj"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GHtXdDu/jOjvmv3yx9nrIccDnZW3PM8rM3YEW+E9sMg=; b=O6jIu7NjLSr3oxue2lcJC9jurO
-	zKWI5uLKW5JylpIzXb2r5FB7cKv7rMnfr1Cty6G7RZY9yLPjYQFwIuuyEe0Mg2AildpHsLWRnFy1d
-	lRpY3FiL5AijwJPKwTbvIoSKLLQ3dBuY5blQeM0QDBl/j555IRc6+ZWRUqeGP57zGqZiyTSeMy8r+
-	j9FaWutMXg4CrqpCWEvnrkkqlcQw06J+ztxN+8+KJFz922fW69LsN/PpYn1EB9fsjKe5DKk05n6Qq
-	6juAtqoVLUIaQQmC8vQ7wnIM3OsercClnpgJpuzEJExX6Cnxfu+LUdl2VOALxQagY1n3nqVgNS7Gt
-	7ZlVM8LQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s3IIu-00000006lOj-2iUx;
-	Sat, 04 May 2024 16:32:04 +0000
-Date: Sat, 4 May 2024 17:32:04 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Kundan Kumar <kundan.kumar@samsung.com>,
-	axboe@kernel.dk, linux-block@vger.kernel.org, joshi.k@samsung.com,
-	mcgrof@kernel.org, anuj20.g@samsung.com, nj.shetty@samsung.com,
-	c.gameti@samsung.com, gost.dev@samsung.com
-Subject: Re: [PATCH v2] block : add larger order folio size instead of pages
-Message-ID: <ZjZjBHAdUdt6FJe6@casper.infradead.org>
-References: <CGME20240430175735epcas5p103ac74e1482eda3e393c0034cea8e9ff@epcas5p1.samsung.com>
- <20240430175014.8276-1-kundan.kumar@samsung.com>
- <317ce09b-5fec-4ed2-b32c-d098767956d0@suse.de>
- <20240502125340.GB20610@lst.de>
- <ZjUCP08UyIGTzpW_@casper.infradead.org>
- <89417350-2589-4b7d-831e-eccfe1ce1ae2@suse.de>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AF7a2jdM"
+Received: from [10.137.106.151] (unknown [167.220.2.23])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 79675207DBB5;
+	Sat,  4 May 2024 13:13:16 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 79675207DBB5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1714853596;
+	bh=Xjz+ah6dGJK98fSkhXGcgKoJ+WDVAsQMdYbME8KL/v4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AF7a2jdMT93DQfcuBJJyAee3iRGHkB6sAaFzHW3xa8rmM2fr/yng8b/vuFYOI6r1C
+	 mOake8mf6Ya2UDnxaN+IpyWI8rszWLoz+iix+kLcubqMjZSW2GP9OEzG1RuoPbRQBn
+	 oVcqMwODzceFEk90N4os+slDEJ+rrCu+IqwzfnOM=
+Message-ID: <ab7054cd-affd-47c3-bd98-2cf47d6a6376@linux.microsoft.com>
+Date: Sat, 4 May 2024 13:13:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89417350-2589-4b7d-831e-eccfe1ce1ae2@suse.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 20/21] Documentation: add ipe documentation
+To: Bagas Sanjaya <bagasdotme@gmail.com>, corbet@lwn.net,
+ zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, tytso@mit.edu,
+ ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+ eparis@redhat.com, paul@paul-moore.com
+Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+ linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com>
+ <1714775551-22384-21-git-send-email-wufan@linux.microsoft.com>
+ <ZjXsBjAFs-qp9xY4@archie.me>
+Content-Language: en-CA
+From: Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <ZjXsBjAFs-qp9xY4@archie.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, May 04, 2024 at 02:35:15PM +0200, Hannes Reinecke wrote:
-> > I think this is wandering into a minefield.  I'm pretty sure
-> > it's considered valid to split the bio, and complete the two halves
-> > independently.  Each one will put the refcounts for the pages it touches,
-> > and if we do this early putting of references, that's going to fail.
+
+
+On 5/4/2024 1:04 AM, Bagas Sanjaya wrote:
+> On Fri, May 03, 2024 at 03:32:30PM -0700, Fan Wu wrote:
+>> +IPE does not mitigate threats arising from malicious but authorized
+>> +developers (with access to a signing certificate), or compromised
+>> +developer tools used by them (i.e. return-oriented programming attacks).
+>> +Additionally, IPE draws hard security boundary between userspace and
+>> +kernelspace. As a result, IPE does not provide any protections against a
+>> +kernel level exploit, and a kernel-level exploit can disable or tamper
+>> +with IPE's protections.
 > 
-> Precisesly my worries. Something I want to talk to you about at LSF;
-> refcounting of folios vs refcounting of pages.
-> When one takes a refcount on a folio we are actually taking a refcount
-> on the first page, which is okay if we stick with using the folio throughout
-> the call chain. But if we start mixing between pages and folios (as we do
-> here) we will be getting the refcount wrong.
+> So how to mitigate kernel-level exploits then?
+>
+One possible way is to use hypervisor to protect the kernel integrity. 
+https://github.com/heki-linux is one project on this direction. Perhaps 
+I should also add this link to the doc.
+
+>> +Allow only initramfs
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> <snipped>...
+>> +Allow any signed and validated dm-verity volume and the initramfs
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> <snipped>...
 > 
-> Do you have plans how we could improve the situation?
-> Like a warning 'Hey, you've used the folio for taking the reference, but now
-> you are releasing the references for the page'?
+> htmldocs build reports new warnings:
+> 
+> Documentation/admin-guide/LSM/ipe.rst:694: WARNING: Title underline too short.
+> 
+> Allow any signed and validated dm-verity volume and the initramfs
+> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> Documentation/admin-guide/LSM/ipe.rst:694: WARNING: Title underline too short.
+> 
+> Allow any signed and validated dm-verity volume and the initramfs
+> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> Documentation/arch/x86/resctrl.rst:577: WARNING: Title underline too short.
+> 
+> I have to match these sections underline length:
+> 
+> ---- >8 ----
+> diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admin-guide/LSM/ipe.rst
+> index 1a3bf1d8aa23f0..a47e14e024a90d 100644
+> --- a/Documentation/admin-guide/LSM/ipe.rst
+> +++ b/Documentation/admin-guide/LSM/ipe.rst
+> @@ -681,7 +681,7 @@ Allow all
+>      DEFAULT action=ALLOW
+>   
+>   Allow only initramfs
+> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +~~~~~~~~~~~~~~~~~~~~
+>   
+>   ::
+>   
+> @@ -691,7 +691,7 @@ Allow only initramfs
+>      op=EXECUTE boot_verified=TRUE action=ALLOW
+>   
+>   Allow any signed and validated dm-verity volume and the initramfs
+> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   
+>   ::
+>   
+> @@ -725,7 +725,7 @@ Allow only a specific dm-verity volume
+>      op=EXECUTE dmverity_roothash=sha256:401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
+>   
+>   Allow any fs-verity file with a valid built-in signature
+> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   
+>   ::
+>   
+> @@ -735,7 +735,7 @@ Allow any fs-verity file with a valid built-in signature
+>      op=EXECUTE fsverity_signature=TRUE action=ALLOW
+>   
+>   Allow execution of a specific fs-verity file
+> -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   
+>   ::
+>   
+> 
+>> +Additional Information
+>> +----------------------
+>> +
+>> +- `Github Repository <https://github.com/microsoft/ipe>`_
+>> +- Documentation/security/ipe.rst
+> 
+> Link title to both this admin-side and developer docs can be added for
+> disambiguation (to avoid confusion on readers):
+> 
+> ---- >8 ----
+> diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admin-guide/LSM/ipe.rst
+> index a47e14e024a90d..25b17e11559149 100644
+> --- a/Documentation/admin-guide/LSM/ipe.rst
+> +++ b/Documentation/admin-guide/LSM/ipe.rst
+> @@ -7,7 +7,8 @@ Integrity Policy Enforcement (IPE)
+>   
+>      This is the documentation for admins, system builders, or individuals
+>      attempting to use IPE. If you're looking for more developer-focused
+> -   documentation about IPE please see Documentation/security/ipe.rst
+> +   documentation about IPE please see :doc:`the design docs
+> +   </security/ipe>`.
+>   
+>   Overview
+>   --------
+> @@ -748,7 +749,7 @@ Additional Information
+>   ----------------------
+>   
+>   - `Github Repository <https://github.com/microsoft/ipe>`_
+> -- Documentation/security/ipe.rst
+> +- :doc:`Developer and design docs for IPE </security/ipe>`
+>   
+>   FAQ
+>   ---
+> diff --git a/Documentation/security/ipe.rst b/Documentation/security/ipe.rst
+> index 07e3632241285d..fd1b1a852d2165 100644
+> --- a/Documentation/security/ipe.rst
+> +++ b/Documentation/security/ipe.rst
+> @@ -7,7 +7,7 @@ Integrity Policy Enforcement (IPE) - Kernel Documentation
+>   
+>      This is documentation targeted at developers, instead of administrators.
+>      If you're looking for documentation on the usage of IPE, please see
+> -   Documentation/admin-guide/LSM/ipe.rst
+> +   `IPE admin guide </admin-guide/LSM/ipe.rst>`_.
+>   
+>   Historical Motivation
+>   ---------------------
+> 
+> Thanks.
+> 
 
-This is a fairly common misunderstanding, but TLDR: problem solved long
-before I started this project.
-
-Individual pages don't actually have a refcount.  I know it looks
-like they do, and they kind of do, but for tail pages, the refcount is
-always 0.  Functions like get_page() and put_page() always operate on
-the head page (ie folio) refcount.
-
-Specifically, I think you're concerned about pages coming from GUP.
-Take a look at try_get_folio().  We pass in a struct page, explicitly
-get the refcount on a folio, check the page is still part of the
-folio, then return the folio.  And we return the page to the caller
-because the caller needs to know the precise page at that address,
-not the folio that contains it.
-
-There are functions which don't surreptitiously call compound_head()
-behind your back.  set_page_count(), for example.  And page_ref_count()
-(rather than the more normal page_count()).
-
-And none of this is true if you don't use __GFP_COMP.  But let's call
-that an aberration that must die.
+My apologies for these format issues and thanks for the suggestions. I 
+will fix them.
+-Fan
