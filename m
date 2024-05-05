@@ -1,258 +1,122 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5A1191;
-	Sun,  5 May 2024 00:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601E8A35
+	for <linux-block@vger.kernel.org>; Sun,  5 May 2024 04:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714868128; cv=none; b=QWPqPf0AiwM0RGGoHtzFnquY8FmI2YeWd0+B/31bzLXqaqrhBuf43WJJl0Dch4eUVpuf4xe34iPPS2eAiezd7J/GMvOUkQY06GALOjtNC/Kcg1G4F4Wp/XSDvse4uAcUE1ZbUBpEjdnlGW4vPGyowZ2KA2LNgKBP7EPqPWWqHwA=
+	t=1714884004; cv=none; b=R1BF1w2/6H9+IAEbTlkCw+EKf2LhgOq76nggNIzWtqKgYXF420m/4THwqSI8Qu0sMmzUUL51ee/QQF9Mpnn6jhH4uZyAJBCTeDGU+C2J4OezyHS0DLOX0Oi9YBClp0Zg0mX6LMs/VcCFp1Oirm4QDN6lXxXh8WMO5wYCfab5pts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714868128; c=relaxed/simple;
-	bh=Us12kLS2/JZzE9OjnNQSSWjgW41q/1qK+0tYJ109430=;
+	s=arc-20240116; t=1714884004; c=relaxed/simple;
+	bh=zg1XkJMfhl0NSO0NTG2Ku336zIdH3gENBvcjq01QdDI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xe12wYUL5AuwOiFg2pJpBydk7OATwXAsRIZqOb/Dbyiss3czJWpWzf3gaP+f8mfYfeGgXKTzwPYbVTAasSrQYoofUWq5LYEcjN/A5Y5of3KeTimj7xjdMOdBNnENt2OEdHYq527VR9TzYIp4mFTHKxXWKUZV3ky8+nY8c0Vv9Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N0uFbkB6; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=kJitrj6QIz9Uh0w3UYCqli8z2z+QpfZA4QFB4j78LZibzhxg8Se4QLKe2Ovq3j6X6nAyI9rpJlTEeHaexP+MMB4g9CpCaRF8/pNZ6/bULo1RYCF2broAVLiLI1fjV16fRgW6iFRcFT2mRu8btHMmxtQh9rIqhlJKfY0VDuwlUi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=OiQLKpa3; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N0uFbkB6"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1ec4dd8525cso6328525ad.3;
-        Sat, 04 May 2024 17:15:25 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OiQLKpa3"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ecd9a81966so20259655ad.0
+        for <linux-block@vger.kernel.org>; Sat, 04 May 2024 21:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714868125; x=1715472925; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1714884003; x=1715488803; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wgS8JoAt6F27d1bbCvSCcX4fIE1TnZzCg1FmdDqGcZI=;
-        b=N0uFbkB6jlEaPVaOkdFzQg50wGVyjtKlAT3sTV6Q1wl8d6l6Xslb0jv8uf3R25h8Vb
-         tQsr+pzftUPFvfauxRNFUWxeHVqk+2/GkzR9xk1MCJ60cyEGTpv32mcpuKmD1kc8Egbz
-         vsm3zfxNnG7vFZf4HXCFb0hKVEchgUQIZgj0R+ssWzz6zCkwcJIf3GEb0ykNOHMclFrw
-         ThB3bpYZgAWRIuwMHUsR/WMYdJyhtIeQyLQ9NVkZQXg5aQNda0gEHC/JY1L7FQPD7euN
-         hJPdS6nDAlq1RFpXrT9XKI7x2/9TN5HjBBZeRWkk9CUam2mffol8nXHPOsBcoDYtnCpN
-         slsA==
+        bh=TzpM7FU8Imvm8zuTPXcEgxBeaAl1FWkYeSH3YqD2Xns=;
+        b=OiQLKpa3uJLoDH6uGW1rVkG2MrjAs55QzEvNgDRwmHsSX9KRKrKyMnxClP2n0Sc6fR
+         siNY4zTSrJaHSMqNsKFYLldatBGlf35XlCsCDwogMYndmcP0SlFsuvCZ7ApTIbL60Qhr
+         mtHZsTvt3Le36c766TVffKRmiUjB8uHoS4Hbg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714868125; x=1715472925;
+        d=1e100.net; s=20230601; t=1714884003; x=1715488803;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wgS8JoAt6F27d1bbCvSCcX4fIE1TnZzCg1FmdDqGcZI=;
-        b=wKFsWS6sAadDXIujg0o/v1q1dSOqM5tVT4I8jlEtWrIK73hknDfP9422oPMfkDrVZD
-         eqGtCiXx4GamW5aKQvXKCjSKsDhFLfKoJYlM50aEWUnqyPQrt6LZxA+uaRIuwipm2Knz
-         AU0r85HdkcFOEzi3OJnvbAlwvqN4nrmGZjEtwqXC64U55TszEn9c5QCDvtbDryFK1RSI
-         5NiXHK1o7btqB4oPD6wJLNVcLBuU77Stu4cRnOQ7cXqR84qS6fhPEuqRjGR5XPwKeYR2
-         iq37+Zf0IeZZtdK1LgAyx7KnLvKtYw0Bs5ataG1S/4hERgAHvpA4IuPodqCfM3Fsvnpr
-         Fc9g==
-X-Forwarded-Encrypted: i=1; AJvYcCWEjhnFrI5QyOCG09iEPWqDmGN1fyBoYOR3i4aKKWfKPgfv77Rqfi224NjfrpQIxy1MkX0Fp5XHtR+fzyQwkvq6VBTnOXeBvF9dgsavW3M5HMGE1HdjQu21OrDe5ZWf1HEgWDnBHQG9AC3NVnzW0eXmi/cFqpvBv2lliq8pw1Ewjek8aEU++fOfj68OmCAfNnIuinkFZHmRdQuVsBDfBZQ4ICsfrHsZOBwGv+shx1Fqp5q6ugtDTTsGEEEl1D8l8oqptgyEcXCSLg==
-X-Gm-Message-State: AOJu0Yw5aS/Ye9GcDBg/BwHHL/jmFCtqhaLCCEcuvlVve1FlkFzsjKQl
-	On3koFLDz39sSniWvUSRXDETmx4SpWV1/Im/nsHC7BJL0h8fOKAf
-X-Google-Smtp-Source: AGHT+IEuepOKmbUX0nP6tkkmgH/wJcdmWEBFxatponT+7JHJdiSXjE9CQIyDOyyrEvUleV3UtJK/YA==
-X-Received: by 2002:a17:903:2403:b0:1e5:8175:4968 with SMTP id e3-20020a170903240300b001e581754968mr5632206plo.9.1714868124735;
-        Sat, 04 May 2024 17:15:24 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id ld14-20020a170902face00b001e0c568ae8fsm5583101plb.192.2024.05.04.17.15.23
+        bh=TzpM7FU8Imvm8zuTPXcEgxBeaAl1FWkYeSH3YqD2Xns=;
+        b=u/n8Rs5QIGSPPn2YbUycSCXkgyUw51DD2DNnpQ3gBp9pGiW3/N+5hxsg7jvF2V1Fgq
+         adJppZdqnDZUqI1zoOn/CZgOYd3pJsGUxqPjVH1cXyiOxvX1wGg08uZhcZYAe6mgFCB2
+         7w3Y4Gf6Dn5qWB6ZCe3uTf86klRLQp0VuRmfp8vxZ/rvUByI9qN7WfzQfTC8qVFbR2D5
+         35LxUMmGzPkvLIh7baPAgJwuy0rvH7HTxhcBKWAoTn0ZkbZivWqYBhFtg7nAJS9/y0Et
+         HW+tj6SkTL/vtnR97xcuwZyfgKqtfMymrP+2bh0Mo4owUHHMqJ4edDUPgFknyUmOXE9v
+         msqA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/zn6W2CAoNtIwf0CbQTi2kICJVjqfWVruvcXl8cCwcPGDyG1/i3JhYnf9jlMYwBeAjMYOlGCtti7aH0KWmtYO7T+vZLyKmRb6LS0=
+X-Gm-Message-State: AOJu0YwlqhDSfOcRHVfsy4cQUH39+h0gtcPV+rZ7aQ2fJBuu5t84pQp+
+	V4iSla8tV631FfADtJ3Y4moA1cgFjzIv7Pd664H4k0mv23/fVOpU3B7iIHiZbIKdtRQu0LTsGw4
+	=
+X-Google-Smtp-Source: AGHT+IEeiKOrRPU5vIIqBtlS4HJNxQ0aabIvlspSUVAEeWBnpj7xpaPpcUt2xQ7IpYeR2DLXXzG+rw==
+X-Received: by 2002:a17:902:ecc4:b0:1e4:59a2:d7c1 with SMTP id a4-20020a170902ecc400b001e459a2d7c1mr15472258plh.33.1714884002658;
+        Sat, 04 May 2024 21:40:02 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:8263:3b89:bcee:2ed4])
+        by smtp.gmail.com with ESMTPSA id r12-20020a170902c60c00b001ec7a1a8702sm5789626plr.271.2024.05.04.21.40.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 17:15:24 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 133A9184947D8; Sun, 05 May 2024 07:15:18 +0700 (WIB)
-Date: Sun, 5 May 2024 07:15:18 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com,
-	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu,
-	ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com,
-	snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com
-Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	audit@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH v18 20/21] Documentation: add ipe documentation
-Message-ID: <ZjbPlk8ZwFZwdqJJ@archie.me>
-References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com>
- <1714775551-22384-21-git-send-email-wufan@linux.microsoft.com>
- <ZjXsBjAFs-qp9xY4@archie.me>
- <ab7054cd-affd-47c3-bd98-2cf47d6a6376@linux.microsoft.com>
+        Sat, 04 May 2024 21:40:02 -0700 (PDT)
+Date: Sun, 5 May 2024 13:39:57 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	kernel test robot <lkp@intel.com>, Minchan Kim <minchan@kernel.org>,
+	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 08/14] zram: check that backends array has at least one
+ backend
+Message-ID: <20240505043957.GA8623@google.com>
+References: <20240503091823.3616962-9-senozhatsky@chromium.org>
+ <202405041440.UTBQZAaf-lkp@intel.com>
+ <20240504071416.GH14947@google.com>
+ <20240504161004.f5a0aab5e5aa1033d4696c20@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="InlbHezzGTuEcuIT"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab7054cd-affd-47c3-bd98-2cf47d6a6376@linux.microsoft.com>
+In-Reply-To: <20240504161004.f5a0aab5e5aa1033d4696c20@linux-foundation.org>
 
+On (24/05/04 16:10), Andrew Morton wrote:
+> > On (24/05/04 14:54), kernel test robot wrote:
+> > >          |                            ~~~~~~~~~~~~~~~~~~~~~~
+> > > >> drivers/block/zram/zcomp.c:214:2: error: call to '__compiletime_assert_285' declared with 'error' attribute: BUILD_BUG_ON failed: ARRAY_SIZE(backends) <= 1
+> > >      214 |         BUILD_BUG_ON(ARRAY_SIZE(backends) <= 1);
+> > >          |         ^
+> > 
+> > So this is what that BUILD_BUG_ON() is supposed to catch. You don't
+> > have any backends selected in your .config:
+> > 
+> > # CONFIG_ZRAM_BACKEND_LZO is not set
+> > # CONFIG_ZRAM_BACKEND_LZ4 is not set
+> > # CONFIG_ZRAM_BACKEND_LZ4HC is not set
+> > # CONFIG_ZRAM_BACKEND_ZSTD is not set
+> > # CONFIG_ZRAM_BACKEND_DEFLATE is not set
+> > CONFIG_ZRAM_DEF_COMP="unset-value"
+> > 
+> > Which is invalid configuration because it means that zram has no
+> > compression enabled.
+> 
+> We don't want s390 defconfig to be doing this!
+> 
+> I guess just pick one if none were selected.
 
---InlbHezzGTuEcuIT
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm looking into it.
 
-On Sat, May 04, 2024 at 01:13:16PM -0700, Fan Wu wrote:
->=20
->=20
-> On 5/4/2024 1:04 AM, Bagas Sanjaya wrote:
-> > On Fri, May 03, 2024 at 03:32:30PM -0700, Fan Wu wrote:
-> > > +IPE does not mitigate threats arising from malicious but authorized
-> > > +developers (with access to a signing certificate), or compromised
-> > > +developer tools used by them (i.e. return-oriented programming attac=
-ks).
-> > > +Additionally, IPE draws hard security boundary between userspace and
-> > > +kernelspace. As a result, IPE does not provide any protections again=
-st a
-> > > +kernel level exploit, and a kernel-level exploit can disable or tamp=
-er
-> > > +with IPE's protections.
-> >=20
-> > So how to mitigate kernel-level exploits then?
-> >=20
-> One possible way is to use hypervisor to protect the kernel integrity.
-> https://github.com/heki-linux is one project on this direction. Perhaps I
-> should also add this link to the doc.
+We used to have "zram depends on crypto compression algorithm"
 
-OK.
+: config ZRAM
+:        tristate "Compressed RAM block device support"
+:        depends on BLOCK && SYSFS && MMU
+:        depends on CRYPTO_LZO || CRYPTO_ZSTD || CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842
 
->=20
-> > > +Allow only initramfs
-> > > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > <snipped>...
-> > > +Allow any signed and validated dm-verity volume and the initramfs
-> > > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > <snipped>...
-> >=20
-> > htmldocs build reports new warnings:
-> >=20
-> > Documentation/admin-guide/LSM/ipe.rst:694: WARNING: Title underline too=
- short.
-> >=20
-> > Allow any signed and validated dm-verity volume and the initramfs
-> > ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > Documentation/admin-guide/LSM/ipe.rst:694: WARNING: Title underline too=
- short.
-> >=20
-> > Allow any signed and validated dm-verity volume and the initramfs
-> > ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > Documentation/arch/x86/resctrl.rst:577: WARNING: Title underline too sh=
-ort.
-> >=20
-> > I have to match these sections underline length:
-> >=20
-> > ---- >8 ----
-> > diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admi=
-n-guide/LSM/ipe.rst
-> > index 1a3bf1d8aa23f0..a47e14e024a90d 100644
-> > --- a/Documentation/admin-guide/LSM/ipe.rst
-> > +++ b/Documentation/admin-guide/LSM/ipe.rst
-> > @@ -681,7 +681,7 @@ Allow all
-> >      DEFAULT action=3DALLOW
-> >   Allow only initramfs
-> > -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > +~~~~~~~~~~~~~~~~~~~~
-> >   ::
-> > @@ -691,7 +691,7 @@ Allow only initramfs
-> >      op=3DEXECUTE boot_verified=3DTRUE action=3DALLOW
-> >   Allow any signed and validated dm-verity volume and the initramfs
-> > -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >   ::
-> > @@ -725,7 +725,7 @@ Allow only a specific dm-verity volume
-> >      op=3DEXECUTE dmverity_roothash=3Dsha256:401fcec5944823ae12f62726e8=
-184407a5fa9599783f030dec146938 action=3DALLOW
-> >   Allow any fs-verity file with a valid built-in signature
-> > -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >   ::
-> > @@ -735,7 +735,7 @@ Allow any fs-verity file with a valid built-in sign=
-ature
-> >      op=3DEXECUTE fsverity_signature=3DTRUE action=3DALLOW
-> >   Allow execution of a specific fs-verity file
-> > -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >   ::
-> >=20
-> > > +Additional Information
-> > > +----------------------
-> > > +
-> > > +- `Github Repository <https://github.com/microsoft/ipe>`_
-> > > +- Documentation/security/ipe.rst
-> >=20
-> > Link title to both this admin-side and developer docs can be added for
-> > disambiguation (to avoid confusion on readers):
-> >=20
-> > ---- >8 ----
-> > diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admi=
-n-guide/LSM/ipe.rst
-> > index a47e14e024a90d..25b17e11559149 100644
-> > --- a/Documentation/admin-guide/LSM/ipe.rst
-> > +++ b/Documentation/admin-guide/LSM/ipe.rst
-> > @@ -7,7 +7,8 @@ Integrity Policy Enforcement (IPE)
-> >      This is the documentation for admins, system builders, or individu=
-als
-> >      attempting to use IPE. If you're looking for more developer-focused
-> > -   documentation about IPE please see Documentation/security/ipe.rst
-> > +   documentation about IPE please see :doc:`the design docs
-> > +   </security/ipe>`.
-> >   Overview
-> >   --------
-> > @@ -748,7 +749,7 @@ Additional Information
-> >   ----------------------
-> >   - `Github Repository <https://github.com/microsoft/ipe>`_
-> > -- Documentation/security/ipe.rst
-> > +- :doc:`Developer and design docs for IPE </security/ipe>`
-> >   FAQ
-> >   ---
-> > diff --git a/Documentation/security/ipe.rst b/Documentation/security/ip=
-e.rst
-> > index 07e3632241285d..fd1b1a852d2165 100644
-> > --- a/Documentation/security/ipe.rst
-> > +++ b/Documentation/security/ipe.rst
-> > @@ -7,7 +7,7 @@ Integrity Policy Enforcement (IPE) - Kernel Documentati=
-on
-> >      This is documentation targeted at developers, instead of administr=
-ators.
-> >      If you're looking for documentation on the usage of IPE, please see
-> > -   Documentation/admin-guide/LSM/ipe.rst
-> > +   `IPE admin guide </admin-guide/LSM/ipe.rst>`_.
-> >   Historical Motivation
-> >   ---------------------
-> >=20
-> > Thanks.
-> >=20
->=20
-> My apologies for these format issues and thanks for the suggestions. I wi=
-ll
-> fix them.
+I sort of wanted to change it and make zram select compression algorithm,
+instead of depending on some comp algorithm being already selected.
+But I can probably keep the old behaviour
 
-Oh, I forgot to also add :doc: directive for the last reference link:
-
----- >8 ----
-diff --git a/Documentation/security/ipe.rst b/Documentation/security/ipe.rst
-index fd1b1a852d2165..aa2e64d4119f3e 100644
---- a/Documentation/security/ipe.rst
-+++ b/Documentation/security/ipe.rst
-@@ -7,7 +7,7 @@ Integrity Policy Enforcement (IPE) - Kernel Documentation
-=20
-    This is documentation targeted at developers, instead of administrators.
-    If you're looking for documentation on the usage of IPE, please see
--   `IPE admin guide </admin-guide/LSM/ipe.rst>`_.
-+   :doc:`IPE admin guide </admin-guide/LSM/ipe>`.
-=20
- Historical Motivation
- ---------------------
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---InlbHezzGTuEcuIT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZjbPjgAKCRD2uYlJVVFO
-o8HPAQDxhozqHxPAtlb/vByqFj4O4DT+qZVm5PvJcv9tnq0aCQD7BQbQr6wEPrYZ
-0lIMQIcpVMj+XdMBtixikEDTadIDHQI=
-=mp4a
------END PGP SIGNATURE-----
-
---InlbHezzGTuEcuIT--
+: config ZRAM
+:        tristate "Compressed RAM block device support"
+:        depends on BLOCK && SYSFS && MMU
+:        select ZSMALLOC
+:        depends on (LZO_COMPRESS && LZO_DECOMPRESS) || \
+:                (LZ4_COMPRESS && LZ4_DECOMPRESS) || \
+:                (LZ4HC_COMPRESS && LZ4_DECOMPRESS) || \
+:                (ZSTD_COMPRESS && ZSTD_DECOMPRESS) || \
+:                (ZLIB_DEFLATE && ZLIB_INFLATE)
