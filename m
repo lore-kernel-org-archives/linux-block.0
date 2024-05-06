@@ -1,30 +1,76 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C7448CCD
-	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 06:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8095F46439
+	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 06:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714975518; cv=none; b=XANHKmOej2hO5N9avommUn/TKv3YFQBiP4PZuHthjJEd9BvJth2F/5utuz8fZ5A0P+1cBRNayfXtpAe/AgtkTtxLof025ntpQgdg8EOTGjFr5NxdoU2ueid3171W4eZ5qKNVDyT8d/u0gW0wpw68wBXn16OLXR2gJcozr4KXfSw=
+	t=1714977822; cv=none; b=UtNYAbdQC0n8xCM66zJvjXrZYvf1yll0T2g5ILSkorCEIDDzLMd7ckIfucOoJPudHKCZ7wwMJwhFjIUMg6UzQm6XJARn7xJAwpfG+tm6vEEJmS1XxtvvBC7RXFHGZ4KnZtjJo23xc3pctqRntIHT+o8ck7Im2T2kcE7qUeZ/UTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714975518; c=relaxed/simple;
-	bh=N3pWe94OvSgIhXH06V+jpz1V7E2/EVJQGIHDLNjkRg4=;
+	s=arc-20240116; t=1714977822; c=relaxed/simple;
+	bh=TTtQyHcx8HkIEEBoI/wvFIf+0GYqPB/yGd00nQkF9Ys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qFDS4boEAZ4M1c6KXK0kRrHQKN+C9El/gvni6WawXyf/RA40c/Cw++6xAU+q5C0y+T1hKKZ2dweOa8RbzD8CtrV9A4+gYYXquIyOO0fYIzCAoJJGNT3deycoxHPVRSFIikGHt98Nl5/k2U374ipcxLMPP6rFWX0SfFSbYThIMyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 5D7C468AFE; Mon,  6 May 2024 08:05:10 +0200 (CEST)
-Date: Mon, 6 May 2024 08:05:09 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: kbusch@kernel.org, hch@lst.de, axboe@kernel.dk,
-	linux-block@vger.kernel.org, martin.petersen@oracle.com,
-	anuj20.g@samsung.com
-Subject: Re: [PATCH] block: streamline meta bounce buffer handling
-Message-ID: <20240506060509.GA5362@lst.de>
-References: <CGME20240506051751epcas5p1ed84e21495e12c7bf41e94827aa85e33@epcas5p1.samsung.com> <20240506051047.4291-1-joshi.k@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QlsV2ranDcKwYX0ALR74IPHIHsOy33fOZvCT1TWu1b6tRN2X+2vCnUyB+BgaX0El0unI1HIf4jCTz92Nahfkxk+8AqUZktvSQ8Ke9LxbsC+u92vXX6MNufbKDzpze5Y95d8zjAGGoFc3sXXBzyVJNHMy04XGA3CfrZeMGBrUPAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=RflGFmp+; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RflGFmp+"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5dcc4076c13so937026a12.0
+        for <linux-block@vger.kernel.org>; Sun, 05 May 2024 23:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714977821; x=1715582621; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Awh0YX9sFOZlmXGVWv7TrQyTmY6KwzUZh2FsqtFN28s=;
+        b=RflGFmp+l+BXhk012uKZ6aGuTeT6YcCrQtXctXqH+GYKCsoFUkUu+ncgwY+ZsVSEPf
+         Optz1qPMVDD6ozHGvn9LX7Vbec04BflDCvLwMgIJnuOo6N7bOWYZBSyKR8z6jaTMREwx
+         jbKOWzJ+JqoF4pLVdtWNcOTcBDLi2H9zqMAT4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714977821; x=1715582621;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Awh0YX9sFOZlmXGVWv7TrQyTmY6KwzUZh2FsqtFN28s=;
+        b=JbfrPP9wQygOlLd083O0sYgGohca3wTkzIDIIbuETI/3pxAZ/ub/Gb7vYhItJTj3jf
+         /+JBucwLg6ukQPdHmct/4Wh/xFYtb1wN8G0FCeGDeQZLEzi9GZCo/LkvGfRxiGUDPHO0
+         9QC/QWztuD8SHWokWRp5tpZUpO4pJCInweRWktD/HO70W78S4cWYD2mZmZE7ferZy1pp
+         TWhMcAREOdAqYzP2WOMjoJ8biXVpDb/mWJSqEVMYmOCCBu8dWUGg8CLWd7PVuhaSVUjO
+         OC/OwBAgEc6s+77D0q6yXqivoL34igmDBTScnktI3C2BciU9tysmvookIx+2YvIMt9ln
+         EAGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxbIq95f4AXOxgKWG0/sSgCRZzdwaBRsksiQEfTxBjtga9EPzGythNEAZBHtq7KGDK1vlr6M5HbmdxDI57EmKCFYnzqpX+fJPUWRs=
+X-Gm-Message-State: AOJu0Yw1biad46XsNCEsar6s+anR2MPuMgI/l81FIZ5vuZYvuzXfY8b7
+	H7jWzqND24E5HT06frp0/L+b0AvjYguf3af2gSp/faDtA8FdF432lBwZVZgb3g==
+X-Google-Smtp-Source: AGHT+IH9/hiNrPAZgMq5yCe0qsmK1lm2LH0SwY8LB+Tn+zX2oS8PqcHxJee+fl5rH8OfTgRdDd1VYA==
+X-Received: by 2002:a17:90b:124b:b0:2b0:763b:370e with SMTP id gx11-20020a17090b124b00b002b0763b370emr18238105pjb.18.1714977820818;
+        Sun, 05 May 2024 23:43:40 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:4e24:10c3:4b65:e126])
+        by smtp.gmail.com with ESMTPSA id rr3-20020a17090b2b4300b002b113ad5f10sm9316590pjb.12.2024.05.05.23.43.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 May 2024 23:43:40 -0700 (PDT)
+Date: Mon, 6 May 2024 15:43:35 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kbuild@vger.kernel.org, kernel test robot <lkp@intel.com>,
+	Minchan Kim <minchan@kernel.org>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 08/14] zram: check that backends array has at least one
+ backend
+Message-ID: <20240506064335.GE8623@google.com>
+References: <20240503091823.3616962-9-senozhatsky@chromium.org>
+ <202405041440.UTBQZAaf-lkp@intel.com>
+ <20240504071416.GH14947@google.com>
+ <20240504161004.f5a0aab5e5aa1033d4696c20@linux-foundation.org>
+ <20240505043957.GA8623@google.com>
+ <20240505051305.GB8623@google.com>
+ <20240505064832.GC8623@google.com>
+ <20240506032207.GD8623@google.com>
+ <CAK7LNARUBuR3gDtX6GfB7Zv6dydt1+qzBB_XT58wOg3WeCTVvA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,21 +79,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240506051047.4291-1-joshi.k@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <CAK7LNARUBuR3gDtX6GfB7Zv6dydt1+qzBB_XT58wOg3WeCTVvA@mail.gmail.com>
 
-Can we take a step back first?
+On (24/05/06 14:20), Masahiro Yamada wrote:
+> config ZRAM_BACKEND_FORCE_LZO
+>         def_bool !ZRAM_BACKEND_LZ4 && !ZRAM_BACKEND_LZ4HC && \
+>                  !ZRAM_BACKEND_ZSTD && !ZRAM_BACKEND_DEFLATE
+> 
+> config ZRAM_BACKEND_LZO
+>         bool "lzo and lzo-rle compression support" if !ZRAM_BACKEND_FORCE_LZO
+>         depends on ZRAM
+>         default ZRAM_BACKEND_FORCE_LZO
+>         select LZO_COMPRESS
+>         select LZO_DECOMPRESS
 
-Current the blk-map user buffer handling decided to either pin
-the memory and use that directly or use the normal user copy helpers
-through copy_page_to_iter/copy_page_from_iter.
+I'll take this one. Thank you.
 
-Why do we even pin the memory here to then do an in-kernel copy instead
-of doing the copy_from/to_user which is going to be a lot more efficient?
+> BTW, "default n" you are adding are redundant.
 
-Sort of related to that is that this does driver the copy to user and
-unpin from bio_integrity_free, which is a low-level routine.  It really
-should be driven from the highlevel blk-map code that is the I/O
-submitter, just like the data side.  Shoe-horning uaccess into the
-low-level block layer plumbing is just going to get us into trouble.
-
+OK.
