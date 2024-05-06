@@ -1,63 +1,63 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594101448D4
-	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 07:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4E11448FA
+	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 07:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714982365; cv=none; b=oJxmuA6zqgztmWBdShFwF5FtjDY3+T3F8XVHpdr02Yvz1TJUlWvFN2rVgb6XgeO4N5Vlb/ifUYOhJsOxzB/XsxbZAHTdFn917S/Y290kdito1N2rbKQTPVR0k3VUtQ/5yran5EXU4E9EQgwL0yEO21Fbq8NE9NQ+ltBKOunWRXE=
+	t=1714982367; cv=none; b=o4UGThhHP7d4WqW7Bk3D2GLtHs0/R0vl+IwIsDWFLvtLgKyCTjjHMXPooiIimNshvszySrYn9+vE433OzrDRK4QboJUJeVyWpgmhlnBETt1HeS5wM9t9luCa4xT+4iZxLxX8ETXPhRwdqXT5RZyRlGJh3vtdsE0XZLSnxi0iaTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714982365; c=relaxed/simple;
-	bh=d3vFRBqQt4rMVioo0/wvp6HT9RZQh4Y89EivFcAwXXA=;
+	s=arc-20240116; t=1714982367; c=relaxed/simple;
+	bh=0QKD/VRLqE4UJhTMThwx4W0GPaxzgatlvvK+3EE9Gd0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nsYJemnbEHedgG1hjllNzO+XL8tQfBZq+v/1ga4+4vt8Geh33VdN0hB8qMIGutx+6IBK5Cnx+tDyTWREKlzHaiTu1wLlz42z+gno0GgnSFaGPGzYod8sq3JmSlql5cNVvD57PgcoAArGjfdZnXXb1oXsO8sROHfMZ+ufoXFLSFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=a22O3M7h; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version; b=PzVoeSy/W6fsfQOKHGkDapZmGnAkJ9cOTVv+7MeyCW6gRjUFEllqszc+WjboaLHLmMoHuLSmit1r+ezYRfXbJQMPl3A1qTBVj4FZta5VIJgjFXndF/7CR0GMWJm4NkrFDfU91rFAAAIGsh6pvZcOsBa2J3RX3G9378B4Yk2zw30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=HNK33Wdi; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="a22O3M7h"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1ec4dc64c6cso10587605ad.0
-        for <linux-block@vger.kernel.org>; Mon, 06 May 2024 00:59:24 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="HNK33Wdi"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ec486198b6so11724765ad.1
+        for <linux-block@vger.kernel.org>; Mon, 06 May 2024 00:59:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714982363; x=1715587163; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1714982366; x=1715587166; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UawFcLvcVVuz6l7D9w7wTxKhqDne11bGdAUI9Tc6zcg=;
-        b=a22O3M7hgUiDPYJIGXlyVHQidISMahs7I3evFaWbwdIjJcy83YHo79I1jgi8TvMC0H
-         fhu4fSQuEG1DyBtwmsvUK8n3CD+OnBZYgtv1u8ALYxcyKazYycvEKfAZfi0FqYm9UgqN
-         fXYvpenhLgVgQko/Ay9VJtmD0vIHr7E015k9Y=
+        bh=ow2rUHFnrcYhlTotFbBj4Gwxyq4hSnuB9nn9e+mMxIY=;
+        b=HNK33WdiJNKGrbAzcZCJfzRSc2z/Ri2zshCOD6DA24APChdR3JA0J5CAzCO7q1SU87
+         PUfREEHBg1dSMqwo1vbGueiEI+jU798eebatD2M/LbL2cTIp/61JNGN0+ycnumaFZHfX
+         mQ1cPkJlCyCjPahkp/6LsvqX+18eBNHB3+oxk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714982363; x=1715587163;
+        d=1e100.net; s=20230601; t=1714982366; x=1715587166;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UawFcLvcVVuz6l7D9w7wTxKhqDne11bGdAUI9Tc6zcg=;
-        b=fQS8MctCCvOI3lii9bXUjdCVrIPYdNc2sbV6hAi33X5bRiNkbrSnaD6gI/raKxmc3i
-         znvDSW85YClX22/FnCbS8PEnRjig66O/IJ1TTVgfoqtZ0F/wcLccgtSM+GKLuo1UEE3R
-         ROaSk6zz8GUpjX8+OxiQUONfnlhGTHDKe8Bm6KjxV+/pJVaCo3YNu0rhgLdVnBfxs27S
-         h0Nbd2eOVdXtOr38j4Kvf3IOBCDbeAPqPu2QokvmFfEvuVq+F4WeuMpGaIa7VROi4Fgn
-         CU8JLOCcTvHRHDYiViWtdqxauHYKjBROByF6LiV2O5gzGAHRyVCvD7Yih3SgOTy+2ANJ
-         6ktA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6TDQ7D+yBgLEfDXF7Bep1f/fVt4Ug0fFRVRf6s5comsnSOshCX5wxm+E3wmmD+zJlbVsf56Q+CfwUADxthlYY0RnDhH82D0OGhQU=
-X-Gm-Message-State: AOJu0YyXi5tYdDz1ZbvgJOt9bVxbjjtAx9BfzuQ+/RkOJSV6lSK8DJHg
-	gh6WWmZyfjw1NIP3e77qjki2d4RES6NwgQDq3m5+jhUuVmzkVTyZNuXMN8Z9AQ==
-X-Google-Smtp-Source: AGHT+IHmZ+eYgC3Tq1EfdPkOv57BYc61jK6mkSfnt3zGgOMiuOEVcQPHHosKuKLxkmgHUlN/n5sCSQ==
-X-Received: by 2002:a17:902:eb91:b0:1ee:2a58:cb7c with SMTP id q17-20020a170902eb9100b001ee2a58cb7cmr1021125plg.35.1714982363738;
-        Mon, 06 May 2024 00:59:23 -0700 (PDT)
+        bh=ow2rUHFnrcYhlTotFbBj4Gwxyq4hSnuB9nn9e+mMxIY=;
+        b=GE6xD87ZPngGHWyt8O5+LK9zwk1N35/9jzyHB544S6Y2BbUW6kifhg/pMNlaEH1OEW
+         xA+bJcNTexpRU3VffMtGEVOvJc+ufXSxxUjmA4BMh4M/ksxbSZzP67KMN+X1HNZiYgjd
+         qbOk4lpkedjrFQgUac6vp8Q65qz+3sbN6SGW8LkYdRvsbeSX1pq8C4ZLQ2gyuRg9e8zg
+         msYJViw0jDQN0QhEJ0Fyk7uebDJsP0XlmWCyM3RM/eZfHWcblUO2xT2l+9+EnWhqbPt2
+         cxLhc8IgPdmeYgZdXTyWfY5dZetRP7YjlmaEjfgX0iR8gC5X2qIZgzkhAqAk1FjKMAd/
+         enng==
+X-Forwarded-Encrypted: i=1; AJvYcCU7A1fU1DJ/uyUROpI5kliuiWWZ+9s9yJH0uYs4BgDYzubw7H4w7aCl+Um6F+N1HhWODPYtgWrXaUAqUlgwEOk46g+BNqq2udZhtHI=
+X-Gm-Message-State: AOJu0YxFYZVAo44VmiPew/MjMC8tlDz0AaCXwyZ0m9uzE/b4HUuGZStb
+	kTiZMW+LTVYfJqiyMd+h1sSPB8D9bPafyHczkheRy1klac4nf+blXEUWPcrrqw==
+X-Google-Smtp-Source: AGHT+IGtD6df0LGz8qgNCcFIQycCbTSE1kkQVyBBaYoc1cmb4rEblCnjBd4Fq0l6WUO2JRvfpM/M5A==
+X-Received: by 2002:a17:902:e749:b0:1e3:cf2b:7151 with SMTP id p9-20020a170902e74900b001e3cf2b7151mr12883681plf.59.1714982365968;
+        Mon, 06 May 2024 00:59:25 -0700 (PDT)
 Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:4e24:10c3:4b65:e126])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902f54600b001ec64b128dasm7633772plf.129.2024.05.06.00.59.22
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902f54600b001ec64b128dasm7633772plf.129.2024.05.06.00.59.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 00:59:23 -0700 (PDT)
+        Mon, 06 May 2024 00:59:25 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Minchan Kim <minchan@kernel.org>
 Cc: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCHv2 16/17] zram: share dictionaries between per-CPU contexts
-Date: Mon,  6 May 2024 16:58:29 +0900
-Message-ID: <20240506075834.302472-17-senozhatsky@chromium.org>
+Subject: [PATCHv2 17/17] Documentation/zram: add documentation for algorithm parameters
+Date: Mon,  6 May 2024 16:58:30 +0900
+Message-ID: <20240506075834.302472-18-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 In-Reply-To: <20240506075834.302472-1-senozhatsky@chromium.org>
 References: <20240506075834.302472-1-senozhatsky@chromium.org>
@@ -69,216 +69,70 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-zstd's CDict and DDict are accessed read-only during compression
-and decompression, so instead of allocation per-context dictionaries
-we can create just one CDict and DDict in init_config() and make
-per-CPU contexts use them. This saves quite a lot of memory: on my
-system CDict requires 408128 bytes and DDict requires 27352 bytes.
+Document brief description of compression algorithms' parameters:
+compression level and pre-trained dictionary.
 
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/backend_zstd.c | 106 ++++++++++++++++++++----------
- 1 file changed, 70 insertions(+), 36 deletions(-)
+ Documentation/admin-guide/blockdev/zram.rst | 38 ++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
-index df59584b0337..99115b21c264 100644
---- a/drivers/block/zram/backend_zstd.c
-+++ b/drivers/block/zram/backend_zstd.c
-@@ -7,14 +7,18 @@
+diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
+index 091e8bb38887..58d79f9099e3 100644
+--- a/Documentation/admin-guide/blockdev/zram.rst
++++ b/Documentation/admin-guide/blockdev/zram.rst
+@@ -102,15 +102,26 @@ Examples::
+ 	#select lzo compression algorithm
+ 	echo lzo > /sys/block/zram0/comp_algorithm
  
- #include "backend_zstd.h"
- 
-+struct zstd_ctx_data {
-+	ZSTD_customMem ctx_mem;
-+	ZSTD_CDict *cdict;
-+	ZSTD_DDict *ddict;
-+};
+-For the time being, the `comp_algorithm` content does not necessarily
+-show every compression algorithm supported by the kernel. We keep this
+-list primarily to simplify device configuration and one can configure
+-a new device with a compression algorithm that is not listed in
+-`comp_algorithm`. The thing is that, internally, ZRAM uses Crypto API
+-and, if some of the algorithms were built as modules, it's impossible
+-to list all of them using, for instance, /proc/crypto or any other
+-method. This, however, has an advantage of permitting the usage of
+-custom crypto compression modules (implementing S/W or H/W compression).
++For the time being, the `comp_algorithm` content shows only compression
++algorithms that are supported by zram.
 +
- struct zstd_ctx {
- 	zstd_cctx *cctx;
- 	zstd_dctx *dctx;
- 	void *cctx_mem;
- 	void *dctx_mem;
--	ZSTD_customMem ctx_mem;
--	ZSTD_CDict *cdict;
--	ZSTD_DDict *ddict;
-+	struct zstd_ctx_data *ctx_data;
- 	s32 level;
- };
- 
-@@ -38,32 +42,81 @@ static void zstd_ctx_free(void *opaque, void *address)
- 
- static int zstd_init_config(struct zcomp_config *config)
- {
-+	struct zstd_ctx_data *ctx_data = config->private;
-+	ZSTD_compressionParameters params;
++It is also possible to pass algorithm specific configuration parameters::
 +
-+	/* Already initialized */
-+	if (ctx_data)
-+		return 0;
++	#set compression level to 8
++	echo "zstd level=8" > /sys/block/zram0/comp_algorithm
 +
- 	if (config->level == ZCOMP_CONFIG_NO_LEVEL)
- 		config->level = ZSTD_defaultCLevel();
- 
-+	if (config->dict_sz == 0)
-+		return 0;
++Note that `comp_algorithm` also supports `algo=name` format::
 +
-+	ctx_data = kzalloc(sizeof(*ctx_data), GFP_KERNEL);
-+	if (!ctx_data)
-+		return -ENOMEM;
++	#set compression level to 8
++	echo "algo=zstd level=8" > /sys/block/zram0/comp_algorithm
 +
-+	ctx_data->ctx_mem.customAlloc = zstd_ctx_alloc;
-+	ctx_data->ctx_mem.customFree = zstd_ctx_free;
++Certain compression algorithms support pre-trained dictionaries, which
++significantly change algorithms' characteristics. In order to configure
++compression algorithm to use external pre-trained dictionary, pass full
++path to the dictionary along with other parameters::
 +
-+	params = ZSTD_getCParams(config->level, PAGE_SIZE, config->dict_sz);
++	#pass path to pre-trained dictionary
++	echo "algo=zstd dict=/etc/dictioary" > /sys/block/zram0/comp_algorithm
+ 
+ 4) Set Disksize
+ ===============
+@@ -442,6 +453,15 @@ configuration:::
+ 	#select deflate recompression algorithm, priority 2
+ 	echo "algo=deflate priority=2" > /sys/block/zramX/recomp_algorithm
+ 
++The `recomp_algorithm` also supports algorithm configuration parameters, e.g.
++compression level and pre-trained dircionary::
 +
-+	ctx_data->cdict = ZSTD_createCDict_advanced(config->dict,
-+						    config->dict_sz,
-+						    ZSTD_dlm_byRef,
-+						    ZSTD_dct_auto,
-+						    params,
-+						    ctx_data->ctx_mem);
-+	if (!ctx_data->cdict)
-+		goto error;
++	#pass compression level
++	echo "algo=zstd level=8" > /sys/block/zramX/recomp_algorithm
 +
-+	ctx_data->ddict = ZSTD_createDDict_advanced(config->dict,
-+						    config->dict_sz,
-+						    ZSTD_dlm_byRef,
-+						    ZSTD_dct_auto,
-+						    ctx_data->ctx_mem);
-+	if (!ctx_data->ddict)
-+		goto error;
++	#pass path to pre-trained dictionary
++	echo "algo=zstd dict=/etc/dictioary" > /sys/block/zramX/recomp_algorithm
 +
-+	config->private = ctx_data;
- 	return 0;
-+
-+error:
-+	ZSTD_freeCDict(ctx_data->cdict);
-+	ZSTD_freeDDict(ctx_data->ddict);
-+	kfree(ctx_data);
-+	return -EINVAL;
- }
+ Another device attribute that CONFIG_ZRAM_MULTI_COMP enables is recompress,
+ which controls recompression.
  
- static void zstd_release_config(struct zcomp_config *config)
- {
-+	struct zstd_ctx_data *ctx_data = config->private;
-+
-+	if (!ctx_data)
-+		return;
-+
-+	config->private = NULL;
-+	ZSTD_freeCDict(ctx_data->cdict);
-+	ZSTD_freeDDict(ctx_data->ddict);
-+	kfree(ctx_data);
- }
- 
- static void zstd_destroy(void *ctx)
- {
- 	struct zstd_ctx *zctx = ctx;
- 
-+	/* Don't free zctx->ctx_data, it's done in release_config() */
- 	if (zctx->cctx_mem)
- 		vfree(zctx->cctx_mem);
- 	else
- 		ZSTD_freeCCtx(zctx->cctx);
--
- 	if (zctx->dctx_mem)
- 		vfree(zctx->dctx_mem);
- 	else
- 		ZSTD_freeDCtx(zctx->dctx);
--
--	ZSTD_freeCDict(zctx->cdict);
--	ZSTD_freeDDict(zctx->ddict);
- 	kfree(zctx);
- }
- 
-@@ -75,9 +128,8 @@ static void *zstd_create(struct zcomp_config *config)
- 	if (!ctx)
- 		return NULL;
- 
-+	ctx->ctx_data = config->private;
- 	ctx->level = config->level;
--	ctx->ctx_mem.customAlloc = zstd_ctx_alloc;
--	ctx->ctx_mem.customFree = zstd_ctx_free;
- 
- 	if (config->dict_sz == 0) {
- 		zstd_parameters params;
-@@ -102,35 +154,15 @@ static void *zstd_create(struct zcomp_config *config)
- 		if (!ctx->dctx)
- 			goto error;
- 	} else {
--		ZSTD_compressionParameters params;
-+		struct zstd_ctx_data *ctx_data = ctx->ctx_data;
- 
--		ctx->cctx = ZSTD_createCCtx_advanced(ctx->ctx_mem);
-+		ctx->cctx = ZSTD_createCCtx_advanced(ctx_data->ctx_mem);
- 		if (!ctx->cctx)
- 			goto error;
- 
--		ctx->dctx = ZSTD_createDCtx_advanced(ctx->ctx_mem);
-+		ctx->dctx = ZSTD_createDCtx_advanced(ctx_data->ctx_mem);
- 		if (!ctx->dctx)
- 			goto error;
--
--		params = ZSTD_getCParams(ctx->level, PAGE_SIZE,
--					 config->dict_sz);
--
--		ctx->cdict = ZSTD_createCDict_advanced(config->dict,
--						       config->dict_sz,
--						       ZSTD_dlm_byRef,
--						       ZSTD_dct_auto,
--						       params,
--						       ctx->ctx_mem);
--		if (!ctx->cdict)
--			goto error;
--
--		ctx->ddict = ZSTD_createDDict_advanced(config->dict,
--						       config->dict_sz,
--						       ZSTD_dlm_byRef,
--						       ZSTD_dct_auto,
--						       ctx->ctx_mem);
--		if (!ctx->ddict)
--			goto error;
- 	}
- 
- 	return ctx;
-@@ -144,15 +176,16 @@ static int zstd_compress(void *ctx, const unsigned char *src,
- 			 unsigned char *dst, size_t *dst_len)
- {
- 	struct zstd_ctx *zctx = ctx;
-+	struct zstd_ctx_data *ctx_data = zctx->ctx_data;
- 	const zstd_parameters params = zstd_get_params(zctx->level, PAGE_SIZE);
- 	size_t ret;
- 
--	if (!zctx->cdict)
-+	if (!ctx_data)
- 		ret = zstd_compress_cctx(zctx->cctx, dst, *dst_len,
- 					 src, PAGE_SIZE, &params);
- 	else
- 		ret = ZSTD_compress_usingCDict(zctx->cctx, dst, *dst_len,
--					       src, PAGE_SIZE, zctx->cdict);
-+					       src, PAGE_SIZE, ctx_data->cdict);
- 	if (zstd_is_error(ret))
- 		return -EINVAL;
- 	*dst_len = ret;
-@@ -163,14 +196,15 @@ static int zstd_decompress(void *ctx, const unsigned char *src, size_t src_len,
- 			   unsigned char *dst)
- {
- 	struct zstd_ctx *zctx = ctx;
-+	struct zstd_ctx_data *ctx_data = zctx->ctx_data;
- 	size_t ret;
- 
--	if (!zctx->ddict)
-+	if (!ctx_data)
- 		ret = zstd_decompress_dctx(zctx->dctx, dst, PAGE_SIZE,
- 					   src, src_len);
- 	else
- 		ret = ZSTD_decompress_usingDDict(zctx->dctx, dst, PAGE_SIZE,
--						 src, src_len, zctx->ddict);
-+						 src, src_len, ctx_data->ddict);
- 	if (zstd_is_error(ret))
- 		return -EINVAL;
- 	return 0;
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
