@@ -1,100 +1,119 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8095F46439
-	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 06:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605B3757EF
+	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 07:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714977822; cv=none; b=UtNYAbdQC0n8xCM66zJvjXrZYvf1yll0T2g5ILSkorCEIDDzLMd7ckIfucOoJPudHKCZ7wwMJwhFjIUMg6UzQm6XJARn7xJAwpfG+tm6vEEJmS1XxtvvBC7RXFHGZ4KnZtjJo23xc3pctqRntIHT+o8ck7Im2T2kcE7qUeZ/UTA=
+	t=1714980311; cv=none; b=qaz+8Y7A/o/5diLtQbrpP5vOtPy+Ejy+T1Q+mRYvuHixOmV+/TdkJJiprr9PfjLbUNwaZOttm8aMa2BBGkoQYDnQDu4BHLOJehDjsuSlvNe+fiW59E8nNoBayf3QvQsTxCWsln9w81fstL8xWrOsZ8VGoRj8hLi+KLLFZu/efsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714977822; c=relaxed/simple;
-	bh=TTtQyHcx8HkIEEBoI/wvFIf+0GYqPB/yGd00nQkF9Ys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QlsV2ranDcKwYX0ALR74IPHIHsOy33fOZvCT1TWu1b6tRN2X+2vCnUyB+BgaX0El0unI1HIf4jCTz92Nahfkxk+8AqUZktvSQ8Ke9LxbsC+u92vXX6MNufbKDzpze5Y95d8zjAGGoFc3sXXBzyVJNHMy04XGA3CfrZeMGBrUPAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=RflGFmp+; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1714980311; c=relaxed/simple;
+	bh=OVDIWxUDRvlUhkLXJmVPIg7Ss7MCI8rmRJKjNBcIAYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=txbjHmNq6DPpH/u81RY4g8c/N/3SWr7Ubn6aiP2qxXcXse8XRVUAszpFx4lcDxfGsTvP79wF2s0eN/7dU2QAvyJUWsQCKnvJCEu1uLOn7lPKPbXcpUWg9AdQumYXydcebJqVXZxFx+S2IdQV7Jc6XSAJco2AQsFaWe7d/y9dyeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nZznPeyz; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RflGFmp+"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5dcc4076c13so937026a12.0
-        for <linux-block@vger.kernel.org>; Sun, 05 May 2024 23:43:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714977821; x=1715582621; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Awh0YX9sFOZlmXGVWv7TrQyTmY6KwzUZh2FsqtFN28s=;
-        b=RflGFmp+l+BXhk012uKZ6aGuTeT6YcCrQtXctXqH+GYKCsoFUkUu+ncgwY+ZsVSEPf
-         Optz1qPMVDD6ozHGvn9LX7Vbec04BflDCvLwMgIJnuOo6N7bOWYZBSyKR8z6jaTMREwx
-         jbKOWzJ+JqoF4pLVdtWNcOTcBDLi2H9zqMAT4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714977821; x=1715582621;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Awh0YX9sFOZlmXGVWv7TrQyTmY6KwzUZh2FsqtFN28s=;
-        b=JbfrPP9wQygOlLd083O0sYgGohca3wTkzIDIIbuETI/3pxAZ/ub/Gb7vYhItJTj3jf
-         /+JBucwLg6ukQPdHmct/4Wh/xFYtb1wN8G0FCeGDeQZLEzi9GZCo/LkvGfRxiGUDPHO0
-         9QC/QWztuD8SHWokWRp5tpZUpO4pJCInweRWktD/HO70W78S4cWYD2mZmZE7ferZy1pp
-         TWhMcAREOdAqYzP2WOMjoJ8biXVpDb/mWJSqEVMYmOCCBu8dWUGg8CLWd7PVuhaSVUjO
-         OC/OwBAgEc6s+77D0q6yXqivoL34igmDBTScnktI3C2BciU9tysmvookIx+2YvIMt9ln
-         EAGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVxbIq95f4AXOxgKWG0/sSgCRZzdwaBRsksiQEfTxBjtga9EPzGythNEAZBHtq7KGDK1vlr6M5HbmdxDI57EmKCFYnzqpX+fJPUWRs=
-X-Gm-Message-State: AOJu0Yw1biad46XsNCEsar6s+anR2MPuMgI/l81FIZ5vuZYvuzXfY8b7
-	H7jWzqND24E5HT06frp0/L+b0AvjYguf3af2gSp/faDtA8FdF432lBwZVZgb3g==
-X-Google-Smtp-Source: AGHT+IH9/hiNrPAZgMq5yCe0qsmK1lm2LH0SwY8LB+Tn+zX2oS8PqcHxJee+fl5rH8OfTgRdDd1VYA==
-X-Received: by 2002:a17:90b:124b:b0:2b0:763b:370e with SMTP id gx11-20020a17090b124b00b002b0763b370emr18238105pjb.18.1714977820818;
-        Sun, 05 May 2024 23:43:40 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:4e24:10c3:4b65:e126])
-        by smtp.gmail.com with ESMTPSA id rr3-20020a17090b2b4300b002b113ad5f10sm9316590pjb.12.2024.05.05.23.43.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 May 2024 23:43:40 -0700 (PDT)
-Date: Mon, 6 May 2024 15:43:35 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kbuild@vger.kernel.org, kernel test robot <lkp@intel.com>,
-	Minchan Kim <minchan@kernel.org>, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 08/14] zram: check that backends array has at least one
- backend
-Message-ID: <20240506064335.GE8623@google.com>
-References: <20240503091823.3616962-9-senozhatsky@chromium.org>
- <202405041440.UTBQZAaf-lkp@intel.com>
- <20240504071416.GH14947@google.com>
- <20240504161004.f5a0aab5e5aa1033d4696c20@linux-foundation.org>
- <20240505043957.GA8623@google.com>
- <20240505051305.GB8623@google.com>
- <20240505064832.GC8623@google.com>
- <20240506032207.GD8623@google.com>
- <CAK7LNARUBuR3gDtX6GfB7Zv6dydt1+qzBB_XT58wOg3WeCTVvA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nZznPeyz"
+Message-ID: <1615fe92-d4ff-4ef2-9bd0-199aa9e3a426@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714980307;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VNICsQwAZLEIq4FagMWJtT9l3ne94Q3HOggFLnvinbw=;
+	b=nZznPeyzXvBnkwuymZAd7H5uP6FsRpvl2JfkIEHhVLGTRXN2z1loonY6p/619WY28zpwEl
+	Bogs2+q+8zcc500vR6DNiQHdd+mPtphq8OjqAyhbN7IEoPG5hcFcOxw9uMk2A927K9UGj9
+	Kf4xW9Sd1i3DF1NmDYSRbBRBNofkxMI=
+Date: Mon, 6 May 2024 09:25:01 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARUBuR3gDtX6GfB7Zv6dydt1+qzBB_XT58wOg3WeCTVvA@mail.gmail.com>
+Subject: Re: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+ linux-nvme@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+ Bart Van Assche <bvanassche@acm.org>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ Amir Goldstein <amir73il@gmail.com>,
+ "josef@toxicpanda.com" <josef@toxicpanda.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ Dan Williams <dan.j.williams@intel.com>, "jack@suse.com" <jack@suse.com>
+References: <cover.1709635535.git.leon@kernel.org>
+ <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
+ <c9f9e29e-c2e1-4f99-b359-db0babd41dec@linux.dev>
+ <20240505132314.GC68202@unreal>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20240505132314.GC68202@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On (24/05/06 14:20), Masahiro Yamada wrote:
-> config ZRAM_BACKEND_FORCE_LZO
->         def_bool !ZRAM_BACKEND_LZ4 && !ZRAM_BACKEND_LZ4HC && \
->                  !ZRAM_BACKEND_ZSTD && !ZRAM_BACKEND_DEFLATE
-> 
-> config ZRAM_BACKEND_LZO
->         bool "lzo and lzo-rle compression support" if !ZRAM_BACKEND_FORCE_LZO
->         depends on ZRAM
->         default ZRAM_BACKEND_FORCE_LZO
->         select LZO_COMPRESS
->         select LZO_DECOMPRESS
 
-I'll take this one. Thank you.
+On 05.05.24 15:23, Leon Romanovsky wrote:
+> On Fri, May 03, 2024 at 04:41:21PM +0200, Zhu Yanjun wrote:
+>> On 05.03.24 12:18, Leon Romanovsky wrote:
+>>> From: Chaitanya Kulkarni <kch@nvidia.com>
+> <...>
+>
+>>> This is an RFC to demonstrate the newly added DMA APIs can be used to
+>>> map/unmap bvecs without the use of sg list, hence I've modified the pci
+>>> code to only handle SGLs for now. Once we have some agreement on the
+>>> structure of new DMA API I'll add support for PRPs along with all the
+>>> optimization that I've removed from the code for this RFC for NVMe SGLs
+>>> and PRPs.
+>>>
+> <...>
+>
+>>> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+>>> index e6267a6aa380..140939228409 100644
+>>> --- a/drivers/nvme/host/pci.c
+>>> +++ b/drivers/nvme/host/pci.c
+>>> @@ -236,7 +236,9 @@ struct nvme_iod {
+>>>    	unsigned int dma_len;	/* length of single DMA segment mapping */
+>>>    	dma_addr_t first_dma;
+>>>    	dma_addr_t meta_dma;
+>>> -	struct sg_table sgt;
+>>> +	struct dma_iova_attrs iova;
+>>> +	dma_addr_t dma_link_address[128];
+>> Why the length of this array is 128? Can we increase this length of the
+>> array?
+> It is combination of two things:
+>   * Good enough value for this nvme RFC to pass simple test, which Chaitanya did.
+>   * Output of various NVME_CTRL_* defines
 
-> BTW, "default n" you are adding are redundant.
+Thanks a lot. I enlarged this number to 512. It seems that it can work. 
+Hope this will increase the performance.
 
-OK.
+Best Regards,
+
+Zhu Yanjun
+
+>
+> Thanks
+
+-- 
+Best Regards,
+Yanjun.Zhu
+
