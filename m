@@ -1,43 +1,43 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37D64503B
-	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 04:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6DA43AD4
+	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 04:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714969244; cv=none; b=fhThIEAe1Wz8HX3f4GaC67/PM9oXEk2VscbsbzRwdcy2N3c1xewJb+oc/v8BunEF6+Wjd1jZfn/tZMhLCKikOdtG0b3nrFRg3LiAF5Fo/QXdmQV3eOjNta4aSJeeB5PqHuLXeBfucyt7QI/Xz3jYeQ9UaCOZu5ZnHHTtdS8SyGw=
+	t=1714969247; cv=none; b=ks0cJA8KKLyuTwQF2AqK+lgIrLg/YPGyPbG2iybpYLZw5GqKzphD5hcUYGnl3vdOsckAM958qPj/5TTLQjKG7A6MIRIxVDdn45EJda6fV97LFTWwsFNke+OwCV56X5h0st9tbcLd4yoKksE1C+UNm690HHIxPcQys1IlZJwnBRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714969244; c=relaxed/simple;
-	bh=QhqhFXk85lPTTZsdhSj7N4YrSdpQ4Fu8FYAmOTsD/hQ=;
+	s=arc-20240116; t=1714969247; c=relaxed/simple;
+	bh=/2tBtxZzSDxn5DgC3zUtJp9JJrlJvFs0jB1tGkV3u+A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=deijMCxVQ/9P9M6PDfs4zZNIvoijW9VWygqG2jbxK5fVGDfvC/ogzXIuvetwVXmABbWhJkUJW0gelbr8460GCdQWmPzpAppazH1QCI4QrmX93Sk4SOb66sKhsSpt0uGRR58FptnpUrt5U0vPSpzeJ0ce3C/i8K8BadArRrOXiDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JPgOBDRG; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=a8HNEt1ByV7mChJ9GRvNzOQ7NXg6fqqsfVFrH4CAMMbpSpwrj6tfXnPXTJHvgpaJ0w61sVcSNKNGXW88YwFYcw/ClfflpcixciThs5gfMbAkpfeHxLvbHYG8EY0uruYY1ucFV53IdjVgNafyIaoNjV6KNNHaAjE2A24mFSJkq9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fWadFoyo; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JPgOBDRG"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fWadFoyo"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=tV22VCmL8WFPyjffeM+IMToxy9rDQt+mlWu4HhQ2xus=; b=JPgOBDRGUS3veosPRjyUUDRQsJ
-	QHtAM1JjGN51rUytbYhj0O1K5mO56/qiX+V5jtgwaxkIr+LMzQoKEx5T0Sspl1S4rRTTWk/1UXPty
-	5RruUbvyq8JjweVT+8GgfS3B0+rSWxt4UuhoJgPBkl8zODUvOUT8iN1gLB7Oxseuo8b2rtTMoZo22
-	yryU9foOzfa64tIbwaXztt4ESHZhkq1gGWXX0ZlerZeZCJCidIu+xgaAU3FSPLq3z80yBBLm2p1L/
-	I1kCopR4eQcv/VhjFXOt0ilKWsT0Klxa90kjKI3ROg3eOkbxqU0tglBn3j0hq4R+qrhvrMI8tfRJd
-	8bkJrw1w==;
+	bh=ICzvPLnKCjqbvrzst2txWHdjNu7MZMnaZDVGNIQ6QRU=; b=fWadFoyohaHY1Ew0WRdGfwxYkl
+	uTlznNb0AM6aFtg0Z/Ef8FvziF+tO5n/lEcSwPtSfNgVLNKjJ0QY80YkexKLjPRpfHjVM1z/Dz8zi
+	8VznWMQBtpAe0hp7jLYWlBgvEuKwwu0RZn/+AkxpK42bfyGipuc87pJziyt0hhq8C4d0y7ghXTnZB
+	CKvz/BoFIhIvL4oW6IQjH/nKZZigz9Bm2s44wSKyRm2IIOlBa56ohE6Fhu/edC021tDWlsxYlf4d4
+	wrYPx6kLbGXSsbj/Kz/1KtpxtQvmyLn1pKP6L41krlpVd5JAITSP9tvYfQH6tF/kVfqQPaGshggck
+	+T94HDSA==;
 Received: from [2001:4bb8:188:7ba8:c70:4a89:bc61:3] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s3pqD-000000060Me-3zYu;
-	Mon, 06 May 2024 04:20:42 +0000
+	id 1s3pqG-000000060Nd-21HP;
+	Mon, 06 May 2024 04:20:45 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Keith Busch <kbusch@kernel.org>,
 	Conrad Meyer <conradmeyer@meta.com>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 5/6] block: add a bio_await_chain helper
-Date: Mon,  6 May 2024 06:20:26 +0200
-Message-Id: <20240506042027.2289826-6-hch@lst.de>
+Subject: [PATCH 6/6] blk-lib: check for kill signal in ioctl BLKDISCARD
+Date: Mon,  6 May 2024 06:20:27 +0200
+Message-Id: <20240506042027.2289826-7-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240506042027.2289826-1-hch@lst.de>
 References: <20240506042027.2289826-1-hch@lst.de>
@@ -50,62 +50,76 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Keith Busch <kbusch@kernel.org>
+Discards can access a significant capacity and take longer than the user
+expected.  A user may change their mind about wanting to run that command
+and attempt to kill the process and do something else with their device.
+But since the task is uninterruptable, they have to wait for it to
+finish, which could be many hours.
 
-Add a helper to wait for an entire chain of bios to complete.
+Open code blkdev_issue_discard in the BLKDISCARD ioctl handler and check
+for a fatal signal at each iteration so the user doesn't have to wait
+for their regretted operation to complete naturally.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-[hch: split from a larger patch, moved and changed the name now that it
- is non-static]
+Heavily based on an earlier patch from Keith Busch.
+
+Reported-by: Conrad Meyer <conradmeyer@meta.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c | 20 ++++++++++++++++++++
- block/blk.h |  1 +
- 2 files changed, 21 insertions(+)
+ block/ioctl.c | 33 ++++++++++++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index d82ef4fd545cb2..dce12a0efdead2 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1395,6 +1395,26 @@ int submit_bio_wait(struct bio *bio)
- }
- EXPORT_SYMBOL(submit_bio_wait);
- 
-+static void bio_wait_end_io(struct bio *bio)
-+{
-+	complete(bio->bi_private);
-+	bio_put(bio);
-+}
-+
-+/*
-+ * bio_await_chain - ends @bio and waits for every chained bio to complete
-+ */
-+void bio_await_chain(struct bio *bio)
-+{
-+	DECLARE_COMPLETION_ONSTACK_MAP(done,
-+			bio->bi_bdev->bd_disk->lockdep_map);
-+
-+	bio->bi_private = &done;
-+	bio->bi_end_io = bio_wait_end_io;
-+	bio_endio(bio);
-+	blk_wait_io(&done);
-+}
-+
- void __bio_advance(struct bio *bio, unsigned bytes)
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 03bcdf2783b508..003d134779db56 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -96,9 +96,11 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 		unsigned long arg)
  {
- 	if (bio_integrity(bio))
-diff --git a/block/blk.h b/block/blk.h
-index ee4f782d149662..d5107e65355e27 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -38,6 +38,7 @@ void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
- void blk_queue_start_drain(struct request_queue *q);
- int __bio_queue_enter(struct request_queue *q, struct bio *bio);
- void submit_bio_noacct_nocheck(struct bio *bio);
-+void bio_await_chain(struct bio *bio);
+ 	unsigned int bs_mask = bdev_logical_block_size(bdev) - 1;
+-	uint64_t range[2];
+-	uint64_t start, len;
+ 	struct inode *inode = bdev->bd_inode;
++	uint64_t range[2], start, len;
++	struct bio *prev = NULL, *bio;
++	sector_t sector, nr_sects;
++	struct blk_plug plug;
+ 	int err;
  
- static inline bool blk_try_enter_queue(struct request_queue *q, bool pm)
- {
+ 	if (!(mode & BLK_OPEN_WRITE))
+@@ -127,7 +129,32 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+ 	if (err)
+ 		goto fail;
+-	err = blkdev_issue_discard(bdev, start >> 9, len >> 9, GFP_KERNEL);
++
++	sector = start >> SECTOR_SHIFT;
++	nr_sects = len >> SECTOR_SHIFT;
++
++	blk_start_plug(&plug);
++	while (1) {
++		if (fatal_signal_pending(current)) {
++			if (prev)
++				bio_await_chain(prev);
++			err = -EINTR;
++			goto out_unplug;
++		}
++		bio = blk_alloc_discard_bio(bdev, &sector, &nr_sects,
++				GFP_KERNEL);
++		if (!bio)
++			break;
++		prev = bio_chain_and_submit(prev, bio);
++	}
++	if (prev) {
++		err = submit_bio_wait(prev);
++		if (err == -EOPNOTSUPP)
++			err = 0;
++		bio_put(prev);
++	}
++out_unplug:
++	blk_finish_plug(&plug);
+ fail:
+ 	filemap_invalidate_unlock(inode->i_mapping);
+ 	return err;
 -- 
 2.39.2
 
