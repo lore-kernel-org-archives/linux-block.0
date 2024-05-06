@@ -1,163 +1,53 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A90482C3;
-	Mon,  6 May 2024 05:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C7448CCD
+	for <linux-block@vger.kernel.org>; Mon,  6 May 2024 06:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714972876; cv=none; b=LHYY/yHn1EMpmKUUIsS7loS/vm8njq5ITML7Ui6hFnSNn+UjcRwyEIZEpzqv55ER+/dYHAn2uG0M61994bE2CBIYdXT4M/bfNvgk920T6guMnabKMsKLuV9Dvj9UWJSce/hluubqEVY7J8T3p2lVPhznsYnIfIdl1LC12GxxWbo=
+	t=1714975518; cv=none; b=XANHKmOej2hO5N9avommUn/TKv3YFQBiP4PZuHthjJEd9BvJth2F/5utuz8fZ5A0P+1cBRNayfXtpAe/AgtkTtxLof025ntpQgdg8EOTGjFr5NxdoU2ueid3171W4eZ5qKNVDyT8d/u0gW0wpw68wBXn16OLXR2gJcozr4KXfSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714972876; c=relaxed/simple;
-	bh=IKlIvjuBn/H754DI9jvJWcFPcdV3jR8qdRnrj4+WI+E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gTNkp4lLt5ir7vVD9cX50esZmzprHcolyE25WBUBhthMgi4Yur3iBO0i4DXRuGC5r0xGmvjcjPFUkAWTrisd5914DK8fQp+95pZ0hZEZ9Foe9s10TIZaltM27fs7pxQVSTDxrIgIM+gW36mQ8iJAeQh4GXgN18mjrs2mW6C3aug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tqHS/vGn; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tqHS/vGn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A56C116B1;
-	Mon,  6 May 2024 05:21:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714972875;
-	bh=IKlIvjuBn/H754DI9jvJWcFPcdV3jR8qdRnrj4+WI+E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=tqHS/vGnvtQgm5ottAK403iYyDc6/kLmsTqJatmTnLywHGL2J4Yx3BQFHn8kIh5py
-	 nAooPFJ/9D/gp80HpsyAE7VLHtgoEXN2oFlLX5jPGy9UcaNhHy63gOMOzCBNTTjYzY
-	 zTp1VSdM3dp9bb6a1cRiUxYBB01w14LtjpGUitKZvmBd////F+XFWc+2WhNuCayL1f
-	 5DKi+xN1JCPwBItgzdC22IH1kLTrDRX9bueAA25gRiT5J7ruCdhav0YQqrZ4kFm33e
-	 GoiquvMi/ejmmVn8rmJXrvcabBTLqBrTOjH9PoG8HDm8g2HgzSTiZfZk5HaOctZgEA
-	 vnVuNTv7yqmXw==
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51f72a29f13so1793397e87.3;
-        Sun, 05 May 2024 22:21:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUN5bEpBmEgr3VFQifDqAad5vcxr7JTmsV4nAOzCMOqLiX1hFq62oU34QTfvd32oBL7oElXIcSyMpIwBMX8bQ5cwujIJfjSalv+8gB1cWhJBS3K0zcNCt1MFYZVzDLfe6spJcM3VP8Brrt8P/nHONeTGKHIPrtN+wuF1WDPPeTm57lQfepwgjI=
-X-Gm-Message-State: AOJu0YzaY9FmWx1A2wyhiu7Pe6CI8Rekok3SQkU3tXm1E9qvibdT+EcT
-	yNbbo6DHwUd+C2TMjx45w0KemVURI6FfKMU8vfOdtUJmj6wU4hEsh6fGO4O0aMOZgpQkeoQ24dX
-	G8VpSsnur6at4brRsKVIhwXnV2wg=
-X-Google-Smtp-Source: AGHT+IHQJhS1znz8gVwOUrqUtv4OQz0bCGrfCQ1loRBZocjB8uJP1gVAFiA08qYh/ghUaXKQtWYvCUkCZIIXeKTn4Jg=
-X-Received: by 2002:ac2:4189:0:b0:51d:aaf7:a92e with SMTP id
- z9-20020ac24189000000b0051daaf7a92emr6626911lfh.47.1714972874359; Sun, 05 May
- 2024 22:21:14 -0700 (PDT)
+	s=arc-20240116; t=1714975518; c=relaxed/simple;
+	bh=N3pWe94OvSgIhXH06V+jpz1V7E2/EVJQGIHDLNjkRg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qFDS4boEAZ4M1c6KXK0kRrHQKN+C9El/gvni6WawXyf/RA40c/Cw++6xAU+q5C0y+T1hKKZ2dweOa8RbzD8CtrV9A4+gYYXquIyOO0fYIzCAoJJGNT3deycoxHPVRSFIikGHt98Nl5/k2U374ipcxLMPP6rFWX0SfFSbYThIMyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5D7C468AFE; Mon,  6 May 2024 08:05:10 +0200 (CEST)
+Date: Mon, 6 May 2024 08:05:09 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: kbusch@kernel.org, hch@lst.de, axboe@kernel.dk,
+	linux-block@vger.kernel.org, martin.petersen@oracle.com,
+	anuj20.g@samsung.com
+Subject: Re: [PATCH] block: streamline meta bounce buffer handling
+Message-ID: <20240506060509.GA5362@lst.de>
+References: <CGME20240506051751epcas5p1ed84e21495e12c7bf41e94827aa85e33@epcas5p1.samsung.com> <20240506051047.4291-1-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240503091823.3616962-9-senozhatsky@chromium.org>
- <202405041440.UTBQZAaf-lkp@intel.com> <20240504071416.GH14947@google.com>
- <20240504161004.f5a0aab5e5aa1033d4696c20@linux-foundation.org>
- <20240505043957.GA8623@google.com> <20240505051305.GB8623@google.com>
- <20240505064832.GC8623@google.com> <20240506032207.GD8623@google.com>
-In-Reply-To: <20240506032207.GD8623@google.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Mon, 6 May 2024 14:20:37 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARUBuR3gDtX6GfB7Zv6dydt1+qzBB_XT58wOg3WeCTVvA@mail.gmail.com>
-Message-ID: <CAK7LNARUBuR3gDtX6GfB7Zv6dydt1+qzBB_XT58wOg3WeCTVvA@mail.gmail.com>
-Subject: Re: [PATCH 08/14] zram: check that backends array has at least one backend
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, 
-	kernel test robot <lkp@intel.com>, Minchan Kim <minchan@kernel.org>, llvm@lists.linux.dev, 
-	oe-kbuild-all@lists.linux.dev, 
-	Linux Memory Management List <linux-mm@kvack.org>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240506051047.4291-1-joshi.k@samsung.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, May 6, 2024 at 12:22=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (24/05/05 15:48), Sergey Senozhatsky wrote:
-> > On (24/05/05 14:13), Sergey Senozhatsky wrote:
-> > > On (24/05/05 13:39), Sergey Senozhatsky wrote:
-> > > [..]
-> > > > > I guess just pick one if none were selected.
-> > >
-> > > How do I pick one if none were selected? Does Kconfig support
-> > > something like that?
-> >
-> > This triggers Kconfig error:
-> >
-> > config ZRAM_EMPTY_BACKENDS_FIXUP
-> >        bool
-> >        depends on ZRAM && !ZRAM_BACKEND_LZO && !ZRAM_BACKEND_LZ4 && \
-> >                !ZRAM_BACKEND_LZ4HC && !ZRAM_BACKEND_ZSTD && \
-> >                !ZRAM_BACKEND_DEFLATE
-> >        select ZRAM_BACKEND_LZO
-> >
-> >
-> > drivers/block/zram/Kconfig:17:error: recursive dependency detected!
-> > drivers/block/zram/Kconfig:17:  symbol ZRAM_BACKEND_LZO is selected by =
-ZRAM_EMPTY_BACKENDS_FIXUP
-> > drivers/block/zram/Kconfig:52:  symbol ZRAM_EMPTY_BACKENDS_FIXUP depend=
-s on ZRAM_BACKEND_LZO
-> >
-> >
-> > I'm a little surprised by this - EMPTY_BACKENDS_FIXUP does not depend
-> > on ZRAM_BACKEND_LZO, it depends on NOT ZRAM_BACKEND_LZO.
-> >
-> > Let me Cc linux-kbuild. Kbuild folks, how do I workaround this?
->
-> Is this how one does it?
->
-> config ZRAM_BACKEND_LZO
->        bool "lzo and lzo-rle compression support"
->        depends on ZRAM
->        default y if !ZRAM_BACKEND_LZ4 && !ZRAM_BACKEND_LZ4HC && \
->                !ZRAM_BACKEND_ZSTD && !ZRAM_BACKEND_DEFLATE
->        default n
->        select LZO_COMPRESS
->        select LZO_DECOMPRESS
->
->
-> User still can select N and then we'll have empty backends, but
-> at least default is Y if none of the algorithms were selected.
-> Is it good enough?
+Can we take a step back first?
 
+Current the blk-map user buffer handling decided to either pin
+the memory and use that directly or use the normal user copy helpers
+through copy_page_to_iter/copy_page_from_iter.
 
-I interpret this sentence into:
+Why do we even pin the memory here to then do an in-kernel copy instead
+of doing the copy_from/to_user which is going to be a lot more efficient?
 
-"randconfig will eventually disable all ZRAM_BACKEND_*,
-causing the build error again.
-Is it good enough, Arnd?"
+Sort of related to that is that this does driver the copy to user and
+unpin from bio_integrity_free, which is a low-level routine.  It really
+should be driven from the highlevel blk-map code that is the I/O
+submitter, just like the data side.  Shoe-horning uaccess into the
+low-level block layer plumbing is just going to get us into trouble.
 
-
-
-Some possible solutions:
-
-
-
-config ZRAM_BACKEND_FORCE_LZO
-        def_bool !ZRAM_BACKEND_LZ4 && !ZRAM_BACKEND_LZ4HC && \
-                 !ZRAM_BACKEND_ZSTD && !ZRAM_BACKEND_DEFLATE
-        depends on ZRAM
-        select ZRAM_BACKEND_LZO
-
-config ZRAM_BACKEND_LZO
-        bool "lzo and lzo-rle compression support"
-        depends on ZRAM
-        select LZO_COMPRESS
-        select LZO_DECOMPRESS
-
-
-OR
-
-
-config ZRAM_BACKEND_FORCE_LZO
-        def_bool !ZRAM_BACKEND_LZ4 && !ZRAM_BACKEND_LZ4HC && \
-                 !ZRAM_BACKEND_ZSTD && !ZRAM_BACKEND_DEFLATE
-
-config ZRAM_BACKEND_LZO
-        bool "lzo and lzo-rle compression support" if !ZRAM_BACKEND_FORCE_L=
-ZO
-        depends on ZRAM
-        default ZRAM_BACKEND_FORCE_LZO
-        select LZO_COMPRESS
-        select LZO_DECOMPRESS
-
-
-
-
-BTW, "default n" you are adding are redundant.
-
---=20
-Best Regards
-Masahiro Yamada
