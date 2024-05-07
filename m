@@ -1,98 +1,125 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1AE15EFCF
-	for <linux-block@vger.kernel.org>; Tue,  7 May 2024 13:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C9716132B;
+	Tue,  7 May 2024 14:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715088887; cv=none; b=uqhop46SdhIB0asjIlKKSkC2QVpBsYNxrsSOyGLIAXLABnKqHJyl0QDjq29Yevg4qtcuyw5YdT+nLb6cnB+9BHykNkDOZRCb8fr1avkEmfgVrqkcLagVjR4qNWBuKdHJqv+coIrc3pZar0uhhuE67rNDMuysx4YTs/FNhA+fWYE=
+	t=1715093932; cv=none; b=p+0aoq0GipcW/FzEjHLXaBPpU+VaxN5dlVQhDr1FreBmktxEXcwxD5wrYFKTxB4tNJKyfiaeQnKNv2fyjJSJYd47F2tcQ1LibSa9BfaeJLSFht7RoXBmtppd61anZr0b42t5wU9vwqic9F/7mCltZ+G0dMaAK3dhz3FEYEkL3xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715088887; c=relaxed/simple;
-	bh=bV3hZF+yWnUvLfolt0qL3m4QpmW8/sDlFRD//n8L/aY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=RxGq3BG6eYru+//toFvUcu4iYAppoER5Szl0oJxMroedtRgLwW5IQwa2r5Nd8gBb7jaV+7oShzpSm9UCVmbwzjZpzaxXanoecrYF5VFxbG66gQ1Uf3CxIwa436lpJqxCduJChE4JTq/3N6BX5nuHZbFEsw1icCYRAYrnPy2dRKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=d/ZoamSZ; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1715093932; c=relaxed/simple;
+	bh=4MpifA+N47dI2Zo3BlsZjWbAJOG/C+o+WSbE9zSoglA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=PEUBQRSD9U7ffmmvXmA+w1SJOmlf9ARQZ6IYDRDGgg0i2ePGNf9KhMoOavHt4P8Z55Y3bzeEyg8k1MCveLC73jhLw3UeKlYyYbreCLapiaitU2RkJLU5ITzXPV+x+rCRLxcmInwCKDt4KIRZ1LvgPFyDfjBkl8oRnxJqEXu6XmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=iIOQShVl; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="d/ZoamSZ"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7dee044afe7so5827539f.2
-        for <linux-block@vger.kernel.org>; Tue, 07 May 2024 06:34:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715088885; x=1715693685; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KP5HKRW4kBbKaUQGr7WJW/KutC9oC2MC2S4+gvWBuKE=;
-        b=d/ZoamSZxjkvWrrT1IMnPjBogp7aF4nGIKxTB+uXxJOsWbIZSeYZx7XBltN96MBlQk
-         8tB1owEP+Sq59e+aiay7+QEqKGYaRV7LMii6hgkaVGmXBl14rd4Tyc3gRzOazu22Z9oT
-         m/iOa4Wm5Bc2SiavE0gfOi66WP++JsHD9ubhyN25XFE1pH+i8ZM9btDDBTsKFIxHse2i
-         VNkHmz/hODE6fGbDTAesR+VQi3QZEPyvBPl+i02MCabTbS0xgxnKe6XLNyyciUeKZssB
-         c862NBTqVEvNr7EgZkyxZ61vUZlPtZoe4dEh8w7KeuL3SesZBhQJSIMIfFBoRn5kHBuQ
-         HQiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715088885; x=1715693685;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KP5HKRW4kBbKaUQGr7WJW/KutC9oC2MC2S4+gvWBuKE=;
-        b=PnFbyBvoCgcpbvXKRoNRiqAlvX1hYscqQmJzpqxh3MYhtp1Ma9Q3E6Ruo3TSIpvpfY
-         mxvf93Gbm6CNIOmot66ouXXic2KE3K2H7r4HXeA1rwOhakO7N8KSgsEjzMXaalXZ0u6F
-         9zgNy1glMj39wGWdOzBKDG9Tm164gEBTGFW9fba+ZxxcqVz+7yUYmoocR0d0QV5KAx70
-         RqrsQjVmsZ+PMOsuyudzpo5Hx6axerLGJMLHAQz4AuC2PH0ni4A5ETztKhYmMoX+w+M4
-         Eo2M29MySb3uA8JzcWLo3B5P46D0wqCsXzaC9msgv97BNwm+rbErmsXxonaRMwojeU+q
-         yDKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ+14DklbU1MIh0DjBsaMKvOwWThTYwswtehFabJm5Z2W9lavLDNZFfCjuD15Uoke3im+FoxDHlHXRocPGv78fK4RdvpmnqslWU8o=
-X-Gm-Message-State: AOJu0YzTmgSMqRdDBdsyFkyHWRqZW0wW+WCVO8sdky82qR/fijGI0Ext
-	LUxnSTTJeGm9J18RH/YYXEZDskiUgUCIq961pjAIuA8S7u4uNXVzjp5617wvd4QUIW7oVwC+jhb
-	d
-X-Google-Smtp-Source: AGHT+IEfjA72JzoPNtuzqqBb/n6TSa5TGv07xhF8//9/sK/vhyY+R3mRWtXhNQLSmyncdcc61+6t5g==
-X-Received: by 2002:a6b:3f45:0:b0:7e1:8829:51f6 with SMTP id m66-20020a6b3f45000000b007e1882951f6mr974176ioa.1.1715088885335;
-        Tue, 07 May 2024 06:34:45 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id x6-20020a056638248600b0048859a02138sm2249450jat.86.2024.05.07.06.34.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 06:34:44 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: song@kernel.org, linan666@huaweicloud.com
-Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-block@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
- houtao1@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20240507023103.781816-1-linan666@huaweicloud.com>
-References: <20240507023103.781816-1-linan666@huaweicloud.com>
-Subject: Re: [PATCH] md: Revert "md: Fix overflow in is_mddev_idle"
-Message-Id: <171508888455.12290.2983821888497713665.b4-ty@kernel.dk>
-Date: Tue, 07 May 2024 07:34:44 -0600
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="iIOQShVl"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4VYhHT4qmNz9sd6;
+	Tue,  7 May 2024 16:58:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1715093925;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l4BxBuTRaRH2Icv5CxaP0p6s54rUUSgkZ15W6zrfzYQ=;
+	b=iIOQShVl6oyIultqxr0Zh0jmWet+S/bPIQv8kiORbz4m3wvOnGDEc6ZSEdiPiIwJBxkdax
+	gue+lspS1QNXVxkBcVmCx5y83WhPe5Ios/fLrQSv2aBKeLuObTyg5V5YSP7ovzWBRvUJf8
+	rDNu7yl9cmBDhy/rBfbclICwyIMTVdeVnMBQTLZt3DNQwMMA4mnIfj/zZQXoBsTubvdHB9
+	mplnIDFmivgPZH81/IBYfaFYKll+02u6H6Sphe55j0wHE2JaCQ1wAH5ovWWis3FltlvEMr
+	RAZp+Ic8jQpeZiMHaRpkqe/dmrlsrf1kB+6ztKqL5N3Vs1nV18K5F1SUs/5KJA==
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: hch@lst.de,
+	willy@infradead.org
+Cc: mcgrof@kernel.org,
+	akpm@linux-foundation.org,
+	brauner@kernel.org,
+	chandan.babu@oracle.com,
+	david@fromorbit.com,
+	djwong@kernel.org,
+	gost.dev@samsung.com,
+	hare@suse.de,
+	john.g.garry@oracle.com,
+	kernel@pankajraghav.com,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-xfs@vger.kernel.org,
+	p.raghav@samsung.com,
+	ritesh.list@gmail.com,
+	ziy@nvidia.com
+Subject: [RFC] iomap: use huge zero folio in iomap_dio_zero
+Date: Tue,  7 May 2024 16:58:12 +0200
+Message-Id: <20240507145811.52987-1-kernel@pankajraghav.com>
+In-Reply-To: <20240503095353.3798063-8-mcgrof@kernel.org>
+References: <20240503095353.3798063-8-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Transfer-Encoding: 8bit
 
+From: Pankaj Raghav <p.raghav@samsung.com>
 
-On Tue, 07 May 2024 10:31:03 +0800, linan666@huaweicloud.com wrote:
-> This reverts commit 3f9f231236ce7e48780d8a4f1f8cb9fae2df1e4e.
-> 
-> Using 64bit for 'sync_io' is unnecessary from the gendisk side. This
-> overflow will not cause any functional impact, except for a UBSAN
-> warning. Solving this overflow requires introducing additional
-> calculations and checks which are not necessary. So just keep using
-> 32bit for 'sync_io'.
-> 
-> [...]
+Instead of looping with ZERO_PAGE, use a huge zero folio to zero pad the
+block. Fallback to ZERO_PAGE if mm_get_huge_zero_folio() fails.
 
-Applied, thanks!
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+I rebased on top of mm-unstable to get mm_get_huge_zero_folio().
 
-[1/1] md: Revert "md: Fix overflow in is_mddev_idle"
-      commit: 504fbcffea649cad69111e7597081dd8adc3b395
+@Christoph is this inline with what you had in mind?
 
-Best regards,
+ fs/iomap/direct-io.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index 5f481068de5b..7f584f9ff2c5 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -236,11 +236,18 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+ 		loff_t pos, unsigned len)
+ {
+ 	struct inode *inode = file_inode(dio->iocb->ki_filp);
+-	struct page *page = ZERO_PAGE(0);
++	struct folio *zero_page_folio = page_folio(ZERO_PAGE(0));
++	struct folio *folio = zero_page_folio;
+ 	struct bio *bio;
+ 
+ 	WARN_ON_ONCE(len > (BIO_MAX_VECS * PAGE_SIZE));
+ 
++	if (len > PAGE_SIZE) {
++		folio = mm_get_huge_zero_folio(current->mm);
++		if (!folio)
++			folio = zero_page_folio;
++	}
++
+ 	bio = iomap_dio_alloc_bio(iter, dio, BIO_MAX_VECS,
+ 				  REQ_OP_WRITE | REQ_SYNC | REQ_IDLE);
+ 	fscrypt_set_bio_crypt_ctx(bio, inode, pos >> inode->i_blkbits,
+@@ -251,10 +258,10 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+ 	bio->bi_end_io = iomap_dio_bio_end_io;
+ 
+ 	while (len) {
+-		unsigned int io_len = min_t(unsigned int, len, PAGE_SIZE);
++		unsigned int size = min(len, folio_size(folio));
+ 
+-		__bio_add_page(bio, page, io_len, 0);
+-		len -= io_len;
++		bio_add_folio_nofail(bio, folio, size, 0);
++		len -= size;
+ 	}
+ 	iomap_dio_submit_bio(iter, dio, bio, pos);
+ }
 -- 
-Jens Axboe
-
-
+2.34.1
 
