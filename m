@@ -1,122 +1,96 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBE54A3E
-	for <linux-block@vger.kernel.org>; Tue,  7 May 2024 02:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47D24A3E
+	for <linux-block@vger.kernel.org>; Tue,  7 May 2024 02:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715048906; cv=none; b=hGu+mgKqTOOMAo1fo1O8Kcp/0b1CP7njItvYvmPUMqUmP5edz7Vfgl6rxpLM36L7K+Fckf/UQ6dFyghSmAPytcLBSrVwmP9QrEMnfasxZe3UrJyyBD7fmHzp/ruk2tbeD1P3VCTm2HAN/4VKKuxdcxYcDRhvibt7EdP4jpbAA5c=
+	t=1715048914; cv=none; b=oSsTlQRrertygZQV2PMOKndcplPLlAK/yaRbcey3K09cTQlQV+8kxyp9pWn2YY0aJYb2Nbvw5P1rf5W/z950SNAMdB2X4tBmJq0ik+eOmCJgHTNX6979B/w5jdX57f2pnXz9JVJd9uUX4n3+LNC1zlLjedtlN7WTl9NVc4QXcqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715048906; c=relaxed/simple;
-	bh=8x76DuarRGDNbh4VSPXvCc7KctaXgSAwJaOlTqnPqIs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TA/8mIFPmVKRRaMYsF5HaABet9fh+IExz8gCRKrKGJq+qZtS2O2eMjoxnEoQtPinD3MXp9BxWMJ5gIZ/5bOsvXnQLizuA2dajcSrj1YdE1GnF4P43WRn4vpm0vJc3lK07ikbfRDQX7V5VxJK9bSpzqQtkkGnvZukYx2gUKoFtJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zHLjc/6j; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1715048914; c=relaxed/simple;
+	bh=+CSkBnBgPd+J06ce1jh46cEKGNnoCbnsrDETobBGafY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=OLlUCvjcrE2vDhdaArmeICmo6Hx7ltgUxsIJ1GBQAQ/oTj0FIHgr+VDsEETlQXm0BWbrbP7a8anBRzRdra8M3ma52KUpe+NxDw+VKj0K+ckaCyP8zVVzCuvKn1S6a+wZenVtgY+fOlt5K/Mqgx6iItK78DZHGBYKRAV/m8fBG/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=c3mASknz; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zHLjc/6j"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ec8d265389so6750385ad.2
-        for <linux-block@vger.kernel.org>; Mon, 06 May 2024 19:28:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="c3mASknz"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6f470d4f777so7071b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 06 May 2024 19:28:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715048902; x=1715653702; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sEszd8rYc09PdsNNr6xTGuOWi7FK729iJPG08VKTGkM=;
-        b=zHLjc/6jNJSvzcBaCPBVstep+g4Ou0RmBo3HRpwx/9C3ecZMPr9mdIVEKZwpEsntgv
-         8JIzz/ygzNOZMpE/1qxh7MOz00rqe6WkGlBRNSXB0yo2v6NcRNtlGslRkWDfCes+NlQV
-         m4ZKEgfFhSNa5eSxb9AMcCd5OVZK+3NWjhpx7QqdP4JiJSioCTKWsmTEiRQrAMYUpp3U
-         TVpAYb2DRyylFAmTlYu/cLWmqbWxqzW9JcLHwgKHAurjAm2cmr9R5XxedmAhrWTQxgTN
-         6Jwb4+1dNzwaDVjWFrK+tuD+CXWdx9f5855kEP+V2tgh4IThsiUXWpG7HY7G9xx8RjM6
-         0c8A==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715048911; x=1715653711; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YmC62/ezjUIPisfgcsC1ZvH2jf8v9/q15qxsZCWeKQs=;
+        b=c3mASknz+/lmYfe8+lYathpHW5g2fuh/0Denzex9jrjHI0ytwqTUMwO1z17u+kzTa3
+         HjaMgjNh8Rwp9b5n2YOL++LfCCNAiusfRE02dRY+RDYu+LUKw2gXdZYzToiDf+Nz43Sw
+         VYjOznRvQrKl79JLM2GfVjm7dbdygL7PaPaZJnmvibs81CwHnR8z1WFKrQZpf++3zBW/
+         3j2B/PMfuGMmWpwITNvC0UmJZigj7mTpGTnmSgleep//yA4ibgwUa7bxLUbdrwpvUU65
+         hwQiDW7M2hnuCm+ncTMddkVL3mfhB61RvtZ1TfdS992MYo47GGhF4iFji42WVLQ6Ghn3
+         2rYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715048902; x=1715653702;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sEszd8rYc09PdsNNr6xTGuOWi7FK729iJPG08VKTGkM=;
-        b=Famq4SgT4eUoXo7f3M1D29lcPxJ/yI/2u6RLMPqrI06XxlfvKfn/uNV3Xi1uYGlmYl
-         HNxJPOjsEmazqOl4T62CsKaPQCu2+vPM+MjOKqo0Vo7e3+zNcXcIPXoxblTs0bAiV6Zb
-         OUFCF4VksFMecFUX3bWwAhr2gxQSIPHJwq19LwTGCiUGD3DY+efYRav8DIsFEqlATcJZ
-         CXGPs28M7YXv5q8YM9F3dlCCvX89quRpS1t5YhI0U2L6hlu17fgH4TqOqJ508S4Fb/pZ
-         JMq4OuEaS0wncHHtTvuwdTzgAkdx7F+jn6H9fm4mDkfPiTJsvPNz5S4LHAohprij2qvR
-         Jxdg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2jAFan/+KEfcmamAfdiGcDfCy+utOfJ90e0mkrIsjjW2CkdJhu3qeKtT+bKymr95WCXhHMJ9fcbM2DlY4TFNXkQkyZ0Y4wai8U9w=
-X-Gm-Message-State: AOJu0YyiVKbOLrioz0IsJDR8ma1ke41qKeQTKJbaR/Kxkn0s4sxEKZhg
-	GzP8JxCXrXpgPSGqLUvUR5Hjbfredc1RemPE5NFzio4YR6dKnezjls+/ggivxHqVIZ2ylB6v4S5
-	5
-X-Google-Smtp-Source: AGHT+IErB8yDgI+bdb76aVdH8sh5oVA8W04SFkmB0p8B/laBWuwZggRQ7fD+CSUzLtTsIB6J1+pt0w==
-X-Received: by 2002:a05:6a20:394a:b0:1af:991a:d1a0 with SMTP id r10-20020a056a20394a00b001af991ad1a0mr11100307pzg.3.1715048901990;
-        Mon, 06 May 2024 19:28:21 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id t22-20020a17090a5d9600b002b16d9ab430sm8783349pji.3.2024.05.06.19.28.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 May 2024 19:28:21 -0700 (PDT)
-Message-ID: <4792740a-0387-4945-8501-b2c240271ec7@kernel.dk>
-Date: Mon, 6 May 2024 20:28:19 -0600
+        d=1e100.net; s=20230601; t=1715048911; x=1715653711;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YmC62/ezjUIPisfgcsC1ZvH2jf8v9/q15qxsZCWeKQs=;
+        b=GgE8nnZK9Fs6lCE+3ipBBo3BT1NR9MqNeHTWNQe0ywX1NvSoKjUqfJgf+WSkClW9rH
+         CAZTFsBCqvfFV8Z6WxLB/wn7ItYMx+yYqmLTW0IdZlodh0cLaXf0Yhb9ohn8tCBn9dwx
+         WQE4OzK+bi9FWl0YqFC9Do84iMmUOXH/z75SGVIG4TqG8JGuoEs6TZB5P9KgqmpJzE4v
+         MV5U/s6/jVRl+fWKbi7yBJ5k5nxVcZac0tJQcnJcqxbMVTm//6rOQkqzNQWfswOM4gqX
+         +OlEH5xnla10MXABly1xF6rs8v6tD4xNrMBEiDIWbDZSOaM3VW/LZW+4KeQYNnnKuHdW
+         3LGg==
+X-Gm-Message-State: AOJu0YxcSWWt7yLqHyMw9lKaX164pktKGlr9TMFTRlL02dxgci2IM17/
+	dCmLWyPertxmoDvEriJDkpObpu4Mgi1iIf2U+AJgiGrdVF+10ogCcdaX9cS3Znb7deEPm7Yu/hs
+	V
+X-Google-Smtp-Source: AGHT+IGi7dDN1zaQctVUuzUX2G1GipF78B4o1yqdt51mpwCXyg7akJLuCnUnompoMGaV4oQSqj3L/Q==
+X-Received: by 2002:a05:6a00:8c07:b0:6ec:f406:ab17 with SMTP id ih7-20020a056a008c0700b006ecf406ab17mr12498603pfb.0.1715048910830;
+        Mon, 06 May 2024 19:28:30 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id bn12-20020a056a00324c00b006edd05e3751sm8703084pfb.176.2024.05.06.19.28.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 19:28:30 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@kernel.org>, 
+ Geert Uytterhoeven <geert+renesas@glider.be>
+In-Reply-To: <20240424134722.2584284-1-ming.lei@redhat.com>
+References: <20240424134722.2584284-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: set default max segment size in case of
+ virt_boundary
+Message-Id: <171504890971.2934.13939084723557956334.b4-ty@kernel.dk>
+Date: Mon, 06 May 2024 20:28:29 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: set default max segment size in case of
- virt_boundary
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>
-References: <20240424134722.2584284-1-ming.lei@redhat.com>
- <ZjmG0aFl1oU2OeDZ@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZjmG0aFl1oU2OeDZ@fedora>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 5/6/24 7:41 PM, Ming Lei wrote:
-> On Wed, Apr 24, 2024 at 09:47:22PM +0800, Ming Lei wrote:
->> For devices with virt_boundary limit, the driver may provide zero max
->> segment size, we have to set it as UINT_MAX at default. Otherwise, it
->> may cause warning in driver when handling sglist.
->>
->> Fix it by setting default max segment size as UINT_MAX.
->>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: Mike Snitzer <snitzer@kernel.org>
->> Fixes: b561ea56a264 ("block: allow device to have both virt_boundary_mask and max segment size")
->> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
->> Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
->> Closes: https://lore.kernel.org/linux-block/7e38b67c-9372-a42d-41eb-abdce33d3372@linux-m68k.org/
->> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->> ---
->>  block/blk-settings.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index d2731843f2fc..9d6033e01f2e 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -188,7 +188,10 @@ static int blk_validate_limits(struct queue_limits *lim)
->>  	 * bvec and lower layer bio splitting is supposed to handle the two
->>  	 * correctly.
->>  	 */
->> -	if (!lim->virt_boundary_mask) {
->> +	if (lim->virt_boundary_mask) {
->> +		if (!lim->max_segment_size)
->> +			lim->max_segment_size = UINT_MAX;
->> +	} else {
->>  		/*
->>  		 * The maximum segment size has an odd historic 64k default that
->>  		 * drivers probably should override.  Just like the I/O size we
+
+On Wed, 24 Apr 2024 21:47:22 +0800, Ming Lei wrote:
+> For devices with virt_boundary limit, the driver may provide zero max
+> segment size, we have to set it as UINT_MAX at default. Otherwise, it
+> may cause warning in driver when handling sglist.
 > 
-> Hello Jens,
+> Fix it by setting default max segment size as UINT_MAX.
 > 
-> Looks this fix is missed, can you make it to v6.9?
+> 
+> [...]
 
-Oops yes, thanks for the reminder.
+Applied, thanks!
 
+[1/1] block: set default max segment size in case of virt_boundary
+      commit: ffd379c13fc0ab2c7c4313e7a01c71d9d202cc88
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
