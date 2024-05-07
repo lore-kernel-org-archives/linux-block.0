@@ -1,99 +1,100 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7E64C8A;
-	Tue,  7 May 2024 18:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439BD187326;
+	Tue,  7 May 2024 21:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715107146; cv=none; b=CmFGY2GzAmtMX2Pjzdu6u+algxzaLUmrA70ZcjkJpg+ZVmKk85IrKpa/idsNmtHye2q/tQywM2dcaY9QMMaJ6SotnNDsHxTFsKHn0woDphgpO2ACPmdM17UsSeIErF+YMtUboNUz3O4NCr1pHM8sEWip4o7hXfWbV4L7nrlVA64=
+	t=1715116391; cv=none; b=Hnh21CmUJRzP+ZLw/p9xQ26jd30cbQ9d5z1LuuuplYDz8v7gwPUKtxaQEN2h9olDqmhxqCZoxPJ0hq1DDuFPw24QVfo2vrnjSZfBcoaYm6kmbNoIlRWKtsi6crnoRT6DPjBXw38gVjSskWYSFQvgsyH5XZZu5G7ZlsodUyInAWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715107146; c=relaxed/simple;
-	bh=+e7JwIYntPd6JoynacX1iCTVqyD9G8I62Q6xeEPQjd8=;
-	h=Date:Message-Id:From:To:Cc:Subject; b=IPVeP1Vx7Bl//uRQfyThzwrLz59YD0dbrgCiuwVkBuOxItoptk8Hs8WMe46eAIHGT7F+EyCXU89mN2XB14fEiwI2CL2tEAWDX2o3BlGAh916uaWZ2IGQO8BBaPwjSa1Gkc6afW8YeKAYVNnm6RDhp6EsblMQmwi8bzL8j1TKVzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bjaon+TZ; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715116391; c=relaxed/simple;
+	bh=TrK/HQl6cRzmC2myzYV+mRcGrE69UCP6jKEvenXWgnw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=il8Z2ggSFXkQpvIAjBSuwQNUWdYNKmJ5pFHViRetlemQag7TFdClkSaA7qVGLeDHNssM5iPv4jt/fHKyvoC46gkuEWOAjIoIODH24G8bIEez8dW7MvatyE+nMuvGkjJhGUmja0/mCFec+yxJYfeHzFPjrW0vTV9UK7FB9qBKQ04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5MvJLhy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bjaon+TZ"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6f4521ad6c0so2588336b3a.0;
-        Tue, 07 May 2024 11:39:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715107144; x=1715711944; darn=vger.kernel.org;
-        h=subject:cc:to:from:message-id:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vbTvMCqSzr4haV2ycU7qwM3HYG3Vs4AHqnsFnA064zI=;
-        b=bjaon+TZDAvWe3bzhROCKarec18mVKG0P1sCx1v0eOZYvMieiamQ5zE8x9IUJvvTiE
-         SOOrED/bTavznID3+GLY1VTnpvfhoYQaKiGfJlYCUad93ckhE96Hcv6LJEKghJPShLjr
-         cWk/TJraRrmbWF/5ZOzB9l4JdWcziXKXpd9lpcrSyJ+osHCqab0FxZjzGUF7CAe3rKhs
-         x3dJoLG4+vO5uBknwcR9otrLEcmIOmV7FJsuDph1/qUx45vyB2qLmUthvXDZ+1d9I126
-         yaq5gaW05Uf6eIJwNEgrhLtOLw/grIu3u1ay2ZhTRCblAIMn6F1RH+6qkTysqKZ+qtCJ
-         Hcjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715107144; x=1715711944;
-        h=subject:cc:to:from:message-id:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vbTvMCqSzr4haV2ycU7qwM3HYG3Vs4AHqnsFnA064zI=;
-        b=CHEdMs1UIkni/NKOBl/TUD0Bsgi/n7Oc1nGrnyAN1WALqDGOey7MzUiU41gjWCqdv/
-         Az6ubqQxxkXWBP0am7m8/d+f1KIOqm4D4BlJwcnFD748npawcG5Dmhm1cwxUd9GeDOTC
-         80nM20mu5XyoFGnRoLB0XE8o8sNWymifvPtCWuEpm+rThv0cNFZZUEsXgvdtqEUkRYIw
-         S5AJhT9EL1mmIBC1f4QMFonkkuy09OsfvLsmOpVEQp+BKfJn17Zrwx2sqai0DNXjkPH7
-         ovd5hBxSnA2mjuTIuSzyQuBNe6uSpADhM1Nw8QmxZf8a0JQpLMBymfVUyV4dYE2Jo5Sc
-         fv/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXa/02PYY6K96IwcRdhHSUY6Kd2MlJAgfgf7/T/tlUOWem/t6F91tz2nJ4HniEztvW7aRspITZpQQpByLUpe2YuQJ+0OmrG5WycfiAjSG80SPk2oUSCnSs/XERpkec59CQyB0eF2KrkjVbhu08ssHr9KqZIPTRD/6NigBYT613lzET0Y1Xr
-X-Gm-Message-State: AOJu0Yz7/hYHK32ltmmYgMUoj9m8+K0CTxt2cam+/EzRPdzTpGqT9YZx
-	ViCY9bOxu/5S0Ahn1MJpeA7qxGXcCf0XPT1GRUtROzVEP1uimkd8
-X-Google-Smtp-Source: AGHT+IG1CoIsZ33D9jBTrdDLGpbQF8WORjgZG8GNes4e13UPyDA8z1xFk6dphfOtkjP9qKAC1oMGtQ==
-X-Received: by 2002:a05:6a00:2f16:b0:6ea:e2fd:6100 with SMTP id d2e1a72fcca58-6f49c2b1cb4mr437440b3a.30.1715107144144;
-        Tue, 07 May 2024 11:39:04 -0700 (PDT)
-Received: from dw-tp ([171.76.81.176])
-        by smtp.gmail.com with ESMTPSA id p38-20020a056a000a2600b006f0da46c019sm9687357pfh.219.2024.05.07.11.38.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 11:39:03 -0700 (PDT)
-Date: Wed, 08 May 2024 00:08:56 +0530
-Message-Id: <87edado4an.fsf@gmail.com>
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Christoph Hellwig <hch@infradead.org>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-Cc: hch@lst.de, willy@infradead.org, mcgrof@kernel.org, akpm@linux-foundation.org, brauner@kernel.org, chandan.babu@oracle.com, david@fromorbit.com, djwong@kernel.org, gost.dev@samsung.com, hare@suse.de, john.g.garry@oracle.com, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-xfs@vger.kernel.org, p.raghav@samsung.com, ziy@nvidia.com
-Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5MvJLhy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16510C2BBFC;
+	Tue,  7 May 2024 21:13:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715116391;
+	bh=TrK/HQl6cRzmC2myzYV+mRcGrE69UCP6jKEvenXWgnw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C5MvJLhyKfV8u/qyAsvf2tSznMLAqpQHln891YiqiPBldbclCZO1XL1eXx2jpD0Rn
+	 Ji16VjrUx9yyjmFN25KCetsvxb+165k7+rG7VfxV+q6pdtfq0iBZM/XPIbWIjdVTyW
+	 vJfTwYXK1+BkPzSepiOF0qCAYfJanyStbFUteGbLBnezH6dj4CajsC0mv0gVnyGUqu
+	 y4t7AtOfWyAkMLv0Gc4K2dh5GBk5j97unEIGpMI8VR6IitKp1EAzH9I38e2UAZLY09
+	 ctCXei+OdYArXRug+Usmau5Dk7tFwNl83w/d8VHO2QbZvU9xm1508Fru7LMxUup7fx
+	 7xCre+ouriTYA==
+Date: Tue, 7 May 2024 14:13:10 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, akpm@linux-foundation.org,
+	willy@infradead.org, brauner@kernel.org, david@fromorbit.com,
+	chandan.babu@oracle.com, hare@suse.de, ritesh.list@gmail.com,
+	ziy@nvidia.com, linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	p.raghav@samsung.com, kernel@pankajraghav.com
+Subject: Re: [PATCH v5 10/11] xfs: make the calculation generic in
+ xfs_sb_validate_fsb_count()
+Message-ID: <20240507211310.GW360919@frogsfrogsfrogs>
+References: <20240503095353.3798063-1-mcgrof@kernel.org>
+ <20240503095353.3798063-11-mcgrof@kernel.org>
+ <b3a3e9c1-91ca-4c7f-81a7-03f905ee0bd8@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b3a3e9c1-91ca-4c7f-81a7-03f905ee0bd8@oracle.com>
 
-Christoph Hellwig <hch@infradead.org> writes:
+On Tue, May 07, 2024 at 09:40:58AM +0100, John Garry wrote:
+> On 03/05/2024 10:53, Luis Chamberlain wrote:
+> > From: Pankaj Raghav <p.raghav@samsung.com>
+> > 
+> > Instead of assuming that PAGE_SHIFT is always higher than the blocklog,
+> > make the calculation generic so that page cache count can be calculated
+> > correctly for LBS.
+> > 
+> > Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> > Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+> > ---
+> >   fs/xfs/xfs_mount.c | 9 ++++++++-
+> >   1 file changed, 8 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
+> > index df370eb5dc15..56d71282972a 100644
+> > --- a/fs/xfs/xfs_mount.c
+> > +++ b/fs/xfs/xfs_mount.c
+> > @@ -133,9 +133,16 @@ xfs_sb_validate_fsb_count(
+> >   {
+> >   	ASSERT(PAGE_SHIFT >= sbp->sb_blocklog);
+> >   	ASSERT(sbp->sb_blocklog >= BBSHIFT);
+> > +	uint64_t max_index;
+> > +	uint64_t max_bytes;
 
-> On Tue, May 07, 2024 at 04:58:12PM +0200, Pankaj Raghav (Samsung) wrote:
->> +	if (len > PAGE_SIZE) {
->> +		folio = mm_get_huge_zero_folio(current->mm);
->
-> I don't think the mm_struct based interfaces work well here, as I/O
-> completions don't come in through the same mm.  You'll want to use
+Extra nit: the  ^ indentation of the names should have tabs, like the
+other xfs functions.
 
-But right now iomap_dio_zero() is only called from the submission
-context right i.e. iomap_dio_bio_iter(). Could you please explain the
-dependency with the completion context to have same mm_struct here?
+--D
 
-> lower level interfaces like get_huge_zero_page and use them at
-> mount time.
->
-
-Even so, should we not check whether allocation of hugepage is of any
-value or not depending upon how large the length or (blocksize in case of
-mount time) really is.
-i.e. say if the len for zeroing is just 2 times the PAGE_SIZE, then it
-doesn't really make sense to allocate a 2MB hugepage and sometimes 16MB
-hugepage on some archs (like Power with hash mmu).
-
-maybe something like if len > 16 * pagesize?
-
->> +		if (!folio)
->> +			folio = zero_page_folio;
->
-> And then don't bother with a fallback.
-
-The hugepage allocation can still fail during mount time (if we mount
-late when the system memory is already fragmented). So we might still
-need a fallback to ZERO_PAGE(0), right?
-
--ritesh
+> nit: any other XFS code which I have seen puts the declarations before any
+> ASSERT() calls
+> 
+> > +
+> > +	if (check_shl_overflow(nblocks, sbp->sb_blocklog, &max_bytes))
+> > +		return -EFBIG;
+> >   	/* Limited by ULONG_MAX of page cache index */
+> > -	if (nblocks >> (PAGE_SHIFT - sbp->sb_blocklog) > ULONG_MAX)
+> > +	max_index = max_bytes >> PAGE_SHIFT;
+> > +
+> > +	if (max_index > ULONG_MAX)
+> >   		return -EFBIG;
+> >   	return 0;
+> >   }
+> 
+> 
