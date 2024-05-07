@@ -1,67 +1,67 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5369314273
-	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8801755A
+	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715146672; cv=none; b=PgQO6lzScpbS06/yb9P27JFLyzs/QxC1fdYojC4vTU1hlBRVHktHPPPSNn4NU+A4QDys/qrrsp0mxxyH82WwwbUsdg0XvnnxyDp9/FJ/QHkBD7sGxfYMzzRmQ0qFtBMLTUGt+oz8DK7JfK0LHcYeeNXSwSx10Qt3vGgS9+PAIGE=
+	t=1715146678; cv=none; b=u5J0hIivznhNO86rK4i2vqiQBBQhOX0uFkxCv+Ok7NVlUxRYjb4LfNy+n8T5DhdWhdkUIuUvKRBhhWNTljeSd2/ca/t1mACklaqd2tE9ZVO2aOOZa0nYq5uh4uSOORl2ju3lQ5w7+9AoyIhoS7XmrLafGP+ffhVlhSMYrdRQdiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715146672; c=relaxed/simple;
-	bh=0t+iazXb0oQed4nfQWFOESyncTUo+2gX42SIZ5iy7Uc=;
+	s=arc-20240116; t=1715146678; c=relaxed/simple;
+	bh=cEGNWM79vtwr8ee3ZPhTdancPLn9TjjyE06Lq63u41g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=Fgz3UqMDh3zISDz+/gFeLGfC5OeJCmZgGNTqIxKPcWuG4dXJ7+rzjFQXZeyk0GJL6n1beEziE7F+oXyF4igZP/cKTuyRHP3tlDjOWf5BmSz4IDy15Hsv3TSrgGD/dwP9/SYxtRkYRWAX/6l0JbxuSDRotIx43MELlLrE0wnf0uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=nbwOkWCS; arc=none smtp.client-ip=203.254.224.24
+	 Content-Type:References; b=MNNWo0LlrTAyG7w479FxUCJfn5NwVoFl4crvKwqmMUcXilX5Js56tT4kPwrtD0ptoyfO0wC3+FL6xHSSsAKAR69Vosnb6XdTHt+TYJnZbA/4v3FQqBRqLdNv/kpQ24g7AvBCqx74HFQqiGFmoYElcnJur7ygc+xpbHkgzYSMWyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=PN9JpyP3; arc=none smtp.client-ip=203.254.224.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="nbwOkWCS"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240508053747epoutp01ed5141cb9e043aa44b9a713dab932810~NbM6mItUU1979919799epoutp01j
-	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:47 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240508053747epoutp01ed5141cb9e043aa44b9a713dab932810~NbM6mItUU1979919799epoutp01j
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="PN9JpyP3"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240508053744epoutp04bdafea7153459755b3cf86df05411d03~NbM3nrRD11144411444epoutp04D
+	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240508053744epoutp04bdafea7153459755b3cf86df05411d03~NbM3nrRD11144411444epoutp04D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1715146667;
-	bh=IIbfaRdLQWOuaFq30MoGCp/C8CgWODxBmzHQcjZa1Q4=;
+	s=mail20170921; t=1715146664;
+	bh=caFPHF3Jzy+JjJ69FjaEX3QBtwejfSBYgbmabI2wjrI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nbwOkWCSwmsRHNNMh79vJIds4CXtgSxZFjOkuj0vWmmf9phIiYwU1yLPH2Ku7/BWE
-	 PEs3+IQEta2/wWxyBQX86a7NOZCc2aGjPIPLejdxLfqVAWdsEbFoK55iWd1bM5jSe/
-	 Rxarg6naNlqb0PhdeqaPwJdkn5X/U/Q6x1ONiKfY=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240508053747epcas5p2f09887eb6e495680607a9a5c670846b5~NbM6MZo1D2079420794epcas5p2T;
-	Wed,  8 May 2024 05:37:47 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.180]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4VZ3nj4DY7z4x9Q9; Wed,  8 May
-	2024 05:37:45 +0000 (GMT)
+	b=PN9JpyP3avFAvMPJDQbQcevG9kp4K9RGUwiVwM8gE2i4syrLEzl4ftYhWSKASasLQ
+	 O+esJEmx7KVox1XA/5FRsrzEhAL2QuUGdPZ2c3E6enq7WYpOkBlq4eMsM7LPm1PQhL
+	 NoHKohBNSgdHbSIgA1DC167w1InYAhuzeR5Rg6DU=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240508053744epcas5p48469025a32f246ed8a20bf6863b3f8aa~NbM3G2ENz0753007530epcas5p4b;
+	Wed,  8 May 2024 05:37:44 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.183]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4VZ3nf2yZJz4x9QK; Wed,  8 May
+	2024 05:37:42 +0000 (GMT)
 Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	69.EE.09666.9AF0B366; Wed,  8 May 2024 14:37:45 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240507145326epcas5p1ce10f0e232cee06bae6a2115c2192eaa~NPIxtDWbV2534225342epcas5p16;
-	Tue,  7 May 2024 14:53:26 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240507145326epsmtrp10d8da3ee67baa7d1d7956ac28d34b866~NPIxsPwTG0639106391epsmtrp1r;
-	Tue,  7 May 2024 14:53:26 +0000 (GMT)
-X-AuditID: b6c32a49-f53fa700000025c2-ac-663b0fa93757
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	5F.69.19431.6AF0B366; Wed,  8 May 2024 14:37:42 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20240507145323epcas5p3834a1c67986bf104dbf25a5bd844a063~NPIuM8JcK3113331133epcas5p3H;
+	Tue,  7 May 2024 14:53:23 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240507145323epsmtrp25935de4da344f0847fb4929568482ad8~NPIuLWmHu0954309543epsmtrp2r;
+	Tue,  7 May 2024 14:53:23 +0000 (GMT)
+X-AuditID: b6c32a50-ccbff70000004be7-f4-663b0fa6d6b8
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	2D.4D.09238.6604A366; Tue,  7 May 2024 23:53:26 +0900 (KST)
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	46.B7.08924.2604A366; Tue,  7 May 2024 23:53:23 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.99.41.245]) by
 	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240507145325epsmtip162013f8d022d64dc2a84d64edb8d6fae~NPIv7p_b32912429124epsmtip1i;
-	Tue,  7 May 2024 14:53:24 +0000 (GMT)
+	20240507145321epsmtip17da84e3df1f72184dd191a304d695004~NPIskl7Ci2861028610epsmtip1-;
+	Tue,  7 May 2024 14:53:21 +0000 (GMT)
 From: Kundan Kumar <kundan.kumar@samsung.com>
 To: axboe@kernel.dk, hch@lst.de, willy@infradead.org
 Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
 	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
-	gost.dev@samsung.com, Kundan Kumar <kundan.kumar@samsung.com>, Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCH v3 3/3] block: unpin user pages belonging to a folio
-Date: Tue,  7 May 2024 20:15:09 +0530
-Message-Id: <20240507144509.37477-4-kundan.kumar@samsung.com>
+	gost.dev@samsung.com, Kundan Kumar <kundan.kumar@samsung.com>
+Subject: [PATCH v3 2/3] block: add folio awareness instead of looping
+ through pages
+Date: Tue,  7 May 2024 20:15:08 +0530
+Message-Id: <20240507144509.37477-3-kundan.kumar@samsung.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240507144509.37477-1-kundan.kumar@samsung.com>
 Precedence: bulk
@@ -71,95 +71,159 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNJsWRmVeSWpSXmKPExsWy7bCmpu5Kfus0g5XP5C2aJvxltlh9t5/N
-	4vv2PhaLmwd2MlmsXH2UyeLo/7dsFpMOXWO02PrlK6vF3lvaFjcmPGW02PZ7PrPF7x9z2Bx4
-	PDav0PK4fLbUY9OqTjaP3Tcb2Dz6tqxi9Pi8SS6ALSrbJiM1MSW1SCE1Lzk/JTMv3VbJOzje
-	Od7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwfoQiWFssScUqBQQGJxsZK+nU1RfmlJqkJGfnGJ
-	rVJqQUpOgUmBXnFibnFpXrpeXmqJlaGBgZEpUGFCdsajpstsBYu5K9ZsncjYwPifo4uRk0NC
-	wETiQu8Lti5GLg4hgd2MEtNn/2WGcD4xSjQc3MsKUiUk8I1R4s0NZpiO24+fQBXtZZTovrSV
-	EcL5zChxvfs+excjBwebgK7Ej6ZQkAYRoIaXK2+D1TALfGCU2DRpDSNIQljARWLfv+tgNouA
-	qsSnGZdYQGxeAVuJG8fXMEFsk5eYeek7O4jNKWAn0bfmASNEjaDEyZlPwOqZgWqat84Gu0hC
-	YCqHxOyVh6CaXSSuHD3OCmELS7w6voUdwpaSeNnfBmVnSxxq3ABVXyKx80gDVNxeovVUPzPI
-	M8wCmhLrd+lDhGUlpp5axwSxl0+i9/cTqFZeiR3zYGw1iTnvprJA2DISCy/NgIp7SCy41s4E
-	CayJjBJXP85nmsCoMAvJP7OQ/DMLYfUCRuZVjJKpBcW56anFpgWGeanl8FhOzs/dxAhOtVqe
-	OxjvPvigd4iRiYPxEKMEB7OSCO/RdvM0Id6UxMqq1KL8+KLSnNTiQ4ymwACfyCwlmpwPTPZ5
-	JfGGJpYGJmZmZiaWxmaGSuK8r1vnpggJpCeWpGanphakFsH0MXFwSjUw6WmZ/v3CWqUgKCnE
-	bHRXi+V/gG0Oz9cM2+YGmTy+YiWeFHXj+tZVpWZ7zXN/c1c+3iF9mfsK5622F7Ncpn72NqpZ
-	52xSJrOKSedgW1S77WT3pbKVrrcqPs6Valu/75teyv8vfqWR1WtbWN3Mv2Sx2ZUma5iK25Vu
-	E7iwV7w1dXP6Oht77iWtOn5SH1RCbht3Gvy7wmNR41uV2qxvxpXWF+lpESB4/Pfsx5L/+fgX
-	rK+1aa9gtdJeP8twdm+gbaxC6YJQ7Q23gwqfWsfssLfYoaJ+fb9YarudnInbt9sXJZo91mzW
-	8S6yO2t9+EGH4DxF16NPz6pFr15XVLrTuMMqbe7ZPQoqG6vXyi1WYinOSDTUYi4qTgQA84Cz
-	0z4EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrELMWRmVeSWpSXmKPExsWy7bCSnG6ag1WawYx5hhZNE/4yW6y+289m
-	8X17H4vFzQM7mSxWrj7KZHH0/1s2i0mHrjFabP3yldVi7y1tixsTnjJabPs9n9ni9485bA48
-	HptXaHlcPlvqsWlVJ5vH7psNbB59W1YxenzeJBfAFsVlk5Kak1mWWqRvl8CV8ajpMlvBYu6K
-	NVsnMjYw/ufoYuTkkBAwkbj9+AlzFyMXh5DAbkaJI5PnMUIkZCR2393JCmELS6z895wdougj
-	o8THZY+AOjg42AR0JX40hYLUiAhYSDxvXs4EUsMs8ItRYsejFcwgCWEBF4l9/66DDWURUJX4
-	NOMSC4jNK2ArceP4GiaIBfISMy99ZwexOQXsJPrWPACrFwKquf11LRtEvaDEyZlPwHqZgeqb
-	t85mnsAoMAtJahaS1AJGplWMkqkFxbnpucmGBYZ5qeV6xYm5xaV56XrJ+bmbGMHRoKWxg/He
-	/H96hxiZOBgPMUpwMCuJ8B5tN08T4k1JrKxKLcqPLyrNSS0+xCjNwaIkzms4Y3aKkEB6Yklq
-	dmpqQWoRTJaJg1OqgWnD3rObn3Da6Wj+3P5zZarJFMWQR+dMX0kmFX1Z4RUpc/1UOu/tmAl/
-	44K2f/Zddu1x3I77Xptuz2k+etXrk9tz4e1Kjp47pLdbsdSefxg296/J+waFs30XO5I1rjNn
-	MSrf63F5VWS49Si7xo0natNybDrfLVqXnS7R6rN7wxO1N0cXPFP+Ftj66cjPe53as5dlrGD5
-	cTj0Upmn/t4XniHqeYczDr/+2jHvIuP/myeeMlqX7GLI4uzUyA2X8Nq+w3bPyuMNzsa8PoVi
-	3Q91jR5Zddqwbs827fG8wdv4srl4+hPrCb9k3tnumKn+4uh172Q170uOejNcdh7iameNeih8
-	8I2SleXS14v7DgjsdqpRYinOSDTUYi4qTgQAvZXSy/UCAAA=
-X-CMS-MailID: 20240507145326epcas5p1ce10f0e232cee06bae6a2115c2192eaa
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrOJsWRmVeSWpSXmKPExsWy7bCmpu4yfus0g/09whZNE/4yW6y+289m
+	8X17H4vFzQM7mSxWrj7KZHH0/1s2i61fvrJa7L2lbXFjwlNGi22/5zNb/P4xh82B22PzCi2P
+	y2dLPTat6mTz2H2zgc2jb8sqRo/Pm+QC2KKybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwM
+	dQ0tLcyVFPISc1NtlVx8AnTdMnOAjlNSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTk
+	FJgU6BUn5haX5qXr5aWWWBkaGBiZAhUmZGds/drBWvBJpqL390+mBsYm8S5GTg4JAROJNVPm
+	s3UxcnEICexhlJj59DMrhPOJUeLlr48sEM43RolLPVfZYFruTJvBCJHYyyjx7c4uJpCEkMBn
+	Rom3Nyq6GDk42AR0JX40hYKERYDqX668DVbPLHCWUeLE1EcsIAlhgVCJSZc2g/WyCKhKLJ4z
+	CWwBr4CtxJVVs1gglslLzLz0nR3E5hSwk+hb84ARokZQ4uTMJ2A1zEA1zVtnM4MskBDo5JCY
+	PXE9K0Szi0TXz5vMELawxKvjW9ghbCmJz+/2Qn2TLXGocQMThF0isfNIA1SNvUTrqX5mkGeY
+	BTQl1u/ShwjLSkw9tY4JYi+fRO/vJ1CtvBI75sHYahJz3k2Ful9GYuGlGVBxD4lVH+6yQwJu
+	IqNE1+rHzBMYFWYh+WcWkn9mIaxewMi8ilEqtaA4Nz012bTAUDcvtRwezcn5uZsYwSlWK2AH
+	4+oNf/UOMTJxMB5ilOBgVhLhPdpunibEm5JYWZValB9fVJqTWnyI0RQY4hOZpUST84FJPq8k
+	3tDE0sDEzMzMxNLYzFBJnPd169wUIYH0xJLU7NTUgtQimD4mDk6pBiaup1JiFqcXuTwIj+Ex
+	+jk5pTzo7Ey3Nwvdn/bNznwnwlVzsWrt8kczk/9/ONVyuGf+wrs1Ls9Wrn/ivm569rY318LD
+	S5XC+uZPfeor80Yp7EdJn/pns7dvo8Kmb62P5GPa+jiy5tXPRWZXAu6VMwS/mRk573S33YJO
+	rikhnHOn3GU6+CxTbvLP8xPYOUz91pmeMHy340DLv5UiXx8KHjKRv3K4/WzZVKm9Fz+oBh84
+	7/vfKe1r4MIpxtH/Ag6YJF7YPPVRacb1zv4sxYPH06/915twfE/xth6WuBPVF0oWWN6vlRX7
+	p659mEv87rPH19U+PmjVC+GQPd3E9lLmfZ8ac/3Kn7ZePq8n9fXNu8XFrsRSnJFoqMVcVJwI
+	AJFOHaU6BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLLMWRmVeSWpSXmKPExsWy7bCSnG6yg1WawfJFzBZNE/4yW6y+289m
+	8X17H4vFzQM7mSxWrj7KZHH0/1s2i61fvrJa7L2lbXFjwlNGi22/5zNb/P4xh82B22PzCi2P
+	y2dLPTat6mTz2H2zgc2jb8sqRo/Pm+QC2KK4bFJSczLLUov07RK4MrZ+7WAt+CRT0fv7J1MD
+	Y5N4FyMnh4SAicSdaTMYuxi5OIQEdjNK3Jn3jA0iISOx++5OVghbWGLlv+fsEEUfGSWuL5/L
+	1MXIwcEmoCvxoykUpEZEwELiefNyJpAaZoHrjBI3pm9lBkkICwRL7Dp+hB3EZhFQlVg8ZxLY
+	Al4BW4krq2axQCyQl5h56TtYDaeAnUTfmgeMILYQUM3tr2uh6gUlTs58AlbPDFTfvHU28wRG
+	gVlIUrOQpBYwMq1ilEwtKM5Nzy02LDDMSy3XK07MLS7NS9dLzs/dxAiOAS3NHYzbV33QO8TI
+	xMF4iFGCg1lJhPdou3maEG9KYmVValF+fFFpTmrxIUZpDhYlcV7xF70pQgLpiSWp2ampBalF
+	MFkmDk6pBqbtyeYeGXmvVRL0O/JvxTJ0W/1RaG1ys1125U6vnJxJ/f0e/V611bPrdBW2zdIK
+	NN0kEutS7LBviZpQ0dz2ZyGVnJJdM+4ceNzb1m7v8NAkfubl5cnSCUVuJsskeNeYLXfs1HpU
+	5cT8wtVk7tl/bHFHVP2rPhev2L7mvPeaGSsdDkszOlVlKR2Y5vH36QWjF4YlLza7vvkhuLCQ
+	3+rY1RAX5avvnFqfHXSIDDVO9vY1TxCfa8GssfbhyfiwSWt6uqesfaa2+8iiYpOTDTPDI46c
+	jLHbrpPK5VX7SejMf/YlR+7amX3kKn6dpmArn1PpKTH5/8ddV5Ur1toZHd1dF7LDIEUzUlDq
+	hWL5fr9FSizFGYmGWsxFxYkAE5tVFPACAAA=
+X-CMS-MailID: 20240507145323epcas5p3834a1c67986bf104dbf25a5bd844a063
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: REQ_APPROVE
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240507145326epcas5p1ce10f0e232cee06bae6a2115c2192eaa
+X-CMS-RootMailID: 20240507145323epcas5p3834a1c67986bf104dbf25a5bd844a063
 References: <20240507144509.37477-1-kundan.kumar@samsung.com>
-	<CGME20240507145326epcas5p1ce10f0e232cee06bae6a2115c2192eaa@epcas5p1.samsung.com>
+	<CGME20240507145323epcas5p3834a1c67986bf104dbf25a5bd844a063@epcas5p3.samsung.com>
 
-Unpin pages which belong to same folio. This enables us to release folios
-on I/O completion rather than looping through pages.
+Add a bigger size from folio to bio and skip processing for pages.
 
-Suggested-by: Keith Busch <kbusch@kernel.org>
+Fetch the offset of page within a folio. Depending on the size of folio
+and folio_offset, fetch a larger length. This length may consist of
+multiple contiguous pages if folio is multiorder.
+
+Using the length calculate number of pages which will be added to bio and
+increment the loop counter to skip those pages.
+
+This technique helps to avoid overhead of merging pages which belong to
+same large order folio.
+
+Also folio-lize the functions bio_iov_add_page() and
+bio_iov_add_zone_append_page()
+
 Signed-off-by: Kundan Kumar <kundan.kumar@samsung.com>
 ---
- block/bio.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ block/bio.c | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index e2c31f1b0aa8..510327b8852e 100644
+index 38baedb39c6f..e2c31f1b0aa8 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -1154,20 +1154,12 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
- 	struct folio_iter fi;
- 
- 	bio_for_each_folio_all(fi, bio) {
--		struct page *page;
--		size_t nr_pages;
--
- 		if (mark_dirty) {
- 			folio_lock(fi.folio);
- 			folio_mark_dirty(fi.folio);
- 			folio_unlock(fi.folio);
- 		}
--		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
--		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
--			   fi.offset / PAGE_SIZE + 1;
--		do {
--			bio_release_page(bio, page++);
--		} while (--nr_pages != 0);
-+		bio_release_page(bio, &fi.folio->page);
- 	}
+@@ -1192,7 +1192,7 @@ void bio_iov_bvec_set(struct bio *bio, struct iov_iter *iter)
+ 	bio_set_flag(bio, BIO_CLONED);
  }
- EXPORT_SYMBOL_GPL(__bio_release_pages);
-@@ -1307,6 +1299,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 		} else
- 			bio_iov_add_folio(bio, folio, len, folio_offset);
  
-+		if (bio_flagged(bio, BIO_PAGE_PINNED) && num_pages > 1)
-+			unpin_user_pages(pages + i, num_pages - 1);
+-static int bio_iov_add_page(struct bio *bio, struct page *page,
++static int bio_iov_add_folio(struct bio *bio, struct folio *folio,
+ 		unsigned int len, unsigned int offset)
+ {
+ 	bool same_page = false;
+@@ -1202,27 +1202,27 @@ static int bio_iov_add_page(struct bio *bio, struct page *page,
+ 
+ 	if (bio->bi_vcnt > 0 &&
+ 	    bvec_try_merge_page(&bio->bi_io_vec[bio->bi_vcnt - 1],
+-				page, len, offset, &same_page)) {
++				&folio->page, len, offset, &same_page)) {
+ 		bio->bi_iter.bi_size += len;
+ 		if (same_page)
+-			bio_release_page(bio, page);
++			bio_release_page(bio, &folio->page);
+ 		return 0;
+ 	}
+-	__bio_add_page(bio, page, len, offset);
++	bio_add_folio_nofail(bio, folio, len, offset);
+ 	return 0;
+ }
+ 
+-static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
++static int bio_iov_add_zone_append_folio(struct bio *bio, struct folio *folio,
+ 		unsigned int len, unsigned int offset)
+ {
+ 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	bool same_page = false;
+ 
+-	if (bio_add_hw_page(q, bio, page, len, offset,
++	if (bio_add_hw_page(q, bio, &folio->page, len, offset,
+ 			queue_max_zone_append_sectors(q), &same_page) != len)
+ 		return -EINVAL;
+ 	if (same_page)
+-		bio_release_page(bio, page);
++		bio_release_page(bio, &folio->page);
+ 	return 0;
+ }
+ 
+@@ -1247,8 +1247,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	struct page **pages = (struct page **)bv;
+ 	ssize_t size, left;
+ 	unsigned len, i = 0;
+-	size_t offset;
+-	int ret = 0;
++	size_t offset, folio_offset;
++	int ret = 0, num_pages;
+ 
+ 	/*
+ 	 * Move page array up in the allocated memory for the bio vecs as far as
+@@ -1289,15 +1289,26 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 
+ 	for (left = size, i = 0; left > 0; left -= len, i++) {
+ 		struct page *page = pages[i];
++		struct folio *folio = page_folio(page);
 +
- 		/* Skip the pages which got added */
- 		i = i + (num_pages - 1);
++		/* Calculate the offset of page in folio */
++		folio_offset = (folio_page_idx(folio, page) << PAGE_SHIFT) +
++				offset;
++
++		len = min_t(size_t, (folio_size(folio) - folio_offset), left);
++
++		num_pages = DIV_ROUND_UP(offset + len, PAGE_SIZE);
  
+-		len = min_t(size_t, PAGE_SIZE - offset, left);
+ 		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+-			ret = bio_iov_add_zone_append_page(bio, page, len,
+-					offset);
++			ret = bio_iov_add_zone_append_folio(bio, folio, len,
++					folio_offset);
+ 			if (ret)
+ 				break;
+ 		} else
+-			bio_iov_add_page(bio, page, len, offset);
++			bio_iov_add_folio(bio, folio, len, folio_offset);
++
++		/* Skip the pages which got added */
++		i = i + (num_pages - 1);
+ 
+ 		offset = 0;
+ 	}
 -- 
 2.25.1
 
