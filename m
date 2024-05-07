@@ -1,68 +1,68 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7BB15EFAE
-	for <linux-block@vger.kernel.org>; Tue,  7 May 2024 13:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1AE15EFCF
+	for <linux-block@vger.kernel.org>; Tue,  7 May 2024 13:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715088752; cv=none; b=ecnDJ1OjFznOECc9sPJj9kyfvPgk/6TChpDYIsV1fSoOOgN1tyaA2nIFHE/kbbkU4hbVbQy8KwfNQt+eaVpeYdcwNQvwrTy+imqnscbawtwY+OQhw1F3fFsK01HJMV8cT4rFlYe6WpJiwPymkDneHeRz87b29LeJY6tfdSs+GBU=
+	t=1715088887; cv=none; b=uqhop46SdhIB0asjIlKKSkC2QVpBsYNxrsSOyGLIAXLABnKqHJyl0QDjq29Yevg4qtcuyw5YdT+nLb6cnB+9BHykNkDOZRCb8fr1avkEmfgVrqkcLagVjR4qNWBuKdHJqv+coIrc3pZar0uhhuE67rNDMuysx4YTs/FNhA+fWYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715088752; c=relaxed/simple;
-	bh=k6pSVcceaxwAAJTy4YX1HKLpF7J2HxiuW5h8z6oQNzI=;
+	s=arc-20240116; t=1715088887; c=relaxed/simple;
+	bh=bV3hZF+yWnUvLfolt0qL3m4QpmW8/sDlFRD//n8L/aY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=MtvjjhY2TrLsFSVzMJU1AzzcSxaeTK3//2kUioPxL03iWUQ5XPrnXohVSoVoYvoA6luXZWp9HRd4fsABZ9yrjKiGEjHRHFb380VY0y83xQ53gcPQmjGX0smecz8ttdIbDSgNpqin1WrskpebjMsI3bJZZ1hlmk9AebB+Tjfti+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HqsoLqVE; arc=none smtp.client-ip=209.85.166.171
+	 MIME-Version:Content-Type; b=RxGq3BG6eYru+//toFvUcu4iYAppoER5Szl0oJxMroedtRgLwW5IQwa2r5Nd8gBb7jaV+7oShzpSm9UCVmbwzjZpzaxXanoecrYF5VFxbG66gQ1Uf3CxIwa436lpJqxCduJChE4JTq/3N6BX5nuHZbFEsw1icCYRAYrnPy2dRKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=d/ZoamSZ; arc=none smtp.client-ip=209.85.166.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HqsoLqVE"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-36c86ad15caso564105ab.2
-        for <linux-block@vger.kernel.org>; Tue, 07 May 2024 06:32:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="d/ZoamSZ"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7dee044afe7so5827539f.2
+        for <linux-block@vger.kernel.org>; Tue, 07 May 2024 06:34:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715088750; x=1715693550; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715088885; x=1715693685; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=67ULBmYkXMeSOYar0fWizuEeqwDWQyJQLFC/+ljYcKo=;
-        b=HqsoLqVE2aKIou3NB0/LYHigGl4rAbFqgxqYa7QBAH4CvOljiS5xlpLxNfK5HXiRzs
-         5uLbM0PgWvkvuxzzyRJc1H3ZVXJ0pKDWe1caLAe0X5Drh1W9pI3vOXA4j3FZICDaEq/6
-         xZXJFgZ21Y9IB0U4WNsTQKDP0DFWEzfmLaSZyvxQTfn8o1eaJSnub/ikJWtUVhHbfeJO
-         x9iB4CcaU3tjKqLqot/PeD9Tq+A7oTE+Ht/Mx2SFrUV83g8T318U8zLZPxhkvR4hsISE
-         OwGGAjE8PtP+A9vP+OOqT3wsfwvmiKRSy07+n3ZgnsW3FVkYzzkzGJz6JHWT0uj0f69q
-         lXDg==
+        bh=KP5HKRW4kBbKaUQGr7WJW/KutC9oC2MC2S4+gvWBuKE=;
+        b=d/ZoamSZxjkvWrrT1IMnPjBogp7aF4nGIKxTB+uXxJOsWbIZSeYZx7XBltN96MBlQk
+         8tB1owEP+Sq59e+aiay7+QEqKGYaRV7LMii6hgkaVGmXBl14rd4Tyc3gRzOazu22Z9oT
+         m/iOa4Wm5Bc2SiavE0gfOi66WP++JsHD9ubhyN25XFE1pH+i8ZM9btDDBTsKFIxHse2i
+         VNkHmz/hODE6fGbDTAesR+VQi3QZEPyvBPl+i02MCabTbS0xgxnKe6XLNyyciUeKZssB
+         c862NBTqVEvNr7EgZkyxZ61vUZlPtZoe4dEh8w7KeuL3SesZBhQJSIMIfFBoRn5kHBuQ
+         HQiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715088750; x=1715693550;
+        d=1e100.net; s=20230601; t=1715088885; x=1715693685;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=67ULBmYkXMeSOYar0fWizuEeqwDWQyJQLFC/+ljYcKo=;
-        b=as2osUHQ3cCLJM1CSa51cUpImMr8+C9zVTshj4oxXBtORTCeNdMzJ7JTCT/+xzml/T
-         Eh4uTe681mgWbbqavUfAeSZl0gF/lIyzPL4JEt0DXzW+SLvLj9Dkh0o3UvPxaI6+slS3
-         isEEs4o9NwMvVvGlygjSCiwGxghE1K/m69MIECGUIyO12CWWalcTHaXAQnBKLzRnKJIm
-         pxcP212aJkuKGe8dck+ldYX/Z5Hftvj9BuVTugbLw/n+FZmRmnTVadbP2+Q0deVykFAI
-         kAQbx2wx85ky/r5ak04Xptdjl/E5rtej4kwJXKCuNf/wTw+EvDf3nJ0Pstn8igZc9q+w
-         zCkw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkMWfl9+PorErA3gctD3+tHAvhrDJkEyt3KDlAdJg5AWYX0lRliVI/0nHDh6F1Vl/7gQ+BQ4jioh76HKbVUQpxufRnv+BAH1wTIYU=
-X-Gm-Message-State: AOJu0Yx7srihQEj2vGrd4KoV4z8WMtsRdNy6C5YNPzw6pvKjDUQSRga5
-	f9WptTZDh2aKhfNvC1X3079ek33kHeBQ5ETG13pejDU5SbPOZDpnK37+Nb0RS5U=
-X-Google-Smtp-Source: AGHT+IFH7mjfTRiR6AQaq1lZNlqPTZWIWFPzXf9zuuVMkFfKzroGmxSiiCeBxXn5rP1xIU6p3vGXpg==
-X-Received: by 2002:a5d:930d:0:b0:7de:e495:42bf with SMTP id l13-20020a5d930d000000b007dee49542bfmr6446702ion.1.1715088750557;
-        Tue, 07 May 2024 06:32:30 -0700 (PDT)
+        bh=KP5HKRW4kBbKaUQGr7WJW/KutC9oC2MC2S4+gvWBuKE=;
+        b=PnFbyBvoCgcpbvXKRoNRiqAlvX1hYscqQmJzpqxh3MYhtp1Ma9Q3E6Ruo3TSIpvpfY
+         mxvf93Gbm6CNIOmot66ouXXic2KE3K2H7r4HXeA1rwOhakO7N8KSgsEjzMXaalXZ0u6F
+         9zgNy1glMj39wGWdOzBKDG9Tm164gEBTGFW9fba+ZxxcqVz+7yUYmoocR0d0QV5KAx70
+         RqrsQjVmsZ+PMOsuyudzpo5Hx6axerLGJMLHAQz4AuC2PH0ni4A5ETztKhYmMoX+w+M4
+         Eo2M29MySb3uA8JzcWLo3B5P46D0wqCsXzaC9msgv97BNwm+rbErmsXxonaRMwojeU+q
+         yDKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ+14DklbU1MIh0DjBsaMKvOwWThTYwswtehFabJm5Z2W9lavLDNZFfCjuD15Uoke3im+FoxDHlHXRocPGv78fK4RdvpmnqslWU8o=
+X-Gm-Message-State: AOJu0YzTmgSMqRdDBdsyFkyHWRqZW0wW+WCVO8sdky82qR/fijGI0Ext
+	LUxnSTTJeGm9J18RH/YYXEZDskiUgUCIq961pjAIuA8S7u4uNXVzjp5617wvd4QUIW7oVwC+jhb
+	d
+X-Google-Smtp-Source: AGHT+IEfjA72JzoPNtuzqqBb/n6TSa5TGv07xhF8//9/sK/vhyY+R3mRWtXhNQLSmyncdcc61+6t5g==
+X-Received: by 2002:a6b:3f45:0:b0:7e1:8829:51f6 with SMTP id m66-20020a6b3f45000000b007e1882951f6mr974176ioa.1.1715088885335;
+        Tue, 07 May 2024 06:34:45 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id kw24-20020a056638931800b00488b8c8eae9sm727626jab.104.2024.05.07.06.32.29
+        by smtp.gmail.com with ESMTPSA id x6-20020a056638248600b0048859a02138sm2249450jat.86.2024.05.07.06.34.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 06:32:29 -0700 (PDT)
+        Tue, 07 May 2024 06:34:44 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, Conrad Meyer <conradmeyer@meta.com>, 
- linux-block@vger.kernel.org
-In-Reply-To: <20240506042027.2289826-2-hch@lst.de>
-References: <20240506042027.2289826-1-hch@lst.de>
- <20240506042027.2289826-2-hch@lst.de>
-Subject: Re: [PATCH 1/6] block: remove the discard_granularity check in
- __blkdev_issue_discard
-Message-Id: <171508874935.11829.2769498627059589937.b4-ty@kernel.dk>
-Date: Tue, 07 May 2024 07:32:29 -0600
+To: song@kernel.org, linan666@huaweicloud.com
+Cc: linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
+ houtao1@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20240507023103.781816-1-linan666@huaweicloud.com>
+References: <20240507023103.781816-1-linan666@huaweicloud.com>
+Subject: Re: [PATCH] md: Revert "md: Fix overflow in is_mddev_idle"
+Message-Id: <171508888455.12290.2983821888497713665.b4-ty@kernel.dk>
+Date: Tue, 07 May 2024 07:34:44 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,26 +74,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Mon, 06 May 2024 06:20:22 +0200, Christoph Hellwig wrote:
-> We now set a default granularity in the queue limits API, so don't
-> bother with this extra check.
+On Tue, 07 May 2024 10:31:03 +0800, linan666@huaweicloud.com wrote:
+> This reverts commit 3f9f231236ce7e48780d8a4f1f8cb9fae2df1e4e.
 > 
+> Using 64bit for 'sync_io' is unnecessary from the gendisk side. This
+> overflow will not cause any functional impact, except for a UBSAN
+> warning. Solving this overflow requires introducing additional
+> calculations and checks which are not necessary. So just keep using
+> 32bit for 'sync_io'.
 > 
+> [...]
 
 Applied, thanks!
 
-[1/6] block: remove the discard_granularity check in __blkdev_issue_discard
-      commit: 0942592045782e76a9d52c409955c2dc313cbd30
-[2/6] block: move discard checks into the ioctl handler
-      commit: 30f1e724142242a453f92d90b33e030014900bf0
-[3/6] block: add a bio_chain_and_submit helper
-      commit: 81c2168c229bab0665e862937bb476f18cff056d
-[4/6] block: add a blk_alloc_discard_bio helper
-      commit: e8b4869bc78da1a71f2a2ab476caf50c1dcfeed0
-[5/6] block: add a bio_await_chain helper
-      commit: 0f8e9ecc4636e3abb4f3cf1ead14c94cce7dfde8
-[6/6] blk-lib: check for kill signal in ioctl BLKDISCARD
-      commit: 719c15a75ebf3bda3ca718fe8e0ce63d262ec7ae
+[1/1] md: Revert "md: Fix overflow in is_mddev_idle"
+      commit: 504fbcffea649cad69111e7597081dd8adc3b395
 
 Best regards,
 -- 
