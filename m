@@ -1,67 +1,69 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05B014273
-	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC19714273
+	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715146660; cv=none; b=t9DjpKcejhbJRevxIPJetgN3MFk0PPtowFj2tI4/CWY3Nkx4VjKyZcyaNuJrYhmK4GC9EvMMDou5pusu8IK7Bry20fRNfMFxyj1qucoMmyPfKXDmqbCO+aAbWbgI1qytOPhPPAADrNtbX7TSeAZe1Df19sJcznhxlwS8u+yDFn0=
+	t=1715146669; cv=none; b=m6MXOi/7Ygjkkb2AKTTL8Pbim/h+hE3eAkSWxMqzv4TW8t9Dmf02NvbtpwqCvCMvhVJRnF6FG8mCAymkNPbHPY1+nC4AbP0ErVKYHWnKI/6jCoP9Y10zBTZnRRELboYcN3DLqaVMElT2TbfxLhXef1Fp6zMF0Zab0gdMDxxA4+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715146660; c=relaxed/simple;
-	bh=O0jLFBJ8UXW4a0+9UA6V0nLgZlmzrpM0VVESkDqhyiw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=VExny1PIYx6XIDnwXUPOdAnzwTN8GlYxVJWdlFfpCfYJPY7fJPAiI5yGJU6Q0OjdahCIWUHyQjDiu0M7eEy5fO75+e8iUnQKc4CBw6qKX2fX0ImGa1t4sbvclTiAMr3Ryhl07bUc8fVMH+UkXfHI+MSID1Sz8kYoZWA3CKTqb5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=jFFmo2x8; arc=none smtp.client-ip=203.254.224.25
+	s=arc-20240116; t=1715146669; c=relaxed/simple;
+	bh=RrwhV9wI5t2iPVtGGb01nOvzSeBF+YBhtXJrOl5dCR0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=mn4UVUeX/5z+soaZ56dBdtbj1HfpjY69GQ+BSEPs2spzIM/iXF51/Kw7BiPsTTL1hBBPPhR9h9FgtjBtPdxZIjvRIUEkD6nrb+zumw8QmWF5sbhjFaoyK0D7LWvUNxeXuQKemxdHbcLuYI/6hI6KUE+GMrCNsbDOPqxQVgqJQwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Taw+KeoN; arc=none smtp.client-ip=203.254.224.24
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="jFFmo2x8"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240508053735epoutp0216c472947376e3fa1c73e7b1b3d8c105~NbMuyYUQl1312113121epoutp02q
-	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240508053735epoutp0216c472947376e3fa1c73e7b1b3d8c105~NbMuyYUQl1312113121epoutp02q
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Taw+KeoN"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240508053738epoutp01fb0854a219b0b10b94b92ce544e66fe0~NbMyDlsfN2166721667epoutp01o
+	for <linux-block@vger.kernel.org>; Wed,  8 May 2024 05:37:38 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240508053738epoutp01fb0854a219b0b10b94b92ce544e66fe0~NbMyDlsfN2166721667epoutp01o
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1715146655;
-	bh=ty7CCCnUcpWQh1sgBg+mOgUpAIak77Fu+sq7/BWxxtM=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=jFFmo2x8D2UkDDxkdQTwpVKrLVLPxop/uLVEsdaSNHduZ8bDOn0gT1DwmPLLUGPqp
-	 Iezl46TziJmDd8vZNfuIiyGGeciVjvWPnnuhiFFoIyODYp6NTyIkGev4JRgQRmPybd
-	 9MLtQ0WmtiCDVHCvnQjU9kPRxatgeWGx6isvvtwU=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20240508053734epcas5p3f31a2e9a74d0a751a05cb40276128903~NbMuWiGIr1929419294epcas5p3e;
-	Wed,  8 May 2024 05:37:34 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.174]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4VZ3nS5wBzz4x9Q2; Wed,  8 May
-	2024 05:37:32 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	1D.49.19431.C9F0B366; Wed,  8 May 2024 14:37:32 +0900 (KST)
+	s=mail20170921; t=1715146658;
+	bh=lMKoTuW498udd4sb4rpdpBjxl9EL7fK/db3c2eR17zs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Taw+KeoN3Hy7JmcwF6PC9tawTaX+MnjzHRavuq5VXc8H6PYjTJknMhxKRsDltUhRQ
+	 rspCnJiDWKua6sxim94O5vwQnDEtKjfZmroMjLm52f1RGB+a6FO7y+slo2nicYeT5C
+	 2R3x71gPguR2BLWLWVav/Go2jscAVu5WZ7VuJV8Q=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240508053738epcas5p4b52b57c77208ec01ed70f8bc1ce5b285~NbMxwylxz0993109931epcas5p44;
+	Wed,  8 May 2024 05:37:38 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4VZ3nX5Xr8z4x9Q5; Wed,  8 May
+	2024 05:37:36 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	75.AE.08600.0AF0B366; Wed,  8 May 2024 14:37:36 +0900 (KST)
 Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240507145232epcas5p481986099a82b1880758b7770cdeaf2d2~NPH-UEGO93095830958epcas5p4U;
-	Tue,  7 May 2024 14:52:32 +0000 (GMT)
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240507145251epcas5p29e95da982219c6a1c196182fe70a45f5~NPIQpFEfj3003330033epcas5p2i;
+	Tue,  7 May 2024 14:52:51 +0000 (GMT)
 Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
 	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240507145232epsmtrp1547e7b2554334d5dafe904093145e2b0~NPH-TC_tH0625406254epsmtrp1w;
-	Tue,  7 May 2024 14:52:32 +0000 (GMT)
-X-AuditID: b6c32a50-ccbff70000004be7-dc-663b0f9c22c7
+	20240507145251epsmtrp12d9d0c8e2e166c3ac5a14d7f36c52ed9~NPIQoUmz90625406254epsmtrp14;
+	Tue,  7 May 2024 14:52:51 +0000 (GMT)
+X-AuditID: b6c32a44-921fa70000002198-e6-663b0fa0f5b4
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
 	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	C2.4D.09238.0304A366; Tue,  7 May 2024 23:52:32 +0900 (KST)
+	24.4D.09238.3404A366; Tue,  7 May 2024 23:52:51 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.99.41.245]) by
 	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240507145230epsmtip116f7dfb5eeb5ff994f7ca9251b4efd81~NPH9k6x4h2861028610epsmtip1z;
-	Tue,  7 May 2024 14:52:30 +0000 (GMT)
+	20240507145249epsmtip1c3faac5b537feaa70de3c0587ba03e18~NPIPD_g2z2861028610epsmtip11;
+	Tue,  7 May 2024 14:52:49 +0000 (GMT)
 From: Kundan Kumar <kundan.kumar@samsung.com>
 To: axboe@kernel.dk, hch@lst.de, willy@infradead.org
 Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
 	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
 	gost.dev@samsung.com, Kundan Kumar <kundan.kumar@samsung.com>
-Subject: [PATCH v3 0/3] block: add larger order folio instead of pages
-Date: Tue,  7 May 2024 20:15:06 +0530
-Message-Id: <20240507144509.37477-1-kundan.kumar@samsung.com>
+Subject: [PATCH v3 1/3] nvme: adjust multiples of NVME_CTRL_PAGE_SIZE in
+ offset
+Date: Tue,  7 May 2024 20:15:07 +0530
+Message-Id: <20240507144509.37477-2-kundan.kumar@samsung.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240507144509.37477-1-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,109 +71,78 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBJsWRmVeSWpSXmKPExsWy7bCmpu4cfus0gzlTdC2aJvxltlh9t5/N
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGJsWRmVeSWpSXmKPExsWy7bCmuu4Cfus0gyMz1C2aJvxltlh9t5/N
 	4vv2PhaLmwd2MlmsXH2UyeLo/7dsFlu/fGW12HtL2+LGhKeMFtt+z2e2+P1jDpsDt8fmFVoe
 	l8+Wemxa1cnmsftmA5tH35ZVjB6fN8kFsEVl22SkJqakFimk5iXnp2TmpdsqeQfHO8ebmhkY
 	6hpaWpgrKeQl5qbaKrn4BOi6ZeYAHaekUJaYUwoUCkgsLlbSt7Mpyi8tSVXIyC8usVVKLUjJ
-	KTAp0CtOzC0uzUvXy0stsTI0MDAyBSpMyM5YMOcwU8FH0YozhyYwNzAeEOxi5OSQEDCR2HP1
-	KFMXIxeHkMAeRolzl9czgySEBD4xSnz5GQSR+MYo8fVROwtMx+PJ79khEnsZJaaffAHV/plR
-	YtbNI0AZDg42AV2JH02hIA0iQA0vV95mBKlhFjjLKHFi6iOwScICbhKdC7aBrWMRUJXY/2oH
-	O4jNK2ArcWHKTnaIbfISMy99h4oLSpyc+QSslxko3rx1NjNEzUd2iUfPy0D2Sgi4SLTfkoUI
-	C0u8Or4FaoyUxMv+Nig7W+JQ4wYmCLtEYueRBqi4vUTrqX5mkDHMApoS63fpQ4RlJaaeWscE
-	sZVPovf3E6hWXokd82BsNYk576ZCw0dGYuGlGVBxD4k5n5oZIQEaK3FgTTvrBEb5WUiemYXk
-	mVkImxcwMq9ilEotKM5NT002LTDUzUsth8drcn7uJkZwEtUK2MG4esNfvUOMTByMhxglOJiV
-	RHiPtpunCfGmJFZWpRblxxeV5qQWH2I0BQbxRGYp0eR8YBrPK4k3NLE0MDEzMzOxNDYzVBLn
-	fd06N0VIID2xJDU7NbUgtQimj4mDU6qBaR6n70bTKymP/yvWT5rtVrdqxZmNhzIu9dVO9L5z
-	y9tYtzfaOC6Q6/6EzR+qTntd0fFYGWga8N6gY/uFX0unTPc47W/NybYoPdZn6+Jl5V+6lz63
-	CDgqtfOk74vYdzmMQa43L11Tv9OTOHnh8WUPpR5/NRGqb8yqLs57u9p1OpfPJs/QbqlohUM1
-	BawNZbuvTGCV7FjdEBKkuOGvxa29jy7K3Qt9aK5YkaiwifFF7La7fPv1m3da8/xy05FwyjV5
-	+9fRXX3Lk6uGfz3OzbBjsplReXORxj4Fp8rf/TZ3HWYyOc1NOn5z5ZrbVm2vAhVygh/cePHR
-	9GHcpRgnCcmrPOze07VXX9HicZ5ydavYTCWW4oxEQy3mouJEANxBCaErBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKLMWRmVeSWpSXmKPExsWy7bCSnK6Bg1WawZ9edYumCX+ZLVbf7Wez
+	KTAp0CtOzC0uzUvXy0stsTI0MDAyBSpMyM6Y3vObrWAWZ8XKO7tYGhiPsncxcnJICJhI/Nzf
+	x9rFyMUhJLCbUeL64uPMEM4nRolpM+exglQJCXxjlFi52wGmo239OxaIor1ARY0X2SGcz4wS
+	3+aBzOXgYBPQlfjRFArSIALU8HLlbUaQGmaBs4wSJ6Y+YgFJCAsESrzeuwTsDhYBVYmdB7vA
+	bF4BW4k3j/ewQmyTl5h56TtYnFPATqJvzQNGiBpBiZMzn4DNYQaqad46G+xsCYFODom7q35A
+	NbtIrFgE86iwxKvjW6BsKYmX/W1QdrbEocYNTBB2icTOIw1QcXuJ1lP9zCDPMAtoSqzfpQ8R
+	lpWYemodE8RePone30+gWnkldsyDsdUk5rybygJhy0gsvDQDKu4hMevBWmjITWSUmHejn3kC
+	o8IsJP/MQvLPLITVCxiZVzFKphYU56anJpsWGOallsNjOTk/dxMjOMFquexgvDH/n94hRiYO
+	xkOMEhzMSiK8R9vN04R4UxIrq1KL8uOLSnNSiw8xmgIDfCKzlGhyPjDF55XEG5pYGpiYmZmZ
+	WBqbGSqJ875unZsiJJCeWJKanZpakFoE08fEwSnVwLQxN3LnJDfNmfHbDl20zDM+sITh5H2e
+	pSqP060eVa2V2v9LUGHDDtElP+ZPDp7n1bPiRchrpsXnjz7Nu3zmxqMln+01XIJzZr885vXI
+	YOb5gydfP1ObbppxN6TMW+N9OcNmltdrv+bK5SyfdmUiq66QyFeeDWct57lET1neuJCn6579
+	1+0yzm8F7bnP/PrMbitwvGT7ar8N10/sauPcetSDuz9G93he9Bcvw0vXlyknRrx/etSnQsZc
+	mfnY5LmMl3LCL7+9vHCj+r1Jir0XJXryxEOemdypyQu0SJXaWetpNN9Q20Z5MltFdWielWaY
+	b084x+J96TrmLumHdkpOdd6hk3/6k+CBeZ9Tz0vmciUqsRRnJBpqMRcVJwIAvrxcgzkEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLLMWRmVeSWpSXmKPExsWy7bCSnK6zg1Wawc4OMYumCX+ZLVbf7Wez
 	+L69j8Xi5oGdTBYrVx9lsjj6/y2bxdYvX1kt9t7Strgx4Smjxbbf85ktfv+Yw+bA7bF5hZbH
-	5bOlHptWdbJ57L7ZwObRt2UVo8fnTXIBbFFcNimpOZllqUX6dglcGQvmHGYq+ChacebQBOYG
-	xgOCXYycHBICJhKPJ79n72Lk4hAS2M0ocffbF0aIhIzE7rs7WSFsYYmV/55DFX1klHg66xBQ
-	goODTUBX4kdTKEiNiICFxPPm5UwgNcwC1xklbkzfygySEBZwk+hcsA3MZhFQldj/agc7iM0r
-	YCtxYcpOdogF8hIzL32HigtKnJz5hAXEZgaKN2+dzTyBkW8WktQsJKkFjEyrGCVTC4pz03OT
-	DQsM81LL9YoTc4tL89L1kvNzNzGCQ1pLYwfjvfn/9A4xMnEwHmKU4GBWEuE92m6eJsSbklhZ
-	lVqUH19UmpNafIhRmoNFSZzXcMbsFCGB9MSS1OzU1ILUIpgsEwenVAPT+Xm8fe9y5rldPt0V
-	Gh1Yt0hTbFFg1r4dfSx3bFjeaBQ0++g/Ypk4UTb+uMBTBc1L5RPmXK+/q8ce8Pxx+675Gb8P
-	Kguvy8vqkeDYdX692+prMXc7TraL7prFdELVs3WlRc/pEoVEzSMLyz47WIrViTRsD5bYb5wg
-	wsKdu/mB0k6j9s1Nm/9ONH1VfP/ewpPFjl7Wm/5t7eWzPBX6/JC9+Itgq+/7+j12G04w/ziv
-	fk7Y76DonMnJp1Qv3F+7UimtS+79ma7Jh68n3y+sLuP9O2PeVrEaOe4729V8L+i+/rFxUdun
-	pIqPQelNFcniP83MlxwwyV6evC77kfvr3w8UJXsuSH/rS+fSm86jm7daiaU4I9FQi7moOBEA
-	yaSED9gCAAA=
-X-CMS-MailID: 20240507145232epcas5p481986099a82b1880758b7770cdeaf2d2
+	5bOlHptWdbJ57L7ZwObRt2UVo8fnTXIBbFFcNimpOZllqUX6dglcGdN7frMVzOKsWHlnF0sD
+	41H2LkZODgkBE4m29e9Yuhi5OIQEdjNKPHjZzwKRkJHYfXcnK4QtLLHy33N2iKKPjBKd5/6x
+	dTFycLAJ6Er8aAoFqRERsJB43rycCaSGWeA6o8SN6VuZQRLCAv4SiyZuAtvGIqAqsfNgF5jN
+	K2Ar8ebxHqgF8hIzL30Hi3MK2En0rXnACGILAdXc/rqWDaJeUOLkzCdgxzED1Tdvnc08gVFg
+	FpLULCSpBYxMqxglUwuKc9Nzkw0LDPNSy/WKE3OLS/PS9ZLzczcxgmNAS2MH4735//QOMTJx
+	MB5ilOBgVhLhPdpunibEm5JYWZValB9fVJqTWnyIUZqDRUmc13DG7BQhgfTEktTs1NSC1CKY
+	LBMHp1QDE2/11zuxvhOWnGq2MBUyLu+zlvOp79R6uLYl8veHvTKq9befnd3Z6+m0ZZJi5zYl
+	o9aNDDrcd923ZrgqXMibtT6DO/FNh+JWVbPGmw767ky6JVxqvtp33ZcUcvs8//v1zNvO11z3
+	LjvtZdNV2aq9VO4ad26SlO2zE24bzAqsv2r4hna8ePde5XrVas1Ni5Z/8j6klsljNP3E9k8P
+	zHSXvclbyLuYv2xn1+Rnpq7nY94eXeE6Y/tm3Zcuj2pyZRrXPGNRiC0sXunS94VvUlPtyYSn
+	8+VmG7qxd8jMn89gwy6n/Zw/gHP5xeTpj5J0Q37s2H/j4LEAVsn31yI2We6ZMunc7ofWby9Y
+	/vdcqKvWrcRSnJFoqMVcVJwIAK8/EFrwAgAA
+X-CMS-MailID: 20240507145251epcas5p29e95da982219c6a1c196182fe70a45f5
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: REQ_APPROVE
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240507145232epcas5p481986099a82b1880758b7770cdeaf2d2
-References: <CGME20240507145232epcas5p481986099a82b1880758b7770cdeaf2d2@epcas5p4.samsung.com>
+X-CMS-RootMailID: 20240507145251epcas5p29e95da982219c6a1c196182fe70a45f5
+References: <20240507144509.37477-1-kundan.kumar@samsung.com>
+	<CGME20240507145251epcas5p29e95da982219c6a1c196182fe70a45f5@epcas5p2.samsung.com>
 
-User space memory is mapped in kernel in form of pages array. These pages
-are iterated and added to BIO. In process, pages are also checked for
-contiguity and merged.
+bio_vec start offset may be relatively large particularly when large
+folio was added to the bio. A bigger offset will result in avoiding the
+single-segment mapping optimization and end up using expensive
+mempool_alloc further.
 
-When mTHP is enabled the pages generally belong to larger order folio. The
-pages from larger order folio need not be checked for contiguity and can be
-added directly as a big chunk.
+Rather than using absolute value, adjust bv_offset by
+NVME_CTRL_PAGE_SIZE while checking if segment can be fitted into one/two
+PRP entries.
 
-This patch series enables adding large folio to bio. It fetches folio for
-page in the page array. The page might start from an offset in the folio
-which could be multiples of PAGE_SIZE. Subsequent pages in page array
-might belong to same folio. Using the length of folio, folio_offset and
-remaining size, determine length in folio which shall be added to the
-bio. Further processing is skipped for these pages. This reduces the
-overhead of iterating through pages.
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kundan Kumar <kundan.kumar@samsung.com>
+---
+ drivers/nvme/host/pci.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-perf diff before and after this change:
-
-Perf diff for write I/O with 128K block size:
-        1.26%     -1.04%  [kernel.kallsyms]  [k] bio_iov_iter_get_pages
-        1.74%             [kernel.kallsyms]  [k] bvec_try_merge_page
-Perf diff for read I/O with 128K block size:
-        4.40%     -3.63%  [kernel.kallsyms]  [k] bio_iov_iter_get_pages
-        5.60%             [kernel.kallsyms]  [k] bvec_try_merge_page
-
-Patch 1: Ignores bigger offset and helps driver to keep using PRP for I/Os
-if length is one or two PRPs
-Patch 2: Adds changes to add larger order folio to BIO.
-Patch 3: If a large folio gets added, the subsequent pages of the folio are
-released. This helps to avoid calculations at I/O completion.
-
-Previous Postings
------------------
-v1: https://lore.kernel.org/all/20240419091721.1790-1-kundan.kumar@samsung.com/
-v2: https://lore.kernel.org/linux-block/33717b97-8986-4d6e-aa10-47393b810ea2@suse.de/T/#m31564a9c6ae30e32e560dd8c76d26a3290a875aa
-
-Changes since v2:
-- Made separate patches
-- Corrected code as per kernel coding style
-- Removed size_folio variable
-
-Changes since v1:
-- Changed functions bio_iov_add_page() and bio_iov_add_zone_append_page() to
-  accept a folio
-- Removed branch and calculate folio_offset and len in same fashion for both
-  0 order and larger folios
-- Added change in NVMe driver to use nvme_setup_prp_simple() by
-  ignoring multiples of PAGE_SIZE in offset
-- Added a change to unpin_user_pages which were added as folios. Also stopped
-  the unpin of pages one by one from __bio_release_pages()(Suggested by
-  Keith)
-
-Kundan Kumar (3):
-  nvme: adjust multiples of NVME_CTRL_PAGE_SIZE in offset
-  block: add folio awareness instead of looping through pages
-  block: unpin user pages belonging to a folio
-
- block/bio.c             | 50 +++++++++++++++++++++++------------------
- drivers/nvme/host/pci.c |  3 ++-
- 2 files changed, 30 insertions(+), 23 deletions(-)
-
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 8e0bb9692685..c6408871466f 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -778,7 +778,8 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 		struct bio_vec bv = req_bvec(req);
+ 
+ 		if (!is_pci_p2pdma_page(bv.bv_page)) {
+-			if (bv.bv_offset + bv.bv_len <= NVME_CTRL_PAGE_SIZE * 2)
++			if ((bv.bv_offset & (NVME_CTRL_PAGE_SIZE - 1)) +
++			     bv.bv_len <= NVME_CTRL_PAGE_SIZE * 2)
+ 				return nvme_setup_prp_simple(dev, req,
+ 							     &cmnd->rw, &bv);
+ 
 -- 
 2.25.1
 
