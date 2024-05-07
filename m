@@ -1,128 +1,91 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCBE1635AD;
-	Tue,  7 May 2024 15:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EC81649D3;
+	Tue,  7 May 2024 16:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715095172; cv=none; b=MUa9YvvciFrYdGvDrmrrCwvZs945sKL2JNHkYabz/18ZOWq1kxbc9jxNZTzo3BiPK4ZgaIsrrwDgX2DI3J3AiOVkaYrtvGS3CjfBiLskfAnR8anPqQcfElkKXsB22jDLuD1JSXXeD/ihJsbbOB4W4Tsho+y4zMwUutzBjokUzrg=
+	t=1715097638; cv=none; b=l/pHSOcT6el9wIdkcrKKigHNyeTAs/jj/Uy6mx4YI3ZEfuWPmgfQyfs5dkUCkVKI1bo/2rF4aQEc+9yqc6BJJiv5dtCeWkR/x0P7SUkY2j2fyawp1SdMjTlwF2kHoYTMc3PwXFVsYp+VSrXdAQrqiiYBTDlZUWpK4xP1go8//M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715095172; c=relaxed/simple;
-	bh=HCiNuMOgUWLAa2QGV+NRM5PIIgw4/qkm4rQshhilttE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hFq+e7vbzuhUL183fepk5cpq+0/21LRea4QI6SFqHRoYaNjJngwtzu88a9FJ4rA/Voa8ZXmrb/mMYPcZ+c6LXyRtZTN8sp2f6VqD4XiwNxfG5Ut/hs11QH5vOcCR0TduimtFjg5jwlspHjLGPiqGWg4it7fwRiahaHVXL0vW11k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1F1A1063;
-	Tue,  7 May 2024 08:19:51 -0700 (PDT)
-Received: from [10.1.34.28] (e133047.arm.com [10.1.34.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F3D23F587;
-	Tue,  7 May 2024 08:19:22 -0700 (PDT)
-Message-ID: <80da988f-899e-4b93-a648-ffd0680d4000@arm.com>
-Date: Tue, 7 May 2024 16:19:20 +0100
+	s=arc-20240116; t=1715097638; c=relaxed/simple;
+	bh=6+Gkl/pRAYqQQn7gSCq0pRNOmE+2kE7WdPcvYkYcoPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IhtbGMXZhT1ceOijliAQH+37TTlL7NtGGg3pcIgWNofePTXyHCHC3I0vH7+5shOHR08CPvmEIlFQ/R8nmzr/wuZV/5udQvGNuXy0sW3t6IF1/d6mlbxqaiveW4R74S+07WS+aCFEvZGS/3xlmpqPGBdH+T2Caf20TkV4x81KX4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SpiBK44a; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SpiBK44a"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ry5qXfj/Y6VuUjlQ1iK9ZLpA72CsG7mprzoo7D4E3bg=; b=SpiBK44aWoWuuaBLExkMFMiHu6
+	59YnYanRygofKHL+QFtmNCWPfEw5RUMULVykGljX/cX6mslfgct4hX/Wmz2hesYaVwBdaPy7U9TET
+	6af/i+mb+e6B+B0gbG7i4Kzmtaf8SX+ITnr2SEjC7gzbazcSUGiKHfdJKav8LffZ47Gd1/VLK9kgV
+	WrL8V6l3wZUt8T+QH7TCNmp8Hc79tPUppdhsue2bmXiGg+LIOq+/QBSSc+d0xPE2FqVxQt36LSa0Q
+	DIzTOUjF/P7IySbT2YfZUOsWQbZMdNg0BqEerQcLYx8+Xmrw2if9KkAMTAjsg/crFC0494N6pwsRn
+	jxH6214A==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s4NEy-0000000DYyd-30hx;
+	Tue, 07 May 2024 16:00:28 +0000
+Date: Tue, 7 May 2024 17:00:28 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: akpm@linux-foundation.org, djwong@kernel.org, brauner@kernel.org,
+	david@fromorbit.com, chandan.babu@oracle.com, hare@suse.de,
+	ritesh.list@gmail.com, john.g.garry@oracle.com, ziy@nvidia.com,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, kernel@pankajraghav.com
+Subject: Re: [PATCH v5 07/11] iomap: fix iomap_dio_zero() for fs bs > system
+ page size
+Message-ID: <ZjpQHA1zcLhUZa_D@casper.infradead.org>
+References: <20240503095353.3798063-1-mcgrof@kernel.org>
+ <20240503095353.3798063-8-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/2] cpufreq/schedutil: Remove iowait boost
-To: Qais Yousef <qyousef@layalina.io>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-kernel@vger.kernel.org,
- peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
- dietmar.eggemann@arm.com, vschneid@redhat.com, vincent.guittot@linaro.org,
- Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com, ulf.hansson@linaro.org,
- andres@anarazel.de, asml.silence@gmail.com, linux-pm@vger.kernel.org,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <20240304201625.100619-1-christian.loehle@arm.com>
- <20240304201625.100619-3-christian.loehle@arm.com>
- <CAJZ5v0gMni0QJTBJXoVOav=kOtQ9W--NyXAgq+dXA+m-bciG8w@mail.gmail.com>
- <5060c335-e90a-430f-bca5-c0ee46a49249@arm.com>
- <CAJZ5v0janPrWRkjcLkFeP9gmTC-nVRF-NQCh6CTET6ENy-_knQ@mail.gmail.com>
- <20240325023726.itkhlg66uo5kbljx@airbuntu>
- <d99fd27a-dac5-4c71-b644-1213f51f2ba0@arm.com>
- <20240429111816.mqok5biihvy46eba@airbuntu>
-Content-Language: en-US
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <20240429111816.mqok5biihvy46eba@airbuntu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240503095353.3798063-8-mcgrof@kernel.org>
 
-On 29/04/2024 12:18, Qais Yousef wrote:
-> On 04/19/24 14:42, Christian Loehle wrote:
-> 
->>> I think the major thing we need to be careful about is the behavior when the
->>> task is sleeping. I think the boosting will be removed when the task is
->>> dequeued and I can bet there will be systems out there where the BLOCK softirq
->>> being boosted when the task is sleeping will matter.
->>
->> Currently I see this mainly protected by the sugov rate_limit_us.
->> With the enqueue's being the dominating cpufreq updates it's not really an
->> issue, the boost is expected to survive the sleep duration, during which it
->> wouldn't be active.
->> I did experiment with some sort of 'stickiness' of the boost to the rq, but
->> it is somewhat of a pain to deal with if we want to remove it once enqueued
->> on a different rq. A sugov 1ms timer is much simpler of course.
->> Currently it's not necessary IMO, but for the sake of being future-proof in
->> terms of more frequent freq updates I might include it in v2.
-> 
-> Making sure things work with purpose would be really great. This implicit
-> dependency is not great IMHO and make both testing and reasoning about why
-> things are good or bad harder when analysing real workloads. Especially by non
-> kernel developers.
+On Fri, May 03, 2024 at 02:53:49AM -0700, Luis Chamberlain wrote:
+> +	bio = iomap_dio_alloc_bio(iter, dio, BIO_MAX_VECS,
+> +				  REQ_OP_WRITE | REQ_SYNC | REQ_IDLE);
+>  	fscrypt_set_bio_crypt_ctx(bio, inode, pos >> inode->i_blkbits,
+>  				  GFP_KERNEL);
+> +
+>  	bio->bi_iter.bi_sector = iomap_sector(&iter->iomap, pos);
+>  	bio->bi_private = dio;
+>  	bio->bi_end_io = iomap_dio_bio_end_io;
+>  
+> -	__bio_add_page(bio, page, len, 0);
+> +	while (len) {
+> +		unsigned int io_len = min_t(unsigned int, len, PAGE_SIZE);
+> +
+> +		__bio_add_page(bio, page, io_len, 0);
+> +		len -= io_len;
+> +	}
+>  	iomap_dio_submit_bio(iter, dio, bio, pos);
 
-Agreed.
-Even without your proposed changes [1] relying on sugov rate_limit_us is
-unfortunate.
-There is a problem with an arbitrarily low rate_limit_us more generally, not
-just because we kind of rely on the CPU being boosted right before the task is
-actually enqueued (for the interrupt/softirq part of it), but also because of
-the latency from requested frequency improvement to actually running on that
-frequency. If the task is 90% done by the time it sees the improvement and
-the frequency will be updated (back to a lower one) before the next enqueue,
-then that's hardly worth the effort.
-Currently this is covered by rate_limit_us probabillistically and that seems
-to be good enough in practice, but it's not very pleasing (and also EAS can't
-take it into consideration).
-That's not just exclusive for iowait wakeup tasks of course, but in theory any
-that is off the rq frequently (and still requests a higher frequency than it can
-realistically build up through util_avg like through uclamp_min).
+If the len is more than PAGE_SIZE * BIO_MAX_VECS, __bio_add_page()
+will fail silently.  I hate this interface.
 
->>>
->>> FWIW I do have an implementation for per-task iowait boost where I went a step
->>> further and converted intel_pstate too and like Christian didn't notice
->>> a regression. But I am not sure (rather don't think) I triggered this use case.
->>> I can't tell when the systems truly have per-cpu cpufreq control or just appear
->>> so and they are actually shared but not visible at linux level.
->>
->> Please do share your intel_pstate proposal!
-> 
-> This is what I had. I haven't been working on this for the past few months, but
-> I remember tried several tests on different machines then without a problem.
-> I tried to re-order patches at some point though and I hope I didn't break
-> something accidentally and forgot the state.
-> 
-> https://github.com/torvalds/linux/compare/master...qais-yousef:linux:uclamp-max-aggregation
-> 
+You should be doing something like ...
 
-Thanks for sharing, that looks reasonable with consolidating it into uclamp_min.
-Couple of thoughts on yours, I'm sure you're aware, but consider it me thinking out
-loud:
-- iowait boost is taken into consideration for task placement, but with just the
-4 steps that made it more aggressive on HMP. (Potentially 2-3 consecutive iowait
-wakeups to land on the big instead of running at max OPP of a LITTLE).
-- If the current iowait boost decay is sensible is questionable, but there should
-probably be some decay. Taken to the extreme this would mean something
-like blk_wait_io() demands 1024 utilization, if it waits for a very long time.
-Repeating myself here, but iowait wakeups itself is tricky to work with (and I
-try to work around that).
-- The intel_pstate solution will increase boost even if
-previous_wakeup->iowait_boost > current->iowait_boost
-right? But using current->iowait_boost is a clever idea.
+	while (len) {
+		unsigned int io_len = min_t(unsigned int, len, PAGE_SIZE);
 
-[1]
-https://lore.kernel.org/lkml/ZgKFT5b423hfQdl9@gmail.com/T/
-
-Kind Regards,
-Christian
+		while (!bio || bio_add_page() < io_len) {
+			if (bio)
+				iomap_dio_submit_bio(iter, dio, bio, pos);
+			bio = iomap_dio_alloc_bio(iter, dio, BIO_MAX_VECS,
+					REQ_OP_WRITE | REQ_SYNC | REQ_IDLE);
+		 	fscrypt_set_bio_crypt_ctx(bio, inode,
+					pos >> inode->i_blkbits, GFP_KERNEL);
+		}
+	}
