@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFF97D41C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD327E11E;
 	Wed,  8 May 2024 10:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715162586; cv=none; b=Uevpuz7SHGJyJWVILHwWSv1g9dervyNOsMG60xPOevIh6O6JNH4KOdsS86GvQd8xt7i2Dq4QyymtqZ9coz6hX1HsDyweM6U5pc5X0WQZFUn8b6mP7CZT5tY6x5joNfd1a355jMNWaACgcR/cH61y+7dYdyiZG9Ib70T/ftyCvWY=
+	t=1715162585; cv=none; b=RQIBmmWLAcUeTQBfGqRwPUJbF2zziUMh7krqlKxAzDdmnsEURRGd5rXpJBW4UPjZ0QFX/Xq1ThvB6FdtlL0u487JTQ5PWUgKljYirWRllkChyCnW8dr7vL6JwSuTkk2sg47wtN3Ubq6wg0sgIMvqqcgS0HLdz5cr7DONM8Lv67I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715162586; c=relaxed/simple;
-	bh=dvBMB/3tVBl91UmE/Oqq9GwFm49AFiuEmYF2r5QUheY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=IxAWWqfCI8lDJVbFbzBX8pgChfewEtZVynkssawvQOVW3LS8nlXjrcXjv3LtWFa5NgyGm68MzqrhewOwnCrQFKQmcdaePV2I1ygYo8Q2TzXBjvMO/3fW7KdY99WcX7IrJpLMbedkFt2PG4Ip4AfTdRzqgLef0+bINzUgQrzZmdY=
+	s=arc-20240116; t=1715162585; c=relaxed/simple;
+	bh=yYyo9J9LbrfncpB2CWVjqJhM6aD/eyXV6B0l1bR9NkI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=bx7MTKAwffy3bd0r14NS5gjJn/kHrpgQEAJsv/SyFg0vvROSxLIDg5q0x3BMYJL8XN2EOqxy0pt3BCEd6yFCLrSbN/ytwk1nQxzPVNm/jea1V4zQ+AF7ID4OVZyxtvOogCdFySjsXspn6lhA3ogHnm7hK76pcD7X88uKCThTuFg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-d85ff70000001748-95-663b4a39c48b
+X-AuditID: a67dfc5b-d85ff70000001748-45-663b4a3836b1
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -71,43 +71,43 @@ Cc: kernel_team@skhynix.com,
 	longman@redhat.com,
 	hdanton@sina.com,
 	her0gyugyu@gmail.com
-Subject: [PATCH v14 08/28] dept: Distinguish each work from another
-Date: Wed,  8 May 2024 18:47:05 +0900
-Message-Id: <20240508094726.35754-9-byungchul@sk.com>
+Subject: [PATCH v14 03/28] dept: Add single event dependency tracker APIs
+Date: Wed,  8 May 2024 18:47:00 +0900
+Message-Id: <20240508094726.35754-4-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240508094726.35754-1-byungchul@sk.com>
 References: <20240508094726.35754-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSeUiTcRjH+/3e09XidRa9GVQsKjJSi46ngyiiersgkCIMqpWvOZpTZmoK
-	gbW5zFLs0NUS8WIburS2EjusZTmPlVmZRzgvIpM8QtvIlGxa/fPw4ft8+PL88bCE7CEVyCrV
-	Z0WNWqGS0xJSMjirYNXGvZsjQ81pa+Da1VDw/EgjIbfcSkNTWSkC64MLGPprdkOrdwDB+Ju3
-	BBiymxAU9LgJeODsRFBluUjDh8+zodkzTEN99hUatEXlNLz7NoGhI+c6hlLbAXBlFWJwjPWR
-	YOin4Y5Bi33jK4YxUwkDppSl0GsxMjDRsxrqO1soqPq0Em7nddDwtKqeBGdlL4YPj3Np6LRO
-	UuBy1pHQdC2DgrtDhTR885oIMHmGGXjvyMdwT+cr0o/+pqA2w4FBX3wfQ3P7EwTP0rox2Kwt
-	NLz0DGCw27IJ+GWuQdCbOchA6tUxBu5cyERwJTWHBF3HOhj/mUtv2yi8HBgmBJ09Uajy5pNC
-	QyEvPDK6GUH37BMj5NviBbslSCh62o+FghEPJdhKLtOCbeQ6I6QPNmNhqLGREepujZPC52YD
-	PhgYLtkSIaqUCaImZOsJSZSrLhvHDgecM1Z0oRRUxqUjP5bn1vIN78zUfzY+dNFTTHPL+ba2
-	MWKK53CLeXvGl2mH4AYkfHHjrikO4Hbw1Ub3dE5yS/lXeTenfSm3jm9wjZJ/Oxfxpfcc07kf
-	t55v7xtCUyzzOU+0RiYdSXzOT5Z/3Zf574j5/AtLG5mFpPloRgmSKdUJ0Qqlam1wVJJaeS74
-	VEy0DfmeyXR+4mglGmkKq0Yci+SzpI55myJllCIhLim6GvEsIZ8jrbm0IVImjVAkJYuamOOa
-	eJUYV40WsKR8nnSNNzFCxp1WnBXPiGKsqPm/xaxfYAoq8fbY83oWdB0mVmQhZ4w9xRgw7lrY
-	fWKf+ujoLv8crz19+c5jluJ2N3VEbV6iL/qoX1RxaHFp2Y3Wk5Pa5ye37A8zfE/+mqT7nTp3
-	/+CjsBxtcG/otqDwblpfG41/FKoMz5ND+tPC/eVd263dt+5bZuqKjky6ncr3e1qXnVnJmuVk
-	XJRidRChiVP8AaNl6EpIAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0hTcRzF+/3ua45WlyV5sSdLCXpYQda3FtGLukTvf4r+qVXXHOqUTU2F
-	SNOepqmlqzV1mS3xkTV710RcmjayleYrdbmkKS0X2cSlZc7on8OHcw7nryMipFoqUKRUxQpq
-	lSJSRotJ8S556tI12+Vhy0cdsyH70nLw/DxPgr6ynAbb3TIE5Q9SMAzUbYO2YReC0TdvCdDm
-	2hDc7O0m4EF9DwJzyWkamvumQYvHTUNjbjoNqbcqaXj3dQxDV14OhjLTTrBmFWGo8TpJ0A7Q
-	cEObiiekH4PXWMqAMTkYHCU6BsZ6V0BjTysFlvxGCsydi+F6QRcNL8yNJNQ/cWBofqanoad8
-	nAJrfQMJtuwMCioGi2j4OmwkwOhxM/C+xoDhXtrE2tmhPxS8yqjBcLb4PoaWjucIqs9/wmAq
-	b6XB4nFhqDLlEvDrTh0CR+Y3Bs5c8jJwIyUTQfqZPBLSukJhdERPb1jLW1xugk+rOsGbhw0k
-	/7qI45/quhk+rbqT4Q2mOL6qZBF/68UA5m/+8FC8qfQCzZt+5DD8xW8tmB9samL4hmujJN/X
-	osV7Zh0UrzsmRCrjBfWy9YfF4daGXBzjnpGge2RHyeguexH5iTh2Jad7aKV9TLMLufZ2L+Fj
-	f3Y+V5XxhfIxwbrEXHHTVh/PYDdztbruSZ9kg7mXBVcn+xI2lHttHSL/bc7jyu7VTPp+7Cqu
-	wzmIfCyd6DxP1TFZSGxAU0qRv1IVH6VQRoaGaCLCE1XKhJCj0VEmNHEX48mx7CfoZ/O2WsSK
-	kGyqxEbLw6SUIl6TGFWLOBEh85fUnVsdJpUcUyQmCeroQ+q4SEFTi2aJSFmAZPt+4bCUPa6I
-	FSIEIUZQ/0+xyC8wGQW07bySxS7Ykvk0pHLJ9H5n4ALLwaBmeXdO58LVJUnz/yj2xUcYV6bn
-	WWJi028r+y9PHy+2V7xp1Q3Ko09M/b7W/dvqnXtgvzS52n7KYD9UOHNv0qbSkZHPwfv0Gx/b
-	dBUu5+78I9M+Bn0oTHFkaYXxOcsK9WInNqvsIaq+FL1xh4zUhCtWLCLUGsVflGbi5CoDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTZxTH9zz3lTs6r5XIFT64dFETDSoG9PgSs8RE74y6RY0f9ANWe7HV
+	gloERWMCUhgW0WrEbpUpINYGqmBrjC+AtaQoELFqVTCUCKljjVC02moFpwXjl5Nfzvn/f58O
+	S8gdVBKryd4n6bKVWgXNkdxwfHXK4tVLM+dfHOXg5LH5EH5fSkJlg40Gz5V6BLZrhRgC7lXw
+	PDKEYPTBQwJMFR4E1f0+Aq619SFoth6h4Yn/J/CGR2horyijoehCAw2PXo9h6D1zCkO9fS10
+	GmswOKODJJgCNJw1FeHY+A9D1FLHgKVgBgxYzQyM9adCe98zCppfzIG/z/XS0NTcTkLbjQEM
+	T25V0tBn+0JBZ9t9Ejwnyym4HKyh4XXEQoAlPMLAY2cVhkZ9TFTy7n8K7pU7MZTUXsXg7bmN
+	oKX0JQa77RkNreEhDA57BQGfLrkRDBwfZqD4WJSBs4XHEZQVnyFB35sOox8r6V8Xi61DI4So
+	d+wXmyNVpNhRI4g3zT5G1Le8YMQqe67osM4WLzQFsFgdClOive4oLdpDpxjRMOzFYrCrixHv
+	/zVKin6vCf+RtJlbppK0mjxJN2/5Vk7tMpqpPc8TD0RM0wuQV25AcazApwldw6+I7/zWYptg
+	mp8ldHdHJziB/1lwlP9LjTPBD3FCbdfKcZ7C/yY8bXzDGBDLkvwMocc4ZXwt49OFPl8n/qac
+	LtQ3Oic0cfxCoWcwiMZZHsvcLjLHqlws85EVzJYg9a0wTbhr7SaNSFaFfqhDck12XpZSo02b
+	q87P1hyYu313lh3FXslyeGzLDRTybHAhnkWKeJkzcUmmnFLm5eRnuZDAEooEmfvPRZlymUqZ
+	f1DS7c7Q5WqlHBdKZklFomxBZL9Kzu9Q7pN2SdIeSff9itm4pAKkTVQd8oMv/s670KdJCTO5
+	8/0dq93qvRt/8Y/9s+5Ex4Ied/pggff6j7lrjCo20KRsXbc+dXmywW8XHC69j9u0xaFLNzxc
+	Mblw79Q3DbRnfeDSTtNp98vP1schfbItJa32Q0YwevpDKabLplkNRb8XZuDiRUtajpblq0v4
+	lM/bFGSOWpk6m9DlKL8Cl/UHnUYDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTcRjG+//P1dnqMCUP+cEYdMFIk7RetDthpyipT0UENfKYS52xqWVo
+	WFNT09BAV17CSy3RVTbNrDSW4tIss1zpTFeaZNLSbhst18UVfXn58TwPv08vS8iKqYWsUpUk
+	qlWKeDktISVREdoVsD0iZmW/IwSK8leC41sOCeU3DDT0Xa9HYGg6hWGycysMOO0IZp48JUBX
+	3IeganSEgCazDUFb7Wka+sfngcUxTUN38VkatDU3aHj2wY1huOQ8hnrjTugprMZgck2QoJuk
+	oUynxbPnPQaXvo4BfcZiGKstZcA9GgLdtpcUdFR0U9A2tBwuXhqmobWtmwRzyxiG/rvlNNgM
+	vynoMXeR0FdUQMG1qWoaPjj1BOgd0ww8N1ViaMictWV//UXBwwIThuzLNzFYrPcQ3M95g8Fo
+	eElDh8OOodFYTMCPq50Ixs59ZCAr38VA2alzCM5mlZCQORwGM9/L6Y3hQod9mhAyG48Jbc5K
+	UnhUzQt3SkcYIfP+ECNUGpOFxtpAoaZ1EgtVXxyUYKzLpQXjl/OMkPfRgoWp3l5G6LowQwrj
+	Fh3e5b9PsjZajFemiOrg9Qclse2FpdTRAb/jTl1ABrLI8pAXy3Oh/Ge9gfAwzS3lBwddf9mX
+	W8Q3FryjPExwdgl/uTfSwz7cNv5FwycmD7EsyS3mrYU+nljKhfG2kR78TxnA1zeY/mq8uNW8
+	dWIKeVg2u7mnLWUKkaQSzalDvkpVSoJCGR8WpImLTVUpjwcdSkwwotln0ae7i1rQt/6t7Yhj
+	kXyutI+OiJFRihRNakI74llC7ivtPLMmRiaNVqSeENWJB9TJ8aKmHfmzpNxPun2PeFDGHVYk
+	iXGieFRU/28x67UwA+2TOVOhaUVGy25r8o7DEYMtFa+cri0ynb8k3b3Otlb6uOzW5qr5reb1
+	u3NfaJWbUqrqLHRIbqItMHf/kYAN7gfRzeFBWwzWS2yFd7B3GsoPDm2+ElewyGEPjEyf9yZ8
+	geL2yZ+R3hO39pY8cS9JOyBvjqqGZa2rxNdvs0wq81iUnNTEKkICCbVG8QdySKOkKAMAAA==
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -115,81 +115,108 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Workqueue already provides concurrency control. By that, any wait in a
-work doesn't prevents events in other works with the control enabled.
-Thus, each work would better be considered a different context.
+Wrapped the base APIs for easier annotation on wait and event. Start
+with supporting waiters on each single event. More general support for
+multiple events is a future work. Do more when the need arises.
 
-So let Dept assign a different context id to each work.
+How to annotate (the simplest way):
+
+1. Initaialize a map for the interesting wait.
+
+   /*
+    * Recommand to place along with the wait instance.
+    */
+   struct dept_map my_wait;
+
+   /*
+    * Recommand to place in the initialization code.
+    */
+   sdt_map_init(&my_wait);
+
+2. Place the following at the wait code.
+
+   sdt_wait(&my_wait);
+
+3. Place the following at the event code.
+
+   sdt_event(&my_wait);
+
+That's it!
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/dept.h     |  2 ++
- kernel/dependency/dept.c | 10 ++++++++++
- kernel/workqueue.c       |  3 +++
- 3 files changed, 15 insertions(+)
+ include/linux/dept_sdt.h | 62 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+ create mode 100644 include/linux/dept_sdt.h
 
-diff --git a/include/linux/dept.h b/include/linux/dept.h
-index 4e359f76ac3c..319a5b43df89 100644
---- a/include/linux/dept.h
-+++ b/include/linux/dept.h
-@@ -509,6 +509,7 @@ extern void dept_ecxt_exit(struct dept_map *m, unsigned long e_f, unsigned long
- extern void dept_sched_enter(void);
- extern void dept_sched_exit(void);
- extern void dept_kernel_enter(void);
-+extern void dept_work_enter(void);
- 
- static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
- {
-@@ -559,6 +560,7 @@ struct dept_task { };
- #define dept_sched_enter()				do { } while (0)
- #define dept_sched_exit()				do { } while (0)
- #define dept_kernel_enter()				do { } while (0)
-+#define dept_work_enter()				do { } while (0)
- #define dept_ecxt_enter_nokeep(m)			do { } while (0)
- #define dept_key_init(k)				do { (void)(k); } while (0)
- #define dept_key_destroy(k)				do { (void)(k); } while (0)
-diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 9aba9eb22760..a8e693fd590f 100644
---- a/kernel/dependency/dept.c
-+++ b/kernel/dependency/dept.c
-@@ -1933,6 +1933,16 @@ void noinstr dept_hardirqs_off(void)
- 	dept_task()->hardirqs_enabled = false;
- }
- 
+diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
+new file mode 100644
+index 000000000000..12a793b90c7e
+--- /dev/null
++++ b/include/linux/dept_sdt.h
+@@ -0,0 +1,62 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * Assign a different context id to each work.
++ * Single-event Dependency Tracker
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (c) 2020 LG Electronics, Inc., Byungchul Park
 + */
-+void dept_work_enter(void)
-+{
-+	struct dept_task *dt = dept_task();
 +
-+	dt->cxt_id[DEPT_CXT_PROCESS] += 1UL << DEPT_CXTS_NR;
-+}
++#ifndef __LINUX_DEPT_SDT_H
++#define __LINUX_DEPT_SDT_H
 +
- void noinstr dept_kernel_enter(void)
- {
- 	struct dept_task *dt = dept_task();
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index d2dbe099286b..e7b3818a26eb 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -55,6 +55,7 @@
- #include <linux/kvm_para.h>
- #include <linux/delay.h>
- #include <linux/irq_work.h>
++#include <linux/kernel.h>
 +#include <linux/dept.h>
- 
- #include "workqueue_internal.h"
- 
-@@ -3184,6 +3185,8 @@ __acquires(&pool->lock)
- 
- 	lockdep_copy_map(&lockdep_map, &work->lockdep_map);
- #endif
-+	dept_work_enter();
 +
- 	/* ensure we're on the correct CPU */
- 	WARN_ON_ONCE(!(pool->flags & POOL_DISASSOCIATED) &&
- 		     raw_smp_processor_id() != pool->cpu);
++#ifdef CONFIG_DEPT
++#define sdt_map_init(m)							\
++	do {								\
++		static struct dept_key __key;				\
++		dept_map_init(m, &__key, 0, #m);			\
++	} while (0)
++
++#define sdt_map_init_key(m, k)		dept_map_init(m, k, 0, #m)
++
++#define sdt_wait(m)							\
++	do {								\
++		dept_request_event(m);					\
++		dept_wait(m, 1UL, _THIS_IP_, __func__, 0);		\
++	} while (0)
++
++/*
++ * sdt_might_sleep() and its family will be committed in __schedule()
++ * when it actually gets to __schedule(). Both dept_request_event() and
++ * dept_wait() will be performed on the commit.
++ */
++
++/*
++ * Use the code location as the class key if an explicit map is not used.
++ */
++#define sdt_might_sleep_start(m)					\
++	do {								\
++		struct dept_map *__m = m;				\
++		static struct dept_key __key;				\
++		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__);\
++	} while (0)
++
++#define sdt_might_sleep_end()		dept_clean_stage()
++
++#define sdt_ecxt_enter(m)		dept_ecxt_enter(m, 1UL, _THIS_IP_, "start", "event", 0)
++#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__)
++#define sdt_ecxt_exit(m)		dept_ecxt_exit(m, 1UL, _THIS_IP_)
++#else /* !CONFIG_DEPT */
++#define sdt_map_init(m)			do { } while (0)
++#define sdt_map_init_key(m, k)		do { (void)(k); } while (0)
++#define sdt_wait(m)			do { } while (0)
++#define sdt_might_sleep_start(m)	do { } while (0)
++#define sdt_might_sleep_end()		do { } while (0)
++#define sdt_ecxt_enter(m)		do { } while (0)
++#define sdt_event(m)			do { } while (0)
++#define sdt_ecxt_exit(m)		do { } while (0)
++#endif
++#endif /* __LINUX_DEPT_SDT_H */
 -- 
 2.17.1
 
