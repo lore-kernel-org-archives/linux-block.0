@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE237E798;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A9437E79F;
 	Wed,  8 May 2024 10:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715162585; cv=none; b=dP40uGGjHnAG9+WWDoVE8FD6i/nm1CUFDFp1I+ov4j7IFuog8eq2JT+yc04tg0ulxqhsZDspMj34fUjgHBIRJpKZmNieW4Zgx7qsCMMWB3s+vh7W08DiQjwHm/RZj+tuLfY4gh6iFDuVxfqSlnjksjrLFv9bA4PfMZD9nu4Ox7g=
+	t=1715162584; cv=none; b=o1iwbZQEwa+25SjyaeG3i0DPS2qyslVIthzEjg4NjwoXZPpmMDYTecPdY5z/EqxwIe8+tqetcoRdOWmQxoUK26KnpwfNx9yUeVL9M8WBuodzFXVf6nQ5PUUbzbnVpmsIqfbSzLuoutdWISNu7lwhNF1qhkRoe8RLe8rLz4B8ARQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715162585; c=relaxed/simple;
-	bh=ILOiGypKonBszEM01cavkBhnNff7lLqOK+UDeJBRKwI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=eS2SVNf9L06G5r0Lo1KQ/t1JMY19dmgZWNe4HvCdc2+AOz6d36EvJW0H+OIIeBNL1bGDgSYNp6vmzaEjplH9U1Y3mluR4q0r4KJqPB7LGhfINkHHCC+7KksI2zh6QCxncPVTW93EqVaQHMGcCHKZfhtmWZrYdchOCJJrJJo/Wb8=
+	s=arc-20240116; t=1715162584; c=relaxed/simple;
+	bh=K+RXoftco95OISrgk67ubcC/9saOGPHgiOYhsyWCyXw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=JzuIrvF0ribohO4Vl+icjhiD3FMrY99u199bHYt1NnleXvobbyeuIMwJtQXaUthYn+zzV7Ih+kZWbmkGvx1vXpqEpqA4veMk3YegfIw9gA+UpRBu8IDPBYZda9kLJcEMnJZOvkJJPw0CPQokVxrGRtLvEeaju2x9joZpFlrp910=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-d85ff70000001748-d9-663b4a3c0e6c
+X-AuditID: a67dfc5b-d85ff70000001748-69-663b4a3b6bae
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -71,43 +71,43 @@ Cc: kernel_team@skhynix.com,
 	longman@redhat.com,
 	hdanton@sina.com,
 	her0gyugyu@gmail.com
-Subject: [PATCH v14 28/28] dept: Add documentation for Dept's APIs
-Date: Wed,  8 May 2024 18:47:25 +0900
-Message-Id: <20240508094726.35754-29-byungchul@sk.com>
+Subject: [PATCH v14 21/28] dept: Apply timeout consideration to dma fence wait
+Date: Wed,  8 May 2024 18:47:18 +0900
+Message-Id: <20240508094726.35754-22-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240508094726.35754-1-byungchul@sk.com>
 References: <20240508094726.35754-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0iTYRTHe97rXK5eltCrkdUggsLKyDqVRBTYUxEUXakPNdprG02TmbdA
-	0rxU3khDV9NELdbS1Wzbhy5qa+F0hTbLcuaFNMssLzSbaNplKn45/Pif8/99OiJSaqWDRKro
-	C4ImWq6WMWJKPORfHhK+d1vkemtXMOTnrAfvr6sUlJiMDLgeViEwWlMJGKjfDW1jgwgmm96Q
-	oC10ISjv6SLB6uhGUGu4zMC7vgXQ6h1hwFmYzUDaHRMDLT+mCOgsKiCgyrwfXl+vIMA20U+B
-	doCBYm0a4RvfCJjQV7KgT1kJvQYdC1M9oeDs/kBD7cc1cKu0k4GaWicFjse9BLx7WsJAt/Ef
-	Da8djRS48nNpeDBcwcCPMT0Jeu8IC29tZQRUp/tEmaN/aWjItRGQefcRAa3tzxDUXf1EgNn4
-	gYGX3kECLOZCEn7fq0fQmzfEQkbOBAvFqXkIsjOKKEjvDIPJ8RJmxxb8cnCExOmWBFw7Vkbh
-	VxU8fqLrYnF63UcWl5njsMWwGt+pGSBwucdLY3PlNQabPQUszhpqJfBwczOLG29OUrivVUsc
-	CDohDlcIalW8oFm3/bRYmeFsYGNKZYnVTXEpKH9JFvIT8dxG/vZvDzXHn0tHZ5jhVvFu9wQ5
-	zQHcct6S+5WeZpIbFPN3myOmeRG3k3eMvkfTTHEr+Uxny0xXwm3ibxQ40KxzGV9VbZvx+Pny
-	9v7hmVzKhfHP0nRsFhL7bsZFfNv7Unq2EMi/MLip60hShuZVIqkqOj5KrlJvXKtMilYlrj1z
-	PsqMfL+kT546+Rh5XIfsiBMhmb/EtnhrpJSWx8cmRdkRLyJlAZL6K5sjpRKFPOmioDl/ShOn
-	FmLtaImIki2WbBhLUEi5s/ILwjlBiBE0c1tC5BeUghbWdeh0l1YcW3E4yjQQY+l4eON5VlNa
-	oNq41G21NR9pbDsuDrbYU/ECuX2n64i/OnENV4PF24wJ88e/7/H2L/t1tNPzpd2rLtocv+5+
-	Y9fPlojiP3/CziWHK4cK9yqGtR2mE3k5+9zKgIN1ZGVoiJX793RX7iVTgMKQ3XD/SYhURsUq
-	5aGrSU2s/D9L025kRwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSf0yMcRzH+36fX9ets2dX41nZ4qYh82sTHw4zjEfGzGxt/UGH53TrKu4q
-	Yua4fqhkLurIlZOcVofcxUJnt9LltE6UiLRKQ6SsuubU0GX+ee+192ef119vESEtokJFqqQU
-	QZOkUMtoMSneKdcvlkfLlct6ateC4dwy8I6dJcF010pD650qBNaa0xgGGrfCm/FBBBMtLwgw
-	FrYiuN77gYAaVzcCR8UZGtr6Z0C7d5gGd2EeDfobd2l4+W0SQ1dRAYYq2w5ovlCGwen7TIJx
-	gIarRj2eii8YfJZKBiy6COirKGZgsnc5uLs7KGgocVPgeLcIrpR20VDncJPgqu3D0PbIREO3
-	9Q8Fza5nJLQa8im4PVRGw7dxCwEW7zADr5xmDNUZU7as0d8UNOU7MWSV38PQ3vkYwZOzPRhs
-	1g4aGryDGOy2QgJ+3WpE0Hf+OwOZ53wMXD19HkFeZhEJGV1RMPHTRG9YwzcMDhN8hv0o7xg3
-	k/zzMo5/WPyB4TOevGN4sy2Vt1dE8jfqBjB/fcRL8bbKHJq3jRQwfO73dswPeTwM/+zyBMn3
-	txvxrrBY8dqDglqVJmiWro8Tx2e6m5jDpbJj1S2pOmQIy0WBIo5dwX0sHSX9TLPzubdvfYSf
-	Q9g5nD3/E+Vngh0Uc+WeLX4OZjdyrtHXyM8kG8FluV9O/0rYldzFAhf65wznqqqd057Aqb7z
-	89B0L2WjuMf6YuYCEptRQCUKUSWlJSpU6qgl2oT49CTVsSUHkhNtaGotlpOThlo01ra1HrEi
-	JAuStNJypZRSpGnTE+sRJyJkIZLG7FVKqeSgIv24oEnep0lVC9p6FCYiZbMk0TFCnJQ9pEgR
-	EgThsKD5f8WiwFAduo+jT62brDPFlji/apqRY6ZhZPX28pBkpUd35URTV9jCH+qle/eXa3cH
-	xW3y3Nx81O7bWLvN2p+84dFs/dwOpTEgRnvtgfip0hTckmBeMOxInRP1/ogqeN7TyEvyrEs1
-	KfNMtj1ljLM6r8cVtG/Px/zeJnN2drhWt+tAjmyd/EyJjNTGK5ZHEhqt4i/zXmBuKQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa2xLYRjHve85PeesVjkp4WwipCITd2I8rhGEQ0KE+MAEZWfa2LqltZsQ
+	m3VWY2Niyi50l9Sy1u10YS6V2myMqLGOja1sxix2YbRZdUE3fHnyy/P8/79PD0PIKyShjFpz
+	QNBqlNEKSkpKe4KLZi5ZvyRqjssSAjkn54Dnh4GEgmtWCuqvWhBYK1IxdNWshdfebgT+Z88J
+	MObWIyhqayWgotaNwF52lIKGjlHg8vRRUJd7goK0kmsUvPgyiKHl3BkMFnEDPD1djMHh6yTB
+	2EVBvjENB8ZnDD5zOQ3mlCnQXpZHw2DbXKhzv5KA/c10uHCxhYJ79joSaivbMTTcKaDAbf0t
+	gae1j0moz8mSwJXeYgq+eM0EmD19NLx0mDBc1wdEx77/ksCjLAeGY6U3MLia7yK4b3iPQbS+
+	oqDa043BJuYS8PNyDYL27B4a0k/6aMhPzUZwIv0cCfqWcPAPFFArFvHV3X0Er7cl8navieSf
+	FHP87bxWmtfff0PzJjGet5VN40vudWG+qN8j4cXy4xQv9p+h+cweF+Z7nU6af3zeT/IdLiPe
+	FLpdujRSiFYnCNrZy3dLVe8aI+IamKTsaj+dgix0JgpiOHY+Jxbekvxn90svGmKKDeOamnzE
+	EI9hJ3G2rE/DGYLtlnKlzjVDPJrdyFX2Pxv2kOwUbrDNTw2xjF3AXbEV/nNO5CzXHcOeoMC+
+	ubN32C9nw7m7aXmBrjSQGWC4js4P6G8hhHtQ1kSeRjITGlGO5GpNQoxSHT1/lipZo06atTc2
+	RkSBXzIfHoyoRP31W6oQyyBFsMwxbnGUXKJM0CXHVCGOIRRjZDUZC6Pkskhl8kFBG7tLGx8t
+	6KrQeIZUjJPN8yZGytl9ygPCfkGIE7T/r5gJCk1B6a8XnhpRWri8qVFVcvPQw7hP9CrXZHvS
+	6nnijoTZrMn5Nae5KCN2wta+2otjv+XTcfrnUc4U6S+DYWDPqLy3I8/qln1Ufzdm/Fzh3nTJ
+	MTPYlJmaXpq7aIavtfcIbtyqWtcT/t66MynEr8gPM2iWmRurV29etUAzNTEiIt6l/Lpym4LU
+	qZRzpxFanfIP8AkjmEcDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTYRjHe99zznvmanFYUgf7UA263wyyHjKiT/USXQ0ULMuVZzmaq7ay
+	LAJr2m1qGal5q81smbPUMwu7TETTMsms2RW1FLEkL2FOsknljL48/Pj/+f8+PQpGnckFKfTG
+	w5LJqDVoiJJVbg61LA7dEKoL/lXGQnpKMHiHzrGQV1pCoPmuE0FJxSkMPXXr4d1wLwLfi5cM
+	ZGU0I7B3tDFQUd+OwF10moCnazK0eAcINGRYCVhulBJ49W0UQ2vmZQxOeRM0XirAUD3yhYWs
+	HgK5WRY8dr5iGHEU8+BInA2dRTk8jHYsg4b2txzU5jdw4P64ELKvtRJ47G5gob6yE4PnYR6B
+	9pI/HDTWP2OhOT2Vgzv9BQS+DTsYcHgHeHhdbcNQljRmO/PjNwdPU6sxnCksx9Dy4RGCqnOf
+	McglbwnUensxuOQMBn7dqkPQmdbHQ3LKCA+5p9IQWJMzWUhqDQHfzzyydhWt7R1gaJLrKHUP
+	21j6vECkD3LaeJpU9ZGnNvkIdRUtoDce92BqH/RyVC4+T6g8eJmnF/paMO1vauLps6s+lna1
+	ZOGt0yOVq2Mkgz5eMi1dE62M/fRmx0GP4lharY9PRE7+AgpQiMJysf31MPIzEeaK79+PMH4O
+	FGaKrtRuzs+M0KsUC5vW+XmKsFmsHHwxvmWF2eJoh4/4WSWsEO+48rl/zhmis6x63BMwln/4
+	0j/uVwsh4iNLDn8JKW1oQjEK1Bvj47R6Q8gS8/7YBKP+2JK9B+JkNPYtjpOj6ZVoyLO+BgkK
+	pJmkaiahOjWnjTcnxNUgUcFoAlV1Z1fq1KoYbcJxyXRgt+mIQTLXoOkKVjNNtSFCilYL+7SH
+	pf2SdFAy/W+xIiAoEcnZRFdoLVy5L9jdFvVg0c2QIOc7Q2lKsef4nKrki1MjzVGL4GrkuhOm
+	xMYOnXtiRNgcY7g9bMXc8Fsb+7bM31Vzrxx3Rz+8mXDbNiBbs7duu+6dB91h5zPu5eaKXWfv
+	P7fv1u25bx+K2j7LGnFl74xINub7oR209KglKn/pTvIkR8OaY7XLFjAms/Yv1hmQZykDAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -115,137 +115,36 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-This document describes the APIs of Dept.
+Now that CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT was introduced, apply the
+consideration to dma fence wait.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- Documentation/dependency/dept_api.txt | 117 ++++++++++++++++++++++++++
- 1 file changed, 117 insertions(+)
- create mode 100644 Documentation/dependency/dept_api.txt
+ drivers/dma-buf/dma-fence.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/dependency/dept_api.txt b/Documentation/dependency/dept_api.txt
-new file mode 100644
-index 000000000000..8e0d5a118a46
---- /dev/null
-+++ b/Documentation/dependency/dept_api.txt
-@@ -0,0 +1,117 @@
-+DEPT(DEPendency Tracker) APIs
-+=============================
-+
-+Started by Byungchul Park <max.byungchul.park@sk.com>
-+
-+SDT(Single-event Dependency Tracker) APIs
-+-----------------------------------------
-+Use these APIs to annotate on either wait or event.  These have been
-+already applied into the existing synchronization primitives e.g.
-+waitqueue, swait, wait_for_completion(), dma fence and so on.  The basic
-+APIs of SDT are:
-+
-+   /*
-+    * After defining 'struct dept_map map', initialize the instance.
-+    */
-+   sdt_map_init(map);
-+
-+   /*
-+    * Place just before the interesting wait.
-+    */
-+   sdt_wait(map);
-+
-+   /*
-+    * Place just before the interesting event.
-+    */
-+   sdt_event(map);
-+
-+The advanced APIs of SDT are:
-+
-+   /*
-+    * After defining 'struct dept_map map', initialize the instance
-+    * using an external key.
-+    */
-+   sdt_map_init_key(map, key);
-+
-+   /*
-+    * Place just before the interesting timeout wait.
-+    */
-+   sdt_wait_timeout(map, time);
-+
-+   /*
-+    * Use sdt_might_sleep_start() and sdt_might_sleep_end() in pair.
-+    * Place at the start of the interesting section that might enter
-+    * schedule() or its family that needs to be woken up by
-+    * try_to_wake_up().
-+    */
-+   sdt_might_sleep_start(map);
-+
-+   /*
-+    * Use sdt_might_sleep_start_timeout() and sdt_might_sleep_end() in
-+    * pair.  Place at the start of the interesting section that might
-+    * enter schedule_timeout() or its family that needs to be woken up
-+    * by try_to_wake_up().
-+    */
-+   sdt_might_sleep_start_timeout(map, time);
-+
-+   /*
-+    * Use sdt_might_sleep_start() and sdt_might_sleep_end() in pair.
-+    * Place at the end of the interesting section that might enter
-+    * schedule(), schedule_timeout() or its family that needs to be
-+    * woken up by try_to_wake_up().
-+    */
-+   sdt_might_sleep_end();
-+
-+   /*
-+    * Use sdt_ecxt_enter() and sdt_ecxt_exit() in pair.  Place at the
-+    * start of the interesting section where the interesting event might
-+    * be triggered.
-+    */
-+   sdt_ecxt_enter(map);
-+
-+   /*
-+    * Use sdt_ecxt_enter() and sdt_ecxt_exit() in pair.  Place at the
-+    * end of the interesting section where the interesting event might
-+    * be triggered.
-+    */
-+   sdt_ecxt_exit(map);
-+
-+
-+LDT(Lock Dependency Tracker) APIs
-+---------------------------------
-+Do not use these APIs directly.  These are the wrappers for typical
-+locks, that have been already applied into major locks internally e.g.
-+spin lock, mutex, rwlock and so on.  The APIs of LDT are:
-+
-+   ldt_init(map, key, sub, name);
-+   ldt_lock(map, sub_local, try, nest, ip);
-+   ldt_rlock(map, sub_local, try, nest, ip, queued);
-+   ldt_wlock(map, sub_local, try, nest, ip);
-+   ldt_unlock(map, ip);
-+   ldt_downgrade(map, ip);
-+   ldt_set_class(map, name, key, sub_local, ip);
-+
-+
-+Raw APIs
-+--------
-+Do not use these APIs directly.  The raw APIs of dept are:
-+
-+   dept_free_range(start, size);
-+   dept_map_init(map, key, sub, name);
-+   dept_map_reinit(map, key, sub, name);
-+   dept_ext_wgen_init(ext_wgen);
-+   dept_map_copy(map_to, map_from);
-+   dept_wait(map, wait_flags, ip, wait_func, sub_local, time);
-+   dept_stage_wait(map, key, ip, wait_func, time);
-+   dept_request_event_wait_commit();
-+   dept_clean_stage();
-+   dept_stage_event(task, ip);
-+   dept_ecxt_enter(map, evt_flags, ip, ecxt_func, evt_func, sub_local);
-+   dept_ecxt_holding(map, evt_flags);
-+   dept_request_event(map, ext_wgen);
-+   dept_event(map, evt_flags, ip, evt_func, ext_wgen);
-+   dept_ecxt_exit(map, evt_flags, ip);
-+   dept_ecxt_enter_nokeep(map);
-+   dept_key_init(key);
-+   dept_key_destroy(key);
-+   dept_map_ecxt_modify(map, cur_evt_flags, key, evt_flags, ip, ecxt_func, evt_func, sub_local);
+diff --git a/drivers/dma-buf/dma-fence.c b/drivers/dma-buf/dma-fence.c
+index d6f9b339b143..ccd9beb140d1 100644
+--- a/drivers/dma-buf/dma-fence.c
++++ b/drivers/dma-buf/dma-fence.c
+@@ -784,7 +784,7 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
+ 	cb.task = current;
+ 	list_add(&cb.base.node, &fence->cb_list);
+ 
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (!test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags) && ret > 0) {
+ 		if (intr)
+ 			__set_current_state(TASK_INTERRUPTIBLE);
+@@ -888,7 +888,7 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count,
+ 		}
+ 	}
+ 
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (ret > 0) {
+ 		if (intr)
+ 			set_current_state(TASK_INTERRUPTIBLE);
 -- 
 2.17.1
 
