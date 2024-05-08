@@ -1,17 +1,17 @@
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57FEA7E563;
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F06F7E59A;
 	Wed,  8 May 2024 10:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715162586; cv=none; b=rrPKyARsiK2b4ZvTZyX97dwZ/EyacFNMv3bckEzx9FvTr6/8jg8rkn5yAErhFA7Ilcl4l98HBmY2HloLxPHSojOp0lXOxEEEj0EHLDMgrNyWpy36u2Hu1DLJ0IN4DCaM0Uc9944HscNG8/dmHYzcQEpIv7h7yaZn8BsrgnAfeA8=
+	t=1715162585; cv=none; b=LEpOvMXp9ztB4SyEnmVw6i7ilFZFrhMuDjTP4rwoZymhlBxTm1va7Oip+4VB6og9YV44ktK9eFVdaMSjdyFG/+Ax2FINcGSJDp80eTvgDAGRICxjuQRWCwJdQdxCyur0MMZGufEQaXYRI8uDZkgnk58kFQhOs37zsQ5q5+pjIvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715162586; c=relaxed/simple;
-	bh=DetjHz1GQxaPNALJ8Dks1FUieVl0UuRtCd7xVumYWkI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=QFGqxuFtip2eLzDQHSqs0AA4YzKqh9Ox67T9THvS72xCOIm0nqt45rGM57yN2+X1lFaocO9Dl6lZcFKf2CUjJUbtCpSkuXSGhVFattJYDfgdrbqqIvldOBH4iZW9K265emo1hcqaAr3VPVvdECNelbroNYRP65n2l5p68uUnydk=
+	s=arc-20240116; t=1715162585; c=relaxed/simple;
+	bh=Zg3dPmxAeZfdPCpe0eFW6kAfwZet+/NUlIS50hmLxGs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=RynREJY4NN5tUomoXAIVx2uQ9EeTedEbAgXDJlNxwQbteyhFKMvM2rxtRzKtS7vkodsrbkkVcdUI0i3Dn9s8y1/aZQy+jZM2PjVUnOOrHIcSerR13FAMMRbKWVqrOrwtUq16t/CI4XHBdKNiqpX2JL5ZrMwGUjSOj8ODwtBfR8g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-d85ff70000001748-17-663b4a3a9eab
+X-AuditID: a67dfc5b-d85ff70000001748-79-663b4a3bf635
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -71,44 +71,44 @@ Cc: kernel_team@skhynix.com,
 	longman@redhat.com,
 	hdanton@sina.com,
 	her0gyugyu@gmail.com
-Subject: [PATCH v14 16/28] dept: Track timeout waits separately with a new Kconfig
-Date: Wed,  8 May 2024 18:47:13 +0900
-Message-Id: <20240508094726.35754-17-byungchul@sk.com>
+Subject: [PATCH v14 22/28] dept: Make Dept able to work with an external wgen
+Date: Wed,  8 May 2024 18:47:19 +0900
+Message-Id: <20240508094726.35754-23-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240508094726.35754-1-byungchul@sk.com>
 References: <20240508094726.35754-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSf0zMcRjHfT7fn92cfR3mKzPcEPIjljx+zj/4zmipP2x+dtM33fRrl0oa
-	K52QatWWI82qa6fdHeUuRN25ShHJoSW3hGaSrrK4W6fIHfPPs9ee5/1+/fWwhOwO5c8q40+I
-	qnhFrJyWkJKhqeUrN+7aFB2UqQ2GwtwgcP24QEJptZEG+y0DAmNtJoaBlp3wxu1EMP78BQGa
-	YjuC8o/vCKht7UVgqTpLw+tP06DTNUJDW/ElGrK01TS8HJzA0HO5CIPBtAeeFVRgsHn6SdAM
-	0HBNk4W94wsGj07PgC5jMfRVlTAw8XENtPV2UWBxBMLV6z00NFjaSGit68Pw+kEpDb3GSQqe
-	tT4hwV6YR8HN4QoaBt06AnSuEQZe2cow1Ki9ouzvvyl4nGfDkF15G0Pn23oE1gsfMJiMXTQ0
-	u5wYzKZiAn7eaEHQlz/EwLlcDwPXMvMRXDp3mQR1zzoYHyult20Qmp0jhKA2pwoWdxkpPK3g
-	hfsl7xhBbXUwQpkpWTBXLRe0DQNYKB91UYJJf5EWTKNFjJAz1ImF4Y4ORnhyZZwUPnVqcJj/
-	fsnmKDFWmSKqVm+NlMS4rZN04pfIk9+M18kMdGd3DvJjeS6Yr/RkU/+5XtuOfUxzAXx3t4fw
-	8UxuAW/O+/w3Q3BOCV/ZscPHM7hw/p6mmvExyS3mrzzMp30s5UL4R79t5D/nfN5QY/vr8fPu
-	3/YPIx/LuHV8fVaJtyvxZiZZvne8iPlXmMM3VnWTBUhahqbokUwZnxKnUMYGr4pJi1eeXHU0
-	Ic6EvM+kOz1xoA6N2iOaEMci+VSpbfbGaBmlSElKi2tCPEvIZ0pbzq+PlkmjFGmnRFXCEVVy
-	rJjUhOaypHy2dK07NUrGHVOcEI+LYqKo+n/FrJ9/BjrkHHM7agKCAqxFC/cksEsNPzJ+Kbcn
-	BNVqH6u4aTunh+U+eJ/e+D6zsLh9mXlvqNs8+DJw3uEztcbbHpWaPxDWfD99W2iB3eFYErhF
-	X3escFG7dcWy3aFdQCobD9fcHWI/J0bUpaeunV4xIyfka9jg6vDkxoX2W7PG9i151XKQssjJ
-	pBjFmuWEKknxBxNNdjZIAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAAzXSf0yMcRzAcd/v8zzf5zrOnp3wKBs7M1t+dDbxmQx/+PHMr1kbxvzowZNu
-	KtypnM304yL6sTJ1SSWVkzrKkybqcitFIlELLU3NqOnKr7s55eiYfz577fPZ3n99FJTazPgp
-	dFHHJX2UGKEhSlq5JThx4fINwWHaK13+kJmqBef3ZBryKqwE2m+VI7Deiccw2LQeXrmGEIw+
-	e06BOasdwdW+txTcae5FYCtNINDxfjJ0OkcItGSlEEgsriDw4tMYhp7sCxjK5c3QmlGEwe7+
-	SIN5kMBlcyIeHwMY3JYyFixxc6G/NJeFsb7F0NLbxUBjfgsDtu75cKmgh0CdrYWG5pp+DB33
-	8wj0Wn8z0Nr8mIb2zDQGbg4XEfjkslBgcY6w8NJeiKHSNF47883DwKM0O4YzJbcxdL6pRVCf
-	/A6DbO0i0OgcwlAlZ1Hw83oTgv50BwtJqW4WLsenI0hJyqbB1BMEoz/yyOrlQuPQCCWYqmIF
-	m6uQFp4U8cK93LesYKrvZoVCOVqoKg0QiusGsXD1q5MR5LJzRJC/XmCF845OLAy3tbHC45xR
-	WnjfacZb/XcpVxyUInQxkj5wZagy3FX/mxwdCD3x2VpAx6HqTeeRj4LnlvC1xU+x14Sbx79+
-	7aa89uVm81VpHxivKW5IyZe0rfN6ChfC3zVXsF7T3Fw+50E68VrFLeUfeuz0v+YsvrzS/rfj
-	M75/83EYea3mgvjaxFw2AykL0YQy5KuLiokUdRFBiwyHw41RuhOLDhyJlNH4u1hOjWXWoO8d
-	6xsQp0CaSap2EhymZsQYgzGyAfEKSuOrajq7LEytOigaT0r6I/v00RGSoQH5K2jNdNWGHVKo
-	mjskHpcOS9JRSf//ihU+fnGocqczMPj5phuTj0UbOx6xp5NSVyWIA5zCZY2d6OHmeaDVsaY6
-	P5md7bd62vZtM38t6NfvN3nkgpeBedrbV3aLdeHTr/tWf8lAci29a052QMmeqbo9TfeSYx/k
-	ULa163KqHQuDcJ8jHtXsvHYxZG9CyIx33WWhRrfRR5ui2qhdoaEN4eLiAEpvEP8AEjmoSioD
-	AAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzXSf2yLeRwH8Pt+n6fP86z0PCmJx4gfXZDgmJ/3YYuTEL45kRD/iJ9rbs+s
+	bCMtY+LHZuVYtxm5KTOsJTVdq9PWZWcmNbZpxRQbM1vDsjOj22TWUuvNte7888krnx/vvz4c
+	Jb8hieVUGbtEdYYyTcFIaWnPcMNPCb8mpMTrDXFwMj8eAgPHaCi1WRjwXqtAYHHmYOiuWwHP
+	g34Egw8fUaAv9iIwvG6nwFnvQ1BTfpiBp50/QlOgjwF3sY6B3Es2Bh6/D2NoO30KQ4V9FTwo
+	MmJwhbpo0HczcE6fiyPlLYaQycyCKXsydJSXsBB+PRvcvmcSqGmdDmcvtDFwq8ZNQ31VB4an
+	N0sZ8Fm+SuBB/X0avCcLJGDtNTLwPmiiwBToY+GJqwxDpTYSdPTjkAQaClwYjl6+jqHpRTWC
+	28deYbBbnjFwN+DH4LAXU/DlSh2CjsIeFo7kh1g4l1OIQHfkNA3atvkw+LmUWbKQ3PX3UUTr
+	2ENqgmU08RgF8ldJO0u0t1tZUmbfTRzl08ilW92YGPoDEmI3H2eIvf8US/J6mjDpbWxkyf0z
+	gzTpbNLj1bHrpYnJYpoqU1TPWpwkTXW+baZ25v2y11l0lcpG/jl5KIYT+HnCPwEP+91twSvf
+	zPBThZaWEBX1KH6i4Ch4I4ma4v1S4XLj8qhH8quEdxcb6KhpfrJg1ZbiqGX8AkFnbv0/c4JQ
+	Uen6lhMT6b/o6kVRy/n5QnVuSWRHGtn5ygkeywn838EY4U55C12EZGXoBzOSqzIy05WqtHkz
+	U7MyVHtn/rYj3Y4iz2Q6EN5Qhfq9a2sRzyHFcJlr9KIUuUSZqclKr0UCRylGyep+/zlFLktW
+	Zu0T1Tu2qHeniZpaNJajFaNlc4J7kuX8VuUucbso7hTV36eYi4nNRlTi2KHCyrhlOSmV0x/v
+	D6/0LG1Z+WHb9XVPNrq15xuG1ck2NL/6mPppvPBSY5hyNb547gC9aZKzwyyV3yEDw0Z8+vvP
+	e9YZxjXeZoc7FPY064p0/b78YHuc7Y+kgzKbFSXWN6xYfGjoy/FrCctnbLaGFQc8y5LGGaXj
+	E90leZzNp6A1qcrZ0yi1RvkvVqN/UkgDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzXSf0zMcRjAcZ/P99d1nH2dM9/Fpo4mIZLjmYg/yHe2jPmD2dCtvulWHbvr
+	J7NFJ/TDrqijupziSj/EXX9EXdc6RUyiH2gJDSlXbXRxauiYf5699jzb+69HREgNlLdIpU4Q
+	NGplnJwWk+LdIemrQ3aFRK8dezsbcrPXgmviPAnFtdU0dN6uQlBddxrDcOtOeDnpRDD19BkB
+	hvxOBNffvyGgrm0Aga3iDA1dH+ZCt2uchvb8LBrSy2ppeP5lGkN/QR6GKks4PNGXYmh2D5Fg
+	GKahyJCOZ8ZnDG5zJQPmND8YrChkYPp9ELQP9FLgMLZTYOtbCVdL+mlotLWT0FY/iKHrfjEN
+	A9W/KXjS9oiEztwcCmrGSmn4MmkmwOwaZ+BFswnDHd1MLePbLwoe5jRjyLhxF0P36wYETeff
+	YbBU99LgcDkxWC35BPwsb0UweHGUgbPZbgaKTl9EkHW2gARdvwKmfhTT2zbxDuc4weusybxt
+	0kTyj0s5/l7hG4bXNfUxvMmSyFsrAviyxmHMX//qonhL5QWat3zNY/jM0W7Mj3V0MPyjK1Mk
+	/6HbgPcsOijeHCXEqZIEzZrQCHFM3ece4njm1pQ6/S0iDTnXZSIvEceu5/onyxmPaXY59+qV
+	m/BYxvpw1pxPlMcE6xRzNzrCPJ7PhnMj1x6SHpOsH1ejK8YeS9gNXFZlH/OvuYSrutP8t+M1
+	s389NIY8lrIKriG9kNEjsQnNqkQylTopXqmKUwRqY2NS1aqUwMhj8RY08y7mU9O59Wiia2cL
+	YkVIPkfSSYdESyllkjY1vgVxIkIuk7Se2xgtlUQpU08ImmNHNIlxgrYFLRKR8oWSXfuFCCl7
+	VJkgxArCcUHz/4pFXt5paN9ie1fwhHa/fMPSvVUyuyDdc8KoX1Pj/7FszsEt4aWJyb7Zqm02
+	vXu0R+nl5/C/siys15aUcHPFkQH9SZ/t30tqswp8g43Bqw7L/E+daW1i5i2NPmT0tRIOnd20
+	1RiaeKAwxv3ArjAG/rBnLLg0khGrUOfv+HR77uWUyGRVQIlbTmpjlEEBhEar/APVLfPUKgMA
+	AA==
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -116,369 +116,223 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Waits with valid timeouts don't actually cause deadlocks. However, Dept
-has been reporting the cases as well because it's worth informing the
-circular dependency for some cases where, for example, timeout is used
-to avoid a deadlock but not meant to be expired.
+There is a case where total maps for its wait/event is so large in size.
+For instance, struct page for PG_locked and PG_writeback is the case.
+The additional memory size for the maps would be 'the # of pages *
+sizeof(struct dept_map)' if each struct page keeps its map all the way,
+which might be too big to accept.
 
-However, yes, there are also a lot of, even more, cases where timeout
-is used for its clear purpose and meant to be expired.
-
-Let Dept report these as an information rather than shouting DEADLOCK.
-Plus, introduced CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT Kconfig to make it
-optional so that any reports involving waits with timeouts can be turned
-on/off depending on the purpose.
+It'd be better to keep the minimum data in the case, which is timestamp
+called 'wgen' that Dept makes use of. So made Dept able to work with an
+external wgen when needed.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/dept.h     | 15 ++++++---
- include/linux/dept_ldt.h |  6 ++--
- include/linux/dept_sdt.h | 12 +++++---
- kernel/dependency/dept.c | 66 ++++++++++++++++++++++++++++++++++------
- lib/Kconfig.debug        | 10 ++++++
- 5 files changed, 89 insertions(+), 20 deletions(-)
+ include/linux/dept.h     | 18 ++++++++++++++----
+ include/linux/dept_sdt.h |  4 ++--
+ kernel/dependency/dept.c | 30 +++++++++++++++++++++---------
+ 3 files changed, 37 insertions(+), 15 deletions(-)
 
 diff --git a/include/linux/dept.h b/include/linux/dept.h
-index ca1a34be4127..0280e45cc2af 100644
+index 0280e45cc2af..dea53ad5b356 100644
 --- a/include/linux/dept.h
 +++ b/include/linux/dept.h
-@@ -270,6 +270,11 @@ struct dept_wait {
- 			 * whether this wait is for commit in scheduler
- 			 */
- 			bool		sched_sleep;
-+
-+			/*
-+			 * whether a timeout is set
-+			 */
-+			bool				timeout;
- 		};
- 	};
+@@ -482,6 +482,13 @@ struct dept_task {
+ 	bool				in_sched;
  };
-@@ -453,6 +458,7 @@ struct dept_task {
- 	bool				stage_sched_map;
- 	const char			*stage_w_fn;
- 	unsigned long			stage_ip;
-+	bool				stage_timeout;
  
- 	/*
- 	 * the number of missing ecxts
-@@ -490,6 +496,7 @@ struct dept_task {
- 	.stage_sched_map = false,				\
- 	.stage_w_fn = NULL,					\
- 	.stage_ip = 0UL,					\
-+	.stage_timeout = false,					\
- 	.missing_ecxt = 0,					\
- 	.hardirqs_enabled = false,				\
- 	.softirqs_enabled = false,				\
-@@ -507,8 +514,8 @@ extern void dept_map_init(struct dept_map *m, struct dept_key *k, int sub_u, con
++/*
++ * for subsystems that requires compact use of memory e.g. struct page
++ */
++struct dept_ext_wgen{
++	unsigned int wgen;
++};
++
+ #define DEPT_TASK_INITIALIZER(t)				\
+ {								\
+ 	.wait_hist = { { .wait = NULL, } },			\
+@@ -512,6 +519,7 @@ extern void dept_task_exit(struct task_struct *t);
+ extern void dept_free_range(void *start, unsigned int sz);
+ extern void dept_map_init(struct dept_map *m, struct dept_key *k, int sub_u, const char *n);
  extern void dept_map_reinit(struct dept_map *m, struct dept_key *k, int sub_u, const char *n);
++extern void dept_ext_wgen_init(struct dept_ext_wgen *ewg);
  extern void dept_map_copy(struct dept_map *to, struct dept_map *from);
  
--extern void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip, const char *w_fn, int sub_l);
--extern void dept_stage_wait(struct dept_map *m, struct dept_key *k, unsigned long ip, const char *w_fn);
-+extern void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip, const char *w_fn, int sub_l, long timeout);
-+extern void dept_stage_wait(struct dept_map *m, struct dept_key *k, unsigned long ip, const char *w_fn, long timeout);
- extern void dept_request_event_wait_commit(void);
- extern void dept_clean_stage(void);
+ extern void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip, const char *w_fn, int sub_l, long timeout);
+@@ -521,8 +529,8 @@ extern void dept_clean_stage(void);
  extern void dept_stage_event(struct task_struct *t, unsigned long ip);
-@@ -558,8 +565,8 @@ struct dept_task { };
+ extern void dept_ecxt_enter(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *c_fn, const char *e_fn, int sub_l);
+ extern bool dept_ecxt_holding(struct dept_map *m, unsigned long e_f);
+-extern void dept_request_event(struct dept_map *m);
+-extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn);
++extern void dept_request_event(struct dept_map *m, struct dept_ext_wgen *ewg);
++extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn, struct dept_ext_wgen *ewg);
+ extern void dept_ecxt_exit(struct dept_map *m, unsigned long e_f, unsigned long ip);
+ extern void dept_sched_enter(void);
+ extern void dept_sched_exit(void);
+@@ -551,6 +559,7 @@ extern void dept_hardirqs_off(void);
+ struct dept_key  { };
+ struct dept_map  { };
+ struct dept_task { };
++struct dept_ext_wgen { };
+ 
+ #define DEPT_MAP_INITIALIZER(n, k) { }
+ #define DEPT_TASK_INITIALIZER(t)   { }
+@@ -563,6 +572,7 @@ struct dept_task { };
+ #define dept_free_range(s, sz)				do { } while (0)
+ #define dept_map_init(m, k, su, n)			do { (void)(n); (void)(k); } while (0)
  #define dept_map_reinit(m, k, su, n)			do { (void)(n); (void)(k); } while (0)
++#define dept_ext_wgen_init(wg)				do { } while (0)
  #define dept_map_copy(t, f)				do { } while (0)
  
--#define dept_wait(m, w_f, ip, w_fn, sl)			do { (void)(w_fn); } while (0)
--#define dept_stage_wait(m, k, ip, w_fn)			do { (void)(k); (void)(w_fn); } while (0)
-+#define dept_wait(m, w_f, ip, w_fn, sl, t)		do { (void)(w_fn); } while (0)
-+#define dept_stage_wait(m, k, ip, w_fn, t)		do { (void)(k); (void)(w_fn); } while (0)
- #define dept_request_event_wait_commit()		do { } while (0)
- #define dept_clean_stage()				do { } while (0)
+ #define dept_wait(m, w_f, ip, w_fn, sl, t)		do { (void)(w_fn); } while (0)
+@@ -572,8 +582,8 @@ struct dept_task { };
  #define dept_stage_event(t, ip)				do { } while (0)
-diff --git a/include/linux/dept_ldt.h b/include/linux/dept_ldt.h
-index 062613e89fc3..8adf298dfcb8 100644
---- a/include/linux/dept_ldt.h
-+++ b/include/linux/dept_ldt.h
-@@ -27,7 +27,7 @@
- 		else if (t)						\
- 			dept_ecxt_enter(m, LDT_EVT_L, i, "trylock", "unlock", sl);\
- 		else {							\
--			dept_wait(m, LDT_EVT_L, i, "lock", sl);		\
-+			dept_wait(m, LDT_EVT_L, i, "lock", sl, false);	\
- 			dept_ecxt_enter(m, LDT_EVT_L, i, "lock", "unlock", sl);\
- 		}							\
- 	} while (0)
-@@ -39,7 +39,7 @@
- 		else if (t)						\
- 			dept_ecxt_enter(m, LDT_EVT_R, i, "read_trylock", "read_unlock", sl);\
- 		else {							\
--			dept_wait(m, q ? LDT_EVT_RW : LDT_EVT_W, i, "read_lock", sl);\
-+			dept_wait(m, q ? LDT_EVT_RW : LDT_EVT_W, i, "read_lock", sl, false);\
- 			dept_ecxt_enter(m, LDT_EVT_R, i, "read_lock", "read_unlock", sl);\
- 		}							\
- 	} while (0)
-@@ -51,7 +51,7 @@
- 		else if (t)						\
- 			dept_ecxt_enter(m, LDT_EVT_W, i, "write_trylock", "write_unlock", sl);\
- 		else {							\
--			dept_wait(m, LDT_EVT_RW, i, "write_lock", sl);	\
-+			dept_wait(m, LDT_EVT_RW, i, "write_lock", sl, false);\
- 			dept_ecxt_enter(m, LDT_EVT_W, i, "write_lock", "write_unlock", sl);\
- 		}							\
- 	} while (0)
+ #define dept_ecxt_enter(m, e_f, ip, c_fn, e_fn, sl)	do { (void)(c_fn); (void)(e_fn); } while (0)
+ #define dept_ecxt_holding(m, e_f)			false
+-#define dept_request_event(m)				do { } while (0)
+-#define dept_event(m, e_f, ip, e_fn)			do { (void)(e_fn); } while (0)
++#define dept_request_event(m, wg)			do { } while (0)
++#define dept_event(m, e_f, ip, e_fn, wg)		do { (void)(e_fn); } while (0)
+ #define dept_ecxt_exit(m, e_f, ip)			do { } while (0)
+ #define dept_sched_enter()				do { } while (0)
+ #define dept_sched_exit()				do { } while (0)
 diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
-index 12a793b90c7e..21fce525f031 100644
+index 21fce525f031..8cdac7982036 100644
 --- a/include/linux/dept_sdt.h
 +++ b/include/linux/dept_sdt.h
-@@ -22,11 +22,12 @@
+@@ -24,7 +24,7 @@
  
- #define sdt_map_init_key(m, k)		dept_map_init(m, k, 0, #m)
- 
--#define sdt_wait(m)							\
-+#define sdt_wait_timeout(m, t)						\
+ #define sdt_wait_timeout(m, t)						\
  	do {								\
- 		dept_request_event(m);					\
--		dept_wait(m, 1UL, _THIS_IP_, __func__, 0);		\
-+		dept_wait(m, 1UL, _THIS_IP_, __func__, 0, t);		\
+-		dept_request_event(m);					\
++		dept_request_event(m, NULL);				\
+ 		dept_wait(m, 1UL, _THIS_IP_, __func__, 0, t);		\
  	} while (0)
-+#define sdt_wait(m) sdt_wait_timeout(m, -1L)
- 
- /*
-  * sdt_might_sleep() and its family will be committed in __schedule()
-@@ -37,12 +38,13 @@
- /*
-  * Use the code location as the class key if an explicit map is not used.
-  */
--#define sdt_might_sleep_start(m)					\
-+#define sdt_might_sleep_start_timeout(m, t)				\
- 	do {								\
- 		struct dept_map *__m = m;				\
- 		static struct dept_key __key;				\
--		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__);\
-+		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, t);\
- 	} while (0)
-+#define sdt_might_sleep_start(m) sdt_might_sleep_start_timeout(m, -1L)
- 
+ #define sdt_wait(m) sdt_wait_timeout(m, -1L)
+@@ -49,7 +49,7 @@
  #define sdt_might_sleep_end()		dept_clean_stage()
  
-@@ -52,7 +54,9 @@
+ #define sdt_ecxt_enter(m)		dept_ecxt_enter(m, 1UL, _THIS_IP_, "start", "event", 0)
+-#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__)
++#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__, NULL)
+ #define sdt_ecxt_exit(m)		dept_ecxt_exit(m, 1UL, _THIS_IP_)
  #else /* !CONFIG_DEPT */
  #define sdt_map_init(m)			do { } while (0)
- #define sdt_map_init_key(m, k)		do { (void)(k); } while (0)
-+#define sdt_wait_timeout(m, t)		do { } while (0)
- #define sdt_wait(m)			do { } while (0)
-+#define sdt_might_sleep_start_timeout(m, t) do { } while (0)
- #define sdt_might_sleep_start(m)	do { } while (0)
- #define sdt_might_sleep_end()		do { } while (0)
- #define sdt_ecxt_enter(m)		do { } while (0)
 diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 2c0f30646652..5c996f11abd5 100644
+index 5c996f11abd5..fb33c3758c25 100644
 --- a/kernel/dependency/dept.c
 +++ b/kernel/dependency/dept.c
-@@ -739,6 +739,8 @@ static void print_diagram(struct dept_dep *d)
- 	if (!irqf) {
- 		print_spc(spc, "[S] %s(%s:%d)\n", c_fn, fc_n, fc->sub_id);
- 		print_spc(spc, "[W] %s(%s:%d)\n", w_fn, tc_n, tc->sub_id);
-+		if (w->timeout)
-+			print_spc(spc, "--------------- >8 timeout ---------------\n");
- 		print_spc(spc, "[E] %s(%s:%d)\n", e_fn, fc_n, fc->sub_id);
- 	}
+@@ -2186,6 +2186,11 @@ void dept_map_reinit(struct dept_map *m, struct dept_key *k, int sub_u,
  }
-@@ -792,6 +794,24 @@ static void print_dep(struct dept_dep *d)
+ EXPORT_SYMBOL_GPL(dept_map_reinit);
  
- static void save_current_stack(int skip);
- 
-+static bool is_timeout_wait_circle(struct dept_class *c)
++void dept_ext_wgen_init(struct dept_ext_wgen *ewg)
 +{
-+	struct dept_class *fc = c->bfs_parent;
-+	struct dept_class *tc = c;
-+
-+	do {
-+		struct dept_dep *d = lookup_dep(fc, tc);
-+
-+		if (d->wait->timeout)
-+			return true;
-+
-+		tc = fc;
-+		fc = fc->bfs_parent;
-+	} while (tc != c);
-+
-+	return false;
++	ewg->wgen = 0U;
 +}
 +
- /*
-  * Print all classes in a circle.
-  */
-@@ -814,10 +834,14 @@ static void print_circle(struct dept_class *c)
- 	pr_warn("summary\n");
- 	pr_warn("---------------------------------------------------\n");
- 
--	if (fc == tc)
-+	if (is_timeout_wait_circle(c)) {
-+		pr_warn("NOT A DEADLOCK BUT A CIRCULAR DEPENDENCY\n");
-+		pr_warn("CHECK IF THE TIMEOUT IS INTENDED\n\n");
-+	} else if (fc == tc) {
- 		pr_warn("*** AA DEADLOCK ***\n\n");
--	else
-+	} else {
- 		pr_warn("*** DEADLOCK ***\n\n");
-+	}
- 
- 	i = 0;
- 	do {
-@@ -1582,7 +1606,8 @@ static void add_dep(struct dept_ecxt *e, struct dept_wait *w)
- static atomic_t wgen = ATOMIC_INIT(1);
- 
- static void add_wait(struct dept_class *c, unsigned long ip,
--		     const char *w_fn, int sub_l, bool sched_sleep)
-+		     const char *w_fn, int sub_l, bool sched_sleep,
-+		     bool timeout)
+ void dept_map_copy(struct dept_map *to, struct dept_map *from)
  {
- 	struct dept_task *dt = dept_task();
- 	struct dept_wait *w;
-@@ -1602,6 +1627,7 @@ static void add_wait(struct dept_class *c, unsigned long ip,
- 	w->wait_fn = w_fn;
- 	w->wait_stack = get_current_stack();
- 	w->sched_sleep = sched_sleep;
-+	w->timeout = timeout;
- 
- 	cxt = cur_cxt();
- 	if (cxt == DEPT_CXT_HIRQ || cxt == DEPT_CXT_SIRQ)
-@@ -2313,7 +2339,7 @@ static struct dept_class *check_new_class(struct dept_key *local,
+ 	if (unlikely(!dept_working())) {
+@@ -2371,7 +2376,7 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
   */
- static void __dept_wait(struct dept_map *m, unsigned long w_f,
- 			unsigned long ip, const char *w_fn, int sub_l,
--			bool sched_sleep, bool sched_map)
-+			bool sched_sleep, bool sched_map, bool timeout)
+ static void __dept_event(struct dept_map *m, unsigned long e_f,
+ 			 unsigned long ip, const char *e_fn,
+-			 bool sched_map)
++			 bool sched_map, unsigned int wg)
  {
- 	int e;
+ 	struct dept_class *c;
+ 	struct dept_key *k;
+@@ -2393,7 +2398,7 @@ static void __dept_event(struct dept_map *m, unsigned long e_f,
+ 	c = check_new_class(&m->map_key, k, sub_id(m, e), m->name, sched_map);
  
-@@ -2336,7 +2362,7 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
- 		if (!c)
- 			continue;
- 
--		add_wait(c, ip, w_fn, sub_l, sched_sleep);
-+		add_wait(c, ip, w_fn, sub_l, sched_sleep, timeout);
+ 	if (c && add_ecxt(m, c, 0UL, NULL, e_fn, 0)) {
+-		do_event(m, c, READ_ONCE(m->wgen), ip);
++		do_event(m, c, wg, ip);
+ 		pop_ecxt(m, c);
  	}
  }
+@@ -2606,7 +2611,7 @@ void dept_stage_event(struct task_struct *requestor, unsigned long ip)
+ 	if (!m.keys)
+ 		goto exit;
  
-@@ -2373,14 +2399,23 @@ static void __dept_event(struct dept_map *m, unsigned long e_f,
+-	__dept_event(&m, 1UL, ip, "try_to_wake_up", sched_map);
++	__dept_event(&m, 1UL, ip, "try_to_wake_up", sched_map, m.wgen);
+ exit:
+ 	dept_exit(flags);
  }
+@@ -2785,10 +2790,11 @@ bool dept_ecxt_holding(struct dept_map *m, unsigned long e_f)
+ }
+ EXPORT_SYMBOL_GPL(dept_ecxt_holding);
  
- void dept_wait(struct dept_map *m, unsigned long w_f,
--	       unsigned long ip, const char *w_fn, int sub_l)
-+	       unsigned long ip, const char *w_fn, int sub_l,
-+	       long timeoutval)
+-void dept_request_event(struct dept_map *m)
++void dept_request_event(struct dept_map *m, struct dept_ext_wgen *ewg)
  {
- 	struct dept_task *dt = dept_task();
  	unsigned long flags;
-+	bool timeout;
+ 	unsigned int wg;
++	unsigned int *wg_p;
  
  	if (unlikely(!dept_working()))
  		return;
+@@ -2801,21 +2807,25 @@ void dept_request_event(struct dept_map *m)
+ 	 */
+ 	flags = dept_enter_recursive();
  
-+	timeout = timeoutval > 0 && timeoutval < MAX_SCHEDULE_TIMEOUT;
++	wg_p = ewg ? &ewg->wgen : &m->wgen;
 +
-+#if !defined(CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT)
-+	if (timeout)
-+		return;
-+#endif
-+
- 	if (dt->recursive)
+ 	/*
+ 	 * Avoid zero wgen.
+ 	 */
+ 	wg = atomic_inc_return(&wgen) ?: atomic_inc_return(&wgen);
+-	WRITE_ONCE(m->wgen, wg);
++	WRITE_ONCE(*wg_p, wg);
+ 
+ 	dept_exit_recursive(flags);
+ }
+ EXPORT_SYMBOL_GPL(dept_request_event);
+ 
+ void dept_event(struct dept_map *m, unsigned long e_f,
+-		unsigned long ip, const char *e_fn)
++		unsigned long ip, const char *e_fn,
++		struct dept_ext_wgen *ewg)
+ {
+ 	struct dept_task *dt = dept_task();
+ 	unsigned long flags;
++	unsigned int *wg_p;
+ 
+ 	if (unlikely(!dept_working()))
+ 		return;
+@@ -2823,24 +2833,26 @@ void dept_event(struct dept_map *m, unsigned long e_f,
+ 	if (m->nocheck)
  		return;
  
-@@ -2389,21 +2424,30 @@ void dept_wait(struct dept_map *m, unsigned long w_f,
++	wg_p = ewg ? &ewg->wgen : &m->wgen;
++
+ 	if (dt->recursive) {
+ 		/*
+ 		 * Dept won't work with this even though an event
+ 		 * context has been asked. Don't make it confused at
+ 		 * handling the event. Disable it until the next.
+ 		 */
+-		WRITE_ONCE(m->wgen, 0U);
++		WRITE_ONCE(*wg_p, 0U);
+ 		return;
+ 	}
  
  	flags = dept_enter();
  
--	__dept_wait(m, w_f, ip, w_fn, sub_l, false, false);
-+	__dept_wait(m, w_f, ip, w_fn, sub_l, false, false, timeout);
- 
- 	dept_exit(flags);
- }
- EXPORT_SYMBOL_GPL(dept_wait);
- 
- void dept_stage_wait(struct dept_map *m, struct dept_key *k,
--		     unsigned long ip, const char *w_fn)
-+		     unsigned long ip, const char *w_fn,
-+		     long timeoutval)
- {
- 	struct dept_task *dt = dept_task();
- 	unsigned long flags;
-+	bool timeout;
- 
- 	if (unlikely(!dept_working()))
- 		return;
- 
-+	timeout = timeoutval > 0 && timeoutval < MAX_SCHEDULE_TIMEOUT;
-+
-+#if !defined(CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT)
-+	if (timeout)
-+		return;
-+#endif
-+
- 	if (m && m->nocheck)
- 		return;
- 
-@@ -2449,6 +2493,7 @@ void dept_stage_wait(struct dept_map *m, struct dept_key *k,
- 
- 	dt->stage_w_fn = w_fn;
- 	dt->stage_ip = ip;
-+	dt->stage_timeout = timeout;
- exit:
- 	dept_exit_recursive(flags);
- }
-@@ -2460,6 +2505,7 @@ static void __dept_clean_stage(struct dept_task *dt)
- 	dt->stage_sched_map = false;
- 	dt->stage_w_fn = NULL;
- 	dt->stage_ip = 0UL;
-+	dt->stage_timeout = false;
- }
- 
- void dept_clean_stage(void)
-@@ -2490,6 +2536,7 @@ void dept_request_event_wait_commit(void)
- 	unsigned long ip;
- 	const char *w_fn;
- 	bool sched_map;
-+	bool timeout;
- 
- 	if (unlikely(!dept_working()))
- 		return;
-@@ -2512,6 +2559,7 @@ void dept_request_event_wait_commit(void)
- 	w_fn = dt->stage_w_fn;
- 	ip = dt->stage_ip;
- 	sched_map = dt->stage_sched_map;
-+	timeout = dt->stage_timeout;
+-	__dept_event(m, e_f, ip, e_fn, false);
++	__dept_event(m, e_f, ip, e_fn, false, READ_ONCE(*wg_p));
  
  	/*
- 	 * Avoid zero wgen.
-@@ -2519,7 +2567,7 @@ void dept_request_event_wait_commit(void)
- 	wg = atomic_inc_return(&wgen) ?: atomic_inc_return(&wgen);
- 	WRITE_ONCE(dt->stage_m.wgen, wg);
+ 	 * Keep the map diabled until the next sleep.
+ 	 */
+-	WRITE_ONCE(m->wgen, 0U);
++	WRITE_ONCE(*wg_p, 0U);
  
--	__dept_wait(&dt->stage_m, 1UL, ip, w_fn, 0, true, sched_map);
-+	__dept_wait(&dt->stage_m, 1UL, ip, w_fn, 0, true, sched_map, timeout);
- exit:
  	dept_exit(flags);
  }
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index d366acacffec..b0351667a771 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1319,6 +1319,16 @@ config DEPT
- 	  noting, to mitigate the impact by the false positives, multi
- 	  reporting has been supported.
- 
-+config DEPT_AGGRESSIVE_TIMEOUT_WAIT
-+	bool "Aggressively track even timeout waits"
-+	depends on DEPT
-+	default n
-+	help
-+	  Timeout wait doesn't contribute to a deadlock. However,
-+	  informing a circular dependency might be helpful for cases
-+	  that timeout is used to avoid a deadlock. Say N if you'd like
-+	  to avoid verbose reports.
-+
- config LOCK_DEBUGGING_SUPPORT
- 	bool
- 	depends on TRACE_IRQFLAGS_SUPPORT && STACKTRACE_SUPPORT && LOCKDEP_SUPPORT
 -- 
 2.17.1
 
