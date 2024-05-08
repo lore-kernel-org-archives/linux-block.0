@@ -1,17 +1,17 @@
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4277E110;
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631647E772;
 	Wed,  8 May 2024 10:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715162584; cv=none; b=uIgEc8YQjJhYIwnc/3yeRyIT1OgGELdQcKhmPHJyIqQW+ZcHtfL2nNexpIwnWNQNwpmxF3zt3Vj3T4qP45kKxgX1hc3dPlNf+wZ2LglNvqcyNoS8z0TtZYc3SyZCglJ3v46tLgyHG+AQCWhZ0s7d7El2cDOYp5PNDDq5ja+ZJ0Q=
+	t=1715162584; cv=none; b=Hmc2X+bG8Wm9SggWS0mwDMcrD+juZHRMUcsdQ7V04Ki/stiC0TBNf9saf+QGvWAICS7//qr99UGUMPeFB8Qrb95RVtd6TZ0u02sT8n+awZi7XPyI9FtOu731rdpQwTISnkgZdQgE+tDdJQD7VwabHyZDq1BQxZAnVLNX+Baw95o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715162584; c=relaxed/simple;
-	bh=dwbWt4rlWq9QuuKHgbLzff+gNBwrST8dIRTjEytHNmQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=TZvgqwCP54kedRuj0bjC5bKqEXSDImzUw0Vz+NL4km4WEnjZOqe0u0AdjnVBsN84cDD1G3/ke6LgnI0tfyNBDu2TUynFxJmgWULLthhx9c3kCbEpYNWzNCJMduVie0ol7BVZLJ0vtN86DqB1rjv4ZZKs50KWE1uu97W4xGdNenA=
+	bh=oVu1M/z+Be6zJoonqEicwRg8jn1j0IbzUk3u5AE/er0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=KMDRq2aC65pMcfNTtVBogiOwIs7u7BpxiTkLdvKR8hc/Oa5M6T5DLARW/CHxNVCnLbIavWKoNxu7Nk11zi7U3KZpswfEU0V8L16dBFSugOm78uQjKX2jTAX5MQerCzUmiTB5HRxNw9OAoZ9Tzg9KO+20MY9knBJo4AkA0x5F7/Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-d85ff70000001748-e5-663b4a3aeddf
+X-AuditID: a67dfc5b-d85ff70000001748-59-663b4a3b5c02
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -71,43 +71,43 @@ Cc: kernel_team@skhynix.com,
 	longman@redhat.com,
 	hdanton@sina.com,
 	her0gyugyu@gmail.com
-Subject: [PATCH v14 13/28] dept: Apply sdt_might_sleep_{start,end}() to waitqueue wait
-Date: Wed,  8 May 2024 18:47:10 +0900
-Message-Id: <20240508094726.35754-14-byungchul@sk.com>
+Subject: [PATCH v14 20/28] dept: Apply timeout consideration to hashed-waitqueue wait
+Date: Wed,  8 May 2024 18:47:17 +0900
+Message-Id: <20240508094726.35754-21-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240508094726.35754-1-byungchul@sk.com>
 References: <20240508094726.35754-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0iTYRTHe573NkeLl2X4ah+qlRRGlmJ1yoxu2EtQiUUf9EONfNWRNzav
-	QWCpZamlllo2whvTdF7aCixdLE3TRFtlpmEzbVTDzdFspinVNPpy+PE///P7dESE9BHlI1Ik
-	JAvKBHmcjBaTYvvyyi27jwRHb7N+8oai/G3g+pFLgrpZS4OpqQGB9uFFDNauw/B+xoZgvv8V
-	AWUlJgSV4x8JeNhtRmCou0TDW8sKGHQ5aOgtyaMhq7qZhteTCxhGS4sxNOiOQl9hFQbj3FcS
-	yqw03C3Lwu7xDcOcpp4BTaYvTNSVM7AwHgC95iEKDB82w517ozS0G3pJ6G6dwPD2iZoGs/YP
-	BX3dPSSYigooaJyqomFyRkOAxuVg4I2xAkNLtlt0efo3BS8KjBgu1zzAMDjShuBp7icMOu0Q
-	DZ0uGwa9roSAX7VdCCau2xnIyZ9j4O7F6wjyckpJyB7dDvOzanrfLr7T5iD4bH0ab5ipIPmX
-	VRz/uPwjw2c//cDwFboUXl/nx1e3WzFf6XRRvK7+Ks3rnMUMf80+iPmpgQGG77k9T/KWwTIc
-	5hMh3hMlxClSBeXWvWfEsWMdZiqpwCO9xjpNZKJ85hryEHFsELdg1lD/ecg0ssQ0u5EbHp4j
-	FtmTXcvpC74s5QRrE3M1A6GLvJI9xT1vLcGLTLK+nO1z5pJTwu7gvjua6H/ONVxDi3HJ4+HO
-	R75OoUWWstu5tqxyd1/s7vwQcXmOMeLfgTf3rG6YLESSCrSsHkkVCanxckVckH9sRoIi3f9s
-	YrwOuZ9Jc2EhshU5TSc6ECtCsuUSo9fuaCklT1VlxHcgTkTIPCVdV3ZGSyVR8ozzgjLxtDIl
-	TlB1oNUiUuYlCZxJi5KyMfJk4ZwgJAnK/1ss8vDJRLXrvTeIC5sMoZLXivAqOJh4zDzsmXIj
-	MFcXLmgzpouru2uJnD/6q5vvG2dLiyzVYz4RtrWNLwKSL23qVX33C4lSH/+Zsuyd+o264ZFT
-	HXMs1P9CBLsyyd5/b3KdvfjW7zTVqmcHbt4JtoQV+u5H8SdDIpOdh7ZYJlJDdgb1bwqelZGq
-	WHmAH6FUyf8C6Ue/y0gDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSf0yMcRzHfb/Pr+vm6nEyzzSya42YFOIzmdlsepZp/IPZjMOTbq4f7vrJ
-	KO4QOqu4Tj+QtNPqFBdT6nIupVg5aqlWIQ2t0026m1NDl/nnvdfe7+3111tESA3UIpEiIVlQ
-	JciVMlpMimMiNas2RkfGhl0zkZCXEwauyWwSSmpMNNirqxCYHp7BMNoSBe/cDgRTHa8JMOjt
-	CG5/HCTgYesQAkvFWRq6Rnyh2+WkoV1/mQbNnRoa3oxNYxgoyMdQZd4Br3LLMFg9X0gwjNJQ
-	bNDgmfiKwWOsZMCYFQzDFUUMTH8Mh/ahHgqab7RTYOlfCYU3B2hotLST0Fo3jKHrSQkNQ6Y/
-	FLxqbSPBnqej4N54GQ1jbiMBRpeTgbfWUgz3tTO28z9+U/BCZ8VwvvwBhu6+BgRN2R8wmE09
-	NDS7HBhqzXoCft1tQTB85RsD53I8DBSfuYLg8rkCErQDETD1s4TespFvdjgJXlubxlvcpST/
-	sozj64sGGV7b1M/wpeYUvrZiBX+ncRTztydcFG+uvEjz5ol8hr/0rRvz452dDN92fYrkR7oN
-	eGfAPvGmI4JSkSqoVm8+KI57bxuiknQ+6eWjP4gslMNcQj4ijl3H9dj7KC/T7DKut9dDeNmf
-	XcrV6j7P9gTrEHPlndu8PJ/dzT2v02Mvk2ww5/iUNeuRsOu5785q+p8zkKu6b531+Mz0fV/G
-	kZelbATXoClicpG4FM2pRP6KhNR4uUIZEao+FpeRoEgPPZwYb0YzdzGems6rQ5NdUTbEipBs
-	rsROR8ZKKXmqOiPehjgRIfOXtFzYECuVHJFnnBBUiQdUKUpBbUMBIlK2UBK9RzgoZY/Kk4Vj
-	gpAkqP6vWOSzKAulmWJ8l2da50yb1mx7ljNI7N0U4lmY3ibtCEryyz6QVrh9rc3wXb9b81hJ
-	xWt/2RafnqjvCGIeV9a7dUsy/arDtwacPH5orm/gWL/ulm3HAvn75P3zJjMeNUnCRCmKVSNP
-	nYpCSDzbGJZdmP6utylmwG+1Ldj94e6uzKsQYgbLTxmpjpOHryBUavlfmxi4yCoDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0hTcRTH+/3u0+HqtgJvBhmLsCx7iNXpJRGVlyAqoogKdOU1R2oxXxkU
+	lrNMm5Rhmo9SZ2vMtekUqUxZmpZptmqUxRQd9hhODWviUqpp9M/hw+ec7/evwxKyeiqQVSYm
+	i6pERbyclpCSYf+K0M27N8eueWabCzeurQHPz2wSSs1GGmymagTG+osYXG2R8GHcjWDy1WsC
+	CgtsCCoGegmob+9D0KS/RMO7wdlg94zS0FGQS0Om1kzDm6EpDI5b+RiqLXug83olBqv3KwmF
+	LhpKCjOxb3zD4NUZGNBlLAWnvpiBqYG10NH3noKmTyvg9h0HDU+aOkhof+jE8O5xKQ19xj8U
+	dLa/IMF2Q0PBg5FKGobGdQToPKMMvLWWY6hR+4ou//hNwXONFcPlqloM9o+NCJqz+zFYjO9p
+	aPW4MdRZCgj4db8NgTNvmIGsa14GSi7mIcjNukWC2rEOJidK6W0bhVb3KCGo69KEpvFyUnhZ
+	yQuPinsZQd38iRHKLSlCnT5E0D5xYaFizEMJFsNVWrCM5TNCzrAdCyPd3YzwomiSFAbthXhf
+	4BHJlhgxXpkqqlZHREviujLN6Ewec/a7Q4Mz0ACVg/xYngvnb6r1xH9uuHd/xtNcMN/T453x
+	87nFfJ3my4wnOLeEr+reNc3zuIP8qK2FmWaSW8oPPOjDOYhlpdx6vqtL/q8yiK+usc7U+Pn0
+	x68jaJpl3Dq+MbPYF5X4biZY3vGmBP8LLOCf6nvI60hajmYZkEyZmJqgUMaHr4pLT1SeXXXi
+	dIIF+X5Jd37q6EM0ZjvQgjgWyf2l1oBNsTJKkZqUntCCeJaQz5e2XdkQK5PGKNLPiarTUaqU
+	eDGpBS1kSXmANGw8LUbGnVQki6dE8Yyo+r/FrF9gBuL4w4bJYG1DY+uOsm+v8n+GRlU1eJcd
+	7x+KdrEROxc1owufGSo17bv7+Na7Kc7ONL3CdkwcrF25a1bRgQ9hv5ebIpvtMVqTIdhcFKYc
+	LNJ5Ip1fQsuW7Z2jqSwJ2d5JBkz4L6k6ZNzv8j7qXWBSB77OCjJr2QtGzJjU4dVKQk4mxSnW
+	hhCqJMVf/xghQ0cDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTYRzGe99zdbQ6LKGDBsW6CEaWkfVPK6QP+RIYQUTRBRt2zJE3tjSN
+	LGublaWloJZZqNUSnZlTKvOCzlzespWjUqbkLZVMy5q1tIsafXn48Tzw+/TwlCKL8eDVUSck
+	TZQqQsnKaNmuAN0a/50BYet+tWyG9CvrwPntIg25pSYWbA+KEZgqzmEYaQyCt5OjCKZevKQg
+	O9OGIL+3m4IKaw+CmsLzLHQMLAC7c5yF5szLLOjulLLw6uM0BkdWBoZiczC0XivAUOcaoiF7
+	hIWb2To8E8MYXMYiDoxJK6GvMIeD6V5faO55w0DDrWYGarpWw43bDhaqa5ppsD7pw9DxNJeF
+	HtMfBlqtTTTY0lMZKBkrYOHjpJECo3Ocg9d1eRge6mdsyV9/M/A8tQ5D8t0yDPbOKgS1F99j
+	MJvesNDgHMVQbs6k4Of9RgR9aZ84MFxxcXDzXBqCy4YsGvQOP5j6kcsG+pOG0XGK6MtPkprJ
+	PJq0FIikMqebI/raLo7kmWNJeaE3uVM9gkn+hJMh5qJLLDFPZHAk5ZMdk7H2do40XZ+iyYA9
+	G+/2PCDbclSKUMdJmrXbjsjC23SlKCaNi//sSMVJqJdJQW68KGwQH927P8es4CW+e+eiZtld
+	WCaWp36Y6ylhVCbebd8xy4uEveK4zcLNMi2sFHtLenAK4nm5sFFsa1P+Uy4Vix/WzWncZurO
+	oTE0ywrBT6zS5XDXkCwPzStC7uqouEiVOsLPR3s8PCFKHe8TGh1pRjNvMSZOpz9B3zqCLEjg
+	kXK+3MYGhCkYVZw2IdKCRJ5SussbL2wKU8iPqhJOSZroEE1shKS1IE+eVi6W79wnHVEIx1Qn
+	pOOSFCNp/q+Yd/NIQh5VvnvOFyy5Gpgp5MukwEuLDNMbvZYPEfeDRY7vz7YNSsEtreHV1hAL
+	eAZ3fYlR7kpcf2jKK9Znf2WL5F2Ktvzy7x5cNjzctkczGGSoL1uVb/2RoXgQutVlus1FRr8o
+	0Z4+U5nYFR+b3H+9X1+v0D/eXrZi4nCTwXTWd2GIPX5ASWvDVb7elEar+gs90H2lKQMAAA==
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -115,41 +115,28 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Makes Dept able to track dependencies by waitqueue waits.
+Now that CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT was introduced, apply the
+consideration to hashed-waitqueue wait, assuming an input 'ret' in
+___wait_var_event() macro is used as a timeout value.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/wait.h | 3 +++
- 1 file changed, 3 insertions(+)
+ include/linux/wait_bit.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/wait.h b/include/linux/wait.h
-index 8aa3372f21a0..3177550a1b42 100644
---- a/include/linux/wait.h
-+++ b/include/linux/wait.h
-@@ -7,6 +7,7 @@
- #include <linux/list.h>
- #include <linux/stddef.h>
- #include <linux/spinlock.h>
-+#include <linux/dept_sdt.h>
- 
- #include <asm/current.h>
- 
-@@ -302,6 +303,7 @@ extern void init_wait_entry(struct wait_queue_entry *wq_entry, int flags);
- 	struct wait_queue_entry __wq_entry;					\
- 	long __ret = ret;	/* explicit shadow */				\
- 										\
-+	sdt_might_sleep_start(NULL);						\
- 	init_wait_entry(&__wq_entry, exclusive ? WQ_FLAG_EXCLUSIVE : 0);	\
- 	for (;;) {								\
- 		long __int = prepare_to_wait_event(&wq_head, &__wq_entry, state);\
-@@ -317,6 +319,7 @@ extern void init_wait_entry(struct wait_queue_entry *wq_entry, int flags);
- 		cmd;								\
- 	}									\
- 	finish_wait(&wq_head, &__wq_entry);					\
-+	sdt_might_sleep_end();							\
- __out:	__ret;									\
- })
- 
+diff --git a/include/linux/wait_bit.h b/include/linux/wait_bit.h
+index fe89282c3e96..3ef450d9a7c5 100644
+--- a/include/linux/wait_bit.h
++++ b/include/linux/wait_bit.h
+@@ -247,7 +247,7 @@ extern wait_queue_head_t *__var_waitqueue(void *p);
+ 	struct wait_bit_queue_entry __wbq_entry;			\
+ 	long __ret = ret; /* explicit shadow */				\
+ 									\
+-	sdt_might_sleep_start(NULL);					\
++	sdt_might_sleep_start_timeout(NULL, __ret);			\
+ 	init_wait_var_entry(&__wbq_entry, var,				\
+ 			    exclusive ? WQ_FLAG_EXCLUSIVE : 0);		\
+ 	for (;;) {							\
 -- 
 2.17.1
 
