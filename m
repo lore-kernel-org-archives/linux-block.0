@@ -1,227 +1,203 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0918712DD9A
-	for <linux-block@vger.kernel.org>; Thu,  9 May 2024 10:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715251403; cv=fail; b=Grm1bL9FKpbNgboDoRx7kpUI+O56NOSdTFo5exfVH5heVMgJhmuDpGH8cO1mDprBPm4jvcOCExaSWqanGSNILTSZiNTQ3nzyXhka0qnjxntMkp3gLLl1u7Em540aN+3I6LvxybUSwjm9DNNOIPKebRbNvZthUf5YzPXjXchWgWk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715251403; c=relaxed/simple;
-	bh=4VxXOHE1gK+rOammEEF1lIRWusEHYxwMTH7Ry3QFRl4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nntpcGjqHrzA9FkprRl4qcYvO/9Y8IazjCAdrLK0/CBqEb5kW11rr02N7cLU/ScXWJIi5Yidg61lCK9DleJHBFzuKjITUnH6bbiXUMmkWMYrQSI1PkXbcs8ruptPq412Lgu2U4QnRiJRExepW0dRdGXFcMSsyK1cwfTXM8zCULw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=kqtSDmS5; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=HWgEsOqy; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2936926ACD;
+	Thu,  9 May 2024 11:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715253849; cv=none; b=Fe7/jhMFWHMf25IP4c0/RyvAqk6FzEj2AaPI6K12S2yz9qDvnfVP2H0b9MCkaIA3GA5Qavri98qHV9jaRDCNmEjHYOdgqkkfYIrDwKupCctCjguIeU1oiN/9gsNUUgkCKA2tEP+HX3enAMEeP13g7d+yVJvdLL/SpGppSz/2Q7o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715253849; c=relaxed/simple;
+	bh=tLMPuK2Ly0RBsmWYYg9cOjP/3RZQ19gOk8kWcXXHoFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gq4wvmjQVkHvEWaMXjGWlg6ZmwjgiwFshAutKQfFuuJBRXigoiqjxZdZCgwapyF4GmD+MBCHiXQFE81BrFG2cuE8/+sRdgI+xETu3PlYeMoYARwxyqjPEEjpzGEXH1EkT1IXssypu75KuyN8S15+jnL6OtZ0d2gAwo8yKGvBUwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LhAowGzz; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kqtSDmS5";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="HWgEsOqy"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1715251402; x=1746787402;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=4VxXOHE1gK+rOammEEF1lIRWusEHYxwMTH7Ry3QFRl4=;
-  b=kqtSDmS5/F/lFJP77ddElT2Rv+TT83pwGZqZ6V1g3tVbxdRQYrJzQcB8
-   b0XczyBUxHMUlKNDyKN0S26MPNNZPU7ss6jy4SHumtVdibcajmJ4NwoB5
-   G0263stFtSe9OmHpp+E9p4ETZfXi965XfmP37DSz+lxtXxJpz0oWJ0nAJ
-   9G9pPNN1jhBkSOCSrpug1IB/Wv5Gs95sI5GDQx3gytusKG0Bk5cx/9yAv
-   95TN1fceBQpGt9voZzdwjV07nLE7IPmPQl1joQYIdfCHZKiiVHpDjIUpS
-   8DlrhUCEai9F1KDirFb+pXQEaJglWj3ub1uD5DGz1s5SXgi1pT/0xRvsw
-   w==;
-X-CSE-ConnectionGUID: Q3SpZ8tdQXqKDo8IRt4YPg==
-X-CSE-MsgGUID: GcMykwomToqItfqNMFH57Q==
-X-IronPort-AV: E=Sophos;i="6.08,147,1712592000"; 
-   d="scan'208";a="16187903"
-Received: from mail-dm6nam04lp2041.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.41])
-  by ob1.hgst.iphmx.com with ESMTP; 09 May 2024 18:43:20 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KccZfhdoKGZ6hXz2iIs2ia9QwrGYEIg5zGY8VXQ1zLDMh6a1hNPiwURhi0YnqK6UaOAkfUUYK6LuCRbFzkfnaPQplJPSfHZ7yNuaIX+lG5A1YQu8qWf+iICXeQEDpvQTHKKc8t72Nk+CSWQp4Vg0GMqMMA5LTsjsixF9OJt3XmAp8sxtXOjQ+o/QcoHJ5ESmCcTvJPYYQsCiOo9LApj/3Oqbz4E3tQLuvBH/Q0jdvp/OvrnL448ebvCOrLhvJwTVVUvpVRj+KAGPxSHO5JMXvhlDg59I5RPvcGTTGEzXqU8ANHhjhzDKzddkVe5iYDmTEHqjSYQydeyZbjNuhIQO5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0visKUxUrob3XZ8iA9Jn7vUhrcBhpfjHTjKFyJkL1N4=;
- b=mj5tPxXWLliFm3Tevap15Pe4sqBgbdeb7epOULQ9QGqN2M4/L/bflLscs6D67fXe40Bj161BD045+i7FTdWTj6mvMbnatjnQmdOdBpIg7sNBnZM71R/70JdE6O+QijCPQDaNK4tlCpe1mGcii0jORIlGO6agGHfXJU6BkkbObD0nnOxB8fw1F1Y0AYW5JHsC60kSAZirA/JDwDNhmFjx88guOV5pRG/IhDe5i7zPYReFUmHNuACFj800KTX+Oe3CAXIJzvciEgr1vAfpY5+h048e/hxZHdZr4ozZD4EhCvqO7NtTEwyxNbpjWAYiTyiF13vB+0ShsiPpPpfJUYW9yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0visKUxUrob3XZ8iA9Jn7vUhrcBhpfjHTjKFyJkL1N4=;
- b=HWgEsOqyYQhRe6RMeMcH0Tu5r6zRs72sh9yoNQwqrzE5401l84GY5WzXjgFADLbTG01DcK+mk/ywCB6LH2nVMiih+KjAw5frcfRtKVCh2BnCzdZeEYXhar0uHsT0PN0sOCClLHlFgSQOabAgLUkkc75SmKxA8iJMO4W8/AIN+VQ=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BY5PR04MB7044.namprd04.prod.outlook.com (2603:10b6:a03:227::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.47; Thu, 9 May
- 2024 10:43:18 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::c75d:c682:da15:14f]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::c75d:c682:da15:14f%3]) with mapi id 15.20.7544.046; Thu, 9 May 2024
- 10:43:18 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Daniel
- Wagner <dwagner@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>, Sagi Grimberg
-	<sagi@grimberg.me>
-Subject: Re: [PATCH blktests v4 00/17] support test case repeat by different
- conditions
-Thread-Topic: [PATCH blktests v4 00/17] support test case repeat by different
- conditions
-Thread-Index: AQHanfskESNiAEBXBkigoijujDdN6rGOv3EA
-Date: Thu, 9 May 2024 10:43:18 +0000
-Message-ID: <vdr37ciqnbjpfxb6yzgpxoqtjlvbgxl7czz2g2mr2do6gprabg@dze7yhsz7nim>
-References: <20240504081448.1107562-1-shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20240504081448.1107562-1-shinichiro.kawasaki@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BY5PR04MB7044:EE_
-x-ms-office365-filtering-correlation-id: e8aae29f-090c-420a-0f94-08dc7014d704
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|366007|376005|1800799015|38070700009;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?j5m+qwrzV8L2QsUGEpu5fYtSvUM7oIwbxztbQBuqZFk24QuiSvO+IB4m6tvZ?=
- =?us-ascii?Q?NwU1c3Wtx5KnYn7w8npUr4tq+O170t70w278ljA2t1svgDpGZbjuoDjbOPxw?=
- =?us-ascii?Q?8kik4sBWgQIS+OitEqHY4BsFvhJ1NLN6cnnG/s5yIa+FsUq9eaSuBx+f+HAu?=
- =?us-ascii?Q?Lfuwh+rmMWZZ/1MIbxE1AmDIj07s+Fzj2Fq9IOe3BhTLaetjKbMZkFEIs+4z?=
- =?us-ascii?Q?rjkhLWCTPpRwZUOH5D9ZD3r9D20GWg8+rydlT+O2trUjI0wUcq9szDYJ+t4D?=
- =?us-ascii?Q?wC7DUna/2Hm/De0ug+cUSyAjuD+ZxFbEHm6qlM7DOpK+xA5BfQ076lCh1hFh?=
- =?us-ascii?Q?bOmb1mStPmBHR0XWICZiZgYiCC7DU/TxhhNmnUttC95W8xrhdFC5VKlRR0zJ?=
- =?us-ascii?Q?FFP6UrKonDd20wb+kKhNZVg27VkrhAqVE2BAFdxbZ40Z2ul5z/DAAb24h65a?=
- =?us-ascii?Q?yqgTJM2Fr05yjL5qxaR4WqEXi9CPTDSMo5cw0GKELE+tqIxlX2xFag2MirNM?=
- =?us-ascii?Q?nEONZ6CpIJjRW7bKT8qsF78fqvn7lDv+aLlSWQ1EQK209NrsCnBXPnpgA4V0?=
- =?us-ascii?Q?j1282Ls60W5FD+y8c3uZF0Ptz4aJsEEOS5Y5iHFAcgspxrdIDMUZvCeVtx5j?=
- =?us-ascii?Q?t5l6FeCJ/ZudsWLYyyUsiLqfkYUXqbSTIMVba3RReQJcw6gKjNutG8tHp9iz?=
- =?us-ascii?Q?XpqFsu7DPDR5wxzyM+ygNhgzh4mBkhoJeyTX7+hzTRoVrkGibdYf+/JqvyZ/?=
- =?us-ascii?Q?ntMmw4TbxCjou7dAzc/hNCJHtVHlh6tCxdkzQWF5r3Vio/mf1lExlPts7+BR?=
- =?us-ascii?Q?zN9Z46ympCImVkExBmyEh/fDgAPDY1UNyESPXGYeDA64ZZik7bG7wcjb5aL5?=
- =?us-ascii?Q?FzZEl8AKkybcezErvShYzYNRqNlY+/ebGnpP/5S4CQgfePOZt2cqA+JQbspO?=
- =?us-ascii?Q?hxU63hSvHC20rV/W4xIgDjauC12KDPOiN8UkR1aCYzYAiMCuf6oiinzsPEC+?=
- =?us-ascii?Q?0vCRrtumtPwpZOFASl+XcxnLjemsvVArSHKdYbAG2vLEBQePpxOSb+cdojZd?=
- =?us-ascii?Q?v2gR+Kl9J1zBumbEP1Ja8z4+kbSrrWU4HPh9lia61YlyahAhXucHbdwXEmP5?=
- =?us-ascii?Q?t9o4iIxubWfIMh/dg+J77iGr9ziRpmQiPDuTs2tsn8FDV/XTCgFQ+7FgtbaE?=
- =?us-ascii?Q?aoohrji1VY5zRP3Nz0re1VfVhZiy06wBMzANnp+gGaE11Ly3lsVGi6DVB/TX?=
- =?us-ascii?Q?eMtVOkx7gglopuXANri5l7UL4tsQ572YCSos91J/iw=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?KU04Mc0wdwN9L1P1japlZnFeohfg+AzemxVN7w5vkRDacqYl0ExzjYSsnPKi?=
- =?us-ascii?Q?fTDuZ+5J6ooY+S5tvnZ6j8lWU23gVLPUcvFWW7AgnOUIl3ynhXNIekQCzaVu?=
- =?us-ascii?Q?SU1SXj9N3M1LzYYeODif71mFbsC01kL+RQ/mlt+rUWZ4h486aqMNb10PToZy?=
- =?us-ascii?Q?0+jL4RRtdYMWcA3Tv8WXo7phpYh4lltWjHXN+JGmcGZwAj5dk5/6wQutlQGm?=
- =?us-ascii?Q?o14Iix97GJ4DfeDrOQBtKmEyClGKGVDDykIIGLoZBxJENw0vzjT+1U5p0h2M?=
- =?us-ascii?Q?gmDW6CTztNSepMoJu7YjdoFU5z//xDnS8onfW2YoCpxi6tSbIUlIJA888RI0?=
- =?us-ascii?Q?YPF/PNn9Exh3wjSkOfLTwJU8gzmVE3fmveqaDe7IADuFVzctEuygtx3ZEn5E?=
- =?us-ascii?Q?m8kiTZbm0UCgrj5OB5cJahMUIp46EhgOp1DF/5AiqgyS21lk8SGdKKy9+yU/?=
- =?us-ascii?Q?VwQakEC5qJJbh1wgLeRGLPtRVSBeRU0ID6t6MoDr2W6YDKRwl2oIsDkUrvhe?=
- =?us-ascii?Q?svzrVLr6gry3tiCRsCSdSx7h8fLQX4TTRKdSJsXsoAdmOhtk33ozGqh6VzBj?=
- =?us-ascii?Q?mCB+5Pl8jMw+DfPoRi+WzVePYa+ra+v9RcHcrpJKsE9yfXSWL0jnuVZ5tcqo?=
- =?us-ascii?Q?f3XIGFDNBcuGtE4MmQLncMmi0Jkr7v2A4kwCcXUfl4vXEjIBQ5H2EdYpFYs+?=
- =?us-ascii?Q?mar/lCVn64cE7bkpnAf7QwMSOeuAWI8thmbhqRVaLalTal5iux0fJbp5CjNQ?=
- =?us-ascii?Q?wm4xY9bVD+9Qd4lDzMJKxuffmIpMhqJZ6hzkVKTX/b4/tRtNq1IxSXJmaaKJ?=
- =?us-ascii?Q?ar+l5bogdZpnPedkbPdfbqa7/tI0Zn5aV8kkws2/QzKg3zmjZRgURNT7tIgD?=
- =?us-ascii?Q?xZteGHr8iJ7qztEB6Npdzoc7WBpx7muFqckSMKZKIJNBKyPdkxLo2gRxVluU?=
- =?us-ascii?Q?khpI2EzW2GR4Ih0Vtoj+VlGReqMfL7lIg1bFsnkc4eOKrkg3qGLhMWV6KT0X?=
- =?us-ascii?Q?eYq2++81lKMvnAumnLIjf1PEz1FrKg4nWTQ3h25MQ3Uy+w0m6++vsDwWAuCx?=
- =?us-ascii?Q?RxRIBM3KK9/VkbJXgOacVtYDq/ZX6FERHes8jLCjt/C5zHPvmogfQrTBwzSJ?=
- =?us-ascii?Q?3Qy6kZJydzwkiEfENvdEUNIuSRpi0YQIjQ9h3d82G/S0lFTMeZh8msWeISIQ?=
- =?us-ascii?Q?88Xx0kdNJSMmiad/JuO6UQyF9tjxY7DDV6+hqmvjyawbLzMJ/gqv2eTZUM1j?=
- =?us-ascii?Q?SQxRwOeCzPmOASsmeE+oFsmbS7sR5rkizqOnjXyFw5Xzi+rHRNsthRXkQZqS?=
- =?us-ascii?Q?VIBmQdskLPPWX0IU3jVnPc/SerDMriQTtf6vhwWoAK+DM2oiS0M3oWoV06nW?=
- =?us-ascii?Q?DHuQd4hcN+aG3e35ZqlLiIQzghaTAJ9C+sCSr/TvfJg7qF1M0kI3K22c0hfP?=
- =?us-ascii?Q?WGBh4FDKhNy//xbs9wc981/w9Z/4rpuW+2mLSHM0X0Ug2Oy56BQsPMoM5CbS?=
- =?us-ascii?Q?PuuyBG/vyeNMXgWWzRkVo+Mvzv/jwSO25CMp1Gmd/4QJjNWjDy+YSphKfbMg?=
- =?us-ascii?Q?5bFyMJOCe7pT2ymXwcUXOVD63dCPgqimXBX0RaibgThqnRfkqZWGNyKe6yF1?=
- =?us-ascii?Q?+L2xBDgJWvTQgJL7lX+1BPs=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <389152A29EF6244F9047A712F2DC1053@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LhAowGzz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715253847; x=1746789847;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tLMPuK2Ly0RBsmWYYg9cOjP/3RZQ19gOk8kWcXXHoFA=;
+  b=LhAowGzzqmFj5R/IT1RXDb8duTAm+3AH+2Rd8XKPFHQpplF2wWcHv7Nk
+   BbH6PXbT1qFDoS+L4i0idLa1+PmunxYl3QE8kEvZBHZNo0be0cV5KIvic
+   vSVRhR0IQDj93X7b4Hf7BPDJUrleKJQxgjvmR6MtfUjb2ezg1TjXTav65
+   laQN7DNBDcU5bctQC1gxpkP4RQy7vdh2C9T/Han0NhJ3JG+qcmdgdDBv6
+   goNYO30QVB7uSJ9K5lw2H9KBDseXb1Rskdobi1Lr7R810mDQwnkFqiIo9
+   lL6pNnVoidoylpz1MR51PJicACbWN9ZDrJhbgbL03SDzzVhzB67SrGfq9
+   A==;
+X-CSE-ConnectionGUID: RQpotY0oSLq1sr9yOFZmxQ==
+X-CSE-MsgGUID: 9qbDQ3zxTzqhbRyAxaWCag==
+X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="21838608"
+X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
+   d="scan'208";a="21838608"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2024 04:24:07 -0700
+X-CSE-ConnectionGUID: TDrF/mY/TVCfXE0QIr001A==
+X-CSE-MsgGUID: wwK+3fd5SpSj0LfYkrLsCQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
+   d="scan'208";a="33680718"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 09 May 2024 04:24:04 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s51sY-0004pA-0c;
+	Thu, 09 May 2024 11:24:02 +0000
+Date: Thu, 9 May 2024 19:23:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCHv3 02/19] zram: add lzo and lzorle compression backends
+ support
+Message-ID: <202405091921.320BxOyE-lkp@intel.com>
+References: <20240508074223.652784-3-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	rdIsWj1u9f149MBp/mbXZBUeLSB4+DEyaiw8c/l1YqxhvrJKL8Pv9Se6dJ02mhdQafBZZJnTL0G8KVEG8u/7A/bIJueAg6+BSQyGl8cG5Y641Y5h7u8Szz3de9ODmh5nyzaxDDCRRbBO/i+OY09qhVSBgyjNDDQdkJPp9dZR4jT6kVUNU5xoFO/n3nv/R+a0fAzCgCRb5o4kMXa+X0f58vZjemE6OqoMdtC4L3lOb/oPEco6d+zwQE1s5t7fDKi9dT1nXC2RXnZB9/zOeVL+5A4nWdenKFnQob/3KWhhjbZ89cR4iUODMezJ8N5bk/6qMIcFslc0H0Yx2xijLjoh9AQuyyrUMKeanXgv/oKxxYTRXi6xllYG9AmWCDyTnG+O5ZJRAah7jEJF+717aWB9BU6L0q/he8Bj4euyRz0YUcSO8UOVSkCXNR+shT5kYLaHQo805IfNto+OaD1yHWDtRjVgGZ8bgcDcIL4RWmW+hY74WFr5NLeCB176O50izfxFzCQLFJVsaL87xxDr75Y/LxAVJdKcFEKsNSZ0gPgv1YieZqHnAAocuMkc0YwBbLr4+FnbzVJo5doqG7xFWiUkaYeiZ5wjeEQkZTwxOnrUuJV5blnGlwm9wAdSRpzsOe0E
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8aae29f-090c-420a-0f94-08dc7014d704
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2024 10:43:18.8393
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: htcaUdQwMyAvzW0HacVwzoMznUni/6YzX5cOGfBvQ3wq/0GLQJYXCbMB1TaZkG8vkTA7hkpHw0HuOvmGCzBBrHmHdPnMR8Q3TeIcxOR0CGw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB7044
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508074223.652784-3-senozhatsky@chromium.org>
 
-On May 04, 2024 / 17:14, Shin'ichiro Kawasaki wrote:
-> In the recent discussion for nvme test group [1], two pain points were me=
-ntioned
-> regarding the test case runs.
->=20
-> 1) Several test cases in nvme test group do exactly the same test except =
-the
->    NVME transport backend set up condition difference (device vs. file). =
-This
->    results in duplicate test script codes. It is desired to unify the tes=
-t cases
->    and run them repeatedly with the different conditions.
->=20
-> 2) NVME transport types can be specified with nvme_trtype parameter so th=
-at the
->    same tests can be run for various transport types. However, some test =
-cases
->    do not depend on the transport types. They are repeated in multiple ru=
-ns for
->    the various transport types under the exact same conditions. It is des=
-ired to
->    repeat the test cases only when such repetition is required.
->=20
-> [1] https://lore.kernel.org/linux-block/w2eaegjopbah5qbjsvpnrwln2t5dr7mv3=
-v4n2e63m5tjqiochm@uonrjm2i2g72/
->=20
-> One idea to address these pain points is to add the test repeat feature t=
-o the
-> nvme test group. However, Daniel questioned if the feature could be imple=
-mented
-> in the blktests framework. Actually, a similar feature has already been
-> implemented to repeat some test cases for non-zoned block devices and zon=
-ed
-> block devices. However, this feature is implemented only for the zoned an=
-d non-
-> zoned device conditions. It can not fulfill the desires for nvme test gro=
-up.
->=20
-> This series proposes to generalize the feature in the blktests framework =
-to
-> repeat the test cases with different conditions. Introduce a new function
-> set_conditions() that each test case can define and instruct the framewor=
-k to
-> repeat the test case. This series applies this feature to nvme test group=
- so
-> that the test cases can be repeated for NVME transport types and backend =
-types
-> in the ideal way. For this purpose, this series introduces new config par=
-ameters
-> NVMET_TRTYPES and NVMET_BLKDEV_TYPES. Taking this chance, it renames othe=
-r
-> lowercase config parameters nvme_img_size, nvme_num_iter and use_rxe to
-> uppercase to follow the guide for environment variables.
-[...]
+Hi Sergey,
 
-Thank you for the discussions and the comments on the series. This series h=
-as
-got applied.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on akpm-mm/mm-everything linus/master v6.9-rc7 next-20240509]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Sergey-Senozhatsky/zram-move-from-crypto-API-to-custom-comp-backends-API/20240508-154917
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20240508074223.652784-3-senozhatsky%40chromium.org
+patch subject: [PATCHv3 02/19] zram: add lzo and lzorle compression backends support
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240509/202405091921.320BxOyE-lkp@intel.com/config)
+compiler: clang version 18.1.4 (https://github.com/llvm/llvm-project e6c3289804a67ea0bb6a86fadbe454dd93b8d855)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240509/202405091921.320BxOyE-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405091921.320BxOyE-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dma/dmatest.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dma/ioat/ioatdma.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/virtio/virtio_dma_buf.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/xen/xen-evtchn.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/xen/xen-privcmd.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/tty/n_hdlc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/tty/n_gsm.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/agp/intel-gtt.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/lp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/ppdev.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/tlclk.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tiny/bochs.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tiny/cirrus.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/i915/kvmgt.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-i2c.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-spi.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/brd.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/loop.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dax/hmem/dax_hmem.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dax/device_dax.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dax/kmem.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dax/dax_pmem.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/scsi/isci/isci.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cdrom/cdrom.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/usb_debug.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/tuners/tda9887.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/rc-core.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/dvb-frontends/au8522_decoder.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/dvb-frontends/mb86a16.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-async.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-fwnode.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hwmon/asus_atk0110.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/thermal/intel/intel_soc_dts_iosf.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/thermal/intel/int340x_thermal/processor_thermal_rapl.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/thermal/intel/int340x_thermal/processor_thermal_rfim.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/thermal/intel/int340x_thermal/processor_thermal_mbox.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/thermal/intel/int340x_thermal/processor_thermal_wt_req.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/thermal/intel/int340x_thermal/processor_thermal_wt_hint.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/thermal/intel/int340x_thermal/processor_thermal_power_floor.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/mmc_core.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/sdio_uart.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-a4tech.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-apple.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-aureal.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-belkin.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-cherry.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-chicony.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-cypress.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-dr.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-elecom.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-ezkey.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-gyration.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-ite.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-kensington.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-keytouch.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-kye.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-lcpower.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-lenovo.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-logitech.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-lg-g15.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-logitech-dj.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-logitech-hidpp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-microsoft.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-monterey.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-ortek.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-pl.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-petalynx.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-primax.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-saitek.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-samsung.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-sjoy.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-speedlink.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-steelseries.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-sunplus.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-gaff.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-tmff.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-tivo.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-topseed.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-twinhan.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-xinmo.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-zpff.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-zydacron.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/hid-waltop.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hid/intel-ish-hid/intel-ishtp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/platform/x86/intel/intel-hid.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/platform/x86/intel/intel-vbtn.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/platform/x86/intel/intel-rst.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/platform/x86/amilo-rfkill.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/platform/x86/classmate-laptop.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/ras/amd/atl/amd_atl.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hwtracing/intel_th/intel_th_msu_sink.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/parport/parport.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/nvdimm/libnvdimm.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/nvdimm/nd_pmem.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/nvdimm/nd_btt.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/nvdimm/nd_e820.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/uio/uio.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/uio/uio_cif.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/uio/uio_aec.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dca/dca.o
+>> ERROR: modpost: "backend_lzorle" [drivers/block/zram/zram.ko] undefined!
+>> ERROR: modpost: "backend_lzo" [drivers/block/zram/zram.ko] undefined!
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
