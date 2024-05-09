@@ -1,98 +1,165 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5718A26AC7
-	for <linux-block@vger.kernel.org>; Thu,  9 May 2024 01:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DEF146A67
+	for <linux-block@vger.kernel.org>; Thu,  9 May 2024 02:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715217352; cv=none; b=Wl4tqEojsGwGxj7tVNaJT0dfYGmvv2iykk3jRL+LqHEutylDzX+kGdmqKS7CfBztAfE70/K1JJG0pEZlMhHLbfqkErHngEjVsUfQo+Fed04NmTYIiOyJWiaE+BAhHXHserzeohvF0Ie9+ldQYW4p1bJpSAGlO4k2ExiWCJ3RPTc=
+	t=1715222433; cv=none; b=Qxz1ILanBnvgVQQZUr4EeVunwjdrUdTAzFJnmyzHF8QmzjeB0q3oDVYOs9Gh9oW4RvJ1wQKHh/lEueaijEgwMLW9yOJKBf2bIdk8C1dI7UiPyiNpaenO7gulKf1+cJppurhJFusmEKTel90Y9eJaDe2LVFzp/0qFmd/oBQnRVgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715217352; c=relaxed/simple;
-	bh=7X61mZ5lfsoEsG6HnR6GXEyIgQo8vageQpInxeE6FnY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lHbLGKwypoY/HKzKsp+EmViWp++Y98y4P9Mofw0cVzVHI2eLmiFHaqubrbRyyrB5u66xPo62uC4e1ORvntl4RraM9iJUvvaFKzlgc8lrVNrCipp/hEeLVWrx7GSSrgGq+WQ16A+NLlIcVknpw0D+0uKCUyKANpEFyPoZJ9fDhFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=k5WKX7Sq; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="k5WKX7Sq"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2b6215bcd03so125655a91.1
-        for <linux-block@vger.kernel.org>; Wed, 08 May 2024 18:15:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715217349; x=1715822149; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o8lwS9vcphRmjixI/uaFdylh1pgxXJ6lfp2qPwJut7g=;
-        b=k5WKX7Sqj6wSQyWCbW9GFWS5IVeU+5/yVLEeA19XuHrOrOQYZUpydchZMbyxVq71HV
-         E4RUn0gF9+wVUAv8FjyOshlCe4UJ7HDFBNsTmG23AhPyJk1sqADk1BzeUQpPuQhrUyTs
-         hxvF84Tj15eyP1g6YRtUJi4IovWmkwbbCT73BKWzhhLf9MXxZq+76AOsSdij8HnfEeot
-         r3hrz3OTv4Nph1UFfyoTwdH8N6sGb/+JQJEMQpQYFcWeWHaccOmH9Ul01DS7U89cP1RG
-         tur4a1561jL/F3uctYyJGx8WWQXpyXwjf4HV96OmcI11J7+M9XEFd8+EesX2UNpb5NrM
-         j/TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715217349; x=1715822149;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o8lwS9vcphRmjixI/uaFdylh1pgxXJ6lfp2qPwJut7g=;
-        b=Yyz8UzPLZffP8pc5xFM5ocbC5z07Zk5H9BNvpvWqsbueqTw05sviBSA9TMbl0otZYJ
-         TTjhFWzzed7AZhESRn0RDs27O8i/2ZvQ3i+3tQTGzcn94xcywmW2u8tfUzNbEBilFiFK
-         XQEdDUo5GXkoElxgayPRziPkBq/cjrdzbcm/EUPOOPJVxPZ1Ecx4WJPSSe7YfJbI9hAU
-         XXXRIi/l1faxnTFKhM28b6CQb1hMk3joFcJJ0QjrSMNHaXGr5SDriigfbJ9WjknmbVId
-         nwF3vhFJBsIqOqLgyA28v97PfnokIMzjPcl96kPhPcC9EnpHd2v0XztKy87BTv6ulhgu
-         Y6Cg==
-X-Gm-Message-State: AOJu0YxYyCqF/4SIxqAFTm89KkphfQTVJUgEwkKBh1fOzI5sCxQmqKpq
-	tImzEmRJqRRAbSqqDwNKUIytIykBCNQyfiXF/mM+UlJYdZGIkqhHQflwwE3kW6FGJjvVYNovO2J
-	9
-X-Google-Smtp-Source: AGHT+IG+KQp/2UPB+v262lL13vKSoTcFv0DdiGTOqb57XhqAB3+StExChLeNCKp7Mz0cujw+/u6xQg==
-X-Received: by 2002:a17:903:32ca:b0:1e0:c91b:b950 with SMTP id d9443c01a7336-1eeb0991088mr47671945ad.5.1715217349150;
-        Wed, 08 May 2024 18:15:49 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c03b8e6sm1715775ad.229.2024.05.08.18.15.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 18:15:48 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Coly Li <colyli@suse.de>
-Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
-In-Reply-To: <20240509011117.2697-1-colyli@suse.de>
-References: <20240509011117.2697-1-colyli@suse.de>
-Subject: Re: [PATCH 0/2] bcache-6.10 20240509
-Message-Id: <171521734824.13804.15279321312095650681.b4-ty@kernel.dk>
-Date: Wed, 08 May 2024 19:15:48 -0600
+	s=arc-20240116; t=1715222433; c=relaxed/simple;
+	bh=cxIwpQSHcfuYZZ9GvvSMLZ3wG9q7rFvAlf9yitR+PVo=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cjS7R6px0zYuguukYKI4ZoyLqErJNIQnP5vDV+6tr+qvg1QnYcEoyOnkW7V9mdLjz+yUV6FMPUKtwgygWtEIRXUji+fymbwZfMZmCXj+HJV8jAVxRPFnDNpaCac3oRZ68rcspG+sakL+5stTEfSAUrNaz26ToWaMNgEJx6M0Aqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 4492dk5p051858;
+	Thu, 9 May 2024 10:39:46 +0800 (+08)
+	(envelope-from zhaoyang.huang@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4VZbkH4hbGz2PGl6X;
+	Thu,  9 May 2024 10:36:39 +0800 (CST)
+Received: from bj03382pcu01.spreadtrum.com (10.0.73.40) by
+ BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Thu, 9 May 2024 10:39:43 +0800
+From: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox
+	<willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo
+	<tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Baolin Wang
+	<baolin.wang@linux.alibaba.com>, <linux-mm@kvack.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <cgroups@vger.kernel.org>, Zhaoyang Huang <huangzhaoyang@gmail.com>,
+        <steve.kang@unisoc.com>
+Subject: [RFC PATCH 1/2] block: introduce helper function to calculate bps budgt
+Date: Thu, 9 May 2024 10:39:36 +0800
+Message-ID: <20240509023937.1090421-2-zhaoyang.huang@unisoc.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240509023937.1090421-1-zhaoyang.huang@unisoc.com>
+References: <20240509023937.1090421-1-zhaoyang.huang@unisoc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX01.spreadtrum.com (10.0.64.7)
+X-MAIL:SHSQR01.spreadtrum.com 4492dk5p051858
 
+From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
 
-On Thu, 09 May 2024 09:11:15 +0800, Coly Li wrote:
-> There are two bcache patches I'd like to submit upstream.
-> 
-> The patch from Christophe uses ida_alloc_max()/ida_free() to replace the
-> deprecated ida_simple_get()/ida_simple_remove().
-> 
-> Patch from Matthew uses similar method which bcachefs code uses, to
-> remove UBSAN warning of out-of-bounds index on dynamic sized bset
-> iteration from the in-memory btree node.
-> 
-> [...]
+The 'over-sized' bio under blk throttle control will be delayed to
+launch which breaks original IO timing and have the immediate BW be
+not within the bps limit. Introduce a helper function to calculate block
+device's budgt which provide the allowed bytes for current bio.
 
-Applied, thanks!
+Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+---
+ block/blk-throttle.c       | 44 ++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-cgroup.h | 10 +++++++++
+ 2 files changed, 54 insertions(+)
 
-[1/2] bcache: Remove usage of the deprecated ida_simple_xx() API
-      commit: 2abd9a197d828ed5c2cbe922368eb28d02861a28
-[2/2] bcache: fix variable length array abuse in btree_iter
-      commit: 3a861560ccb35f2a4f0a4b8207fa7c2a35fc7f31
-
-Best regards,
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index f4850a6f860b..41c75258183d 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -10,6 +10,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/bio.h>
+ #include <linux/blktrace_api.h>
++#include <linux/cgroup.h>
+ #include "blk.h"
+ #include "blk-cgroup-rwstat.h"
+ #include "blk-stat.h"
+@@ -2365,6 +2366,49 @@ void blk_throtl_bio_endio(struct bio *bio)
+ }
+ #endif
+ 
++unsigned long blk_throttle_budgt(struct block_device *bdev)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++	struct blkcg *blkcg;
++	struct blkcg_gq *blkg;
++	struct throtl_grp *tg;
++	long long bytes_allowed = 0;
++	unsigned long jiffy_elapsed, jiffy_elapsed_rnd;
++	u64 bps_limit;
++
++	if (!q)
++		return U64_MAX;
++
++	rcu_read_lock();
++	spin_lock_irq(&q->queue_lock);
++	blkcg =	css_to_blkcg(task_css(current, io_cgrp_id));
++	if (!blkcg)
++		goto out;
++
++	blkg = blkg_lookup(blkcg, q);
++	if (!blkg || !blkg_tryget(blkg))
++		goto out;
++
++	tg = blkg_to_tg(blkg);
++	bps_limit = tg_bps_limit(tg, READ);
++	if (bps_limit == U64_MAX)
++		goto out;
++
++	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[READ];
++	if (!jiffy_elapsed)
++		jiffy_elapsed_rnd = tg->td->throtl_slice;
++
++	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
++	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
++			tg->carryover_bytes[READ];
++	blkg_put(blkg);
++out:
++	spin_unlock_irq(&q->queue_lock);
++	rcu_read_unlock();
++	return bytes_allowed;
++}
++
++
+ int blk_throtl_init(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index dd5841a42c33..ba79fa464e0a 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -15,10 +15,12 @@
+  */
+ 
+ #include <linux/types.h>
++#include <linux/limits.h>
+ 
+ struct bio;
+ struct cgroup_subsys_state;
+ struct gendisk;
++struct block_device;
+ 
+ #define FC_APPID_LEN              129
+ 
+@@ -45,6 +47,14 @@ static inline struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
+ }
+ #endif	/* CONFIG_BLK_CGROUP */
+ 
++#ifdef CONFIG_BLK_DEV_THROTTLING
++unsigned long blk_throttle_budgt(struct block_device *bdev);
++#else
++static inline unsigned long blk_throttle_budgt(struct block_device *bdev)
++{
++	return U64_MAX;
++}
++#endif
+ int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_len);
+ char *blkcg_get_fc_appid(struct bio *bio);
+ 
 -- 
-Jens Axboe
-
-
+2.25.1
 
