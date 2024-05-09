@@ -1,117 +1,105 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D63A1FAA;
-	Thu,  9 May 2024 12:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DD513B7BD;
+	Thu,  9 May 2024 12:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715258915; cv=none; b=SEgZWC+VEXprQWcUivVMuTHg3pvIUPOu7pB+8U48kyXv9zrl9O6ybz9HVAZ2JDyRNSn8gOMbNJTW2UpFGyv967vraN+VmB1bptl2OCWhc4mABxPauVvIqt/6JfPqXTDbuoQDnUs9eNCZuqZFaq+qYjMgGisaSYJnIBIBwlWLcaM=
+	t=1715259331; cv=none; b=E8uZKVf3WJx4ERZbj4wNGIidcw2TYhckuroeDS4Haa5+vSbVrdYo/BmoQd7L9cP5YkNfLnJR7NwBtnqI46Iyt0qkEU2dZUa+e//xEzRTJYPDHrUTWA/dd538lLRXvFgTyjXWJCmW0LIjA9B9TiueX7nY0+DmWHlRSkpSPuJxKGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715258915; c=relaxed/simple;
-	bh=sZSzNB9H37MEPXqIR+iA9PYBkNUyh3pO2Ijg3kkZTKs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZP32qWbT0wBKgHxazJgNjpg4vCT0UtE1stiXoENfBT5W+ijV4kvOrV0fiRnL7KwJ8nr2C5iBwiEVTlupNeZw5MORBNODtGkjBhechr5xMerp6EIqAlywb4YrVehqAumiAUIhagFVMJ1Cps0vFrE9w+vqVC9BQbrhTZya6Pvwg7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VZsJ44ngvz4f3n5n;
-	Thu,  9 May 2024 20:48:20 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 8E6F21A09E0;
-	Thu,  9 May 2024 20:48:30 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAX6REdxjxmuxLDMA--.45709S4;
-	Thu, 09 May 2024 20:48:30 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH RESEND for-6.10/block] block: add plug while submitting IO
-Date: Thu,  9 May 2024 20:38:25 +0800
-Message-Id: <20240509123825.3225207-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1715259331; c=relaxed/simple;
+	bh=05QMPNFVypoo7MQhuiVJn5TpAp/gm9r77dINcx5tRVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fpHZEyYhB8mq6pUM+KaaQ1+gzLHEsSEeN+6mM3iQnxIcwzmk4D/pMp6E8ZAR5OKHZ70+3uyUy5gcanAe0UYn4OKpN+Ue/6qHQla9CCOtp7jEM7q4QZG7cARAzi/bKh/9fFvK4AVTyFOuhCaWC+v5QVJAE66+GvXTYS1HQy5O9CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=xtVL76wK; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="xtVL76wK"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4VZsS858jXz9sSD;
+	Thu,  9 May 2024 14:55:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1715259320;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dfpr4O1ruwod+MTm7pGPfWogKD4Gt2EPTVtvHr0sOQs=;
+	b=xtVL76wKt6rG8+F7KEd/puC+S7PZTXghfnlMFu3YrT77cDpYnNDzGw5jHLGr0NA2FLYjvZ
+	84XZgst8xi9n7HvHw96PSpsgatVenbaBdLmPcLUSN9qddu4m9JXEXcE0YDl3owJT7GQD40
+	ENZpttER1BHCfU4k5tDNTPBh2ZufQ8LUguhRhaA0ThPw95B9ZxExViRYb1YLCNXtTDOEve
+	ne3wpNt9JGcTB3A1o8feQV9gj6ba0nTpIdHEO8AqGl/b/yOAztckdz/71iP+M2QmwSL47z
+	j1QB9OujlUyv9iGK6lwnK9AYIXWGHcMi6s2Bn9zbqXBOgP47/SBjrIPnkvHnFw==
+Date: Thu, 9 May 2024 12:55:14 +0000
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: hch@lst.de, willy@infradead.org, mcgrof@kernel.org,
+	akpm@linux-foundation.org, brauner@kernel.org,
+	chandan.babu@oracle.com, david@fromorbit.com, djwong@kernel.org,
+	gost.dev@samsung.com, hare@suse.de, john.g.garry@oracle.com,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-xfs@vger.kernel.org, p.raghav@samsung.com,
+	ritesh.list@gmail.com, ziy@nvidia.com
+Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
+Message-ID: <20240509125514.2i3a7yo657frjqwq@quentin>
+References: <20240503095353.3798063-8-mcgrof@kernel.org>
+ <20240507145811.52987-1-kernel@pankajraghav.com>
+ <ZjpSx7SBvzQI4oRV@infradead.org>
+ <20240508113949.pwyeavrc2rrwsxw2@quentin>
+ <Zjtlep7rySFJFcik@infradead.org>
+ <20240509123107.hhi3lzjcn5svejvk@quentin>
+ <ZjzFv7cKJcwDRbjQ@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAX6REdxjxmuxLDMA--.45709S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFW3Cw45WFW8ArWDJw45trb_yoW8Xr4Upr
-	4Y93ZxKFWUWrs2vw48XFy7GF1ftF1DWr17Aay5ua9xtr1j9r4qqwnav348Za4rCr48WrW3
-	Ar93Kr98Gw4xCrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
-	67AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjzFv7cKJcwDRbjQ@infradead.org>
+X-Rspamd-Queue-Id: 4VZsS858jXz9sSD
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Thu, May 09, 2024 at 05:46:55AM -0700, Christoph Hellwig wrote:
+> On Thu, May 09, 2024 at 12:31:07PM +0000, Pankaj Raghav (Samsung) wrote:
+> > > Well, that's why I suggest doing it at mount time.  Asking for it deep
+> > > down in the write code is certainly going to be a bit problematic.
+> > 
+> > Makes sense. But failing to mount because we can't get a huge zero folio
+> > seems wrong as we still can't guarantee it even at mount time.
+> > 
+> > With the current infrastructure I don't see anyway of geting a huge zero
+> > folio that is guaranteed so that we don't need any fallback.
+> 
+> You export get_huge_zero_page, put_huge_zero_page (they might need a
+> rename and kerneldoc for the final version) and huge_zero_folio or a
+> wrapper to get it, and then call get_huge_zero_page from mount,
 
-So that if caller didn't use plug, for example, __blkdev_direct_IO_simple()
-and __blkdev_direct_IO_async(), block layer can still benefit from caching
-nsec time in the plug.
+static bool get_huge_zero_page(void)
+{
+	struct folio *zero_folio;
+retry:
+	if (likely(atomic_inc_not_zero(&huge_zero_refcount)))
+		return true;
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+	zero_folio = folio_alloc((GFP_TRANSHUGE | __GFP_ZERO) & ~__GFP_MOVABLE,
+			HPAGE_PMD_ORDER);
+	if (!zero_folio) {
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9ead80d6c6f0..8566bbd8aeba 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -646,11 +646,13 @@ static void __submit_bio(struct bio *bio)
- static void __submit_bio_noacct(struct bio *bio)
- {
- 	struct bio_list bio_list_on_stack[2];
-+	struct blk_plug plug;
- 
- 	BUG_ON(bio->bi_next);
- 
- 	bio_list_init(&bio_list_on_stack[0]);
- 	current->bio_list = bio_list_on_stack;
-+	blk_start_plug(&plug);
- 
- 	do {
- 		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-@@ -684,19 +686,23 @@ static void __submit_bio_noacct(struct bio *bio)
- 		bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
- 	} while ((bio = bio_list_pop(&bio_list_on_stack[0])));
- 
-+	blk_finish_plug(&plug);
- 	current->bio_list = NULL;
- }
- 
- static void __submit_bio_noacct_mq(struct bio *bio)
- {
- 	struct bio_list bio_list[2] = { };
-+	struct blk_plug plug;
- 
- 	current->bio_list = bio_list;
-+	blk_start_plug(&plug);
- 
- 	do {
- 		__submit_bio(bio);
- 	} while ((bio = bio_list_pop(&bio_list[0])));
- 
-+	blk_finish_plug(&plug);
- 	current->bio_list = NULL;
- }
- 
+We might still fail here during mount. My question is: do we also fail
+the mount if folio_alloc fails?
+
+		count_vm_event(THP_ZERO_PAGE_ALLOC_FAILED);
+		return false;
+	}
+
+...
+> from unmount and just use huge_zero_folio which is guaranteed to
+> exist once get_huge_zero_page succeeded.
+> 
+
 -- 
-2.39.2
-
+Pankaj Raghav
