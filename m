@@ -1,48 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F25513B2BB;
-	Thu,  9 May 2024 12:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C687813AD33;
+	Thu,  9 May 2024 12:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715258409; cv=none; b=rMF8CZatXp46Vkf1Gniy7fih2RCbFo1vnSwGDTnPwzcv96gKkiPSvG6YwAkHGiK5MfQ3Z2YGZ769mE8F1DLlBw+f2VMuhFltFY1ndhaUpTgyeQ5sk/y4WyVzBPVl5f7kYOYshGC9vFDKokCZyvYHpNEJWznnAgk91PFfqGDBQeg=
+	t=1715258527; cv=none; b=Wz7Pk6zObtkBWfPRZmON7/c82r+5EQe+R+efo9BITe2iguLaRbmQ6dBoiEbJdIuThyuz0yzYZCR9XONL8jTscxM0rHbZlxusmulCKcQukuVFmzqQuH8lTlqx4F+Rh0xRCW35cktjlPic/BjHGyrFU2+S46LO0wPX+9W5dQN5BIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715258409; c=relaxed/simple;
-	bh=o4EJzw5BUXuBgoy2uU4zb1qMLA37I4KNAPe8azdAsNQ=;
+	s=arc-20240116; t=1715258527; c=relaxed/simple;
+	bh=uOTQxuvQ8i7Oz5Vhw1Nb5t6RYRONDIv98MsW+Ken0ac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UdxdhDeNnXWjmQGNtV4e7YlWadJAOU+vZg0hYOTC4Ip/kBGHZhePfbn0K3Nh1T+0VTprg9EZZWYCuCKr3Yuw8sCujWm2tDUlD1CvsraJkWsuDhM7Xqu3ovDZ+d/tEjkUzQRQFJsdhWelrX9osv2joFyhy7dGRJbC1y5mAI5coCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ee/2otxe; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=o8shlIUDVoyfppY/QjhOVpsEBf7GlZkUbwuFp78lg81rp7YgtKi5mlTmQ2PN8ED+velXxQm3/v7/qLg6bdK1i9ZbwZljfI1mYWtboVer4+bNdwacwvZNFWJw5hCYwouM2hJxRXfGH4qGy68pZ9WUMPilUbhNuUNymqvCZlh01i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MCsHHGGA; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ee/2otxe"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MCsHHGGA"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=P/Yh6fmWOx0S3hHFDnR/3XNxSMU0c5O7DQ9VhEI3qZ4=; b=Ee/2otxepDaoDyWBcWwFyiIctq
-	nqoj0uR7R7rKU2RVLehLlBSEbFOIzg3Ei49vP9t0eZfHXbnK7Clo4ViqVb2Eja8jvDoFoOTO7KzS2
-	mx0+KGb840gHS36HB/TO+kOV3kAi9xSNAap53ofcOVYJn54tWWpd/4UJL62TiOyvKVqCS9AMgY1H1
-	E8R41KbrN0wd6lmELud0Aer8PlF9GNud2sqoOAkxfMREoWS8Fpdn+2hR+mRQyF706nSm7HCCNFC7P
-	sKuzRooBCw5ovFR3K20jpikuGw2ivt218HNx5m6JJwCgrgrc3OArj4I8OPVW2Pp+0bUA1SLr+L/1P
-	3czW+isA==;
+	bh=/NQShJ2vBOZuOn/Cc2uD7FM4Dkx1Wb4jgFli6QGjY7w=; b=MCsHHGGAephGlLZzNPjbmC4PGG
+	cjRzOpuDOZrEM9vsWhhzhq7GlEQsd2S63naSVU5QM/MmgmmEfy3V1rkQK5BFq8Fq6CZ53kCi73tp5
+	3wJhESpoyK2expDWbcVG0sKx5LtgIQv0PZHQzd7I9OnQOS7JdpghLp9hDcsRR//d3DMIhEq86Maqz
+	pkLyo4x8vBsgXtiOxeGBiNBO+vKu2H9OxLJMfXmB6RPheI7wtmr9wxx7pp2cSr1Mywib6kNdh/sHr
+	ugoX69LDlnd/gndbMiFKVsjEOhS2Jb1F1KJgSvk7cEGAPyMfBbrqRoDusn9IyS9xMRLg3XCgpOJJn
+	snTSSQPA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s5343-00000001STi-2Jqg;
-	Thu, 09 May 2024 12:39:59 +0000
-Date: Thu, 9 May 2024 05:39:59 -0700
+	id 1s5365-00000001SrE-1Dn6;
+	Thu, 09 May 2024 12:42:05 +0000
+Date: Thu, 9 May 2024 05:42:05 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	cgroups@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>,
-	steve.kang@unisoc.com
-Subject: Re: [RFC PATCH 2/2] mm: introduce budgt control in readahead
-Message-ID: <ZjzEH5fFGHgnqbLj@infradead.org>
-References: <20240509023937.1090421-1-zhaoyang.huang@unisoc.com>
- <20240509023937.1090421-3-zhaoyang.huang@unisoc.com>
+	Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv3 08/19] zram: add 842 compression backend support
+Message-ID: <ZjzEnbHGO_hYQN11@infradead.org>
+References: <20240508074223.652784-1-senozhatsky@chromium.org>
+ <20240508074223.652784-9-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,12 +47,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240509023937.1090421-3-zhaoyang.huang@unisoc.com>
+In-Reply-To: <20240508074223.652784-9-senozhatsky@chromium.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-> +	unsigned long budgt = inode->i_sb->s_bdev ?
-> +			blk_throttle_budgt(inode->i_sb->s_bdev) : 0;
+On Wed, May 08, 2024 at 04:42:01PM +0900, Sergey Senozhatsky wrote:
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 
-The readahead code is used for all file systems, you can't just call
-into block layer code here.
+Not a very useful commit message, made worse by the magic '842'
+name.  How is anyone stumbling over git-blame or looking at git
+logs supposed to make sense of this?
 
