@@ -1,187 +1,158 @@
-Received: from mail-m17229.xmail.ntesmail.com (mail-m17229.xmail.ntesmail.com [45.195.17.229])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C25653;
-	Thu,  9 May 2024 19:02:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.195.17.229
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB047D088
+	for <linux-block@vger.kernel.org>; Thu,  9 May 2024 20:43:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715281371; cv=none; b=gS5RyhTAP0IP17+deH6yEFXsfqsGgf2RNAZJDnbwXAijRn9SHbH3AGwPd+DrJsHNRR2q7jQfZk2KWbrliNvn+HTEFqxwxBy3IywJeFvt1GCRtHzzh6Rzzv9JwKnqjJjqJoUozOVusIA5u6kIc0xufq20pEVjdN92Rbueof8ENSs=
+	t=1715287414; cv=none; b=bTIq6RLvt6a9iiKwvHMHj6Tl9AVEqbCDdJ+mrrMNnLZTUPQMArTDxjH59YLo/upO+SEiOBPuk9fPlzsSz2sXHygp097oCWaJe7kWHfrpOgjgeFpAIZD5T+bPubvL+DvXuAQzrIGZu7wdFpIIH4P0QrnrJCt7ZBZGS66f61vTW8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715281371; c=relaxed/simple;
-	bh=4XnBz2lh+7YxriUGIom+RcfBIR64ijJxolblnDjagBQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=CHchWtgmZK1r13FgNAiQNW2n+e5sa19I/i7JXuPU/TJT4shnsV4SCOurfsQ1Pcj5ZOz1IRGL0/SEYOsA4tiKjfiKNl+HWBvis6IF5kWHE8f1LPEfnN5HXzOSS8tBaO2rSwrXpZgZILv9EA4/MoRd0na1kWtUvfdu07zASnvvGds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn; spf=none smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=45.195.17.229
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easystack.cn
-Received: from [192.168.122.189] (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 0F263860417;
-	Thu,  9 May 2024 21:03:43 +0800 (CST)
-Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc: John Groves <John@groves.net>, Dan Williams <dan.j.williams@intel.com>,
- Gregory Price <gregory.price@memverge.com>, axboe@kernel.dk,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev
-References: <20240422071606.52637-1-dongsheng.yang@easystack.cn>
- <66288ac38b770_a96f294c6@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <ef34808b-d25d-c953-3407-aa833ad58e61@easystack.cn>
- <ZikhwAAIGFG0UU23@memverge.com>
- <bbf692ec-2109-baf2-aaae-7859a8315025@easystack.cn>
- <ZiuwyIVaKJq8aC6g@memverge.com>
- <98ae27ff-b01a-761d-c1c6-39911a000268@easystack.cn>
- <ZivS86BrfPHopkru@memverge.com>
- <8f373165-dd2b-906f-96da-41be9f27c208@easystack.cn>
- <wold3g5ww63cwqo7rlwevqcpmlen3fl3lbtbq3qrmveoh2hale@e7carkmumnub>
- <20240503105245.00003676@Huawei.com>
- <5b7f3700-aeee-15af-59a7-8e271a89c850@easystack.cn>
- <20240508131125.00003d2b@Huawei.com>
- <ef0ee621-a2d2-e59a-f601-e072e8790f06@easystack.cn>
- <20240508164417.00006c69@Huawei.com>
- <3d547577-e8f2-8765-0f63-07d1700fcefc@easystack.cn>
- <20240509132134.00000ae9@Huawei.com>
-From: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Message-ID: <a571be12-2fd3-e0ee-a914-0a6e2c46bdbc@easystack.cn>
-Date: Thu, 9 May 2024 21:03:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+	s=arc-20240116; t=1715287414; c=relaxed/simple;
+	bh=beCdEFrDjDbqNzt6CjgtMqoWvg/CjED3y7rA+iD94Iw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-type; b=DTVTF58fSKZsR7qdP6ipKu/STCbkClskZInng8mkcZdqUEOPrFbRYKWJxepo5u3aZLSqzizsB1Ju9fG16O+lmmcgepkENHmBWwdsGVJ+W2R0ut1H2/Zw6lp7txYhlR+qfH2FVU5NNNHxctcIUXbv4yO9v2V6g1YdryYUaDn7QZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YRgtRmkD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRgtRmkD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715287411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vCRiRvE1CgiNzou2dDo1DdiD9MqS9nj8dSi6q8kd19E=;
+	b=YRgtRmkDshAPY/YlZzzc2hAJMU7jDW2Qhjnw/eX5G56tgdO3+TLlFhuegvbF2P9EfdAvYl
+	USRDza/CcKUol8HC/n7fn5qC9xZMUfX7v6L3TEdscgapXxGI3NSXDHIe3tfgEgBDyRiISo
+	ybzHStDjf1HJnCj/D4mfl9FzQEYG688=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-13-duN84RJdNTKgb3GElsR1Gg-1; Thu,
+ 09 May 2024 16:43:28 -0400
+X-MC-Unique: duN84RJdNTKgb3GElsR1Gg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 732C029AA389;
+	Thu,  9 May 2024 20:43:27 +0000 (UTC)
+Received: from jmeneghi.bos.com (unknown [10.22.16.53])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B560D1C4DB56;
+	Thu,  9 May 2024 20:43:26 +0000 (UTC)
+From: John Meneghini <jmeneghi@redhat.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	kbusch@kernel.org,
+	hch@lst.de,
+	sagi@grimberg.me,
+	emilne@redhat.com,
+	hare@kernel.org
+Cc: linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	jmeneghi@redhat.com,
+	jrani@purestorage.com,
+	randyj@purestorage.com,
+	aviv.coro@ibm.com
+Subject: [PATCH v3 0/3] block,nvme: latency-based I/O scheduler
+Date: Thu,  9 May 2024 16:43:21 -0400
+Message-Id: <20240509204324.832846-1-jmeneghi@redhat.com>
+In-Reply-To: <20240403141756.88233-1-hare@kernel.org>
+References: <20240403141756.88233-1-hare@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240509132134.00000ae9@Huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlDGUNNVh1KTB0eSx8ZS0wZSFUZERMWGhIXJBQOD1
-	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8f5d73d560023ckunm0f263860417
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Ngg6Fjo*FDc*EUo6Aj1JLj5J
-	GggwC0JVSlVKTEpOSU5CQ0lIQ0xIVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBTE5JTjcG
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
+I'm re-issuing Hannes's latency patches in preparation for LSFMM
 
+Changes since V2:
 
-在 2024/5/9 星期四 下午 8:21, Jonathan Cameron 写道:
-> On Thu, 9 May 2024 19:24:28 +0800
-> Dongsheng Yang <dongsheng.yang@easystack.cn> wrote:
-> 
-...
->>> Yes. I think we are going to have to wait on architecture specific clarifications
->>> before any software coherent use case can be guaranteed to work beyond the 3.1 ones
->>> for temporal sharing (only one accessing host at a time) and read only sharing where
->>> writes are dropped anyway so clean write back is irrelevant beyond some noise in
->>> logs possibly (if they do get logged it is considered so rare we don't care!).
->>
->> Hi Jonathan,
->> 	Allow me to discuss further. As described in CXL 3.1:
->> ```
->> Software-managed coherency schemes are complicated by any host or device
->> whose caching agents generate clean writebacks. A “No Clean Writebacks”
->> capability bit is available for a host in the CXL System Description
->> Structure (CSDS; see Section 9.18.1.6) or for a device in the DVSEC CXL
->> Capability2 register (see Section 8.1.3.7).
->> ```
->>
->> If we check and find that the "No clean writeback" bit in both CSDS and
->> DVSEC is set, can we then assume that software cache-coherency is
->> feasible, as outlined below:
->>
->> (1) Both the writer and reader ensure cache flushes. Since there are no
->> clean writebacks, there will be no background data writes.
->>
->> (2) The writer writes data to shared memory and then executes a cache
->> flush. If we trust the "No clean writeback" bit, we can assume that the
->> data in shared memory is coherent.
->>
->> (3) Before reading the data, the reader performs cache invalidation.
->> Since there are no clean writebacks, this invalidation operation will
->> not destroy the data written by the writer. Therefore, the data read by
->> the reader should be the data written by the writer, and since the
->> writer's cache is clean, it will not write data to shared memory during
->> the reader's reading process. Additionally, data integrity can be ensured.
->>
->> The first step for CBD should depend on hardware cache coherence, which
->> is clearer and more feasible. Here, I am just exploring the possibility
->> of software cache coherence, not insisting on implementing software
->> cache-coherency right away. :)
-> 
-> Yes, if a platform sets that bit, you 'should' be fine.  What exact flush
-> is needed is architecture specific however and the DMA related ones
-> may not be sufficient. I'd keep an eye open for arch doc update from the
-> various vendors.
-> 
-> Also, the architecture that motivated that bit existing is a 'moderately
-> large' chip vendor so I'd go so far as to say adoption will be limited
-> unless they resolve that in a future implementation :)
+I've done quite a bit of work cleaning up these patches. There were a
+number of checkpatch.pl problems as well as some compile time errors
+when config BLK_NODE_LATENCY was turned off. After the clean up I
+rebased these patches onto Ewan's "nvme: queue-depth multipath iopolicy"
+patches. This allowed me to test both iopolicy changes together. 
 
-Great, I think we've had a good discussion and reached a consensus on 
-this issue. The remaining aspect will depend on hardware updates. Thank 
-you for the information, that helps a lot.
+All of my test results, together with the scripts I used to generate these
+graphs, are available at:
 
-Thanx
-> 
-> Jonathan
-> 
->>
->> Thanx
->>>    
->>>>>       
->>>>>>
->>>>>> CBD can initially support (3), and then transition to (1) when hardware
->>>>>> supports cache-coherency. If there's sufficient market demand, we can
->>>>>> also consider supporting (2).
->>>>> I'd assume only (3) works.  The others rely on assumptions I don't think
->>>>
->>>> I guess you mean (1), the hardware cache-coherency way, right?
->>>
->>> Indeed - oops!
->>> Hardware coherency is the way to go, or a well defined and clearly document
->>> description of how to play with the various host architectures.
->>>
->>> Jonathan
->>>
->>>    
->>>>
->>>> :)
->>>> Thanx
->>>>   
->>>>> you can rely on.
->>>>>
->>>>> Fun fun fun,
->>>>>
->>>>> Jonathan
->>>>>       
->>>>>>
->>>>>> How does this approach sound?
->>>>>>
->>>>>> Thanx
->>>>>>>
->>>>>>> J
->>>>>>>          
->>>>>>>>
->>>>>>>> Keep in mind that I don't think anybody has cxl 3 devices or CPUs yet, and
->>>>>>>> shared memory is not explicitly legal in cxl 2, so there are things a cpu
->>>>>>>> could do (or not do) in a cxl 2 environment that are not illegal because
->>>>>>>> they should not be observable in a no-shared-memory environment.
->>>>>>>>
->>>>>>>> CBD is interesting work, though for some of the reasons above I'm somewhat
->>>>>>>> skeptical of shared memory as an IPC mechanism.
->>>>>>>>
->>>>>>>> Regards,
->>>>>>>> John
->>>>>>>>
->>>>>>>>
->>>>>>>>         
->>>>>>>
->>>>>>> .
->>>>>>>          
->>>>>
->>>>> .
->>>>>       
->>>
->>>    
-> 
+  https://github.com/johnmeneghini/iopolicy
+
+Please use the scripts in this repository to do your own testing.
+
+Changes since V1:
+
+Hi all,
+
+there had been several attempts to implement a latency-based I/O
+scheduler for native nvme multipath, all of which had its issues.
+
+So time to start afresh, this time using the QoS framework
+already present in the block layer.
+It consists of two parts:
+- a new 'blk-nlatency' QoS module, which is just a simple per-node
+  latency tracker
+- a 'latency' nvme I/O policy
+
+Using the 'tiobench' fio script with 512 byte blocksize I'm getting
+the following latencies (in usecs) as a baseline:
+- seq write: avg 186 stddev 331
+- rand write: avg 4598 stddev 7903
+- seq read: avg 149 stddev 65
+- rand read: avg 150 stddev 68
+
+Enabling the 'latency' iopolicy:
+- seq write: avg 178 stddev 113
+- rand write: avg 3427 stddev 6703
+- seq read: avg 140 stddev 59
+- rand read: avg 141 stddev 58
+
+Setting the 'decay' parameter to 10:
+- seq write: avg 182 stddev 65
+- rand write: avg 2619 stddev 5894
+- seq read: avg 142 stddev 57
+- rand read: avg 140 stddev 57  
+
+That's on a 32G FC testbed running against a brd target,
+fio running with 48 threads. So promises are met: latency
+goes down, and we're even able to control the standard
+deviation via the 'decay' parameter.
+
+As usual, comments and reviews are welcome.
+
+Changes to the original version:
+- split the rqos debugfs entries
+- Modify commit message to indicate latency
+- rename to blk-nlatency
+
+Hannes Reinecke (2):
+  block: track per-node I/O latency
+  nvme: add 'latency' iopolicy
+
+John Meneghini (1):
+  nvme: multipath: pr_notice when iopolicy changes
+
+ MAINTAINERS                   |   1 +
+ block/Kconfig                 |   9 +
+ block/Makefile                |   1 +
+ block/blk-mq-debugfs.c        |   2 +
+ block/blk-nlatency.c          | 389 ++++++++++++++++++++++++++++++++++
+ block/blk-rq-qos.h            |   6 +
+ drivers/nvme/host/multipath.c |  73 ++++++-
+ drivers/nvme/host/nvme.h      |   1 +
+ include/linux/blk-mq.h        |  11 +
+ 9 files changed, 484 insertions(+), 9 deletions(-)
+ create mode 100644 block/blk-nlatency.c
+
+-- 
+2.39.3
+
