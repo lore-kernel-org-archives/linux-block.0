@@ -1,102 +1,128 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 779A615E88;
-	Wed,  8 May 2024 22:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FF23C482;
+	Thu,  9 May 2024 01:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715207416; cv=none; b=m0bppicqogg4h+dKioyasG/QR//kVUKXpKnMwzE9wmSRjUpXzN/v44Z5BstztCsVxr4/azASJj6q/AWo3uyQpBGZ1kVVCqw5VrTHuG+hEAZQJ54diDVJN+mUSDDCUys2Cx3RhFPPG6t+MMNfOdoGjeo5RgV4YKNSCvYwZDFh528=
+	t=1715217086; cv=none; b=qX6vFMXpLB2zDWhaHL13uxp/+I7La4futqRcYNbiRl8h4DqhgpsFTXjhhWwGCXEpNYJWVBr8gvS8XXRXZkWHJnQDOGXdOp78imKiYKJl5oRr/H4O+6fICQSU6Ow5eExfdW6WnkazMVTAHa1wsWK+Mvmc5zyabNx3U1q35qmmGIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715207416; c=relaxed/simple;
-	bh=jfeLTHQ7V+tCqtymgqJlwOAfeOURmxDxjCflu8nkTEY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ew+zAFcD1+A/SybQg/pNhhOuC6HZD5+itj0YmEVK9m7Ql8waBqOIGXLa7QbWN/DdXJ+AfM3iqAwamxKMl0+o/CV/TbjRL5ZnmpvGmikwf2vRfn3kJy8sA0ogQd50VjLsxMYtt9GOUju6vfDW7eb1gs6dluzwBwtvI4RR5LuZHrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=OQn9AT8g; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1715217086; c=relaxed/simple;
+	bh=VBErHUxaaBcJNTMrNhCJi897Vl9mGvsHqeWzPHWtVSs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s5Vmz3pNkgNd3k4aStEv1gP4ae4C6/crma/pJtq6B7IQ9q7IusTbJY8W9rpXVF8rKSWdxQQSzubWgVuacV2j05V/1zxb+QqGr0UW3HDkEL9qsyr3/Z9s5X44HQjmBzLNiP6QQdg7SaLXFryokh/+0jMh6X+g37dnf+qMx7Qg3F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TMpl6gDJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DeS/l+hm; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TMpl6gDJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DeS/l+hm; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="OQn9AT8g"
-Received: from [10.137.106.151] (unknown [167.220.2.23])
-	by linux.microsoft.com (Postfix) with ESMTPSA id C10B42083CB3;
-	Wed,  8 May 2024 15:30:14 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C10B42083CB3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1715207414;
-	bh=O39rDdpiO7kqlQ1I2DZU4uxK3DPuYhyDQeOss37ivQE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OQn9AT8gEUZm1+BKeo83wexh4Z3f5It6vRhh7Pzqr+2y0WTUnuH/E7sqiAHVHeEL+
-	 9XhkVv8JsB+7owD+m+wLhaQu1OV5XajkEcsn4jOkJzoZWmVZ0k69t5uJonoPcXpT9o
-	 lDsC/EkVaH0XrDBb0zgwyEVgoCmSC44jslo29LI4=
-Message-ID: <212b02a8-f5f0-4433-a726-1639dda61790@linux.microsoft.com>
-Date: Wed, 8 May 2024 15:30:14 -0700
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TMpl6gDJ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DeS/l+hm";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TMpl6gDJ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DeS/l+hm"
+Received: from suse-arm.lan (unknown [10.149.192.130])
+	by smtp-out1.suse.de (Postfix) with ESMTP id 539FC3790E;
+	Thu,  9 May 2024 01:11:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1715217081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=T7E+jwQc4W0pgxmLqTd86bEWzjocEnA5z3ss1dpdjYk=;
+	b=TMpl6gDJw8GTABdzjTfA0httSRnJWXBWTMgplON8bI9LxtX6KA+qrqlep/sazVGodtrs0W
+	2Sgl9YGuSTpK3o2EXcFR1cTQmIvw1svFAlF2p5nK4KPWPVvSlEnjxjQInMX5kMhtuJ976H
+	KFro9RoLFN/d2eR2qs1K49QaZH8u+3A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1715217081;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=T7E+jwQc4W0pgxmLqTd86bEWzjocEnA5z3ss1dpdjYk=;
+	b=DeS/l+hmJSfbYDJr1MUSxbCXuY7Mgw9eY5ahPrhuoMnUcH0rVj/nJev4uW80bSW2EiI29o
+	XW2GGrsyFMNE9JAw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1715217081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=T7E+jwQc4W0pgxmLqTd86bEWzjocEnA5z3ss1dpdjYk=;
+	b=TMpl6gDJw8GTABdzjTfA0httSRnJWXBWTMgplON8bI9LxtX6KA+qrqlep/sazVGodtrs0W
+	2Sgl9YGuSTpK3o2EXcFR1cTQmIvw1svFAlF2p5nK4KPWPVvSlEnjxjQInMX5kMhtuJ976H
+	KFro9RoLFN/d2eR2qs1K49QaZH8u+3A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1715217081;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=T7E+jwQc4W0pgxmLqTd86bEWzjocEnA5z3ss1dpdjYk=;
+	b=DeS/l+hmJSfbYDJr1MUSxbCXuY7Mgw9eY5ahPrhuoMnUcH0rVj/nJev4uW80bSW2EiI29o
+	XW2GGrsyFMNE9JAw==
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 0/2] bcache-6.10 20240509
+Date: Thu,  9 May 2024 09:11:15 +0800
+Message-Id: <20240509011117.2697-1-colyli@suse.de>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 12/21] dm: add finalize hook to target_type
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
- tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com,
- snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com,
- linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
- linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- audit@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com>
- <1714775551-22384-13-git-send-email-wufan@linux.microsoft.com>
- <aa767961-5e3-2ceb-1a1e-ff66a8eed649@redhat.com>
-Content-Language: en-CA
-From: Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <aa767961-5e3-2ceb-1a1e-ff66a8eed649@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-0.24 / 50.00];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	BAYES_HAM(-0.44)[78.75%];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_COUNT_ZERO(0.00)[0];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Spam-Score: -0.24
+X-Spam-Flag: NO
 
+Hi Jens,
 
+There are two bcache patches I'd like to submit upstream.
 
-On 5/8/2024 10:17 AM, Mikulas Patocka wrote:
-> 
-> 
-> On Fri, 3 May 2024, Fan Wu wrote:
-> 
->> This patch adds a target finalize hook.
->>
->> The hook is triggered just before activating an inactive table of a
->> mapped device. If it returns an error the __bind get cancelled.
->>
->> The dm-verity target will use this hook to attach the dm-verity's
->> roothash metadata to the block_device struct of the mapped device.
->>
->> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> 
-> Hi
-> 
-> Why not use the preresume callback?
-> 
-> Is there some reason why do we need a new callback instead of using the
-> existing one?
-> 
-> Mikulas
-Thanks for the suggestion.
+The patch from Christophe uses ida_alloc_max()/ida_free() to replace the
+deprecated ida_simple_get()/ida_simple_remove().
 
-Mike suggested the new finalize() callback. I think the reason for not 
-using the preresume() callback is that there are multiple points that 
-can fail before activating an inactive table of a mapped device which 
-can potentially lead to inconsistent state.
+Patch from Matthew uses similar method which bcachefs code uses, to
+remove UBSAN warning of out-of-bounds index on dynamic sized bset
+iteration from the in-memory btree node.
 
-In our specific case, we are trying to associate dm-verity's roothash 
-metadata with the block_device struct of the mapped device inside the 
-callback.
+These two patches are quite straightforward and have been tested on
+my machine for a while and no regression observed.
 
-If we use the preresume() callback for the work and an error occurs 
-between the callback and the table activation, this leave the 
-block_device struct in an inconsistent state.
+Please consider take these two patches for bcache-6.10.
 
-This is because now the block device contains the roothash metadata of 
-it's inactive table due to the preresume() callback, but the activation 
-failed so the mapped device is still using the old table.
+Thanks in advance.
 
-The new finalize() callback guarantees that the callback happens just 
-before the table activation, thus avoiding the inconsistency.
+Coly Li
+---
 
--Fan
+Christophe JAILLET (1):
+  bcache: Remove usage of the deprecated ida_simple_xx() API
+
+Matthew Mirvish (1):
+  bcache: fix variable length array abuse in btree_iter
+
+ drivers/md/bcache/bset.c      | 44 +++++++++++++++++------------------
+ drivers/md/bcache/bset.h      | 28 ++++++++++++++--------
+ drivers/md/bcache/btree.c     | 40 ++++++++++++++++---------------
+ drivers/md/bcache/super.c     | 15 ++++++------
+ drivers/md/bcache/sysfs.c     |  2 +-
+ drivers/md/bcache/writeback.c | 10 ++++----
+ 6 files changed, 75 insertions(+), 64 deletions(-)
+
+-- 
+2.35.3
+
