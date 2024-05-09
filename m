@@ -1,141 +1,139 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D59C2ED
-	for <linux-block@vger.kernel.org>; Thu,  9 May 2024 17:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D2ADF55
+	for <linux-block@vger.kernel.org>; Thu,  9 May 2024 17:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715274140; cv=none; b=QzG6nxitjaSORydXjqGDzYVnw2x/rnuBKQytwUlMRF1lwepI1f8aoZn4AGREub/nW/5/iGip7k+voUUUgnXi3gTcVbHDJnRk9e134D5+AW6w63g0OvV6UgxDM5v1S9enpZumVbpVHOLH+kNKhXM6wrfYs+Lkx4rntBbJPrdxILs=
+	t=1715274441; cv=none; b=XLBQNS2TFRXGtsSamn/RJt6NP7ZJG9Qnw55YE7VsDNxVyD+rsUoalr00X/RoENcYxbOWJcaIxxlDmHdAPmQ6i/EQqBpljW0FZk/IgLs8yER4LnLoMdMlZFyrFk2G9KBccD7pJKM2ltLOgbez/TODALx1ZzXmQRsUEBfnimuIImg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715274140; c=relaxed/simple;
-	bh=jhUZnInkrjo+riCu4qEmDel7/Cn84rpXdlBkKQXyCKc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rsFv5Xf/tEQ3RCBrjq2KCRqJz+AXYTIZcuSbxEYsg67cURY86sXay27o3VGO2G7IEUahgTg7U0qKhDx8siNcXhQB0znRUY/S98CNP596TQwHZd+U5Lg4iZ2qvh9ygOFEVdJZY63zRtcmHQWGYktsqDMwfj0opxR7S5sre83E1UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=bP1jzvZ1; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1715274441; c=relaxed/simple;
+	bh=JTqRwvs7ATnblMDzbI8kYx5IrTBxMWNprcLAXd5ODXg=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=G0q6O+2gNg9ONk0tJBXYjbtFm3Fzv2dTtpBujPjYNR+eqQ7LD4y5yQ7zYv9DXJUipdWQOTAETPL6jGoLwkkUslk+GKdCIA1gFcQNlfWDdvcRtYZDhd6oKkMdjHdZnCyRRqX2yYaSX8M4uvcx0F9vRNKeKuaCL28ucrnD/mQ/IsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gj74gB3A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="bP1jzvZ1"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VZyx63KRZz6Cnk8t;
-	Thu,  9 May 2024 17:02:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1715274134; x=1717866135; bh=vfS5r
-	xu/jVyPDLMfwcKKUVf4Usik4EvYrIok0TYMcWw=; b=bP1jzvZ1Z3TbQGSkeD/UI
-	K3XWtg4mff/g81ggoEng+9hLt1k9TxCLMxHZojQz3ah3AvvAY6WSez1xq5rpXeIe
-	3x00yNWaTq5TuuiK05jBq+rOnE6yOBkfU30OJiJspjg4uAbltLTzs1roznD6Z229
-	V4d+HYyYDRVwjBS0P2Nrm46elr/Dj2ksOAPu3Kkh6xJsKEFYAi8IA77fHLrLK8wH
-	xd5NAqtEMNAvnIpYfOEOUKiigIyGFgS8FLH89IL96ITrSHsUQj3H+yJXRBTtzrLl
-	spfT4nqThcIWxjJkj2Jjedny1wiqPQDJhx5OOLsdCHf7U61i9b0ew7a5LWjzEHxi
-	A==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id dJjVa4Aq2-WX; Thu,  9 May 2024 17:02:14 +0000 (UTC)
-Received: from asus.hsd1.ca.comcast.net (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gj74gB3A"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715274438;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Ca9Pf11lzbP4jlatyhKofM52bEPeu8vNmdS1FsH4a8=;
+	b=Gj74gB3Az5lVrt/bidIeitwVmn6xGayMoADokCYgbRM+t5Rd/uhjXHw0qE/UgdaKjZ9LN8
+	1IJOMfkWNVmfVsLaVRL+46Vhsp43QFzBatLFNn3oSRLM9z7tCou6s5v9XjIkESMiSXoxx2
+	kzzH+jTIYr6R9MD0B1+I/mMSV8MhACE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-182-Y19FXQdzO2eI8S9NubSUHw-1; Thu,
+ 09 May 2024 13:07:16 -0400
+X-MC-Unique: Y19FXQdzO2eI8S9NubSUHw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VZyx06DdCz6Cnk8s;
-	Thu,  9 May 2024 17:02:12 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Zhiguo Niu <zhiguo.niu@unisoc.com>
-Subject: [PATCH v2 2/2] block/mq-deadline: Fix the tag reservation code
-Date: Thu,  9 May 2024 10:01:49 -0700
-Message-ID: <20240509170149.7639-3-bvanassche@acm.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240509170149.7639-1-bvanassche@acm.org>
-References: <20240509170149.7639-1-bvanassche@acm.org>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 71A903802292;
+	Thu,  9 May 2024 17:07:14 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CB1CB1169588;
+	Thu,  9 May 2024 17:07:13 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id A5F3A30C1B8F; Thu,  9 May 2024 17:07:13 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 9F5133E683;
+	Thu,  9 May 2024 19:07:13 +0200 (CEST)
+Date: Thu, 9 May 2024 19:07:13 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Fan Wu <wufan@linux.microsoft.com>
+cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, 
+    tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, 
+    snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com, 
+    linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
+    linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
+    linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
+    audit@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v18 12/21] dm: add finalize hook to target_type
+In-Reply-To: <212b02a8-f5f0-4433-a726-1639dda61790@linux.microsoft.com>
+Message-ID: <bc9aa053-20a6-eaa-cbe4-344f340242b@redhat.com>
+References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com> <1714775551-22384-13-git-send-email-wufan@linux.microsoft.com> <aa767961-5e3-2ceb-1a1e-ff66a8eed649@redhat.com> <212b02a8-f5f0-4433-a726-1639dda61790@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-The current tag reservation code is based on a misunderstanding of the
-meaning of data->shallow_depth. Fix the tag reservation code as follows:
-* By default, do not reserve any tags for synchronous requests because
-  for certain use cases reserving tags reduces performance. See also
-  Harshit Mogalapalli, [bug-report] Performance regression with fio
-  sequential-write on a multipath setup, 2024-03-07
-  (https://lore.kernel.org/linux-block/5ce2ae5d-61e2-4ede-ad55-5511126024=
-01@oracle.com/)
-* Reduce min_shallow_depth to one because min_shallow_depth must be less
-  than or equal any shallow_depth value.
-* Scale dd->async_depth from the range [1, nr_requests] to [1,
-  bits_per_sbitmap_word].
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>
-Fixes: 07757588e507 ("block/mq-deadline: Reserve 25% of scheduler tags fo=
-r synchronous requests")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/mq-deadline.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 94eede4fb9eb..acdc28756d9d 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -487,6 +487,20 @@ static struct request *dd_dispatch_request(struct bl=
-k_mq_hw_ctx *hctx)
- 	return rq;
- }
-=20
-+/*
-+ * 'depth' is a number in the range 1..INT_MAX representing a number of
-+ * requests. Scale it with a factor (1 << bt->sb.shift) / q->nr_requests=
- since
-+ * 1..(1 << bt->sb.shift) is the range expected by sbitmap_get_shallow()=
-.
-+ * Values larger than q->nr_requests have the same effect as q->nr_reque=
-sts.
-+ */
-+static int dd_to_word_depth(struct blk_mq_hw_ctx *hctx, unsigned int qde=
-pth)
-+{
-+	struct sbitmap_queue *bt =3D &hctx->sched_tags->bitmap_tags;
-+	const unsigned int nrr =3D hctx->queue->nr_requests;
-+
-+	return ((qdepth << bt->sb.shift) + nrr - 1) / nrr;
-+}
-+
- /*
-  * Called by __blk_mq_alloc_request(). The shallow_depth value set by th=
-is
-  * function is used by __blk_mq_get_tag().
-@@ -503,7 +517,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_=
-mq_alloc_data *data)
- 	 * Throttle asynchronous requests and writes such that these requests
- 	 * do not block the allocation of synchronous requests.
- 	 */
--	data->shallow_depth =3D dd->async_depth;
-+	data->shallow_depth =3D dd_to_word_depth(data->hctx, dd->async_depth);
- }
-=20
- /* Called by blk_mq_update_nr_requests(). */
-@@ -513,9 +527,9 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hc=
-tx)
- 	struct deadline_data *dd =3D q->elevator->elevator_data;
- 	struct blk_mq_tags *tags =3D hctx->sched_tags;
-=20
--	dd->async_depth =3D max(1UL, 3 * q->nr_requests / 4);
-+	dd->async_depth =3D q->nr_requests;
-=20
--	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
-+	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
- }
-=20
- /* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
+On Wed, 8 May 2024, Fan Wu wrote:
+
+> 
+> 
+> On 5/8/2024 10:17 AM, Mikulas Patocka wrote:
+> > 
+> > 
+> > On Fri, 3 May 2024, Fan Wu wrote:
+> > 
+> >> This patch adds a target finalize hook.
+> >>
+> >> The hook is triggered just before activating an inactive table of a
+> >> mapped device. If it returns an error the __bind get cancelled.
+> >>
+> >> The dm-verity target will use this hook to attach the dm-verity's
+> >> roothash metadata to the block_device struct of the mapped device.
+> >>
+> >> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > 
+> > Hi
+> > 
+> > Why not use the preresume callback?
+> > 
+> > Is there some reason why do we need a new callback instead of using the
+> > existing one?
+> > 
+> > Mikulas
+> Thanks for the suggestion.
+> 
+> Mike suggested the new finalize() callback. I think the reason for not using
+> the preresume() callback is that there are multiple points that can fail
+> before activating an inactive table of a mapped device which can potentially
+> lead to inconsistent state.
+> 
+> In our specific case, we are trying to associate dm-verity's roothash metadata
+> with the block_device struct of the mapped device inside the callback.
+> 
+> If we use the preresume() callback for the work and an error occurs between
+> the callback and the table activation, this leave the block_device struct in
+> an inconsistent state.
+
+The preresume callback is the final GO/NO-GO decision point. If all the 
+targets return zero in their preresume callback, then there's no turning 
+back and the table will be activated.
+
+> This is because now the block device contains the roothash metadata of it's
+> inactive table due to the preresume() callback, but the activation failed so
+> the mapped device is still using the old table.
+> 
+> The new finalize() callback guarantees that the callback happens just before
+> the table activation, thus avoiding the inconsistency.
+
+In your patch, it doesn't guarantee that.
+
+do_resume calls dm_swap_table, dm_swap_table calls __bind, __bind calls 
+ti->type->finalize. Then we go back to do_resume and call dm_resume which 
+calls __dm_resume which calls dm_table_resume_targets which calls the 
+preresume callback on all the targets. If some of them fails, it returns a 
+failure (despite the fact that ti->type->finalize succeeded), if all of 
+them succeed, it calls the resume callback on all of them.
+
+So, it seems that the preresume callback provides the guarantee that you 
+looking for.
+
+> -Fan
+
+Mikulas
+
