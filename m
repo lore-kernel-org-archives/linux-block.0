@@ -1,55 +1,48 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85281DA4D;
-	Thu,  9 May 2024 12:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F25513B2BB;
+	Thu,  9 May 2024 12:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715257885; cv=none; b=m18pxgywvVySW5w59gHLsnihwZIVwNRPy1nM+rPK1YmDq5yTlNt4ScSfs3Ft7UpJKxzb9+PsoMxUX4vmuFRSyvI/SDs/ir6+fYzbjihrQAG5H+5lIJHVYh4y8+uM6bCBuUfUU/OErFzptUnD43ypLeRlZvfpviE8H1wTPeT9vAM=
+	t=1715258409; cv=none; b=rMF8CZatXp46Vkf1Gniy7fih2RCbFo1vnSwGDTnPwzcv96gKkiPSvG6YwAkHGiK5MfQ3Z2YGZ769mE8F1DLlBw+f2VMuhFltFY1ndhaUpTgyeQ5sk/y4WyVzBPVl5f7kYOYshGC9vFDKokCZyvYHpNEJWznnAgk91PFfqGDBQeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715257885; c=relaxed/simple;
-	bh=TrIT4sozvI5rvBSMIRgj1iOqe27OC70E6GfMShUnt7g=;
+	s=arc-20240116; t=1715258409; c=relaxed/simple;
+	bh=o4EJzw5BUXuBgoy2uU4zb1qMLA37I4KNAPe8azdAsNQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dUb4f7NmSGtH4MUmrNIpkNVTR0AwDzj8bfikMbn35aBjCi1UP0bKJM0x6qxrkA2VPJsESME3mzxDr72qqzaHJW64QEUKvj0as67dJndpbcdywki4SeGmyJSVdcsRMJW8aZBo8lF4eE9k6InsYutmGQrvFElcwlp5f82uHiXdIWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=ENoWDIlM; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=UdxdhDeNnXWjmQGNtV4e7YlWadJAOU+vZg0hYOTC4Ip/kBGHZhePfbn0K3Nh1T+0VTprg9EZZWYCuCKr3Yuw8sCujWm2tDUlD1CvsraJkWsuDhM7Xqu3ovDZ+d/tEjkUzQRQFJsdhWelrX9osv2joFyhy7dGRJbC1y5mAI5coCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ee/2otxe; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="ENoWDIlM"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4VZrwL2LXfz9sr9;
-	Thu,  9 May 2024 14:31:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1715257874;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=syRYsn5YkWqtDoVOn9NFuMpVM6WQHaccjb1P8o4QWJk=;
-	b=ENoWDIlMdBwQF+JZTxrddQuXCrXDJ+v2SKC5XavGOjx+KmlSGRIwmfCuaoeWSfFnH8+wHA
-	StaYVY4Kr7IGwafjdTi4Qkgqj37BX4BeZ3HOoI++h/IiaTr1oWCJjEU2QBjcMpaVzUYZfb
-	UAVH5b+3A0WyHilnOL9AM109fpZ+FqCVqtqfuyHVBAoocTrTgdz1mGISKjvxHYGV7Lrorf
-	d0C6EFvJI+FOS+M8rmeinVfSc9mhtp1qXE1Ubol1xItY2EZcip0kIwoErd61IGMOVVmOJT
-	zgKDepUg03xCT9crOatZUxzBLG/fS2p9Kef8nGb150xtT6w4l01r6fm8UPXVgA==
-Date: Thu, 9 May 2024 12:31:07 +0000
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: hch@lst.de, willy@infradead.org, mcgrof@kernel.org,
-	akpm@linux-foundation.org, brauner@kernel.org,
-	chandan.babu@oracle.com, david@fromorbit.com, djwong@kernel.org,
-	gost.dev@samsung.com, hare@suse.de, john.g.garry@oracle.com,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-xfs@vger.kernel.org, p.raghav@samsung.com,
-	ritesh.list@gmail.com, ziy@nvidia.com
-Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
-Message-ID: <20240509123107.hhi3lzjcn5svejvk@quentin>
-References: <20240503095353.3798063-8-mcgrof@kernel.org>
- <20240507145811.52987-1-kernel@pankajraghav.com>
- <ZjpSx7SBvzQI4oRV@infradead.org>
- <20240508113949.pwyeavrc2rrwsxw2@quentin>
- <Zjtlep7rySFJFcik@infradead.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ee/2otxe"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=P/Yh6fmWOx0S3hHFDnR/3XNxSMU0c5O7DQ9VhEI3qZ4=; b=Ee/2otxepDaoDyWBcWwFyiIctq
+	nqoj0uR7R7rKU2RVLehLlBSEbFOIzg3Ei49vP9t0eZfHXbnK7Clo4ViqVb2Eja8jvDoFoOTO7KzS2
+	mx0+KGb840gHS36HB/TO+kOV3kAi9xSNAap53ofcOVYJn54tWWpd/4UJL62TiOyvKVqCS9AMgY1H1
+	E8R41KbrN0wd6lmELud0Aer8PlF9GNud2sqoOAkxfMREoWS8Fpdn+2hR+mRQyF706nSm7HCCNFC7P
+	sKuzRooBCw5ovFR3K20jpikuGw2ivt218HNx5m6JJwCgrgrc3OArj4I8OPVW2Pp+0bUA1SLr+L/1P
+	3czW+isA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s5343-00000001STi-2Jqg;
+	Thu, 09 May 2024 12:39:59 +0000
+Date: Thu, 9 May 2024 05:39:59 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>,
+	steve.kang@unisoc.com
+Subject: Re: [RFC PATCH 2/2] mm: introduce budgt control in readahead
+Message-ID: <ZjzEH5fFGHgnqbLj@infradead.org>
+References: <20240509023937.1090421-1-zhaoyang.huang@unisoc.com>
+ <20240509023937.1090421-3-zhaoyang.huang@unisoc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,26 +51,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zjtlep7rySFJFcik@infradead.org>
-X-Rspamd-Queue-Id: 4VZrwL2LXfz9sr9
+In-Reply-To: <20240509023937.1090421-3-zhaoyang.huang@unisoc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, May 08, 2024 at 04:43:54AM -0700, Christoph Hellwig wrote:
-> On Wed, May 08, 2024 at 11:39:49AM +0000, Pankaj Raghav (Samsung) wrote:
-> > At the moment, we can get a reference to the huge zero folio only through
-> > the mm interface. 
-> > 
-> > Even if change the lower level interface to return THP, it can still fail
-> > at the mount time and we will need the fallback right?
-> 
-> Well, that's why I suggest doing it at mount time.  Asking for it deep
-> down in the write code is certainly going to be a bit problematic.
+> +	unsigned long budgt = inode->i_sb->s_bdev ?
+> +			blk_throttle_budgt(inode->i_sb->s_bdev) : 0;
 
-Makes sense. But failing to mount because we can't get a huge zero folio
-seems wrong as we still can't guarantee it even at mount time.
+The readahead code is used for all file systems, you can't just call
+into block layer code here.
 
-With the current infrastructure I don't see anyway of geting a huge zero
-folio that is guaranteed so that we don't need any fallback.
-
-Let me know what you think.
--- 
-Pankaj Raghav
