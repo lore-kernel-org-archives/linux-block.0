@@ -1,54 +1,29 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EABF13B590;
-	Thu,  9 May 2024 12:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D51613B590
+	for <linux-block@vger.kernel.org>; Thu,  9 May 2024 12:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715259510; cv=none; b=utdBAJvSakhQvsZ9qniw3YEolmb4cKCZkUa08me0vdV0c2ynRK3XOu3RX6nKeSW8BnADXikcYqQQEPd8C571LAnTmeI+2BlnP9DlqlZHzbt8b+fzFXcFyBARALf1OXTBr+VrFUXukwT+MTq+wIng4UEdtgfwAy7870PZxya4ZRo=
+	t=1715259542; cv=none; b=fAuQ00O7bJ81Vpq3W3QZdKW9rrEVi7b991mjp4bscVcLfs3sJ/ok4pwmPvBspaT732uxGQeoWUiT24mFbqUvGI8mHbkKrhDBaaQ4+SKYz+U/tlbqesNf3ILplodrjxDZE3SpnuLlBdFURpfuJPnZBFEJiAlhzWBc5UVSwaYKBEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715259510; c=relaxed/simple;
-	bh=MKC9wCjSQVelLnxG27A3NgjqV66DuuMiZIDzudaJX34=;
+	s=arc-20240116; t=1715259542; c=relaxed/simple;
+	bh=mIooRyGilQKiiAZbSNY09gQqaPZVuzmLc9AJYwBC2g0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tgzUocSf3Y/GWFgBQ93Xuh2EDWf3UbIeCAzbdacwBw6PYovfAQKjtaAjnWwqWW+buEg5gPkjMXTH/Z2dOtIgQ1hFm9/FGh7i8PjaF7AfqQpbCxczZ472bKXDMD4bNWmg19ru5kv+n1+oxsNmiXWvR2ZK+0eiwHNX091kvxiWQGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=TS/zwIpI; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TS/zwIpI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=P8JtwUqTZ5thY5C0o8JQ9jcIA6kib8zFsh+AmPPcQkw=; b=TS/zwIpI/RgjwOZIRNph0V1iPg
-	HFcQKqlkwrUU+z/fSblzUSWWo/CcR1JozYosfXC/3cdu1Krwf7lInvpoP222XBUJKgn7j696Q9aQR
-	oYbe3BcJjc1IykDXgGRB9TPZZTQis23b4wjWRNFOS+7GVflB14MGtUSobZkXZAJfT/EV3/rHtvz/E
-	3DQ1XkVZK7NZoMbuowRbe/cbywe/SgPkRkpu5Jk8VXha4nEGm3JFYGO2luu2m0t5hwwRgwxFAyMLi
-	ElSwArKsC7VSDkGuTwnIvysLt55peuNMyVDcWSnVM7kSpgantdDoj/5YSZIrx6ED4eSteU5z2AGhr
-	aL1XHHdw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s53Lr-00000001VQ2-0TaS;
-	Thu, 09 May 2024 12:58:23 +0000
-Date: Thu, 9 May 2024 05:58:23 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-Cc: Christoph Hellwig <hch@infradead.org>, hch@lst.de, willy@infradead.org,
-	mcgrof@kernel.org, akpm@linux-foundation.org, brauner@kernel.org,
-	chandan.babu@oracle.com, david@fromorbit.com, djwong@kernel.org,
-	gost.dev@samsung.com, hare@suse.de, john.g.garry@oracle.com,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-xfs@vger.kernel.org, p.raghav@samsung.com,
-	ritesh.list@gmail.com, ziy@nvidia.com
-Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
-Message-ID: <ZjzIb-xfFgZ4yg0I@infradead.org>
-References: <20240503095353.3798063-8-mcgrof@kernel.org>
- <20240507145811.52987-1-kernel@pankajraghav.com>
- <ZjpSx7SBvzQI4oRV@infradead.org>
- <20240508113949.pwyeavrc2rrwsxw2@quentin>
- <Zjtlep7rySFJFcik@infradead.org>
- <20240509123107.hhi3lzjcn5svejvk@quentin>
- <ZjzFv7cKJcwDRbjQ@infradead.org>
- <20240509125514.2i3a7yo657frjqwq@quentin>
+	 Content-Type:Content-Disposition:In-Reply-To; b=e6a+oAhuH7Wsv2QvLI13KeaupkXLvlRyQSszxUtroo5Fi1TzgcjxLesc0Y+Th4yDV+b6lbnyInDh2hIFWpjTGqq7q9zrIdPJNvOmLim2H5g3x4UwXMytOCEayWM0iwPVPnIiz+JCCsEhNU4B5mlX5eoQnHD8hUkb3np2N8jw/RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 08A1768BFE; Thu,  9 May 2024 14:58:57 +0200 (CEST)
+Date: Thu, 9 May 2024 14:58:56 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: work around sparse in queue_limits_commit_update
+Message-ID: <20240509125856.GB12191@lst.de>
+References: <20240405085018.243260-1-hch@lst.de> <65a7c6b1-ad4e-4b27-b8b1-44d94a66bf7a@oracle.com> <20240405143856.GA6008@lst.de> <343cc769-b318-4c2d-b08a-0bc752f41f78@oracle.com> <20240405171330.GA16914@lst.de> <293dbd7b-9955-48f4-9eb4-87db1ec9335a@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,12 +32,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240509125514.2i3a7yo657frjqwq@quentin>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <293dbd7b-9955-48f4-9eb4-87db1ec9335a@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, May 09, 2024 at 12:55:14PM +0000, Pankaj Raghav (Samsung) wrote:
-> We might still fail here during mount. My question is: do we also fail
-> the mount if folio_alloc fails?
+On Thu, May 09, 2024 at 10:49:29AM +0100, John Garry wrote:
+> On 05/04/2024 18:13, Christoph Hellwig wrote:
+>> On Fri, Apr 05, 2024 at 05:43:24PM +0100, John Garry wrote:
+>>> This actually looks like a kernel issue - that being that the mutex API is
+>>> not annotated for lock checking.
+>>
+>> Oh.  Yeah, that would explain the weird behavior.
+>>
+>>> I would need to investigate further for any progress in adding that lock
+>>> checking to the mutex API, but it did not look promising from that
+>>> patchset. For now I suppose you can either:
+>>> a. remove current annotation.
+>>
+>> I can send a patch for that.
+>>
+>
+> A reminder on this one.
+>
+> I can send a patch if you like.
 
-Yes.  Like any other allocation that fails at mount time.
+Yes, please.
 
+Sorry, I expected you to just do that.
