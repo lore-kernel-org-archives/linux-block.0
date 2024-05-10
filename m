@@ -1,74 +1,45 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181041A2C0F
-	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 08:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57701581E3;
+	Fri, 10 May 2024 09:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715330441; cv=none; b=PdCc+db4/kbSBklI9WW3gRFn5LaxWHQHXwocZRWaRJy/IKyEz9MpOelLljJVKP91e9h2oGTeBbwpBw1UcxfW+m6JdT9hdfSi+4mugHQLiUrF9k5tDN+RA/HgmTJfv5c1/S3NJ2DEwGKu+X6FVmoBy1/u/PoG32ZTYZwjxCloyqY=
+	t=1715333322; cv=none; b=bMiILUf6h/uRfzrLqN/GztgNr6OH8BzYNrq92A+bjsGuWmTzOweqczuC82Yd5wfWCOaPFWSrI93hplfXeIh0pu7vSHQhY22BtkMKZ6OFYpBxOEiBTbwNZAf07Et0IuJe8ick6vTLD7JojCnG6UU2+lsj5nWLtAyEWBfFoSxAVhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715330441; c=relaxed/simple;
-	bh=JPMH+mm4lMiMXt4zL+tM57v/I78L4rUVEq6LC3xXP64=;
+	s=arc-20240116; t=1715333322; c=relaxed/simple;
+	bh=oxjnBw0YNQFYA5GB81I1XJ33OzLdua4xr2AApp9Wiss=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bpvYdBbe6W/AyGKIVUGHT/P9lPdFbGRxYGqOYuGvJogv4DHh+UPgDdR31S5uyuclFHHZBxBS3UuR2mwjnzj6gnJd/qr+VrQWhHLKor91HyLb+tSFkwN/KubPe11Cyw4iHh0gaANAxpEJxkwo+bhwIAyvxi/M4Uv3zdL017U+BMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JE8i56y+; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZgAG1KrrGNFumj4w0+wUskOLF+SUmT+OM7bREoEiLLxmeLkxEOFhG5qLYYlpXV5kuuTTJoShE8m/+DjglN3PMsTe4WHr6CXi9KWKDkCdR5/kLudt5t6BV9gLZMi636O0L8TynPkAX+fNCwTYdLDWkbM77RDJrDrvnFi0Yk8WUQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P51B6Dt/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JE8i56y+"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6f0e4212d5aso908649a34.3
-        for <linux-block@vger.kernel.org>; Fri, 10 May 2024 01:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715330439; x=1715935239; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ZomfWJD3t0+7BUAA8nVU6dC0xByk+g2aWDPY0LtdD8=;
-        b=JE8i56y+DZ10s4THXa5PQB0cDoyvDghUg7b1x+vH0Itq9Ai29ECFF6JtnTxl0btbk/
-         S/MIaEEYG+Pwxqflk+LmkQ6s91lDuXshHa+f/SsrgTU0FVU2ukYiZUYVPuJZyg6mBRcX
-         aJiHY49RKJsw8/JWy/BMCzFn2oJJ8Qcu1liug=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715330439; x=1715935239;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ZomfWJD3t0+7BUAA8nVU6dC0xByk+g2aWDPY0LtdD8=;
-        b=YmryOTR0JkP89WSg236/apfFNeMlggKGP8XtIgZDby2P38+1QaV9+4rFuSbMnlF1MR
-         NCwGxIX7V9mMJ/lhIsYsz7h/TvftHyawdul4Tn5xVWKWGDY9aLFjg5bLvvbRm+HuV1ik
-         UdGhOErWnuEJP5IHBNtszzSvdC7GqlP7UfXiKpkWMKArKWHIa9jGmceO4xOD4W+a4k7I
-         2F22g6Y3Ghu2Hygj6JunvJudOf+sWqh72tKfBEG7K1azIRtuvVudoItcSnJXHGixpcgP
-         p99+nhYPs+O2Z9xAWVgAhs93SlvGg1Tedcuy4LAYZ2OWK1kp+nphiIg+d0dc0PBBxViL
-         honA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkjRKSTtEVqDIHpMxHuEc46o+WsJiY6TGA0re7fcJF8C7INjSl+Ungc5ER78ox+j0g2abPHbTJBC0kpGznCef1rnsimQuaY3T61uo=
-X-Gm-Message-State: AOJu0YzSddVyCzf2JkzZ+JxGWRAaGi7UCfFIjAovOzatDjx6tACnSgFy
-	mdY8BmLjjIjxGcWUYjaeuJ0MtilTBwSr6eKsxudiE2qnzujXhx9R0Qon5X80dw==
-X-Google-Smtp-Source: AGHT+IGjXZlYHqz/IqO+Uf2rD0hKlsdFl0CNwe7KKovq2KKzmPdZdYnhVD45lL16TlHcC/EZJvrPMA==
-X-Received: by 2002:a05:6870:730d:b0:23e:6f11:85f9 with SMTP id 586e51a60fabf-24172c2fac6mr2287281fac.33.1715330439147;
-        Fri, 10 May 2024 01:40:39 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:de58:3aa6:b644:b8e9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a66600sm2556666b3a.11.2024.05.10.01.40.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 01:40:38 -0700 (PDT)
-Date: Fri, 10 May 2024 17:40:34 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCHv3 00/19] zram: convert to custom compression API and
- allow algorithms tuning
-Message-ID: <20240510084034.GD950946@google.com>
-References: <20240508074223.652784-1-senozhatsky@chromium.org>
- <ZjzFB2CzCh1NKlfw@infradead.org>
- <20240510051509.GI8623@google.com>
- <Zj3PXKcpqUPuFJRu@gondor.apana.org.au>
- <20240510080827.GB950946@google.com>
- <Zj3W7OK9kDpneKXR@gondor.apana.org.au>
- <20240510082850.GC950946@google.com>
- <Zj3bFngCxSbO2I4a@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P51B6Dt/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7D30C113CC;
+	Fri, 10 May 2024 09:28:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715333322;
+	bh=oxjnBw0YNQFYA5GB81I1XJ33OzLdua4xr2AApp9Wiss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=P51B6Dt/bsfnrvqsI3zczK2l8toNlYkKJm+ymZrDnfP/5zfTTVeAJP1bWS+KRvDPv
+	 BwMBAyWnRXmiG8MFxuBdcE0olUh2h+jFtlgi536ih7nxZgkREY49J6yuiFbFMZpjk9
+	 ZwmUlo4Yy0Z/OgjuU5xeuYR2yiwsYvMT6eCacI+S2BcEdK4vGGjdMXC0Hi4rvh9sfF
+	 se6PKSPQDAndTxlk8PdLcurOktGrFCsqAx8O1iJUDk/Hky8+++vXDPIc+q37VEqeyM
+	 FxlNxqIoRX9UQ6A3fkjaHWCQ0UedVPkppTaKH591xNggb8qjSpztBBcnvjs0oQbOzm
+	 KXoWaeixRiZsg==
+Date: Fri, 10 May 2024 11:28:36 +0200
+From: Niklas Cassel <cassel@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: John Meneghini <jmeneghi@redhat.com>, tj@kernel.org,
+	josef@toxicpanda.com, axboe@kernel.dk, kbusch@kernel.org,
+	hch@lst.de, sagi@grimberg.me, emilne@redhat.com, hare@kernel.org,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+	jrani@purestorage.com, randyj@purestorage.com, aviv.coro@ibm.com
+Subject: Re: [PATCH v3 1/3] block: track per-node I/O latency
+Message-ID: <Zj3oxKCGQYQ7xpjt@ryzen.lan>
+References: <20240403141756.88233-1-hare@kernel.org>
+ <20240509204324.832846-2-jmeneghi@redhat.com>
+ <fcda2351-9ba7-4121-a993-184a4c02f9a6@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,18 +48,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zj3bFngCxSbO2I4a@gondor.apana.org.au>
+In-Reply-To: <fcda2351-9ba7-4121-a993-184a4c02f9a6@kernel.org>
 
-On (24/05/10 16:30), Herbert Xu wrote:
-> On Fri, May 10, 2024 at 05:28:50PM +0900, Sergey Senozhatsky wrote:
-> >
-> > OK.  I guess for drivers' params support (dictionaries handling etc.)
-> > we take take some code from this series.  You mentioned acomp, does this
-> > mean setparam is for async compression only?
+On Fri, May 10, 2024 at 04:11:10PM +0900, Damien Le Moal wrote:
+> On 5/10/24 05:43, John Meneghini wrote:
+> > From: Hannes Reinecke <hare@kernel.org>
+> > 
+> > Add a new option 'BLK_NODE_LATENCY' to track per-node I/O latency.
+> > This can be used by I/O schedulers to determine the 'best' queue
+> > to send I/O to.
+> > 
+> > Signed-off-by: Hannes Reinecke <hare@kernel.org>
+> > 
+> > Cleaned up checkpatch warnings and updated MAINTAINERS.
 > 
-> It would be for both acomp and scomp.  I have no intention to
-> add it to the legacy comp interface.
+> This note should be before Hannes SoB. E.g:
+> 
+> [John] Fixed checkpatch warnings and updated MAINTAINERS.
 
-Alright, I'll wait for the patches and then will take a look
-at how to use them in zram and how I can help with the drivers
-(if needed).
+Not before, it shoud be after Hannes SoB.
+(Between Hannes' Signed-off-by and John's Signed-off-by)
+
+See this example:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a37e12bcab22efa05802f87baa0692365ae0ab4d
+
+
+Kind regards,
+Niklas
