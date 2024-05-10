@@ -1,95 +1,111 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E3FFC0B
-	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 20:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D208713BAFB
+	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 22:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715374297; cv=none; b=r1GYW9gNb4ue54/WymCu7ztSW+9xjmkWnSxrBDVV/T63WaGLc0Zi8nKYiygJMfSpqHPhjAusWK+l5JNrFPh0CRi/tRA/3qcjYgRfC2yjRz5f/J3OAv+x10mIZM22Hj4kih4+i9hx2pWKk3R1qO1YiOEuF/G6C6gYKhO6IpAOn5c=
+	t=1715379585; cv=none; b=oG+8bxCTGapuM487YmTKQt+p0eIjx52mxPmpEWmOUAT4l85BAC2aokyVNc+cF8Kxj0Sus6uPPyRbBlQrRWIf1WM49z80ZpjJFXaBoDajFA4QDpi+gXCMR6pTWhD4dJ7evNbTh4jpRSxEKxQtjNg5fmSiUejZUDQpKBQEnQJcddQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715374297; c=relaxed/simple;
-	bh=nxDeY0QQt4Bh9tHrvzhDjEN4clFZT0MxyFo1QgQVXsg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=oVXeGUbg2xZ7IciTUJGIfCOIDwLOmzBH7GNnDkn6T2eJZWP3eoRh84RgjvucMlYFY1fCJ9mDyQQht1ZPYZIYIysoxmh6DFPJ7Ri+vn5Kj3i76CIrSNTzKACwAHcIVliZUBbP8ZBjAuxF3w1OgxgORVEDOST2KVYhavdrZ2/Cqi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=0FoAp9aA; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1715379585; c=relaxed/simple;
+	bh=0XffWd5sLG3pDSlUKfM1AJx/oYw1hhSvrwpfCMuquXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rg1Y3FrlnYISa/wLbR4zJIr36Bh8r2cTJjKvxlY30a08Lmgj9DDOKjYSsjXJTaIwzWpyolxMzD6bNB5BV60q9iwBK+V0g6LCwPZdWJQWOYrAd+Rz3URdod7T+OzOn7ODNAWf9/w04SG1fcXTeaUjRjU3oOLeMYpnY+3TmzTAzHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UWW8rNo5; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="0FoAp9aA"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4VbgzC5GqVzlgVnW;
-	Fri, 10 May 2024 20:51:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1715374293; x=1717966294; bh=BuuaEwcbhswX43BSZfFysQS4
-	B/+pIxdLezwxQw9hauQ=; b=0FoAp9aAtwjSJGK+NlFnfYgWUBqktUt+vcvZ2My1
-	itD5/kADcL2CKo030WPZjJqrK1Eqz1lrOX1+XKe0R5J5otcijitOajNZmb/kbq4v
-	5Octw/qK4ZHV3z16PULjRhplExSLBZXlqkQzWOyg/jJFhUDRD2e56NdJshzXQNlQ
-	i3trYMstSOkki8sA9YdGDy2+ixZvx8vPHHSaYP76eYtYjInUooI4MLtHewwEoCeU
-	3b6GAtWo1jEg18eEAwnapJaZQko5Vo9uCom4ZZbX3OnxfH1nlmzxPSB/1G75wz3A
-	mp/iz3Bd52xgGpkJwtFw+g+jF6g8a3DQTSy2FJxsCnwH4w==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 0ehdUUu2GdSX; Fri, 10 May 2024 20:51:33 +0000 (UTC)
-Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Vbgz835jTzlgVnN;
-	Fri, 10 May 2024 20:51:32 +0000 (UTC)
-Message-ID: <2786c4cb-86ad-42bb-8998-4d8fe6a537a4@acm.org>
-Date: Fri, 10 May 2024 13:51:30 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UWW8rNo5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=hBrnX+U4pxDm7jtcvPTU+zBs2Ty6Lb9srPF/queK5b8=; b=UWW8rNo5+wP3OEtQWhtBvWYjYv
+	MGWITLSJ1MEEzroRx6lXiYPQDQeJYKgiEjTZZisYpgkFAMwK8DzfFfz9T877tIgWZ6M5kyhpZcpRh
+	WGyhh3MVNw//vQRpENVlUIJcK97i1nSxVOVu92vlxtrw1sIt5rpD9jkh1gReHciR0kjY10uW1xGgt
+	5wCfmTqkcVKeF+gVQ3L284xijLAmESSG0DuXe8nxhU3U9bSJtme0vMZAH8NmqviSiYDOrHAAfePbj
+	+I6UMOaPy3JxXCrTXvKJ703iGuO7BQlpvCCJ+vfxwoTewCiumxZYJRf2jJdzQsJkqNjhSj11tYNWc
+	e1pb3RNw==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s5YaT-000000043J5-1hlz;
+	Fri, 10 May 2024 22:19:33 +0000
+Date: Fri, 10 May 2024 23:19:33 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: hare@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Pankaj Raghav <kernel@pankajraghav.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 1/5] fs/mpage: use blocks_per_folio instead of
+ blocks_per_page
+Message-ID: <Zj6ddYvmb2uIq5Ec@casper.infradead.org>
+References: <20240510102906.51844-1-hare@kernel.org>
+ <20240510102906.51844-2-hare@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] block nbd0: Unexpected reply (15) 000000009c07859b
-To: Vincent Chen <vincent.chen@sifive.com>
-References: <CABvJ_xhxR22i4_xfuFjf9PQxJHVUmW-Xr8dut_1F4Ys7gxW5pw@mail.gmail.com>
-Content-Language: en-US
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CABvJ_xhxR22i4_xfuFjf9PQxJHVUmW-Xr8dut_1F4Ys7gxW5pw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240510102906.51844-2-hare@kernel.org>
 
+On Fri, May 10, 2024 at 12:29:02PM +0200, hare@kernel.org wrote:
+> +++ b/fs/mpage.c
+> @@ -114,7 +114,7 @@ static void map_buffer_to_folio(struct folio *folio, struct buffer_head *bh,
+>  		 * don't make any buffers if there is only one buffer on
+>  		 * the folio and the folio just needs to be set up to date
+>  		 */
+> -		if (inode->i_blkbits == PAGE_SHIFT &&
+> +		if (inode->i_blkbits == folio_shift(folio) &&
 
-On 5/9/24 10:04 PM, Vincent Chen wrote:
-> I occasionally encountered this NBD error on the Linux 6.9.0-rc7
-> (commit hash: dd5a440a31fae) arm64 kernel when I executed the
-> stress-ng HDD test on NBD. The failure rate is approximately 40% in my
-> testing environment. Since this test case can consistently pass on
-> Linux 6.2 kernel, I performed a bisect to find the problematic commit.
-> Finally, I discovered that this NBD issue might be caused by this
-> commit 65a558f66c30 ("block: Improve performance for BLK_MQ_F_BLOCKING
-> drivers"). After reverting this commit, I didn't encounter any NBD
-> issues when executing this test case. Unfortunately, I was unable to
-> determine the root cause of the problem. I hope that experts in this
-> area can help clarify this issue. I have posted the execution log and
-> all relevant experimental information below for further analysis.
+yes
 
-(+Jens, Christoph and Josef)
+> @@ -160,7 +160,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>  	struct folio *folio = args->folio;
+>  	struct inode *inode = folio->mapping->host;
+>  	const unsigned blkbits = inode->i_blkbits;
+> -	const unsigned blocks_per_page = PAGE_SIZE >> blkbits;
+> +	const unsigned blocks_per_folio = folio_size(folio) >> blkbits;
+>  	const unsigned blocksize = 1 << blkbits;
+>  	struct buffer_head *map_bh = &args->map_bh;
+>  	sector_t block_in_file;
+> @@ -168,7 +168,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>  	sector_t last_block_in_file;
+>  	sector_t first_block;
+>  	unsigned page_block;
+> -	unsigned first_hole = blocks_per_page;
+> +	unsigned first_hole = blocks_per_folio;
 
-Thank you for the detailed report. Unfortunately it is nontrivial to
-replicate your test setup so I took a look at the nbd source code.
+yes
 
-It seems likely to me that the root cause is in nbd. The root cause 
-could e.g. be in the signal handling code. If
-nbd_queue_rq() is run asynchronously it is run on the context of a
-kernel worker thread then it does not receive signals from the process
-that submits I/O. If nbd_queue_rq() is run synchronously then it may
-receive signals from the process that submits I/O. I think that I have
-found a bug in the nbd signal handling code. See also
-https://lore.kernel.org/linux-block/20240510202313.25209-1-bvanassche@acm.org/T/#t
+> @@ -189,7 +189,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>  		goto confused;
+>  
+>  	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
+> -	last_block = block_in_file + args->nr_pages * blocks_per_page;
+> +	last_block = block_in_file + args->nr_pages * blocks_per_folio;
 
-Bart.
+no.  args->nr_pages really is the number of pages, so last_block is
+block_in_file + nr_pages * blocks_per_page.  except that blocks_per_page
+might now be 0.
 
+so i think this needs to be rewritten as:
 
+	last_block = block_in_file + (args->nr_pages * PAGE_SIZE) >> blkbits;
+
+or have i confused myself?
+
+> @@ -275,7 +275,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>  		bdev = map_bh->b_bdev;
+>  	}
+>  
+> -	if (first_hole != blocks_per_page) {
+> +	if (first_hole != blocks_per_folio) {
+>  		folio_zero_segment(folio, first_hole << blkbits, PAGE_SIZE);
+
+... doesn't that need to be folio_size(folio)?
+
+there may be other problems, but let's settle these questions first.
