@@ -1,53 +1,60 @@
 Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471B5502AB
-	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 20:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6C44D9EF
+	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 20:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715372616; cv=none; b=DJYP8+qjqht6a9JXNMgnYsVXSufjZ7ZK3yLsypvttNpaoeyon7sN96DkxWJu0YyiTEV3fveJqVp0Rxu1AGFIfhGfJtmexqLiUAMBYGa/SnhRIRmg4AeMzZ1qFXpB81XyM/Jt3nxVZUtEErf8vijbMB9kCCfKwC1S7hDNF8CnBuE=
+	t=1715372619; cv=none; b=Ad9+e8Hggg7qxeyhBAbKdnodH8F/H7tDos+H3bIvKyPwbDXSVH3iGsjJ1tQ9JPpbG3zV6dNMXrVZka+noPO0+kweoeaSEPUQPvifGEfiEGoeYS0+v2UjxcHl3Q17jP8dzYtCFlmb8SLLrgnRQlZoBb31Sj0mzVwsmZFau5w2oOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715372616; c=relaxed/simple;
-	bh=Wa5Mn2znRmsT1ure+if+PSLB11Dz07dBHpIR9I/D+ac=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MZLlQi0s/hePNAm9CxF4vL9MwMlPDs1A+54sAzBVNzIHRq8UQX8rfYZpmE2OzaI1wP38k8UR2UpR0sM+zpMdaNjz6NjCI+DnZEqt14YlBwih+pmFZd1MV3cySV+53MNHLcWGJgMQmUfkYJFdJUiMkuZuPJ5RVo5QA5YHI8Z6wCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=iyBnhcIo; arc=none smtp.client-ip=199.89.1.11
+	s=arc-20240116; t=1715372619; c=relaxed/simple;
+	bh=SU48rvFsJmciPJZDbPt/sSt+K7l6wEHLMj/VbI3UBU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Z7dR5X0ClOFepBfWRfBjAZXX2oxDfRPH8ls1jDf7jxPW5tI8dEQQgUUrOf9KAJWthQGpKFg4QOlFJQ6uNyDUDBtzQOZs6EpLsVkoWOeU4sqbvFDW/TRKTl2sKxZHwmj5ua+ID5buP0SEewenh3AO6OyxiNTtE/qRdzD6Vc1XlpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Qjve3fli; arc=none smtp.client-ip=199.89.1.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="iyBnhcIo"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Qjve3fli"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VbgLh4FzQz6Cnk94;
-	Fri, 10 May 2024 20:23:24 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VbgLl0s2bz6Cnk97;
+	Fri, 10 May 2024 20:23:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1715372603; x=1717964604; bh=9PJ6nJztjWanAE4KkFB3RbuEtSHysLQRIzZ
-	841AbzeI=; b=iyBnhcIonaUAJHkez73uKEyKL8MjXqTjMvsXSHSEpcffj8Ia+qB
-	SMl8VvN4cT5eGK2W1EUrKiD64KM20PQlJBOpTBCLykAbWGx5INX1Ve/14yoA0nDQ
-	N/DSdOHWR98eZXoyNmoZu/LAIn6NZGfkC8etZbA4AvXI4NZ2V6NFfBvzW9iPMyfW
-	bOQQRE0eGCjNWTJyJxi3z0aG7dH+JhAPldFrJS/Ocods5T5AEy0duH4KFSzp+JG/
-	gjvW6mDoCevwPm6kN0iY2q5LekK2VQ20KsZAPSTK0lIukJ0O8opHiRHNRHTPAxZS
-	vCsdUcWQwtBPuw72KCodP/FogHpxXhh8vhQ==
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1715372604; x=1717964605; bh=ncpBU
+	YtPwyHbcLGHAP9rZjdTni9O+34Sb/jyhW2bRmA=; b=Qjve3fliwSN+4dt9/DjV1
+	xyUDw186+m8I7CNedSADT3xoTD04kng16UEk0HnejGpO84ISirQKOLeGX7cFNBAb
+	Q+gsAY1xTcP2fpGER1zawSoZjG25LiJvO4ih6yqhK5E5WdUcjgTM38DPfi58bHdX
+	UcD+THO1TEE8Hkv+zoM4Bs+z04wgDbwU/LmZvjGOSzWYti0+/Q4uxoE9CH6YMaiR
+	UMAsrkKe743WnBAoN2x2AiUjfqs8lg1H7giy9novTrkWXN0FllzzpzXY4gNgETUy
+	e5vr0SenN6skYqQKILE36l88fJR08A5eFAH2vweuzfFt/jfugG16Qn2TeN3Gx5B2
+	g==
 X-Virus-Scanned: by MailRoute
 Received: from 008.lax.mailroute.net ([127.0.0.1])
  by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 2Ok4QipLd-Is; Fri, 10 May 2024 20:23:23 +0000 (UTC)
+ id yr2wsDA8Ulx1; Fri, 10 May 2024 20:23:24 +0000 (UTC)
 Received: from asus.hsd1.ca.comcast.net (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VbgLf3RFBz6Cnk8s;
-	Fri, 10 May 2024 20:23:22 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VbgLg18CGz6Cnk8y;
+	Fri, 10 May 2024 20:23:23 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 0/5] Five nbd patches
-Date: Fri, 10 May 2024 13:23:08 -0700
-Message-ID: <20240510202313.25209-1-bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>,
+	Josef Bacik <jbacik@fb.com>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Markus Pargmann <mpa@pengutronix.de>
+Subject: [PATCH 1/5] nbd: Use NULL to represent a pointer
+Date: Fri, 10 May 2024 13:23:09 -0700
+Message-ID: <20240510202313.25209-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240510202313.25209-1-bvanassche@acm.org>
+References: <20240510202313.25209-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,24 +63,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jens,
+This patch fixes the following sparse warnings:
 
-These patches are what I came up with after having reviewed the nbd sourc=
-e code.
-Please consider these patches for the next merge window.
+drivers/block/nbd.c: note: in included file (through include/trace/trace_=
+events.h, include/trace/define_trace.h, include/trace/events/nbd.h):
+./include/trace/events/nbd.h:61:1: warning: Using plain integer as NULL p=
+ointer
+drivers/block/nbd.c: note: in included file (through include/trace/perf.h=
+, include/trace/define_trace.h, include/trace/events/nbd.h):
+./include/trace/events/nbd.h:61:1: warning: Using plain integer as NULL p=
+ointer
 
-Thanks,
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: Yu Kuai <yukuai3@huawei.com>
+Cc: Markus Pargmann <mpa@pengutronix.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ include/trace/events/nbd.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Bart.
-
-Bart Van Assche (5):
-  nbd: Use NULL to represent a pointer
-  nbd: Remove superfluous casts
-  nbd: Improve the documentation of the locking assumptions
-  nbd: Remove a local variable from nbd_send_cmd()
-  nbd: Fix signal handling
-
- drivers/block/nbd.c        | 41 ++++++++++++++++++++------------------
- include/trace/events/nbd.h |  2 +-
- 2 files changed, 23 insertions(+), 20 deletions(-)
-
+diff --git a/include/trace/events/nbd.h b/include/trace/events/nbd.h
+index 9849956f34d8..390d98a05c9d 100644
+--- a/include/trace/events/nbd.h
++++ b/include/trace/events/nbd.h
+@@ -72,7 +72,7 @@ DECLARE_EVENT_CLASS(nbd_send_request,
+ 	),
+=20
+ 	TP_fast_assign(
+-		__entry->nbd_request =3D 0;
++		__entry->nbd_request =3D NULL;
+ 		__entry->dev_index =3D index;
+ 		__entry->request =3D rq;
+ 	),
