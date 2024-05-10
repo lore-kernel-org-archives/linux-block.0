@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D357516C448
-	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 10:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BA716C448
+	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 10:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715336977; cv=none; b=gxLzeoZEWkLJbSzXE4D8Kca7R/kpASscr223A3ryMNk36tVDiUoExV+KOBByWH8S5UaU90M0o5ZnyQedZoaEQpRCPo3cGw5+PyP8Do6EGl84m3z0cbjVjiPIknJ8gOG9rCgtjYcCIn1Cm+katEIdaWHq1iLpuypnf6T0FXNDsTk=
+	t=1715336979; cv=none; b=bAZcQSpFmhGk5O3mh6seVvxIw6JuxiLkpcgHCwJlrfXfe5YPj/VxdLBIl+fwVK1EhhwXB3oX5PllCfWxc7TAIb4eRmfJ+gWEH0l+gl68hOljnCFi+t+/5cR1nBPEjrx0i8STv4WhpF6sWjXbryNW+jJdVna+Ld6KpQxPQhKs8Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715336977; c=relaxed/simple;
-	bh=SfTqYqjeY1DMHHy8PsIgRfckqhfnwz8Z8GXownPO+64=;
+	s=arc-20240116; t=1715336979; c=relaxed/simple;
+	bh=2+i7bTWNtKNOAzGlbkmTO8GKENs6BV1RJJ0bZA8PkaA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=N89CkVSOuXrW3a9ep3eRn5B0yLOybPp1vEyoP+JYXKftIU3sy4pAEaRtjaBe17ODYQzujTeRyYpda3s+Up5oJ50svsd+P/k+p4aC6DoWG+n2Lt9DLe7DpXdGyFlSHQBusVuvm6yLVkVFxMEEKDJwB241SQTfAFWr637g/T3/uO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=irQ3S8Oz; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=I1n3kepZh7xZ0CwA5nvUhYDANirDNbdHljvcFFY8ZXxRBkBq8err9lNtou/sXy3Ltcau6OfXRbN0xpcSsbi2C/B5KeukDjtupyJmay+nMCGYBaEykLu3jIHJLHhz8YS74p0UsCJNeb1e1K+G2cktcRg3AA0usqOhBEoy+0FCSds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WNs4MY8q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="irQ3S8Oz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDFA2C2BD11;
-	Fri, 10 May 2024 10:29:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNs4MY8q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0BEFC32781;
+	Fri, 10 May 2024 10:29:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715336977;
-	bh=SfTqYqjeY1DMHHy8PsIgRfckqhfnwz8Z8GXownPO+64=;
+	s=k20201202; t=1715336979;
+	bh=2+i7bTWNtKNOAzGlbkmTO8GKENs6BV1RJJ0bZA8PkaA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=irQ3S8OzolMWOpoNPU6k4yiLO+Q3uFep0TbWy9iN+uKud3i3oLTy/d+Fs1L9Ry2qW
-	 CPKvLYHiPOChuU8PhajLs/58GCJG5iNVewUu1De+RDeST80RSrDqZBBu2SpcYgbdCH
-	 FSfvC5uUToWdmFwUKymeLImDLsB2XvEpLfSwlGKP497VX5s1YHe0iozvbDMTfJE8wk
-	 fCQARAptqSgb1AhS6B6abOuz79J/lr7zvdGVKou4wA8WwzIM5mrGdg7YzEkkUd1lKh
-	 WfzojuBhuKlmmxK2flrLxMAPU9H184vuUBUyVxbC71B93pa+FjITd+7q1NcLNFlldi
-	 IlT4/VyH8zRkg==
+	b=WNs4MY8q3abQM8SbLYgXMeYaDzHCmij5v91uqVWOtyH6UAAoHEYtwfRmmkjMZW7b9
+	 pHvpHFlmPx2pLHvHSnlcQp1tzMauPCkbwiNixewSYtZljYf1VNKc+GOGbzHHnqF/pR
+	 YaOFURjHFbTRc/GG7FcKehQSjnKz/rReuQYOTmbqmeWMNzvGyZ+f1/iMK2zLNu/Fa7
+	 uOI+PaSFKdSi/Keou7y/s70aVKizAX2JEHwjGUf9J4B198WrbJ5dK8QA//kEYvAI8o
+	 lyGA87Zxx1COTgDIBWfGBj0FKhXFItokyhnEGz3/cR9QZ+HF4fCtzzVodCcpiPCiXQ
+	 zBC2fzlYnZg5w==
 From: hare@kernel.org
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Matthew Wilcox <willy@infradead.org>,
@@ -34,9 +34,9 @@ Cc: Matthew Wilcox <willy@infradead.org>,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 3/5] block/bdev: lift restrictions on supported blocksize
-Date: Fri, 10 May 2024 12:29:04 +0200
-Message-Id: <20240510102906.51844-4-hare@kernel.org>
+Subject: [PATCH 4/5] block/bdev: enable large folio support for large logical block sizes
+Date: Fri, 10 May 2024 12:29:05 +0200
+Message-Id: <20240510102906.51844-5-hare@kernel.org>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20240510102906.51844-1-hare@kernel.org>
 References: <20240510102906.51844-1-hare@kernel.org>
@@ -50,38 +50,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Hannes Reinecke <hare@suse.de>
 
-We now can support blocksizes larger than PAGE_SIZE, so lift
-the restriction.
+Call mapping_set_folio_min_order() when modifying the logical block
+size to ensure folios are allocated with the correct size.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- block/bdev.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/bdev.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/block/bdev.c b/block/bdev.c
-index b8e32d933a63..d37aa51b99ed 100644
+index d37aa51b99ed..a0c0ecc886e8 100644
 --- a/block/bdev.c
 +++ b/block/bdev.c
-@@ -146,8 +146,8 @@ static void set_init_blocksize(struct block_device *bdev)
+@@ -142,6 +142,8 @@ static void set_init_blocksize(struct block_device *bdev)
+ 		bsize <<= 1;
+ 	}
+ 	bdev->bd_inode->i_blkbits = blksize_bits(bsize);
++	mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
++				    get_order(bsize));
+ }
  
  int set_blocksize(struct block_device *bdev, int size)
- {
--	/* Size must be a power of two, and between 512 and PAGE_SIZE */
--	if (size > PAGE_SIZE || size < 512 || !is_power_of_2(size))
-+	/* Size must be a power of two, and larger than 512 */
-+	if (size < 512 || !is_power_of_2(size))
- 		return -EINVAL;
- 
- 	/* Size cannot be smaller than the size supported by the device */
-@@ -170,7 +170,7 @@ int sb_set_blocksize(struct super_block *sb, int size)
- 	if (set_blocksize(sb->s_bdev, size))
- 		return 0;
- 	/* If we get here, we know size is power of two
--	 * and it's value is between 512 and PAGE_SIZE */
-+	 * and it's value is larger than 512 */
- 	sb->s_blocksize = size;
- 	sb->s_blocksize_bits = blksize_bits(size);
- 	return sb->s_blocksize;
+@@ -158,6 +160,8 @@ int set_blocksize(struct block_device *bdev, int size)
+ 	if (bdev->bd_inode->i_blkbits != blksize_bits(size)) {
+ 		sync_blockdev(bdev);
+ 		bdev->bd_inode->i_blkbits = blksize_bits(size);
++		mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
++					    get_order(size));
+ 		kill_bdev(bdev);
+ 	}
+ 	return 0;
 -- 
 2.35.3
 
