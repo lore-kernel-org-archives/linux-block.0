@@ -1,53 +1,52 @@
 Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179FA4D9EA
-	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 20:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471B5502AB
+	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 20:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715372306; cv=none; b=OCrCxG0eCP5Lu4+RQv+gpBNPR2Nd4AS+Kf5WKG8ZlFiMYmzLuYFrrqwsYEidqOs1ALLHAS0cBcCM6Qg0KsawWuXeu9JXNd1R6EMw89FASE/TZVvtlvO2VsufZ2x4C8UUJgl1i1RvxD8Ef+LH6ugEbebQqjy0dr3wiGb1zYX3vG4=
+	t=1715372616; cv=none; b=DJYP8+qjqht6a9JXNMgnYsVXSufjZ7ZK3yLsypvttNpaoeyon7sN96DkxWJu0YyiTEV3fveJqVp0Rxu1AGFIfhGfJtmexqLiUAMBYGa/SnhRIRmg4AeMzZ1qFXpB81XyM/Jt3nxVZUtEErf8vijbMB9kCCfKwC1S7hDNF8CnBuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715372306; c=relaxed/simple;
-	bh=pRT+ap3eWc1yWz3qSF6mzb8zUpTmFnzNHzCZsZsBlhk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fJgUxSuimpo0wJjzg816sEUYS1+c+qtyabSij4UDwa56lAPI403peLi1ltlr6IWj/UFErBaneLLjJP0kBu59EAA1Bqnq/uKphrZR6DVxYhiZWjzxg6a9Xs/A4O561guMebLO7lxrs6dUxrIzzX88ZNr4kpbdbFHlsudaG49I8nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Qg1Hdhp/; arc=none smtp.client-ip=199.89.1.11
+	s=arc-20240116; t=1715372616; c=relaxed/simple;
+	bh=Wa5Mn2znRmsT1ure+if+PSLB11Dz07dBHpIR9I/D+ac=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MZLlQi0s/hePNAm9CxF4vL9MwMlPDs1A+54sAzBVNzIHRq8UQX8rfYZpmE2OzaI1wP38k8UR2UpR0sM+zpMdaNjz6NjCI+DnZEqt14YlBwih+pmFZd1MV3cySV+53MNHLcWGJgMQmUfkYJFdJUiMkuZuPJ5RVo5QA5YHI8Z6wCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=iyBnhcIo; arc=none smtp.client-ip=199.89.1.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Qg1Hdhp/"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="iyBnhcIo"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VbgDw2Gx2z6Cnk8y;
-	Fri, 10 May 2024 20:18:24 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VbgLh4FzQz6Cnk94;
+	Fri, 10 May 2024 20:23:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:x-mailer:message-id:date
 	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1715372301; x=1717964302; bh=/OAYqQCDaLAYlEw2E5FPzc4npfgTmODj2ln
-	MswQNp0M=; b=Qg1Hdhp/pvhgEb4xUEJ65SXeDYBTFBO3icQ/HBldZINFh+DdmNS
-	kNT98Lbm4YlAnzUEFIXZCRkhgc3dz6QRJ4tmmmKyKTR91veK7mGkYvo8j1gWwgSY
-	PAlJ/kkJk9Wuyr/r+kwi3VuAbYA+2MWhbsLlNom+ms/11h5FR1F0JBYG3cpvSq4F
-	ye5+AFr57DBsyedV1EOXYtPt1vqnXOH6PZEX5FyM7SUg5wtfSY3KXxxYYeAyNUmj
-	KfCbYwWIpa0SGjdcEGL9Q9atmq8MiKPKbSCPOfA6hhayPATmJcl8KrhHcz2FEd/W
-	/L2v4Mr/zFFSkE9AbAvt7h3GEcpNIC8yXjw==
+	1715372603; x=1717964604; bh=9PJ6nJztjWanAE4KkFB3RbuEtSHysLQRIzZ
+	841AbzeI=; b=iyBnhcIonaUAJHkez73uKEyKL8MjXqTjMvsXSHSEpcffj8Ia+qB
+	SMl8VvN4cT5eGK2W1EUrKiD64KM20PQlJBOpTBCLykAbWGx5INX1Ve/14yoA0nDQ
+	N/DSdOHWR98eZXoyNmoZu/LAIn6NZGfkC8etZbA4AvXI4NZ2V6NFfBvzW9iPMyfW
+	bOQQRE0eGCjNWTJyJxi3z0aG7dH+JhAPldFrJS/Ocods5T5AEy0duH4KFSzp+JG/
+	gjvW6mDoCevwPm6kN0iY2q5LekK2VQ20KsZAPSTK0lIukJ0O8opHiRHNRHTPAxZS
+	vCsdUcWQwtBPuw72KCodP/FogHpxXhh8vhQ==
 X-Virus-Scanned: by MailRoute
 Received: from 008.lax.mailroute.net ([127.0.0.1])
  by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 0bQIN5zA1Ah7; Fri, 10 May 2024 20:18:21 +0000 (UTC)
+ id 2Ok4QipLd-Is; Fri, 10 May 2024 20:23:23 +0000 (UTC)
 Received: from asus.hsd1.ca.comcast.net (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VbgDs1FSdz6Cnk8s;
-	Fri, 10 May 2024 20:18:20 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VbgLf3RFBz6Cnk8s;
+	Fri, 10 May 2024 20:23:22 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <dlemoal@kernel.org>
-Subject: [PATCH] null_blk: Fix two sparse warnings
-Date: Fri, 10 May 2024 13:18:16 -0700
-Message-ID: <20240510201816.24921-1-bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/5] Five nbd patches
+Date: Fri, 10 May 2024 13:23:08 -0700
+Message-ID: <20240510202313.25209-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -57,57 +56,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Fix the following sparse warnings:
+Hi Jens,
 
-drivers/block/null_blk/main.c:1243:35: warning: incorrect type in return =
-expression (different base types)
-drivers/block/null_blk/main.c:1243:35:    expected int
-drivers/block/null_blk/main.c:1243:35:    got restricted blk_status_t
-drivers/block/null_blk/main.c:1291:30: warning: incorrect type in return =
-expression (different base types)
-drivers/block/null_blk/main.c:1291:30:    expected restricted blk_status_=
-t
-drivers/block/null_blk/main.c:1291:30:    got int
+These patches are what I came up with after having reviewed the nbd sourc=
+e code.
+Please consider these patches for the next merge window.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/null_blk/main.c  | 2 +-
- drivers/block/null_blk/trace.h | 7 ++++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
-c
-index 4005a8b685e8..5d56ad4ce01a 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1218,7 +1218,7 @@ static int null_transfer(struct nullb *nullb, struc=
-t page *page,
- 	return err;
- }
-=20
--static int null_handle_rq(struct nullb_cmd *cmd)
-+static blk_status_t null_handle_rq(struct nullb_cmd *cmd)
- {
- 	struct request *rq =3D blk_mq_rq_from_pdu(cmd);
- 	struct nullb *nullb =3D cmd->nq->dev->nullb;
-diff --git a/drivers/block/null_blk/trace.h b/drivers/block/null_blk/trac=
-e.h
-index ef2d05d5f0df..82b8f6a5e5f0 100644
---- a/drivers/block/null_blk/trace.h
-+++ b/drivers/block/null_blk/trace.h
-@@ -36,7 +36,12 @@ TRACE_EVENT(nullb_zone_op,
- 	    TP_ARGS(cmd, zone_no, zone_cond),
- 	    TP_STRUCT__entry(
- 		__array(char, disk, DISK_NAME_LEN)
--		__field(enum req_op, op)
-+		/*
-+		 * __field() uses is_signed_type(). is_signed_type() does not
-+		 * support bitwise types. Use __field_struct() instead because
-+		 * it does not use is_signed_type().
-+		 */
-+		__field_struct(enum req_op, op)
- 		__field(unsigned int, zone_no)
- 		__field(unsigned int, zone_cond)
- 	    ),
+Bart.
+
+Bart Van Assche (5):
+  nbd: Use NULL to represent a pointer
+  nbd: Remove superfluous casts
+  nbd: Improve the documentation of the locking assumptions
+  nbd: Remove a local variable from nbd_send_cmd()
+  nbd: Fix signal handling
+
+ drivers/block/nbd.c        | 41 ++++++++++++++++++++------------------
+ include/trace/events/nbd.h |  2 +-
+ 2 files changed, 23 insertions(+), 20 deletions(-)
+
