@@ -1,51 +1,42 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCBCEAC0;
-	Fri, 10 May 2024 14:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA91A171E72;
+	Fri, 10 May 2024 15:41:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715353051; cv=none; b=n2zm3+PKevpMhh/F5A0Yt0wBivSgLeebY36l+i3Yv88N5MnAzXPKE7/uZcVTqU7P59ntH7HJnGs128nWtZfxKin6um2lGfGZFId4ca7nauavk1jyFJxqGiwLeQMk5dH/ASV/xZYCUf9+LqmhXDKKKPsG6bI4vYQEo3N/rfdriTQ=
+	t=1715355668; cv=none; b=RtkkuzSBSlIuMIpI6tchId00mFiNp1ixdEn3DWkp2RDkfJoolQpSdgDMOmycidDTxSVu19/q72LtUgQxOevMbaCsEvQPcgRLYxhmZZr/2gY/nLL+VgbdvQWh+pqsjvUHVWm7mWP7NXIzFsBkeiwlEjL3/PQFg11qU/1rX9UOkdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715353051; c=relaxed/simple;
-	bh=U7C++UZ8Ckt4orfC7xx+jCKetrNe3QBnPE/FhNdCFiE=;
+	s=arc-20240116; t=1715355668; c=relaxed/simple;
+	bh=LTm7mVVSrXVQxGvjvWX4FzLddQuu5y9GagjAYFS7UnE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XQJmQu7UJrDD//2Y9EfyCbcGvnFF2mq9Vwe+rAJOSQ5FDoknGlCcuy8GFV4cCvFJjubLJbynZj10YMICdIgrGhlheXJui2uKeDwz6l7hlOOOWE27KC4rJFKyUH08fUeZ0E8Fvf13jcCO8OQbzZdKRmlINQJZPLyDY5ctD4wDI1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a59cdf7cd78so551865966b.0;
-        Fri, 10 May 2024 07:57:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715353048; x=1715957848;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rmPX0pe9l4LhCeCJ9RFzXwq04vOIoS39dg64tvVpZjk=;
-        b=NNn6SLB8JpuEkJfvo3cUVp7nc1mh2qpZQ9cTcefa/IBahy5RWwkib6LwQkDr1Sf3TG
-         0Ddr+ztQl+juI+UDkLRK7SbpHqTE+hDZhcBh0WOmq9CeUfCPD6l9yowIOiKnZJJ1rZ/V
-         IDr1Zm1LbpOeEpl7G6ifWHa9AUIw289QY6YoCWG2cz3EaC9Q/bOjOFRAWiGslTZX2RHZ
-         MwVezosBcY32KzhL/ChUS0uw5qRSfS9N8BQYDl83p2ubBllJmHVQLXuBHWtl5Gbfedee
-         ievWMEVvK/NIFWhFrx2yHlb9ScM52He+qDh1HebY5p6Y+YZQUqn6DoWItFepFZzY37LS
-         3lvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUyQREAEx5LVER8fiLon0DjtuTCitcuDEfUbZUaLSxqHo6RwrABxIzz6IDpAdk7Hl+zrLSxSBfglNGElPQRQpjLkCh2hKxJlbh//S9XnLCPjJPrrgk2V6ptlG5vIfdWpc3MKEy2AV59H+Q=
-X-Gm-Message-State: AOJu0Yxh8M4TN1WVL73ik6ZAJHCPZSDM/46H2PmJnkt8f4X6YDkYT1KB
-	EXPdmNaMCPnFY6g75p4aqPpyixQGfKC0p+ae19R4Yzj6n9lKkUvItZ5IsQ==
-X-Google-Smtp-Source: AGHT+IGGA/8ZLCXE/dv5h5A0DSdUWkY1ph/S9vsyAXGZVdS97Q4Grrs19CnXBnC8zxpU20db+5ZmZQ==
-X-Received: by 2002:a50:f699:0:b0:570:369:3e06 with SMTP id 4fb4d7f45d1cf-5734d5de84emr2201724a12.19.1715353048169;
-        Fri, 10 May 2024 07:57:28 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-120.fbsv.net. [2a03:2880:30ff:78::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5733becfcc1sm1838512a12.45.2024.05.10.07.57.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 07:57:27 -0700 (PDT)
-Date: Fri, 10 May 2024 07:57:25 -0700
-From: Breno Leitao <leitao@debian.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EwOKQP0F8a8dhhYYm3KR1xfjTahdhKkvY578dUTJANDkhyqWMddBm2MGlEEH/kXtoHvqx9ZxtaDUrmGynMz93Qwo5yby4lQKdM9oJBnq5lseOKLZWs7xFuqyi5MvzIzBchBrvWcsEoPxshaHEYzXbdTRckFp7ZdFAtVY591qEAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILH92WRG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILH92WRG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53594C113CC;
+	Fri, 10 May 2024 15:41:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715355668;
+	bh=LTm7mVVSrXVQxGvjvWX4FzLddQuu5y9GagjAYFS7UnE=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=ILH92WRGpndE4x0yfGD4wnPfYZ4rTISC0GlbkmceAWhVMsME2gQOqcgf/ilW0nt+w
+	 v3PgRBbqDB1BUfYWtw4vw13qLuy9/2fLBPsaEzd9sUusQNPTTnNxgc3SOBUpcbvk0w
+	 n4Wqru7CY/SKzBi29lMdglgHeGz3ZcGK88QSoEv3w38yOC0VsTEVdYBeGK+YpxRE/H
+	 gWeFh8QBdLUUo094YR0v+wlW6y3GKeVYYeYOhcE+e6jKMee4NpEsPyLY2Lfp/85BMB
+	 lkCGIXTA+fs89uOlcmGe1j1PkK+CYgLA9DbH7XR1KGdrd80DgfkFce1b7v+8cg1Txx
+	 c/ev8CR31bDKQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 0576BCE08A1; Fri, 10 May 2024 08:41:08 -0700 (PDT)
+Date: Fri, 10 May 2024 08:41:07 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
 To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, paulmck@kernel.org,
+Cc: Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
 	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
 	open list <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] block: Annotate a racy read in blk_do_io_stat()
-Message-ID: <Zj411QK+K+CmXaVi@gmail.com>
+Message-ID: <de92101c-f9c4-4af4-95f4-19a6f59b636f@paulmck-laptop>
+Reply-To: paulmck@kernel.org
 References: <20240510141921.883231-1-leitao@debian.org>
  <ef8c5f6d-17e3-4504-8560-b970912b9eae@acm.org>
 Precedence: bulk
@@ -79,8 +70,10 @@ On Fri, May 10, 2024 at 07:28:41AM -0700, Bart Van Assche wrote:
 > there any cases in which it is better to use data_race() than
 > READ_ONCE()?
 
-data_race() doesn't not emit any code, but, keep KCSAN silent.
-READ_ONCE()/WRITE_ONCE() emits code.
+We use this pattern quite a bit in RCU.  For example, suppose that we
+have a variable that is accessed only under a given lock, except that it
+is also locklessly accessed for diagnostics or statistics.  Then having
+unmarked (normal C language) accesses under the lock and data_race()
+for that statistics enables KCSAN to flag other (buggy) lockless accesses.
 
-So, if you do not want to change the current behaviour, but, keep KCSAN
-away, data_race() is preferred.
+							Thanx, Paul
