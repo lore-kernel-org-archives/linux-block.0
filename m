@@ -1,102 +1,77 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE4F176FA7;
-	Fri, 10 May 2024 23:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA80B7710A;
+	Fri, 10 May 2024 23:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715383387; cv=none; b=lRIUWM3YkpGp4VJJC+xFzLgBamhCA0TbwdrUmOLqtZl6jK/6x45+DyPONPa+BpB3xUg+4wED3UAk89U7dyc6v3KI4gjAqvs5epwYkX6AwDqEAmAcSFBHNDqvjpFCBrB/uJmcMXMG0ubheWyVDOwOCbHn+OhW/2uqqJDHY1hgTdA=
+	t=1715384118; cv=none; b=IgAUp20B4Z75YuxKLlkAL+ikdA1vfZoc2QK3htiQzmwen4H4oAi5SwQjX2yoSezu7xhzCdlblEBkUb1JWXkBtfaaYlMuTdc7BznVpdl4NSyzR8JknZ+Sr2sXdGi5kPtnWRCAqWkoEHl37Cs9zioEv3ipnY2MjhSRSMYKzk8dd74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715383387; c=relaxed/simple;
-	bh=yf0FNSjbNgNh569vaKttKl6BvtWgoLVJ7oycuOUTvPg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qcGTQEe/tG8BwAYFoLmmO0I9juFsr7VMR310ZYksxuPLhlztKZaW2D1Dv+KjKul9pnIV1AfJUx2GphmLOX/DvcfJq0+f+K3hVbr98aXq97iGf9cA4TcThasfFBpmgZ1hB3Sxa56dDKqxuJy53xS+ulRvVeUpJ78V/Pfowzf2++M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=uj0AKQCB; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1715384118; c=relaxed/simple;
+	bh=o+9fe329P7ljRzO43YkDEDHDfsYP5X21I5HJqZq/Cik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VTcdxLhvmTcw07IANy0H39i6NkuDD14P3+sw4FmU/peeE2SupOjDIJTc8Oczrz1VCWpSuT/eVfwvTDwOJ4zqn8uj5auhewjx8W51ASS6ooevOriMZjcGL/CSBGnp/1UIkxd9NQP38XXhSkfF/dX6Pa3qvOTakdAk1imSuCRRk5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=beYW8OFK; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="uj0AKQCB"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4VblL05vCSzlgVnW;
-	Fri, 10 May 2024 23:23:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1715383382; x=1717975383; bh=CzEDEmar4vsS2I118T5B//2s
-	E8cJCPpqhlzHZWV8EcY=; b=uj0AKQCBAE3s4MP1IZ41tUiPyIra1cn69rsXPpN4
-	cevWDAEpQ8m/pD4PUucE/4xyl8B52xP2WakpjoJeu0hYYGaqtyk/rUPDFp9Bwzvf
-	n6btg1lkxI0hINgWC5QcUqdg6mFaGYLA3t+Hxow/M9jBUt4IA2Jo7OoHQ0VmOZFr
-	L+F+hHTIK1sp0429k8ZkACIwr2/v2OSNnMAGGKjTLbEKrURqzHPcsb+vBqNsHd/j
-	D4G5/O9A/9c/WCBQynM10+6EhQsX0XuQTl7zSP4Yw5tipWx0Tgitp8CRr9K8HQBC
-	nuphGhrQj2IM0pPGZT3L+2JYN9J70fS5IW5/Io+Udi6+Ww==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Ps412-NO1kid; Fri, 10 May 2024 23:23:02 +0000 (UTC)
-Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4VblKw52rxzlgVnN;
-	Fri, 10 May 2024 23:23:00 +0000 (UTC)
-Message-ID: <ca7c2ef0-7e21-4fb3-ac6b-3dae652a7a0e@acm.org>
-Date: Fri, 10 May 2024 16:22:58 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="beYW8OFK"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=1bK5po7ozuM/Kuo0oGkyZOlLv+PYx/iiGbhInJnVwdA=; b=beYW8OFK/Evctd/o1bZL3U9Nm8
+	eTSCiYPQqxLCU1h/G8tCvycJePPmvBYGglYEDiNevh5sKgLKieS129opY6Ck8TF9CDSCDMSEJPel0
+	bVAtiaFcE0Xv2YksM9VKIEZ2NEPLFTYzF94iXWMJQOKY2zW9hYG7SNXbCkeWRRB9aDSYRfnFtRfPF
+	M2ZnlEJ6OJBvh+7QK1n9JfCQWg8J4hGeU5ggnA5OhHq5+MyjCOKlg7BSYeae+ZkuOKD0UWj+RbVxR
+	T4M784Cs74UPa92oqIn+T3p08orz2S1xDEmWqBsl8LdLhF6SX+AyFp8RA49VdyVPktQ/UB/eA/VR6
+	o+JWQMMg==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s5Zlf-00000004Asp-3pUw;
+	Fri, 10 May 2024 23:35:12 +0000
+Date: Sat, 11 May 2024 00:35:11 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+	bpf@vger.kernel.org
+Cc: lsf-pc@lists.linux-foundation.org
+Subject: Re: [LSF/MM/BPF TOPIC] Running BOF
+Message-ID: <Zj6vL2FgUh3tbmBu@casper.infradead.org>
+References: <ZiAATJkOF-FulDyS@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Annotate a racy read in blk_do_io_stat()
-To: paulmck@kernel.org
-Cc: Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
- "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>, Marco Elver <elver@google.com>
-References: <20240510141921.883231-1-leitao@debian.org>
- <ef8c5f6d-17e3-4504-8560-b970912b9eae@acm.org>
- <de92101c-f9c4-4af4-95f4-19a6f59b636f@paulmck-laptop>
- <d037f37a-4722-4a1d-a282-63355a97a1a1@acm.org>
- <c83d9c25-b839-4e31-8dd4-85f3cb938653@paulmck-laptop>
- <4d230bac-bdb0-4a01-8006-e95156965aa8@acm.org>
- <447ad732-3ff8-40bf-bd82-f7be66899cee@paulmck-laptop>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <447ad732-3ff8-40bf-bd82-f7be66899cee@paulmck-laptop>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZiAATJkOF-FulDyS@casper.infradead.org>
 
-On 5/10/24 3:35 PM, Paul E. McKenney wrote:
-> diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-> index c00cc6c0878a1..78593b40fe7e9 100644
-> --- a/include/linux/compiler.h
-> +++ b/include/linux/compiler.h
-> @@ -194,9 +194,18 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
->    * This data_race() macro is useful for situations in which data races
->    * should be forgiven.  One example is diagnostic code that accesses
->    * shared variables but is not a part of the core synchronization design.
-> + * For example, if accesses to a given variable are protected by a lock,
-> + * except for diagnostic code, then the accesses under the lock should
-> + * be plain C-language accesses and those in the diagnostic code should
-> + * use data_race().  This way, KCSAN will complain if buggy lockless
-> + * accesses to that variable are introduced, even if the buggy accesses
-> + * are protected by READ_ONCE() or WRITE_ONCE().
-> + *
-> + * This macro *does not* affect normal code generation, but is a hint to
-> + * tooling that data races here are to be ignored.  If code generation must
-> + * be protected *and* KCSAN should ignore the access, use both data_race()
-> + * and READ_ONCE(), for example, data_race(READ_ONCE(x)).
->    *
-> - * This macro *does not* affect normal code generation, but is a hint
-> - * to tooling that data races here are to be ignored.
->    */
+On Wed, Apr 17, 2024 at 06:01:00PM +0100, Matthew Wilcox wrote:
+> As in previous years, I'll be heading out for a run each morning and I'd
+> be delighted to have company.  Assuming our normal start time (breakfast
+> at 8am, sessions at 9am), I'll aim for a 6:30am start so we can go
+> for an hour, have half an hour to shower etc, then get to breakfast.
+> We'll meet just outside the Hilton main lobby on Temple Street.
 
-This patch changes the end of the comment from "*/" into "*\n*/".
-That's probably unintended? Otherwise this patch looks good to me.
+Our start time has been pushed back by half an hour this year (breakfast
+at 8:30, sessions at 9:30), so let's start the run half an hour later.
+And the street name needs a little disambiguation; there are North,
+South, East and West Temple Streets ;-)
 
-Thanks,
+So, we will meet at West Temple Street & Pierpont Ave at 7am.  I have
+a certain amount of route scouting done, and we can negotiate where we
+go each day.  I'll be wearing a red t-shirt and black shorts.
 
-Bart.
+> I don't know Salt Lake City at all.  I'll be arriving a few days in
+> advance, so I'll scout various routes then.  It seems inevitable that
+> we'll head up Ensign Peak one day (6 mile round trip from the Hilton
+> with 348m of elevation) and probably do something involving City Creek /
+> Bonneville Boulevard another day.  If anyone does know the various trails,
+> I'd be delighted to listen to your advice.
 
+Ensign Peak was muddy when I went up on Wednesday and not very fun.
+It's also more of a hike than a run.  Now, it had been raining/snowing
+on Tuesday, so it may have dried out by the time we want to go up.
