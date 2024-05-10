@@ -1,330 +1,122 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DA012C48F
-	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 13:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17AF127B69
+	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 14:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715348875; cv=none; b=hCxQnV8P2iqufblVaPHRbnwkOz9NHGFTErYD3vauT0ybTSiU7tFk7Q0q0grb7GtKXlOk19mPT85UT+Zm1aqeJGVCMGt4gFV/lFeCSsPy/sO1U4zSOdW5TELsKMlh/fdXWZZ4Ag53T60yd9Oh0tLUFptzY85fE5lxoz+nrPr+TY8=
+	t=1715349745; cv=none; b=PZmEFwvNNWnR4Ov3qG1/Ki5lYWvneC8towGRAvCDfIfqIA21AbktqOxnE6+ymyYb95B1rMA/w1jxnVaos3IJ8R1sMNWV3mpE7DKzDPcVz2i+GIR0+xuUBEjnAynZYStVH/e5Qk4vqpEMNGSI+2Hm76k2OXRfSDVNMRe1RRv3VR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715348875; c=relaxed/simple;
-	bh=fCY8RdSita7Wzec+OVmDbIW+QKuuAQsdD3wT5ovbvt0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=fJAdnVW53iw5agARI2PXVhlbkMF/Ga9c/V91MkDCEK3U46g7MpLvkpM6QMRo0fqA2/WQ+APFaOlfFfR+yDBvo6Ss0bxKT64Ho6CxSz6DTsrk+jhx0q602PXYW0AEQ3eqIiyy6RRzuWC931ln845A4bv+79JLOs1fegdID/phPsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=uqIT4v2D; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1715349745; c=relaxed/simple;
+	bh=qNrQblarQm/eAKeHXbimZo9JwH2CpESovcKUE0JuP/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sGAfEg7XzLCeZoxaAWxxqN9yUfVSkI3KLDzIeBfARAs/AuRKATjjupMqqHhtS5Jccz1ua5GZ5Lf4wn/KX5jAg8SRg6NXmQSWHMbB5QfsQ6tz62pI6jqka3e36Ax9GueyGuSvgFBr726jQZw0jo1rEVeCv23rjxymHxNgqthZnHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S9WUhkr3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="uqIT4v2D"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240510134743epoutp039d5ba661d72b6a2ae05df1500d991578~OJLQAUc112877828778epoutp03w
-	for <linux-block@vger.kernel.org>; Fri, 10 May 2024 13:47:43 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240510134743epoutp039d5ba661d72b6a2ae05df1500d991578~OJLQAUc112877828778epoutp03w
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1715348863;
-	bh=2uqy5c3cXO+FBejMvjh5tS4H8j3VD4n0/AUG7aIY4I8=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=uqIT4v2DaIGSK56Kd9s2UbTOE+aF0niljCN61HoHue7XyMgDhbkwZldH9NKkwZ192
-	 1e5y/Fq8bY2KKrIXoIzQXEmpbvCkhgs7YD/G8bMdo4+cn8N3XdAbrJ/LkuGGbB8Mi/
-	 FGROWsQ9RRKaWSgvyCG5yCgx2Gy80oTfR3bDbwwg=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20240510134743epcas5p443098c2f5128f5a6692a5c483f4e8e6e~OJLPhwOSr0394803948epcas5p44;
-	Fri, 10 May 2024 13:47:43 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4VbVZ56QBjz4x9Pp; Fri, 10 May
-	2024 13:47:41 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	DF.59.09665.D752E366; Fri, 10 May 2024 22:47:41 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240510134740epcas5p24ef1c2d6e8934c1c79b01c849e7ccb41~OJLNIWKZB0383303833epcas5p26;
-	Fri, 10 May 2024 13:47:40 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240510134740epsmtrp197c7b75541e85f37a0c995b847c819ca~OJLNHiKrN2682726827epsmtrp1T;
-	Fri, 10 May 2024 13:47:40 +0000 (GMT)
-X-AuditID: b6c32a4b-829fa700000025c1-6b-663e257d7a3a
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	CB.3D.08390.C752E366; Fri, 10 May 2024 22:47:40 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240510134738epsmtip18d16323614d1dcf26ce66e1ab75b4257~OJLLNwann2890228902epsmtip1E;
-	Fri, 10 May 2024 13:47:38 +0000 (GMT)
-From: Kanchan Joshi <joshi.k@samsung.com>
-To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	javier.gonz@samsung.com, bvanassche@acm.org, david@fromorbit.com,
-	slava@dubeyko.com, gost.dev@samsung.com, Kanchan Joshi
-	<joshi.k@samsung.com>, Hui Qi <hui81.qi@samsung.com>, Nitesh Shetty
-	<nj.shetty@samsung.com>
-Subject: [PATCH] nvme: enable FDP support
-Date: Fri, 10 May 2024 19:10:15 +0530
-Message-Id: <20240510134015.29717-1-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S9WUhkr3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715349742;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D1dqZxcbBRaFgQ3CYFJI1laffgSrUenXWyya9D4bc6s=;
+	b=S9WUhkr3DhNm3tM1MxXz0WoBai+gYBeUESm9VBoieXKNQyPjNQJ3jCMW/Yp8kagzDGNX2Z
+	WNAZKwgbd7pYqG07DsGuY62RTTdNeHNC4/xHxGC5TmbG1qMi/hw5bt05RroH41dPyEfKVs
+	YrtuE5pLjf7Nof5omfCbItLiAGvx/xY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-112-_mDPlR_MNkaHfJKcasvu6w-1; Fri, 10 May 2024 10:02:19 -0400
+X-MC-Unique: _mDPlR_MNkaHfJKcasvu6w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3BD578016FA;
+	Fri, 10 May 2024 14:02:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.93])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A1641D6946B;
+	Fri, 10 May 2024 14:02:15 +0000 (UTC)
+Date: Fri, 10 May 2024 22:02:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
+	Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [RFC PATCH V2 0/9] io_uring: support sqe group and provide group
+ kbuf
+Message-ID: <Zj4o5LjuLo6fGeDd@fedora>
+References: <20240506162251.3853781-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEJsWRmVeSWpSXmKPExsWy7bCmum6tql2awbYfuhar7/azWUz78JPZ
-	Ysuxe4wWNw/sZLJYufook8XOZWvZLR7f+cxucfT/WzaLSYeuMVrsvaVtMX/ZU3aLbb/nM1t8
-	2jKbyYHX4/IVb4+D69+weJxaJOFx+Wypx6ZVnWwem5fUe+y+2cDm0bdlFaPH501yAZxR2TYZ
-	qYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5QDcrKZQl5pQC
-	hQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgpMCvSKE3OLS/PS9fJSS6wMDQyMTIEKE7Izbrxv
-	ZCm4bVgxfeYmxgbG+RpdjJwcEgImEssuv2fqYuTiEBLYzSixe91rVgjnE6NE49EGdpAqIYFv
-	jBLb++xhOi4+PsYMUbSXUeJf3wWojs+MEp/+nwKaxcHBJqApcWFyKUiDiICRxM6/r9lAapgF
-	5jJJTJzygRkkIQxUs3PxIzCbRUBVYs7N7WDbeAUsJM6dus0OsU1eYual71BxQYmTM5+wgNjM
-	QPHmrbPBrpAQmMghcXbrFqgGF4l9pyCGSggIS7w6DhOXknjZ3wZlJ0tcmnmOCcIukXi85yCU
-	bS/ReqqfGeQBZqDj1u/Sh9jFJ9H7+wnYXxICvBIdbUIQ1YoS9yY9ZYWwxSUezlgCZXtILJrQ
-	zAhSLiQQK9H1OXECo9wsJA/MQvLALIRdCxiZVzFKphYU56anFpsWGOellsOjMjk/dxMjOLFq
-	ee9gfPTgg94hRiYOxkOMEhzMSiK8VTXWaUK8KYmVValF+fFFpTmpxYcYTYGhOpFZSjQ5H5ja
-	80riDU0sDUzMzMxMLI3NDJXEeV+3zk0REkhPLEnNTk0tSC2C6WPi4JRqYOrbkp39veOCKP/b
-	Bv+HKxn12uQ3Z8QFsphus5YIFVnruevr4wuvt/j8cXJ5/G7z8z62R2YtEezz07rMdjxJmmcq
-	oDppo6Vw+4smyVkWxYtFlC66ajOp6cRfydpY7yF7bo/Q3ccSf7p5F/EV7r2822czs3fVzds/
-	9/9Usntt/LWhMDCndVXG/M3ts+T4lXoVmUtm6HrrM8zKfGbndSDd//AEm+pe9oWKH7bbeizQ
-	fNBit/V8/MZD98q5Q4WeX05dVZUwf1pR80u5f+bXeeysFfuMtT6eEm+xNVxsEbn/270vAc/4
-	+ZJXWDywuOPTymSkIGF17UFvt81/sQZth/1q0+K75JhL3ygFPVW11zmoxFKckWioxVxUnAgA
-	u1PgvTUEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrDLMWRmVeSWpSXmKPExsWy7bCSnG6Nql2awYx1khar7/azWUz78JPZ
-	Ysuxe4wWNw/sZLJYufook8XOZWvZLR7f+cxucfT/WzaLSYeuMVrsvaVtMX/ZU3aLbb/nM1t8
-	2jKbyYHX4/IVb4+D69+weJxaJOFx+Wypx6ZVnWwem5fUe+y+2cDm0bdlFaPH501yAZxRXDYp
-	qTmZZalF+nYJXBk33jeyFNw2rJg+cxNjA+N8jS5GTg4JAROJi4+PMXcxcnEICexmlHg6q4EJ
-	IiEu0XztBzuELSyx8t9zdoiij4wSXZf6WbsYOTjYBDQlLkwuBakRETCT2H9uI9ggZoHlTBJb
-	Zu9nBUkIA9XsXPyIGcRmEVCVmHNzO9hQXgELiXOnbkMtkJeYeek7VFxQ4uTMJywgNjNQvHnr
-	bOYJjHyzkKRmIUktYGRaxSiZWlCcm55bbFhglJdarlecmFtcmpeul5yfu4kRHAFaWjsY96z6
-	oHeIkYmD8RCjBAezkghvVY11mhBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHeb697U4QE0hNLUrNT
-	UwtSi2CyTBycUg1MAvWy+ZcN9vZrLMpZPfnnm8deavv722993hivknZqkXd0CQtLZO/+lthF
-	bXeLX2XKFGncvj1x+XtpsRPsRplBB3Kuttt8VDl56uGNutUbvv/jSNb3srJkecm5ul41Y/6P
-	J2JPZx153OF8c4lkVnPBLvaCQ2c2hZtUPJd/9pClVtfope2nnHPrG8ra58z3Vn+S7XPd2F1d
-	KTm95pnrz+g1t/qY7H86eT9jmOd+NdgnIV66oe7Liu0CvIZ/q0+UX79duuNIRvwVzc7aoshb
-	743OJbssucL0bMGr5msXm1bFhh1Mfnv/Bvecw7KfjjCeWhQne2vPoxTuqw9W+/HaRqfdO1ge
-	LXXz7qeLLroX4gLrlFiKMxINtZiLihMBhKlfse8CAAA=
-X-CMS-MailID: 20240510134740epcas5p24ef1c2d6e8934c1c79b01c849e7ccb41
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240510134740epcas5p24ef1c2d6e8934c1c79b01c849e7ccb41
-References: <CGME20240510134740epcas5p24ef1c2d6e8934c1c79b01c849e7ccb41@epcas5p2.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240506162251.3853781-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Flexible Data Placement (FDP), as ratified in TP 4146a, allows the host
-to control the placement of logical blocks so as to reduce the SSD WAF.
+On Tue, May 07, 2024 at 12:22:36AM +0800, Ming Lei wrote:
+> Hello,
+> 
+> The 1st 4 patches are cleanup, and prepare for adding sqe group.
+> 
+> The 5th patch supports generic sqe group which is like link chain, but
+> allows each sqe in group to be issued in parallel, so N:M dependency can be
+> supported with sqe group & io link together.
+> 
+> The 6th patch supports one variant of sqe group: allow members to depend
+> on group leader, so that kernel resource lifetime can be aligned with
+> group leader or group, then any kernel resource can be shared in this
+> sqe group, and can be used in generic device zero copy.
+> 
+> The 7th & 8th patches supports providing sqe group buffer via the sqe
+> group variant.
+> 
+> The 9th patch supports ublk zero copy based on io_uring providing sqe
+> group buffer.
+> 
+> Tests:
+> 
+> 1) pass liburing test
+> - make runtests
+> 
+> 2) write/pass two sqe group test cases:
+> 
+> https://github.com/axboe/liburing/compare/master...ming1:liburing:sqe_group_v2
+> 
+> covers related sqe flags combination and linking groups, both nop and
+> one multi-destination file copy.
+> 
+> 3) ublksrv zero copy:
+> 
+> ublksrv userspace implements zero copy by sqe group & provide group
+> kbuf:
+> 
+> 	git clone https://github.com/ublk-org/ublksrv.git -b group-provide-buf_v2
+> 	make test T=loop/009:nbd/061:nbd/062	#ublk zc tests
+> 
+> When running 64KB block size test on ublk-loop('ublk add -t loop --buffered_io -f $backing'),
+> it is observed that perf can be doubled.
+> 
+> Any comments are welcome!
+> 
+> V2:
+> 	- add generic sqe group, suggested by Kevin Wolf
+> 	- add REQ_F_SQE_GROUP_DEP which is based on IOSQE_SQE_GROUP, for sharing
+> 	  kernel resource in group wide, suggested by Kevin Wolf
+> 	- remove sqe ext flag, and use the last bit for IOSQE_SQE_GROUP(Pavel),
+> 	in future we still can extend sqe flags with one uring context flag
+> 	- initialize group requests via submit state pattern, suggested by Pavel
+> 	- all kinds of cleanup & bug fixes
 
-Userspace can send the data lifetime information using the write hints.
-The SCSI driver (sd) can already pass this information to the SCSI
-devices. This patch does the same for NVMe.
+Please ignore V2, and will send V3 with simplification & cleanup, and
+many fixes on error handling code path.
 
-Fetches the placement-identifiers (plids) if the device supports FDP.
-And map the incoming write-hints to plids.
 
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-Signed-off-by: Hui Qi <hui81.qi@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
----
- drivers/nvme/host/core.c | 67 ++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h |  4 +++
- include/linux/nvme.h     | 19 ++++++++++++
- 3 files changed, 90 insertions(+)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 8ae0a2dc5eda..c3de06cff12f 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -42,6 +42,20 @@ struct nvme_ns_info {
- 	bool is_removed;
- };
- 
-+struct nvme_fdp_ruh_status_desc {
-+	u16 pid;
-+	u16 ruhid;
-+	u32 earutr;
-+	u64 ruamw;
-+	u8  rsvd16[16];
-+};
-+
-+struct nvme_fdp_ruh_status {
-+	u8  rsvd0[14];
-+	u16 nruhsd;
-+	struct nvme_fdp_ruh_status_desc ruhsd[];
-+};
-+
- unsigned int admin_timeout = 60;
- module_param(admin_timeout, uint, 0644);
- MODULE_PARM_DESC(admin_timeout, "timeout in seconds for admin commands");
-@@ -943,6 +957,16 @@ static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
- 	return BLK_STS_OK;
- }
- 
-+static inline void nvme_assign_placement_id(struct nvme_ns *ns,
-+					struct request *req,
-+					struct nvme_command *cmd)
-+{
-+	enum rw_hint h = min(ns->head->nr_plids, req->write_hint);
-+
-+	cmd->rw.control |= cpu_to_le16(NVME_RW_DTYPE_DPLCMT);
-+	cmd->rw.dsmgmt |= cpu_to_le32(ns->head->plids[h] << 16);
-+}
-+
- static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		struct request *req, struct nvme_command *cmnd,
- 		enum nvme_opcode op)
-@@ -1058,6 +1082,8 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req)
- 		break;
- 	case REQ_OP_WRITE:
- 		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
-+		if (!ret && ns->head->nr_plids)
-+			nvme_assign_placement_id(ns, req, cmd);
- 		break;
- 	case REQ_OP_ZONE_APPEND:
- 		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_zone_append);
-@@ -2070,6 +2096,40 @@ static int nvme_update_ns_info_generic(struct nvme_ns *ns,
- 	return ret;
- }
- 
-+static int nvme_fetch_fdp_plids(struct nvme_ns *ns, u32 nsid)
-+{
-+	struct nvme_command c = {};
-+	struct nvme_fdp_ruh_status *ruhs;
-+	struct nvme_fdp_ruh_status_desc *ruhsd;
-+	int size, ret, i;
-+
-+	size = sizeof(*ruhs) + NVME_MAX_PLIDS * sizeof(*ruhsd);
-+	ruhs = kzalloc(size, GFP_KERNEL);
-+	if (!ruhs)
-+		return -ENOMEM;
-+
-+	c.imr.opcode = nvme_cmd_io_mgmt_recv;
-+	c.imr.nsid = cpu_to_le32(nsid);
-+	c.imr.mo = 0x1;
-+	c.imr.numd =  cpu_to_le32((size >> 2) - 1);
-+
-+	ret = nvme_submit_sync_cmd(ns->queue, &c, ruhs, size);
-+	if (ret)
-+		goto out;
-+
-+	ns->head->nr_plids = le16_to_cpu(ruhs->nruhsd);
-+	ns->head->nr_plids =
-+		min_t(u16, ns->head->nr_plids, NVME_MAX_PLIDS);
-+
-+	for (i = 0; i < ns->head->nr_plids; i++) {
-+		ruhsd = &ruhs->ruhsd[i];
-+		ns->head->plids[i] = le16_to_cpu(ruhsd->pid);
-+	}
-+out:
-+	kfree(ruhs);
-+	return ret;
-+}
-+
- static int nvme_update_ns_info_block(struct nvme_ns *ns,
- 		struct nvme_ns_info *info)
- {
-@@ -2157,6 +2217,13 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
- 		if (ret && !nvme_first_scan(ns->disk))
- 			goto out;
- 	}
-+	if (ns->ctrl->ctratt & NVME_CTRL_ATTR_FDPS) {
-+		ret = nvme_fetch_fdp_plids(ns, info->nsid);
-+		if (ret)
-+			dev_warn(ns->ctrl->device,
-+				"FDP failure status:0x%x\n", ret);
-+	}
-+
- 
- 	ret = 0;
- out:
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index d0ed64dc7380..67dad29fe289 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -440,6 +440,8 @@ struct nvme_ns_ids {
- 	u8	csi;
- };
- 
-+#define NVME_MAX_PLIDS   (128)
-+
- /*
-  * Anchor structure for namespaces.  There is one for each namespace in a
-  * NVMe subsystem that any of our controllers can see, and the namespace
-@@ -457,6 +459,8 @@ struct nvme_ns_head {
- 	bool			shared;
- 	bool			passthru_err_log_enabled;
- 	int			instance;
-+	u16			nr_plids;
-+	u16			plids[NVME_MAX_PLIDS];
- 	struct nvme_effects_log *effects;
- 	u64			nuse;
- 	unsigned		ns_id;
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 425573202295..fc07ba1b5ec5 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -270,6 +270,7 @@ enum nvme_ctrl_attr {
- 	NVME_CTRL_ATTR_HID_128_BIT	= (1 << 0),
- 	NVME_CTRL_ATTR_TBKAS		= (1 << 6),
- 	NVME_CTRL_ATTR_ELBAS		= (1 << 15),
-+	NVME_CTRL_ATTR_FDPS		= (1 << 19),
- };
- 
- struct nvme_id_ctrl {
-@@ -829,6 +830,7 @@ enum nvme_opcode {
- 	nvme_cmd_resv_register	= 0x0d,
- 	nvme_cmd_resv_report	= 0x0e,
- 	nvme_cmd_resv_acquire	= 0x11,
-+	nvme_cmd_io_mgmt_recv	= 0x12,
- 	nvme_cmd_resv_release	= 0x15,
- 	nvme_cmd_zone_mgmt_send	= 0x79,
- 	nvme_cmd_zone_mgmt_recv	= 0x7a,
-@@ -850,6 +852,7 @@ enum nvme_opcode {
- 		nvme_opcode_name(nvme_cmd_resv_register),	\
- 		nvme_opcode_name(nvme_cmd_resv_report),		\
- 		nvme_opcode_name(nvme_cmd_resv_acquire),	\
-+		nvme_opcode_name(nvme_cmd_io_mgmt_recv),	\
- 		nvme_opcode_name(nvme_cmd_resv_release),	\
- 		nvme_opcode_name(nvme_cmd_zone_mgmt_send),	\
- 		nvme_opcode_name(nvme_cmd_zone_mgmt_recv),	\
-@@ -1001,6 +1004,7 @@ enum {
- 	NVME_RW_PRINFO_PRCHK_GUARD	= 1 << 12,
- 	NVME_RW_PRINFO_PRACT		= 1 << 13,
- 	NVME_RW_DTYPE_STREAMS		= 1 << 4,
-+	NVME_RW_DTYPE_DPLCMT		= 2 << 4,
- 	NVME_WZ_DEAC			= 1 << 9,
- };
- 
-@@ -1088,6 +1092,20 @@ struct nvme_zone_mgmt_recv_cmd {
- 	__le32			cdw14[2];
- };
- 
-+struct nvme_io_mgmt_recv_cmd {
-+	__u8			opcode;
-+	__u8			flags;
-+	__u16			command_id;
-+	__le32			nsid;
-+	__le64			rsvd2[2];
-+	union nvme_data_ptr	dptr;
-+	__u8			mo;
-+	__u8			rsvd11;
-+	__u16			mos;
-+	__le32			numd;
-+	__le32			cdw12[4];
-+};
-+
- enum {
- 	NVME_ZRA_ZONE_REPORT		= 0,
- 	NVME_ZRASF_ZONE_REPORT_ALL	= 0,
-@@ -1808,6 +1826,7 @@ struct nvme_command {
- 		struct nvmf_auth_receive_command auth_receive;
- 		struct nvme_dbbuf dbbuf;
- 		struct nvme_directive_cmd directive;
-+		struct nvme_io_mgmt_recv_cmd imr;
- 	};
- };
- 
--- 
-2.25.1
+Thanks,
+Ming
 
