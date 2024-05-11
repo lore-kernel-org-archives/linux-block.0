@@ -1,85 +1,97 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC24DDDAD
-	for <linux-block@vger.kernel.org>; Sat, 11 May 2024 15:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C8D18E1F
+	for <linux-block@vger.kernel.org>; Sat, 11 May 2024 17:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715439890; cv=none; b=HXCffNvDf9tjblhyZdtO7xItE3MQOr7FQ9tNMV8G4uR1nzhYJxm60qOEnBK/AF2B43AoKbyWmnsvCeVK6VBqRHl3ScDd4GoqbC81jJwHZ8bdo6BuK/WmtSnzjJhkkNV0/JPc17JCeD0bWhAxhqu91o8S/WhmpicDe3iju5cEDko=
+	t=1715447043; cv=none; b=MBHcMgPddm6/2O8YpTgShLey7xDGchGOAeztVa8ICb5EwSYt/OqwqfYuhMBxTSpU7eE5Dg8VEpFlpOCvwgv4c6waabI0tnZqjT8EeNkgPvzCgfH8QuoUOBr34zVvcXQIpbhBZiiFecH6/2vbt7KlKi2PeCV4BMujXDAvjWu83yY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715439890; c=relaxed/simple;
-	bh=xUbWc7fj517LFIdf3gDv32EBpQhBBvxt79pLIr82Kcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ufkD8+jcXtpXI8CdXXaLbig+PPa4qJ/PpKOXIRLp4IKpKDw6myJ+uoDbbGQyJamw9Gkgn88TYwxErm1GQtfmHzgXZRiGDA7gBIH48lgLpjn7UzTvI/tF0bMTmCG20oePjYlwhm8kvC7WWZy8IJgXtCK5YIvWQVukE3WQ+F0UdRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SVohtMGb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1715447043; c=relaxed/simple;
+	bh=wZWk3Xr/mPmlC5lZyQOPWTMyteuUBw1nHeQvKhE4pmU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=M7Bqtb1mK8iPhLZFk3S6fwdR+j7gYGYwphkYr2+/ylWuncqbRPi/uZyaqz/CnqHG9pmc4ohSuiVeNivleYUNZnkmhuay4X03NcUkQdP070w2eKEuQwlD/KuIoeDDMYdNmMHkDrCthzSPeo6gbJvrXEz1fZFLvl66snCXzh5UHTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IJtptj+M; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVohtMGb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715439887;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0PLXdiUI8m4MEUDeWkRWZDRtsZo779QPF8tHxv4ocyw=;
-	b=SVohtMGb3hT4j6R2Wads8EF+lxuVaBL5p0wb6MeVt7ZVjBAYseAthLjItoHKF1vUUclb05
-	dUe7v7MjixKnmjzMBWtClSS0VYf5CbvcDbW7RKy7zlYSCjGnI77CGBrZF0AGyDnPfZVbSD
-	W6Zp2ukZM6gZ59+K2+RCC3VJ8yoCD7o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-48F_gGkpMmC5YSS9O40joA-1; Sat, 11 May 2024 11:04:44 -0400
-X-MC-Unique: 48F_gGkpMmC5YSS9O40joA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF195812296;
-	Sat, 11 May 2024 15:04:43 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CA5AC20CC4A0;
-	Sat, 11 May 2024 15:04:41 +0000 (UTC)
-Date: Sat, 11 May 2024 23:04:37 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] ublk_drv: set DMA alignment mask to 3
-Message-ID: <Zj+JBbODPDh/v3vK@fedora>
-References: <379b841f-210f-41dc-a44c-f1dc3197e10f@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IJtptj+M"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2b4b30702a5so803720a91.1
+        for <linux-block@vger.kernel.org>; Sat, 11 May 2024 10:04:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715447039; x=1716051839; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S5RYDq0sQ0FFV9c0o/9fI9m5/lcDInA2F35bjIY1CUo=;
+        b=IJtptj+MZDKZ6FzH9cF+Dq19nz0x4s1+cMHK8/Yw7FyHkKBu1+iTs/YpEpaZ5w3dks
+         7/Br+yYwDB7Hj9zxK0tqbsIo15YOiIKHJ3fsWewqd9tIJQYfre3NX6l4vkeT61rmXWeR
+         P7xQHaabdvd/2J1qyAtzSnw5r+ivWwml/9Eu1uMq8naenPpS4rGJ8lzR2FhqWvKu+qHN
+         BbyMNvKyJrofvaHiVy+Eyd5YB0jBrZTNc5U8EX+fkHdFHVzY54fr+lK56uf+PZhTW+9R
+         CqmtVPS7qg97Ehrsz9zH/4QiickiLJcGC2dNRFSkNRP3Y3dzanfalDRPRBksml579UHO
+         pMwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715447039; x=1716051839;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S5RYDq0sQ0FFV9c0o/9fI9m5/lcDInA2F35bjIY1CUo=;
+        b=rySJ/bM5Uibe4DOfWGgu5+PL+eZw/cY6z2OUy+6pUvoJL7yIpithIdkQZ1mdIhDodg
+         1JmGmyF7txx4dqCpbhXY1sgC1muhWRY4IQJqzSp0nyQ8hBNKKtSPuu6IxKx87ie4YD0x
+         gJEeeQyh/B/oTubt95yIWRyC631+rZ+N2s5fdpLzAh/Aq95f973wF/fIq9yYUOFjYzBy
+         OKCvvFiB/w6RxXi9H5Wtv6oUsVmxlEemWBtfu75vSnmh0dhVT57aMmz7G0bwD91uRJJZ
+         g/qCLS9bTnZVm57YZggNk2RERGtGbVvqObHuYv65T96PJAJDocGwo+oPwmVQ6J3UWoKo
+         4DFQ==
+X-Gm-Message-State: AOJu0YyVpP6SNyDMsSiBYMn34SXQU4QqwWL8bpzXMbKSMay0RfMz2DU6
+	9B7G98AAujuL2MlcYd6acB9zIMhSD7vW0qQDn7U9cnbM+7dZFP53VQ/Hcx+RIloDrd+0+TquIiT
+	R
+X-Google-Smtp-Source: AGHT+IEwTBE8UAPksHtdcjc6wpuqBSQS8YhA4bTHiOsDr/N+DYs8t/FOSYCuYxV2CsT50maKJHu4MA==
+X-Received: by 2002:a17:90a:d716:b0:2b8:cb2c:4fda with SMTP id 98e67ed59e1d1-2b8cb2c509dmr125241a91.1.1715447039631;
+        Sat, 11 May 2024 10:03:59 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b6710565e3sm5081769a91.11.2024.05.11.10.03.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 May 2024 10:03:59 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20240510201816.24921-1-bvanassche@acm.org>
+References: <20240510201816.24921-1-bvanassche@acm.org>
+Subject: Re: [PATCH] null_blk: Fix two sparse warnings
+Message-Id: <171544703866.418778.16613935289747164338.b4-ty@kernel.dk>
+Date: Sat, 11 May 2024 11:03:58 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <379b841f-210f-41dc-a44c-f1dc3197e10f@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Sat, May 11, 2024 at 08:40:57AM -0600, Jens Axboe wrote:
-> By default, this will be 511, as that's the block layer default. But
-> drivers these days can support memory alignments that aren't tied to
-> the sector sizes, instead just being limited by what the DMA engine
-> supports. An example is NVMe, where it's generally set to a 32-bit or
-> 64-bit boundary. As ublk itself doesn't really care, just set it low
-> enough that we don't run into issues with NVMe where the required
-> O_DIRECT memory alignment is now more restrictive on ublk than it is
-> on the underlying device.
+
+On Fri, 10 May 2024 13:18:16 -0700, Bart Van Assche wrote:
+> Fix the following sparse warnings:
 > 
-> This was triggered by spurious -EINVAL returns on O_DIRECT IO on a
-> setup with ublk managing NVMe devices, which previously worked just
-> fine on the NVMe device itself. With the alignment relaxed, the test
-> works fine.
+> drivers/block/null_blk/main.c:1243:35: warning: incorrect type in return expression (different base types)
+> drivers/block/null_blk/main.c:1243:35:    expected int
+> drivers/block/null_blk/main.c:1243:35:    got restricted blk_status_t
+> drivers/block/null_blk/main.c:1291:30: warning: incorrect type in return expression (different base types)
+> drivers/block/null_blk/main.c:1291:30:    expected restricted blk_status_t
+> drivers/block/null_blk/main.c:1291:30:    got int
 > 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> [...]
 
-It should be triggered since DIO DMA alignment is relaxed:
+Applied, thanks!
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+[1/1] null_blk: Fix two sparse warnings
+      commit: e655d93e55b9ef7508b59d2d42a58549a37fd4aa
+
+Best regards,
+-- 
+Jens Axboe
 
 
-
-Thanks, 
-Ming
 
