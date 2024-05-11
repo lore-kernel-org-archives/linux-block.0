@@ -1,81 +1,80 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846D6524B8
-	for <linux-block@vger.kernel.org>; Sat, 11 May 2024 09:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F5326AD3
+	for <linux-block@vger.kernel.org>; Sat, 11 May 2024 09:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715418798; cv=none; b=kieFiPmfsm/rfrmJdQdB/yur4LhOr9E3j59i93+N4yMuv+uKk/TD3Lpn6xh9zFsWSb3WpFvGRNMJ2jniaaedYaKzWOZK75k3xKEPTnTPUfo6oDIXBQi4g/cA69uk0qKxYWD3o20BNlbitmDZdzBEz3uErLdxyP4X+6LBGJ0W5HU=
+	t=1715418958; cv=none; b=byuZYLG6tqybEM1aS+dfuEKdewbTgutDRPt2e/fP1gOi+3/gdGmXdHuCVlZymduaeaqC0uvUsz4Tv2RvNNfo2fl86X/Dg5Dm8SUOpJWzhWbq5dOw8+KpYcVT/ZpopIo0qMqqSUT1QC0CSSZJntKzsGmn4aZ3tyHlcTXFNZ6k8CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715418798; c=relaxed/simple;
-	bh=HDFGwBZ2Ix3R8SN6cB8bUbWKC/PI39Sy1OEc54SzdP0=;
+	s=arc-20240116; t=1715418958; c=relaxed/simple;
+	bh=Fva8hjHSAyDjsK6RmzdBGAgHiDWJ0vmCr1G+/2KKEHI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=emiKPqLgqqopqCRISoQTAOOJNlcxnrl0cRZndyfHli8BYhvkRlAeIUHAaLkXA1X8t+IYO/6iT+ManBv8EAlk2WRAs4wl5oqyQ8ncJwfwu/q0ApNPQQjtsG9GsB7SwDtUHRgid/yN0YX+drsEAZFWSN1qwYNKcRWhyHSpNzGXd4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OojacKkz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rimIeH5p; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OojacKkz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rimIeH5p; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=LoWpw5eddK+GiKQc9mjzNL92maLUyRM2YIxQxmybM7/baCKKoEvjSSiK99egNthVar/ZzgDYobMtUc6dAktER3zZJPe5OvxEeYuQnVc0kz69H2taa27Qx4MmyehAph0HdGSrcGUB6vR0loJ+zQJVl0Em7w+F6MYWe1VmrelsT/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qnFK2wtc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=18iUeZQO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qnFK2wtc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=18iUeZQO; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OojacKkz";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rimIeH5p";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OojacKkz";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rimIeH5p"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qnFK2wtc";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="18iUeZQO";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qnFK2wtc";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="18iUeZQO"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 862FC20B6A;
-	Sat, 11 May 2024 09:13:15 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 90CF933F80;
+	Sat, 11 May 2024 09:15:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1715418795; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1715418955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UE4InP61OxD+l8jmkYdUmsijattPNEVP+SewgNel8uk=;
-	b=OojacKkzxvOiyzxIpsmZsH+AFH4mYHjQJCMDw5zGtTRSA7e74BDrt5mN+Tt5Ja66b5XH1N
-	Q/eUKsa6F1kLYBnNiYGMa2/u23G+CX6/c9ZWJHdZl4LjKFszZeEwUReaHnNPmJy8UoOXKU
-	cYoXyPoqKgDZkWQmI87ndWcb9T22fPM=
+	bh=Fg/9NzJ9JZq7UAGY1dWL+Wpq5rYtsuJf+b8ABIg5lb8=;
+	b=qnFK2wtcUWXtlQERoCldRWOnpH38Un5cpx7L7tBDYGxH08RDOkdoJcAW5+89Bl0Zcca5Fu
+	w26mRf/3aTbayG3SjUw/QJ7KjFKbsMZhndAeUx+SLY7wHhlRXTHc9MmBdaHReCOr6iTWh/
+	/NUiXsj4z77WTE9R+gpEEkeWnFS76zg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1715418795;
+	s=susede2_ed25519; t=1715418955;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UE4InP61OxD+l8jmkYdUmsijattPNEVP+SewgNel8uk=;
-	b=rimIeH5pn1icjr5UoU3kF92Sf+tcdG83e5jdYYgk1rAg3lrambnOj9swvvj+ZxxVp9ZKvu
-	wO1HpfHwq7nmzCAw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=OojacKkz;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=rimIeH5p
+	bh=Fg/9NzJ9JZq7UAGY1dWL+Wpq5rYtsuJf+b8ABIg5lb8=;
+	b=18iUeZQOVcnoDOir5v8H/thnXm9DtiP1Dg/QFNM5/4wEZefB7z4h1leig533lHgeMmgNuQ
+	4TxTLJh9rSiEVaDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1715418795; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1715418955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UE4InP61OxD+l8jmkYdUmsijattPNEVP+SewgNel8uk=;
-	b=OojacKkzxvOiyzxIpsmZsH+AFH4mYHjQJCMDw5zGtTRSA7e74BDrt5mN+Tt5Ja66b5XH1N
-	Q/eUKsa6F1kLYBnNiYGMa2/u23G+CX6/c9ZWJHdZl4LjKFszZeEwUReaHnNPmJy8UoOXKU
-	cYoXyPoqKgDZkWQmI87ndWcb9T22fPM=
+	bh=Fg/9NzJ9JZq7UAGY1dWL+Wpq5rYtsuJf+b8ABIg5lb8=;
+	b=qnFK2wtcUWXtlQERoCldRWOnpH38Un5cpx7L7tBDYGxH08RDOkdoJcAW5+89Bl0Zcca5Fu
+	w26mRf/3aTbayG3SjUw/QJ7KjFKbsMZhndAeUx+SLY7wHhlRXTHc9MmBdaHReCOr6iTWh/
+	/NUiXsj4z77WTE9R+gpEEkeWnFS76zg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1715418795;
+	s=susede2_ed25519; t=1715418955;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UE4InP61OxD+l8jmkYdUmsijattPNEVP+SewgNel8uk=;
-	b=rimIeH5pn1icjr5UoU3kF92Sf+tcdG83e5jdYYgk1rAg3lrambnOj9swvvj+ZxxVp9ZKvu
-	wO1HpfHwq7nmzCAw==
+	bh=Fg/9NzJ9JZq7UAGY1dWL+Wpq5rYtsuJf+b8ABIg5lb8=;
+	b=18iUeZQOVcnoDOir5v8H/thnXm9DtiP1Dg/QFNM5/4wEZefB7z4h1leig533lHgeMmgNuQ
+	4TxTLJh9rSiEVaDQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2552C13A3E;
-	Sat, 11 May 2024 09:13:15 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3421F13A3E;
+	Sat, 11 May 2024 09:15:55 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([10.150.64.162])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4NvgA6s2P2Y9JwAAD6G6ig
-	(envelope-from <hare@suse.de>); Sat, 11 May 2024 09:13:15 +0000
-Message-ID: <3e6bbc4a-c1ed-4460-a266-3d4b0fdbb9c6@suse.de>
-Date: Sat, 11 May 2024 11:13:15 +0200
+	id xzKOCUs3P2bVJwAAD6G6ig
+	(envelope-from <hare@suse.de>); Sat, 11 May 2024 09:15:55 +0000
+Message-ID: <985265c8-c8cb-40cb-bec3-8b808bdf4d3b@suse.de>
+Date: Sat, 11 May 2024 11:15:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,7 +82,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] fs/mpage: avoid negative shift for large blocksize
+Subject: Re: [PATCH 3/5] block/bdev: lift restrictions on supported blocksize
 Content-Language: en-US
 To: Matthew Wilcox <willy@infradead.org>, hare@kernel.org
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -91,51 +90,56 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
  <mcgrof@kernel.org>, linux-nvme@lists.infradead.org,
  linux-block@vger.kernel.org
 References: <20240510102906.51844-1-hare@kernel.org>
- <20240510102906.51844-3-hare@kernel.org>
- <Zj6ehjm1iVcc_x2m@casper.infradead.org>
+ <20240510102906.51844-4-hare@kernel.org>
+ <Zj6e95dncIn-Zrlh@casper.infradead.org>
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <Zj6ehjm1iVcc_x2m@casper.infradead.org>
+In-Reply-To: <Zj6e95dncIn-Zrlh@casper.infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Flag: NO
-X-Spam-Score: -4.50
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 862FC20B6A
+X-Spam-Score: -4.29
 X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.50 / 50.00];
+X-Spamd-Result: default: False [-4.29 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
 	XM_UA_NO_VERSION(0.01)[];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email];
-	DKIM_TRACE(0.00)[suse.de:+]
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
 
-On 5/11/24 00:24, Matthew Wilcox wrote:
-> On Fri, May 10, 2024 at 12:29:03PM +0200, hare@kernel.org wrote:
->> -	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
->> +	block_in_file = (sector_t)(((loff_t)folio->index << PAGE_SHIFT) >> blkbits);
+On 5/11/24 00:25, Matthew Wilcox wrote:
+> On Fri, May 10, 2024 at 12:29:04PM +0200, hare@kernel.org wrote:
+>> From: Hannes Reinecke <hare@suse.de>
+>>
+>> We now can support blocksizes larger than PAGE_SIZE, so lift
+>> the restriction.
 > 
-> 	block_in_file = folio_pos(folio) >> blkbits;
-> 
-> 
-I know there was a better way. Will be fixing it up.
+> Do we need to make this conditional on a CONFIG option?  Not all
+> architectures support THP yet ... which means they don't support
+> large folios.  We should fix that, but it is well below the cutoff line
+> on my todo list.
+
+Well. We will only ever trigger this if we _really_ encounter a block 
+device with a block size larger than PAGE_SIZE.
+If which there currently are none (note to self: check NFS).
+
+And the overall idea is that the logical blocksize is mandatory, ie the 
+device _cannot_ handle requests with shorter blocksizes.
+We might be setting min_order == max_order, but again this can be 
+discussed once we get min_order working :-)
 
 Cheers,
 
