@@ -1,130 +1,104 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80B74C66
-	for <linux-block@vger.kernel.org>; Sat, 11 May 2024 07:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90D3522A;
+	Sat, 11 May 2024 07:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715411096; cv=none; b=jFxYF04nu1NYg4N8qW3YuB7oVirsl4BhdPGLhTMZveqLEROvDgqxxlKSS9pCQqVfkBTJOQAiMoMst23ud1+T1/3HA0BF6TjPkIgrJnzKsCg7jTw64xDOAgh/9zqPEZXfjI4mdeMRMG8sn5pLOZb6MNZWSZ+bYU/BCCLZtU4AfGs=
+	t=1715412924; cv=none; b=n//LUOi99TLMfQYzANLPA9EOihFAjoHVtqgIHoaxEkCwPzX5/GNYMxT/jLqpurU+7a/7JpdkiWxGIFOGdVmp6uA/yE3OPUxAJFAvvu0YLO1SukrbxPLOV6vpks9L6shK8t7kWoTgP/hhU8jBR3/phfHEXnHqnbEnRxWxiZk7NW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715411096; c=relaxed/simple;
-	bh=Yiz0h+TJ4V6Llm1CfE0BJLB5v4VhySio+M1awKypBAA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E1t6KTjgDmYEoCSBOrzgdi09qfkCeXlWOIBGuRXQ1LSvVYXVQiiEGpVHLA5J92+qoB0JehIMbkIWsF5A4bXGjWoXMqtnwOjeBUE2apmAO444uDkxBdrdT9MSzndaVY94VrkjLo2p/sFLO+fwCn7OgnL/Qnuxw6ftVJaiyxFWh44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VlfG+pyz; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1715412924; c=relaxed/simple;
+	bh=RCnR/Narod92mFqDOefmW4qo56aOWbIqph2R20YVQuw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sbnKWih/uJbfgWPVzNIadFZLcxZ3X72Pn2jl/iN7gY61eqlTi9w5mraj7UetLteMfq1a7kmZmprzMaDKItR+jDgFBGWL/fJLZuejPO0Ia1MXcjjlyaLEHfPgGqrghDfTx5ccNcS3r9uR/Fkm4HqQxMLfZAd39lKLt7QjbDDC94o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CVoAdqTG; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VlfG+pyz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715411095; x=1746947095;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Yiz0h+TJ4V6Llm1CfE0BJLB5v4VhySio+M1awKypBAA=;
-  b=VlfG+pyzz7JJXNCKbTUS3Ef7Q+/tZbfKWflY0xeh+WN7eS0SwcM/7Kv7
-   YYoAsutENN4GeOaad4EQQxEJoN6XA5rdeXu7fchxz5R9nCC2ImiG3PMi7
-   XEZ2vTrfNIw5EzigiVW8E/2whMl2dC+7hK/8IEtAdrU0iUxvkK0KJgfFf
-   0PAJKC475fuoH4DKx0NO3EOu8I8UZatTEH5stywK5/rtM5I7GdhhbHoKD
-   Pr2CKu/F/6QJNVIqazfIb4cbYc9D6WrVuiQzUtBu2o2vWuWBZthkFzTCr
-   a5Cilet8vZvUDfxFuvph1plerStwSUp7p+J0beYa/03/0NjIztyvmQMJf
-   Q==;
-X-CSE-ConnectionGUID: FjgAK3APSXqO4nNkIszlQQ==
-X-CSE-MsgGUID: +h+NfuryQ6mGi/vIyJ/BUQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11069"; a="28925809"
-X-IronPort-AV: E=Sophos;i="6.08,153,1712646000"; 
-   d="scan'208";a="28925809"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2024 00:04:54 -0700
-X-CSE-ConnectionGUID: yOylc/n3QNSnm1GO/I4eZg==
-X-CSE-MsgGUID: pnGRZh0IQk6cjN4ddyq4KQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,153,1712646000"; 
-   d="scan'208";a="29958479"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 11 May 2024 00:04:52 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s5gmn-00073X-0n;
-	Sat, 11 May 2024 07:04:49 +0000
-Date: Sat, 11 May 2024 15:04:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: hare@kernel.org, Andrew Morton <akpm@linux-foundation.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Pankaj Raghav <kernel@pankajraghav.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 4/5] block/bdev: enable large folio support for large
- logical block sizes
-Message-ID: <202405111438.WaVytRae-lkp@intel.com>
-References: <20240510102906.51844-5-hare@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVoAdqTG"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-51f1bf83f06so3266029e87.1;
+        Sat, 11 May 2024 00:35:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715412921; x=1716017721; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=onldwQIzp78LG59n3NFElPNcsr9m2UJ7FD1wkPedMlM=;
+        b=CVoAdqTG7Nz4W5HmK6Hov3YAsmJWnHzP9cZKnywWoDXkUlQYN5E0ZyviXAKFFYgbpn
+         5A9Bn9I5ZFzWzm8WCwcxFWeGsOzNC2Xw79xljYTYAHCPRRcn9XXPtHF1PcuMJr3Ob7LL
+         LQr6oGntS7dr5Faia9Cv49ryhrMftZ7VRRK7f/K+5QRLQRIzi46H9ENcKGPXaY/K+VxI
+         Vvacm7wo2eiPi/sL8iW5u0uozMEfkpYcesA62fgsR4+EWcExuUri3rDxxUXStBa7NkrK
+         YJDT4Uvfqk2G8evVuWreHxe+NB32Ki+JmVhNdwo2YxljOWL7G1qMoTCusyz8HDDDVOv2
+         sUaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715412921; x=1716017721;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=onldwQIzp78LG59n3NFElPNcsr9m2UJ7FD1wkPedMlM=;
+        b=XPVQKa5f1r5/kKo9UUlW0+UKjrV9SotbyzCpDlMuzsxcJLIZnyr5ZSNvMxreVR57sG
+         N3pESC5ZE7luja6weNIL1DVbDUoc3GKofMwUp/e2bNEw4rY6eq7r/h44Rg6sP/Op1d/x
+         SMyc0NU+dlWGWXeUGUcqt5EOnwIxx5trrN3nwQQJVwyO4/Uz2hk7yB4Sm4+1I2Rv8Lgs
+         NMt8DThPdCxIqCxpnswDL5mCEsuhnAx1laj2pQU0N3UmWTM0cj7qtJII7oWSWT9xK492
+         zGDYxmKFYQ/rReBzvaQNLOo5mGjopqyi28YRo4uSdvlSa6wUgFW0jWhrNFj0mvLcY+tW
+         J2kA==
+X-Forwarded-Encrypted: i=1; AJvYcCURf+1644oYoT+1Zz8xihTN+sL1BWumctP0MdWzCjS2kRE8fb8tUoN7+6cEYEf9J0o5wgck3P45KIUFx2I0UHKg4oIvqphNxKNYFNI+vAB1l8KtSQ9yNfGzYns1Z7PPP8HWrmrfr8ZPZZ6jQKoev+KUzb42xiuHVi8rR9XSceQeLGET
+X-Gm-Message-State: AOJu0YzIrvd1tMaeE/2MOfst0ivHWsY0BxGGQg4Ll3NNoPie+yxwrN5/
+	F0fmtKRUdA5jr9jkCYqE5z2XrVSZ8aeioVT/GE7NTENdCaNAK2W6GLEeoptqO+u7AZz1hLDZmey
+	lQI6de4LlYivXzZML6+mSzuyiOfA9lVIv
+X-Google-Smtp-Source: AGHT+IGwYg82We3uLuR2mZ/xbiWuGjRpwEPg+Yy/6af9O3ukcvNdq4tIg71vISFu90ZIh+8muwTg9jg1Bla+rXCh2xI=
+X-Received: by 2002:a05:6512:38d1:b0:51f:1853:25f with SMTP id
+ 2adb3069b0e04-5220fc79467mr2836408e87.19.1715412920609; Sat, 11 May 2024
+ 00:35:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240510102906.51844-5-hare@kernel.org>
+References: <20240509023937.1090421-1-zhaoyang.huang@unisoc.com>
+ <20240509023937.1090421-3-zhaoyang.huang@unisoc.com> <Zjw_0UPKvGkPfKFO@casper.infradead.org>
+ <CAGWkznGZP3KUBN2M6syrjTmVOdSM0zx23hcJ6+hqE8Drgz2f-A@mail.gmail.com> <Zj2R_UH0JMspexp5@casper.infradead.org>
+In-Reply-To: <Zj2R_UH0JMspexp5@casper.infradead.org>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Sat, 11 May 2024 15:35:09 +0800
+Message-ID: <CAGWkznHX3OBeMh7-jvAP1HyVaT=TN6Fs2ArUCkUHtE3nVadaDA@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] mm: introduce budgt control in readahead
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	cgroups@vger.kernel.org, steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Fri, May 10, 2024 at 11:18=E2=80=AFAM Matthew Wilcox <willy@infradead.or=
+g> wrote:
+>
+> On Fri, May 10, 2024 at 10:43:20AM +0800, Zhaoyang Huang wrote:
+> > Thanks for the prompt. I did some basic research on soft RAID and
+> > wonder if applying the bps limit on /dev/md0 like below could make
+> > this work.
+>
+> No.  Look at btrfs' raid support, for example.  it doesn't use md0.
+If I understand the below command correctly, btrfs uses one of the
+volumes within RAID as the mount block device, not /dev/md0. However,
+I think this is a problem of blkio.throttle rather than this commit
+which means this readahead budget control will work accordingly as
+long as blkio.throttle's parameter is configured correctly(eg. 50/50
+on sdb and sdc)
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on akpm-mm/mm-everything linus/master v6.9-rc7]
-[cannot apply to next-20240510]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/hare-kernel-org/fs-mpage-use-blocks_per_folio-instead-of-blocks_per_page/20240510-183146
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20240510102906.51844-5-hare%40kernel.org
-patch subject: [PATCH 4/5] block/bdev: enable large folio support for large logical block sizes
-config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240511/202405111438.WaVytRae-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240511/202405111438.WaVytRae-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405111438.WaVytRae-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> block/bdev.c:145:2: error: call to undeclared function 'mapping_set_folio_min_order'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     145 |         mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
-         |         ^
-   block/bdev.c:163:3: error: call to undeclared function 'mapping_set_folio_min_order'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     163 |                 mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
-         |                 ^
-   2 errors generated.
+mkfs.btrfs -m raid0 -d raid0 /dev/sdb /dev/sdc
+mount -t btrfs /dev/sdb /mnt/btr
 
 
-vim +/mapping_set_folio_min_order +145 block/bdev.c
 
-   133	
-   134	static void set_init_blocksize(struct block_device *bdev)
-   135	{
-   136		unsigned int bsize = bdev_logical_block_size(bdev);
-   137		loff_t size = i_size_read(bdev->bd_inode);
-   138	
-   139		while (bsize < PAGE_SIZE) {
-   140			if (size & bsize)
-   141				break;
-   142			bsize <<= 1;
-   143		}
-   144		bdev->bd_inode->i_blkbits = blksize_bits(bsize);
- > 145		mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
-   146					    get_order(bsize));
-   147	}
-   148	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+> > I didn't find information about 'RAID internally'. Could we set the
+> > limit on the root device(the one used for mount) to manage the whole
+> > partition without caring about where the bio finally goes? Or ask the
+> > user to decide if to use by making sure the device they apply will not
+> > do RAID?
+>
+> No.
