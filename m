@@ -1,104 +1,207 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90D3522A;
-	Sat, 11 May 2024 07:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D0B14005
+	for <linux-block@vger.kernel.org>; Sat, 11 May 2024 09:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715412924; cv=none; b=n//LUOi99TLMfQYzANLPA9EOihFAjoHVtqgIHoaxEkCwPzX5/GNYMxT/jLqpurU+7a/7JpdkiWxGIFOGdVmp6uA/yE3OPUxAJFAvvu0YLO1SukrbxPLOV6vpks9L6shK8t7kWoTgP/hhU8jBR3/phfHEXnHqnbEnRxWxiZk7NW0=
+	t=1715418771; cv=none; b=ms9OF4Enb5/wIO//DnJaKX7xy6wZgzcVwr6PpiJSe/jH9qyWGf3ouvyJ0a+UW/y6u+byc4AfTS+wAR8jd39Yhl0OVvhKhg0I7b5JhWEAFTXf79KPZyCeMKjItspHoV5k0o2TPUShG4NJ1TBlnsmmLaMFqd8nwvGJh3K8ykAsXPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715412924; c=relaxed/simple;
-	bh=RCnR/Narod92mFqDOefmW4qo56aOWbIqph2R20YVQuw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sbnKWih/uJbfgWPVzNIadFZLcxZ3X72Pn2jl/iN7gY61eqlTi9w5mraj7UetLteMfq1a7kmZmprzMaDKItR+jDgFBGWL/fJLZuejPO0Ia1MXcjjlyaLEHfPgGqrghDfTx5ccNcS3r9uR/Fkm4HqQxMLfZAd39lKLt7QjbDDC94o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CVoAdqTG; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715418771; c=relaxed/simple;
+	bh=N1uoxHakYrVriCYBtbiWqsnhXKFDiUtG8KYnH/+53BE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IowHON5aNQZWLtaOQSgRdvG/1Xj1kGPD/Er41wTTnw+ntrasvvLP7FELsPycAzowOT6ddj6YhDJ6dxGGUkpFJeMegZOo4dotOkhSmdY4XFsB5zvSUbSunfZqe4cuXVXlp52/nyOxM8K9KEbztge6+wE6wjG45umBHm8f/QEr42E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E6TTRKjm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cV03JxGN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E6TTRKjm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cV03JxGN; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVoAdqTG"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-51f1bf83f06so3266029e87.1;
-        Sat, 11 May 2024 00:35:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715412921; x=1716017721; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=onldwQIzp78LG59n3NFElPNcsr9m2UJ7FD1wkPedMlM=;
-        b=CVoAdqTG7Nz4W5HmK6Hov3YAsmJWnHzP9cZKnywWoDXkUlQYN5E0ZyviXAKFFYgbpn
-         5A9Bn9I5ZFzWzm8WCwcxFWeGsOzNC2Xw79xljYTYAHCPRRcn9XXPtHF1PcuMJr3Ob7LL
-         LQr6oGntS7dr5Faia9Cv49ryhrMftZ7VRRK7f/K+5QRLQRIzi46H9ENcKGPXaY/K+VxI
-         Vvacm7wo2eiPi/sL8iW5u0uozMEfkpYcesA62fgsR4+EWcExuUri3rDxxUXStBa7NkrK
-         YJDT4Uvfqk2G8evVuWreHxe+NB32Ki+JmVhNdwo2YxljOWL7G1qMoTCusyz8HDDDVOv2
-         sUaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715412921; x=1716017721;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=onldwQIzp78LG59n3NFElPNcsr9m2UJ7FD1wkPedMlM=;
-        b=XPVQKa5f1r5/kKo9UUlW0+UKjrV9SotbyzCpDlMuzsxcJLIZnyr5ZSNvMxreVR57sG
-         N3pESC5ZE7luja6weNIL1DVbDUoc3GKofMwUp/e2bNEw4rY6eq7r/h44Rg6sP/Op1d/x
-         SMyc0NU+dlWGWXeUGUcqt5EOnwIxx5trrN3nwQQJVwyO4/Uz2hk7yB4Sm4+1I2Rv8Lgs
-         NMt8DThPdCxIqCxpnswDL5mCEsuhnAx1laj2pQU0N3UmWTM0cj7qtJII7oWSWT9xK492
-         zGDYxmKFYQ/rReBzvaQNLOo5mGjopqyi28YRo4uSdvlSa6wUgFW0jWhrNFj0mvLcY+tW
-         J2kA==
-X-Forwarded-Encrypted: i=1; AJvYcCURf+1644oYoT+1Zz8xihTN+sL1BWumctP0MdWzCjS2kRE8fb8tUoN7+6cEYEf9J0o5wgck3P45KIUFx2I0UHKg4oIvqphNxKNYFNI+vAB1l8KtSQ9yNfGzYns1Z7PPP8HWrmrfr8ZPZZ6jQKoev+KUzb42xiuHVi8rR9XSceQeLGET
-X-Gm-Message-State: AOJu0YzIrvd1tMaeE/2MOfst0ivHWsY0BxGGQg4Ll3NNoPie+yxwrN5/
-	F0fmtKRUdA5jr9jkCYqE5z2XrVSZ8aeioVT/GE7NTENdCaNAK2W6GLEeoptqO+u7AZz1hLDZmey
-	lQI6de4LlYivXzZML6+mSzuyiOfA9lVIv
-X-Google-Smtp-Source: AGHT+IGwYg82We3uLuR2mZ/xbiWuGjRpwEPg+Yy/6af9O3ukcvNdq4tIg71vISFu90ZIh+8muwTg9jg1Bla+rXCh2xI=
-X-Received: by 2002:a05:6512:38d1:b0:51f:1853:25f with SMTP id
- 2adb3069b0e04-5220fc79467mr2836408e87.19.1715412920609; Sat, 11 May 2024
- 00:35:20 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E6TTRKjm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cV03JxGN";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E6TTRKjm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cV03JxGN"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 622BD20B6A;
+	Sat, 11 May 2024 09:12:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1715418768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bBv4mHLZJqDUPEnY1FKk08hMrS1asm0aCdIft0VM19E=;
+	b=E6TTRKjmkq2v5R6exgQL+Jj4ZrlIYfP9cIiV19hYEsT6hE2AHi5w1uLk69St9IYyRWkaSn
+	1CsZSfN8Aa9ZjmOLfg5ocfUzBza5S6IiauLdvApWvIsPWQSl454uMhzXthpb1f72BQbmAc
+	f9ZjyQQ4UKpaF8SfVS4EWo3Z01l/x4E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1715418768;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bBv4mHLZJqDUPEnY1FKk08hMrS1asm0aCdIft0VM19E=;
+	b=cV03JxGNEB2YesFiMp6dXqnqiRM5k6APWFSOccb+Ez2eU8q/9IE+II3bZchOPvHrDlyeJF
+	6e8URuov8dF0LACQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=E6TTRKjm;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=cV03JxGN
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1715418768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bBv4mHLZJqDUPEnY1FKk08hMrS1asm0aCdIft0VM19E=;
+	b=E6TTRKjmkq2v5R6exgQL+Jj4ZrlIYfP9cIiV19hYEsT6hE2AHi5w1uLk69St9IYyRWkaSn
+	1CsZSfN8Aa9ZjmOLfg5ocfUzBza5S6IiauLdvApWvIsPWQSl454uMhzXthpb1f72BQbmAc
+	f9ZjyQQ4UKpaF8SfVS4EWo3Z01l/x4E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1715418768;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bBv4mHLZJqDUPEnY1FKk08hMrS1asm0aCdIft0VM19E=;
+	b=cV03JxGNEB2YesFiMp6dXqnqiRM5k6APWFSOccb+Ez2eU8q/9IE+II3bZchOPvHrDlyeJF
+	6e8URuov8dF0LACQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0D70813A3E;
+	Sat, 11 May 2024 09:12:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5P8ZAZA2P2Y9JwAAD6G6ig
+	(envelope-from <hare@suse.de>); Sat, 11 May 2024 09:12:48 +0000
+Message-ID: <9918c372-9ecb-4e3c-9d36-058737491d93@suse.de>
+Date: Sat, 11 May 2024 11:12:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240509023937.1090421-1-zhaoyang.huang@unisoc.com>
- <20240509023937.1090421-3-zhaoyang.huang@unisoc.com> <Zjw_0UPKvGkPfKFO@casper.infradead.org>
- <CAGWkznGZP3KUBN2M6syrjTmVOdSM0zx23hcJ6+hqE8Drgz2f-A@mail.gmail.com> <Zj2R_UH0JMspexp5@casper.infradead.org>
-In-Reply-To: <Zj2R_UH0JMspexp5@casper.infradead.org>
-From: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Date: Sat, 11 May 2024 15:35:09 +0800
-Message-ID: <CAGWkznHX3OBeMh7-jvAP1HyVaT=TN6Fs2ArUCkUHtE3nVadaDA@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/2] mm: introduce budgt control in readahead
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	cgroups@vger.kernel.org, steve.kang@unisoc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] fs/mpage: use blocks_per_folio instead of
+ blocks_per_page
+Content-Language: en-US
+To: Matthew Wilcox <willy@infradead.org>, hare@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Pankaj Raghav <kernel@pankajraghav.com>, Luis Chamberlain
+ <mcgrof@kernel.org>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
+References: <20240510102906.51844-1-hare@kernel.org>
+ <20240510102906.51844-2-hare@kernel.org>
+ <Zj6ddYvmb2uIq5Ec@casper.infradead.org>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <Zj6ddYvmb2uIq5Ec@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 622BD20B6A
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.50
 
-On Fri, May 10, 2024 at 11:18=E2=80=AFAM Matthew Wilcox <willy@infradead.or=
-g> wrote:
->
-> On Fri, May 10, 2024 at 10:43:20AM +0800, Zhaoyang Huang wrote:
-> > Thanks for the prompt. I did some basic research on soft RAID and
-> > wonder if applying the bps limit on /dev/md0 like below could make
-> > this work.
->
-> No.  Look at btrfs' raid support, for example.  it doesn't use md0.
-If I understand the below command correctly, btrfs uses one of the
-volumes within RAID as the mount block device, not /dev/md0. However,
-I think this is a problem of blkio.throttle rather than this commit
-which means this readahead budget control will work accordingly as
-long as blkio.throttle's parameter is configured correctly(eg. 50/50
-on sdb and sdc)
+On 5/11/24 00:19, Matthew Wilcox wrote:
+> On Fri, May 10, 2024 at 12:29:02PM +0200, hare@kernel.org wrote:
+>> +++ b/fs/mpage.c
+>> @@ -114,7 +114,7 @@ static void map_buffer_to_folio(struct folio *folio, struct buffer_head *bh,
+>>   		 * don't make any buffers if there is only one buffer on
+>>   		 * the folio and the folio just needs to be set up to date
+>>   		 */
+>> -		if (inode->i_blkbits == PAGE_SHIFT &&
+>> +		if (inode->i_blkbits == folio_shift(folio) &&
+> 
+> yes
+> 
+>> @@ -160,7 +160,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>>   	struct folio *folio = args->folio;
+>>   	struct inode *inode = folio->mapping->host;
+>>   	const unsigned blkbits = inode->i_blkbits;
+>> -	const unsigned blocks_per_page = PAGE_SIZE >> blkbits;
+>> +	const unsigned blocks_per_folio = folio_size(folio) >> blkbits;
+>>   	const unsigned blocksize = 1 << blkbits;
+>>   	struct buffer_head *map_bh = &args->map_bh;
+>>   	sector_t block_in_file;
+>> @@ -168,7 +168,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>>   	sector_t last_block_in_file;
+>>   	sector_t first_block;
+>>   	unsigned page_block;
+>> -	unsigned first_hole = blocks_per_page;
+>> +	unsigned first_hole = blocks_per_folio;
+> 
+> yes
+> 
+>> @@ -189,7 +189,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>>   		goto confused;
+>>   
+>>   	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
+>> -	last_block = block_in_file + args->nr_pages * blocks_per_page;
+>> +	last_block = block_in_file + args->nr_pages * blocks_per_folio;
+> 
+> no.  args->nr_pages really is the number of pages, so last_block is
+> block_in_file + nr_pages * blocks_per_page.  except that blocks_per_page
+> might now be 0.
+> 
+> so i think this needs to be rewritten as:
+> 
+> 	last_block = block_in_file + (args->nr_pages * PAGE_SIZE) >> blkbits;
+> 
+> or have i confused myself?
+> 
+Aw. No. MIssed that line.
 
-mkfs.btrfs -m raid0 -d raid0 /dev/sdb /dev/sdc
-mount -t btrfs /dev/sdb /mnt/btr
+Will be fixing it up.
 
 
+>> @@ -275,7 +275,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>>   		bdev = map_bh->b_bdev;
+>>   	}
+>>   
+>> -	if (first_hole != blocks_per_page) {
+>> +	if (first_hole != blocks_per_folio) {
+>>   		folio_zero_segment(folio, first_hole << blkbits, PAGE_SIZE);
+> 
+> ... doesn't that need to be folio_size(folio)?
+> 
+> there may be other problems, but let's settle these questions first.
+> 
 
->
-> > I didn't find information about 'RAID internally'. Could we set the
-> > limit on the root device(the one used for mount) to manage the whole
-> > partition without caring about where the bio finally goes? Or ask the
-> > user to decide if to use by making sure the device they apply will not
-> > do RAID?
->
-> No.
+Thanks for the review.
+I'll be sure to pester you next week :-)
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
