@@ -1,79 +1,233 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C941CAB8
-	for <linux-block@vger.kernel.org>; Sun, 12 May 2024 11:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B512405F7
+	for <linux-block@vger.kernel.org>; Sun, 12 May 2024 15:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715511905; cv=none; b=Omj97Go0BPkzT8foyP/HRs4DIkH0a5KXPagTnGf6cdiLHp2z54bJil+NBg6K/TNLHVGtZRvGWuQqTekeWNzM0GO7IzHvUR6vEUSNRY8tviWNC5buD7OIEx36kCRRUC25ZBo+eYaEnVXBaj/Z5TD6rL+heLrizg/GlUnVLnujVh4=
+	t=1715527786; cv=none; b=NU9lKFNSqd1futAUZ5ecNhHpSSRlG7DT9d166ezaa5Iz4TDN64xMP9aWNRrmlFDQ/YYPmgcFBY4rwclpSnzdrVbbCwdY3axmuyhTppIJG4J2t5oLhA8pQz5N4GUCqpAIKixTVWIs5eg8ZG06lBsXLbs+iAoTnMh8Ug2b4Kij/Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715511905; c=relaxed/simple;
-	bh=jYig5DgAOcqBHrE0/9+1Mu2F6/2OlimOLVdZNsXTNhY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=pW+uoA3KRcyZ3LzVcymzNbXKxFk3SJskFdFwzYvlLtmXilLzidOzAQCkB3G10WCGiLHNrjJPrF7LbOMpZitgmBaONSJtQ0AJUmF55+hisjw41H6/Q9YJ27YIYGHKs9BcCsEQaVnU84gwlskW/LGxVw1PAHozL4zU1E1w7xpqoEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36b2eee85edso48531385ab.0
-        for <linux-block@vger.kernel.org>; Sun, 12 May 2024 04:05:03 -0700 (PDT)
+	s=arc-20240116; t=1715527786; c=relaxed/simple;
+	bh=4RtoKskPkzcF0LL91SvIcSP506czT0YJBI/jZVBpUqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=be8ViDRjdYHAa1ksRuNZq4PeTdrdsNuBOrtLoBHDg6O1zklVEUzflKVDIf1QyOehPsQeKUS9TC/XoEreUs4MtBq9RQ+3Zx7q9ewSO0gT6cuNjfw1uyLYeYr3X2MYRPvoRAaWmuHVpVlxsCSmZlPtF4hyoMT383/eaITlivWrtbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=d5I/Lvst; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="d5I/Lvst"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4200ee78f33so9491305e9.3
+        for <linux-block@vger.kernel.org>; Sun, 12 May 2024 08:29:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1715527782; x=1716132582; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ulCsNPhkK7JWi+tclLTU2fNAWwgtOLr+Kj0KyEHWc8I=;
+        b=d5I/Lvstd+PxR0uKe8JMadr45EW39ox63U+ErJglqVA+mRvqMOnId009IZruNEHih5
+         9URgPHFayJgU7F9ePVAifthrkkoZIcv7XDxDTWUg5OfkA8PhmRK44eV7b6qLMfjGD78/
+         4YO6wClouGlUVakp5FIUz3YicAmO09/uUgZUDQkcvijfOi2vD+xdiw+zETQ0MKySNDqv
+         ti9KlED4k9tbNLz/BAgAksyHym89f0VT1UgSxBzne2YrjzwGVMuIklg9CZWWKZiYVaxg
+         sC6jO+VqI137EMZxSPKXfrlGnamY5V/0EXFMfuDfWoThCKXCc9Tl4psURpJnTswRZdb0
+         UW4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715511903; x=1716116703;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1AzMq+CA5JeAen4yA3wRsZUlx1QJVPYX6wCmrtep2Os=;
-        b=quXwpXZcChmgqt3DVuJn1mSX4TAhPaAca1KxmPrOgcjVH7rTzjJE4fquHbRxYOBxX9
-         476O193bsY7OJdxbKfFa8UXzzIKVvaSaYJ1RdYbp8n7hCjLCMUBKSVBgDXXcsjbhOvMQ
-         j5MVLHUoqjvPVoLnmfKSFxEb99CnIFMiYeAyLQKor9+/duKmt/FQx778XBU/5kD9r69q
-         9lSyY8G+0RopM0+dto7/kGYtNu6MNtPEHPkEiA4by9lO78zCNcYV1ot2yFXrvtOVtqq+
-         Vy3YQEpKA18UHJ7FO+UT2uDOeJpTu7BMMnb8oOZEOql8aC3Az3voXBqE/FkhaDA6A6U1
-         Lzkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUUsFSu54mvdDDUx41auK0BS2u1YN+0MrC9jXVqB2UUDUCKp7Uy6QNnFTmOZZxs62Ag01X27gXQDnO7IemM+GAx47LHzxtz8cp2hUo=
-X-Gm-Message-State: AOJu0YxOIuZPn/mindYWfel6D8JIQTc7jKirEly8ur8GYrAAGNs4ry0X
-	N2dL8sBeSOBYKFCNPEgHSPYKB70Oz9OHb2bXKLWjHF2nL4qpo15/xG24Xscw68cL6OLREiPk52i
-	J6wI3sWVQ6p9GVDe4bHCJhUX+Dp44KQwGwFlk29oa7AUhBljZHLJqeNU=
-X-Google-Smtp-Source: AGHT+IGNjREMwQGltAFiKnu2rdMUsKA/x7WehSP+HZJj5UV4BdfJukZuMBf6IpPhE0j3eAVYtBhejK+D6fNrUTJJVVE3zNpl+ZoP
+        d=1e100.net; s=20230601; t=1715527782; x=1716132582;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ulCsNPhkK7JWi+tclLTU2fNAWwgtOLr+Kj0KyEHWc8I=;
+        b=i84OjxeI+Y4cgXkk3UcidCKGe2H6nTQ3k+SY8kY4W6ioHZi6wqYW1WQaa1JB/7A32H
+         D6f/laq+7HMBIK0VlpRytT+JgWxOXF5sh5TlooPBtVgrL/HrGmISJClW19frlKdr7Te6
+         1RG2RGIDxVhvC4G+xv5Xbi8CobU5JKq3JNmRlQBVknTmNXXrKrK7cqgX3oS/H181/loW
+         ituE5gqdf9+a1FicL7qojGDDjBELOSmiIGIPULdOlsqHOnmHJB4y7PEwChHyMoXGhGrY
+         eB9yEda97IdQVmbs4eU0TsKD+6Gtm/6dOPmx4Od7UZta6W7VwF18yvSxQ1/xeBcBUHFH
+         18PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkEIkwd158SOVXRP/iru3KauEmApud3vsPkVr0EtbyT2QvEOj8HWmi3+QGP2e+sy0YM/VHTN3VSfHenjEpQz2tygUgEGc9UOL8GUs=
+X-Gm-Message-State: AOJu0YxtQWZe9SE8Hixovgm2ZeoASSC2ryWlBsiaoVjmO8DVpN9z+rQx
+	VCrP+FiXIKrtBzttCm1bguzMvyDci2Ba8hVYUDfKs60OAZcxKbrxa3MrXqOjSi4=
+X-Google-Smtp-Source: AGHT+IFidXj0Jp6WwIXMOTr0NTyKKQh/6JrlZHr6gpW2TsGF40zRKnrhaGr2bg52AZ3q/wS9ek9uHA==
+X-Received: by 2002:a5d:6405:0:b0:34d:9dff:1119 with SMTP id ffacd0b85a97d-3504aa63350mr5943715f8f.64.1715527781968;
+        Sun, 12 May 2024 08:29:41 -0700 (PDT)
+Received: from airbuntu (host81-157-90-255.range81-157.btcentralplus.com. [81.157.90.255])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b896a29sm9067710f8f.43.2024.05.12.08.29.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 May 2024 08:29:41 -0700 (PDT)
+Date: Sun, 12 May 2024 16:29:39 +0100
+From: Qais Yousef <qyousef@layalina.io>
+To: Christian Loehle <christian.loehle@arm.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-kernel@vger.kernel.org,
+	peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
+	dietmar.eggemann@arm.com, vschneid@redhat.com,
+	vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
+	adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de,
+	asml.silence@gmail.com, linux-pm@vger.kernel.org,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] cpufreq/schedutil: Remove iowait boost
+Message-ID: <20240512152939.uua2sritrwg4zobj@airbuntu>
+References: <20240304201625.100619-1-christian.loehle@arm.com>
+ <20240304201625.100619-3-christian.loehle@arm.com>
+ <CAJZ5v0gMni0QJTBJXoVOav=kOtQ9W--NyXAgq+dXA+m-bciG8w@mail.gmail.com>
+ <5060c335-e90a-430f-bca5-c0ee46a49249@arm.com>
+ <CAJZ5v0janPrWRkjcLkFeP9gmTC-nVRF-NQCh6CTET6ENy-_knQ@mail.gmail.com>
+ <20240325023726.itkhlg66uo5kbljx@airbuntu>
+ <d99fd27a-dac5-4c71-b644-1213f51f2ba0@arm.com>
+ <20240429111816.mqok5biihvy46eba@airbuntu>
+ <80da988f-899e-4b93-a648-ffd0680d4000@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:d152:0:b0:36c:4457:ca5d with SMTP id
- e9e14a558f8ab-36cc14f785bmr944215ab.5.1715511903210; Sun, 12 May 2024
- 04:05:03 -0700 (PDT)
-Date: Sun, 12 May 2024 04:05:03 -0700
-In-Reply-To: <0000000000008de5720617f64aae@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009966ab06183fbd83@google.com>
-Subject: Re: [syzbot] [block?] [usb?] INFO: rcu detected stall in aoecmd_cfg (2)
-From: syzbot <syzbot+1e6e0b916b211bee1bd6@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, gregkh@linuxfoundation.org, hdanton@sina.com, 
-	justin@coraid.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, loberman@redhat.com, marcello.bauer@9elements.com, 
-	rafael@kernel.org, stern@rowland.harvard.edu, sylv@sylv.io, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <80da988f-899e-4b93-a648-ffd0680d4000@arm.com>
 
-syzbot has bisected this issue to:
+On 05/07/24 16:19, Christian Loehle wrote:
+> On 29/04/2024 12:18, Qais Yousef wrote:
+> > On 04/19/24 14:42, Christian Loehle wrote:
+> > 
+> >>> I think the major thing we need to be careful about is the behavior when the
+> >>> task is sleeping. I think the boosting will be removed when the task is
+> >>> dequeued and I can bet there will be systems out there where the BLOCK softirq
+> >>> being boosted when the task is sleeping will matter.
+> >>
+> >> Currently I see this mainly protected by the sugov rate_limit_us.
+> >> With the enqueue's being the dominating cpufreq updates it's not really an
+> >> issue, the boost is expected to survive the sleep duration, during which it
+> >> wouldn't be active.
+> >> I did experiment with some sort of 'stickiness' of the boost to the rq, but
+> >> it is somewhat of a pain to deal with if we want to remove it once enqueued
+> >> on a different rq. A sugov 1ms timer is much simpler of course.
+> >> Currently it's not necessary IMO, but for the sake of being future-proof in
+> >> terms of more frequent freq updates I might include it in v2.
+> > 
+> > Making sure things work with purpose would be really great. This implicit
+> > dependency is not great IMHO and make both testing and reasoning about why
+> > things are good or bad harder when analysing real workloads. Especially by non
+> > kernel developers.
+> 
+> Agreed.
+> Even without your proposed changes [1] relying on sugov rate_limit_us is
+> unfortunate.
+> There is a problem with an arbitrarily low rate_limit_us more generally, not
+> just because we kind of rely on the CPU being boosted right before the task is
+> actually enqueued (for the interrupt/softirq part of it), but also because of
+> the latency from requested frequency improvement to actually running on that
+> frequency. If the task is 90% done by the time it sees the improvement and
+> the frequency will be updated (back to a lower one) before the next enqueue,
+> then that's hardly worth the effort.
 
-commit a7f3813e589fd8e2834720829a47b5eb914a9afe
-Author: Marcello Sylvester Bauer <sylv@sylv.io>
-Date:   Thu Apr 11 14:51:28 2024 +0000
+I think that's why iowait boost is done the way it is today. You need to
+sustain the boost as the thing that need it run for a very short amount of
+time..
 
-    usb: gadget: dummy_hcd: Switch to hrtimer transfer scheduler
+Have you looked at how long the iowait boosted tasks run for in your tests?
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12415cd0980000
-start commit:   9221b2819b8a Add linux-next specific files for 20240503
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11415cd0980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16415cd0980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8ab537f51a6a0d98
-dashboard link: https://syzkaller.appspot.com/bug?extid=1e6e0b916b211bee1bd6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15661898980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=161a5d1f180000
+> Currently this is covered by rate_limit_us probabillistically and that seems
 
-Reported-by: syzbot+1e6e0b916b211bee1bd6@syzkaller.appspotmail.com
-Fixes: a7f3813e589f ("usb: gadget: dummy_hcd: Switch to hrtimer transfer scheduler")
+Side note. While looking more at the history of rate_limit_us and why it is set
+soo much higher than reported transition_latency by the driver, I am slowly
+reaching the conclusion that what is happening here is similar to introduction
+of down_rate_limit_us in Android. Our ability to predict system requirement is
+not great and we end up with prematurely lowering frequencies, and this rate
+limit just happens to more likely keep it higher so on average you see better
+perf in various workloads. I hope we can improve on this so we don't rely on
+this magic and enable better usage of the hardware ability to transition
+between frequencies fast and be more exact. I am trying to work on this as part
+of my magic margins series. But I think the story is bigger than that..
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> to be good enough in practice, but it's not very pleasing (and also EAS can't
+> take it into consideration).
+> That's not just exclusive for iowait wakeup tasks of course, but in theory any
+> that is off the rq frequently (and still requests a higher frequency than it can
+> realistically build up through util_avg like through uclamp_min).
+
+For uclamp_min, if the task RUNNING duration is shorter than the hardware
+ability to apply the boost, I think there's little we can do. The user can opt
+to boost the system in general. Note that this is likely a problem on systems
+with multi-ms transition_delay_us. If the task is running for few 100s us and
+it really wants to be boosted for this short time then a static system wide
+boost is all we can do to guarantee what it wants. The hardware is poor fit for
+the use case in this scenario. And personally I'd push back against introducing
+complexity to deal with such poor fit scenarios. We can already set min freq
+for the policy via sysfs and uclamp_min can still help with task placement for
+HMP systems.
+
+Now the problem we could have which is similar to iowait boost scenario is when
+there's a chaining effect that requires the boost for the duration of the
+chain.
+
+I think we can do something about it if we:
+
+	1. Guarantee the chain will run on the same CPU.
+	2. Introduce a 'sticky' flag for the boost to stay while the chain is
+	   running.
+	3. Introduce a start/finish indication for the chain.
+
+I think we can do something like that with sched-qos [1] to tag the chain via
+a cookie and request the boost to apply to them collectively.
+
+Generally, userspace would be better to collapse this chain into a single task
+that runs in one go.
+
+I don't know how often this scenario exists in practice and what limitations
+exist that make the simple collapse solution infeasible.. So I'd leave this
+out until more info is available.
+
+> 
+> >>>
+> >>> FWIW I do have an implementation for per-task iowait boost where I went a step
+> >>> further and converted intel_pstate too and like Christian didn't notice
+> >>> a regression. But I am not sure (rather don't think) I triggered this use case.
+> >>> I can't tell when the systems truly have per-cpu cpufreq control or just appear
+> >>> so and they are actually shared but not visible at linux level.
+> >>
+> >> Please do share your intel_pstate proposal!
+> > 
+> > This is what I had. I haven't been working on this for the past few months, but
+> > I remember tried several tests on different machines then without a problem.
+> > I tried to re-order patches at some point though and I hope I didn't break
+> > something accidentally and forgot the state.
+> > 
+> > https://github.com/torvalds/linux/compare/master...qais-yousef:linux:uclamp-max-aggregation
+> > 
+> 
+> Thanks for sharing, that looks reasonable with consolidating it into uclamp_min.
+> Couple of thoughts on yours, I'm sure you're aware, but consider it me thinking out
+> loud:
+> - iowait boost is taken into consideration for task placement, but with just the
+> 4 steps that made it more aggressive on HMP. (Potentially 2-3 consecutive iowait
+> wakeups to land on the big instead of running at max OPP of a LITTLE).
+
+Yeah I opted to keep the logic the same. I think there are gains to be had even
+without being smarter about the algorithm. But we do need to improve it, yes.
+The current logic is too aggressive and the perf/power trade-off will be tricky
+in practice.
+
+> - If the current iowait boost decay is sensible is questionable, but there should
+> probably be some decay. Taken to the extreme this would mean something
+> like blk_wait_io() demands 1024 utilization, if it waits for a very long time.
+> Repeating myself here, but iowait wakeups itself is tricky to work with (and I
+> try to work around that).
+
+I didn't get you here. But generally the story can go few levels deep yes. My
+approach was to make incremental progress without breaking existing stuff, but
+help move things in the right direction over time. Fixing everything in one go
+will be hard and not productive.
+
+> - The intel_pstate solution will increase boost even if
+> previous_wakeup->iowait_boost > current->iowait_boost
+> right? But using current->iowait_boost is a clever idea.
+
+I forgot the details now. But I seem to remember intel_pstate had its own
+accounting when it sees iowait boost in intel_pstate_hwp_boost_up/down().
+
+Note that the major worry I had is about the softirq not being boosted.
+Although in my testing this didn't seem to show up as things seemed fine. But
+I haven't dug down to see how accidental this was. I could easily see my
+patches making some use case out there not happy as the softirq might not get
+a chance to see the boost. I got distracted with other stuff and didn't get
+back to the topic since then. I am more than happy to support your efforts
+though :)
+
+[1] https://lore.kernel.org/lkml/20230916213316.p36nhgnibsidoggt@airbuntu/
