@@ -1,233 +1,255 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B512405F7
-	for <linux-block@vger.kernel.org>; Sun, 12 May 2024 15:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF012EB1D
+	for <linux-block@vger.kernel.org>; Sun, 12 May 2024 18:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715527786; cv=none; b=NU9lKFNSqd1futAUZ5ecNhHpSSRlG7DT9d166ezaa5Iz4TDN64xMP9aWNRrmlFDQ/YYPmgcFBY4rwclpSnzdrVbbCwdY3axmuyhTppIJG4J2t5oLhA8pQz5N4GUCqpAIKixTVWIs5eg8ZG06lBsXLbs+iAoTnMh8Ug2b4Kij/Yc=
+	t=1715539129; cv=none; b=G/OnJX2HqNZKDlXXONVq0UcrL7wpHoPVuweLKtjYDnF/dGFJ6+R20vdd6eFQx15H2COYmQqPnK1+R0xxVHBUwMumUx69i+pbq/wr17/G4fBYSyb4N5I4gfR7ms6ewYuULjqafiALNnaMPICwfPojwsXsROjWwXfn/Ere0NCV7H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715527786; c=relaxed/simple;
-	bh=4RtoKskPkzcF0LL91SvIcSP506czT0YJBI/jZVBpUqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=be8ViDRjdYHAa1ksRuNZq4PeTdrdsNuBOrtLoBHDg6O1zklVEUzflKVDIf1QyOehPsQeKUS9TC/XoEreUs4MtBq9RQ+3Zx7q9ewSO0gT6cuNjfw1uyLYeYr3X2MYRPvoRAaWmuHVpVlxsCSmZlPtF4hyoMT383/eaITlivWrtbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=d5I/Lvst; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
+	s=arc-20240116; t=1715539129; c=relaxed/simple;
+	bh=zQhfFMtf/32xi+lYgTG1ULLlEVWmIik5yzTYXylWDOs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=acABlQlsI7psS104vcxHhqKY6nMF91H4Vc6JDxZfbHi/0MLfhg1zz23o5VLEV6AgsRvJ3zEfeUXTpd1E4pPzDEvYjoO7uoiLFEYQsNtOnsTqv5MqD/8lo2NRZ5LpxRry97OnEyH806cwR/Tye4DapH7sGz0ig/iYePqAmKI3R7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=2FoCPYHA; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="d5I/Lvst"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4200ee78f33so9491305e9.3
-        for <linux-block@vger.kernel.org>; Sun, 12 May 2024 08:29:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="2FoCPYHA"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-602801ea164so2539234a12.0
+        for <linux-block@vger.kernel.org>; Sun, 12 May 2024 11:38:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1715527782; x=1716132582; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ulCsNPhkK7JWi+tclLTU2fNAWwgtOLr+Kj0KyEHWc8I=;
-        b=d5I/Lvstd+PxR0uKe8JMadr45EW39ox63U+ErJglqVA+mRvqMOnId009IZruNEHih5
-         9URgPHFayJgU7F9ePVAifthrkkoZIcv7XDxDTWUg5OfkA8PhmRK44eV7b6qLMfjGD78/
-         4YO6wClouGlUVakp5FIUz3YicAmO09/uUgZUDQkcvijfOi2vD+xdiw+zETQ0MKySNDqv
-         ti9KlED4k9tbNLz/BAgAksyHym89f0VT1UgSxBzne2YrjzwGVMuIklg9CZWWKZiYVaxg
-         sC6jO+VqI137EMZxSPKXfrlGnamY5V/0EXFMfuDfWoThCKXCc9Tl4psURpJnTswRZdb0
-         UW4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715527782; x=1716132582;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1715539126; x=1716143926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ulCsNPhkK7JWi+tclLTU2fNAWwgtOLr+Kj0KyEHWc8I=;
-        b=i84OjxeI+Y4cgXkk3UcidCKGe2H6nTQ3k+SY8kY4W6ioHZi6wqYW1WQaa1JB/7A32H
-         D6f/laq+7HMBIK0VlpRytT+JgWxOXF5sh5TlooPBtVgrL/HrGmISJClW19frlKdr7Te6
-         1RG2RGIDxVhvC4G+xv5Xbi8CobU5JKq3JNmRlQBVknTmNXXrKrK7cqgX3oS/H181/loW
-         ituE5gqdf9+a1FicL7qojGDDjBELOSmiIGIPULdOlsqHOnmHJB4y7PEwChHyMoXGhGrY
-         eB9yEda97IdQVmbs4eU0TsKD+6Gtm/6dOPmx4Od7UZta6W7VwF18yvSxQ1/xeBcBUHFH
-         18PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkEIkwd158SOVXRP/iru3KauEmApud3vsPkVr0EtbyT2QvEOj8HWmi3+QGP2e+sy0YM/VHTN3VSfHenjEpQz2tygUgEGc9UOL8GUs=
-X-Gm-Message-State: AOJu0YxtQWZe9SE8Hixovgm2ZeoASSC2ryWlBsiaoVjmO8DVpN9z+rQx
-	VCrP+FiXIKrtBzttCm1bguzMvyDci2Ba8hVYUDfKs60OAZcxKbrxa3MrXqOjSi4=
-X-Google-Smtp-Source: AGHT+IFidXj0Jp6WwIXMOTr0NTyKKQh/6JrlZHr6gpW2TsGF40zRKnrhaGr2bg52AZ3q/wS9ek9uHA==
-X-Received: by 2002:a5d:6405:0:b0:34d:9dff:1119 with SMTP id ffacd0b85a97d-3504aa63350mr5943715f8f.64.1715527781968;
-        Sun, 12 May 2024 08:29:41 -0700 (PDT)
-Received: from airbuntu (host81-157-90-255.range81-157.btcentralplus.com. [81.157.90.255])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b896a29sm9067710f8f.43.2024.05.12.08.29.40
+        bh=qEs+Uy+D6yRLJ6uVdcGDdXVWWb0Ye6WAdIDQbGkZrM4=;
+        b=2FoCPYHAqXOoD5KsQOx9WOsfZJadt8Et6fSsgmLIbI/fcqLjn8ZLtLfues+3w4tAaW
+         nWmbeOctmqsIE1PPyFLXyeALWcntAF0iMPM6SkH8GS5OLeE1A3kcjYEwFbi3lYeq2wOO
+         2/uDv1HZCp1MHYmcNa+1E1ipRTpm1FbCSgr0jTSfs2ne/jNWM226GejUxwsB96J6Q0AZ
+         RE2h4RtOIouGpC7ew2HwpYZw7cuQh+mjUjPhjDMq3N6bP11aSq9dH5qzuxw7wunOHkEF
+         AwfNsqHqEKSdNWEhvbp3I7rkywKyr/yWFt8O4UcrrAmochkYaOTN005ESzxLdayb0VSy
+         4G5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715539126; x=1716143926;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qEs+Uy+D6yRLJ6uVdcGDdXVWWb0Ye6WAdIDQbGkZrM4=;
+        b=SmYfLOkfs/4mr6WYUxicpVM9LAsMwPnUZt7ZC+9L9DHomUTp8P5ijOD6tYXRiiBnZ/
+         bBmorrll4WasL4r+KBinGIFU0unM44TQ+ID+N0mJjDLfgP19vrfWALYsYsZqdF8Om7Fx
+         IsG2w/m5iUqLl8qZ2XrquJ/iNjWmNptmfHArX3ubgWOGRX7O+zHgbVDqchLtZBGeOnHq
+         jp0jWkuwVQIRHcxZ9lGWxharftADO6Ui1aZTKWlZ1Hz72LslTkNHTnlS96o8kJgMMZmj
+         B/gtTCG6KkHPxhiXMjg6yrVDjWqbvUe8lARDOzlrTdUYOjo0qwFQ8IgBebmHhdCp5JW/
+         bQ/w==
+X-Forwarded-Encrypted: i=1; AJvYcCV30HHqdnxviNAZxaLdQtGL3gl3Xe0A6HMwYFE+CQxkGslB/orxOGEHj/fSvjRH2eLVtkFn4/m7R8yJEajsI2SziRkp0/DmN1HJIi8=
+X-Gm-Message-State: AOJu0YzhsLh9yM2G1eAfgiX8GDRljLiiEMQ4YgmO878tUxU/FICwga4R
+	qC9imPy28XOX0Ku5AzqU+tflIcZFhWgR3O0tD0drmz9rJSUC7697J5JCpqMHBis=
+X-Google-Smtp-Source: AGHT+IFzxn8oM9sRHT5lPi1yaMqFudJyCRrmgvRN7lZpQ2U2sZg3XiNi4QXfSNB23XmaVSG/z9g+3Q==
+X-Received: by 2002:a17:903:41c4:b0:1eb:50fd:7875 with SMTP id d9443c01a7336-1ef43e2323cmr102491605ad.33.1715539125697;
+        Sun, 12 May 2024 11:38:45 -0700 (PDT)
+Received: from localhost ([50.204.89.33])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136a59sm65200835ad.237.2024.05.12.11.38.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 May 2024 08:29:41 -0700 (PDT)
-Date: Sun, 12 May 2024 16:29:39 +0100
-From: Qais Yousef <qyousef@layalina.io>
-To: Christian Loehle <christian.loehle@arm.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-kernel@vger.kernel.org,
-	peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
-	dietmar.eggemann@arm.com, vschneid@redhat.com,
-	vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
-	adrian.hunter@intel.com, ulf.hansson@linaro.org, andres@anarazel.de,
-	asml.silence@gmail.com, linux-pm@vger.kernel.org,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] cpufreq/schedutil: Remove iowait boost
-Message-ID: <20240512152939.uua2sritrwg4zobj@airbuntu>
-References: <20240304201625.100619-1-christian.loehle@arm.com>
- <20240304201625.100619-3-christian.loehle@arm.com>
- <CAJZ5v0gMni0QJTBJXoVOav=kOtQ9W--NyXAgq+dXA+m-bciG8w@mail.gmail.com>
- <5060c335-e90a-430f-bca5-c0ee46a49249@arm.com>
- <CAJZ5v0janPrWRkjcLkFeP9gmTC-nVRF-NQCh6CTET6ENy-_knQ@mail.gmail.com>
- <20240325023726.itkhlg66uo5kbljx@airbuntu>
- <d99fd27a-dac5-4c71-b644-1213f51f2ba0@arm.com>
- <20240429111816.mqok5biihvy46eba@airbuntu>
- <80da988f-899e-4b93-a648-ffd0680d4000@arm.com>
+        Sun, 12 May 2024 11:38:45 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Yexuan Yang <1182282462@bupt.edu.cn>,
+	=?UTF-8?q?Sergio=20Gonz=C3=A1lez=20Collado?= <sergio.collado@gmail.com>,
+	Joel Granados <j.granados@samsung.com>,
+	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Niklas Cassel <Niklas.Cassel@wdc.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Conor Dooley <conor@kernel.org>,
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>,
+	open list <linux-kernel@vger.kernel.org>,
+	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: [PATCH 2/3] rust: block: add rnull, Rust null_blk implementation
+Date: Sun, 12 May 2024 12:39:47 -0600
+Message-ID: <20240512183950.1982353-3-nmi@metaspace.dk>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240512183950.1982353-1-nmi@metaspace.dk>
+References: <20240512183950.1982353-1-nmi@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <80da988f-899e-4b93-a648-ffd0680d4000@arm.com>
+Content-Transfer-Encoding: 8bit
 
-On 05/07/24 16:19, Christian Loehle wrote:
-> On 29/04/2024 12:18, Qais Yousef wrote:
-> > On 04/19/24 14:42, Christian Loehle wrote:
-> > 
-> >>> I think the major thing we need to be careful about is the behavior when the
-> >>> task is sleeping. I think the boosting will be removed when the task is
-> >>> dequeued and I can bet there will be systems out there where the BLOCK softirq
-> >>> being boosted when the task is sleeping will matter.
-> >>
-> >> Currently I see this mainly protected by the sugov rate_limit_us.
-> >> With the enqueue's being the dominating cpufreq updates it's not really an
-> >> issue, the boost is expected to survive the sleep duration, during which it
-> >> wouldn't be active.
-> >> I did experiment with some sort of 'stickiness' of the boost to the rq, but
-> >> it is somewhat of a pain to deal with if we want to remove it once enqueued
-> >> on a different rq. A sugov 1ms timer is much simpler of course.
-> >> Currently it's not necessary IMO, but for the sake of being future-proof in
-> >> terms of more frequent freq updates I might include it in v2.
-> > 
-> > Making sure things work with purpose would be really great. This implicit
-> > dependency is not great IMHO and make both testing and reasoning about why
-> > things are good or bad harder when analysing real workloads. Especially by non
-> > kernel developers.
-> 
-> Agreed.
-> Even without your proposed changes [1] relying on sugov rate_limit_us is
-> unfortunate.
-> There is a problem with an arbitrarily low rate_limit_us more generally, not
-> just because we kind of rely on the CPU being boosted right before the task is
-> actually enqueued (for the interrupt/softirq part of it), but also because of
-> the latency from requested frequency improvement to actually running on that
-> frequency. If the task is 90% done by the time it sees the improvement and
-> the frequency will be updated (back to a lower one) before the next enqueue,
-> then that's hardly worth the effort.
+From: Andreas Hindborg <a.hindborg@samsung.com>
 
-I think that's why iowait boost is done the way it is today. You need to
-sustain the boost as the thing that need it run for a very short amount of
-time..
+This patch adds an initial version of the Rust null block driver.
 
-Have you looked at how long the iowait boosted tasks run for in your tests?
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+---
+ drivers/block/Kconfig  |  9 +++++
+ drivers/block/Makefile |  3 ++
+ drivers/block/rnull.rs | 82 ++++++++++++++++++++++++++++++++++++++++++
+ scripts/Makefile.build |  2 +-
+ 4 files changed, 95 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/block/rnull.rs
 
-> Currently this is covered by rate_limit_us probabillistically and that seems
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 5b9d4aaebb81..ed209f4f2798 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -354,6 +354,15 @@ config VIRTIO_BLK
+ 	  This is the virtual block driver for virtio.  It can be used with
+           QEMU based VMMs (like KVM or Xen).  Say Y or M.
+ 
++config BLK_DEV_RUST_NULL
++	tristate "Rust null block driver (Experimental)"
++	depends on RUST
++	help
++	  This is the Rust implementation of the null block driver. For now it
++	  is only a minimal stub.
++
++	  If unsure, say N.
++
+ config BLK_DEV_RBD
+ 	tristate "Rados block device (RBD)"
+ 	depends on INET && BLOCK
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index 101612cba303..1105a2d4fdcb 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -9,6 +9,9 @@
+ # needed for trace events
+ ccflags-y				+= -I$(src)
+ 
++obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull_mod.o
++rnull_mod-y := rnull.o
++
+ obj-$(CONFIG_MAC_FLOPPY)	+= swim3.o
+ obj-$(CONFIG_BLK_DEV_SWIM)	+= swim_mod.o
+ obj-$(CONFIG_BLK_DEV_FD)	+= floppy.o
+diff --git a/drivers/block/rnull.rs b/drivers/block/rnull.rs
+new file mode 100644
+index 000000000000..80e240a95446
+--- /dev/null
++++ b/drivers/block/rnull.rs
+@@ -0,0 +1,82 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! This is a Rust implementation of the C null block driver.
++//!
++//! Supported features:
++//!
++//! - blk-mq interface
++//! - direct completion
++//! - block size 4k
++//!
++//! The driver is not configurable.
++
++use kernel::{
++    block::mq::{
++        self,
++        gen_disk::{self, GenDisk},
++        Operations, TagSet,
++    },
++    error::Result,
++    new_mutex, pr_info,
++    prelude::*,
++    sync::{Arc, Mutex},
++    types::ARef,
++};
++
++module! {
++    type: NullBlkModule,
++    name: "rnull_mod",
++    author: "Andreas Hindborg",
++    license: "GPL v2",
++}
++
++struct NullBlkModule {
++    _disk: Pin<Box<Mutex<GenDisk<NullBlkDevice, gen_disk::Added>>>>,
++}
++
++fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Result<GenDisk<NullBlkDevice, gen_disk::Added>> {
++    let block_size: u16 = 4096;
++    if block_size % 512 != 0 || !(512..=4096).contains(&block_size) {
++        return Err(kernel::error::code::EINVAL);
++    }
++
++    let mut disk = gen_disk::try_new(tagset)?;
++    disk.set_name(format_args!("rnullb{}", 0))?;
++    disk.set_capacity_sectors(4096 << 11);
++    disk.set_queue_logical_block_size(block_size.into());
++    disk.set_queue_physical_block_size(block_size.into());
++    disk.set_rotational(false);
++    disk.add()
++}
++
++impl kernel::Module for NullBlkModule {
++    fn init(_module: &'static ThisModule) -> Result<Self> {
++        pr_info!("Rust null_blk loaded\n");
++        let tagset = Arc::pin_init(TagSet::try_new(1, 256, 1))?;
++        let disk = Box::pin_init(new_mutex!(add_disk(tagset)?, "nullb:disk"))?;
++
++        Ok(Self { _disk: disk })
++    }
++}
++
++struct NullBlkDevice;
++
++#[vtable]
++impl Operations for NullBlkDevice {
++    #[inline(always)]
++    fn queue_rq(rq: ARef<mq::Request<Self>>, _is_last: bool) -> Result {
++        mq::Request::end_ok(rq)
++            .map_err(|_e| kernel::error::code::EIO)
++            .expect("Failed to complete request");
++
++        Ok(())
++    }
++
++    fn commit_rqs() {}
++
++    fn complete(rq: ARef<mq::Request<Self>>) {
++        mq::Request::end_ok(rq)
++            .map_err(|_e| kernel::error::code::EIO)
++            .expect("Failed to complete request")
++    }
++}
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index baf86c0880b6..603dee4b66c4 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -263,7 +263,7 @@ $(obj)/%.lst: $(src)/%.c FORCE
+ # Compile Rust sources (.rs)
+ # ---------------------------------------------------------------------------
+ 
+-rust_allowed_features := new_uninit,offset_of
++rust_allowed_features := new_uninit,offset_of,allocator_api
+ 
+ # `--out-dir` is required to avoid temporaries being created by `rustc` in the
+ # current working directory, which may be not accessible in the out-of-tree
+-- 
+2.44.0
 
-Side note. While looking more at the history of rate_limit_us and why it is set
-soo much higher than reported transition_latency by the driver, I am slowly
-reaching the conclusion that what is happening here is similar to introduction
-of down_rate_limit_us in Android. Our ability to predict system requirement is
-not great and we end up with prematurely lowering frequencies, and this rate
-limit just happens to more likely keep it higher so on average you see better
-perf in various workloads. I hope we can improve on this so we don't rely on
-this magic and enable better usage of the hardware ability to transition
-between frequencies fast and be more exact. I am trying to work on this as part
-of my magic margins series. But I think the story is bigger than that..
-
-> to be good enough in practice, but it's not very pleasing (and also EAS can't
-> take it into consideration).
-> That's not just exclusive for iowait wakeup tasks of course, but in theory any
-> that is off the rq frequently (and still requests a higher frequency than it can
-> realistically build up through util_avg like through uclamp_min).
-
-For uclamp_min, if the task RUNNING duration is shorter than the hardware
-ability to apply the boost, I think there's little we can do. The user can opt
-to boost the system in general. Note that this is likely a problem on systems
-with multi-ms transition_delay_us. If the task is running for few 100s us and
-it really wants to be boosted for this short time then a static system wide
-boost is all we can do to guarantee what it wants. The hardware is poor fit for
-the use case in this scenario. And personally I'd push back against introducing
-complexity to deal with such poor fit scenarios. We can already set min freq
-for the policy via sysfs and uclamp_min can still help with task placement for
-HMP systems.
-
-Now the problem we could have which is similar to iowait boost scenario is when
-there's a chaining effect that requires the boost for the duration of the
-chain.
-
-I think we can do something about it if we:
-
-	1. Guarantee the chain will run on the same CPU.
-	2. Introduce a 'sticky' flag for the boost to stay while the chain is
-	   running.
-	3. Introduce a start/finish indication for the chain.
-
-I think we can do something like that with sched-qos [1] to tag the chain via
-a cookie and request the boost to apply to them collectively.
-
-Generally, userspace would be better to collapse this chain into a single task
-that runs in one go.
-
-I don't know how often this scenario exists in practice and what limitations
-exist that make the simple collapse solution infeasible.. So I'd leave this
-out until more info is available.
-
-> 
-> >>>
-> >>> FWIW I do have an implementation for per-task iowait boost where I went a step
-> >>> further and converted intel_pstate too and like Christian didn't notice
-> >>> a regression. But I am not sure (rather don't think) I triggered this use case.
-> >>> I can't tell when the systems truly have per-cpu cpufreq control or just appear
-> >>> so and they are actually shared but not visible at linux level.
-> >>
-> >> Please do share your intel_pstate proposal!
-> > 
-> > This is what I had. I haven't been working on this for the past few months, but
-> > I remember tried several tests on different machines then without a problem.
-> > I tried to re-order patches at some point though and I hope I didn't break
-> > something accidentally and forgot the state.
-> > 
-> > https://github.com/torvalds/linux/compare/master...qais-yousef:linux:uclamp-max-aggregation
-> > 
-> 
-> Thanks for sharing, that looks reasonable with consolidating it into uclamp_min.
-> Couple of thoughts on yours, I'm sure you're aware, but consider it me thinking out
-> loud:
-> - iowait boost is taken into consideration for task placement, but with just the
-> 4 steps that made it more aggressive on HMP. (Potentially 2-3 consecutive iowait
-> wakeups to land on the big instead of running at max OPP of a LITTLE).
-
-Yeah I opted to keep the logic the same. I think there are gains to be had even
-without being smarter about the algorithm. But we do need to improve it, yes.
-The current logic is too aggressive and the perf/power trade-off will be tricky
-in practice.
-
-> - If the current iowait boost decay is sensible is questionable, but there should
-> probably be some decay. Taken to the extreme this would mean something
-> like blk_wait_io() demands 1024 utilization, if it waits for a very long time.
-> Repeating myself here, but iowait wakeups itself is tricky to work with (and I
-> try to work around that).
-
-I didn't get you here. But generally the story can go few levels deep yes. My
-approach was to make incremental progress without breaking existing stuff, but
-help move things in the right direction over time. Fixing everything in one go
-will be hard and not productive.
-
-> - The intel_pstate solution will increase boost even if
-> previous_wakeup->iowait_boost > current->iowait_boost
-> right? But using current->iowait_boost is a clever idea.
-
-I forgot the details now. But I seem to remember intel_pstate had its own
-accounting when it sees iowait boost in intel_pstate_hwp_boost_up/down().
-
-Note that the major worry I had is about the softirq not being boosted.
-Although in my testing this didn't seem to show up as things seemed fine. But
-I haven't dug down to see how accidental this was. I could easily see my
-patches making some use case out there not happy as the softirq might not get
-a chance to see the boost. I got distracted with other stuff and didn't get
-back to the topic since then. I am more than happy to support your efforts
-though :)
-
-[1] https://lore.kernel.org/lkml/20230916213316.p36nhgnibsidoggt@airbuntu/
