@@ -1,85 +1,142 @@
-Received: from mail78-58.sinamail.sina.com.cn (mail78-58.sinamail.sina.com.cn [219.142.78.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E1C14B098
-	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 10:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=219.142.78.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4495314B949
+	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 11:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715597715; cv=none; b=GLxYmDI7b+jIaf/PVFHK1l+NzPqG6CSwH4ZWB0D/eya6tpeFJmBCMrgaTmI0pJv51A+t2adSELWhq1XIkl8WGyf72BM/BR3p+l0o/B84I+Di9v2t1Co4Osuh9zIQG1tPwQ8p2G+D/FYF/f2eNSE61IwA17kdg1dte4XjuffSOe0=
+	t=1715601377; cv=none; b=bTVuGQO3EqtNQgXsYC8pXjmFwT/kv2Rp46uXytHqr9SgJwOMJqkM4Q12RC8vE+hreFgJB6Qsu0CDS8FtY7W6OJ2OrJ32xbgg3cqvfOH8l34CRCJdNwnSxvHcSYX1nPtNh/IbvR6jHo/GkmmMj7AdIxmhjAF9SMQu8iv/Gm3ZAfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715597715; c=relaxed/simple;
-	bh=5oSpI+yEDAjstmktVw/EAv6DAdZsnilJtyVy9s9eXPg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YBXrOmK1V/5ToIPTjZ4eCUXq4QoT5I4rDQZg//8mX9Bts2PjzsI12YhO92Tymrd8zeO75L3CnwdLIL0IgDVP8VuJGTL39Bh56PdS0kb+TkSZMBmkEpArRGFksrmB/GcC3umMGQ7vqPyvQ9OHU4lcJ9iMi97vNfMdXJAqjZwbb0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=219.142.78.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.88.50.17])
-	by sina.com (172.16.235.25) with ESMTP
-	id 6641F15E0000393B; Mon, 13 May 2024 18:54:25 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 45323634210360
-X-SMAIL-UIID: 106C01B471954D5E8661512F8CB6D411-20240513-185425-1
-From: Hillf Danton <hdanton@sina.com>
-To: Sam Sun <samsun1006219@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	syzkaller-bugs@googlegroups.com,
-	xrivendell7@gmail.com
-Subject: Re: [Linux kernel bug] INFO: task hung in blk_mq_get_tag
-Date: Mon, 13 May 2024 18:54:13 +0800
-Message-Id: <20240513105413.2951-1-hdanton@sina.com>
-In-Reply-To: <CAEkJfYPO8OK=JCFphuZvqzqCWpUjPiTVoHma3CY0gLo+rdLKNw@mail.gmail.com>
-References: 
+	s=arc-20240116; t=1715601377; c=relaxed/simple;
+	bh=/K5+pcbqvHdmlKOIY6EGxlQYW8ZajxPOAOvXpRv0FbI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j31zbUkJW9I906xSXaes9RLVrHeDR6VmY+n3J09SWBYhovLxRNeZKhyU//bWaj1MEk+viQOylhcOG3fWgzpW7s4bPqizhSUNOYNb2os2vf2pRyI2kq+LckYYwYd3OIs0ARlzi/D4KxSYgd8C5/QM77560vRf/FmGjKctgyJ2MIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Kew62/v5; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Kew62/v5"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-420180b5897so4551745e9.3
+        for <linux-block@vger.kernel.org>; Mon, 13 May 2024 04:56:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1715601373; x=1716206173; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SVjlWqAdfLnp41PpnyNhWZSZIhghyWvNnJwtCIztyEM=;
+        b=Kew62/v5idseMPnkp4F3MIDryaF9FFyCBe5IoHp8kdaIv6s/GZeDW0KGqOLqak6pH6
+         vcER/yR77fsBwjMmEo5E6WugXHxSkbK0gRbnml211CHOyWG0Fx+tVLP07fjYDFVO6Qim
+         25V7eS6KfLRDl106PkmJdncPCcR1PTEmidqk3mjaS/ggoe869ELFKrIwjrlcJpOI5hrE
+         4SRwHicZx6qaFmaCmAHU5I5gX1jPTii/a7t0+p8tKWfALRLBFsZcCM5SAwE5mDuKxEGa
+         c39mY99OHk2VkgwuLTh7rU0JKXBRjYFSYp5SVDWNh/2/uZY3PzaVPMFC7MWGUrJJIeBJ
+         Dy7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715601373; x=1716206173;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SVjlWqAdfLnp41PpnyNhWZSZIhghyWvNnJwtCIztyEM=;
+        b=xEZMvvsDMgOCexHKvWnWH6Z53n9Vfva6gV8felQ6XslE9hykKdXzueqM2X/UbNi6l8
+         atNDyJSVQY2pek9KI3VnZOR2guxr1Ll48vTWmrzfzZ3ce20pdKKmHu2ghqyhfRqxCQSp
+         sGtk+5TUJTZ29H02GKxGMON3Juk/t7IEsUdb5bztuYYZDOtKEFz3GLEWv2kSpji1WOc8
+         rN8tb+E550q0CkS3jlTtxguVhS6eQhFVvf11abtN/ouYzySCFd4jU1PxROuA9LI7Y1du
+         /oWhKgGbQu6CGusqjElzby+c2ULSiIJGvf8QDN2+uffGmikqKXZtS9noaTkX1ek/CgtU
+         AmDQ==
+X-Gm-Message-State: AOJu0YyhnrstrRYCJWeZaJyh0bjVJjSybF/FAULHhL52/yauWlSKgC1k
+	yRCAgJ5ALXP7clKIuf681QuWFZIhgirH0QTBtfDRxlUeJQjoAv5MmU/pFxTfAdE=
+X-Google-Smtp-Source: AGHT+IFgswfetSuy8fSnW1jZdJ739NMwh+RprYAmO4yJuBB3g7hQJgzPn7f9sw3vDrnKs/BAr/2Q8g==
+X-Received: by 2002:a05:600c:3b26:b0:41f:3ee0:a302 with SMTP id 5b1f17b1804b1-41feac55f70mr66726895e9.30.1715601373573;
+        Mon, 13 May 2024 04:56:13 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccee9335sm154180975e9.29.2024.05.13.04.56.09
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 13 May 2024 04:56:13 -0700 (PDT)
+Date: Mon, 13 May 2024 19:56:05 +0800
+From: joeyli <jlee@suse.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Justin Sanders <justin@coraid.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Chun-Yi Lee <joeyli.kernel@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jens Axboe <axboe@kernel.dk>, Kirill Korotaev <dev@openvz.org>,
+	Nicolai Stange <nstange@suse.com>,
+	Pavel Emelianov <xemul@openvz.org>
+Subject: Re: [PATCH] aoe: fix the potential use-after-free problem in more
+ places
+Message-ID: <20240513115605.GE4433@linux-l9pv.suse>
+References: <20240410134858.6313-1-jlee@suse.com>
+ <11361de9-b145-41c0-8d5e-5312cd710124@web.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <11361de9-b145-41c0-8d5e-5312cd710124@web.de>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 
-On Mon, 13 May 2024 10:38:34 +0800 Sam Sun <samsun1006219@gmail.com>
-> Dear developers and maintainers,
+Hi Markus,
+
+Thanks for your review! I will send v2 patch.
+
+Joey Lee
+
+On Tue, Apr 30, 2024 at 06:16:00PM +0200, Markus Elfring wrote:
+> > For fixing CVE-2023-6270, f98364e92662 patch moved dev_put() from
+> …
 > 
-> We encountered a task hung in function blk_mq_get_tag. It was tested
-> against the latest upstream kernel which was compiled by clang 14.
-
-BTW make it clear if repro is available and if you could test patches
-in reply.
-
-Thanks for your report. See if the below low-hang pear is sweet, I
-mean see if it could survive your repro.
-
---- x/block/blk-mq-tag.c
-+++ y/block/blk-mq-tag.c
-@@ -180,8 +180,10 @@ unsigned int blk_mq_get_tag(struct blk_m
- 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
- 
- 		tag = __blk_mq_get_tag(data, bt);
--		if (tag != BLK_MQ_NO_TAG)
-+		if (tag != BLK_MQ_NO_TAG) {
-+			sbitmap_finish_wait(bt, ws, &wait);
- 			break;
-+		}
- 
- 		bt_prev = bt;
- 		io_schedule();
-@@ -208,8 +210,6 @@ unsigned int blk_mq_get_tag(struct blk_m
- 		ws = bt_wait_ptr(bt, data->hctx);
- 	} while (1);
- 
--	sbitmap_finish_wait(bt, ws, &wait);
--
- found_tag:
- 	/*
- 	 * Give up this allocation if the hctx is inactive.  The caller will
---
+> Please add a subject for the mentioned commit hash.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9-rc6#n99
+> 
+> 
+> > This patch adds dev_hold() to those functions and also uses dev_put()
+> > when the skb_clone() returns NULL.
+> 
+> Please improve this change description with a corresponding imperative wording.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9-rc6#n94
+> 
+> 
+> …
+> > Fixes: f98364e92662 ("aoe: fix the potential use-after-free problem in
+> > aoecmd_cfg_pkts")
+> 
+> I suggest to omit a line break for this tag.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9-rc6#n145
+> 
+> 
+> …
+> > +++ b/drivers/block/aoe/aoecmd.c
+> …
+> > @@ -401,7 +402,8 @@ aoecmd_ata_rw(struct aoedev *d)
+> >  		__skb_queue_head_init(&queue);
+> >  		__skb_queue_tail(&queue, skb);
+> >  		aoenet_xmit(&queue);
+> > -	}
+> > +	} else
+> > +		dev_put(f->t->ifp->nd);
+> >  	return 1;
+> >  }
+> >
+> …
+> > @@ -617,7 +622,8 @@ probe(struct aoetgt *t)
+> >  		__skb_queue_head_init(&queue);
+> >  		__skb_queue_tail(&queue, skb);
+> >  		aoenet_xmit(&queue);
+> > -	}
+> > +	} else
+> > +		dev_put(f->t->ifp->nd);
+> >  }
+> >
+> >  static long
+> …
+> 
+> Should curly brackets be used for both if branches in these function implementations?
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/coding-style.rst?h=v6.9-rc6#n213
+> 
+> Regards,
+> Markus
