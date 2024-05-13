@@ -1,142 +1,148 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4495314B949
-	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 11:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57E314EC56
+	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 11:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715601377; cv=none; b=bTVuGQO3EqtNQgXsYC8pXjmFwT/kv2Rp46uXytHqr9SgJwOMJqkM4Q12RC8vE+hreFgJB6Qsu0CDS8FtY7W6OJ2OrJ32xbgg3cqvfOH8l34CRCJdNwnSxvHcSYX1nPtNh/IbvR6jHo/GkmmMj7AdIxmhjAF9SMQu8iv/Gm3ZAfY=
+	t=1715601516; cv=none; b=Vt4PkiGA1zGpcP9Me5kLc6VGGxpwS8KPrRT4uWleiUJaHfECDrahv7Fu1YSBcP1arMoW8jAvJXxMmE410uBrX8FpIHTFKJUo6nU2zaKAXoglXNSjpKPtAlNurz4d4qQaEisK/igMXRVKFgpv6gFedBbGtVP2pPsrR2nEaAot+WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715601377; c=relaxed/simple;
-	bh=/K5+pcbqvHdmlKOIY6EGxlQYW8ZajxPOAOvXpRv0FbI=;
+	s=arc-20240116; t=1715601516; c=relaxed/simple;
+	bh=PrR35GiulFe05GlhKAd3AxFWa4/eHJrBCI6ecndk+OY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j31zbUkJW9I906xSXaes9RLVrHeDR6VmY+n3J09SWBYhovLxRNeZKhyU//bWaj1MEk+viQOylhcOG3fWgzpW7s4bPqizhSUNOYNb2os2vf2pRyI2kq+LckYYwYd3OIs0ARlzi/D4KxSYgd8C5/QM77560vRf/FmGjKctgyJ2MIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Kew62/v5; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=YEL+kDjdW4ft2XpKveoKgp6YC0CsllYthkN8VbLOzNbZxHg58iHYGVa/eAjhekbOMVMRvUE41dYlae1oE0bAtNW3Vvwkqrbka9N+xLmuSXmeXqYkmQ5u1Yk138/pde0Cu3HEa36Np4j2/xwy0n4GhhCNytLKaojzf7m9LPtf9s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gDsbwYu6; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Kew62/v5"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-420180b5897so4551745e9.3
-        for <linux-block@vger.kernel.org>; Mon, 13 May 2024 04:56:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1715601373; x=1716206173; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-transfer-encoding
-         :content-disposition:mime-version:references:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SVjlWqAdfLnp41PpnyNhWZSZIhghyWvNnJwtCIztyEM=;
-        b=Kew62/v5idseMPnkp4F3MIDryaF9FFyCBe5IoHp8kdaIv6s/GZeDW0KGqOLqak6pH6
-         vcER/yR77fsBwjMmEo5E6WugXHxSkbK0gRbnml211CHOyWG0Fx+tVLP07fjYDFVO6Qim
-         25V7eS6KfLRDl106PkmJdncPCcR1PTEmidqk3mjaS/ggoe869ELFKrIwjrlcJpOI5hrE
-         4SRwHicZx6qaFmaCmAHU5I5gX1jPTii/a7t0+p8tKWfALRLBFsZcCM5SAwE5mDuKxEGa
-         c39mY99OHk2VkgwuLTh7rU0JKXBRjYFSYp5SVDWNh/2/uZY3PzaVPMFC7MWGUrJJIeBJ
-         Dy7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715601373; x=1716206173;
-        h=user-agent:in-reply-to:content-transfer-encoding
-         :content-disposition:mime-version:references:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SVjlWqAdfLnp41PpnyNhWZSZIhghyWvNnJwtCIztyEM=;
-        b=xEZMvvsDMgOCexHKvWnWH6Z53n9Vfva6gV8felQ6XslE9hykKdXzueqM2X/UbNi6l8
-         atNDyJSVQY2pek9KI3VnZOR2guxr1Ll48vTWmrzfzZ3ce20pdKKmHu2ghqyhfRqxCQSp
-         sGtk+5TUJTZ29H02GKxGMON3Juk/t7IEsUdb5bztuYYZDOtKEFz3GLEWv2kSpji1WOc8
-         rN8tb+E550q0CkS3jlTtxguVhS6eQhFVvf11abtN/ouYzySCFd4jU1PxROuA9LI7Y1du
-         /oWhKgGbQu6CGusqjElzby+c2ULSiIJGvf8QDN2+uffGmikqKXZtS9noaTkX1ek/CgtU
-         AmDQ==
-X-Gm-Message-State: AOJu0YyhnrstrRYCJWeZaJyh0bjVJjSybF/FAULHhL52/yauWlSKgC1k
-	yRCAgJ5ALXP7clKIuf681QuWFZIhgirH0QTBtfDRxlUeJQjoAv5MmU/pFxTfAdE=
-X-Google-Smtp-Source: AGHT+IFgswfetSuy8fSnW1jZdJ739NMwh+RprYAmO4yJuBB3g7hQJgzPn7f9sw3vDrnKs/BAr/2Q8g==
-X-Received: by 2002:a05:600c:3b26:b0:41f:3ee0:a302 with SMTP id 5b1f17b1804b1-41feac55f70mr66726895e9.30.1715601373573;
-        Mon, 13 May 2024 04:56:13 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccee9335sm154180975e9.29.2024.05.13.04.56.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 13 May 2024 04:56:13 -0700 (PDT)
-Date: Mon, 13 May 2024 19:56:05 +0800
-From: joeyli <jlee@suse.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	Justin Sanders <justin@coraid.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Chun-Yi Lee <joeyli.kernel@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jens Axboe <axboe@kernel.dk>, Kirill Korotaev <dev@openvz.org>,
-	Nicolai Stange <nstange@suse.com>,
-	Pavel Emelianov <xemul@openvz.org>
-Subject: Re: [PATCH] aoe: fix the potential use-after-free problem in more
- places
-Message-ID: <20240513115605.GE4433@linux-l9pv.suse>
-References: <20240410134858.6313-1-jlee@suse.com>
- <11361de9-b145-41c0-8d5e-5312cd710124@web.de>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gDsbwYu6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715601514; x=1747137514;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PrR35GiulFe05GlhKAd3AxFWa4/eHJrBCI6ecndk+OY=;
+  b=gDsbwYu6C0poVoBsp++mFv5iJ23bAgUlZskbCcbbQRL39+ZyiSrPMOqF
+   3cvVmT3GOB2lfslRDmGVFdwC2+JpssepSk7BEQtlRg1/YRypQLFfc/JSE
+   gD0BiZ1c+6uJDE6uKiM+yVJ4QVOmefn4QmMZxzGwqN8t+Gi8B+xy2UTYJ
+   uLtKmCNxMUZv5gXaXS8JM8y/90gxC1FLnO12Lkt0BH1IaIWLUd3+68Lh9
+   PnPR4w+PPR7L39sYfO5CHajbBGq8N1ShSPnT9U+oLTYpy68BLRuWMVpgj
+   yybh+uOcHpeTpkOLiqFkQG/McQMGupMSuzL2qtUo7NS5g9G+Sh6XXVQ05
+   A==;
+X-CSE-ConnectionGUID: 2mPdNUkBS4KYVBXHNHn1Bg==
+X-CSE-MsgGUID: m6iHfVqZR5iCmov6g2b81g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="15342083"
+X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
+   d="scan'208";a="15342083"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:58:34 -0700
+X-CSE-ConnectionGUID: xcwqmTJNRtKYJ0Jq01KgPA==
+X-CSE-MsgGUID: XpeGDUyYSCqR90C+hNbjig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
+   d="scan'208";a="30270709"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 13 May 2024 04:58:27 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s6UK0-000A6N-2c;
+	Mon, 13 May 2024 11:58:24 +0000
+Date: Mon, 13 May 2024 19:58:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Greg KH <greg@kroah.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Yexuan Yang <1182282462@bupt.edu.cn>,
+	Sergio =?iso-8859-1?Q?Gonz=E1lez?= Collado <sergio.collado@gmail.com>,
+	Joel Granados <j.granados@samsung.com>,
+	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Niklas Cassel <Niklas.Cassel@wdc.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Conor Dooley <conor@kernel.org>,
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH 1/3] rust: block: introduce `kernel::block::mq` module
+Message-ID: <202405131926.5TqIqaTc-lkp@intel.com>
+References: <20240512183950.1982353-2-nmi@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <11361de9-b145-41c0-8d5e-5312cd710124@web.de>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20240512183950.1982353-2-nmi@metaspace.dk>
 
-Hi Markus,
+Hi Andreas,
 
-Thanks for your review! I will send v2 patch.
+kernel test robot noticed the following build warnings:
 
-Joey Lee
+[auto build test WARNING on fec50db7033ea478773b159e0e2efb135270e3b7]
 
-On Tue, Apr 30, 2024 at 06:16:00PM +0200, Markus Elfring wrote:
-> > For fixing CVE-2023-6270, f98364e92662 patch moved dev_put() from
-> …
-> 
-> Please add a subject for the mentioned commit hash.
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9-rc6#n99
-> 
-> 
-> > This patch adds dev_hold() to those functions and also uses dev_put()
-> > when the skb_clone() returns NULL.
-> 
-> Please improve this change description with a corresponding imperative wording.
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9-rc6#n94
-> 
-> 
-> …
-> > Fixes: f98364e92662 ("aoe: fix the potential use-after-free problem in
-> > aoecmd_cfg_pkts")
-> 
-> I suggest to omit a line break for this tag.
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9-rc6#n145
-> 
-> 
-> …
-> > +++ b/drivers/block/aoe/aoecmd.c
-> …
-> > @@ -401,7 +402,8 @@ aoecmd_ata_rw(struct aoedev *d)
-> >  		__skb_queue_head_init(&queue);
-> >  		__skb_queue_tail(&queue, skb);
-> >  		aoenet_xmit(&queue);
-> > -	}
-> > +	} else
-> > +		dev_put(f->t->ifp->nd);
-> >  	return 1;
-> >  }
-> >
-> …
-> > @@ -617,7 +622,8 @@ probe(struct aoetgt *t)
-> >  		__skb_queue_head_init(&queue);
-> >  		__skb_queue_tail(&queue, skb);
-> >  		aoenet_xmit(&queue);
-> > -	}
-> > +	} else
-> > +		dev_put(f->t->ifp->nd);
-> >  }
-> >
-> >  static long
-> …
-> 
-> Should curly brackets be used for both if branches in these function implementations?
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/coding-style.rst?h=v6.9-rc6#n213
-> 
-> Regards,
-> Markus
+url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/rust-block-introduce-kernel-block-mq-module/20240513-024107
+base:   fec50db7033ea478773b159e0e2efb135270e3b7
+patch link:    https://lore.kernel.org/r/20240512183950.1982353-2-nmi%40metaspace.dk
+patch subject: [PATCH 1/3] rust: block: introduce `kernel::block::mq` module
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240513/202405131926.5TqIqaTc-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240513/202405131926.5TqIqaTc-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405131926.5TqIqaTc-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> warning: unresolved link to `GenDisk`
+   --> rust/kernel/block/mq.rs:10:18
+   |
+   10 | //! - Create a [`GenDisk<T>`], passing in the `TagSet` reference
+   |                  ^^^^^^^^^^ no item named `GenDisk` in scope
+   |
+   = help: to escape `[` and `]` characters, add '' before them like `[` or `]`
+   = note: `#[warn(rustdoc::broken_intra_doc_links)]` on by default
+--
+>> warning: unresolved link to `GenDisk::add`
+   --> rust/kernel/block/mq.rs:11:47
+   |
+   11 | //! - Add the disk to the system by calling [`GenDisk::add`]
+   |                                               ^^^^^^^^^^^^ no item named `GenDisk` in scope
+--
+>> warning: unresolved link to `Operations::RequestData`
+   --> rust/kernel/block/mq.rs:22:45
+   |
+   22 | //! associated types in `Operations`, see [`Operations::RequestData`] for an
+   |                                             ^^^^^^^^^^^^^^^^^^^^^^^ the trait `Operations` has no associated item named `RequestData`
+--
+>> warning: unresolved link to `Request::start`
+   --> rust/kernel/block/mq.rs:30:51
+   |
+   30 | //! mark start of request processing by calling [`Request::start`] and end of
+   |                                                   ^^^^^^^^^^^^^^ the struct `Request` has no field or associated item named `start`
+--
+>> warning: unresolved link to `Request::end`
+   --> rust/kernel/block/mq.rs:31:40
+   |
+   31 | //! processing by calling one of the [`Request::end`], methods. Failure to do so
+   |                                        ^^^^^^^^^^^^ the struct `Request` has no field or associated item named `end`
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
