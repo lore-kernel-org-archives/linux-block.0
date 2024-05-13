@@ -1,192 +1,134 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158DF14AD02;
-	Mon, 13 May 2024 12:19:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BE114EC5E;
+	Mon, 13 May 2024 12:23:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715602759; cv=none; b=Dw4L2E4FBoUZ7lmn99uK++3DQSbg2/2piWsrcYI7a8ytkv3W6N/ca5WBsyZBRVOCQBQVCgii2yuxdTQqkXeDB2r77t2mToIs1AA5n8UgTiYNe5Ob2rg7itiAqxtrfHwD77lDP7Yaej/O532XzQLu54FdmYfVkKa6WQRU9lc5AYU=
+	t=1715602986; cv=none; b=aEpvjtEbFh0kOLECbCUiC2PeZlwIMeyySqCEEdtxJAdhXR8UCY1t9SjKKU1j1OBsWeOZvbTIkTj7LCmRM+kJjQwFff8z2tx7uxBZqOCDBUUHRXaVxlm7R79OCYGnw+2CLiCxJJn4jKKHXIwHLXnv1E7yxrqLNTLsiJYwpPmaJd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715602759; c=relaxed/simple;
-	bh=kGwJDyXDTrdeGxyVauCIhfgu5eE81vJ3XmNmSQWsYaQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bGZPQkva7ugm4ec6pNucbz+GWh1/3tQXSgZpHkns6/S/Kyle+hwoET3ofAHuumgTPh8NDdBsb4v6V86f9v5uKbo4zRw/FKJLHKH5Y8xh2xPv0sbhga6M0XPm5ZFax39rst2Nbwm6HDEu7nOwpnDDgvKY5JOJdn0MuxoFCMCNIbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VdJSL6SFTz4f3n6D;
-	Mon, 13 May 2024 20:18:58 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 00A3D1A01D2;
-	Mon, 13 May 2024 20:19:08 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgAn9g46BUJm8iY0Mg--.57325S5;
-	Mon, 13 May 2024 20:19:08 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH -next 1/2] blk-throttle: factor out a helper to get throtl_slice from tg
-Date: Mon, 13 May 2024 20:08:47 +0800
-Message-Id: <20240513120848.2828797-2-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240513120848.2828797-1-yukuai1@huaweicloud.com>
-References: <20240513120848.2828797-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1715602986; c=relaxed/simple;
+	bh=GMpp0dPFuIFfvEUduPyIjFcKlLnBpiSg9daDEDmMREo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lTbCEDmoImQbPZtEd015bqs/NgWxm3yrLzT7C+QzanKiRLejU3OtGamWaxEWDKeM6eTVRvEBCx6+FkmU/xp0G47gBpZ4xAXM6PbkDp0fEHvEFhTgpqWWzAcCV0qGG7uZ2jWU/Dd1JHPnLM5xGIpC08b5n+47Ujf2tPKkW6IYkbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=jzT6xeI3; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="jzT6xeI3"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VdJXy1tR4z6Cnk90;
+	Mon, 13 May 2024 12:22:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1715602962; x=1718194963; bh=7Ih71/Watz1cdPTWlkmWtBwl
+	P9ZcU5ZJPsGWDZOPS0Y=; b=jzT6xeI3w+cBrbZgW+L7A5crY0hWa6Q4mx/1MHQE
+	B8JU1uAtmpxRvcx8kY5GQZBcuGgyo2OONYgKdIgmhlAvT6oKhREKiOFVCBfTCmHA
+	a3JXZoC1XANZmc9Z/saTfeC99ouZ0tuRaxaafBSKRBySDS3d6wwcjB+VOxYoJYuG
+	Kshui5g5ctx5ZcnXxJ/HO/HaeHSThdryHdvqM/b3bwdcbQkcR27Z6D6ISOpRZDCi
+	6N1JwHxIu+EMOmqRUAf+7TGxu6V+wD0lNfW+An2y4fbLVOVBDm6pCyNoR80qHnHM
+	9X88dvEGxU9nWcY+IUWLez3lumEp7uNOlnogIavx0EP7hg==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 6kRT-qnGtJMv; Mon, 13 May 2024 12:22:42 +0000 (UTC)
+Received: from [172.20.0.79] (unknown [8.9.45.205])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VdJXV0Dx6z6Cnk8s;
+	Mon, 13 May 2024 12:22:33 +0000 (UTC)
+Message-ID: <1b618942-a0fe-45d9-90de-eede429e7284@acm.org>
+Date: Mon, 13 May 2024 06:22:31 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAn9g46BUJm8iY0Mg--.57325S5
-X-Coremail-Antispam: 1UD129KBjvJXoW3GF1DuFyfJF48Cr45XF4Utwb_yoW7XryxpF
-	WfAa1jqw45Jas7KFW5uwn0yay0kws7JryUJw13Xr4rCF13t3W8JFyDZryUAa4UAas7ua1S
-	y3Wqv345KF42yrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
-	x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-	xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-	6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-	Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-	Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-	IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUqAp5UUUUU
-	=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] rust: block: introduce `kernel::block::mq` module
+To: Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+ Damien Le Moal <Damien.LeMoal@wdc.com>, Hannes Reinecke <hare@suse.de>,
+ Ming Lei <ming.lei@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>,
+ Wedson Almeida Filho <wedsonaf@gmail.com>,
+ Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>,
+ Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>,
+ =?UTF-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>,
+ Joel Granados <j.granados@samsung.com>,
+ "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+ Daniel Gomez <da.gomez@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>,
+ Philipp Stanner <pstanner@redhat.com>, Conor Dooley <conor@kernel.org>,
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ =?UTF-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>,
+ open list <linux-kernel@vger.kernel.org>,
+ "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ "gost.dev@samsung.com" <gost.dev@samsung.com>
+References: <20240512183950.1982353-1-nmi@metaspace.dk>
+ <20240512183950.1982353-2-nmi@metaspace.dk>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240512183950.1982353-2-nmi@metaspace.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 5/12/24 11:39, Andreas Hindborg wrote:
+> +    /// Set the logical block size of the device.
+> +    ///
+> +    /// This is the smallest unit the storage device can address. It i=
+s
+> +    /// typically 512 bytes.
 
-There are no functional changes, prepare to use bigger slice in the case
-that iops limit is quite low in the next patch.
+Hmm ... all block devices that I have encountered recently have a
+logical block size of 4096 bytes. Isn't this the preferred logical
+block size for SSDs and for SMR hard disks?
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
+> +    /// Set the physical block size of the device.
+> +    ///
+> +    /// This is the smallest unit a physical storage device can write
+> +    /// atomically. It is usually the same as the logical block size b=
+ut may be
+> +    /// bigger. One example is SATA drives with 4KB sectors that expos=
+e a
+> +    /// 512-byte logical block size to the operating system.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 80aaca18bfb0..69f1bb91ea78 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -489,6 +489,11 @@ static bool throtl_schedule_next_dispatch(struct throtl_service_queue *sq,
- 	return false;
- }
- 
-+static unsigned int tg_throtl_slice(struct throtl_grp *tg, int rw)
-+{
-+	return tg->td->throtl_slice;
-+}
-+
- static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 		bool rw, unsigned long start)
- {
-@@ -506,7 +511,7 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 	if (time_after(start, tg->slice_start[rw]))
- 		tg->slice_start[rw] = start;
- 
--	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
-+	tg->slice_end[rw] = jiffies + tg_throtl_slice(tg, rw);
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice with credit start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -519,7 +524,7 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
- 	tg->slice_start[rw] = jiffies;
--	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
-+	tg->slice_end[rw] = jiffies + tg_throtl_slice(tg, rw);
- 	if (clear_carryover) {
- 		tg->carryover_bytes[rw] = 0;
- 		tg->carryover_ios[rw] = 0;
-@@ -534,7 +539,7 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
- static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
- 					unsigned long jiffy_end)
- {
--	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
-+	tg->slice_end[rw] = roundup(jiffy_end, tg_throtl_slice(tg, rw));
- }
- 
- static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
-@@ -594,6 +599,7 @@ static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
- /* Trim the used slices and adjust slice start accordingly */
- static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- {
-+	unsigned int slice;
- 	unsigned long time_elapsed;
- 	long long bytes_trim;
- 	int io_trim;
-@@ -616,10 +622,10 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	 * is bad because it does not allow new slice to start.
- 	 */
- 
--	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
-+	slice = tg_throtl_slice(tg, rw);
-+	throtl_set_slice_end(tg, rw, jiffies + slice);
- 
--	time_elapsed = rounddown(jiffies - tg->slice_start[rw],
--				 tg->td->throtl_slice);
-+	time_elapsed = rounddown(jiffies - tg->slice_start[rw], slice);
- 	if (!time_elapsed)
- 		return;
- 
-@@ -647,7 +653,7 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 
- 	throtl_log(&tg->service_queue,
- 		   "[%c] trim slice nr=%lu bytes=%lld io=%d start=%lu end=%lu jiffies=%lu",
--		   rw == READ ? 'R' : 'W', time_elapsed / tg->td->throtl_slice,
-+		   rw == READ ? 'R' : 'W', time_elapsed / slice,
- 		   bytes_trim, io_trim, tg->slice_start[rw], tg->slice_end[rw],
- 		   jiffies);
- }
-@@ -701,7 +707,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
- 	jiffy_elapsed = jiffies - tg->slice_start[rw];
- 
- 	/* Round up to the next throttle slice, wait time must be nonzero */
--	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg_throtl_slice(tg, rw));
- 	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
- 		     tg->carryover_ios[rw];
- 	if (io_allowed > 0 && tg->io_disp[rw] + 1 <= io_allowed)
-@@ -730,9 +736,9 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	/* Slice has just started. Consider one slice interval */
- 	if (!jiffy_elapsed)
--		jiffy_elapsed_rnd = tg->td->throtl_slice;
-+		jiffy_elapsed_rnd = tg_throtl_slice(tg, rw);
- 
--	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg_throtl_slice(tg, rw));
- 	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
- 			tg->carryover_bytes[rw];
- 	if (bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
-@@ -792,10 +798,10 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
- 		throtl_start_new_slice(tg, rw, true);
- 	else {
--		if (time_before(tg->slice_end[rw],
--		    jiffies + tg->td->throtl_slice))
--			throtl_extend_slice(tg, rw,
--				jiffies + tg->td->throtl_slice);
-+		unsigned int slice = tg_throtl_slice(tg, rw);
-+
-+		if (time_before(tg->slice_end[rw], jiffies + slice))
-+			throtl_extend_slice(tg, rw, jiffies + slice);
- 	}
- 
- 	bps_wait = tg_within_bps_limit(tg, bio, bps_limit);
--- 
-2.39.2
+Please be consistent and change "4 KB sectors" into "4 KB physical block
+size".
 
+I think that the physical block size can also be smaller than the
+logical block size. From the SCSI SBC standard:
+
+Table 91 =E2=80=94 LOGICAL BLOCKS PER PHYSICAL BLOCK EXPONENT field
+-----  ------------------------------------------------------------
+Code   Description
+-----  ------------------------------------------------------------
+0      One or more physical blocks per logical block (the number of
+        physical blocks per logical block is not reported).
+n > 0  2**n logical blocks per physical block
+-----  ------------------------------------------------------------
+
+> +impl<T: Operations, S: GenDiskState> GenDisk<T, S> {
+> +    /// Call to tell the block layer the capacity of the device in sec=
+tors (512B).
+
+Why to use any other unit than bytes in Rust block::mq APIs? sector_t
+was introduced before 64-bit CPUs became available to reduce the number
+of bytes required to represent offsets. I don't think that this is still
+a concern today. Hence my proposal to be consistent in the Rust=20
+block::mq API and to use bytes as the unit in all APIs.
+
+Thanks,
+
+Bart.
