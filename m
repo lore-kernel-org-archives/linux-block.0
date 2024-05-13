@@ -1,144 +1,255 @@
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BE1146D62
-	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 08:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A81A1474B1
+	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 09:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715588071; cv=none; b=o5kII4rp7NrL9uw4tQ0uIJpZZTdMqCqMXLX1PfbGazJlQFiyx6UlUF3qYVNYd7vc8aziHv+BmfA8YJkVoxQDROmg7El/Hk+88zMVTLcUnykQ4U51wSKibwZrspuZ411lS4PGg9CFOleLtuG/fdAjmuLoyl7mD1BUpqyLZzX0FP0=
+	t=1715592736; cv=none; b=lynTjiEpmk9ZmwbnfBKJWZelbF2MOk+l/UYjIz7QuFi8zla2TCOz0j3RN0LO51lDQeBuBLCxbpmr8ZxG0cUkU4WbmYnTZ3aCFjo8GtrT+81Jk6ZZtRewJKNvoaUzCXqoC6PXfigj6qFGLJDgVdjygk7Zbs8Gqh8Rdxei7pWwgd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715588071; c=relaxed/simple;
-	bh=12ml4wWfxQl4jhbhqgvB8GySKJX6FlqTruuxJO3r50s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XoVgh32CZsnNJlF1lE6Pc3/9Q/oaBvHaxd7bvznjmiRGzzCQSzOpkXmFmPaOzVyc0Ikkhiawfh6GjyB5u8CRz6mKGJuGe73wOG0el07lja6PorsD9RirvKJD2SlY5/La7boRE1awBYcKok8ZPDzmaVAyzTtMxP01f0Hq5+GUc2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mc6nznAe; arc=none smtp.client-ip=209.85.222.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1715592736; c=relaxed/simple;
+	bh=Q3cQFLlFJQJ3q7xAmfD5Nbt3jz+06UgaKT8Gs/twL4w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=SZBJPMViz3Be9CA2lAxMDYbZ1zzsRsazf/Xj55Cxlf6bL93Y5xheFgvb8jARPjij9pPlsQ36YC4hUwPuq8lqjcGaaaamrO6t5pd7cWQFaIu2NqoHcpQNoM3jqgUD39DGltO7O6lRRKVByo46521su5LX3fc76KyhoSSv2LsW0Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=eYWNTMPR; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mc6nznAe"
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-7f34ebbcde4so1152287241.3
-        for <linux-block@vger.kernel.org>; Mon, 13 May 2024 01:14:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715588067; x=1716192867; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=f0QsI6eg5FRHjsJ3EXAYkOdUsRM9QF3yW2xylikNfdY=;
-        b=mc6nznAe164x80c7YoJMbtDNP7Os9yNeaBOuOgoZaxVmnTpTXhM7aXwA/BFq3OedU5
-         ozmMpKEAjtcIUyHUS2E8C5Qu9VOhR49+rPByIeMFdjknlTmKXJpUjLA0foRWY6F8M0sp
-         8nlnj6toixhcQdyJZcf+sKVX6kP2soHeskCQBs4a1kaysSECppmX5ikLPgM474QfHQ/N
-         7ancMeBGBARY+K26FXcTt899+m5rFU0XBWPg1brekvl4RbVG9n3wgzPk5/nvfoNZGMs0
-         SBvg/Js4n5la2qTIYka+5cqf1HqH2PRcgXeBWJ3aL1jtVKx09Y6wzpyDo1dfYYSLbKdJ
-         rEUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715588067; x=1716192867;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f0QsI6eg5FRHjsJ3EXAYkOdUsRM9QF3yW2xylikNfdY=;
-        b=bkxdUlcOyrBWOsZ9t01IiZUyx/zxAMi1LJ1oBMK4Qy9SJxl+gyD8m+2hqHI0ilLk3T
-         oLaLsm873LwI0PIrVIRB/re4Ie7WfF9Z2hZtlt4MiW9F/bq7ZMjgD4s6JAJ2EFtdUkXy
-         8YhbYoHbcuy+HXTLddEMMhuQh5bmTO6PMH2NuSsw3jgb5OAF9TBHo/++ihbgjSzC9Y1i
-         26NF8sLnabYAdM/bB0ynX+ivR/pq5tW/HT3/WwR0PirV71sE+Og6h9iaYtYJR9cj/LXL
-         LTc5S7P/vV1qb+FBYg8La7wakaty9fBj+dLz1C0QX2L6rNCuwlxhNkk2SMsb4Zx0Z7Cl
-         unQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5elLMiWyo6qxNsVSeJufHShaoS+wTjmwcNDirsDdShv5QuDdQhDBT0VjSTbAkK9diyg+TqCyoVg+eDdn05RmCuHXxhYM3E1NN398=
-X-Gm-Message-State: AOJu0YyOi0EV23zpYvV5RS+n8SNcBgN/9QDXFTiGqo7jwHWlHFq+vfnF
-	yZM4t+aQpdEIlNAl33hCrpO/Bzrxk5M/jRCm3y50xQXu89XvnRDCakuJU8cERbBcdoqt8K2gmdU
-	uJmu9kQczJ3Gnx+oR2utxBxmRXpxpwCr7oX/alUhPUUTyn/BwQQ==
-X-Google-Smtp-Source: AGHT+IEN0CwwIMvMPcNvYrtwL0GHvXK2FmCEs3NcLvhxj5VrVLU78hu+gqQv8TlnVYs4qK+0BgkSJwJf7Ph04NygmMk=
-X-Received: by 2002:a05:6102:38ca:b0:47c:2c87:f019 with SMTP id
- ada2fe7eead31-48077db706cmr10268656137.5.1715588067255; Mon, 13 May 2024
- 01:14:27 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="eYWNTMPR"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240513093210epoutp024cde29dd228272f348fd0803e33452d0~PAn-C4kUp0899108991epoutp02d
+	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 09:32:10 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240513093210epoutp024cde29dd228272f348fd0803e33452d0~PAn-C4kUp0899108991epoutp02d
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1715592730;
+	bh=medcbqT+hzhIxEb9+cGAuNRKUIWaALINKfbnzpxDjK8=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=eYWNTMPRgMCYh6gQNSWxDJzKW+rEirm/F3UlJAWFYKJu5EzxFWom00Q4PKadeBVVt
+	 q/u0F0BW8Pu2NaZB8LPjcKDKKYGcCRjQZPuxE8dntRYwYNFJEvaHdHRSOwKoTvEel4
+	 aPlYCKHATEWP3Q/4TyOz/0lITw80hDwfyhms2wrg=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240513093210epcas5p47744252ca84d3f28fbcd33c94312f1f0~PAn_fdLmV0087000870epcas5p4R;
+	Mon, 13 May 2024 09:32:10 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4VdDlr31yfz4x9Q2; Mon, 13 May
+	2024 09:32:08 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F9.2C.08600.71ED1466; Mon, 13 May 2024 18:32:07 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240513084939epcas5p4530be8e7fc62b8d4db694d6b5bca3a19~PAC2ldK7h1354513545epcas5p4x;
+	Mon, 13 May 2024 08:49:39 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240513084939epsmtrp2506b8b1119eb210831094d9d8e576497~PAC2kp_2s2957029570epsmtrp2W;
+	Mon, 13 May 2024 08:49:39 +0000 (GMT)
+X-AuditID: b6c32a44-921fa70000002198-31-6641de17f54e
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D7.86.09238.224D1466; Mon, 13 May 2024 17:49:38 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240513084934epsmtip2f6bbb4448dc7bebe6596907b473c2b55~PACyqlI7F2689126891epsmtip2B;
+	Mon, 13 May 2024 08:49:34 +0000 (GMT)
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	martin.petersen@oracle.com, Anuj Gupta <anuj20.g@samsung.com>, Kanchan Joshi
+	<joshi.k@samsung.com>
+Subject: [PATCH v2] block: unmap and free user mapped integrity via
+ submitter
+Date: Mon, 13 May 2024 14:12:22 +0530
+Message-Id: <20240513084222.8577-1-anuj20.g@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510141921.883231-1-leitao@debian.org> <ef8c5f6d-17e3-4504-8560-b970912b9eae@acm.org>
- <de92101c-f9c4-4af4-95f4-19a6f59b636f@paulmck-laptop> <d037f37a-4722-4a1d-a282-63355a97a1a1@acm.org>
- <c83d9c25-b839-4e31-8dd4-85f3cb938653@paulmck-laptop> <4d230bac-bdb0-4a01-8006-e95156965aa8@acm.org>
- <447ad732-3ff8-40bf-bd82-f7be66899cee@paulmck-laptop> <ca7c2ef0-7e21-4fb3-ac6b-3dae652a7a0e@acm.org>
- <59ec96c2-52ce-4da1-92c3-9fe38053cd3d@paulmck-laptop>
-In-Reply-To: <59ec96c2-52ce-4da1-92c3-9fe38053cd3d@paulmck-laptop>
-From: Marco Elver <elver@google.com>
-Date: Mon, 13 May 2024 10:13:49 +0200
-Message-ID: <CANpmjNMj9r1V6Z63fcJxrFC1v4i2vUCEhm1HT77ikxhx0Rghdw@mail.gmail.com>
-Subject: Re: [PATCH] block: Annotate a racy read in blk_do_io_stat()
-To: paulmck@kernel.org
-Cc: Bart Van Assche <bvanassche@acm.org>, Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAJsWRmVeSWpSXmKPExsWy7bCmhq74Pcc0gy2ndC2aJvxltlh9t5/N
+	YuXqo0wWR/+/ZbOYdOgao8XeW9oW85c9ZbdYfvwfkwOHx+WzpR6bVnWyeWxeUu+x+2YDm8fH
+	p7dYPPq2rGL0+LxJLoA9KtsmIzUxJbVIITUvOT8lMy/dVsk7ON453tTMwFDX0NLCXEkhLzE3
+	1VbJxSdA1y0zB+gkJYWyxJxSoFBAYnGxkr6dTVF+aUmqQkZ+cYmtUmpBSk6BSYFecWJucWle
+	ul5eaomVoYGBkSlQYUJ2RtO3YywFX9UqHv++wdbAeFGhi5GTQ0LARGLHtinMXYxcHEICuxkl
+	utfug3I+MUosmP2UHcL5xijR0biFpYuRA6zl3GM+iPheRomevk6ojs+MEtO2z2MEmcsmoC5x
+	5HkrmC0iYCSx/9NJVpAiZoHljBKfJx5iBUkIC/hL7F0yH6yIRUBV4uvOP+wgNq+AhcSjp+tZ
+	IA6Ul5h56TtUXFDi5MwnYHFmoHjz1tlgmyUEHrFLbHl0hQmiwUXi4I27jBC2sMSr41vYIWwp
+	ic/v9rJB2OkSPy4/haovkGg+tg+q3l6i9VQ/M8ibzAKaEut36UOEZSWmnlrHBLGXT6L39xOo
+	Vl6JHfNgbCWJ9pVzoGwJib3nGqBsD4mNJ16C/SskECtxde0RxgmM8rOQvDMLyTuzEDYvYGRe
+	xSiZWlCcm56abFpgmJdaDo/Z5PzcTYzgpKnlsoPxxvx/eocYmTgYDzFKcDArifA6FNqnCfGm
+	JFZWpRblxxeV5qQWH2I0BYbxRGYp0eR8YNrOK4k3NLE0MDEzMzOxNDYzVBLnfd06N0VIID2x
+	JDU7NbUgtQimj4mDU6qBaVuzzQX2Xe/iv/3+ImnaZm7z73TxcoYizfpNc9M8H818uCdxfeAR
+	J55zX+xLGHlEvUq1T7XceskUsWOzgl9e8PP4/GPrlrN92GdQ4ZMeEiK39J+w2LM7RxMX9xjt
+	MtWI3BDQIh4gYDtLbH+RjLvnmkzFltYnSVpPa1n+10yfqRMitOW+5gzHicvudmbtuLri+A6e
+	1/b5GTpZ9Zzf/9/OitW0/nil61zPg8U/YuqvxejOmiFzsH3XxdYjLy49XZbudNvOf+2HqSZ9
+	y4Ir3t7yqznW3B+7/KyleLwG+7bpjNIV//I5GvuyeWRS93oyfLOTk5UNlvwjlyIrFCblIHs/
+	2OyCm+LlKeJLIpxYWs8rsRRnJBpqMRcVJwIAgBVJNCMEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFLMWRmVeSWpSXmKPExsWy7bCSvK7SFcc0g1l/bSyaJvxltlh9t5/N
+	YuXqo0wWR/+/ZbOYdOgao8XeW9oW85c9ZbdYfvwfkwOHx+WzpR6bVnWyeWxeUu+x+2YDm8fH
+	p7dYPPq2rGL0+LxJLoA9issmJTUnsyy1SN8ugSuj6dsxloKvahWPf99ga2C8qNDFyMEhIWAi
+	ce4xXxcjF4eQwG5Gid6Hk1i6GDmB4hISp14uY4SwhSVW/nvODlH0kVHiwaRWJpAEm4C6xJHn
+	rWBFIgJmEksPr2EBKWIWWM0ocWLKYjaQDcICvhJfv2qB1LAIqEp83fmHHcTmFbCQePR0PdQy
+	eYmZl75DxQUlTs58AhZnBoo3b53NPIGRbxaS1CwkqQWMTKsYJVMLinPTc5MNCwzzUsv1ihNz
+	i0vz0vWS83M3MYKDV0tjB+O9+f/0DjEycTAeYpTgYFYS4XUotE8T4k1JrKxKLcqPLyrNSS0+
+	xCjNwaIkzms4Y3aKkEB6YklqdmpqQWoRTJaJg1OqgenesfpDrXVfOvY3y/+y//nX8/Yr9z+R
+	NiF3rqydcyXxfd3HxaejHJ+KRp2bWjZVIs58Q/ahysLVypf+6N/9eTXH+/KHtrJFivbVv1lc
+	VBa3/BKqtYravdPzev+BlnWu1RplF24tmvbwQdEm93/R8UkRJTXb76R7XX7yRWyu885G1Vat
+	W6a7ti18vTPtuEXOJUdfveWuYc7c6UnlB3Mz5/O2zL9kcHWdS+IqjaYb2+pfzz+4b4nO+xfT
+	l3K9+Hzm6MzE04tkA/49V9A429WzjWnD7Ri+7+JXYt7Zp8z5eiJFkEdb76sbV0NiThDD8m1X
+	fezWChiemf738L8n0++t3jJx/vKDvqyVs49s296ze/YuayWW4oxEQy3mouJEAIxwNZTNAgAA
+X-CMS-MailID: 20240513084939epcas5p4530be8e7fc62b8d4db694d6b5bca3a19
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240513084939epcas5p4530be8e7fc62b8d4db694d6b5bca3a19
+References: <CGME20240513084939epcas5p4530be8e7fc62b8d4db694d6b5bca3a19@epcas5p4.samsung.com>
 
-On Sat, 11 May 2024 at 02:41, Paul E. McKenney <paulmck@kernel.org> wrote:
-[...]
-> ------------------------------------------------------------------------
->
-> commit 930cb5f711443d8044e88080ee21b0a5edda33bd
-> Author: Paul E. McKenney <paulmck@kernel.org>
-> Date:   Fri May 10 15:36:57 2024 -0700
->
->     kcsan: Add example to data_race() kerneldoc header
->
->     Although the data_race() kerneldoc header accurately states what it does,
->     some of the implications and usage patterns are non-obvious.  Therefore,
->     add a brief locking example and also state how to have KCSAN ignore
->     accesses while also preventing the compiler from folding, spindling,
->     or otherwise mutilating the access.
->
->     [ paulmck: Apply Bart Van Assche feedback. ]
->
->     Reported-by: Bart Van Assche <bvanassche@acm.org>
->     Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
->     Cc: Marco Elver <elver@google.com>
->     Cc: Breno Leitao <leitao@debian.org>
->     Cc: Jens Axboe <axboe@kernel.dk>
->
-> diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-> index c00cc6c0878a1..9249768ec7a26 100644
-> --- a/include/linux/compiler.h
-> +++ b/include/linux/compiler.h
-> @@ -194,9 +194,17 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
->   * This data_race() macro is useful for situations in which data races
->   * should be forgiven.  One example is diagnostic code that accesses
->   * shared variables but is not a part of the core synchronization design.
-> + * For example, if accesses to a given variable are protected by a lock,
-> + * except for diagnostic code, then the accesses under the lock should
-> + * be plain C-language accesses and those in the diagnostic code should
-> + * use data_race().  This way, KCSAN will complain if buggy lockless
-> + * accesses to that variable are introduced, even if the buggy accesses
-> + * are protected by READ_ONCE() or WRITE_ONCE().
->   *
-> - * This macro *does not* affect normal code generation, but is a hint
-> - * to tooling that data races here are to be ignored.
-> + * This macro *does not* affect normal code generation, but is a hint to
-> + * tooling that data races here are to be ignored.  If code generation must
-> + * be protected *and* KCSAN should ignore the access, use both data_race()
+The user mapped intergity is copied back and unpinned by
+bio_integrity_free which is a low-level routine. Do it via the submitter
+rather than doing it in the low-level block layer code, to split the
+submitter side from the consumer side of the bio.
 
-"code generation must be protected" seems ambiguous, because
-protecting code generation could mean a lot of different things to
-different people.
+Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+---
+Changes in v2:
+- create a helper for unmap logic (Keith)
+- return if integrity is not user-mapped (Jens)
+- v1: https://lore.kernel.org/linux-block/20240510094429.2489-1-anuj20.g@samsung.com/
+---
+ block/bio-integrity.c     | 26 ++++++++++++++++++++++++--
+ drivers/nvme/host/ioctl.c | 15 +++++++++++----
+ include/linux/bio.h       |  4 ++++
+ 3 files changed, 39 insertions(+), 6 deletions(-)
 
-The more precise thing would be to write that "If the access must be
-atomic *and* KCSAN should ignore the access, use both ...".
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 2e3e8e04961e..8b528e12136f 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -144,16 +144,38 @@ void bio_integrity_free(struct bio *bio)
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 	struct bio_set *bs = bio->bi_pool;
+ 
++	if (bip->bip_flags & BIP_INTEGRITY_USER)
++		return;
+ 	if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
+ 		kfree(bvec_virt(bip->bip_vec));
+-	else if (bip->bip_flags & BIP_INTEGRITY_USER)
+-		bio_integrity_unmap_user(bip);
+ 
+ 	__bio_integrity_free(bs, bip);
+ 	bio->bi_integrity = NULL;
+ 	bio->bi_opf &= ~REQ_INTEGRITY;
+ }
+ 
++/**
++ * bio_integrity_unmap_free_user - Unmap and free bio user integrity payload
++ * @bio:	bio containing bip to be unmapped and freed
++ *
++ * Description: Used to unmap and free the user mapped integrity portion of a
++ * bio. Submitter attaching the user integrity buffer is responsible for
++ * unmapping and freeing it during completion.
++ */
++void bio_integrity_unmap_free_user(struct bio *bio)
++{
++	struct bio_integrity_payload *bip = bio_integrity(bio);
++	struct bio_set *bs = bio->bi_pool;
++
++	if (WARN_ON_ONCE(!(bip->bip_flags & BIP_INTEGRITY_USER)))
++		return;
++	bio_integrity_unmap_user(bip);
++	__bio_integrity_free(bs, bip);
++	bio->bi_integrity = NULL;
++	bio->bi_opf &= ~REQ_INTEGRITY;
++}
++EXPORT_SYMBOL(bio_integrity_unmap_free_user);
++
+ /**
+  * bio_integrity_add_page - Attach integrity metadata
+  * @bio:	bio to update
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index 499a8bb7cac7..2dff5933cae9 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -111,6 +111,13 @@ static struct request *nvme_alloc_user_request(struct request_queue *q,
+ 	return req;
+ }
+ 
++static void nvme_unmap_bio(struct bio *bio)
++{
++	if (bio_integrity(bio))
++		bio_integrity_unmap_free_user(bio);
++	blk_rq_unmap_user(bio);
++}
++
+ static int nvme_map_user_request(struct request *req, u64 ubuffer,
+ 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
+ 		u32 meta_seed, struct io_uring_cmd *ioucmd, unsigned int flags)
+@@ -157,7 +164,7 @@ static int nvme_map_user_request(struct request *req, u64 ubuffer,
+ 
+ out_unmap:
+ 	if (bio)
+-		blk_rq_unmap_user(bio);
++		nvme_unmap_bio(bio);
+ out:
+ 	blk_mq_free_request(req);
+ 	return ret;
+@@ -195,7 +202,7 @@ static int nvme_submit_user_cmd(struct request_queue *q,
+ 	if (result)
+ 		*result = le64_to_cpu(nvme_req(req)->result.u64);
+ 	if (bio)
+-		blk_rq_unmap_user(bio);
++		nvme_unmap_bio(bio);
+ 	blk_mq_free_request(req);
+ 
+ 	if (effects)
+@@ -406,7 +413,7 @@ static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd,
+ 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+ 
+ 	if (pdu->bio)
+-		blk_rq_unmap_user(pdu->bio);
++		nvme_unmap_bio(pdu->bio);
+ 	io_uring_cmd_done(ioucmd, pdu->status, pdu->result, issue_flags);
+ }
+ 
+@@ -432,7 +439,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+ 	 */
+ 	if (blk_rq_is_poll(req)) {
+ 		if (pdu->bio)
+-			blk_rq_unmap_user(pdu->bio);
++			nvme_unmap_bio(pdu->bio);
+ 		io_uring_cmd_iopoll_done(ioucmd, pdu->result, pdu->status);
+ 	} else {
+ 		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d5379548d684..818e93612947 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -731,6 +731,7 @@ static inline bool bioset_initialized(struct bio_set *bs)
+ 		bip_for_each_vec(_bvl, _bio->bi_integrity, _iter)
+ 
+ int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t len, u32 seed);
++void bio_integrity_unmap_free_user(struct bio *bio);
+ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
+ extern bool bio_integrity_prep(struct bio *);
+@@ -807,6 +808,9 @@ static inline int bio_integrity_map_user(struct bio *bio, void __user *ubuf,
+ {
+ 	return -EINVAL;
+ }
++static inline void bio_integrity_unmap_free_user(struct bio *bio)
++{
++}
+ 
+ #endif /* CONFIG_BLK_DEV_INTEGRITY */
+ 
+-- 
+2.25.1
 
-I've also had trouble in the past referring to "miscompilation" or
-similar, because that also entirely depends on the promised vs.
-expected semantics: if the code in question assumes for the access to
-be atomic, the compiler compiling the code in a way that the access is
-no longer atomic would be a "miscompilation". Although is it still a
-"miscompilation" if the compiler generated code according to specified
-language semantics (say according to our own LKMM) - and that's where
-opinions can diverge because it depends on which side we stand
-(compiler vs. our code).
-
-> + * and READ_ONCE(), for example, data_race(READ_ONCE(x)).
-
-Having more documentation sounds good to me, thanks for adding!
-
-This extra bit of documentation also exists in a longer form in
-access-marking.txt, correct? I wonder how it would be possible to
-refer to it, in case the reader wants to learn even more.
-
-Thanks,
--- Marco
