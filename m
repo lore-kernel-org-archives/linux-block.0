@@ -1,148 +1,76 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57E314EC56
-	for <linux-block@vger.kernel.org>; Mon, 13 May 2024 11:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1595E14EC6A;
+	Mon, 13 May 2024 12:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715601516; cv=none; b=Vt4PkiGA1zGpcP9Me5kLc6VGGxpwS8KPrRT4uWleiUJaHfECDrahv7Fu1YSBcP1arMoW8jAvJXxMmE410uBrX8FpIHTFKJUo6nU2zaKAXoglXNSjpKPtAlNurz4d4qQaEisK/igMXRVKFgpv6gFedBbGtVP2pPsrR2nEaAot+WY=
+	t=1715602759; cv=none; b=aG/GJawicsFo6JgJjezRX7s331DC7dEl5toFahOvEeU8FGxS6/lwtATcxsHN6Gu8zUi7Uwb9Yc5k1TponoNv54hTl8S/mkHm+/D0w/pMKtPk6AV1FfmiYRQm5JU06dJjIArxt/j0Kk48lmeitBc/2Z6qFMeWzVb274I5Y6797Ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715601516; c=relaxed/simple;
-	bh=PrR35GiulFe05GlhKAd3AxFWa4/eHJrBCI6ecndk+OY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YEL+kDjdW4ft2XpKveoKgp6YC0CsllYthkN8VbLOzNbZxHg58iHYGVa/eAjhekbOMVMRvUE41dYlae1oE0bAtNW3Vvwkqrbka9N+xLmuSXmeXqYkmQ5u1Yk138/pde0Cu3HEa36Np4j2/xwy0n4GhhCNytLKaojzf7m9LPtf9s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gDsbwYu6; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gDsbwYu6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715601514; x=1747137514;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PrR35GiulFe05GlhKAd3AxFWa4/eHJrBCI6ecndk+OY=;
-  b=gDsbwYu6C0poVoBsp++mFv5iJ23bAgUlZskbCcbbQRL39+ZyiSrPMOqF
-   3cvVmT3GOB2lfslRDmGVFdwC2+JpssepSk7BEQtlRg1/YRypQLFfc/JSE
-   gD0BiZ1c+6uJDE6uKiM+yVJ4QVOmefn4QmMZxzGwqN8t+Gi8B+xy2UTYJ
-   uLtKmCNxMUZv5gXaXS8JM8y/90gxC1FLnO12Lkt0BH1IaIWLUd3+68Lh9
-   PnPR4w+PPR7L39sYfO5CHajbBGq8N1ShSPnT9U+oLTYpy68BLRuWMVpgj
-   yybh+uOcHpeTpkOLiqFkQG/McQMGupMSuzL2qtUo7NS5g9G+Sh6XXVQ05
-   A==;
-X-CSE-ConnectionGUID: 2mPdNUkBS4KYVBXHNHn1Bg==
-X-CSE-MsgGUID: m6iHfVqZR5iCmov6g2b81g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="15342083"
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="15342083"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:58:34 -0700
-X-CSE-ConnectionGUID: xcwqmTJNRtKYJ0Jq01KgPA==
-X-CSE-MsgGUID: XpeGDUyYSCqR90C+hNbjig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="30270709"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 13 May 2024 04:58:27 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s6UK0-000A6N-2c;
-	Mon, 13 May 2024 11:58:24 +0000
-Date: Mon, 13 May 2024 19:58:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Andreas Hindborg <a.hindborg@samsung.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Greg KH <greg@kroah.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Yexuan Yang <1182282462@bupt.edu.cn>,
-	Sergio =?iso-8859-1?Q?Gonz=E1lez?= Collado <sergio.collado@gmail.com>,
-	Joel Granados <j.granados@samsung.com>,
-	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Niklas Cassel <Niklas.Cassel@wdc.com>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Conor Dooley <conor@kernel.org>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Subject: Re: [PATCH 1/3] rust: block: introduce `kernel::block::mq` module
-Message-ID: <202405131926.5TqIqaTc-lkp@intel.com>
-References: <20240512183950.1982353-2-nmi@metaspace.dk>
+	s=arc-20240116; t=1715602759; c=relaxed/simple;
+	bh=lkPugVOypGhAP7Q3SGXFpjeqcaDfBZ/dF03MDdJXcP4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xjz4XwiEzRoC2to5pkKG43Um+DMfCgGGpn109kqWi1MXqF5o1CtWYcV9/ywzCu2cJehoP9WIieDzX/VnBnXGkDCrv8vTNi/gJVSmoktNQQBFvYDqS864s2RPAQHFMDWrtGBX8Lqrt5xqU2z1l/tSjWXs8S34/9Gv3n+uZkuYA8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VdJSR0dcyz4f3kkP;
+	Mon, 13 May 2024 20:19:03 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 8F0D31A016E;
+	Mon, 13 May 2024 20:19:08 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgAn9g46BUJm8iY0Mg--.57325S4;
+	Mon, 13 May 2024 20:19:08 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH -next 0/2] blk-throttle: fix lower control under super low iops limit
+Date: Mon, 13 May 2024 20:08:46 +0800
+Message-Id: <20240513120848.2828797-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240512183950.1982353-2-nmi@metaspace.dk>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAn9g46BUJm8iY0Mg--.57325S4
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY77AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2js
+	IEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
+	5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeV
+	CFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l
+	FIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi Andreas,
+From: Yu Kuai <yukuai3@huawei.com>
 
-kernel test robot noticed the following build warnings:
+Yu Kuai (2):
+  blk-throttle: factor out a helper to get throtl_slice from tg
+  blk-throttle: fix lower control under super low iops limit
 
-[auto build test WARNING on fec50db7033ea478773b159e0e2efb135270e3b7]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/rust-block-introduce-kernel-block-mq-module/20240513-024107
-base:   fec50db7033ea478773b159e0e2efb135270e3b7
-patch link:    https://lore.kernel.org/r/20240512183950.1982353-2-nmi%40metaspace.dk
-patch subject: [PATCH 1/3] rust: block: introduce `kernel::block::mq` module
-config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240513/202405131926.5TqIqaTc-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240513/202405131926.5TqIqaTc-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405131926.5TqIqaTc-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> warning: unresolved link to `GenDisk`
-   --> rust/kernel/block/mq.rs:10:18
-   |
-   10 | //! - Create a [`GenDisk<T>`], passing in the `TagSet` reference
-   |                  ^^^^^^^^^^ no item named `GenDisk` in scope
-   |
-   = help: to escape `[` and `]` characters, add '' before them like `[` or `]`
-   = note: `#[warn(rustdoc::broken_intra_doc_links)]` on by default
---
->> warning: unresolved link to `GenDisk::add`
-   --> rust/kernel/block/mq.rs:11:47
-   |
-   11 | //! - Add the disk to the system by calling [`GenDisk::add`]
-   |                                               ^^^^^^^^^^^^ no item named `GenDisk` in scope
---
->> warning: unresolved link to `Operations::RequestData`
-   --> rust/kernel/block/mq.rs:22:45
-   |
-   22 | //! associated types in `Operations`, see [`Operations::RequestData`] for an
-   |                                             ^^^^^^^^^^^^^^^^^^^^^^^ the trait `Operations` has no associated item named `RequestData`
---
->> warning: unresolved link to `Request::start`
-   --> rust/kernel/block/mq.rs:30:51
-   |
-   30 | //! mark start of request processing by calling [`Request::start`] and end of
-   |                                                   ^^^^^^^^^^^^^^ the struct `Request` has no field or associated item named `start`
---
->> warning: unresolved link to `Request::end`
-   --> rust/kernel/block/mq.rs:31:40
-   |
-   31 | //! processing by calling one of the [`Request::end`], methods. Failure to do so
-   |                                        ^^^^^^^^^^^^ the struct `Request` has no field or associated item named `end`
+ block/blk-throttle.c | 52 ++++++++++++++++++++++++++++++++------------
+ block/blk-throttle.h |  6 +++++
+ 2 files changed, 44 insertions(+), 14 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.2
+
