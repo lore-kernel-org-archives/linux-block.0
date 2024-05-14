@@ -1,97 +1,109 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF807144D0B;
-	Tue, 14 May 2024 19:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47EF18131C
+	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 19:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715714720; cv=none; b=rMpuqaWkN8Tsc6Ps16SyE8GUo3FESFxx9/++bnjKbVkZxqgYRYc+qngM4BLSOukj/L4t3Otio7hmPySVmiIrEPOJo7w3RrUvmHo51lqBOnF8AMNDw/I/h9OCknmwmsUNe5wIUfZUg+sBSmKp2z652lka2YnduQIDCJgZKKUmrEQ=
+	t=1715716224; cv=none; b=exGQjchwxiV8R9pkW1i2rwLfXdM7s9P95cYn1MMKmnbiryHZn4SvnlshQ06CKpZBuZ6Q4aMRtM36Mhehp/52K33yXr+G+S+izSSnaHMynl/ZkDtrebVujFJtwQEynYWagFEM1x4NRHLyHkNuuY8efXc6UCIj4Zj3m4zbruml4Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715714720; c=relaxed/simple;
-	bh=BKkPQ6MUtsS8ScL8KN3xo+e8VCvzKFbPixFMlTSPPhE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=rs/H3SoH/ExIpe2s7BpkkpJQ32m4jSkG5GjcmgO9KaQn4DJ3L/AycgKf9xnxepqYptU9o7JbLkN+Xq6CU5DJD+yX9js7GHLtwjZAjWeg3TKPeXnfCvlQ0epfYMp9A1IShYAtJjw8Yn6fKESBa9LeAt3Le2VhN8wn9KCatswIrPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T/F6zMUI; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715716224; c=relaxed/simple;
+	bh=xCGobSiEZZKVIGvtlb17VkXzrJav2cpynpYO5pxHsTg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fs2czrxxGI0radmSkmESPLj67Hh75ERXhVQ7k38fb0cFG6SsiNcVM3ELCOmz2LrB1H+K2FjysqXKQdDwrNpvlOBKF3PBSi7aR5DfjRB1jNcHpW+7elPckJPQAqfilsHlzIlpdXe7RKzh+bOgHk3eAAxICVu1dETHb+DAQQd8V1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=JF+Zbwi4; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/F6zMUI"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2e3e18c240fso66925791fa.0;
-        Tue, 14 May 2024 12:25:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="JF+Zbwi4"
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-de60a51fe21so5994393276.0
+        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 12:50:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715714717; x=1716319517; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BKkPQ6MUtsS8ScL8KN3xo+e8VCvzKFbPixFMlTSPPhE=;
-        b=T/F6zMUIRJ+CaHt9xzy66G0VOTpHDn80s6tnKcesbNu+0KVPaglK+XOKsgO09SJGL7
-         LKSodrLunyd+ElAcxNTTI/lg7z4EW3TxsD/DDRO2qoVIKFLVNqAecUzCsBA8Y8QZq3Em
-         cJOuULzXuh3oYOwlGIPi/8LLmqTmv9XqmoF7+y7RhCqmKrLC8xDCITdZarz1guNJ3ljS
-         Yw3jjcJyM4BiVUIkb6oDHbiYo+jBMu6YI0dHZHUXZBAsDpSN+AvhP8sbfA7VwbmeoIFX
-         sNo1L0d4GPJttod5en5dNnfUTbNn0tmDNTtEmJXP4eg47WVPwqLxPUhF9TU6uy8EAh7H
-         50aA==
+        d=paul-moore.com; s=google; t=1715716220; x=1716321020; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lkp4I1/EP34xCsXz894jXcfOHu9Xc+3+8P13l0GVrxE=;
+        b=JF+Zbwi4A37UVjOELqyuSxI5XF16PnHoy/clBUi83jiG+YRodmecFW52qZKz4Kq726
+         4PTOrHIBMXKsd7NPB6GCHO6oGJCvxjHHJaMw38WnlU+B/cm4WbJETzVMZ2TafdoTfo4X
+         rBPSV09s7/igRv/0AE1D7RnilAUdFI2LXQQWFeHNyDVUgFRiRFPHAJLU+iEB4N2/widJ
+         cASIqHwqPxifXEwwXws+q0QEDlDblFWXqGYAXJmXfXw3VXV1KCegxMxVhRx0XCksA/sB
+         1VxkK02/WpwjROj2m5sVqBTGjVDYmmzXsDovMQ2t1pd4IrqPTv+jT8xruRy07h+w1pWB
+         IsxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715714717; x=1716319517;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BKkPQ6MUtsS8ScL8KN3xo+e8VCvzKFbPixFMlTSPPhE=;
-        b=m71qttQKMuAJzIzoDZGrwTs1zzZjB8Cd0OPAf2PzxBtpSJ7PqpU2fXP8VIRKB2uoFv
-         Mfs0FTu1o/ALomykI+mrYupsT6Uf5qugCPL929gJ/YD5ZbgSzIce2wYj2Q8x95kcySWL
-         MW1nboAxKJEm+6NIMxygvr3q/3k5B8JdlwRrDtUzfpG6bMvRVwAAZr67WVi0FcpjUUrU
-         BxtrtD8jJXVUuVCCIMZFEJtSvcgv+3YC6az8+j7wPkWLupzOb9Ez9EocSKRKaguCXc37
-         TgY72fsi5jDqdNh9TTPibmVSlYQd/ujrC+bg2korJeUjMCw7ukrPX1AIwMruk0Jq1G26
-         gPhw==
-X-Forwarded-Encrypted: i=1; AJvYcCVomJc4xUNo1GmjWAZ9pVAGjEp+AWB27VFV3wYpxEXsTsU1O5Yyq5zr7E//0B8NnDGTgqO8URSE9MbIvh0nY6f+Akg27hent04HAcdS+7Le2H3GdiKGwU/RW3uR8W2DBbolRbtVYA==
-X-Gm-Message-State: AOJu0YzTqGxvJ4IwdU7Npv1XC0BMFldaGcpwD6j3sHQXHxpvYk22aG5b
-	6tM22WxBQXb/68UWYoalv8rX/41CgM7ixgFHVk44aslim6nfvJTy
-X-Google-Smtp-Source: AGHT+IGP3P1+UwL6FCmnidu99mpLnYJnZSJQSrp8iNFTaTkPkNeIyLAHQx+RTr4FFfO4iye8vXDULQ==
-X-Received: by 2002:a19:6914:0:b0:51f:2f2:d66 with SMTP id 2adb3069b0e04-52210277cbamr11726964e87.61.1715714716487;
-        Tue, 14 May 2024 12:25:16 -0700 (PDT)
-Received: from dschatzberg-fedora-PF3DHTBV ([2620:10d:c091:500::5:4a5c])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-523714d3785sm342275e87.301.2024.05.14.12.25.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 12:25:15 -0700 (PDT)
-Date: Tue, 14 May 2024 15:25:11 -0400
-From: Dan Schatzberg <schatzberg.dan@gmail.com>
-To: Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: cgroup io.stat propagation regression
-Message-ID: <ZkO6l/ODzadSgdhC@dschatzberg-fedora-PF3DHTBV>
+        d=1e100.net; s=20230601; t=1715716220; x=1716321020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lkp4I1/EP34xCsXz894jXcfOHu9Xc+3+8P13l0GVrxE=;
+        b=YLI0rXd2yrXT9dNJVmlCJbAmzT5JBYzCAbmHQ2nwlihACAdKTYXJhOqf5i8+5Le5RL
+         3dWZNUJ89EWcEIjA5qKu7lTJgSfiGkPEgRWoZTe/pn8EeelZLPBo3kaWcoVF0aW1qikw
+         uejkz/7qaj9E8EhGdtyosw/RddD6RHmjnTyZNiBa8f/G3B4h2aEZ1/kfsbBvs1W94OLy
+         7cpffTOmj3XESupbGPip4N0ZEkNlM9CEWPOJgUs3hZWXD1y9V9Ck7HWVmdlCkytMKpcm
+         +kC76r9DSM0INAUagtfFfJK+kEerGE9AsuTXpn+fOayEx+Houm5X3XHIQnFsV71Ex+wx
+         QgFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPmREMirqYTcWpQG5CKXquoxyDu/TJjefMdUVohQIk6OC8/941sXIm1YidLSbeEU13TYA1FeyQ9gtCxLG2qoF38Mwy+oFX5wEH1Ec=
+X-Gm-Message-State: AOJu0YzYmlSBoyu9wtVrsCZAP/5/WDvkULSJehEN8YfgY96/dynWGxaX
+	Ea4lxIkQkfEl3mLKx4jxUTYml1Aa+pSe/Yxk1pzxHs58+3Bnw6Si4dqVYmMADwFVt/wnshOvB1x
+	HhFg0fbjusF0l5E+6tC/iurbTQkjElPv5SYRf
+X-Google-Smtp-Source: AGHT+IFWIy5UA2F/+z955H9aT1kkILcAstR0rQ1Z6k7ELYYSk3poMncJ+M812qPYw6M0u0TMB7AFkJo/BviRvM2KHkE=
+X-Received: by 2002:a05:6902:218f:b0:dee:8da8:aeb7 with SMTP id
+ 3f1490d57ef6-dee8da8b092mr8719461276.25.1715716220678; Tue, 14 May 2024
+ 12:50:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com>
+ <1714775551-22384-21-git-send-email-wufan@linux.microsoft.com>
+ <ZjXsBjAFs-qp9xY4@archie.me> <ab7054cd-affd-47c3-bd98-2cf47d6a6376@linux.microsoft.com>
+In-Reply-To: <ab7054cd-affd-47c3-bd98-2cf47d6a6376@linux.microsoft.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 14 May 2024 15:50:09 -0400
+Message-ID: <CAHC9VhQewDL4cWXSiAgzvrHa8N5rd6TbhSCM3jRp29=Kmr3m-Q@mail.gmail.com>
+Subject: Re: [PATCH v18 20/21] Documentation: add ipe documentation
+To: Fan Wu <wufan@linux.microsoft.com>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>, corbet@lwn.net, zohar@linux.ibm.com, 
+	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org, 
+	axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, eparis@redhat.com, 
+	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Waiman,
+On Sat, May 4, 2024 at 4:13=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> w=
+rote:
+> On 5/4/2024 1:04 AM, Bagas Sanjaya wrote:
+> > On Fri, May 03, 2024 at 03:32:30PM -0700, Fan Wu wrote:
+> >> +IPE does not mitigate threats arising from malicious but authorized
+> >> +developers (with access to a signing certificate), or compromised
+> >> +developer tools used by them (i.e. return-oriented programming attack=
+s).
+> >> +Additionally, IPE draws hard security boundary between userspace and
+> >> +kernelspace. As a result, IPE does not provide any protections agains=
+t a
+> >> +kernel level exploit, and a kernel-level exploit can disable or tampe=
+r
+> >> +with IPE's protections.
+> >
+> > So how to mitigate kernel-level exploits then?
+>
+> One possible way is to use hypervisor to protect the kernel integrity.
+> https://github.com/heki-linux is one project on this direction. Perhaps
+> I should also add this link to the doc.
 
-I've noticed that on recent kernels io.stat metrics don't propagate
-all the way up the hierarchy. Specifically, io.stat metrics of some
-leaf cgroup will be propagated to the parent, but not its grandparent.
+I wouldn't spend a lot of time on kernel exploits in the IPE
+documentation as it is out of scope for IPE.  In face, I would say
+just that in the last sentence in the paragraph above:
 
-For a simple repro, run the following:
+"As a result, kernel-level exploits are considered outside the scope
+of IPE and mitigation is left to other mechanisms."
 
-systemd-run --slice test-test dd if=/dev/urandom of=/tmp/test bs=4096 count=1
+(or something similar)
 
-Then:
-
-cat /sys/fs/cgroup/test.slice/test-test.slice/io.stat
-
-Shows the parent cgroup stats and I see wbytes=4096 but the grandparent cgroup:
-
-cat /sys/fs/cgroup/test.slice/io.stat
-
-shows no writes.
-
-I believe this was caused by the change in "blk-cgroup: Optimize
-blkcg_rstat_flush()". When blkcg_rstat_flush is called on the parent
-cgroup, it exits early because the lockless list is empty since the
-parent cgroup never issued writes itself (e.g. in
-blk_cgroup_bio_start). However, in doing so it never propagated stats
-to its parent.
-
-Can you confirm if my understanding of the logic here is correct and
-advise on a fix?
+--=20
+paul-moore.com
