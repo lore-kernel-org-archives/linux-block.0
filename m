@@ -1,148 +1,102 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D19A320F;
-	Tue, 14 May 2024 12:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0541146A8A
+	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 13:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715688469; cv=none; b=NPndq+zoImSvfzWA/YASDF1O7fDEBzTZekF9721RFpMYHbReITXb6CQdKG0SWo0Gbw1a9QlLCuFFzORXW+2hV5vCapNCkvC0Mhks1muS7M0zcXOCd/DsTnOkdEuFU7jd5pCMbzm/YJXlPVuW2fTnArzy/qHGDNPgs8ztjxGPvz8=
+	t=1715692983; cv=none; b=GJi+UUs1cZnNjLK1ohn+e2RKrlS69aeu42/1E/nWv1n0+mBcQxjAWUZ8dOEH/aWTk0ZPgv+w7Yugbb++jJykg+gZhnUuGEnSzFHsBuXK4MoOpeFAL1/g4zqgkdt57mVIJq1m4zn2jwQOV+tDsWHj+ys7IZHQFEL0uOQBPwOFYzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715688469; c=relaxed/simple;
-	bh=mLL7B8vDyCDH8vmnqNlRJpEkXI6Ms8si8mOelAOXJwA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g5W2/gEV8xCWA8TWK00vNVhBmK8IyYkphcjPP5wfpgpSpngy1M9/TYe+o3TaozyAcHf2YykIhEOCka6BJxePY++zA99DPboROFZ6NKT0HxsVNXSdEFH3HxLW5Jco788TbXOdRWXioMcnt+7FZ8826dHqj1S2p5ehRXHz/z4E2MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jM88O5ZQ; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715692983; c=relaxed/simple;
+	bh=caTajgp7wr5lL8Zqr1Zf1iv9MQqr1coB6X3fvJdqMvY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=VQoOgMczx/m42DfOmeknRMweZ3vQb8exx/VGZ2N2c+SKBMDdz5pzNWZI02sEyGAV8Bs4JFMvabTq5VUKk/sdTiuo+BfhiOre3DjswCkmaLRvxNTJtelmgefZ3aOtjPPMANLAuc9UQc9m6vyWm+caSgO5CB0e6OJo1rBm3VukORM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EbayFsTi; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jM88O5ZQ"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a59c0a6415fso23314666b.1;
-        Tue, 14 May 2024 05:07:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EbayFsTi"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2b4b30702a5so1418126a91.1
+        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 06:23:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715688466; x=1716293266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715692979; x=1716297779; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=spJhcMCJLLZ5XYu12iV4bIRUrYgxZ4FzOTF2itKzb8U=;
-        b=jM88O5ZQYK4FiYSvnsvy6Tk1goyb06yBKHacC6xdxswpm9LlZSMjhdMcQpA9GWUi5f
-         vR5UXBfGTJx2hilanCi2foJKoXPj9Yqzf+cMiAPyte4FxXVTc8WdEkeJ8LjxzFofAw/b
-         ZqF4DVyhxAdjG+crhG6ntgDewYYjrcphRryjk71wby0sG8RSPQ3yVg+PueSwcEQ3rx1F
-         Rg3MmIsyKkWpS1qrVbPl2d8OTBo6NrLOi69rR7VRwZ7n7EQoGGX1OUMwuWfW+kVbLv6y
-         zndb48RhrJFTEj33p8K8dXyZ+hYL75moEk8T3Dn2oTewEef8aNzcjkQ5xfmGCDfDAjvm
-         Vhiw==
+        bh=uBz+0EoAj8tRotJX75zTvVyN6+ypYgr2NjUyx47M1sg=;
+        b=EbayFsTizGUXozZltvWAGvnAKoiR27ng8uSmeBOQV9y10KUBebHAYi9xmBN27wCXHd
+         x7ieptAf2eeu0d6zWWYMKKEd7zBczDMdTNp/Rw9k4eRCTffx0irmBXZv7QEc5hQBQYiC
+         DbK6gXOMq9jt0eXQ5GKSltPNdS4wjW7lUkHPMZoLU5qGj1BtVTDoYLDpG+irhOxPJAfe
+         p4ESZxxulANtIjxasEt0AM0UzE2I4rRy7239jcfgSwiuSDLPfEfrC4oIH9r/tqQU9qPV
+         TSsqkhU1HUeMhBLcL9Ockpefs9/gOtVdpeEx1KgdKlfLcq0KzI7QsUA1nlbNKnAnR0Op
+         ivTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715688466; x=1716293266;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715692979; x=1716297779;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=spJhcMCJLLZ5XYu12iV4bIRUrYgxZ4FzOTF2itKzb8U=;
-        b=IoHX0areuj4wh8tAhieLjeQiCdsrHeQAKFtXZ6Yud+U70mZZA2Caqna/Ck8DHk7AnB
-         CoxlMUSXAGVeTOj6TcvXijkLtlC5WzgDC3lGQvLL6uT0FJFeEqG8YkTNDw5LrubYVp3M
-         hNZy/fdIwoPHfeBB6HeZ3i6uKPoupyY/glR+U4NEfgj8qhNi6K5JM3haqh3FbDpYd+M2
-         lS17GV3BXYKiYJXFGHpfwkN4vg85nSeUt0TGoPUId6vw9dqtKES+lbIx2oq5XxzsYMiP
-         awazdIxzQD0U2A2DvRlmtlBOKm65VsVa2pS7vdUvYj0eKx3qwYIBKhkekDpRP4FQrBr7
-         1z5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUJvovLLvsb+cBkSr5HXuPPUvkqDRxGUQuFBAQ6fuR8fzeq7XSpGDxUa8AMhDhjqT2LrgSOTdgIDUJRfOJTtWc8fOxj8DZIBxxmxD4=
-X-Gm-Message-State: AOJu0Yzyjf1TLHtOje4r1SJ1GglK88lTxmpFYcCzCfXZzoY2sizg58wu
-	pSxfUlVsSkCk9GSxVClTrBNfEoRL2wC529LHJmVY6QMQy/wYWBUw5FcM/Z3WuS5eovBCdkcLGjb
-	SA0u0+dYLA+1V/aRDMzPu1G5+npg=
-X-Google-Smtp-Source: AGHT+IHJuloMH1XSDHVgTqa/HlyWJaT93NPV8YsGUHp1LosKD76lHUgKrGDPCc7F4L5qVYKU2iSiFjkXnFF6c1o/eTM=
-X-Received: by 2002:a17:907:7757:b0:a59:c9ce:3389 with SMTP id
- a640c23a62f3a-a5a2d673aa6mr751324566b.67.1715688466430; Tue, 14 May 2024
- 05:07:46 -0700 (PDT)
+        bh=uBz+0EoAj8tRotJX75zTvVyN6+ypYgr2NjUyx47M1sg=;
+        b=IL65/nMvXVIofiGkPgwTRnyk1TsyHqC0bhGjTh29BV67oSWL50A+6exiQ2rm9eklOt
+         8M1dhMFeVYwtPnUSWWApjULFEgqFKF1cKMeydok6I2mX93braf/KfQlib+71DCxwo0Ph
+         ZTyj/Zso37rG+iQSl9IOFpTaAg3O6PiwMNwNj9rzdrVr1pNEE93ptcMJKZm1w7cP9Crl
+         /K10LruCvXJqhLp5bES/5mZcrfRoV2ASDuJ6yIwPGBAthzFkfzQsh2SlnLFShNuCQJzR
+         BB8yg4nOHZSKer/Qhv3/y0hfCVHWbe7hr31QilOSgQi6yjQ8LGcclZiUF6cBc9WAtT8T
+         AyjQ==
+X-Gm-Message-State: AOJu0YwQhcbazcuCkPRC+qalMX0fwZUvIEkq2yFvPvkEmC0NfXV40ng3
+	1MAvswK2zmgAEvuqPuiGd7ohy4W7vVwQwnZ8fH/20K8w8aZ41o62fyOpd4b0hvnTcZBxlxuYBlL
+	4
+X-Google-Smtp-Source: AGHT+IHxwMKra850PVDtfrzQeGzTIMs3S1tZv8gtgqSasAwvKKdKvv+Fa2r5MitQv9UVIoxg0M/YZA==
+X-Received: by 2002:a05:6a20:a122:b0:1af:5385:3aff with SMTP id adf61e73a8af0-1afde1bca05mr16862404637.3.1715692979041;
+        Tue, 14 May 2024 06:22:59 -0700 (PDT)
+Received: from [127.0.0.1] ([50.204.89.20])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340a449f4csm9538660a12.4.2024.05.14.06.22.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 06:22:58 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20240510202313.25209-1-bvanassche@acm.org>
+References: <20240510202313.25209-1-bvanassche@acm.org>
+Subject: Re: [PATCH 0/5] Five nbd patches
+Message-Id: <171569297769.29126.13525185875517518274.b4-ty@kernel.dk>
+Date: Tue, 14 May 2024 07:22:57 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEkJfYMhv8AxxHSVdPT9bCX1cJZXw39+bMFh=2N9uNOB4Hcr=w@mail.gmail.com>
- <20240514103742.3137-1-hdanton@sina.com>
-In-Reply-To: <20240514103742.3137-1-hdanton@sina.com>
-From: Sam Sun <samsun1006219@gmail.com>
-Date: Tue, 14 May 2024 20:07:34 +0800
-Message-ID: <CAEkJfYPH3SJ6J3kLSjMGqkWOzgbgKZV_f2Hq05cpZZv7RmhvOg@mail.gmail.com>
-Subject: Re: [Linux kernel bug] INFO: task hung in blk_mq_get_tag
-To: Hillf Danton <hdanton@sina.com>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk, 
-	syzkaller-bugs@googlegroups.com, xrivendell7@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Tue, May 14, 2024 at 6:37=E2=80=AFPM Hillf Danton <hdanton@sina.com> wro=
-te:
->
-> On Tue, 14 May 2024 10:05:21 +0800 Sam Sun <samsun1006219@gmail.com>
-> > On Tue, May 14, 2024 at 6:54=E2=80=AFAM Hillf Danton <hdanton@sina.com>=
- wrote:
-> > > On Mon, 13 May 2024 20:57:44 +0800 Sam Sun <samsun1006219@gmail.com>
-> > > >
-> > > > I applied this patch and tried using the C repro, but it still cras=
-hed
-> > > > with the same task hang kernel dump log.
-> > >
-> > > Oh low-hanging pear is sour, and try again seeing if there is missing
-> > > wakeup due to wake batch.
-> > >
-> > > --- x/lib/sbitmap.c
-> > > +++ y/lib/sbitmap.c
-> > > @@ -579,6 +579,8 @@ void sbitmap_queue_wake_up(struct sbitma
-> > >         unsigned int wake_batch =3D READ_ONCE(sbq->wake_batch);
-> > >         unsigned int wakeups;
-> > >
-> > > +       __sbitmap_queue_wake_up(sbq, nr);
-> > > +
-> > >         if (!atomic_read(&sbq->ws_active))
-> > >                 return;
-> > >
-> > > --
-> >
-> > I applied this patch together with the last patch. Unfortunately it
-> > still crashed.
->
-> After two rounds of test, what is clear now so far is -- it is IOs
-> in flight that caused the task hung reported, though without spotting
-> why they failed to complete within 120 seconds.
-> >
-> > Pointed out by Tetsuo, this kernel panic might be caused by sending
-> > NMI between cpus. As dump log shows:
-> > ```
-> > [  429.046960][   T32] NMI backtrace for cpu 0
-> > [  429.047499][   T32] CPU: 0 PID: 32 Comm: khungtaskd Not tainted 6.9.=
-0-dirty #6
-> > [  429.048417][   T32] Hardware name: QEMU Standard PC (i440FX + PIIX,
-> > 1996), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
-> > [  429.049873][   T32] Call Trace:
-> > [  429.050299][   T32]  <TASK>
-> > [  429.050672][   T32]  dump_stack_lvl+0x201/0x300
-> > ...
-> > [  429.063133][   T32]  ret_from_fork_asm+0x11/0x20
-> > [  429.063735][   T32]  </TASK>
-> > [  429.064168][   T32] Sending NMI from CPU 0 to CPUs 1:
-> > [  429.064833][   T32] BUG: unable to handle page fault for address:
-> > ffffffff813d4cf1
->
-> Given many syzbot reports without gpf like this one, I have difficulty
-> understanding it. If it is printed after task hung detected, it should
-> be a seperate issue.
->
 
-I tried to run
+On Fri, 10 May 2024 13:23:08 -0700, Bart Van Assche wrote:
+> These patches are what I came up with after having reviewed the nbd source code.
+> Please consider these patches for the next merge window.
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> [...]
 
-# echo 0 > /proc/sys/kernel/hung_task_all_cpu_backtrace
+Applied, thanks!
 
-before running the reproducer, the kernel stops panic. But still, even
-if I terminate the execution of the reproducer, kernel continues
-dumping task hung logs. After setting bung_task_all_cpu_backtrace back
-to 1, it panic immediately during next dump. So I guess it is still a
-task hung instead of general protection fault.
+[1/5] nbd: Use NULL to represent a pointer
+      commit: 08190cc4d8a62f2a07b4158751afd3a01638c4c5
+[2/5] nbd: Remove superfluous casts
+      commit: 40639e9a0f6e49edd4ef520e6c0e070e1a04a330
+[3/5] nbd: Improve the documentation of the locking assumptions
+      commit: 2a6751e052ab4789630bc889c814037068723bc1
+[4/5] nbd: Remove a local variable from nbd_send_cmd()
+      commit: f6cb9a2c3d2e893a8d493d34ed3e0400fe8afe28
+[5/5] nbd: Fix signal handling
+      commit: e56d4b633fffea9510db468085bed0799cba4ecd
 
-> > [  429.065765][   T32] #PF: supervisor write access in kernel mode
-> > [  429.066502][   T32] #PF: error_code(0x0003) - permissions violation
-> > [  429.067274][   T32] PGD db38067 P4D db38067 PUD db39063 PMD 12001a1
-> > [  429.068068][   T32] Oops: 0003 [#1] PREEMPT SMP KASAN NOPTI
-> > [  429.068767][   T32] CPU: 0 PID: 32 Comm: khungtaskd Not tainted
-> > 6.9.0-dirty #6
-> > [  429.069666][   T32] Hardware name: QEMU Standard PC (i440FX + PIIX,
-> > 1996), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
-> > [  429.071142][   T32] RIP: 0010:__send_ipi_mask+0x541/0x690
+Best regards,
+-- 
+Jens Axboe
+
+
+
