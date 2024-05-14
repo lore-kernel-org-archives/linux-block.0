@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B861181337
-	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 17:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2926F181337
+	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 17:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715708367; cv=none; b=QeRExdIPLYYtb9jdGFKfiG7BQCCL9lRbZHbl8CDfiPzFo0VJX0e2Jz5cU3/c4+0o5nMNMPQfCvGklL6mI57KY9Zv4G9tyILUBXuApJTQVavm0RMS0rrGcE1RqjqbgC6g0xbstCuHZBZp8x4zSIyLMejYZKAflRx8lKKGA9VpYtM=
+	t=1715708368; cv=none; b=c3qQ2/ukkRdQIm0xre56g5LwF9abBv3GyAtmIDUHdnU/fbK3x+QDn2WX4yuh3NRfanj/uKaaN5vnBXCeOOro4aCqjhaIDuXsWHGBlp0/JVkTxz9Zm6Rx18OvCKUda8d0WYq/qxzhd+MXMkWNKUuWzV7SAdXqFdRgj4ntCJBwFQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715708367; c=relaxed/simple;
-	bh=2MLs8aaNGq+Z9BPfM3fqM3TE7Pu96U6iUhQcyxpAkm8=;
+	s=arc-20240116; t=1715708368; c=relaxed/simple;
+	bh=DovLNH0jWI5RgqORRkqm9l+XJ5AhX39zkvbiQ0Futvc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YUl8F0+g9rlig7/OdQrZ1vvMzI/E6TxijgVuVbRa35r0M/ygsqvcqy5fngUMwW3pnBBHbkNJywhhcdptLEIH15alAf/IOAEQv15G/BUGc7lEYWGEaNzmVs4BzSXpfS8KpeMQIR7o+WBl5+/ze+itOAcSjzvPWw8cnNMvK38sQY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iysJzMaR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=hXWIvubGZClF4oaZS3bsAV5GIjVl5teA5X40RKwy9diRdwWKF++VMdBXn38z0kBsiYWWG48V/8D+AMzsl0hw8jzFPHmqJOtSA6Y3aP2O+xWTg6Onk9+SmXTE5dLPYQLEEr4BRhywjqGPNsryFspYY0x77Sv49SV2RyV25OTBlVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IlIQnAwc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iysJzMaR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E12C2BD11;
-	Tue, 14 May 2024 17:39:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IlIQnAwc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 462C5C32782;
+	Tue, 14 May 2024 17:39:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715708365;
-	bh=2MLs8aaNGq+Z9BPfM3fqM3TE7Pu96U6iUhQcyxpAkm8=;
+	s=k20201202; t=1715708367;
+	bh=DovLNH0jWI5RgqORRkqm9l+XJ5AhX39zkvbiQ0Futvc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iysJzMaR5lswnCwhLkr1ZR9+Vqdq/KQOX48aG7GIum/4RIFSOG8pPPV09UFL/iN6g
-	 wl5OuHTINhxJjJhdZ9ueImaQzD+9nGuHStjWbHAi+n9aIMx7jLKJXgHjP/YnIdac8P
-	 58VVJITm3d+2gEc3vDHfLJS1/nlhwi0zeHIqtpfbQllvK5wmTd4CSdMPoW796mHnG9
-	 l4nGZKqMdb/UbSV7FIAH1TcyrgayMvvHfSzsr5C6OiaVsw1sOXtoWXdtdRlQ2dJ33m
-	 xGg8qwbyJNEGGExp4F7klBP0YMudQeJVEaSPCrFnWTTdiKCAt6X2iNqqvjLvOQiiUL
-	 FmqbTTd7bySBw==
+	b=IlIQnAwcsHIjT3vGrkL2MlHhLWPBsGvCvVPdf6YEH0DurwDMzPZyTREBMAnohIoP8
+	 MZSoLqMRqgEssNu+YSn/1n7lIxcjuMsNnBL0yvywsDlRye3O/VdiPXt4qXLXVsqsHN
+	 Eq81/ab+itMx9Hc6sz9gas+Sn27iOmTGNHqwEVcUBwbJJb2W4DKiK467ozO+aVHs+z
+	 FWQQ8IgOr9Fvb2Z2ssAuWhx1DLNw9stxLrNLxBSQd1vOpu1ELd1whGrnENf0DI+wDD
+	 e0DL7xodgbMjwHDoD4p+TRYtNAkbjMcvNAAi4FIH/634i08v8lLwvqIE+WJCSdOirJ
+	 h63mxYXobFr2A==
 From: Hannes Reinecke <hare@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Matthew Wilcox <willy@infradead.org>,
@@ -34,9 +34,9 @@ Cc: Matthew Wilcox <willy@infradead.org>,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH 5/6] block/bdev: lift restrictions on supported blocksize
-Date: Tue, 14 May 2024 19:38:59 +0200
-Message-Id: <20240514173900.62207-6-hare@kernel.org>
+Subject: [PATCH 6/6] nvme: enable logical block size > PAGE_SIZE
+Date: Tue, 14 May 2024 19:39:00 +0200
+Message-Id: <20240514173900.62207-7-hare@kernel.org>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20240514173900.62207-1-hare@kernel.org>
 References: <20240514173900.62207-1-hare@kernel.org>
@@ -48,39 +48,38 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We now can support blocksizes larger than PAGE_SIZE, so lift
-the restriction.
+From: Pankaj Raghav <p.raghav@samsung.com>
 
+Don't set the capacity to zero for when logical block size > PAGE_SIZE
+as the block device with iomap aops support allocating block cache with
+a minimum folio order.
+
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 Signed-off-by: Hannes Reinecke <hare@kernel.org>
 ---
- block/bdev.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/nvme/host/core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index bd2efcad4f32..f092a1b04629 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -148,8 +148,9 @@ static void set_init_blocksize(struct block_device *bdev)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 828c77fa13b7..111bf4197052 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1963,11 +1963,11 @@ static bool nvme_update_disk_info(struct nvme_ns *ns, struct nvme_id_ns *id,
+ 	bool valid = true;
  
- int set_blocksize(struct block_device *bdev, int size)
- {
--	/* Size must be a power of two, and between 512 and PAGE_SIZE */
--	if (size > PAGE_SIZE || size < 512 || !is_power_of_2(size))
-+	/* Size must be a power of two, and between 512 and MAX_PAGECACHE_ORDER*/
-+	if (get_order(bs) > MAX_PAGECACHE_ORDER || size < 512 ||
-+	    !is_power_of_2(size))
- 		return -EINVAL;
- 
- 	/* Size cannot be smaller than the size supported by the device */
-@@ -174,7 +175,7 @@ int sb_set_blocksize(struct super_block *sb, int size)
- 	if (set_blocksize(sb->s_bdev, size))
- 		return 0;
- 	/* If we get here, we know size is power of two
--	 * and it's value is between 512 and PAGE_SIZE */
-+	 * and it's value is larger than 512 */
- 	sb->s_blocksize = size;
- 	sb->s_blocksize_bits = blksize_bits(size);
- 	return sb->s_blocksize;
+ 	/*
+-	 * The block layer can't support LBA sizes larger than the page size
+-	 * or smaller than a sector size yet, so catch this early and don't
+-	 * allow block I/O.
++	 * The block layer can't support LBA sizes larger than
++	 * MAX_PAGECACHE_ORDER or smaller than a sector size, so catch this
++	 * early and don't allow block I/O.
+ 	 */
+-	if (head->lba_shift > PAGE_SHIFT || head->lba_shift < SECTOR_SHIFT) {
++	if (get_order(bs) > MAX_PAGECACHE_ORDER || head->lba_shift < SECTOR_SHIFT) {
+ 		bs = (1 << 9);
+ 		valid = false;
+ 	}
 -- 
 2.35.3
 
