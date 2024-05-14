@@ -1,137 +1,97 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E0A1E504
-	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 19:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF807144D0B;
+	Tue, 14 May 2024 19:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715713257; cv=none; b=kUDnO2jVRpSPlhMPAVh7UQ3GFYd1/Oo5Q2KG/LXvE4RNLXNLwUcByUWBePYINWPMprkEMAyivu3Ak8jiHYDW71UcpA/TwhPVPXPUCnjBkgzcKuhX6f+dkMEVhhOnhQYrthfgJpjbfXQGJqONHsBFSHhGaMKcYop8YRqbouRgv1w=
+	t=1715714720; cv=none; b=rMpuqaWkN8Tsc6Ps16SyE8GUo3FESFxx9/++bnjKbVkZxqgYRYc+qngM4BLSOukj/L4t3Otio7hmPySVmiIrEPOJo7w3RrUvmHo51lqBOnF8AMNDw/I/h9OCknmwmsUNe5wIUfZUg+sBSmKp2z652lka2YnduQIDCJgZKKUmrEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715713257; c=relaxed/simple;
-	bh=RlCA1EtoNX39uA5IHrsyJZpW2tq7ERtIHtW/Y8P0+mo=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=fd1WEjjq8UCfYxkeTcvygj05USHh4Uo3AQ/MjexWWXl70Hv6v4PaZQsDhZvtXsO+Ehg9FiaZ5nWTAF/8+OGV5tTxbzxmhj5VKgoSV0qwiZIqjRQ1O/erNpwmAj1KWk8COc/Dl/pHik+3v1AchZ54BVU9iwv1y6Eg3F5ONaJcdww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=aJ1Yf9Nk; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
+	s=arc-20240116; t=1715714720; c=relaxed/simple;
+	bh=BKkPQ6MUtsS8ScL8KN3xo+e8VCvzKFbPixFMlTSPPhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rs/H3SoH/ExIpe2s7BpkkpJQ32m4jSkG5GjcmgO9KaQn4DJ3L/AycgKf9xnxepqYptU9o7JbLkN+Xq6CU5DJD+yX9js7GHLtwjZAjWeg3TKPeXnfCvlQ0epfYMp9A1IShYAtJjw8Yn6fKESBa9LeAt3Le2VhN8wn9KCatswIrPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T/F6zMUI; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="aJ1Yf9Nk"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2df83058d48so77454521fa.1
-        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 12:00:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/F6zMUI"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2e3e18c240fso66925791fa.0;
+        Tue, 14 May 2024 12:25:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1715713253; x=1716318053; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5uaRNapfMv5f1rVugo2BX+9Ar9b3PGznLd2aVR8CIok=;
-        b=aJ1Yf9Nkm/Whb+ilzk8Idd6Wj0qjxxE6Vlo/NkFTx20oQRiQBoUE3STuAsR/77/oCo
-         mBrcgOSM6Wfs7vhGVVX/3T5UquUkZHjpnuiM9dd5NATxeuqE6aJ++C2HtdLIKY8hNDh3
-         BE2u9jKHtEGjdo0c3MjbrK8/CWEl2NrXti0SrU79Ym8gtVJTGxob9+Os0ly0GBqEj/wq
-         Ouqca1LVvMN8I2aRyz2ssMDGG6MpLbK9fzN5F6F6L9VITXNpOTQ/UEmQbdmXcagBL6Eh
-         Ca6If/QqY2r4eJDEU9u3/HdqIkN7um3YFLx2ua5Tn9jHneKYT9JTvOyc6Ii5fVjB2WVc
-         ZOXQ==
+        d=gmail.com; s=20230601; t=1715714717; x=1716319517; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BKkPQ6MUtsS8ScL8KN3xo+e8VCvzKFbPixFMlTSPPhE=;
+        b=T/F6zMUIRJ+CaHt9xzy66G0VOTpHDn80s6tnKcesbNu+0KVPaglK+XOKsgO09SJGL7
+         LKSodrLunyd+ElAcxNTTI/lg7z4EW3TxsD/DDRO2qoVIKFLVNqAecUzCsBA8Y8QZq3Em
+         cJOuULzXuh3oYOwlGIPi/8LLmqTmv9XqmoF7+y7RhCqmKrLC8xDCITdZarz1guNJ3ljS
+         Yw3jjcJyM4BiVUIkb6oDHbiYo+jBMu6YI0dHZHUXZBAsDpSN+AvhP8sbfA7VwbmeoIFX
+         sNo1L0d4GPJttod5en5dNnfUTbNn0tmDNTtEmJXP4eg47WVPwqLxPUhF9TU6uy8EAh7H
+         50aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715713253; x=1716318053;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5uaRNapfMv5f1rVugo2BX+9Ar9b3PGznLd2aVR8CIok=;
-        b=WoQ6TRwTOWzsDc+mGlDnGIJ3ezIPFhWJiMecatOb1EZUm6Z8jzFbteZ7AGyFv8dn4B
-         Zk/MU5P/T6sO5T7RAJOeHgYDYfiJqL1B4+TqpM04GT1T4tmQLbJMF81Bq8gcveq4n/LV
-         Q5KJwg9TVieDwuH4G9ra1ZzFS4CnKEIFe4zAU+PIvfN8UIRtENDtZ2wAc2SOYkgrAN6d
-         WMKgR9sj6OWOwSdbI88afcXfr+af1Ir28Ar9Uv6TvJS7DGzU6J+f+UWxdu2XRTMoHfax
-         hxGFvWYf5gt26XluTiyRoqQ74yZoIrVwHmaE2HrvPEuhSUjVp1LK+4Q97lY9PIvSRF6x
-         RmrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXM+d7i64Ea+UOI1WroiT/iPdW8Rkd+wQfxliPwMFxg4K4AUd+RiUX/vRb/ENy5vusZ+GwjaqrEGpqd6wTFuf6OciUj6ghkfIEwbX0=
-X-Gm-Message-State: AOJu0YwPtqKHRCa9Hz1r3bQTAOXOWIDMLwKCzOQY0Dd3FMNVoUoR7Vu+
-	fwkNfm90LgAnNvoGjawoRCAZFu4NlsQwEIrphZVgHCEL+8udIcDrT/ZGP1H1jUE=
-X-Google-Smtp-Source: AGHT+IF8Tfh2uu+B1TsYgX0zRT6Rbfo1m6HiOQghs7bs/CgInno9rJlztpdNh3x1sVdGe6eXublZZg==
-X-Received: by 2002:a05:651c:505:b0:2df:baf3:2ae3 with SMTP id 38308e7fff4ca-2e51ff4d047mr107289251fa.29.1715713252968;
-        Tue, 14 May 2024 12:00:52 -0700 (PDT)
-Received: from smtpclient.apple ([2a00:1370:81a4:8e0a:7881:38ef:d13d:5d35])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e4d0ef09ffsm18123191fa.59.2024.05.14.12.00.50
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 14 May 2024 12:00:52 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20230601; t=1715714717; x=1716319517;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BKkPQ6MUtsS8ScL8KN3xo+e8VCvzKFbPixFMlTSPPhE=;
+        b=m71qttQKMuAJzIzoDZGrwTs1zzZjB8Cd0OPAf2PzxBtpSJ7PqpU2fXP8VIRKB2uoFv
+         Mfs0FTu1o/ALomykI+mrYupsT6Uf5qugCPL929gJ/YD5ZbgSzIce2wYj2Q8x95kcySWL
+         MW1nboAxKJEm+6NIMxygvr3q/3k5B8JdlwRrDtUzfpG6bMvRVwAAZr67WVi0FcpjUUrU
+         BxtrtD8jJXVUuVCCIMZFEJtSvcgv+3YC6az8+j7wPkWLupzOb9Ez9EocSKRKaguCXc37
+         TgY72fsi5jDqdNh9TTPibmVSlYQd/ujrC+bg2korJeUjMCw7ukrPX1AIwMruk0Jq1G26
+         gPhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVomJc4xUNo1GmjWAZ9pVAGjEp+AWB27VFV3wYpxEXsTsU1O5Yyq5zr7E//0B8NnDGTgqO8URSE9MbIvh0nY6f+Akg27hent04HAcdS+7Le2H3GdiKGwU/RW3uR8W2DBbolRbtVYA==
+X-Gm-Message-State: AOJu0YzTqGxvJ4IwdU7Npv1XC0BMFldaGcpwD6j3sHQXHxpvYk22aG5b
+	6tM22WxBQXb/68UWYoalv8rX/41CgM7ixgFHVk44aslim6nfvJTy
+X-Google-Smtp-Source: AGHT+IGP3P1+UwL6FCmnidu99mpLnYJnZSJQSrp8iNFTaTkPkNeIyLAHQx+RTr4FFfO4iye8vXDULQ==
+X-Received: by 2002:a19:6914:0:b0:51f:2f2:d66 with SMTP id 2adb3069b0e04-52210277cbamr11726964e87.61.1715714716487;
+        Tue, 14 May 2024 12:25:16 -0700 (PDT)
+Received: from dschatzberg-fedora-PF3DHTBV ([2620:10d:c091:500::5:4a5c])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-523714d3785sm342275e87.301.2024.05.14.12.25.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 12:25:15 -0700 (PDT)
+Date: Tue, 14 May 2024 15:25:11 -0400
+From: Dan Schatzberg <schatzberg.dan@gmail.com>
+To: Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: cgroup io.stat propagation regression
+Message-ID: <ZkO6l/ODzadSgdhC@dschatzberg-fedora-PF3DHTBV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.8\))
-Subject: Re: [PATCH] nvme: enable FDP support
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-In-Reply-To: <CA+1E3rLxUnuv9E_BxCFj1aodOTp3yrOEh7cFYt_j-Yz+_0q29g@mail.gmail.com>
-Date: Tue, 14 May 2024 22:00:48 +0300
-Cc: Kanchan Joshi <joshi.k@samsung.com>,
- Jens Axboe <axboe@kernel.dk>,
- Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org,
- =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
- Bart Van Assche <bvanassche@acm.org>,
- david@fromorbit.com,
- gost.dev@samsung.com,
- Hui Qi <hui81.qi@samsung.com>,
- Nitesh Shetty <nj.shetty@samsung.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <88421397-1B95-4B2A-A302-55A919BCE98E@dubeyko.com>
-References: <CGME20240510134740epcas5p24ef1c2d6e8934c1c79b01c849e7ccb41@epcas5p2.samsung.com>
- <20240510134015.29717-1-joshi.k@samsung.com>
- <CB17E82F-C649-4D13-8813-1A6F2D621C51@dubeyko.com>
- <CA+1E3rLxUnuv9E_BxCFj1aodOTp3yrOEh7cFYt_j-Yz+_0q29g@mail.gmail.com>
-To: Kanchan Joshi <joshiiitr@gmail.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.8)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+Hi Waiman,
 
+I've noticed that on recent kernels io.stat metrics don't propagate
+all the way up the hierarchy. Specifically, io.stat metrics of some
+leaf cgroup will be propagated to the parent, but not its grandparent.
 
-> On May 14, 2024, at 9:47 PM, Kanchan Joshi <joshiiitr@gmail.com> =
-wrote:
->=20
-> On Mon, May 13, 2024 at 2:04=E2=80=AFAM Viacheslav Dubeyko =
-<slava@dubeyko.com> wrote:
->>=20
->>=20
->>=20
->>> On May 10, 2024, at 4:40 PM, Kanchan Joshi <joshi.k@samsung.com> =
-wrote:
->>>=20
->>> Flexible Data Placement (FDP), as ratified in TP 4146a, allows the =
-host
->>> to control the placement of logical blocks so as to reduce the SSD =
-WAF.
->>>=20
->>> Userspace can send the data lifetime information using the write =
-hints.
->>> The SCSI driver (sd) can already pass this information to the SCSI
->>> devices. This patch does the same for NVMe.
->>>=20
->>> Fetches the placement-identifiers (plids) if the device supports =
-FDP.
->>> And map the incoming write-hints to plids.
->>>=20
->>=20
->>=20
->> Great! Thanks for sharing  the patch.
->>=20
->> Do  we have documentation that explains how, for example, =
-kernel-space
->> file system can work with block layer to employ FDP?
->=20
-> This is primarily for user driven/exposed hints. For file system
-> driven hints, the scheme is really file system specific and therefore,
-> will vary from one to another.
-> F2FS is one (and only at the moment) example. Its 'fs-based' policy
-> can act as a reference for one way to go about it.
+For a simple repro, run the following:
 
-Yes, I completely see the point. I would like to employ the FDP in my
-kernel-space file system (SSDFS). And I have a vision how I can do it.
-But I simply would like to see some documentation with the explanation =
-of
-API and limitations of FDP for the case of kernel-space file systems.
+systemd-run --slice test-test dd if=/dev/urandom of=/tmp/test bs=4096 count=1
 
-Thanks,
-Slava.
+Then:
 
+cat /sys/fs/cgroup/test.slice/test-test.slice/io.stat
+
+Shows the parent cgroup stats and I see wbytes=4096 but the grandparent cgroup:
+
+cat /sys/fs/cgroup/test.slice/io.stat
+
+shows no writes.
+
+I believe this was caused by the change in "blk-cgroup: Optimize
+blkcg_rstat_flush()". When blkcg_rstat_flush is called on the parent
+cgroup, it exits early because the lockless list is empty since the
+parent cgroup never issued writes itself (e.g. in
+blk_cgroup_bio_start). However, in doing so it never propagated stats
+to its parent.
+
+Can you confirm if my understanding of the logic here is correct and
+advise on a fix?
