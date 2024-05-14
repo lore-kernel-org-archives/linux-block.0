@@ -1,117 +1,177 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D97A180A6C
-	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 19:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C702818131E
+	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 20:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715716515; cv=none; b=TaFgxjy74ddF6GzZ5VF0+pRdBO5aATO2onM2CMXN6Gyo2b/C6ztx/6gpIIwR29ifchv7NHU/FiflZArZLj/JLVjPewVT/9FtZ2iAhXbhqzxcxdh7cAJWCWUtCK8POSSGwFFpD61HJ1ZB2Nc9y85ZKeJm8cEnASS8J68Rzp5mDZU=
+	t=1715716833; cv=none; b=TMEGdlpQKgbK+ty3J9ckjBmO2CQTLzPG4B6k5hvzlb93sD0cYsfptqGZa9idkjoxlZe32eEeO0OQmopwHCKLhSE5jGLLQaIzGE3zP9424ap3N1fLJRvEQOHnJPQzDzFe+6KOYY6tAgfLuvEF9DOdG2JmGIKe/2QBqWI6FoljAdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715716515; c=relaxed/simple;
-	bh=Tn7ggDBZ467fewog7X29iTchxNr3w1imZ5QlMHFp0v0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fNZS3q2vcDyN33xgpAzS7P9SCSYzG4TYfn9tEiGVIJqAgysWkevX14uivGQVLPSuDijYQugb9/7zvb+wdfPQ+LqkbayzQN3ggNOZTzsvVLrdz3qRJ5hI/A3sqQWdusSqtGmzZDIajRo3ZjPWqjYi6D/JHfL+yL43Vit4QNwSDsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=BQ5nTcrJ; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1715716833; c=relaxed/simple;
+	bh=F1BCusWVnox0inKiwWulDDxeUYd5ETJQa5nYC/mUo7w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YL5Mj5lMOVNpsUgaaOAFpsQTHfnZ2LEp2ywgBUfqefy5/KVx3gfudpwnb47JdvIJnmbJI2J1pfS+4RGtnY0/CepWH7Q2CBqL3MZ18cxKa8OjNnvVvMFcWfOeAp224kmRebe8yY234ki1NKT8RGI4GOf38n3lTmZaCVkz26ftf7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uZQHp6bg; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="BQ5nTcrJ"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-de462979e00so6447185276.3
-        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 12:55:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uZQHp6bg"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2b8efd5ee5dso703235a91.3
+        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 13:00:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1715716512; x=1716321312; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I5DfaKSvWBjSuruH8QpkzwqbDWxyqIe8ntp5STBjhPE=;
-        b=BQ5nTcrJeiDGmJPbk+0RbPTElKvyqninC22tbUnOXLGS1LGq1NMiBlKd/vEdzgWmX3
-         J6CyOwcl5ivwV579DFEK3+TPJNedRbX5ta4rufuEGc9PXSFysi/1ahLWwCZ145ht6Uyl
-         Bw6LPtcCw4jhHWxePof5VARvVKrO7Gny5IjBXAEBH3jl2fhWU277pEPsN/aRwtFOao6H
-         alRLOYOxC3Mw4O3SYM24cutTSjj6riCyqehsqMkh76Ix8NCPvVfYnaoGWhA3ar0CMRBO
-         uOblc/Ql1V5KS6OL2dGv81/5AuDDrkYhB4Q5bH42HhK8obCcNSuLZXmuVzWWpy725Av5
-         SDxw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715716830; x=1716321630; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ll8ePMooaLJ++vSB+9syazdtLkK7b8/0TCj36hEfQbQ=;
+        b=uZQHp6bgXhVNv4WSPqVQvAiYLV3mF+NBc0Eiac6OZ/inaPjDmRqjOVmAbgvGCcbWSP
+         wTuX6JI/oeiW4Cgx5TrwyzkEEJwM962DpZ6X0Cwvxr0gzzTtPJeBStI754dEytgUv3BC
+         H5mvPBBnrmdkXJkr0XDJAyB23Xe1bAl1Ki6nc2kIziDDpmjsD2xvKnU9xYKD6XgjuHg9
+         WgKIkzJlskrafMzooda8nvLhVk3zOlFZinKclt/cjSO8fjjrVlIDtI+rpi5BkvInw/hw
+         I0KM7xMLpzbgS+ddFCk8X0zxdrlMD8S4jes6PhYm1lCIUueR2dK++Uncmmj3REjvKKPU
+         Vgvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715716512; x=1716321312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I5DfaKSvWBjSuruH8QpkzwqbDWxyqIe8ntp5STBjhPE=;
-        b=AY/u3H+u7ssVzb6ZmGbPCzL+cFverOVQrgSDdwUS5+lGLsR7cDyhmwIdt9fpbpKoM7
-         nw4rp952FMm0Y2XwRmel3dvZyahbCDz+cIpYErlm1H25U+XrUJksIeXL6kv36p7NxI6O
-         2xHO5kHlne0eKTTbleleKcr5zPskN4aMfx4ja2XaeOv3lbxqR83ez0LtenQVFKI8yLgj
-         mrI4Bvd/B/YiMAdWlE7x5jafl6dRaLUDqERWYYrKva4v1TWw/vOSZ2SfVCBvrQq4ZgX+
-         IORCOdlH8b6DICe3EYO0jI4WPoM/5wjjmRrD+zncImTax1vM4mYHPAp+0LlIJRqIFNxs
-         zFAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbDzdMKdXfTD5AqzGGZaUIU04OViSm4CwYPctDJZTtJCvjOP11Ni/DYnGoycOeFRPWHwIVFJfCNMqGUqEW2/x+9SwBGzZcm7fP0iA=
-X-Gm-Message-State: AOJu0YyQweSexp2+8YT7MU2uUSm7DmPuqDVsTwBYE8IgZi6NUf9vwsGi
-	4j7PEhAXv1o9u0pOn1Fy3u0j/RWC1ncx0npvHPZkZhOpMp9nRQG2y4BrZYfdZE5x0lh8Dk/mAOA
-	7WIkwg70a7UxYkMAjUdwOmwpUOInmrV2dTzOV
-X-Google-Smtp-Source: AGHT+IGVq5mRXTNrK/KaBwurMBldLnV/6qJN5uwTdGazOX6+s8bWL81rsv23lU+ZbyujJVMk8Qdjk3/8J+Z+jQ3+QZk=
-X-Received: by 2002:a25:ad50:0:b0:de4:619a:fbd with SMTP id
- 3f1490d57ef6-dee4f2f6cb8mr13359322276.9.1715716512499; Tue, 14 May 2024
- 12:55:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715716830; x=1716321630;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ll8ePMooaLJ++vSB+9syazdtLkK7b8/0TCj36hEfQbQ=;
+        b=Sm61T5MrUio/G31rbfu/edrW7mESQ+i4UiCC/acmwi26W2lHtfSQaww2LAgWm32/l8
+         KfQ2KSMsBt1ZEF5UAIOokeYsMbCXpP3nUpcxYf9bhXbZ89D7afBWh8Y1yC/zfyTaGbZo
+         nv5vEqlnE8QbeSSojZrh93N9RNHXad6KmJvFPSeQNbqzcyLwAbfy0MIbUTKqzMgSHX04
+         WBa2CV143z0tI7uMt6EBj00u+Nt97si8L/SgqxrJdPV2lK5y1q7h4t/dSP7zY7tpNfM4
+         reeDYk/QeopQp741Fm03vTRgh2vmKwlKCZ3dBg6dScppwDUD4t2j1ssoBJbeDR3u6AMC
+         otvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWjeOYNgyjIShC+vE5fToU2ByDtap0LjH6HBfuVJH0ZBMRF+rbmXFWeGUh35V4Q55OZHXcgDnwtFmAXFhhAaAaxT87d/DAVW3fz2TA=
+X-Gm-Message-State: AOJu0YwZpXDUCD1ICRvhuCG10L+uvuB0BkStW8/bWx3BUA3usrFuqISL
+	A5W1bfxz5lNcwwf59qzi11mo2lbdB/L4JKY/O6J8iG2ftzl82g7C0dpk/u3NPcA=
+X-Google-Smtp-Source: AGHT+IFnBHUUmMWtiYG9e/YiHxcQJT/qNVtzttvhR+ZqrEmfm+gaRsCol3BlyeJlD0TCv2qEnJ75gA==
+X-Received: by 2002:a05:6a00:8986:b0:6ec:ee44:17bb with SMTP id d2e1a72fcca58-6f4e0343824mr14250305b3a.2.1715716829950;
+        Tue, 14 May 2024 13:00:29 -0700 (PDT)
+Received: from [172.21.2.105] ([50.204.89.20])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a819e7sm9572850b3a.56.2024.05.14.13.00.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 May 2024 13:00:29 -0700 (PDT)
+Message-ID: <593a98c9-baaa-496b-a9a7-c886463722e1@kernel.dk>
+Date: Tue, 14 May 2024 14:00:20 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com> <1714775551-22384-17-git-send-email-wufan@linux.microsoft.com>
-In-Reply-To: <1714775551-22384-17-git-send-email-wufan@linux.microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 14 May 2024 15:55:01 -0400
-Message-ID: <CAHC9VhTK4WS6BOXqLJ4sNKXR9a17gT3vXJUBc1F11cZ_QaOYBA@mail.gmail.com>
-Subject: Re: [PATCH v18 16/21] fsverity: expose verified fsverity built-in
- signatures to LSMs
-To: ebiggers@kernel.org
-Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, 
-	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk, 
-	agk@redhat.com, snitzer@kernel.org, eparis@redhat.com, 
-	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Rust block device driver API and null block driver
+To: Andreas Hindborg <nmi@metaspace.dk>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>,
+ Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>,
+ Ming Lei <ming.lei@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>,
+ Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
+ Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng
+ <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>,
+ Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>,
+ =?UTF-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>,
+ Joel Granados <j.granados@samsung.com>,
+ "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+ Daniel Gomez <da.gomez@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>,
+ Philipp Stanner <pstanner@redhat.com>, Conor Dooley <conor@kernel.org>,
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ =?UTF-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>,
+ open list <linux-kernel@vger.kernel.org>,
+ "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ "gost.dev@samsung.com" <gost.dev@samsung.com>
+References: <20240512183950.1982353-1-nmi@metaspace.dk>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240512183950.1982353-1-nmi@metaspace.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 3, 2024 at 6:32=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> w=
-rote:
->
-> This patch enhances fsverity's capabilities to support both integrity and
-> authenticity protection by introducing the exposure of built-in
-> signatures through a new LSM hook. This functionality allows LSMs,
-> e.g. IPE, to enforce policies based on the authenticity and integrity of
-> files, specifically focusing on built-in fsverity signatures. It enables
-> a policy enforcement layer within LSMs for fsverity, offering granular
-> control over the usage of authenticity claims. For instance, a policy
-> could be established to permit the execution of all files with verified
-> built-in fsverity signatures while restricting kernel module loading
-> from specified fsverity files via fsverity digests.
->
-> The introduction of a security_inode_setintegrity() hook call within
-> fsverity's workflow ensures that the verified built-in signature of a fil=
-e
-> is exposed to LSMs. This enables LSMs to recognize and label fsverity fil=
-es
-> that contain a verified built-in fsverity signature. This hook is invoked
-> subsequent to the fsverity_verify_signature() process, guaranteeing the
-> signature's verification against fsverity's keyring. This mechanism is
-> crucial for maintaining system security, as it operates in kernel space,
-> effectively thwarting attempts by malicious binaries to bypass user space
-> stack interactions.
->
-> The second to last commit in this patch set will add a link to the IPE
-> documentation in fsverity.rst.
->
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+On 5/12/24 12:39 PM, Andreas Hindborg wrote:
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+> 
+> Hi All!
+> 
+> I am happy to finally send the first _non_ RFC patches for the Rust
+> block device API.
+> 
+> This series provides an initial Rust block layer device driver API,
+> and a very minimal null block driver to exercise the API. The driver
+> has only one mode of operation and cannot be configured.
+> 
+> These patches are an updated and trimmed down version of the v2 RFC
+> [1]. One of the requests for the v2 RFC was to split the abstractions
+> into smaller pieces that are easier to review. This is the first part
+> of the split patches.
+> 
+> A notable change in this patch set is that they no longer use the
+> `ref` field of the C `struct request` to manage lifetime of the
+> request structure.
+> 
+> The removed features will be sent later, as their dependencies land
+> upstream.
+> 
+> As mentioned before, I will gladly maintain this code if required.
 
-Eric, are you okay with the fs-verity patches in v18?  If so, it would
-be nice to get your ACK on this patch at the very least.
+With the following stipulations (and the kernel test bot issues sorted),
+I think we should give this a go. We already covered this today at
+LSFMM, but for the sake of others, here's how I see the rust support for
+the block side of things:
 
-While it looks like there may be a need for an additional respin to
-address some new/different feedback from the device-mapper folks, that
-shouldn't affect the fs-verity portions of the patchset.
+I see rust support for the block layer as a two stage kind of thing.
+Stage 1 would be including this patchset. In stage 1, all fallout from
+block layer changes fall upon Andreas and group to fix. Under no
+circumstance will changes from other contributors be held up, or
+contributors be held accountable, for breakages of the block rust code.
+Should contributors wish to sort out these issues themselves, then they
+are of course free to do so, but it won't be something that gatekeeps
+other changes.
 
---=20
-paul-moore.com
+This leaves existing contributors free to go about their usual business.
+Kernels that don't enable rust (which won't happen unless you're setup
+for it anyway) won't even see build breakages. We will see some noise
+from the kernel test bot on the list, which does worry me a little bit.
+Not because it'll mark the rust side as being broken, but because it'll
+cause more noise which may make us miss breakages that are ultimately
+more important. I don't think this is a big risk, just highlighting that
+it is indeed a risk and will cause some potential annoyances.
+
+In stage 1, block rust is just there to enable people to experiment and
+play with it, and continue to develop it. Right now Andreas has a very
+(VERY) basic null_blk driver, I think we should move towards a fully
+fledged implementation of that so we at least have _something_ to test.
+We really need to full API to be used and exposed, this is generic
+kernel requirement - we just don't merge code that has no users, ever.
+Since a more complete rust null blk driver does exist out of tree,
+perhaps we can get something more complete for v2 of this patchset? I
+would highly recommend that.
+
+We may never exit stage 1, and I think during this particular stage, if
+things don't work out for whatever reason, the code can be removed
+again. As we have no critical drivers being rust exclusive at that
+point, it won't cause any issues yanking the code again. Moving into a
+stage 2 for block rust would mean that the rest of the kernel has fully
+adopted rust anyway, and being able (and willing) to write rust is just
+another part of the developer arsenal.
+
+I'd love to see the rust code moved to eg block/rust/, as I would
+greatly prefer to have it closer to the actual block code rather than
+sitting off in rust/kernel/block instead. I see this as a similar
+problem to having documentation away fro the actual code, it inevitably
+causes a drift between them. I understand from Andreas that this is
+actually something that is being worked on, and we can probably expect
+to see that in a cycle or two.
+
+tldr - as long as this doesn't encumer existing contributors, then I see
+absolutely no reason not to enable a rust playground for block drivers.
+
+-- 
+Jens Axboe
+
