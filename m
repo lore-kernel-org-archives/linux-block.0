@@ -1,94 +1,73 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4344B653
-	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 03:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6D81AACC
+	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 05:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715658503; cv=none; b=Fv+YKNVbx3H0/0KR3q6u2sZTssg41CKEI2GmWgqIkca5QMhhkluNSlY/+A+Y9TVbI29/V2nDSP4wgP6bm6JPCedX1sF9U4XpZ/OMSYrwSHxalrh8NKI5jlef97Xpp0QUyAvgW6Vn7xN7Tl4Thz3agYIRozKEOHx7JzAHtij709M=
+	t=1715663315; cv=none; b=EuvNCvLCb+SyJf2hIQGed8aYANQj7KfmYpv6YZIUSHzp0qrniTyLip0CZm+VE/WrflhSFh+jCsw+m4mFVn7t8yWMtmGTO0bYudSUO0BCTqV/Y4+8YV+ZRVU/Aw6auEtNQqNdaNsWs11an3+CXZNJStWu6GcTiwxbgWHpwyKNjsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715658503; c=relaxed/simple;
-	bh=KqDa2ScQA5UPp1ZRj0yl5RygTHFZN1yOchvHUh3c/P0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=LgnCXqH8vcGZVe9J6gmJfREoMi/y+4adcmr7GiNLRoekJgO0TZ0O8p+6HHd9mIjA8LWx7TRaLAp65OHsAxzxM+fWLNjYkCIpoMYsO2xcia7rZNILNTyrjxpPMn5okNsP/xEgNWrqtNwBGtjGheyhTnPz+FQC9WUyDa/gqpbgfgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=O1KZ8Bul; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1715663315; c=relaxed/simple;
+	bh=mB+8jHTwf1bMVLqyntHhJLdnCHwvdfi8WlYdPEnSuN0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYatcvMTK2Wo0POCg0Qd46iIWi7ZLhUZ0xj5P4q/FELU4XhZ/rjsPpnYU0a4N9TLLz20FyJKGree4bLwbn430DxsBQyIIUZBGTH3Hr14d26ktVHhy4SBZDfz+ZUowPoOz101nTg99EhJ2Fb9DKwk0HdPzQ5L4GrxqQ3tYNlmvLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=c1IcnK+e; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="O1KZ8Bul"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2b432d0252cso1281339a91.2
-        for <linux-block@vger.kernel.org>; Mon, 13 May 2024 20:48:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715658500; x=1716263300; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=peYsg/YUnELwKP62MLPathqFR5UneY1DGWncGhnYgDM=;
-        b=O1KZ8BulzLdhyPAwgjx1t/o+Ph68jD9iVR37+mXjfgTkxJLlmCB39bodxltG/7oUSw
-         RL0kCVNhAQY2HiEuqQsgdy+dczybPHYYkV9BpiseeA+vmlWQUSsH+8wL3iaHe0/WfOIW
-         p9HRN7qOP/UYjdAwJM+PQzUOI4uUjtrZuyhxN+6qgHBZhROATbfET7W5vDh6G+tuJjKL
-         9LDke5Mu7eEkWVXx1oq4kJ7tFZIK7o34M5NkifBRX7lRc68/MD9EsIQaKrobQNBPloUa
-         kDsZNnzq7RNiQjBZhVUgXeqKf3MA7COlJw/M24T7e5HkHv+k3zerVKS3pY52WEKiPW0K
-         OBNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715658500; x=1716263300;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=peYsg/YUnELwKP62MLPathqFR5UneY1DGWncGhnYgDM=;
-        b=rehP02JQy480Q04zPh8muPAIhVzYAr0SrwUQvqkfG34dmWljaXbrGkPPbPDT8chg9+
-         JjvJNJXhSGYdxlEILvgZnJPm1WBjWrYP6GKPKfycO/MvyGXyl+1g9CIQfFVMdxiT3cWE
-         F0mGI12yHgAj/LoHiVDBGqt8flFbFYzX5gKTiJYZtxaXisZhMk7v5IH4kPLiPLFzX4L8
-         9PKKT1BkpecgN6G7Qk9fDa4xPxOB+mZbPPar663f9JdgaqTJjoP+yy0cfBXv8IXEcEZs
-         nyk4CIgLxEihxZ9abZQr2rS2zLyly94vOvXTJS68cJLQmDNaUtwKoIQDCNRoS4uMS4ti
-         EtHA==
-X-Gm-Message-State: AOJu0YwKesFa1J3/M2DpvoSs4cseYSsT2CX8zfif6TntIiu0Tvy76jR/
-	U+x1ljGV/LOYKqAbxok7vG7yMd/d5Z1X1Aguoxgu6746BeBL6a/+QUxPqb9JJY1fjeVzTeb+QsJ
-	Ig/U=
-X-Google-Smtp-Source: AGHT+IGi51unJ5H4uNDgq4XGmm8jPky+y87ln++w2rRNkULieUj9IX/Bm+y5FyQGpAw1KtnZHKG8mw==
-X-Received: by 2002:a17:90a:ee45:b0:2b9:7dd3:a86c with SMTP id 98e67ed59e1d1-2b97de2eb56mr818604a91.1.1715658499818;
-        Mon, 13 May 2024 20:48:19 -0700 (PDT)
-Received: from [127.0.0.1] ([2600:380:755e:1dce:4b17:18d9:3b03:407e])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b67126add4sm8672921a91.31.2024.05.13.20.48.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 20:48:19 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Keith Busch <kbusch@meta.com>
-Cc: Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20240429102308.147627-1-kbusch@meta.com>
-References: <20240429102308.147627-1-kbusch@meta.com>
-Subject: Re: [PATCH] brd: implement discard support
-Message-Id: <171565849854.5897.16749670445299003017.b4-ty@kernel.dk>
-Date: Mon, 13 May 2024 21:48:18 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="c1IcnK+e"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=V8BLKEDjVLSYCeIAVSa2UNwbV9pR9h6kyjxXY8EtniY=; b=c1IcnK+e5fUSdoqZLyvbrU8Ygc
+	2nqiAtWrFNYDhiHPZoshYlYeJdUgQyyTfFlqq6ddCUGNOHQEJ68l/WSFeztaa20+eyKxUzzwDxIRd
+	oc9/5OnwSASoCAuhsj+iIDnRbP9eTc5Gya5KGXS1L5H39oMzPsZa9E1QZctVXsG/53/s+bb8QZs+Y
+	TjhWAnbgCR/heuhtMokjJqPhjp9m4d8rPknIVJTTc/O6mmPWHvOb9iZZ4XM/ZQZkzUpt/13+2N5Yd
+	fCk8FuDBPjZ3QA1p9dqMDFxCjraCzhl4Zsi0Lq+HWnFtnQhjQ3eD+FoJQBmrBCyP5BGp9ylYHbUUk
+	DtlTlsqw==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s6kOp-00000008kBQ-0ekQ;
+	Tue, 14 May 2024 05:08:27 +0000
+Date: Tue, 14 May 2024 06:08:27 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Luis Chamberlain <mcgrof@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>, hare@kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Pankaj Raghav <kernel@pankajraghav.com>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCH 5/5] nvme: enable logical block size > PAGE_SIZE
+Message-ID: <ZkLxy6QUc5BB_adf@casper.infradead.org>
+References: <20240510102906.51844-1-hare@kernel.org>
+ <20240510102906.51844-6-hare@kernel.org>
+ <Zj_6vDMwyb2O6ztI@bombadil.infradead.org>
+ <Zj__oIGiY8xzrwnb@casper.infradead.org>
+ <ZkAEhFLVD9gSk0y0@bombadil.infradead.org>
+ <ZkAszpvBkb5_UUiH@bombadil.infradead.org>
+ <ZkCI_21z_h1ez4sN@bombadil.infradead.org>
+ <993991e6-7f06-4dfd-b5d7-554b9574384c@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <993991e6-7f06-4dfd-b5d7-554b9574384c@suse.de>
 
-
-On Mon, 29 Apr 2024 03:23:08 -0700, Keith Busch wrote:
-> The ramdisk memory utilization can only go up when data is written to
-> new pages. Implement discard to provide the possibility to reduce memory
-> usage for pages no longer in use. Aligned discards will free the
-> associated pages, if any, and determinisitically return zeroed data
-> until written again.
+On Mon, May 13, 2024 at 06:07:55PM +0200, Hannes Reinecke wrote:
+> On 5/12/24 11:16, Luis Chamberlain wrote:
+> > On Sat, May 11, 2024 at 07:43:26PM -0700, Luis Chamberlain wrote:
+> > > I'll try next going above 512 KiB.
+> > 
+> > At 1 MiB NVMe LBA format we crash with the BUG_ON(sectors <= 0) on bio_split().
 > 
-> 
-> [...]
+> Ah. MAX_BUFS_PER_PAGE getting in the way.
 
-Applied, thanks!
-
-[1/1] brd: implement discard support
-      commit: 9ead7efc6f3f2b46c4ec68209bca4888cfbd4c19
-
-Best regards,
--- 
-Jens Axboe
-
-
+That doesn't make sense.  We will need something like this patch for
+filesystems which use large folios with buffer_heads.  But for a 1MB
+block size device, we should have one buffer_head per folio.
 
