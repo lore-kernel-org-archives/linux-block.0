@@ -1,108 +1,134 @@
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48951E480;
-	Tue, 14 May 2024 15:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD351448C0
+	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 16:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715700934; cv=none; b=BFe4Br46jsIaOn8fbwjmzDFhmzS+ljunCZpq28+/zSpPGcgpxo0v2jLmejbIU25j0OV7EziNetds25Z4QoMS0I8m1wvUBmvDHtcspf1IJPLmldXSSZBFo98E86w1jTrqKau6xY6wg8KwNAXUWH/+cVkEhK417J1rxjcztz1Kljc=
+	t=1715702902; cv=none; b=kvD6HF8ZejyFzu8L87x5c91lyRI2PFt8CGFqwT2rwYAi+XhCane/RI5TaOVeZWbyt4JGQ1IMUsj2m0pjlapAazoo85ScNQbtgYySuRGvRq7sZ9PX6/6+69/qb++UjYJKTk4PVz0C1z7vOedJEFwvVBH81CaCbNh1ARhAR64ObNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715700934; c=relaxed/simple;
-	bh=SoQbPUWxjuqB+n6gFAZO19Vdp2vroZPMEa/RFMCFvbg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kmWVmj3iWskrXZ+bQHdCeiNMu8ug/T8nKHjQIMzJiyJg2BekjXa5wVy0Y5f489gBu3k8k94Sf0p6Dn7cQmYERnAgz+3+jPyxsiBFcZSvETXYwU5O+HCkYGWXf7jGkJDY9U/vrTSCn/pn0V5c3PJUcA0hBnAfF3UsF+7cve7aE7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=YPkQtHr0; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="YPkQtHr0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715700914; x=1716305714; i=markus.elfring@web.de;
-	bh=SoQbPUWxjuqB+n6gFAZO19Vdp2vroZPMEa/RFMCFvbg=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=YPkQtHr0zu+SIwBO7X/Ck26TsRZiCSr0mGja7XWK5C7HjtYAhICMVTUOu839walo
-	 0QdbYiEfDLAv8pRa6IFt/mu/kieWx9+4rgfdTi1wqtkFnOQ6VGEREkBDOBg8slNCZ
-	 bdfJrqSuBaXsK0pSCLpfDnuhURh2pXksEzbN7PsrxltTssud6hIJ/5RZHAyeHLaFE
-	 0ZuQOvobgftzt/WzMVHlSDllO/bws1V/je/yW5LwteuFH0QBRfKjqgVXSfw8JOfQ2
-	 HtDhIUg6Y1SSGkjKSJnUvZnTRMhniOSdcC57RJ2TGhbUoQGGODmO7EN71QVtvkvgY
-	 RlK0CbQfIA5NC6gfQA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mmhnu-1spLXQ1gfO-00jham; Tue, 14
- May 2024 17:35:14 +0200
-Message-ID: <e8331545-d261-44af-b500-93b90d77d8b7@web.de>
-Date: Tue, 14 May 2024 17:34:57 +0200
+	s=arc-20240116; t=1715702902; c=relaxed/simple;
+	bh=TALiqw+2bRnrQzNIioqE2dReB/lq0tUTzpan2VON0GE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AosUqCLAMl+SG/cBv0AJ/K1xCuYaNLy39InSbkX54635nnRl/dmvgsOc1sUt8JzZE1EoE+inDJ+dj7jmfhYfLBBGx+A5q/KJWcy29QbrMw4ODI8MW+0auI+dlbWHRkJklb3FMRzxAkjE6fYpaqyfDDjvSGYSvHD7rQjd5zU3HXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6f44b296e02so3357190b3a.2
+        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 09:08:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715702900; x=1716307700;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YNP5n42nn9nZu6GVCQLpvtO7ZgtE6a5A4oDtv9l67/E=;
+        b=IrcXcZnH69u//8R0MADPgFRaUJwWouk1dOeanP1HAsYmm1ZnwUL4vJ0EKlpNMTupJd
+         usFyJfL0CthM9VllpFzCtMlu1W/eMLsWQEgYxNBTn2E+JDBRFxgN9QNr1ndHKAc31eSm
+         8Ihfa/4EaFD02QQ9dB5b7FntLHQ/N4yuk2BgemRe3hCovWEzoWz9RqY68dMr6Y1ia7/c
+         pTlHycG+BtmNbHPW2Dmn46xn91DqcPhGJ6d5Va3aLNq01ZDhr538P65iS5p5bUIErxV2
+         518FrDylvzPbkwgPIbzsBnIE75vbtRoVGWGtoPlZoOfjUV1Y4WnQvXq6095BXhvhg2G+
+         r5PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWnWSxxnEQYFxlgNFTSvZaNiQvYLqpmgjUxK//+HuJTbf4wzkhVXYXU87ABEceNKKTRhHgW4We8qdQDSLwONzpzJfAStjBEMNSwrbg=
+X-Gm-Message-State: AOJu0YzxvLk22yqsWHvVENfu3pdcdhG9orQuae7zn2wxktCzkEJ4O4fn
+	vQcz0rg8uzBKZSGbuY9FWmjHdTGtzyj3ZiqToFUllrTA3EGKpMdjSP81jOAhpNc=
+X-Google-Smtp-Source: AGHT+IGISwphAxSeBGW6eIoRZvoxDajLXY5C9QYe2vWn2FJFRUScFThli9hJhEif/xY0XERfyE3W1w==
+X-Received: by 2002:a05:6a20:d70b:b0:1af:d9a3:f38d with SMTP id adf61e73a8af0-1afde202083mr12223986637.62.1715702900535;
+        Tue, 14 May 2024 09:08:20 -0700 (PDT)
+Received: from localhost ([50.204.89.20])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340a449e0esm9649907a12.13.2024.05.14.09.08.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 09:08:19 -0700 (PDT)
+Date: Tue, 14 May 2024 12:08:19 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	Alasdair G Kergon <agk@redhat.com>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Joel Colledge <joel.colledge@linbit.com>,
+	yangerkun <yangerkun@huawei.com>
+Subject: [git pull] device mapper changes for 6.10
+Message-ID: <ZkOMczEgGuPBOCrr@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
- places
-To: Chun-Yi Lee <jlee@suse.com>, linux-block@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Chun-Yi Lee
- <joeyli.kernel@gmail.com>, "David S . Miller" <davem@davemloft.net>,
- Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
- Kirill Korotaev <dev@openvz.org>, Nicolai Stange <nstange@suse.com>,
- Pavel Emelianov <xemul@openvz.org>
-References: <20240514151854.13066-1-jlee@suse.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240514151854.13066-1-jlee@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:fcZPHpdMdYfE0uS8qeE7j3Ylbn43JMopNHDsYQV+r0PbpW6+1c/
- L+M7MUop3bLNG66Gth86c9Io6zCZ4SYcOsn3PVFw+lfR5R9t8HPo+HglFxBbM/beKqXwV+A
- rMZA2ORzZBI20Shg3pfCK2lZqGWixL9zqeUytlAlRD2j9s8FMlqkmZTwiEGBuc/4NCDtett
- rPDW4HYm03VeeqT/4543A==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:6I+Qgqut20Y=;KKxnByEwbtSb0a0f5l0OIb+jA57
- ISpL5Glnx4xcxK/cbpCLrpfZPApEmvrY3m1ELObL28qHVdWIddKDjE65ovaIaxM/j7MLizFLe
- kcarZUePKtUGaKOO+X1or58PvGcmH+XldnM0KJgow9JS9RGBJIkmdWXvT1WVtmB2GF3113rA+
- xUV0EUQjLfLBYBnKtRHIFdr/e0orijwC+pq0IZtWHLEEGgVWM6RS5HoKWACgN13KdLIN4Yx6n
- 5VGpJG45YnGAQyv3XFpIkPdRakHnubSXU9e6Ws4ZaKxkujqVevA3wX4A9cN+/Jd7IxUCiwCSQ
- y919thdyBNGzLnLrzw5tqf/07bZFmPfuC2roipZfJCWktRedaSyUi+jKVWoZwMfNbuD6C7RLo
- YOqsrS/pEQORAPZUOuUr3uplYLMdQvNONN8deicyW0xaiuidQVrJuaSMS4hbuuCfQXOhSKJLc
- /c3pd1wWEuJuBn2w/mpirHqTSx0p/UC8pxf4ZTJHVNjewbTtqdgnu+qVHiHTUmSk1uT7kdUUF
- OeqcRCnWYB9S2BCNCubglzl26TjtS8tfsdHDg0E8OazOqEnDKuM7ej6dvC6dprHrreEThJWIc
- z/Hxpx7Ner8sXKsYXc0UWp/Ed5s1Wnt/zA0JrdvB1crdKsQMEQkPwRNb1PThUb+YRZFd+Ja70
- ZifucfsgnWMsFu3ybYWRK4F4QDqNV4grt2EZOEBe8ZmAVPP2Rt0vcSfVn8//A7IWE3vo35R8x
- NrYky8OFntbpBtsq3+OKOeGFJyXWYskCg8Hv2JEz2N7BbFsVwb7NU+/e8KriGYZzEY7Tjrk8T
- mxFHr62of0Y/RLm6oNayW2dQSnXmQw1euLShpvKrHfK+w=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I suggest to reconsider the version identification in this patch subject
-once more.
+Hi Linus,
 
+The following changes since commit 48ef0ba12e6b77a1ce5d09c580c38855b090ae7c:
 
-=E2=80=A6
-> This patch makes the above functions do =E2=80=A6
+  dm: restore synchronous close of device mapper block device (2024-04-16 11:32:07 -0400)
 
-Do you stumble still on wording challenges for improved change description=
-s
-in your patches?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.9#n94
+are available in the Git repository at:
 
-=E2=80=A6
-> ---
->
-> v2:
-> - Improve patch description
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.10/dm-changes
 
-V3:
-???
+for you to fetch changes up to 8b21ac87d550acc4f6207764fed0cf6f0e3966cd:
 
-V4:
-???
+  dm-delay: remove timer_lock (2024-05-09 09:10:58 -0400)
 
-Would you like to include issue reporters in message recipient lists?
+Please pull, thanks.
+Mike
 
-Regards,
-Markus
+----------------------------------------------------------------
+- Add a dm-crypt optional "high_priority" flag that enables the crypt
+  workqueues to use WQ_HIGHPRI.
+
+- Export dm-crypt workqueues via sysfs (by enabling WQ_SYSFS) to allow
+  for improved visibility and controls over IO and crypt workqueues.
+
+- Fix dm-crypt to no longer constrain max_segment_size to PAGE_SIZE.
+  This limit isn't needed given that the block core provides late bio
+  splitting if bio exceeds underlying limits (e.g. max_segment_size).
+
+- Fix dm-crypt crypt_queue's use of WQ_UNBOUND to not use
+  WQ_CPU_INTENSIVE because it is meaningless with WQ_UNBOUND.
+
+- Fix various issues with dm-delay target (ranging from a resource
+  teardown fix, a fix for hung task when using kthread mode, and other
+  improvements that followed from code inspection).
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmZDiggACgkQxSPxCi2d
+A1oQrwf7BUHy7ehwCjRrVlFTteIlx0ULTpPxictakN/S+xZfcZUcbE20OjNVzdk9
+m5dx4Gn557rlMkiC4NDlHazVEVM5BbTpih27rvUgvX2nchUUdfHIT1OvU0isT4Yi
+h9g/o7i9DnBPjvyNjpXjP9YE7Xg8u2X9mxpv8DyU5M+QpFuofwzsfkCP7g14B0g2
+btGxT3AZ5Bo8A/csKeSqHq13Nbq/dcAZZ3IvjIg1xSXjm6CoQ04rfO0TN6SKfsFJ
+GXteBS2JT1MMcXf3oKweAeQduTE+psVFea7gt/8haKFldnV+DpPNg1gU/7rza5Os
+eL1+L1iPY5fuEJIkaqPjBVRGkxQqHg==
+=+OhH
+-----END PGP SIGNATURE-----
+
+----------------------------------------------------------------
+Benjamin Marzinski (4):
+      dm-delay: fix workqueue delay_timer race
+      dm-delay: fix max_delay calculations
+      dm-delay: change locking to avoid contention
+      dm-delay: remove timer_lock
+
+Christoph Hellwig (1):
+      dm: use queue_limits_set
+
+Joel Colledge (1):
+      dm-delay: fix hung task introduced by kthread mode
+
+Mike Snitzer (2):
+      dm-crypt: stop constraining max_segment_size to PAGE_SIZE
+      dm-crypt: don't set WQ_CPU_INTENSIVE for WQ_UNBOUND crypt_queue
+
+Mikulas Patocka (1):
+      dm-crypt: add the optional "high_priority" flag
+
+yangerkun (1):
+      dm-crypt: export sysfs of all workqueues
+
+ .../admin-guide/device-mapper/dm-crypt.rst         |  5 ++
+ drivers/md/dm-crypt.c                              | 73 +++++++++++++++-------
+ drivers/md/dm-delay.c                              | 60 +++++++++---------
+ drivers/md/dm-table.c                              | 27 ++++----
+ 4 files changed, 97 insertions(+), 68 deletions(-)
