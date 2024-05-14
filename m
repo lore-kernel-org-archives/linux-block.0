@@ -1,131 +1,150 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F66BCA62;
-	Tue, 14 May 2024 02:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1629979D2;
+	Tue, 14 May 2024 02:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715652337; cv=none; b=OA6aFA6ZwRYQ+CsTfNdD/c0LfjkxQxSD86jRUTSNgoIJU0r0hdKqaV7LxY2DPc4n3kkpZEXlUAYdkrH8aROYtxr3eGknsXPIRYFzured7AH8pNmx7ypM7EG1u+jfZpK7nY+W0xxIqoECsAiaZJJ2rJukPw8DhP2nZkijTz7ek/w=
+	t=1715654269; cv=none; b=CDQn6Dz0Bfe0D7v5gL1ki9nfJd9rzTXKSRLhsSpGPFTLiraOS3JmCSktNoYs1a6HGpaCGWYMXvukXf6Idv4Sb5uiG5/tLTcMYHbPRM90mGFl60X+jNzvl10mkfKCdkydBL/eQtIsE2aIV8DfRDsorvkvZmqLD8WxgBqTVuv/ejU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715652337; c=relaxed/simple;
-	bh=NhsZ+C2CYcpDtcwpIljnQcDjOLmdu+fZF7+ROHY/32M=;
+	s=arc-20240116; t=1715654269; c=relaxed/simple;
+	bh=ekzT3/ALmq1PjIJdX057ZpcKoIJb0LpnFk9nb9TeOgw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=enuwlan/q0g3TmJb4F5fIqdgvDY/rcMqwLDvhA/picR6L4GrIzpKq5TB0AqQWU50pysUWB22luMIxwcqxRmc/YiHrW+5JG0lmyVw9oIDjVgX1wLgGD2EVUiu1gVqU8Rhp/qQ5Q6jPYjiRZ+D4MY/XwIMPmMEZtgKu9OBG8LO7Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z5rQJR98; arc=none smtp.client-ip=209.85.167.42
+	 To:Cc:Content-Type; b=cLrOMON34Qgon6Hp9bhseMkLcHIG8WVmMF/e+rrtrJHVivRwzC/SomsKv6Iqpo3AGubDQmNTMC/kIbK8/+aVk2grWpW7BlqDSGlCWolqFGK4OeBHstvIFwfEUegZ5jubcGGyawp6CI/BK80GHLNK89o0Pv1mwzBw8c7331j2NMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UOhjoXpO; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z5rQJR98"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51f2ebbd8a7so5641716e87.2;
-        Mon, 13 May 2024 19:05:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOhjoXpO"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51ef64d051bso5834638e87.1;
+        Mon, 13 May 2024 19:37:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715652333; x=1716257133; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715654266; x=1716259066; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wxFA2X6IJt65tETPWjtrRru5w3XzoCwgMRsrmd+S4lU=;
-        b=Z5rQJR98CJVccS7cUkVlC3TtMD9fHOAa+bmnrkMya3P9ArlPk8VsabJUUGO8ansULN
-         /oF/+YSLImwdPbH769woSwdTYYY06f9gvx/xi3UCFaiC8NU3KW+EuLiS2/QbhQ/yDYu+
-         yCyK68E5tik0ML2M+3RY3Il1ww7S1UbjyLQAaPQFctYYy1CaK/9pCG98Wso34lXJgw5+
-         IyRVYQJoKIOrWdVuKilCBdy5uQJaJlmPQt5Rn8hl2+WzlUKANTh9wfjinENwFqJ2dqAr
-         sDBL5ZFFhsMyLLeF0WjsZNmvTjCyU9uvK5tXN1wtAYQs9H3uaiK8l1Cl76nsGWmzn6zD
-         +fmg==
+        bh=OYzw8FYz26q93IeZfDcCF7zSochl7yn4cVs5hUQhg0w=;
+        b=UOhjoXpOn839HQEIUXQbWRFhQL0Xu1FDOAX7kaVJ/jkMVJ5y+ax94VX+4WBKQVAKg7
+         oP93FN/+rlN/PZ2rTaxjH/A10uBg4nz6sE1CEcI6iFFpPMS9H3UkzWjuoW0Awo8Gbp/w
+         cdWFimdVWjEv5MQp0j4exmrzBQrU4kzBCzdPSHj7XBoAg2+rYQe4vdmgnSoqXsXJ5FeB
+         G7MJU9ySotZCUoEWQOWnXHHc2MrsY9mXdQ223bspJAcvg+oZ93XzdV7rgWgTtJ+PlB5T
+         1fPlyzvi2J3Nr5KPreJuMTdRrS5Qk9e/331AjEK8KfV6u1RVQ+taNzVF8oA7rE/6Zy7K
+         8aJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715652333; x=1716257133;
+        d=1e100.net; s=20230601; t=1715654266; x=1716259066;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wxFA2X6IJt65tETPWjtrRru5w3XzoCwgMRsrmd+S4lU=;
-        b=HMMrkkQUvbM5DFD6RAPMGflGxQeFjkLKP9B8aZ1x3ZIK57JUjaKrp789OTIcp4PMMC
-         GpSM/Is3F6okViAhipthjVUxWhuCpVh7Z6DEZZBd2D3962J7nNB5drIcLKVBBCfTcCN0
-         djXkwUfUhUcALVgS1k76C6kEiNaKOcrTQR20/EZ0NIr+DWpgFtT3jPee98+SQvWrswiW
-         0XeStqesFHLsy5dytlJYgOTEVbxhxMeRRzTaYpjUvzOHVeEV1krIh1f8WHKBv11hyW20
-         Z/wT9MmI4BEHbII7kpVuNgsuBRbEYY5s/DB2bBdyJ61D2CyV4l1GTolYaEiGa4hH+HT+
-         0JrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOXFnarzm7eT6CUunEoWSao2kxJ4G0jhard7by0lG/sgO2c3GzZkJHEk5bsNK6nt3IEhpLVPlte9JA62adyy3obENV4n4qgB451JU=
-X-Gm-Message-State: AOJu0Yx5eIWuxZsDEUup5dSNl/k/HRM/K5PEAp1/T5yTg+DswJHJiB8M
-	nRgWo11Mjnk9VzIWrCp7N+fyf0zOgNhUKmG7RNZPy5mX/+MdQZKl1rfar3DP6SM+yZSdOpWJWDL
-	OQ787XYrrjqhDTWMewZi8CqpA4ek=
-X-Google-Smtp-Source: AGHT+IEEpX8txEQ2kh0R+wJnLXEGVaauqZJdg6f5TnWvPdFjZHEBtUpvYvfS68tNCK/5/jMWRWQWIIerHFZudGqxoQQ=
-X-Received: by 2002:a05:6512:b1a:b0:51d:a4e3:4cb8 with SMTP id
- 2adb3069b0e04-5220ff70b64mr9038580e87.49.1715652333236; Mon, 13 May 2024
- 19:05:33 -0700 (PDT)
+        bh=OYzw8FYz26q93IeZfDcCF7zSochl7yn4cVs5hUQhg0w=;
+        b=oNNqXAKGRUE3YNiltmhPKw8u4tegAg59VhzKI4jOq4hiHASszLv928OxQAOqO9ZYit
+         D7Pxbkno2q3DfpZumgMpVY6IWcrc4icTbEyuCIghQVc13PxPQ+B0z+NIoBFspoutkPJn
+         dUbAvsRbUlio0ghwC5bxjL+i+s3Oesbw7iyAzIX7M94cSlPz5iwmdJxa1QX79FaLQ8Pp
+         LPYMSglcna+8oXqlDmY1294CrYQEsVcN114WokqA+IgTGL6Ii01wkg7RT/mHjE4lGrxB
+         Hz5d7hqiYO2P8SrcGKZK0Ip32EzYgXw0FjYVCDuNHX7NYzbnP32erHNXFB7gdwriJ/qV
+         JAPw==
+X-Forwarded-Encrypted: i=1; AJvYcCX71/ml//VFKCBOYaX5xfRQMhWZnEbdGkfM+zYUnxNQMrZ7N40V3wzWBZJFDP4kNa93aKQuo9KqNsRZZ4wj1Sd+aCWryJLT7HpnWJY1uKMGmoLuHkpIyi4+Y97YaPxHtqqcX+QUYGueCg97rdHYowfNU/RBxfMoNjJ/6iPaJZy4Rzox
+X-Gm-Message-State: AOJu0Yxw0u1iQQIgmpwhAufBd7fZddkpQnZA6Dl352pPFVUtBWDJ2MpA
+	q2jC+O7rirUZSfccLbUTHavbYrfGfHCYoG8KgroK2ZQ0YbpKSfGFm0F38EvZuXrYTydt0zXs8EN
+	yRFGoV/3FTgMukZVCq+kDKYERs2k=
+X-Google-Smtp-Source: AGHT+IFNDspAwtyzoDLuNze7g9mcZhGYAjP0GU2W7ymEHWo1OP7lcHugnImIwqWWiKNTUnOO1zZoCH3B7ZuG5lEgDsE=
+X-Received: by 2002:a05:6512:1c8:b0:51c:3e9e:98ee with SMTP id
+ 2adb3069b0e04-5220fb6b067mr6954023e87.23.1715654265932; Mon, 13 May 2024
+ 19:37:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEkJfYPxWBfEnuKeCGEsscVTYy8MrNxCJwdbxS=c2-B0H+HfTA@mail.gmail.com>
- <20240513225409.3025-1-hdanton@sina.com>
-In-Reply-To: <20240513225409.3025-1-hdanton@sina.com>
-From: Sam Sun <samsun1006219@gmail.com>
-Date: Tue, 14 May 2024 10:05:21 +0800
-Message-ID: <CAEkJfYMhv8AxxHSVdPT9bCX1cJZXw39+bMFh=2N9uNOB4Hcr=w@mail.gmail.com>
-Subject: Re: [Linux kernel bug] INFO: task hung in blk_mq_get_tag
-To: Hillf Danton <hdanton@sina.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk, 
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, syzkaller-bugs@googlegroups.com, 
-	xrivendell7@gmail.com
+References: <20240509023937.1090421-1-zhaoyang.huang@unisoc.com>
+ <20240509023937.1090421-3-zhaoyang.huang@unisoc.com> <Zjw_0UPKvGkPfKFO@casper.infradead.org>
+ <CAGWkznGZP3KUBN2M6syrjTmVOdSM0zx23hcJ6+hqE8Drgz2f-A@mail.gmail.com>
+ <Zj2R_UH0JMspexp5@casper.infradead.org> <CAGWkznHX3OBeMh7-jvAP1HyVaT=TN6Fs2ArUCkUHtE3nVadaDA@mail.gmail.com>
+In-Reply-To: <CAGWkznHX3OBeMh7-jvAP1HyVaT=TN6Fs2ArUCkUHtE3nVadaDA@mail.gmail.com>
+From: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date: Tue, 14 May 2024 10:37:34 +0800
+Message-ID: <CAGWkznGYBAWQCBFRbFCVkFcUZsZ77+yf+Pun6NS8EpmdKdsaBQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] mm: introduce budgt control in readahead
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	cgroups@vger.kernel.org, steve.kang@unisoc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 14, 2024 at 6:54=E2=80=AFAM Hillf Danton <hdanton@sina.com> wro=
-te:
+On Sat, May 11, 2024 at 3:35=E2=80=AFPM Zhaoyang Huang <huangzhaoyang@gmail=
+.com> wrote:
 >
-> On Mon, 13 May 2024 20:57:44 +0800 Sam Sun <samsun1006219@gmail.com>
+> On Fri, May 10, 2024 at 11:18=E2=80=AFAM Matthew Wilcox <willy@infradead.=
+org> wrote:
 > >
-> > I applied this patch and tried using the C repro, but it still crashed
-> > with the same task hang kernel dump log.
+> > On Fri, May 10, 2024 at 10:43:20AM +0800, Zhaoyang Huang wrote:
+> > > Thanks for the prompt. I did some basic research on soft RAID and
+> > > wonder if applying the bps limit on /dev/md0 like below could make
+> > > this work.
+> >
+> > No.  Look at btrfs' raid support, for example.  it doesn't use md0.
+> If I understand the below command correctly, btrfs uses one of the
+> volumes within RAID as the mount block device, not /dev/md0. However,
+> I think this is a problem of blkio.throttle rather than this commit
+> which means this readahead budget control will work accordingly as
+> long as blkio.throttle's parameter is configured correctly(eg. 50/50
+> on sdb and sdc)
 >
-> Oh low-hanging pear is sour, and try again seeing if there is missing
-> wakeup due to wake batch.
+> mkfs.btrfs -m raid0 -d raid0 /dev/sdb /dev/sdc
+> mount -t btrfs /dev/sdb /mnt/btr
 >
-> --- x/lib/sbitmap.c
-> +++ y/lib/sbitmap.c
-> @@ -579,6 +579,8 @@ void sbitmap_queue_wake_up(struct sbitma
->         unsigned int wake_batch =3D READ_ONCE(sbq->wake_batch);
->         unsigned int wakeups;
 >
-> +       __sbitmap_queue_wake_up(sbq, nr);
-> +
->         if (!atomic_read(&sbq->ws_active))
->                 return;
 >
-> --
+> >
+> > > I didn't find information about 'RAID internally'. Could we set the
+> > > limit on the root device(the one used for mount) to manage the whole
+> > > partition without caring about where the bio finally goes? Or ask the
+> > > user to decide if to use by making sure the device they apply will no=
+t
+> > > do RAID?
+> >
+> > No.
+
+@all, Please find below for more test results where we can find this
+commit has the result meet the desired value more closely and enhance
+it by 3% than mainline.
+
+echo "254:48 20000000" > blkio.throttle.read_bps_device
+fio -filename=3D/data/ylog/ap/000-0101_000015_poweron.ylog -rw=3Dread
+-direct=3D0 -bs=3D4k -size=3D2000M -numjobs=3D8 -group_reporting -name=3Dmy=
+test
+
+    before : IOPS=3D37.9k, BW=3D148MiB/s (155MB/s)(11.6GiB/80333msec)
+    after  : IOPS=3D39.0k, BW=3D153MiB/s (160MB/s)(15.6GiB/104914msec)
+
+    before : clat (usec): min=3D4, max=3D1056.6k, avg=3D197.23, stdev=3D100=
+80.69
+    after  : clat (usec): min=3D4, max=3D193481, avg=3D188.83, stdev=3D4651=
+.29
+
+    before : lat (usec): min=3D5, max=3D1056.6k, avg=3D200.48, stdev=3D1008=
+0.76
+    after  : lat (usec): min=3D5, max=3D193483, avg=3D192.68, stdev=3D4651.=
+87
 
 
-I applied this patch together with the last patch. Unfortunately it
-still crashed.
+echo "254:48 30000000" > blkio.throttle.read_bps_device
+fio -filename=3D/data/ylog/ap/000-0101_000015_poweron.ylog -rw=3Dread
+-direct=3D0 -bs=3D4k -size=3D2000M -numjobs=3D8 -group_reporting -name=3Dmy=
+test
 
-Pointed out by Tetsuo, this kernel panic might be caused by sending
-NMI between cpus. As dump log shows:
-```
-[  429.046960][   T32] NMI backtrace for cpu 0
-[  429.047499][   T32] CPU: 0 PID: 32 Comm: khungtaskd Not tainted
-6.9.0-dirty #6
-[  429.048417][   T32] Hardware name: QEMU Standard PC (i440FX + PIIX,
-1996), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
-[  429.049873][   T32] Call Trace:
-[  429.050299][   T32]  <TASK>
-[  429.050672][   T32]  dump_stack_lvl+0x201/0x300
-...
-[  429.063133][   T32]  ret_from_fork_asm+0x11/0x20
-[  429.063735][   T32]  </TASK>
-[  429.064168][   T32] Sending NMI from CPU 0 to CPUs 1:
-[  429.064833][   T32] BUG: unable to handle page fault for address:
-ffffffff813d4cf1
-[  429.065765][   T32] #PF: supervisor write access in kernel mode
-[  429.066502][   T32] #PF: error_code(0x0003) - permissions violation
-[  429.067274][   T32] PGD db38067 P4D db38067 PUD db39063 PMD 12001a1
-[  429.068068][   T32] Oops: 0003 [#1] PREEMPT SMP KASAN NOPTI
-[  429.068767][   T32] CPU: 0 PID: 32 Comm: khungtaskd Not tainted
-6.9.0-dirty #6
-[  429.069666][   T32] Hardware name: QEMU Standard PC (i440FX + PIIX,
-1996), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
-[  429.071142][   T32] RIP: 0010:__send_ipi_mask+0x541/0x690
-```
-Should I add them to cc list?
+    before : IOPS=3D57.2k, BW=3D224MiB/s (234MB/s)(15.6GiB/71561msec)
+    after  : IOPS=3D58.5k, BW=3D229MiB/s (240MB/s)(15.6GiB/69996msec)
 
-Best,
-Yue
+    before : clat (usec): min=3D4, max=3D1105.5k, avg=3D126.20, stdev=3D641=
+9.22
+    after  : clat (usec): min=3D4, max=3D183956, avg=3D120.60, stdev=3D2957=
+.28
+
+    before : lat (usec): min=3D5, max=3D1105.5k, avg=3D129.45, stdev=3D6419=
+.29
+    after  : lat (usec): min=3D5, max=3D183958, avg=3D124.40, stdev=3D2958.=
+18
