@@ -1,64 +1,63 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79B162171
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 07:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F6B5BAFC
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 07:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715757453; cv=none; b=Y70Cg8xPlPEgtavmT8HopYX/4X6C5RFSd7PZFa61x45dB9o0kNYCDNDsTfCAa/odgAzz3uWbfMOfCM/Hno262wCji+PA5LbdzdtkDrD+d7lni1mYwrYPTmDjBdeJGk5ItyepaT4oj4yyAs++2x0iRLVwpBzz4VmACGJWnatEhxc=
+	t=1715757456; cv=none; b=hYgJ5Pu6JehKEUxWiN2Cr2FJCcbRflRQKh8o+tWPcXc2RRPAPPLs14vQjIV6TOrAwEUFUlmL5PHyNYTCH7HJOkNmW8LkIY+nsA8PUMgU/lvTdHB2TLjH3kAWUb4FHHdoeQybqE0RLySMvCqmQekTIGM1Xd+zGS9bA5NAn4fW3EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715757453; c=relaxed/simple;
-	bh=dGZx0+acqv0CZi2wH7InQ4R8O8AcdvZYdUe91hxxiWY=;
+	s=arc-20240116; t=1715757456; c=relaxed/simple;
+	bh=qPxpMzrLexeajXOvydJh+v3ubpdPbmLqWgxknedh2Uk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nSN0JJuL4+kqD8wkwQ/xsxDn3US7SofLsmP7QM+ZHA21D5QV0FQmIj0XWdmLrAQzNWcbgtH4C23NYrXOFYCTdUdJbLdiQj8U6F1Ei2QojuTR+fWJOTyCkDeMdcXnQJPSJILG84T1UejYi/fmWt4QW4yCuDMGkytWaW3xOcw241I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=XYhwxIUM; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=qQN9TTa6mYnCORpmYG6m658GaU8Iw73GsCViJeSIfCkzr7pjEUEOrsZMcR32VDsahHtoz77UrZ+L5Ok8BzDx71k58uNXk375qDNX3eZCSQJor7VGntQun2dD8V2ShHL4JrxWx64QtLLHyq3qIHYO+mbyg04ekIsOEH4VXTGpTLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Xdt8p9hv; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XYhwxIUM"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f4472561f1so5896174b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 00:17:31 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Xdt8p9hv"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6f453d2c5a1so5277447b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 00:17:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715757451; x=1716362251; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1715757453; x=1716362253; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/z5a3E5tjsWd2v3yZqDEd2ZFUX29EqdmRojLDBz4OHQ=;
-        b=XYhwxIUM8or1FxDmvVN5glOWFu63z/QCHG1Ml26EstgH79SW1uXwEBvolud6QX6cdr
-         2+dXRPM+1lza3dA2tPVvNhIQrMIsTCCoKiEZOzBED75+gaQ1/9SWjjsxVuJV0tQVwQOQ
-         n0dmXtvze4CwhLT/6loisp/6N0yo4cD6NuT5s=
+        bh=e1Q92/50oEzsFAIXeAasi/lhjVaiDz6wVjSMUCSkV98=;
+        b=Xdt8p9hvR9TFDNsREHSqFGtB4LrvWY6k3grut4Jh2mc67rjUSKE6UncsmCO6Lc5F/q
+         7q8FhbvOcx+XLoPR+yglbhlOfFlycwo9lgVqS6Mmdfvvvw5icjO9/p1zNM5frFZNuulB
+         QBXRdiJqUWmsdPOCwa8nlNr3UmFwQCV1tiXL4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715757451; x=1716362251;
+        d=1e100.net; s=20230601; t=1715757453; x=1716362253;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/z5a3E5tjsWd2v3yZqDEd2ZFUX29EqdmRojLDBz4OHQ=;
-        b=EodaHsRk803VHjFXm4xpZD9FsENqBmx0PvJEwj/Ash0aUjCTX+MIke9LDwKIo1e4Xu
-         0xI4KpPYHg45zGkem7wbdMV3pnY/9XExwDVak6oa3DeT0tmd7+o1Uql5vjTYpnh47ERo
-         uaD2e5FV0aos7l4CKpUZKaKAXNurTrK4VVtjCiL6kP2lMkwOQFQtupQX5Jqa9/idFKON
-         Z1FhMOQ41Le4LaHq1cMi3a65H46W6D6rExtjSITqGQCKYLK7NodJ3TCdONi95UccqIZP
-         vQ2WTE+Bw5SA/pwGvgzG/5Y2WdEBVYv7MskbZ7ZT5/3TZ4KHGPJ9PA7IcM2ClBBWR9DC
-         ps7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUfGagOGYgE8IHwTah0NsP+AAUyvPMwSn1pe0JvFY4qyitIKf99kIXNIcOX9huKt3csf5cLNmwDqcEPdTh0c0KhU77ZqIzg9rhe7Eo=
-X-Gm-Message-State: AOJu0Yw3tor6pLTk36oSy70J/XmJjwZIQ6YtU0NVdYF0ET/y6U+s+01P
-	tJckAsAKjnldL5eDgJYjko/r8/4ihEJxYhgLvhancNTr1cTU9LD9wbLaGPBUGA==
-X-Google-Smtp-Source: AGHT+IGv1Omsyk9TRAdIngjWvd5a6uW973xBM8/wHVw3kf6S3NTLue+rsCGPi9x1UgDL0rvIAAuHOQ==
-X-Received: by 2002:a05:6a20:f38f:b0:1aa:a6cc:39c5 with SMTP id adf61e73a8af0-1afde0824f6mr18701539637.7.1715757451053;
-        Wed, 15 May 2024 00:17:31 -0700 (PDT)
+        bh=e1Q92/50oEzsFAIXeAasi/lhjVaiDz6wVjSMUCSkV98=;
+        b=T7/NVgtMXc21ADPnzklqZIXR3tApbATudmnxjp38C2Me8i7M8kR5OoGMtiEfymVlXM
+         hComt5M8h5fti9Zg2tDRADtdPcVCbtT+MFKzrPf+j0ykZSNV7voFL2lliebcp34TMSOV
+         ZvIax8izGlwO+8or8fEMS6um9G8cFgVaqzwS/c8OnDD6wXv2ID76BNTZd5ECzyym+feh
+         mshdkgXkOSTXgvGwAWMSLevtmiUQonA0F3P/N575yil7jBz9M1pZCbsmFwcNYK2bcf2B
+         gyWoAYZ/5Ml9OiOWuoak9oM5YO1DtpnJIWwzNZfQjFqutpn8NWPLKLSVDOysIYVVdDNo
+         kBNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWjAsuHwNyDbrORzT9yfCQzvb3y6puUzj2ulSGMeazTxIdqitr+wwyYc3gPUd3/IoK6cHei4rKZaFRQzIFSmgRB7XsTOuAhddYSo6o=
+X-Gm-Message-State: AOJu0Yw3o3Agdv8j6GsbvGRS0lK93FExIDhTsO6X7A58hxNMR9aObcRM
+	FbP/SlXp3B5um6447f7nXpsWoJU4H5sV8rXDtjBh3azHL5BXo0xe3vaHW/BoRQ==
+X-Google-Smtp-Source: AGHT+IFoXN+G8OBVIyHl2dhkr+cK7yJTsa+IDe8Y4EgCK8SM3Nz6RhZgJrZp6Vf7WOYHuo5IjVDf2g==
+X-Received: by 2002:a05:6a20:5504:b0:1a9:8152:5102 with SMTP id adf61e73a8af0-1afde0d54c9mr14256096637.24.1715757453236;
+        Wed, 15 May 2024 00:17:33 -0700 (PDT)
 Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:111d:a618:3172:cd5b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136d53sm110941605ad.254.2024.05.15.00.17.29
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136d53sm110941605ad.254.2024.05.15.00.17.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 00:17:30 -0700 (PDT)
+        Wed, 15 May 2024 00:17:32 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Minchan Kim <minchan@kernel.org>
 Cc: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Nick Terrell <terrelln@fb.com>
-Subject: [PATCHv4 14/21] lib/zstd: export API needed for dictionary support
-Date: Wed, 15 May 2024 16:12:51 +0900
-Message-ID: <20240515071645.1788128-15-senozhatsky@chromium.org>
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCHv4 15/21] zram: add dictionary support to zstd backend
+Date: Wed, 15 May 2024 16:12:52 +0900
+Message-ID: <20240515071645.1788128-16-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 In-Reply-To: <20240515071645.1788128-1-senozhatsky@chromium.org>
 References: <20240515071645.1788128-1-senozhatsky@chromium.org>
@@ -70,355 +69,207 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We need to export a number of API functions that enable
-advanced zstd usage - C/D dictionaries, dictionaries
-sharing between contexts, etc.
+This adds support for pre-trained zstd dictionaries [1]
+Dictionary is loaded once (per-config) and then loaded to Cctx
+and Dctx by reference, so we don't allocate extra memory.
+
+Regarding GFP_ATOMIC in Cctx customAlloc(), we probably would
+want to do something about it. Either make sure that we always
+(somehow) fully setup all Cctx contexts from non-atomic context
+before we attempt to use them, come up with some sort of custom
+allocator or stop calling zcomp_compress() from atomic context.
+
+TEST
+====
+
+- default zstd
+
+/sys/block/zram0/mm_stat
+1750315008 504602831 514256896        0 514256896        1        0    34204    34204
+
+- zstd level=7 dict=/etc/dictionary
+
+/sys/block/zram0/mm_stat
+1750310912 432540606 441712640        0 441712640        1        0    34187    34187
+
+[1] https://github.com/facebook/zstd/blob/dev/programs/zstd.1.md#dictionary-builder
 
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Nick Terrell <terrelln@fb.com>
 ---
- include/linux/zstd.h              | 165 ++++++++++++++++++++++++++++++
- lib/zstd/zstd_compress_module.c   |  52 ++++++++++
- lib/zstd/zstd_decompress_module.c |  38 +++++++
- 3 files changed, 255 insertions(+)
+ drivers/block/zram/backend_zstd.c | 126 ++++++++++++++++++++++++------
+ 1 file changed, 101 insertions(+), 25 deletions(-)
 
-diff --git a/include/linux/zstd.h b/include/linux/zstd.h
-index f109d49f43f8..18260a354231 100644
---- a/include/linux/zstd.h
-+++ b/include/linux/zstd.h
-@@ -77,6 +77,30 @@ int zstd_min_clevel(void);
-  */
- int zstd_max_clevel(void);
+diff --git a/drivers/block/zram/backend_zstd.c b/drivers/block/zram/backend_zstd.c
+index d392d364ad2c..4be149370e0b 100644
+--- a/drivers/block/zram/backend_zstd.c
++++ b/drivers/block/zram/backend_zstd.c
+@@ -12,23 +12,52 @@ struct zstd_ctx {
+ 	zstd_dctx *dctx;
+ 	void *cctx_mem;
+ 	void *dctx_mem;
++	zstd_custom_mem ctx_mem;
++	zstd_cdict *cdict;
++	zstd_ddict *ddict;
+ 	s32 level;
+ };
  
-+/**
-+ * zstd_default_clevel() - default compression level
-+ *
-+ * Return: Default compression level.
++/*
++ * Cctx allocator.customAlloc() can be called from zcomp_compress() under
++ * local-lock (per-CPU compression stream), in which case we must use
++ * GFP_ATOMIC.
 + */
-+int zstd_default_clevel(void);
-+
-+/**
-+ * struct zstd_custom_mem - custom memory allocation
-+ */
-+typedef ZSTD_customMem zstd_custom_mem;
-+
-+/**
-+ * struct zstd_dict_load_method - Dictionary load method.
-+ * See zstd_lib.h.
-+ */
-+typedef ZSTD_dictLoadMethod_e zstd_dict_load_method;
-+
-+/**
-+ * struct zstd_dict_content_type - Dictionary context type.
-+ * See zstd_lib.h.
-+ */
-+typedef ZSTD_dictContentType_e zstd_dict_content_type;
-+
- /* ======   Parameter Selection   ====== */
- 
- /**
-@@ -136,6 +160,19 @@ typedef ZSTD_parameters zstd_parameters;
- zstd_parameters zstd_get_params(int level,
- 	unsigned long long estimated_src_size);
- 
-+
-+/**
-+ * zstd_get_cparams() - returns zstd_compression_parameters for selected level
-+ * @level:              The compression level
-+ * @estimated_src_size: The estimated source size to compress or 0
-+ *                      if unknown.
-+ * @dict_size:          Dictionary size.
-+ *
-+ * Return:              The selected zstd_compression_parameters.
-+ */
-+zstd_compression_parameters zstd_get_cparams(int level,
-+	unsigned long long estimated_src_size, size_t dict_size);
-+
- /* ======   Single-pass Compression   ====== */
- 
- typedef ZSTD_CCtx zstd_cctx;
-@@ -180,6 +217,70 @@ zstd_cctx *zstd_init_cctx(void *workspace, size_t workspace_size);
- size_t zstd_compress_cctx(zstd_cctx *cctx, void *dst, size_t dst_capacity,
- 	const void *src, size_t src_size, const zstd_parameters *parameters);
- 
-+/**
-+ * zstd_create_cctx_advanced() - Create compression context
-+ * @custom_mem:   Custom allocator.
-+ *
-+ * Return:        NULL on error, pointer to compression context otherwise.
-+ */
-+zstd_cctx *zstd_create_cctx_advanced(zstd_custom_mem custom_mem);
-+
-+/**
-+ * zstd_free_cctx() - Free compression context
-+ * @cdict:        Pointer to compression context.
-+ *
-+ * Return:        Always 0.
-+ */
-+size_t zstd_free_cctx(zstd_cctx* cctx);
-+
-+/**
-+ * struct zstd_cdict - Compression dictionary.
-+ * See zstd_lib.h.
-+ */
-+typedef ZSTD_CDict zstd_cdict;
-+
-+/**
-+ * zstd_create_cdict_advanced() - Create compression dictionary
-+ * @dict:              Pointer to dictionary buffer.
-+ * @dict_size:         Size of the dictionary buffer.
-+ * @dict_load_method:  Dictionary load method.
-+ * @dict_content_type: Dictionary content type.
-+ * @custom_mem:        Memory allocator.
-+ *
-+ * Return:             NULL on error, pointer to compression dictionary
-+ *                     otherwise.
-+ */
-+zstd_cdict *zstd_create_cdict_advanced(const void *dict, size_t dict_size,
-+				       zstd_dict_load_method dict_load_method,
-+				       zstd_dict_content_type dict_content_type,
-+				       zstd_compression_parameters cparams,
-+				       zstd_custom_mem custom_mem);
-+
-+/**
-+ * zstd_free_cdict() - Free compression dictionary
-+ * @cdict:        Pointer to compression dictionary.
-+ *
-+ * Return:        Always 0.
-+ */
-+size_t zstd_free_cdict(zstd_cdict* cdict);
-+
-+/**
-+ * zstd_compress_using_cdict() - compress src into dst using a dictionary
-+ * @cctx:         The context. Must have been initialized with zstd_init_cctx().
-+ * @dst:          The buffer to compress src into.
-+ * @dst_capacity: The size of the destination buffer. May be any size, but
-+ *                ZSTD_compressBound(srcSize) is guaranteed to be large enough.
-+ * @src:          The data to compress.
-+ * @src_size:     The size of the data to compress.
-+ * @cdict:        The dictionary to be used.
-+ *
-+ * Return:        The compressed size or an error, which can be checked using
-+ *                zstd_is_error().
-+ */
-+size_t zstd_compress_using_cdict(zstd_cctx *cctx, void *dst,
-+	size_t dst_capacity, const void *src, size_t src_size,
-+	const zstd_cdict *cdict);
-+
- /* ======   Single-pass Decompression   ====== */
- 
- typedef ZSTD_DCtx zstd_dctx;
-@@ -220,6 +321,70 @@ zstd_dctx *zstd_init_dctx(void *workspace, size_t workspace_size);
- size_t zstd_decompress_dctx(zstd_dctx *dctx, void *dst, size_t dst_capacity,
- 	const void *src, size_t src_size);
- 
-+/**
-+ * struct zstd_ddict - Decompression dictionary.
-+ * See zstd_lib.h.
-+ */
-+typedef ZSTD_DDict zstd_ddict;
-+
-+/**
-+ * zstd_create_ddict_advanced() - Create decompression dictionary
-+ * @dict:              Pointer to dictionary buffer.
-+ * @dict_size:         Size of the dictionary buffer.
-+ * @dict_load_method:  Dictionary load method.
-+ * @dict_content_type: Dictionary content type.
-+ * @custom_mem:        Memory allocator.
-+ *
-+ * Return:             NULL on error, pointer to decompression dictionary
-+ *                     otherwise.
-+ */
-+zstd_ddict *zstd_create_ddict_advanced(const void *dict, size_t dict_size,
-+				       zstd_dict_load_method dict_load_method,
-+				       zstd_dict_content_type dict_content_type,
-+				       zstd_custom_mem custom_mem);
-+/**
-+ * zstd_free_ddict() - Free decompression dictionary
-+ * @dict:         Pointer to the dictionary.
-+ *
-+ * Return:        Always 0.
-+ */
-+size_t zstd_free_ddict(zstd_ddict *ddict);
-+
-+/**
-+ * zstd_create_dctx_advanced() - Create decompression context
-+ * @custom_mem:   Custom allocator.
-+ *
-+ * Return:        NULL on error, pointer to decompression context otherwise.
-+ */
-+zstd_dctx *zstd_create_dctx_advanced(zstd_custom_mem custom_mem);
-+
-+/**
-+ * zstd_free_dctx() -- Free decompression context
-+ * @dctx:         Pointer to decompression context.
-+ * Return:        Always 0.
-+ */
-+size_t zstd_free_dctx(zstd_dctx *dctx);
-+
-+/**
-+ * zstd_decompress_using_ddict() - decompress src into dst using a dictionary
-+ * @dctx:         The decompression context.
-+ * @dst:          The buffer to decompress src into.
-+ * @dst_capacity: The size of the destination buffer. Must be at least as large
-+ *                as the decompressed size. If the caller cannot upper bound the
-+ *                decompressed size, then it's better to use the streaming API.
-+ * @src:          The zstd compressed data to decompress. Multiple concatenated
-+ *                frames and skippable frames are allowed.
-+ * @src_size:     The exact size of the data to decompress.
-+ * @ddict:        The dictionary to be used.
-+ *
-+ * Return:        The decompressed size or an error, which can be checked using
-+ *                zstd_is_error().
-+ */
-+size_t zstd_decompress_using_ddict(zstd_dctx *dctx,
-+	void *dst, size_t dst_capacity, const void *src, size_t src_size,
-+	const zstd_ddict *ddict);
-+
-+
- /* ======   Streaming Buffers   ====== */
- 
- /**
-diff --git a/lib/zstd/zstd_compress_module.c b/lib/zstd/zstd_compress_module.c
-index 8ecf43226af2..a5edf59334df 100644
---- a/lib/zstd/zstd_compress_module.c
-+++ b/lib/zstd/zstd_compress_module.c
-@@ -66,6 +66,12 @@ int zstd_max_clevel(void)
- }
- EXPORT_SYMBOL(zstd_max_clevel);
- 
-+int zstd_default_clevel(void)
++static void *zstd_ctx_alloc(void *opaque, size_t size)
 +{
-+	return ZSTD_defaultCLevel();
-+}
-+EXPORT_SYMBOL(zstd_default_clevel);
++	if (!preemptible())
++		return kvzalloc(size, GFP_ATOMIC);
 +
- size_t zstd_compress_bound(size_t src_size)
++	return kvzalloc(size, GFP_KERNEL);
++}
++
++static void zstd_ctx_free(void *opaque, void *address)
++{
++	kvfree(address);
++}
++
+ static void zstd_destroy(void *ctx)
  {
- 	return ZSTD_compressBound(src_size);
-@@ -79,6 +85,13 @@ zstd_parameters zstd_get_params(int level,
- }
- EXPORT_SYMBOL(zstd_get_params);
+ 	struct zstd_ctx *zctx = ctx;
  
-+zstd_compression_parameters zstd_get_cparams(int level,
-+	unsigned long long estimated_src_size, size_t dict_size)
-+{
-+	return ZSTD_getCParams(level, estimated_src_size, dict_size);
-+}
-+EXPORT_SYMBOL(zstd_get_cparams);
+-	vfree(zctx->cctx_mem);
+-	vfree(zctx->dctx_mem);
++	if (zctx->cctx_mem)
++		vfree(zctx->cctx_mem);
++	else
++		zstd_free_cctx(zctx->cctx);
 +
- size_t zstd_cctx_workspace_bound(const zstd_compression_parameters *cparams)
- {
- 	return ZSTD_estimateCCtxSize_usingCParams(*cparams);
-@@ -93,6 +106,36 @@ zstd_cctx *zstd_init_cctx(void *workspace, size_t workspace_size)
++	if (zctx->dctx_mem)
++		vfree(zctx->dctx_mem);
++	else
++		zstd_free_dctx(zctx->dctx);
++
++	zstd_free_cdict(zctx->cdict);
++	zstd_free_ddict(zctx->ddict);
+ 	kfree(zctx);
  }
- EXPORT_SYMBOL(zstd_init_cctx);
  
-+zstd_cctx *zstd_create_cctx_advanced(zstd_custom_mem custom_mem)
-+{
-+	return ZSTD_createCCtx_advanced(custom_mem);
-+}
-+EXPORT_SYMBOL(zstd_create_cctx_advanced);
-+
-+size_t zstd_free_cctx(zstd_cctx *cctx)
-+{
-+	return ZSTD_freeCCtx(cctx);
-+}
-+EXPORT_SYMBOL(zstd_free_cctx);
-+
-+zstd_cdict *zstd_create_cdict_advanced(const void *dict, size_t dict_size,
-+				       zstd_dict_load_method dict_load_method,
-+				       zstd_dict_content_type dict_content_type,
-+				       zstd_compression_parameters cparams,
-+				       zstd_custom_mem custom_mem)
-+{
-+	return ZSTD_createCDict_advanced(dict, dict_size, dict_load_method,
-+					 dict_content_type, cparams,
-+					 custom_mem);
-+}
-+EXPORT_SYMBOL(zstd_create_cdict_advanced);
-+
-+size_t zstd_free_cdict(zstd_cdict *cdict)
-+{
-+	return ZSTD_freeCDict(cdict);
-+}
-+EXPORT_SYMBOL(zstd_free_cdict);
-+
- size_t zstd_compress_cctx(zstd_cctx *cctx, void *dst, size_t dst_capacity,
- 	const void *src, size_t src_size, const zstd_parameters *parameters)
+ static void *zstd_create(struct zcomp_config *config)
  {
-@@ -101,6 +144,15 @@ size_t zstd_compress_cctx(zstd_cctx *cctx, void *dst, size_t dst_capacity,
- }
- EXPORT_SYMBOL(zstd_compress_cctx);
+-	zstd_parameters params;
+ 	struct zstd_ctx *ctx;
+-	size_t sz;
  
-+size_t zstd_compress_using_cdict(zstd_cctx *cctx, void *dst,
-+	size_t dst_capacity, const void *src, size_t src_size,
-+	const ZSTD_CDict *cdict)
-+{
-+	return ZSTD_compress_usingCDict(cctx, dst, dst_capacity,
-+					src, src_size, cdict);
-+}
-+EXPORT_SYMBOL(zstd_compress_using_cdict);
-+
- size_t zstd_cstream_workspace_bound(const zstd_compression_parameters *cparams)
- {
- 	return ZSTD_estimateCStreamSize_usingCParams(*cparams);
-diff --git a/lib/zstd/zstd_decompress_module.c b/lib/zstd/zstd_decompress_module.c
-index 7d31518e9d5a..6a0f464609bc 100644
---- a/lib/zstd/zstd_decompress_module.c
-+++ b/lib/zstd/zstd_decompress_module.c
-@@ -44,6 +44,35 @@ size_t zstd_dctx_workspace_bound(void)
- }
- EXPORT_SYMBOL(zstd_dctx_workspace_bound);
+ 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+@@ -39,24 +68,62 @@ static void *zstd_create(struct zcomp_config *config)
+ 	else
+ 		ctx->level = zstd_default_clevel();
  
-+zstd_dctx *zstd_create_dctx_advanced(zstd_custom_mem custom_mem)
-+{
-+	return ZSTD_createDCtx_advanced(custom_mem);
-+}
-+EXPORT_SYMBOL(zstd_create_dctx_advanced);
+-	params = zstd_get_params(ctx->level, PAGE_SIZE);
+-	sz = zstd_cctx_workspace_bound(&params.cParams);
+-	ctx->cctx_mem = vzalloc(sz);
+-	if (!ctx->cctx_mem)
+-		goto error;
+-
+-	ctx->cctx = zstd_init_cctx(ctx->cctx_mem, sz);
+-	if (!ctx->cctx)
+-		goto error;
+-
+-	sz = zstd_dctx_workspace_bound();
+-	ctx->dctx_mem = vzalloc(sz);
+-	if (!ctx->dctx_mem)
+-		goto error;
+-
+-	ctx->dctx = zstd_init_dctx(ctx->dctx_mem, sz);
+-	if (!ctx->dctx)
+-		goto error;
++	ctx->ctx_mem.customAlloc = zstd_ctx_alloc;
++	ctx->ctx_mem.customFree = zstd_ctx_free;
 +
-+size_t zstd_free_dctx(zstd_dctx *dctx)
-+{
-+	return ZSTD_freeDCtx(dctx);
-+}
-+EXPORT_SYMBOL(zstd_free_dctx);
++	if (config->dict_sz == 0) {
++		zstd_parameters params;
++		size_t sz;
 +
-+zstd_ddict *zstd_create_ddict_advanced(const void *dict, size_t dict_size,
-+                                      zstd_dict_load_method dict_load_method,
-+                                      zstd_dict_content_type dict_content_type,
-+                                      zstd_custom_mem custom_mem)
-+{
-+	return ZSTD_createDDict_advanced(dict, dict_size, dict_load_method,
-+					 dict_content_type, custom_mem);
++		params = zstd_get_params(ctx->level, PAGE_SIZE);
++		sz = zstd_cctx_workspace_bound(&params.cParams);
++		ctx->cctx_mem = vzalloc(sz);
++		if (!ctx->cctx_mem)
++			goto error;
 +
-+}
-+EXPORT_SYMBOL(zstd_create_ddict_advanced);
++		ctx->cctx = zstd_init_cctx(ctx->cctx_mem, sz);
++		if (!ctx->cctx)
++			goto error;
 +
-+size_t zstd_free_ddict(zstd_ddict *ddict)
-+{
-+	return ZSTD_freeDDict(ddict);
-+}
-+EXPORT_SYMBOL(zstd_free_ddict);
++		sz = zstd_dctx_workspace_bound();
++		ctx->dctx_mem = vzalloc(sz);
++		if (!ctx->dctx_mem)
++			goto error;
 +
- zstd_dctx *zstd_init_dctx(void *workspace, size_t workspace_size)
- {
- 	if (workspace == NULL)
-@@ -59,6 +88,15 @@ size_t zstd_decompress_dctx(zstd_dctx *dctx, void *dst, size_t dst_capacity,
- }
- EXPORT_SYMBOL(zstd_decompress_dctx);
++		ctx->dctx = zstd_init_dctx(ctx->dctx_mem, sz);
++		if (!ctx->dctx)
++			goto error;
++	} else {
++		zstd_compression_parameters params;
++
++		ctx->cctx = zstd_create_cctx_advanced(ctx->ctx_mem);
++		if (!ctx->cctx)
++			goto error;
++
++		ctx->dctx = zstd_create_dctx_advanced(ctx->ctx_mem);
++		if (!ctx->dctx)
++			goto error;
++
++		params = zstd_get_cparams(ctx->level, PAGE_SIZE,
++					  config->dict_sz);
++
++		ctx->cdict = zstd_create_cdict_advanced(config->dict,
++							config->dict_sz,
++							ZSTD_dlm_byRef,
++							ZSTD_dct_auto,
++							params,
++							ctx->ctx_mem);
++		if (!ctx->cdict)
++			goto error;
++
++		ctx->ddict = zstd_create_ddict_advanced(config->dict,
++							config->dict_sz,
++							ZSTD_dlm_byRef,
++							ZSTD_dct_auto,
++							ctx->ctx_mem);
++		if (!ctx->ddict)
++			goto error;
++	}
  
-+size_t zstd_decompress_using_ddict(zstd_dctx *dctx,
-+	void *dst, size_t dst_capacity, const void* src, size_t src_size,
-+	const zstd_ddict* ddict)
-+{
-+	return ZSTD_decompress_usingDDict(dctx, dst, dst_capacity, src,
-+					  src_size, ddict);
-+}
-+EXPORT_SYMBOL(zstd_decompress_using_ddict);
-+
- size_t zstd_dstream_workspace_bound(size_t max_window_size)
- {
- 	return ZSTD_estimateDStreamSize(max_window_size);
+ 	return ctx;
+ 
+@@ -72,8 +139,12 @@ static int zstd_compress(void *ctx, const unsigned char *src,
+ 	const zstd_parameters params = zstd_get_params(zctx->level, PAGE_SIZE);
+ 	size_t ret;
+ 
+-	ret = zstd_compress_cctx(zctx->cctx, dst, *dst_len,
+-				 src, PAGE_SIZE, &params);
++	if (!zctx->cdict)
++		ret = zstd_compress_cctx(zctx->cctx, dst, *dst_len,
++					 src, PAGE_SIZE, &params);
++	else
++		ret = zstd_compress_using_cdict(zctx->cctx, dst, *dst_len,
++						src, PAGE_SIZE, zctx->cdict);
+ 	if (zstd_is_error(ret))
+ 		return -EINVAL;
+ 	*dst_len = ret;
+@@ -86,7 +157,12 @@ static int zstd_decompress(void *ctx, const unsigned char *src, size_t src_len,
+ 	struct zstd_ctx *zctx = ctx;
+ 	size_t ret;
+ 
+-	ret = zstd_decompress_dctx(zctx->dctx, dst, PAGE_SIZE, src, src_len);
++	if (!zctx->ddict)
++		ret = zstd_decompress_dctx(zctx->dctx, dst, PAGE_SIZE,
++					   src, src_len);
++	else
++		ret = zstd_decompress_using_ddict(zctx->dctx, dst, PAGE_SIZE,
++						  src, src_len, zctx->ddict);
+ 	if (zstd_is_error(ret))
+ 		return -EINVAL;
+ 	return 0;
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
