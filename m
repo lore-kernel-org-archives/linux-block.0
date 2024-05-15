@@ -1,46 +1,57 @@
-Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCC25CB0
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 01:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4690812
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 01:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715736268; cv=none; b=JdZvL1cvFrvNwNqgXyyceVxid8pashBUI84G+tPQmdDeOWwpPpCCuPNqvoKsWFN4eJfWug1TyuM7nuGmyX0FgLgSfE9QNeUvaxZo7IK3e2iypk7Xse5vY2hZIJNQZVmSuuk9qoNupaITGma9pk10wusYVf8VqrT4zr0AYtPL1Jg=
+	t=1715736737; cv=none; b=kCcjreFoZUmWq1znerPyA8s0kZzWgO5iXfM1N1p+7NurW8lDmEuQ9Ubua40AipWsKYWjWQomtKsbx1ljqYZEk8Y9kExfv75lDrQlWtjlCaNFlCd3YQmlSl6wBiWwn9iLGcFsv5ETr1UeYa7Qj6n1/GO5bg3nGlo/ddcsOUz1Bcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715736268; c=relaxed/simple;
-	bh=cxIwpQSHcfuYZZ9GvvSMLZ3wG9q7rFvAlf9yitR+PVo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bkj79r9ndFOwiAxPQKs4+6KNgQIfsUDCT5X7+zgECCekECAW05cFY2kSaQAhuzITO9QTNvBLkuHtSvIzgJKYbstPsCkW6g9JS0sSorwi9I1J2LziRxMEzsBVPgy2z5VaziSE9orxxE/mTFmpwnTD8bRE1FzYJ6sZB3hiv/RbcT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 44F1O5Om051360;
-	Wed, 15 May 2024 09:24:05 +0800 (+08)
-	(envelope-from zhaoyang.huang@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4VfFly3fXQz2QDRDk;
-	Wed, 15 May 2024 09:20:46 +0800 (CST)
-Received: from bj03382pcu01.spreadtrum.com (10.0.73.40) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Wed, 15 May 2024 09:24:03 +0800
-From: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox
-	<willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo
-	<tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Baolin Wang
-	<baolin.wang@linux.alibaba.com>, <linux-mm@kvack.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <cgroups@vger.kernel.org>, Zhaoyang Huang <huangzhaoyang@gmail.com>,
-        <steve.kang@unisoc.com>
-Subject: [RFC PATCH 1/2] block: introduce helper function to calculate bps budgt
-Date: Wed, 15 May 2024 09:23:49 +0800
-Message-ID: <20240515012350.1166350-2-zhaoyang.huang@unisoc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240515012350.1166350-1-zhaoyang.huang@unisoc.com>
-References: <20240515012350.1166350-1-zhaoyang.huang@unisoc.com>
+	s=arc-20240116; t=1715736737; c=relaxed/simple;
+	bh=WxWQHkAkQ3kTFrtbB5UblJOZr1EDWb/uQxr7e9PyLWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Rq1xDKOINq5urQNCwYupYWU0UefLKqPMABq2hp2c1Sj/MY4QjEauQYxWysPNXWzHdAciwZTbu92H9NtLTPtWzM0De3c9TJoJevP4ieTsWNcTB6zW82u9jtLvSSz0gp3pNequFB8/xlPsxqBNLIB5diwnagZcYdOg4qtLhzum0L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CJ9hYDzG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CJ9hYDzG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715736734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EGKoZkJUmWaaV+EKb29TxZkRunrslIu2yAMBC/QhwKY=;
+	b=CJ9hYDzGBQg+W+CiuIWrbeXBv7rtNJJuc29SpiOxT80mY/BkQB92twjsFn+idWkl6H5L2w
+	+5b9m7ugLr4o2CeVtMp9Q1ddrRIP5jM7RLgPjRhdKeyig/7cYrv+zYKq9QPgu19jv4yoVh
+	bgQQyutcEAXfZ8kjpcsviDU4U7MZKxQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-576-cyt22AuNP-mVz6SLQ8RVIA-1; Tue, 14 May 2024 21:32:12 -0400
+X-MC-Unique: cyt22AuNP-mVz6SLQ8RVIA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 393908008AD;
+	Wed, 15 May 2024 01:32:12 +0000 (UTC)
+Received: from localhost (unknown [10.72.112.11])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0AF701C0654B;
+	Wed, 15 May 2024 01:32:10 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jay Shin <jaeshin@redhat.com>
+Subject: [PATCH 1/2] blk-cgroup: fix list corruption from resetting io stat
+Date: Wed, 15 May 2024 09:31:56 +0800
+Message-ID: <20240515013157.443672-2-ming.lei@redhat.com>
+In-Reply-To: <20240515013157.443672-1-ming.lei@redhat.com>
+References: <20240515013157.443672-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,118 +59,112 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL:SHSQR01.spreadtrum.com 44F1O5Om051360
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+Since commit 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()"),
+each iostat instance is added to blkcg percpu list, so blkcg_reset_stats()
+can't reset the stat instance by memset(), otherwise the llist may be
+corrupted.
 
-The 'over-sized' bio under blk throttle control will be delayed to
-launch which breaks original IO timing and have the immediate BW be
-not within the bps limit. Introduce a helper function to calculate block
-device's budgt which provide the allowed bytes for current bio.
+Fix the issue by only resetting the counter part.
 
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Waiman Long <longman@redhat.com>
+Cc: Jay Shin <jaeshin@redhat.com>
+Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-throttle.c       | 44 ++++++++++++++++++++++++++++++++++++++
- include/linux/blk-cgroup.h | 10 +++++++++
- 2 files changed, 54 insertions(+)
+ block/blk-cgroup.c | 58 ++++++++++++++++++++++++++++------------------
+ 1 file changed, 35 insertions(+), 23 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index f4850a6f860b..41c75258183d 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -10,6 +10,7 @@
- #include <linux/blkdev.h>
- #include <linux/bio.h>
- #include <linux/blktrace_api.h>
-+#include <linux/cgroup.h>
- #include "blk.h"
- #include "blk-cgroup-rwstat.h"
- #include "blk-stat.h"
-@@ -2365,6 +2366,49 @@ void blk_throtl_bio_endio(struct bio *bio)
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 059467086b13..86752b1652b5 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -619,12 +619,45 @@ static void blkg_destroy_all(struct gendisk *disk)
+ 	spin_unlock_irq(&q->queue_lock);
  }
- #endif
  
-+unsigned long blk_throttle_budgt(struct block_device *bdev)
++static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
 +{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	struct blkcg *blkcg;
-+	struct blkcg_gq *blkg;
-+	struct throtl_grp *tg;
-+	long long bytes_allowed = 0;
-+	unsigned long jiffy_elapsed, jiffy_elapsed_rnd;
-+	u64 bps_limit;
++	int i;
 +
-+	if (!q)
-+		return U64_MAX;
-+
-+	rcu_read_lock();
-+	spin_lock_irq(&q->queue_lock);
-+	blkcg =	css_to_blkcg(task_css(current, io_cgrp_id));
-+	if (!blkcg)
-+		goto out;
-+
-+	blkg = blkg_lookup(blkcg, q);
-+	if (!blkg || !blkg_tryget(blkg))
-+		goto out;
-+
-+	tg = blkg_to_tg(blkg);
-+	bps_limit = tg_bps_limit(tg, READ);
-+	if (bps_limit == U64_MAX)
-+		goto out;
-+
-+	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[READ];
-+	if (!jiffy_elapsed)
-+		jiffy_elapsed_rnd = tg->td->throtl_slice;
-+
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
-+	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
-+			tg->carryover_bytes[READ];
-+	blkg_put(blkg);
-+out:
-+	spin_unlock_irq(&q->queue_lock);
-+	rcu_read_unlock();
-+	return bytes_allowed;
++	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
++		dst->bytes[i] = src->bytes[i];
++		dst->ios[i] = src->ios[i];
++	}
 +}
 +
++static void __blkg_clear_stat(struct blkg_iostat_set *bis)
++{
++	struct blkg_iostat cur = {0};
++	unsigned long flags;
 +
- int blk_throtl_init(struct gendisk *disk)
++	flags = u64_stats_update_begin_irqsave(&bis->sync);
++	blkg_iostat_set(&bis->cur, &cur);
++	blkg_iostat_set(&bis->last, &cur);
++	u64_stats_update_end_irqrestore(&bis->sync, flags);
++}
++
++static void blkg_clear_stat(struct blkcg_gq *blkg)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu) {
++		struct blkg_iostat_set *s = per_cpu_ptr(blkg->iostat_cpu, cpu);
++
++		__blkg_clear_stat(s);
++	}
++	__blkg_clear_stat(&blkg->iostat);
++}
++
+ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+ 			     struct cftype *cftype, u64 val)
  {
- 	struct request_queue *q = disk->queue;
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index dd5841a42c33..ba79fa464e0a 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -15,10 +15,12 @@
-  */
+ 	struct blkcg *blkcg = css_to_blkcg(css);
+ 	struct blkcg_gq *blkg;
+-	int i, cpu;
++	int i;
  
- #include <linux/types.h>
-+#include <linux/limits.h>
+ 	mutex_lock(&blkcg_pol_mutex);
+ 	spin_lock_irq(&blkcg->lock);
+@@ -635,18 +668,7 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+ 	 * anyway.  If you get hit by a race, retry.
+ 	 */
+ 	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
+-		for_each_possible_cpu(cpu) {
+-			struct blkg_iostat_set *bis =
+-				per_cpu_ptr(blkg->iostat_cpu, cpu);
+-			memset(bis, 0, sizeof(*bis));
+-
+-			/* Re-initialize the cleared blkg_iostat_set */
+-			u64_stats_init(&bis->sync);
+-			bis->blkg = blkg;
+-		}
+-		memset(&blkg->iostat, 0, sizeof(blkg->iostat));
+-		u64_stats_init(&blkg->iostat.sync);
+-
++		blkg_clear_stat(blkg);
+ 		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 			struct blkcg_policy *pol = blkcg_policy[i];
  
- struct bio;
- struct cgroup_subsys_state;
- struct gendisk;
-+struct block_device;
- 
- #define FC_APPID_LEN              129
- 
-@@ -45,6 +47,14 @@ static inline struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
+@@ -949,16 +971,6 @@ void blkg_conf_exit(struct blkg_conf_ctx *ctx)
  }
- #endif	/* CONFIG_BLK_CGROUP */
+ EXPORT_SYMBOL_GPL(blkg_conf_exit);
  
-+#ifdef CONFIG_BLK_DEV_THROTTLING
-+unsigned long blk_throttle_budgt(struct block_device *bdev);
-+#else
-+static inline unsigned long blk_throttle_budgt(struct block_device *bdev)
-+{
-+	return U64_MAX;
-+}
-+#endif
- int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_len);
- char *blkcg_get_fc_appid(struct bio *bio);
- 
+-static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
+-{
+-	int i;
+-
+-	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
+-		dst->bytes[i] = src->bytes[i];
+-		dst->ios[i] = src->ios[i];
+-	}
+-}
+-
+ static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat *src)
+ {
+ 	int i;
 -- 
-2.25.1
+2.44.0
 
