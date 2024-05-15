@@ -1,86 +1,206 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510861E53F;
-	Wed, 15 May 2024 06:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D503C41C76
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 07:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715754721; cv=none; b=t/RYriT+z0lYN0aRpPIoaKWoQGtdf6WQqrfas+DE2Z5QMf0izuyQAMJZ7FUrBuSMQctbu9vMormwlTxeEDB7la2aKpo2iOc5bpQ57KXBniwVxdtjbm/JUpStXMgAlPxqnaL9Bxma30YIMrylYlsrb15lctFRoL/3kn7Ug1MgGR8=
+	t=1715757418; cv=none; b=e0MRAtCcZ2cXwRqC8jaldn8FEBtP9VIuXb9oFoIpBjfIHCBp6jOo7hDXdjVJxxfGwUZVWukziyrcSYUcLeUzJSvFfx2UYyiy5jOVERDOEcBZ8jNdxBk35zkiUaVhcB8z2LCN6fO/sapGa9lgzm1lm30Jey4SuV3XdZSNN63XemI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715754721; c=relaxed/simple;
-	bh=SMe88j30uJlqLy1VfHIE4rYvL+Pl2XRda8aPFrB8pg0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hIsnYtSbPwvKmbyjDyij/sW/UaaT6/AnE1boaVxl/zsda6K6Z58QGt11xh8z6eNGYq5NFJ8G9V6YhZgzfSUAE1SU68voL5E8yMApnUTkpAb0oIcRKItkRlhjxtQNjtVooqzxtvfYf3XliVj3qTzAAGCnyEb/5avQiw0N6RP/cMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l9gG0Zf0; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715757418; c=relaxed/simple;
+	bh=nMfzBYy/IKnygvUg6mHmh2PasEXMAt0h0sN3MQ6jjpA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o2nagdbCGddcS6nKwSWPKT5lyO9MTrnZ+diqo4HnHTasB0A8YeNZ1AyHKuwLhaL47q0xN1dBJeyEOTK3vcwFOHwhT5kFDnPFvq4btsa6lepzPE5e74m560FQeKbV4dMxQLGR9DyvjLvTAkMylsTZ6jlmWDBLeQ4UVKXnIoX4R04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nCH1ES/u; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9gG0Zf0"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5238b5c080cso811553e87.1;
-        Tue, 14 May 2024 23:31:59 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nCH1ES/u"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1eeb1a4c10aso39638875ad.3
+        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 00:16:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715754717; x=1716359517; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KO/Qnq8uu0A2bAHSPuBz0lil2/aJMgXXAcipsRcH8eU=;
-        b=l9gG0Zf0JqRHxzAsIf98ffv7hZlzQA0TQxvBRpgnMCA4iM2FKPQFjdTIpYxzYGvzfy
-         1cg+5FjYvp5GFLhf307IiaD3jgpyIhwoAynsLr9A2P4gUO12ZYNM93sS7uCvAT4h3LOF
-         HgCwDznA2tp+uQ0E5OKCJpyceRhKBnrJlvIFF+gAJwrg+keSXuqAgq6vJZ45aAWIjmDG
-         CdYMjENuCROS4ykt5Xwa4mqfVz89bkaGwt/vId3qt6Zj1HMTSaNJd8F93o0TStJuzCzz
-         teXdTlHzRywOsRTEQFdLoulF/8mPD69j77Hn5Mj/oDmsvuAaYCwbXlZvEW8huqXgrbMU
-         41lA==
+        d=chromium.org; s=google; t=1715757416; x=1716362216; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aqYLcxQwayuywWH1rsCyBGByNQv01b0ugqtKkJ7GT30=;
+        b=nCH1ES/uKFmiBdaqV2bKVQvTJ343jBhcamlq2LFdfcGXOiTWek/7tM2KxpaHdXkcgY
+         M+mI8fo+hDhQ06SrQVhTasWMY7puUm1YcKWVCqZ8FdyCgdhTacisGxqTFVoH9tB65tGg
+         DA/N6U3JTH0+o/4dDGCYju9kEz0czi3LTSUss=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715754717; x=1716359517;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KO/Qnq8uu0A2bAHSPuBz0lil2/aJMgXXAcipsRcH8eU=;
-        b=Yg5DwL9qduKj+eMUDdPiOIzIWwbztsojpfkTZIzKyUlXp+Z926J1qM+UYAnvz13rGA
-         ftHy6u9aRlBYKqgAt/rezENvj9Gp7I3iO/JeB6/whUGKfrc4vC5ZGkpg9wv96xyCJr/L
-         CyI9t886+L/Y0jhNEYEMYm60dY12dRyBihDsmYdYeUYuJepzwesMiao7d12LtWMXKpuN
-         sA+rW7GASiwWtsMnRxAw/4fCOfzlJO5K82D87XKx5tT0Jw5twVSMaZuveVvT3dIi+0zo
-         /MIt2UJGN93gBhoqlL18l2D6zMM2mCK7oZzeAK7qfKe/QWxIiUoeBInHnQpUwthnODtn
-         lJMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZkuwwHBpNGECGhcoyzMa1rwCvknuOdoO4YNpBYvCnst24DYvE4t+on/J2DV1GNbBaldApUp5pqdwekJJVGaAtOl+3qwlzDjfoPnagoB7SLNZ5MkQBSc1mHKXGh/vnOnpGinU2m3kplJSYAXKHElB5lxdf7xdDyhN3KOfk51RPqRW9
-X-Gm-Message-State: AOJu0YxQqdkvsnoiRfSHVjvpKlKcz4G/QWgfSDDRaxO25XMdFYMMM+Gi
-	nwQLJ9Y7UeMRtSuK7RAQJsFxSIbC6c43KNse1w3Wfj2HvrLEBhqe31iL/raoatMO4UddpN77Dh+
-	ufHPffUKzfLB/fdirlWeR8uw82Wk=
-X-Google-Smtp-Source: AGHT+IHoKg0Vu+Ev/OMzjy0UIYtyUIbh89ctl6Q2Uk+JY2wl6Xd+Yslf9XhsdnZpO7qUHzF5fIdfEgEnHzxHsvSQbzc=
-X-Received: by 2002:ac2:58e3:0:b0:518:dfed:f021 with SMTP id
- 2adb3069b0e04-5220fb749bdmr7624802e87.24.1715754717250; Tue, 14 May 2024
- 23:31:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715757416; x=1716362216;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aqYLcxQwayuywWH1rsCyBGByNQv01b0ugqtKkJ7GT30=;
+        b=CnKjh4uVZ9Bgo0GltqgiSUHKcwjpJ85UorZSwOd6ALuhqR+XiIfy2RLk7m8ouyGTip
+         SACQzEaxa5MYgPxih+aZRuaREgzAuAfKdXJp3m1YHtAGpXzjCptFc1w4zDC/PtiBl7mu
+         HjD106/RXAHRNE9diTeKWM/hzsSgl2HX+Rp2tavkOkwe4qDXcvwXhPbMArYE4sswFlFo
+         EI/tcYMkZeR12Hm8NQY7l2yFhE57jY5VjJ79TCevL4CKCGt3PoPuJCshff+Tyv0qDF0W
+         G/4Ev9h3CtsCIM5n3TnCb6e9h02QRfXwULn3qyDsFsNbhaywLyMbJLnWpdNYCeCU+m14
+         3kzw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbtcuNh08JqqDCoIgENp1je2IMteG28Bseq53lbBeNe41Pr4ihUufWlMVGtq4T3lDY8qPhB8rCgLirixZpiQBjOXE8p4sbzkCnENo=
+X-Gm-Message-State: AOJu0YxBTjY5C48UyJk5VxMxNaVcWSm8ft8d0QI1ilfGEhXB6hBI5mP6
+	lHBN7Fbtl/ZX6eLPshTYoMNXeVWf48G8IXK1LkShmZDMUPJAThuz1zN7ZqX3RQ==
+X-Google-Smtp-Source: AGHT+IFm/nXRy82CuAgQxP6v9tK0QrWnblDLayE/IvdgtiIEFVabYJ0aogguwVbyzlQiqncW5RLhBA==
+X-Received: by 2002:a17:902:dad2:b0:1eb:5293:dc37 with SMTP id d9443c01a7336-1ef43c0cf65mr170232545ad.10.1715757416182;
+        Wed, 15 May 2024 00:16:56 -0700 (PDT)
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:111d:a618:3172:cd5b])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136d53sm110941605ad.254.2024.05.15.00.16.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 00:16:55 -0700 (PDT)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCHv4 00/21] zram: custom comp API and comp algorithms tunables
+Date: Wed, 15 May 2024 16:12:37 +0900
+Message-ID: <20240515071645.1788128-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240515012350.1166350-1-zhaoyang.huang@unisoc.com>
- <20240515012350.1166350-3-zhaoyang.huang@unisoc.com> <ZkQ1dsHKVttb7y4_@casper.infradead.org>
-In-Reply-To: <ZkQ1dsHKVttb7y4_@casper.infradead.org>
-From: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Date: Wed, 15 May 2024 14:31:45 +0800
-Message-ID: <CAGWkznH1dxyF17cQi+9+0EadoG7_MVUNy8n-svQ7ZjYNaWKYdQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/2] mm: introduce budgt control in readahead
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	cgroups@vger.kernel.org, steve.kang@unisoc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 15, 2024 at 12:09=E2=80=AFPM Matthew Wilcox <willy@infradead.or=
-g> wrote:
->
-> On Wed, May 15, 2024 at 09:23:50AM +0800, zhaoyang.huang wrote:
-> > +     unsigned long budgt =3D inode->i_sb->s_bdev ?
-> > +                     blk_throttle_budgt(inode->i_sb->s_bdev) : 0;
->
-> NAK as previously explained.
-ok. But this commit could work by following the configuration of
-blk-throttle as long as it works on btrfs with internal RAID on.
-Furthermore, this will help the blkcg meet the desired BPS value
-perfectly.
+
+---8<---8<---
+This series contains important patches which we either can apply
+as is (if zram makes a switch to compression backends) or cherry-pick
+(if zram sticks to crypto API), as compression drivers/backends still
+need to be patches regardless of direction zram takes. Sending it out
+so that the patches don't get lost.
+---8<---8<---
+
+This patch set moves zram from crypto API to a custom compression
+API which allows us to tune and configure compression algorithms,
+something that crypto API, unfortunately, doesn't support yet.
+Basically, this series brings back the bits of compression "backends"
+code that we had many years ago.
+
+		Currently, zram supports a pretty decent number of comp backends:
+lzo, lzorle, lz4, lz4hc, 842, deflate, zstd
+
+		At this point we handle 2 parameters: a compression level and
+a pre-trained compression dictionary. Which seems like a good enough
+start. The list will be extended in the future.
+
+Examples:
+
+- tunes compression level
+	echo "algo=zstd level=11" > /sys/block/zram0/comp_algorithm
+
+- uses a pre-trained dictionary and tunes compression level
+	echo "algo=zstd level=11 dict=/etc/dictionary" > /sys/block/zram0/comp_algorithm
+
+Benchmarks
+==========
+
+*** zstd
+/sys/block/zram0/mm_stat
+1750302720 504600204 514416640        0 514416640        1        0    34204    34204
+
+*** zstd level=5
+/sys/block/zram0/mm_stat
+1750331392 488449001 497905664        0 497905664        1        0    34204    34204
+
+*** zstd dict=/etc/dictionary
+/sys/block/zram0/mm_stat
+1750335488 464838883 474210304        0 474210304        1        0    34204    34204
+
+*** zstd level=5 dict=/etc/dictionary
+/sys/block/zram0/mm_stat
+1750319104 451907185 461299712        0 461299712        1        0    34204    34204
+
+*** lz4
+/sys/block/zram0/mm_stat
+1750319104 664253635 676859904        0 676859904        1        0    34288    34288
+
+*** lz4 dict=/etc/dictionary
+/sys/block/zram0/mm_stat
+1750319104 620602911 632705024        0 632705024        1        0    34288    34288
+
+*** lz4hc
+/sys/block/zram0/mm_stat
+1750315008 609004936 621092864        0 621092864        1        0    34288    34288
+
+*** lz4hc level=5 dict=/etc/dictionary
+/sys/block/zram0/mm_stat
+1750323200 501315128 511303680        0 511303680        1        0    34288    34288
+
+
+v4:
+-- fixed ZRAM=m build error (kernel test robot @intel)
+-- added compression level tunable to lz4
+-- export lz4hc symbol needed for dictionary support
+-- export advanced zstd API needed for dictionary support
+
+Sergey Senozhatsky (21):
+  zram: move from crypto API to custom comp backends API
+  zram: add lzo and lzorle compression backends support
+  zram: add lz4 compression backend support
+  zram: add lz4hc compression backend support
+  zram: add zstd compression backend support
+  zram: pass estimated src size hint to zstd
+  zram: add zlib compression backend support
+  zram: add 842 compression backend support
+  zram: check that backends array has at least one backend
+  zram: introduce zcomp_config structure
+  zram: extend comp_algorithm attr write handling
+  zram: support compression level comp config
+  zram: add support for dict comp config
+  lib/zstd: export API needed for dictionary support
+  zram: add dictionary support to zstd backend
+  zram: add config init/release backend callbacks
+  zram: share dictionaries between per-CPU contexts
+  zram: add dictionary support to lz4
+  lib/lz4hc: export LZ4_resetStreamHC symbol
+  zram: add dictionary support to lz4hc
+  Documentation/zram: add documentation for algorithm parameters
+
+ Documentation/admin-guide/blockdev/zram.rst |  38 +++-
+ drivers/block/zram/Kconfig                  |  76 +++++--
+ drivers/block/zram/Makefile                 |   8 +
+ drivers/block/zram/backend_842.c            |  79 +++++++
+ drivers/block/zram/backend_842.h            |  10 +
+ drivers/block/zram/backend_deflate.c        | 143 +++++++++++++
+ drivers/block/zram/backend_deflate.h        |  10 +
+ drivers/block/zram/backend_lz4.c            | 128 +++++++++++
+ drivers/block/zram/backend_lz4.h            |  10 +
+ drivers/block/zram/backend_lz4hc.c          | 128 +++++++++++
+ drivers/block/zram/backend_lz4hc.h          |  10 +
+ drivers/block/zram/backend_lzo.c            |  55 +++++
+ drivers/block/zram/backend_lzo.h            |  10 +
+ drivers/block/zram/backend_lzorle.c         |  55 +++++
+ drivers/block/zram/backend_lzorle.h         |  10 +
+ drivers/block/zram/backend_zstd.c           | 223 ++++++++++++++++++++
+ drivers/block/zram/backend_zstd.h           |  10 +
+ drivers/block/zram/zcomp.c                  | 155 +++++++-------
+ drivers/block/zram/zcomp.h                  |  42 +++-
+ drivers/block/zram/zram_drv.c               | 120 ++++++++++-
+ drivers/block/zram/zram_drv.h               |   1 +
+ include/linux/zstd.h                        | 165 +++++++++++++++
+ lib/lz4/lz4hc_compress.c                    |   1 +
+ lib/zstd/zstd_compress_module.c             |  52 +++++
+ lib/zstd/zstd_decompress_module.c           |  38 ++++
+ 25 files changed, 1466 insertions(+), 111 deletions(-)
+ create mode 100644 drivers/block/zram/backend_842.c
+ create mode 100644 drivers/block/zram/backend_842.h
+ create mode 100644 drivers/block/zram/backend_deflate.c
+ create mode 100644 drivers/block/zram/backend_deflate.h
+ create mode 100644 drivers/block/zram/backend_lz4.c
+ create mode 100644 drivers/block/zram/backend_lz4.h
+ create mode 100644 drivers/block/zram/backend_lz4hc.c
+ create mode 100644 drivers/block/zram/backend_lz4hc.h
+ create mode 100644 drivers/block/zram/backend_lzo.c
+ create mode 100644 drivers/block/zram/backend_lzo.h
+ create mode 100644 drivers/block/zram/backend_lzorle.c
+ create mode 100644 drivers/block/zram/backend_lzorle.h
+ create mode 100644 drivers/block/zram/backend_zstd.c
+ create mode 100644 drivers/block/zram/backend_zstd.h
+
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
+
