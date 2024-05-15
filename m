@@ -1,177 +1,126 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C702818131E
-	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 20:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDCD181CEF
+	for <linux-block@vger.kernel.org>; Tue, 14 May 2024 21:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715716833; cv=none; b=TMEGdlpQKgbK+ty3J9ckjBmO2CQTLzPG4B6k5hvzlb93sD0cYsfptqGZa9idkjoxlZe32eEeO0OQmopwHCKLhSE5jGLLQaIzGE3zP9424ap3N1fLJRvEQOHnJPQzDzFe+6KOYY6tAgfLuvEF9DOdG2JmGIKe/2QBqWI6FoljAdI=
+	t=1715722233; cv=none; b=mVvjwMdhw1WFA7n9B/OJAyqpjz8kAjf0072AWhJZx5VnXZlg9SIg7Nff2J5mMYOpyRNwFOZQ/Hq0fmBEzEW+gW1kTvroJFipGLi6HaMpFI+bW7CZYoRBY+8CLn0iTSUTPm2FX/ddrkLCKDYqPvDvrWWwpKVVc9FHpCbWisgc0eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715716833; c=relaxed/simple;
-	bh=F1BCusWVnox0inKiwWulDDxeUYd5ETJQa5nYC/mUo7w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YL5Mj5lMOVNpsUgaaOAFpsQTHfnZ2LEp2ywgBUfqefy5/KVx3gfudpwnb47JdvIJnmbJI2J1pfS+4RGtnY0/CepWH7Q2CBqL3MZ18cxKa8OjNnvVvMFcWfOeAp224kmRebe8yY234ki1NKT8RGI4GOf38n3lTmZaCVkz26ftf7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uZQHp6bg; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1715722233; c=relaxed/simple;
+	bh=RuAI++SoVIlHd05YaYB8gWn2IVcA/jHLXYOcRf3tQKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I2Hi+yEhSIjsGgJZ/GZ4TIZTAv401xXFLiDrgcmjgcUfyR2uLwgRcOMZp/0n4I7/aEX+KEiJVZJtEcV5zyIJi2nKJN+8zsqPfPF9/ruLFMcspcnZOUSkaOlVltia/ZI/+wKPzt0TT5+AviS/8uzYgW8JYorF/d4Rajhq1l93UPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZyCmrLzS; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uZQHp6bg"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2b8efd5ee5dso703235a91.3
-        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 13:00:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZyCmrLzS"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-23dd52c6176so4189518fac.1
+        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 14:30:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715716830; x=1716321630; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ll8ePMooaLJ++vSB+9syazdtLkK7b8/0TCj36hEfQbQ=;
-        b=uZQHp6bgXhVNv4WSPqVQvAiYLV3mF+NBc0Eiac6OZ/inaPjDmRqjOVmAbgvGCcbWSP
-         wTuX6JI/oeiW4Cgx5TrwyzkEEJwM962DpZ6X0Cwvxr0gzzTtPJeBStI754dEytgUv3BC
-         H5mvPBBnrmdkXJkr0XDJAyB23Xe1bAl1Ki6nc2kIziDDpmjsD2xvKnU9xYKD6XgjuHg9
-         WgKIkzJlskrafMzooda8nvLhVk3zOlFZinKclt/cjSO8fjjrVlIDtI+rpi5BkvInw/hw
-         I0KM7xMLpzbgS+ddFCk8X0zxdrlMD8S4jes6PhYm1lCIUueR2dK++Uncmmj3REjvKKPU
-         Vgvw==
+        d=gmail.com; s=20230601; t=1715722230; x=1716327030; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LZurqd/gZ6QFwdhwsizttTDWmPh16bUHHZCUzWs7aTQ=;
+        b=ZyCmrLzSd1bQ875B9a0xAnNVEavDuqMG/gJcZuNYlQkpS9ycB9GThDcwnea9r/68KZ
+         lvPwj75VW+taQz0NqZk5uL/H4Iyec+M6NxtH81R2+yoNoni7Gx+ZmsOYlJ/Qe1eQIaZC
+         W7WOLhp7pJtjdwAwJYOm31By3oN8Vs45AqdrujObmxeIMGcG4ARiLhK9XOnlmNf2xS30
+         MZiogpdNGrdYIeUfBXDS9S/gjFoy5SCxziadvSH13Y7OVI0hWpniC55rqCW3TzK1EwOR
+         MCdUCv1LUqXPMt0lk05g2QZBy1e0h4pWHQEDlOZos6jI/E4ls1LpDtDUN29ZbfEgJ/as
+         jD9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715716830; x=1716321630;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ll8ePMooaLJ++vSB+9syazdtLkK7b8/0TCj36hEfQbQ=;
-        b=Sm61T5MrUio/G31rbfu/edrW7mESQ+i4UiCC/acmwi26W2lHtfSQaww2LAgWm32/l8
-         KfQ2KSMsBt1ZEF5UAIOokeYsMbCXpP3nUpcxYf9bhXbZ89D7afBWh8Y1yC/zfyTaGbZo
-         nv5vEqlnE8QbeSSojZrh93N9RNHXad6KmJvFPSeQNbqzcyLwAbfy0MIbUTKqzMgSHX04
-         WBa2CV143z0tI7uMt6EBj00u+Nt97si8L/SgqxrJdPV2lK5y1q7h4t/dSP7zY7tpNfM4
-         reeDYk/QeopQp741Fm03vTRgh2vmKwlKCZ3dBg6dScppwDUD4t2j1ssoBJbeDR3u6AMC
-         otvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjeOYNgyjIShC+vE5fToU2ByDtap0LjH6HBfuVJH0ZBMRF+rbmXFWeGUh35V4Q55OZHXcgDnwtFmAXFhhAaAaxT87d/DAVW3fz2TA=
-X-Gm-Message-State: AOJu0YwZpXDUCD1ICRvhuCG10L+uvuB0BkStW8/bWx3BUA3usrFuqISL
-	A5W1bfxz5lNcwwf59qzi11mo2lbdB/L4JKY/O6J8iG2ftzl82g7C0dpk/u3NPcA=
-X-Google-Smtp-Source: AGHT+IFnBHUUmMWtiYG9e/YiHxcQJT/qNVtzttvhR+ZqrEmfm+gaRsCol3BlyeJlD0TCv2qEnJ75gA==
-X-Received: by 2002:a05:6a00:8986:b0:6ec:ee44:17bb with SMTP id d2e1a72fcca58-6f4e0343824mr14250305b3a.2.1715716829950;
-        Tue, 14 May 2024 13:00:29 -0700 (PDT)
-Received: from [172.21.2.105] ([50.204.89.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a819e7sm9572850b3a.56.2024.05.14.13.00.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 May 2024 13:00:29 -0700 (PDT)
-Message-ID: <593a98c9-baaa-496b-a9a7-c886463722e1@kernel.dk>
-Date: Tue, 14 May 2024 14:00:20 -0600
+        d=1e100.net; s=20230601; t=1715722230; x=1716327030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LZurqd/gZ6QFwdhwsizttTDWmPh16bUHHZCUzWs7aTQ=;
+        b=dvDRQ9vF9biqW+aO9tDUoLvS5dlYaOCRc5qvuqP8Vra8TNHe/oZtH50EsZQlW4e4k/
+         V38MwgCZQHubk0a7is+VTpGP5arLDx9+usOvF/qlGlF+kPiVfIxkDVCbV/wYZhz5nqYK
+         4+mLAE4s1DGjd3ALk2gum8msxJfJjoueG0hdyHq/a3IUZlie4iBaGgMvJpkMUhq3GnWE
+         8mjPnMez4dgaeI3sL4iyDaFo9EWBou6G8J3V2BLP7xW7HSMF10Uq5rkiI9EbjKV6uqGi
+         MdAipoaM0UAw+AAiAoCgjue2J5cgpWf4YIGZKYzI+P+UmajiCx8v/7Abkq5t+qRAgOBw
+         ENGA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/2OHqw148GMbkZ0d8fiMdLgySaK5MJz5/50flvG7XWzEx6I3AS+OvGYxB8sCNqCkMLome1yl3wYr5O5jbZIdbKtq3G1tVZdlQbJk=
+X-Gm-Message-State: AOJu0Ywhc9IM2esVtWGTqPiMWHt7tpDM8uOut5yx/PbGgOawDDlysg0e
+	/f65Az0r8Su6MtKz4JzVEAq1afpMPeYxJw2o+afM7meRCv7hLOvmRAdFAzvm/kG5cLC3LfW/oKu
+	4Kcim6vaf8EweaqRR0+y+GKgFI9CyxmR4
+X-Google-Smtp-Source: AGHT+IEycJcbPG5zfCZqWOSZZTQntcgwvQT5RiO9XocQJvPSCsd1FEQKQGkcgRfm9DqQvfwhKyHU5zzYSuTd6dAI5uE=
+X-Received: by 2002:a05:6871:e01c:b0:232:f9e0:e4da with SMTP id
+ 586e51a60fabf-24171730217mr6811949fac.1.1715722230103; Tue, 14 May 2024
+ 14:30:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Rust block device driver API and null block driver
-To: Andreas Hindborg <nmi@metaspace.dk>, Christoph Hellwig <hch@lst.de>,
- Keith Busch <kbusch@kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>,
- Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>,
- Ming Lei <ming.lei@redhat.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>,
- Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>,
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
- Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng
- <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
- =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>,
- =?UTF-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>,
- Joel Granados <j.granados@samsung.com>,
- "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
- Daniel Gomez <da.gomez@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>,
- Philipp Stanner <pstanner@redhat.com>, Conor Dooley <conor@kernel.org>,
- Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
- =?UTF-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>,
- open list <linux-kernel@vger.kernel.org>,
- "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
- "gost.dev@samsung.com" <gost.dev@samsung.com>
-References: <20240512183950.1982353-1-nmi@metaspace.dk>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240512183950.1982353-1-nmi@metaspace.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CGME20240510134740epcas5p24ef1c2d6e8934c1c79b01c849e7ccb41@epcas5p2.samsung.com>
+ <20240510134015.29717-1-joshi.k@samsung.com> <CB17E82F-C649-4D13-8813-1A6F2D621C51@dubeyko.com>
+ <CA+1E3rLxUnuv9E_BxCFj1aodOTp3yrOEh7cFYt_j-Yz+_0q29g@mail.gmail.com> <88421397-1B95-4B2A-A302-55A919BCE98E@dubeyko.com>
+In-Reply-To: <88421397-1B95-4B2A-A302-55A919BCE98E@dubeyko.com>
+From: Kanchan Joshi <joshiiitr@gmail.com>
+Date: Tue, 14 May 2024 21:30:03 -0600
+Message-ID: <CA+1E3rJtJpxk3EmTmtJWDFwP8km0xqRPt2QeQTRar7sTHtdD2Q@mail.gmail.com>
+Subject: Re: [PATCH] nvme: enable FDP support
+To: Viacheslav Dubeyko <slava@dubeyko.com>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>, 
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org, 
+	linux-block@vger.kernel.org, =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>, 
+	Bart Van Assche <bvanassche@acm.org>, david@fromorbit.com, gost.dev@samsung.com, 
+	Hui Qi <hui81.qi@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/12/24 12:39 PM, Andreas Hindborg wrote:
-> From: Andreas Hindborg <a.hindborg@samsung.com>
-> 
-> Hi All!
-> 
-> I am happy to finally send the first _non_ RFC patches for the Rust
-> block device API.
-> 
-> This series provides an initial Rust block layer device driver API,
-> and a very minimal null block driver to exercise the API. The driver
-> has only one mode of operation and cannot be configured.
-> 
-> These patches are an updated and trimmed down version of the v2 RFC
-> [1]. One of the requests for the v2 RFC was to split the abstractions
-> into smaller pieces that are easier to review. This is the first part
-> of the split patches.
-> 
-> A notable change in this patch set is that they no longer use the
-> `ref` field of the C `struct request` to manage lifetime of the
-> request structure.
-> 
-> The removed features will be sent later, as their dependencies land
-> upstream.
-> 
-> As mentioned before, I will gladly maintain this code if required.
+On Tue, May 14, 2024 at 1:00=E2=80=AFPM Viacheslav Dubeyko <slava@dubeyko.c=
+om> wrote:
+> > On May 14, 2024, at 9:47 PM, Kanchan Joshi <joshiiitr@gmail.com> wrote:
+> >
+> > On Mon, May 13, 2024 at 2:04=E2=80=AFAM Viacheslav Dubeyko <slava@dubey=
+ko.com> wrote:
+> >>
+> >>
+> >>
+> >>> On May 10, 2024, at 4:40 PM, Kanchan Joshi <joshi.k@samsung.com> wrot=
+e:
+> >>>
+> >>> Flexible Data Placement (FDP), as ratified in TP 4146a, allows the ho=
+st
+> >>> to control the placement of logical blocks so as to reduce the SSD WA=
+F.
+> >>>
+> >>> Userspace can send the data lifetime information using the write hint=
+s.
+> >>> The SCSI driver (sd) can already pass this information to the SCSI
+> >>> devices. This patch does the same for NVMe.
+> >>>
+> >>> Fetches the placement-identifiers (plids) if the device supports FDP.
+> >>> And map the incoming write-hints to plids.
+> >>>
+> >>
+> >>
+> >> Great! Thanks for sharing  the patch.
+> >>
+> >> Do  we have documentation that explains how, for example, kernel-space
+> >> file system can work with block layer to employ FDP?
+> >
+> > This is primarily for user driven/exposed hints. For file system
+> > driven hints, the scheme is really file system specific and therefore,
+> > will vary from one to another.
+> > F2FS is one (and only at the moment) example. Its 'fs-based' policy
+> > can act as a reference for one way to go about it.
+>
+> Yes, I completely see the point. I would like to employ the FDP in my
+> kernel-space file system (SSDFS). And I have a vision how I can do it.
+> But I simply would like to see some documentation with the explanation of
+> API and limitations of FDP for the case of kernel-space file systems.
 
-With the following stipulations (and the kernel test bot issues sorted),
-I think we should give this a go. We already covered this today at
-LSFMM, but for the sake of others, here's how I see the rust support for
-the block side of things:
+Nothing complicated for early experimentation.
+Once FS has determined the hint value, it can put that into
+bio->bi_write_hint and send bio down.
 
-I see rust support for the block layer as a two stage kind of thing.
-Stage 1 would be including this patchset. In stage 1, all fallout from
-block layer changes fall upon Andreas and group to fix. Under no
-circumstance will changes from other contributors be held up, or
-contributors be held accountable, for breakages of the block rust code.
-Should contributors wish to sort out these issues themselves, then they
-are of course free to do so, but it won't be something that gatekeeps
-other changes.
-
-This leaves existing contributors free to go about their usual business.
-Kernels that don't enable rust (which won't happen unless you're setup
-for it anyway) won't even see build breakages. We will see some noise
-from the kernel test bot on the list, which does worry me a little bit.
-Not because it'll mark the rust side as being broken, but because it'll
-cause more noise which may make us miss breakages that are ultimately
-more important. I don't think this is a big risk, just highlighting that
-it is indeed a risk and will cause some potential annoyances.
-
-In stage 1, block rust is just there to enable people to experiment and
-play with it, and continue to develop it. Right now Andreas has a very
-(VERY) basic null_blk driver, I think we should move towards a fully
-fledged implementation of that so we at least have _something_ to test.
-We really need to full API to be used and exposed, this is generic
-kernel requirement - we just don't merge code that has no users, ever.
-Since a more complete rust null blk driver does exist out of tree,
-perhaps we can get something more complete for v2 of this patchset? I
-would highly recommend that.
-
-We may never exit stage 1, and I think during this particular stage, if
-things don't work out for whatever reason, the code can be removed
-again. As we have no critical drivers being rust exclusive at that
-point, it won't cause any issues yanking the code again. Moving into a
-stage 2 for block rust would mean that the rest of the kernel has fully
-adopted rust anyway, and being able (and willing) to write rust is just
-another part of the developer arsenal.
-
-I'd love to see the rust code moved to eg block/rust/, as I would
-greatly prefer to have it closer to the actual block code rather than
-sitting off in rust/kernel/block instead. I see this as a similar
-problem to having documentation away fro the actual code, it inevitably
-causes a drift between them. I understand from Andreas that this is
-actually something that is being worked on, and we can probably expect
-to see that in a cycle or two.
-
-tldr - as long as this doesn't encumer existing contributors, then I see
-absolutely no reason not to enable a rust playground for block drivers.
-
--- 
-Jens Axboe
-
+If SSDFS cares about user-exposed hints too, it can choose different
+hint values than what is exposed to user-space.
+Or it can do what F2FS does - use the mount option as a toggle to
+reuse the same values either for user-hints or fs-defined hints.
