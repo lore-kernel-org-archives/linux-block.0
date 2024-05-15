@@ -1,63 +1,64 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A769D43AD2
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 07:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B81C46424
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 07:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715757421; cv=none; b=ubHYijljRLSvvq5I0t105c3r//9tFdgOn8/uTGOZhCUWn+hWrNRKTtO10RbfBCohH2NtKsGavxwfF2A6O4iYn/vyq4xBefwgtsenXQfCy4Ol49Mrg633ByrOlpeZeATqXZenRP4i1zMDVvWu9casqmO+E3Jsc9DGpYtzBA38b60=
+	t=1715757423; cv=none; b=NpZotvW6gu3C2hETQYklJLxM0FjbT5/0bBvWQrlwcxMagcK0K7DGqR0yftzyxs4uTcRVbIPpG+cYOh3smSYqpYX2qKIVB9uPeDnIda/tEdLip+8OSSSh5cRgy1D2HOuuu6dCOwmx7soPP0g+WURtcdPmNLnhSITgHXIl/oRDmdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715757421; c=relaxed/simple;
-	bh=544LLbSp8/PVrYB0QGq7rRmx9sLqiZpPOCFAPpIoqy0=;
+	s=arc-20240116; t=1715757423; c=relaxed/simple;
+	bh=SQspApLzR6A+qI3ABji2AwHeyysKKTXjPbdBT7c8Ig8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oQoyC1htOfrYJHjyABjowvB61sm1Cu4xaaKX2EwWx/MfJuPj1cOONY64c342bzqgMyYkXofsqDUsFC9zigU9INH/CM/VTMxcPxdJM5JO3WTLD5D1+/38kbRGyH2IRu3npUJvIcGCoE9L+umbUHY9ZbG5VkwDztMsJ4tRlb8yk2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GsHICxUG; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version; b=t5ak9Bxeawj8YY1NxHpcKMKNw4BqCk/21JvRDAu3fQYmw8pjlZFKDIddS84ZIYZfGUzudAEylmZbtfGgXpl2NnZf6jg9mffT9KvNTqY+z5i81DZpAaVkKqUQKcnnDNyWQ+EuMEwfjjUdaHSQOo56LqhC80H3awxOoCRXnQ9pBVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=aGT3GKz7; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GsHICxUG"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1ecc23e6c9dso43072425ad.2
-        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 00:16:59 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aGT3GKz7"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1edc696df2bso56594915ad.0
+        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 00:17:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715757419; x=1716362219; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1715757421; x=1716362221; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fsLG0zPIDV95vZmzBVa/SvUT8ZYjpbB7N30gWJFx0mg=;
-        b=GsHICxUGAfpKfZMBu3GPpDoVfAE4zE4XWuifCtCGJun31Akyh9KG0wrV84E1mqL8wZ
-         MCN5glkCkvxQ67Aon6C1zHdvzZMkPylWSTD1K0idpAT17LbYaowBsDFEhcBtFTmFxCq2
-         XdYBddbbHGVn8IFThXJhT4ti+eQusRxyuL7mU=
+        bh=zHiH39OlVbbyYOoV0PVG81/IjMwGnGQnqALJjuzf7+o=;
+        b=aGT3GKz7+tMGUzCxJW/Ezcs3m9E++MTurLqHSz5AOQOrIUipU1671dzGqM1nXcP61w
+         6r1+TqTp/+GmxYqAV4tmyt1zosJBeNmibXN3l1+Ri7umUkgsXjwM7Rls5MM9ChDSnjVF
+         Wle+YjbC54Kdqd31XWNU4A0v6nDcS1SmHPGeo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715757419; x=1716362219;
+        d=1e100.net; s=20230601; t=1715757421; x=1716362221;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fsLG0zPIDV95vZmzBVa/SvUT8ZYjpbB7N30gWJFx0mg=;
-        b=P8LvCR6FBJdHiQknW4KndnjpoERqY/K4d0S1aTkXdKbQ8x3Cj03cZlIjcoPHGTIHej
-         DcAMMvqaSCQ8HsEfe+ud635xPYb1dSlQDf/AFYFgBP1bNubKsQsvtdoPN8jQGwaBzcUk
-         VWHXZR/2BhgoxOXkxSA0jRme+YgqPSAnVI+L1yXacOtKbXYWj3X7qZNuHkB6yqHy0Dpx
-         kJIxSAb35uMvcZpXb9B64DSscqX0t+q8xz2+kxCibWrA1zK37pVRrr7Yrpm2Qk2GRr9w
-         GDfE+G7068FYkP1MKPfD+sisc3jlV0aPZSRbnzq6zyFKOHQHHQpmB+TA+PxwFN2FnOAT
-         6BRA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6fxyDjbjSHlvCLcDtGQ7pQGP6IYuXkECdyEWkoStRP+CFJzSKTGQ2v3vsUvhYzvrzqavnWJl0zD5fjIZneiyk+ZqmLm5s6XP7Veg=
-X-Gm-Message-State: AOJu0Ywd7kVkBSzJiDqx0BMiCTMBPhbQDMgwrQwo6rdADFHTX2ehXcPm
-	uTpYDWdoqkJvTXszmaYxZAPho1JIvXf4drXmAqxjSbq6FWrUDORnjMi3JwScIQ==
-X-Google-Smtp-Source: AGHT+IE4lcnvFwAZn4jYeIZdBmKYEjCZJtmfcPgBKIRB2MhlQ4QeIrzh5k67ZucVVYTYmBniCUBgIg==
-X-Received: by 2002:a17:902:cf07:b0:1ea:ca03:5d8e with SMTP id d9443c01a7336-1ef4404fbecmr181642705ad.44.1715757418737;
-        Wed, 15 May 2024 00:16:58 -0700 (PDT)
+        bh=zHiH39OlVbbyYOoV0PVG81/IjMwGnGQnqALJjuzf7+o=;
+        b=pchKL0bpuINbPPEzxseHImzAWOxfDCgCdbNA3Orjlsl69tMQ+R+fLiPwlE6LvDvNlr
+         bsP8pkDINWidKb3UrHndejcn4xNERomV0YDt0Ha/OK96DnpfsUKiIQqXDGs6sYUFc90B
+         0GXESOyLSqgAp+DerxlrVxJRJ7L8KBXmrkHXaoJfEAjUDc02bsDpI15buj7mWw33gaBU
+         e2BFiBFG6q+QzR5BQGOmSmQ8UstDbZvQr3p1caJpp/KKDuv4ZGvO3qEvi1Z+v081RpcS
+         YsmEjQAfrMDcpfNnEkkeoc04AMnOxf7/6+HdZUIDu+EqNSlGcotCWOZMeTLrSSflWDc9
+         Xe5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWfQYlzNTb65ChhPyNWiveUz6YE88prsStPmhyxQZa5hDTW3ymqipIMWZKA7Lh6HtiSIqhdAsd3cKPpDV3oOCSJPeya7/+gBYsGzVM=
+X-Gm-Message-State: AOJu0YyAxyJClhafD1ar57EFyHXC5CmEyLAy5tinv534yGJbs26pr13K
+	AZpOdOaYWDb7yI9OOGUXDagDH2RwvKns+ujZ0Cbe8XP3EY9r+AHVfnApt1bmzXZhqlkZIp/+e+I
+	=
+X-Google-Smtp-Source: AGHT+IFL9UyLu26jE4g+X6OYAAQOaCxw87D8rJNv/C2yKEFY7GXkl4F5s/LdrGfAqTySIEcbf+3Imw==
+X-Received: by 2002:a17:902:7b87:b0:1ea:9585:a1d7 with SMTP id d9443c01a7336-1ef43e293d9mr148335675ad.37.1715757421264;
+        Wed, 15 May 2024 00:17:01 -0700 (PDT)
 Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:111d:a618:3172:cd5b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136d53sm110941605ad.254.2024.05.15.00.16.57
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136d53sm110941605ad.254.2024.05.15.00.16.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 00:16:58 -0700 (PDT)
+        Wed, 15 May 2024 00:17:00 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Minchan Kim <minchan@kernel.org>
 Cc: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCHv4 01/21] zram: move from crypto API to custom comp backends API
-Date: Wed, 15 May 2024 16:12:38 +0900
-Message-ID: <20240515071645.1788128-2-senozhatsky@chromium.org>
+Subject: [PATCHv4 02/21] zram: add lzo and lzorle compression backends support
+Date: Wed, 15 May 2024 16:12:39 +0900
+Message-ID: <20240515071645.1788128-3-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 In-Reply-To: <20240515071645.1788128-1-senozhatsky@chromium.org>
 References: <20240515071645.1788128-1-senozhatsky@chromium.org>
@@ -69,394 +70,222 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Crypto API is beautiful and powerful, however, being a
-generic API, it lacks support for fine-grained per-algorithm
-configuration. A number of compression algorithms provide
-various knobs to tune characteristics for particular data
-patterns. The simplest case is "compression level". A more
-complicated and interesting case is user-space trained
-dictionaries (e.g. lz4 and zstd).
-
-Moving to custom backends implementation gives us ability to
-have our own minimalistic and extendable API, and algorithms
-tunings becomes possible.
-
-The list of compression backends is empty at this point,
-we will add backends in the followup patches.
+Add s/w lzo/lzorle compression support.
 
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/Kconfig    |  39 +----------
- drivers/block/zram/zcomp.c    | 127 +++++++++++++---------------------
- drivers/block/zram/zcomp.h    |  26 +++++--
- drivers/block/zram/zram_drv.c |   9 ++-
- 4 files changed, 73 insertions(+), 128 deletions(-)
+ drivers/block/zram/Kconfig          | 23 +++++++++++++++
+ drivers/block/zram/Makefile         |  3 ++
+ drivers/block/zram/backend_lzo.c    | 44 +++++++++++++++++++++++++++++
+ drivers/block/zram/backend_lzo.h    | 10 +++++++
+ drivers/block/zram/backend_lzorle.c | 44 +++++++++++++++++++++++++++++
+ drivers/block/zram/backend_lzorle.h | 10 +++++++
+ drivers/block/zram/zcomp.c          |  7 +++++
+ 7 files changed, 141 insertions(+)
+ create mode 100644 drivers/block/zram/backend_lzo.c
+ create mode 100644 drivers/block/zram/backend_lzo.h
+ create mode 100644 drivers/block/zram/backend_lzorle.c
+ create mode 100644 drivers/block/zram/backend_lzorle.h
 
 diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
-index 7b29cce60ab2..8ecb74f83a5e 100644
+index 8ecb74f83a5e..5d329a887b12 100644
 --- a/drivers/block/zram/Kconfig
 +++ b/drivers/block/zram/Kconfig
-@@ -2,7 +2,6 @@
- config ZRAM
- 	tristate "Compressed RAM block device support"
- 	depends on BLOCK && SYSFS && MMU
--	depends on CRYPTO_LZO || CRYPTO_ZSTD || CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842
- 	select ZSMALLOC
- 	help
- 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
-@@ -15,45 +14,9 @@ config ZRAM
+@@ -14,8 +14,31 @@ config ZRAM
  
  	  See Documentation/admin-guide/blockdev/zram.rst for more information.
  
--choice
--	prompt "Default zram compressor"
--	default ZRAM_DEF_COMP_LZORLE
--	depends on ZRAM
--
--config ZRAM_DEF_COMP_LZORLE
--	bool "lzo-rle"
--	depends on CRYPTO_LZO
--
--config ZRAM_DEF_COMP_ZSTD
--	bool "zstd"
--	depends on CRYPTO_ZSTD
--
--config ZRAM_DEF_COMP_LZ4
--	bool "lz4"
--	depends on CRYPTO_LZ4
--
--config ZRAM_DEF_COMP_LZO
--	bool "lzo"
--	depends on CRYPTO_LZO
--
--config ZRAM_DEF_COMP_LZ4HC
--	bool "lz4hc"
--	depends on CRYPTO_LZ4HC
--
--config ZRAM_DEF_COMP_842
--	bool "842"
--	depends on CRYPTO_842
--
--endchoice
--
++config ZRAM_BACKEND_LZO
++	bool "lzo and lzo-rle compression support"
++	depends on ZRAM
++	select LZO_COMPRESS
++	select LZO_DECOMPRESS
++
++choice
++	prompt "Default zram compressor"
++	default ZRAM_DEF_COMP_LZORLE
++	depends on ZRAM
++
++config ZRAM_DEF_COMP_LZORLE
++	bool "lzo-rle"
++	depends on ZRAM_BACKEND_LZO
++
++config ZRAM_DEF_COMP_LZO
++	bool "lzo"
++	depends on ZRAM_BACKEND_LZO
++
++endchoice
++
  config ZRAM_DEF_COMP
  	string
--	default "lzo-rle" if ZRAM_DEF_COMP_LZORLE
--	default "zstd" if ZRAM_DEF_COMP_ZSTD
--	default "lz4" if ZRAM_DEF_COMP_LZ4
--	default "lzo" if ZRAM_DEF_COMP_LZO
--	default "lz4hc" if ZRAM_DEF_COMP_LZ4HC
--	default "842" if ZRAM_DEF_COMP_842
-+	default "unset-value"
++	default "lzo-rle" if ZRAM_DEF_COMP_LZORLE
++	default "lzo" if ZRAM_DEF_COMP_LZO
+ 	default "unset-value"
  
  config ZRAM_WRITEBACK
-        bool "Write back incompressible or idle page to backing device"
+diff --git a/drivers/block/zram/Makefile b/drivers/block/zram/Makefile
+index de9e457907b1..2a3db3368af9 100644
+--- a/drivers/block/zram/Makefile
++++ b/drivers/block/zram/Makefile
+@@ -1,4 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++
+ zram-y	:=	zcomp.o zram_drv.o
+ 
++zram-$(CONFIG_ZRAM_BACKEND_LZO)	+= backend_lzorle.o backend_lzo.o
++
+ obj-$(CONFIG_ZRAM)	+=	zram.o
+diff --git a/drivers/block/zram/backend_lzo.c b/drivers/block/zram/backend_lzo.c
+new file mode 100644
+index 000000000000..b88b408964cd
+--- /dev/null
++++ b/drivers/block/zram/backend_lzo.c
+@@ -0,0 +1,44 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/lzo.h>
++
++#include "backend_lzo.h"
++
++static void *lzo_create(void)
++{
++	return kzalloc(LZO1X_MEM_COMPRESS, GFP_KERNEL);
++}
++
++static void lzo_destroy(void *ctx)
++{
++	kfree(ctx);
++}
++
++static int lzo_compress(void *ctx, const unsigned char *src,
++			unsigned char *dst, size_t *dst_len)
++{
++	int ret;
++
++	ret = lzo1x_1_compress(src, PAGE_SIZE, dst, dst_len, ctx);
++	return ret == LZO_E_OK ? 0 : ret;
++}
++
++static int lzo_decompress(void *ctx, const unsigned char *src, size_t src_len,
++			  unsigned char *dst)
++{
++	size_t dst_len = PAGE_SIZE;
++	int ret;
++
++	ret = lzo1x_decompress_safe(src, src_len, dst, &dst_len);
++	return ret == LZO_E_OK ? 0 : ret;
++}
++
++struct zcomp_backend backend_lzo = {
++	.compress	= lzo_compress,
++	.decompress	= lzo_decompress,
++	.create_ctx	= lzo_create,
++	.destroy_ctx	= lzo_destroy,
++	.name		= "lzo",
++};
+diff --git a/drivers/block/zram/backend_lzo.h b/drivers/block/zram/backend_lzo.h
+new file mode 100644
+index 000000000000..377ccb7389e2
+--- /dev/null
++++ b/drivers/block/zram/backend_lzo.h
+@@ -0,0 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++#ifndef __BACKEND_LZO_H__
++#define __BACKEND_LZO_H__
++
++#include "zcomp.h"
++
++extern struct zcomp_backend backend_lzo;
++
++#endif /* __BACKEND_LZO_H__ */
+diff --git a/drivers/block/zram/backend_lzorle.c b/drivers/block/zram/backend_lzorle.c
+new file mode 100644
+index 000000000000..9bf1843021b0
+--- /dev/null
++++ b/drivers/block/zram/backend_lzorle.c
+@@ -0,0 +1,44 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/lzo.h>
++
++#include "backend_lzorle.h"
++
++static void *lzorle_create(void)
++{
++	return kzalloc(LZO1X_MEM_COMPRESS, GFP_KERNEL);
++}
++
++static void lzorle_destroy(void *ctx)
++{
++	kfree(ctx);
++}
++
++static int lzorle_compress(void *ctx, const unsigned char *src,
++			   unsigned char *dst, size_t *dst_len)
++{
++	int ret;
++
++	ret = lzorle1x_1_compress(src, PAGE_SIZE, dst, dst_len, ctx);
++	return ret == LZO_E_OK ? 0 : ret;
++}
++
++static int lzorle_decompress(void *ctx, const unsigned char *src,
++			     size_t src_len, unsigned char *dst)
++{
++	size_t dst_len = PAGE_SIZE;
++	int ret;
++
++	ret = lzo1x_decompress_safe(src, src_len, dst, &dst_len);
++	return ret == LZO_E_OK ? 0 : ret;
++}
++
++struct zcomp_backend backend_lzorle = {
++	.compress	= lzorle_compress,
++	.decompress	= lzorle_decompress,
++	.create_ctx	= lzorle_create,
++	.destroy_ctx	= lzorle_destroy,
++	.name		= "lzo-rle",
++};
+diff --git a/drivers/block/zram/backend_lzorle.h b/drivers/block/zram/backend_lzorle.h
+new file mode 100644
+index 000000000000..5c1db65a38a4
+--- /dev/null
++++ b/drivers/block/zram/backend_lzorle.h
+@@ -0,0 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++#ifndef __BACKEND_LZORLE_H__
++#define __BACKEND_LZORLE_H__
++
++#include "zcomp.h"
++
++extern struct zcomp_backend backend_lzorle;
++
++#endif /* __BACKEND_LZORLE_H__ */
 diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 8237b08c49d8..0d0d2e6dbaa9 100644
+index 0d0d2e6dbaa9..58fb3ac91f4b 100644
 --- a/drivers/block/zram/zcomp.c
 +++ b/drivers/block/zram/zcomp.c
-@@ -15,31 +15,16 @@
+@@ -15,7 +15,14 @@
  
  #include "zcomp.h"
  
--static const char * const backends[] = {
--#if IS_ENABLED(CONFIG_CRYPTO_LZO)
--	"lzo",
--	"lzo-rle",
--#endif
--#if IS_ENABLED(CONFIG_CRYPTO_LZ4)
--	"lz4",
--#endif
--#if IS_ENABLED(CONFIG_CRYPTO_LZ4HC)
--	"lz4hc",
--#endif
--#if IS_ENABLED(CONFIG_CRYPTO_842)
--	"842",
--#endif
--#if IS_ENABLED(CONFIG_CRYPTO_ZSTD)
--	"zstd",
--#endif
-+static struct zcomp_backend *backends[] = {
-+	NULL
++#include "backend_lzo.h"
++#include "backend_lzorle.h"
++
+ static struct zcomp_backend *backends[] = {
++#if IS_ENABLED(CONFIG_ZRAM_BACKEND_LZO)
++	&backend_lzorle,
++	&backend_lzo,
++#endif
+ 	NULL
  };
  
--static void zcomp_strm_free(struct zcomp_strm *zstrm)
-+static void zcomp_strm_free(struct zcomp *comp, struct zcomp_strm *zstrm)
- {
--	if (!IS_ERR_OR_NULL(zstrm->tfm))
--		crypto_free_comp(zstrm->tfm);
-+	if (zstrm->ctx)
-+		comp->backend->destroy_ctx(zstrm->ctx);
- 	vfree(zstrm->buffer);
--	zstrm->tfm = NULL;
-+	zstrm->ctx = NULL;
- 	zstrm->buffer = NULL;
- }
- 
-@@ -47,60 +32,55 @@ static void zcomp_strm_free(struct zcomp_strm *zstrm)
-  * Initialize zcomp_strm structure with ->tfm initialized by backend, and
-  * ->buffer. Return a negative value on error.
-  */
--static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
-+static int zcomp_strm_init(struct zcomp *comp, struct zcomp_strm *zstrm)
- {
--	zstrm->tfm = crypto_alloc_comp(comp->name, 0, 0);
-+	zstrm->ctx = comp->backend->create_ctx();
-+
- 	/*
- 	 * allocate 2 pages. 1 for compressed data, plus 1 extra for the
- 	 * case when compressed size is larger than the original one
- 	 */
- 	zstrm->buffer = vzalloc(2 * PAGE_SIZE);
--	if (IS_ERR_OR_NULL(zstrm->tfm) || !zstrm->buffer) {
--		zcomp_strm_free(zstrm);
-+	if (!zstrm->ctx || !zstrm->buffer) {
-+		zcomp_strm_free(comp, zstrm);
- 		return -ENOMEM;
- 	}
- 	return 0;
- }
- 
-+static struct zcomp_backend *lookup_backend(const char *comp)
-+{
-+	int i = 0;
-+
-+	while (backends[i]) {
-+		if (sysfs_streq(comp, backends[i]->name))
-+			break;
-+		i++;
-+	}
-+	return backends[i];
-+}
-+
- bool zcomp_available_algorithm(const char *comp)
- {
--	/*
--	 * Crypto does not ignore a trailing new line symbol,
--	 * so make sure you don't supply a string containing
--	 * one.
--	 * This also means that we permit zcomp initialisation
--	 * with any compressing algorithm known to crypto api.
--	 */
--	return crypto_has_comp(comp, 0, 0) == 1;
-+	return lookup_backend(comp) != NULL;
- }
- 
- /* show available compressors */
- ssize_t zcomp_available_show(const char *comp, char *buf)
- {
--	bool known_algorithm = false;
- 	ssize_t sz = 0;
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(backends); i++) {
--		if (!strcmp(comp, backends[i])) {
--			known_algorithm = true;
-+	for (i = 0; i < ARRAY_SIZE(backends) - 1; i++) {
-+		if (!strcmp(comp, backends[i]->name)) {
- 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
--					"[%s] ", backends[i]);
-+					"[%s] ", backends[i]->name);
- 		} else {
- 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
--					"%s ", backends[i]);
-+					"%s ", backends[i]->name);
- 		}
- 	}
- 
--	/*
--	 * Out-of-tree module known to crypto api or a missing
--	 * entry in `backends'.
--	 */
--	if (!known_algorithm && crypto_has_comp(comp, 0, 0) == 1)
--		sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
--				"[%s] ", comp);
--
--	sz += scnprintf(buf + sz, PAGE_SIZE - sz, "\n");
- 	return sz;
- }
- 
-@@ -115,8 +95,8 @@ void zcomp_stream_put(struct zcomp *comp)
- 	local_unlock(&comp->stream->lock);
- }
- 
--int zcomp_compress(struct zcomp_strm *zstrm,
--		const void *src, unsigned int *dst_len)
-+int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
-+		   const void *src, unsigned int *dst_len)
- {
- 	/*
- 	 * Our dst memory (zstrm->buffer) is always `2 * PAGE_SIZE' sized
-@@ -132,21 +112,19 @@ int zcomp_compress(struct zcomp_strm *zstrm,
- 	 * the dst buffer, zram_drv will take care of the fact that
- 	 * compressed buffer is too big.
- 	 */
--	*dst_len = PAGE_SIZE * 2;
-+	size_t dlen = PAGE_SIZE * 2;
-+	int ret;
- 
--	return crypto_comp_compress(zstrm->tfm,
--			src, PAGE_SIZE,
--			zstrm->buffer, dst_len);
-+	ret = comp->backend->compress(zstrm->ctx, src, zstrm->buffer, &dlen);
-+	if (!ret)
-+		*dst_len = dlen;
-+	return ret;
- }
- 
--int zcomp_decompress(struct zcomp_strm *zstrm,
--		const void *src, unsigned int src_len, void *dst)
-+int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
-+		     const void *src, unsigned int src_len, void *dst)
- {
--	unsigned int dst_len = PAGE_SIZE;
--
--	return crypto_comp_decompress(zstrm->tfm,
--			src, src_len,
--			dst, &dst_len);
-+	return comp->backend->decompress(zstrm->ctx, src, src_len, dst);
- }
- 
- int zcomp_cpu_up_prepare(unsigned int cpu, struct hlist_node *node)
-@@ -158,7 +136,7 @@ int zcomp_cpu_up_prepare(unsigned int cpu, struct hlist_node *node)
- 	zstrm = per_cpu_ptr(comp->stream, cpu);
- 	local_lock_init(&zstrm->lock);
- 
--	ret = zcomp_strm_init(zstrm, comp);
-+	ret = zcomp_strm_init(comp, zstrm);
- 	if (ret)
- 		pr_err("Can't allocate a compression stream\n");
- 	return ret;
-@@ -170,7 +148,7 @@ int zcomp_cpu_dead(unsigned int cpu, struct hlist_node *node)
- 	struct zcomp_strm *zstrm;
- 
- 	zstrm = per_cpu_ptr(comp->stream, cpu);
--	zcomp_strm_free(zstrm);
-+	zcomp_strm_free(comp, zstrm);
- 	return 0;
- }
- 
-@@ -199,32 +177,21 @@ void zcomp_destroy(struct zcomp *comp)
- 	kfree(comp);
- }
- 
--/*
-- * search available compressors for requested algorithm.
-- * allocate new zcomp and initialize it. return compressing
-- * backend pointer or ERR_PTR if things went bad. ERR_PTR(-EINVAL)
-- * if requested algorithm is not supported, ERR_PTR(-ENOMEM) in
-- * case of allocation error, or any other error potentially
-- * returned by zcomp_init().
-- */
- struct zcomp *zcomp_create(const char *alg)
- {
- 	struct zcomp *comp;
- 	int error;
- 
--	/*
--	 * Crypto API will execute /sbin/modprobe if the compression module
--	 * is not loaded yet. We must do it here, otherwise we are about to
--	 * call /sbin/modprobe under CPU hot-plug lock.
--	 */
--	if (!zcomp_available_algorithm(alg))
--		return ERR_PTR(-EINVAL);
--
- 	comp = kzalloc(sizeof(struct zcomp), GFP_KERNEL);
- 	if (!comp)
- 		return ERR_PTR(-ENOMEM);
- 
--	comp->name = alg;
-+	comp->backend = lookup_backend(alg);
-+	if (!comp->backend) {
-+		kfree(comp);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
- 	error = zcomp_init(comp);
- 	if (error) {
- 		kfree(comp);
-diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-index e9fe63da0e9b..757b85017e23 100644
---- a/drivers/block/zram/zcomp.h
-+++ b/drivers/block/zram/zcomp.h
-@@ -12,13 +12,26 @@ struct zcomp_strm {
- 	local_lock_t lock;
- 	/* compression/decompression buffer */
- 	void *buffer;
--	struct crypto_comp *tfm;
-+	void *ctx;
-+};
-+
-+struct zcomp_backend {
-+	int (*compress)(void *ctx, const unsigned char *src,
-+			unsigned char *dst, size_t *dst_len);
-+
-+	int (*decompress)(void *ctx, const unsigned char *src, size_t src_len,
-+			  unsigned char *dst);
-+
-+	void *(*create_ctx)(void);
-+	void (*destroy_ctx)(void *ctx);
-+
-+	const char *name;
- };
- 
- /* dynamic per-device compression frontend */
- struct zcomp {
- 	struct zcomp_strm __percpu *stream;
--	const char *name;
-+	struct zcomp_backend *backend;
- 	struct hlist_node node;
- };
- 
-@@ -33,10 +46,9 @@ void zcomp_destroy(struct zcomp *comp);
- struct zcomp_strm *zcomp_stream_get(struct zcomp *comp);
- void zcomp_stream_put(struct zcomp *comp);
- 
--int zcomp_compress(struct zcomp_strm *zstrm,
--		const void *src, unsigned int *dst_len);
--
--int zcomp_decompress(struct zcomp_strm *zstrm,
--		const void *src, unsigned int src_len, void *dst);
-+int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
-+		   const void *src, unsigned int *dst_len);
-+int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
-+		     const void *src, unsigned int src_len, void *dst);
- 
- #endif /* _ZCOMP_H_ */
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 3acd7006ad2c..38afc2c23108 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1327,7 +1327,8 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
- 		ret = 0;
- 	} else {
- 		dst = kmap_local_page(page);
--		ret = zcomp_decompress(zstrm, src, size, dst);
-+		ret = zcomp_decompress(zram->comps[prio], zstrm,
-+				       src, size, dst);
- 		kunmap_local(dst);
- 		zcomp_stream_put(zram->comps[prio]);
- 	}
-@@ -1414,7 +1415,8 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
- compress_again:
- 	zstrm = zcomp_stream_get(zram->comps[ZRAM_PRIMARY_COMP]);
- 	src = kmap_local_page(page);
--	ret = zcomp_compress(zstrm, src, &comp_len);
-+	ret = zcomp_compress(zram->comps[ZRAM_PRIMARY_COMP], zstrm,
-+			     src, &comp_len);
- 	kunmap_local(src);
- 
- 	if (unlikely(ret)) {
-@@ -1601,7 +1603,8 @@ static int zram_recompress(struct zram *zram, u32 index, struct page *page,
- 		num_recomps++;
- 		zstrm = zcomp_stream_get(zram->comps[prio]);
- 		src = kmap_local_page(page);
--		ret = zcomp_compress(zstrm, src, &comp_len_new);
-+		ret = zcomp_compress(zram->comps[prio], zstrm,
-+				     src, &comp_len_new);
- 		kunmap_local(src);
- 
- 		if (ret) {
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
