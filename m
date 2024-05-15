@@ -1,138 +1,100 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB673763F7
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 07:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176FA44391;
+	Wed, 15 May 2024 07:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715757469; cv=none; b=KazZC1BwTv4SGHvoKKAqw0o741wu8oCrhgOV/wtJ3zAh3LD1o02Ypq9vEFqlARkKUsqm3fkX8eFMvei/H2tsRvIoW/aR2ouSvbHGHiGcy50kuWpTb1dDF66x1pHvOUznYj6xQbT+zN+2Zhp/UTAqCJt0if+PBp/U7RI54C0mqjI=
+	t=1715758861; cv=none; b=q8BTcAh8fJdXht7TmCsZfCR2SMC+PFb+aEqYWFS/mWIvIOmWmv19pvpGYUF73xuEOBAjsab9g96seZ5pbm0MHEG+Celd+B0h1sxDv2rCgH/YsPHW5OEBEan5QbUkZnzbyjWL5GEZW0M2gN7bdu+csuenAO4SSoJYpeXaIg9WsaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715757469; c=relaxed/simple;
-	bh=0QKD/VRLqE4UJhTMThwx4W0GPaxzgatlvvK+3EE9Gd0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ictz6hF1GcdpUj9PRkuzQX6jmRtVoFxCkqHAqI7beLai8ojoEvnWrh3uqAfgvRTc9unZ8FdWu/rp2fagtY3VRuFrfNO+uykk5q+6N0PHn0cIGsgTKc2r7rHe36SZGWCQzvpr1ElfDfOVJa/XEsHguYHIpQ3BmamfbQ0s1UyEsas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YHQzgsw2; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1715758861; c=relaxed/simple;
+	bh=t9RspgqG+F2PVlmvWuEQ0GLhwwngFJ3ao73Evv6IOpc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lycdBEhIjUgeahdFvxQWIdRdbrzKpTcR4FJwkqQH0/3i49ZR6WH5oXRcSutYRZdsNhVcRVWK81MCRz/Yi/vGBH91bL7PT8myyU+mH8ujy+Vqlyhbq8t9I+0Id9R8ENmWEs33yB2A4iBMgMspKyZIf9X4kWdt4wbbgZ4b3NefdwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e8+pZEkW; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YHQzgsw2"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1f082d92864so16529405ad.1
-        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 00:17:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8+pZEkW"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6f0f5645c68so2211271a34.1;
+        Wed, 15 May 2024 00:40:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715757467; x=1716362267; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ow2rUHFnrcYhlTotFbBj4Gwxyq4hSnuB9nn9e+mMxIY=;
-        b=YHQzgsw2miaw+A94pdrS9zbw6+Yen4uDKAHCSsd+5Pv/WyQAA41PeR3hs1rChZ6Yc9
-         CPSflOIuyfyGCdPWV0kx5WKzNQ/E8BsOREcSthOX/Vb58PcCkQ7RNy/on1u5NRyRWuxV
-         10TMPfYFcNtQe4w9M+ZBzIRuCTEv6/IFvkLd8=
+        d=gmail.com; s=20230601; t=1715758859; x=1716363659; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TLhn4fqdh7o5svdDGhY37fd8hSl+dswnienDJA3jE4w=;
+        b=e8+pZEkWRrmirjaxLS/JuS0I+LZprA9UzY2I1lgAHtV7JaJoWwp1sOvka8kN/b/V8B
+         0md3lEy3wv8jJHUH271MxrtdZTERZLp7vu/5Orfn7DiBzV6yRE3jkeYgIMYBArevzh86
+         eIiVlL4adsC6kpkQOr+f1mrjf11H+7gzCeLmZlCG1z3G6nbd9/bYO06telsZCFXj5Q+w
+         A6AjussYuWZkGjket7wxkUd25Hcl92adqxxKtByIcaCsUgwgaMIB2LS+K89mIkjbt4mV
+         fJ4yv871NzFE7phzB4UiNrvkCAOZ4PMIeHzlp6RVtIYswRoVvgQTE5kLtO9JBZrUcCa1
+         UMuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715757467; x=1716362267;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715758859; x=1716363659;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ow2rUHFnrcYhlTotFbBj4Gwxyq4hSnuB9nn9e+mMxIY=;
-        b=sC/h1lwiQSR9khnnv6VZ4BK3jNhh9I42jGVJ8D1Q7pJaBezsOTAwjqcorCiFcPNyhO
-         AI76sBkQVbKZCOf1/4cFBzQL2S7JsICvkn/p7wzYXsFNXz4/LtrpVGY0sqSUEcJf/Tqb
-         cYMWoFg4Uvoyefuzn3huqWrgNvdzEB3ATge5iBVGBX7g/BmQ2+Aqfl9+sX/fchA8cMYY
-         spSDqeNvUXmaXUH57uqFWuMWCOE4KWX769Q3gBZbg6rpB8V6SAMbeSpMisZMm22hBJfU
-         9vpNg4x4ytJK5ozr21AcjjHPxnH/UxNuOV14k4BlHWpqSfm73GuPqROkam2o+w5q8CXD
-         ttxg==
-X-Forwarded-Encrypted: i=1; AJvYcCVWPTEiDd9fk3SbX4y3BbtX/01yrTSQrlkpz4S8pJkG/+Sp7eE1EJ2FAdBMUGPWpz6+EVdRuXpWQYUaUZSi2RZxawbwhHcGsO40fkk=
-X-Gm-Message-State: AOJu0Ywnt7aic8ahKEJw28o2/mjAhhLuwoIBIt0RQLW0GnmO7Nl0pMrU
-	Sxox5B6/XuZs6uaaNBZQIss1QcGMsSv3ehE8bpKGOap6NSSa+NNiWE8nVCia5w==
-X-Google-Smtp-Source: AGHT+IFUXSL8PagKambUAn3JNk1vaS0WDwvdWErdRIsdpbLz+NRveFk3xgU/oe2NPDEqLe4EoIXhzg==
-X-Received: by 2002:a17:903:984:b0:1eb:7746:4248 with SMTP id d9443c01a7336-1ef440495abmr176201825ad.54.1715757466991;
-        Wed, 15 May 2024 00:17:46 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:111d:a618:3172:cd5b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136d53sm110941605ad.254.2024.05.15.00.17.45
+        bh=TLhn4fqdh7o5svdDGhY37fd8hSl+dswnienDJA3jE4w=;
+        b=OTY7I8PskVeO/rgBpDSwS4bdXjYizR6njNgpLfizv0ktga/OlOXODtn/cTLbqcf/Ew
+         YTAqCFFY5UuLJVy0GNYR7uQDU2DKcAH6jomK6VRa/ddrpOGw68qFIFRTNpTbpkZkAnY4
+         B37fAwz0ODajWocgblRqLSD9sW9dwleMzswOhAO7e1GuAfEtG+/qLeP05QkWDuhC0pFK
+         uVzN3zBSzNdpAKLXYSiWeH6SM/jY10rBRslRBy5Tp8ZojRcOvOuBz4Lo0F90QQOJhCG0
+         bPoAQfSlnVEMFBcD+SX7tAf7ee/+Wts6w2qv0WNcomcxYP1ncbqRX1pVdQdFp8z1jPJ5
+         q8bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWC6IOCdu5Mjah025IGxZ6SZkXkjDxAEkdheBZseQBSTw3dBq63G5HmQJhgHdEWsu0BvQ2DlZzsdPU+vz4rN82l/XqlZnxGrxXNjD2emHDeW/4ly55coq2dbM/lLBYsoX14enj69qCk418DOYfiRkW+wv/joXOwip59ZrEAeu6kVndH
+X-Gm-Message-State: AOJu0Yzpbgq6OpmkK5aowEtbWxaU7/G3PV7mFHzsYkvhg/lGjkJIkkpa
+	Av/E9Qm1WDfiPBJW1w1o+F8XdaOfD4ufk8tG8t44zzcDuE+bnR6K
+X-Google-Smtp-Source: AGHT+IFAoB28Oxhj1Qe9IKvpyG7rsjUv6rTIqwphEgorIUy9cjMuH127glK9Bi63tCvYIjYKLEYIaQ==
+X-Received: by 2002:a05:6830:f8c:b0:6f1:23cc:b4ff with SMTP id 46e09a7af769-6f123ccbc9amr1247245a34.11.1715758859033;
+        Wed, 15 May 2024 00:40:59 -0700 (PDT)
+Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-63411530b0esm10843078a12.88.2024.05.15.00.40.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 00:17:46 -0700 (PDT)
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCHv4 21/21] Documentation/zram: add documentation for algorithm parameters
-Date: Wed, 15 May 2024 16:12:58 +0900
-Message-ID: <20240515071645.1788128-22-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-In-Reply-To: <20240515071645.1788128-1-senozhatsky@chromium.org>
-References: <20240515071645.1788128-1-senozhatsky@chromium.org>
+        Wed, 15 May 2024 00:40:58 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 14 May 2024 21:40:56 -1000
+From: Tejun Heo <tj@kernel.org>
+To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>,
+	steve.kang@unisoc.com
+Subject: Re: [RFC PATCH 2/2] mm: introduce budgt control in readahead
+Message-ID: <ZkRnCDasZNvFQUaY@slm.duckdns.org>
+References: <20240515012350.1166350-1-zhaoyang.huang@unisoc.com>
+ <20240515012350.1166350-3-zhaoyang.huang@unisoc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240515012350.1166350-3-zhaoyang.huang@unisoc.com>
 
-Document brief description of compression algorithms' parameters:
-compression level and pre-trained dictionary.
+Hello,
 
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- Documentation/admin-guide/blockdev/zram.rst | 38 ++++++++++++++++-----
- 1 file changed, 29 insertions(+), 9 deletions(-)
+On Wed, May 15, 2024 at 09:23:50AM +0800, zhaoyang.huang wrote:
+> +static unsigned long get_next_ra_size(struct readahead_control *ractl,
+>  				      unsigned long max)
+>  {
+> +	unsigned long cur = ractl->ra->size;
+> +	struct inode *inode = ractl->mapping->host;
+> +	unsigned long budgt = inode->i_sb->s_bdev ?
+> +			blk_throttle_budgt(inode->i_sb->s_bdev) : 0;
 
-diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
-index 091e8bb38887..58d79f9099e3 100644
---- a/Documentation/admin-guide/blockdev/zram.rst
-+++ b/Documentation/admin-guide/blockdev/zram.rst
-@@ -102,15 +102,26 @@ Examples::
- 	#select lzo compression algorithm
- 	echo lzo > /sys/block/zram0/comp_algorithm
- 
--For the time being, the `comp_algorithm` content does not necessarily
--show every compression algorithm supported by the kernel. We keep this
--list primarily to simplify device configuration and one can configure
--a new device with a compression algorithm that is not listed in
--`comp_algorithm`. The thing is that, internally, ZRAM uses Crypto API
--and, if some of the algorithms were built as modules, it's impossible
--to list all of them using, for instance, /proc/crypto or any other
--method. This, however, has an advantage of permitting the usage of
--custom crypto compression modules (implementing S/W or H/W compression).
-+For the time being, the `comp_algorithm` content shows only compression
-+algorithms that are supported by zram.
-+
-+It is also possible to pass algorithm specific configuration parameters::
-+
-+	#set compression level to 8
-+	echo "zstd level=8" > /sys/block/zram0/comp_algorithm
-+
-+Note that `comp_algorithm` also supports `algo=name` format::
-+
-+	#set compression level to 8
-+	echo "algo=zstd level=8" > /sys/block/zram0/comp_algorithm
-+
-+Certain compression algorithms support pre-trained dictionaries, which
-+significantly change algorithms' characteristics. In order to configure
-+compression algorithm to use external pre-trained dictionary, pass full
-+path to the dictionary along with other parameters::
-+
-+	#pass path to pre-trained dictionary
-+	echo "algo=zstd dict=/etc/dictioary" > /sys/block/zram0/comp_algorithm
- 
- 4) Set Disksize
- ===============
-@@ -442,6 +453,15 @@ configuration:::
- 	#select deflate recompression algorithm, priority 2
- 	echo "algo=deflate priority=2" > /sys/block/zramX/recomp_algorithm
- 
-+The `recomp_algorithm` also supports algorithm configuration parameters, e.g.
-+compression level and pre-trained dircionary::
-+
-+	#pass compression level
-+	echo "algo=zstd level=8" > /sys/block/zramX/recomp_algorithm
-+
-+	#pass path to pre-trained dictionary
-+	echo "algo=zstd dict=/etc/dictioary" > /sys/block/zramX/recomp_algorithm
-+
- Another device attribute that CONFIG_ZRAM_MULTI_COMP enables is recompress,
- which controls recompression.
- 
+Technical correctness aside, I'm not convinced it's generally a good idea to
+bubble up one specific IO control mechanism's detail all the way upto RA
+layer. Besides what's the gain here? For continuous IO stream, whether some
+RA bios are oversized or not shouldn't matter, no? Doesn't this just affect
+the accuracy of the last RA IO of a finite read stream?
+
+Thanks.
+
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
-
+tejun
