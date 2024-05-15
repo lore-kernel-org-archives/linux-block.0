@@ -1,94 +1,86 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326D138FA6
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 19:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A690715AD83
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 20:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715799613; cv=none; b=gkQwmwu/+HZqF5QoNvyi6qAsJkrx4dpCxLwbYXOZGAT1ourvvo89LyKmAGZe+8sbkHZo82gPot5+Wr3AnetW99UKkDW6M5cnSJQB3ElebP5cWcmrTjPS3zRFR9qJzLixlGdQSzQFta9rXGcpF6rQBZQD8hA0/N8HSZZYsoCW9pc=
+	t=1715806533; cv=none; b=HlRF0rqR2uUidoa0/zJo/OEDih0dajqOrBokZeVLHoPReNiY2IkKbJudur4fESj80ISNm7B4wNrxWZFrT3g7xIlntWy5NEbFNeMojoMyJqIMlVKPpZDvaR2R3QVBF9hb3HHPhMF8lMXwjkPC1HFceZEU3fyqz16/wsGEzg/nYGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715799613; c=relaxed/simple;
-	bh=jaTMCpliYa58QvXqV3pMPAR4eF2IWFG4iXnt82z7cDA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=bB8fIBxDZPU/bqxhdNCj+EiQCdG+By76VQGNKeToCGwh5y6oQBZZjf1/9trMDOuGfObMHvCo1WTsu7LC20g/DGxP3kZUIz/EiEtQTq+t2xR22L+bsCJLX8tjDmtCrlveXwKcPlpONlqoeEO898nrriCtv0jatxp7BX48Rg+0ULs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q/iPQqnn; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1715806533; c=relaxed/simple;
+	bh=QD9vsP2ElAUmTy+nmhwp3aHXEVfC7Kc2gwkmvmTS3S4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i1Z+c4W/c9mF78HKZVcWqn4XLabDvL1edFUbFN0YIIR1BFat32rn8jrzYiCiRDPxN9b9xap9AMmQviPWOwKcXMwKJ0O/dvw72Ff8V2VwVMfwP6XQk4I4H8+/V6x484tj6/3XSYv0FfJz2qdkWu319MT1AriMqvN6PUdnHrsGxt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KbDp1JNZ; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q/iPQqnn"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1ed82d37dcbso1441685ad.3
-        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 12:00:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715799608; x=1716404408; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R/3uJsdBbnZz1Z3+KQAN8U1TxWyVKpiQRHRgXw9S5Tc=;
-        b=Q/iPQqnnRdyHhj+ScyVgoXEm4FreSLyGFAqkwI2BpKbPQ5bLe03UsWHHyXOP5DEoHX
-         GSMbDaHkQkgehL3fEQ9lk1XMP+9yS2E87YvLhDS6BhSCxFdH+J3/pwc+IRK8e+4QhMj4
-         0KcJUW5hO8WI2K+uJy29uaYBNRxBkfIGkjZIogGcy4sCIhlCQc7h+P/g2ODOTbPP7yVy
-         k1H2IvK+E6UuyZ2YnhwUKz8LkZvVEoPYFVgpDkAYPxkzbMR3FVgZJCwSUWEPLlv1aC4o
-         d7QGwxmGaGTo4BCzC4DrEdksvufmRO+EsJHIp9AY2olbVY8DJwcgACEpDdWh53LiE7Uw
-         BzTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715799608; x=1716404408;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R/3uJsdBbnZz1Z3+KQAN8U1TxWyVKpiQRHRgXw9S5Tc=;
-        b=EgvZ37OOx3mi9iucfGp8o776ck9fwpGd4AP770J8bvMlveG1rODEmJmJiCUoc4qAox
-         5Zuu7secLAywDQnmaBKQS9PrRDn9pcLrHygRH3rD0s3ZDD876QuxZn+tcVmm0o7/1q5j
-         wjU8WkLXNca+f+hReeRV+9/oeQl3n7ZNDXnUlVZaGOtlPQrqLFMMhCKW7QYtoVfiBkon
-         juLvVkOxltXgj4DXkxIlusZy7qUpnkFJhn7JpaCKLjdg2/qk8hozRJfGglqeS4/R6Rca
-         R2DA1DOjSG2qykhg1zN2uKBk6ylK1wRmTEihG1fCWAC3/+SJbk0m6t2OPfyiGbZVnZaM
-         8krw==
-X-Gm-Message-State: AOJu0YzISUXdQupRlhfkscsLceC9uLOeMz/hKP3lk2Gjdc727XLN1LvC
-	WtV8VPh0tLyMdcYg9y+48++dKf0yrbtUecV8hnCvtkAGSUq9L3VveoEh2gEVkngslc//cT2hSdh
-	s
-X-Google-Smtp-Source: AGHT+IFHaWEMVRnZmG86FK9Qho1mQesYuK6si7V79a2wuRHWqBO07TvEOq5IrXU9JxU5tWKjcLwTKw==
-X-Received: by 2002:a05:6a21:c92:b0:1b0:111f:2b70 with SMTP id adf61e73a8af0-1b0111f2ceemr4138504637.3.1715799607549;
-        Wed, 15 May 2024 12:00:07 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2ae0d77sm11477435b3a.106.2024.05.15.12.00.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 12:00:06 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Phillip Potter <phil@philpotter.co.uk>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20240507222520.1445-1-phil@philpotter.co.uk>
-References: <20240507222520.1445-1-phil@philpotter.co.uk>
-Subject: Re: [PATCH 0/1] cdrom: patch for inclusion in 6.10
-Message-Id: <171579960632.171640.15923003704981684226.b4-ty@kernel.dk>
-Date: Wed, 15 May 2024 13:00:06 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KbDp1JNZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=fyJlbpFwcRIlpk11CzpL8loQ8nicymIY+63J/Tv5MaM=; b=KbDp1JNZUVsjzRLIuvvVAWZgdV
+	vnlkpOEz6/wCHhjew4k0lX63V1e8q8Qgrb2lQJhVAutTHrLSLODOmaF+yIqIOTvdjcylYRNyTuICP
+	U/L7vBe8pLD6DzLQqVSPV4jXpsSAcmFrYuYYbE1TK+mbWetgC99C5fWKgt/ABsWXZlPHKi2aCzlaX
+	JY3tjjKNDOMxqa6RrrChCQyxQzyPt1ncSyauRyRSNYGL82bQbGb52g/OvrP2BkQGagewJwqQ09Tzk
+	2+PqofZpQmHEqoZSG963fn84su2PtjcFqL1oNJmtNdqULAsXT3OMcSkTKSUAcXXLXEBm9dK/IccIx
+	RAWzGwKw==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s7Lep-0000000AvcO-0Obq;
+	Wed, 15 May 2024 20:55:27 +0000
+Date: Wed, 15 May 2024 21:55:26 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
+	joshi.k@samsung.com, mcgrof@kernel.org, anuj20.g@samsung.com,
+	nj.shetty@samsung.com, c.gameti@samsung.com, gost.dev@samsung.com
+Subject: Re: [PATCH v3 2/3] block: add folio awareness instead of looping
+ through pages
+Message-ID: <ZkUhPoWnvxPYONIA@casper.infradead.org>
+References: <20240507144509.37477-1-kundan.kumar@samsung.com>
+ <CGME20240507145323epcas5p3834a1c67986bf104dbf25a5bd844a063@epcas5p3.samsung.com>
+ <20240507144509.37477-3-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240507144509.37477-3-kundan.kumar@samsung.com>
 
-
-On Tue, 07 May 2024 23:25:19 +0100, Phillip Potter wrote:
-> Please apply the following patch to your for-6.10/block tree from
-> Justin Stitt, that changes a media change condition in a sensible
-> way to not require a subtraction anymore, thus no longer triggering
-> the re-enabled signed integer overflow sanitizer in Clang/UBSan.
+On Tue, May 07, 2024 at 08:15:08PM +0530, Kundan Kumar wrote:
+> Add a bigger size from folio to bio and skip processing for pages.
 > 
-> Many thanks in advance.
-> 
-> [...]
+> Fetch the offset of page within a folio. Depending on the size of folio
+> and folio_offset, fetch a larger length. This length may consist of
+> multiple contiguous pages if folio is multiorder.
 
-Applied, thanks!
+The problem is that it may not.  Here's the scenario:
 
-[1/1] cdrom: rearrange last_media_change check to avoid unintentional overflow
-      commit: efb905aeb44b0e99c0e6b07865b1885ae0471ebf
+int fd, fd2;
+fd = open(src, O_RDONLY);
+char *addr = mmap(NULL, 1024 * 1024, PROT_READ | PROT_WRITE,
+	MAP_PRIVATE | MAP_HUGETLB, fd, 0);
+int i, j;
 
-Best regards,
--- 
-Jens Axboe
+for (i = 0; i < 1024 * 1024; i++)
+	j |= addr[i];
 
+addr[30000] = 17;
+fd2 = open(dest, O_RDWR | O_DIRECT);
+write(fd2, &addr[16384], 32768);
 
+Assuming that the source file supports being cached in large folios,
+the page array we get from GUP might contain:
+
+f0p4 f0p5 f0p6 f1p0 f0p8 f0p9 ...
+
+because we allocated 'f1' when we did COW due to the store to addr[30000].
+
+We can certainly reduce the cost of merge if we know two pages are part
+of the same folio, but we still need to check that we actually got
+pages which are part of the same folio.
 
