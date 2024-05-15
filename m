@@ -1,256 +1,173 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CF93B79F
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 13:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A60213FD75
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 13:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715779824; cv=none; b=HK6fpHJNAOqpoyL4hjfH16u9YhXN/EWV09XQzRXKmlLUQE8qX10jYzdapAjMMjfIDMTO3IBwL2eL23UbmqqzmVW00d3Ob3sf9ldPqwA2BEkWaezcQUBpQk+/NKDSht3YdiSafN2BuBcuX/k1UxFw8BHf2Y1RUGjLB7ePFg8sqTA=
+	t=1715781548; cv=none; b=VJFvzKa9xaRWzwAvoMzo6fKFv/BZyXQUMORbbbOPuEcR8dCbHr9g6hVHK9G9wXz02HeVdBBjD/y4Qun/UuvYqltxru0BoIedvqgT7otTWpdiqJf6ZU1O3PQdMdX+C6J9ENX0MlTNH/onlZZoA35Jqg1a+HMpEXI2LeAMHYaKKXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715779824; c=relaxed/simple;
-	bh=pIeiSZrd4rgBZC4gL7z+H5NdoWWSEVH80JIRINfngNg=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=s8ajt+kCkK+tR4ro4TpC87odKpmfm9XO17OBaWRrcOUbJf7tV7H4gydgz9eKtZwULVYf9DJKsk/ato/mgfqNhfXay13pveb6fwwBLCWcTUOeLlmid3TrGA8SJoDtQr9w/R94qyWRxvD/3rWa9CIDg2/zwBVemOPLYSVzWlOpT/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iUMDKPdc; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1715781548; c=relaxed/simple;
+	bh=rXjbn/XmBzZi1VlsBK5szeltygemCnt1pVy5tRNMQlg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=alySMxik7OcJboqmmPjI6M9+b0HAcSLDSVrztsWAihj9qaAXwOZzHX1tOBqHpBlJRAWbsQ3rJkq3AIhfZXfWTwUGd1yfkxcZ6hayQSJrHvApqgfd/hNL24mw/P/UCfD3fmnyIma3LXn1ewVtLu7o5qNXIooFs4cOGFGHK7iQmzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UxPWa0ZA; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iUMDKPdc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxPWa0ZA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715779821;
+	s=mimecast20190719; t=1715781546;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9EXSHk5bMjjCfNj1XQxUp8jPiBPqNxQX5WYV1QsG8g8=;
-	b=iUMDKPdctZ3Q8+bPiWYStifNBLnyCJcgvxc1anoXgPqhBN2HwUnKujBi6FeHpCvm6/Ukm0
-	S6J6FpBTYley7Ob4AysSk860RuZP9pwHa1IxX/4CaqEQQYslDK97ny1OwsCgTFPeM5nG/Z
-	D2pV/di/JmzplGca4TLH8Y91/b/1/Do=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-663-TVbppDLyMD-k2oXIqPpyTg-1; Wed,
- 15 May 2024 09:30:12 -0400
-X-MC-Unique: TVbppDLyMD-k2oXIqPpyTg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	bh=Hxluf7fXv8K6mMhArnjgUdWKJ31fjvKmbrUFeNJHxZA=;
+	b=UxPWa0ZAJ8kTtYWSrke7+NcGpTHhJYTs6qFC0UYFcYHPBUodpI+Bt6wz3wfhyX9j+7AWCO
+	x7nsaMQm7KAjVcTp94nVKWNo6EXkO+9yTQdvuFAHErG5155FeCuhtvy83nCpNiT4Z3eDq4
+	VvyBkKKUWkg6WhFvuTAGfFuXp9ODpG4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-hTmxgJEMO3COyEcZYpZ0YQ-1; Wed, 15 May 2024 09:59:02 -0400
+X-MC-Unique: hTmxgJEMO3COyEcZYpZ0YQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D9F2E1C53C69;
-	Wed, 15 May 2024 13:30:11 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D311A51BF;
-	Wed, 15 May 2024 13:30:11 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id C2AD330C7280; Wed, 15 May 2024 13:30:11 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id C1C7E3FB52;
-	Wed, 15 May 2024 15:30:11 +0200 (CEST)
-Date: Wed, 15 May 2024 15:30:11 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-    Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-    Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>
-cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
-    linux-nvme@lists.infradead.org
-Subject: [RFC PATCH 2/2] dm-crypt: support per-sector NVMe metadata
-In-Reply-To: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
-Message-ID: <703ffbcf-2fa8-56aa-2219-10254af26ba5@redhat.com>
-References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 55B21101A551;
+	Wed, 15 May 2024 13:59:02 +0000 (UTC)
+Received: from [10.22.33.50] (unknown [10.22.33.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1768B103A3AA;
+	Wed, 15 May 2024 13:59:01 +0000 (UTC)
+Message-ID: <a776ac38-acfa-4c1a-b665-d442f6b481f0@redhat.com>
+Date: Wed, 15 May 2024 09:59:01 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] blk-cgroup: fix list corruption from resetting io
+ stat
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>,
+ Jay Shin <jaeshin@redhat.com>
+References: <20240515013157.443672-1-ming.lei@redhat.com>
+ <20240515013157.443672-2-ming.lei@redhat.com>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <20240515013157.443672-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Support per-sector NVMe metadata in dm-crypt.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-
----
- drivers/md/dm-crypt.c |   53 ++++++++++++++++++++++++++++----------------------
- 1 file changed, 30 insertions(+), 23 deletions(-)
-
-Index: linux-2.6/drivers/md/dm-crypt.c
-===================================================================
---- linux-2.6.orig/drivers/md/dm-crypt.c
-+++ linux-2.6/drivers/md/dm-crypt.c
-@@ -211,7 +211,8 @@ struct crypt_config {
- 
- 	unsigned int integrity_tag_size;
- 	unsigned int integrity_iv_size;
--	unsigned int on_disk_tag_size;
-+	unsigned int used_tag_size;
-+	unsigned int tuple_size;
- 
- 	/*
- 	 * pool for per bio private data, crypto requests,
-@@ -1148,14 +1149,14 @@ static int dm_crypt_integrity_io_alloc(s
- 	unsigned int tag_len;
- 	int ret;
- 
--	if (!bio_sectors(bio) || !io->cc->on_disk_tag_size)
-+	if (!bio_sectors(bio) || !io->cc->tuple_size)
- 		return 0;
- 
- 	bip = bio_integrity_alloc(bio, GFP_NOIO, 1);
- 	if (IS_ERR(bip))
- 		return PTR_ERR(bip);
- 
--	tag_len = io->cc->on_disk_tag_size * (bio_sectors(bio) >> io->cc->sector_shift);
-+	tag_len = io->cc->tuple_size * (bio_sectors(bio) >> io->cc->sector_shift);
- 
- 	bip->bip_iter.bi_sector = io->cc->start + io->sector;
- 
-@@ -1173,24 +1174,30 @@ static int crypt_integrity_ctr(struct cr
- 	struct blk_integrity *bi = blk_get_integrity(cc->dev->bdev->bd_disk);
- 	struct mapped_device *md = dm_table_get_md(ti->table);
- 
-+	if (!bi) {
-+		ti->error = "No integrity profile.";
-+		return -EINVAL;
-+	}
-+
- 	/* From now we require underlying device with our integrity profile */
--	if (!bi || strcasecmp(bi->profile->name, "DM-DIF-EXT-TAG")) {
-+	if (strcasecmp(bi->profile->name, "DM-DIF-EXT-TAG") &&
-+	    strcasecmp(bi->profile->name, "nop")) {
- 		ti->error = "Integrity profile not supported.";
- 		return -EINVAL;
- 	}
- 
--	if (bi->tag_size != cc->on_disk_tag_size ||
--	    bi->tuple_size != cc->on_disk_tag_size) {
-+	if (bi->tuple_size < cc->used_tag_size) {
- 		ti->error = "Integrity profile tag size mismatch.";
- 		return -EINVAL;
- 	}
-+	cc->tuple_size = bi->tuple_size;
- 	if (1 << bi->interval_exp != cc->sector_size) {
- 		ti->error = "Integrity profile sector size mismatch.";
- 		return -EINVAL;
- 	}
- 
- 	if (crypt_integrity_aead(cc)) {
--		cc->integrity_tag_size = cc->on_disk_tag_size - cc->integrity_iv_size;
-+		cc->integrity_tag_size = cc->used_tag_size - cc->integrity_iv_size;
- 		DMDEBUG("%s: Integrity AEAD, tag size %u, IV size %u.", dm_device_name(md),
- 		       cc->integrity_tag_size, cc->integrity_iv_size);
- 
-@@ -1202,7 +1209,7 @@ static int crypt_integrity_ctr(struct cr
- 		DMDEBUG("%s: Additional per-sector space %u bytes for IV.", dm_device_name(md),
- 		       cc->integrity_iv_size);
- 
--	if ((cc->integrity_tag_size + cc->integrity_iv_size) != bi->tag_size) {
-+	if ((cc->integrity_tag_size + cc->integrity_iv_size) > cc->tuple_size) {
- 		ti->error = "Not enough space for integrity tag in the profile.";
- 		return -EINVAL;
- 	}
-@@ -1281,7 +1288,7 @@ static void *tag_from_dmreq(struct crypt
- 	struct dm_crypt_io *io = container_of(ctx, struct dm_crypt_io, ctx);
- 
- 	return &io->integrity_metadata[*org_tag_of_dmreq(cc, dmreq) *
--		cc->on_disk_tag_size];
-+		cc->tuple_size];
- }
- 
- static void *iv_tag_from_dmreq(struct crypt_config *cc,
-@@ -1362,9 +1369,9 @@ static int crypt_convert_block_aead(stru
- 		aead_request_set_crypt(req, dmreq->sg_in, dmreq->sg_out,
- 				       cc->sector_size, iv);
- 		r = crypto_aead_encrypt(req);
--		if (cc->integrity_tag_size + cc->integrity_iv_size != cc->on_disk_tag_size)
-+		if (cc->integrity_tag_size + cc->integrity_iv_size != cc->tuple_size)
- 			memset(tag + cc->integrity_tag_size + cc->integrity_iv_size, 0,
--			       cc->on_disk_tag_size - (cc->integrity_tag_size + cc->integrity_iv_size));
-+			       cc->tuple_size - (cc->integrity_tag_size + cc->integrity_iv_size));
- 	} else {
- 		aead_request_set_crypt(req, dmreq->sg_in, dmreq->sg_out,
- 				       cc->sector_size + cc->integrity_tag_size, iv);
-@@ -1794,7 +1801,7 @@ static void crypt_dec_pending(struct dm_
- 		return;
- 
- 	if (likely(!io->ctx.aead_recheck) && unlikely(io->ctx.aead_failed) &&
--	    cc->on_disk_tag_size && bio_data_dir(base_bio) == READ) {
-+	    cc->used_tag_size && bio_data_dir(base_bio) == READ) {
- 		io->ctx.aead_recheck = true;
- 		io->ctx.aead_failed = false;
- 		io->error = 0;
-@@ -3173,7 +3180,7 @@ static int crypt_ctr_optional(struct dm_
- 				ti->error = "Invalid integrity arguments";
- 				return -EINVAL;
- 			}
--			cc->on_disk_tag_size = val;
-+			cc->used_tag_size = val;
- 			sval = strchr(opt_string + strlen("integrity:"), ':') + 1;
- 			if (!strcasecmp(sval, "aead")) {
- 				set_bit(CRYPT_MODE_INTEGRITY_AEAD, &cc->cipher_flags);
-@@ -3384,12 +3391,12 @@ static int crypt_ctr(struct dm_target *t
- 		if (ret)
- 			goto bad;
- 
--		cc->tag_pool_max_sectors = POOL_ENTRY_SIZE / cc->on_disk_tag_size;
-+		cc->tag_pool_max_sectors = POOL_ENTRY_SIZE / cc->tuple_size;
- 		if (!cc->tag_pool_max_sectors)
- 			cc->tag_pool_max_sectors = 1;
- 
- 		ret = mempool_init_kmalloc_pool(&cc->tag_pool, MIN_IOS,
--			cc->tag_pool_max_sectors * cc->on_disk_tag_size);
-+			cc->tag_pool_max_sectors * cc->tuple_size);
- 		if (ret) {
- 			ti->error = "Cannot allocate integrity tags mempool";
- 			goto bad;
-@@ -3464,7 +3471,7 @@ static int crypt_map(struct dm_target *t
- 	 * Check if bio is too large, split as needed.
- 	 */
- 	if (unlikely(bio->bi_iter.bi_size > (BIO_MAX_VECS << PAGE_SHIFT)) &&
--	    (bio_data_dir(bio) == WRITE || cc->on_disk_tag_size))
-+	    (bio_data_dir(bio) == WRITE || cc->used_tag_size))
- 		dm_accept_partial_bio(bio, ((BIO_MAX_VECS << PAGE_SHIFT) >> SECTOR_SHIFT));
- 
- 	/*
-@@ -3480,8 +3487,8 @@ static int crypt_map(struct dm_target *t
- 	io = dm_per_bio_data(bio, cc->per_bio_data_size);
- 	crypt_io_init(io, cc, bio, dm_target_offset(ti, bio->bi_iter.bi_sector));
- 
--	if (cc->on_disk_tag_size) {
--		unsigned int tag_len = cc->on_disk_tag_size * (bio_sectors(bio) >> cc->sector_shift);
-+	if (cc->tuple_size) {
-+		unsigned int tag_len = cc->tuple_size * (bio_sectors(bio) >> cc->sector_shift);
- 
- 		if (unlikely(tag_len > KMALLOC_MAX_SIZE))
- 			io->integrity_metadata = NULL;
-@@ -3552,7 +3559,7 @@ static void crypt_status(struct dm_targe
- 		num_feature_args += test_bit(DM_CRYPT_NO_WRITE_WORKQUEUE, &cc->flags);
- 		num_feature_args += cc->sector_size != (1 << SECTOR_SHIFT);
- 		num_feature_args += test_bit(CRYPT_IV_LARGE_SECTORS, &cc->cipher_flags);
--		if (cc->on_disk_tag_size)
-+		if (cc->used_tag_size)
- 			num_feature_args++;
- 		if (num_feature_args) {
- 			DMEMIT(" %d", num_feature_args);
-@@ -3566,8 +3573,8 @@ static void crypt_status(struct dm_targe
- 				DMEMIT(" no_read_workqueue");
- 			if (test_bit(DM_CRYPT_NO_WRITE_WORKQUEUE, &cc->flags))
- 				DMEMIT(" no_write_workqueue");
--			if (cc->on_disk_tag_size)
--				DMEMIT(" integrity:%u:%s", cc->on_disk_tag_size, cc->cipher_auth);
-+			if (cc->used_tag_size)
-+				DMEMIT(" integrity:%u:%s", cc->used_tag_size, cc->cipher_auth);
- 			if (cc->sector_size != (1 << SECTOR_SHIFT))
- 				DMEMIT(" sector_size:%d", cc->sector_size);
- 			if (test_bit(CRYPT_IV_LARGE_SECTORS, &cc->cipher_flags))
-@@ -3588,9 +3595,9 @@ static void crypt_status(struct dm_targe
- 		DMEMIT(",iv_large_sectors=%c", test_bit(CRYPT_IV_LARGE_SECTORS, &cc->cipher_flags) ?
- 		       'y' : 'n');
- 
--		if (cc->on_disk_tag_size)
-+		if (cc->used_tag_size)
- 			DMEMIT(",integrity_tag_size=%u,cipher_auth=%s",
--			       cc->on_disk_tag_size, cc->cipher_auth);
-+			       cc->used_tag_size, cc->cipher_auth);
- 		if (cc->sector_size != (1 << SECTOR_SHIFT))
- 			DMEMIT(",sector_size=%d", cc->sector_size);
- 		if (cc->cipher_string)
+On 5/14/24 21:31, Ming Lei wrote:
+> Since commit 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()"),
+> each iostat instance is added to blkcg percpu list, so blkcg_reset_stats()
+> can't reset the stat instance by memset(), otherwise the llist may be
+> corrupted.
+>
+> Fix the issue by only resetting the counter part.
+>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Waiman Long <longman@redhat.com>
+> Cc: Jay Shin <jaeshin@redhat.com>
+> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-cgroup.c | 58 ++++++++++++++++++++++++++++------------------
+>   1 file changed, 35 insertions(+), 23 deletions(-)
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 059467086b13..86752b1652b5 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -619,12 +619,45 @@ static void blkg_destroy_all(struct gendisk *disk)
+>   	spin_unlock_irq(&q->queue_lock);
+>   }
+>   
+> +static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
+> +		dst->bytes[i] = src->bytes[i];
+> +		dst->ios[i] = src->ios[i];
+> +	}
+> +}
+> +
+> +static void __blkg_clear_stat(struct blkg_iostat_set *bis)
+> +{
+> +	struct blkg_iostat cur = {0};
+> +	unsigned long flags;
+> +
+> +	flags = u64_stats_update_begin_irqsave(&bis->sync);
+> +	blkg_iostat_set(&bis->cur, &cur);
+> +	blkg_iostat_set(&bis->last, &cur);
+> +	u64_stats_update_end_irqrestore(&bis->sync, flags);
+> +}
+> +
+> +static void blkg_clear_stat(struct blkcg_gq *blkg)
+> +{
+> +	int cpu;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		struct blkg_iostat_set *s = per_cpu_ptr(blkg->iostat_cpu, cpu);
+> +
+> +		__blkg_clear_stat(s);
+> +	}
+> +	__blkg_clear_stat(&blkg->iostat);
+> +}
+> +
+>   static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+>   			     struct cftype *cftype, u64 val)
+>   {
+>   	struct blkcg *blkcg = css_to_blkcg(css);
+>   	struct blkcg_gq *blkg;
+> -	int i, cpu;
+> +	int i;
+>   
+>   	mutex_lock(&blkcg_pol_mutex);
+>   	spin_lock_irq(&blkcg->lock);
+> @@ -635,18 +668,7 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+>   	 * anyway.  If you get hit by a race, retry.
+>   	 */
+>   	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
+> -		for_each_possible_cpu(cpu) {
+> -			struct blkg_iostat_set *bis =
+> -				per_cpu_ptr(blkg->iostat_cpu, cpu);
+> -			memset(bis, 0, sizeof(*bis));
+> -
+> -			/* Re-initialize the cleared blkg_iostat_set */
+> -			u64_stats_init(&bis->sync);
+> -			bis->blkg = blkg;
+> -		}
+> -		memset(&blkg->iostat, 0, sizeof(blkg->iostat));
+> -		u64_stats_init(&blkg->iostat.sync);
+> -
+> +		blkg_clear_stat(blkg);
+>   		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+>   			struct blkcg_policy *pol = blkcg_policy[i];
+>   
+> @@ -949,16 +971,6 @@ void blkg_conf_exit(struct blkg_conf_ctx *ctx)
+>   }
+>   EXPORT_SYMBOL_GPL(blkg_conf_exit);
+>   
+> -static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
+> -{
+> -	int i;
+> -
+> -	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
+> -		dst->bytes[i] = src->bytes[i];
+> -		dst->ios[i] = src->ios[i];
+> -	}
+> -}
+> -
+>   static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat *src)
+>   {
+>   	int i;
+Reviewed-by: Waiman Long <longman@redhat.com>
 
