@@ -1,77 +1,63 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF2DA2A
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 01:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7323B293;
+	Wed, 15 May 2024 01:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715736749; cv=none; b=kIIqURKyTuINZpWa3w8Ngyshrd3vA6AF0xAFrCAfoHCQ2kFjfQQKudEM/vF2Fcyw801rAbRT96WWZ5GHAyWccU3fY6HykiOm+vEZuoHMsyurqqcSups1gm4OPYNQvuNWfVfhvR6We1I1pvMsqGOIpdnrl7Z9qLZEkGL5yPSN5wc=
+	t=1715737758; cv=none; b=ldTCn2fFpBs6nMzUlx2UYuHRW1zP2Armealtrg6SiVs9HP8+IDLqBeXKByUDIbjrhY3j7DxOrtnAuuA/fw84BOFNG4hR5nK88dVjeA1Pd/F+tOj6KM+hvQcC94nnqqafdCpwaqTRaYULZa/Jb6Dr9alRLxclt5aYW+6K/73yBNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715736749; c=relaxed/simple;
-	bh=KQsKaeabrKdboRHfx6hU3HkugUjk2mJbKjID2UQfhJc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bOT/CaG2+7LH1vczhPp83IiCgBRLBOrh1OdDT3rfWsXtYMetA+ENnlFwKuBG/ZJc6ZzbjhRTvh7RRdvOH4rsIZbH6+Pja9CvCrB2xFb6g03xVjZA/BN1xz+xXlYVszvKWf1AntmGzhTcrPXg2DMBxnz2XhQ/RGNsEGFhOpIrkSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E6e7D/6E; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1715737758; c=relaxed/simple;
+	bh=hQMAZFhf7ihzw2VJOzuaSpN4197wZEIt0nPmaxcihHc=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Hx3Atd0AhhTCB94aSbE6AHiRuNssj8qWsUSDr8LO6fzLIJBmRYwEvw8z0MZmal+yA8LSL1UobKaYaTxueZvLWyZFW1BQUxU7vTPTnsjYpbx36ZBq0l//bOYArSf1oj1Ke2YhfHG74g0wFw75A+dV7O4MqXtlhLxV02S8Nml0JTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hjQW9gct; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E6e7D/6E"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715736747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=A5lc/yJVWR2p2x1Hi5f6Xdfhu5OJrGe1x6bCuD6KXNg=;
-	b=E6e7D/6EFvTZNC1F+vyUaWYBI6HaX//V3LPCsWSgLoP+Pcx3e2wUdoslfMmTEZck4EMlhL
-	AgXZlTJfb2qPqArDGIhnLRWgKr2V+DJvFfn+6nyruqVn8R79v6MpdRs9m/BY9GX8wLDGrm
-	afdkTPTkcvXDeh6V+i5xEMOQ9FQoot8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-554-TZADKGc2NZWGI6CkFvGA6Q-1; Tue, 14 May 2024 21:32:09 -0400
-X-MC-Unique: TZADKGc2NZWGI6CkFvGA6Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E463085A58C;
-	Wed, 15 May 2024 01:32:08 +0000 (UTC)
-Received: from localhost (unknown [10.72.112.11])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A9EF7C15BB9;
-	Wed, 15 May 2024 01:32:07 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/2] blk-cgroup: two fixes on list corruption
-Date: Wed, 15 May 2024 09:31:55 +0800
-Message-ID: <20240515013157.443672-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjQW9gct"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 927F2C2BD10;
+	Wed, 15 May 2024 01:49:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715737757;
+	bh=hQMAZFhf7ihzw2VJOzuaSpN4197wZEIt0nPmaxcihHc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=hjQW9gct65g3C+g8BfuMl6emUgmYwelx1DVd+XbT3M8li0k7Pdo2+dCsyG9xl7C3d
+	 r+gVILn+LJkIL/bba7KEHzHIRrjRiBwTWrhabw3HHLO9i8xoYmNByOywUsRwqJrCJr
+	 ZDhz4lN0UmbXobn/tH9OzFnsSR/V+mieailgChFPvxlgGbyTeWToezVNEE2rVXc+iD
+	 hRFzUsF8CEcSzkb9zo4GHORHPXGfr4aJjuVccoBDcmBuKeVpP/4TaviKvdOacTeXT0
+	 lJKrDgl1xFIUxwKW1QJ4Les+4LM3zBQx2GgH+aJpb1nnmNGBnQkNP+RqoX/sxA2KKI
+	 eF42yUvBqtrXg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88B94C1614E;
+	Wed, 15 May 2024 01:49:17 +0000 (UTC)
+Subject: Re: [git pull] device mapper changes for 6.10
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <ZkOMczEgGuPBOCrr@redhat.com>
+References: <ZkOMczEgGuPBOCrr@redhat.com>
+X-PR-Tracked-List-Id: <dm-devel.lists.linux.dev>
+X-PR-Tracked-Message-Id: <ZkOMczEgGuPBOCrr@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.10/dm-changes
+X-PR-Tracked-Commit-Id: 8b21ac87d550acc4f6207764fed0cf6f0e3966cd
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4f8b6f25eb1e51febd426da764a0b0ea652ad238
+Message-Id: <171573775755.23667.11330689717464782357.pr-tracker-bot@kernel.org>
+Date: Wed, 15 May 2024 01:49:17 +0000
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, dm-devel@lists.linux.dev, linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, Christoph Hellwig <hch@lst.de>, Joel Colledge <joel.colledge@linbit.com>, yangerkun <yangerkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Hello,
+The pull request you sent on Tue, 14 May 2024 12:08:19 -0400:
 
-The 1st patch fixes list corruption when running reset_iostat(cgroup
-v1).
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.10/dm-changes
 
-The 2nd patch fixes potential list corruption when reordering of
-writting to ->lqueued and reading from iostat instance.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4f8b6f25eb1e51febd426da764a0b0ea652ad238
 
-
-Ming Lei (2):
-  blk-cgroup: fix list corruption from resetting io stat
-  blk-cgroup: fix list corruption from reorder of WRITE ->lqueued
-
- block/blk-cgroup.c | 68 ++++++++++++++++++++++++++++++----------------
- 1 file changed, 45 insertions(+), 23 deletions(-)
+Thank you!
 
 -- 
-2.44.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
