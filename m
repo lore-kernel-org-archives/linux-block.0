@@ -1,68 +1,66 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD2423776
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 16:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C091425745;
+	Wed, 15 May 2024 16:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715791798; cv=none; b=QSkiIbi5trggeIYK8C4Cod1VolzmmST5Db+GbQYzlxO9wzXW8ikl7Z0xs9VNzcGYByycZW15/7YRLRaouaZ0YSkTLUTN6X9b7nDnXIdxxwc++FkimlKNByhTDppPTTtO5oW94rgYz89lavKoewv7ChqhnVvUgszSvttw7aH8UZg=
+	t=1715792073; cv=none; b=es4tpsUa7uZudX037/+p7e1x74niBxxlQv+HghjNGBkVdQct2B2GqLvF6UOioaIln3rOgEtrH1hKY++Xvfl92e28X+0jtdFUSpzotBwm6wq4Ml0aVz339HKbvaVsP8/TLx8mj9BvLVd1+svOjw/ysWgT1Pp6XixNBpv2j4OOx3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715791798; c=relaxed/simple;
-	bh=laEdVHACIJMQScujzTPMp+fHxj2bXDAoqux4V2IQapE=;
+	s=arc-20240116; t=1715792073; c=relaxed/simple;
+	bh=GIs5f+xsHD3yOfMod+xbtSvQ2IUmiMI6wy1enZJNPhU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sUiF8xvJc9/F7fWXGVE7pNBSk0+YpnNAvo/80NqC8U5L4cPoYT0AmeJV6ATbB7FviERCiCtQqj4KLUTy23rZ3OjaDRHnOlcqDV8FTb9DmgXfH9S7p5mcU4f9vfrxq/CCbqWOU+B4oX5eKFze5p1AyI3bYg6P2PCdx11RmRwJPdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2T2H/u3; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=iRcsOVBiJZWF9/n8W9eeErUOnKMnFDsEdmB3SA6BqGrM7IYTKFuGrb6WtT5gMRK1lDbaQlAfO5kUVv9e3k2ePpM9ULXAV1tw03EdQD1Q4mse23Hr4HIO1MoifAzyVWO/RqokwUWf1K5dmjt0mp7DZN7HfP3/La/+UADCXRzTVnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G4Hku+1V; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2T2H/u3"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f4d6b7168eso4012263b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 09:49:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G4Hku+1V"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-69b5a87505cso35165476d6.2;
+        Wed, 15 May 2024 09:54:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715791796; x=1716396596; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715792070; x=1716396870; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jv5iSW1qFScqGCvRObqnjsWaDgHlyK8fXr0JLPQdhOY=;
-        b=i2T2H/u3LB3HoT+g/c/bcbZg//vAuQhG35QlAbZw2pISFV9M5FwqE/r/cWqhHN5z9H
-         zmJWuYfNZl3VZCoiaI8oGDpkK1vORvRyj6SjFFy+LYnOxCkIeG6P9+qm5JNfE1LLD8Dv
-         vFyjTRftBuNalT8Hq1y6OdhyIeF9z18klEvbmQpom/uzOgO0NMB27kZ2+Iu4JGzn+RR7
-         W9WRqGKXXaAx5HVq6Yf4MAjxgS4Zm/VbFgDeqjGC7LF9fdaLW/bvNaLy9T4gX5lOxMvc
-         FVKLAeWct79DXr+yq3o7XjrkCaE/aMca6HTbNRvataWsGNfR4tCQblPW7av/WKaFWwX3
-         VRQw==
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xQJvos9LzUCKd6k0Vowf3gtRs6yQddQLHilrv8BeO1M=;
+        b=G4Hku+1VFLIjUe0hk9oOZKBywo4AYPOr8FJ5h2+L4t3zLlm5rfXqENOpDoZmhIBojP
+         Zk3wLgQx2Z+0iU2SaRT6d+TAXUWJemnw9GEcb3q81ipFHn7VWa1zfp2FTy3+dxp/Z8l+
+         IGb7EY9uDAUNVkbs0wUZIDHL+47iTLj1T2cIzZBK+ZYaHAv7H4dvrKlAqufR+ICcrLtG
+         0pMdvjTbx9MAaM32R3m88aUt/fINVNLZcWUj1i5abwdHN+8RZlTo3kHCWDJ0rtyA6Nh1
+         IGW7b9OuY5Bcgc2qIbkbaINZcfTaxuPidWE84EIWxdNy84DlH5L21N0s5qLL+/3fmTml
+         8Wsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715791796; x=1716396596;
+        d=1e100.net; s=20230601; t=1715792070; x=1716396870;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Jv5iSW1qFScqGCvRObqnjsWaDgHlyK8fXr0JLPQdhOY=;
-        b=MXSzF+j0SsrfzCNGaPs+lVTwH6HwOFai5vMChmnuFpEl0sxgR4n7UWbHqQ/3ltfy0Y
-         hnmx8PbCJZ87V6wa4fl8v79z6K1VBg3PZGhOj72XAo0Yt/2Flh4p7E2sPnnCCAN2yBKr
-         ta67xnp6iq+YeosR91uwAOFkcZUWCM1fJFWzRqKY2eUBSnFrgZFSk4GEpST1BhnGczE9
-         dqFkeb4fb+DlWlUw0B5cpwPYOArSZt37nwCseZHgwps2jAhxUQJYpYN1wwnv/g7vPOFO
-         gDUQGWsschA6IUBEhLTVNnxzqgCsxGaPvNAd+2u7qHyb20KMiN+1PxRc0kMt3R1/JdEq
-         UOsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqDfdznJmN1MPbwMDwYASFF7w/dG4e8Jpq88n9EGiOdbN4uvkU1pj5hZ5GVJwdkny/bzuT2g47ryA2Hy5Ii+fUCGL53reE2KamE0c=
-X-Gm-Message-State: AOJu0YxPHFQppj5V6YwNFgzYIpDoMBAk9w2OaaMc7e2iLdsyAb+nPAEf
-	j0kw9zVTbn7dmxySEJ4bYI5RsdbuzwYHFi+jpzT6g402kCj58xlM
-X-Google-Smtp-Source: AGHT+IHOo0zftAHZUWdHr8s/khtZDHqaC2sEnJz4XpkZkiowBpq1csxHW0VRfbhsJHmg08AZKpk7gQ==
-X-Received: by 2002:a05:6a21:1aa:b0:1af:cd45:598b with SMTP id adf61e73a8af0-1afde10f2c3mr17773132637.34.1715791796329;
-        Wed, 15 May 2024 09:49:56 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-658c79ca62dsm2774a12.92.2024.05.15.09.49.55
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xQJvos9LzUCKd6k0Vowf3gtRs6yQddQLHilrv8BeO1M=;
+        b=aSRlZKphSDhqt7iJLb8UAStPhvjQqoKP9TOHBS/Gl3O39+3/6AhZR7kxlf9cb5Gjxy
+         nteUCS5LIvd3gDWCFlfrmZPWzforC3IdpX7HFa01A162atJI1M5ncD29qsa5n9bYbVzL
+         I7m6lIZeyeY+CbchbUIhvOdRbV59+KBFAeI6ipmSfCIZQAJkaPxPHxQVWwF3nwExBVW0
+         qw5x2WEVKyTTiB7RyvNrHMi1lXKG2/7gCrSCX4jXkVjbno9vrZPV2JJ+Gqa37cWvY8El
+         nDgjIbLLi/u4q4Uq2vrzSjHIDf6kXLJ4ZvQ/BGWOoMCgi4YDA53kwsgLdG5qTWUFkbHn
+         Wxug==
+X-Forwarded-Encrypted: i=1; AJvYcCWpzyHwSz6WQdCUp/pHk3He0yfXtqdMNfWy7cK5ywdjquIO4CVsLTSUP2360yxELmSLhzpoVsx9MPpPDnelRfNcrn4Yd47nOJXoSPE+jYdYX8GA9Um9YF3xPZigDaetbjCUQeiAzEoeIrV2MnYKNuzS58cOppLOSiMDIFthAoxU75I1
+X-Gm-Message-State: AOJu0YwGsP+qCt7rXHd8WXVQfb+eGiusPhXyQo7OguNFi3aW5qXgQRxL
+	ahRAbk3GkifL1mYUerWDlmDpXnssdXIq6DTFuvSpiVEhKe1g6JB5
+X-Google-Smtp-Source: AGHT+IEE1oYzjigoTHOCCbcBU4OmR2uyKJi2zA5od8ycqoeHeXEqOxYf4KpPPsXy34ZTS2qvCgoKyA==
+X-Received: by 2002:a05:6214:4602:b0:6a0:e827:d8e with SMTP id 6a1803df08f44-6a16822b743mr199727976d6.40.1715792070616;
+        Wed, 15 May 2024 09:54:30 -0700 (PDT)
+Received: from dschatzberg-fedora-PF3DHTBV ([2620:10d:c091:500::4:d26])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f194da1sm65087116d6.67.2024.05.15.09.54.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 09:49:55 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 15 May 2024 06:49:54 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Waiman Long <longman@redhat.com>, Jay Shin <jaeshin@redhat.com>
-Subject: Re: [PATCH 1/2] blk-cgroup: fix list corruption from resetting io
- stat
-Message-ID: <ZkTnsu3gfxCJEnd6@slm.duckdns.org>
-References: <20240515013157.443672-1-ming.lei@redhat.com>
- <20240515013157.443672-2-ming.lei@redhat.com>
+        Wed, 15 May 2024 09:54:29 -0700 (PDT)
+Date: Wed, 15 May 2024 12:54:28 -0400
+From: Dan Schatzberg <schatzberg.dan@gmail.com>
+To: Waiman Long <longman@redhat.com>
+Cc: Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: cgroup io.stat propagation regression
+Message-ID: <ZkToxDuKxSPEg5aP@dschatzberg-fedora-PF3DHTBV>
+References: <ZkO6l/ODzadSgdhC@dschatzberg-fedora-PF3DHTBV>
+ <3ed32279-904a-411d-91a4-a62f4ca2dde2@redhat.com>
+ <11b8c1e4-45a7-4895-a1f3-6626744cee1e@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,25 +69,57 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240515013157.443672-2-ming.lei@redhat.com>
+In-Reply-To: <11b8c1e4-45a7-4895-a1f3-6626744cee1e@redhat.com>
 
-On Wed, May 15, 2024 at 09:31:56AM +0800, Ming Lei wrote:
-> Since commit 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()"),
-> each iostat instance is added to blkcg percpu list, so blkcg_reset_stats()
-> can't reset the stat instance by memset(), otherwise the llist may be
-> corrupted.
+On Wed, May 15, 2024 at 10:26:31AM -0400, Waiman Long wrote:
 > 
-> Fix the issue by only resetting the counter part.
+> On 5/14/24 23:59, Waiman Long wrote:
+> > On 5/14/24 15:25, Dan Schatzberg wrote:
+> > > Hi Waiman,
+> > > 
+> > > I've noticed that on recent kernels io.stat metrics don't propagate
+> > > all the way up the hierarchy. Specifically, io.stat metrics of some
+> > > leaf cgroup will be propagated to the parent, but not its grandparent.
+> > > 
+> > > For a simple repro, run the following:
+> > > 
+> > > systemd-run --slice test-test dd if=/dev/urandom of=/tmp/test
+> > > bs=4096 count=1
+> > > 
+> > > Then:
+> > > 
+> > > cat /sys/fs/cgroup/test.slice/test-test.slice/io.stat
+> > > 
+> > > Shows the parent cgroup stats and I see wbytes=4096 but the
+> > > grandparent cgroup:
+> > > 
+> > > cat /sys/fs/cgroup/test.slice/io.stat
+> > > 
+> > > shows no writes.
+> > > 
+> > > I believe this was caused by the change in "blk-cgroup: Optimize
+> > > blkcg_rstat_flush()". When blkcg_rstat_flush is called on the parent
+> > > cgroup, it exits early because the lockless list is empty since the
+> > > parent cgroup never issued writes itself (e.g. in
+> > > blk_cgroup_bio_start). However, in doing so it never propagated stats
+> > > to its parent.
+> > > 
+> > > Can you confirm if my understanding of the logic here is correct and
+> > > advise on a fix?
+> > 
+> > Yes, I believe your analysis is correct. Thanks for spotting this iostat
+> > propagation problem.
+> > 
+> > I am working on a fix to address this problem and will post a patch once
+> > I have finished my testing.
 > 
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: Waiman Long <longman@redhat.com>
-> Cc: Jay Shin <jaeshin@redhat.com>
-> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Actually, I can only reproduce the issue with a 3-level
+> (child-parent-grandparent) cgroup hierarchy below the root cgroup. The dd
+> command is run test.slice/test-test.slice. So both test.slice/io.stat and
+> test.slice/test-test.slice/io.stat are properly updated.
 
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
--- 
-tejun
+That's correct, this repros with a 3-level cgroup hierarchy (or
+more). systemd-run should create an ephemeral .scope cgroup under
+test-test.slice and then delete it when the dd command finishes. So
+test.slice/test-test.slice was the parent (2nd level) and test.slice
+is the grandparent.
