@@ -1,63 +1,68 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7323B293;
-	Wed, 15 May 2024 01:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056D917C96;
+	Wed, 15 May 2024 02:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715737758; cv=none; b=ldTCn2fFpBs6nMzUlx2UYuHRW1zP2Armealtrg6SiVs9HP8+IDLqBeXKByUDIbjrhY3j7DxOrtnAuuA/fw84BOFNG4hR5nK88dVjeA1Pd/F+tOj6KM+hvQcC94nnqqafdCpwaqTRaYULZa/Jb6Dr9alRLxclt5aYW+6K/73yBNA=
+	t=1715740454; cv=none; b=DFnxE1BT70dOCz3PsCE+K8M44i6kRdWHz02O3tiiltjqfp+jRXD65L/SCReEPPl0rXSUk3OLl5BRxYiWsbK75Tp92dWfQbYH/FU+YkW5nQdNiYhUdduLU0qxiKbfbOrMjBuLzwHsGr3Dqvm+z/h9mrxNTvYhUNBTx5FrCwQKLec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715737758; c=relaxed/simple;
-	bh=hQMAZFhf7ihzw2VJOzuaSpN4197wZEIt0nPmaxcihHc=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Hx3Atd0AhhTCB94aSbE6AHiRuNssj8qWsUSDr8LO6fzLIJBmRYwEvw8z0MZmal+yA8LSL1UobKaYaTxueZvLWyZFW1BQUxU7vTPTnsjYpbx36ZBq0l//bOYArSf1oj1Ke2YhfHG74g0wFw75A+dV7O4MqXtlhLxV02S8Nml0JTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hjQW9gct; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715740454; c=relaxed/simple;
+	bh=0Py+mhpyh17Xg65Pwy3AgGKMlMnS9vSsEebG9ZJaFD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e6ZfZZfWsrC8f9SI1MJvN4CPfQJw5zVpPTuqX1oUYDs6TlKeT+rlosDIKm2lm3CEqgtT0JedA2fTneZZahAhLuQfZKLOtcXK0KLErrsKo/HMZ+m5QQWVm2KXFCuA7LGb6+Yx4jyGU3vm0sRkezAet6rVc4pinmqDqxmKPlGcUgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AsAsoTRy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjQW9gct"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 927F2C2BD10;
-	Wed, 15 May 2024 01:49:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AsAsoTRy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FE1DC2BD10;
+	Wed, 15 May 2024 02:34:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715737757;
-	bh=hQMAZFhf7ihzw2VJOzuaSpN4197wZEIt0nPmaxcihHc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=hjQW9gct65g3C+g8BfuMl6emUgmYwelx1DVd+XbT3M8li0k7Pdo2+dCsyG9xl7C3d
-	 r+gVILn+LJkIL/bba7KEHzHIRrjRiBwTWrhabw3HHLO9i8xoYmNByOywUsRwqJrCJr
-	 ZDhz4lN0UmbXobn/tH9OzFnsSR/V+mieailgChFPvxlgGbyTeWToezVNEE2rVXc+iD
-	 hRFzUsF8CEcSzkb9zo4GHORHPXGfr4aJjuVccoBDcmBuKeVpP/4TaviKvdOacTeXT0
-	 lJKrDgl1xFIUxwKW1QJ4Les+4LM3zBQx2GgH+aJpb1nnmNGBnQkNP+RqoX/sxA2KKI
-	 eF42yUvBqtrXg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88B94C1614E;
-	Wed, 15 May 2024 01:49:17 +0000 (UTC)
-Subject: Re: [git pull] device mapper changes for 6.10
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <ZkOMczEgGuPBOCrr@redhat.com>
-References: <ZkOMczEgGuPBOCrr@redhat.com>
-X-PR-Tracked-List-Id: <dm-devel.lists.linux.dev>
-X-PR-Tracked-Message-Id: <ZkOMczEgGuPBOCrr@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.10/dm-changes
-X-PR-Tracked-Commit-Id: 8b21ac87d550acc4f6207764fed0cf6f0e3966cd
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 4f8b6f25eb1e51febd426da764a0b0ea652ad238
-Message-Id: <171573775755.23667.11330689717464782357.pr-tracker-bot@kernel.org>
-Date: Wed, 15 May 2024 01:49:17 +0000
-To: Mike Snitzer <snitzer@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, dm-devel@lists.linux.dev, linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>, Christoph Hellwig <hch@lst.de>, Joel Colledge <joel.colledge@linbit.com>, yangerkun <yangerkun@huawei.com>
+	s=k20201202; t=1715740453;
+	bh=0Py+mhpyh17Xg65Pwy3AgGKMlMnS9vSsEebG9ZJaFD4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AsAsoTRypuTTu9iaHHn2KZjbJ/9neXFQJTFwUXCDU+s7ruNnsRvASy0edAeFZE4Z8
+	 j9kUsw8UGriNRqZNG5wR/zf8gLLLIsPvHecCzRobMZ/X07hQgg9yqznIOm5HXI9VBY
+	 XnPoQStJZIryWkPphJEAC/giqR0vgcj1ia/zRfjJ+1JOem5el76/mI+vFVbHPqMOsa
+	 4L5FG8RXZ5XQodrhSBQqbUM1dgK2dqd5ggnjttYR7BpouOp7LyGxneTLhxHCdV91sj
+	 Q7T/kJtwg1Y+sik6O/xokLJcQlDVhKJbVPoL/m7ybDfpqiu8BRG0U0gcI3f1ffIjOT
+	 RbMBAtJuCxcog==
+Date: Tue, 14 May 2024 20:34:09 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, hch@lst.de,
+	mcgrof@kernel.org, akpm@linux-foundation.org, brauner@kernel.org,
+	chandan.babu@oracle.com, david@fromorbit.com, djwong@kernel.org,
+	gost.dev@samsung.com, hare@suse.de, john.g.garry@oracle.com,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-xfs@vger.kernel.org, p.raghav@samsung.com,
+	ritesh.list@gmail.com, ziy@nvidia.com
+Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
+Message-ID: <ZkQfId5IdKFRigy2@kbusch-mbp>
+References: <20240503095353.3798063-8-mcgrof@kernel.org>
+ <20240507145811.52987-1-kernel@pankajraghav.com>
+ <ZkQG7bdFStBLFv3g@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkQG7bdFStBLFv3g@casper.infradead.org>
 
-The pull request you sent on Tue, 14 May 2024 12:08:19 -0400:
+On Wed, May 15, 2024 at 01:50:53AM +0100, Matthew Wilcox wrote:
+> On Tue, May 07, 2024 at 04:58:12PM +0200, Pankaj Raghav (Samsung) wrote:
+> > Instead of looping with ZERO_PAGE, use a huge zero folio to zero pad the
+> > block. Fallback to ZERO_PAGE if mm_get_huge_zero_folio() fails.
+> 
+> So the block people say we're doing this all wrong.  We should be
+> issuing a REQ_OP_WRITE_ZEROES bio, and the block layer will take care of
+> using the ZERO_PAGE if the hardware doesn't natively support
+> WRITE_ZEROES or a DISCARD that zeroes or ...
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.10/dm-changes
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/4f8b6f25eb1e51febd426da764a0b0ea652ad238
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Wait a second, I think you've gone too far if you're setting the bio op
+to REQ_OP_WRITE_ZEROES. The block layer handles the difference only
+through the blkdev_issue_zeroout() helper. If you actually submit a bio
+with that op to a block device that doesn't support it, you'll just get
+a BLK_STS_NOTSUPP error from submit_bio_noacct().
