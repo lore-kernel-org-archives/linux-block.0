@@ -1,128 +1,116 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB9A3838A
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 04:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2F0381B9
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 05:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715746970; cv=none; b=bS44d/s78NgZnqJgUFPEIvNgW3/XU5dt5JkRHF+bYUutw9WO8umFIpkNqwTVeVcRYZw+niqcB948ljaLDO2hTIuH4ndtlvsh8DuB5XltsZ5pW+AC4fYzDy+sPPVHVv+e6mJ8kpNWTXancTgb6tAQNwOZ0yPtU9J3K7NQjdPcieY=
+	t=1715749786; cv=none; b=LFKkwxNeD8Rpd9cMysptEcb2oOoqgcpp9jFxG1P5zEdXZl6OFnUrZMvQEtwjIgkVXB3vMhntcvu0qtfhAz15cZB5beFKMx6VOuxYuSVsgRIiHS0yqIZiiHQumS3R6YxE3MWkDEfsvpirAwd8Ujlza7zkGkD4BYyacGaebQY0POc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715746970; c=relaxed/simple;
-	bh=UfvTxTsJGM30yB6JUP6qcnmueYS7+adWFARHTPLXG/8=;
+	s=arc-20240116; t=1715749786; c=relaxed/simple;
+	bh=PWr1eoNqTJuHMfIrKTjK0JxHOEZr8PegEGVOLzYxh8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JrDsu6/DQJBGh9sCvNr8t2AV09PbDfYVg9829VrJ0VGmlCgKL8REvwKJM+KxTO72zUVChn9aa6HFluX5zMirmV3QG55FeuyBp3sBouhRg4buX2Vl65swMYAdv6wsAbN2hoOJBk12s0IuCplTnB+v8k7cxFrr1+4Kin2Yfu03HZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J/3btKER; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=AcVfiJhg7xmuoxMZJCJj6NUoXdbNqUVei9aj7VyERCsls0hIxZ3/l1OHGDVT0xs3dfloygZ/GyOw1HTlzNM21/AXinDfp8GhXbLXQsDInuwQVOioPeNJiczD5U2gkE3H5VblIr8FAb2Vzmnpbzp8bu7SqLRGFAzb+vEXUdx0qgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ej67GMLX; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J/3btKER"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715746969; x=1747282969;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UfvTxTsJGM30yB6JUP6qcnmueYS7+adWFARHTPLXG/8=;
-  b=J/3btKERTG6LOfHKwIYADFMBFYTrAvi6oRvzOIpxZJncZMQwS42mIFD1
-   y/mQVHna4Np5f3RYXlNms8QUVDRagc0L40zuOjO0mptkTsu1a+cp0j2q2
-   /mcy5Q+M5wp/Vkq+asu52/qsXeGBUIyGm/eGG8Y7cPgMVDoUvNxmDT6h9
-   uQw38zNIgh6vCfqprvf+wjp6OYo4qy4tPbQw7kYUP0IbJ+OhHwrXqs+Kh
-   sD5pa1PqSjir7BiUPMuizVpqg652gEbbahDyArtdXcdJn+V3JCcI8+pOD
-   7mdAhXPcYQKezcfFZt8za2kL2pH72m/TIc7eSsNqieCjysSXITm1T2zBM
-   A==;
-X-CSE-ConnectionGUID: K+GTLf20SYqAvVbuT45hGA==
-X-CSE-MsgGUID: pZAHOfIxR9WRXKc/Wd0ajw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11073"; a="29292537"
-X-IronPort-AV: E=Sophos;i="6.08,160,1712646000"; 
-   d="scan'208";a="29292537"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 21:22:48 -0700
-X-CSE-ConnectionGUID: UfaLV5ZhQmeGHhCIH1mdFA==
-X-CSE-MsgGUID: 9m3SOfKSTjW4zDwa8XcXSw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,160,1712646000"; 
-   d="scan'208";a="68375794"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 14 May 2024 21:22:46 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s769j-000CQ9-1j;
-	Wed, 15 May 2024 04:22:19 +0000
-Date: Wed, 15 May 2024 12:21:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Hannes Reinecke <hare@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Matthew Wilcox <willy@infradead.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Pankaj Raghav <p.raghav@samsung.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, Hannes Reinecke <hare@kernel.org>
-Subject: Re: [PATCH 4/6] block/bdev: enable large folio support for large
- logical block sizes
-Message-ID: <202405151219.H2vlwtc0-lkp@intel.com>
-References: <20240514173900.62207-5-hare@kernel.org>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ej67GMLX"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e09138a2b1so91086501fa.3
+        for <linux-block@vger.kernel.org>; Tue, 14 May 2024 22:09:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1715749781; x=1716354581; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=975B1sVy32LTXzxsALukKLfSACwxUEyol/q8JnyOA4o=;
+        b=ej67GMLXY8Y51jLGong7n/KBK7cX/nzd0k4PgoxEeCn69smoXi1dDjTuytEIov8rmm
+         AmGUE9ZAqmO87ghfuvA7MHRjLiM9DoNE15HRFapLVka3yaA/EPyQcbwn3neYNB8n838l
+         hCu3Al+LNdIDI0G8t7a6OYoe+Nv4DgPwvcDH2lyzA5rEGksUMjVnpwJiaLUDTY6CYCsu
+         oGKUVO32NnaisJfn7T2B9Dnt5hityYs6KL8j0QvqLXDLwGHmfBpKg+L8cHJ8OSU44Ogt
+         ATLtESK7UB9fCiBZS5bii8h+gEIuPyvhRIOUwJ1mr830E4VcFV4temwpJ3a0ywQoh2SM
+         f+EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715749781; x=1716354581;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=975B1sVy32LTXzxsALukKLfSACwxUEyol/q8JnyOA4o=;
+        b=fkqZeOY2z74NXnaNBTahOS9hoxNvPeCem/4V7MaHfvknqWIkUL+iZLbn7lOcG1F/9k
+         mQ4kiR8uklB473EN8HcTg3PIyVwrH67uPmmGAbaaIbtaFsXyUOmYKTZmzw58CtiieOts
+         +oxpLTiA8DO8hOyCKuQ+2JbQXMsKbFFf9oOur3ET9SFE/Otf8DU4qkmYOyh5w7gJbpXT
+         QZ7wnI13Sit5XCPnZDSwObF/HoV5T5WwSIqpdbi33xeIKp5ztfIyfjH8cXtqrAwaVYq5
+         x216Vk1tXWCP8VcTAW4Ig2biWJuaQtRE94RJoCs76Fi+43k+f9Xr1/tmxfeLsGZpNWhc
+         TxLA==
+X-Gm-Message-State: AOJu0YzMkZ38ZaeM7LgTmUnbnTLODJnXBgwxXxBhRHs+/dKK3mCLeklm
+	2SgiU4oVD2jzCOMTVDuuLfr1wPsFCgce55vOKixlWljZnc1nD106huhl9ITpA94=
+X-Google-Smtp-Source: AGHT+IGrUkRE45seMgtIIoE9PEoi8QF/KuINpSVm4YfmrAzeH/MZdLnoXwgGuJCSWjOgBpc2tUxYKw==
+X-Received: by 2002:a2e:84c9:0:b0:2d9:eb66:6d39 with SMTP id 38308e7fff4ca-2e51ff667d5mr92842571fa.19.1715749781375;
+        Tue, 14 May 2024 22:09:41 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340a632608sm9175077a12.5.2024.05.14.22.09.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 14 May 2024 22:09:40 -0700 (PDT)
+Date: Wed, 15 May 2024 13:09:32 +0800
+From: joeyli <jlee@suse.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Chun-Yi Lee <joeyli.kernel@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
+	Kirill Korotaev <dev@openvz.org>, Nicolai Stange <nstange@suse.com>,
+	Pavel Emelianov <xemul@openvz.org>
+Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
+ places
+Message-ID: <20240515050932.GG4433@linux-l9pv.suse>
+References: <20240514151854.13066-1-jlee@suse.com>
+ <e8331545-d261-44af-b500-93b90d77d8b7@web.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240514173900.62207-5-hare@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e8331545-d261-44af-b500-93b90d77d8b7@web.de>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 
-Hi Hannes,
+Hi Markus,
 
-kernel test robot noticed the following build errors:
+On Tue, May 14, 2024 at 05:34:57PM +0200, Markus Elfring wrote:
+> I suggest to reconsider the version identification in this patch subject
+> once more.
+> 
+> 
+> …
+> > This patch makes the above functions do …
+> 
+> Do you stumble still on wording challenges for improved change descriptions
+> in your patches?
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9#n94
+> 
+> …
+> > ---
+> >
+> > v2:
+> > - Improve patch description
+> 
+> V3:
+> ???
+> 
+> V4:
+> ???
+> 
+> Would you like to include issue reporters in message recipient lists?
+> 
+> Regards,
+> Markus
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on linus/master v6.9]
-[cannot apply to next-20240514]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I will wait more suggestion for code side and send new version.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Hannes-Reinecke/fs-mpage-avoid-negative-shift-for-large-blocksize/20240515-014146
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20240514173900.62207-5-hare%40kernel.org
-patch subject: [PATCH 4/6] block/bdev: enable large folio support for large logical block sizes
-config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240515/202405151219.H2vlwtc0-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240515/202405151219.H2vlwtc0-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405151219.H2vlwtc0-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> block/bdev.c:145:2: error: call to undeclared function 'mapping_set_folio_min_order'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     145 |         mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
-         |         ^
-   block/bdev.c:163:3: error: call to undeclared function 'mapping_set_folio_min_order'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     163 |                 mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
-         |                 ^
-   2 errors generated.
-
-
-vim +/mapping_set_folio_min_order +145 block/bdev.c
-
-   133	
-   134	static void set_init_blocksize(struct block_device *bdev)
-   135	{
-   136		unsigned int bsize = bdev_logical_block_size(bdev);
-   137		loff_t size = i_size_read(bdev->bd_inode);
-   138	
-   139		while (bsize < PAGE_SIZE) {
-   140			if (size & bsize)
-   141				break;
-   142			bsize <<= 1;
-   143		}
-   144		bdev->bd_inode->i_blkbits = blksize_bits(bsize);
- > 145		mapping_set_folio_min_order(bdev->bd_inode->i_mapping,
-   146					    get_order(bsize));
-   147	}
-   148	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks a lot!
+Joey Lee 
