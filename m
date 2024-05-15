@@ -1,66 +1,69 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C083512B6C;
-	Wed, 15 May 2024 16:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DD01802B;
+	Wed, 15 May 2024 17:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715792285; cv=none; b=uZW2CWGBMQTQDh97qL1zM83P2Y0yb1i4I8l1I27DH14lvADcpyXfFRmBiZnTUZqmrFej2Eg7cDrmE9UBN+0RrZ0U2vySeob5R8HQQyMG3AmQkV84oHt1Gkwx7TUwCbD1x6WEq+dBa+4eDG0yhVT3Af1PKGj7BLiLaSTouyJIYF4=
+	t=1715792419; cv=none; b=W/SHZRKHbD6tD4wHjZtlYn5IZOb3FqAxaUE7Nulo3u9cvNictylphR59ipFg6Ahv3Qm7aDJmm0tBNXRq4tF69gmOock/+Ft6BV4c8oEJBnXqEMCLgzAC0hjEQU/qnl/tQExMzxNNErBmlct+PgS4Ozu2mtdmJyyBZXiOLZG4wWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715792285; c=relaxed/simple;
-	bh=QDqaJwtTVl0GHXKlC/HrjCtU144s0RKtNX4orwnBVUY=;
+	s=arc-20240116; t=1715792419; c=relaxed/simple;
+	bh=l4PH7I6OL5p39oWGVsKZ2XgG4P5yf60Kl+VEfBip2+E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dOVilSqiQ+wCL/7SzCkG2WxFKwyyBuV3EVnsRagL3c2hqVD20j6Y5ufwxQ87fxo61fE6c5Dk1XWofLGD5NCRPuqvGdG/qMrD2Ic/qDqS2+PoCK8X6eACe36q9DW/K57fCkJj7nXFVxM/+10COKEOhQHejMfoQjy8yz9BF2l4KmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZV8k6vLr; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=S/tuaGdOPMc24ffYqGW4gQ4SCcTJt7nGdsTi00WCdFcwUQ6//DFsjrDjuXtmDJM6cthBSVi7FqumXnJNVa3h91lw73uIXvqUzYL3BpRRYroc+EOBXfrTgSm4sqy39AvyZw4EgArHPJvhcbriQlCwI1k9ruyJohlsJZHJc59t144=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/+QdZfd; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZV8k6vLr"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-792b8cd0825so640073785a.0;
-        Wed, 15 May 2024 09:58:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/+QdZfd"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5b2e942171cso1133270eaf.3;
+        Wed, 15 May 2024 10:00:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715792283; x=1716397083; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715792417; x=1716397217; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1pQDotCdPdPCkgm8cle2fS9xDk5zHSYJRqw3XQSQ/9U=;
-        b=ZV8k6vLrrQzjNv9CuBaDcsqelNCO7yoUDxLZ6mZXWYVGEhGfomXfbDw3EAA3bcHgJ3
-         WzArj421VId0LocU3RXp9S3N2keLiJjuX6eVzl6ZFg62It66yb+9s+AVBmNldHStd6H7
-         IHK6wE5/r+PnSSDiYjc5o4UXa4v52X9Jw7xtHp/uZ7RLXcInz/Bbu1XpJLDbfNQdyfZq
-         Ap9J+88/pvSfYH3f+6d6FdSAyjww2WQeGlAYGCD8iDtzVik4d1gjPzoYC5/wUbodozCw
-         rsnuZS0OZIWUeyjre/RHWjuk+goIIb0Lc1wDSQ4XVuRs4p1c2sxTovX3ToY1xD9b3Pj/
-         VAVQ==
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ztWuJKUB2kUkxBkt2qGizUFIOwiieGPZAc0z1Q9sNvE=;
+        b=I/+QdZfdtm4uX5cy/VuJ1FBa+pl8ze8DQsJM0Yem8vYmFjJ/EECByH5FfIWJ49pp6l
+         CH/5W8tLPTtypD8TsbqbQ2QBnKrzH8LVGCZZ7/OWR9SuRBfBSK9X0r5qrcqvjxJxBo7D
+         OLmX/9ptIYg+I0TbD2f2Gr/qO1UKJxMXeAohaF7qM47ge4rRxtrehOSApIGV9wXpnY1+
+         P5lxXXpRQiPwFp7oOkJWOujHlt21/nFaHG+4Y3rWYHxvfXLUv2NeOG8MJOH3ghjP61It
+         sQYOu/V8CFNmzxDJATKOAqesav6kFt9x5ohTCX1kILOSq7bOdlUxkPgutf7WNCQOl5A2
+         oKbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715792283; x=1716397083;
+        d=1e100.net; s=20230601; t=1715792417; x=1716397217;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1pQDotCdPdPCkgm8cle2fS9xDk5zHSYJRqw3XQSQ/9U=;
-        b=BRHhtaD7ju7rgWZ8cQGlcv9mSU1thZEXIDQl5tVeC3OlLHGPvXejjp2Uh9pRk2zBQm
-         eJZikGmn+qLOX3930MSgZWEQVbgiJdqZXcd32dErt8TMhv6fmXuwnfwvGYIE/iVim5g6
-         3OptzLQo57xmTSmXUjJXX+M6u0YlpdzODIDcJEbvk4tAvfVUZM6sVMTtnTKo5Wwc4Sc3
-         OpveemxJWs1tcPPMImVNAN5DA0sfHD/Kwv1iu2HI9hK+/IDoe1U9PoY1Q8F2BUjeumK1
-         7qMHPZ+W7ekFpsOIHUPQjj4mL4q6YPFw8kE05/GM/5V7oLNmjsrUQhrj6tY6ftlBflgP
-         rUmA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPk9r9PHiEAmxpByb/+tizCBVUQluQ8Fwn2DU6RkKe0wHcjP23d8aVHrJo7HOayolBx/Q71PHRYZImU98Bj4XRdpMj4xjyheDrBlJIREcJ9bHlcoop7ZMK5G7ig4AWkb2Ric4e+5Jndh4YmA3A7WZpawHukUyv01pCAaWfQPj516cZ
-X-Gm-Message-State: AOJu0YxpaYyxaMZf86nlnIjDSdJ4KAby5S1vF3BVt2xAFb2CKOBDab37
-	eikMFprAtwz8/3GCoXmeVIXP0M6p+RaE2keKj1+tKR4LNrbnLnGF
-X-Google-Smtp-Source: AGHT+IFJtlglhIwapcrP+uS3RQY3OU31faztIYfG9NFCUSU+i5SwQNUTdQE5Z/5ASxfwuyECQZGRCQ==
-X-Received: by 2002:a05:620a:5232:b0:792:ff4f:43b5 with SMTP id af79cd13be357-792ff4f459fmr125434785a.24.1715792282528;
-        Wed, 15 May 2024 09:58:02 -0700 (PDT)
-Received: from dschatzberg-fedora-PF3DHTBV ([2620:10d:c091:500::4:d26])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792ee702076sm185805985a.60.2024.05.15.09.58.01
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ztWuJKUB2kUkxBkt2qGizUFIOwiieGPZAc0z1Q9sNvE=;
+        b=gNitJJVu2jPJ+MsHYP7IaYJRfyR+hftViVud46hnWs9tBGZcqyU18+3dj2VN3t7XON
+         yai0U/fXX+zExprrOhRb6YPHmNmM3ckWapVrB1G7b+1cnET/C/rGPIf3NUTt5BupFBFw
+         rajxb3WlDBoIZUHqo7WBmj8n60cgG00elswuozc+64Re8esFJZKtMEHzER/lCsmGXuL1
+         DxBpSj9nPvFvFKba7hobnLig0tA9iAfbaTFel8huU30lxbAADJ/QK61TRQmzBvz6HCJq
+         c7aF7SQDPRM38x7m5aVjbVsDSeD8vKNeHAGa7YvxzArgloi+0JQXltuD09RYgFHHi7gi
+         cmww==
+X-Forwarded-Encrypted: i=1; AJvYcCV+7/byx+jr3aM0CUsSzwQT4vnKrPbvrlRuGbOIeDjVSKJT/aFKkhnhTdg15G3hsVEH7dhwwkzBK2qDDyHS+unUio9fDUC5QDQwc85D/X6/AgKoTDl1X84J0d/Zo24rsxSO5keMB/twS/KI5QSH/fNhkmvbo+bcSEyhCruP11kxj0cN
+X-Gm-Message-State: AOJu0YxFfJH9MjGeR8kxdOX8o6tBwJOIog/exST7klGS6LHxxuYvgHYM
+	odxyshmO5nUh3R1Ax8xIfhd/eYVaXFA2UxsPnSsWpC1yVYcIvdATqQ064A==
+X-Google-Smtp-Source: AGHT+IHLXDd5iZw3cSyEW2Xx8gG6pVUp8WIX00xcwNYcmq0TARtdWfJj/qGbWrestPmohe9xpTGejg==
+X-Received: by 2002:a05:6358:6214:b0:194:801b:151b with SMTP id e5c5f4694b2df-194801b1919mr484472155d.7.1715792416887;
+        Wed, 15 May 2024 10:00:16 -0700 (PDT)
+Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6341134705dsm11678185a12.85.2024.05.15.10.00.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 09:58:02 -0700 (PDT)
-Date: Wed, 15 May 2024 12:58:00 -0400
-From: Dan Schatzberg <schatzberg.dan@gmail.com>
+        Wed, 15 May 2024 10:00:15 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 15 May 2024 07:00:14 -1000
+From: Tejun Heo <tj@kernel.org>
 To: Waiman Long <longman@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dan Schatzberg <schatzberg.dan@gmail.com>,
 	Ming Lei <ming.lei@redhat.com>
 Subject: Re: [PATCH] blk-cgroup: Properly propagate the iostat update up the
  hierarchy
-Message-ID: <ZkTpmPoMb4PyPwCl@dschatzberg-fedora-PF3DHTBV>
+Message-ID: <ZkTqHlkm0G6g_NSk@slm.duckdns.org>
 References: <20240515143059.276677-1-longman@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -92,59 +95,10 @@ On Wed, May 15, 2024 at 10:30:59AM -0400, Waiman Long wrote:
 > Reported-by: Dan Schatzberg <schatzberg.dan@gmail.com>
 > Closes: https://lore.kernel.org/lkml/ZkO6l%2FODzadSgdhC@dschatzberg-fedora-PF3DHTBV/
 > Signed-off-by: Waiman Long <longman@redhat.com>
-> ---
->  block/blk-cgroup.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 059467086b13..2a7624c32a1a 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -323,6 +323,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
->  	blkg->q = disk->queue;
->  	INIT_LIST_HEAD(&blkg->q_node);
->  	blkg->blkcg = blkcg;
-> +	blkg->iostat.blkg = blkg;
->  #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
->  	spin_lock_init(&blkg->async_bio_lock);
->  	bio_list_init(&blkg->async_bios);
-> @@ -1025,6 +1026,8 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
->  		unsigned int seq;
->  
->  		WRITE_ONCE(bisc->lqueued, false);
-> +		if (bisc == &blkg->iostat)
-> +			goto propagate_up; /* propagate up to parent only */
->  
->  		/* fetch the current per-cpu values */
->  		do {
-> @@ -1034,10 +1037,24 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
->  
->  		blkcg_iostat_update(blkg, &cur, &bisc->last);
->  
-> +propagate_up:
->  		/* propagate global delta to parent (unless that's root) */
-> -		if (parent && parent->parent)
-> +		if (parent && parent->parent) {
->  			blkcg_iostat_update(parent, &blkg->iostat.cur,
->  					    &blkg->iostat.last);
-> +			/*
-> +			 * Queue parent->iostat to its blkcg's lockless
-> +			 * list to propagate up to the grandparent if the
-> +			 * iostat hasn't been queued yet.
-> +			 */
-> +			if (!parent->iostat.lqueued) {
-> +				struct llist_head *plhead;
-> +
-> +				plhead = per_cpu_ptr(parent->blkcg->lhead, cpu);
-> +				llist_add(&parent->iostat.lnode, plhead);
-> +				parent->iostat.lqueued = true;
-> +			}
-> +		}
->  	}
->  	raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
->  out:
-> -- 
-> 2.39.3
-> 
 
-I've tested and confirmed this patch fixes the original issue. Thanks!
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
