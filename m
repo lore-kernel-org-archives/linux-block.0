@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA04145B1B
-	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 14:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF1D57CA1
+	for <linux-block@vger.kernel.org>; Wed, 15 May 2024 14:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715783735; cv=none; b=oq3L+/VEsX4XWRaPkx0TiV+QgJtNhzSQJSGSc+GhDwbh7gZG3w7HPxoT364CdYLCsS1Gjx1aC3nsIcMWv8ZXVuHRZJ92NEZUBuuCt/8izeHNjP7gX1vhzEpCGvbqa/56KcaW4KOYevZBhAqazXCvZZtho9Xg9UuX8Xi5TBqkX7w=
+	t=1715784415; cv=none; b=F9HEj3PMnQw3Pi54gzG6lnqXdelnAlcyOOYEmRzFPR971XvhkT+DGdRtrlzPGzFjtCtWb/KPBYokQ5TNaJEvYPSRBHhBFKRzICytCWz2sQpu8QJEC3Li+UdR7fOOTOwG+634s/mqb9TZdFlNY5CbgiO71sG2keog7hNLGzqnmdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715783735; c=relaxed/simple;
-	bh=XrEHWXzHYH414DvlVESjOtx15TYA6noXORpfTNUMgRU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cI5kPQDry9jasDTanKMDhMiutpjg9KEvOR3gxXoY44trCdPtzHGBndu4gqDS8DdZjGiKOA/k36KxWu1Qb6GP11guFwgUPNonVl+R1+CMQw58k/bh5rt9hjbw3/MisdEFJNUYgEW/Z+EzIn++vNZo8kDo6CF+HNffzR2W4sMtpOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gMa9qzSN; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1715784415; c=relaxed/simple;
+	bh=vB/r2E9PY4UgETQH9vPghPD71V8UshZLDF+Y5hwnhiY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=COJKzeZlzi5Hss9mc3rU2/yjsAJ7qj8SQUsrwC8Ul81X2wqwLS+S7UzGgqMXJy1ux8xwOdW0vAkDUyNog8Zs9fAS0A/FPvNbqco+XEeY8Hj3cVdbFcTxSVJyRFE29895SQ+kItdx/+DstQg3zo7X1iMuuspESs+SfXU5X75ZWsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F+ekJ/Mr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMa9qzSN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+ekJ/Mr"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715783732;
+	s=mimecast20190719; t=1715784412;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Sc9fEb2mK7PfNta2o/2kA9lq5+CKKqFEWMN/clrZxT8=;
-	b=gMa9qzSN9JgHLDoiJAPkm7Y0gcvUfxPye+lRniWKtjUwia44NYAHyx1PlQNoKpJqfsRIvw
-	mHWKnrKzgUr1Fl4GGXavbY46q6gbDIoAaTeFT83ta8+GhKMoThWOrk8JRPLaZcn8NgNZ9J
-	JuL+Ob6AkoKEy9zLi1+V356SbRRjuJU=
+	bh=z5+zsN4jJI7ZDKtAhvwQrO2TvqdYZZ5r36mN+xSmrlw=;
+	b=F+ekJ/MrMVcNjFYuk5l5hRb8SrsYCD9PNTWMvq5sji0K768T8jj+DAZFMhSESP8E5/+IoL
+	3Xfan5BPyj443Jga35+sqolvsxrl/MbPCRXRB/LQnidBYPfpoQuMV2tOozWo1nzduje4R2
+	av6qNHUjfHN0Mplhb4cMQ1gb9uxxnQw=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-658-OvT26MQQMRis29XSB5ZWXA-1; Wed,
- 15 May 2024 10:35:21 -0400
-X-MC-Unique: OvT26MQQMRis29XSB5ZWXA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-66-VwfnsvBUNc6xF7IKinfXvg-1; Wed,
+ 15 May 2024 10:46:49 -0400
+X-MC-Unique: VwfnsvBUNc6xF7IKinfXvg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 77A5D1C3F0EE;
-	Wed, 15 May 2024 14:35:20 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2AE4738157BA;
+	Wed, 15 May 2024 14:46:49 +0000 (UTC)
 Received: from [10.22.33.50] (unknown [10.22.33.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CD231200A08E;
-	Wed, 15 May 2024 14:35:19 +0000 (UTC)
-Message-ID: <7ab67d43-84af-4328-8aca-9383afa2d6df@redhat.com>
-Date: Wed, 15 May 2024 10:35:19 -0400
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E83C640C6CB6;
+	Wed, 15 May 2024 14:46:48 +0000 (UTC)
+Message-ID: <a8330e4a-5ffe-4e37-9398-a37f9ae29f0c@redhat.com>
+Date: Wed, 15 May 2024 10:46:48 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,96 +49,72 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-cgroup: Properly propagate the iostat update up the
- hierarchy
-To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
- Josef Bacik <josef@toxicpanda.com>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Dan Schatzberg <schatzberg.dan@gmail.com>,
- Ming Lei <ming.lei@redhat.com>
-References: <20240515143059.276677-1-longman@redhat.com>
-Content-Language: en-US
+Subject: Re: [PATCH 2/2] blk-cgroup: fix list corruption from reorder of WRITE
+ ->lqueued
 From: Waiman Long <longman@redhat.com>
-In-Reply-To: <20240515143059.276677-1-longman@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>
+References: <20240515013157.443672-1-ming.lei@redhat.com>
+ <20240515013157.443672-3-ming.lei@redhat.com>
+ <2a0cae15-e9d9-4524-a0db-f665b1832db4@redhat.com>
+Content-Language: en-US
+In-Reply-To: <2a0cae15-e9d9-4524-a0db-f665b1832db4@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On 5/15/24 10:30, Waiman Long wrote:
-> During a cgroup_rstat_flush() call, the lowest level of nodes are flushed
-> first before their parents. Since commit 3b8cc6298724 ("blk-cgroup:
-> Optimize blkcg_rstat_flush()"), iostat propagation was still done to
-> the parent. Grandparent, however, may not get the iostat update if the
-> parent has no blkg_iostat_set queued in its lhead lockless list.
+On 5/15/24 10:09, Waiman Long wrote:
 >
-> Fix this iostat propagation problem by queuing the parent's global
-> blkg->iostat into one of its percpu lockless lists to make sure that
-> the delta will always be propagated up to the grandparent and so on
-> toward the root blkcg.
+> On 5/14/24 21:31, Ming Lei wrote:
+>> __blkcg_rstat_flush() can be run anytime, especially when 
+>> blk_cgroup_bio_start
+>> is being executed.
+>>
+>> If WRITE of `->lqueued` is re-ordered with READ of 'bisc->lnode.next' in
+>> the loop of __blkcg_rstat_flush(), `next_bisc` can be assigned with one
+>> stat instance being added in blk_cgroup_bio_start(), then the local
+>> list in __blkcg_rstat_flush() could be corrupted.
+>>
+>> Fix the issue by adding one barrier.
+>>
+>> Cc: Tejun Heo <tj@kernel.org>
+>> Cc: Waiman Long <longman@redhat.com>
+>> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>> ---
+>>   block/blk-cgroup.c | 10 ++++++++++
+>>   1 file changed, 10 insertions(+)
+>>
+>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>> index 86752b1652b5..b36ba1d40ba1 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -1036,6 +1036,16 @@ static void __blkcg_rstat_flush(struct blkcg 
+>> *blkcg, int cpu)
+>>           struct blkg_iostat cur;
+>>           unsigned int seq;
+>>   +        /*
+>> +         * Order assignment of `next_bisc` from `bisc->lnode.next` in
+>> +         * llist_for_each_entry_safe and clearing `bisc->lqueued` for
+>> +         * avoiding to assign `next_bisc` with new next pointer added
+>> +         * in blk_cgroup_bio_start() in case of re-ordering.
+>> +         *
+>> +         * The pair barrier is implied in llist_add() in 
+>> blk_cgroup_bio_start().
+>> +         */
+>> +        smp_mb();
+>> +
+>>           WRITE_ONCE(bisc->lqueued, false);
 >
-> Note that successive calls to __blkcg_rstat_flush() are serialized by
-> the cgroup_rstat_lock. So no special barrier is used in the reading
-> and writing of blkg->iostat.lqueued.
->
-> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-> Reported-by: Dan Schatzberg <schatzberg.dan@gmail.com>
-> Closes: https://lore.kernel.org/lkml/ZkO6l%2FODzadSgdhC@dschatzberg-fedora-PF3DHTBV/
-> Signed-off-by: Waiman Long <longman@redhat.com>
-> ---
->   block/blk-cgroup.c | 19 ++++++++++++++++++-
->   1 file changed, 18 insertions(+), 1 deletion(-)
->
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 059467086b13..2a7624c32a1a 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -323,6 +323,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
->   	blkg->q = disk->queue;
->   	INIT_LIST_HEAD(&blkg->q_node);
->   	blkg->blkcg = blkcg;
-> +	blkg->iostat.blkg = blkg;
->   #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
->   	spin_lock_init(&blkg->async_bio_lock);
->   	bio_list_init(&blkg->async_bios);
-> @@ -1025,6 +1026,8 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
->   		unsigned int seq;
->   
->   		WRITE_ONCE(bisc->lqueued, false);
-> +		if (bisc == &blkg->iostat)
-> +			goto propagate_up; /* propagate up to parent only */
->   
->   		/* fetch the current per-cpu values */
->   		do {
-> @@ -1034,10 +1037,24 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
->   
->   		blkcg_iostat_update(blkg, &cur, &bisc->last);
->   
-> +propagate_up:
->   		/* propagate global delta to parent (unless that's root) */
-> -		if (parent && parent->parent)
-> +		if (parent && parent->parent) {
->   			blkcg_iostat_update(parent, &blkg->iostat.cur,
->   					    &blkg->iostat.last);
-> +			/*
-> +			 * Queue parent->iostat to its blkcg's lockless
-> +			 * list to propagate up to the grandparent if the
-> +			 * iostat hasn't been queued yet.
-> +			 */
-> +			if (!parent->iostat.lqueued) {
-> +				struct llist_head *plhead;
-> +
-> +				plhead = per_cpu_ptr(parent->blkcg->lhead, cpu);
-> +				llist_add(&parent->iostat.lnode, plhead);
-> +				parent->iostat.lqueued = true;
-> +			}
-> +		}
->   	}
->   	raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
->   out:
+> I believe replacing WRITE_ONCE() by smp_store_release() and the 
+> READ_ONCE() in blk_cgroup_bio_start() by smp_load_acquire() should 
+> provide enough barrier to prevent unexpected reordering as the 
+> subsequent u64_stats_fetch_begin() will also provide a read barrier 
+> for subsequent read.
 
-Note that this patch will conflict with Ming's patch 
-(https://lore.kernel.org/linux-block/20240515013157.443672-3-ming.lei@redhat.com/). 
-Will send out an updated version later on to synchronize with his patch.
+We can also use a smp_acquire__after_ctrl_dep() after the READ_ONCE() in 
+blk_cgroup_bio_start() instead of a full smp_load_acquire() to optimize 
+it a bit more.
 
 Cheers,
 Longman
