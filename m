@@ -1,74 +1,71 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E535BAFC;
-	Wed, 15 May 2024 11:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D05B6EB4D;
+	Wed, 15 May 2024 11:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715771217; cv=none; b=J9E1cb/aO7UR2RIuTQ3EAxRWm59oE7XMa4tUpYEvX1W9zH5NzEyNBP0A8MQioljF7+xj6hmmSTOdF9MgrWXQPnu/riogwM8VixWniqjWfc8yoi+nrgRrJN5z0pjQIMV7ADGjYSZMnzo9h+JTEtKjyUnW+QfxaDnmq2B4Ll58UtM=
+	t=1715773747; cv=none; b=aG/6oFJBKzhiroQCAURY24/ZMifL6sdMEKglrGsmqsp615K84D2q5TmgnYf/9DcRQ4+ufOf3Z+yJ3+5/qicCbQwf6oNzJZX6gG1nC2saWeLqvokFDf3MZM7rAYZV2sQcirG3QIe6NWz98A9r77RQvJDxD+hMUlGFXThegXQpKxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715771217; c=relaxed/simple;
-	bh=5whSzgE848s25eHm6MbF4welNqlW7UUI4lx7+7DRh2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KdTxKmhNzFrvJOW34+FAJm9ARccYGpAPc04iD4uf/T+nTRjbjlQUnOukkDnfx2tzGAmiZFcWU6i8dKpLfTPoVKAqW7IGU34EqT/r3N3/FnYcY6b0icwbXw7jKUSiWvNDD8wf8HyGwL63umZPGYREeeps9apIUBC8aRltSQNv/LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 44FADZci044451;
-	Wed, 15 May 2024 19:13:35 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
- Wed, 15 May 2024 19:13:35 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 44FADUNw044434
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 15 May 2024 19:13:35 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <09f1879e-3d38-4d84-b73c-fd1688d07ea4@I-love.SAKURA.ne.jp>
-Date: Wed, 15 May 2024 19:13:30 +0900
+	s=arc-20240116; t=1715773747; c=relaxed/simple;
+	bh=Fk4iWd0hQbRAsY4uPC6Kc9QaabxZ9cf5EOY8s+xuqXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8KoBMdiY47ZPBP4ScmHe7lq6QwI7aJzChO3BIY0rcAQo9XrVGVrFj8LqdN6BVU5t3QEWBLY54RMrj5kVeoVSVHmtJlKjXl9irmR2FCm6rYT/HGuzmgt/S9D5m0wLkxVZ2McJTZU+6nXkJ5LvqGaKNsGNlz6S1qEmL71QTJmdus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id D53C268B05; Wed, 15 May 2024 13:48:50 +0200 (CEST)
+Date: Wed, 15 May 2024 13:48:50 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, hch@lst.de,
+	mcgrof@kernel.org, akpm@linux-foundation.org, brauner@kernel.org,
+	chandan.babu@oracle.com, david@fromorbit.com, djwong@kernel.org,
+	gost.dev@samsung.com, hare@suse.de, john.g.garry@oracle.com,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-xfs@vger.kernel.org, p.raghav@samsung.com,
+	ritesh.list@gmail.com, ziy@nvidia.com
+Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
+Message-ID: <20240515114850.GB1938@lst.de>
+References: <20240503095353.3798063-8-mcgrof@kernel.org> <20240507145811.52987-1-kernel@pankajraghav.com> <ZkQG7bdFStBLFv3g@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Linux kernel bug] INFO: task hung in blk_mq_get_tag
-To: Hillf Danton <hdanton@sina.com>, Sam Sun <samsun1006219@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk,
-        syzkaller-bugs@googlegroups.com, xrivendell7@gmail.com
-References: <CAEkJfYMhv8AxxHSVdPT9bCX1cJZXw39+bMFh=2N9uNOB4Hcr=w@mail.gmail.com>
- <20240514103742.3137-1-hdanton@sina.com>
- <20240514224117.3191-1-hdanton@sina.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20240514224117.3191-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkQG7bdFStBLFv3g@casper.infradead.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 2024/05/15 7:41, Hillf Danton wrote:
-> On Tue, 14 May 2024 20:07:34 +0800 Sam Sun <samsun1006219@gmail.com>
->>
->> I tried to run
->>
->> # echo 0 > /proc/sys/kernel/hung_task_all_cpu_backtrace
->>
->> before running the reproducer, the kernel stops panic. But still, even
->> if I terminate the execution of the reproducer, kernel continues
->> dumping task hung logs. After setting bung_task_all_cpu_backtrace back
->> to 1, it panic immediately during next dump. So I guess it is still a
->> task hung instead of general protection fault.
+On Wed, May 15, 2024 at 01:50:53AM +0100, Matthew Wilcox wrote:
+> On Tue, May 07, 2024 at 04:58:12PM +0200, Pankaj Raghav (Samsung) wrote:
+> > Instead of looping with ZERO_PAGE, use a huge zero folio to zero pad the
+> > block. Fallback to ZERO_PAGE if mm_get_huge_zero_folio() fails.
 > 
-> Given kworker/u10:2:53 blocked for more than 143 seconds, or the subject
-> line, how could it trigger gpf?
+> So the block people say we're doing this all wrong.  We should be
+> issuing a REQ_OP_WRITE_ZEROES bio, and the block layer will take care of
+> using the ZERO_PAGE if the hardware doesn't natively support
+> WRITE_ZEROES or a DISCARD that zeroes or ...
 
-Since CONFIG_CMDLINE in the attached config file includes sysctl.kernel.hung_task_all_cpu_backtrace=1 ,
-khungtaskd calls trigger_all_cpu_backtrace() when a hung task is detected.
+Not sure who "the block people" are, but while this sounds smart
+it actually is a really bad idea.
 
-trigger_all_cpu_backtrace() is expected to be safe, but there seems a bug
-which is triggering a general protection fault.
+Think about what we are doing here, we zero parts of a file system
+block as part of a direct I/O write operation.  So the amount is
+relatively small and it is part of a fast path I/O operation.  It
+also will most likely land on the indirection entry on the device.
+
+If you use a write zeroes it will go down a separate slow path in
+the device instead of using the highly optimized write path and
+slow the whole operation down.  Even worse there are chances that
+it will increase write amplification because there are two separate
+operations now instead of one merged one (either a block layer or
+device merge).
+
+And I'm not sure what "block layer person" still doesn't understand
+that discard do not zero data, but maybe we'll need yet another
+education campaign there.
 
