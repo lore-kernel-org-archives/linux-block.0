@@ -1,102 +1,98 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4A8138C
-	for <linux-block@vger.kernel.org>; Thu, 16 May 2024 02:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F9C391
+	for <linux-block@vger.kernel.org>; Thu, 16 May 2024 02:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715826077; cv=none; b=on3foNPSEqhLKjUGETF4QVb2zOFbxBajJMn8IGNJeA6NqBCW3Y0eqfrs3vEu5uW3/7l66/WEjoUjK4iQ4rfOo8+ASlBjOP1NHWO0ecB4mD/kk8AoRVBDZsq2YZipKFAmOnCWy8uaPQRmyl+U7JF//L8B0idFaKK68AESJn7hPdY=
+	t=1715826616; cv=none; b=Y3pzfFPLmdr3bSwPm1D21UratFVxJ2lnSz3NEwB0V9aWuCmI0sliVeknuAIcCIgtXdRiVsZgYcDDXGc9A5gkg91yLTHi7NKg7yKjc0GoXpoHZk20CHKdmBmL2lmfQoReGiRHUw4AnvArOF1ZZ1/rxYa90kTzhxBE2Fco++l1gzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715826077; c=relaxed/simple;
-	bh=+nqrNVmYmohfUrprPzD9C57d3zHyTeg7Lioodc9p4g4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=fiqIWe5myy+yIYLdThAPFegDVIMu78T9+zcuTAIowyFnQjIwaYtFQ6TKZxkbQarYnzZugVifga4JX6GijZgikW2aPmyjvYKtYoH9IgEyY2Hgbx+L5Bz8nHivOaXJQEyyGU23WsRF7eYbzrMCBYHTXngI0vB0opoAXDdNo6O/mhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CUcvsj5s; arc=none smtp.client-ip=209.85.167.170
+	s=arc-20240116; t=1715826616; c=relaxed/simple;
+	bh=IJfeXlGUHjly/M0zLN9mmkIcm0dd0HVgqLHDqtsmfqc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lx4YtY9UHC7GANSBqI1+9XWdXDV5k3UAIqaPR165IqjomLeg0MpZSMg3Nxif15NkLQI45JPJEeWG/3lWsvqc8MjxICpEhpurktz2HSUNeWpQTO11BnU2WpU+A3CikaH8O1i0Yz1DIUa0Zbn2d4P3Bl+VUf1io8vL+bU1RqPOPp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=u3njCUiS; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CUcvsj5s"
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c998b36c6bso1234377b6e.3
-        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 19:21:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="u3njCUiS"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2b8efd5ee5dso1090361a91.3
+        for <linux-block@vger.kernel.org>; Wed, 15 May 2024 19:30:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715826075; x=1716430875; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aXSD811bYryV9ebSAntCLnwE4mJzzmb6s7DeS7yDo6M=;
-        b=CUcvsj5sonSvj7lF7ElggVjGiNhtZN6I94+ShduIWD8EI9vcHl33AMM4pu6K2UaIhW
-         AavsrkqmmlfEeKGaDcpvVlO71jdpZv9oeGpAOVcx3b1YXazjwXmCsL9u4tUNE7W21qED
-         /8+OOhWWjSBHfoMi15vSSsGwKi62gmoGv96SI1Nu7DuMGZoPmHYWszzSLEvkzecGsMtM
-         YH2DcK9W4i4YkwIYhUAwDk2gxuI0LQPA/OZwiOqbhcirwRCJ//jl7CPkFZztpxr80Mh0
-         T+q8+4PoyuyePihpv+3jJ7QTgJnW/9hoKdfS6iBF0w3itT8DkzO3HS2S5jFCp5BmygJE
-         gyUw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715826615; x=1716431415; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I+7daecJRB1K8ERvqxbImKF1sffU1MhW8D6cj40EMyY=;
+        b=u3njCUiSwoOiwApBQBAoa95QedLLT8OGB+B5O5ICxiR8crMGvwI/aTLX5DECLag+GZ
+         dpRPQ5tU/MDNaipZZXha93srPCaNg5emDUQCb/f5puUav2BA95bsCYtwN9keXHrFgyXQ
+         driSL5Qq6Ljhc2jO5/4x2h0mCo9XLPBw7FH5MQGd/+b8jQPjvcFyNk1/xKpt0Sd3Q8iP
+         CYQLqKxrsFsrdYYeCz3HkyVvKHgfTIcBuwrWzCY1IS+dx8qePQGzdy24my+vQYhvb0pp
+         FONY4mIAvb43HHd6NK81Yx9mEdlwGT1OB6FKHI/U3CAsXxUhsjRJOripej6wqZgsvoqU
+         FGsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715826075; x=1716430875;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aXSD811bYryV9ebSAntCLnwE4mJzzmb6s7DeS7yDo6M=;
-        b=DO2GxpUzsDNFGf+LzRqwB/ipptVq/Iy238Y3HJElxT2KckycM+OgUVwoEc/Q2SLu8e
-         +ff+Ao2BRhwJPsBrYHowIhZOvPslCal5Qe1Ne0GRGLrq/+CeoMQSDOALgWLKA62yYhqC
-         BLunHTIVf3qTnFafEE69AIkuopYk6ZzdlN8/MKSruCQpZh/bMPEt7c2Lfqu8DyCHak/A
-         4X9dwM/NjllsEp+tZ/kJbt8rs4hYx8fLbiwvpnSJFSChjhCc6EvZ6UW1piQxxLRJ44FD
-         AJmejX1o2xjxGwrZ+EmArGjzNROUFd/86MIQEYjjNSqEvMaWhjaq09iehqluJLKNqoI9
-         xc4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVV/jU71NuPEaZP2DFAI6EqET5pdoDMHrLSsBBT5c0rhXFCdbwPz6UpkFaieIRXgon7VrgeUHiKZxa5iinMYbaaXluQ4y2MXT9y0r4=
-X-Gm-Message-State: AOJu0Yw4+ye/MEWf8UKO0pJqDJdHip0EbZs4kZ0wt+nefhzCg6pRtRXC
-	sq4fl1fGGXBKfzlz3Bmq0kTPpXyiWyMaY9iJIwk75ejoYq0yAGyFskvs1VQ5RXU=
-X-Google-Smtp-Source: AGHT+IE3ahqmTSWsWI6SW0+bQ2oqoZ8kOwwhZn9lRGyp4StkWsHF4AWWVqRGdIlz+iKka73bNy5xEQ==
-X-Received: by 2002:a05:6830:14cd:b0:6f0:e2aa:ea49 with SMTP id 46e09a7af769-6f0e92ce674mr20305110a34.3.1715826075518;
-        Wed, 15 May 2024 19:21:15 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634024a3eb4sm12257551a12.0.2024.05.15.19.21.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 19:21:14 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
- Waiman Long <longman@redhat.com>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Dan Schatzberg <schatzberg.dan@gmail.com>, 
- Ming Lei <ming.lei@redhat.com>
-In-Reply-To: <20240515143059.276677-1-longman@redhat.com>
-References: <20240515143059.276677-1-longman@redhat.com>
-Subject: Re: [PATCH] blk-cgroup: Properly propagate the iostat update up
- the hierarchy
-Message-Id: <171582607425.11025.1197820625337989209.b4-ty@kernel.dk>
-Date: Wed, 15 May 2024 20:21:14 -0600
+        d=1e100.net; s=20230601; t=1715826615; x=1716431415;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I+7daecJRB1K8ERvqxbImKF1sffU1MhW8D6cj40EMyY=;
+        b=p3vP8O66yeLPKSyKJYKLRedCGDLCum8KQXePhxR5wwHPcuNyJgo7TOyTEEd/4Vk0vo
+         tzQwJjV4AiRIcV0WXbNgmNjjrFjA5+JXbT/YRqfrBoCzA2vUcz2RPrIzI2iQtWl2ZaOa
+         Fua2qiFe8oo+65W0l9FDeIghUHSyBYIRHwU3U70s/iF/UW1eXsgWj1j124T/oAEcvZeY
+         9xeifR1TyWE3hkbeXpYB3JsOIsKUy+fbd9uOVd3le5QvJnKo9HM8ZeTnPS/1afylAbHb
+         3gOnL6qebx5zbCJj2jkhaUuFkpwAvbMmOjbwL01qnWIXJeaTdpqYo0CnXEn2Zqi0W0sZ
+         oiSQ==
+X-Gm-Message-State: AOJu0YyeQO7MqZ9VJzxzeYrVgbZ3Sd9Vh+BYwZ9Pd9pf2jB3lUtuDYL+
+	9UuiKyC+roZr3j8qc4+lpK2kHJTbQDV0dg/pnGNZ8XHlSrFizYBEO8zDfm11Ale8jacFYoIfACl
+	m
+X-Google-Smtp-Source: AGHT+IHisy9+lDOgAxqwY5N2n4AXPgS6IiVdn1NisspaguWsx50BdDg5mkfFVisgYhmrskBIhdn0sg==
+X-Received: by 2002:a17:903:2444:b0:1e2:c544:9bb0 with SMTP id d9443c01a7336-1ef433d37a2mr200912295ad.0.1715826614709;
+        Wed, 15 May 2024 19:30:14 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bf30fc7sm125494195ad.133.2024.05.15.19.30.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 May 2024 19:30:14 -0700 (PDT)
+Message-ID: <8522af2f-fb97-4d0b-9e38-868c572da18a@kernel.dk>
+Date: Wed, 15 May 2024 20:30:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/2] block: change rq_integrity_vec to respect the
+ iterator
+To: Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-nvme@lists.infradead.org
+References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
+ <c366231-e146-5a2b-1d8a-5936fb2047ca@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <c366231-e146-5a2b-1d8a-5936fb2047ca@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
 
+On 5/15/24 7:28 AM, Mikulas Patocka wrote:
+> @@ -177,9 +177,9 @@ static inline int blk_integrity_rq(struc
+>  	return 0;
+>  }
+>  
+> -static inline struct bio_vec *rq_integrity_vec(struct request *rq)
+> +static inline struct bio_vec rq_integrity_vec(struct request *rq)
+>  {
+> -	return NULL;
+> +	BUG();
+>  }
+>  #endif /* CONFIG_BLK_DEV_INTEGRITY */
+>  #endif /* _LINUX_BLK_INTEGRITY_H */
 
-On Wed, 15 May 2024 10:30:59 -0400, Waiman Long wrote:
-> During a cgroup_rstat_flush() call, the lowest level of nodes are flushed
-> first before their parents. Since commit 3b8cc6298724 ("blk-cgroup:
-> Optimize blkcg_rstat_flush()"), iostat propagation was still done to
-> the parent. Grandparent, however, may not get the iostat update if the
-> parent has no blkg_iostat_set queued in its lhead lockless list.
-> 
-> Fix this iostat propagation problem by queuing the parent's global
-> blkg->iostat into one of its percpu lockless lists to make sure that
-> the delta will always be propagated up to the grandparent and so on
-> toward the root blkcg.
-> 
-> [...]
+Let's please not do that. If it's not used outside of
+CONFIG_BLK_DEV_INTEGRITY, it should just go away.
 
-Applied, thanks!
-
-[1/1] blk-cgroup: Properly propagate the iostat update up the hierarchy
-      commit: 9d230c09964e6e18c8f6e4f0d41ee90eef45ec1c
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
