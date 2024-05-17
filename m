@@ -1,92 +1,98 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC7F41213;
-	Fri, 17 May 2024 13:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6812F595
+	for <linux-block@vger.kernel.org>; Fri, 17 May 2024 15:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715952660; cv=none; b=una5WSqsouYoAjs/29Hi+3Sm3v6z0Kl/pST+rY5Ki6O7YfMCWx8bnakgK3d0D5pqPu+Xy7sjmxOxdRAjSKRnRaHqURjMqzF868VHUYV8EhOARKemqswypqgNY3/BEtxx4/NrIsrZmGVnCIKP4n6Xfm9Ny0ZheggqLn0xq2Yp/U0=
+	t=1715960470; cv=none; b=sDyh0ZFFqvrmmp1t4jWw86BBBhDc4OMbOOdiw7ZEWCAo+4sfvSmZ5xtpOJJ4l6a4YBom1GYXE5PTd1BWSE1+uA84LWlxc2ydrtZoGC1fWvnT3pomrOI1qIzz5jAYJfQHh07PkZaSYRU8pSuow4SirJYUvI4yLE/NXArRCcV0IHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715952660; c=relaxed/simple;
-	bh=22I53c26kSfT41B2cb4kNLqZWudw/plo2PbVRr1bu38=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ltI3zB1hPPSkuQoefrTE9X05Z/zB2simcXc0M5pZBY/SlB7/GUOul3MP1Q4hxoxlKr7aS3CazlzKiU4G9IoXWM7CAQwPmfYZEDqH7uCesDEW4zbSw1eBPB815PRl1AU0iZnEl/ITWxomXahymiDkKTixI8ODfPVKLcJxf26Kcuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mDZbhB0B; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1715960470; c=relaxed/simple;
+	bh=daIjeLJoYfF/qiW/jXTlnkKca5gDynEnT598Pz+MVxs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=SbBwrVia5Kpi9LyVLYn/RzN2Vm5Mc0bIDnlgMsd4K0ImCp+0w49tdti2C/zouRSf6QkfDs8CVTwZLcpItCVtDSzdk4MShdQ2E36u0F8/2IkxhmRYC7vhEECnPATTmTa/5diuCYFlO+Cj83y1n5AqlBsOnoVj/Tidw4jHDedHYyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dO+YQ9kA; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mDZbhB0B"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xp/PqiG39gfb+fpKlsrloVFa0KFhPJTa9GfWfq4DY7g=; b=mDZbhB0Bo4bbgFpo9pkLp89Vj/
-	wQhzCtsKtWw/04XAp921BFJxBDJY6bKoMlhnaWs/54a/1u1WvxzalD9IdR96CnYYZulpOTk6HWhEB
-	EfnYBHEk4GWrbYshJIU+8S/L+sPZbDV9m7DT0xMEzDeqI3v13dwbYqJHyda0BW5fTVwUAt74I2LRv
-	Yw3g7+uck/GtcjPYkivUx3OA2yVDFL584Z+TD7Le/+0jiQU/tJkb4heNIKtfoMqVUX2ZU4XNJUOhV
-	PsovbgyNjpACoJlqCKmgn77Dehb5jY1xIvWyHk5cTn+Uy31F5OxzkgAEEEjQwamqrAPHTtSSdZyTr
-	vJwYQbqg==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s7xfW-0000000Czht-1Hei;
-	Fri, 17 May 2024 13:30:42 +0000
-Date: Fri, 17 May 2024 14:30:42 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
-	david@fromorbit.com, djwong@kernel.org, hch@lst.de,
-	Keith Busch <kbusch@kernel.org>, mcgrof@kernel.org,
-	akpm@linux-foundation.org, brauner@kernel.org,
-	chandan.babu@oracle.com, gost.dev@samsung.com,
-	john.g.garry@oracle.com, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-xfs@vger.kernel.org, p.raghav@samsung.com,
-	ritesh.list@gmail.com, ziy@nvidia.com
-Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
-Message-ID: <ZkdcAsENj2mBHh91@casper.infradead.org>
-References: <20240503095353.3798063-8-mcgrof@kernel.org>
- <20240507145811.52987-1-kernel@pankajraghav.com>
- <ZkQG7bdFStBLFv3g@casper.infradead.org>
- <ZkQfId5IdKFRigy2@kbusch-mbp>
- <ZkQ0Pj26H81HxQ_4@casper.infradead.org>
- <20240515155943.2uaa23nvddmgtkul@quentin>
- <ZkT46AsZ3WghOArL@casper.infradead.org>
- <20240516150206.d64eezbj3waieef5@quentin>
- <ef22fc06-0227-419c-8f25-38aff7f5e3eb@suse.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dO+YQ9kA"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7e1fb2a81fdso13373539f.1
+        for <linux-block@vger.kernel.org>; Fri, 17 May 2024 08:41:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715960462; x=1716565262; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j2gDIsaoeq0TSAEMY5fz35Za46TPuUHkxbIlOmvSFNc=;
+        b=dO+YQ9kAfLQZTAeUWyZ41AMAlhwo31rOB6x+wqRDlsKTN/BW/nOZomwZnKE+BjwRM9
+         nS4PcuuMeTIGYy+JFHMoOM/p5N/wXXrO/gVqv1k6fKI8pmeo5Ngv958z61ZIrM6zAhM1
+         vgw4YWD3Q81rhtIZ0pZPFKipEfydR3Ws5kVj2iWvX4IKswn4jBitwMqkxFKHoI8QxBwm
+         tqt1wiqISBG3uiSkEiD4BfgHC/+JKZ2yTrJmQ94v2xVJ8v+g4wjCH9AeACZzcpvbng2L
+         ND2HkNKB/T0DRE6bJtu2FtmAgkGw/T7iEoRIxz1+6VclgsCcaD3dJ6IDTXBF9Od/ICYy
+         T2fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715960462; x=1716565262;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j2gDIsaoeq0TSAEMY5fz35Za46TPuUHkxbIlOmvSFNc=;
+        b=t8iGkIkTtzj5hJGde5XikYEIQIaB+3rpRlPZC9Yi9SgbqFXzxl+tQZHZ17hAW7mSFT
+         SQ9L1OihtuYJ+Z6WsLJD8KavTftLxlrHxPy5OjIvxeR5yF/nciA4e/KnWq4yW6fZxfnZ
+         e+Ab5c5UnLpLrCCnyKBAOmfa/PeKUoxag0+nvI5SLFrMa5BiGnbOHwcy01OTO424nZw7
+         M6jEkYK1LeVvZYvQR/BWs2aBKvyOnTV0R3Syc554JDIwQwAIOnZxw84a53318rd7ZhL5
+         8+Q0l4uaTNBg2N9uY+tY67kUsZ53hIP5IBVoaX5BRrsaL4ebct8mPiVa7ApYW6vMfMim
+         +xgQ==
+X-Gm-Message-State: AOJu0YyrOSIn7fWxeSw5NT8tNbAE9M8xPT5QDLi7T3R7IgRnKtGYsPjM
+	IYvcC4iKexBm/4L/+Npt8gk21mtUHQ2GKPMMsVi4JihFYXnMlcRrNFGzkS0BVcbl/xB8DwDbz1b
+	m
+X-Google-Smtp-Source: AGHT+IH7H6fvlHVPknrkefefwYKmrg8/VOlj7yq/36l4s6tauiCEeApsDxPQSR8dkChW12qCzsTJ3Q==
+X-Received: by 2002:a5e:8704:0:b0:7de:e495:42bf with SMTP id ca18e2360f4ac-7e1b51f3e6amr2276898739f.1.1715960462143;
+        Fri, 17 May 2024 08:41:02 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489376fc708sm4652992173.177.2024.05.17.08.41.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 08:41:01 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Raju Cheerla <rcheerla@redhat.com>
+In-Reply-To: <20240517020514.149771-1-ming.lei@redhat.com>
+References: <20240517020514.149771-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] blk-mq: add helper for checking if one CPU is mapped
+ to specified hctx
+Message-Id: <171596046118.12101.5842133090388456838.b4-ty@kernel.dk>
+Date: Fri, 17 May 2024 09:41:01 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ef22fc06-0227-419c-8f25-38aff7f5e3eb@suse.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Fri, May 17, 2024 at 02:36:29PM +0200, Hannes Reinecke wrote:
-> > +#define ZERO_FSB_SIZE (65536)
-> > +#define ZERO_FSB_ORDER (get_order(ZERO_FSB_SIZE))
-> > +extern struct page *zero_fs_block;
-> > +
-> >   /*
-> >    * char_dev.c
-> >    */
-> But why?
-> We already have a perfectly fine hugepage zero page in huge_memory.c.
-> Shouldn't we rather export that one and use it?
-> (Actually I have some patches for doing so...)
 
-But we don't necessarily.  We only have it if
-do_huge_pmd_anonymous_page() satisfies:
+On Fri, 17 May 2024 10:05:14 +0800, Ming Lei wrote:
+> Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
+> rules out isolated CPUs from hctx->cpumask, and hctx->cpumask should only be
+> used for scheduling kworker.
+> 
+> Add helper blk_mq_cpu_mapped_to_hctx() and apply it into cpuhp handlers.
+> 
+> This patch avoids to forget clearing INACTIVE of hctx state in case that one
+> isolated CPU becomes online, and fixes hang issue when allocating request
+> from this hctx's tags.
+> 
+> [...]
 
-        if (!(vmf->flags & FAULT_FLAG_WRITE) &&
-                        !mm_forbids_zeropage(vma->vm_mm) &&
-                        transparent_hugepage_use_zero_page()) {
+Applied, thanks!
 
-ie we've taken a page fault on a PMD hole in a VMA, that VMA permits
-PMD mappings to exist, the page fault was for read, the
-forbids-huge-zeropage isn't set for this vma, and using the hugetlb zero
-page isn't forbidden.
+[1/1] blk-mq: add helper for checking if one CPU is mapped to specified hctx
+      commit: 7b815817aa58d2e2101feb2fcf64c60cae0b2695
 
-I'd like to see stats for how much the PMD-zero-page is actually used,
-because I suspect it's not really used very much.
+Best regards,
+-- 
+Jens Axboe
+
+
 
