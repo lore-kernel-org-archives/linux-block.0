@@ -1,173 +1,127 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B0D13F423;
-	Fri, 17 May 2024 19:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B035231;
+	Fri, 17 May 2024 21:32:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715973216; cv=none; b=ok9rZbwP6SBnQ3ydAey78g7sFx9YsB59h+E11RBBuLwU0js/izpFeK88hjflSt64LtW1H67z8BXftkpKseI3fVFkjizzfuw7w2EDzkHuqtlqsJ2lx1hlz2LFHV/tGRdB6UKrIpxSN7xam1dykkkRiZKcwCwojwykHM9ndiwNhYY=
+	t=1715981560; cv=none; b=RY1GXDGHCGjiXTtjii4dyjj0GFJJV+RV9ZCiYPuuoBr80mVHrKgLq4bdkQDvaGcn0zAFRGjxgndB5qSK8hM1+BFoQsMFaJXUxXr5C+lK9FttLX7mn2FimObg917lC6DSpCnmU4y1yQYGSmKx9COdZuapVD46jDzcMf86Z9eP+s8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715973216; c=relaxed/simple;
-	bh=cl5z+RypzfaYXGWf+rnBBjI5OlA1WYqdwNwX6Edu4uM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sBvJuDcCVC/JfYhw9pXSqQC4rCodnPr1gKmcVu4Rj7PgKS10tH5lU9t9AUyyzUT2314l2ypu6ELPrRLFMvjtNupA6tCxYGiXvwvYBUKyskW0HmuGNixCY9FJnMM9BgVUtniV+v5nuDhliYhQTgfHo9KkzrquHv+BbCPbx/t107I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=fpp/vl3D; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1715981560; c=relaxed/simple;
+	bh=7TdUGU59lM5Y68qE55hDQHQuzdkvVUf7N0kWoeZdMSs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=K7RkIH829JjTFwvor5iD1A88Wj2UPZgCc7nE8Cp4NBFXqaIxwmP/PvtPVw6df5m4hmTYuR5VDiBlTYww76mii1McIUW1DeWlnRtjHtFAqFdhwxMgN/ym9/NNVTighpSmBWdlUqE2GreFHJKuMgzLurKJ2GUAteCnX9WJSrDe9N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S9vMkJd8; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="fpp/vl3D"
-Received: from [10.137.106.151] (unknown [167.220.2.23])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6FAD220B915A;
-	Fri, 17 May 2024 12:13:27 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6FAD220B915A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1715973207;
-	bh=2p1wopyKvglG1K22JP2DhRwV85SJbq4dKxtjT1xHvtY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fpp/vl3DKUdjSDRpvAjyDgeuyiVrUyujnX4va9QRUjeu+quEuTpy1VLMWrbI1o4O2
-	 7tFT61OD7MvfnS0fygEkUh5vIkJKB8wvWKhgP7fqsqhi6YbLFLZ5KpReHrkz8TRyK5
-	 gfobGVgWsvo7PzhwRCDJDIgnL1vDR71OaQIF5phw=
-Message-ID: <234910c1-40c3-4489-94ab-6e9a5f00d93e@linux.microsoft.com>
-Date: Fri, 17 May 2024 12:13:26 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S9vMkJd8"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2b33d011e5dso456857a91.0;
+        Fri, 17 May 2024 14:32:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715981558; x=1716586358; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cyrneMtT2roM/mXv9xc7jF6yRyXUeDAQ1aSOo1P0c+s=;
+        b=S9vMkJd89imnOHeCgIiY9IV0YKWSbrONZDKiIsQCKLezFEAxoYYVVgmI1B9OMWcEUF
+         Y1Y/pWQfXbI+dwJM/o5cqNH8c2ScuDQcQzShPtNMNZWou0CKAQg/RZg7rbV0d8zV1UMp
+         1cjqbNJn7DUYsEGH0AmemdEVEAzfbklh9piSs34XB3Cuw30YYWZP+IIUBRJXzuJQnGnc
+         gmpqg7BxszmAQ5qFIt8K2Nk3MGAOwzxH37uHNGUgKii/1O37ll6dsNZjgUSS2aFsYlyX
+         8Wnanh/p55uHLg/NzGpoSO/JLfFTDPA9aZNjvkW7xZzdSmZ9WEnxHLvKnLH3G3W8NGZC
+         UhUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715981558; x=1716586358;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cyrneMtT2roM/mXv9xc7jF6yRyXUeDAQ1aSOo1P0c+s=;
+        b=ZUPIH4RF0nCaOY6bOYd9oiBP8xJBaXnZ2h0AMbQU2fiWznTjVr4dOE3tT2hAlH5dgf
+         nCk/91hlqUbkNt9irSu9V5xv60l2Ux102cjWHqJIkJ2LbRrHymR2suKki7Kv0btMHGJM
+         c1CH93IgMfCCzeFcpVfa8er6dc5Q9pX8mTxXUvhQ+CyQrHJLNlQNT5eJUjRvYST6P6Eh
+         bJZngicjbXb4z8auH7dQNgtSNOWb5UsfLm2fgx+cSsWYehz3kFGffqYhHjCPKa60XCk2
+         Ecb+zXNUaeDW+pnjs4WrW14Eu2fmBGLDJMEEMDhSPm/gg1PFSNk+bbUIklyxufO18yxV
+         wXsw==
+X-Forwarded-Encrypted: i=1; AJvYcCVH1Jz+L+xyeLoxUcL4RlNw8XU7F/GmmVwKggGMqnT/TVVgl6+BFF8g0WlypnuhGBl1BgSUIZtEPjgFd1vrsOo16W2fiu7W7kaKisPWZn6VGGI90hgOkoszSG0I3JFOulTLV/E9mo/RMAl3d236SUxX9nud/cCUVcABHEHC30XX/RnGj/OZokhEVGt24na4CPwgm+rbXATzSYZBoNdQjK3oRw==
+X-Gm-Message-State: AOJu0YyjahJvbGI3dpI7fuAHVPwFoszvy7EBIH4Yqu/eTSdMWtVo4/Ex
+	4uDOhiXcRyKgyQRxU1jXqe28NLn8fhh/gdE4l6Zb28IYlj0v2fR5
+X-Google-Smtp-Source: AGHT+IFXyePfAU6GysoFIX/3SNu/9wWzEv6Uf6hwUK7S74vkedQQo6HP3kvP2IJec5JbP/nPkQmlFg==
+X-Received: by 2002:a17:90a:68c9:b0:2b3:6898:d025 with SMTP id 98e67ed59e1d1-2bd6038cdabmr402648a91.9.1715981558358;
+        Fri, 17 May 2024 14:32:38 -0700 (PDT)
+Received: from nvdcloudtop.c.googlers.com.com (32.39.145.34.bc.googleusercontent.com. [34.145.39.32])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2b5e02bcf6asm15563186a91.1.2024.05.17.14.32.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 14:32:37 -0700 (PDT)
+From: Navid <navid.emamdoost@gmail.com>
+To: willy@infradead.org
+Cc: bpf@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	lsf-pc@lists.linux-foundation.org,
+	navid.emamdoost@gmail.com,
+	yuzhao@google.com
+Subject: Re: [LSF/MM/BPF TOPIC] Reclaiming & documenting page flags
+Date: Fri, 17 May 2024 21:32:31 +0000
+Message-ID: <20240517213231.2934591-1-navid.emamdoost@gmail.com>
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+In-Reply-To: <Zbcn-P4QKgBhyxdO@casper.infradead.org>
+References: <Zbcn-P4QKgBhyxdO@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 12/21] dm: add finalize hook to target_type
-To: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
- tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com,
- snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com,
- linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
- linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- audit@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1714775551-22384-1-git-send-email-wufan@linux.microsoft.com>
- <1714775551-22384-13-git-send-email-wufan@linux.microsoft.com>
- <aa767961-5e3-2ceb-1a1e-ff66a8eed649@redhat.com>
- <212b02a8-f5f0-4433-a726-1639dda61790@linux.microsoft.com>
- <bc9aa053-20a6-eaa-cbe4-344f340242b@redhat.com>
-Content-Language: en-CA
-From: Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <bc9aa053-20a6-eaa-cbe4-344f340242b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-
-
-On 5/9/2024 10:07 AM, Mikulas Patocka wrote:
+On Mon, 2024-01-29 at 04:32 +0000, Matthew Wilcox wrote:
+> Our documentation of the current page flags is ... not great.  I think
+> I can improve it for the page cache side of things; I understand the
+> meanings of locked, writeback, uptodate, dirty, head, waiters, slab,
+> mlocked, mappedtodisk, error, hwpoison, readahead, anon_exclusive,
+> has_hwpoisoned, hugetlb and large_remappable.
 > 
+> Where I'm a lot more shaky is the meaning of the more "real MM" flags,
+> like active, referenced, lru, workingset, reserved, reclaim, swapbacked,
+> unevictable, young, idle, swapcache, isolated, and reported.
 > 
-> On Wed, 8 May 2024, Fan Wu wrote:
+> Perhaps we could have an MM session where we try to explain slowly and
+> carefully to each other what all these flags actually mean, talk about
+> what combinations of them make sense, how we might eliminate some of
+> them to make more space in the flags word, and what all this looks like
+> in a memdesc world.
 > 
->>
->>
->> On 5/8/2024 10:17 AM, Mikulas Patocka wrote:
->>>
->>>
->>> On Fri, 3 May 2024, Fan Wu wrote:
->>>
->>>> This patch adds a target finalize hook.
->>>>
->>>> The hook is triggered just before activating an inactive table of a
->>>> mapped device. If it returns an error the __bind get cancelled.
->>>>
->>>> The dm-verity target will use this hook to attach the dm-verity's
->>>> roothash metadata to the block_device struct of the mapped device.
->>>>
->>>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
->>>
->>> Hi
->>>
->>> Why not use the preresume callback?
->>>
->>> Is there some reason why do we need a new callback instead of using the
->>> existing one?
->>>
->>> Mikulas
->> Thanks for the suggestion.
->>
->> Mike suggested the new finalize() callback. I think the reason for not using
->> the preresume() callback is that there are multiple points that can fail
->> before activating an inactive table of a mapped device which can potentially
->> lead to inconsistent state.
->>
->> In our specific case, we are trying to associate dm-verity's roothash metadata
->> with the block_device struct of the mapped device inside the callback.
->>
->> If we use the preresume() callback for the work and an error occurs between
->> the callback and the table activation, this leave the block_device struct in
->> an inconsistent state.
+> And maybe we can get some documentation written about it!  Not trying
+> to nerd snipe Jon into attending this session, but if he did ...
 > 
-> The preresume callback is the final GO/NO-GO decision point. If all the
-> targets return zero in their preresume callback, then there's no turning
-> back and the table will be activated.
+> [thanks to Amir for reminding me that I meant to propose this topic]
 > 
->> This is because now the block device contains the roothash metadata of it's
->> inactive table due to the preresume() callback, but the activation failed so
->> the mapped device is still using the old table.
->>
->> The new finalize() callback guarantees that the callback happens just before
->> the table activation, thus avoiding the inconsistency.
-> 
-> In your patch, it doesn't guarantee that.
-> 
-> do_resume calls dm_swap_table, dm_swap_table calls __bind, __bind calls
-> ti->type->finalize. Then we go back to do_resume and call dm_resume which
-> calls __dm_resume which calls dm_table_resume_targets which calls the
-> preresume callback on all the targets. If some of them fails, it returns a
-> failure (despite the fact that ti->type->finalize succeeded), if all of
-> them succeed, it calls the resume callback on all of them.
-> 
-> So, it seems that the preresume callback provides the guarantee that you
-> looking for.
-> 
->> -Fan
-> 
-> Mikulas
 
-Thanks for the info. I have tested and verified that the preresume() 
-hook can also work for our case.
+On the "Reclaiming" part of this thread, we might consider this:
 
- From the source code 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/md/dm-ioctl.c#n1149, 
-the whole resume process appears to be:
+Optimizing Page Flags: Reclaiming Bits in page->flags via folio->lru
 
-1. Check if there is a new map for the device. If so, attempt to 
-activate the new map using dm_swap_table() (where the finalize() 
-callback occurs).
+Limited bit space in the Linux kernel's page->flags field, especially on 32-bit
+architectures, is a source of challenge [1]. This proposal aims to free up bits
+by relocating flags like PG_active and PG_unevictable to the lower bits of
+folio->lru as they are always unset. It helps with encoding zone, numa node,
+and sparsemem section [2].
 
-2. Check if the device is suspended. If so, use dm_resume() (where the 
-preresume() callback occurs) to resume the device.
+Proposed Process:
 
-3. If a new map is activated, use dm_table_destroy() to destroy the old map.
+Candidate Evaluation: Assess flags for relocation suitability based on usage,
+dependencies, and functional impact.
+Impact Assessment: Evaluate the impact on kernel code to ensure correct behavior
+and compatibility.
+Relocation Implementation: Modify code to read/write flags from folio->lru and
+adjust related macros/functions.
+Thoroughly test changes.
 
-For our case:
+[1] https://lwn.net/Articles/335768/
+[2] https://blogs.oracle.com/linux/post/struct-page-the-linux-physical-page-frame-data-structure
 
-- Using the finalize() callback, the metadata of the dm-verity target 
-inside the table is attached to the mapped device every time a new table 
-is activated.
-- Using the preresume() callback, the same metadata is attached every 
-time the device resumes from suspension.
 
-If I understand the code correctly, resuming from suspension is a 
-necessary step for loading a new mapping table. Thus, the preresume() 
-callback covers all conditions where the finalize() callback would be 
-triggered. However, the preresume() callback can also be triggered when 
-the device resumes from suspension without loading a new table, in which 
-case there is no new metadata in the table to attach to the mapped device.
-
-In the scenario where the finalize() callback succeeds but the 
-preresume() callback fails, it seems the device will remain in a 
-suspended state, the newly activated table will be kept, and the old 
-table will be destroyed, so it seems there is no inconsistency using 
-finalize() even preresume() potentially fails.
-
-I believe both the finalize() callback proposed by Mike and the 
-preresume() callback suggested by Mikulas can work for our case. I am 
-fine with either approach, but I would like to know which one is 
-preferred by the maintainers and would appreciate an ACK for the chosen 
-approach.
-
--Fan
