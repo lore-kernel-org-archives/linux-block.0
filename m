@@ -1,222 +1,270 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DE724B34;
-	Fri, 17 May 2024 09:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F58C7F9;
+	Fri, 17 May 2024 12:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715939427; cv=none; b=O4xq5yuQ28+cp3xEKAI3QWWFbn5Dz4WzUQ06C3sswhNsPfcYD0nUAQo4DY3xiKJ/9CP67P6kBucgLyilSJIHnHHE4z7dVnytfiqe2kCzDemJ75K8XyApr/EmTI4jF32HpI/km67OngFpVmeDJaW3/dsXEqtP5bqoE+JY67hRlyA=
+	t=1715949396; cv=none; b=jB8N3CpsECiwlAUTY5zQ3+2ii5YPNJJFDtWKTvxcof3iyyS85PeDv8f9lPVB2C08FH1dMpHapaNU329zw3JhY8I7k55OgL2q1BLe7GMPU6a3nmcMSXduSNtAjp4oqAhbzUpvDV3YH/rkXnoTgTkYBMMzPTNMD0XiwH/442BDdxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715939427; c=relaxed/simple;
-	bh=fH748Fp39+O/lxgUrh9rhN64OkwK7uTA4acwzoyb8i0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H+2+gI0oSJRdPj14eLzxvbVR6e79738QtYfx2VDCCdilIIM/OTo8vtzhzfPBWXiKyGsUIc7WXPbwVAAmubUiG0kDJFGsVMGCvyNX3JyVQyoiamOM6Zw9VXPjlDNVJ7yj4wamOw5KsKwikutUqe/wLB3Q9yiaghIbwEyOivewIKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aqPS27rf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ybHcdzif; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aqPS27rf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ybHcdzif; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1715949396; c=relaxed/simple;
+	bh=RDsNP+vun4IuHN3F+yPTvliBSlzYXtxXg8UG0BlX8NQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YGNpGLJRpkizrI5+DebsZskgQQzqTPMS0gO95hsRZg7EfKt3+N3qWNzpRYBFn9/8J+kbnQhnRiIHXWGsslDH8qFUFXc0rQOvZMJePRNerZkX2UUMJuQQsuT8vAnxjGa5vMuz0tV2CzJjMHfST1CRE+YmDT7SETsyUQEqLX2QJ1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ydH76rsx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bk9pEpDF; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TXXm5qRm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=xtO6hOK0; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aqPS27rf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ybHcdzif";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aqPS27rf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ybHcdzif"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ydH76rsx";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bk9pEpDF";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TXXm5qRm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xtO6hOK0"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6034E37344;
-	Fri, 17 May 2024 09:50:22 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 435CA37472;
+	Fri, 17 May 2024 12:36:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1715939422; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1715949392; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8jfFpRbNQ4JylrNPf/Ju6XAY6qQjrc+0U9vxW7VwdqA=;
-	b=aqPS27rfYVOIlQYJQqRWN1OB2KuGqplKO0xASvAy99Em1LNhKAq/Z45rrmqOfomt6ymSXF
-	OiEv1bW+ZdpI213w3TR/RlpBxADCOtSoygZG2IWVCeRjyU7fk9xYWgYywcz+IS9+rfxp20
-	iBC1DT09pzE+KgT4PXFcXk6IVt2gReU=
+	bh=Ue3vJL1SAMo1R7zI163Hy0EYrAeewo1Z63UFC2G4Xyg=;
+	b=ydH76rsxdcfKe18Ri9nE9LKLEiPj9U7dcgoTI/rlRld70TFEumeFp3ro0x5UJlHSF5Iiq2
+	kuh1gPt9jeR/69fxDCMrIHcI4io0fNX+E7P8j+o9BBdGv2liJg2+r4oobKZ6tghsFKsumP
+	8Ypw782OJceIGc6q+S4TRNBnv+U7dwI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1715939422;
+	s=susede2_ed25519; t=1715949392;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8jfFpRbNQ4JylrNPf/Ju6XAY6qQjrc+0U9vxW7VwdqA=;
-	b=ybHcdzifmrWaHz4fudlW6TywmF4wPptrNP5A3fPjgJZxiNP8yysPTURMY+P9YDVx2v+UNY
-	h72YrP3bBg//bVBQ==
+	bh=Ue3vJL1SAMo1R7zI163Hy0EYrAeewo1Z63UFC2G4Xyg=;
+	b=bk9pEpDFlPWzp/xArkxHF/skFla39sDMuyh4FFjzo77NgsJuR1yH9+lDcOUBQm8dPzz7Zw
+	TuETGXRrHnhV/YDQ==
 Authentication-Results: smtp-out1.suse.de;
-	none
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=TXXm5qRm;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=xtO6hOK0
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1715939422; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1715949391; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8jfFpRbNQ4JylrNPf/Ju6XAY6qQjrc+0U9vxW7VwdqA=;
-	b=aqPS27rfYVOIlQYJQqRWN1OB2KuGqplKO0xASvAy99Em1LNhKAq/Z45rrmqOfomt6ymSXF
-	OiEv1bW+ZdpI213w3TR/RlpBxADCOtSoygZG2IWVCeRjyU7fk9xYWgYywcz+IS9+rfxp20
-	iBC1DT09pzE+KgT4PXFcXk6IVt2gReU=
+	bh=Ue3vJL1SAMo1R7zI163Hy0EYrAeewo1Z63UFC2G4Xyg=;
+	b=TXXm5qRm60AH+633Mfa6cA0TeNY/PXkrguk54+N2dM79pS+QDOl27cY/jnJznGAjwz0LIZ
+	J8yDEflDUX/aKkolv2mgiXeUZHff24t1mADj7F0/B6UPWNLo+44u8WondS3zCgC9r1Qfaz
+	GH7XuOHvKd2ann9txx/uNKZxnQ1O0gE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1715939422;
+	s=susede2_ed25519; t=1715949391;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8jfFpRbNQ4JylrNPf/Ju6XAY6qQjrc+0U9vxW7VwdqA=;
-	b=ybHcdzifmrWaHz4fudlW6TywmF4wPptrNP5A3fPjgJZxiNP8yysPTURMY+P9YDVx2v+UNY
-	h72YrP3bBg//bVBQ==
+	bh=Ue3vJL1SAMo1R7zI163Hy0EYrAeewo1Z63UFC2G4Xyg=;
+	b=xtO6hOK0ZgJ7afvvYaFtlJtlYoVKPvJJkrAQZLxP+EnJHFz6AOZGARAfaZjdNhvCOXDPez
+	ufbLyS0pV3GSAfCg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3DB2D13991;
-	Fri, 17 May 2024 09:50:21 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7193413942;
+	Fri, 17 May 2024 12:36:30 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id rHjlDV0oR2boBwAAD6G6ig
-	(envelope-from <tiwai@suse.de>); Fri, 17 May 2024 09:50:21 +0000
-Date: Fri, 17 May 2024 11:50:38 +0200
-Message-ID: <87r0e0zs0h.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Linux trace kernel
- <linux-trace-kernel@vger.kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers 
- <mathieu.desnoyers@efficios.com>,
-	Linus Torvalds 
- <torvalds@linux-foundation.org>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-cxl@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	amd-gfx@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org,
-	linux-arm-msm@vger.kernel.org,
-	freedreno@lists.freedesktop.org,
-	virtualization@lists.linux.dev,
-	linux-rdma@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-tegra@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	ath11k@lists.infradead.org,
-	ath12k@lists.infradead.org,
-	brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com,
-	linux-usb@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ocfs2-devel@lists.linux.dev,
-	linux-cifs@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-edac@vger.kernel.org,
-	selinux@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-hwmon@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-s390@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	Julia 
- Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [PATCH] tracing/treewide: Remove second parameter of __assign_str()
-In-Reply-To: <20240516133454.681ba6a0@rorschach.local.home>
-References: <20240516133454.681ba6a0@rorschach.local.home>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	id xvbqGU5PR2Z5TAAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 17 May 2024 12:36:30 +0000
+Message-ID: <ef22fc06-0227-419c-8f25-38aff7f5e3eb@suse.de>
+Date: Fri, 17 May 2024 14:36:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] iomap: use huge zero folio in iomap_dio_zero
+Content-Language: en-US
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+ Matthew Wilcox <willy@infradead.org>
+Cc: david@fromorbit.com, djwong@kernel.org, hch@lst.de,
+ Keith Busch <kbusch@kernel.org>, mcgrof@kernel.org,
+ akpm@linux-foundation.org, brauner@kernel.org, chandan.babu@oracle.com,
+ gost.dev@samsung.com, john.g.garry@oracle.com, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-xfs@vger.kernel.org, p.raghav@samsung.com, ritesh.list@gmail.com,
+ ziy@nvidia.com
+References: <20240503095353.3798063-8-mcgrof@kernel.org>
+ <20240507145811.52987-1-kernel@pankajraghav.com>
+ <ZkQG7bdFStBLFv3g@casper.infradead.org> <ZkQfId5IdKFRigy2@kbusch-mbp>
+ <ZkQ0Pj26H81HxQ_4@casper.infradead.org>
+ <20240515155943.2uaa23nvddmgtkul@quentin>
+ <ZkT46AsZ3WghOArL@casper.infradead.org>
+ <20240516150206.d64eezbj3waieef5@quentin>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240516150206.d64eezbj3waieef5@quentin>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Level: 
-X-Spamd-Result: default: False [-1.80 / 50.00];
+X-Spamd-Result: default: False [-5.00 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
+	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
 	SUSPICIOUS_RECIPS(1.50)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MX_GOOD(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	FUZZY_BLOCKED(0.00)[rspamd.com];
-	R_RATELIMIT(0.00)[to_ip_from(RL6rcqepr6awpd9qb5xxedoiwq)];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[fromorbit.com,kernel.org,lst.de,linux-foundation.org,oracle.com,samsung.com,vger.kernel.org,kvack.org,gmail.com,nvidia.com];
+	RCVD_COUNT_TWO(0.00)[2];
 	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[efficios.com:email,inria.fr:email,imap1.dmz-prg2.suse.org:helo,suse.de:email,goodmis.org:email,linux-foundation.org:email]
-X-Spam-Score: -1.80
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 435CA37472
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 X-Spam-Flag: NO
+X-Spam-Score: -5.00
 
-On Thu, 16 May 2024 19:34:54 +0200,
-Steven Rostedt wrote:
+On 5/16/24 17:02, Pankaj Raghav (Samsung) wrote:
+> On Wed, May 15, 2024 at 07:03:20PM +0100, Matthew Wilcox wrote:
+>> On Wed, May 15, 2024 at 03:59:43PM +0000, Pankaj Raghav (Samsung) wrote:
+>>>   static int __init iomap_init(void)
+>>>   {
+>>> +       void            *addr = kzalloc(16 * PAGE_SIZE, GFP_KERNEL);
+>>
+>> Don't use XFS coding style outside XFS.
+>>
+>> kzalloc() does not guarantee page alignment much less alignment to
+>> a folio.  It happens to work today, but that is an implementation
+>> artefact.
+>>
+>>> +
+>>> +       if (!addr)
+>>> +               return -ENOMEM;
+>>> +
+>>> +       zero_fsb_folio = virt_to_folio(addr);
+>>
+>> We also don't guarantee that calling kzalloc() gives you a virtual
+>> address that can be converted to a folio.  You need to allocate a folio
+>> to be sure that you get a folio.
+>>
+>> Of course, you don't actually need a folio.  You don't need any of the
+>> folio metadata and can just use raw pages.
+>>
+>>> +       /*
+>>> +        * The zero folio used is 64k.
+>>> +        */
+>>> +       WARN_ON_ONCE(len > (16 * PAGE_SIZE));
+>>
+>> PAGE_SIZE is not necessarily 4KiB.
+>>
+>>> +       bio = iomap_dio_alloc_bio(iter, dio, BIO_MAX_VECS,
+>>> +                                 REQ_OP_WRITE | REQ_SYNC | REQ_IDLE);
+>>
+>> The point was that we now only need one biovec, not MAX.
+>>
 > 
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> Thanks for the comments. I think it all makes sense:
 > 
-> [
->    This is a treewide change. I will likely re-create this patch again in
->    the second week of the merge window of v6.10 and submit it then. Hoping
->    to keep the conflicts that it will cause to a minimum.
-> ]
+> diff --git a/fs/internal.h b/fs/internal.h
+> index 7ca738904e34..e152b77a77e4 100644
+> --- a/fs/internal.h
+> +++ b/fs/internal.h
+> @@ -35,6 +35,14 @@ static inline void bdev_cache_init(void)
+>   int __block_write_begin_int(struct folio *folio, loff_t pos, unsigned len,
+>                  get_block_t *get_block, const struct iomap *iomap);
+>   
+> +/*
+> + * iomap/buffered-io.c
+> + */
+> +
+> +#define ZERO_FSB_SIZE (65536)
+> +#define ZERO_FSB_ORDER (get_order(ZERO_FSB_SIZE))
+> +extern struct page *zero_fs_block;
+> +
+>   /*
+>    * char_dev.c
+>    */
+But why?
+We already have a perfectly fine hugepage zero page in huge_memory.c. 
+Shouldn't we rather export that one and use it?
+(Actually I have some patches for doing so...)
+We might allocate folios
+> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+> index 4e8e41c8b3c0..36d2f7edd310 100644
+> --- a/fs/iomap/buffered-io.c
+> +++ b/fs/iomap/buffered-io.c
+> @@ -42,6 +42,7 @@ struct iomap_folio_state {
+>   };
+>   
+>   static struct bio_set iomap_ioend_bioset;
+> +struct page *zero_fs_block;
+>   
+>   static inline bool ifs_is_fully_uptodate(struct folio *folio,
+>                  struct iomap_folio_state *ifs)
+> @@ -1985,8 +1986,13 @@ iomap_writepages(struct address_space *mapping, struct writeback_control *wbc,
+>   }
+>   EXPORT_SYMBOL_GPL(iomap_writepages);
+>   
+> +
+>   static int __init iomap_init(void)
+>   {
+> +       zero_fs_block = alloc_pages(GFP_KERNEL | __GFP_ZERO, ZERO_FSB_ORDER);
+> +       if (!zero_fs_block)
+> +               return -ENOMEM;
+> +
+>          return bioset_init(&iomap_ioend_bioset, 4 * (PAGE_SIZE / SECTOR_SIZE),
+>                             offsetof(struct iomap_ioend, io_bio),
+>                             BIOSET_NEED_BVECS);
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index f3b43d223a46..50c2bca8a347 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -236,17 +236,22 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+>                  loff_t pos, unsigned len)
+>   {
+>          struct inode *inode = file_inode(dio->iocb->ki_filp);
+> -       struct page *page = ZERO_PAGE(0);
+>          struct bio *bio;
+>   
+> +       /*
+> +        * Max block size supported is 64k
+> +        */
+> +       WARN_ON_ONCE(len > ZERO_FSB_SIZE);
+> +
+>          bio = iomap_dio_alloc_bio(iter, dio, 1, REQ_OP_WRITE | REQ_SYNC | REQ_IDLE);
+>          fscrypt_set_bio_crypt_ctx(bio, inode, pos >> inode->i_blkbits,
+>                                    GFP_KERNEL);
+> +
+>          bio->bi_iter.bi_sector = iomap_sector(&iter->iomap, pos);
+>          bio->bi_private = dio;
+>          bio->bi_end_io = iomap_dio_bio_end_io;
+>   
+> -       __bio_add_page(bio, page, len, 0);
+> +       __bio_add_page(bio, zero_fs_block, len, 0);
+>          iomap_dio_submit_bio(iter, dio, bio, pos);
+>   }
 > 
-> With the rework of how the __string() handles dynamic strings where it
-> saves off the source string in field in the helper structure[1], the
-> assignment of that value to the trace event field is stored in the helper
-> value and does not need to be passed in again.
-> 
-> This means that with:
-> 
->   __string(field, mystring)
-> 
-> Which use to be assigned with __assign_str(field, mystring), no longer
-> needs the second parameter and it is unused. With this, __assign_str()
-> will now only get a single parameter.
-> 
-> There's over 700 users of __assign_str() and because coccinelle does not
-> handle the TRACE_EVENT() macro I ended up using the following sed script:
-> 
->   git grep -l __assign_str | while read a ; do
->       sed -e 's/\(__assign_str([^,]*[^ ,]\) *,[^;]*/\1)/' $a > /tmp/test-file;
->       mv /tmp/test-file $a;
->   done
-> 
-> I then searched for __assign_str() that did not end with ';' as those
-> were multi line assignments that the sed script above would fail to catch.
-> 
-> Note, the same updates will need to be done for:
-> 
->   __assign_str_len()
->   __assign_rel_str()
->   __assign_rel_str_len()
-> 
-> I tested this with both an allmodconfig and an allyesconfig (build only for both).
-> 
-> [1] https://lore.kernel.org/linux-trace-kernel/20240222211442.634192653@goodmis.org/
-> 
-> Cc: Masami Hiramatsu <mhiramat@kernel.org>
-> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> Cc: Julia Lawall <Julia.Lawall@inria.fr>
-> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-For the sound part
-Acked-by: Takashi Iwai <tiwai@suse.de>
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
-
-thanks,
-
-Takashi
