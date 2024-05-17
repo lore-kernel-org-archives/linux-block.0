@@ -1,98 +1,128 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6812F595
-	for <linux-block@vger.kernel.org>; Fri, 17 May 2024 15:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0225D3D9E;
+	Fri, 17 May 2024 16:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715960470; cv=none; b=sDyh0ZFFqvrmmp1t4jWw86BBBhDc4OMbOOdiw7ZEWCAo+4sfvSmZ5xtpOJJ4l6a4YBom1GYXE5PTd1BWSE1+uA84LWlxc2ydrtZoGC1fWvnT3pomrOI1qIzz5jAYJfQHh07PkZaSYRU8pSuow4SirJYUvI4yLE/NXArRCcV0IHg=
+	t=1715962994; cv=none; b=JbzhVl9QqOrGn5aI3Lp2QNl3nFNFVGz2U9XaYDDV5FovgM5gKKZAXRXy1/SmO9pdi7wgxYf4Ybf2RQI7LH29HkUaLiMIMdWi2pliMj4nIRJ4+c9q0QjMzoq0sWfXOJpcHg7fErYP1NBGlj//ZNX4xSSk6r7glY0UKNAc0GOIo/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715960470; c=relaxed/simple;
-	bh=daIjeLJoYfF/qiW/jXTlnkKca5gDynEnT598Pz+MVxs=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SbBwrVia5Kpi9LyVLYn/RzN2Vm5Mc0bIDnlgMsd4K0ImCp+0w49tdti2C/zouRSf6QkfDs8CVTwZLcpItCVtDSzdk4MShdQ2E36u0F8/2IkxhmRYC7vhEECnPATTmTa/5diuCYFlO+Cj83y1n5AqlBsOnoVj/Tidw4jHDedHYyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dO+YQ9kA; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1715962994; c=relaxed/simple;
+	bh=uNwlZVn0k6bBYrUn2NOTbtyZjAe9hAwPUWGNLiaSzKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MlIAnJvXoclx91HzV3KHgMAmzFsWWX7APIuqQKg6D8rdDfiO2lBWN8hNUnta8MkPvLMjbRrCzno9d+ey7uKWaxOu5yWMAIKuIS4yXd50yO6+ba4Jn3R+4XC21rSS0pTUnL9jV4xzW+y5gexohMQGsr+7nf1x4bn2gL2/M+fleQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8J6rGhR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dO+YQ9kA"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7e1fb2a81fdso13373539f.1
-        for <linux-block@vger.kernel.org>; Fri, 17 May 2024 08:41:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1715960462; x=1716565262; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j2gDIsaoeq0TSAEMY5fz35Za46TPuUHkxbIlOmvSFNc=;
-        b=dO+YQ9kAfLQZTAeUWyZ41AMAlhwo31rOB6x+wqRDlsKTN/BW/nOZomwZnKE+BjwRM9
-         nS4PcuuMeTIGYy+JFHMoOM/p5N/wXXrO/gVqv1k6fKI8pmeo5Ngv958z61ZIrM6zAhM1
-         vgw4YWD3Q81rhtIZ0pZPFKipEfydR3Ws5kVj2iWvX4IKswn4jBitwMqkxFKHoI8QxBwm
-         tqt1wiqISBG3uiSkEiD4BfgHC/+JKZ2yTrJmQ94v2xVJ8v+g4wjCH9AeACZzcpvbng2L
-         ND2HkNKB/T0DRE6bJtu2FtmAgkGw/T7iEoRIxz1+6VclgsCcaD3dJ6IDTXBF9Od/ICYy
-         T2fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715960462; x=1716565262;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j2gDIsaoeq0TSAEMY5fz35Za46TPuUHkxbIlOmvSFNc=;
-        b=t8iGkIkTtzj5hJGde5XikYEIQIaB+3rpRlPZC9Yi9SgbqFXzxl+tQZHZ17hAW7mSFT
-         SQ9L1OihtuYJ+Z6WsLJD8KavTftLxlrHxPy5OjIvxeR5yF/nciA4e/KnWq4yW6fZxfnZ
-         e+Ab5c5UnLpLrCCnyKBAOmfa/PeKUoxag0+nvI5SLFrMa5BiGnbOHwcy01OTO424nZw7
-         M6jEkYK1LeVvZYvQR/BWs2aBKvyOnTV0R3Syc554JDIwQwAIOnZxw84a53318rd7ZhL5
-         8+Q0l4uaTNBg2N9uY+tY67kUsZ53hIP5IBVoaX5BRrsaL4ebct8mPiVa7ApYW6vMfMim
-         +xgQ==
-X-Gm-Message-State: AOJu0YyrOSIn7fWxeSw5NT8tNbAE9M8xPT5QDLi7T3R7IgRnKtGYsPjM
-	IYvcC4iKexBm/4L/+Npt8gk21mtUHQ2GKPMMsVi4JihFYXnMlcRrNFGzkS0BVcbl/xB8DwDbz1b
-	m
-X-Google-Smtp-Source: AGHT+IH7H6fvlHVPknrkefefwYKmrg8/VOlj7yq/36l4s6tauiCEeApsDxPQSR8dkChW12qCzsTJ3Q==
-X-Received: by 2002:a5e:8704:0:b0:7de:e495:42bf with SMTP id ca18e2360f4ac-7e1b51f3e6amr2276898739f.1.1715960462143;
-        Fri, 17 May 2024 08:41:02 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489376fc708sm4652992173.177.2024.05.17.08.41.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 08:41:01 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Raju Cheerla <rcheerla@redhat.com>
-In-Reply-To: <20240517020514.149771-1-ming.lei@redhat.com>
-References: <20240517020514.149771-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] blk-mq: add helper for checking if one CPU is mapped
- to specified hctx
-Message-Id: <171596046118.12101.5842133090388456838.b4-ty@kernel.dk>
-Date: Fri, 17 May 2024 09:41:01 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8J6rGhR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70342C2BD10;
+	Fri, 17 May 2024 16:23:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715962993;
+	bh=uNwlZVn0k6bBYrUn2NOTbtyZjAe9hAwPUWGNLiaSzKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F8J6rGhR6abMw+H3e0sNsBE3c0HR9drUMq7zelYKMTQHa0vv/MIG2W8+/hD/7XTI+
+	 9VkRoCKMyZzVY3LjQAv7zTKPKrfWjp+PaYpWL+HZIXKwJ9PpfHkWCOm8/AnprKJTiS
+	 x71fH3FEiRuBcJ7Snaffb4mCRWAYWAV32gCoEeO44TUBKDap7ZLHPJJXjD0QMTmCNO
+	 ZUj+MK/eDva4zMj4VegTwZ0y/H/lyuO2Nk/KqN8YnLbubwD8YFqugReL9OgeiAJUxc
+	 u0pTJlCPPo4/7T1+KTMYWfO14b9TwwHb+K7KeD4YmO6RNA3DpP+PsNxwbeXmOHuVhd
+	 +qE7xoo2PLRTA==
+Date: Fri, 17 May 2024 09:23:12 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Linux trace kernel <linux-trace-kernel@vger.kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+	freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
+	linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
+	iommu@lists.linux.dev, linux-tegra@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+	ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+	linux-usb@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-edac@vger.kernel.org, selinux@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-hwmon@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-sound@vger.kernel.org,
+	bpf@vger.kernel.org, linux-wpan@vger.kernel.org,
+	dev@openvswitch.org, linux-s390@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	Julia Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <20240517162312.GZ360919@frogsfrogsfrogs>
+References: <20240516133454.681ba6a0@rorschach.local.home>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240516133454.681ba6a0@rorschach.local.home>
 
-
-On Fri, 17 May 2024 10:05:14 +0800, Ming Lei wrote:
-> Commit a46c27026da1 ("blk-mq: don't schedule block kworker on isolated CPUs")
-> rules out isolated CPUs from hctx->cpumask, and hctx->cpumask should only be
-> used for scheduling kworker.
+On Thu, May 16, 2024 at 01:34:54PM -0400, Steven Rostedt wrote:
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
 > 
-> Add helper blk_mq_cpu_mapped_to_hctx() and apply it into cpuhp handlers.
+> [
+>    This is a treewide change. I will likely re-create this patch again in
+>    the second week of the merge window of v6.10 and submit it then. Hoping
+>    to keep the conflicts that it will cause to a minimum.
+> ]
 > 
-> This patch avoids to forget clearing INACTIVE of hctx state in case that one
-> isolated CPU becomes online, and fixes hang issue when allocating request
-> from this hctx's tags.
+> With the rework of how the __string() handles dynamic strings where it
+> saves off the source string in field in the helper structure[1], the
+> assignment of that value to the trace event field is stored in the helper
+> value and does not need to be passed in again.
 > 
-> [...]
+> This means that with:
+> 
+>   __string(field, mystring)
+> 
+> Which use to be assigned with __assign_str(field, mystring), no longer
+> needs the second parameter and it is unused. With this, __assign_str()
+> will now only get a single parameter.
+> 
+> There's over 700 users of __assign_str() and because coccinelle does not
+> handle the TRACE_EVENT() macro I ended up using the following sed script:
+> 
+>   git grep -l __assign_str | while read a ; do
+>       sed -e 's/\(__assign_str([^,]*[^ ,]\) *,[^;]*/\1)/' $a > /tmp/test-file;
+>       mv /tmp/test-file $a;
+>   done
+> 
+> I then searched for __assign_str() that did not end with ';' as those
+> were multi line assignments that the sed script above would fail to catch.
+> 
+> Note, the same updates will need to be done for:
+> 
+>   __assign_str_len()
+>   __assign_rel_str()
+>   __assign_rel_str_len()
+> 
+> I tested this with both an allmodconfig and an allyesconfig (build only for both).
+> 
+> [1] https://lore.kernel.org/linux-trace-kernel/20240222211442.634192653@goodmis.org/
+> 
+> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: Julia Lawall <Julia.Lawall@inria.fr>
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-Applied, thanks!
+/me finds this pretty magical, but such is the way of macros.
+Thanks for being much smarter about them than me. :)
 
-[1/1] blk-mq: add helper for checking if one CPU is mapped to specified hctx
-      commit: 7b815817aa58d2e2101feb2fcf64c60cae0b2695
+Acked-by: Darrick J. Wong <djwong@kernel.org>	# xfs
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+--D
