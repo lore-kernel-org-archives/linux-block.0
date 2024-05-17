@@ -1,210 +1,150 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED6C13DB83
-	for <linux-block@vger.kernel.org>; Fri, 17 May 2024 17:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B50213E028;
+	Fri, 17 May 2024 17:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715966538; cv=none; b=u/Cfzu8FmrsQhYw6N2Rjws7PmDHQY9/z0Am44lIcDVkjrE8sM9W57ViDSr9HkBmki4zsU3kK/T8sYEjnjdXKmmvVNJ0Aj9JIP7GJRU1RKCae0Caj+MareSyWx2osvMUlbGsYWKChS9y7wAg5BsqmsxDz1z8h+EJOiPkEqgi88V4=
+	t=1715967401; cv=none; b=VGD+W1XxUso2VlvuOvz4lxOKEOG1+CgMdYH21RRFwrGzncpE6uX2rvfoTeeEHPH29OY+v7d//yMlX7Zpm1LmdWg/0Q0Ow6NTNHQM5w2kDcyPbB/vgn1f05c54oSM9ndNq8DwMOIyRgbeC12qwPOBes4JNFpurb5I1nclEbQAOg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715966538; c=relaxed/simple;
-	bh=mSbO7HksBDo+HeEzl/bNAopNXW6i+R3p89PpYrgJauI=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=bm8A6xnGUM7eoLF5CdfPKVWf1Xoq/gmNfLTXfREP3b4e/pSJaJt3xPb2ADdjEEkSENhuoZM720jAYpatkAaR2fwDqJTYtAGXwspDBW0zA1aApnUK4zhKQMzPpAElKw8pOzMwcJtsWF8pDwqiCjn1yRaHLUerEpswIJth0lmQFIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=RKJghd+f; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
+	s=arc-20240116; t=1715967401; c=relaxed/simple;
+	bh=l7K75G8hEZf6Nf3Gd+zb5LouEwarRLauIdJPMoFivlA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HHDU2a+DAWtPRcmt4C6PNdPbseXKcMelAX2wzvQMYCRqxHPakEdRVvQff3WPguwpodBLpV7fPbdCvZ94NfW0WSvQDuc0Gmbi/M37I2hQcmH6pFp7wlAmn5n+co7hQSDkGkpVMKwa0McBxDQvO/xYNevxFiLG7sf4OWnflrwmeZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emn3CkST; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="RKJghd+f"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2e7078a367eso8285691fa.0
-        for <linux-block@vger.kernel.org>; Fri, 17 May 2024 10:22:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emn3CkST"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1ee954e0aa6so16680785ad.3;
+        Fri, 17 May 2024 10:36:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1715966535; x=1716571335; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a9v5UHstQmCiEMrDNZmaD/04p0iBzlvQ5DIypYPTouQ=;
-        b=RKJghd+fY3vIStOOABOGn4xSEB/JtXozQCk0dHSQ8bZM9nwDG5szcI010IUwVIzOUA
-         UltEUO5q9L8B57RT/sHoCPnieeo91r483/QGZBIvmOiksoAL8UkasV46HpOOlS6uVW8u
-         Wlb5lLtLcJjKcANyF952rj2+UqtrMEKT50caQZLrXyK74jIqo0/f7Cw3QsVcCDaORFIZ
-         jt476vA0BWL/QpaO8tJdYu87lQsJdI3vM3X00X3NqAwQ+5C466tTBXlgNMWatilJF/UZ
-         N5zqTsNuWAE6WayxLeP+1VSVxpaCH6t5GkC943I1/SIPopPiSIhtR/gC0zK/OuLaudOM
-         4+Jw==
+        d=gmail.com; s=20230601; t=1715967399; x=1716572199; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rzMfxbAB8QJEcJdIySGROcUOqAKXWq8nqUdcExbi1Zk=;
+        b=emn3CkSTmGwb7Ev6REZ9Z3U3XD4Y+jPjdTTKRrd1xunPWgI+cGM6iP3TELOI5V8ATa
+         VbiGe+xcAirEDS5iorMu2B+VEBPivgYYBJAFyyk/dtcE+BdDAEcBR/OSDeMAia+M02aV
+         JtJr53ZjOlMBaf51DPBBJSXIlVEj8/ta7pTQaBfTGVSwemtnu9tMYnJUuHNl2FkBsWa2
+         RY29x4C0oql3h5xd/BScqyiM9KMAjCxcwhA5cszmGMdkeAyAQyWwOl4SEGtmK+Cfk17e
+         ZUmUwjzXpEuOreMImVvNFBtQTMD0YnZzxGLGWYMvA88gK3n/MpOcCwIl6WzZ4yooz3JS
+         JzXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715966535; x=1716571335;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715967399; x=1716572199;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=a9v5UHstQmCiEMrDNZmaD/04p0iBzlvQ5DIypYPTouQ=;
-        b=PWd6GOzq2MdKuEhG7aTIGyfreRg/cHhI/42poCnRKP0ur3y3p4zPN27OipzMf8sNfj
-         IvkUzOF5K+lYozUv4L4qi3gvwFqms9TLD7lrW/lOvLzKMfl7pkV/ktxzWXFv4KxmXSOJ
-         o0u5epTht/1vlf+k/g5u0tMZL2XOIDCAM1kjnl/fQOUCfG8nvoGg0TUcF80H40QkyIgV
-         R4bBis0h/HmgT8I48T5ZqbUQ8HnLWiubIH31y1NSGxztC274VL8j/PgQq57F29k4EMhP
-         Oo1bT9c+Ud+YKlycPd78wcF5C8Ea042tpdHzpVDlv4mL9Id3Doubi5te+eA2+3e5lzHC
-         8LFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcX+aMvquG7pUCarfWWeZpsYBIux/e001D0uXtwrG32jmh1F6ukZ/TGxDG+egrs22zP1KBSUnGhhjJYZY97sCetYZHRrMfE+i2IXY=
-X-Gm-Message-State: AOJu0YzqE6FgRxCP3Q065mdPrBErrX9qREIAqWpd/4+kIienqpoYYT/K
-	Lnh8fC1y/fFkumtoGjiopEVM+tlrBKzG2NRoYqttrGrHPcqVYscd6aq/LON2LQ4=
-X-Google-Smtp-Source: AGHT+IFzagdP4PeigI0hrZjJ8bPqkcttP59bYrzytO6RudEioXqfJ1z28D27QFTyu+49dRg0+vhc3w==
-X-Received: by 2002:a05:6512:1289:b0:519:65fe:ac10 with SMTP id 2adb3069b0e04-5220e68b5a3mr8362770e87.32.1715966534663;
-        Fri, 17 May 2024 10:22:14 -0700 (PDT)
-Received: from smtpclient.apple ([2a00:1370:81a4:8e0a:197b:a3fe:ebe2:821e])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f38d8bafsm3319862e87.235.2024.05.17.10.22.13
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 17 May 2024 10:22:13 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        bh=rzMfxbAB8QJEcJdIySGROcUOqAKXWq8nqUdcExbi1Zk=;
+        b=tRaBInC5CBZVJiTyNhPeAMF0Mv8ZyhDngT/Ke4lsBz6dnWLTVbrxiYmDGKR3474tHa
+         Jw0S2Pd1w9vB5TttyIKUZ3vkElFqN8D82iwb6kL7vCXbWz+ZO+kOgSp2q2lMeYG13wJ3
+         Pd4jLhwNb/5j//D5V0kA6eEHTeRPM+KlHNN2ZXDOKj2sqnyMigDYM3Yyxzog0n99DW50
+         DbdwYUgj+mBGDnl1Wi3MfB/KObA9dlYM5hJ0VYDOGEqfhhsM9xkE6J3r09MMgCufkcSJ
+         MFPDLIL9Qyg8pNl52R6ymP0RQyefKT1UiQ+E7Y0jutAqKo/SZ6YeNcoI1ileC9aAa4W0
+         uyJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeikZ+5A7mGmqeVlRxUOHe3Z4BVx7A6SdRIJ9KlcdOS9QSNvCDsre7aHGEDTt/hTkAM3qO0uM2xeP+jtEHZh5JsSeK9A/+tFrYQA1Gt+sOL3ewNO6LlYK9y7DD7mpAtqpfD7DjXB75ufvKHVU6kM3a/elOuYDfutBUvo4a9bI4BCb2VDcyzEXzDexUc9t0in/T8C2XOhPKn7wWpdtpjhPEZSUvfBbj5JIuV5SOt4ozapoAEBa6p9eoNzUqVSV+FTR0IAeRERSnOL6XqGk495fk7J/QsGArESB7IkyWGLl2UfJVr+STIxS8eHdJJiLcNAzso4UUQBPch6E8dfNENIPvXxQAsave+ZjX9aqXjIT96Hz/aHminfcbngd99gozkR8JcHcG37i5SZidszxbbVcf9ugBd6iBJBSvP3YPM6hIvwhrKlXpceN2VyhqUDGta0Y2tQ8Y92YBThBW9tUwaEcwpwLLtnkcoENUdMSzNo1PisKVaRS0s0oNoAWHaeTm033idWAzW8Z6AMcGqpdUZef30iZpnny7DOCCRdx6bdPIPfc8m8lwMbo6DXkdKIQnaqlplZsK6CLKNgppIYSJ7U793bTJTH44UOdcWLKNUTDeK1XJMU+un4iEAjTM4sbk5xfiplNYftumz3+FD+ZUcLZWXKJBMvMx7eT5NA18jT46CIW4oBwdkZsngjutYGEYxbL/3oE5mRVrHB1dgdQB0YljgIrh2vfVWMnSdGUfmhbsUn3exZybXMRR9PJNk7TMh60ZKjaGM3YyEgvEgQVWpZ4sxK1fHIUzkaJHi56sH9Vb1HRQuX6pNOHreK/nEi3g6aW7gIA7T1ww4N6bLeNtZRSJMBfQ7RJIfpa4nB66EJI9p+xXnabbY1FucmTW2fAhf83tzqzRTLEML3+RBqx6xPn5uR2l/K2m0V/YFHhfHKN5kNYIOcc0Y+KpHUPL2A==
+X-Gm-Message-State: AOJu0YyVJKJDHI54++5KLrCtRmLug9WO1yHYT9xtbae1yHeJBFY7OAOO
+	4meyTffhXTst2nI7rjVckVaPWZ7pOCdtS8zLnwvw9MCn/zh6jfsS
+X-Google-Smtp-Source: AGHT+IHJ9PZtASiLb9HJkYrHy1DRhdQlVEuKbRr0NYIRv4Tx+av91BIA0wx1gBcIQQlm9sd2COIQnQ==
+X-Received: by 2002:a17:90a:9606:b0:2b9:a299:928e with SMTP id 98e67ed59e1d1-2b9a29994c9mr10436893a91.24.1715967398710;
+        Fri, 17 May 2024 10:36:38 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b67105666csm15749258a91.8.2024.05.17.10.36.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 10:36:38 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Fri, 17 May 2024 10:36:37 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Linux trace kernel <linux-trace-kernel@vger.kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+	freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
+	linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
+	iommu@lists.linux.dev, linux-tegra@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+	ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+	linux-usb@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-edac@vger.kernel.org, selinux@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-hwmon@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-sound@vger.kernel.org,
+	bpf@vger.kernel.org, linux-wpan@vger.kernel.org,
+	dev@openvswitch.org, linux-s390@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	Julia Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <5080f4c5-e0b3-4c2e-9732-f673d7e6ca66@roeck-us.net>
+References: <20240516133454.681ba6a0@rorschach.local.home>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.8\))
-Subject: Re: [PATCH] nvme: enable FDP support
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-In-Reply-To: <CA+1E3r+hgO=-K=oojP8xMBDOkVtma60FK-RTxQhbvg2yUc+Abg@mail.gmail.com>
-Date: Fri, 17 May 2024 20:22:11 +0300
-Cc: Kanchan Joshi <joshi.k@samsung.com>,
- Jens Axboe <axboe@kernel.dk>,
- Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org,
- =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
- Bart Van Assche <bvanassche@acm.org>,
- david@fromorbit.com,
- gost.dev@samsung.com,
- Hui Qi <hui81.qi@samsung.com>,
- Nitesh Shetty <nj.shetty@samsung.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E069A44C-9B95-4B7D-97C2-0087A8E68B48@dubeyko.com>
-References: <CGME20240510134740epcas5p24ef1c2d6e8934c1c79b01c849e7ccb41@epcas5p2.samsung.com>
- <20240510134015.29717-1-joshi.k@samsung.com>
- <CB17E82F-C649-4D13-8813-1A6F2D621C51@dubeyko.com>
- <CA+1E3rLxUnuv9E_BxCFj1aodOTp3yrOEh7cFYt_j-Yz+_0q29g@mail.gmail.com>
- <88421397-1B95-4B2A-A302-55A919BCE98E@dubeyko.com>
- <CA+1E3rJtJpxk3EmTmtJWDFwP8km0xqRPt2QeQTRar7sTHtdD2Q@mail.gmail.com>
- <6078F029-A2ED-4B11-AC3B-B0E54D1BEB97@dubeyko.com>
- <CA+1E3r+hgO=-K=oojP8xMBDOkVtma60FK-RTxQhbvg2yUc+Abg@mail.gmail.com>
-To: Kanchan Joshi <joshiiitr@gmail.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.8)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240516133454.681ba6a0@rorschach.local.home>
 
+On Thu, May 16, 2024 at 01:34:54PM -0400, Steven Rostedt wrote:
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> 
+> [
+>    This is a treewide change. I will likely re-create this patch again in
+>    the second week of the merge window of v6.10 and submit it then. Hoping
+>    to keep the conflicts that it will cause to a minimum.
+> ]
+> 
+> With the rework of how the __string() handles dynamic strings where it
+> saves off the source string in field in the helper structure[1], the
+> assignment of that value to the trace event field is stored in the helper
+> value and does not need to be passed in again.
+> 
+> This means that with:
+> 
+>   __string(field, mystring)
+> 
+> Which use to be assigned with __assign_str(field, mystring), no longer
+> needs the second parameter and it is unused. With this, __assign_str()
+> will now only get a single parameter.
+> 
+> There's over 700 users of __assign_str() and because coccinelle does not
+> handle the TRACE_EVENT() macro I ended up using the following sed script:
+> 
+>   git grep -l __assign_str | while read a ; do
+>       sed -e 's/\(__assign_str([^,]*[^ ,]\) *,[^;]*/\1)/' $a > /tmp/test-file;
+>       mv /tmp/test-file $a;
+>   done
+> 
+> I then searched for __assign_str() that did not end with ';' as those
+> were multi line assignments that the sed script above would fail to catch.
+> 
 
+Building csky:allmodconfig (and others) ... failed
+--------------
+Error log:
+In file included from include/trace/trace_events.h:419,
+                 from include/trace/define_trace.h:102,
+                 from drivers/cxl/core/trace.h:737,
+                 from drivers/cxl/core/trace.c:8:
+drivers/cxl/core/./trace.h:383:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
 
-> On May 17, 2024, at 7:27 PM, Kanchan Joshi <joshiiitr@gmail.com> =
-wrote:
->=20
-> On Tue, May 14, 2024 at 2:40=E2=80=AFPM Viacheslav Dubeyko =
-<slava@dubeyko.com> wrote:
->>=20
->>=20
->>=20
->>> On May 15, 2024, at 6:30 AM, Kanchan Joshi <joshiiitr@gmail.com> =
-wrote:
->>>=20
->>> On Tue, May 14, 2024 at 1:00=E2=80=AFPM Viacheslav Dubeyko =
-<slava@dubeyko.com> wrote:
->>>>> On May 14, 2024, at 9:47 PM, Kanchan Joshi <joshiiitr@gmail.com> =
-wrote:
->>>>>=20
->>>>> On Mon, May 13, 2024 at 2:04=E2=80=AFAM Viacheslav Dubeyko =
-<slava@dubeyko.com> wrote:
->>>>>>=20
->>>>>>=20
->>>>>>=20
->>>>>>> On May 10, 2024, at 4:40 PM, Kanchan Joshi <joshi.k@samsung.com> =
-wrote:
->>>>>>>=20
->>>>>>> Flexible Data Placement (FDP), as ratified in TP 4146a, allows =
-the host
->>>>>>> to control the placement of logical blocks so as to reduce the =
-SSD WAF.
->>>>>>>=20
->>>>>>> Userspace can send the data lifetime information using the write =
-hints.
->>>>>>> The SCSI driver (sd) can already pass this information to the =
-SCSI
->>>>>>> devices. This patch does the same for NVMe.
->>>>>>>=20
->>>>>>> Fetches the placement-identifiers (plids) if the device supports =
-FDP.
->>>>>>> And map the incoming write-hints to plids.
->>>>>>>=20
->>>>>>=20
->>>>>>=20
->>>>>> Great! Thanks for sharing  the patch.
->>>>>>=20
->>>>>> Do  we have documentation that explains how, for example, =
-kernel-space
->>>>>> file system can work with block layer to employ FDP?
->>>>>=20
->>>>> This is primarily for user driven/exposed hints. For file system
->>>>> driven hints, the scheme is really file system specific and =
-therefore,
->>>>> will vary from one to another.
->>>>> F2FS is one (and only at the moment) example. Its 'fs-based' =
-policy
->>>>> can act as a reference for one way to go about it.
->>>>=20
->>>> Yes, I completely see the point. I would like to employ the FDP in =
-my
->>>> kernel-space file system (SSDFS). And I have a vision how I can do =
-it.
->>>> But I simply would like to see some documentation with the =
-explanation of
->>>> API and limitations of FDP for the case of kernel-space file =
-systems.
->>>=20
->>> Nothing complicated for early experimentation.
->>> Once FS has determined the hint value, it can put that into
->>> bio->bi_write_hint and send bio down.
->>>=20
->>> If SSDFS cares about user-exposed hints too, it can choose different
->>> hint values than what is exposed to user-space.
->>> Or it can do what F2FS does - use the mount option as a toggle to
->>> reuse the same values either for user-hints or fs-defined hints.
->>=20
->> How many hint values file system can use? Any limitations here?
->=20
-> As many as already defined (in rw_hint.h). Possible to go higher too.
-> No hard limitation per se. Write is not going to fail even if it sends
-> a hint that does not exist.
->=20
+This is with the patch applied on top of v6.9-8410-gff2632d7d08e.
+So far that seems to be the only build failure.
+Introduced with commit 6aec00139d3a8 ("cxl/core: Add region info to
+cxl_general_media and cxl_dram events"). Guess we'll see more of those
+towards the end of the commit window.
 
-OK. I see. Thanks.
-
->> And how file system can detect that it=E2=80=99s FDP-based device?
->=20
-> It does not need to detect. File system sees write-hints; FDP is a
-> lower-level detail.
-
-I see your point. But SSDFS doesn=E2=80=99t need in hints from =
-user-space side.
-SSDFS has various types of segments (several types of metadata segments =
-and
-user data segment) and I would like to use hints for these different =
-types of segments.
-I mean that SSDFS needs to make decisions when and for what type of data =
-or
-metadata to send such hints without any instructions from user-space =
-side.
-
-Technically speaking, user-space side doesn=E2=80=99t need to care to =
-provide any hints
-to SSDFS because SSDFS can manage everything without such hints.
-So, I would like to have opportunity to change SSDFS behavior for =
-different
-type of devices:
-
-if (zns_device)
-   execute_zns_related_logic
-else if (fdp_device)
-   execute_fdp_related_logic
-else // conventional SSD
-   execute_conventional_ssd_logic
-
-Does it mean that there is no such way of FDP based device detection?
-
-Thanks,
-Slava.
-
+Guenter
