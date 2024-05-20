@@ -1,171 +1,211 @@
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCCC17991
-	for <linux-block@vger.kernel.org>; Mon, 20 May 2024 07:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5931B7E9;
+	Mon, 20 May 2024 07:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716188447; cv=none; b=Q/Un7+t6NAn1LBcqPkpPIL9PTvf8QaG+oa7BcpSZXPysVgQR2XJQVyWnh2n3/8OCkITCupVU9S2YrxZ8NbO6FbhAiIOtoxizRUZcOTWfE5kZlY10imsS2tdiyU+TyO4vg8yoCmdi5RVB84FpvpJa2O4lbNBsllPXofueOv9ZNfY=
+	t=1716190038; cv=none; b=VGtW+j2t40Dh+XH4cAXL3XXkkee+QKej4d4WeF1t4aWoHJ8F1ZZizXhIp7afHlD5PAgiLqx2Nq6ZvFq0g0fLQ9dbIEliuF53eG8mbhHT1v03YKxP6GqSJw2+kxxkZ2Y4SGub/hgKgJJMFuKSUQOtxBkI4oTgKEQ4rkj/I+KfcHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716188447; c=relaxed/simple;
-	bh=8ZRMC5Uly6jS5R8KABa2COBukEnIXeczTynUW9gTJRg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZIKBQ4wgqhjb25/nBYvOI1N8A/98+ftN1KZmH+bqaxEl9tTB2Fkh/3EaoRN+rplAalQ7BPVeG+0qZz0TCdffCTQqI/jtq47jsqk8/jHq51+m9q2N84yvZvglWbcgufrMDobiiZWrRywYwikUGimgfmyZTXYTF0/F5fZ/x/zrVzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7e2230f7b56so298599739f.2
-        for <linux-block@vger.kernel.org>; Mon, 20 May 2024 00:00:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716188445; x=1716793245;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZZQa9KdsEtFL8F8GUFXuRdDELKL6g4qjVouGfdg9xxo=;
-        b=pWWxLrjyiFu3jfoUlFAgbUNZqSAfgKS1lUZ1CfXVqxI/XPQKNsZZs9YCBlV8OdpUL5
-         WcmESx/LKTdtaUNbudIbOovJ3eZNpWpp077ERwEpnhdEwMlUFrLsFURYKxq0bEs88vX1
-         iKpZ9sMFbMWQ/cnXiw1wIm7sBsb5oP6oqWQIgC51x+Qt6xVu/blgvttrmmdvmU94x1lA
-         8DoSUWVbUnOxtf1kXYNDt/htw0qehAr6iHJ8j3enDTGEbYO/zkgRnJbDVlCnkSO8z53K
-         tQVOPjDiA6C+OgDNPG1Pi6aHvrgxdvsnIGlPrkfXDqp4pkHRxK2KYgQ/qeZ6CnscVoOh
-         OH8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXBESk5Fl8DNsUfYF5XjCwWnSMhuzkKi9B5NmOmP+vblswaTeNrOdX88gJWdr97jbcPycwdn6o6KLXIbyo6zdigMGr1mXX+dGeaAo4=
-X-Gm-Message-State: AOJu0YySBxxilhdahD/fSSJ8qjFaXFYceQ4Ipm3u6TDNOYciHyGZen6x
-	V5T7Afo/fyqE3oLkFIQh14Nn6aYwBgTTO4v/+8nSyj4hx7d8PFsuLro+Fj+g5J/XZuRcWdvNVG2
-	RXW2zhBcrFLhJqOhx1rqRM5Qx4YSoQxI7686acygzhN2OhBmnXUff4yQ=
-X-Google-Smtp-Source: AGHT+IERcERSXL1cjB/QB367p7YJ6hxUshBjeTt+wMhwl+DdfAmd+wRw0vOVDLma2ZVyvzwck6XAhf0yVkDwPCksEJVbnpwe8VIa
+	s=arc-20240116; t=1716190038; c=relaxed/simple;
+	bh=X0lhOwRtW/UV/XAfkDERI5c3Rxox9rP4mq/396aTjYw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=bgPnpt5FycmApWq6n7eUlcBnwW5I+6Sk7lrawQSDgmqgUc3P7wDH3aXg0GF2n5nEQF1Zf+XSiot7KF8haE0jN/qfEjXOy85a/gDpX42i8B9hJRo7YkyF63aiIlQk6bO7rI4rb628SXpv4wHYLoQkttuQTMjCodRiY646hCj7X34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VjTfH2FH3z4f3jHv;
+	Mon, 20 May 2024 15:27:03 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 2D94F1A01B9;
+	Mon, 20 May 2024 15:27:12 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgDHlxBM+0pmCnisNA--.43024S3;
+	Mon, 20 May 2024 15:27:10 +0800 (CST)
+Subject: Re: [bug report] INFO: task mdX_resync:42168 blocked for more than
+ 122 seconds
+To: Yu Kuai <yukuai1@huaweicloud.com>, Changhui Zhong <czhong@redhat.com>
+Cc: Ming Lei <ming.lei@redhat.com>,
+ Linux Block Devices <linux-block@vger.kernel.org>, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Song Liu <song@kernel.org>, linux-raid@vger.kernel.org,
+ Xiao Ni <xni@redhat.com>, "yukuai (C)" <yukuai3@huawei.com>
+References: <CAGVVp+Xsmzy2G9YuEatfMT6qv1M--YdOCQ0g7z7OVmcTbBxQAg@mail.gmail.com>
+ <ZkXsOKV5d4T0Hyqu@fedora>
+ <9b340157-dc0c-6e6a-3d92-f2c65b515461@huaweicloud.com>
+ <CAGVVp+XtThX7=bZm441VxyVd-wv_ycdqMU=19a2pa4wUkbkJ3g@mail.gmail.com>
+ <1b35a177-670a-4d2f-0b68-6eda769af37d@huaweicloud.com>
+ <CAGVVp+WQVeV0PE12RvpojFTRB4rHXh6Lk01vLmdStw1W9zUACg@mail.gmail.com>
+ <CAGVVp+WGyPS5nOQYhWtgJyQnXwUb-+Hui14pXqxd+-ZUjWpTrA@mail.gmail.com>
+ <f1c98dd1-a62c-6857-3773-e05b80e6a763@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ca29a4b1-4b4a-3b1c-4981-6e05e0bb24be@huaweicloud.com>
+Date: Mon, 20 May 2024 15:27:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:29c1:b0:7d6:5f6:831b with SMTP id
- ca18e2360f4ac-7e1b51aaa1amr90593039f.1.1716188443485; Mon, 20 May 2024
- 00:00:43 -0700 (PDT)
-Date: Mon, 20 May 2024 00:00:43 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008ab82a0618dd429f@google.com>
-Subject: [syzbot] [block?] WARNING: locking bug in mempool_alloc
-From: syzbot <syzbot+ed9ea019381af2e78b60@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <f1c98dd1-a62c-6857-3773-e05b80e6a763@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDHlxBM+0pmCnisNA--.43024S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCrWrCr43Zry7Gr4xZFW8JFb_yoWrWr4kpa
+	yfXF1ayFWUZrn3Jw1kJa1UuFyFv348ta48JFWrKwn3ZFZ7tFZa9w1Igw1YgryqvrZ3X34x
+	XF98Z39xAr17tFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+	3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+在 2024/05/20 10:55, Yu Kuai 写道:
+> Hi, Changhui
+> 
+> 在 2024/05/20 8:39, Changhui Zhong 写道:
+>> [czhong@vm linux-block]$ git bisect bad
+>> 060406c61c7cb4bbd82a02d179decca9c9bb3443 is the first bad commit
+>> commit 060406c61c7cb4bbd82a02d179decca9c9bb3443
+>> Author: Yu Kuai<yukuai3@huawei.com>
+>> Date:   Thu May 9 20:38:25 2024 +0800
+>>
+>>      block: add plug while submitting IO
+>>
+>>      So that if caller didn't use plug, for example, 
+>> __blkdev_direct_IO_simple()
+>>      and __blkdev_direct_IO_async(), block layer can still benefit 
+>> from caching
+>>      nsec time in the plug.
+>>
+>>      Signed-off-by: Yu Kuai<yukuai3@huawei.com>
+>>      
+>> Link:https://lore.kernel.org/r/20240509123825.3225207-1-yukuai1@huaweicloud.com 
+>>
+>>      Signed-off-by: Jens Axboe<axboe@kernel.dk>
+>>
+>>   block/blk-core.c | 6 ++++++
+>>   1 file changed, 6 insertions(+)
+> 
+> Thanks for the test!
+> 
+> I was surprised to see this blamed commit, and after taking a look at
+> raid1 barrier code, I found that there are some known problems, fixed in
+> raid10, while raid1 still unfixed. So I wonder this patch maybe just
+> making the exist problem easier to reporduce.
+> 
+> I'll start cooking patches to sync raid10 fixes to raid1, meanwhile,
+> can you change your script to test raid10 as well, if raid10 is fine,
+> I'll give you these patches later to test raid1.
 
-HEAD commit:    33e02dc69afb Merge tag 'sound-6.10-rc1' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=120186d0980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=39878f1ce91ccfda
-dashboard link: https://syzkaller.appspot.com/bug?extid=ed9ea019381af2e78b60
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+Hi,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Sorry to ask, but since I can't reporduce the problem, and based on
+code reiview, there are multiple potential problems, can you also
+reporduce the problem with following debug patch(just add some debug
+info, no functional changes). So that I can make sure of details of
+the problem.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-33e02dc6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a7597d9cd2b5/vmlinux-33e02dc6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/93cadb45c580/bzImage-33e02dc6.xz
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 113135e7b5f2..b35b847a9e8b 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -936,6 +936,45 @@ static void flush_pending_writes(struct r1conf *conf)
+                 spin_unlock_irq(&conf->device_lock);
+  }
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ed9ea019381af2e78b60@syzkaller.appspotmail.com
++static bool waiting_barrier(struct r1conf *conf, int idx)
++{
++       int nr = atomic_read(&conf->nr_waiting[idx]);
++
++       if (nr) {
++               printk("%s: idx %d nr_waiting %d\n", __func__, idx, nr);
++               return true;
++       }
++
++       return false;
++}
++
++static bool waiting_pending(struct r1conf *conf, int idx)
++{
++       int nr;
++
++       if (test_bit(MD_RECOVERY_INTR, &conf->mddev->recovery))
++               return false;
++
++       if (conf->array_frozen) {
++               printk("%s: array is frozen\n", __func__);
++               return true;
++       }
++
++       nr = atomic_read(&conf->nr_pending[idx]);
++       if (nr) {
++               printk("%s: idx %d nr_pending %d\n", __func__, idx, nr);
++               return true;
++       }
++
++       nr = atomic_read(&conf->barrier[idx]);
++       if (nr >= RESYNC_DEPTH) {
++               printk("%s: idx %d barrier %d exceeds %d\n", __func__, 
+idx, nr, RESYNC_DEPTH);
++               return true;
++       }
++
++       return false;
++}
++
+  /* Barriers....
+   * Sometimes we need to suspend IO while we do something else,
+   * either some resync/recovery, or reconfigure the array.
+@@ -967,8 +1006,7 @@ static int raise_barrier(struct r1conf *conf, 
+sector_t sector_nr)
+         spin_lock_irq(&conf->resync_lock);
 
-------------[ cut here ]------------
-Looking for class "c->lock" with key __key.0, but found a different class "&c->lock" with the same key
-WARNING: CPU: 2 PID: 8623 at kernel/locking/lockdep.c:932 look_up_lock_class+0x133/0x140 kernel/locking/lockdep.c:932
-Modules linked in:
-CPU: 2 PID: 8623 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-07370-g33e02dc69afb #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:look_up_lock_class+0x133/0x140 kernel/locking/lockdep.c:932
-Code: c7 c7 80 bd 2c 8b e8 7c 13 75 f6 90 0f 0b 90 90 90 31 db eb be c6 05 9f 47 ef 04 01 90 48 c7 c7 a0 c0 2c 8b e8 5e 13 75 f6 90 <0f> 0b 90 90 e9 62 ff ff ff 0f 1f 40 00 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffc900033772c8 EFLAGS: 00010086
-RAX: 0000000000000000 RBX: ffffffff941e3900 RCX: ffffc900078a1000
-RDX: 0000000000040000 RSI: ffffffff81516566 RDI: 0000000000000001
-RBP: ffffffff94ad7a10 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 000000006b6f6f4c R12: ffffe8ffad234c20
-R13: 0000000000000000 R14: 0000000000000000 R15: ffffffff94abfba0
-FS:  0000000000000000(0000) GS:ffff88802c200000(0063) knlGS:00000000f5f19b40
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 00000000209fd000 CR3: 000000000062a000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- register_lock_class+0xb1/0x1230 kernel/locking/lockdep.c:1284
- __lock_acquire+0x111/0x3b30 kernel/locking/lockdep.c:5014
- lock_acquire kernel/locking/lockdep.c:5754 [inline]
- lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
- local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
- ___slab_alloc+0x73b/0x1810 mm/slub.c:3641
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3682
- __slab_alloc_node mm/slub.c:3735 [inline]
- slab_alloc_node mm/slub.c:3908 [inline]
- kmem_cache_alloc+0x2f3/0x330 mm/slub.c:3925
- mempool_alloc+0x176/0x390 mm/mempool.c:408
- bio_alloc_bioset+0x480/0x8b0 block/bio.c:554
- bch2_direct_write+0x629/0x4310 fs/bcachefs/fs-io-direct.c:624
- bch2_write_iter+0x10c/0x3180 fs/bcachefs/fs-io-buffered.c:1143
- call_write_iter include/linux/fs.h:2120 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0x6b6/0x1120 fs/read_write.c:590
- ksys_write+0x12f/0x260 fs/read_write.c:643
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0x75/0x120 arch/x86/entry/common.c:386
- do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-RIP: 0023:0xf7327579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000f5f195ac EFLAGS: 00000292 ORIG_RAX: 0000000000000004
-RAX: ffffffffffffffda RBX: 0000000000000008 RCX: 0000000020000200
-RDX: 0000000000044000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000292 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	10 06                	adc    %al,(%rsi)
-   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
-   6:	10 07                	adc    %al,(%rdi)
-   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
-   c:	10 08                	adc    %cl,(%rax)
-   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-  1e:	00 51 52             	add    %dl,0x52(%rcx)
-  21:	55                   	push   %rbp
-  22:	89 e5                	mov    %esp,%ebp
-  24:	0f 34                	sysenter
-  26:	cd 80                	int    $0x80
-* 28:	5d                   	pop    %rbp <-- trapping instruction
-  29:	5a                   	pop    %rdx
-  2a:	59                   	pop    %rcx
-  2b:	c3                   	ret
-  2c:	90                   	nop
-  2d:	90                   	nop
-  2e:	90                   	nop
-  2f:	90                   	nop
-  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+         /* Wait until no block IO is waiting */
+-       wait_event_lock_irq(conf->wait_barrier,
+-                           !atomic_read(&conf->nr_waiting[idx]),
++       wait_event_lock_irq(conf->wait_barrier, !waiting_barrier(conf, idx),
+                             conf->resync_lock);
 
+         /* block any new IO from starting */
+@@ -990,11 +1028,7 @@ static int raise_barrier(struct r1conf *conf, 
+sector_t sector_nr)
+          * C: while conf->barrier[idx] >= RESYNC_DEPTH, meaning reaches
+          *    max resync count which allowed on current I/O barrier bucket.
+          */
+-       wait_event_lock_irq(conf->wait_barrier,
+-                           (!conf->array_frozen &&
+-                            !atomic_read(&conf->nr_pending[idx]) &&
+-                            atomic_read(&conf->barrier[idx]) < 
+RESYNC_DEPTH) ||
+-                               test_bit(MD_RECOVERY_INTR, 
+&conf->mddev->recovery),
++       wait_event_lock_irq(conf->wait_barrier, !waiting_pending(conf, idx),
+                             conf->resync_lock);
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+         if (test_bit(MD_RECOVERY_INTR, &conf->mddev->recovery)) {
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Thanks,
+Kuai
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+> 
+> Thanks,
+> Kuai
+> 
+> .
+> 
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
