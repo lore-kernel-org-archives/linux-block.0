@@ -1,190 +1,171 @@
-Received: from SINPR02CU002.outbound.protection.outlook.com (mail-southeastasiaazon11011004.outbound.protection.outlook.com [52.101.133.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24520DDAB;
-	Mon, 20 May 2024 03:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.133.4
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716176363; cv=fail; b=bQgY3w0Uef3N4YxgIMfbHaM/IuDtIVP9SYCftodp8gKFsQQ3AP+qsxWfhRqNehT0SGavhmch3paxgeTdMUpS4j9HrUSAT3S2T/gPjvSVDt+btkvhcHLho5S9dl0AZljWdO0zEz14gCzU3t9zI5bV8RBEiqKRLTK4KIyiRgYQMKI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716176363; c=relaxed/simple;
-	bh=bTsLvqHu2GbomBp25PUM469mj57dHGP49MkKeamhhEw=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=qDyjddh0jCOdTOt43wiElAB/AUw9k35lPjVxUQMqImG1gNAmyYHJEUXUB9koZa7Nbqsn9z1iXiCEK1Dn2GdDCK2ss13vSlGN5Pl7Urlpgx0dtdqc3VILb7k35Dkd1o0WORXthWrcCw6NiNXVVEkrR0DyAYAeThMxDL2Y76gizLw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=C0+TdFes; arc=fail smtp.client-ip=52.101.133.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="C0+TdFes"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FmAlCLNMUVuvVobP5X9XE4A3NBT1pNH6mQ+5j0PfCFhj4ZhUSBwgI16HuTigC4oPha5+jAUrfJJClxVcfA/PsxVQ0dtHUuN0YO6+kXehtN4fYFQd1RDN8d7kj8wkrcZNgxX2kL67nwGvxX8QBjtDR52lCNhgvR9oqdcsR5/GwveUJ8idfsEYoO9dEAZ9wY/L/5sMAvdJJE5AAsRUB5QZYmAGviTqJD0g52BSoBG8JiZaWIwykgeCRhaipEPs8CweuJ6Lr7dvWMoSloKekOlb2ERr1xaPJc/et//PUwVJHfyp2awBnlDqirYkvVGKMh1vGFql/0RSJuPPgrEsbEhc/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SGU7/Ai8H0PuH72OGoH/z+9S0nVvJ+q6xeBbwhTsJWg=;
- b=KV8yDUVj+GdYEo1vfgk0MWKdKcBls8emVd7ozWLEVduVuuazgPwFWJmR1z2PmbZFN1dtUsV3Koj1rVbAEHAhdg8r7mH1BVdb6VW111h03PeHl2Xd6WjfWUlLxQ/1BJGcBDkDn55Y78PRrszESICQcO5SGaoL0cCPfGmoTLRwKMPS43wAXAIEByiZblQOYBh/gv2H1c4N0a+jcmRIcyUOdoGHUDNDdse5+IC2VbyVSOAsEb3FeJuGyiFkzhaA4licfs14zDJXZ0PMe/uiVlOExQylJavnQ524yVcr7vSn6k1CRIkzHZ1usUAPFeuSQyyZf+42fSAfrx9v/FetqW5Ohg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SGU7/Ai8H0PuH72OGoH/z+9S0nVvJ+q6xeBbwhTsJWg=;
- b=C0+TdFesphbYMPa7qy3TPQ59X0vMepy3kNizM9olbQppjfJm/eheXhx+ilJrrV2musGjkNhKKu6CbeIKszvVfEw4WeuAEOaSEepGFamHK9qJykuXiVSXJGHLngiFHSsMY7YSUv1GTraIRAueKar4hIn9K2W6FLeUuLrSsW2A5SzhuJsDcTmFGD9jgpPoXupZ1VFTiUF7EUzfTQEJnsRPbuzI50i0LohxH6WAnh+bEc5EvHoUYkWyGFWtUQSRfhyZEMH1G0dXgVS4D9ab8jzyv6IYq1tkkgkahBqgHMZxMAaKgB9LY/xvtxGcIgveoRCvhuF/wxk1qRWMThCTFyFPZg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from KL1PR06MB7401.apcprd06.prod.outlook.com (2603:1096:820:146::12)
- by SEZPR06MB5023.apcprd06.prod.outlook.com (2603:1096:101:47::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.35; Mon, 20 May
- 2024 03:39:17 +0000
-Received: from KL1PR06MB7401.apcprd06.prod.outlook.com
- ([fe80::f4f:43c4:25e5:394e]) by KL1PR06MB7401.apcprd06.prod.outlook.com
- ([fe80::f4f:43c4:25e5:394e%4]) with mapi id 15.20.7587.030; Mon, 20 May 2024
- 03:39:17 +0000
-From: Yang Yang <yang.yang@vivo.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Yang Yang <yang.yang@vivo.com>
-Subject: [RFC PATCH] blk-mq: fix potential I/O hang caused by batch wakeup
-Date: Mon, 20 May 2024 11:38:46 +0800
-Message-Id: <20240520033847.13533-1-yang.yang@vivo.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI1PR02CA0014.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::9) To KL1PR06MB7401.apcprd06.prod.outlook.com
- (2603:1096:820:146::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCCC17991
+	for <linux-block@vger.kernel.org>; Mon, 20 May 2024 07:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716188447; cv=none; b=Q/Un7+t6NAn1LBcqPkpPIL9PTvf8QaG+oa7BcpSZXPysVgQR2XJQVyWnh2n3/8OCkITCupVU9S2YrxZ8NbO6FbhAiIOtoxizRUZcOTWfE5kZlY10imsS2tdiyU+TyO4vg8yoCmdi5RVB84FpvpJa2O4lbNBsllPXofueOv9ZNfY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716188447; c=relaxed/simple;
+	bh=8ZRMC5Uly6jS5R8KABa2COBukEnIXeczTynUW9gTJRg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZIKBQ4wgqhjb25/nBYvOI1N8A/98+ftN1KZmH+bqaxEl9tTB2Fkh/3EaoRN+rplAalQ7BPVeG+0qZz0TCdffCTQqI/jtq47jsqk8/jHq51+m9q2N84yvZvglWbcgufrMDobiiZWrRywYwikUGimgfmyZTXYTF0/F5fZ/x/zrVzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7e2230f7b56so298599739f.2
+        for <linux-block@vger.kernel.org>; Mon, 20 May 2024 00:00:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716188445; x=1716793245;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZZQa9KdsEtFL8F8GUFXuRdDELKL6g4qjVouGfdg9xxo=;
+        b=pWWxLrjyiFu3jfoUlFAgbUNZqSAfgKS1lUZ1CfXVqxI/XPQKNsZZs9YCBlV8OdpUL5
+         WcmESx/LKTdtaUNbudIbOovJ3eZNpWpp077ERwEpnhdEwMlUFrLsFURYKxq0bEs88vX1
+         iKpZ9sMFbMWQ/cnXiw1wIm7sBsb5oP6oqWQIgC51x+Qt6xVu/blgvttrmmdvmU94x1lA
+         8DoSUWVbUnOxtf1kXYNDt/htw0qehAr6iHJ8j3enDTGEbYO/zkgRnJbDVlCnkSO8z53K
+         tQVOPjDiA6C+OgDNPG1Pi6aHvrgxdvsnIGlPrkfXDqp4pkHRxK2KYgQ/qeZ6CnscVoOh
+         OH8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXBESk5Fl8DNsUfYF5XjCwWnSMhuzkKi9B5NmOmP+vblswaTeNrOdX88gJWdr97jbcPycwdn6o6KLXIbyo6zdigMGr1mXX+dGeaAo4=
+X-Gm-Message-State: AOJu0YySBxxilhdahD/fSSJ8qjFaXFYceQ4Ipm3u6TDNOYciHyGZen6x
+	V5T7Afo/fyqE3oLkFIQh14Nn6aYwBgTTO4v/+8nSyj4hx7d8PFsuLro+Fj+g5J/XZuRcWdvNVG2
+	RXW2zhBcrFLhJqOhx1rqRM5Qx4YSoQxI7686acygzhN2OhBmnXUff4yQ=
+X-Google-Smtp-Source: AGHT+IERcERSXL1cjB/QB367p7YJ6hxUshBjeTt+wMhwl+DdfAmd+wRw0vOVDLma2ZVyvzwck6XAhf0yVkDwPCksEJVbnpwe8VIa
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR06MB7401:EE_|SEZPR06MB5023:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ee7c794-761d-4d40-efc2-08dc787e6d04
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|366007|376005|52116005|1800799015|38350700005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bxgyPqijSBTMRGEGEmE0QjRdk9C4q6DRZYTkXLTD6fQmWIFJmOyZX+9kxqJa?=
- =?us-ascii?Q?Yf8Xla/YN1vcf0nms/55DKalMjv85a1HuFfOnYeoBulNMbLlO/dSm90+5CDb?=
- =?us-ascii?Q?dFRIDfSPjKtHzjp/nzrCGSsRWQuZ9pQ/X3ioCdxU8Pt8iYwnlUH6+gGwPQdD?=
- =?us-ascii?Q?M7N1VrCFgKcx3VoLZxDxef8lYXS2DVULTVS2h8d1LMe03XLqtrK+AyWths6E?=
- =?us-ascii?Q?X2L0QNWnzTrMXAcAXVQZw/tdrq3QpWlqP7NXnj4KqAzVjMkRRdDzB3EUkevz?=
- =?us-ascii?Q?6LlCD/0sf8GNLpzM4qeIdVqKJCKMSDW9SfR+f5yMLPynHb/HQB0AzK4cvyUH?=
- =?us-ascii?Q?f4E0BlMnJNyiNxBl/z3zamCyQo+RQfYwWQ22ls+N7TvVrJVHgYikGdMF5x1x?=
- =?us-ascii?Q?TaJwnWCVjUSqrRp3YSzdXSAk3Qps4U9L5Mf2as2pmKB5RhxzvEiELcEvq3tz?=
- =?us-ascii?Q?ZPJJQyC9iapnUdXfmXcsqXRXULIxxJt7hnhwTgfsZb5+woMf2otZFxHI3G57?=
- =?us-ascii?Q?Vr3wu9oF+4s4flaIqM0NIsba/6n3Dl9+tZ2WqwCb2Lg5ChvSSnDo0O9IeTHE?=
- =?us-ascii?Q?n+CtnFKADbb06qsaQo5Fm/lmLpz1Tje0TuEOc1Ba4idZJ/tphnN7r/Zy4imL?=
- =?us-ascii?Q?isGfQfTL28xXfbONfqvig3Ps9felnayRlo1XswaW4IdfJhFwibBwCIegn9wf?=
- =?us-ascii?Q?QoUkgNEWbjWEdzIeX5507Zw09pvkZzP2aLDCaXnYjHamN3lFYFC6dXtRdhdU?=
- =?us-ascii?Q?pR+tW2mu38R9BHSOJNns7ydsegx5mWM9p7GnqDsdQiSSW7udm4NyARFz/cqE?=
- =?us-ascii?Q?ZD0njL717iFgg1jQJUA3UTHhwKE4fE6i12C4By0G128iJ1eaxmwsKsK+OjMr?=
- =?us-ascii?Q?4mKECjsYReb8ZbtVtSpqM3v+DBjkWYPfkSHQPaqdk0Q3Tqb9rSZAf6vvnw2z?=
- =?us-ascii?Q?9jZx744clbVPXY+md1sUxBw1BJ8ULsQjcbuNm9WYJbgM4N11Iq4RR8mXcXzA?=
- =?us-ascii?Q?XepG2ThOqnPZ0YhhIKab/vSrMTZlxfmyXArtZrnUASdFjDSxuemjREqVkBMD?=
- =?us-ascii?Q?m3gcnJJYLUocqWbhGURTq+6F0xo41VVLXzu+Uy45EeOIm80wV/l6Yi/RqUcS?=
- =?us-ascii?Q?CgR5YlMM85bHzDVKoNfGeSUcxffGsOCw9iyVwrakOLa3KeJoM9d7h1uWdYUq?=
- =?us-ascii?Q?hh3m/pRogey4TX826zx4aklQDJzvfLCAKGSYn2lBCl9Ma6SpaOxx0GLedNcW?=
- =?us-ascii?Q?f0GgYmxtssSgMvJgdY0j8G8i4n5l/SZ7mWvASdGM1NbFQVpWgWfaDZAgWH6A?=
- =?us-ascii?Q?l5hi6HQvPNEvZsQ8Zq9jTj3mFM4qExbQgdG9/BuH2PgCUw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR06MB7401.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(52116005)(1800799015)(38350700005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ltEmVa/oT3ONGIkccdYCz/y7aLmyuaOt+Fcee7M3QjKbnOSDQA56nxvambAp?=
- =?us-ascii?Q?HV+vHZNbLei1IaRMwRBnHq3ejeAV+b8RoNu8tvVTDMOxp2aHyXBq5gZbw1Nm?=
- =?us-ascii?Q?XofIjAoiFkhvetbqeUjblw5aZ290yVnlnZiKEFaOYxXgJ3isYZ4BtT7QtZlu?=
- =?us-ascii?Q?0dTMwkDRR9KxmYbbrFszGZeu35FPmJkIymL3G7z323TtoQCUwFPjV3M6vsin?=
- =?us-ascii?Q?1NZfQrydpHCKvjF5TglB2lmDmZoL/zjuqas+aA3nZ88Fjc8rz5yqG1zZD6xC?=
- =?us-ascii?Q?9F6jvgJR3lCOVKsuthDUcsLNUwCI0fGQklRU0JZoN60mq9sSJ7D6UJ7p+3hh?=
- =?us-ascii?Q?mfzVBAmexp5vOjJcFtjQLQyftDSpmBgiK2lIaqVx6DsjymYozO7c7JI45dLQ?=
- =?us-ascii?Q?Aku0+yEPwbKrsbcUuaRRrr54Ar91gUp4JGZatkAQ1tDbsbrxH+A7bDgzWSGD?=
- =?us-ascii?Q?ewsY2Ky+nl/x5CX/hVm4NFo1FLGbgzknErIhhF8u9kRiE/a5OuRfE+rdaItF?=
- =?us-ascii?Q?jAOUKOa0N5lIPmzFC+rtBrCUl0nnLRPKj11JJ9gHNJhImWl6Mr8RwEQEruEI?=
- =?us-ascii?Q?wXEO0ybPSVgqv8Ra8xMpVKiO/4+Mh0wzLQ/0VUFsyCM6jVi64tvU/nr28TlV?=
- =?us-ascii?Q?MK/CC0VjG3DWbp+i1SBjlFg15AsMpD+LvSVyt8KN8AfN1dHRT0Zueuv8opyy?=
- =?us-ascii?Q?6uZ0s7fcZjh/n2PiW5tNv6BzdRcqYu5l6558+WHjXwWeoYZVENpHWmnWEe0z?=
- =?us-ascii?Q?gz1IDWivzlxykRYqccUsr8AfhSML3f8FKm0mfTpk8Mpha/hBPjOrFlPzl2Z6?=
- =?us-ascii?Q?uwt++nDJ0kwslZwkb44ais0xGFaicXq58KlkZttmqVj8Vls7yrL37LOc27yQ?=
- =?us-ascii?Q?M6QbYDdHSCz2VEHGtLnCjNftDPpzV5fUZjSFL4426AipzehPe/8O0IF4b1nN?=
- =?us-ascii?Q?mf3vgWOXYgwJlGlYmNDtSaj+hLdUD62DLeVhE7ZyLPNFaeI6HBfrn2mfhORl?=
- =?us-ascii?Q?eFxIjVzyOZFNpZoTHZwqcLNFqd10mIKtuYx/c31YDpUgrXgQO1+evnmS3mvx?=
- =?us-ascii?Q?l4QZKvdx+BtAYrHRasUGEJ0HAXlw0x8Ue16b/ImWIAXEbjM/HLFuWy4JuJIS?=
- =?us-ascii?Q?vd4JYMhRrW24GipFiFHU4MXd6oRT9FYihxKIcmEnb48thD3kBOcana6Vp3Tl?=
- =?us-ascii?Q?hidQNE5YUlafj8PxzvHW7xL7v5889aw9F/hN7qw3m5mHKql0sGgHQyApYMbw?=
- =?us-ascii?Q?RgmBq/er0b9PdAbzAhwnYDeWmNz8OwnQlwVLEdSWeniWc1Gz5nZ9PFmF3RsY?=
- =?us-ascii?Q?TNo7IEhHNf08ADiTJygGixwKhZITmGKimCQCdAg8wXNIrBv3utSuqks5K0Iy?=
- =?us-ascii?Q?mM7gNd4i6HNUpXCofj3weRltU3iOoUHJTzDRQhwGzxwUz8qSXQ7JANXcUmA2?=
- =?us-ascii?Q?ByEWqE/JycyfJSvmIxEjpJ+x+mumMVyLYMNXC78uvHniGrxSUSunxijTPU/o?=
- =?us-ascii?Q?iDcfWFkik8ksF1YcKb7NrOfbhmNSl0E1kPt+V2S+cX0E9960BD45kqwfgxkg?=
- =?us-ascii?Q?HD0v67pisj620TnlDYkGXsTFlu8M6rYH87DWD3+e?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ee7c794-761d-4d40-efc2-08dc787e6d04
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR06MB7401.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2024 03:39:17.1493
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VdHBC140FjscUC+x08sOgYh8RFHaeUQe9MhFu6bRHcWBpeKwXwmMyvtHf8Zz2+iSXEq/aJdesiMGIor+ifoSkw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB5023
+X-Received: by 2002:a05:6602:29c1:b0:7d6:5f6:831b with SMTP id
+ ca18e2360f4ac-7e1b51aaa1amr90593039f.1.1716188443485; Mon, 20 May 2024
+ 00:00:43 -0700 (PDT)
+Date: Mon, 20 May 2024 00:00:43 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008ab82a0618dd429f@google.com>
+Subject: [syzbot] [block?] WARNING: locking bug in mempool_alloc
+From: syzbot <syzbot+ed9ea019381af2e78b60@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The depth is 62, and the wake_batch is 8. In the following situation,
-the task would hang forever.
+Hello,
 
-  t1:                 t2:                          t3:
-  blk_mq_get_tag      .                            .
-  io_schedule         .                            .
-                      elevator_switch              .
-                      blk_mq_freeze_queue          .
-                      blk_freeze_queue_start       .
-                      blk_mq_freeze_queue_wait     .
-                                                   blk_mq_submit_bio
-                                                   __bio_queue_enter
+syzbot found the following issue on:
 
-Fix this issue by waking up all the waiters sleeping on tags after
-freezing the queue.
+HEAD commit:    33e02dc69afb Merge tag 'sound-6.10-rc1' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=120186d0980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=39878f1ce91ccfda
+dashboard link: https://syzkaller.appspot.com/bug?extid=ed9ea019381af2e78b60
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
 
-Signed-off-by: Yang Yang <yang.yang@vivo.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-33e02dc6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a7597d9cd2b5/vmlinux-33e02dc6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/93cadb45c580/bzImage-33e02dc6.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ed9ea019381af2e78b60@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+Looking for class "c->lock" with key __key.0, but found a different class "&c->lock" with the same key
+WARNING: CPU: 2 PID: 8623 at kernel/locking/lockdep.c:932 look_up_lock_class+0x133/0x140 kernel/locking/lockdep.c:932
+Modules linked in:
+CPU: 2 PID: 8623 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-07370-g33e02dc69afb #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:look_up_lock_class+0x133/0x140 kernel/locking/lockdep.c:932
+Code: c7 c7 80 bd 2c 8b e8 7c 13 75 f6 90 0f 0b 90 90 90 31 db eb be c6 05 9f 47 ef 04 01 90 48 c7 c7 a0 c0 2c 8b e8 5e 13 75 f6 90 <0f> 0b 90 90 e9 62 ff ff ff 0f 1f 40 00 90 90 90 90 90 90 90 90 90
+RSP: 0018:ffffc900033772c8 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: ffffffff941e3900 RCX: ffffc900078a1000
+RDX: 0000000000040000 RSI: ffffffff81516566 RDI: 0000000000000001
+RBP: ffffffff94ad7a10 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 000000006b6f6f4c R12: ffffe8ffad234c20
+R13: 0000000000000000 R14: 0000000000000000 R15: ffffffff94abfba0
+FS:  0000000000000000(0000) GS:ffff88802c200000(0063) knlGS:00000000f5f19b40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 00000000209fd000 CR3: 000000000062a000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ register_lock_class+0xb1/0x1230 kernel/locking/lockdep.c:1284
+ __lock_acquire+0x111/0x3b30 kernel/locking/lockdep.c:5014
+ lock_acquire kernel/locking/lockdep.c:5754 [inline]
+ lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
+ local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
+ ___slab_alloc+0x73b/0x1810 mm/slub.c:3641
+ __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3682
+ __slab_alloc_node mm/slub.c:3735 [inline]
+ slab_alloc_node mm/slub.c:3908 [inline]
+ kmem_cache_alloc+0x2f3/0x330 mm/slub.c:3925
+ mempool_alloc+0x176/0x390 mm/mempool.c:408
+ bio_alloc_bioset+0x480/0x8b0 block/bio.c:554
+ bch2_direct_write+0x629/0x4310 fs/bcachefs/fs-io-direct.c:624
+ bch2_write_iter+0x10c/0x3180 fs/bcachefs/fs-io-buffered.c:1143
+ call_write_iter include/linux/fs.h:2120 [inline]
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0x6b6/0x1120 fs/read_write.c:590
+ ksys_write+0x12f/0x260 fs/read_write.c:643
+ do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+ __do_fast_syscall_32+0x75/0x120 arch/x86/entry/common.c:386
+ do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+RIP: 0023:0xf7327579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f5f195ac EFLAGS: 00000292 ORIG_RAX: 0000000000000004
+RAX: ffffffffffffffda RBX: 0000000000000008 RCX: 0000000020000200
+RDX: 0000000000044000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000292 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess), 2 bytes skipped:
+   0:	10 06                	adc    %al,(%rsi)
+   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+   6:	10 07                	adc    %al,(%rdi)
+   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+   c:	10 08                	adc    %cl,(%rax)
+   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  1e:	00 51 52             	add    %dl,0x52(%rcx)
+  21:	55                   	push   %rbp
+  22:	89 e5                	mov    %esp,%ebp
+  24:	0f 34                	sysenter
+  26:	cd 80                	int    $0x80
+* 28:	5d                   	pop    %rbp <-- trapping instruction
+  29:	5a                   	pop    %rdx
+  2a:	59                   	pop    %rcx
+  2b:	c3                   	ret
+  2c:	90                   	nop
+  2d:	90                   	nop
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+
+
 ---
- block/blk-core.c | 2 --
- block/blk-mq.c   | 4 +++-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a16b5abdbbf5..e1eacfad6e5b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -298,8 +298,6 @@ void blk_queue_start_drain(struct request_queue *q)
- 	 * prevent I/O from crossing blk_queue_enter().
- 	 */
- 	blk_freeze_queue_start(q);
--	if (queue_is_mq(q))
--		blk_mq_wake_waiters(q);
- 	/* Make blk_queue_enter() reexamine the DYING flag. */
- 	wake_up_all(&q->mq_freeze_wq);
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4ecb9db62337..9eb3139e713a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -125,8 +125,10 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	if (++q->mq_freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
- 		mutex_unlock(&q->mq_freeze_lock);
--		if (queue_is_mq(q))
-+		if (queue_is_mq(q)) {
-+			blk_mq_wake_waiters(q);
- 			blk_mq_run_hw_queues(q, false);
-+		}
- 	} else {
- 		mutex_unlock(&q->mq_freeze_lock);
- 	}
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
