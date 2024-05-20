@@ -1,109 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C4A34CDE;
-	Mon, 20 May 2024 18:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A3D1386A4;
+	Mon, 20 May 2024 18:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716228332; cv=none; b=mIJ//TCFRfpt/Llr38CVwipUOWy5fq9vMLc5BefbH1PHWfNDn/7j3KuMGdKQHp3ypArrC+CzCpJ1ZFllVpPaHil+DRE+K71OUoDER9EXLeij0pTkimvD2j7y8EirfAZDncEhj04aOymOhRq2pwfsvgGhXi4ZvO7qhXxBk0RmohU=
+	t=1716228725; cv=none; b=qN9qvezMez9CEBrcoRpGiY5z70h58Y9rG0vTi0KtZpQx6GOd1YOo/sLeC/qLPW4xexIJKJBgacn7qWpzulmJ++8INxBX3OeT51w0izKMMJTPv6Gst6VY6UyA93c7s5EUqOaNUJb8UY7eaJKxB9gsrWeYoWu2pxdcCWnWev3VvGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716228332; c=relaxed/simple;
-	bh=fe0UcvX4RKyP+54gpQ64qZRY1cISErxtCFj+FyCrqVI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g7DicqGJSnGYwV1rTE5YVnXKomnOToSijEg8urYpzNW3MFtI8APIpwFVxGmgFV+x5AxYdvb94Q+OHYcdwQw/5JeF2ZHlRQPzR+B7B0dIzvn4ZLWfocTEHcxhkyIZ2Dp1KBlBAqa09+82JuWGXb5uD1J7Mxc+/CH1qxOdKPz0F3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tDnSfZn9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716228725; c=relaxed/simple;
+	bh=iocunVnJ+v8ee9GjUVHVr/9dpb1QjxihA8CLfmO9WYA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=t1YO79oxCWF9zIWoqb+PZTOKUTyeSRffSKDggHYn/1sivFjeMrhZI7cbfa173RaBg1cCbgQf6UeklJMldZ45TURGIEc6Gu+BrEZIzrg9TRnc6PAdF90dah3xPyECOXVKW9bS1c+78J5c2nDL8P23A7KXxsyz0iWZS1koQbQBT2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ucF/DqQv; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tDnSfZn9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E39CC2BD10;
-	Mon, 20 May 2024 18:05:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716228332;
-	bh=fe0UcvX4RKyP+54gpQ64qZRY1cISErxtCFj+FyCrqVI=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=tDnSfZn9+DolgC7qHMN7wdeEtzOqkgm1iuWyrvbwsBvH504JRpoeSIo+vcrSGLEFP
-	 3AaGTl2kjDBQdfszqrGVp9DxG4fUCp5ivs54FeOZ9fCoMTOgnGkhQj3qwq0FmoErQY
-	 duP5ZS3JxGW1X/UzybA8+VswOAV98w5oJ6mxwLOGnY09pn9r5iR9DWMwTMm5yKJ7it
-	 ENxht2fwRbFM98LBRPI8CeD7tnyfrlNu2z54wTy43qMqjD0AACt16kDXGqEK4ixjc4
-	 cJzHX7mU1xtHn7UaAaXNwrz5QuM7vyIfM9bqKW7OzO3IfrDLOKKMqJTFdaIbq/KapC
-	 idGAeS01yhWZg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id EAE9DCE0C3C; Mon, 20 May 2024 11:05:31 -0700 (PDT)
-Date: Mon, 20 May 2024 11:05:31 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Marco Elver <elver@google.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, Breno Leitao <leitao@debian.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: Annotate a racy read in blk_do_io_stat()
-Message-ID: <14bb1b20-b03c-45c1-9566-9287eee23c54@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <447ad732-3ff8-40bf-bd82-f7be66899cee@paulmck-laptop>
- <ca7c2ef0-7e21-4fb3-ac6b-3dae652a7a0e@acm.org>
- <59ec96c2-52ce-4da1-92c3-9fe38053cd3d@paulmck-laptop>
- <CANpmjNMj9r1V6Z63fcJxrFC1v4i2vUCEhm1HT77ikxhx0Rghdw@mail.gmail.com>
- <dd251dba-0a63-4b57-a05b-bfa02615fae5@paulmck-laptop>
- <CANpmjNMqRUNUs1mZEhrOSyK0Hk+PdGOi+VAs22qYD+1zTkwfhg@mail.gmail.com>
- <75421237-4c5a-48bc-849e-87a216ee9d32@paulmck-laptop>
- <CANpmjNM-Cg12qCU3WoLeBboogLQVgn4znFerRwD3BVAFMc9BiQ@mail.gmail.com>
- <d9df8351-7cc2-4562-a8b5-440344bfeb91@paulmck-laptop>
- <CANpmjNO+WDF804s49VdCf2=3io5Uh=8ZbM_jiW5j1rcbcONbUA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ucF/DqQv"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VjlyP5bZdz6Cnk8y;
+	Mon, 20 May 2024 18:11:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1716228715; x=1718820716; bh=vmnp8Xofx7aq1MTYbdJagK+2
+	gwvhxTDTz+NZiBzRvgY=; b=ucF/DqQvYsA5WCQX3PdgDO+ASWA5tGo/oNPZc3n4
+	s8U8iXYTMosiePtvrF75C0nhoXkvzMvjYdJrTZPPQaGstg10jJlqsK32dExJcGV3
+	fYnOEOIhWA0Zc1NerLi2xq4qgNhGq3g3ovsmOx1ez1qdCFA6nNKJuqB5X3Y3PfJm
+	muK1EWFbjgbxSbxt7CoGGwFw3L9ejsYRR79GZXZ4ZkBLSNJmXOhQ8Y2AHCR7pRAi
+	bjFhx2JQzpELxVowIA5+fwt6FabhjP1ou8HPVXNpmjrIS83j93QrGqxFMoCDlcJx
+	/hyKoFS51dSHP8xkv9vtDa0XcHPI6Ox0mrKUnI8P3mznLw==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 6T2UuOEIh_Tj; Mon, 20 May 2024 18:11:55 +0000 (UTC)
+Received: from [100.96.154.26] (unknown [104.132.0.90])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VjlyL3yBmz6Cnk8t;
+	Mon, 20 May 2024 18:11:54 +0000 (UTC)
+Message-ID: <24d4d60f-05f3-472b-8dfc-4edcb5f7883c@acm.org>
+Date: Mon, 20 May 2024 11:11:52 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANpmjNO+WDF804s49VdCf2=3io5Uh=8ZbM_jiW5j1rcbcONbUA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] blk-mq: fix potential I/O hang caused by batch wakeup
+To: Yang Yang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240520033847.13533-1-yang.yang@vivo.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240520033847.13533-1-yang.yang@vivo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 16, 2024 at 08:35:02AM +0200, Marco Elver wrote:
-> On Wed, 15 May 2024 at 23:51, Paul E. McKenney <paulmck@kernel.org> wrote:
-> [...]
-> > > And I just checked the current access-marking.txt to see where we
-> > > might add more, and found the section "ACCESS-DOCUMENTATION OPTIONS"
-> > > already exists. I think that section is perfectly reasonable as is,
-> > > and it does explicitly talk about ASSERT_EXCLUSIVE* macros.
-> > >
-> > > Did you want to add it more prominently at the top? If so, maybe a
-> > > brief forward-reference to that section might be helpful.
-> >
-> > How about like this?
-> >
-> > ------------------------------------------------------------------------
-> >
-> > The Linux kernel provides the following access-marking options:
-> >
-> > 1.      Plain C-language accesses (unmarked), for example, "a = b;"
-> >
-> > 2.      Data-race marking, for example, "data_race(a = b);"
-> >
-> > 3.      READ_ONCE(), for example, "a = READ_ONCE(b);"
-> >         The various forms of atomic_read() also fit in here.
-> >
-> > 4.      WRITE_ONCE(), for example, "WRITE_ONCE(a, b);"
-> >         The various forms of atomic_set() also fit in here.
-> >
-> > 5.      __data_racy, for example "int __data_racy a;"
-> >
-> > 6.      KCSAN's negative-marking assertions, ASSERT_EXCLUSIVE_ACCESS()
-> >         and ASSERT_EXCLUSIVE_WRITER(), are desccribed in the
-> >         "ACCESS-DOCUMENTATION OPTIONS" section below.
+On 5/19/24 20:38, Yang Yang wrote:
+> The depth is 62, and the wake_batch is 8. In the following situation,
+> the task would hang forever.
 > 
-> s/desccribed/described/
-
-Good eyes, fixed!
-
-> > ------------------------------------------------------------------------
-> >
-> > Would that work?
+>    t1:                 t2:                          t3:
+>    blk_mq_get_tag      .                            .
+>    io_schedule         .                            .
+>                        elevator_switch              .
+>                        blk_mq_freeze_queue          .
+>                        blk_freeze_queue_start       .
+>                        blk_mq_freeze_queue_wait     .
+>                                                     blk_mq_submit_bio
+>                                                     __bio_queue_enter
 > 
-> It works for me, if we agree that "negative marking" makes sense: if
-> the other markings indicate the access is happening concurrently with
-> others, a negative marking does the opposite.
+> Fix this issue by waking up all the waiters sleeping on tags after
+> freezing the queue.
 
-Very good, I will send this out shortly after v6.10-rc1 comes out and
-let's see where the bikeshedding leads.  ;-)
+Shouldn't blk_mq_alloc_request() be mentioned in t1 since that is the function
+that calls blk_queue_enter()?
 
-							Thanx, Paul
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index a16b5abdbbf5..e1eacfad6e5b 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -298,8 +298,6 @@ void blk_queue_start_drain(struct request_queue *q)
+>   	 * prevent I/O from crossing blk_queue_enter().
+>   	 */
+>   	blk_freeze_queue_start(q);
+> -	if (queue_is_mq(q))
+> -		blk_mq_wake_waiters(q);
+>   	/* Make blk_queue_enter() reexamine the DYING flag. */
+>   	wake_up_all(&q->mq_freeze_wq);
+>   }
+
+Why has blk_queue_start_drain() been modified? I don't see any reference
+in the patch description to blk_queue_start_drain(). Am I perhaps missing
+something?
+
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4ecb9db62337..9eb3139e713a 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -125,8 +125,10 @@ void blk_freeze_queue_start(struct request_queue *q)
+>   	if (++q->mq_freeze_depth == 1) {
+>   		percpu_ref_kill(&q->q_usage_counter);
+>   		mutex_unlock(&q->mq_freeze_lock);
+> -		if (queue_is_mq(q))
+> +		if (queue_is_mq(q)) {
+> +			blk_mq_wake_waiters(q);
+>   			blk_mq_run_hw_queues(q, false);
+> +		}
+>   	} else {
+>   		mutex_unlock(&q->mq_freeze_lock);
+>   	}
+
+Why would the above change be necessary? If the blk_queue_enter() call
+by blk_mq_alloc_request() succeeds and blk_mq_get_tag() calls
+io_schedule(), io_schedule() will be woken up indirectly by the
+blk_mq_run_hw_queues() call because that call will free one of the tags
+that the io_schedule() call is waiting for.
+
+Thanks,
+
+Bart.
