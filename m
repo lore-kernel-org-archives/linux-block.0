@@ -1,360 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44ECF28E7;
-	Mon, 20 May 2024 15:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49D74D9FE;
+	Mon, 20 May 2024 15:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716217211; cv=none; b=o16U9RWi3Yw+1yYU1MiVXS6FlYkICFJ6dGWfyNzDYolzcUT1L9EAzJ3Thac0M+hJYmF+ZDeegpB9P+SCU24sH71QwE90aPGRfyhj6SIBFdFiDTG7rTnA6EpwVe68A6RuhBMeoyR1v6xloqMH65Y3dBMXpkO/NVa+VE/qpWbGOvQ=
+	t=1716217626; cv=none; b=AKev2y48uLW1ARfU6NwgZvPBubE1A28reExGwBpK26N4QmP3NoQZGpzr3G8iIQqpBI0biJSfMBWXn65Wa3AjwcRt5g0M5CRFItuu9id5LjWD5wf8v1Lm/Xp9hXtIRjoaU155LoHoT8BK4rBQetvHZXfWap2B/E374Kz9Oixpa4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716217211; c=relaxed/simple;
-	bh=6RnVIwxpdPu2quHrapU91k6GMCQR93bNvVmrk8LVkS0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AkYHCH1Moa0kiqP9zxJ70pusqJiZcZifYy+cC4n34WuLkrxHb+Rf7raEFAksfh25HBkWhcADc+0ZryKfnPMJfjsnSq/fqXwow0Wu2P0hZBFMB2op2GVcQHCk5xHml3bhp2ioQf+xdI0aXCE6bxrGuIfc5Dg2wL4d8gEqhn4jy6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oF28tbLn; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oF28tbLn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE63C2BD10;
-	Mon, 20 May 2024 15:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716217210;
-	bh=6RnVIwxpdPu2quHrapU91k6GMCQR93bNvVmrk8LVkS0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oF28tbLntmCzHKO6rQoXTZ3wKS2octb5Jh6K7EmZBCBXNUFfb9Nz1Ajdy2nO9Hg6i
-	 XH7BjC2Ird+JGwRVmNhYqZy92ZhQbsr0HNPXjFb0fZLNNC41MVNmz3haLdyF98Qnzj
-	 7RIeTux/Yy0jcBFDHe5A9TzSj/0iWQ9kiXWX0kmAFy12DYxTuJdfnfaIIIoDgrdMzd
-	 ROqbDuj7O5sFlDYxBNYp4yVwskKIQr9qUQc3Bnz14LyBtSwhMAesbcDurXhZ+CwrKz
-	 bMxZchDGqjooqICZYNYs/QGUCBjCyX7PXC5YqgnAi5/S/iRCxQ99JjQCCqClqOpfm4
-	 MoZvH6ZaVtHFA==
-Message-ID: <8f60ed88-1978-4d7c-9149-aee672aa1b09@kernel.org>
-Date: Mon, 20 May 2024 17:00:03 +0200
+	s=arc-20240116; t=1716217626; c=relaxed/simple;
+	bh=ZAmlkD2H/yb/d8FBbvu5IRs6uaEE11WCWhPfXq3NnuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BdNOfiV76mn5Mpi6+ojdDraQgYrRve+bX5X/rv6uAURVCDsTDj2FcGR4VBR/KCVUh+ztV4iVs7TLbVpcaEI2Qa2jiZ/fuSoEwG4YyxdVi6XKAAVI2nERMXkmbSqLjTvgeo+msjsblAIiGsrg5DBPGj7np/rCLepovOyF+B7D96g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 1F90E68AFE; Mon, 20 May 2024 17:06:54 +0200 (CEST)
+Date: Mon, 20 May 2024 17:06:53 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Theodore Ts'o <tytso@mit.edu>, dm-devel@lists.linux.dev,
+	fstests@vger.kernel.org, linux-ext4@vger.kernel.org,
+	regressions@lists.linux.dev, Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org
+Subject: Re: dm: use queue_limits_set
+Message-ID: <20240520150653.GA32461@lst.de>
+References: <20240518022646.GA450709@mit.edu> <ZkmIpCRaZE0237OH@kernel.org> <ZkmRKPfPeX3c138f@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
- and request layer.
-To: Nitesh Shetty <nj.shetty@samsung.com>, Jens Axboe <axboe@kernel.dk>,
- Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Cc: martin.petersen@oracle.com, bvanassche@acm.org, david@fromorbit.com,
- hare@suse.de, damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com,
- joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520102842epcas5p4949334c2587a15b8adab2c913daa622f@epcas5p4.samsung.com>
- <20240520102033.9361-3-nj.shetty@samsung.com>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20240520102033.9361-3-nj.shetty@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkmRKPfPeX3c138f@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 2024/05/20 12:20, Nitesh Shetty wrote:
-> We add two new opcode REQ_OP_COPY_DST, REQ_OP_COPY_SRC.
-> Since copy is a composite operation involving src and dst sectors/lba,
-> each needs to be represented by a separate bio to make it compatible
-> with device mapper.
-
-Why ? The beginning of the sentence isn't justification enough for the two new
-operation codes ? The 2 sentences should be reversed for easier reading:
-justification first naturally leads to the reader understanding why the codes
-are needed.
-
-Also: s/opcode/operations
-
-
-> We expect caller to take a plug and send bio with destination information,
-> followed by bio with source information.
-
-expect ? Plugging is optional. Does copy offload require it ? Please clarify this.
-
-> Once the dst bio arrives we form a request and wait for source
-
-arrives ? You mean "is submitted" ?
-
-s/and wait for/and wait for the
-
-> bio. Upon arrival of source bio we merge these two bio's and send
-
-s/arrival/submission ?
-
-s/of/of the
-s/bio's/BIOs
-s/and send/and send the
-s/down to/down to the
-
-> corresponding request down to device driver.
-> Merging non copy offload bio is avoided by checking for copy specific
-> opcodes in merge function.
-
-Super unclear... What are you trying to say here ? That merging copy offload
-BIOs with other BIOs is not allowed ? That is already handled. Only BIOs &
-requests with the same operation can be merged. The code below also suggests
-that you allow merging copy offloads... So I really do not understand this.
-
+On Sun, May 19, 2024 at 01:42:00AM -0400, Mike Snitzer wrote:
+> > This being one potential fix from code inspection I've done to this
+> > point, please see if it resolves your fstests failures (but I haven't
+> > actually looked at those fstests yet _and_ I still need to review
+> > commits d690cb8ae14bd and 4f563a64732da further -- will do on Monday,
+> > sorry for the trouble):
 > 
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> ---
->  block/blk-core.c          |  7 +++++++
->  block/blk-merge.c         | 41 +++++++++++++++++++++++++++++++++++++++
->  block/blk.h               | 16 +++++++++++++++
->  block/elevator.h          |  1 +
->  include/linux/bio.h       |  6 +-----
->  include/linux/blk_types.h | 10 ++++++++++
->  6 files changed, 76 insertions(+), 5 deletions(-)
+> I looked early, this is needed (max_user_discard_sectors makes discard
+> limits stacking suck more than it already did -- imho 4f563a64732da is
+> worthy of revert.
+
+Can you explain why?  This actually makes the original addition of the
+user-space controlled max discard limit work.  No I'm a bit doubful
+that allowing this control was a good idea, but that ship unfortunately
+has sailed.
+
+Short of that, dm-cache-target.c and possibly other
+> DM targets will need fixes too -- I'll go over it all Monday):
 > 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index ea44b13af9af..f18ee5f709c0 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -122,6 +122,8 @@ static const char *const blk_op_name[] = {
->  	REQ_OP_NAME(ZONE_FINISH),
->  	REQ_OP_NAME(ZONE_APPEND),
->  	REQ_OP_NAME(WRITE_ZEROES),
-> +	REQ_OP_NAME(COPY_SRC),
-> +	REQ_OP_NAME(COPY_DST),
->  	REQ_OP_NAME(DRV_IN),
->  	REQ_OP_NAME(DRV_OUT),
->  };
-> @@ -838,6 +840,11 @@ void submit_bio_noacct(struct bio *bio)
->  		 * requests.
->  		 */
->  		fallthrough;
-> +	case REQ_OP_COPY_SRC:
-> +	case REQ_OP_COPY_DST:
-> +		if (!q->limits.max_copy_sectors)
-> +			goto not_supported;
-> +		break;
->  	default:
->  		goto not_supported;
->  	}
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 8534c35e0497..f8dc48a03379 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -154,6 +154,20 @@ static struct bio *bio_split_write_zeroes(struct bio *bio,
->  	return bio_split(bio, lim->max_write_zeroes_sectors, GFP_NOIO, bs);
->  }
+> diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+> index 4793ad2aa1f7..c196f39579af 100644
+> --- a/drivers/md/dm-thin.c
+> +++ b/drivers/md/dm-thin.c
+> @@ -4099,8 +4099,10 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
 >  
-> +static struct bio *bio_split_copy(struct bio *bio,
-> +				  const struct queue_limits *lim,
-> +				  unsigned int *nsegs)
-> +{
-> +	*nsegs = 1;
-> +	if (bio_sectors(bio) <= lim->max_copy_sectors)
-> +		return NULL;
-> +	/*
-> +	 * We don't support splitting for a copy bio. End it with EIO if
-> +	 * splitting is required and return an error pointer.
-> +	 */
-> +	return ERR_PTR(-EIO);
-> +}
+>  	if (pt->adjusted_pf.discard_enabled) {
+>  		disable_discard_passdown_if_not_supported(pt);
+> -		if (!pt->adjusted_pf.discard_passdown)
+> -			limits->max_discard_sectors = 0;
+> +		if (!pt->adjusted_pf.discard_passdown) {
+> +			limits->max_hw_discard_sectors = 0;
+> +			limits->max_user_discard_sectors = 0;
+> +		}
 
-Hmm... Why not check that the copy request is small enough and will not be split
-when it is submitted ? Something like blk_check_zone_append() does with
-REQ_OP_ZONE_APPEND ? So adding a blk_check_copy_offload(). That would also
-include the limits check from the previous hunk.
+I think the main problem here is that dm targets adjust
+max_discard_sectors diretly instead of adjusting max_hw_discard_sectors.
+Im other words we need to switch all places dm targets set
+max_discard_sectors to use max_hw_discard_sectors instead.  They should
+not touch max_user_discard_sectors ever.
 
-> +
->  /*
->   * Return the maximum number of sectors from the start of a bio that may be
->   * submitted as a single request to a block device. If enough sectors remain,
-> @@ -362,6 +376,12 @@ struct bio *__bio_split_to_limits(struct bio *bio,
->  	case REQ_OP_WRITE_ZEROES:
->  		split = bio_split_write_zeroes(bio, lim, nr_segs, bs);
->  		break;
-> +	case REQ_OP_COPY_SRC:
-> +	case REQ_OP_COPY_DST:
-> +		split = bio_split_copy(bio, lim, nr_segs);
-> +		if (IS_ERR(split))
-> +			return NULL;
-> +		break;
-
-See above.
-
->  	default:
->  		split = bio_split_rw(bio, lim, nr_segs, bs,
->  				get_max_io_size(bio, lim) << SECTOR_SHIFT);
-> @@ -925,6 +945,9 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
->  	if (!rq_mergeable(rq) || !bio_mergeable(bio))
->  		return false;
->  
-> +	if (blk_copy_offload_mergable(rq, bio))
-> +		return true;
-> +
->  	if (req_op(rq) != bio_op(bio))
->  		return false;
->  
-> @@ -958,6 +981,8 @@ enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
->  {
->  	if (blk_discard_mergable(rq))
->  		return ELEVATOR_DISCARD_MERGE;
-> +	else if (blk_copy_offload_mergable(rq, bio))
-> +		return ELEVATOR_COPY_OFFLOAD_MERGE;
->  	else if (blk_rq_pos(rq) + blk_rq_sectors(rq) == bio->bi_iter.bi_sector)
->  		return ELEVATOR_BACK_MERGE;
->  	else if (blk_rq_pos(rq) - bio_sectors(bio) == bio->bi_iter.bi_sector)
-> @@ -1065,6 +1090,20 @@ static enum bio_merge_status bio_attempt_discard_merge(struct request_queue *q,
->  	return BIO_MERGE_FAILED;
->  }
->  
-> +static enum bio_merge_status bio_attempt_copy_offload_merge(struct request *req,
-> +							    struct bio *bio)
-> +{
-> +	if (req->__data_len != bio->bi_iter.bi_size)
-> +		return BIO_MERGE_FAILED;
-> +
-> +	req->biotail->bi_next = bio;
-> +	req->biotail = bio;
-> +	req->nr_phys_segments++;
-> +	req->__data_len += bio->bi_iter.bi_size;
-
-Arg... You seem to be assuming that the source BIO always comes right after the
-destination request... What if copy offloads are being concurrently issued ?
-Shouldn't you check somehow that the pair is a match ? Or are you relying on the
-per-context plugging which prevents that from happening in the first place ? But
-that would assumes that you never ever sleep trying to allocate the source BIO
-after the destination BIO/request are prepared and plugged.
-
-> +
-> +	return BIO_MERGE_OK;
-> +}
-> +
->  static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
->  						   struct request *rq,
->  						   struct bio *bio,
-> @@ -1085,6 +1124,8 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
->  		break;
->  	case ELEVATOR_DISCARD_MERGE:
->  		return bio_attempt_discard_merge(q, rq, bio);
-> +	case ELEVATOR_COPY_OFFLOAD_MERGE:
-> +		return bio_attempt_copy_offload_merge(rq, bio);
->  	default:
->  		return BIO_MERGE_NONE;
->  	}
-> diff --git a/block/blk.h b/block/blk.h
-> index 189bc25beb50..6528a2779b84 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -174,6 +174,20 @@ static inline bool blk_discard_mergable(struct request *req)
->  	return false;
->  }
->  
-> +/*
-> + * Copy offload sends a pair of bio with REQ_OP_COPY_DST and REQ_OP_COPY_SRC
-> + * operation by taking a plug.
-> + * Initially DST bio is sent which forms a request and
-> + * waits for SRC bio to arrive. Once SRC bio arrives
-> + * we merge it and send request down to driver.
-> + */
-> +static inline bool blk_copy_offload_mergable(struct request *req,
-> +					     struct bio *bio)
-> +{
-> +	return (req_op(req) == REQ_OP_COPY_DST &&
-> +		bio_op(bio) == REQ_OP_COPY_SRC);
-> +}
-
-This function is really not needed at all (used in one place only).
-
-> +
->  static inline unsigned int blk_rq_get_max_segments(struct request *rq)
->  {
->  	if (req_op(rq) == REQ_OP_DISCARD)
-> @@ -323,6 +337,8 @@ static inline bool bio_may_exceed_limits(struct bio *bio,
->  	case REQ_OP_DISCARD:
->  	case REQ_OP_SECURE_ERASE:
->  	case REQ_OP_WRITE_ZEROES:
-> +	case REQ_OP_COPY_SRC:
-> +	case REQ_OP_COPY_DST:
->  		return true; /* non-trivial splitting decisions */
-
-See above. Limits should be checked on submission.
-
->  	default:
->  		break;
-> diff --git a/block/elevator.h b/block/elevator.h
-> index e9a050a96e53..c7a45c1f4156 100644
-> --- a/block/elevator.h
-> +++ b/block/elevator.h
-> @@ -18,6 +18,7 @@ enum elv_merge {
->  	ELEVATOR_FRONT_MERGE	= 1,
->  	ELEVATOR_BACK_MERGE	= 2,
->  	ELEVATOR_DISCARD_MERGE	= 3,
-> +	ELEVATOR_COPY_OFFLOAD_MERGE	= 4,
->  };
->  
->  struct blk_mq_alloc_data;
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index d5379548d684..528ef22dd65b 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -53,11 +53,7 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
->   */
->  static inline bool bio_has_data(struct bio *bio)
->  {
-> -	if (bio &&
-> -	    bio->bi_iter.bi_size &&
-> -	    bio_op(bio) != REQ_OP_DISCARD &&
-> -	    bio_op(bio) != REQ_OP_SECURE_ERASE &&
-> -	    bio_op(bio) != REQ_OP_WRITE_ZEROES)
-> +	if (bio && (bio_op(bio) == REQ_OP_READ || bio_op(bio) == REQ_OP_WRITE))
->  		return true;
-
-This change seems completely broken and out of place. This would cause a return
-of false for zone append operations.
-
->  
->  	return false;
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 781c4500491b..7f692bade271 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -342,6 +342,10 @@ enum req_op {
->  	/* reset all the zone present on the device */
->  	REQ_OP_ZONE_RESET_ALL	= (__force blk_opf_t)15,
->  
-> +	/* copy offload src and dst operation */
-
-s/src/source
-s/dst/destination
-s/operation/operations
-
-> +	REQ_OP_COPY_SRC		= (__force blk_opf_t)18,
-> +	REQ_OP_COPY_DST		= (__force blk_opf_t)19,
-> +
->  	/* Driver private requests */
->  	REQ_OP_DRV_IN		= (__force blk_opf_t)34,
->  	REQ_OP_DRV_OUT		= (__force blk_opf_t)35,
-> @@ -430,6 +434,12 @@ static inline bool op_is_write(blk_opf_t op)
->  	return !!(op & (__force blk_opf_t)1);
->  }
->  
-> +static inline bool op_is_copy(blk_opf_t op)
-> +{
-> +	return ((op & REQ_OP_MASK) == REQ_OP_COPY_SRC ||
-> +		(op & REQ_OP_MASK) == REQ_OP_COPY_DST);
-> +}
-
-May be use a switch here to avoid the double masking of op ?
-
-> +
->  /*
->   * Check if the bio or request is one that needs special treatment in the
->   * flush state machine.
-
--- 
-Damien Le Moal
-Western Digital Research
+This is probably my fault, I actually found this right at the time
+of the original revert of switching dm to the limits API, and then
+let it slip as the patch was reverted.  That fact that you readded
+the commit somehow went past my attention window.
 
