@@ -1,204 +1,145 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89318137C42;
-	Mon, 20 May 2024 17:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5B2135A71
+	for <linux-block@vger.kernel.org>; Mon, 20 May 2024 17:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716224432; cv=none; b=S3BrjVJ7mn3gqBBo2qMHMJdyCxjkFhbuN7DuvD/BQQ5pqAIDJOIOTRl4MQAw+6s8y0+rm6o2IbSHEaDg0MTmQZFrkm9BPrXyDvVC00R1cv4ZswHLxvZ5jMrVU5F3HkeCSkFXzQzw9gHdc3RtWWOC9m8M7KLkxdDswvdh5xo4JiY=
+	t=1716225471; cv=none; b=UyBA/mPgd6unjJhfIU4Uq676qsOzh7RzJLfdcRrpfDopzeZyFWmauRK7lwTyNTXj6Ny77zQjffRMxWE4IER1zlnNr2SNc9JhiSPx9+0I0+izJVofRvjPfXOmve04VG66OV891hzW+2GO1L54hW8iKf0GSBaWlB5/vvhWVIV6u2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716224432; c=relaxed/simple;
-	bh=JGYB2S6yTcgO2d865g5dJ9N3Cr0pfgIfMlJ+HBoWHqM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VYtdV02YBeJhOTGtsQut8Tabp9pPO7mEmxpW4emJNTgQPLCQHoso12bTQRjEKh+Nr1oorODmgTraPRlFoHF0KH//P8VsYAhlOZVH2VC9A2GSkjh8LjE4WpEsx1lGVO7v7FujvZwr73bRa9znx8j9w1B1gIktIoVG/y0tq4Vd0II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ju26hfmW; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ju26hfmW"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4VjkMr2SKzzlgT1M;
-	Mon, 20 May 2024 17:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1716224419; x=1718816420; bh=vKr+u0Wv7UNQpsfIGSaoT6+D
-	nTw+Zuk0k0HaxCTxkh0=; b=ju26hfmWvh+lMdtwq5Ass4+hGfqL7MqGFMp7yoAC
-	0WiBc8gVrWTyay2JvLCyFFnrYW3r45ENRYp8A8aqf5jrCdxLvxru+LBKFjwZ4c6u
-	0QdEdK+qNILyEpnWVBldh1/FrEnLJQwldYT5Ojdm5bD3AqfN4GOsz17vYviOYAk9
-	0bem7bz0Ei4XVEX5/fvF15szxxaHJHCZDvs3kdW97zmbESolR3gjy9+VaOlcmHz0
-	Ur5+MlHhRi2RFsQpif4WCceE1JxCisIjw7S534NU7m3fvwhkcZqjnubwfKxKH1tl
-	UhCs/8c/WZYwEr8jQLYhIQsZFAEv9buxfPC6Lw6PAHCOBw==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id uCTKBezyTx6O; Mon, 20 May 2024 17:00:19 +0000 (UTC)
-Received: from [100.96.154.26] (unknown [104.132.0.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4VjkMj5yN1zlgT1K;
-	Mon, 20 May 2024 17:00:17 +0000 (UTC)
-Message-ID: <55e8c5f0-d80b-49a8-8026-4e5a25290fa7@acm.org>
-Date: Mon, 20 May 2024 10:00:14 -0700
+	s=arc-20240116; t=1716225471; c=relaxed/simple;
+	bh=8Ey01W3TWy3+gnWNHRxVsreKBzXGp/Fzi06llfcCTYA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jimGcoMNqKf8EFKr/2ik17VMfsRWB+my85s/aAGwcnN0+iKUKWma7kzy5tqXiw/yTH8oBRjSwT9nW/CZu40ZxVR2RheJ2MWLV9VzXe/ems/yQAnIIWMNLt4EY3sZgFD6bdqUt2MwbsecxvMGcQo3ZJe+fXu6OphTugDm4eAVrjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5b53bb4bebaso230370eaf.0
+        for <linux-block@vger.kernel.org>; Mon, 20 May 2024 10:17:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716225469; x=1716830269;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b9qfg2yY+aMu5/VkyPP4w1KWCmXu9VzHzd1XZC4MYQM=;
+        b=Ttzxb+pPr9EsellCZkWhUAL4/r2uQsFv8miYmJhTruEnuYRrLz9XiV89zEVzN+dIrg
+         NbE1psRvLBubWbzXkraijNDkkN+pa7pK2upMsSJ1e3Pt6jL2Z940bWvVCR7AHIaidmoB
+         Pa47Ct/IupUrfB5i+MvOIEW1LDxHljbBCaSr+XB8L2adtaxaL1RKLNs4gMBWhDq7J3SF
+         vMqLVPKAPH5gfXZ3/SMfg9cyrd/LPASia7NnWrk0Nl/LWsJzAgSFIQM5I+4zpdcOGCKp
+         2ageYFYZAyyjLZ7KCu5CQMo8QHLSMXUeZOA4eirxQEMzzJMr5gq+JPO5yaRsfbLN0iQn
+         KabA==
+X-Forwarded-Encrypted: i=1; AJvYcCW68Z7Wy6hXfQg7KfIf9k2uSAEDDF77uD5vs/Y4u84xXw3/zIVB7RatzB+VGDXnbMFllfWqOuzYIPESDDeIe7N4l2a8ada1ff8yBuU=
+X-Gm-Message-State: AOJu0YxXiH9K/CO49316ue65LQSLHXZDRazlCtz7WCjx28cen4+lblK1
+	e8HNRRZPjltl8iHHev8fBPNarFLanKeIt6SXCflYM2+Mu1FW9w3JQzkJVaOUryA=
+X-Google-Smtp-Source: AGHT+IGOQ4OQGxkNfsshJaLNjEfIH76m2IGPnMddp7gaSVxhNmrS/aA7yI7pZ70kNwz5B3/MuQaylg==
+X-Received: by 2002:a05:6359:5a8c:b0:192:4bf2:a397 with SMTP id e5c5f4694b2df-193bb64d50cmr2918493755d.17.1716225468732;
+        Mon, 20 May 2024 10:17:48 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e0bf64844sm121731321cf.62.2024.05.20.10.17.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 May 2024 10:17:48 -0700 (PDT)
+Date: Mon, 20 May 2024 13:17:46 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Theodore Ts'o <tytso@mit.edu>, dm-devel@lists.linux.dev,
+	fstests@vger.kernel.org, linux-ext4@vger.kernel.org,
+	regressions@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: dm: use queue_limits_set
+Message-ID: <ZkuFuqo3dNw8bOA2@kernel.org>
+References: <20240518022646.GA450709@mit.edu>
+ <ZkmIpCRaZE0237OH@kernel.org>
+ <ZkmRKPfPeX3c138f@kernel.org>
+ <20240520150653.GA32461@lst.de>
+ <ZktuojMrQWH9MQJO@kernel.org>
+ <20240520154425.GB1104@lst.de>
+ <ZktyTYKySaauFcQT@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] nbd: Fix signal handling
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Josef Bacik <jbacik@fb.com>, Yu Kuai <yukuai3@huawei.com>,
- Markus Pargmann <mpa@pengutronix.de>, stable@vger.kernel.org
-References: <20240510202313.25209-1-bvanassche@acm.org>
- <20240510202313.25209-6-bvanassche@acm.org> <20240520124137.GA30199@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240520124137.GA30199@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZktyTYKySaauFcQT@kernel.org>
 
-On 5/20/24 05:41, Christoph Hellwig wrote:
-> On Fri, May 10, 2024 at 01:23:13PM -0700, Bart Van Assche wrote:
->> Both nbd_send_cmd() and nbd_handle_cmd() return either a negative error
->> number or a positive blk_status_t value.
+[replying for completeness to explain what I think is happening for
+the issue Ted reported]
+
+On Mon, May 20, 2024 at 11:54:53AM -0400, Mike Snitzer wrote:
+> On Mon, May 20, 2024 at 05:44:25PM +0200, Christoph Hellwig wrote:
+> > On Mon, May 20, 2024 at 11:39:14AM -0400, Mike Snitzer wrote:
+> > > That's fair.  My criticism was more about having to fix up DM targets
+> > > to cope with the new normal of max_discard_sectors being set as a
+> > > function of max_hw_discard_sectors and max_user_discard_sectors.
+> > > 
+> > > With stacked devices in particular it is _very_ hard for the user to
+> > > know their exerting control over a max discard limit is correct.
+> > 
+> > The user forcing a limit is always very sketchy, which is why I'm
+> > not a fan of it.
+> > 
+> > > Yeah, but my concern is that if a user sets a value that is too low
+> > > it'll break targets like DM thinp (which Ted reported).  So forcibly
+> > > setting both to indirectly set the required max_discard_sectors seems
+> > > necessary.
+
+Could also be that a user sets the max discard too large (e.g. larger
+than thinp's BIO_PRISON_MAX_RANGE).
+
+> > Dm-think requiring a minimum discard size is a rather odd requirement.
+> > Is this just a debug asswert, or is there a real technical reason
+> > for it?  If so we can introduce a now to force a minimum size or
+> > disable user setting the value entirely. 
 > 
-> Eww.  Please split these into separate values instead.  There is a reason
-> why blk_status_t is a separate type with sparse checks, and drivers
-> really shouldn't do avoid with that for a tiny micro-optimization of
-> the calling convention (if this even is one and not just the driver
-> being sloppy).
+> thinp's discard implementation is constrained by the dm-bio-prison's
+> constraints.  One of the requirements of dm-bio-prison is that a
+> discard not exceed BIO_PRISON_MAX_RANGE.
+> 
+> My previous reply is a reasonible way to ensure best effort to respect
+> a users request but that takes into account the driver provided
+> discard_granularity.  It'll force suboptimal (too small) discards be
+> issued but at least they'll cover a full thinp block.
 
-How about the (untested) patch below?
+Given below, this isn't at the heart of the issue Ted reported.  So
+the change to ensure max_discard_sectors is a factor of
+discard_granularity, while worthwhile, isn't critical to fixing the
+reported issue.
 
-Thanks,
+> > > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+> > > index 4793ad2aa1f7..c196f39579af 100644
+> > > --- a/drivers/md/dm-thin.c
+> > > +++ b/drivers/md/dm-thin.c
+> > > @@ -4497,7 +4499,8 @@ static void thin_io_hints(struct dm_target *ti, struct queue_limits *limits)
+> > >  
+> > >  	if (pool->pf.discard_enabled) {
+> > >  		limits->discard_granularity = pool->sectors_per_block << SECTOR_SHIFT;
+> > > -		limits->max_discard_sectors = pool->sectors_per_block * BIO_PRISON_MAX_RANGE;
+> > > +		limits->max_hw_discard_sectors = limits->max_user_discard_sectors =
+> > > +			pool->sectors_per_block * BIO_PRISON_MAX_RANGE;
+> > >  	}
+> > 
+> > Drivers really have no business setting max_user_discard_sector,
+> > the whole point of the field is to separate device/driver capabilities
+> > from user policy.  So if dm-think really has no way of handling
+> > smaller discards, we need to ensure they can't be set.
+> 
+> It can handle smaller so long as they respect discard_granularity.
+> 
+> > I'm also kinda curious what actually sets a user limit in Ted's case
+> > as that feels weird.
+> 
+> I agree, not sure... maybe the fstests is using the knob?
 
-Bart.
+Doubt there was anything in fstests setting max discard user limit
+(max_user_discard_sectors) in Ted's case. blk_set_stacking_limits()
+sets max_user_discard_sectors to UINT_MAX, so given the use of
+min(lim->max_hw_discard_sectors, lim->max_user_discard_sectors) I
+suspect blk_stack_limits() stacks up max_discard_sectors to match the
+underlying storage's max_hw_discard_sectors.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 22a79a62cc4e..4ee76c39e3a5 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -588,11 +588,17 @@ static inline int was_interrupted(int result)
-  	return result == -ERESTARTSYS || result == -EINTR;
-  }
+And max_hw_discard_sectors exceeds BIO_PRISON_MAX_RANGE, resulting in
+dm_cell_key_has_valid_range() triggering on:
+WARN_ON_ONCE(key->block_end - key->block_begin > BIO_PRISON_MAX_RANGE)
 
-+struct send_res {
-+	int result;
-+	blk_status_t status;
-+};
-+
-  /*
-   * Returns BLK_STS_RESOURCE if the caller should retry after a delay. Returns
-   * -EAGAIN if the caller should requeue @cmd. Returns -EIO if sending failed.
-   */
--static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-+static struct send_res nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
-+				    int index)
-  {
-  	struct request *req = blk_mq_rq_from_pdu(cmd);
-  	struct nbd_config *config = nbd->config;
-@@ -614,13 +620,13 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-
-  	type = req_to_nbd_cmd_type(req);
-  	if (type == U32_MAX)
--		return -EIO;
-+		return (struct send_res){ .result = -EIO };
-
-  	if (rq_data_dir(req) == WRITE &&
-  	    (config->flags & NBD_FLAG_READ_ONLY)) {
-  		dev_err_ratelimited(disk_to_dev(nbd->disk),
-  				    "Write on read-only\n");
--		return -EIO;
-+		return (struct send_res){ .result = -EIO };
-  	}
-
-  	if (req->cmd_flags & REQ_FUA)
-@@ -674,11 +680,11 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-  				nsock->sent = sent;
-  			}
-  			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
--			return (__force int)BLK_STS_RESOURCE;
-+			return (struct send_res){ .status = BLK_STS_RESOURCE };
-  		}
-  		dev_err_ratelimited(disk_to_dev(nbd->disk),
-  			"Send control failed (result %d)\n", result);
--		return -EAGAIN;
-+		return (struct send_res){ .result = -EAGAIN };
-  	}
-  send_pages:
-  	if (type != NBD_CMD_WRITE)
-@@ -715,12 +721,14 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-  					nsock->pending = req;
-  					nsock->sent = sent;
-  					set_bit(NBD_CMD_REQUEUED, &cmd->flags);
--					return (__force int)BLK_STS_RESOURCE;
-+					return (struct send_res){
-+						.status = BLK_STS_RESOURCE
-+					};
-  				}
-  				dev_err(disk_to_dev(nbd->disk),
-  					"Send data failed (result %d)\n",
-  					result);
--				return -EAGAIN;
-+				return (struct send_res){ .result = -EAGAIN };
-  			}
-  			/*
-  			 * The completion might already have come in,
-@@ -737,7 +745,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-  	trace_nbd_payload_sent(req, handle);
-  	nsock->pending = NULL;
-  	nsock->sent = 0;
--	return 0;
-+	return (struct send_res){};
-  }
-
-  static int nbd_read_reply(struct nbd_device *nbd, struct socket *sock,
-@@ -1018,7 +1026,8 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *cmd, int index)
-  	struct nbd_device *nbd = cmd->nbd;
-  	struct nbd_config *config;
-  	struct nbd_sock *nsock;
--	int ret;
-+	struct send_res send_res;
-+	blk_status_t ret;
-
-  	lockdep_assert_held(&cmd->lock);
-
-@@ -1076,14 +1085,15 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *cmd, int index)
-  	 * Some failures are related to the link going down, so anything that
-  	 * returns EAGAIN can be retried on a different socket.
-  	 */
--	ret = nbd_send_cmd(nbd, cmd, index);
--	/*
--	 * Access to this flag is protected by cmd->lock, thus it's safe to set
--	 * the flag after nbd_send_cmd() succeed to send request to server.
--	 */
--	if (!ret)
-+	send_res = nbd_send_cmd(nbd, cmd, index);
-+	ret = send_res.result < 0 ? BLK_STS_IOERR : send_res.status;
-+	if (ret == BLK_STS_OK) {
-+		/*
-+		 * cmd->lock is held. Hence, it's safe to set this flag after
-+		 * nbd_send_cmd() succeeded sending the request to the server.
-+		 */
-  		__set_bit(NBD_CMD_INFLIGHT, &cmd->flags);
--	else if (ret == -EAGAIN) {
-+	} else if (send_res.result == -EAGAIN) {
-  		dev_err_ratelimited(disk_to_dev(nbd->disk),
-  				    "Request send failed, requeueing\n");
-  		nbd_mark_nsock_dead(nbd, nsock, 1);
-@@ -1093,7 +1103,7 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *cmd, int index)
-  out:
-  	mutex_unlock(&nsock->tx_lock);
-  	nbd_config_put(nbd);
--	return ret < 0 ? BLK_STS_IOERR : (__force blk_status_t)ret;
-+	return ret;
-  }
-
-  static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
-
+Mike
