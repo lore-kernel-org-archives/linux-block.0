@@ -1,96 +1,143 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0F3C2E9
-	for <linux-block@vger.kernel.org>; Tue, 21 May 2024 02:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2864DDDD7
+	for <linux-block@vger.kernel.org>; Tue, 21 May 2024 02:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716257806; cv=none; b=VyswObQiljTXnfeqprK/RXhJ2KC2KDVbEOiNqX4cQ2tA+W820StLmFhi31sX9qyG0ZVT3CKMG1FkL18sXWwJQuA6vuCcnAduV+DBlIQfdWEo8b3OP5K7o4Whx/68FGiNVr+e+vozcVjT33ID2l76R4IJ4sQE26TJgr45hjNJLS8=
+	t=1716260309; cv=none; b=fHm61XnTYfZOP+WBujeW0GFpp5TI9ikg9alWnMqnjjtH2gDLuwWRwSG5FwCc9rQ3PgPIw4nTYsOTKzxzsq/bTyT+jYr/h7/hjdinfXqQ/wMpNXxh4sygMdsLgDdf+Rzwo9qU7FOF41Wnu2YwAWC40BVIrMUoGTt6krqWyde3SzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716257806; c=relaxed/simple;
-	bh=eKnpfxvDaYq+DwDZHBRUy+U6nOAfeD0uRw7ixhZoG2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z36DW3KQBWry8VyMOPrEFMfvd71VIgTTw/sV9xzEpomxs5PXxo8VkwUnCWHlwf6DxKhZBupQZ/BNuD/QyXXEFhgUct/g/diGBY57oEAAbk16vgCq6rTTjBuPZoWGHCPmNufSGyPIgibTE0z9G/mK3TyuH6CzsjtrIv6j9LaFyhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CCqbyM/9; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1716260309; c=relaxed/simple;
+	bh=8CAEzE8UwTJrfsu+0ZWuR33SWmuDxMlc70dhFiUwbuI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J7XRJSJasElsl742fwiaxpzxVCTQaoJzRa2pXkxRNeHbU8PP7MygYLCTPpNRYiu6T4JxKbTtEjNibgXOjS0nI+JHa4SGkpR1mizmyEhS4rkFUsKgXc37h+1a3uxx1335b8jPQibNrSDq82L+W2YsYhNqPtEiBwxrUEZl/Tz81nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i2yF/WBo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CCqbyM/9"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e5c7dfe277so5581845ad.1
-        for <linux-block@vger.kernel.org>; Mon, 20 May 2024 19:16:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716257803; x=1716862603; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0mkKTqOw+p2imSeScmeiyaYB3xUiHp3oIcyaShivtNk=;
-        b=CCqbyM/9uypoiaIUJUofXRYZNTejU3BvEfuh2ORRc+IyH5Xf7YC3ZN3ot05kgZT1SL
-         oMV9xdr7Xo4F8r3evT+7w5LnXYk+/jtt4xUx2cAwF22UI0w+SK+lYmkxzSuJopOPztOp
-         7KCc8wV/INVQqGbIAqgZUsHeyLfdM/u0na4q2QuiJSGYB1xxpbMJSynbBn02JLS8ZHJy
-         nes02X8uWqWa/FiVEBhrNME/Tm1gUKPjo/ECBABakygfboV3cNZEsDhHtQjrZ6a658UN
-         hrIZpGprZA061l00vsvv5pb4DzuqXvxK2NAqxfUp9FxbVvX6WqO3jvn9sJqnVCQ5a/XV
-         Gd1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716257803; x=1716862603;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0mkKTqOw+p2imSeScmeiyaYB3xUiHp3oIcyaShivtNk=;
-        b=jK3X2rmZ1WvbsZ9tXSx5UZmCG3di/fav79DNipiihCuP9XHHAf42DGUAxoOOU6dEIH
-         Jo4ZD9eFQ7RjMceuk8EIxcsCf/hbAAnltXqGpBAVU+QNLAwdnb6j5g0OiYeRcVr0sKhb
-         L1iRe/bNykZQQ4Qs3OP31lMzG6lOon9atw7G4V6wpNFc4rYhtkAwONY5YJYBbT73idS5
-         6zIxbBTLZUvbfnGRbjJ+zsIKm+M84u18DHSXZt4YfcSoI1yQl7CgWjRWAV00kYSiGoRP
-         rNnnEDPdHt7E2Jban4i8RidGauxF4KAbPGU2ry2akGNgW2RvQR4UuU7O40fxxYIRCABO
-         cqnw==
-X-Gm-Message-State: AOJu0Yz5t90wLyXUmn80Vw+KQyWs2FPAoT9WU1dWWzo40JzFyIkJ47P+
-	7gKvH1IekJWBqL48lWk6Ug/SK31AykvJ6PSmiUtRF/0LXEGYl/libk5rgQVXekw=
-X-Google-Smtp-Source: AGHT+IG+ljMqQiJsntMg0IA+jPL3/O9ib+aSj/rx6/n7y5iVi7EkelHQkD9oXGx1+ihOevGAFZJxJw==
-X-Received: by 2002:a05:6a21:329d:b0:1af:a5e8:d184 with SMTP id adf61e73a8af0-1afde224bd1mr34072911637.5.1716257803584;
-        Mon, 20 May 2024 19:16:43 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b628861725sm24825245a91.22.2024.05.20.19.16.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 May 2024 19:16:42 -0700 (PDT)
-Message-ID: <8b4f7d90-05d9-4245-889f-64c86bd81e98@kernel.dk>
-Date: Mon, 20 May 2024 20:16:41 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i2yF/WBo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716260307;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BIEH28unuZSbFltUlDuF3nm0O0I68xphDIs4SX1Zj3I=;
+	b=i2yF/WBoHXh/x5GHyg6MACUbHqv6GHAqOr+agol6r5C6QXtQnQiLqV41O1XqJRYPYeZVBY
+	Y/+ohQy/NuzUwowncCCCYOe71bh/qgjNc1d2WNRHipME184Sb4eP0Lm+jM/K3ja3DTrlGJ
+	Q7Us/w/zqN+L5AIsUSI9n7yOQmsVbec=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-wbc8xyKHMHaFFVGGzLqHQg-1; Mon, 20 May 2024 22:58:23 -0400
+X-MC-Unique: wbc8xyKHMHaFFVGGzLqHQg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42917101A525;
+	Tue, 21 May 2024 02:58:23 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.24])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AAEB62026D68;
+	Tue, 21 May 2024 02:58:19 +0000 (UTC)
+Date: Tue, 21 May 2024 10:58:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
+	Kevin Wolf <kwolf@redhat.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V3 5/9] io_uring: support SQE group
+Message-ID: <ZkwNxxUM7jqzpqgg@fedora>
+References: <20240511001214.173711-1-ming.lei@redhat.com>
+ <20240511001214.173711-6-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] Internal error isnullstartblock(got.br_startblock) a
- t line 6005 of file fs/xfs/libxfs/xfs_bmap.c.
-To: Guangwu Zhang <guazhang@redhat.com>, Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- fstests@vger.kernel.org
-References: <CAGS2=Ypq9_X23syZw8tpybjc_hPk7dQGqdYNbpw0KKN1A1wbNA@mail.gmail.com>
- <ZktnrDCSpUYOk5xm@infradead.org>
- <CAGS2=YqCD15RVtZ=NWVjPMa22H3wks1z6TSMVk7jmE_k1A-csg@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAGS2=YqCD15RVtZ=NWVjPMa22H3wks1z6TSMVk7jmE_k1A-csg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240511001214.173711-6-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On 5/20/24 7:05 PM, Guangwu Zhang wrote:
-> yes,
-> the branch header info.
-> commit 04d3822ddfd11fa2c9b449c977f340b57996ef3d
-> Merge: 59ef81807482 7b815817aa58
-> Author: Jens Axboe <axboe@kernel.dk>
-> Date:   Fri May 17 09:40:38 2024 -0600
+On Sat, May 11, 2024 at 08:12:08AM +0800, Ming Lei wrote:
+> SQE group is defined as one chain of SQEs starting with the first SQE that
+> has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+> doesn't have it set, and it is similar with chain of linked SQEs.
 > 
->     Merge branch 'block-6.10' into for-next
+> Not like linked SQEs, each sqe is issued after the previous one is completed.
+> All SQEs in one group are submitted in parallel, so there isn't any dependency
+> among SQEs in one group.
 > 
->     * block-6.10:
->       blk-mq: add helper for checking if one CPU is mapped to specified hctx
+> The 1st SQE is group leader, and the other SQEs are group member. The whole
+> group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
+> the two flags are ignored for group members.
+> 
+> When the group is in one link chain, this group isn't submitted until the
+> previous SQE or group is completed. And the following SQE or group can't
+> be started if this group isn't completed. Failure from any group member will
+> fail the group leader, then the link chain can be terminated.
+> 
+> When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
+> previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
+> group leader only, we respect IO_DRAIN by always completing group leader as
+> the last one in the group.
+> 
+> Working together with IOSQE_IO_LINK, SQE group provides flexible way to
+> support N:M dependency, such as:
+> 
+> - group A is chained with group B together
+> - group A has N SQEs
+> - group B has M SQEs
+> 
+> then M SQEs in group B depend on N SQEs in group A.
+> 
+> N:M dependency can support some interesting use cases in efficient way:
+> 
+> 1) read from multiple files, then write the read data into single file
+> 
+> 2) read from single file, and write the read data into multiple files
+> 
+> 3) write same data into multiple files, and read data from multiple files and
+> compare if correct data is written
+> 
+> Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
+> extend sqe->flags with one uring context flag, such as use __pad3 for
+> non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
+> 
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Doesn't reproduce for me, with many loops on either nvme or SCSI. You seem
-to be using loop, can you please include some more details on your setup?
+BTW, I wrote one link-grp-cp.c liburing/example which is based on sqe group,
+and keep QD not changed, just re-organize IOs in the following ways:
 
--- 
-Jens Axboe
+- each group have 4 READ IOs, linked by one single write IO for writing
+  the read data in sqe group to destination file
 
+- the 1st 12 groups have (4 + 1) IOs, and the last group have (3 + 1)
+  IOs
+
+
+Run the example for copying two block device(from virtio-blk to
+virtio-scsi in my test VM):
+
+1) buffered copy:
+- perf is improved by 5%
+
+2) direct IO mode
+- perf is improved by 27%
+
+
+[1] link-grp-cp.c example
+
+https://github.com/ming1/liburing/commits/sqe_group_v2/
+
+
+[2] one bug fixes(top commit) against V3
+
+https://github.com/ming1/linux/commits/io_uring_sqe_group_v3/
+
+
+
+Thanks,
+Ming
 
