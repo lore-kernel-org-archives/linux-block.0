@@ -1,177 +1,116 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4275148822;
-	Tue, 21 May 2024 22:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936FF36134
+	for <linux-block@vger.kernel.org>; Tue, 21 May 2024 23:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716331383; cv=none; b=pkMKBCMEKsmMZChjOb2jolKBXzn2TURv1NnqfjtrIjJRuaj2HkWuxMESrmkEXaCvAjWVVNdiS6ytziE7L0NGJIHRjrUYKYdRYUQCEOgBHOlafiBhGBG9Mmp6hHyAgfVRamECX14/KXsJxfgsR3OKDhDiHdQEoUxb3wKVGnD8rhQ=
+	t=1716333573; cv=none; b=ri3X6YMvlkSpIHDbvuxK9+OeXF3TrWKzvgKs/xTN+Zn5boyToNTNg1MtOKa2PVthcMd+weyCowlcA5nGGSSHVGeb7hB8UBgV9zjEvYaWje2+u3OTQ1s/pPTfMQOcPjgxHKx4b+8NJBmPm1qrMCw0OzWfhOKawgv7bDl93mxPmOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716331383; c=relaxed/simple;
-	bh=HOlB3ZecCxj8ivbGAJlk8GYdk2c092iUpt0dBwX1EM4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jLfZCrboj4gzlzgTEoPzP7vsqTMvVuUIsk0Af/j+oicuDSq1ogwzdjro7KUL4z27xpKJSRJJbIdXj9Uw1skOWCK3em8+j6pCbsIKAJO5enhwzUe+YInBFYEnRVUSemfUrqBVfWyaJmDoOREhW7HPviYONbf+ryKEo4F0q5uon+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Wqcd3Tfh; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Wqcd3Tfh"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44LJi2QT005412;
-	Tue, 21 May 2024 22:42:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-11-20; bh=h/aKpvCUkFlWxbtyI98X6dTGVAY7OaogODfh6KxYNpc=;
- b=Wqcd3TfheJF5SSeh5aaZMa7RbO6S7fc7lsIC8PwrzNg9Ku+NA+zFYnyZiUrb2uokpnY5
- RwxKz+2892fyXwzXEI63Xe+Ejre3CFWYVBB5S71sgJJuB/4GhedXRW8XR9FAFHwhypfc
- 7QzAIxpWJl6t9mnNnPmRWF64BhfhmX1NB7vwaVZH1Qg32/EV7FWR41dR7ZMkBzdj6fBU
- +VJTxsM+DP0nqtpgzhPZ6fyClyxmKsVGCxxjmkdPaFmiei+pLWkX0/8EJRXzmEhIClE/
- 1TpdVD+UUC4XzYN06PwDbonLR1rZQZDEDKnbUWn2qFr7fYPxts5/v/R2bdQTw9Qmfr/J 2g== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3y6kxv6hys-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 May 2024 22:42:50 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44LLIjjr019519;
-	Tue, 21 May 2024 22:42:50 GMT
-Received: from gms-lo-open-test.osdevelopmeniad.oraclevcn.com (gms-lo-open-test.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.255.129])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3y6js8ef4q-1;
-	Tue, 21 May 2024 22:42:50 +0000
-From: Gulam Mohamed <gulam.mohamed@oracle.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: axboe@kernel.dk, shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com,
-        hch@lst.de
-Subject: [PATCH V2 for-6.10/block 1/2] loop: Fix a race between loop detach and loop open
-Date: Tue, 21 May 2024 22:42:48 +0000
-Message-Id: <20240521224249.7389-1-gulam.mohamed@oracle.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1716333573; c=relaxed/simple;
+	bh=uok8ci7oRP3MNHrXIWln3P2ERxY4MQe+7vIO5pahGEs=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=e7balHv8WU4gWLaboxPDlnyAaxZscbaMtwZ7oQI4om4zp1xx8IQNvCgHiUIVVASr5H9b23ghk7FltldSr5FTkX2uWNd7g66VZUbdTarsa4lVbC2tv4bYNb5Jw53GaLDvuLtYSy1IcyaDak/cE0ZIlaI4cbDACqDwzxVH8p7Qdyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id 7750485;
+	Tue, 21 May 2024 16:19:26 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id TDTdmSp48eMn; Tue, 21 May 2024 16:19:22 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.ewheeler.net (Postfix) with ESMTPSA id 1862440;
+	Tue, 21 May 2024 16:19:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 1862440
+Date: Tue, 21 May 2024 16:19:22 -0700 (PDT)
+From: Eric Wheeler <dm-devel@lists.ewheeler.net>
+To: Hannes Reinecke <hare@suse.de>
+cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: Kernel namespaces for device mapper targets and block devices?
+In-Reply-To: <5fc134e0-6f9b-4f87-8dea-ba929bf1e91d@suse.de>
+Message-ID: <10a92e14-70f5-e3c8-dd75-532c35d51d13@ewheeler.net>
+References: <61c1fff7-b5ff-dfdd-62c1-506e055ae5e@ewheeler.net> <a3d8bab5-9293-4765-b202-d2bbecaa1f63@suse.de> <f55c2eb7-eb6d-3f95-b2c8-a28e9447e570@ewheeler.net> <5fc134e0-6f9b-4f87-8dea-ba929bf1e91d@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-21_14,2024-05-21_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- adultscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405210172
-X-Proofpoint-GUID: 0bLT9saxes5WIghY_9ks7iWIe4Q4ii7U
-X-Proofpoint-ORIG-GUID: 0bLT9saxes5WIghY_9ks7iWIe4Q4ii7U
+Content-Type: multipart/mixed; boundary="8323328-1834047648-1716333562=:9489"
 
-Description
-===========
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-1. Userspace sends the command "losetup -d" which uses the open() call
-   to open the device
-2. Kernel receives the ioctl command "LOOP_CLR_FD" which calls the
-   function loop_clr_fd()
-3. If LOOP_CLR_FD is the first command received at the time, then the
-   AUTOCLEAR flag is not set and deletion of the
-   loop device proceeds ahead and scans the partitions (drop/add
-   partitions)
+--8323328-1834047648-1716333562=:9489
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-	if (disk_openers(lo->lo_disk) > 1) {
-		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
-		loop_global_unlock(lo, true);
-		return 0;
-	}
+On Sun, 19 May 2024, Hannes Reinecke wrote:
+> On 5/18/24 00:04, Eric Wheeler wrote:
+> > On Fri, 17 May 2024, Hannes Reinecke wrote:
+> > 
+> >> On 5/17/24 02:18, Eric Wheeler wrote:
+> >>> Hello everyone,
+> >>>
+> >>> Is there any work being done on namespaces for device-mapper targets, or
+> >>> for the block layer in general?
+> >>>
+> >>> For example, namespaces could make `dmsetup table` or `losetup -a` see
+> >>> only devices mapped in that name space. I found this article from to 2013,
+> >>> but it is quite old:
+> >>>   https://lwn.net/Articles/564854/
+> >>>
+> >>> If you know any more recent work on the topic that I would be interested.
+> >>> Thank you for help!
+> >>>
+> >> It is on my to-do list.
+> >> We sure should work on that one.
+> > 
+> > How you envision hooking namespaces into the block layer?
+> > 
+> Overall idea is to inherit devices from the original namespace.
+> - upon creation the new namespace inherits all devices from the
+>   original ns.
 
- 4. Before scanning partitions, it will check to see if any partition of
-    the loop device is currently opened
- 5. If any partition is opened, then it will return EBUSY:
+For namespace initialization, is there way to start with an empty 
+namespace (no inherit), and only add devices the namespace that you would 
+like to provide to the container? For example, you might want to provide a 
+logical volume to the container and then let the container users do with 
+they want in terms of creating new devices from that namespace-assigned 
+"root level" device.
 
-    if (disk->open_partitions)
-		return -EBUSY;
- 6. So, after receiving the "LOOP_CLR_FD" command and just before the above
-    check for open_partitions, if any other command
-    (like blkid) opens any partition of the loop device, then the partition
-    scan will not proceed and EBUSY is returned as shown in above code
- 7. But in "__loop_clr_fd()", this EBUSY error is not propagated
- 8. We have noticed that this is causing the partitions of the loop to
-    remain stale even after the loop device is detached resulting in the
-    IO errors on the partitions
+Somehow it needs to be safe in terms of the container users changing the 
+device mapper table spec of a "root level" device using `dmsetup reload 
+--table`.
 
-Fix
----
-Re-introduce the lo_open() call to restrict any process to open the loop
-device when its being detached
 
-Test case
-=========
-Test case involves the following two scripts:
+--
+Eric Wheeler
 
-script1.sh
-----------
-while [ 1 ];
-do
-	losetup -P -f /home/opt/looptest/test10.img
-	blkid /dev/loop0p1
-done
 
-script2.sh
-----------
-while [ 1 ];
-do
-	losetup -d /dev/loop0
-done
 
-Without fix, the following IO errors have been observed:
-
-kernel: __loop_clr_fd: partition scan of loop0 failed (rc=-16)
-kernel: I/O error, dev loop0, sector 20971392 op 0x0:(READ) flags 0x80700
-        phys_seg 1 prio class 0
-kernel: I/O error, dev loop0, sector 108868 op 0x0:(READ) flags 0x0
-        phys_seg 1 prio class 0
-kernel: Buffer I/O error on dev loop0p1, logical block 27201, async page
-        read
-
-V1->V2:
-	Added a test case, 010, in blktests in tests/loop/
-Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
----
- drivers/block/loop.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 28a95fd366fe..9a235d8c062d 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1717,6 +1717,24 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
- }
- #endif
- 
-+static int lo_open(struct gendisk *disk, blk_mode_t mode)
-+{
-+        struct loop_device *lo = disk->private_data;
-+        int err;
-+
-+        if (!lo)
-+                return -ENXIO;
-+
-+        err = mutex_lock_killable(&lo->lo_mutex);
-+        if (err)
-+                return err;
-+
-+        if (lo->lo_state == Lo_rundown)
-+                err = -ENXIO;
-+        mutex_unlock(&lo->lo_mutex);
-+	return err;
-+}
-+
- static void lo_release(struct gendisk *disk)
- {
- 	struct loop_device *lo = disk->private_data;
-@@ -1752,6 +1770,7 @@ static void lo_free_disk(struct gendisk *disk)
- 
- static const struct block_device_operations lo_fops = {
- 	.owner =	THIS_MODULE,
-+	.open = 	lo_open,
- 	.release =	lo_release,
- 	.ioctl =	lo_ioctl,
- #ifdef CONFIG_COMPAT
--- 
-2.39.3
-
+> - new devices show up only in the current namespace and all
+>   namespaces derived from it.
+> - Namespace teardown should remove all devices created
+>   within this namespace.
+> 
+> I did a patchset once, based upon suggestion from Christian Brauner.
+> Let me dig it up.
+> 
+> Cheers,
+> 
+> Hannes
+> -- 
+> Dr. Hannes Reinecke                  Kernel Storage Architect
+> hare@suse.de                                +49 911 74053 688
+> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+> HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+> 
+> 
+> 
+--8323328-1834047648-1716333562=:9489--
