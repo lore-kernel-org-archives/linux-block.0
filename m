@@ -1,82 +1,96 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6505C2B9C3;
-	Wed, 22 May 2024 17:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E9313D60A
+	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 17:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716398723; cv=none; b=TJ3sib4Ignt2pwekTgIKLnhMlk6VRKC0+Fxlh6ASwx3C5siF+SjQAX1f5UaHc/Oeq+QPhU74KnrO6mQZCgVKD8gX++4JDzyxAh5OWbQ0L9u5ZGYqHBCK6J46Nwt5Ox+rp55uC38zS57T5u94gDB4sCHP8afI8SsT4ZqmfbZaG4Q=
+	t=1716399075; cv=none; b=bE8saFr67CgFdlz5alGq/O9xS/RJfVaSecs2EtiGEjfiBmHiEs3kNvzp13zt9i0bUmYGX0OZCecL9mFyd9N/+ZIg3a7BGxo6cb9IyKoTLiBrGhM42uf+PkPgoXQRsdf/1yPLZCAMkNUJngTVWUo1PiWqWvxbI50O9mVGf/02vBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716398723; c=relaxed/simple;
-	bh=QnU6TLnYhrKP0IhVowNIjwPrz/U8ertoOdukGfKUadw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uIHOSlPuxU1HOzV25kTB2W942HQ2STeEi2t04Ca8/rUjYWaP2d6Vu47Vs2Z9f3oH1Iw/TcveWs3kdVOylLdbLUL60Nx0rdK2tszRz3AIrs/L4rKzd6iSfdib1Bbr08nSpOzugTiD2xduL95GQfkDzFm50WF8D9UM6JTVmTforo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=n56wN4hb; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1716399075; c=relaxed/simple;
+	bh=1B9dsnoCotJxFTrkGAZwC40Nz5IzOJrheW4eFVSuLL4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=r5Q0+sZImSZvIR5Ue8xUkSP5tLdLwuVQOKrGTYy8qhJxN+RvXxU4Ys7ObAe+VFlnWZq8B9VoXMrr4HXfF/H3Ee4FD42OGwO4LT+metXTFmWWfOlkdXvszglF8DNe8Z4YWM4G2RA0E6Fd6mRWcSjeoe3MPJT3+6BNKuPXC+82G5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=F/1Ut54e; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="n56wN4hb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=V5gX0iaMm0XLDVaVLLJuDodgb7XRDFc8VwDQ9Wvel1Q=; b=n56wN4hbZpnW7D2u
-	TH9ZMYWx5fvF+SHZAV3WEgtpYmRolbhSDhtMmRT1MEnGjnmKEGlGx936t8FTpM0PqFhWK7R0OMke5
-	cYsQceOI91L+Z9CFQKXWTcA7xC4hxtYjNONCflFKQtwGwJ07t0BLiyPVhPUoP+Lw+8rh41JLzQn6I
-	a6ZMWBXQe70l+akHdh2Fk27xQmHj0z6INJ9mfa4gf6bje35IUwCBN7zjDH92A/YE521McaCYbkxMX
-	lC3279B3di7BBQFb6BDc2UEYwLDdfzAUVS0AwF0QNvXAXfuOepaOj1sWTIBBHja+Qzgd+ve0U6sjW
-	zWBR3aGVj05yDVsBGA==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1s9pi0-0025JX-1Q;
-	Wed, 22 May 2024 17:25:00 +0000
-From: linux@treblig.org
-To: tj@kernel.org,
-	axboe@kernel.dk,
-	yukuai3@huawei.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] blk-throttle: remove unused struct 'avg_latency_bucket'
-Date: Wed, 22 May 2024 18:24:58 +0100
-Message-ID: <20240522172458.334173-1-linux@treblig.org>
-X-Mailer: git-send-email 2.45.1
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="F/1Ut54e"
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7e24bcce578so23520339f.0
+        for <linux-block@vger.kernel.org>; Wed, 22 May 2024 10:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716399072; x=1717003872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZyoQ04pME4REpApsHBdNGyO5vz5nhCeO/3yT1CYUWSM=;
+        b=F/1Ut54evQVA/sNcBskksLJr3mLash2EAqtjclZRL8j9WZ1VFe8QogB2r7wBFBkEba
+         C18D9ewMvCpAWMsbHKN+B3ZHQe8OYpOCZyCM7nQ3uIJ+fGieQIqYeZ2Ca7Vee1HNqGrc
+         lNIQU2WnZr5mi+lRsnpOZFbMxbNby8Xy+lKR9Ogl9flW9BB6wtvAE8O1z20oU2K5CQCl
+         jSzUMwDTMvxOSjO3lA0eLDPbvQbva8i7yR3/rTzyu3J83B8p/HIRZXhGCjUWFGz4xNgk
+         6LS07pTxJxkb+v5MNY+2NvHOx5FpNWvgmi2K5J7bkXeMCSPV2+TzYTtZrmTKWB1AgwBq
+         3BxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716399072; x=1717003872;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZyoQ04pME4REpApsHBdNGyO5vz5nhCeO/3yT1CYUWSM=;
+        b=RWGbC99SY+u2jW7O+kAM6HmczNQ12J5RFtmFS3Fj8q0Ao6ibRvnMr9q3CTYgD78ye0
+         I4nfXbyrwUbXatS4hBayFNdAfk5Yla6l/Zs0AllfSK+dpF+WClJFGeC50E/gV7ln7Mx3
+         HB0c2yBEjmLP4TKxdbEfrQvh1g2vSDjJXCFwY4snHa0umC+Qrmxwoqetbi5C2MtnpB+P
+         QsYXcPQSBoe+OpcsAbnoe8Vlj+Er8LBhAF70iaiqEqjlsw3N0ja7TttzrqqXRwsUOWZ2
+         b+FI9eO3TNtJMh325Tm4vW3j70v4g644xw/7FXUpXWTX9Rb0MBvNXOX3l0PbPS2IH0jm
+         WNkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjcFA1EuoEOT15PT7oaTKm8bnrDO2AgS1E3+DyAvfridXfajr6T+N/fQhjJBLzhUK2WOVZYbKbWXHnl5jksKw4nf2BWe1Fk9XRkFU=
+X-Gm-Message-State: AOJu0Yz3wnTzkO31SrFTzoCw/B/uLe3FKtVo11NhxtUaiFan4NRswMph
+	9w9fa76+xhTFYUgYccntWLGW/Y4egtTgnX+eFqFBfXCEmSdhIJq71EWZEsDgaCE=
+X-Google-Smtp-Source: AGHT+IF/WI1FtilI6WWcWW4/jJALodFw4CgIslzmlQd2qik5wcTeLLwZMVKIhIz6ctQZ1GF6SAn4GQ==
+X-Received: by 2002:a05:6602:420a:b0:7de:b279:fb3e with SMTP id ca18e2360f4ac-7e37db353b9mr277689039f.1.1716399072236;
+        Wed, 22 May 2024 10:31:12 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489375c1a86sm7626823173.105.2024.05.22.10.31.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 May 2024 10:31:11 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: tj@kernel.org, yukuai3@huawei.com, linux@treblig.org
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20240522172458.334173-1-linux@treblig.org>
+References: <20240522172458.334173-1-linux@treblig.org>
+Subject: Re: [PATCH] blk-throttle: remove unused struct
+ 'avg_latency_bucket'
+Message-Id: <171639907112.82914.16265588567608443016.b4-ty@kernel.dk>
+Date: Wed, 22 May 2024 11:31:11 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-'avg_latency_bucket' is unused since
-commit bf20ab538c81 ("blk-throttle: remove
-CONFIG_BLK_DEV_THROTTLING_LOW")
+On Wed, 22 May 2024 18:24:58 +0100, linux@treblig.org wrote:
+> 'avg_latency_bucket' is unused since
+> commit bf20ab538c81 ("blk-throttle: remove
+> CONFIG_BLK_DEV_THROTTLING_LOW")
+> 
+> Remove it.
+> 
+> 
+> [...]
 
-Remove it.
+Applied, thanks!
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- block/blk-throttle.c | 5 -----
- 1 file changed, 5 deletions(-)
+[1/1] blk-throttle: remove unused struct 'avg_latency_bucket'
+      commit: 4a482e691c8b8a188b1ea3d6a80180e9fa925fd0
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 80aaca18bfb0..0be180f9a789 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -39,11 +39,6 @@ struct latency_bucket {
- 	int samples;
- };
- 
--struct avg_latency_bucket {
--	unsigned long latency; /* ns / 1024 */
--	bool valid;
--};
--
- struct throtl_data
- {
- 	/* service tree for active throtl groups */
+Best regards,
 -- 
-2.45.1
+Jens Axboe
+
+
 
