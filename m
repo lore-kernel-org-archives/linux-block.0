@@ -1,195 +1,125 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9296339A8;
-	Wed, 22 May 2024 02:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CB85234
+	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 02:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716345076; cv=none; b=o6+zAXhPPjQoZff7bHfYh0cs/YKMEyP95+6WbspTHakmmoRPt6SKYMGUBLRbgVIZEg1X6tU+H6Jg/dUGzyddN/UA7NazHgkqeDGYy50adZuuYTSlHj7fD4yIjnucYkfFzyohAVhv7tyFW6S+X3eDgvbCmRnDbuMUwe212bSgx9E=
+	t=1716346283; cv=none; b=Gpztuflw4jtAxsBZQ5TpEpARs5lYfuzHJBUz/t+5Zw1TVGJS68+mKceW14wGGw+GSvHtF+yaGNCi6p93fu+7ay1AUmudLbkTdDUwxSWz6igkJuObMA9IutImytI/sQYePdqtilE+0STSzbK/eKP+m/A3oDiXH2RriqD0gNyimQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716345076; c=relaxed/simple;
-	bh=dCWpHDIGxN8+JH6x/Fr1QOyLBL0zIKxdojXzZXnoBWs=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=pbDbomx4+6PWGJU4HqYI0dqzvDr+Y4XJ2RACiI+DmAU/BBstJrALjTLmRVhmGvdAPo6Q/xudw7qMbnsPRC4M3NuQV7eUpzUk5H8SrzXbvQSkTrgPh+aDHDkcPT4KugEiG5tuvsxdN4RUxrwihUUEzwe8R3p/kP0c2uyViTydNNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VkZzn672Vz4f3kK0;
-	Wed, 22 May 2024 10:31:01 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id A003A1A0199;
-	Wed, 22 May 2024 10:31:07 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgDHlxDlWE1mfUNSNQ--.47117S3;
-	Wed, 22 May 2024 10:31:03 +0800 (CST)
-Subject: Re: [PATCH V2 for-6.10/block 1/2] loop: Fix a race between loop
- detach and loop open
-To: Jens Axboe <axboe@kernel.dk>, Gulam Mohamed <gulam.mohamed@oracle.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com, hch@lst.de,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240521224249.7389-1-gulam.mohamed@oracle.com>
- <dcd2dac3-07d2-4ee8-addf-b9266a84f7fd@kernel.dk>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c7eb562c-97ae-455a-3859-0ed28ebdf7ae@huaweicloud.com>
-Date: Wed, 22 May 2024 10:31:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1716346283; c=relaxed/simple;
+	bh=nw+9U/m6IzUil9LX5+jWVMT7vSrTI3aaobRmeTwjTgw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YkK10RWIiCeLd3psKDrcLuyigkhjPQbXymg7PddvFA/xpOsymzZp0lcJqZYlkNq2pJe5F+ms6vCycZjmzo7b4YaFJidt5FJzQZ8Fhbx0BsiRxAvIjf5zVX/js1esiQ+hU8QNEUxjw4Pjn+yTpO4pvIgc6rsw+XZxCS92vITo/hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-43e1593d633so5243101cf.3
+        for <linux-block@vger.kernel.org>; Tue, 21 May 2024 19:51:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716346279; x=1716951079;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JprbaBpshjvrnm8PC3hpDUHsifaejsi6Oxq/zCB98rQ=;
+        b=EQhUDOuDrvoB5+h4gtYqOXz/KVAsttuStOrEBZTvDD5IXcA0n3+ZJTWGl6FNqtYSF8
+         JwLm6YEujVkdf9YnVKhJ6duRYeuzdIMGYRPoicP0if9GbhmVNwFPEmzXfkgLrjo18odP
+         gHreuHYt85+nDsM2D+mPiSKZklHqdq6v3GKzsGQM5WqmT9Su6YcejconQcGPO5PfKrEx
+         vp77zOcFDh2yqbXo9NSqaBwxV2p9cjbRybMJyVXXn/6+XLTYvUZQXwe6d2JrvLRX84I/
+         uPJkh7Y/9/FGtOTsfi8gFrKlGON03uX08Hi9a2n/SByHBjrGqsrLzPww0dvnv0jNK2BC
+         RjbA==
+X-Gm-Message-State: AOJu0YzikPQO72seXC/c/JW5/ayqWtmgaDYyhdoEAhfnMr/6DITuEOhG
+	K/KL/TNuLPDCgSJ4GReasCtyfrzlBF+7kpssdyf/OWI9bi74AuuDgjYS93TQilc=
+X-Google-Smtp-Source: AGHT+IH0FlKvJ4K2kh6y3bCOSMKoFk03tXhm+54ZX4wUSA2seFT02HAZDbyTH/HtJv+RAR8c3v4g0Q==
+X-Received: by 2002:ac8:7e90:0:b0:43d:e6fa:1ffc with SMTP id d75a77b69052e-43f9e1abe2bmr7847141cf.54.1716346279671;
+        Tue, 21 May 2024 19:51:19 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43dfa52e547sm159185701cf.10.2024.05.21.19.51.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 May 2024 19:51:19 -0700 (PDT)
+From: Mike Snitzer <snitzer@kernel.org>
+To: dm-devel@lists.linux.dev
+Cc: linux-block@vger.kernel.org,
+	hch@lst.de,
+	Marco Patalano <mpatalan@redhat.com>,
+	Ewan Milne <emilne@redhat.com>
+Subject: [PATCH] dm: retain stacked max_sectors when setting queue_limits
+Date: Tue, 21 May 2024 22:51:17 -0400
+Message-ID: <20240522025117.75568-1-snitzer@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <dcd2dac3-07d2-4ee8-addf-b9266a84f7fd@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDHlxDlWE1mfUNSNQ--.47117S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGF47XF4fAryDury3tw18Xwb_yoW5KFWDpF
-	Z3WFW2kryDKa9xWw12vF1xu3WFq3Z2yrWrGrn7C34SkrnFyFnavFy2vryY9a4jgrW0kayj
-	vF1UWrWUuFWUCFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-	kEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
-	7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+Otherwise, blk_validate_limits() will throw-away the max_sectors that
+was stacked from underlying device(s). In doing so it can set a
+max_sectors limit that violates underlying device limits.
 
-在 2024/05/22 9:39, Jens Axboe 写道:
-> On 5/21/24 4:42 PM, Gulam Mohamed wrote:
->> Description
->> ===========
->>
->> 1. Userspace sends the command "losetup -d" which uses the open() call
->>     to open the device
->> 2. Kernel receives the ioctl command "LOOP_CLR_FD" which calls the
->>     function loop_clr_fd()
->> 3. If LOOP_CLR_FD is the first command received at the time, then the
->>     AUTOCLEAR flag is not set and deletion of the
->>     loop device proceeds ahead and scans the partitions (drop/add
->>     partitions)
->>
->> 	if (disk_openers(lo->lo_disk) > 1) {
->> 		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
->> 		loop_global_unlock(lo, true);
->> 		return 0;
->> 	}
->>
->>   4. Before scanning partitions, it will check to see if any partition of
->>      the loop device is currently opened
->>   5. If any partition is opened, then it will return EBUSY:
->>
->>      if (disk->open_partitions)
->> 		return -EBUSY;
->>   6. So, after receiving the "LOOP_CLR_FD" command and just before the above
->>      check for open_partitions, if any other command
->>      (like blkid) opens any partition of the loop device, then the partition
->>      scan will not proceed and EBUSY is returned as shown in above code
->>   7. But in "__loop_clr_fd()", this EBUSY error is not propagated
->>   8. We have noticed that this is causing the partitions of the loop to
->>      remain stale even after the loop device is detached resulting in the
->>      IO errors on the partitions
->>
->> Fix
->> ---
->> Re-introduce the lo_open() call to restrict any process to open the loop
->> device when its being detached
->>
->> Test case
->> =========
->> Test case involves the following two scripts:
->>
->> script1.sh
->> ----------
->> while [ 1 ];
->> do
->> 	losetup -P -f /home/opt/looptest/test10.img
->> 	blkid /dev/loop0p1
->> done
->>
->> script2.sh
->> ----------
->> while [ 1 ];
->> do
->> 	losetup -d /dev/loop0
->> done
->>
->> Without fix, the following IO errors have been observed:
->>
->> kernel: __loop_clr_fd: partition scan of loop0 failed (rc=-16)
->> kernel: I/O error, dev loop0, sector 20971392 op 0x0:(READ) flags 0x80700
->>          phys_seg 1 prio class 0
->> kernel: I/O error, dev loop0, sector 108868 op 0x0:(READ) flags 0x0
->>          phys_seg 1 prio class 0
->> kernel: Buffer I/O error on dev loop0p1, logical block 27201, async page
->>          read
->>
->> V1->V2:
->> 	Added a test case, 010, in blktests in tests/loop/
->> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
->> ---
->>   drivers/block/loop.c | 19 +++++++++++++++++++
->>   1 file changed, 19 insertions(+)
->>
->> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
->> index 28a95fd366fe..9a235d8c062d 100644
->> --- a/drivers/block/loop.c
->> +++ b/drivers/block/loop.c
->> @@ -1717,6 +1717,24 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
->>   }
->>   #endif
->>   
->> +static int lo_open(struct gendisk *disk, blk_mode_t mode)
->> +{
->> +        struct loop_device *lo = disk->private_data;
->> +        int err;
->> +
->> +        if (!lo)
->> +                return -ENXIO;
->> +
->> +        err = mutex_lock_killable(&lo->lo_mutex);
->> +        if (err)
->> +                return err;
->> +
->> +        if (lo->lo_state == Lo_rundown)
->> +                err = -ENXIO;
->> +        mutex_unlock(&lo->lo_mutex);
+This caused dm-multipath IO failures like the following because the
+underlying devices' max_sectors were stacked up to be 1024, yet
+blk_validate_limits() defaulted max_sectors to BLK_DEF_MAX_SECTORS_CAP
+(2560):
 
-This doesn't fix the problem completely, there is still a race window.
+[ 1214.673233] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+[ 1214.673267] device-mapper: multipath: 254:3: Failing path 8:32.
+[ 1214.675196] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+[ 1214.675224] device-mapper: multipath: 254:3: Failing path 8:16.
+[ 1214.675309] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+[ 1214.675338] device-mapper: multipath: 254:3: Failing path 8:48.
+[ 1214.675413] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+[ 1214.675441] device-mapper: multipath: 254:3: Failing path 8:64.
 
-lo_release
-  if (disk_openers(disk) > 0)
-   reutrn
-   -> no openers now
-		lo_open
-		 if (lo->lo_state == Lo_rundown)
-		 -> no set yet
-		 open succeed
-  mutex_lock(lo_mutex)
-  lo->lo_state = Lo_rundown
-  mutex_unlock(lo_mutex)
-  __loop_clr_fd
+The initial bug report included:
 
-And with the respect, loop_clr_fd() has the same problem.
+[   13.822701] blk_insert_cloned_request: over max size limit. (248 > 128)
+[   13.829351] device-mapper: multipath: 253:3: Failing path 8:32.
+[   13.835307] blk_insert_cloned_request: over max size limit. (248 > 128)
+[   13.841928] device-mapper: multipath: 253:3: Failing path 65:16.
+[   13.844532] blk_insert_cloned_request: over max size limit. (248 > 128)
+[   13.854363] blk_insert_cloned_request: over max size limit. (248 > 128)
+[   13.854580] device-mapper: multipath: 253:4: Failing path 8:48.
+[   13.861166] device-mapper: multipath: 253:3: Failing path 8:192.
 
-I think probably loop need a open counter for itself.
+Reported-by: Marco Patalano <mpatalan@redhat.com>
+Reported-by: Ewan Milne <emilne@redhat.com>
+Fixes: 1c0e720228ad ("dm: use queue_limits_set")
+Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+---
+ drivers/md/dm-table.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Thanks,
-Kuai
-
->> +	return err;
->> +}
-> 
-> Most of this function uses spaces rather than tabs.
-> 
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 88114719fe18..6463b4afeaa4 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1961,6 +1961,7 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 			      struct queue_limits *limits)
+ {
+ 	bool wc = false, fua = false;
++	unsigned int max_hw_sectors;
+ 	int r;
+ 
+ 	if (dm_table_supports_nowait(t))
+@@ -1981,9 +1982,16 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	if (!dm_table_supports_secure_erase(t))
+ 		limits->max_secure_erase_sectors = 0;
+ 
++	/* Don't allow queue_limits_set() to throw-away stacked max_sectors */
++	max_hw_sectors = limits->max_hw_sectors;
++	limits->max_hw_sectors = limits->max_sectors;
+ 	r = queue_limits_set(q, limits);
+ 	if (r)
+ 		return r;
++	/* Restore stacked max_hw_sectors */
++	mutex_lock(&q->limits_lock);
++	limits->max_hw_sectors = max_hw_sectors;
++	mutex_unlock(&q->limits_lock);
+ 
+ 	if (dm_table_supports_flush(t, (1UL << QUEUE_FLAG_WC))) {
+ 		wc = true;
+-- 
+2.43.0
 
