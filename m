@@ -1,194 +1,202 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE4B17758
-	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 07:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716361386; cv=fail; b=Hons6ngHt1eat+LmwdpBqnAmAyDAGVw0NGi6n7fPx0xo7DEB/u8mUIS45oWH1uSjN3x8HjEIumfJOyMzZaKXe7jDJt9cV553OBweNDZY9s7RpWTQHLHI2WrpqnI2y4YwCP56wu+gB41pRNFP8SQODsFnYUgqqOizLcH9t2B4VrI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716361386; c=relaxed/simple;
-	bh=VwsiHvcfytK1Fz8Ny0m42+wgfUkfsz3IAHkEDV7zGzs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bQwCIsqiNqtGTGWmAk7k7eqiPKaRlaiSB7u2rIPXe3W0HN4MS2JEQlxgivqOn7kQ297cip0puHy7aPGYt/Q1g7CBu7xYJhjj/Rqx0opAPYG8BWwDWglLUUouY4mGuouwbN1Y/EInAU32CcC7yEfRdAetmFjEiIcE1qiL5yA/50o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=KPsDDcHp; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=F/d6uBUR; arc=fail smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7963BBC9
+	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 08:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716364908; cv=none; b=IpjNU/0m+POL8B5laumxKLhZQAe76yKmoaZmSrhOjLlQ8pAriMDLWYP4HXLtm1HoxN4g6qqpruqChV3UVVmJvX7GODt6jAdNGoxIaJcx7UI58TyHO13b40KTyFkv3jAVXiqXBNVB9vBRdKnkJm9tYsVhQc8az12T+8X3b1qXEHg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716364908; c=relaxed/simple;
+	bh=3IU/Y5S5PbEM8sZoU16hx3r94ogEHRDSVQlKe9+7bN0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=cUSQ6aQ9im2z5ra5swfSGxtRvbu6RdrbgQO0Oj2/JH6wYUbM3TC1nUu0RsgTbmKsJWlhHGDlZphOcUM6LzwORXsCWBqY2ukrpoGUIdlIeGfc/K2w7BQl4EJC2wd24+e0KRbS9cS9IaqrYln2ho+5DpXTYK474U8ge+LkWRjrZmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=t0SIqXIe; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KPsDDcHp";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="F/d6uBUR"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1716361384; x=1747897384;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=VwsiHvcfytK1Fz8Ny0m42+wgfUkfsz3IAHkEDV7zGzs=;
-  b=KPsDDcHpIUFtS7NM80G2yU69MvzuIUBVo0BIl0AX6SkNjT3bt0sLX0pc
-   muoNT8M7A/HhzozNtBhKi8yed77hpdc4rVGZK+vqEPzWBaI9BXrwpVt7B
-   XuyBxJi9Yxz8OQ/jwzkoSm6Cn72PVlHpDfz5jNiodwybNy+7QncZlfJsv
-   VCrAjeS5P5+/5JOtD4JrxYoRGpaQCh6gecwKJsE3G80Zf1LhKmc1ZCwZW
-   AL1ikgIVA/CwRNZrv7e/0B/JFcMIeNC4dpikOZrYpMNPRr85v4DJ+e8Q9
-   uIcAtm77qECN/ItGDIqAqvuoC5rcRIHYdCAc+8RTEaBGAWTMwaPmvSSoV
-   Q==;
-X-CSE-ConnectionGUID: A46nHU3sRx6++1xQL7KGBg==
-X-CSE-MsgGUID: W2j4PLx/TICkqH5yB++GRw==
-X-IronPort-AV: E=Sophos;i="6.08,179,1712592000"; 
-   d="scan'208";a="17761122"
-Received: from mail-mw2nam12lp2040.outbound.protection.outlook.com (HELO outbound.mail.protection.outlook.com) ([104.47.66.40])
-  by ob1.hgst.iphmx.com with ESMTP; 22 May 2024 15:02:56 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g5JK5WUuUw8k//T2fTTzl5a7NNhnLJIKyL4Rn13JO3Pl9kVmoL4m2802qXDjmUts176eyR0X0b/ECsMQ/ICuD/2FgIYEKQZlhOckczi3N6tVnWgxPWdndS8kKKeljwPrpiGvYRuWUIFgF/Qx5AoqsDj/r2IRILv+lPl8d85it4Nm7De1pnSflGoOtbkXqwaz59o+u+0aphxPRbqjY9xEIFfwmHIulkfoHJUHT69FsAgZACKIvNoxkOlWpCUAAc8yuc6/g0bqJkgQ3UIQ++CV20cD7+XYtVY9G03QeYgS9UGdii6Zecv9oKGmnIXL8kaWwhatfBKnp3P/MCyEZU88iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=05KIDX+Bx8bZXMyEgVhIlAI2RVl8rei0wnAt4bxzyfc=;
- b=aoP+6z61+gBHmOElvuOxq3ZdyZjaj4pq+xm7vMHzpezCua3yKKSPSot6MInkCxiC+6OQbs4XoaXTx9nFz4IeaUSSjTSPjHu/rgcbszKu9nFPzrnBSFIvDJnIJ2pswSFurZc1hbcjJ1Pe/XXeKMWkdsFt06PapcccZfIUyzGv/Znm/F7sIqDne7f3wu9uZ4Sy+yQzW9uJjZj+VG949CQo8mL0AmcNsJGZDuQZguyMViXO0TJ5fmHsvFmm8tA33GVj58Y8oX5fK7i+Nv+hvrdnBExWWX50GVXBwXw+puSQDfIFMVPFCsEIt0qd0pZeE7LE7L5XC8UitD5KdeSDsY5EkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=05KIDX+Bx8bZXMyEgVhIlAI2RVl8rei0wnAt4bxzyfc=;
- b=F/d6uBURw3UPyQF0+qqSHIYWN9jg086W0L8SEob0hpv4Xnsy+KlS+tDrKpY+k4g7/Y50cYtDCw9CMwVM3R1PmRw7l/4hD7kuqC1CarLgs5X5mCZBUtdvJUzQTCRLmK9ZGyeZLrAp94jsGvaemO3uTO8SSN9Q9kGZylHu2mV1Tmg=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DM6PR04MB6924.namprd04.prod.outlook.com (2603:10b6:5:24d::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7587.36; Wed, 22 May 2024 07:02:55 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a%3]) with mapi id 15.20.7611.016; Wed, 22 May 2024
- 07:02:55 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Josef Bacik <josef@toxicpanda.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] blktests: fix how we handle waiting for nbd to connect
-Thread-Topic: [PATCH] blktests: fix how we handle waiting for nbd to connect
-Thread-Index: AQHaq6POIzbQh7y+cUGT2zs6FG/CorGi1NoA
-Date: Wed, 22 May 2024 07:02:54 +0000
-Message-ID: <p7qubalwunuxohkn2rfxejl2jkfpcfqp2d722xra4vmqpiofid@7niwetngzy5u>
-References:
- <9377610cbdc3568c172cd7c5d2e9d36da8dd2cf4.1716312272.git.josef@toxicpanda.com>
-In-Reply-To:
- <9377610cbdc3568c172cd7c5d2e9d36da8dd2cf4.1716312272.git.josef@toxicpanda.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DM6PR04MB6924:EE_
-x-ms-office365-filtering-correlation-id: 390b972e-1844-415c-3610-08dc7a2d3467
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|376005|366007|1800799015|38070700009;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?bb6ICGCFTxfQ7Jx7DBP6nqWDqZnAP3jRXK9oHvz3MCIbJO8FC1NEwfIDQFsD?=
- =?us-ascii?Q?7nvsykVbTShaPNrN8hMry6fty+lFn/QQm21+OOgLqz3JXltTwad1uvoqSqiQ?=
- =?us-ascii?Q?ruIuhWepzOYWhD1WDALqOTSojKl3FwC21d+H/Qeo+l3YKXknX/+D43oCvRqp?=
- =?us-ascii?Q?ZkqUZUNDbeFFqzxsgmMIsqiqiq2+75Pxt8V7uLEZAFAC4eupEqrQHeOWW0MM?=
- =?us-ascii?Q?bn5Pr0bpDUiWWtRESicyB3suvyChLg9sS9zxbD8EKPt20n+RWDExd4yl3CpH?=
- =?us-ascii?Q?3EIy69PC9h6/xRwlgGooXGhESWE37RbteMNHjhm0ljRneJLNN0caGJ1TgwKr?=
- =?us-ascii?Q?C0xnAAuT3Twkc5QNH9bbcaVKg3+lIsV2XcuZDdpEcaXyF50ICtJuz7IPf6li?=
- =?us-ascii?Q?o2sBirOp1tZoRE4YAhxT8NaSnqmBvBv3rwsMYsEMXeqfnrakKcvKGSmcqar8?=
- =?us-ascii?Q?BMR84PmLYz4SREPNunk01dw1cF4NKpSq2MHi997KT/TsdZ5KCZYvphli47de?=
- =?us-ascii?Q?SIZfGjzt/luH3e1+cHT1frL+qob4RtTJpxnIsL0L08M2OHXvBU9SRuONE/2Z?=
- =?us-ascii?Q?TB1iQraW/g1+IMJihyYWt9spGO1hlyuxN2fwwyOAslr9V1+6O6tGj123ubfv?=
- =?us-ascii?Q?f6CwNxbaU+/YwtFHFEkvXoOArgrf5E8ueTwrX1ihWpAAl+o1kBnIG410rVqG?=
- =?us-ascii?Q?Z2QjZTNIStXtkZ/FndOQD9j9hLA6hBPnQX3IT08NlKLszxgp+Acn0UP41Ybs?=
- =?us-ascii?Q?Jfsbm1A96E29I7LEk3TwOunWym5/rZGRM2BSJms6cmUktbXKCWeYv9BLE95l?=
- =?us-ascii?Q?tjEWkrR0JNaZ9lKEpCOz9sWu4+DC2lPK96txge9HaxGrAAEKAg7jWTNdw6uO?=
- =?us-ascii?Q?oEsCZ0B1kwlDor/k7ZkOC3Kp1rWhzTCpsbkdRK1lsRQY8zQ436BXw9LFRcb2?=
- =?us-ascii?Q?0MvmWyMxga6sGWT/HhYqDZe1nfMgcicNlOFJu65goAvPyDtFFMVEMt2ggRcd?=
- =?us-ascii?Q?PJYGXfH2Ot7DtPP0miLCi7bgRcIAmpwzF08q/e/zSL/xTOEn7TdNl+Betl5G?=
- =?us-ascii?Q?tGogCuT4BZpTBog8DD/Mm8I19ygyeOEX3r5ADObWhoqCExDn29dtg/ESVeFn?=
- =?us-ascii?Q?N1kwp4m6n1GFbtFrqP0yV5gDMAXLB7TezKQ3C0RZvuY1ZU0Pgd9asCrGDzLy?=
- =?us-ascii?Q?2y06zKQ2Srs6QxbFUhHDDYuAPFPJHYcKPaureK4GzaVR9+ZnwFKleUXW/JNv?=
- =?us-ascii?Q?actcorF+aqR9WccSi04YKbzSDKyLcBvkQaGwNmKIphqGlK3Ayme2iiJKAt8b?=
- =?us-ascii?Q?+jbA13fqO4sUpyzNSm/voFu3GtyjZ6yD3aZ4K6q6vbK7gA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?oQVTXwp6rpWM1+afd5D4vXiREtsPP6A5v6fmyAfdn5v2eooc1yGPBPQsKCyH?=
- =?us-ascii?Q?odBqloqn+yvUgsMt8THIhj7+Td39Cgn64AJwvv1J/AaEtSc8sFLDhrh4oq2s?=
- =?us-ascii?Q?RG6f2Isjdz63StG/+w+kuceKj/RwVm9DXFK36QZSzDmAghiMtIxXVvESqQZZ?=
- =?us-ascii?Q?+8ex6MFKLWi4VT2b3mpFN5WcsrL9IfNmLAjIUn1PGfMLdQe6umXBCX8Clqcg?=
- =?us-ascii?Q?kd+7Vtr5BrVeMFDtxvuvXPCDDkHj3JhnZD2DM6Rc3HvhIQsec2+yFk5Qo3Ru?=
- =?us-ascii?Q?pT+Th8VLxvgWBObQuQYAodUVOjQcAv8Xe/bQnG5AsadXX20deSDKvrdcfKd9?=
- =?us-ascii?Q?0YvSoTJCt8PXl9YyLOzTCSJ/MfjSyLuTy43lofy/P5CQnim9jHvpGzGVxpU/?=
- =?us-ascii?Q?1+rpGgLQcr5Vb1dgqMFU0NJTP8N/S9P2UIJIWixfidPHl1cgaZ/wFv54wfPs?=
- =?us-ascii?Q?85sKylGslxKBgfiPHD9l5TxYgraY/WdllJYU6tT/0hVq5Q54vqFiYHE+UNaK?=
- =?us-ascii?Q?7ZcdT7tSJchcoCsVbTnECtqg+Q2O/R4A9DOqbuKaLcgIP1LaMoM0odpwZv+L?=
- =?us-ascii?Q?rP+fQVYXlH48r1a1Q5mjL4AtuefyWhjj/PpzDzc6Nx3pCV9fUgpSYvML+wZj?=
- =?us-ascii?Q?9p/MhZhEj0yUwf9i0YVWlP6tD38JqzrXDUlDJUTBaE5d2J7vF8g993GvdbD+?=
- =?us-ascii?Q?gDlz+BM21v1AvTW6wtRHITDfy0wiVgUJwjgKpJ4v+Ox40E1lMTp9VzEnWeUu?=
- =?us-ascii?Q?UzZBVR85mmtFIc225VPwKYb1ZoR+jLQXlh89oio/vgIm8NrpEJq2iShcqq4I?=
- =?us-ascii?Q?SAMavLeiqmRJ6BOOp0jgimMBdKSkiRcjJh9nqjsj57gS53ZDFFecZfeWyK6O?=
- =?us-ascii?Q?QTi+P9ywMQGM5NeJZBppkc21sKwCVLAnW7bIDDk8nocoU7IIM0pKdyxMqTMM?=
- =?us-ascii?Q?MyKHK9uuyavHjLS4ldUatBzwofjNO3ukP95qSD2IeiW368pDskGlyzVp3R4/?=
- =?us-ascii?Q?KTok4mpyIA+qtRrZms07Zjg9/9UkG86J3IuFZuDGqC2mata/OE4RQYEd/RPH?=
- =?us-ascii?Q?FM3fAh+cqyrcpXXUjO7Jwuprxs5u0xpVJO5e80Fzdrj4JimiBkUPiYSCRnXU?=
- =?us-ascii?Q?TkePyGVwImDyPfRev4KEYcYk6cU1eRitMUoiFtfGHTkEDst9e+mwzmNgnkwn?=
- =?us-ascii?Q?0mHpTsfv1Y0BL9jK5+fzXZw+O2Zau2mLhzWtWskmqp1Q6u+HKwbfjFWyEL1j?=
- =?us-ascii?Q?oeHUvMHFB85m07AR4FHbL82wh2vef9sMF9BE1HR7oQL8NqPyeIKVdmloYb1S?=
- =?us-ascii?Q?bqVZc1RrCUWgStNWOWbLJeNM1AuRFXRdVtFMcyOREy9zp+4WOgSVI0Tgqi2Z?=
- =?us-ascii?Q?ru+F86z7p6ML30qeIzknzgw/F5QybJRXt+7DGbyaD2QDwwoMYF+9ns3dnZjo?=
- =?us-ascii?Q?mzB26LE3zvtYmjeX87bHncc61KCONL4+fFoPEMSfxGi8aevu2UDla7SBlrVF?=
- =?us-ascii?Q?BduPRgSEd0jxOa/I7UWeQy+Duv540emi9OeySyLa8NGxIJ95tOAzhgjTqgVS?=
- =?us-ascii?Q?6H21MH2iSs6fNElXg9bn/bb35y3DqODay5NZGmlV1aKkEhs9qN/GiRmeiozV?=
- =?us-ascii?Q?C07oZuCxLsT2kLWBlhkCy3o=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <330CAFDC2051D8428467FEFAC063AEC6@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="t0SIqXIe"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240522080142epoutp01eca2f8f1338bfff97d76bb7a43fa9536~RwMkAh9uz2184721847epoutp01g
+	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 08:01:42 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240522080142epoutp01eca2f8f1338bfff97d76bb7a43fa9536~RwMkAh9uz2184721847epoutp01g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1716364902;
+	bh=627E9H6r3w+Yw4w0h70HH2hr5j+VfvV9NWE3+rPSikA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t0SIqXIeAFMAMBIHtT9GgGfIo0nlEaXJEoLablJbu6Nq8eS3Eg2imD/IxF53PLYGu
+	 dY1bILQk6nurtGP9Wreazhc4n5vLq6MGaHsrDsthqu+cRBsT1HVh1OY46gbLTm6Imm
+	 5q+IhbOtZwmFo1Er9+24orKl8kJcrpMhHsrefvFI=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240522080141epcas5p465ef2f70fec9f61ce57611b3f188fc54~RwMjcp4ql1649116491epcas5p4E;
+	Wed, 22 May 2024 08:01:41 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4VkkKJ4nNqz4x9Q7; Wed, 22 May
+	2024 08:01:40 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D9.0F.09688.466AD466; Wed, 22 May 2024 17:01:40 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240522071705epcas5p23ab74d2c71948bc9e5a9b23a65146eeb~RvlnKjcwd2177421774epcas5p2s;
+	Wed, 22 May 2024 07:17:05 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240522071705epsmtrp2f47c73456f842bfd16c1f3953e503f90~RvlnJUYKI0221202212epsmtrp2e;
+	Wed, 22 May 2024 07:17:05 +0000 (GMT)
+X-AuditID: b6c32a4a-837fa700000025d8-01-664da664e987
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	09.D5.08390.1FB9D466; Wed, 22 May 2024 16:17:05 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20240522071701epsmtip1ac16f31e1dcf01f686c2edd63bf915aa~RvljiHMFw3023730237epsmtip1r;
+	Wed, 22 May 2024 07:17:01 +0000 (GMT)
+Date: Wed, 22 May 2024 12:40:03 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, Alasdair
+	Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka
+	<mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig
+	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
+	<kch@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
+	Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	martin.petersen@oracle.com, bvanassche@acm.org, david@fromorbit.com,
+	damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
+	nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v20 09/12] dm: Add support for copy offload
+Message-ID: <20240522071003.fd5oijr3jycvtws4@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	8RFpErDpLSVylshJC8GnS4FR2Wbma9fez+6DhfujJLlKBG0bySDDRg0LLpkaOtX8jTbBLeoFnawOulPRK/VDWFIXkhuw9Htngb2igfazsBvIji5+Pv7nWdl3IhTmrBvwH2u+nCKGBVShVXlDHWO491CqGdfVpa53AO1GjWUFMnMtIjLHxCBZYTfC1dRWJgm5e8CS9kyvw+gVXXiv43bHFpZvs91OeUO0zQJB1kvuYZ6qPiBEwtK47A1Qj27+9CRVjbrN41+O1XD/wN8PoMq6aUa7RXCXGSgPrwvvrBy632eczWO08aQ8keOGj5A/cKAK28Lj0/9xJgJxUGs5y+rqySrR34vwm7qTqhElhUNiw0g2LW2PeTt5oQ9CB6r/5og/s0ChGHJhwD2oWSzxlFmFc83bdEZrrsY43b7XEwM8GxVGFabgO0Q0cWdUW9GGQ4Y9j2pAtpYi3rlRJgayP0+otpeHUmOEooIsepVd7V1o9fcLsEIIcnWUs/jGKEwZzlLiG96RIC1oacwE2UFNTqdChYOXTKefCSiJroF1inYVMA2vG66aX+Ls8NuCHQLsJDcBPv2cELkc4iBWO78Fh6wj/XCZQ37TnuwgBRmVITh6lsfMu2R6Kq/Ru84c9Qh9N5zJ
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 390b972e-1844-415c-3610-08dc7a2d3467
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2024 07:02:55.0574
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mKcvV+0Um7IdvgRorho+Wwf5OlWCNnWCdrvCnEWtjvi9fB6OewytZ2bTLrdUc40oeQ70xWAbx+r5PGtRaHrAj6GrpkpQZtbUDuJ7WZBP7MA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6924
+In-Reply-To: <0f29bcc1-e708-47cc-a562-0d1e69be6b03@suse.de>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TezBcdxTH53fv7nVpdG52mfxCTXQ7ndZ7N2H7k9I0IXoTIjKJVtJM2XI9
+	Brvb3UUlpvGoeDQPpC2uYAnRoCSIsVlCKUKopqxiQpsp0ampoINREbWWtv995nzP+8whcZ7W
+	yIKMkKoYhVQSJSBMOI0dNrYOITePhQpLqq1QbW8XjpKz1nBUNX6VQDMdCwB9PbeCo8m2NIBW
+	+wdw1NA1AZC6tJCDRts0GGouzcHQrapODBXkpmCoc/1PAuW0DwM0pWMx1DJmh0oulnFQc0sP
+	Bw3eu06g4ptTRqii+wWGstN1GGqaTAKoZuYZBz0Ys0QDa93cdy3pwSFvurcU0hp23IgemLjD
+	oQf7Y+i6ygyCri+7QP9enw9o7WgiQd+4co1LX06ZJWhN6i9cen5qjEM/u68j6CsNlYDuU39v
+	5Mc/E+kWzkhCGIU1Iw2WhURIw9wF3icDPQJdxEKRg8gVvSWwlkqiGXeBp4+fg1dE1MZyBNax
+	kqiYDZOfRKkUOL3jppDFqBjrcJlS5S5g5CFRcme5o1ISrYyRhjlKGdV+kVC412XDMSgyfCG/
+	w0j+yPxT7cwlIhGs78wExiSknGF1YzLIBCYkj9ICeLcvj9ALPGoBwL47XgZhCcDn3z4itiNy
+	8hqMDEILgEvaJ1sRTwGs00TrmUO9DkufjnAyAUkSlB18uE7qzWaUAM6ntW/G4lQFAZ+vj3P1
+	Ap86ANfGMzA9m1JiOJfRhht4J+zJn+To2Zh6G86UD2zazalXYF75Im5oaNYYtnb7GtgT3mbz
+	MQPz4R/d+kb1bAH/mm3ZGiAO3vryG0LfBKQ+B5D9mQUG4QBM7b2K65vGqXCYXkwazFbwq96a
+	zZw49TK8vDq5ld8UNhVt82uwula9lX83HF5O2mIa6pLrccOy+jF4Y7IRywJ72P/Nxv5Xjt0s
+	sR9mzCVzDbwHptwtwA0ulrDiBWlAG1h7z0kNiEqwm5Ero8MYpYt8r5SJ+/f0wbLoOrD5RbZH
+	m8CTX+cc2wFGgnYASVxgZlrXcCSUZxoiiT/HKGSBipgoRtkOXDbOlo1bmAfLNt5QqgoUObsK
+	ncVisbPrPrFIsMt0JrUwhEeFSVRMJMPIGcV2HEYaWyRi/PoIIt+mXHz4xHuf+MQfOrUy/5v/
+	BBHX5zvL455Mm55d2MXuOy8bLc9lOpLGpjWikUxzt7lrAeyHJbycQ+EL8Lq2SH1uVVsw9VmZ
+	5uDHKznc7vaAs4utQX4qYevy/cdvetgfD8z+QmyhflA1PTQ/zV7gt1rVgmo4Kv6o+HznQqnH
+	4nRRgu4s70hn+kWn3J/EnNO6Uc13Ow5XnhlZPh3QYf/S36WzniY/XIoqd3lfapZ5EAUN6xK6
+	4ptjC5fIdO9F01NsT/IH9Vle8dHHwx4zqZWvwhbW0cdfzQQlpJQcAzW1J5ylHvOhmPcb/B2x
+	Pz5UFtv5CkX2rGVBIXXUP+X2kICjDJeIbHGFUvIPNBNwJs4EAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphleLIzCtJLcpLzFFi42LZdlhJTvfjbN80g73ntSzWnzrGbNE04S+z
+	xeq7/WwWrw9/YrSY9uEns8WTA+2MFr/Pnme22HLsHqPFgkVzWSxuHtjJZLFn0SQmi5WrjzJZ
+	zJ7ezGRx9P9bNotJh64xWjy9OovJYu8tbYuFbUtYLPbsPclicXnXHDaL+cueslssP/6PyWJi
+	x1Umix1PGhkt1r1+z2Jx4pa0xfm/x1kdpD0uX/H2OLVIwmPnrLvsHufvbWTxuHy21GPTqk42
+	j81L6j1ebJ7J6LH7ZgObx+K+yawevc3v2Dx2tt5n9fj49BaLx/t9V9k8+rasYvQ4s+AIe4Bw
+	FJdNSmpOZllqkb5dAldG48v7zAWPhCo2b+plbWBcy9/FyMkhIWAiMWnGFvYuRi4OIYHdjBK9
+	l/6yQSQkJZb9PcIMYQtLrPz3HKroCaPEuZ/PwIpYBFQlFj27wdLFyMHBJqAtcfo/B0hYREBJ
+	4mP7IbB6ZoHVbBK7Di1mBEkIC9hL/L3byQRi8wqYSXzoPMAMMfQsk0Tf+99sEAlBiZMzn7CA
+	2MxARfM2P2QGWcAsIC2x/B8HRFheonnrbLDjOAWsJV4vPQ9miwrISMxY+pV5AqPQLCSTZiGZ
+	NAth0iwkkxYwsqxilEwtKM5Nzy02LDDKSy3XK07MLS7NS9dLzs/dxAhOMFpaOxj3rPqgd4iR
+	iYPxEKMEB7OSCO+mLZ5pQrwpiZVVqUX58UWlOanFhxilOViUxHm/ve5NERJITyxJzU5NLUgt
+	gskycXBKNTCtbZxb5v6y/0Ow30pN5TR9Pu+qide+PdUPEfeRMo+779X6cOGtSmb753E/hD/9
+	3/j/2qRXjit7QiTvzbj9yNE33t/nUky5stWJR65CcUukdjybznZPT6muZ7X4hZ3zFcz4WRVm
+	Sp09X3znzrcZC2e/cPrO//i8iKe+QYnSjwMt02Kijzrb2v02DxGef9n+4Nyjjesf6+1RSlj1
+	aX61vwfDU8Y3O2Z9L2dlFTmzaXGJ3Kepjcqu82fe2JRhs+Dw5gPz926N2+bFVfq1f03BQ/EF
+	RW98+i8fZON7uTN524ZlfpeUX6i5Orovl/+xeILizOI5j141uP5TiTh1Tqtd6jpr7MFDke+i
+	tjZcfyAS6yN7Q4mlOCPRUIu5qDgRABcP8X2fAwAA
+X-CMS-MailID: 20240522071705epcas5p23ab74d2c71948bc9e5a9b23a65146eeb
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_19f97_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240520103004epcas5p4a18f3f6ba0f218d57b0ab4bb84c6ff18
+References: <20240520102033.9361-1-nj.shetty@samsung.com>
+	<CGME20240520103004epcas5p4a18f3f6ba0f218d57b0ab4bb84c6ff18@epcas5p4.samsung.com>
+	<20240520102033.9361-10-nj.shetty@samsung.com>
+	<41228a01-9d0c-415d-9fef-a3d2600b1dfa@suse.de>
+	<20240521140850.m6ppy2sxv457gxgs@green245>
+	<0f29bcc1-e708-47cc-a562-0d1e69be6b03@suse.de>
 
-On May 21, 2024 / 13:24, Josef Bacik wrote:
-> Because NBD has the old style configure the device directly config we
-> sometimes have spurious failures where the device wasn't quite ready
-> before the rest of the test continued.
->=20
-> nbd/002 had been using _wait_for_nbd_connect, however this helper waits
-> for the recv task to show up, which actually happens slightly before the
-> size is set and we're actually ready to be read from.  This means we
-> would sometimes fail nbd/002 because the device wasn't quite right.
->=20
-> Additionally nbd/001 has a similar issue where we weren't waiting for
-> the device to be ready before going ahead with the test, which would
-> cause spurious failures.
->=20
-> Fix this by adjusting _wait_for_nbd_connect to only exit once the size
-> for the device is being reported properly, meaning that it's ready to be
-> read from.
->=20
-> Then add this call to nbd/001 to eliminate the random failures we would
-> see with this test.
->=20
-> Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_19f97_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
 
-Josef, thank you very much. I've been seeing nbd/001 on my test system and =
-this
-patch avoids it :) The change looks good to me. I will leave it for several
-days before applying it, in case anyone has some more comments.=
+On 22/05/24 08:22AM, Hannes Reinecke wrote:
+>On 5/21/24 16:08, Nitesh Shetty wrote:
+>>On 21/05/24 09:11AM, Hannes Reinecke wrote:
+>>>On 5/20/24 12:20, Nitesh Shetty wrote:
+>>>>Before enabling copy for dm target, check if underlying devices and
+>>>>dm target support copy. Avoid split happening inside dm target.
+>>>>Fail early if the request needs split, currently splitting copy
+>>>>request is not supported.
+>>>>
+>>>>Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>>>>---
+>>>>@@ -397,6 +397,9 @@ struct dm_target {
+>>>>      * bio_set_dev(). NOTE: ideally a target should _not_ need this.
+>>>>      */
+>>>>     bool needs_bio_set_dev:1;
+>>>>+
+>>>>+    /* copy offload is supported */
+>>>>+    bool copy_offload_supported:1;
+>>>> };
+>>>> void *dm_per_bio_data(struct bio *bio, size_t data_size);
+>>>
+>>>Errm. Not sure this will work. DM tables might be arbitrarily, 
+>>>requiring us to _split_ the copy offload request according to the 
+>>>underlying component devices. But we explicitly disallowed a split 
+>>>in one of the earlier patches.
+>>>Or am I wrong?
+>>>
+>>Yes you are right w.r.to split, we disallow split.
+>>But this flag indicates whether we support copy offload in dm-target or
+>>not. At present we support copy offload only in dm-linear.
+>>For other dm-target, eventhough underlaying device supports copy
+>>offload, dm-target based on it wont support copy offload.
+>>If the present series get merged, we can test and integrate more
+>>targets.
+>>
+>But dm-linear can be concatenated, too; you can easily use dm-linear
+>to tie several devices together.
+>Which again would require a copy-offload range to be split.
+>Hmm?
+>
+Sorry, I dont understand the concern here. I see 3 possibilites here.
+
+1. Both src and dst IO lies in same underlying device. This will succeed.
+2. src and dst lie in different devices. This will fail.
+	a. src or dst needs to be split, if one or both of them
+	spans across the underlying block device boundary. In this case we
+	fail the IO in dm layer(refer patch 9).
+	b. src and dst doesn't split in dm,
+	but they wont be merged in request later as they belong to
+	different block device.
+	Hence the request reaches the driver with single bio and will fail
+	in driver(refer patch 7)
+
+Does this address your concern, or do you have something else in mind ?
+
+Thank you,
+Nitesh Shetty
+
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_19f97_
+Content-Type: text/plain; charset="utf-8"
+
+
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_19f97_--
