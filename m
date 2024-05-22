@@ -1,48 +1,59 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64CB145B02;
-	Wed, 22 May 2024 17:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1923182877
+	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 17:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716400348; cv=none; b=qc6U99tYOwiiXuUTdwo0YWl2ZUtGSugxD726X3dkRkJbeGoCXWJkeIcnVgzB2H5IuZYVNmS6iGxzS2JMqW2NhoVCJhd1mA5Ut2/O8IYAfS2Z/wpNTrlkPm8nqnL9/TTtezdvvdG/+bMcbIJD1XyTjdnplEIeH/RI87Ghdt+M0Kw=
+	t=1716400659; cv=none; b=ZSfocHUuCI16uNutk0b4q2LiJskZ02bRnrCbjW6DbyUS/sVdNMTTgG50mC42oQOatjTFVrkvDfnb48uTaZ1bl5RP/ulEQdjzJdCTyBI9BLqBxdyG7oV0bzVPoDJp3diZjwIPQmlk9Yko51Qobt4Xmk8WrWA9hvgIOHwCz+8AgnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716400348; c=relaxed/simple;
-	bh=aA3DKznaBT1BfNeUkAE6FwQ0W4IHdJ7XzpJGKtXI/6s=;
+	s=arc-20240116; t=1716400659; c=relaxed/simple;
+	bh=km6GkJRH1oXle4Y0aeGjvJ9VZaAmz5Ww5mIIUQ0fpFo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ja6LSKSfe3Nlp56nuFBr546uewCtvKshoJnMgCdk4YrOM5fneTy5g6znBmCtx7oYq3kXGuNvgniFgaawDktThOMWomWJzdcQLvRzfmv1gpw0WcBY+OgTS4hfvV5esGWlXcZ7gGqLQH78MRSqwQ/N9RGCAZBwT16SFzEpOaon10M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=p2pHGKlT; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=ADht75r9EBM/BQ+YGnVIiP8fSNv/4Rc5Zq28i9RIvV+jOkmpbKHm4l3VJIlLZkoaZQgDUjTLz49dXDUzIft61Rtd1pQ9mIeU/pgXWB0kZU46TdQpxpbmlAsLKX6qsvhId4N0bxdZbuGP+A5ZDdzrlGwsE1cOrH8HXWjp7AOEv+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JZW6DHNi; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="p2pHGKlT"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VkzQy08jwz6Cnk9V;
-	Wed, 22 May 2024 17:52:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1716400336; x=1718992337; bh=aA3DKznaBT1BfNeUkAE6FwQ0
-	W4IHdJ7XzpJGKtXI/6s=; b=p2pHGKlTGN1n79gxy2b/GyEl+HkP0bgyc2UeYFM/
-	GXSzKzNN1hhVyWYWt36+Lp/wge77YnUp3UTBQCCs5mnMacRLMOcgij5X6fN65Wej
-	8KE9Kc0EFuDdd4BXiOu3B/ASQKyk8frkif00MA86DIrCWQvv4TL86jA6U4fYWUZo
-	pAeT3gs6lohVfoM8VXD757F87uEZlLe8RGe3dO6Y619fpHFuOke+evLOcDOq98DH
-	RTyPuQLqHjXoK/xBROHDvP9Iy+XKZ1Mj4yQ1DKWMguuVjseOFLaV2CCHYGnIZaV4
-	Lgjk/nUaA+7ZTeyoDv8HIjuDr+QSK8ehLX5M3WFoaFZOXA==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id SYpxkEZJmixc; Wed, 22 May 2024 17:52:16 +0000 (UTC)
-Received: from [100.96.154.26] (unknown [104.132.0.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VkzQg1dXmz6Cnk9X;
-	Wed, 22 May 2024 17:52:11 +0000 (UTC)
-Message-ID: <631c55b9-8b0a-4ac0-81bd-acf82c4a7602@acm.org>
-Date: Wed, 22 May 2024 10:52:10 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JZW6DHNi"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-36daacdbf21so1936965ab.2
+        for <linux-block@vger.kernel.org>; Wed, 22 May 2024 10:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716400656; x=1717005456; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vvzMaUzKqFOseklIwtjARXZ+I/8PBiP7raqhNOSJqDw=;
+        b=JZW6DHNik4i+ZmVTi1e+aXeZz/LUGUchQgL0lIocvg46NrLytfU85zIPLLbXqDkhI0
+         2sJIrooVtdWhV0jLn9Xr+hwJkEWE/YIgzaqOw9f0lj00XDdPF8L39HtGjXHdGkinbGUK
+         CqKk96pF0CAN7DsyFzG3HjYdq4+KbTXLmh5ehWP/bmR6nkOx4uiz47Yzc4z1jAye+v5H
+         IvecX/zyJ1duFRJHFRPsN/rLww5pnKXPrqXgF+Nrb7XCq74YRwmAcp4Ewq2b9qh+oIkV
+         yhixLCJvX3V07vtJas59GoGcoXNhQ2DG4twxLCZ9usbMFJokJMO1WEo14A8Zfz7dv48d
+         KihA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716400656; x=1717005456;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vvzMaUzKqFOseklIwtjARXZ+I/8PBiP7raqhNOSJqDw=;
+        b=lCIDVD3GXxvxvj7T2bbJcz6ys9orM80ZoSlydUE8/DHuTGBNjOLo6xOlJIBnMNJM5h
+         7Mi7hL0rOz2w3BfhHJkq8BXz700oFG7dj0aapy/xPojSItcgxl3oFQTGD18hhgtWCOnf
+         FJ5F/AcAf0Re39bTmoaWOIhwCuN0e4MW8hFuQpNWrx9l8pS9t0JrQn0hSLeGCa4f4nz5
+         xxxech1m89e0lNUWGJECHvn2rryVzxFXEcA0TtRq2nJXeW0JrNNuYV/H4MX04G5u8E3G
+         zwECXM/hwGPzlvEe5VKoqN5RW2DUImN/5JoFXZZcq1EMapeyyBYH6q5P58hYKEZsmcMY
+         GTIQ==
+X-Gm-Message-State: AOJu0YyaMkxRgMqYLdiqKPe52rF56nSKKep6NabHv8sb7o5X8uoKKq8Z
+	wtkVTM1GRqMDLQXIX9bXaqgQC5/S0QkPMkd+np498q5awMptObu9Cj9yQoTn6L45/6vTqfvWXKh
+	L
+X-Google-Smtp-Source: AGHT+IHXUHRzeijL9T4CaAAoS3S+jdJoetWF8AHLSeL5TvrVSBx4SyHEVK6B66pE+FSdZ/SqPFVxTA==
+X-Received: by 2002:a05:6e02:1c47:b0:36c:c86b:9180 with SMTP id e9e14a558f8ab-371f56c8a4amr30384885ab.0.1716400654771;
+        Wed, 22 May 2024 10:57:34 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3732463eeb2sm601815ab.84.2024.05.22.10.57.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 May 2024 10:57:34 -0700 (PDT)
+Message-ID: <68cfbc08-6d39-4bc6-854d-5df0c94dbfd4@kernel.dk>
+Date: Wed, 22 May 2024 11:57:32 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,66 +61,39 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 12/12] null_blk: add support for copy offload
-To: Nitesh Shetty <nj.shetty@samsung.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, martin.petersen@oracle.com, david@fromorbit.com,
- hare@suse.de, damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com,
- joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
- Vincent Fu <vincent.fu@samsung.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520103039epcas5p4373f7234162a32222ac225b976ae30ce@epcas5p4.samsung.com>
- <20240520102033.9361-13-nj.shetty@samsung.com>
- <2433bc0d-3867-475d-b472-0f6725f9a296@acm.org>
- <20240521144629.reyeiktaj72p4lzd@green245>
+Subject: Re: [PATCH] loop: inherit the ioprio in loop woker thread
+To: Bart Van Assche <bvanassche@acm.org>,
+ Yunlong Xing <yunlong.xing@unisoc.com>, yunlongxing23@gmail.com,
+ niuzhiguo84@gmail.com, Hao_hao.Wang@unisoc.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240522074829.1750204-1-yunlong.xing@unisoc.com>
+ <5166bc31-1fd9-4f7f-bc51-f1f50d9d5483@acm.org>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240521144629.reyeiktaj72p4lzd@green245>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <5166bc31-1fd9-4f7f-bc51-f1f50d9d5483@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 5/21/24 07:46, Nitesh Shetty wrote:
-> On 20/05/24 04:42PM, Bart Van Assche wrote:
->> On 5/20/24 03:20, Nitesh Shetty wrote:
->>> +=C2=A0=C2=A0=C2=A0 __rq_for_each_bio(bio, req) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (seg =3D=3D blk_rq_nr_=
-phys_segments(req)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-ector_in =3D bio->bi_iter.bi_sector;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (rem !=3D bio->bi_iter.bi_size)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return status;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-ector_out =3D bio->bi_iter.bi_sector;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-em =3D bio->bi_iter.bi_size;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 seg++;
->>> +=C2=A0=C2=A0=C2=A0 }
->>
->> _rq_for_each_bio() iterates over the bios in a request. Does a copy
->> offload request always have two bios - one copy destination bio and
->> one copy source bio? If so, is 'seg' a bio counter? Why is that bio
->> counter compared with the number of physical segments in the request?
->>
-> Yes, your observation is right. We are treating first bio as dst and
-> second as src. If not for that comparision, we might need to store the
-> index in a temporary variable and parse based on index value.
+On 5/22/24 11:38 AM, Bart Van Assche wrote:
+> On 5/22/24 00:48, Yunlong Xing wrote:
+>> @@ -1913,6 +1921,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+>>           set_active_memcg(old_memcg);
+>>           css_put(cmd_memcg_css);
+>>       }
+>> +
+>> +    if (ori_ioprio != cmd_ioprio)
+>> +        set_task_ioprio(current, ori_ioprio);
+>> +
+>>    failed:
+>>       /* complete non-aio request */
+>>       if (!use_aio || ret) {
+> 
+> Does adding this call in the hot path have a measurable performance impact?
 
-I'm still wondering why 'seg' is compared with blk_rq_nr_phys_segments(re=
-q).
+It's loop, I would not be concerned with overhead. But it does look pretty
+bogus to modify the task ioprio from here.
 
-Thanks,
+-- 
+Jens Axboe
 
-Bart.
 
