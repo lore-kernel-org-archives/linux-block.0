@@ -1,96 +1,193 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E9313D60A
-	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 17:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F921422D5
+	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 17:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716399075; cv=none; b=bE8saFr67CgFdlz5alGq/O9xS/RJfVaSecs2EtiGEjfiBmHiEs3kNvzp13zt9i0bUmYGX0OZCecL9mFyd9N/+ZIg3a7BGxo6cb9IyKoTLiBrGhM42uf+PkPgoXQRsdf/1yPLZCAMkNUJngTVWUo1PiWqWvxbI50O9mVGf/02vBA=
+	t=1716399446; cv=none; b=gPOhMpJe9alf75z5LUTRq8AcXdM1F5NbL9RGwuJWlWoYrbjpO6u3SM60XLw3gk0hQ+DoN3EZwUZb+TT72+fIp10jEBGWjzXAqUq37oaAXhx604P+zvN/E0aXlH7R/fCFUXqsFyB+pH/D1NzcbDpUa8MOEa+5KOHU4WdFUYWMS+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716399075; c=relaxed/simple;
-	bh=1B9dsnoCotJxFTrkGAZwC40Nz5IzOJrheW4eFVSuLL4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=r5Q0+sZImSZvIR5Ue8xUkSP5tLdLwuVQOKrGTYy8qhJxN+RvXxU4Ys7ObAe+VFlnWZq8B9VoXMrr4HXfF/H3Ee4FD42OGwO4LT+metXTFmWWfOlkdXvszglF8DNe8Z4YWM4G2RA0E6Fd6mRWcSjeoe3MPJT3+6BNKuPXC+82G5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=F/1Ut54e; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1716399446; c=relaxed/simple;
+	bh=BsCfFqXmskMjOpeSEN/u265PuQFM1MR/tOMn8LfJ/Y0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cInC8jIhDJvvluJsMjgjCfcgbOUMOSS86oiYKJCIzHIx7kTnfBTKJ3nZnAcRty8FCfyqLGk8iI325vbQzCO7waRNiWUWekq9mArNOVW3+9xhW89Qm8z1NmfDLe06HqPRJUhcU7XbMSlDFzLeWGCvSBQnqaT8tLUJneL2ejeYBmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mu2daiWf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="F/1Ut54e"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7e24bcce578so23520339f.0
-        for <linux-block@vger.kernel.org>; Wed, 22 May 2024 10:31:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716399072; x=1717003872; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZyoQ04pME4REpApsHBdNGyO5vz5nhCeO/3yT1CYUWSM=;
-        b=F/1Ut54evQVA/sNcBskksLJr3mLash2EAqtjclZRL8j9WZ1VFe8QogB2r7wBFBkEba
-         C18D9ewMvCpAWMsbHKN+B3ZHQe8OYpOCZyCM7nQ3uIJ+fGieQIqYeZ2Ca7Vee1HNqGrc
-         lNIQU2WnZr5mi+lRsnpOZFbMxbNby8Xy+lKR9Ogl9flW9BB6wtvAE8O1z20oU2K5CQCl
-         jSzUMwDTMvxOSjO3lA0eLDPbvQbva8i7yR3/rTzyu3J83B8p/HIRZXhGCjUWFGz4xNgk
-         6LS07pTxJxkb+v5MNY+2NvHOx5FpNWvgmi2K5J7bkXeMCSPV2+TzYTtZrmTKWB1AgwBq
-         3BxQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mu2daiWf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716399443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=llHIFO0/Fki+cPFoMQv30dTXRmTpbLAeQQBl/Bb7SGc=;
+	b=Mu2daiWfO6NreyYRnB1elZwj/44fjszPMzqnyEo5mzaaRCZfC5jk+chI9jxvk/clo91KjA
+	QYJcDiyeOgJcgK/JUpwihZWJ2krQGL5dVC0L+wFe52nLxM3WL2AGgaMc5dYt87i9CUNQSQ
+	nJMyPS7D5cyFERD3RyTAswIDOmFsGoc=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-652-_2S5G3lGP9urYu_8j_Fsog-1; Wed, 22 May 2024 13:37:22 -0400
+X-MC-Unique: _2S5G3lGP9urYu_8j_Fsog-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-61be530d024so255913997b3.2
+        for <linux-block@vger.kernel.org>; Wed, 22 May 2024 10:37:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716399072; x=1717003872;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1716399441; x=1717004241;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZyoQ04pME4REpApsHBdNGyO5vz5nhCeO/3yT1CYUWSM=;
-        b=RWGbC99SY+u2jW7O+kAM6HmczNQ12J5RFtmFS3Fj8q0Ao6ibRvnMr9q3CTYgD78ye0
-         I4nfXbyrwUbXatS4hBayFNdAfk5Yla6l/Zs0AllfSK+dpF+WClJFGeC50E/gV7ln7Mx3
-         HB0c2yBEjmLP4TKxdbEfrQvh1g2vSDjJXCFwY4snHa0umC+Qrmxwoqetbi5C2MtnpB+P
-         QsYXcPQSBoe+OpcsAbnoe8Vlj+Er8LBhAF70iaiqEqjlsw3N0ja7TttzrqqXRwsUOWZ2
-         b+FI9eO3TNtJMh325Tm4vW3j70v4g644xw/7FXUpXWTX9Rb0MBvNXOX3l0PbPS2IH0jm
-         WNkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjcFA1EuoEOT15PT7oaTKm8bnrDO2AgS1E3+DyAvfridXfajr6T+N/fQhjJBLzhUK2WOVZYbKbWXHnl5jksKw4nf2BWe1Fk9XRkFU=
-X-Gm-Message-State: AOJu0Yz3wnTzkO31SrFTzoCw/B/uLe3FKtVo11NhxtUaiFan4NRswMph
-	9w9fa76+xhTFYUgYccntWLGW/Y4egtTgnX+eFqFBfXCEmSdhIJq71EWZEsDgaCE=
-X-Google-Smtp-Source: AGHT+IF/WI1FtilI6WWcWW4/jJALodFw4CgIslzmlQd2qik5wcTeLLwZMVKIhIz6ctQZ1GF6SAn4GQ==
-X-Received: by 2002:a05:6602:420a:b0:7de:b279:fb3e with SMTP id ca18e2360f4ac-7e37db353b9mr277689039f.1.1716399072236;
-        Wed, 22 May 2024 10:31:12 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489375c1a86sm7626823173.105.2024.05.22.10.31.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 10:31:11 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: tj@kernel.org, yukuai3@huawei.com, linux@treblig.org
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20240522172458.334173-1-linux@treblig.org>
-References: <20240522172458.334173-1-linux@treblig.org>
-Subject: Re: [PATCH] blk-throttle: remove unused struct
- 'avg_latency_bucket'
-Message-Id: <171639907112.82914.16265588567608443016.b4-ty@kernel.dk>
-Date: Wed, 22 May 2024 11:31:11 -0600
+        bh=llHIFO0/Fki+cPFoMQv30dTXRmTpbLAeQQBl/Bb7SGc=;
+        b=vrksd0IatrmsvVHimPdsI5ZkQyuN4uISoz8ScB5S5BTIjCETBbY3eKpD/k9UE1r1On
+         KKa48qsOIJErQutdLIuy6N2GuzWEb/d+pbRHpdZC9tPfGO8SOEfVYh6xOaqSchluuUEz
+         xg3TD1n9nMYkOSw9AZjuGmjf93xQLYyLQpi/vAr+uyRgycVEa1BJFeJLzVlOxz3SGC+v
+         g9CcebvrBtEmkC6RfNludccM0WoIfikya1dfdNQ1++ajuQG7P9YNqae1OVhv48PaKwWN
+         XlcYQVzz6xoLKaRKvjI/jWC9Pcmm0YFqlBJQwoLBuP/8Q06Ns0A2Dwct1m3kaRWmZZDX
+         hKGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUUrLXbNtu+S5cT4VuALreXkVeUuYHW/ymS/zW+6Hyike+aeFvV+7qpfkopNf3cIxpBTFVKHMVqYcjrP0e2nvP9Ltbx6rIr6GRTMeo=
+X-Gm-Message-State: AOJu0YxvlPokxgaH81oi+rrbcF1rXXfQNSHIJ7t2X+BpO8SyYIQ0QHqR
+	JbCl1eKdFk+N0Y791xBtmxFI8YOw95QKwjGwJv9VONyJ0+m/NPgaV4qIJXm9G/K6mOTundQgeoL
+	yNjvydH/9gQ1VaU6wux1+XD8IESLGYxrvq8Ao5lg5wS9XO3u6HhT6W5xLvXkO5AMdDXiE6eppOH
+	A30/Zty+MBwR1nP2GYY10/KOoBtTTbGczyYb0=
+X-Received: by 2002:a0d:df42:0:b0:619:5176:5e34 with SMTP id 00721157ae682-627e4658bd2mr25563487b3.18.1716399441525;
+        Wed, 22 May 2024 10:37:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGqqHn6QBnyL0lTqc0WTSwbHo1OjdUoiiNvEfqYstLHD0xqqU0pqXN9YQvZpMEZ3DT++9JhHSkyOOjLKQvcAqU=
+X-Received: by 2002:a0d:df42:0:b0:619:5176:5e34 with SMTP id
+ 00721157ae682-627e4658bd2mr25563287b3.18.1716399441162; Wed, 22 May 2024
+ 10:37:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+References: <20240522025117.75568-1-snitzer@kernel.org> <20240522142458.GB7502@lst.de>
+ <Zk4h-6f2M0XmraJV@kernel.org>
+In-Reply-To: <Zk4h-6f2M0XmraJV@kernel.org>
+From: Ewan Milne <emilne@redhat.com>
+Date: Wed, 22 May 2024 13:37:10 -0400
+Message-ID: <CAGtn9rkzDdsq-_VQQfcRB8V9tD82_DWLx=pz+59DuBEkvuvOQw@mail.gmail.com>
+Subject: Re: dm: retain stacked max_sectors when setting queue_limits
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+	Marco Patalano <mpatalan@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+We tried the sd_revalidate_disk() change, just to be sure.  It didn't fix i=
+t.
 
-On Wed, 22 May 2024 18:24:58 +0100, linux@treblig.org wrote:
-> 'avg_latency_bucket' is unused since
-> commit bf20ab538c81 ("blk-throttle: remove
-> CONFIG_BLK_DEV_THROTTLING_LOW")
-> 
-> Remove it.
-> 
-> 
-> [...]
+-Ewan
 
-Applied, thanks!
-
-[1/1] blk-throttle: remove unused struct 'avg_latency_bucket'
-      commit: 4a482e691c8b8a188b1ea3d6a80180e9fa925fd0
-
-Best regards,
--- 
-Jens Axboe
-
-
+On Wed, May 22, 2024 at 12:49=E2=80=AFPM Mike Snitzer <snitzer@kernel.org> =
+wrote:
+>
+> On Wed, May 22, 2024 at 04:24:58PM +0200, Christoph Hellwig wrote:
+> > On Tue, May 21, 2024 at 10:51:17PM -0400, Mike Snitzer wrote:
+> > > Otherwise, blk_validate_limits() will throw-away the max_sectors that
+> > > was stacked from underlying device(s). In doing so it can set a
+> > > max_sectors limit that violates underlying device limits.
+> >
+> > Hmm, yes it sort of is "throwing the limit away", but it really
+> > recalculates it from max_hw_sectors, max_dev_sectors and user_max_secto=
+rs.
+>
+> Yes, but it needs to do that recalculation at each level of a stacked
+> device.  And then we need to combine them via blk_stack_limits() -- as
+> is done with the various limits stacking loops in
+> drivers/md/dm-table.c:dm_calculate_queue_limits
+>
+> > > This caused dm-multipath IO failures like the following because the
+> > > underlying devices' max_sectors were stacked up to be 1024, yet
+> > > blk_validate_limits() defaulted max_sectors to BLK_DEF_MAX_SECTORS_CA=
+P
+> > > (2560):
+> >
+> > I suspect the problem is that SCSI messed directly with max_sectors ins=
+tead
+> > and ignores max_user_sectors (and really shouldn't touch either, but th=
+at's
+> > a separate discussion).  Can you try the patch below and maybe also pro=
+vide
+> > the sysfs output for max_sectors_kb and max_hw_sectors_kb for all invol=
+ved
+> > devices?
+>
+> FYI, you can easily reproduce with:
+>
+> git clone https://github.com/snitm/mptest.git
+> cd mptest
+> <edit so it uses: export MULTIPATH_BACKEND_MODULE=3D"scsidebug">
+> ./runtest ./tests/test_00_no_failure
+>
+> Also, best to change this line:
+> ./lib/mpath_generic:        local _feature=3D"4 queue_if_no_path retain_a=
+ttached_hw_handler queue_mode $MULTIPATH_QUEUE_MODE"
+> to:
+> ./lib/mpath_generic:        local _feature=3D"3 retain_attached_hw_handle=
+r queue_mode $MULTIPATH_QUEUE_MODE"
+> Otherwise the test will hang due to queue_if_no_path.
+>
+> all underlying scsi-debug scsi devices:
+>
+> ./max_hw_sectors_kb:2147483647
+> ./max_sectors_kb:512
+>
+> multipath device:
+>
+> before my fix:
+> ./max_hw_sectors_kb:2147483647
+> ./max_sectors_kb:1280
+>
+> after my fix:
+> ./max_hw_sectors_kb:2147483647
+> ./max_sectors_kb:512
+>
+> > diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> > index 332eb9dac22d91..f6c822c9cbd2d3 100644
+> > --- a/drivers/scsi/sd.c
+> > +++ b/drivers/scsi/sd.c
+> > @@ -3700,8 +3700,10 @@ static int sd_revalidate_disk(struct gendisk *di=
+sk)
+> >        */
+> >       if (sdkp->first_scan ||
+> >           q->limits.max_sectors > q->limits.max_dev_sectors ||
+> > -         q->limits.max_sectors > q->limits.max_hw_sectors)
+> > +         q->limits.max_sectors > q->limits.max_hw_sectors) {
+> >               q->limits.max_sectors =3D rw_max;
+> > +             q->limits.max_user_sectors =3D rw_max;
+> > +     }
+> >
+> >       sdkp->first_scan =3D 0;
+> >
+> >
+>
+> Driver shouldn't be changing max_user_sectors..
+>
+> But it also didn't fix it (mpath still gets ./max_sectors_kb:1280):
+>
+> [   74.872485] blk_insert_cloned_request: over max size limit. (2048 > 10=
+24)
+> [   74.872505] device-mapper: multipath: 254:3: Failing path 8:16.
+> [   74.872620] blk_insert_cloned_request: over max size limit. (2048 > 10=
+24)
+> [   74.872641] device-mapper: multipath: 254:3: Failing path 8:32.
+> [   74.872712] blk_insert_cloned_request: over max size limit. (2048 > 10=
+24)
+> [   74.872732] device-mapper: multipath: 254:3: Failing path 8:48.
+> [   74.872788] blk_insert_cloned_request: over max size limit. (2048 > 10=
+24)
+> [   74.872808] device-mapper: multipath: 254:3: Failing path 8:64.
+>
+> Simply setting max_user_sectors won't help with stacked devices
+> because blk_stack_limits() doesn't stack max_user_sectors.  It'll
+> inform the underlying device's blk_validate_limits() calculation which
+> will result in max_sectors having the desired value (which it already
+> did, as I showed above).  But when stacking limits from underlying
+> devices up to the higher-level dm-mpath queue_limits we still have
+> information loss.
+>
+> Mike
+>
 
