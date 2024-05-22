@@ -1,153 +1,108 @@
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC5D14198E
-	for <linux-block@vger.kernel.org>; Wed, 22 May 2024 16:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C040E249F9;
+	Wed, 22 May 2024 16:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716396544; cv=none; b=NkBz2UstyJ0QIdu4DNow0U3XSc/ArRBYTqM+Y8WFTcxSQT/yDrXJxSUmOVQfjyZEgL0AE3aTuOzINyjWKntrzz/c1KfjNUXXS2I6n5gtAnkiFHF/OW5k6IuMyB9bHYphLbRzbhkWrkGGXx49DXekSe/Ro97Ky/AjHYAjFjuBj64=
+	t=1716396695; cv=none; b=LHa2XYoInOPtgqrDzbOruuiMxwL1OB4IWN085FqQKrP4aO1FcY3G9CgOhLPWTDLc06mM5wDJii2op2zkP2EP7uUJ2TqerGLs2P34sqv9b4uKGtsIXQwCiOt50CsSc+xYJ7kJo5FW/zmVeCUSA738gKD/9IeB3e2IxZYpTcZ37WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716396544; c=relaxed/simple;
-	bh=7MzehI0Q2fJpHZsH1+KgnNH047c73IwfOfxTS9IjLcE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EQOIfwHciYlCLgmTjq8/DZ/LfU0dgMwpl8Vrsq+VRlNs+IvbdPduaKGrm6P1NbrS3WromIgJxkL1IJ8qfBX2nthSgYA5fsKDZXRPC2r+u7ceVrc1IXcSoEdw6bGR3oN1k4wGahR4YTILJZKY7LiEhKWCLAwkkqaFzX8oAKG1EMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.160.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-24c0dbd2866so1760507fac.0
-        for <linux-block@vger.kernel.org>; Wed, 22 May 2024 09:49:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716396541; x=1717001341;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9sJh3+M7j60eGGfzHmACpJhU1B6ooDDZPfumWrr/YfY=;
-        b=WSjlvlc5gIwDuzHJw/S+P8B3bAIWZMqwXChprwph2/0BiP1EoI8wRJDVxjO1Kg8TxK
-         EAnFrQPLnlBMB7IZhIhZV2QSDay1kImMR/mHNsWKNg9PpPq/MXbYBHfjHmgLIys9p4RY
-         BfSnDrUs4+cQUAr/SFpDBgBe5PGAP5yv5Se8bEbIRrhlTOPMlVdgNyKVp6GEDuMYkGEa
-         2aXnlIkZRpbvG4wPPyyZUs1Bs+Z45/sUB8CHZZrH1uaWgqNIoYvBEi1TrHO9DBAlrPBt
-         g/gvVgticJQ6OgppnwSEZOEd+4t0CbykRMlLOy3Go6gnnuEfSQI7nGgYQic4TLZhB8OX
-         nBaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU8Fp2nwyOddEM2tLr2PBrXuAZfjFMDP+a4gTikkzDMUMoGgMUTmXDbZ5OSlkUSrN9jccwzlx4x/UvULZlP2J6bQW1Ln4lSuVoXnNs=
-X-Gm-Message-State: AOJu0YypLdA9/Y8yhCAPXRhovuTbUMyP4w7qicDoYnpK7XrlgCoXG4Qr
-	2i+Wnq/QRe4ASLcz7hJ8Eeo++UFVGSGStVyJJgbfF9+cUEf0WiPEssVjOtrPZoo=
-X-Google-Smtp-Source: AGHT+IGeZSQX+E3YkbKQFl9xkKgIoXpFnXcZjjux/ZrFPulBr4tPWIpSG7dOPSN9T7Bd71fh8mpW3w==
-X-Received: by 2002:a05:6871:b0f:b0:24c:6335:cf1c with SMTP id 586e51a60fabf-24c68ad9b78mr2867125fac.13.1716396541620;
-        Wed, 22 May 2024 09:49:01 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43df54ef4c9sm173199201cf.30.2024.05.22.09.49.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 09:49:01 -0700 (PDT)
-Date: Wed, 22 May 2024 12:48:59 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	Marco Patalano <mpatalan@redhat.com>,
-	Ewan Milne <emilne@redhat.com>
-Subject: Re: dm: retain stacked max_sectors when setting queue_limits
-Message-ID: <Zk4h-6f2M0XmraJV@kernel.org>
-References: <20240522025117.75568-1-snitzer@kernel.org>
- <20240522142458.GB7502@lst.de>
+	s=arc-20240116; t=1716396695; c=relaxed/simple;
+	bh=6sqL4Sln4VTXgOdS36e3ZnSUXf0674oIdBAh3AxRshY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pSLewLY1XLew/Nthd2+oSB4/84RmBvYQOlt2Z8friPlA4FExbin6/3le31/rtjMKi+F9d00dVc4HfxD+Sl1IAUKPXqEmdsK5ixe1nNZ1IcalCg32iFxDdFSd9knrSiiIUEIEIMrLYbjNsFvP4/o8PLtdIlKtuZEqicp/V5Eg7V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4eJ2D4C1; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4eJ2D4C1"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Vky4b40HhzlgMVN;
+	Wed, 22 May 2024 16:51:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1716396682; x=1718988683; bh=+qHjXc4wc3A6hgY+QIP3fsYa
+	svVjod08q+0H/O6siVM=; b=4eJ2D4C1cKZjsn191QXsxoSR77Wj6jVuvaPDJdTJ
+	ryUP1pXg6rll7oigWxq9Fw68+yjDxEniGZiV6vi/TTMn4rqYjIa3cRvPnJdVse2Q
+	k4h0BIjjb8cPdLvhWna6sdkRZYoIWGHKQHRbrM/TYQGnCbOWrgk03LTTYj9WQA2O
+	OcD+Qjufb+FsUri6m9UH89mOVcQrPz5n9Nu+gSIQ/ut0OTTd4C+mcmtWqqtu7K48
+	eUjUeEldT/U31TSIzMtvTzYFqWOo8O15GQVZCdgTGw+pGZK3TZJZfGhf4GdqtHhP
+	cW2QLRHrMCJKbkaGcjsOPUQ5wlnv3t4gQP9c8Rz+Qx1G8g==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id BHXIj_N2MZ5d; Wed, 22 May 2024 16:51:22 +0000 (UTC)
+Received: from [100.96.154.26] (unknown [104.132.0.90])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Vky4Q4C7rzlgMVL;
+	Wed, 22 May 2024 16:51:18 +0000 (UTC)
+Message-ID: <b2e4a072-a339-444e-abea-29388dcbfee6@acm.org>
+Date: Wed, 22 May 2024 09:51:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240522142458.GB7502@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] block: Add ioprio to block_rq tracepoint
+To: Dongliang Cui <dongliang.cui@unisoc.com>, axboe@kernel.dk,
+ rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ ebiggers@kernel.org
+Cc: ke.wang@unisoc.com, hongyu.jin.cn@gmail.com, niuzhiguo84@gmail.com,
+ hao_hao.wang@unisoc.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, akailash@google.com,
+ cuidongliang390@gmail.com, Damien Le Moal <dlemoal@kernel.org>
+References: <20240522090104.1751148-1-dongliang.cui@unisoc.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240522090104.1751148-1-dongliang.cui@unisoc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 22, 2024 at 04:24:58PM +0200, Christoph Hellwig wrote:
-> On Tue, May 21, 2024 at 10:51:17PM -0400, Mike Snitzer wrote:
-> > Otherwise, blk_validate_limits() will throw-away the max_sectors that
-> > was stacked from underlying device(s). In doing so it can set a
-> > max_sectors limit that violates underlying device limits.
-> 
-> Hmm, yes it sort of is "throwing the limit away", but it really
-> recalculates it from max_hw_sectors, max_dev_sectors and user_max_sectors.
+On 5/22/24 02:01, Dongliang Cui wrote:
+> +#define IOPRIO_CLASS_STRINGS \
+> +	{ IOPRIO_CLASS_NONE,	"none" }, \
+> +	{ IOPRIO_CLASS_RT,	"rt" }, \
+> +	{ IOPRIO_CLASS_BE,	"be" }, \
+> +	{ IOPRIO_CLASS_IDLE,	"idle" }, \
+> +	{ IOPRIO_CLASS_INVALID,	"invalid"}
+> +
+>   #ifdef CONFIG_BUFFER_HEAD
+>   DECLARE_EVENT_CLASS(block_buffer,
+>   
+> @@ -82,6 +90,8 @@ TRACE_EVENT(block_rq_requeue,
+>   		__field(  dev_t,	dev			)
+>   		__field(  sector_t,	sector			)
+>   		__field(  unsigned int,	nr_sector		)
+> +		__field(  unsigned int,	ioprio_class		)
+> +		__field(  unsigned int, ioprio_value		)
+>   		__array(  char,		rwbs,	RWBS_LEN	)
+>   		__dynamic_array( char,	cmd,	1		)
+>   	),
+> @@ -90,16 +100,19 @@ TRACE_EVENT(block_rq_requeue,
+>   		__entry->dev	   = rq->q->disk ? disk_devt(rq->q->disk) : 0;
+>   		__entry->sector    = blk_rq_trace_sector(rq);
+>   		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
+> +		__entry->ioprio_class = rq->ioprio >> IOPRIO_CLASS_SHIFT & 0x3;
+> +		__entry->ioprio_value = rq->ioprio & 0xff;
 
-Yes, but it needs to do that recalculation at each level of a stacked
-device.  And then we need to combine them via blk_stack_limits() -- as
-is done with the various limits stacking loops in
-drivers/md/dm-table.c:dm_calculate_queue_limits
+Why to split the I/O priority field when storing it in __entry instead of when
+the values are printed? Combined the ioprio bitfields occupy 16 bits. The above
+patch reserves 64 bits in __entry. I think that's overkill. Additionally, some
+bits of the I/O priority bits are discarded by the above code before I/O
+priority information is reported.
 
-> > This caused dm-multipath IO failures like the following because the
-> > underlying devices' max_sectors were stacked up to be 1024, yet
-> > blk_validate_limits() defaulted max_sectors to BLK_DEF_MAX_SECTORS_CAP
-> > (2560):
-> 
-> I suspect the problem is that SCSI messed directly with max_sectors instead
-> and ignores max_user_sectors (and really shouldn't touch either, but that's
-> a separate discussion).  Can you try the patch below and maybe also provide
-> the sysfs output for max_sectors_kb and max_hw_sectors_kb for all involved
-> devices?
+Please split the I/O priority information into the three fields defined in
+include/uapi/linux/ioprio.h (class, hint, prio) and use the macros from that
+header file for splitting I/O priority information.
 
-FYI, you can easily reproduce with:
+Thanks,
 
-git clone https://github.com/snitm/mptest.git
-cd mptest
-<edit so it uses: export MULTIPATH_BACKEND_MODULE="scsidebug">
-./runtest ./tests/test_00_no_failure
+Bart.
 
-Also, best to change this line:
-./lib/mpath_generic:        local _feature="4 queue_if_no_path retain_attached_hw_handler queue_mode $MULTIPATH_QUEUE_MODE"
-to:
-./lib/mpath_generic:        local _feature="3 retain_attached_hw_handler queue_mode $MULTIPATH_QUEUE_MODE"
-Otherwise the test will hang due to queue_if_no_path.
-
-all underlying scsi-debug scsi devices:
-
-./max_hw_sectors_kb:2147483647
-./max_sectors_kb:512
-
-multipath device:
-
-before my fix:
-./max_hw_sectors_kb:2147483647
-./max_sectors_kb:1280
-
-after my fix:
-./max_hw_sectors_kb:2147483647
-./max_sectors_kb:512
- 
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index 332eb9dac22d91..f6c822c9cbd2d3 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -3700,8 +3700,10 @@ static int sd_revalidate_disk(struct gendisk *disk)
->  	 */
->  	if (sdkp->first_scan ||
->  	    q->limits.max_sectors > q->limits.max_dev_sectors ||
-> -	    q->limits.max_sectors > q->limits.max_hw_sectors)
-> +	    q->limits.max_sectors > q->limits.max_hw_sectors) {
->  		q->limits.max_sectors = rw_max;
-> +		q->limits.max_user_sectors = rw_max;
-> +	}
->  
->  	sdkp->first_scan = 0;
->  
-> 
-
-Driver shouldn't be changing max_user_sectors..
-
-But it also didn't fix it (mpath still gets ./max_sectors_kb:1280):
-
-[   74.872485] blk_insert_cloned_request: over max size limit. (2048 > 1024)
-[   74.872505] device-mapper: multipath: 254:3: Failing path 8:16.
-[   74.872620] blk_insert_cloned_request: over max size limit. (2048 > 1024)
-[   74.872641] device-mapper: multipath: 254:3: Failing path 8:32.
-[   74.872712] blk_insert_cloned_request: over max size limit. (2048 > 1024)
-[   74.872732] device-mapper: multipath: 254:3: Failing path 8:48.
-[   74.872788] blk_insert_cloned_request: over max size limit. (2048 > 1024)
-[   74.872808] device-mapper: multipath: 254:3: Failing path 8:64.
-
-Simply setting max_user_sectors won't help with stacked devices
-because blk_stack_limits() doesn't stack max_user_sectors.  It'll
-inform the underlying device's blk_validate_limits() calculation which
-will result in max_sectors having the desired value (which it already
-did, as I showed above).  But when stacking limits from underlying
-devices up to the higher-level dm-mpath queue_limits we still have
-information loss.
-
-Mike
