@@ -1,48 +1,48 @@
 Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380BC145B1D;
-	Wed, 22 May 2024 18:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2526C141991;
+	Wed, 22 May 2024 18:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716401138; cv=none; b=VXe+q0EJdEHIFtK/Zjhc63rcyUR0KrPGuUr3EzmVmUj+/PYJu4yPkkxvuK9dWPYwmI5v8+YyQsv2cWOJ23kgoLoj5bli9ohx5AHCXJj5phjo1PVxqK5+QRhf8CYj8yFivMyqbpjiP32uPK6VaHHwsYgUPyQjf+91rKxBN4zjZr8=
+	t=1716401541; cv=none; b=JsZ0d1ZypwpCNPQ6rh8b2aCqsjPdfubaFInu5XwkaE8WFNI4//GpcGORwq1lwOt8UbrIhAXrO8vHtpAvTPF9wzJnhoqJ1GLASx5kV+UFvUSn3iv38FYsSWEK4h3ofSinorp0JgaeVMUYW6sAYnyPKOAeeWH3Y+iZoernqkde7QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716401138; c=relaxed/simple;
-	bh=luEwbZp5k3nkrHj86wxSaPapUg/Y1fNnfoeZAYeQvfo=;
+	s=arc-20240116; t=1716401541; c=relaxed/simple;
+	bh=/d4v5sYm1m6fuW79UH7BAzTvWviVCQgqSpnXSdESHns=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=byQi1sB9fc5AKcPLDq4w9f1u8UcKVLZNgw1C/V/zR6PRsMusKYuMEqbb8vrwAdKmDHEvvCQCeUtzntRhNsTaTe1F4JcEbmHFkW6sD6fYhfkgxHuneehsRVVG+s0UlppZ3ZePoonh8xzhyyMt0PxJOwu9Q5GnHCEK4+ycbm7rjPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=w4GG+Zk5; arc=none smtp.client-ip=199.89.1.12
+	 In-Reply-To:Content-Type; b=AOef6FiDK4yon+/qoVa+XA2xyZgzea3DOHlgOE05aWL5HgRJJTUzxFfIItTyLvObxZUCTDB9bnFU/eEKIDDNrj3k3lVCep7o3mqFqX0CZG2ArrW7bXzb6kA+GVbKstcMZ85szZEQtbiEnBZxh2GusOuWawyvtiIpjExPVRMZybA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=BjTuCMuh; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="w4GG+Zk5"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="BjTuCMuh"
 Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Vkzk83zW8zlgMVN;
-	Wed, 22 May 2024 18:05:36 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Vkzsv4W3HzlgMVN;
+	Wed, 22 May 2024 18:12:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1716401127; x=1718993128; bh=L/Z8Mp/V6Xlw6wkYa899vAJP
-	gD1/fbki4rEqLMN5kt0=; b=w4GG+Zk5K8I/0oN1UncHTyKd/Gk3/mstQgMKWu5t
-	Ny7lWh1SNsdH2k/eerNIDbR63ln2fHwadLSxbN26wlaOya/Eb7PeDC2wO1wQKjb9
-	3Kv/JR7I2jGtvACEHUtbbltKIsewEnPsGTXlFkdHY5VQDRMbOzG2Cwd8N6o6Kglt
-	VAATPhWT8TLmUPmX550QPPAX33B17Mu07oRnRQwIO7d7FhOlbWoNQaN1AFJr+alO
-	tSKLeozFvhzoY0vF+hxn0Q0phgYjUm0983n3BJ3WEMUeCawbvbeOWfDl6EKHKFRy
-	nODt7HOx9vbzAwF9c3bzRHWDHD+tlt4k1IYNX1Ev1w+wxg==
+	 s=mr01; t=1716401537; x=1718993538; bh=ovcwOX7c3kKC7VfVSgG2qEQZ
+	z0LFgHzfruEwaIPcjQI=; b=BjTuCMuhoqZIW+R/GHbffN1feXO1KNBl5rwqZExO
+	tG/h1FfpnC6NETZnWurq0WKpfOFYPq3q5d7vp+iT+c3/FU6etpKyq/4ksMjcf30I
+	QmddFHtuxgTM6jHx2HGNeHi6hBu6G7hmB7iNUdVjct1wFcHqH0yyU7mhBbJyfjlV
+	7qo2etsKOicPQDolOSeXD7m+O88IQPpczOJ9FLcvJGGo2tUjDiPdqwZGk8FuFI0R
+	EgCEaIuqiBV3FW/ReDIh6Py9sUZpZik+UPXvWUCl3dklRc2iPKi5GOPjtjI17pbx
+	EpsQ+8TdGEBo/8RqlypYIU/HovgwarKY6msBQ0xZfCBdrw==
 X-Virus-Scanned: by MailRoute
 Received: from 009.lax.mailroute.net ([127.0.0.1])
  by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id F51LBj9xAtLQ; Wed, 22 May 2024 18:05:27 +0000 (UTC)
+ id lFeQQcOfYWfF; Wed, 22 May 2024 18:12:17 +0000 (UTC)
 Received: from [100.96.154.26] (unknown [104.132.0.90])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Vkzjx0WdLzlgMVL;
-	Wed, 22 May 2024 18:05:24 +0000 (UTC)
-Message-ID: <97966085-d7a4-4238-a413-4cdac77af8bd@acm.org>
-Date: Wed, 22 May 2024 11:05:24 -0700
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Vkzsr5hSvzlgMVL;
+	Wed, 22 May 2024 18:12:16 +0000 (UTC)
+Message-ID: <f6d3e1f2-e004-49bb-b6c1-969915ccab37@acm.org>
+Date: Wed, 22 May 2024 11:12:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,56 +50,62 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
- and request layer.
-To: Nitesh Shetty <nj.shetty@samsung.com>, Jens Axboe <axboe@kernel.dk>,
- Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Cc: martin.petersen@oracle.com, david@fromorbit.com, hare@suse.de,
- damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
- nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520102842epcas5p4949334c2587a15b8adab2c913daa622f@epcas5p4.samsung.com>
- <20240520102033.9361-3-nj.shetty@samsung.com>
+Subject: Re: [PATCH] loop: inherit the ioprio in loop woker thread
+To: Jens Axboe <axboe@kernel.dk>, Yunlong Xing <yunlong.xing@unisoc.com>,
+ yunlongxing23@gmail.com, niuzhiguo84@gmail.com, Hao_hao.Wang@unisoc.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240522074829.1750204-1-yunlong.xing@unisoc.com>
+ <5166bc31-1fd9-4f7f-bc51-f1f50d9d5483@acm.org>
+ <68cfbc08-6d39-4bc6-854d-5df0c94dbfd4@kernel.dk>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240520102033.9361-3-nj.shetty@samsung.com>
+In-Reply-To: <68cfbc08-6d39-4bc6-854d-5df0c94dbfd4@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 5/20/24 03:20, Nitesh Shetty wrote:
-> We add two new opcode REQ_OP_COPY_DST, REQ_OP_COPY_SRC.
-> Since copy is a composite operation involving src and dst sectors/lba,
-> each needs to be represented by a separate bio to make it compatible
-> with device mapper.
-> We expect caller to take a plug and send bio with destination information,
-> followed by bio with source information.
-> Once the dst bio arrives we form a request and wait for source
-> bio. Upon arrival of source bio we merge these two bio's and send
-> corresponding request down to device driver.
-> Merging non copy offload bio is avoided by checking for copy specific
-> opcodes in merge function.
+On 5/22/24 10:57, Jens Axboe wrote:
+> On 5/22/24 11:38 AM, Bart Van Assche wrote:
+>> On 5/22/24 00:48, Yunlong Xing wrote:
+>>> @@ -1913,6 +1921,10 @@ static void loop_handle_cmd(struct loop_cmd *c=
+md)
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_active_me=
+mcg(old_memcg);
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 css_put(cmd_m=
+emcg_css);
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (ori_ioprio !=3D cmd_ioprio)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_task_ioprio(current, =
+ori_ioprio);
+>>> +
+>>>  =C2=A0=C2=A0 failed:
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* complete non-aio request */
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!use_aio || ret) {
+>>
+>> Does adding this call in the hot path have a measurable performance im=
+pact?
+>=20
+> It's loop, I would not be concerned with overhead. But it does look pre=
+tty
+> bogus to modify the task ioprio from here.
 
-Plugs are per task. Can the following happen?
-* Task A calls blk_start_plug()
-* Task B calls blk_start_plug()
-* Task A submits a REQ_OP_COPY_DST bio and a REQ_OP_COPY_SRC bio.
-* Task B submits a REQ_OP_COPY_DST bio and a REQ_OP_COPY_SRC bio.
-* Task A calls blk_finish_plug()
-* Task B calls blk_finish_plug()
-* The REQ_OP_COPY_DST bio from task A and the REQ_OP_COPY_SRC bio from
-   task B are combined into a single request.
-* The REQ_OP_COPY_DST bio from task B and the REQ_OP_COPY_SRC bio from
-   task A are combined into a single request.
+Hi Jens,
+
+Maybe Yunlong uses that call to pass the I/O priority to the I/O submitte=
+r?
+
+I think that it is easy to pass the I/O priority to the kiocb submitted b=
+y
+lo_rw_aio() without calling set_task_ioprio().
+
+lo_read_simple() and lo_write_simple() however call vfs_iter_read() /
+vfs_iter_write(). This results in a call of do_iter_readv_writev() and
+init_sync_kiocb(). The latter function calls get_current_ioprio(). This i=
+s
+probably why the set_task_ioprio() call has been added?
 
 Thanks,
 
 Bart.
+
 
