@@ -1,218 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F27B641
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 14:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894287470
+	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 14:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716476317; cv=none; b=AYJKxpnxXKgqrm2bQpzK5yW9eNaChebSgVxdnJwpCZO+ExfPCoiBxsJO1orcTAYhLdPYT0zKRbYXNG0oiSh0k5GBNwyEedXTP8QnkYZkQdz99zIA1PAyFX6v93OfjwCeb5HB6vflnONgEMWsRYbFbh2rT0o4gbJWx7L5mG6mgoo=
+	t=1716476334; cv=none; b=jbuPW56nqrq8M41hqDWzNzBvv48AMzwSPfEUEqMxa4vxwmMILrxMFxbLEYd851dQNebFAVVRR6XCKfmxkamXVJSXbzPJvyhUwlemHKG/5kjeaBAA3vvLsJPT1HRZunoX0ernEXe6yb1jNyF/6NAwPnxR6m9ZYBmad7lSonCInlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716476317; c=relaxed/simple;
-	bh=oSneREWGG2ETnM/vj8hywylDGM2f94bRDcsr8f8ARQA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=a8L31AzYmPHgNWIyMNritxloPQGFkFFNUkDwezcB1/l88/GN+YC2Lzg07GU8Sf1xw45x4GIjbppBfo6zxc8qlsxm0vu/ZMaNqSA8lZiyJ8rfCe0YKfaD5AiU2CXj+hwvKQ6wcTCnqLqdTCvh1rLty2UYdH4xweZ7z5BRnX8jKW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a1Vfq1C0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1716476334; c=relaxed/simple;
+	bh=R+E4pRAuFfMJYL2+j0lxUR1KIGi7d5dv3fdg4BkB5kw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s0Cc/aBfBYwlxvYyd5NwoK1Wt0I1lBIUMzrqJWUl2sItjzEw8f1+pcziCZ23gEQXkVZDo7zhKvZojbfGnaUJ+VINC/mliUDy5v3vxkqIsffAtiqPrEXUkzEDtVuLatYsav14spx4at4bqkbFuQLBK0JX9XRRXoTWGXpcaCf0jkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zRY0KFCQ; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1Vfq1C0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716476315;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jmUiY9ZEjEZGC2aGfwSm6xcWZAuN4JLkyu/tzL/ne3A=;
-	b=a1Vfq1C0MlEHKfeJpr5/oQpGB4YA5Xib9wnRNu7Yn3bKRbTVUerDwqF/DJ6s75pbbnJeSc
-	ll8cFh65F6PzF9xRdZvDS2hrzLbBgtEFV5bhCs1X7wSEm5aChyPHTSZ7fWf5ux4Whiotl4
-	vX3fF9WQ4EZcE9QNdVSw7Yu9K19jIv4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-tewdWmgVOpuCWGIP_MSJ5g-1; Thu,
- 23 May 2024 10:58:31 -0400
-X-MC-Unique: tewdWmgVOpuCWGIP_MSJ5g-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 37ED429AA386;
-	Thu, 23 May 2024 14:58:31 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1029440004D;
-	Thu, 23 May 2024 14:58:31 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id EFD8930C1C33; Thu, 23 May 2024 14:58:30 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id EBDAF3FB4F;
-	Thu, 23 May 2024 16:58:30 +0200 (CEST)
-Date: Thu, 23 May 2024 16:58:30 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-    Sagi Grimberg <sagi@grimberg.me>, Mike Snitzer <snitzer@kernel.org>, 
-    Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org, 
-    dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org
-Subject: [PATCH v2] block: change rq_integrity_vec to respect the iterator
-In-Reply-To: <8522af2f-fb97-4d0b-9e38-868c572da18a@kernel.dk>
-Message-ID: <7060a917-6537-4334-4961-601a182bca54@redhat.com>
-References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com> <c366231-e146-5a2b-1d8a-5936fb2047ca@redhat.com> <8522af2f-fb97-4d0b-9e38-868c572da18a@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zRY0KFCQ"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-36dbdb1caf3so522835ab.2
+        for <linux-block@vger.kernel.org>; Thu, 23 May 2024 07:58:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716476331; x=1717081131; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gfXXZckBzq2acoPDITkGPN2KIH+xyzDm74Vnyl/qeIU=;
+        b=zRY0KFCQYonEWE58UQ6+aaVOAH+KKg1OqHLqvmhlHwh0wKQolv1scU4rYrVSjX/q9X
+         87Ul+hw+bPY8wNQbvJC8Rn5FjSE9/OjUJEymga4eu1u/JXVyHFzLC+1cotgw/gV+eThQ
+         u2a7T8uYINOnuZYThEmiV5S36R/jhpRrPJQ3jG1oRpkh2vY+STggSQvg+rsQ1a6zqsMC
+         h9PHLE5pLmqTdp5glewJWRlVOIApY03SHCbX5YtdNqeaLw+X8OnrLr88KP+JsSQYu9wk
+         iv5UUXVOVIDSkxHXpuGUPfNeRJrxDnlD1PUrakdLO8+9ewjJsrK8caCWk0YtuB1L+VYO
+         eNVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716476331; x=1717081131;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gfXXZckBzq2acoPDITkGPN2KIH+xyzDm74Vnyl/qeIU=;
+        b=LSIvbqCOhFTaRK2FUUkef5anJLyeaNOYbLOyyQriXz1VaxQ3oclP4unL04/m9I7+Zg
+         oG0AFodDyl8ayV50WjkDSW8XjvMXknJTc4tztwL+pnB4f1Qt2Hn+IbNkwyYW1VhoWnYw
+         /y6IHpP9s1eJO3Y5y2tzkGmkVDdlHcB7aGfPJxcA644NErgL8FwHasQy0tUYOTxWPEC+
+         IYqZE+vDI41lxh6Vm5wp1Wq8pJWfUTWXyCWmt0PTyZEHm1AlTTRzxWjo1pkA2Uh8Wbft
+         00A2tpUmtrT00IfGjaNHvMEvs0Sqi9M7fjVo7JXBENEB8RNs108Z7XAxvCmqLJnL/qdg
+         WLOA==
+X-Forwarded-Encrypted: i=1; AJvYcCXubOrOX5FLPn7uq+EKveohTRgoo1NKZr7Yjc15MPFW3+HKUhRbGVNvwv9hWMzm+5iFpVJF4pM2eUHxNlAnm4gXDO33lvC1GM5s4K8=
+X-Gm-Message-State: AOJu0YxmdfZg4t9HxDLScSQviB/Wjyo/bhA9Fy/zEMcc5YlUAxt2phFG
+	VrjH8DVtGaAcMQ99Ou6Ikro6/Qxa8NbYKBPkjYP+33X5hcEGN68GXzNEDgTjoEQ=
+X-Google-Smtp-Source: AGHT+IGx3asnk7Za2Wl/hBXvOmtenUuwYO0KyfMDZtouSX+rYp0Z3ZaGtOTCXbTi9dvLhk664owmzw==
+X-Received: by 2002:a5d:9496:0:b0:7e1:8bc8:8228 with SMTP id ca18e2360f4ac-7e34f7ff29fmr520451139f.0.1716476330632;
+        Thu, 23 May 2024 07:58:50 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489376fb22asm8071929173.164.2024.05.23.07.58.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 May 2024 07:58:50 -0700 (PDT)
+Message-ID: <fac0eb31-55f4-43fe-9e85-6363031aa5ce@kernel.dk>
+Date: Thu, 23 May 2024 08:58:48 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] loop: inherit the ioprio in loop woker thread
+To: yunlong xing <yunlongxing23@gmail.com>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+ Yunlong Xing <yunlong.xing@unisoc.com>, niuzhiguo84@gmail.com,
+ Hao_hao.Wang@unisoc.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240522074829.1750204-1-yunlong.xing@unisoc.com>
+ <5166bc31-1fd9-4f7f-bc51-f1f50d9d5483@acm.org>
+ <68cfbc08-6d39-4bc6-854d-5df0c94dbfd4@kernel.dk>
+ <f6d3e1f2-e004-49bb-b6c1-969915ccab37@acm.org>
+ <CA+3AYtS=5=_4cQK3=ASvgqQWWCohOsDuVwqiuDgErAnBJ17bBw@mail.gmail.com>
+ <ab21593c-d32e-40b4-9238-60acdd402fd1@kernel.dk>
+ <CA+3AYtTbkG_8KWNWJ8rZ-z=v-V+A9CqKCUUsXLPJyHZgL-FjwQ@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CA+3AYtTbkG_8KWNWJ8rZ-z=v-V+A9CqKCUUsXLPJyHZgL-FjwQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 5/23/24 8:52 AM, yunlong xing wrote:
+> Jens Axboe <axboe@kernel.dk> ?2024?5?23??? 21:04???
+>>
+>> On 5/23/24 12:04 AM, yunlong xing wrote:
+>>> Bart Van Assche <bvanassche@acm.org> ?2024?5?23??? 02:12???
+>>>>
+>>>> On 5/22/24 10:57, Jens Axboe wrote:
+>>>>> On 5/22/24 11:38 AM, Bart Van Assche wrote:
+>>>>>> On 5/22/24 00:48, Yunlong Xing wrote:
+>>>>>>> @@ -1913,6 +1921,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+>>>>>>>            set_active_memcg(old_memcg);
+>>>>>>>            css_put(cmd_memcg_css);
+>>>>>>>        }
+>>>>>>> +
+>>>>>>> +    if (ori_ioprio != cmd_ioprio)
+>>>>>>> +        set_task_ioprio(current, ori_ioprio);
+>>>>>>> +
+>>>>>>>     failed:
+>>>>>>>        /* complete non-aio request */
+>>>>>>>        if (!use_aio || ret) {
+>>>>>>
+>>>>>> Does adding this call in the hot path have a measurable performance impact?
+>>>>>
+>>>>> It's loop, I would not be concerned with overhead. But it does look pretty
+>>>>> bogus to modify the task ioprio from here.
+>>>>
+>>>> Hi Jens,
+>>>>
+>>>> Maybe Yunlong uses that call to pass the I/O priority to the I/O submitter?
+>>>>
+>>>> I think that it is easy to pass the I/O priority to the kiocb submitted by
+>>>> lo_rw_aio() without calling set_task_ioprio().
+>>>>
+>>>> lo_read_simple() and lo_write_simple() however call vfs_iter_read() /
+>>>> vfs_iter_write(). This results in a call of do_iter_readv_writev() and
+>>>> init_sync_kiocb(). The latter function calls get_current_ioprio(). This is
+>>>> probably why the set_task_ioprio() call has been added?
+>>>
+>>> Yeah that's why I call set_task_ioprio.  I want to the loop kwoker
+>>> task?submit I/O to the real disk device?can pass the iopriority of the
+>>> loop device request? both lo_rw_aio() and
+>>> lo_read_simple()/lo_write_simple().
+>>
+>> And that's a totally backwards and suboptimal way to do it. The task
+>> priority is only used as a last resort lower down, if the IO itself
+>> hasn't been appropriately marked.
+>>
+>> Like I said, it's back to the drawing board on this patch, there's no
+>> way it's acceptable in its current form.
+>>
+>> --
+>> Jens Axboe
+>>
+> Thanks for your advice. So, you can't accept pass the ioprio by
+> set_task_ioprio?
 
+Not sure how many times I'd have to state that, no.
 
-On Wed, 15 May 2024, Jens Axboe wrote:
+> If only the method of lo_rw_aio() counld you accept? I don't want to
+> submit this part of the modifications separately. I just want to know,
+> this is ok to you or not?
 
-> On 5/15/24 7:28 AM, Mikulas Patocka wrote:
-> > @@ -177,9 +177,9 @@ static inline int blk_integrity_rq(struc
-> >  	return 0;
-> >  }
-> >  
-> > -static inline struct bio_vec *rq_integrity_vec(struct request *rq)
-> > +static inline struct bio_vec rq_integrity_vec(struct request *rq)
-> >  {
-> > -	return NULL;
-> > +	BUG();
-> >  }
-> >  #endif /* CONFIG_BLK_DEV_INTEGRITY */
-> >  #endif /* _LINUX_BLK_INTEGRITY_H */
-> 
-> Let's please not do that. If it's not used outside of
-> CONFIG_BLK_DEV_INTEGRITY, it should just go away.
-> 
-> -- 
-> Jens Axboe
+Inheriting the kiocb ioprio from the request is the right approach, so
+yeah that part is fine.
 
-Here I'm resending the patch with the function rq_integrity_vec removed if 
-CONFIG_BLK_DEV_INTEGRITY is not defined.
-
-Mikulas
-
-
-From: Mikulas Patocka <mpatocka@redhat.com>
-
-If we allocate a bio that is larger than NVMe maximum request size, attach
-integrity metadata to it and send it to the NVMe subsystem, the integrity
-metadata will be corrupted.
-
-Splitting the bio works correctly. The function bio_split will clone the
-bio, trim the iterator of the first bio and advance the iterator of the
-second bio.
-
-However, the function rq_integrity_vec has a bug - it returns the first
-vector of the bio's metadata and completely disregards the metadata
-iterator that was advanced when the bio was split. Thus, the second bio
-uses the same metadata as the first bio and this leads to metadata
-corruption.
-
-This commit changes rq_integrity_vec, so that it calls mp_bvec_iter_bvec
-instead of returning the first vector. mp_bvec_iter_bvec reads the
-iterator and advances the vector by the iterator.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-
----
- drivers/nvme/host/pci.c       |   14 +++++++++++---
- include/linux/blk-integrity.h |   12 ++++--------
- 2 files changed, 15 insertions(+), 11 deletions(-)
-
-Index: linux-2.6/drivers/nvme/host/pci.c
-===================================================================
---- linux-2.6.orig/drivers/nvme/host/pci.c
-+++ linux-2.6/drivers/nvme/host/pci.c
-@@ -821,18 +821,20 @@ out_free_sg:
- 	return ret;
- }
- 
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
- static blk_status_t nvme_map_metadata(struct nvme_dev *dev, struct request *req,
- 		struct nvme_command *cmnd)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+	struct bio_vec bv = rq_integrity_vec(req);
- 
--	iod->meta_dma = dma_map_bvec(dev->dev, rq_integrity_vec(req),
--			rq_dma_dir(req), 0);
-+	iod->meta_dma = dma_map_bvec(dev->dev, &bv, rq_dma_dir(req), 0);
- 	if (dma_mapping_error(dev->dev, iod->meta_dma))
- 		return BLK_STS_IOERR;
- 	cmnd->rw.metadata = cpu_to_le64(iod->meta_dma);
- 	return BLK_STS_OK;
- }
-+#endif
- 
- static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
- {
-@@ -853,16 +855,20 @@ static blk_status_t nvme_prep_rq(struct
- 			goto out_free_cmd;
- 	}
- 
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
- 	if (blk_integrity_rq(req)) {
- 		ret = nvme_map_metadata(dev, req, &iod->cmd);
- 		if (ret)
- 			goto out_unmap_data;
- 	}
-+#endif
- 
- 	nvme_start_request(req);
- 	return BLK_STS_OK;
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
- out_unmap_data:
- 	nvme_unmap_data(dev, req);
-+#endif
- out_free_cmd:
- 	nvme_cleanup_cmd(req);
- 	return ret;
-@@ -962,12 +968,14 @@ static __always_inline void nvme_pci_unm
- 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
- 	struct nvme_dev *dev = nvmeq->dev;
- 
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
- 	if (blk_integrity_rq(req)) {
- 	        struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 
- 		dma_unmap_page(dev->dev, iod->meta_dma,
--			       rq_integrity_vec(req)->bv_len, rq_dma_dir(req));
-+			       rq_integrity_vec(req).bv_len, rq_dma_dir(req));
- 	}
-+#endif
- 
- 	if (blk_rq_nr_phys_segments(req))
- 		nvme_unmap_data(dev, req);
-Index: linux-2.6/include/linux/blk-integrity.h
-===================================================================
---- linux-2.6.orig/include/linux/blk-integrity.h
-+++ linux-2.6/include/linux/blk-integrity.h
-@@ -109,11 +109,11 @@ static inline bool blk_integrity_rq(stru
-  * Return the first bvec that contains integrity data.  Only drivers that are
-  * limited to a single integrity segment should use this helper.
-  */
--static inline struct bio_vec *rq_integrity_vec(struct request *rq)
-+static inline struct bio_vec rq_integrity_vec(struct request *rq)
- {
--	if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
--		return NULL;
--	return rq->bio->bi_integrity->bip_vec;
-+	WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1);
-+	return mp_bvec_iter_bvec(rq->bio->bi_integrity->bip_vec,
-+				 rq->bio->bi_integrity->bip_iter);
- }
- #else /* CONFIG_BLK_DEV_INTEGRITY */
- static inline int blk_rq_count_integrity_sg(struct request_queue *q,
-@@ -177,9 +177,5 @@ static inline int blk_integrity_rq(struc
- 	return 0;
- }
- 
--static inline struct bio_vec *rq_integrity_vec(struct request *rq)
--{
--	return NULL;
--}
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
- #endif /* _LINUX_BLK_INTEGRITY_H */
+-- 
+Jens Axboe
 
