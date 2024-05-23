@@ -1,98 +1,176 @@
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2454F17583
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 15:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5FF12B89
+	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 15:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716479334; cv=none; b=oCQbCjG8ht5i9dcfrxRTOBfNtB0j7YX/dYB3wPu1srbHaGempWHWSob+seByAXWLtCtwsjqf0pNqV0Jmw92ROrzWUV+/VVZdnlutt019b3Cs1wdzn1WkCrvD28eMrFzAtN6p3CDytHUBdy0XNvbDvuz+w9EY7fvmUTpzMvkSfz0=
+	t=1716479335; cv=none; b=NINaRQhHFbl2HAUz1kJL+O1jSqJ3WZEos5U9wFRi7z4z4mo0FSW8982FTFaCzNkxYMT8mN/A+NPMOSVqgszY0SmGwWQLACR2CvGTNqDv1oT/uKLYqT8JQte8d6xU/XaFJwVsoM/rr3KeS/KKVB71CNq0DOn/KnKQzF0h7ZttpJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716479334; c=relaxed/simple;
-	bh=jC0aG3EkzcKZdjr+fP2C64RYCMwKnxXtn8lfl+S1K9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mh9vMFdQgE1ql65SD3Xi5ZFbx/HKqA6YXRz2LTieOIg5rviN1ccGz8wIHLOMmpmalndcGlJ7SPqCGwYYYElQNOitlzAVTw8+YMwDDrnbi+eaX28h3TyYX0kQsy9wyS9w4L+cGDh3sBGkgZ5tva+bHA8pKJIVd5A4RLRCi1wy8Es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-803156ef0bfso668374241.2
-        for <linux-block@vger.kernel.org>; Thu, 23 May 2024 08:48:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716479332; x=1717084132;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a5+s+v+Kaz3Sa2swWlssFa+au8LNzsklBiXuB2DuE8Y=;
-        b=TZAxZst0ivI7MClSHd+UsdnqTM2WPcJTHWW9h/ltnp25nbxf4KRehbVZO71ezeEjLO
-         aOuBBEImuF0fZ/ylQFLmQ4lMcQKB8e8JdJir4xwcOkmFhRXmA8FPLIrhNLvcfY9D65PB
-         oQO3SNoxN5BPu6Dz2qOT2A5QBZq+kJE4qlXmcpRbZkdE21GSe7c49HGVfEgUDXSamZCb
-         YYm6FoRqyKe29DmQ4XMZnltWuapoBFihDc67Ph3hOcQNhstD5k0APumvGtsi7/alZqmU
-         hY+mf4EflTt0/eW6bmihWQigRIh8Up+jc/BmuFWg4LBuWP5XH6Mm6ih78BMu7Ug2aLwF
-         FKbg==
-X-Forwarded-Encrypted: i=1; AJvYcCWUsWGECWqYrLmhln8bDaWTldI6m1d6PscDU7B6zZkJ4UkovLsgIrXFXQ6YJIWyDgr4GHalInOnXvYaxVHv0wb5k3g3n+CGbnAUkv4=
-X-Gm-Message-State: AOJu0Yz+KleBJAPl3wAIUw5K3PfJ+ORMqZq/IHKbkShfs4EMA9j7G8F3
-	UQ+TiQOWcoX6FavGjw7KNkjfgcI+cy4LXXeMBkskiWp31HTlDYEKKajcrT87bh0=
-X-Google-Smtp-Source: AGHT+IFnQTuSDpB+iXcIQzp9C6VddK7XK5I10n5kKiU1npfJRVtTmmVFoX2dLZUvEHgiCelrQmnMHg==
-X-Received: by 2002:a05:6122:1684:b0:4da:9aa1:dd5e with SMTP id 71dfb90a1353d-4e2185b2452mr5729898e0c.10.1716479332059;
-        Thu, 23 May 2024 08:48:52 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ab84cd6d93sm15947186d6.127.2024.05.23.08.48.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 08:48:51 -0700 (PDT)
-Date: Thu, 23 May 2024 11:48:50 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	Marco Patalano <mpatalan@redhat.com>,
-	Ewan Milne <emilne@redhat.com>, linux-raid@vger.kernel.org
-Subject: Re: [PATCH for-6.10-rc1] block: fix blk_validate_limits() to
- properly handle stacked devices
-Message-ID: <Zk9lYpthswuegMhn@kernel.org>
-References: <20240522025117.75568-1-snitzer@kernel.org>
- <20240522142458.GB7502@lst.de>
- <Zk4h-6f2M0XmraJV@kernel.org>
- <Zk6haNVa5JXxlOf1@fedora>
- <Zk9i7V2GRoHxBPRu@kernel.org>
- <20240523154435.GA1783@lst.de>
+	s=arc-20240116; t=1716479335; c=relaxed/simple;
+	bh=1CHa0LLDhw1EOaJGtZFhJV+l49sZMF/QoPVvj1O3wVE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=cm97hJGLiKoz5z4EmDlEFVahMclhBz93DlhchDNOWbFw/rqisU/lGoLIH3cAPRNbZwle6LnCYxaVcDoweXesXt6i6FfLf1MHCggb6NQFWgVknOkbuWS81np1a3jo8gdyZrVr11EBZpgZgIbegRvYEqKdbgw9h7YE7MXYe9sZfmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RRxyocRZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RRxyocRZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716479332;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XQUquqtb6nc3Z5Y3SUxZ2nv+ANeQKSKLo7pB44ee164=;
+	b=RRxyocRZoNRK4oa3DWQbauMBUrVljIo6acIRPKFPjTyEM5f+kytbc16mvhEdwUhuI53Xkc
+	hGHj4NOt7ylyCfbAnnAw/8qfLf023AFf62WdvoOf3l8hquO5hH7eu/+DFyLnp4dcw7stmL
+	nBQfeRvn2qrXPFm3ZMa2MeBwltiqW2k=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-678-gGgK3U6JPj2tF8bOxmChaA-1; Thu,
+ 23 May 2024 11:48:47 -0400
+X-MC-Unique: gGgK3U6JPj2tF8bOxmChaA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DC6CB3C025C7;
+	Thu, 23 May 2024 15:48:46 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 975AC2027019;
+	Thu, 23 May 2024 15:48:46 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id 81DFB30C1C33; Thu, 23 May 2024 15:48:46 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 7F03C3FB52;
+	Thu, 23 May 2024 17:48:46 +0200 (CEST)
+Date: Thu, 23 May 2024 17:48:46 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+    Sagi Grimberg <sagi@grimberg.me>, Mike Snitzer <snitzer@kernel.org>, 
+    Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org, 
+    dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v2] block: change rq_integrity_vec to respect the
+ iterator
+In-Reply-To: <9ef7cff7-1ef5-4a3f-a2d5-5d7e28bb8a44@kernel.dk>
+Message-ID: <f537bcb-bd99-e741-cf2e-8f5ace404252@redhat.com>
+References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com> <c366231-e146-5a2b-1d8a-5936fb2047ca@redhat.com> <8522af2f-fb97-4d0b-9e38-868c572da18a@kernel.dk> <7060a917-6537-4334-4961-601a182bca54@redhat.com> <b1ca89ae-1500-4c3c-bd8a-74e081aa8dd3@kernel.dk>
+ <798720bc-bc69-1e1c-8436-474e8a9fb0e8@redhat.com> <9ef7cff7-1ef5-4a3f-a2d5-5d7e28bb8a44@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240523154435.GA1783@lst.de>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Thu, May 23, 2024 at 05:44:35PM +0200, Christoph Hellwig wrote:
-> On Thu, May 23, 2024 at 11:38:21AM -0400, Mike Snitzer wrote:
-> > Sure, we could elevate it to blk_validate_limits (and callers) but
-> > adding a 'stacking' parameter is more intrusive on an API level.
+
+
+On Thu, 23 May 2024, Jens Axboe wrote:
+
+> On 5/23/24 9:11 AM, Mikulas Patocka wrote:
+> >>> @@ -853,16 +855,20 @@ static blk_status_t nvme_prep_rq(struct
+> >>>  			goto out_free_cmd;
+> >>>  	}
+> >>>  
+> >>> +#ifdef CONFIG_BLK_DEV_INTEGRITY
+> >>>  	if (blk_integrity_rq(req)) {
+> >>>  		ret = nvme_map_metadata(dev, req, &iod->cmd);
+> >>>  		if (ret)
+> >>>  			goto out_unmap_data;
+> >>>  	}
+> >>> +#endif
+> >>
+> >> 	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) && blk_integrity_rq(req)) {
+> >>
+> >> ?
 > > 
-> > Best to just update blk_set_stacking_limits() to set a new 'stacking'
-> > flag in struct queue_limits, and update blk_stack_limits() to stack
-> > that flag up.
-> > 
-> > I've verified this commit to work and have staged it in linux-next via
-> > linux-dm.git's 'for-next', see:
-> > 
-> > https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=for-next&id=cedc03d697ff255dd5b600146521434e2e921815
-> > 
-> > Jens (and obviously: Christoph, Ming and others), I'm happy to send
-> > this to Linus tomorrow morning if you could please provide your
-> > Reviewed-by or Acked-by.  I'd prefer to keep the intermediate DM fix
-> > just to "show the work and testing".
+> > That wouldn't work, because the calls to rq_integrity_vec need to be 
+> > eliminated by the preprocessor.
 > 
-> A stacking flag in the limits is fundamentally wrong, please don't
-> do this.
+> Why not just do this incremental? Cleans up the ifdef mess too, leaving
+> only the one actually using rq_integrity_vec in place.
+> 
+> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> index 5f857cbc95c8..bd56416a7fa8 100644
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -821,10 +821,10 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+>  	return ret;
+>  }
+>  
+> -#ifdef CONFIG_BLK_DEV_INTEGRITY
+>  static blk_status_t nvme_map_metadata(struct nvme_dev *dev, struct request *req,
+>  		struct nvme_command *cmnd)
+>  {
+> +#ifdef CONFIG_BLK_DEV_INTEGRITY
+>  	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+>  	struct bio_vec bv = rq_integrity_vec(req);
+>  
+> @@ -832,9 +832,9 @@ static blk_status_t nvme_map_metadata(struct nvme_dev *dev, struct request *req,
+>  	if (dma_mapping_error(dev->dev, iod->meta_dma))
+>  		return BLK_STS_IOERR;
+>  	cmnd->rw.metadata = cpu_to_le64(iod->meta_dma);
+> +#endif
+>  	return BLK_STS_OK;
+>  }
+> -#endif
+>  
+>  static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
+>  {
+> @@ -855,20 +855,16 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
+>  			goto out_free_cmd;
+>  	}
+>  
+> -#ifdef CONFIG_BLK_DEV_INTEGRITY
+> -	if (blk_integrity_rq(req)) {
+> +	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) && blk_integrity_rq(req)) {
+>  		ret = nvme_map_metadata(dev, req, &iod->cmd);
+>  		if (ret)
+>  			goto out_unmap_data;
+>  	}
+> -#endif
+>  
+>  	nvme_start_request(req);
+>  	return BLK_STS_OK;
+> -#ifdef CONFIG_BLK_DEV_INTEGRITY
+>  out_unmap_data:
+>  	nvme_unmap_data(dev, req);
+> -#endif
+>  out_free_cmd:
+>  	nvme_cleanup_cmd(req);
+>  	return ret;
+> 
+> > Should I change rq_integrity_vec to this? Then, we could get rid of the 
+> > ifdefs and let the optimizer remove all calls to rq_integrity_vec.
+> > static inline struct bio_vec rq_integrity_vec(struct request *rq)
+> > {
+> > 	struct bio_vec bv = { };
+> > 	return bv;
+> > }
+> 
+> Only if that eliminates runtime checking for !INTEGRITY, which I don't
+> thin it will.
 
-Um, how so?  It serves as a hint to how the limits were constructed.
+It will eliminate the ifdefs. If we are compiling without 
+CONFIG_BLK_DEV_INTEGRITY, blk_integrity_rq(req) is inline and it always 
+returns 0. So the optimizer will remove anything guarded with "if 
+(blk_integrity_rq(req))" - including the calls to nvme_map_metadata and 
+rq_integrity_vec.
 
-Reality is, we have stacking block devices that regularly are _not_
-accounted for when people make changes to block core queue_limits
-code.  That is a serious problem.
+But we need to provide dummy rq_integrity_vec for the compiler front-end. 
+The front-end doesn't know that blk_integrity_rq always returns zero.
 
-Happy to see the need for the 'stacking' flag to go away in time but I
-fail to see why it is "fundamentally wrong".
+So, the patch will be smaller if we get rid of the ifdefs and provide a 
+dummy rq_integrity_vec.
 
-Mike
+Mikulas
+
+> 
+> 
+> -- 
+> Jens Axboe
+> 
+
