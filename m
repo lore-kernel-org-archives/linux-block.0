@@ -1,168 +1,253 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5852013CABB
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 07:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D583B29D
+	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 07:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716448745; cv=none; b=SWYKIvKuJGXL7wRk94qy3icCxaYb0LaSKaeejgaIy8u8xSXZpGXVyf3WQKNT4V86EAuAl7qSjQqaOGJiShbMHlSrTlKqP6ZOvoOoamf489FrJB3RYR9o8xaHmqprLdByCBCPCVaU70xbMmg5eNUZuvC3Osx4Nn5PBqiaJms/7jg=
+	t=1716449653; cv=none; b=RumTbvjLdnDu//EHoUmKh/TqGyA8BZoS7PQSFbsQ0WTS6pGVUV7Ixzih17QzwaTMbbFF41a8UehVnxgYIDeXfR6+5bYthPXueGCaAINW/du5QxK3wfOeumWlfYSuL8MUFxQ5tVNH6GSXKGGp9tgvADPr8uAk1nFAbW2vyYBuU2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716448745; c=relaxed/simple;
-	bh=bCWU7Lc3U6Gf5GeFq7c4kfDiTYQheurIl1SgCCmRW2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=bHtf+ES2AcYy8ijX70K5ETq+89f9rQ41MftfoC1KHycHqp7sxBM7nG1s6Upxmx8k5AX+FD2EEmX+EZn8NkpCLEQrRGQlW9Jgfl/s9QZ/sSTHEO+Ie+oC61OK5MbNv6jb2SyrSMe+9eXvCCc1H71VoB72GTwsyJk6jE0NUFjTrIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Tf7+WlgL; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1716449653; c=relaxed/simple;
+	bh=e+pnxPro/Bk2iXBaKon9OkDQYn2dOQdUYnKE1vh//Tg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q1Sym/B0rYvrm67L60IuhCGwl7WEp5EiWKJXBMN+CdyOwAhrM58rErsceBMo0wPH2QULRklk6FtUgn4zFdZht14W0KFkJQCw2G1j1YFr8jQUyyt07Q3w15XOrfaezfME/izcXruB1rhNWLGZyYVlibjARsEgQsw/kXS5ce1tb44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EDoneBkV; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Tf7+WlgL"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240523071856epoutp02cea3ff2f3323ac7354294e9fedf4fb23~SDQgPcW_N2723927239epoutp021
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 07:18:56 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240523071856epoutp02cea3ff2f3323ac7354294e9fedf4fb23~SDQgPcW_N2723927239epoutp021
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1716448736;
-	bh=bCWU7Lc3U6Gf5GeFq7c4kfDiTYQheurIl1SgCCmRW2E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Tf7+WlgLBawm/YVOH/7VyF+LvicAHD0h0EumnzsVsMKnmsCiKN2AkWy84PN9iJnKp
-	 +RebvJV1T9GTPfAAmOZu4LW9sRvt0qIW48Lviixv5JtcgHibp4Uio+HXD9yWoCQMMo
-	 LVATUhIpbuu6Zu2t+8LNCan3lF+j5b5MGS0tNRlU=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240523071855epcas5p21aeec08c159e8d0f1adcdf6b64938e3f~SDQfodwgx1031010310epcas5p29;
-	Thu, 23 May 2024 07:18:55 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.180]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4VlKKV11Gxz4x9Q5; Thu, 23 May
-	2024 07:18:54 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	18.17.09666.DDDEE466; Thu, 23 May 2024 16:18:54 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240523071219epcas5p2e8a92db80cd848b52d49715b1c010006~SDKu17ZOh2481924819epcas5p2x;
-	Thu, 23 May 2024 07:12:19 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240523071219epsmtrp21c79b655e9d0043b667ac9556b156183~SDKu0vTEG1280012800epsmtrp2G;
-	Thu, 23 May 2024 07:12:19 +0000 (GMT)
-X-AuditID: b6c32a49-f53fa700000025c2-ba-664eedddf85d
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	45.46.08924.35CEE466; Thu, 23 May 2024 16:12:19 +0900 (KST)
-Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240523071215epsmtip14cb2b6df4b2fd21744f10ec306679a1d~SDKrOsSq10670606706epsmtip1T;
-	Thu, 23 May 2024 07:12:15 +0000 (GMT)
-Date: Thu, 23 May 2024 07:05:12 +0000
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, Alasdair
-	Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka
-	<mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig
-	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
-	<kch@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
-	Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	martin.petersen@oracle.com, david@fromorbit.com, hare@suse.de,
-	damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
-	nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v20 01/12] block: Introduce queue limits and sysfs for
- copy-offload support
-Message-ID: <20240523070512.kku7gtw5qanmsrjg@nj.shetty@samsung.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EDoneBkV"
+X-Envelope-To: yukuai1@huaweicloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716449648;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0euZuNBXt/t1L6vvrwtCCno1ncTQZXfg8PJkHBUVkU4=;
+	b=EDoneBkV46ZBClIvfya7xeBbTQkoiIBTRa19Wm0/C6mfxQM/jtaC5dGTwsZQGAuvsboDoV
+	bSH8FuSU2W5OLrxGp1UoKlBDTzzvg3Vg4we6skpr2XRXA0YdgJ+kSrRtj1S4yf66dvasqd
+	TqBBxG/ZLg38UaZLh4DonZFUcVfuOyI=
+X-Envelope-To: axboe@kernel.dk
+X-Envelope-To: yi.zhang@redhat.com
+X-Envelope-To: dlemoal@kernel.org
+X-Envelope-To: hare@suse.de
+X-Envelope-To: johannes.thumshirn@wdc.com
+X-Envelope-To: kch@nvidia.com
+X-Envelope-To: zhouchengming@bytedance.com
+X-Envelope-To: bvanassche@acm.org
+X-Envelope-To: linux-block@vger.kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: yukuai3@huawei.com
+X-Envelope-To: yi.zhang@huawei.com
+X-Envelope-To: yangerkun@huawei.com
+Message-ID: <c30465e7-ced2-4732-993f-9d9eba2f8403@linux.dev>
+Date: Thu, 23 May 2024 09:34:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <174d4908-b81c-4775-9b99-b0941451cb0e@acm.org>
-X-Brightmail-Tracker: H4sIAAAAAAAAA02TezBcdxTH+7t39+6lo9kSyS9LRLbTNKTYTdAfsdIJ096OtEw7bVKZdm3s
-	DYLdzT5KHjPWK8I0IkLMIi1qyKII247XtrKK0Kh0kJQpMkGnRdhEPFpFl0sn/33O95zvnPM7
-	Z34kblvP4ZFRMjWtlEli+IQ16/s2F1e3kScfnBZktOKoprsDR0lZKziqHL5KoKm2ZwDdMP+N
-	o/HWNICWe3pxZOgYAaio5CYLDbY2YqilJBtD+sp2DBXkJWOofe0JgbJNDwCaGMjHkHHoACq+
-	VMpCLcYuFuprKiTQ12UTHFTeuYqha5cHMNQwnghQ9dQsC90dckC9K53stx2ovv4gqrsEUo35
-	wxyqd+Q2i+rr0VB1FekEVV+aQP1ZrwNU86CWoL7JvM6mriTPEFRj6iibejoxxKJmfxggqExD
-	BaDuFf3ECbELjfaLpCVSWulMy8Ll0ihZhIgf9JE4QOzlLRC6CX3QW3xnmSSWFvEDj4W4vRMV
-	Y1kO3/kLSYzGIoVIVCq+h7+fUq5R086RcpVaxKcV0hiFp8JdJYlVaWQR7jJa7SsUCA56WQrD
-	oiO1aX6K+1bxl2r7MS3QkRnAioRcT9j+eIyVAaxJW24zgJXfjhFM8AxAbfFlNhMsAFh2/yF7
-	y1J1p23TYgTQmNnFYYI5S9W0jlivYnFfh0uGcQuTJME9AH9e2+i3nbsfLjwq3zDj3GIC/v7b
-	Er6esONKYPmgEayzDTcA9k2ucBh+FXbpxlnrbMU9DKtzKsG6GXIfW8F/ZtY4zEiBsCknhWDY
-	Dk52GjZ1HpybMW7qcVCfc4tgzCkA5j/MB0ziCEztvroxBc6NhObpUpzRd8Pc7mqM0V+BV5bH
-	MUa3gQ1fbfFrsKqmaLPBLvhgMXGTKVgw0YYxa7mHwdxf04ks4JT/wovyX+jHsC9MNyexGd4D
-	k78rsOikhR1g+SrJoAusafIoAkQF2EUrVLERtMpLIZTRcf+fPFweWwc2fo/rew1g+JHZ3QQw
-	EpgAJHH+dpuT+vdP29pIJefO00q5WKmJoVUm4GW51jWcZx8ut3w/mVos9PQReHp7e3v6HPIW
-	8nfaTKXelNpyIyRqOpqmFbRyy4eRVjwt5j8Y6lRd/lwT/HLyHm1hcp3RftJV3KfyiIclea6+
-	d07u6DWHib60EtWrO2suOn4cP1W67XZz8DTreVz2ioveJ7bHPNaXYHpz22ghWebEu6Wyzuw/
-	rDuR4BBqeKlg92rm2bN69qnPOcNuT/WJe/eFHSMzSlp+6aqN/XHcb3X+jL5n1NCY9Eb6DX9B
-	3l+IPW+vCb4benRHV1Xg8v4jw4txF5onPgk8/wc4Xh8QdOK6QfrZh4lFS/OH3l0kNAOST2vM
-	sIV3efb4mRQdXeeoa3YR4mmFeRPTWQu6HPe8Wrf+C+dE7AXfU3Le2EXhQb6jjs0XJE3Z7mWn
-	mP6dE+/cF7jYkTvCZ6kiJUJXXKmS/AeyGZ60xgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgleLIzCtJLcpLzFFi42LZdlhJTjf4jV+awcF7UhbrTx1jtmia8JfZ
-	YvXdfjaL14c/MVpM+/CT2eLJgXZGi99nzzNbbDl2j9FiwaK5LBY3D+xkstizaBKTxcrVR5ks
-	Zk9vZrI4+v8tm8WkQ9cYLZ5encVksfeWtsXCtiUsFnv2nmSxuLxrDpvF/GVP2S2WH//HZDGx
-	4yqTxY4njYwW616/Z7E4cUva4vzf46wO0h6Xr3h7nFok4bFz1l12j/P3NrJ4XD5b6rFpVSeb
-	x+Yl9R4vNs9k9Nh9s4HNY3HfZFaP3uZ3bB47W++zenx8eovF4/2+q2wefVtWMXqcWXCEPUA4
-	issmJTUnsyy1SN8ugSvj6Pn9zAUP2SreXtrI3sB4nLWLkZNDQsBEYs3BwyxdjFwcQgK7GSVu
-	PPrBBJGQlFj29wgzhC0ssfLfc3aIoo+MEv1z14IlWARUJX5secLWxcjBwSagLXH6PwdIWERA
-	Q+Lbg+VgQ5kFlrJJXNz/mx0kISyQKLH85l5GEJtXwFni8qu/UEPPMEkcv9fDDJEQlDg58wkL
-	iM0sYCYxb/NDZpAFzALSEsv/cUCE5SWat84GK+cUsJZYN2U14wRGwVlIumch6Z6F0D0LSfcC
-	RpZVjJKpBcW56bnFhgWGeanlesWJucWleel6yfm5mxjBiURLcwfj9lUf9A4xMnEwHmKU4GBW
-	EuGNXumbJsSbklhZlVqUH19UmpNafIhRmoNFSZxX/EVvipBAemJJanZqakFqEUyWiYNTqoGJ
-	12jVtS5O83NXWjMCK4OfL/jV1f7rstbeyCmnPonvWNboZ7OCO/Nlp4v557eCcyZr7NV64t/i
-	fuc/U752aQ/n0z6Dcxc6ttftKr9/VK+bXX/+Bk9pRvc5MZHTK/RsM9mVGd5uWsQW8yPs0xeH
-	i08DTxl/OLWrcuOLLPGdWveWc4idWL46yeGO7mHHvPlRps3O658wqt04l9e3/94+tfp4ywOt
-	rRPWft69+/HVyh2uv8Q2cjOvsP+ecEDKlH9ZulnstL1V0U71Qpt/lcVfq2afZvabebITf1SG
-	v57o9YjKzIq4HbVnamL2G39wKWt8pRI882vndZ73+xd8kYh6fVj2p7rLf+2ezl0tny38tiso
-	sRRnJBpqMRcVJwIAAu4TPpMDAAA=
-X-CMS-MailID: 20240523071219epcas5p2e8a92db80cd848b52d49715b1c010006
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_1f672_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240520102830epcas5p27274901f3d0c2738c515709890b1dec4
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
-	<CGME20240520102830epcas5p27274901f3d0c2738c515709890b1dec4@epcas5p2.samsung.com>
-	<20240520102033.9361-2-nj.shetty@samsung.com>
-	<d47b55ac-b986-4bb0-84f4-e193479444e3@acm.org>
-	<20240521142509.o7fu7gpxcvsrviav@green245>
-	<174d4908-b81c-4775-9b99-b0941451cb0e@acm.org>
+Subject: Re: [PATCH RESEND] null_blk: fix null-ptr-dereference while
+ configuring 'power' and 'submit_queues'
+To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, yi.zhang@redhat.com,
+ dlemoal@kernel.org, hare@suse.de, johannes.thumshirn@wdc.com,
+ kch@nvidia.com, zhouchengming@bytedance.com, bvanassche@acm.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+References: <20240523144536.1376904-1-yukuai1@huaweicloud.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20240523144536.1376904-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_1f672_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
 
-On 22/05/24 10:49AM, Bart Van Assche wrote:
->On 5/21/24 07:25, Nitesh Shetty wrote:
->>On 20/05/24 03:42PM, Bart Van Assche wrote:
->>>On 5/20/24 03:20, Nitesh Shetty wrote:
->>>>+    if (max_copy_bytes & (queue_logical_block_size(q) - 1))
->>>>+        return -EINVAL;
->>>
->>>Wouldn't it be more user-friendly if this check would be left out? Does any code
->>>depend on max_copy_bytes being a multiple of the logical block size?
->>>
->>In block layer, we use max_copy_bytes to split larger copy into
->>device supported copy size.
->>Simple copy spec requires length to be logical block size aligned.
->>Hence this check.
+On 23.05.24 16:45, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 >
->Will blkdev_copy_sanity_check() reject invalid copy requests even if this
->check is left out?
+> Writing 'power' and 'submit_queues' concurrently will trigger kernel
+> panic:
 >
-Yes, you are right. We have checks both places.
-We will remove checks in one of the places.
+> Test script:
+>
+> modprobe null_blk nr_devices=0
+> mkdir -p /sys/kernel/config/nullb/nullb0
+> while true; do echo 1 > submit_queues; echo 4 > submit_queues; done &
+> while true; do echo 1 > power; echo 0 > power; done
+>
+> Test result:
+>
+> BUG: kernel NULL pointer dereference, address: 0000000000000148
+> Oops: 0000 [#1] PREEMPT SMP
+> RIP: 0010:__lock_acquire+0x41d/0x28f0
+> Call Trace:
+>   <TASK>
+>   lock_acquire+0x121/0x450
+>   down_write+0x5f/0x1d0
+>   simple_recursive_removal+0x12f/0x5c0
+>   blk_mq_debugfs_unregister_hctxs+0x7c/0x100
+>   blk_mq_update_nr_hw_queues+0x4a3/0x720
+>   nullb_update_nr_hw_queues+0x71/0xf0 [null_blk]
+>   nullb_device_submit_queues_store+0x79/0xf0 [null_blk]
+>   configfs_write_iter+0x119/0x1e0
+>   vfs_write+0x326/0x730
+>   ksys_write+0x74/0x150
+>
+> This is because del_gendisk() can concurrent with
+> blk_mq_update_nr_hw_queues():
+>
+> nullb_device_power_store	nullb_apply_submit_queues
+>   null_del_dev
+>   del_gendisk
+> 				 nullb_update_nr_hw_queues
+> 				  if (!dev->nullb)
+> 				  // still set while gendisk is deleted
+> 				   return 0
+> 				  blk_mq_update_nr_hw_queues
+>   dev->nullb = NULL
+>
+> Fix this problem by resuing the global mutex to protect
+> nullb_device_power_store() and nullb_update_nr_hw_queues() from configs.
+>
+> Fixes: 45919fbfe1c4 ("null_blk: Enable modifying 'submit_queues' after an instance has been configured")
+> Reported-and-tested-by: Yi Zhang <yi.zhang@redhat.com>
+> Closes: https://lore.kernel.org/all/CAHj4cs9LgsHLnjg8z06LQ3Pr5cax-+Ps+xT7AP7TPnEjStuwZA@mail.gmail.com/
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   drivers/block/loop.c          |  2 +-
+>   drivers/block/null_blk/main.c | 40 +++++++++++++++++++++++------------
+>   2 files changed, 27 insertions(+), 15 deletions(-)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 28a95fd366fe..3e1c4f5ef714 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -2140,7 +2140,7 @@ static int loop_control_remove(int idx)
+>   		pr_warn_once("deleting an unspecified loop device is not supported.\n");
+>   		return -EINVAL;
+>   	}
+> -		
+> +
 
-Thank you,
-Nitesh Shetty
+This snippet changes nothing. Can we remove it?
 
-------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_1f672_
-Content-Type: text/plain; charset="utf-8"
+Zhu Yanjun
 
+>   	/* Hide this loop device for serialization. */
+>   	ret = mutex_lock_killable(&loop_ctl_mutex);
+>   	if (ret)
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+> index 5d56ad4ce01a..eb023d267369 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -413,13 +413,25 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
+>   static int nullb_apply_submit_queues(struct nullb_device *dev,
+>   				     unsigned int submit_queues)
+>   {
+> -	return nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues);
+> +	int ret;
+> +
+> +	mutex_lock(&lock);
+> +	ret = nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues);
+> +	mutex_unlock(&lock);
+> +
+> +	return ret;
+>   }
+>   
+>   static int nullb_apply_poll_queues(struct nullb_device *dev,
+>   				   unsigned int poll_queues)
+>   {
+> -	return nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
+> +	int ret;
+> +
+> +	mutex_lock(&lock);
+> +	ret = nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
+> +	mutex_unlock(&lock);
+> +
+> +	return ret;
+>   }
+>   
+>   NULLB_DEVICE_ATTR(size, ulong, NULL);
+> @@ -468,28 +480,31 @@ static ssize_t nullb_device_power_store(struct config_item *item,
+>   	if (ret < 0)
+>   		return ret;
+>   
+> +	ret = count;
+> +	mutex_lock(&lock);
+>   	if (!dev->power && newp) {
+>   		if (test_and_set_bit(NULLB_DEV_FL_UP, &dev->flags))
+> -			return count;
+> +			goto out;
+> +
+>   		ret = null_add_dev(dev);
+>   		if (ret) {
+>   			clear_bit(NULLB_DEV_FL_UP, &dev->flags);
+> -			return ret;
+> +			goto out;
+>   		}
+>   
+>   		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
+>   		dev->power = newp;
+>   	} else if (dev->power && !newp) {
+>   		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {
+> -			mutex_lock(&lock);
+>   			dev->power = newp;
+>   			null_del_dev(dev->nullb);
+> -			mutex_unlock(&lock);
+>   		}
+>   		clear_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
+>   	}
+>   
+> -	return count;
+> +out:
+> +	mutex_unlock(&lock);
+> +	return ret;
+>   }
+>   
+>   CONFIGFS_ATTR(nullb_device_, power);
+> @@ -1932,15 +1947,12 @@ static int null_add_dev(struct nullb_device *dev)
+>   	nullb->q->queuedata = nullb;
+>   	blk_queue_flag_set(QUEUE_FLAG_NONROT, nullb->q);
+>   
+> -	mutex_lock(&lock);
+>   	rv = ida_alloc(&nullb_indexes, GFP_KERNEL);
+> -	if (rv < 0) {
+> -		mutex_unlock(&lock);
+> +	if (rv < 0)
+>   		goto out_cleanup_disk;
+> -	}
+> +
+>   	nullb->index = rv;
+>   	dev->index = rv;
+> -	mutex_unlock(&lock);
+>   
+>   	if (config_item_name(&dev->group.cg_item)) {
+>   		/* Use configfs dir name as the device name */
+> @@ -1969,9 +1981,7 @@ static int null_add_dev(struct nullb_device *dev)
+>   	if (rv)
+>   		goto out_ida_free;
+>   
+> -	mutex_lock(&lock);
+>   	list_add_tail(&nullb->list, &nullb_list);
+> -	mutex_unlock(&lock);
+>   
+>   	pr_info("disk %s created\n", nullb->disk_name);
+>   
+> @@ -2020,7 +2030,9 @@ static int null_create_dev(void)
+>   	if (!dev)
+>   		return -ENOMEM;
+>   
+> +	mutex_lock(&lock);
+>   	ret = null_add_dev(dev);
+> +	mutex_unlock(&lock);
+>   	if (ret) {
+>   		null_free_dev(dev);
+>   		return ret;
 
-------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_1f672_--
+-- 
+Best Regards,
+Yanjun.Zhu
+
