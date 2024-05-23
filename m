@@ -1,75 +1,61 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475F9208C3
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 17:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E719E328B6;
+	Thu, 23 May 2024 18:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716484770; cv=none; b=TxzZQEE5iv8JCaD5tv8lKmK0dxqPx34EycIhlc+bnf5/f9ZYX8OcOuZKPP187ycmdiqORk+g2wHlWA8fCgoIG9+jGJI+o2UKD5gtNZjt3fuLFGRTNG7+IZxHuPRg35yynR/C2/vkK6nqHNLFuHksUWVF+z8cWQEBF52sP6SEQuA=
+	t=1716488787; cv=none; b=UOQddnvejYBuW/qByf+/Jc0eqPdcTD4R9o0qC9+zlF8NEz8boQBnqZbyuvJbQ5Si3P+9tdQ5F8DTMflc8MeU3KzAlo1OpRK4R3Dl0h4FzMcCGnViOHSGKBhOtSHtLZRxmTQqScz8fxWGGq9TmlYa2r0DIRYAUMlY/1jYwJGQCl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716484770; c=relaxed/simple;
-	bh=rzjBZ+ZqzZ3pgcSSzYavvdnHHXUmc0wo0KrHLoClF/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i37QFLjppxbMRLEYsaURKwT5GAUQPcv+4PB2uyeV3+xGR8Dvb4vZcMZs3Jz5eSL/f5TzCXc3FA6qNlHdU3zhco6sY/SZxnhwub1GuXHbRpmw3xmZlpjpEGCD5OUmxQl/qBFU6tBVhR+SEL1ny1dvaTTIM/mI1zwN97TAXjQ1lds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+	s=arc-20240116; t=1716488787; c=relaxed/simple;
+	bh=fnNobCrd2w3N4DklNwdXdvoufcIoq3pYSdrX2EVTbYM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r7py0ofm3+SSNVbzONgmpwro5gFRsbSFbll4JFPxV/zWsKK/1/cC+DMee5JQAANzX7fEHsszmIz4v3Lr2DVO8zNcq1LJg8M41Q2i13/x/Ai9u9I8NVt2W+9zd8HLpwKxGhFh37zL7wneLc0Ast1B9ryYIB/TtudhzcfhE/lky90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=cJuKMtax; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3014068CFE; Thu, 23 May 2024 19:19:23 +0200 (CEST)
-Date: Thu, 23 May 2024 19:19:22 +0200
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cJuKMtax"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=o7lK42oMusv53tmiUgIoOz2t+okOeCzwVYhaaNVIoeg=; b=cJuKMtaxw8x1b/2Y1K2dGNqzs0
+	QVfksZ+8uPNTJrK1goyPWljxOetlWfiQ3NtSETcfGjDicm8gnun5rX9i45yIkj/XRNJB2NFD5UqEt
+	ygd6X1IXKfXtArYrh8lG6jfWXgQJcwhQEWQI0Dspx414UadVNVUF4xsciTvvBzHNc6VYlLMV3j+48
+	W3xznMauo6meHqy68VWsseJ3wodihXI8mX/zLmZwc8NORDBDF21l0t88W83JAmQtTMgatPC+Ajh64
+	NyTmylkDPQQDp1o8RxNQh22Lbs4x11wW9j8NO2Ylk+EvJuwWzpFGZyKkpfnxrW5HfvrP2bkJsaHQ0
+	B9u3rWeA==;
+Received: from [2001:4bb8:2d0:ea45:284:cf8f:6784:4c64] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sAD8w-000000070py-06zW;
+	Thu, 23 May 2024 18:26:22 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>,
-	Anuj gupta <anuj1072538@gmail.com>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/2 v3] block: change rq_integrity_vec to respect the
- iterator
-Message-ID: <20240523171922.GA5892@lst.de>
-References: <a1d8771a-70ad-9eed-476c-af696d2f9ac2@redhat.com> <d27da881-e615-b081-d8db-17ac9b91d4be@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: fix stacking of sd-imposed max_sectors
+Date: Thu, 23 May 2024 20:26:12 +0200
+Message-ID: <20240523182618.602003-1-hch@lst.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d27da881-e615-b081-d8db-17ac9b91d4be@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, May 23, 2024 at 06:54:47PM +0200, Mikulas Patocka wrote:
-> 
-> However, the function rq_integrity_vec has a bug - it returns the first
-> vector of the bio's metadata and completely disregards the metadata
-> iterator that was advanced when the bio was split. Thus, the second bio
-> uses the same metadata as the first bio and this leads to metadata
-> corruption.
-> 
-> This commit changes rq_integrity_vec, so that it calls mp_bvec_iter_bvec
-> instead of returning the first vector. mp_bvec_iter_bvec reads the
-> iterator and advances the vector by the iterator.
+Hi Jens,
 
-mp_bvec_iter_bvec does not advance the bvec_iter, it just uses the
-iter to build a bvec for the current position in the iter.
+this series fixes a regression in 6.10-rc report by Mike when using
+device mapper multipath on top of SCSI disks.  It is due the sd
+driver not only setting the hard max_dev_sectors limit but also
+pre-setting a potentially lower max_sectors value.
 
-Also please fix the commit log to not use more than 73 characters,
-as-is it will be unreadable in git show output or email replies.
-
-> -static inline struct bio_vec *rq_integrity_vec(struct request *rq)
-> +static inline struct bio_vec rq_integrity_vec(struct request *rq)
->  {
->  	if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
-> +		return (struct bio_vec){ };
-> +	return mp_bvec_iter_bvec(rq->bio->bi_integrity->bip_vec,
-> +				 rq->bio->bi_integrity->bip_iter);
-
-The queue_max_integrity_segments check can go away now.  Once you
-use the bvec_iter the function works just fine for multiple
-integrity segments and always returns the one at the current iter
-position.   That should preferably also documented in a comment.
-
-(I'm also pretty sure I've already written this in reply to Anuj's
-version of the patch)
-
+Diffstat:
+ block/blk-settings.c |    2 ++
+ drivers/scsi/sd.c    |    4 +++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
