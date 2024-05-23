@@ -1,63 +1,33 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5A86E60F
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 17:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475F9208C3
+	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 17:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716484453; cv=none; b=jnC5dzx0WsAp6sbLwk9HjXWqNuY47HVg4ZudFHYyE11XrHKVD1Czq8C8pTA3sfCy0IFfjMSuOAVXzETi/6j1kaRgqqRM1fITML0pDs55ftgEd/g8Hta/TMaN8fSRqp3cN8oq9J5uMMwCP40PICYpzliYa6w7wwReLtS2VoSmR4E=
+	t=1716484770; cv=none; b=TxzZQEE5iv8JCaD5tv8lKmK0dxqPx34EycIhlc+bnf5/f9ZYX8OcOuZKPP187ycmdiqORk+g2wHlWA8fCgoIG9+jGJI+o2UKD5gtNZjt3fuLFGRTNG7+IZxHuPRg35yynR/C2/vkK6nqHNLFuHksUWVF+z8cWQEBF52sP6SEQuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716484453; c=relaxed/simple;
-	bh=+6Ej6+V7JSASFl6xwXwaI0Nd374hyR6rEnfM0hJ0CvI=;
+	s=arc-20240116; t=1716484770; c=relaxed/simple;
+	bh=rzjBZ+ZqzZ3pgcSSzYavvdnHHXUmc0wo0KrHLoClF/4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q/tDtKZkzhdXpWlW6eFRtwRZ2NCwO6ZHBsmN1mk3ZnBapomQgWbaMXXx1/vwKHytZPlD02P6YpoMnKL7vuQHmIHOQRM1Xi9iur2Vo9GcoCYUT/aUKF0OezqVJ4gxHac/8pQNuvd1CXnfTrtSuVn6RLuzozqUadQbpTmrUg4oTko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6ab9ce74bddso165346d6.0
-        for <linux-block@vger.kernel.org>; Thu, 23 May 2024 10:14:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716484451; x=1717089251;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CzmpCB59GSrDk5hFUMou10m427x6o85nt9s0M9X2cEI=;
-        b=xGevbGqX+rcBlrIVr2vK3+GH3FLq8ePjarjrKZ+NOxOUmj03Zb0BmuPQU/hIRE5x2m
-         iCCfRl4+cbQCThHrtQDiVlqVZQNNULrdzLW6nCoLBYLgLd1SBZFJOtuQP6oweJRHazs1
-         gv5Zuz0bu8mQFADMps7z51s81K/aG3gnx28cORbcYYDNZjqZkb1AuWLwhF5U/oaWIROw
-         1WqmQMhP2U5YIYz2Z04rfHpYd7GoHnUasTg2X2DQjDOyTJpEpG7iSpLwKN0Hc0JoP/Xl
-         f7DLv+ewIWuKWwFdP36O46MrQH5n0GOvlzsSWZwt1+g6VeWvbLkIC0yhE5uz0Q6FGWep
-         /x5w==
-X-Forwarded-Encrypted: i=1; AJvYcCV7iwb66KTK/3NEVLt0+NM6p4Bv20cbvtSAcAwRa6yMtRo07oJgQ/ePK0Ro5BwDU2iV9ETvG38RkYCnhrCyZqgcKLQCuOXrKZgNLmg=
-X-Gm-Message-State: AOJu0YzUykUtVGiE6UqxyOvKDW2de2sGDSiiU4S4U07fRn9A/dHGckDu
-	oDyhUsmR9dQvGZ0B3ixQdrQ9w1kLb8sUMSDoTzQj76eR0NKqwCyft4DufJzjdlQ=
-X-Google-Smtp-Source: AGHT+IE0ppZklj8z7bcsUa2Mv8eNJe9hLf2Ih8JeHK+KyBpe/0oUWLFLwBqabSTngtcVzwCEh120Vw==
-X-Received: by 2002:a05:6214:5786:b0:6aa:9998:3170 with SMTP id 6a1803df08f44-6ab7f3560a7mr55555256d6.22.1716484450875;
-        Thu, 23 May 2024 10:14:10 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a1624fb686sm142714746d6.124.2024.05.23.10.14.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 10:14:10 -0700 (PDT)
-Date: Thu, 23 May 2024 13:14:09 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk,
-	dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	Marco Patalano <mpatalan@redhat.com>,
-	Ewan Milne <emilne@redhat.com>, linux-raid@vger.kernel.org
-Subject: Re: [PATCH for-6.10-rc1] block: fix blk_validate_limits() to
- properly handle stacked devices
-Message-ID: <Zk95YRs-A-pxijMp@kernel.org>
-References: <20240522025117.75568-1-snitzer@kernel.org>
- <20240522142458.GB7502@lst.de>
- <Zk4h-6f2M0XmraJV@kernel.org>
- <Zk6haNVa5JXxlOf1@fedora>
- <Zk9i7V2GRoHxBPRu@kernel.org>
- <20240523154435.GA1783@lst.de>
- <Zk9lYpthswuegMhn@kernel.org>
- <20240523155217.GA2346@lst.de>
- <Zk9xAJur96MVX0cy@kernel.org>
- <20240523170529.GB5736@lst.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=i37QFLjppxbMRLEYsaURKwT5GAUQPcv+4PB2uyeV3+xGR8Dvb4vZcMZs3Jz5eSL/f5TzCXc3FA6qNlHdU3zhco6sY/SZxnhwub1GuXHbRpmw3xmZlpjpEGCD5OUmxQl/qBFU6tBVhR+SEL1ny1dvaTTIM/mI1zwN97TAXjQ1lds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 3014068CFE; Thu, 23 May 2024 19:19:23 +0200 (CEST)
+Date: Thu, 23 May 2024 19:19:22 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>,
+	Anuj gupta <anuj1072538@gmail.com>, linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/2 v3] block: change rq_integrity_vec to respect the
+ iterator
+Message-ID: <20240523171922.GA5892@lst.de>
+References: <a1d8771a-70ad-9eed-476c-af696d2f9ac2@redhat.com> <d27da881-e615-b081-d8db-17ac9b91d4be@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,29 +36,40 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240523170529.GB5736@lst.de>
+In-Reply-To: <d27da881-e615-b081-d8db-17ac9b91d4be@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, May 23, 2024 at 07:05:29PM +0200, Christoph Hellwig wrote:
-> On Thu, May 23, 2024 at 12:38:24PM -0400, Mike Snitzer wrote:
-> > Happy to see mptest get folded into blktests (its just bash code) --
-> > but it doesn't reproduce for you so not a reliable safeguard.
+On Thu, May 23, 2024 at 06:54:47PM +0200, Mikulas Patocka wrote:
 > 
-> It is a lot better than not running it.  And I'll look into why
-> it doesn't reproduce.  Right now the only thing I can think of is
-> different kernel configs, maybe related to schedulers.  Can you send
-> me your .config?
+> However, the function rq_integrity_vec has a bug - it returns the first
+> vector of the bio's metadata and completely disregards the metadata
+> iterator that was advanced when the bio was split. Thus, the second bio
+> uses the same metadata as the first bio and this leads to metadata
+> corruption.
+> 
+> This commit changes rq_integrity_vec, so that it calls mp_bvec_iter_bvec
+> instead of returning the first vector. mp_bvec_iter_bvec reads the
+> iterator and advances the vector by the iterator.
 
-Will do off-list.
+mp_bvec_iter_bvec does not advance the bvec_iter, it just uses the
+iter to build a bvec for the current position in the iter.
 
-> Is adding mptests something you want to do, or you'd prefer outhers
-> to take care of?
+Also please fix the commit log to not use more than 73 characters,
+as-is it will be unreadable in git show output or email replies.
 
-I won't have time in the near or mid-term.  So if someone else would
-like to convert mptests over to blktests that'd be wonderful.
+> -static inline struct bio_vec *rq_integrity_vec(struct request *rq)
+> +static inline struct bio_vec rq_integrity_vec(struct request *rq)
+>  {
+>  	if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
+> +		return (struct bio_vec){ };
+> +	return mp_bvec_iter_bvec(rq->bio->bi_integrity->bip_vec,
+> +				 rq->bio->bi_integrity->bip_iter);
 
-Fanning out to test the various supported test permutations would be
-cool (meaning, test with both MULTIPATH_BACKEND_MODULE=scsidebug and
-MULTIPATH_BACKEND_MODULE=tcmloop ... but tcmloop is brittle due to
-sysfs changes vs targetcli's sysfs expectations -- but that's a
-targetcli issue that might have been fixed, assuming that code is
-supported still?  Not revisited in a few months)
+The queue_max_integrity_segments check can go away now.  Once you
+use the bvec_iter the function works just fine for multiple
+integrity segments and always returns the one at the current iter
+position.   That should preferably also documented in a comment.
+
+(I'm also pretty sure I've already written this in reply to Anuj's
+version of the patch)
+
