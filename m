@@ -1,130 +1,113 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5077113B7BC
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 13:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AFB13D621
+	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 14:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716469455; cv=none; b=VUh8d16dTD+xlyz/bgJ9eB4NAtQSdfP0/0pbgtpj/c6kmJahHga6CY+DIXMfOKNLRfJNwUbKDgvVDLLqShZBtg9v2FJIbCbchEtwcHCcoI65YQkxA5BHTmotVT7K8XgFevm1QsWk+8t7e6Eo+jFPJ3ykHQkoNVMOU+7WcL+rHvo=
+	t=1716473549; cv=none; b=apgywjX6RSsyv3Xxe/HPfuyY/HVCY6i3TfULuWOb07gcKB37+M3/wglXIJNycJ7mxKRE1BUMd8NGJtUcPYPOj8ptv81s4zextZJ4YNJhnbGvBYORrweopM0n6D/crIlcMh0SxZuMuOyREHyLkAiWptY66BsY8fjOsMB6XNUGSdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716469455; c=relaxed/simple;
-	bh=gPGMwLLeDLNkh3TYTRIn0gXVjE6IQM9ONM01R4ivyJ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QmbdScmtNdwltFORTIbIWsxqblGemMkZe5v5eI2mlsGpaJnaJLHHPMt4/93Wll8cnAA8N9sI2cGfoWUCWGtmTkJs6NFtaYNqzvMJdj7/133yLyk9xMZwMWGjVmJYurucHe3HpTwxAOlwcdOxKd7YRhcNOVbR5T7X8PUjj7mLxCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=c+2RCE0r; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="c+2RCE0r"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1f2f6becadaso154725ad.3
-        for <linux-block@vger.kernel.org>; Thu, 23 May 2024 06:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716469451; x=1717074251; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iPcBTM5I+MFfOzb0MSOYi+VNek3mHku58ke+pzSmNtQ=;
-        b=c+2RCE0ru38BgMQZ3kdNaPfHWngzdAzopNdsAl/u0WNEIBTlOOUyTmzvr9ou8VFmGB
-         vfNLVHfkWH8hMZr9OX1a73U9a/K327uRqtME5E40C9G8dDPr0TBqHI9YCLuCdx8MXr3g
-         veo/pkn3gtqaxDnpaawh28PINkK5EcHGX44xWM2v2zQTJTseASiv43RNeqYyB4PtvtiU
-         q7vh04CrUAnRp0pWTmrFbovCAFIXu2A0MKDvjc0ABZ7ikUdpQG/1T8bM00XSqWwPdT+n
-         xrvXpjO74lyapsVcvK/cc2apCGrbLtsI0/vNWbJ8vjF45tLdct50LL170r1loR9PRhQc
-         Ntlg==
+	s=arc-20240116; t=1716473549; c=relaxed/simple;
+	bh=A6b249eIVjdS7vnVC+kgOF6GTuzhWCTIk2nVY/5aPLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBnU/l90TlYxIdunU9tkLPmoq3KFScXwdm2QaBmtz/LoBzJ/HYEas2oaz0DAIO8fAuhGhwq09LQHD/GdVbdmwI8mIo/DKtnpTkx89NMU3NNybHrd0UYe9yhcmbDnuL+HHv0GAHocDrBk5L3VXAceutHS8dl6hgJ+v8pihYRpiZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-43e4c568e14so12143591cf.3
+        for <linux-block@vger.kernel.org>; Thu, 23 May 2024 07:12:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716469451; x=1717074251;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iPcBTM5I+MFfOzb0MSOYi+VNek3mHku58ke+pzSmNtQ=;
-        b=HMbNCOYxU7I5eWnSlv4+ckZc3GCRMKLyv8hblw9192w1qruM0FdKjSQfxDUmEprS1z
-         9xEMLR+KEzpfhyWHbi+sY15Ik8Ajg22KYtNqpYnZDy7Pdu5ANP9rVDR1/jsFYTMkJFeF
-         FFD0M07WzycUMvpxHRnw8w9YJDVyw3amVPmtmb3hsHUODbGheGGvpAxO18FGSiFZRH8j
-         honwlb5FI5HIZlhtbpF7+2S8fWRP5q5GbwOa1M8Ps4IoXhx3MKsKeL6YnFlosHHxAl9+
-         ZaKilx95n6BQhvqwTDO/ti4EtCMfdMizhZ93HTI9yuz+bRgVDFa9Sr3+yemHqpPmK22p
-         UFYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/8Bw9qWhcojg5NBDPDsByphWzPSOuTyBtVbo0zXU/C1lpv4orhSifmOjI97FdetMWdeS6zuwXGgv8M5dlzpoXnK18jUfjjJAaW6M=
-X-Gm-Message-State: AOJu0Yzt2eg3gntfAgKWqjlQPLp3A1J6S6zSoKoVZ8pUX4e64c3JgAEH
-	RGzXd0xH7ZFN6bdgasgP8tKpYO8DXJ5qVvLEk4Lh2RjTt/alagrY5QmxgEgUm9U=
-X-Google-Smtp-Source: AGHT+IEqZumjDycfTAekXjBdCht0wMdxVooj/kFc6UYJXA9kMC56gWlA98Y7SCepLg/V0zaIRcI/CQ==
-X-Received: by 2002:a17:902:d489:b0:1f2:f12e:27f6 with SMTP id d9443c01a7336-1f31c7ff1cdmr51407425ad.0.1716469451262;
-        Thu, 23 May 2024 06:04:11 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f328767adesm28199705ad.189.2024.05.23.06.04.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 May 2024 06:04:10 -0700 (PDT)
-Message-ID: <ab21593c-d32e-40b4-9238-60acdd402fd1@kernel.dk>
-Date: Thu, 23 May 2024 07:04:09 -0600
+        d=1e100.net; s=20230601; t=1716473546; x=1717078346;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0JBPRnkMS0zUivAASHtUxfgXxZpuuzb1J9ltdC7xhBY=;
+        b=MoMpcPXP1NSMhVwnJgH0nv73mesTup0qxJJZ+ZbYRJ4rfs6LxErJYBjV6U25E0vMEU
+         DN3gi+0d8vM0+hfwlNtq139rbx1klgQFdxz8o+febpPxMbZ1sfBDmwufqs6qdPPyfDLM
+         3S7lJRiXeZ5mGdkB+WrIya7GLMA0vUDn6u0heDWLL9W1txh56mXJwUr+OIHdxEYhAGdj
+         TwHz1OA+hJMSlnVdkFP2fGA53E95OGByvg4epC4CDweeVT29oi6IOe9M/P2UORmG/tNv
+         gV8GN9Fbx6n4RNyJ3CF5tXym+YyzI9n6aVhz2KP0Xg0E/5usUK1ygDfYKkVWopfPFZmY
+         g5Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCVvjS2Fqq1POSnrp2Fe9L/N19gU3msv9e+6hO8aQydnySGBgZYxKDY2NyaJTPOl1bOPAWDO9JCRuor98cNHvEi7S1B240N5sZgDwDw=
+X-Gm-Message-State: AOJu0Yw5yggWYfmw47JWQf8H7W3ifnASsftxz8X0qdhHT7EyM7c99rLB
+	JYhsfRYQbUo9WBcdV5SFOC3tobDpBEj/ywIRiRuK0OX45EC3XRJeMkncNLOApnVyHKM7zWPhTMJ
+	uA1/GMw==
+X-Google-Smtp-Source: AGHT+IHPKEMelY5Shpu+fWI3/RY4s2pDGIMViv+ef6vKPVlb1bP6X65trSmZ5dprazwZYRJ3koeaAA==
+X-Received: by 2002:ac8:5f96:0:b0:43d:fd2b:3098 with SMTP id d75a77b69052e-43f9e152cb3mr54327551cf.52.1716473546108;
+        Thu, 23 May 2024 07:12:26 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e3c475eb3sm98205551cf.82.2024.05.23.07.12.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 May 2024 07:12:25 -0700 (PDT)
+Date: Thu, 23 May 2024 10:12:24 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	Marco Patalano <mpatalan@redhat.com>,
+	Ewan Milne <emilne@redhat.com>
+Subject: Re: dm: retain stacked max_sectors when setting queue_limits
+Message-ID: <Zk9OyGTESlHXu6Wa@kernel.org>
+References: <20240522025117.75568-1-snitzer@kernel.org>
+ <20240522142458.GB7502@lst.de>
+ <Zk4h-6f2M0XmraJV@kernel.org>
+ <20240523082731.GA3010@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loop: inherit the ioprio in loop woker thread
-To: yunlong xing <yunlongxing23@gmail.com>,
- Bart Van Assche <bvanassche@acm.org>
-Cc: Yunlong Xing <yunlong.xing@unisoc.com>, niuzhiguo84@gmail.com,
- Hao_hao.Wang@unisoc.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240522074829.1750204-1-yunlong.xing@unisoc.com>
- <5166bc31-1fd9-4f7f-bc51-f1f50d9d5483@acm.org>
- <68cfbc08-6d39-4bc6-854d-5df0c94dbfd4@kernel.dk>
- <f6d3e1f2-e004-49bb-b6c1-969915ccab37@acm.org>
- <CA+3AYtS=5=_4cQK3=ASvgqQWWCohOsDuVwqiuDgErAnBJ17bBw@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CA+3AYtS=5=_4cQK3=ASvgqQWWCohOsDuVwqiuDgErAnBJ17bBw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240523082731.GA3010@lst.de>
 
-On 5/23/24 12:04 AM, yunlong xing wrote:
-> Bart Van Assche <bvanassche@acm.org> ?2024?5?23??? 02:12???
->>
->> On 5/22/24 10:57, Jens Axboe wrote:
->>> On 5/22/24 11:38 AM, Bart Van Assche wrote:
->>>> On 5/22/24 00:48, Yunlong Xing wrote:
->>>>> @@ -1913,6 +1921,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
->>>>>            set_active_memcg(old_memcg);
->>>>>            css_put(cmd_memcg_css);
->>>>>        }
->>>>> +
->>>>> +    if (ori_ioprio != cmd_ioprio)
->>>>> +        set_task_ioprio(current, ori_ioprio);
->>>>> +
->>>>>     failed:
->>>>>        /* complete non-aio request */
->>>>>        if (!use_aio || ret) {
->>>>
->>>> Does adding this call in the hot path have a measurable performance impact?
->>>
->>> It's loop, I would not be concerned with overhead. But it does look pretty
->>> bogus to modify the task ioprio from here.
->>
->> Hi Jens,
->>
->> Maybe Yunlong uses that call to pass the I/O priority to the I/O submitter?
->>
->> I think that it is easy to pass the I/O priority to the kiocb submitted by
->> lo_rw_aio() without calling set_task_ioprio().
->>
->> lo_read_simple() and lo_write_simple() however call vfs_iter_read() /
->> vfs_iter_write(). This results in a call of do_iter_readv_writev() and
->> init_sync_kiocb(). The latter function calls get_current_ioprio(). This is
->> probably why the set_task_ioprio() call has been added?
+On Thu, May 23, 2024 at 10:27:31AM +0200, Christoph Hellwig wrote:
+> On Wed, May 22, 2024 at 12:48:59PM -0400, Mike Snitzer wrote:
+> > [   74.872485] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+> > [   74.872505] device-mapper: multipath: 254:3: Failing path 8:16.
+> > [   74.872620] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+> > [   74.872641] device-mapper: multipath: 254:3: Failing path 8:32.
+> > [   74.872712] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+> > [   74.872732] device-mapper: multipath: 254:3: Failing path 8:48.
+> > [   74.872788] blk_insert_cloned_request: over max size limit. (2048 > 1024)
+> > [   74.872808] device-mapper: multipath: 254:3: Failing path 8:64.
+> > 
+> > Simply setting max_user_sectors won't help with stacked devices
+> > because blk_stack_limits() doesn't stack max_user_sectors.  It'll
+> > inform the underlying device's blk_validate_limits() calculation which
+> > will result in max_sectors having the desired value (which it already
+> > did, as I showed above).  But when stacking limits from underlying
+> > devices up to the higher-level dm-mpath queue_limits we still have
+> > information loss.
 > 
-> Yeah that's why I call set_task_ioprio.  I want to the loop kwoker
-> task?submit I/O to the real disk device?can pass the iopriority of the
-> loop device request? both lo_rw_aio() and
-> lo_read_simple()/lo_write_simple().
+> So while I can't reproduce it, I think the main issue is that
+> max_sectors really just is a voluntary limit, and enforcing that at
+> the lower device doesn't really make any sense.  So we could just
+> check blk_insert_cloned_request to check max_hw_sectors instead.
 
-And that's a totally backwards and suboptimal way to do it. The task
-priority is only used as a last resort lower down, if the IO itself
-hasn't been appropriately marked.
+I haven't tried your patch but we still want properly stacked
+max_sectors configured for the device.
 
-Like I said, it's back to the drawing board on this patch, there's no
-way it's acceptable in its current form.
+> Or my below preferre variant to just drop the check, as the
+> max_sectors == 0 check indicates it's pretty sketchy to start with.
 
--- 
-Jens Axboe
+At this point in the 6.10 release I don't want further whack-a-mole
+fixes due to fallout from removing longstanding negative checks.
 
+Not sure what is sketchy about the max_sectors == 0 check, the large
+comment block explains that check quite well.  We want to avoid EIO
+for unsupported operations (otherwise we'll get spurious path failures
+in the context of dm-multipath).  Could be we can remove this check
+after an audit of how LLD handle servicing IO for unsupported
+operations -- so best to work through it during a devel cycle.
+
+Not sure why scsi_debug based testing with mptest isn't triggering it
+for you. Are you seeing these limits for the underlying scsi_debug
+devices?
+
+./max_hw_sectors_kb:2147483647
+./max_sectors_kb:512
+
+What are those limits for the mptest created 'mp' dm-multipath device?
+
+Mike
