@@ -1,173 +1,169 @@
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF5B10A14
-	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 15:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8B9F9D4
+	for <linux-block@vger.kernel.org>; Thu, 23 May 2024 15:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716477788; cv=none; b=BURcGLFktB+cLXDO91annrhJAxWCmqyOpKO+NiFxxww2WiLr6w0YULi1cq4NKwtf7DcII0fsr5hpOJDUe5zMrBDp9Rj67BTTNoihVfQSb9mXz9BP7jlnBBf/dvU5ZwmClZHg3BHRKLLm/0tO1MlitzXdkMOTiJr/RxS5KJWtil8=
+	t=1716478434; cv=none; b=d3ugNWLs5iwylOAWohv79LjzL7dNbiHvD0QDg2W46AG69nWXaIIj0mQ7n65Uf+Gv7KY6f8w0gYJ8xX781EVTe37Rpe2fkqvj+bL+ppLP7/qsO+78UEZu64bzT3uIWwvZTq8V//sYejWJGU/R9XbCGnnjRwJuPo4lowoH/FbEkPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716477788; c=relaxed/simple;
-	bh=tPUeEnU5cjG3i0yzJnK9h4CPPvHzW2y3ucRopOeOZR8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mGMCgF9GHRR2Izx+rv0pxLkx8pWiSwbR6ugeK741jsFyfivZBF7hNeyMBsBOPLIMqYnJ9idc4tvFkaZBm5gZDvqptsqxMDT5U2D8GpMWn8JN2uQlkjvV2m/pynL1qcCGeLoXfUhf0FE66JByK6BkHW8NNiwDOukYczxPrSLs9x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BREKqrQ6; arc=none smtp.client-ip=209.85.222.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716478434; c=relaxed/simple;
+	bh=nYU1PIO2SFfLSTahfzTNWZje2OwhniNmOSD/p9qzWE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UMdfswTb07zUp4mEKr5MFbBdco5FrlFdyNZWEZ+Zo3QexJwx/3JIojC3xqZNbKdyKCNSQmAX3hDxUEcXXhfkUgfKuOoeLlxJQlFchWWld6jVSWJarbZu5NC7iCagEkVTzFpROYzDZfrMq2I9uh+C6ylEqbbGkjl1lURC2rC1NbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H6X+St0I; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BREKqrQ6"
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-8030f814a15so664067241.1
-        for <linux-block@vger.kernel.org>; Thu, 23 May 2024 08:23:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H6X+St0I"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7e89ade63cdso208739f.1
+        for <linux-block@vger.kernel.org>; Thu, 23 May 2024 08:33:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716477786; x=1717082586; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c8tCGD+B/90fiwr0wHpk4PrsZCbhBjOEiTIub+soBMc=;
-        b=BREKqrQ6T2lDxxClbOURvV3ZeKJ5J5EBtA10ZfBBqk9+JudJGvrBJJN8bafMDmyynN
-         PTQ46tp+ZE0SuAB6N0YCEY8QdE6tLrqenQsMvrk8kLs5JkYA1b99tOZLiz/CLasohc27
-         0XGhYxqpDToQFqVwt5j9MQhjAcebVFWVC0gZlch5qirtCLajgfZ1TwxqrGjJPM5Vz+C7
-         9ns9PB2CsT7ycLaufZbwDTNfWHPxxsx0kBhNRzSk6fW4VCOxqpKvChjrnYSX/k7OLj7S
-         4oZbLuonAA63bhKNDv3Ert7swbj/jHms0th7fAGXg+QCmLhQz6reDVYbGfEDA++NiG8D
-         4ddw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716478430; x=1717083230; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SvWyFJZNYQN+hDCxIRXzzdxVe6wwtRttv3fHKAE+JmM=;
+        b=H6X+St0IDQ65SNn6h/goDEToGx4dB73rQlZ1NX0ze66DBN+o/GHLrguWWmmJod0Xqb
+         ISltrC3zCvVF+ED7LBUcxWsED1FDhXMFyn/L3qo+h4yJKWnMTX8tEqdrgKVlDaM3S+Hg
+         pv1ByuG0sOuue9ys4XoVfpsaSIhyHucPqf0fz/EW2l2ZI5fwj7aWRkbBR+8Y9/3Q7jol
+         CkqDUl2sElnY1ZbjEtymH7WakHj4imX4K9+O6kh9ELwJ5MxA5k3Kvw75dQfH4vx8O6iI
+         exiqeawGBKK63vnX+rQVpmeLABgLu5X5iO4qtl69biymNNJ13CXxXAoMn7adhzSeynzq
+         0dFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716477786; x=1717082586;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c8tCGD+B/90fiwr0wHpk4PrsZCbhBjOEiTIub+soBMc=;
-        b=XVGY2rG8XGQNGUJ5SbxvtO2c0KanYMu7lsUiTLLRFMVDCCT7fDhyAFuZdkZmcrRw0W
-         4nRpmSVmFNe7+6gf5C8aB98O0qFMG2Ilp05gLevoTqBydvTxsdYD6RBuZC7gCi7gXqWd
-         gLt78XO2rk/4KNu8S+g1o48+9KIokQyMu4nRioA+t9mCnf7NBUrOuuXxy97muDRS4/9J
-         Szr8tHPP+szPKEGUvu0VAsiKqan0iwNfDdHj5C76EbJd85U9qu+eHeKAuKTs2Xc05T+3
-         aTFSXVN+/tLukicloYveGyzIoYe0FmtGXRqONm5J3TExNKlCuFBmQ2n/BZlgyeyHDu18
-         DsJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXXf1HT+Ak8UwEzNohfdSOiCUxVsar68WW88DEAe4Lc+GVO3oWVP/q7+/A8Fa/hRpge+ghingJ//kuP5OluzbOaMUDsddhAzUSdgto=
-X-Gm-Message-State: AOJu0YxwvB7gelMAK2m8Bq3JkTRMG4/bUZzjStRkxeR2FirYe2o+5sL/
-	YOsFNe36hki0qTfLJ+28GbYWoDPfSV8oDqJrLKyVxAuuoHEQ63QH9ElIbrc11NL0qM+slP3jI4u
-	qxYr441LRgdhZjzUyqQ4ItWdNKg==
-X-Google-Smtp-Source: AGHT+IHf+AmqHylb4UCzV6cCGGq50XriQJFqc3S13bgCKMdOxy9ZuTsPeUtcuE77AHyQWp9HPWeABRGMmoFgFZvcQWY=
-X-Received: by 2002:a05:6122:208a:b0:4bd:32c9:acb with SMTP id
- 71dfb90a1353d-4e218524df6mr5691819e0c.7.1716477786039; Thu, 23 May 2024
- 08:23:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716478430; x=1717083230;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SvWyFJZNYQN+hDCxIRXzzdxVe6wwtRttv3fHKAE+JmM=;
+        b=YFldrxRD7uJK564zSb62vs+V1RSx2PepRHSIoSJPTVVIa3R7zsO73zDC/8+E/HgT6K
+         QAHbLAJSxSojC/ZrJqR8WZNtOHMatSElHfVWEJwKC6z1GcmkHzzSbEfL7PokrMBErAq6
+         GwP5T7UrWpEoE8Z0auIS/SvaVJn50oMW1qz7h6L8lgutGjxBRNg3cbXJuPSUwFDV5hHQ
+         QHR/R5xorTm1zrxKnlFM/YV4Zyh7qDM5HaMwzuGj26n4PCqoHPKQt276SyRm0IiNItPK
+         TLwTL6igbXHG6sM7AfcUy62dHPsxhrgSMMAs+nKxCQyDU+2nwRwL9jA0KWcYl8uGsmbA
+         fUsA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXucdM+UBtVze4zJ9T/UDiTid//qA5xnpKmz4toyDSmvvtl7ULiGZ8ZxGnyrSm7qOncC0V2cGQQf3q53OTkmf8J5XroygzMsqfJfQ=
+X-Gm-Message-State: AOJu0Yy70++KJefdcJjW7jJha03+bNRTYjQ066Lrbb1ehWtza2VnK0o0
+	WjF7/K2KolN6vHpwSwGWfyL3AtGFH9gEozblTr4TUvVOGmatl/bF9Ym+AeubPIU=
+X-Google-Smtp-Source: AGHT+IF5NcgPaSwej7+H6rkVJpCG1LN6K+ptgamP3mzzVLSM397L3FcGvlEY98JyQtKJbxKK2SxjEw==
+X-Received: by 2002:a5d:84ca:0:b0:7de:f48e:36c3 with SMTP id ca18e2360f4ac-7e360c17344mr550273439f.0.1716478428270;
+        Thu, 23 May 2024 08:33:48 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489375c13f9sm7936231173.97.2024.05.23.08.33.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 May 2024 08:33:47 -0700 (PDT)
+Message-ID: <9ef7cff7-1ef5-4a3f-a2d5-5d7e28bb8a44@kernel.dk>
+Date: Thu, 23 May 2024 09:33:46 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
- <c366231-e146-5a2b-1d8a-5936fb2047ca@redhat.com> <8522af2f-fb97-4d0b-9e38-868c572da18a@kernel.dk>
- <7060a917-6537-4334-4961-601a182bca54@redhat.com> <b1ca89ae-1500-4c3c-bd8a-74e081aa8dd3@kernel.dk>
- <798720bc-bc69-1e1c-8436-474e8a9fb0e8@redhat.com>
-In-Reply-To: <798720bc-bc69-1e1c-8436-474e8a9fb0e8@redhat.com>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Thu, 23 May 2024 20:52:28 +0530
-Message-ID: <CACzX3As928NhtJdNGii16Jeuix3RfzRZbgr4ZSv9p+Pi6FiNvA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2] block: change rq_integrity_vec to respect the iterator
 To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Sagi Grimberg <sagi@grimberg.me>, Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>, 
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
-	linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Mike Snitzer <snitzer@kernel.org>,
+ Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org
+References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
+ <c366231-e146-5a2b-1d8a-5936fb2047ca@redhat.com>
+ <8522af2f-fb97-4d0b-9e38-868c572da18a@kernel.dk>
+ <7060a917-6537-4334-4961-601a182bca54@redhat.com>
+ <b1ca89ae-1500-4c3c-bd8a-74e081aa8dd3@kernel.dk>
+ <798720bc-bc69-1e1c-8436-474e8a9fb0e8@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <798720bc-bc69-1e1c-8436-474e8a9fb0e8@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 23, 2024 at 8:41=E2=80=AFPM Mikulas Patocka <mpatocka@redhat.co=
-m> wrote:
->
->
->
-> On Thu, 23 May 2024, Jens Axboe wrote:
->
-> > On 5/23/24 8:58 AM, Mikulas Patocka wrote:
->
-> > > Here I'm resending the patch with the function rq_integrity_vec remov=
-ed if
-> > > CONFIG_BLK_DEV_INTEGRITY is not defined.
-> >
-> > That looks better - but can you please just post a full new series,
-> > that's a lot easier to deal with and look at than adding a v2 of one
-> > patch in the thread.
->
-> OK, I'll post both patches.
->
-> > > @@ -853,16 +855,20 @@ static blk_status_t nvme_prep_rq(struct
-> > >                     goto out_free_cmd;
-> > >     }
-> > >
-> > > +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> > >     if (blk_integrity_rq(req)) {
-> > >             ret =3D nvme_map_metadata(dev, req, &iod->cmd);
-> > >             if (ret)
-> > >                     goto out_unmap_data;
-> > >     }
-> > > +#endif
-> >
-> >       if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) && blk_integrity_rq(req)=
-) {
-> >
-> > ?
->
-> That wouldn't work, because the calls to rq_integrity_vec need to be
+On 5/23/24 9:11 AM, Mikulas Patocka wrote:
+>>> @@ -853,16 +855,20 @@ static blk_status_t nvme_prep_rq(struct
+>>>  			goto out_free_cmd;
+>>>  	}
+>>>  
+>>> +#ifdef CONFIG_BLK_DEV_INTEGRITY
+>>>  	if (blk_integrity_rq(req)) {
+>>>  		ret = nvme_map_metadata(dev, req, &iod->cmd);
+>>>  		if (ret)
+>>>  			goto out_unmap_data;
+>>>  	}
+>>> +#endif
+>>
+>> 	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) && blk_integrity_rq(req)) {
+>>
+>> ?
+> 
+> That wouldn't work, because the calls to rq_integrity_vec need to be 
 > eliminated by the preprocessor.
->
-> Should I change rq_integrity_vec to this? Then, we could get rid of the
+
+Why not just do this incremental? Cleans up the ifdef mess too, leaving
+only the one actually using rq_integrity_vec in place.
+
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 5f857cbc95c8..bd56416a7fa8 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -821,10 +821,10 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 	return ret;
+ }
+ 
+-#ifdef CONFIG_BLK_DEV_INTEGRITY
+ static blk_status_t nvme_map_metadata(struct nvme_dev *dev, struct request *req,
+ 		struct nvme_command *cmnd)
+ {
++#ifdef CONFIG_BLK_DEV_INTEGRITY
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	struct bio_vec bv = rq_integrity_vec(req);
+ 
+@@ -832,9 +832,9 @@ static blk_status_t nvme_map_metadata(struct nvme_dev *dev, struct request *req,
+ 	if (dma_mapping_error(dev->dev, iod->meta_dma))
+ 		return BLK_STS_IOERR;
+ 	cmnd->rw.metadata = cpu_to_le64(iod->meta_dma);
++#endif
+ 	return BLK_STS_OK;
+ }
+-#endif
+ 
+ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
+ {
+@@ -855,20 +855,16 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
+ 			goto out_free_cmd;
+ 	}
+ 
+-#ifdef CONFIG_BLK_DEV_INTEGRITY
+-	if (blk_integrity_rq(req)) {
++	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) && blk_integrity_rq(req)) {
+ 		ret = nvme_map_metadata(dev, req, &iod->cmd);
+ 		if (ret)
+ 			goto out_unmap_data;
+ 	}
+-#endif
+ 
+ 	nvme_start_request(req);
+ 	return BLK_STS_OK;
+-#ifdef CONFIG_BLK_DEV_INTEGRITY
+ out_unmap_data:
+ 	nvme_unmap_data(dev, req);
+-#endif
+ out_free_cmd:
+ 	nvme_cleanup_cmd(req);
+ 	return ret;
+
+> Should I change rq_integrity_vec to this? Then, we could get rid of the 
 > ifdefs and let the optimizer remove all calls to rq_integrity_vec.
 > static inline struct bio_vec rq_integrity_vec(struct request *rq)
 > {
->         struct bio_vec bv =3D { };
->         return bv;
+> 	struct bio_vec bv = { };
+> 	return bv;
 > }
 
-This can be reduced to
-return (struct bio_vec){ };
+Only if that eliminates runtime checking for !INTEGRITY, which I don't
+thin it will.
 
->
-> > > @@ -962,12 +968,14 @@ static __always_inline void nvme_pci_unm
-> > >     struct nvme_queue *nvmeq =3D req->mq_hctx->driver_data;
-> > >     struct nvme_dev *dev =3D nvmeq->dev;
-> > >
-> > > +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> > >     if (blk_integrity_rq(req)) {
-> > >             struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
-> >
-> > Ditto
-> >
-> > > Index: linux-2.6/include/linux/blk-integrity.h
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > --- linux-2.6.orig/include/linux/blk-integrity.h
-> > > +++ linux-2.6/include/linux/blk-integrity.h
-> > > @@ -109,11 +109,11 @@ static inline bool blk_integrity_rq(stru
-> > >   * Return the first bvec that contains integrity data.  Only drivers=
- that are
-> > >   * limited to a single integrity segment should use this helper.
-> > >   */
-> > > -static inline struct bio_vec *rq_integrity_vec(struct request *rq)
-> > > +static inline struct bio_vec rq_integrity_vec(struct request *rq)
-> > >  {
-> > > -   if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
-> > > -           return NULL;
-> > > -   return rq->bio->bi_integrity->bip_vec;
-> > > +   WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1);
-> > > +   return mp_bvec_iter_bvec(rq->bio->bi_integrity->bip_vec,
-> > > +                            rq->bio->bi_integrity->bip_iter);
-> > >  }
-> >
-> > Not clear why the return on integrity segments > 1 is removed?
->
-> Because we can't return NULL. But I can leave it there, print a warning
-> and return the first vector.
->
-> Mikulas
->
-> > --
-> > Jens Axboe
-> >
->
->
 
---
-Anuj Gupta
+-- 
+Jens Axboe
+
