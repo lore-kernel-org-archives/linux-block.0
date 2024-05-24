@@ -1,28 +1,28 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00DA12EBED;
-	Fri, 24 May 2024 20:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D06F84DFD;
+	Fri, 24 May 2024 20:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716583624; cv=none; b=k6Ddp70EUeTX0ZRP3aPU8dL8s0eyR5QM4bwWTELsrUtWp3cDxX+XN5oRm/M0eRHzlL2OD2DUooJ5an6EBxko0/5SCu6YNpN/rLvt7467059NYLF0ZrxTHaawGVpIZFY3uocbLrp8sneI28FvP8iZicnV9UpAkLPD6fOsCrFuwCY=
+	t=1716583625; cv=none; b=s4Ba27GQfudeZW79CNAhso4hoVzH/6BzpqXwbU+hwwpn30312vB+xmLQd34hy0VgU/CiZZpI8EAwFfSk0zfMkj7JRZ45+A1ikDC3noZXyGvQR+lUtZfgMRJpBFj6c5G3efg0wspe5EDNeDESWQ7lD/+qNg9pdtt4V/4I81NksJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716583624; c=relaxed/simple;
-	bh=whOH6OIOdpUOXk1bSveUN9hJZJ1gJKQMfx0B1dJVTeY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=t1MWESiSGD6qV6nwXNySG6rWRMUVQgXDfc9g6qCl1lcGgHuTA2rAYIdG3qh0F4MMGVX5gxPMjrev062o+p+PxgQDtVYKHKGE3VaNZnQ9V0fPLDFmFmCyd8JGTdzGTxSm7XD7IvDedkFHmUzzaYndOCSUcxI33p0zPUKwmqgXsfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Ud2DQFPj; arc=none smtp.client-ip=13.77.154.182
+	s=arc-20240116; t=1716583625; c=relaxed/simple;
+	bh=hALd62jtxfmHVvlAHqMQJIVwQq9kxLw+A81pDmAfJag=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=XPnfdQ8Uqd4+0WvSkbV83y/67J1pjf0ioGPnfo+LFuZwHZYyFVsKh9+bpT8IInd5m040qRzdxmM7ma+kA1BVzECVOsURh6MmXyFhhzcTfTXGzOyUuIvWzA83gPGQRc7asZqMfUP3n3Ufh6yUN3xFsfki9F4AIS/jFHhxOAC47Xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HTcorkoI; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Ud2DQFPj"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HTcorkoI"
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-	id C5F1120BE582; Fri, 24 May 2024 13:46:51 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C5F1120BE582
+	id EE35F20BE595; Fri, 24 May 2024 13:46:51 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EE35F20BE595
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
 	s=default; t=1716583611;
-	bh=EnA+fGahX7DRTOc4BqY+nlsscr5z7afHZnEgqXnBdDU=;
+	bh=vrJzOGuvqZ8IP0pHGyWlhX1P94tTAhnoJcQfMZyCfB4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ud2DQFPju3SHMwGyZuSUbb1Am32heo1MyCrd6TNsjwkWJbLz7njchh0QU6FTskxas
-	 4ORZgSGbSP25Xv1QDY90I4s8KoS0q5tJ9BYKmKriAjoQ/4W117Wh+aix8yTY+EjtrO
-	 x31BpOoEmAIXgHQdLtBIeuScVY5D5W8AsLrlaFFY=
+	b=HTcorkoIexYH396yioziMyDQi0DLF37upTUm8jnQgRJmZlYfB/dUCajE2t21RLqbH
+	 pMUZeaDnpizhl3UQkYYhMjKrN6x105bn/GiuWBX1Z3b7ZL5EfFYX6AS+dPjMhDL05N
+	 2z050H69U1Q+Ltv2QgWga9AbMmioRcmNOyj4a/v0=
 From: Fan Wu <wufan@linux.microsoft.com>
 To: corbet@lwn.net,
 	zohar@linux.ibm.com,
@@ -44,11 +44,11 @@ Cc: linux-doc@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	audit@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>,
-	Fan Wu <wufan@linux.microsoft.com>
-Subject: [PATCH v19 12/20] dm verity: expose root hash digest and signature data to LSMs
-Date: Fri, 24 May 2024 13:46:41 -0700
-Message-Id: <1716583609-21790-13-git-send-email-wufan@linux.microsoft.com>
+	Fan Wu <wufan@linux.microsoft.com>,
+	Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: [PATCH v19 15/20] fsverity: expose verified fsverity built-in signatures to LSMs
+Date: Fri, 24 May 2024 13:46:44 -0700
+Message-Id: <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1716583609-21790-1-git-send-email-wufan@linux.microsoft.com>
 References: <1716583609-21790-1-git-send-email-wufan@linux.microsoft.com>
@@ -58,312 +58,206 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-From: Deven Bowers <deven.desai@linux.microsoft.com>
+This patch enhances fsverity's capabilities to support both integrity and
+authenticity protection by introducing the exposure of built-in
+signatures through a new LSM hook. This functionality allows LSMs,
+e.g. IPE, to enforce policies based on the authenticity and integrity of
+files, specifically focusing on built-in fsverity signatures. It enables
+a policy enforcement layer within LSMs for fsverity, offering granular
+control over the usage of authenticity claims. For instance, a policy
+could be established to permit the execution of all files with verified
+built-in fsverity signatures while restricting kernel module loading
+from specified fsverity files via fsverity digests.
 
-dm-verity provides a strong guarantee of a block device's integrity. As
-a generic way to check the integrity of a block device, it provides
-those integrity guarantees to its higher layers, including the filesystem
-level.
+The introduction of a security_inode_setintegrity() hook call within
+fsverity's workflow ensures that the verified built-in signature of a file
+is exposed to LSMs. This enables LSMs to recognize and label fsverity files
+that contain a verified built-in fsverity signature. This hook is invoked
+subsequent to the fsverity_verify_signature() process, guaranteeing the
+signature's verification against fsverity's keyring. This mechanism is
+crucial for maintaining system security, as it operates in kernel space,
+effectively thwarting attempts by malicious binaries to bypass user space
+stack interactions.
 
-An LSM that control access to a resource on the system based on the
-available integrity claims can use this transitive property of
-dm-verity, by querying the underlying block_device of a particular
-file.
-
-The digest and signature information need to be stored in the block
-device to fulfill the next requirement of authorization via LSM policy.
-This will enable the LSM to perform revocation of devices that are still
-mounted, prohibiting execution of files that are no longer authorized
-by the LSM in question.
-
-This patch adds two security hook calls in dm-verity to expose the
-dm-verity roothash and the roothash signature to LSMs via preresume
-callback. The hook calls are depended on CONFIG_SECURITY.
+The second to last commit in this patch set will add a link to the IPE
+documentation in fsverity.rst.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+
 ---
-v2:
-  + No Changes
-
-v3:
-  + No changes
-
-v4:
-  + No changes
-
-v5:
-  + No changes
-
-v6:
-  + Fix an improper cleanup that can result in
-    a leak
+v1-v6:
+  + Not present
 
 v7:
-  + Squash patch 08/12, 10/12 to [11/16]
-  + Use part0 for block_device, to retrieve the block_device, when
-    calling security_bdev_setsecurity
+  Introduced
 
 v8:
-  + Undo squash of 08/12, 10/12 - separating drivers/md/ from
-    security/ & block/
-  + Use common-audit function for dmverity_signature.
-  + Change implementation for storing the dm-verity digest to use the
-    newly introduced dm_verity_digest structure introduced in patch
-    14/20.
-  + Create new structure, dm_verity_digest, containing digest algorithm,
-    size, and digest itself to pass to the LSM layer. V7 was missing the
-    algorithm.
-  + Create an associated public header containing this new structure and
-    the key values for the LSM hook, specific to dm-verity.
-  + Additional information added to commit, discussing the layering of
-    the changes and how the information passed will be used.
+  + Split fs/verity/ changes and security/ changes into separate patches
+  + Change signature of fsverity_create_info to accept non-const inode
+  + Change signature of fsverity_verify_signature to accept non-const inode
+  + Don't cast-away const from inode.
+  + Digest functionality dropped in favor of:
+    ("fs-verity: define a function to return the integrity protected
+      file digest")
+  + Reworded commit description and title to match changes.
+  + Fix a bug wherein no LSM implements the particular fsverity @name
+    (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
 
 v9:
   + No changes
 
 v10:
-  + No changes
+  + Rename the signature blob key
+  + Cleanup redundant code
+  + Make the hook call depends on CONFIG_FS_VERITY_BUILTIN_SIGNATURES
 
 v11:
-  + Add an optional field to save signature
-  + Move the security hook call to the new finalize hook
+  + No changes
 
 v12:
-  + No changes
+  + Add constification to the hook call
 
 v13:
   + No changes
 
 v14:
-  + Correct code format
-  + Remove unnecessary header and switch to dm_disk()
+  + Add doc/comment to built-in signature verification
 
 v15:
-  + Refactor security_bdev_setsecurity() to security_bdev_setintegrity()
-  + Remove unnecessary headers
+  + Add more docs related to IPE
+  + Switch the hook call to security_inode_setintegrity()
 
 v16:
-  + Use kmemdup to duplicate signature
-  + Clean up lsm blob data in error case
+  + Explicitly mention "fsverity builtin signatures" in the commit
+    message
+  + Amend documentation in fsverity.rst
+  + Fix format issue
+  + Change enum name
 
 v17:
-  + Switch to depend on CONFIG_SECURITY
-  + Use new enum name LSM_INT_DMVERITY_SIG_VALID
+  + Fix various documentation issues
+  + Use new enum name LSM_INT_FSVERITY_BUILTINSIG_VALID
 
 v18:
-  + Amend commit title
-  + Fix incorrect error handling
-  + Make signature exposure depends on CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG
-  + Fix inaccurate comment
-  + Remove include/linux/dm-verity.h
-  + use crypto_ahash_alg_name(v->tfm) instead of v->alg_name
+  + Fix typos
+  + Move the inode_setintegrity hook call into fsverity_verify_signature()
 
 v19:
-  + Drop finalize callback and switch to preresume callback
-  + Adding NULL check to avoid kmemdup when sig is NULL
+  + Cleanup code w.r.t inode_setintegrity hook refactoring
 ---
- drivers/md/dm-verity-target.c | 108 ++++++++++++++++++++++++++++++++++
- drivers/md/dm-verity.h        |   6 ++
- include/linux/security.h      |   9 ++-
- 3 files changed, 122 insertions(+), 1 deletion(-)
+ Documentation/filesystems/fsverity.rst | 23 +++++++++++++++++++++--
+ fs/verity/signature.c                  | 18 +++++++++++++++++-
+ include/linux/security.h               |  1 +
+ 3 files changed, 39 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index bb5da66da4c1..0a54ce02ea53 100644
---- a/drivers/md/dm-verity-target.c
-+++ b/drivers/md/dm-verity-target.c
-@@ -22,6 +22,7 @@
- #include <linux/scatterlist.h>
- #include <linux/string.h>
- #include <linux/jump_label.h>
+diff --git a/Documentation/filesystems/fsverity.rst b/Documentation/filesystems/fsverity.rst
+index 13e4b18e5dbb..362b7a5dc300 100644
+--- a/Documentation/filesystems/fsverity.rst
++++ b/Documentation/filesystems/fsverity.rst
+@@ -86,6 +86,14 @@ authenticating fs-verity file hashes include:
+   signature in their "security.ima" extended attribute, as controlled
+   by the IMA policy.  For more information, see the IMA documentation.
+ 
++- Integrity Policy Enforcement (IPE).  IPE supports enforcing access
++  control decisions based on immutable security properties of files,
++  including those protected by fs-verity's built-in signatures.
++  "IPE policy" specifically allows for the authorization of fs-verity
++  files using properties ``fsverity_digest`` for identifying
++  files by their verity digest, and ``fsverity_signature`` to authorize
++  files with a verified fs-verity's built-in signature.
++
+ - Trusted userspace code in combination with `Built-in signature
+   verification`_.  This approach should be used only with great care.
+ 
+@@ -457,7 +465,11 @@ Enabling this option adds the following:
+    On success, the ioctl persists the signature alongside the Merkle
+    tree.  Then, any time the file is opened, the kernel verifies the
+    file's actual digest against this signature, using the certificates
+-   in the ".fs-verity" keyring.
++   in the ".fs-verity" keyring. This verification happens as long as the
++   file's signature exists, regardless of the state of the sysctl variable
++   "fs.verity.require_signatures" described in the next item. The IPE LSM
++   relies on this behavior to recognize and label fsverity files
++   that contain a verified built-in fsverity signature.
+ 
+ 3. A new sysctl "fs.verity.require_signatures" is made available.
+    When set to 1, the kernel requires that all verity files have a
+@@ -481,7 +493,7 @@ be carefully considered before using them:
+ 
+ - Builtin signature verification does *not* make the kernel enforce
+   that any files actually have fs-verity enabled.  Thus, it is not a
+-  complete authentication policy.  Currently, if it is used, the only
++  complete authentication policy.  Currently, if it is used, one
+   way to complete the authentication policy is for trusted userspace
+   code to explicitly check whether files have fs-verity enabled with a
+   signature before they are accessed.  (With
+@@ -490,6 +502,13 @@ be carefully considered before using them:
+   could just store the signature alongside the file and verify it
+   itself using a cryptographic library, instead of using this feature.
+ 
++- Another approach is to utilize fs-verity builtin signature
++  verification in conjunction with the IPE LSM, which supports defining
++  a kernel-enforced, system-wide authentication policy that allows only
++  files with a verified fs-verity builtin signature to perform certain
++  operations, such as execution. Note that IPE doesn't require
++  fs.verity.require_signatures=1.
++
+ - A file's builtin signature can only be set at the same time that
+   fs-verity is being enabled on the file.  Changing or deleting the
+   builtin signature later requires re-creating the file.
+diff --git a/fs/verity/signature.c b/fs/verity/signature.c
+index 90c07573dd77..a4ed91c7049f 100644
+--- a/fs/verity/signature.c
++++ b/fs/verity/signature.c
+@@ -17,6 +17,7 @@
+ 
+ #include <linux/cred.h>
+ #include <linux/key.h>
 +#include <linux/security.h>
+ #include <linux/slab.h>
+ #include <linux/verification.h>
  
- #define DM_MSG_PREFIX			"verity"
- 
-@@ -1017,6 +1018,41 @@ static void verity_io_hints(struct dm_target *ti, struct queue_limits *limits)
- 	blk_limits_io_min(limits, limits->logical_block_size);
- }
- 
-+#ifdef CONFIG_SECURITY
-+
-+static int verity_init_sig(struct dm_verity *v, const void *sig,
-+			   size_t sig_size)
-+{
-+	v->sig_size = sig_size;
-+
-+	if (sig) {
-+		v->root_digest_sig = kmemdup(sig, v->sig_size, GFP_KERNEL);
-+		if (!v->root_digest_sig)
-+			return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+static void verity_free_sig(struct dm_verity *v)
-+{
-+	kfree(v->root_digest_sig);
-+}
-+
-+#else
-+
-+static inline int verity_init_sig(struct dm_verity *v, const void *sig,
-+				  size_t sig_size)
-+{
-+	return 0;
-+}
-+
-+static inline void verity_free_sig(struct dm_verity *v)
-+{
-+}
-+
-+#endif /* CONFIG_SECURITY */
-+
- static void verity_dtr(struct dm_target *ti)
- {
- 	struct dm_verity *v = ti->private;
-@@ -1035,6 +1071,7 @@ static void verity_dtr(struct dm_target *ti)
- 	kfree(v->salt);
- 	kfree(v->root_digest);
- 	kfree(v->zero_digest);
-+	verity_free_sig(v);
- 
- 	if (v->tfm)
- 		crypto_free_ahash(v->tfm);
-@@ -1434,6 +1471,13 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		ti->error = "Root hash verification failed";
- 		goto bad;
+@@ -41,7 +42,11 @@ static struct key *fsverity_keyring;
+  * @sig_size: size of signature in bytes, or 0 if no signature
+  *
+  * If the file includes a signature of its fs-verity file digest, verify it
+- * against the certificates in the fs-verity keyring.
++ * against the certificates in the fs-verity keyring. Note that signatures
++ * are verified regardless of the state of the 'fsverity_require_signatures'
++ * variable and the LSM subsystem relies on this behavior to help enforce
++ * file integrity policies. Please discuss changes with the LSM list
++ * (thank you!).
+  *
+  * Return: 0 on success (signature valid or not required); -errno on failure
+  */
+@@ -106,6 +111,17 @@ int fsverity_verify_signature(const struct fsverity_info *vi,
+ 		return err;
  	}
+ 
++	err = security_inode_setintegrity(inode,
++					  LSM_INT_FSVERITY_BUILTINSIG_VALID,
++					  signature,
++					  le32_to_cpu(sig_size));
 +
-+	r = verity_init_sig(v, verify_args.sig, verify_args.sig_size);
-+	if (r < 0) {
-+		ti->error = "Cannot allocate root digest signature";
-+		goto bad;
++	if (err) {
++		fsverity_err(inode, "Error %d exposing file signature to LSMs",
++			     err);
++		return err;
 +	}
 +
- 	v->hash_per_block_bits =
- 		__fls((1 << v->hash_dev_block_bits) / v->digest_size);
- 
-@@ -1584,6 +1628,67 @@ int dm_verity_get_root_digest(struct dm_target *ti, u8 **root_digest, unsigned i
  	return 0;
  }
  
-+#ifdef CONFIG_SECURITY
-+
-+#ifdef CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG
-+
-+static int verity_security_set_signature(struct block_device *bdev,
-+					 struct dm_verity *v)
-+{
-+	return security_bdev_setintegrity(bdev,
-+					  LSM_INT_DMVERITY_SIG_VALID,
-+					  v->root_digest_sig,
-+					  v->sig_size);
-+}
-+
-+#else
-+
-+static inline int verity_security_set_signature(struct block_device *bdev,
-+						struct dm_verity *v)
-+{
-+	return 0;
-+}
-+
-+#endif /* CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG */
-+
-+/*
-+ * Expose verity target's root hash and signature data to LSMs before resume.
-+ *
-+ * Returns 0 on success, or -ENOMEM if the system is out of memory.
-+ */
-+static int verity_preresume(struct dm_target *ti)
-+{
-+	struct block_device *bdev;
-+	struct dm_verity_digest root_digest;
-+	struct dm_verity *v;
-+	int r;
-+
-+	v = ti->private;
-+	bdev = dm_disk(dm_table_get_md(ti->table))->part0;
-+	root_digest.digest = v->root_digest;
-+	root_digest.digest_len = v->digest_size;
-+	root_digest.alg = crypto_ahash_alg_name(v->tfm);
-+
-+	r = security_bdev_setintegrity(bdev, LSM_INT_DMVERITY_ROOTHASH, &root_digest,
-+				       sizeof(root_digest));
-+	if (r)
-+		return r;
-+
-+	r =  verity_security_set_signature(bdev, v);
-+	if (r)
-+		goto bad;
-+
-+	return 0;
-+
-+bad:
-+
-+	security_bdev_setintegrity(bdev, LSM_INT_DMVERITY_ROOTHASH, NULL, 0);
-+
-+	return r;
-+}
-+
-+#endif /* CONFIG_SECURITY */
-+
- static struct target_type verity_target = {
- 	.name		= "verity",
- 	.features	= DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
-@@ -1596,6 +1701,9 @@ static struct target_type verity_target = {
- 	.prepare_ioctl	= verity_prepare_ioctl,
- 	.iterate_devices = verity_iterate_devices,
- 	.io_hints	= verity_io_hints,
-+#ifdef CONFIG_SECURITY
-+	.preresume	= verity_preresume,
-+#endif /* CONFIG_SECURITY */
- };
- module_dm(verity);
- 
-diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-index 20b1bcf03474..2de89e0d555b 100644
---- a/drivers/md/dm-verity.h
-+++ b/drivers/md/dm-verity.h
-@@ -43,6 +43,9 @@ struct dm_verity {
- 	u8 *root_digest;	/* digest of the root block */
- 	u8 *salt;		/* salt: its size is salt_size */
- 	u8 *zero_digest;	/* digest for a zero block */
-+#ifdef CONFIG_SECURITY
-+	u8 *root_digest_sig;	/* signature of the root digest */
-+#endif /* CONFIG_SECURITY */
- 	unsigned int salt_size;
- 	sector_t data_start;	/* data offset in 512-byte sectors */
- 	sector_t hash_start;	/* hash start in blocks */
-@@ -56,6 +59,9 @@ struct dm_verity {
- 	bool hash_failed:1;	/* set if hash of any block failed */
- 	bool use_bh_wq:1;	/* try to verify in BH wq before normal work-queue */
- 	unsigned int digest_size;	/* digest size for the current hash algorithm */
-+#ifdef CONFIG_SECURITY
-+	unsigned int sig_size;	/* root digest signature size */
-+#endif /* CONFIG_SECURITY */
- 	unsigned int ahash_reqsize;/* the size of temporary space for crypto */
- 	enum verity_mode mode;	/* mode for handling verification errors */
- 	unsigned int corrupted_errs;/* Number of errors for corrupted blocks */
 diff --git a/include/linux/security.h b/include/linux/security.h
-index a64e83622c7c..09c80326518f 100644
+index ab489fb02f06..2e87e038bc79 100644
 --- a/include/linux/security.h
 +++ b/include/linux/security.h
-@@ -83,8 +83,15 @@ enum lsm_event {
- 	LSM_POLICY_CHANGE,
- };
- 
-+struct dm_verity_digest {
-+	const char *alg;
-+	const u8 *digest;
-+	size_t digest_len;
-+};
-+
+@@ -92,6 +92,7 @@ struct dm_verity_digest {
  enum lsm_integrity_type {
--	__LSM_INT_MAX
-+	LSM_INT_DMVERITY_SIG_VALID,
-+	LSM_INT_DMVERITY_ROOTHASH,
+ 	LSM_INT_DMVERITY_SIG_VALID,
+ 	LSM_INT_DMVERITY_ROOTHASH,
++	LSM_INT_FSVERITY_BUILTINSIG_VALID,
  };
  
  /*
