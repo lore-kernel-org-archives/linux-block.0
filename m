@@ -1,122 +1,91 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E5885927
-	for <linux-block@vger.kernel.org>; Fri, 24 May 2024 10:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53AADDC7;
+	Fri, 24 May 2024 10:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716546541; cv=none; b=uDrspoIZZx9Ig15XCfn7JYOXUW0RG6KYMIwWaKHqEAYwHc21p9QsyjRRyiuRxISXmlG2lUMnX297hqe3RIVpCcs//rHhUqtGrnLV7uvYPUAgJV4U6fhxcCGvKXLBP4p3QK3cMvyOKQlgnmfED1vavqmQWTam3cImA05+6P4wdAw=
+	t=1716547618; cv=none; b=hLacI7kPNDxPv9tzvMAnfoDOSAKSjRZ3EBtt1rVAFEn1Bm131KnMjPF285H/xKH+7ubRRHi1xc34SIB6r6cEzHDPN4DqQ2vst3JvdmGJ/ZeOP3QGMjZ3OgxfwxZVZoBJyxKcF9sUvY3Kb5CY1nJMu+74MpAcq7JCtWkK/0PLXp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716546541; c=relaxed/simple;
-	bh=lIeKJZ2OVOsBGIQYP6aYbaCAR81wXWkARY37Wi4Bksc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=RHre/wYg1C1Dsq0E9htavd7BJYoZD9Ni7WFU2ra9YNEbfwM5aWe3SknChNvA92uGpEnYNCMYsfIu3Lt+AoOcPEASYZ4a0kYmDAPWZmemYt44O6YmFpFTqBWMJ1dEjnmfCv1/433xVOxYz+LlBOBwMbZI9C72ywEpJOfZqXvpMG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=O+qaMYFC; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1716547618; c=relaxed/simple;
+	bh=El40fFKvSQA62aQn3lWxFdNTsiyC/RjddEVEMtvh7I4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K3+TgbHZV38onEC9I3/dISHbQ2dTIhjv+LhpAiToJB8YMCY7pmRt9Vy4BQa8z89yl3tao8jaPaMePFjgjYJKEn+SGidNrOug9Y9/0JxAqdFcSYb9AXXscTjuXBmYp7VdYm/ZG2GeNho+6ltD8piDsGd0T3gC5Nfte6xrpGoLME0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSRXLMq5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="O+qaMYFC"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240524102849epoutp04c9188f3958d88e714d87ed5c72cf48bf~SZflV8BGU2501025010epoutp04O
-	for <linux-block@vger.kernel.org>; Fri, 24 May 2024 10:28:49 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240524102849epoutp04c9188f3958d88e714d87ed5c72cf48bf~SZflV8BGU2501025010epoutp04O
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1716546529;
-	bh=lIeKJZ2OVOsBGIQYP6aYbaCAR81wXWkARY37Wi4Bksc=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=O+qaMYFCKYADvcGllsW+IMFM90n5VXKykQyZpegZIyv2QMf1zwUNGe+dsovQpyBtv
-	 Sy9orpJTAK6tlZBsZbcC+u1m2P5pqXzEhXcT846MsZ1/4ekZjpR19InK3xO5pZ/yRg
-	 qiCRPfWIqWZ3XnxY7t8yNMPbwINmEl8E8gZ7PPPc=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240524102849epcas5p1ded2aee0b3b9963d7acd03f12893b6d9~SZfk6j21U1211212112epcas5p11;
-	Fri, 24 May 2024 10:28:49 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.180]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4Vm1V739TBz4x9Pv; Fri, 24 May
-	2024 10:28:47 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	ED.B1.09666.FDB60566; Fri, 24 May 2024 19:28:47 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240524102847epcas5p4a664bc84623cb5eee95b0d0786d2b621~SZfjCfTAJ2616826168epcas5p40;
-	Fri, 24 May 2024 10:28:47 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240524102847epsmtrp12d75a0db2cb0766488ec26be96b2c3fc~SZfjBo2y50470904709epsmtrp1k;
-	Fri, 24 May 2024 10:28:47 +0000 (GMT)
-X-AuditID: b6c32a49-cefff700000025c2-76-66506bdf76f0
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	F3.07.19234.EDB60566; Fri, 24 May 2024 19:28:46 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240524102845epsmtip2f4f6a5763e5cbeb0db31814f1c49f911~SZfiA7zt70273102731epsmtip2C;
-	Fri, 24 May 2024 10:28:45 +0000 (GMT)
-Message-ID: <87067eac-db91-c144-b3da-86d16f0a060a@samsung.com>
-Date: Fri, 24 May 2024 15:58:45 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSRXLMq5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCE9AC3277B;
+	Fri, 24 May 2024 10:46:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716547618;
+	bh=El40fFKvSQA62aQn3lWxFdNTsiyC/RjddEVEMtvh7I4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VSRXLMq5UsTTn2fa3tOgqf85AOP5Dy544dhMmEIKgfplepBVEoDmMlgLuqK6/TVAe
+	 aPB5b0Y+SooZsTYmyjSD32o/xvcgSziKC6aGpVah9WBpWtKr6UA8bsYY8G/6UI80hT
+	 WdLqks5tfx6CxkrsknrxXUatNyTNeB6wjOYm2ER34VGy9VX84jJ0Xg0tKC3ONOrAdk
+	 D/2MKBtlGRyj2Nfs92EDoGS+f5y/Bq9aKYcLSciCnLptEuHfuXzOBy+/Pyf9ZyU+H5
+	 Loyx3BgieOKf8oBouOUgsZAQHh2+UkM1d2it6lFwh9Q0Gr/lMABt73XpPdkh0NkBeH
+	 DQkhys9GbhKwg==
+From: Hannes Reinecke <hare@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@kernel.org>,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	Hannes Reinecke <hare@kernel.org>
+Subject: [PATCHv2] block: check for max_hw_sectors underflow
+Date: Fri, 24 May 2024 12:46:51 +0200
+Message-Id: <20240524104651.92506-1-hare@kernel.org>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH] block: streamline meta bounce buffer handling
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>
-Cc: kbusch@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-	martin.petersen@oracle.com, anuj20.g@samsung.com
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20240506060509.GA5362@lst.de>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJJsWRmVeSWpSXmKPExsWy7bCmlu797IA0gzMzRCyaJvxltlh9t5/N
-	YuXqo0wWkw5dY7TYe0vbYvnxf0wObB6Xz5Z6bFrVyeax+2YDm8fHp7dYPPq2rGL0+LxJLoAt
-	KtsmIzUxJbVIITUvOT8lMy/dVsk7ON453tTMwFDX0NLCXEkhLzE31VbJxSdA1y0zB+gIJYWy
-	xJxSoFBAYnGxkr6dTVF+aUmqQkZ+cYmtUmpBSk6BSYFecWJucWleul5eaomVoYGBkSlQYUJ2
-	xv+7C9gK/jFWXH29l6mB8TJjFyMnh4SAicSc7+tZuhi5OIQEdjNK/J7zjxHC+cQo0XflNRuc
-	c/HIVWaYlu3PJ0C17GSUuL/yPJTzllGiZcEFFpAqXgE7iV3//7KC2CwCqhJ72/6yQ8QFJU7O
-	fAJWIyqQLPGz6wAbiC0s4CSx7uA1sDizgLjErSfzmUBsEQEliaevzjJCxMsl9h7+ClTDwcEm
-	oClxYXIpSJhTQFvizZv/UCXyEtvfzmEGuUdCoJVD4tq1aUwQV7tIzHv4gx3CFpZ4dXwLlC0l
-	8bK/DcpOlrg08xxUfYnE4z0HoWx7idZT/cwge5mB9q7fpQ+xi0+i9/cTJpCwhACvREebEES1
-	osS9SU9ZIWxxiYczlkDZHhKNTxawQ4JqFaPE8a9/GCcwKsxCCpVZSL6fheSdWQibFzCyrGKU
-	TC0ozk1PLTYtMMxLLYdHeHJ+7iZGcBrV8tzBePfBB71DjEwcjIcYJTiYlUR4o1f6pgnxpiRW
-	VqUW5ccXleakFh9iNAVGz0RmKdHkfGAizyuJNzSxNDAxMzMzsTQ2M1QS533dOjdFSCA9sSQ1
-	OzW1ILUIpo+Jg1OqgUnkYmOXxJflaiXTfzcq1iwqFqqpLiqIUlwtd0jkrfzVLTsvJAmYhZYx
-	6XS2se1+HrOHuX5pLmPB2RnOCYc7hM4ZsV281yJ6Uqw5ltXmWxeD3e5/U49pbH/IKrftlbP7
-	H+20wsbfLzSFwi/NyapbEVB3MkQs9C/TkSOL/dxvVHe9XyjFcKT95fJNjS2+26s06zdN3S+4
-	1kIl38Hm7buknwy3Dth1etukHJkauy97zt6vp0+fWHty2vKtevvCr0n2CCvm94WKbn2e21L5
-	/9fLdb+CAw0VVt3Z/kenbv/WJPYU/w+rgj6eOLW58LzbpYV7ts1SuGBh4qxwZeejnVNv12qo
-	m4RWxK5tU+nzexq+4bUSS3FGoqEWc1FxIgAHYdc0LAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrALMWRmVeSWpSXmKPExsWy7bCSvO697IA0g39XLS2aJvxltlh9t5/N
-	YuXqo0wWkw5dY7TYe0vbYvnxf0wObB6Xz5Z6bFrVyeax+2YDm8fHp7dYPPq2rGL0+LxJLoAt
-	issmJTUnsyy1SN8ugSvj/90FbAX/GCuuvt7L1MB4mbGLkZNDQsBEYvvzCSxdjFwcQgLbGSUm
-	X9zPBJEQl2i+9oMdwhaWWPnvOTtE0WtGiaObXjODJHgF7CR2/f/LCmKzCKhK7G37yw4RF5Q4
-	OfMJC4gtKpAs8fLPRLC4sICTxLqD18DizEALbj2ZD7ZMREBJ4umrs4wQ8XKJ9S+WsoHYQgKr
-	GCW+bIzpYuTgYBPQlLgwuRQkzCmgLfHmzX+ocjOJrq1dULa8xPa3c5gnMArNQnLFLCTbZiFp
-	mYWkZQEjyypG0dSC4tz03OQCQ73ixNzi0rx0veT83E2M4EjRCtrBuGz9X71DjEwcjIcYJTiY
-	lUR4o1f6pgnxpiRWVqUW5ccXleakFh9ilOZgURLnVc7pTBESSE8sSc1OTS1ILYLJMnFwSjUw
-	dZ68+mrF7b7u78smLXbLr3l5J2LC4tPxFemm5rc+nbd+ePE3Q976nieaUznM1nK+VH8fUG0n
-	1P3+YAzj7QVXb+8s/rct5EHfTxspd42tgluefe6fsXjjruQD8ac/rLm5gL3qW/P2Zy/Cjc0Z
-	8uTfb8rSdcsKmctxUmjL3CTPaY/+8a0yCHoqlD/5dmnCuz89RoHpl8UOMvPfefhS/SZvtlH8
-	0rtZH95Okg6vnhWQudVP/crRpLMGZqb+56+cmFGTynVyn7HgGa2Zv06fvyRyTDb5c+MMR0uW
-	+s6gjdl3/9isLdHriLyUJPY5dMrLZ3eEKvzMOmxCupon2nidaZ+5d0cVZ3RS/WybunPnmLY+
-	F1JiKc5INNRiLipOBADvyEQoAwMAAA==
-X-CMS-MailID: 20240524102847epcas5p4a664bc84623cb5eee95b0d0786d2b621
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240506051751epcas5p1ed84e21495e12c7bf41e94827aa85e33
-References: <CGME20240506051751epcas5p1ed84e21495e12c7bf41e94827aa85e33@epcas5p1.samsung.com>
-	<20240506051047.4291-1-joshi.k@samsung.com> <20240506060509.GA5362@lst.de>
+Content-Transfer-Encoding: 8bit
 
-On 5/6/2024 11:35 AM, Christoph Hellwig wrote:
-> Can we take a step back first?
+The logical block size need to be smaller than the max_hw_sector
+setting, otherwise we can't even transfer a single LBA.
 
-Now that back step has been taken[*], can this patch be looked at.
-This still applies cleanly.
+Signed-off-by: Hannes Reinecke <hare@kernel.org>
+---
+ block/blk-settings.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-[*] https://lore.kernel.org/linux-block/20240520154943.GA1327@lst.de/
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index d2731843f2fc..030afb597183 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -104,6 +104,7 @@ static int blk_validate_zoned_limits(struct queue_limits *lim)
+ static int blk_validate_limits(struct queue_limits *lim)
+ {
+ 	unsigned int max_hw_sectors;
++	unsigned int logical_block_sectors;
+ 
+ 	/*
+ 	 * Unless otherwise specified, default to 512 byte logical blocks and a
+@@ -134,8 +135,11 @@ static int blk_validate_limits(struct queue_limits *lim)
+ 		lim->max_hw_sectors = BLK_SAFE_MAX_SECTORS;
+ 	if (WARN_ON_ONCE(lim->max_hw_sectors < PAGE_SECTORS))
+ 		return -EINVAL;
++	logical_block_sectors = lim->logical_block_size >> SECTOR_SHIFT;
++	if (WARN_ON_ONCE(logical_block_sectors > lim->max_hw_sectors))
++		return -EINVAL;
+ 	lim->max_hw_sectors = round_down(lim->max_hw_sectors,
+-			lim->logical_block_size >> SECTOR_SHIFT);
++			logical_block_sectors);
+ 
+ 	/*
+ 	 * The actual max_sectors value is a complex beast and also takes the
+@@ -153,7 +157,7 @@ static int blk_validate_limits(struct queue_limits *lim)
+ 		lim->max_sectors = min(max_hw_sectors, BLK_DEF_MAX_SECTORS_CAP);
+ 	}
+ 	lim->max_sectors = round_down(lim->max_sectors,
+-			lim->logical_block_size >> SECTOR_SHIFT);
++			logical_block_sectors);
+ 
+ 	/*
+ 	 * Random default for the maximum number of segments.  Driver should not
+-- 
+2.35.3
+
