@@ -1,90 +1,85 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2195B86651;
-	Fri, 24 May 2024 13:53:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8855312C473
+	for <linux-block@vger.kernel.org>; Fri, 24 May 2024 15:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716558782; cv=none; b=SQqllyvcEr4pVyQCyJjaPC/684PP2zJ6UAn1AR/oewnM6U3b6CEoRnak6YiSwpIZhb2EJZ0C6yTCQQt8VvIo5CtB0M2sYOyLpVRQFJXMDlyolbZg1zi6PowSMn/XzRS1YVP4itq82TkOg6y72i7+11by5Hdf4DtonsYRlFGHqZA=
+	t=1716563870; cv=none; b=n4guTkbftMpw4ArDPqkjAmlYYWP4Bh3E3yrxlRg0ybqgg9YEJ4Cpl/GeWM8jCnY0H2qZr7aN4FlUhrHdyF2bJ/Hrzio7WzFgux8RflmYWJmLg/oTPPkEN179QTI63Bue7lfuczhU1UkvTqZjh116imI6SyeaWu8dO8rKvgeRDPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716558782; c=relaxed/simple;
-	bh=2rXmAoTx3CNlh/GGc7KRf6DwDOKO0u6bWqKxzMYf8jk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D2uv1afxbC90d/+oGzSBXZ7snV6GMiNxkTZX2/HiOtZe2DyxfpIybl+STfqVOBDz9pJDe5JNn5hU876bFPSeWWqYT5AUzZ/MFkyff+480PRhcp5P4EHvzzXLTJ5MlgYBkkG64obUZYh1yNrzcaUp350Gwh5NnINT5qdHVVleRUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=YVdOKINE; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="YVdOKINE"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Vm61m2xr9zlgMVR;
-	Fri, 24 May 2024 13:53:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1716558774; x=1719150775; bh=2rXmAoTx3CNlh/GGc7KRf6Dw
-	DOKO0u6bWqKxzMYf8jk=; b=YVdOKINEcaBAiCvlkuTSwdmRd4IpR916nbHNtrWY
-	5T2+ihVtDJKqlKwmp55t4ZGsaAzSwT8N3iUuthzOrGokFyOvHHHwoPanRwsFqJ3L
-	3v2Tf12D8XdQq//ARpexroy8PAQc3DvIPAo1doOavE1SyJ7oHv4W9OV2603l0oco
-	7zFScfLDbfWVFi/uA43qiK6iKKSKOEcdEHdyd7YLIsf2nNPig8QWNBxvW+wBDWpB
-	pbjSBfk2Fl1FpSrXDsqy4y/4rKohiQq0aoPcAgDKotDRQNQ449I/UEpVFtqL/lsU
-	q8KrTHUOkpAz2XpNOWt/hyTOKKxQkQz9q/Wy8v7/RNAGKQ==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id IazCX3NYb6ZA; Fri, 24 May 2024 13:52:54 +0000 (UTC)
-Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Vm61V3wB5zlgMVP;
-	Fri, 24 May 2024 13:52:46 +0000 (UTC)
-Message-ID: <144e9e03-d16d-4158-a9eb-177a53b67c6c@acm.org>
-Date: Fri, 24 May 2024 06:52:44 -0700
+	s=arc-20240116; t=1716563870; c=relaxed/simple;
+	bh=ogJeLBfVi/q8VKA2MghKvEN86VsXSqxJl6qNr17O5oY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zq95LDhzFnSe4q+ndOiRQKNIjDVZvqpUIG6Flp0JZCUqc97ocKOy2fdI3/pKlXIhiAWAALfFnzjbKYNRYqYBOv6KzvDGMLna2o8Xsb3aZCN1tOYTavbGeH5HvXKOXddFSl3qQq6pv2kJtlA0EKG8CCYP08fD3tjrjlN1zsn3Gjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-794ab181ff7so65080585a.2
+        for <linux-block@vger.kernel.org>; Fri, 24 May 2024 08:17:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716563868; x=1717168668;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PHRRH4xO/lD0B5A+mQnuddNrtjcDUg2GphrYjUWZwX4=;
+        b=eD4AOeDBqaHYLXbXb9yF806zyNiis0AMwp/goSEQYGcAoeVlUZfdR1HhWovktaVCrw
+         Sf6xsdOCFNClOYHhOnYvmW8rOYQojfizRE/DJpW4lb6sh0z8I39TefyEjr8Dz5ZajW/w
+         dE1LZO/hndv7f8coZ6p2AB3ZF1iKqbDBFZknpFjChhcj1e9lcAAiJiCaysu1qikDjSYG
+         CqLqESf/R1P6mB18AiU2+wKNL5xc9hbW+SNTNdfj58bb7iV02wnUvIcvz7JdZnJGQOC8
+         5bYXuJmzJUiNro7kDrKof1d7e1oBoFnaM/IjCHPx4xMHSXm62J8xpa+cA7X2u/6+crk7
+         rLhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWC7+tr9gPELmqFCMPQss+igSxUh27tFxvfwFbvBnLe6HXAt+qFkPn1e1yy6Knh1hjeKI9odhtdia7NVZbxM3VM6R9sIiJMZq669vQ=
+X-Gm-Message-State: AOJu0YxPgiGdLOL3fcV/RQwK8x8GskVN9lgeY+TvD3aWISG0GJYX8FTg
+	Xy/xT+JCiYVXaUjpv4GQFtBvrwVdfsmWidBcwP90NUWvc6oH3H0CRm0m2TMsUjg=
+X-Google-Smtp-Source: AGHT+IHnNl97lF0jmbaeQAvD6YhDS2EY5lsp+p/3ECpyfDxlVITlKcEEOW1iX8vh1QN4DYiM3aU12A==
+X-Received: by 2002:a05:620a:25cb:b0:793:d25:7b1 with SMTP id af79cd13be357-794ab08429bmr272781485a.23.1716563868456;
+        Fri, 24 May 2024 08:17:48 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-794abbfcd24sm72610185a.0.2024.05.24.08.17.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 May 2024 08:17:48 -0700 (PDT)
+Date: Fri, 24 May 2024 11:17:47 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Mikulas Patocka <mpatocka@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>, dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org
+Subject: Re: convert newly added dm-zone code to the atomic queue commit API
+Message-ID: <ZlCvm3_PpaNmPa0q@kernel.org>
+References: <20240524142929.817565-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
- and request layer.
-To: Nitesh Shetty <nj.shetty@samsung.com>, Hannes Reinecke <hare@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, martin.petersen@oracle.com, david@fromorbit.com,
- damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
- nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520102842epcas5p4949334c2587a15b8adab2c913daa622f@epcas5p4.samsung.com>
- <20240520102033.9361-3-nj.shetty@samsung.com>
- <f54c770c-9a14-44d3-9949-37c4a08777e7@suse.de>
- <66503bc7.630a0220.56c85.8b9dSMTPIN_ADDED_BROKEN@mx.google.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <66503bc7.630a0220.56c85.8b9dSMTPIN_ADDED_BROKEN@mx.google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240524142929.817565-1-hch@lst.de>
 
-On 5/23/24 23:54, Nitesh Shetty wrote:
-> Regarding merge, does it looks any better, if we use single request
-> operation such as REQ_OP_COPY and use op_flags(REQ_COPY_DST/REQ_COPY_SRC)
-> to identify dst and src bios ?
+On Fri, May 24, 2024 at 04:29:08PM +0200, Christoph Hellwig wrote:
+> Hi all,
+> 
+> the new dm-zone code added by Damien in 6.10-rc directly modifies the
+> queue limits instead of using the commit-style API that dm has used
+> forever and that the block layer adopted now, and thus can only run
+> after all the other changes have been commited.  This is quite a land
+> mine and can be easily fixed.
+> 
+> Note that if this doesn't go into 6.10-rc we'll need a way to get this
+> in before more block work in this area for 6.11, i.e. probably through
+> the block tree.
+> 
+> Diffstat:
+>  dm-table.c |   19 +++++++---------
+>  dm-zone.c  |   72 +++++++++++++++++++++++++++----------------------------------
+>  dm.h       |    3 +-
+>  3 files changed, 44 insertions(+), 50 deletions(-)
 
-I prefer to keep the current approach (REQ_COPY_DST/REQ_COPY_SRC) and to
-use a more appropriate verb than "merge", e.g. "combine".
+Found a couple issues/questions in patches 1 and 3.
 
-Thanks,
+But once all looks good: I'm fine with these changes going through
+Jens for 6.10-rc (especially in that all DM's zoned changes for 6.10
+were merged through block anyway).
 
-Bart.
-
+Mike
