@@ -1,146 +1,157 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C1884FD4
-	for <linux-block@vger.kernel.org>; Fri, 24 May 2024 10:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CFB1AACC;
+	Fri, 24 May 2024 10:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716545988; cv=none; b=BHoGX4qN39PPNTbsPkX5M7a7xjaYtLKUNvI5p4Jpzah5DLKT7FtjNXQhvku/gbTAMYr/IPr6f0atC1QHRl5Sxxbh5DOCYja7oFRtUk17vhDe8BzCa5fdWMGbgr96mg/IpDu4cJYOfDZpRlIzTjfEsymbFDXymHL+XH1+DxX6HFc=
+	t=1716546392; cv=none; b=S3bQdSfGrELS5YL+aqd1HVINeWf/yZpYHtPdSDpQB6zrQ6zWYLZCxyKeo0Hwn//Jy8L3/qYs4wcEnxNM1YHPNOPEzJk+Rf5cuGUsEB8M7Z+PpLDvSa7shKNWguse1vhUXn6IflfRKj2wc7Oj9hox4yoKke0K9e344SkD48pIVm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716545988; c=relaxed/simple;
-	bh=HYIbLlewHBqch2Rhc4Pgg/2Hp+zX6YGY1L5FKlVXcM8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=uo1bcig7NJX7++Q7PvmfZ6jMq/BWBuYSeVKSZxQMdJ71JBO4XhUzQdRtcYT91V8pGHjctTAX0LyIVV9gEA5KTzbqVLAZKV3V+m0S3ODgcVfzH22NMwiza9xEe4GuFwwIBoV67/Ud4GXH3mwzHoaqY5y0/XhcI4MkJ+1MoUEZJVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=hsUbKew2; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1716546392; c=relaxed/simple;
+	bh=M7BPVny6GRqRCRrBPsePpinTmhcQxMXr2fj7fwqN5P4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZipC5ZqMAXB+xEAz1TIZLpROJGbyR0aQWTcFRcMTlGnSnksq4Z+PVYGjdCP1hMBYfwA2VVUayWcDkIJbTembBhOwFRSVRCNR3MZJy0XpZIms4cQB5NNRuHmaRV3zVvA+6KNaLEsN/gC+ywtECRLqvT6GikDMxUCWTokoX4TvI9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hSWw7+pA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=x9wUFStH; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hSWw7+pA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=x9wUFStH; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hsUbKew2"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240524101936epoutp026859e2056971f787a5ee5812576b4a7b~SZXihGZCy0742707427epoutp02T
-	for <linux-block@vger.kernel.org>; Fri, 24 May 2024 10:19:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240524101936epoutp026859e2056971f787a5ee5812576b4a7b~SZXihGZCy0742707427epoutp02T
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1716545976;
-	bh=ZhR12I05zkWrFi8rGaGtHcwrErsg208ZqJpD9O0alVY=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=hsUbKew2w84gE/CpGrPcbaw7+ujyST4ccsAknGF3rgGME9U5oxIV3jUII1tQ3Zse/
-	 xWu7e9JoNWdzrUrda0LaXCQFAzxLyTuto8e8WvvwG/ARcAEXyi3ShOnjm2bw7x6Iw5
-	 E7CUMCAb97XLjCLeUdmNOcWm5NQ+YQus+id8Xkc0=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240524101936epcas5p2576c3b790ca8d91a13de03098b66f3b5~SZXh7yrLj1735817358epcas5p27;
-	Fri, 24 May 2024 10:19:36 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.176]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4Vm1HV1tB9z4x9Pv; Fri, 24 May
-	2024 10:19:34 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	9D.AA.19431.6B960566; Fri, 24 May 2024 19:19:34 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240524101933epcas5p3809e5993650dc7c018956fb5965b9b38~SZXf303ne2575325753epcas5p3C;
-	Fri, 24 May 2024 10:19:33 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240524101933epsmtrp1c8fd001eac975d79f80e3101c6c90581~SZXf3NTeu3246832468epsmtrp1L;
-	Fri, 24 May 2024 10:19:33 +0000 (GMT)
-X-AuditID: b6c32a50-f57ff70000004be7-b4-665069b6721b
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	04.92.08390.5B960566; Fri, 24 May 2024 19:19:33 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240524101932epsmtip1caed712a390045c4c1e44881b33e3f20~SZXeuoMpk3147031470epsmtip1A;
-	Fri, 24 May 2024 10:19:32 +0000 (GMT)
-Message-ID: <d07ac170-b364-8c15-0edd-94132f47d9fd@samsung.com>
-Date: Fri, 24 May 2024 15:49:31 +0530
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hSWw7+pA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="x9wUFStH";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hSWw7+pA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="x9wUFStH"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 019D933A27;
+	Fri, 24 May 2024 10:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1716546389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cst0lpLCKeUOXJy5RfbmatmpaHhsUx8Kv9oyqv7TXXA=;
+	b=hSWw7+pA168/443wCSXvZxpJ5LZLVBOlXCGSdD3I8VXGKtAvPeVFACaYF3YF1L47/Tl0oR
+	XMmWtGHwRayep2gYZk3uF4NtPUT0vOapwScYSVac1P/ZXgBWzbec7e8cFU7yWuAeg+7hFC
+	w0l+iwisEDzFqFb7+tBpeVf9o0UfcNk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1716546389;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cst0lpLCKeUOXJy5RfbmatmpaHhsUx8Kv9oyqv7TXXA=;
+	b=x9wUFStHTsPss42ckStJt+JuzE4tT7N8v5a64jUgRlyXAuk1QOoDnKS8LHtw2dYKjCNZOD
+	PfKVjN2krbFV8WDw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1716546389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cst0lpLCKeUOXJy5RfbmatmpaHhsUx8Kv9oyqv7TXXA=;
+	b=hSWw7+pA168/443wCSXvZxpJ5LZLVBOlXCGSdD3I8VXGKtAvPeVFACaYF3YF1L47/Tl0oR
+	XMmWtGHwRayep2gYZk3uF4NtPUT0vOapwScYSVac1P/ZXgBWzbec7e8cFU7yWuAeg+7hFC
+	w0l+iwisEDzFqFb7+tBpeVf9o0UfcNk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1716546389;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cst0lpLCKeUOXJy5RfbmatmpaHhsUx8Kv9oyqv7TXXA=;
+	b=x9wUFStHTsPss42ckStJt+JuzE4tT7N8v5a64jUgRlyXAuk1QOoDnKS8LHtw2dYKjCNZOD
+	PfKVjN2krbFV8WDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D872413A6B;
+	Fri, 24 May 2024 10:26:28 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ++f9M1RrUGZjCgAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 24 May 2024 10:26:28 +0000
+Message-ID: <a51b79db-c48c-4bd1-a32b-28c72e9edbb8@suse.de>
+Date: Fri, 24 May 2024 12:26:28 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH v2] block: unmap and free user mapped integrity via
- submitter
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] scsi: core: Pass sdev to blk_mq_alloc_queue()
+To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+ martin.petersen@oracle.com, James.Bottomley@HansenPartnership.com, hch@lst.de
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ himanshu.madhani@oracle.com
+References: <20240524084829.2132555-1-john.g.garry@oracle.com>
+ <20240524084829.2132555-2-john.g.garry@oracle.com>
 Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>
-Cc: axboe@kernel.dk, kbusch@kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, martin.petersen@oracle.com
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20240520154943.GA1327@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240524084829.2132555-2-john.g.garry@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrCJsWRmVeSWpSXmKPExsWy7bCmlu62zIA0gzU72C2aJvxltlh9t5/N
-	YuXqo0wWkw5dY7TYe0vbYv6yp+wWy4//Y3Jg97h8ttRj06pONo/NS+o9dt9sYPP4+PQWi0ff
-	llWMHp83yQWwR2XbZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE
-	6Lpl5gBdo6RQlphTChQKSCwuVtK3synKLy1JVcjILy6xVUotSMkpMCnQK07MLS7NS9fLSy2x
-	MjQwMDIFKkzIzji66AVrwVvOisYjR5kaGH+zdzFyckgImEh0f94OZHNxCAnsYZSY96yRBcL5
-	xCgx5fI8qMw3RomHc6eywLT8WLuHESKxl1Hi8LUvbBDOW0aJ51/3sYFU8QrYSVxcvwesg0VA
-	VeJw0zOouKDEyZlPwOKiAskSP7sOgMWFBYIluucfYwSxmQXEJW49mc8EYosIuEqcenCRGWQB
-	s0Ajo8T+c4uAHA4ONgFNiQuTS0FqOAW0JU5/+sgK0Ssvsf3tHLB6CYGpHBIz175kgzjbRWLp
-	jaNQLwhLvDq+BRoCUhIv+9ug7GSJSzPPMUHYJRKP9xyEsu0lWk/1g+1lBtq7fpc+xC4+id7f
-	T5hAwhICvBIdbUIQ1YoS9yY9ZYWwxSUezlgCZXtIbDzxkhUSVqsZJY4u6mCfwKgwCylYZiF5
-	fxaSd2YhbF7AyLKKUSq1oDg3PTXZtMBQNy+1HB7lyfm5mxjByVUrYAfj6g1/9Q4xMnEwHmKU
-	4GBWEuGNXumbJsSbklhZlVqUH19UmpNafIjRFBhBE5mlRJPzgek9ryTe0MTSwMTMzMzE0tjM
-	UEmc93Xr3BQhgfTEktTs1NSC1CKYPiYOTqkGpkB+Wb56p80hu/vPzur2PX752qrbLr2zlHlm
-	nFVcu1j5818FY36XiGOfz7vlBKp/+7M5wlcs6IDPvUm/Mw2vHzxzL6dqu+dzN++IntbU/pXL
-	EtKP5d7snsPR/6zn9STJeTpbtzJbcm0t/6W04PScxYafmmMNT6g37QrU2/aI8QW3QZVc0rFl
-	fmldieKHQ6NXVN/waaiO+v3Q2WeB39EAnZ2aTHHOMVwzIgIutKyaevn5xSxthstc7tzNadnH
-	jc6I80zjqJgn82OlYHBmUHxR/ZrnpyaUqDoqSRyq3aHd38+13bWJf0bt21035u01ORfyydIx
-	y4Vvz6+1ep0bGi9ETFWeMzfo2etSNf5SoeOflFiKMxINtZiLihMBXBniODcEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrHLMWRmVeSWpSXmKPExsWy7bCSnO7WzIA0g/mTDSyaJvxltlh9t5/N
-	YuXqo0wWkw5dY7TYe0vbYv6yp+wWy4//Y3Jg97h8ttRj06pONo/NS+o9dt9sYPP4+PQWi0ff
-	llWMHp83yQWwR3HZpKTmZJalFunbJXBlHF30grXgLWdF45GjTA2Mv9m7GDk5JARMJH6s3cPY
-	xcjFISSwm1Fifd9NRoiEuETztR9QRcISK/89Z4coes0o0fN0IhNIglfATuLi+j0sIDaLgKrE
-	4aZnbBBxQYmTM5+AxUUFkiVe/pkINkhYIFiie/4xsAXMQAtuPZkPNkdEwFXi1IOLzBDxRkaJ
-	vpWmEMtWM0rMaF3M2sXIwcEmoClxYXIpSA2ngLbE6U8fWSHqzSS6tnZBzZSX2P52DvMERqFZ
-	SM6YhWTdLCQts5C0LGBkWcUomVpQnJueW2xYYJSXWq5XnJhbXJqXrpecn7uJERxFWlo7GPes
-	+qB3iJGJg/EQowQHs5IIb/RK3zQh3pTEyqrUovz4otKc1OJDjNIcLErivN9e96YICaQnlqRm
-	p6YWpBbBZJk4OKUamNbeiV6lZKj92TDv+YyXy3qUE7j/Sxak78k22vKzfbOPbHrF0YMerZoO
-	DMs1otRn7H3Fkn7r5Erm8kYxh/1d3My2337mdJm+kxDc06i+9uPbrnNnr3GsEuELlGyes8+A
-	fe02MSEDxt96r7XqYt5f2DZX3GPish8nV2rVHPyhtXfbfz+hHbP/pqec2RR9f3aWHvPOe1dD
-	jvwt2uKrX/v1uekVhtNH0g97lmXd2ftSbta3yhSH678XxGQ9vPkywbjg4KZ7Doo2s0rkl89M
-	qvmxQH+fGcOy5oxHPF/Lzzn7qUjdVEu+fDNG66qcfbL87AfP6z33/PvxbU/Wdd8zW268u51f
-	8GrTbxmOT8X348uK/qUqsRRnJBpqMRcVJwIAIShFYREDAAA=
-X-CMS-MailID: 20240524101933epcas5p3809e5993650dc7c018956fb5965b9b38
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240513084939epcas5p4530be8e7fc62b8d4db694d6b5bca3a19
-References: <CGME20240513084939epcas5p4530be8e7fc62b8d4db694d6b5bca3a19@epcas5p4.samsung.com>
-	<20240513084222.8577-1-anuj20.g@samsung.com> <20240520154943.GA1327@lst.de>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.56 / 50.00];
+	BAYES_HAM(-2.27)[96.59%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Score: -3.56
+X-Spam-Flag: NO
 
-On 5/20/2024 9:19 PM, Christoph Hellwig wrote:
->> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
->> index 2e3e8e04961e..8b528e12136f 100644
->> --- a/block/bio-integrity.c
->> +++ b/block/bio-integrity.c
->> @@ -144,16 +144,38 @@ void bio_integrity_free(struct bio *bio)
->>   	struct bio_integrity_payload *bip = bio_integrity(bio);
->>   	struct bio_set *bs = bio->bi_pool;
->>   
->> +	if (bip->bip_flags & BIP_INTEGRITY_USER)
->> +		return;
->>   	if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
->>   		kfree(bvec_virt(bip->bip_vec));
->> -	else if (bip->bip_flags & BIP_INTEGRITY_USER)
->> -		bio_integrity_unmap_user(bip);
->>   
->>   	__bio_integrity_free(bs, bip);
->>   	bio->bi_integrity = NULL;
->>   	bio->bi_opf &= ~REQ_INTEGRITY;
+On 5/24/24 10:48, John Garry wrote:
+> When calling scsi_alloc_sdev() -> blk_mq_alloc_queue(), we don't pass
+> the sdev as the queuedata, but rather manually set it afterwards. Just
+> pass to blk_mq_alloc_queue() to have automatically set.
 > 
-> This looks correct.  I wish we could go one step further (maybe
-> in a separate patch/series) to also move freeing the bio integrity
-> data to the callers.  In fact I wonder if there is any point in
-> doing this early separate free vs just doing it as part of the
-> final bio put.
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>   drivers/scsi/scsi_scan.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
+> index 463ce6e23dc6..ec54d58fb6c0 100644
+> --- a/drivers/scsi/scsi_scan.c
+> +++ b/drivers/scsi/scsi_scan.c
+> @@ -334,7 +334,7 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
+>   	sdev->sg_reserved_size = INT_MAX;
+>   
+>   	scsi_init_limits(shost, &lim);
+> -	q = blk_mq_alloc_queue(&sdev->host->tag_set, &lim, NULL);
+> +	q = blk_mq_alloc_queue(&sdev->host->tag_set, &lim, sdev);
+>   	if (IS_ERR(q)) {
+>   		/* release fn is set up in scsi_sysfs_device_initialise, so
+>   		 * have to free and put manually here */
+> @@ -344,7 +344,6 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
+>   	}
+>   	kref_get(&sdev->host->tagset_refcnt);
+>   	sdev->request_queue = q;
+> -	q->queuedata = sdev;
+>   
+>   	depth = sdev->host->cmd_per_lun ?: 1;
+>   
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Tried to think in this direction in past.
-But bio_put will not be called if bio is statically allocated. Currently 
-that gets freed implicitly because bio_endio is called and it tries to 
-free the integrity.
+Cheers,
+
+Hannes
+
