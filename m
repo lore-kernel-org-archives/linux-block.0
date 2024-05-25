@@ -1,68 +1,65 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE3984DFD
-	for <linux-block@vger.kernel.org>; Sat, 25 May 2024 16:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3412A84FB3
+	for <linux-block@vger.kernel.org>; Sat, 25 May 2024 16:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716653384; cv=none; b=f8ZrrNi9+sxQkeEjYfIrm+wYq5w1GD94cxuCud6ugIF4YxzNW9V4GyJ6PPpW0PsJgBinnTTS/gYlpQOkDEd8pjuN5N51mOVgQ2nYjGoAFXg/D1OHiHAJmX9zgQIfLZ5TjkP/gJzzlkjxYLaohGWSHVuCKatCMWnOKatxsYLAKto=
+	t=1716653398; cv=none; b=FXcZNnoUW1LJgSg6k7AQF4IsD1DPKJMqAH1H8hYPciKW8PSqAKlbAHqPeanVcHQrhaa6kpJNX9BknhcZD9aOrXfCdy+0uDoH4AQXaObxHPkU4E8eafTDcnge50aLM9FNdqjo3xb6FMPj3T4O1+5sl49YVwVz4MF8mxliW9CKmlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716653384; c=relaxed/simple;
-	bh=OPficxHWk8bwHHYtAKscq/o1og6MmtSjXjhRJMxGzYg=;
+	s=arc-20240116; t=1716653398; c=relaxed/simple;
+	bh=ULegqM8lE5bdtkX3KVzwwd8rBi0IA2VuFG27hCJEkzM=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=bsrQ89CbI+W3W8opgyl9T9LeTcg9qoTERan/4MNbks6a4COHRpQ/68wkqcLubC9lxJYVuDqXdImQwhaQruDVPZ7QvHOu4/uAOn7M3LPkcWmlFjb2VeMvw6gDPg5WlgMuDsz6cZZc0kloTGyhXlfVhqpfd0FXBgsw7ononpnNnA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SC81kv07; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version:Content-Type; b=s2RAQYk0cPL9xRKcv0ulHxAUwCzfLmk+7MIpNzZrIg3yUQGrEix7euSNSir7D7vzsZNYzIjUgtJM5M4OyUYGP8aXYPcXhcDUXBEx7zOcgI7Tovv5JaPdCxb92LJhfCXC2IP9iN67BK/Y6ripiR7RDh/ElgYxEDEyIXKNQ31+pzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ls98SUhj; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SC81kv07"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1f44b7b2e19so322975ad.2
-        for <linux-block@vger.kernel.org>; Sat, 25 May 2024 09:09:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ls98SUhj"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2bf5bb3508fso351913a91.1
+        for <linux-block@vger.kernel.org>; Sat, 25 May 2024 09:09:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716653382; x=1717258182; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716653396; x=1717258196; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+OBzotavdEJ1R+hPrLpZfVYcvCmreaa9Jw4a7xc6rwA=;
-        b=SC81kv07fVEXtcz3Na3bo70tfDl6JaBqJlkXaJksnh25B8wfmg2s+ys3PVrq49EmQa
-         5klry6HIW3RLclQrZ46RLap0M4cqUiDvaJMd4xcXHz1uA+eUbO/JPEMOhraUseudTvZv
-         aDCZ7GO6B/4U+9bjXyhwaLQxoD681XhJmGkZ4ERNB9L3DKoBn82WrK47fmFqGANaXzfO
-         EqrlrJsArvrQtPOvwdN3VZTDWj74dYOW5eKl15t969/MJkrgsEfkMi38o5+FB67mQR1Q
-         YjDMHQEyBwqZp2qtuVDyP0Q9U7A2Dlyyd0Ob/hpKbPhqSOHQ4LRfsXst2OfRfVbYZ1Ow
-         Fj6Q==
+        bh=FtaZXvjPs7V8ADzOcZqxTsMj8PlpAXZ+KzLAnSF7664=;
+        b=ls98SUhjLyw+JM1mv0mBR6A60INmPuPTCUrDbgXa09TShivfnfXY4zbT4u0YDMOKH9
+         npbJAZVtCJTZtPwBfgAwIZmwOlKp6YoQWgGzlwVRFQCaYM3wsA9/y3n4rQOjCg2vJx1N
+         N3I2+BPQOniUNT7/7H2ZML8IaUh5HiybplmifMY9qHtrSkQ9UTEZUkbOjyIDRqNvKFGb
+         5JikY2dLUnlrk/Oa3BOlzEmm0EqE0BIRpL2sdAuoQZOpAkdBpCBiihO/c+oEIjtaiqc7
+         ++vkyBEbmU1m2njA+nfnj724MG1uUWYzPlILLiU5ZxeL+rmOY8lmbESTV9BDY6l1GVsT
+         Wxpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716653382; x=1717258182;
+        d=1e100.net; s=20230601; t=1716653396; x=1717258196;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+OBzotavdEJ1R+hPrLpZfVYcvCmreaa9Jw4a7xc6rwA=;
-        b=Bgs0wb3cUWMMQc6eSVT3FPvzzjfKZJT1aa0PO8COPtbuanuvMaq5bolsdKfuse9l3m
-         oQ+hgg2lRn/Gzev1WYJyMxrnJUIjqrH+b9vPBbEqpqHwp/5QcgjbYCj4J9rUuX3AWBZ/
-         k8lHiLJMi4AfwrmcKxOAxtuLpX/lWuFNBhekRsUdAWgZi1OvtwdN/jTl69/s2/Poz8AE
-         b6qnQVO2CMmWuXDxh+bisg9KG6tZ1zkJ2GOLMgDFZU5+iM0MDSPhxGY0n7FC9Dgdp6+c
-         yRCkVDY77TnQkAKXBwd6r61fUmeBMrBlP6KjI1Xc2SbIghy699BN3bUtngqtUQq1XkS8
-         pAog==
-X-Gm-Message-State: AOJu0Yy39e9lc9bsSGkpwKDnAWJFtY+koEILYLzfBKDIsL/7HJJng7bl
-	VNxOOrA/KX7BI/JS9BlFvK+3yYAtY5KfZp2kEvbnKWYPwJ7+MYPZaQ4W6Pnds84=
-X-Google-Smtp-Source: AGHT+IG/V6epI7I8Utje/XCe2cdaWrcaMvGwnulElISoQFT9atBOBYGM72rEYRjmT7cxt2h4C/6dVw==
-X-Received: by 2002:a17:903:22cb:b0:1f3:889:ee2 with SMTP id d9443c01a7336-1f4486b07c9mr57455445ad.1.1716653382055;
-        Sat, 25 May 2024 09:09:42 -0700 (PDT)
+        bh=FtaZXvjPs7V8ADzOcZqxTsMj8PlpAXZ+KzLAnSF7664=;
+        b=Aei1E1UV4d41PrMuixc1J25xK4OOLnLgkVj41iRlSGf/ZV99+poSuc/rbmOP1eUwRb
+         H3DqsAvpq4JcrqdGRdNSuh+ZICMsy1tMJNwh+MYzIFED5kz16HAe+qcOuTJ2zmyWjHa8
+         2Tdts84Io4WL1lwzcumGO2MH91T3JGRb7egHKqPnAvim9S63sSjNOvuhmwtzI8/EuUTO
+         U3hiCxi/yjv2u7kxeZjlgMX249DkdMRAANzir3VgiTKKvqe1lECK/Et2dN5rd3JzNC4j
+         TOOSfZRTzOu32VlqHprmkIkW5edtQGGbtMUREtRV2IIP8D3cbcDeSjlEmV469O0U3hF7
+         IIag==
+X-Gm-Message-State: AOJu0YzYwrql5VFLd5HagtVCzXlLFj7X5iqR8nFpwacbotsmABCbyTaL
+	pYHaCMwXJ1E9ANtIYOp5r0VTrRwIooQ6+hb73moCBlwjWuPXFlzoteiPCwAyH9JMRlVQL2lXpWo
+	m
+X-Google-Smtp-Source: AGHT+IG6bOdMkWUgMlGS31QT9WiMtfSYnGx1J7m6JDPK3bRwJtxiwioNq4RDwnMSE+rFXyYm8TyoTQ==
+X-Received: by 2002:a17:902:e810:b0:1f2:fd9a:dbf8 with SMTP id d9443c01a7336-1f449907a09mr61146185ad.5.1716653396371;
+        Sat, 25 May 2024 09:09:56 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c96ccfasm31974765ad.147.2024.05.25.09.09.39
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c96ccfasm31974765ad.147.2024.05.25.09.09.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 May 2024 09:09:40 -0700 (PDT)
+        Sat, 25 May 2024 09:09:49 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: yi.zhang@redhat.com, dlemoal@kernel.org, hare@suse.de, 
- johannes.thumshirn@wdc.com, kch@nvidia.com, zhouchengming@bytedance.com, 
- yanjun.zhu@linux.dev, bvanassche@acm.org, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20240523153934.1937851-1-yukuai1@huaweicloud.com>
-References: <20240523153934.1937851-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v2] null_blk: fix null-ptr-dereference while
- configuring 'power' and 'submit_queues'
-Message-Id: <171665337969.160479.8933222085761129078.b4-ty@kernel.dk>
-Date: Sat, 25 May 2024 10:09:39 -0600
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20240521221606.393040-1-hch@lst.de>
+References: <20240521221606.393040-1-hch@lst.de>
+Subject: Re: [PATCH] block: remove blk_queue_max_integrity_segments
+Message-Id: <171665338954.160479.1052207499474780924.b4-ty@kernel.dk>
+Date: Sat, 25 May 2024 10:09:49 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,23 +71,16 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Thu, 23 May 2024 23:39:34 +0800, Yu Kuai wrote:
-> Writing 'power' and 'submit_queues' concurrently will trigger kernel
-> panic:
+On Tue, 21 May 2024 15:16:06 -0700, Christoph Hellwig wrote:
+> This is unused now that all the atomic queue limit conversions are
+> merged.
 > 
-> Test script:
 > 
-> modprobe null_blk nr_devices=0
-> mkdir -p /sys/kernel/config/nullb/nullb0
-> while true; do echo 1 > submit_queues; echo 4 > submit_queues; done &
-> while true; do echo 1 > power; echo 0 > power; done
-> 
-> [...]
 
 Applied, thanks!
 
-[1/1] null_blk: fix null-ptr-dereference while configuring 'power' and 'submit_queues'
-      commit: a2db328b0839312c169eb42746ec46fc1ab53ed2
+[1/1] block: remove blk_queue_max_integrity_segments
+      (no commit info)
 
 Best regards,
 -- 
