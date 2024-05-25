@@ -1,61 +1,61 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7592F2C69A
-	for <linux-block@vger.kernel.org>; Sat, 25 May 2024 23:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866C8129A83
+	for <linux-block@vger.kernel.org>; Sat, 25 May 2024 23:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716678166; cv=none; b=DbGNSIwq6aMq5EBoTZn91mhwSIr14VDSpDy8MP8W9HhM8PxuXAQ2xfrbwA9RAZ88jIW1ux/qOl/gV6HT9JiVXlclH3q4/TTh+H9vof6JKAd81rNqQtYohP0SaGiZMKw+0GaMax4ukr69E5+w5djBH6yRMwwfla7iEoz4Tqm+lzo=
+	t=1716678574; cv=none; b=sH2z6hOlGnZV5JWAR/FRbFxyp4wq0/HyCWeOf1LKrvMtVTqOf2nGvbHB0iWeent9ziSd/XQyZuCSaaHs6FrCNi7gamkfEK3g0dFDeVaCJ5v7BhncAA7JycluLJwj3e0E5izGKhtEN1KlqMOvB4EAXju8jSfutmI8BO3ZU2r4IV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716678166; c=relaxed/simple;
-	bh=L3hWBTMmA6viEgmlEybu5t+iS/55NiCc6jPW1Kjsoa0=;
+	s=arc-20240116; t=1716678574; c=relaxed/simple;
+	bh=faN9rNSdcMcbjtK47u0oId+ibnqpzDbiA+nKCknSZ+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MQq+KRjI9X5TTp758VwhJl30amO0TSoI5nDmrOusAO08qK/MEa+0HnI+TD+LfUg4l6JXMD2ouxdz835VIFH+VS/5b7BO6I+lileEsEWr/2+/eMsqZsmCLLCH+RZ1ZohFKuQ+BJ1ZIJLvQDx2GLkvDDYPIHAhExrak8NJF+xMrKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=upxmnVYb; arc=none smtp.client-ip=209.85.210.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=je0WeQqSEA+xdEVJC/2ffvoy7seAifM1yjYTjtcJ9rwrCzucSkt0Z63XQaf742/K8q11Ljub9Hi+QDclJkMHR6dyYvLWIDLwNdlRjDXfRJsNwWEUt3wNY2bbrXXOUZFqyZmeBoY1teixeOiAw9/Wz+lrBWixkmEVP8TPc3i/lpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=TYAcnYSZ; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="upxmnVYb"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f966840af7so1547827b3a.2
-        for <linux-block@vger.kernel.org>; Sat, 25 May 2024 16:02:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="TYAcnYSZ"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-68197de7400so1731411a12.3
+        for <linux-block@vger.kernel.org>; Sat, 25 May 2024 16:09:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1716678163; x=1717282963; darn=vger.kernel.org;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1716678571; x=1717283371; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gic6Wo3zjudyzI0BAjsVaWRrn7WVkv86SSZTvDO7XFs=;
-        b=upxmnVYbF9XuqlhXcqNr8K+zIJ1d9TVX6Mon09OG0FFLHCqYaj7yD1Ms1Sfxu9RZpD
-         TaeFXJNQ4eJ1FqL21NTClYIV26S51nH8shM+vzjfb7KSxRYxcH0dk2Wng+cxkDpr40EH
-         hFgNR/0qWwNxlLCHQ6WGhnSpbnJLmLmN2k+/XAQdFWDFjrtPZHVdDAxS55mGnXE9Ldv8
-         NEba7m2oCj4uPOVIAKdjDZBlyNaTbGOcVUvJIH4YWzWz4WXeeb3eGs6is2FivFkODsB+
-         QOR88d4K70UUIwKaKx6rEcHOO+FDHMF8DLliEHlzPAHFkPz5aUoRlKnlUkPN6i7y5TAs
-         KzVQ==
+        bh=Crh6RjgT+TcJb1jq4rCjRtTqJLBvMRyCXUhpelsfOKA=;
+        b=TYAcnYSZr305sH9XLnMvStIEDlJaWfuAxeIKJ8RHPQ2FdZChlHVw3WOedEm+oJTNqI
+         stTuZ4fQcw6UxiGfRHR90Bp74bwzaixt2GDlsFinFqwsc869LKAliJMxIv9qTmLKte90
+         sq9F8bi8bpvUJzN0IUjLPRE9fJjkfjv5gfgmowNLTuqBzw1qcIAMQNDSly1A1w3VVbGl
+         8+P7OVtW0gK8XJZGCmv5e1rowLpX51EXhR5iPw/zYbDLRoTZIL2nRgW5TTKIhnQ6151n
+         cTidOa1KmAj+ZAT11fKYV1i4bpCfpO+pzVNGRkUDuJnBIDt7bLWMHaeIDv9F1c8BEZf0
+         OwMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716678163; x=1717282963;
+        d=1e100.net; s=20230601; t=1716678571; x=1717283371;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gic6Wo3zjudyzI0BAjsVaWRrn7WVkv86SSZTvDO7XFs=;
-        b=TmoNXPYhpG1Jwyj1NwD3kr1MgMmuzbcEbcxkpl9Au2HhqiAVXe3YJP5/jdBdR49Sug
-         edH2EUFFLuxZFvNvzze843FTh+foRZZ5Koc1tu1HzltGkgCd3PJM0ZQ5fd1TptO6gA+E
-         SOVa3VgeMuR6wuU58vUCEc2QvZBTO/CBpyC+FIOWPuX8lSBgUjK3gMpDlsb8Hk++3Vnc
-         oCV0FwFaABYOLwfBuf5O4k1xO6e0csh/DgYtBsscDjzaOULFIjp04alzMhWMZ/VQYwZO
-         1NGvs8QJat0s+LJ/wNbBxLYKaZodcc4pxgw0ZfuGn+edgPF8pd88dKBDSV6zL4FQSJDZ
-         gTOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWivCBLZ7p5+t46w9N+a50kOYKYEN+dRIgHH0PVpHCynpdj1dY+45obx3/+KKm0Jpj0Y1Qjlg9iHG0HYELqx6nlXAHJfdW9z/2Brpw=
-X-Gm-Message-State: AOJu0YyG32dIe/l/Iub+Sl7dhEgtyBPv4hxNE/eJ67Sq1fZs+wx4V61s
-	6dRXzrJ0QF/apd6rWzbFNh27SyVCZtm401IlCyXFQWdxAFt9TncriDaNtO5rcwM=
-X-Google-Smtp-Source: AGHT+IHkIK468Us7w5racBBbD0k32HWYTGqS9h3qKLyIaPSGj5Sg+dT6eM4UpYv8VhDI97pWq3omsw==
-X-Received: by 2002:a05:6a00:4405:b0:6f8:caf2:8f4f with SMTP id d2e1a72fcca58-6f8f45d2624mr6450954b3a.33.1716678162585;
-        Sat, 25 May 2024 16:02:42 -0700 (PDT)
+        bh=Crh6RjgT+TcJb1jq4rCjRtTqJLBvMRyCXUhpelsfOKA=;
+        b=moiJzmrw9Nm+NoAUiU96+BncfTTUjViYOOl0GtSdiHQnSldyY/eDF7b6+qQvDwlbcI
+         Gsfjl08tHQXnJo1jfY395My7wsGN0j/7hDg0faEBxp6+lgMvZjG0rMtu29HO16nfdQm8
+         gE6GuY96q2qxv1pZ/jeqEOYFEV2G7gCsldlLH0gnqrv14BqpPf/44PsgdHhZx/tyOjYS
+         MEPuEdJOiTG2/n2/LfBtV8ZTCFxhlmVXED/Et0a/5MJbKVOIEelUEeFC29uBGtfjsfVF
+         bn39H6DZpEGM62XrkYHkZH1hZPb+I2wVgeUdY6yC9XR8g9Wt51UKLdOaNSiXSM4IuvXB
+         Oc3A==
+X-Forwarded-Encrypted: i=1; AJvYcCXxKHghFctU8TOLlftTKSAwcct6gTr+cxODHYNYg7TC7O/b5MLNTwOPaMn7985+eVkEPgNduivLwMvDFY2nQv+s44/BjQbNTt6VDko=
+X-Gm-Message-State: AOJu0Ywr1aDm2PSq/OTVkH6LzKRHKXC0LRMFX0LyUfXcOqk6XM3TD7Ed
+	6moDJFBcl81iPJiJJ/nOPp41wlAnx1Vn+q+ufK/uMjyv8yrJ2d1UqVl0api814I=
+X-Google-Smtp-Source: AGHT+IGYciyTBhNiI5PZlCjyMDogB+ANQNNWDCUuYjIsBj+L8eTBYhs5xE8S13XEF72yE6eBkoNGvg==
+X-Received: by 2002:a17:902:d50b:b0:1f4:768b:445e with SMTP id d9443c01a7336-1f4768b4768mr21943575ad.24.1716678570642;
+        Sat, 25 May 2024 16:09:30 -0700 (PDT)
 Received: from dread.disaster.area (pa49-179-32-121.pa.nsw.optusnet.com.au. [49.179.32.121])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f8fcbeaaa3sm2831749b3a.103.2024.05.25.16.02.42
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c9afba1sm34658165ad.246.2024.05.25.16.09.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 May 2024 16:02:42 -0700 (PDT)
+        Sat, 25 May 2024 16:09:30 -0700 (PDT)
 Received: from dave by dread.disaster.area with local (Exim 4.96)
 	(envelope-from <david@fromorbit.com>)
-	id 1sB0PP-00AUdG-2E;
-	Sun, 26 May 2024 09:02:39 +1000
-Date: Sun, 26 May 2024 09:02:39 +1000
+	id 1sB0Vz-00AUvI-1V;
+	Sun, 26 May 2024 09:09:27 +1000
+Date: Sun, 26 May 2024 09:09:27 +1000
 From: Dave Chinner <david@fromorbit.com>
 To: Nitesh Shetty <nj.shetty@samsung.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
@@ -72,12 +72,12 @@ Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-doc@vger.kernel.org, dm-devel@lists.linux.dev,
 	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v20 05/12] fs/read_write: Enable copy_file_range for
- block device.
-Message-ID: <ZlJuDxhMEpJxKQHV@dread.disaster.area>
+Subject: Re: [PATCH v20 06/12] fs, block: copy_file_range for def_blk_ops for
+ direct block device
+Message-ID: <ZlJvp47RSFKkbwRJ@dread.disaster.area>
 References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520102917epcas5p1bda532309b9174bf2702081f6f58daf7@epcas5p1.samsung.com>
- <20240520102033.9361-6-nj.shetty@samsung.com>
+ <CGME20240520102929epcas5p2f4456f6fa0005d90769615eb2c2bf273@epcas5p2.samsung.com>
+ <20240520102033.9361-7-nj.shetty@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -86,68 +86,76 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240520102033.9361-6-nj.shetty@samsung.com>
+In-Reply-To: <20240520102033.9361-7-nj.shetty@samsung.com>
 
-On Mon, May 20, 2024 at 03:50:18PM +0530, Nitesh Shetty wrote:
-> From: Anuj Gupta <anuj20.g@samsung.com>
-> 
-> This is a prep patch. Allow copy_file_range to work for block devices.
-> Relaxing generic_copy_file_checks allows us to reuse the existing infra,
-> instead of adding a new user interface for block copy offload.
-> Change generic_copy_file_checks to use ->f_mapping->host for both inode_in
-> and inode_out. Allow block device in generic_file_rw_checks.
+On Mon, May 20, 2024 at 03:50:19PM +0530, Nitesh Shetty wrote:
+> For direct block device opened with O_DIRECT, use blkdev_copy_offload to
+> issue device copy offload, or use splice_copy_file_range in case
+> device copy offload capability is absent or the device files are not open
+> with O_DIRECT.
 > 
 > Reviewed-by: Hannes Reinecke <hare@suse.de>
 > Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
 > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
 > ---
->  fs/read_write.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  block/fops.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
 > 
-> diff --git a/fs/read_write.c b/fs/read_write.c
-> index ef6339391351..31645ca5ed58 100644
-> --- a/fs/read_write.c
-> +++ b/fs/read_write.c
-> @@ -1413,8 +1413,8 @@ static int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
->  				    struct file *file_out, loff_t pos_out,
->  				    size_t *req_count, unsigned int flags)
->  {
-> -	struct inode *inode_in = file_inode(file_in);
-> -	struct inode *inode_out = file_inode(file_out);
-> +	struct inode *inode_in = file_in->f_mapping->host;
-> +	struct inode *inode_out = file_out->f_mapping->host;
->  	uint64_t count = *req_count;
->  	loff_t size_in;
->  	int ret;
+> diff --git a/block/fops.c b/block/fops.c
+> index 376265935714..5a4bba4f43aa 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/fs.h>
+>  #include <linux/iomap.h>
+>  #include <linux/module.h>
+> +#include <linux/splice.h>
+>  #include "blk.h"
+>  
+>  static inline struct inode *bdev_file_inode(struct file *file)
+> @@ -754,6 +755,30 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+>  	return ret;
+>  }
+>  
+> +static ssize_t blkdev_copy_file_range(struct file *file_in, loff_t pos_in,
+> +				      struct file *file_out, loff_t pos_out,
+> +				      size_t len, unsigned int flags)
+> +{
+> +	struct block_device *in_bdev = I_BDEV(bdev_file_inode(file_in));
+> +	struct block_device *out_bdev = I_BDEV(bdev_file_inode(file_out));
+> +	ssize_t copied = 0;
+> +
+> +	if ((in_bdev == out_bdev) && bdev_max_copy_sectors(in_bdev) &&
+> +	    (file_in->f_iocb_flags & IOCB_DIRECT) &&
+> +	    (file_out->f_iocb_flags & IOCB_DIRECT)) {
+> +		copied = blkdev_copy_offload(in_bdev, pos_in, pos_out, len,
+> +					     NULL, NULL, GFP_KERNEL);
+> +		if (copied < 0)
+> +			copied = 0;
+> +	} else {
+> +		copied = splice_copy_file_range(file_in, pos_in + copied,
+> +						 file_out, pos_out + copied,
+> +						 len - copied);
+> +	}
 
-Ok, so this changes from file->f_inode to file->mapping->host. No
-doubt this is because of how bdev inode mappings are munged.
-However, the first code that is run here is:
+This should not fall back to a page cache copy.
 
-	ret = generic_file_rw_checks(file_in, file_out);
+We keep being told by application developers that if the fast
+hardware/filesystem offload fails, then an error should be returned
+so the application can determine what the fallback operation should
+be.
 
-and that function still uses file_inode().
+It may well be that the application falls back to "copy through the
+page cache", but that is an application policy choice, not a
+something the kernel offload driver should be making mandatory.
 
-Hence there checks:
+Userspace has to handle copy offload failure anyway, so they a
+fallback path regardless of whether copy_file_range() works on block
+devices or not...
 
-> @@ -1726,7 +1726,9 @@ int generic_file_rw_checks(struct file *file_in, struct file *file_out)
->  	/* Don't copy dirs, pipes, sockets... */
->  	if (S_ISDIR(inode_in->i_mode) || S_ISDIR(inode_out->i_mode))
->  		return -EISDIR;
-> -	if (!S_ISREG(inode_in->i_mode) || !S_ISREG(inode_out->i_mode))
-> +	if (!S_ISREG(inode_in->i_mode) && !S_ISBLK(inode_in->i_mode))
-> +		return -EINVAL;
-> +	if ((inode_in->i_mode & S_IFMT) != (inode_out->i_mode & S_IFMT))
->  		return -EINVAL;
+Cheers,
 
-.... are being done on different inodes to the rest of
-generic_copy_file_checks() when block devices are used.
-
-Is this correct? If so, this needs a pair of comments (one for each
-function) to explain why the specific inode used for these functions
-is correct for block devices....
-
--Dave.
+Dave.
 -- 
 Dave Chinner
 david@fromorbit.com
