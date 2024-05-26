@@ -1,138 +1,311 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FE8131BCE;
-	Sun, 26 May 2024 09:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD17E8F4E;
+	Sun, 26 May 2024 10:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716716631; cv=none; b=iWh62DIqyqjvHVss/Dm7LmXnld+zfGMyDfnQJNRhevVFSlJwq+pOGyp0OUxH39/ihWhtvXNuDSaqs2q9BuDxkDHMl57xRIZmnDR0SS1lBi3C93dUKDwwsxBmcVQg5rrjerJT5UGz7gxEpICj+yO8EwWX4aXFCzOHujxD/ATjRrk=
+	t=1716717961; cv=none; b=VV5uVXhddwpAlWBsqlbmDx4R56PRx1TunOB4Bu0eiHaQTG4xmHLgpfH7jRmHPBbqnyCF4zQEcm8uPmk8ZOuM17pbhPVtId9pgXjII42XPh4FaCSsfB3C9EmkapvbG/7XfSu2hQNwgki3L3h0C5p9t2Z64/paZfzw1Qi0Ks66SkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716716631; c=relaxed/simple;
-	bh=4Hx/U7MiYIQ+eFnMWjsQEcNrONO+JzOpAm5p7GNLqT8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WX6YeutLHKmfp2/p2dzu7EDgROUSy/9aI5r1PZ9CUr8fbbLemVjOFmHXL+1vGJh+z0WK1qdomwIIoQ3AJEuJKKQ8/PbroAkZtH3AhobLNBNGvMn/+UkgvWDFOriPSCyN9Lkj6ZHJlp+77C6BDq2IRtteJ4m4ySLJKq+HqLU0NrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mf6YDH/J; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716717961; c=relaxed/simple;
+	bh=U8sViIwTvfqyAEFWwJYA2QuGtxh5YeclfUPtRLMvasM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=LUbQGRN1/k8+xiScB2y1YA07RoaeOd+SsBbZO6MLP43Jy4TdhYzG91k3ZSHEpZMD94xiTGfFGO4jGoQDfM1UuSdVt5z6SJ/14PpFQIgyzulh/NyPxQCRdUmb4gNBGbS53p94jIlfex0WJtHx7RdCEE84ZRjhJGh2xpqmeItAlCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KoIoZrxE; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mf6YDH/J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D3C7C32781;
-	Sun, 26 May 2024 09:43:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716716631;
-	bh=4Hx/U7MiYIQ+eFnMWjsQEcNrONO+JzOpAm5p7GNLqT8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Mf6YDH/Jbluhd0jBFucAIme0m1vfYoz0kKMb5sfpqkuAiIXFc+HpeUcPoUl/90TM7
-	 eK+7/j669KyrqpeVqGijG5KnWJuf77Y3hUQHRngk/MD6GD8A9n5vRVWtLkaljVqz71
-	 16C2vP5tug+T00j2W9lty8/GjhZXNFjD4FCfziwpHbBgkc+/1N1jHiqEpRw9tR4MVo
-	 gAov8BUF/3YU0w7K8kHxS9zxh+HpWvPFe6J/cnpxeHFik4nFhhjcHyJXVAZxvrwTHw
-	 Y61MzYE2op7Vo76UcRIE7VEtPnECqQ/xM18TuppFql6khPQzzsgBbvRmsxPq0gH4sa
-	 ugymWNZFRsPZg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Justin Stitt <justinstitt@google.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	nathan@kernel.org,
-	linux-block@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH AUTOSEL 5.10 5/5] block/ioctl: prefer different overflow check
-Date: Sun, 26 May 2024 05:43:41 -0400
-Message-ID: <20240526094342.3413841-5-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240526094342.3413841-1-sashal@kernel.org>
-References: <20240526094342.3413841-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KoIoZrxE"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3c9d70d93dbso4673396b6e.3;
+        Sun, 26 May 2024 03:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716717958; x=1717322758; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=k3rp31B0mQlFat0bx4wPf89tw+hDPDO09XoleO7LiSM=;
+        b=KoIoZrxE98yoeRh0/2W2bQ5ojy5lL+xXhOSPreFU0MRTJYKxFOI/m6L9t8DvnxoW70
+         Mfv5qV+MevFwjc7ujLIHF+De3EhJBcdeROb06XbyvIao3FimQMs8nGRp3rJK3Op8a3vd
+         jxmUsXsPokw4Bb5IxEIaPN/U/LG5ad3qWxla4Jm7zNap9TE7+HkaN/QKFgdg1KChLSss
+         ax9tIATO3j3nl/oJWZdlCavn6XlEtHOgtR448cjzgMVISdE1VKLqTnQkMem+IOQQ0D4N
+         JJYlRKuFsJUg6lRWFjS+dha2l8aKvoassazBnpGgYB0T5IRDloOMpn6PS7S+kr9T1JTE
+         HthQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716717958; x=1717322758;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k3rp31B0mQlFat0bx4wPf89tw+hDPDO09XoleO7LiSM=;
+        b=XVO+fmjX2tTTF8kBqoMr2uB7FVzSeGP74ezBrYIlCULwT0g2/rUq62wpw6CNNMIYVH
+         OqcJosnz3+Ssnh6bI+BOw+zYZrPiG6qOU1PW3f9X+JqcVelLRmrSJ26rQqFw+QY2T4Sk
+         gxqxvvYAZfgnUzaJeFJbVRabIlVGTWJrrKu8+rvjlIhSya2hM1+f/CZHO9UwxqIvAFrS
+         lJFxMmf3Rn6xxn1fZi3YyhEgN3H6lA8Up+aY2xreJmL6GAT4ZfsNvuWBOCrQZezdFNTv
+         1HC1LXwwCYFEzRLZeEy11jTZdYmknvmtcjWhwEsDEYCaF25LXabmh6DLps8mO2Hhol+u
+         IMjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPPq7JVFoiwTWs4m4Kgz+VwmNhE5e9/IFCTWu49txzEnxvrHZGx4cewrs1RCWBXEGFU8RDeLlH3Ge474FUAdEAmav/9Ujz
+X-Gm-Message-State: AOJu0Ywzu3ODWM20UUFYNz1rgKWT7PGAL4mg95t/l26j0DCnXx1tl1UG
+	AnG8Z0NGhWe/5O9XOybc9SX+RKDUNnbXBqjKa+Uw47kSIBjbsIRsthayLXlqZTKNia1cPYSZ5Tj
+	QNuSODUlpAmC25vH8p8O26jBec4aajt8oX3M=
+X-Google-Smtp-Source: AGHT+IGiSUJmIhl1ePzTyzUGUvs86MfJk1/2h6Lz8k5iISWTHRBnUECH2J5x2MLQvd3FhlXdS02aaYVPrr7f77y00NQ=
+X-Received: by 2002:a05:6808:3d0:b0:3c9:a968:d0b2 with SMTP id
+ 5614622812f47-3d1a61138a5mr6500681b6e.32.1716717958104; Sun, 26 May 2024
+ 03:05:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.217
-Content-Transfer-Encoding: 8bit
+From: Chris Rankin <rankincj@gmail.com>
+Date: Sun, 26 May 2024 11:05:47 +0100
+Message-ID: <CAK2bqVJGsz8r8D-x=4N6p9nXQ=v4AwpMAg2frotmdSdtjvnexg@mail.gmail.com>
+Subject: [BUG] NPE with Linux 6.8.10 and Linux 6.8.11 SCSI optical drive.
+To: linux-block@vger.kernel.org, Linux Stable <stable@vger.kernel.org>
+Cc: axboe@kernel.dk, Greg KH <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Justin Stitt <justinstitt@google.com>
+Hi,
 
-[ Upstream commit ccb326b5f9e623eb7f130fbbf2505ec0e2dcaff9 ]
+I have recently purchased a new UHD optical disc which is proving so
+difficult to read that both the 6.8.10 and 6.8.11 kernels throw NPE
+errors:
 
-Running syzkaller with the newly reintroduced signed integer overflow
-sanitizer shows this report:
+With vanilla 6.8.11:
+[  173.866492] BUG: kernel NULL pointer dereference, address: 0000000000000048
+[  173.872158] #PF: supervisor read access in kernel mode
+[  173.875995] #PF: error_code(0x0000) - not-present page
+[  173.879836] PGD 0 P4D 0
+[  173.881075] Oops: 0000 [#1] PREEMPT SMP PTI
+[  173.883960] CPU: 0 PID: 4183 Comm: umount Tainted: G          I E
+   6.8.10 #2
+[  173.890052] Hardware name: Gigabyte Technology Co., Ltd.
+EX58-UD3R/EX58-UD3R, BIOS FB  05/04/2009
+[  173.897619] RIP: 0010:blk_try_enter_queue+0xc/0x75
+[  173.901120] Code: 41 00 eb 04 65 48 ff 08 58 e9 05 90 d6 ff 90 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 89 f5 53 48 89 fb e8 04
+54 d6 ff <48> 8b 43 48 a8 03 74 0f f6 43 48 02 75 4d 48 8b 53 50 48 8b
+02 eb
+[  173.918568] RSP: 0018:ffffc90002e87b60 EFLAGS: 00010202
+[  173.922493] RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+[  173.928324] RDX: ffff88810c434740 RSI: 0000000000000000 RDI: 0000000000000000
+[  173.934156] RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000001b58
+[  173.939991] R10: 0000000000000020 R11: 0000000000000223 R12: 0000000000000000
+[  173.945824] R13: 0000000000000000 R14: ffffc90002e87d20 R15: 0000000000001b58
+[  173.951656] FS:  00007fc145466800(0000) GS:ffff888343c00000(0000)
+knlGS:0000000000000000
+[  173.958442] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  173.962887] CR2: 0000000000000048 CR3: 00000001413be000 CR4: 00000000000006f0
+[  173.968720] Call Trace:
+[  173.969867]  <TASK>
+[  173.970671]  ? __die_body+0x1a/0x5c
+[  173.972862]  ? page_fault_oops+0x321/0x36e
+[  173.975664]  ? exc_page_fault+0x105/0x117
+[  173.978374]  ? asm_exc_page_fault+0x22/0x30
+[  173.981263]  ? blk_try_enter_queue+0xc/0x75
+[  173.984147]  blk_queue_enter+0x37/0x10b
+[  173.986688]  blk_mq_alloc_request+0x154/0x1b7
+[  173.989750]  scsi_alloc_request+0xa/0x57 [scsi_mod]
+[  173.993351]  scsi_execute_cmd+0x5d/0x174 [scsi_mod]
+[  173.996948]  sr_do_ioctl+0x8d/0x1ac [sr_mod]
+[  173.999930]  sr_packet+0x39/0x42 [sr_mod]
+[  174.002653]  cdrom_get_disc_info+0x60/0xc9 [cdrom]
+[  174.006156]  cdrom_mrw_exit+0x25/0xe6 [cdrom]
+[  174.009220]  ? xa_destroy+0x7e/0xb8
+[  174.011413]  ? preempt_latency_start+0x2b/0x46
+[  174.014560]  sr_free_disk+0x40/0x56 [sr_mod]
+[  174.017542]  disk_release+0xb6/0xc4
+[  174.019735]  device_release+0x5a/0x80
+[  174.022098]  kobject_put+0x84/0xa4
+[  174.024204]  bdev_release+0x153/0x165
+[  174.026573]  deactivate_locked_super+0x2f/0x68
+[  174.029726]  cleanup_mnt+0xab/0xd3
+[  174.031832]  task_work_run+0x6b/0x80
+[  174.034110]  resume_user_mode_work+0x22/0x55
+[  174.037082]  syscall_exit_to_user_mode+0x5d/0x7b
+[  174.040404]  do_syscall_64+0x86/0xdc
+[  174.042681]  entry_SYSCALL_64_after_hwframe+0x60/0x68
+[  174.046434] RIP: 0033:0x7fc14568715b
+[  174.048739] Code: c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 f3
+0f 1e fa 31 f6 e9 05 00 00 00 0f 1f 44 00 00 f3 0f 1e fa b8 a6 00 00
+00 0f 05 <48> 3d 00 f0 ff ff 77 05 c3 0f 1f 40 00 48 8b 15 89 9c 0c 00
+f7 d8
+[  174.066185] RSP: 002b:00007ffddee09a88 EFLAGS: 00000246 ORIG_RAX:
+00000000000000a6
+[  174.072450] RAX: 0000000000000000 RBX: 000055607dd37e60 RCX: 00007fc14568715b
+[  174.078283] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000055607dd38270
+[  174.084117] RBP: 00007ffddee09b60 R08: 000055607dd3a350 R09: 00007fc145751b20
+[  174.089947] R10: 0000000000000008 R11: 0000000000000246 R12: 000055607dd37f68
+[  174.095773] R13: 0000000000000000 R14: 000055607dd38270 R15: 000055607dd393d0
+[  174.101608]  </TASK>
+[  174.102500] Modules linked in: udf snd_seq_dummy rpcrdma rdma_cm
+iw_cm ib_cm ib_core nf_nat_ftp nf_conntrack_ftp cfg80211 af_packet
+nf_conntrack_netbios_ns nf_conntrack_broadcast nft_fib_inet
+nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4
+nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_tables ebtable_nat
+ebtable_broute ip6table_nat ip6table_mangle ip6table_raw
+ip6table_security iptable_nat nf_nat nf_conntrack nf_defrag_ipv6
+nf_defrag_ipv4 libcrc32c iptable_mangle iptable_raw iptable_security
+ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter
+ip_tables x_tables it87 hwmon_vid bnep binfmt_misc
+snd_hda_codec_realtek snd_hda_codec_hdmi snd_hda_codec_generic
+snd_hda_intel uvcvideo intel_powerclamp coretemp snd_intel_dspcfg
+btusb kvm_intel uvc videobuf2_vmalloc videobuf2_memops btintel
+snd_hda_codec snd_usb_audio btbcm videobuf2_v4l2 kvm bluetooth
+snd_virtuoso snd_hda_core videodev snd_usbmidi_lib snd_oxygen_lib
+snd_mpu401_uart snd_hwdep usb_storage snd_seq videobuf2_common
+snd_rawmidi
+[  174.102617]  input_leds ecdh_generic mc joydev snd_seq_device
+led_class rfkill snd_pcm ecc iTCO_wdt r8169 gpio_ich irqbypass pktcdvd
+snd_hrtimer realtek intel_cstate snd_timer intel_uncore mdio_devres
+psmouse libphy snd i2c_i801 mxm_wmi acpi_cpufreq i2c_smbus
+tiny_power_button pcspkr lpc_ich soundcore i7core_edac button nfsd(E)
+auth_rpcgss nfs_acl lockd grace sunrpc fuse dm_mod loop configfs dax
+nfnetlink zram zsmalloc amdgpu ext4 crc32c_generic crc16 mbcache jbd2
+video amdxcp i2c_algo_bit mfd_core drm_ttm_helper ttm drm_exec
+gpu_sched sr_mod drm_suballoc_helper drm_buddy drm_display_helper
+cdrom sd_mod hid_microsoft usbhid drm_kms_helper ahci libahci
+pata_jmicron drm uhci_hcd xhci_pci libata ehci_pci ehci_hcd xhci_hcd
+scsi_mod usbcore firewire_ohci crc32c_intel sha512_ssse3 firewire_core
+sha256_ssse3 drm_panel_orientation_quirks cec sha1_ssse3 serio_raw bsg
+rc_core crc_itu_t usb_common scsi_common wmi msr
+[  174.269914] CR2: 0000000000000048
+[  174.271981] ---[ end trace 0000000000000000 ]---
+[  174.275308] RIP: 0010:blk_try_enter_queue+0xc/0x75
+[  174.278892] Code: 41 00 eb 04 65 48 ff 08 58 e9 05 90 d6 ff 90 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 89 f5 53 48 89 fb e8 04
+54 d6 ff <48> 8b 43 48 a8 03 74 0f f6 43 48 02 75 4d 48 8b 53 50 48 8b
+02 eb
+[  174.296345] RSP: 0018:ffffc90002e87b60 EFLAGS: 00010202
+[  174.300320] RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+[  174.306156] RDX: ffff88810c434740 RSI: 0000000000000000 RDI: 0000000000000000
+[  174.312035] RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000001b58
+[  174.317946] R10: 0000000000000020 R11: 0000000000000223 R12: 0000000000000000
+[  174.323860] R13: 0000000000000000 R14: ffffc90002e87d20 R15: 0000000000001b58
+[  174.329743] FS:  00007fc145466800(0000) GS:ffff888343c00000(0000)
+knlGS:0000000000000000
+[  174.336601] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  174.341136] CR2: 0000000000000048 CR3: 00000001413be000 CR4: 00000000000006f0
 
-[   62.982337] ------------[ cut here ]------------
-[   62.985692] cgroup: Invalid name
-[   62.986211] UBSAN: signed-integer-overflow in ../block/ioctl.c:36:46
-[   62.989370] 9pnet_fd: p9_fd_create_tcp (7343): problem connecting socket to 127.0.0.1
-[   62.992992] 9223372036854775807 + 4095 cannot be represented in type 'long long'
-[   62.997827] 9pnet_fd: p9_fd_create_tcp (7345): problem connecting socket to 127.0.0.1
-[   62.999369] random: crng reseeded on system resumption
-[   63.000634] GUP no longer grows the stack in syz-executor.2 (7353): 20002000-20003000 (20001000)
-[   63.000668] CPU: 0 PID: 7353 Comm: syz-executor.2 Not tainted 6.8.0-rc2-00035-gb3ef86b5a957 #1
-[   63.000677] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   63.000682] Call Trace:
-[   63.000686]  <TASK>
-[   63.000731]  dump_stack_lvl+0x93/0xd0
-[   63.000919]  __get_user_pages+0x903/0xd30
-[   63.001030]  __gup_longterm_locked+0x153e/0x1ba0
-[   63.001041]  ? _raw_read_unlock_irqrestore+0x17/0x50
-[   63.001072]  ? try_get_folio+0x29c/0x2d0
-[   63.001083]  internal_get_user_pages_fast+0x1119/0x1530
-[   63.001109]  iov_iter_extract_pages+0x23b/0x580
-[   63.001206]  bio_iov_iter_get_pages+0x4de/0x1220
-[   63.001235]  iomap_dio_bio_iter+0x9b6/0x1410
-[   63.001297]  __iomap_dio_rw+0xab4/0x1810
-[   63.001316]  iomap_dio_rw+0x45/0xa0
-[   63.001328]  ext4_file_write_iter+0xdde/0x1390
-[   63.001372]  vfs_write+0x599/0xbd0
-[   63.001394]  ksys_write+0xc8/0x190
-[   63.001403]  do_syscall_64+0xd4/0x1b0
-[   63.001421]  ? arch_exit_to_user_mode_prepare+0x3a/0x60
-[   63.001479]  entry_SYSCALL_64_after_hwframe+0x6f/0x77
-[   63.001535] RIP: 0033:0x7f7fd3ebf539
-[   63.001551] Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 14 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-[   63.001562] RSP: 002b:00007f7fd32570c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-[   63.001584] RAX: ffffffffffffffda RBX: 00007f7fd3ff3f80 RCX: 00007f7fd3ebf539
-[   63.001590] RDX: 4db6d1e4f7e43360 RSI: 0000000020000000 RDI: 0000000000000004
-[   63.001595] RBP: 00007f7fd3f1e496 R08: 0000000000000000 R09: 0000000000000000
-[   63.001599] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-[   63.001604] R13: 0000000000000006 R14: 00007f7fd3ff3f80 R15: 00007ffd415ad2b8
-...
-[   63.018142] ---[ end trace ]---
+And with vanilla 6.8.10:
+[ 4426.333116] BUG: kernel NULL pointer dereference, address: 0000000000000048
+[ 4426.338778] #PF: supervisor read access in kernel mode
+[ 4426.342617] #PF: error_code(0x0000) - not-present page
+[ 4426.346455] PGD 0 P4D 0
+[ 4426.347696] Oops: 0000 [#1] PREEMPT SMP PTI
+[ 4426.350581] CPU: 4 PID: 9349 Comm: umount Tainted: G          I
+   6.8.11 #1
+[ 4426.356674] Hardware name: Gigabyte Technology Co., Ltd.
+EX58-UD3R/EX58-UD3R, BIOS FB  05/04/2009
+[ 4426.364242] RIP: 0010:blk_try_enter_queue+0xc/0x75
+[ 4426.367744] Code: 41 00 eb 04 65 48 ff 08 58 e9 05 90 d6 ff 90 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 89 f5 53 48 89 fb e8 04
+54 d6 ff <48> 8b 43 48 a8 03 74 0f f6 43 48 02 75 4d 48 8b 53 50 48 8b
+02 eb
+[ 4426.385189] RSP: 0018:ffffc9000186bb60 EFLAGS: 00010202
+[ 4426.389114] RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+[ 4426.394946] RDX: ffff8881852b3900 RSI: 0000000000000000 RDI: 0000000000000000
+[ 4426.400780] RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000001b58
+[ 4426.406611] R10: 0000000000000020 R11: 0000000000000235 R12: 0000000000000000
+[ 4426.412445] R13: 0000000000000000 R14: ffffc9000186bd20 R15: 0000000000001b58
+[ 4426.418279] FS:  00007f2d5041e800(0000) GS:ffff888343d00000(0000)
+knlGS:0000000000000000
+[ 4426.425063] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 4426.429510] CR2: 0000000000000048 CR3: 000000021d394000 CR4: 00000000000006f0
+[ 4426.435350] Call Trace:
+[ 4426.436505]  <TASK>
+[ 4426.437311]  ? __die_body+0x1a/0x5c
+[ 4426.439511]  ? page_fault_oops+0x321/0x36e
+[ 4426.442320]  ? exc_page_fault+0x105/0x117
+[ 4426.445031]  ? asm_exc_page_fault+0x22/0x30
+[ 4426.447924]  ? blk_try_enter_queue+0xc/0x75
+[ 4426.450812]  blk_queue_enter+0x37/0x10b
+[ 4426.453354]  blk_mq_alloc_request+0x154/0x1b7
+[ 4426.456421]  scsi_alloc_request+0xa/0x57 [scsi_mod]
+[ 4426.460026]  scsi_execute_cmd+0x5d/0x174 [scsi_mod]
+[ 4426.463633]  sr_do_ioctl+0x8d/0x1ac [sr_mod]
+[ 4426.466613]  sr_packet+0x39/0x42 [sr_mod]
+[ 4426.469335]  cdrom_get_disc_info+0x60/0xc9 [cdrom]
+[ 4426.472837]  cdrom_mrw_exit+0x25/0xe6 [cdrom]
+[ 4426.475904]  ? xa_destroy+0x7e/0xb8
+[ 4426.478104]  ? preempt_latency_start+0x2b/0x46
+[ 4426.481251]  sr_free_disk+0x40/0x56 [sr_mod]
+[ 4426.484232]  disk_release+0xb6/0xc4
+[ 4426.486424]  device_release+0x5a/0x80
+[ 4426.488790]  kobject_put+0x84/0xa4
+[ 4426.490895]  bdev_release+0x153/0x165
+[ 4426.493263]  deactivate_locked_super+0x2f/0x68
+[ 4426.496408]  cleanup_mnt+0xab/0xd3
+[ 4426.498514]  task_work_run+0x6b/0x80
+[ 4426.500811]  resume_user_mode_work+0x22/0x55
+[ 4426.503784]  syscall_exit_to_user_mode+0x5d/0x7b
+[ 4426.507102]  do_syscall_64+0x86/0xdc
+[ 4426.509383]  entry_SYSCALL_64_after_hwframe+0x60/0x68
+[ 4426.513143] RIP: 0033:0x7f2d5063f15b
+[ 4426.515456] Code: c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 f3
+0f 1e fa 31 f6 e9 05 00 00 00 0f 1f 44 00 00 f3 0f 1e fa b8 a6 00 00
+00 0f 05 <48> 3d 00 f0 ff ff 77 05 c3 0f 1f 40 00 48 8b 15 89 9c 0c 00
+f7 d8
+[ 4426.532903] RSP: 002b:00007fff2878dcb8 EFLAGS: 00000246 ORIG_RAX:
+00000000000000a6
+[ 4426.539167] RAX: 0000000000000000 RBX: 000055cd5ee85e60 RCX: 00007f2d5063f15b
+[ 4426.545002] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000055cd5ee86270
+[ 4426.550891] RBP: 00007fff2878dd90 R08: 000055cd5ee88350 R09: 00007f2d50709b20
+[ 4426.556719] R10: 0000000000000008 R11: 0000000000000246 R12: 000055cd5ee85f68
+[ 4426.562550] R13: 0000000000000000 R14: 000055cd5ee86270 R15: 000055cd5ee873d0
+[ 4426.568386]  </TASK>
+[ 4426.569277] Modules linked in: sg udf usb_storage uinput
+snd_seq_dummy rpcrdma rdma_cm iw_cm ib_cm ib_core nf_nat_ftp
+nf_conntrack_ftp cfg80211 af_packet nf_conntrack_netbios_ns
+nf_conntrack_broadcast nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
+nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct
+nft_chain_nat nf_tables ebtable_nat ebtable_broute ip6table_nat
+ip6table_mangle ip6table_raw ip6table_security iptable_nat nf_nat
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c iptable_mangle
+iptable_raw iptable_security ebtable_filter ebtables ip6table_filter
+ip6_tables iptable_filter ip_tables x_tables it87 hwmon_vid bnep
+rc_pinnacle_pctv_hd em28xx_rc binfmt_misc tda18271
+snd_hda_codec_realtek snd_hda_codec_hdmi cxd2820r
+snd_hda_codec_generic snd_hda_intel regmap_i2c em28xx_dvb dvb_core
+uvcvideo btusb btintel uvc intel_powerclamp videobuf2_vmalloc coretemp
+btbcm snd_usb_audio videobuf2_memops em28xx kvm_intel videobuf2_v4l2
+bluetooth tveeprom snd_intel_dspcfg videodev snd_hda_codec
+snd_virtuoso kvm
+[ 4426.569392]  videobuf2_common
+[ 4426.583929] usb 2-4: new high-speed USB device number 6 using ehci-pci
+[ 4426.657557]  snd_oxygen_lib snd_usbmidi_lib snd_hda_core
+snd_mpu401_uart snd_hwdep snd_rawmidi mc snd_seq input_leds led_class
+joydev ecdh_generic rfkill snd_seq_device ecc iTCO_wdt gpio_ich r8169
+snd_pcm irqbypass snd_hrtimer pktcdvd realtek snd_timer intel_cstate
+mdio_devres snd libphy psmouse intel_uncore i2c_i801 pcspkr
+acpi_cpufreq i2c_smbus mxm_wmi soundcore lpc_ich i7core_edac
+tiny_power_button button nfsd auth_rpcgss nfs_acl lockd grace dm_mod
+sunrpc fuse loop configfs dax nfnetlink zram zsmalloc amdgpu ext4
+crc32c_generic crc16 mbcache jbd2 video amdxcp i2c_algo_bit mfd_core
+drm_ttm_helper ttm drm_exec gpu_sched drm_suballoc_helper drm_buddy
+drm_display_helper drm_kms_helper sr_mod hid_microsoft sd_mod cdrom
+usbhid drm xhci_pci uhci_hcd ehci_pci ahci ehci_hcd pata_jmicron
+libahci xhci_hcd libata drm_panel_orientation_quirks cec usbcore
+crc32c_intel scsi_mod sha512_ssse3 rc_core firewire_ohci firewire_core
+bsg serio_raw sha256_ssse3 sha1_ssse3 usb_common crc_itu_t scsi_common
+wmi msr
+[ 4426.750898] CR2: 0000000000000048
+[ 4426.752950] ---[ end trace 0000000000000000 ]---
+[ 4426.756276] RIP: 0010:blk_try_enter_queue+0xc/0x75
+[ 4426.759776] Code: 41 00 eb 04 65 48 ff 08 58 e9 05 90 d6 ff 90 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 89 f5 53 48 89 fb e8 04
+54 d6 ff <48> 8b 43 48 a8 03 74 0f f6 43 48 02 75 4d 48 8b 53 50 48 8b
+02 eb
+[ 4426.777232] RSP: 0018:ffffc9000186bb60 EFLAGS: 00010202
+[ 4426.781165] RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+[ 4426.786998] RDX: ffff8881852b3900 RSI: 0000000000000000 RDI: 0000000000000000
+[ 4426.790807] usb-storage 2-4:1.0: USB Mass Storage device detected
+[ 4426.792867] RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000001b58
+[ 4426.797877] scsi host10: usb-storage 2-4:1.0
+[ 4426.803501] R10: 0000000000000020 R11: 0000000000000235 R12: 0000000000000000
+[ 4426.812322] R13: 0000000000000000 R14: ffffc9000186bd20 R15: 0000000000001b58
+[ 4426.818165] FS:  00007f2d5041e800(0000) GS:ffff888343d00000(0000)
+knlGS:0000000000000000
+[ 4426.824958] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 4426.829402] CR2: 0000000000000048 CR3: 000000021d394000 CR4: 00000000000006f0
+[ 4427.835567] scsi 10:0:0:0: CD-ROM            HL-DT-ST BD-RE BU40N
+   1.00 PQ: 0 ANSI: 0
 
-Historically, the signed integer overflow sanitizer did not work in the
-kernel due to its interaction with `-fwrapv` but this has since been
-changed [1] in the newest version of Clang; It was re-enabled in the
-kernel with Commit 557f8c582a9ba8ab ("ubsan: Reintroduce signed overflow
-sanitizer").
-
-Let's rework this overflow checking logic to not actually perform an
-overflow during the check itself, thus avoiding the UBSAN splat.
-
-[1]: https://github.com/llvm/llvm-project/pull/82432
-
-Signed-off-by: Justin Stitt <justinstitt@google.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20240507-b4-sio-block-ioctl-v3-1-ba0c2b32275e@google.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/ioctl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index bc97698e0e8a3..11e692741f17c 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -32,7 +32,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 	if (op == BLKPG_DEL_PARTITION)
- 		return bdev_del_partition(bdev, p.pno);
- 
--	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
-+	if (p.start < 0 || p.length <= 0 || LLONG_MAX - p.length < p.start)
- 		return -EINVAL;
- 	/* Check that the partition is aligned to the block size */
- 	if (!IS_ALIGNED(p.start | p.length, bdev_logical_block_size(bdev)))
--- 
-2.43.0
-
+Cheers,
+Chris
