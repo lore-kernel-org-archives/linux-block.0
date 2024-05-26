@@ -1,161 +1,154 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866C8129A83
-	for <linux-block@vger.kernel.org>; Sat, 25 May 2024 23:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421F1BA2D;
+	Sun, 26 May 2024 09:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716678574; cv=none; b=sH2z6hOlGnZV5JWAR/FRbFxyp4wq0/HyCWeOf1LKrvMtVTqOf2nGvbHB0iWeent9ziSd/XQyZuCSaaHs6FrCNi7gamkfEK3g0dFDeVaCJ5v7BhncAA7JycluLJwj3e0E5izGKhtEN1KlqMOvB4EAXju8jSfutmI8BO3ZU2r4IV0=
+	t=1716716517; cv=none; b=hHXZWyw1dfNTt1V1FvAUj8urAjRrjRhEf8cIIkJZ8peAV1JkvBMTABKRU3rPB342wJ5cqxMVLzPV7cAH5SeTdj3Rl1L4VT0hDWfxjXWhsZiNKE67Hov81xmuewCXNNMFQ2z7gevImzwV7IHqCinNCOol9XrDlBzA1eEmxBwwZ2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716678574; c=relaxed/simple;
-	bh=faN9rNSdcMcbjtK47u0oId+ibnqpzDbiA+nKCknSZ+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=je0WeQqSEA+xdEVJC/2ffvoy7seAifM1yjYTjtcJ9rwrCzucSkt0Z63XQaf742/K8q11Ljub9Hi+QDclJkMHR6dyYvLWIDLwNdlRjDXfRJsNwWEUt3wNY2bbrXXOUZFqyZmeBoY1teixeOiAw9/Wz+lrBWixkmEVP8TPc3i/lpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=TYAcnYSZ; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	s=arc-20240116; t=1716716517; c=relaxed/simple;
+	bh=5RIir6L7Ts3/9a4boKXOUaCBOlle/6gJpZum6k377MM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZuvFSHiiTHxqj7qlcZebahwRsRa17+knz74avdxAVbIG2KRRjBJ4n6nlgTfQy3coQkqrHPN19++YnWFPW7u33G4z03QaTGPof+S2RnfNiu2OJ+UT5wI+k/LyIT3M3Too8CRr3SeOyK79qwXurtaRgAcjqHTJGDS4+14A/ji1HPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=orsa4Ceu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="TYAcnYSZ"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-68197de7400so1731411a12.3
-        for <linux-block@vger.kernel.org>; Sat, 25 May 2024 16:09:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1716678571; x=1717283371; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Crh6RjgT+TcJb1jq4rCjRtTqJLBvMRyCXUhpelsfOKA=;
-        b=TYAcnYSZr305sH9XLnMvStIEDlJaWfuAxeIKJ8RHPQ2FdZChlHVw3WOedEm+oJTNqI
-         stTuZ4fQcw6UxiGfRHR90Bp74bwzaixt2GDlsFinFqwsc869LKAliJMxIv9qTmLKte90
-         sq9F8bi8bpvUJzN0IUjLPRE9fJjkfjv5gfgmowNLTuqBzw1qcIAMQNDSly1A1w3VVbGl
-         8+P7OVtW0gK8XJZGCmv5e1rowLpX51EXhR5iPw/zYbDLRoTZIL2nRgW5TTKIhnQ6151n
-         cTidOa1KmAj+ZAT11fKYV1i4bpCfpO+pzVNGRkUDuJnBIDt7bLWMHaeIDv9F1c8BEZf0
-         OwMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716678571; x=1717283371;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Crh6RjgT+TcJb1jq4rCjRtTqJLBvMRyCXUhpelsfOKA=;
-        b=moiJzmrw9Nm+NoAUiU96+BncfTTUjViYOOl0GtSdiHQnSldyY/eDF7b6+qQvDwlbcI
-         Gsfjl08tHQXnJo1jfY395My7wsGN0j/7hDg0faEBxp6+lgMvZjG0rMtu29HO16nfdQm8
-         gE6GuY96q2qxv1pZ/jeqEOYFEV2G7gCsldlLH0gnqrv14BqpPf/44PsgdHhZx/tyOjYS
-         MEPuEdJOiTG2/n2/LfBtV8ZTCFxhlmVXED/Et0a/5MJbKVOIEelUEeFC29uBGtfjsfVF
-         bn39H6DZpEGM62XrkYHkZH1hZPb+I2wVgeUdY6yC9XR8g9Wt51UKLdOaNSiXSM4IuvXB
-         Oc3A==
-X-Forwarded-Encrypted: i=1; AJvYcCXxKHghFctU8TOLlftTKSAwcct6gTr+cxODHYNYg7TC7O/b5MLNTwOPaMn7985+eVkEPgNduivLwMvDFY2nQv+s44/BjQbNTt6VDko=
-X-Gm-Message-State: AOJu0Ywr1aDm2PSq/OTVkH6LzKRHKXC0LRMFX0LyUfXcOqk6XM3TD7Ed
-	6moDJFBcl81iPJiJJ/nOPp41wlAnx1Vn+q+ufK/uMjyv8yrJ2d1UqVl0api814I=
-X-Google-Smtp-Source: AGHT+IGYciyTBhNiI5PZlCjyMDogB+ANQNNWDCUuYjIsBj+L8eTBYhs5xE8S13XEF72yE6eBkoNGvg==
-X-Received: by 2002:a17:902:d50b:b0:1f4:768b:445e with SMTP id d9443c01a7336-1f4768b4768mr21943575ad.24.1716678570642;
-        Sat, 25 May 2024 16:09:30 -0700 (PDT)
-Received: from dread.disaster.area (pa49-179-32-121.pa.nsw.optusnet.com.au. [49.179.32.121])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c9afba1sm34658165ad.246.2024.05.25.16.09.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 May 2024 16:09:30 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1sB0Vz-00AUvI-1V;
-	Sun, 26 May 2024 09:09:27 +1000
-Date: Sun, 26 May 2024 09:09:27 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Nitesh Shetty <nj.shetty@samsung.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	martin.petersen@oracle.com, bvanassche@acm.org, hare@suse.de,
-	damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com,
-	joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v20 06/12] fs, block: copy_file_range for def_blk_ops for
- direct block device
-Message-ID: <ZlJvp47RSFKkbwRJ@dread.disaster.area>
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520102929epcas5p2f4456f6fa0005d90769615eb2c2bf273@epcas5p2.samsung.com>
- <20240520102033.9361-7-nj.shetty@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="orsa4Ceu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4A18C32782;
+	Sun, 26 May 2024 09:41:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716716516;
+	bh=5RIir6L7Ts3/9a4boKXOUaCBOlle/6gJpZum6k377MM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=orsa4CeuIeT5HUoxAOvLYOIQuTk6Kbhm6MrIlQ+7qNgu56HDTGQ2oMtMstnB1b/8Z
+	 lmHnGjC5pN8bd7Bmxgpuam2ERXMJPTeS0VsWulHcrS3NMLqfW0lI/U2gJqIfKtnIQW
+	 gVkDIC8p49KJYzVle5e03jIDGBDOEfxutE3exTH525b8bE1WKwHVOqKtDhqNUNRYxr
+	 apSnwZAaz32oh9OjjZp5gSxMMJOKVq0IB2CZ5rpgH78GQOqHe/AxvM073AITVsg1BZ
+	 XVntGI1TvcRCD4iOEsplM0sDFkpnzmpG+6zEXZOIYKtJ1B5tmP8kwnCbZrTxgdSW6v
+	 y8Xg9kplCQI4w==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Li Nan <linan122@huawei.com>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Song Liu <song@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	axboe@kernel.dk,
+	linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 02/15] md: Fix overflow in is_mddev_idle
+Date: Sun, 26 May 2024 05:41:34 -0400
+Message-ID: <20240526094152.3412316-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240526094152.3412316-1-sashal@kernel.org>
+References: <20240526094152.3412316-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240520102033.9361-7-nj.shetty@samsung.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.1
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 20, 2024 at 03:50:19PM +0530, Nitesh Shetty wrote:
-> For direct block device opened with O_DIRECT, use blkdev_copy_offload to
-> issue device copy offload, or use splice_copy_file_range in case
-> device copy offload capability is absent or the device files are not open
-> with O_DIRECT.
-> 
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> ---
->  block/fops.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
-> 
-> diff --git a/block/fops.c b/block/fops.c
-> index 376265935714..5a4bba4f43aa 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -17,6 +17,7 @@
->  #include <linux/fs.h>
->  #include <linux/iomap.h>
->  #include <linux/module.h>
-> +#include <linux/splice.h>
->  #include "blk.h"
->  
->  static inline struct inode *bdev_file_inode(struct file *file)
-> @@ -754,6 +755,30 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
->  	return ret;
->  }
->  
-> +static ssize_t blkdev_copy_file_range(struct file *file_in, loff_t pos_in,
-> +				      struct file *file_out, loff_t pos_out,
-> +				      size_t len, unsigned int flags)
-> +{
-> +	struct block_device *in_bdev = I_BDEV(bdev_file_inode(file_in));
-> +	struct block_device *out_bdev = I_BDEV(bdev_file_inode(file_out));
-> +	ssize_t copied = 0;
-> +
-> +	if ((in_bdev == out_bdev) && bdev_max_copy_sectors(in_bdev) &&
-> +	    (file_in->f_iocb_flags & IOCB_DIRECT) &&
-> +	    (file_out->f_iocb_flags & IOCB_DIRECT)) {
-> +		copied = blkdev_copy_offload(in_bdev, pos_in, pos_out, len,
-> +					     NULL, NULL, GFP_KERNEL);
-> +		if (copied < 0)
-> +			copied = 0;
-> +	} else {
-> +		copied = splice_copy_file_range(file_in, pos_in + copied,
-> +						 file_out, pos_out + copied,
-> +						 len - copied);
-> +	}
+From: Li Nan <linan122@huawei.com>
 
-This should not fall back to a page cache copy.
+[ Upstream commit 3f9f231236ce7e48780d8a4f1f8cb9fae2df1e4e ]
 
-We keep being told by application developers that if the fast
-hardware/filesystem offload fails, then an error should be returned
-so the application can determine what the fallback operation should
-be.
+UBSAN reports this problem:
 
-It may well be that the application falls back to "copy through the
-page cache", but that is an application policy choice, not a
-something the kernel offload driver should be making mandatory.
+  UBSAN: Undefined behaviour in drivers/md/md.c:8175:15
+  signed integer overflow:
+  -2147483291 - 2072033152 cannot be represented in type 'int'
+  Call trace:
+   dump_backtrace+0x0/0x310
+   show_stack+0x28/0x38
+   dump_stack+0xec/0x15c
+   ubsan_epilogue+0x18/0x84
+   handle_overflow+0x14c/0x19c
+   __ubsan_handle_sub_overflow+0x34/0x44
+   is_mddev_idle+0x338/0x3d8
+   md_do_sync+0x1bb8/0x1cf8
+   md_thread+0x220/0x288
+   kthread+0x1d8/0x1e0
+   ret_from_fork+0x10/0x18
 
-Userspace has to handle copy offload failure anyway, so they a
-fallback path regardless of whether copy_file_range() works on block
-devices or not...
+'curr_events' will overflow when stat accum or 'sync_io' is greater than
+INT_MAX.
 
-Cheers,
+Fix it by changing sync_io, last_events and curr_events to 64bit.
 
-Dave.
+Signed-off-by: Li Nan <linan122@huawei.com>
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+Link: https://lore.kernel.org/r/20240117031946.2324519-2-linan666@huaweicloud.com
+Signed-off-by: Song Liu <song@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/md/md.c        | 7 ++++---
+ drivers/md/md.h        | 4 ++--
+ include/linux/blkdev.h | 2 +-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index e575e74aabf5e..c88b50a4be82f 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -8576,14 +8576,15 @@ static int is_mddev_idle(struct mddev *mddev, int init)
+ {
+ 	struct md_rdev *rdev;
+ 	int idle;
+-	int curr_events;
++	long long curr_events;
+ 
+ 	idle = 1;
+ 	rcu_read_lock();
+ 	rdev_for_each_rcu(rdev, mddev) {
+ 		struct gendisk *disk = rdev->bdev->bd_disk;
+-		curr_events = (int)part_stat_read_accum(disk->part0, sectors) -
+-			      atomic_read(&disk->sync_io);
++		curr_events =
++			(long long)part_stat_read_accum(disk->part0, sectors) -
++			atomic64_read(&disk->sync_io);
+ 		/* sync IO will cause sync_io to increase before the disk_stats
+ 		 * as sync_io is counted when a request starts, and
+ 		 * disk_stats is counted when it completes.
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index 097d9dbd69b83..d0db98c0d33be 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -51,7 +51,7 @@ struct md_rdev {
+ 
+ 	sector_t sectors;		/* Device size (in 512bytes sectors) */
+ 	struct mddev *mddev;		/* RAID array if running */
+-	int last_events;		/* IO event timestamp */
++	long long last_events;		/* IO event timestamp */
+ 
+ 	/*
+ 	 * If meta_bdev is non-NULL, it means that a separate device is
+@@ -621,7 +621,7 @@ extern void mddev_unlock(struct mddev *mddev);
+ 
+ static inline void md_sync_acct(struct block_device *bdev, unsigned long nr_sectors)
+ {
+-	atomic_add(nr_sectors, &bdev->bd_disk->sync_io);
++	atomic64_add(nr_sectors, &bdev->bd_disk->sync_io);
+ }
+ 
+ static inline void md_sync_acct_bio(struct bio *bio, unsigned long nr_sectors)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 69e7da33ca49a..f10fb01a629fb 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -174,7 +174,7 @@ struct gendisk {
+ 	struct list_head slave_bdevs;
+ #endif
+ 	struct timer_rand_state *random;
+-	atomic_t sync_io;		/* RAID */
++	atomic64_t sync_io;		/* RAID */
+ 	struct disk_events *ev;
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
 -- 
-Dave Chinner
-david@fromorbit.com
+2.43.0
+
