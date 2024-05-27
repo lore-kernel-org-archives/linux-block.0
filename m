@@ -1,121 +1,102 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EC316727F;
-	Mon, 27 May 2024 22:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C811A52F6D
+	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 22:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716847778; cv=none; b=ShalfeoS3dj6rGrA31WSzkrXio8B6EjC1j2rKh1hqbzK0eDsowe+R8RAF1x8WzWRytkraZ7+iyTuOVJC178zo0j00IypS6lWpfQ2QS1j9mfa5GJBkg1rsadO7KhSbQJTyS9SIjdSDQ1FsFutKtq3d0BOwzVDjwzJKZeOrnRlTVA=
+	t=1716847935; cv=none; b=pKpKN/hgMwAFiHxDrVMBajDplkNYjYEqoZPG3UOIriAs+bBBcQAMg2lHzXVOnZbvglAj9XJOtVx6nNrLr88i2hG9cLnm+bl7iEtvAJLo3jseEaS/HNXMRfoaAR0FA3lQ0uVt/zYsSxnNgQ2WhNiFUSlrbZlFBSJGubdGDCTSITk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716847778; c=relaxed/simple;
-	bh=bWoyIz8f8wLuHH16zUiaZPhrCvft6pF8t2F8c7UdBXM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RjFlilbKq6BFV8RsDAf05KsFXr3fOsZSKzMymm2ipje/mrvIiC1TJqUrgCt3AzyWdRaA8RQLltrAyZiD0Dcwdx9bw0GjsTaVMHX/1wObvfA5xlvsTEuJdspzoxd9AT/s+Qp0vePwzCWKLr5+Ub9fdxCVuC3dlDmdizDKo6v3S+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=d7GYKjCm; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="d7GYKjCm"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1716847935; c=relaxed/simple;
+	bh=K6nhJkdLk32NLMRWXvuG1EBEh5ADmK3U7M1QmtpFNyE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=VRWHFkeus4RkcPcT1MUEcjUu0NB3Dlg6jxJixST7IJNqGCgGYQw0o/rMbRP4+VcthlNyo7XUL1wuwfp2qWT0d0irxG00woQ0os4viQQWa9B4YHikl+uqID6xleBDf/Vw9Uv1WcNHL+Rk1HiIK1TBe4RtWXxNWJhtAi9Tbpx5EnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id EBEA287;
+	Mon, 27 May 2024 15:12:06 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id 8prv4BcT0aEo; Mon, 27 May 2024 15:12:06 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4Vp8vH030Gz9sSx;
-	Tue, 28 May 2024 00:09:31 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1716847771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xofQJrMqQk/+jqsSg/d7hjeU9inOMDriTC1PeyMQG1c=;
-	b=d7GYKjCmdcKC3w87rQ2OBjU46lVmFu+qDHmCRuwcxFNx99FLKTE0TzY7RF8KBaU5NyPfUt
-	hefNRq7vvZAlp/ecd2E8FnP7knvZpTtdv2f9fMYvGvgROdDTQ6tQUte5EamAs4TNNA3d1g
-	pfm1uCH4+aMyOxS3MF0OravLFnL4FxjB48Ne9D0KhKZqnUCZ7N+uZYWaEB9WrwIDvqy7YY
-	g+T86ovA5qY25WmbRF1r/SbWMjXrV2LAJOk5MEj32ge5pqCnrr5if4tcVTBwFR5zXUawVq
-	kHUUR0HgihJiWD0KDSAOpac2L3etWpOwKQUreW9XzuZ9fKGUrjwIHOLO6QvA2Q==
-Date: Mon, 27 May 2024 22:09:26 +0000
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: akpm@linux-foundation.org, djwong@kernel.org, brauner@kernel.org,
-	david@fromorbit.com, chandan.babu@oracle.com, hare@suse.de,
-	ritesh.list@gmail.com, john.g.garry@oracle.com, ziy@nvidia.com,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, p.raghav@samsung.com, mcgrof@kernel.org
-Subject: Re: [PATCH v5.1] fs: Allow fine-grained control of folio sizes
-Message-ID: <20240527220926.3zh2rv43w7763d2y@quentin>
-References: <20240527210125.1905586-1-willy@infradead.org>
+	by mx.ewheeler.net (Postfix) with ESMTPSA id F181948;
+	Mon, 27 May 2024 15:12:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net F181948
+Date: Mon, 27 May 2024 15:12:05 -0700 (PDT)
+From: Eric Wheeler <dm-devel@lists.ewheeler.net>
+To: Mikulas Patocka <mpatocka@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
+    Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+    Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>, 
+    linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
+    linux-nvme@lists.infradead.org
+Subject: Re: [RFC PATCH 0/2] dm-crypt support for per-sector NVMe metadata
+In-Reply-To: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
+Message-ID: <206cd9fc-7dd0-f633-f6a9-9a2bd348a48e@ewheeler.net>
+References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240527210125.1905586-1-willy@infradead.org>
-X-Rspamd-Queue-Id: 4Vp8vH030Gz9sSx
+Content-Type: text/plain; charset=US-ASCII
 
-On Mon, May 27, 2024 at 10:01:23PM +0100, Matthew Wilcox (Oracle) wrote:
-> We need filesystems to be able to communicate acceptable folio sizes
-> to the pagecache for a variety of uses (e.g. large block sizes).
-> Support a range of folio sizes between order-0 and order-31.
+On Wed, 15 May 2024, Mikulas Patocka wrote:
+> Hi
 > 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Co-developed-by: Pankaj Raghav <p.raghav@samsung.com>
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> ---
-> For this version, I fixed the TODO that the maximum folio size was not
-> being honoured.  I made some other changes too like adding const, moving
-> the location of the constants, checking CONFIG_TRANSPARENT_HUGEPAGE, and
-> dropping some of the functions which aren't needed until later patches.
-> (They can be added in the commits that need them).  Also rebased against
-> current Linus tree, so MAX_PAGECACHE_ORDER no longer needs to be moved).
-
-Thanks for this! So I am currently running my xfstests on the new series
-I am planning to send in a day or two based on next-20240523.
-
-I assume this patch is intended to be folded in to the next LBS series?
-
+> Some NVMe devices may be formatted with extra 64 bytes of metadata per 
+> sector.
 > 
-> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-> index 1ed9274a0deb..c6aaceed0de6 100644
-> --- a/include/linux/pagemap.h
-> +++ b/include/linux/pagemap.h
-> @@ -204,13 +204,18 @@ enum mapping_flags {
->  	AS_EXITING	= 4, 	/* final truncate in progress */
->  	/* writeback related tags are not used */
->  	AS_NO_WRITEBACK_TAGS = 5,
-> -	AS_LARGE_FOLIO_SUPPORT = 6,
-> -	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
-> -	AS_STABLE_WRITES,	/* must wait for writeback before modifying
-> +	AS_RELEASE_ALWAYS = 6,	/* Call ->release_folio(), even if no private data */
-> +	AS_STABLE_WRITES = 7,	/* must wait for writeback before modifying
->  				   folio contents */
-> -	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
-> +	AS_UNMOVABLE = 8,	/* The mapping cannot be moved, ever */
-> +	AS_FOLIO_ORDER_MIN = 16,
-> +	AS_FOLIO_ORDER_MAX = 21, /* Bits 16-25 are used for FOLIO_ORDER */
->  };
->  
-> +#define AS_FOLIO_ORDER_MIN_MASK 0x001f0000
-> +#define AS_FOLIO_ORDER_MAX_MASK 0x03e00000
+> Here I'm submitting for review dm-crypt patches that make it possible to 
+> use per-sector metadata for authenticated encryption. With these patches, 
+> dm-crypt can run directly on the top of a NVMe device, without using 
+> dm-integrity. These patches increase write throughput twice, because there 
+> is no write to the dm-integrity journal.
+> 
+> An example how to use it (so far, there is no support in the userspace 
+> cryptsetup tool):
+> 
+> # nvme format /dev/nvme1 -n 1 -lbaf=4
+> # dmsetup create cr --table '0 1048576 crypt 
+> capi:authenc(hmac(sha256),cbc(aes))-essiv:sha256 
+> 01b11af6b55f76424fd53fb66667c301466b2eeaf0f39fd36d26e7fc4f52ade2de4228e996f5ae2fe817ce178e77079d28e4baaebffbcd3e16ae4f36ef217298 
+> 0 /dev/nvme1n1 0 2 integrity:32:aead sector_size:4096'
 
-As you changed the mapping flag offset, these masks also needs to be
-changed accordingly.
+Thats really an amazing feature, and I think your implementation is simple 
+and elegant.  Somehow reminds me of 520/528-byte sectors that big 
+commercial filers use, but in a way the Linux could use.
 
-I moved(pun intended) the AS_UNMOVABLE and kept the
-AS_FOLIO_ORDER_(MIN|MAX) value the same.
+Questions:
 
-	AS_FOLIO_ORDER_MIN = 8,
-	AS_FOLIO_ORDER_MAX = 13, /* Bit 8-17 are used for FOLIO_ORDER */
-	AS_UNMOVABLE = 18,	 /* The mapping cannot be moved, ever */
-	AS_INACCESSIBLE,	/* Do not attempt direct R/W access to the mapping */
+- I see you are using 32-bytes of AEAD data (out of 64).  Is AEAD always 
+  32-bytes, or can it vary by crypto mechanism?
 
-> +#define AS_FOLIO_ORDER_MASK (AS_FOLIO_ORDER_MIN_MASK | AS_FOLIO_ORDER_MAX_MASK)
-> +
->  
+- What drive are you using? I am curious what your `nvme id-ns` output 
+  looks like. Do you have 64 in the `ms` value?
+
+        # nvme id-ns /dev/nvme0n1 | grep lbaf
+        nlbaf   : 0
+        nulbaf  : 0
+        lbaf  0 : ms:0   lbads:9  rp:0 (in use)
+                     ^         ^512b
+
 --
-Pankaj
+Eric Wheeler
+
+
+
+> 
+> Please review it - I'd like to know whether detecting the presence of 
+> per-sector metadata in crypt_integrity_ctr is correct whether it should be 
+> done differently.
+> 
+> Mikulas
+> 
+> 
+> 
