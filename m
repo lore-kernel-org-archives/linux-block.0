@@ -1,93 +1,241 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185E61BC59
-	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 19:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35B316191B;
+	Mon, 27 May 2024 21:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716839936; cv=none; b=PT4q/HPvCgcBTte1RVEdH5qEAogt01o61oWb1rn9J/Jf3WSWqO8nppwYvi11/jvb470kb2YewyrOpncAM79LNKAA57oXOYipr2vUOhpbRMNINEPBseOFB6+X75SGHR+RolMoaWzIIf12Vn+IeSh4GqhlFgl/ew/b789/Qu+HMn0=
+	t=1716843704; cv=none; b=tc6MUZE7VUrt8/jqbJ8Jcn++xdRmJ0ZMjqI2CES08DMk/T91aapLN3AXj6d1P6zXvoq5PX3IvfPmpO9nbcyCJjW0craLhoU3ocK+ucYL71Dewhkfis1qgVGtJX+oG3cXkDPwm3NjCyp1g621hNho8ONAdyMrZv0ZSby5pOQbmVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716839936; c=relaxed/simple;
-	bh=ks7Mff04vGsMnYvo++ZgpbVUC58K1Rpct1dh+KIWgFY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=mcKwGFsyoTWn3ZSlZ563TnISdBnLDbPzP5G0zgX21cxkfWDKbZ3O7NC/VK8xyLPrmUHJyau7tBrllwSObw7zWTbiqvv2acAUl/AMEtLlgkWo5tjch2ihXDWtPYwPVNbyG9GvdfdsOScrHctfsZdU2TxALToBlJHjpGmzhPh9c9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EbnoTdId; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1716843704; c=relaxed/simple;
+	bh=d0tVjBIZ50XMn1Z2omCL0kJaG42f2EEBao3K7MDcvwo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QyFrVJdt3Bk2dooQBHw4M658+Ns5xp5G+ur3Uc957OZN8YmwsiehCGvc3mPIPPsDUWc3JPP8jZJ3EQOYs77Q7FtPySwHilHgzgIPaOm7IOfnn6FZECmdd7XMyuKlmLdnaeJmYwO8r/Y6MtT4y5LFUSR+XSWS8FBVOX6b5IjMWAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XsuVjs01; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EbnoTdId"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2bdd6b73a3aso10162a91.3
-        for <linux-block@vger.kernel.org>; Mon, 27 May 2024 12:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716839934; x=1717444734; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aCtCHMcHGMsYabdcrTqMbv7AnaT2U5qGwPVOFGULJ1o=;
-        b=EbnoTdId3NxJG0KlUC7WP2Oo15uqEUL6PYNOytUppr4vz+EfdjnXAIClxpE2yYa6V/
-         K0GFMFuoU5Oh9pCBej9q1mAemfKiVU1s1BXQIimnVIvbmfA58TvFUcjduM6dNZsP6wyH
-         OUSCVQwudDowCk5GeTqilB6C6Sa3Sj45KV5EeoRLA1sgg08QyiDNpa4qKhMlv1wutC52
-         VG2XPsXmCmWNop7HcujFGHcU91+ZSeYAMftkcmIE9jnIDSPJk2W73ClwxXXvEkefmwoo
-         Xo6/Han2y7bo3zlh3QLpNblGWyHPfA2xECfZ2X8qv7fSqOXonbvMcOFIP52HiSWomR0j
-         QNfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716839934; x=1717444734;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aCtCHMcHGMsYabdcrTqMbv7AnaT2U5qGwPVOFGULJ1o=;
-        b=JzLcYVhU4bvm0oc/3cj4U8q37aEMDxdyjztotp0jGN7o9cpg8irtlmHxtbEeq7rmyI
-         U1JgzHQwO+2r/0ARDlYebZPPEri8g2bkEY3oryOje5SwnMdkwUvalSKzQ2zrICAFKeDP
-         3axemL7BPEXqOaa9YmeIYAvSmoxPwSQBjOGtF8IL+tdjkxd4aKJLSW8zxaEKqLqG6hqt
-         KSnRY3BLTEtqOp2NeFb17YLJNnlXP7/1St2BiPp9gq3Xly3AcO5VTq4r7gkoiSL1B5Gh
-         PvQsK1wwsmV6OFejEAxQcXU6UeWw6FqhwKiTJ3RLP46sASD3BouGmv6ANRlnhwZCEaxl
-         FptQ==
-X-Gm-Message-State: AOJu0YzwjcEAUVUaLrfLDNuWy1lSjSze/Tw2mWlpoEe/P5yLpZnTdoSB
-	FXxZGTRXyWExGSbG0wR3HvIYj3RzwQmq5RbZdyqleUODF0urKAEyBYH3SIg3rf+5PFu/Hja0KBw
-	n
-X-Google-Smtp-Source: AGHT+IHwIZPGluEus19FHdXWfCpeZrfreP+zIjtoh4A1gbN0wdglgFYVjd7Dn3/nbJj/bXdL8h7oAQ==
-X-Received: by 2002:a17:90a:df13:b0:2bd:7e73:6628 with SMTP id 98e67ed59e1d1-2bf5e0c1bc4mr9801465a91.0.1716839934416;
-        Mon, 27 May 2024 12:58:54 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2bf5e13b6acsm6218409a91.0.2024.05.27.12.58.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 12:58:53 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: hexue <xue01.he@samsung.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20240527084533.1485210-1-xue01.he@samsung.com>
-References: <CGME20240527084541epcas5p17fa0a6ee3f53148ff0896703c58146b6@epcas5p1.samsung.com>
- <20240527084533.1485210-1-xue01.he@samsung.com>
-Subject: Re: [PATCH v2] block: delete redundant function declarations
-Message-Id: <171683993340.262308.9239565153961135856.b4-ty@kernel.dk>
-Date: Mon, 27 May 2024 13:58:53 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XsuVjs01"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=HDLaoQD7cnvad9Y4kohJVJq8Wi/o15RfSw0EInJn85g=; b=XsuVjs01D2A4snvIOF0Tkf2krm
+	Bd4zzZilKsucxO4d0BOVKcbaDAHrIdKrC/JQdKnTEZWBcLQe/jL2CmpPN5agCqjD8lfKIv3ilZs0v
+	0ZmkrbK8cmhLjJBoRa8kajFepFpRSjfrB5F68CezJOH4HNlVkbUKv0PaeYUOi7B2rA2W3ahfig8U2
+	0aC3Q35KhX4zT8Zy5RNW67HYbTMe3p8hh1+cYcVjiCHu8mud1r97EcMZCALq8Mp7BkUGpnEmnXEK6
+	Bw7dE+mGrKkk/Qj7GcnhQpb2qQiFIQyajYIblqZ2/a8+4hT90E46rkoMyQrEzzDf/TYszEv8N1GGy
+	W3n+g2Lg==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sBhTJ-00000007zjV-12Yd;
+	Mon, 27 May 2024 21:01:33 +0000
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To: akpm@linux-foundation.org,
+	willy@infradead.org,
+	djwong@kernel.org,
+	brauner@kernel.org,
+	david@fromorbit.com,
+	chandan.babu@oracle.com
+Cc: hare@suse.de,
+	ritesh.list@gmail.com,
+	john.g.garry@oracle.com,
+	ziy@nvidia.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	gost.dev@samsung.com,
+	p.raghav@samsung.com,
+	kernel@pankajraghav.com,
+	mcgrof@kernel.org
+Subject: [PATCH v5.1] fs: Allow fine-grained control of folio sizes
+Date: Mon, 27 May 2024 22:01:23 +0100
+Message-ID: <20240527210125.1905586-1-willy@infradead.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Transfer-Encoding: 8bit
 
+We need filesystems to be able to communicate acceptable folio sizes
+to the pagecache for a variety of uses (e.g. large block sizes).
+Support a range of folio sizes between order-0 and order-31.
 
-On Mon, 27 May 2024 16:45:33 +0800, hexue wrote:
-> blk_stats_alloc_enable is used in block hybrid poll, the related function
-> definitions have been removed by patch:
-> commit 54bdd67d0f88 ("blk-mq: remove hybrid polling")
-> but the function declaration was not deleted.
-> 
-> 
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Co-developed-by: Pankaj Raghav <p.raghav@samsung.com>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+For this version, I fixed the TODO that the maximum folio size was not
+being honoured.  I made some other changes too like adding const, moving
+the location of the constants, checking CONFIG_TRANSPARENT_HUGEPAGE, and
+dropping some of the functions which aren't needed until later patches.
+(They can be added in the commits that need them).  Also rebased against
+current Linus tree, so MAX_PAGECACHE_ORDER no longer needs to be moved).
 
-Applied, thanks!
+ include/linux/pagemap.h | 81 +++++++++++++++++++++++++++++++++++------
+ mm/filemap.c            |  6 +--
+ mm/readahead.c          |  4 +-
+ 3 files changed, 73 insertions(+), 18 deletions(-)
 
-[1/1] block: delete redundant function declarations
-      commit: 30a0e3135f9aa14ba745f767375183b3112d7440
-
-Best regards,
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 1ed9274a0deb..c6aaceed0de6 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -204,13 +204,18 @@ enum mapping_flags {
+ 	AS_EXITING	= 4, 	/* final truncate in progress */
+ 	/* writeback related tags are not used */
+ 	AS_NO_WRITEBACK_TAGS = 5,
+-	AS_LARGE_FOLIO_SUPPORT = 6,
+-	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
+-	AS_STABLE_WRITES,	/* must wait for writeback before modifying
++	AS_RELEASE_ALWAYS = 6,	/* Call ->release_folio(), even if no private data */
++	AS_STABLE_WRITES = 7,	/* must wait for writeback before modifying
+ 				   folio contents */
+-	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
++	AS_UNMOVABLE = 8,	/* The mapping cannot be moved, ever */
++	AS_FOLIO_ORDER_MIN = 16,
++	AS_FOLIO_ORDER_MAX = 21, /* Bits 16-25 are used for FOLIO_ORDER */
+ };
+ 
++#define AS_FOLIO_ORDER_MIN_MASK 0x001f0000
++#define AS_FOLIO_ORDER_MAX_MASK 0x03e00000
++#define AS_FOLIO_ORDER_MASK (AS_FOLIO_ORDER_MIN_MASK | AS_FOLIO_ORDER_MAX_MASK)
++
+ /**
+  * mapping_set_error - record a writeback error in the address_space
+  * @mapping: the mapping in which an error should be set
+@@ -359,9 +364,48 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
+ #define MAX_PAGECACHE_ORDER	8
+ #endif
+ 
++/*
++ * mapping_set_folio_order_range() - Set the orders supported by a file.
++ * @mapping: The address space of the file.
++ * @min: Minimum folio order (between 0-MAX_PAGECACHE_ORDER inclusive).
++ * @max: Maximum folio order (between @min-MAX_PAGECACHE_ORDER inclusive).
++ *
++ * The filesystem should call this function in its inode constructor to
++ * indicate which base size (min) and maximum size (max) of folio the VFS
++ * can use to cache the contents of the file.  This should only be used
++ * if the filesystem needs special handling of folio sizes (ie there is
++ * something the core cannot know).
++ * Do not tune it based on, eg, i_size.
++ *
++ * Context: This should not be called while the inode is active as it
++ * is non-atomic.
++ */
++static inline void mapping_set_folio_order_range(struct address_space *mapping,
++		unsigned int min, unsigned int max)
++{
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
++		return;
++
++	if (min > MAX_PAGECACHE_ORDER)
++		min = MAX_PAGECACHE_ORDER;
++	if (max > MAX_PAGECACHE_ORDER)
++		max = MAX_PAGECACHE_ORDER;
++	if (max < min)
++		max = min;
++
++	mapping->flags = (mapping->flags & ~AS_FOLIO_ORDER_MASK) |
++		(min << AS_FOLIO_ORDER_MIN) | (max << AS_FOLIO_ORDER_MAX);
++}
++
++static inline void mapping_set_folio_min_order(struct address_space *mapping,
++		unsigned int min)
++{
++	mapping_set_folio_order_range(mapping, min, MAX_PAGECACHE_ORDER);
++}
++
+ /**
+  * mapping_set_large_folios() - Indicate the file supports large folios.
+- * @mapping: The file.
++ * @mapping: The address space of the file.
+  *
+  * The filesystem should call this function in its inode constructor to
+  * indicate that the VFS can use large folios to cache the contents of
+@@ -372,7 +416,23 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
+  */
+ static inline void mapping_set_large_folios(struct address_space *mapping)
+ {
+-	__set_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
++	mapping_set_folio_order_range(mapping, 0, MAX_PAGECACHE_ORDER);
++}
++
++static inline
++unsigned int mapping_max_folio_order(const struct address_space *mapping)
++{
++	if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
++		return 0;
++	return (mapping->flags & AS_FOLIO_ORDER_MAX_MASK) >> AS_FOLIO_ORDER_MAX;
++}
++
++static inline
++unsigned int mapping_min_folio_order(const struct address_space *mapping)
++{
++	if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
++		return 0;
++	return (mapping->flags & AS_FOLIO_ORDER_MIN_MASK) >> AS_FOLIO_ORDER_MIN;
+ }
+ 
+ /*
+@@ -381,16 +441,13 @@ static inline void mapping_set_large_folios(struct address_space *mapping)
+  */
+ static inline bool mapping_large_folio_support(struct address_space *mapping)
+ {
+-	return IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE) &&
+-		test_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
++	return mapping_max_folio_order(mapping) > 0;
+ }
+ 
+ /* Return the maximum folio size for this pagecache mapping, in bytes. */
+-static inline size_t mapping_max_folio_size(struct address_space *mapping)
++static inline size_t mapping_max_folio_size(const struct address_space *mapping)
+ {
+-	if (mapping_large_folio_support(mapping))
+-		return PAGE_SIZE << MAX_PAGECACHE_ORDER;
+-	return PAGE_SIZE;
++	return PAGE_SIZE << mapping_max_folio_order(mapping);
+ }
+ 
+ static inline int filemap_nr_thps(struct address_space *mapping)
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 382c3d06bfb1..0557020f130e 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1933,10 +1933,8 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+ 		if (WARN_ON_ONCE(!(fgp_flags & (FGP_LOCK | FGP_FOR_MMAP))))
+ 			fgp_flags |= FGP_LOCK;
+ 
+-		if (!mapping_large_folio_support(mapping))
+-			order = 0;
+-		if (order > MAX_PAGECACHE_ORDER)
+-			order = MAX_PAGECACHE_ORDER;
++		if (order > mapping_max_folio_order(mapping))
++			order = mapping_max_folio_order(mapping);
+ 		/* If we're not aligned, allocate a smaller folio */
+ 		if (index & ((1UL << order) - 1))
+ 			order = __ffs(index);
+diff --git a/mm/readahead.c b/mm/readahead.c
+index c1b23989d9ca..66058ae02f2e 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -503,9 +503,9 @@ void page_cache_ra_order(struct readahead_control *ractl,
+ 
+ 	limit = min(limit, index + ra->size - 1);
+ 
+-	if (new_order < MAX_PAGECACHE_ORDER) {
++	if (new_order < mapping_max_folio_order(mapping)) {
+ 		new_order += 2;
+-		new_order = min_t(unsigned int, MAX_PAGECACHE_ORDER, new_order);
++		new_order = min(mapping_max_folio_order(mapping), new_order);
+ 		new_order = min_t(unsigned int, new_order, ilog2(ra->size));
+ 	}
+ 
 -- 
-Jens Axboe
-
-
+2.43.0
 
