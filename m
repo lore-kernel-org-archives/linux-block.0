@@ -1,118 +1,154 @@
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8A7B640;
-	Sun, 26 May 2024 12:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCB563B;
+	Mon, 27 May 2024 01:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716728305; cv=none; b=TZAvROF2v5glUwE9Je18iorPNayR+WqEWTByTRJn2LgH158zwbgZ5APgmSvhkr3mWLiy+5LG5pyrUBugLsNP6v5wMO9DGzDs6yy4Ff5LzY79HgnbWE5NERmDmx5VRhJ8GnnEIAnPMa2GOL4ZxK/Af5QB7c+GGRu/FFgDQ8B2oVg=
+	t=1716772122; cv=none; b=M5JIru8bh9pj+EQzrhouhzz73nlNPOjiohTdy6Mr/DZJ580yA6YSJYdrDgQuRndNKwWnfqlC5DulxYBjIcQLYACGBt2h0FvZW2qDC14rc0SaL3ld5B88pDuCZlfbLdkz7BNmKGTSsVe8mu17xGAxkkphW1U1kiAnBl4iW92V0fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716728305; c=relaxed/simple;
-	bh=+Jk/U5uDbfjV3TVqCr1thBx3H0i66FuEANV7xC+xlvQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=tLyQ+0Gz8nFk8rG9B78zKQY37flALSgPVgyd6yuSCzQQ1i6hcstWRckHpP+9dgTB/HQ6f7f8G8Su8/MQrd5sgSUqIuETLyDIjNfWIzJC0soQkaiedeFUttzlu4an7DMPAXOFPXenwkBwa4hitSJRvHyzMvMCAqqWr0GeOFUXJPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=uG0ygbpX; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="uG0ygbpX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1716728235; x=1717333035; i=markus.elfring@web.de;
-	bh=TH4bJDOAOe0AwLA0U7wO9TtqPvaa/z7ZkRomrKnaLd4=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=uG0ygbpXlIzchJJB+ZdOgUQP4d/HFkCO8o4Ry3NUK+JNWGVW5k2T4bvra9f5+K1f
-	 z1WlHA5y263i+om7NxkheRkx6Ly4c46fT6T2r1+nYVkrBro/p6bbfLjKXqomo/hu2
-	 B/IMzN3Ciguh4J9g63On2I4BKA8h9RYhbr1WMbHAYd57uXVnLWNu/onDtyBAyyjlW
-	 zMJQv8Qc3V11NMrOKokYrmIKmAtz7022B6qOPv1wIZ/pfWVbkUxlCwH/E+kqAK31T
-	 0OxlMt0lD1uTBSPEt5r/Yo0yuBHDVmO1hYpYqltVQffBf2jaQav3RjhUoH9DKsn8d
-	 CLQTdcTc1GEgfwiAuw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mmhnu-1sts6v2L1a-00jhaj; Sun, 26
- May 2024 14:57:15 +0200
-Message-ID: <369912bd-2ccf-4cb7-817a-a32ccbb3d83d@web.de>
-Date: Sun, 26 May 2024 14:57:07 +0200
+	s=arc-20240116; t=1716772122; c=relaxed/simple;
+	bh=aI+EFZH1rjfUKSaYYHxiFlWEFPTZhL+Hgux59hPbcqc=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gfSQ145mHdtf5U5IVqEjo3IutpRiKtRB/GQjzD14AxJqWLJbYU28uK0gOZKYOsJYEKma4j9+g89o1jGZ7VPn2ny4v21135DEHk1v/Ov62garQ3trvxOUVVlhE0Lh57lViRRFgUn+QLJE50Vt1T9Qodbp2hNfjSp1eSuaT/5GW5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Vnctj3wKfzcd27;
+	Mon, 27 May 2024 09:07:09 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (unknown [7.193.23.164])
+	by mail.maildlp.com (Postfix) with ESMTPS id 44FEE14037D;
+	Mon, 27 May 2024 09:08:29 +0800 (CST)
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 27 May 2024 09:08:28 +0800
+Subject: Re: [PATCH AUTOSEL 6.9 02/15] md: Fix overflow in is_mddev_idle
+To: Sasha Levin <sashal@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>
+CC: Li Nan <linan122@huawei.com>, Song Liu <song@kernel.org>,
+	<axboe@kernel.dk>, <linux-raid@vger.kernel.org>,
+	<linux-block@vger.kernel.org>
+References: <20240526094152.3412316-1-sashal@kernel.org>
+ <20240526094152.3412316-2-sashal@kernel.org>
+From: Yu Kuai <yukuai3@huawei.com>
+Message-ID: <217cd112-b5cb-9b6b-9dc9-b11490c2f137@huawei.com>
+Date: Mon, 27 May 2024 09:08:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Yu Kuai <yukuai3@huawei.com>, linux-block@vger.kernel.org,
- kernel-janitors@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
- Chaitanya Kulkarni <kch@nvidia.com>,
- Chengming Zhou <zhouchengming@bytedance.com>,
- Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
- Jens Axboe <axboe@kernel.dk>, Johannes Thumshirn
- <johannes.thumshirn@wdc.com>, Yi Zhang <yi.zhang@redhat.com>,
- Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: LKML <linux-kernel@vger.kernel.org>, Yang Erkun <yangerkun@huawei.com>,
- Yi Zhang <yi.zhang@huawei.com>, Yu Kuai <yukuai1@huaweicloud.com>
-References: <20240523153934.1937851-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v2] null_blk: fix null-ptr-dereference while configuring
- 'power' and 'submit_queues'
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240523153934.1937851-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:FdTFfjKeMbueufJpEs7qeLt78+mhGzQxV8dbJ8BZleWz5WKA7rT
- FmGUKdTjZd2dbVMLZpVl7LIsbMuJLfg+tHDnPWxHvuhi4yjHMtb/37F+G0k0OMUZSklQxrR
- U7j1LjI7dnRcX0WfLVIBFx/4LC/ivVsTNZYd13CSXIxcr2ousa0Dmfbf7RWLbsBjyhD+AZc
- v55JqHyCA8lj+nijOSZUg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:RONZyowvkdA=;qIEX4tPfOuBuJwMVujzM1AjwnE1
- fXfbD52+wJJcpo3wOabKrMkSIDjnDwSl8GM15LMmisc19pOR3V1pMZesXaadRNs19u8Xj7375
- ePbES4D9Y13fcIO69qSLHjB0GJOzqN1TjG3+fwRBflTPOHV3nDH95sWqVwau/8cJ16OCuMlnd
- JLcVWuVRbp3MH/xfZIly7mLV5lD8gulrxBpKEFZf79OHWlW4Tt0Gcdry76SWw9MQRLDcG0A3e
- JwEaAbBxy58YkZSiznpsrgVYiv66q5V0Ow35UxwhXLeIIVTAK1bGII4kWds/QUDkZpgkNILOk
- qA/HkQ8le1/9K056RAc5NuuDSrPfK7IUZkWFvCOPhZzJstTLDDsDr9LZP8vgNGZRglHCBsm3v
- MPrn8D4F35ovmZK5Vz9ZoP/BX4EOx95a6zsjCZVytgapfmRh6St6kTQr8gZuBKOjuEj1rbr3l
- VGBXNl3fUnB1UlMgEzgSjXkdDLUevJcAeFjelk2oyHUvKxh4PFLQ7OHiWlwIzQBpvg23n92SP
- iUljOEXZuzg744GjEZWWBu4h0sufg8aEQ9b80BwlA9h51WGarTeWFZr5LiQai5FFX3gv7ocB/
- xVPeRvCZkvX8szP0Mh6KajMJxHkXuRF4en0E0V0ksrB+pBYbTc1lcwZqX6cbCndW/GgGyoVxh
- fhZWIYqzDqq7GlbKlxkxrQRrxuajaCtdgO+c0TsaAkZ5lwxQNJspvrvDocMxoWx1hI1Fe1eSg
- FLZeQNSEiGmu2i/N7RndvIWx8gLjsysEzPI3H6Fkw5QFsIVUUP1ZdGJQdQI1tdddeB0HINLIi
- +kkcErcdMI7Ry4PI9w7+koiRTUQ1nuSTln1TGTqLt8OPo=
+In-Reply-To: <20240526094152.3412316-2-sashal@kernel.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
 
-=E2=80=A6
-> Fix this problem by resuing the global mutex to protect
-> nullb_device_power_store() and nullb_update_nr_hw_queues() from configfs=
-.
->
-> Fixes: 45919fbfe1c4 ("null_blk: Enable modifying 'submit_queues' after a=
-n instance has been configured")
-=E2=80=A6
-> +++ b/drivers/block/null_blk/main.c
-> @@ -413,13 +413,25 @@ static int nullb_update_nr_hw_queues(struct nullb_=
-device *dev,
->  static int nullb_apply_submit_queues(struct nullb_device *dev,
->  				     unsigned int submit_queues)
->  {
-> -	return nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues)=
-;
-> +	int ret;
-> +
-> +	mutex_lock(&lock);
-> +	ret =3D nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues=
-);
-> +	mutex_unlock(&lock);
-> +
-> +	return ret;
->  }
-=E2=80=A6
+Hi,
 
-How do you think about to increase the application of scope-based resource=
- management here?
-https://elixir.bootlin.com/linux/v6.9.1/source/include/linux/cleanup.h#L12=
-4
+ÔÚ 2024/05/26 17:41, Sasha Levin Ð´µÀ:
+> From: Li Nan <linan122@huawei.com>
+> 
+> [ Upstream commit 3f9f231236ce7e48780d8a4f1f8cb9fae2df1e4e ]
+> 
+> UBSAN reports this problem:
+> 
+>    UBSAN: Undefined behaviour in drivers/md/md.c:8175:15
+>    signed integer overflow:
+>    -2147483291 - 2072033152 cannot be represented in type 'int'
+>    Call trace:
+>     dump_backtrace+0x0/0x310
+>     show_stack+0x28/0x38
+>     dump_stack+0xec/0x15c
+>     ubsan_epilogue+0x18/0x84
+>     handle_overflow+0x14c/0x19c
+>     __ubsan_handle_sub_overflow+0x34/0x44
+>     is_mddev_idle+0x338/0x3d8
+>     md_do_sync+0x1bb8/0x1cf8
+>     md_thread+0x220/0x288
+>     kthread+0x1d8/0x1e0
+>     ret_from_fork+0x10/0x18
+> 
+> 'curr_events' will overflow when stat accum or 'sync_io' is greater than
+> INT_MAX.
+> 
+> Fix it by changing sync_io, last_events and curr_events to 64bit.
+> 
+> Signed-off-by: Li Nan <linan122@huawei.com>
+> Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+> Link: https://lore.kernel.org/r/20240117031946.2324519-2-linan666@huaweicloud.com
+> Signed-off-by: Song Liu <song@kernel.org>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-Will development interests grow for the usage of a statement like =E2=80=
-=9Cguard(mutex)(&lock);=E2=80=9D?
-
-Regards,
-Markus
+Hi, please notice that this patch doesn't fix real issue expect for
+the ubsan warning, and this patch is reverted:
+> ---
+>   drivers/md/md.c        | 7 ++++---
+>   drivers/md/md.h        | 4 ++--
+>   include/linux/blkdev.h | 2 +-
+>   3 files changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index e575e74aabf5e..c88b50a4be82f 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -8576,14 +8576,15 @@ static int is_mddev_idle(struct mddev *mddev, int init)
+>   {
+>   	struct md_rdev *rdev;
+>   	int idle;
+> -	int curr_events;
+> +	long long curr_events;
+>   
+>   	idle = 1;
+>   	rcu_read_lock();
+>   	rdev_for_each_rcu(rdev, mddev) {
+>   		struct gendisk *disk = rdev->bdev->bd_disk;
+> -		curr_events = (int)part_stat_read_accum(disk->part0, sectors) -
+> -			      atomic_read(&disk->sync_io);
+> +		curr_events =
+> +			(long long)part_stat_read_accum(disk->part0, sectors) -
+> +			atomic64_read(&disk->sync_io);
+>   		/* sync IO will cause sync_io to increase before the disk_stats
+>   		 * as sync_io is counted when a request starts, and
+>   		 * disk_stats is counted when it completes.
+> diff --git a/drivers/md/md.h b/drivers/md/md.h
+> index 097d9dbd69b83..d0db98c0d33be 100644
+> --- a/drivers/md/md.h
+> +++ b/drivers/md/md.h
+> @@ -51,7 +51,7 @@ struct md_rdev {
+>   
+>   	sector_t sectors;		/* Device size (in 512bytes sectors) */
+>   	struct mddev *mddev;		/* RAID array if running */
+> -	int last_events;		/* IO event timestamp */
+> +	long long last_events;		/* IO event timestamp */
+>   
+>   	/*
+>   	 * If meta_bdev is non-NULL, it means that a separate device is
+> @@ -621,7 +621,7 @@ extern void mddev_unlock(struct mddev *mddev);
+>   
+>   static inline void md_sync_acct(struct block_device *bdev, unsigned long nr_sectors)
+>   {
+> -	atomic_add(nr_sectors, &bdev->bd_disk->sync_io);
+> +	atomic64_add(nr_sectors, &bdev->bd_disk->sync_io);
+>   }
+>   
+>   static inline void md_sync_acct_bio(struct bio *bio, unsigned long nr_sectors)
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 69e7da33ca49a..f10fb01a629fb 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -174,7 +174,7 @@ struct gendisk {
+>   	struct list_head slave_bdevs;
+>   #endif
+>   	struct timer_rand_state *random;
+> -	atomic_t sync_io;		/* RAID */
+> +	atomic64_t sync_io;		/* RAID */
+>   	struct disk_events *ev;
+>   
+>   #ifdef CONFIG_BLK_DEV_ZONED
+> 
