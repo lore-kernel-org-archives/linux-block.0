@@ -1,102 +1,97 @@
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C811A52F6D
-	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 22:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D71C101DE;
+	Mon, 27 May 2024 22:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716847935; cv=none; b=pKpKN/hgMwAFiHxDrVMBajDplkNYjYEqoZPG3UOIriAs+bBBcQAMg2lHzXVOnZbvglAj9XJOtVx6nNrLr88i2hG9cLnm+bl7iEtvAJLo3jseEaS/HNXMRfoaAR0FA3lQ0uVt/zYsSxnNgQ2WhNiFUSlrbZlFBSJGubdGDCTSITk=
+	t=1716849599; cv=none; b=VzXGbGv0QK95KnkzHu1We1he0zY5cD7UnF5Waql9AUDPvMmxkJ1Ttks/RMU8J87Rrcm+cZ0EZeStSyfiNfbx6yTrD5V3BxtXoN/QG6jhOXZs4JuoUpvA65b0tvvdJqwFWwM4YTancHy4hbTHn5XdHC0CX2PfLP2uDBwYGNwhXsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716847935; c=relaxed/simple;
-	bh=K6nhJkdLk32NLMRWXvuG1EBEh5ADmK3U7M1QmtpFNyE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=VRWHFkeus4RkcPcT1MUEcjUu0NB3Dlg6jxJixST7IJNqGCgGYQw0o/rMbRP4+VcthlNyo7XUL1wuwfp2qWT0d0irxG00woQ0os4viQQWa9B4YHikl+uqID6xleBDf/Vw9Uv1WcNHL+Rk1HiIK1TBe4RtWXxNWJhtAi9Tbpx5EnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
-Received: from localhost (localhost [127.0.0.1])
-	by mx.ewheeler.net (Postfix) with ESMTP id EBEA287;
-	Mon, 27 May 2024 15:12:06 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id 8prv4BcT0aEo; Mon, 27 May 2024 15:12:06 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx.ewheeler.net (Postfix) with ESMTPSA id F181948;
-	Mon, 27 May 2024 15:12:05 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net F181948
-Date: Mon, 27 May 2024 15:12:05 -0700 (PDT)
-From: Eric Wheeler <dm-devel@lists.ewheeler.net>
-To: Mikulas Patocka <mpatocka@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-    Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-    Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>, 
-    linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
-    linux-nvme@lists.infradead.org
-Subject: Re: [RFC PATCH 0/2] dm-crypt support for per-sector NVMe metadata
-In-Reply-To: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
-Message-ID: <206cd9fc-7dd0-f633-f6a9-9a2bd348a48e@ewheeler.net>
-References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com>
+	s=arc-20240116; t=1716849599; c=relaxed/simple;
+	bh=xteO/duhHrr8zHBhHW3MJ26nWqqjWTZHB+o7b8pD3yg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SYwx3bakQ1WaI9OvVekDSVL7PFw46T/T1y7SBLdDpoZtoCOgcv86Qwea68aXBiCAqQoZ2osayR9XNtro50ywFvugUBU3ne+sDZCSSiLy5p91Ie2XhalU41ylp2BSsZALHLMltvMHBNbpBs5fJXiCdGGH4DkA3HjY7+sIDjbbZhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W46aTZnF; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W46aTZnF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=q6QhU7sKR5QtsOX2F1+hAkRgqnFTKmnF+5KVWJ1Beow=; b=W46aTZnF2g3pObfqLgHSuvvP8f
+	PTkB0Gnh8LL1d/ksibNbD3Hi+s9DlPBRI3hlMg9tKy/Rm1x2YY01pR8ccq9dM2LwSgUC2Nz5W5NzV
+	qNxo7hxAo0xp2CdNbB5oGK4KAORrPQigmnSMggI+PqBhZJ+FUbNoA/Q888/qI0C3DSPOqncuURwig
+	rIVwFzNzDB5aqtcu9jV6ljhjIOugfeXGgPGGBJaV4H9kuyzIpRBLUcM8RkGWZLkIxiK7G0tRViU6u
+	IZraOoTgTGm8Jih2FDJPoUsipqa5hNGzUItGnyr1puajL0KNRKT+1ooOXP/K86Cee2o5xX/6HZ9DR
+	0YZYgwcA==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sBj0N-000000083ub-32ao;
+	Mon, 27 May 2024 22:39:47 +0000
+Date: Mon, 27 May 2024 23:39:47 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+Cc: akpm@linux-foundation.org, djwong@kernel.org, brauner@kernel.org,
+	david@fromorbit.com, chandan.babu@oracle.com, hare@suse.de,
+	ritesh.list@gmail.com, john.g.garry@oracle.com, ziy@nvidia.com,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, mcgrof@kernel.org
+Subject: Re: [PATCH v5.1] fs: Allow fine-grained control of folio sizes
+Message-ID: <ZlULs_hAKMmasUR8@casper.infradead.org>
+References: <20240527210125.1905586-1-willy@infradead.org>
+ <20240527220926.3zh2rv43w7763d2y@quentin>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240527220926.3zh2rv43w7763d2y@quentin>
 
-On Wed, 15 May 2024, Mikulas Patocka wrote:
-> Hi
+On Mon, May 27, 2024 at 10:09:26PM +0000, Pankaj Raghav (Samsung) wrote:
+> > For this version, I fixed the TODO that the maximum folio size was not
+> > being honoured.  I made some other changes too like adding const, moving
+> > the location of the constants, checking CONFIG_TRANSPARENT_HUGEPAGE, and
+> > dropping some of the functions which aren't needed until later patches.
+> > (They can be added in the commits that need them).  Also rebased against
+> > current Linus tree, so MAX_PAGECACHE_ORDER no longer needs to be moved).
 > 
-> Some NVMe devices may be formatted with extra 64 bytes of metadata per 
-> sector.
+> Thanks for this! So I am currently running my xfstests on the new series
+> I am planning to send in a day or two based on next-20240523.
 > 
-> Here I'm submitting for review dm-crypt patches that make it possible to 
-> use per-sector metadata for authenticated encryption. With these patches, 
-> dm-crypt can run directly on the top of a NVMe device, without using 
-> dm-integrity. These patches increase write throughput twice, because there 
-> is no write to the dm-integrity journal.
+> I assume this patch is intended to be folded in to the next LBS series?
+
+Right, that was why I numbered it as 5.1 so as to not preempt your v6.
+
+> > diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> > index 1ed9274a0deb..c6aaceed0de6 100644
+> > --- a/include/linux/pagemap.h
+> > +++ b/include/linux/pagemap.h
+> > @@ -204,13 +204,18 @@ enum mapping_flags {
+> >  	AS_EXITING	= 4, 	/* final truncate in progress */
+> >  	/* writeback related tags are not used */
+> >  	AS_NO_WRITEBACK_TAGS = 5,
+> > -	AS_LARGE_FOLIO_SUPPORT = 6,
+> > -	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
+> > -	AS_STABLE_WRITES,	/* must wait for writeback before modifying
+> > +	AS_RELEASE_ALWAYS = 6,	/* Call ->release_folio(), even if no private data */
+> > +	AS_STABLE_WRITES = 7,	/* must wait for writeback before modifying
+> >  				   folio contents */
+> > -	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
+> > +	AS_UNMOVABLE = 8,	/* The mapping cannot be moved, ever */
+> > +	AS_FOLIO_ORDER_MIN = 16,
+> > +	AS_FOLIO_ORDER_MAX = 21, /* Bits 16-25 are used for FOLIO_ORDER */
+> >  };
+> >  
+> > +#define AS_FOLIO_ORDER_MIN_MASK 0x001f0000
+> > +#define AS_FOLIO_ORDER_MAX_MASK 0x03e00000
 > 
-> An example how to use it (so far, there is no support in the userspace 
-> cryptsetup tool):
-> 
-> # nvme format /dev/nvme1 -n 1 -lbaf=4
-> # dmsetup create cr --table '0 1048576 crypt 
-> capi:authenc(hmac(sha256),cbc(aes))-essiv:sha256 
-> 01b11af6b55f76424fd53fb66667c301466b2eeaf0f39fd36d26e7fc4f52ade2de4228e996f5ae2fe817ce178e77079d28e4baaebffbcd3e16ae4f36ef217298 
-> 0 /dev/nvme1n1 0 2 integrity:32:aead sector_size:4096'
+> As you changed the mapping flag offset, these masks also needs to be
+> changed accordingly.
 
-Thats really an amazing feature, and I think your implementation is simple 
-and elegant.  Somehow reminds me of 520/528-byte sectors that big 
-commercial filers use, but in a way the Linux could use.
+That's why I did change them?
 
-Questions:
-
-- I see you are using 32-bytes of AEAD data (out of 64).  Is AEAD always 
-  32-bytes, or can it vary by crypto mechanism?
-
-- What drive are you using? I am curious what your `nvme id-ns` output 
-  looks like. Do you have 64 in the `ms` value?
-
-        # nvme id-ns /dev/nvme0n1 | grep lbaf
-        nlbaf   : 0
-        nulbaf  : 0
-        lbaf  0 : ms:0   lbads:9  rp:0 (in use)
-                     ^         ^512b
-
---
-Eric Wheeler
-
-
-
-> 
-> Please review it - I'd like to know whether detecting the presence of 
-> per-sector metadata in crypt_integrity_ctr is correct whether it should be 
-> done differently.
-> 
-> Mikulas
-> 
-> 
-> 
