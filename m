@@ -1,98 +1,199 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6471BC3C
-	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 06:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716791551; cv=none; b=bcsiPx13efOhUc/LQGfMx5suPJTGfJZcvR+jGCvMEcOTpAWhsiKk1JhWFTRZkR3QmGkcYWQu4RXD3ZM/jOVte1une/PwkPrcAuPGKGyv5IZz+pJ2EinXNdOSMhGfANwwxmfRBskOVHe2a3+T21kNXz2uPxX9YE0QsGYSHNR7DdY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716791551; c=relaxed/simple;
-	bh=VA73YefItL0ChwwUb86OTEsrDPcNSDffKHfTxWSbing=;
-	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MpE4QvmohJQTyGLzKyeQWtr3LqZJ2ws79VeLnRmyGRZxEc3VQRHhuYcxuS0DAksiKxnZzDXuB4LOkZoYjWZj19TYH2T8Y/+n3ixZaBe2H+BZjVq7p1Q7RA7givnH99zRI8pWdFbjOcCgyjhwZK2R99HDifhlEfs7Ld7Obs3CjvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Vnm5n31WTz4f3jLJ
-	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 14:32:13 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 6307C1A016E
-	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 14:32:19 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP1 (Coremail) with SMTP id cCh0CgBnOBHxKFRmwtwyNw--.11670S3;
-	Mon, 27 May 2024 14:32:19 +0800 (CST)
-Subject: Re: [PATCH] null_blk: Fix return value of nullb_device_power_store()
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240527043445.235267-1-dlemoal@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <db98bd1f-9cdf-4a20-0f22-705b5519dfc5@huaweicloud.com>
-Date: Mon, 27 May 2024 14:32:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5878917BCA;
+	Mon, 27 May 2024 07:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716795502; cv=fail; b=SS3MFhNqjH3XRHeZ1W9OF6JrrLOpqKlRXZkDuzJzb8CziNgMQm3RIFzfeoHJHXu2d+ToLTeWNw7a+3noSgGJTEGwLVMBV5BubBnIj7eigZX7EOadbQ7XRISeQfl5DRRy7hDFkt0WfGgUt5OrZWozYzDImOQqRClpBAM/RfEVlZg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716795502; c=relaxed/simple;
+	bh=rE9gmSyLYv4dFVWSJ6UIu2AG+n7o6SfDNyDf+CjN9jY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YtyokSdX7WENl/YnnTXjMDIWazsYyHlhMhrzTM124R4ysyxEpdZ40FeGAocvaNOwliNMls1uZvhhFr/vMleQFbmM0r3hp9aPXZuK1bl+3HU3b/GNzH3IvS88ixaEs8JtAU8Hc5j42YaiMBDKFuNm7bVUrjhOl6mfGN+9bUbQi04=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=mMeHrBOd; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=ENFZ8oZw; arc=fail smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mMeHrBOd";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ENFZ8oZw"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1716795501; x=1748331501;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=rE9gmSyLYv4dFVWSJ6UIu2AG+n7o6SfDNyDf+CjN9jY=;
+  b=mMeHrBOdDLtu2cqmAnwsWOax5VEZf2hqxUCQavzzdgFZFXcW4Uck8Q0G
+   duktJdp82yWg1m8WakQLCBevtO3lJlV+UuGnv6pSsPumPuG9E75tzggAw
+   yMQ9hZ4mzZqGiuaI0y8nyGCyH/zS/i15ky64HeoaOiRWtLXXSv7fYy/Hp
+   GxvfIbtB2MxV/gRcP7x/svmhpF9ebiU61N9peS0WtGcHzCO1XLErbfYyw
+   BZ6skxE1SiNb01WyAe7cmqEsth+fa5PTGY8HbfsppQJm3C9JEeIEYlNgW
+   Fof8dWweZs+VvYW8Qj60JSkKfDonJ8XSuug1gMT5sA4kTf5gZL38CXwDJ
+   A==;
+X-CSE-ConnectionGUID: bdn0JD/wRF6rBgai7QsUzg==
+X-CSE-MsgGUID: /+dofCCGQne8h/RfowMeRQ==
+X-IronPort-AV: E=Sophos;i="6.08,192,1712592000"; 
+   d="scan'208";a="17074263"
+Received: from mail-mw2nam04lp2168.outbound.protection.outlook.com (HELO NAM04-MW2-obe.outbound.protection.outlook.com) ([104.47.73.168])
+  by ob1.hgst.iphmx.com with ESMTP; 27 May 2024 15:38:19 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K08rpwnj7xHPm2mgBKFgJXLkuNbhGzd99a26ZJPPsQPRS53yjynxQDAam0z4d9+KmWmrHq+vZhsNWisZ0/dLPj1M4jZUM2D8o1ppRrHuBPwev/P9But/qYLeDaFHfn9pEkYIJftJDu9BAHOElmfJPxSIc/9o6Zx8Ph06EedQ7DoIuMNIG8U5sK70Ce/h5aIUQwos1mzj/ffH6Sp9Cl2TjYnvqoaPunF+MS6EIDiX/OY+evhWa3gSeEuDRp98RiAETtEnILfX2REI00OaJovTnq8WIYJok2fxVs0qncMY5f61w39RralRFSK9eUYkP4IPqCCyPtd21kieLm1PYSk0Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rE9gmSyLYv4dFVWSJ6UIu2AG+n7o6SfDNyDf+CjN9jY=;
+ b=gH/s12IA/sDkdDplecZ6DJ5aBvyr670NZ30KaXYiWkUyw3UtZ80gnGcakNrnTiICjsjaDorrDzfs2VJoG7qCaQsmLyg3nSkU+QpYjtLKXiSogm1/XROADkPlrbfCiSTtRf4zdRjEKaEFjjH1RymUPhfG8/iGnNmfGOhM5oe1hp7IMqAIxr6L3V7T2qbmtpb0fCXC0SuwohHbkF8+9trNfo/t6uMAf/slNfEb2ty6od3NeU6I8g4Qp8+iGCu4fKV//rjD+xV6biKbpbjSyjZOYs6auQFD9HlUF8bHVIMnOFQA5IIViQeSCaYKB0fUip+4RoASD3eN4qsXtCTiVT/fvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rE9gmSyLYv4dFVWSJ6UIu2AG+n7o6SfDNyDf+CjN9jY=;
+ b=ENFZ8oZwrJ4oCjFyfROmZFCaYYdRWcfeM4fmZ/t7SmaPnkZ8jggbd9iqmGaNL1whEO59r0cful5VMvBeToOVZYecaNNDB+X8hMY8gjadh4SzvWHOZTVzKOJl37qhX7uZ5tEzOEJksOOFUO/GXcQASPV3sm4Sgr/ZngQQ9R83Xk8=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by CO6PR04MB7537.namprd04.prod.outlook.com (2603:10b6:303:a1::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.36; Mon, 27 May
+ 2024 07:38:17 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ee22:5d81:bfcf:7969%7]) with mapi id 15.20.7611.025; Mon, 27 May 2024
+ 07:38:17 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Markus Elfring <Markus.Elfring@web.de>, Yu Kuai <yukuai3@huawei.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>, Bart Van
+ Assche <bvanassche@acm.org>, Chaitanya Kulkarni <kch@nvidia.com>, Chengming
+ Zhou <zhouchengming@bytedance.com>, Damien Le Moal <dlemoal@kernel.org>,
+	Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, Yi Zhang
+	<yi.zhang@redhat.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
+CC: LKML <linux-kernel@vger.kernel.org>, Yang Erkun <yangerkun@huawei.com>, Yi
+ Zhang <yi.zhang@huawei.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v2] null_blk: fix null-ptr-dereference while configuring
+ 'power' and 'submit_queues'
+Thread-Topic: [PATCH v2] null_blk: fix null-ptr-dereference while configuring
+ 'power' and 'submit_queues'
+Thread-Index: AQHarOVY0VXK7QNuUkqU61vUOCDLFLGpfqKAgAE5PwA=
+Date: Mon, 27 May 2024 07:38:17 +0000
+Message-ID: <7bdebf81-253d-4278-a615-ed82692e026b@wdc.com>
+References: <20240523153934.1937851-1-yukuai1@huaweicloud.com>
+ <369912bd-2ccf-4cb7-817a-a32ccbb3d83d@web.de>
+In-Reply-To: <369912bd-2ccf-4cb7-817a-a32ccbb3d83d@web.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|CO6PR04MB7537:EE_
+x-ms-office365-filtering-correlation-id: d06084a8-15b5-4085-6795-08dc7e1ff944
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230031|366007|7416005|376005|1800799015|38070700009|921011;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?U21lYkhONjBpSXMrRUd5bUF6RERhWFRwdkQ1MWY2cTRKQStoa2hKZHhsK1FF?=
+ =?utf-8?B?NVd0dTd0c2lHZ0tSVEM5bnJ6bzlSbWdUcTFYZUdMdnlUdUVFSHBVSnYxRktm?=
+ =?utf-8?B?YmhMT250VFNXRmIzNlQ5c1dKNjgvRjJPZmdwdXdvK1RrVXZJOW12cTNXQUtn?=
+ =?utf-8?B?QWtjYldYc1ptY2xoOFI2UGt2Mmk0cGhDL0lhTDRjc1FLb1dydWFnM296cFgw?=
+ =?utf-8?B?WHpRSUM0K0s4bGc5a2YwN1Z4TzVST2pWOTNuY0dlNWZmSDdRT25rb1V6U1RZ?=
+ =?utf-8?B?RXdEVi9aV3ZRd2JjUmpDTXpTc2lJajJVclY0VHN4ZEhUQnp2U2dGVUg5V2Rp?=
+ =?utf-8?B?S0FjaG9VRlprY3BNdDZjamdRQXNxNWNRR0FPbXhjVTRpR0ZUU3ZMVHFUZG45?=
+ =?utf-8?B?MnpXTWtKQVErZW45QUdlYWRWRVozTnpEYU1qYVFyZllGcVc4b1hVUTlXd1Mv?=
+ =?utf-8?B?Nko5d2hSSkNZRTBMcXNJdmZJd2ZURnZxejlqcEZsdXRGZnJaN1RkdmRPNUhY?=
+ =?utf-8?B?ejdORDdCTllnQ002SG9BRHJmM2kwOFZTNTd5NWc3SmlDSk9waWc0TFJwNWNj?=
+ =?utf-8?B?MjRWNjdrd25CWUhTbXNkL0JlV2J2RHozekZ1c0VBVkFiRERPNHVRSWpNZnhp?=
+ =?utf-8?B?VGMvMjlGZ2d2MjV5U1dzSzVmTFBIaGVqUzNvQWNtbFFsL1FxMkJBSmVQbjRs?=
+ =?utf-8?B?M1h2TkJnOFBsZWlJQlQ2SkhDWlFTcGdYUk1kaTFVZzZNNUsvYTBlNGhTaUds?=
+ =?utf-8?B?SE9Fa2JPdWFSOVYrTm1oQWpvcDExb3NrSVBaanNIbHZaZ1RYRFIvWUhZTTJv?=
+ =?utf-8?B?d3FZSmsxcUdQYWJlODFiSHRyM0xqNXo2U2ZiQmdST2hJdlhJOUZURXMyZXhR?=
+ =?utf-8?B?QjFacyt3VEVsaEpPdGN6enRDdllrRUFVaFkzYlg1OUN3TkZrK1FVcjZ5VDFK?=
+ =?utf-8?B?a3pnTUpjQ2NaVmNCS21SREE5bmJhMW1PUjFPdlNTT2xJbUdyZkZGQ1F2eVly?=
+ =?utf-8?B?dmRpMU1Nak9kWWlXbDV6dGN3ZHR5bUVTQ3BNcTFWZDlSZzNqQWJaZ0JzRmtR?=
+ =?utf-8?B?cWtkbXZ0UXBUMTlnRVh0VEtDdmxQTzhZNzczbUtrMVNPck9INFd4bGFoc2gv?=
+ =?utf-8?B?dmhZY3N1Zkw4MEdsZFlGV2p3cndIdE9JZUxaNHczNVQ4eFpmMGlzMDF0QmhX?=
+ =?utf-8?B?NTgxVCtnNUYxV3M5L2ZrOUw1UzNGWllpS29UVEIyUmJ0aDZNMEkrUzdrcTZC?=
+ =?utf-8?B?aHN6UUJ0L1BKOHZlQXoxVVZmVm54eVlqMlVSZW9ydGdhRHplS3UrV2lZWnNj?=
+ =?utf-8?B?Y0NmMzFpMnYrR2o0blZYQTc5Vmc1eU80WWYyWjQrb0lBcWQ4S044dFo2bnhZ?=
+ =?utf-8?B?Rk9kZU9ENUp1d1JoRTl6bjFXbEtHYmoyeTNVNThxSlZnY1R5VUtWbElRZnFl?=
+ =?utf-8?B?YzFVelRvN2xqUG9lb1diaURLUFpqMWE1S3czTWdOSm5TcW1yYkpmU2tpUENv?=
+ =?utf-8?B?VGxuM3RBT0xuTzhZNlZ4NXBqT0FrVjA1M2VSajZtSlNqSjZtSFQvQWt0T2F5?=
+ =?utf-8?B?aG1oalBrOG8xUmtUWHErcXpNS0dFeWlvWVBsMkhIVnFHbEkrZnFkNjI4OFh5?=
+ =?utf-8?B?aUlaeHQyZmRYS3U3VTBmMFlIL1VnUlVvOG9TbUF1RVF4amJ3ODk1U2RUVjA2?=
+ =?utf-8?B?RjdvbWV5UDN3RkNSRnVWb2RDNExQN0VnMTN2M01ZbmNHZ2UwN1BySnpKb0d6?=
+ =?utf-8?B?STRRZk1QSC9SanduMEtwZ3JZZnJnQUhUNFlxVXJvVS9ubk41SE9YR1NBNWto?=
+ =?utf-8?B?aFZGaEpJNTQ2UFE5djU0UT09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(376005)(1800799015)(38070700009)(921011);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ZFIyWFg2REtqUjNxSVNIS1o4aVRVcnc4U1pqOG9naGRUSllOL2wyOW52ZHps?=
+ =?utf-8?B?NnJ1WTBwQndNQytEL1ozZXJvdnZweHRJRGpFU1ZVa0MxaDFyNmxEZ3J1eHNs?=
+ =?utf-8?B?UDVnclU0aHNKVGt2SG1BTlJXTE41bk13U1dwUW5wM29sRTh6Sy9kd0tzbU9i?=
+ =?utf-8?B?SWlDTEMxaGJTcERheGhYdWowaGg3ZExKcm5TUm5yVDhUT0RiZkhQVzJIOWlq?=
+ =?utf-8?B?blVoM0JYNlRncDEwdW1MOHluaDNHMklDa2xxUmtrOCt4eEdmaUkyYU1XOWlQ?=
+ =?utf-8?B?Nm5pYkxNT1FoMXVHS0lRQXVpWWpmWGorUmpxYzM4aGJkMWhWaXYwQ0hZWDVx?=
+ =?utf-8?B?VCtONGFtMWMvYWYzcHVrMHZEQnZ0dGNqcFhRSHRiOE5MS1Y0UUJyZEVHZjJK?=
+ =?utf-8?B?bW5Ya0Jpd1RHdmFPY1p5TURzRGtqV2ZrbmVBZTg4T0drd3k3YlRwekFqd3lH?=
+ =?utf-8?B?bHp1OE9lYW9oTUhzSGVENHZLcFpieDBmYXQvM25mK0l2OHdpQWtlTDdwR3Ns?=
+ =?utf-8?B?eG5LcGozSWI2SVVzakpleW9OdXd0YXNsbFlzMXNUMHBPZnBQUGdZTHdsOVJ5?=
+ =?utf-8?B?TFMxZGRockFuelBwK3VwTVFpMzVNaTcrWW9CRzdrMkd4KzhJRHF3Y0lhak54?=
+ =?utf-8?B?UThreFdZMjY4SDViRXlQSXhTYzNRSzRxRUtDNVFrV3NucmV1dmdrOFh6bE5j?=
+ =?utf-8?B?OGU2b25NcmZBUzVqVTJXdVoyQzN5TUhsVjEwajFnRWRXbUNIWk9kNmdPWFJW?=
+ =?utf-8?B?c1kwOThlRCtFUWVSSUc0dlp4dWFMczk2MDBJMWt0UkExRUtJbDYwUXIxZXJS?=
+ =?utf-8?B?YWJQSmRmTVpNSGhDOWFVekliSmxVOFMxODlEMWpmSVhVWFBTdUgweWR1REZx?=
+ =?utf-8?B?RmFWVmVIWDd6R1BkSW1OWDdlbUpKdHpXNGhscWV1YVl5Mk8zNk0yRGhoTHBY?=
+ =?utf-8?B?N2REMndvUnpJdUlWQmlCcUFncVhtdEMxNjVHaTRWK0RnN0hkWGxvektkV2Rt?=
+ =?utf-8?B?R2JQYnZRQ21FT3hGRXpMT3BDWG5Wd01oSlV4K0IxNlNFd0o2VTlWR3N1M3Yy?=
+ =?utf-8?B?UTNBM0tlc3F3UUJXUVBtUytzdG5mMG1jZDNjUnNHbVF6TVJsYk1Db2dPUy96?=
+ =?utf-8?B?TlZwM0h3T0x6ZG9jQWNNMFhpaXZGMURseVhxaWNOVjR3Skk4VHlaaHhTNTJP?=
+ =?utf-8?B?OFlzMVFZM1U3MDg3SXpJNWd6NXNhK3dLTU9MVWtyN2JkaXpDYUlUUVVMYWpR?=
+ =?utf-8?B?dWFLbnF5L05mSWVhZ3pUci9DbmdIY0IxL3Z0WTFvR1JtZzBEeUFFMHdyRE5p?=
+ =?utf-8?B?ZmRvZWF4TlJodnQ4RUZITmtqMllZeTFodDBvT2ZaQzE0SHVnSTVwRUJRL0lz?=
+ =?utf-8?B?cU0xakY0VDYrWGJGQmo0TjhiZ2k0Ky90Y0xpRFJBWGFrUDdEU2NZN1BHNVFt?=
+ =?utf-8?B?MHdyOUNNeHFLMU9MQi81cFVSMU0wWEp3VDdEb1VCWkdLajhkVDFuTTNzSVFI?=
+ =?utf-8?B?T0J5cDhuS0dsUFlHQTh1bVpIMXNld1RvYUtvRG9ISXJBZXl2NXZleGdmaUIx?=
+ =?utf-8?B?eW0yM2pYRUpCS1hJR04yODJ2Z0VReFhpVkZmek4waEF6dWFBNEFNSlFhMUlX?=
+ =?utf-8?B?Z3YxbnJaYlJxckNNVzhXVFBiM3hWNUp2TEJFMEdJZjM2NmJBeEc0ZnJyYkE2?=
+ =?utf-8?B?blF4WjJlVUNSMkZ0dnF1ZFpvN2lUMnNqMVVLdzZuZk5aU1o4dnFKMXZkVFJP?=
+ =?utf-8?B?QTRsWktaZ2RLT3h1K05NVlVLa1lPVDNjYXZmVGpZNnFxYzZIVlBMTllGbGFE?=
+ =?utf-8?B?RXlZekVEWGhKNDkraXE0T1JJbDVEd2NjV25GMndyLzY1TS9qY1NycTJmSTNx?=
+ =?utf-8?B?djB6TlorREdhWlBNV2IyTE5nN3lUbHRWOVBuQVdWTW9yMFJxcFRIUUtEb2Zs?=
+ =?utf-8?B?ZGVrdDNhUDZsK1ZUa0F1WVVrOFNDREpuRHQ5MTl0OElqNWYxY2s4V1FPMEVv?=
+ =?utf-8?B?R0doNTBTMVBQNW4rUTBuTVY5RkVCZ3BjYjM5eE1USDEvbndKRmVZdWVzQTE4?=
+ =?utf-8?B?ZGVDNmNobDhtbWpkN2ZObUIyUERUb1oxM1JranlBWk9WK1I1M3kvSlY5NU9Q?=
+ =?utf-8?B?NGJ5V2RLTEhuZzB2emNVajBEVGxwY01RSWkvRElCMzc5UldKdVFRdlhvYmJE?=
+ =?utf-8?B?YW5zR1FGR0VZUU9UQU92bVRrRU40eXpoRUdlMEY5czBRViszYmZTdk1FSk5N?=
+ =?utf-8?B?M3diZTVwOC84aTdES0tNMVErTUVnPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8CAD1A9D602E37478873D47E2C0782C3@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240527043445.235267-1-dlemoal@kernel.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBnOBHxKFRmwtwyNw--.11670S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFy3try8ZFyfWw1DKr4xXrb_yoW8Gw1fpF
-	s8KF90kry8GF1Uua17Wa1SyFyrCa4xAFWrGryUCryS9ryayr9Ik3sxG3Z8Xa1UJ3yUAr4a
-	qFnF9a1rJasxWrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-	wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-	I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-	k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-	1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUzsqWUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	MKmIVwYWq+mBvMjUWKKVFm8/oLCd5htLKrYSF6OL2R6yEicpX6Ik4l3VMejpq6j2Y9UN/PEOdqp6eBXWEVOo473y/XXXC8nxzb7Sp0V2meEOImiX2WnbFHKH4GHwGmscwU2xrYlcyC7CmA90GhvwDiqDRFkXHOjqIefSGNwJOwJCKs5HC5PlmqLVoJSZ+M0u1bryiw+qGr70rmbsWILeWAfyqx4v92y1sgFCfq2w/FSNsqWmTVgGZC8BnGdrjVGSnnMDE9NtrgPUH/B4Up5kaX7MWb/I8fBJtMWZFL1tQUc6zAtTaYYXs65krAvPsvr/SKnce7KNJYjtAlf+9YUfBj5H7GSsSexCUmUvyzyMzzU+GOs81P52+ON8WGBHZRxPSEB41Aj/l3QkFaLzZ/EszrYoFHZ1kPkbL2sJpd3CM32JxrHMlYapQezI+0AnYgffRVLRr7Djl7ZsJm9K0pu8kGmpNJPpMVKXPPILVFjlcukdATnGDYy7j4LqKIygpGHa8WJTOi5EgQS04VF1WgreoPoJK14yvuIg3yn0Yz+0Y6Q6JtIsVU5iEX/pPJqyS+K+dnPTSfwkvjvI5R/CtjOStO1QA4vcI9sSOdxw1+ZOO+OYawfWYHimuo1eReRx4Ur4
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d06084a8-15b5-4085-6795-08dc7e1ff944
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2024 07:38:17.0322
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gcTSI/e15kKzBeEeRr+yISYnid3c4y8eDYn8el21YqAGkh48jcF7yqDbvqTxtYU5QEYjnNQtRTJRjtBnPfm6D6u/RD4sGHC+yjgkzE9t/uE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7537
 
-Hi,
-
-ÔÚ 2024/05/27 12:34, Damien Le Moal Ð´µÀ:
-> When powering on a null_blk device that is not already on, the return
-> value ret that is initialized to be count is reused to check the return
-> value of null_add_dev(), leading to nullb_device_power_store() to return
-> null_add_dev() return value (0 on success) instead of "count".
-> So make sure to set ret to be equal to count when there are no errors.
-
-Yes, thanks for the patch!
-
-And the reason test did't find this problem is that the "echo" cmd will
-write again to the configfs entry, and nullb_device_power_store() will
-found the allocated nullb_device.
-
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-> 
-> Fixes: a2db328b0839 ("null_blk: fix null-ptr-dereference while configuring 'power' and 'submit_queues'")
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   drivers/block/null_blk/main.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index eb023d267369..631dca2e4e84 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -494,6 +494,7 @@ static ssize_t nullb_device_power_store(struct config_item *item,
->   
->   		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
->   		dev->power = newp;
-> +		ret = count;
->   	} else if (dev->power && !newp) {
->   		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {
->   			dev->power = newp;
-> 
-
+T24gMjYuMDUuMjQgMTQ6NTgsIE1hcmt1cyBFbGZyaW5nIHdyb3RlOg0KPiBXaWxsIGRldmVsb3Bt
+ZW50IGludGVyZXN0cyBncm93IGZvciB0aGUgdXNhZ2Ugb2YgYSBzdGF0ZW1lbnQgbGlrZSDigJxn
+dWFyZChtdXRleCkoJmxvY2spO+KAnT8NCg0KTm8NCg0K
