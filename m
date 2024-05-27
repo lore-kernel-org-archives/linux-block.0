@@ -1,48 +1,67 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1384C3D0D0;
-	Mon, 27 May 2024 08:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827E656470
+	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 08:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716797089; cv=none; b=rRfeMlgabvRG2F1ByubUUnKauktNvgIO00IZd/vL29um6jTc51EjAKZsCByPZlRLLiFZJUJUtRAI3A83jRg636ye15pZObeAhZzAIzXLRhWRt8jvQQWuo+YDv9kjb5ziBsJTlqhRTA6XBobgvdxIacue1yXk7Jh9eBZtyZQKQac=
+	t=1716799152; cv=none; b=m2ywqC7/LJxy0cy89JveREp8U656d/pLzZI/bd4BbB2dt6X3xFaQ23f+fOH3HTuC8fen9yjCsMoF4Lnr00gDvMTqIDgcSZoNFgr1wepqaoQu54GdlSXdtTfyCsHUQfc6LA1Hbf10Bc+xze0E+vfnJpJds0UuxKYcF3jfqVnlXt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716797089; c=relaxed/simple;
-	bh=K6QW4Ee4lGnLIoRVxiBydldanURp7hDujs18V3mvsSc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Eoc0/3pi2ah4rpFxKbFReWODVTlwKcn4EYN5RcDslhSNvYTUEDC/vs+wv219/92CdWFJrf7Lpl1YAH0TyS1Y2HBrcDUWsWkG05BZUZNxd7sRLI4kTIc6xZnXgV4iG5pVzeLA46AjQtQ87Y9dZEb30oMAVx115af6NGlR/tftYQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gRPVzS2J; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1716799152; c=relaxed/simple;
+	bh=y0zyZhvjZhGIy+JqgQVf1Y3tlTr2BPJicX5wSAVLuZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=VW6EwoJM4DLv69OxaszIfA2FnfPdU0IMVfvxqOPLPg2eG2SP+tPLOdcKR7chk1SBVl1s2qICJZCXZHtE/mtEp5a8XyRj4YT+gUP0DfXhXo1TOmG4Pn8catwlNHt3em3fpZA3/5TCam2toHZUW2eVzKFZZVDd4oki++kyQPwsgKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=P+iP+TZU; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gRPVzS2J"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=lbwSzTm0VhAXubnmYNdJiciwo9vwE6hDWfs2OC3v0UU=; b=gRPVzS2JUvCwPzoos1we10eAH+
-	waT9BIh1tV7RfYiYlgQBNoDYu5Nez26VO8KvZx+yK0xTvLMHwcSmqZdPaT/wIr/jS+qNtzXsnDG0c
-	oBtvVDmEFj2RsROWgRZuaxnbbUEf1DNan/df386qT8dmRoywBn9YcYtp3xUzpAlLOZNJoIHzeUDAu
-	MgRLhEbIJIVUn9n8LmyXRtq7QQdZwnK/wn+8zoH3tyBxwKvN6EoP1jtG2rKGUoiUcFrYF3KQOqnz8
-	S2dvj7X4hOlN5ry5v4oZbmfTRx6/Bnt7Tk8x7mt/juWMeMy+4zOTnVGLTeydC/7P1lSvx72kDxu2F
-	fb0rRKlQ==;
-Received: from 2a02-8389-2341-5b80-3177-e4c1-2108-f294.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:3177:e4c1:2108:f294] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sBVLb-0000000EAkP-1iBI;
-	Mon, 27 May 2024 08:04:47 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/3] dm: make dm_set_zones_restrictions work on the queue limits
-Date: Mon, 27 May 2024 10:04:26 +0200
-Message-ID: <20240527080435.1029612-4-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240527080435.1029612-1-hch@lst.de>
-References: <20240527080435.1029612-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="P+iP+TZU"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240527083908epoutp02c8653c0ccf74b3a3ff0337d136a6ecbb~TS7rDuDqA0583705837epoutp028
+	for <linux-block@vger.kernel.org>; Mon, 27 May 2024 08:39:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240527083908epoutp02c8653c0ccf74b3a3ff0337d136a6ecbb~TS7rDuDqA0583705837epoutp028
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1716799148;
+	bh=cldK3v8hjaOZ5NFr9ZMfKJUSo4QaG/KA3A1fFtLoxOM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=P+iP+TZUlEeEoGpLO28P5sxksCOVkG2Y0v5TBvIyJxjd8Q7WUPjPmieFbIYalF9Tp
+	 2zJFb7mR+5CX1hxHJGzmwAVsdUrbtbETfhSgam7dWRpWm4ELADLXFIB/gji/cvqeGT
+	 URom9cd9piRS5uaPSNeXnm48jV7Qlv/0uf0BHOkw=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240527083908epcas5p36c0dad40ec0aa905dc1de0b993d104ca~TS7qqlSox2565525655epcas5p3W;
+	Mon, 27 May 2024 08:39:08 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.178]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4VnpwB2bdHz4x9Ps; Mon, 27 May
+	2024 08:39:06 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	91.D9.08853.AA644566; Mon, 27 May 2024 17:39:06 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240527082328epcas5p205a74058d8163a1c724ad800ba18e056~TSt-Q5XRD0774507745epcas5p2Y;
+	Mon, 27 May 2024 08:23:28 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240527082328epsmtrp2b7be2d3d2b12c6011a7794ae65681849~TSt-QI1TP0696206962epsmtrp2x;
+	Mon, 27 May 2024 08:23:28 +0000 (GMT)
+X-AuditID: b6c32a44-d67ff70000002295-45-665446aacceb
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	18.07.08336.FF244566; Mon, 27 May 2024 17:23:27 +0900 (KST)
+Received: from testpc11818.samsungds.net (unknown [109.105.118.18]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240527082326epsmtip1ccfad5257e1af129f208e85886eb318b~TSt_KSNJn1036110361epsmtip16;
+	Mon, 27 May 2024 08:23:26 +0000 (GMT)
+From: hexue <xue01.he@samsung.com>
+To: joshi.k@samsung.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	peiwei.li@samsung.com, ruyi.zhang@samsung.com, xue01.he@samsung.com
+Subject: Re: Re: [PATCH] block: delete redundant function declarations
+Date: Mon, 27 May 2024 16:23:22 +0800
+Message-Id: <20240527082322.1476057-1-xue01.he@samsung.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <ff59fb89-c186-af41-0990-54de8ef91ef5@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,104 +69,62 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphk+LIzCtJLcpLzFFi42LZdlhTU3eVW0iawcSfvBar7/azWRz9/5bN
+	4lf3XUaLvbe0LS7vmsNm8Wwvp8WXw9/ZLc5O+MBq0XXhFJsDp8fls6UefVtWMXp83iQXwByV
+	bZORmpiSWqSQmpecn5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdIOSQlli
+	TilQKCCxuFhJ386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITvj
+	5cr5TAVvmCt6dl9ga2DsYe5i5OSQEDCR+P2rn7GLkYtDSGA3o8TdK8fZIJxPjBKHTt1iBKkS
+	EvjGKLFmhi9Mx577G1ghivYySmx/dZMFwvnBKLGx+zzYXDYBJYn9Wz6AdYsIaEhsOH6ZFcRm
+	FmhhlPjWmAFiCwu4SSxcu4gdxGYRUJV4vm4uC4jNK2AtcWtrExPENnmJm137wWZyCthLHJ3/
+	mx2iRlDi5MwnLBAz5SWat85mBjlCQuARu8TUPy9ZIJpdJBp+NrND2MISr45vgbKlJD6/28sG
+	YedLTP6+nhHCrpFYt/kdVK+1xL8re4BsDqAFmhLrd+lDhGUlpp5axwSxl0+i9/cTqDt5JXbM
+	g7GVJJYcWQE1UkLi94RFrCBjJAQ8JL7OEYSE1SRGYLjvYpnAqDALyTuzkLwzC2HzAkbmVYyS
+	qQXFuempyaYFhnmp5fBITs7P3cQITpZaLjsYb8z/p3eIkYmD8RCjBAezkgivyLzANCHelMTK
+	qtSi/Pii0pzU4kOMpsDwnsgsJZqcD0zXeSXxhiaWBiZmZmYmlsZmhkrivK9b56YICaQnlqRm
+	p6YWpBbB9DFxcEo1MAXNrl+Z+v34Qb+XpzjZSh/wdp0wZFiuM+XiWZOlhSvD1x78dumpuPBh
+	FvUs2R3BS3bu8fHIkltiOvOf7UnViiP1HrYBH/bKyqVM23XIcr7F9t6+U2+2PnpjMIEzuWSl
+	sPjuR8yKs30Wn6n+/9Jy3R0NVdcnzvofd78JN3z/+z6LaYHJgkV7eFIWh6ReStVMqr/k0Zl6
+	UU6i06CFZ0naDYlFnB7LOPtv/vV8mvX0idPJvEX2jZesfv886tzv+nypkvHH5uItTN8zGp/t
+	fpq5QravWWTK4ZjWK5sKF/48XbKeUU4uVeX+c9urX1vOV6lrNS8Ksrgvo/QrqGS945RJvbNz
+	dC+Ec71pUa9mOzuxfYsSS3FGoqEWc1FxIgB+D+mGHwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKLMWRmVeSWpSXmKPExsWy7bCSnO5/p5A0gwmPLS1W3+1nszj6/y2b
+	xa/uu4wWe29pW1zeNYfN4tleTosvh7+zW5yd8IHVouvCKTYHTo/LZ0s9+rasYvT4vEkugDmK
+	yyYlNSezLLVI3y6BK+PlyvlMBW+YK3p2X2BrYOxh7mLk5JAQMJHYc38DaxcjF4eQwG5Gib8/
+	FrFDJCQkdjz6wwphC0us/PecHaLoG6PEvvYbYN1sAkoS+7d8YASxRQS0JPpanrKBFDELdDFK
+	vJmwlQ0kISzgJrFwLcRUFgFViefr5rKA2LwC1hK3tjYxQWyQl7jZtR9sKKeAvcTR+b/B6oUE
+	7CRmHXzFClEvKHFy5hOwXmag+uats5knMArMQpKahSS1gJFpFaNkakFxbnpusWGBYV5quV5x
+	Ym5xaV66XnJ+7iZGcEhrae5g3L7qg94hRiYOxkOMEhzMSiK8IvMC04R4UxIrq1KL8uOLSnNS
+	iw8xSnOwKInzir/oTRESSE8sSc1OTS1ILYLJMnFwSjUwrXf5mxy8dNmtaZyPP0xQfFNZZ3FN
+	N+g2y8yGZwsF+OUmtXNuWsxizB6uKncp42v2t0mMUzasjKvLlN5z5lmM3xPFIF3n21s/vPr5
+	5E1D0e2FUd/Z58n37HVflr7I04TR/OGa7rhHc8J9fW+6sOx4VGdefiS/UNLg0+bJq843CwSf
+	/y97/IDvZ/bJukfYcjb4p5l531y10jYyWemk1gP2ty6mxc45U778TGkI1i5wq3XJ56+dsl4o
+	RC9DdcrpqVo8jjFTcoVsbUKFclhmfKpVKwtpWpTkFCIwkzfA5sebmRFKLwS32GvuZFFVbi+Q
+	WOaomPemYbLYx3zBllannXPuTA2JLrFXLJJNfHCBZb8SS3FGoqEWc1FxIgCHNkEU2AIAAA==
+X-CMS-MailID: 20240527082328epcas5p205a74058d8163a1c724ad800ba18e056
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240527082328epcas5p205a74058d8163a1c724ad800ba18e056
+References: <ff59fb89-c186-af41-0990-54de8ef91ef5@samsung.com>
+	<CGME20240527082328epcas5p205a74058d8163a1c724ad800ba18e056@epcas5p2.samsung.com>
 
-Don't stuff the values directly into the queue without any
-synchronization, but instead delay applying the queue limits in
-the caller and let dm_set_zones_restrictions work on the limit
-structure.
+On 5/27/2024 11:09 AM, Kanchan Joshi wrote:
+>On 5/27/2024 7:59 AM, hexue wrote:
+>> From: Xue He <xue01.he@samsung.com>
+>> 
+>> It is used in block hybrid poll, the related function
+>
+>It -> blk_stats_alloc_enable
+>
+>Also, you might want to mention the patch that removed it.
+>54bdd67d0f88 blk-mq: remove hybrid polling
+>
+>
+>> definitions have been removed, but the function
+>> declaration has not been delelted.
+>delelted -> deleted.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-table.c | 12 ++++++------
- drivers/md/dm-zone.c  | 11 ++++++-----
- drivers/md/dm.h       |  3 ++-
- 3 files changed, 14 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index e291b78b307b13..a027a6c0928d1a 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1981,10 +1981,6 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	if (!dm_table_supports_secure_erase(t))
- 		limits->max_secure_erase_sectors = 0;
- 
--	r = queue_limits_set(q, limits);
--	if (r)
--		return r;
--
- 	if (dm_table_supports_flush(t, (1UL << QUEUE_FLAG_WC))) {
- 		wc = true;
- 		if (dm_table_supports_flush(t, (1UL << QUEUE_FLAG_FUA)))
-@@ -2036,12 +2032,16 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	 * For a zoned target, setup the zones related queue attributes
- 	 * and resources necessary for zone append emulation if necessary.
- 	 */
--	if (blk_queue_is_zoned(q)) {
--		r = dm_set_zones_restrictions(t, q);
-+	if (limits->zoned) {
-+		r = dm_set_zones_restrictions(t, q, limits);
- 		if (r)
- 			return r;
- 	}
- 
-+	r = queue_limits_set(q, limits);
-+	if (r)
-+		return r;
-+
- 	dm_update_crypto_profile(q, t);
- 
- 	/*
-diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-index 0ee22494857d07..5d66d916730efa 100644
---- a/drivers/md/dm-zone.c
-+++ b/drivers/md/dm-zone.c
-@@ -220,7 +220,8 @@ static bool dm_table_supports_zone_append(struct dm_table *t)
- 	return true;
- }
- 
--int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
-+int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
-+		struct queue_limits *lim)
- {
- 	struct mapped_device *md = t->md;
- 	struct gendisk *disk = md->disk;
-@@ -236,7 +237,7 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
- 		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
- 	} else {
- 		set_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
--		blk_queue_max_zone_append_sectors(q, 0);
-+		lim->max_zone_append_sectors = 0;
- 	}
- 
- 	if (!get_capacity(md->disk))
-@@ -260,9 +261,9 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
- 	 * a regular device.
- 	 */
- 	if (nr_conv_zones >= ret) {
--		disk->queue->limits.max_open_zones = 0;
--		disk->queue->limits.max_active_zones = 0;
--		disk->queue->limits.zoned = false;
-+		lim->max_open_zones = 0;
-+		lim->max_active_zones = 0;
-+		lim->zoned = false;
- 		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
- 		disk->nr_zones = 0;
- 		return 0;
-diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-index e0c57f19839b29..53ef8207fe2c15 100644
---- a/drivers/md/dm.h
-+++ b/drivers/md/dm.h
-@@ -101,7 +101,8 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t);
- /*
-  * Zoned targets related functions.
-  */
--int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q);
-+int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
-+		struct queue_limits *lim);
- void dm_zone_endio(struct dm_io *io, struct bio *clone);
- #ifdef CONFIG_BLK_DEV_ZONED
- int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
--- 
-2.43.0
-
+Thanks, will modify these and submit v2.
