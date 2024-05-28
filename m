@@ -1,220 +1,171 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F2610E9
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 00:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2862BDF49
+	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 02:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716855139; cv=none; b=l8xp/6/Hom6zlTyxIqduAciudSk4HTKT9gxcv0vAa+TrZMPjvWqugIBDBQghgRXfGcLTSywkJC1Rrnb0rOKb4s/zsatWq1/z8gczVNb48h8pfecLESlpxny2Yam5bgeWEpwsn1dBmP/piU77x222/j09U+PKWPm+J34cy9vVLIk=
+	t=1716863010; cv=none; b=FYeBc8I9kykI57PZ3tGyH6SqQcg5mGwJ+7leRPFy2J5A+ZnApSzRr/YAvyN5eYACJ7apUZjbQbDAA3v9v6piSUbvWm98NUvoPpF3Or7md3wdvSwYLdGTAR8itdnAdkKEU2wulG831wRHArQFGOYLRRLFqLNvTPQcYHKpWAPS1PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716855139; c=relaxed/simple;
-	bh=A8DALDHd3MMh4OXdcMx5E3c0mAWR9NDzuk63Jb+1Yfc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jz8AGYfWac/DTb8Auz0CipmY13muxJ/z3XY4AaYyzNWsdT9YyXxSvvwAsadCfg/nitslFQq9z36PA/Xx6dOw5vPuL0ZSJHGpt18d21RnhCM1v82wHPKqwbk8VqZTWD78befpwGlEInJTX0xS88m/GolTFqlm98sTPO3k38537dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ETclSgOB; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1716863010; c=relaxed/simple;
+	bh=yQ9LsbgDIcB40o8seBlQdFBp13TqIFWpX1tnx9eFx6w=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=p8hKgQemzx3c1xmQ8AKR9R51XS09Ml+cTlVDkZbJ5Qg6HRRID82CW4LtmqpBCAnMGUjB2OuGd5xFrqPdXR4mJwAoxuVcblXNV/NsVWd+0EvjjxIjdBNYyhrIaij6V4IJYJNKfDOcumvUaGZwhlfo2OludIJ47Hdc3ZPp7NW3oTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bmboYTT0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ETclSgOB"
-X-Envelope-To: f.weber@proxmox.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1716855135;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bmboYTT0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716863007;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gMJ0eL3rp/jBrLY+934O2yj2Yff8RteD+peA5AFBPDM=;
-	b=ETclSgOBPawhuiJFChrFz0JsNyCvbhlqdJIsq2W/x40B21KJdvsG/9P30h1qDRutJIcRzp
-	gYkYUItWeuzdccAxOnB8LnkzvrMiyFsSqN4GqcNqpIgltEtUquFn4cZ1RzhrZiSNY4NQ7z
-	Xl3iKDsQSkwD6xRt3+Uw6FzC63F/cIs=
-X-Envelope-To: axboe@kernel.dk
-X-Envelope-To: ming.lei@redhat.com
-X-Envelope-To: hch@lst.de
-X-Envelope-To: bvanassche@acm.org
-X-Envelope-To: linux-block@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: zhouchengming@bytedance.com
-Message-ID: <87f495c2-7504-4d22-b355-608b13c456cd@linux.dev>
-Date: Tue, 28 May 2024 08:12:07 +0800
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=e1xEGCiIjrg5JFpsPwwbXmlcWKdQ+zX2+cTccvrezeo=;
+	b=bmboYTT0/soWW9as7zAzWBvVQBPWOXm94/7gxCDXvUprPijI64sTUkC2QbzrTqOSyu+NPS
+	mUhXvhebf+O/qPaAaDiuIC49A38iP0zoBi+qLmjXYLVbhZ90543RfkT+ABuU+hHmzyzNiA
+	WDZcz+B7e0Lt4dCI/9kJlw/wFR2C104=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-282-slDTG2P5PBG-olpKQrBWYQ-1; Mon, 27 May 2024 22:23:25 -0400
+X-MC-Unique: slDTG2P5PBG-olpKQrBWYQ-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-6819568d854so240178a12.2
+        for <linux-block@vger.kernel.org>; Mon, 27 May 2024 19:23:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716863003; x=1717467803;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e1xEGCiIjrg5JFpsPwwbXmlcWKdQ+zX2+cTccvrezeo=;
+        b=qulEc3Dr9agtA6ZlgkJGF3zydreepRSucDItZpkkVdO40/VSK1c53G5+CoU3KOLgw1
+         Aa4pb8pl6oBFpYC6EtFnrX7U6HM1VD6aIznfmOXt8fJ3QpAszOsTBIKC0C1EKPJqU3z5
+         KouhvgcsNnCRtEEFCb4cspV5QK3WbsZ6EcxR++LnQ6CXN3+Eqgs4IOuEowFUhIimLsh2
+         J5dbuPh8WwgU56uRlQpqCidB5FATjG2Lo9ujIbb7s4NJJTUYvWzrIvGN6h0RgnnkQxJk
+         vhdF46W2v25KYBg984z9Tpt9riwKy2UVFiBmlHexHaQlQ5QwAtF1SjkU4JkhQhGixjIZ
+         A+YQ==
+X-Gm-Message-State: AOJu0Yy8cqn0SxunJ46bbs5P84JWRGqWoXBGp+GD/Hf/VNcMh8N0roHG
+	1I4VcL5vAhzCyKEEBto7VXfZZ1eMTfLDBi77xzYmTlbzR+9M2wMOUYOd1KfY1hxGN8TUDCTr3Vi
+	TVn+92D2gwn0vkj7hK7w2qpYph0sEQCAElTv4TxPvKnWkTJgtky4VCSP18ZLfIACMN++65x93NR
+	BrBqPacUpcqKQDlmQU6EyT23ztRSV9+GDajylvmzMgJWQmkA==
+X-Received: by 2002:a05:6a20:d498:b0:1af:3715:80c8 with SMTP id adf61e73a8af0-1b212e14883mr11478845637.46.1716863003107;
+        Mon, 27 May 2024 19:23:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGTEDdg+2eK5UQU5Pa/bX85ru56WXt/8S9nZgI6tbGLCoIJKOtCDuzoZL1/AeWXEIhY7ja7rNqorNo+9jWaPmA=
+X-Received: by 2002:a05:6a20:d498:b0:1af:3715:80c8 with SMTP id
+ adf61e73a8af0-1b212e14883mr11478834637.46.1716863002579; Mon, 27 May 2024
+ 19:23:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 4/4] blk-flush: reuse rq queuelist in flush state
- machine
-Content-Language: en-US
-To: Friedrich Weber <f.weber@proxmox.com>, axboe@kernel.dk,
- ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- zhouchengming@bytedance.com
-References: <20230717040058.3993930-1-chengming.zhou@linux.dev>
- <20230717040058.3993930-5-chengming.zhou@linux.dev>
- <14b89dfb-505c-49f7-aebb-01c54451db40@proxmox.com>
- <984f1f77-288c-441a-a649-5f320249b576@linux.dev>
- <4d799672-378b-42b1-896b-38df2c5e9c84@proxmox.com>
- <0783d367-4608-4b16-9b88-6eaf5d5706eb@linux.dev>
- <8b1400e6-b35e-486b-8ea0-de76270267c0@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <8b1400e6-b35e-486b-8ea0-de76270267c0@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Tue, 28 May 2024 10:23:10 +0800
+Message-ID: <CAHj4cs9KZJc6Wsp9t0fDc4fDBJB1TmwGT7-8peCGLiqW3J_Fqw@mail.gmail.com>
+Subject: [bug report][regression] blktests block/008 lead kerne panic at RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
+To: linux-block <linux-block@vger.kernel.org>, iommu@lists.linux.dev
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, joro@8bytes.org, 
+	suravee.suthikulpanit@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2024/5/28 07:50, Chengming Zhou wrote:
-> On 2024/5/28 07:34, Chengming Zhou wrote:
->> On 2024/5/28 00:04, Friedrich Weber wrote:
->>> Hi Chengming,
->>>
->>> Thank you for taking a look at this!
->>>
->>> On 27/05/2024 07:09, Chengming Zhou wrote:
->>>>> I've used this reproducer for a bisect, which produced
->>>>>
->>>>>  81ada09cc25e (blk-flush: reuse rq queuelist in flush state machine)
->>>>>
->>>>> as the first commit with which I can reproduce the crashes. I'm not 100%
->>>>> sure it is this one because the reproducer is a bit flaky. But it does
->>>>> sound plausible, as the commit is included in our 6.8 kernel, and
->>>>> touches `queuelist` which is AFAICT where blk_flush_complete_seq
->>>>> dereferences the NULL pointer.
->>>>
->>>> Ok, it will be better that I can reproduce it locally, will try later.
->>>
->>> Interestingly, so far I haven't been able to reproduce the crash when
->>> generating IO on the host itself, I only got crashes when generating IO
->>> in a QEMU VM.
->>>
->>> The reproducer in more detail:
->>
->> Thanks for these details, I will try to setup and reproduce when I back to work.
->>
->>>
->>> - Compile Linux 6.9 with CONFIG_FAULT_INJECTION,
->> [...]
->>>>
->>>> BUG shows it panic on 0000000000000008, not sure what it's accessing then,
->>>> does it means rq->queuelist.next == 0 or something? Could you use add2line
->>>> to show the exact source code line that panic? I use blk_flush_complete_seq+0x296/0x2e0
->>>> and get block/blk-flush.c:190, which is "fq->flush_data_in_flight++;",
->>>> obviously fq can't be NULL. (I'm using the v6.9 kernel)
->>>
->>> Sorry for the confusion, the crash dump was from a kernel compiled at
->>> 81ada09cc25e -- with 6.9, the offset seems to be different. See [2] for
->>> a kernel 6.9 crash dump.
->>>
->>> I don't know too much about kernel debugging, but I tried to get
->>> something useful out of addr2line:
->>>
->>> # addr2line -f -e /usr/lib/debug/vmlinux-6.9.0-debug2
->>> blk_flush_complete_seq+0x291/0x2d0
->>> __list_del
->>> /[...]./include/linux/list.h:195
->>>
->>> I tried to find the relevant portions in `objdump -SD blk-flush.o`, see
->>> [3]. If I'm not mistaken, blk_flush_complete_seq+0x291 should point to
->>>
->>> 351:   48 89 4f 08             mov    %rcx,0x8(%rdi)
->>>
->>> To me this looks like part of
->>>
->>> 	list_move_tail(&rq->queuelist, pending);
->>>
->>> What do you think?
->>
->> Yeah, it seems correct, so the rq->queuelist.next == NULL. It can't be NULL
->> if went through REQ_FSEQ_POSTFLUSH, so it must be REQ_FSEQ_PREFLUSH. It means
->> we allocated a request but its queuelist is not initialized or corrupted?
->>
->> Anyway, I will use below changes for debugging when reproduce, and you could
->> also try this to see if we could get something useful. :)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 3b4df8e5ac9e..6e3a6cd7739d 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -2989,6 +2989,8 @@ void blk_mq_submit_bio(struct bio *bio)
->>                 blk_mq_use_cached_rq(rq, plug, bio);
->>         }
->>
->> +       BUG_ON(rq->queuelist.next == NULL);
->> +
->>         trace_block_getrq(bio);
->>
->>         rq_qos_track(q, rq, bio);
->> @@ -3006,6 +3008,8 @@ void blk_mq_submit_bio(struct bio *bio)
->>         if (bio_zone_write_plugging(bio))
->>                 blk_zone_write_plug_init_request(rq);
->>
->> +       BUG_ON(rq->queuelist.next == NULL);
->> +
->>         if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
->>                 return;
->>
-> 
-> Ah, I forgot to change to your kernel version, then should be:
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d98654869615..908fdfb62132 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2963,6 +2963,8 @@ void blk_mq_submit_bio(struct bio *bio)
->                         return;
->         }
-> 
-> +       BUG_ON(rq->queuelist.next == NULL);
-> +
->         trace_block_getrq(bio);
-> 
->         rq_qos_track(q, rq, bio);
-> @@ -2977,6 +2979,8 @@ void blk_mq_submit_bio(struct bio *bio)
->                 return;
->         }
-> 
-> +       BUG_ON(rq->queuelist.next == NULL);
-> +
->         if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
->                 return;
-> 
+Hello
+I found this regression panic issue on the latest 6.10-rc1 and it
+cannot be reproduced on 6.9, please help check and let me know if you
+need any info/testing for it, thanks.
 
-Another possibility is that drivers may change rq->queuelist even after
-rq->end_io(). So add two more BUG_ON() to detect this:
+reproducer
+# cat config
+TEST_DEVS=(/dev/nvme0n1 /dev/nvme1n1)
+# ./check block/008
+block/008 => nvme0n1 (do IO while hotplugging CPUs)
+    read iops  131813   ...
+    runtime    32.097s  ...
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index e73dc22d05c1..0eb684a468e5 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -179,7 +179,10 @@ static void blk_flush_complete_seq(struct request *rq,
+[  973.823246] run blktests block/008 at 2024-05-27 22:11:38
+[  977.485983] kernel tried to execute NX-protected page - exploit
+attempt? (uid: 0)
+[  977.493463] BUG: unable to handle page fault for address: ffffffffb3d5e310
+[  977.500334] #PF: supervisor instruction fetch in kernel mode
+[  977.505992] #PF: error_code(0x0011) - permissions violation
+[  977.511567] PGD 719225067 P4D 719225067 PUD 719226063 PMD 71a5ff063
+PTE 8000000719d5e163
+[  977.519662] Oops: Oops: 0011 [#1] PREEMPT SMP NOPTI
+[  977.524541] CPU: 4 PID: 42 Comm: cpuhp/4 Not tainted
+6.10.0-0.rc1.17.eln136.x86_64 #1
+[  977.532366] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS
+2.13.3 09/12/2023
+[  977.540017] RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
+[  977.545329] Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 00
+00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40
+00 00
+[  977.564076] RSP: 0018:ffffa5bd80437e58 EFLAGS: 00010246
+[  977.569301] RAX: ffffffffb324bf00 RBX: ffff8f40df020820 RCX: 0000000000000000
+[  977.576433] RDX: 0000000000000001 RSI: 00000000000000c0 RDI: 0000000000000004
+[  977.583567] RBP: 0000000000000004 R08: ffff8f40df020848 R09: ffff8f398664ece0
+[  977.590698] R10: 0000000000000000 R11: 0000000000000008 R12: 00000000000000c0
+[  977.597833] R13: ffffffffb3d5e310 R14: 0000000000000000 R15: ffff8f40df020848
+[  977.604963] FS:  0000000000000000(0000) GS:ffff8f40df000000(0000)
+knlGS:0000000000000000
+[  977.613050] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  977.618795] CR2: ffffffffb3d5e310 CR3: 0000000719220000 CR4: 0000000000350ef0
+[  977.625927] Call Trace:
+[  977.628376]  <TASK>
+[  977.630480]  ? srso_return_thunk+0x5/0x5f
+[  977.634491]  ? show_trace_log_lvl+0x255/0x2f0
+[  977.638851]  ? show_trace_log_lvl+0x255/0x2f0
+[  977.643213]  ? cpuhp_invoke_callback+0x122/0x410
+[  977.647830]  ? __die_body.cold+0x8/0x12
+[  977.651669]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+[  977.656979]  ? page_fault_oops+0x146/0x160
+[  977.661080]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+[  977.666392]  ? exc_page_fault+0x152/0x160
+[  977.670405]  ? asm_exc_page_fault+0x26/0x30
+[  977.674590]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+[  977.679905]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+[  977.685215]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+[  977.690527]  cpuhp_invoke_callback+0x122/0x410
+[  977.694977]  ? __pfx_smpboot_thread_fn+0x10/0x10
+[  977.699593]  cpuhp_thread_fun+0x98/0x140
+[  977.703521]  smpboot_thread_fn+0xdd/0x1d0
+[  977.707533]  kthread+0xd2/0x100
+[  977.710677]  ? __pfx_kthread+0x10/0x10
+[  977.714431]  ret_from_fork+0x34/0x50
+[  977.718009]  ? __pfx_kthread+0x10/0x10
+[  977.721763]  ret_from_fork_asm+0x1a/0x30
+[  977.725692]  </TASK>
+[  977.727879] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4
+dns_resolver nfs lockd grace netfs sunrpc vfat fat dm_multipath
+ipmi_ssif amd_atl intel_rapl_msr intel_rapl_common amd64_edac
+edac_mce_amd dell_wmi sparse_keymap rfkill video kvm_amd dcdbas kvm
+dell_smbios dell_wmi_descriptor wmi_bmof rapl mgag200 pcspkr
+acpi_cpufreq i2c_algo_bit acpi_power_meter ptdma k10temp i2c_piix4
+ipmi_si acpi_ipmi ipmi_devintf ipmi_msghandler fuse xfs sd_mod sg ahci
+crct10dif_pclmul nvme libahci crc32_pclmul crc32c_intel mpt3sas
+ghash_clmulni_intel libata nvme_core tg3 ccp nvme_auth raid_class
+t10_pi scsi_transport_sas sp5100_tco wmi dm_mirror dm_region_hash
+dm_log dm_mod
+[  977.786224] CR2: ffffffffb3d5e310
+[  977.789544] ---[ end trace 0000000000000000 ]---
+[  977.883220] RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
+[  977.888532] Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 00
+00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40
+00 00
+[  977.907277] RSP: 0018:ffffa5bd80437e58 EFLAGS: 00010246
+[  977.912503] RAX: ffffffffb324bf00 RBX: ffff8f40df020820 RCX: 0000000000000000
+[  977.919633] RDX: 0000000000000001 RSI: 00000000000000c0 RDI: 0000000000000004
+[  977.926767] RBP: 0000000000000004 R08: ffff8f40df020848 R09: ffff8f398664ece0
+[  977.933900] R10: 0000000000000000 R11: 0000000000000008 R12: 00000000000000c0
+[  977.941030] R13: ffffffffb3d5e310 R14: 0000000000000000 R15: ffff8f40df020848
+[  977.948163] FS:  0000000000000000(0000) GS:ffff8f40df000000(0000)
+knlGS:0000000000000000
+[  977.956251] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  977.961995] CR2: ffffffffb3d5e310 CR3: 0000000719220000 CR4: 0000000000350ef0
+[  977.969129] Kernel panic - not syncing: Fatal exception
+[  977.974439] Kernel Offset: 0x30400000 from 0xffffffff81000000
+(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  978.087528] ---[ end Kernel panic - not syncing: Fatal exception ]---
 
-        switch (seq) {
-        case REQ_FSEQ_PREFLUSH:
-+               BUG_ON(rq->queuelist.next == NULL);
-+               fallthrough;
-        case REQ_FSEQ_POSTFLUSH:
-+               BUG_ON(rq->queuelist.next == NULL);
-                /* queue for flush */
-                if (list_empty(pending))
-                        fq->flush_pending_since = jiffies;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d98654869615..908fdfb62132 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2963,6 +2963,8 @@ void blk_mq_submit_bio(struct bio *bio)
-                        return;
-        }
+-- 
+Best Regards,
+  Yi Zhang
 
-+       BUG_ON(rq->queuelist.next == NULL);
-+
-        trace_block_getrq(bio);
-
-        rq_qos_track(q, rq, bio);
-@@ -2977,6 +2979,8 @@ void blk_mq_submit_bio(struct bio *bio)
-                return;
-        }
-
-+       BUG_ON(rq->queuelist.next == NULL);
-+
-        if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
-                return;
