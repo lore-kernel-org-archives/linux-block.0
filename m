@@ -1,124 +1,69 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B66A4AEDF
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2980023C9
+	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 06:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716873959; cv=none; b=NPNQWaBObRk/nWJKx6UF4Dl/BZlRnCs4m1L0zggx8tHdZUeE/FQdNbXRtrOF1W1ynBW+FrMDOQ2AiXk4NVjWaB7vpplY3U4ZJioXPK/yzwHCeCeSvxpyGHG4T13pFVhfs7LP7+uKTAGCc1h/VmjHsXMTq5fC/CHJCEDtGpA/Tqg=
+	t=1716877735; cv=none; b=X3fjbOILEbI3six7C9TdBPmhTnSNU61m1E1MulZ+2fLJm6v/xuzhhHXgnNvnNbv2TVMTHLtNkz8XSTRCkp6MQbbqPfmQQ9vDNnOAPEqWKGkXhX4GScfuYHZF2bgMIP/hINALbeSH9iP6BbisUFBVtnKxHyMgdfvET6QKcgevgK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716873959; c=relaxed/simple;
-	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=pA63PJ3lEjfqOVQ7SeDC4WLTJQpmcgH9oprp3utAO6UmFcXwpIhcLpHNIf386lXULo77g0irjzdSVh+boH/f4jsGf1RANaEEI4GpRkPYnCDRwtFaz4KCqfLyM/vqRQHoBZ36XgMfm0VbqAb24Zn5RzxU5w02mjd3q4kR8xWp9/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=eKQU0NpT; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1716877735; c=relaxed/simple;
+	bh=EZcPaKGqPkm4sCZIAQ4m6dMMeBWczsW78U41g2vY5us=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vj3xsnNH+BiqZmf7oXzaO0HKbO4yL40Ky16G4luYkwDAFNP4QzQcW2FfKnrbaKwZELyRgUBM21+Sv51qhJ48Rvesibimsxl21Zxtywa0yQeZ3c2S12e26u2sQfSVcmtvYFt3L0k83kGANf4FcIxBrFMG4TF76/XwOWGJUUHhA+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drjX7T5X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="eKQU0NpT"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240528052554epoutp02a391cadf673f9ca13aa9e8eb7e97773f~Tj8Pk-GHW0236602366epoutp02H
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:25:54 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240528052554epoutp02a391cadf673f9ca13aa9e8eb7e97773f~Tj8Pk-GHW0236602366epoutp02H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1716873954;
-	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=eKQU0NpT9fiumiFihgz705hQjzUXrszAaZpp/j0121QE7PT+cS30aAYVZCtHktQ2g
-	 RBJVwy6OfsXUAyZLlrzlpZwlbx3Ply6Z9GUmmQJLfEz4StEBXKUHGG6W3eQYrf/zHx
-	 TrzEGHpL8LUhDGqkPayXsMJq3LmjOgEQnR5tBDVQ=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240528052554epcas5p1110e43a96b238c1cf5435fb3f5d379bf~Tj8PKzHc72041920419epcas5p1p;
-	Tue, 28 May 2024 05:25:54 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.174]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4VpLZm5NhQz4x9QH; Tue, 28 May
-	2024 05:25:52 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	95.33.10035.FDA65566; Tue, 28 May 2024 14:25:51 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240528052550epcas5p27a89e7264e9058afad39e0d8970235a9~Tj8MQyse02997129971epcas5p24;
-	Tue, 28 May 2024 05:25:50 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240528052550epsmtrp24139879fedea4bd8e4e03e79ff4be473~Tj8MQGGwA1060410604epsmtrp2p;
-	Tue, 28 May 2024 05:25:50 +0000 (GMT)
-X-AuditID: b6c32a4b-b11fa70000002733-be-66556adf2de7
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	34.50.07412.EDA65566; Tue, 28 May 2024 14:25:50 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240528052549epsmtip1a2ad4691ce9efe5d243006691de7865f~Tj8KqaO2h3181531815epsmtip1W;
-	Tue, 28 May 2024 05:25:49 +0000 (GMT)
-Message-ID: <4f35011f-c710-c207-ebfc-68f7117cced1@samsung.com>
-Date: Tue, 28 May 2024 10:55:48 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drjX7T5X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E065C3277B;
+	Tue, 28 May 2024 06:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716877734;
+	bh=EZcPaKGqPkm4sCZIAQ4m6dMMeBWczsW78U41g2vY5us=;
+	h=From:To:Cc:Subject:Date:From;
+	b=drjX7T5XSXQxINt3g4ymLAw8jqQqjpYSwydBapbB39WNpS4CRdfs/oxxMqSEjFrnB
+	 f7BvjqgrNCiSX8UYPEPK1kj1JMiwc3OD06+5s9jF7RgkiVvFn6mvZxUyifd+rmf0jt
+	 1t+CC3x1PMmBX41ZDOKi8UYEi/bcHY9ZDFSV9KkswoPAGraPh8LnjcmRajfdcQBpws
+	 p3/mE/6FSGRQFDyn9ke9PDbjwJPFWi4Rfdz6CGpHSQMxDINXHipGrry4hcqjuR8SRM
+	 4UfvsKOGBq2A5PsxssvOkHo2DNNOBoDLWas0Dh2Q1eoe1xAiZq9RjWt+C20pJsVo46
+	 mpKG5QlJaveag==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Niklas Cassel <cassel@kernel.org>
+Subject: [PATCH] null_blk: Print correct max open zones limit in null_init_zoned_dev()
+Date: Tue, 28 May 2024 15:28:52 +0900
+Message-ID: <20240528062852.437599-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH 1/2 v4] block: change rq_integrity_vec to respect the
- iterator
-Content-Language: en-US
-To: Mikulas Patocka <mpatocka@redhat.com>, Axboe <axboe@kernel.dk>, Keith
-	Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg
-	<sagi@grimberg.me>, Mike Snitzer <snitzer@kernel.org>, Milan Broz
-	<gmazyland@gmail.com>, Anuj gupta <anuj1072538@gmail.com>
-Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-nvme@lists.infradead.org
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <49d1afaa-f934-6ed2-a678-e0d428c63a65@redhat.com>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrLJsWRmVeSWpSXmKPExsWy7bCmuu79rNA0g+8XRSw+fv3NYrH6bj+b
-	xYJFc1ksju2fxW6xcvVRJotJh64xWuy9pW0xf9lTdouJHVeZLNa9fs9iceKWtAO3x85Zd9k9
-	zt/byOJx+Wypx6ZVnWwem5fUe7zYPJPRY/fNBjaP9/uusnl83iQXwBmVbZORmpiSWqSQmpec
-	n5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdKqSQlliTilQKCCxuFhJ386m
-	KL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITvjz9nTrAUmFdfm9jE1
-	MOp2MXJySAiYSBzpvsbcxcjFISSwm1Fi0oYZLBDOJ0aJnaeOM0E43xglGnZeZ4NpmbvuE1Ri
-	L6PE40N/oPrfMkrcmLMCyOHg4BWwk/i32hukgUVAVWJC6wtWEJtXQFDi5MwnLCC2qECyxM+u
-	A2BDhQVCJB7dn8gEYjMLiEvcejIfbIGIwBQmicvzOtggEtESB95cYwKZzyagKXFhcilImBNo
-	1Zfnd9khSuQltr+dA3aPhMABDokFR2czQVztIvFu8W9WCFtY4tXxLewQtpTE53d7oT5Llrg0
-	8xxUfYnE4z0HoWx7idZT/WB/MQPtXb9LH2IXn0Tv7ydg50gI8Ep0tAlBVCtK3Jv0FGqTuMTD
-	GUugbA+JZ2v+QUP3MKPEnRkLmSYwKsxCCpZZSN6fheSdWQibFzCyrGKUTC0ozk1PLTYtMM5L
-	LYdHd3J+7iZGcDrW8t7B+OjBB71DjEwcjIcYJTiYlUR4ReYFpgnxpiRWVqUW5ccXleakFh9i
-	NAXGz0RmKdHkfGBGyCuJNzSxNDAxMzMzsTQ2M1QS533dOjdFSCA9sSQ1OzW1ILUIpo+Jg1Oq
-	gUm5a+auW4FNZk8W9quGLPbf7GK54Hy4xR2tsyXr+tXedhzvfT3lZYbnilsS7MnubjPONWXX
-	dCcxmIh2pySeurL98nwuzn0Tygqnvt29WTKGr/zGI+61/RsZH/Z4brppGaBp9yvcXJavPz9A
-	+rJ+m82xOzph7mZz68PN67zOlNzYEXtrwgvjhtUdiU28h7bu6L6+td3Qh6d8Q2F0fowR7/lX
-	IaGn+F+qvOhI7tm+962p0InsjZf7w8O8Xun7GSfc23Rwjd7qL/JmT64uuP3AoLj22j3J99yJ
-	yy8JfrCatSdNu3IHi9yWTyaPAoqq5EVYheo8e5d9L5rTfKRr2/+fmx4atlrZtxr8MuFafvz/
-	VCWW4oxEQy3mouJEACXD/5BQBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsWy7bCSnO69rNA0g8UXDC0+fv3NYrH6bj+b
-	xYJFc1ksju2fxW6xcvVRJotJh64xWuy9pW0xf9lTdouJHVeZLNa9fs9iceKWtAO3x85Zd9k9
-	zt/byOJx+Wypx6ZVnWwem5fUe7zYPJPRY/fNBjaP9/uusnl83iQXwBnFZZOSmpNZllqkb5fA
-	lfHn7GnWApOKa3P7mBoYdbsYOTkkBEwk5q77xNTFyMUhJLCbUWLq34nsEAlxieZrP6BsYYmV
-	/56D2UICrxkllizy6mLk4OAVsJP4t9obJMwioCoxofUFK4jNKyAocXLmExYQW1QgWeLlH4iR
-	wgIhEo/uT2QCsZmBxt96Mh9sr4jAFCaJ3rUNjBCJaInjRx4xQxx0mFHiX/MXdpBlbAKaEhcm
-	l4LUcALt/fL8LjtEvZlE19YuqF55ie1v5zBPYBSaheSOWUj2zULSMgtJywJGllWMkqkFxbnp
-	ucmGBYZ5qeV6xYm5xaV56XrJ+bmbGMGRp6Wxg/He/H96hxiZOBgPMUpwMCuJ8IrMC0wT4k1J
-	rKxKLcqPLyrNSS0+xCjNwaIkzms4Y3aKkEB6YklqdmpqQWoRTJaJg1OqgenxewMWzq3zMqeK
-	ibTc+906yVFE9d6SqAAJ41xZ1Yv7WvOLcqTuThQyUlnbEKzcVug3oz39mYrMw/crKpTLb16W
-	rijo+/9qe3KcZvky66sHbqWvi7Pom3jsbNGjJ6dcT51/4fEgz1iB9d/ig2W1nZMCPxRH56Su
-	5kw+L31EZuYZdYmfhlKMamunFghuvZ03c5niUWXtNSeNPPbUHJHWLJ716ZWpznou/mUm3T1G
-	2vm8Lkp1PN/n7GFXvNQnlLSqdX3Dzbjzt7llrvIyHtGMj7o3VST4uonItNkntsmtOXT6sf/a
-	XSsynI201+f7bl3Iaek6xeXy57WH7gl9VGj8OHVTdEJcrjSbnc2+N9dvHFBiKc5INNRiLipO
-	BAB+qBLmKwMAAA==
-X-CMS-MailID: 20240528052550epcas5p27a89e7264e9058afad39e0d8970235a9
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240527154143epcas5p3a7738864fd2eff65f8dab75b2fd9f1e8
-References: <719d2e-b0e6-663c-ec38-acf939e4a04b@redhat.com>
-	<CGME20240527154143epcas5p3a7738864fd2eff65f8dab75b2fd9f1e8@epcas5p3.samsung.com>
-	<49d1afaa-f934-6ed2-a678-e0d428c63a65@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+When changing the maximum number of open zones, print that number
+instead of the total number of zones.
+
+Fixes: dc4d137ee3b7 ("null_blk: add support for max open/active zone limit for zoned devices")
+Cc: stable@vger.kernel.org
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ drivers/block/null_blk/zoned.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+index 5b5a63adacc1..79c8e5e99f7f 100644
+--- a/drivers/block/null_blk/zoned.c
++++ b/drivers/block/null_blk/zoned.c
+@@ -108,7 +108,7 @@ int null_init_zoned_dev(struct nullb_device *dev,
+ 	if (dev->zone_max_active && dev->zone_max_open > dev->zone_max_active) {
+ 		dev->zone_max_open = dev->zone_max_active;
+ 		pr_info("changed the maximum number of open zones to %u\n",
+-			dev->nr_zones);
++			dev->zone_max_open);
+ 	} else if (dev->zone_max_open >= dev->nr_zones - dev->zone_nr_conv) {
+ 		dev->zone_max_open = 0;
+ 		pr_info("zone_max_open limit disabled, limit >= zone count\n");
+-- 
+2.45.1
 
