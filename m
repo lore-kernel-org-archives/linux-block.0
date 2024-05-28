@@ -1,171 +1,158 @@
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044CB1429B
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 04:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011E344C87
+	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716869427; cv=none; b=I1gZB9nFQ85fvoc6XaUABaYSFU3h556y+FoWbt1FlaC8JtNqdgOdsKhSLT+Fi8M8FokBQPwNubOSHZK6Mt6DjUZRE/DxzKFbGdJD2+DvJhwyeIS0X0m3McUZlyccJBTodHNO3Hlagd+6rngOQNIybVXgnKIZiY/gBpijP8uqcOI=
+	t=1716872773; cv=none; b=KnCLTS/sx16RTHWCNet99DuWTPUNKbqMDsfp6XFXYEAiRv5Wlg0VDkKCptvt1NApuXezvUpfvkQnm+46cmVfDhCRSp9hTZU4nkuCmjoGtRJppB8mrVwTxGPaLWndSHeES8DwpbfyGElB4XoP8DmfSjmVpCJ5PgMXwpAw8XbpfH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716869427; c=relaxed/simple;
-	bh=0cvZepUIvNJXoV7lW6K9xAhU2kcSdcBqVcvBUB6Iwh0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QMbLXr6Hlf19kLUgRuh7jD/DybFmoiBHxkpTG4A8xSCsCWe4DjzkYPYs8KV3uFv44ySwtwEiIDQjEpbjc9qNpJ+3OKuORIYaOFJvn6TDlskh8t09Lg4JWRLIelzGBKELgYo6gzYosChqUPn5iv2nvCimA4HxM9v7EucYCv0Vq7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7e94cac3c71so50503339f.2
-        for <linux-block@vger.kernel.org>; Mon, 27 May 2024 21:10:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716869425; x=1717474225;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/nOHnGS86ObooVRSXIaAI7W3Fp4Nqiw6Bm7kqUuJil0=;
-        b=C4a48XrjeFHXm+YHMX8J45bHhHW95gUuIbwGk0SgLfTXQ+02HIbNXJJNxNRWF+PWpd
-         NoP9VcNruS28HzYUgq4TIm/Okx7PHkNP/h0ZMLS/+/S6RrMy9B1CjYSFEz9ibt1/NIsr
-         QGf2sls38HZf4j2rZUaTptBhEFnwewSZ5b7HodnZ8K3lCticdl3Td+47EAG8++9h7u2u
-         NW01D+k+/feLTYigrcWJMnq7vAOnMySBsk2Eke7cG9SjVIXKVVP6EHgncmuXMXqajDZ/
-         W7O+mEnI1mOU4w0lR+V9yVjqwXOcBIlvPrLztUmCDWz/p1+eSiOUPLjOaf/hQEOV6kD5
-         xpcA==
-X-Forwarded-Encrypted: i=1; AJvYcCWT/yHXp95Ga6Vu90LB+xTy097HNhLBNbhmlmlfYv7bmUjm3dddu03eihE9yJLIZzYoqHAV/HByacjvYt9ll285kMgcdm9fbvuipSI=
-X-Gm-Message-State: AOJu0YxmQeV1vHMx7UC4pTqD0xzRnBMBwYqceD3JNqwF8cZ9EfJvrMnf
-	aH82sU5Djm+sLtAZ2n0PuBcE1B59IZ7wsg8Ucgy3QdCWl+oiK8BAMPyhosiIkKtUF6MO5P+h5w0
-	B1ZrAKUffYiXv4KoPToaACf1vWNvlZtEwxmpcVfaFYlbvOOolsX74LGc=
-X-Google-Smtp-Source: AGHT+IF/wjHJpGze8sQyAJ3okRfBV5NbehwLwnkkI/fPSgAOr804e4B/PiigRWuLxgBbCsnIMcuMIdunbN2ytB0L5cDV1+q3FO6x
+	s=arc-20240116; t=1716872773; c=relaxed/simple;
+	bh=DS4CinmS5NhhvcFvqcc1PRc0k1RkSciE4FtXUUX6P94=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3zjyo07qrmTFHnX1mF6HWvfw/M2/U5TVD+A9J4vxlOtMLuqAuo4pQFvtTnaygAaU6j3Ytei9Mg2qdlwehUvNUadOy3Esw8n2cGYDbaUe60cpa8OsHPJCP06Uyz3edEfSW+hG1svHl5URpL+m5SeH32WDp6msBcF4YIb3rsgqwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=Kp0t7lGa; arc=none smtp.client-ip=85.214.250.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="Kp0t7lGa"
+Received: from 8bytes.org (pd9fe9dd8.dip0.t-ipconnect.de [217.254.157.216])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.8bytes.org (Postfix) with ESMTPSA id 1CB831C0DAD;
+	Tue, 28 May 2024 07:00:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
+	s=default; t=1716872440;
+	bh=DS4CinmS5NhhvcFvqcc1PRc0k1RkSciE4FtXUUX6P94=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Kp0t7lGagTLNobtAhiPc4wiYVvExIjI2XKNmFlXsV3TJh45zyqHCOnKYP8NFkdTvr
+	 u556+XAvdgxBae9UCTaD9YBoD9Pt9FvmM4oIf5dWUESutS9Tupbe9j+V14xNU6mznX
+	 eiOUInKX6c5ffhC08w1r/FLceuVc78j4t93ttlFeR95Tp27KoJ0uyYWkNkq9JfodOU
+	 /gTQZVhgYxEydgONmqJUSu2OzYUx/G1oUh8WHC1t3Z5430nnFwmChKWem+qQEDt157
+	 3zubd8MJbmyZ48eP4tl4vOHZcrNkZ8YoWFmDpGNyhos/Xo5vt7cyn5KxlkSZCQ0IsF
+	 bV18JVpKgazLw==
+Date: Tue, 28 May 2024 07:00:39 +0200
+From: Joerg Roedel <joro@8bytes.org>
+To: Yi Zhang <yi.zhang@redhat.com>, Vasant Hegde <vasant.hegde@amd.com>
+Cc: linux-block <linux-block@vger.kernel.org>, iommu@lists.linux.dev,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	suravee.suthikulpanit@amd.com
+Subject: Re: [bug report][regression] blktests block/008 lead kerne panic at
+ RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
+Message-ID: <ZlVk95sNtdkzZ8bE@8bytes.org>
+References: <CAHj4cs9KZJc6Wsp9t0fDc4fDBJB1TmwGT7-8peCGLiqW3J_Fqw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca0d:0:b0:36c:4b17:e05d with SMTP id
- e9e14a558f8ab-3737b3fe339mr10509935ab.4.1716869425110; Mon, 27 May 2024
- 21:10:25 -0700 (PDT)
-Date: Mon, 27 May 2024 21:10:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000035b2ce06197bd027@google.com>
-Subject: [syzbot] [block?] INFO: task hung in bdev_open
-From: syzbot <syzbot+5c6179f2c4f1e111df11@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHj4cs9KZJc6Wsp9t0fDc4fDBJB1TmwGT7-8peCGLiqW3J_Fqw@mail.gmail.com>
 
-Hello,
+Adding Vasant.
 
-syzbot found the following issue on:
-
-HEAD commit:    6fbf71854e2d Merge tag 'perf-tools-fixes-for-v6.10-1-2024-..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15b4942c980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ee7b962709a5f5a5
-dashboard link: https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/91effa72f285/disk-6fbf7185.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c6afe2efff99/vmlinux-6fbf7185.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/46aae93f5511/bzImage-6fbf7185.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5c6179f2c4f1e111df11@syzkaller.appspotmail.com
-
-INFO: task udevd:16174 blocked for more than 143 seconds.
-      Not tainted 6.9.0-syzkaller-12400-g6fbf71854e2d #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:udevd           state:D stack:23920 pid:16174 tgid:16174 ppid:1      flags:0x00000002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x1796/0x49d0 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- bdev_open+0xe5/0xc60 block/bdev.c:897
- blkdev_open+0x20d/0x2e0 block/fops.c:615
- do_dentry_open+0x95a/0x1720 fs/open.c:955
- do_open fs/namei.c:3650 [inline]
- path_openat+0x289f/0x3280 fs/namei.c:3807
- do_filp_open+0x235/0x490 fs/namei.c:3834
- do_sys_openat2+0x13e/0x1d0 fs/open.c:1405
- do_sys_open fs/open.c:1420 [inline]
- __do_sys_openat fs/open.c:1436 [inline]
- __se_sys_openat fs/open.c:1431 [inline]
- __x64_sys_openat+0x247/0x2a0 fs/open.c:1431
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f7f09b169a4
-RSP: 002b:00007fffaaf9cc90 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 000055bf84d3cdb0 RCX: 00007f7f09b169a4
-RDX: 00000000000a0800 RSI: 000055bf84d19770 RDI: 00000000ffffff9c
-RBP: 000055bf84d19770 R08: 0000000000000001 R09: 7fffffffffffffff
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000a0800
-R13: 000055bf84d2b2c0 R14: 0000000000000001 R15: 000055bf84d18910
- </TASK>
-INFO: task syz-executor.1:16345 blocked for more than 143 seconds.
-      Not tainted 6.9.0-syzkaller-12400-g6fbf71854e2d #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.1  state:D stack:21168 pid:16345 tgid:16344 ppid:15599  flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x1796/0x49d0 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- bdev_release+0x184/0x700 block/bdev.c:1080
- blkdev_release+0x15/0x20 block/fops.c:623
- __fput+0x406/0x8b0 fs/file_table.c:422
- task_work_run+0x24f/0x310 kernel/task_work.c:180
- get_signal+0x15e6/0x1740 kernel/signal.c:2681
- arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
- exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0xc9/0x370 kernel/entry/common.c:218
- do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f297527cee9
-RSP: 002b:00007f297608b0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: 0000000000000000 RBX: 00007f29753abf80 RCX: 00007f297527cee9
-RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000006
-RBP: 00007f29752c949e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f29753abf80 R15: 00007ffd34ac6de8
- </TASK>
-INFO: task syz-executor.1:16353 blocked for more than 144 seconds.
-      Not tainted 6.9.0-syzkaller-12400-g6fbf71854e2d #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.1  state:D stack:18712 pid:16353 tgid:16344 ppid:15599  flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x1796/0x49d0 kernel/sched/core.c:6745
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+On Tue, May 28, 2024 at 10:23:10AM +0800, Yi Zhang wrote:
+> Hello
+> I found this regression panic issue on the latest 6.10-rc1 and it
+> cannot be reproduced on 6.9, please help check and let me know if you
+> need any info/testing for it, thanks.
+> 
+> reproducer
+> # cat config
+> TEST_DEVS=(/dev/nvme0n1 /dev/nvme1n1)
+> # ./check block/008
+> block/008 => nvme0n1 (do IO while hotplugging CPUs)
+>     read iops  131813   ...
+>     runtime    32.097s  ...
+> 
+> [  973.823246] run blktests block/008 at 2024-05-27 22:11:38
+> [  977.485983] kernel tried to execute NX-protected page - exploit
+> attempt? (uid: 0)
+> [  977.493463] BUG: unable to handle page fault for address: ffffffffb3d5e310
+> [  977.500334] #PF: supervisor instruction fetch in kernel mode
+> [  977.505992] #PF: error_code(0x0011) - permissions violation
+> [  977.511567] PGD 719225067 P4D 719225067 PUD 719226063 PMD 71a5ff063
+> PTE 8000000719d5e163
+> [  977.519662] Oops: Oops: 0011 [#1] PREEMPT SMP NOPTI
+> [  977.524541] CPU: 4 PID: 42 Comm: cpuhp/4 Not tainted
+> 6.10.0-0.rc1.17.eln136.x86_64 #1
+> [  977.532366] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS
+> 2.13.3 09/12/2023
+> [  977.540017] RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
+> [  977.545329] Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 00 00 00 00 00 00 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 00
+> 00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40
+> 00 00
+> [  977.564076] RSP: 0018:ffffa5bd80437e58 EFLAGS: 00010246
+> [  977.569301] RAX: ffffffffb324bf00 RBX: ffff8f40df020820 RCX: 0000000000000000
+> [  977.576433] RDX: 0000000000000001 RSI: 00000000000000c0 RDI: 0000000000000004
+> [  977.583567] RBP: 0000000000000004 R08: ffff8f40df020848 R09: ffff8f398664ece0
+> [  977.590698] R10: 0000000000000000 R11: 0000000000000008 R12: 00000000000000c0
+> [  977.597833] R13: ffffffffb3d5e310 R14: 0000000000000000 R15: ffff8f40df020848
+> [  977.604963] FS:  0000000000000000(0000) GS:ffff8f40df000000(0000)
+> knlGS:0000000000000000
+> [  977.613050] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  977.618795] CR2: ffffffffb3d5e310 CR3: 0000000719220000 CR4: 0000000000350ef0
+> [  977.625927] Call Trace:
+> [  977.628376]  <TASK>
+> [  977.630480]  ? srso_return_thunk+0x5/0x5f
+> [  977.634491]  ? show_trace_log_lvl+0x255/0x2f0
+> [  977.638851]  ? show_trace_log_lvl+0x255/0x2f0
+> [  977.643213]  ? cpuhp_invoke_callback+0x122/0x410
+> [  977.647830]  ? __die_body.cold+0x8/0x12
+> [  977.651669]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+> [  977.656979]  ? page_fault_oops+0x146/0x160
+> [  977.661080]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+> [  977.666392]  ? exc_page_fault+0x152/0x160
+> [  977.670405]  ? asm_exc_page_fault+0x26/0x30
+> [  977.674590]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+> [  977.679905]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+> [  977.685215]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
+> [  977.690527]  cpuhp_invoke_callback+0x122/0x410
+> [  977.694977]  ? __pfx_smpboot_thread_fn+0x10/0x10
+> [  977.699593]  cpuhp_thread_fun+0x98/0x140
+> [  977.703521]  smpboot_thread_fn+0xdd/0x1d0
+> [  977.707533]  kthread+0xd2/0x100
+> [  977.710677]  ? __pfx_kthread+0x10/0x10
+> [  977.714431]  ret_from_fork+0x34/0x50
+> [  977.718009]  ? __pfx_kthread+0x10/0x10
+> [  977.721763]  ret_from_fork_asm+0x1a/0x30
+> [  977.725692]  </TASK>
+> [  977.727879] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4
+> dns_resolver nfs lockd grace netfs sunrpc vfat fat dm_multipath
+> ipmi_ssif amd_atl intel_rapl_msr intel_rapl_common amd64_edac
+> edac_mce_amd dell_wmi sparse_keymap rfkill video kvm_amd dcdbas kvm
+> dell_smbios dell_wmi_descriptor wmi_bmof rapl mgag200 pcspkr
+> acpi_cpufreq i2c_algo_bit acpi_power_meter ptdma k10temp i2c_piix4
+> ipmi_si acpi_ipmi ipmi_devintf ipmi_msghandler fuse xfs sd_mod sg ahci
+> crct10dif_pclmul nvme libahci crc32_pclmul crc32c_intel mpt3sas
+> ghash_clmulni_intel libata nvme_core tg3 ccp nvme_auth raid_class
+> t10_pi scsi_transport_sas sp5100_tco wmi dm_mirror dm_region_hash
+> dm_log dm_mod
+> [  977.786224] CR2: ffffffffb3d5e310
+> [  977.789544] ---[ end trace 0000000000000000 ]---
+> [  977.883220] RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
+> [  977.888532] Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 00 00 00 00 00 00 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 00
+> 00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40
+> 00 00
+> [  977.907277] RSP: 0018:ffffa5bd80437e58 EFLAGS: 00010246
+> [  977.912503] RAX: ffffffffb324bf00 RBX: ffff8f40df020820 RCX: 0000000000000000
+> [  977.919633] RDX: 0000000000000001 RSI: 00000000000000c0 RDI: 0000000000000004
+> [  977.926767] RBP: 0000000000000004 R08: ffff8f40df020848 R09: ffff8f398664ece0
+> [  977.933900] R10: 0000000000000000 R11: 0000000000000008 R12: 00000000000000c0
+> [  977.941030] R13: ffffffffb3d5e310 R14: 0000000000000000 R15: ffff8f40df020848
+> [  977.948163] FS:  0000000000000000(0000) GS:ffff8f40df000000(0000)
+> knlGS:0000000000000000
+> [  977.956251] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  977.961995] CR2: ffffffffb3d5e310 CR3: 0000000719220000 CR4: 0000000000350ef0
+> [  977.969129] Kernel panic - not syncing: Fatal exception
+> [  977.974439] Kernel Offset: 0x30400000 from 0xffffffff81000000
+> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> [  978.087528] ---[ end Kernel panic - not syncing: Fatal exception ]---
+> 
+> -- 
+> Best Regards,
+>   Yi Zhang
+> 
