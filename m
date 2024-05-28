@@ -1,176 +1,171 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BC717E8E7
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 03:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044CB1429B
+	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 04:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716868101; cv=none; b=d2a7QKybbwCQKvtNoTDd+VkGssG8OqXsgXsmtC4yanlZ8OJSv3x+7shwCNjQVcTCUp7lf25te7gkI4gBL+KfgfafZixfjWj2bpYtso1b8BMr3W8DiRlzJUMA3r3XQlO+thXUkv6OkoCwhQ7rHFB2m7qbWttr4PuVjmnAv3Y3Szc=
+	t=1716869427; cv=none; b=I1gZB9nFQ85fvoc6XaUABaYSFU3h556y+FoWbt1FlaC8JtNqdgOdsKhSLT+Fi8M8FokBQPwNubOSHZK6Mt6DjUZRE/DxzKFbGdJD2+DvJhwyeIS0X0m3McUZlyccJBTodHNO3Hlagd+6rngOQNIybVXgnKIZiY/gBpijP8uqcOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716868101; c=relaxed/simple;
-	bh=yyeBDjI04HvU5PJEMYDx4SQI7kbJQ7UbZoy41Jy4YF0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bwdGipDlnSBbqoYR5MyOAoeEaUW8F3JsFAql39LJH+zrOagtwoFFu/jl3Yf0llbbTUeTfDtxvkWHxi17hBI9W5lVQyIemq773Z+iXmrYmk96KJtIDWrCV3wBd36mAO51/tQ6WaE9IId3IIwV87u4GgtYMUlAxUIzZB2Lj2PbiTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfbxV3Cj; arc=none smtp.client-ip=209.85.221.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfbxV3Cj"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4e4f02f4c6fso101390e0c.2
-        for <linux-block@vger.kernel.org>; Mon, 27 May 2024 20:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716868097; x=1717472897; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tMwY3jSjxqwMDaKFlhd/s9pzladNU9TjXZV/5WHBypU=;
-        b=GfbxV3CjRU+IYzwO+qlb3fJSAfGsfuUPy9dQ+q+G31VVQIEx64w4IRNskUe/vvrZgI
-         S//ml5X9dSBbgb/0tkUBMLMTfQAT+flsvGy0yPJQ7lLFjiJvQVfH5acg7HFPqXPKXJWr
-         CUxFdSnNznz1oTefX+QYDXhxqldN/0R3i8twrTFpsIEC4wYnHzDx/5KI/tDK2jsAszf6
-         477UqhKfkcoAYKyLNQzlY4YXfM8WAkaNEw0HfjN85yfcR8EDs/j5nMtRMtoxev9G0jwm
-         TsVOG0ZFiXtx87mxnrV/OvwR44GCTz/aowGsDPr+o+qpvJHHMYsSr/5r1JvBjAjo/5sC
-         gbcw==
+	s=arc-20240116; t=1716869427; c=relaxed/simple;
+	bh=0cvZepUIvNJXoV7lW6K9xAhU2kcSdcBqVcvBUB6Iwh0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QMbLXr6Hlf19kLUgRuh7jD/DybFmoiBHxkpTG4A8xSCsCWe4DjzkYPYs8KV3uFv44ySwtwEiIDQjEpbjc9qNpJ+3OKuORIYaOFJvn6TDlskh8t09Lg4JWRLIelzGBKELgYo6gzYosChqUPn5iv2nvCimA4HxM9v7EucYCv0Vq7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7e94cac3c71so50503339f.2
+        for <linux-block@vger.kernel.org>; Mon, 27 May 2024 21:10:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716868097; x=1717472897;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tMwY3jSjxqwMDaKFlhd/s9pzladNU9TjXZV/5WHBypU=;
-        b=t6UZD2vxlbLBjrkyRspjeE9hGSAfgTEluH5xKnp3B1+h5noAjm6JDZJGN1/fh8nWaN
-         5cwk2Bgkp3wGYKM3dtfIl4d36+YrGccFIrXL36l+FeU2BAzfyxlQLIU82SFdpIDlprr6
-         N2dFVC/BLlg4DPK+EnQIzk+6/co0njsSfM70fyIOIZtcv8hbwdrRWPcTYhj/6PSOE8c1
-         U4RKguZX0SJgWT/sBn4uP9tHt8OfLZMYrhiZ3V7gqvRgHltK+VXhyARdFrifgSRjcUkN
-         j1YiEnX5e615WO7BqwydTgI6y5XbHqQi4m20Imz+5sqbSLVIly7bX8dIMyETWbHb3JId
-         2bgw==
-X-Forwarded-Encrypted: i=1; AJvYcCVaYls32s93JEFN0r7CUh6ZVCIilUeYpmFx0wVKBbISKQtxBUM4QGG6jQmr6AHlVKfOFqX1IV4VETt0ghKAYQ6dZm8DtuL/rqXbeJI=
-X-Gm-Message-State: AOJu0YzBhk8784vBMBp8BI6JvNkMLp8/7wKmnYUv8pzYm560IGovRYB+
-	SKbi2hkBpq4K8nO94L2Wbwd4qFWmeKtOawucXWHKfYTqIddlkZ2S1yO+1IGAFm8c16ByVDDMREq
-	7KCMbXtNTC9K0a1VR/2DsWDw+9g==
-X-Google-Smtp-Source: AGHT+IEebTthiV+k9KwZYbfA6UqXjceghKuE5RhC9df1UxBYQNbJVxSNh4yrualQ39ZzH38xtnqX/A3NTiH2tP5u528=
-X-Received: by 2002:a05:6122:3c54:b0:4e4:e998:bf88 with SMTP id
- 71dfb90a1353d-4e4f02e3f3dmr10489613e0c.13.1716868097258; Mon, 27 May 2024
- 20:48:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716869425; x=1717474225;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/nOHnGS86ObooVRSXIaAI7W3Fp4Nqiw6Bm7kqUuJil0=;
+        b=C4a48XrjeFHXm+YHMX8J45bHhHW95gUuIbwGk0SgLfTXQ+02HIbNXJJNxNRWF+PWpd
+         NoP9VcNruS28HzYUgq4TIm/Okx7PHkNP/h0ZMLS/+/S6RrMy9B1CjYSFEz9ibt1/NIsr
+         QGf2sls38HZf4j2rZUaTptBhEFnwewSZ5b7HodnZ8K3lCticdl3Td+47EAG8++9h7u2u
+         NW01D+k+/feLTYigrcWJMnq7vAOnMySBsk2Eke7cG9SjVIXKVVP6EHgncmuXMXqajDZ/
+         W7O+mEnI1mOU4w0lR+V9yVjqwXOcBIlvPrLztUmCDWz/p1+eSiOUPLjOaf/hQEOV6kD5
+         xpcA==
+X-Forwarded-Encrypted: i=1; AJvYcCWT/yHXp95Ga6Vu90LB+xTy097HNhLBNbhmlmlfYv7bmUjm3dddu03eihE9yJLIZzYoqHAV/HByacjvYt9ll285kMgcdm9fbvuipSI=
+X-Gm-Message-State: AOJu0YxmQeV1vHMx7UC4pTqD0xzRnBMBwYqceD3JNqwF8cZ9EfJvrMnf
+	aH82sU5Djm+sLtAZ2n0PuBcE1B59IZ7wsg8Ucgy3QdCWl+oiK8BAMPyhosiIkKtUF6MO5P+h5w0
+	B1ZrAKUffYiXv4KoPToaACf1vWNvlZtEwxmpcVfaFYlbvOOolsX74LGc=
+X-Google-Smtp-Source: AGHT+IF/wjHJpGze8sQyAJ3okRfBV5NbehwLwnkkI/fPSgAOr804e4B/PiigRWuLxgBbCsnIMcuMIdunbN2ytB0L5cDV1+q3FO6x
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <719d2e-b0e6-663c-ec38-acf939e4a04b@redhat.com> <49d1afaa-f934-6ed2-a678-e0d428c63a65@redhat.com>
-In-Reply-To: <49d1afaa-f934-6ed2-a678-e0d428c63a65@redhat.com>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Tue, 28 May 2024 09:17:40 +0530
-Message-ID: <CACzX3AvanzKyVFsyWOLyQMXo8oYOX=fggPaW_Uej+KUNfhMmFA@mail.gmail.com>
-Subject: Re: [PATCH 1/2 v4] block: change rq_integrity_vec to respect the iterator
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Sagi Grimberg <sagi@grimberg.me>, Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>, 
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
-	linux-nvme@lists.infradead.org
+X-Received: by 2002:a92:ca0d:0:b0:36c:4b17:e05d with SMTP id
+ e9e14a558f8ab-3737b3fe339mr10509935ab.4.1716869425110; Mon, 27 May 2024
+ 21:10:25 -0700 (PDT)
+Date: Mon, 27 May 2024 21:10:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000035b2ce06197bd027@google.com>
+Subject: [syzbot] [block?] INFO: task hung in bdev_open
+From: syzbot <syzbot+5c6179f2c4f1e111df11@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 27, 2024 at 9:10=E2=80=AFPM Mikulas Patocka <mpatocka@redhat.co=
-m> wrote:
->
-> If we allocate a bio that is larger than NVMe maximum request size,
-> attach integrity metadata to it and send it to the NVMe subsystem, the
-> integrity metadata will be corrupted.
->
-> Splitting the bio works correctly. The function bio_split will clone the
-> bio, trim the iterator of the first bio and advance the iterator of the
-> second bio.
->
-> However, the function rq_integrity_vec has a bug - it returns the first
-> vector of the bio's metadata and completely disregards the metadata
-> iterator that was advanced when the bio was split. Thus, the second bio
-> uses the same metadata as the first bio and this leads to metadata
-> corruption.
->
-> This commit changes rq_integrity_vec, so that it calls mp_bvec_iter_bvec
-> instead of returning the first vector. mp_bvec_iter_bvec reads the
-> iterator and uses it to build a bvec for the current position in the
-> iterator.
->
-> The "queue_max_integrity_segments(rq->q) > 1" check was removed, because
-> the updated rq_integrity_vec function works correctly with multiple
-> segments.
->
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
->
-> ---
->  drivers/nvme/host/pci.c       |    6 +++---
->  include/linux/blk-integrity.h |   14 +++++++-------
->  2 files changed, 10 insertions(+), 10 deletions(-)
->
-> Index: linux-2.6/drivers/nvme/host/pci.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- linux-2.6.orig/drivers/nvme/host/pci.c
-> +++ linux-2.6/drivers/nvme/host/pci.c
-> @@ -825,9 +825,9 @@ static blk_status_t nvme_map_metadata(st
->                 struct nvme_command *cmnd)
->  {
->         struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
-> +       struct bio_vec bv =3D rq_integrity_vec(req);
->
-> -       iod->meta_dma =3D dma_map_bvec(dev->dev, rq_integrity_vec(req),
-> -                       rq_dma_dir(req), 0);
-> +       iod->meta_dma =3D dma_map_bvec(dev->dev, &bv, rq_dma_dir(req), 0)=
-;
->         if (dma_mapping_error(dev->dev, iod->meta_dma))
->                 return BLK_STS_IOERR;
->         cmnd->rw.metadata =3D cpu_to_le64(iod->meta_dma);
-> @@ -966,7 +966,7 @@ static __always_inline void nvme_pci_unm
->                 struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
->
->                 dma_unmap_page(dev->dev, iod->meta_dma,
-> -                              rq_integrity_vec(req)->bv_len, rq_dma_dir(=
-req));
-> +                              rq_integrity_vec(req).bv_len, rq_dma_dir(r=
-eq));
->         }
->
->         if (blk_rq_nr_phys_segments(req))
-> Index: linux-2.6/include/linux/blk-integrity.h
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- linux-2.6.orig/include/linux/blk-integrity.h
-> +++ linux-2.6/include/linux/blk-integrity.h
-> @@ -106,14 +106,13 @@ static inline bool blk_integrity_rq(stru
->  }
->
->  /*
-> - * Return the first bvec that contains integrity data.  Only drivers tha=
-t are
-> - * limited to a single integrity segment should use this helper.
-> + * Return the current bvec that contains the integrity data. bip_iter ma=
-y be
-> + * advanced to iterate over the integrity data.
->   */
-> -static inline struct bio_vec *rq_integrity_vec(struct request *rq)
-> +static inline struct bio_vec rq_integrity_vec(struct request *rq)
->  {
-> -       if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
-> -               return NULL;
-> -       return rq->bio->bi_integrity->bip_vec;
-> +       return mp_bvec_iter_bvec(rq->bio->bi_integrity->bip_vec,
-> +                                rq->bio->bi_integrity->bip_iter);
->  }
->  #else /* CONFIG_BLK_DEV_INTEGRITY */
->  static inline int blk_rq_count_integrity_sg(struct request_queue *q,
-> @@ -179,7 +178,8 @@ static inline int blk_integrity_rq(struc
->
->  static inline struct bio_vec *rq_integrity_vec(struct request *rq)
->  {
-> -       return NULL;
-> +       /* the optimizer will remove all calls to this function */
-> +       return (struct bio_vec){ };
->  }
->  #endif /* CONFIG_BLK_DEV_INTEGRITY */
->  #endif /* _LINUX_BLK_INTEGRITY_H */
->
+Hello,
 
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+syzbot found the following issue on:
+
+HEAD commit:    6fbf71854e2d Merge tag 'perf-tools-fixes-for-v6.10-1-2024-..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15b4942c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ee7b962709a5f5a5
+dashboard link: https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/91effa72f285/disk-6fbf7185.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c6afe2efff99/vmlinux-6fbf7185.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/46aae93f5511/bzImage-6fbf7185.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5c6179f2c4f1e111df11@syzkaller.appspotmail.com
+
+INFO: task udevd:16174 blocked for more than 143 seconds.
+      Not tainted 6.9.0-syzkaller-12400-g6fbf71854e2d #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:udevd           state:D stack:23920 pid:16174 tgid:16174 ppid:1      flags:0x00000002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0x1796/0x49d0 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ bdev_open+0xe5/0xc60 block/bdev.c:897
+ blkdev_open+0x20d/0x2e0 block/fops.c:615
+ do_dentry_open+0x95a/0x1720 fs/open.c:955
+ do_open fs/namei.c:3650 [inline]
+ path_openat+0x289f/0x3280 fs/namei.c:3807
+ do_filp_open+0x235/0x490 fs/namei.c:3834
+ do_sys_openat2+0x13e/0x1d0 fs/open.c:1405
+ do_sys_open fs/open.c:1420 [inline]
+ __do_sys_openat fs/open.c:1436 [inline]
+ __se_sys_openat fs/open.c:1431 [inline]
+ __x64_sys_openat+0x247/0x2a0 fs/open.c:1431
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f7f09b169a4
+RSP: 002b:00007fffaaf9cc90 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 000055bf84d3cdb0 RCX: 00007f7f09b169a4
+RDX: 00000000000a0800 RSI: 000055bf84d19770 RDI: 00000000ffffff9c
+RBP: 000055bf84d19770 R08: 0000000000000001 R09: 7fffffffffffffff
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000a0800
+R13: 000055bf84d2b2c0 R14: 0000000000000001 R15: 000055bf84d18910
+ </TASK>
+INFO: task syz-executor.1:16345 blocked for more than 143 seconds.
+      Not tainted 6.9.0-syzkaller-12400-g6fbf71854e2d #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.1  state:D stack:21168 pid:16345 tgid:16344 ppid:15599  flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0x1796/0x49d0 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ bdev_release+0x184/0x700 block/bdev.c:1080
+ blkdev_release+0x15/0x20 block/fops.c:623
+ __fput+0x406/0x8b0 fs/file_table.c:422
+ task_work_run+0x24f/0x310 kernel/task_work.c:180
+ get_signal+0x15e6/0x1740 kernel/signal.c:2681
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xc9/0x370 kernel/entry/common.c:218
+ do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f297527cee9
+RSP: 002b:00007f297608b0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: 0000000000000000 RBX: 00007f29753abf80 RCX: 00007f297527cee9
+RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000006
+RBP: 00007f29752c949e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f29753abf80 R15: 00007ffd34ac6de8
+ </TASK>
+INFO: task syz-executor.1:16353 blocked for more than 144 seconds.
+      Not tainted 6.9.0-syzkaller-12400-g6fbf71854e2d #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.1  state:D stack:18712 pid:16353 tgid:16344 ppid:15599  flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0x1796/0x49d0 kernel/sched/core.c:6745
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
