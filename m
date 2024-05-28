@@ -1,68 +1,65 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212B013E3F6
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 12:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC69D16DEC3
+	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 12:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716901049; cv=none; b=QFDKLBqUDtY4mdodwEj2q1WX1yoZCOaQ6d62WUCTJaG4J4bHyHOZh5merbtc6/MCHigQkVzuXcu8DSwCwrIq5mBwWWt2Lg6HUQL4yg4QeTcWfe8ArnIGtvQoyasu0VqiAJFQpJCU5vA8uVzAnB13tg9ugijxhZ/4M5ZRcM/uOy4=
+	t=1716901051; cv=none; b=WwepYZY5xI/uSONUXHjgWMr1aZvL1xWoSm3PswH38I47URA5DrYez2kigOhg1LHzf5+cXR8RfeAYRSw65lNGbdpYEqnamLNpgF6g0xY91g+soRuyxGl9+5Jw2l19AFQs4hK+cqO5a7lyB+zw43RxExK1XnAGYKpcbwEI9Fnz1eU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716901049; c=relaxed/simple;
-	bh=xckvGxOTg/lK5cif/dlUPP7K75rJd5o/fYmUcMKFews=;
+	s=arc-20240116; t=1716901051; c=relaxed/simple;
+	bh=yLXEm1c42e6C5TSq6c3jBGbb3fPTE8uHjV+RDOiqHso=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Ckt/9P8cqGvg4bMiPqx4fvjQiRTpcPTnVhsPBKYbwzPeNSSSoe7dc6gQB3IngEbGZh+SQeiVVpCKhFqCEPGZdRpngKpQbcC4t+ESpNQhXyES48yOIZrpbubzKiWDWqSgczj5JBraVcQCuZSsIBe6ZvGxtGubCh9Ivzots11B470=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iMpW2Gen; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version:Content-Type; b=D6niZUA+0rTLmZ2KGYu8xT/Q6PrgFe0VrXHyx8JWFojy/TTApCBpS6sCVXRYWYCgIpkNXmME7jNUgCxXvxPoZwEUQ0Mr7pmVDNtwDU+04rqy8v1EKeU/fHfH3g47/OURRAfNBrdjkvBNxpu+NHuxZRNh/ma4Kn8RzTI+mwClKW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CoAPvequ; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iMpW2Gen"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1f34d742ff8so383145ad.2
-        for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:57:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CoAPvequ"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1f347e8f6acso374815ad.1
+        for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:57:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716901046; x=1717505846; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716901048; x=1717505848; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FYN+y0FKjMiFfxNxeNcv+kisab5C54aEhDjwsKNvTjI=;
-        b=iMpW2Gen0gHodQ7rui4bO9NiUyi4lixuOCHjIRMXBfAXcm49XBC2iUhJYpt/tBQV+8
-         jLt4Dc1Ga1wu6FnvaEd89kVQwotiVafgINMeq/uciA2mKq+PBJS6aMLekXbU29wV2sr1
-         Mw8XPvFdnpOo8FDVTdefj/i5WgqUZ1S8RZlUlIczPd6aIG75zz7KZa/O6RwK9S0GbZAc
-         Hv9h2Abr2x+7Q9IogG5er9iL9ZVa6bkrL5+SWG45/CLCMvVeeb0B9PPXBTiv08dWHJzt
-         A/xk9eVjOR2IeZ0/74ygyfxoQekLku23jHLDpQJocAdWd/ZSk37xQbbLyoNcYwzbF+A3
-         QFkg==
+        bh=jeEpsyiS3b8raPxgZdh+Wek4BUXAmeaBtOvZqJZBf0E=;
+        b=CoAPvequTJOVgrC79J3OQ4aD63NSG2z6NeAlLpwgkysMOc0UTNDL5ail3JODRqIGo6
+         +g+MJtk3uSqghjDD8MGlAsLYrvZ9QKcWYJSTeCUmJrO62EAjOH0lzFvEgTO/Zv1AXofr
+         eAwAWBRovt10Fnil3bChDnYvSduhNLokYJUPRd0GAyBb62vhyJJjLGTMcnXzmFaoVJBB
+         txYsWCTCeri7LZ1pXyafkP4Qp/BLXktJDeGz06hyXSde/FDkmTZDoPKNEpho/YjIZgzx
+         SiE0ojX7v5Qx4s0sGgmlWcNreX/n01tpY1sAbgZARBgS6tkd8eupfwAkIOab6/7lBfAz
+         GVGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716901046; x=1717505846;
+        d=1e100.net; s=20230601; t=1716901048; x=1717505848;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FYN+y0FKjMiFfxNxeNcv+kisab5C54aEhDjwsKNvTjI=;
-        b=E/QsKK0c9mPTpwT1Qbl88uBKUxP3SS3AMjjnYQgapBsR/bOWL4y/DtR8AksWkxVGKb
-         CdPcmYjqPUxCQITTE3ocIsd+KfUCpKtVkfJo+BW+HMNjMfqmVwtY1/PCM59QBW3JTOsx
-         f8FnQihHtcD7nOQRn7wBd6Ktz425rWMXU7CXnNIXK0Tp4lC4fY7NWb6YriDdjOECL3qx
-         ExIYd4xXmgPBosxALmpJzMPSqc6/x84/fm+FCpFB+qNaPh3QlOFQD+IUsCZdpGR1eCeH
-         gF/3A1XnIEQQP2XOpklpKvVzycDt6ld8zITo0pEV4PiQGeGJU7sozOkUy3TfIZWkCFyi
-         yXXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVcl0qdsPXq0jXhZEbxYqkRlJxfr5PF5GXVLUBUWfHp6i+XjqG4Pi/AHEBkaZy2H7nchtdmdJc0zI4XzZI/bQHKoZrjt2pu5Ltv5Uo=
-X-Gm-Message-State: AOJu0YywDuNJGX0iMZIVMACrjWwB76+x6IL7LzsAlGJoLr7gBuDdBhWW
-	7yMG0/a7UixY+CwcM1yl3jo89CuZ+tyQ8khyFWL3fgM2kfbRdC9SAn8pZt7s3XoLcX+zu76FOR5
-	b
-X-Google-Smtp-Source: AGHT+IHfg7PaOLjhcyBQZnYo0OBle297wmr0EK1KJxoXRsP4bx7sQyTPNGJnYx5ffb4QKpYXTHjyxw==
-X-Received: by 2002:a17:903:2347:b0:1f2:ff65:d2e6 with SMTP id d9443c01a7336-1f4483e93e8mr136790545ad.0.1716901046335;
-        Tue, 28 May 2024 05:57:26 -0700 (PDT)
+        bh=jeEpsyiS3b8raPxgZdh+Wek4BUXAmeaBtOvZqJZBf0E=;
+        b=pBKcHehDfnpKCCnQObV3b3alYdhthkkiz2RQMqw9GNGSjaLxSB5cn6Hdpa1uRiPmc7
+         nrr9tNpRpR52LkvCwo4stB80cpcXt7vI/YD7DPbLfUaZaHUWyN8L3MQw8vB3RobqJQrT
+         wR2FcN95ppLsAlz1rPyoa5++Ka+WpNPPpwh+2qzHV8wseJnvLExgTZXin7yuqRBRjcFz
+         Oo+cGDZNNZUGFXylwdBQGAmztHGzK/OErKxMuCV6S/Tmer+ekQ2tLzWICXbx9WHttN0j
+         mn39pFqv32KaG8u1iWUMsvRBUz0tOUgL2EDzxaFrVr8v/VA5xHfIZCeZjsWiOx8yz6he
+         e5Qw==
+X-Gm-Message-State: AOJu0Ywv6A1pmRec1hinyUJPPLHDf/T7WjQB2rAcFcYwG+QBg2PUfPdp
+	KtNDgM2MHRRlyj5vATXX2k2N3qNIxVM9UeTEsRsferidFJz38u5dlnYIiP+yMOshnBr7qYG0tzK
+	8
+X-Google-Smtp-Source: AGHT+IEDT5wjyQdIWxBFy7iDmEP048k5ary7ucllsQ2C76rJTpb2NNS/f9uwl2ddLYm3BPA1HtYt5Q==
+X-Received: by 2002:a17:902:f688:b0:1f3:358:cc30 with SMTP id d9443c01a7336-1f4486d1fbamr136086695ad.2.1716901048527;
+        Tue, 28 May 2024 05:57:28 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c967ac0sm79255505ad.180.2024.05.28.05.57.23
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c967ac0sm79255505ad.180.2024.05.28.05.57.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 05:57:24 -0700 (PDT)
+        Tue, 28 May 2024 05:57:26 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org, 
- linux-scsi@vger.kernel.org
-In-Reply-To: <20240523182618.602003-1-hch@lst.de>
-References: <20240523182618.602003-1-hch@lst.de>
-Subject: Re: fix stacking of sd-imposed max_sectors
-Message-Id: <171690104393.274292.7885096310356049183.b4-ty@kernel.dk>
-Date: Tue, 28 May 2024 06:57:23 -0600
+To: Coly Li <colyli@suse.de>
+Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+In-Reply-To: <20240528120914.28705-1-colyli@suse.de>
+References: <20240528120914.28705-1-colyli@suse.de>
+Subject: Re: [PATCH 0/3] bcache-6.10 20240528
+Message-Id: <171690104653.274292.6349743072736147377.b4-ty@kernel.dk>
+Date: Tue, 28 May 2024 06:57:26 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,25 +71,26 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Thu, 23 May 2024 20:26:12 +0200, Christoph Hellwig wrote:
-> this series fixes a regression in 6.10-rc report by Mike when using
-> device mapper multipath on top of SCSI disks.  It is due the sd
-> driver not only setting the hard max_dev_sectors limit but also
-> pre-setting a potentially lower max_sectors value.
+On Tue, 28 May 2024 20:09:11 +0800, Coly Li wrote:
+> This series is just for the patch from Dongsheng Yang, due to more
+> testing needed, it comes after the first wave.
 > 
-> Diffstat:
->  block/blk-settings.c |    2 ++
->  drivers/scsi/sd.c    |    4 +++-
->  2 files changed, 5 insertions(+), 1 deletion(-)
+> Dongsheng's patch helps to improve the latency of cache space
+> allocation. This patch has been shipped in product more than one year
+> by his team. Robert Pang from Google introduces this patch has been
+> tested inside Google with quite extended hardware configurations. Eric
+> Wheeler also deploys this patch in his production for 1+ months.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/2] sd: also set max_user_sectors when setting max_sectors
-      commit: bafea1c58b24be594d97841ced1b7ae0347bf6e3
-[2/2] block: stack max_user_sectors
-      commit: e528bede6f4e6822afdf0fa80be46ea9199f0911
+[1/3] bcache: allow allocator to invalidate bucket in gc
+      commit: a14a68b76954e73031ca6399abace17dcb77c17a
+[2/3] bcache: call force_wake_up_gc() if necessary in check_should_bypass()
+      commit: 05356938a4be356adde4eab4425c6822f3c7d706
+[3/3] bcache: code cleanup in __bch_bucket_alloc_set()
+      commit: 74d4ce92e08d5669d66fd890403724faa4286c21
 
 Best regards,
 -- 
