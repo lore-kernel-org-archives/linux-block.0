@@ -1,158 +1,124 @@
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011E344C87
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716872773; cv=none; b=KnCLTS/sx16RTHWCNet99DuWTPUNKbqMDsfp6XFXYEAiRv5Wlg0VDkKCptvt1NApuXezvUpfvkQnm+46cmVfDhCRSp9hTZU4nkuCmjoGtRJppB8mrVwTxGPaLWndSHeES8DwpbfyGElB4XoP8DmfSjmVpCJ5PgMXwpAw8XbpfH8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716872773; c=relaxed/simple;
-	bh=DS4CinmS5NhhvcFvqcc1PRc0k1RkSciE4FtXUUX6P94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J3zjyo07qrmTFHnX1mF6HWvfw/M2/U5TVD+A9J4vxlOtMLuqAuo4pQFvtTnaygAaU6j3Ytei9Mg2qdlwehUvNUadOy3Esw8n2cGYDbaUe60cpa8OsHPJCP06Uyz3edEfSW+hG1svHl5URpL+m5SeH32WDp6msBcF4YIb3rsgqwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=Kp0t7lGa; arc=none smtp.client-ip=85.214.250.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="Kp0t7lGa"
-Received: from 8bytes.org (pd9fe9dd8.dip0.t-ipconnect.de [217.254.157.216])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id 1CB831C0DAD;
-	Tue, 28 May 2024 07:00:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-	s=default; t=1716872440;
-	bh=DS4CinmS5NhhvcFvqcc1PRc0k1RkSciE4FtXUUX6P94=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kp0t7lGagTLNobtAhiPc4wiYVvExIjI2XKNmFlXsV3TJh45zyqHCOnKYP8NFkdTvr
-	 u556+XAvdgxBae9UCTaD9YBoD9Pt9FvmM4oIf5dWUESutS9Tupbe9j+V14xNU6mznX
-	 eiOUInKX6c5ffhC08w1r/FLceuVc78j4t93ttlFeR95Tp27KoJ0uyYWkNkq9JfodOU
-	 /gTQZVhgYxEydgONmqJUSu2OzYUx/G1oUh8WHC1t3Z5430nnFwmChKWem+qQEDt157
-	 3zubd8MJbmyZ48eP4tl4vOHZcrNkZ8YoWFmDpGNyhos/Xo5vt7cyn5KxlkSZCQ0IsF
-	 bV18JVpKgazLw==
-Date: Tue, 28 May 2024 07:00:39 +0200
-From: Joerg Roedel <joro@8bytes.org>
-To: Yi Zhang <yi.zhang@redhat.com>, Vasant Hegde <vasant.hegde@amd.com>
-Cc: linux-block <linux-block@vger.kernel.org>, iommu@lists.linux.dev,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	suravee.suthikulpanit@amd.com
-Subject: Re: [bug report][regression] blktests block/008 lead kerne panic at
- RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
-Message-ID: <ZlVk95sNtdkzZ8bE@8bytes.org>
-References: <CAHj4cs9KZJc6Wsp9t0fDc4fDBJB1TmwGT7-8peCGLiqW3J_Fqw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B66A4AEDF
+	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716873959; cv=none; b=NPNQWaBObRk/nWJKx6UF4Dl/BZlRnCs4m1L0zggx8tHdZUeE/FQdNbXRtrOF1W1ynBW+FrMDOQ2AiXk4NVjWaB7vpplY3U4ZJioXPK/yzwHCeCeSvxpyGHG4T13pFVhfs7LP7+uKTAGCc1h/VmjHsXMTq5fC/CHJCEDtGpA/Tqg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716873959; c=relaxed/simple;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=pA63PJ3lEjfqOVQ7SeDC4WLTJQpmcgH9oprp3utAO6UmFcXwpIhcLpHNIf386lXULo77g0irjzdSVh+boH/f4jsGf1RANaEEI4GpRkPYnCDRwtFaz4KCqfLyM/vqRQHoBZ36XgMfm0VbqAb24Zn5RzxU5w02mjd3q4kR8xWp9/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=eKQU0NpT; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="eKQU0NpT"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240528052554epoutp02a391cadf673f9ca13aa9e8eb7e97773f~Tj8Pk-GHW0236602366epoutp02H
+	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 05:25:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240528052554epoutp02a391cadf673f9ca13aa9e8eb7e97773f~Tj8Pk-GHW0236602366epoutp02H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1716873954;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=eKQU0NpT9fiumiFihgz705hQjzUXrszAaZpp/j0121QE7PT+cS30aAYVZCtHktQ2g
+	 RBJVwy6OfsXUAyZLlrzlpZwlbx3Ply6Z9GUmmQJLfEz4StEBXKUHGG6W3eQYrf/zHx
+	 TrzEGHpL8LUhDGqkPayXsMJq3LmjOgEQnR5tBDVQ=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240528052554epcas5p1110e43a96b238c1cf5435fb3f5d379bf~Tj8PKzHc72041920419epcas5p1p;
+	Tue, 28 May 2024 05:25:54 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.174]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4VpLZm5NhQz4x9QH; Tue, 28 May
+	2024 05:25:52 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	95.33.10035.FDA65566; Tue, 28 May 2024 14:25:51 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240528052550epcas5p27a89e7264e9058afad39e0d8970235a9~Tj8MQyse02997129971epcas5p24;
+	Tue, 28 May 2024 05:25:50 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240528052550epsmtrp24139879fedea4bd8e4e03e79ff4be473~Tj8MQGGwA1060410604epsmtrp2p;
+	Tue, 28 May 2024 05:25:50 +0000 (GMT)
+X-AuditID: b6c32a4b-b11fa70000002733-be-66556adf2de7
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	34.50.07412.EDA65566; Tue, 28 May 2024 14:25:50 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240528052549epsmtip1a2ad4691ce9efe5d243006691de7865f~Tj8KqaO2h3181531815epsmtip1W;
+	Tue, 28 May 2024 05:25:49 +0000 (GMT)
+Message-ID: <4f35011f-c710-c207-ebfc-68f7117cced1@samsung.com>
+Date: Tue, 28 May 2024 10:55:48 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHj4cs9KZJc6Wsp9t0fDc4fDBJB1TmwGT7-8peCGLiqW3J_Fqw@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH 1/2 v4] block: change rq_integrity_vec to respect the
+ iterator
+Content-Language: en-US
+To: Mikulas Patocka <mpatocka@redhat.com>, Axboe <axboe@kernel.dk>, Keith
+	Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg
+	<sagi@grimberg.me>, Mike Snitzer <snitzer@kernel.org>, Milan Broz
+	<gmazyland@gmail.com>, Anuj gupta <anuj1072538@gmail.com>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-nvme@lists.infradead.org
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <49d1afaa-f934-6ed2-a678-e0d428c63a65@redhat.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrLJsWRmVeSWpSXmKPExsWy7bCmuu79rNA0g+8XRSw+fv3NYrH6bj+b
+	xYJFc1ksju2fxW6xcvVRJotJh64xWuy9pW0xf9lTdouJHVeZLNa9fs9iceKWtAO3x85Zd9k9
+	zt/byOJx+Wypx6ZVnWwem5fUe7zYPJPRY/fNBjaP9/uusnl83iQXwBmVbZORmpiSWqSQmpec
+	n5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdKqSQlliTilQKCCxuFhJ386m
+	KL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITvjz9nTrAUmFdfm9jE1
+	MOp2MXJySAiYSBzpvsbcxcjFISSwm1Fi0oYZLBDOJ0aJnaeOM0E43xglGnZeZ4NpmbvuE1Ri
+	L6PE40N/oPrfMkrcmLMCyOHg4BWwk/i32hukgUVAVWJC6wtWEJtXQFDi5MwnLCC2qECyxM+u
+	A2BDhQVCJB7dn8gEYjMLiEvcejIfbIGIwBQmicvzOtggEtESB95cYwKZzyagKXFhcilImBNo
+	1Zfnd9khSuQltr+dA3aPhMABDokFR2czQVztIvFu8W9WCFtY4tXxLewQtpTE53d7oT5Llrg0
+	8xxUfYnE4z0HoWx7idZT/WB/MQPtXb9LH2IXn0Tv7ydg50gI8Ep0tAlBVCtK3Jv0FGqTuMTD
+	GUugbA+JZ2v+QUP3MKPEnRkLmSYwKsxCCpZZSN6fheSdWQibFzCyrGKUTC0ozk1PLTYtMM5L
+	LYdHd3J+7iZGcDrW8t7B+OjBB71DjEwcjIcYJTiYlUR4ReYFpgnxpiRWVqUW5ccXleakFh9i
+	NAXGz0RmKdHkfGBGyCuJNzSxNDAxMzMzsTQ2M1QS533dOjdFSCA9sSQ1OzW1ILUIpo+Jg1Oq
+	gUm5a+auW4FNZk8W9quGLPbf7GK54Hy4xR2tsyXr+tXedhzvfT3lZYbnilsS7MnubjPONWXX
+	dCcxmIh2pySeurL98nwuzn0Tygqnvt29WTKGr/zGI+61/RsZH/Z4brppGaBp9yvcXJavPz9A
+	+rJ+m82xOzph7mZz68PN67zOlNzYEXtrwgvjhtUdiU28h7bu6L6+td3Qh6d8Q2F0fowR7/lX
+	IaGn+F+qvOhI7tm+962p0InsjZf7w8O8Xun7GSfc23Rwjd7qL/JmT64uuP3AoLj22j3J99yJ
+	yy8JfrCatSdNu3IHi9yWTyaPAoqq5EVYheo8e5d9L5rTfKRr2/+fmx4atlrZtxr8MuFafvz/
+	VCWW4oxEQy3mouJEACXD/5BQBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsWy7bCSnO69rNA0g8UXDC0+fv3NYrH6bj+b
+	xYJFc1ksju2fxW6xcvVRJotJh64xWuy9pW0xf9lTdouJHVeZLNa9fs9iceKWtAO3x85Zd9k9
+	zt/byOJx+Wypx6ZVnWwem5fUe7zYPJPRY/fNBjaP9/uusnl83iQXwBnFZZOSmpNZllqkb5fA
+	lfHn7GnWApOKa3P7mBoYdbsYOTkkBEwk5q77xNTFyMUhJLCbUWLq34nsEAlxieZrP6BsYYmV
+	/56D2UICrxkllizy6mLk4OAVsJP4t9obJMwioCoxofUFK4jNKyAocXLmExYQW1QgWeLlH4iR
+	wgIhEo/uT2QCsZmBxt96Mh9sr4jAFCaJ3rUNjBCJaInjRx4xQxx0mFHiX/MXdpBlbAKaEhcm
+	l4LUcALt/fL8LjtEvZlE19YuqF55ie1v5zBPYBSaheSOWUj2zULSMgtJywJGllWMkqkFxbnp
+	ucmGBYZ5qeV6xYm5xaV56XrJ+bmbGMGRp6Wxg/He/H96hxiZOBgPMUpwMCuJ8IrMC0wT4k1J
+	rKxKLcqPLyrNSS0+xCjNwaIkzms4Y3aKkEB6YklqdmpqQWoRTJaJg1OqgenxewMWzq3zMqeK
+	ibTc+906yVFE9d6SqAAJ41xZ1Yv7WvOLcqTuThQyUlnbEKzcVug3oz39mYrMw/crKpTLb16W
+	rijo+/9qe3KcZvky66sHbqWvi7Pom3jsbNGjJ6dcT51/4fEgz1iB9d/ig2W1nZMCPxRH56Su
+	5kw+L31EZuYZdYmfhlKMamunFghuvZ03c5niUWXtNSeNPPbUHJHWLJ716ZWpznou/mUm3T1G
+	2vm8Lkp1PN/n7GFXvNQnlLSqdX3Dzbjzt7llrvIyHtGMj7o3VST4uonItNkntsmtOXT6sf/a
+	XSsynI201+f7bl3Iaek6xeXy57WH7gl9VGj8OHVTdEJcrjSbnc2+N9dvHFBiKc5INNRiLipO
+	BAB+qBLmKwMAAA==
+X-CMS-MailID: 20240528052550epcas5p27a89e7264e9058afad39e0d8970235a9
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240527154143epcas5p3a7738864fd2eff65f8dab75b2fd9f1e8
+References: <719d2e-b0e6-663c-ec38-acf939e4a04b@redhat.com>
+	<CGME20240527154143epcas5p3a7738864fd2eff65f8dab75b2fd9f1e8@epcas5p3.samsung.com>
+	<49d1afaa-f934-6ed2-a678-e0d428c63a65@redhat.com>
 
-Adding Vasant.
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
-On Tue, May 28, 2024 at 10:23:10AM +0800, Yi Zhang wrote:
-> Hello
-> I found this regression panic issue on the latest 6.10-rc1 and it
-> cannot be reproduced on 6.9, please help check and let me know if you
-> need any info/testing for it, thanks.
-> 
-> reproducer
-> # cat config
-> TEST_DEVS=(/dev/nvme0n1 /dev/nvme1n1)
-> # ./check block/008
-> block/008 => nvme0n1 (do IO while hotplugging CPUs)
->     read iops  131813   ...
->     runtime    32.097s  ...
-> 
-> [  973.823246] run blktests block/008 at 2024-05-27 22:11:38
-> [  977.485983] kernel tried to execute NX-protected page - exploit
-> attempt? (uid: 0)
-> [  977.493463] BUG: unable to handle page fault for address: ffffffffb3d5e310
-> [  977.500334] #PF: supervisor instruction fetch in kernel mode
-> [  977.505992] #PF: error_code(0x0011) - permissions violation
-> [  977.511567] PGD 719225067 P4D 719225067 PUD 719226063 PMD 71a5ff063
-> PTE 8000000719d5e163
-> [  977.519662] Oops: Oops: 0011 [#1] PREEMPT SMP NOPTI
-> [  977.524541] CPU: 4 PID: 42 Comm: cpuhp/4 Not tainted
-> 6.10.0-0.rc1.17.eln136.x86_64 #1
-> [  977.532366] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS
-> 2.13.3 09/12/2023
-> [  977.540017] RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
-> [  977.545329] Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00 00 00 00 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 00
-> 00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40
-> 00 00
-> [  977.564076] RSP: 0018:ffffa5bd80437e58 EFLAGS: 00010246
-> [  977.569301] RAX: ffffffffb324bf00 RBX: ffff8f40df020820 RCX: 0000000000000000
-> [  977.576433] RDX: 0000000000000001 RSI: 00000000000000c0 RDI: 0000000000000004
-> [  977.583567] RBP: 0000000000000004 R08: ffff8f40df020848 R09: ffff8f398664ece0
-> [  977.590698] R10: 0000000000000000 R11: 0000000000000008 R12: 00000000000000c0
-> [  977.597833] R13: ffffffffb3d5e310 R14: 0000000000000000 R15: ffff8f40df020848
-> [  977.604963] FS:  0000000000000000(0000) GS:ffff8f40df000000(0000)
-> knlGS:0000000000000000
-> [  977.613050] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  977.618795] CR2: ffffffffb3d5e310 CR3: 0000000719220000 CR4: 0000000000350ef0
-> [  977.625927] Call Trace:
-> [  977.628376]  <TASK>
-> [  977.630480]  ? srso_return_thunk+0x5/0x5f
-> [  977.634491]  ? show_trace_log_lvl+0x255/0x2f0
-> [  977.638851]  ? show_trace_log_lvl+0x255/0x2f0
-> [  977.643213]  ? cpuhp_invoke_callback+0x122/0x410
-> [  977.647830]  ? __die_body.cold+0x8/0x12
-> [  977.651669]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
-> [  977.656979]  ? page_fault_oops+0x146/0x160
-> [  977.661080]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
-> [  977.666392]  ? exc_page_fault+0x152/0x160
-> [  977.670405]  ? asm_exc_page_fault+0x26/0x30
-> [  977.674590]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
-> [  977.679905]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
-> [  977.685215]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
-> [  977.690527]  cpuhp_invoke_callback+0x122/0x410
-> [  977.694977]  ? __pfx_smpboot_thread_fn+0x10/0x10
-> [  977.699593]  cpuhp_thread_fun+0x98/0x140
-> [  977.703521]  smpboot_thread_fn+0xdd/0x1d0
-> [  977.707533]  kthread+0xd2/0x100
-> [  977.710677]  ? __pfx_kthread+0x10/0x10
-> [  977.714431]  ret_from_fork+0x34/0x50
-> [  977.718009]  ? __pfx_kthread+0x10/0x10
-> [  977.721763]  ret_from_fork_asm+0x1a/0x30
-> [  977.725692]  </TASK>
-> [  977.727879] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4
-> dns_resolver nfs lockd grace netfs sunrpc vfat fat dm_multipath
-> ipmi_ssif amd_atl intel_rapl_msr intel_rapl_common amd64_edac
-> edac_mce_amd dell_wmi sparse_keymap rfkill video kvm_amd dcdbas kvm
-> dell_smbios dell_wmi_descriptor wmi_bmof rapl mgag200 pcspkr
-> acpi_cpufreq i2c_algo_bit acpi_power_meter ptdma k10temp i2c_piix4
-> ipmi_si acpi_ipmi ipmi_devintf ipmi_msghandler fuse xfs sd_mod sg ahci
-> crct10dif_pclmul nvme libahci crc32_pclmul crc32c_intel mpt3sas
-> ghash_clmulni_intel libata nvme_core tg3 ccp nvme_auth raid_class
-> t10_pi scsi_transport_sas sp5100_tco wmi dm_mirror dm_region_hash
-> dm_log dm_mod
-> [  977.786224] CR2: ffffffffb3d5e310
-> [  977.789544] ---[ end trace 0000000000000000 ]---
-> [  977.883220] RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
-> [  977.888532] Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00 00 00 00 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 00
-> 00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40
-> 00 00
-> [  977.907277] RSP: 0018:ffffa5bd80437e58 EFLAGS: 00010246
-> [  977.912503] RAX: ffffffffb324bf00 RBX: ffff8f40df020820 RCX: 0000000000000000
-> [  977.919633] RDX: 0000000000000001 RSI: 00000000000000c0 RDI: 0000000000000004
-> [  977.926767] RBP: 0000000000000004 R08: ffff8f40df020848 R09: ffff8f398664ece0
-> [  977.933900] R10: 0000000000000000 R11: 0000000000000008 R12: 00000000000000c0
-> [  977.941030] R13: ffffffffb3d5e310 R14: 0000000000000000 R15: ffff8f40df020848
-> [  977.948163] FS:  0000000000000000(0000) GS:ffff8f40df000000(0000)
-> knlGS:0000000000000000
-> [  977.956251] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  977.961995] CR2: ffffffffb3d5e310 CR3: 0000000719220000 CR4: 0000000000350ef0
-> [  977.969129] Kernel panic - not syncing: Fatal exception
-> [  977.974439] Kernel Offset: 0x30400000 from 0xffffffff81000000
-> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> [  978.087528] ---[ end Kernel panic - not syncing: Fatal exception ]---
-> 
-> -- 
-> Best Regards,
->   Yi Zhang
-> 
