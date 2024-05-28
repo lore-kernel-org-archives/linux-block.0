@@ -1,142 +1,61 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B330E161321;
-	Tue, 28 May 2024 12:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF5A16D33C;
+	Tue, 28 May 2024 12:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716898175; cv=none; b=nKcm5BwyUGORmlzPsL3H29uXpfb0GhV0xBI+XK5lWXaqTqoQjb/Vt441nKkLC2IGXS1iOLuZpYiP/vA/V+R5Uo6Riq41zq4WzhZpvlvbK5Wj0t7xzM9JpjiS4vapFCojQq5NuoRy0AaFK0pxoZGNCeqIsKOfETyixnTzWJ1ZG4M=
+	t=1716898422; cv=none; b=uwRbHSIfnyDoahM0zxOctoxnu6YuhQPHCW7dUoH+xnH6QqJ7yEp3+ZTD361oqpgMsBHF2JZi+tcv6lWMqDk8S0WLFA0n6Lh0S4KL/lJthEXVVVz+VG75bDqStl8hwxk9C/c2hCpY2ER3UU6R9OA8gnML5TPS3mf7Iexwqt/S/1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716898175; c=relaxed/simple;
-	bh=8H7BV9/eeO5tjatJqOyVQkKquqg19jk66pQrSgWPS3A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nUoox60XqDaEmSEueZ/ZxWn3OQjFEASNdOMUJiXkoTJ0tN74fR++iS+zeCFnVz5GnoE/cVlxSTBGoRYu3+3cIEavD8asL/nGQFcFpShyfH6MsRG+eGTZn8/LIemI2Hzn4/nZbEKUjuFjxy7/W4j9Z7/KHMk6js+3A8Kcr8inqYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NwlLummx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j/hDu81B; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NwlLummx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j/hDu81B; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1716898422; c=relaxed/simple;
+	bh=ucel0VCAjN/oDU+URcHY43YqIVDaj1+TA1ii6J3sN3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lXR1tsinqbp1qoz/Dnm+8cRGNymrS81tlHzeckhj8ocH6y6JjTz95QFZGNCCDi3IJakkNHpawEx0K2yaQhlPetsquMOujb8ZOvC36dPJ8woQOCbXLhlL92Otdn+6mSerLi1ZBYf3qs0bGWFgyJkvlTnfV/WWApYjnBgcB/pQfiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=t6rnuVyk; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NwlLummx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j/hDu81B";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NwlLummx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j/hDu81B"
-Received: from suse-arm.lan (unknown [10.149.192.130])
-	by smtp-out2.suse.de (Postfix) with ESMTP id 407B020287;
-	Tue, 28 May 2024 12:09:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1716898172; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X+3f9q1shIhYWg9rVbKhSKne37I38ok0u2p9d2o7S2s=;
-	b=NwlLummxCmct8INs3CIGrwAZ433/cFyOkNry0YkZ3ZqBpSfC68cIPv2gZvrJ3KRKfXRYOa
-	7igfmlgUfSKAbv4/bMTl6iwQI22t++VPhLeLEqxDVodeN2/N+3SdhTvwNVDw3uUamYc1iV
-	MR/TtVRpw5Dvly58sMYuzcfWJeAiSIs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1716898172;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X+3f9q1shIhYWg9rVbKhSKne37I38ok0u2p9d2o7S2s=;
-	b=j/hDu81B/mYHHXPYUJ0gu2L1vC1fUb/th9gCREccG5Y7yKndNGzn76P4UnWxEJJl8pMOcb
-	eUdbIH+JsgK62oCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1716898172; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X+3f9q1shIhYWg9rVbKhSKne37I38ok0u2p9d2o7S2s=;
-	b=NwlLummxCmct8INs3CIGrwAZ433/cFyOkNry0YkZ3ZqBpSfC68cIPv2gZvrJ3KRKfXRYOa
-	7igfmlgUfSKAbv4/bMTl6iwQI22t++VPhLeLEqxDVodeN2/N+3SdhTvwNVDw3uUamYc1iV
-	MR/TtVRpw5Dvly58sMYuzcfWJeAiSIs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1716898172;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X+3f9q1shIhYWg9rVbKhSKne37I38ok0u2p9d2o7S2s=;
-	b=j/hDu81B/mYHHXPYUJ0gu2L1vC1fUb/th9gCREccG5Y7yKndNGzn76P4UnWxEJJl8pMOcb
-	eUdbIH+JsgK62oCg==
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 3/3] bcache: code cleanup in __bch_bucket_alloc_set()
-Date: Tue, 28 May 2024 20:09:14 +0800
-Message-Id: <20240528120914.28705-4-colyli@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20240528120914.28705-1-colyli@suse.de>
-References: <20240528120914.28705-1-colyli@suse.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="t6rnuVyk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ucel0VCAjN/oDU+URcHY43YqIVDaj1+TA1ii6J3sN3Y=; b=t6rnuVykEcAU15WWPDvnz1j2J6
+	PIfy7CNVFojD0nFbFgPp+GslcpAR/gHGcuep4lbCujEDY3AdgPh5JEyMdbBx15I9wnnFIieZ+0d2+
+	MXc2GGTFmkkVsDx4MUmO/R6WXmpoyaLlgYOUCaqFWFd8WLLPnxKU5WilkychhqKO2wZXpZvxTHgJw
+	UTSgxmPV+P/dgO801g8AMxENmLfvuxwhd4eGXS5ewlVqwsqVJPc6xnKhfUCRVBIBntFYBpBhN441v
+	okr9Iu/IjZvRcM0cxqyhNCztVJFScpvJeaCkHFdzb7MpGsvQtGL7hKB7SnCU5qhgPn1Mt5oUFekBc
+	oZCUGR7Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sBvho-00000008dEB-4Axy;
+	Tue, 28 May 2024 12:13:29 +0000
+Date: Tue, 28 May 2024 13:13:28 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+Cc: akpm@linux-foundation.org, djwong@kernel.org, brauner@kernel.org,
+	david@fromorbit.com, chandan.babu@oracle.com, hare@suse.de,
+	ritesh.list@gmail.com, john.g.garry@oracle.com, ziy@nvidia.com,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, mcgrof@kernel.org
+Subject: Re: [PATCH v5.1] fs: Allow fine-grained control of folio sizes
+Message-ID: <ZlXKaJ9soHMKMbGB@casper.infradead.org>
+References: <20240527210125.1905586-1-willy@infradead.org>
+ <20240527220926.3zh2rv43w7763d2y@quentin>
+ <ZlULs_hAKMmasUR8@casper.infradead.org>
+ <20240528101332.b7uwjjjeifgsugrw@quentin>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -6.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.978];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_ZERO(0.00)[0];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240528101332.b7uwjjjeifgsugrw@quentin>
 
-In __bch_bucket_alloc_set() the lines after lable 'err:' indeed do
-nothing useful after multiple cache devices are removed from bcache
-code. This cleanup patch drops the useless code to save a bit CPU
-cycles.
+On Tue, May 28, 2024 at 10:13:32AM +0000, Pankaj Raghav (Samsung) wrote:
+> Btw, I noticed you have removed mapping_align_start_index(). I will add
+> it back in.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/alloc.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 32a46343097d..48ce750bf70a 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -498,8 +498,8 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
- 
- 	ca = c->cache;
- 	b = bch_bucket_alloc(ca, reserve, wait);
--	if (b == -1)
--		goto err;
-+	if (b < 0)
-+		return -1;
- 
- 	k->ptr[0] = MAKE_PTR(ca->buckets[b].gen,
- 			     bucket_to_sector(c, b),
-@@ -508,10 +508,6 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
- 	SET_KEY_PTRS(k, 1);
- 
- 	return 0;
--err:
--	bch_bucket_free(c, k);
--	bkey_put(c, k);
--	return -1;
- }
- 
- int bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
--- 
-2.35.3
-
+Add it in the patch which uses it, not this patch.
