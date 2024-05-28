@@ -1,130 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C468416133E
-	for <linux-block@vger.kernel.org>; Tue, 28 May 2024 11:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9619182B3;
+	Tue, 28 May 2024 11:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716894973; cv=none; b=kc9Uoskh50v4/0W9liqvnclQYZWG2OK0yvJcdNq30zIZE07r20gunvQ6/Qe74wPUMGXWZEsHJETxon+nasdtzz7rhgL3QvpXIgZ2pc7sdEXbHWbCDYplEEoFEpL65i/Hyd7rBZRpGWbpnai7OHe+NJDnx08jfHO2uZ0ASMmvavo=
+	t=1716896275; cv=none; b=t/03ntKfMqKWGGeOzETsidPEA3HxsRfYqEtodff3OXWQWBwLqBAUL57X4vqIvMOmcZA5yUT/jdDmd9XSC46AZZcqf7jqNGe19UxwoUkE6oHJJlOvKEwhHX4TugfBoFHbQTo0AB8rs1LtNIaVL4voRIWCwt9xzeBXwnaTE7OOLow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716894973; c=relaxed/simple;
-	bh=dJzxH+C+YgA2K6Qr0KSXq7M+QtKSoJ8jXdM+a0oASB0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=aWW7VGd7v597yTiyga/h9ZiPWtNtQfC5HPqh4LrvSDOJMMbeC3BaMrnhfFu1Tc/+EYajzkBl0OwTLhZXLAVfjl3HeqdmrVxa4EsVUSrlmztD78JmQF5ydPYsUWrOhBXP1YSzysW+gBHrl6UN5PkywQb6mqx3OR6pT6I1MBRKWh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BEuzNZwR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1716896275; c=relaxed/simple;
+	bh=BPx3/5wdXsJGI4AJO7t/7IynKbNRWk2jWU84tK70+xM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ul0ybJJNzIcbAEi8CWvjd24DjlGJiM2pIFj89Kk//60kMhV1mi+qdLiHbIe7TgLXZW/s2jRvH1WrK2AgCBPebKrrpbWmFXGynq5ZfAV6Gf+LzoYYv2PK08cUXkgRO1W4AWVyFweEPDtyB3VqOI+OCIvXDwvsZYBDpzS351ZDmVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=Zm9g0deC; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BEuzNZwR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716894970;
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="Zm9g0deC"
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4VpVqx5SJ3z9sp7;
+	Tue, 28 May 2024 13:37:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1716896269;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rYg0TTRzA8O3sBmCaNFcaodzlZZszlkh1V5SLXZSiEs=;
-	b=BEuzNZwRj18EBpGIHgBYA6+2HADA9lRZRh9JG+bDRegf8dmFiHAbAY9g7Of57tYclfBXoA
-	12ugeBvUwTyH0XjmDdlx1PTJWCciTkqc6bcYSjDcNc1qjOoNw50Wp+6lFpUSuxlArzkPbb
-	pC4LcIPXjGXOeybiHTFV/yPgS6HSH+8=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-487-iVtCDwhVNzKupBwSEjm7lg-1; Tue,
- 28 May 2024 07:16:06 -0400
-X-MC-Unique: iVtCDwhVNzKupBwSEjm7lg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 486FC1C05131;
-	Tue, 28 May 2024 11:16:06 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A8603400059;
-	Tue, 28 May 2024 11:16:05 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id 9094030C1C33; Tue, 28 May 2024 11:16:05 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 8C6013C542;
-	Tue, 28 May 2024 13:16:05 +0200 (CEST)
-Date: Tue, 28 May 2024 13:16:05 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Eric Wheeler <dm-devel@lists.ewheeler.net>
-cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-    Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-    Mike Snitzer <snitzer@kernel.org>, Milan Broz <gmazyland@gmail.com>, 
-    linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
-    linux-nvme@lists.infradead.org
-Subject: Re: [RFC PATCH 0/2] dm-crypt support for per-sector NVMe metadata
-In-Reply-To: <206cd9fc-7dd0-f633-f6a9-9a2bd348a48e@ewheeler.net>
-Message-ID: <971e4bbc-62b8-18bb-e847-1d2e58f2a07f@redhat.com>
-References: <f85e3824-5545-f541-c96d-4352585288a@redhat.com> <206cd9fc-7dd0-f633-f6a9-9a2bd348a48e@ewheeler.net>
+	bh=GTsatAjEP5Z8hfmSAf2UWHF4m9F5ZsKNkIun34OCiBY=;
+	b=Zm9g0deCam8+HbkRh/fSgRnY4JWMb05jZLjC2f/Wj9SYi6E7+mdZHPZs6SyE3htSRNERjr
+	EqWEYEei5jTbvWfIRzj3W4Dyy/SZLUSn+Y91W5exEERsSL5YFWLhWc8thlSck/DA0PYmcA
+	9fFjW3mdubYrMh+MeQaOTFQQGi6Lf6AMvxfCGEeX481BV9rhpMFhHmf+vTPXAlzDY8ogAO
+	sx9EkNDYfLn6Ehjusk6t8lpVDy0c69VK4gkXaCv0cqsdyGtB3rESCkBGS7KeLR0hXfHSmS
+	H5yu/mKg6imqOJy7btrNknjLhd4bbmbju763kIgEm1TpZ1fcJ1kN/+6+ael63Q==
+Date: Tue, 28 May 2024 11:37:43 +0000
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	akpm@linux-foundation.org, djwong@kernel.org, brauner@kernel.org,
+	david@fromorbit.com, chandan.babu@oracle.com, ritesh.list@gmail.com,
+	john.g.garry@oracle.com, ziy@nvidia.com,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, mcgrof@kernel.org
+Subject: Re: [PATCH v5.1] fs: Allow fine-grained control of folio sizes
+Message-ID: <20240528113743.7bpg2kgeirwysmoa@quentin>
+References: <20240527210125.1905586-1-willy@infradead.org>
+ <e732a6ea-ade2-4398-b1ac-9e552fd365f5@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e732a6ea-ade2-4398-b1ac-9e552fd365f5@suse.de>
 
+> > + * is non-atomic.
+> > + */
+> > +static inline void mapping_set_folio_order_range(struct address_space *mapping,
+> > +		unsigned int min, unsigned int max)
+> > +{
+> > +	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
+> > +		return;
+> > +
+> Errm. Sure? When transparent hugepages are _enabled_ we don't support this
+> feature?
+> Confused.
 
+I think large folio support depends on THP, at least for now. I remember
+willy mentioning that in a thread. The future plan is to get rid of
+this dependency.
 
-On Mon, 27 May 2024, Eric Wheeler wrote:
-
-> On Wed, 15 May 2024, Mikulas Patocka wrote:
-> > Hi
-> > 
-> > Some NVMe devices may be formatted with extra 64 bytes of metadata per 
-> > sector.
-> > 
-> > Here I'm submitting for review dm-crypt patches that make it possible to 
-> > use per-sector metadata for authenticated encryption. With these patches, 
-> > dm-crypt can run directly on the top of a NVMe device, without using 
-> > dm-integrity. These patches increase write throughput twice, because there 
-> > is no write to the dm-integrity journal.
-> > 
-> > An example how to use it (so far, there is no support in the userspace 
-> > cryptsetup tool):
-> > 
-> > # nvme format /dev/nvme1 -n 1 -lbaf=4
-> > # dmsetup create cr --table '0 1048576 crypt 
-> > capi:authenc(hmac(sha256),cbc(aes))-essiv:sha256 
-> > 01b11af6b55f76424fd53fb66667c301466b2eeaf0f39fd36d26e7fc4f52ade2de4228e996f5ae2fe817ce178e77079d28e4baaebffbcd3e16ae4f36ef217298 
-> > 0 /dev/nvme1n1 0 2 integrity:32:aead sector_size:4096'
 > 
-> Thats really an amazing feature, and I think your implementation is simple 
-> and elegant.  Somehow reminds me of 520/528-byte sectors that big 
-> commercial filers use, but in a way the Linux could use.
+> Cheers,
 > 
-> Questions:
+> Hannes
+> -- 
+> Dr. Hannes Reinecke                  Kernel Storage Architect
+> hare@suse.de                                +49 911 74053 688
+> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+> HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 > 
-> - I see you are using 32-bytes of AEAD data (out of 64).  Is AEAD always 
->   32-bytes, or can it vary by crypto mechanism?
 
-It varies. I.e. if you use hmac(sha512), full 64 bytes will be used.
-
-> - What drive are you using?
-
-Western Digital SN840
-
-WUS4BA119DSP3X3
-
-> I am curious what your `nvme id-ns` output 
->   looks like. Do you have 64 in the `ms` value?
-> 
->         # nvme id-ns /dev/nvme0n1 | grep lbaf
->         nlbaf   : 0
->         nulbaf  : 0
->         lbaf  0 : ms:0   lbads:9  rp:0 (in use)
->                      ^         ^512b
-
-Yes, I have this:
-lbaf  0 : ms:0   lbads:9  rp:0
-lbaf  1 : ms:8   lbads:9  rp:0
-lbaf  2 : ms:0   lbads:12 rp:0
-lbaf  3 : ms:8   lbads:12 rp:0
-lbaf  4 : ms:64  lbads:12 rp:0 (in use)
-
-Mikulas
-
-> --
-> Eric Wheeler
-
+-- 
+Pankaj Raghav
