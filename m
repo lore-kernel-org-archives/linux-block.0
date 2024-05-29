@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89832168C3D;
-	Wed, 29 May 2024 07:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAE12F37;
+	Wed, 29 May 2024 08:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716968903; cv=none; b=AgKiAlLGKjjHD1FlVwQGkCvuGbonD+yPwxCi9NFyAz9XwfkBdl11WxpkXXwjvTOM3wyFD9PSIr65Ff6tsg+xpy5sZ1aQ71qYJxyZskij1Gb/Mw/GN+rg378CHhr0yWxyO/IrW880ruIZcoCzpqg4/aALnp97RK75o452yN+N/Wo=
+	t=1716969638; cv=none; b=CrfIl1nLm6NyhCS9Q5zTZjsC62Br+wX+E96NfAGkGC0YzJB0xBe0EdS/nYjjKTz4yZ+f1shkxWnjk8CGcGWtINUkFHc5DsL05TeJ+7UwODrhwUiMa5IwbQ3s9qj2OJgH492qtRYiXz5Vva2HK+LDSrPcmai66r7KNNsGWVtB+N0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716968903; c=relaxed/simple;
-	bh=S3iTcM1ZSPmjm7GZozDt8RGkp17GchQ3Ca1mGNH4Urc=;
+	s=arc-20240116; t=1716969638; c=relaxed/simple;
+	bh=G8ukn4/ipULjaA61nZoKSh0N7cnsV0YBmRdlGxpAHeY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GjRZQkdMKZgcQdVHlToFkLnSnnqrOn29v5LPQqdVK6arkKQQYQtKHCG1H/UhEqhAv99TtWd1y+0TWnbbBMFYvvYBRyVjWmswIUmKiX2WpmayH1fBLa6MgbJWMFCiZDH5IFpUpoDXvDjWNvxBXEdKIjWVzj9v9SPyQ4BwyeEmg2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dfbgA6jN; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=XA9CjoMo2W73/RRL1lGlUS0Xbb71R+jRCD4BQ3y98nkRHqAULAwIprjJ38KF1EIMoEt37KMPUI99gRBo7BjYR8z2tDWLNfmd2zDJOYOhO/C6odsAXZBsdwp1fVlaklNt/eKsVMoW+1SdvMkNX9waOKfr1As0JcoNzs5dIWSQq1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SuVzllmY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dfbgA6jN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B05F7C2BD10;
-	Wed, 29 May 2024 07:48:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SuVzllmY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1365C2BD10;
+	Wed, 29 May 2024 08:00:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716968903;
-	bh=S3iTcM1ZSPmjm7GZozDt8RGkp17GchQ3Ca1mGNH4Urc=;
+	s=k20201202; t=1716969637;
+	bh=G8ukn4/ipULjaA61nZoKSh0N7cnsV0YBmRdlGxpAHeY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dfbgA6jNdLtv905YzgHRwUpIcUYBb2/FqhbHwVVPi8jDYBzJegkHqnKtVllDgSZxJ
-	 hl119F1YITV2L0CzUXjFMz0P8CY1JoKC531SnvSR0HoJ9YdSPXasTOt6h/EqHBOz5D
-	 L6tidnnLJT9F5jmKbw3Jjz/je6ejB31Y6FneddoZhnRuBt9uZ2weZz0M8qraIlnOGu
-	 b564lvPJrYPe1xyTLSU6lOiEFiwyarsZVBy/9tTbFhKAXiUQ99rmKkFZCc0tkP24fr
-	 AM3HjKJP/ev9C0RkvyustpQi11rCci5L99jxRXkdkeoJFk08ttBvU+/Hb1H+2ytDwu
-	 nVyuobiiw1hmg==
-Message-ID: <9f1ec1c1-e1b8-48ac-b7ff-8efb806a1bc8@kernel.org>
-Date: Wed, 29 May 2024 16:48:18 +0900
+	b=SuVzllmYSRfquuJcDcRWnc0GHSPtFNyp26AyBluVbJ0up4tbRtITWjDNuKs1XeKsj
+	 9unRV1rYyOv2gxNp3rc+jY9sEkrRoqVZBHFucwYGOw+cZtDcO5G4HtfEKacdVyOA5g
+	 6mlURbCvBUcRD04eBHxPfjMS/Igzp8+knm7PD62kn5RYL66jlTq5s1KxPqTq4ABeHL
+	 J7gn1nDulWyl0ZYRxhgciUY+N6bzgokG2U4wmuyIXgq6xnWCSKMrB/TqQkHYeFuDg7
+	 CGmud4af4+/jP58GUdbsQFpcZukByzTLb1+jCTWsClYve1yVdsTgRE9/fLAmqjluGl
+	 t4JqpvDKBOzCw==
+Message-ID: <8878dcb7-5f18-4e34-b917-ee5e1ee15cff@kernel.org>
+Date: Wed, 29 May 2024 17:00:34 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,59 +35,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
- and request layer.
-To: Nitesh Shetty <nj.shetty@samsung.com>,
- Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, martin.petersen@oracle.com, david@fromorbit.com,
- hare@suse.de, damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com,
- joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520102842epcas5p4949334c2587a15b8adab2c913daa622f@epcas5p4.samsung.com>
- <20240520102033.9361-3-nj.shetty@samsung.com>
- <eda6c198-3a29-4da4-94db-305cfe28d3d6@acm.org>
- <20240529061736.rubnzwkkavgsgmie@nj.shetty@samsung.com>
-Content-Language: en-US
+Subject: Re: [PATCH 01/12] ubd: untagle discard vs write zeroes not support
+ handling
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Josef Bacik
+ <josef@toxicpanda.com>, Ilya Dryomov <idryomov@gmail.com>,
+ Dongsheng Yang <dongsheng.yang@easystack.cn>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ linux-um@lists.infradead.org, linux-block@vger.kernel.org,
+ nbd@other.debian.org, ceph-devel@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-scsi@vger.kernel.org
+References: <20240529050507.1392041-1-hch@lst.de>
+ <20240529050507.1392041-2-hch@lst.de>
 From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <20240529061736.rubnzwkkavgsgmie@nj.shetty@samsung.com>
+In-Reply-To: <20240529050507.1392041-2-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 5/29/24 15:17, Nitesh Shetty wrote:
-> On 24/05/24 01:33PM, Bart Van Assche wrote:
->> On 5/20/24 03:20, Nitesh Shetty wrote:
->>> We add two new opcode REQ_OP_COPY_DST, REQ_OP_COPY_SRC.
->>> Since copy is a composite operation involving src and dst sectors/lba,
->>> each needs to be represented by a separate bio to make it compatible
->>> with device mapper.
->>> We expect caller to take a plug and send bio with destination information,
->>> followed by bio with source information.
->>> Once the dst bio arrives we form a request and wait for source
->>> bio. Upon arrival of source bio we merge these two bio's and send
->>> corresponding request down to device driver.
->>> Merging non copy offload bio is avoided by checking for copy specific
->>> opcodes in merge function.
->>
->> In this patch I don't see any changes for blk_attempt_bio_merge(). Does
->> this mean that combining REQ_OP_COPY_DST and REQ_OP_COPY_SRC will never
->> happen if the QUEUE_FLAG_NOMERGES request queue flag has been set?
->>
-> Yes, in this case copy won't work, as both src and dst bio reach driver
-> as part of separate requests.
-> We will add this as part of documentation.
+On 5/29/24 14:04, Christoph Hellwig wrote:
+> Discard and Write Zeroes are different operation and implemented
+> by different fallocate opcodes for ubd.  If one fails the other one
+> can work and vice versa.
+> 
+> Split the code to disable the operations in ubd_handler to only
+> disable the operation that actually failed.
+> 
+> Fixes: 50109b5a03b4 ("um: Add support for DISCARD in the UBD Driver")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/um/drivers/ubd_kern.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
+> index ef805eaa9e013d..a79a3b7c33a647 100644
+> --- a/arch/um/drivers/ubd_kern.c
+> +++ b/arch/um/drivers/ubd_kern.c
+> @@ -471,9 +471,14 @@ static void ubd_handler(void)
+>  		for (count = 0; count < n/sizeof(struct io_thread_req *); count++) {
+>  			struct io_thread_req *io_req = (*irq_req_buffer)[count];
+>  
+> -			if ((io_req->error == BLK_STS_NOTSUPP) && (req_op(io_req->req) == REQ_OP_DISCARD)) {
+> -				blk_queue_max_discard_sectors(io_req->req->q, 0);
+> -				blk_queue_max_write_zeroes_sectors(io_req->req->q, 0);
+> +			if (io_req->error == BLK_STS_NOTSUPP) {
+> +				struct request_queue *q = io_req->req->q;
+> +
+> +				if (req_op(io_req->req) == REQ_OP_DISCARD)
+> +					blk_queue_max_discard_sectors(q, 0);
+> +				if (req_op(io_req->req) == REQ_OP_WRITE_ZEROES)
 
-So that means that 2 major SAS HBAs which set this flag (megaraid and mpt3sas)
-will not get support for copy offload ? Not ideal, by far.
+Nit: this can be an "else if".
+
+Otherwise, looks OK to me.
+
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+> +					blk_queue_max_write_zeroes_sectors(q,
+> +							0);
+>  			}
+>  			blk_mq_end_request(io_req->req, io_req->error);
+>  			kfree(io_req);
 
 -- 
 Damien Le Moal
