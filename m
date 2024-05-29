@@ -1,142 +1,109 @@
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F221CD37;
-	Wed, 29 May 2024 13:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F0715920F;
+	Wed, 29 May 2024 14:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716990819; cv=none; b=QDyG7igP4aGbufkp37Ff/MdgjBtF2HocXRKV4c8EGRQqRCl2IzAIsO+fVrhbfsGTmYkAqxWXguW5lmBfCBQGYN5IfASjvhqxzAPb4am6wqxPU7GxoJMnBCbRoV2NiW5t/4A1HnxlZSS5QnRglszBbPan1XC2NnJq8h5D9N3Rplg=
+	t=1716993427; cv=none; b=VGnLlTNt6wLweVPpdamdVs2caNs3YpcjJwVDxWLCJSw19p5lyYmqXG9ytYSjYVkBZvQnGx6ZXVvCIuDhg6745N+5EC0u2gWIvnseYSyEY3n3u0E3m1KlrTGVNDII5cNqDjErjaSZ4blHGbH0SVCZnucGdtJWd3RvYa8iGxgfTzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716990819; c=relaxed/simple;
-	bh=y26ipyuX/ItBKpPRg/M7phcLUegsUUakBbPT+K6ItPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J1Op3P8sODEQq3IUk3IRta3AGoxkld44ngRfowph90pa3ZraI6/hDsbaXluCp/A6VHFPrxqHHdbu+x7UJUStUWHtG4wBrMP1NzdaLl2doPJMlucd40l7uA31Fnz7LgzmcRFXGUzjn6cn7Trk6o1nstwtP4F1LzpcmSmPk1iQQY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; arc=none smtp.client-ip=148.163.147.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
-Received: from pps.filterd (m0134422.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44TAjcFv010057;
-	Wed, 29 May 2024 12:49:39 GMT
-DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Dhpe.com;_h=3Dcc?=
- =?UTF-8?Q?:content-transfer-encoding:content-type:date:from:in-reply-to:m?=
- =?UTF-8?Q?essage-id:mime-version:references:subject:to;_s=3Dpps0720;_bh?=
- =?UTF-8?Q?=3DOkSHme8qRdc1oP9Z1/sJWLvkHwZYfQaTyyjWMYtmqVo=3D;_b=3DoRa/3eYu?=
- =?UTF-8?Q?LfuflX4ymkmcGxR8NOtDrbujU/fZgZBjCkxSWZbXLJiuZbLyckSiVIk3EVyW_hj?=
- =?UTF-8?Q?AydiTlGDAPITyoZVZz4D3t+E+yLhY6u9CD5dar/edlSmSFIQsxV13QpGEdGhDap?=
- =?UTF-8?Q?4fb_sB3G0g9w6/5dqb6Lgsp/4pL0cp2qveKPukVV1CpM2NsMMIpCOCBxeDUCZHh?=
- =?UTF-8?Q?1GJ7rdznp_N2H8nviRFCfcnRCVil8nXbIlssiMQW8MSsAXg097zQSjUUwFKqsc3?=
- =?UTF-8?Q?5G3Q05N7MLMw/lt_J/HAjVF9ctGkI8tYR9GZmgIc/iJDi7Z1jvhsT5k0wJWKDo8?=
- =?UTF-8?Q?X1DSg5R+w/GiFtVbW7RDC_ag=3D=3D_?=
-Received: from p1lg14879.it.hpe.com ([16.230.97.200])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3ye1r59bvy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 12:49:39 +0000
-Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 63CFF12B5B;
-	Wed, 29 May 2024 12:49:38 +0000 (UTC)
-Received: from hpe.com (unknown [16.231.227.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTPS id 8936680172C;
-	Wed, 29 May 2024 12:49:36 +0000 (UTC)
-Date: Wed, 29 May 2024 07:49:34 -0500
-From: Dimitri Sivanich <sivanich@hpe.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Vasant Hegde <vasant.hegde@amd.com>, Yi Zhang <yi.zhang@redhat.com>,
-        Baolu Lu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
-Subject: Re: [bug report][regression] blktests block/008 lead kerne panic at
- RIP: 0010:amd_iommu_enable_faulting+0x0/0x10
-Message-ID: <ZlckXh4rZ+sWRqXR@hpe.com>
-References: <CAHj4cs9KZJc6Wsp9t0fDc4fDBJB1TmwGT7-8peCGLiqW3J_Fqw@mail.gmail.com>
- <ZlVk95sNtdkzZ8bE@8bytes.org>
- <77c7eb43-2321-484d-a1bf-50ddd907db17@amd.com>
- <80ceceba-ac9c-4ab7-a0e3-bdb9336a86e6@amd.com>
- <CAHj4cs9W=OEZTPqi6jx4Hinebz8VCJBpngHnr5LO-+xqWMrG2g@mail.gmail.com>
- <f9252410-a295-4ad5-9925-228119011539@amd.com>
- <BN9PR11MB5276CBD826F1E95D28B2E30A8CF22@BN9PR11MB5276.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1716993427; c=relaxed/simple;
+	bh=pYrTtkOBQOYeyXCIy27DWA6GTTCSA3OpaXyqB8Pa86U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fSO45P+nKBPEIblN4wWRroYLI09EQQ4AnaCyv0bqDVnzdqPoy5YpuVlCrfXhQkC7WuXOpn5/pLCriYDiaN0jmkJcRN/jhQ5Y9WGgUYpXzmTkjmPp+P3Ufi8op1T3GLv9J2JKH0dCKasiH3N9Y0xEA4B8Bvgg+MQkzdKEYhLq94E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=ZveWQ6Dr; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="ZveWQ6Dr"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:Reply-To:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=B7XB8qUIcTmB1ehnipB+Kf3z1BPRYE36ZBSUE8NS1go=;
+	t=1716993425; x=1717425425; b=ZveWQ6Dr3LUYuVdUNOPo0tAZkO5ChVyME/VbLMP1uqSiRaE
+	yzbEOROreEYOY8mROeCiqHYK/bj/Zrtbeb66pNlA15L0rCy5o1xhVFuTkEzifskJhrzOhg3Aat1/x
+	JHFkgSCVLfdWVLAVgq1eMHiE4tki9j15sZGcGfe9pckoXaURMBFNnODVdNP29WAH8L8BFf4S2BfvE
+	3+pGS1l0eqgUsTjU6ga2iIPLjOIZfYgKFkHogihuqkeuYcHkUKhHc9r51fRhRWU9whiw4WMxtmzQa
+	NgIISdJBWUeB/D5ALf/lnvaEEbuMKfGQyk7lQaVoN8XbMg3ZcerYk2RxItMp2Pig==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1sCKQF-0003Dv-Nj; Wed, 29 May 2024 16:36:59 +0200
+Message-ID: <fc6a2243-6982-45e9-a640-9d98c29a8f53@leemhuis.info>
+Date: Wed, 29 May 2024 16:36:58 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BN9PR11MB5276CBD826F1E95D28B2E30A8CF22@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Proofpoint-ORIG-GUID: 5wU5SyHn4ZLuUtk0lOH_FE5JDykRFw2I
-X-Proofpoint-GUID: 5wU5SyHn4ZLuUtk0lOH_FE5JDykRFw2I
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-29_07,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 suspectscore=0 spamscore=0 malwarescore=0 impostorscore=0
- mlxscore=0 clxscore=1011 priorityscore=1501 phishscore=0 adultscore=0
- mlxlogscore=871 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405290087
+User-Agent: Mozilla Thunderbird
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: [PATCH 04/23] scsi: initialize scsi midlayer limits before
+ allocating the queue
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: John Garry <john.g.garry@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-scsi@vger.kernel.org, benh@kernel.crashing.org,
+ linuxppc-dev@lists.ozlabs.org, Guenter Roeck <linux@roeck-us.net>,
+ Christoph Hellwig <hch@lst.de>,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: <20240520151536.GA32532@lst.de>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+In-Reply-To: <20240520151536.GA32532@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1716993425;08490132;
+X-HE-SMSGID: 1sCKQF-0003Dv-Nj
 
-On Wed, May 29, 2024 at 08:13:42AM +0000, Tian, Kevin wrote:
-> > From: Vasant Hegde <vasant.hegde@amd.com>
-> > Sent: Wednesday, May 29, 2024 2:26 PM
-> > 
-> > Hi Yi,
-> > 
-> > +Dimitri, Lu, Tian.
-> > 
-> > 
-> > On 5/29/2024 11:46 AM, Yi Zhang wrote:
-> > > On Wed, May 29, 2024 at 1:40 AM Vasant Hegde <vasant.hegde@amd.com>
-> > wrote:
-> > >>
-> > >> Hi Yi,
-> > >>
-> > >>
-> > >> On 5/28/2024 11:00 PM, Vasant Hegde wrote:
-> > >>> Hi Yi,
-> > >>>
-> > >>>
-> > >>> On 5/28/2024 10:30 AM, Joerg Roedel wrote:
-> > >>>> Adding Vasant.
-> > >>>>
-> > >>>> On Tue, May 28, 2024 at 10:23:10AM +0800, Yi Zhang wrote:
-> > >>>>> Hello
-> > >>>>> I found this regression panic issue on the latest 6.10-rc1 and it
-> > >>>>> cannot be reproduced on 6.9, please help check and let me know if
-> > you
-> > >>>>> need any info/testing for it, thanks.
-> > >>>
-> > >>> I have tried to reproduce this issue on my system. So far I am not able to
-> > >>> reproduce it.
-> > >>>
-> > >>> Will you be able to bisect the kernel?
-> > >>
-> > >> I see that below patch touched this code path. Can you revert below patch
-> > and
-> > >> test it again?
-> > >
-> > > Yes, the panic cannot be reproduced now after revert this patch.
-> > 
-> > Thanks for verifying. AMD code path (amd_iommu_enable_faulting()) just
-> > return
-> > zero. It doesn't do anything else. I am not familiar with cpuhp_setup_state()
-> > code path.
-> > 
-> > @Dimitri, Can you look into this issue?
-> > 
+[CCing the regression list, as it should be in the loop for regressions:
+https://docs.kernel.org/admin-guide/reporting-regressions.html]
+
+On 20.05.24 17:15, Christoph Hellwig wrote:
+> Adding ben and the linuxppc list.
+
+Hmm, no reply and no other progress to get this resolved afaics. So lets
+bring Michael into the mix, he might be able to help out.
+
+BTW TWIMC: a PowerMac G5 user user reported similar symptoms here
+recently: https://bugzilla.kernel.org/show_bug.cgi?id=218858
+
+Ciao, Thorsten
+
+> Context: pata_macio initialization now fails as we enforce that the
+> segment size is set properly.
 > 
-> -int __init amd_iommu_enable_faulting(void)
-> +int __init amd_iommu_enable_faulting(unsigned int cpu)
+> On Wed, May 15, 2024 at 04:52:29PM -0700, Guenter Roeck wrote:
+>> pata_macio_common_init() Calling ata_host_activate() with limit 65280
+>> ...
+>> max_segment_size is 65280; PAGE_SIZE is 65536; BLK_MAX_SEGMENT_SIZE is 65536
+>> WARNING: CPU: 0 PID: 12 at block/blk-settings.c:202 blk_validate_limits+0x2d4/0x364
+>> ...
+>>
+>> This is with PPC_BOOK3S_64 which selects a default page size of 64k.
 > 
-> likely it's due to '__init' not being removed...
-
-Yes, agreed.  I will submit a patch with this change soon.
-
+> Yeah.  Did you actually manage to use pata macio previously?  Or is
+> it just used because it's part of the pmac default config?
+> 
+>> Looking at the old code, I think it did what you suggested above,
+> 
+>> but assuming that the driver requested a lower limit on purpose that
+>> may not be the best solution.
+> 
+>> Never mind, though - I updated my test configuration to explicitly
+>> configure the page size to 4k to work around the problem. With that,
+>> please consider this report a note in case someone hits the problem
+>> on a real system (and sorry for the noise).
+> 
+> Yes, the idea behind this change was to catch such errors.  So far
+> most errors have been drivers setting lower limits than what the
+> hardware can actually handle, but I'd love to track this down.
+> 
+> If the hardware can't actually handle the lower limit we should
+> probably just fail the probe gracefully with a well comment if
+> statement instead.
