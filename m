@@ -1,171 +1,224 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CB52B9A0
-	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 06:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0AC176AD7;
+	Thu, 30 May 2024 07:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717050353; cv=none; b=js3Ty/4b0c3wKHMTL3uP9TvrHyxBWP6SAQmm6ycHEhRRaQBnvZA2CSa48pCq4dE/l6K/vlW0TcgL2L3FTzzgzRIA99wXYkx8zkUuQmrPfD2h0dllSDaUaGP/EMIThsj34Xkpl5TF1RdmqZ88K7wyJYbgooDKT6NmgeN54dVmoes=
+	t=1717054634; cv=none; b=P6WTPURqydCEJejSkEmTdg9tUH3NL+XPY2wwVXp0tdMgC0dXB0ZaxDvNA+pfiv/ZtkA305ntlLc0eJZ3Wh8dlygs6lgUvXyPWF5cK8zn9euw1CRjXep1Rw8iosgAbMzTlYOJqeuHxAfq6G9V5lt8A0V+dhh1q2L+c+KDbst2p80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717050353; c=relaxed/simple;
-	bh=ZDcFsnA0i1LjyLR1crnrYyoQ5zgqFLBc1sDLgAA2fgI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EIzwK1KGOBNC5DTYvTnaaYufPRw1jjIaQfMFOdbHvtx/fKIus4syw4i4MqS8UCO2H9DuR2bcNZxvsmOubRxzJW/RZ4/SAL86eM53//N9we7J9c1W/QCnjvdG+JtqBjzza+nEFeXMGcJRfbqwJRUuncRHsXIRfrllh7QOM/HpFho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44U5mRDX028552;
-	Thu, 30 May 2024 06:25:47 GMT
-DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Doracle.com;_h?=
- =?UTF-8?Q?=3Dcc:content-transfer-encoding:date:from:message-id:mime-versi?=
- =?UTF-8?Q?on:subject:to;_s=3Dcorp-2023-11-20;_bh=3DPcwe1susMFs6axzxQyaLUP?=
- =?UTF-8?Q?82jY/su08Rw5XeJWqwwV0=3D;_b=3DYySbUFA761uXeECDn2Rm9IFiyHgw0L0mD?=
- =?UTF-8?Q?IrJk3XazT7MljomHuRAvp1XzkaKt/bpmumn_SyQW+Y9GEhpEm5a14IDHQprOp28?=
- =?UTF-8?Q?rFrlqi78PvHwRH1tSvWPm3JVx2NdZpVF+Bdpm35er_OQM66M0r8J8dH62Z+TvVV?=
- =?UTF-8?Q?AAYAqNXZpW4cFVrCh/eunc3XEVbdn/pNRZLZck/UdzQtthW_IXoZ3hbPMJfCaRK?=
- =?UTF-8?Q?3RxIAo0YPjNaV168JPGr1K9/Lvm0atdE15f73EnOvDu83Qidf7e75_5NW1Q3xdf?=
- =?UTF-8?Q?MKFtW666IRnbIYt3JLY8tbbCYzskVoqeionIlpM9RVbUTy4sLS3nJ/08Sz1_1g?=
- =?UTF-8?Q?=3D=3D_?=
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yb8g4894g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 30 May 2024 06:25:46 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44U4u7wv010726;
-	Thu, 30 May 2024 06:25:45 GMT
-Received: from gms-lo-open-test.osdevelopmeniad.oraclevcn.com (gms-lo-open-test.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.255.129])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3yc5106ngv-1;
-	Thu, 30 May 2024 06:25:45 +0000
-From: Gulam Mohamed <gulam.mohamed@oracle.com>
-To: linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com
-Subject: [PATCH V3 blktests] loop: Detect a race condition between loop detach and open
-Date: Thu, 30 May 2024 06:25:45 +0000
-Message-Id: <20240530062545.79400-1-gulam.mohamed@oracle.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1717054634; c=relaxed/simple;
+	bh=iL5yPu5QHv8P4EuhBRD+yXyYZUPty/l0bQpJeJk7fJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uhxm4MkzMbepYqtekJK4M1Uj59WeEUCexaOKSfdKjo5KsxqnY0h6Pbg9E2xZO4JrDNcj8HKO5SmDyaM0y6j5teGO0Xrn0Mr3Ba693Dz+vA+59+jsgNZ5m0JXVQ+wVBIpRk2tpEwCAphtuz3vnDgIJ/5cksvqU1W+JXRmoz1Ue4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YvgTC7dH; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YvgTC7dH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39CACC2BBFC;
+	Thu, 30 May 2024 07:37:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717054633;
+	bh=iL5yPu5QHv8P4EuhBRD+yXyYZUPty/l0bQpJeJk7fJU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YvgTC7dHljG52xS6zo4f+aNTGWqPERadz302O6Tkcp/k+3vHwMJDpqouLsU9Y/mpw
+	 X4l1JW4THg9lztaH/dnyxTRxIbuIwEUELT+LTk0gLNRMtu9LP6CgBZNOKrQ2YUhLYs
+	 TpS5W40MVor0ybLj2Ks8/Ub37EAT4nzKkJIUc9H3tC/3AmwG4tD0ubdEzhdUx3m3CF
+	 kYW/eHGd96iWvEbXC+6UdHOD5Pjc9dHAZX43A1AkYjrw73q6vaPQRdAFveY0d8s/Kl
+	 fvsvbXSPdjaFAFy3Y/4pbVczEGcijpFFsDASzUPdUxpxAa0uPS2EqzpT6ysjNAjBw6
+	 TH+6xhIVgHw5A==
+Date: Thu, 30 May 2024 09:37:09 +0200
+From: Niklas Cassel <cassel@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: [PATCH 3/4] block: Fix zone write plugging handling of devices
+ with a runt zone
+Message-ID: <ZlgspRAZQ4lmqBcC@ryzen.lan>
+References: <20240530054035.491497-1-dlemoal@kernel.org>
+ <20240530054035.491497-4-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-30_03,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=929 malwarescore=0
- spamscore=0 adultscore=0 mlxscore=0 phishscore=0 suspectscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405300046
-X-Proofpoint-GUID: PH65gPGD7bbD-JFkjqCelrEpneLXHAYe
-X-Proofpoint-ORIG-GUID: PH65gPGD7bbD-JFkjqCelrEpneLXHAYe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240530054035.491497-4-dlemoal@kernel.org>
 
-When one process opens a loop device partition and another process detaches
-it, there will be a race condition due to which stale loop partitions are
-created causing IO errors. This test will detect the race
+On Thu, May 30, 2024 at 02:40:34PM +0900, Damien Le Moal wrote:
+> A zoned device may have a last sequential write required zone that is
+> smaller than other zones. However, all tests to check if a zone write
+> plug write offset exceeds the zone capacity use the same capacity
+> value stored in the gendisk zone_capacity field. This is incorrect for a
+> zoned device with a last runt (smaller) zone.
+> 
+> Add the new field last_zone_capacity to struct gendisk to store the
+> capacity of the last zone of the device. blk_revalidate_seq_zone() and
+> blk_revalidate_conv_zone() are both modified to get this value when
+> disk_zone_is_last() returns true. Similarly to zone_capacity, the value
+> is first stored using the last_zone_capacity field of struct
+> blk_revalidate_zone_args. Once zone revalidation of all zones is done,
+> this is used to set the gendisk last_zone_capacity field.
+> 
+> The checks to determine if a zone is full or if a sector offset in a
+> zone exceeds the zone capacity in disk_should_remove_zone_wplug(),
+> disk_zone_wplug_abort_unaligned(), blk_zone_write_plug_init_request(),
+> and blk_zone_wplug_prepare_bio() are modified to use the new helper
+> functions disk_zone_is_full() and disk_zone_wplug_is_full().
+> disk_zone_is_full() uses the zone index to determine if the zone being
+> tested is the last one of the disk and uses the either the disk
+> zone_capacity or last_zone_capacity accordingly.
+> 
+> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>  block/blk-zoned.c      | 35 +++++++++++++++++++++++++++--------
+>  include/linux/blkdev.h |  1 +
+>  2 files changed, 28 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 402a50a1ac4d..52abebf56027 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -455,6 +455,20 @@ static bool disk_zone_is_last(struct gendisk *disk, struct blk_zone *zone)
+>  	return zone->start + zone->len >= get_capacity(disk);
+>  }
+>  
+> +static bool disk_zone_is_full(struct gendisk *disk,
+> +			      unsigned int zno, unsigned int offset_in_zone)
 
-Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
----
-v3<-v2:
-Resolved all the formatting issues
+Why not just call the third parameter wp?
 
- tests/loop/010     | 77 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/loop/010.out |  2 ++
- 2 files changed, 79 insertions(+)
- create mode 100755 tests/loop/010
- create mode 100644 tests/loop/010.out
 
-diff --git a/tests/loop/010 b/tests/loop/010
-new file mode 100755
-index 000000000000..19ceb6ab69cf
---- /dev/null
-+++ b/tests/loop/010
-@@ -0,0 +1,77 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024, Oracle and/or its affiliates.
-+#
-+# Test to detect a race between loop detach and loop open which creates
-+# stale loop partitions when one process opens the loop partition and
-+# another process detaches the loop device
-+#
-+. tests/loop/rc
-+DESCRIPTION="check stale loop partition"
-+TIMED=1
-+
-+requires() {
-+	_have_program parted
-+	_have_program mkfs.xfs
-+	_have_program blkid
-+	_have_program udevadm
-+}
-+
-+image_file="$TMPDIR/loopImg"
-+
-+create_loop() {
-+	while true
-+	do
-+		loop_device="$(losetup -P -f --show "${image_file}")"
-+		blkid /dev/loop0p1 >> /dev/null 2>&1
-+	done
-+}
-+
-+detach_loop() {
-+	while true
-+	do
-+		if [ -e /dev/loop0 ]; then
-+			losetup -d /dev/loop0 > /dev/null 2>&1
-+		fi
-+	done
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+	local loop_device
-+	local create_pid
-+	local detach_pid
-+
-+	truncate -s 1G "${image_file}"
-+	parted -a none -s "${image_file}" mklabel gpt
-+	loop_device="$(losetup -P -f --show "${image_file}")"
-+	parted -a none -s "${loop_device}" mkpart primary 64s 109051s
-+
-+	udevadm settle
-+
-+	if [ ! -e "${loop_device}" ]; then
-+		return 1
-+	fi
-+
-+	mkfs.xfs -f "${loop_device}p1" > /dev/null 2>&1
-+	losetup -d "${loop_device}" >  /dev/null 2>&1
-+
-+	create_loop &
-+	create_pid=$!
-+	detach_loop &
-+	detach_pid=$!
-+
-+	sleep "${TIMEOUT:-90}"
-+	{
-+		kill -9 $create_pid
-+		kill -9 $detach_pid
-+		wait
-+		sleep 1
-+	} 2>/dev/null
-+
-+	losetup -D > /dev/null 2>&1
-+	if _dmesg_since_test_start | grep -q "partition scan of loop0 failed (rc=-16)"; then
-+		echo "Fail"
-+	fi
-+	echo "Test complete"
-+}
-diff --git a/tests/loop/010.out b/tests/loop/010.out
-new file mode 100644
-index 000000000000..64a6aee00b8a
---- /dev/null
-+++ b/tests/loop/010.out
-@@ -0,0 +1,2 @@
-+Running loop/010
-+Test complete
--- 
-2.39.3
+> +{
+> +	if (zno < disk->nr_zones - 1)
+> +		return offset_in_zone >= disk->zone_capacity;
+> +	return offset_in_zone >= disk->last_zone_capacity;
+> +}
+> +
+> +static bool disk_zone_wplug_is_full(struct gendisk *disk,
+> +				    struct blk_zone_wplug *zwplug)
+> +{
+> +	return disk_zone_is_full(disk, zwplug->zone_no, zwplug->wp_offset);
+> +}
+> +
+>  static bool disk_insert_zone_wplug(struct gendisk *disk,
+>  				   struct blk_zone_wplug *zwplug)
+>  {
+> @@ -548,7 +562,7 @@ static inline bool disk_should_remove_zone_wplug(struct gendisk *disk,
+>  		return false;
+>  
+>  	/* We can remove zone write plugs for zones that are empty or full. */
+> -	return !zwplug->wp_offset || zwplug->wp_offset >= disk->zone_capacity;
+> +	return !zwplug->wp_offset || disk_zone_wplug_is_full(disk, zwplug);
+>  }
+>  
+>  static void disk_remove_zone_wplug(struct gendisk *disk,
+> @@ -669,13 +683,12 @@ static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
+>  static void disk_zone_wplug_abort_unaligned(struct gendisk *disk,
+>  					    struct blk_zone_wplug *zwplug)
+>  {
+> -	unsigned int zone_capacity = disk->zone_capacity;
+>  	unsigned int wp_offset = zwplug->wp_offset;
+>  	struct bio_list bl = BIO_EMPTY_LIST;
+>  	struct bio *bio;
+>  
+>  	while ((bio = bio_list_pop(&zwplug->bio_list))) {
+> -		if (wp_offset >= zone_capacity ||
+> +		if (disk_zone_is_full(disk, zwplug->zone_no, wp_offset) ||
 
+Why don't you use disk_zone_wplug_is_full() here?
+
+
+>  		    (bio_op(bio) != REQ_OP_ZONE_APPEND &&
+>  		     bio_offset_from_zone_start(bio) != wp_offset)) {
+>  			blk_zone_wplug_bio_io_error(zwplug, bio);
+> @@ -914,7 +927,6 @@ void blk_zone_write_plug_init_request(struct request *req)
+>  	sector_t req_back_sector = blk_rq_pos(req) + blk_rq_sectors(req);
+>  	struct request_queue *q = req->q;
+>  	struct gendisk *disk = q->disk;
+> -	unsigned int zone_capacity = disk->zone_capacity;
+>  	struct blk_zone_wplug *zwplug =
+>  		disk_get_zone_wplug(disk, blk_rq_pos(req));
+>  	unsigned long flags;
+> @@ -938,7 +950,7 @@ void blk_zone_write_plug_init_request(struct request *req)
+>  	 * into the back of the request.
+>  	 */
+>  	spin_lock_irqsave(&zwplug->lock, flags);
+> -	while (zwplug->wp_offset < zone_capacity) {
+> +	while (!disk_zone_wplug_is_full(disk, zwplug)) {
+>  		bio = bio_list_peek(&zwplug->bio_list);
+>  		if (!bio)
+>  			break;
+> @@ -984,7 +996,7 @@ static bool blk_zone_wplug_prepare_bio(struct blk_zone_wplug *zwplug,
+>  	 * We know such BIO will fail, and that would potentially overflow our
+>  	 * write pointer offset beyond the end of the zone.
+>  	 */
+> -	if (zwplug->wp_offset >= disk->zone_capacity)
+> +	if (disk_zone_wplug_is_full(disk, zwplug))
+>  		goto err;
+>  
+>  	if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+> @@ -1561,6 +1573,7 @@ void disk_free_zone_resources(struct gendisk *disk)
+>  	kfree(disk->conv_zones_bitmap);
+>  	disk->conv_zones_bitmap = NULL;
+>  	disk->zone_capacity = 0;
+> +	disk->last_zone_capacity = 0;
+>  	disk->nr_zones = 0;
+>  }
+>  
+> @@ -1605,6 +1618,7 @@ struct blk_revalidate_zone_args {
+>  	unsigned long	*conv_zones_bitmap;
+>  	unsigned int	nr_zones;
+>  	unsigned int	zone_capacity;
+> +	unsigned int	last_zone_capacity;
+>  	sector_t	sector;
+>  };
+>  
+> @@ -1622,6 +1636,7 @@ static int disk_update_zone_resources(struct gendisk *disk,
+>  
+>  	disk->nr_zones = args->nr_zones;
+>  	disk->zone_capacity = args->zone_capacity;
+> +	disk->last_zone_capacity = args->last_zone_capacity;
+>  	swap(disk->conv_zones_bitmap, args->conv_zones_bitmap);
+>  	if (disk->conv_zones_bitmap)
+>  		nr_conv_zones = bitmap_weight(disk->conv_zones_bitmap,
+> @@ -1673,6 +1688,9 @@ static int blk_revalidate_conv_zone(struct blk_zone *zone, unsigned int idx,
+>  		return -ENODEV;
+>  	}
+>  
+> +	if (disk_zone_is_last(disk, zone))
+> +		args->last_zone_capacity = zone->capacity;
+> +
+>  	if (!disk_need_zone_resources(disk))
+>  		return 0;
+>  
+> @@ -1703,8 +1721,9 @@ static int blk_revalidate_seq_zone(struct blk_zone *zone, unsigned int idx,
+>  	 */
+>  	if (!args->zone_capacity)
+>  		args->zone_capacity = zone->capacity;
+> -	if (!disk_zone_is_last(disk, zone) &&
+> -	    zone->capacity != args->zone_capacity) {
+> +	if (disk_zone_is_last(disk, zone)) {
+> +		args->last_zone_capacity = zone->capacity;
+> +	} else if (zone->capacity != args->zone_capacity) {
+>  		pr_warn("%s: Invalid variable zone capacity\n",
+>  			disk->disk_name);
+>  		return -ENODEV;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index aefdda9f4ec7..24c36929920b 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -186,6 +186,7 @@ struct gendisk {
+>  	 */
+>  	unsigned int		nr_zones;
+>  	unsigned int		zone_capacity;
+> +	unsigned int		last_zone_capacity;
+>  	unsigned long		*conv_zones_bitmap;
+>  	unsigned int            zone_wplugs_hash_bits;
+>  	spinlock_t              zone_wplugs_lock;
+> -- 
+> 2.45.1
+> 
