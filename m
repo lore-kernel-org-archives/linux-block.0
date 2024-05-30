@@ -1,183 +1,203 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50BC18036
-	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 01:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BA518036;
+	Thu, 30 May 2024 01:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717033632; cv=none; b=HJPlauKekvk0cg0bTfhfj7b1Gm2Ha4u5jAfgsOn8Gn1xR8T5yBQb7YETirVn284KsVXiKzQqjUgre0XrTVPScvVeJye/mnyeHEsqmCWpfHpRAXG76p59YjNsEm0oxNDjLp1hlORAqLSOrOYgQKW0mmIjaXW1AoHEHn5c0tFiC2M=
+	t=1717033768; cv=none; b=paW6rtYwUR7EgUA+ssJ9fCRl8wCEiB/mKZZKKjdC367xYEUVSE69vOUcvDHpW1Ki36MKjFjiynbm0/r9/rTZ59iLY2vzlisCnimfkbNT8JmGM1wmN6IeeZpmHB2Ra26k+HCFZnJPpTPQ6Z5PuoksOIaP7dOSxAAnZadj+ISCbTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717033632; c=relaxed/simple;
-	bh=x1jS0mxgpy/2saLRwCgP0IDOSIhPVz9T5ZHuv9e2c30=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mlLLJc4n8WQH129fqbiwOCMa5fEd+zH/XEHAKYHYJxscGy17m9UMu0/aJq8Ua229iVq1P/AcygkD55Q2yhD2brjn7ZZ0W1mhW5ixWbRi33EBAk14cxoMbUnxrLCflDhL9ofusCJq4I4M1vKu5VHnizBrMdQIqdtDnQW1Zbxhs5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=RwtgAkTz; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="RwtgAkTz"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-627efad69b4so3158787b3.3
-        for <linux-block@vger.kernel.org>; Wed, 29 May 2024 18:47:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1717033629; x=1717638429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GtKBdXnoQfLOHhfUlX9Bxsk6L3lUvasMxrh9oed50QE=;
-        b=RwtgAkTzeIe14CmGCyMksSR4l21XcWqOQkKoopcgKO/XLkZUIn4G/0i0q0lKZrcy4x
-         xn68e3VSEarmh1mvNflXaLAyT29Gv70J4qQTPiTT05QTrRcMDjhNFl1k0s3cr14tBGG6
-         yL71M4rAGeGLtcneYI7oXdXS7scDG95KWbSh3npaBfIrxNpZ9xwjoq1VUJFmfXrn8CRj
-         KMEtKZPZrCDtknaqS5rNesrw9qnisExtDi3jgfHhEY7IUV9y1lfeVXDRq8GEYtPqrmkL
-         FpMsJap7fFxb8yCjg7PMJWPjGZpfF+3y/IHrgo+lih0Ycse8GFpBMubGKutnNwI4dxvG
-         KhSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717033629; x=1717638429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GtKBdXnoQfLOHhfUlX9Bxsk6L3lUvasMxrh9oed50QE=;
-        b=dXa5f1G87ZJQG9DTlJUn3wW4gZsg7vb55ZdcknhuCLzI1m6+O0VppG/Sdik/HTjFzb
-         ygK+CztAPRAtnMshJ8DMVYdq+lNKVTpnjKEwpJBQSBIsrD68s8BW+jh6hJHb56sfBEmA
-         0I6rtfnL0lm+U7sNrNxlltDPL5onfACX8+sn4hbnTsVDERfsWDCI+vsgr6Fd6g55JyAM
-         qo6pCPv/mdHIdxOWjNcsfEneGa1Sn7CLNFfunlnQJPzg8AQfh6quAzCOkzUJeK1ua/bF
-         zpC1JiLPugWX2sUCgnTl11C99posLTSw+6DxdOK2onBUlFTVSIjWJGSNYdlruN1wS+s+
-         H3Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCU0Ow2kubJyDWAiZOS9CkHr+uIQEHwMC7RYfGC39RW0ZRm3xkAlqlEuIS+9Mg1AN4+lG636BJu+pHmN+6wLOcxl+ph1g8elYk5hQ+M=
-X-Gm-Message-State: AOJu0YyBT+6LzQBu24kMYoEzHOsaB/4C0mshUZsZhkgGo/LWenJsJAkl
-	PqXWAKB7TPWT21tSJKp7ZfqdkOyfrdF+bLpGV3H4T3QirGUSb6Pq5mJeGrB5+DdMKED3+aQ8+Sh
-	amWIwHOHfvlR4djuk5hZa/Dsabq79A035czb9
-X-Google-Smtp-Source: AGHT+IHE8pHh5vgrRzbkNWJnz/7ABaPo+xQvVDp6nIkAadJxWm7yBQS/PqPj3c4uPz54TzSylU9FuipuoCMPbpIsfP8=
-X-Received: by 2002:a05:690c:ecc:b0:627:ecd3:6223 with SMTP id
- 00721157ae682-62c6bc79ed6mr10295197b3.35.1717033629104; Wed, 29 May 2024
- 18:47:09 -0700 (PDT)
+	s=arc-20240116; t=1717033768; c=relaxed/simple;
+	bh=mY/foS7cc/9Dxh6P5MjKPvofzIufEuNdePlyuqwblYg=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=k7cYtxz1lqPXoADJeN7KehsXg9EpKtchWB0purjGRoCYj5nxQueLJpFGE3k2GU/S89g95Bu/8iPe3aNZUTF79eXUzlQKzdZF6B7pwIzQhYhVplbt8ed0LG2AezVbtS+4Wlj7rH+PTewUiYS6O1QhFJ3OxD/yOmeKfnprji0Ibqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VqTgj3rbWz4f3jMd;
+	Thu, 30 May 2024 09:49:05 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id DBC851A0189;
+	Thu, 30 May 2024 09:49:14 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBXKBEZ21dmGhI4OA--.43211S3;
+	Thu, 30 May 2024 09:49:14 +0800 (CST)
+Subject: Re: [RFC PATCH] sbitmap: fix io hung due to race on
+ sbitmap_word::cleared
+To: Yang Yang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240527042654.2404-1-yang.yang@vivo.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <bd176002-90e8-030d-f8d8-9388d3b40241@huaweicloud.com>
+Date: Thu, 30 May 2024 09:49:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1716583609-21790-1-git-send-email-wufan@linux.microsoft.com> <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
-In-Reply-To: <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 29 May 2024 21:46:57 -0400
-Message-ID: <CAHC9VhRsnGjZATBj7-evK6Gdryr54raTTKMYO_vup8AGXLwjQg@mail.gmail.com>
-Subject: Re: [PATCH v19 15/20] fsverity: expose verified fsverity built-in
- signatures to LSMs
-To: ebiggers@kernel.org, Fan Wu <wufan@linux.microsoft.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, 
-	tytso@mit.edu, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, 
-	mpatocka@redhat.com, eparis@redhat.com, linux-doc@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	fsverity@lists.linux.dev, linux-block@vger.kernel.org, 
-	dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240527042654.2404-1-yang.yang@vivo.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBXKBEZ21dmGhI4OA--.43211S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWrWDCw4DJryDAw45tr1UJrb_yoWrGF4rpF
+	WUKFyxKFWYqr17ursxJ3y8A3WSvws7t39rJr1xK343C3W7Kr9xJF4rKFW3twn3AFWktF4U
+	XF4rJrWkCw1q9FJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Fri, May 24, 2024 at 4:46=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
-wrote:
->
-> This patch enhances fsverity's capabilities to support both integrity and
-> authenticity protection by introducing the exposure of built-in
-> signatures through a new LSM hook. This functionality allows LSMs,
-> e.g. IPE, to enforce policies based on the authenticity and integrity of
-> files, specifically focusing on built-in fsverity signatures. It enables
-> a policy enforcement layer within LSMs for fsverity, offering granular
-> control over the usage of authenticity claims. For instance, a policy
-> could be established to permit the execution of all files with verified
-> built-in fsverity signatures while restricting kernel module loading
-> from specified fsverity files via fsverity digests.
->
-> The introduction of a security_inode_setintegrity() hook call within
-> fsverity's workflow ensures that the verified built-in signature of a fil=
-e
-> is exposed to LSMs. This enables LSMs to recognize and label fsverity fil=
-es
-> that contain a verified built-in fsverity signature. This hook is invoked
-> subsequent to the fsverity_verify_signature() process, guaranteeing the
-> signature's verification against fsverity's keyring. This mechanism is
-> crucial for maintaining system security, as it operates in kernel space,
-> effectively thwarting attempts by malicious binaries to bypass user space
-> stack interactions.
->
-> The second to last commit in this patch set will add a link to the IPE
-> documentation in fsverity.rst.
->
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
->
+Hi,
+
+ÔÚ 2024/05/27 12:26, Yang Yang Ð´µÀ:
+> Configuration for sbq:
+>    depth=64, wake_batch=6, shift=6, map_nr=1
+> 
+> 1. There are 64 requests in progress:
+>    map->word = 0xFFFFFFFFFFFFFFFF
+> 2. After all the 64 requests complete, and no more requests come:
+>    map->word = 0xFFFFFFFFFFFFFFFF, map->cleared = 0xFFFFFFFFFFFFFFFF
+> 3. Now two tasks try to allocate requests:
+>    T1:                                       T2:
+>    __blk_mq_get_tag                          .
+>    __sbitmap_queue_get                       .
+>    sbitmap_get                               .
+>    sbitmap_find_bit                          .
+>    sbitmap_find_bit_in_word                  .
+>    __sbitmap_get_word  -> nr=-1              __blk_mq_get_tag
+>    sbitmap_deferred_clear                    __sbitmap_queue_get
+>    /* map->cleared=0xFFFFFFFFFFFFFFFF */     sbitmap_find_bit
+>      if (!READ_ONCE(map->cleared))           sbitmap_find_bit_in_word
+>        return false;                         __sbitmap_get_word -> nr=-1
+>      mask = xchg(&map->cleared, 0)           sbitmap_deferred_clear
+>      atomic_long_andnot()                    /* map->cleared=0 */
+>                                                if (!(map->cleared))
+>                                                  return false;
+>                                       /*
+>                                        * map->cleared is cleared by T1
+>                                        * T2 fail to acquire the tag
+>                                        */
+
+This looks correct.
+
+> 
+> 4. T2 is the sole tag waiter. When T1 puts the tag, T2 cannot be woken
+> up due to the wake_batch being set at 6. If no more requests come, T1
+> will wait here indefinitely.
+> 
+> Fix this issue by adding a new flag swap_inprogress to indicate whether
+> the swap is ongoing.
+> 
+> Fixes: 661d4f55a794 ("sbitmap: remove swap_lock")
+> Signed-off-by: Yang Yang <yang.yang@vivo.com>
 > ---
-> v1-v6:
->   + Not present
->
-> v7:
->   Introduced
->
-> v8:
->   + Split fs/verity/ changes and security/ changes into separate patches
->   + Change signature of fsverity_create_info to accept non-const inode
->   + Change signature of fsverity_verify_signature to accept non-const ino=
-de
->   + Don't cast-away const from inode.
->   + Digest functionality dropped in favor of:
->     ("fs-verity: define a function to return the integrity protected
->       file digest")
->   + Reworded commit description and title to match changes.
->   + Fix a bug wherein no LSM implements the particular fsverity @name
->     (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
->
-> v9:
->   + No changes
->
-> v10:
->   + Rename the signature blob key
->   + Cleanup redundant code
->   + Make the hook call depends on CONFIG_FS_VERITY_BUILTIN_SIGNATURES
->
-> v11:
->   + No changes
->
-> v12:
->   + Add constification to the hook call
->
-> v13:
->   + No changes
->
-> v14:
->   + Add doc/comment to built-in signature verification
->
-> v15:
->   + Add more docs related to IPE
->   + Switch the hook call to security_inode_setintegrity()
->
-> v16:
->   + Explicitly mention "fsverity builtin signatures" in the commit
->     message
->   + Amend documentation in fsverity.rst
->   + Fix format issue
->   + Change enum name
->
-> v17:
->   + Fix various documentation issues
->   + Use new enum name LSM_INT_FSVERITY_BUILTINSIG_VALID
->
-> v18:
->   + Fix typos
->   + Move the inode_setintegrity hook call into fsverity_verify_signature(=
-)
->
-> v19:
->   + Cleanup code w.r.t inode_setintegrity hook refactoring
-> ---
->  Documentation/filesystems/fsverity.rst | 23 +++++++++++++++++++++--
->  fs/verity/signature.c                  | 18 +++++++++++++++++-
->  include/linux/security.h               |  1 +
->  3 files changed, 39 insertions(+), 3 deletions(-)
+>   include/linux/sbitmap.h |  5 +++++
+>   lib/sbitmap.c           | 22 ++++++++++++++++++++--
+>   2 files changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index d662cf136021..b88a9e4997ab 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -36,6 +36,11 @@ struct sbitmap_word {
+>   	 * @cleared: word holding cleared bits
+>   	 */
+>   	unsigned long cleared ____cacheline_aligned_in_smp;
+> +
+> +	/**
+> +	 * @swap_inprogress: set to 1 when swapping word <-> cleared
+> +	 */
+> +	atomic_t swap_inprogress;
+>   } ____cacheline_aligned_in_smp;
+>   
+>   /**
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 1e453f825c05..d4bb258fe8b0 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -62,10 +62,19 @@ static inline void update_alloc_hint_after_get(struct sbitmap *sb,
+>    */
+>   static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
+>   {
+> -	unsigned long mask;
+> +	unsigned long mask, flags;
+> +	int zero = 0;
+>   
+> -	if (!READ_ONCE(map->cleared))
+> +	if (!READ_ONCE(map->cleared)) {
+> +		if (atomic_read(&map->swap_inprogress))
+> +			goto out_wait;
+>   		return false;
+> +	}
+> +
+> +	if (!atomic_try_cmpxchg(&map->swap_inprogress, &zero, 1))
+> +		goto out_wait;
+> +
+> +	local_irq_save(flags);
+>   
+>   	/*
+>   	 * First get a stable cleared mask, setting the old mask to 0.
+> @@ -77,6 +86,15 @@ static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
+>   	 */
+>   	atomic_long_andnot(mask, (atomic_long_t *)&map->word);
+>   	BUILD_BUG_ON(sizeof(atomic_long_t) != sizeof(map->word));
+> +
+> +	atomic_set(&map->swap_inprogress, 0);
+> +	smp_mb__after_atomic();
+> +	local_irq_restore(flags);
+> +	return true;
+> +
+> +out_wait:
+> +	while (atomic_read(&map->swap_inprogress))
+> +		;
 
-Eric, can you give this patch in particular a look to make sure you
-are okay with everything?  I believe Fan has addressed all of your
-previous comments and it would be nice to have your Ack/Review tag if
-you are okay with the current revision.
+However, I really don't like this change.
 
---=20
-paul-moore.com
+How about following patch? I think it can fix the prblem as well.
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 1e453f825c05..d1b9bd61d296 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -175,12 +175,14 @@ static int sbitmap_find_bit_in_word(struct 
+sbitmap_word *map,
+         int nr;
+
+         do {
++               bool clear = READ_ONCE(map->cleared) != 0;
++
+                 nr = __sbitmap_get_word(&map->word, depth,
+                                         alloc_hint, wrap);
+-               if (nr != -1)
+-                       break;
+-               if (!sbitmap_deferred_clear(map))
++               if (nr != -1 || !clear)
+                         break;
++
++               sbitmap_deferred_clear(map);
+         } while (1);
+
+         return nr;
+
+Thanks,
+Kuai
+>   	return true;
+>   }
+>   
+> 
+
