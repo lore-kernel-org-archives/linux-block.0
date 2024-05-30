@@ -1,146 +1,83 @@
-Received: from mail-m2411.xmail.ntesmail.com (mail-m2411.xmail.ntesmail.com [45.195.24.11])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36FE4D595;
-	Thu, 30 May 2024 18:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.195.24.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1377158874;
+	Thu, 30 May 2024 19:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717094954; cv=none; b=bMeEfJWxs8LYMycjCMK/HP/dDuQhPtAogPa5OgfEdAD69GxpnFMM76XUNoumO/TrVuZHJ2Xv8ud5v5uHdIAVXjD2HJJZaGs6DijCFUoern4DI7CRS657P3x79Nc2AvTejEKReKnTI5trGzIQSwMahFoqxUWxSfCqUwq/VzicMEQ=
+	t=1717098295; cv=none; b=n3iwWoy+bgP/jr2vaYyLnLbb2jgPYXz7vwvX9mPOlNwm+utcBRTKIzxX6aQuJIOfEKG1UDqKd0186OUqQqGfsJn7JWXFLb1CdGOjjEvR5ET7sBzmT6bGCwYQGm121grhb8cpwRnqarCzRgzLCSz7aPhAfMo0tBXf4YptC/S7CEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717094954; c=relaxed/simple;
-	bh=P2bO5JWCsGZMtS8zS4ZP9PbUQbMPfPvnLfoGhj5y2VA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=rLKuO4GF0WaxwM621f0rwhq6hMIWLKQpiBNqeVkOlU6+3TWPYjTn0IlXLkOB0PCvNc/EFLEATmz9tIrcqVh8Q/cMLL7QdmyQ+uQy+XXObNhRBil+B9hcSOyvmS5ILFV9cBq8vrNjgdHGbI5ZEDO67xjhlW9yv/DwjdQudMZiKqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=45.195.24.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
-Received: from [192.168.122.189] (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTPA id 3882D860313;
-	Thu, 30 May 2024 14:59:39 +0800 (CST)
-Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
-To: Gregory Price <gregory.price@memverge.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, John Groves
- <John@groves.net>, axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- nvdimm@lists.linux.dev
-References: <20240503105245.00003676@Huawei.com>
- <5b7f3700-aeee-15af-59a7-8e271a89c850@easystack.cn>
- <20240508131125.00003d2b@Huawei.com>
- <ef0ee621-a2d2-e59a-f601-e072e8790f06@easystack.cn>
- <20240508164417.00006c69@Huawei.com>
- <3d547577-e8f2-8765-0f63-07d1700fcefc@easystack.cn>
- <20240509132134.00000ae9@Huawei.com>
- <a571be12-2fd3-e0ee-a914-0a6e2c46bdbc@easystack.cn>
- <664cead8eb0b6_add32947d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <8f161b2d-eacd-ad35-8959-0f44c8d132b3@easystack.cn>
- <ZldIzp0ncsRX5BZE@memverge.com>
-From: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Message-ID: <5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
-Date: Thu, 30 May 2024 14:59:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+	s=arc-20240116; t=1717098295; c=relaxed/simple;
+	bh=NqD7BFqcvpYiPPucUb5Xs7cfQLPshp0Z3ca0XeE2TaQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jwBn2wtixZ6CeRTs491ctFnZYKQHY+hHIJ7pXETRHpH7fpjK8nJmSUhUyL5FVI7UoS2M335UBx09LUeUe0sw0u2t4FvHNWH0B4QdOXu1tz139T1k3LQ1f7ek/InhmV0eSiZovuKrycsp6caH/uL6yjhFKANrOi9+LPP3P72D8Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=O+dyHa1D; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="O+dyHa1D"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4VqxY061N4zlgMVV;
+	Thu, 30 May 2024 19:44:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1717098288; x=1719690289; bh=1qawYRnNtHLyKkfk2KIuL7Vw
+	Fij1fGlSBD1rE6Kec4k=; b=O+dyHa1DO+LxwuvN37caN3rc79Al5B59aVt872Yy
+	myvPBRd3qJOpB/ssbZf9DD6jeQwG3oky5nPyGHmKtOjLfDnHlE+e3wVIfqzpWjOs
+	6hfPZNndbOYIdhdiprqYgfQpwZxp2KIDZmAsJBYG5LuLkM6flrrsn+Z7CP3aCzDV
+	pwN4+gbFQD4bp6z4s36qcFNV+1waUaRjvrfL+xtNhs1hivVR8LlUKLXvQ4CEJ/sF
+	RymJznQ8+fPT5LcsiI4IQupBmhHjJpPce8ad1C01w5LQVIcRKBZRcPzwxcXH/hff
+	wu+Gqo4QOptIYFBfw/rmjL36jeH02rPcp9YADbGYnOeaDg==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id XhrHqHFE5lIy; Thu, 30 May 2024 19:44:48 +0000 (UTC)
+Received: from [100.96.154.26] (unknown [104.132.0.90])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4VqxXv0mMXzlgMVR;
+	Thu, 30 May 2024 19:44:46 +0000 (UTC)
+Message-ID: <2384c3c9-5629-4438-a87b-0e05e1b6f5cc@acm.org>
+Date: Thu, 30 May 2024 12:44:46 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZldIzp0ncsRX5BZE@memverge.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkaThpMVkxDTENJTR5NQkNCTVUZERMWGhIXJBQOD1
-	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
-X-HM-Tid: 0a8fc84c11d1023ckunm3882d860313
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6OjY6DBw6MDcZPi8fExwQNy4S
-	MQhPCx9VSlVKTEpMS05JSENLSEtLVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
-	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBTUlDTDcG
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/12] ubd: untagle discard vs write zeroes not support
+ handling
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Josef Bacik
+ <josef@toxicpanda.com>, Ilya Dryomov <idryomov@gmail.com>,
+ Dongsheng Yang <dongsheng.yang@easystack.cn>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ linux-um@lists.infradead.org, linux-block@vger.kernel.org,
+ nbd@other.debian.org, ceph-devel@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-scsi@vger.kernel.org
+References: <20240529050507.1392041-1-hch@lst.de>
+ <20240529050507.1392041-2-hch@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240529050507.1392041-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 5/28/24 22:04, Christoph Hellwig wrote:
+> Discard and Write Zeroes are different operation and implemented
+> by different fallocate opcodes for ubd.  If one fails the other one
+> can work and vice versa.
+> 
+> Split the code to disable the operations in ubd_handler to only
+> disable the operation that actually failed.
 
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-在 2024/5/29 星期三 下午 11:25, Gregory Price 写道:
-> On Wed, May 22, 2024 at 02:17:38PM +0800, Dongsheng Yang wrote:
->>
->>
->> 在 2024/5/22 星期三 上午 2:41, Dan Williams 写道:
->>> Dongsheng Yang wrote:
->>>
->>> What guarantees this property? How does the reader know that its local
->>> cache invalidation is sufficient for reading data that has only reached
->>> global visibility on the remote peer? As far as I can see, there is
->>> nothing that guarantees that local global visibility translates to
->>> remote visibility. In fact, the GPF feature is counter-evidence of the
->>> fact that writes can be pending in buffers that are only flushed on a
->>> GPF event.
->>
->> Sounds correct. From what I learned from GPF, ADR, and eADR, there would
->> still be data in WPQ even though we perform a CPU cache line flush in the
->> OS.
->>
->> This means we don't have a explicit method to make data puncture all caches
->> and land in the media after writing. also it seems there isn't a explicit
->> method to invalidate all caches along the entire path.
->>
->>>
->>> I remain skeptical that a software managed inter-host cache-coherency
->>> scheme can be made reliable with current CXL defined mechanisms.
->>
->>
->> I got your point now, acorrding current CXL Spec, it seems software managed
->> cache-coherency for inter-host shared memory is not working. Will the next
->> version of CXL spec consider it?
->>>
-> 
-> Sorry for missing the conversation, have been out of office for a bit.
-> 
-> It's not just a CXL spec issue, though that is part of it. I think the
-> CXL spec would have to expose some form of puncturing flush, and this
-> makes the assumption that such a flush doesn't cause some kind of
-> race/deadlock issue.  Certainly this needs to be discussed.
-> 
-> However, consider that the upstream processor actually has to generate
-> this flush.  This means adding the flush to existing coherence protocols,
-> or at the very least a new instruction to generate the flush explicitly.
-> The latter seems more likely than the former.
-> 
-> This flush would need to ensure the data is forced out of the local WPQ
-> AND all WPQs south of the PCIE complex - because what you really want to
-> know is that the data has actually made it back to a place where remote
-> viewers are capable of percieving the change.
-> 
-> So this means:
-> 1) Spec revision with puncturing flush
-> 2) Buy-in from CPU vendors to generate such a flush
-> 3) A new instruction added to the architecture.
-> 
-> Call me in a decade or so.
-> 
-> 
-> But really, I think it likely we see hardware-coherence well before this.
-> For this reason, I have become skeptical of all but a few memory sharing
-> use cases that depend on software-controlled cache-coherency.
-
-Hi Gregory,
-
-	From my understanding, we actually has the same idea here. What I am 
-saying is that we need SPEC to consider this issue, meaning we need to 
-describe how the entire software-coherency mechanism operates, which 
-includes the necessary hardware support. Additionally, I agree that if 
-software-coherency also requires hardware support, it seems that 
-hardware-coherency is the better path.
-> 
-> There are some (FAMFS, for example). The coherence state of these
-> systems tend to be less volatile (e.g. mappings are read-only), or
-> they have inherent design limitations (cacheline-sized message passing
-> via write-ahead logging only).
-
-Can you explain more about this? I understand that if the reader in the 
-writer-reader model is using a readonly mapping, the interaction will be 
-much simpler. However, after the writer writes data, if we don't have a 
-mechanism to flush and invalidate puncturing all caches, how can the 
-readonly reader access the new data?
-> 
-> ~Gregory
-> 
