@@ -1,79 +1,179 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A441C2AD;
-	Thu, 30 May 2024 02:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16FF33C5;
+	Thu, 30 May 2024 03:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717035361; cv=none; b=Yf7mfOeNOoXzN273K73Zp25laV3vLdfph1pRuA64yfC4gtszapAjMd6aEtM1CXMQ1oMvc+2wtI2gwt+GcmDKmOeO2HmbUlHo1+kgjHi434tdfUN+435gIVSiZG/OaeTjlooDe9H+PNy9VVMRgjgvUdr8Zbp4HgMireydlMDG7EQ=
+	t=1717038369; cv=none; b=APt3oW7dDyBK1sVM28hZ8a/wa5ibNQ7QIQWtrt2dFa2qJnmPRS9QIceAzybymw32Y8p43KXD9PsYp55FhaB0j0y73uUqaDs0enbnDuEcg0qo0DshLoQdGVzErjpkXOvpPYHWlYHxqagfIcsJP2C77Qof2EnMAT3QO/ewDA4JGd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717035361; c=relaxed/simple;
-	bh=m34IzQbYV7M9yK88DF0P7kP3OWiFqCk8AKxKQuzB5bs=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rl2Nh51vy1R15rqwTStqZzWacxmPYkn+wEBaOzQtIDj6Z1zKCmx1Xjg3NBpiworcWcDbyykcCJl4Se2jm0G5IDcHuLzLQSnIfzh4feSQHRI/JzrGNNkcfjYqQHwW/4/nxtJDCE2/S+0TS9OvSyCOYWNHE8HDA0LGa624kboXGp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sCVKY-000000004jd-18lv;
-	Thu, 30 May 2024 02:15:50 +0000
-Date: Thu, 30 May 2024 03:15:46 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
-	Christian Brauner <brauner@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Li Lingfeng <lilingfeng3@huawei.com>,
-	Christian Heusel <christian@heusel.eu>,
-	Min Li <min15.li@samsung.com>, Avri Altman <avri.altman@wdc.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Mikko Rapeli <mikko.rapeli@linaro.org>, Yeqi Fu <asuk4.q@gmail.com>,
-	Victor Shih <victor.shih@genesyslogic.com.tw>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Li Zhijian <lizhijian@fujitsu.com>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH v2 9/9] mmc: block: set GENHD_FL_NVMEM
-Message-ID: <927d02524c467351c546c4245a2eaf19030e8316.1717031992.git.daniel@makrotopia.org>
-References: <cover.1717031992.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1717038369; c=relaxed/simple;
+	bh=5WLfsgF8O76R3zxYvopG4iE5lsb1nbAnf+aMSgf9czA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VkRY+g3LbhKrpgBoCXOScSa2gAG+WZf+s/f50x8mE8QvQXu1ld+qvU8MqK3auYfTLMaSDmeuL6LSIEhnR9dlEM6BlIZNgHK0594VRO36TkI7lwmdIiUW4MzpmfwJ5g8ZfIaAEuByVqVv5qCM3Moxt8k3aRxSD5cQy91djZwKNhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PYOKCDuR; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PYOKCDuR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 814FDC116B1;
+	Thu, 30 May 2024 03:06:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717038368;
+	bh=5WLfsgF8O76R3zxYvopG4iE5lsb1nbAnf+aMSgf9czA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PYOKCDuR3jyQbxGiMo/Q46/CE1+8wVKBuqHvfzf3hFccaeCBJf3j8JIyW7yaiSynw
+	 WEzhVw3wMa723xV57cMNVHVcBYTYai/65NHk7xQlm12gIDASpcUNRUs/bejtpZoWpe
+	 bTo4P2EP4t06KxPLw4JHE9yjT5pneQyraz6MTvQVz2mPh2LImVgy8lgyLPpiPHirkz
+	 r+vHZmK5rMg1KFU47P8qKDa4YK71RYWKWY37SWgs5wzx2uJqOPhBEJz3ztPM26DVGz
+	 M9RrTEiLLIYr1EFzS9PqToKqV7qZOg1yyV+hHPOjSjNbg0UgJNxMOEsaQxcpuXrcHy
+	 z3vxSNvzCnXBQ==
+Date: Wed, 29 May 2024 20:06:05 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com,
+	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk,
+	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
+	eparis@redhat.com, linux-doc@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+	audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [PATCH v19 15/20] fsverity: expose verified fsverity built-in
+ signatures to LSMs
+Message-ID: <20240530030605.GA29189@sol.localdomain>
+References: <1716583609-21790-1-git-send-email-wufan@linux.microsoft.com>
+ <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
+ <CAHC9VhRsnGjZATBj7-evK6Gdryr54raTTKMYO_vup8AGXLwjQg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1717031992.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHC9VhRsnGjZATBj7-evK6Gdryr54raTTKMYO_vup8AGXLwjQg@mail.gmail.com>
 
-Set flag to consider MMC block devices as NVMEM providers.
+On Wed, May 29, 2024 at 09:46:57PM -0400, Paul Moore wrote:
+> On Fri, May 24, 2024 at 4:46 PM Fan Wu <wufan@linux.microsoft.com> wrote:
+> >
+> > This patch enhances fsverity's capabilities to support both integrity and
+> > authenticity protection by introducing the exposure of built-in
+> > signatures through a new LSM hook. This functionality allows LSMs,
+> > e.g. IPE, to enforce policies based on the authenticity and integrity of
+> > files, specifically focusing on built-in fsverity signatures. It enables
+> > a policy enforcement layer within LSMs for fsverity, offering granular
+> > control over the usage of authenticity claims. For instance, a policy
+> > could be established to permit the execution of all files with verified
+> > built-in fsverity signatures while restricting kernel module loading
+> > from specified fsverity files via fsverity digests.
+> >
+> > The introduction of a security_inode_setintegrity() hook call within
+> > fsverity's workflow ensures that the verified built-in signature of a file
+> > is exposed to LSMs. This enables LSMs to recognize and label fsverity files
+> > that contain a verified built-in fsverity signature. This hook is invoked
+> > subsequent to the fsverity_verify_signature() process, guaranteeing the
+> > signature's verification against fsverity's keyring. This mechanism is
+> > crucial for maintaining system security, as it operates in kernel space,
+> > effectively thwarting attempts by malicious binaries to bypass user space
+> > stack interactions.
+> >
+> > The second to last commit in this patch set will add a link to the IPE
+> > documentation in fsverity.rst.
+> >
+> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> >
+> > ---
+> > v1-v6:
+> >   + Not present
+> >
+> > v7:
+> >   Introduced
+> >
+> > v8:
+> >   + Split fs/verity/ changes and security/ changes into separate patches
+> >   + Change signature of fsverity_create_info to accept non-const inode
+> >   + Change signature of fsverity_verify_signature to accept non-const inode
+> >   + Don't cast-away const from inode.
+> >   + Digest functionality dropped in favor of:
+> >     ("fs-verity: define a function to return the integrity protected
+> >       file digest")
+> >   + Reworded commit description and title to match changes.
+> >   + Fix a bug wherein no LSM implements the particular fsverity @name
+> >     (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
+> >
+> > v9:
+> >   + No changes
+> >
+> > v10:
+> >   + Rename the signature blob key
+> >   + Cleanup redundant code
+> >   + Make the hook call depends on CONFIG_FS_VERITY_BUILTIN_SIGNATURES
+> >
+> > v11:
+> >   + No changes
+> >
+> > v12:
+> >   + Add constification to the hook call
+> >
+> > v13:
+> >   + No changes
+> >
+> > v14:
+> >   + Add doc/comment to built-in signature verification
+> >
+> > v15:
+> >   + Add more docs related to IPE
+> >   + Switch the hook call to security_inode_setintegrity()
+> >
+> > v16:
+> >   + Explicitly mention "fsverity builtin signatures" in the commit
+> >     message
+> >   + Amend documentation in fsverity.rst
+> >   + Fix format issue
+> >   + Change enum name
+> >
+> > v17:
+> >   + Fix various documentation issues
+> >   + Use new enum name LSM_INT_FSVERITY_BUILTINSIG_VALID
+> >
+> > v18:
+> >   + Fix typos
+> >   + Move the inode_setintegrity hook call into fsverity_verify_signature()
+> >
+> > v19:
+> >   + Cleanup code w.r.t inode_setintegrity hook refactoring
+> > ---
+> >  Documentation/filesystems/fsverity.rst | 23 +++++++++++++++++++++--
+> >  fs/verity/signature.c                  | 18 +++++++++++++++++-
+> >  include/linux/security.h               |  1 +
+> >  3 files changed, 39 insertions(+), 3 deletions(-)
+> 
+> Eric, can you give this patch in particular a look to make sure you
+> are okay with everything?  I believe Fan has addressed all of your
+> previous comments and it would be nice to have your Ack/Review tag if
+> you are okay with the current revision.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/mmc/core/block.c | 1 +
- 1 file changed, 1 insertion(+)
+Sorry, I've just gotten a bit tired of finding so many basic issues in this
+patchset even after years of revisions.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index cd3ee6d69aaa..577e7ae5df14 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2516,6 +2516,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 	md->disk->major	= MMC_BLOCK_MAJOR;
- 	md->disk->minors = perdev_minors;
- 	md->disk->first_minor = devidx * perdev_minors;
-+	md->disk->flags = GENHD_FL_NVMEM;
- 	md->disk->fops = &mmc_bdops;
- 	md->disk->private_data = md;
- 	md->parent = parent;
--- 
-2.45.1
+This patch in particular is finally looking better.  There are a couple issues
+that I still see.  (BTW, you're welcome to review it too to help find these
+things, given that you seem to have an interest in getting this landed...):
+
+> +	err = security_inode_setintegrity(inode,
+> +					  LSM_INT_FSVERITY_BUILTINSIG_VALID,
+> +					  signature,
+> +					  le32_to_cpu(sig_size));
+
+This is doing le32_to_cpu() on a variable of type size_t, which will do the
+wrong thing on big endian systems and will generate a 'sparse' warning.
+
+Also, the commit message still incorrectly claims that this patch allows
+"restricting kernel module loading from specified fsverity files via fsverity
+digests".  As I said before (sigh...), this is not correct as that can be done
+without this patch.
+
+- Eric
