@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81F328DD0;
-	Thu, 30 May 2024 02:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2991C693;
+	Thu, 30 May 2024 02:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717035327; cv=none; b=CXb4IGnfRyG3aR6mwhXcB8IFEQHapG3j2F5gUA7l7wvEboUS2IwcwYL8+E9dOFMaAtTFvK2bO7QIKmyA6q8gaOtMMb52wOvTlGuKlVrlc946c1X58VyYDQGgOLQr0+zHvJux9QVGu91X6lUVuot2A464ykIuJzets2Bcoaxm4JA=
+	t=1717035339; cv=none; b=oCs0V611KpiEnYtXFi8Swmt5t3pyPJQYycS/o+HcwWuJzaO097IckOtvTsgYnH67dwjg0e6CMmUaIYzH2bSlYQ2wBBlo4EuRYk6CL6FfKrwIYjtGRFoUHuQcwuyJdsApJDULWijbEkN2DW39WuxYfpfUG7lch/cuTulFE9dqCVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717035327; c=relaxed/simple;
-	bh=ZND/IraLGpqQA+zSSLk7Bz2Qe5V3dwxk3TRcMUKSLPk=;
+	s=arc-20240116; t=1717035339; c=relaxed/simple;
+	bh=6wAe6PDwPoPRbuAdisd3AgoRY7qZA25aGbQfD/XuvsY=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QpZEqwVtNavCpDQ2TaYkDaT48W8/Oh29JSLuxkBaOGMmBAYW8rosjGJ0dfXCycT7PT6hNildFTmho4YcW4AK+lzhhhG3GSFtdV4vDaySWi4Qb1noP9i5qQPKnm6LCol/fz4LlR/28GYUPqpZLxQYddxAiUKubHxo6nEPJH+6ayA=
+	 Content-Type:Content-Disposition:In-Reply-To; b=iF/poW5jiWccKJQebTxrbR5KxgAqfMtimToSpxOIPyZc6svXa7OZico+sCzC2zZ5xY4XaE2blo9XIgC3eSiOgTDVnGK6UnaAk8drCIQCyu3xOVHth6UyT90MZ4AnTpC/yaSDp05bwYvKKGw3aVeKGo3bKmZ6Hw8z0SvxuqPl15g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.97.1)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1sCVJz-000000004hP-0r0o;
-	Thu, 30 May 2024 02:15:15 +0000
-Date: Thu, 30 May 2024 03:15:11 +0100
+	id 1sCVKD-000000004iN-1qwQ;
+	Thu, 30 May 2024 02:15:29 +0000
+Date: Thu, 30 May 2024 03:15:25 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
@@ -43,8 +43,8 @@ To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	"Ricardo B. Marliere" <ricardo@marliere.net>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH v2 6/9] dt-bindings: mmc: mmc-card: add block device nodes
-Message-ID: <e1018427f46d500eaa4fc10a3f2c0eac71eb399a.1717031992.git.daniel@makrotopia.org>
+Subject: [PATCH v2 7/9] mmc: core: set card fwnode_handle
+Message-ID: <f02d242f41294bf632eb1db8bd9d7959911f9784.1717031992.git.daniel@makrotopia.org>
 References: <cover.1717031992.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -56,76 +56,25 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1717031992.git.daniel@makrotopia.org>
 
-Add nodes representing the block devices exposed by an MMC device
-including an example involving nvmem-cells.
+Set fwnode in case it isn't set yet and of_node is present.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- .../devicetree/bindings/mmc/mmc-card.yaml     | 45 +++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ drivers/mmc/core/bus.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-index fd347126449a..95ccbda871d2 100644
---- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-+++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-@@ -26,6 +26,18 @@ properties:
-       Use this to indicate that the mmc-card has a broken hpi
-       implementation, and that hpi should not be used.
+diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
+index 0ddaee0eae54..e1c5fc1b3ce4 100644
+--- a/drivers/mmc/core/bus.c
++++ b/drivers/mmc/core/bus.c
+@@ -364,6 +364,8 @@ int mmc_add_card(struct mmc_card *card)
  
-+  block:
-+    $ref: /schemas/block/block-device.yaml#
-+    description:
-+      Represents the block storage provided by an SD card or the
-+      main hardware partition of an eMMC.
-+
-+patternProperties:
-+  '^boot[0-9]+':
-+    $ref: /schemas/block/block-device.yaml#
-+    description:
-+      Represents a boot hardware partition on an eMMC.
-+
- required:
-   - compatible
-   - reg
-@@ -42,6 +54,39 @@ examples:
-             compatible = "mmc-card";
-             reg = <0>;
-             broken-hpi;
-+
-+            block {
-+                partitions {
-+                    cal_data: block-partition-rf {
-+                        partnum = <3>;
-+                        partname = "rf";
-+
-+                        nvmem-layout {
-+                            compatible = "fixed-layout";
-+                            #address-cells = <1>;
-+                            #size-cells = <1>;
-+
-+                            eeprom@0 {
-+                                reg = <0x0 0x1000>;
-+                            };
-+                        };
-+                    };
-+                };
-+            };
-+
-+            boot1 {
-+                nvmem-layout {
-+                    compatible = "fixed-layout";
-+                    #address-cells = <1>;
-+                    #size-cells = <1>;
-+
-+                    macaddr: macaddr@a {
-+                        compatible = "mac-base";
-+                        reg = <0xa 0x6>;
-+                        #nvmem-cell-cells = <1>;
-+                    };
-+                };
-+            };
-         };
-     };
+ 	mmc_add_card_debugfs(card);
+ 	card->dev.of_node = mmc_of_find_child_device(card->host, 0);
++	if (card->dev.of_node && !card->dev.fwnode)
++		card->dev.fwnode = &card->dev.of_node->fwnode;
+ 
+ 	device_enable_async_suspend(&card->dev);
  
 -- 
 2.45.1
