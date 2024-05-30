@@ -1,79 +1,77 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6860E1C6A7
-	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 21:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1C21C6A7
+	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 21:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717103009; cv=none; b=HdFOxQIYd88x+y32Hggsx5/zgk+oauuQcv7POVnKtLEWjt2EwbiS0BwvaNIga1BQw/zvr56BXZfYc5ke/pdWJa97WYb8CE9j+U4t5f1UPTOJitd1DDgpeNboPd+FDf+znOtTz5BSUGJ/MrX7x2kMZBRVLWTkXmWtN3vxNCQNHo0=
+	t=1717103070; cv=none; b=fqSAWjXCDQvKf75KKYeQaU//JPmEagNcRxCdTXvmwLqfE/Z0ezyYOyRSgft74mQ0xBBtm4iUjvUxsnGSEh6KAPerbjk/HauizdssLfCLjHJxv9WnQ+b8cF3SKOfnPHKdRISmfcMn9zQ02vc0HkA/RTCCJ/03f/gq0R4OsKkWS9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717103009; c=relaxed/simple;
-	bh=z1QkV/oN4PrtxkXkowk2WXG5mwwAmpepcbaxRHSK50k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=R3Oeu2KvuhrmjeMN0OPWOZyzAqchdrZ/N1YRDg8rEyROtPSeG+uL38ykR7XHLlDJog0DqjzIYd3ZNDAek2jWelCgfIl8dDukaJqZzAj9sMJLcBhCpJWOeE980P+m8Kz7Y1MHfpKzgu2GQgoBdTEi60Sio6cx8CHebA0VChyy/78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=z4ZIneD2; arc=none smtp.client-ip=209.85.210.53
+	s=arc-20240116; t=1717103070; c=relaxed/simple;
+	bh=zacMwD2B75k17xBwiTcDV8Fm746aX+06s3VllNJfDbA=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Y/dYh4PphxtEzVthpg4FYHEn+DNO278dpzzgtRt8iyr03+QPFMaX4WISflLvVMIuiZaBl2ghLWOkHJ8Ef7jKS5mdog7H2NAGm8gUnnVvVvrpQChvYDRoJWKuON9tbZMdMEBt+ULdSm31bxWKQsPipuuxWAMDHO4tJpVVV3zkOso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AamufOSV; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="z4ZIneD2"
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6f8e60db1abso22000a34.2
-        for <linux-block@vger.kernel.org>; Thu, 30 May 2024 14:03:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AamufOSV"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6f8d6204db1so25951a34.1
+        for <linux-block@vger.kernel.org>; Thu, 30 May 2024 14:04:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1717103006; x=1717707806; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8ADwps8sC0bvy2KrBBRv+blQLWKGCsgQXNcwl/1TWNo=;
-        b=z4ZIneD2+bNx1nZ2vfxwdYAfA0UyQ6xFJGEYP1IhNHTdaiexv4bs/n7AVcvf2MbE7B
-         dOG1tCXkpm1hvHP+OPDbMb6G7/okLR2/WWG+bxFBCoFzq+s9MbJ2UnYQNnP8YDFR/8zo
-         eegQiiO7oqi0WGXMS0ub3cAPLTitEiSTte4FZBhHtKAhAHAmpFv87LSsRPjmbn40hlPK
-         H9+TsbHrMMM29yLTwjgAc1WPM5G+DP6uHSpiVY3CzjGoG1aj1FCrIz3HyRqx2Lz+vY4f
-         Y/8NfVvchzKZVBIuZcNQXvtgqQX3HpOQrxJxAYWHJyTxjnw24nxvEfvoSjAb89J53Bvd
-         n8aA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1717103067; x=1717707867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DmVsWK/E9tOB9NkFQ0ll8LZhGunDUEIrCnb9vISkFqs=;
+        b=AamufOSV3f5A3fuvGODD4M14Ov7RRCaX/vu1zuI+HZgxPYGHfmfo3zYKCZ0jn5UrO9
+         mR+zUup6GWfVcrBjhsZBnK6VMlgc/8gtV47RyysulqUnXVGkDRTFKX3WyPMeaHAIZ9sP
+         f8bdosgCnQgN1kt6Ugpf8FrXJLgyaW4ZKfjvPTf+BbJXCtPmuaYzrDne+8HfiQuFoTih
+         KPPq3D2MWcPJSx+0Rhh/LP/K1UaUUc/X9v+PxlU0Z8OmQrEqX5n+BHWRgdyaTxgMJfYp
+         DZirBg7qEsX+AK0KyIKF0oPMN9Ns0u9x5KNmtcU9OzV3CNCDsL5SvSajq5XQLrHY5C4D
+         eYYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717103006; x=1717707806;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ADwps8sC0bvy2KrBBRv+blQLWKGCsgQXNcwl/1TWNo=;
-        b=PRTS1EG1vy26t8+qngcIdCwcCfca+iCXxfeiES+VsgSapdLKPiQ/6cQ+9GbKpoNvs0
-         FAGjLkI+j61vYnIOiPVZ6ImzIvRvapofj216Hpg2xcAd7igOBya6uzB5rk29R0Gluqqc
-         St9Ox6PdFXsFKJ/e/x63c9YPPh+ZFjcn+f2Mbs5FkdnZWhTWmp55fDj/aJU16d4CSJZO
-         xXRS7q7rZCSV7OKftTYKD1eVnNJjCBmJ235JQHa8Q0LObd2mBZBeaCE5caN0LBwm0hA7
-         lr+rxPIBhn+h2wpclhdBfAtMrqW428Te8h8YIkdy6Pn3C3sVQei2R87hbVDbkDG9YnP2
-         YXJA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/RaVHH+T1OmTvldsESdwQcgqnEyrwwzb4PoR1tjfXgRekz1RwnsTLV9wIQI/ItsQRD9S5RkQjauDtluk7UX8V74BfeLA4eaobokw=
-X-Gm-Message-State: AOJu0Yyx1ufd3xhEBj8krYAoZF4xS2QsXujZqtEqKtPoQiGzJVFiR9Xu
-	EahtBni/wNU2/36KD/FnHG83JR0hvSdBRarY3TcU7NKYL5AO/wjkPLtttI38P16hKZVptkmvzQA
-	M
-X-Google-Smtp-Source: AGHT+IF59a24algYsdHIAtCu4zdmdj/N+NLGFiVkQN1zMHhH16wEcxkPdyBROz5FEWzkyW5od0gN8g==
-X-Received: by 2002:a05:6830:7203:b0:6f0:3cf3:fb35 with SMTP id 46e09a7af769-6f90aee6d10mr3391090a34.1.1717103006452;
-        Thu, 30 May 2024 14:03:26 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6f9105239d5sm100984a34.6.2024.05.30.14.03.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 May 2024 14:03:25 -0700 (PDT)
-Message-ID: <1599ad1c-4395-46eb-9b9b-7439850a8300@kernel.dk>
-Date: Thu, 30 May 2024 15:03:24 -0600
+        d=1e100.net; s=20230601; t=1717103067; x=1717707867;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DmVsWK/E9tOB9NkFQ0ll8LZhGunDUEIrCnb9vISkFqs=;
+        b=W6ZEEQB3JRzLspb/ngapzcCZ3GR3zI79qtSppw7W8vmU88wlvnrWbvcQ6Qc0X3P3O2
+         yZdpZe82lp0tzGVcwLJxkOaAvInx+rc7BorBrVzF8cuwkY13OJDbJrQDjRiUzso6zh7T
+         Ina4+MKG5LE7W1fSHTAUGTfyqnf+UPQ7dbeWhkUGsEJfUP4grDpmpoxqzywrvguhk2Yf
+         gxSLuXdKQV/bUnSf9+G56epFIUO7nh/GcWr+dfhiZBT6DzZNagaCk5h2F16/POQkmHSD
+         kRr/YlUPbIif3rvmKrQr/U3bd/xayJhWDQcOhwMGfL0x88HjRuXvi/fgAr+hvJWmUhz5
+         1S2A==
+X-Gm-Message-State: AOJu0YxJuiWhFvi3pjFyvsLVDzS2oy9BdPf8GO/3gMl3yUjDw/cko2kH
+	rvwrbXYCoflF5ckSgMqe7WmH/xU478jkL8QjtvLv73TdEamD9Bt5//IsbKWd3Mw=
+X-Google-Smtp-Source: AGHT+IFU8TrnMQc7ItWkJnQGMjr97rywwV4nt/yGguhqbP6/Dfyv5QV7PXG46HjLsFxcH4q6LD600A==
+X-Received: by 2002:a05:6830:4597:b0:6f1:2171:4f9a with SMTP id 46e09a7af769-6f911d8fd89mr19716a34.0.1717103067428;
+        Thu, 30 May 2024 14:04:27 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6f910539e29sm100113a34.17.2024.05.30.14.04.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 May 2024 14:04:26 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
+ Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20240530054035.491497-1-dlemoal@kernel.org>
+References: <20240530054035.491497-1-dlemoal@kernel.org>
+Subject: Re: (subset) [PATCH 0/4] Zone write plugging and DM zone fixes
+Message-Id: <171710306664.600767.9806925600309225248.b4-ty@kernel.dk>
+Date: Thu, 30 May 2024 15:04:26 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/4] Zone write plugging and DM zone fixes
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>
-References: <20240530054035.491497-1-dlemoal@kernel.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240530054035.491497-1-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On 5/29/24 11:40 PM, Damien Le Moal wrote:
+
+On Thu, 30 May 2024 14:40:31 +0900, Damien Le Moal wrote:
 > The first patch of this series fixes null_blk to avoid weird zone
 > configurations, namely, a zoned device with a last smaller zone with a
 > zone capacity smaller than the zone size. Related to this, the next 2
@@ -85,10 +83,21 @@ On 5/29/24 11:40 PM, Damien Le Moal wrote:
 > zones limits) are not exposed to the user. This patch fixes that,
 > allowing for the limits of the underlying target devices to be exposed
 > with a warning for setups that lead to unreliable limits.
+> 
+> [...]
 
-Would be nice to get the dm part acked, but I guess I can queue up 1-3
-for now for 6.10?
+Applied, thanks!
 
+[1/4] null_blk: Do not allow runt zone with zone capacity smaller then zone size
+      commit: b164316808ec5de391c3e7b0148ec937d32d280d
+[2/4] block: Fix validation of zoned device with a runt zone
+      commit: cd6399936869b4a042dd1270078cbf2bb871a407
+[3/4] block: Fix zone write plugging handling of devices with a runt zone
+      commit: 29459c3eaa5c6261fbe0dea7bdeb9b48d35d862a
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
