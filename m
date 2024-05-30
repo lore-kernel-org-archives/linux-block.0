@@ -1,119 +1,146 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m2411.xmail.ntesmail.com (mail-m2411.xmail.ntesmail.com [45.195.24.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B79224D4;
-	Thu, 30 May 2024 17:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36FE4D595;
+	Thu, 30 May 2024 18:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.195.24.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717091892; cv=none; b=XeNQCWlgoTMyqEqGbKi2I1lgVT2aqpKPFtO3O0lL3yRw0hKyBkB62MyyfxHegT5LgKQchUo+w9lPakR/XuyG+d5C7sYdOyqL+NeHz1QomZl3fjmBNPDK/vE9T3u1YtAT7ZhphPed3TMRQ6nrhOGSq+v1ceTEeJ4xboJI6cH30Lc=
+	t=1717094954; cv=none; b=bMeEfJWxs8LYMycjCMK/HP/dDuQhPtAogPa5OgfEdAD69GxpnFMM76XUNoumO/TrVuZHJ2Xv8ud5v5uHdIAVXjD2HJJZaGs6DijCFUoern4DI7CRS657P3x79Nc2AvTejEKReKnTI5trGzIQSwMahFoqxUWxSfCqUwq/VzicMEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717091892; c=relaxed/simple;
-	bh=zy9/jkZo5Kkm2qDUeVoKDrkhkws3NyE2cNMGwJegfBs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JWWk7SgJRhRb2nNx5KKBOlTUqsmLTD8+OKGwUO+pUvyf7gbWYlAtMzp1LtBOrwgaiMkFVrXIQ3B8knRJQguzL+OAgyNX8p0Jrm3dnFkZD4AsEmHoqh9ZJyOvBAiFUDiQwIaLV76ylntH/hJnPrcYu31Ij5EjpluHytXPqUpOaYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-421160b07eeso433155e9.0;
-        Thu, 30 May 2024 10:58:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717091889; x=1717696689;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hC23jucMm+q+/3nVmnb3JFDkYf90kQS7VVGYEUblW18=;
-        b=AtxxUSC9Z9RFut9NgaZlrP6TaCw2KB0TbOgcgSLlDhS24WgEzwAyZrjSV/EJc6TOjU
-         gDV8HzxCRTCDgj93e6P79AhmSssN34Y79P97XG0FbbhIw8dlquQ+1wCqHujl4WieNiBJ
-         ApkDl2KECNdpWQsSxbjcd68J7SjxBiuQ1NriYqa4Wet++NJJeiO7lGslnPIUav6GMNaG
-         Ix5GvhhE/GqeKGjuc44reOoX5g6khcL8dlBjxo/bk6cID4PdlLHbYF2soVOnzQ6einIY
-         XxaOlGJH4jFXOXWsA87u/636dI1NWVA83k7FnDcpVjaYfcWx+nC1CGPJpmaS2MnJQA6w
-         TJag==
-X-Forwarded-Encrypted: i=1; AJvYcCUdcwrjah0Hxb9HKciNprZV0tLoodaHHCxYdvWzwnZjqzzAiv+xUTTHu4CJoUZ3fPWIdE+AGQAXlJF8XAddNUI2WXOzMIL/ne37Gdg2qWl79D0bfBccYxp0InNAhYkOglREMsCYT9nZxUtRfoG4ygHq84I70h9+Q8GpW/P6Px+U
-X-Gm-Message-State: AOJu0Yxe5tmAZ+l0GCNjpjBlJmRogAGXo47mmArADLUhbwp0IoOEMlUv
-	VpORhkHBSrNDkYWglxMyfLWfUjwzxgNSy63nsGiV1AKvxzw1Q4Ag
-X-Google-Smtp-Source: AGHT+IEKs/D/YOXJKNpqQBu1D27NdILizXiASB7GFF049ZDfxVYEPi5NY+sGao+1Yf3CzW3yUcmd7w==
-X-Received: by 2002:a5d:678d:0:b0:35d:bdda:3553 with SMTP id ffacd0b85a97d-35dc00bc230mr2126917f8f.4.1717091889059;
-        Thu, 30 May 2024 10:58:09 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.193.189.dynamic.barak-online.net. [85.65.193.189])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4212709d341sm31609825e9.36.2024.05.30.10.58.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 May 2024 10:58:08 -0700 (PDT)
-Message-ID: <d6b2c19b-c2a6-400c-bbf1-bf0469138777@grimberg.me>
-Date: Thu, 30 May 2024 20:58:06 +0300
+	s=arc-20240116; t=1717094954; c=relaxed/simple;
+	bh=P2bO5JWCsGZMtS8zS4ZP9PbUQbMPfPvnLfoGhj5y2VA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=rLKuO4GF0WaxwM621f0rwhq6hMIWLKQpiBNqeVkOlU6+3TWPYjTn0IlXLkOB0PCvNc/EFLEATmz9tIrcqVh8Q/cMLL7QdmyQ+uQy+XXObNhRBil+B9hcSOyvmS5ILFV9cBq8vrNjgdHGbI5ZEDO67xjhlW9yv/DwjdQudMZiKqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=45.195.24.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
+Received: from [192.168.122.189] (unknown [218.94.118.90])
+	by smtp.qiye.163.com (Hmail) with ESMTPA id 3882D860313;
+	Thu, 30 May 2024 14:59:39 +0800 (CST)
+Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
+To: Gregory Price <gregory.price@memverge.com>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, John Groves
+ <John@groves.net>, axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
+ nvdimm@lists.linux.dev
+References: <20240503105245.00003676@Huawei.com>
+ <5b7f3700-aeee-15af-59a7-8e271a89c850@easystack.cn>
+ <20240508131125.00003d2b@Huawei.com>
+ <ef0ee621-a2d2-e59a-f601-e072e8790f06@easystack.cn>
+ <20240508164417.00006c69@Huawei.com>
+ <3d547577-e8f2-8765-0f63-07d1700fcefc@easystack.cn>
+ <20240509132134.00000ae9@Huawei.com>
+ <a571be12-2fd3-e0ee-a914-0a6e2c46bdbc@easystack.cn>
+ <664cead8eb0b6_add32947d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+ <8f161b2d-eacd-ad35-8959-0f44c8d132b3@easystack.cn>
+ <ZldIzp0ncsRX5BZE@memverge.com>
+From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Message-ID: <5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
+Date: Thu, 30 May 2024 14:59:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/4] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org
-Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
- kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, philipp.reisner@linbit.com,
- lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
- idryomov@gmail.com, xiubli@redhat.com
-References: <20240530132629.4180932-1-ofir.gal@volumez.com>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240530132629.4180932-1-ofir.gal@volumez.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <ZldIzp0ncsRX5BZE@memverge.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVkaThpMVkxDTENJTR5NQkNCTVUZERMWGhIXJBQOD1
+	lXWRgSC1lBWUlKQ1VCT1VKSkNVQktZV1kWGg8SFR0UWUFZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
+X-HM-Tid: 0a8fc84c11d1023ckunm3882d860313
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6OjY6DBw6MDcZPi8fExwQNy4S
+	MQhPCx9VSlVKTEpMS05JSENLSEtLVTMWGhIXVR8UFRwIEx4VHFUCGhUcOx4aCAIIDxoYEFUYFUVZ
+	V1kSC1lBWUlKQ1VCT1VKSkNVQktZV1kIAVlBTUlDTDcG
 
-Hey Ofir,
 
-On 30/05/2024 16:26, Ofir Gal wrote:
-> skb_splice_from_iter() warns on !sendpage_ok() which results in nvme-tcp
-> data transfer failure. This warning leads to hanging IO.
->
-> nvme-tcp using sendpage_ok() to check the first page of an iterator in
-> order to disable MSG_SPLICE_PAGES. The iterator can represent a list of
-> contiguous pages.
->
-> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
-> it requires all pages in the iterator to be sendable.
-> skb_splice_from_iter() checks each page with sendpage_ok().
->
-> nvme_tcp_try_send_data() might allow MSG_SPLICE_PAGES when the first
-> page is sendable, but the next one are not. skb_splice_from_iter() will
-> attempt to send all the pages in the iterator. When reaching an
-> unsendable page the IO will hang.
 
-Interesting. Do you know where this buffer came from? I find it strange
-that a we get a bvec with a contiguous segment which consists of non slab
-originated pages together with slab originated pages... it is surprising 
-to see
-a mix of the two.
+在 2024/5/29 星期三 下午 11:25, Gregory Price 写道:
+> On Wed, May 22, 2024 at 02:17:38PM +0800, Dongsheng Yang wrote:
+>>
+>>
+>> 在 2024/5/22 星期三 上午 2:41, Dan Williams 写道:
+>>> Dongsheng Yang wrote:
+>>>
+>>> What guarantees this property? How does the reader know that its local
+>>> cache invalidation is sufficient for reading data that has only reached
+>>> global visibility on the remote peer? As far as I can see, there is
+>>> nothing that guarantees that local global visibility translates to
+>>> remote visibility. In fact, the GPF feature is counter-evidence of the
+>>> fact that writes can be pending in buffers that are only flushed on a
+>>> GPF event.
+>>
+>> Sounds correct. From what I learned from GPF, ADR, and eADR, there would
+>> still be data in WPQ even though we perform a CPU cache line flush in the
+>> OS.
+>>
+>> This means we don't have a explicit method to make data puncture all caches
+>> and land in the media after writing. also it seems there isn't a explicit
+>> method to invalidate all caches along the entire path.
+>>
+>>>
+>>> I remain skeptical that a software managed inter-host cache-coherency
+>>> scheme can be made reliable with current CXL defined mechanisms.
+>>
+>>
+>> I got your point now, acorrding current CXL Spec, it seems software managed
+>> cache-coherency for inter-host shared memory is not working. Will the next
+>> version of CXL spec consider it?
+>>>
+> 
+> Sorry for missing the conversation, have been out of office for a bit.
+> 
+> It's not just a CXL spec issue, though that is part of it. I think the
+> CXL spec would have to expose some form of puncturing flush, and this
+> makes the assumption that such a flush doesn't cause some kind of
+> race/deadlock issue.  Certainly this needs to be discussed.
+> 
+> However, consider that the upstream processor actually has to generate
+> this flush.  This means adding the flush to existing coherence protocols,
+> or at the very least a new instruction to generate the flush explicitly.
+> The latter seems more likely than the former.
+> 
+> This flush would need to ensure the data is forced out of the local WPQ
+> AND all WPQs south of the PCIE complex - because what you really want to
+> know is that the data has actually made it back to a place where remote
+> viewers are capable of percieving the change.
+> 
+> So this means:
+> 1) Spec revision with puncturing flush
+> 2) Buy-in from CPU vendors to generate such a flush
+> 3) A new instruction added to the architecture.
+> 
+> Call me in a decade or so.
+> 
+> 
+> But really, I think it likely we see hardware-coherence well before this.
+> For this reason, I have become skeptical of all but a few memory sharing
+> use cases that depend on software-controlled cache-coherency.
 
-I'm wandering if this is something that happened before david's splice_pages
-changes. Maybe before that with multipage bvecs? Anyways it is strange, 
-never
-seen that.
+Hi Gregory,
 
-David,  strange that nvme-tcp is setting a single contiguous element 
-bvec but it
-is broken up into PAGE_SIZE increments in skb_splice_from_iter...
+	From my understanding, we actually has the same idea here. What I am 
+saying is that we need SPEC to consider this issue, meaning we need to 
+describe how the entire software-coherency mechanism operates, which 
+includes the necessary hardware support. Additionally, I agree that if 
+software-coherency also requires hardware support, it seems that 
+hardware-coherency is the better path.
+> 
+> There are some (FAMFS, for example). The coherence state of these
+> systems tend to be less volatile (e.g. mappings are read-only), or
+> they have inherent design limitations (cacheline-sized message passing
+> via write-ahead logging only).
 
->
-> The patch introduces a helper sendpages_ok(), it returns true if all the
-> continuous pages are sendable.
->
-> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
-> this helper to check whether the page list is OK. If the helper does not
-> return true, the driver should remove MSG_SPLICE_PAGES flag.
->
->
-> The bug is reproducible, in order to reproduce we need nvme-over-tcp
-> controllers with optimal IO size bigger than PAGE_SIZE. Creating a raid
-> with bitmap over those devices reproduces the bug.
->
-> In order to simulate large optimal IO size you can use dm-stripe with a
-> single device.
-> Script to reproduce the issue on top of brd devices using dm-stripe is
-> attached below.
-
-This is a great candidate for blktests. would be very beneficial to have 
-it added there.
+Can you explain more about this? I understand that if the reader in the 
+writer-reader model is using a readonly mapping, the interaction will be 
+much simpler. However, after the writer writes data, if we don't have a 
+mechanism to flush and invalidate puncturing all caches, how can the 
+readonly reader access the new data?
+> 
+> ~Gregory
+> 
