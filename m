@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522BA3D57A;
-	Thu, 30 May 2024 02:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A441C2AD;
+	Thu, 30 May 2024 02:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717035350; cv=none; b=T5EU8eGdqALO0cHJWc7VJTSu3gIC/odDEzZ53MNGVzCuiH5Wuag2DBjuql3tLKt5F+/prTaNcQzZWrty4sWy1CVYgHs9WOKOrNuNxKeu3fh9PrF/gBo9ZKXlC5FLykVjIpCeyDTOOvWSdTJQf34o6B/2pVJ7TX8i1c2Bl3dvvrk=
+	t=1717035361; cv=none; b=Yf7mfOeNOoXzN273K73Zp25laV3vLdfph1pRuA64yfC4gtszapAjMd6aEtM1CXMQ1oMvc+2wtI2gwt+GcmDKmOeO2HmbUlHo1+kgjHi434tdfUN+435gIVSiZG/OaeTjlooDe9H+PNy9VVMRgjgvUdr8Zbp4HgMireydlMDG7EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717035350; c=relaxed/simple;
-	bh=jUdRJVyoIcjUb4yayy/yqSHIWyvEbd3XvWtltACDs4w=;
+	s=arc-20240116; t=1717035361; c=relaxed/simple;
+	bh=m34IzQbYV7M9yK88DF0P7kP3OWiFqCk8AKxKQuzB5bs=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cV+ThJ1aRtEY+hFtAm16c13e1KrDc89GimVNu2mhRUX/OJKTyYuFKKi/TnSjFY+gRBYFUltPWknPQ8M+FP/tWEZAkDW29UuWyUTSG10ZJ4bydvSEPZyIjFmIMJgEg4GXKb2fum6ttJ6WmhNwVOVyTCjGXj1qgQUr12ykLxInRD8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rl2Nh51vy1R15rqwTStqZzWacxmPYkn+wEBaOzQtIDj6Z1zKCmx1Xjg3NBpiworcWcDbyykcCJl4Se2jm0G5IDcHuLzLQSnIfzh4feSQHRI/JzrGNNkcfjYqQHwW/4/nxtJDCE2/S+0TS9OvSyCOYWNHE8HDA0LGa624kboXGp0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.97.1)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1sCVKO-000000004is-1sla;
-	Thu, 30 May 2024 02:15:40 +0000
-Date: Thu, 30 May 2024 03:15:36 +0100
+	id 1sCVKY-000000004jd-18lv;
+	Thu, 30 May 2024 02:15:50 +0000
+Date: Thu, 30 May 2024 03:15:46 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
@@ -43,8 +43,8 @@ To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	"Ricardo B. Marliere" <ricardo@marliere.net>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH v2 8/9] mmc: block: set fwnode of disk devices
-Message-ID: <ee24b739d469db1567e10258f694550c5d297b47.1717031992.git.daniel@makrotopia.org>
+Subject: [PATCH v2 9/9] mmc: block: set GENHD_FL_NVMEM
+Message-ID: <927d02524c467351c546c4245a2eaf19030e8316.1717031992.git.daniel@makrotopia.org>
 References: <cover.1717031992.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -56,39 +56,24 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1717031992.git.daniel@makrotopia.org>
 
-Set fwnode of disk devices to 'block', 'boot0' and 'boot1' subnodes of
-the mmc-card. This is done in preparation for having the eMMC act as
-NVMEM provider.
+Set flag to consider MMC block devices as NVMEM providers.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/mmc/core/block.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/mmc/core/block.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 367509b5b646..cd3ee6d69aaa 100644
+index cd3ee6d69aaa..577e7ae5df14 100644
 --- a/drivers/mmc/core/block.c
 +++ b/drivers/mmc/core/block.c
-@@ -2463,6 +2463,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 					      int area_type,
- 					      unsigned int part_type)
- {
-+	struct fwnode_handle *fwnode;
- 	struct mmc_blk_data *md;
- 	int devidx, ret;
- 	char cap_str[10];
-@@ -2559,6 +2560,12 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 
- 	blk_queue_write_cache(md->queue.queue, cache_enabled, fua_enabled);
- 
-+	fwnode = device_get_named_child_node(subname ? md->parent->parent :
-+						       md->parent,
-+					     subname ? subname : "block");
-+	if (fwnode)
-+		device_set_node(disk_to_dev(md->disk), fwnode);
-+
- 	string_get_size((u64)size, 512, STRING_UNITS_2,
- 			cap_str, sizeof(cap_str));
- 	pr_info("%s: %s %s %s%s\n",
+@@ -2516,6 +2516,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 	md->disk->major	= MMC_BLOCK_MAJOR;
+ 	md->disk->minors = perdev_minors;
+ 	md->disk->first_minor = devidx * perdev_minors;
++	md->disk->flags = GENHD_FL_NVMEM;
+ 	md->disk->fops = &mmc_bdops;
+ 	md->disk->private_data = md;
+ 	md->parent = parent;
 -- 
 2.45.1
