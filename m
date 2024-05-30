@@ -1,185 +1,159 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87D917C203;
-	Thu, 30 May 2024 13:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CC717F513
+	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 13:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717076300; cv=none; b=toUj4qYCt3TcP64Os3ekaBTJkEVPzMWv7pJ/Oc/Teu+BInjCupy0Y2z0Q68D2MUe8LypFAgjhk7iW5Z+iK2t5WhPU1cJldihe5M6UDR+2fHpxQHfx3tFvl/4K11KvslVWL+IFpXuNK9PAXnpJ/DmU5fszmBQWQ5SNz4yfsnsCWI=
+	t=1717076773; cv=none; b=tqyY3+3jg9cNLy6D2RAYLQieh1rcu2IidDgPCqsPMWdyG4dvKC3DnGXkodtVkTkTFuWQDuJRP6M2X1fTQY/y30zc55qkKn3WQLNPwqNFAdr3bN8SyrR8lpgYrzuPWBJI3fzL7awfs3VfRU1Paqmvg4DF/WXmbLuKEBX3CzjwYMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717076300; c=relaxed/simple;
-	bh=S55mCDwB/L5bdVzNJdlQckiADHtrRU057V4YeMUyCks=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mBsm+uY0bq0rwFqLyE5eXJd2LThWuHFmYS2Z9k4PneqpDvtrTfCZETVFkLrPQdl7TJ2/AiqEsDW8Su5vEPpDh4LyMO8p7ykq2+1OvrUKSGKM9VoFc229/G/qGRAGluuCkGjbLND7/NP0nhvz+1i9jicjkKDXm2O8hOlxP+S77G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VqnKK2qwNz6J9yY;
-	Thu, 30 May 2024 21:34:13 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 61233140B38;
-	Thu, 30 May 2024 21:38:15 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 30 May
- 2024 14:38:14 +0100
-Date: Thu, 30 May 2024 14:38:13 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Dongsheng Yang <dongsheng.yang@easystack.cn>
-CC: Gregory Price <gregory.price@memverge.com>, Dan Williams
-	<dan.j.williams@intel.com>, John Groves <John@groves.net>, <axboe@kernel.dk>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-cxl@vger.kernel.org>, <nvdimm@lists.linux.dev>, <james.morse@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
-Message-ID: <20240530143813.00006def@Huawei.com>
-In-Reply-To: <5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
-References: <20240503105245.00003676@Huawei.com>
-	<5b7f3700-aeee-15af-59a7-8e271a89c850@easystack.cn>
-	<20240508131125.00003d2b@Huawei.com>
-	<ef0ee621-a2d2-e59a-f601-e072e8790f06@easystack.cn>
-	<20240508164417.00006c69@Huawei.com>
-	<3d547577-e8f2-8765-0f63-07d1700fcefc@easystack.cn>
-	<20240509132134.00000ae9@Huawei.com>
-	<a571be12-2fd3-e0ee-a914-0a6e2c46bdbc@easystack.cn>
-	<664cead8eb0b6_add32947d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-	<8f161b2d-eacd-ad35-8959-0f44c8d132b3@easystack.cn>
-	<ZldIzp0ncsRX5BZE@memverge.com>
-	<5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1717076773; c=relaxed/simple;
+	bh=juDbdX0Y8GqixK8pMaIwY4mK1Kc2Uns7SMNNeKabaC8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e0DDPwXTVUSsBCpMx0Ec8ppWIbPdJt1eZhrArT7LJPQpu1eYf3meKfJyf/MP0zS+AFkVnWfS3f2KBBRUOIRJMh8k6ltUe2XOfijlNOeeP5zX/iwzygP3B/3VTjQ5klCNd5xRphVgFCfpESEzh8Teq3U/3kccfwSGqVsY3fN9Rsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TEckmd6x; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TEckmd6x"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717076770;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EfyjO2O9S+39QYbsHE3kG4m3i1fzVGSXeu8l7KeSxG4=;
+	b=TEckmd6xdZzVOAFhmwJGyP8+sZxLRT4vsPo7e2Hs1yBvrXZUleBRazVm6zAk65YNHAL2Z3
+	VfePEQbyIHm727MAtvWv61W92jObjqaem4hz6qgJ26AQdayXxYPr/+7odSEEn6cxdoAFs4
+	oaE7kMeQfq6LZkYgu76kqcmcIPfmYP4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-OC8SETo-PHm4FRv1JHhA0A-1; Thu,
+ 30 May 2024 09:46:09 -0400
+X-MC-Unique: OC8SETo-PHm4FRv1JHhA0A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF82A29AA387;
+	Thu, 30 May 2024 13:46:08 +0000 (UTC)
+Received: from llong.com (unknown [10.22.33.42])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9F5CA40C6EB7;
+	Thu, 30 May 2024 13:46:07 +0000 (UTC)
+From: Waiman Long <longman@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dan Schatzberg <schatzberg.dan@gmail.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Waiman Long <longman@redhat.com>,
+	Justin Forbes <jforbes@redhat.com>
+Subject: [PATCH] blk-throttle: Fix incorrect display of io.max
+Date: Thu, 30 May 2024 09:45:47 -0400
+Message-Id: <20240530134547.970075-1-longman@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Thu, 30 May 2024 14:59:38 +0800
-Dongsheng Yang <dongsheng.yang@easystack.cn> wrote:
+Commit bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW")
+attempts to revert the code change introduced by commit cd5ab1b0fcb4
+("blk-throttle: add .low interface").  However, it leaves behind the
+bps_conf[] and iops_conf[] fields in the throtl_grp structure which
+aren't set anywhere in the new blk-throttle.c code but are still being
+used by tg_prfill_limit() to display the limits in io.max. Now io.max
+always displays the following values if a block queue is used:
 
-> =E5=9C=A8 2024/5/29 =E6=98=9F=E6=9C=9F=E4=B8=89 =E4=B8=8B=E5=8D=88 11:25,=
- Gregory Price =E5=86=99=E9=81=93:
-> > On Wed, May 22, 2024 at 02:17:38PM +0800, Dongsheng Yang wrote: =20
-> >>
-> >>
-> >> =E5=9C=A8 2024/5/22 =E6=98=9F=E6=9C=9F=E4=B8=89 =E4=B8=8A=E5=8D=88 2:4=
-1, Dan Williams =E5=86=99=E9=81=93: =20
-> >>> Dongsheng Yang wrote:
-> >>>
-> >>> What guarantees this property? How does the reader know that its local
-> >>> cache invalidation is sufficient for reading data that has only reach=
-ed
-> >>> global visibility on the remote peer? As far as I can see, there is
-> >>> nothing that guarantees that local global visibility translates to
-> >>> remote visibility. In fact, the GPF feature is counter-evidence of the
-> >>> fact that writes can be pending in buffers that are only flushed on a
-> >>> GPF event. =20
-> >>
-> >> Sounds correct. From what I learned from GPF, ADR, and eADR, there wou=
-ld
-> >> still be data in WPQ even though we perform a CPU cache line flush in =
-the
-> >> OS.
-> >>
-> >> This means we don't have a explicit method to make data puncture all c=
-aches
-> >> and land in the media after writing. also it seems there isn't a expli=
-cit
-> >> method to invalidate all caches along the entire path.
-> >> =20
-> >>>
-> >>> I remain skeptical that a software managed inter-host cache-coherency
-> >>> scheme can be made reliable with current CXL defined mechanisms. =20
-> >>
-> >>
-> >> I got your point now, acorrding current CXL Spec, it seems software ma=
-naged
-> >> cache-coherency for inter-host shared memory is not working. Will the =
-next
-> >> version of CXL spec consider it? =20
-> >>> =20
-> >=20
-> > Sorry for missing the conversation, have been out of office for a bit.
-> >=20
-> > It's not just a CXL spec issue, though that is part of it. I think the
-> > CXL spec would have to expose some form of puncturing flush, and this
-> > makes the assumption that such a flush doesn't cause some kind of
-> > race/deadlock issue.  Certainly this needs to be discussed.
-> >=20
-> > However, consider that the upstream processor actually has to generate
-> > this flush.  This means adding the flush to existing coherence protocol=
-s,
-> > or at the very least a new instruction to generate the flush explicitly.
-> > The latter seems more likely than the former.
-> >=20
-> > This flush would need to ensure the data is forced out of the local WPQ
-> > AND all WPQs south of the PCIE complex - because what you really want to
-> > know is that the data has actually made it back to a place where remote
-> > viewers are capable of percieving the change.
-> >=20
-> > So this means:
-> > 1) Spec revision with puncturing flush
-> > 2) Buy-in from CPU vendors to generate such a flush
-> > 3) A new instruction added to the architecture.
-> >=20
-> > Call me in a decade or so.
-> >=20
-> >=20
-> > But really, I think it likely we see hardware-coherence well before thi=
-s.
-> > For this reason, I have become skeptical of all but a few memory sharing
-> > use cases that depend on software-controlled cache-coherency. =20
->=20
-> Hi Gregory,
->=20
-> 	From my understanding, we actually has the same idea here. What I am=20
-> saying is that we need SPEC to consider this issue, meaning we need to=20
-> describe how the entire software-coherency mechanism operates, which=20
-> includes the necessary hardware support. Additionally, I agree that if=20
-> software-coherency also requires hardware support, it seems that=20
-> hardware-coherency is the better path.
-> >=20
-> > There are some (FAMFS, for example). The coherence state of these
-> > systems tend to be less volatile (e.g. mappings are read-only), or
-> > they have inherent design limitations (cacheline-sized message passing
-> > via write-ahead logging only). =20
->=20
-> Can you explain more about this? I understand that if the reader in the=20
-> writer-reader model is using a readonly mapping, the interaction will be=
-=20
-> much simpler. However, after the writer writes data, if we don't have a=20
-> mechanism to flush and invalidate puncturing all caches, how can the=20
-> readonly reader access the new data?
+	<m>:<n> rbps=0 wbps=0 riops=0 wiops=0
 
-There is a mechanism for doing coarse grained flushing that is known to
-work on some architectures. Look at cpu_cache_invalidate_memregion().
-On intel/x86 it's wbinvd_on_all_cpu_cpus()
-on arm64 it's a PSCI firmware call CLEAN_INV_MEMREGION (there is a
-public alpha specification for PSCI 1.3 with that defined but we
-don't yet have kernel code.)
+Fix this problem by removing bps_conf[] and iops_conf[] and use bps[]
+and iops[] instead to complete the revert.
 
-These are very big hammers and so unsuited for anything fine grained.
-In the extreme end of possible implementations they briefly stop all
-CPUs and clean and invalidate all caches of all types.  So not suited
-to anything fine grained, but may be acceptable for a rare setup event,
-particularly if the main job of the writing host is to fill that memory
-for lots of other hosts to use.
+Fixes: bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW")
+Reported-by: Justin Forbes <jforbes@redhat.com>
+Closes: https://github.com/containers/podman/issues/22701#issuecomment-2120627789
+Signed-off-by: Waiman Long <longman@redhat.com>
+---
+ block/blk-throttle.c | 24 ++++++++++++------------
+ block/blk-throttle.h |  8 ++------
+ 2 files changed, 14 insertions(+), 18 deletions(-)
 
-At least the ARM one takes a range so allows for a less painful
-implementation.  I'm assuming we'll see new architecture over time
-but this is a different (and potentially easier) problem space
-to what you need.
-
-Jonathan
-
-
-
-> > ~Gregory
-> >  =20
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index d907040859f9..da619654f418 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1347,32 +1347,32 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	bps_dft = U64_MAX;
+ 	iops_dft = UINT_MAX;
+ 
+-	if (tg->bps_conf[READ] == bps_dft &&
+-	    tg->bps_conf[WRITE] == bps_dft &&
+-	    tg->iops_conf[READ] == iops_dft &&
+-	    tg->iops_conf[WRITE] == iops_dft)
++	if (tg->bps[READ] == bps_dft &&
++	    tg->bps[WRITE] == bps_dft &&
++	    tg->iops[READ] == iops_dft &&
++	    tg->iops[WRITE] == iops_dft)
+ 		return 0;
+ 
+ 	seq_printf(sf, "%s", dname);
+-	if (tg->bps_conf[READ] == U64_MAX)
++	if (tg->bps[READ] == U64_MAX)
+ 		seq_printf(sf, " rbps=max");
+ 	else
+-		seq_printf(sf, " rbps=%llu", tg->bps_conf[READ]);
++		seq_printf(sf, " rbps=%llu", tg->bps[READ]);
+ 
+-	if (tg->bps_conf[WRITE] == U64_MAX)
++	if (tg->bps[WRITE] == U64_MAX)
+ 		seq_printf(sf, " wbps=max");
+ 	else
+-		seq_printf(sf, " wbps=%llu", tg->bps_conf[WRITE]);
++		seq_printf(sf, " wbps=%llu", tg->bps[WRITE]);
+ 
+-	if (tg->iops_conf[READ] == UINT_MAX)
++	if (tg->iops[READ] == UINT_MAX)
+ 		seq_printf(sf, " riops=max");
+ 	else
+-		seq_printf(sf, " riops=%u", tg->iops_conf[READ]);
++		seq_printf(sf, " riops=%u", tg->iops[READ]);
+ 
+-	if (tg->iops_conf[WRITE] == UINT_MAX)
++	if (tg->iops[WRITE] == UINT_MAX)
+ 		seq_printf(sf, " wiops=max");
+ 	else
+-		seq_printf(sf, " wiops=%u", tg->iops_conf[WRITE]);
++		seq_printf(sf, " wiops=%u", tg->iops[WRITE]);
+ 
+ 	seq_printf(sf, "\n");
+ 	return 0;
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index 32503fd83a84..8c365541a275 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -95,15 +95,11 @@ struct throtl_grp {
+ 	bool has_rules_bps[2];
+ 	bool has_rules_iops[2];
+ 
+-	/* internally used bytes per second rate limits */
++	/* bytes per second rate limits */
+ 	uint64_t bps[2];
+-	/* user configured bps limits */
+-	uint64_t bps_conf[2];
+ 
+-	/* internally used IOPS limits */
++	/* IOPS limits */
+ 	unsigned int iops[2];
+-	/* user configured IOPS limits */
+-	unsigned int iops_conf[2];
+ 
+ 	/* Number of bytes dispatched in current slice */
+ 	uint64_t bytes_disp[2];
+-- 
+2.43.0
 
