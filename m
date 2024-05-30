@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AED018040;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEFC18054;
 	Thu, 30 May 2024 02:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717035227; cv=none; b=DbRQYTRr9g/zNaiY7M+emlf0+RWCTockkgY73taENR48wbeol/nX9g+RJvlWdbXfdyy+82GLiV2z9wxc4vje1gILOb6OVfkRLraQXvhxIgdEngl6MfIhgVb/OV2bprR5KI6D762/h4s/FM3B9G1fNdX4nDWk1xWq0RCNvp7Iiso=
+	t=1717035227; cv=none; b=I9fIjuG0XhmOOYsbdjEK//pylYeqH0sOicppP4xOJZWX5wVsWOjmyHQc4Dd+mYLUhzX38Jay+AZ1m4+gHViOk6V1oI9hIoAqyunSOd+PY+0QjGxaFsW9zOr8w8SeOIAYc8DduMGpEJQPXMvRB5hrKJ5DcHN0eJSxTV0pkqnZ5Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717035227; c=relaxed/simple;
-	bh=i6vBjYMdFnnLJpM5QWR1zTf8u6cNKoHy8dOt9MG9lIA=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PhG3xWXxNvwOB8y71AklSUge3nJBqFj6zCNyeos8haJ6QLgNMlX0XhnhtGsSyG5uP0EvvefoVJQwuxyks8PQQ5sOct4qJuxu0oxc0346IxFpth3nGAw/5IIa1qH6HW1xWN7ncGPU0L44pEW7qMEDzK2kRPpPcokab8ztvv2Eris=
+	bh=8KiukBQuZe8dk/35HCsKrEZ3OpWGl77bj/JKjKV4ggo=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mkRP2/7rD7pV5FSVh4vtCe5WmiDIsnT01psM6X+ad0wEZmxkBVvDxvvbirAA9TGITpMKymD35k2NB86BTiAdpzDDK4FOcXKV1eDtsQhIfv6MPLABzsfXRRY9YuM9NU7BIJkkf1s1fTQ76lAeJVBq90wWPg2VVqxgJ+u33PzIrTc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.97.1)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1sCVHr-000000004cn-1BZJ;
-	Thu, 30 May 2024 02:13:03 +0000
-Date: Thu, 30 May 2024 03:12:54 +0100
+	id 1sCVIB-000000004dG-0THb;
+	Thu, 30 May 2024 02:13:23 +0000
+Date: Thu, 30 May 2024 03:13:19 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
@@ -43,8 +43,9 @@ To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	"Ricardo B. Marliere" <ricardo@marliere.net>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH v2 0/9] nvmem: implement block NVMEM provider
-Message-ID: <cover.1717031992.git.daniel@makrotopia.org>
+Subject: [PATCH v2 2/9] block: partitions: populate fwnode
+Message-ID: <3329bf2fa25695934b392944ff977ae95dc8c02d.1717031992.git.daniel@makrotopia.org>
+References: <cover.1717031992.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,73 +54,81 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1717031992.git.daniel@makrotopia.org>
 
-On embedded devices using an eMMC it is common that one or more (hw/sw)
-partitions on the eMMC are used to store MAC addresses and Wi-Fi
-calibration EEPROM data.
+Let block partitions to be represented by a firmware node and hence
+allow them to being referenced e.g. for use with blk-nvmem.
 
-Implement an NVMEM provider backed by a block device as typically the
-NVMEM framework is used to have kernel drivers read and use binary data
-from EEPROMs, efuses, flash memory (MTD), ...
-
-In order to be able to reference hardware partitions on an eMMC, add code
-to bind each hardware partition to a specific firmware subnode.
-
-Overall, this enables uniform handling across practially all flash
-storage types used for this purpose (MTD, UBI, and now also MMC or and in
-future may also other block devices).
-
-As part of this series it was necessary to define a device tree schema
-for block devices and partitions on them, which (similar to how it now
-works also for UBI volumes) can be matched by one or more properties.
-
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-This series has previously been submitted as RFC on July 19th 2023[1]
-and most of the basic idea did not change since. Another round of RFC
-was submitted on March 5th 2024[2].
+ block/partitions/core.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-Changes since v1 sent on March 21st 2024 [3]:
- - introduce notifications for block device addition and removal for
-   in-kernel users. This allows the nvmem driver to be built as a module
-   and avoids using class_interface and block subsystem internals as
-   suggested in https://patchwork.kernel.org/comment/25771998/ and
-   https://patchwork.kernel.org/comment/25770441/
-
-[1]: https://patchwork.kernel.org/project/linux-block/list/?series=767565
-[2]: https://patchwork.kernel.org/project/linux-block/list/?series=832705
-[3]: https://patchwork.kernel.org/project/linux-block/list/?series=837150&archive=both
-
-Daniel Golle (9):
-  dt-bindings: block: add basic bindings for block devices
-  block: partitions: populate fwnode
-  block: add support for notifications
-  block: add new genhd flag GENHD_FL_NVMEM
-  nvmem: implement block NVMEM provider
-  dt-bindings: mmc: mmc-card: add block device nodes
-  mmc: core: set card fwnode_handle
-  mmc: block: set fwnode of disk devices
-  mmc: block: set GENHD_FL_NVMEM
-
- .../bindings/block/block-device.yaml          |  22 ++
- .../devicetree/bindings/block/partition.yaml  |  51 +++++
- .../devicetree/bindings/block/partitions.yaml |  20 ++
- .../devicetree/bindings/mmc/mmc-card.yaml     |  45 ++++
- block/Kconfig                                 |   6 +
- block/Makefile                                |   1 +
- block/blk-notify.c                            |  88 ++++++++
- block/partitions/core.c                       |  41 ++++
- drivers/mmc/core/block.c                      |   8 +
- drivers/mmc/core/bus.c                        |   2 +
- drivers/nvmem/Kconfig                         |  11 +
- drivers/nvmem/Makefile                        |   2 +
- drivers/nvmem/block.c                         | 198 ++++++++++++++++++
- include/linux/blkdev.h                        |  10 +
- 14 files changed, 505 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/block/block-device.yaml
- create mode 100644 Documentation/devicetree/bindings/block/partition.yaml
- create mode 100644 Documentation/devicetree/bindings/block/partitions.yaml
- create mode 100644 block/blk-notify.c
- create mode 100644 drivers/nvmem/block.c
-
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index ab76e64f0f6c..93d109409905 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -10,6 +10,8 @@
+ #include <linux/ctype.h>
+ #include <linux/vmalloc.h>
+ #include <linux/raid/detect.h>
++#include <linux/property.h>
++
+ #include "check.h"
+ 
+ static int (*const check_part[])(struct parsed_partitions *) = {
+@@ -281,6 +283,43 @@ static ssize_t whole_disk_show(struct device *dev,
+ }
+ static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
+ 
++static struct fwnode_handle *find_partition_fwnode(struct block_device *bdev)
++{
++	struct fwnode_handle *fw_parts, *fw_part;
++	struct device *ddev = disk_to_dev(bdev->bd_disk);
++	const char *partname, *uuid;
++	u32 partno;
++
++	fw_parts = device_get_named_child_node(ddev, "partitions");
++	if (!fw_parts)
++		fw_parts = device_get_named_child_node(ddev->parent, "partitions");
++
++	if (!fw_parts)
++		return NULL;
++
++	fwnode_for_each_child_node(fw_parts, fw_part) {
++		if (!fwnode_property_read_string(fw_part, "uuid", &uuid) &&
++		    (!bdev->bd_meta_info || strncmp(uuid,
++						    bdev->bd_meta_info->uuid,
++						    PARTITION_META_INFO_UUIDLTH)))
++			continue;
++
++		if (!fwnode_property_read_string(fw_part, "partname", &partname) &&
++		    (!bdev->bd_meta_info || strncmp(partname,
++						    bdev->bd_meta_info->volname,
++						    PARTITION_META_INFO_VOLNAMELTH)))
++			continue;
++
++		if (!fwnode_property_read_u32(fw_part, "partno", &partno) &&
++		    bdev_partno(bdev) != partno)
++			continue;
++
++		return fw_part;
++	}
++
++	return NULL;
++}
++
+ /*
+  * Must be called either with open_mutex held, before a disk can be opened or
+  * after all disk users are gone.
+@@ -355,6 +394,8 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+ 			goto out_put;
+ 	}
+ 
++	device_set_node(pdev, find_partition_fwnode(bdev));
++
+ 	/* delay uevent until 'holders' subdir is created */
+ 	dev_set_uevent_suppress(pdev, 1);
+ 	err = device_add(pdev);
 -- 
 2.45.1
