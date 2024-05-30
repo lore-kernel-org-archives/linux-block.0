@@ -1,90 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB7D12BE91;
-	Thu, 30 May 2024 11:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4537F13211F;
+	Thu, 30 May 2024 12:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717067379; cv=none; b=GxmVisUYvHmm+DyYpK3YLgj8MpgajADUxaBIZYFRDGkSWLLvmdV/vxPDac4pPGSuZgdbICqPRTmuVllPimxMxDCZHcZsOIGCZZjeMj6ruQsDd956guY9OePoamsFRUo1dJv1j//X7wwg6i2RjlonlCHCqPEDa1tPVswRI2Cb3q8=
+	t=1717073186; cv=none; b=PnaVRTP4yMOg0+Vys8bTd5WfaWZUCc3yYTGmNDm2c6k1yN51X2aVmYGUAzKW0F+pzrvT6bV24pzaT/HXor8Z/zDojJqOnxtouYSWSHVN+QBmQlDmc9zd5JnuB/xLyz7CKK65EjM8QNQ2f/8JAXt1Rdk++6mM672mKPlIZlt8E3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717067379; c=relaxed/simple;
-	bh=HeZxGnvMZ7Iclw9p2NasiojNVxxMm4UZ04WpvYt6hQ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qU1N33nlBS/aiC5wpnexArqb8oXhwRvNJWHdWhODJXes4R2sJVhSnnsTzKzVeDYLELq58c+q6p2VPIZxzIKO14H+iAxnbwYEIBPrTHi55JO4SxN5a5VOFtyArvEmfg5hPXf9WCJI8P29LB767QmjXrGa63ConSkDnonvx18xWpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gx1w/7wx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717073186; c=relaxed/simple;
+	bh=gxjZcr2PnZyvQMyCopRCK5av5SbxPnA/ce41gmyZI4k=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uJjzNh+68Uvae66q3X/5uLG7WH03YHoDms9sQ/JxDhxivjtAMTuRnpS+rRztZNMjpqk/cpEZQ+rwUkFLz4EkPtbvyPr/pYOnVzRmDuWuxKvuXMOuqaMiXPg03pQ/YXw23WyRHk+6Mmq7bezAdUoSa+Y/SIDm9ocuifklJqow+6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=Z+fZaOsM; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gx1w/7wx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56694C2BBFC;
-	Thu, 30 May 2024 11:09:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717067379;
-	bh=HeZxGnvMZ7Iclw9p2NasiojNVxxMm4UZ04WpvYt6hQ4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Gx1w/7wxl+t3+TxsUCoMpuxOEr20FzUgjP5rNB6RIx7sXhJ6T4W6LvhJUd0sjsCHR
-	 e+4jcnEp8wtXokBLyuOei7Ad92cVX2A4z6Z6U8WwKYumwlckNN1gJlFZlmq5XjSln+
-	 vZOEXgxhBl8ev7ujJzyXDSG++FpJkDQHkbRte5/uL2D090VTdeermWIqYMEJZzQrVg
-	 OjS2nuuOOfHBH/qDRUs41pSJmasCVxSnrkLvtohvzcSnX3KKGWnR0XzwyulWSmvdsP
-	 NMFil2Xsyz6NcRrUeKdrsDxG7JYzxhbY6v/K7TRKIniqkqYauUHDovo6XhHcse/kJV
-	 VR5gj/wJPqw9g==
-Message-ID: <c61058da-831c-4872-8032-69d3405db228@kernel.org>
-Date: Thu, 30 May 2024 20:09:37 +0900
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="Z+fZaOsM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1717073182;
+	bh=2PQslrF5DLJnjhxjVmppW6OzIMjxkmaQb7qN4cQE65Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Z+fZaOsMOEUTjZCZMamY0ob93TTFoxEs/E/5qjZIhX9yHTy60nzW+0GD3pVHpb8TB
+	 b/in31fd2yRpgO82h+XfGopnNAfaSqQGCeWCoNCdHoljCWvGha9lVKgLtFaCWErtOA
+	 tMfUdblW1V4uwFpAfL77YS6hy2esknHHvplmM+ypb+OuCnhmvj/R0rS7X4J1kskl5L
+	 4Mu7rYzVGMejQ5kFlmjmTcB9Gy8fSejfSLiV7XCuTQGKGIB1y9nFwyp8xvfPNoVA/f
+	 zXn4pYXs2+Re1dNMgT/Ogt/J0YzliE+LyYP/POMjAw1I0FrPS62JqUu9+mzfD13BJy
+	 VG8NOpgcC8lLw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VqmG402Gjz4x1Q;
+	Thu, 30 May 2024 22:46:19 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: "Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
+Cc: John Garry <john.g.garry@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-scsi@vger.kernel.org, benh@kernel.crashing.org,
+ linuxppc-dev@lists.ozlabs.org, Guenter Roeck <linux@roeck-us.net>,
+ Christoph Hellwig <hch@lst.de>, Linux kernel regressions list
+ <regressions@lists.linux.dev>
+Subject: Re: [PATCH 04/23] scsi: initialize scsi midlayer limits before
+ allocating the queue
+In-Reply-To: <fc6a2243-6982-45e9-a640-9d98c29a8f53@leemhuis.info>
+References: <20240520151536.GA32532@lst.de>
+ <fc6a2243-6982-45e9-a640-9d98c29a8f53@leemhuis.info>
+Date: Thu, 30 May 2024 22:46:18 +1000
+Message-ID: <8734pz4gdh.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] block: Fix zone write plugging handling of devices
- with a runt zone
-To: Niklas Cassel <cassel@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>
-References: <20240530054035.491497-1-dlemoal@kernel.org>
- <20240530054035.491497-4-dlemoal@kernel.org> <ZlgspRAZQ4lmqBcC@ryzen.lan>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <ZlgspRAZQ4lmqBcC@ryzen.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 5/30/24 16:37, Niklas Cassel wrote:
-[...]
+"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info> writes:
+> [CCing the regression list, as it should be in the loop for regressions:
+> https://docs.kernel.org/admin-guide/reporting-regressions.html]
+>
+> On 20.05.24 17:15, Christoph Hellwig wrote:
+>> Adding ben and the linuxppc list.
+>
+> Hmm, no reply and no other progress to get this resolved afaics. So lets
+> bring Michael into the mix, he might be able to help out.
 
->> +static bool disk_zone_is_full(struct gendisk *disk,
->> +			      unsigned int zno, unsigned int offset_in_zone)
-> 
-> Why not just call the third parameter wp?
+Sorry I didn't see the original forward for some reason.
 
-Because it does not have to be a plug write pointer. And even then, zone write
-plugging uses offset in a zone as write pointer values :)
+I haven't seen this on my G5, but it's hard drive is on SATA. I think
+the CDROM is pata_macio, but there isn't a disk in the drive to test
+with.
 
-[...]
+> BTW TWIMC: a PowerMac G5 user user reported similar symptoms here
+> recently: https://bugzilla.kernel.org/show_bug.cgi?id=218858
 
->>  static void disk_remove_zone_wplug(struct gendisk *disk,
->> @@ -669,13 +683,12 @@ static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
->>  static void disk_zone_wplug_abort_unaligned(struct gendisk *disk,
->>  					    struct blk_zone_wplug *zwplug)
->>  {
->> -	unsigned int zone_capacity = disk->zone_capacity;
->>  	unsigned int wp_offset = zwplug->wp_offset;
->>  	struct bio_list bl = BIO_EMPTY_LIST;
->>  	struct bio *bio;
->>  
->>  	while ((bio = bio_list_pop(&zwplug->bio_list))) {
->> -		if (wp_offset >= zone_capacity ||
->> +		if (disk_zone_is_full(disk, zwplug->zone_no, wp_offset) ||
-> 
-> Why don't you use disk_zone_wplug_is_full() here?
+AFAICS that report is from a 4K page size kernel (Page orders: ...
+virtual = 12), so there must be something else going on?
 
-Because this function does not modify the zone write plug write offset. So we
-cannot use it.
+I've asked the reporter to confirm the page size.
 
+cheers
 
-
--- 
-Damien Le Moal
-Western Digital Research
-
+>> Context: pata_macio initialization now fails as we enforce that the
+>> segment size is set properly.
+>> 
+>> On Wed, May 15, 2024 at 04:52:29PM -0700, Guenter Roeck wrote:
+>>> pata_macio_common_init() Calling ata_host_activate() with limit 65280
+>>> ...
+>>> max_segment_size is 65280; PAGE_SIZE is 65536; BLK_MAX_SEGMENT_SIZE is 65536
+>>> WARNING: CPU: 0 PID: 12 at block/blk-settings.c:202 blk_validate_limits+0x2d4/0x364
+>>> ...
+>>>
+>>> This is with PPC_BOOK3S_64 which selects a default page size of 64k.
+>> 
+>> Yeah.  Did you actually manage to use pata macio previously?  Or is
+>> it just used because it's part of the pmac default config?
+>> 
+>>> Looking at the old code, I think it did what you suggested above,
+>> 
+>>> but assuming that the driver requested a lower limit on purpose that
+>>> may not be the best solution.
+>> 
+>>> Never mind, though - I updated my test configuration to explicitly
+>>> configure the page size to 4k to work around the problem. With that,
+>>> please consider this report a note in case someone hits the problem
+>>> on a real system (and sorry for the noise).
+>> 
+>> Yes, the idea behind this change was to catch such errors.  So far
+>> most errors have been drivers setting lower limits than what the
+>> hardware can actually handle, but I'd love to track this down.
+>> 
+>> If the hardware can't actually handle the lower limit we should
+>> probably just fail the probe gracefully with a well comment if
+>> statement instead.
