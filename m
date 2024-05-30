@@ -1,77 +1,82 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D8B1804E
-	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 01:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50BC18036
+	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 01:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717033453; cv=none; b=V4IfAGGwkNITakY5qrbuVz2fOYrEI+m7NT4KUWMtaWPOPJHWSI5VcwX46VU9bNdR/5VPXa94NkQufIb7so12tJOPEhSeLnSi9em9LKbVPLRg0nyvCqrY+ma44CX00AnQceWgXq+iqG3RTKz7fUop64iA+JHsFh6P/sUy+xtkMG4=
+	t=1717033632; cv=none; b=HJPlauKekvk0cg0bTfhfj7b1Gm2Ha4u5jAfgsOn8Gn1xR8T5yBQb7YETirVn284KsVXiKzQqjUgre0XrTVPScvVeJye/mnyeHEsqmCWpfHpRAXG76p59YjNsEm0oxNDjLp1hlORAqLSOrOYgQKW0mmIjaXW1AoHEHn5c0tFiC2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717033453; c=relaxed/simple;
-	bh=XlFPj1RXQZAE85eiIkf3uz2oawhmGHw25xz2yWGVjJs=;
-	h=Date:Message-ID:MIME-Version:Content-Type:Content-Disposition:
-	 From:To:Cc:Subject:References:In-Reply-To; b=T1Ta3gclJ6WgOM9EWqDHEnyh9YF24ovQxRhWGkemEex/nhiATIsLFBjrRGTw77QZsnDNeeyfvnSn3y++Pb1E8y5nAwc8WVk5wsrVCrGOWE4J/hNHeqC08j6UikOnj9K+CI+LNFxmL0jTTkOMXOPwuHmztZ2BDyDFNRl5/QbYsvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=gaHMHYSX; arc=none smtp.client-ip=209.85.219.51
+	s=arc-20240116; t=1717033632; c=relaxed/simple;
+	bh=x1jS0mxgpy/2saLRwCgP0IDOSIhPVz9T5ZHuv9e2c30=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mlLLJc4n8WQH129fqbiwOCMa5fEd+zH/XEHAKYHYJxscGy17m9UMu0/aJq8Ua229iVq1P/AcygkD55Q2yhD2brjn7ZZ0W1mhW5ixWbRi33EBAk14cxoMbUnxrLCflDhL9ofusCJq4I4M1vKu5VHnizBrMdQIqdtDnQW1Zbxhs5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=RwtgAkTz; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="gaHMHYSX"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6ab9db33f0dso1861236d6.2
-        for <linux-block@vger.kernel.org>; Wed, 29 May 2024 18:44:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="RwtgAkTz"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-627efad69b4so3158787b3.3
+        for <linux-block@vger.kernel.org>; Wed, 29 May 2024 18:47:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1717033450; x=1717638250; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
-         :content-disposition:mime-version:message-id:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=L4ABwrC5FtgyoOimiqfOWAU5N+FeuMNhCFfwy0UlI8s=;
-        b=gaHMHYSX+in2cyNtu69wcpOjh6zbIKonsN3uczQlXv/Y8ThCV5Zk78jJzZqaos8V/F
-         AsfNBPXVZ8t4W+F/aCTL7a97EZOPfFbrjpiyTnLxkT/QX8SgkaWaNb0zf8zocJeICNzC
-         sSMpWlsiRXyU0xoAZggJ7FUNj0wg/6a4B8OrRqnWm1agsSmUcD/8WmS7o7zi6N/bDxGu
-         CVL5SYStQh4fuSxph3Ij+2RV3bTGCETptV0BiCIhdXfymm5GiVfsrcrBiHysZQwVE3W2
-         PxMJW8yYVo9cx0VQxxMVZ0WUFOF1vp/0TzrSol8BdFF/dTMykXaGZpIXtqgg5uJozqso
-         ddcw==
+        d=paul-moore.com; s=google; t=1717033629; x=1717638429; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GtKBdXnoQfLOHhfUlX9Bxsk6L3lUvasMxrh9oed50QE=;
+        b=RwtgAkTzeIe14CmGCyMksSR4l21XcWqOQkKoopcgKO/XLkZUIn4G/0i0q0lKZrcy4x
+         xn68e3VSEarmh1mvNflXaLAyT29Gv70J4qQTPiTT05QTrRcMDjhNFl1k0s3cr14tBGG6
+         yL71M4rAGeGLtcneYI7oXdXS7scDG95KWbSh3npaBfIrxNpZ9xwjoq1VUJFmfXrn8CRj
+         KMEtKZPZrCDtknaqS5rNesrw9qnisExtDi3jgfHhEY7IUV9y1lfeVXDRq8GEYtPqrmkL
+         FpMsJap7fFxb8yCjg7PMJWPjGZpfF+3y/IHrgo+lih0Ycse8GFpBMubGKutnNwI4dxvG
+         KhSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717033450; x=1717638250;
-        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
-         :content-disposition:mime-version:message-id:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L4ABwrC5FtgyoOimiqfOWAU5N+FeuMNhCFfwy0UlI8s=;
-        b=Xe6IGbee8k0CdUxYefJxqXYn8S5X96Xl7gaamh1VdJlGnKcp8F7ydXdu4LL3CDpfBC
-         0yMPNp9/JdWBJGnxPAdPvOOpKa2v1po3VkebF5NqC35gjmJq+gwy1lqv6fXZwYSHlveN
-         paoJGnuPFutDfdI22vWf+m+361HpLBWd0p5kf/MTQ/SPL6SdwAAsF1f1o0dW5kadiEKd
-         4XDREREyaoOnWxAWM46IeLL34DOlqpJnbv4HaJ+q/uiJ3r5BjGKEyesV3z6GeqXIydWu
-         ThQvx3eJEq/XcldEwbWk8SKO49gC11+NVShJdzBPFFXNLoFCatcpA6CvERmkzzkv78yt
-         8ZlA==
-X-Forwarded-Encrypted: i=1; AJvYcCVv7/U4eXshY5b/Yu2CrfuINkgJvwC9i4GbaA/np4R3JwEjq1Llqydf79gCNw9AUWlbGeOs2aH2bXYOA15kqWwD1C25Don8kH36wrY=
-X-Gm-Message-State: AOJu0Yx22nqrnUXNqLuETyJ+EqjILArBinbB3DfHBUyNSSzot8rWEzbP
-	vi4wq62VXDSGAtDL6HG0QWz5VJ2QwiSLbb4mEi323gbGtIsUKHwcl+YDdjv4Mw==
-X-Google-Smtp-Source: AGHT+IHQp0C1crkZOCMGGvX3eqKW4chrG+mKjNt/WRAkCWU4RNMq/9Ztm3BtBFcPUbJ6oSOp3C66DA==
-X-Received: by 2002:a05:6214:3f88:b0:6ab:4e10:838f with SMTP id 6a1803df08f44-6ae0ccaddbdmr10799836d6.35.1717033450457;
-        Wed, 29 May 2024 18:44:10 -0700 (PDT)
-Received: from localhost ([70.22.175.108])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ae01ed9967sm4958596d6.72.2024.05.29.18.44.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 18:44:10 -0700 (PDT)
-Date: Wed, 29 May 2024 21:44:09 -0400
-Message-ID: <06bb61dc838eeff63bb5f11cea6d4b53@paul-moore.com>
+        d=1e100.net; s=20230601; t=1717033629; x=1717638429;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GtKBdXnoQfLOHhfUlX9Bxsk6L3lUvasMxrh9oed50QE=;
+        b=dXa5f1G87ZJQG9DTlJUn3wW4gZsg7vb55ZdcknhuCLzI1m6+O0VppG/Sdik/HTjFzb
+         ygK+CztAPRAtnMshJ8DMVYdq+lNKVTpnjKEwpJBQSBIsrD68s8BW+jh6hJHb56sfBEmA
+         0I6rtfnL0lm+U7sNrNxlltDPL5onfACX8+sn4hbnTsVDERfsWDCI+vsgr6Fd6g55JyAM
+         qo6pCPv/mdHIdxOWjNcsfEneGa1Sn7CLNFfunlnQJPzg8AQfh6quAzCOkzUJeK1ua/bF
+         zpC1JiLPugWX2sUCgnTl11C99posLTSw+6DxdOK2onBUlFTVSIjWJGSNYdlruN1wS+s+
+         H3Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0Ow2kubJyDWAiZOS9CkHr+uIQEHwMC7RYfGC39RW0ZRm3xkAlqlEuIS+9Mg1AN4+lG636BJu+pHmN+6wLOcxl+ph1g8elYk5hQ+M=
+X-Gm-Message-State: AOJu0YyBT+6LzQBu24kMYoEzHOsaB/4C0mshUZsZhkgGo/LWenJsJAkl
+	PqXWAKB7TPWT21tSJKp7ZfqdkOyfrdF+bLpGV3H4T3QirGUSb6Pq5mJeGrB5+DdMKED3+aQ8+Sh
+	amWIwHOHfvlR4djuk5hZa/Dsabq79A035czb9
+X-Google-Smtp-Source: AGHT+IHE8pHh5vgrRzbkNWJnz/7ABaPo+xQvVDp6nIkAadJxWm7yBQS/PqPj3c4uPz54TzSylU9FuipuoCMPbpIsfP8=
+X-Received: by 2002:a05:690c:ecc:b0:627:ecd3:6223 with SMTP id
+ 00721157ae682-62c6bc79ed6mr10295197b3.35.1717033629104; Wed, 29 May 2024
+ 18:47:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 
-Content-Type: text/plain; charset=utf-8 
-Content-Disposition: inline 
-Content-Transfer-Encoding: 8bit
-From: Paul Moore <paul@paul-moore.com>
-To: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, eparis@redhat.com
-Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, Fan Wu <wufan@linux.microsoft.com>, Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH v19 15/20] fsverity: expose verified fsverity built-in  signatures to LSMs
-References: <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
+MIME-Version: 1.0
+References: <1716583609-21790-1-git-send-email-wufan@linux.microsoft.com> <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
 In-Reply-To: <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 29 May 2024 21:46:57 -0400
+Message-ID: <CAHC9VhRsnGjZATBj7-evK6Gdryr54raTTKMYO_vup8AGXLwjQg@mail.gmail.com>
+Subject: Re: [PATCH v19 15/20] fsverity: expose verified fsverity built-in
+ signatures to LSMs
+To: ebiggers@kernel.org, Fan Wu <wufan@linux.microsoft.com>
+Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com, 
+	tytso@mit.edu, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, 
+	mpatocka@redhat.com, eparis@redhat.com, linux-doc@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	fsverity@lists.linux.dev, linux-block@vger.kernel.org, 
+	dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Deven Bowers <deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On May 24, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
-> 
+On Fri, May 24, 2024 at 4:46=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
+wrote:
+>
 > This patch enhances fsverity's capabilities to support both integrity and
 > authenticity protection by introducing the exposure of built-in
 > signatures through a new LSM hook. This functionality allows LSMs,
@@ -82,33 +87,37 @@ On May 24, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
 > could be established to permit the execution of all files with verified
 > built-in fsverity signatures while restricting kernel module loading
 > from specified fsverity files via fsverity digests.
-> 
+>
 > The introduction of a security_inode_setintegrity() hook call within
-> fsverity's workflow ensures that the verified built-in signature of a file
-> is exposed to LSMs. This enables LSMs to recognize and label fsverity files
+> fsverity's workflow ensures that the verified built-in signature of a fil=
+e
+> is exposed to LSMs. This enables LSMs to recognize and label fsverity fil=
+es
 > that contain a verified built-in fsverity signature. This hook is invoked
 > subsequent to the fsverity_verify_signature() process, guaranteeing the
 > signature's verification against fsverity's keyring. This mechanism is
 > crucial for maintaining system security, as it operates in kernel space,
 > effectively thwarting attempts by malicious binaries to bypass user space
 > stack interactions.
-> 
+>
 > The second to last commit in this patch set will add a link to the IPE
 > documentation in fsverity.rst.
-> 
+>
 > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+>
 > ---
 > v1-v6:
 >   + Not present
-> 
+>
 > v7:
 >   Introduced
-> 
+>
 > v8:
 >   + Split fs/verity/ changes and security/ changes into separate patches
 >   + Change signature of fsverity_create_info to accept non-const inode
->   + Change signature of fsverity_verify_signature to accept non-const inode
+>   + Change signature of fsverity_verify_signature to accept non-const ino=
+de
 >   + Don't cast-away const from inode.
 >   + Digest functionality dropped in favor of:
 >     ("fs-verity: define a function to return the integrity protected
@@ -116,46 +125,47 @@ On May 24, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
 >   + Reworded commit description and title to match changes.
 >   + Fix a bug wherein no LSM implements the particular fsverity @name
 >     (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
-> 
+>
 > v9:
 >   + No changes
-> 
+>
 > v10:
 >   + Rename the signature blob key
 >   + Cleanup redundant code
 >   + Make the hook call depends on CONFIG_FS_VERITY_BUILTIN_SIGNATURES
-> 
+>
 > v11:
 >   + No changes
-> 
+>
 > v12:
 >   + Add constification to the hook call
-> 
+>
 > v13:
 >   + No changes
-> 
+>
 > v14:
 >   + Add doc/comment to built-in signature verification
-> 
+>
 > v15:
 >   + Add more docs related to IPE
 >   + Switch the hook call to security_inode_setintegrity()
-> 
+>
 > v16:
 >   + Explicitly mention "fsverity builtin signatures" in the commit
 >     message
 >   + Amend documentation in fsverity.rst
 >   + Fix format issue
 >   + Change enum name
-> 
+>
 > v17:
 >   + Fix various documentation issues
 >   + Use new enum name LSM_INT_FSVERITY_BUILTINSIG_VALID
-> 
+>
 > v18:
 >   + Fix typos
->   + Move the inode_setintegrity hook call into fsverity_verify_signature()
-> 
+>   + Move the inode_setintegrity hook call into fsverity_verify_signature(=
+)
+>
 > v19:
 >   + Cleanup code w.r.t inode_setintegrity hook refactoring
 > ---
@@ -164,31 +174,10 @@ On May 24, 2024 Fan Wu <wufan@linux.microsoft.com> wrote:
 >  include/linux/security.h               |  1 +
 >  3 files changed, 39 insertions(+), 3 deletions(-)
 
-...
+Eric, can you give this patch in particular a look to make sure you
+are okay with everything?  I believe Fan has addressed all of your
+previous comments and it would be nice to have your Ack/Review tag if
+you are okay with the current revision.
 
-> diff --git a/fs/verity/signature.c b/fs/verity/signature.c
-> index 90c07573dd77..a4ed91c7049f 100644
-> --- a/fs/verity/signature.c
-> +++ b/fs/verity/signature.c
-> @@ -106,6 +111,17 @@ int fsverity_verify_signature(const struct fsverity_info *vi,
->  		return err;
->  	}
->  
-> +	err = security_inode_setintegrity(inode,
-> +					  LSM_INT_FSVERITY_BUILTINSIG_VALID,
-> +					  signature,
-> +					  le32_to_cpu(sig_size));
-
-I like this much better without the explicit inode cast :)
-
-> +	if (err) {
-> +		fsverity_err(inode, "Error %d exposing file signature to LSMs",
-> +			     err);
-> +		return err;
-> +	}
-> +
->  	return 0;
->  }
-
---
+--=20
 paul-moore.com
