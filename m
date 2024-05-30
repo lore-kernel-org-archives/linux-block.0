@@ -1,48 +1,45 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC3A45BE4;
-	Thu, 30 May 2024 17:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B79224D4;
+	Thu, 30 May 2024 17:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717089091; cv=none; b=gUdfIh8OT6X+brsgPk2x0c3TdubG9/HbDpT8UpSDJvhh+ofIIw8GTFpnVPkBP8yoyu5kY392HVG9uiLaAlyIup/OWUDnXuu9/FUrNHIGsTqn8yKjadnllQnGn02CGYP16Df0CI3MzGuYtoPCZEMX1yoB3oku19byljw6zlYq0HU=
+	t=1717091892; cv=none; b=XeNQCWlgoTMyqEqGbKi2I1lgVT2aqpKPFtO3O0lL3yRw0hKyBkB62MyyfxHegT5LgKQchUo+w9lPakR/XuyG+d5C7sYdOyqL+NeHz1QomZl3fjmBNPDK/vE9T3u1YtAT7ZhphPed3TMRQ6nrhOGSq+v1ceTEeJ4xboJI6cH30Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717089091; c=relaxed/simple;
-	bh=go0cYzcDqydRtutKma5FUwv79zZ3P7zOWhGl/8O+3OI=;
+	s=arc-20240116; t=1717091892; c=relaxed/simple;
+	bh=zy9/jkZo5Kkm2qDUeVoKDrkhkws3NyE2cNMGwJegfBs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CkVKFvLxaJsigiQ7RfCmp0CXKIatuPkMJ3ptN6HMGuXul6xUF3h6XZFT1jHUaR6QgZO1oJBnnDcvNGr2MwLexL2u2SSiL3EE1Wb4fjSoNtOt9UZ93vUqwPEym7NshI0Mupmx6sh1vEQm7l5bnukrFtMHSfyCSP2xsoPooxj65Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=pDdrsLN3; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="pDdrsLN3"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4Vqt812W1wz6Cnk9F;
-	Thu, 30 May 2024 17:11:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1717089079; x=1719681080; bh=Ul8tShPV3DUMrLj4E7kNdLyB
-	ZmST2o57Jd5aN0FDWYg=; b=pDdrsLN3JZPbFaUtLRbj37cnYuTv29wYsaoWbWPX
-	0jAfS4sWOekodOat3cJMbqn2RuFn9uq1dvv60rD84RsGZNOhy608uxLLU+fhbyly
-	eKTbCc9wykATpOsmXQs1/utBwypcCkWl3KNU2MCRI5q96GhEKAOJtbitLN7/YNmG
-	3Mn9taXV/EfZN1zWvkxJYjfq7QJgcsxlE8NwOH4KI1q7OAQMt6CrARV53oLIJ5CE
-	jigej7/3tFmHOi5xt9zZPOhIruRk26PiBfPzT3bdqB0Juw5GHorv14poLk5Hg7m/
-	4sx7azLGVHPrQJdDegiabUIRkEKLqqQMji0NKTMLKSNjWA==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id T0Ifl3ssZIoq; Thu, 30 May 2024 17:11:19 +0000 (UTC)
-Received: from [100.96.154.26] (unknown [104.132.0.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4Vqt7l6w1zz6Cnk97;
-	Thu, 30 May 2024 17:11:15 +0000 (UTC)
-Message-ID: <abe8c209-d452-4fb5-90eb-f77b5ec1a2dc@acm.org>
-Date: Thu, 30 May 2024 10:11:15 -0700
+	 In-Reply-To:Content-Type; b=JWWk7SgJRhRb2nNx5KKBOlTUqsmLTD8+OKGwUO+pUvyf7gbWYlAtMzp1LtBOrwgaiMkFVrXIQ3B8knRJQguzL+OAgyNX8p0Jrm3dnFkZD4AsEmHoqh9ZJyOvBAiFUDiQwIaLV76ylntH/hJnPrcYu31Ij5EjpluHytXPqUpOaYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-421160b07eeso433155e9.0;
+        Thu, 30 May 2024 10:58:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717091889; x=1717696689;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hC23jucMm+q+/3nVmnb3JFDkYf90kQS7VVGYEUblW18=;
+        b=AtxxUSC9Z9RFut9NgaZlrP6TaCw2KB0TbOgcgSLlDhS24WgEzwAyZrjSV/EJc6TOjU
+         gDV8HzxCRTCDgj93e6P79AhmSssN34Y79P97XG0FbbhIw8dlquQ+1wCqHujl4WieNiBJ
+         ApkDl2KECNdpWQsSxbjcd68J7SjxBiuQ1NriYqa4Wet++NJJeiO7lGslnPIUav6GMNaG
+         Ix5GvhhE/GqeKGjuc44reOoX5g6khcL8dlBjxo/bk6cID4PdlLHbYF2soVOnzQ6einIY
+         XxaOlGJH4jFXOXWsA87u/636dI1NWVA83k7FnDcpVjaYfcWx+nC1CGPJpmaS2MnJQA6w
+         TJag==
+X-Forwarded-Encrypted: i=1; AJvYcCUdcwrjah0Hxb9HKciNprZV0tLoodaHHCxYdvWzwnZjqzzAiv+xUTTHu4CJoUZ3fPWIdE+AGQAXlJF8XAddNUI2WXOzMIL/ne37Gdg2qWl79D0bfBccYxp0InNAhYkOglREMsCYT9nZxUtRfoG4ygHq84I70h9+Q8GpW/P6Px+U
+X-Gm-Message-State: AOJu0Yxe5tmAZ+l0GCNjpjBlJmRogAGXo47mmArADLUhbwp0IoOEMlUv
+	VpORhkHBSrNDkYWglxMyfLWfUjwzxgNSy63nsGiV1AKvxzw1Q4Ag
+X-Google-Smtp-Source: AGHT+IEKs/D/YOXJKNpqQBu1D27NdILizXiASB7GFF049ZDfxVYEPi5NY+sGao+1Yf3CzW3yUcmd7w==
+X-Received: by 2002:a5d:678d:0:b0:35d:bdda:3553 with SMTP id ffacd0b85a97d-35dc00bc230mr2126917f8f.4.1717091889059;
+        Thu, 30 May 2024 10:58:09 -0700 (PDT)
+Received: from [10.100.102.74] (85.65.193.189.dynamic.barak-online.net. [85.65.193.189])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4212709d341sm31609825e9.36.2024.05.30.10.58.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 May 2024 10:58:08 -0700 (PDT)
+Message-ID: <d6b2c19b-c2a6-400c-bbf1-bf0469138777@grimberg.me>
+Date: Thu, 30 May 2024 20:58:06 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,86 +47,73 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
- and request layer.
-To: Nitesh Shetty <nj.shetty@samsung.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- martin.petersen@oracle.com, david@fromorbit.com, hare@suse.de,
- damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
- nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org
-References: <20240520102033.9361-1-nj.shetty@samsung.com>
- <CGME20240520102842epcas5p4949334c2587a15b8adab2c913daa622f@epcas5p4.samsung.com>
- <20240520102033.9361-3-nj.shetty@samsung.com>
- <eda6c198-3a29-4da4-94db-305cfe28d3d6@acm.org>
- <20240529061736.rubnzwkkavgsgmie@nj.shetty@samsung.com>
- <9f1ec1c1-e1b8-48ac-b7ff-8efb806a1bc8@kernel.org>
- <a866d5b5-5b01-44a2-9ccb-63bf30aa8a51@acm.org>
- <665850bd.050a0220.a5e6b.5b72SMTPIN_ADDED_BROKEN@mx.google.com>
+Subject: Re: [PATCH 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
+ kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, philipp.reisner@linbit.com,
+ lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+ idryomov@gmail.com, xiubli@redhat.com
+References: <20240530132629.4180932-1-ofir.gal@volumez.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <665850bd.050a0220.a5e6b.5b72SMTPIN_ADDED_BROKEN@mx.google.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240530132629.4180932-1-ofir.gal@volumez.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 5/30/24 00:16, Nitesh Shetty wrote:
-> +static inline bool blk_copy_offload_attempt_combine(struct request_que=
-ue *q,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-struct bio *bio)
-> +{
-> +=C2=A0=C2=A0=C2=A0 struct blk_plug *plug =3D current->plug;
-> +=C2=A0=C2=A0=C2=A0 struct request *rq;
-> +
-> +=C2=A0=C2=A0=C2=A0 if (!plug || rq_list_empty(plug->mq_list))
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
-> +
-> +=C2=A0=C2=A0=C2=A0 rq_list_for_each(&plug->mq_list, rq) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (rq->q =3D=3D q) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
-(!blk_copy_offload_combine(rq, bio))
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 return true;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
-ak;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Only keep iterating=
- plug list for combines if we have multiple
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * queues
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!plug->multiple_queues)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
-ak;
-> +=C2=A0=C2=A0=C2=A0 }
-> +=C2=A0=C2=A0=C2=A0 return false;
-> +}
+Hey Ofir,
 
-This new approach has the following two disadvantages:
-* Without plug, REQ_OP_COPY_SRC and REQ_OP_COPY_DST are not combined. The=
-se two
-   operation types are the only operation types for which not using a plu=
-g causes
-   an I/O failure.
-* A loop is required to combine the REQ_OP_COPY_SRC and REQ_OP_COPY_DST o=
-perations.
+On 30/05/2024 16:26, Ofir Gal wrote:
+> skb_splice_from_iter() warns on !sendpage_ok() which results in nvme-tcp
+> data transfer failure. This warning leads to hanging IO.
+>
+> nvme-tcp using sendpage_ok() to check the first page of an iterator in
+> order to disable MSG_SPLICE_PAGES. The iterator can represent a list of
+> contiguous pages.
+>
+> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
+> it requires all pages in the iterator to be sendable.
+> skb_splice_from_iter() checks each page with sendpage_ok().
+>
+> nvme_tcp_try_send_data() might allow MSG_SPLICE_PAGES when the first
+> page is sendable, but the next one are not. skb_splice_from_iter() will
+> attempt to send all the pages in the iterator. When reaching an
+> unsendable page the IO will hang.
 
-Please switch to the approach Hannes suggested, namely bio chaining. Chai=
-ning
-REQ_OP_COPY_SRC and REQ_OP_COPY_DST bios before these are submitted elimi=
-nates the
-two disadvantages mentioned above.
+Interesting. Do you know where this buffer came from? I find it strange
+that a we get a bvec with a contiguous segment which consists of non slab
+originated pages together with slab originated pages... it is surprising 
+to see
+a mix of the two.
 
-Thanks,
+I'm wandering if this is something that happened before david's splice_pages
+changes. Maybe before that with multipage bvecs? Anyways it is strange, 
+never
+seen that.
 
-Bart.
+David,  strange that nvme-tcp is setting a single contiguous element 
+bvec but it
+is broken up into PAGE_SIZE increments in skb_splice_from_iter...
+
+>
+> The patch introduces a helper sendpages_ok(), it returns true if all the
+> continuous pages are sendable.
+>
+> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
+> this helper to check whether the page list is OK. If the helper does not
+> return true, the driver should remove MSG_SPLICE_PAGES flag.
+>
+>
+> The bug is reproducible, in order to reproduce we need nvme-over-tcp
+> controllers with optimal IO size bigger than PAGE_SIZE. Creating a raid
+> with bitmap over those devices reproduces the bug.
+>
+> In order to simulate large optimal IO size you can use dm-stripe with a
+> single device.
+> Script to reproduce the issue on top of brd devices using dm-stripe is
+> attached below.
+
+This is a great candidate for blktests. would be very beneficial to have 
+it added there.
