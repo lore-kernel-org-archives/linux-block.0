@@ -1,91 +1,128 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153316A8D2
-	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 20:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D84584E1F
+	for <linux-block@vger.kernel.org>; Thu, 30 May 2024 20:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717101640; cv=none; b=iSZOd+HxiaszOSyttwkyO2ACVFalNmyqbhsbJLb75NmGXcbXSwCpzpWzaceq9+nsSMmer9sDklKdxLQUwZcWQ5ijzmaDGaajbP1ClkIaP6iT3o6aEnN1iXunltD8MvRzAe/x4yTmTs0hYOLhjhTKOFD8Ky0tiYyHMp5dKcueTSM=
+	t=1717102050; cv=none; b=Uqn7Vj208Lc0YXdYIUIZf9uVELRKTUbX5HCJgGFWaEia1ef/UiJesfuL4vL7rLD0sUK0JRxzmTz4R5swiw0ENwTu16eCKGjNRBZCt9KL21ilPbwx9cKnxKh0RwjO15mrYGjarx9B4IPiaeXwprJjgZdD9DfwRVfSbHeGhYTIxLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717101640; c=relaxed/simple;
-	bh=AKngulMmLfU7YDyaE28LkF8ok53MobClOxdVCSUHi1A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=mYZXbhWwm1eOGQiYbkdvVqZdmSTEzxMaakllmN6jKE+eJWKvteWvz/hlyCLjpD/DVX9fLi+OyqsBGVVEJoop5T3mOyTvLrtjo1r1Spq6nJ9Rvej7utuLuNokUbsvUKAglUWy9cF1bNDg3JpBRbjCLi6FGgsxk5OOYK0B6mwc/4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Y13KIQFm; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1717102050; c=relaxed/simple;
+	bh=ZXKTlRYXVuLxCxIJXVRBgNNViO881p7pXt3fVtyL7Co=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eKF3Bt0LOhgPr3aqGu1yUSUEymMhHNJYsjpfEtrGzKvfnuR+8DUJ0u5AM+BevyvMc1hGbc5iElQ2U2Xx1oss6Uq8/lSSN9zCf+NCdWqcEtCHefKZZMyeRfeupVgpm7OiK3pe7MiB8zDml6IKf9uERr1qoGXQIcFD0SwzPQWRRjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u11nqIdp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Y13KIQFm"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VqynL4PNBz6Cnk9B;
-	Thu, 30 May 2024 20:40:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1717101635; x=1719693636; bh=Fg6O7ErVDV/y9HcuOrWg18vq
-	P0vTCZMGBnZ/3D3DoA0=; b=Y13KIQFmgKHqO+vJrEFYKmx7mTnIFXwRl4nQ6++B
-	i1Q4ksD8cfr03yhY32izWl2HV3N/P5YosihlKxAV14/dJsI4IAu5+BjI9QIz9xZ2
-	usPJcErREM5CTxEddPyR0nphJjEWTZMPqvygClq9SAzFiw/1/EZjEgfGsEWgvdWG
-	2tKZA04Kba1BqATG7UU/62H8R7GPqzql/ku8JgiyIgzK2lZs22INpsNyCBbKJNLc
-	vLl3rFtihPoKbwaCmLiS3B5IqXh3BE5jLgxAwc6HRbcYlc6Fc/1IbSpwXg86vkqF
-	47cV1v8WgMCz4unUmV8JNU6WCBQBGeZzJPBpehmc38cEUw==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id VUx2anOILgn0; Thu, 30 May 2024 20:40:35 +0000 (UTC)
-Received: from [100.96.154.26] (unknown [104.132.0.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VqynH2ZR8z6Cnk90;
-	Thu, 30 May 2024 20:40:35 +0000 (UTC)
-Message-ID: <dd8d296e-a2e6-462d-9e4c-cbbc2d166097@acm.org>
-Date: Thu, 30 May 2024 13:40:34 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u11nqIdp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 096B9C3277B;
+	Thu, 30 May 2024 20:47:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717102049;
+	bh=ZXKTlRYXVuLxCxIJXVRBgNNViO881p7pXt3fVtyL7Co=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u11nqIdpfSgTRvxelwE0qy2coZ9guK1Qppf4+iWKVKYvvb9FSwoYJ1N2IUSp1CfA9
+	 yc1wO8lDqLIX5r3n+PcGvSn4PW/oaPfPnbHktAMcrGNt3E5OCxMXUI240zm98fd9Gg
+	 mK6M9azq62nJgfD4JTqmk3WuLd8DxpmL/Zz3vX+LdyfVTAggQ0NqVbxCLjYd4zZWc/
+	 vN6U22zVzof5O+jVFkmP+k1CIpbJ7UeLY5N11RUviVnzzo9kbc/hM1qg4H7CrzYEC2
+	 50gLuDKkAwnLTQjwnKilS0/uA9I/EucMG/qdkRCK6gPO/VRiv1qkg9XrvAR/6DUdrv
+	 6iwBNwOvUkSkw==
+Date: Thu, 30 May 2024 14:47:26 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+	Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai3@huawei.com>
+Subject: Re: [PATCH v7] block: Improve IOPS by removing the fairness code
+Message-ID: <Zljl3kAfL0WfFkoZ@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240529213921.3166462-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] block: Fix zone write plugging handling of devices
- with a runt zone
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
-References: <20240530054035.491497-1-dlemoal@kernel.org>
- <20240530054035.491497-4-dlemoal@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240530054035.491497-4-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240529213921.3166462-1-bvanassche@acm.org>
 
-On 5/29/24 22:40, Damien Le Moal wrote:
-> A zoned device may have a last sequential write required zone that is
-> smaller than other zones. However, all tests to check if a zone write
-> plug write offset exceeds the zone capacity use the same capacity
-> value stored in the gendisk zone_capacity field. This is incorrect for a
-> zoned device with a last runt (smaller) zone.
+On Wed, May 29, 2024 at 02:39:20PM -0700, Bart Van Assche wrote:
+> There is an algorithm in the block layer for maintaining fairness
+> across queues that share a tag set. The sbitmap implementation has
+> improved so much that we don't need the block layer fairness algorithm
+> anymore and that we can rely on the sbitmap implementation to guarantee
+> fairness.
 > 
-> Add the new field last_zone_capacity to struct gendisk to store the
-> capacity of the last zone of the device. blk_revalidate_seq_zone() and
-> blk_revalidate_conv_zone() are both modified to get this value when
-> disk_zone_is_last() returns true. Similarly to zone_capacity, the value
-> is first stored using the last_zone_capacity field of struct
-> blk_revalidate_zone_args. Once zone revalidation of all zones is done,
-> this is used to set the gendisk last_zone_capacity field.
+> On my test setup (x86 VM with 72 CPU cores) this patch results in 2.9% more
+> IOPS. IOPS have been measured as follows:
 > 
-> The checks to determine if a zone is full or if a sector offset in a
-> zone exceeds the zone capacity in disk_should_remove_zone_wplug(),
-> disk_zone_wplug_abort_unaligned(), blk_zone_write_plug_init_request(),
-> and blk_zone_wplug_prepare_bio() are modified to use the new helper
-> functions disk_zone_is_full() and disk_zone_wplug_is_full().
-> disk_zone_is_full() uses the zone index to determine if the zone being
-> tested is the last one of the disk and uses the either the disk
-> zone_capacity or last_zone_capacity accordingly.
+> $ modprobe null_blk nr_devices=1 completion_nsec=0
+> $ fio --bs=4096 --disable_clat=1 --disable_slat=1 --group_reporting=1 \
+>       --gtod_reduce=1 --invalidate=1 --ioengine=psync --ioscheduler=none \
+>       --norandommap --runtime=60 --rw=randread --thread --time_based=1 \
+>       --buffered=0 --numjobs=64 --name=/dev/nullb0 --filename=/dev/nullb0
+> 
+> Additionally, it has been verified as follows that all request queues that
+> share a tag set process I/O even if the completion times are different (see
+> also test block/035):
+> - Create a first request queue with completion time 1 ms and queue
+>   depth 64.
+> - Create a second request queue with completion time 100 ms and that
+>   shares the tag set of the first request queue.
+> - Submit I/O to both request queues with fio.
+> 
+> Tests have shown that the IOPS for this test case are 29859 and 318 or a
+> ratio of about 94. This ratio is close to the completion time ratio.
+> While this is unfair, both request queues make progress at a consistent
+> pace.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+I suggested running a more lopsided workload on a high contention tag
+set: here's an example fio profile to exaggerate this:
 
+---
+[global]
+rw=randread
+direct=1
+ioengine=io_uring
+time_based
+runtime=60
+ramp_time=10
+
+[zero]
+bs=131072
+filename=/dev/nvme0n1
+iodepth=256
+iodepth_batch_submit=64
+iodepth_batch_complete=64
+
+[one]
+bs=512
+filename=/dev/nvme0n2
+iodepth=1
+--
+
+My test nvme device has 2 namespaces, 1 IO queue, and only 63 tags.
+
+Without your patch:
+
+  zero: (groupid=0, jobs=1): err= 0: pid=465: Thu May 30 13:29:43 2024
+    read: IOPS=14.0k, BW=1749MiB/s (1834MB/s)(103GiB/60002msec)
+       lat (usec): min=2937, max=40980, avg=16990.33, stdev=1732.37
+  ...
+  one: (groupid=0, jobs=1): err= 0: pid=466: Thu May 30 13:29:43 2024
+    read: IOPS=2726, BW=1363KiB/s (1396kB/s)(79.9MiB/60001msec)
+       lat (usec): min=45, max=4859, avg=327.52, stdev=335.25
+
+With your patch:
+
+  zero: (groupid=0, jobs=1): err= 0: pid=341: Thu May 30 13:36:26 2024
+    read: IOPS=14.8k, BW=1852MiB/s (1942MB/s)(109GiB/60004msec)
+       lat (usec): min=3103, max=26191, avg=16322.77, stdev=1138.04
+  ...
+  one: (groupid=0, jobs=1): err= 0: pid=342: Thu May 30 13:36:26 2024
+    read: IOPS=1841, BW=921KiB/s (943kB/s)(54.0MiB/60001msec)
+       lat (usec): min=51, max=5935, avg=503.81, stdev=608.41
+
+So there's definitely a difference here that harms the lesser used
+device for a modest gain on the higher demanding device. Does it matter?
+I really don't know if I can answer that. It's just different is all I'm
+saying.
