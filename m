@@ -1,112 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A44C8E9;
-	Fri, 31 May 2024 00:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E014415E9B;
+	Fri, 31 May 2024 01:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717116204; cv=none; b=XbnH2XFsGz3VYksgngGQwBo2TKEie3tMsNJbYPnwGkRZCVio8vjkXYsY2tTgrAtTxIzS6k1//oJD8SejceyNVle0oQj+7kqrVH09wy+4kNyNjtAq2Zl0x0IFGamK4vlCCSKzhy3NF1b7VIMfzavB7ZUm5EMsl76ssza7R3mqMxI=
+	t=1717118491; cv=none; b=Cx6SvA4z9fWCfSJkHNqfPaxn+0xhT/KRKtv+X4uJ5oM+PQLlfBZesJwxx8PtSKglLkGNR1LUQ2nDchEFXOM1oWuQYC9oIBqhf/X++nedxtfA69ey6x+H8tNfZKbIjW3ewj4r44jW8vIdQf+yrc1IZ3PzUcpm9KNHf4rAuNm/6r8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717116204; c=relaxed/simple;
-	bh=Si8XOeHALztLMCNRy0WVUR6eEdJsznZcIFbxAADO+ws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t6mFcna2KcbI4CdYz3HgExVYO6j+3xgXfT52pPWNViVMNYFZo2WXY+RuYoxenvFD9JLcaur1Gjar1JSgyNh8bRHuUftwbn3Y9YuBDIjqJlXQA1dtVHXIl6kBO7o8Gteq1WZCU5II6QFlumAV0NLnzx8+s7SWKA97H4gNAUckDcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aL+I4kcJ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aL+I4kcJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D22D7C2BBFC;
-	Fri, 31 May 2024 00:43:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717116203;
-	bh=Si8XOeHALztLMCNRy0WVUR6eEdJsznZcIFbxAADO+ws=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aL+I4kcJ/OXypWoEww0Gcs/K6q+ipdHIFStSTPXEusvtmwsVT6Y5Gx+hB/Z8NFvcg
-	 kk0aN5Ya2M3CtobxjGIO/J8URF8KA8GPPSqmdaRS/J0LLdEfPA0O12JA7q/hQ6fGfX
-	 SwfuTm0oJ+BUOIpXNNN9GK0rAuZVJsxMYF0i/EoIwfnBnWjEOag1O0HrcFn3kbyYtd
-	 t1OTPhgcjJPrqXeKo5kubhG5AO+qWl+nsDbFvnc17W78pikT8ci40gbrCQjnnwBQH1
-	 AzakKGpI2SiDbCV3seJHFg22s50U9W40RxniIrslsdhtv3JRiZLu3+h/ThTs7xM5SB
-	 Kvdqh9bknwLeQ==
-Date: Thu, 30 May 2024 17:43:21 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com,
-	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk,
-	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
-	eparis@redhat.com, linux-doc@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	audit@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH v19 15/20] fsverity: expose verified fsverity built-in
- signatures to LSMs
-Message-ID: <20240531004321.GA1238@sol.localdomain>
-References: <1716583609-21790-1-git-send-email-wufan@linux.microsoft.com>
- <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
- <CAHC9VhRsnGjZATBj7-evK6Gdryr54raTTKMYO_vup8AGXLwjQg@mail.gmail.com>
- <20240530030605.GA29189@sol.localdomain>
- <CAHC9VhRySQ0c16UZz5xKT-y5Tn39wXxe4-f7LNjFY+ROGGxpaQ@mail.gmail.com>
+	s=arc-20240116; t=1717118491; c=relaxed/simple;
+	bh=3iZda8hQoxDkFln2Bed60LL/YAsuXzhJiaI3KKtJlUA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=mkuU+CBUxbBjlISwc25UXDTktD7WF8Pnz/fW3y+hdpfqXWFUcb9yMMd2Ys74A0xVusatQ3mh1N6KitbMV17OKchB2C0dQ8a44SeWk48QveStuoMj9Xqt/GAwb2tXbSZ4qOfEZLUoL5nWG38xWUGI76uQHr687WiP1+ua009vEn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Vr51B0fv5z4f3k6d;
+	Fri, 31 May 2024 09:21:18 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 34CCC1A0184;
+	Fri, 31 May 2024 09:21:24 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP1 (Coremail) with SMTP id cCh0CgBHZQ4SJllmULOSOA--.35328S3;
+	Fri, 31 May 2024 09:21:24 +0800 (CST)
+Subject: Re: [PATCH] blk-throttle: Fix incorrect display of io.max
+To: Waiman Long <longman@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Dan Schatzberg <schatzberg.dan@gmail.com>,
+ Ming Lei <ming.lei@redhat.com>, Justin Forbes <jforbes@redhat.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240530134547.970075-1-longman@redhat.com>
+ <0de07021-df77-4196-bb75-9ded88b74ce2@redhat.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <8191bb3d-2afd-ab76-c8b4-50f2871b7a9d@huaweicloud.com>
+Date: Fri, 31 May 2024 09:21:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <0de07021-df77-4196-bb75-9ded88b74ce2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHC9VhRySQ0c16UZz5xKT-y5Tn39wXxe4-f7LNjFY+ROGGxpaQ@mail.gmail.com>
+X-CM-TRANSID:cCh0CgBHZQ4SJllmULOSOA--.35328S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAF4rXr1DZw47ur4UWr1UGFg_yoWrZryUpF
+	93trWUW345X3Z5KF13tr1UXFW5JrWDJa4DXwn3WFy3Ar4UAryIgr1DXr1v9rWUAF48Gr4Y
+	yw1UXr9xZF17J3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UWE__UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Thu, May 30, 2024 at 04:54:37PM -0400, Paul Moore wrote:
-> On Wed, May 29, 2024 at 11:06 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > On Wed, May 29, 2024 at 09:46:57PM -0400, Paul Moore wrote:
-> > > On Fri, May 24, 2024 at 4:46 PM Fan Wu <wufan@linux.microsoft.com> wrote:
-> > > >
-> > > > This patch enhances fsverity's capabilities to support both integrity and
-> > > > authenticity protection by introducing the exposure of built-in
-> > > > signatures through a new LSM hook. This functionality allows LSMs,
-> > > > e.g. IPE, to enforce policies based on the authenticity and integrity of
-> > > > files, specifically focusing on built-in fsverity signatures. It enables
-> > > > a policy enforcement layer within LSMs for fsverity, offering granular
-> > > > control over the usage of authenticity claims. For instance, a policy
-> > > > could be established to permit the execution of all files with verified
-> > > > built-in fsverity signatures while restricting kernel module loading
-> > > > from specified fsverity files via fsverity digests.
+在 2024/05/30 21:49, Waiman Long 写道:
 > 
-> ...
+> On 5/30/24 09:45, Waiman Long wrote:
+>> Commit bf20ab538c81 ("blk-throttle: remove 
+>> CONFIG_BLK_DEV_THROTTLING_LOW")
+>> attempts to revert the code change introduced by commit cd5ab1b0fcb4
+>> ("blk-throttle: add .low interface").  However, it leaves behind the
+>> bps_conf[] and iops_conf[] fields in the throtl_grp structure which
+>> aren't set anywhere in the new blk-throttle.c code but are still being
+>> used by tg_prfill_limit() to display the limits in io.max. Now io.max
+>> always displays the following values if a block queue is used:
+>>
+>>     <m>:<n> rbps=0 wbps=0 riops=0 wiops=0
+>>
+>> Fix this problem by removing bps_conf[] and iops_conf[] and use bps[]
+>> and iops[] instead to complete the revert.
+>>
+>> Fixes: bf20ab538c81 ("blk-throttle: remove 
+>> CONFIG_BLK_DEV_THROTTLING_LOW")
+>> Reported-by: Justin Forbes <jforbes@redhat.com>
+>> Closes: 
+>> https://github.com/containers/podman/issues/22701#issuecomment-2120627789
+>> Signed-off-by: Waiman Long <longman@redhat.com>
+
+LGTM
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+
+>> ---
+>>   block/blk-throttle.c | 24 ++++++++++++------------
+>>   block/blk-throttle.h |  8 ++------
+>>   2 files changed, 14 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index d907040859f9..da619654f418 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -1347,32 +1347,32 @@ static u64 tg_prfill_limit(struct seq_file 
+>> *sf, struct blkg_policy_data *pd,
+>>       bps_dft = U64_MAX;
+>>       iops_dft = UINT_MAX;
+>> -    if (tg->bps_conf[READ] == bps_dft &&
+>> -        tg->bps_conf[WRITE] == bps_dft &&
+>> -        tg->iops_conf[READ] == iops_dft &&
+>> -        tg->iops_conf[WRITE] == iops_dft)
+>> +    if (tg->bps[READ] == bps_dft &&
+>> +        tg->bps[WRITE] == bps_dft &&
+>> +        tg->iops[READ] == iops_dft &&
+>> +        tg->iops[WRITE] == iops_dft)
+>>           return 0;
+>>       seq_printf(sf, "%s", dname);
+>> -    if (tg->bps_conf[READ] == U64_MAX)
+>> +    if (tg->bps[READ] == U64_MAX)
+>>           seq_printf(sf, " rbps=max");
+>>       else
+>> -        seq_printf(sf, " rbps=%llu", tg->bps_conf[READ]);
+>> +        seq_printf(sf, " rbps=%llu", tg->bps[READ]);
+>> -    if (tg->bps_conf[WRITE] == U64_MAX)
+>> +    if (tg->bps[WRITE] == U64_MAX)
+>>           seq_printf(sf, " wbps=max");
+>>       else
+>> -        seq_printf(sf, " wbps=%llu", tg->bps_conf[WRITE]);
+>> +        seq_printf(sf, " wbps=%llu", tg->bps[WRITE]);
+>> -    if (tg->iops_conf[READ] == UINT_MAX)
+>> +    if (tg->iops[READ] == UINT_MAX)
+>>           seq_printf(sf, " riops=max");
+>>       else
+>> -        seq_printf(sf, " riops=%u", tg->iops_conf[READ]);
+>> +        seq_printf(sf, " riops=%u", tg->iops[READ]);
+>> -    if (tg->iops_conf[WRITE] == UINT_MAX)
+>> +    if (tg->iops[WRITE] == UINT_MAX)
+>>           seq_printf(sf, " wiops=max");
+>>       else
+>> -        seq_printf(sf, " wiops=%u", tg->iops_conf[WRITE]);
+>> +        seq_printf(sf, " wiops=%u", tg->iops[WRITE]);
+>>       seq_printf(sf, "\n");
+>>       return 0;
+>> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+>> index 32503fd83a84..8c365541a275 100644
+>> --- a/block/blk-throttle.h
+>> +++ b/block/blk-throttle.h
+>> @@ -95,15 +95,11 @@ struct throtl_grp {
+>>       bool has_rules_bps[2];
+>>       bool has_rules_iops[2];
+>> -    /* internally used bytes per second rate limits */
+>> +    /* bytes per second rate limits */
+>>       uint64_t bps[2];
+>> -    /* user configured bps limits */
+>> -    uint64_t bps_conf[2];
+>> -    /* internally used IOPS limits */
+>> +    /* IOPS limits */
+>>       unsigned int iops[2];
+>> -    /* user configured IOPS limits */
+>> -    unsigned int iops_conf[2];
+>>       /* Number of bytes dispatched in current slice */
+>>       uint64_t bytes_disp[2];
 > 
-> > > Eric, can you give this patch in particular a look to make sure you
-> > > are okay with everything?  I believe Fan has addressed all of your
-> > > previous comments and it would be nice to have your Ack/Review tag if
-> > > you are okay with the current revision.
-> >
-> > Sorry, I've just gotten a bit tired of finding so many basic issues in this
-> > patchset even after years of revisions.
-> >
-> > This patch in particular is finally looking better.  There are a couple issues
-> > that I still see.  (BTW, you're welcome to review it too to help find these
-> > things, given that you seem to have an interest in getting this landed...):
+> Add Yu Kuai <yukuai3@huawei.com> to cc.
 > 
-> I too have been reviewing this patchset across multiple years and have
-> worked with Fan to fix locking issues, parsing issues, the initramfs
-> approach, etc.  
-
-Sure, but none of the patches actually have your Reviewed-by.
-
-> My interest in getting this landed is simply a
-> combination of fulfilling my role as LSM maintainer as well as being
-> Fan's coworker.  While I realize you don't work with Fan, you are
-> listed as the fs-verity maintainer and as such I've been looking to
-> you to help review and authorize the fs-verity related code.  If you
-> are too busy, frustrated, or <fill in the blank> to continue reviewing
-> this patchset it would be helpful if you could identify an authorized
-> fs-verity reviewer.  I don't see any besides you and Ted listed in the
-> MAINTAINERS file, but perhaps the fs-verity entry is dated.
 > 
-> Regardless, I appreciate your time and feedback thus far and I'm sure
-> Fan does as well.
+> .
+> 
 
-Maintainers are expected to do reviews and acks, but not to the extent of
-extensive hand-holding of a half-baked submission.
-
-- Eric
