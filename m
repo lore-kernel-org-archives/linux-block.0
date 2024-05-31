@@ -1,207 +1,197 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2121.outbound.protection.outlook.com [40.107.93.121])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FC01EA91;
-	Fri, 31 May 2024 14:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.121
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717165436; cv=fail; b=GhUTyXSFgRKA+kaKI1ILlC0fhzfJziIlZdgWXAJvoKuiX96KybS/zlz2fWl/hwYKisy1xmhWMfsxv/ESl1KrupG0xfXHvtt9JCUgXkGA0DeEOlTZbr84HzTS1mmcs1jT2BXDAtKs4CgpdROAaqlODYc2/w32Wi8A+9lROBcDp0I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717165436; c=relaxed/simple;
-	bh=oP+BFIYw0crJC6AerN5WSCF40UQK+EJRNTBVxvnShzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=uGRPSFE1PNq45f3YMVyF5TEbsz15Smtdoe4hXnR24qO0bWXfnjBjQeHtqGZF3ndSl8arXaWATwkW7XTKuScsVRSQx2Hq8F4X+8vSjLdCinxv+kjNUQAyXgDYvBHx+rGJlFKMfYcq2SYSDNy2lGmUk5W9xi2UBhF6gSnC7AnQBbA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=memverge.com; spf=pass smtp.mailfrom=memverge.com; dkim=pass (1024-bit key) header.d=memverge.com header.i=@memverge.com header.b=di4SGgMD; arc=fail smtp.client-ip=40.107.93.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=memverge.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=memverge.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F6639AE3
+	for <linux-block@vger.kernel.org>; Fri, 31 May 2024 14:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717166040; cv=none; b=TQOd+vAdwDyWFWQIeUEHcCtXHSTBPUVLkm6enkTrcCaEWltCvfNhUyYMPfZTAg4BBjGdVr7CxlP7MpctD7T1ht0UMjR4uNztCbFqTJN3Ko9hfIjbCwmb4q1AIyfpDidHNILqBE3Wa3wWAqgxoe3kWgcwYTUGUmiIkFdOmrBYzn4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717166040; c=relaxed/simple;
+	bh=ZPsHJkSW6lsWZLWxSGyefQfCpMtT9TACp631Rz7driU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=t1EPcdVuA2RceFEZ56W+LoQZykDaQvh/jivfmJ+LPNCzMHNJXjBPGJUZA0ceFumjd3pL5PbKO9PZx09oQcx+eu8gzC753d1h+X4mt+WPmGn9SMD0vveC+wfu6rysJZod498oTLwZHH+opulF9CoyB1YTOBOx2YxVtLb87V7Er2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uQsxvQ/m; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=memverge.com header.i=@memverge.com header.b="di4SGgMD"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FgUZKTbAIHx5Ae2Wi9k6zj54LTPwArRw17kR1Q0uj7EKn6EmmMa1WHqu9fpg+yJdhRctZlQyemUPnWqiFNkF6IRMhVGTY9lPFC0GvAG81fFnEwD80mDi1sW9+0ZFvDLFEjFfATOnYHCXe86dFYrO5pPdRHAeAAe2qRNXOL1q7RKUv6P34LkTEXSrsKjB7L/26lFUV5U8GUrSeLjqcjGDTQLOC6P8z9nxTUzVNjjCLlwHcS+id+2k2oc3oCdeFyN8kNWM/Mn3vdAKwiodkvgRR0rqbMDCDKVuhALDH/v7L4iuBSQuqKW4oa5yGkOsoF5WINMdOtRsYKI+RjzhAlZgLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=waV6iEa7vFVwHio4JfoyFRmDoERH3djmQBYt5ePHlLM=;
- b=m2dhQvVXvjhbKTCqxKgoRM65JaY5py6HhJA2zAXOGAZUJyf31Xbpf0CP3T3uT6GC0XdEXRexaOV6z2wROzFHBXzEbwqkkGezSDukp5BEYk47uzBgfbSB1yjKzYbARssL272fH9yLXRHCDiDUDLZBnL7uDz2zJB5MzYgAZpNzZfVKowiv+WZqazFUFj0brHypv3h168OeKfeihoDxzbFZRpOAyXER/FvOvRYqE7TVHohABq37Y7EbdQefK9hjNZ3wSWg7u9dkCDsy5V/6QbDgnaQGKTDc2uRZGbTNDo+xySlcgnwtWUNIzCcPyzqF0+hEGanqISRKQFEgZEyDw6zVlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=memverge.com; dmarc=pass action=none header.from=memverge.com;
- dkim=pass header.d=memverge.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=memverge.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=waV6iEa7vFVwHio4JfoyFRmDoERH3djmQBYt5ePHlLM=;
- b=di4SGgMD8VkRYdhX0okjAsbwh1DZVOob79EmV5gdkcCaiOUuDQYjd9+Tni61khF3fa1wGfERpRysTds1bh42aE21I7yfruOsmODOC0NFySCPCySK/lBO9bQrff116wGqwtAGnshxvonOycj8zyK9XdWIkGmBEoJYQwkiUK3MTOI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=memverge.com;
-Received: from SJ0PR17MB5512.namprd17.prod.outlook.com (2603:10b6:a03:394::19)
- by CH3PR17MB6666.namprd17.prod.outlook.com (2603:10b6:610:132::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.21; Fri, 31 May
- 2024 14:23:51 +0000
-Received: from SJ0PR17MB5512.namprd17.prod.outlook.com
- ([fe80::5d53:b947:4cab:2cc8]) by SJ0PR17MB5512.namprd17.prod.outlook.com
- ([fe80::5d53:b947:4cab:2cc8%5]) with mapi id 15.20.7633.021; Fri, 31 May 2024
- 14:23:51 +0000
-Date: Fri, 31 May 2024 10:23:47 -0400
-From: Gregory Price <gregory.price@memverge.com>
-To: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	John Groves <John@groves.net>, axboe@kernel.dk,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev
-Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
-Message-ID: <Zlndc8NI0eK3MmuR@memverge.com>
-References: <20240508131125.00003d2b@Huawei.com>
- <ef0ee621-a2d2-e59a-f601-e072e8790f06@easystack.cn>
- <20240508164417.00006c69@Huawei.com>
- <3d547577-e8f2-8765-0f63-07d1700fcefc@easystack.cn>
- <20240509132134.00000ae9@Huawei.com>
- <a571be12-2fd3-e0ee-a914-0a6e2c46bdbc@easystack.cn>
- <664cead8eb0b6_add32947d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <8f161b2d-eacd-ad35-8959-0f44c8d132b3@easystack.cn>
- <ZldIzp0ncsRX5BZE@memverge.com>
- <5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
-X-ClientProxiedBy: SJ0PR03CA0284.namprd03.prod.outlook.com
- (2603:10b6:a03:39e::19) To SJ0PR17MB5512.namprd17.prod.outlook.com
- (2603:10b6:a03:394::19)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uQsxvQ/m"
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6f90679d3bbso49846a34.0
+        for <linux-block@vger.kernel.org>; Fri, 31 May 2024 07:33:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1717166035; x=1717770835; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UFOiVua3aBgyOhu4hLBGVqqHst3odYdNGRYkuP/usRw=;
+        b=uQsxvQ/mHw6hFo9j20WFmOKEnjYxwrgEbA15z36w7G4a2OkXTR/7w6RWUIFEDt9kx4
+         MlWklEPkT1pN4Pf+J1GmG7AFaN1yfqJ1wnZhKzBMjgz+KX9/Zlo5Tf6AfQtdEJKU+PIn
+         258IkGuVBr7KN8X8sVl98y9z/EuGS0i6pH+mVKP6tEgS015QbZmnqNtWq/4WoJ9CVAAG
+         B7EObFga7vRSTTZ0/+CGCZyqgI91FG9jKgLHWtmTkpHWWbTDemV7+/8//Zy5OrUu+K6N
+         XesZM+8x2s5XC0ETj1KEm9dE6ZAOsjk+j1lTgBuMEl58U/8QSJ0GA4G1EvyQPPQkE4LN
+         UZoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717166035; x=1717770835;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UFOiVua3aBgyOhu4hLBGVqqHst3odYdNGRYkuP/usRw=;
+        b=HGy/t5ZZCSvbEgd/oq3fv8G7eyAcPjJTdY5vsNdZH6++EZVmLqAA3ZfMFFDvwA9zP6
+         3FcoPdQ3HKYtiyXe2dscvYbxM3lSmTrSpGypxERGakLfUWs0E68r1x9sT1iq8/2no4wY
+         a4IXfyEGC0zuOygbN34dKyyRgu75mVd+Zv/lXVEpAcrCU/mI+PZkGbuI6KBp5HH5VdJI
+         GPqsOqnZ20thOj4vxiQZZI0+9nPZyKlNpKF++/7StnP2Dgp8MrqQNaS6/91ODkChk0fw
+         yTTuT4PQKwq+eOhr6rB42TnUEmzbzNgECHO6etyg1NRJEKFrXKgMX+wDfQx/cckrFSOs
+         kDMA==
+X-Gm-Message-State: AOJu0YyxKzTxrx8zxI+jQLw6vULOA5bJnIe3iwT9pyYUU+M5QdELQPsC
+	QcER6O/cfGGqeOjEpLmw2ozM3fhTO9RxFE1Ajfu97qkvdl+4bbSjkaIYUHJtGADPnKi2Xdgx6G2
+	r
+X-Google-Smtp-Source: AGHT+IEoN5+ABUcXPwxgdm9W65sj3oDwlsdT3q5cU9xhD/BjkQCHcK6hpOCFfs5F67g2RZ6ws2qgdA==
+X-Received: by 2002:a9d:6056:0:b0:6f9:543:cc81 with SMTP id 46e09a7af769-6f911fb5679mr2159397a34.3.1717166035030;
+        Fri, 31 May 2024 07:33:55 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6f91059cc5asm345512a34.64.2024.05.31.07.33.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 May 2024 07:33:54 -0700 (PDT)
+Message-ID: <87063af8-c102-4e64-a00d-15d76786c893@kernel.dk>
+Date: Fri, 31 May 2024 08:33:53 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR17MB5512:EE_|CH3PR17MB6666:EE_
-X-MS-Office365-Filtering-Correlation-Id: af8599d2-1dcc-4765-623f-08dc817d4b08
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Rzl4MUNYbENWS0M0emErZllCWVJEUXhNT21LeG1GcFd1QU83aU1taW9icGN5?=
- =?utf-8?B?cG9nY0xjTm51YUR6N3MvUndHaUpyTjRjMnF4K0tqUmdBRFUrZ0NOdi9LckR6?=
- =?utf-8?B?dWN2VW9udzVSZ0lsNVV6UDBHOW5BQ3UvWHY0SXpSY1pnb1F0SVpQSXFLT213?=
- =?utf-8?B?emREclVEK3hoYW54d2xjaWRIVTJWMWlHejlxRkpVeTR6N3ZzTjcwY1FEV2Vz?=
- =?utf-8?B?VGpZSW1oNm92ZXNReGYzUjZpSnlHOFhidkdDWUkyVEpKNGhINGcxcmVEckJt?=
- =?utf-8?B?dUNYL3JSMXQvUXhQZzR1VWJScXoyVjhYWG5QN0Z4eTk4VU0zdzZzNkhmVHdw?=
- =?utf-8?B?Vy90Q0ttOGlocjVLQ3ZHaVJCTXYwNSsxQUtvcWJCZ21sdWZnZWZJaDBIcURD?=
- =?utf-8?B?WkxUalgxSUlKejlQSERRMG41UlFERlJRcFhjc1c3Z0lRQlBJWGRmeVJxS01J?=
- =?utf-8?B?cDB1VE01SnBnaWI5VmVOYUZCMFdPaVYzMG9wSUVoeXdFNFlvOE1ZNE4reTdC?=
- =?utf-8?B?NGViUFNiQ2VMUHo2WTFYeEFhM09OWU5qTlVWdndrbWZhMzB2cDBxU0grY1o5?=
- =?utf-8?B?eVFrOUxJNHd4c2hxZ0hOVG83MzJxQ1lhS0pocVRSTmVaaTcyT0lkRlFsSjBt?=
- =?utf-8?B?TGlaSU56ZTNLWVl6bUlwWFV1SDMyNUxPWGVRaUhMd1c4b0tORDVHRnprRHM0?=
- =?utf-8?B?RUhuMFl0NHZEaDBZSy9QeFlRR0c2RzVPVUpCNVBIRzNuQTdMVDZabE5UWHQy?=
- =?utf-8?B?LzhCRXVhOGtodUxnc0QyelowZWZ4eGVZdDRsK09GTWVSS05sb3RZRmx0aTdo?=
- =?utf-8?B?WG5Na2ZpOVdyMkZzeUovS2RrYUw5V1FJakRwUWduL1Y3dmZBTW1RSWpRb0ZS?=
- =?utf-8?B?NDFQSXNWU0ZJS3dWdmw5SVVtZzJsQlp4L3c4Z1dvSVRObTNMb3k1SXpRUDdU?=
- =?utf-8?B?SGRleUk5YmR6V2VvejNkbnZQOHh4TU9qS090L0dFOTZCTWw5QW0wdkRjSVNx?=
- =?utf-8?B?d09nRW9uUFZ5elVLZXFZR1VLUVhKajE4L1NCTlFrYXlSemt3YjEzdkJqTlBp?=
- =?utf-8?B?S21xK0lXTnVxVUgxRHFtU3dnSk14MjJGWldOaHJpWkxGamZGM1lpM3UxVi9a?=
- =?utf-8?B?MEs3ckRlQ09oWW9PVC9uOFpBQm5UMHk1bGJUazhZZ3VIeHl1UEtUWjFIdDJz?=
- =?utf-8?B?VGthQk5UQXBnQ004Y3RyQlZHL1pld1BUYkhkMWtGcnZiL250NWRsdVNTWGQ4?=
- =?utf-8?B?c1RxUHAwaXVmUVZFZnNvai9FWFlDR1J3YUZRRkZkbE1jZnNZcitwUklxd2pl?=
- =?utf-8?B?SG9YWjkvRzJkQk1mZ0tCUG11VG5rSUp0WTFhN1MzSWlMOWlXanpLQ1QzMzZ5?=
- =?utf-8?B?dURJNjZLY242SCsxWXZ4VFA1RlBHbENBOFdMei8rOERLUHFOakhQelJ4MnZR?=
- =?utf-8?B?MFNvUFBCWlpGL3FGY1lrNlFidUs3UVZDeG9CYU5NS1ZnbFdCRWpUR0cxaTdH?=
- =?utf-8?B?VXRnMnBBTXlDWU0zY0Z1Z29kRUpoaXRZdFdoZjdOc0hoZmdqa2c4MjgwMFdM?=
- =?utf-8?B?YnlqcTU5MkU3c29oTU9YZWNkdlNmbHNCcWxmcU10UGJWTUlEUWJFWlhjS2pF?=
- =?utf-8?B?d0RFdDBNSE5DUmU4SjNDcE9wVkk5R3VxMlQxTlNUdk5vNWM3SGNjdHFzbFNF?=
- =?utf-8?B?S29JZmttZzd3RFdxb1Z0bldhQjRXL0s3cWlYSHNLQ3hpcXVrVWN1Zmp3PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR17MB5512.namprd17.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Q0NVL2JBbU83Q0o5V2Y0M2tKMlcwREs0dW1rZFROcGZXTVU0dlJycDdDU0Ru?=
- =?utf-8?B?TXY4Y1VDNjltSTV6M0dYYmhDWk9zeVp1ZGRwb3RPc0lTd3ZrSjl4dTY2Y29N?=
- =?utf-8?B?c2FCS2xwMTRkTW5GbVMwR2NSVExsK2drdFB5NFFRRG85S3dsUUNXQXBVUFlJ?=
- =?utf-8?B?c0xLakd0SDRTMGtJWVpLT2YxbDBSUzNCTVNOQ2o5UzFzS2NBMTdpazJCMUMz?=
- =?utf-8?B?aTcyalpMc3ltLzJ6aXB1M0VvVWFFVitnS2l0Mm5LK1ZoQlpXNEkzSkptd3pO?=
- =?utf-8?B?ODJLSzhNWnJmT05KQloxWXFLSGNOWnllUzUzOFo5SHNOSXF2QWE5U3FiYXp4?=
- =?utf-8?B?dmE3WDFlcS9talh4SEoyT3U0bm9IUUJwaTNtWUY2Y2FaSGZkM2J2ektyeDEy?=
- =?utf-8?B?STdrV1F2Q2gzVzJvMHRWTVNxYVJyN0VrSEFYa0I5WDRLRmgyUWQ0c1IrdUxk?=
- =?utf-8?B?QjZNYjhteVQyWm15UGpHMUpwUlA1SE4zYUN3VC9FdjJ6YUgwaENLbW9WYUE1?=
- =?utf-8?B?S3VFT2JmL082N0lXNFJvTjZ5ZUhVRkkzUzJEZmVWNXZMbW5BZ3A4N09xTmdM?=
- =?utf-8?B?SVkyR2ZLbUliaW4vL0hsK0NtTTQyK0dwRmhCMG8ySHdUeGdsSTZ3UklHMnhO?=
- =?utf-8?B?Q1FKZ2hQbndDQnlOVXBLL1lSckNVVlpUaFZoeFVqTHVDdndCTExNdHdPWXZC?=
- =?utf-8?B?ZmhHd0RnY3VyazRGbjBtL0wwQitLNmNNV1JBTTFZNlVyOVh4WXNVK0ZQeXho?=
- =?utf-8?B?aXV1Yy9vRi9EV2dUUGh1Vm1GU3FMbkZWMENKUkpEejhIaXlaOGhXWmtIV0Uv?=
- =?utf-8?B?c1lnVWVVQ2ZURXgwTk1DVGpuTUd0SkZ3bTJ0NFZ6RjBSeVZmODZEejJ1WlVK?=
- =?utf-8?B?MG1sUVBBLzdJRzJNVkdjZG9ydTEyVGNDK0hERzJlRDN5NkU1VmxnSFlVWk9C?=
- =?utf-8?B?Ty82Mlh5N3FubERLWGFKM2pMMVpHOFBlRnpzVnoybzZrZUp5K1gvMDRId3Ji?=
- =?utf-8?B?UlphTWttTTNSLy80MmhnckthSm9EOUVGTWtzcnJyVnBNaUNvc3FQNG9Od2Mz?=
- =?utf-8?B?dVgwLytqNkdIYUlIRHpocnBpZzBKRmxqbXk0YUlrMzI3NndidEc0MEFSM2Rv?=
- =?utf-8?B?SnE5Uit6dDdaODEvemdYL3Z2TjhTdGJYL2hudEIxMGlSclFOcTNTREpmN1M4?=
- =?utf-8?B?dWJONmVBWDJnd0hlSU56RFFhRENSUU1NaGlncXVINzJ2MnBRamZJMzcyeHdp?=
- =?utf-8?B?bVNxTWNWbTdEQ1dhOWREaGxFSG9OeXlRc09aUzdwZUF5L1VaaGxFcUU2Z1Zt?=
- =?utf-8?B?SHRzbW9NOWk1RzdKQnJ5RGUyU2FxNFR0VHZPSjluR3dtQk56ZGxlWjUxdVox?=
- =?utf-8?B?VWhCQldKUUFXTTFhRTlJZHFjc0pXTEl2ZmJ5d1Y1ZTJYeWtnaEpHYTlTOXJT?=
- =?utf-8?B?LzVSQ1M3OWJ1K1BtOHNld2lwN0VKNTJnQVdsYmdYM0orVUZYc09EeDdFUDJy?=
- =?utf-8?B?M3ZRYnZlY2RYOVBHckhaeUF2dEN0TzJTNytJa0d4REpxUmM0c1VleGd6Rld1?=
- =?utf-8?B?RUdvblJOSWRyWGdqTkp1dWg1QkFHK0FiWGFuWnYyanZvbHhLYU4vOVplSExD?=
- =?utf-8?B?bFU5cy80azAyVVFCd0p3SnBoeW42M2JKV0JCNjVpY2F2RWwvWGtKL3dSYlNL?=
- =?utf-8?B?NXptbjdNMDdVK1ZySVduVmNpRzVjRlNGL1NaWVZoWW9laUtobG1HOHF6dnlU?=
- =?utf-8?B?djF3Vm5OYVVtRGltTW1UUUE4UlhVZGp1L0FoeXI0TEhzZnIwUVM4WStWSzR3?=
- =?utf-8?B?M0pTUk45Y1VpdUtnTDVVMnE3QTA2T1Jib1JlenB2VFJvYldCSmFxSGtpTVpJ?=
- =?utf-8?B?WUFhbUg1VnlkTmtmcHRYaTZ6Szg0azNrdjZFaGNHc1BEeGFkajJubFRoU3F6?=
- =?utf-8?B?L29KQWV3dE5TZFJUZFpVWUpsOGx5SDJXQjBPZDNjbGZ4ZFU1QmhEL1gydGhm?=
- =?utf-8?B?NEE4Sm5xTU43NklIS3dHRkZ3dkErZ0lZZW1DdENuUm5XWDh1WWk3UFI0bk1Y?=
- =?utf-8?B?Zms2UDdlOGNhR2p5RlZqcS9EMk94b1hMZkN6SnY3RFFtVTlWLy9rcUNrWHZB?=
- =?utf-8?B?TlJhTTBoNWNiajA3dmpSWklBY1VMMmsvcVBkbXhyRXNraCtndnFnc3NEWkJk?=
- =?utf-8?B?Z2c9PQ==?=
-X-OriginatorOrg: memverge.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af8599d2-1dcc-4765-623f-08dc817d4b08
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR17MB5512.namprd17.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2024 14:23:51.1316
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 5c90cb59-37e7-4c81-9c07-00473d5fb682
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +U6Cg99HFHH8M1MbVofZginPuV42yn52sXdWcjrWN0Vb9SAZO1v+ne96OsbS4B99RhLIssqcLWukQHNo3xDSSEVeBFL5FWPmTK8a76zgbgc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR17MB6666
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.10-rc2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 30, 2024 at 02:59:38PM +0800, Dongsheng Yang wrote:
-> 
-> 
-> 在 2024/5/29 星期三 下午 11:25, Gregory Price 写道:
-> > 
-> > There are some (FAMFS, for example). The coherence state of these
-> > systems tend to be less volatile (e.g. mappings are read-only), or
-> > they have inherent design limitations (cacheline-sized message passing
-> > via write-ahead logging only).
-> 
-> Can you explain more about this? I understand that if the reader in the
-> writer-reader model is using a readonly mapping, the interaction will be
-> much simpler. However, after the writer writes data, if we don't have a
-> mechanism to flush and invalidate puncturing all caches, how can the
-> readonly reader access the new data?
+Hi Linus,
 
-This is exactly right, so the coherence/correctness of the data needs to
-be enforced in some other way.
+Block fixes for 6.10-rc2:
 
-Generally speaking, the WPQs will *eventually* get flushed.  As such,
-the memory will *eventually* become coherent.  So if you set up the
-following pattern, you will end up with an "eventually coherent" system
+- NVMe fixes via Keith:
+	- Removing unused fields (Kanchan)
+	- Large folio offsets support (Kundan)
+	- Multipath NUMA node initialiazation fix (Nilay)
+	- Multipath IO stats accounting fixes (Keith)
+	- Circular lockdep fix (Keith)
+	- Target race condition fix (Sagi)
+	- Target memory leak fix (Sagi)
 
-1) Writer instantiates the memory to be used
-2) Writer calculates and records a checksum of that data into memory
-3) Writer invalidates everything
-4) Reader maps the memory
-5) Reader reads the checksum and calculates the checksum of the data
-   a) if the checksums match, the data is coherent
-   b) if they don't, we must wait longer for the queues to flush
+- bcache fixes
 
-This is just one example of a system design which enforces coherence by
-placing the limitation on the system that the data will never change
-once it becomes coherent.
+- null_blk fixes (Damien)
 
-Whatever the case, regardless of the scheme you come up with, you will
-end up with a system where the data must be inspected and validated
-before it can be used.  This has the limiting factor of performance:
-throughput will be limited by how fast you can validate the data.
+- Fix regression in io.max due to throttle low removal (Waiman)
 
-~Gregory
+- DM limit table fixes (Christoph)
+
+- SCSI and block limit fixes (Christoph)
+
+- zone fixes (Damien)
+
+- Misc fixes (Christoph, Hannes, hexue)
+
+Please pull!
+
+
+The following changes since commit 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0:
+
+  Linux 6.10-rc1 (2024-05-26 15:20:12 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.10-20240530
+
+for you to fetch changes up to 0a751df4566c86e5a24f2a03290dad3d0f215692:
+
+  blk-throttle: Fix incorrect display of io.max (2024-05-30 19:44:29 -0600)
+
+----------------------------------------------------------------
+block-6.10-20240530
+
+----------------------------------------------------------------
+Christoph Hellwig (6):
+      block: remove blk_queue_max_integrity_segments
+      dm: move setting zoned_enabled to dm_table_set_restrictions
+      dm: remove dm_check_zoned
+      dm: make dm_set_zones_restrictions work on the queue limits
+      sd: also set max_user_sectors when setting max_sectors
+      block: stack max_user_sectors
+
+Coly Li (2):
+      bcache: call force_wake_up_gc() if necessary in check_should_bypass()
+      bcache: code cleanup in __bch_bucket_alloc_set()
+
+Damien Le Moal (5):
+      null_blk: Fix return value of nullb_device_power_store()
+      null_blk: Print correct max open zones limit in null_init_zoned_dev()
+      null_blk: Do not allow runt zone with zone capacity smaller then zone size
+      block: Fix validation of zoned device with a runt zone
+      block: Fix zone write plugging handling of devices with a runt zone
+
+Dongsheng Yang (1):
+      bcache: allow allocator to invalidate bucket in gc
+
+Hannes Reinecke (1):
+      block: check for max_hw_sectors underflow
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.10-2024-05-29' of git://git.infradead.org/nvme into block-6.10
+
+Kanchan Joshi (1):
+      nvme: remove sgs and sws
+
+Keith Busch (3):
+      nvme: fix multipath batched completion accounting
+      nvme-multipath: fix io accounting on failover
+      nvme: use srcu for iterating namespace list
+
+Kundan Kumar (1):
+      nvme: adjust multiples of NVME_CTRL_PAGE_SIZE in offset
+
+Nilay Shroff (1):
+      nvme-multipath: find NUMA path only for online numa-node
+
+Sagi Grimberg (2):
+      nvmet: fix ns enable/disable possible hang
+      nvmet: fix a possible leak when destroy a ctrl during qp establishment
+
+Waiman Long (1):
+      blk-throttle: Fix incorrect display of io.max
+
+hexue (1):
+      block: delete redundant function declaration
+
+ block/blk-settings.c           |  10 +++-
+ block/blk-stat.h               |   1 -
+ block/blk-throttle.c           |  24 ++++-----
+ block/blk-throttle.h           |   8 +--
+ block/blk-zoned.c              |  47 +++++++++++++----
+ drivers/block/null_blk/main.c  |   1 +
+ drivers/block/null_blk/zoned.c |  13 ++++-
+ drivers/md/bcache/alloc.c      |  21 +++-----
+ drivers/md/bcache/bcache.h     |   1 +
+ drivers/md/bcache/btree.c      |   7 ++-
+ drivers/md/bcache/request.c    |  16 +++++-
+ drivers/md/dm-table.c          |  15 +++---
+ drivers/md/dm-zone.c           |  72 ++++++++++++-------------
+ drivers/md/dm.h                |   3 +-
+ drivers/nvme/host/core.c       | 116 +++++++++++++++++++++++++----------------
+ drivers/nvme/host/ioctl.c      |  15 +++---
+ drivers/nvme/host/multipath.c  |  26 +++++----
+ drivers/nvme/host/nvme.h       |   7 +--
+ drivers/nvme/host/pci.c        |   3 +-
+ drivers/nvme/target/configfs.c |   8 +++
+ drivers/nvme/target/core.c     |   9 ++++
+ drivers/scsi/sd.c              |   4 +-
+ include/linux/blk-integrity.h  |  10 ----
+ include/linux/blkdev.h         |   1 +
+ 24 files changed, 262 insertions(+), 176 deletions(-)
+
+-- 
+Jens Axboe
+
