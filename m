@@ -1,63 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E994512F5B6
-	for <linux-block@vger.kernel.org>; Fri, 31 May 2024 23:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EB57C6D5;
+	Fri, 31 May 2024 23:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717198808; cv=none; b=Rt/5qFkrSXGO0vN2etD6cY4R9JUnHvLxqfO8lgdKIuiyBHiT7v9sNRvVPxwC/1qnnPiKnRhS8UgRYRA+5FlJPrU8HuJc2y5WiAtiPqojiWf0M4xjgApW9hqK2qTm0aaNjqGhN9CiMO+Mh5Ho2l06ftaDHkKoh7GbQD0ej5QbhF0=
+	t=1717199118; cv=none; b=EtTodAiFhV09TEaztIXfaQztDTOit6V4QM2YJVyco9pp2GON4bXwJDQbKUPzqTK7ehaUZ5UWVcM61tsYjC7v0vps2slpKERmDrvnIHIVQPLEeLfW1bCnmx3qDgy92vcGNubC0SYZ+c2bSwNTmRs5TWk5rizVqN9LxyGxfui+K8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717198808; c=relaxed/simple;
-	bh=p975gcvL0dg0qtxOHJOQPwd7XPiUf8bzR6HutMbS+Qs=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Kcf/4mH/dKGHSu0EeSIAukPTa+xHTsQGQYHf1ZTasyNtwSoKbhNw4aczhE++4JN7w4eQvTMtRY2rMks8ZNiSA7k06vnxGaVYmRYsLs79hmCpnMpKCvzEO/l7xhFAfht7erSvgNR6pKErO/7BwOi3Nn8YvD+EpsuBIJIG1zT2rhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hYXXzyMZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717199118; c=relaxed/simple;
+	bh=l3t+BmfLmI+otY4MKq9hvWi5XN6CrB1zj/HPdbzHnk8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E7TLD/hdxQGY5pQypxdz8Iu3Y3RaHlFZzpxbFz3BPvLgbQ7TcaFgVY6z6dRF/pDEMfHT11m+mLDcqRepRl9FTsea6PqhJVW8RLWjZyuQG9rUzDpoO3fF9rIAE7KiWq5UnsRSxFe8pEeGkRdrlziMPVDBrwCd7WzIj/+YvdX1WUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZklNmP1Y; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hYXXzyMZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CA93CC4AF07;
-	Fri, 31 May 2024 23:40:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717198807;
-	bh=p975gcvL0dg0qtxOHJOQPwd7XPiUf8bzR6HutMbS+Qs=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=hYXXzyMZib5rHmuYOEaTMhV23J+1pbC8sEiIlzm39l5dBUfK1yov7KEPkzAIBJwJc
-	 XDwKd4e7OuOxvKoU0+arIu7ba2o1mCAJyHZRR/0owWO2ETVHC9wYl8+OG2AZnKQ6Iz
-	 KcOhUFnVhYpdOi8waJxB71K9KZWbCZRN0wingX2MJQDAJHmQg/veb49VAEiBufhhW1
-	 XaMS54f2a8Xh5p4IuTgIbRYzYdRjcVysPxbu52zp9ka0n1M50ZX0XmV/6mcUXUlpk0
-	 AJ5CzaV+W2xkmdoQWCM9oXyqoIB+Sv77xRzAcoUuE9QFlDWUqxoRAdW/qKuRKsOZRI
-	 fJKEW2mAlgBLQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AA3A5C4361B;
-	Fri, 31 May 2024 23:40:07 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.10-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <87063af8-c102-4e64-a00d-15d76786c893@kernel.dk>
-References: <87063af8-c102-4e64-a00d-15d76786c893@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <87063af8-c102-4e64-a00d-15d76786c893@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.10-20240530
-X-PR-Tracked-Commit-Id: 0a751df4566c86e5a24f2a03290dad3d0f215692
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0f9a75179da33cc03594b882ed823cc5f4356d9a
-Message-Id: <171719880767.1891.8455959760067586078.pr-tracker-bot@kernel.org>
-Date: Fri, 31 May 2024 23:40:07 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZklNmP1Y"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Vrfqw2d4jzlgMVh;
+	Fri, 31 May 2024 23:45:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1717199108; x=1719791109; bh=zkochTf1pJt/Am6auJvVyeUO
+	0m/clb0l/O7D9nMG788=; b=ZklNmP1YJ5I6wZoLhUGC2GqLb9lFFx6n2ktRI1Kx
+	Nl7eRqzK72L7iylss28HRyQRn55MXa33iQtDbhVYdGuOsrbsfxQUH0MQI/q/83NC
+	naGlUr7nOXCs+ynUYr7Us7SG/yw/CDkSBGpU6kffWxO+L13RE1xW0d+wScKyYd5C
+	8UbYw7VREWul20bnYqKuPoFAWHgcTgTfaYNDtti/zlVZ3sPgIwaaIQqSPOY35Vzl
+	fKeYl7k4q3U2Af6xUuNuWM+ySy4ooBHWAZubP7KHqeU/R9xLQ8aENAiol+5dzy2y
+	j20Zy90y6kCex0Hcv++PGtzTMByipGkBfQjmyB2khsUy+Q==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ho3liOON33iq; Fri, 31 May 2024 23:45:08 +0000 (UTC)
+Received: from [100.96.154.26] (unknown [104.132.0.90])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Vrfqk2qcnzlgMVf;
+	Fri, 31 May 2024 23:45:06 +0000 (UTC)
+Message-ID: <967ec49b-3298-4db2-8f59-c5cd8abf366b@acm.org>
+Date: Fri, 31 May 2024 16:45:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
+ and request layer.
+To: Nitesh Shetty <nj.shetty@samsung.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ martin.petersen@oracle.com, david@fromorbit.com, hare@suse.de,
+ damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
+ nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org
+References: <20240520102033.9361-1-nj.shetty@samsung.com>
+ <CGME20240520102842epcas5p4949334c2587a15b8adab2c913daa622f@epcas5p4.samsung.com>
+ <20240520102033.9361-3-nj.shetty@samsung.com>
+ <eda6c198-3a29-4da4-94db-305cfe28d3d6@acm.org>
+ <20240529061736.rubnzwkkavgsgmie@nj.shetty@samsung.com>
+ <9f1ec1c1-e1b8-48ac-b7ff-8efb806a1bc8@kernel.org>
+ <a866d5b5-5b01-44a2-9ccb-63bf30aa8a51@acm.org>
+ <665850bd.050a0220.a5e6b.5b72SMTPIN_ADDED_BROKEN@mx.google.com>
+ <abe8c209-d452-4fb5-90eb-f77b5ec1a2dc@acm.org>
+ <6659b691.630a0220.90195.d0ebSMTPIN_ADDED_BROKEN@mx.google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <6659b691.630a0220.90195.d0ebSMTPIN_ADDED_BROKEN@mx.google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Fri, 31 May 2024 08:33:53 -0600:
+On 5/31/24 03:17, Nitesh Shetty wrote:
+> I see the following challenges with bio-chained approach.
+> 1. partitioned device:
+>  =C2=A0=C2=A0=C2=A0=C2=A0We need to add the code which iterates over al=
+l bios and adjusts
+>  =C2=A0=C2=A0=C2=A0=C2=A0the sectors offsets.
+> 2. dm/stacked device:
+>  =C2=A0=C2=A0=C2=A0=C2=A0We need to make major changes in dm, such as a=
+llocating cloned
+>  =C2=A0=C2=A0=C2=A0=C2=A0bios, IO splits, IO offset mappings. All of wh=
+ich need to
+>  =C2=A0=C2=A0=C2=A0=C2=A0iterate over chained BIOs.
+>=20
+> Overall with chained BIOs we need to add a special handling only for co=
+py
+> to iterate over chained BIOs and do the same thing which is being done
+> for single BIO at present.
+> Or am I missing something here ?
 
-> git://git.kernel.dk/linux.git tags/block-6.10-20240530
+Hmm ... aren't chained bios submitted individually? See e.g.
+bio_chain_and_submit(). In other words, it shouldn't be necessary to
+add any code that iterates over bio chains.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0f9a75179da33cc03594b882ed823cc5f4356d9a
+Thanks,
 
-Thank you!
+Bart.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
