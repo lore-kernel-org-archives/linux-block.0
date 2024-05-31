@@ -1,22 +1,22 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68115588D;
-	Fri, 31 May 2024 07:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1F65588D;
+	Fri, 31 May 2024 07:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717140743; cv=none; b=daGsr+gjKMZaP3gkbuBrJXV8/gpXicq6cd4rVZ+qUVln78JzjRjckwAdzfy+qIGYWPHBISnQMIApTdMZLcV/xPzAwPbvoHjWLssmE5sqtiUxQhQCIaYjpU1pcxwmxukAbAM9vuZffPLmj2MqPeNIdoFFhJ7MRQVFQIo4vvpbj44=
+	t=1717140758; cv=none; b=MU5jdRrYKkiUaqWTyCB5m0PtXeyvIMuTaRiXQ1T+HzaMhbfJItNYFNMSfv9pdSa5W3NcS4IOjExmzSNtgZdkqDvooMvbM6iVNzvOuZZkiqdNv63r+d78s1nphEFxxeevmvNpf9sYrPBs9P1YdpWJgNUWXSeJzKHawNi3/tAwKgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717140743; c=relaxed/simple;
-	bh=prvFo1QmkAuBtaYZafOU/65r2uSc+CLjjoRQJfADFVs=;
+	s=arc-20240116; t=1717140758; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dnV6PE2LDo41uBDJVA2ZctjBOVxckwP1WOBSFMBe48F3p/Hm6SYwJG5+C6kI705v6JKJxaFEhSSYyf03D7XNyNWYzh21/EudEmTsB5DiMH5/1a3v4XbScQU8R12wpUQGcz+zJrxdUSRPpfJzwMTBYv+p7B2vXKVYEs8H4UFCung=
+	 Content-Type:Content-Disposition:In-Reply-To; b=YfWfRPaBT4kYeHWQL9QvI3gWndH7KIq4YUCmGQRsgHL4wipiDVg5ixBs6WA1PDzkiLJw+uEn9IHICPY9z1U2AleD5uD2+Nrc/l+dBm/coqaWcFVTfVuc+3wnQk6RXS6iVevRbTO5ps7tny0eugeuPhq72S6yJqeIE8cuMzOPyq8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 61B1F68BEB; Fri, 31 May 2024 09:32:15 +0200 (CEST)
-Date: Fri, 31 May 2024 09:32:14 +0200
+	id 22FA468BFE; Fri, 31 May 2024 09:32:33 +0200 (CEST)
+Date: Fri, 31 May 2024 09:32:32 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Ofir Gal <ofir.gal@volumez.com>
 Cc: davem@davemloft.net, linux-block@vger.kernel.org,
@@ -27,10 +27,9 @@ Cc: davem@davemloft.net, linux-block@vger.kernel.org,
 	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
 	christoph.boehmwalder@linbit.com, idryomov@gmail.com,
 	xiubli@redhat.com
-Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-Message-ID: <20240531073214.GA19108@lst.de>
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
+Subject: Re: [PATCH v2 1/4] net: introduce helper sendpages_ok()
+Message-ID: <20240531073232.GB19108@lst.de>
+References: <20240530142417.146696-1-ofir.gal@volumez.com> <20240530142417.146696-2-ofir.gal@volumez.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,11 +38,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240530142417.146696-1-ofir.gal@volumez.com>
+In-Reply-To: <20240530142417.146696-2-ofir.gal@volumez.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-I still find it hightly annoying that we can't have a helper that
-simply does the right thing for callers, but I guess this is the
-best thing we can get without a change of mind from the networking
-maintainers..
+Looks good:
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
