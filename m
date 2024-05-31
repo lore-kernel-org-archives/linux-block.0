@@ -1,217 +1,176 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B54C626CB
-	for <linux-block@vger.kernel.org>; Fri, 31 May 2024 15:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984C1156242
+	for <linux-block@vger.kernel.org>; Fri, 31 May 2024 15:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717168671; cv=none; b=gBgyGnvNyBcAQLEEPNqK3zr0kA6ILBmf+0L8JYFmDlmoBmNytM+tVxEtPr3PEGzfj/EId1WhrIdxUJXP23R7ABK+iAuLy+FSqpb6CgGtLaqBLfCsS60Oil65oxslbUJu53nZzA8qSr7TF604cu5G2xvMAW9Af5RxipMEO11fRE0=
+	t=1717170721; cv=none; b=lCenQ2wVPZosTT9w5wut8IYKCDo0UE0QUrklTc5ZQ+zSG+MnGmHi1BEEE1YyECmujVYA/OsPM8z3N5wN8q9t4gs1rOVDV/m3IHVha7fsjm7pm2qBFktI0i9CyIbm39B25scxcFQypsJVEoT1KkQu0TsmzSOs94RzfK6PzUTDuqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717168671; c=relaxed/simple;
-	bh=2FbQqlVM8oqZ+0S3oyHvew+8sHHSKI9UUtypYdVKFeg=;
+	s=arc-20240116; t=1717170721; c=relaxed/simple;
+	bh=3Ot0Q+UNMH93NNe6w2xEdYL7SS7lyjTPxCgxXIk/HII=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=imV9t9RaH/ybw5KLQlYs2eapGuCSvu3vhruAoL14p8bpz5yZsrMl5CC/S7jsjRtNDfzFhnWqI0PsN4ZN1lcLkJBUfReu94NcUcuq8uEVHmoABtocyEfrVU9Gs0rRd8NeDGH0aTotewb6rnSgcHjQKqhbkLd+8RhzJhCV/bLa5+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=QYmjaZ6Y; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
+	 To:Cc:Content-Type; b=OUZdIVXPPi0YvOdLIt65NRYvudcHgZJ823xDXAcyqRx2IpYrtPQJ3eENICFGh58/gtRpu+tBhOm/ma3MD/O7np3vmytCziqDNJPdwcbTXg2wEBXeWqYpHEV+pE5eORA3gQO65dNJ5KFHUcdLonu/W4gYPTv0wcTwsoROe6/BJxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=WYmK2Ngo; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="QYmjaZ6Y"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-62a2424ed00so23575267b3.1
-        for <linux-block@vger.kernel.org>; Fri, 31 May 2024 08:17:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="WYmK2Ngo"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-62a08092c4dso21018167b3.0
+        for <linux-block@vger.kernel.org>; Fri, 31 May 2024 08:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1717168668; x=1717773468; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1717170718; x=1717775518; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bqvRq7yENLDnnpdEq2cw3Le9KvoZpYlA6wAP6e79glQ=;
-        b=QYmjaZ6Yg0mFfGbb7js5zrKK1mF2xybYHbBaIW/NM/5lmicmtWPtnoGZzeQXpV5GHN
-         ERlxz0E0mxuPruAccJskiag+BE9YC0fFQa5jeq6zHZAJ9p4sPBX+WB8MCa7wSiSuWnT/
-         7Bh9P82EaRgy7VoF2nINxTNV/XQKJcKphJJZM6bVSC32yJvUMYK4q9OqmZ0twVLWOZlp
-         PAptdxaQ35qPL7Rw/c+tsNUT/R0n/ZvWm33x6pybbinc5i3RtugI9qXxR4EO2UcvGp23
-         ao2OCA6OLSCzqXXMZF6dVcuQDdKG4Ti35AXIQL0Ua0IEdZdjRe8pyXi4Ec+AMMd5sNUU
-         aAyg==
+        bh=umHwvOWM6BZb7+KUwwTZhP6Ecq2Z1H7xf7RPJu7Y4LI=;
+        b=WYmK2NgorglmETNVsa8lVKUBI8stYpjO0fymmtz1DRh+QxwOPCMOqHtdXM+EqwGRuf
+         QHENiru5BzdxOE1NquZlCP3t50X7DimA/z+MSjBPfKy5GIhNqaycVFu2c/2g1kviVUkx
+         /sS4q7dqa7worYWKYSUeGmZM3jVHXpd3PCD+aiLpAsjfn3mcZSDqmCvKbx2wDIQjkznr
+         R0fVnatG25Qkb7ns2K8Qdg44HgZoiCtwewnVl5ZhyjRfOmGLVvNpUqGmEt0dcRPTe4dK
+         6d/0ywSUY5ta6fdTzMzzak+v4Z/R0Jyx90j2TcJi8dm3wDLz9sDTZzwKAVHYo71uDyEG
+         SpaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717168668; x=1717773468;
+        d=1e100.net; s=20230601; t=1717170718; x=1717775518;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bqvRq7yENLDnnpdEq2cw3Le9KvoZpYlA6wAP6e79glQ=;
-        b=JNzOv2VYB1UxGb527ESj62hIMvW+JQrknGuWWv5aFeqMMXD+ncYuH627LATYCr9bCg
-         LwTQdkTPfGAuE/LQiZfIJ3kpkerW8JxHHU4o19jl2wTITbW4wfrF/MCMDSA9LcZDxtZ+
-         d9J6ORl1HOxPvzZFGhYEX2yczliEm2MDluHiRfPVWj7yxqnreLdwflRsvZdKmZMSu1Lq
-         JLzvS25OgGykf5tYA28yPvS5Wm8uDMf8M5aYipsI4zTQG9yZedYg9YL4NKDd38XoLjs5
-         ArKFwcMCSk3EBIaUQQGeO/iR498UCcWBHPBZNE14s2GlmRgZHWV5UHOOTwEeCxV+Whs2
-         sWDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUarQQuUSmhzqvPARWtVs7ql9O7R+0+A0lcSRlZ5eHOd64KHJ/NbC9nAHY9B1K950YXuV2ZhffQrc1kf3UbS8ol8na5XTjKTQ/QcDs=
-X-Gm-Message-State: AOJu0YwW2VyzBuSX7ir2gMPSxo/XSUhVymozCbRDdix5pBGB+C8EqSVy
-	Q0lPgBOS9CozNxi14El0nIdH5iYPA2krQFdiJxSt9YtWBSV5OcxnertXPqnSoL+TpkArnzBuoaR
-	OAsdaKHa0zKb1LzYgS6kIb28wPspLuCFJLbOibg==
-X-Google-Smtp-Source: AGHT+IGoBZVRTn8ZPER/V7J2reQJ1YQXw2ghQEo3AzlqRvr5HIsKCAfC+0w/WBOKqoJQt56aaKBXQrPQC8Zk6per3zM=
-X-Received: by 2002:a81:f90f:0:b0:620:33dc:8357 with SMTP id
- 00721157ae682-62c79708611mr20130947b3.18.1717168668126; Fri, 31 May 2024
- 08:17:48 -0700 (PDT)
+        bh=umHwvOWM6BZb7+KUwwTZhP6Ecq2Z1H7xf7RPJu7Y4LI=;
+        b=Rn4eqCi87hbr2SX9dqtsAbUjWEsn9hvXjujrUPWR63vB1xK4rn61fSWlmj3EId8ydO
+         V1cbCHnjRaba5guyaJrYsML1rUIqX6l0sz/wdpZnVw3m9A7s467KO2tSCH0ME5jY+ORy
+         BZ5r/M2ecAAMNZBDCuYmVtN2kfi0TNkJYShGC2CiUGLCUWE7+igSPl+GODK3mm9vkTh+
+         gUHxUJ/FmyKjDWL7GjEFbTo+d6CXwBtTo8lpZXJ1bS066sXNaZYTpBkWgii1mFlhxRb5
+         7Ij1ia2mg1HtTesPgExsMoiX9YB1hHiSetECrlurWjIXFZxahLcKr56gW4mrGZeTsdC7
+         NIjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUznEINex2rJGX4QFNrvKVpUvD2qSqqe1paR+ddidvlnf37MY9hWFrQZPLMmigOO1IZ+/sdX9dpanEYGs0R7wlouWr2NOLqMOmnT08=
+X-Gm-Message-State: AOJu0YwUTBA6By6m3BMGab5pftfF3qBg9joVgM19Ut+rSQm5NQ/3JBbI
+	zR2+FEzErnBNxaEtvOXDYKO5WgWzHiVv/jYZSCSRVqWSB7Ynf0rK8mKLPOuCgBymh2QvhMhohie
+	8fdMhm04UisQlgCn58ul/KF8FkAZETALZ6W9A
+X-Google-Smtp-Source: AGHT+IHXzsYZDXrOIeHpN/g+jpmnMKhUXad17ToUg8H48P+bzIE3W6LWRQGFybVp9CQlBFZl48Ombvk1I/V82/c84Do=
+X-Received: by 2002:a81:7754:0:b0:627:ddc5:eb5c with SMTP id
+ 00721157ae682-62c797e22a5mr22158347b3.34.1717170718539; Fri, 31 May 2024
+ 08:51:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6d33a50a-eea5-4a40-8976-fd6beff191ad@gmail.com> <5d188452-fe93-48b3-9eb7-e0fbcb5e3648@famille-lp.fr>
-In-Reply-To: <5d188452-fe93-48b3-9eb7-e0fbcb5e3648@famille-lp.fr>
-From: Josef Bacik <josef@toxicpanda.com>
-Date: Fri, 31 May 2024 11:17:37 -0400
-Message-ID: <CAEzrpqfg6V5Pc-CcMqgceRapUWfb-HjAkFU9TUSEAoBNXbToFA@mail.gmail.com>
-Subject: Re: [BUG REPORT][BLOCK/NBD] Error when accessing qcow2 image through NBD
-To: Michel LAFON-PUYO <michel@famille-lp.fr>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, nbd@other.debian.org, 
-	linux-kernel@vger.kernel.org
+References: <1716583609-21790-1-git-send-email-wufan@linux.microsoft.com>
+ <1716583609-21790-16-git-send-email-wufan@linux.microsoft.com>
+ <CAHC9VhRsnGjZATBj7-evK6Gdryr54raTTKMYO_vup8AGXLwjQg@mail.gmail.com>
+ <20240530030605.GA29189@sol.localdomain> <CAHC9VhRySQ0c16UZz5xKT-y5Tn39wXxe4-f7LNjFY+ROGGxpaQ@mail.gmail.com>
+ <20240531004321.GA1238@sol.localdomain>
+In-Reply-To: <20240531004321.GA1238@sol.localdomain>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 31 May 2024 11:51:47 -0400
+Message-ID: <CAHC9VhRRuBdnv3u2VjKZCR672p4oj_smA72P-181ysdDXGJ-AA@mail.gmail.com>
+Subject: Re: [PATCH v19 15/20] fsverity: expose verified fsverity built-in
+ signatures to LSMs
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com, 
+	jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk, 
+	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, eparis@redhat.com, 
+	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Deven Bowers <deven.desai@linux.microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 31, 2024 at 1:48=E2=80=AFAM Michel LAFON-PUYO <michel@famille-l=
-p.fr> wrote:
+On Thu, May 30, 2024 at 8:43=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+> On Thu, May 30, 2024 at 04:54:37PM -0400, Paul Moore wrote:
+> > On Wed, May 29, 2024 at 11:06=E2=80=AFPM Eric Biggers <ebiggers@kernel.=
+org> wrote:
+> > > On Wed, May 29, 2024 at 09:46:57PM -0400, Paul Moore wrote:
+> > > > On Fri, May 24, 2024 at 4:46=E2=80=AFPM Fan Wu <wufan@linux.microso=
+ft.com> wrote:
+> > > > >
+> > > > > This patch enhances fsverity's capabilities to support both integ=
+rity and
+> > > > > authenticity protection by introducing the exposure of built-in
+> > > > > signatures through a new LSM hook. This functionality allows LSMs=
+,
+> > > > > e.g. IPE, to enforce policies based on the authenticity and integ=
+rity of
+> > > > > files, specifically focusing on built-in fsverity signatures. It =
+enables
+> > > > > a policy enforcement layer within LSMs for fsverity, offering gra=
+nular
+> > > > > control over the usage of authenticity claims. For instance, a po=
+licy
+> > > > > could be established to permit the execution of all files with ve=
+rified
+> > > > > built-in fsverity signatures while restricting kernel module load=
+ing
+> > > > > from specified fsverity files via fsverity digests.
+> >
+> > ...
+> >
+> > > > Eric, can you give this patch in particular a look to make sure you
+> > > > are okay with everything?  I believe Fan has addressed all of your
+> > > > previous comments and it would be nice to have your Ack/Review tag =
+if
+> > > > you are okay with the current revision.
+> > >
+> > > Sorry, I've just gotten a bit tired of finding so many basic issues i=
+n this
+> > > patchset even after years of revisions.
+> > >
+> > > This patch in particular is finally looking better.  There are a coup=
+le issues
+> > > that I still see.  (BTW, you're welcome to review it too to help find=
+ these
+> > > things, given that you seem to have an interest in getting this lande=
+d...):
+> >
+> > I too have been reviewing this patchset across multiple years and have
+> > worked with Fan to fix locking issues, parsing issues, the initramfs
+> > approach, etc.
 >
-> Hi!
->
->
-> When switching from version 6.8.x to version 6.9.x, I've noticed errors w=
-hen mounting NBD device:
->
-> mount: /tmp/test: can't read superblock on /dev/nbd0.
->         dmesg(1) may have more information after failed mount system call=
-.
->
-> dmesg shows this kind of messages:
->
-> [    5.138056] mount: attempt to access beyond end of device
->                 nbd0: rw=3D4096, sector=3D2, nr_sectors =3D 2 limit=3D0
-> [    5.138062] EXT4-fs (nbd0): unable to read superblock
-> [    5.140097] nbd0: detected capacity change from 0 to 1024000
->
-> or
->
-> [  144.431247] blk_print_req_error: 61 callbacks suppressed
-> [  144.431250] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys=
-_seg 4 prio class 0
-> [  144.431254] buffer_io_error: 66 callbacks suppressed
-> [  144.431255] Buffer I/O error on dev nbd0, logical block 0, async page =
-read
-> [  144.431258] Buffer I/O error on dev nbd0, logical block 1, async page =
-read
-> [  144.431259] Buffer I/O error on dev nbd0, logical block 2, async page =
-read
-> [  144.431260] Buffer I/O error on dev nbd0, logical block 3, async page =
-read
-> [  144.431273] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.431275] Buffer I/O error on dev nbd0, logical block 0, async page =
-read
-> [  144.431278] I/O error, dev nbd0, sector 2 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.431279] Buffer I/O error on dev nbd0, logical block 1, async page =
-read
-> [  144.431282] I/O error, dev nbd0, sector 4 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.431283] Buffer I/O error on dev nbd0, logical block 2, async page =
-read
-> [  144.431286] I/O error, dev nbd0, sector 6 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.431287] Buffer I/O error on dev nbd0, logical block 3, async page =
-read
-> [  144.431289]  nbd0: unable to read partition table
-> [  144.435144] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.435154] Buffer I/O error on dev nbd0, logical block 0, async page =
-read
-> [  144.435161] I/O error, dev nbd0, sector 2 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.435166] Buffer I/O error on dev nbd0, logical block 1, async page =
-read
-> [  144.435170] I/O error, dev nbd0, sector 4 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.436007] I/O error, dev nbd0, sector 6 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.436023] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 0
-> [  144.436034]  nbd0: unable to read partition table
-> [  144.437036]  nbd0: unable to read partition table
-> [  144.438712]  nbd0: unable to read partition table
->
-> It can be reproduced on v6.10-rc1.
->
-> I've bisected the commits between v6.8 tag and v6.9 tag on vanilla master=
- branch and found out that commit 242a49e5c8784e93a99e4dc4277b28a8ba85eac5 =
-seems to introduce this regression. When reverting this commit, everything =
-seems fine.
->
-> There is only one change in this commit in drivers/block/nbd.c.
->
-> -static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
-> +static int __nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
->
-> +static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
-> +               loff_t blksize)
-> +{
-> +       int error;
-> +
-> +       blk_mq_freeze_queue(nbd->disk->queue);
-> +       error =3D __nbd_set_size(nbd, bytesize, blksize);
-> +       blk_mq_unfreeze_queue(nbd->disk->queue);
-> +
-> +       return error;
-> +}
-> +
->
-> To reproduce the issue, you need qemu-img and qemu-nbd. Executing the fol=
-lowing script (as root) triggers the issue. This is not systematic but runn=
-ing the script once or twice is generally sufficient to get an error.
->
-> qemu-img create -f qcow2 test.img 500M
-> qemu-nbd -c /dev/nbd0 test.img
-> mkfs.ext4 /dev/nbd0
-> qemu-nbd -d /dev/nbd0
-> mkdir /tmp/test
->
-> for i in {1..20} ; do
->      qemu-nbd -c /dev/nbd0 test.img
->      mount /dev/nbd0 /tmp/test
->      umount /dev/nbd0
->      qemu-nbd -d /dev/nbd0
->      sleep 0.5
-> done
->
-> Output of the script is similar to:
->
-> /dev/nbd0 disconnected
-> /dev/nbd0 disconnected
-> /dev/nbd0 disconnected
-> /dev/nbd0 disconnected
-> /dev/nbd0 disconnected
-> /dev/nbd0 disconnected
-> /dev/nbd0 disconnected
-> mount: /tmp/test: can't read superblock on /dev/nbd0.
->         dmesg(1) may have more information after failed mount system call=
-.
->
-> Can you please have a look at this issue?
-> I can help at testing patches.
->
+> Sure, but none of the patches actually have your Reviewed-by.
 
-This is just you racing with the connection being ready and the device
-being ready and you trying to mount it.  The timing has changed, if
-you look at this patch that I added for blk-tests you'll see the sort
-of thing that needs to be done
+As a general rule I don't post Acked-by/Reviewed-by tags for patches
+that are targeting a subsystem that I maintain.  The logic being that
+I'm going to be adding my Signed-off-by tag to the patches and arguing
+these in front of Linus, so adding a Acked-by/Reviewed-by simply
+creates more work later on where I have to strip them off and replace
+them with my sign-off.
 
-https://github.com/osandov/blktests/commit/698f1a024cb4d69b4b6cd5500b72efa7=
-58340d05
+If the lack of a Reviewed-by tag is *really* what is preventing you
+from reviewing the fs-verity patch, I can post that starting with the
+next revision, but I'm guessing the lack of my tag isn't your core
+issue (or at least I would argue it shouldn't be).
 
-A better option for you is to load the module with devices=3D0, and use
-the netlink thing so that the device doesn't show up until it's
-actually connected.  This problem exists because historically we used
-the device itself to get configured, instead of a control device that
-would then add the device once it is ready.  We can't change the old
-way, but going forward to avoid this style of problem you'll want to
-use nbds_max=3D0 and then use the netlink interface for configuration,
-that'll give you a much more "normal" experience.  Thanks,
+> > My interest in getting this landed is simply a
+> > combination of fulfilling my role as LSM maintainer as well as being
+> > Fan's coworker.  While I realize you don't work with Fan, you are
+> > listed as the fs-verity maintainer and as such I've been looking to
+> > you to help review and authorize the fs-verity related code.  If you
+> > are too busy, frustrated, or <fill in the blank> to continue reviewing
+> > this patchset it would be helpful if you could identify an authorized
+> > fs-verity reviewer.  I don't see any besides you and Ted listed in the
+> > MAINTAINERS file, but perhaps the fs-verity entry is dated.
+> >
+> > Regardless, I appreciate your time and feedback thus far and I'm sure
+> > Fan does as well.
+>
+> Maintainers are expected to do reviews and acks, but not to the extent of
+> extensive hand-holding of a half-baked submission.
 
-Josef
+Considering the current state of this patchset I don't believe that
+verdict to be fair, or very considerate.
+
+We clearly have different styles and approaches towards subsystem
+maintainer roles.  I've had the good fortune to work with both hostile
+and helpful senior developers during the early years of my time
+working in the Linux kernel, and it helped reinforce the impact
+patience and mentoring can have on contributors who are new to the
+Linux kernel or perhaps system programming in general.  While I'm far
+from perfect in this regard, I do hope and recommend that all of us in
+maintainer, or senior developer, roles remember to exercise some
+additional patience and education when working with new contributors.
+
+--=20
+paul-moore.com
