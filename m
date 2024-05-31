@@ -1,58 +1,61 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F6639AE3
-	for <linux-block@vger.kernel.org>; Fri, 31 May 2024 14:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A6417758;
+	Fri, 31 May 2024 14:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717166040; cv=none; b=TQOd+vAdwDyWFWQIeUEHcCtXHSTBPUVLkm6enkTrcCaEWltCvfNhUyYMPfZTAg4BBjGdVr7CxlP7MpctD7T1ht0UMjR4uNztCbFqTJN3Ko9hfIjbCwmb4q1AIyfpDidHNILqBE3Wa3wWAqgxoe3kWgcwYTUGUmiIkFdOmrBYzn4=
+	t=1717166128; cv=none; b=Jnh/pnEFyjmlzSJq9a2wvlVyCahe29l78PTt/ArSSpKqXPCJjeD2WJwDLZgqrN0YZNHBH8+mUmeTIQGpkkE3Et4QUqey9Yn+yNNEY9cPfhsoggWRqyeP1JNSz14fjRd4eXcOh5Tc8wRFOxEtHJyW2O45grVHNYozNXbGmrvBqAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717166040; c=relaxed/simple;
-	bh=ZPsHJkSW6lsWZLWxSGyefQfCpMtT9TACp631Rz7driU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=t1EPcdVuA2RceFEZ56W+LoQZykDaQvh/jivfmJ+LPNCzMHNJXjBPGJUZA0ceFumjd3pL5PbKO9PZx09oQcx+eu8gzC753d1h+X4mt+WPmGn9SMD0vveC+wfu6rysJZod498oTLwZHH+opulF9CoyB1YTOBOx2YxVtLb87V7Er2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uQsxvQ/m; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1717166128; c=relaxed/simple;
+	bh=ef/DJjtPmTqPj1loDMbxCMS7osswe0vD0N//nDnbMYg=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:References:
+	 In-Reply-To:Content-Type; b=o4qlS7PojvYTHitilYSrm0EYMzNfDtjV3dEWkexVumsKIycisXLyRXEvj5ILJPlA6mCYJbgzlJg0KP/Pw/4yZMEW9wpMguZriXW61bSvHYmgJlgzus8trxPT0PSGj4OKuJUbCgCWq04mn8EDdjdkTi7cVZTr4u4O8G540KBcCcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j6f3KftU; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uQsxvQ/m"
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6f90679d3bbso49846a34.0
-        for <linux-block@vger.kernel.org>; Fri, 31 May 2024 07:33:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6f3KftU"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2e96f298fbdso22217501fa.1;
+        Fri, 31 May 2024 07:35:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1717166035; x=1717770835; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UFOiVua3aBgyOhu4hLBGVqqHst3odYdNGRYkuP/usRw=;
-        b=uQsxvQ/mHw6hFo9j20WFmOKEnjYxwrgEbA15z36w7G4a2OkXTR/7w6RWUIFEDt9kx4
-         MlWklEPkT1pN4Pf+J1GmG7AFaN1yfqJ1wnZhKzBMjgz+KX9/Zlo5Tf6AfQtdEJKU+PIn
-         258IkGuVBr7KN8X8sVl98y9z/EuGS0i6pH+mVKP6tEgS015QbZmnqNtWq/4WoJ9CVAAG
-         B7EObFga7vRSTTZ0/+CGCZyqgI91FG9jKgLHWtmTkpHWWbTDemV7+/8//Zy5OrUu+K6N
-         XesZM+8x2s5XC0ETj1KEm9dE6ZAOsjk+j1lTgBuMEl58U/8QSJ0GA4G1EvyQPPQkE4LN
-         UZoQ==
+        d=gmail.com; s=20230601; t=1717166125; x=1717770925; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:subject:user-agent:mime-version:date:message-id:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n05EtFe3sdj15ew6SLWTU1Vrct7rRtquCuzOf+gCyVM=;
+        b=j6f3KftUlY79ijIB3P66WdOjvJ2QzIN6sxIP28zJ1BA2rA6fbSNgjhmBAWsQp8qt+K
+         CfTJSC7jktr5m0xjqWSO7fwXedWnUGF6yScbnHRDnNocmwq5Be2tU9ukBd4hzVUS9fYM
+         tqaIbeZIM70luHQwqAOg36nteokihe6PQzmcexN8PUjM5pMWSZPPszDSHUJSihNIgaq4
+         O9b8ASeZhtFHsBNfifgm9lftqMjYOGOvNq7bcE3PBKORh5Qt0aWFwLPekC7SdlL0VU7t
+         Tlw08W0vKW00oeL4oQgIMafv6P+95Ayd4P/bGJ41IdC9tVakzp/Zh52pyc1vO2ZOBzQu
+         C4eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717166035; x=1717770835;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UFOiVua3aBgyOhu4hLBGVqqHst3odYdNGRYkuP/usRw=;
-        b=HGy/t5ZZCSvbEgd/oq3fv8G7eyAcPjJTdY5vsNdZH6++EZVmLqAA3ZfMFFDvwA9zP6
-         3FcoPdQ3HKYtiyXe2dscvYbxM3lSmTrSpGypxERGakLfUWs0E68r1x9sT1iq8/2no4wY
-         a4IXfyEGC0zuOygbN34dKyyRgu75mVd+Zv/lXVEpAcrCU/mI+PZkGbuI6KBp5HH5VdJI
-         GPqsOqnZ20thOj4vxiQZZI0+9nPZyKlNpKF++/7StnP2Dgp8MrqQNaS6/91ODkChk0fw
-         yTTuT4PQKwq+eOhr6rB42TnUEmzbzNgECHO6etyg1NRJEKFrXKgMX+wDfQx/cckrFSOs
-         kDMA==
-X-Gm-Message-State: AOJu0YyxKzTxrx8zxI+jQLw6vULOA5bJnIe3iwT9pyYUU+M5QdELQPsC
-	QcER6O/cfGGqeOjEpLmw2ozM3fhTO9RxFE1Ajfu97qkvdl+4bbSjkaIYUHJtGADPnKi2Xdgx6G2
-	r
-X-Google-Smtp-Source: AGHT+IEoN5+ABUcXPwxgdm9W65sj3oDwlsdT3q5cU9xhD/BjkQCHcK6hpOCFfs5F67g2RZ6ws2qgdA==
-X-Received: by 2002:a9d:6056:0:b0:6f9:543:cc81 with SMTP id 46e09a7af769-6f911fb5679mr2159397a34.3.1717166035030;
-        Fri, 31 May 2024 07:33:55 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6f91059cc5asm345512a34.64.2024.05.31.07.33.54
+        d=1e100.net; s=20230601; t=1717166125; x=1717770925;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n05EtFe3sdj15ew6SLWTU1Vrct7rRtquCuzOf+gCyVM=;
+        b=CGr6CwJ4+ZVv4GCk1iGWmY3b5yTUexWAdnnIZinlDTyARAZzgLnu0S5uhh5g6kNHrH
+         5FTYbZ2wi7LGUsAbe6/J1P5nIjnuZw0k0zdXJpwl9l+VOL9Fbm6h2rtA3jQ51IuuVfNz
+         wV0tCJ2Rya7Ci04HTG6HuRnsBYuRFHFqVDQSv0fvM+Sh/v8kHpoC0W2DneyI9b5YhJjR
+         7KQ3eb+AZuflr6vt5CR5jfAbKXKtG/NYbhznfuZSggKqB/dhOE6pCztgKwUtpW12RzUR
+         FiCteFxljCLwwyOYXgb12Vj7ZOD4WMaU7uKyWgnPQvFwPWLZtkgVyW+dhH0nNIJucfz8
+         eNbg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9458J2T7b7/loiGib9KJ22kgKHDCC6AMKZBYBsYMvzWgixAuzLnj/DB77pmXnibVHq2y0Y8Ox2FKbQhyYg9vdsJWkfhhh6aIGhQxmnuJdqZdNbWAjiDHkTzQxFD/KTM3Ls35EhM1/VBV/YsGboIXcjFRnSLs9Wh20OndKtI9DYo0o1Q==
+X-Gm-Message-State: AOJu0YxybgFVyiS3whflyAo4fvs3fWqY2BHJghc9vs8Uhz31Dryo650G
+	z2dcQ7Y+tCgrIaUsZEuuDOGMUp5M4O38w2I9j/EA+xfDv/jzkbYA
+X-Google-Smtp-Source: AGHT+IGVcCUHaZnpv1MwLaF6IIx1BsHReM37tDQicYsLW0v+utsuiS5MmlTY3NO6OJjjjtHmAt8QVg==
+X-Received: by 2002:a05:651c:1402:b0:2ea:7def:46d0 with SMTP id 38308e7fff4ca-2ea950c896emr12043811fa.9.1717166124628;
+        Fri, 31 May 2024 07:35:24 -0700 (PDT)
+Received: from [10.16.155.254] ([212.227.34.98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd04da603sm1988134f8f.57.2024.05.31.07.35.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 May 2024 07:33:54 -0700 (PDT)
-Message-ID: <87063af8-c102-4e64-a00d-15d76786c893@kernel.dk>
-Date: Fri, 31 May 2024 08:33:53 -0600
+        Fri, 31 May 2024 07:35:24 -0700 (PDT)
+From: Zhu Yanjun <zyjzyj2000@gmail.com>
+X-Google-Original-From: Zhu Yanjun <yanjun.zhu@linux.dev>
+Message-ID: <6cd21274-50b3-44c5-af48-179cbd08b1ba@linux.dev>
+Date: Fri, 31 May 2024 16:35:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,138 +63,87 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: blktests failures with v6.10-rc1 kernel
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "nbd@other.debian.org" <nbd@other.debian.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+References: <wnucs5oboi4flje5yvtea7puvn6zzztcnlrfz3lpzlwgblrxgw@7wvqdzioejgl>
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.10-rc2
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <wnucs5oboi4flje5yvtea7puvn6zzztcnlrfz3lpzlwgblrxgw@7wvqdzioejgl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 31.05.24 03:54, Shinichiro Kawasaki wrote:
+> Hi all,
+> 
+> (I added linux-rdma list to the To list since blktests nvme and srp groups
+>   depend on rdma drivers.)
+> 
+> I ran the latest blktests (git hash: 698f1a024cb4) with the v6.10-rc1 kernel,
+> and observed a couple of failures as listed below.
+> 
+> There are two notable differences from the result with kernel v6.9-rc1 [1].
+> The first one is srp/002,011 hangs with the rdma rxe driver, which was discussed
 
-Block fixes for 6.10-rc2:
+IIRC, the problem with srp/002, 011 also occurs with siw driver, do you 
+make tests with siw driver to verify whether the problem with srp/002, 
+011 is also fixed or not?
 
-- NVMe fixes via Keith:
-	- Removing unused fields (Kanchan)
-	- Large folio offsets support (Kundan)
-	- Multipath NUMA node initialiazation fix (Nilay)
-	- Multipath IO stats accounting fixes (Keith)
-	- Circular lockdep fix (Keith)
-	- Target race condition fix (Sagi)
-	- Target memory leak fix (Sagi)
+Thanks,
+Zhu Yanjun
 
-- bcache fixes
-
-- null_blk fixes (Damien)
-
-- Fix regression in io.max due to throttle low removal (Waiman)
-
-- DM limit table fixes (Christoph)
-
-- SCSI and block limit fixes (Christoph)
-
-- zone fixes (Damien)
-
-- Misc fixes (Christoph, Hannes, hexue)
-
-Please pull!
-
-
-The following changes since commit 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0:
-
-  Linux 6.10-rc1 (2024-05-26 15:20:12 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.10-20240530
-
-for you to fetch changes up to 0a751df4566c86e5a24f2a03290dad3d0f215692:
-
-  blk-throttle: Fix incorrect display of io.max (2024-05-30 19:44:29 -0600)
-
-----------------------------------------------------------------
-block-6.10-20240530
-
-----------------------------------------------------------------
-Christoph Hellwig (6):
-      block: remove blk_queue_max_integrity_segments
-      dm: move setting zoned_enabled to dm_table_set_restrictions
-      dm: remove dm_check_zoned
-      dm: make dm_set_zones_restrictions work on the queue limits
-      sd: also set max_user_sectors when setting max_sectors
-      block: stack max_user_sectors
-
-Coly Li (2):
-      bcache: call force_wake_up_gc() if necessary in check_should_bypass()
-      bcache: code cleanup in __bch_bucket_alloc_set()
-
-Damien Le Moal (5):
-      null_blk: Fix return value of nullb_device_power_store()
-      null_blk: Print correct max open zones limit in null_init_zoned_dev()
-      null_blk: Do not allow runt zone with zone capacity smaller then zone size
-      block: Fix validation of zoned device with a runt zone
-      block: Fix zone write plugging handling of devices with a runt zone
-
-Dongsheng Yang (1):
-      bcache: allow allocator to invalidate bucket in gc
-
-Hannes Reinecke (1):
-      block: check for max_hw_sectors underflow
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.10-2024-05-29' of git://git.infradead.org/nvme into block-6.10
-
-Kanchan Joshi (1):
-      nvme: remove sgs and sws
-
-Keith Busch (3):
-      nvme: fix multipath batched completion accounting
-      nvme-multipath: fix io accounting on failover
-      nvme: use srcu for iterating namespace list
-
-Kundan Kumar (1):
-      nvme: adjust multiples of NVME_CTRL_PAGE_SIZE in offset
-
-Nilay Shroff (1):
-      nvme-multipath: find NUMA path only for online numa-node
-
-Sagi Grimberg (2):
-      nvmet: fix ns enable/disable possible hang
-      nvmet: fix a possible leak when destroy a ctrl during qp establishment
-
-Waiman Long (1):
-      blk-throttle: Fix incorrect display of io.max
-
-hexue (1):
-      block: delete redundant function declaration
-
- block/blk-settings.c           |  10 +++-
- block/blk-stat.h               |   1 -
- block/blk-throttle.c           |  24 ++++-----
- block/blk-throttle.h           |   8 +--
- block/blk-zoned.c              |  47 +++++++++++++----
- drivers/block/null_blk/main.c  |   1 +
- drivers/block/null_blk/zoned.c |  13 ++++-
- drivers/md/bcache/alloc.c      |  21 +++-----
- drivers/md/bcache/bcache.h     |   1 +
- drivers/md/bcache/btree.c      |   7 ++-
- drivers/md/bcache/request.c    |  16 +++++-
- drivers/md/dm-table.c          |  15 +++---
- drivers/md/dm-zone.c           |  72 ++++++++++++-------------
- drivers/md/dm.h                |   3 +-
- drivers/nvme/host/core.c       | 116 +++++++++++++++++++++++++----------------
- drivers/nvme/host/ioctl.c      |  15 +++---
- drivers/nvme/host/multipath.c  |  26 +++++----
- drivers/nvme/host/nvme.h       |   7 +--
- drivers/nvme/host/pci.c        |   3 +-
- drivers/nvme/target/configfs.c |   8 +++
- drivers/nvme/target/core.c     |   9 ++++
- drivers/scsi/sd.c              |   4 +-
- include/linux/blk-integrity.h  |  10 ----
- include/linux/blkdev.h         |   1 +
- 24 files changed, 262 insertions(+), 176 deletions(-)
-
--- 
-Jens Axboe
+> at LSF 2024. I no longer observe these hangs with v6.10-rc1 kernel. Great :) I
+> found Bob Pearson made a number of improvements in the driver. I guess these
+> changes avoided the hangs. Thank you very much!
+> 
+> The other difference is nbd/002 failure. CKI project still reports it for
+> v6.10-rc1 kernel [2]. Recently Josef provided blktests side fix [3] (Thanks!),
+> and it has not yet applied to the CKI test run set up. The fix was made for
+> nbd/001, but I expect that it will avoid the nbd/002 failure also.
+> 
+> [1] https://lore.kernel.org/linux-block/m6a437jvfwzq2jfytvvk62zpgu7e4bjvegr7x73pihhkp5me5c@sh6vs3s7w754/
+> [2] https://datawarehouse.cki-project.org/kcidb/tests/12631448
+> [3] https://lore.kernel.org/linux-block/9377610cbdc3568c172cd7c5d2e9d36da8dd2cf4.1716312272.git.josef@toxicpanda.com/
+> 
+> 
+> List of failures
+> ================
+> #1: nvme/041 (fc transport)
+> #2: nvme/050
+> 
+> Failure description
+> ===================
+> 
+> #1: nvme/041 (fc transport)
+> 
+>     With the trtype=fc configuration, nvme/041 fails:
+> 
+>    nvme/041 (Create authenticated connections)                  [failed]
+>        runtime  2.677s  ...  4.823s
+>        --- tests/nvme/041.out      2023-11-29 12:57:17.206898664 +0900
+>        +++ /home/shin/Blktests/blktests/results/nodev/nvme/041.out.bad     2024-03-19 14:50:56.399101323 +0900
+>        @@ -2,5 +2,5 @@
+>         Test unauthenticated connection (should fail)
+>         disconnected 0 controller(s)
+>         Test authenticated connection
+>        -disconnected 1 controller(s)
+>        +disconnected 0 controller(s)
+>         Test complete
+> 
+>     nvme/044 had same failure symptom until the kernel v6.9. A solution was
+>     suggested and discussed in Feb/2024 [4].
+> 
+>     [4] https://lore.kernel.org/linux-nvme/20240221132404.6311-1-dwagner@suse.de/
+> 
+> #2: nvme/050
+> 
+>     The test case fails occasionally with a QEMU NVME device. The failure cause
+>     is the lockdep WARN among ctrl->namespaces_rwsem, dev->shutdown_lock and
+>     workqueue work completion. After LSF 2024 discussion, Sagi and Keith worked
+>     on the solution and Keith provided the fix [5]. Thank you!
+> 
+>     [5] https://lore.kernel.org/linux-nvme/20240524155345.243814-1-kbusch@meta.com/
 
