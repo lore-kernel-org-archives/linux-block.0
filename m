@@ -1,57 +1,55 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA0C1514F1
-	for <linux-block@vger.kernel.org>; Sat,  1 Jun 2024 13:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86673152168
+	for <linux-block@vger.kernel.org>; Sat,  1 Jun 2024 13:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717249236; cv=none; b=pV+z1o/lfZSZIYEZola5zMYfdKLrta8Eg7doRmiiZ4g9CT8xBSEJZqHF9cDZS79hB7Gv1IfbqRL0Kt8Wzq2cvWVn4JpRTZOuvYszXwRA9mhAOBj8AXQHitqJvQCqKseYuNd99U0lJHypnPMNCeyjXvgup1n9e/OVzVBmhzQbkpg=
+	t=1717249237; cv=none; b=IgtKsYlgElV2nks2UHpVJt7VuvurecLQgzzXur5Tf4/JnnKZs3bF3fXLlquTaI3cCqRaEmrzK2QAobcl4ch7w5dfx7JvfgjxCUNiE5Hw1ApvHbdPLe9JXrYnKfxh6li+qyhB1qajFICHl+yIYHF5QROd5/IfdIAull77bUxZARw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717249236; c=relaxed/simple;
-	bh=juRogTLPO2qs3UM+cO6uXQ3Ufimi9V6rXzS1gdbXpLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TBfHwJxVXIPr34tcrMyjgbRYhIEu6WwStRjottljPK7OCaFNPRf+G23W+GUCuIdzWyj1llqNASNatSRlm81T9G/u6himcJRdv2zMgRLZd+l18eU67NDQ1SM+9IhSed52o+dOO+pcrQ+FWyePNxGjLjRUKd/LqNKUpkfmopOOOug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=3L2gyQWx; arc=none smtp.client-ip=209.85.167.48
+	s=arc-20240116; t=1717249237; c=relaxed/simple;
+	bh=aQ38ZhHYsrlwdR3vgqyHxmlopGuks4yflq18E5jTA4E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UuWJhabBb8DiRXht9oi+SaUDczKVFsugoWgwX2lCXUYFUhnDOdV9umr2EZtTFZxmmi+JzRMvmv6amMAaBgP0yXt5cq7zI++XJSBK+x5zMQLxsmibY61XjcytfVIRcNkAgGRUcDYg6VK6ZZghKUe9BJBpMl9PVLniXRsi2v8kFsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=1tz+sqM+; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="3L2gyQWx"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52b8254338dso3140786e87.2
-        for <linux-block@vger.kernel.org>; Sat, 01 Jun 2024 06:40:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="1tz+sqM+"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a68a288b8a4so42364066b.2
+        for <linux-block@vger.kernel.org>; Sat, 01 Jun 2024 06:40:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1717249232; x=1717854032; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qDSrS2M7i0BNRPCtONpXbPIlnKGYcwSP27wPNDFPtFI=;
-        b=3L2gyQWx9mzBmilZCnN72PvodhO6oit7sB2Q0mS0pUqAFrNyXgZeg7FEUvgwdwSinZ
-         L+81TX1cfUZQ8tPntHnqRH2VOeH2SoLW+ChUmlCkh+iUb+ti7nIW3yK2+I1u7PhlZuaa
-         rk7wZLbS1yJzKaEXIAG5ME/fzGep4tUd7JQIBO2RqQvJrztKm5h8AjXRz9u5p4aBksrv
-         vuuExU7IdnDM0guesf0WjmlxW2KHqwu45xXlEwbJwTy+LAXn7weNe06qxMM8lAT+9sZ3
-         2etzY/AWw37Zv1bhcTnnfeFhuiKhyGtuXRLk2MGFqOF16NTYpM5PyBmJvzTyJZC1yscu
-         MudA==
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1717249234; x=1717854034; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KyzuF3brQQkovopkloODG73sB5o5CxxgafSs5PeVkB4=;
+        b=1tz+sqM+WGfQjUidz0FZkYuN7/Su8sMNGeEaEay9fkm5i7bVXjMyCBREh3x6sDAXZU
+         HBjycbEPF45v8fcCgdRDwDY3/Sh+6tyiLuTqXwyDt7W1ZeaW7yd1Sam6c5KL8+nD0keR
+         2+irnhxXySMeRmEyFx28cYRxKuNZ+IF/kUlfqCsCos34fIQwE32jQ+Ui2RYaiuFd9esW
+         pcybF17AJ+qXlaGvTa1eNU8jl1tuRTDY+UdWDrFMIRmwIKTxZh2FhTtOOiW0X1yQUONk
+         v5PvsBeMjxcGr08EFcUX93XyrKAgYy3ZR/RmRD+JBxV5AUFAoGq7r5sHPFtI/ChmhVzL
+         Qmww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717249232; x=1717854032;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qDSrS2M7i0BNRPCtONpXbPIlnKGYcwSP27wPNDFPtFI=;
-        b=kGMhKZNJ13kY7/dxiDEVAhEskQlhfS73z/yciGJ09dgCBIpOdMggjMbxYnrM6EhIl3
-         J5ozJCQV6lThay1ohMMM6zDioWp3PpyJv9/0rZU/FqXT4R+qsJic/FvAsAuhH68CJRfs
-         dXnBIXY5LMuI3/NbM+rXbSfJm0lWVeI3iarpUEYTk6xnoWTCYTIr1TsKUYr3SJulif4I
-         4gtIzRNKUlqxKoLO5JT8SCOo/lSTtdHWxN++BXOuQG6mQ4+43PCYJfQ93KEJ/HoMq09J
-         2aUJyPUJRRZkXKHql7NPqQOsiF4rBv8gmCl4f5jGQzGrea6DigboV7jy9fReLgTCGB0D
-         haXA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7H3yxIISJIKUUOff3C5SQv4Evmu48SDfUoYaeJ0C7geZaiIBWD3GAg6yS425REwUZR2I4OEsJtmIx3UBH5YAhV/Oxd3SndV2Zr/A=
-X-Gm-Message-State: AOJu0Ywj06P/opjcTGyonrU2V+9g1yhDn4L6dYbe7z0jKlvrei1SEBC5
-	qHrdroL1jJLFlFHPRqYEmZdsYV6BA1VnO9F69OB2KrdUJmcYTLLKHa+byNojrfQ=
-X-Google-Smtp-Source: AGHT+IGrq3PBkLFNZCEIOfb99HJhQdA8UmV7flzStmSdZ6PDy4PhuONljOCGU66Onvq9WUuNAfmmow==
-X-Received: by 2002:a05:6512:b9d:b0:52b:8255:71d4 with SMTP id 2adb3069b0e04-52b8956093emr4368044e87.3.1717249232498;
-        Sat, 01 Jun 2024 06:40:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717249234; x=1717854034;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KyzuF3brQQkovopkloODG73sB5o5CxxgafSs5PeVkB4=;
+        b=AgaIwyviRptYiLCCOXbgqOJJnj4ZrgfYMfDPo70movii44N2xP4ee66+u60YA6AMBm
+         5PLUlpbP31KF9JfANGseBbdCw6TWotdaXxv8KzeCGvVtOj+yOYKu1TgDzusG5qdkJOtO
+         ecV1lQl7yJXryTS0qcPuzBzJl7NXkeasfzo/ytQ7IMoIL1ZPgdp2gekjrsZmessFCxbK
+         U3wi1VBYu1xKTwofkkVvo3+JeJ6ez1wObqKWNZDKXUrnPunIuxn2MmkxA2Rdy3Jk6u1/
+         WAxscydABdqjbhkPu7xbeLRPtBVZRBq3ibX4UyMxGXwwv1dInCE4ayCq7+ZNALqP2riL
+         BRFw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/lHGiwqSw6wSL4FDHQnUt6Jj7Q4RWK3yhWBHSM/LBYGDbtrmHGzVHDSc9ule5PQIZJj+5es6gXRXhzY3VGzVBI5MOeyfmWxonmkg=
+X-Gm-Message-State: AOJu0YxDNUxXBrQ+vQmqKm75DsuOWaAjZPf7XJ+fJDlOGS8PoywkL9PW
+	Kz4H/mX4FgBmM0FHfLLl6dZUPwI5lAGSAoljruFEt/jf0nCTEC6riYOIC3A50Bg=
+X-Google-Smtp-Source: AGHT+IHm6iJQ5zWo9gmL/sApCYvn87FeI3FVoS60Bcoobcm9QG6YgSoaJbUyMU8f1sqs0HvKYas+uA==
+X-Received: by 2002:a50:d7da:0:b0:57a:22b1:b02c with SMTP id 4fb4d7f45d1cf-57a363ffeffmr3839471a12.27.1717249233833;
+        Sat, 01 Jun 2024 06:40:33 -0700 (PDT)
 Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a68a8ece075sm92371866b.143.2024.06.01.06.40.32
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a31c9d5d5sm2234736a12.95.2024.06.01.06.40.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Jun 2024 06:40:32 -0700 (PDT)
+        Sat, 01 Jun 2024 06:40:33 -0700 (PDT)
 From: Andreas Hindborg <nmi@metaspace.dk>
 To: Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
@@ -88,12 +86,10 @@ Cc: Andreas Hindborg <a.hindborg@samsung.com>,
 	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
 	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
 	"gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: [PATCH v4 3/3] MAINTAINERS: add entry for Rust block device driver API
-Date: Sat,  1 Jun 2024 15:40:05 +0200
-Message-ID: <20240601134005.621714-4-nmi@metaspace.dk>
+Subject: [PATCH v4 0/3] Rust block device driver API and null block driver
+Date: Sat,  1 Jun 2024 15:40:02 +0200
+Message-ID: <20240601134005.621714-1-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240601134005.621714-1-nmi@metaspace.dk>
-References: <20240601134005.621714-1-nmi@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -104,38 +100,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Add an entry for the Rust block device driver abstractions.
+Hi!
 
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+A few more fixes based on input from Benno. Earlier version here [1].
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d6c90161c7bf..698515b0b0b3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3782,6 +3782,20 @@ F:	include/linux/blk*
- F:	kernel/trace/blktrace.c
- F:	lib/sbitmap.c
- 
-+BLOCK LAYER DEVICE DRIVER API [RUST]
-+M:	Andreas Hindborg <a.hindborg@samsung.com>
-+R:	Boqun Feng <boqun.feng@gmail.com>
-+L:	linux-block@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Supported
-+W:	https://rust-for-linux.com
-+B:	https://github.com/Rust-for-Linux/linux/issues
-+C:	https://rust-for-linux.zulipchat.com/#narrow/stream/Block
-+T:	git https://github.com/Rust-for-Linux/linux.git rust-block-next
-+F:	drivers/block/rnull.rs
-+F:	rust/kernel/block.rs
-+F:	rust/kernel/block/
-+
- BLOCK2MTD DRIVER
- M:	Joern Engel <joern@lazybastard.org>
- L:	linux-mtd@lists.infradead.org
+Changes from v3:
+
+ - mq: rewrite `atomic_relaxed_op_unless` in terms of `atomicu64::fetch_update`
+ - mq: fix docs for `atomic_relaxed_op_unless`
+ - mq: rewrite initialization of `TagSet` to be more idiomatic
+ - rnull: add a comment for error path
+ - rnull: move a ? operator
+
+
+Best regards,
+Andreas Hindborg
+
+
+Link: https://lore.kernel.org/all/20240601081806.531954-1-nmi@metaspace.dk/
+
+
+Andreas Hindborg (3):
+  rust: block: introduce `kernel::block::mq` module
+  rust: block: add rnull, Rust null_blk implementation
+  MAINTAINERS: add entry for Rust block device driver API
+
+ MAINTAINERS                        |  14 ++
+ drivers/block/Kconfig              |   9 ++
+ drivers/block/Makefile             |   3 +
+ drivers/block/rnull.rs             |  81 ++++++++++
+ rust/bindings/bindings_helper.h    |   2 +
+ rust/helpers.c                     |  16 ++
+ rust/kernel/block.rs               |   5 +
+ rust/kernel/block/mq.rs            |  97 ++++++++++++
+ rust/kernel/block/mq/gen_disk.rs   | 222 ++++++++++++++++++++++++++
+ rust/kernel/block/mq/operations.rs | 233 ++++++++++++++++++++++++++++
+ rust/kernel/block/mq/raw_writer.rs |  55 +++++++
+ rust/kernel/block/mq/request.rs    | 241 +++++++++++++++++++++++++++++
+ rust/kernel/block/mq/tag_set.rs    |  85 ++++++++++
+ rust/kernel/error.rs               |   6 +
+ rust/kernel/lib.rs                 |   2 +
+ 15 files changed, 1071 insertions(+)
+ create mode 100644 drivers/block/rnull.rs
+ create mode 100644 rust/kernel/block.rs
+ create mode 100644 rust/kernel/block/mq.rs
+ create mode 100644 rust/kernel/block/mq/gen_disk.rs
+ create mode 100644 rust/kernel/block/mq/operations.rs
+ create mode 100644 rust/kernel/block/mq/raw_writer.rs
+ create mode 100644 rust/kernel/block/mq/request.rs
+ create mode 100644 rust/kernel/block/mq/tag_set.rs
+
+
+base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
 -- 
 2.45.1
 
