@@ -1,79 +1,53 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86673152168
-	for <linux-block@vger.kernel.org>; Sat,  1 Jun 2024 13:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7589B10949;
+	Sat,  1 Jun 2024 14:24:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717249237; cv=none; b=IgtKsYlgElV2nks2UHpVJt7VuvurecLQgzzXur5Tf4/JnnKZs3bF3fXLlquTaI3cCqRaEmrzK2QAobcl4ch7w5dfx7JvfgjxCUNiE5Hw1ApvHbdPLe9JXrYnKfxh6li+qyhB1qajFICHl+yIYHF5QROd5/IfdIAull77bUxZARw=
+	t=1717251873; cv=none; b=KXv0EccHTffBTkOoSizopTpIR5o8TGocatKto2ANfDpEgGe4jZX97TxpiCLbTBRzXRDjO4aiheQ1PynSgf3sundvcYvKWfgbvg2UqAWWndEvIri7hG66WUfBv+U3W1M5/sKh2veE70n3UAjpRp4k/ZQyvq2QLhyFbq3a2Q/WFsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717249237; c=relaxed/simple;
-	bh=aQ38ZhHYsrlwdR3vgqyHxmlopGuks4yflq18E5jTA4E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UuWJhabBb8DiRXht9oi+SaUDczKVFsugoWgwX2lCXUYFUhnDOdV9umr2EZtTFZxmmi+JzRMvmv6amMAaBgP0yXt5cq7zI++XJSBK+x5zMQLxsmibY61XjcytfVIRcNkAgGRUcDYg6VK6ZZghKUe9BJBpMl9PVLniXRsi2v8kFsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=1tz+sqM+; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1717251873; c=relaxed/simple;
+	bh=3hpQGG0DXNOz5SDZzCSta1IGiF02qt2SWM+gfOhfF/w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T1S/EZKTMJ0hNEzr2/IBrxrh9cSgFIX44SetWT75hinXYyLjPC1LWT1TofLOaIGtTNVF/zkH8nVHzzSXe+VT0E7Uzmm41o4xGXUswcMnrFBbaKAAkZauuWJGsGnfo8lUg3tXTvaPYlUc3w2ePSPp7dxTAma4PpVJgbS3NObjS8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJyxFB3o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="1tz+sqM+"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a68a288b8a4so42364066b.2
-        for <linux-block@vger.kernel.org>; Sat, 01 Jun 2024 06:40:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1717249234; x=1717854034; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KyzuF3brQQkovopkloODG73sB5o5CxxgafSs5PeVkB4=;
-        b=1tz+sqM+WGfQjUidz0FZkYuN7/Su8sMNGeEaEay9fkm5i7bVXjMyCBREh3x6sDAXZU
-         HBjycbEPF45v8fcCgdRDwDY3/Sh+6tyiLuTqXwyDt7W1ZeaW7yd1Sam6c5KL8+nD0keR
-         2+irnhxXySMeRmEyFx28cYRxKuNZ+IF/kUlfqCsCos34fIQwE32jQ+Ui2RYaiuFd9esW
-         pcybF17AJ+qXlaGvTa1eNU8jl1tuRTDY+UdWDrFMIRmwIKTxZh2FhTtOOiW0X1yQUONk
-         v5PvsBeMjxcGr08EFcUX93XyrKAgYy3ZR/RmRD+JBxV5AUFAoGq7r5sHPFtI/ChmhVzL
-         Qmww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717249234; x=1717854034;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KyzuF3brQQkovopkloODG73sB5o5CxxgafSs5PeVkB4=;
-        b=AgaIwyviRptYiLCCOXbgqOJJnj4ZrgfYMfDPo70movii44N2xP4ee66+u60YA6AMBm
-         5PLUlpbP31KF9JfANGseBbdCw6TWotdaXxv8KzeCGvVtOj+yOYKu1TgDzusG5qdkJOtO
-         ecV1lQl7yJXryTS0qcPuzBzJl7NXkeasfzo/ytQ7IMoIL1ZPgdp2gekjrsZmessFCxbK
-         U3wi1VBYu1xKTwofkkVvo3+JeJ6ez1wObqKWNZDKXUrnPunIuxn2MmkxA2Rdy3Jk6u1/
-         WAxscydABdqjbhkPu7xbeLRPtBVZRBq3ibX4UyMxGXwwv1dInCE4ayCq7+ZNALqP2riL
-         BRFw==
-X-Forwarded-Encrypted: i=1; AJvYcCW/lHGiwqSw6wSL4FDHQnUt6Jj7Q4RWK3yhWBHSM/LBYGDbtrmHGzVHDSc9ule5PQIZJj+5es6gXRXhzY3VGzVBI5MOeyfmWxonmkg=
-X-Gm-Message-State: AOJu0YxDNUxXBrQ+vQmqKm75DsuOWaAjZPf7XJ+fJDlOGS8PoywkL9PW
-	Kz4H/mX4FgBmM0FHfLLl6dZUPwI5lAGSAoljruFEt/jf0nCTEC6riYOIC3A50Bg=
-X-Google-Smtp-Source: AGHT+IHm6iJQ5zWo9gmL/sApCYvn87FeI3FVoS60Bcoobcm9QG6YgSoaJbUyMU8f1sqs0HvKYas+uA==
-X-Received: by 2002:a50:d7da:0:b0:57a:22b1:b02c with SMTP id 4fb4d7f45d1cf-57a363ffeffmr3839471a12.27.1717249233833;
-        Sat, 01 Jun 2024 06:40:33 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a31c9d5d5sm2234736a12.95.2024.06.01.06.40.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Jun 2024 06:40:33 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJyxFB3o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF01EC116B1;
+	Sat,  1 Jun 2024 14:24:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717251873;
+	bh=3hpQGG0DXNOz5SDZzCSta1IGiF02qt2SWM+gfOhfF/w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AJyxFB3otjuYJSZT9fWb84TQMFrA2DG/52s5pD4j4oi/54cIya+Zufr0luSztLMbF
+	 ElRL0+vsQ0oDJIbOJ7NoBLGhYiZjquTcvcig2Cr7YnpR25alKPPYPLqdnlmA7Aivyz
+	 GAgwl9B0FSwxiA2lZLlgUuZqjyTJVmCsmIa5ynLP9SGKhjUQzi6OcwSmonDP3IQoeF
+	 klkp8ZxDNqMv+ZDZDGG3DgEsUptU1RBcKProhdwf9b36Es+TvYlMkGSmqI8dCmAzeC
+	 5zj8CdYaJZVk+DxxVuxZ9GvZFT/1tZ2LNZnZtqkddgafQ55TuE+mzYqwl1gImTqq78
+	 bPZNWoyiX+2mg==
+Date: Sat, 1 Jun 2024 08:24:29 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Andreas Hindborg <nmi@metaspace.dk>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>,
+	Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
 	Greg KH <gregkh@linuxfoundation.org>,
 	Matthew Wilcox <willy@infradead.org>,
 	Miguel Ojeda <ojeda@kernel.org>,
 	Alex Gaynor <alex.gaynor@gmail.com>,
 	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
 	Benno Lossin <benno.lossin@proton.me>,
 	Alice Ryhl <aliceryhl@google.com>,
 	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
 	Luis Chamberlain <mcgrof@kernel.org>,
 	Yexuan Yang <1182282462@bupt.edu.cn>,
-	=?UTF-8?q?Sergio=20Gonz=C3=A1lez=20Collado?= <sergio.collado@gmail.com>,
+	Sergio =?iso-8859-1?Q?Gonz=E1lez?= Collado <sergio.collado@gmail.com>,
 	Joel Granados <j.granados@samsung.com>,
 	"Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
 	Daniel Gomez <da.gomez@samsung.com>,
@@ -81,77 +55,37 @@ Cc: Andreas Hindborg <a.hindborg@samsung.com>,
 	Philipp Stanner <pstanner@redhat.com>,
 	Conor Dooley <conor@kernel.org>,
 	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>,
+	Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
 	open list <linux-kernel@vger.kernel.org>,
 	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
 	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
 	"gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: [PATCH v4 0/3] Rust block device driver API and null block driver
-Date: Sat,  1 Jun 2024 15:40:02 +0200
-Message-ID: <20240601134005.621714-1-nmi@metaspace.dk>
-X-Mailer: git-send-email 2.45.1
+Subject: Re: [PATCH v4 2/3] rust: block: add rnull, Rust null_blk
+ implementation
+Message-ID: <ZlsvHV6y4DEdC8ja@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240601134005.621714-1-nmi@metaspace.dk>
+ <20240601134005.621714-3-nmi@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240601134005.621714-3-nmi@metaspace.dk>
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
+On Sat, Jun 01, 2024 at 03:40:04PM +0200, Andreas Hindborg wrote:
+> +impl kernel::Module for NullBlkModule {
+> +    fn init(_module: &'static ThisModule) -> Result<Self> {
+> +        pr_info!("Rust null_blk loaded\n");
+> +        let tagset = Arc::pin_init(TagSet::try_new(1, 256, 1), flags::GFP_KERNEL)?;
+> +
+> +        let disk = {
+> +            let block_size: u16 = 4096;
+> +            if block_size % 512 != 0 || !(512..=4096).contains(&block_size) {
+> +                return Err(kernel::error::code::EINVAL);
+> +            }
 
-Hi!
-
-A few more fixes based on input from Benno. Earlier version here [1].
-
-Changes from v3:
-
- - mq: rewrite `atomic_relaxed_op_unless` in terms of `atomicu64::fetch_update`
- - mq: fix docs for `atomic_relaxed_op_unless`
- - mq: rewrite initialization of `TagSet` to be more idiomatic
- - rnull: add a comment for error path
- - rnull: move a ? operator
-
-
-Best regards,
-Andreas Hindborg
-
-
-Link: https://lore.kernel.org/all/20240601081806.531954-1-nmi@metaspace.dk/
-
-
-Andreas Hindborg (3):
-  rust: block: introduce `kernel::block::mq` module
-  rust: block: add rnull, Rust null_blk implementation
-  MAINTAINERS: add entry for Rust block device driver API
-
- MAINTAINERS                        |  14 ++
- drivers/block/Kconfig              |   9 ++
- drivers/block/Makefile             |   3 +
- drivers/block/rnull.rs             |  81 ++++++++++
- rust/bindings/bindings_helper.h    |   2 +
- rust/helpers.c                     |  16 ++
- rust/kernel/block.rs               |   5 +
- rust/kernel/block/mq.rs            |  97 ++++++++++++
- rust/kernel/block/mq/gen_disk.rs   | 222 ++++++++++++++++++++++++++
- rust/kernel/block/mq/operations.rs | 233 ++++++++++++++++++++++++++++
- rust/kernel/block/mq/raw_writer.rs |  55 +++++++
- rust/kernel/block/mq/request.rs    | 241 +++++++++++++++++++++++++++++
- rust/kernel/block/mq/tag_set.rs    |  85 ++++++++++
- rust/kernel/error.rs               |   6 +
- rust/kernel/lib.rs                 |   2 +
- 15 files changed, 1071 insertions(+)
- create mode 100644 drivers/block/rnull.rs
- create mode 100644 rust/kernel/block.rs
- create mode 100644 rust/kernel/block/mq.rs
- create mode 100644 rust/kernel/block/mq/gen_disk.rs
- create mode 100644 rust/kernel/block/mq/operations.rs
- create mode 100644 rust/kernel/block/mq/raw_writer.rs
- create mode 100644 rust/kernel/block/mq/request.rs
- create mode 100644 rust/kernel/block/mq/tag_set.rs
-
-
-base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
--- 
-2.45.1
-
+You've set block_size to the literal 4096, then validate its value
+immediately after? Am I missing some way this could ever be invalid?
