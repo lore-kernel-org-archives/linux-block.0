@@ -1,92 +1,156 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CD4208A1;
-	Sun,  2 Jun 2024 07:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF97D2C694
+	for <linux-block@vger.kernel.org>; Sun,  2 Jun 2024 09:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717314499; cv=none; b=AnK3njdj2p0Jnr2oze3t0gL1tPYISbKCxGc8ToBW+nGPHgx1mINYUoyhfd9JRZQz2UX8Pn6+XxzWOtU6NxykyMMz1WQ4B9S0qjVF1gkew4opLfxBI23EzEpiioHSQGUewads5SXUyB6vazzUcavnjgS5yP9oCBXOaAoB41f1Flw=
+	t=1717320487; cv=none; b=jJ5rwBiwDl50ZusSILADFDrq5SjT9MFFAXbZLZ6wduSknuBWbz8h+v4q8fk3D0SsqxK1OtqBnWIogd+R8aEoBwiX63Fyq3/d9R/qOiICszY6lqFsIPIFD9V5rRluF2AzWBjbizpN1zfXzBwrLs7cWKho9xkheAV5mUZcTKmU39k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717314499; c=relaxed/simple;
-	bh=0osbBSBLTMt8nX/8+KW0zNocP78w7qcjHw2JL9olbfQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Df/JkQ6P1CVerlRVHFoTAUJ8TWJC8uqxFZwsT8rCk4ZPZeK5Ne9ruk29tG2peoRkHeCRrYy6ntBIyXrCVVegMAx19Yxv/of/4JolDW8uqdde1QHqqjESOyEZcbYKbrc0JnRtMDkaSRsWNKP0jKT9ptaz2Nj7ibTYoXt2234HOms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-35e544aa9a9so19307f8f.2;
-        Sun, 02 Jun 2024 00:48:17 -0700 (PDT)
+	s=arc-20240116; t=1717320487; c=relaxed/simple;
+	bh=J6TIPS1GAf2SCnwgcDej5TyjCcgyhxhkgcJ3f/46rQM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EZ+5wcNSLje0p2BQvZmtHUoGouI6qOOKDm5lXUKPlw0smLw+xeubPUcBOzVRloSP9UeaAOw07qbp3Bt+VVJ1GGYwk4U1EEdWacdbDsQJO0x3V4BNLJD6lAOnzUfvZZwRJUYDAI4x8sfFBoszURS6iSo3HGc2DTCIYT9FTxgkIzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=mrPD/MEG; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="mrPD/MEG"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a689ad8d1f6so177023166b.2
+        for <linux-block@vger.kernel.org>; Sun, 02 Jun 2024 02:28:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1717320483; x=1717925283; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJwF3q+t+A1DpoaxsaOYNQPfvGAIw2IDRpun6/tsk/o=;
+        b=mrPD/MEGRoyx2A9ueQ+jZ6rSYNqo5bJctavsrZ3W8CN7Hd4EIMyNmhDvDBf0KEBmfu
+         IlGHXQHHYfLJy1INosOhOlifsqz8WOO3tOaB7KHpCZ/LaFXOsiAx9eroArEhdVpU9GPt
+         DDsRgzQR7DXG7rYJ5QmWzVwdCPHYdb/R0bEU4jaswHhPKELa3mJ2m1oZw7de0/GeO12h
+         8827Jn5TjM7NhnH/hfTzHufrAbWS+pMWdens59YHGwl+KAnG0xQ2cZLi9C/rVeNaJ0QT
+         e128x20f7pmPaEg827F5MSkJBXBuC4saUtIOffBz+k7JUWNNu5ZWDdfISdDv5uLQbIKM
+         kj/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717314496; x=1717919296;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Mi/VKBiZjMcaZsYVmfXcA5vUMibCH5GQOs6BRjI06o=;
-        b=tj+taI39WaKJoLi+4NzuLFlFrkkj1WGSluBv+5Xo+5bPSShP+w2kRDMmmJ2gS5bof+
-         0WhJgLZt05mCkYw54d+n7nGfC77SBvPUBqYUE4zPf2exeKMm9mTPBUfZabKP2m3DFE7j
-         mwScTMMN6nyFwvT1oHsaRH7biCilyz07gB/yzwKaof47RaY0SwRbtpbOYcux09BXD/gu
-         FpCUl6SOoJJJGxwhogeSj5RDDm+pY4aTqrG5Lx4cu9TDgSsGLF4iNPyUF04pjAg6uRUz
-         PD/HWNPfx3pLPwqhuUiVeJinFUg2R2WM7XopN7BCRfSfqXjZ5sNlCLAOGHSslDvposXe
-         9ITg==
-X-Forwarded-Encrypted: i=1; AJvYcCW70C9ThNH0FoFyl9U1VJ5oSSXz9IJpPgutcMJp/7ryP1EEm2m/gDMtf2AE59jvoXpampH3xqvKunLHb8GsXpPdKe+IUWv3Q28doWy830q8+2yDW7jauvBBS5WzPNlLMODhEGamt1g73MUjZYll2x1B6ILrg8K29nCbX6KFExIr
-X-Gm-Message-State: AOJu0YxSpKzWLEtUFujMIyZCDuZJvpXC3P12SfakCG2dhv/LqiLcnHeW
-	kIPgdky/4345W+6CE6K6Yl1iyJhmpMu1Z1CEEr3taMGBlSFqaveO
-X-Google-Smtp-Source: AGHT+IFsCjXnSMmjNSZUGoj/v4xQvOLvmmlAnC28L1qi45HucRzp7Mm8nzhveD4Y6FLy0KHDf5ir5A==
-X-Received: by 2002:adf:f547:0:b0:358:d0c:b9a0 with SMTP id ffacd0b85a97d-35e0f23ebc2mr4051664f8f.1.1717314495772;
-        Sun, 02 Jun 2024 00:48:15 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.205.146.dynamic.barak-online.net. [85.65.205.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd062edcdsm5532084f8f.70.2024.06.02.00.48.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Jun 2024 00:48:15 -0700 (PDT)
-Message-ID: <9f62247b-ae36-49d9-9ccc-6ea5a238e147@grimberg.me>
-Date: Sun, 2 Jun 2024 10:48:12 +0300
+        d=1e100.net; s=20230601; t=1717320483; x=1717925283;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJwF3q+t+A1DpoaxsaOYNQPfvGAIw2IDRpun6/tsk/o=;
+        b=rgGHZSpDflnOOf2N4HAIK9SQ357y34T/B8lSYd8iyU8DzaWwO7N4ngi5FRHGhSoRBv
+         A29tiECeR0W9istC95PSLIEsPA+/5pbH0LVTzLtm8sihbLyJpNOB8RWFsjZf3pu7lalM
+         PHVWR82nTOU88sMCtyZX2zmHQHZtFJpjxTc/gbITyIVo7fW27+2tkceiUBzIqrkAqlQg
+         c3xQx3iuUNuvMAaU4bcy8UOEPfOncAXGi+2c3gPb+CHi73DQ9sx0Jsgraj1KNmaFhvdY
+         Ee7GTLIDn97zzjj5RQZTgZ6k/I2aKbhMP4Lse/SPnC7Plp7E2O4QZY6zH3wOcpJ2cbl0
+         vBJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKwqbqmUsZ6H+0UbQmrop0ci6Hkp0AD9zRRYnpAPhyQGBVStoOlYzjUF9OGtUmimg7DT7Dq8LD2Jhd4OF5dMkyPl6ZMwSUeAEa5cc=
+X-Gm-Message-State: AOJu0YwazewHXoruJlqDJr5mslFOsZPtRlJ671KiVh8d/MnzrsfXugZB
+	5NBaSktOwFIku2n5DUcZwaULkFYBIS9d8Cyfw2/CDBCp7pVUqBSr7XoxABSqAu8=
+X-Google-Smtp-Source: AGHT+IGFlfYHryGwagfRHunmriFz3Ud/gnVhIdpwenAZTGPR/AZRD0JBNNJ2v6tqbUTBYOKFrCwy/Q==
+X-Received: by 2002:a17:907:9284:b0:a62:5ff6:c728 with SMTP id a640c23a62f3a-a6822157081mr494056866b.76.1717320482689;
+        Sun, 02 Jun 2024 02:28:02 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a68c162a69csm155894266b.187.2024.06.02.02.28.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Jun 2024 02:28:02 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Keith Busch <kbusch@kernel.org>,  Jens Axboe <axboe@kernel.dk>,
+  Christoph Hellwig <hch@lst.de>,  Damien Le Moal <dlemoal@kernel.org>,
+  Bart Van Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,
+  Ming Lei <ming.lei@redhat.com>,  "linux-block@vger.kernel.org"
+ <linux-block@vger.kernel.org>,  Andreas Hindborg <a.hindborg@samsung.com>,
+  Greg KH <gregkh@linuxfoundation.org>,  Miguel Ojeda <ojeda@kernel.org>,
+  Alex Gaynor <alex.gaynor@gmail.com>,  Wedson Almeida Filho
+ <wedsonaf@gmail.com>,  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo
+ <gary@garyguo.net>,  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>,  Benno
+ Lossin <benno.lossin@proton.me>,  Alice Ryhl <aliceryhl@google.com>,
+  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
+ <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
+ =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
+ Granados
+ <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
+ <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  Niklas
+ Cassel <Niklas.Cassel@wdc.com>,  Philipp Stanner <pstanner@redhat.com>,
+  Conor Dooley <conor@kernel.org>,  Johannes Thumshirn
+ <Johannes.Thumshirn@wdc.com>,  Matias =?utf-8?Q?Bj=C3=B8rling?=
+ <m@bjorling.me>,  open list
+ <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
+ <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
+ <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
+ <gost.dev@samsung.com>
+Subject: Re: [PATCH v4 2/3] rust: block: add rnull, Rust null_blk
+ implementation
+In-Reply-To: <ZlvrwbQ1WJZQ6_KR@casper.infradead.org> (Matthew Wilcox's message
+	of "Sun, 2 Jun 2024 04:49:21 +0100")
+References: <20240601134005.621714-1-nmi@metaspace.dk>
+	<20240601134005.621714-3-nmi@metaspace.dk>
+	<ZlsvHV6y4DEdC8ja@kbusch-mbp.dhcp.thefacebook.com>
+	<875xusoetn.fsf@metaspace.dk>
+	<ZltF5NvDnKFphcOo@kbusch-mbp.dhcp.thefacebook.com>
+	<ZlvrwbQ1WJZQ6_KR@casper.infradead.org>
+Date: Sun, 02 Jun 2024 11:27:55 +0200
+Message-ID: <87sexvn17o.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-To: Jakub Kicinski <kuba@kernel.org>, Ofir Gal <ofir.gal@volumez.com>
-Cc: davem@davemloft.net, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
- ceph-devel@vger.kernel.org, dhowells@redhat.com, edumazet@google.com,
- pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk, hch@lst.de,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240601153430.19416989@kernel.org>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240601153430.19416989@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Matthew Wilcox <willy@infradead.org> writes:
 
-
-On 02/06/2024 1:34, Jakub Kicinski wrote:
-> On Thu, 30 May 2024 17:24:10 +0300 Ofir Gal wrote:
->> skbuff: before sendpage_ok - i: 0. page: 0x654eccd7 (pfn: 120755)
->> skbuff: before sendpage_ok - i: 1. page: 0x1666a4da (pfn: 120756)
->> skbuff: before sendpage_ok - i: 2. page: 0x54f9f140 (pfn: 120757)
-> noob question, how do you get 3 contiguous pages, the third of which
-> is slab? is_slab doesn't mean what I think it does, or we got extremely
-> lucky with kmalloc?
+> On Sat, Jun 01, 2024 at 10:01:40AM -0600, Keith Busch wrote:
+>> It's fine, just wondering why it's there. But it also allows values like
+>> 1536 and 3584, which are not valid block sizes, so I think you want the
+>> check to be:
+>> 
+>> 	if !(512..=4096).contains(&block_size) || ((block_size & (block_size - 1)) != 0)
 >
+> I'd drop the range check.  We're pretty close to landing the bs>PS
+> patches, so just
+>
+> 	if block_size & block_size - 1 != 0
+>
+> should be enough of a validation.
 
-The contig range according to the trace is 256K, the third page was just the
-first time that it saw this !ok page.
+Is it safe to do so already? Otherwise we just remove it when it is
+safe, no biggie.
 
-I asked the same thing. nvme-tcp gets a bio and sets up its own iov_iter
-on the bio bvec for sending it over the wire. The test that reproduces this
-creates an raid1 md device which probably has at least some effect into how
-we got this buffer.
+> Is it considered "good style" in
+> Rust to omit the brackets here?
 
-With the recent multipage bvecs work from Ming, nvme-tcp bvec entries will
-often point to contiguous ranges that are > PAGE_SIZE. I didn't look 
-into the
-implementation of skb_splice_from_iter, but I think its not very 
-efficient to
-extract a contiguous range in PAGE_SIZE granular vector...
+Yes, the compiler will complain if you add parenthesis here.
+
+```rust
+fn main() {
+    if (true) {
+        return;
+    }
+}
+```
+
+Building this will give you:
+
+```text
+warning: unnecessary parentheses around `if` condition
+ --> src/main.rs:2:8
+  |
+2 |     if (true) {
+  |        ^    ^
+  |
+  = note: `#[warn(unused_parens)]` on by default
+help: remove these parentheses
+  |
+2 -     if (true) {
+2 +     if true {
+  |
+
+warning: `playground` (bin "playground") generated 1 warning (run `cargo fix --bin "playground"` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.64s
+     Running `target/debug/playground`
+```
+
+If you omit the `{}` block after the `if` it is a syntax error.
+
+Best regards,
+Andreas
