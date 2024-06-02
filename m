@@ -1,475 +1,501 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B7A4086A;
-	Sun,  2 Jun 2024 14:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717337633; cv=fail; b=X6+SkGOZSG/bt4bvMxycxuuiipYcvD2gMj2edSeSPcbGghqzDiiHs1cZpiDPOXEaLB1bAhBIo+g6EIGuAmv4Su5qGMWU/RGNG8XLFMQ5rrNHr0aK7nKrWxZo+70Anyc+TQVCwWhk+0l2sdtIfqF+8Ml3W1xMDZlYgsFPtdTEHIo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717337633; c=relaxed/simple;
-	bh=fpBs8Q05QP9h8997Tapg+W+QlIARQJ0aVgGpHmiprEA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dmOeUWMbjeAk466rgT4wY/mFITuU2o9KaydYvMXWFpded2OxrzZ/sYliPJ570mIAHxMyPA09+RzYbDScP3ivAhgyUfb6Suw7GVeG/mlIid73zfNLw5pON4Bpwvkh7QGq9PofQOBaDcwOtkCDqMQaBlaMjsS504EfYdIM505Ob2g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4525x9wN006406;
-	Sun, 2 Jun 2024 14:09:53 GMT
-DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Doracle.com;_h?=
- =?UTF-8?Q?=3Dcc:content-transfer-encoding:content-type:date:from:in-reply?=
- =?UTF-8?Q?-to:message-id:mime-version:references:subject:to;_s=3Dcorp-202?=
- =?UTF-8?Q?3-11-20;_bh=3DtZ9etgNWFzxoGl6vttrRSkXH0odkInGHkvSdo8PtLNI=3D;_b?=
- =?UTF-8?Q?=3DcyniTPf8e4YGRhZ0NLfV2gq2ON1qQxs1Bo7Zv/RL0MZhIvv8fCaeMDNLTZaK?=
- =?UTF-8?Q?bXdbSSd1_nPANsV3liPOdztnn592ErHFW/jOI6aBWVE+JnMTk5rXiwEHswyUUUC?=
- =?UTF-8?Q?MUak4R3BsjZiwX_SKcsm7f11qDBWGp8abaqFxYWQNrfiGrArT8TQc7mWoJtw25M?=
- =?UTF-8?Q?lpd7HPugEz0LUR9wM4ru_8bgM23K9aBuYouDHazAqFDt9NAqNUBg+2hcCyk7Qwl?=
- =?UTF-8?Q?z1y3QQ+u9LYFvMaOrZjCCBbriX_haJ3wsBKGnQTyNBJwcOt4yYYbBoyDJUCH5mg?=
- =?UTF-8?Q?rGb5LOlDqg3yvt6SGezK0MRxQGda0HUf_+A=3D=3D_?=
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yfv07sd0m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 02 Jun 2024 14:09:53 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 452CDYtZ037809;
-	Sun, 2 Jun 2024 14:09:52 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2101.outbound.protection.outlook.com [104.47.70.101])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3ygrja1h81-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 02 Jun 2024 14:09:52 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SE3CoqgECrCbzVXuPs6kWyzK9V29USCMAwCn1H5NZ37kHqIZC0tUWBiPx4WUpToBN+RewTQk2Sp1/QTRQF058f0nI3rg4okH4Bc8xCYsw+jbfnYZ415Wc99u6TRJN3plOb+nInMt0v4cnC6923zLehQ4b2y2z+6ybhVEBm1OAcauwGFjCRBTJIjQYzd8g2p9rzsw0LhmlQaHrwcKRZ5sg0ZNnIn5GZFRWYCKdo37bV+XRf5hMQbHl2PffeAntBmr83pRG9G4llsn+1llkh/n/AfR5Zik20gvwcGQ6R0zKV+Nl1LnOUyq8Q26omG5M3Wo2meVdE2E05EpQP05jSdgDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tZ9etgNWFzxoGl6vttrRSkXH0odkInGHkvSdo8PtLNI=;
- b=I/C+usNUiZVqiJutbiYi+ulODvSLdH8EypHS/PBW/dx28f4izxJtyDeRivjGEdTwAe+1qvZoBoYa06FwR2G1sun4tsXA8Ka+CNkzGbxaT4ZIUAIf23AI9Z1DvmWI90ewZ1C9AQrdxXVK0p1QM1gduKhyfh84EvPpnnRTRDYXmsit9tWfntuOEIowuS1xTIlNKrfRvZ0Azg3V8irHJjVPOLP7U3uGxjC5I05yx2jNsFwCFLqQNJ5HO+C9jm6jYZAxb1vdySgcz5TaYo8yY6lOrBRDQQRd6OosRgYhQlHOrnwhBZtX93XOR+XngKV1JsIN1EpPyshtb/b3g2xWA+jKMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tZ9etgNWFzxoGl6vttrRSkXH0odkInGHkvSdo8PtLNI=;
- b=yHKPrq4hiZ+ayfeLpD5ub+Aumd7HWaAIeoDokm/tjkPXCCU0/RUd1/Vk7CpYB4hzq3HNhsoU8gnAKkv7TEYVuCaN3Gl7QCLtyrU6WNRvW9+jsRI/qizYtEX7bxoduBj/r0NBP4N+CbcSPr5b2CBcTDwPNo2GCU56icnMdv043NM=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by DS0PR10MB8078.namprd10.prod.outlook.com (2603:10b6:8:1fd::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.25; Sun, 2 Jun
- 2024 14:09:50 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%5]) with mapi id 15.20.7633.018; Sun, 2 Jun 2024
- 14:09:50 +0000
-From: John Garry <john.g.garry@oracle.com>
-To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-        jack@suse.cz
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-        ojaswin@linux.ibm.com, linux-aio@kvack.org,
-        linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org,
-        nilay@linux.ibm.com, ritesh.list@gmail.com, willy@infradead.org,
-        John Garry <john.g.garry@oracle.com>
-Subject: [PATCH v7 7/9] scsi: sd: Atomic write support
-Date: Sun,  2 Jun 2024 14:09:10 +0000
-Message-Id: <20240602140912.970947-8-john.g.garry@oracle.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20240602140912.970947-1-john.g.garry@oracle.com>
-References: <20240602140912.970947-1-john.g.garry@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BL0PR01CA0003.prod.exchangelabs.com (2603:10b6:208:71::16)
- To DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+Received: from smtp.tiscali.it (santino-notr.mail.tiscali.it [213.205.33.215])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BAA3BBF5
+	for <linux-block@vger.kernel.org>; Sun,  2 Jun 2024 18:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.205.33.215
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717353458; cv=none; b=sOnxR8LoUHW+XrYSXp2MxV/XpPS3VDuf6g51nWVsh5x94307BdD7bfvQsjxJai6NM+4qEloNPQ+9/a865YTrEeNa8mBFj64q7xuV10L3y2NjuQCDU8Vz6KZv88IQxIeossT1Gb7KE9WhPNywmImoSs562tsEwPUwW1cAFB91cHc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717353458; c=relaxed/simple;
+	bh=8Vo17OmuU+v63OTwVzwDFPwIG+Ka1MDQUxVqHalM1Ek=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VjcH3DnjGNx6w2VwlvRIMQm+k6M/3TVt/hoDCBr7Akkryzc7SgaxUs6wCxy70K/P88o4g0MPkYDWTx6PIGD9ZNqMFT5Phok8mOVBFhDCCq1RKa2fTjWWusKYH2gXAefEZmkKoTve0cVjWaU53F8aOcLpJlG76GXa7Xbt8dPuSSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tiscali.it; spf=pass smtp.mailfrom=tiscali.it; dkim=pass (1024-bit key) header.d=tiscali.it header.i=@tiscali.it header.b=2N74Pw6g; arc=none smtp.client-ip=213.205.33.215
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tiscali.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tiscali.it
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=tiscali.it header.i=@tiscali.it header.b="2N74Pw6g"
+Received: from localhost.localdomain ([87.0.86.194])
+	by santino.mail.tiscali.it with 
+	id WicN2C00o4BaX8701icN1P; Sun, 02 Jun 2024 18:36:23 +0000
+X-Spam-Final-Verdict: clean
+X-Spam-State: 0
+X-Spam-Score: 0
+X-Spam-Verdict: clean
+x-auth-user: fantonifabio@tiscali.it
+From: Fabio Fantoni <fantonifabio@tiscali.it>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fabio Fantoni <fantonifabio@tiscali.it>
+Subject: [PATCH] block: fix some typo
+Date: Sun,  2 Jun 2024 20:36:03 +0200
+Message-Id: <20240602183603.18799-1-fantonifabio@tiscali.it>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|DS0PR10MB8078:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22e55e9d-9c6e-4760-98aa-08dc830daaa3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: 
-	BCL:0;ARA:13230031|366007|7416005|1800799015|376005|921011;
-X-Microsoft-Antispam-Message-Info: 
-	=?us-ascii?Q?YWTRmgALqIvmLKvWjhDFORpUrCfy7uH1jVUAjSyik8jtfcaS8+6TCmsnZwGN?=
- =?us-ascii?Q?y3PbFMImSEYD3KnmutC+w5n80jk7XGpWvchYvWvJhcJ9SDt3zsfrsu0UBNHU?=
- =?us-ascii?Q?TF9VXYTCDQ2DAngMitI+zFRwnTgiZ1vnb/EFCeMjna5dDCkxvzj2zZEqNfuJ?=
- =?us-ascii?Q?DbhJefD8Big5VgnfLmMN7kWNz+ur3FokD+GopJsMRFYpsUifipkI5I2sMM8m?=
- =?us-ascii?Q?KR950ohNQc4aCaR9S3RsJeDz2IEogZJPnqo+pVeCnCG+yOW/4l4ZlprcDCgt?=
- =?us-ascii?Q?Phk79jxqD3yr+tK1JXr7lyXsCHFVi6yFt0wgpqqEjXDZFjh+bzXJGt4rGU02?=
- =?us-ascii?Q?Jh8jA8C/BhHbDy3kKtPMhei5cZJe4w5vWEUjYfH69xThSKny6kNuN/Y84eDO?=
- =?us-ascii?Q?gONsvBI1XYjGsmAD60i2ArOXKxwmh0eCX7rqvxR0oS8jiurjbNunCndTrmyn?=
- =?us-ascii?Q?gUPg5VP67x7iUTAAps20CslKGnE6nYW4/h2oyVRo2rNdt585drFNuGywmA9b?=
- =?us-ascii?Q?mey9wWNUzsmvkYz4avUB42ZZ0YPpo7ak9cuJFdO7MNV/svdh4RkB4gkNeiVP?=
- =?us-ascii?Q?pNG8SGOrwcDqrx60iXqBPcokfEIclR1SlKOFEBjg3DqXhRgevXcx90WeT9Tj?=
- =?us-ascii?Q?XIBus92M5oZZxXy2UGIbjLueuceKf2rEZcN2+ZoO36OQvP1mtlTV3OJELFMW?=
- =?us-ascii?Q?X32HDJf8jOtDdiN0pOj3cKNnjc1AexRdtXN+3dE4gF8X0XTAutX7IfkeL1I4?=
- =?us-ascii?Q?9wrFGdLZIoVWmBZtRERfbDye+ADJAO8ejKazCfQ+D4cXRNzKQoP+dBJ57HCB?=
- =?us-ascii?Q?2fUXA+IWj5bbO2LRrVYCYTS7SfocHoG9EbRqzgm/mRGrxqDIYqLWvwOR5Pmm?=
- =?us-ascii?Q?UuhTa+r9p6zEHVadG/O/qcEZ8CrfVz38BHUaqtfbXkXVqK47ysXLAJRlqZe4?=
- =?us-ascii?Q?aPC3qB0iBMGdfBqrxFS9Gvj2lKYP6rRo5LAnAu62U8b3M2Yf7IOLEx8sguri?=
- =?us-ascii?Q?X2exTb5k0UjsgyjKhOuQ3hlum8b10b4CtkhIRC/KLRc91i5LMdiheOiyLKiU?=
- =?us-ascii?Q?Rvxlr9JCQvIQMHOdxwx/doFhopB9engsBo2jyeYAzXxxodfQazl+v20GhyT6?=
- =?us-ascii?Q?S967t6pWE4+bFnTN3mcLEssKddN8zEJspb81XCsNhJy+EtL/nHO8kWxL61Yi?=
- =?us-ascii?Q?xxxwHQSFH/hR0kv111kzLNv4efLop8WKwDCoXv2rk5LmzL7Egk1shI4+2gZJ?=
- =?us-ascii?Q?O3S2lpDz5uYx5W8y7I6eoly/b8qDVp9Nd66D0IyfQdqHz0Z0LcMLn//Jhm4L?=
- =?us-ascii?Q?vLVIt8ZSblMHrN/edaAtIIsd?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005)(921011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?JJWsYdFkj0/WabvIexxy6MyOr3mfpR5r6G787ex3WYsyEAv6M3NcrRUcYIV3?=
- =?us-ascii?Q?Res0EiovA/B7DxYB4IfwTL/5LSycByX6e55eGknTAuVK4M5k/oYcrinZqVaA?=
- =?us-ascii?Q?6vc48lS4JyxX1Y8lMuFSIs9PEhat1/26EOrryAd/qlTfsVo4lKIPB1egd3QA?=
- =?us-ascii?Q?btYNJ9GiFV8IW+eZblTU0ZVaH6e3s9nq5vK9GsZuiuvV4tTDyayRXiSRxr0o?=
- =?us-ascii?Q?0m3rzEqcMhA2XRvVGJAh3D4U0xIOVlPwG72bq1N7joG5xttgSfzIjOssDz0i?=
- =?us-ascii?Q?csCU7Af8jyM15Ip6PqISNeauG8eynAHkXJMP1C8HSIbeB8biz6cQSvjHEi9b?=
- =?us-ascii?Q?/w4/4ctGpg3H2zaDYD7M31bB7UGb5MR3R4fvC6hRqO2uKoU03LMDvyP3zY6n?=
- =?us-ascii?Q?KIYJrN3Gj+LB2dy0tsoSJxYkG4LBB6A7S6es5TcoUpzdPyyAn0lY30HuJywd?=
- =?us-ascii?Q?dYXTVNX3kt/w8j/U+Svg+ZHWtJPqRO0hcaXJ7YR1VrYorss566wBHkM0KJbz?=
- =?us-ascii?Q?o+s+bPbdSfv7gkKsT2Z8Q3muqSAF4/fGoWj3AhluBRj00RXSr8y4AnoZdKwL?=
- =?us-ascii?Q?fc9f3TFB2uAbxwwAz6wGCGerGJ1f7GSqqFSXWC6sNAXYicCLfszYKNs0E7XL?=
- =?us-ascii?Q?SAq0iCURbhQnDFgw8PGKNOGhuWRX2cMiTEAfCGwIS3Fc0/LQHc00t75n3Yp6?=
- =?us-ascii?Q?PHDM/vLSr1mMSVPHYAOUuaFLJoWJQF8bK9fkorZEaqRWk1shrO04wqeyomau?=
- =?us-ascii?Q?XQayRMo8/r1JBYmGenVm1Q7Lp857Yi5dB65ixmE+qTgS4G6qJNcWXixs+Yg6?=
- =?us-ascii?Q?gdcIQUJRaG6R1j1b3NEE9cFN5sjHffeQLUgziYUP3j2TswnuyokqLAuN61Xe?=
- =?us-ascii?Q?ya/ZiXyMK6D+8xRb3lACmRbT8QyLjlsgL9+Fnls7GMDvRSyJm23e81EApe2I?=
- =?us-ascii?Q?pG+mPpxJBcJhjQAdQvxkI+vuRHSwVFy2HWgaOlugoIu/ifZrySq2RWqadr6V?=
- =?us-ascii?Q?zEtBma4i5ufoxdrShWk0MbsrZc+vB3iRP0HenbkTtB2mNEII6QHOtiEH14EZ?=
- =?us-ascii?Q?aM5ra2Ca+9sAXO2i/yq3T6Ayw943qRGnnWGc60MpSK95yFTqf3Qut0Mcsq1a?=
- =?us-ascii?Q?/qTSqn7yWcIetbQyDsDBIXH+xe/PQHnikQbq94vz8+GvGrfmOfT7ruD8CAce?=
- =?us-ascii?Q?zjdh9WAJAps+WVmpp2WDVmNcrg5qw4YCMRYL1q7FjDgunv0545Yj6zbZ3mOl?=
- =?us-ascii?Q?sRotpWCSTbN6GDp8enUQOetzCdzuytEx43R+WuZ8JU2BwSM70vvQ5MbN6Zj+?=
- =?us-ascii?Q?UW9ccOfzJ30lbY5iS5BXMm1Kjl3qg1CBWaFN+Nelb6XSIBop05Xke2QuPR7w?=
- =?us-ascii?Q?4AuN6KNyfCgxUZJLl2xtJCNh9n26EzH9q81b62AseRAwaLWD6457u7usGMRN?=
- =?us-ascii?Q?ZN5JPmEDRvGLVoL7LG7iIim/IWTKal7EdfjyHHvHZ3K6WRaa77yPh+9LCObK?=
- =?us-ascii?Q?PiNS/K/rk5SspXinuBe6W8Xk/YUwj1xNyccQRcFcf1Rs6Ve92x6Wkja0yqpV?=
- =?us-ascii?Q?peeHUUajJouYN4p/54BhO/nFVYvy6rdNTSJ5ss/CFjsGOXS9xLkjlVADneTH?=
- =?us-ascii?Q?RQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	sgvK5BEa9cdQHRCqL8zECpUn3r12B+K8Ldw7Nv2XEI0WPmK/oa2CYZpbY6nBQwo787gyxcRLvQrkekDbaVDv2cAsfuvpCLUXcQibE52tnI/vmDdePO4K3RQ1DjsV6oUJ+1ikKhqmPOXMh52+0UXE8TVueNwufgP7cUyOkxyMNukMT5/C/9qcR2k7aGYGoahVfUFTgL2/qZNoFIbSUeFt5NPaxisTU3it/Ds5yqrvCK0geifYVVkuIrWgv6UZbe2DqGel5EYhSx0RCFH6mx6Vjdjg7qn7aIVlKYPJ2t7RvccRYFtdVndZfNlB5qpT3EQsf+XsLVWYvG9sfQRVrAivkVmYIc05nCwHmWXAy3Jp49UrMnpjLWwl5YjQ4Dbvejvf8DjRGou/0Vb9cqIXUU3FlaLKdk+H01dCfDP+UZ0KBy55Vs49lwF7JYChIaKnQ+WVWCcdPnpYv1sAvqrP/3L5oTbe0IfccLBRrz50gJz+0PKRjgiXMUEOp6KGtFyNT78fd5dUoatrh8ZAuRcU+UcyDOtAjxv1kznFc88yWEl07ooXSgfsTyu2QXdUQDGFgjrl8iZEhTbS2xeQaLSICxEeuZ3uJMuWdgzXw99V0rpg9r0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22e55e9d-9c6e-4760-98aa-08dc830daaa3
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2024 14:09:50.1891
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q+Vcz7xDs2KwmSoMhTThOI7MJGYw4lmVaVdYHiSoVOPFAIkNJVS5BjJ1Bdx5cHgLU8zo4sJ02i2aqkLoBB5QVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB8078
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-02_08,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- adultscore=0 bulkscore=0 spamscore=0 malwarescore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406020122
-X-Proofpoint-GUID: l-msDISvh_vgTiuaMAtkQmpxhYayU2Fs
-X-Proofpoint-ORIG-GUID: l-msDISvh_vgTiuaMAtkQmpxhYayU2Fs
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tiscali.it; s=smtp;
+	t=1717353383; bh=rleMtP1ew2ItAJZRQ+5UxW/qkxk3oyyl4iv3r3svIrY=;
+	h=From:To:Cc:Subject:Date;
+	b=2N74Pw6g8g7AxOeoCpqVzi0OyfUVSXbJ/gfcrhJgfoyt6yOiLsGMx8DvkzK23tARj
+	 GTsAw1M6KZCtvdPGvQ69lC9KqTavnF1AFK1K+itAOW+t/6sAxnH7n7n6fnwie7fexW
+	 OFCppZBrRFyhg2Qz9gW2gTTqOnSJmVwZosqWn7Kk=
 
-Support is divided into two main areas:
-- reading VPD pages and setting sdev request_queue limits
-- support WRITE ATOMIC (16) command and tracing
+During some blksnap patch checks I noticed that the codespell one
+detected other errors outside of patch changes, so I created this patch
+to fix those detected for the block folder.
 
-The relevant block limits VPD page need to be read to allow the block layer
-request_queue atomic write limits to be set. These VPD page limits are
-described in sbc4r22 section 6.6.4 - Block limits VPD page.
-
-There are five limits of interest:
-- MAXIMUM ATOMIC TRANSFER LENGTH
-- ATOMIC ALIGNMENT
-- ATOMIC TRANSFER LENGTH GRANULARITY
-- MAXIMUM ATOMIC TRANSFER LENGTH WITH BOUNDARY
-- MAXIMUM ATOMIC BOUNDARY SIZE
-
-MAXIMUM ATOMIC TRANSFER LENGTH is the maximum length for a WRITE ATOMIC
-(16) command. It will not be greater than the device MAXIMUM TRANSFER
-LENGTH.
-
-ATOMIC ALIGNMENT and ATOMIC TRANSFER LENGTH GRANULARITY are the minimum
-alignment and length values for an atomic write in terms of logical blocks.
-
-Unlike NVMe, SCSI does not specify an LBA space boundary, but does specify
-a per-IO boundary granularity. The maximum boundary size is specified in
-MAXIMUM ATOMIC BOUNDARY SIZE. When used, this boundary value is set in the
-WRITE ATOMIC (16) ATOMIC BOUNDARY field - layout for the WRITE_ATOMIC_16
-command can be found in sbc4r22 section 5.48. This boundary value is the
-granularity size at which the device may atomically write the data. A value
-of zero in WRITE ATOMIC (16) ATOMIC BOUNDARY field means that all data must
-be atomically written together.
-
-MAXIMUM ATOMIC TRANSFER LENGTH WITH BOUNDARY is the maximum atomic write
-length if a non-zero boundary value is set.
-
-For atomic write support, the WRITE ATOMIC (16) boundary is not of much
-interest, as the block layer expects each request submitted to be executed
-atomically. However, the SCSI spec does leave itself open to a quirky
-scenario where MAXIMUM ATOMIC TRANSFER LENGTH is zero, yet MAXIMUM ATOMIC
-TRANSFER LENGTH WITH BOUNDARY and MAXIMUM ATOMIC BOUNDARY SIZE are both
-non-zero. This case will be supported.
-
-To set the block layer request_queue atomic write capabilities, sanitize
-the VPD page limits and set limits as follows:
-- atomic_write_unit_min is derived from granularity and alignment values.
-  If no granularity value is not set, use physical block size
-- atomic_write_unit_max is derived from MAXIMUM ATOMIC TRANSFER LENGTH. In
-  the scenario where MAXIMUM ATOMIC TRANSFER LENGTH is zero and boundary
-  limits are non-zero, use MAXIMUM ATOMIC BOUNDARY SIZE for
-  atomic_write_unit_max. New flag scsi_disk.use_atomic_write_boundary is
-  set for this scenario.
-- atomic_write_boundary_bytes is set to zero always
-
-SCSI also supports a WRITE ATOMIC (32) command, which is for type 2
-protection enabled. This is not going to be supported now, so check for
-T10_PI_TYPE2_PROTECTION when setting any request_queue limits.
-
-To handle an atomic write request, add support for WRITE ATOMIC (16)
-command in handler sd_setup_atomic_cmnd(). Flag use_atomic_write_boundary
-is checked here for encoding ATOMIC BOUNDARY field.
-
-Trace info is also added for WRITE_ATOMIC_16 command.
-
-Signed-off-by: John Garry <john.g.garry@oracle.com>
+Signed-off-by: Fabio Fantoni <fantonifabio@tiscali.it>
 ---
- drivers/scsi/scsi_trace.c   | 22 +++++++++
- drivers/scsi/sd.c           | 93 ++++++++++++++++++++++++++++++++++++-
- drivers/scsi/sd.h           |  8 ++++
- include/scsi/scsi_proto.h   |  1 +
- include/trace/events/scsi.h |  1 +
- 5 files changed, 124 insertions(+), 1 deletion(-)
+ block/bdev.c                | 4 ++--
+ block/bfq-iosched.c         | 4 ++--
+ block/bfq-iosched.h         | 2 +-
+ block/bio-integrity.c       | 2 +-
+ block/bio.c                 | 2 +-
+ block/blk-cgroup-fc-appid.c | 2 +-
+ block/blk-cgroup-rwstat.c   | 2 +-
+ block/blk-cgroup.c          | 2 +-
+ block/blk-core.c            | 6 +++---
+ block/blk-iocost.c          | 8 ++++----
+ block/blk-iolatency.c       | 4 ++--
+ block/blk-ioprio.c          | 2 +-
+ block/blk-merge.c           | 6 +++---
+ block/blk-mq.c              | 2 +-
+ block/blk-settings.c        | 2 +-
+ block/blk-sysfs.c           | 2 +-
+ block/blk-zoned.c           | 2 +-
+ block/genhd.c               | 2 +-
+ block/ioprio.c              | 4 ++--
+ block/kyber-iosched.c       | 2 +-
+ block/opal_proto.h          | 4 ++--
+ block/partitions/ibm.c      | 2 +-
+ block/partitions/sun.c      | 2 +-
+ block/sed-opal.c            | 2 +-
+ 24 files changed, 36 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/scsi/scsi_trace.c b/drivers/scsi/scsi_trace.c
-index 41a950075913..3e47c4472a80 100644
---- a/drivers/scsi/scsi_trace.c
-+++ b/drivers/scsi/scsi_trace.c
-@@ -325,6 +325,26 @@ scsi_trace_zbc_out(struct trace_seq *p, unsigned char *cdb, int len)
- 	return ret;
+diff --git a/block/bdev.c b/block/bdev.c
+index 353677ac49b3..0059bcf6ae6a 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -580,7 +580,7 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
+  * @holder: holder that has claimed @bdev
+  * @hops: block device holder operations
+  *
+- * Finish exclusive open of a block device. Mark the device as exlusively
++ * Finish exclusive open of a block device. Mark the device as exclusively
+  * open by the holder and wake up all waiters for exclusive open to finish.
+  */
+ static void bd_finish_claiming(struct block_device *bdev, void *holder,
+@@ -1183,7 +1183,7 @@ EXPORT_SYMBOL(lookup_bdev);
+  * to %true the device or media is already gone, if not we are preparing for an
+  * orderly removal.
+  *
+- * This calls into the file system, which then typicall syncs out all dirty data
++ * This calls into the file system, which then typical syncs out all dirty data
+  * and writes back inodes and then invalidates any cached data in the inodes on
+  * the file system.  In addition we also invalidate the block device mapping.
+  */
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 4b88a54a9b76..cb67f5bdd561 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1964,7 +1964,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	 * As for throughput, we ask bfq_better_to_idle() whether we
+ 	 * still need to plug I/O dispatching. If bfq_better_to_idle()
+ 	 * says no, then plugging is not needed any longer, either to
+-	 * boost throughput or to perserve service guarantees. Then
++	 * boost throughput or to preserve service guarantees. Then
+ 	 * the best option is to stop plugging I/O, as not doing so
+ 	 * would certainly lower throughput. We may end up in this
+ 	 * case if: (1) upon a dispatch attempt, we detected that it
+@@ -5363,7 +5363,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 		 * by the fact that bfqq has just been merged.
+ 		 * 2) burst_size is greater than 0, to handle
+ 		 * unbalanced decrements. Unbalanced decrements may
+-		 * happen in te following case: bfqq is inserted into
++		 * happen in the following case: bfqq is inserted into
+ 		 * the current burst list--without incrementing
+ 		 * bust_size--because of a split, but the current
+ 		 * burst list is not the burst list bfqq belonged to
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 467e8cfc41a2..19654d8215c4 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -843,7 +843,7 @@ struct bfq_data {
+ 	 * We set the threshold, empirically, to the minimum possible
+ 	 * value for which an actuator is fully utilized, or close to
+ 	 * be fully utilized. By doing so, injected I/O 'steals' as
+-	 * few drive-queue slots as possibile to the in-service
++	 * few drive-queue slots as possible to the in-service
+ 	 * queue. This reduces as much as possible the probability
+ 	 * that the service of I/O from the in-service bfq_queue gets
+ 	 * delayed because of slot exhaustion, i.e., because all the
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 2e3e8e04961e..e86a6a4cb6ce 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -419,7 +419,7 @@ static blk_status_t bio_integrity_process(struct bio *bio,
+  * Description:  Checks if the bio already has an integrity payload attached.
+  * If it does, the payload has been generated by another kernel subsystem,
+  * and we just pass it through. Otherwise allocates integrity payload.
+- * The bio must have data direction, target device and start sector set priot
++ * The bio must have data direction, target device and start sector set prior
+  * to calling.  In the WRITE case, integrity metadata will be generated using
+  * the block device's integrity function.  In the READ case, the buffer
+  * will be prepared for DMA and a suitable end_io handler set up.
+diff --git a/block/bio.c b/block/bio.c
+index e9e809a63c59..700931dfe95f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -520,7 +520,7 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
+ 				return bio;
+ 			/*
+ 			 * No cached bio available, bio returned below marked with
+-			 * REQ_ALLOC_CACHE to particpate in per-cpu alloc cache.
++			 * REQ_ALLOC_CACHE to participate in per-cpu alloc cache.
+ 			 */
+ 		} else {
+ 			opf &= ~REQ_ALLOC_CACHE;
+diff --git a/block/blk-cgroup-fc-appid.c b/block/blk-cgroup-fc-appid.c
+index 3ec21333f393..c26fedaf6827 100644
+--- a/block/blk-cgroup-fc-appid.c
++++ b/block/blk-cgroup-fc-appid.c
+@@ -3,7 +3,7 @@
+ #include "blk-cgroup.h"
+ 
+ /**
+- * blkcg_set_fc_appid - set the fc_app_id field associted to blkcg
++ * blkcg_set_fc_appid - set the fc_app_id field associated to blkcg
+  * @app_id: application identifier
+  * @cgrp_id: cgroup id
+  * @app_id_len: size of application identifier
+diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
+index a55fb0c53558..c3afb0b62aaa 100644
+--- a/block/blk-cgroup-rwstat.c
++++ b/block/blk-cgroup-rwstat.c
+@@ -31,7 +31,7 @@ EXPORT_SYMBOL_GPL(blkg_rwstat_exit);
+  * @pd: policy private data of interest
+  * @rwstat: rwstat to print
+  *
+- * Print @rwstat to @sf for the device assocaited with @pd.
++ * Print @rwstat to @sf for the device associated with @pd.
+  */
+ u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+ 			 const struct blkg_rwstat_sample *rwstat)
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 37e6cc91d576..e638653b932d 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1542,7 +1542,7 @@ EXPORT_SYMBOL_GPL(io_cgrp_subsys);
+  * always enough for dereferencing policy data.
+  *
+  * The caller is responsible for synchronizing [de]activations and policy
+- * [un]registerations.  Returns 0 on success, -errno on failure.
++ * [un]registrations.  Returns 0 on success, -errno on failure.
+  */
+ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+ {
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 82c3ae22d76d..83c784feb406 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -728,7 +728,7 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+ 	/*
+ 	 * We only want one ->submit_bio to be active at a time, else stack
+ 	 * usage with stacked devices could be a problem.  Use current->bio_list
+-	 * to collect a list of requests submited by a ->submit_bio method while
++	 * to collect a list of requests submitted by a ->submit_bio method while
+ 	 * it is active, and then process them after it returned.
+ 	 */
+ 	if (current->bio_list)
+@@ -801,7 +801,7 @@ void submit_bio_noacct(struct bio *bio)
+ 	case REQ_OP_FLUSH:
+ 		/*
+ 		 * REQ_OP_FLUSH can't be submitted through bios, it is only
+-		 * synthetized in struct request by the flush state machine.
++		 * synthesized in struct request by the flush state machine.
+ 		 */
+ 		goto not_supported;
+ 	case REQ_OP_DISCARD:
+@@ -960,7 +960,7 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+ 	 * point to a freshly allocated bio at this point.  If that happens
+ 	 * we have a few cases to consider:
+ 	 *
+-	 *  1) the bio is beeing initialized and bi_bdev is NULL.  We can just
++	 *  1) the bio is being initialized and bi_bdev is NULL.  We can just
+ 	 *     simply nothing in this case
+ 	 *  2) the bio points to a not poll enabled device.  bio_poll will catch
+ 	 *     this and return 0
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 690ca99dfaca..7a11e04a87fa 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -853,7 +853,7 @@ static int ioc_autop_idx(struct ioc *ioc, struct gendisk *disk)
  }
  
-+static const char *
-+scsi_trace_atomic_write16_out(struct trace_seq *p, unsigned char *cdb, int len)
-+{
-+	const char *ret = trace_seq_buffer_ptr(p);
-+	unsigned int boundary_size;
-+	unsigned int nr_blocks;
-+	sector_t lba;
-+
-+	lba = get_unaligned_be64(&cdb[2]);
-+	boundary_size = get_unaligned_be16(&cdb[10]);
-+	nr_blocks = get_unaligned_be16(&cdb[12]);
-+
-+	trace_seq_printf(p, "lba=%llu txlen=%u boundary_size=%u",
-+			  lba, nr_blocks, boundary_size);
-+
-+	trace_seq_putc(p, 0);
-+
-+	return ret;
-+}
-+
- static const char *
- scsi_trace_varlen(struct trace_seq *p, unsigned char *cdb, int len)
- {
-@@ -385,6 +405,8 @@ scsi_trace_parse_cdb(struct trace_seq *p, unsigned char *cdb, int len)
- 		return scsi_trace_zbc_in(p, cdb, len);
- 	case ZBC_OUT:
- 		return scsi_trace_zbc_out(p, cdb, len);
-+	case WRITE_ATOMIC_16:
-+		return scsi_trace_atomic_write16_out(p, cdb, len);
- 	default:
- 		return scsi_trace_misc(p, cdb, len);
- 	}
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index d957e29b17a9..a79da08d3cce 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -933,6 +933,64 @@ static blk_status_t sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
- 	return scsi_alloc_sgtables(cmd);
+ /*
+- * Take the followings as input
++ * Take the following as input
+  *
+  *  @bps	maximum sequential throughput
+  *  @seqiops	maximum sequential 4k iops
+@@ -1267,7 +1267,7 @@ static bool iocg_activate(struct ioc_gq *iocg, struct ioc_now *now)
+ 
+ 	/*
+ 	 * If seem to be already active, just update the stamp to tell the
+-	 * timer that we're still active.  We don't mind occassional races.
++	 * timer that we're still active.  We don't mind occasional races.
+ 	 */
+ 	if (!list_empty(&iocg->active_list)) {
+ 		ioc_now(ioc, now);
+@@ -2154,7 +2154,7 @@ static void ioc_forgive_debts(struct ioc *ioc, u64 usage_us_sum, int nr_debtors,
  }
  
-+static void sd_config_atomic(struct scsi_disk *sdkp, struct queue_limits *lim)
-+{
-+	unsigned int logical_block_size = sdkp->device->sector_size,
-+		physical_block_size_sectors, max_atomic, unit_min, unit_max;
-+
-+	if ((!sdkp->max_atomic && !sdkp->max_atomic_with_boundary) ||
-+	    sdkp->protection_type == T10_PI_TYPE2_PROTECTION)
-+		return;
-+
-+	physical_block_size_sectors = sdkp->physical_block_size /
-+					sdkp->device->sector_size;
-+
-+	unit_min = rounddown_pow_of_two(sdkp->atomic_granularity ?
-+					sdkp->atomic_granularity :
-+					physical_block_size_sectors);
-+
-+	/*
-+	 * Only use atomic boundary when we have the odd scenario of
-+	 * sdkp->max_atomic == 0, which the spec does permit.
-+	 */
-+	if (sdkp->max_atomic) {
-+		max_atomic = sdkp->max_atomic;
-+		unit_max = rounddown_pow_of_two(sdkp->max_atomic);
-+		sdkp->use_atomic_write_boundary = 0;
-+	} else {
-+		max_atomic = sdkp->max_atomic_with_boundary;
-+		unit_max = rounddown_pow_of_two(sdkp->max_atomic_boundary);
-+		sdkp->use_atomic_write_boundary = 1;
-+	}
-+
-+	/*
-+	 * Ensure compliance with granularity and alignment. For now, keep it
-+	 * simple and just don't support atomic writes for values mismatched
-+	 * with max_{boundary}atomic, physical block size, and
-+	 * atomic_granularity itself.
-+	 *
-+	 * We're really being distrustful by checking unit_max also...
-+	 */
-+	if (sdkp->atomic_granularity > 1) {
-+		if (unit_min > 1 && unit_min % sdkp->atomic_granularity)
-+			return;
-+		if (unit_max > 1 && unit_max % sdkp->atomic_granularity)
-+			return;
-+	}
-+
-+	if (sdkp->atomic_alignment > 1) {
-+		if (unit_min > 1 && unit_min % sdkp->atomic_alignment)
-+			return;
-+		if (unit_max > 1 && unit_max % sdkp->atomic_alignment)
-+			return;
-+	}
-+
-+	lim->atomic_write_hw_max = max_atomic * logical_block_size;
-+	lim->atomic_write_hw_boundary = 0;
-+	lim->atomic_write_hw_unit_min = unit_min * logical_block_size;
-+	lim->atomic_write_hw_unit_max = unit_max * logical_block_size;
-+}
-+
- static blk_status_t sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd,
- 		bool unmap)
- {
-@@ -1231,6 +1289,26 @@ static int sd_cdl_dld(struct scsi_disk *sdkp, struct scsi_cmnd *scmd)
- 	return (hint - IOPRIO_HINT_DEV_DURATION_LIMIT_1) + 1;
+ /*
+- * Check the active iocgs' state to avoid oversleeping and deactive
++ * Check the active iocgs' state to avoid oversleeping and deactivate
+  * idle iocgs.
+  *
+  * Since waiters determine the sleep durations based on the vrate
+@@ -2356,7 +2356,7 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 				 *
+ 				 * Don't reset debtors as their inuse's are
+ 				 * owned by debt handling. This shouldn't affect
+-				 * donation calculuation in any meaningful way
++				 * donation calculation in any meaningful way
+ 				 * as @iocg doesn't have a meaningful amount of
+ 				 * share anyway.
+ 				 */
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index ebb522788d97..e8d71c6f8c30 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -18,7 +18,7 @@
+  * every configured node, and each configured node has it's own independent
+  * queue depth.  This means that we only care about our latency targets at the
+  * peer level.  Some group at the bottom of the hierarchy isn't going to affect
+- * a group at the end of some other path if we're only configred at leaf level.
++ * a group at the end of some other path if we're only configured at leaf level.
+  *
+  * Consider the following
+  *
+@@ -34,7 +34,7 @@
+  * throttle "unloved", but nobody else.
+  *
+  * In this example "fast", "slow", and "normal" will be the only groups actually
+- * accounting their io latencies.  We have to walk up the heirarchy to the root
++ * accounting their io latencies.  We have to walk up the hierarchy to the root
+  * on every submit and complete so we can do the appropriate stat recording and
+  * adjust the queue depth of ourselves if needed.
+  *
+diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+index 4051fada01f1..a5d978756496 100644
+--- a/block/blk-ioprio.c
++++ b/block/blk-ioprio.c
+@@ -8,7 +8,7 @@
+  * - This policy is cgroup based so it has all the advantages of cgroups.
+  * - While ioprio_set() does not affect page cache writeback I/O, this rq-qos
+  *   controller affects page cache writeback I/O for filesystems that support
+- *   assiociating a cgroup with writeback I/O. See also
++ *   associating a cgroup with writeback I/O. See also
+  *   Documentation/admin-guide/cgroup-v2.rst.
+  */
+ 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 8534c35e0497..56a1638bfb40 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -96,7 +96,7 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
  }
  
-+static blk_status_t sd_setup_atomic_cmnd(struct scsi_cmnd *cmd,
-+					sector_t lba, unsigned int nr_blocks,
-+					bool boundary, unsigned char flags)
-+{
-+	cmd->cmd_len  = 16;
-+	cmd->cmnd[0]  = WRITE_ATOMIC_16;
-+	cmd->cmnd[1]  = flags;
-+	put_unaligned_be64(lba, &cmd->cmnd[2]);
-+	put_unaligned_be16(nr_blocks, &cmd->cmnd[12]);
-+	if (boundary)
-+		put_unaligned_be16(nr_blocks, &cmd->cmnd[10]);
-+	else
-+		put_unaligned_be16(0, &cmd->cmnd[10]);
-+	put_unaligned_be16(nr_blocks, &cmd->cmnd[12]);
-+	cmd->cmnd[14] = 0;
-+	cmd->cmnd[15] = 0;
-+
-+	return BLK_STS_OK;
-+}
-+
- static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
+ /*
+- * The max size one bio can handle is UINT_MAX becasue bvec_iter.bi_size
++ * The max size one bio can handle is UINT_MAX because bvec_iter.bi_size
+  * is defined as 'unsigned int', meantime it has to be aligned to with the
+  * logical block size, which is the minimum accepted unit by hardware.
+  */
+@@ -327,7 +327,7 @@ struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
+ 	/*
+ 	 * Bio splitting may cause subtle trouble such as hang when doing sync
+ 	 * iopoll in direct IO routine. Given performance gain of iopoll for
+-	 * big IO can be trival, disable iopoll when split needed.
++	 * big IO can be trivial, disable iopoll when split needed.
+ 	 */
+ 	bio_clear_polled(bio);
+ 	return bio_split(bio, bytes >> SECTOR_SHIFT, GFP_NOIO, bs);
+@@ -738,7 +738,7 @@ static void blk_rq_set_mixed_merge(struct request *rq)
+ 	/*
+ 	 * @rq will no longer represent mixable attributes for all the
+ 	 * contained bios.  It will just track those of the first one.
+-	 * Distributes the attributs to each bio.
++	 * Distributes the attributes to each bio.
+ 	 */
+ 	for (bio = rq->bio; bio; bio = bio->bi_next) {
+ 		WARN_ON_ONCE((bio->bi_opf & REQ_FAILFAST_MASK) &&
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3b4df8e5ac9e..ad03e7c7fa16 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2253,7 +2253,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ EXPORT_SYMBOL(blk_mq_run_hw_queue);
+ 
+ /*
+- * Return prefered queue to dispatch from (if any) for non-mq aware IO
++ * Return preferred queue to dispatch from (if any) for non-mq aware IO
+  * scheduler.
+  */
+ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index effeb9a639bb..b8961c2d28f7 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -835,7 +835,7 @@ void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
+ EXPORT_SYMBOL_GPL(blk_queue_write_cache);
+ 
+ /**
+- * disk_set_zoned - inidicate a zoned device
++ * disk_set_zoned - indicate a zoned device
+  * @disk:	gendisk to configure
+  */
+ void disk_set_zoned(struct gendisk *disk)
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index f0f9314ab65c..e7e8b58f1d91 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -818,7 +818,7 @@ int blk_register_queue(struct gendisk *disk)
+ 	/*
+ 	 * SCSI probing may synchronously create and destroy a lot of
+ 	 * request_queues for non-existent devices.  Shutting down a fully
+-	 * functional queue takes measureable wallclock time as RCU grace
++	 * functional queue takes measurable wallclock time as RCU grace
+ 	 * periods are involved.  To avoid excessive latency in these
+ 	 * cases, a request_queue starts out in a degraded mode which is
+ 	 * faster to shut down and is made fully functional here as
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 52abebf56027..ea43f07ce9d5 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1563,7 +1563,7 @@ void disk_free_zone_resources(struct gendisk *disk)
+ 
+ 	/*
+ 	 * Wait for the zone write plugs to be RCU-freed before
+-	 * destorying the mempool.
++	 * destroying the mempool.
+ 	 */
+ 	rcu_barrier();
+ 
+diff --git a/block/genhd.c b/block/genhd.c
+index 8f1f3c6b4d67..7ef2726aa3d3 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -352,7 +352,7 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+ 
+ 	/*
+ 	 * If the device is opened exclusively by current thread already, it's
+-	 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
++	 * safe to scan partitions, otherwise, use bd_prepare_to_claim() to
+ 	 * synchronize with other exclusive openers and other partition
+ 	 * scanners.
+ 	 */
+diff --git a/block/ioprio.c b/block/ioprio.c
+index 73301a261429..66cdf8e9b9df 100644
+--- a/block/ioprio.c
++++ b/block/ioprio.c
+@@ -5,7 +5,7 @@
+  * Copyright (C) 2004 Jens Axboe <axboe@kernel.dk>
+  *
+  * Helper functions for setting/querying io priorities of processes. The
+- * system calls closely mimmick getpriority/setpriority, see the man page for
++ * system calls closely mimic getpriority/setpriority, see the man page for
+  * those. The prio argument is a composite of prio class and prio data, where
+  * the data argument has meaning within that class. The standard scheduling
+  * classes have 8 distinct prio levels, with 0 being the highest prio and 7
+@@ -157,7 +157,7 @@ static int get_task_ioprio(struct task_struct *p)
+  * Return raw IO priority value as set by userspace. We use this for
+  * ioprio_get(pid, IOPRIO_WHO_PROCESS) so that we keep historical behavior and
+  * also so that userspace can distinguish unset IO priority (which just gets
+- * overriden based on task's nice value) from IO priority set to some value.
++ * overridden based on task's nice value) from IO priority set to some value.
+  */
+ static int get_task_raw_ioprio(struct task_struct *p)
  {
- 	struct request *rq = scsi_cmd_to_rq(cmd);
-@@ -1296,6 +1374,10 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
- 	if (protect && sdkp->protection_type == T10_PI_TYPE2_PROTECTION) {
- 		ret = sd_setup_rw32_cmnd(cmd, write, lba, nr_blocks,
- 					 protect | fua, dld);
-+	} else if (rq->cmd_flags & REQ_ATOMIC && write) {
-+		ret = sd_setup_atomic_cmnd(cmd, lba, nr_blocks,
-+				sdkp->use_atomic_write_boundary,
-+				protect | fua);
- 	} else if (sdp->use_16_for_rw || (nr_blocks > 0xffff)) {
- 		ret = sd_setup_rw16_cmnd(cmd, write, lba, nr_blocks,
- 					 protect | fua, dld);
-@@ -3256,7 +3338,7 @@ static void sd_read_block_limits(struct scsi_disk *sdkp,
- 		sdkp->max_ws_blocks = (u32)get_unaligned_be64(&vpd->data[36]);
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 4155594aefc6..274e08dc678d 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -140,7 +140,7 @@ struct kyber_cpu_latency {
+  */
+ struct kyber_ctx_queue {
+ 	/*
+-	 * Used to ensure operations on rq_list and kcq_map to be an atmoic one.
++	 * Used to ensure operations on rq_list and kcq_map to be an atomic one.
+ 	 * Also protect the rqs on rq_list when merge.
+ 	 */
+ 	spinlock_t lock;
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index d247a457bf6e..f7bdc017b773 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -232,7 +232,7 @@ enum opal_revertlsp {
  
- 		if (!sdkp->lbpme)
--			goto out;
-+			goto config_atomic;
+ /* Packets derived from:
+  * TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
+- * Secion: 3.2.3 ComPackets, Packets & Subpackets
++ * Section: 3.2.3 ComPackets, Packets & Subpackets
+  */
  
- 		lba_count = get_unaligned_be32(&vpd->data[20]);
- 		desc_count = get_unaligned_be32(&vpd->data[24]);
-@@ -3271,6 +3353,15 @@ static void sd_read_block_limits(struct scsi_disk *sdkp,
- 				get_unaligned_be32(&vpd->data[32]) & ~(1 << 31);
- 
- 		sd_config_discard(sdkp, lim, sd_discard_mode(sdkp));
-+
-+config_atomic:
-+		sdkp->max_atomic = get_unaligned_be32(&vpd->data[44]);
-+		sdkp->atomic_alignment = get_unaligned_be32(&vpd->data[48]);
-+		sdkp->atomic_granularity = get_unaligned_be32(&vpd->data[52]);
-+		sdkp->max_atomic_with_boundary = get_unaligned_be32(&vpd->data[56]);
-+		sdkp->max_atomic_boundary = get_unaligned_be32(&vpd->data[60]);
-+
-+		sd_config_atomic(sdkp, lim);
- 	}
- 
-  out:
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index b4170b17bad4..c7ee1e9c2ba4 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -115,6 +115,13 @@ struct scsi_disk {
- 	u32		max_unmap_blocks;
- 	u32		unmap_granularity;
- 	u32		unmap_alignment;
-+
-+	u32		max_atomic;
-+	u32		atomic_alignment;
-+	u32		atomic_granularity;
-+	u32		max_atomic_with_boundary;
-+	u32		max_atomic_boundary;
-+
- 	u32		index;
- 	unsigned int	physical_block_size;
- 	unsigned int	max_medium_access_timeouts;
-@@ -148,6 +155,7 @@ struct scsi_disk {
- 	unsigned	security : 1;
- 	unsigned	ignore_medium_access_errors : 1;
- 	unsigned	rscs : 1; /* reduced stream control support */
-+	unsigned	use_atomic_write_boundary : 1;
+ /* Comm Packet (header) for transmissions. */
+@@ -425,7 +425,7 @@ struct d0_single_user_mode {
  };
- #define to_scsi_disk(obj) container_of(obj, struct scsi_disk, disk_dev)
  
-diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
-index 843106e1109f..70e1262b2e20 100644
---- a/include/scsi/scsi_proto.h
-+++ b/include/scsi/scsi_proto.h
-@@ -120,6 +120,7 @@
- #define WRITE_SAME_16	      0x93
- #define ZBC_OUT		      0x94
- #define ZBC_IN		      0x95
-+#define WRITE_ATOMIC_16	0x9c
- #define SERVICE_ACTION_BIDIRECTIONAL 0x9d
- #define SERVICE_ACTION_IN_16  0x9e
- #define SERVICE_ACTION_OUT_16 0x9f
-diff --git a/include/trace/events/scsi.h b/include/trace/events/scsi.h
-index 8e2d9b1b0e77..05f1945ed204 100644
---- a/include/trace/events/scsi.h
-+++ b/include/trace/events/scsi.h
-@@ -102,6 +102,7 @@
- 		scsi_opcode_name(WRITE_32),			\
- 		scsi_opcode_name(WRITE_SAME_32),		\
- 		scsi_opcode_name(ATA_16),			\
-+		scsi_opcode_name(WRITE_ATOMIC_16),		\
- 		scsi_opcode_name(ATA_12))
+ /*
+- * Additonal Datastores feature
++ * Additional Datastores feature
+  *
+  * code == 0x0202
+  */
+diff --git a/block/partitions/ibm.c b/block/partitions/ibm.c
+index 82d9c4c3fb41..eb2327fcaa59 100644
+--- a/block/partitions/ibm.c
++++ b/block/partitions/ibm.c
+@@ -247,7 +247,7 @@ static int find_lnx1_partitions(struct parsed_partitions *state,
+ 		size = label->lnx.formatted_blocks * secperblk;
+ 	} else {
+ 		/*
+-		 * Formated w/o large volume support. If the sanity check
++		 * Formatted w/o large volume support. If the sanity check
+ 		 * 'size based on geo == size based on nr_sectors' is true, then
+ 		 * we can safely assume that we know the formatted size of
+ 		 * the disk, otherwise we need additional information
+diff --git a/block/partitions/sun.c b/block/partitions/sun.c
+index ddf9e6def4b2..a0e46679d0aa 100644
+--- a/block/partitions/sun.c
++++ b/block/partitions/sun.c
+@@ -100,7 +100,7 @@ int sun_partition(struct parsed_partitions *state)
  
- #define scsi_hostbyte_name(result)	{ result, #result }
+ 	/*
+ 	 * So that old Linux-Sun partitions continue to work,
+-	 * alow the VTOC to be used under the additional condition ...
++	 * allow the VTOC to be used under the additional condition ...
+ 	 */
+ 	use_vtoc = use_vtoc || !(label->vtoc.sanity ||
+ 				 label->vtoc.version || label->vtoc.nparts);
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 14fe0fef811c..9cbf504a3f77 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -2095,7 +2095,7 @@ static int set_lr_boolean_ace(struct opal_dev *dev,
+ 		/*
+ 		 * Add boolean operator in postfix only with
+ 		 * two or more authorities being added in ACE
+-		 * expresion.
++		 * expression.
+ 		 * */
+ 		if (u > 0)
+ 			add_boolean_object_ref(&err, dev, OPAL_BOOLEAN_OR);
 -- 
-2.31.1
+2.25.1
 
