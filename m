@@ -1,103 +1,111 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1447262B6;
-	Sun,  2 Jun 2024 23:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097BF7E765;
+	Sun,  2 Jun 2024 23:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717372003; cv=none; b=GDuFOui+my9mfnl2aSWGI0I6NqzgPEYNH9T1eZ0oZUQLS2dsGnVxeHcuYsqunltTGe4t4i394uLEYazvrYnHlJo3SSB7G2ws46DO1pqbSM3BMn+46hyZs/8x57X8NmBFt499KTbIgck7uprQm0jzsrkcZWX+d2QOkEWXB9oOxEA=
+	t=1717372753; cv=none; b=Z2thakL7TgxXTlBk3cuk85FVkuUC7Y8v8mHLVIxO9l4z9Ge9s8+XtY2rMgdD7yzylAJ6O+lx1fui5M7px6JWKgkLqMx/blmYDcAHz6W7Y4hYdRRyzjpddOPIWOy3rdHlZb/beuVAFPHsLOxfVAFRN+9DZGF6l2Paze/S5+yjRjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717372003; c=relaxed/simple;
-	bh=+AVY8B406UA3Sr2AeXmjZg3eG/SM31mhuFjExpBndOk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=GspmxeaFe0dAcbmdkFuBPJYIoDsi2Zr77tXIhqhj9sqUNJLxFXzegW8f7i0pIaGvc/VUt5X7IfUKzMqqIxeaj6VtzeeiMFHh4XkW3+dIYtlsortOEe3y55kna29Ncm9gxZUM6XIoODC8N45MvIb/BKNYWzQyPYQdV47ec39oCb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hy1dzwrx; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1717372753; c=relaxed/simple;
+	bh=f9O5QybcaMD2WnAIw2zJMF2wywEOo5ijEP+aNWm+CN4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IiVGFslJfd7h3bcqG6w+UCji3ROPX+oJFNRhreaLcbrHBQKk/VMLF1L8x/nn+ZLN5p1yMZq2ZYrBhxZdEKSorCZgFBVmAJKTp5ZeEne4e0941VzhQxcYnE0HT+c7VW7KDiCInhLFirpD4Q2BIen/LvV+Oq4SU/G/u6Rnb28ueLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lZ4cfxlM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hy1dzwrx"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 452LjQWw019693;
-	Sun, 2 Jun 2024 23:46:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=qMSKmHzTNfqaAlTk93UL3e
-	Iha71pItJolPFNbiTHD+c=; b=hy1dzwrxRxkuhr1MUYqhxJHzGrs9CcMClcrHAc
-	96tBn3BD7KNrWzorlfReqY8yLN/OHQBf5lLHJP+KbqDwa5txq0z5LHv/+4EA5LqY
-	/rN2y7abw7JUP5YxNBVX4a1hR+seE/kg9MKzi7ivoT8qKeYcaTGud4lXIa+7bcWM
-	bXvUGEOTlBnlcgYi2i7EPqpGJWHTo8UZm83p0rFRBt/4XZrijvwvG3dPQK/aAyrS
-	82WoIuDn+0vh4gFZ8zf6cJvUMf5J4UuTDBNh59UqXdcQjvY1xnjSd+Pb4dgICCGc
-	9OcYuOYTuOlsMe1kCMmh1WQ3ap1U1FX/M7Bb3Shr7uEsTqOw==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfw5wjk79-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 02 Jun 2024 23:46:33 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 452NkWjn017158
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 2 Jun 2024 23:46:32 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 2 Jun 2024
- 16:46:25 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Sun, 2 Jun 2024 16:46:25 -0700
-Subject: [PATCH] brd: add missing MODULE_DESCRIPTION() macro
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lZ4cfxlM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81146C2BBFC;
+	Sun,  2 Jun 2024 23:59:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717372752;
+	bh=f9O5QybcaMD2WnAIw2zJMF2wywEOo5ijEP+aNWm+CN4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lZ4cfxlMdcwhOVhbqsf9w4uFBEq+LN8pDb0XkjLabo/Zy97mJnI9UreSoibY7uHl7
+	 3ZpWy1VJOLx3FpzUmjzhhsXsXRpzoFTlA8q3sp+cXgdrSBw8DRZcStV9JGQ37KhzVh
+	 RJ4N/06Hcvml4sBrmT2zbaXVJoo3Xif7/7QLvtYSTuU+AEBV2WWTlz+FKseOz6w4zC
+	 JW79RueDt6DIdpx0uwHAgcHV1TCJtLDWZJ4mhHO1Jd0vvRKbQI+DvFFnsn8XD4wmwq
+	 zuLmEogyxrmCesQe9NSvRHAf3mKQCNFKx6ZQRFNlD0Jkk7ZKrxHAHGsyemQDXFcc8U
+	 F5ZjC0rwW0a1w==
+Message-ID: <9d68c7c1-b1e6-4f42-8d4b-8c986ab688b5@kernel.org>
+Date: Mon, 3 Jun 2024 08:59:10 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] null_blk: fix validation of block size
+To: John Garry <john.g.garry@oracle.com>, Andreas Hindborg
+ <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>, Keith Busch
+ <kbusch@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240601202351.691952-1-nmi@metaspace.dk>
+ <d6999fef-aadf-494e-ad58-f27dfd975535@oracle.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <d6999fef-aadf-494e-ad58-f27dfd975535@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-ID: <20240602-md-block-brd-v1-1-e71338e131b6@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAFAEXWYC/x3MywrCQAyF4VcpWRsYh1ovryJdZGaiDbZTSVQKp
- e9udPnBOf8KxipscGlWUP6IyVwd+10DeaB6Z5TihhhiG7oQcSqYxjk/MGlBbimfzt3hSJHAL0/
- lmyz/3LV3JzL2IdU8/CKj1PeCE9mLFbbtC8u0lYh9AAAA
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: WTJvNnTsNT_634DVFL4EkwRVN1HKr2YH
-X-Proofpoint-ORIG-GUID: WTJvNnTsNT_634DVFL4EkwRVN1HKr2YH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-02_15,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- adultscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 bulkscore=0 spamscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406020208
 
-make allmodconfig && make W=1 C=1 reports:
-modpost: missing MODULE_DESCRIPTION() in drivers/block/brd.o
+On 6/2/24 19:57, John Garry wrote:
+> On 01/06/2024 21:23, Andreas Hindborg wrote:
+>> From: Andreas Hindborg <a.hindborg@samsung.com>
+>>
+>> Block size should be between 512
+> 
+> 
+>> and 4096
+> 
+> Or PAGE_SIZE?
 
-Add the missing invocation of the MODULE_DESCRIPTION() macro.
+PAGE_SIZE can be larger than 4096. But most drives are 512 or 4096 LBA-sized.
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- drivers/block/brd.c | 1 +
- 1 file changed, 1 insertion(+)
+> 
+>   and be a power of 2. The current
+>> check does not validate this, so update the check.
+>>
+>> Without this patch, null_blk would Oops due to a null pointer deref when
+>> loaded with bs=1536 [1].
+>>
+>> Link: https://urldefense.com/v3/__https://lore.kernel.org/all/87wmn8mocd.fsf@metaspace.dk/__;!!ACWV5N9M2RV99hQ!OWXI3DGxeIAWvKfM5oVSiA5fTWmiRvUctIdVrcBcKnO_HF-vgkarVfd27jkvQ1-JjNgX5IFIvBWcsUttvg$
+>>
+>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>> ---
+>>   drivers/block/null_blk/main.c | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+>> index eb023d267369..6a26888c52bb 100644
+>> --- a/drivers/block/null_blk/main.c
+>> +++ b/drivers/block/null_blk/main.c
+>> @@ -1823,8 +1823,10 @@ static int null_validate_conf(struct nullb_device *dev)
+>>   		dev->queue_mode = NULL_Q_MQ;
+>>   	}
+>>   
+>> -	dev->blocksize = round_down(dev->blocksize, 512);
+>> -	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
+>> +	if ((dev->blocksize < 512 || dev->blocksize > 4096) ||
+>> +	    ((dev->blocksize & (dev->blocksize - 1)) != 0)) {
+>> +		return -EINVAL;
+>> +	}
+> 
+> Looks like blk_validate_block_size(), modulo PAGE_SIZE check
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 558d8e670566..3fb2f37ab893 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -296,6 +296,7 @@ static int max_part = 1;
- module_param(max_part, int, 0444);
- MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
- 
-+MODULE_DESCRIPTION("Ram backed block device driver");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_BLOCKDEV_MAJOR(RAMDISK_MAJOR);
- MODULE_ALIAS("rd");
+Not PAGE_SIZE...
 
----
-base-commit: a693b9c95abd4947c2d06e05733de5d470ab6586
-change-id: 20240602-md-block-brd-e4ac89657a2a
+> 
+>>   
+>>   	if (dev->use_per_node_hctx) {
+>>   		if (dev->submit_queues != nr_online_nodes)
+>>
+>> base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+> 
+> 
+
+-- 
+Damien Le Moal
+Western Digital Research
 
