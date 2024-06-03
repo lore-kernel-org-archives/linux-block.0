@@ -1,228 +1,185 @@
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2121.outbound.protection.outlook.com [40.107.6.121])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB0984FDE;
-	Mon,  3 Jun 2024 11:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.6.121
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717415242; cv=fail; b=Yr1H0CVkpie/c4E8/eu0a4AMxE6NezuaPvTOMQwDyHeQvBZ4ZqFUgeepsVEaX8BPQf50Knba4tYFoA2i/fH7/LQzkfwC9JvzSZUo7RTrkkZcPXxFtFLKa4MjXYK0cNq4fMZPcZegPYsUWvpKhDeOYr4uqDc7hS4Z0KosbIvomtM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717415242; c=relaxed/simple;
-	bh=emWdh88yIZPuI9XD231vukObF1MJaRhmIpzkFn+8gBk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lCMF/OP9EZ1bmiL4Dg+Wi1bWgA9GvECpXj9dPH7BDzYjbFvw4NFaGTaZB1tpxAPPNdA4FmDKRnp9e763KAQsybzOrzWzCi2jfzblIQ7MFsNUTQrmnsR/zl3/C9g9AbxxaiYnzPhr7wb9quhn6jJVeKUUq/H1TyW1tIVSfLh0gEE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com; spf=pass smtp.mailfrom=volumez.com; dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b=UZAHehRs; arc=fail smtp.client-ip=40.107.6.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=volumez.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEE386248
+	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 11:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717415609; cv=none; b=TPkmQjMDK296vH2xYqXb3MWfC7tz/JoJ4QfAxRyGYVojhs/HrWAvVkz3RroL2dbl8cFFmeqFBskN4CKdY47CvE3fBLUqAVZd4bENQGmumxkj2V4NrIAE2l2XDyst7wsx/T6wdWVZVInHTtaQnotbrP5tRvWD4wrrblxwAAHBqEA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717415609; c=relaxed/simple;
+	bh=yyNUMLw/GbUO1MJCYZB6GVLkpbdu8CsKGpnKsH8egEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=J8S1MFk6aCaBYM8Yvb7FKwDKmS7Er59VtggftKdssJkq0z5crHX6Us1vFVBv3/hrU0feaEHSY+cwperFMu/oFddFH1LV9o/9xzCC1X6jA5ri56amvZxqNIal5d6/m5CG0cdmc+2WEmtXg0H2PcnX/u7LjG1Z2xftyqAT7oiWtOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=fP+DAI06; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b="UZAHehRs"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A3WMuE9d3PKdxawz2T1T6k442enZ4SAZHSwTegqLGG5/p9rLJU6snRH8EhblHoAA/ZPvS8upUzSNPWm1at1JiZau3AXlgS6kGTkmPtN/9O1HDgtCzCF1EZ9n8JskACTLszZEVFzBsyewu1WaGRkGQQsJ1AgumbynKghnpCBZcADL/Z0yYJQuSC3Up2xq/xmdC5VOhNq1yHJkb1nkChVrJRAYGn1/r+cakTKe2xxU0UNd52QPSuJ904uuhDQSwkAgPsM/BZt+tYpDCCLaXBZYrzzyBVFKHLmderw0sCmLNLVOs+tfSvHCiMqAKstve2TmHQbxUlhytz67pd7/4pxE5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=emWdh88yIZPuI9XD231vukObF1MJaRhmIpzkFn+8gBk=;
- b=Z5EE6UoNo1xBa5fHBchHIrOZHRePsPck4LnX7LGDaDu14rJ+w35s8b9ksYNSLuZMVjksQjLeUXZxIBuNBlAhfePmNR828pA/s4KfVcgljT3o3+D3lJWih9XhOljsIWx93pRpvwIYut3vqVdmix9RL5GCEnDYA/aaNrRN5LCYW65LYPqZtc45MnGugUTo7/dQiXGcHfWcyYaLNPtc/M1i8hyW7d8qeL/RhnROSZr+vkyMuDe1TXN6Q+u2FC6lVIDqWucghPREuQ9mNkJt7nr+dcYsOPBSuc1aBS3Oiab2wETQOiJG8Wj7OlSdC6rcK+xwV42U9gDMyquArqXgSO0DdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=volumez.com; dmarc=pass action=none header.from=volumez.com;
- dkim=pass header.d=volumez.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=storingio.onmicrosoft.com; s=selector1-storingio-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=emWdh88yIZPuI9XD231vukObF1MJaRhmIpzkFn+8gBk=;
- b=UZAHehRsflZp57SyHV/bOSJYWmZsX5N1L4m6NISbn1FB4PhETeazyN/t20jEzL+nXHNcr8ixGIrEVqbLLo49/l3tCFTEUVHTfm40o641kqZu/4bv57DzBhe6B6pbldZE+Axazbj/+6mYS8TYL1vn4NPizWQEWaLui7DCD8sYZQyNw8q3z4xM84Y2TWiI21V26OifojIw77B1yFBeBNerLAgg+XDA6sSHpWwbzyeazO/F+Jsdc+7T2weo6bKbk2ThGC760plgdqyOO/GUnS/+kGDXEQwT69DXK8TuI98FoeqTIuNv6hxk98uCiTg0Qt/dOFHx+NSn79BjBdIHhlbGxA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=volumez.com;
-Received: from AM0PR04MB5107.eurprd04.prod.outlook.com (2603:10a6:208:cb::11)
- by GV1PR04MB10243.eurprd04.prod.outlook.com (2603:10a6:150:17d::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.25; Mon, 3 Jun
- 2024 11:47:15 +0000
-Received: from AM0PR04MB5107.eurprd04.prod.outlook.com
- ([fe80::de53:c058:7ef:21fb]) by AM0PR04MB5107.eurprd04.prod.outlook.com
- ([fe80::de53:c058:7ef:21fb%4]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
- 11:47:14 +0000
-Message-ID: <85e8e613-ea8f-4f6d-b9f7-cd05913b5de6@volumez.com>
-Date: Mon, 3 Jun 2024 14:47:04 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] net: introduce helper sendpages_ok()
-To: Hannes Reinecke <hare@suse.de>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org
-Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
- kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240530132629.4180932-1-ofir.gal@volumez.com>
- <20240530132629.4180932-2-ofir.gal@volumez.com>
- <8fc3fc34-2861-429e-9716-b25b90049693@suse.de>
-Content-Language: en-US
-From: Ofir Gal <ofir.gal@volumez.com>
-In-Reply-To: <8fc3fc34-2861-429e-9716-b25b90049693@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TL0P290CA0004.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::17) To AM0PR04MB5107.eurprd04.prod.outlook.com
- (2603:10a6:208:cb::11)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="fP+DAI06"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240603115325epoutp041cb06b3677f562796617b86c304399e1~VfGTKDvkq1301213012epoutp04-
+	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 11:53:25 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240603115325epoutp041cb06b3677f562796617b86c304399e1~VfGTKDvkq1301213012epoutp04-
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1717415605;
+	bh=LcKYgdyDMyHXraxQxmDzCTSZymeakJlnkz6ezAKVGEQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fP+DAI06tMvyyGgS+6+6Qj6y6AqIJI7EZrwW9N4siuCnFMedcp7Zhy7EIaZvXRn/H
+	 79eXl+75vclvvIIC+AN09nC/4fS9TvF8Ex9PdqdE4/4XWxETKR1R3gDq3d99KcTcqo
+	 AhSZzxjQZl+OP+6vV+bmak+KBgEv179sfmqmAJAQ=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240603115324epcas5p3e77764cde13ea6a0ae34e3ca3687866b~VfGSjgeNx2720327203epcas5p3H;
+	Mon,  3 Jun 2024 11:53:24 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4VtBv73FtVz4x9Q6; Mon,  3 Jun
+	2024 11:53:23 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	01.06.19174.3BEAD566; Mon,  3 Jun 2024 20:53:23 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240603114332epcas5p26f0bff3af640acf73819b485b02ea318~Ve9qyqWb91520015200epcas5p2R;
+	Mon,  3 Jun 2024 11:43:32 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240603114332epsmtrp227d5502c0abfcd0cc2120278ca9eff6f~Ve9qwgjRP2552225522epsmtrp2V;
+	Mon,  3 Jun 2024 11:43:32 +0000 (GMT)
+X-AuditID: b6c32a50-87fff70000004ae6-c4-665daeb3ffe2
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	EA.8E.08622.36CAD566; Mon,  3 Jun 2024 20:43:31 +0900 (KST)
+Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240603114328epsmtip217510b9a96c0c468e513a20910da8803~Ve9nGlrbV2032820328epsmtip2V;
+	Mon,  3 Jun 2024 11:43:28 +0000 (GMT)
+Date: Mon, 3 Jun 2024 11:43:40 +0000
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, Alasdair
+	Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka
+	<mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg
+	<sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara
+	<jack@suse.cz>, martin.petersen@oracle.com, bvanassche@acm.org,
+	david@fromorbit.com, hare@suse.de, damien.lemoal@opensource.wdc.com,
+	anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
+	gost.dev@samsung.com, Javier Gonz??lez <javier.gonz@samsung.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v20 07/12] nvme: add copy offload support
+Message-ID: <20240603114340.5rvx3o57h2zojfjs@nj.shetty@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB5107:EE_|GV1PR04MB10243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6afaea04-f8f4-4267-a597-08dc83c2e957
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015|7416005;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Nk9MdzNPNUdENis3U2lNSkZDRnVSN3dSVDJodlBlWDRyQ0xwT3AvUW5aUlpV?=
- =?utf-8?B?aGxwZVVyaUNsbG9obUgveHZlV2xOVzFRK3QvTE15dHRpYXdRY3A2RXN1cEZz?=
- =?utf-8?B?MS9tcFdEQlI0RnJ5WnNZQm85WmxSemFFK1kvTU1HMlRUWUp1dmVtbWRkSDFk?=
- =?utf-8?B?R05xUmpZMm1HeGl5VFhMQXdkaFFTUXU1QlZMaWNBTFZhOEJBSTQxTzdkTlVm?=
- =?utf-8?B?eXh0cnVnNndxNnNtOHFkUkVnbktTdVBSVTVNQThmaHFxSmVIcTVRVlQ4RGpT?=
- =?utf-8?B?OEx1anZnZUszM2F6M2l2QU10ZVQ5RGZsVzVZUElxM1lzV3VDRXRxWXB3cHdm?=
- =?utf-8?B?R1R2ZUZVZVVybC91bktBanFMdERCbmdEZm5HcTFrZVR4Q1Y3WUFWWFFvaUVP?=
- =?utf-8?B?bm5vdzBwdk9qZnpQLzlCREo2K1pIMjBlWlIrdkpsbGovN0FvUmxIdTRjYkl4?=
- =?utf-8?B?LzlIOXY3VUl4ZEEzdFFkWWZkaTVETzltNDE1VzFzVkJYNENBOGJHeWViQU5X?=
- =?utf-8?B?dzNWdVdVc25YcElMZU0xeFZEUFIzaHFmOHJwdjhvUFhIV0ZFaVRYd1hnTUZS?=
- =?utf-8?B?YlhkdmhzVnBNRWt2b08zSVp0eHpxelVWQVNPSTU1Q0hTbW9iN2l0eGpmV2RL?=
- =?utf-8?B?bnRoNmJuN3pqSGJxaHpycXdIQTROdmozWmpKb3NRcVBZQ2Q0VkR1cVNKVTVL?=
- =?utf-8?B?WnpXaXIvUlBDNUd4VVZ6bWgzVzhEbms1YXd2U0s1MVdZbm1OdW9yc2U0RkU5?=
- =?utf-8?B?VllndXVRcERJYm8rVnFTUDI5blc4ZzdnWExGK09sTXpDWDkzNG1vK1d0YjAx?=
- =?utf-8?B?YThkbmxFdmR3K2srYjM3UXJFZmpCdHpwWTZDR0dpZVFrQVlINVdhbk9nRENV?=
- =?utf-8?B?U1l5VmxhT0p6Y0tzbUZRMEE4U2lGSWpReDU3ZGliY2xpeFlLY1NhTWNINFQr?=
- =?utf-8?B?RWsrT09nNG9mREprb0lDSVNUL2ZHVXl4TVVmakxmWG9aMS81U0JYenVUNFBW?=
- =?utf-8?B?YzVsZlVsUzNJWXZCdlVHUFFmUnR6Zk54TzhtSlpMdjhMNTcwd052dlcxTVJn?=
- =?utf-8?B?Zm5iaTljUm50MGliOG8wWXNQc1YwcTBqTVNGajRaS05WTWpPbUxKNVJWYlVz?=
- =?utf-8?B?UE90MEJPZ09pcURrdkNNMC9NSmgwQ2JjUlM2QnZBUlJGNkFyM090RGZKRGNJ?=
- =?utf-8?B?Wk1wN3puOVlESXdONW5xd29vT2hzZmdmcmxiVkZRVHhsR2I5N3RvRGZSeklH?=
- =?utf-8?B?MDlPRVo2cDhqUGJFejRtRUZ3MEp0K0NNaGl3THRXSVVnSmowOEVrWFQydkF1?=
- =?utf-8?B?Slh6N2lwYXhjSXBPSThYbWNjaUxEL2MzeGFVUTN4S3ZueXZ0USszSUdpalkz?=
- =?utf-8?B?Q1Y4anJVYVgwU21yc1JTd1VSN1BGaVBZZDk4dHhtVThCY1lUUFI2ZlZhRkt0?=
- =?utf-8?B?MUFRS1p3MUNhNGtEaFM5L05kVUk2L1UwV2ovTDZubk1qYU5HckpHdm81VGND?=
- =?utf-8?B?SnhxRHBMTkJ6ZXI5NzJ3KzRTVW96S0xnVG8vdHdjQno0VzQ5cEg4S2Fsc2ZH?=
- =?utf-8?B?bk9Eb053UGY3dFBPQlA3M2t6TUpPeU5sR3J1Ui9tNUVlS2luL0pza3BZRFl1?=
- =?utf-8?B?TDlhbU5FYlhsSzFOcndVRUM4M09EU1dsRjBqVi9OTHhBM0lVUEZPbjR0WmVG?=
- =?utf-8?B?ZEVuNFk2V21vOHBHNjNIVUV6N1VNdGpNU1FJNkRkNW5DSmNnVjBJdWhRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5107.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?amlkRU95eWFmQng2V3RiZnlHbWFYUkdNNnBjbUh6UiszbllsRFNEVFFhaENo?=
- =?utf-8?B?KzNFVHZVR1pGRCt2S0lnOGZtR3RkdkhUelZaR0VqZTh2eUJJcjljUlpGaWdK?=
- =?utf-8?B?SUhsUGFxOVBkR1hVUlBpYSsySG9Mc3dXeFpaWG9QNEZmcEcvbGFNMm5oc2o1?=
- =?utf-8?B?TVpyTEFINTZKTm1PcFpSQ1V5dGVIY3d2UDdnUjBVUitvSUFrWEJ6NElNOG45?=
- =?utf-8?B?VmwvZDZjSUNGejhXYk1ZbXR3KzlCanJBMGJrei9MNmNtV0tTdWJma0JlcHJa?=
- =?utf-8?B?VG9sWm1TWjEyTmMxbThweEJUYkRjSHZCclhPdGN5OEVyMS9aQVduOE1ucGlO?=
- =?utf-8?B?UlRRQWpnOE5ZSGdVZmdrTTBXdTB6U0pXZmxCbWtLVU1BU3o5a0pqYzAxZndz?=
- =?utf-8?B?aHNlQXNEa0MrTXE5MlJ4c1Q0VUJHcjBsaFh1QmtoWFE4d01aVnI2QzYwalFk?=
- =?utf-8?B?QkNXbFY2K0ZUaElkUWJQcFkwckpCZWRuV3FobC8zM3NxNXRzVDhLT3ZHRlVM?=
- =?utf-8?B?VEVNR0I1Nm9CcnpqWVd1Q0FIcXIvTytnV3U1emYxUXRuNTFqZzhkamVVUXdk?=
- =?utf-8?B?bWNXNjkrazBSS3VZS2N5WlFBM1lKQ3dreVc1TnEzRWQ4TTgvYW9kVVJ5TkFX?=
- =?utf-8?B?d3h1WXFBOFJ1cjc5R1pPd0UrV3p4aTdyaFdqREFoemRZSHhvZ3N1UTY4UnU2?=
- =?utf-8?B?N0d6Ry9ieUo0REx5VG1KQ1Z0RnZVc21JTk92djE1UXB6K3lwaTdIVFNYUEg2?=
- =?utf-8?B?Uk54a2VlcnJkY0NIWFVBWW44RFhlajdKUm5YamVoK3phSWtHNmtzUXNmNDFN?=
- =?utf-8?B?dkE4ZGx0NkhiZGU3a2dvN1VYN0g3NHBldzgxNXZRNjg1YXdHcGxZL1NwNFlZ?=
- =?utf-8?B?VTZXMnhxMzVkbFk3WHVuWjhIK2J1U01RK043ZGdBV0VXT1RYdmJkbDVnZENz?=
- =?utf-8?B?Ui9qZHR0RW83V3dYdHBqZmVyLy9HUGppQW5BL3FDRjRDK3B1NExFTnI2cFNY?=
- =?utf-8?B?YmV4QkhQZ3ZMN0d0T3JEU0I5Si9EWFBwK1dQekF6TElKSWVmTzRQRXB6WnVL?=
- =?utf-8?B?c01pODkrMkVGOVZ0SDFmN25oa2NFOUZ3VTJQdkFxRmhHbjBTV0NOZ3VDaFUx?=
- =?utf-8?B?dU9BQ3MwdnRYNitSbW5QQmIrTjJBOWgyVmIyL1FrNzA0VlNIK3g3UG5BMlBi?=
- =?utf-8?B?SWE1eC9DRWd1dmdnUHVrZ3BtNEZkSWNVekJBN1RWZHo0N3ZGOERjdDdPRzYw?=
- =?utf-8?B?ODVGQXlwS281ODVvOFNUL1RYM1pydy9pS1RLTlhNN0dtUmZ4VTRwM1NtaUwv?=
- =?utf-8?B?clV3YlEvd2NncVZveUhLWU9vY0ZJd2c0ZTRJQmJwMDU3QVRDNVFPMUhDSWJZ?=
- =?utf-8?B?YUtPRjBLdUwxRWErN3R3Sk53Y0RIM3B2ZklTc21hNHFlOFdWY3cyaVY5alk3?=
- =?utf-8?B?VG42QzhEd0pBMWtIZm9ZcURlOVR5SWs3OEZNb1BPczh6dCtDam9qQkQwa1I4?=
- =?utf-8?B?T1NpVXUxZUtzazA4K1RFanFveUx2MERIT0MzTy9JOTcwUklBMzRwdjcvU2JO?=
- =?utf-8?B?V0JBOWVMUTR6ZUJpUmIwbTlsSFRPR3hGNlA2UUtzMnAzb0xUdWlldmRtUDN1?=
- =?utf-8?B?SHZKNVNWYk1sK0R1TzErRllaeTI4bGxMdVI3aGZndVNtbnBNUjRsdWdTMURj?=
- =?utf-8?B?WERNNkt3bFZqKzVUTDlhakFjTVJxekNOZjZQRHRrN1ZNR2JZUVhzVnU4aDhn?=
- =?utf-8?B?cWROeVdiMVo0RTZaTndrQmlVWlIvK3Z3NWIxM1ZJZkZrR3VYL2FMYXFCbGJq?=
- =?utf-8?B?TElvWFhrdStEWEtxUWxmeW8vcDlJcnNxN002VDQxTWpCbmI5dURNaHZBd1Fj?=
- =?utf-8?B?Ynh3eWRocms2Q0pVeXNZUzVhYTdudXBGRnJJSUpBaDBNK1dXUmpsY2ZEdUdO?=
- =?utf-8?B?Nk5FbUhyT0prT0FVUlUvUVo3dzJ1cTBONFFKbldFdUpEWmF4MkFwTkxlNUZ5?=
- =?utf-8?B?TWlkUkZ1bXVQb1JnckRvTXA1b09wV0hZbEdMZkhyK0o5ZFUxcGRTcXZ4dVNt?=
- =?utf-8?B?RnU2NW43b0dWTk90SDdodWd3QW9BOGgxVk1MVTYwUzdQb3ZybjBOOU9qNDVo?=
- =?utf-8?Q?sgB3V8LrslqR+su4RLZJWvMQV?=
-X-OriginatorOrg: volumez.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6afaea04-f8f4-4267-a597-08dc83c2e957
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5107.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 11:47:14.2236
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b1841924-914b-4377-bb23-9f1fac784a1d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2klV7o4pM/SCI5dhtYrYMgZrP+cFire2jGfJahW519bsBdRKFhMY6Pm6/dasRlE+RFFPHCw4YhyoftYhZXUjng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10243
+In-Reply-To: <20240601062219.GB6221@lst.de>
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTVxzHc+5tbwsOcwUWz+qLFNxABrSTsgODKZHMm0gysmUzkTmo9NIi
+	pS19KO4PLfIYj4HgcEARRWBD3u+Np5MiIEWCjoGB8AqWbQJTXsMZAqylsO2/z+97fu9fDhu3
+	LWdx2BEyNa2UCaVcwprxY6eLs1t91dlw3u1Fe1Rt6MbR1Yx1HJWPXyPQXOcSQN8tvMaR8f7X
+	AK31D+CooXsCoILCfAYaud+MobbC6xgqLe/CUF52HIaejS2zUNfmnwS6rh8GaGZIh6H2UVd0
+	J7GYgdraexlosOUmgW7/MMNCJT0bGMpMGsJQkzEWoKq5lwz0cHQfGljvYR7fTw3+eooyFEKq
+	WTfOogYmahnUYL+GqitLJqj64ivUH/W5gGod0RJUUfq3TCot7gVBNSdMMqnFmVEG9fLeEEGl
+	N5QB6lHBA1aQ3ZlIXwktFNFKB1oWJhdFyMR+3FOfhpwIEXjx+G58b/Q+10EmjKL9uAGBQW4f
+	RUhNG+I6XBBKNSYpSKhScT0+9FXKNWraQSJXqf24tEIkVXgq3FXCKJVGJnaX0WofPo/3nsDk
+	GBop2ch4SCj+2h2zWjHD0gL9GynAig1JT/h9+s9ECrBm25JtAP7UeBezGEsAdg42MS3GKoAp
+	HVX4TshK4hjDzLZkO4DxC7TFaRnAip5azPzAIJ3gVHMJKwWw2QTpCvs22WbZnuTCmdl+YPbH
+	yQ4CJizmbCW1I/1g6uMaYGYb8gTsy0/d5j2wN9e4VczKlKfrceNWR5ActoJxuVqWpaMA2D3R
+	ASxsB2d7GrZ1Dlx+0U5Y+CIszbpLWILjAdQ91W0HHIMJhmu4uVOclMDW5BCLfADeMFRtDYOT
+	u2HamhGz6Daw6dYOO8KK6oLt/G/B4Vex20zB8vguYNnKGIBpHZlEBjio+99Auv/K6bZK+MDk
+	hatMi7wPlmywLegCq1s8CgCzDHBohSpKTIcJFHw3GX3x3yuHyaPqwNavORLUBMpr1t31AGMD
+	PYBsnGtvk345ONzWRiS89BWtlIcoNVJapQcC04Eycc6bYXLTt5OpQ/ie3jxPLy8vT++jXnzu
+	Xpu5hHyRLSkWqulImlbQyp04jG3F0WLOv/jmlMW0ygsD0z3rRvytxZzYXbnOgRlPj2k+Od3g
+	314VOnE6SmqfuktQp71RvHxu2uPc9Osp68DJw8yKPXG+KzftW4gx2Hh+1CBYLepaOZTzeX9b
+	KGfjQdzzPu/MgP3zktbz4hkf/QdTssUn2ZEnYypnsyuNzq8+PuTYEGHnv3ynwRh98lKvk93f
+	tZXfzM7D3/YSpUVanuiCUTInfnLvnfVp77MxgUkHDj/Kqn63pN0pezM6L0udwB1qWZtW35Im
+	tQoOhrumBFP6vKVCxxr49rOW4Uh15LWgM9FftM0PqFzwlMuV5JdXYng63bhHbuJnEeX5k8ex
+	o4ai4PjnrYO/z3VyGSqJkH8EV6qE/wCfm8hgvgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrLIsWRmVeSWpSXmKPExsWy7bCSvG7ymtg0g7PrzS3WnzrGbNE04S+z
+	xeq7/WwWrw9/YrSY9uEns8WTA+2MFr/Pnme22HLsHqPFgkVzWSxuHtjJZLFn0SQmi5WrjzJZ
+	zJ7ezGTx+M5ndouj/9+yWUw6dI3R4unVWUwWe29pWyxsW8JisWfvSRaLy7vmsFnMX/aU3WL5
+	8X9MFhM7rjJZ7HjSyGix7vV7FosTt6Qtzv89zuog43H5irfHqUUSHjtn3WX3OH9vI4vH5bOl
+	HptWdbJ5bF5S7/Fi80xGj903G9g8FvdNZvXobX7H5rGz9T6rx8ent1g83u+7yubRt2UVo8eZ
+	BUfYA4SjuGxSUnMyy1KL9O0SuDK2NS1hLVjOU/G6fxV7A2MfVxcjJ4eEgInEl7Y7LF2MXBxC
+	ArsZJVY9u80IkZCUWPb3CDOELSyx8t9zdoiij4wStyeeZANJsAioSDzYuRwowcHBJqAtcfo/
+	B0hYREBJ4umrs4wg9cwCR9kkFm6YDDZIWMBWovvCBrAFvALOEqfndjNCDL3HKPFt+xqohKDE
+	yZlPWEBsZgEziXmbHzKDLGAWkJZY/g9sASfQrqMXtrJOYBSYhaRjFpKOWQgdCxiZVzFKphYU
+	56bnFhsWGOWllusVJ+YWl+al6yXn525iBKcILa0djHtWfdA7xMjEwXiIUYKDWUmEt68uOk2I
+	NyWxsiq1KD++qDQntfgQozQHi5I477fXvSlCAumJJanZqakFqUUwWSYOTqkGpqMVaxNYnjGW
+	z4n4EqYgctqC8yTzjKyqjcW+yn/08rZbvm7dMc2s2XfRr17vlx/kbdXZag+VS1XpiJmonmXZ
+	catLhauorJrX1zjY5bJF+M2V8h9yKrhEiuZNVfBoVKpkMPaNWOAzSe92i7rF87Kce+5vzVxr
+	ezQOXZOzcahc5HHYx0Uw4kjxBbGiZ556V6eYJsfvf7k11J1z4cmX4uE1EzRZbh4OfOf4Ivv6
+	uSdzFDf+bW6YePRaxSG/Gv8um02dIU6LpZgWeDFdnMyx/83UqVGV9g2nXi5rSb1bO/3Ex08V
+	7D9OPpX7MS3c4akJb3h3inztRrNvjqciKs4+vvzQJUnD9GzfrH8ii7dfLTBTYinOSDTUYi4q
+	TgQARi3hiYADAAA=
+X-CMS-MailID: 20240603114332epcas5p26f0bff3af640acf73819b485b02ea318
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_52166_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240520102940epcas5p2b5f38ceabe94bed3905fb386a0d65ec7
+References: <20240520102033.9361-1-nj.shetty@samsung.com>
+	<CGME20240520102940epcas5p2b5f38ceabe94bed3905fb386a0d65ec7@epcas5p2.samsung.com>
+	<20240520102033.9361-8-nj.shetty@samsung.com> <20240601062219.GB6221@lst.de>
 
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_52166_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-
-On 03/06/2024 10:18, Hannes Reinecke wrote:
-> On 5/30/24 15:26, Ofir Gal wrote:
->> Network drivers are using sendpage_ok() to check the first page of an
->> iterator in order to disable MSG_SPLICE_PAGES. The iterator can
->> represent list of contiguous pages.
->>
->> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
->> it requires all pages in the iterator to be sendable. Therefore it needs
->> to check that each page is sendable.
->>
->> The patch introduces a helper sendpages_ok(), it returns true if all the
->> contiguous pages are sendable.
->>
->> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
->> this helper to check whether the page list is OK. If the helper does not
->> return true, the driver should remove MSG_SPLICE_PAGES flag.
->>
->> Signed-off-by: Ofir Gal <ofir.gal@volumez.com>
->> ---
->>   include/linux/net.h | 20 ++++++++++++++++++++
->>   1 file changed, 20 insertions(+)
->>
->> diff --git a/include/linux/net.h b/include/linux/net.h
->> index 688320b79fcc..b33bdc3e2031 100644
->> --- a/include/linux/net.h
->> +++ b/include/linux/net.h
->> @@ -322,6 +322,26 @@ static inline bool sendpage_ok(struct page *page)
->>       return !PageSlab(page) && page_count(page) >= 1;
->>   }
->>   +/*
->> + * Check sendpage_ok on contiguous pages.
->> + */
->> +static inline bool sendpages_ok(struct page *page, size_t len, size_t offset)
->> +{
->> +    unsigned int pagecount;
->> +    size_t page_offset;
->> +    int k;
->> +
->> +    page = page + offset / PAGE_SIZE;
->> +    page_offset = offset % PAGE_SIZE;
->> +    pagecount = DIV_ROUND_UP(len + page_offset, PAGE_SIZE);
->> +
-> Don't we miss the first page for offset > PAGE_SIZE?
-> I'd rather check for all pages from 'page' up to (offset + len), just
-> to be on the safe side.
-We do, I copied the logic from iov_iter_extract_bvec_pages() to be
-aligned with how skb_splice_from_iter() splits the pages.
-
-I don't think we need to check a page we won't send, but I don't mind to
-be on the safeside.
-
->> +    for (k = 0; k < pagecount; k++)
->> +        if (!sendpage_ok(page + k))
->> +            return false;
->> +
->> +    return true;
->> +}
->> +
->>   int kernel_sendmsg(struct socket *sock, struct msghdr *msg, struct kvec *vec,
->>              size_t num, size_t len);
->>   int kernel_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+On 01/06/24 08:22AM, Christoph Hellwig wrote:
+>On Mon, May 20, 2024 at 03:50:20PM +0530, Nitesh Shetty wrote:
+>> +	if (blk_rq_nr_phys_segments(req) != BLK_COPY_MAX_SEGMENTS)
+>> +		return BLK_STS_IOERR;
 >
-> Cheers,
+>This sounds like BLK_COPY_MAX_SEGMENTS is misnamed.  Right now this is
+>not a max segments, but the exact number of segments required.
 >
-> Hannes
+We will move this check to block layer, with name
+BLK_COPY_TOTAL_SEGMENTS.
 
+>>  /*
+>>   * Recommended frequency for KATO commands per NVMe 1.4 section 7.12.1:
+>> - *
+>> + *
+>
+>Please submit this whitespace fix separately.
+>
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 8b1edb46880a..1c5974bb23d5 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -1287,6 +1287,7 @@ static inline unsigned int bdev_discard_granularity(struct block_device *bdev)
+>>
+>>  /* maximum copy offload length, this is set to 128MB based on current testing */
+>>  #define BLK_COPY_MAX_BYTES		(1 << 27)
+>> +#define BLK_COPY_MAX_SEGMENTS		2
+>
+>... and this doesn't belong into a NVMe patch.  I'd also expect that
+>the block layer would verify this before sending of the request to the driver.
+>
+Acked
+
+>> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+>> index 425573202295..5275a0962a02 100644
+>> --- a/include/linux/nvme.h
+>> +++ b/include/linux/nvme.h
+>
+>Note that we've usually kept adding new protocol bits to nvme.h separate
+>from the implementation in the host or target code.
+>
+Acked, will move it to a separate patch.
+
+Thank you,
+Nitesh Shetty
+
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_52166_
+Content-Type: text/plain; charset="utf-8"
+
+
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_52166_--
