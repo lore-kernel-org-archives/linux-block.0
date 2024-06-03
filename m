@@ -1,117 +1,63 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D045A137923
-	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 19:26:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C1620ED;
+	Mon,  3 Jun 2024 19:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717442821; cv=none; b=bUj4ENoUl6AimbGZnt3ez80Bim0tIItgSmiCQa0c/1+1N7RwBYq8tOgdnFRsYD6306VNDaguiUxQHJoCPAN+EQl5bgT7qAz9W3T7Z18va8MXQAqOdZHy8iiapNIQp18e46wRsPD94ocUz2wwRYRIstOLgPxvo+8USjQZI79NPqI=
+	t=1717444040; cv=none; b=AkL8mfQGad28RddTdqpCal5kHA7hkfz0IoZZbr2DK4LKa1ZtdNSWQoBUExJxSh95ea/Y3O1f/bLNxKBJRW5TrRS/SOTzjZOOUDmXa9uFtTsttJp57cFM8aJ/S+n1Vwj5wetRpYzC/qpnBjIXuAIXscHDAaSWWXqm+sywWUGALig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717442821; c=relaxed/simple;
-	bh=5tryiqGWz7woo9GeAI9cW9IgeIA3mnTyekQazR6n7B4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SuY+SF0VUysyLpcmhAwsUTmqdYAbn/gHhjDBPp+osRt3KYvr034qpLePIHZzGVUok6R5nyQEiRtK/zIQCwQshNunRPEOnbyq8fWmZ7qdxGOyHyRPmAUTNxKoNFuOPCfQI4LPY5hS3zUuBd33MR5EAcNO3IIJkAa+4eivw/4kcFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=VC5X3SyU; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1717444040; c=relaxed/simple;
+	bh=v+0RbsfKdGgk/6XvGRknMDTc2wiUcVUl6dcouRw8NJ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PsZz++ekOgyEsZFwTkJi7ONr/YQ0PYJEeUSb70SPUgiZoTo4s5Vs3o7ZjLqW/iCCJGrZ5RY5VUkr3Vf/ekSq4VuWE1o6gpO2wUHaX20/JjlRhs1PJEu4qrfonZ0CVpFKHvzheTfEvXjsrm0GvCSVm8b/XVSl859VBjJFxumVMWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QPmyw51K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="VC5X3SyU"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5295e488248so4989130e87.2
-        for <linux-block@vger.kernel.org>; Mon, 03 Jun 2024 12:26:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1717442818; x=1718047618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bgq00PUjrhCM1KT9z8TW3RB/dgS4Xp/0LzoRpKh5jRs=;
-        b=VC5X3SyUAX39DOqxIZieCJeam9lTh7o1tGDRr39FCQjSum+iV0kRiLYJqXbT/XadTx
-         Zd4C8geUfvFnvXlVPvq51RbcxsGSgCgw66Y5MB4QdzG9y339gcj3ffadEK262Tqsz9u0
-         xE9Hdf6mEAwFJDmCoSEabrpdvHy68D2E9GDv16HAIDqwss6QEFo2Fa84Q6YkfhTVBiCM
-         zuc9VxnowYCjcU5h4RX8m7fJIAdq9f5k9LmqmuSJVEBm/MfOc1B2LAKeNAzG3O3GgVb8
-         1o3SH6UeVfxCa2/fVPXL1QDHrPb5N+1OHdk9F7Ok/qVXmjwjBvL8mLQ1nHbyxXSZTIO7
-         WlTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717442818; x=1718047618;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Bgq00PUjrhCM1KT9z8TW3RB/dgS4Xp/0LzoRpKh5jRs=;
-        b=LLlR4GGHZTVeKKdy1oebQ0i1fKBKQBKwSREcRtx9IHNlpK5P8BslrG9g2GVebmff9+
-         H59y7Trt0DhyAlnjOVzpoEQe7X1JqNkg/RPStIlbCdQh/GG7J8mxacALwASnr60Dku7Z
-         4CwQyyMuzk82cj47OP4MNI6fR4dUCVTOxqxaKlFPWRLul/8U0kMiS2iS+gSQR9D59InB
-         n9Q9BJjxEXcZ5E43SevlPZXc048aokWKMHVIB7rXPpxb9DcK/a06cIden7Ww/nSlk0N7
-         7m10KdalJKSiCfN749Y9pswHZZiXw6OTt0I3GIT7LcN+XUzo4NrxIz/ZxU53+JhND4jv
-         J62A==
-X-Forwarded-Encrypted: i=1; AJvYcCWvgnsZLc+digayi4TI9HHACSqew0FcugsaSi0yxhimVaf4KdEC2fdARtK/AfMIlS5vpMUA2EE93SQnN4M0BHtdcNIo6AO7bKgWsHs=
-X-Gm-Message-State: AOJu0YzBciusnNm1lWxNUJlBz/y0MRz7Mb6iO/+BaBt7D2Bz7foyH5tT
-	NVH7XO4p9YRnzckrL5kZ+rLKB8gq2xISml1zwTi+x835MG7sV6RtVz1kgkv895Q=
-X-Google-Smtp-Source: AGHT+IEEdiuK70dIt0kRQ6ZqIyfF8/dtIItu00A5a5CGgt7ADEjKNbKwIlbZf+kUgc+loKojBUe4Pw==
-X-Received: by 2002:a19:a40a:0:b0:522:3551:35f5 with SMTP id 2adb3069b0e04-52b89564058mr6258471e87.14.1717442817779;
-        Mon, 03 Jun 2024 12:26:57 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6900c692b0sm235052066b.151.2024.06.03.12.26.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 12:26:56 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>,
-	Keith Busch <kbusch@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPmyw51K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F955C2BD10;
+	Mon,  3 Jun 2024 19:47:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717444039;
+	bh=v+0RbsfKdGgk/6XvGRknMDTc2wiUcVUl6dcouRw8NJ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QPmyw51KfG4g3+7Ei/p0tAOrX7io955hQRR8FthZq/gWvI/n9Z4SxaNt68zwa9g2O
+	 6POAii0RDLzdMk6TOEGtP6JwF5VGbu8HblqBBvmbEsCBnq5G9jnhtcvfR9FbQt5J9y
+	 ZzilGkhi05j99m90Sc7r6s825ay12VRbAlQT0PBMtVssCYPiCXhQcNhfeAJ1Z0h73D
+	 Jj1MTDr0pITf2p+a8k0YPApfPUETkikOq2zpjH++zD/cm2JJxJiRZaQa2+Uuv2tzks
+	 wmQnrmI67Ev7VkJhZmKyW1y6pLrq45fYlTzCEDAdFHPdvpqzkjt+Vi3tvASCycWAPE
+	 GrirwzVbQAuKQ==
+Date: Mon, 3 Jun 2024 13:47:17 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Andreas Hindborg <nmi@metaspace.dk>
+Cc: Jens Axboe <axboe@kernel.dk>, Andreas Hindborg <a.hindborg@samsung.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	John Garry <john.g.garry@oracle.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	linux-block@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] null_blk: fix validation of block size
-Date: Mon,  3 Jun 2024 21:26:45 +0200
-Message-ID: <20240603192645.977968-1-nmi@metaspace.dk>
-X-Mailer: git-send-email 2.45.1
+Subject: Re: [PATCH v2] null_blk: fix validation of block size
+Message-ID: <Zl4dxaQgPbw19Irk@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240603192645.977968-1-nmi@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240603192645.977968-1-nmi@metaspace.dk>
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
+On Mon, Jun 03, 2024 at 09:26:45PM +0200, Andreas Hindborg wrote:
+> -	dev->blocksize = round_down(dev->blocksize, 512);
+> -	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
+> +	if (blk_validate_block_size(dev->blocksize) != 0) {
+> +		return -EINVAL;
+> +	}
 
-Block size should be between 512 and PAGE_SIZE and be a power of 2. The current
-check does not validate this, so update the check.
+No need for the { } brackets for a one-line if.
 
-Without this patch, null_blk would Oops due to a null pointer deref when
-loaded with bs=1536 [1].
-
-Link: https://lore.kernel.org/all/87wmn8mocd.fsf@metaspace.dk/
-
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
-
-Changes from v2:
-
- - Use blk_validate_block_size instead of open coding the check.
- - Change upper bound of chec from 4096 to PAGE_SIZE.
-
-V1: https://lore.kernel.org/all/20240601202351.691952-1-nmi@metaspace.dk/
-
- drivers/block/null_blk/main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index eb023d267369..967d39d191ca 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1823,8 +1823,9 @@ static int null_validate_conf(struct nullb_device *dev)
- 		dev->queue_mode = NULL_Q_MQ;
- 	}
- 
--	dev->blocksize = round_down(dev->blocksize, 512);
--	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
-+	if (blk_validate_block_size(dev->blocksize) != 0) {
-+		return -EINVAL;
-+	}
- 
- 	if (dev->use_per_node_hctx) {
- 		if (dev->submit_queues != nr_online_nodes)
-
-base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
--- 
-2.45.1
-
+It also looks like a good idea if this check was just done in
+blk_validate_limits() so that each driver doesn't have to do their own
+checks. That block function is kind of recent though. Your patch here
+looks fine if you want stable back-ports, but I haven't heard any
+complaints till recently :)
