@@ -1,140 +1,213 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDBB127B4B
-	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 12:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F8364F;
+	Mon,  3 Jun 2024 12:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717416456; cv=none; b=WwajAQkErJjubg64sLk14jbtDdMsv7oJ1iMubJSmaBg4uyBWKuz0anTMKCI2y9jQDbpIjeCUMDB+hTiBLbVVZpj21HB7N+YQd74g2mjkL4Hml+UkFNW0V9ECpZzPIazfJ2JPCWgoddysAgyJ+XSnf6rNz33V1M5hU9y86XTZYvI=
+	t=1717417870; cv=none; b=HjDN3ALHs7s7uyenSMaGYqZjHj0FnH06ShJrJOyHb7hY2iUHjVLCRGLIbhn/pY4829EvOGdYoXAfV4ZGhg0zhuT4XRT7NsQRl9Ljz9Oi6hj1bo7MmTJrWuB7nt+T2QwWFSPChFytdq23Uot4xL5pihtNGEXT3B/RKLAe2WlGJfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717416456; c=relaxed/simple;
-	bh=HKSuZku3Cjx589sVTPzEh7UJFBNrnrV54/ShUb7zzP4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Q2VpbPHEtVNK3Up4imusAagX0CWGrGcZJKQ8I0GEVRVBXNcTVj44KYCY0A7QyR+AUEXiK2KrAm+SCDJ8mz0LOZXNHFVlk0EDAQfMWDAsC9g6pKx4UtenVvT4jyuPrzVcuEUGT7iZyU1sEDumvBWW3s5QiVFjqo+FHOhPBMj5Vkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=CzLaJWYv; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1717417870; c=relaxed/simple;
+	bh=hOHeohRDUTCtFvpXo1EE1vFQ8GgEnhiXTAPgDM3uzXk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N7NcAFdLcLu7QbhtPOa+MnOaqmZoqkvQO6f7aWsLraPu/PMdNPNO5UTiSeihEegSmkp4TfW6OU7hajs+BsLivvTvTXE8WNYRkwZ8/n/Y5QyPMVd+JkiztFdzwoxy6LLrBw7HkIjQb10tBOpHRRXDYpDVQGJ1PF/eD2KFVZTpjp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=paHICZLC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=f3qWbxyI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=WHXig8Ks; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AcmevNMq; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="CzLaJWYv"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52b992fd796so1152071e87.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Jun 2024 05:07:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1717416453; x=1718021253; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qp9kpSxktdl3t5QptSg4ay9ut9mo2kwGjiti3usGOlc=;
-        b=CzLaJWYvJIPMuYNShj9hqXtOdVkzbsqs6C2Mxa4kKnR8eR2SFnJA0wDZiHIyOcN9i0
-         +MvxUWIXlxK6oML9+9l0cdOC3cSDMH/FS5pYmXcgfqO9Sq8f1P5gb9gTpc19AWtQaB5i
-         AlwHgFVTzfowsyYWDeBz9cteMfj5PwI6+Q7UzXixT8X8nAchnR/kIVR6vLasCHiyBE7g
-         ODwprmWc+pxiCSYHa9JAJuIRF5UoQqorefxHo65NIfGNiVdz+j1gl+XacbbzKN7qL0XR
-         iALmTwuSmmX+ZNxFYpWRSTduASj9LVevRIxDm+FeZtQeNDLVl4Vh43IAU40lObwxsWv4
-         yv6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717416453; x=1718021253;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qp9kpSxktdl3t5QptSg4ay9ut9mo2kwGjiti3usGOlc=;
-        b=Zqn4J/lJu0nvfQuK2LXb4VsaoCaUf6hIHvhZ+O+6mMxTBWzNU7hv+y31jHPoAHdeZt
-         HJv4jwPTphkkMCBMSrbvTPVpl30R+XS4haJjGxws97+bs4vXCsmPRQJ8r95Dys+ILH5s
-         Fk6dfnJsEFTWj0J7nfOZ4M5bF9m0/dToCRlWQ0z57WDHRejCLIbcTe5fiPQdfwu4iLRM
-         gyNLes8t3cVWu4N0TBHO3XsBSIii4Jw6Xzb/srMkQXlmOkY54vCIz5dy7TfPJnPojyHK
-         +j1jSID38O8FKhaK4hMJUzS8aWgZcfb4cQkhO08AticHddlRSFfOJw0wLy3Qww0dj0Di
-         D1KQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV2FIJFzRb6Ayus52RKNndLe0KqWDWA4tXQHJIzvnRby02+xtO+8O+lThGxzPL2HLc3B9Vg7Jtd54y6JsLA1VkXvu6X8NLupSdATdU=
-X-Gm-Message-State: AOJu0YzrmtrbgSbP7fy8HA6aqQeSfKnvXklpc3GXjWXbyLbtk71c42GC
-	asWPwoH68YTH1lKMzUWMYbDEstSShShNu7dOh0P4KCyJ6Qa2pbKMkvibAeP/AbU=
-X-Google-Smtp-Source: AGHT+IG95U4cvzKCqCJC//mHEC5cwihIOE7E6yEp2LTEdM2o+aM+R0L+4dCYqsxwbWfMmXDgcOyfsQ==
-X-Received: by 2002:ac2:559a:0:b0:525:32aa:4449 with SMTP id 2adb3069b0e04-52b8958ba33mr5060953e87.5.1717416452482;
-        Mon, 03 Jun 2024 05:07:32 -0700 (PDT)
-Received: from localhost ([165.225.194.205])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35e574748ffsm3619750f8f.87.2024.06.03.05.07.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 05:07:32 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Keith Busch <kbusch@kernel.org>,  Jens Axboe <axboe@kernel.dk>,
-  Christoph Hellwig <hch@lst.de>,  Damien Le Moal <dlemoal@kernel.org>,
-  Bart Van Assche <bvanassche@acm.org>,  Ming Lei <ming.lei@redhat.com>,
-  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,  Andreas
- Hindborg <a.hindborg@samsung.com>,  Greg KH <gregkh@linuxfoundation.org>,
-  Matthew Wilcox <willy@infradead.org>,  Miguel Ojeda <ojeda@kernel.org>,
-  Alex Gaynor <alex.gaynor@gmail.com>,  Wedson Almeida Filho
- <wedsonaf@gmail.com>,  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo
- <gary@garyguo.net>,  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>,  Benno
- Lossin <benno.lossin@proton.me>,  Alice Ryhl <aliceryhl@google.com>,
-  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
- <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
- =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
- Granados
- <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
- <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  Niklas
- Cassel <Niklas.Cassel@wdc.com>,  Philipp Stanner <pstanner@redhat.com>,
-  Conor Dooley <conor@kernel.org>,  Johannes Thumshirn
- <Johannes.Thumshirn@wdc.com>,  Matias =?utf-8?Q?Bj=C3=B8rling?=
- <m@bjorling.me>,  open list
- <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
- <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
- <gost.dev@samsung.com>
-Subject: Re: [PATCH v4 2/3] rust: block: add rnull, Rust null_blk
- implementation
-In-Reply-To: <0a47eebd-2aca-494d-814b-bc949b08630b@suse.de> (Hannes Reinecke's
-	message of "Mon, 3 Jun 2024 11:05:19 +0200")
-References: <20240601134005.621714-1-nmi@metaspace.dk>
-	<20240601134005.621714-3-nmi@metaspace.dk>
-	<ZlsvHV6y4DEdC8ja@kbusch-mbp.dhcp.thefacebook.com>
-	<875xusoetn.fsf@metaspace.dk>
-	<ZltF5NvDnKFphcOo@kbusch-mbp.dhcp.thefacebook.com>
-	<0a47eebd-2aca-494d-814b-bc949b08630b@suse.de>
-Date: Mon, 03 Jun 2024 14:07:19 +0200
-Message-ID: <877cf6mdqg.fsf@metaspace.dk>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="paHICZLC";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="f3qWbxyI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="WHXig8Ks";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AcmevNMq"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6C15D2003F;
+	Mon,  3 Jun 2024 12:31:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717417866; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O5KLPAXOU7O9Zmy/g/FuaV4GngJI7olAqvrZ4Kvt6hI=;
+	b=paHICZLCGp80ONqknHFalzAt1kkCRlR0Z9QSlZS4VszonEOlvJ3549kiqbSPbi/sSKXb4z
+	cIvqTWDSWb2+YFpYGCicZX7c8WhDo+fYxDHtiofhOfjyxWj+kv/rj+7rJekm3sBbVedKQe
+	GqKVeKKc4GyC6Ca/ZZrc7Lg+P01viXs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717417866;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O5KLPAXOU7O9Zmy/g/FuaV4GngJI7olAqvrZ4Kvt6hI=;
+	b=f3qWbxyI4YiJPerFsADqhlSLCuCoSY8XWlG2k6PmVp9TDTJfvqlv86qzZ+wwguEc0UK4CB
+	87xNqQZoJmCVJODQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=WHXig8Ks;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=AcmevNMq
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717417865; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O5KLPAXOU7O9Zmy/g/FuaV4GngJI7olAqvrZ4Kvt6hI=;
+	b=WHXig8KsBN2t3SUFevfVGyCz0n3zjib6BofjLAXbEnk6I9rI6rY0tt89NkEzGzcndOh6nB
+	UIvvKPubgrTlcdXvJ+wG4Za5mTVoOg3crxM+lrDIK1+QBFEsH97TaFYt1ffeBMABV7MQVC
+	IndNek6ci1hwNLbIPlnx60PaK1ItRSc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717417865;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O5KLPAXOU7O9Zmy/g/FuaV4GngJI7olAqvrZ4Kvt6hI=;
+	b=AcmevNMqwwEvq6QfSVtCAq/epBZVDnBBs4orcsVinsWji4hpwhqC922nY+0+DXu+wAcwvZ
+	4hSsbwob3Wki4FCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 27F5313A93;
+	Mon,  3 Jun 2024 12:31:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 28xHCYm3XWb7PAAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 03 Jun 2024 12:31:05 +0000
+Message-ID: <ee20a47d-3131-41c2-a2fc-39017f535527@suse.de>
+Date: Mon, 3 Jun 2024 14:31:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 4/9] block: Add core atomic write support
+To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
+ martin.petersen@oracle.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, dchinner@redhat.com, jack@suse.cz
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+ ojaswin@linux.ibm.com, linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+ io-uring@vger.kernel.org, nilay@linux.ibm.com, ritesh.list@gmail.com,
+ willy@infradead.org, Himanshu Madhani <himanshu.madhani@oracle.com>
+References: <20240602140912.970947-1-john.g.garry@oracle.com>
+ <20240602140912.970947-5-john.g.garry@oracle.com>
+ <749f9615-2fd2-49a3-9c9e-c725cb027ad3@suse.de>
+ <a84ad9de-a274-4bdf-837a-03c38a32288a@oracle.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <a84ad9de-a274-4bdf-837a-03c38a32288a@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.00
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 6C15D2003F
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.00 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,mit.edu,google.com,linux.ibm.com,kvack.org,gmail.com,infradead.org,oracle.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	R_RATELIMIT(0.00)[to_ip_from(RL7q43nzpr7is614unuocxbefr)];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
 
-Hannes Reinecke <hare@suse.de> writes:
-
-> On 6/1/24 18:01, Keith Busch wrote:
->> On Sat, Jun 01, 2024 at 05:36:20PM +0200, Andreas Hindborg wrote:
->>> Keith Busch <kbusch@kernel.org> writes:
+On 6/3/24 13:38, John Garry wrote:
+> On 03/06/2024 10:26, Hannes Reinecke wrote:
 >>>
->>>> On Sat, Jun 01, 2024 at 03:40:04PM +0200, Andreas Hindborg wrote:
->>>>> +impl kernel::Module for NullBlkModule {
->>>>> +    fn init(_module: &'static ThisModule) -> Result<Self> {
->>>>> +        pr_info!("Rust null_blk loaded\n");
->>>>> +        let tagset = Arc::pin_init(TagSet::try_new(1, 256, 1), flags::GFP_KERNEL)?;
->>>>> +
->>>>> +        let disk = {
->>>>> +            let block_size: u16 = 4096;
->>>>> +            if block_size % 512 != 0 || !(512..=4096).contains(&block_size) {
->>>>> +                return Err(kernel::error::code::EINVAL);
->>>>> +            }
->>>>
->>>> You've set block_size to the literal 4096, then validate its value
->>>> immediately after? Am I missing some way this could ever be invalid?
->>>
->>> Good catch. It is because I have a patch in the outbound queue that allows setting
->>> the block size via a module parameter. The module parameter patch is not
->>> upstream yet. Once I have that up, I will send the patch with the block
->>> size config.
->>>
->>> Do you think it is OK to have this redundancy? It would only be for a
->>> few cycles.
->> It's fine, just wondering why it's there. But it also allows values like
->> 1536 and 3584, which are not valid block sizes, so I think you want the
->> check to be:
->> 	if !(512..=4096).contains(&block_size) || ((block_size & (block_size - 1))
->> != 0)
->> 
-> Can't we overload .contains() to check only power-of-2 values?
+>>> +static bool rq_straddles_atomic_write_boundary(struct request *rq,
+>>> +                    unsigned int front_adjust,
+>>> +                    unsigned int back_adjust)
+>>> +{
+>>> +    unsigned int boundary = queue_atomic_write_boundary_bytes(rq->q);
+>>> +    u64 mask, start_rq_pos, end_rq_pos;
+>>> +
+>>> +    if (!boundary)
+>>> +        return false;
+>>> +
+>>> +    start_rq_pos = blk_rq_pos(rq) << SECTOR_SHIFT;
+>>> +    end_rq_pos = start_rq_pos + blk_rq_bytes(rq) - 1;
+>>> +
+>>> +    start_rq_pos -= front_adjust;
+>>> +    end_rq_pos += back_adjust;
+>>> +
+>>> +    mask = ~(boundary - 1);
+>>> +
+>>> +    /* Top bits are different, so crossed a boundary */
+>>> +    if ((start_rq_pos & mask) != (end_rq_pos & mask))
+>>> +        return true;
+>>> +
+>>> +    return false;
+>>> +}
+>>
+>> But isn't that precisely what 'chunk_sectors' is doing?
+>> IE ensuring that requests never cross that boundary?
+>>
+> 
+>> Q1: Shouldn't we rather use/modify/adapt chunk_sectors for this thing?
+> 
+> So you are saying that we can re-use blk_chunk_sectors_left() to 
+> determine whether merging a bio/req would cross the boundary, right?
+> 
+> It seems ok in principle - we would just need to ensure that it is 
+> watertight.
+> 
 
-I think `contains` just compiles down to a simple bounds check. We have
-to do both the bounds check and the power-of-2 check either way.
+We currently use chunk_sectors for quite some different things, most 
+notably zones boundaries, NIOIB, raid stripes etc.
+So I don't have an issue adding another use-case for it.
 
-BR Andreas
+>> Q2: If we don't, shouldn't we align the atomic write boundary to the 
+>> chunk_sectors setting to ensure both match up?
+> 
+> Yeah, right. But we can only handle what HW tells.
+> 
+> The atomic write boundary is only relevant to NVMe. NVMe NOIOB - which 
+> we use to set chunk_sectors - is an IO optimization hint, AFAIK. However 
+> the atomic write boundary is a hard limit. So if NOIOB is not aligned 
+> with the atomic write boundary - which seems unlikely - then the atomic 
+> write boundary takes priority.
+> 
+Which is what I said; we need to check. And I would treat a NOIOB value 
+not aligned to the atomic write boundary as an error.
+
+But the real issue here is that the atomic write boundary only matters
+for requests, and not for the entire queue.
+So using chunk_sectors is out of question as this would affect all 
+requests, and my comment was actually wrong.
+I'll retract it.
+
+Cheers,
+
+Hannes
 
