@@ -1,391 +1,229 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2124.outbound.protection.outlook.com [40.107.105.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110BF7E578;
-	Mon,  3 Jun 2024 09:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717406812; cv=none; b=rzXNYOkdDUAo6fXOjh6m+EHX2vV0NkWWjimgp+kKUgYxOgZbCwbMcqaXyk3ig78MIY0ilUnLPOGK6B84T8vYZtq76rSaYWBBXmif/FtrgGuXDbL5t8NN8HQXUPonQcYQ1IQzDRPwxTXnjlmCxWo9Htf5PjYCY4D22jzm+eEDDj4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717406812; c=relaxed/simple;
-	bh=bIKgTHqqqvNrDn6N46S23oj6Yn8jnVRBUOsZYqWHjnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wlx6gu8HpMWFQOzBAsqRg0bdtgEsEQ9SbTRldbFekVCAnY/y5BcDh6yq3+7SYmuf5Ab8s7CiEVt7dvUFBV4RNVz8QOZe0ja5l45F5csuwcWexciwJhTNcrPlhE118YGzOc0s0ja/9o6GJuat9e4MCwNh3NlLRqIKq9zFEtLb85I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BGYyrAyK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=iktIf95i; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CRtM5bSS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9mUkp0gi; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57C1107A8;
+	Mon,  3 Jun 2024 10:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717410783; cv=fail; b=QY57LY3Z4wNNBWAfzHg2uS7j/FdIlz8UKuTqZU1SMSMWzWnnwLoT1eCR7+2Bd+mI5lythoL4ypLrUoLfd/H4ttDQk5xNt+9RLPB8TZGGVZIhNwIwwNItpjBAGhO0nI1mg5wbffte7zNmeaOzZzexcZHLBJBRfcyeiNBAlyT/bTA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717410783; c=relaxed/simple;
+	bh=XFdksna1Kd5K+wXvr50fpAeA/8p5banMyLKhv8Bc8dU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=tjOxAOpNP9mDwvc70bIxxNFm/9AevCNY5EHLtLV5VciuUC52Vq/azo222vmrNEqzxhVQcuopwuYjXvDKkvm0V+ocUzNPK3AEcNmJO3BtEohyVhjVd0N2aMXmqDHNcUMTPuBbBhDNTEPs25z5DI5+d24+gMMswRH+OyCIqjACL9o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com; spf=pass smtp.mailfrom=volumez.com; dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b=ZG/Ta+JY; arc=fail smtp.client-ip=40.107.105.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=volumez.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BGYyrAyK";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="iktIf95i";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CRtM5bSS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9mUkp0gi"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 334982001E;
-	Mon,  3 Jun 2024 09:26:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1717406808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4aiqyGNs4C6F+459GE4XKKIaj4uHNvODVh4oeUc9YQQ=;
-	b=BGYyrAyKVIVppKuFCDEVCQqAMX3+cbzScFb/SmBJE9FsafW60ImLURzecJUbtPj+EU7qd8
-	vkq4XUehN2UOcypeE0ZIW3SwVrqNvJkuFLsuidqJkFvs2knxu+BkLv8kGMMdFOSkNAzf3A
-	W2x/xbKWNR8AJMYK3ikPiqMJa72a2J4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1717406808;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4aiqyGNs4C6F+459GE4XKKIaj4uHNvODVh4oeUc9YQQ=;
-	b=iktIf95ibTh8suh83mbxhsmIwD12npaRJTO3Tel2NYrJdwhvuYQHA99L7p0fgRdDp4/Ue3
-	/wbV33bFzYZ0bKDQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1717406807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4aiqyGNs4C6F+459GE4XKKIaj4uHNvODVh4oeUc9YQQ=;
-	b=CRtM5bSS3vtA1ctSrWW37O8hx39qarpl0KB1WdfR/cytUAB0x98GLtGwsoz+3wXsVXoPqy
-	sHrlAnlhuzPNMByAZ3blK6KTukZacSrncVwhgoQrfUB+EccNBhJIHpz+SdqGrF7ENHIjCL
-	6XcUDj4wpXXKqHZg8ERCUkXHhrKSxSE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1717406807;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4aiqyGNs4C6F+459GE4XKKIaj4uHNvODVh4oeUc9YQQ=;
-	b=9mUkp0giwL7NhJ1jtx4OC9TvCHau/UID+Bkr+jBA9/Q8H2t9tKpcl4lk0QMUm26ZX0arss
-	4oQV6QFAonOh4hBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E3B1A139CB;
-	Mon,  3 Jun 2024 09:26:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id rWTdNlaMXWY6AgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 03 Jun 2024 09:26:46 +0000
-Message-ID: <749f9615-2fd2-49a3-9c9e-c725cb027ad3@suse.de>
-Date: Mon, 3 Jun 2024 11:26:46 +0200
+	dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b="ZG/Ta+JY"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j2YY2cKmcV8l7OKwHYlP2cP9bymYKH0AOQqlJJl4pGMYv5YdFNGJzW+0K0Uo4rNMOcmtLSqpAnZv8f0zt68pXOyeEFHdgrgE31a4hxj9IiP1l7AP/CWwK1Ky1kP1aWXQio5zWxLzKNoJi4tX5quyZ9KrybZSrZt9Bk0JoYueSO6rXM2AZRiNRToB6Tno6BHZHOmmGZg+Nbkyw2zMHKNU9890PrnD6UcAipmEG99MJ722Enuc/Hja7en54vbDREh0nf0vA/AF8ve5S1sJ37Is9+wiD14/80P8IRflCITOHKnc6OznC9rA7YmziLBwETxuzS+jbn78tOS2LGHHBRLFNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XFdksna1Kd5K+wXvr50fpAeA/8p5banMyLKhv8Bc8dU=;
+ b=YEKN6smNaEKaGuExuLtSV/iMnovn423axtzqTel6wrhtgT9GNX9OghvlW3L0DBPE677XDleiLLE3Wa34vY3++UD0SPpf68Fxf2BYxgBbxN955WFLgVLKEovduE9zKCJYh8UPsE/pHT57w882Woop4uermEN9aQ4vhpERROkN6qxfvlyh2i4cy8ym3QJyAUOZtkjVazA8MD8+80hEBJvu8Bs4WRRvl4EsAwdjqvY53G4Kij1rHW0s8FrjWSbkvAOcE0vLgbTcJg/Bu1LWwxjzKsA0qNmzayxja8egRgQpRY6JlVlqMDERcCoXwEzAlQ0J39yLAzEsOVDlfNrkKSeQLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=volumez.com; dmarc=pass action=none header.from=volumez.com;
+ dkim=pass header.d=volumez.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=storingio.onmicrosoft.com; s=selector1-storingio-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XFdksna1Kd5K+wXvr50fpAeA/8p5banMyLKhv8Bc8dU=;
+ b=ZG/Ta+JYhLXgGqNHVHCLHSwSpGFi9ONPgt2/QMBJc7+0Fxa20QT+gbS6ASClGewH4HWJ1rM5FN9YB5CPLUgDNj/rYfMjGuuaGYethgDRC6hBnTq3iWd3uYsdD4SGBBOMYnorbJ7fo+XHOS8Hr1Y93WjjQju7k6Utd8xjQ1uOduu+zYFkP61EqJusy0sn9awW54EB3Nr5vG+/DVy4yvSArY3XpV5PFRpwKDSJdIe1KvsD+KHIoJgoM1YT8DXn2i7dNf0PZw1iw2eJ5W7vmv7mbhz3HQd5hMSNC6nl1LqzM5MUe3hKIcN1B49ifJIUKsbU4WqgflHDhqBlLMY9+rhmDA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=volumez.com;
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com (2603:10a6:208:cb::11)
+ by DU4PR04MB11029.eurprd04.prod.outlook.com (2603:10a6:10:590::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.24; Mon, 3 Jun
+ 2024 10:32:59 +0000
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb]) by AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb%4]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
+ 10:32:58 +0000
+Message-ID: <bca1947a-4826-472d-a62c-5ca5ad724939@volumez.com>
+Date: Mon, 3 Jun 2024 13:32:54 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Sagi Grimberg <sagi@grimberg.me>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
+ kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, philipp.reisner@linbit.com,
+ lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+ idryomov@gmail.com, xiubli@redhat.com
+References: <20240530132629.4180932-1-ofir.gal@volumez.com>
+ <d6b2c19b-c2a6-400c-bbf1-bf0469138777@grimberg.me>
+Content-Language: en-US
+From: Ofir Gal <ofir.gal@volumez.com>
+In-Reply-To: <d6b2c19b-c2a6-400c-bbf1-bf0469138777@grimberg.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL0P290CA0008.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::19) To AM0PR04MB5107.eurprd04.prod.outlook.com
+ (2603:10a6:208:cb::11)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 4/9] block: Add core atomic write support
-To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, kbusch@kernel.org,
- hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
- martin.petersen@oracle.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
- brauner@kernel.org, dchinner@redhat.com, jack@suse.cz
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
- ojaswin@linux.ibm.com, linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
- io-uring@vger.kernel.org, nilay@linux.ibm.com, ritesh.list@gmail.com,
- willy@infradead.org, Himanshu Madhani <himanshu.madhani@oracle.com>
-References: <20240602140912.970947-1-john.g.garry@oracle.com>
- <20240602140912.970947-5-john.g.garry@oracle.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20240602140912.970947-5-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -2.79
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.79 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_RCPT(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,mit.edu,google.com,linux.ibm.com,kvack.org,gmail.com,infradead.org,oracle.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLusjj3u5c53i6g8q6enupwtij)]
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB5107:EE_|DU4PR04MB11029:EE_
+X-MS-Office365-Filtering-Correlation-Id: dac32f5c-7002-4d7a-f21f-08dc83b8898c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005|7416005;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?amN5eloyN2JsanI0VDh6Wkp5ejFva1NTTnZGS2VKR0VnRVZPOXdpZmdScmFM?=
+ =?utf-8?B?bzR1VnhWcGY5QUg2RmFkRnNkdWt5M2F3R1duRzNKZGFaRmk2Z0JrNVNveEE3?=
+ =?utf-8?B?Vk9OeUc4SVk2R0xFQ2hPSkxNL3hnZTdwZThTYWttMy80YVcxZENqb0Qzb2xF?=
+ =?utf-8?B?b2ZqOStZUzVVU2hEWklhSmdyUElKZzA1QkhpYy9JTXdpc3hxOWVEQjNlam1W?=
+ =?utf-8?B?UFRLWHh0dXNtcXBRcmxyNXgvVUF5c0k4Y2tQSkFPMlFJZ3NXQm5RNnpwdHh2?=
+ =?utf-8?B?Q2g4dzRraU5ZQ21JMTN0UnVoZDl5Zy9PMUVFTHJpUjhLWW8zbGpmaDJMNWN0?=
+ =?utf-8?B?WXo3NU9rNEgvU2R6ZEZhdmgvM0RBR1hIc1dydmw3YjErbVFWV25aVno5ZERD?=
+ =?utf-8?B?V2hPUVRVZW1ncHRId1JWV2Q2UW9SWU9ncXVlcjBnNGJEY0c1M1RtcjBGY24w?=
+ =?utf-8?B?Z3RRdWE5bWh2NHltakEyWFdGSXltVytITlpWNCswNDFVWUMycUV3S05qVmtZ?=
+ =?utf-8?B?R0ttdG5BTzM5Mk4wV2V3RUVmc1ZqMTFDcXhHT3pCbkFSamM1L250QTMwQW00?=
+ =?utf-8?B?cHRsOUo5YlpnTi9CRTl5a2pCbldLZkVpcy9VYVVlYUFSMExNL2VrYWkxaHJr?=
+ =?utf-8?B?VGRUeDlFV2orTTk4b1kzYzIxZEl3TW13Vll1NDFJajRXOERSUURmMXpnZjVW?=
+ =?utf-8?B?M1B0VGFQWlZrVGZ0aGYvcE9KZitYTHp3RCtXbWpLcGpRVGllRTM4UUZEMFNC?=
+ =?utf-8?B?S3hWbkNmaG9BZ2tFeW5oaU5zcUpiTmV4M3JrblNMUkxHZEVtUmlFbTFNMHBZ?=
+ =?utf-8?B?N1FBdE5tZVNoTEppSmdjaUdnU0ZBcTlZOTBFZlUzSHg3N0M0QUovNFFzS2dR?=
+ =?utf-8?B?UHF2dFgxcENwZHNieldXUkhETHdGdmpFSXJ6NmxLTG9EMDZYNHhFSS9Lbzl6?=
+ =?utf-8?B?bzQzMSsrVE0yajY5b1ZMaCttVHc2bnJqWlFERGhEbTB6ZkRmbU15MHYwdDg5?=
+ =?utf-8?B?ZDRWbGUzNm5wQU82anYrcU41eXJvMVVsa3dIeitZVUk2U0k4bVBRYTN5QUUy?=
+ =?utf-8?B?Q0lzdWFBUUVGdjhkb282aTYvekhGcmtENVpGbHpqaVpkSXFLa1dUS1g5V0x6?=
+ =?utf-8?B?Z204MHdOZjlpaWMwazNFaUgyeFo4Uk15Y2JtWXViK3V0cFo5MG1LbndFUXd6?=
+ =?utf-8?B?dXB5eHF0aFBBaXlrdlMwWGMvaVBEdTU2TXZjS09OZmdyUHdhU2hHZWlwRzg0?=
+ =?utf-8?B?WlgrcHJhOHRnei9CanQ0TVd3YUpqb1pRa3JOMWF3UWFlZzJDZ1J3OW5rSVpE?=
+ =?utf-8?B?T2lTc2ZlN3ZHVkp0WTRKU0NGNzJwTjRoMUNvSDYzRkdCNHcwcmx4VUpsTmZ5?=
+ =?utf-8?B?S0tUTVR4cDk5RE9WRHo2WmsyVlJZVHpjanpJVnlUbk9ralN6YmNPeFdUOCtV?=
+ =?utf-8?B?MVZQcGVkR2dlSzFTYk5tN21aaWQvaDB6dmdGRzZYdXJXSEY3ZHFyK2ZWNzZ5?=
+ =?utf-8?B?MUl2em13QVhmMHJTdnAzU1JIQmt6aCthc3paT1B4bG9uVEowZDZIbVg3cG9r?=
+ =?utf-8?B?NEZnNHlWckp3bjhiblZ0ZVZVaTlobWhFWjkwUFU3THIzdWV6TS96bnp2TElk?=
+ =?utf-8?B?aUZzZ1JCcEQ3ZG9rL2hEd0JUUUR3cXl4OGd4N0FucVlFMUt1TkhaaEhRTnYy?=
+ =?utf-8?B?ZFJxUWtwR3o4Mk5Rd29mZ3NYMzhNc0hsTW00V1ZJdUR2U2pCaEFxK09nPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5107.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?M1dJZ2tBcE55Y2EwcnNXSjNjSEhBeGprREZMUENmaDYvTWxLZEFYRnBWYjZz?=
+ =?utf-8?B?cjZxM0F0Z2dROE1OVURIN2RVK0s2ZFRobTNyRnA1cFppWDU2bXJPNE53WFgv?=
+ =?utf-8?B?M2VCOVowZkwvQUZhTi83YXBzMWdLYmJuakdKZndaczI3L2pYeHFFOWlEaTRV?=
+ =?utf-8?B?TlVFMVhvL01jZlNnL3RQaHVRYnZlbFg2YjhtYlYyWGV4bi9ZZ3lPdHRHM3Az?=
+ =?utf-8?B?QWs3WnVrajNDeXEzdUtqRXU3Yms5bTd1azJmVk81QW5nSTAzRDNDeWhwMWRM?=
+ =?utf-8?B?bUlVcWVsUWlpSWI0dTcrWkNUR0hYSXpSajJ3MFJqc3gxeXBhdHp6R2R3bjdC?=
+ =?utf-8?B?OVNiUDVKYk5XbEVQZHZsaGlyTTgzZjlzMlNrWHhIb1NaWEVMUFZRT1pPTkxo?=
+ =?utf-8?B?RG9IUzE4aURnR1RyeXNHdVVCNzg1MXhIMWh6anhHdW82WHMrMXFma0hjNDhQ?=
+ =?utf-8?B?TDYwNXIrbWVZL0JWM3phWHlGTkl5czVzWUlQajlzVHg3OWJBc01BZzNxNUpD?=
+ =?utf-8?B?RERPWmxTNzRVc0VqNFd1TDUxVEt3YWJCU3pvOUxkbUxCWFRWb1B4WHZaeVRH?=
+ =?utf-8?B?MmxOS2U0aGFSVFRpVDQyaWxPb1p4ODdoK0EwNWxQUHRHMmlyM05SdzB0b3Vo?=
+ =?utf-8?B?dHVCVEdPMVptOTBpSGtYcWhaUXR1aFI0S2NlOExmVVQxVFRBUVY0V0dXSGNQ?=
+ =?utf-8?B?ZG9GaHRhYWhpeExVck40UXZmL1Q1cTZUbUowUW16TnRacDYreCs4anNTRXF4?=
+ =?utf-8?B?R0RBQVc0bUNqZTV6bkRQSFNlOUE0bkJTaXEwb21xSlZpRWVmWlF4NWRpL3k0?=
+ =?utf-8?B?VDR5QWZ2KzhnbnlBYU1XUHpLYWc2NFEwOFIxWVhmZE8zOTR6SFV4UEJMWHFL?=
+ =?utf-8?B?aHhmdTFncUN4OXVWbzNqMkE2QTNQQ01NSEJGQlVPMjN5R3JBaHMxZXdlSVA4?=
+ =?utf-8?B?R3YvRVNoOHJSdk8rakR0QWdrTXd0TWRoSjQ1djRvV0gzY2JMbTZFRVRub01u?=
+ =?utf-8?B?NlVKaW9veGEraDZaenJ5TFRzUmpvNS8rUWhLNitEMXhwSjRZNTRGSmZzZEtq?=
+ =?utf-8?B?akxjTTBEa1paZXcwL2VBaDE2d0ZiN2NBQ3lBZ3VOMzFBM1huMGRQVGlyclJK?=
+ =?utf-8?B?VHJwbDdpNWhpOTdMSXJraFU4SXJnSWdjZGp1OVo5MDdnYnlkRGllRFNtK3Nl?=
+ =?utf-8?B?UVBmVU9GcS9nbENEMnJMUkd5OTJYMUcwQkVWd284aHNSYmNmVGo3WDJBdktj?=
+ =?utf-8?B?R1JKcnoxNXBvektsalJtYm9qWE9JaTh4cUpFM0taem15dk9uRHNCSjg1YkRK?=
+ =?utf-8?B?N3ZFem5pSkZzTHdYbmhiY3ZFcXg4dEZENVgyR3FWdFJyTE5rZU9EOCs5c2x6?=
+ =?utf-8?B?RnhHa3R3WHByT2ZUYTA2VW5idVhDSmFLbTMvcDRIa2RpNVZUM1RkREVTZElu?=
+ =?utf-8?B?UVpPaWhhNjV4ZmhQM0dKMzBJVTB0NFFwemNRSnh1WDhoSy9JNENnb1VXaHJK?=
+ =?utf-8?B?Y2FqcER3WWticE85Y2VIaTRxL29XbU1VTHNrZTVkVDc1ZllqY2U4SCtyOGtp?=
+ =?utf-8?B?K0RlK1BveVBtOFJyUEliSW1TVUVEamNsUlVZa3R0T080TGRwZ3FiNXEyVVA3?=
+ =?utf-8?B?TVAwQjcxMXJhY2MraEdFL1NObTlyREI1WVA4VlVnWXdLR1hKaEVuK01PZGF0?=
+ =?utf-8?B?T25Ub2g0L3ltcU9XOTFvdVNYdTYwMHNxY3BaeDV5b2FOdExwZ1FiNjRNVXY2?=
+ =?utf-8?B?RVd1Nmk3b2pTclY4eVdMbERvajFRWTQvMytNTEx5Nks5OEMxcGJIODhsRFNo?=
+ =?utf-8?B?bTJDb21pVUNMV1BDTWlIcENNVG1pUlFVU2F1UjVNQnM5VTZsK3VQVi92dkx2?=
+ =?utf-8?B?QnlULzJhQnFVd3RQQTUvUWkwa1lCQ3dqVTdwRkdiWDg2SDZnUWkwRzZRaDV2?=
+ =?utf-8?B?TXd1NXdXY0k0R0FvNVdsVDIxalhhNzlmYUJIZWl3b1k5V2NndXVHY1VyWm9O?=
+ =?utf-8?B?Tjk5bUZlNzFOTmJxMnFFbnV6OGF1ZGg0SkpPNkdDTUNidnRjdnJsbVlOWGNK?=
+ =?utf-8?B?TG9UNXBwS1o4SEdCYndib2EwZU55ekJqSFlkeitrY2xWeXVZMDhoRTRDcTUv?=
+ =?utf-8?Q?9Qo6Kb1+stuDKZxGQX95I0I9O?=
+X-OriginatorOrg: volumez.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dac32f5c-7002-4d7a-f21f-08dc83b8898c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5107.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 10:32:58.7866
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b1841924-914b-4377-bb23-9f1fac784a1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zoYqfuv7pPX2JrRW+1eokv4dxkwZ1hBMS2yct+zzmfhasAzYM4Y/XtTENQsmKbBWAHDaADjyGy28pXDqE47Zlw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB11029
 
-On 6/2/24 16:09, John Garry wrote:
-> Add atomic write support, as follows:
-> - add helper functions to get request_queue atomic write limits
-> - report request_queue atomic write support limits to sysfs and update Doc
-> - support to safely merge atomic writes
-> - deal with splitting atomic writes
-> - misc helper functions
-> - add a per-request atomic write flag
-> 
-> New request_queue limits are added, as follows:
-> - atomic_write_hw_max is set by the block driver and is the maximum length
->    of an atomic write which the device may support. It is not
->    necessarily a power-of-2.
-> - atomic_write_max_sectors is derived from atomic_write_hw_max_sectors and
->    max_hw_sectors. It is always a power-of-2. Atomic writes may be merged,
->    and atomic_write_max_sectors would be the limit on a merged atomic write
->    request size. This value is not capped at max_sectors, as the value in
->    max_sectors can be controlled from userspace, and it would only cause
->    trouble if userspace could limit atomic_write_unit_max_bytes and the
->    other atomic write limits.
-> - atomic_write_hw_unit_{min,max} are set by the block driver and are the
->    min/max length of an atomic write unit which the device may support. They
->    both must be a power-of-2. Typically atomic_write_hw_unit_max will hold
->    the same value as atomic_write_hw_max.
-> - atomic_write_unit_{min,max} are derived from
->    atomic_write_hw_unit_{min,max}, max_hw_sectors, and block core limits.
->    Both min and max values must be a power-of-2.
-> - atomic_write_hw_boundary is set by the block driver. If non-zero, it
->    indicates an LBA space boundary at which an atomic write straddles no
->    longer is atomically executed by the disk. The value must be a
->    power-of-2. Note that it would be acceptable to enforce a rule that
->    atomic_write_hw_boundary_sectors is a multiple of
->    atomic_write_hw_unit_max, but the resultant code would be more
->    complicated.
-> 
-> All atomic writes limits are by default set 0 to indicate no atomic write
-> support. Even though it is assumed by Linux that a logical block can always
-> be atomically written, we ignore this as it is not of particular interest.
-> Stacked devices are just not supported either for now.
-> 
-> An atomic write must always be submitted to the block driver as part of a
-> single request. As such, only a single BIO must be submitted to the block
-> layer for an atomic write. When a single atomic write BIO is submitted, it
-> cannot be split. As such, atomic_write_unit_{max, min}_bytes are limited
-> by the maximum guaranteed BIO size which will not be required to be split.
-> This max size is calculated by request_queue max segments and the number
-> of bvecs a BIO can fit, BIO_MAX_VECS. Currently we rely on userspace
-> issuing a write with iovcnt=1 for pwritev2() - as such, we can rely on each
-> segment containing PAGE_SIZE of data, apart from the first+last, which each
-> can fit logical block size of data. The first+last will be LBS
-> length/aligned as we rely on direct IO alignment rules also.
-> 
-> New sysfs files are added to report the following atomic write limits:
-> - atomic_write_unit_max_bytes - same as atomic_write_unit_max_sectors in
-> 				bytes
-> - atomic_write_unit_min_bytes - same as atomic_write_unit_min_sectors in
-> 				bytes
-> - atomic_write_boundary_bytes - same as atomic_write_hw_boundary_sectors in
-> 				bytes
-> - atomic_write_max_bytes      - same as atomic_write_max_sectors in bytes
-> 
-> Atomic writes may only be merged with other atomic writes and only under
-> the following conditions:
-> - total resultant request length <= atomic_write_max_bytes
-> - the merged write does not straddle a boundary
-> 
-> Helper function bdev_can_atomic_write() is added to indicate whether
-> atomic writes may be issued to a bdev. If a bdev is a partition, the
-> partition start must be aligned with both atomic_write_unit_min_sectors
-> and atomic_write_hw_boundary_sectors.
-> 
-> FSes will rely on the block layer to validate that an atomic write BIO
-> submitted will be of valid size, so add blk_validate_atomic_write_op_size()
-> for this purpose. Userspace expects an atomic write which is of invalid
-> size to be rejected with -EINVAL, so add BLK_STS_INVAL for this. Also use
-> BLK_STS_INVAL for when a BIO needs to be split, as this should mean an
-> invalid size BIO.
-> 
-> Flag REQ_ATOMIC is used for indicating an atomic write.
-> 
-> Co-developed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
-> Signed-off-by: Himanshu Madhani <himanshu.madhani@oracle.com>
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->   Documentation/ABI/stable/sysfs-block | 53 ++++++++++++++++
->   block/blk-core.c                     | 19 ++++++
->   block/blk-merge.c                    | 95 +++++++++++++++++++++++++++-
->   block/blk-settings.c                 | 52 +++++++++++++++
->   block/blk-sysfs.c                    | 33 ++++++++++
->   block/blk.h                          |  3 +
->   include/linux/blk_types.h            |  8 ++-
->   include/linux/blkdev.h               | 54 ++++++++++++++++
->   8 files changed, 315 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-> index 831f19a32e08..cea8856f798d 100644
-> --- a/Documentation/ABI/stable/sysfs-block
-> +++ b/Documentation/ABI/stable/sysfs-block
-> @@ -21,6 +21,59 @@ Description:
->   		device is offset from the internal allocation unit's
->   		natural alignment.
->   
-> +What:		/sys/block/<disk>/atomic_write_max_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] This parameter specifies the maximum atomic write
-> +		size reported by the device. This parameter is relevant
-> +		for merging of writes, where a merged atomic write
-> +		operation must not exceed this number of bytes.
-> +		This parameter may be greater than the value in
-> +		atomic_write_unit_max_bytes as
-> +		atomic_write_unit_max_bytes will be rounded down to a
-> +		power-of-two and atomic_write_unit_max_bytes may also be
-> +		limited by some other queue limits, such as max_segments.
-> +		This parameter - along with atomic_write_unit_min_bytes
-> +		and atomic_write_unit_max_bytes - will not be larger than
-> +		max_hw_sectors_kb, but may be larger than max_sectors_kb.
-> +
-> +
-> +What:		/sys/block/<disk>/atomic_write_unit_min_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] This parameter specifies the smallest block which can
-> +		be written atomically with an atomic write operation. All
-> +		atomic write operations must begin at a
-> +		atomic_write_unit_min boundary and must be multiples of
-> +		atomic_write_unit_min. This value must be a power-of-two.
-> +
-> +
-> +What:		/sys/block/<disk>/atomic_write_unit_max_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] This parameter defines the largest block which can be
-> +		written atomically with an atomic write operation. This
-> +		value must be a multiple of atomic_write_unit_min and must
-> +		be a power-of-two. This value will not be larger than
-> +		atomic_write_max_bytes.
-> +
-> +
-> +What:		/sys/block/<disk>/atomic_write_boundary_bytes
-> +Date:		February 2024
-> +Contact:	Himanshu Madhani <himanshu.madhani@oracle.com>
-> +Description:
-> +		[RO] A device may need to internally split an atomic write I/O
-> +		which straddles a given logical block address boundary. This
-> +		parameter specifies the size in bytes of the atomic boundary if
-> +		one is reported by the device. This value must be a
-> +		power-of-two and at least the size as in
-> +		atomic_write_unit_max_bytes.
-> +		Any attempt to merge atomic write I/Os must not result in a
-> +		merged I/O which crosses this boundary (if any).
-> +
->   
->   What:		/sys/block/<disk>/diskseq
->   Date:		February 2021
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 82c3ae22d76d..d9f58fe71758 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -174,6 +174,8 @@ static const struct {
->   	/* Command duration limit device-side timeout */
->   	[BLK_STS_DURATION_LIMIT]	= { -ETIME, "duration limit exceeded" },
->   
-> +	[BLK_STS_INVAL]		= { -EINVAL,	"invalid" },
-> +
->   	/* everything else not covered above: */
->   	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
->   };
-> @@ -739,6 +741,18 @@ void submit_bio_noacct_nocheck(struct bio *bio)
->   		__submit_bio_noacct(bio);
->   }
->   
-> +static blk_status_t blk_validate_atomic_write_op_size(struct request_queue *q,
-> +						 struct bio *bio)
-> +{
-> +	if (bio->bi_iter.bi_size > queue_atomic_write_unit_max_bytes(q))
-> +		return BLK_STS_INVAL;
-> +
-> +	if (bio->bi_iter.bi_size % queue_atomic_write_unit_min_bytes(q))
-> +		return BLK_STS_INVAL;
-> +
-> +	return BLK_STS_OK;
-> +}
-> +
->   /**
->    * submit_bio_noacct - re-submit a bio to the block device layer for I/O
->    * @bio:  The bio describing the location in memory and on the device.
-> @@ -797,6 +811,11 @@ void submit_bio_noacct(struct bio *bio)
->   	switch (bio_op(bio)) {
->   	case REQ_OP_READ:
->   	case REQ_OP_WRITE:
-> +		if (bio->bi_opf & REQ_ATOMIC) {
-> +			status = blk_validate_atomic_write_op_size(q, bio);
-> +			if (status != BLK_STS_OK)
-> +				goto end_io;
-> +		}
->   		break;
->   	case REQ_OP_FLUSH:
->   		/*
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 8957e08e020c..ad07759ca147 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -18,6 +18,46 @@
->   #include "blk-rq-qos.h"
->   #include "blk-throttle.h"
->   
-> +/*
-> + * rq_straddles_atomic_write_boundary - check for boundary violation
-> + * @rq: request to check
-> + * @front: data size to be appended to front
-> + * @back: data size to be appended to back
-> + *
-> + * Determine whether merging a request or bio into another request will result
-> + * in a merged request which straddles an atomic write boundary.
-> + *
-> + * The value @front_adjust is the data which would be appended to the front of
-> + * @rq, while the value @back_adjust is the data which would be appended to the
-> + * back of @rq. Callers will typically only have either @front_adjust or
-> + * @back_adjust as non-zero.
-> + *
-> + */
-> +static bool rq_straddles_atomic_write_boundary(struct request *rq,
-> +					unsigned int front_adjust,
-> +					unsigned int back_adjust)
-> +{
-> +	unsigned int boundary = queue_atomic_write_boundary_bytes(rq->q);
-> +	u64 mask, start_rq_pos, end_rq_pos;
-> +
-> +	if (!boundary)
-> +		return false;
-> +
-> +	start_rq_pos = blk_rq_pos(rq) << SECTOR_SHIFT;
-> +	end_rq_pos = start_rq_pos + blk_rq_bytes(rq) - 1;
-> +
-> +	start_rq_pos -= front_adjust;
-> +	end_rq_pos += back_adjust;
-> +
-> +	mask = ~(boundary - 1);
-> +
-> +	/* Top bits are different, so crossed a boundary */
-> +	if ((start_rq_pos & mask) != (end_rq_pos & mask))
-> +		return true;
-> +
-> +	return false;
-> +}
 
-But isn't that precisely what 'chunk_sectors' is doing?
-IE ensuring that requests never cross that boundary?
 
-Q1: Shouldn't we rather use/modify/adapt chunk_sectors for this thing?
-Q2: If we don't, shouldn't we align the atomic write boundary to the 
-chunk_sectors setting to ensure both match up?
+On 30/05/2024 20:58, Sagi Grimberg wrote:
+> Hey Ofir,
+>
+> On 30/05/2024 16:26, Ofir Gal wrote:
+>> skb_splice_from_iter() warns on !sendpage_ok() which results in nvme-tcp
+>> data transfer failure. This warning leads to hanging IO.
+>>
+>> nvme-tcp using sendpage_ok() to check the first page of an iterator in
+>> order to disable MSG_SPLICE_PAGES. The iterator can represent a list of
+>> contiguous pages.
+>>
+>> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
+>> it requires all pages in the iterator to be sendable.
+>> skb_splice_from_iter() checks each page with sendpage_ok().
+>>
+>> nvme_tcp_try_send_data() might allow MSG_SPLICE_PAGES when the first
+>> page is sendable, but the next one are not. skb_splice_from_iter() will
+>> attempt to send all the pages in the iterator. When reaching an
+>> unsendable page the IO will hang.
+>
+> Interesting. Do you know where this buffer came from? I find it strange
+> that a we get a bvec with a contiguous segment which consists of non slab
+> originated pages together with slab originated pages... it is surprising to see
+> a mix of the two.
 
-Cheers,
+I find it strange as well, I haven't investigate the origin of the IO
+yet. I suspect the first 2 pages are the superblocks of the raid
+(mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the
+bitmap.
 
-Hannes
+I have stumbled with the same issue when running xfs_format (couldn't
+reproduce it from scratch). I suspect there are others cases that mix
+the slab pages and non-slab pages.
 
+> I'm wandering if this is something that happened before david's splice_pages
+> changes. Maybe before that with multipage bvecs? Anyways it is strange, never
+> seen that.
+I haven't bisect the commit that caused the behavior but I have tested
+ubuntu with 6.2.0 kernel, the bug didn't occur. (6.2.0 doesn't contain
+david's splice_pages changes).
+
+I'm not familiar with "multipage bvecs" patch, which patch do you refer
+to?
+
+> David,  strange that nvme-tcp is setting a single contiguous element bvec but it
+> is broken up into PAGE_SIZE increments in skb_splice_from_iter...
+>
+>>
+>> The patch introduces a helper sendpages_ok(), it returns true if all the
+>> continuous pages are sendable.
+>>
+>> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
+>> this helper to check whether the page list is OK. If the helper does not
+>> return true, the driver should remove MSG_SPLICE_PAGES flag.
+>>
+>>
+>> The bug is reproducible, in order to reproduce we need nvme-over-tcp
+>> controllers with optimal IO size bigger than PAGE_SIZE. Creating a raid
+>> with bitmap over those devices reproduces the bug.
+>>
+>> In order to simulate large optimal IO size you can use dm-stripe with a
+>> single device.
+>> Script to reproduce the issue on top of brd devices using dm-stripe is
+>> attached below.
+>
+> This is a great candidate for blktests. would be very beneficial to have it added there.
+Good idea, will do!
