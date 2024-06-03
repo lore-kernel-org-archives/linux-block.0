@@ -1,325 +1,197 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6D23FBA7
-	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 10:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717411726; cv=fail; b=VcDCcy5RZwS9N+iFOOyi0l96R1gwhp+onRDYdX71VpUZkW/fQuh94i00+BlGNG82eRbN+OtBCCiTYUoUBCXDd1mZtTk5CUciHMhmMIb+3g7zzUkeGBBs1ShMBXPT0e12Ku4GZ0Yle5YCh1CQVQRwfcUXI2Ur6EQK6awGA+IRgQQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717411726; c=relaxed/simple;
-	bh=zJkcZV/FLJfPBqbdwMXiWMRXEY5OgcbkEBd4KRBaIMU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=j6BM3fMgbLI2NXdXVhkHPk49Kk5CRrpSCyqTF30OOzPDASl4LCwPOjHIAerP3hXohXcoR9SofKE80obHBwdw8B1Clb1yhJdiS/FzuAPoBw1UwE+hHYFYafyvxE7oYOT7MpabomCeit/J0hdCdpoGYmW3dLyCTf842mG1ABvEot0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=gGei8a/h; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Ss+x0bti; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A701477F11
+	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 11:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717413453; cv=none; b=kOt6Ct5Z3cz/Bz4uAiN6/HGK9Hv+4wQadJeqTmlureghUQBO6HJIYmdgO4vr+k3HD30mC3NDxbVg84lj/wWi2Xjp66yk3kvziqm1pJZfMOwCMrJJ6ZUYyOjA8fHlg0qPv3PkkzM+1OY28rAa3qRaD9xptVw6mP0aV+iJd2d3W68=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717413453; c=relaxed/simple;
+	bh=X9ILtM/+5hKq9Dskgzk3jggSkTrWGbcydimSrAcZB/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=PJXOA6SWSamLJLZ0a+Io2J1EtCc/H7lS0Pkx62ocETvYvSA/V/wTk+pmujyYqCKgV05dRpN3G7Grclg9m1cefsQ6XgRDYfJxwgjxPaK9wdyt8A/pPINLuf19JGlqjjlOJLJOOM4n0MtrIBClt7d4h/UdGTA/1Z1kZMBUpOp5RE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=fBCyfFmm; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gGei8a/h";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Ss+x0bti"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1717411724; x=1748947724;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=zJkcZV/FLJfPBqbdwMXiWMRXEY5OgcbkEBd4KRBaIMU=;
-  b=gGei8a/hvtdfhPFnQe2R5rsIWcJuQ2oIDXmHzmiIfse/gU6PC2RO4LrA
-   /438KU3r3/iwGYOwfL9Idci7o+eo45yHXvuMZHAV14m2U9ec2O5pzeC+g
-   EJ1SrLd+a8gPOPE1ZLDlp2phsVNA4LgQwtvuKFW0Fos0aVOziFph1yyEd
-   A07pToZhUlEGMZguCLModsOVniTD87kuULxJeJr1mCUIXPJTXdnkGLCBN
-   LbFrgg195BfYtWMJf74LmRgKp4aWy6RFpbz4R+hf2WcDZphD8GmNBu7nB
-   d28QDOdTiZWfdfeBwtO2d4Z+YGDqWWuQgeBxs5B+W4T6Cxn8S43SwQnjs
-   w==;
-X-CSE-ConnectionGUID: cpye6WvWS8+vvG3KKnHToQ==
-X-CSE-MsgGUID: R4B96+sNTfSsCDJeILPWKw==
-X-IronPort-AV: E=Sophos;i="6.08,211,1712592000"; 
-   d="scan'208";a="17706723"
-Received: from mail-dm6nam04lp2041.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.41])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jun 2024 18:48:37 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LWei25f4NaM+lg0ZZ0ixo7BeQH5m2cI/K/1ZMqzGbzwyeI6VNE5Fi5NcDJSxuG3FkJAd/qQD/72zYSFqcwcJC+8mzgdIcaE+6IfAUfu46JbnsoSRqkZAMOj9bKkN5jKYJlAJLxdrqey7mHX/t5/F8r9rWQ5bytxTGNQf4DHxWb6foyxWKUpAkR6yZMhQI27sYI/PdWmdwgRNPtgAK1ae+CfCEdCyNrdQ384ygN1oZ5VG+9umYWXSr6LzuVhV0l+CBkb5RennuAeK9heOHQS5h69m1J7DYLwQNnpka+hJhZZsc8I0pMJO+nHtcp2lvc50Eb5hg2v/QEeNfaCWmnJu/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kkqYJ/Dzx9EQMiPN9NZwNAixl7Mnybn89V79XLCTCII=;
- b=HvjYARW8WY8WXwel6WZOZzuol+NX+ic52L00NtRb0MXCv3U4p0STOcfqMOaTNBkNrTEwYatixq7s0zKGAuHY60bJNCYw601rHilG9uuIgrhIrYUpxPZnj6HMHVmIJieIKzvrXk23arIBrTOUUMr9NAQ6uAUbnO5uqcGYBU5JS4M/T3dxq85mFMBANHE/vrPTTYWNFhtyfd6ARF5RaEDy9aWFdC87+6ftrdootcSWmDBFOqZ6B3WcQ9K4TU21M3tDcaJW8Jmei9jRML/D7gVbt66GVYYaTAGV1GOCo8GhQLjDQRM6fGLNkipHXTaQ1zLlsebm7BCuXrMUjYtyLoneJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kkqYJ/Dzx9EQMiPN9NZwNAixl7Mnybn89V79XLCTCII=;
- b=Ss+x0bti7vkDn4RJosdJL4q9if2sOYeINHfMVz9Y3LfvBojNF0jXTO9GRkFOknXEbVWrenHopjNxiqFXzLd4/mISQDo/QFSQYcroWmTaao6JeRDHFr5sg63g5FUP1ai/XwcvsMo0vkPaniqtvieQsGaWgc/Z19L3jNps12hQpGg=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- PH0PR04MB7671.namprd04.prod.outlook.com (2603:10b6:510:5a::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7633.27; Mon, 3 Jun 2024 10:48:35 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a%3]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
- 10:48:34 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Gulam Mohamed <gulam.mohamed@oracle.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"chaitanyak@nvidia.com" <chaitanyak@nvidia.com>
-Subject: Re: [PATCH V3 blktests] loop: Detect a race condition between loop
- detach and open
-Thread-Topic: [PATCH V3 blktests] loop: Detect a race condition between loop
- detach and open
-Thread-Index: AQHaslo7LGrJZSVauUiGTCt3iR9q9bG14nQA
-Date: Mon, 3 Jun 2024 10:48:34 +0000
-Message-ID: <6wxosk3bjaxumrk5xsy7euifwvftspikk4q35m67tvryvculra@63zgrasrshxt>
-References: <20240530062545.79400-1-gulam.mohamed@oracle.com>
-In-Reply-To: <20240530062545.79400-1-gulam.mohamed@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH0PR04MB7671:EE_
-x-ms-office365-filtering-correlation-id: f86663a1-1c63-49d8-3d52-08dc83bab7b3
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?+4mK7Ba3tA0khJ2YrnRVtLq66OGcaZfyQyIwZMU7+TOsVUvyJnjY2OMU4Ulc?=
- =?us-ascii?Q?jWy8RDdApHrEUXpS/aHEDpeFGcVh5+H1N3Hay/csLTXvCofsbzGUWTbrQQgc?=
- =?us-ascii?Q?dRhYecGRYhlaT4nl8slX5RTOf19BG6Jv0qdgOP1WnmKNxNst4PwsAK4SpOUH?=
- =?us-ascii?Q?M4RTH11tC0f5Aa2RvSWNxHRZPsks2KLnklF7dyLctaan35h+gWMp8CvYrYJ4?=
- =?us-ascii?Q?2GIaTNLOcdsHPZOfemuDB3AcMvgC1F2O5wKcibZhcn+QLeaINv7OQO/T7P9n?=
- =?us-ascii?Q?A5vp0/P7XQrKvmb1y0kYiGPihbON9KpHe0v7PsfMdZur2IMjpMU1CKAajFMk?=
- =?us-ascii?Q?JK391UPTz8TdIO59111FtCDjCtc5OoLM55adz5pIIT25GplWqgsnszNndMPJ?=
- =?us-ascii?Q?eCcqdW9pS7LPR020RmJoEv2oiYzYQCrd9KyCB9YHFkzO3NOQ2PnVSOIeRb5N?=
- =?us-ascii?Q?1CSWPQ02mz+V5gMoMdPAB7Fc3fTxjEQLYOEzSOY79QdBYnpVfSBRGM/OjcPQ?=
- =?us-ascii?Q?0E+VHZelfTSL7fzRoUVCuvZaMdvu6tvukltqSeTJ8P2mQhB129Jo8Mf1iIKa?=
- =?us-ascii?Q?yShVJYU/DSDN/3eRu0ZxZA88cbiM/0S47l9kta6VXUj6nvcg1fjZMNDf2wc0?=
- =?us-ascii?Q?JXBC/RA8JM04butqgL3D4q4q/llHN4VMCjBadrdY8vYAmyWBSXI2QEO7UM74?=
- =?us-ascii?Q?0CZ9V+LLxpn1yN0DzAYZ7UtfHfYeoDUZ1hOCJ6w7SZpcDCYcsre2bX5VmRms?=
- =?us-ascii?Q?FBVucPn5svGUP1tIBx/vDR7un2VRjDefsohWNC8NZZGu4i8SJWlqRJh+/F9W?=
- =?us-ascii?Q?BnH63mp8gvFN6/6GipxvIBM8rYq14L2arMaDQq+XIHBSAN88bfyGSUm4oJcJ?=
- =?us-ascii?Q?73LdGE+lkPyB/mbxawhQrtcnBuA7XC/dBHoIEs7XsNHEC30fcXtVtI0Ot9Qk?=
- =?us-ascii?Q?Xo9QDOnTxjgCal8ggQu2exbm8BiJPVZgqaG3Xz8eU2UcVqCSWGvWiTOm6BqO?=
- =?us-ascii?Q?NLWa1GXNHhNFtlWmiA5f5lrtL7RU1+1rNPmYf1LOMuDK1K5ie7H6685ldaFv?=
- =?us-ascii?Q?lnBfTqhCrKqHHaiPt5Q1ysXJyMzVyzRfOpS025n7CQ3CpNfjQ9DfTmudbHhE?=
- =?us-ascii?Q?arCYAaOEgJyhSGQW6Tw06+1DqQJg7yAjLbCUyqtXflxDbgxPN79XsAoSvkLa?=
- =?us-ascii?Q?p6+a80UOW7Q77ykMJBLyE5BmpeXZnqEJgBX7UrZcn2/PD4z+OQm9LA8ioUOy?=
- =?us-ascii?Q?1anQLYyFQ5rawj7oYV9VpPtLCq7l9N+DWsjRtpD3PzL5xs3nsrwrl0JtUt5v?=
- =?us-ascii?Q?+COkGf/tuvxy5VjmZGtcxSDMZYByLrdK5M2pzR20lOQzYA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?j/M+h2uAm9fe0+ZI2HqidPUzNZRM6YCS70E9zXydKHH34Ii0+2KuuzYo63sp?=
- =?us-ascii?Q?qOvEMIuLReliyMZAIBtG534xAOiHKWCbvVkgXGPKiSNGjvdlbE8NaBb6oGJJ?=
- =?us-ascii?Q?vw1Ri0DAY1pbUc7liteH9/Ov9JeBwguIuadY/zzUEPncKMyXhd/7e9bjCrHx?=
- =?us-ascii?Q?IOzdo4cNYtXXcASXweoKwSSa2vfOEDYm7Ij1R1JTXSYfMoWBUkosJkjhY42Y?=
- =?us-ascii?Q?KnJsU8WoSYnb2WZL4/Cz6V2GDngKDRZUR+syu84rQwxvj5ZdTaxCD1Q6hlmK?=
- =?us-ascii?Q?GoKyouIDVJ7xzwk6n5CXZByqMS7DTQdXo2M0WOF5IhmWLTIk8xYYHdkan6+F?=
- =?us-ascii?Q?fsa8Oj7Xkym8Gjr5Fpq5STGwiFZRX0/OMxwj5PDCi0x8J5m84IBvItgaulUn?=
- =?us-ascii?Q?A1OIUftYDH7RQ3vgZ/tWkDsTUqv59bCbLGMU0JYz9KNHVHfy2NQaI0XinLAx?=
- =?us-ascii?Q?cJRevswlfCzfRNChhFanb8YfpwiXCPeWOhYpfg8XVgwTftAUSv8sijIShQHL?=
- =?us-ascii?Q?Znf+d9xNann21rOKJGM5REsSkJN3h/WDPMBXNdqP5JvR/FCpxjBn9Hq1gchg?=
- =?us-ascii?Q?BmKYcsTdMejcm5qr4z7Pz9cpcIx/v0bJfZinx7OR3aRB/AeIcZbRkGjGy6F4?=
- =?us-ascii?Q?Jm1XDRS6pMc5b6v7gnSoajvEVe8+1cS2cGjp5qgLTXyNGNxI3X9LxzWWbCE1?=
- =?us-ascii?Q?r+W+xTzskQIAaLOKUijMjeTyMOa0/kIeyrgB5AStRRys39Eia3vcqqimTiUl?=
- =?us-ascii?Q?WbWMWZsjgbseKgAlQN9OmzayM7yCYIRP7jkBbyHo2FQdW9OoxutgoXdnGfpv?=
- =?us-ascii?Q?nvJ6E7Va3uCFK7UgKZx8VwOV4HKIjNucnnP3DJEx1fht7LXhAB7HoAEe10g8?=
- =?us-ascii?Q?fyTckGhLfS+Zg/WqOWea4XgNJQyBs+oy61j1WlHfXzfqRDIt2NJyXQ7Slrth?=
- =?us-ascii?Q?g7uV1HTPTky1IPFSWhrboESdZJMEbL2bb7kxhYWNnnq/lKINWUF3de1V4h72?=
- =?us-ascii?Q?g5AdKcwcf4A6VlMs8yaTO+jtnFElTp8YeLtHm3UYXzRBxMGfW8Qvn12ECC5W?=
- =?us-ascii?Q?Lp+/hxZ9WIS99OIZeHl3sRz5aSs3OtaKKpjrP62nk/Nxs8r0tPHARDoT1mgm?=
- =?us-ascii?Q?0CpKXDfTS0pH30GWME9FzGNi0LGIFGGBHi6lzPwuOGAna0Ph1i/o8SpioeI1?=
- =?us-ascii?Q?MyEm9Ul9GYLKPQqimf2PR7qbJ12bTHc2arL8rknjkAHx66C+0dDKaZG+2Vmy?=
- =?us-ascii?Q?3jUj3v635Au9ElK5rUf1gr3s/tZFsZdnYlFUBKIkpibKo1dqcyos81fLlWem?=
- =?us-ascii?Q?RwavWcwMWlEoBrwGrQBFFcd+NPUyoIsTW133rI0RizLapRgzC6xApw/JOkZL?=
- =?us-ascii?Q?druxHHSRwM2wV01phUjlRvFDgtzojFVUvUkzcDPdTxiR0D0t69nfAX6cexmZ?=
- =?us-ascii?Q?o1x9pjuM9yoFRiylosxjt3ZmnIHcXNZMvIPRPDhl7vGNvfusHhIgR0J/gZsK?=
- =?us-ascii?Q?Jc/W3umLo7z6xPKdJKMl2H20oHrHWeex6kRrTgZdakMaJlluusA4aUo1nnT9?=
- =?us-ascii?Q?P41cGApbuph8WufXtTIuXwFaAWK3iobpmK+jSYSsaPloQKbHTNWAl1Mdsbg9?=
- =?us-ascii?Q?6+kOBVyIuBsRAJfeR0TXbRQ=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <003C4ED72B7236469238864100FA352F@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="fBCyfFmm"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240603111728epoutp02b0d122677df6979a0cbb644a2b3bf7a9~Vem6xIP9h2921929219epoutp02X
+	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 11:17:28 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240603111728epoutp02b0d122677df6979a0cbb644a2b3bf7a9~Vem6xIP9h2921929219epoutp02X
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1717413448;
+	bh=NdbbPTU401HPnUoOaw/F+ZPaUI8FnwtrRdYBN1GmdNc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fBCyfFmmOdsx9UkBEa9C/gMGpiNyDk4AnmSWtZbFfDv+7gBM+/il6hdrezNZoUm6u
+	 brNd0Yu+RFdFsvyiRq3EIXyNs2rR5HOPiAJA2VvMW5i5ShY8k0rytDknHtWX3ygeiW
+	 3INEWIAMTs1GV2KS6JZWO4Og6VhdoTW05ZmMqKO8=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240603111727epcas5p447c1effda385c696f1a1dab79263bc00~Vem6CshrS0313903139epcas5p4f;
+	Mon,  3 Jun 2024 11:17:27 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.182]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4VtB5f5Krnz4x9Pr; Mon,  3 Jun
+	2024 11:17:26 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F7.39.10035.646AD566; Mon,  3 Jun 2024 20:17:26 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240603110051epcas5p1210a0ffdd361216c504cc342c8d4f247~VeYaUA-3V1603316033epcas5p10;
+	Mon,  3 Jun 2024 11:00:51 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240603110051epsmtrp274773a1330edafc070774ea66a2e82c2~VeYaSaTm90159301593epsmtrp2H;
+	Mon,  3 Jun 2024 11:00:51 +0000 (GMT)
+X-AuditID: b6c32a4b-b11fa70000002733-8b-665da646c938
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	2F.BD.18846.362AD566; Mon,  3 Jun 2024 20:00:51 +0900 (KST)
+Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240603110042epsmtip288f7ecce5d34cdfe18b68ceb823a3cdb~VeYRdfn010474404744epsmtip2K;
+	Mon,  3 Jun 2024 11:00:41 +0000 (GMT)
+Date: Mon, 3 Jun 2024 10:53:39 +0000
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, Alasdair
+	Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka
+	<mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg
+	<sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara
+	<jack@suse.cz>, martin.petersen@oracle.com, bvanassche@acm.org,
+	david@fromorbit.com, hare@suse.de, damien.lemoal@opensource.wdc.com,
+	anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
+	gost.dev@samsung.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v20 00/12] Implement copy offload support
+Message-ID: <20240603105339.keuiudmeplxdmczj@nj.shetty@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	3pEPFCyh/L3pLSejVp+6tc+yW9/LxmzY2qyh+OQCqDUF6fW6BdVKZYa0FJ13LGCkYEEziWoHYmjIyNrgambBklVNytnmDbU7MgXxlx760mpK4H6x3BBGDJ4D+YIl7rGuO0cX47GnM9OwqfJHQV/lQ62Qg1TWKmlj1uj7LISCmb2EGgKtkxtfZjt93kNiKfvFtFKtakyuiEaB2+nbQ/VIh5XbZsVucbsUqwhSNKlsEgcL9N45y9ppifRm9e07Ar3LSNbm3Gm8FLzhAioFGPrwsj3ZFOsXCo7W/bNMjSKO1Y5k1tLIvcrUf6dz9pcVX6mfSxuc8nPGo2pgfOrYXJE9mJj/UGdNbjlU3Qd37eR9m1Kx5MJ/3haycKwI6JXRD1QFwC4bTKbYl6BD5yFyfftrMoqzYtDSGAGvMVsH8+X28rzlDAnhhyLBngpLUYlyHkxdBdMjGJd0nTozPTwAVa8rKOC3r4u7LSfYroo7qg4xjJN0BXEjhXeFoSlyn6iSPkELr2sSUIulgJ+wGjGey17xR+Dg5C8R5h4MWuDAYy/frB7t2YSoQiUU1a3iQIbi1dlv4Mu0dcYDvkC45C6Rpl9mg956xyv2mwTxgmpNMEbopM1IGF5AilC9/Hu/2TEkXHiA
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f86663a1-1c63-49d8-3d52-08dc83bab7b3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2024 10:48:34.8804
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zBtoVyN+Gbf9JC7ArYOHNuH8bKoKniBoiY0mNTSYhY3bcd2wHX4MtkzTtRF6Dd5jiYvSA9sqJWxm544gegIjZJpWvuQ3SoL72gb6fwSbzNQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7671
+In-Reply-To: <20240601054701.GA5613@lst.de>
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTVxzHd+5tby9OSFeQHWAyUkkcEqBVigcGbAmM3Ag69jJOY6CDKyCl
+	bdoizi1bEXDQjbeFWYExROQlRGgWysMQHjJBRhwClilDUjYGE8pLtjBgLReN/31+33N+7/xI
+	nHed40wmSFW0QiqW8IldrJ+6Pd7yCqs6fUawsroPNfbfwdHFvA0c1T3OJdBc9xJAReZ/cWTq
+	/Aag9cEhHOnvTABUXlHKQsZOA4baKwowVFPXi6GrxWkY6t16SqCCrlGApkd0GOoY90Q/Xqpk
+	ofaOuyw03FpCoB+qpjnoRt8mhvIzRzDUYkoFqGFugYV+HndBQxt97HddqOEH4VR/BaQMuscc
+	amjiFosaHkymmmqzCKq58mtqpvkKoNqMaoK6llPIprLT5gnKkPE7m1qcHmdRC7dHCCpHXwuo
+	e+U9nEj7k4mB8bQ4lla40dIYWWyCNC6IH/5RVEiUyE8g9BL6o8N8N6k4iQ7ih0ZEeoUlSCzD
+	4budE0uSLVKkWKnk+wQHKmTJKtotXqZUBfFpeaxE7iv3VoqTlMnSOG8prQoQCgQHRZaP0Ynx
+	xrV6XK53PG9Qa3A1aOBpgA0Jub5wYWOcZWUetw3A4jpPDdhl4SUAq41m4oUx3ToGNIDc9vi+
+	3IXRDQBmG9IxxlgGcLJnHLeGYnHdYeb6M8zqQHA94cAWaZUduHw4PTsIrIxztQTc0rlY2Z4b
+	BB8Z0jlWtuWGQM3NX9gMvwbvXjFtV2djCbOVVcay5oLcbhtYrF7FmRZC4dMnjzgM28PZPv0O
+	O8Pl+Q6C4RRYc7maYJzTAdSN6QDz8A7M6M/FmYriYf53uWxG3wu1/Q0Yo9vB7HUTxui2sKXs
+	Oe+D9Y3lOwmc4Oha6g5T8B9DEYuZSj2A2sJMkAdcdS91pHspH8MBMMt80cKkhV3gjU2SQQ/Y
+	2OpTDti1wImWK5PiaKVIfkhKp7xYcowsqQls38uB8BYwNWn27gIYCboAJHG+g23OV6fO8Gxj
+	xZ9foBWyKEWyhFZ2AZFlQfm4854YmeXgpKoooa+/wNfPz8/X/5CfkP+67VxGaSyPGydW0Yk0
+	LacVz/0w0sZZjb0nQidHP/6vLUtysPJIxG52WrNaqx345Bbvr0vVwYE+JZKZ/pnmtxtOzM27
+	hx6btdfrucvHg7X3H+ZoTkx0NmUeKZy3Xzmv+yJHL8j+M6YwoyAsYtgMvDP17qbotr72cyub
+	xN6JJfKD0T+qJn1MxoCzu/Ubixd0ZYtRutknzbMxqa7Hist//XDt6LPj1Gqz/5RScjXvjW+F
+	sOhU18M3Py0tM3V3hxyVgmDDkpvA10MD3/dTO4X08FJXzKU1Zx1faT1sU8ZZfjCWYzfQc+3m
+	7czeXNeUtLXl03bZX/69qBjec490d7xfMph62Ri91eiwXxTx6vXfCj+bj7Hr3L/iTU7hcxl8
+	ljJeLDyAK5Ti/wH/DoZ6uAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHe897dnY0xOOsfGtFsRJKa2ZEvZGZIOWhqwZBF8yGntRyKptK
+	N0ydWY4yXVG6zKaGppKR95W3vJXpWmaGqSnaVpYsL6BdbFpzRH378/yf3+/58tBQMEQuoUPD
+	ozhZuCRMRNmSFY2i5esCc/xPrC9+vQY/fNECcUKqGeKi99coPNI4AfDNsR8QG+ovATyt00Nc
+	1tIPsCbnDonf1WsJXJ2jInBBUTOBb99SELh51kRhVcNbgI1dagLX9Lji7KR7JK6uaSVx5+NM
+	Ct/NM/Jx/rMZAqdd7iJwlSEe4OKRURI/7xFivfkZz0vIdr7Zzb7IQaxW/Z7P6vsfkWynLpot
+	KUym2NJ7F9jh0gzAPnkXR7G5Kdd57FXFV4rVXhzgsePGHpIdre2i2JSyQsC2a5r4vo5HbD2C
+	uLDQGE7m5nncNiTtzSSM/Oh4+pUpHsaBn/ZKQNOI2YjSNUIlsKUFTCVAU0kaoAQ2f+aLUZ65
+	CVqzIyqY+cS3Lo0DlParl7IUJLMKXZ6eIiwiinFFbbO0ZbyAESHjF92cBzIZFGq/K7VkR2Yb
+	6tMm8i3ZjvFGygcveVZnMUATug7KWjig1gwDaYU3oazSQWjxQ0aI8mfm/DZ/Ts0mZ5GpgFH/
+	R6j/I9T/CA2AhWAhFymXBksDI93FcolUHh0eLA6MkJaAuTdwOVAF8h6axQ2AoEEDQDQULbBL
+	iT16QmAXJDlzlpNFBMiiwzh5AxDSpMjJbmVYcpCACZZEcac4LpKT/W0J2mZJHOEcXxck2Pnj
+	RsXgMpW9h+LLPi+uT/C5XjI0lPi0dsywM9VZNfw6pm7qW1tiwOihRZPrH+gdmkM2+/Wq0n+2
+	d7tFB4bejPWpluY2yUIcYMyq4fjpiOzTwerNHU3MYdGy3pbDWr/z4+f3KHwmfHJXCCeieN6v
+	GpeuXVq+McVTW1F00XQrf/7qWuPKgYCWc7vGElCsl7D8ujIrs1vX4X7QO1Fvr1gBObHO5Jm9
+	/9jyAH/z99X9hbvNb8XqHsP4d+xrSuoe0eaNeoSehO5tNbvcPsw7g2euODlzGemyrcIhp0d1
+	8ytbJ/f2VSTlZm7ZMLCDBE8y2xNcpxy2p7sUzLvf9WtQRMpDJO4uUCaX/AYjgqMpdQMAAA==
+X-CMS-MailID: 20240603110051epcas5p1210a0ffdd361216c504cc342c8d4f247
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_520e5_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240520102747epcas5p33497a911ca70c991e5da8e22c5d1336b
+References: <CGME20240520102747epcas5p33497a911ca70c991e5da8e22c5d1336b@epcas5p3.samsung.com>
+	<20240520102033.9361-1-nj.shetty@samsung.com> <20240601054701.GA5613@lst.de>
 
-Hi Gulam, thanks for the v3 patch. I think it's almost good. I found some m=
-ore
-minor points to improve. Please find my comments and consider if they make
-sense.
+------atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_520e5_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-On May 30, 2024 / 06:25, Gulam Mohamed wrote:
-> When one process opens a loop device partition and another process detach=
-es
-> it, there will be a race condition due to which stale loop partitions are
-> created causing IO errors. This test will detect the race
+On 01/06/24 07:47AM, Christoph Hellwig wrote:
+>On Mon, May 20, 2024 at 03:50:13PM +0530, Nitesh Shetty wrote:
+>> So copy offload works only for request based storage drivers.
+>
+>I don't think that is actually true.  It just requires a fair amount of
+>code in a bio based driver to match the bios up.
+>
+>I'm missing any kind of information on what this patch set as-is
+>actually helps with.  What operations are sped up, for what operations
+>does it reduce resource usage?
+>
+The major benefit of this copy-offload/emulation framework is
+observed in fabrics setup, for copy workloads across the network.
+The host will send offload command over the network and actual copy
+can be achieved using emulation on the target (hence patch 4).
+This results in higher performance and lower network consumption,
+as compared to read and write travelling across the network.
+With this design of copy-offload/emulation we are able to see the
+following improvements as compared to userspace read + write on a
+NVMeOF TCP setup:
 
-Missing last period '.'?
+Setup1: Network Speed: 1000Mb/s
+	Host PC: Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz
+	Target PC: AMD Ryzen 9 5900X 12-Core Processor
+	block size 8k:
+	Improvement in IO BW from 106 MiB/s to 360 MiB/s
+	Network utilisation drops from  97% to 6%.
+	block-size 1M:
+	Improvement in IO BW from 104 MiB/s to 2677 MiB/s
+	Network utilisation drops from 92% to 0.66%.
 
->=20
-> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
-> ---
-> v3<-v2:
-> Resolved all the formatting issues
->=20
->  tests/loop/010     | 77 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/loop/010.out |  2 ++
->  2 files changed, 79 insertions(+)
->  create mode 100755 tests/loop/010
->  create mode 100644 tests/loop/010.out
->=20
-> diff --git a/tests/loop/010 b/tests/loop/010
-> new file mode 100755
-> index 000000000000..19ceb6ab69cf
-> --- /dev/null
-> +++ b/tests/loop/010
-> @@ -0,0 +1,77 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2024, Oracle and/or its affiliates.
-> +#
-> +# Test to detect a race between loop detach and loop open which creates
-> +# stale loop partitions when one process opens the loop partition and
-> +# another process detaches the loop device
+Setup2: Network Speed: 100Gb/s
+	Server: Intel(R) Xeon(R) Gold 6240 CPU @ 2.60GHz, 72 cores
+	(host and target have the same configuration)
+	block-size 8k:
+	17.5% improvement in IO BW (794 MiB/s to 933 MiB/s).
+	Network utilisation drops from  6.75% to 0.16%.
 
-Missing last period '.'?
+>Part of that might be that the included use case of offloading
+>copy_file_range doesn't seem particularly useful - on any advance
+>file system that would be done using reflinks anyway.
+>
+Instead of coining a new user interface just for copy,
+we thought of using existing infra for plumbing.
+When this series gets merged, we can add io-uring interface.
 
-> +#
-> +. tests/loop/rc
-> +DESCRIPTION=3D"check stale loop partition"
-> +TIMED=3D1
-> +
-> +requires() {
-> +	_have_program parted
-> +	_have_program mkfs.xfs
-> +	_have_program blkid
-> +	_have_program udevadm
+>Have you considered hooking into dm-kcopyd which would be an
+>instant win instead?  Or into garbage collection in zoned or other
+>log structured file systems?  Those would probably really like
+>multiple source bios, though.
+>
+Our initial few version of the series had dm-kcopyd use case.
+We dropped it, to make overall series lightweight and make it
+easier to review and test.
+When the current series gets merged, we will start adding
+more in-kernel users in next phase.
 
-I understand that Chaitanya suggested the checks for blkid and udevadm.
-Actually, I don't think they are needed. blkid is included in util-linux, w=
-hich
-is documented in README as a requirement. Other util-linux tools' availabil=
-ity
-is not checked: e.g., blockdev. As for udevadm, many test cases use it (ref=
-:
-common/null_blk, common/scsi_block), but no test case checks udevadm
-availability. It doesn't make much sense to check blkid and udevadm only fo=
-r
-this test case. I plan to post a patch to document that udevadm (systemdev-=
-udev)
-requirement in README.
+Thank you,
+Nitesh Shetty
 
-> +}
-> +
-> +image_file=3D"$TMPDIR/loopImg"
-> +
-> +create_loop() {
-> +	while true
-> +	do
-> +		loop_device=3D"$(losetup -P -f --show "${image_file}")"
+------atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_520e5_
+Content-Type: text/plain; charset="utf-8"
 
-Recently, we had a couple of troubles due to behavior changes of short opti=
-ons.
-It is more robust (and readable) to use long options than short options. I
-suggest longer options like this:
 
-		loop_device=3D"$(losetup --partscan --find --show \
-			"${image_file}")"
-
-The same comment applies to losetup, truncate, parted and mkfs.xfs commands
-below.
-
-> +		blkid /dev/loop0p1 >> /dev/null 2>&1
-
-The line above can be a bit shorter:
-
-		blkid /dev/loop0p1 >& /dev/null
-
-The same comment applies to some lines below.
-
-> +	done
-> +}
-> +
-> +detach_loop() {
-> +	while true
-> +	do
-> +		if [ -e /dev/loop0 ]; then
-> +			losetup -d /dev/loop0 > /dev/null 2>&1
-> +		fi
-> +	done
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +	local loop_device
-> +	local create_pid
-> +	local detach_pid
-> +
-> +	truncate -s 1G "${image_file}"
-> +	parted -a none -s "${image_file}" mklabel gpt
-> +	loop_device=3D"$(losetup -P -f --show "${image_file}")"
-> +	parted -a none -s "${loop_device}" mkpart primary 64s 109051s
-> +
-> +	udevadm settle
-> +
-> +	if [ ! -e "${loop_device}" ]; then
-> +		return 1
-> +	fi
-> +
-> +	mkfs.xfs -f "${loop_device}p1" > /dev/null 2>&1
-> +	losetup -d "${loop_device}" >  /dev/null 2>&1
-> +
-> +	create_loop &
-> +	create_pid=3D$!
-> +	detach_loop &
-> +	detach_pid=3D$!
-> +
-> +	sleep "${TIMEOUT:-90}"
-> +	{
-> +		kill -9 $create_pid
-> +		kill -9 $detach_pid
-> +		wait
-> +		sleep 1
-> +	} 2>/dev/null
-> +
-> +	losetup -D > /dev/null 2>&1
-> +	if _dmesg_since_test_start | grep -q "partition scan of loop0 failed (r=
-c=3D-16)"; then
-> +		echo "Fail"
-> +	fi
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/loop/010.out b/tests/loop/010.out
-> new file mode 100644
-> index 000000000000..64a6aee00b8a
-> --- /dev/null
-> +++ b/tests/loop/010.out
-> @@ -0,0 +1,2 @@
-> +Running loop/010
-> +Test complete
-> --=20
-> 2.39.3
-> =
+------atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_520e5_--
