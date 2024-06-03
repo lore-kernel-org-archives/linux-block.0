@@ -1,127 +1,173 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B210A2E83F;
-	Mon,  3 Jun 2024 06:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51103BB24
+	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 06:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717397634; cv=none; b=ajy5UZ8WPuXMo50P22F0jCldCHxx3hXNT+oOBVdgr8L87YCaLKWSmUPYXbAfTtZvF03Sbl/kbUHFb1xjhp2zsNzwZl4a8BfMsQEWKkb0bRsR33909IG6+FQYYjdbtu0vTN7hiShQ+T270ubV0GZjNcGypactutixSWakBo8OI/I=
+	t=1717397638; cv=none; b=LNgJ/Rqc2oPwzZ0Cf7XyxgeUVe6TcGUeAXOOCDL0Yi6NKIGOw5BBGKsE3FsZASX0upDfbHDAXp01KcaxOHIV1BMzw0VyicAAlgI59zknIJUQI89R76n2BR1CXdOBTQlxbNbJqecYPbcmtFN7iUwou7fOxgtoH42gTTqpRaEVyRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717397634; c=relaxed/simple;
-	bh=PSpnKx1vqGSTY+XAOBgB8tYxuVovad6Oht5s6dBoYKI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cxtDnaie7j/ZrXPt36HkrgpAYI9b9bJrZzO9zl5hoRGz0tp0ReUCIHJVn3JUzXYxNxgb64VZvBQLVFtlc88f1sz79b5bvoHjwfqucgN++2zHALp5CuY0ryygnOFd+DDCXYY+izgtUsHrwXxTunEUaG3ZuDiC9RY0UpJhu6WdoJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Vt4FJ41QDz4f3kkH;
-	Mon,  3 Jun 2024 14:53:40 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id C65B61A016E;
-	Mon,  3 Jun 2024 14:53:46 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP3 (Coremail) with SMTP id _Ch0CgDnpp53aF1ms5njOA--.30852S4;
-	Mon, 03 Jun 2024 14:53:44 +0800 (CST)
-From: linan666@huaweicloud.com
-To: ming.lei@redhat.com,
-	axboe@kernel.dk,
-	ZiyangZhang@linux.alibaba.com
-Cc: czhong@redhat.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linan666@huaweicloud.com,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	houtao1@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH v2] ublk_drv: fix NULL pointer dereference in ublk_ctrl_start_recovery()
-Date: Mon,  3 Jun 2024 14:53:50 +0800
-Message-Id: <20240603065350.1619493-1-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1717397638; c=relaxed/simple;
+	bh=nKUuWSWPs2vNKFmW3QDUB28ySS7E9tkeOYd+S0FF6GQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=XJ1y5w1f8Csxh5jJh4T72KgFEhs0mwT3rIhADlUPJcy8tvjZ66pXtbmfw0Y2g9yXFGt6llabQIwiICeuq49ot20zDlzyQc0BqdBC6AehDqGpizamqKCnOb4ufU9xZi/i2bFU44nKSt0HAv4Vyb8NukhD8pPshIAufGD/HwEVpTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Tm823oyu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fn4yqxTE; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Tm823oyu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fn4yqxTE; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Tm823oyu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fn4yqxTE";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Tm823oyu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fn4yqxTE"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 2E4C52001C;
+	Mon,  3 Jun 2024 06:53:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717397635; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nYKLYvvb6UXmBQ4gamX4cQTEQs4Y1fNlipcTUwzQbjM=;
+	b=Tm823oyuBod5FVApecpKSOeETutgwMwEDG/II6UwPH/MrpWhXfavElWk7g5UUXA322DfA3
+	8mbMZCCM1wGTKk8kkdH5b5pRqHR0S5FEwkh09k755DF702W2oUu66cbErr76WLKYvLalxu
+	Qw+/zBsPzpJe5exQ9N10VS+2VPVrkfY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717397635;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nYKLYvvb6UXmBQ4gamX4cQTEQs4Y1fNlipcTUwzQbjM=;
+	b=fn4yqxTEtd1yDbspTODBJfwKFP7GznUFpu6iQOy1x6NtEFgzi79UZScl+WOijPk4xgx37G
+	5YALJDASheXiIYDA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717397635; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nYKLYvvb6UXmBQ4gamX4cQTEQs4Y1fNlipcTUwzQbjM=;
+	b=Tm823oyuBod5FVApecpKSOeETutgwMwEDG/II6UwPH/MrpWhXfavElWk7g5UUXA322DfA3
+	8mbMZCCM1wGTKk8kkdH5b5pRqHR0S5FEwkh09k755DF702W2oUu66cbErr76WLKYvLalxu
+	Qw+/zBsPzpJe5exQ9N10VS+2VPVrkfY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717397635;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nYKLYvvb6UXmBQ4gamX4cQTEQs4Y1fNlipcTUwzQbjM=;
+	b=fn4yqxTEtd1yDbspTODBJfwKFP7GznUFpu6iQOy1x6NtEFgzi79UZScl+WOijPk4xgx37G
+	5YALJDASheXiIYDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D1EA413A93;
+	Mon,  3 Jun 2024 06:53:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id V4FmIIJoXWZwTwAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 03 Jun 2024 06:53:54 +0000
+Message-ID: <2868ac3f-ba6f-460c-a736-6bf94746608f@suse.de>
+Date: Mon, 3 Jun 2024 08:53:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] null_blk: Do not allow runt zone with zone capacity
+ smaller then zone size
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
+References: <20240530054035.491497-1-dlemoal@kernel.org>
+ <20240530054035.491497-2-dlemoal@kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240530054035.491497-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgDnpp53aF1ms5njOA--.30852S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFy3JF47uFyUKw18uFyxGrg_yoW8uFWDpF
-	Z8Kw1DGrZ5tF4UZF4UtwsrJFy5G3WYkFy7Wws3Aa4F9asIyF9Iv3y3Ga1qgFW7GFWxCFyU
-	ZF4Du34093WUGF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAKI4
-	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
-	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
-	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
-	Y4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYuc_UUUUU
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.29 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Score: -4.29
+X-Spam-Flag: NO
 
-From: Li Nan <linan122@huawei.com>
+On 5/30/24 07:40, Damien Le Moal wrote:
+> A zoned device with a smaller last zone together with a zone capacity
+> smaller than the zone size does make any sense as that does not
+                                       ^not
+> correspond to any possible setup for a real device:
+> 1) For ZNS and zoned UFS devices, all zones are always the same size.
+> 2) For SMR HDDs, all zones always have the same capacity.
+> In other words, if we have a smaller last runt zone, then this zone
+> capacity should always be equal to the zone size.
+> 
+> Add a check in null_init_zoned_dev() to prevent a configuration to have
+> both a smaller zone size and a zone capacity smaller than the zone size.
+> 
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>   drivers/block/null_blk/zoned.c | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+> index 79c8e5e99f7f..f118d304f310 100644
+> --- a/drivers/block/null_blk/zoned.c
+> +++ b/drivers/block/null_blk/zoned.c
+> @@ -74,6 +74,17 @@ int null_init_zoned_dev(struct nullb_device *dev,
+>   		return -EINVAL;
+>   	}
+>   
+> +	/*
+> +	 * If a smaller zone capacity was requested, do not allow a smaller last
+> +	 * zone at the same time as such zone configuration does not correspond
+> +	 * to any real zoned device.
+> +	 */
+> +	if (dev->zone_capacity != dev->zone_size &&
+> +	    dev->size & (dev->zone_size - 1)) {
+> +		pr_err("A smaller last zone is not allowed with zone capacity smaller than zone size.\n");
+> +		return -EINVAL;
+> +	}
+> +
+>   	zone_capacity_sects = mb_to_sects(dev->zone_capacity);
+>   	dev_capacity_sects = mb_to_sects(dev->size);
+>   	dev->zone_size_sects = mb_to_sects(dev->zone_size);
 
-When two UBLK_CMD_START_USER_RECOVERY commands are submitted, the
-first one sets 'ubq->ubq_daemon' to NULL, and the second one triggers
-WARN in ublk_queue_reinit() and subsequently a NULL pointer dereference
-issue.
+Otherwise:
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Fix it by adding the check in ublk_ctrl_start_recovery() and return
-immediately in case of zero 'ub->nr_queues_ready'.
+Cheers,
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000028
-  RIP: 0010:ublk_ctrl_start_recovery.constprop.0+0x82/0x180
-  Call Trace:
-   <TASK>
-   ? __die+0x20/0x70
-   ? page_fault_oops+0x75/0x170
-   ? exc_page_fault+0x64/0x140
-   ? asm_exc_page_fault+0x22/0x30
-   ? ublk_ctrl_start_recovery.constprop.0+0x82/0x180
-   ublk_ctrl_uring_cmd+0x4f7/0x6c0
-   ? pick_next_task_idle+0x26/0x40
-   io_uring_cmd+0x9a/0x1b0
-   io_issue_sqe+0x193/0x3f0
-   io_wq_submit_work+0x9b/0x390
-   io_worker_handle_work+0x165/0x360
-   io_wq_worker+0xcb/0x2f0
-   ? finish_task_switch.isra.0+0x203/0x290
-   ? finish_task_switch.isra.0+0x203/0x290
-   ? __pfx_io_wq_worker+0x10/0x10
-   ret_from_fork+0x2d/0x50
-   ? __pfx_io_wq_worker+0x10/0x10
-   ret_from_fork_asm+0x1a/0x30
-   </TASK>
-
-Fixes: c732a852b419 ("ublk_drv: add START_USER_RECOVERY and END_USER_RECOVERY support")
-Reported-and-tested-by: Changhui Zhong <czhong@redhat.com>
-Closes: https://lore.kernel.org/all/CAGVVp+UvLiS+bhNXV-h2icwX1dyybbYHeQUuH7RYqUvMQf6N3w@mail.gmail.com
-Signed-off-by: Li Nan <linan122@huawei.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
-v2: add the check to ublk_ctrl_start_recovery().
-
- drivers/block/ublk_drv.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 4e159948c912..ebd997095b65 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2661,6 +2661,8 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
- 	mutex_lock(&ub->mutex);
- 	if (!ublk_can_use_recovery(ub))
- 		goto out_unlock;
-+	if (!ub->nr_queues_ready)
-+		goto out_unlock;
- 	/*
- 	 * START_RECOVERY is only allowd after:
- 	 *
+Hannes
 -- 
-2.39.2
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
