@@ -1,245 +1,391 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2097.outbound.protection.outlook.com [40.107.13.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345A3839EA;
-	Mon,  3 Jun 2024 12:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717418907; cv=none; b=sJQl7Qr9oRL87Z1PGWoBepCcHm5uuAkNI5/NnY84C0nl/hB5wZ5lLpPNpgFUtH6q2IT68ob8KMpurOftXFhl3OTUGTp8zIiIGRp3lWBfderjKfwRn4JgRcWThZsZ8Pch+aYHjT0uRM5lNo9t36cgDdYgnwOpEvZiHwTCSy/qLOQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717418907; c=relaxed/simple;
-	bh=LU3VNWiMTpsMlsnk6QbX+f+ptU01h6D7q3/HM/MmTn4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZD4761pfl+6hyYEmPqhbfvODReMmR1nOPBAkUNM9TcX0E8kRZ0D7Fl9RQbqwWuCsJUYfK2a/imN066pRF02pvEJakZGE8/HpaxHoKOT8jLC/wCbhn3QeJjnV1yBTf61Dl4PE9hzAtqMdlY1+lUqCp69ytqNPFGOO4b/0HJOhagw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VtD5F0LhTz6K9Y7;
-	Mon,  3 Jun 2024 20:47:13 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1B017140B2A;
-	Mon,  3 Jun 2024 20:48:21 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 3 Jun
- 2024 13:48:20 +0100
-Date: Mon, 3 Jun 2024 13:48:19 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Dan Williams <dan.j.williams@intel.com>
-CC: Dongsheng Yang <dongsheng.yang@easystack.cn>, Gregory Price
-	<gregory.price@memverge.com>, John Groves <John@groves.net>,
-	<axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-	<nvdimm@lists.linux.dev>, <james.morse@arm.com>, Mark Rutland
-	<mark.rutland@arm.com>
-Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
-Message-ID: <20240603134819.00001c5f@Huawei.com>
-In-Reply-To: <665a9402445ee_166872941d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-References: <ef0ee621-a2d2-e59a-f601-e072e8790f06@easystack.cn>
-	<20240508164417.00006c69@Huawei.com>
-	<3d547577-e8f2-8765-0f63-07d1700fcefc@easystack.cn>
-	<20240509132134.00000ae9@Huawei.com>
-	<a571be12-2fd3-e0ee-a914-0a6e2c46bdbc@easystack.cn>
-	<664cead8eb0b6_add32947d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-	<8f161b2d-eacd-ad35-8959-0f44c8d132b3@easystack.cn>
-	<ZldIzp0ncsRX5BZE@memverge.com>
-	<5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
-	<20240530143813.00006def@Huawei.com>
-	<665a9402445ee_166872941d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30C312C54B;
+	Mon,  3 Jun 2024 12:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.13.97
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717418959; cv=fail; b=Zp9ERKIGYxI9skLKWYTXI8Jqni2YLHryjoPoRQ03Ms1kwk5OPiqN6dOhnLwOlfEaK3ou9JpLypGX6h2f76Q6mQG4NXBFgHWHupuK7vGuzg+oOgzc5hlBJDxfCA5iKe7v88DTLylXTQpkj8XSm9saDBTHA9op5379zf27Ql+fd1M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717418959; c=relaxed/simple;
+	bh=H0/OXU1xpbkWnVJa9N9knR8UbDm+oJzF+IQXVPhHpjw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ihdU7Fyd4+ZFlN1KtJTC2/lrh809WxNeA9kNY667RRzzkxDUIypRXpr7A02I4o53LyXo7Pi8N4cwJVeqRKZUiFLlIAV66Iaj8+RagjsfYY+dOUNYUh88cPfCDnmA2mK7BMswNxFvHORC1OHOGLpQ+28zcd3H5gjd2vhFsWgCMgw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com; spf=pass smtp.mailfrom=volumez.com; dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b=dXn/uM34; arc=fail smtp.client-ip=40.107.13.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=volumez.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b="dXn/uM34"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bPzZzhXZKaLHF4SWT5BCnR67VyyQfdnb7baBmXqmlH3siQAhJlMJF87rd6peyzZIuNsxXlWGyPGv3mN3M9GfIExlY+Vy2pcFNA40kiHkG3ZKIEbBi/JK/KH+YDuWtMdF4GOo/eg/7NYiVTF2GcSVlEOye9+jh2CEUZPN3mHxJl3Mf7p5mTSy4U1mF72FjJyY00wMgYDmIj6/LpTMgs/mTPcsr/Iwho37UZvBRmamUKYNqW3PqDeOdjX3artjiEUXJFTp7gtRegPVNDv0Q2ajAXHUuNSXuLiaot2XASgGV+YaEy653DC3YTpTqeu33ISsEIPImG+zKFDYaVFotJaW2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H0/OXU1xpbkWnVJa9N9knR8UbDm+oJzF+IQXVPhHpjw=;
+ b=ZB6YUvyBAVMSKxXCEtCYFYLp9SaogifZUCQbXrtkSmUfl8scE0RLiwd/2zEM4XqYdNGQuPXR4lWTLMss34JRtvc45uQ8mmEfvTt1Df8yCIlvRQ8fRxzg7Aha0KyoC4jLzk7cvpKOos2YpNskzalp7Zy/jbhuxXODri+y5eIQND735paG7AoTYlLERJ6h9E4elvOIjmQfdQtgppyzaGspVLoEEMfciCRfNzQFI6V74yLNeG+yyrM+jTf+oHVI1p8/jtHgTmdXuq9nI/xPf52fYM2CnkPjQCuopwRXOe4TmjnGtjxWcR8kBb5PYnQ7Jj4kX7OpoqzpIxUtOzZfGTo0Bg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=volumez.com; dmarc=pass action=none header.from=volumez.com;
+ dkim=pass header.d=volumez.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=storingio.onmicrosoft.com; s=selector1-storingio-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H0/OXU1xpbkWnVJa9N9knR8UbDm+oJzF+IQXVPhHpjw=;
+ b=dXn/uM34cpJRUmW1ezaDR3yFP1jAfQMsa96rUqtufQWVxYhM5Y0aoTQnRKIe9LIcrSH6rznHE0i7DKwMSaNnel3DGfhcbyLp6cHUdVbQ9GmEVrZKKc5cJ4Gfk7hkVnMKwv0SmTb64iDyeAwVOBOMLirAdK/Ps3qQklcTH5ewWKCDVb+WGVYQCX4CTxXH3TurKlyNpgbpZ571dvW3F0wU7ceqibVyFzVt+f9024sqHitlEnHwYfs/0Mgi3P46vpwiux7JAufW6iNcn9mUcnmUPQgQoSLYdVlz+9PXz5ocM5QZpOdfkzInd9fxp1tXnZVw+nFC1TqpBx3r+QkD5Ez9jg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=volumez.com;
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com (2603:10a6:208:cb::11)
+ by AS8PR04MB9189.eurprd04.prod.outlook.com (2603:10a6:20b:44c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.25; Mon, 3 Jun
+ 2024 12:49:13 +0000
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb]) by AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb%4]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
+ 12:49:13 +0000
+Message-ID: <df9123d5-e542-44f6-b9a8-cada72252cf7@volumez.com>
+Date: Mon, 3 Jun 2024 15:49:09 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Hannes Reinecke <hare@suse.de>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
+ kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+ philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240530142417.146696-1-ofir.gal@volumez.com>
+ <a3fac93a-af2b-4969-8ab5-302089cdb3a6@suse.de>
+Content-Language: en-US
+From: Ofir Gal <ofir.gal@volumez.com>
+In-Reply-To: <a3fac93a-af2b-4969-8ab5-302089cdb3a6@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL0P290CA0002.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::10) To AM0PR04MB5107.eurprd04.prod.outlook.com
+ (2603:10a6:208:cb::11)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB5107:EE_|AS8PR04MB9189:EE_
+X-MS-Office365-Filtering-Correlation-Id: ceaf123c-b199-4b9a-6d0f-08dc83cb9263
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|7416005|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cDZhdFdUV1h6ajg3Y0NDdXgrOHBUczlvcVVQUFNJelpxc3Z3M3RESTdjK0wy?=
+ =?utf-8?B?ay8xZTlkL1h6ZEZtaUVObFQrLzBiTHBKQWNHR2pmMm1ZcWc0cnY4K2RIT0s5?=
+ =?utf-8?B?R2RYcWtUK2FYRDc0Q3R3NUdjM3FuQlNGc3lOUURxMEhzdVhmc3FqaEdJTEh6?=
+ =?utf-8?B?aU5yTXhyNytJNFA1UVdJNS82Mzg0VER4d01nZFlZUTgwQmZ5dGg4SjhhV2pa?=
+ =?utf-8?B?d3c0WnN3aFJNQmJnaFZFUUJuRlpiYzB4ZUYxd3IvR1o2NHVUNzB4VTR2d1lH?=
+ =?utf-8?B?ekpqbzdCQUtNTHZUSjdyUTFxSGZZT2VBNlRVTjNabzVhWE9MRUdUeHh3cExU?=
+ =?utf-8?B?Si9Scmh4SEtGZFc1RzVRWENJV2R5emNWdTJTblpuSmVuREZNUERmR3ZWUmJG?=
+ =?utf-8?B?ak1jaWoyUUdzWDU5ZnZVVmJrSUQzMGkzWldqWWN5UjRCUlpyYlhUSTRTVms3?=
+ =?utf-8?B?eUNjK0RIaUhQc1luVUV0U3JDejd2cjJwK29NUFhVclhpNGdDTG93TVBGbFor?=
+ =?utf-8?B?eW1xR0Fjd1p5eklOSERLbDdXNjRvbjkvMHZ2M3hrVUdPeURJalgrN01BTUZO?=
+ =?utf-8?B?SVJEWlRseXUyZDZ5OWQrU3BKcFc4LytNRS9uV3Z5YmFRWFNKZTlaTGtlWDE0?=
+ =?utf-8?B?YnZEVDE2b2ZSNVorb2hTNk5kRUJpUVZ0NzFrWmpoT2dBRGl3MnVSNUZJcTIy?=
+ =?utf-8?B?ZEZxRlJIRjllQjdWTDFGUVZvamxUMXZ2bWgxVU44ZnAwNkRJUWxDdmJaYUJw?=
+ =?utf-8?B?VTdGS2J6eXErY1pBSSsveTVKcjFxRm5RL1pSRGlYSlNOSko3L1lRVTJhSEE4?=
+ =?utf-8?B?dWZzUzdwcGFsT2FjOW1KZzNoQzhtL0xqRDlsejd5WFhvaTAvSlVEc2RlbTlQ?=
+ =?utf-8?B?K3NSVTBPQklxbzRBUTdIUG5ub2JrZjJKbjk4eE03VUVRRlJNZUUxUC9QUjI4?=
+ =?utf-8?B?MTRxdTUwYXNUakJLeWdOYmI2N295OUhmSy9hWkRkSXdVN1RRNmwyTTNhRlJw?=
+ =?utf-8?B?MlVrRXJUSFh4STRSYlFCdkFhL3VMaFN0RmlPSFhYN0htU1ZrRjZQWndkVGZM?=
+ =?utf-8?B?aWdLaEJNaEtVTjZVV3QxMHp2aVowRHhVSERwUVFabmVqdUp0ci9CNU5sZ0E0?=
+ =?utf-8?B?VzM4VzJKSUZRc1U1d1hFZUNJendxRkRaeWU3bUViMjhCcFlvNEhhSGR2dmFr?=
+ =?utf-8?B?b1ZnUHFrZUh5T0FRbnZkbE1XNCtWdzZQbTRhZHJaaG5VR1JwUGVGL2UyYXR0?=
+ =?utf-8?B?ZjNUZTdsNFNPbWFuZjZQYmRLK2UyZGIxeERUMUI2dWU4c3ZsUkV1b2p0Z3l5?=
+ =?utf-8?B?bGl2UlNoZ25IWVZUbHVTNkxBQ25hRWh6bDRtUnJnNzZGNDZQOHdJQ09zcjZJ?=
+ =?utf-8?B?cXYvRW1IY21hZ2VCQjQ0T3Erekdsbi9NYWoxS3NPL0dMS3V0NEcxcExiY1JD?=
+ =?utf-8?B?TStXM0JBZjlaTEhSdi93WFZsY3pVdk5xM1lySzhheURUd3hvRkdwWlNzZ25J?=
+ =?utf-8?B?S29oMndFby9XMEw1WEtCSVc4b3FYK1IvTWZpWGRnQTU0Q1Z2SURTWXd1ZENj?=
+ =?utf-8?B?L0pBbG1wcGtzVGZzOXhmOHNVWVpsSVYvRkdPVDVuY0U1WkVBeWRHRHM0UVpQ?=
+ =?utf-8?B?YmRXbTRKUjI1YTF4dWgvUUNMOGpqd2ErME1kZkl6SlZFWVEyM3Y0cmdjc0lK?=
+ =?utf-8?B?ajl2NDN1WDRjbXg3NUVzVHUrbUh6VHNNVmVYVXpMTTBLcVRXd0pxUlFRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5107.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YU1kU1NzekVCVmo3ZzZYcWZLR2NESFk5N1hEd1ZRMElDWDJhd0J1cmdvTnVC?=
+ =?utf-8?B?U0Z2WEhvVklOVGdzMVJtQkVvZ3Ayd1NaS3R2WkNheXlVUm1rM2dEbFYwdkJm?=
+ =?utf-8?B?elFycUY5T2RIc3ZqZHVxTkJ4T3MzVkdXQW9tQTJTVkEweG5EM0J1elQ0cmVB?=
+ =?utf-8?B?NXpoM2trQkRNb2pHdFdKSjBwb2dhcjZ3bUp5c1FLNjNyNGtXcVJPQyt6alQ3?=
+ =?utf-8?B?TDV0WkpSRnBUVUJpU29uM1V5V1cyUTlSNUlPUVcreWtrT0oxUEk4TFo4VkhZ?=
+ =?utf-8?B?S3llZUFOcHUyOHcvREZxalZyRmJQNDFDWGhKMUV1b3pDQjJKSFIzT3BwWHhY?=
+ =?utf-8?B?SXA1QnNtbDhWc21FQkFDVi9xb0w5R3h3UEl0aGVod0w2ZkNZVnpJbG9YSDdi?=
+ =?utf-8?B?dWZNbHhkdndSR0UxRC9EOFRLRjIxNFZJd1prL0V2STk5SWJEeUxCTVdrbXJy?=
+ =?utf-8?B?dTRNNmRtNFBkYUNJM3hRcmkyQytnNGRybktaaGtZSlc2YW9VaGp1eU1mVUd2?=
+ =?utf-8?B?Mm5sbWxBV2Q1aDZMbG1odFMvYW50SVg5Z1UxNGxSNUhYemZTN2Z2L0JPUDBJ?=
+ =?utf-8?B?dHdrN0ZibXkrOUFybUg0eldSSDBCOGlHbDFPVmdWdUIzWEZFaXU0cytza2Vi?=
+ =?utf-8?B?UjY2b2xIbWE1eVdqaXZjUTFpREtGbnZkczQ4czMyV0RRMGZlbkhPNnhRcjFo?=
+ =?utf-8?B?TjZmeCtmNjRIY1NCY0JKMm5NZTB3RE95d2JBUFJOTVJUTTBabEU1THc1TXhP?=
+ =?utf-8?B?NFNUTXF6OFhPTzM2aEZoaDFzbjMzbnpLb3ZqWm9mM2FiRTlqaTEzS2cxSlZQ?=
+ =?utf-8?B?MFJ5VHNvMndISTVEcmFyVVNWZDRZWXZCbHA5Qjc1WUpKdXJFMFNSRFhMQ1VU?=
+ =?utf-8?B?Sm5qTW9YK2ZjUDhxV1U3QU9nbU9Lem9LUlhSYytuU1EzU2NDR1lUemZDend5?=
+ =?utf-8?B?dTduQkRETlZ6VVU0QkZlUGpRUGFzcGpTV2lGSE9ickRyN1o1RjFiS3BUak5u?=
+ =?utf-8?B?dGRMK2JLNnRXRnZqMmE5aWpYVHhkRWVmejg0S0t2bUg4NTI5SEJFVmFYYUJn?=
+ =?utf-8?B?UVRZOG9KSlpCWTd1cGltZ3BGc2hQeUg2OGRINUhlY3NiaGY5YTJ2RTBYNUVh?=
+ =?utf-8?B?TmRtR050NlhWVEFsa2hhVU0zMUpLTjZ0SXlybjc5Vm5UUmQ1RnpoNVFOdFBS?=
+ =?utf-8?B?MXlOS1krbWg1bytWWVpsRnVrY3ZYR3pZZ3VSdVc2NjgzN2xxQ3hvZ1BFbG80?=
+ =?utf-8?B?UnpYOC9qM2luRnRhUHkwTFNrUFF1MnAwVUtvc01UZVhzSnlUdm8rVnpSTlAv?=
+ =?utf-8?B?QW5HcDFaWW43TnBIb1l2anorLzlCRkFpd3Vta2V2VFU5dklRY2FoR3YxTTF3?=
+ =?utf-8?B?VWd6dXFHSXljOE1ZbDNrTllJeGM3NTlHVm9zWE9DU3I1TjFzWkFSRll0QUIz?=
+ =?utf-8?B?eTN5am8vZVVaNkwvMkszZmxpT0dtRDVxZEcrT3RPejZPUW9qNVVjcW9wVGtB?=
+ =?utf-8?B?Mkl5ZitGaVNXQ3R1UFZiRDlyU1RVME9EdUl5WWxwdUttL1lRb0g3aFdXRHEr?=
+ =?utf-8?B?SmNXUXFFZm5CRDFjdEl0eXRQMElvQ1BIaDJmdHNLa2RQSFNoYzhDTHRJcUFm?=
+ =?utf-8?B?THFRcis3R1JwbHFEeTMzeDZWVEowMm1ka2xiTlZZOW5ZWWY2S2lEa2k5VVVu?=
+ =?utf-8?B?dzZqOG1zQkF1VjlZcCtHSTQ4T1p1TlpEQWJtVDVVUU8xaWVjbTF0QisrL3kw?=
+ =?utf-8?B?UFZnYlJ6YURhcmJNdHo1WmFjV2tDa29lMUlHejJ5Wkl1NVAvN3QrZUlRai9z?=
+ =?utf-8?B?RXFrTkptQURET21nWkFzQWxUc0tpZjZmL1lkbzVWeTVkUFdZOU8zbFVSWnRi?=
+ =?utf-8?B?WXRSbjhTa0FJa2RuMnZEcmp1WGpzejN1RW9BelVJZ29LL1h1QUJPdUpSdklP?=
+ =?utf-8?B?MmdEcXJLdk5HUU5EMm9veVhoM2xsekdlb3RQM1puKzN5Rk5wWHVibk0yYUF3?=
+ =?utf-8?B?SDdPeHB3VWdYTzhrRjlIdDhPTTQwa1l2R1lvMEEraFRzQnViUnlsVWxGakVm?=
+ =?utf-8?B?WndXQjJZOEtObk5mQnovdThDUWVVOXhod2tFa3BpaW1BM0dZdzJlTWFJUWdW?=
+ =?utf-8?Q?zme1FfRp6X1CbeOGCtFXOL1I4?=
+X-OriginatorOrg: volumez.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ceaf123c-b199-4b9a-6d0f-08dc83cb9263
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5107.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 12:49:13.8116
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b1841924-914b-4377-bb23-9f1fac784a1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SkHeCYFLtYjylFgdTu5Nc0leQ38VW6GhdHTWNMxAldlOZCjGuE4Dn79UnLOUfwFCBp5PEVuwJqkMgKAhpqCYcg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9189
 
-On Fri, 31 May 2024 20:22:42 -0700
-Dan Williams <dan.j.williams@intel.com> wrote:
 
-> Jonathan Cameron wrote:
-> > On Thu, 30 May 2024 14:59:38 +0800
-> > Dongsheng Yang <dongsheng.yang@easystack.cn> wrote:
-> >  =20
-> > > =E5=9C=A8 2024/5/29 =E6=98=9F=E6=9C=9F=E4=B8=89 =E4=B8=8B=E5=8D=88 11=
-:25, Gregory Price =E5=86=99=E9=81=93: =20
-> > > > On Wed, May 22, 2024 at 02:17:38PM +0800, Dongsheng Yang wrote:   =
-=20
-> > > >>
-> > > >>
-> > > >> =E5=9C=A8 2024/5/22 =E6=98=9F=E6=9C=9F=E4=B8=89 =E4=B8=8A=E5=8D=88=
- 2:41, Dan Williams =E5=86=99=E9=81=93:   =20
-> > > >>> Dongsheng Yang wrote:
-> > > >>>
-> > > >>> What guarantees this property? How does the reader know that its =
-local
-> > > >>> cache invalidation is sufficient for reading data that has only r=
-eached
-> > > >>> global visibility on the remote peer? As far as I can see, there =
-is
-> > > >>> nothing that guarantees that local global visibility translates to
-> > > >>> remote visibility. In fact, the GPF feature is counter-evidence o=
-f the
-> > > >>> fact that writes can be pending in buffers that are only flushed =
-on a
-> > > >>> GPF event.   =20
-> > > >>
-> > > >> Sounds correct. From what I learned from GPF, ADR, and eADR, there=
- would
-> > > >> still be data in WPQ even though we perform a CPU cache line flush=
- in the
-> > > >> OS.
-> > > >>
-> > > >> This means we don't have a explicit method to make data puncture a=
-ll caches
-> > > >> and land in the media after writing. also it seems there isn't a e=
-xplicit
-> > > >> method to invalidate all caches along the entire path.
-> > > >>   =20
-> > > >>>
-> > > >>> I remain skeptical that a software managed inter-host cache-coher=
-ency
-> > > >>> scheme can be made reliable with current CXL defined mechanisms. =
-  =20
-> > > >>
-> > > >>
-> > > >> I got your point now, acorrding current CXL Spec, it seems softwar=
-e managed
-> > > >> cache-coherency for inter-host shared memory is not working. Will =
-the next
-> > > >> version of CXL spec consider it?   =20
-> > > >>>   =20
-> > > >=20
-> > > > Sorry for missing the conversation, have been out of office for a b=
-it.
-> > > >=20
-> > > > It's not just a CXL spec issue, though that is part of it. I think =
-the
-> > > > CXL spec would have to expose some form of puncturing flush, and th=
-is
-> > > > makes the assumption that such a flush doesn't cause some kind of
-> > > > race/deadlock issue.  Certainly this needs to be discussed.
-> > > >=20
-> > > > However, consider that the upstream processor actually has to gener=
-ate
-> > > > this flush.  This means adding the flush to existing coherence prot=
-ocols,
-> > > > or at the very least a new instruction to generate the flush explic=
-itly.
-> > > > The latter seems more likely than the former.
-> > > >=20
-> > > > This flush would need to ensure the data is forced out of the local=
- WPQ
-> > > > AND all WPQs south of the PCIE complex - because what you really wa=
-nt to
-> > > > know is that the data has actually made it back to a place where re=
-mote
-> > > > viewers are capable of percieving the change.
-> > > >=20
-> > > > So this means:
-> > > > 1) Spec revision with puncturing flush
-> > > > 2) Buy-in from CPU vendors to generate such a flush
-> > > > 3) A new instruction added to the architecture.
-> > > >=20
-> > > > Call me in a decade or so.
-> > > >=20
-> > > >=20
-> > > > But really, I think it likely we see hardware-coherence well before=
- this.
-> > > > For this reason, I have become skeptical of all but a few memory sh=
-aring
-> > > > use cases that depend on software-controlled cache-coherency.   =20
-> > >=20
-> > > Hi Gregory,
-> > >=20
-> > > 	From my understanding, we actually has the same idea here. What I am=
-=20
-> > > saying is that we need SPEC to consider this issue, meaning we need t=
-o=20
-> > > describe how the entire software-coherency mechanism operates, which=
-=20
-> > > includes the necessary hardware support. Additionally, I agree that i=
-f=20
-> > > software-coherency also requires hardware support, it seems that=20
-> > > hardware-coherency is the better path. =20
-> > > >=20
-> > > > There are some (FAMFS, for example). The coherence state of these
-> > > > systems tend to be less volatile (e.g. mappings are read-only), or
-> > > > they have inherent design limitations (cacheline-sized message pass=
-ing
-> > > > via write-ahead logging only).   =20
-> > >=20
-> > > Can you explain more about this? I understand that if the reader in t=
-he=20
-> > > writer-reader model is using a readonly mapping, the interaction will=
- be=20
-> > > much simpler. However, after the writer writes data, if we don't have=
- a=20
-> > > mechanism to flush and invalidate puncturing all caches, how can the=
-=20
-> > > readonly reader access the new data? =20
-> >=20
-> > There is a mechanism for doing coarse grained flushing that is known to
-> > work on some architectures. Look at cpu_cache_invalidate_memregion().
-> > On intel/x86 it's wbinvd_on_all_cpu_cpus() =20
->=20
-> There is no guarantee on x86 that after cpu_cache_invalidate_memregion()
-> that a remote shared memory consumer can be assured to see the writes
-> from that event.
 
-I was wondering about that after I wrote this...  I guess it guarantees
-we won't get a late landing write or is that not even true?
-
-So if we remove memory, then added fresh memory again quickly enough
-can we get a left over write showing up?  I guess that doesn't matter as
-the kernel will chase it with a memset(0) anyway and that will be ordered
-as to the same address.
-
-However we won't be able to elide that zeroing even if we know the device
-did it which is makes some operations the device might support rather
-pointless :(
-
->=20
-> > on arm64 it's a PSCI firmware call CLEAN_INV_MEMREGION (there is a
-> > public alpha specification for PSCI 1.3 with that defined but we
-> > don't yet have kernel code.) =20
->=20
-> That punches visibility through CXL shared memory devices?
-
-It's a draft spec and Mark + James in +CC can hopefully confirm.
-It does say
-"Cleans and invalidates all caches, including system caches".
-which I'd read as meaning it should but good to confirm.
-
->=20
-> > These are very big hammers and so unsuited for anything fine grained.
-> > In the extreme end of possible implementations they briefly stop all
-> > CPUs and clean and invalidate all caches of all types.  So not suited
-> > to anything fine grained, but may be acceptable for a rare setup event,
-> > particularly if the main job of the writing host is to fill that memory
-> > for lots of other hosts to use.
-> >=20
-> > At least the ARM one takes a range so allows for a less painful
-> > implementation.  I'm assuming we'll see new architecture over time
-> > but this is a different (and potentially easier) problem space
-> > to what you need. =20
->=20
-> cpu_cache_invalidate_memregion() is only about making sure local CPU
-> sees new contents after an DPA:HPA remap event. I hope CPUs are able to
-> get away from that responsibility long term when / if future memory
-> expanders just issue back-invalidate automatically when the HDM decoder
-> configuration changes.
-
-I would love that to be the way things go, but I fear the overheads of
-doing that on the protocol means people will want the option of the painful
-approach.
-
-Jonathan
-=20
+On 03/06/2024 10:24, Hannes Reinecke wrote:
+> On 5/30/24 16:24, Ofir Gal wrote:
+>> skb_splice_from_iter() warns on !sendpage_ok() which results in nvme-tcp
+>> data transfer failure. This warning leads to hanging IO.
+>>
+>> nvme-tcp using sendpage_ok() to check the first page of an iterator in
+>> order to disable MSG_SPLICE_PAGES. The iterator can represent a list of
+>> contiguous pages.
+>>
+>> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
+>> it requires all pages in the iterator to be sendable.
+>> skb_splice_from_iter() checks each page with sendpage_ok().
+>>
+>> nvme_tcp_try_send_data() might allow MSG_SPLICE_PAGES when the first
+>> page is sendable, but the next one are not. skb_splice_from_iter() will
+>> attempt to send all the pages in the iterator. When reaching an
+>> unsendable page the IO will hang.
+>>
+>> The patch introduces a helper sendpages_ok(), it returns true if all the
+>> continuous pages are sendable.
+>>
+>> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
+>> this helper to check whether the page list is OK. If the helper does not
+>> return true, the driver should remove MSG_SPLICE_PAGES flag.
+>>
+>>
+>> The bug is reproducible, in order to reproduce we need nvme-over-tcp
+>> controllers with optimal IO size bigger than PAGE_SIZE. Creating a raid
+>> with bitmap over those devices reproduces the bug.
+>>
+>> In order to simulate large optimal IO size you can use dm-stripe with a
+>> single device.
+>> Script to reproduce the issue on top of brd devices using dm-stripe is
+>> attached below.
+>>
+>>
+>> I have added 3 prints to test my theory. One in nvme_tcp_try_send_data()
+>> and two others in skb_splice_from_iter() the first before sendpage_ok()
+>> and the second on !sendpage_ok(), after the warning.
+>> ...
+>> nvme_tcp: sendpage_ok, page: 0x654eccd7 (pfn: 120755), len: 262144, offset: 0
+>> skbuff: before sendpage_ok - i: 0. page: 0x654eccd7 (pfn: 120755)
+>> skbuff: before sendpage_ok - i: 1. page: 0x1666a4da (pfn: 120756)
+>> skbuff: before sendpage_ok - i: 2. page: 0x54f9f140 (pfn: 120757)
+>> WARNING: at net/core/skbuff.c:6848 skb_splice_from_iter+0x142/0x450
+>> skbuff: !sendpage_ok - page: 0x54f9f140 (pfn: 120757). is_slab: 1, page_count: 1
+>> ...
+>>
+>>
+>> stack trace:
+>> ...
+>> WARNING: at net/core/skbuff.c:6848 skb_splice_from_iter+0x141/0x450
+>> Workqueue: nvme_tcp_wq nvme_tcp_io_work
+>> Call Trace:
+>>   ? show_regs+0x6a/0x80
+>>   ? skb_splice_from_iter+0x141/0x450
+>>   ? __warn+0x8d/0x130
+>>   ? skb_splice_from_iter+0x141/0x450
+>>   ? report_bug+0x18c/0x1a0
+>>   ? handle_bug+0x40/0x70
+>>   ? exc_invalid_op+0x19/0x70
+>>   ? asm_exc_invalid_op+0x1b/0x20
+>>   ? skb_splice_from_iter+0x141/0x450
+>>   tcp_sendmsg_locked+0x39e/0xee0
+>>   ? _prb_read_valid+0x216/0x290
+>>   tcp_sendmsg+0x2d/0x50
+>>   inet_sendmsg+0x43/0x80
+>>   sock_sendmsg+0x102/0x130
+>>   ? vprintk_default+0x1d/0x30
+>>   ? vprintk+0x3c/0x70
+>>   ? _printk+0x58/0x80
+>>   nvme_tcp_try_send_data+0x17d/0x530
+>>   nvme_tcp_try_send+0x1b7/0x300
+>>   nvme_tcp_io_work+0x3c/0xc0
+>>   process_one_work+0x22e/0x420
+>>   worker_thread+0x50/0x3f0
+>>   ? __pfx_worker_thread+0x10/0x10
+>>   kthread+0xd6/0x100
+>>   ? __pfx_kthread+0x10/0x10
+>>   ret_from_fork+0x3c/0x60
+>>   ? __pfx_kthread+0x10/0x10
+>>   ret_from_fork_asm+0x1b/0x30
+>> ...
+>>
+>> ---
+>> Changelog:
+>> v2, fix typo in patch subject
+>>
+>> Ofir Gal (4):
+>>    net: introduce helper sendpages_ok()
+>>    nvme-tcp: use sendpages_ok() instead of sendpage_ok()
+>>    drbd: use sendpages_ok() to instead of sendpage_ok()
+>>    libceph: use sendpages_ok() to instead of sendpage_ok()
+>>
+>>   drivers/block/drbd/drbd_main.c |  2 +-
+>>   drivers/nvme/host/tcp.c        |  2 +-
+>>   include/linux/net.h            | 20 ++++++++++++++++++++
+>>   net/ceph/messenger_v1.c        |  2 +-
+>>   net/ceph/messenger_v2.c        |  2 +-
+>>   5 files changed, 24 insertions(+), 4 deletions(-)
+>>
+>>   reproduce.sh | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 114 insertions(+)
+>>   create mode 100755 reproduce.sh
+>>
+>> diff --git a/reproduce.sh b/reproduce.sh
+>> new file mode 100755
+>> index 000000000..8ae226b18
+>> --- /dev/null
+>> +++ b/reproduce.sh
+>> @@ -0,0 +1,114 @@
+>> +#!/usr/bin/env sh
+>> +# SPDX-License-Identifier: MIT
+>> +
+>> +set -e
+>> +
+>> +load_modules() {
+>> +    modprobe nvme
+>> +    modprobe nvme-tcp
+>> +    modprobe nvmet
+>> +    modprobe nvmet-tcp
+>> +}
+>> +
+>> +setup_ns() {
+>> +    local dev=$1
+>> +    local num=$2
+>> +    local port=$3
+>> +    ls $dev > /dev/null
+>> +
+>> +    mkdir -p /sys/kernel/config/nvmet/subsystems/$num
+>> +    cd /sys/kernel/config/nvmet/subsystems/$num
+>> +    echo 1 > attr_allow_any_host
+>> +
+>> +    mkdir -p namespaces/$num
+>> +    cd namespaces/$num/
+>> +    echo $dev > device_path
+>> +    echo 1 > enable
+>> +
+>> +    ln -s /sys/kernel/config/nvmet/subsystems/$num \
+>> +        /sys/kernel/config/nvmet/ports/$port/subsystems/
+>> +}
+>> +
+>> +setup_port() {
+>> +    local num=$1
+>> +
+>> +    mkdir -p /sys/kernel/config/nvmet/ports/$num
+>> +    cd /sys/kernel/config/nvmet/ports/$num
+>> +    echo "127.0.0.1" > addr_traddr
+>> +    echo tcp > addr_trtype
+>> +    echo 8009 > addr_trsvcid
+>> +    echo ipv4 > addr_adrfam
+>> +}
+>> +
+>> +setup_big_opt_io() {
+>> +    local dev=$1
+>> +    local name=$2
+>> +
+>> +    # Change optimal IO size by creating dm stripe
+>> +    dmsetup create $name --table \
+>> +        "0 `blockdev --getsz $dev` striped 1 512 $dev 0"
+>> +}
+>> +
+>> +setup_targets() {
+>> +    # Setup ram devices instead of using real nvme devices
+>> +    modprobe brd rd_size=1048576 rd_nr=2 # 1GiB
+>> +
+>> +    setup_big_opt_io /dev/ram0 ram0_big_opt_io
+>> +    setup_big_opt_io /dev/ram1 ram1_big_opt_io
+>> +
+>> +    setup_port 1
+>> +    setup_ns /dev/mapper/ram0_big_opt_io 1 1
+>> +    setup_ns /dev/mapper/ram1_big_opt_io 2 1
+>> +}
+>> +
+>> +setup_initiators() {
+>> +    nvme connect -t tcp -n 1 -a 127.0.0.1 -s 8009
+>> +    nvme connect -t tcp -n 2 -a 127.0.0.1 -s 8009
+>> +}
+>> +
+>> +reproduce_warn() {
+>> +    local devs=$@
+>> +
+>> +    # Hangs here
+>> +    mdadm --create /dev/md/test_md --level=1 --bitmap=internal \
+>> +        --bitmap-chunk=1024K --assume-clean --run --raid-devices=2 $devs
+>> +}
+>> +
+>> +echo "###################################
+>> +
+>> +The script creates 2 nvme initiators in order to reproduce the bug.
+>> +The script doesn't know which controllers it created, choose the new nvme
+>> +controllers when asked.
+>> +
+>> +###################################
+>> +
+>> +Press enter to continue.
+>> +"
+>> +
+>> +read tmp
+>> +
+>> +echo "# Creating 2 nvme controllers for the reproduction. current nvme devices:"
+>> +lsblk -s | grep nvme || true
+>> +echo "---------------------------------
+>> +"
+>> +
+>> +load_modules
+>> +setup_targets
+>> +setup_initiators
+>> +
+>> +sleep 0.1 # Wait for the new nvme ctrls to show up
+>> +
+>> +echo "# Created 2 nvme devices. nvme devices list:"
+>> +
+>> +lsblk -s | grep nvme
+>> +echo "---------------------------------
+>> +"
+>> +
+>> +echo "# Insert the new nvme devices as separated lines. both should be with size of 1G"
+>> +read dev1
+>> +read dev2
+>> +
+>> +ls /dev/$dev1 > /dev/null
+>> +ls /dev/$dev2 > /dev/null
+>> +
+>> +reproduce_warn /dev/$dev1 /dev/$dev2
+>
+> Can you convert that into a blktest script?
+Yes, will do.
 
