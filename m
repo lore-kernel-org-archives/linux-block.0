@@ -1,124 +1,211 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE3C13D501
-	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 03:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF24313D60F
+	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 03:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717471545; cv=none; b=Gx+QzIIZloW1sKLzRdoVEGOGw84PlZEW1FLOKvLVYXo2t3TkARe5CvFsYVE5A/8h78euxCRHcPunU1dvPCHZe82ZSYcX3pIr5ttv+77j6eS5JOU4dZOdzf9nirJfTli5RW/Tnk5cmVpft90M6kGEoRI95bgZj+ymDDzovu9EGsE=
+	t=1717471736; cv=none; b=f82XMKBP+OVKNzvmP0KvryWvsKPKhlRyRD0m5rzdzRBe/kNijyDugM/VPcicCo1qlBVI3vx6DAYuM78Yh1TWBo4fYtUHuiAYRuWZgbv2OiGTNppt/KlJTelCCZSwvvbB6+Kco0ydii/NQtp3bNqOj+JL/+JtZtC0TVSjxwHdh/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717471545; c=relaxed/simple;
-	bh=NjrI4lHVFyH79QzE/OE3lhpa4QHszBqtLMquvt/lk1A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PFe/yG8hyIGAoCRaljT9Pjdn8oejzJFj9Bx4Z0I8zVceoOO54bAT8TfP/yI7hyJod3xBgYOnD0+EWEPja2aBxIE2726sVbPUp82m2wA1kRXhT780s2veMB8DDOQB+WN6uy928+3u6L15u97rtCkvkIYiL69c9jVnfM7b+OBC/JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cNToNuRD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1717471736; c=relaxed/simple;
+	bh=BmnSM780gtlucE+xybG8Q/hhbxyboU3CWExMeE8IYw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=L4bo7Pl+/dEKgJnYao2ZuF1fu5QFrbsWm1XTh4KpvZ+d1utQzSYmEd3wYbVYhwxlfcQe/FlRCg552tScRyfnRDaGwWO02rZ2Nb8xUn4Je8XdhCCHE1DOGeFHN6jtmRq+raWAmhkI0AGBg4hk19ChhF9ctqRWA9Q9s0ECm2e61yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=tNcvNOlR; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cNToNuRD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717471542;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zEUAhiXSNeBDF6NeU6DEm0KF3UmpeqhO8TfskOx9nww=;
-	b=cNToNuRDvFvizomTVk76tdQoSMNLsT6dg/WYxQzLiEn52wkPKeblpRBk4O0bjTN7OEQkod
-	EOLwauKTEakoQ3C9a34SpFXR1WnFtt1QhTYuBP+2VDUv2jxqIPSgT9yArq28rHUKoJuzdu
-	Z9oOZS7aTksyn/Kuj+5OgPWuoorUUQo=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-669-1Vxa9YS0MlOb3nCYTOrTAA-1; Mon, 03 Jun 2024 23:25:35 -0400
-X-MC-Unique: 1Vxa9YS0MlOb3nCYTOrTAA-1
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-48bbd01f2e8so77028137.3
-        for <linux-block@vger.kernel.org>; Mon, 03 Jun 2024 20:25:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717471535; x=1718076335;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zEUAhiXSNeBDF6NeU6DEm0KF3UmpeqhO8TfskOx9nww=;
-        b=U45D/9HYdboDWr8L57PD06tW/KyBBGbPLHY+QVtc76Cab2GELJpDU5bZq0NVmge14N
-         sqOPRo5VGgyA9F7iuEH20Plk+Et4S1IiOS5HioYnBhY/9EB2DHgRe8vgx7JfBrNdYX60
-         JfBHCX2zX8Rw+uJBuP3961MgeS1fx7kYubFiDw/CTgR5MiwiPHTJ/78NNe/Oot10rDxJ
-         ASQPl0CbuydS1TwpXYQk6u0yaLfxZibROZ3Eioq93W08ZXv0rtxdMIInM++IziWUNePK
-         IEyBf8yQzFGrAL4kwmbBbC3vzrK83nTXF87OX0tL8VC+G9moknTUa1sb3wXNmXLH8Bj5
-         6Y+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWgy06PxcAqNFwoeplZikv+JxFZcqWC6OiDHr5bUb0Ovc6eh0t67YDcXAvwol92HReEAlS58B6dAd86zB3nBKvdGYUf17zQgvaQfJ0=
-X-Gm-Message-State: AOJu0YwUydvBbtZBnlri6WW88JO/614zulqnO3dENOP3YtRimdQe1HAB
-	7U2IVlu7G3bFYy0dZKna6LLdlFac7kB5y7ADcVlnYjgJOaPym+PArDTE9dqI/fnGsZ3DpJm0piB
-	yMJIhgAl+cDn4mH0sn0XQct/8CfXEZRiX5z+REhPqJmk+tlwSP1OHHaFPIxxtO/GT+1mFXOmq6W
-	CcqOEsVIwRrfYSU/bHa6JsQd76xnwEZztymZ0=
-X-Received: by 2002:a05:6102:2413:b0:47e:d83:3baa with SMTP id ada2fe7eead31-48bc20d61c5mr9946006137.1.1717471535497;
-        Mon, 03 Jun 2024 20:25:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG7DXnSSwrPGvQPNJKTJH9Cjm0AElH/f5m6QlOX8pDSYFZHyQ4s0E3aFQSu7Exbjezn8E4sDHKpToxRMkZtOOg=
-X-Received: by 2002:a05:6102:2413:b0:47e:d83:3baa with SMTP id
- ada2fe7eead31-48bc20d61c5mr9945993137.1.1717471535155; Mon, 03 Jun 2024
- 20:25:35 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="tNcvNOlR"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240604032847epoutp01e3d7b0dbeb9db12e7f28b34ac569b52b~Vr2-EQoz72621226212epoutp01H
+	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 03:28:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240604032847epoutp01e3d7b0dbeb9db12e7f28b34ac569b52b~Vr2-EQoz72621226212epoutp01H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1717471727;
+	bh=7VN6ZUoN/sVx9OFQYPCvCDso3Uou5inchmMvd4vuq5E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tNcvNOlRXnI5bedxJ26y9w6TRzG50YcynA+2cGwniUTGpbgpPHphBAsVudbrcN6WS
+	 Fpv7ucxsfE765eTLhxyisAVREhNHMPqO/FB5cH81xO6io/wNvfYuyBtGTssgD1G/vj
+	 9fPq3lfnRj7akJXFtacojDMp/JpXoMaqAMTH/PV8=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240604032846epcas5p1f1c03e377b238d49df5eb58251bf4543~Vr29wVx_50292302923epcas5p1T;
+	Tue,  4 Jun 2024 03:28:46 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4VtbfN3yFfz4x9Pv; Tue,  4 Jun
+	2024 03:28:44 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	46.70.08853.CE98E566; Tue,  4 Jun 2024 12:28:44 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240603065101epcas5p2acde37ff1854ff6f455f51ec940caf65~Va_R6KOZ01423114231epcas5p2p;
+	Mon,  3 Jun 2024 06:51:01 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240603065101epsmtrp18e7b805f6f3c250176196fb7d0105d49~Va_R3vysa1582915829epsmtrp1i;
+	Mon,  3 Jun 2024 06:51:01 +0000 (GMT)
+X-AuditID: b6c32a44-fc3fa70000002295-08-665e89ec9f67
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	B8.4E.07412.5D76D566; Mon,  3 Jun 2024 15:51:01 +0900 (KST)
+Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240603065058epsmtip19af2886049d9888391a19a98b3e4be4f~Va_OP59sS2735927359epsmtip1k;
+	Mon,  3 Jun 2024 06:50:57 +0000 (GMT)
+Date: Mon, 3 Jun 2024 06:43:56 +0000
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, Alasdair
+	Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka
+	<mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg
+	<sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara
+	<jack@suse.cz>, martin.petersen@oracle.com, bvanassche@acm.org,
+	david@fromorbit.com, hare@suse.de, damien.lemoal@opensource.wdc.com,
+	anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
+	gost.dev@samsung.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v20 01/12] block: Introduce queue limits and sysfs for
+ copy-offload support
+Message-ID: <20240603064356.nujnjbtje3vjnti2@nj.shetty@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240604031124.2261-1-yang.yang@vivo.com>
-In-Reply-To: <20240604031124.2261-1-yang.yang@vivo.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Tue, 4 Jun 2024 11:25:24 +0800
-Message-ID: <CAFj5m9KV7OJ4_KjbSkpdtfrKamoLzV6EH-mJP3=y+VvoYOzC3w@mail.gmail.com>
-Subject: Re: [PATCH v2] sbitmap: fix io hung due to race on sbitmap_word::cleared
-To: Yang Yang <yang.yang@vivo.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
-	Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240601055323.GB5613@lst.de>
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te1BUVRzHO3fv3r1YS5eHcVgmh7nSFO9dWeDgiDVBdiebEXPGHHvACpdH
+	7Kt9aOAMgYiKBCvyilXj2RJgkkLyTmMFAsOdIEAQqCG2SCKIxqBBoIULjf99ft/ze//mkDxH
+	k0BEJih1rEYpk9PENvym2dPT94/M92PFE2MuqK63i4dOXVjhodpxA4FmzAsAFc7/y0NTt88C
+	tNxn4aGGrgmASsuv4GjkdjOG2sovYqi6thNDl4rSMdS5Nkugix1DAFkHjRhqH/VGZWcqcdTW
+	3oOjgZbLBCoxWQWoqnsVQ7nnBjHUNJUG0LWZORx9N+qGLCvd/FfcmIEf9zO95ZBpNo4LGMvE
+	dZwZ6NMzN2oyCaa+8mNmur4YMK0jqQRTkZPHZ7LT/ySY5oyf+Mxf1lGcmftmkGByGmoA833p
+	HUGE09HEPfGsLIbVuLPKaFVMgjIulN5/KDIsMjBILPGVhKBg2l0pU7ChdPibEb77EuS25dDu
+	x2VyvU2KkGm1tP/ePRqVXse6x6u0ulCaVcfI1VK1n1am0OqVcX5KVrdbIhbvCrQ5RiXGD+Xm
+	EOoml4+WUx+AVHDZ6TywIyElhYbGbOI82EY6Uq0Amq63YpyxYDNquvmc8Q+A5ol6sBUyXFDF
+	4x7aAVypz8U5428A+/v6BeteOOUBR0x9NiZJgvKGd9fIddmZoqH1Yd9GIh5VQMA1o9s6O1Ey
+	WDXSvqELqTA435DK59gB9hRP4etsZ0tjqf4NrNeClNkOdt0twdfzQyocDjTSXHNO8GF3g4Bj
+	EfzdcGaTT8Dq/C8ILvY0gMZh4+Y0L8OMXgOPaygeThuaN/XnYUHvNYzT7WH28hTG6ULY9NkW
+	74RX60oJjl3h0GLaJjPwktW8uccxANubR4gLYIfxiYGMT9TjeDfMnD/FN9rm4VFusGqV5NAT
+	1rX4lwJ+DXBl1VpFHBsdqJYo2RP/XzlapbgBNj6MV3gTuF+y6tcBMBJ0AEjyaGdhTso7sY7C
+	GFlSMqtRRWr0clbbAQJt98nlibZHq2w/TqmLlEhDxNKgoCBpSECQhHYRzmRciXGk4mQ6NpFl
+	1axmKw4j7USpmNbhhaIM/x37rMdGH096e/RGer8OF6ZKBhZe1VdbzvmW2S+99O4PC4uxB1qy
+	8O3DFSaHR1SQ988+gcVzTsSXT0fLVvL1hx8veS2W+3j0BVTy3eSubrOFSQejzaFRDj4ftpc3
+	HFz61kQeD//1tChX+uCWpL86eWz6yNfBj5JffHb4lmtN8lMnG1Wiyp7X8kZO7m1+65muubiZ
+	A8E6C23+tKzLPiSrRGLubCtO/4ScrZisXYHiqGBBRlpjvn/YB8OfKwwBR2OdQrRnj1Ue0jt/
+	9UvKnY6hhTcUeT5Fh7N2Ls1O7up2vPreTUHpkdnkzKSU+jihIF5xr+i+6G2DOOBhoTx/vPbe
+	czSujZdJvHgarew/c/aterkEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa1BMYRzGveeczp5KzbGFN2vEYQyhbLm8bg3pwyG5fHC/rjptxm7lHJGI
+	Te4Ry5A2tdmy22VEl2mkwoRSrGUS2lJkl6ZGchmTtGGL4dtvnmd+z//Ln8LF74gR1LaInRwf
+	IVMwpBNRcpcZNaVevjFsaqraG12rrcLRwTM2HOW9Ok2ijrufAbrQ9R1HljtHAfphNOGouKoZ
+	oAxdGoEa7pRiqFx3FkM5efcxlJqcgKH7Pz+Q6Gzlc4Cs9RoMVZgnoctHsghUXlFDoLqbl0ik
+	1VtFyFDdhyH1sXoM3bDEA5Tf8ZFAD8wSZLJVO8yXsHXPgthaHWRLNa9ErKm5gGDrjNFsYe5x
+	ki3KOsC2FaUAtqxBRbKZSecc2FMJnSRberjFgf1kNRPsx1v1JJtUnAvYRxn3RMvd1jnNDeUU
+	23ZxvI//Fqfwruuv8ah295ib3V8IFWijTwBHCtLT4IvzBvwEcKLEdBmAVxKywUDhAfW2e/gA
+	u8GcvvciO4vpTwDGl0XbmaDHwQa98XdOUSQ9CT78Sdljd5qB1nZj/wxOp5DwkVZpZzdaBg0N
+	Ff25C70QdhWrHAbuNgNY01vypxgCa1IsxIA8A6YXvcHt+zgtgYa+/n3H36dMOe/BGUBr/jM0
+	/xmaf0YGwHOBBxclKOXKEGmUNILb7S3IlEJ0hNw7JFJZCPpfwWvCDdCs7fOuBBgFKgGkcMbd
+	JWn/+jCxS6hsTyzHR27moxWcUAkkFMEMd5FeTA0V03LZTm47x0Vx/N8WoxxHqLAnr0s8Dab8
+	HYOFdml25ju3mF3hwTHg3OygC641TSPfjI50DnRfuSy4VzK0HDsd19p5e6Rv+u1GV7WlZ30h
+	o57o17bEjxcWrs5sKpuXtT/3pbOGyWiM6clp8dN5JQtjtQFKcUpHYkCLdebe+Yf4VYpbBZvG
+	zYzfNyNZsXzNrMTW2N6tcdN1vk+bwiaO7VmRPV5fsEXDLYBV5rql7f6iOSHINoyIm+ATaYv1
+	T0+bM+Zq59vjlpA8n1W+rtb8tEBPc+rswK/axsXTHq+t/abu3mw+/FxuuxLsMciTmTylep+q
+	V7ge1prw42T2kw0feH2tsWqrYdHVtaODlN+htYlx7vYJiGMIIVwm9cJ5QfYLXINCcHkDAAA=
+X-CMS-MailID: 20240603065101epcas5p2acde37ff1854ff6f455f51ec940caf65
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_50408_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240520102830epcas5p27274901f3d0c2738c515709890b1dec4
+References: <20240520102033.9361-1-nj.shetty@samsung.com>
+	<CGME20240520102830epcas5p27274901f3d0c2738c515709890b1dec4@epcas5p2.samsung.com>
+	<20240520102033.9361-2-nj.shetty@samsung.com> <20240601055323.GB5613@lst.de>
 
-On Tue, Jun 4, 2024 at 11:12=E2=80=AFAM Yang Yang <yang.yang@vivo.com> wrot=
-e:
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_50408_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+
+On 01/06/24 07:53AM, Christoph Hellwig wrote:
+>On Mon, May 20, 2024 at 03:50:14PM +0530, Nitesh Shetty wrote:
+>> Add device limits as sysfs entries,
+>> 	- copy_max_bytes (RW)
+>> 	- copy_max_hw_bytes (RO)
+>>
+>> Above limits help to split the copy payload in block layer.
+>> copy_max_bytes: maximum total length of copy in single payload.
+>> copy_max_hw_bytes: Reflects the device supported maximum limit.
 >
-> Configuration for sbq:
->   depth=3D64, wake_batch=3D6, shift=3D6, map_nr=3D1
+>That's a bit of a weird way to phrase the commit log as the queue_limits
+>are the main thing (and there are three of them as required for the
+>scheme to work).  The sysfs attributes really are just an artifact.
 >
-> 1. There are 64 requests in progress:
->   map->word =3D 0xFFFFFFFFFFFFFFFF
-> 2. After all the 64 requests complete, and no more requests come:
->   map->word =3D 0xFFFFFFFFFFFFFFFF, map->cleared =3D 0xFFFFFFFFFFFFFFFF
-> 3. Now two tasks try to allocate requests:
->   T1:                                       T2:
->   __blk_mq_get_tag                          .
->   __sbitmap_queue_get                       .
->   sbitmap_get                               .
->   sbitmap_find_bit                          .
->   sbitmap_find_bit_in_word                  .
->   __sbitmap_get_word  -> nr=3D-1              __blk_mq_get_tag
->   sbitmap_deferred_clear                    __sbitmap_queue_get
->   /* map->cleared=3D0xFFFFFFFFFFFFFFFF */     sbitmap_find_bit
->     if (!READ_ONCE(map->cleared))           sbitmap_find_bit_in_word
->       return false;                         __sbitmap_get_word -> nr=3D-1
->     mask =3D xchg(&map->cleared, 0)           sbitmap_deferred_clear
->     atomic_long_andnot()                    /* map->cleared=3D0 */
->                                               if (!(map->cleared))
->                                                 return false;
->                                      /*
->                                       * map->cleared is cleared by T1
->                                       * T2 fail to acquire the tag
->                                       */
+Acked, we will update commit log.
+
+>> @@ -231,10 +237,11 @@ int blk_set_default_limits(struct queue_limits *lim)
+>>  {
+>>  	/*
+>>  	 * Most defaults are set by capping the bounds in blk_validate_limits,
+>> -	 * but max_user_discard_sectors is special and needs an explicit
+>> -	 * initialization to the max value here.
+>> +	 * but max_user_discard_sectors and max_user_copy_sectors are special
+>> +	 * and needs an explicit initialization to the max value here.
 >
-> 4. T2 is the sole tag waiter. When T1 puts the tag, T2 cannot be woken
-> up due to the wake_batch being set at 6. If no more requests come, T1
-> will wait here indefinitely.
+>s/needs/need/
 >
-> To fix this issue, simply revert commit 661d4f55a794 ("sbitmap:
-> remove swap_lock"), which causes this issue.
+Acked.
 
-I'd suggest to add the following words in commit log:
+>> +/*
+>> + * blk_queue_max_copy_hw_sectors - set max sectors for a single copy payload
+>> + * @q:	the request queue for the device
+>> + * @max_copy_sectors: maximum number of sectors to copy
+>> + */
+>> +void blk_queue_max_copy_hw_sectors(struct request_queue *q,
+>> +				   unsigned int max_copy_sectors)
+>> +{
+>> +	struct queue_limits *lim = &q->limits;
+>> +
+>> +	if (max_copy_sectors > (BLK_COPY_MAX_BYTES >> SECTOR_SHIFT))
+>> +		max_copy_sectors = BLK_COPY_MAX_BYTES >> SECTOR_SHIFT;
+>> +
+>> +	lim->max_copy_hw_sectors = max_copy_sectors;
+>> +	lim->max_copy_sectors =
+>> +		min(max_copy_sectors, lim->max_user_copy_sectors);
+>> +}
+>> +EXPORT_SYMBOL_GPL(blk_queue_max_copy_hw_sectors);
+>
+>Please don't add new blk_queue_* helpers, everything should go through
+>the atomic queue limits API now.  Also capping the hardware limit
+>here looks odd.
+>
+This was a mistake, we are not using this function. We will remove this
+function in next version.
 
-Check on ->cleared and update on both ->cleared and ->word need to be
-done atomically, and using spinlock could be the simplest solution.
+>> +	if (max_copy_bytes & (queue_logical_block_size(q) - 1))
+>> +		return -EINVAL;
+>
+>This should probably go into blk_validate_limits and just round down.
+>
+Bart also pointed out similar thing. We do same check before issuing
+copy offload, so we will remove this check.
 
-Otherwise, the patch looks fine for me.
+>Also most block limits are in kb.  Not that I really know why we are
+>doing that, but is there a good reason to deviate from that scheme?
+>
+We followed discard as a reference, but we can move to kb, if that helps
+with overall readability.
 
-Thanks,
+Thank you,
+Nitesh Shetty
 
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_50408_
+Content-Type: text/plain; charset="utf-8"
+
+
+------Fualeei1.f5fhWGYL679EBd0hH5-OLgtfrOtH6wInDZGwDEe=_50408_--
