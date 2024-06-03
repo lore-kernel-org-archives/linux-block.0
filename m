@@ -1,127 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D3319F
-	for <linux-block@vger.kernel.org>; Mon,  3 Jun 2024 00:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A08A19E;
+	Mon,  3 Jun 2024 00:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717373132; cv=none; b=Ym1Cq0g0oD54jf6fQCE2VLce6mnCA4wtcPs6w16ChaFwYwanJYkXKiISetpvZ8uf6YSUBeZPZae5YmwxoszopRZsQD7YjS63Sh3E6NAQBXg/Ly3aOvkFwJDDt+83ioRbrcdf7i9R3OzTo4MFYRJQcYOk2IvYI3TA8kPPUOBQRU8=
+	t=1717373138; cv=none; b=Wh6UFn3wxjbztUlERtzC1Ujn5lO4PACJlmQZsyfVUmhe5bjfFnwVcypehbaamFOX/X60od+MZdUDEtifUxxewvy+AXr2J3X/HLlaRFxvJ7xibvwezleEo2+FZDTX7De8uyqjwe6GK6O1o8OOO1F8gzPr9B2caRleSJKuz4fOo+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717373132; c=relaxed/simple;
-	bh=6r7z1Yttg9lTfJLTYa91j1L8sLxPnz6zalqk5ZRVS3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZizouQitkPYd/np+iVKjkQsNxFweUNj0I+DVtCR/jjlIMxjaVfhD2/IrO4iJPTwh/wX/nR7RASJQYwT9sYER//R/RQGLZIlB31BUfJ2e0VtjrtKl7Eo0KPS0axrz+W64Ye9Zfqd831FNidVjDNXOsOmKRVCa+ZCVbsTtEfcGkBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jI95X7Qq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1717373138; c=relaxed/simple;
+	bh=zy1trVZNXdzSYKGFjksmzJXN/QGq0Sj95jtxuW3Bblc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=FGmmYSkknmqlArf9FtYqkZOI6JCZXUONjgRc91VOVaLynbEUhevHom4kPFC8u80gSP7PM611WjRm9LzupRNLvggCs2/y7v2/ngip6zWM1/GH8LPFSMH7s/aG+a+8ZTc//OxgBWvhhydUZ+UP9MaIqQT8ulT1/FdTiVM+wVozSMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=oiQouVkv; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jI95X7Qq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717373129;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FQHZIgaB+fIyyxbrWLwLAjk5CP7G3CWBw1Ys6rmC1iM=;
-	b=jI95X7QqflVBFICG+j5SBHKr3r8zIFiRW64p3ASmz+ThaCGFmRZm/R6hH3sRcCO9KO0SlF
-	3l8WTnZZKZeJZ0hoWM3wIC1s5nNhy/wRZbc10FE+zBUhg67wIoBZ+JHUcw6yj8Z9uDKpaT
-	mcDijgQlnVp93jMHpu7dLFR5cE+2oWQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-95tzrdCAMRCyHOP1qkNXsg-1; Sun, 02 Jun 2024 20:05:24 -0400
-X-MC-Unique: 95tzrdCAMRCyHOP1qkNXsg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD03D85A58C;
-	Mon,  3 Jun 2024 00:05:23 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 92D841054824;
-	Mon,  3 Jun 2024 00:05:20 +0000 (UTC)
-Date: Mon, 3 Jun 2024 08:05:16 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
-	Kevin Wolf <kwolf@redhat.com>, Hollin Liu <hollinisme@gmail.com>
-Subject: Re: [PATCH V3 0/9] io_uring: support sqe group and provide group kbuf
-Message-ID: <Zl0IvMTuFfDOu3Gj@fedora>
-References: <20240511001214.173711-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oiQouVkv"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 452Np6bX026166;
+	Mon, 3 Jun 2024 00:05:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=e1fRDQ19gGIsI4uZjga8MO
+	ag9mx43TrLxWHagrL2+Oc=; b=oiQouVkvC1uiW8lu8wLf/lEVngYqY9vmd9PBnb
+	sO5KDXEb2gi4o8IJDtN0oV2DUZ986beUpQeSUA5gFrXE9uCC+1uyTOrp2e7bz88n
+	DTvpZbx2jzgtKPqHUuYe7kw+iFIhSvwwuCQqjceHyIL0FJrdwh/KzFamCu6OF8Xo
+	bhe+jbBwg01tvyht/z9O7A13iP5RVLu59E6ONq+JiTkyIX5nE4/N4rmoTQLYGN7B
+	Hc7aqbbgHpRXLAkBOaLUvm0CH9omk2/ge9je0a4QN2ojLI3DGOqHZeHC7VmY2kpR
+	dZKe2QZyHVOLsLY10XlUm9NMbsSh0EqOe1HBhkbk0fBgcSvQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfw6qjm0x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jun 2024 00:05:33 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 45305WJo030020
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 3 Jun 2024 00:05:32 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 2 Jun 2024
+ 17:05:31 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Sun, 2 Jun 2024 17:05:31 -0700
+Subject: [PATCH] floppy: add missing MODULE_DESCRIPTION() macro
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240511001214.173711-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240602-md-block-floppy-v1-1-bc628ea5eb84@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAMoIXWYC/x3MTQ7CIBBA4as0s3YSwNa/qzQugE7tRApkUFPT9
+ O5Fl9/ivRUKCVOBW7OC0IcLp1ihDw34ycYHIQ/VYJRp1UkZnAd0IfknjiHl/EV9vbRan4+dIg+
+ 1ykIjL/9jf692thA6sdFPv0/g+F5wtuVFAtu2A8kF3tuAAAAA
+To: Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: GQmSe479sB2skAGlDyFgRaaaZbsc3AQn
+X-Proofpoint-ORIG-GUID: GQmSe479sB2skAGlDyFgRaaaZbsc3AQn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-06-02_15,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxlogscore=929 clxscore=1011 impostorscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406020211
 
-On Sat, May 11, 2024 at 08:12:03AM +0800, Ming Lei wrote:
-> Hello,
-> 
-> The 1st 4 patches are cleanup, and prepare for adding sqe group.
-> 
-> The 5th patch supports generic sqe group which is like link chain, but
-> allows each sqe in group to be issued in parallel and the group shares
-> same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
-> sqe group & io link together. sqe group changes nothing on
-> IOSQE_IO_LINK.
-> 
-> The 6th patch supports one variant of sqe group: allow members to depend
-> on group leader, so that kernel resource lifetime can be aligned with
-> group leader or group, then any kernel resource can be shared in this
-> sqe group, and can be used in generic device zero copy.
-> 
-> The 7th & 8th patches supports providing sqe group buffer via the sqe
-> group variant.
-> 
-> The 9th patch supports ublk zero copy based on io_uring providing sqe
-> group buffer.
-> 
-> Tests:
-> 
-> 1) pass liburing test
-> - make runtests
-> 
-> 2) write/pass two sqe group test cases:
-> 
-> https://github.com/axboe/liburing/compare/master...ming1:liburing:sqe_group_v2
-> 
-> - covers related sqe flags combination and linking groups, both nop and
-> one multi-destination file copy.
-> 
-> - cover failure handling test: fail leader IO or member IO in both single
->   group and linked groups, which is done in each sqe flags combination
->   test
-> 
-> 3) ublksrv zero copy:
-> 
-> ublksrv userspace implements zero copy by sqe group & provide group
-> kbuf:
-> 
-> 	git clone https://github.com/ublk-org/ublksrv.git -b group-provide-buf_v2
-> 	make test T=loop/009:nbd/061:nbd/062	#ublk zc tests
-> 
-> When running 64KB block size test on ublk-loop('ublk add -t loop --buffered_io -f $backing'),
-> it is observed that perf is doubled.
-> 
-> Any comments are welcome!
-> 
-> V3:
-> 	- add IORING_FEAT_SQE_GROUP
-> 	- simplify group completion, and minimize change on io_req_complete_defer()
-> 	- simplify & cleanup io_queue_group_members()
-> 	- fix many failure handling issues
-> 	- cover failure handling code in added liburing tests
-> 	- remove RFC
+make allmodconfig && make W=1 C=1 reports:
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/floppy.o
 
-Hello Jens and Pavel,
+Add the missing invocation of the MODULE_DESCRIPTION() macro.
 
-V3 should address all your comments, would you mind to take a look at
-this version?
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ drivers/block/floppy.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-Ming
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 25c9d85667f1..854a88cf56bd 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -5016,6 +5016,7 @@ module_param(floppy, charp, 0);
+ module_param(FLOPPY_IRQ, int, 0);
+ module_param(FLOPPY_DMA, int, 0);
+ MODULE_AUTHOR("Alain L. Knaff");
++MODULE_DESCRIPTION("Normal floppy disk support");
+ MODULE_LICENSE("GPL");
+ 
+ /* This doesn't actually get used other than for module information */
+
+---
+base-commit: a693b9c95abd4947c2d06e05733de5d470ab6586
+change-id: 20240602-md-block-floppy-1984117350ec
 
