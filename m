@@ -1,33 +1,45 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4680F1EB30;
-	Tue,  4 Jun 2024 07:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2A313C672;
+	Tue,  4 Jun 2024 08:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717486771; cv=none; b=FdzOn4M3TR9xulbXJGtnZrZPFYA+DHn6tVjGZvTKPouJLEDNWlGgfXyNJYITQUJA0K6VFiyDDVc8ZQK6plrPNWL7pvfLvg+xSqo2LfPF/hsMzsR+DwUPhkzmye8/nb7FnAJLmVwrYyDjlztILYUV35AsIANClfL8E7Ah3HSrS0s=
+	t=1717489495; cv=none; b=qtNTC2IYizmKwSbg1s/2aYfIk2TDnpqmDT+ZegV6ez5aRutL7Cw3sMLFa8cbDZZcQdJK/mTW9x+oRbhWrb2oB5RkbEoQBXuXqSFq8qrthu6yu6Nvy5d2I+7vEe3ukanKcKCxSEM6flOrJQypw6gjMBiLM0+jvdFAeAnYr5GMMhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717486771; c=relaxed/simple;
-	bh=IwRk73FI7oCSvA9GoThk9eEnhOPDGRbbqcPOdPVc2Uw=;
+	s=arc-20240116; t=1717489495; c=relaxed/simple;
+	bh=V8u4ises0PLg+j92Lwu6MTiv2dwQoVXMLN8iHbUF+/c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qUzx9cG0SUqbRDiM/U2xVcpFMCV2roMQJ9RZOqPEBgz8PioWDzB+rSaoDmNpVStQ1YywYe+GAAGBiv0HSEN9Ok+VmmfAqFQi4lcpA4Pit7uMlqqjUcVFByDtc/GPYLT6e+hPzr51LNyZN+Us3yxgkCkz866GysabXcHyNirkuVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GI261o57; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GI261o57"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11995C32782;
-	Tue,  4 Jun 2024 07:39:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717486770;
-	bh=IwRk73FI7oCSvA9GoThk9eEnhOPDGRbbqcPOdPVc2Uw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GI261o576gg25/lggqNDA2SfXlSJn3QRY7AGVwcyAmBUOY2+2/Skb/bS1BUCh9qWl
-	 QKz3Jh5M82o5F/6PUgsBq0Gsh7DHrbgUxYPptG+VI9WDVVcsarzvpz92mvCFUSRn4w
-	 dsA3PAUnRTIlKggNkbrr+yewxURwwu2pgA4udfQ7PsravITSz0hF0RNkvPEsXjrDW0
-	 wgwdLoaBdgKRYI4xl7pgSc9vSh2CdAzwjhxH4xcArykbw0zJHnERyQlz+xAu/TMLtL
-	 Yd9pQ9MINSEdazBen1lLjskybIkbgnHTDxCdtLFQWOH/x3vJ71IiKQwnw36Gv4Ljfd
-	 jhhldACaNEbJQ==
-Message-ID: <5441b256-494a-4344-89fd-ee8c5a073f8b@kernel.org>
-Date: Tue, 4 Jun 2024 16:39:25 +0900
+	 In-Reply-To:Content-Type; b=N9UPO62UtHYlTjQyPCTGm3rS6oUVTWfAiZA+cmKShw0tKxYHfIETy6c36GJlJ0FBf7ZFVzsTSAbfZKwmjhxjejd8z1ROWC+pTsFg4TmYHW2BhyliAHyVvDsBufc+g1T4+rPDmLaj497nE1KLhZAiRzlPMsbmzs4P2RLMO1yfrn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2eab062bbdeso3025971fa.1;
+        Tue, 04 Jun 2024 01:24:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717489491; x=1718094291;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jT03552+joJgoqrGEVdI7Fe6g8UVlQf4Q+uQisoEmo8=;
+        b=iadCYMBHaT8rFusnKkB/PzQPq6Dnb6uuefo8SPfazjiz7dssrYakp4yvOwMvJUQYr6
+         Xl6FaxrUmkJ3tOHsAn4j8hgmSYcAb4dF3R5CFfIOPlxuTcwbCiSv/Rgfx1OBDoedAslG
+         k2sfeLXF+9f5L5tFphABCx9vxVFCvWUQThUj/vB8pQdWp3X9/9VtCRpBOwHAJn+QEYIF
+         ESxY4vVneo5RM3zdvtqAC3vGrd+zzxajJwR4TVT8tzurUNrwhtYT/VSMjUF7icgGz3dW
+         WFJqTYJ3cAD4esXvPn7sG4GCXNtFScdkQMoRedLmV5a8V2cT3tEyQHSvLTm41F5hrW+s
+         gCVw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXq7HuYzvAQFb65HeqDwbIOg1zIkku4bbwYW4QPqSyLPm/dmIoqGHJiZGqjzsMYSz1OWhEv6LKR337tCykX8TKlZjL7j5jU/BjeEY6bl6AYBOika7hrHA9/imYek39WBaEk6q+x2t7mQeRbOOKsPKVtat05kL/6gNz6LEkMUSJ
+X-Gm-Message-State: AOJu0YyzXEz/TkSQKYs5yV5DFXZeDudg7sNZV9pWcHwEmXy/Tz6HUZKp
+	jl3BwtBsqU6d2x6WC363nghFGkjNbQzpNfHYrgi34VG9odDlszRh
+X-Google-Smtp-Source: AGHT+IHuXM2IV1Hvv1yo73FAtyZR/fINFEtA7+m+S0KNoMFYIA+FZgsSVFChErK9dkk4AU6gDb5/pA==
+X-Received: by 2002:a2e:8756:0:b0:2ea:8442:2096 with SMTP id 38308e7fff4ca-2ea95153f82mr61441631fa.2.1717489491014;
+        Tue, 04 Jun 2024 01:24:51 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4214186ccdcsm34884405e9.16.2024.06.04.01.24.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jun 2024 01:24:50 -0700 (PDT)
+Message-ID: <62c2b8cd-ce6a-4e13-a58c-a6b30a0dcf17@grimberg.me>
+Date: Tue, 4 Jun 2024 11:24:48 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,63 +47,48 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 00/12] Implement copy offload support
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
- Nitesh Shetty <nj.shetty@samsung.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- martin.petersen@oracle.com, bvanassche@acm.org, david@fromorbit.com,
- damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
- nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org
-References: <20240604043242.GC28886@lst.de>
- <393edf87-30c9-48b8-b703-4b8e514ac4d9@suse.de>
-From: Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH v2 1/4] net: introduce helper sendpages_ok()
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org, dhowells@redhat.com,
+ edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk,
+ philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240530142417.146696-1-ofir.gal@volumez.com>
+ <20240530142417.146696-2-ofir.gal@volumez.com>
+ <8d0c198f-9c15-4a8f-957a-2e4aecddd2e5@grimberg.me>
+ <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
+ <86e60615-9286-4c9c-bffc-72304bd3cc1f@grimberg.me>
+ <20240604042738.GA28853@lst.de>
 Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <393edf87-30c9-48b8-b703-4b8e514ac4d9@suse.de>
-Content-Type: text/plain; charset=UTF-8
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240604042738.GA28853@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/4/24 16:16, Hannes Reinecke wrote:
-> On 6/4/24 06:32, Christoph Hellwig wrote:
->> On Mon, Jun 03, 2024 at 10:53:39AM +0000, Nitesh Shetty wrote:
->>> The major benefit of this copy-offload/emulation framework is
->>> observed in fabrics setup, for copy workloads across the network.
->>> The host will send offload command over the network and actual copy
->>> can be achieved using emulation on the target (hence patch 4).
->>> This results in higher performance and lower network consumption,
->>> as compared to read and write travelling across the network.
->>> With this design of copy-offload/emulation we are able to see the
->>> following improvements as compared to userspace read + write on a
->>> NVMeOF TCP setup:
->>
->> What is the use case of this?   What workloads does raw copies a lot
->> of data inside a single block device?
->>
-> 
-> The canonical example would be VM provisioning from a master copy.
-> That's not within a single block device, mind; that's more for copying 
-> the contents of one device to another.
 
-Wouldn't such use case more likely to use file copy ?
-I have not heard a lot of cases where VM images occupy an entire block device,
-but I may be mistaken here...
 
-> But I wasn't aware that this approach is limited to copying within a 
-> single block devices; that would be quite pointless indeed.
+On 04/06/2024 7:27, Christoph Hellwig wrote:
+> On Tue, Jun 04, 2024 at 12:27:06AM +0300, Sagi Grimberg wrote:
+>>>> I still don't understand how a page in the middle of a contiguous range ends
+>>>> up coming from the slab while others don't.
+>>> I haven't investigate the origin of the IO
+>>> yet. I suspect the first 2 pages are the superblocks of the raid
+>>> (mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the bitmap.
+>> Well, if these indeed are different origins and just *happen* to be a
+>> mixture
+>> of slab originated pages and non-slab pages combined together in a single
+>> bio of a bvec entry,
+>> I'd suspect that it would be more beneficial to split the bvec (essentially
+>> not allow bio_add_page
+>> to append the page to tail bvec depending on a queue limit (similar to how
+>> we handle sg gaps).
+> So you want to add a PageSlab check to bvec_try_merge_page?  That sounds
+> fairly expensive..
+>
 
-Not pointless for any FS doing CoW+Rebalancing of block groups (e.g. btrfs) and
-of course GC for FSes on zoned devices. But for this use case, an API allowing
-multiple sources and one destination would be better.
-
--- 
-Damien Le Moal
-Western Digital Research
-
+The check needs to happen somewhere apparently, and given that it will 
+be gated by a queue flag
+only request queues that actually needed will suffer, but they will 
+suffer anyways...
