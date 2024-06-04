@@ -1,98 +1,280 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678E718028
-	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 14:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B19A12CD98;
+	Tue,  4 Jun 2024 14:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717510644; cv=none; b=d++iX59Vk3Nufajp+p9KhGA4mf1b7E9/ZJ5h7GFsFqm7kNTyIGIpek6d4qut343GvdN62vg4dwW7osy2A3PVmvJlxDQDlTRoOmRtQ3s6fsLfX5G21iAcjXFsJnLEuWiML5lZnxuKFdQWtsEFBDpQJVSYsGoTxVGZBay/aaGTSE0=
+	t=1717511215; cv=none; b=HwL85Qd9j2xwR3whdAo4V1rx8XFZ5FrMJev7QUKZmpdsYR4JftBytXYGZT7TBBMd7aueEVBRqi23cvynkc5FCGve8KPmpenHxPdkniJnvlwkKtvmzoP2592MksE7iKVZVUZDJIuX+PIM/M6HhtXlosBdwke6WvDpl9WgKD0Osig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717510644; c=relaxed/simple;
-	bh=c0Gl5eI8FJR4mEiSN4AXwqOECr3onflNZ+UtZXW07EA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Gjqe5ayo1pD6YBrPgsNW+nPhwCDcfyi4ZhUV9N41lswUMCCWNilsoPWAhmYcTsBjJE+YlJJ4s5+L0vWIghidbcHEEk4AMw82Sevb9kFCfvVbfWA6cUfY9zrD997D2YEVbrSboFIqFdzoF6KpRUjAKf3kGs5/HX2O0GvXw3heSos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NNEch1Dg; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NNEch1Dg"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-6d125d826f4so217738a12.0
-        for <linux-block@vger.kernel.org>; Tue, 04 Jun 2024 07:17:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1717510642; x=1718115442; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KBlnaVpwqtF8k8iFTOmr2O+C5Qz7ghBI0GFEvdHUNgg=;
-        b=NNEch1DgJqSWZXk/3e1H8Jed8qzvQ9jwMPIZ2kDqC5EMZumTfraSZ1gTP7PqwLKm/G
-         UkVy0fS5R6KFJb2iz5bkfEgu/xahcZqRp3UnqPsBEELbsULyoQVyFzNyD71TTIO7WKK1
-         liRv9hQGfWVF/+TdMsGvhLw+jPozreJw8KsEVHooKYI6yX65O2aYKfNnGQCZsud9Zfxg
-         Y5UVOWN3b9KZn+PRh9mLU7G2S+/FCWIifeVn3mT/jQewvMcEyITe7bR6zwBW7CmLZAng
-         TKiX1EP+Hk75+fIvEj1SiYxI+mVFmKjfYUvFYtRcRMSW1eWhZbMGmORbTn3Q3KBMaleB
-         29NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717510642; x=1718115442;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KBlnaVpwqtF8k8iFTOmr2O+C5Qz7ghBI0GFEvdHUNgg=;
-        b=UgoWDxySk6GO3727CoPMdirTInupVITnEQu25qIykC5zU7ML0tJAUM9LNhwk7ORwBV
-         aCSecThDfI2xNvNjOppABxmB0mV553uObxxWjSQuZgRLY/5e13tk/zw3oZTrqORBBW+S
-         rjg0klzrfUQ77b+zxCcv6N4r79elgN40vWBbGTlO6PRAe+33ALQEw1h2e0KcFXa6n1Aj
-         YeLJ0JVZn5Ubcu/41UkBKczNjCVQBbXqy64ZzX6jrL1iRu/ZqxV4RmwkhxApnMg/bWrO
-         +QQhTPQeG7430t+87LJNdMfAC6eIFGDt6Eyss78xiw4eWAIYbdD938EFhy1QEteWJBPz
-         cPxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWG/AOu0nd56WmCw6f4QgKSl2wVkBqfY00h19d53qfVPNdoDRc1cxe7vRHPqAQPgCR/kXNH1oaGDeLBNwBJiK/MPIEVqbyS2LTVXTE=
-X-Gm-Message-State: AOJu0Yx4WIykY4fbZ10wJRoFq+gOnUcerAeZ7gJL476siKSge4N7AWpd
-	76OeZbjOIt56kz6+Q44PHVYN1Rm1DvU9cBd8npu6wEeGBjm6MM0rWf6hjVdkh/4=
-X-Google-Smtp-Source: AGHT+IG1r95h5ImX6XbMyN2ZaYG526149J0Ysh9SCb5aVD8a5Samcy0fwVuJLxocgDCwYNTe/T3aMw==
-X-Received: by 2002:a05:6a21:789b:b0:1aa:68c4:3271 with SMTP id adf61e73a8af0-1b2a46a884dmr2688540637.3.1717510641596;
-        Tue, 04 Jun 2024 07:17:21 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-702541eeadcsm5396462b3a.150.2024.06.04.07.17.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jun 2024 07:17:20 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Andreas Hindborg <nmi@metaspace.dk>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>, 
- Keith Busch <kbusch@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
- John Garry <john.g.garry@oracle.com>, Damien Le Moal <dlemoal@kernel.org>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20240603192645.977968-1-nmi@metaspace.dk>
-References: <20240603192645.977968-1-nmi@metaspace.dk>
-Subject: Re: [PATCH v2] null_blk: fix validation of block size
-Message-Id: <171751063982.375344.56104601455563821.b4-ty@kernel.dk>
-Date: Tue, 04 Jun 2024 08:17:19 -0600
+	s=arc-20240116; t=1717511215; c=relaxed/simple;
+	bh=7+91b/Mzn/+lSMt/L+Per4bli8Defp55Ltg9xOXNCLI=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VdDxc9LrG2d+2oGwbgPEjUtKegT3fZ1t1ft2tVReSkg6dB8QDlV5YXn2HqwwzP73zEHxG4b7Zpy/mSpy9Y6Ul0n4NDFXGVNnihxcm0Ia7gj1V7/DHVZWeCV4m0kJE/80Ujjfmf4/6c0TwdfRmxwgcGVyfZmMekfyJepexPZ8pZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Vtt8n1FWTz6JBWr;
+	Tue,  4 Jun 2024 22:22:33 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5968C140D37;
+	Tue,  4 Jun 2024 22:26:49 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 4 Jun
+ 2024 15:26:48 +0100
+Date: Tue, 4 Jun 2024 15:26:48 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: James Morse <james.morse@arm.com>
+CC: Dan Williams <dan.j.williams@intel.com>, Dongsheng Yang
+	<dongsheng.yang@easystack.cn>, Gregory Price <gregory.price@memverge.com>,
+	John Groves <John@groves.net>, <axboe@kernel.dk>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, <nvdimm@lists.linux.dev>, Mark Rutland
+	<mark.rutland@arm.com>
+Subject: Re: [PATCH RFC 0/7] block: Introduce CBD (CXL Block Device)
+Message-ID: <20240604152648.000071f8@Huawei.com>
+In-Reply-To: <3c7c9b07-78b2-4b8d-968e-0c395c8f22b3@arm.com>
+References: <ef0ee621-a2d2-e59a-f601-e072e8790f06@easystack.cn>
+	<20240508164417.00006c69@Huawei.com>
+	<3d547577-e8f2-8765-0f63-07d1700fcefc@easystack.cn>
+	<20240509132134.00000ae9@Huawei.com>
+	<a571be12-2fd3-e0ee-a914-0a6e2c46bdbc@easystack.cn>
+	<664cead8eb0b6_add32947d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+	<8f161b2d-eacd-ad35-8959-0f44c8d132b3@easystack.cn>
+	<ZldIzp0ncsRX5BZE@memverge.com>
+	<5db870de-ecb3-f127-f31c-b59443b4fbb4@easystack.cn>
+	<20240530143813.00006def@Huawei.com>
+	<665a9402445ee_166872941d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+	<20240603134819.00001c5f@Huawei.com>
+	<3c7c9b07-78b2-4b8d-968e-0c395c8f22b3@arm.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
+On Mon, 3 Jun 2024 18:28:51 +0100
+James Morse <james.morse@arm.com> wrote:
 
-On Mon, 03 Jun 2024 21:26:45 +0200, Andreas Hindborg wrote:
-> Block size should be between 512 and PAGE_SIZE and be a power of 2. The current
-> check does not validate this, so update the check.
-> 
-> Without this patch, null_blk would Oops due to a null pointer deref when
-> loaded with bs=1536 [1].
-> 
-> Link: https://lore.kernel.org/all/87wmn8mocd.fsf@metaspace.dk/
-> 
-> [...]
+> Hi guys,
+>=20
+> On 03/06/2024 13:48, Jonathan Cameron wrote:
+> > On Fri, 31 May 2024 20:22:42 -0700
+> > Dan Williams <dan.j.williams@intel.com> wrote: =20
+> >> Jonathan Cameron wrote: =20
+> >>> On Thu, 30 May 2024 14:59:38 +0800
+> >>> Dongsheng Yang <dongsheng.yang@easystack.cn> wrote: =20
+> >>>> =E5=9C=A8 2024/5/29 =E6=98=9F=E6=9C=9F=E4=B8=89 =E4=B8=8B=E5=8D=88 1=
+1:25, Gregory Price =E5=86=99=E9=81=93:   =20
+> >>>>> It's not just a CXL spec issue, though that is part of it. I think =
+the
+> >>>>> CXL spec would have to expose some form of puncturing flush, and th=
+is
+> >>>>> makes the assumption that such a flush doesn't cause some kind of
+> >>>>> race/deadlock issue.  Certainly this needs to be discussed.
+> >>>>>
+> >>>>> However, consider that the upstream processor actually has to gener=
+ate
+> >>>>> this flush.  This means adding the flush to existing coherence prot=
+ocols,
+> >>>>> or at the very least a new instruction to generate the flush explic=
+itly.
+> >>>>> The latter seems more likely than the former.
+> >>>>>
+> >>>>> This flush would need to ensure the data is forced out of the local=
+ WPQ
+> >>>>> AND all WPQs south of the PCIE complex - because what you really wa=
+nt to
+> >>>>> know is that the data has actually made it back to a place where re=
+mote
+> >>>>> viewers are capable of percieving the change.
+> >>>>>
+> >>>>> So this means:
+> >>>>> 1) Spec revision with puncturing flush
+> >>>>> 2) Buy-in from CPU vendors to generate such a flush
+> >>>>> 3) A new instruction added to the architecture.
+> >>>>>
+> >>>>> Call me in a decade or so.
+> >>>>>
+> >>>>>
+> >>>>> But really, I think it likely we see hardware-coherence well before=
+ this.
+> >>>>> For this reason, I have become skeptical of all but a few memory sh=
+aring
+> >>>>> use cases that depend on software-controlled cache-coherency.     =
+=20
+> >>>>
+> >>>> Hi Gregory,
+> >>>>
+> >>>> 	From my understanding, we actually has the same idea here. What I a=
+m=20
+> >>>> saying is that we need SPEC to consider this issue, meaning we need =
+to=20
+> >>>> describe how the entire software-coherency mechanism operates, which=
+=20
+> >>>> includes the necessary hardware support. Additionally, I agree that =
+if=20
+> >>>> software-coherency also requires hardware support, it seems that=20
+> >>>> hardware-coherency is the better path.   =20
+> >>>>>
+> >>>>> There are some (FAMFS, for example). The coherence state of these
+> >>>>> systems tend to be less volatile (e.g. mappings are read-only), or
+> >>>>> they have inherent design limitations (cacheline-sized message pass=
+ing
+> >>>>> via write-ahead logging only).     =20
+> >>>>
+> >>>> Can you explain more about this? I understand that if the reader in =
+the=20
+> >>>> writer-reader model is using a readonly mapping, the interaction wil=
+l be=20
+> >>>> much simpler. However, after the writer writes data, if we don't hav=
+e a=20
+> >>>> mechanism to flush and invalidate puncturing all caches, how can the=
+=20
+> >>>> readonly reader access the new data?   =20
+> >>>
+> >>> There is a mechanism for doing coarse grained flushing that is known =
+to
+> >>> work on some architectures. Look at cpu_cache_invalidate_memregion().
+> >>> On intel/x86 it's wbinvd_on_all_cpu_cpus()   =20
+> >>
+> >> There is no guarantee on x86 that after cpu_cache_invalidate_memregion=
+()
+> >> that a remote shared memory consumer can be assured to see the writes
+> >> from that event. =20
+> >=20
+> > I was wondering about that after I wrote this...  I guess it guarantees
+> > we won't get a late landing write or is that not even true?
+> >=20
+> > So if we remove memory, then added fresh memory again quickly enough
+> > can we get a left over write showing up?  I guess that doesn't matter as
+> > the kernel will chase it with a memset(0) anyway and that will be order=
+ed
+> > as to the same address.
+> >=20
+> > However we won't be able to elide that zeroing even if we know the devi=
+ce
+> > did it which is makes some operations the device might support rather
+> > pointless :( =20
+>=20
+> >>> on arm64 it's a PSCI firmware call CLEAN_INV_MEMREGION (there is a
+> >>> public alpha specification for PSCI 1.3 with that defined but we
+> >>> don't yet have kernel code.)   =20
+>=20
+> I have an RFC for that - but I haven't had time to update and re-test it.
 
-Applied, thanks!
+If it's useful, I might either be able to find time to take that forwards
+(or get someone else to do it).
 
-[1/1] null_blk: fix validation of block size
-      commit: 237e061865aa5a24c2cd960c4feb2904c8736a75
+Let me know if that would be helpful; I'd love to add this to the list
+of things I can forget about because it just works for kernel
+(and hence is a problem for the firmware and uarch folk).
 
-Best regards,
--- 
-Jens Axboe
+>=20
+> If you need this, and have a platform where it can be implemented, please=
+ get in touch
+> with the people that look after the specs to move it along from alpha.
+>=20
+>=20
+> >> That punches visibility through CXL shared memory devices? =20
+>=20
+> > It's a draft spec and Mark + James in +CC can hopefully confirm.
+> > It does say
+> > "Cleans and invalidates all caches, including system caches".
+> > which I'd read as meaning it should but good to confirm. =20
+>=20
+> It's intended to remove any cached entries - including lines in what the =
+arm-arm calls
+> "invisible" system caches, which typically only platform firmware can tou=
+ch. The next
+> access should have to go all the way to the media. (I don't know enough a=
+bout CXL to say
+> what a remote shared memory consumer observes)
 
+If it's out of the host bridge buffers (and known to have succeeded in writ=
+e back) which I
+think the host should know, I believe what happens next is a device impleme=
+nter problem.
+Hopefully anyone designing a device that does memory sharing has built that=
+ part right.
 
+>=20
+> Without it, all we have are the by-VA operations which are painfully slow=
+ for large
+> regions, and insufficient for system caches.
+>=20
+> As with all those firmware interfaces - its for the platform implementer =
+to wire up
+> whatever is necessary to remove cached content for the specified range. J=
+ust because there
+> is an (alpha!) spec doesn't mean it can be supported efficiently by a par=
+ticular platform.
+>=20
+>=20
+> >>> These are very big hammers and so unsuited for anything fine grained.=
+ =20
+>=20
+> You forgot really ugly too!
+
+I was being polite :)
+
+>=20
+>=20
+> >>> In the extreme end of possible implementations they briefly stop all
+> >>> CPUs and clean and invalidate all caches of all types. So not suited
+> >>> to anything fine grained, but may be acceptable for a rare setup even=
+t,
+> >>> particularly if the main job of the writing host is to fill that memo=
+ry
+> >>> for lots of other hosts to use.
+> >>>
+> >>> At least the ARM one takes a range so allows for a less painful
+> >>> implementation.  =20
+>=20
+> That is to allow some ranges to fail. (e.g. you can do this to the CXL wi=
+ndows, but not
+> the regular DRAM).
+>=20
+> On the less painful implementation, arm's interconnect has a gadget that =
+does "Address
+> based flush" which could be used here. I'd hope platforms with that don't=
+ need to
+> interrupt all CPUs - but it depends on what else needs to be done.
+>=20
+>=20
+> >>> I'm assuming we'll see new architecture over time
+> >>> but this is a different (and potentially easier) problem space
+> >>> to what you need.   =20
+> >>
+> >> cpu_cache_invalidate_memregion() is only about making sure local CPU
+> >> sees new contents after an DPA:HPA remap event. I hope CPUs are able to
+> >> get away from that responsibility long term when / if future memory
+> >> expanders just issue back-invalidate automatically when the HDM decoder
+> >> configuration changes. =20
+> >=20
+> > I would love that to be the way things go, but I fear the overheads of
+> > doing that on the protocol means people will want the option of the pai=
+nful
+> > approach. =20
+>=20
+>=20
+>=20
+> Thanks,
+>=20
+> James
+
+Thanks for the info,
+
+Jonathan
+
+>=20
 
