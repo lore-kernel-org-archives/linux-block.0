@@ -1,117 +1,211 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE66A3BB24
-	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 14:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC4813CABB
+	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 21:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717512223; cv=none; b=WsFB+7wrr6dkRT4qB4mOQbBRl2b8pBq+npX4i6jy/KoqqpgH2yo9mES3Iosp6EGEWBBNdNc65rX7Evi7HfkOQxLNsfvsZmPMb0vywKrJDLc7LeXprZkDgbk8yPUkVHUgx5POTZ+ZZUljz2ybZfU32gMmiq9w/6CLpSG1j1Vxddc=
+	t=1717537974; cv=none; b=UfmyVhQoxfQGGjmkU5XRHE7p3erCMK1uQ8UzMdeo6LQnFyN7doe/xW3nMXgw6JQgUKe1i0uIdfOjz5OFbfLFzqqauX8bqlKnEUwDfcHu93O2Jq3S3zhHru6kVtNgP0m2epjZco0GCTk4ClEDW74MY6576dJOzL8pOHfNS/IhyzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717512223; c=relaxed/simple;
-	bh=ctL3vOIMlqdpL6CapPC1i2IXAG8LcWYLTNh2SbfxJmA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OVNJ/Rr16JlO8LRkTrmecPeiZgBzwFwCHZLvo0aKeQ8qdbTNheylIeySQfL1soTlEqIlqYbL9QKeLguw2+98TIdbYjAtSB/m9iC0JbMkA/W9l4c+GTv70jSZweR4u8X2p+a9RCIBCwvxcw0cZN6c8hEDGl5XjxMUple/qX/BkdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=1wDv1eu6; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1717537974; c=relaxed/simple;
+	bh=C11qX6LTQePui5QFJlcQ6PZCmV27LQ34C2bj5qgfg2E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JmQy5yAE846y1Q+BxWVO9HnnqU2Kz2zBq6ffW55kIrRDzXNGS8/TJ7eHCMWFmBG+/8TW3j1Z1/cGWiVLWKEXaw0OugTVUgkXWxalbfoae+kCKp4oVjSNYIy2Sq8AtL/qswuDn3cmAWs06/Ps3/3BuNOde7wPMcX3+1Vbu5OdGwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RU4VMNll; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="1wDv1eu6"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52ba5868965so861326e87.2
-        for <linux-block@vger.kernel.org>; Tue, 04 Jun 2024 07:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1717512218; x=1718117018; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZCEn26vgqSLqQ0Kbr2xP1FXMBBWSrXPv0PAuT8e/Jrs=;
-        b=1wDv1eu6oWQwOgVoxRmo6/jVdW76i+Rv7vHzZR3oochQDxCFUrsKeAeDWAVR33in34
-         JARx+1OWL95eZDw6y8yTGXcpuVnreGTvDCXMXW0lqSsTq0/UcruHNGzOFy2MS1cwVMbN
-         KJEWSw6dmB/57HAUDd0Gh3faRLuMdlLtLjJSrgdOy9EXFkkyWQ9K9dojckCID7QV8+pz
-         UMAqIVP35kFTK15dTCN6GTg7eU0ycjn4zod2ty0+EoHDqZhI/yZe58skmzTLPSz9myys
-         RYR8z4oU8HgODH7cjFD72QFzHrzspbSPS7zhNj9VHHMA1VUskDAReSkBqGVnbNDvOvPS
-         ddmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717512218; x=1718117018;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZCEn26vgqSLqQ0Kbr2xP1FXMBBWSrXPv0PAuT8e/Jrs=;
-        b=wdTuMvdu9PEM0NaREmHbqvSF/OW+QYjhdTDStW4t06Ivo9uD9uqMttBLfOMxeiDRv9
-         W02RU0qpMrWocB7K9E74mdl164ansE+Xdx3WvCkLdL5+FcBNsVr1y6VyO30y2LIP98NX
-         eMiW9V7sImBEHBW/Zvq8excDAALZp/yJAsiDzlMFAv9pxD6q2wbxGNVI+UrYgeN0L6yJ
-         EavUKGfsw87IySUb4XuQtVSvJkcGJtbvL1eyHwgG1PY3JS1Hz5lGTLPzrl5THheFOreY
-         44luK92ZGuV9qKLYlXXHx2b6stbwlzqhbLumgIKlQw28bZs4kgmjSZ9ZIUToLomyIVvo
-         xwSg==
-X-Forwarded-Encrypted: i=1; AJvYcCXP/HNCH+hBK/PuVF6pvhsGlBk+85rgEsiH+Wxdxrux5txVHxAIsZ7WJaAMb4DNvUKsnaGXDQxCiBJP2zJN8bISHQwg5Mn6L6FyjFE=
-X-Gm-Message-State: AOJu0Yzchb4ASgOSbIWmr9xldocn2buY9mDIuL2APmob5kpjlqSX4K+9
-	M1TpUumayIo6tybwWNdGhu0wskHlIdnlL9ngqPvWvkuY+W82Rt6zt7nHqXNxZ0Q=
-X-Google-Smtp-Source: AGHT+IE7Xgjew2+pYIorgscT+zEtC6CiHfD7k5h5SBbUKiV5TVIkUTo4RiJEiP56EYmy6Bj8NTlM6Q==
-X-Received: by 2002:a05:6512:1152:b0:52b:9c8a:735a with SMTP id 2adb3069b0e04-52b9c8a74fcmr3991508e87.40.1717512218053;
-        Tue, 04 Jun 2024 07:43:38 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a6522d405sm3599992a12.1.2024.06.04.07.43.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jun 2024 07:43:37 -0700 (PDT)
-Message-ID: <c117893f-865a-4fdf-a480-705c31a72ee3@linbit.com>
-Date: Tue, 4 Jun 2024 16:43:36 +0200
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RU4VMNll"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Vv48M6szHzlgMVX;
+	Tue,  4 Jun 2024 21:52:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1717537968; x=1720129969; bh=ROzWNWWJQkg20lfp6H65EJ9HhpghXR2mO0t
+	BDVwqHs0=; b=RU4VMNllpPx93AHfAdCp5AeHpWzUxbJ11q5rvmr0IN5IaIvUIrf
+	O0Lof1AbB2UofS7Ifvkx/0UarNpSE8HENrK5lbnTOniWrxHh7JXEt1V8zt2fpQbz
+	jDBZVXU+i4jkuZ7VKW677SgPApqbkPHjNc0yL2jVRBLmeBQR20GucIjMJbTQeh/u
+	aY/ia6owiOqRi5t3E3tpZZvR7zv7H+F8KvbcsT5ntHJa0jWVLeNR2LiZZpYJ8kwB
+	tPJzGqu8IMnJa8jNXRGEMHgb8X6wa4u+oCJyCjgLa3eCYtRYHy6pPs8isiTKRSXK
+	Jm5YrZzgHsI41Mad6EYtbT7jc5Dhri0rw6Q==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id a8yEeROWuQsX; Tue,  4 Jun 2024 21:52:48 +0000 (UTC)
+Received: from bvanassche-glaptop2.roam.corp.google.com (unknown [65.117.37.195])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Vv48H0RHJzlgMVV;
+	Tue,  4 Jun 2024 21:52:46 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH v2] nbd: Remove __force casts
+Date: Tue,  4 Jun 2024 15:52:27 -0600
+Message-ID: <20240604215227.321764-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] drbd: use sendpages_ok() instead of sendpage_ok()
-To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org
-Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240530142417.146696-4-ofir.gal@volumez.com>
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Content-Language: en-US
-In-Reply-To: <20240530142417.146696-4-ofir.gal@volumez.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-Am 30.05.24 um 16:24 schrieb Ofir Gal:
-> Currently _drbd_send_page() use sendpage_ok() in order to enable
-> MSG_SPLICE_PAGES, it check the first page of the iterator, the iterator
-> may represent contiguous pages.
-> 
-> MSG_SPLICE_PAGES enables skb_splice_from_iter() which checks all the
-> pages it sends with sendpage_ok().
-> 
-> When _drbd_send_page() sends an iterator that the first page is
-> sendable, but one of the other pages isn't skb_splice_from_iter() warns
-> and aborts the data transfer.
-> 
-> Using the new helper sendpages_ok() in order to enable MSG_SPLICE_PAGES
-> solves the issue.
-> 
-> Signed-off-by: Ofir Gal <ofir.gal@volumez.com>
-> ---
->  drivers/block/drbd/drbd_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-> index 113b441d4d36..a5dbbf6cce23 100644
-> --- a/drivers/block/drbd/drbd_main.c
-> +++ b/drivers/block/drbd/drbd_main.c
-> @@ -1550,7 +1550,7 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
->  	 * put_page(); and would cause either a VM_BUG directly, or
->  	 * __page_cache_release a page that would actually still be referenced
->  	 * by someone, leading to some obscure delayed Oops somewhere else. */
-> -	if (!drbd_disable_sendpage && sendpage_ok(page))
-> +	if (!drbd_disable_sendpage && sendpages_ok(page, len, offset))
->  		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
->  
->  	drbd_update_congested(peer_device->connection);
+From: Christoph Hellwig <hch@lst.de>
 
-Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Make it again possible for sparse to verify that blk_status_t and Unix
+error codes are used in the proper context by making nbd_send_cmd()
+return a struct instead of an integer.
 
--- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+No functionality has been changed.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+[ bvanassche: added description and made two small formatting changes ]
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/block/nbd.c | 51 +++++++++++++++++++--------------------------
+ 1 file changed, 22 insertions(+), 29 deletions(-)
+
+Changes compared to v1: instead of making nbd_send_cmd() return a struct,
+  change the nbd_send_cmd() return type into blk_status_t and move the co=
+de
+  for making a socket dead from the nbd_send_cmd() caller into nbd_send_c=
+md().
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 22a79a62cc4e..b87aa80a46dd 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -589,10 +589,11 @@ static inline int was_interrupted(int result)
+ }
+=20
+ /*
+- * Returns BLK_STS_RESOURCE if the caller should retry after a delay. Re=
+turns
+- * -EAGAIN if the caller should requeue @cmd. Returns -EIO if sending fa=
+iled.
++ * Returns BLK_STS_RESOURCE if the caller should retry after a delay.
++ * Returns BLK_STS_IOERR if sending failed.
+  */
+-static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int=
+ index)
++static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd =
+*cmd,
++				 int index)
+ {
+ 	struct request *req =3D blk_mq_rq_from_pdu(cmd);
+ 	struct nbd_config *config =3D nbd->config;
+@@ -614,13 +615,13 @@ static int nbd_send_cmd(struct nbd_device *nbd, str=
+uct nbd_cmd *cmd, int index)
+=20
+ 	type =3D req_to_nbd_cmd_type(req);
+ 	if (type =3D=3D U32_MAX)
+-		return -EIO;
++		return BLK_STS_IOERR;
+=20
+ 	if (rq_data_dir(req) =3D=3D WRITE &&
+ 	    (config->flags & NBD_FLAG_READ_ONLY)) {
+ 		dev_err_ratelimited(disk_to_dev(nbd->disk),
+ 				    "Write on read-only\n");
+-		return -EIO;
++		return BLK_STS_IOERR;
+ 	}
+=20
+ 	if (req->cmd_flags & REQ_FUA)
+@@ -674,11 +675,11 @@ static int nbd_send_cmd(struct nbd_device *nbd, str=
+uct nbd_cmd *cmd, int index)
+ 				nsock->sent =3D sent;
+ 			}
+ 			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
+-			return (__force int)BLK_STS_RESOURCE;
++			return BLK_STS_RESOURCE;
+ 		}
+ 		dev_err_ratelimited(disk_to_dev(nbd->disk),
+ 			"Send control failed (result %d)\n", result);
+-		return -EAGAIN;
++		goto requeue;
+ 	}
+ send_pages:
+ 	if (type !=3D NBD_CMD_WRITE)
+@@ -715,12 +716,12 @@ static int nbd_send_cmd(struct nbd_device *nbd, str=
+uct nbd_cmd *cmd, int index)
+ 					nsock->pending =3D req;
+ 					nsock->sent =3D sent;
+ 					set_bit(NBD_CMD_REQUEUED, &cmd->flags);
+-					return (__force int)BLK_STS_RESOURCE;
++					return BLK_STS_RESOURCE;
+ 				}
+ 				dev_err(disk_to_dev(nbd->disk),
+ 					"Send data failed (result %d)\n",
+ 					result);
+-				return -EAGAIN;
++				goto requeue;
+ 			}
+ 			/*
+ 			 * The completion might already have come in,
+@@ -737,7 +738,16 @@ static int nbd_send_cmd(struct nbd_device *nbd, stru=
+ct nbd_cmd *cmd, int index)
+ 	trace_nbd_payload_sent(req, handle);
+ 	nsock->pending =3D NULL;
+ 	nsock->sent =3D 0;
+-	return 0;
++	__set_bit(NBD_CMD_INFLIGHT, &cmd->flags);
++	return BLK_STS_OK;
++
++requeue:
++	/* retry on a different socket */
++	dev_err_ratelimited(disk_to_dev(nbd->disk),
++			    "Request send failed, requeueing\n");
++	nbd_mark_nsock_dead(nbd, nsock, 1);
++	nbd_requeue_cmd(cmd);
++	return BLK_STS_OK;
+ }
+=20
+ static int nbd_read_reply(struct nbd_device *nbd, struct socket *sock,
+@@ -1018,7 +1028,7 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *=
+cmd, int index)
+ 	struct nbd_device *nbd =3D cmd->nbd;
+ 	struct nbd_config *config;
+ 	struct nbd_sock *nsock;
+-	int ret;
++	blk_status_t ret;
+=20
+ 	lockdep_assert_held(&cmd->lock);
+=20
+@@ -1072,28 +1082,11 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd=
+ *cmd, int index)
+ 		ret =3D BLK_STS_OK;
+ 		goto out;
+ 	}
+-	/*
+-	 * Some failures are related to the link going down, so anything that
+-	 * returns EAGAIN can be retried on a different socket.
+-	 */
+ 	ret =3D nbd_send_cmd(nbd, cmd, index);
+-	/*
+-	 * Access to this flag is protected by cmd->lock, thus it's safe to set
+-	 * the flag after nbd_send_cmd() succeed to send request to server.
+-	 */
+-	if (!ret)
+-		__set_bit(NBD_CMD_INFLIGHT, &cmd->flags);
+-	else if (ret =3D=3D -EAGAIN) {
+-		dev_err_ratelimited(disk_to_dev(nbd->disk),
+-				    "Request send failed, requeueing\n");
+-		nbd_mark_nsock_dead(nbd, nsock, 1);
+-		nbd_requeue_cmd(cmd);
+-		ret =3D BLK_STS_OK;
+-	}
+ out:
+ 	mutex_unlock(&nsock->tx_lock);
+ 	nbd_config_put(nbd);
+-	return ret < 0 ? BLK_STS_IOERR : (__force blk_status_t)ret;
++	return ret;
+ }
+=20
+ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
