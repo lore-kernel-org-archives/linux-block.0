@@ -1,36 +1,42 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C55E8F77;
-	Tue,  4 Jun 2024 04:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC53D13D639;
+	Tue,  4 Jun 2024 04:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717475448; cv=none; b=uHlqlaLWOsKb0H9+nW2aP2YrnVJJa4p/DOCakttUBzBb74oVxUDAkw5S8Lwy6jk8/SFEjbLABXPwTMhUgUi9MSZL65wozRuufVi9LAbsibu7m/WlKMi6q0kO82aiZFr4gz9t0rUC+gyn0cvGHTeSdi9dsajmxzfDdIwEl44WjNw=
+	t=1717475509; cv=none; b=shUbwzMFeCdYAbv2PFjDx/2JkLd1/X84M5pZD56Tn0OOD7WahsUdBbnc7r4zZX8jV1v/rB+5CW43U0cdDx88CaPEMA1X7UjcKxyH9+NzmLcjBtauE5ocmQ3X+cEk/GcuF32wMmQvs1CDibThBlbQmlcQB8He9qn5Sb2RDTczoeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717475448; c=relaxed/simple;
-	bh=FrRpTyIC0TSN7vgeKaP9koVH9eDEgABWGhVAwupcyZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XI1vq7Y1el0blYK7ZynkUCDqE7w4ZshYHEFqsF3yCvTe1ypvaoTC11YPLeXmf6nD2X0sQghRroAAmDOWhmLjetJAlKpvcJy+GLFpdhyRgjKNaeyj7YyuTmf85dUhtW9D9fA897QroxXNNXB25bepbRjbZYxP/JZ7Ay5niYk1+qE=
+	s=arc-20240116; t=1717475509; c=relaxed/simple;
+	bh=+P6lCzxMtgkTSM7bfvrnPizzmdH3bqAUPXp7C4X6W4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lHg/lI1wmHaeo3EueASAirCMGtHqoODqEA5Jh7Xe8P+656+6g9GLEfWKqKgWCm3SGJ+/ADjFf384ONT4vQ8BI/6rNUDgHqHxrUfxqe37/AqnLJvoU1OVXL2WHV72uu0+Wy0uRvNs/zgXNOBCYc2+Bpm613KU/AVFeUZzlQHue7w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 71B6A68D15; Tue,  4 Jun 2024 06:30:41 +0200 (CEST)
-Date: Tue, 4 Jun 2024 06:30:41 +0200
+	id 2831268D12; Tue,  4 Jun 2024 06:31:43 +0200 (CEST)
+Date: Tue, 4 Jun 2024 06:31:42 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Ofir Gal <ofir.gal@volumez.com>,
-	davem@davemloft.net, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
-	ceph-devel@vger.kernel.org, dhowells@redhat.com,
-	edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org,
-	axboe@kernel.dk, sagi@grimberg.me, philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-	idryomov@gmail.com, xiubli@redhat.com
-Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-Message-ID: <20240604043041.GA28886@lst.de>
-References: <20240530142417.146696-1-ofir.gal@volumez.com> <20240531073214.GA19108@lst.de> <20240601153610.30a92740@kernel.org>
+To: Nitesh Shetty <nj.shetty@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	martin.petersen@oracle.com, bvanassche@acm.org, david@fromorbit.com,
+	hare@suse.de, damien.lemoal@opensource.wdc.com,
+	anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
+	gost.dev@samsung.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v20 01/12] block: Introduce queue limits and sysfs for
+ copy-offload support
+Message-ID: <20240604043142.GB28886@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,22 +45,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240601153610.30a92740@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sat, Jun 01, 2024 at 03:36:10PM -0700, Jakub Kicinski wrote:
-> On Fri, 31 May 2024 09:32:14 +0200 Christoph Hellwig wrote:
-> > I still find it hightly annoying that we can't have a helper that
-> > simply does the right thing for callers, but I guess this is the
-> > best thing we can get without a change of mind from the networking
-> > maintainers..
-> 
-> Change mind about what? Did I miss a discussion?
+On Mon, Jun 03, 2024 at 06:43:56AM +0000, Nitesh Shetty wrote:
+>> Also most block limits are in kb.  Not that I really know why we are
+>> doing that, but is there a good reason to deviate from that scheme?
+>>
+> We followed discard as a reference, but we can move to kb, if that helps
+> with overall readability.
 
-Having a net helper to just send some memory in the most efficient
-way and leave it up to the networking code to decide if it wants
-to use sendpage or sendmsg internally as needed instead of burdening
-the caller.
+I'm not really sure what is better.  Does anyone remember why we did
+the _kb version?  Either way some amount of consistency would be nice.
 
-This happened before sendpage_ok was added, so probably in 2020
-and most involved Dave and not you.
