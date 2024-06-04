@@ -1,201 +1,220 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E82A1E519;
-	Tue,  4 Jun 2024 13:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C498146019;
+	Tue,  4 Jun 2024 13:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717506083; cv=none; b=uDaq9x1VYvihMHtckHa4ya2ZdVc7P14j2vhITmbCD2w7wrMuN/qd7j/gD+G3QSAivForJjs9DFaNuXnhSxoRUd+V3cQSfqM570fwUO1LgnbJhiYfEL//dxR06t8bm/YO0HBNIHN9tFnslBX4NI+wAer/Z8pTvVrZLmaU5ebIqGs=
+	t=1717506894; cv=none; b=YGWK1Gv8edFLwokE/neGnKEOhzcKcO+2hz7TYAusFJ4JoM7fNcE0vZBaleEfbI6VsZJasCxau4bbCR5X82SrO/Y+RYdIIyoL3rU2JnZkvgZbvdIPk/TS/0OcFPPlc1/PkXs0M3fdDSyjDLUxYtWF/xwHZiLC5Mzv1LZtI5g2tX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717506083; c=relaxed/simple;
-	bh=q4Tr+AFR+WP7AGPpqaG/QKSTCGhZPx0fb7JxJHtzMi4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=lR+4plt67IxgOc3pqXqUwgzkzkGaUR2LArIUsV48NeTFfqKcUPQJMNmqC9USnC+sN92laimjOC0KkM2NUgLpb9uBvGX8SKCfBCGYzRLiNXj+vkFDZxCkUIEfvRA3mKU4IRzO1fFN/p/XSuBhBYT+dmQpB4KNePaeP3n6VGIroTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4210f0bb857so5430995e9.1;
-        Tue, 04 Jun 2024 06:01:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717506080; x=1718110880;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxHXs7IG64cFNSoqIPh3h+fcJrQqZkul2851soVpEBU=;
-        b=jH4RvCan+YDykSraSvJTsPODWwtXC1CHh+ImZ9HUJXKtlRaYz6MYuKvm+OetM9B0Mg
-         dPtWv2fGYE3T9Ubp+YcDJNB7LVMoIWShsjmFeSgOsx+grvVGsO4kX0UCpS60weOxKAiS
-         fPRTkSKGghQF02aVUJxHXC4q6WhuKQmqpj2shDehZuq0L29KdRgwalyMNB7oqeU+Fmo1
-         9kWQtiD1C3k8fLjNrvSot9YQ1jQB9z8AjpR3e2gK340ITN1ZjsScaqfAo/RjeOjLYnVA
-         OBt+V7rjI9z93jS9bcdzhTUFg28Wo3OPUWoxlYx0NSFKB8AThIfrlsiql20PfT5Dadg7
-         aTIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVKY9qkCW7DgRJzbcxuEzkxAukpz/WY1DZQyJplZG39n2ozKaASv1daGPi/pRGm05YdBgxtt9Yi0ndhjWdBCM3Pa3/u9A01mvZos02rVfyceKUZ/KleYYZGkitdAvHupn4Lu7d19YBL/T6PtgA47SE0Gsh7F49yXqp8T8mFEPNF
-X-Gm-Message-State: AOJu0Yx6TjGEcTVnoy+LbNDyW8jZHkB2+aCMEO5h47OI4Ph9bKFTjIaT
-	ufUpF9GkPRDU76e3ghrCpQFyV+7dGbSB+xO3bd833LW+qqpSnmUP
-X-Google-Smtp-Source: AGHT+IH9oq3dFpvLJVUKgEQQ0Vx9YEe7q6Q5Zb8A/OQIgbPFG2wSdi0d9xEzXrAJ0zX69KHy0U2C2g==
-X-Received: by 2002:a05:600c:1382:b0:41b:fdf9:98b5 with SMTP id 5b1f17b1804b1-4212e0c40a5mr92270135e9.4.1717506080292;
-        Tue, 04 Jun 2024 06:01:20 -0700 (PDT)
-Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421542e207esm13638365e9.22.2024.06.04.06.01.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jun 2024 06:01:20 -0700 (PDT)
-Message-ID: <ef7ea4a8-c0e4-4fd9-9abb-42ae95090fc8@grimberg.me>
-Date: Tue, 4 Jun 2024 16:01:17 +0300
+	s=arc-20240116; t=1717506894; c=relaxed/simple;
+	bh=8nW1V6CbncsFWuIQZgo5buIgXhsjHyc1sGEJPYs+00Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sBHqSPGQp0gFfqRsBPGuWI5cPBWvexLmFs/yW+GV5yqz+4w8nYk8nOjJHx5M/1kB31nCXiYLexF97Fan/Do5+1IGhjo5Zu7ayxZWLoKpPPPcv/yubOFcQW8jyGuwz1OTRxcUxAqZPh6nQmixY4bLLA+u7XBrwGGGB1VgIf1lPAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VtrfN175Pz4f3mHZ;
+	Tue,  4 Jun 2024 21:14:36 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 3EA601A0842;
+	Tue,  4 Jun 2024 21:14:47 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP2 (Coremail) with SMTP id Syh0CgDnCw9FE19mKJipOw--.8022S3;
+	Tue, 04 Jun 2024 21:14:47 +0800 (CST)
+Message-ID: <86c3df48-7e9f-bf72-c7a7-5c02b31ed9c0@huaweicloud.com>
+Date: Tue, 4 Jun 2024 21:14:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: introduce helper sendpages_ok()
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org, dhowells@redhat.com,
- edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240530142417.146696-2-ofir.gal@volumez.com>
- <8d0c198f-9c15-4a8f-957a-2e4aecddd2e5@grimberg.me>
- <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
- <86e60615-9286-4c9c-bffc-72304bd3cc1f@grimberg.me>
- <20240604042738.GA28853@lst.de>
- <62c2b8cd-ce6a-4e13-a58c-a6b30a0dcf17@grimberg.me>
-Content-Language: en-US
-In-Reply-To: <62c2b8cd-ce6a-4e13-a58c-a6b30a0dcf17@grimberg.me>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] ublk_drv: fix NULL pointer dereference in
+ ublk_ctrl_start_recovery()
+To: Changhui Zhong <czhong@redhat.com>
+Cc: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk,
+ ZiyangZhang@linux.alibaba.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+ houtao1@huawei.com, yangerkun@huawei.com
+References: <20240529095313.2568595-1-linan666@huaweicloud.com>
+ <Zl0QpCbYVHIkKa/H@fedora>
+ <225f4c8e-0e2c-8f4b-f87d-69f4677af572@huaweicloud.com>
+ <CAGVVp+XD5MbYOWL4pbLMxXL0yNKO5NJ84--=KVnW6w5-GF7Drw@mail.gmail.com>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <CAGVVp+XD5MbYOWL4pbLMxXL0yNKO5NJ84--=KVnW6w5-GF7Drw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgDnCw9FE19mKJipOw--.8022S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxKw4UtrWUuw1UWw4rur17KFg_yoWxJFyUpF
+	ykWFW0kFW8Gr18Aws7tr45tF10ya1q9a1DGwnagFy7Wa4kur13Xa48CF1jgrWDWw4Utay7
+	tFn0grW0gr1jqaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
+	Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aV
+	AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E
+	8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWr
+	Zr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_Gr
+	UvcSsGvfC2KfnxnUUI43ZEXa7IU1VOJ7UUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
 
 
-On 04/06/2024 11:24, Sagi Grimberg wrote:
->
->
-> On 04/06/2024 7:27, Christoph Hellwig wrote:
->> On Tue, Jun 04, 2024 at 12:27:06AM +0300, Sagi Grimberg wrote:
->>>>> I still don't understand how a page in the middle of a contiguous 
->>>>> range ends
->>>>> up coming from the slab while others don't.
->>>> I haven't investigate the origin of the IO
->>>> yet. I suspect the first 2 pages are the superblocks of the raid
->>>> (mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the 
->>>> bitmap.
->>> Well, if these indeed are different origins and just *happen* to be a
->>> mixture
->>> of slab originated pages and non-slab pages combined together in a 
->>> single
->>> bio of a bvec entry,
->>> I'd suspect that it would be more beneficial to split the bvec 
->>> (essentially
->>> not allow bio_add_page
->>> to append the page to tail bvec depending on a queue limit (similar 
->>> to how
->>> we handle sg gaps).
->> So you want to add a PageSlab check to bvec_try_merge_page? That sounds
->> fairly expensive..
+在 2024/6/4 9:32, Changhui Zhong 写道:
+> On Mon, Jun 3, 2024 at 10:20 AM Li Nan <linan666@huaweicloud.com> wrote:
 >>
->
-> The check needs to happen somewhere apparently, and given that it will 
-> be gated by a queue flag
-> only request queues that actually needed will suffer, but they will 
-> suffer anyways...
+>>
+>>
+>> 在 2024/6/3 8:39, Ming Lei 写道:
+>>
+>> [...]
+>>
+>>>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+>>>> index 4e159948c912..99b621b2d40f 100644
+>>>> --- a/drivers/block/ublk_drv.c
+>>>> +++ b/drivers/block/ublk_drv.c
+>>>> @@ -2630,7 +2630,8 @@ static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
+>>>>    {
+>>>>       int i;
+>>>>
+>>>> -    WARN_ON_ONCE(!(ubq->ubq_daemon && ubq_daemon_is_dying(ubq)));
+>>>> +    if (WARN_ON_ONCE(!(ubq->ubq_daemon && ubq_daemon_is_dying(ubq))))
+>>>> +            return;
+>>>
+>>> Yeah, it is one bug. However, it could be addressed by adding the check in
+>>> ublk_ctrl_start_recovery() and return immediately in case of NULL ubq->ubq_daemon,
+>>> what do you think about this way?
+>>>
+>>
+>> Check ub->nr_queues_ready seems better. How about:
+>>
+>> @@ -2662,6 +2662,8 @@ static int ublk_ctrl_start_recovery(struct
+>> ublk_device *ub,
+>>           mutex_lock(&ub->mutex);
+>>           if (!ublk_can_use_recovery(ub))
+>>                   goto out_unlock;
+>> +       if (!ub->nr_queues_ready)
+>> +               goto out_unlock;
+>>           /*
+>>            * START_RECOVERY is only allowd after:
+>>            *
+>>
+>>>
+>>> Thanks,
+>>> Ming
+>>
+>> --
+>> Thanks,
+>> Nan
+>>
+> 
+> 
+> Hi,Nan
+> 
+> After applying your new patch, I did not trigger "NULL pointer
+> dereference" and "Warning",
+> but hit task hung "Call Trace" info, please check
+> 
+> [13617.812306] running generic/004
+> [13622.293674] blk_print_req_error: 91 callbacks suppressed
+> [13622.293681] I/O error, dev ublkb4, sector 233256 op 0x1:(WRITE)
+> flags 0x8800 phys_seg 1 prio class 0
+> [13622.308145] I/O error, dev ublkb4, sector 233256 op 0x0:(READ)
+> flags 0x0 phys_seg 2 prio class 0
+> [13622.316923] I/O error, dev ublkb4, sector 233264 op 0x1:(WRITE)
+> flags 0x8800 phys_seg 1 prio class 0
+> [13622.326048] I/O error, dev ublkb4, sector 233272 op 0x0:(READ)
+> flags 0x0 phys_seg 1 prio class 0
+> [13622.334828] I/O error, dev ublkb4, sector 233272 op 0x1:(WRITE)
+> flags 0x8800 phys_seg 1 prio class 0
+> [13622.343954] I/O error, dev ublkb4, sector 233312 op 0x0:(READ)
+> flags 0x0 phys_seg 1 prio class 0
+> [13622.352733] I/O error, dev ublkb4, sector 233008 op 0x0:(READ)
+> flags 0x0 phys_seg 1 prio class 0
+> [13622.361514] I/O error, dev ublkb4, sector 233112 op 0x0:(READ)
+> flags 0x0 phys_seg 1 prio class 0
+> [13622.370292] I/O error, dev ublkb4, sector 233192 op 0x1:(WRITE)
+> flags 0x8800 phys_seg 1 prio class 0
+> [13622.379419] I/O error, dev ublkb4, sector 233120 op 0x0:(READ)
+> flags 0x0 phys_seg 1 prio class 0
+> [13641.069695] INFO: task fio:174413 blocked for more than 122 seconds.
+> [13641.076061]       Not tainted 6.10.0-rc1+ #1
+> [13641.080338] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [13641.088164] task:fio             state:D stack:0     pid:174413
+> tgid:174413 ppid:174386 flags:0x00004002
+> [13641.088168] Call Trace:
+> [13641.088170]  <TASK>
+> [13641.088171]  __schedule+0x221/0x670
+> [13641.088177]  schedule+0x23/0xa0
+> [13641.088179]  io_schedule+0x42/0x70
+> [13641.088181]  blk_mq_get_tag+0x118/0x2b0
+> [13641.088185]  ? gup_fast_pgd_range+0x280/0x370
+> [13641.088188]  ? __pfx_autoremove_wake_function+0x10/0x10
+> [13641.088192]  __blk_mq_alloc_requests+0x194/0x3a0
+> [13641.088194]  blk_mq_submit_bio+0x241/0x6c0
+> [13641.088196]  __submit_bio+0x8a/0x1f0
+> [13641.088199]  submit_bio_noacct_nocheck+0x168/0x250
+> [13641.088201]  ? submit_bio_noacct+0x45/0x560
+> [13641.088203]  __blkdev_direct_IO_async+0x167/0x1a0
+> [13641.088206]  blkdev_write_iter+0x1c8/0x270
+> [13641.088208]  aio_write+0x11c/0x240
+> [13641.088212]  ? __rq_qos_issue+0x21/0x40
+> [13641.088214]  ? blk_mq_start_request+0x34/0x1a0
+> [13641.088216]  ? io_submit_one+0x68/0x380
+> [13641.088218]  ? kmem_cache_alloc_noprof+0x4e/0x320
+> [13641.088221]  ? fget+0x7c/0xc0
+> [13641.088224]  ? io_submit_one+0xde/0x380
+> [13641.088226]  io_submit_one+0xde/0x380
+> [13641.088228]  __x64_sys_io_submit+0x80/0x160
+> [13641.088229]  do_syscall_64+0x79/0x150
+> [13641.088233]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> [13641.088237]  ? do_io_getevents+0x8b/0xe0
+> [13641.088238]  ? syscall_exit_work+0xf3/0x120
+> [13641.088241]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> [13641.088243]  ? do_syscall_64+0x85/0x150
+> [13641.088245]  ? do_syscall_64+0x85/0x150
+> [13641.088247]  ? blk_mq_flush_plug_list.part.0+0x108/0x160
+> [13641.088249]  ? rseq_get_rseq_cs+0x1d/0x220
+> [13641.088252]  ? rseq_ip_fixup+0x6d/0x1d0
+> [13641.088254]  ? blk_finish_plug+0x24/0x40
+> [13641.088256]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> [13641.088258]  ? do_syscall_64+0x85/0x150
+> [13641.088260]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> [13641.088262]  ? do_syscall_64+0x85/0x150
+> [13641.088264]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> [13641.088266]  ? do_syscall_64+0x85/0x150
+> [13641.088268]  ? do_syscall_64+0x85/0x150
+> [13641.088270]  ? do_syscall_64+0x85/0x150
+> [13641.088272]  ? clear_bhb_loop+0x45/0xa0
+> [13641.088275]  ? clear_bhb_loop+0x45/0xa0
+> [13641.088277]  ? clear_bhb_loop+0x45/0xa0
+> [13641.088279]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [13641.088281] RIP: 0033:0x7ff92150713d
+> [13641.088283] RSP: 002b:00007ffca1ef81f8 EFLAGS: 00000246 ORIG_RAX:
+> 00000000000000d1
+> [13641.088285] RAX: ffffffffffffffda RBX: 00007ff9217e2f70 RCX: 00007ff92150713d
+> [13641.088286] RDX: 000055863b694fe0 RSI: 0000000000000010 RDI: 00007ff92164d000
+> [13641.088287] RBP: 00007ff92164d000 R08: 00007ff91936d000 R09: 0000000000000180
+> [13641.088288] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000010
+> [13641.088289] R13: 0000000000000000 R14: 000055863b694fe0 R15: 000055863b6970c0
+> [13641.088291]  </TASK>
+> 
+> Thanks，
+> Changhui
 
-Something like the untested patch below:
---
-diff --git a/block/bio.c b/block/bio.c
-index 53f608028c78..e55a4184c0e6 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -18,6 +18,7 @@
-  #include <linux/highmem.h>
-  #include <linux/blk-crypto.h>
-  #include <linux/xarray.h>
-+#include <linux/net.h>
+Thanks for your test, I am trying to find the cause of this new issue.
 
-  #include <trace/events/block.h>
-  #include "blk.h"
-@@ -960,6 +961,9 @@ bool bvec_try_merge_hw_page(struct request_queue *q, 
-struct bio_vec *bv,
-                 return false;
-         if (len > queue_max_segment_size(q) - bv->bv_len)
-                 return false;
-+       if (q->limits.splice_pages &&
-+           sendpage_ok(bv->bv_page) ^ sendpage_ok(page))
-+                       return false;
-         return bvec_try_merge_page(bv, page, len, offset, same_page);
-  }
+-- 
+Thanks,
+Nan
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index a7e820840cf7..82e2719acb9c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1937,6 +1937,7 @@ static void nvme_set_ctrl_limits(struct nvme_ctrl 
-*ctrl,
-         lim->virt_boundary_mask = NVME_CTRL_PAGE_SIZE - 1;
-         lim->max_segment_size = UINT_MAX;
-         lim->dma_alignment = 3;
-+       lim->splice_pages = ctrl->splice_pages;
-  }
-
-  static bool nvme_update_disk_info(struct nvme_ns *ns, struct 
-nvme_id_ns *id,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 3f3e26849b61..d9818330e236 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -398,6 +398,7 @@ struct nvme_ctrl {
-
-         enum nvme_ctrl_type cntrltype;
-         enum nvme_dctype dctype;
-+       bool splice_pages
-  };
-
-  static inline enum nvme_ctrl_state nvme_ctrl_state(struct nvme_ctrl *ctrl)
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 02076b8cb4d8..618b8f20206a 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -2146,6 +2146,12 @@ static int nvme_tcp_configure_admin_queue(struct 
-nvme_ctrl *ctrl, bool new)
-         if (error)
-                 goto out_stop_queue;
-
-+       /*
-+        * we want to prevent contig pages with conflicting 
-splice-ability with
-+        * respect to the network transmission
-+        */
-+       ctrl->splice_pages = true;
-+
-         nvme_unquiesce_admin_queue(ctrl);
-
-         error = nvme_init_ctrl_finish(ctrl, false);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 69c4f113db42..ec657ddad2a4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -331,6 +331,12 @@ struct queue_limits {
-          * due to possible offsets.
-          */
-         unsigned int            dma_alignment;
-+
-+       /*
-+        * Drivers that use MSG_SPLICE_PAGES to send the bvec over the 
-network,
-+        * will need either bvec entry contig pages spliceable or not.
-+        */
-+       bool                    splice_pages;
-  };
-
-  typedef int (*report_zones_cb)(struct blk_zone *zone, unsigned int idx,
---
-
-What I now see is that we will check PageSlab twice (bvec last index and 
-append page)
-and skb_splice_from_iter checks it again... How many times check we 
-check this :)
-
-Would be great if the network stack can just check it once and fallback 
-to page copy...
