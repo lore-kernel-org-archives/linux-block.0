@@ -1,43 +1,47 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB93613D638;
-	Tue,  4 Jun 2024 04:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AEF17741;
+	Tue,  4 Jun 2024 04:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717476050; cv=none; b=MtwLwIoSHHG9bk/Yu3ixH8dXfJVgMgIIPPMsx0y5ufuNiwCTdYrIO+sNiz/Ue0CqxFaEPX85nMXZzhlhkhkDQBUkuyPwUMKpsahqaTgsDdPXq3Om08bWSurC+/X5WB2N/gqeY3c2aw+eI5b2EwvX1FyxSSKPcBcg9hnPDF1abio=
+	t=1717476386; cv=none; b=uUVp4FQLNIyzwHjKjX6BRbU6CPND6yShEVPwWBU+9BC78vsZ4wPI8LVRG9izNdITF6Zoh42g9QpUni0WB2yMtDme2voiY++aV5lml1Eqj3g97hHr00fFSNlBrFfEzt9nNX30zpI9c3k2gmAFFd3gCB/InD1W6m8IIuzLPeIdHTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717476050; c=relaxed/simple;
-	bh=YspLg/oZO+NECETpz3U99drDYtBVvMb6eMXzhEQZu1I=;
+	s=arc-20240116; t=1717476386; c=relaxed/simple;
+	bh=lF+3ndP0Ib1DsiimtVj/EelNOErTHudK0jOBHFzWKcw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kjoKciJKskMO8scKIxjtcD8rSfWx52AhznzPgs68r8V9pBmAub31EbPFRz5yg857F//Dv+p8s8ML6p8gyUaKryygBIkf169Ahvqq0jVQ88fjPyr334LoE4KJuOGurTqmYjiCH+Z34s2V6RQQCZdXEiumrnvYWlTSMwlrxFqS2EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id EAF7068D12; Tue,  4 Jun 2024 06:40:42 +0200 (CEST)
-Date: Tue, 4 Jun 2024 06:40:42 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Nitesh Shetty <nj.shetty@samsung.com>,
-	Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	martin.petersen@oracle.com, david@fromorbit.com, hare@suse.de,
-	damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com,
-	joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
- and request layer.
-Message-ID: <20240604044042.GA29094@lst.de>
-References: <20240520102033.9361-1-nj.shetty@samsung.com> <CGME20240520102842epcas5p4949334c2587a15b8adab2c913daa622f@epcas5p4.samsung.com> <20240520102033.9361-3-nj.shetty@samsung.com> <eda6c198-3a29-4da4-94db-305cfe28d3d6@acm.org> <9f1ec1c1-e1b8-48ac-b7ff-8efb806a1bc8@kernel.org> <a866d5b5-5b01-44a2-9ccb-63bf30aa8a51@acm.org> <665850bd.050a0220.a5e6b.5b72SMTPIN_ADDED_BROKEN@mx.google.com> <abe8c209-d452-4fb5-90eb-f77b5ec1a2dc@acm.org> <20240601055931.GB5772@lst.de> <d7ae00c8-c038-4bed-937e-222251bc627a@acm.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HqwhkNbmyGiCcGsvVQQde+S0ShYxEKcgFo0DPQeazCsRnO+FZ8MDfwcSU0cJFgT6zJoIWbfKcOQrr6JO3MjcEPONYsIMFObUYklpDH5ob/O0vHFBiBSJQx2TG62vOU07wDMlu8A5JBgdzkII0UwKV9W2U2usgvsZgOpXxx+2jZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=l2GdXoju; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="l2GdXoju"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ytAhbThPNjXTfUodETZzpPMZu1FR/UjRFuF7PD2TYzI=; b=l2GdXojuHsJXgJ4rpXKIfG1a0T
+	s7k0GA6kXT4jmAJ4e0Ji7+4860jftg8sUu+AXLp8nzI++WuKr1gNaxLjPSoYudHkKFHheYsHGC9ic
+	bfbqBQIYxPUg7DXSrg1+c1Vmo9/UPjMZt9P8SbdxRNoiC4JzzeFhy4B64YZAimVs9cYeozmZqb3dE
+	1npH6HwmFfaIJXkk8Fl31/PP0I6EqXzHHRy9/u+sZvwjmrInqX6VSlXKRoW73Mtk7SNkXtrXQZMK9
+	rRO7LuuSfij1iEx9iK8a/xLDCzO5OMksMrSCd+wuQ4mqf6kztx6PqvwSueR3zhUyaBkLIW1cHAm4l
+	ZzMQiSVw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sEM3w-00000001CWj-48dY;
+	Tue, 04 Jun 2024 04:46:20 +0000
+Date: Mon, 3 Jun 2024 21:46:20 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	John Garry <john.g.garry@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] null_blk: fix validation of block size
+Message-ID: <Zl6cHI48ye7Tp1-C@infradead.org>
+References: <20240603192645.977968-1-nmi@metaspace.dk>
+ <Zl4dxaQgPbw19Irk@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,37 +50,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d7ae00c8-c038-4bed-937e-222251bc627a@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <Zl4dxaQgPbw19Irk@kbusch-mbp.dhcp.thefacebook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jun 03, 2024 at 10:12:48AM -0700, Bart Van Assche wrote:
-> Consider the following use case:
-> * Task A calls blk_start_plug()
-> * Task B calls blk_start_plug()
-> * Task A submits a REQ_OP_COPY_DST bio and a REQ_OP_COPY_SRC bio.
-> * Task B submits a REQ_OP_COPY_DST bio and a REQ_OP_COPY_SRC bio.
-> * The stacking driver to which all REQ_OP_COPY_* operations have been
->   submitted processes bios asynchronusly.
-> * Task A calls blk_finish_plug()
-> * Task B calls blk_finish_plug()
-> * The REQ_OP_COPY_DST bio from task A and the REQ_OP_COPY_SRC bio from
->   task B are combined into a single request.
-> * The REQ_OP_COPY_DST bio from task B and the REQ_OP_COPY_SRC bio from
->   task A are combined into a single request.
->
-> This results in silent and hard-to-debug data corruption. Do you agree
-> that we should not restrict copy offloading to stacking drivers that
-> process bios synchronously and also that this kind of data corruption
-> should be prevented?
+On Mon, Jun 03, 2024 at 01:47:17PM -0600, Keith Busch wrote:
+> On Mon, Jun 03, 2024 at 09:26:45PM +0200, Andreas Hindborg wrote:
+> > -	dev->blocksize = round_down(dev->blocksize, 512);
+> > -	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
+> > +	if (blk_validate_block_size(dev->blocksize) != 0) {
+> > +		return -EINVAL;
+> > +	}
+> 
+> No need for the { } brackets for a one-line if.
 
-There is no requirement to process them synchronously, there is just
-a requirement to preserve the order.  Note that my suggestion a few
-arounds ago also included a copy id to match them up.  If we don't
-need that I'm happy to leave it away.  If need it it to make stacking
-drivers' lifes easier that suggestion still stands.
+or the != 0.
 
->
-> Thanks,
->
-> Bart.
----end quoted text---
+> 
+> It also looks like a good idea if this check was just done in
+> blk_validate_limits() so that each driver doesn't have to do their own
+> checks. That block function is kind of recent though.
+
+Yes.  We already discussed this in another thread a few days ago.
