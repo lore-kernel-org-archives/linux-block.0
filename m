@@ -1,101 +1,92 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727A513BAE5;
-	Mon,  3 Jun 2024 21:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C754801
+	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 00:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717450033; cv=none; b=NYj7j2ReoT88lDCctX0hVEeLZgLH5VUrI1cJ/SmlIUKDQc0nXs2skRGoF7hp87vLu0PhknwsuX0WVo+HkYTzVlQwaHReG/K13NByg2gaoicfyroHnf0xHlt3LS9KHpYDLuVJLQqIcLNpro7wo9G0nHzjOxsuAVWzyZ3JGjdGXns=
+	t=1717461770; cv=none; b=PkWhVf2UpRJ2n81uvk2LQ48heY58H6aavp9LJ63j7R2d+NjOuhjSwSnDL6SyytaT89XIWaqxdKW/cQlAkiqh8IVqNd52fwhch3PgMVjAS7Si/BWUNikYoKZxCh0T4Q/cKfDEQGVds+2v7Z3oZHiPvpcWlJdkLCj8iArfk3vZ1hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717450033; c=relaxed/simple;
-	bh=cweTklJChgGQJ4iaB8EL2Zwbqlpyn3DUc51xHBMHR10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CYRDAnqEHjhZzdTOVODamO+zcXvgc5IRrOPmpOFwJ5d4TOweGRtSB6zqU4FXBB8nvRZnn6DvK72OvXVrkkN0lixM3Wnt0f4+F55tQU7KEPjADxwf9K82OnISgpzEVa3+NtxN67u3fPWPtcHPPYVon/6C0at7jtgWVM370INKi1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-35dbf63c774so161264f8f.2;
-        Mon, 03 Jun 2024 14:27:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717450030; x=1718054830;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uY599MDCIjCv3UIyzbwe3bA9VXqb6OB7ySlkBu+KXLw=;
-        b=kIhkd+Qxb2SAVzXaMbJkzBlqKEWhwCMmnvoqoOC031bH/Q624ZLlxgl8+Kk1k1U3nH
-         neGykquLU6h2Lqr0elQPuZlBszQSD5nh1NRWTRaw6OEIeFnK5/WfEjMg5wK4yRMczUeH
-         40XfZW9m3ME2VyFmxXoZVeNUIpM9ssQBi1wgG5wlzKgz8b5E4KDUTIOEUSo/iRPFEqst
-         PHHWm5CFi4REfonBQXEP00ad1ycG0bb8XjGbNiI1hN4uQyIUZF0WHBgvq+u9p6mX2qnK
-         +umPwL9QNcRru/Gp7KKfmn9XEWNDTVnaJ5ijBHEprE/4vahZm3rWB779Rlv92mRE342Q
-         9Tuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWVM/EDnAqp9YkhNzqoXjBE7CkLVke+hJE/crcgtZsrtNV1UALsV4Db3nSeVSBoq1d/yM3leX2lnoE8nLaESogfSmNIaMeXf3xLDJYnr309+LdBgc/yRnIHRMtJaVpaiEl98/vqqo1f/RgFWhH8ptZwWnOLLQ2z57W/ucHR/Sm
-X-Gm-Message-State: AOJu0YwcfF7pEv3F2slftBILNgaiZEyZsGpYaP3MTGNBNF1e1UTRHRFz
-	EKaap0feZFw33BRGf4IlT5cMc6PsRrvCVLbMSRg3iuFa0dyPqJVk
-X-Google-Smtp-Source: AGHT+IH46P8IN4JrAN5hCuulfHxINGqT3MUA6PYnKCaDFijovEp8eZHOBGyMyXYbErBqqHO2JIAUtg==
-X-Received: by 2002:a05:600c:1c1e:b0:421:2c02:9779 with SMTP id 5b1f17b1804b1-4212e0c55c3mr82014925e9.4.1717450029553;
-        Mon, 03 Jun 2024 14:27:09 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.205.146.dynamic.barak-online.net. [85.65.205.146])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42134f12e72sm100165345e9.34.2024.06.03.14.27.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jun 2024 14:27:09 -0700 (PDT)
-Message-ID: <86e60615-9286-4c9c-bffc-72304bd3cc1f@grimberg.me>
-Date: Tue, 4 Jun 2024 00:27:06 +0300
+	s=arc-20240116; t=1717461770; c=relaxed/simple;
+	bh=zeQo/iYSHJhiMzdVXgk2M6AYXyLP0PszcyyTEven13o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LmXszyj7OSAFDpoIUr0wAzb7QU3ejYB/Ub0UPu/h9hlnQ41w7ER1NJmgYWifcftMzO9fp5RDDXfFqVB6nQipoSqsF9qoOybk7qymDPbE7UbITHibCAinsaY9A8fh5cpswvoMz/mmGgR+sPljHryP+eTodeQWJ+Dv51WStzZ+FMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=q7+WDB38; arc=none smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="q7+WDB38"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1717461768; x=1748997768;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zeQo/iYSHJhiMzdVXgk2M6AYXyLP0PszcyyTEven13o=;
+  b=q7+WDB38fAnOLuPK9V1qEEs23Ydkm0Wk4Vlg+w5XKZ53Nv9ALgYtAGBs
+   WbxlHCELs8x3+ai7gkUT2mHkPHGot7btoshHcvyf7UR3NIUPK7lS1IrdB
+   sOzUGYVOcnvknucWx+BHMjFfsgT80nXELBszDRUHfmTCz1kZ8LBOUd+5L
+   6erElqaiRZ6+tPxASlW6LIS/ADTduWWpEglYWKZfDFjSV5E+Yf1qTr77u
+   KhR4sjOUQIOGdHpc5Q7eqf7wqOdaZulsz71dLf5tpHfv1qjw6E7/6vg0u
+   BUv6VXPdkyKBj8zkbcRpG4qUnQ+bxBhQm/w/rLt9rSjLx7TP1SgNJSwTh
+   A==;
+X-CSE-ConnectionGUID: FRVlETQ6RFCsCg9f5t0lKQ==
+X-CSE-MsgGUID: vDTR39EtQJmYkictb4VW0g==
+X-IronPort-AV: E=Sophos;i="6.08,212,1712592000"; 
+   d="scan'208";a="18908789"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Jun 2024 08:42:42 +0800
+IronPort-SDR: 665e56ab_vE1EXoIhtV3vS7yKlt3iSzCZr1bXBuI0oN+R/mZ+H2KevxV
+ Ht0JNPmS4Mh8tGYMy6JX25Dy6+oVEJB0mnAnoow==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Jun 2024 16:50:03 -0700
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip02.wdc.com with ESMTP; 03 Jun 2024 17:42:42 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] README: add dependent command descriptions
+Date: Tue,  4 Jun 2024 09:42:41 +0900
+Message-ID: <20240604004241.218163-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: introduce helper sendpages_ok()
-To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org
-Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
- kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, philipp.reisner@linbit.com,
- lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
- idryomov@gmail.com, xiubli@redhat.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240530142417.146696-2-ofir.gal@volumez.com>
- <8d0c198f-9c15-4a8f-957a-2e4aecddd2e5@grimberg.me>
- <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
->> I still don't understand how a page in the middle of a contiguous range ends
->> up coming from the slab while others don't.
-> I haven't investigate the origin of the IO
-> yet. I suspect the first 2 pages are the superblocks of the raid
-> (mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the bitmap.
+Even though many test cases assume the availability of the systemd-udev
+service and the udevadm command, this dependency is not described. Add
+it to the dependency list. Also add optional dependencies to other
+commands: mkfs.f2fs, mkfs.btrfs, nvme, nbd-client and nbd-server.
 
-Well, if these indeed are different origins and just *happen* to be a 
-mixture
-of slab originated pages and non-slab pages combined together in a 
-single bio of a bvec entry,
-I'd suspect that it would be more beneficial to split the bvec 
-(essentially not allow bio_add_page
-to append the page to tail bvec depending on a queue limit (similar to 
-how we handle sg gaps).
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ README.md | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
->
->> Ofir, can you please check which condition in sendpage_ok actually fails?
-> It failed because the page has slab, page count is 1. Sorry for not
-> clarifying this.
->
-> "skbuff: !sendpage_ok - page: 0x54f9f140 (pfn: 120757). is_slab: 1, page_count: 1"
->                                                                   ^
-> The print I used:
-> pr_info(
->      "!sendpage_ok - page: 0x%p (pfn: %lx). is_slab: %u, page_count: %u\n",
->      (void *)page,
->      page_to_pfn(page),
->      page_address(page),
->      !!PageSlab(page),
->      page_count(page)
-> );
->
->
+diff --git a/README.md b/README.md
+index 09fbb1e..55227d9 100644
+--- a/README.md
++++ b/README.md
+@@ -19,12 +19,15 @@ The dependencies are minimal, but make sure you have them installed:
+ - fio
+ - gcc
+ - make
++- systemd-udev (udevadm)
+ 
+ Some tests require the following:
+ 
+-- e2fsprogs and xfsprogs
++- e2fsprogs, xfsprogs, f2fs-tools and btrfs-progs
++- nvme-cli
+ - multipath-tools (Debian, openSUSE, Arch Linux) or device-mapper-multipath
+   (Fedora)
++- nbd-client and nbd-server (Debian) or nbd (Fedora, openSUSE, Arch Linux)
+ - dmsetup (Debian) or device-mapper (Fedora, openSUSE, Arch Linux)
+ - rublk (`cargo install --version=^0.1 rublk`) for ublk test
+ 
+-- 
+2.45.0
 
