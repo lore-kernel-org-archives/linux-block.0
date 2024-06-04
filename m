@@ -1,92 +1,227 @@
-Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48F3145FF7
-	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 09:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AD81448CD
+	for <linux-block@vger.kernel.org>; Tue,  4 Jun 2024 09:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717492180; cv=none; b=qq+oZmdKSiuWYUYPONU83oKn6xPRDEyKFexLZHZsLej2111gjt1+ePt9zokSZU+IroPfbcKvfRexYtrNFahaYq/Mo37LnAaukaHDFF8JGrKEyF3aTY5hiFdlJd+RERaTMSNuNvpdrV91jSyf24f/GlRrwt2WzL66cFzAYpZ5fVU=
+	t=1717495200; cv=none; b=JperIeJLti4vWy7AS9lCGjf2+KchPf56vxFkLMm8wVFIIG+24UFbTbu6eR3O6QZhJBEgtu8i/RkXZQesqZ5reU6odiyjUJvzBCsGWqIdciMbSp+/8USFVl0Ykv2jg+Uh6613yuGhz1NDLxxy6FoqRN5Aftk59qF1YCvGlTIEKRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717492180; c=relaxed/simple;
-	bh=6Lig3/RUqPr/Yl8BoQ0K6Cf2+zHtdA6WNn4Y6WBWyU0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KSxiSlePy9lg+hmEWlcXJQ2tHdgNYXP7NrFe8htOjvktLnYaicWwqVQtLxFdkr2a9VEzqndp0IKZ3XFuEwCG+YBbukJ+vZ30my7XEGLnOos3RcnIkDVIve8KzKiB3rVZp/iLytfhbFNDHtQvRr10bjjk2jl1idOnZS8sMnfp/mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 45498bSQ008201;
-	Tue, 4 Jun 2024 17:08:37 +0800 (+08)
-	(envelope-from Zhiguo.Niu@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4Vtl5z3kdMz2R5sl0;
-	Tue,  4 Jun 2024 17:04:39 +0800 (CST)
-Received: from BJMBX02.spreadtrum.com (10.0.64.8) by BJMBX01.spreadtrum.com
- (10.0.64.7) with Microsoft SMTP Server (TLS) id 15.0.1497.23; Tue, 4 Jun 2024
- 17:08:36 +0800
-Received: from BJMBX02.spreadtrum.com ([fe80::c8c3:f3a0:9c9f:b0fb]) by
- BJMBX02.spreadtrum.com ([fe80::c8c3:f3a0:9c9f:b0fb%19]) with mapi id
- 15.00.1497.023; Tue, 4 Jun 2024 17:08:36 +0800
-From: =?utf-8?B?54mb5b+X5Zu9IChaaGlndW8gTml1KQ==?= <Zhiguo.Niu@unisoc.com>
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Christoph
- Hellwig" <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
-        =?utf-8?B?546L55qTIChIYW9faGFvIFdhbmcp?= <Hao_hao.Wang@unisoc.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggdjIgMi8yXSBibG9jay9tcS1kZWFkbGluZTogRml4?=
- =?utf-8?Q?_the_tag_reservation_code?=
-Thread-Topic: [PATCH v2 2/2] block/mq-deadline: Fix the tag reservation code
-Thread-Index: AQHap2kizicYyTkUFUm9uy0mwBNrX7GZ2t6AgB2RWFA=
-Date: Tue, 4 Jun 2024 09:08:36 +0000
-Message-ID: <8bdfaa1201874892b166a5b5c59ee9c7@BJMBX02.spreadtrum.com>
-References: <20240509170149.7639-1-bvanassche@acm.org>
- <20240509170149.7639-3-bvanassche@acm.org>
- <fcaa5844-e2fb-41d6-8a38-2e318b3e3311@vivo.com>
- <c9900a6e-889d-4b7c-8aba-4ab1a89c3672@acm.org>
-In-Reply-To: <c9900a6e-889d-4b7c-8aba-4ab1a89c3672@acm.org>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1717495200; c=relaxed/simple;
+	bh=ojWCF20cfUoiMtLqDIeUZ96Ul+Nd3RwITJw/ORXbDbc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GfhVsvnrYsiPvphOn2y3zZ8FN8LImt1Ksi8WVB8edCXwTLS0gTVOo7RL3B2SxZ0poDN41+ecwzUK/tVFdcu7jnYv+zjmakIOFkaTuzLNg3cc0fFTB0tiIj6nZXnVS2aUgkRELy7kL385jFcKaj5QJWYPp+Ry8OASh4fab9EqmPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=YgXe1opa; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="YgXe1opa"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-57a6fcb823fso1593646a12.3
+        for <linux-block@vger.kernel.org>; Tue, 04 Jun 2024 02:59:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1717495196; x=1718099996; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NIq/eUO9YgOB4ouX5wft1IfVxCcuFVt84XqSDqsem4E=;
+        b=YgXe1opacThhBRASQJwpscZaF/tEgG1LG33rXLo3BpRu9hTkLUwxt0J6rI/zAXEk7z
+         XX6UHIQrSij5pwyWtjV+OFbtZQcwga6UTYdc3ThO6qbI/pTexKAqZooQhqRyHyuUBNHS
+         bR/IsfWiWZEQ9WKwG1TE+CjG3i12C3qv6tOPs5lIADpqiG0GkTpHnBA9gs+iALgzZ+Hp
+         DerLvIOZ7vIyP0EpvCQ5+tKouonIze8jyKUgizkE7Y86shIeCNGA/npaVxKEcS2QtMLR
+         XKmY7BIdaPiBIgMnymRC/BMkCqul9w/H4AeMVE8buHGYddxZgJS3FkKfvdH1hETkQLD5
+         kbvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717495196; x=1718099996;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NIq/eUO9YgOB4ouX5wft1IfVxCcuFVt84XqSDqsem4E=;
+        b=gzWpuAMgiAXNj9TN+bx33kwR4cL20w4aB3Sc5mLUQVHKk4s4YV/LnTW9bgCMnMzxzh
+         zlcTMTsOx3FHDrM50CgU9JDAhNsKGPrruTGkhiD77J9EWZbehDm5p8V3cmRHIVYNQHDM
+         ijMbwAawQd/+hla5LhJtaahOoV+VIKELb33jaDX1jGL5qxX9NKE2KHIu7RY741fXyGNR
+         TIqN3UKo7jn/mz5QzBFr+uDGrTbEqTCFAuODx9ERU4QijeJbtZbWO8mlDeqR6JOvUgdx
+         r0qWdqiYTceeC7Q7N9fBb7mswEtaVJKJYa/G+XmAuQw6Pe/xDWZrYpEKH0L33LV2SpDi
+         1XYw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCA+74bZqbcJ1p+N/QfwS2jewUFtnrlY6Lg2UFTVjCL80cVB8OWOQlPK58kbHueRxssMKsqjJt+T7MufpA0Lrrvsu29Bw6EZedFOY=
+X-Gm-Message-State: AOJu0Yw5QvZitCoGP33L8st88StL/PyTGJ/U8cEMa+VLKQZyPtQiingv
+	WQanIGYsKzNxHI/BTeUxRJGJU+RnyCkVwNLcR+LQTrXqOR2tjjSLeafDkV1zgv8=
+X-Google-Smtp-Source: AGHT+IH5c8gvgpxeYJR9DYjfzyPr9/QZPrSpme+Az/DADz5sutMsuFt/AqEGuTF3K5Xc2qa5/1JKTQ==
+X-Received: by 2002:a17:906:6807:b0:a68:bae4:94d3 with SMTP id a640c23a62f3a-a68bae49c1fmr545115966b.8.1717495195916;
+        Tue, 04 Jun 2024 02:59:55 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a67e6f03b7esm594011066b.2.2024.06.04.02.59.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 02:59:55 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,  Keith
+ Busch <kbusch@kernel.org>,  Damien Le Moal <dlemoal@kernel.org>,  Bart Van
+ Assche <bvanassche@acm.org>,  Hannes Reinecke <hare@suse.de>,  Ming Lei
+ <ming.lei@redhat.com>,  "linux-block@vger.kernel.org"
+ <linux-block@vger.kernel.org>,  Andreas Hindborg <a.hindborg@samsung.com>,
+  Wedson Almeida Filho <wedsonaf@gmail.com>,  Greg KH
+ <gregkh@linuxfoundation.org>,  Matthew Wilcox <willy@infradead.org>,
+  Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
+  Boqun Feng <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,
+  =?utf-8?Q?Bj=C3=B6rn?=
+ Roy Baron <bjorn3_gh@protonmail.com>,  Alice Ryhl <aliceryhl@google.com>,
+  Chaitanya Kulkarni <chaitanyak@nvidia.com>,  Luis Chamberlain
+ <mcgrof@kernel.org>,  Yexuan Yang <1182282462@bupt.edu.cn>,  Sergio
+ =?utf-8?Q?Gonz=C3=A1lez?= Collado <sergio.collado@gmail.com>,  Joel
+ Granados
+ <j.granados@samsung.com>,  "Pankaj Raghav (Samsung)"
+ <kernel@pankajraghav.com>,  Daniel Gomez <da.gomez@samsung.com>,  Niklas
+ Cassel <Niklas.Cassel@wdc.com>,  Philipp Stanner <pstanner@redhat.com>,
+  Conor Dooley <conor@kernel.org>,  Johannes Thumshirn
+ <Johannes.Thumshirn@wdc.com>,  Matias =?utf-8?Q?Bj=C3=B8rling?=
+ <m@bjorling.me>,  open list
+ <linux-kernel@vger.kernel.org>,  "rust-for-linux@vger.kernel.org"
+ <rust-for-linux@vger.kernel.org>,  "lsf-pc@lists.linux-foundation.org"
+ <lsf-pc@lists.linux-foundation.org>,  "gost.dev@samsung.com"
+ <gost.dev@samsung.com>
+Subject: Re: [PATCH v4 1/3] rust: block: introduce `kernel::block::mq` module
+In-Reply-To: <925fe0fe-9303-4f49-b473-c3a3ecc5e2e6@proton.me> (Benno Lossin's
+	message of "Mon, 03 Jun 2024 18:26:08 +0000")
+References: <20240601134005.621714-1-nmi@metaspace.dk>
+	<20240601134005.621714-2-nmi@metaspace.dk>
+	<b6b8e3e6-a2b9-4ddd-bf0f-e924d5d65653@proton.me>
+	<87mso2me0p.fsf@metaspace.dk>
+	<925fe0fe-9303-4f49-b473-c3a3ecc5e2e6@proton.me>
+Date: Tue, 04 Jun 2024 11:59:49 +0200
+Message-ID: <87y17lqb8q.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MAIL:SHSQR01.spreadtrum.com 45498bSQ008201
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-SGkgQmFydCBWYW4gQXNzY2hlIGFuZCBKZW5zIEF4Ym9lDQoNClNvcnJ5IHRvIGRpc3R1cmIgeW91
-Lg0KV291bGQgeW91IGhhdmUgYSBwbGFuIFdoZW4gd2lsbCB0aGVzZSBwYXRjaCBzZXRzIGJlIG1l
-cmdlZCBpbnRvIHRoZSBtYWlubGluZT8gDQpUaGFua3MhDQoNCi0tLS0t6YKu5Lu25Y6f5Lu2LS0t
-LS0NCuWPkeS7tuS6ujogQmFydCBWYW4gQXNzY2hlIDxidmFuYXNzY2hlQGFjbS5vcmc+IA0K5Y+R
-6YCB5pe26Ze0OiAyMDI05bm0NeaciDE35pelIDU6MjgNCuaUtuS7tuS6ujogWWFuZ1lhbmcgPHlh
-bmcueWFuZ0B2aXZvLmNvbT4NCuaKhOmAgTogbGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnOyBD
-aHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT47IERhbWllbiBMZSBNb2FsIDxkbGVtb2FsQGtl
-cm5lbC5vcmc+OyDniZvlv5flm70gKFpoaWd1byBOaXUpIDxaaGlndW8uTml1QHVuaXNvYy5jb20+
-OyBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+DQrkuLvpopg6IFJlOiBbUEFUQ0ggdjIgMi8y
-XSBibG9jay9tcS1kZWFkbGluZTogRml4IHRoZSB0YWcgcmVzZXJ2YXRpb24gY29kZQ0KDQoNCuaz
-qOaEjzog6L+Z5bCB6YKu5Lu25p2l6Ieq5LqO5aSW6YOo44CC6Zmk6Z2e5L2g56Gu5a6a6YKu5Lu2
-5YaF5a655a6J5YWo77yM5ZCm5YiZ5LiN6KaB54K55Ye75Lu75L2V6ZO+5o6l5ZKM6ZmE5Lu244CC
-DQpDQVVUSU9OOiBUaGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBvdXRzaWRlIG9mIHRoZSBvcmdh
-bml6YXRpb24uIERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5
-b3UgcmVjb2duaXplIHRoZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4NCg0K
-DQoNCk9uIDUvMTYvMjQgMDI6MTQsIFlhbmdZYW5nIHdyb3RlOg0KPj4gQEAgLTUxMyw5ICs1Mjcs
-OSBAQCBzdGF0aWMgdm9pZCBkZF9kZXB0aF91cGRhdGVkKHN0cnVjdCBibGtfbXFfaHdfY3R4DQo+
-PiAqaGN0eCkNCj4+ICAgICAgIHN0cnVjdCBkZWFkbGluZV9kYXRhICpkZCA9IHEtPmVsZXZhdG9y
-LT5lbGV2YXRvcl9kYXRhOw0KPj4gICAgICAgc3RydWN0IGJsa19tcV90YWdzICp0YWdzID0gaGN0
-eC0+c2NoZWRfdGFnczsNCj4+IC0gICAgZGQtPmFzeW5jX2RlcHRoID0gbWF4KDFVTCwgMyAqIHEt
-Pm5yX3JlcXVlc3RzIC8gNCk7DQo+PiArICAgIGRkLT5hc3luY19kZXB0aCA9IHEtPm5yX3JlcXVl
-c3RzOw0KPj4gLSAgICBzYml0bWFwX3F1ZXVlX21pbl9zaGFsbG93X2RlcHRoKCZ0YWdzLT5iaXRt
-YXBfdGFncywNCj4+IGRkLT5hc3luY19kZXB0aCk7DQo+PiArICAgIHNiaXRtYXBfcXVldWVfbWlu
-X3NoYWxsb3dfZGVwdGgoJnRhZ3MtPmJpdG1hcF90YWdzLCAxKTsNCj4NCj4gSWYgc2JxLT5taW5f
-c2hhbGxvd19kZXB0aCBpcyBzZXQgdG8gMSwgc2JxLT53YWtlX2JhdGNoIHdpbGwgYWxzbyBiZSAN
-Cj4gc2V0IHRvIDEuIEkgZ3Vlc3MgdGhpcyBtYXkgcmVzdWx0IGluIGJhdGNoIHdha2V1cCBub3Qg
-d29ya2luZyBhcyBleHBlY3RlZC4NCg0KVGhlIHZhbHVlIG9mIHRoZSBzYnEtPm1pbl9zaGFsbG93
-X2RlcHRoIHBhcmFtZXRlciBtYXkgYWZmZWN0IHBlcmZvcm1hbmNlIGJ1dCBkb2VzIG5vdCBhZmZl
-Y3QgY29ycmVjdG5lc3MuIFNlZSBhbHNvIHRoZSBjb21tZW50IGFib3ZlIHRoZQ0Kc2JpdG1hcF9x
-dWV1ZV9taW5fc2hhbGxvd19kZXB0aCgpIGRlY2xhcmF0aW9uLiBJcyB0aGlzIHN1ZmZpY2llbnQg
-dG8gYWRkcmVzcyB5b3VyIGNvbmNlcm4/DQoNClRoYW5rcywNCg0KQmFydC4NCg==
+Benno Lossin <benno.lossin@proton.me> writes:
+
+[...]
+
+>>>> +impl<T: Operations> OperationsVTable<T> {
+>>>> +    /// This function is called by the C kernel. A pointer to this fu=
+nction is
+>>>> +    /// installed in the `blk_mq_ops` vtable for the driver.
+>>>> +    ///
+>>>> +    /// # Safety
+>>>> +    ///
+>>>> +    /// - The caller of this function must ensure `bd` is valid
+>>>> +    ///   and initialized. The pointees must outlive this function.
+>>>
+>>> Until when do the pointees have to be alive? "must outlive this
+>>> function" could also be the case if the pointees die immediately after
+>>> this function returns.
+>>=20
+>> It should not be plural. What I intended to communicate is that what
+>> `bd` points to must be valid for read for the duration of the function
+>> call. I think that is what "The pointee must outlive this function"
+>> states? Although when we talk about lifetime of an object pointed to by
+>> a pointer, I am not sure about the correct way to word this. Do we talk
+>> about the lifetime of the pointer or the lifetime of the pointed to
+>> object (the pointee). We should not use the same wording for the pointer
+>> and the pointee.
+>>=20
+>> How about:
+>>=20
+>>     /// - The caller of this function must ensure that the pointee of `b=
+d` is
+>>     ///   valid for read for the duration of this function.
+>
+> But this is not enough for it to be sound, right? You create an `ARef`
+> from `bd.rq`, which potentially lives forever. You somehow need to
+> require that the pointer `bd` stays valid for reads and (synchronized)
+> writes until the request is ended (probably via `blk_mq_end_request`).
+
+The statement does not say anything about `*((*bd).rq)`. `*bd` needs to
+be valid only for the duration of the function. It carries a pointer to
+a `struct request` in the `rq` field. The pointee of that pointer must
+be exclusively owned by the driver until the request is done.
+
+Maybe like this:
+
+# Safety
+
+- The caller of this function must ensure that the pointee of `bd` is
+  valid for read for the duration of this function.
+- This function must be called for an initialized and live `hctx`. That
+  is, `Self::init_hctx_callback` was called and
+  `Self::exit_hctx_callback()` was not yet called.
+- `(*bd).rq` must point to an initialized and live `bindings:request`.
+  That is, `Self::init_request_callback` was called but
+  `Self::exit_request_callback` was not yet called for the request.
+- `(*bd).rq` must be owned by the driver. That is, the block layer must
+  promise to not access the request until the driver calls
+  `bindings::blk_mq_end_request` for the request.
+
+[...]
+
+>>>> +    /// This function is called by the C kernel. A pointer to this fu=
+nction is
+>>>> +    /// installed in the `blk_mq_ops` vtable for the driver.
+>>>> +    ///
+>>>> +    /// # Safety
+>>>> +    ///
+>>>> +    /// This function may only be called by blk-mq C infrastructure. =
+`set` must
+>
+> `set` doesn't exist (`_set` does), you are also not using this
+> requirement.
+
+Would be nice if there was a way in `rustdoc` no name arguments
+explicitly.
+
+>
+>>>> +    /// point to an initialized `TagSet<T>`.
+>>>> +    unsafe extern "C" fn init_request_callback(
+>>>> +        _set: *mut bindings::blk_mq_tag_set,
+>>>> +        rq: *mut bindings::request,
+>>>> +        _hctx_idx: core::ffi::c_uint,
+>>>> +        _numa_node: core::ffi::c_uint,
+>>>> +    ) -> core::ffi::c_int {
+>>>> +        from_result(|| {
+>>>> +            // SAFETY: The `blk_mq_tag_set` invariants guarantee that=
+ all
+>>>> +            // requests are allocated with extra memory for the reque=
+st data.
+>>>
+>>> What guarantees that the right amount of memory has been allocated?
+>>> AFAIU that is guaranteed by the `TagSet` (but there is no invariant).
+>>=20
+>> It is by C API contract. `TagSet`::try_new` (now `new`) writes
+>> `cmd_size` into the `struct blk_mq_tag_set`. That is picked up by
+>> `blk_mq_alloc_tag_set` to allocate the right amount of space for each re=
+quest.
+>>=20
+>> The invariant here is on the C type. Perhaps the wording is wrong. I am
+>> not exactly sure how to express this. How about this:
+>>=20
+>>             // SAFETY: We instructed `blk_mq_alloc_tag_set` to allocate =
+requests
+>>             // with extra memory for the request data when we called it =
+in
+>>             // `TagSet::new`.
+>
+> I think you need a safety requirement on the function: `rq` points to a
+> valid `Request`. Then you could just use `Request::wrapper_ptr` instead
+> of the line below.
+
+I cannot require `rq` to point to a valid `Request`, because that would
+require the private data area to already be initialized as a valid
+`RequestDataWrapper`. Using the `wrapper_ptr` is good =F0=9F=91=8D. How is =
+this:
+
+
+    /// # Safety
+    ///
+    /// - This function may only be called by blk-mq C infrastructure.
+    /// - `_set` must point to an initialized `TagSet<T>`.
+    /// - `rq` must point to an initialized `bindings::request`.
+    /// - The allocation pointed to by `rq` must be at the size of `Request`
+    ///   plus the size of `RequestDataWrapper`.
+
+
+BR Andreas
