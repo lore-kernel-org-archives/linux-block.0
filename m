@@ -1,72 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF7F4CB36
-	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 19:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31517156C6D;
+	Wed,  5 Jun 2024 20:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717617063; cv=none; b=hnA+t3xa8jD6sEK7NLA1dP+jNez2j4EPfuAV458mQJGXMX051Dcov1y9n5ADtNNSzkO4wTA/HJZitsrjPd8MVEiuADK/XbhTwJ1tPCGesmv73TYdBt3KSrx65j7maHfRJTsGqF10AyifiQN5Dr4xiRMCa6f6cPiWevDbno6E/MY=
+	t=1717617949; cv=none; b=ct2V9KVC3ctEoN602385De4tUNVzjEU4SPaWlqrF9nC18NIZRAIckL/J83GJHmaG9Hhkt6nBQSZ/MvjmrNbfypUkFOXTHrhaWiiHxllHYbKouwHusPvw5s35CeESvZYrhCBicAVtPIkgWTb/OdBQUyQoW+6mmDI5Vs29EkVz4dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717617063; c=relaxed/simple;
-	bh=vdDPgOETrlIUEHKIjDm7sqX4QOdjEmevinvwmI0xP0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bp6zMFmCpjCZCZdwz3G0JbmG1H0DAAuZJzTTG8ZP9iXGWLM6KWY9HdXU1qqAGawW8aeWIphlchi6rspsu25UkgO6dN6SPHbIko6YAFk5F9b0zPR0GSKjziymqMKu+twr7h/kN3KUSGGsANCcyaEA2hS3tMLuIdoiKjJ6idFckQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S/0/K2Vy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1717617949; c=relaxed/simple;
+	bh=WIESEa30dZ/hQw4soSdWvR9FvT6kULeFPhCVwwSmx90=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NL4WKlciv/g1DtCSKCoIbd4p4fUySGrY0o11HHziMa4AoDDUVfjYVLV6JYxPKCL/liY6fTV4H+pTvPR2XgOVNVg/tk5iIZNLjaZ/oN/DCRagMfeELGGwFQRfXvcIhQ/5FkNIw7pGPgvFjjFQKgrWLHDN5Bnn32prgtnP7UD0YXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ib4C/EYZ; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S/0/K2Vy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717617060;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vdDPgOETrlIUEHKIjDm7sqX4QOdjEmevinvwmI0xP0U=;
-	b=S/0/K2Vyj+UgeOT6RdLYwGdkfpVYg1d3v5LCGdKyAYsaS2GmUIF5EJMxisXcoj+Wi922xm
-	dSn/OGWAuFlRA9OgU60cEBL6mBRhjxpQaJu+TOcUMfnrG/9y+MCD0G96u6KMZBRW0u+TsX
-	MfzaNmc0gj8jsZuHEcfKDOKGDfd37xw=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-360-U1cu7pIlNPKX-2lwW12HzQ-1; Wed,
- 05 Jun 2024 15:50:59 -0400
-X-MC-Unique: U1cu7pIlNPKX-2lwW12HzQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 98AA91953966;
-	Wed,  5 Jun 2024 19:50:57 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B0E81300060C;
-	Wed,  5 Jun 2024 19:50:56 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.17.2/8.17.1) with ESMTPS id 455JotT0617827
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 5 Jun 2024 15:50:55 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.17.2/8.17.2/Submit) id 455JotIY617826;
-	Wed, 5 Jun 2024 15:50:55 -0400
-Date: Wed, 5 Jun 2024 15:50:55 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v4 3/3] dm: Remove unused macro DM_ZONE_INVALID_WP_OFST
-Message-ID: <ZmDBn_YCyxNauhe4@redhat.com>
-References: <20240605075144.153141-1-dlemoal@kernel.org>
- <20240605075144.153141-4-dlemoal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ib4C/EYZ"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-250bbae0ff6so89851fac.0;
+        Wed, 05 Jun 2024 13:05:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717617947; x=1718222747; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q2sovYnnLqu3ePNoGdykaYCzoGX/KrvirZkk+6UfwMw=;
+        b=Ib4C/EYZYlPAUrGxUSnApAlreoDKQr7Lt9y0VFlcUqpTKeO9S2bkczC8zfGHxT2iDz
+         TNw1bNa1lveSpSnVMi4mpD86Ct1UGN6wEgoCTGZMmI08XHMmG/mWqaG6EpTOKLTUdd0X
+         0lVY3kEey4AG5jysU4Xr36dymRNTNZih8GFX1jesufkGH1lVEPRWBh1MENgh4it1Yei/
+         g7IyDREitdINhMWDzXZFAUYpGsUBWZAJ/pFsXQhw/pJ+Xl7obgRxI/v3h/MpTFjbvPxI
+         RPQ5KCBInDQk1Fn1uloYwPOR9vQaz1AszKtjCGrUlo4g4kIyoJLe5GiRK2O5YnEgDzwo
+         uwDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717617947; x=1718222747;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q2sovYnnLqu3ePNoGdykaYCzoGX/KrvirZkk+6UfwMw=;
+        b=D8R+eiGyZrqgwVDGpIBuUe7jyTF/AuDbMSOpFTGbOELs7fn+e2NSb7XkjIE6Nbn0LN
+         xgYdmi6E50P47jN+okbnr58xXmp3t9e9vxQulAM0cZxapDJQhm/qL8b+TTkm5DbEyjpE
+         1EjyiHuEu43Ry+CYtPLjILznVnQbaY8WLJrIH6ODJFI5ubXCJNNueWMc5t82PgUBTRL3
+         CqEMjJ4At67OTfKeXS4hrZHwLNkFNaOJ5I8MVxYO3yuLyrdm2Halo2X5WHKGsATo1ape
+         a7wB8GKyueb3ZfxZjNeYDzamD6K+wB70j3glT6AMth4oSJ1oF4ZOJ5pWiSXdvJnUbtss
+         ohVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+Z69hKLq94264v2YjBPS9oQIPj+p1fkTK9ltryHr7EgDJvdB+xkNp4ggBnvSj4UpmGgZPcObBIoUmzs9cJtPgFWnvMOLItFJ3NpRRMr0R7fpfFyNvcxtaqmAQr8rz7ovTv98rBIu7A+iAC81I8lL2zJ25xOEFwmZ2eRT+awlSsyYiZw==
+X-Gm-Message-State: AOJu0Ywjm7QRaw4d30kvndCBQ89CAE5SNGvV/AjsAzOPmraGB2jqbTm5
+	0YqJEeM0sNlWPLZeG3R6fYpnKYFfU2D6qJn9v80rL+p5cz/ielKgrq/G8vlRGIHs8/0pUs03aQK
+	Y4Cg4puH2sM/rzH2om0C52b/XQO8=
+X-Google-Smtp-Source: AGHT+IGyVhO7rSQAoGDSB+vjloBrx705BG5D6fs1Cr4EcslfrxplrQUigFncTawwbH2U8MnF7SOq8ImGhCk8Gp1b7A4=
+X-Received: by 2002:a05:6871:738f:b0:24c:4f83:48da with SMTP id
+ 586e51a60fabf-254407aeaf0mr366594fac.16.1717617947176; Wed, 05 Jun 2024
+ 13:05:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605075144.153141-4-dlemoal@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20240605063031.3286655-1-hch@lst.de> <20240605063031.3286655-5-hch@lst.de>
+In-Reply-To: <20240605063031.3286655-5-hch@lst.de>
+From: Kanchan Joshi <joshiiitr@gmail.com>
+Date: Wed, 5 Jun 2024 20:05:20 +0530
+Message-ID: <CA+1E3rJn3uNfkoFtm_am9qwQmwWvhu3nPVMaM63AJ2GBdxZTmQ@mail.gmail.com>
+Subject: Re: [PATCH 04/12] block: remove the blk_integrity_profile structure
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>, 
+	Yu Kuai <yukuai3@huawei.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>, 
+	Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org, 
+	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Benjamin Marzinski <bmarzins@redhat.com>
+On Wed, Jun 5, 2024 at 12:01=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
+e:
+> @@ -446,13 +446,14 @@ bool bio_integrity_prep(struct bio *bio)
+>         if (bio_integrity(bio))
+>                 return true;
+>
+> +       if (!bi->csum_type)
+> +               return true;
 
+Changes look mostly good, but trigger a behavior change for non-PI
+metadata format.
+
+Earlier nop profile was registered for that case. And the block-layer
+continued to attach an appropriately sized meta buffer to incoming IO, even
+though it did not generate/verify. Hence, IOs don't fail.
+
+Now also we show that the nop profile is set, but the above
+"csum_type" check ensures that
+meta buffer is not attached and REQ_INTEGRITY is not set in the bio.
+NVMe will start failing IOs with BLK_STS_NOTSUPP now [*].
+
+[*]
+     if (!blk_integrity_rq(req)) {
+             if (WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)))
+                     return BLK_STS_NOTSUPP;
+             control |=3D NVME_RW_PRINFO_PRACT;
+     }
