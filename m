@@ -1,52 +1,85 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39EF1922D5;
-	Wed,  5 Jun 2024 07:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F33218F2C1;
+	Wed,  5 Jun 2024 07:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717572468; cv=none; b=BSw16IcKCYF6A5NoZ7b5jhTdO9YbheKH1d7N2nqtXYA3X1Rva5FAP5HaeV1Vat1+PCK4itOzSJ2Sg44IgAWHZaZOyUnOE6G5BkwveyOhS8U4FnD40t0Dz++N0fy480AvzymCz2xnsO5N62Jxf9JbrFm35yQ5ammapVLV74t9ZVw=
+	t=1717573908; cv=none; b=ZGbSQMQjwnD3D/k8KyXlaejTtwZte2Bmq6xl4XOXJoeCRmc9Gt8OXcbg0fO2wOAYjMRGH3GCGy0jYopL3EMYu1GVqIh7+WAEC4JkGXDhjAToi9bA12St0+nZbM8xWJuMGa8OmBsSzC+5CtejztYPFr1if+4+OtvDMCX+FtMkqz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717572468; c=relaxed/simple;
-	bh=8LUykD/62bGMRfd/a9I1PHICud17UdPvZyyzW9ay8wM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pn/Htn1V3OYFJanM6koYswBZ4zfYlgJIBfwMO5vOnc+SeGNUA/1O87FIEOq8YupWJCpSOYCmZw/l9np/oTWFwjuhrbh4TDPKuzTOC7B2Kb0XiEkWuvPXTOLcqm5ySkpBl/ZGOItdlfn+HhEc0W1Fi5vDGnB/ERb1JIuPHlR0248=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6002E68D0D; Wed,  5 Jun 2024 09:27:43 +0200 (CEST)
-Date: Wed, 5 Jun 2024 09:27:42 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Ofir Gal <ofir.gal@volumez.com>,
-	davem@davemloft.net, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
-	ceph-devel@vger.kernel.org, dhowells@redhat.com,
-	edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org,
-	axboe@kernel.dk, sagi@grimberg.me, philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-	idryomov@gmail.com, xiubli@redhat.com
-Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-Message-ID: <20240605072742.GA16306@lst.de>
-References: <20240530142417.146696-1-ofir.gal@volumez.com> <20240531073214.GA19108@lst.de> <20240601153610.30a92740@kernel.org> <20240604043041.GA28886@lst.de> <20240604074224.44668dab@kernel.org>
+	s=arc-20240116; t=1717573908; c=relaxed/simple;
+	bh=jV6l/P6zCV6JbpSpn+l4qDidPcLYWrZhNbtmcZ6dNcI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mutuaOLpDumEJxZ6NRpGtNd3E8d6uT9PCJ+sGCc21Rs1e1sDLYMAquXeOToGEP0XHk4wYF6S5oKAD1j3sqwaoDppdI06I+JXkuSNjwRopM3iQr0VKUnjSc0tc5HgNp6C2rkNMU3Trim23fGT97418xvxflx3kxZuf/mNpO6u3Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VmNAX0UP; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VmNAX0UP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDCEBC3277B;
+	Wed,  5 Jun 2024 07:51:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717573907;
+	bh=jV6l/P6zCV6JbpSpn+l4qDidPcLYWrZhNbtmcZ6dNcI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VmNAX0UPqQeBm2ifuTk9sUMICX2t1YIuRa3IG002Cyo0CgJ0ag7KfZLjA2hIXrnPn
+	 j4fXb5XEsM90FCFNebgtriOMkEqMCTEEe5b+rVBgR8Vf2i0u9Pb1qStAw7XuHSFrvz
+	 kfA4Cb2x08YfZrJeWeOtizkFhTs+iOzMXx3uv9TT+v/WNFEnqx4L3zbuYKtv1q8GMP
+	 A5WLw/M7kffOcyslxy+EnU2S3zHHRpLXHF0KY2WzJQ9eNRa4eZ6NosIbWbTJzgkrTw
+	 PrvszlFhvWB+3Zohgy3skucM6gan98OMg7i6WmtfB/BQqw6+9X+Vtf2ciqY38EDqGa
+	 BI2/vF6C5eB/A==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Benjamin Marzinski <bmarzins@redhat.com>
+Subject: [PATCH v4 0/3] Fix DM zone resource limits stacking
+Date: Wed,  5 Jun 2024 16:51:41 +0900
+Message-ID: <20240605075144.153141-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240604074224.44668dab@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 04, 2024 at 07:42:24AM -0700, Jakub Kicinski wrote:
-> I'd guess the thinking was that if we push back the callers would
-> switch the relevant allocations to be page-backed. But we can add
-> a comment above the helper that says "you'd be better off using
-> page frags and calling sendmsg(MSG_SPLICE_PAGES) directly".
+This is the updated patch 4/4 of the series "Zone write plugging and DM
+zone fixes". This patch fixes DM zone resource limits stacking (max open
+zones and max active zones limits). Patch 1 is new and is added to help
+catch problems and eventual regressions of the handling of these limits.
 
-That's just not how network block devices or file systems work, they
-don't control the allocations and need to take what gets fed to them.
+Changes from v3:
+ - Modify patch 1 to always check the zone resource limits values in
+   disk_update_zone_resources(), including for DM devices that do not
+   use zone write plugging. Simplify patch 2 accordingly by removing the
+   same check and adjustment of the zone resource limits.
+ - Added patch 3
+
+Changes from v2:
+ - Modify patch 1 to return an error for the case where the max open
+   zones limit is greater than the max active zones limit.
+ - Modify patch 2 to avoid duplicated actions on the limits and to
+   remove warnings for unusual zone limits.
+
+Changes from v1:
+ - Added patch 1
+ - Modified patch 2 to not cap the limits for a target with the number
+   of sequential zones mapped but rather to use the device limits as is
+   when more zones than the limits are mapped and 0 otherwise (no
+   limits).
+
+Damien Le Moal (3):
+  block: Improve checks on zone resource limits
+  dm: Improve zone resource limits handling
+  dm: Remove unused macro DM_ZONE_INVALID_WP_OFST
+
+ block/blk-settings.c |   8 ++
+ block/blk-zoned.c    |  20 ++++-
+ drivers/md/dm-zone.c | 206 +++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 191 insertions(+), 43 deletions(-)
+
+-- 
+2.45.1
+
