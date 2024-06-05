@@ -1,237 +1,171 @@
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993B01946BE;
-	Wed,  5 Jun 2024 08:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9774963B
+	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 09:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717577150; cv=none; b=g0ot0mtEYwHXTU0gTll3H+Tw9gZdY69hlmH4jheT7ehqhyYjVh8CEipcFNBQrzAAK2CiesFUANaH66KZMIBT8yY6E/b/sMbnD6IRKEHhK5BYSo7n8RqMbFxsNkR8Lao3jIRgP7qkFj+h7HRZ5lE7gnJOdkZ13lxRECEvCnfCZ5k=
+	t=1717580846; cv=none; b=gEMqynfHGjLZIapL9dFKvG6ch+vyHastmkTCGFs8pMveW/VDTv+KfZe6eJYPLJb19VSIESHJriEIXJs1uIrO/FdtD7GgqFLySdWSB+E+uARZpN2HfJsR45RMiG+i2pocNWlfcXBpYYB+Jp5pG5REH6R9MXZUdDCuL3E61zoigvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717577150; c=relaxed/simple;
-	bh=YEOpsdHHq6I5JBM3c1MylljJlTQL7qXCqWOU+JPKB04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DmuzW10aECJC6l3gM6PwErXrNgssizb5OO03rAhxoDluW0R+DZqPSAWONB/048vTK1hbkFg4mGxbnqSwtffVQDJXCWkDTYJDhzxG4o2j5tnK61VwR2h5fkqPbyZA2odYrRgDEBkylq6lfPVUr+PRIzUQBcp5tO9Vb0NTzQKlwCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 0EDBF44D00;
-	Wed,  5 Jun 2024 10:45:44 +0200 (CEST)
-Message-ID: <c9d03ff7-27c5-4ebd-b3f6-5a90d96f35ba@proxmox.com>
-Date: Wed, 5 Jun 2024 10:45:42 +0200
+	s=arc-20240116; t=1717580846; c=relaxed/simple;
+	bh=jphH6dwz1cNPfoL0yTl66O88ntqJUjdtffNc/I3p/rc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=p2YslxPJRBdMAbfha1mSgjD/tiz9NI3ZZzZKqPxzVzNWNkruMuy7Cb1QkEmurjq2Oc5GOTZXzH2utJOdLtVWYoL62cRSOrevS3y/C9Z8oH3fkEEvgE2C6SNp1Eqb/ovpbuITZMZmgfVk3IBipG5sHreRcPrljg2H5Sr8YnWahx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=fzGizY3h; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="fzGizY3h"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240605094721epoutp03d36be791310b667c5c333918b206f9bc~WEqzTMQLh1503815038epoutp03Y
+	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 09:47:21 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240605094721epoutp03d36be791310b667c5c333918b206f9bc~WEqzTMQLh1503815038epoutp03Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1717580841;
+	bh=74u9IHD4jU2yLvZgFueYmVwx6n9tO2kSu7pq0WcDg1Y=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=fzGizY3hhcUxdK5p8Elyvbws4PruBA35fr6OM3f9uL8zkI0HPY+yqzwPipWuuYhT1
+	 4ThdM92TvPNBTMp4woetAqnXJ0fZKsMQXWPRACAjX412XTgAkfqfRTCmFOvJ5u4tVA
+	 0cM+SurXn5wrYgs4euxQ1JiXXtd/b8upuH7nBHaw=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240605094720epcas5p1f8cbeea3f41258661d136eeafb4acc70~WEqyBsLt_1854718547epcas5p1C;
+	Wed,  5 Jun 2024 09:47:20 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.180]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4VvN0k2gpyz4x9Px; Wed,  5 Jun
+	2024 09:47:18 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	10.61.19174.62430666; Wed,  5 Jun 2024 18:47:18 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240605093220epcas5p18c9f9d8fe89f53f91f7c1c2464b07a65~WEdsa59Tm0833108331epcas5p1b;
+	Wed,  5 Jun 2024 09:32:20 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240605093220epsmtrp1b04afe6fce8d9de3f8231c80296aa4c4~WEdsZeekL2905729057epsmtrp1T;
+	Wed,  5 Jun 2024 09:32:20 +0000 (GMT)
+X-AuditID: b6c32a50-87fff70000004ae6-69-666034263dbc
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	6D.4E.07412.4A030666; Wed,  5 Jun 2024 18:32:20 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240605093218epsmtip2e7c4e532148132f3711da229deaaaf33~WEdqntE3X3189331893epsmtip2i;
+	Wed,  5 Jun 2024 09:32:18 +0000 (GMT)
+From: Kundan Kumar <kundan.kumar@samsung.com>
+To: axboe@kernel.dk, hch@lst.de, willy@infradead.org, kbusch@kernel.org
+Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com, Kundan Kumar <kundan.kumar@samsung.com>
+Subject: [PATCH v4 0/2] block: add larger order folio instead of pages
+Date: Wed,  5 Jun 2024 14:54:53 +0530
+Message-Id: <20240605092455.20435-1-kundan.kumar@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: fix request.queuelist usage in flush
-To: Chengming Zhou <chengming.zhou@linux.dev>, axboe@kernel.dk,
- ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- zhouchengming@bytedance.com
-References: <20240604064745.808610-1-chengming.zhou@linux.dev>
-Content-Language: en-US
-From: Friedrich Weber <f.weber@proxmox.com>
-In-Reply-To: <20240604064745.808610-1-chengming.zhou@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHJsWRmVeSWpSXmKPExsWy7bCmhq6aSUKawfIrQhZNE/4yW6y+289m
+	8X17H4vFzQM7mSxWrj7KZHH0/1s2i0mHrjFabP3yldVi7y1tixsTnjJabPs9n9ni9485bA48
+	HptXaHlcPlvqsWlVJ5vH7psNbB59W1YxenzeJBfAFpVtk5GamJJapJCal5yfkpmXbqvkHRzv
+	HG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQN0oZJCWWJOKVAoILG4WEnfzqYov7QkVSEjv7jE
+	Vim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO+PVRr2ClcIV73c3sjYwruTvYuTkkBAw
+	kdhz4B5TFyMXh5DAHkaJm6desEM4nxgl/rc9ZoRwvjFK/N5xGyjDAdby600WRHwvo8Spee+h
+	Oj4zSrROO8QKUsQmoCvxoykUZIWIgLvE1JePwAYxC5xllDgx9RELSEJYwE2ie+dRNhCbRUBV
+	4u3Ek+wgNq+ArcTU1b+ZIe6Tl5h56TtUXFDi5MwnYL3MQPHmrbOZQYZKCPxkl7h0/zILRIOL
+	xJQJj5kgbGGJV8e3sEPYUhIv+9ug7GyJQ40boGpKJHYeaYCK20u0nupnBnmAWUBTYv0ufYiw
+	rMTUU+uYIPbySfT+fgLVyiuxYx6MrSYx591UqBNkJBZemgEV95BY2n4Y7BchgViJX7dnsE9g
+	lJ+F5J1ZSN6ZhbB5ASPzKkap1ILi3PTUZNMCQ9281HJ4xCbn525iBCdUrYAdjKs3/NU7xMjE
+	wXiIUYKDWUmE1684Pk2INyWxsiq1KD++qDQntfgQoykwkCcyS4km5wNTel5JvKGJpYGJmZmZ
+	iaWxmaGSOO/r1rkpQgLpiSWp2ampBalFMH1MHJxSDUwLJr/JPZPNc4mzfOncumdM9Tw5b9gv
+	hE17IJ1z+k+w+bPCGA0Dx5nB9n4n4gyuVi17a+dldidvRSmnw65kFum2OVNDpbLKTZ/tFmWe
+	G3i5g832h5IVn11vBmf5q787jm+r+NRX0ndPouWgF4cqy9Jek/IaV5P+S4mbLXPfCW2JSbH7
+	J/oxL60sfGXSho3CJ+da7/r3hk+5WKlEyYZhZ2XtussJ33NUHVZym6zqcK1YqMgiUyOafE5W
+	QD7h9eXg039cV3G+dAn4E1Nwr/aRvavy9i63l6bbxYu0Q3Jut5hXf1cK7Ta525Qbzfz55PnG
+	mn+sG57NNkx6/8zeyPXf58v9JfHJjQ7vZDSD5l5SYinOSDTUYi4qTgQA5YONJzEEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrOLMWRmVeSWpSXmKPExsWy7bCSvO4Sg4Q0g7NvFSyaJvxltlh9t5/N
+	4vv2PhaLmwd2MlmsXH2UyeLo/7dsFpMOXWO02PrlK6vF3lvaFjcmPGW02PZ7PrPF7x9z2Bx4
+	PDav0PK4fLbUY9OqTjaP3Tcb2Dz6tqxi9Pi8SS6ALYrLJiU1J7MstUjfLoEr49VGvYKVwhXv
+	dzeyNjCu5O9i5OCQEDCR+PUmq4uRi0NIYDejxI8Fh9i6GDmB4jISu+/uZIWwhSVW/nvODmIL
+	CXxklLg+jxekl01AV+JHUyhIWETAV2LBhueMIHOYBa4zStyYvpUZJCEs4CbRvfMo2EwWAVWJ
+	txNPgs3hFbCVmLr6NzPEfHmJmZe+Q8UFJU7OfMICYjMDxZu3zmaewMg3C0lqFpLUAkamVYyS
+	qQXFuem5yYYFhnmp5XrFibnFpXnpesn5uZsYwWGtpbGD8d78f3qHGJk4GA8xSnAwK4nw+hXH
+	pwnxpiRWVqUW5ccXleakFh9ilOZgURLnNZwxO0VIID2xJDU7NbUgtQgmy8TBKdXAxGmiUXhd
+	573r1ftGc3Ye5TpvHDjd8NxZh7UnctZ13uyd2XazI0PT73CUamdVMXtP5/3Xtgmi0hcai47F
+	e+vtXdqY/L0lfsf/3Eaeqc7iDT3erf3x1sdWJJf8EjP47XMllsv1YvHVCAabU9Mq9qvpTM04
+	G+S761+U7mvW9ZW+ia1qm0sX2k6eN/f+uuQXp3gbeQ5PzTopVxCT8T+61vPCHZk5Z8NtAr0D
+	uict2yO44+je0IfyDWaLz/nvPH478Ni+utqjR9O/3rodrnTpwgHeCO0LM7/NucSQpTAjPX/N
+	nYaEFe73PDfavOYuEX/76H+LfaSHmW+H7KagG9NWNy4yrn1ddKjjXva2mxMtL1ocUGIpzkg0
+	1GIuKk4EAEc7mcbaAgAA
+X-CMS-MailID: 20240605093220epcas5p18c9f9d8fe89f53f91f7c1c2464b07a65
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240605093220epcas5p18c9f9d8fe89f53f91f7c1c2464b07a65
+References: <CGME20240605093220epcas5p18c9f9d8fe89f53f91f7c1c2464b07a65@epcas5p1.samsung.com>
 
-Hi,
+User space memory is mapped in kernel in form of pages array. These pages
+are iterated and added to BIO. In process, pages are also checked for
+contiguity and merged.
 
-On 04/06/2024 08:47, Chengming Zhou wrote:
-> Friedrich Weber reported a kernel crash problem and bisected to commit
-> 81ada09cc25e ("blk-flush: reuse rq queuelist in flush state machine").
-> 
-> The root cause is that we use "list_move_tail(&rq->queuelist, pending)"
-> in the PREFLUSH/POSTFLUSH sequences. But rq->queuelist.next == xxx since
-> it's popped out from plug->cached_rq in __blk_mq_alloc_requests_batch().
-> We don't initialize its queuelist just for this first request, although
-> the queuelist of all later popped requests will be initialized.
-> 
-> Fix it by changing to use "list_add_tail(&rq->queuelist, pending)" so
-> rq->queuelist doesn't need to be initialized. It should be ok since rq
-> can't be on any list when PREFLUSH or POSTFLUSH, has no move actually.
-> 
-> Please note the commit 81ada09cc25e ("blk-flush: reuse rq queuelist in
-> flush state machine") also has another requirement that no drivers would
-> touch rq->queuelist after blk_mq_end_request() since we will reuse it to
-> add rq to the post-flush pending list in POSTFLUSH. If this is not true,
-> we will have to revert that commit IMHO.
+When mTHP is enabled the pages generally belong to larger order folio. This
+patch series enables adding large folio to bio. It fetches folio for
+page in the page array. The page might start from an offset in the folio
+which could be multiples of PAGE_SIZE. Subsequent pages in page array
+might belong to same folio. Using the length of folio, folio_offset and
+remaining size, determine length in folio which can be added to the bio.
+Check if pages are contiguous and belong to same folio. If yes then skip
+further processing for the contiguous pages.
 
-Unfortunately, with this patch applied to kernel 6.9 I get a different
-crash [2] on a Debian 12 (virtual) machine with root on LVM on boot (no
-software RAID involved). See [1] for lsblk and findmnt output. addr2line
-says:
+This complete scheme reduces the overhead of iterating through pages.
 
-# addr2line -f -e /usr/lib/debug/vmlinux-6.9.0-patch0604-nodebuglist+
-blk_mq_request_bypass_insert+0x20
-blk_mq_request_bypass_insert
-[...]/linux/block/blk-mq.c:2456
+perf diff before and after this change:
 
-No crashes seen so far if the root is on LVM on top of software RAID, or
-if the root partition is directly on disk.
+Perf diff for write I/O with 128K block size:
+     1.32%     -0.33%  [kernel.kallsyms]  [k] bio_iov_iter_get_pages
+     1.78%             [kernel.kallsyms]  [k] bvec_try_merge_page
+Perf diff for read I/O with 128K block size:
+     3.99%     -1.61%  [kernel.kallsyms]  [k] bio_iov_iter_get_pages
+     5.21%             [kernel.kallsyms]  [k] bvec_try_merge_page
 
-If I can provide any more information, just let me know.
+Patch 1: Adds changes to add larger order folio to BIO.
+Patch 2: If a large folio gets added, the subsequent pages of the folio are
+released. This helps to avoid calculations at I/O completion.
 
-Thanks!
+Changes since v3:
+- Added change to see if pages are contiguous and belong to same folio.
+  If not then avoid skipping of pages.(Suggested by Matthew Wilcox)
 
-Best,
+Changes since v2:
+- Made separate patches
+- Corrected code as per kernel coding style
+- Removed size_folio variable
 
-Friedrich
+Changes since v1:
+- Changed functions bio_iov_add_page() and bio_iov_add_zone_append_page()
+  to accept a folio
+- Removed branch and calculate folio_offset and len in same fashion for
+  both 0 order and larger folios
+- Added change in NVMe driver to use nvme_setup_prp_simple() by
+  ignoring multiples of PAGE_SIZE in offset
+- Added a change to unpin_user_pages which were added as folios. Also
+  stopped the unpin of pages one by one from __bio_release_pages()
+  (Suggested by Keith)
 
-[1]
+Kundan Kumar (2):
+  block: add folio awareness instead of looping through pages
+  block: unpin user pages belonging to a folio
 
-# lsblk -o name,fstype,label --ascii
-NAME                          FSTYPE      LABEL
-sda
-|-sda1                        ext2
-|-sda2
-`-sda5                        LVM2_member
-  |-kernel684--deb--vg-root   ext4
-  `-kernel684--deb--vg-swap_1 swap
-sr0                           iso9660     Debian 12.5.0 amd64 n
-# findmnt --ascii
-TARGET                       SOURCE     FSTYPE    OPTIONS
-/                            /dev/mapper/kernel684--deb--vg-root
-                                        ext4
-rw,relatime,errors=remount-ro
-|-/sys                       sysfs      sysfs
-rw,nosuid,nodev,noexec,relatime
-| |-/sys/kernel/security     securityfs securityf
-rw,nosuid,nodev,noexec,relatime
-| |-/sys/fs/cgroup           cgroup2    cgroup2
-rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursive
-| |-/sys/fs/pstore           pstore     pstore
-rw,nosuid,nodev,noexec,relatime
-| |-/sys/fs/bpf              bpf        bpf
-rw,nosuid,nodev,noexec,relatime,mode=700
-| |-/sys/kernel/debug        debugfs    debugfs
-rw,nosuid,nodev,noexec,relatime
-| |-/sys/kernel/tracing      tracefs    tracefs
-rw,nosuid,nodev,noexec,relatime
-| |-/sys/fs/fuse/connections fusectl    fusectl
-rw,nosuid,nodev,noexec,relatime
-| `-/sys/kernel/config       configfs   configfs
-rw,nosuid,nodev,noexec,relatime
-|-/proc                      proc       proc
-rw,nosuid,nodev,noexec,relatime
-| `-/proc/sys/fs/binfmt_misc systemd-1  autofs
-rw,relatime,fd=30,pgrp=1,timeout=0,minproto=5,maxproto=5,di
-|-/dev                       udev       devtmpfs
-rw,nosuid,relatime,size=4040780k,nr_inodes=1010195,mode=755
-| |-/dev/pts                 devpts     devpts
-rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000
-| |-/dev/shm                 tmpfs      tmpfs     rw,nosuid,nodev,inode64
-| |-/dev/hugepages           hugetlbfs  hugetlbfs rw,relatime,pagesize=2M
-| `-/dev/mqueue              mqueue     mqueue
-rw,nosuid,nodev,noexec,relatime
-|-/run                       tmpfs      tmpfs
-rw,nosuid,nodev,noexec,relatime,size=813456k,mode=755,inode
-| |-/run/lock                tmpfs      tmpfs
-rw,nosuid,nodev,noexec,relatime,size=5120k,inode64
-| |-/run/credentials/systemd-sysctl.service
-| |                          ramfs      ramfs
-ro,nosuid,nodev,noexec,relatime,mode=700
-| |-/run/credentials/systemd-sysusers.service
-| |                          ramfs      ramfs
-ro,nosuid,nodev,noexec,relatime,mode=700
-| |-/run/credentials/systemd-tmpfiles-setup-dev.service
-| |                          ramfs      ramfs
-ro,nosuid,nodev,noexec,relatime,mode=700
-| |-/run/user/0              tmpfs      tmpfs
-rw,nosuid,nodev,relatime,size=813452k,nr_inodes=203363,mode
-| `-/run/credentials/systemd-tmpfiles-setup.service
-|                            ramfs      ramfs
-ro,nosuid,nodev,noexec,relatime,mode=700
-`-/boot                      /dev/sda1  ext2      rw,relatime
+ block/bio.c | 75 +++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 52 insertions(+), 23 deletions(-)
 
-[2]
-[    1.137443] BUG: kernel NULL pointer dereference, address:
-0000000000000000
-[    1.137951] #PF: supervisor write access in kernel mode
-[    1.138332] #PF: error_code(0x0002) - not-present page
-[    1.138695] PGD 0 P4D 0
-[    1.138697] Oops: 0002 [#1] PREEMPT SMP NOPTI
-[    1.138702] CPU: 1 PID: 27 Comm: kworker/1:0H Tainted: G            E
-     6.9.0-patch0604-nodebuglist+ #35
-[    1.138703] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-[    1.138705] Workqueue: kblockd blk_mq_requeue_work
-[    1.141021] RIP: 0010:_raw_spin_lock+0x13/0x60
-[    1.141336] Code: 31 db c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90
-90 90 90 90 90 90 0f 1f 44 00 00 65 ff 05 bc 94 cb 69 31 c0 ba 01 00 00
-00 <f0> 0f b1 17 75 1b 31 c0 31 d2 31 c9 31 f6 31 ff 45 31 c0 45 31 c9
-[    1.142670] RSP: 0018:ffffa42a40103d78 EFLAGS: 00010246
-[    1.143032] RAX: 0000000000000000 RBX: ffff91c4c0357c00 RCX:
-00000000ffffffe0
-[    1.143545] RDX: 0000000000000001 RSI: 0000000000000001 RDI:
-0000000000000000
-[    1.144037] RBP: ffffa42a40103d98 R08: 0000000000000000 R09:
-0000000000000000
-[    1.144548] R10: 0000000000000000 R11: 0000000000000000 R12:
-0000000000000000
-[    1.145036] R13: 0000000000000001 R14: ffff91c5f7cc1d80 R15:
-ffff91c4c153eb54
-[    1.145542] FS:  0000000000000000(0000) GS:ffff91c5f7c80000(0000)
-knlGS:0000000000000000
-[    1.146092] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.146511] CR2: 0000000000000000 CR3: 000000010e514001 CR4:
-0000000000370ef0
-[    1.147003] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[    1.147507] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-0000000000000400
-[    1.147997] Call Trace:
-[    1.148177]  <TASK>
-[    1.148332]  ? show_regs+0x6c/0x80
-[    1.148603]  ? __die+0x24/0x80
-[    1.148824]  ? page_fault_oops+0x175/0x5b0
-[    1.149111]  ? do_user_addr_fault+0x311/0x680
-[    1.149420]  ? exc_page_fault+0x82/0x1b0
-[    1.149718]  ? asm_exc_page_fault+0x27/0x30
-[    1.150013]  ? _raw_spin_lock+0x13/0x60
-[    1.150282]  ? blk_mq_request_bypass_insert+0x20/0xe0
-[    1.150663]  blk_mq_insert_request+0x120/0x1e0
-[    1.150975]  blk_mq_requeue_work+0x18f/0x230
-[    1.151277]  process_one_work+0x19b/0x3f0
-[    1.151562]  worker_thread+0x32a/0x500
-[    1.151847]  ? __pfx_worker_thread+0x10/0x10
-[    1.152148]  kthread+0xe1/0x110
-[    1.152373]  ? __pfx_kthread+0x10/0x10
-[    1.152640]  ret_from_fork+0x44/0x70
-[    1.152906]  ? __pfx_kthread+0x10/0x10
-[    1.153169]  ret_from_fork_asm+0x1a/0x30
-[    1.153449]  </TASK>
-[    1.153608] Modules linked in: efi_pstore(E) dmi_sysfs(E)
-qemu_fw_cfg(E) ip_tables(E) x_tables(E) autofs4(E) psmouse(E) bochs(E)
-uhci_hcd(E) crc32_pclmul(E) drm_vram_helper(E) drm_ttm_helper(E)
-i2c_piix4(E) ttm(E) ehci_hcd(E) pata_acpi(E) floppy(E)
-[    1.155135] CR2: 0000000000000000
-[    1.155370] ---[ end trace 0000000000000000 ]---
-[    1.155694] RIP: 0010:_raw_spin_lock+0x13/0x60
-[    1.156024] Code: 31 db c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90
-90 90 90 90 90 90 0f 1f 44 00 00 65 ff 05 bc 94 cb 69 31 c0 ba 01 00 00
-00 <f0> 0f b1 17 75 1b 31 c0 31 d2 31 c9 31 f6 31 ff 45 31 c0 45 31 c9
-[    1.157306] RSP: 0018:ffffa42a40103d78 EFLAGS: 00010246
-[    1.157669] RAX: 0000000000000000 RBX: ffff91c4c0357c00 RCX:
-00000000ffffffe0
-[    1.158172] RDX: 0000000000000001 RSI: 0000000000000001 RDI:
-0000000000000000
-[    1.158682] RBP: ffffa42a40103d98 R08: 0000000000000000 R09:
-0000000000000000
-[    1.159311] R10: 0000000000000000 R11: 0000000000000000 R12:
-0000000000000000
-[    1.159992] R13: 0000000000000001 R14: ffff91c5f7cc1d80 R15:
-ffff91c4c153eb54
-[    1.160575] FS:  0000000000000000(0000) GS:ffff91c5f7c80000(0000)
-knlGS:0000000000000000
-[    1.161186] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.161618] CR2: 0000000000000000 CR3: 000000010e514001 CR4:
-0000000000370ef0
-[    1.162158] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[    1.162691] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-0000000000000400
+-- 
+2.25.1
 
