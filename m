@@ -1,175 +1,107 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3595C1922E6
-	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 12:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435F819FA83;
+	Wed,  5 Jun 2024 12:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588914; cv=none; b=C5S1uGeZd1rPSnHj8unFw1dCPrhZ8R6A8G4MWnSV3A0l+Pu+xBKxT/pLbq33E4rtjMm6Gur2//K/Xp9/vdMMzjA6fFdUKVfeosFz/2zdTL7He17YiVrrlLZNDLNWs0c3s20RXWi6C65dJaoLOTgOKc+ffXpOZ7S6gOUkKE2tO7k=
+	t=1717588965; cv=none; b=lCXOUdASKHQ1e+CZu64MiBOQ9eSBPO7o5AIWjb1OzHhWE5wr64f2FrW3/VShSjHrs+Cs/Z2PdtMyh9XdkN6HIALYYiJ1uwjFswwdsathA4vkN9cZ8T/3lnnTcZI/1Kb7kPMSpubJA2bAOei4MrTDniiO/JRkdi2nyUgu1ekZQRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588914; c=relaxed/simple;
-	bh=dTSPITE6kEPd/QuZwZhVdc4FwhjFN60qUC7K6wgLGyw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ighfyO8Cueqk3YxPJEyOBF1Uta5KOE4vlllXad9jk50FMxQbpLKNAFQAtCTTxGBdjlYa0Yt40I/Lk5YPpyuqCyRMBto7gXg0XmGgUFBxsS4qxXSvwQuV293UwjejOnHxVCbwYsABfPEviDx6B1Q4bbz5Ej5hH518OzS6efvVOuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VcHjO4de; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1717588965; c=relaxed/simple;
+	bh=BQlbPAvxsdi3X1d2VhHNpiIeTwGwQryj+ROh8dfsSWI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AQdbBk03BoeyRpEQxW9c1gblESCLj1VR6edZ/0rLJgaz+MSFVOT4HNtEdnl8W8e0WupUX1VbvxmzmTNFdO9S/wp76o0OblzNh7Lxa8H6nC99H6CjdMRtnFeSJy1gL2eoxZTVBXKG6wngIqunXbICZ8Wicv1eKWQIZH92bPbXKH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfUB443L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VcHjO4de"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717588912;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nMRqhaPyHN4csAzL/75DeO1tOaUHg/Zb9U9prwcVRgo=;
-	b=VcHjO4de03I6tOBi/m+UShtyepNH9RiBEq13Fz+ANuljFEvA1HBUAnT1sZNwnN/D+uT52v
-	PJN3VhpkyyCq7lRofCm8t0T2cetXzxPh0xbf1LOoWaaFwDZGGD0zVlSa9j6GIhwifBRgAG
-	YtKwgOIoRD/fLK13qnhM74nJ7TCv8dk=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-Piu8FEirMo6hZ2dY8sp6GA-1; Wed, 05 Jun 2024 08:01:50 -0400
-X-MC-Unique: Piu8FEirMo6hZ2dY8sp6GA-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2c1b53b0038so5951483a91.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Jun 2024 05:01:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717588909; x=1718193709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nMRqhaPyHN4csAzL/75DeO1tOaUHg/Zb9U9prwcVRgo=;
-        b=b/fH2sZ5e9uOQ9gjXadxygRzA3zYP1F1p9gdrbAlBylhZSfn5tJ420WgSubxlQcYRR
-         HurCDun83kgEt4SUlxhtZzJqxRulK/9IWoow7uQQX9B9CPpOPLUr2YDrpFFpCENy7mNG
-         7kyMglLrglyd3MfoIf3sYuZewGTZNDmTr+6gkHTPQpsLK6MqAL76+xHC/gwWbA9h7UUT
-         3hjIgkFJxFh6aMk8AXW2Od5Y/1+JIY/AykNpse52mdH0n5o7105cYYHlTD2+hSgdcUJ+
-         MKKl0q/a9pjNCSAdiQnpxrikORNAigMAUCW+XLrzK/bHyCMXX/4PV7RlYEU8bnIA1hLB
-         xe8Q==
-X-Gm-Message-State: AOJu0YxxgZny6VD7J0lFvoJvm7xhmMNeRvs0968jUC9hSqiaKyNLaNmH
-	4AjcyHkq56KMaTplhWGQQps0oG54Su2QWNOKwdcGjVH1bMjH9IN3eib2bO+sR54OzIHQeKYYuAC
-	fwRONSiwR79CbyWpMGbAeQyqaCTWYwvtXDmgGANKKGdDzVqp3IH1yLrjwCsQVqBW09joJhgsgwA
-	w8u0o8W2k0rGDEPfCMEjLvW4o8nbA0lNehUS6Nj3XG5BBDTg==
-X-Received: by 2002:a17:90a:cf03:b0:2c1:e9e4:c6ea with SMTP id 98e67ed59e1d1-2c27db591c5mr2504539a91.31.1717588909162;
-        Wed, 05 Jun 2024 05:01:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEIH2qwzGQVuwroF/qUNH2KgSqP3BJTvvThYcLQWE5+uHoaaPwXzoMeUqPlRiuJnkdscQvsFhDkeGqX6Fnxb8w=
-X-Received: by 2002:a17:90a:cf03:b0:2c1:e9e4:c6ea with SMTP id
- 98e67ed59e1d1-2c27db591c5mr2504510a91.31.1717588908754; Wed, 05 Jun 2024
- 05:01:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfUB443L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 408F5C4AF09;
+	Wed,  5 Jun 2024 12:02:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717588965;
+	bh=BQlbPAvxsdi3X1d2VhHNpiIeTwGwQryj+ROh8dfsSWI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rfUB443LzP7TXG7N5SYUwYTseiYa7PFmIsm5QKtNDuZjxE5E3mCb3KvvVxFuhUarq
+	 H1J+y9hCDXSNzxnrSRGJK8fWKU9V0KJZTl5tMyVIgVrz366T9aSrg6S9kYUavZBuOH
+	 P2W8MuPMcKwyUW9/jstPUg8pa1+pbi+1+pBNhaVwszxJChR4zB9Xqbq/HAm/O5QnmY
+	 iqDT0mUTOAYXlv8jyb2Z5IBJaTmzZtWM5SZVF2qY/g4jxk6oFbPx26/cNx7AdvZ++z
+	 7EGovBcdCcm2QRoO/3nj7eo+MHkQ3PDfanOhI1jSC89S7yqHmD0eDVwyslyNLrXk88
+	 mICsIYWZ8Whdw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Hannes Reinecke <hare@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	John Garry <john.g.garry@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 13/23] block: check for max_hw_sectors underflow
+Date: Wed,  5 Jun 2024 08:01:56 -0400
+Message-ID: <20240605120220.2966127-13-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240605120220.2966127-1-sashal@kernel.org>
+References: <20240605120220.2966127-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605010542.216971-1-yi.zhang@redhat.com> <a4djmoku2cxfxhxrhgdu6b7vqyi4idqdzza7fx37ps2hdyorld@ababkd4e4zzd>
-In-Reply-To: <a4djmoku2cxfxhxrhgdu6b7vqyi4idqdzza7fx37ps2hdyorld@ababkd4e4zzd>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Wed, 5 Jun 2024 20:01:36 +0800
-Message-ID: <CAHj4cs_QHjtLjsmZs2myDQYzzFfMeTQTCEoXY_huiPzUD7BoQw@mail.gmail.com>
-Subject: Re: [PATCH V2 blktests] block: add regression test for null-blk
- concurrently power/submit_queues test
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"yukuai1@huaweicloud.com" <yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.3
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 5, 2024 at 7:52=E2=80=AFPM Shinichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
->
-> On Jun 04, 2024 / 21:05, Yi Zhang wrote:
-> > null-blk currently power/submit_queues operations which will lead kerne=
-l
-> > null-ptr-dereference[1], add one regression test for it and the fix has
-> > been merged to v6.10-rc1 by [2].
-> > [1]
-> > https://lore.kernel.org/linux-block/CAHj4cs9LgsHLnjg8z06LQ3Pr5cax-+Ps+x=
-T7AP7TPnEjStuwZA@mail.gmail.com/
-> > https://lore.kernel.org/linux-block/20240523153934.1937851-1-yukuai1@hu=
-aweicloud.com/
-> > [2]
-> > commit a2db328b0839 ("null_blk: fix null-ptr-dereference while configur=
-ing 'power' and 'submit_queues'")
->
-> Thank you Yi. I ran the test case and it looks working good. It passes wi=
-th
-> the kernel v6.10-rc2. It causes the hang with the kernel v6.9. To not con=
-fuse
-> blktests users with the hang, I will wait for the commit a2db328b0839 to =
-land on
-> the stable kernels before I apply this patch.
->
-> One more thing I noticed is that your current patch requires loadable nul=
-l_blk.
-> To allow it run with built-in null_blk, I would like to suggest additiona=
-l
-> change below on top of your patch. It,
->
-> - calls _have_null_blk instead of _have_module null_blk,
-> - checks submit_queues parameter with _have_null_blk_feature instead of
->   _have_module_param,
-> - does not call _init_null_blk, and
-> - uses nullb1 instead for nullb0.
->
-> Please let me know your thought about these changes. If you are ok with t=
-hem, I
-> can fold them in the commit.
+From: Hannes Reinecke <hare@kernel.org>
 
-Sure, I'm OK with the change, thanks. :)
+[ Upstream commit e993db2d6e5207f1ae061c2ac554ab1f714c741d ]
 
->
-> diff --git a/tests/block/038 b/tests/block/038
-> index fe3c7cd..56272be 100755
-> --- a/tests/block/038
-> +++ b/tests/block/038
-> @@ -12,9 +12,10 @@ DESCRIPTION=3D"Test null-blk concurrent power/submit_q=
-ueues operations"
->  QUICK=3D1
->
->  requires() {
-> -       _have_module null_blk
-> -       _have_module_param null_blk nr_devices
-> -       _have_module_param null_blk submit_queues
-> +       _have_null_blk
-> +       if ! _have_null_blk_feature submit_queues; then
-> +               SKIP_REASONS+=3D("null_blk does not support submit_queues=
-")
-> +       fi
->  }
->
->  null_blk_power_loop() {
-> @@ -36,23 +37,15 @@ null_blk_submit_queues_loop() {
->  test() {
->         echo "Running ${TEST_NAME}"
->
-> -       local nullb_params=3D(
-> -               nr_devices=3D0
-> -       )
-> -       if ! _init_null_blk "${nullb_params[@]}"; then
-> -               echo "Loading null_blk failed"
-> -               return 1
-> -       fi
-> -
-> -       if ! _configure_null_blk nullb0; then
-> -               echo "Configuring null_blk nullb0 failed"
-> +       if ! _configure_null_blk nullb1; then
-> +               echo "Configuring null_blk nullb1 failed"
->                 return 1
->         fi
->
->         # fire off two null-blk power/submit_queues concurrently and wait
->         # for them to complete...
-> -       null_blk_power_loop nullb0 &
-> -       null_blk_submit_queues_loop nullb0 &
-> +       null_blk_power_loop nullb1 &
-> +       null_blk_submit_queues_loop nullb1 &
->         wait
->
->         _exit_null_blk
->
+The logical block size need to be smaller than the max_hw_sector
+setting, otherwise we can't even transfer a single LBA.
 
+Signed-off-by: Hannes Reinecke <hare@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: John Garry <john.g.garry@oracle.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-settings.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
---=20
-Best Regards,
-  Yi Zhang
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 9d6033e01f2e1..b4272bd926370 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -104,6 +104,7 @@ static int blk_validate_zoned_limits(struct queue_limits *lim)
+ static int blk_validate_limits(struct queue_limits *lim)
+ {
+ 	unsigned int max_hw_sectors;
++	unsigned int logical_block_sectors;
+ 
+ 	/*
+ 	 * Unless otherwise specified, default to 512 byte logical blocks and a
+@@ -134,8 +135,11 @@ static int blk_validate_limits(struct queue_limits *lim)
+ 		lim->max_hw_sectors = BLK_SAFE_MAX_SECTORS;
+ 	if (WARN_ON_ONCE(lim->max_hw_sectors < PAGE_SECTORS))
+ 		return -EINVAL;
++	logical_block_sectors = lim->logical_block_size >> SECTOR_SHIFT;
++	if (WARN_ON_ONCE(logical_block_sectors > lim->max_hw_sectors))
++		return -EINVAL;
+ 	lim->max_hw_sectors = round_down(lim->max_hw_sectors,
+-			lim->logical_block_size >> SECTOR_SHIFT);
++			logical_block_sectors);
+ 
+ 	/*
+ 	 * The actual max_sectors value is a complex beast and also takes the
+@@ -153,7 +157,7 @@ static int blk_validate_limits(struct queue_limits *lim)
+ 		lim->max_sectors = min(max_hw_sectors, BLK_DEF_MAX_SECTORS_CAP);
+ 	}
+ 	lim->max_sectors = round_down(lim->max_sectors,
+-			lim->logical_block_size >> SECTOR_SHIFT);
++			logical_block_sectors);
+ 
+ 	/*
+ 	 * Random default for the maximum number of segments.  Driver should not
+-- 
+2.43.0
 
