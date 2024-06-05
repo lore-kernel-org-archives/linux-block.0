@@ -1,103 +1,78 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31517156C6D;
-	Wed,  5 Jun 2024 20:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE2D15F321
+	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 21:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717617949; cv=none; b=ct2V9KVC3ctEoN602385De4tUNVzjEU4SPaWlqrF9nC18NIZRAIckL/J83GJHmaG9Hhkt6nBQSZ/MvjmrNbfypUkFOXTHrhaWiiHxllHYbKouwHusPvw5s35CeESvZYrhCBicAVtPIkgWTb/OdBQUyQoW+6mmDI5Vs29EkVz4dU=
+	t=1717622537; cv=none; b=OSeBah0j/TNLsZWczKDpH+vlgrg9Sx0bbNKu5qdxNOw+vRCZy75wEJRzhVVQP2Ny9+lZoVmiOW4EjEPn9RQbxWfbuebN8AV3ZjmMXwk7aXEzwrs8JzcZn5dtdJo1dJNuARvnt9ihUEEaYZpdlSh+GSlELBkNOpcUOKq38aEFjio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717617949; c=relaxed/simple;
-	bh=WIESEa30dZ/hQw4soSdWvR9FvT6kULeFPhCVwwSmx90=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NL4WKlciv/g1DtCSKCoIbd4p4fUySGrY0o11HHziMa4AoDDUVfjYVLV6JYxPKCL/liY6fTV4H+pTvPR2XgOVNVg/tk5iIZNLjaZ/oN/DCRagMfeELGGwFQRfXvcIhQ/5FkNIw7pGPgvFjjFQKgrWLHDN5Bnn32prgtnP7UD0YXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ib4C/EYZ; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717622537; c=relaxed/simple;
+	bh=YFOqINnmT4zQEz1jA/7iIWsu3E0GtXhMYFevqvQmcIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N42ghc4LQgQGxM5uIpDVXW2bHyboR7FnkVOUn9PVOgKcIALy5Zwp1ug6H+tO69bvXqtg0gPI9IW+Aju7KTy9/PjCXEDpGOM/RBzfxH2zu87djO0aceKviBob2bl8DE2y/WMFW3St6kTmJfRxt85zDXE8RxsqguETwhsPb5Smi9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UqkkVLXN; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ib4C/EYZ"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-250bbae0ff6so89851fac.0;
-        Wed, 05 Jun 2024 13:05:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717617947; x=1718222747; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q2sovYnnLqu3ePNoGdykaYCzoGX/KrvirZkk+6UfwMw=;
-        b=Ib4C/EYZYlPAUrGxUSnApAlreoDKQr7Lt9y0VFlcUqpTKeO9S2bkczC8zfGHxT2iDz
-         TNw1bNa1lveSpSnVMi4mpD86Ct1UGN6wEgoCTGZMmI08XHMmG/mWqaG6EpTOKLTUdd0X
-         0lVY3kEey4AG5jysU4Xr36dymRNTNZih8GFX1jesufkGH1lVEPRWBh1MENgh4it1Yei/
-         g7IyDREitdINhMWDzXZFAUYpGsUBWZAJ/pFsXQhw/pJ+Xl7obgRxI/v3h/MpTFjbvPxI
-         RPQ5KCBInDQk1Fn1uloYwPOR9vQaz1AszKtjCGrUlo4g4kIyoJLe5GiRK2O5YnEgDzwo
-         uwDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717617947; x=1718222747;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q2sovYnnLqu3ePNoGdykaYCzoGX/KrvirZkk+6UfwMw=;
-        b=D8R+eiGyZrqgwVDGpIBuUe7jyTF/AuDbMSOpFTGbOELs7fn+e2NSb7XkjIE6Nbn0LN
-         xgYdmi6E50P47jN+okbnr58xXmp3t9e9vxQulAM0cZxapDJQhm/qL8b+TTkm5DbEyjpE
-         1EjyiHuEu43Ry+CYtPLjILznVnQbaY8WLJrIH6ODJFI5ubXCJNNueWMc5t82PgUBTRL3
-         CqEMjJ4At67OTfKeXS4hrZHwLNkFNaOJ5I8MVxYO3yuLyrdm2Halo2X5WHKGsATo1ape
-         a7wB8GKyueb3ZfxZjNeYDzamD6K+wB70j3glT6AMth4oSJ1oF4ZOJ5pWiSXdvJnUbtss
-         ohVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX+Z69hKLq94264v2YjBPS9oQIPj+p1fkTK9ltryHr7EgDJvdB+xkNp4ggBnvSj4UpmGgZPcObBIoUmzs9cJtPgFWnvMOLItFJ3NpRRMr0R7fpfFyNvcxtaqmAQr8rz7ovTv98rBIu7A+iAC81I8lL2zJ25xOEFwmZ2eRT+awlSsyYiZw==
-X-Gm-Message-State: AOJu0Ywjm7QRaw4d30kvndCBQ89CAE5SNGvV/AjsAzOPmraGB2jqbTm5
-	0YqJEeM0sNlWPLZeG3R6fYpnKYFfU2D6qJn9v80rL+p5cz/ielKgrq/G8vlRGIHs8/0pUs03aQK
-	Y4Cg4puH2sM/rzH2om0C52b/XQO8=
-X-Google-Smtp-Source: AGHT+IGyVhO7rSQAoGDSB+vjloBrx705BG5D6fs1Cr4EcslfrxplrQUigFncTawwbH2U8MnF7SOq8ImGhCk8Gp1b7A4=
-X-Received: by 2002:a05:6871:738f:b0:24c:4f83:48da with SMTP id
- 586e51a60fabf-254407aeaf0mr366594fac.16.1717617947176; Wed, 05 Jun 2024
- 13:05:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UqkkVLXN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=RBqjyCaN+PjUE3YnZPBzV7SnCg45JpFlSWlY1/nUM74=; b=UqkkVLXNYQXmJoanYgwqzSTVV0
+	L+1gaACKBW77rpPooVFvDpW0y16R0SunhoDricJJHjU6g+QK4fFmytBxA80PrEjFmGDc2UOZ6Rq0y
+	uWH+iZdfA6LY0bOgHR74FekxUTtWnBVfQhmsN+kzLJUSxQMaJI2Zr9NvDOKdp9rUpghE1EhtDG6eW
+	DKNJEgh6Ku+FnuMqiS37kJLMcKFZdJGEdSLBmNcBg9ArAfUdqmtmFP1uiudUPZMMSVsmSamwKsPMr
+	1pjUW9VrC5I2BY6qYLATzzrmrcx0/HdM/hFSN+vRB+pAcZ69HTUmGqft1Mn3L9AATtScYs1zYThxt
+	a7B0uiJA==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sEy5D-00000004SrP-3Iua;
+	Wed, 05 Jun 2024 21:22:11 +0000
+Date: Wed, 5 Jun 2024 22:22:11 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v4 2/2] block: unpin user pages belonging to a folio
+Message-ID: <ZmDXAxGm01XayBSn@casper.infradead.org>
+References: <20240605092455.20435-1-kundan.kumar@samsung.com>
+ <CGME20240605093234epcas5p151b3b39b2f2e1567c6e4ceae6130c6b9@epcas5p1.samsung.com>
+ <20240605092455.20435-3-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605063031.3286655-1-hch@lst.de> <20240605063031.3286655-5-hch@lst.de>
-In-Reply-To: <20240605063031.3286655-5-hch@lst.de>
-From: Kanchan Joshi <joshiiitr@gmail.com>
-Date: Wed, 5 Jun 2024 20:05:20 +0530
-Message-ID: <CA+1E3rJn3uNfkoFtm_am9qwQmwWvhu3nPVMaM63AJ2GBdxZTmQ@mail.gmail.com>
-Subject: Re: [PATCH 04/12] block: remove the blk_integrity_profile structure
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>, 
-	Yu Kuai <yukuai3@huawei.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>, 
-	Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org, 
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, 
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240605092455.20435-3-kundan.kumar@samsung.com>
 
-On Wed, Jun 5, 2024 at 12:01=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
-e:
-> @@ -446,13 +446,14 @@ bool bio_integrity_prep(struct bio *bio)
->         if (bio_integrity(bio))
->                 return true;
->
-> +       if (!bi->csum_type)
-> +               return true;
+On Wed, Jun 05, 2024 at 02:54:55PM +0530, Kundan Kumar wrote:
+> -		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
+> -		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
+> -			   fi.offset / PAGE_SIZE + 1;
+> -		do {
+> -			bio_release_page(bio, page++);
+> -		} while (--nr_pages != 0);
+> +		bio_release_page(bio, &fi.folio->page);
+>  	}
 
-Changes look mostly good, but trigger a behavior change for non-PI
-metadata format.
+Why can't we have ...
 
-Earlier nop profile was registered for that case. And the block-layer
-continued to attach an appropriately sized meta buffer to incoming IO, even
-though it did not generate/verify. Hence, IOs don't fail.
+		bio_release_folio(bio, fi.folio, nr_pages);
 
-Now also we show that the nop profile is set, but the above
-"csum_type" check ensures that
-meta buffer is not attached and REQ_INTEGRITY is not set in the bio.
-NVMe will start failing IOs with BLK_STS_NOTSUPP now [*].
+which is implemented as:
 
-[*]
-     if (!blk_integrity_rq(req)) {
-             if (WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)))
-                     return BLK_STS_NOTSUPP;
-             control |=3D NVME_RW_PRINFO_PRACT;
-     }
+static inline void bio_release_page(struct bio *bio, struct folio *folio, unsigned long nr_pages)
+{
+	if (bio_flagged(bio, BIO_PAGE_PINNED))
+		gup_put_folio(folio, nr_pages, FOLL_PIN);
+}
+
+Sure, we'd need to make gup_put_folio() unstatic, but this seems far
+more sensible.
+
