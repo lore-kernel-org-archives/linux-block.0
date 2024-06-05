@@ -1,83 +1,96 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0432816F909
-	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 21:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C0D15FD0B;
+	Wed,  5 Jun 2024 23:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717622626; cv=none; b=ZzcWBWBA8/9FTafA9IQoavwxWfViFgP63o5GOkN6AwL4ufaTDdVMPDj94Fl5YrhAd00RI09KTPlGhB91dHUAI4c2WPZtFbLoiWsWBr8SkJcrgTzfwQHG2Fm6gF3sz0Zqsnl/CtEP31b2PJl+7xEgifNqEfwK8Dyt00kd9Jf58j8=
+	t=1717631555; cv=none; b=H+J5hngqxjL64xyLeJ+e6YiXNpsF0FxnCZxTgyyp6rLrzLwSzAUJnVJYBYT5cxv581SeUb89PgjbbFB77/rBvsTsXeZ7lhigOapImERaMcHX0KbCP5hLD9eogqbi7fLJb3vJMUAUuIGckdrWwT6GnsNtm1l1ryVYKfVI94/sT2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717622626; c=relaxed/simple;
-	bh=lI3dK5A0I/WVvIWtW/iXp2fK5mMudTlwVIJUdEogL7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFPxDZBn3BpLT4XpoLDzuzPIxSyXFUkBWaOKots4ZsDAZwV5ysrefMuuvAMBzKEZEjRXeNOgILRTjlycwgx8AwUQSFUGcrjsYnnioQEVAOt9qSPKWrYUwD+VQ0h1Y3IfkgT0pztMbyjwKRJpT2AW1gdSYBB+NroBi/100RTg41w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ArH0cJAY; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1717631555; c=relaxed/simple;
+	bh=RViE+yDwPHMKwcj3LObh26OQLR9TJ/tVR/tAYs6LNzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=idiD0TiyWdZj+nkB2UN5+O7f6ydEUGhWpCy4Cm+2VKf5yNGEjnEFtXHG7zXCofdN5ww68zvbhl8v4Sp5TI+EWitxiwMtd86mmFTDfDyF3fWaSJOhgE8W9WO++GWwujleegQQ2dLVe4mosTp4/AeThKtZ2Wuy4nJyYfnHWlxvb+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=caWCVx4y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ArH0cJAY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NN5rQs7qFo1c/qLxBTsJcXtAYAbooWbhlqMzT5GtAS0=; b=ArH0cJAYURInDKayIKBFjUYeTU
-	/FQv5Gxa7+SzWJl0jnXzUouY2o5ijh4UwdE/epdjo1k2i21ZWJtMQXVXaHURhquNeoX5+OjApHvvn
-	ugkg4ZpWu6QLi8rrmwTpWuD0vn1ZavqVqUIP2bST7nz5hHWkawFzV1ZNvdH22csHrPyLaR4jujkhe
-	400wil+2++P+bQvanTEoKyIC4Mbf+WJyg4j/3jsUy3UHPU5ObBf3xJoGEMSgKWB5WP2/uMTztE1vX
-	yqEbTJMlakngvU+3wmQmQGXWNOJX9jI+M2DgXbWA1ZSCqcY4eenXZ6APh/g4Uhi+1BBRkuydrEu4t
-	KY+SnrgQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sEy6f-00000004WNI-2kLO;
-	Wed, 05 Jun 2024 21:23:41 +0000
-Date: Wed, 5 Jun 2024 22:23:41 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Kundan Kumar <kundan.kumar@samsung.com>
-Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
-	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
-	gost.dev@samsung.com
-Subject: Re: [PATCH v4 1/2] block: add folio awareness instead of looping
- through pages
-Message-ID: <ZmDXXQCfHsvL-NPS@casper.infradead.org>
-References: <20240605092455.20435-1-kundan.kumar@samsung.com>
- <CGME20240605093225epcas5p335664b9185c99a8fe1d661227d3f4f1a@epcas5p3.samsung.com>
- <20240605092455.20435-2-kundan.kumar@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="caWCVx4y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D488AC2BD11;
+	Wed,  5 Jun 2024 23:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717631554;
+	bh=RViE+yDwPHMKwcj3LObh26OQLR9TJ/tVR/tAYs6LNzM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=caWCVx4yrrHdSuFT8937kBbWdyHz/zy+QZW5l7BYFHI8WKusyw6e+ph9wDBQvu+bL
+	 F8qqi1r8Md3hx2bBRvgb1D/9Ki1f7+kdoIqJGaCM0hNzQ61Jt/mmaWOAqyP8o573JV
+	 62zjayu5LsiMXMefs1eBiJY78EQPnbacQJ6+o2rsIDkigdFa+GkuyRT39YWKbXiUZv
+	 BS2SGWbpzd3gZPRpKrO2TJrHwirBDNoU4wZCblesz2OppveMd5skkV8i5X8duHt2hp
+	 UIquvzb9tTYLGclHhpRUl+FXF4KG2NjjJz1Igp9ENe9cVP0afRq7hVsz/nKyguYF+s
+	 tOI5tsP3QoOwg==
+Message-ID: <90629a40-e45f-490b-bef6-436839d91b92@kernel.org>
+Date: Thu, 6 Jun 2024 08:52:32 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605092455.20435-2-kundan.kumar@samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/3] dm: Improve zone resource limits handling
+To: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>, Christoph Hellwig <hch@lst.de>
+References: <20240605075144.153141-1-dlemoal@kernel.org>
+ <20240605075144.153141-3-dlemoal@kernel.org> <ZmDA5fmZMNGM1oFl@redhat.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ZmDA5fmZMNGM1oFl@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 05, 2024 at 02:54:54PM +0530, Kundan Kumar wrote:
-> +			/*
-> +			 * Check if pages are contiguous and belong to the
-> +			 * same folio.
-> +			 */
+On 6/6/24 4:47 AM, Benjamin Marzinski wrote:
+> On Wed, Jun 05, 2024 at 04:51:43PM +0900, Damien Le Moal wrote:
+>> +static int dm_device_count_zones(struct dm_dev *dev,
+>> +				 struct dm_device_zone_count *zc)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = blkdev_report_zones(dev->bdev, 0, UINT_MAX,
+>> +				  dm_device_count_zones_cb, zc);
+> 
+> Other than the nitpick that BLK_ALL_ZONES looks better than UINT_MAX
+> here, looks good.
 
-Oh, a useful comment here would be *why* we do this, not *what* we do.
+Thanks, will make this change.
 
-			/*
-			 * We might COW a single page in the middle of
-			 * a large folio, so we have to check that all
-			 * pages belong to the same folio.
-			 */
+However, I realized that we have another serious issue with this, so more
+changes are needed. The issue is that we have the call chain:
 
-for example.
+dm_table_set_restrictions(t, q, lim) -> dm_set_zones_restrictions(t, q, lim) ->
+dm_set_zone_resource_limits(md, t, lim) which  is fine as all these functions
+operate looking at the same limits. But then after calling
+dm_set_zone_resource_limits() which may modify the max open/max active limits,
+dm_set_zones_restrictions() calls dm_revalidate_zones(md, t), which then calls
+blk_revalidate_disk_zones(). This last function looks at the max open/max
+active limits of the disk queue limits to setup zone write plugging (if needed
+in the case of DM). But the disk queue limits are *different* from the lim
+pointer passed from dm_table_set_restrictions() as these have not been applied
+yet. So we have blk_revalidate_disk_zones() looking at the "old", not yet
+corrected zone resource limits.
 
-> +			for (j = i + 1; j < i + num_pages; j++) {
-> +				size_t next = min_t(size_t, PAGE_SIZE, bytes);
-> +
-> +				if (page_folio(pages[j]) != folio ||
-> +				    pages[j] != pages[j - 1] + 1) {
-> +					break;
-> +				}
-> +				contig_sz += next;
-> +				bytes -= next;
-> +			}
-> +			num_pages = j - i;
-> +			len = contig_sz;
-> +		}
+I have 22 different test cases for testing this and none of them can detect a
+problem with this. But it is still wrong and needs to be fixed.
+
+Christoph,
+
+Unless you have a better idea, I think we need to pass a queue_limits struct
+pointer to blk_revalidate_disk_zones() -> disk_update_zone_resources(). This
+pointer can be NULL, in which case disk_update_zone_resources() needs to do the
+limit start_update+commit. But if it is not NULL, then
+disk_update_zone_resources() must use the passed limits.
+
+-- 
+Damien Le Moal
+Western Digital Research
+
