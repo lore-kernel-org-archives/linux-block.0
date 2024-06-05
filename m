@@ -1,223 +1,216 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26121755A
-	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 14:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352782746A;
+	Wed,  5 Jun 2024 14:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717597646; cv=none; b=RL6eFzFLN8bzGUHZbhJursHXdXZwqCVHgj2/xFJpiDsegXxaopG9c0avy+hPrikQqZpFoI1EhS2Jwx++vsYRexUDYMg2ixJOxNRG/HQK0wJmFQAUF19SfLg0JSsjvKughrkGq/KANU9OC9c4n5ARP4SIdz9sQrysAddg1hGmAto=
+	t=1717599152; cv=none; b=W61MrbH47tG6dZ2BUEMy6jed6qJ4vDiMn6tGRIeVKe21B8QYe+K5V4YkCTbkyotcNxqSQ+1qKSnSr2SXLHqsEK2g8LoYR/dl2+NjHE+8aYYeTYzZJa54qhszBL6qd6GOGgQ0M1ef51U9/4ronXq8daRu2QPYsV18vbAZnJj1W8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717597646; c=relaxed/simple;
-	bh=90D3auDK3WcXsX7TKCAyKV0KwfqmFAGuEW7dW1JYvLw=;
+	s=arc-20240116; t=1717599152; c=relaxed/simple;
+	bh=6YGdcEbu7psY0CECGg/8Hrrfy09dwQCVJnM3252GwPg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q18Sfn5eBcVF9fjvWaQIOxe696rZm/X5Of0xUxSfyJfSsk1uUzgjL7mVUWtd6/GPyXZQBrlZwtDvCMvep4bJMthJw5Xma3njsgsB2aKZoxXIoKAdj92R66QPw0k2/LbNia4Ecae4+q6bGMKNje++jarO9qkcVKojYBs3FIT0zps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pU+/3saq; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=Jyk/gsy5cjt1rl9b/z4a2p3TqRfKC1VVxej8mP1zXNuay7M6lAh8uIGT3eUu4kkh9C+gTuJ0Hc15BtnX01IFtmuUvKsNTxtOxJK2QN2mj5u/SqB5DW03B0/850s7h37oPtJ2EAgdjPWc4dz6GYW0YkI/ikZbiW0bmFxJVszx9EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HwsE85Y4; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pU+/3saq"
-X-Envelope-To: f.weber@proxmox.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717597641;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ko9Xb067+XeTJSQmpXx37lrgx0pHjdOn4v8/Lptp5VY=;
-	b=pU+/3saq4RCm9zXTUWkf4REijLOh+B5BxW/WNYA3tFRUdAZeILcrVm9MLVdPbmaaQpOaJM
-	wvBvkqHTy2uJu8DwSBimt2R2F5zorTmR8bN3gcg4snTK/dHvtiaJi8vUx5ZBy5RhMH4ESf
-	9WCTcSF9Sbry94Y/2WJIrAw8EORDK+g=
-X-Envelope-To: axboe@kernel.dk
-X-Envelope-To: ming.lei@redhat.com
-X-Envelope-To: hch@lst.de
-X-Envelope-To: bvanassche@acm.org
-X-Envelope-To: linux-block@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: zhouchengming@bytedance.com
-X-Envelope-To: t.lamprecht@proxmox.com
-Message-ID: <448721f2-8e0b-4c5a-9764-bde65a5ee981@linux.dev>
-Date: Wed, 5 Jun 2024 22:27:11 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HwsE85Y4"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-57a44c2ce80so5185239a12.0;
+        Wed, 05 Jun 2024 07:52:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717599149; x=1718203949; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6X/f7PPWIX1Kzms7IPH5lwuYJdnB1Eo9TTaF+YUyUl0=;
+        b=HwsE85Y4y7Ki2L9V06TqEs7l1WSqd1ItDQ8VI0dwi2Ub/tHs7P4G/R0XALXaBDMQS0
+         NEBsUe5ZtQVZEJ7W2w6XXpNW7W1Zgwq7NUXydvte3WLcVDsehC7itCWVNtjKnAJfpcRS
+         0Nix4OUa7/MEhlZ2cIPQhCLFhjpLwQxZ98fCsWlYtX/fqzYmWsgycfwJFT0iJwMRh2Tq
+         bT9Hr3D/7w+l3igfiTtcEaUGPEVOaZlSmJtW/b07MaF6VluMl8cgje/gua8iFAL8LPrm
+         HAPLEGVV9zb8Xqk04HEubmf964D5CbY88IHPN6fb8VebZw4Wg7DslRPclTHjPDGZPCv0
+         UULA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717599149; x=1718203949;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6X/f7PPWIX1Kzms7IPH5lwuYJdnB1Eo9TTaF+YUyUl0=;
+        b=fR31kEFT4hsQgNmK0RSymVC6saNLWuFN4SKBggoxSYc0gJSHX9V/fXsLFP6vx6oeNF
+         PpQP5VnLPMsjb1kHFXcvGxTAVPpjs7eCzqqai90D2nh5QEGMMroeSgTnewnsw4AWgBLa
+         TRXsBmS4v+IcaszHF6tMYz569+zoSRertjZsYqIZA6IEl1iSDbrjXXazxbmYYvxMiP9m
+         Q+FDz3bXdn7MXCN9yPAfiG34YbAmjCsIKUhvKLPiM0uBET8Q98fmZtIpJP4caVrv4O+6
+         ucwj1artlPfWr6deMtiMc37e+PK0/sSR+33RM4199fbM+oWippusOUeMd5SgEZdYAoGi
+         a4fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXhVOgsl1YM+VI9NI7Kvs4mxlv0nzZ84hZuu1piFy6dOkHx/bAAft9qdA4BrSeBk6Cyl4iDjx+D9HV9F8eTgYdPXB/pgg23t5DwPVPn7HQQ4mcuqL2HMYrjRYIFY4EJ+MRMfXNg9mgYy8XJzNEnbkam4EtB4ondVQDl/3erhUK4eSx7zQ==
+X-Gm-Message-State: AOJu0Yz9hjdN5gO5VtzerwB3Jrd9htyyAgCOTxAZlNPUzKm9F0b0LamD
+	zNAsjOhkybC6vYDnup91kfzl3ND89usgzQJmAQm+VshS+2lSkLw0
+X-Google-Smtp-Source: AGHT+IHfZpY/oJpv1KHxWECam8DBkIhLG621coNQBkTPHDAxVpVXT1v7gNr0xmHExWyRZaSsBNf1Og==
+X-Received: by 2002:a50:d4d2:0:b0:57a:2430:67eb with SMTP id 4fb4d7f45d1cf-57a8bc9506dmr1893838a12.28.1717599149183;
+        Wed, 05 Jun 2024 07:52:29 -0700 (PDT)
+Received: from [147.251.42.107] (laomedon.fi.muni.cz. [147.251.42.107])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a31b99445sm9334556a12.18.2024.06.05.07.52.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jun 2024 07:52:28 -0700 (PDT)
+Message-ID: <a5570194-920c-45d8-98d5-da99db0d2f8d@gmail.com>
+Date: Wed, 5 Jun 2024 16:52:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] block: fix request.queuelist usage in flush
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/12] dm-integrity: use the nop integrity profile
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+References: <20240605063031.3286655-1-hch@lst.de>
+ <20240605063031.3286655-2-hch@lst.de>
 Content-Language: en-US
-To: Friedrich Weber <f.weber@proxmox.com>, axboe@kernel.dk,
- ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- zhouchengming@bytedance.com, Thomas Lamprecht <t.lamprecht@proxmox.com>
-References: <20240604064745.808610-1-chengming.zhou@linux.dev>
- <c9d03ff7-27c5-4ebd-b3f6-5a90d96f35ba@proxmox.com>
- <1344640f-b22d-4791-aed4-68fc62fb6e36@linux.dev>
- <ec27da86-b84a-430b-98aa-9971f90c8c87@proxmox.com>
- <7193e02e-7347-48db-b1a0-67b44730480b@proxmox.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <7193e02e-7347-48db-b1a0-67b44730480b@proxmox.com>
-Content-Type: text/plain; charset=UTF-8
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ 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
+In-Reply-To: <20240605063031.3286655-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 2024/6/5 21:34, Friedrich Weber wrote:
-> On 05/06/2024 12:54, Friedrich Weber wrote:
->> On 05/06/2024 12:30, Chengming Zhou wrote:
->>> On 2024/6/5 16:45, Friedrich Weber wrote:
->>>> [...]
->>>> Unfortunately, with this patch applied to kernel 6.9 I get a different
->>>> crash [2] on a Debian 12 (virtual) machine with root on LVM on boot (no
->>>> software RAID involved). See [1] for lsblk and findmnt output. addr2line
->>>> says:
->>>
->>> Sorry, which commit is your kernel? Is mainline tag v6.9 or at some commit?
->>
->> Yes, by "kernel 6.9" I meant mainline tag v6.9, so commit a38297e3fb01.
->>
->> If I boot this mainline kernel v6.9 in a Debian (virtual) machine with
->> root on LVM, I do not get a crash. If I apply the patch "block: fix
->> request.queuelist usage in flush" on top of this mainline kernel v6.9,
->> and boot the Debian machine into that patched kernel, I get a crash on boot.
->>
->>> And is it reproducible using the mainline kernel v6.10-rc2?
->>
->> I'll test mainline kernel v6.10-rc2, and "block: fix request.queuelist
->> usage in flush" applied on top of v6.10-rc2, and get back to you.
-> 
-> My results:
-> 
-> Booting the Debian (virtual) machine with mainline kernel v6.10-rc2
-> (c3f38fa61af77b49866b006939479069cd451173):
-> works fine, no crash
-> 
-> Booting the Debian (virtual) machine with patch "block: fix
-> request.queuelist usage in flush" applied on top of v6.10-rc2: The
-> Debian (virtual) machine crashes during boot with [1].
-> 
-> Hope this helps! If I can provide anything else, just let me know.
+On 6/5/24 8:28 AM, Christoph Hellwig wrote:
+> Use the block layer built-in nop profile instead of reinventing it.
 
-Thanks for your help, I still can't reproduce it myself, don't know why.
+As this is my "invention", I am pretty sure that "nop" profile was
+not available at the time I was prototyping AEAD dmcrypt extension.
+(It was months before we submitted it upstream - and then nobody
+apparently fixed it.)
 
-Could you help to test with this diff?
+So, I am quite happy this hack can go away!
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index e7aebcf00714..cca4f9131f79 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -263,6 +263,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
-                unsigned int seq = blk_flush_cur_seq(rq);
+I run full cryptsetup testuite with this patch and everything
+works, nice cleanup.
 
-                BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
-+               list_del_init(&rq->queuelist);
-                blk_flush_complete_seq(rq, fq, seq, error);
-        }
+Reviewed-by: Milan Broz <gmazyland@gmail.com>
 
-
-I don't know if the request can have PREFLUSH and POSTFLUSH set but no DATA,
-maybe in some special cases? Hope someone can give me some hints BTW.
-
-The panic below seems something very bad happened, hctx(maybe ctx)->lock got
-from the request is NULL.
-
-Thanks!
+Thanks,
+Milan
 
 > 
-> Best wishes,
+> Tested by:
 > 
-> Friedrich
+> $ dd if=/dev/urandom of=key.bin bs=512 count=1
 > 
-> [1]
+> $ cryptsetup luksFormat -q --type luks2 --integrity hmac-sha256 \
+>   	--integrity-no-wipe /dev/nvme0n1 key.bin
+> $ cryptsetup luksOpen /dev/nvme0n1 luks-integrity --key-file key.bin
 > 
-> [    1.091562] BUG: kernel NULL pointer dereference, address:
-> 0000000000000000
-> [    1.092097] #PF: supervisor write access in kernel mode
-> [    1.092469] #PF: error_code(0x0002) - not-present page
-> [    1.092880] PGD 0 P4D 0
-> [    1.093064] Oops: Oops: 0002 [#1] PREEMPT SMP NOPTI
-> [    1.093193] systemd[1]: Finished systemd-sysusers.service - Create
-> System Users.
-> [    1.093422] CPU: 1 PID: 130 Comm: kworker/1:1H Tainted: G
-> E      6.10.0-rc2-patch0604-6-10rc2+ #37
-> [    1.095178] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-> [    1.096005] Workqueue: kblockd blk_mq_requeue_work
-> [    1.096342] RIP: 0010:_raw_spin_lock+0x13/0x60
-> [    1.096707] Code: 31 db c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90
-> 90 90 90 90 90 90 0f 1f 44 00 00 65 ff 05 3c 42 4a 6f 31 c0 ba 01 00 00
-> 00 <f0> 0f b1 17 75 1b 31 c0 31 d2 31 c9 31 f6 31 ff 45 31 c0 45 31 c9
-> [    1.098021] RSP: 0000:ffffb5ebc0343d78 EFLAGS: 00010246
-> [    1.098381] RAX: 0000000000000000 RBX: ffff9326c8c8c800 RCX:
-> 00000000ffffffe0
-> [    1.098917] RDX: 0000000000000001 RSI: 0000000000000001 RDI:
-> 0000000000000000
-> [    1.099409] RBP: ffffb5ebc0343d98 R08: 0000000000000000 R09:
-> 0000000000000000
-> [    1.099944] R10: 0000000000000000 R11: 0000000000000000 R12:
-> 0000000000000000
-> [    1.100440] R13: 0000000000000001 R14: ffff9327f7cc2180 R15:
-> ffff9326c8c91894
-> [    1.100969] FS:  0000000000000000(0000) GS:ffff9327f7c80000(0000)
-> knlGS:0000000000000000
-> [    1.101526] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.101950] CR2: 0000000000000000 CR3: 0000000100eaa005 CR4:
-> 0000000000370ef0
-> [    1.102443] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-> 0000000000000000
-> [    1.102951] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-> 0000000000000400
-> [    1.103447] Call Trace:
-> [    1.103626]  <TASK>
-> [    1.103805]  ? show_regs+0x6c/0x80
-> [    1.104053]  ? __die+0x24/0x80
-> [    1.104055]  ? page_fault_oops+0x175/0x5e0
-> [    1.104059]  ? do_user_addr_fault+0x325/0x690
-> [    1.104062]  ? exc_page_fault+0x82/0x1b0
-> [    1.105390]  ? asm_exc_page_fault+0x27/0x30
-> [    1.105716]  ? _raw_spin_lock+0x13/0x60
-> [    1.106033]  ? blk_mq_request_bypass_insert+0x20/0xe0
-> [    1.106385]  blk_mq_insert_request+0x120/0x1e0
-> [    1.106704]  blk_mq_requeue_work+0x18f/0x230
-> [    1.107033]  process_one_work+0x196/0x3e0
-> [    1.107316]  worker_thread+0x32a/0x500
-> [    1.107587]  ? __pfx_worker_thread+0x10/0x10
-> [    1.107915]  kthread+0xe1/0x110
-> [    1.108140]  ? __pfx_kthread+0x10/0x10
-> [    1.108409]  ret_from_fork+0x44/0x70
-> [    1.108662]  ? __pfx_kthread+0x10/0x10
-> [    1.108952]  ret_from_fork_asm+0x1a/0x30
-> [    1.109228]  </TASK>
-> [    1.109386] Modules linked in: efi_pstore(E) dmi_sysfs(E)
-> qemu_fw_cfg(E) ip_tables(E) x_tables(E) autofs4(E) crc32_pclmul(E)
-> bochs(E) drm_vram_helper(E) drm_ttm_helper(E) psmouse(E) uhci_hcd(E)
-> ttm(E) ehci_hcd(E) i2c_piix4(E) pata_acpi(E) floppy(E)
-> [    1.110910] CR2: 0000000000000000
-> [    1.111161] ---[ end trace 0000000000000000 ]---
-> [    1.111489] RIP: 0010:_raw_spin_lock+0x13/0x60
-> [    1.111802] Code: 31 db c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90
-> 90 90 90 90 90 90 0f 1f 44 00 00 65 ff 05 3c 42 4a 6f 31 c0 ba 01 00 00
-> 00 <f0> 0f b1 17 75 1b 31 c0 31 d2 31 c9 31 f6 31 ff 45 31 c0 45 31 c9
-> [    1.113119] RSP: 0000:ffffb5ebc0343d78 EFLAGS: 00010246
-> [    1.113489] RAX: 0000000000000000 RBX: ffff9326c8c8c800 RCX:
-> 00000000ffffffe0
-> [    1.114001] RDX: 0000000000000001 RSI: 0000000000000001 RDI:
-> 0000000000000000
-> [    1.114497] RBP: ffffb5ebc0343d98 R08: 0000000000000000 R09:
-> 0000000000000000
-> [    1.114998] R10: 0000000000000000 R11: 0000000000000000 R12:
-> 0000000000000000
-> [    1.115508] R13: 0000000000000001 R14: ffff9327f7cc2180 R15:
-> ffff9326c8c91894
-> [    1.115997] FS:  0000000000000000(0000) GS:ffff9327f7c80000(0000)
-> knlGS:0000000000000000
-> [    1.116578] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.116975] CR2: 0000000000000000 CR3: 0000000100eaa005 CR4:
-> 0000000000370ef0
-> [    1.117494] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-> 0000000000000000
-> [    1.117982] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-> 0000000000000400
-> [    1.118526] note: kworker/1:1H[130] exited with irqs disabled
-> [    1.118947] note: kworker/1:1H[130] exited with preempt_count 1
+> and then doing mkfs.xfs and simple I/O on the mount file system.
 > 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/md/dm-crypt.c     |  4 ++--
+>   drivers/md/dm-integrity.c | 20 --------------------
+>   2 files changed, 2 insertions(+), 22 deletions(-)
 > 
+> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> index 1b7a97cc377943..1dfc462f29cd6f 100644
+> --- a/drivers/md/dm-crypt.c
+> +++ b/drivers/md/dm-crypt.c
+> @@ -1176,8 +1176,8 @@ static int crypt_integrity_ctr(struct crypt_config *cc, struct dm_target *ti)
+>   	struct blk_integrity *bi = blk_get_integrity(cc->dev->bdev->bd_disk);
+>   	struct mapped_device *md = dm_table_get_md(ti->table);
+>   
+> -	/* From now we require underlying device with our integrity profile */
+> -	if (!bi || strcasecmp(bi->profile->name, "DM-DIF-EXT-TAG")) {
+> +	/* We require an underlying device with non-PI metadata */
+> +	if (!bi || strcmp(bi->profile->name, "nop")) {
+>   		ti->error = "Integrity profile not supported.";
+>   		return -EINVAL;
+>   	}
+> diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+> index 417fddebe367a2..c1cc27541673c7 100644
+> --- a/drivers/md/dm-integrity.c
+> +++ b/drivers/md/dm-integrity.c
+> @@ -350,25 +350,6 @@ static struct kmem_cache *journal_io_cache;
+>   #define DEBUG_bytes(bytes, len, msg, ...)	do { } while (0)
+>   #endif
+>   
+> -static void dm_integrity_prepare(struct request *rq)
+> -{
+> -}
+> -
+> -static void dm_integrity_complete(struct request *rq, unsigned int nr_bytes)
+> -{
+> -}
+> -
+> -/*
+> - * DM Integrity profile, protection is performed layer above (dm-crypt)
+> - */
+> -static const struct blk_integrity_profile dm_integrity_profile = {
+> -	.name			= "DM-DIF-EXT-TAG",
+> -	.generate_fn		= NULL,
+> -	.verify_fn		= NULL,
+> -	.prepare_fn		= dm_integrity_prepare,
+> -	.complete_fn		= dm_integrity_complete,
+> -};
+> -
+>   static void dm_integrity_map_continue(struct dm_integrity_io *dio, bool from_map);
+>   static void integrity_bio_wait(struct work_struct *w);
+>   static void dm_integrity_dtr(struct dm_target *ti);
+> @@ -3656,7 +3637,6 @@ static void dm_integrity_set(struct dm_target *ti, struct dm_integrity_c *ic)
+>   	struct blk_integrity bi;
+>   
+>   	memset(&bi, 0, sizeof(bi));
+> -	bi.profile = &dm_integrity_profile;
+>   	bi.tuple_size = ic->tag_size;
+>   	bi.tag_size = bi.tuple_size;
+>   	bi.interval_exp = ic->sb->log2_sectors_per_block + SECTOR_SHIFT;
+
