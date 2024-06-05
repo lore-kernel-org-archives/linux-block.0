@@ -1,171 +1,77 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F5419D899
-	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 16:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7B010A0C;
+	Wed,  5 Jun 2024 16:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717604301; cv=none; b=i1SiHuvC55hImfi8giI+84nOKgJAN8mbMfYDbhkU1p93HvEUSmLMn5Qm4zxrEEIqXHqrNgB3up2+kbk/PkaKloyVjXseTZwx36mLUDm9HXuTgw8y8Ja5WLxzNo6Koyw4m+5IaBhiz/gy2nwOiZmpGbS5AuxRVFF0b5NOzA8TrFo=
+	t=1717604491; cv=none; b=I5D2Xu/Ed5pjbowk5vp+6S4FTC92UqVFnpupLU8gt6VEQrVeHA34HuBxWnMUjJymQGyuQI2o1yPAXSfN+vTghjQJGfXtX9EqduhiR9YqrlzPWNglVPggDu9VsZQanHODzya+RoRL64XSHqMW7SEGqGRj+IPn8v7bQloTqrnKMfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717604301; c=relaxed/simple;
-	bh=fwWU9ACLHlXOSaWCSc9OkDOHKfli8HD1HB9skGbW5wA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JTLiNgrV/TvMUTCtVXI9Mr7jFXLlaVujqJXtm2Vs8JkqS1T+l4qPWOLVkt084RMMOK0kfL2i8vGeTIZlSNXvWkpvE4/rU0Ez3iGu2IlgnS2j9qrvzDBelNK7fH09o3RXs8EEQZ5aezAcQEQ/U+PZ/P4xITKBl59vxT16HHoAS6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Snfrg//j; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1717604491; c=relaxed/simple;
+	bh=AeMpN3/HkoGEKgWkazauMmOVV7MorD6M70jE/QLwyw0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D18OT5oI4J7QmeWgIyxMxgfbwnI52AphFv+bApV/ckes3wlkb8Nwsf2Wz6esYUVT/Pf/5EvM8pF7S9yHpMtyE657bNvzOxywn2IYQfuW4Gk2bjB7qBCiCgEP2NhgR3e6aOghgPJfYqcxL9tztkjA+1pxENtEB8eVI25yMRQslzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=rPUEUzoZ; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Snfrg//j"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455CX74w016230;
-	Wed, 5 Jun 2024 16:18:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc :
- content-transfer-encoding : date : from : message-id : mime-version :
- subject : to; s=corp-2023-11-20;
- bh=nXDwuzf8ZCw8mtVnH92xBGHNdkLZ8tOpmAeNBQr7cXU=;
- b=Snfrg//juf+nMt9Ez99XFYqYig/MtuKXi0gIC9tQdfZCvB/JTNoZgMpSIDCO7SqzYG9f
- JpWqeF65UsGs8cGkODxPyxiypP65DseTW5AbbsfCG4UZ3PPW6IU0SUPyUp1A3fFtxyC4
- 1RN/5OxQR68E3Xf46HZEDTXSNoKy8reXFr/aneV2KDVOzWHmhP6kBMXoAsHSaeDWPCb2
- hVIBFtxyafe9+2ctBl3NmOZQZpHDW4EnbleTaJrIbNdi9UrFuIUrA3BaZlVvXUaWCNsd
- G8ltq9e5tJ9OQO9q/DSaDJfBIysTNXaimXv2CJqqdsu0o/6zWWHs5lEOwcLavbKa+o4O GA== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yjbtw9pbv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 05 Jun 2024 16:18:17 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 455G4o03016140;
-	Wed, 5 Jun 2024 16:18:16 GMT
-Received: from gms-lo-open-test.osdevelopmeniad.oraclevcn.com (gms-lo-open-test.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.255.129])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3ygrsbs5xq-1;
-	Wed, 05 Jun 2024 16:18:16 +0000
-From: Gulam Mohamed <gulam.mohamed@oracle.com>
-To: linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com
-Subject: [PATCH V4 blktests] loop: Detect a race condition between loop detach and open
-Date: Wed,  5 Jun 2024 16:18:15 +0000
-Message-Id: <20240605161815.34923-1-gulam.mohamed@oracle.com>
-X-Mailer: git-send-email 2.39.3
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="rPUEUzoZ"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VvXlY2Rxnz6Cnv3g;
+	Wed,  5 Jun 2024 16:21:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1717604483; x=1720196484; bh=AeMpN3/HkoGEKgWkazauMmOV
+	V7MorD6M70jE/QLwyw0=; b=rPUEUzoZ8+KtwYmYeN7KvwPdY7EOKVynTJK+fuWF
+	LaoU5ckjwgRby7kkTKgtKGUiYtVXK9rzxp6GB511AEqNulgxggxdZMkeTTwYWWMx
+	s2kwIsnrH87QkEJ+c61r1M955VRxUd5y2xd0Es7OHNE4aQqofgTswIyrpXr2lPsW
+	YCBC0snf+ZTwbKYZ6Nx+Swm7H0hiRiOswF6eJPfxPJ9dz/NhAa+A5SOn5VOz7Nc6
+	GMmdcIhYn9MUJxRjiLNBiLczbPgsvE3xc8+Q+HJys0PH0GG2UCiWUKmHGmsh2M6I
+	FG0Uc9LLYrF0wAMHTKzSNfedf63LMKcqNRtvJHe9pcgUdQ==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id LdQe7KTkFscU; Wed,  5 Jun 2024 16:21:23 +0000 (UTC)
+Received: from [192.168.132.235] (unknown [65.117.37.195])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VvXlM2TnXz6Cnv3Q;
+	Wed,  5 Jun 2024 16:21:19 +0000 (UTC)
+Message-ID: <2a4ce522-bdc0-41b9-b601-6e001719121b@acm.org>
+Date: Wed, 5 Jun 2024 10:21:17 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-05_02,2024-06-05_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
- malwarescore=0 suspectscore=0 phishscore=0 mlxlogscore=983 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2406050122
-X-Proofpoint-GUID: Zb-1lH4ZaPFIa7hZhG9afySw_f_NqBbO
-X-Proofpoint-ORIG-GUID: Zb-1lH4ZaPFIa7hZhG9afySw_f_NqBbO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/12] block: remove the BIP_IP_CHECKSUM flag
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+References: <20240605063031.3286655-1-hch@lst.de>
+ <20240605063031.3286655-4-hch@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240605063031.3286655-4-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When one process opens a loop device partition and another process detaches
-it, there will be a race condition due to which stale loop partitions are
-created causing IO errors. This test will detect the race.
+On 6/5/24 00:28, Christoph Hellwig wrote:
+> Remove the BIP_IP_CHECKSUM as sd can just look at the per-disk
+> checksum type instead.
 
-Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
----
-v4<-v3:
-1. Resolved formatting issues
-2. Using long options for commands instead of short options
-
- tests/loop/010     | 75 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/loop/010.out |  2 ++
- 2 files changed, 77 insertions(+)
- create mode 100755 tests/loop/010
- create mode 100644 tests/loop/010.out
-
-diff --git a/tests/loop/010 b/tests/loop/010
-new file mode 100755
-index 000000000000..f5d1bf1f9c18
---- /dev/null
-+++ b/tests/loop/010
-@@ -0,0 +1,75 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024, Oracle and/or its affiliates.
-+#
-+# Test to detect a race between loop detach and loop open which creates
-+# stale loop partitions when one process opens the loop partition and
-+# another process detaches the loop device.
-+#
-+. tests/loop/rc
-+DESCRIPTION="check stale loop partition"
-+TIMED=1
-+
-+requires() {
-+	_have_program parted
-+	_have_program mkfs.xfs
-+}
-+
-+image_file="$TMPDIR/loopImg"
-+
-+create_loop() {
-+	while true
-+	do
-+		loop_device="$(losetup --partscan --find --show "${image_file}")"
-+		blkid /dev/loop0p1 >& /dev/null
-+	done
-+}
-+
-+detach_loop() {
-+	while true
-+	do
-+		if [ -e /dev/loop0 ]; then
-+			losetup --detach /dev/loop0 >& /dev/null
-+		fi
-+	done
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+	local loop_device
-+	local create_pid
-+	local detach_pid
-+
-+	truncate --size 1G "${image_file}"
-+	parted --align none --script "${image_file}" mklabel gpt
-+	loop_device="$(losetup --partscan --find --show "${image_file}")"
-+	parted --align none --script "${loop_device}" mkpart primary 64s 109051s
-+
-+	udevadm settle
-+
-+	if [ ! -e "${loop_device}" ]; then
-+		return 1
-+	fi
-+
-+	mkfs.xfs --force "${loop_device}p1" >& /dev/null
-+	losetup --detach "${loop_device}" >&  /dev/null
-+
-+	create_loop &
-+	create_pid=$!
-+	detach_loop &
-+	detach_pid=$!
-+
-+	sleep "${TIMEOUT:-90}"
-+	{
-+		kill -9 $create_pid
-+		kill -9 $detach_pid
-+		wait
-+		sleep 1
-+	} 2>/dev/null
-+
-+	losetup --detach-all >& /dev/null
-+	if _dmesg_since_test_start | grep --quiet "partition scan of loop0 failed (rc=-16)"; then
-+		echo "Fail"
-+	fi
-+	echo "Test complete"
-+}
-diff --git a/tests/loop/010.out b/tests/loop/010.out
-new file mode 100644
-index 000000000000..64a6aee00b8a
---- /dev/null
-+++ b/tests/loop/010.out
-@@ -0,0 +1,2 @@
-+Running loop/010
-+Test complete
--- 
-2.39.3
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
