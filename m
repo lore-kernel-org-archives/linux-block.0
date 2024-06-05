@@ -1,164 +1,249 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9708718FDAD
-	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 09:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA9114B093
+	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 09:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717580854; cv=none; b=Ox+mKEG6lopT9xfR9MIqV4hSl/v6PsLTWn4ulinG0P1uT0DbQIgqxwkJAuqh2RBe5zzM6a2ePWfxf4uVfr7EnFvdXpFxFTdj3kaMEfQGbjy0OhsvjzQYt4YpJGd8XktQw/3HHG8+XOYveD59inavZSryVqyk1YtDXSThU7m+92s=
+	t=1717580889; cv=none; b=MUy0Kj2z5KLtOXiWukejtTaT6N93WY7FGJc/zfb5Ulvvm8i4rMtWWTLuWIBShc9wYYl0+mcpWmzYiPfrHVgN/nWmQCxAoYPem/QI0lFi2oCp1tX1qkdmKKPftFf436wvRrP/PPFZxgHu8fVV8G3JUs+6ckykuH3v8CyfK5GNSus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717580854; c=relaxed/simple;
-	bh=twWVhE0qODsH13l8jNlnYU6LMTSQAMjcBl9X8fIvn10=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=VpRDrPBZNfkWfH6Kx/ViSbAXiguyXAD0PrSY5XaAuIBgtzacaN7WxSSEC3hVF/rU7yqY56Y1sPyfMo3lYT7XRy1qO8qs7R9DkAerRHzdMPQb2P0dEZ0ERrONycG9odVuwG1H5MUFUJ1GP4KEgYt3F59PGljTsEVwPy7Wre8RvNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=AoiKFC96; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1717580889; c=relaxed/simple;
+	bh=C4iwgHy0Vtpi0Ntz+kAPqXOSt3BXAywIVancJW3S7TA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bgoA8aGimVjJbxkRkZ2cSG9jWDqGsPKpvsDL68utVBcRwU6mE8XCG0xWfgizHO/xxIjZu+kyxD81XqpIAxKR9s+hx6guZQjRkBy29ytjN8VugTu54RhXKWFKzsfQusx7vZCcsXBQxx2pzzzV6FFuCg1RGwy+GND0ZmhU8PlYKh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iWLWlqAi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="AoiKFC96"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240605094730epoutp03ca7ac9488d436ddee03440bf29df098a~WEq7-McvU1454214542epoutp030
-	for <linux-block@vger.kernel.org>; Wed,  5 Jun 2024 09:47:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240605094730epoutp03ca7ac9488d436ddee03440bf29df098a~WEq7-McvU1454214542epoutp030
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1717580850;
-	bh=vEiOcRtnbcv+SVB6C6T2s2ws1aVXj9VFiwsT7ZEL6UQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AoiKFC96jgTnImtRVM8PQA9OddAAdvNtlNKlnhJoLZp8hI90c4pcIep/7fWsE2/oD
-	 rMxOKMe5TrTG6+3s6Z7G9cHaMxPEijV3Hvqqj6QK0xjN9rEiI05qwG2OE6C78ynwmS
-	 dGLbwJUt7m07T8s9joH3TpasBjt72cYSlqrxMDa4=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240605094730epcas5p1fa8ffcb50c36f69bdab51e7e6d383b1a~WEq7oqPOm0305703057epcas5p1E;
-	Wed,  5 Jun 2024 09:47:30 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.178]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4VvN0w3bw2z4x9Q2; Wed,  5 Jun
-	2024 09:47:28 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	20.25.08853.03430666; Wed,  5 Jun 2024 18:47:28 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240605093234epcas5p151b3b39b2f2e1567c6e4ceae6130c6b9~WEd49sY1W0833508335epcas5p1w;
-	Wed,  5 Jun 2024 09:32:34 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240605093234epsmtrp2d559341e5b8690ae545f91b7432b48ec~WEd48gCJH0105501055epsmtrp25;
-	Wed,  5 Jun 2024 09:32:34 +0000 (GMT)
-X-AuditID: b6c32a44-d67ff70000002295-32-66603430f1bf
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	44.23.08336.1B030666; Wed,  5 Jun 2024 18:32:33 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240605093232epsmtip2258d7d272d666f567578917b46da1492~WEd3ODD-G3189331893epsmtip2s;
-	Wed,  5 Jun 2024 09:32:32 +0000 (GMT)
-From: Kundan Kumar <kundan.kumar@samsung.com>
-To: axboe@kernel.dk, hch@lst.de, willy@infradead.org, kbusch@kernel.org
-Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
-	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
-	gost.dev@samsung.com, Kundan Kumar <kundan.kumar@samsung.com>
-Subject: [PATCH v4 2/2] block: unpin user pages belonging to a folio
-Date: Wed,  5 Jun 2024 14:54:55 +0530
-Message-Id: <20240605092455.20435-3-kundan.kumar@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240605092455.20435-1-kundan.kumar@samsung.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWLWlqAi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717580886;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=opY4p+BpYUBWLdwIooIw98BXTUX1WcY1hsxBx/R5iBM=;
+	b=iWLWlqAi/eA8o7da24suwonh1ZDFp0AecEAr0mKYUvpyyHSeGbQKH0FTmFZujNHmYTvJH4
+	++1urh5gaX5DrjkwqGlEbcsoAjX1r/FMs4393k+1QTKAgJQEuxy33sGFLhUwmcc8KWqh0M
+	RgQbxhFdK0/Dwi0jPWgdSc6pRUz/HjI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-4X7cLI-bOh-8HDmhpp1D3Q-1; Wed, 05 Jun 2024 05:48:03 -0400
+X-MC-Unique: 4X7cLI-bOh-8HDmhpp1D3Q-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1F6BF101A520;
+	Wed,  5 Jun 2024 09:48:03 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DFE9E492BF6;
+	Wed,  5 Jun 2024 09:47:57 +0000 (UTC)
+Date: Wed, 5 Jun 2024 17:47:53 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Changhui Zhong <czhong@redhat.com>
+Cc: Li Nan <linan666@huaweicloud.com>, axboe@kernel.dk,
+	ZiyangZhang@linux.alibaba.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+	yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH] ublk_drv: fix NULL pointer dereference in
+ ublk_ctrl_start_recovery()
+Message-ID: <ZmA0Se+t/LZihBKp@fedora>
+References: <20240529095313.2568595-1-linan666@huaweicloud.com>
+ <Zl0QpCbYVHIkKa/H@fedora>
+ <225f4c8e-0e2c-8f4b-f87d-69f4677af572@huaweicloud.com>
+ <CAGVVp+XD5MbYOWL4pbLMxXL0yNKO5NJ84--=KVnW6w5-GF7Drw@mail.gmail.com>
+ <918f128b-f752-2d66-ca60-7d9c711ed928@huaweicloud.com>
+ <CAGVVp+V6XGmE_LyOYM3z8cEOzkvQZy=2Fnr5V3G4+DchxAz3Qw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJJsWRmVeSWpSXmKPExsWy7bCmhq6BSUKawZ014hZNE/4yW6y+289m
-	8X17H4vFzQM7mSxWrj7KZHH0/1s2i0mHrjFabP3yldVi7y1tixsTnjJabPs9n9ni9485bA48
-	HptXaHlcPlvqsWlVJ5vH7psNbB59W1YxenzeJBfAFpVtk5GamJJapJCal5yfkpmXbqvkHRzv
-	HG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQN0oZJCWWJOKVAoILG4WEnfzqYov7QkVSEjv7jE
-	Vim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO2NL42KWgsXcFZdOPGNqYPzP0cXIySEh
-	YCIx+0Q3G4gtJLCbUaLpT3EXIxeQ/YlRonPyMVYI5xujxOZjH5m7GDnAOqbeqoFo2Mso0ftX
-	AaLmM6PEjNvLWUBq2AR0JX40hYLUiAi4S0x9+YgRpIZZ4CyjxImpj1hAEsICLhI/f/xlArFZ
-	BFQl7mw+xQhi8wrYSix8cJEF4jp5iZmXvrOD2JwCdhLfW3tYIWoEJU7OfAJWwwxU07x1NjPI
-	AgmBqRwSTTOeMEE0u0gc2NDCDmELS7w6vgXKlpL4/G4vG4SdLXGocQNUfYnEziMNUDX2Eq2n
-	+sEeZhbQlFi/Sx8iLCsx9dQ6Joi9fBK9v2FW8UrsmAdjq0nMeTcV6n4ZiYWXZkDFPSTOfDwO
-	DdCJjBIvPq9inMCoMAvJP7OQ/DMLYfUCRuZVjJKpBcW56anJpgWGeanl8DhOzs/dxAhOs1ou
-	OxhvzP+nd4iRiYPxEKMEB7OSCK9fcXyaEG9KYmVValF+fFFpTmrxIUZTYIBPZJYSTc4HJvq8
-	knhDE0sDEzMzMxNLYzNDJXHe161zU4QE0hNLUrNTUwtSi2D6mDg4pRqY6sQdJT4YJ1f9epYy
-	9+L5hISfAdV19VL1gjPYNoTrNgiL/PwZkX/xwKv68szp97j3vL28WHHZwtDFqzPn3i+pCeq9
-	9rp03iS+O91Lft+beP9Z3ln7m9u2Gk+YWLRz0kKOPxaf5JYfbWcw47ly17nEmI0vdnrnEcE5
-	HTNUlyyxPtoaHrK4vCKIxalHKm/F8v/ft7c6MyZ+tZpVa/h7+5wfd01ilnz8rDm1Y3ls8Ksz
-	qeekF5wPPNTx6vCS90ePnIlde1PlqhnndvFwLQfBtNxr4R8EIngFJsks1bsRsPWI8eRPPWtS
-	j8z89cz8+Kxg9a69N35fvDMl8+va5mCbpX4z3e5Nz/l2Rvp6ufWP/mXPT+5TYinOSDTUYi4q
-	TgQASGWUmzwEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrALMWRmVeSWpSXmKPExsWy7bCSvO4mg4Q0gyvOFk0T/jJbrL7bz2bx
-	fXsfi8XNAzuZLFauPspkcfT/WzaLSYeuMVps/fKV1WLvLW2LGxOeMlps+z2f2eL3jzlsDjwe
-	m1doeVw+W+qxaVUnm8fumw1sHn1bVjF6fN4kF8AWxWWTkpqTWZZapG+XwJWxpXExS8Fi7opL
-	J54xNTD+5+hi5OCQEDCRmHqrpouRi0NIYDejxN2XnaxdjJxAcRmJ3Xd3QtnCEiv/PWeHKPrI
-	KHHu4DZmkGY2AV2JH02hIDUiAr4SCzY8ZwSpYRa4zihxY/pWZpCEsICLxM8ff5lAbBYBVYk7
-	m08xgti8ArYSCx9cZIFYIC8x89J3dhCbU8BO4ntrD9hiIaCaXTu2skDUC0qcnPkEzGYGqm/e
-	Opt5AqPALCSpWUhSCxiZVjFKphYU56bnFhsWGOallusVJ+YWl+al6yXn525iBEeCluYOxu2r
-	PugdYmTiYDzEKMHBrCTC61ccnybEm5JYWZValB9fVJqTWnyIUZqDRUmcV/xFb4qQQHpiSWp2
-	ampBahFMlomDU6qBKTf2ys15+4vUdD9PuZddNfPQ9S37ExgCq7vTmCUqZTmXT963ascVowK7
-	5jSHhzZa5s/4rp3Zfvbb0RXn716dyNnQ9b6ssM6kevn1dyuyohZ0+xye0Jpkf5VPT8LpcQmz
-	yxyNLBerXA7nirUru23uHpl/qOCKVe8yC9s9y3tuvDXNv8wvcviKw6bsb3yXd6RtYp4irPu8
-	u7zUyvbIu7lMnpv6s3+fzLwbc9SvV/Ki9aQ390KyzHKEIgtu/s3nu1AkOn3xBu7leWcjdViK
-	/t+dqPP3kcC1nje7ZywyPDLTqD1hysSrN2bd1Xv/QPdhvE2Sy13jK6mRdgqh85YkaD688HbL
-	pqaYpHv7v4qXnZy6sFCJpTgj0VCLuag4EQBap/ns8wIAAA==
-X-CMS-MailID: 20240605093234epcas5p151b3b39b2f2e1567c6e4ceae6130c6b9
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240605093234epcas5p151b3b39b2f2e1567c6e4ceae6130c6b9
-References: <20240605092455.20435-1-kundan.kumar@samsung.com>
-	<CGME20240605093234epcas5p151b3b39b2f2e1567c6e4ceae6130c6b9@epcas5p1.samsung.com>
+In-Reply-To: <CAGVVp+V6XGmE_LyOYM3z8cEOzkvQZy=2Fnr5V3G4+DchxAz3Qw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Unpin pages which belong to same folio. This enables us to release folios
-on I/O completion rather than looping through pages.
+On Wed, Jun 05, 2024 at 03:20:34PM +0800, Changhui Zhong wrote:
+> On Wed, Jun 5, 2024 at 9:41 AM Li Nan <linan666@huaweicloud.com> wrote:
+> >
+> >
+> >
+> > 在 2024/6/4 9:32, Changhui Zhong 写道:
+> > > On Mon, Jun 3, 2024 at 10:20 AM Li Nan <linan666@huaweicloud.com> wrote:
+> > >>
+> > >>
+> > >>
+> > >> 在 2024/6/3 8:39, Ming Lei 写道:
+> > >>
+> > >> [...]
+> > >>
+> > >>>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > >>>> index 4e159948c912..99b621b2d40f 100644
+> > >>>> --- a/drivers/block/ublk_drv.c
+> > >>>> +++ b/drivers/block/ublk_drv.c
+> > >>>> @@ -2630,7 +2630,8 @@ static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
+> > >>>>    {
+> > >>>>       int i;
+> > >>>>
+> > >>>> -    WARN_ON_ONCE(!(ubq->ubq_daemon && ubq_daemon_is_dying(ubq)));
+> > >>>> +    if (WARN_ON_ONCE(!(ubq->ubq_daemon && ubq_daemon_is_dying(ubq))))
+> > >>>> +            return;
+> > >>>
+> > >>> Yeah, it is one bug. However, it could be addressed by adding the check in
+> > >>> ublk_ctrl_start_recovery() and return immediately in case of NULL ubq->ubq_daemon,
+> > >>> what do you think about this way?
+> > >>>
+> > >>
+> > >> Check ub->nr_queues_ready seems better. How about:
+> > >>
+> > >> @@ -2662,6 +2662,8 @@ static int ublk_ctrl_start_recovery(struct
+> > >> ublk_device *ub,
+> > >>           mutex_lock(&ub->mutex);
+> > >>           if (!ublk_can_use_recovery(ub))
+> > >>                   goto out_unlock;
+> > >> +       if (!ub->nr_queues_ready)
+> > >> +               goto out_unlock;
+> > >>           /*
+> > >>            * START_RECOVERY is only allowd after:
+> > >>            *
+> > >>
+> > >>>
+> > >>> Thanks,
+> > >>> Ming
+> > >>
+> > >> --
+> > >> Thanks,
+> > >> Nan
+> > >>
+> > >
+> > >
+> > > Hi,Nan
+> > >
+> > > After applying your new patch, I did not trigger "NULL pointer
+> > > dereference" and "Warning",
+> > > but hit task hung "Call Trace" info, please check
+> > >
+> > > [13617.812306] running generic/004
+> > > [13622.293674] blk_print_req_error: 91 callbacks suppressed
+> > > [13622.293681] I/O error, dev ublkb4, sector 233256 op 0x1:(WRITE)
+> > > flags 0x8800 phys_seg 1 prio class 0
+> > > [13622.308145] I/O error, dev ublkb4, sector 233256 op 0x0:(READ)
+> > > flags 0x0 phys_seg 2 prio class 0
+> > > [13622.316923] I/O error, dev ublkb4, sector 233264 op 0x1:(WRITE)
+> > > flags 0x8800 phys_seg 1 prio class 0
+> > > [13622.326048] I/O error, dev ublkb4, sector 233272 op 0x0:(READ)
+> > > flags 0x0 phys_seg 1 prio class 0
+> > > [13622.334828] I/O error, dev ublkb4, sector 233272 op 0x1:(WRITE)
+> > > flags 0x8800 phys_seg 1 prio class 0
+> > > [13622.343954] I/O error, dev ublkb4, sector 233312 op 0x0:(READ)
+> > > flags 0x0 phys_seg 1 prio class 0
+> > > [13622.352733] I/O error, dev ublkb4, sector 233008 op 0x0:(READ)
+> > > flags 0x0 phys_seg 1 prio class 0
+> > > [13622.361514] I/O error, dev ublkb4, sector 233112 op 0x0:(READ)
+> > > flags 0x0 phys_seg 1 prio class 0
+> > > [13622.370292] I/O error, dev ublkb4, sector 233192 op 0x1:(WRITE)
+> > > flags 0x8800 phys_seg 1 prio class 0
+> > > [13622.379419] I/O error, dev ublkb4, sector 233120 op 0x0:(READ)
+> > > flags 0x0 phys_seg 1 prio class 0
+> > > [13641.069695] INFO: task fio:174413 blocked for more than 122 seconds.
+> > > [13641.076061]       Not tainted 6.10.0-rc1+ #1
+> > > [13641.080338] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> > > disables this message.
+> > > [13641.088164] task:fio             state:D stack:0     pid:174413
+> > > tgid:174413 ppid:174386 flags:0x00004002
+> > > [13641.088168] Call Trace:
+> > > [13641.088170]  <TASK>
+> > > [13641.088171]  __schedule+0x221/0x670
+> > > [13641.088177]  schedule+0x23/0xa0
+> > > [13641.088179]  io_schedule+0x42/0x70
+> > > [13641.088181]  blk_mq_get_tag+0x118/0x2b0
+> > > [13641.088185]  ? gup_fast_pgd_range+0x280/0x370
+> > > [13641.088188]  ? __pfx_autoremove_wake_function+0x10/0x10
+> > > [13641.088192]  __blk_mq_alloc_requests+0x194/0x3a0
+> > > [13641.088194]  blk_mq_submit_bio+0x241/0x6c0
+> > > [13641.088196]  __submit_bio+0x8a/0x1f0
+> > > [13641.088199]  submit_bio_noacct_nocheck+0x168/0x250
+> > > [13641.088201]  ? submit_bio_noacct+0x45/0x560
+> > > [13641.088203]  __blkdev_direct_IO_async+0x167/0x1a0
+> > > [13641.088206]  blkdev_write_iter+0x1c8/0x270
+> > > [13641.088208]  aio_write+0x11c/0x240
+> > > [13641.088212]  ? __rq_qos_issue+0x21/0x40
+> > > [13641.088214]  ? blk_mq_start_request+0x34/0x1a0
+> > > [13641.088216]  ? io_submit_one+0x68/0x380
+> > > [13641.088218]  ? kmem_cache_alloc_noprof+0x4e/0x320
+> > > [13641.088221]  ? fget+0x7c/0xc0
+> > > [13641.088224]  ? io_submit_one+0xde/0x380
+> > > [13641.088226]  io_submit_one+0xde/0x380
+> > > [13641.088228]  __x64_sys_io_submit+0x80/0x160
+> > > [13641.088229]  do_syscall_64+0x79/0x150
+> > > [13641.088233]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> > > [13641.088237]  ? do_io_getevents+0x8b/0xe0
+> > > [13641.088238]  ? syscall_exit_work+0xf3/0x120
+> > > [13641.088241]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> > > [13641.088243]  ? do_syscall_64+0x85/0x150
+> > > [13641.088245]  ? do_syscall_64+0x85/0x150
+> > > [13641.088247]  ? blk_mq_flush_plug_list.part.0+0x108/0x160
+> > > [13641.088249]  ? rseq_get_rseq_cs+0x1d/0x220
+> > > [13641.088252]  ? rseq_ip_fixup+0x6d/0x1d0
+> > > [13641.088254]  ? blk_finish_plug+0x24/0x40
+> > > [13641.088256]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> > > [13641.088258]  ? do_syscall_64+0x85/0x150
+> > > [13641.088260]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> > > [13641.088262]  ? do_syscall_64+0x85/0x150
+> > > [13641.088264]  ? syscall_exit_to_user_mode+0x6c/0x1f0
+> > > [13641.088266]  ? do_syscall_64+0x85/0x150
+> > > [13641.088268]  ? do_syscall_64+0x85/0x150
+> > > [13641.088270]  ? do_syscall_64+0x85/0x150
+> > > [13641.088272]  ? clear_bhb_loop+0x45/0xa0
+> > > [13641.088275]  ? clear_bhb_loop+0x45/0xa0
+> > > [13641.088277]  ? clear_bhb_loop+0x45/0xa0
+> > > [13641.088279]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > > [13641.088281] RIP: 0033:0x7ff92150713d
+> > > [13641.088283] RSP: 002b:00007ffca1ef81f8 EFLAGS: 00000246 ORIG_RAX:
+> > > 00000000000000d1
+> > > [13641.088285] RAX: ffffffffffffffda RBX: 00007ff9217e2f70 RCX: 00007ff92150713d
+> > > [13641.088286] RDX: 000055863b694fe0 RSI: 0000000000000010 RDI: 00007ff92164d000
+> > > [13641.088287] RBP: 00007ff92164d000 R08: 00007ff91936d000 R09: 0000000000000180
+> > > [13641.088288] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000010
+> > > [13641.088289] R13: 0000000000000000 R14: 000055863b694fe0 R15: 000055863b6970c0
+> > > [13641.088291]  </TASK>
+> > >
+> > > Thanks，
+> > > Changhui
+> > >
+> >
+> > After applying the previous patch, will the test environment continue to
+> > execute test cases after WARN?
+> 
+> a few days ago，test with the previous patch, the test environment
+> continued to execute test cases after WARN,
+> and I terminated the test when I observed a WARN，so I did not observe
+> the subsequent situation.
+> 
+> > I am not sure whether this issue has always
+> > existed but was not tested becasue of WARN, or whether the new patch
+> > introduced it.
+> 
+> today， I re-test previous patch， and let it run for a long time，I
+> observed WARN and task hung，
+> looks this issue already existed and not introduced by new patch.
 
-Suggested-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Kundan Kumar <kundan.kumar@samsung.com>
----
- block/bio.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+Hi Changhui,
 
-diff --git a/block/bio.c b/block/bio.c
-index 7857b9ca5957..28418170a14a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1166,20 +1166,12 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
- 	struct folio_iter fi;
- 
- 	bio_for_each_folio_all(fi, bio) {
--		struct page *page;
--		size_t nr_pages;
--
- 		if (mark_dirty) {
- 			folio_lock(fi.folio);
- 			folio_mark_dirty(fi.folio);
- 			folio_unlock(fi.folio);
- 		}
--		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
--		nr_pages = (fi.offset + fi.length - 1) / PAGE_SIZE -
--			   fi.offset / PAGE_SIZE + 1;
--		do {
--			bio_release_page(bio, page++);
--		} while (--nr_pages != 0);
-+		bio_release_page(bio, &fi.folio->page);
- 	}
- }
- EXPORT_SYMBOL_GPL(__bio_release_pages);
-@@ -1342,6 +1334,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 		} else
- 			bio_iov_add_folio(bio, folio, len, folio_offset);
- 
-+		if (bio_flagged(bio, BIO_PAGE_PINNED) && num_pages > 1)
-+			unpin_user_pages(pages + i, num_pages - 1);
-+
- 		/* Skip the pages which got added */
- 		i = i + (num_pages - 1);
- 
--- 
-2.25.1
+The hang is actually expected because recovery fails.
+
+Please pull the latest ublksrv and check if the issue can still be
+reproduced:
+
+https://github.com/ublk-org/ublksrv
+
+BTW, one ublksrv segfault and two test cleanup issues are fixed.
+
+Thanks,
+Ming
 
