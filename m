@@ -1,43 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435F819FA83;
-	Wed,  5 Jun 2024 12:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F9F1A2560;
+	Wed,  5 Jun 2024 12:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588965; cv=none; b=lCXOUdASKHQ1e+CZu64MiBOQ9eSBPO7o5AIWjb1OzHhWE5wr64f2FrW3/VShSjHrs+Cs/Z2PdtMyh9XdkN6HIALYYiJ1uwjFswwdsathA4vkN9cZ8T/3lnnTcZI/1Kb7kPMSpubJA2bAOei4MrTDniiO/JRkdi2nyUgu1ekZQRY=
+	t=1717588987; cv=none; b=OR71m4sLSWbZk+JETQ1BMxRHLz99gm4tTrszsIAdx3FHv2zL93UnLBNtv9Ue4axIuprgJncZ6XQr0xebkAXVbn1vgOhIdHjSuBRYgxKRUx1znMZxgbqWt7Jn4ylcpKDVQRF5JFOohrwMwlGxpQoMAmhW/0rRNLQ7XGJYM0T8z1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588965; c=relaxed/simple;
-	bh=BQlbPAvxsdi3X1d2VhHNpiIeTwGwQryj+ROh8dfsSWI=;
+	s=arc-20240116; t=1717588987; c=relaxed/simple;
+	bh=+W6S6xQ9Mr5ysKrm4VyCT5dvvfoqp7FzldkgEf13SbY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AQdbBk03BoeyRpEQxW9c1gblESCLj1VR6edZ/0rLJgaz+MSFVOT4HNtEdnl8W8e0WupUX1VbvxmzmTNFdO9S/wp76o0OblzNh7Lxa8H6nC99H6CjdMRtnFeSJy1gL2eoxZTVBXKG6wngIqunXbICZ8Wicv1eKWQIZH92bPbXKH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfUB443L; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=BkeYL2kLkH1khoNcLTL815xlWM4wXFKwFmaILYvWxWdVO8ovBI7/Qf8Xcov8DmH1h0hg40iDwUiDOvxWi/IS4dHiaraxnPH8MAYC+dK7necBSq2as+X/Eg2fo7JrviriICP1ZIdao1jfz/rHGiYoMh/AHhdAdQjjUt9xEWsp1b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGGPvpxQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfUB443L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 408F5C4AF09;
-	Wed,  5 Jun 2024 12:02:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGGPvpxQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FC49C3277B;
+	Wed,  5 Jun 2024 12:03:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717588965;
-	bh=BQlbPAvxsdi3X1d2VhHNpiIeTwGwQryj+ROh8dfsSWI=;
+	s=k20201202; t=1717588987;
+	bh=+W6S6xQ9Mr5ysKrm4VyCT5dvvfoqp7FzldkgEf13SbY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rfUB443LzP7TXG7N5SYUwYTseiYa7PFmIsm5QKtNDuZjxE5E3mCb3KvvVxFuhUarq
-	 H1J+y9hCDXSNzxnrSRGJK8fWKU9V0KJZTl5tMyVIgVrz366T9aSrg6S9kYUavZBuOH
-	 P2W8MuPMcKwyUW9/jstPUg8pa1+pbi+1+pBNhaVwszxJChR4zB9Xqbq/HAm/O5QnmY
-	 iqDT0mUTOAYXlv8jyb2Z5IBJaTmzZtWM5SZVF2qY/g4jxk6oFbPx26/cNx7AdvZ++z
-	 7EGovBcdCcm2QRoO/3nj7eo+MHkQ3PDfanOhI1jSC89S7yqHmD0eDVwyslyNLrXk88
-	 mICsIYWZ8Whdw==
+	b=jGGPvpxQvls/iN3TSXFBQYWKOvxHyL7UIRGCZ46It6PPEFuvsFIk3Jz5h0F6+32Bq
+	 82Gou7oQ+uE4e18uakPLP27UQ4AiGFr+5+UWi4UTSiG6ZS5L9I2Ezy9hboxcCQ6UwB
+	 iqt8SllWwlhuWXmEiorQyTZ+4Q1S30D7Qx5KPmcC97VdtvBxhNGI1LNOV06Sexu1r7
+	 10yoXDLkCVopnlsZYdUSI0pbUK6ES067uPn1fYn+6NQMW++TcH+MuRvIH2+MKU+C6o
+	 P5Gd8wu6BdRdiASKEgl2d0CvtJeDzJisO7BD/pnWWXphmBhrBlZynXB0zg34A6H306
+	 LX3g+pQExSLQA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Hannes Reinecke <hare@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	John Garry <john.g.garry@oracle.com>,
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
+	martin.petersen@oracle.com,
+	hare@suse.de,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 13/23] block: check for max_hw_sectors underflow
-Date: Wed,  5 Jun 2024 08:01:56 -0400
-Message-ID: <20240605120220.2966127-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.9 23/23] null_blk: Do not allow runt zone with zone capacity smaller then zone size
+Date: Wed,  5 Jun 2024 08:02:06 -0400
+Message-ID: <20240605120220.2966127-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240605120220.2966127-1-sashal@kernel.org>
 References: <20240605120220.2966127-1-sashal@kernel.org>
@@ -52,56 +54,53 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.9.3
 Content-Transfer-Encoding: 8bit
 
-From: Hannes Reinecke <hare@kernel.org>
+From: Damien Le Moal <dlemoal@kernel.org>
 
-[ Upstream commit e993db2d6e5207f1ae061c2ac554ab1f714c741d ]
+[ Upstream commit b164316808ec5de391c3e7b0148ec937d32d280d ]
 
-The logical block size need to be smaller than the max_hw_sector
-setting, otherwise we can't even transfer a single LBA.
+A zoned device with a smaller last zone together with a zone capacity
+smaller than the zone size does make any sense as that does not
+correspond to any possible setup for a real device:
+1) For ZNS and zoned UFS devices, all zones are always the same size.
+2) For SMR HDDs, all zones always have the same capacity.
+In other words, if we have a smaller last runt zone, then this zone
+capacity should always be equal to the zone size.
 
-Signed-off-by: Hannes Reinecke <hare@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: John Garry <john.g.garry@oracle.com>
+Add a check in null_init_zoned_dev() to prevent a configuration to have
+both a smaller zone size and a zone capacity smaller than the zone size.
+
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Niklas Cassel <cassel@kernel.org>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Link: https://lore.kernel.org/r/20240530054035.491497-2-dlemoal@kernel.org
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-settings.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/block/null_blk/zoned.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 9d6033e01f2e1..b4272bd926370 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -104,6 +104,7 @@ static int blk_validate_zoned_limits(struct queue_limits *lim)
- static int blk_validate_limits(struct queue_limits *lim)
- {
- 	unsigned int max_hw_sectors;
-+	unsigned int logical_block_sectors;
- 
- 	/*
- 	 * Unless otherwise specified, default to 512 byte logical blocks and a
-@@ -134,8 +135,11 @@ static int blk_validate_limits(struct queue_limits *lim)
- 		lim->max_hw_sectors = BLK_SAFE_MAX_SECTORS;
- 	if (WARN_ON_ONCE(lim->max_hw_sectors < PAGE_SECTORS))
+diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+index 1689e25841048..b638b7f7b4f80 100644
+--- a/drivers/block/null_blk/zoned.c
++++ b/drivers/block/null_blk/zoned.c
+@@ -84,6 +84,17 @@ int null_init_zoned_dev(struct nullb_device *dev,
  		return -EINVAL;
-+	logical_block_sectors = lim->logical_block_size >> SECTOR_SHIFT;
-+	if (WARN_ON_ONCE(logical_block_sectors > lim->max_hw_sectors))
-+		return -EINVAL;
- 	lim->max_hw_sectors = round_down(lim->max_hw_sectors,
--			lim->logical_block_size >> SECTOR_SHIFT);
-+			logical_block_sectors);
- 
- 	/*
- 	 * The actual max_sectors value is a complex beast and also takes the
-@@ -153,7 +157,7 @@ static int blk_validate_limits(struct queue_limits *lim)
- 		lim->max_sectors = min(max_hw_sectors, BLK_DEF_MAX_SECTORS_CAP);
  	}
- 	lim->max_sectors = round_down(lim->max_sectors,
--			lim->logical_block_size >> SECTOR_SHIFT);
-+			logical_block_sectors);
  
- 	/*
- 	 * Random default for the maximum number of segments.  Driver should not
++	/*
++	 * If a smaller zone capacity was requested, do not allow a smaller last
++	 * zone at the same time as such zone configuration does not correspond
++	 * to any real zoned device.
++	 */
++	if (dev->zone_capacity != dev->zone_size &&
++	    dev->size & (dev->zone_size - 1)) {
++		pr_err("A smaller last zone is not allowed with zone capacity smaller than zone size.\n");
++		return -EINVAL;
++	}
++
+ 	zone_capacity_sects = mb_to_sects(dev->zone_capacity);
+ 	dev_capacity_sects = mb_to_sects(dev->size);
+ 	dev->zone_size_sects = mb_to_sects(dev->zone_size);
 -- 
 2.43.0
 
