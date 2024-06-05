@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F9F1A2560;
-	Wed,  5 Jun 2024 12:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14F81A36B7;
+	Wed,  5 Jun 2024 12:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588987; cv=none; b=OR71m4sLSWbZk+JETQ1BMxRHLz99gm4tTrszsIAdx3FHv2zL93UnLBNtv9Ue4axIuprgJncZ6XQr0xebkAXVbn1vgOhIdHjSuBRYgxKRUx1znMZxgbqWt7Jn4ylcpKDVQRF5JFOohrwMwlGxpQoMAmhW/0rRNLQ7XGJYM0T8z1M=
+	t=1717589036; cv=none; b=FuUjEbCCJG/Dnxx/fgXuyhl9grvNqOvGcasX+5rtpWZXR7Jjc6ZDjsZqKkHJMnGVw0wZnLLchx/0aKi5vjHC8sx4wBAiVLBeOgeldRkC1ZvlZ6+27Bjyd6GrcB3UsL3VPfAqPn0uhhTGKbmQLwWf42OupvxZVR+JnQfdDhRPMzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588987; c=relaxed/simple;
-	bh=+W6S6xQ9Mr5ysKrm4VyCT5dvvfoqp7FzldkgEf13SbY=;
+	s=arc-20240116; t=1717589036; c=relaxed/simple;
+	bh=GNS9AW5xk91QvxSxcK6nVskhVX+Xg7DubMDBgAl/DNA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BkeYL2kLkH1khoNcLTL815xlWM4wXFKwFmaILYvWxWdVO8ovBI7/Qf8Xcov8DmH1h0hg40iDwUiDOvxWi/IS4dHiaraxnPH8MAYC+dK7necBSq2as+X/Eg2fo7JrviriICP1ZIdao1jfz/rHGiYoMh/AHhdAdQjjUt9xEWsp1b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGGPvpxQ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=q55kARnRXaHwI/YGNkrxI7qR2/VQnBbrGNGQzeMqURw7q2xoI5sMwEh+LYely+HzgvGlS+J8k24K0s9nZ9/HgQmTI7hGMBk4CA+xf83qTe+kJQmf88ygHj4VgbveoMao8y6J+DxcNvfXAtDpyoMBu8XIsq0loFXBC+Z2JQUVW7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NiTUujr3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGGPvpxQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FC49C3277B;
-	Wed,  5 Jun 2024 12:03:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NiTUujr3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E0DC32781;
+	Wed,  5 Jun 2024 12:03:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717588987;
-	bh=+W6S6xQ9Mr5ysKrm4VyCT5dvvfoqp7FzldkgEf13SbY=;
+	s=k20201202; t=1717589036;
+	bh=GNS9AW5xk91QvxSxcK6nVskhVX+Xg7DubMDBgAl/DNA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jGGPvpxQvls/iN3TSXFBQYWKOvxHyL7UIRGCZ46It6PPEFuvsFIk3Jz5h0F6+32Bq
-	 82Gou7oQ+uE4e18uakPLP27UQ4AiGFr+5+UWi4UTSiG6ZS5L9I2Ezy9hboxcCQ6UwB
-	 iqt8SllWwlhuWXmEiorQyTZ+4Q1S30D7Qx5KPmcC97VdtvBxhNGI1LNOV06Sexu1r7
-	 10yoXDLkCVopnlsZYdUSI0pbUK6ES067uPn1fYn+6NQMW++TcH+MuRvIH2+MKU+C6o
-	 P5Gd8wu6BdRdiASKEgl2d0CvtJeDzJisO7BD/pnWWXphmBhrBlZynXB0zg34A6H306
-	 LX3g+pQExSLQA==
+	b=NiTUujr3yHuOF2ZvbOVuWS6Wzk3kTBZexI4bvLOmsdqIJbOKQBOCpb/+4pWaQhGlu
+	 jJrZLVzX3StRQLaaWZI/65X5KC8UV3G4NvbZwwdra3XsQ/mwm3xDDTdKpj1Nc3QjmK
+	 Q1xHtX1jeHfNYOc+jtv+ASTtm3sshbYetYz99Qdk36pvaJOREjyvSfx3UyfF7a5Ix+
+	 wRLspWvGvx2981iz6SPGg+u/shbNA1NDfJFoqsH6XHWAXSQRIkVJr/E+mtCTydcd2L
+	 /TYjNa4TchVUZ/fk7+nGTZcC64B9pyvIALG2a1ZIn3w/X1nWAIZoxvTmONBLAKZwBZ
+	 i2b1v3miG4w4Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -37,12 +37,12 @@ Cc: Damien Le Moal <dlemoal@kernel.org>,
 	martin.petersen@oracle.com,
 	hare@suse.de,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 23/23] null_blk: Do not allow runt zone with zone capacity smaller then zone size
-Date: Wed,  5 Jun 2024 08:02:06 -0400
-Message-ID: <20240605120220.2966127-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.8 18/18] null_blk: Do not allow runt zone with zone capacity smaller then zone size
+Date: Wed,  5 Jun 2024 08:03:08 -0400
+Message-ID: <20240605120319.2966627-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240605120220.2966127-1-sashal@kernel.org>
-References: <20240605120220.2966127-1-sashal@kernel.org>
+In-Reply-To: <20240605120319.2966627-1-sashal@kernel.org>
+References: <20240605120319.2966627-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.9.3
+X-stable-base: Linux 6.8.12
 Content-Transfer-Encoding: 8bit
 
 From: Damien Le Moal <dlemoal@kernel.org>
@@ -80,10 +80,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+)
 
 diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 1689e25841048..b638b7f7b4f80 100644
+index 6f5e0994862ea..bc13adb23ad38 100644
 --- a/drivers/block/null_blk/zoned.c
 +++ b/drivers/block/null_blk/zoned.c
-@@ -84,6 +84,17 @@ int null_init_zoned_dev(struct nullb_device *dev,
+@@ -83,6 +83,17 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
  		return -EINVAL;
  	}
  
