@@ -1,185 +1,180 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFD444C73
-	for <linux-block@vger.kernel.org>; Thu,  6 Jun 2024 06:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717653771; cv=fail; b=UPudF3ETdyDx2qVPfNgFS0hIfDnMDYL9NUMzQj2Q6VBHxz/KpSR+qY3OCsSEpRsYf8vJy88fc0yQ3GauCZedv8tvodNOnS++1HDNbb0kgEVoyNKbSAW6ZSUyw8PlMH9aesTDqoBqEVaWaV+k9JhefoswDWTph9A7E2PIbXdN8Uw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717653771; c=relaxed/simple;
-	bh=W1EsEMezDBfscQUjSnEDnnPFEf5UypCxT/LNiLCgdxc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=WH4USWjPoRTU+6KzzXHRQ6arYHPVe5T0o1DnVwJgZZuGzYRReBTYKXtzlbb/M6/MQMuQFiQX/Ewip34eH4uIy+aschq/gcTOyki3DU+I4Ruuob/VnKclO6g23iB47K1oKfHxB4D9qLJ+gZ+aG+qd/7gY9YhVfquUxKqzqA2fZR8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=kSvAZfgB; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=cYyKTPWF; arc=fail smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kSvAZfgB";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="cYyKTPWF"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1717653769; x=1749189769;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=W1EsEMezDBfscQUjSnEDnnPFEf5UypCxT/LNiLCgdxc=;
-  b=kSvAZfgB18b//jKq07M3nZYbqCxa2bu+Tfr89M40FyY2WhBzDkFU/mjf
-   j0+whU/badd3M1pK33kHAcDAw0zNTyezWibnq9Gj+FDz2a8YdOxAoLz5E
-   UuW5wf/ocVi1VzfrkCRYB7idM5W62MZMi38K3rm5GhebM5zsztGiyLNiw
-   ggjsEiRfpnvHqii8nXljMciOetxpWa3fuFTtrmBVFti6nmZrhKb2/xdEN
-   QezOQqwQL8LAhHIl34chzmmiUAx5p0R/X5vp0SaYIGTK83gSMZcjHt04x
-   fFC4Us4OOQQFK9bv1DyVpu+pXcZaD6BXd44qwlkLP4vhNL83+0TcWDZlv
-   Q==;
-X-CSE-ConnectionGUID: SBhXtjVXQWGqqHpLEf+W8Q==
-X-CSE-MsgGUID: afTdLfDQQ5iYa3rvkYiovg==
-X-IronPort-AV: E=Sophos;i="6.08,218,1712592000"; 
-   d="scan'208";a="18358196"
-Received: from mail-mw2nam04lp2177.outbound.protection.outlook.com (HELO NAM04-MW2-obe.outbound.protection.outlook.com) ([104.47.73.177])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Jun 2024 14:02:47 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n79IW+yqS8RnD0O72M0eKwcjHQF8Lk7OTnGH3b9rpctGeqYP0InZevKQY4Gs9klmE+6oxVZNGdj0Fv1MQkPchOcKGY4gAGIqQ+AAEQG8Wc38Do7YLkpFkgg/DOHcdiMhFuBK9a5LBGrCmWCdHK6YEUdZimTbnrCBH6Y9hFFSKIjgGwV3TdT3zpFeIjuHgxtujOvH45sumsCuUj/aUxo0P2xz3YOyzyeI+PTReHnr7auKq+e2x9DL+EC4alFSDxGSMk/NJIRfiW7p03707DF5fxHAZJclQHszKEv9/9oZw84DD7xe9ZH1Fn4PIv4ruvFfnOwHoTvxzPJCBjlsgAN0wA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W1EsEMezDBfscQUjSnEDnnPFEf5UypCxT/LNiLCgdxc=;
- b=gmMpWJkxf4aWkz2z36fAZV4Pm20RIOe0zWeLILW6Wmgz7q8D+Dd/c0WoRTDtPtmEbeubGh0Q5QtoV/hxDtXy7s+M/nfjrUFQdPNMT11/XWUf0sY0XL/2IgQCXXnNRzYSVVBTrjC5Om8q/nqCF4LLG62yrt6x7LOrI758iOLUTVcTc2P5lTnAYPF0ivMuWkwcsGlGMUFFQi+/joc6wdOBzhfSr76Ug10vlTHEJQ/3r//Jpwyfg7h188Z2//QkvtUY2LL06KBPsJKqWHqKT7eiIpcGw731xDEhJjD3wNzoKk22iUJJj8SDCVyviQVRoIU5ID92N1Ru4TLcLdbgIGQNeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W1EsEMezDBfscQUjSnEDnnPFEf5UypCxT/LNiLCgdxc=;
- b=cYyKTPWFyHW7CW1WJKPFRFFU9LbsTzpfD1qsDqe3Brxm3PHKPXjd/jzMSLRqiesTOGj3LEb5/zydz5Mc2g/WFSPul4dYeoIJCJWuzPa90HxL728Cn9hJQ8GesGQMHcpugzUWT5Xrf59+adecH5xfDbXIaaNGwR6i0C1qrGuWtmQ=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- PH8PR04MB8760.namprd04.prod.outlook.com (2603:10b6:510:258::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.22; Thu, 6 Jun
- 2024 06:02:45 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a%3]) with mapi id 15.20.7633.033; Thu, 6 Jun 2024
- 06:02:45 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Gulam Mohamed <gulam.mohamed@oracle.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"chaitanyak@nvidia.com" <chaitanyak@nvidia.com>
-Subject: Re: [PATCH V4 blktests] loop: Detect a race condition between loop
- detach and open
-Thread-Topic: [PATCH V4 blktests] loop: Detect a race condition between loop
- detach and open
-Thread-Index: AQHat2P+Ro1b1U/u0kSTKICB4pZR2rG6P4MA
-Date: Thu, 6 Jun 2024 06:02:45 +0000
-Message-ID: <ymanwmgtn76jg56vmjbg5vxcegfng2ewccgntmtzskwl6qx42d@g3iyvqldgais>
-References: <20240605161815.34923-1-gulam.mohamed@oracle.com>
-In-Reply-To: <20240605161815.34923-1-gulam.mohamed@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH8PR04MB8760:EE_
-x-ms-office365-filtering-correlation-id: b0e372c2-8d39-49ab-83b4-08dc85ee4916
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|376005|366007|1800799015|38070700009;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?r0aTjTfqFlSfhbYZIeeqz0lnxXHACk1c86FJIoTdMnLBstWLnQX/OfHAoX5O?=
- =?us-ascii?Q?497/XZrTkWdyeNcJYutRu9/BSly+1wBOV0xu7yEgMXbDV/ijbrly/K9uBkBo?=
- =?us-ascii?Q?swohxpHlFSefhVe/uFBXxgARNxl4gbGIm6lt9pgjDFCY54fSUfZA6BPI0kOa?=
- =?us-ascii?Q?Aeq2qQtKE5AlwJhRzIirqqTRUC8ztDYvOZAbZbyOylcAeQoY8CD6xCpUZ1Sn?=
- =?us-ascii?Q?SBhR4H0/4HOCKdjATNQu7aOKxIkODkjbWrruQyaFXiUJlq7b/DAwP3T3QaCB?=
- =?us-ascii?Q?721iJtAJjBe6GJjtGA18yPGJrkIov91qveqOckSgeby52lTEo6arw7e47b1Q?=
- =?us-ascii?Q?PIhTbr6JaVKQ2+sfKDVJ/ESd21ToLXfRZoEbllum5r+50Qf9VPSXvN72zvCi?=
- =?us-ascii?Q?drEdAYRic66kQ3oFt5WWTmz0+TLCCRaJXrXfYP9fTRqmOZMNcuKXJVvZZeIt?=
- =?us-ascii?Q?9KBuDKLSglrJ4gaQuC/+ofzWZ6QZVrQLYXifdgNuDu1VXyuBABInlT5CDGbV?=
- =?us-ascii?Q?nLf2klTBeSBC+Z5Dng2TsquM0a3xyPjQZDIBxz1ULj+eWYBrCFIPdPDKUyvs?=
- =?us-ascii?Q?Ui9RvYugM4I28ecbvE4XK4DEmmELvClPwvDszDaJYOSYhOJwTuEvbtTV5djz?=
- =?us-ascii?Q?tz+yXW1/PM5c/+LEXZia75TUzIaaVU3uT26+RFl8ZNtr5wGAD0PGNc9YKXlh?=
- =?us-ascii?Q?8p959/D7HUvk/XPG/BIMXclI0ysyg11DLXG1DZwFisifpZnpz1vCLrUkbMNc?=
- =?us-ascii?Q?h7De0peRnMEanfrvxJNscHNm0Q/wZk3I5nALBaCPd3SOCrRgszhck8xUZbtU?=
- =?us-ascii?Q?QkhTd+RjK4VEvEjxIajJ9/bYFTP4/vQyMJDER4q4PsVoAKrcwIiER7qSIxgT?=
- =?us-ascii?Q?I/YcQlruH8J8nsJO7tcA1xXKxaLTkex/Gf1LbIAeAXPiQd/etZPK/XHuYtBX?=
- =?us-ascii?Q?yG8QbABtkfrhK5NZ2CfnTstQkf6/dQpRUSskIsjrC4cC8x9WSe5ZmHcr7tJr?=
- =?us-ascii?Q?AaIpU+ww2xDlFwqElx591un743r1wJwfuUs2AygSBG69avxCam7t59E9miKv?=
- =?us-ascii?Q?sYlOP7wbFOo2vud6nhajDKixI61kJoEkA8r+0WVCf7jZMxUkqLiAr+GVbkke?=
- =?us-ascii?Q?DEJrGUQ6mEAE+zcczbNT4IdXtubjA5UWU0i4O0P4XIVE8GvBQUxuKBW3Zl5p?=
- =?us-ascii?Q?DT0PKqZftQdBl56s/ZeaTPRPCWVuDAXs9zCZnka1XL1p005t8aqi2S3GzFdP?=
- =?us-ascii?Q?U8FfzXT3VN1gCO82hVBFRAr12ZQvT03LZZUXInxsIleQhBCPG4bWw999iVuP?=
- =?us-ascii?Q?8j99S7PZEMCe3ULBZutIdJHALPUwl6noeI467t7U+aa9xNsONpN5pFQW05T+?=
- =?us-ascii?Q?i/PywJ4=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?0erG8NMvUKWzCKn4Ua6TPITCdS0c3bhi98HMjVJvn+rdt9chqSc+4SniEaW+?=
- =?us-ascii?Q?AK2fL16T/Pfkr0Qo+uVxzGhsA1Uek7CDSH6TgjX6k8lsdTQl4md43J/dDzwv?=
- =?us-ascii?Q?x86sHmtrrgryMbu6sc00GmxdJ1xpkP2m+CNM2A4G4hfBMSXveo5Drkswn4rl?=
- =?us-ascii?Q?BimlC6OzpsE1yoDuvHVQ2nr3QSgUq1/9nsTzyjpXUXjzOCmZyyWj2UkFgza+?=
- =?us-ascii?Q?Q2yVv+lgqzN7Cj8pBi0I+RbRiM3Rfhf18jwUNYFp9FqjdMZMuyYHS17+9Zl6?=
- =?us-ascii?Q?RcH0vQcuU14YLN0b6P00TyEe6P452ts6fOvVwCgOPxB747jBH9lxhJ2EKM6u?=
- =?us-ascii?Q?8LYC5vkPhhe3taysAxdd5nwfIZPGxqoYe4JuoPN1ciRGgv/6jpRbFP9Gjm60?=
- =?us-ascii?Q?zN30m5lJERJZMc8BgSu9x/7lyRjKUdneGe6/M3uydraK9yIDCu5YGZRY+ER0?=
- =?us-ascii?Q?vFnO7S1vs6BG3Iksqd8e/+O9s8wq4MPvg+55w3IOzWw2Ytwx0WGdHn15E4RH?=
- =?us-ascii?Q?qmEjBitkeTPg2noJCb89QGqNUW+LnEa/YUin1c+DHuFP8pIZ4Dyef7P38mlK?=
- =?us-ascii?Q?5bFzaSovahzRxbuB22NOf9pDe7ErR5aQ4xZqirUQfxuAFqCvgQ/33oVcXJh7?=
- =?us-ascii?Q?NiHW6Ke6Y6NUAZ6gZrVK55DeGuWQe9aQUHreRqnazheKbGHNEHacifE7Wn/p?=
- =?us-ascii?Q?vr4fkg47XhPhM+akh84Ek+qfB0aldjiiuD/lhToXFPLAWarpLKbzAeiHnTAp?=
- =?us-ascii?Q?1MG/czUyApGFzbjGXk/6hdryRZu9yOugYo/FUa/CBZ1z+qx4aVLJtkBxmZGz?=
- =?us-ascii?Q?bWTSyTi3OVaY/EwNOT5etCnaAJVHvi+0+8J0udWK+VmJBwZAjxwvvPfuIAwW?=
- =?us-ascii?Q?qRSyFqkWb0xwqjcmY3wchTEIKWV/AHuY7hA9ggvbyjpI8qPtgymQpoTRHm/l?=
- =?us-ascii?Q?wydHMQjAMDOvvLJe7EIWdJJLjWTu9pmdIy2AdFMXkd1sFAm+0/ul+1t0bEfW?=
- =?us-ascii?Q?XLFsspayxJFeYenW2GetZG3CVxv1CzScGRmX0UtOh99pRX/L05Uf6DaCkBHV?=
- =?us-ascii?Q?T/FdCNomC2rHXCp3YCxJ+/X5vwnU9CswcLRdoK4Zz8cpTrgGtLR1VhKFFlWU?=
- =?us-ascii?Q?6JNk0IgAhGcsAx4DamooEJ5bNz/pxVEWSa4WJedgygfLSbhocKa3LhdtJlb0?=
- =?us-ascii?Q?pgCTfKdpAVfu3rZTsNkEruvgWUXsKrZqN4d6Ln0mwP8cT6btJ02KyiZ7pxxl?=
- =?us-ascii?Q?GAPGIjYThYw3W4cP2dmbxxf2Z2tQTKD84oiPuSzt6HQCi+m/fB9lyAJtJ7hi?=
- =?us-ascii?Q?jNwp1Hmj4YVeMIzAKPDkidIxnPThgkx5nbuir1GugxPLgTqchP2ThJHegxn4?=
- =?us-ascii?Q?tiH0DRmOrXkBlCp8TT515o2hNAhSxxUf2fYPUlCQ8bxQsgBYSeLfAF0jh4A+?=
- =?us-ascii?Q?lYy3zHVt8wrMF3qvZTR79JUYvmiEAbvl+H1XWBA5hjtCrqiBkpIInOTJWYGK?=
- =?us-ascii?Q?01XhE0hLMNC0PKhX98dxMR006dbSwxjDo0XQSrhzbxwUn248WQUNW3Kw3sJi?=
- =?us-ascii?Q?5BHxU8z/leE91l1B67n8GFouPAilI1j3Dpjt8CRo99+f3kRHWeVypcpVF9/j?=
- =?us-ascii?Q?6S6i6rcwTXWhuHwQsU7pRLE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <CA9E21D7E20AF34AA0248C7D0C27374F@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1592E3E5;
+	Thu,  6 Jun 2024 06:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717655263; cv=none; b=R2ukA0cat5VwjsNywTdiCReqn7ZdGnkB+P5Vd5rKxG9dgkaylvRT0uD+4HdHNoxA2v79sH4Lh99VfbRydBVf/mFtHZVYxIK43D/tcaH53a8AVabgBvWW2IICnJRfdYRHiX9BfK/x6KanLfjGGffWb1rMOgBdmA7I3GmUPV5KQIk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717655263; c=relaxed/simple;
+	bh=VdLJkVUrOXVXeMvr//H+2daYj3psYGBQ/AWWezkYvt4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eN9ZFKvGTWhaR6HoQUshw/6j3rZlmXu+QmIMjdYtzRko1tEI90KL426FeJ52wCaUkBzh5FUBQrVOXIGZCXrBjstuOM+yCxHppK0okhW3bjHMXejZFP8C9qG2o77+8CJNFFlwniEpzIgNBwDbwvj8I1PqwntE5FVgwupH2rjrAMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VvvWj3rS1z4f3jtj;
+	Thu,  6 Jun 2024 14:27:29 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id DCAFB1A018A;
+	Thu,  6 Jun 2024 14:27:35 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+	by APP1 (Coremail) with SMTP id cCh0CgCXaBHWVmFm7ZfTOg--.40699S4;
+	Thu, 06 Jun 2024 14:27:35 +0800 (CST)
+From: Ye Bin <yebin@huaweicloud.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: ming.lei@redhat.com,
+	Ye Bin <yebin10@huawei.com>
+Subject: [PATCH] block: bio-integrity: fix potential null-ptr-deref in bio_integrity_free
+Date: Thu,  6 Jun 2024 14:26:55 +0800
+Message-Id: <20240606062655.2185006-1-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	3UEWcoOpppbJ0osyW2q+elwORVCkqKJqBScpRCZgfxoaai/SRCyM8quAuZZ7lhpSqydYFQMFZiiAHRRv/e1TRNxYg3YhMyVqgipRh4VWQezZlY74zpODX03wRXogEGWu1+GTlRAGCdmCZtDTGichSB/QoSjOk/Y++Md7Ljuf07ysfM/yy6S6KkOB6EfSsWmoeWpcDFBPP8Fsnc5j3wPTa8Y+1ok1jvUvmGnBE6vcsSSuWbx5kcN3iXcpEocwsmfl2+7HaqeX/gNQb+CnLiZ5qaLYmjgZecwKkG+uJdRjAXpliYOzM9vmKvi6FX5hrigQJYPIaiNrhIeoJGzd3WWWpATKiwGwYSmKvR7RY65MLEW9AZLTxTa6RaY8LJx4EMmaDdkUNAgTzNbfxFQfmTCKWqusQZxTzPl9PknlkktfRIRz8w0U0MGwLXzk1KkYIuoh6DVCtGQjoJzcy/zOe32PNxg7bybA1n2Qg6nCeesvjWXwobpf4FZBN9sknVv2VRK1w/BJpvCnA2TRBjPOCseLaFwrK1Z3TVQONlNp+YdaYONf3N8Psbclj22lNAfL/lOtV5M7ej8hm9kouUPvPPgrM4gcFvFhDbgGzjrhBqjAEOTUEsb7QpPzt11jX2P//ZIQ
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b0e372c2-8d39-49ab-83b4-08dc85ee4916
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jun 2024 06:02:45.2698
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ikG0svKMgS/DVYDxeDtgAnGBf8rQrUBlQYHX8aGHuSMN4I059fy22aYkZGBecWd7K/aPmP85zqy60EX8O3kZYY4jAUGhnqDcei44YLg0KRk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR04MB8760
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgCXaBHWVmFm7ZfTOg--.40699S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxCr1xWr4kArW7XFWkZr1DWrg_yoW7Jw4xpr
+	43KF45Kr4xXF17CanrAF1rAF48KwsrAF1UGrsxZr15JFn8C34qqr1DGryjqF15Gr4ruryU
+	Xrn8t3409w1DJaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUgCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
+	z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+	AF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
+	IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s
+	0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsG
+	vfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 
-On Jun 05, 2024 / 16:18, Gulam Mohamed wrote:
-> When one process opens a loop device partition and another process detach=
-es
-> it, there will be a race condition due to which stale loop partitions are
-> created causing IO errors. This test will detect the race.
->=20
-> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
-> ---
-> v4<-v3:
-> 1. Resolved formatting issues
-> 2. Using long options for commands instead of short options
+From: Ye Bin <yebin10@huawei.com>
 
-Thank you for the v4 patch. Looks good to me. Before applying it, I will wa=
-it
-for some more days in case anyone has other comments.
+There's a issue as follows when do format NVME with IO:
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
+PGD 101727f067 P4D 1011fae067 PUD fbed78067 PMD 0
+Oops: 0000 [#1] SMP NOPTI
+RIP: 0010:kfree+0x4f/0x160
+RSP: 0018:ff705a800912b910 EFLAGS: 00010247
+RAX: 0000000000000000 RBX: 0d06d30000000000 RCX: ff4fb320260ad990
+RDX: ff4fb30ee7acba40 RSI: 0000000000000000 RDI: 00b04cff80000000
+RBP: ff4fb30ee7acba40 R08: 0000000000000200 R09: ff705a800912bb60
+R10: 0000000000000000 R11: ff4fb3103b67c750 R12: ffffffff9a62d566
+R13: ff4fb30aa0530000 R14: 0000000000000000 R15: 000000000000000a
+FS:  00007f4399b6b700(0000) GS:ff4fb31040140000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000008 CR3: 0000001014cd4002 CR4: 0000000000761ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ bio_integrity_free+0xa6/0xb0
+ __bio_integrity_endio+0x8c/0xa0
+ bio_endio+0x2b/0x130
+ blk_update_request+0x78/0x2b0
+ blk_mq_end_request+0x1a/0x140
+ blk_mq_try_issue_directly+0x5d/0xc0
+ blk_mq_make_request+0x46b/0x540
+ generic_make_request+0x121/0x300
+ submit_bio+0x6c/0x140
+ __blkdev_direct_IO_simple+0x1ca/0x3a0
+ blkdev_direct_IO+0x3d9/0x460
+ generic_file_read_iter+0xb4/0xc60
+ new_sync_read+0x121/0x170
+ vfs_read+0x89/0x130
+ ksys_read+0x52/0xc0
+ do_syscall_64+0x5d/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x65/0xca
+
+Assuming a 512 byte directIO is issued, the initial logical block size of
+the state block device is 512 bytes, and then modified to 4096 bytes.
+Above issue may happen as follows:
+         Direct read                    format NVME
+__blkdev_direct_IO_simple(iocb, iter, nr_pages);
+  if ((pos | iov_iter_alignment(iter)) & (bdev_logical_block_size(bdev) - 1))
+	-->The logical block size is 512, and the IO issued is 512 bytes,
+	   which can be checked
+    return -EINVAL;
+  submit_bio(&bio);
+                                      nvme_dev_ioctl
+                                        case NVME_IOCTL_RESCAN:
+                                          nvme_queue_scan(ctrl);
+                                             ...
+                                            nvme_update_disk_info(disk, ns, id);
+                                              blk_queue_logical_block_size(disk->queue, bs);
+                                                --> 512->4096
+     blk_queue_enter(q, flags)
+     blk_mq_make_request(q, bio)
+       bio_integrity_prep(bio)
+	 len = bio_integrity_bytes(bi, bio_sectors(bio));
+	   -->At this point, because the logical block size has increased to
+	      4096 bytes, the calculated 'len' here is 0
+         buf = kmalloc(len, GFP_NOIO | q->bounce_gfp);
+	   -->Passed in len=0 and returned buf=16
+         end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+         start = ((unsigned long) buf) >> PAGE_SHIFT;
+         nr_pages = end - start;  -->nr_pages == 1
+         bip->bip_flags |= BIP_BLOCK_INTEGRITY;
+         for (i = 0 ; i < nr_pages ; i++) {
+           if (len <= 0)
+              -->Not initializing the bip_vec of bio_integrity, will result
+		 in null pointer access during subsequent releases. Even if
+		 initialized, it will still cause subsequent releases access
+		 null pointer because the buffer address is incorrect.
+             break;
+
+Firstly, it is unreasonable to format NVME in the presence of IO. It is also
+possible to see IO smaller than the logical block size in the block layer for
+this type of concurrency. It is expected that this type of IO device will
+return an error, so exception handling should also be done for this type of
+IO to prevent null pointer access from causing system crashes.
+The root cause of this issue is the concurrency between the write process
+and the block size update process. However, this concurrency does not exist
+in actual production environments. To solve above issue, Verify if the
+segments of BIO are aligned with integrity intervals.
+
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ block/bio-integrity.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 2e3e8e04961e..00a0d1bafe06 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -431,7 +431,7 @@ bool bio_integrity_prep(struct bio *bio)
+ 	void *buf;
+ 	unsigned long start, end;
+ 	unsigned int len, nr_pages;
+-	unsigned int bytes, offset, i;
++	unsigned int bytes, offset, i, intervals;
+ 
+ 	if (!bi)
+ 		return true;
+@@ -457,7 +457,13 @@ bool bio_integrity_prep(struct bio *bio)
+ 	}
+ 
+ 	/* Allocate kernel buffer for protection data */
+-	len = bio_integrity_bytes(bi, bio_sectors(bio));
++	intervals = bio_integrity_intervals(bi, bio_sectors(bio));
++	if (unlikely((bio->bi_vcnt && intervals < bio->bi_vcnt) ||
++		     (!bio->bi_vcnt && intervals < bio_segments(bio)))) {
++		printk(KERN_ERR"BIO segments are not aligned according to integrity interval\n");
++		goto err_end_io;
++	}
++	len = intervals * bi->tuple_size;
+ 	buf = kmalloc(len, GFP_NOIO);
+ 	if (unlikely(buf == NULL)) {
+ 		printk(KERN_ERR "could not allocate integrity buffer\n");
+-- 
+2.31.1
+
