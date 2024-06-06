@@ -1,96 +1,95 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A321957F4;
-	Thu,  6 Jun 2024 12:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2F6190697
+	for <linux-block@vger.kernel.org>; Thu,  6 Jun 2024 12:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717677227; cv=none; b=DGw8fGwQu/72gwwsixawLZATD1NeBESUc7X5gYLg52YzAl9OjHAzrNmtPSwVyAPRpmZqyhH0vN85DlebOJNh6aDu5PcU+kituhNLUQiMdGyLBbvJMwCibKru7bfpQ8GKfy2nWsIAEctVhDM3+Z4o/yAMw4zJd89WnF36gyEF1rs=
+	t=1717678200; cv=none; b=MCNEnwNLTfIYCbM+V9zM85pQnGjIxKwMMZBSF0RcEsfnWBf2YEk43ZaQQLbwx09KaghSBM98/6F0UwInNNXN3/CttX1e0V4dD/FlJeVgGaJktbDYLHXY2YC+h3RC6V7rOZKwTsWF0sRpIVI8xv+5OTl4gNr9ye0kACQsnzO0ScM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717677227; c=relaxed/simple;
-	bh=vGSPg6a5fe0OYL6lAgRHVbj5t2En0Mde6rJzsrpiSxk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UjBaTIboGpwEh7X5ScdecqiJMAxlhdO3Ae26+QHlfwsxaPLeoPqcpjgdZY8CU9ogtWXneX+LlEyMd1EbEXH5ME3ISr251L7r5j7n2lnjD7hvnQp6GSyd/2ZLf/hd2o60Ud/k+8jPU4QD6LI+WtUF9pG8iMQo0MmU7SvvDBi3ovo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=r1ZoiLYv; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+	s=arc-20240116; t=1717678200; c=relaxed/simple;
+	bh=6s3t/kNPu834Gbf2bRMSjLM5gpFGM/d/GKFM6NqrtnU=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=cUOVJK+R1oz/6wik1Lhws5ouM6WpZwnzfCPBUBN1vHmUhglHxGGCjWeLvjhhFhCHXFwJrXT2EJIWZtaGbQnop0bsKAwh8YE1+u3C9rCTLqQA/vXiv3FzDt2WGdtJuX6I78FYukhgprOaGBXr3UE14YE3vIdDDyi8N1EflVQM04A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BOd6HMKs; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="r1ZoiLYv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1717677222;
-	bh=KK2aEsGryauZUlCd5y9kuRvTiVpdgQOV3Jda2VqMpvE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=r1ZoiLYvCjQatKeubwNDC8sbnUXe2n7Tx17Cfx2R7IfXaDM7du4yNb/bCPasy7dys
-	 BsrsW8jSntGwqOTuBqvgwRgsQjrCqD72PT8Bi0omXbnzcKFwQY0oBPnMoBb5cehDTI
-	 E1w6BT2NxiL95bDzY/aSPDAicVdcKZa20X3zyaNF2cuQueg83ZSKVDYiIlC2ZGneAo
-	 Bpyb3CSNjyZrW4dyjYsx57VPOgmTcJV5x/lBQh+TQk1ZRtBq9GAmj129TQ956nM+D9
-	 +Fh3zi2aFekNoQ8/PSUX/G4Ipd5mU8huV4HSRcy/fadXg5PRYOYpo+h4BaiDfRApbK
-	 lvP6xWkF1gDog==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BOd6HMKs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717678197;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=LXouFU8ZPSjf7r8Q47PI+pQjbdcpaUiDOdpCY1yPI+I=;
+	b=BOd6HMKsF8k755W/h50oxTqbD073mC/ulI2P8Z+C0DwoMG73EH8z9Libklm4v1U6QQQB34
+	/qIoH74evxUQkbAWu4Vo00tcrDJ5MewvTUtn03mpSCnid/RV4Pnguj36Y1dJzAFt/YnkLq
+	erXE/SLZcz0rbVmQvRuDqMSKtArM9oE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-368-3s01uroIOKmMWMyXQ2v7hQ-1; Thu, 06 Jun 2024 08:49:52 -0400
+X-MC-Unique: 3s01uroIOKmMWMyXQ2v7hQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Vw3fD4Y5fz4wc3;
-	Thu,  6 Jun 2024 22:33:40 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
-Cc: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>, Jens Axboe <axboe@kernel.dk>, "Martin K.
- Petersen" <martin.petersen@oracle.com>, Damien Le Moal
- <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-scsi@vger.kernel.org, benh@kernel.crashing.org,
- linuxppc-dev@lists.ozlabs.org, Guenter Roeck <linux@roeck-us.net>, Linux
- kernel regressions list <regressions@lists.linux.dev>,
- doru.iorgulescu1@gmail.com, bvanassche@acm.org
-Subject: Re: [PATCH 04/23] scsi: initialize scsi midlayer limits before
- allocating the queue
-In-Reply-To: <0512b259-f803-4feb-a5bf-0feb7f7b44da@oracle.com>
-References: <20240520151536.GA32532@lst.de>
- <fc6a2243-6982-45e9-a640-9d98c29a8f53@leemhuis.info>
- <8734pz4gdh.fsf@mail.lhotse> <87wmnb2x2y.fsf@mail.lhotse>
- <20240531060827.GA17723@lst.de> <87sexy2yny.fsf@mail.lhotse>
- <87wmn3pntq.fsf@mail.lhotse>
- <0512b259-f803-4feb-a5bf-0feb7f7b44da@oracle.com>
-Date: Thu, 06 Jun 2024 22:33:40 +1000
-Message-ID: <87o78ep7x7.fsf@mail.lhotse>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B95A4185B920;
+	Thu,  6 Jun 2024 12:49:51 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A934220229B8;
+	Thu,  6 Jun 2024 12:49:51 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id 8435130C1C37; Thu,  6 Jun 2024 12:49:51 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 7B97D3FB52;
+	Thu,  6 Jun 2024 14:49:51 +0200 (CEST)
+Date: Thu, 6 Jun 2024 14:49:51 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>, Zdenek Kabelac <zkabelac@redhat.com>
+cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>, 
+    Hans Holmberg <hans.holmberg@wdc.com>, 
+    Dennis Maisenbacher <dennis.maisenbacher@wdc.com>, 
+    "Martin K. Petersen" <martin.petersen@oracle.com>, 
+    Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>, 
+    linux-block@vger.kernel.org
+Subject: disk removal slowdown due to rcu_barrier
+Message-ID: <b3c96411-dea-16ed-85fc-a33f842594@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-John Garry <john.g.garry@oracle.com> writes:
->> diff --git a/drivers/ata/pata_macio.c b/drivers/ata/pata_macio.c
->> index 817838e2f70e..3cb455a32d92 100644
->> --- a/drivers/ata/pata_macio.c
->> +++ b/drivers/ata/pata_macio.c
->> @@ -915,10 +915,13 @@ static const struct scsi_host_template pata_macio_sht = {
->>   	.sg_tablesize		= MAX_DCMDS,
->>   	/* We may not need that strict one */
->>   	.dma_boundary		= ATA_DMA_BOUNDARY,
->> -	/* Not sure what the real max is but we know it's less than 64K, let's
->> -	 * use 64K minus 256
->> +	/*
->> +	 * The SCSI core requires the segment size to cover at least a page, so
->> +	 * for 64K page size kernels this must be at least 64K. However the
->> +	 * hardware can't handle 64K, so pata_macio_qc_prep() will split large
->> +	 * requests.
->>   	 */
->> -	.max_segment_size	= MAX_DBDMA_SEG,
->> +	.max_segment_size	= SZ_64K,
->>   	.device_configure	= pata_macio_device_configure,
->>   	.sdev_groups		= ata_common_sdev_groups,
->>   	.can_queue		= ATA_DEF_QUEUE,
->
-> Feel free to add:
-> Reviewed-by: John Garry <john.g.garry@oracle.com>
+Hi
 
-Thanks.
+The patch dd291d77cc90eb6a86e9860ba8e6e38eebd57d12 (block: Introduce zone 
+write plugging) causes a performance regression when removing block 
+devices.
 
-Sorry I missed adding this when sending the proper patch, maybe whoever
-applies it can add it then.
+The kernel 6.9 removes a DM block device in 73ms. The kernel 6.10-rc in 
+103ms.
 
-cheers
+That patch adds a rcu_barrier() call to the disk-removal code path and it 
+causes the slowdown. We get this stacktrace when we attempt to remove 
+large amount of DM devices. Note that the removed devices aren't zoned at 
+all.
+
+[<0>] rcu_barrier+0x208/0x320
+[<0>] disk_free_zone_resources+0x102/0x160
+[<0>] disk_release+0x72/0xe0
+[<0>] device_release+0x34/0x90
+[<0>] kobject_put+0x8b/0x1d0
+[<0>] cleanup_mapped_device+0xd8/0x160
+[<0>] __dm_destroy+0x12a/0x1d0
+[<0>] dm_hash_remove_all+0x77/0x1a0
+[<0>] remove_all+0x23/0x40
+[<0>] ctl_ioctl+0x1dc/0x530
+[<0>] dm_ctl_ioctl+0xe/0x20
+[<0>] __x64_sys_ioctl+0x94/0xd0
+[<0>] do_syscall_64+0x82/0x160
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Mikulas
+
