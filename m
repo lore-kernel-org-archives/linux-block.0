@@ -1,71 +1,96 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703444CB4E
-	for <linux-block@vger.kernel.org>; Thu,  6 Jun 2024 19:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F324A13D884
+	for <linux-block@vger.kernel.org>; Thu,  6 Jun 2024 23:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717702912; cv=none; b=JI0VleZvSQz+BXy/6kNlQVnylqtMn/zjLs2W42f/LWLT0zp+ikPOrWU8pU2bBRyWSfdTGQWJeCPAY2rlqRosd9lsgSwvclFu3MjxFdm5+GKoMjcevmPmpB0JRmxa3r/6YqzIgx3j9U7HfZSuE34B2nVQWmccNRTWtEV3fYqg/wo=
+	t=1717715602; cv=none; b=alyf6C0/QlDUgDl+qF5gh5OKURz6he+m3naMgh3urMLmHVPRC1TqmTtkss51mJtWFvf1znO5NTBUT5+UfM/1ur0hHKbys0zhhTQG74XRPZSGKhgR96Mj5G4cGJaaXJlvefZUKEaeEg96qFsm5MeRStrtgYWdDo4IzSInL/57i4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717702912; c=relaxed/simple;
-	bh=vdDPgOETrlIUEHKIjDm7sqX4QOdjEmevinvwmI0xP0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ByeRh+WEErb5PCS12/antptp7xn0c8I4ZZwwvhXi7VS20NQW2MC5urr2wEbhlHyUz56vHV8qobtkaaXJSjRu1Rwz5kPFJ8k6wDhF5VlWbRaagAoFNGX3Et0Vm4/kyCF7KUB1k2n52x65AoqSnu++Uylz+IZKOvB2eNmX6OuDM0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hd9Nvgf4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1717715602; c=relaxed/simple;
+	bh=EOtoTvWvly0gj88wYnE4Shufh5oDMSqXi4juL59GtTE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mua04pptJG68O2CcsUY+8xhUUKefUgPstXn+ZSbUXIfg4avRGnQ7HmkpR1R/4QZff78prwctbIp/b4JAbgUESLakREhsob/v/vAxnO6m6d0fSueIxN3Uo/hbCI7tFCzPB41v32pTQ6Jn7loAJMTQeJuCAJ2KUMaxwB/htF2kOU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NWpGOZG7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hd9Nvgf4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717702910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vdDPgOETrlIUEHKIjDm7sqX4QOdjEmevinvwmI0xP0U=;
-	b=hd9Nvgf4ukqX25H3gd72mwC/NiuX4Gf1BDR2IdvbIX2lvDrCARpq1Vz4jdHieIyRs5Dou7
-	3y4QYU27h+3JndCUvd1tu+ByF9sLg1AcvTGfmsUOplESy3V9VDHvTu0c+E4dyiI28FbAYI
-	CHQGWmrklDGDdGgtZ9Z0rf3i1mDSlLQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-167-2t8NMh8-PE-EZGvgerM8TA-1; Thu,
- 06 Jun 2024 15:41:46 -0400
-X-MC-Unique: 2t8NMh8-PE-EZGvgerM8TA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B3EDB3806700;
-	Thu,  6 Jun 2024 19:41:45 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AABC010139;
-	Thu,  6 Jun 2024 19:41:45 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.17.2/8.17.1) with ESMTPS id 456JfjkY653112
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 6 Jun 2024 15:41:45 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.17.2/8.17.2/Submit) id 456Jfj7v653111;
-	Thu, 6 Jun 2024 15:41:45 -0400
-Date: Thu, 6 Jun 2024 15:41:45 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v6 3/4] dm: Improve zone resource limits handling
-Message-ID: <ZmIQ-eg7BPOt1HQI@redhat.com>
-References: <20240606082147.96422-1-dlemoal@kernel.org>
- <20240606082147.96422-4-dlemoal@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NWpGOZG7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FBC1C2BD10;
+	Thu,  6 Jun 2024 23:13:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717715601;
+	bh=EOtoTvWvly0gj88wYnE4Shufh5oDMSqXi4juL59GtTE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NWpGOZG7yfs/pok/be0L9v2NGnhakEkWUrBxDnNodQ52fDbxbLe9pjAdtwhT0yM6+
+	 pOFNqpU96gII5CbXnLw+aPJUUfFDIsHNJWxGJNdmwtrCM+hh4gIGKsWlS40/iqUBjd
+	 I06lVyxz8iBnIwDQq2iwt6s7zD5tx+ACcWv1fo3pxp5h7hd3KPyXSMXQ0bldP4UrPd
+	 uTG/FPcc4LjxP17yWGTdKRVGzdltDPkTbObMDA/Af+Ub00vMO+h3wfSl0Mn3IVQdFl
+	 76PZNrN/7b0oa0v77od37zDFScEEC0kwBcNT6KfCMXRXub3gqATkKdKfvK2StX+NKc
+	 KDjhGgxyvLSWg==
+Message-ID: <57ad537d-de62-435f-82db-469e98c056f5@kernel.org>
+Date: Fri, 7 Jun 2024 08:13:18 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240606082147.96422-4-dlemoal@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+User-Agent: Mozilla Thunderbird
+Subject: Re: disk removal slowdown due to rcu_barrier
+To: Mikulas Patocka <mpatocka@redhat.com>,
+ Zdenek Kabelac <zkabelac@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+ Hans Holmberg <hans.holmberg@wdc.com>,
+ Dennis Maisenbacher <dennis.maisenbacher@wdc.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+References: <b3c96411-dea-16ed-85fc-a33f842594@redhat.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <b3c96411-dea-16ed-85fc-a33f842594@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Benjamin Marzinski <bmarzins@redhat.com>
+On 6/6/24 21:49, Mikulas Patocka wrote:
+> Hi
+> 
+> The patch dd291d77cc90eb6a86e9860ba8e6e38eebd57d12 (block: Introduce zone 
+> write plugging) causes a performance regression when removing block 
+> devices.
+> 
+> The kernel 6.9 removes a DM block device in 73ms. The kernel 6.10-rc in 
+> 103ms.
+> 
+> That patch adds a rcu_barrier() call to the disk-removal code path and it 
+> causes the slowdown. We get this stacktrace when we attempt to remove 
+> large amount of DM devices. Note that the removed devices aren't zoned at 
+> all.
+
+OK. Let me send a fix patch to avoid the barrier for non-zoned devices. For
+zoned devices, it can only be avoided if the device does not need zone write
+plugging, which is the case for most zoned DM setup.
+
+> 
+> [<0>] rcu_barrier+0x208/0x320
+> [<0>] disk_free_zone_resources+0x102/0x160
+> [<0>] disk_release+0x72/0xe0
+> [<0>] device_release+0x34/0x90
+> [<0>] kobject_put+0x8b/0x1d0
+> [<0>] cleanup_mapped_device+0xd8/0x160
+> [<0>] __dm_destroy+0x12a/0x1d0
+> [<0>] dm_hash_remove_all+0x77/0x1a0
+> [<0>] remove_all+0x23/0x40
+> [<0>] ctl_ioctl+0x1dc/0x530
+> [<0>] dm_ctl_ioctl+0xe/0x20
+> [<0>] __x64_sys_ioctl+0x94/0xd0
+> [<0>] do_syscall_64+0x82/0x160
+> [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> Mikulas
+> 
+
+-- 
+Damien Le Moal
+Western Digital Research
 
