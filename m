@@ -1,96 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F324A13D884
-	for <linux-block@vger.kernel.org>; Thu,  6 Jun 2024 23:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278AD482F6
+	for <linux-block@vger.kernel.org>; Thu,  6 Jun 2024 23:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717715602; cv=none; b=alyf6C0/QlDUgDl+qF5gh5OKURz6he+m3naMgh3urMLmHVPRC1TqmTtkss51mJtWFvf1znO5NTBUT5+UfM/1ur0hHKbys0zhhTQG74XRPZSGKhgR96Mj5G4cGJaaXJlvefZUKEaeEg96qFsm5MeRStrtgYWdDo4IzSInL/57i4E=
+	t=1717717610; cv=none; b=JLEp00KoyMfbU0RXZWF+gE7vlT+zc0ONl6VxX994bRi1TRsiBcDBmfMVPJpYyFm+/LoZm1nD/qqV62XZtBY5rjIs5GLVAfycn8c/5NrWTaWi9XXKkFsncoC2/3Ih0aEWboKJKhZ+9LZsua5Mx1YvdKa3lx8xHNWcCceNz08iH8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717715602; c=relaxed/simple;
-	bh=EOtoTvWvly0gj88wYnE4Shufh5oDMSqXi4juL59GtTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mua04pptJG68O2CcsUY+8xhUUKefUgPstXn+ZSbUXIfg4avRGnQ7HmkpR1R/4QZff78prwctbIp/b4JAbgUESLakREhsob/v/vAxnO6m6d0fSueIxN3Uo/hbCI7tFCzPB41v32pTQ6Jn7loAJMTQeJuCAJ2KUMaxwB/htF2kOU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NWpGOZG7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717717610; c=relaxed/simple;
+	bh=Q5ZcmHTBdEtDXi0V6CYL5t/Co7Vi1if2BDN7rDzndCQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c+EbGmHIShNl39qYZP1Z+HZ644I0h6sc7zRu/c6W+mmUdDbz//8erAE8KGJYx1E3LejXTyRsK0VVI9hC9X9zthqILFBrbbkAPza5DWpSvkGOELhMvLhXJVWKPdR9mjK3bBeFF1vy69NxCo7gE2KJOf3/L1Zqp6LY+jyrxsL+R/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g6x58FZX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NWpGOZG7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FBC1C2BD10;
-	Thu,  6 Jun 2024 23:13:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717715601;
-	bh=EOtoTvWvly0gj88wYnE4Shufh5oDMSqXi4juL59GtTE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NWpGOZG7yfs/pok/be0L9v2NGnhakEkWUrBxDnNodQ52fDbxbLe9pjAdtwhT0yM6+
-	 pOFNqpU96gII5CbXnLw+aPJUUfFDIsHNJWxGJNdmwtrCM+hh4gIGKsWlS40/iqUBjd
-	 I06lVyxz8iBnIwDQq2iwt6s7zD5tx+ACcWv1fo3pxp5h7hd3KPyXSMXQ0bldP4UrPd
-	 uTG/FPcc4LjxP17yWGTdKRVGzdltDPkTbObMDA/Af+Ub00vMO+h3wfSl0Mn3IVQdFl
-	 76PZNrN/7b0oa0v77od37zDFScEEC0kwBcNT6KfCMXRXub3gqATkKdKfvK2StX+NKc
-	 KDjhGgxyvLSWg==
-Message-ID: <57ad537d-de62-435f-82db-469e98c056f5@kernel.org>
-Date: Fri, 7 Jun 2024 08:13:18 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6x58FZX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717717608;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u6KkShH+LBPBDtFL/J7+56MEKPg8eU6ralQnJ1U5rNo=;
+	b=g6x58FZXDliAaXzQTVqKHyagu6FjuuxCP7ASjzM8ZaG1WlXfbTvxNkgnFUct5RsZXi/QLU
+	38rDrd81vJZq2He4NU68DPzmNWEuKsXsepBKGoa9jka0qSsiBdW9GRsnaE55BucaPNSKeD
+	krYbBz33e6lOFR3DZjnKYeKaZRVTYIg=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-HAhIOT2zNmKofTm7DiPH8g-1; Thu,
+ 06 Jun 2024 19:46:43 -0400
+X-MC-Unique: HAhIOT2zNmKofTm7DiPH8g-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7E5371944D3B;
+	Thu,  6 Jun 2024 23:46:40 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.45])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7CE101955F14;
+	Thu,  6 Jun 2024 23:46:32 +0000 (UTC)
+Date: Fri, 7 Jun 2024 07:46:27 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: yebin <yebin@huaweicloud.com>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ye Bin <yebin10@huawei.com>, Zhang Yi <yizhan@redhat.com>,
+	"Ewan D. Milne" <emilne@redhat.com>, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH] block: bio-integrity: fix potential null-ptr-deref in
+ bio_integrity_free
+Message-ID: <ZmJKU9mMDg1+mO3i@fedora>
+References: <20240606062655.2185006-1-yebin@huaweicloud.com>
+ <ZmFatW3BEzTPgR7S@infradead.org>
+ <66619EB6.4040002@huaweicloud.com>
+ <ZmHH7mW0M80RaPlj@fedora>
+ <ZmHNQ56C6Ee01Kcv@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: disk removal slowdown due to rcu_barrier
-To: Mikulas Patocka <mpatocka@redhat.com>,
- Zdenek Kabelac <zkabelac@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
- Hans Holmberg <hans.holmberg@wdc.com>,
- Dennis Maisenbacher <dennis.maisenbacher@wdc.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-References: <b3c96411-dea-16ed-85fc-a33f842594@redhat.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <b3c96411-dea-16ed-85fc-a33f842594@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZmHNQ56C6Ee01Kcv@infradead.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 6/6/24 21:49, Mikulas Patocka wrote:
-> Hi
+On Thu, Jun 06, 2024 at 07:52:51AM -0700, Christoph Hellwig wrote:
+> On Thu, Jun 06, 2024 at 10:30:06PM +0800, Ming Lei wrote:
+> > Yeah, that is one area queue freezing can't cover logical block size
+> > change, but I'd suggest to put the logical bs check into submit_bio() or
+> > slow path of __bio_queue_enter() at least.
 > 
-> The patch dd291d77cc90eb6a86e9860ba8e6e38eebd57d12 (block: Introduce zone 
-> write plugging) causes a performance regression when removing block 
-> devices.
+> We really need an alignment check in submit_bio anyway, so doing it
+> under the freeze protection would also help with this.
 > 
-> The kernel 6.9 removes a DM block device in 73ms. The kernel 6.10-rc in 
-> 103ms.
+> > My concern is that nvme format is started without draining IO, and
+> > IO can be submitted to hardware when nvme FW is handling formatting.
+> > I am not sure if nvme FW can deal with this situation correctly.
+> > Ewan suggested to run 'nvme format' with exclusive nvme disk open, which
+> > needs nvme-cli change.
 > 
-> That patch adds a rcu_barrier() call to the disk-removal code path and it 
-> causes the slowdown. We get this stacktrace when we attempt to remove 
-> large amount of DM devices. Note that the removed devices aren't zoned at 
-> all.
+> .. and doesn't protect against someone using a different tool anyway.
+> 
+> That beeing said, nvme_passthru_start actually freezes all queues
+> based on the commands supported an affects log, and
+> nvme_init_known_nvm_effects should force this even for controllers
+> not supporting the log or reporting bogus information.  So in general
+> the queue should be frozen during the actual format.
 
-OK. Let me send a fix patch to avoid the barrier for non-zoned devices. For
-zoned devices, it can only be avoided if the device does not need zone write
-plugging, which is the case for most zoned DM setup.
+That is something I missed, thanks for sharing the story.
 
-> 
-> [<0>] rcu_barrier+0x208/0x320
-> [<0>] disk_free_zone_resources+0x102/0x160
-> [<0>] disk_release+0x72/0xe0
-> [<0>] device_release+0x34/0x90
-> [<0>] kobject_put+0x8b/0x1d0
-> [<0>] cleanup_mapped_device+0xd8/0x160
-> [<0>] __dm_destroy+0x12a/0x1d0
-> [<0>] dm_hash_remove_all+0x77/0x1a0
-> [<0>] remove_all+0x23/0x40
-> [<0>] ctl_ioctl+0x1dc/0x530
-> [<0>] dm_ctl_ioctl+0xe/0x20
-> [<0>] __x64_sys_ioctl+0x94/0xd0
-> [<0>] do_syscall_64+0x82/0x160
-> [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Mikulas
-> 
 
--- 
-Damien Le Moal
-Western Digital Research
+Thanks,
+Ming
 
