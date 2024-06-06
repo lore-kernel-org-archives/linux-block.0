@@ -1,180 +1,251 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1592E3E5;
-	Thu,  6 Jun 2024 06:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717655263; cv=none; b=R2ukA0cat5VwjsNywTdiCReqn7ZdGnkB+P5Vd5rKxG9dgkaylvRT0uD+4HdHNoxA2v79sH4Lh99VfbRydBVf/mFtHZVYxIK43D/tcaH53a8AVabgBvWW2IICnJRfdYRHiX9BfK/x6KanLfjGGffWb1rMOgBdmA7I3GmUPV5KQIk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717655263; c=relaxed/simple;
-	bh=VdLJkVUrOXVXeMvr//H+2daYj3psYGBQ/AWWezkYvt4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eN9ZFKvGTWhaR6HoQUshw/6j3rZlmXu+QmIMjdYtzRko1tEI90KL426FeJ52wCaUkBzh5FUBQrVOXIGZCXrBjstuOM+yCxHppK0okhW3bjHMXejZFP8C9qG2o77+8CJNFFlwniEpzIgNBwDbwvj8I1PqwntE5FVgwupH2rjrAMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VvvWj3rS1z4f3jtj;
-	Thu,  6 Jun 2024 14:27:29 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id DCAFB1A018A;
-	Thu,  6 Jun 2024 14:27:35 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-	by APP1 (Coremail) with SMTP id cCh0CgCXaBHWVmFm7ZfTOg--.40699S4;
-	Thu, 06 Jun 2024 14:27:35 +0800 (CST)
-From: Ye Bin <yebin@huaweicloud.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: ming.lei@redhat.com,
-	Ye Bin <yebin10@huawei.com>
-Subject: [PATCH] block: bio-integrity: fix potential null-ptr-deref in bio_integrity_free
-Date: Thu,  6 Jun 2024 14:26:55 +0800
-Message-Id: <20240606062655.2185006-1-yebin@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE97540BE5;
+	Thu,  6 Jun 2024 06:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717655968; cv=fail; b=G+sDJsF37mAIJD3LsT7gIjWsAPm8Wruah74f+GezfOZSoAyggS2O7XGHQ8y+NwnUEh/uBVOBxg8lpRw8WK7svft1qN483hkLKkkqn+ZPSh0CP9X6jDch4sut+o+3tsYF3HPGGc15IwsdJgpyD0oKrRVKCnkVmsRXHPD9zjvo7rQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717655968; c=relaxed/simple;
+	bh=uk4yB7sQ9Kqne7Tr2I/pn+5qaU/TmA7NE4OC2ZbRyCU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=XPdR0WEnIFJ/zr5uszYLDeRFSo6zpp/1ZMpjr02h0qKvwFBXeVrMdH1D+dPjtG6ZMuF7WdWIp43jG9ff8GNWgjbLEakQJm+/bmRQpIXYg2TIveYc5Dp1iH1QV3QQHupc0YpxfNlvoOb86HUj7lfuHpS2oxBPvWLFbFUleOjx/Mk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Zg3zQwII; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=gVLgBoFF; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Zg3zQwII";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="gVLgBoFF"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455J0eFU015603;
+	Thu, 6 Jun 2024 06:38:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=corp-2023-11-20;
+ bh=qC1KwiI78NPWQAV59nIjkK4VOOum8bJAstfcqpaNPAk=;
+ b=Zg3zQwIICjv2QP02fOcXP+SwJaoJxjA6U7Io4py5eNxvvMcy7alMUDqLoIWV55/5t9Dx
+ iXq+TYD/iXcACsgUfhxxneOe3LC2poQaPp+Job1EltR8/6ncT97WX4WmMOoPzE5SOYzJ
+ qNr39Xpb/4IsNlHK7hkblV7B2Ia8mILYudskIBYTMToz0sGCOZXTDdZp2g1cpHKAVy/2
+ n8jdn92LwZYApCTsWGPdZptx/6Ytf3gStA9R1F3p68PROKGw8sITQo8EuFsNUX76QE65
+ ixslhEhO188j2pNX5OLiQ4rM6UdWu31LOUQDf68B4JBN3MDh9RJDczapxf+bSEJyr9cr hw== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yjbsyau5q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 06 Jun 2024 06:38:51 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 4564xt9I016562;
+	Thu, 6 Jun 2024 06:38:50 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2047.outbound.protection.outlook.com [104.47.70.47])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3ygrscms0a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 06 Jun 2024 06:38:50 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mpm6GOSqVZmwF6AijRP1WELmHNGR9syPIJNhiXTHzZ9sKzi7+YxvpAnzuywRfAlzdKYb3rGU0dUEdd8h3Uonns6xNljtQ6FoCrR5ADX57gZDNeVVMvEek/F7DshQXOYf9yEGBKZ945IEqLvuVKJfc99EKwhSk2cbduANvP2Fn8ze+PtzkjzXGOghqTcAvWVNsDAnmv3DWfKyds5NOvryAIUjQXtynztKrunGVgUj84e8dbKpDvv5Tjf+I6AJZXuvzcT5kwM56ehB//iDL4cwuyWfZuPLPkSN7j6RCZ1AASRHNGcDsgTdAaRQ1FDzNUru8jx02PhvcOJJhEG/YMAaGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qC1KwiI78NPWQAV59nIjkK4VOOum8bJAstfcqpaNPAk=;
+ b=juJQW53pOQST1rDszzokqS66/2UxvSWV+eT0DxElO+6ldMbUb/A465g0MU/OJw0V6dZsruWAPZCY6v0KMxseFu2JS4Sm0sSxSmDHLJ5W5y5IRRtTV8Ulyvd70E5kHpGAkaDPPGdxR5jMj85V8K84/IGsgbIKQ0V91SHQGnqFwpecIg5Y/hFydKuJ39jXTClLED8iVBHSJDsmFqio/2gtTYvj+/imeX5an/UDIPyE3SbdONs4+GY6WHa80iunFkqolMgN1Q8wDuya9xK1w7x378YqWpBiPxpltjvBNallXbQcSupvLldIzxXM3GnM8Ovu4JRyFi90laVGDj04j8PF5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qC1KwiI78NPWQAV59nIjkK4VOOum8bJAstfcqpaNPAk=;
+ b=gVLgBoFFFP26jW6G8/F09+FvckOxIQSC5YdYwgIokoPEdjhDBQ/rzvFhL8w5RbhECnNzPSVDe5GpT4l7zpF1Eb07WI1Gd5mCPjBOas/KAgE0MXCh7rh+3REk8kpqgC8gkVgN+QYW9S1okyHbLAxxUrKMDq2/ssteh1qkVcjuJx0=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by IA1PR10MB7336.namprd10.prod.outlook.com (2603:10b6:208:3ff::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.31; Thu, 6 Jun
+ 2024 06:38:48 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088%6]) with mapi id 15.20.7633.032; Thu, 6 Jun 2024
+ 06:38:48 +0000
+Message-ID: <cb5e9d41-c625-43b0-aeda-591b4f7edfaf@oracle.com>
+Date: Thu, 6 Jun 2024 07:38:41 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 2/9] fs: Initial atomic write support
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, dchinner@redhat.com, jack@suse.cz,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
+        ojaswin@linux.ibm.com, linux-aio@kvack.org,
+        linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org,
+        nilay@linux.ibm.com, ritesh.list@gmail.com, willy@infradead.org,
+        Prasad Singamsetty <prasad.singamsetty@oracle.com>
+References: <20240602140912.970947-1-john.g.garry@oracle.com>
+ <20240602140912.970947-3-john.g.garry@oracle.com>
+ <20240605083015.GA20984@lst.de>
+ <fbb835ff-f1ae-4b59-8cb3-22a11449d781@oracle.com>
+ <20240606054143.GB9123@lst.de>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20240606054143.GB9123@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0322.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:197::21) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgCXaBHWVmFm7ZfTOg--.40699S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxCr1xWr4kArW7XFWkZr1DWrg_yoW7Jw4xpr
-	43KF45Kr4xXF17CanrAF1rAF48KwsrAF1UGrsxZr15JFn8C34qqr1DGryjqF15Gr4ruryU
-	Xrn8t3409w1DJaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUgCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
-	z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
-	AF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
-	IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s
-	0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsG
-	vfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|IA1PR10MB7336:EE_
+X-MS-Office365-Filtering-Correlation-Id: cae0fdfe-0c12-492b-2b5e-08dc85f35215
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|7416005|1800799015;
+X-Microsoft-Antispam-Message-Info: 
+	=?utf-8?B?bXR0UDRlUGNSMFhNakVUdFAwYjJoZXFQN1BIV1c1TWYvZ0pKSkV5Z1dJR3hH?=
+ =?utf-8?B?VTNxQTZab0s0ODFaT29GdjRvalp6U00welQvekhuZjQvSHFMeGVIMXBiWFdp?=
+ =?utf-8?B?dU5OMlRQM05DSDQ0Nmg3cUgzeXBwQVJWQW1jYlBUamNJREpDcnJTQ3FqVVhq?=
+ =?utf-8?B?Q2hKM3dxM0NkOHpFeGdEMnlaa2Q5MW43c29oOWN6OXdlT1J3WXBBeGpIalNF?=
+ =?utf-8?B?RVFuaFFrWEdNN1Z4VzNmeHJITUlOVWpqM1BSVmlDL3FyL0ZWSVZNUXVLbzZ5?=
+ =?utf-8?B?YlhTWUxoNWQ3a0FNa0tKQ1FpTGlmb2J3TTdvVDBEWTk2NGZBU3hZME9XeUh4?=
+ =?utf-8?B?VWUvem93Z1Myb1ZIZVhIQk8rTzRvY3NMSDQ4NDdySXhpMHhsUUNhUE9mMzVp?=
+ =?utf-8?B?M2pWT08xSkt4MHRETnFYSGc5SkdCVkVFcjYvWmRCT1BSWUNDemRPUkd0Sjc5?=
+ =?utf-8?B?aS9IMm9nRlZwcFdueU5xRUNCUzJGNXJjSmZSS09PQ2lBQ2FheU9uQ3QvY0VV?=
+ =?utf-8?B?Rnc1UlhDdzVKbjlOOGp6UEpXTnhkSit6VThMREYyRld1a0h4cHhPR3IxMUFZ?=
+ =?utf-8?B?VUtNZ0JEWUtkVzZ5aVlPZmJDUjVvWnlCb0E1cnF4anJwYitOcnE1NUkwRmFu?=
+ =?utf-8?B?RmVGbC8vZHFOVlhheDNuQTYrWnB5QTdyZnlPYXVMYjliall6YmhiWUN5SHNi?=
+ =?utf-8?B?RldnTHhIdnBJWGRRak5Tc1o0RDZlVEhyK1JpLzZXU1hFTUx6YmxsNzI1YUg4?=
+ =?utf-8?B?a0xIWUF2RnhUK0FMY2U1S0NyWjRmQTAwMS9vVUFNUlh3NlJoQjJGNEwxQVFY?=
+ =?utf-8?B?OThBTlh1bk4xckpTV3JxTFBBdDYxeEgvQmRkbVo3ZXFESHIwWGdjdUJMczNZ?=
+ =?utf-8?B?V2Jhanl0UGRpbFd6MDEyUStZUFlUUHM2cEtLajNHMGljenpJQW9Ua3VKZ0Z2?=
+ =?utf-8?B?VHd5endObEhOU2JUdngxM2h0enRXOVA3a09WdnJ6WU9xQ3lrZVhlaS8wd2Rt?=
+ =?utf-8?B?NGNzeGFua3dpUC9rcWU4eW9BaVBaRi9EUVpDU0VWaFJLd0xVQ2RLUXdmV0w2?=
+ =?utf-8?B?L1pDV2pZYmlnZkMycGFjZit1NGU2TXRtZXFUaVFyR0hLeWxYNkJHZ0pzRThr?=
+ =?utf-8?B?SWF3eU9DeEJqZGljTFpmSzdqMDV3anNRS0JsK1RhVC9Udk9rSmlJZXhtZTlY?=
+ =?utf-8?B?Yks1UVhpY21ZelpIR2UzVk5KYVZpL1diS0ZUc3g1S2ExVmlmdlQycGgxajZW?=
+ =?utf-8?B?ZnFnU3JhREdaaFZoczBpQm1LdkFydXFrSTlLNlpvcTN4eEFsbEZqQkh4QTNJ?=
+ =?utf-8?B?T0JYdXQ3cHVJZFJEczBvaFUwTlFXMWdXMUhQK3VXb1VuOG5kcHI2OVVPYWho?=
+ =?utf-8?B?TmxuOThFc2FWN1NOTzkzOWlZT3dJeVFmSHp0d0NyUEp3dW1wS01ZNkoySFNi?=
+ =?utf-8?B?aCs1dGcwZFV3NGQ0WnZUbnJLR2lTaXhsRGZFNG4xMzRIbFR6Rll3eHJmcXk3?=
+ =?utf-8?B?NCtRaERtaENmOWd6U3FzY2RrSXVhK08vZFdMY2NHS2lZVWx0ZWtyQVVyM0pk?=
+ =?utf-8?B?R0xZMHlKTkhhYzRCQmpockkrUXgrQVVyOVZTVlIyZng3cmkySWY3KzdVSzY1?=
+ =?utf-8?B?eVRqeldVOWxSMmt2YjZSR0xLR2REUTBabG1HM1R6a0VuckRNTGtpNTFrK3pj?=
+ =?utf-8?B?NFpBYkwzajhKVTNFYnZtQ0ZQQ0ZJQ2RiMVdqYXlDY1hUUG44ME9sajRXcmNo?=
+ =?utf-8?Q?VPuTAD/CJkvueQTmF1yfTFBZq9IkcVUwPy+/Ywx?=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?YXZadGRLVGJ2Q3ZYanUySmVLWUFPSTNKblNjMUZ0RDhEY2FveXJLYlhoZWFn?=
+ =?utf-8?B?MWthSUR2eTFhUGNDRkFCbEE5MjczU1psdkFCbGNkNHkySU5IZWszbldINjJr?=
+ =?utf-8?B?cmsvcHR3RjhOYVZRUHVOWXNrTXZMUzRnRzhvQ3FWWmt2NWpuQjZwN1FQYUZy?=
+ =?utf-8?B?Q1BGU3BoZ2ZwaU43OHZUMVJXRk5FQmhNVHZDYk5YOTNBenc4SWtSeGNJMlZ4?=
+ =?utf-8?B?TkZBZnhwUTY1Wlo4di9zWW4zbWgwZFkzejZ2MWRwNmIxdHlCS1hZRVQ4ZjBF?=
+ =?utf-8?B?MlJKL1l3V1NlQy9hWnFFaVc3bGtzNUVvSVBzN1Q2R2ZNU1BxV2p5cm40OXVF?=
+ =?utf-8?B?UjZrczNEdzRXamJMSy8xdUFZYmRUdHF1Zzd0aHBZZmZaa1p5MjFMODdEY2dK?=
+ =?utf-8?B?SFNmbGdhd1h2SmpVSFVVTW9KRG5GN2MxZnJXd015Y2tGcEhRaDBDenNoTGcr?=
+ =?utf-8?B?dTQvMCt2dExmMFhqeHZZRmlZQWkyQXhZekI0alZ6UFUyVjgvR2ZNYzIvNVd1?=
+ =?utf-8?B?QzJ0VGVGOUEwMlBwK2h6SXYvUzZmWkg2NGN6bmZoYVUwclUyN0F1N3hPRjdq?=
+ =?utf-8?B?cEVIcnQ1QTBJN3JnM0FnaktlUGVwVjJ2bUQ4MDZKZWprVncvTjVLRmdXaVRr?=
+ =?utf-8?B?N2tuT0pvQSswYjlNTHFnMWtEK1RwRFd4R0g5VUtZSzl5SVpSTHJSbTVPUE9t?=
+ =?utf-8?B?Qk9NdlFVWWxMRUE2b0RVZCtBYVVaMkkyMVpEcDRXWmlsU2p4dzd1bW54VVFm?=
+ =?utf-8?B?c1VyNVZYTlZIdGJJa3FoS2ZoaUo0cGFIblU3TXFpcTE5alMzQ05HRkJnLzBJ?=
+ =?utf-8?B?dzZSVW5ld0R0aTZOUGU1d2VHcHdsWUxweElrY3ZVVkxuNW93SkdxR0h2THIy?=
+ =?utf-8?B?clRsRDR1cVRaTmQvMUFvQ1JiNGRMQUowWXFtSU1LQWQ1VU0vaVgxaTlWQSs4?=
+ =?utf-8?B?dHo0ZStFeE1LRCtIU3FMYnNwOS92cU95RzBDbjZpNXN3N05XSVh2YnRJdFNE?=
+ =?utf-8?B?RTBQY1UrNElSVVBaMU1UdlB0R3kwUmVVZzRIN1hIaGZpS3hTMFU3M09VZXRK?=
+ =?utf-8?B?UFFzK0pBUmFJeFZ0bmtTYnV6UzNjS1RwREh4ZjZpbi9JYjR4LzZMakF5dE8w?=
+ =?utf-8?B?NnRjNUx1NCtqT2tpTWpWbzBwM0dOUUpKcXZkb0REUktweWJiWDNVN3F0ZEZU?=
+ =?utf-8?B?STlJckF5Vi9ZL3VqTzBOVmY1V3F1bFEzbHF3L2JsZ0ZYcUsvUFNwTzBhS2hi?=
+ =?utf-8?B?dVYxSFQxU2RrTnZ6bER2U1RQYndVL3EzQjJzNytXcVI3ZmxzNEhJcG1PeUw5?=
+ =?utf-8?B?dWF5Y1FyQ3cwTys3aUdadGR5ZFBPSkpVajRYZ25zZ2Q3SW9COVhvVjVqb3pF?=
+ =?utf-8?B?eXZnSUZPYWhUMU41eTB3b0RuS01hM3NJclFhcG80SkFRelBqclNocXBYaU9E?=
+ =?utf-8?B?dHBlbHgzRG5Kb0hOdVZLTFJlSFVOWWRCVlhzaEJNVjZpa0h3SktqdDlZOVFZ?=
+ =?utf-8?B?Znc1WG1EdTd5Vk4zamRKYWJGT3RodjdKVGkrWXdRRTM0ZU9KUzVOMVZWTTBh?=
+ =?utf-8?B?ekZOQWdxTkNIK0gxbVdWNzVkYUNkNVdTSVRKbTJOaklnazVUTEpEUUdLOElH?=
+ =?utf-8?B?K3dxOGc2VU9Zc3ErV1o5cFpDdEV1S2RORTBiZ013eC9qMjNNVm91S1ZFbXgw?=
+ =?utf-8?B?OCs5OHYrNXZWaDBVb1V4bjVXbHMvQnNmTEtGQlBxSi9ybFA5RGNVUE9RbjBW?=
+ =?utf-8?B?UzBYc3lZTXpCVmRQV2JobUxBL0pkRVdlVGpIbFVrYmgrTWZ1MFJ2M1A0UVo0?=
+ =?utf-8?B?aXNYTWZzQmczb01CUUtzd1JUbmdjMTNJUlhOb2o3V05yUXFMcTZaUjNzaUI3?=
+ =?utf-8?B?V3h5a0pRTUNRTFNUN25qaUlsR29vZHhSREZPc2VLV3ZQUmZ5NDlaVnBNK1F2?=
+ =?utf-8?B?UmxZdHNZK3BtM0dhck5ZblhsR1MzQnVuMzRCbXJweldpczdoaDA4Z1cvVnJp?=
+ =?utf-8?B?L3V4dDFoSkdxTmt0U0JPK01WSFp4dzJTbHBrd0Via2I2NEdxTWhPWnFuV3Bo?=
+ =?utf-8?B?RzVvZ3B6Zmc3Mk4wLzVuK2F6Rnp4VUNyTDhOQ25CYzBGQWd2MHRkTGQwUDhC?=
+ =?utf-8?Q?mBEmI8IYmDYd1LCjWVIA0rEnr?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	ZwScU5lMIx256z9qO+6dqFLUOkXaiayZj9OqWVuHCOe9RjYxtPNfEePgPcA/6JvwkivBLyGJ0VJv4XKd7T89TGLdOAFKwE7Ucot81VQQfCIhJ6/Z4XqbyCbbluvzUk6EMRP1yw8wFms0lyflfKnlK7gv/R30mA88K+TLlGM1qcdRZi2jQOSXr895J/kKHS4XMNQm77G3h6emayi+SwCzLyJFqpS7RWnbJRlmQbhvVS9IE64ENTXU1RaxA/a/q2O5mCT92Cnc1QFf5F4tBmRjtWf+8vvgvq/lj2BAQRfsGiknYhydqBekwLoJ1UchvnXxZgATfTBBuydnKrovyrfKcQug6y+i/VR5xb+dbQyoPrLklcfgZc//6V7upCxX633rqumxumehUT3PDitTkSpwJVKq2sRcTFj6W2H6Py3A3qoIc4TnLjXn4DYOPVsN+MMQNUmQ4CJrPbcZfmiJTZLIrgTNJ9rj6yglKjXlyLeLy1wfKS1MU0ov3uKvhOahPDgQCMatTFKWdn7vZ6LojFN5YUrYyRVkZEeGBupPDZXGUacK5QWD08VpWJwnT+QNIqlk5p73OB15PSSau+lX8QRTzLHbRLYyFT59AjJxaD/A4ps=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cae0fdfe-0c12-492b-2b5e-08dc85f35215
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2024 06:38:48.2583
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CxtzvARi2C+zlDxM9o1G5ZEuPnAIBMkN95+FAPLV7+eNuGHbG0EI73UGQDipi96guBizvbhiS93DRNMA99Ubtw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7336
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-06_01,2024-06-06_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
+ definitions=main-2406060047
+X-Proofpoint-GUID: dZL0k7ZFCHyGIxS9xF19gB6wpNL1GB_A
+X-Proofpoint-ORIG-GUID: dZL0k7ZFCHyGIxS9xF19gB6wpNL1GB_A
 
-From: Ye Bin <yebin10@huawei.com>
+On 06/06/2024 06:41, Christoph Hellwig wrote:
+> On Wed, Jun 05, 2024 at 11:48:12AM +0100, John Garry wrote:
+>> I have no strong attachment to that name (atomic).
+>>
+>> For both SCSI and NVMe, it's an "atomic" feature and I was basing the
+>> naming on that.
+>>
+>> We could have RWF_NOTEARS or RWF_UNTEARABLE_WRITE or RWF_UNTEARABLE or
+>> RWF_UNTORN or similar. Any preference?
+> 
+> No particular preference between any of the option including atomic.
+> Just mumbling out aloud my thoughts :)
 
-There's a issue as follows when do format NVME with IO:
-BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
-PGD 101727f067 P4D 1011fae067 PUD fbed78067 PMD 0
-Oops: 0000 [#1] SMP NOPTI
-RIP: 0010:kfree+0x4f/0x160
-RSP: 0018:ff705a800912b910 EFLAGS: 00010247
-RAX: 0000000000000000 RBX: 0d06d30000000000 RCX: ff4fb320260ad990
-RDX: ff4fb30ee7acba40 RSI: 0000000000000000 RDI: 00b04cff80000000
-RBP: ff4fb30ee7acba40 R08: 0000000000000200 R09: ff705a800912bb60
-R10: 0000000000000000 R11: ff4fb3103b67c750 R12: ffffffff9a62d566
-R13: ff4fb30aa0530000 R14: 0000000000000000 R15: 000000000000000a
-FS:  00007f4399b6b700(0000) GS:ff4fb31040140000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000008 CR3: 0000001014cd4002 CR4: 0000000000761ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- bio_integrity_free+0xa6/0xb0
- __bio_integrity_endio+0x8c/0xa0
- bio_endio+0x2b/0x130
- blk_update_request+0x78/0x2b0
- blk_mq_end_request+0x1a/0x140
- blk_mq_try_issue_directly+0x5d/0xc0
- blk_mq_make_request+0x46b/0x540
- generic_make_request+0x121/0x300
- submit_bio+0x6c/0x140
- __blkdev_direct_IO_simple+0x1ca/0x3a0
- blkdev_direct_IO+0x3d9/0x460
- generic_file_read_iter+0xb4/0xc60
- new_sync_read+0x121/0x170
- vfs_read+0x89/0x130
- ksys_read+0x52/0xc0
- do_syscall_64+0x5d/0x1d0
- entry_SYSCALL_64_after_hwframe+0x65/0xca
+Regardless of the userspace API, I think that the block layer 
+terminology should match that of the underlying HW technology - so I 
+would plan to keep "atomic" in the block layer, including request_queue 
+sysfs limits.
 
-Assuming a 512 byte directIO is issued, the initial logical block size of
-the state block device is 512 bytes, and then modified to 4096 bytes.
-Above issue may happen as follows:
-         Direct read                    format NVME
-__blkdev_direct_IO_simple(iocb, iter, nr_pages);
-  if ((pos | iov_iter_alignment(iter)) & (bdev_logical_block_size(bdev) - 1))
-	-->The logical block size is 512, and the IO issued is 512 bytes,
-	   which can be checked
-    return -EINVAL;
-  submit_bio(&bio);
-                                      nvme_dev_ioctl
-                                        case NVME_IOCTL_RESCAN:
-                                          nvme_queue_scan(ctrl);
-                                             ...
-                                            nvme_update_disk_info(disk, ns, id);
-                                              blk_queue_logical_block_size(disk->queue, bs);
-                                                --> 512->4096
-     blk_queue_enter(q, flags)
-     blk_mq_make_request(q, bio)
-       bio_integrity_prep(bio)
-	 len = bio_integrity_bytes(bi, bio_sectors(bio));
-	   -->At this point, because the logical block size has increased to
-	      4096 bytes, the calculated 'len' here is 0
-         buf = kmalloc(len, GFP_NOIO | q->bounce_gfp);
-	   -->Passed in len=0 and returned buf=16
-         end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-         start = ((unsigned long) buf) >> PAGE_SHIFT;
-         nr_pages = end - start;  -->nr_pages == 1
-         bip->bip_flags |= BIP_BLOCK_INTEGRITY;
-         for (i = 0 ; i < nr_pages ; i++) {
-           if (len <= 0)
-              -->Not initializing the bip_vec of bio_integrity, will result
-		 in null pointer access during subsequent releases. Even if
-		 initialized, it will still cause subsequent releases access
-		 null pointer because the buffer address is incorrect.
-             break;
+If we used RWF_UNTORN, at some level the "atomic" and "untorn" 
+terminology would need to interface with one another. If it's going to 
+be insane to have RWF_UNTORN from userspace being translated into 
+REQ_ATOMIC, then I could keep RWF_ATOMIC.
 
-Firstly, it is unreasonable to format NVME in the presence of IO. It is also
-possible to see IO smaller than the logical block size in the block layer for
-this type of concurrency. It is expected that this type of IO device will
-return an error, so exception handling should also be done for this type of
-IO to prevent null pointer access from causing system crashes.
-The root cause of this issue is the concurrency between the write process
-and the block size update process. However, this concurrency does not exist
-in actual production environments. To solve above issue, Verify if the
-segments of BIO are aligned with integrity intervals.
+Someone please decide ....
 
-Signed-off-by: Ye Bin <yebin10@huawei.com>
----
- block/bio-integrity.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+>> For io_uring/rw.c, we have io_write() -> io_rw_init_file(..., WRITE), and
+>> then later we set IOCB_WRITE, so would be neat to use there. But then
+>> do_iter_readv_writev() does not set IOCB_WRITE - I can't imagine that
+>> setting IOCB_WRITE would do any harm there. I see a similar change in
+>> https://lore.kernel.org/linux-fsdevel/167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk/
+>>
+>> AFAICS, setting IOCB_WRITE is quite inconsistent. From browsing through
+>> fsdevel on lore, there was some history in trying to use IOCB_WRITE always
+>> instead of iov_iter direction. Any idea what happened to that?
+>>
+>> I'm just getting the feeling that setting IOCB_WRITE in
+>> kiocb_set_rw_flags() is a small part - and maybe counter productive - of a
+>> larger job of fixing IOCB_WRITE usage.
+> 
+> Someone (IIRC Dave H.) want to move it into the iov_iter a while ago.
+> I think that is a bad idea - the iov_iter is a data container except
+> for the shoehorned in read/write information doesn't describe the
+> operation at all.  So using the flag in the iocb seems like the better
+> architecture.  But I can understand that you might want to stay out
+> of all of this, so let's not touch IOCB_WRITE here.
+> 
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 2e3e8e04961e..00a0d1bafe06 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -431,7 +431,7 @@ bool bio_integrity_prep(struct bio *bio)
- 	void *buf;
- 	unsigned long start, end;
- 	unsigned int len, nr_pages;
--	unsigned int bytes, offset, i;
-+	unsigned int bytes, offset, i, intervals;
- 
- 	if (!bi)
- 		return true;
-@@ -457,7 +457,13 @@ bool bio_integrity_prep(struct bio *bio)
- 	}
- 
- 	/* Allocate kernel buffer for protection data */
--	len = bio_integrity_bytes(bi, bio_sectors(bio));
-+	intervals = bio_integrity_intervals(bi, bio_sectors(bio));
-+	if (unlikely((bio->bi_vcnt && intervals < bio->bi_vcnt) ||
-+		     (!bio->bi_vcnt && intervals < bio_segments(bio)))) {
-+		printk(KERN_ERR"BIO segments are not aligned according to integrity interval\n");
-+		goto err_end_io;
-+	}
-+	len = intervals * bi->tuple_size;
- 	buf = kmalloc(len, GFP_NOIO);
- 	if (unlikely(buf == NULL)) {
- 		printk(KERN_ERR "could not allocate integrity buffer\n");
--- 
-2.31.1
-
+ok
