@@ -1,75 +1,97 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F259831A8F;
-	Thu,  6 Jun 2024 05:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776DE1754B
+	for <linux-block@vger.kernel.org>; Thu,  6 Jun 2024 05:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717650142; cv=none; b=CzLKRFehFRWve3GkFDPxoV0OOvX+r25J5TUlN58MYfw1exMgBsZO+hkaZsS5fMGBrf2tKxp/VytWGmo+HAUSTAOy8LqRXG01yIqpOIgvLVn+7XJ9qPkOiFN8RXxG70ZzFONvy2Qg4SXFhNZ1sDyrfXvgMYN/4IHFnzrqUzDYYks=
+	t=1717651682; cv=none; b=Nbocf/IXNjF+9Xkq3Ly8ViRUnBwGDxAlMAjEcJnzOa6PXv5FBT8qEHfTRy/giyw53TopIf3hf1lt/GaUVKso1GjUBCzJQCgKuSUVOLMmhV96vDdE6IWJE8t0zigLRdtqKN3cmxHfUWMVd0ZmBOssbCvggYkt2KRS8V3NpKAiSGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717650142; c=relaxed/simple;
-	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D79jmlYNFawq0+3ovLJxQLdiB3iwaKoo+ldGmvX/sADaDN3+4v3OWMJuL3CUimwhvM+LQWSTvC+BJfjbLb6Wy7jAan6B1V5rb1k2gvO7vtVHzlto4r8KDdd9diQhccDCsRvTR6Z3Taw9IrGpF8rqErGli7ajImF7SPR3MasQhkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OXugaK8E; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717651682; c=relaxed/simple;
+	bh=yY0uNbPQOrufhgaQFeATHZ7HMCnS3ncNTc56pLNjK4I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fckFwe9r2/lyBYYaStrKibSE8jDwf8MvcGmXBFARZgmvKzFMpeDebcLPhV1vtL3CaaeOmjrV6LHrmaYXI1gFUpwhReSO2nLffmT8x/7+LQYnbPJ0Ccn/dRXfa+mc45KGC+Q/BIXjtq9yitwYVMagEtFHk24xinAT1M6ZCql8Zos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=uwxVKed1; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXugaK8E"
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6f264d5dadaso269650a34.0;
-        Wed, 05 Jun 2024 22:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717650140; x=1718254940; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-        b=OXugaK8EfXgybpgiuR/a4ldF9V9+1FcUO+/0aLHy5U88/tjJGaNgwWlKqZB+oqgKF/
-         wic++bd0rYkr8R8pxtcNRoVFbZrS7A7yD6PduAx5DSa20qBG1tMs3mq6xlHPXrZKC6GX
-         0FPukP6x7eWZY+Np9ZHDtjUvpnRtsPDXxhWP9ja+Q0a+XCGJHxu9l1sV9mxlEFDSpY42
-         AZS+adHnskHpKAcLaU+6jiv9h7cYlrhkWNKjhPBkNXcK/4sHCL+jLAaL4XUAQZl925Th
-         p87kdg15FoSJElF/j2qC0jVEpf6vArCdY3OmvmqIKOLdoN8GMg8mDhbS5eP+5bqmzij7
-         CxQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717650140; x=1718254940;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-        b=TyqzNqmczOEkcSUQjmTLpoSEc26mX/ITUasguWx66w9Dq//13VIghihN15w2+n6x0h
-         vuPP93HbSGpWyr0lT3wxSGCJHTz6x4a/XsfJyHksB4/wjbfATXLuuhs9ByB3VZHs/f59
-         davANWYuA1Pw7sMx7siI70Op6nhj5T45uCP21zKzzlhdRoTl8oFYHWohrptk6VGEDJw4
-         JLnXqRkSoDQzOqB2LGTPvsEBe8kMqBp7enQR1EK7Biu1IY7ZtabzJ8/+OGEEQnhkz/No
-         FyTynExIg/GV8Ea9RwDbW1YM371vTPUiqrOog+i3IaAkLRus0HOoY/FC3tObNBHE+50e
-         8GdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqKAQJaXFmYz8ej2CGZnx+TSY8j7gGpN1dWXD4+Re2tKOhsVkTzKyf/X8GzUGskhVCyMzesJ/QnH24lifqeZZPoKcbnULT7U79y2Jgj3i2ugyRAL1iisgEzBmDMuwNBex97MHQrZ3NA69kuTy6UYDv3eIo+fWpN4lkPNGJWqE+JzOp9w==
-X-Gm-Message-State: AOJu0YwT2cUyf8nBMzqAD2PzEUHrSZ61/iTcxlTXmp8Jl1hK5PfGFRQ2
-	lC/1GF/KeyDNbAcP62E2PPckBW5ERZOpWcVg+ArcN5avK70oFmTtDjah7wXykvOKsmRz/wW1Iwe
-	etUkk3E46Jb476P3ah0U+9I3+5go=
-X-Google-Smtp-Source: AGHT+IHPqrwGLrOpiYOHRKHF6jjAJEe69uLlr8JRuR9rDqq7Rjpi5pT7mqAtKEV0L+JskZqRkbXl08yzChKNyWs0Mrk=
-X-Received: by 2002:a05:6871:79c:b0:250:6be5:1fc5 with SMTP id
- 586e51a60fabf-251228adf01mr5001314fac.38.1717650140012; Wed, 05 Jun 2024
- 22:02:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uwxVKed1"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=Ru6e7QlCJJG/gBR+o3ggbDTJvKsMm+SRm2m/B6Mvy6c=; b=uwxVKed1cY3zjEJt78Ymver9+2
+	1jvUZ6A3OPW1PJNEPBDyehgfnYT505bd7heXZ+YyaRrDPaSFqIjqOuFBJLb+pkqNCXdRSxTb3w7+t
+	Rde5T/SmDB7IpY8gzYiMZ1GpaqEGTAP1G+brjhmEYAoeey9SD4iyPPrauBX/H82BU7zR8vcvWglAl
+	SUn/MFgprCBSTxe9mw1renGL7EmDoSs+GNo8t3JBZychlP4/7KOGjLnt73m9S8q/vEzWI0ydO0pkA
+	v5zjHQUJ6sB6Sjc/SCFT8VI4v0RuoRnQRHMCB2plIgwgxI49P3A2zpE/YLHDXBZpkV6mnSDc0wQ09
+	NK7GEq4w==;
+Received: from 2a02-8389-2341-5b80-b586-1966-ebf0-2fd8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:b586:1966:ebf0:2fd8] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sF5fJ-00000008P37-2fbq;
+	Thu, 06 Jun 2024 05:27:58 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: martin.petersen@oracle.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH] block: initialize integrity buffer to zero before writing it to media
+Date: Thu,  6 Jun 2024 07:27:45 +0200
+Message-ID: <20240606052754.3462514-1-hch@lst.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605063031.3286655-1-hch@lst.de> <20240605063031.3286655-4-hch@lst.de>
-In-Reply-To: <20240605063031.3286655-4-hch@lst.de>
-From: Kanchan Joshi <joshiiitr@gmail.com>
-Date: Thu, 6 Jun 2024 05:01:53 +0530
-Message-ID: <CA+1E3rKjG+kG1Z1N0c69Z_P5eNq9BzshKqdB5Ee0ySPzJGg-0g@mail.gmail.com>
-Subject: Re: [PATCH 03/12] block: remove the BIP_IP_CHECKSUM flag
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>, 
-	Yu Kuai <yukuai3@huawei.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>, 
-	Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org, 
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, 
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+Metadata added by bio_integrity_prep is using plain kmalloc, which leads
+to random kernel memory being written media.  For PI metadata this is
+limited to the app tag that isn't used by kernel generated metadata,
+but for non-PI metadata the entire buffer leaks kernel memory.
+
+Fix this by adding the __GFP_ZERO flag to allocations for writes.
+
+Fixes: 7ba1ba12eeef ("block: Block layer data integrity support")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio-integrity.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 2e3e8e04961eae..af7f71d16114de 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -432,6 +432,7 @@ bool bio_integrity_prep(struct bio *bio)
+ 	unsigned long start, end;
+ 	unsigned int len, nr_pages;
+ 	unsigned int bytes, offset, i;
++	gfp_t gfp = GFP_NOIO;
+ 
+ 	if (!bi)
+ 		return true;
+@@ -454,11 +455,19 @@ bool bio_integrity_prep(struct bio *bio)
+ 		if (!bi->profile->generate_fn ||
+ 		    !(bi->flags & BLK_INTEGRITY_GENERATE))
+ 			return true;
++
++		/*
++		 * Zero the memory allocated to not leak uninitialized kernel
++		 * memory to disk.  For PI this only affects the app tag, but
++		 * for non-integrity metadata it affects the entire metadata
++		 * buffer.
++		 */
++		gfp |= __GFP_ZERO;
+ 	}
+ 
+ 	/* Allocate kernel buffer for protection data */
+ 	len = bio_integrity_bytes(bi, bio_sectors(bio));
+-	buf = kmalloc(len, GFP_NOIO);
++	buf = kmalloc(len, gfp);
+ 	if (unlikely(buf == NULL)) {
+ 		printk(KERN_ERR "could not allocate integrity buffer\n");
+ 		goto err_end_io;
+-- 
+2.43.0
+
