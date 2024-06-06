@@ -1,60 +1,71 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C2012E5D;
-	Thu,  6 Jun 2024 05:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BCB4503A;
+	Thu,  6 Jun 2024 05:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717652673; cv=none; b=bHuUGntvudecMaRvFz2cZ+V+gCgQKjxsug3QQcUKZxrZZYTjLX6rwey4BjjznMOmeF+VYV6q9pvkzdEiRwq0ersE/T5SLFQQ0Kn3rkrPKTulvpfehs1jSWyFgqdVtebDvjxmUv60aa+1ZehwJisTPNTUaOhXjnrNTW4gLny4E/k=
+	t=1717652931; cv=none; b=oEL3fimv+k55PxzDaAwro5GR0mURyl51KjWHlvuszYnrqKOAmaly2PQuwN3/pKY7gnwkfSzhH3gSHsE3A3G7d3ott2x8GspyTEfpLQ8eu810/0unxGPFzJyVgX7zxFcE4VvKcUFPZlq1HfzVrlBtd0wUuCDpjzWT4uVEH/+5KGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717652673; c=relaxed/simple;
-	bh=pFUxtO8l3MYBon5QqmQZ++UCuItVyzbyjikb4L80ed8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f8W1sWF9cYi8CpCmIpF1+/dI0IULIPrfFW8TB8U32l5DK7nRHQranlq0NaCxsy0Inen0XBArf4s7uL9W2L8SEhBq4/BYI02S0Tkc8Nfp0oyfY+vHsstsXX9R62aLEcjLYOgfj73qEIqpJl7LFp2hkbj1mLHVv8kcxZtjv8qohyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 82BB368CFE; Thu,  6 Jun 2024 07:44:25 +0200 (CEST)
-Date: Thu, 6 Jun 2024 07:44:25 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-	axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
-	jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
-	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-	io-uring@vger.kernel.org, nilay@linux.ibm.com,
-	ritesh.list@gmail.com, willy@infradead.org,
-	Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH v7 4/9] block: Add core atomic write support
-Message-ID: <20240606054425.GC9123@lst.de>
-References: <20240602140912.970947-1-john.g.garry@oracle.com> <20240602140912.970947-5-john.g.garry@oracle.com> <749f9615-2fd2-49a3-9c9e-c725cb027ad3@suse.de> <a84ad9de-a274-4bdf-837a-03c38a32288a@oracle.com> <ee20a47d-3131-41c2-a2fc-39017f535527@suse.de> <76850f4f-0bd0-48ae-92f4-e3af38039938@oracle.com> <20240605083245.GC20984@lst.de> <09907144-45ca-4a48-8831-2f98518cbca4@oracle.com>
+	s=arc-20240116; t=1717652931; c=relaxed/simple;
+	bh=to9lXwD8y4GZjNah3zFD/tfg5rqM2gIiYcIWJfm8jYo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ui1jrogjzm4qQDpaKQsjyOPxwt5DQvcZlGG0DWskxMFuNhxG6d9rNAXBwvevZ5tj2kUrPutByaaQ2JkYCmboC/LYyBjhR81vNkTaMDkV/efdC1fBVZebXg7ejp7v0dv2Z4ujf0pwv0F6ISHK31rQHYG9Jpi/LADliv341qko/YA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZEjTEaI; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZEjTEaI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEA55C2BD10;
+	Thu,  6 Jun 2024 05:48:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717652931;
+	bh=to9lXwD8y4GZjNah3zFD/tfg5rqM2gIiYcIWJfm8jYo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eZEjTEaI+W5h7tOxe8xUIKqAVAJB3nH7xDikt+h/QidCvFkqw3mMF+xjHq2WP8lnV
+	 bjv5V+N/A+QwJ15dfT1lFDUFg1PZwOoIHX5crBmBR0mJGrAODb33nsQ5eVPLz4Ib2k
+	 EANujo2p4jx4tvShrr0NAbwKv0RCkaNiapXaJ6qCFx9ya7usetACknRSb18xrLL6Qt
+	 ScezNZfg16N5uRAqe9+3M6r5S33HgyKm35RzVFhUmhY7jlemg0xk3iF2XytbdUC4Zz
+	 XaArJ58SHcModLDiSMe+PK4FYRvuzJTI5A7QJGTiN/qY05Rq3RkOn6nF5kFvtQgGoh
+	 17rnOeJLXNUHw==
+Message-ID: <de8d7ddb-10a0-43d8-8c6b-179bed1d25f4@kernel.org>
+Date: Thu, 6 Jun 2024 14:48:48 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09907144-45ca-4a48-8831-2f98518cbca4@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/3] dm: Improve zone resource limits handling
+To: Christoph Hellwig <hch@lst.de>
+Cc: Benjamin Marzinski <bmarzins@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
+References: <20240605075144.153141-1-dlemoal@kernel.org>
+ <20240605075144.153141-3-dlemoal@kernel.org> <ZmDA5fmZMNGM1oFl@redhat.com>
+ <90629a40-e45f-490b-bef6-436839d91b92@kernel.org>
+ <20240606043958.GA8331@lst.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20240606043958.GA8331@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 05, 2024 at 12:21:51PM +0100, John Garry wrote:
-> I assume that you are talking about something like 
-> queue_limits_max_zone_append_sectors().
+On 6/6/24 1:39 PM, Christoph Hellwig wrote:
+> On Thu, Jun 06, 2024 at 08:52:32AM +0900, Damien Le Moal wrote:
+>> Unless you have a better idea, I think we need to pass a queue_limits struct
+>> pointer to blk_revalidate_disk_zones() -> disk_update_zone_resources(). This
+>> pointer can be NULL, in which case disk_update_zone_resources() needs to do the
+>> limit start_update+commit. But if it is not NULL, then
+>> disk_update_zone_resources() must use the passed limits.
+> 
+> I think the right thing is to simply move the call to dm_revalidate_zones
+> out of dm_set_zones_restrictions and after the queue_limits_set call
+> in dm_table_set_restrictions.
 
-Or rather how that is passed to bio_add_hw_page, yes.
+Indeed, that is a simpler approach. Resending with that fixed.
 
-> Anyway, below is the prep patch I was considering for this re-use. It's 
-> just renaming any infrastructure for "chunk_sectors" to generic 
-> "boundary_sectors".
-
-Looks reasonable.  Note that the comment above blk_boundary_sectors_left
-could use a line break.
+-- 
+Damien Le Moal
+Western Digital Research
 
