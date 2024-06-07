@@ -1,167 +1,135 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED8C18C330;
-	Fri,  7 Jun 2024 12:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78E8FC0A
+	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 14:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717765148; cv=none; b=qgrpI8Cjli93yjxf7pSj3OpXqchTPALH1EvqH0GLlDBNPyZz0e2IAxb9X+rasnBdlHXBvHV1R3djOSqYJtSLzhR9vFXMnL7zhlKHKiUC7Iij2XZxUWcK0uHazRgB6J1yfIx53vAxlUt8YZFww4WFDpDbooOF1Gtov/WKNkq7Pbw=
+	t=1717768976; cv=none; b=TuKqFLIL9jMQFGf2TsBMShUjbKWoSR5OAfcWunLsvA4utzBC6euVNTjJtZnlVd3qFNlGov3w+5ygfFPI3cJ2cyTCsnRZGJnu1f0BWuVixVCgOF4Igds6tNDOcheRYlfUewHf8F08ulvNMn/KLCY/ZN2SrDZpDpK/pbM9QN5uX0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717765148; c=relaxed/simple;
-	bh=vjt1+QeSp5Sb/mevIOfvfW6Aev/mE5JAlBBwzVe8frA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h4Ea+kqRqIu4oep/KvsBXfyxNZ+pwrWeyYG2Cpultwt0VHJYzYLyVm84pJXQQeB2tbfAUzRIQv49yoCzgbKkDw23KE9VUMhceaDk2cMtkuetGUI+nJLldQqzQuzbOSVr8MMYsmxC008eySqUmZf18OxD19olFPiCdOrqhmAcKJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Co5j6d96; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717768976; c=relaxed/simple;
+	bh=8tA4wyXAT2G3tDDNWQiVRLl7HjY+NQtI84cnBHQExps=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=rgq55S9Mak9RJQO/RQQRcKO61GWiTC36W7vV2Kct1OTqnlcll5sKdh4YgBJrvalDf7qbJu1N4tJCntLhNQkshmmRG6cA8Rfc0UqZT3741d9psKSTKShNxHaqel8DIheC6xJTkObwDnZAeBl2uKgUdTP5nflBzYMe8+xXjgWvsRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MkMgEPss; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Co5j6d96"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57864327f6eso2460604a12.1;
-        Fri, 07 Jun 2024 05:59:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717765145; x=1718369945; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fwNu32j4Qgs9o4RZx2A4i2wz9FLKQtp05joxe1btFUA=;
-        b=Co5j6d96t47/fcPM5PsIf0vPJelgRLIcDkgwGgqW+tE0M8C0OcR1sM7phA7QSbXPa+
-         PuhSgwQZKTcnMWEHesMso8IElm+D1nTuwHvsj8vgaAqmZ9/cNpSLwR35avqqT4aOCJrR
-         ZfbT4cBfEd1rw1cH/qyK2ZHfSjZMygTJn2OIK5OK7pSTX9gXGSbjxsaEGiYbiP0D+nJL
-         G662WKWILaPYQQTSqkIVQftYSvVFPiGPFuPFllEihQedSc1aXdH4U5dV/4DyM7K7fjUa
-         0RdKkRhoP+8QCjn9PSROBWboKwXcNKQSAowhGCxL5FDWDHesj6R1LsNuWpje22hkW1tG
-         0z0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717765145; x=1718369945;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fwNu32j4Qgs9o4RZx2A4i2wz9FLKQtp05joxe1btFUA=;
-        b=WfmHUb6hNIczdB2arpSpMMV6JvQYMMGgtxv/0FBfjRSiQ88rrv9mS9F9ZqwuL7lONF
-         uJYf4ntiJSB9fv6kCmPu6Mo+H0MRIqAeWXNEm7is3d0RP73rqRnwD7FcwpNihrlqZfCx
-         c11ltShrX5wCy7vwfOKe12H9RuJ4tVTTJcmmbcXp875qje3unMZp4mlE9XpS4RS/ozz+
-         UsoJNafDn1kNWH+7YA8Od3OC78AeVAkDt2MyGlZ2arw2zSpbEpDV34dHoOyj2yC8WSDy
-         QVBhN4nZMfuMgBialARyX9YKp4DIa6y/96TIvBW6V2vImzyeg3z1KMI8Azex/UdnxQCO
-         jMQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWYuZRdM2lyuwmqke4dPlBeMrIfHceAX5ZlZJn0ql9GRqnmGzqF4KeqPmQyhgjmAIcgcSUaWdRtS+DjEUPdF5Zz5DfGlya+16jt27xWxIEgFvHkDktXkVx/rULi3//viBqgHNYo6vsyo/s=
-X-Gm-Message-State: AOJu0YzNutazsNI2ucExzTeXzbbU+3fWUpEz04sD+vtD3cgRtLbL8cLu
-	8aHnay1/EWMGB111DkAY7FpV45L0iVzUEZdYpdJUauqsp5oAFKJQ
-X-Google-Smtp-Source: AGHT+IERA8GW/ndoCYphHW5kfMnR0SWWaANqPC3SnpUYwkOtyDcZn7YAFq06omRL5dyJc8UdYz6Sgg==
-X-Received: by 2002:a50:cdc2:0:b0:574:ebf4:f786 with SMTP id 4fb4d7f45d1cf-57c4e3f5be7mr2219873a12.16.1717765144630;
-        Fri, 07 Jun 2024 05:59:04 -0700 (PDT)
-Received: from [192.168.42.79] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aae229712sm2726504a12.81.2024.06.07.05.59.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jun 2024 05:59:04 -0700 (PDT)
-Message-ID: <cf8bb1db-b601-4f54-bafc-d6c58f6ce946@gmail.com>
-Date: Fri, 7 Jun 2024 13:59:07 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MkMgEPss"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717768973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w2QX6e423Zf7VWbOz8epWMjaNQmuJAw2GsMmG09nLyA=;
+	b=MkMgEPssBb1ZGV/v8QB29pWsP8s+z1CE4xJRTzZQKUm+jBe5MnkzufmMMOTimfR50kd0xj
+	WFY6zedd941Rw3Vw/el7RUnE38SWlCkBufQwInjRrAZVGYfXd5rUaDaLDWZQPjT9Zb9Rlv
+	pxmxe+Lxe/m+wQjgq0K4vwZbTMq1PW8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-658-P6V6W6KTMwq713TISEg_3g-1; Fri,
+ 07 Jun 2024 10:02:50 -0400
+X-MC-Unique: P6V6W6KTMwq713TISEg_3g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2CA03C025AC;
+	Fri,  7 Jun 2024 14:02:49 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DB0923C23;
+	Fri,  7 Jun 2024 14:02:49 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id A0C5230C03D6; Fri,  7 Jun 2024 14:02:49 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 9C9223FB52;
+	Fri,  7 Jun 2024 16:02:49 +0200 (CEST)
+Date: Fri, 7 Jun 2024 16:02:49 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+    dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH] block: Optimize disk zone resource cleanup
+In-Reply-To: <20240607002126.104227-1-dlemoal@kernel.org>
+Message-ID: <d6225ee1-3ed5-7e8a-31b8-1aafdb8a30a7@redhat.com>
+References: <20240607002126.104227-1-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] sbitmap: fix io hung due to race on
- sbitmap_word::cleared
-To: YangYang <yang.yang@vivo.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240604031124.2261-1-yang.yang@vivo.com>
- <CAFj5m9KV7OJ4_KjbSkpdtfrKamoLzV6EH-mJP3=y+VvoYOzC3w@mail.gmail.com>
- <aa7246f9-f7df-3054-077e-eb21c7f423ac@huaweicloud.com>
- <e1cdf579-007b-415f-9e4d-3fadd6f97b36@vivo.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <e1cdf579-007b-415f-9e4d-3fadd6f97b36@vivo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On 6/4/24 08:03, YangYang wrote:
-> On 2024/6/4 14:12, Yu Kuai wrote:
->> Hi,
->>
->> 在 2024/06/04 11:25, Ming Lei 写道:
->>> On Tue, Jun 4, 2024 at 11:12 AM Yang Yang <yang.yang@vivo.com> wrote:
->>>>
->>>> Configuration for sbq:
->>>>    depth=64, wake_batch=6, shift=6, map_nr=1
->>>>
->>>> 1. There are 64 requests in progress:
->>>>    map->word = 0xFFFFFFFFFFFFFFFF
->>>> 2. After all the 64 requests complete, and no more requests come:
->>>>    map->word = 0xFFFFFFFFFFFFFFFF, map->cleared = 0xFFFFFFFFFFFFFFFF
->>>> 3. Now two tasks try to allocate requests:
->>>>    T1:                                       T2:
->>>>    __blk_mq_get_tag                          .
->>>>    __sbitmap_queue_get                       .
->>>>    sbitmap_get                               .
->>>>    sbitmap_find_bit                          .
->>>>    sbitmap_find_bit_in_word                  .
->>>>    __sbitmap_get_word  -> nr=-1              __blk_mq_get_tag
->>>>    sbitmap_deferred_clear                    __sbitmap_queue_get
->>>>    /* map->cleared=0xFFFFFFFFFFFFFFFF */     sbitmap_find_bit
->>>>      if (!READ_ONCE(map->cleared))           sbitmap_find_bit_in_word
->>>>        return false;                         __sbitmap_get_word -> nr=-1
->>>>      mask = xchg(&map->cleared, 0)           sbitmap_deferred_clear
->>>>      atomic_long_andnot()                    /* map->cleared=0 */
->>>>                                                if (!(map->cleared))
->>>>                                                  return false;
->>>>                                       /*
->>>>                                        * map->cleared is cleared by T1
->>>>                                        * T2 fail to acquire the tag
->>>>                                        */
->>>>
->>>> 4. T2 is the sole tag waiter. When T1 puts the tag, T2 cannot be woken
->>>> up due to the wake_batch being set at 6. If no more requests come, T1
->>>> will wait here indefinitely.
->>>>
->>>> To fix this issue, simply revert commit 661d4f55a794 ("sbitmap:
->>>> remove swap_lock"), which causes this issue.
->>>
->>> I'd suggest to add the following words in commit log:
->>>
->>> Check on ->cleared and update on both ->cleared and ->word need to be
->>> done atomically, and using spinlock could be the simplest solution.
->>>
->>> Otherwise, the patch looks fine for me.
->>
->> Maybe I'm noob, but I'm confused how can this fix the problem, looks
->> like the race condition doesn't change.
->>
->> In sbitmap_find_bit_in_word:
->>
->> 1) __sbitmap_get_word read word;
->> 2) sbitmap_deferred_clear clear cleared;
->> 3) sbitmap_deferred_clear update word;
->>
->> 2) and 3) are done atomically while 1) can still concurrent with 3):
->>
->> t1:
->> sbitmap_find_bit_in_word
->>   __sbitmap_get_word
->>   -> read old word, return -1 >          t2:
->>          sbitmap_find_bit_in_word
->>           __sbitmap_get_word
->>           -> read old word, return -1
->>   sbitmap_deferred_clear
->>   -> clear cleared and update word
->>          sbitmap_deferred_clear
->>          -> cleared is cleared, fail
+
+
+On Fri, 7 Jun 2024, Damien Le Moal wrote:
+
+> For zoned block devices using zone write plugging, an rcu_barrier() call
+> is needed in disk_free_zone_resources() to synchronize freeing of zone
+> write plugs and the destrution of the mempool used to allocate the
+> plugs. The barrier call does slow down a little teardown of zoned block
+> devices but should not affect teardown of regular block devices or zoned
+> block devices that do not use zone write plugging (e.g. zoned DM devices
+> that do not require zone append emulation).
 > 
-> Yes, you are right, this patch cannot fix this issue.
-
-One other alternative is to kill ->cleared. It's not
-immediately clear how important it is. Do we have any
-numbers?
-
-
->> BYW, I still think it's fine to fix this problem by trying the
->> __sbitmap_get_word() at least one more time if __sbitmap_get_word()
->> failed.
+> Modify disk_free_zone_resources() to return early if we do not have a
+> mempool to start with, that is, if the device does not use zone write
+> plugging. This avoids the costly rcu_barrier() and speeds up disk
+> teardown.
 > 
-> Err, after trying one more time __sbitmap_get_word() may still fail.
+> Reported-by: Mikulas Patocka <mpatocka@redhat.com>
+> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 
--- 
-Pavel Begunkov
+This works.
+
+Tested-by: Mikulas Patocka <mpatocka@redhat.com>
+
+
+BTW. when we remove large number of DM devices, the process spends a lot 
+of time sleeping with this stacktrace:
+
+__schedule+0x242/0x600
+schedule+0x21/0xd0
+blk_mq_freeze_queue_wait+0x55/0x90
+? __wake_up+0x50/0x50
+del_gendisk+0x1fc/0x320
+cleanup_mapped_device+0x16c/0x180 [dm_mod]
+__dm_destroy+0x145/0x1f0 [dm_mod]
+dm_hash_remove_all+0x5c/0x180 [dm_mod]
+? dm_hash_remove_all+0x180/0x180 [dm_mod]
+remove_all+0x1a/0x30 [dm_mod]
+ctl_ioctl+0x1bb/0x500 [dm_mod]
+dm_compat_ctl_ioctl+0x7/0x10 [dm_mod]
+__x64_compat_sys_ioctl+0x133/0x160
+do_syscall_64+0x17c/0x1a0
+entry_SYSCALL_64_after_hwframe+0x4b/0x53
+
+Is there some way how to remove this wait?
+
+Mikulas
+
+> ---
+>  block/blk-zoned.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 8f89705f5e1c..137842dbb59a 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -1552,6 +1552,9 @@ static void disk_destroy_zone_wplugs_hash_table(struct gendisk *disk)
+>  
+>  void disk_free_zone_resources(struct gendisk *disk)
+>  {
+> +	if (!disk->zone_wplugs_pool)
+> +		return;
+> +
+>  	cancel_work_sync(&disk->zone_wplugs_work);
+>  
+>  	if (disk->zone_wplugs_wq) {
+> -- 
+> 2.45.2
+> 
+
