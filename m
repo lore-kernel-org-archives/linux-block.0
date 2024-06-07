@@ -1,59 +1,59 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8458C186E56;
-	Fri,  7 Jun 2024 12:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED8C18C330;
+	Fri,  7 Jun 2024 12:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717763578; cv=none; b=CO8y5/k4LsMWaCFWX20eyN5QxqmkxpgJ7lN23PKlmiVxwiTRgEEuBBLFl23eRRM9q4LM2lt5PJHDJDLnuJWswqtskITETcwlGSonJvg3uhfjISEdAPG2NFK1RhB0X6+s+Alc9AW325eXL3cDRj4GfrstWFJ3NwLuun6HwOiAawc=
+	t=1717765148; cv=none; b=qgrpI8Cjli93yjxf7pSj3OpXqchTPALH1EvqH0GLlDBNPyZz0e2IAxb9X+rasnBdlHXBvHV1R3djOSqYJtSLzhR9vFXMnL7zhlKHKiUC7Iij2XZxUWcK0uHazRgB6J1yfIx53vAxlUt8YZFww4WFDpDbooOF1Gtov/WKNkq7Pbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717763578; c=relaxed/simple;
-	bh=Mtuzg13utpsWBO44y/vZFgi+4GmxZ59OY7Pby3W91Ro=;
+	s=arc-20240116; t=1717765148; c=relaxed/simple;
+	bh=vjt1+QeSp5Sb/mevIOfvfW6Aev/mE5JAlBBwzVe8frA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aE5YKqCZG3VywzRX6/6MBkLzQ4MS9c6fTlVemJTW+lMXj8orYnHWOZGhe5Gwn0QqWvOz10MABNozkgqN/yuVw+NcB8k88cpq24Jb7q22FGYfkh29Nm+XCVxoaAnKiUSxMEgbgoUqT3n6HEX0dNlPMnaAnsDKizfdPRmvHiJLX3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SCrGeahh; arc=none smtp.client-ip=209.85.218.53
+	 In-Reply-To:Content-Type; b=h4Ea+kqRqIu4oep/KvsBXfyxNZ+pwrWeyYG2Cpultwt0VHJYzYLyVm84pJXQQeB2tbfAUzRIQv49yoCzgbKkDw23KE9VUMhceaDk2cMtkuetGUI+nJLldQqzQuzbOSVr8MMYsmxC008eySqUmZf18OxD19olFPiCdOrqhmAcKJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Co5j6d96; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SCrGeahh"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a68ca4d6545so373560166b.0;
-        Fri, 07 Jun 2024 05:32:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Co5j6d96"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57864327f6eso2460604a12.1;
+        Fri, 07 Jun 2024 05:59:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717763575; x=1718368375; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717765145; x=1718369945; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=frzHWXcV3WTz8vkeTxeKgJVHQUILa1qKA6l4DtovpCM=;
-        b=SCrGeahhQMYWofZJOLBj6k2grKOWcOF8lRjMfyzwF3W8caOqFn3bmt+q1wHI3yWpeo
-         SBpFhwa2+ja1ZH3J+tPgUVInEwrOjx0NWLvbz5LcnVXiATNj2V93/6GTN9SyVITbdyl7
-         5JHAfjQ0P2GZ1W3fO1zOSAyDiPx6jdhmxMELEPHUGE0j5NHc1fN5AnVAAeBlJSCi7STC
-         +KxtTIrJoyt40xdWkxmWXwR8quborXlUOAZjgNR5nFJjldJz8ld3pqCaeEovuEIfeOBh
-         Xd06OdBLthMh5HjR15G8lKYt16PnZ7xkWVrze5PwfDwkjhy96M8z91Abr8rMmDKiGCti
-         1aJw==
+        bh=fwNu32j4Qgs9o4RZx2A4i2wz9FLKQtp05joxe1btFUA=;
+        b=Co5j6d96t47/fcPM5PsIf0vPJelgRLIcDkgwGgqW+tE0M8C0OcR1sM7phA7QSbXPa+
+         PuhSgwQZKTcnMWEHesMso8IElm+D1nTuwHvsj8vgaAqmZ9/cNpSLwR35avqqT4aOCJrR
+         ZfbT4cBfEd1rw1cH/qyK2ZHfSjZMygTJn2OIK5OK7pSTX9gXGSbjxsaEGiYbiP0D+nJL
+         G662WKWILaPYQQTSqkIVQftYSvVFPiGPFuPFllEihQedSc1aXdH4U5dV/4DyM7K7fjUa
+         0RdKkRhoP+8QCjn9PSROBWboKwXcNKQSAowhGCxL5FDWDHesj6R1LsNuWpje22hkW1tG
+         0z0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717763575; x=1718368375;
+        d=1e100.net; s=20230601; t=1717765145; x=1718369945;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=frzHWXcV3WTz8vkeTxeKgJVHQUILa1qKA6l4DtovpCM=;
-        b=YXObvMZucgRG6T8MrOTIZWePVQuxQmAdyPPzXD0daX7x3CtKI45VkM13ivSSlZCoac
-         uFQGKvouRlDpTcuvAbsejdxLx4ZHu8vgscyCj7NzElSr87ZtGiVEBVfvEGdlAMMX/Oho
-         GG+T9le8PqrfErcJySo2oBl502icUN3zknuxoBWRjQ1meHtvawrW8wIbYB6skFtFOcNA
-         7ohVbUxuo0+DcBKNpC78PL2n/MWUSkml3wYadicf04gVG46IXG46zUHa1EaDqAdEtfJS
-         EU8TIJ22md1GL8QwtN9nMxGK0Lj6V77lobh2WJflXKnQP5ST4fP9/Re5tLQ90be0c4I9
-         UUdg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2FAv6szGYL6yfHggePIjSp/wFCnC28Wk39UCx0KU3IuM+pe/wz60rwtATidN2l9TnzVLfHUzzC1QJykhqQWHyUHxw9uM+0eM=
-X-Gm-Message-State: AOJu0YzT8eQ1r+rsCruTV8G/hHNT5B91ZhvUEDi72F6O3fhKfXWYxTtX
-	Q/0Bp46xJM5ASE9KQaiCAA5OOl5yOpt73BLfkMe2eqxuRdQNlY+s
-X-Google-Smtp-Source: AGHT+IFqc9bKCkFHiAOABBh9Yn9ivHpLFB5L9eImJEICDlhZbGZ7+5EFJJTrVdNvUkR5Y98HrEp7Vg==
-X-Received: by 2002:a17:907:97cd:b0:a6e:6555:4bcd with SMTP id a640c23a62f3a-a6e65554cadmr102225966b.35.1717763574532;
-        Fri, 07 Jun 2024 05:32:54 -0700 (PDT)
-Received: from [192.168.42.93] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c806ebd31sm241540966b.139.2024.06.07.05.32.54
+        bh=fwNu32j4Qgs9o4RZx2A4i2wz9FLKQtp05joxe1btFUA=;
+        b=WfmHUb6hNIczdB2arpSpMMV6JvQYMMGgtxv/0FBfjRSiQ88rrv9mS9F9ZqwuL7lONF
+         uJYf4ntiJSB9fv6kCmPu6Mo+H0MRIqAeWXNEm7is3d0RP73rqRnwD7FcwpNihrlqZfCx
+         c11ltShrX5wCy7vwfOKe12H9RuJ4tVTTJcmmbcXp875qje3unMZp4mlE9XpS4RS/ozz+
+         UsoJNafDn1kNWH+7YA8Od3OC78AeVAkDt2MyGlZ2arw2zSpbEpDV34dHoOyj2yC8WSDy
+         QVBhN4nZMfuMgBialARyX9YKp4DIa6y/96TIvBW6V2vImzyeg3z1KMI8Azex/UdnxQCO
+         jMQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYuZRdM2lyuwmqke4dPlBeMrIfHceAX5ZlZJn0ql9GRqnmGzqF4KeqPmQyhgjmAIcgcSUaWdRtS+DjEUPdF5Zz5DfGlya+16jt27xWxIEgFvHkDktXkVx/rULi3//viBqgHNYo6vsyo/s=
+X-Gm-Message-State: AOJu0YzNutazsNI2ucExzTeXzbbU+3fWUpEz04sD+vtD3cgRtLbL8cLu
+	8aHnay1/EWMGB111DkAY7FpV45L0iVzUEZdYpdJUauqsp5oAFKJQ
+X-Google-Smtp-Source: AGHT+IERA8GW/ndoCYphHW5kfMnR0SWWaANqPC3SnpUYwkOtyDcZn7YAFq06omRL5dyJc8UdYz6Sgg==
+X-Received: by 2002:a50:cdc2:0:b0:574:ebf4:f786 with SMTP id 4fb4d7f45d1cf-57c4e3f5be7mr2219873a12.16.1717765144630;
+        Fri, 07 Jun 2024 05:59:04 -0700 (PDT)
+Received: from [192.168.42.79] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aae229712sm2726504a12.81.2024.06.07.05.59.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jun 2024 05:32:54 -0700 (PDT)
-Message-ID: <06c5f635-b065-4ff1-9733-face599ddfe3@gmail.com>
-Date: Fri, 7 Jun 2024 13:32:57 +0100
+        Fri, 07 Jun 2024 05:59:04 -0700 (PDT)
+Message-ID: <cf8bb1db-b601-4f54-bafc-d6c58f6ce946@gmail.com>
+Date: Fri, 7 Jun 2024 13:59:07 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,85 +61,107 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 0/9] io_uring: support sqe group and provide group kbuf
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
- Hollin Liu <hollinisme@gmail.com>
-References: <20240511001214.173711-1-ming.lei@redhat.com>
- <Zl0IvMTuFfDOu3Gj@fedora>
+Subject: Re: [PATCH v2] sbitmap: fix io hung due to race on
+ sbitmap_word::cleared
+To: YangYang <yang.yang@vivo.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240604031124.2261-1-yang.yang@vivo.com>
+ <CAFj5m9KV7OJ4_KjbSkpdtfrKamoLzV6EH-mJP3=y+VvoYOzC3w@mail.gmail.com>
+ <aa7246f9-f7df-3054-077e-eb21c7f423ac@huaweicloud.com>
+ <e1cdf579-007b-415f-9e4d-3fadd6f97b36@vivo.com>
 Content-Language: en-US
 From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <Zl0IvMTuFfDOu3Gj@fedora>
+In-Reply-To: <e1cdf579-007b-415f-9e4d-3fadd6f97b36@vivo.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 6/3/24 01:05, Ming Lei wrote:
-> On Sat, May 11, 2024 at 08:12:03AM +0800, Ming Lei wrote:
->> Hello,
+On 6/4/24 08:03, YangYang wrote:
+> On 2024/6/4 14:12, Yu Kuai wrote:
+>> Hi,
 >>
->> The 1st 4 patches are cleanup, and prepare for adding sqe group.
+>> 在 2024/06/04 11:25, Ming Lei 写道:
+>>> On Tue, Jun 4, 2024 at 11:12 AM Yang Yang <yang.yang@vivo.com> wrote:
+>>>>
+>>>> Configuration for sbq:
+>>>>    depth=64, wake_batch=6, shift=6, map_nr=1
+>>>>
+>>>> 1. There are 64 requests in progress:
+>>>>    map->word = 0xFFFFFFFFFFFFFFFF
+>>>> 2. After all the 64 requests complete, and no more requests come:
+>>>>    map->word = 0xFFFFFFFFFFFFFFFF, map->cleared = 0xFFFFFFFFFFFFFFFF
+>>>> 3. Now two tasks try to allocate requests:
+>>>>    T1:                                       T2:
+>>>>    __blk_mq_get_tag                          .
+>>>>    __sbitmap_queue_get                       .
+>>>>    sbitmap_get                               .
+>>>>    sbitmap_find_bit                          .
+>>>>    sbitmap_find_bit_in_word                  .
+>>>>    __sbitmap_get_word  -> nr=-1              __blk_mq_get_tag
+>>>>    sbitmap_deferred_clear                    __sbitmap_queue_get
+>>>>    /* map->cleared=0xFFFFFFFFFFFFFFFF */     sbitmap_find_bit
+>>>>      if (!READ_ONCE(map->cleared))           sbitmap_find_bit_in_word
+>>>>        return false;                         __sbitmap_get_word -> nr=-1
+>>>>      mask = xchg(&map->cleared, 0)           sbitmap_deferred_clear
+>>>>      atomic_long_andnot()                    /* map->cleared=0 */
+>>>>                                                if (!(map->cleared))
+>>>>                                                  return false;
+>>>>                                       /*
+>>>>                                        * map->cleared is cleared by T1
+>>>>                                        * T2 fail to acquire the tag
+>>>>                                        */
+>>>>
+>>>> 4. T2 is the sole tag waiter. When T1 puts the tag, T2 cannot be woken
+>>>> up due to the wake_batch being set at 6. If no more requests come, T1
+>>>> will wait here indefinitely.
+>>>>
+>>>> To fix this issue, simply revert commit 661d4f55a794 ("sbitmap:
+>>>> remove swap_lock"), which causes this issue.
+>>>
+>>> I'd suggest to add the following words in commit log:
+>>>
+>>> Check on ->cleared and update on both ->cleared and ->word need to be
+>>> done atomically, and using spinlock could be the simplest solution.
+>>>
+>>> Otherwise, the patch looks fine for me.
 >>
->> The 5th patch supports generic sqe group which is like link chain, but
->> allows each sqe in group to be issued in parallel and the group shares
->> same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
->> sqe group & io link together. sqe group changes nothing on
->> IOSQE_IO_LINK.
+>> Maybe I'm noob, but I'm confused how can this fix the problem, looks
+>> like the race condition doesn't change.
 >>
->> The 6th patch supports one variant of sqe group: allow members to depend
->> on group leader, so that kernel resource lifetime can be aligned with
->> group leader or group, then any kernel resource can be shared in this
->> sqe group, and can be used in generic device zero copy.
+>> In sbitmap_find_bit_in_word:
 >>
->> The 7th & 8th patches supports providing sqe group buffer via the sqe
->> group variant.
+>> 1) __sbitmap_get_word read word;
+>> 2) sbitmap_deferred_clear clear cleared;
+>> 3) sbitmap_deferred_clear update word;
 >>
->> The 9th patch supports ublk zero copy based on io_uring providing sqe
->> group buffer.
+>> 2) and 3) are done atomically while 1) can still concurrent with 3):
 >>
->> Tests:
->>
->> 1) pass liburing test
->> - make runtests
->>
->> 2) write/pass two sqe group test cases:
->>
->> https://github.com/axboe/liburing/compare/master...ming1:liburing:sqe_group_v2
->>
->> - covers related sqe flags combination and linking groups, both nop and
->> one multi-destination file copy.
->>
->> - cover failure handling test: fail leader IO or member IO in both single
->>    group and linked groups, which is done in each sqe flags combination
->>    test
->>
->> 3) ublksrv zero copy:
->>
->> ublksrv userspace implements zero copy by sqe group & provide group
->> kbuf:
->>
->> 	git clone https://github.com/ublk-org/ublksrv.git -b group-provide-buf_v2
->> 	make test T=loop/009:nbd/061:nbd/062	#ublk zc tests
->>
->> When running 64KB block size test on ublk-loop('ublk add -t loop --buffered_io -f $backing'),
->> it is observed that perf is doubled.
->>
->> Any comments are welcome!
->>
->> V3:
->> 	- add IORING_FEAT_SQE_GROUP
->> 	- simplify group completion, and minimize change on io_req_complete_defer()
->> 	- simplify & cleanup io_queue_group_members()
->> 	- fix many failure handling issues
->> 	- cover failure handling code in added liburing tests
->> 	- remove RFC
+>> t1:
+>> sbitmap_find_bit_in_word
+>>   __sbitmap_get_word
+>>   -> read old word, return -1 >          t2:
+>>          sbitmap_find_bit_in_word
+>>           __sbitmap_get_word
+>>           -> read old word, return -1
+>>   sbitmap_deferred_clear
+>>   -> clear cleared and update word
+>>          sbitmap_deferred_clear
+>>          -> cleared is cleared, fail
 > 
-> Hello Jens and Pavel,
-> 
-> V3 should address all your comments, would you mind to take a look at
-> this version?
+> Yes, you are right, this patch cannot fix this issue.
 
-I'll take a look this weekend
+One other alternative is to kill ->cleared. It's not
+immediately clear how important it is. Do we have any
+numbers?
+
+
+>> BYW, I still think it's fine to fix this problem by trying the
+>> __sbitmap_get_word() at least one more time if __sbitmap_get_word()
+>> failed.
+> 
+> Err, after trying one more time __sbitmap_get_word() may still fail.
 
 -- 
 Pavel Begunkov
