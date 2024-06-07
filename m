@@ -1,80 +1,157 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033CB2D600
-	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 06:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F513153BF6;
+	Fri,  7 Jun 2024 07:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717741996; cv=none; b=YgmCAtBezG/J+5TLIVyGrejwyeHTX/tsaBfthMEsF+QDFl15akyPjU48hAhMDWoXRFqygCUP8HiFZxJsnrBGm9GOnI5q6hIlX4bQQXo3d3rNzZ9w9AZXJ59J4lLKKOdKr+pC3cBdM7A5XLdBqaEoE5hPMqdCKw3a2EiJccTeOkA=
+	t=1717745499; cv=none; b=F6MJox4w/8W1JAhSHhslijVzvoL8UqwH/Kjo9VBEajbecnp1HE9n/vSBAVWOFewayMEZM1RGVeuhIQBvHYVEqfttLIqc4mhUDPHHpsw28/lK3mqpfAayMUK/GZxWECNUPEz4AxiGTtTwRUD7yi3fq+3ttjzT+R5kOTsvE698Pkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717741996; c=relaxed/simple;
-	bh=aeeAV18NL5zwnJhyY5Mu0GQcHJndNDUCKeVCW99ZGG4=;
+	s=arc-20240116; t=1717745499; c=relaxed/simple;
+	bh=B2gCRIPjZcLOX3TCD7Q0rQ/wCCbd/cF1wmZCrQQQoLg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fN3P6y6BTBIocCMqy6HdyVkNUalCr+wv1GO6ZOdjE1c3MFzblLYtb1hVhfza/Kv0HHtk0NjyHtExKRLJ4Vq//CI9wR08gSmZchpc+bVZqNdY7EfEWFkMzqkafvYY8n34qo+JH+70reU4ArGe9Uq4z8vF9kGThWNShtLAM7SsWfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U5Me/K+7; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=rXh4duDrwGzXDOZlyVdrsULX11lt3Zo+Kiuygmlrj+nN1ttJ3OaTXnNm+cvG0UWqAgRBzDBuIqpY+pPDX8m4PIjjhyypFwtSaV/VNAcAfLud/zTA3xj7RlKONVa0yvpkO1OWEt9WhSiCarQEOPJzqzmF24VxrFBI+10uEF5cROw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oSyCR9xk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=878lOhC7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oSyCR9xk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=878lOhC7; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U5Me/K+7"
-X-Envelope-To: hch@lst.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717741993;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oSyCR9xk";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="878lOhC7";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oSyCR9xk";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="878lOhC7"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B525821AF1;
+	Fri,  7 Jun 2024 07:31:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717745495; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uqn98qnbHlEsgzTqMBvOqaHJPzVEiq0rM4rP3bX1Rw8=;
-	b=U5Me/K+7cduPOZrRRjB59q7O7SRFQM2ACruBZevtAGPMJ9H5JNCUSZxtxTGRQovbDSWgfJ
-	VGd2T2T11otqHh3sj2AMIkvuOVM2Jyl5J0PKAfPW9qcYiPmxwSR3OtCW5sLbl93RdT/XpG
-	DLb30vyf6TvHfCINSJ1lHIwTmD+JxJE=
-X-Envelope-To: f.weber@proxmox.com
-X-Envelope-To: axboe@kernel.dk
-X-Envelope-To: ming.lei@redhat.com
-X-Envelope-To: bvanassche@acm.org
-X-Envelope-To: linux-block@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: zhouchengming@bytedance.com
-X-Envelope-To: t.lamprecht@proxmox.com
-Message-ID: <1899ff04-f1de-4d1a-be97-a8702ca3cd65@linux.dev>
-Date: Fri, 7 Jun 2024 14:33:07 +0800
+	bh=NMMolUiLSPWu3XSdPdZUfGl9BCThwSdPrXW66Az97D8=;
+	b=oSyCR9xkELO8L5Aadz8fPB8CERhvgOs/ZGlDUdrCQIPI0M8wj6y1frU9IbztGDMN4wcB+2
+	kldDqHZLfWYCcHtXJtXox1VdZIQhCL6Iqq5zIs9zww4GaaEFffv7X24gE40Ncbzf7W2hEv
+	Dg5wQHP6bBMEUC+M39L7V/VY8VBPlAw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717745495;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NMMolUiLSPWu3XSdPdZUfGl9BCThwSdPrXW66Az97D8=;
+	b=878lOhC75QuTS6EKVQEBgm0Gq4FVZ4FGMnpgSaU+4z8sCPvaQWsB+sjtGA9GYvtMrGg1k/
+	NH+abBGyLAxZtSDQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=oSyCR9xk;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=878lOhC7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717745495; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NMMolUiLSPWu3XSdPdZUfGl9BCThwSdPrXW66Az97D8=;
+	b=oSyCR9xkELO8L5Aadz8fPB8CERhvgOs/ZGlDUdrCQIPI0M8wj6y1frU9IbztGDMN4wcB+2
+	kldDqHZLfWYCcHtXJtXox1VdZIQhCL6Iqq5zIs9zww4GaaEFffv7X24gE40Ncbzf7W2hEv
+	Dg5wQHP6bBMEUC+M39L7V/VY8VBPlAw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717745495;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NMMolUiLSPWu3XSdPdZUfGl9BCThwSdPrXW66Az97D8=;
+	b=878lOhC75QuTS6EKVQEBgm0Gq4FVZ4FGMnpgSaU+4z8sCPvaQWsB+sjtGA9GYvtMrGg1k/
+	NH+abBGyLAxZtSDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 047AB13A42;
+	Fri,  7 Jun 2024 07:31:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id KbchO1a3YmYEeAAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 07 Jun 2024 07:31:34 +0000
+Message-ID: <04e67b76-1b47-4d67-9e92-71fb37b97351@suse.de>
+Date: Fri, 7 Jun 2024 09:31:34 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] block: fix request.queuelist usage in flush
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/11] block: move integrity information into queue_limits
 Content-Language: en-US
 To: Christoph Hellwig <hch@lst.de>
-Cc: Friedrich Weber <f.weber@proxmox.com>, axboe@kernel.dk,
- ming.lei@redhat.com, bvanassche@acm.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, zhouchengming@bytedance.com,
- Thomas Lamprecht <t.lamprecht@proxmox.com>
-References: <20240604064745.808610-1-chengming.zhou@linux.dev>
- <c9d03ff7-27c5-4ebd-b3f6-5a90d96f35ba@proxmox.com>
- <1344640f-b22d-4791-aed4-68fc62fb6e36@linux.dev>
- <ec27da86-b84a-430b-98aa-9971f90c8c87@proxmox.com>
- <7193e02e-7347-48db-b1a0-67b44730480b@proxmox.com>
- <448721f2-8e0b-4c5a-9764-bde65a5ee981@linux.dev>
- <343166f4-ac11-4f0e-ad13-6dc14dbf573d@proxmox.com>
- <dea87c0a-1c36-4737-bea5-cb7fa273b724@linux.dev>
- <20240607045511.GB2857@lst.de>
- <2223bbb9-8bc8-4566-9c3f-ef6103422068@linux.dev>
- <20240607063101.GA5387@lst.de>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <20240607063101.GA5387@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Cc: Jens Axboe <axboe@kernel.dk>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+References: <20240607055912.3586772-1-hch@lst.de>
+ <20240607055912.3586772-12-hch@lst.de>
+ <8cd46b95-bfdf-42a4-809f-36ff88062322@suse.de> <20240607063221.GB5387@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240607063221.GB5387@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: B525821AF1
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.50
 
-On 2024/6/7 14:31, Christoph Hellwig wrote:
-> On Fri, Jun 07, 2024 at 02:24:52PM +0800, Chengming Zhou wrote:
->> Right, how about add WARN here to catch it? Or just set it to PREFLUSH?
->> Not familiar with dm code, need help if we need to fix it in dm. :)
+On 6/7/24 08:32, Christoph Hellwig wrote:
+> I just found a fullquota.  If you have anthing to say please trim your
+> reply so that it can be found.
 > 
-> We'll need to fix dm first.  I'll take a look if I can reproduce it.
-> Let's kept the list_del_init fix in first, I hope I can allocate some
-> time to this soon.
+Sorry.
 
-Ok, it's great, thanks!
+Trimming reply next time.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
