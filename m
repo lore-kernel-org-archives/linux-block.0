@@ -1,118 +1,50 @@
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D088433B6
-	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 04:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.143.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABCB1384A9;
+	Fri,  7 Jun 2024 04:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717735971; cv=none; b=OP+1NcAEnY8qoaDt7MNGCmx2wEebaFwegNTbYuizTb7gdZasfeef+xsGAGII1Iz+CTh+PNF6ngNgyIjEnf3xNS9B5Zkn8m15mTrCPFMn6benxuLUE2KeqZHdeqDC4ClmgauditJ6W5iybEiM1o0Ux13yKceE7pv3qnYK8Iu77eo=
+	t=1717736117; cv=none; b=K72/S65SxOfjugEOgpBcMDUUJSg6qqihaV9Ew53SeVC9KqAueysw76nBztNqxgx6D/opf3leO9loRTpevA1cV922KgmN/sUouT0mjhCUxLO+yr31g3WYfbcWs42S/sK7niIkyS8YDoCHsR64YBgJ3gVwEoHr1I57+fbGQ9uQCno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717735971; c=relaxed/simple;
-	bh=TtKH/nRpLLSQBv6ga6OR/mLkhPqERzHax4+J4S3D3rY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eu3aTJu59kDWTCJMAltKgkll5w/wXCyBRlvXIfWyRcfETE2tpW6AvS4OoX2aIxMpIs7RdyXULyi1W7jUCcNph3a1nNnlujUL0uonrRxa8PA8GBEDPpE/m+ROVsbdpcUP1ePC4QnbXdT3Hdb3PUIpTdMtmP78EZ8JtL/HcAKXbbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=KkfGSvYu; arc=none smtp.client-ip=68.232.143.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KkfGSvYu"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1717735969; x=1749271969;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=TtKH/nRpLLSQBv6ga6OR/mLkhPqERzHax4+J4S3D3rY=;
-  b=KkfGSvYuSEKVFvk+qPpp620ljzt4P20uxc9D7CQ2WmK7DrXakAs3cBn6
-   h1OcwpNlCdSH1DVomZCjAzFoG5hGKO2fIMumiE0mr1r8o0gKgCB4/zIhA
-   3ouejcpKC81cS/lDDnMZw/RrJDipaNAdDcSpOlsoxJf+z008nbkQzJgOK
-   VI8uSfSiFg5txAwy1/8jMu6Lm/7ieukQ+0BIIn+s4sex+rQgw5+2lKAcl
-   qQaQsk5JArYUNPwl+YlWNZ5XGsi10xBSlNRR33V2Ms5durZ59BSQ5JTOk
-   MGgYgUeGKcKb9EXHUQ/Y0Mq6TB/zi2ViTZWqcunBkKXiE2eqY4YLtcEm3
-   A==;
-X-CSE-ConnectionGUID: QoRo8hy9Q0a5srjv2XGfkQ==
-X-CSE-MsgGUID: 7DL2ZKUqSuyRMH2nRIpXoA==
-X-IronPort-AV: E=Sophos;i="6.08,220,1712592000"; 
-   d="scan'208";a="18511884"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Jun 2024 12:52:48 +0800
-IronPort-SDR: 66628471_E511/p08AAd+FLJ0LzFZ0NK7ZDwFpBrdQPG1SMuy4qjtTpy
- Cq/nwychPN8O5dtDeJYwpXj6Zqv9vJQggM8w2uw==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Jun 2024 20:54:25 -0700
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip01.wdc.com with ESMTP; 06 Jun 2024 21:52:47 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] check: confirm dependent commands
-Date: Fri,  7 Jun 2024 13:52:46 +0900
-Message-ID: <20240607045246.248590-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1717736117; c=relaxed/simple;
+	bh=gz8RtzH8A5MfFuxMeNTqL/qDlRxxZbKZrIKvW418tR8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bG0o2b6dPuMoh7rmwrlhc36Eq6/skcq6/2XxoyVcwoADvaIsw2VA7uEFCBLYfwFVR8bpdYyCzvgb0SlFlznloC3MEmfNZRHNWA/NwIIkvs7J9+RcRe2w1o1MZtBHBrZb8JKhW/WOCKbyoGH9NHYZxQ3Z11Xh3Q6r5Ku17L8KrW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A0E0168B05; Fri,  7 Jun 2024 06:55:11 +0200 (CEST)
+Date: Fri, 7 Jun 2024 06:55:11 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Chengming Zhou <chengming.zhou@linux.dev>
+Cc: Friedrich Weber <f.weber@proxmox.com>, axboe@kernel.dk,
+	ming.lei@redhat.com, hch@lst.de, bvanassche@acm.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zhouchengming@bytedance.com,
+	Thomas Lamprecht <t.lamprecht@proxmox.com>
+Subject: Re: [PATCH] block: fix request.queuelist usage in flush
+Message-ID: <20240607045511.GB2857@lst.de>
+References: <20240604064745.808610-1-chengming.zhou@linux.dev> <c9d03ff7-27c5-4ebd-b3f6-5a90d96f35ba@proxmox.com> <1344640f-b22d-4791-aed4-68fc62fb6e36@linux.dev> <ec27da86-b84a-430b-98aa-9971f90c8c87@proxmox.com> <7193e02e-7347-48db-b1a0-67b44730480b@proxmox.com> <448721f2-8e0b-4c5a-9764-bde65a5ee981@linux.dev> <343166f4-ac11-4f0e-ad13-6dc14dbf573d@proxmox.com> <dea87c0a-1c36-4737-bea5-cb7fa273b724@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dea87c0a-1c36-4737-bea5-cb7fa273b724@linux.dev>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-As described in README, blktests requires some commands to run tests.
-Check them and warn if they are not available. Also confirm that the
-bash version is 4.2 or larger.
+On Fri, Jun 07, 2024 at 10:37:58AM +0800, Chengming Zhou wrote:
+> Yeah, right, it seems LVM may create this special request that only has
+> PREFLUSH | POSTFLUSH without any DATA, goes into the flush state machine.
+> Then, cause the request double list_add_tail() without list_del_init().
+> I don't know the reason behind it, but well, it's allowable in the current
+> flush code.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- check | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
-
-diff --git a/check b/check
-index 3ed4510..7f43a31 100755
---- a/check
-+++ b/check
-@@ -709,6 +709,32 @@ _check() {
- 	return $ret
- }
- 
-+_check_dependencies() {
-+	local v1 v2 v3
-+	local -A required_commands_and_packages
-+	local cmd
-+
-+	# Require bash version 4.2
-+	IFS='.' read -r v1 v2 v3 < <(bash --version | grep version | head -1 | \
-+					   sed 's/.*version \([0-9.]\+\).*/\1/')
-+	if ((v1 * 65536 + v2 * 256 + v3 < 4 * 65536 + 2 * 256)); then
-+		_warning "bash version is older than 4.2"
-+	fi
-+
-+	# Check dependent commands to run blktests
-+	required_commands_and_packages[dd]="GNU coreutils"
-+	required_commands_and_packages[gawk]="GNU awk"
-+	required_commands_and_packages[blockdev]="util-linux"
-+	required_commands_and_packages[fio]="fio"
-+	required_commands_and_packages[udevadm]="systemd-udev"
-+
-+	for cmd in "${!required_commands_and_packages[@]}"; do
-+		command -v "$cmd" &> /dev/null && continue
-+		_warning "$cmd is not available." \
-+			 "Install ${required_commands_and_packages[$cmd]}."
-+	done
-+}
-+
- usage () {
- 	USAGE_STRING="\
- usage: $0 [options] [group-or-test...]
-@@ -748,6 +774,8 @@ Miscellaneous:
- 	esac
- }
- 
-+_check_dependencies
-+
- if ! TEMP=$(getopt -o 'do:q::x:c:h' --long 'device-only,quick::,exclude:,output:,config:,help' -n "$0" -- "$@"); then
- 	exit 1
- fi
--- 
-2.45.0
+PREFLUSH | POSTFLUSH is a weird invalid format.  We'll need to fix this
+in dm, and probably also catch it in the block layer submission path.
 
