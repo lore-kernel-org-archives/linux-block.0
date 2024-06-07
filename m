@@ -1,102 +1,119 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BAA199E83
-	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 15:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6534E19A2BB
+	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 15:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717774978; cv=none; b=VcbUsUgyxhUj7gVMlnFIGNfOWaqCRSrQg6LADa4SqD5yBACvQ5InTmys7bWo8A17axeCS5AyMY/OX+TBq8YC9FuxfhyoP9Yd0nRtJmXdVppsQUO9MbIVda3i0M5bOCF/rYDabaE5jiiO6uu66dAa3T6dscicGOmc273OflcAzJg=
+	t=1717775731; cv=none; b=blridm0Io8ZNUDEUJGKJPPPeDHHqFID6Mvr7h0a5kW+sUntx6GKTwfAZh44zlttX9bA4C4dRk4HRpFrcEUxKGZJ9mM/WmcOZK6RiI9PXTcCgPHVgFa7yGcVPGssACERp+7n4MRY/Pok4n768zdH389XFNBgrUg+9UV6sbGS9ct0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717774978; c=relaxed/simple;
-	bh=VLKCBiqDO1b7IDOT96XGtlch+dI1HdxS4qV5hpgYjzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GjuyrnvdR0V9/deSQGfOiAHdSKEPx73uxqsx1aC+qb+k5t9HuVEdwUFITlv+pNirXo9a9uMtOetaC4JO10tzf0wyFJ2JjJtdNX8mQ1hbngntrV+To4eb8wpNDVNZrFblqtQDz9Ac1EM2xcnzNYi/7C1lO8kxx8HGcO0XGDqEX2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=snitzer.net; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=snitzer.net
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-795502843ccso11884085a.1
-        for <linux-block@vger.kernel.org>; Fri, 07 Jun 2024 08:42:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717774976; x=1718379776;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1717775731; c=relaxed/simple;
+	bh=qId0FjRxmeGgUfEPKOzH9C474bBFVAXB3+3I34D+A6k=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=eFboIFUVaL/o7oi+1PWyvit7Sz1Himc8ae39Woho60E3Y5y6vKn6nSbnpmQUi4GwgyjdwOdLXHr3ZCrwGt5lyLvZICuhB7EatyWfJwcuP2MjPQrgERn4YHSejkL9DlzbEorQhq0XkSYOiiHBTmYjnnIDDzvlessBUciDrE0DM+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kfpea360; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kfpea360"
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3d206832b84so149076b6e.0
+        for <linux-block@vger.kernel.org>; Fri, 07 Jun 2024 08:55:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1717775727; x=1718380527; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RasJ+NShJomVG3pgYjIfDAmcUiePNRF7Ig+7YHU5+mw=;
-        b=lkngcyO5A9V5S1pOMTF6dpeOceCClCNDKiO6BsWXqHvNj++V9+r7P+FLyurLBrTrhD
-         3wlH5fxxGsv6Z+A7oaRihZMcN/nuzcn71xG/+5DQxPgBae4kLbcRNHI7ptdrxvixbxGp
-         6bKrp3hEN1uviwWubxyNqvZi5JopKkbimfnbv1d229LArasLwzVFuQsUSZoYgVLnlW5o
-         jkBHCnBAtWQj+kc89PZ7OiHSG0tpA9wpneGfqAIJEeE6uR/fxdbHWlrCgktFW0liOwDD
-         PRC8hsGe6XEHcB7CJPKBoba5UV1W4mDK9/F46p+WyTCnnqzfSCreGKkp+H8JiBZqvBqI
-         rwFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQzgu0t/PjZrIVkVCTCIddC8w/cV5ja2Zq2PbVPUKWV4SzwTUYpabTjhyeQkS2D+hb64B446AxVJT81L9mW/lc/gCsULARAqJ22O0=
-X-Gm-Message-State: AOJu0Yz7ifAEWku+8rZxJPk1EEYmYuIynAR7hZaw5yMJyGY4X6vFeeKH
-	3ptYzNjfDPFDfgd6bY3FXk2RVCsBtTBpv2PVLr3wp5vha9RjUitX24PJrFPggPg=
-X-Google-Smtp-Source: AGHT+IG83ZaoB4BbDgVdJbtiLnyWwBlppIWmQo0F3w7UfScT22lWYphwl0x6Lo1gXNyzaZaeoZjrHA==
-X-Received: by 2002:a05:620a:99d:b0:795:3927:a801 with SMTP id af79cd13be357-7953c31ef03mr261564985a.31.1717774976345;
-        Fri, 07 Jun 2024 08:42:56 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44042fe10aasm6814211cf.15.2024.06.07.08.42.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 08:42:55 -0700 (PDT)
-Date: Fri, 7 Jun 2024 11:42:54 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Mikulas Patocka <mpatocka@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org
-Subject: Re: move integrity settings to queue_limits v2
-Message-ID: <ZmMqfj3T9Ft680j6@kernel.org>
-References: <20240607055912.3586772-1-hch@lst.de>
+        bh=XOVmvIaQHTfL5oCv5HY/Kk9ibFtcCyT1yblITpb3Kx4=;
+        b=kfpea360e1225ENpvZsDS6CoXrqoVBqJMKZB7TAN2/+RoNmTKc9nvz07i8lGw7NGl0
+         pqdjbpLJ39NQXtjZUhwFZRB6vuKX96BbNTKCuMKA57hgzBhJXdfgpnwavdSlqQKYK1uQ
+         JzjbtnFnZ2WuU8x96PASkYx4uBbAAraX+2Za/sCr6szEMZtLZsDi05ZNqmg2ojxt9Eg3
+         vCXeroBR3CxGWfjvzubOTwoSjfCleRgXbi2D2mCF60tScBFd7k6h66etq84xRSCdkx/T
+         uRtvtGOUeOlAmP+M0lzzjV06l9k16VcOELpEvfnKKtyCae4RxUV6cr1IyuoFvFItIksN
+         7E3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717775727; x=1718380527;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XOVmvIaQHTfL5oCv5HY/Kk9ibFtcCyT1yblITpb3Kx4=;
+        b=CDHL4w9KnjkPn/06cFRoXuPxN30CoOoldNj/P21Fk+r719k3roHdBJ1ZsvbliKmwMK
+         q3786ga0g/bTAzAfLfgniz38QEOKOuhJ339fQvZRGUg6/fkaKb8LafEuydW20l07YKkh
+         msNPSaTXVS2J1d+rA5ufMVH9ZUJUBNcZMvG4J9b2uMOHjQQQHlcvSNBTcCtDnrsyhqcZ
+         UiFN7IJFQYnA8l5eZ63uYiCqoUIoG99cYnIZvXBoxTSEvjb9dwGHrSY+JeNQfljXw7DO
+         SqDrZQrl44fCCqCWvMbsL5/7WRfhvStXT6oxIJ/MzWwn+K6B7jvmelb6iobbFWGUUATO
+         K7Mg==
+X-Gm-Message-State: AOJu0YwK7WLGMrCJ9gzrzRsTI+i4VqdGZupDJdujPReL2/8kVmWwO/7l
+	QYC8uL8Y7+bayxW1t7pjQLO0C1/T+cl+r4yXFsFKUaHgUnI+ZQmFEhASi4gyRbrOXAs8OQyZPFa
+	C
+X-Google-Smtp-Source: AGHT+IHS8zleM9cWMcnmZH/9JdFzYLzudifdKHhuq16DC7DFtdnfAX6LGJ208pDGxNDl3595YnwjjQ==
+X-Received: by 2002:a05:6830:3d8b:b0:6f9:64df:b694 with SMTP id 46e09a7af769-6f964dfbd21mr657421a34.3.1717775727501;
+        Fri, 07 Jun 2024 08:55:27 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6f94dcf4815sm728520a34.58.2024.06.07.08.55.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jun 2024 08:55:27 -0700 (PDT)
+Message-ID: <f39b75f0-054d-4a69-b647-53999bfdbf05@kernel.dk>
+Date: Fri, 7 Jun 2024 09:55:25 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240607055912.3586772-1-hch@lst.de>
+User-Agent: Mozilla Thunderbird
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.10-rc3
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 07, 2024 at 07:58:54AM +0200, Christoph Hellwig wrote:
-> Hi Jens, hi Martin,
-> 
-> this series converts the blk-integrity settings to sit in the queue
-> limits and be updated through the atomic queue limits API.
-> 
-> I've mostly tested this with nvme, scsi is only covered by simple
-> scsi_debug based tests.
-> 
-> For MD I found an pre-existing error handling bug when combining PI
-> capable devices with not PI capable devices.  The fix was posted here
-> (and is included in the git branch below):
-> 
->    https://lore.kernel.org/linux-raid/20240604172607.3185916-1-hch@lst.de/
-> 
-> For dm-integrity my testing showed that even the baseline fails to create
-> the luks-based dm-crypto with dm-integrity backing for the authentication
-> data.  As the failure is non-fatal I've not addressed it here.
+Hi Linus,
 
-Setup is complicated. Did you test in terms of cryptsetup's testsuite?
-Or something else?
+A few minor fixes:
 
-Would really like to see these changes verified to work, with no
-cryptsetup regressions, before they go in.
- 
-> Note that the support for native metadata in dm-crypt by Mikulas will
-> need a rebase on top of this, but as it already requires another
-> block layer patch and the changes in this series will simplify it a bit
-> I hope that is ok.
+- Fix for null_blk block size validation (Andreas)
 
-Should be fine, Mikulas can you verify this series to pass
-cryptsetup's testsuite before you rebase?
+- NVMe pull request via Keith
+	- Use reserved tags for special fabrics operations (Chunguang)
+	- Persistent Reservation status masking fix (Weiwen)
 
-Thanks,
-Mike
+Please pull!
+
+
+The following changes since commit 0a751df4566c86e5a24f2a03290dad3d0f215692:
+
+  blk-throttle: Fix incorrect display of io.max (2024-05-30 19:44:29 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.10-20240607
+
+for you to fetch changes up to 27d024235bdb16af917809d33916392452c3ac85:
+
+  Merge tag 'nvme-6.10-2024-06-05' of git://git.infradead.org/nvme into block-6.10 (2024-06-05 12:13:00 -0600)
+
+----------------------------------------------------------------
+block-6.10-20240607
+
+----------------------------------------------------------------
+Andreas Hindborg (1):
+      null_blk: fix validation of block size
+
+Chunguang Xu (1):
+      nvme-fabrics: use reserved tag for reg read/write command
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.10-2024-06-05' of git://git.infradead.org/nvme into block-6.10
+
+Weiwen Hu (1):
+      nvme: fix nvme_pr_* status code parsing
+
+ drivers/block/null_blk/main.c | 4 ++--
+ drivers/nvme/host/fabrics.c   | 6 +++---
+ drivers/nvme/host/pr.c        | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+-- 
+Jens Axboe
+
