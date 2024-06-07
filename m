@@ -1,165 +1,253 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BB7D27A
-	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 18:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6952161FF6;
+	Fri,  7 Jun 2024 19:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717785121; cv=none; b=eikzD4lX2BR5xGCcUBQgbJPoB5LUwlvc++lYDiQ8kSfJBmCGJhY5bEjMa6fD0gYAM0+zRCij7u6CvOi4B4X/+eusWZMnW9Cgq3faUHzkyI1VumcTd6vcqFyFnIhcKPXw2lrw9BLKNhgt1r8OL2es2POL7FgzqR2SDFkJbyxrseY=
+	t=1717787184; cv=none; b=hnYCEqSyCV2FHGYPsf0HXz3jB9EPNPK3+tXs9bNwBcq+LXcHD9HkEkg6zHFbRlzf8qSu5MhHDj630keaUGVm4kCuCXgGF1ocB0x9KPYX2h4nxxX0VPIAUYqyf1R8gqWhWgzydIdaWI+iq60k9vR1y3/+aWAVqtOI/2XzTA+Pp5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717785121; c=relaxed/simple;
-	bh=5VGyEcgYUZVsYd3JEKkHt82oXNDR1d8g9jbtXoEWEPo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=WQF0lEj4czK73yWpJ8tIhhu32LZEe/yVh5BK9bjbU/ywZ5yUGGdpzEDvg0Tb2A84xj2IAIug9QGy45ORw0FBkNRbOEmjT2T4SPr7B9Zo7CqvMeHTorAel4QoWD2Uqt3L6uchHR8SgbOTmEma+Bt/xi8goYfxL7zkZ3zxNG1Qmsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=MDHcgyKZ; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1717787184; c=relaxed/simple;
+	bh=POh3YrHn4q54h+Qa6SohM8DHib0BNm73vJtFcOXO9c4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BjnuYvu0KsQcIccVNIRhI/DSIv/MoqTmtjYIH9DdxvcC0NMsvvWX5H9Gcd3BGBl2sH0ITT+N7deQ6vG3DXcomd/3wrqVaeO0VyuJNjvYkJaXT6DUfXRlUVX7IBX706hXbajyO9ie/QsYANbZsH+rXdj8Ol5MkqATWMTXga2ZTUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=T0YJQbpI; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="MDHcgyKZ"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240607183150epoutp030cfef2046503288661d99ac5e785c048~WzHUDiLmZ0160001600epoutp03G
-	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 18:31:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240607183150epoutp030cfef2046503288661d99ac5e785c048~WzHUDiLmZ0160001600epoutp03G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1717785110;
-	bh=Q7UteAPU1jA8crxsj3DgD2vFH2FK2jVTwOwPPdbKvCw=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=MDHcgyKZ4cKFzzHyh298rfvSpNjrWKLBoXmDd7oVFirJx/15iqgXXR1MuN3zDyIer
-	 PeVDKTUxA5ifTA/F3zWtN3LWJLmOh/33/YK3vn+j49LByq4TOwNYUoLcTOozi9bg0s
-	 Af3+ET9A2brasJoe59n4V4Jce443KSgfC59uOhDw=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20240607183149epcas5p4f4e675de6d486120a013e2f505a94038~WzHSqWxtY1183311833epcas5p4W;
-	Fri,  7 Jun 2024 18:31:49 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.182]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4VwqXz4NVDz4x9Pq; Fri,  7 Jun
-	2024 18:31:47 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	A0.D9.08853.31253666; Sat,  8 Jun 2024 03:31:47 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240607183146epcas5p2274f401a5fa7bcaeab89a814847ab2af~WzHQU3USS2960329603epcas5p2S;
-	Fri,  7 Jun 2024 18:31:46 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240607183146epsmtrp22776e0f93ea286e1fcb0913b1f4efa82~WzHQT-STE2710127101epsmtrp2M;
-	Fri,  7 Jun 2024 18:31:46 +0000 (GMT)
-X-AuditID: b6c32a44-d67ff70000002295-fd-666352132248
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	E9.CD.18846.21253666; Sat,  8 Jun 2024 03:31:46 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240607183144epsmtip1be7eb2e9bc00f4f582c6ec22f2566f94~WzHOFwhcD3142631426epsmtip1e;
-	Fri,  7 Jun 2024 18:31:44 +0000 (GMT)
-Message-ID: <8d26d133-6fac-531c-d300-5b99678f1cbd@samsung.com>
-Date: Sat, 8 Jun 2024 00:01:43 +0530
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="T0YJQbpI"
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 457CuVjQ023604;
+	Fri, 7 Jun 2024 19:06:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc :
+ content-transfer-encoding : date : from : message-id : mime-version :
+ subject : to; s=corp-2023-11-20;
+ bh=bavZSgWNlH5AnIMvg1whudm4Kfg9OnMmT+mI9SLCa5U=;
+ b=T0YJQbpI7dYm0rus9Kl4t81q/Czx64VkApsS40l/bzqlw+3wW5vuERSxQnzZKcnfQ/kl
+ H+aXxMekGknuj6wlKJUu69KiU/FxQQGZ0E+DrRPVlEqeQP4GHtB+obpp3JEm9XbmHs4u
+ kdL/z5xchvIBa4/X6bZ2SNw4risilVg6yvB0fAys8XnIhkfq8Xp5VJglFbyX9mRQ+b/l
+ Kb8RJPeK0Ii/4kbAUE/MBCkLVqK6I+6NkqLzXuAzw6nNY7kn0DLX4rbPoKWNjSoITsPk
+ cSGz//EXKijq6HM3A2QcolxP5Y54+uoxUqWvBrvVnftnLR+eVyQuGePVyzarQxB5zR2l Tg== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yjbrse68b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 07 Jun 2024 19:06:09 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 457HVcLm015675;
+	Fri, 7 Jun 2024 19:06:08 GMT
+Received: from gms-ol9-loop-1.osdevelopmeniad.oraclevcn.com (gms-ol9-loop-1.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.252.182])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3ygrjh0we9-1;
+	Fri, 07 Jun 2024 19:06:08 +0000
+From: Gulam Mohamed <gulam.mohamed@oracle.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yukuai1@huaweicloud.com, hch@lst.de, axboe@kernel.dk
+Subject: [PATCH V4 for-6.10/block] loop: Fix a race between loop detach and loop open
+Date: Fri,  7 Jun 2024 19:06:07 +0000
+Message-ID: <20240607190607.17705-1-gulam.mohamed@oracle.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH 04/11] block: remove the blk_integrity_profile structure
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, "Martin K.
- Petersen" <martin.petersen@oracle.com>
-Cc: Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka
-	<mpatocka@redhat.com>, Song Liu <song@kernel.org>, Yu Kuai
-	<yukuai3@huawei.com>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg
-	<sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20240607055912.3586772-5-hch@lst.de>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrPJsWRmVeSWpSXmKPExsWy7bCmuq5wUHKawZFeBYvVd/vZLBYsmsti
-	sXL1USaLSYeuMVo8vTqLyWLvLW2L+cueslu0z9/FaNF9fQebxfLj/5gsJnZcZbJY+eMPq8W6
-	1+9ZLE7ckrY4vvwvm8WchWwOAh7n721k8Wg58pbV4/LZUo9NqzrZPDYvqfd4sXkmo8fumw1s
-	Hr3N79g8Pj69xeLxft9VNo/Pm+QCuKOybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwMdQ0t
-	LcyVFPISc1NtlVx8AnTdMnOAnlFSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFJgU
-	6BUn5haX5qXr5aWWWBkaGBiZAhUmZGdMun2EpWAxd8XF76eYGhj7ObsYOTkkBEwktn07ztLF
-	yMUhJLCbUWL74dWsEM4nRonTq7tZ4JxVc9vZYFoafy5khEjsZJQ42XMEynnLKDH7zmUmkCpe
-	ATuJT58OsoPYLAIqEmfPvmaHiAtKnJz5hAXEFhVIlvjZdQBsqrCAj8T/5ltgcWYBcYlbT+aD
-	zRERKJX4veQpE8gCZoGFzBL9N6YAORwcbAKaEhcml4LUcAoYSUy/t44RoldeYvvbOcwQl37g
-	kFhw3xHCdpH4fHwVC4QtLPHq+BZ2CFtK4vO7vVCfJUtcmnmOCcIukXi85yCUbS/ReqqfGWQt
-	M9Da9bv0IVbxSfT+fgJ2jYQAr0RHmxBEtaLEvUlPWSFscYmHM5awQpR4SNz4kQgSFhJYyygx
-	rZ1pAqPCLKQwmYXk91lIfpmFsHcBI8sqRsnUguLc9NRk0wLDvNRyeHQn5+duYgSndC2XHYw3
-	5v/TO8TIxMF4iFGCg1lJhNevOD5NiDclsbIqtSg/vqg0J7X4EKMpMHImMkuJJucDs0peSbyh
-	iaWBiZmZmYmlsZmhkjjv69a5KUIC6YklqdmpqQWpRTB9TBycUg1MThMuKNnZX08RcGCIaHom
-	xlby4bLQa/XHH6ZUOug1m83LUL36RHiPxjONvLmnF6n0nOWSXLQ8Z2WvCXN0UNGkxL4LIt9m
-	bCnetClnpbPF9bMOS6bqz3pp9kfInHd28lebtEVvjeQuO31LN9j182PM88zK9KbIcha2r/tf
-	XKs+MKN5Rfqb94+4e7nMdvGaSJ2QNwiYfbpNO3nqKefTa84pf4mx13n39CFf3Z2b695bvDU6
-	ax+eXc96LOmFwb4ZWqG7jqTxr7eaIFdQeZqDU04qbaLa175a3s3SPX6TW5NK37IpMp6z4dmv
-	JPPu+xrhPV1BSboLf25+/WeGgLJk5tadW9sELU1VVql/2hizfO1aJZbijERDLeai4kQA5sVg
-	g3IEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFIsWRmVeSWpSXmKPExsWy7bCSnK5QUHKawaOH6har7/azWSxYNJfF
-	YuXqo0wWkw5dY7R4enUWk8XeW9oW85c9Zbdon7+L0aL7+g42i+XH/zFZTOy4ymSx8scfVot1
-	r9+zWJy4JW1xfPlfNos5C9kcBDzO39vI4tFy5C2rx+WzpR6bVnWyeWxeUu/xYvNMRo/dNxvY
-	PHqb37F5fHx6i8Xj/b6rbB6fN8kFcEdx2aSk5mSWpRbp2yVwZUy6fYSlYDF3xcXvp5gaGPs5
-	uxg5OSQETCQafy5k7GLk4hAS2M4osa75NwtEQlyi+doPdghbWGLlv+fsEEWvGSVW/dnIBJLg
-	FbCT+PTpIFgRi4CKxNmzr9kh4oISJ2c+ARskKpAs8fLPRLC4sICPxP/mW2BxZqAFt57MB5sj
-	IlAq0f9vBhPIAmaBhcwSi06/ZoPYtpZR4sDTtUAOBwebgKbEhcmlIA2cAkYS0++tY4QYZCbR
-	tbULypaX2P52DvMERqFZSO6YhWTfLCQts5C0LGBkWcUomlpQnJuem1xgqFecmFtcmpeul5yf
-	u4kRHL1aQTsYl63/q3eIkYmD8RCjBAezkgivX3F8mhBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFe
-	5ZzOFCGB9MSS1OzU1ILUIpgsEwenVANTxdN/T21YDvzQ2nY+a+ma6/uK+X88UJbZx//7zO9n
-	/tN+p9zsuyDNE6Bne/5r2BapjJrcVaUMHRN9mUPWP15xu8chRyJX9/ytbS2P9LbtzAhRWhyb
-	f/e02qrpL1Yucb9XYCiw6djzSyu/fJxxedFjqQ8xL2ZquNd/dDxgyqV7XdfWJOSOv/Hdw5d/
-	KvsLfVorwPHZ7fUau+/t/ZnfLwr9qnp9+1LuMxbjq38mHHn1ReTA/sdrahLnrXi8Q8y4zG6D
-	zJuM1/2833ex8bz/Njd2qtbJLscbp+9FZDUUdJifFDH2t9Pf/cVnxsvYhoVn2FZ+eHz9dkGv
-	8tXn7ff4k942X/FIWHggrXgL78FtO298jhBQYinOSDTUYi4qTgQAwDSZfE0DAAA=
-X-CMS-MailID: 20240607183146epcas5p2274f401a5fa7bcaeab89a814847ab2af
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240607060043epcas5p1a6d4d8c3536fe3b6e43ad34155803fc2
-References: <20240607055912.3586772-1-hch@lst.de>
-	<CGME20240607060043epcas5p1a6d4d8c3536fe3b6e43ad34155803fc2@epcas5p1.samsung.com>
-	<20240607055912.3586772-5-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-07_12,2024-06-06_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ adultscore=0 bulkscore=0 spamscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2406070139
+X-Proofpoint-ORIG-GUID: -zGvZEA1eWq0U0JukinkUsG3FlJmG7VZ
+X-Proofpoint-GUID: -zGvZEA1eWq0U0JukinkUsG3FlJmG7VZ
 
-On 6/7/2024 11:28 AM, Christoph Hellwig wrote:
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -1177,7 +1177,7 @@ static int crypt_integrity_ctr(struct crypt_config *cc, struct dm_target *ti)
->   	struct mapped_device *md = dm_table_get_md(ti->table);
->   
->   	/* We require an underlying device with non-PI metadata */
-> -	if (!bi || strcmp(bi->profile->name, "nop")) {
-> +	if (!bi || bi->csum_type != BLK_INTEGRITY_CSUM_NONE) {
->   		ti->error = "Integrity profile not supported.";
->   		return -EINVAL;
+1. Userspace sends the command "losetup -d" which uses the open() call
+   to open the device
+2. Kernel receives the ioctl command "LOOP_CLR_FD" which calls the
+   function loop_clr_fd()
+3. If LOOP_CLR_FD is the first command received at the time, then the
+   AUTOCLEAR flag is not set and deletion of the
+   loop device proceeds ahead and scans the partitions (drop/add
+   partitions)
 
-I'd rename BLK_INTEGRITY_CSUM_NONE to BLK_INTEGRITY_CSUM_NOP. Overall.
+        if (disk_openers(lo->lo_disk) > 1) {
+                lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+                loop_global_unlock(lo, true);
+                return 0;
+        }
 
-Current choice is a bit confusing as it indicates that code is trying to 
-handle "none" case while it is actually trying to handle/support "nop" 
-profile.
+ 4. Before scanning partitions, it will check to see if any partition of
+    the loop device is currently opened
+ 5. If any partition is opened, then it will return EBUSY:
 
-With extended format off:
-# nvme format /dev/nvme0n1 -l 5 -m 0 -i 0 -f
-Success formatting namespace:1
-# cat /sys/block/nvme0n1/integrity/format
-nop
+    if (disk->open_partitions)
+                return -EBUSY;
+ 6. So, after receiving the "LOOP_CLR_FD" command and just before the above
+    check for open_partitions, if any other command
+    (like blkid) opens any partition of the loop device, then the partition
+    scan will not proceed and EBUSY is returned as shown in above code
+ 7. But in "__loop_clr_fd()", this EBUSY error is not propagated
+ 8. We have noticed that this is causing the partitions of the loop to
+    remain stale even after the loop device is detached resulting in the
+    IO errors on the partitions
+Fix:
+Defer the detach of loop device to release function, which is called
+when the last close happens, by setting the lo_flags to LO_FLAGS_AUTOCLEAR
+at the time of detach i.e in loop_clr_fd() function.
 
-With extended format on:
-# nvme format /dev/nvme0n1 -l 5 -m 1 -i 0 -f
-Success formatting namespace:1
-# cat /sys/block/nvme0n1/integrity/format
-none
+Test case involves the following two scripts:
 
-nop is the case when bi->tuple_size is perfectly valid (i.e. not zero), 
-and the code needs to have support for it.
-none is the case when bi->tuple_size is zero, and the code only needs to 
-ensure that it does nothing.
+script1.sh:
 
-That said, the change can be deferred to a future patch as well.
+while [ 1 ];
+do
+        losetup -P -f /home/opt/looptest/test10.img
+        blkid /dev/loop0p1
+done
 
-So, looks good!
+script2.sh:
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+while [ 1 ];
+do
+        losetup -d /dev/loop0
+done
+
+Without fix, the following IO errors have been observed:
+
+kernel: __loop_clr_fd: partition scan of loop0 failed (rc=-16)
+kernel: I/O error, dev loop0, sector 20971392 op 0x0:(READ) flags 0x80700
+        phys_seg 1 prio class 0
+kernel: I/O error, dev loop0, sector 108868 op 0x0:(READ) flags 0x0
+        phys_seg 1 prio class 0
+kernel: Buffer I/O error on dev loop0p1, logical block 27201, async page
+        read
+
+Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+---
+v4<-v3:
+1. Defer the loop detach to last close of loop device
+2. Removed the use of lo_open due to following reasons:
+
+Setting the lo_state to Lo_rundown in loop_clr_fd() may not help in
+stopping the incoming open(), when the loop is being detached, as the
+open() could invoke the lo_open() before the lo_state is set to Lo_rundown
+and increment the disk_openers refcnt later.
+As the actual cleanup is deferred to last close, in release, there is no
+chance for the open() to kick in to take the reference. Because both open()
+and release() are protected by open_mutex and hence they cannot run in
+parallel.
+So, lo_open() and setting lo_state to Lo_rundown is not needed. Removing
+the loop state Lo_rundown as its not used anymore.
+
+ drivers/block/loop.c | 44 ++++++++------------------------------------
+ 1 file changed, 8 insertions(+), 36 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 28a95fd366fe..4936cadc1a63 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -41,7 +41,6 @@
+ enum {
+ 	Lo_unbound,
+ 	Lo_bound,
+-	Lo_rundown,
+ 	Lo_deleting,
+ };
+ 
+@@ -1131,7 +1130,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 	return error;
+ }
+ 
+-static void __loop_clr_fd(struct loop_device *lo, bool release)
++static void __loop_clr_fd(struct loop_device *lo)
+ {
+ 	struct file *filp;
+ 	gfp_t gfp = lo->old_gfp_mask;
+@@ -1139,14 +1138,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
+ 		blk_queue_write_cache(lo->lo_queue, false, false);
+ 
+-	/*
+-	 * Freeze the request queue when unbinding on a live file descriptor and
+-	 * thus an open device.  When called from ->release we are guaranteed
+-	 * that there is no I/O in progress already.
+-	 */
+-	if (!release)
+-		blk_mq_freeze_queue(lo->lo_queue);
+-
+ 	spin_lock_irq(&lo->lo_lock);
+ 	filp = lo->lo_backing_file;
+ 	lo->lo_backing_file = NULL;
+@@ -1164,8 +1155,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	mapping_set_gfp_mask(filp->f_mapping, gfp);
+ 	/* This is safe: open() is still holding a reference. */
+ 	module_put(THIS_MODULE);
+-	if (!release)
+-		blk_mq_unfreeze_queue(lo->lo_queue);
+ 
+ 	disk_force_media_change(lo->lo_disk);
+ 
+@@ -1180,11 +1169,7 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 		 * must be at least one and it can only become zero when the
+ 		 * current holder is released.
+ 		 */
+-		if (!release)
+-			mutex_lock(&lo->lo_disk->open_mutex);
+ 		err = bdev_disk_changed(lo->lo_disk, false);
+-		if (!release)
+-			mutex_unlock(&lo->lo_disk->open_mutex);
+ 		if (err)
+ 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
+ 				__func__, lo->lo_number, err);
+@@ -1232,25 +1217,8 @@ static int loop_clr_fd(struct loop_device *lo)
+ 		loop_global_unlock(lo, true);
+ 		return -ENXIO;
+ 	}
+-	/*
+-	 * If we've explicitly asked to tear down the loop device,
+-	 * and it has an elevated reference count, set it for auto-teardown when
+-	 * the last reference goes away. This stops $!~#$@ udev from
+-	 * preventing teardown because it decided that it needs to run blkid on
+-	 * the loopback device whenever they appear. xfstests is notorious for
+-	 * failing tests because blkid via udev races with a losetup
+-	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
+-	 * command to fail with EBUSY.
+-	 */
+-	if (disk_openers(lo->lo_disk) > 1) {
+-		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+-		loop_global_unlock(lo, true);
+-		return 0;
+-	}
+-	lo->lo_state = Lo_rundown;
++	lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+ 	loop_global_unlock(lo, true);
+-
+-	__loop_clr_fd(lo, false);
+ 	return 0;
+ }
+ 
+@@ -1724,15 +1692,19 @@ static void lo_release(struct gendisk *disk)
+ 	if (disk_openers(disk) > 0)
+ 		return;
+ 
++	/*
++	 * Clear the backing device information if this is the last close of
++	 * a device that's been marked for auto clear, or on which LOOP_CLR_FD
++	 * has been called.
++	 */
+ 	mutex_lock(&lo->lo_mutex);
+ 	if (lo->lo_state == Lo_bound && (lo->lo_flags & LO_FLAGS_AUTOCLEAR)) {
+-		lo->lo_state = Lo_rundown;
+ 		mutex_unlock(&lo->lo_mutex);
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		__loop_clr_fd(lo, true);
++		__loop_clr_fd(lo);
+ 		return;
+ 	}
+ 	mutex_unlock(&lo->lo_mutex);
+-- 
+2.43.0
+
