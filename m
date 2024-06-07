@@ -1,153 +1,117 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873B71CABF;
-	Fri,  7 Jun 2024 06:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D9115491
+	for <linux-block@vger.kernel.org>; Fri,  7 Jun 2024 06:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717741322; cv=none; b=HKaiWdZSzW517W7rtBCKSHTkmZXrLq6L6GU7dnclu2B2eVP7xi69CnNpJNbrHAHppRhrZlD3oVlSEzhpV0qNgW2dRLKLUGkYX415WNWYuVzq/wMkWMEIb/almDIvnh2O/NW6y3cVE5eyw7lsITUDwqg/Nt1QS0R2ahDRsNyaC6E=
+	t=1717741525; cv=none; b=FPm6h3iVJhhvTwZeg9bWMJI2q3+qsnA8qUtJDTVPYY6bAYKqzjFMJkjKeS5G3jUq+8nQLj0ctdMHEEvZPplTTFEpHLvT+0rbyjSBJ2a/AWzwie2TWdikd4ZUl6iIu+VOnKxVPmYEl+7HXFkJa65hHcNk0DxgCu+/l5YcJDA7D2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717741322; c=relaxed/simple;
-	bh=XrYmy5LnN3y15f1gWeKbF+lezC3Y5nc10BN9Jnasm2s=;
+	s=arc-20240116; t=1717741525; c=relaxed/simple;
+	bh=wE/R/t5j7RmtTx7ndh8HOfKlFGmFGqY1/Yk4tvIlyLQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CrdG1dl2pFPdf3fwWiVxXb9Ki7piHxV/9MCkHcC+P2Hx5Wwtuci2AusP9BgLOrESrvluqMgT0LiovmR25IqCbcKBtszhqk514LQfq+vvD90gT8vnLCRe3ls7nC/2D41/RyQfyaZW+wDhvRqB1Mqnj5qZF2AYwGpmSJflM9kPe1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DsSzyneZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vWXNs0gh; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DsSzyneZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vWXNs0gh; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 In-Reply-To:Content-Type; b=Cq8SJJxCkdTp5fXG2YZvpkCgeWJaIMf6/oHh9RTWwM3xaIFnFQvOHQWOy/pC96hwXFj28t/M/2HcVHnS+7ygebZwhuP28bWOOwdTrV/37KuCzCNhEr5/FA7kGgUdIge4Tp9tkljPx0EwTAjIXkOTz+AlIvl+JJPwRcn2xPTKe+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xdCcH+tI; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DsSzyneZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vWXNs0gh";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DsSzyneZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vWXNs0gh"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B7AD621B47;
-	Fri,  7 Jun 2024 06:21:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1717741318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xdCcH+tI"
+X-Envelope-To: hch@lst.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717741520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WaemESl57lfqptUDNpmGBWES97DgowPxufI/sNy55z0=;
-	b=DsSzyneZ49TQZPCDBz4/PVFPOLqdc/GuMpySMYvu/3h/pmh0/3Yzd61ZiXygE/Nck9Vzkj
-	PHdx0Vcqn0kO5L73PpHXHJa8oA534KE2MRy+/0g7MQxS4vqpzZVg4cTZ/wpoxGzuyF3+dz
-	XYFrp5/a23wV2pyjadHn4Wx63oBAx3Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1717741318;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WaemESl57lfqptUDNpmGBWES97DgowPxufI/sNy55z0=;
-	b=vWXNs0gh/OZqFxAO1wqHuIVN2EK1ujrSZscPcL7zMfCaRDFh+7b4gJ8NbV6EkQqtsSSt2Z
-	eJWFDXBF5MfSWYAw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1717741318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WaemESl57lfqptUDNpmGBWES97DgowPxufI/sNy55z0=;
-	b=DsSzyneZ49TQZPCDBz4/PVFPOLqdc/GuMpySMYvu/3h/pmh0/3Yzd61ZiXygE/Nck9Vzkj
-	PHdx0Vcqn0kO5L73PpHXHJa8oA534KE2MRy+/0g7MQxS4vqpzZVg4cTZ/wpoxGzuyF3+dz
-	XYFrp5/a23wV2pyjadHn4Wx63oBAx3Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1717741318;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WaemESl57lfqptUDNpmGBWES97DgowPxufI/sNy55z0=;
-	b=vWXNs0gh/OZqFxAO1wqHuIVN2EK1ujrSZscPcL7zMfCaRDFh+7b4gJ8NbV6EkQqtsSSt2Z
-	eJWFDXBF5MfSWYAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A96C2133F3;
-	Fri,  7 Jun 2024 06:21:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sBMBJwWnYmaVYQAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 07 Jun 2024 06:21:57 +0000
-Message-ID: <2be1eba2-e332-4b61-a2cb-ee1441315ff2@suse.de>
-Date: Fri, 7 Jun 2024 08:21:57 +0200
+	bh=+m/nTQGXSyjTen2jr8IGQUJ8mP1sxHUVx39nE+L9CKc=;
+	b=xdCcH+tI0aeYp6KqObrL8aemNZ6sQ9PgIZCLqCjfd4gECosqAMCxlgBTERDvCymS4uBYXa
+	kzDE2j2kHq7lhuFVD5SwrTXDIB6+Tz1jR2D8B4mXxki/u0sMWzjX0L48K2BOHc/lHO3FxC
+	jPW4eRbjl/qp2jJEwNwho+jh38G9AIY=
+X-Envelope-To: f.weber@proxmox.com
+X-Envelope-To: axboe@kernel.dk
+X-Envelope-To: ming.lei@redhat.com
+X-Envelope-To: bvanassche@acm.org
+X-Envelope-To: linux-block@vger.kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: zhouchengming@bytedance.com
+X-Envelope-To: t.lamprecht@proxmox.com
+Message-ID: <2223bbb9-8bc8-4566-9c3f-ef6103422068@linux.dev>
+Date: Fri, 7 Jun 2024 14:24:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/11] block: invert the BLK_INTEGRITY_{GENERATE,VERIFY}
- flags
+Subject: Re: [PATCH] block: fix request.queuelist usage in flush
 Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-References: <20240607055912.3586772-1-hch@lst.de>
- <20240607055912.3586772-11-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20240607055912.3586772-11-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.29
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.29 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.989];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCVD_COUNT_TWO(0.00)[2];
-	URIBL_BLOCKED(0.00)[suse.de:email,nvidia.com:email,lst.de:email];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,lst.de:email,nvidia.com:email]
+To: Christoph Hellwig <hch@lst.de>
+Cc: Friedrich Weber <f.weber@proxmox.com>, axboe@kernel.dk,
+ ming.lei@redhat.com, bvanassche@acm.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhouchengming@bytedance.com,
+ Thomas Lamprecht <t.lamprecht@proxmox.com>
+References: <20240604064745.808610-1-chengming.zhou@linux.dev>
+ <c9d03ff7-27c5-4ebd-b3f6-5a90d96f35ba@proxmox.com>
+ <1344640f-b22d-4791-aed4-68fc62fb6e36@linux.dev>
+ <ec27da86-b84a-430b-98aa-9971f90c8c87@proxmox.com>
+ <7193e02e-7347-48db-b1a0-67b44730480b@proxmox.com>
+ <448721f2-8e0b-4c5a-9764-bde65a5ee981@linux.dev>
+ <343166f4-ac11-4f0e-ad13-6dc14dbf573d@proxmox.com>
+ <dea87c0a-1c36-4737-bea5-cb7fa273b724@linux.dev>
+ <20240607045511.GB2857@lst.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <20240607045511.GB2857@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 6/7/24 07:59, Christoph Hellwig wrote:
-> Invert the flags so that user set values will be able to persist
-> revalidating the integrity information once we switch the integrity
-> information to queue_limits.
+On 2024/6/7 12:55, Christoph Hellwig wrote:
+> On Fri, Jun 07, 2024 at 10:37:58AM +0800, Chengming Zhou wrote:
+>> Yeah, right, it seems LVM may create this special request that only has
+>> PREFLUSH | POSTFLUSH without any DATA, goes into the flush state machine.
+>> Then, cause the request double list_add_tail() without list_del_init().
+>> I don't know the reason behind it, but well, it's allowable in the current
+>> flush code.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->   block/bio-integrity.c         |  4 ++--
->   block/blk-integrity.c         | 18 +++++++++---------
->   include/linux/blk-integrity.h |  4 ++--
->   3 files changed, 13 insertions(+), 13 deletions(-)
+> PREFLUSH | POSTFLUSH is a weird invalid format.  We'll need to fix this
+> in dm, and probably also catch it in the block layer submission path.
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Cheers,
+Right, how about add WARN here to catch it? Or just set it to PREFLUSH?
+Not familiar with dm code, need help if we need to fix it in dm. :)
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index c17cf8ed8113..3ce9ed78c375 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -185,7 +185,7 @@ static void blk_flush_complete_seq(struct request *rq,
+                /* queue for flush */
+                if (list_empty(pending))
+                        fq->flush_pending_since = jiffies;
+-               list_move_tail(&rq->queuelist, pending);
++               list_add_tail(&rq->queuelist, pending);
+                break;
+
+        case REQ_FSEQ_DATA:
+@@ -263,6 +263,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
+                unsigned int seq = blk_flush_cur_seq(rq);
+
+                BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
++               list_del_init(&rq->queuelist);
+                blk_flush_complete_seq(rq, fq, seq, error);
+        }
+
+@@ -402,6 +403,12 @@ bool blk_insert_flush(struct request *rq)
+        unsigned int policy = blk_flush_policy(fflags, rq);
+        struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
+
++       /*
++        * PREFLUSH | POSTFLUSH is a weird invalid format,
++        * need to fix in the upper layer, catch it here.
++        */
++       WARN_ON_ONCE(policy == (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH));
++
+        /* FLUSH/FUA request must never be merged */
+        WARN_ON_ONCE(rq->bio != rq->biotail);
 
