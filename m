@@ -1,160 +1,120 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DADDF4D
-	for <linux-block@vger.kernel.org>; Sat,  8 Jun 2024 14:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE221E4A4
+	for <linux-block@vger.kernel.org>; Sat,  8 Jun 2024 14:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717856434; cv=none; b=LM3bnMi7lBqptZvQZywi/eE5ru2BeY6hQipt5qdzsrE1OY9ncX+tNmaQsfNURMrGKl4Wt81r0GX5Nz9FizOKEaRjnGTUTJMJp484gbscCBWF5kxR43TK/9GnfM/QX6ifdjmTjMGg/e+yJ80f8QEo1WIH4b/bVr04RAwjynHnPcU=
+	t=1717857110; cv=none; b=Rico5l7xD2BK4mrtPlVs37nE/gYLyxZwoy7nc9Rgj9+NFRB+3nKhnOGZDe62mCMjZK5v9wE9Wg2V8GX3C6QU0eMrQSTWAhK51hqAmRwdJLFtD4X9wus5Mr+itSRDD7iw0XA5BxrYX24PhN7JjZrR5oAPEuDl2B9ePCWLAh5kx6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717856434; c=relaxed/simple;
-	bh=+M95M9zM1Xua8hLu2L2ls9vAwk3ZDAl8SUNCcKayYaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=bju1iO5zyQtFzIxgz8zC3mQwslPwuB+a8pJCCx+xEJPL0lbnt1M/2H35mBRQm9O+FwB6+GEZmHiZ1Ugiwxj6EdwcA0KZ6IyHz6vdfichIWSjZjvnuQtI1Favbk/wM3N4tpSeOxTd/j50AmvVomnlmdRe5Oknn9Yqpnz4qStg4LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bgscm9BT; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1717857110; c=relaxed/simple;
+	bh=5/9a85I5i8X0PqtfKhvRzdHzvpIcMGzFXPg+TzfeH/w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UQbngl1MZMuUxBCbmv3TQnqLc7UV+5Y5yElmbmu/JyKRmXrk2kH77HFMH+3Bf86DiAwU9FMJoTXUAF0EkFjlRaOfbR6WGchuVKmEE0n+FOTOhPE9FIAmV8Y4NzQGHAiqAKBLo0MYQPcEcE09yANBM1WuhVFQfpnPMw+iyv+gOEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AsoXqxX6; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bgscm9BT"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4217f2e3450so1990675e9.1
-        for <linux-block@vger.kernel.org>; Sat, 08 Jun 2024 07:20:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1717856431; x=1718461231; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TpgMHDW7HWh9PLrJnkCM+8lSoR3+8r8fuxKhxkK/TZE=;
-        b=bgscm9BT8mxBoc5WSrrmHMvVwlfnGlZtBqMM5VV5I4zx76ZA25VoCdjloCqBQFXKM6
-         O2QWJflOHiysCXlFl9cyamX66AH8unhL3mk6taCb3lyoXtfQDIEepVQf96ANH3ZDEUdT
-         8X+VfqgQu6RxyJR1T8NrmNUpO9NaB5W3+wYp3SyEF6iBjZJ0xIaH3ARPAmPBOXO15FL/
-         BCetjVhAu+90m4+5WYVT1Y7yM18h3Z+otN+K5+wQCuNmqdzJIs7BjAS8SjUIze9AQGGL
-         U/E0lEn5/QzSJ4EkQfKBfgk/ZGuS3UKxNT8UQD36oi1hr4sK+tcDtuXyOwhpjB90LhDb
-         3MLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717856431; x=1718461231;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TpgMHDW7HWh9PLrJnkCM+8lSoR3+8r8fuxKhxkK/TZE=;
-        b=tEqyxkrojvWd+ToPt008OBmWkDQtrfFf/IiZuko8j/ZqJx9GLvKKTpxBR8uCSHHRIU
-         Fg8ImqR5BUhxzU303XDMYKy3QfID1zAlHBKJbQefu/uCHDnzexT644mgnTPNYJlmx8xT
-         Cwe2Y4y+XxkxJA3gjHMdOT881EnCOy6UvFI0apcnseKN0x9vcm9DSAeFOIeAIMIjLN7J
-         nI0fPUSBXP5yQd347DkAhNcEBicbAOKKrmteTzOjsOiK1nR6I3wGqkdR8hqASJf8NiNK
-         avclTFNlLd1d4ii3CwplcKu/djufGxA/OmO24DDqpEvpCC1tJG6zWo2xeQwqnXPWDQac
-         heow==
-X-Gm-Message-State: AOJu0Yw7i1iPE2RlknHfKte9Rl+kaLk1uPB0AE4MkOuDxzArFzC6vJ/O
-	4A4yBwtA0J/Y+o/rjfLseQl2RJEC1oxE1E36w/xm8mPC2+WspRThcuzhES//9JiCUQl22IYjyW/
-	N
-X-Google-Smtp-Source: AGHT+IHJBo2xPAQXqmkJm53Bst2/Q2ZUqdvyZbQKJKalb3sdxQXDnFgKqe+7g1CFchPhjzv1lVujZA==
-X-Received: by 2002:a05:6000:1f8b:b0:357:3e5a:6c98 with SMTP id ffacd0b85a97d-35efedd7db4mr5738080f8f.48.1717856430586;
-        Sat, 08 Jun 2024 07:20:30 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35ef5d49f72sm6482540f8f.41.2024.06.08.07.20.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Jun 2024 07:20:30 -0700 (PDT)
-Date: Sat, 8 Jun 2024 17:20:26 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: linux-block@vger.kernel.org
-Subject: [bug report] block/bio: remove duplicate append pages code
-Message-ID: <af595d26-f8f2-4b84-81fd-09cc81049cf2@moroto.mountain>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AsoXqxX6"
+X-Envelope-To: axboe@kernel.dk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717857105;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=G6bSjM248xI7+oW0z8fYSMF0v53Z/T3KEz7PTnmiSTs=;
+	b=AsoXqxX6rKS4PFjzo7S/7byCyNK1WrASUTiymE2yz4/OU0T2jbH9pGcynIbgwtRMwGpU3T
+	sxk9EDOLJZOkCCg/KgwVcnUsIZ7uc1vGFUiwJeYNPXF3yiKM/bG3Ap4CRaXgZqOQc+05iG
+	O29nUpXOmtniyu3tswqQwbxPZqae5uU=
+X-Envelope-To: ming.lei@redhat.com
+X-Envelope-To: hch@lst.de
+X-Envelope-To: f.weber@proxmox.com
+X-Envelope-To: bvanassche@acm.org
+X-Envelope-To: linux-block@vger.kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: chengming.zhou@linux.dev
+X-Envelope-To: zhouchengming@bytedance.com
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Chengming Zhou <chengming.zhou@linux.dev>
+To: axboe@kernel.dk,
+	ming.lei@redhat.com,
+	hch@lst.de,
+	f.weber@proxmox.com,
+	bvanassche@acm.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chengming.zhou@linux.dev,
+	zhouchengming@bytedance.com
+Subject: [PATCH v2] block: fix request.queuelist usage in flush
+Date: Sat,  8 Jun 2024 22:31:15 +0800
+Message-Id: <20240608143115.972486-1-chengming.zhou@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello Keith Busch,
+Friedrich Weber reported a kernel crash problem and bisected to commit
+81ada09cc25e ("blk-flush: reuse rq queuelist in flush state machine").
 
-Commit c58c0074c54c ("block/bio: remove duplicate append pages code")
-from Jun 10, 2022 (linux-next), leads to the following Smatch static
-checker warning:
+The root cause is that we use "list_move_tail(&rq->queuelist, pending)"
+in the PREFLUSH/POSTFLUSH sequences. But rq->queuelist.next == xxx since
+it's popped out from plug->cached_rq in __blk_mq_alloc_requests_batch().
+We don't initialize its queuelist just for this first request, although
+the queuelist of all later popped requests will be initialized.
 
-	block/bio.c:1307 __bio_iov_iter_get_pages()
-	error: we previously assumed 'bio->bi_bdev' could be null (see line 1291)
+Fix it by changing to use "list_add_tail(&rq->queuelist, pending)" so
+rq->queuelist doesn't need to be initialized. It should be ok since rq
+can't be on any list when PREFLUSH or POSTFLUSH, has no move actually.
 
-block/bio.c
-    1253 static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-    1254 {
-    1255         iov_iter_extraction_t extraction_flags = 0;
-    1256         unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-    1257         unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
-    1258         struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
-    1259         struct page **pages = (struct page **)bv;
-    1260         ssize_t size, left;
-    1261         unsigned len, i = 0;
-    1262         size_t offset;
-    1263         int ret = 0;
-    1264 
-    1265         /*
-    1266          * Move page array up in the allocated memory for the bio vecs as far as
-    1267          * possible so that we can start filling biovecs from the beginning
-    1268          * without overwriting the temporary page array.
-    1269          */
-    1270         BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
-    1271         pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
-    1272 
-    1273         if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
-                     ^^^^^^^^^^^^
-Assumes bio->bi_bdev can be NULL
+Please note the commit 81ada09cc25e ("blk-flush: reuse rq queuelist in
+flush state machine") also has another requirement that no drivers would
+touch rq->queuelist after blk_mq_end_request() since we will reuse it to
+add rq to the post-flush pending list in POSTFLUSH. If this is not true,
+we will have to revert that commit IMHO.
 
-    1274                 extraction_flags |= ITER_ALLOW_P2PDMA;
-    1275 
-    1276         /*
-    1277          * Each segment in the iov is required to be a block size multiple.
-    1278          * However, we may not be able to get the entire segment if it spans
-    1279          * more pages than bi_max_vecs allows, so we have to ALIGN_DOWN the
-    1280          * result to ensure the bio's total size is correct. The remainder of
-    1281          * the iov data will be picked up in the next bio iteration.
-    1282          */
-    1283         size = iov_iter_extract_pages(iter, &pages,
-    1284                                       UINT_MAX - bio->bi_iter.bi_size,
-    1285                                       nr_pages, extraction_flags, &offset);
-    1286         if (unlikely(size <= 0))
-    1287                 return size ? size : -EFAULT;
-    1288 
-    1289         nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
-    1290 
-    1291         if (bio->bi_bdev) {
-                     ^^^^^^^^^^^^
-More checks
+This updated version adds "list_del_init(&rq->queuelist)" in flush rq
+callback since the dm layer may submit request of a weird invalid format
+(REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH), which causes double list_add
+if without this "list_del_init(&rq->queuelist)". The weird invalid format
+problem should be fixed in dm layer.
 
-    1292                 size_t trim = size & (bdev_logical_block_size(bio->bi_bdev) - 1);
-    1293                 iov_iter_revert(iter, trim);
-    1294                 size -= trim;
-    1295         }
-    1296 
-    1297         if (unlikely(!size)) {
-    1298                 ret = -EFAULT;
-    1299                 goto out;
-    1300         }
-    1301 
-    1302         for (left = size, i = 0; left > 0; left -= len, i++) {
-    1303                 struct page *page = pages[i];
-    1304 
-    1305                 len = min_t(size_t, PAGE_SIZE - offset, left);
-    1306                 if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
---> 1307                         ret = bio_iov_add_zone_append_page(bio, page, len,
-                                                                    ^^^
-bio->bi_bdev is dereferenced inside the function
+Reported-by: Friedrich Weber <f.weber@proxmox.com>
+Closes: https://lore.kernel.org/lkml/14b89dfb-505c-49f7-aebb-01c54451db40@proxmox.com/
+Closes: https://lore.kernel.org/lkml/c9d03ff7-27c5-4ebd-b3f6-5a90d96f35ba@proxmox.com/
+Fixes: 81ada09cc25e ("blk-flush: reuse rq queuelist in flush state machine")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: ming.lei@redhat.com
+Cc: bvanassche@acm.org
+Tested-by: Friedrich Weber <f.weber@proxmox.com>
+Signed-off-by: Chengming Zhou <chengming.zhou@linux.dev>
+---
+ block/blk-flush.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-    1308                                         offset);
-    1309                         if (ret)
-    1310                                 break;
-    1311                 } else
-    1312                         bio_iov_add_page(bio, page, len, offset);
-    1313 
-    1314                 offset = 0;
-    1315         }
-    1316 
-    1317         iov_iter_revert(iter, left);
-    1318 out:
-    1319         while (i < nr_pages)
-    1320                 bio_release_page(bio, pages[i++]);
-    1321 
-    1322         return ret;
-    1323 }
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index c17cf8ed8113..cca4f9131f79 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -185,7 +185,7 @@ static void blk_flush_complete_seq(struct request *rq,
+ 		/* queue for flush */
+ 		if (list_empty(pending))
+ 			fq->flush_pending_since = jiffies;
+-		list_move_tail(&rq->queuelist, pending);
++		list_add_tail(&rq->queuelist, pending);
+ 		break;
+ 
+ 	case REQ_FSEQ_DATA:
+@@ -263,6 +263,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
+ 		unsigned int seq = blk_flush_cur_seq(rq);
+ 
+ 		BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
++		list_del_init(&rq->queuelist);
+ 		blk_flush_complete_seq(rq, fq, seq, error);
+ 	}
+ 
+-- 
+2.20.1
 
-regards,
-dan carpenter
