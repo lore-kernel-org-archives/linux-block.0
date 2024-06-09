@@ -1,64 +1,48 @@
 Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB351CA89;
-	Sun,  9 Jun 2024 08:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8DE46450;
+	Sun,  9 Jun 2024 08:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717921680; cv=none; b=ZQPgzDDLcl/QSGo1gkIIy7VgMsEwPZA8zCyPrtXP8d8XXrYlQGU52loGAQ0YxcC1EyiSGobzedoZQIySNxC0PqYUjGZSC1rtprAhDXMfLSDsWxYpOiVw0IS/rMoBYRaXhDRne9RRYJyQOJdImTUKTtULF1unqy2Oy5ClxFcJuGI=
+	t=1717921691; cv=none; b=IjGXWO+0raqIOlIYBFNISPM4QqIp68erIY3xJYKxIT0qcnVgBvGIuVzLhMTXGvFqjuiWFcBIk8QLw6Xwu+Jx4TiRQbQJ2SL8R3+7YEz+DUkY1ePIG6OT2syTbIZDUfw4ahk7mT0RQRj0sJEsCNKYMQnF3GeNrQgF4bh6oFgImjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717921680; c=relaxed/simple;
-	bh=cl9fmVF+HqNubeETqLioP3KnvOsLThBpD2QkFmQe7ZM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cHqexTzfwS2VZtl2wgHwW7NnVCV5Gnx/7CQTtZRsC5mgR0Ol7JnCxa8A4u8T7CyPwakz4HnjxjPGmTmUbnRQ0AaANnLYziwdOYhlimmw+lh8MRBNh+wfJWswxtFtJey2YKpruKScdh8GjN0zpOZ5TyKP/iYvfERvpv8/36nDwrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=c3jg9XiA; arc=none smtp.client-ip=192.134.164.83
+	s=arc-20240116; t=1717921691; c=relaxed/simple;
+	bh=GPl3J34M1d7NjmG00uBdfMYpPYDtbP1uZbBHCNdhJQc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=QQS972VpI44Ka0TYbz1Euw1KMiQ5MQhTqL34Av4ypvicDKwp9xOjXqYbUMF/uomQOeq2+EDGwiMPSAGbMzw0MAeQyI0xuuOliHaNPCASle2t6Y/1NBx+RshtbUtYoLiVd8K76obvBv4TNRslrQUB2yXZIk4f9NAeZnJStyaA2O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=IgQ0MyW2; arc=none smtp.client-ip=192.134.164.83
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="c3jg9XiA"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="IgQ0MyW2"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=REYx9XJxXex1wT0g8DdBknTJa5z8s+++8BsQM1tAkdE=;
-  b=c3jg9XiAgeKcNkg9Ypz1MXA57+I6z9Upi3oqzG67AIxQoc2Tb/l9+twd
-   o1xqjWHj9bZB/XffVTZ6y3Q5wlIBrpiRIuaxP20ZifTf9z4PP9a6/uHrQ
-   jbNAr8EHCg32T8reqfZHBfM1Bu9ssqsOLmK26M8DXHwpWqbgwQfkqJwz8
-   I=;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YQXnrH/08rhpNkHP4SNUqJ/atSEr8v14IoPZZmef880=;
+  b=IgQ0MyW2rkojQw4XJ41XCYNyMbhdPXIdKBamHkri3xuQXbotjCSMI0PI
+   7bMEDVQSODgpQ5t3pXWVvE1Ck+JMwYJ5vvwSMbuWhDWEOVMQHlCI3Vhsf
+   JKCB30mAP/Y0kzTFt2wadul2Jc2GMBRC04jev/bvyWJj4x6d+13yI4Qgj
+   s=;
 Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
 X-IronPort-AV: E=Sophos;i="6.08,225,1712613600"; 
-   d="scan'208";a="169696895"
+   d="scan'208";a="169696904"
 Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 10:27:48 +0200
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 10:27:49 +0200
 From: Julia Lawall <Julia.Lawall@inria.fr>
-To: linux-block@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
 Cc: kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com,
+	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org,
-	Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
 	"Paul E . McKenney" <paulmck@kernel.org>,
 	Vlastimil Babka <vbabka@suse.cz>
-Subject: [PATCH 00/14] replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-Date: Sun,  9 Jun 2024 10:27:12 +0200
-Message-Id: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+Subject: [PATCH 09/14] block: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Date: Sun,  9 Jun 2024 10:27:21 +0200
+Message-Id: <20240609082726.32742-10-Julia.Lawall@inria.fr>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -155,23 +139,34 @@ Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
 Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
 ---
+ block/blk-ioc.c |    9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
- arch/powerpc/kvm/book3s_mmu_hpte.c  |    8 +-------
- block/blk-ioc.c                     |    9 +--------
- drivers/net/wireguard/allowedips.c  |    9 ++-------
- fs/ecryptfs/dentry.c                |    8 +-------
- fs/nfsd/nfs4state.c                 |    9 +--------
- fs/tracefs/inode.c                  |   10 +---------
- kernel/time/posix-timers.c          |    9 +--------
- kernel/workqueue.c                  |    8 +-------
- net/bridge/br_fdb.c                 |    9 +--------
- net/can/gw.c                        |   13 +++----------
- net/ipv4/fib_trie.c                 |    8 +-------
- net/ipv4/inetpeer.c                 |    9 ++-------
- net/ipv6/ip6_fib.c                  |    9 +--------
- net/ipv6/xfrm6_tunnel.c             |    8 +-------
- net/kcm/kcmsock.c                   |   10 +---------
- net/netfilter/nf_conncount.c        |   10 +---------
- net/netfilter/nf_conntrack_expect.c |   10 +---------
- net/netfilter/xt_hashlimit.c        |    9 +--------
- 18 files changed, 22 insertions(+), 143 deletions(-)
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index 25dd4db11121..ce82770c72ab 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -32,13 +32,6 @@ static void get_io_context(struct io_context *ioc)
+ 	atomic_long_inc(&ioc->refcount);
+ }
+ 
+-static void icq_free_icq_rcu(struct rcu_head *head)
+-{
+-	struct io_cq *icq = container_of(head, struct io_cq, __rcu_head);
+-
+-	kmem_cache_free(icq->__rcu_icq_cache, icq);
+-}
+-
+ /*
+  * Exit an icq. Called with ioc locked for blk-mq, and with both ioc
+  * and queue locked for legacy.
+@@ -102,7 +95,7 @@ static void ioc_destroy_icq(struct io_cq *icq)
+ 	 */
+ 	icq->__rcu_icq_cache = et->icq_cache;
+ 	icq->flags |= ICQ_DESTROYED;
+-	call_rcu(&icq->__rcu_head, icq_free_icq_rcu);
++	kfree_rcu(icq, __rcu_head);
+ }
+ 
+ /*
+
