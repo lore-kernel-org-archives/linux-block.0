@@ -1,41 +1,177 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5599EEAD;
-	Sun,  9 Jun 2024 07:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB351CA89;
+	Sun,  9 Jun 2024 08:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717918192; cv=none; b=H+9EYFLQXGrp0S5oelmxRnRbKV2OpsRKqs9WxMUkJvPaaWUAzS18xa2XHXZJ4ADy5AAzFnA+j3FAj7op0HMm91HbpOknDNPYmITNwa5klCpKW8nYgHC7hu0AuJ9+yHL0OqF7R2YdYKTC/Dq/zssZuvnM0KnxHbZUNBkTCcbtXqc=
+	t=1717921680; cv=none; b=ZQPgzDDLcl/QSGo1gkIIy7VgMsEwPZA8zCyPrtXP8d8XXrYlQGU52loGAQ0YxcC1EyiSGobzedoZQIySNxC0PqYUjGZSC1rtprAhDXMfLSDsWxYpOiVw0IS/rMoBYRaXhDRne9RRYJyQOJdImTUKTtULF1unqy2Oy5ClxFcJuGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717918192; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y2D3vMw9I0LYksjx255m9wIMyPWrduPRc5kFU4b0lrGhnMO7tNR+4JkBSIrIYscW9u5TYytxF6uYoKlJIomv6McqO2pzFyU/Xpuc36NUg/s+du4zX6Ns3CzlTMxb6pjzGeFSMULw6u7OclG/ek4zQsUosoDcYmQ6t+cevnacxbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id A4F7E68B05; Sun,  9 Jun 2024 09:29:38 +0200 (CEST)
-Date: Sun, 9 Jun 2024 09:29:38 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Chengming Zhou <chengming.zhou@linux.dev>
-Cc: axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de, f.weber@proxmox.com,
-	bvanassche@acm.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
-Subject: Re: [PATCH v2] block: fix request.queuelist usage in flush
-Message-ID: <20240609072938.GA10728@lst.de>
-References: <20240608143115.972486-1-chengming.zhou@linux.dev>
+	s=arc-20240116; t=1717921680; c=relaxed/simple;
+	bh=cl9fmVF+HqNubeETqLioP3KnvOsLThBpD2QkFmQe7ZM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cHqexTzfwS2VZtl2wgHwW7NnVCV5Gnx/7CQTtZRsC5mgR0Ol7JnCxa8A4u8T7CyPwakz4HnjxjPGmTmUbnRQ0AaANnLYziwdOYhlimmw+lh8MRBNh+wfJWswxtFtJey2YKpruKScdh8GjN0zpOZ5TyKP/iYvfERvpv8/36nDwrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=c3jg9XiA; arc=none smtp.client-ip=192.134.164.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="c3jg9XiA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=REYx9XJxXex1wT0g8DdBknTJa5z8s+++8BsQM1tAkdE=;
+  b=c3jg9XiAgeKcNkg9Ypz1MXA57+I6z9Upi3oqzG67AIxQoc2Tb/l9+twd
+   o1xqjWHj9bZB/XffVTZ6y3Q5wlIBrpiRIuaxP20ZifTf9z4PP9a6/uHrQ
+   jbNAr8EHCg32T8reqfZHBfM1Bu9ssqsOLmK26M8DXHwpWqbgwQfkqJwz8
+   I=;
+Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.08,225,1712613600"; 
+   d="scan'208";a="169696895"
+Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 10:27:48 +0200
+From: Julia Lawall <Julia.Lawall@inria.fr>
+To: linux-block@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: [PATCH 00/14] replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Date: Sun,  9 Jun 2024 10:27:12 +0200
+Message-Id: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240608143115.972486-1-chengming.zhou@linux.dev>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-Looks good:
+Since SLOB was removed, it is not necessary to use call_rcu
+when the callback only performs kmem_cache_free. Use
+kfree_rcu() directly.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The changes were done using the following Coccinelle semantic patch.
+This semantic patch is designed to ignore cases where the callback
+function is used in another way.
+
+// <smpl>
+@r@
+expression e;
+local idexpression e2;
+identifier cb,f;
+position p;
+@@
+
+(
+call_rcu(...,e2)
+|
+call_rcu(&e->f,cb@p)
+)
+
+@r1@
+type T;
+identifier x,r.cb;
+@@
+
+ cb(...) {
+(
+   kmem_cache_free(...);
+|
+   T x = ...;
+   kmem_cache_free(...,x);
+|
+   T x;
+   x = ...;
+   kmem_cache_free(...,x);
+)
+ }
+
+@s depends on r1@
+position p != r.p;
+identifier r.cb;
+@@
+
+ cb@p
+
+@script:ocaml@
+cb << r.cb;
+p << s.p;
+@@
+
+Printf.eprintf "Other use of %s at %s:%d\n"
+   cb (List.hd p).file (List.hd p).line
+
+@depends on r1 && !s@
+expression e;
+identifier r.cb,f;
+position r.p;
+@@
+
+- call_rcu(&e->f,cb@p)
++ kfree_rcu(e,f)
+
+@r1a depends on !s@
+type T;
+identifier x,r.cb;
+@@
+
+- cb(...) {
+(
+-  kmem_cache_free(...);
+|
+-  T x = ...;
+-  kmem_cache_free(...,x);
+|
+-  T x;
+-  x = ...;
+-  kmem_cache_free(...,x);
+)
+- }
+// </smpl>
+
+Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+
+---
+
+ arch/powerpc/kvm/book3s_mmu_hpte.c  |    8 +-------
+ block/blk-ioc.c                     |    9 +--------
+ drivers/net/wireguard/allowedips.c  |    9 ++-------
+ fs/ecryptfs/dentry.c                |    8 +-------
+ fs/nfsd/nfs4state.c                 |    9 +--------
+ fs/tracefs/inode.c                  |   10 +---------
+ kernel/time/posix-timers.c          |    9 +--------
+ kernel/workqueue.c                  |    8 +-------
+ net/bridge/br_fdb.c                 |    9 +--------
+ net/can/gw.c                        |   13 +++----------
+ net/ipv4/fib_trie.c                 |    8 +-------
+ net/ipv4/inetpeer.c                 |    9 ++-------
+ net/ipv6/ip6_fib.c                  |    9 +--------
+ net/ipv6/xfrm6_tunnel.c             |    8 +-------
+ net/kcm/kcmsock.c                   |   10 +---------
+ net/netfilter/nf_conncount.c        |   10 +---------
+ net/netfilter/nf_conntrack_expect.c |   10 +---------
+ net/netfilter/xt_hashlimit.c        |    9 +--------
+ 18 files changed, 22 insertions(+), 143 deletions(-)
