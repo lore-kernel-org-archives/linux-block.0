@@ -1,46 +1,38 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C2112FB1A;
-	Mon, 10 Jun 2024 14:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7001A1E520
+	for <linux-block@vger.kernel.org>; Mon, 10 Jun 2024 15:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718028885; cv=none; b=ihzA48LM20ZNr6tAz9GDx7/E/7bpxticJObWjyvfEqQ+NPGYBzzSQsJVxfXR57h81se3bu8AepPPKwsn+nD5adi8PzmA/StK9xyvWy9+t+LsZKEReSqhql3twuIXiLOqUyJCA2e055X3grkrYMS0sqamAa2n1wkdR3z8nTTifWw=
+	t=1718031996; cv=none; b=hFZdG9ug9w6SemUeAO/rAiPv1S9vmntLZ6ysMtWYG3vCyTo+SSRn6/n8ZRkWUFh3Y/hMZkQPzLuGDdFK+BvdbcyFbOsh18HXc6G7AsuQyxDsbgwsW54JzpPI6K/0tHOdojoQvlSMe486/dhpDr9p0JPQ6bZn+hAzO24F+a1Gswk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718028885; c=relaxed/simple;
-	bh=FD5N5uRHdIwTmFxwbE42FcAyZnfdFcanXBD2EDz7GFY=;
+	s=arc-20240116; t=1718031996; c=relaxed/simple;
+	bh=TQ5xSoB9yVygyRE8xMBf6WUm5k0FArXdWCNhXUNEk0k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mgx+KIFayO5zqBbDeP+O7OZxDkPBhfo7c3wW87fYmU9IGfxmaUBVkQmKvAfSpCRF/PvQ2RlzDvDq8SsS9Z/rMTRU+8c4r1Gw9Ibw5hjQJ9jOYyBAPb/N90xxQyDPi8Uop6hjE1pYljO7X4MaIvTfV0OgtWBMNKph1GhaeWJQSzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PW4DWXpr; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=DqHVoJu+AkA/Ix8nVVgaaIW037qhzxB4KOcZrHWIg2yqOAxJNwedAllnQaunuYQc9/pnrmf3kflrQj1sO7IbL/JmM5PGbebMCJzANSQ7IfBL2A8QG9GafbHqYnonnWEZU5F7Zqo4V6S8rtwrqzeaXG8SShixDQHsYeQrsQBOID8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXfRFUOO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PW4DWXpr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=rE4tFE9CZ/+gRbB9ULW6+AF11oW7AZsnF8V1vYN9wWw=; b=PW4DWXprY5eszna0+c4qSpHEfH
-	7bFkB/WIKlc5w4yHHRKOgCsOwmrBX2ssM9AbwjZimMgt1MHq+Y0L31L83GmpXBelMLuxyQDvr5sEY
-	HZfCEysvvK9X2nm8MKc1voW7mIZw9uh8tscXEZPyGQxahtbORCUyvF4iRFgi7eZpfJJ2UX/79MzH4
-	FQbcyk4TIZFD56CN1Tr2Fm95MoCN/0fkKAdDeleXxvJHZIqI7+eA11pS2FhAyhmZO5NoGYJR7NdYS
-	m7uXox63OMoM/WPiC3iiQ0WJnxf20NZhKdii3BEEkO5cOXmBGbhzn1nyMTsMgbTGdJaB/z1zxZ7w8
-	RUTmr72Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sGfnH-00000005NB2-01jE;
-	Mon, 10 Jun 2024 14:14:43 +0000
-Date: Mon, 10 Jun 2024 07:14:42 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Cyril Hrubis <chrubis@suse.cz>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH] loop: Disable fallocate() zero and discard if not
- supported
-Message-ID: <ZmcKUgJXc9MOLvqj@infradead.org>
-References: <20240607091555.2504-1-chrubis@suse.cz>
- <ZmPvNu-YijbtJkeR@infradead.org>
- <ZmcKA3zHsOYlyaiq@yuki>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXfRFUOO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9DC7C2BBFC;
+	Mon, 10 Jun 2024 15:06:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718031996;
+	bh=TQ5xSoB9yVygyRE8xMBf6WUm5k0FArXdWCNhXUNEk0k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DXfRFUOOeXcyPgNztpWE1aYYATLWK4yGakltZyyLthfgEI4MZliXhDzlvFURrytPB
+	 jt/cNyEM8HrIwXLP9CMRfdYRlj5imD+uuMHX3CkUzK3MlKfn9Zu+hQTyn8KaF5l3Dv
+	 0kqpuGx9TjTF7H7rRKNImfe4P9O+qyiPXeCqU1b9fl81IwDGJBn9xe0iFEvHkahcM7
+	 6UrWejzw2WVu0vX+Wz6fyH4HWF0MzhDXz5auFVxdn0mNL+pP+7wcHK/FtVkJggnZBZ
+	 PZwnUX422GHZQAETmFBzxfU4OAfmiwEGQwDTCokvi1eCfKUVtJQhjrPA/SAjdt1aTx
+	 Aw8b1iRmrGWLg==
+Date: Mon, 10 Jun 2024 09:06:33 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: linux-block@vger.kernel.org
+Subject: Re: [bug report] block/bio: remove duplicate append pages code
+Message-ID: <ZmcWeQhlbgnINVRO@kbusch-mbp.dhcp.thefacebook.com>
+References: <af595d26-f8f2-4b84-81fd-09cc81049cf2@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,23 +41,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZmcKA3zHsOYlyaiq@yuki>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <af595d26-f8f2-4b84-81fd-09cc81049cf2@moroto.mountain>
 
-On Mon, Jun 10, 2024 at 04:13:23PM +0200, Cyril Hrubis wrote:
-> Do we need noinline attribute for the function as well or unlikely() in
-> the if condition?
+On Sat, Jun 08, 2024 at 05:20:26PM +0300, Dan Carpenter wrote:
+>     1303                 struct page *page = pages[i];
+>     1304 
+>     1305                 len = min_t(size_t, PAGE_SIZE - offset, left);
+>     1306                 if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+> --> 1307                         ret = bio_iov_add_zone_append_page(bio, page, len,
+>                                                                     ^^^
+> bio->bi_bdev is dereferenced inside the function
 
-unlikely sounds like the right thing here.
-
-> > (and maybe one day we figure out a way for the file system to
-> > advertise what fallocate modes it actually supports..)
-> 
-> One of my ideas was to try fallocate() with zero size in the
-> loop_reconfigure_limits() to see if we get EOPNOTSUPP but for that to
-> work we would have to make sure that we do not bail early on zero size
-> in the vfs layer...
-
-And the VFS layer doesn't know, it has to go all the way into the
-file system..
-
+You can't use REQ_OP_ZONE_APPEND for anything that fails
+"bdev_is_zoned()", which requires a bdev, so I think we're safe. 
