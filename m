@@ -1,40 +1,84 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2A177113;
-	Mon, 10 Jun 2024 12:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A423015A8;
+	Mon, 10 Jun 2024 14:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718022271; cv=none; b=KJ6pfROsnGJVPtg0A1roohwK2KL3bEzoUjbmCJZwO9VnbDEd8IObKyX2tj1jl2wlocDDG+WdN5LXTQdQGk41zDW/DRkusSJbJvPhU2fF0110sB2H0b7EeBYeN2anicMd/gd7lLMvqOvgsQD+K881essee3ZJPeS4uY2s2PQwtNs=
+	t=1718028810; cv=none; b=hVIVLaBEVuGawFSp8Sc9DW1dHrkrLEkrhkgGmQFIROYadQkja5FsVnsDeITYgArtJC2NHzetjWmreVac/wJXyRH6z5IKU7u8nkbQl9McvMynRqFNiEPRIMILvBNzk3ik4peJ6esQ8DT7vlm6R8bTK10RJ/4LpdHBxhUOcxKyf/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718022271; c=relaxed/simple;
-	bh=wPj0ka3smDPj42zAIcmgvSYYGdHRdj8CK45dHg9fLDs=;
+	s=arc-20240116; t=1718028810; c=relaxed/simple;
+	bh=659iZLc6HgV20+vEs3FFtbeaJDyW0d2RAagxZHSB9E0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NihfTpiwbLbJQt2ZnY2r1aVpMDd1bym8cU8o+Esfl/7VPi3KziVZurHW1P/p118jMseWKforT3isU6FlQmGMbeAzIFSriqG2Bf8GVIDDWXkF5in+nOrZXrVEJEeEz1uxWh1C5jPsqX06j7kOX7qSjQ7htGn6Q/GXEWWPaGtchAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 25B3D67373; Mon, 10 Jun 2024 14:24:24 +0200 (CEST)
-Date: Mon, 10 Jun 2024 14:24:23 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH 03/11] block: remove the BIP_IP_CHECKSUM flag
-Message-ID: <20240610122423.GB21513@lst.de>
-References: <20240607055912.3586772-1-hch@lst.de> <20240607055912.3586772-4-hch@lst.de> <yq1frtl3tmw.fsf@ca-mkp.ca.oracle.com> <20240610115732.GA19790@lst.de> <yq1bk492dv3.fsf@ca-mkp.ca.oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=V1aUFipTxjZcScarUB37kWCdEPIh2eqAdF6mqX4SRQEH8HllpR4zkmnlFGY9nbO8jS05PnPt6fpf2DKDAZeKZA7gI7/rOXIotp52VSvT9jrfi/wE6YyS46qiz98da0kCm/0kCVyNApOGbaY8Z0n17jkblWgrDIAP9bpybbOEkMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=uUq+XjCV; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8tOYvZPs; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=uUq+XjCV; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8tOYvZPs; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="uUq+XjCV";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8tOYvZPs";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="uUq+XjCV";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8tOYvZPs"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id BABEB1F809;
+	Mon, 10 Jun 2024 14:13:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718028806; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S24EjwAJXanrKH7TQomb+RV2l81bCGv/31nqUxjtpK0=;
+	b=uUq+XjCVyrIRJBADPwQTyGVep+642Q0te+UmCUysLC2v4MvjuqAzIXmlTaAX6JmXBExhje
+	w5962MXgQhc2PvuMwvcHioFl7EV00U8QB8pDuBSGkE1DDFaEK7pMufDHc8yRzfjaBur28k
+	ayD3Z3Xu2VkMK6P11oI1ziR3KcouSZc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718028806;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S24EjwAJXanrKH7TQomb+RV2l81bCGv/31nqUxjtpK0=;
+	b=8tOYvZPsguKvQo8jtyo9Q3fnpjsJd+8YnxkCDTfwjGEVAWErPDYLPIKQo0zEX9g4Cacr+W
+	Iiqdhulm2aqGGrCA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718028806; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S24EjwAJXanrKH7TQomb+RV2l81bCGv/31nqUxjtpK0=;
+	b=uUq+XjCVyrIRJBADPwQTyGVep+642Q0te+UmCUysLC2v4MvjuqAzIXmlTaAX6JmXBExhje
+	w5962MXgQhc2PvuMwvcHioFl7EV00U8QB8pDuBSGkE1DDFaEK7pMufDHc8yRzfjaBur28k
+	ayD3Z3Xu2VkMK6P11oI1ziR3KcouSZc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718028806;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S24EjwAJXanrKH7TQomb+RV2l81bCGv/31nqUxjtpK0=;
+	b=8tOYvZPsguKvQo8jtyo9Q3fnpjsJd+8YnxkCDTfwjGEVAWErPDYLPIKQo0zEX9g4Cacr+W
+	Iiqdhulm2aqGGrCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9A3D013A7F;
+	Mon, 10 Jun 2024 14:13:26 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id n11gJAYKZ2blQQAAD6G6ig
+	(envelope-from <chrubis@suse.cz>); Mon, 10 Jun 2024 14:13:26 +0000
+Date: Mon, 10 Jun 2024 16:13:23 +0200
+From: Cyril Hrubis <chrubis@suse.cz>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH] loop: Disable fallocate() zero and discard if not
+ supported
+Message-ID: <ZmcKA3zHsOYlyaiq@yuki>
+References: <20240607091555.2504-1-chrubis@suse.cz>
+ <ZmPvNu-YijbtJkeR@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,21 +87,75 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq1bk492dv3.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <ZmPvNu-YijbtJkeR@infradead.org>
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:email]
 
-On Mon, Jun 10, 2024 at 08:19:33AM -0400, Martin K. Petersen wrote:
-> On the wire between controller and target there's only CRC. If I want to
-> write a "bad" CRC to disk, I have switch the controller to CRC mode. The
-> controller can't convert a "bad" IP checksum to a "bad" CRC. The PI test
-> tooling relies heavily on being able to write "bad" things to disk and
-> read them back to validate that we detect the error.
+Hi!
+> > How to reproduce:
+> > 
+> > 1. make sure /tmp is mounted as tmpfs
+> > 2. dd if=/dev/zero of=/tmp/disk.img bs=1M count=100
+> > 3. losetup /dev/loop0 /tmp/disk.img
+> > 4. mkfs.ext2 /dev/loop0
+> > 5. dmesg |tail
+> 
+> Can you wire this up for blktests?
 
-But how do you even toggle the flag?  There is no no code to do that.
-And if you already have a special kernel module for that it really
-should just use a passthrough request to take care of that.
+Will try.
 
-Note that unlike the NOCHECK flag which I just cleaned up because they
-were unused, this one actually does get in the way of the architecture
-of the whole series :(  We could add a per-bip csum_type but it would
-feel really weird.
+> > +	if (ret == -EOPNOTSUPP) {
+> > +		struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
+> > +
+> > +		if (mode & FALLOC_FL_ZERO_RANGE)
+> > +			lim.max_write_zeroes_sectors = 0;
+> > +
+> > +		if (mode & FALLOC_FL_PUNCH_HOLE) {
+> > +			lim.max_hw_discard_sectors = 0;
+> > +			lim.discard_granularity = 0;
+> > +		}
+> > +
+> > +		queue_limits_commit_update(lo->lo_queue, &lim);
+> 
+> Please split this out into a separate helper to keep it out of the
+> main fast path I/O handling.  A little comment that we are
+> optimistically trying these if ->fallocate is support and might have
+> to paddle back here would also be useful.
+
+Will do.
+
+Do we need noinline attribute for the function as well or unlikely() in
+the if condition?
+
+> (and maybe one day we figure out a way for the file system to
+> advertise what fallocate modes it actually supports..)
+
+One of my ideas was to try fallocate() with zero size in the
+loop_reconfigure_limits() to see if we get EOPNOTSUPP but for that to
+work we would have to make sure that we do not bail early on zero size
+in the vfs layer...
+
+-- 
+Cyril Hrubis
+chrubis@suse.cz
