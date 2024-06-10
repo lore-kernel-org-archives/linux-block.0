@@ -1,94 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140B72230F;
-	Mon, 10 Jun 2024 19:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D941BF2A;
+	Mon, 10 Jun 2024 20:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718048036; cv=none; b=idC6r3zJdekcf7SNZbp5qhAiP/KfIcUUMRAtSPmMkVvWQU05+Fjl6XDJx4EnYMMQcr2lWQkRj4v3/mdkSb9Grh1abibmbajMLPlA+Sq/Npj0TMA+glsgloljslXMu3XQWUdExuXg7ykCC+kbTqpccybRpVjVkCGw7OUKcu09B+M=
+	t=1718050053; cv=none; b=EeJODszRJDI+mfia87QL3dZlNPIfLmVWA0Tige44rSphLKt/tqhWx6wr5IJlAZNKQwJPaanCIVepPle1pJ1cmNLm78cRhaRwSqUkIvi01y0doL/5y2fvVNz0KgstLg3vwrtouBJg9j+xCC24ZjbC/oKiePOpSM/JYyQi74SzhHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718048036; c=relaxed/simple;
-	bh=Qk5Vp5/sI/Gldp06bVN/w//AsSVkw1JHkdQm2GlWS3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BaAOAV7FyirTcKvqlJvu3ms57Fq4yNZOTLz+tcTQxYISH2UMrVbE8qbyKx3Fik0E3QXedKjZhu8BDS7NuqKvkEjiPXgc97j5II7bRH5g97n7mdZghYql8rjY/Hl30WNwhH8woqBHZhKYFvtmOuU3wxSlsDpCYwZaB1FCDMosOUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LRkBnj3q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718050053; c=relaxed/simple;
+	bh=gsBPbPnYKAP9lMCqyZCeXmja+Pyc5B6zW7EZJXPlBQA=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H+I7CCU4eEfscR6VEaJPO3T/eVZbLLGrzbKMCZJw/aHSij+nKZ6lrFBPspsHKf5oNYtZCsYdIUnFxGpwDmuTJpYgVakJwlW5SMRJidPesDp/TCZE8RNuw68XxzvU1WHRjL8uZWRlYT5OlhccIMNFfA04ruIIq5uvzsyP1BtBDC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=QFQj0aQ9; arc=none smtp.client-ip=185.70.43.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LRkBnj3q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24A64C2BBFC;
-	Mon, 10 Jun 2024 19:33:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718048035;
-	bh=Qk5Vp5/sI/Gldp06bVN/w//AsSVkw1JHkdQm2GlWS3o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LRkBnj3qKLzKtc+3T5Oij/zRoN3CPoJC7GS5nVXb/86MZithcRd6sMyUvqmLiuTQq
-	 pfdjVpplwIOj0hgPBKTLQwNVOUhWufQo/Nz3EGhkIw2Ap9qq7/2KJiSQtwlmrZav/R
-	 Y4Fjx471dGhT/sWZ1ydiRA/gIiheH19aiatm3VQ7oCBB0M1L2INCSzXPTB6ja5tGj1
-	 /vpAeA0tVtZw+i9nFLeqRhVi/DxX43c6938Ok5M3vcZPiMG8cGI3+PxKTyXelp9dry
-	 MTyJEFng7Av4ucas1DQkJXLVpsQchgXgwgVtzS9X1c5qBRcisVuz5DZ6Lrs75vPqhd
-	 TI7lq1JrELaNA==
-Date: Mon, 10 Jun 2024 13:33:53 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, sachinp@linux.vnet.com
-Subject: Re: Kernel OOPS while creating a NVMe Namespace
-Message-ID: <ZmdVIfnqtweVt9ZN@kbusch-mbp.dhcp.thefacebook.com>
-References: <2312e6c3-a069-4388-a863-df7e261b9d70@linux.vnet.ibm.com>
- <ZmdLlaVO-QUug5aj@kbusch-mbp.dhcp.thefacebook.com>
- <e8fa4c36-49e5-40b8-9cea-6b3b61aa3240@grimberg.me>
- <ZmdQuz8vJZMj41Kn@kbusch-mbp.dhcp.thefacebook.com>
- <bccf1e1f-bc45-4052-9504-d852f9ae4e6c@grimberg.me>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="QFQj0aQ9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1718050042; x=1718309242;
+	bh=YaudkvTAFLJ++bghqSZYe4gWhD1sK1cupANwv9nOdZM=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=QFQj0aQ9UrLzFPF+gUn/CRwt+AHtSb9LsJY4rF4T2VFnEqLHBmNtCZBr4e6aT2bkV
+	 0Rlas9rDr3JslF05T+X3blo3fG7H3RznctbNms5RALorGyqc5KYbdigVI+3ob01Mkw
+	 tj/fp4+NItpsf3IWKVU0Bcs1symzYPWXe7ko/49glT/fvmBg22SyQbEqhCUQyRU/xs
+	 Fo5kLuVlUuy0hfU00FRUBZkcJx9HArKjNZURqsK8pUqqXI3tQjQdC2aTJtD+uBKq0K
+	 ZUdA9B+9VJZG7wHxWZCQSNoZzmLeROleKM6lwudahQ4KvMSav+1M6I2ON4tnkwji7T
+	 BN99wZZ0a0kJw==
+Date: Mon, 10 Jun 2024 20:07:15 +0000
+To: Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez <da.gomez@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Philipp Stanner <pstanner@redhat.com>, Conor Dooley <conor@kernel.org>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, =?utf-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>, open list <linux-kernel@vger.kernel.org>,
+	"rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [PATCH v5 2/3] rust: block: add rnull, Rust null_blk implementation
+Message-ID: <f05832b5-de63-46a0-b623-ae9ef18c2648@proton.me>
+In-Reply-To: <20240603191455.968301-3-nmi@metaspace.dk>
+References: <20240603191455.968301-1-nmi@metaspace.dk> <20240603191455.968301-3-nmi@metaspace.dk>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: e8280eca314cd33587780377548bd7cae8afc414
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bccf1e1f-bc45-4052-9504-d852f9ae4e6c@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 10, 2024 at 10:17:42PM +0300, Sagi Grimberg wrote:
-> On 10/06/2024 22:15, Keith Busch wrote:
-> > On Mon, Jun 10, 2024 at 10:05:00PM +0300, Sagi Grimberg wrote:
-> > > 
-> > > On 10/06/2024 21:53, Keith Busch wrote:
-> > > > On Mon, Jun 10, 2024 at 01:21:00PM +0530, Venkat Rao Bagalkote wrote:
-> > > > > Issue is introduced by the patch: be647e2c76b27f409cdd520f66c95be888b553a3.
-> > > > My mistake. The namespace remove list appears to be getting corrupted
-> > > > because I'm using the wrong APIs to replace a "list_move_tail". This is
-> > > > fixing the issue on my end:
-> > > > 
-> > > > ---
-> > > > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> > > > index 7c9f91314d366..c667290de5133 100644
-> > > > --- a/drivers/nvme/host/core.c
-> > > > +++ b/drivers/nvme/host/core.c
-> > > > @@ -3959,9 +3959,10 @@ static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
-> > > >    	mutex_lock(&ctrl->namespaces_lock);
-> > > >    	list_for_each_entry_safe(ns, next, &ctrl->namespaces, list) {
-> > > > -		if (ns->head->ns_id > nsid)
-> > > > -			list_splice_init_rcu(&ns->list, &rm_list,
-> > > > -					     synchronize_rcu);
-> > > > +		if (ns->head->ns_id > nsid) {
-> > > > +			list_del_rcu(&ns->list);
-> > > > +			list_add_tail_rcu(&ns->list, &rm_list);
-> > > > +		}
-> > > >    	}
-> > > >    	mutex_unlock(&ctrl->namespaces_lock);
-> > > >    	synchronize_srcu(&ctrl->srcu);
-> > > > --
-> > > Can we add a reproducer for this in blktests? I'm assuming that we can
-> > > easily trigger this
-> > > with adding/removing nvmet namespaces?
-> > I'm testing this with Namespace Manamgent commands, which nvmet doesn't
-> > support. You can recreate the issue by detaching the last namespace.
-> > 
-> 
-> I think the same will happen in a test that creates two namespaces and then
-> echo 0 > ns/enable.
+On 03.06.24 21:14, Andreas Hindborg wrote:
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+>=20
+> This patch adds an initial version of the Rust null block driver.
+>=20
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> ---
+>  drivers/block/Kconfig  |  9 ++++++
+>  drivers/block/Makefile |  3 ++
+>  drivers/block/rnull.rs | 73 ++++++++++++++++++++++++++++++++++++++++++
 
-Looks like nvme/016 tess this. It's reporting as "passed" on my end, but
-I don't think it's actually testing the driver as intended. Still
-messing with it.
+Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+
+---
+Cheers,
+Benno
+
