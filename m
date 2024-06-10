@@ -1,189 +1,103 @@
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB031BF2A;
-	Mon, 10 Jun 2024 20:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A0850275
+	for <linux-block@vger.kernel.org>; Mon, 10 Jun 2024 20:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718050066; cv=none; b=cI306pDL21pg2f5bRUxLroljc6gZTKn9DKAczV7XgvRM4rH4rw4wduRr39jXV8IMT3effPosUghutzjDrwUh0TPLS3py71a6p2QjfNFJrFy0H7JOTg/Z/eiI2r9r97HIaFw81hwZzDkJW1eqDPVXRI/2uBvQJrtr6gWU16yLmYo=
+	t=1718053008; cv=none; b=VUMbyq5m4lyEskewbZE/+CwCOGA4S6wnA7LVo9fQl46OOqqdGZ1ucY/DN7xArALnA4ZMCVBOfhciWCQ2Qi6wuRBfI0VeuogYteVFqbt97Dysfk7YlvFonox0nlbyNmm3/o5BUrkq9NHnvpLlFT+8mpiXWBcfPVJCq2EpVUxVpkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718050066; c=relaxed/simple;
-	bh=AVwvkyK+QfwnXB8dsA/WxUOo0rA7BRZfw4QqNw4utwc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PzXPsRjiZcaRoIBagJC1FCxtR1V4QqmvcG1wwNAKbg1SuHjk1pwyV+c6yxRek5j/pZvx7tjpWXrezucrSDubaAzSgg2ch3Y9Dt4WSdZXCOs9AolWlK0McsO/JSlY5P458omYZkMSsQa01+V+ImcTVIKJ4VQxQK4tJU2BaunB6X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=iLx/Oj+H; arc=none smtp.client-ip=185.70.43.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1718053008; c=relaxed/simple;
+	bh=51EEDb0ue/Nhh7wtSldBpAO4aoc8AOeutvOQIatD1gI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NOCm82h0tnlvsgq09t6VovBnzIbVb849gkLAbWmkwOtElMpO5X7KPN05hOIfOyQIcyT27Gx3IJnLbxB/zSFjHz2isc7LjX9i+twt/r7hM/ri3p/ODXWa0n+0sI+cMvHYqE4FPSFhmWSjyVE+teijmuOqGRAlU2BC1GrdEVx9fyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=CWhCeBTG; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="iLx/Oj+H"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1718050061; x=1718309261;
-	bh=5jgdFYZWMFkdcxhAGWY4bzY1aHJjynRB5K3U4qiCAsw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=iLx/Oj+HjYHTmkkwWTn1g8PZJslcvdPCNMv20BEQx9wk55B+6f5moINgTz051sEuV
-	 ovPnhX69/pOa8x4DtZqkJ47qpW34Gq0HsYOUBaZs71jawwgJnuKAo+R43N3DzyBaMk
-	 dvUPmy7IyAMK5l/JvD3PwBrA5LthpkSzFZSzFyc2EDiCeHjhvM3fO2aWVFoVzuwyp/
-	 B7CNvXS0ySdUUYSYHLqELKlv5HxXV2JLMVeZ/M5pa7MJetLY2shNfoHwvBz6ZojuXM
-	 RW5+50bBs1z3b7Go0AiQbzjquz0zlihrnrobyQUs7HVQObH+X3RJj3ryfjPYha4XVb
-	 HluHfpESS/MAA==
-Date: Mon, 10 Jun 2024 20:07:37 +0000
-To: Andreas Hindborg <nmi@metaspace.dk>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, =?utf-8?Q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, Joel Granados <j.granados@samsung.com>, "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, Daniel Gomez
-	<da.gomez@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, Philipp Stanner <pstanner@redhat.com>, Conor Dooley <conor@kernel.org>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, =?utf-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>, open list <linux-kernel@vger.kernel.org>, "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>, "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, "gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: Re: [PATCH v4 1/3] rust: block: introduce `kernel::block::mq` module
-Message-ID: <f3e45a41-cc54-4c1f-885b-0f868ebf8744@proton.me>
-In-Reply-To: <87y17lqb8q.fsf@metaspace.dk>
-References: <20240601134005.621714-1-nmi@metaspace.dk> <20240601134005.621714-2-nmi@metaspace.dk> <b6b8e3e6-a2b9-4ddd-bf0f-e924d5d65653@proton.me> <87mso2me0p.fsf@metaspace.dk> <925fe0fe-9303-4f49-b473-c3a3ecc5e2e6@proton.me> <87y17lqb8q.fsf@metaspace.dk>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: e088cf28736281f159b5929e71db72c79baa7ad3
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="CWhCeBTG"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-62a2424ed00so44145997b3.1
+        for <linux-block@vger.kernel.org>; Mon, 10 Jun 2024 13:56:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1718053006; x=1718657806; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YCHlrp1sqWxXkENQgyX1SA6e/23clY3UwLtIBI7esY0=;
+        b=CWhCeBTG3Q0p0XsuKyOTUvQ0qPEMzZFPx5wDriOHW+PHt9qNp8exs2zS4RhDUwz6tl
+         0teTqbs4HduRtEbNGACtYTgLE6G2Et6VswyA9jy3DI/rd+FESjuGI2WafyolHNngzuHl
+         kPNqTPfQxuKGCO5Zhyd49EprGdM9MtZXWPFQkcKs7gPwcRTQi/8eFw5kXRCHSBWdxZjV
+         UH6CBNkS7rsS1yd/C3VW9yR4lf8mdKUrEHouq61hQ5uv3MPfx4r4AL+I439mBpsCJCr8
+         GONZAvefmIEog28pmMNqE2MIXZm74FWIiVeMae0fvOfNlkx5ax8jZ2IaU+gWnCX5Ufif
+         EfZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718053006; x=1718657806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YCHlrp1sqWxXkENQgyX1SA6e/23clY3UwLtIBI7esY0=;
+        b=Us0KKginkjxXKvv6CjijxKxWYR865QMzISTnpaoDMSFW7GM/rwVzHIXz1eWX494vgw
+         triYmKieAAYVnyrbOlF62Hza+MT5RBsW/fA13aF42tvg+CYHKPeukc3od8ZGp84WU54m
+         ixRLKNC1ZELvbuPCX+W85wmehrv7uT7vJa3yuieOZCqtR3riVhBrSUmravdG7JMKYYqy
+         b7oUSiQ5Yg08GkfOtibuwTdNTGzEDOhUUNzXgwo1ll6a4UMMoDhNOWvMTMnBlXUpg/d3
+         V269WzF0E8IQ3z/3uxe50OvQQtLusSnqoMfapUC4uiCXy9U5vH/6frwQ4OAhxFGo7N6+
+         zTeg==
+X-Forwarded-Encrypted: i=1; AJvYcCWDNkRt7/yNc4nt/ndJbwsqetEPHg+zsX5BFHanUyetyoLsqDiBdywY636atLJru7b6olK6PdWXQTII1DTLksZprFLhX1FYUregIq4=
+X-Gm-Message-State: AOJu0YwOAwD8/6X464HaSi/Csxuev//dEPVdCJzUh7kltXxDzLRGEPGc
+	5gsgGzbl4Ud2ywvJOolg7MPqdWVdo1OnFmlZY/gkbvogHeJPLH4M+GPzqG6n7ecgCWf1a87Bx2m
+	l0e4yNsgDacHdcYFKuA0yBAEcT3D0CwZxAhd2
+X-Google-Smtp-Source: AGHT+IFvfIOmbU92tIEUP97U962ZwkX+dae5pNDe8HVsVV2fINnzI7Cy6PJ/dYbQrp9/0zG0WtFUc6q1Xyv7UapuZHg=
+X-Received: by 2002:a0d:c186:0:b0:62d:355:5b34 with SMTP id
+ 00721157ae682-62d03555e3fmr47903587b3.20.1718053006262; Mon, 10 Jun 2024
+ 13:56:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240315113828.258005-1-cgzones@googlemail.com>
+In-Reply-To: <20240315113828.258005-1-cgzones@googlemail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 10 Jun 2024 16:56:35 -0400
+Message-ID: <CAHC9VhRekFEc5HHAEhp52tNT6NLnLw__fpy7F0Yq=Qry0Jk_-Q@mail.gmail.com>
+Subject: Re: [PATCH 01/10] capability: introduce new capable flag CAP_OPT_NOAUDIT_ONDENY
+To: =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>
+Cc: linux-security-module@vger.kernel.org, linux-block@vger.kernel.org, 
+	John Johansen <john.johansen@canonical.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler <casey@schaufler-ca.com>, 
+	Christian Brauner <brauner@kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>, 
+	Mimi Zohar <zohar@linux.ibm.com>, Khadija Kamran <kamrankhadijadj@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, linux-kernel@vger.kernel.org, apparmor@lists.ubuntu.com, 
+	selinux@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 04.06.24 11:59, Andreas Hindborg wrote:
-> Benno Lossin <benno.lossin@proton.me> writes:
->=20
-> [...]
->=20
->>>>> +impl<T: Operations> OperationsVTable<T> {
->>>>> +    /// This function is called by the C kernel. A pointer to this f=
-unction is
->>>>> +    /// installed in the `blk_mq_ops` vtable for the driver.
->>>>> +    ///
->>>>> +    /// # Safety
->>>>> +    ///
->>>>> +    /// - The caller of this function must ensure `bd` is valid
->>>>> +    ///   and initialized. The pointees must outlive this function.
->>>>
->>>> Until when do the pointees have to be alive? "must outlive this
->>>> function" could also be the case if the pointees die immediately after
->>>> this function returns.
->>>
->>> It should not be plural. What I intended to communicate is that what
->>> `bd` points to must be valid for read for the duration of the function
->>> call. I think that is what "The pointee must outlive this function"
->>> states? Although when we talk about lifetime of an object pointed to by
->>> a pointer, I am not sure about the correct way to word this. Do we talk
->>> about the lifetime of the pointer or the lifetime of the pointed to
->>> object (the pointee). We should not use the same wording for the pointe=
-r
->>> and the pointee.
->>>
->>> How about:
->>>
->>>     /// - The caller of this function must ensure that the pointee of `=
-bd` is
->>>     ///   valid for read for the duration of this function.
->>
->> But this is not enough for it to be sound, right? You create an `ARef`
->> from `bd.rq`, which potentially lives forever. You somehow need to
->> require that the pointer `bd` stays valid for reads and (synchronized)
->> writes until the request is ended (probably via `blk_mq_end_request`).
->=20
-> The statement does not say anything about `*((*bd).rq)`. `*bd` needs to
-> be valid only for the duration of the function. It carries a pointer to
-> a `struct request` in the `rq` field. The pointee of that pointer must
-> be exclusively owned by the driver until the request is done.
->=20
-> Maybe like this:
->=20
-> # Safety
->=20
-> - The caller of this function must ensure that the pointee of `bd` is
->   valid for read for the duration of this function.
+On Fri, Mar 15, 2024 at 7:38=E2=80=AFAM Christian G=C3=B6ttsche
+<cgzones@googlemail.com> wrote:
+>
+> Introduce a new capable flag, CAP_OPT_NOAUDIT_ONDENY, to not generate
+> an audit event if the requested capability is not granted.  This will be
+> used in a new capable_any() functionality to reduce the number of
+> necessary capable calls.
+>
+> Handle the flag accordingly in AppArmor and SELinux.
+>
+> CC: linux-block@vger.kernel.org
+> Suggested-by: Paul Moore <paul@paul-moore.com>
+> Signed-off-by: Christian G=C3=B6ttsche <cgzones@googlemail.com>
+> ---
+> v5:
+>    rename flag to CAP_OPT_NOAUDIT_ONDENY, suggested by Serge:
+>      https://lore.kernel.org/all/20230606190013.GA640488@mail.hallyn.com/
+> ---
+>  include/linux/security.h       |  2 ++
+>  security/apparmor/capability.c |  8 +++++---
+>  security/selinux/hooks.c       | 14 ++++++++------
+>  3 files changed, 15 insertions(+), 9 deletions(-)
 
-"valid for reads"
+Acked-by: Paul Moore <paul@paul-moore.com>
 
-> - This function must be called for an initialized and live `hctx`. That
->   is, `Self::init_hctx_callback` was called and
->   `Self::exit_hctx_callback()` was not yet called.
-> - `(*bd).rq` must point to an initialized and live `bindings:request`.
->   That is, `Self::init_request_callback` was called but
->   `Self::exit_request_callback` was not yet called for the request.
-> - `(*bd).rq` must be owned by the driver. That is, the block layer must
->   promise to not access the request until the driver calls
->   `bindings::blk_mq_end_request` for the request.
-
-Sounds good!
-
-> [...]
->=20
->>>>> +    /// This function is called by the C kernel. A pointer to this f=
-unction is
->>>>> +    /// installed in the `blk_mq_ops` vtable for the driver.
->>>>> +    ///
->>>>> +    /// # Safety
->>>>> +    ///
->>>>> +    /// This function may only be called by blk-mq C infrastructure.=
- `set` must
->>
->> `set` doesn't exist (`_set` does), you are also not using this
->> requirement.
->=20
-> Would be nice if there was a way in `rustdoc` no name arguments
-> explicitly.
->=20
->>
->>>>> +    /// point to an initialized `TagSet<T>`.
->>>>> +    unsafe extern "C" fn init_request_callback(
->>>>> +        _set: *mut bindings::blk_mq_tag_set,
->>>>> +        rq: *mut bindings::request,
->>>>> +        _hctx_idx: core::ffi::c_uint,
->>>>> +        _numa_node: core::ffi::c_uint,
->>>>> +    ) -> core::ffi::c_int {
->>>>> +        from_result(|| {
->>>>> +            // SAFETY: The `blk_mq_tag_set` invariants guarantee tha=
-t all
->>>>> +            // requests are allocated with extra memory for the requ=
-est data.
->>>>
->>>> What guarantees that the right amount of memory has been allocated?
->>>> AFAIU that is guaranteed by the `TagSet` (but there is no invariant).
->>>
->>> It is by C API contract. `TagSet`::try_new` (now `new`) writes
->>> `cmd_size` into the `struct blk_mq_tag_set`. That is picked up by
->>> `blk_mq_alloc_tag_set` to allocate the right amount of space for each r=
-equest.
->>>
->>> The invariant here is on the C type. Perhaps the wording is wrong. I am
->>> not exactly sure how to express this. How about this:
->>>
->>>             // SAFETY: We instructed `blk_mq_alloc_tag_set` to allocate=
- requests
->>>             // with extra memory for the request data when we called it=
- in
->>>             // `TagSet::new`.
->>
->> I think you need a safety requirement on the function: `rq` points to a
->> valid `Request`. Then you could just use `Request::wrapper_ptr` instead
->> of the line below.
->=20
-> I cannot require `rq` to point to a valid `Request`, because that would
-> require the private data area to already be initialized as a valid
-> `RequestDataWrapper`. Using the `wrapper_ptr` is good =F0=9F=91=8D. How i=
-s this:
->=20
->=20
->     /// # Safety
->     ///
->     /// - This function may only be called by blk-mq C infrastructure.
->     /// - `_set` must point to an initialized `TagSet<T>`.
->     /// - `rq` must point to an initialized `bindings::request`.
->     /// - The allocation pointed to by `rq` must be at the size of `Reque=
-st`
->     ///   plus the size of `RequestDataWrapper`.
-
-Also sounds good to me.
-
----
-Cheers,
-Benno
-
+--=20
+paul-moore.com
