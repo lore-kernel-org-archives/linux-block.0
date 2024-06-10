@@ -1,210 +1,283 @@
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8051879;
-	Mon, 10 Jun 2024 21:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718053939; cv=none; b=LVVKsgTj+b6XItx7Wd1nUlx34Jeg3dTNRt4FYGO7gyEdGAMzcOu7Tmp3NJoRyAAEfEMUYROkGCL6wIIRz0JlQYcXz/1vtyCGPTID3yiikEyaugazNOmC2WVYZoQBwpqpMR8ZmW2Yie2rpe9rxKUoKOqqPePyqy/orMFlLUE0E7Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718053939; c=relaxed/simple;
-	bh=L6idWEylvQppgYHhQF7YKp4UwnmESQ6eDx18yypSxo0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OwCqnCpuQPyrxRaWQGHoELnMYYYqLm1Q8f7Ow9FtaLusrnBhzYihjDw0pxhCeXYZ7cMslXask/l+uSIwqApr/pTD9rZVRBeH4TU7d8M3p483SYh1XpYgAMPyOF320BeIxN/4uCjh79pDhhXdQD2vQDgLsuAP2huJEDoZtfhF8Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=FSbpHbeJ; arc=none smtp.client-ip=185.125.188.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513DD57CA7;
+	Mon, 10 Jun 2024 21:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718054893; cv=fail; b=V8fsIT2NLhmyy6dZQ2fQbzghKa69zMMMMbbIlig24w3xjw8leZThhpZKLHbX+Gkhe4+PZUlFyfOBMdFhmF8myZNz5LwD99gB2AerdhHzJw4P1C+mFqf83q3z7Y+pLr+kODqBI6Y+JUs9wX+HW0zREE16WS8na6XVyprin2DMHhY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718054893; c=relaxed/simple;
+	bh=BhY3NwRliREZRdNNM43bZ3OvIln91I1pxlVbr1nPbP0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HiGXwBj1Oka1QF9CZaQRRhzRxfsVrto1B4CYadtJvlcXn/ztmuwANfbM0A4o8nuCZaxHfQ2NU9gusSEcGpr4ZO7kDJCDimZVioFjTyxA+Br4i62wt1uyahYuDQvG+I0WepazkC7IDEUOgQ/ftpUxzCelxdSDzOIg6St9Il1sZGQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=muB45dMj; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="FSbpHbeJ"
-Received: from [192.168.192.83] (unknown [50.39.103.33])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id EA0BE40FC9;
-	Mon, 10 Jun 2024 21:12:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1718053927;
-	bh=0+CsIHZM4SguLeaiX+nC4gxIoEzogxF06SwIBnAaJt4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=FSbpHbeJ0qs8ahd0/RIZF8ZdBAdo315IAdFQ9tI7YpABFM9GR8ENuv/wcQaY5ALTy
-	 4O/iscNJCO9tCrEPM2U+Smpe0vkPzg2buaPqVAY7XIwhb+pZ/cSd+rLmysOdEreLNB
-	 tlVCs88sRtTcqCBA654FwfvPgsU4csCpEKSjUwFz0JNx6m4B2HMn2ZKHXxkYnj3Tbn
-	 Yl4FBS+yDxThTxFsiU0mnSWBYBNkS731+cmrGfN1/HQTY2Br1SKtR9bsm0j5XEiFgk
-	 1UJEVB91SFy9PbHey6QQiLkSQISQ9wTOVHt/r4tK38CMpGHxQSu3TxK2hzOhYcx+/o
-	 yrBNYQC0MnuUQ==
-Message-ID: <4cfca86d-ceb7-4abe-8b6b-35194fc55565@canonical.com>
-Date: Mon, 10 Jun 2024 14:12:01 -0700
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="muB45dMj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718054892; x=1749590892;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BhY3NwRliREZRdNNM43bZ3OvIln91I1pxlVbr1nPbP0=;
+  b=muB45dMjKUs7RutsIRf91MGm4Ky/E3I628V5TVVDZiM9ayD2UV0sxfM0
+   R8sY4gMsJO4XYEfUpTLOZcxQVBnf8QJOiQajr9sFf15fNWf6rbgdcDIfN
+   2FvMXGaXqXP5s8EIs2Ao185gd4cOVxjpCetjqn8KDKsIoO0h60pBqAfXB
+   MdQz28E8lk6EAj4vWlfUCAvW5SCaUioyuBrzUAUJ55E6j2Efxd26xldTr
+   waUpBXYPXbagEBYuwlOLSWQT/Lc/0YDssCpIQNUR3QkN7KuSi2VctHlnr
+   PP7lMokdRQsqi1B8negO4bBByRgIV8G1kgMFGJ/B+3P5TOSY5VbA/1uUv
+   w==;
+X-CSE-ConnectionGUID: q+2ipTCTRySgN10YIvDIcA==
+X-CSE-MsgGUID: z2R+P3ydRKCTNjPa+WQZqw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="37262120"
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="37262120"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 14:28:11 -0700
+X-CSE-ConnectionGUID: eUv3vfAtSeaYz9bX1BbdJA==
+X-CSE-MsgGUID: Svj42NBxR9+Im31HyZocDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="70356682"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Jun 2024 14:28:10 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 10 Jun 2024 14:28:09 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 10 Jun 2024 14:28:09 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 10 Jun 2024 14:28:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oQ5wiXLJ15WP5CiENgk85WPGtphz7Lx8JjcU66zgA5Y4/2brtokQIQIBEr1Z1F2zDoZfzDetKF4McOn61kl3Ma3QmuBKLVx6hLSwbOoFr6TgylFDg+3p9SJg4W0pDZWuGquhW7xQZErwmNWfmb3wt98NUUAn6IvcFARHvYpjxkQYIDiKSlqaFOyTjyHQJ3kL4Sl2ZCZDXt5Hw1fkn4atcyt5MtVO/qnFb/q3vNK5QxsSU/4ywqMcYRM2ndJ83zWWXj3gPQq+SFHShRDMkwDiWQ+mCcVAzBJq/jyFVMX8oYlgaN3/W0ZPkcGn/qNH6sp9eL+mjRjyFx2q+JGKHFf8fA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BhY3NwRliREZRdNNM43bZ3OvIln91I1pxlVbr1nPbP0=;
+ b=O0evvpLs2XG6aet3YtmvsdPNUOgD3O87I+MxhWst91/N8In3Yr6GYRhQgJAZIpwZV0A2bXjsvi2/7QY1mUW1+BeNJBvh/Bjz2OPsmpGrXEshrI0KyI7oIz5sIQ96eD8DpwvARQo8LePwOjJ3SVD8kHdf7IcD+01nsaN6+IDvDMgdfIM2LAJAynleX7K5nJgncjxiW/Ie6b7pm6b3fJ+VEYAN18PCLK+M+NKEQfkkpkFrK28rXvHs/w/mlY8Iy8UDAblRA/BnLjmedLm6RP7MMgP2xI9+lPEMVs5eKPfokNx9M4ABnaLx3Vn/zC4i/Yljy6VIzthVaT07DWKvmzXSow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB7004.namprd11.prod.outlook.com (2603:10b6:510:20b::6)
+ by MW3PR11MB4569.namprd11.prod.outlook.com (2603:10b6:303:54::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Mon, 10 Jun
+ 2024 21:28:04 +0000
+Received: from PH7PR11MB7004.namprd11.prod.outlook.com
+ ([fe80::8c26:2819:d0f9:1984]) by PH7PR11MB7004.namprd11.prod.outlook.com
+ ([fe80::8c26:2819:d0f9:1984%3]) with mapi id 15.20.7633.036; Mon, 10 Jun 2024
+ 21:28:04 +0000
+From: "Zeng, Oak" <oak.zeng@intel.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>, "Robin
+ Murphy" <robin.murphy@arm.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, "Chaitanya
+ Kulkarni" <chaitanyak@nvidia.com>, "Brost, Matthew"
+	<matthew.brost@intel.com>, "Hellstrom, Thomas" <thomas.hellstrom@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Keith Busch
+	<kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas
+	<yishaih@nvidia.com>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?Q?J=E9r=F4me_Glisse?= <jglisse@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "Bart Van
+ Assche" <bvanassche@acm.org>, Damien Le Moal
+	<damien.lemoal@opensource.wdc.com>, Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"Williams, Dan J" <dan.j.williams@intel.com>, "jack@suse.com"
+	<jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>, "Bommu, Krishnaiah"
+	<krishnaiah.bommu@intel.com>, "Ghimiray, Himal Prasad"
+	<himal.prasad.ghimiray@intel.com>
+Subject: RE: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Thread-Topic: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two
+ steps
+Thread-Index: AQHanOEtbi0VHTnLn0mNwgftYB7xRbGEmFqggAEftYCAO5ykoIAAFS8AgAAFauCAAA0xgIAAMSmg
+Date: Mon, 10 Jun 2024 21:28:04 +0000
+Message-ID: <PH7PR11MB7004DDE9816D92F690A5C0B692C62@PH7PR11MB7004.namprd11.prod.outlook.com>
+References: <cover.1709635535.git.leon@kernel.org>
+ <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
+ <20240503164239.GB901876@ziepe.ca>
+ <PH7PR11MB70047236290DC1CFF9150B8592C62@PH7PR11MB7004.namprd11.prod.outlook.com>
+ <20240610161826.GA4966@unreal>
+ <PH7PR11MB7004A071F27B4CF45740B87E92C62@PH7PR11MB7004.namprd11.prod.outlook.com>
+ <20240610172501.GJ791043@ziepe.ca>
+In-Reply-To: <20240610172501.GJ791043@ziepe.ca>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB7004:EE_|MW3PR11MB4569:EE_
+x-ms-office365-filtering-correlation-id: 37589a98-37ed-4ea4-5c50-08dc89943694
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|366007|1800799015|7416005|376005|38070700009;
+x-microsoft-antispam-message-info: =?iso-8859-1?Q?eI1q3pcT7kUZJHjJhmmYCldx30UZuwN2ap1MYL260M/76wUwvTFvvgIUrl?=
+ =?iso-8859-1?Q?Ck/dGCdUutjIbPxkNiN7AJcTu9Sjp5xW4sOPG3SLvU4JE570alWaBa9dQG?=
+ =?iso-8859-1?Q?og64/k5Lil7XsES3sDQCjwVx2KCX/Fs0QlYHkqVeizvm6n+9OP6m/5PHyI?=
+ =?iso-8859-1?Q?tZhWeDCLAXL56BbjO8874YhxiGO8AyTB0iZmX0oyQgZDica80XlVESyeyk?=
+ =?iso-8859-1?Q?lS2HYDZ3jJK/S7iQF97OM/+mH5m88uPoMTxV4gvhcxIgrcXoTP2a+w5uFf?=
+ =?iso-8859-1?Q?j6/lOMD0vv6HFSyZ+89v5CfJw2CJTAE1vMOQgL+j1jNSzPDivQxxMl5sb3?=
+ =?iso-8859-1?Q?RgOWDgfmTJnTvWSydRD0sRH7e0H9CcAThIKYw/Ixf5XsoMzw7Nu1O/UtmI?=
+ =?iso-8859-1?Q?yL/IWhM3t+5ymt2+jNWuRA0+hvOnfX0VTbrfSTECu3y5dDtvVhfTbwpOo9?=
+ =?iso-8859-1?Q?YHD+zY8fjJV4YLYvQmbBFpDCkA4SaTFeoazSAYv3OSxjI0Q5mp4NCmpUmn?=
+ =?iso-8859-1?Q?lciBYZ+5RrdJavnsLFgIK2roPdTp7gPOs7IXTj8xj68zHxTCU2ydK0EvJq?=
+ =?iso-8859-1?Q?WKgd4XXm3PqFjOYL6tw9wg9n7oyz7KGKoKjJih5HcoSQlEmS0wsfoKzapL?=
+ =?iso-8859-1?Q?n/QzLaM4oLoAGWJcOXTzyqllDDbDpymBLHbrBt87c4Jc/PXenwFl7g3DwV?=
+ =?iso-8859-1?Q?aqXNOpM6FuDPTvvgbHT9f9fIXN+REnB+qSjKbZteFPYfKqiODmdFMadsA+?=
+ =?iso-8859-1?Q?9SXMTRn5iXPUnl8lSPQaWYgNwQBL7nbaCMQoAbNKUMJL7sjaAHqj6bSco6?=
+ =?iso-8859-1?Q?EbiOhDfZnp7jTWExrkfIHjfwOBCdCJDOmx1kpm5Aod/vDeHNPbN3rACpIA?=
+ =?iso-8859-1?Q?w3OezTU/H1XqBgfi1YbAnliGjwkamTcq79SWvTTMCHWMbNe15BnLz8YLhv?=
+ =?iso-8859-1?Q?muicqQkpODJfUs8Lzkl8d+UDqIygAHVFPAT4xF+iFUiixbJsuF++h0fw8T?=
+ =?iso-8859-1?Q?WdLI8jAnMs6icoQRkPBy1jFr1VMGvqAyF6T80dn9INLWo/ilMMzk6o48uP?=
+ =?iso-8859-1?Q?pALbSc2qvzx1BXer0TEFnXY3+JLb69TAZgmzBIa/PaI/mROnqpDNUATIvO?=
+ =?iso-8859-1?Q?ioW1gyWk/EMGI/Ggwu4tIj8ELJKI5zclPiczn06ovmy7WQC1+iMEdAleYQ?=
+ =?iso-8859-1?Q?tSTbABFXuXWyrq70jXXug14vhjvObQIt/WV+U3fXEOVOGDx0fUDniKN8D6?=
+ =?iso-8859-1?Q?+wn7pFpdmUW1Etq6MfaUnkr1Mtf292dVIRY7mRd46ytYTkfjFwH93b8pEA?=
+ =?iso-8859-1?Q?eXZTO/hAlY2ELaLOdKqbKBAkYjunRXoIgQenyD2SMR/mhfVHFOqWuIOgzM?=
+ =?iso-8859-1?Q?banKjHG+d9pR69qxU9SXvAjXRYzd42QNzec7khZDdVkB98IKsf4kA=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB7004.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(7416005)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?PjcdyxOnSaSGrq+tbgi8+jJ1RCh76Ixo4uQSOUIgXwEcfdhYH60dvSSSCg?=
+ =?iso-8859-1?Q?uAmayoww6Td8Lm5exyoVwK3Ruimaran6JFjYjUn7oKLfusDHLCEwGoBK8s?=
+ =?iso-8859-1?Q?PNRuV/1HgK4icXJF0CrEKu0yWYya73Ys0uOWSdkxSekmRF0t9Ja7XUKoDd?=
+ =?iso-8859-1?Q?d+g/EDvSFLgHnCWhVtt0AWn1LfnA4nW1vSUGbGqXeScuhEYdD+fWyulsp8?=
+ =?iso-8859-1?Q?ETvgIz4cIqpQUk3+yIPSjsiGS9KnWnmtbU7clz6s8ZvSfpLoMARUjFR3lC?=
+ =?iso-8859-1?Q?SBUvA55voMve+iVIxZLj8hNXdPL/sqALb6b+tCq973wUvlKtVG0MMJR6NF?=
+ =?iso-8859-1?Q?4pdrmXirELGkVnFluKfQ6DiDwo6urHzMxnqLaDJSfPGuqZMHGzYKVipLZS?=
+ =?iso-8859-1?Q?nrVgJ+wV4fMXfzJqnpzjRpahWwLV2lVNk3rUnGnu2yvBWbdPe1NwJJTgET?=
+ =?iso-8859-1?Q?lBmEHw2Zfui34kwQ/goQm4AxXDS4vto9g/SJubDAF5sd/o+9vGtERrWJ3Y?=
+ =?iso-8859-1?Q?vM74li+app7/EV5MzeRZakSBqWDv4nXAAoZbSUm4PIONcQ8BowjC7VPXim?=
+ =?iso-8859-1?Q?YB+1svn3+rbS45fWiKRTOq2LHLnukAprFLdBUHPW4J4UBpQVJEsg7i7LL7?=
+ =?iso-8859-1?Q?rJa1YdFNkfpxK9dFNQh0nwpY4GZF+74Ves4LebKXYo8lmXOR4oIvhU4WUh?=
+ =?iso-8859-1?Q?zVk+VZWGgVbIvWhuIHaFaD/f/L41JO5IiEnP+aSstvTUXaEtFqgriHyntP?=
+ =?iso-8859-1?Q?gRGT2EW/2iWQsfWxlbVCld6+O24XTAr0ZGeuHYehzXkbmgGSzCeFJGLlKT?=
+ =?iso-8859-1?Q?LnI4lY+hnYjA02clZmp/zTgYxMY1Fhbj9teM+c7xCq4e9hx0OxLdo0tX/e?=
+ =?iso-8859-1?Q?4GbGJy0lSaRCOdgS9sgXBiawXX+tev5wPpQnGUbpkO/7cwiYQkSzdYgxWx?=
+ =?iso-8859-1?Q?HuwSlxostrJDpMdBY3qowWlinlI2Fo40pM8eJeHnsBTgFSfEmjcap2cbxa?=
+ =?iso-8859-1?Q?e4yEOVrFmebPoBhLL0VkCFySREI5U8gz/IMAhThgwUgY1/GnJz8B9QtrGP?=
+ =?iso-8859-1?Q?d4Vu7DW0q/AGUdhBsB7HBkChBwL0AcTMcWHZCjprWuF8tCoEWjcI+OwbDR?=
+ =?iso-8859-1?Q?3gDGlWgSlOvrdOXnK/J8/jk5fPkTQEyx+1LqygJgjn6e6PWTIdyMGRCMbx?=
+ =?iso-8859-1?Q?oNdDMpjNcQlzciIZmSeLxMe02ofb0wrUwSh00DYrrwc+iC768FlzGS+z/M?=
+ =?iso-8859-1?Q?aMiok0HMjWQHrm4gX8niIjw+G0g+GGqL6PqUycIutzGCa7G9Pdy+Psbox3?=
+ =?iso-8859-1?Q?0w81vALl/0OP4H2MnGqDE8VhVpS/B07r93nzQ5n7ki8ITkANpUimJwwL6Q?=
+ =?iso-8859-1?Q?B7fRkam9NVtLRhZqZ4gsGko2neVZ6Jk03tc1xpCQ0Mk4uE+un8uGZA/ae5?=
+ =?iso-8859-1?Q?w9Uvzn+pxRM2B7uRyzgjCS81WODkbSnnNb8ijGcEmK6oL/TLVi4XWgqsJe?=
+ =?iso-8859-1?Q?NCEPFcrFV6JAjBDKh752M1yAUYW+4uIXpzTdKAcJkZAVPaeeZpZDP4Tkln?=
+ =?iso-8859-1?Q?Nqcx+KGCqwEmjSvP7zQvTZXsfemM3QvsOruR/43e0SXJP8OwTdBYVEJia4?=
+ =?iso-8859-1?Q?I1psmDW/GdYNw=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/10] capability: introduce new capable flag
- CAP_OPT_NOAUDIT_ONDENY
-To: =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>,
- linux-security-module@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Ondrej Mosnacek <omosnace@redhat.com>,
- Casey Schaufler <casey@schaufler-ca.com>,
- Christian Brauner <brauner@kernel.org>,
- Roberto Sassu <roberto.sassu@huawei.com>, Mimi Zohar <zohar@linux.ibm.com>,
- Khadija Kamran <kamrankhadijadj@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, linux-kernel@vger.kernel.org,
- apparmor@lists.ubuntu.com, selinux@vger.kernel.org, bpf@vger.kernel.org
-References: <20240315113828.258005-1-cgzones@googlemail.com>
-Content-Language: en-US
-From: John Johansen <john.johansen@canonical.com>
-Autocrypt: addr=john.johansen@canonical.com; keydata=
- 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 lT9Q
-Organization: Canonical
-In-Reply-To: <20240315113828.258005-1-cgzones@googlemail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB7004.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37589a98-37ed-4ea4-5c50-08dc89943694
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2024 21:28:04.3358
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rQ8N4799OngImkQI47K7erSnlVSMJVBu4avWVxd5FwDOMguigj2T6uY1xo4cGeVG11r09CRETuGb9fisGr0sYg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4569
+X-OriginatorOrg: intel.com
 
-On 3/15/24 04:37, Christian Göttsche wrote:
-> Introduce a new capable flag, CAP_OPT_NOAUDIT_ONDENY, to not generate
-> an audit event if the requested capability is not granted.  This will be
-> used in a new capable_any() functionality to reduce the number of
-> necessary capable calls.
-> 
-> Handle the flag accordingly in AppArmor and SELinux.
-> 
-> CC: linux-block@vger.kernel.org
-> Suggested-by: Paul Moore <paul@paul-moore.com>
-> Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
-Acked-by: John Johansen <john.johansen@canonical.com>
+Hi Jason, Leon,
 
-> ---
-> v5:
->     rename flag to CAP_OPT_NOAUDIT_ONDENY, suggested by Serge:
->       https://lore.kernel.org/all/20230606190013.GA640488@mail.hallyn.com/
-> ---
->   include/linux/security.h       |  2 ++
->   security/apparmor/capability.c |  8 +++++---
->   security/selinux/hooks.c       | 14 ++++++++------
->   3 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/linux/security.h b/include/linux/security.h
-> index 41a8f667bdfa..c60cae78ff8b 100644
-> --- a/include/linux/security.h
-> +++ b/include/linux/security.h
-> @@ -70,6 +70,8 @@ struct lsm_ctx;
->   #define CAP_OPT_NOAUDIT BIT(1)
->   /* If capable is being called by a setid function */
->   #define CAP_OPT_INSETID BIT(2)
-> +/* If capable should audit the security request for authorized requests only */
-> +#define CAP_OPT_NOAUDIT_ONDENY BIT(3)
->   
->   /* LSM Agnostic defines for security_sb_set_mnt_opts() flags */
->   #define SECURITY_LSM_NATIVE_LABELS	1
-> diff --git a/security/apparmor/capability.c b/security/apparmor/capability.c
-> index 9934df16c843..08c9c9a0fc19 100644
-> --- a/security/apparmor/capability.c
-> +++ b/security/apparmor/capability.c
-> @@ -108,7 +108,8 @@ static int audit_caps(struct apparmor_audit_data *ad, struct aa_profile *profile
->    * profile_capable - test if profile allows use of capability @cap
->    * @profile: profile being enforced    (NOT NULL, NOT unconfined)
->    * @cap: capability to test if allowed
-> - * @opts: CAP_OPT_NOAUDIT bit determines whether audit record is generated
-> + * @opts: CAP_OPT_NOAUDIT/CAP_OPT_NOAUDIT_ONDENY bit determines whether audit
-> + *	record is generated
->    * @ad: audit data (MAY BE NULL indicating no auditing)
->    *
->    * Returns: 0 if allowed else -EPERM
-> @@ -126,7 +127,7 @@ static int profile_capable(struct aa_profile *profile, int cap,
->   	else
->   		error = -EPERM;
->   
-> -	if (opts & CAP_OPT_NOAUDIT) {
-> +	if ((opts & CAP_OPT_NOAUDIT) || ((opts & CAP_OPT_NOAUDIT_ONDENY) && error)) {
->   		if (!COMPLAIN_MODE(profile))
->   			return error;
->   		/* audit the cap request in complain mode but note that it
-> @@ -143,7 +144,8 @@ static int profile_capable(struct aa_profile *profile, int cap,
->    * @subj_cred: cred we are testing capability against
->    * @label: label being tested for capability (NOT NULL)
->    * @cap: capability to be tested
-> - * @opts: CAP_OPT_NOAUDIT bit determines whether audit record is generated
-> + * @opts: CAP_OPT_NOAUDIT/CAP_OPT_NOAUDIT_ONDENY bit determines whether audit
-> + *	record is generated
->    *
->    * Look up capability in profile capability set.
->    *
-> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-> index 3448454c82d0..1a2c7c1a89be 100644
-> --- a/security/selinux/hooks.c
-> +++ b/security/selinux/hooks.c
-> @@ -1624,7 +1624,7 @@ static int cred_has_capability(const struct cred *cred,
->   	u16 sclass;
->   	u32 sid = cred_sid(cred);
->   	u32 av = CAP_TO_MASK(cap);
-> -	int rc;
-> +	int rc, rc2;
->   
->   	ad.type = LSM_AUDIT_DATA_CAP;
->   	ad.u.cap = cap;
-> @@ -1643,11 +1643,13 @@ static int cred_has_capability(const struct cred *cred,
->   	}
->   
->   	rc = avc_has_perm_noaudit(sid, sid, sclass, av, 0, &avd);
-> -	if (!(opts & CAP_OPT_NOAUDIT)) {
-> -		int rc2 = avc_audit(sid, sid, sclass, av, &avd, rc, &ad);
-> -		if (rc2)
-> -			return rc2;
-> -	}
-> +	if ((opts & CAP_OPT_NOAUDIT) || ((opts & CAP_OPT_NOAUDIT_ONDENY) && rc))
-> +		return rc;
-> +
-> +	rc2 = avc_audit(sid, sid, sclass, av, &avd, rc, &ad);
-> +	if (rc2)
-> +		return rc2;
-> +
->   	return rc;
->   }
->   
+I was able to fix the issue from my side. Things work fine now. I got two q=
+uestions though:
 
+1) The value returned from dma_link_range function is not contiguous, see b=
+elow print. The "linked pa" is the function return.
+I think dma_map_sgtable API would return some contiguous dma address. Is th=
+e dma-map_sgtable api is more efficient regarding the iommu page table? i.e=
+., try to use bigger page size, such as use 2M page size when it is possibl=
+e. With your new API, does it also have such consideration? I vaguely remem=
+bered Jason mentioned such thing, but my print below doesn't look like so. =
+Maybe I need to test bigger range (only 16 pages range in the test of below=
+ printing). Comment?
+
+[17584.665126] drm_svm_hmmptr_map_dma_pages iova.dma_addr =3D 0x0, linked p=
+a =3D 18ef3f000
+[17584.665146] drm_svm_hmmptr_map_dma_pages iova.dma_addr =3D 0x0, linked p=
+a =3D 190d00000
+[17584.665150] drm_svm_hmmptr_map_dma_pages iova.dma_addr =3D 0x0, linked p=
+a =3D 190024000
+[17584.665153] drm_svm_hmmptr_map_dma_pages iova.dma_addr =3D 0x0, linked p=
+a =3D 178e89000
+
+2) in the comment of dma_link_range function, it is said: " @dma_offset nee=
+ds to be advanced by the caller with the size of previous page that was lin=
+ked + DMA address returned for the previous page".
+Is this description correct? I don't understand the part "+ DMA address ret=
+urned for the previous page ".
+In my codes, let's say I call this function to link 10 pages, the first dma=
+_offset is 0, second is 4k, third 8k. This worked for me. I didn't add the =
+previously returned dma address.
+Maybe I need more test. But any comment?
+
+Thanks,
+Oak
+
+> -----Original Message-----
+> From: Jason Gunthorpe <jgg@ziepe.ca>
+> Sent: Monday, June 10, 2024 1:25 PM
+> To: Zeng, Oak <oak.zeng@intel.com>
+> Cc: Leon Romanovsky <leon@kernel.org>; Christoph Hellwig <hch@lst.de>;
+> Robin Murphy <robin.murphy@arm.com>; Marek Szyprowski
+> <m.szyprowski@samsung.com>; Joerg Roedel <joro@8bytes.org>; Will
+> Deacon <will@kernel.org>; Chaitanya Kulkarni <chaitanyak@nvidia.com>;
+> Brost, Matthew <matthew.brost@intel.com>; Hellstrom, Thomas
+> <thomas.hellstrom@intel.com>; Jonathan Corbet <corbet@lwn.net>; Jens
+> Axboe <axboe@kernel.dk>; Keith Busch <kbusch@kernel.org>; Sagi
+> Grimberg <sagi@grimberg.me>; Yishai Hadas <yishaih@nvidia.com>;
+> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>; Tian, Kevin
+> <kevin.tian@intel.com>; Alex Williamson <alex.williamson@redhat.com>;
+> J=E9r=F4me Glisse <jglisse@redhat.com>; Andrew Morton <akpm@linux-
+> foundation.org>; linux-doc@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-block@vger.kernel.org; linux-rdma@vger.kernel.org;
+> iommu@lists.linux.dev; linux-nvme@lists.infradead.org;
+> kvm@vger.kernel.org; linux-mm@kvack.org; Bart Van Assche
+> <bvanassche@acm.org>; Damien Le Moal
+> <damien.lemoal@opensource.wdc.com>; Amir Goldstein
+> <amir73il@gmail.com>; josef@toxicpanda.com; Martin K. Petersen
+> <martin.petersen@oracle.com>; daniel@iogearbox.net; Williams, Dan J
+> <dan.j.williams@intel.com>; jack@suse.com; Zhu Yanjun
+> <zyjzyj2000@gmail.com>; Bommu, Krishnaiah
+> <krishnaiah.bommu@intel.com>; Ghimiray, Himal Prasad
+> <himal.prasad.ghimiray@intel.com>
+> Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to
+> two steps
+>=20
+> On Mon, Jun 10, 2024 at 04:40:19PM +0000, Zeng, Oak wrote:
+> > Thanks Leon and Yanjun for the reply!
+> >
+> > Based on the reply, we will continue use the current version for
+> > test (as it is tested for vfio and rdma). We will switch to v1 once
+> > it is fully tested/reviewed.
+>=20
+> I'm glad you are finding it useful, one of my interests with this work
+> is to improve all the HMM users.
+>=20
+> Jason
