@@ -1,263 +1,106 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC38613FD84
-	for <linux-block@vger.kernel.org>; Mon, 10 Jun 2024 15:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4993982871;
+	Mon, 10 Jun 2024 15:24:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718032767; cv=none; b=QYeaVNr2+4QVfbj6MsoOcDloArQs01Z7TqqulNvozOuYNfbDSON7kJTbTeEubnmw2DuzQ4aQhuD5MQ9S1G0PR0mQ5z7xx+SctjmjBD8r2X5v1Os2+NQ3nqpKdX0RSl7z9t6OiHsCwj7pxVfV30MMrlWDeHJEE8VjPv8k8Y8sEMM=
+	t=1718033074; cv=none; b=pds4yPT+8FiHBIRpHD39MzqLx12vAZ5/2AiiJbxbZjiM/1rqhDzEr+O1wYe2f+nyvvrz6XDZdPPUJDfmkoIqyI4+D/FZVWhJ2TtC+OTjzLpaSRD9j9n4WjSRnXrZ7LZhT/MJSLfVG/rcrBJzR+lVcyb8MjAlZGtuN2tUgzO7zV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718032767; c=relaxed/simple;
-	bh=+urT2uxejbnWTGWDhjERLm4pJwmoHG+HNqLAz7qV5P4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mG9ZP3CX451MD2l90YM80KoUcxC6VJ020Th7KxBGJAQrvQi84x1q84gMYWlg+sK440uoSJpVDPEkWHGQB+dXO6k3tctwlcuIyQ8OMhod6FRUcipf7tWZKnl1AFgA5SyBBDtqKVKSVmH0jpwEdrWYhLbRfamheQlxS9Lj1mY59gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sw2F+lfM; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1718033074; c=relaxed/simple;
+	bh=c+9tcVpryK4i0tWGtMFCJFNSadZ6QzJfj6WWubKCwGM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KRP89lpXYeU1kzxSglqXNrN3wmAjKzbZsy/ksu+yRUYjmppXB76VZ7Jlnyj+vqpN85PVDmn9493G03ZJ8RFhpH3dufQgQMRuMjuEHdj0jFx9dt2fPfBjKQhbH1DWIbyzHjllKPdKkYu3zxHDCCmLSNhRUV80JmnZqKpLuKhBEsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/nWUu4h; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sw2F+lfM"
-X-Envelope-To: oak.zeng@intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718032762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KKiu4qnDEEkxgkcxXe30X1MKX2KLMdPF1td6NPZnAM8=;
-	b=sw2F+lfMZ3l8HawNA7kIWr3pK0lq7HnmPavMpWgUr7rU+1zbON9Ti/U85ptK/5XBbcEv87
-	2BodlutKmiORSPlAcNIHof0xq71ZHIZgGYywZy2ISSYXzwGQnEez1TFWDIydAKJWuRKGOx
-	OIYVeRO8ue/E5ZniP4Jy+Ay+5ChRqPo=
-X-Envelope-To: jgg@ziepe.ca
-X-Envelope-To: leon@kernel.org
-X-Envelope-To: hch@lst.de
-X-Envelope-To: robin.murphy@arm.com
-X-Envelope-To: m.szyprowski@samsung.com
-X-Envelope-To: joro@8bytes.org
-X-Envelope-To: will@kernel.org
-X-Envelope-To: chaitanyak@nvidia.com
-X-Envelope-To: matthew.brost@intel.com
-X-Envelope-To: thomas.hellstrom@intel.com
-X-Envelope-To: corbet@lwn.net
-X-Envelope-To: axboe@kernel.dk
-X-Envelope-To: kbusch@kernel.org
-X-Envelope-To: sagi@grimberg.me
-X-Envelope-To: yishaih@nvidia.com
-X-Envelope-To: shameerali.kolothum.thodi@huawei.com
-X-Envelope-To: kevin.tian@intel.com
-X-Envelope-To: alex.williamson@redhat.com
-X-Envelope-To: jglisse@redhat.com
-X-Envelope-To: akpm@linux-foundation.org
-X-Envelope-To: linux-doc@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: linux-block@vger.kernel.org
-X-Envelope-To: linux-rdma@vger.kernel.org
-X-Envelope-To: iommu@lists.linux.dev
-X-Envelope-To: linux-nvme@lists.infradead.org
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: linux-mm@kvack.org
-X-Envelope-To: bvanassche@acm.org
-X-Envelope-To: damien.lemoal@opensource.wdc.com
-X-Envelope-To: amir73il@gmail.com
-X-Envelope-To: josef@toxicpanda.com
-X-Envelope-To: martin.petersen@oracle.com
-X-Envelope-To: daniel@iogearbox.net
-X-Envelope-To: dan.j.williams@intel.com
-X-Envelope-To: jack@suse.com
-X-Envelope-To: leonro@nvidia.com
-X-Envelope-To: krishnaiah.bommu@intel.com
-X-Envelope-To: himal.prasad.ghimiray@intel.com
-Message-ID: <e04c1b4a-2677-4db5-bcd0-15e5a3616fa3@linux.dev>
-Date: Mon, 10 Jun 2024 17:19:16 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/nWUu4h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 594F5C2BBFC;
+	Mon, 10 Jun 2024 15:24:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718033073;
+	bh=c+9tcVpryK4i0tWGtMFCJFNSadZ6QzJfj6WWubKCwGM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G/nWUu4hZHsmtMj7BwbWmxTDIpaGKacW5pGjV1FwnnGC4DMq6Eynz6PmWgVLlU/Ka
+	 pP/srzoz+rurgOkuM9Ou4J75djzS11vJTZ3Ols3pXmPsfY2NsyO2rJFWkYAfItQQJ7
+	 fjKi1WGNJN99lia7LYw+vzMCKf7ASqcOAyG3PUQPpPyE8hugC5dU/jnln+W0drTqRv
+	 fjL8Xin3RePaFeXq6isQtQam/I3E62Mhlzcxo0lq09qAVcrWb97CrZStbwKla5gFxz
+	 Xv7l88tQVS36GhF2hQjqLmGURkQU/U8XUtATAzoUiLbzIEm/lLnLgz4yg4cZzxXmEE
+	 ktMuIkZ6OX69w==
+Date: Mon, 10 Jun 2024 09:24:31 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, sachinp@linux.vnet.com
+Subject: Re: Kernel OOPS while creating a NVMe Namespace
+Message-ID: <Zmcar50yXDJW9_Ho@kbusch-mbp.dhcp.thefacebook.com>
+References: <2312e6c3-a069-4388-a863-df7e261b9d70@linux.vnet.ibm.com>
+ <2285ff6e-533f-41dc-90d0-e8ca538da152@grimberg.me>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-To: "Zeng, Oak" <oak.zeng@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "leon@kernel.org" <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Robin Murphy <robin.murphy@arm.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- "Brost, Matthew" <matthew.brost@intel.com>,
- "Hellstrom, Thomas" <thomas.hellstrom@intel.com>,
- Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- "Tian, Kevin" <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- Bart Van Assche <bvanassche@acm.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Amir Goldstein <amir73il@gmail.com>,
- "josef@toxicpanda.com" <josef@toxicpanda.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "Williams, Dan J" <dan.j.williams@intel.com>, "jack@suse.com"
- <jack@suse.com>, Leon Romanovsky <leonro@nvidia.com>,
- "Bommu, Krishnaiah" <krishnaiah.bommu@intel.com>,
- "Ghimiray, Himal Prasad" <himal.prasad.ghimiray@intel.com>
-References: <cover.1709635535.git.leon@kernel.org>
- <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
- <20240503164239.GB901876@ziepe.ca>
- <PH7PR11MB70047236290DC1CFF9150B8592C62@PH7PR11MB7004.namprd11.prod.outlook.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <PH7PR11MB70047236290DC1CFF9150B8592C62@PH7PR11MB7004.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <2285ff6e-533f-41dc-90d0-e8ca538da152@grimberg.me>
 
+On Mon, Jun 10, 2024 at 12:57:02PM +0300, Sagi Grimberg wrote:
+> On 10/06/2024 10:51, Venkat Rao Bagalkote wrote:
+> > 
+> > [† 140.209777] BUG: Unable to handle kernel data access at 0x18d7003065646fee
+> > [† 140.209792] Faulting instruction address: 0xc00000000023b45c
+> > [† 140.209798] Oops: Kernel access of bad area, sig: 11 [#1]
+> > [† 140.209802] LE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=8192 NUMA pSeries
+> > [† 140.209864] CPU: 2 PID: 129 Comm: kworker/u65:3 Kdump: loaded Not tainted 6.10.0-rc3 #2
+> > [† 140.209870] Hardware name: IBM,9009-42A POWER9 (raw) 0x4e0202 0xf000005 of:IBM,FW950.A0 (VL950_141) hv:phyp pSeries
+> > [† 140.209876] Workqueue: nvme-wq nvme_scan_work [nvme_core]
+> > [† 140.209889] NIP:† c00000000023b45c LR: c008000006a96b20 CTR: c00000000023b42c
+> > [† 140.209894] REGS: c0000000506078a0 TRAP: 0380†† Not tainted (6.10.0-rc3)
+> > [† 140.209899] MSR:† 800000000280b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>† CR: 24000244† XER: 00000000
+> > [† 140.209975] NIP [c00000000023b45c] synchronize_srcu+0x30/0x1c0
+> > [† 140.209984] LR [c008000006a96b20] nvme_ns_remove+0x80/0x2d8 [nvme_core]
+> > [† 140.209994] Call Trace:
+> > [† 140.209997] [c000000050607b90] [c008000006a96b20] nvme_ns_remove+0x80/0x2d8 [nvme_core]
+> > [† 140.210008] [c000000050607bd0] [c008000006a972b4] nvme_remove_invalid_namespaces+0x144/0x1ac [nvme_core]
+> > [† 140.210020] [c000000050607c60] [c008000006a9dbd4] nvme_scan_ns_list+0x19c/0x370 [nvme_core]
+> > [† 140.210032] [c000000050607d70] [c008000006a9dfc8] nvme_scan_work+0xc8/0x278 [nvme_core]
+> > [† 140.210043] [c000000050607e40] [c00000000019414c] process_one_work+0x20c/0x4f4
+> > [† 140.210051] [c000000050607ef0] [c0000000001950cc] worker_thread+0x378/0x544
+> > [† 140.210058] [c000000050607f90] [c0000000001a164c] kthread+0x138/0x140
+> > [† 140.210065] [c000000050607fe0] [c00000000000df98] start_kernel_thread+0x14/0x18
+> > [† 140.210072] Code: 3c4c0134 384282d4 7c0802a6 60000000 7c0802a6 fbc1fff0 fba1ffe8 fbe1fff8 7c7e1b78 f8010010 f821ffb1 e9230010 e9290080> 7c2004ac 71290003 41820008
+> > [† 140.210093] ---[ end trace 0000000000000000 ]---
+> > 
+> > Issue is introduced by the patch:
+> > be647e2c76b27f409cdd520f66c95be888b553a3.
+> 
+> Exactly this was the concern when introducing a behavior change in a
+> sensitive area of the code
+> to silence lockdep...
 
-On 10.06.24 17:12, Zeng, Oak wrote:
-> Hi Jason, Leon,
->
-> I come back to this thread to ask a question. Per the discussion in another thread, I have integrated the new dma-mapping API (the first 6 patches of this series) to DRM subsystem. The new API seems fit pretty good to our purpose, better than scatter-gather dma-mapping. So we want to continue work with you to adopt this new API.
->
-> Did you test the new API in RDMA subsystem? Or this RFC series was just some untested codes sending out to get people's design feedback? Do you have refined version for us to try? I ask because we are seeing some issues but not sure whether it is caused by the new API. We are debugging but it would be good to also ask at the same time.
+No risk, no reward. :)
 
-Hi, Zeng
+If we really can't figure this out, we can always revert and revisit for
+the next merge.
 
-I have tested this patch series. And a patch about NVMe will cause some 
-call trace. But if you revert this patch about NVMe, the whole patches 
-can work well. You can develop your patches based on this patch series.
+> I'm assuming that the bad dereference is:
+> ††† ††† synchronize_srcu(&ns->ctrl->srcu);
 
-It seems that "some agreements can not be reached" about NVMe. So NVMe 
-patch can not work well. I do not delve into this NVMe patch.
+That would have to be it based on the report. Not sure what the problem
+could be, though, the ns->ctrl must have been valid or we would have
+failed earlier, and the srcu struct can't be released while the
+controller is still in use by any namespace.
 
-Zhu Yanjun
+Anyway, I tested this path quite a bit, but I'll revisit with dynamic
+attachments instead and see if that helps.
 
->
-> Cc Himal/Krishna who are also working/testing the new API.
->
-> Thanks,
-> Oak
->
->> -----Original Message-----
->> From: Jason Gunthorpe <jgg@ziepe.ca>
->> Sent: Friday, May 3, 2024 12:43 PM
->> To: Zeng, Oak <oak.zeng@intel.com>
->> Cc: leon@kernel.org; Christoph Hellwig <hch@lst.de>; Robin Murphy
->> <robin.murphy@arm.com>; Marek Szyprowski
->> <m.szyprowski@samsung.com>; Joerg Roedel <joro@8bytes.org>; Will
->> Deacon <will@kernel.org>; Chaitanya Kulkarni <chaitanyak@nvidia.com>;
->> Brost, Matthew <matthew.brost@intel.com>; Hellstrom, Thomas
->> <thomas.hellstrom@intel.com>; Jonathan Corbet <corbet@lwn.net>; Jens
->> Axboe <axboe@kernel.dk>; Keith Busch <kbusch@kernel.org>; Sagi
->> Grimberg <sagi@grimberg.me>; Yishai Hadas <yishaih@nvidia.com>;
->> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>; Tian, Kevin
->> <kevin.tian@intel.com>; Alex Williamson <alex.williamson@redhat.com>;
->> J√©r√¥me Glisse <jglisse@redhat.com>; Andrew Morton <akpm@linux-
->> foundation.org>; linux-doc@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linux-block@vger.kernel.org; linux-rdma@vger.kernel.org;
->> iommu@lists.linux.dev; linux-nvme@lists.infradead.org;
->> kvm@vger.kernel.org; linux-mm@kvack.org; Bart Van Assche
->> <bvanassche@acm.org>; Damien Le Moal
->> <damien.lemoal@opensource.wdc.com>; Amir Goldstein
->> <amir73il@gmail.com>; josef@toxicpanda.com; Martin K. Petersen
->> <martin.petersen@oracle.com>; daniel@iogearbox.net; Williams, Dan J
->> <dan.j.williams@intel.com>; jack@suse.com; Leon Romanovsky
->> <leonro@nvidia.com>; Zhu Yanjun <zyjzyj2000@gmail.com>
->> Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to
->> two steps
->>
->> On Thu, May 02, 2024 at 11:32:55PM +0000, Zeng, Oak wrote:
->>
->>>> Instead of teaching DMA to know these specific datatypes, let's separate
->>>> existing DMA mapping routine to two steps and give an option to
->> advanced
->>>> callers (subsystems) perform all calculations internally in advance and
->>>> map pages later when it is needed.
->>> I looked into how this scheme can be applied to DRM subsystem and GPU
->> drivers.
->>> I figured RDMA can apply this scheme because RDMA can calculate the
->>> iova size. Per my limited knowledge of rdma, user can register a
->>> memory region (the reg_user_mr vfunc) and memory region's sized is
->>> used to pre-allocate iova space. And in the RDMA use case, it seems
->>> the user registered region can be very big, e.g., 512MiB or even GiB
->> In RDMA the iova would be linked to the SVA granual we discussed
->> previously.
->>
->>> In GPU driver, we have a few use cases where we need dma-mapping. Just
->> name two:
->>> 1) userptr: it is user malloc'ed/mmap'ed memory and registers to gpu
->>> (in Intel's driver it is through a vm_bind api, similar to mmap). A
->>> userptr can be of any random size, depending on user malloc
->>> size. Today we use dma-map-sg for this use case. The down side of
->>> our approach is, during userptr invalidation, even if user only
->>> munmap partially of an userptr, we invalidate the whole userptr from
->>> gpu page table, because there is no way for us to partially
->>> dma-unmap the whole sg list. I think we can try your new API in this
->>> case. The main benefit of the new approach is the partial munmap
->>> case.
->> Yes, this is one of the main things it will improve.
->>
->>> We will have to pre-allocate iova for each userptr, and we have many
->>> userptrs of random size... So we might be not as efficient as RDMA
->>> case where I assume user register a few big memory regions.
->> You are already doing this. dma_map_sg() does exactly the same IOVA
->> allocation under the covers.
->>
->>> 2) system allocator: it is malloc'ed/mmap'ed memory be used for GPU
->>> program directly, without any other extra driver API call. We call
->>> this use case system allocator.
->>> For system allocator, driver have no knowledge of which virtual
->>> address range is valid in advance. So when GPU access a
->>> malloc'ed/mmap'ed address, we have a page fault. We then look up a
->>> CPU vma which contains the fault address. I guess we can use the CPU
->>> vma size to allocate the iova space of the same size?
->> No. You'd follow what we discussed in the other thread.
->>
->> If you do a full SVA then you'd split your MM space into granuals and
->> when a fault hits a granual you'd allocate the IOVA for the whole
->> granual. RDMA ODP is using a 512M granual currently.
->>
->> If you are doing sub ranges then you'd probably allocate the IOVA for
->> the well defined sub range (assuming the typical use case isn't huge)
->>
->>> But there will be a true difficulty to apply your scheme to this use
->>> case. It is related to the STICKY flag. As I understand it, the
->>> sticky flag is designed for driver to mark "this page/pfn has been
->>> populated, no need to re-populate again", roughly...Unlike userptr
->>> and RDMA use cases where the backing store of a buffer is always in
->>> system memory, in the system allocator use case, the backing store
->>> can be changing b/t system memory and GPU's device private
->>> memory. Even worse, we have to assume the data migration b/t system
->>> and GPU is dynamic. When data is migrated to GPU, we don't need
->>> dma-map. And when migration happens to a pfn with STICKY flag, we
->>> still need to repopulate this pfn. So you can see, it is not easy to
->>> apply this scheme to this use case. At least I can't see an obvious
->>> way.
->> You are already doing this today, you are keeping the sg list around
->> until you unmap it.
->>
->> Instead of keeping the sg list you'd keep a much smaller datastructure
->> per-granual. The sticky bit is simply a convient way for ODP to manage
->> the smaller data structure, you don't have to use it.
->>
->> But you do need to keep track of what pages in the granual have been
->> DMA mapped - sg list was doing this before. This could be a simple
->> bitmap array matching the granual size.
->>
->> Looking (far) forward we may be able to have a "replace" API that
->> allows installing a new page unconditionally regardless of what is
->> already there.
->>
->> Jason
+> btw, looking at the code again, I'm assuming that synchronizing srcu in
+> every ns remove
+> slows down batch removal of many namespaces greatly...
 
--- 
-Best Regards,
-Yanjun.Zhu
-
+I may need to test this out, but I thought srcu sync was pretty quick if
+there were no active readers, which there shouldn't be here outside
+unusual cases.
