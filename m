@@ -1,173 +1,613 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820886FA8
-	for <linux-block@vger.kernel.org>; Mon, 10 Jun 2024 02:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717987874; cv=fail; b=e22g1qAPLu/ksvl178fWo+UkRlQvVB0d+7xVJ8jvuUc4Y7mO/5esFRywH47oj2gSpKR0M36aR5QND0Odch6h/TCsn/YswObBlAy9ndErmWDJJBQQmNTVMcCq406vzWGGmJja4f2EusBkhgPWIqbfQPHSYkDmvCBn99QGV7S2baA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717987874; c=relaxed/simple;
-	bh=nu+hsnEdDPQgatEJJM2sDu0FhAjdhiq5nd7wYSBBFEY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=c+lRgI7zPeOHKn7NGESyQJs2qwUXpWz5RPcEdbyflYiw0p2d5iik5pwCBjIE6erlTfjbkuJgyKWxh/8k9lRTI1cvyFzYGiunSJvsKv7eDc2e8PK5FwpzmVP5fLsXGcK/8WG6iiuZhYmz2eIXt03415GaataUGQZhDF8WS6jJ+p8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=p11lYQZ4; arc=fail smtp.client-ip=40.107.94.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2CA7EF;
+	Mon, 10 Jun 2024 02:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717988035; cv=none; b=CfrdvCFaX9KE+efVh/RACT3rN0b6Uz6rSYBTOCA2+cPuYXweCzx4a+l5Uz5hLvWpvx5xcYWa/uraRhsnQnsPEjfk4/ENxmzpiqD3JShiP88Wg+L5drEl26UtrG6OikDSS9ld3vNeo44yu9nlDYPkMWl9XH7swwWWgklRqd3Pztw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717988035; c=relaxed/simple;
+	bh=w2RYlSugWxxWfqoRkDltOAXIcAe2KyaqA4R4RJZPo5Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YBurm7ze4JaQ1rFIazz3jyaWKbjBRSMTMDUkq2NATVj+ScmgTu1UNLHAGr/DOF60pZofegEU4D9StUQuspKfebFjOPX9LEuYdi+XQEbmuk2mpM7CDZAEomAAIkg5f4nOxYzNmfEmn5+OEViErkApmMbAPiG2AeuyNR9h8DlB3QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i/PRYFny; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="p11lYQZ4"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yi8XKKzxDw/H0RumDLhKzo2twYupKYMm2yq3DS1W07xwdjRY4h1hQgVVdToew3tBq7cAasfcP7hRvHn0Rfbu+GUHITHU+DpX9Fp4KKkrLmik0CjnVIj6KZXQJLgV1AEJh6TO6sEAhYhoyh3LlnGfTr9Dy/hGVDq3MOD3IPI5oe/vUwr+zQszE3XKQJ5EShljdqw49IQ5mGH+FGU031U89WorbbcYQ4JFbwULaLbE0RlSdLnb5TxU5ar6C/RnvjDlHeJyjyaxv3X5qvuupwCFcIw1HxQp0rfcxEI6Mh9Qs6mGuNupCP/rcFXYzYGMbIwDDA2QmDvhfmlGXUVT+erLMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nu+hsnEdDPQgatEJJM2sDu0FhAjdhiq5nd7wYSBBFEY=;
- b=U8ey0CPpPwijSCBDMd/Ew1oOecuTxWhMKfBBj+y7Eczl6OC4t0dqcGmN5zdn55lfVgKKsevMZubz/8F29ftcBHebdRN66L0atMJcATme7BgM157+/iUHN8gwTnaZ1AP0RXs45Km/fchgDFaMOuWCJnZ0KhWyPXxjj0NQQrbSv2zxdXPdVPBfhb8WlPBquaU/wdAqJFBzvnzsi6ROYPKvXqOWsh39MisI2c+YaUjGzpR/QdrJIKR+8ShFRzO2eWHPCDjIyZTLH1nAVgtoyZkkxJCM5x9A7+9ZJQk1iWIRFgQj2DCfery+pj+d+fygzf6Ov+AlcbRYS0ao7IunRXWCmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nu+hsnEdDPQgatEJJM2sDu0FhAjdhiq5nd7wYSBBFEY=;
- b=p11lYQZ406g/oq3QqVYDbD2Ely/IC7GVPuIVE+DbCqTn5g0+iYDY93CPMDEHl5eO6ueH+/HnWRwcaURPE+PUGcSp1O8I6lEEfS3MM+bVIrpqfQQB1cLw1R+EwNt2dzAtvGshRqwCq1nUZ9GpyUrOcJNB2V3qDaZ5mLu46pw6+qW+pVtzuLt3HKxsSHUPcVaKwFi0cqJ6iLIKNeHKZiPE9UQn/77s3DqvKWJCFAs//rB18asW+cR42Hr0py9BgEuPNkQOOkFwIS3qRgez2vGeL5I73CCiwLo7/43wB0nNyWs9Ne3YqBxJZjMlgrI5zZV6RH3nbpwb9WCpdq+pW8zm+g==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by DM4PR12MB7765.namprd12.prod.outlook.com (2603:10b6:8:113::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Mon, 10 Jun
- 2024 02:51:10 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.7633.036; Mon, 10 Jun 2024
- 02:51:10 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Christoph Hellwig <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: initialize integrity buffer to zero before writing
- it to media
-Thread-Topic: [PATCH] block: initialize integrity buffer to zero before
- writing it to media
-Thread-Index: AQHat9JTq4/7opgqV0Km9rXwHHHCpbHAUnQA
-Date: Mon, 10 Jun 2024 02:51:10 +0000
-Message-ID: <fa90aaf0-4a63-45c6-aae3-9e709e6df0c3@nvidia.com>
-References: <20240606052754.3462514-1-hch@lst.de>
-In-Reply-To: <20240606052754.3462514-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|DM4PR12MB7765:EE_
-x-ms-office365-filtering-correlation-id: 1c6672e2-8714-4e1e-e78a-08dc88f82f1c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|366007|38070700009;
-x-microsoft-antispam-message-info:
- =?utf-8?B?MUhSb25UcE55T3FRbkZJZmduMjFJQWlUbTRHb240cjNSaVZTMEtSS3FjUkJS?=
- =?utf-8?B?SGJPem1SNEFtSTI4SHpkeTdCZmx5U0liTG8yb2ZGa3ZLaDgvVWU3Um9VM1Rr?=
- =?utf-8?B?dDBkVnpmOW9ZYXk5RnRFcEIxMzZCNTFQS1ZUMW16MVo2RHphaW15QktKdVV0?=
- =?utf-8?B?TzZVWnpPRDFyeVhSRyt5WGhLdUtYOTczWStxMXRHWnJlY0V6OGx3NVVkOWFz?=
- =?utf-8?B?VkpqWWZBSTlkR29PUWZBSXhUK3ZkdkhFQmpFeWNUZkpOM3ZxeXpkYzExT010?=
- =?utf-8?B?NmZ6MEt5VkZEaVZWQm9xcjZtdmpQeklFMy80NGl6VUEweGpmRTdoTm1PSmNx?=
- =?utf-8?B?OERobHovdVlldGhiRGhEVmVNQ1JPZGhmVkRyS0NUNnltWnhVaFpneEU1TEtR?=
- =?utf-8?B?Znp5OTRNNTc3bmp3cmR2bnNpSnpueDRMZ29VWGxpREhnWElmd01VS1htSURi?=
- =?utf-8?B?SVRrb1lwcWt4MDljU1N2ekpqVy9yempTM1dNczgrdFdiUlF2U3ZWVnp0aFl3?=
- =?utf-8?B?SnZVUTY0TUtia2JpK1ZCUFE3cVZGL1VYaFc0TTNlZDlXU1gwQ1dxS25VKzVL?=
- =?utf-8?B?OUsrTWpQMlM2Z1NMaTBqcHd5UWFGcERBdmQyQmlwOEdxc3FYb3VwcytZdnhr?=
- =?utf-8?B?ckgzdDlmR212ekFGQmZ5Mnd2dHZrRUVLL3VhdmpPbHVGVUU3NlE1eVE2NDlU?=
- =?utf-8?B?dS9ROW5wK1p6ZW1hQjI2bFRLd2xScTAyaE95LzRjNHVRb3Q5di9HU2hrMG9a?=
- =?utf-8?B?cEQ1WEtCNnAvdUJkT2UwSnIyTlo0WU1BU29pZ1RYYUJOOFltM1JNSzA2aFZX?=
- =?utf-8?B?UEhFTGNFWG1WMHI4WjVuWXY1NWQ3eSs5dmtQc2VXWVVvSFpQY2JDeSthb2My?=
- =?utf-8?B?WjM4QXhuNUNZdENmQkRYeWpaV2RodWZzdkY2YTVHZVNWNWVxeENvdk10b3pu?=
- =?utf-8?B?UkpncGhJeHpVY3g0aDQyTjhFbm82a2pTeHh0TEd2QnZvUkgwWDV6YnBGMytB?=
- =?utf-8?B?OXpBZE1PQzJ4Uy9wR0c3aUh3L3NwVCtlVjlOeEEyeCtHQzdJcjU3bEYyeDBK?=
- =?utf-8?B?Mk10RmR4ZFlDMjcvdnNLbVYrdWs5MVlrT1J2c2RLK0MzM09adUUrV1dreEgw?=
- =?utf-8?B?Q2dUeVhiVHFGaDdtZkFmdXArUUN1Uk4zODdxM3oyaW1TNktUQWVpaVpEeWtr?=
- =?utf-8?B?emhYY0Q4M0NmcmdyejNicW1xbVVhcERZZWgyRjRTU3VHMVE5ZUF4TWl2UlN5?=
- =?utf-8?B?Y1RCdk9sQmxyRXVEWTBOWWk4emxjejVVOVI5NjAwVk94OVZHTDlpMmpTTmVv?=
- =?utf-8?B?L3U0R1lNa0MxRzc4YTdFaStad3V5YUJ5eUcxLzRHdWhvUmZOYVg5d3YxaGQ1?=
- =?utf-8?B?dFVkYjJJd0Zya2dib0NvSnRrdWY2VDlpbXh1WnZLcDgvU2haMjlvTDIvQjB3?=
- =?utf-8?B?T0dyOVl0M0xxUjFQcTN1UXZ5aEV3MXozSVhZOVRicDFLYkVybUFVVGF0Q0J3?=
- =?utf-8?B?YzFoYnZsL2lLeDNKYXNBOFNKY21vd1hnck1RazUxenZMUTFLT1V5QXFMMnhx?=
- =?utf-8?B?U2ZoNjlBQkllaEZWVC8ydWFINkNvVHc4M0ttRFhpdmNrMWNUYW00bWkvSnRr?=
- =?utf-8?B?SW9NRzFXNmFVazdpbXgyVC9hSjNLOVN2T2M3SzR5eXE4K3J4eGJyRklJb2Qv?=
- =?utf-8?B?S3hWVWVxc0FMWGU0cU1LdHNlRnh4NFd1R3d2czlvSktIeE8wN1c3elhBWmFx?=
- =?utf-8?B?Q2xiLy9ZUU4xT1JHVGI4L0Q5bk00RWVkcWZ6YmVCajdUZVdmRzhaQ3VXRkNL?=
- =?utf-8?Q?9M0sXmgh4pAsn860d/VKFObb/fUW2TekEW2wA=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?R0Zia0o2MTBqbEl5K3RFZTE0ajJlR3VPSzFpdTlnSlh2bnR4aU9nY1diMmNr?=
- =?utf-8?B?NmRRdU03WVdIZk12SE9NejhxSno3bDdSZmhGOWFIQUJOdmhkTVFPTUFKUk0x?=
- =?utf-8?B?aC9MSmVzUUY3amRjbk5EZFFhRnpvZk00Y1pMN3dWcnlDNWZaaCtwcndMMUVx?=
- =?utf-8?B?cDZRYkw0ckdWdllCU2p5R3BTK2hzTS91c2xsTVFsZUFjdnJWSWY5M0NHU2NJ?=
- =?utf-8?B?QUhvSlFwRzYvMVpyUHlVYWJQSnprQytnN2Y5R2d4VFlCdXl3TnF4b2ZzTitX?=
- =?utf-8?B?WE0wK0IyMjd1cFU3b2lMaC96OFdUUjFEdmRsejVyUFY5YjFLL21qYVV1OHY1?=
- =?utf-8?B?b3BlcTRDbndZQTdPOTUyVCtHRHU1MmRyOU8yenJKOXFaWUQvSVFYZVpYdnFJ?=
- =?utf-8?B?YVk4MkZMRndKblBBK3NyTGVEbjVtRHZsOWJES204RzlIUjlyL0RPTDVHNVNq?=
- =?utf-8?B?UzcyelIrWmUrRjFxNlB0MitjY2U4UjRaNXhHbFB3SXhhZ0JyR2JtcHE4bm1m?=
- =?utf-8?B?cDhCeWR4Wm5OYXdtTHRCSmoxa1BEMklNU2VaV1hPTnNjK0tLN3NlT09YdHJ5?=
- =?utf-8?B?Y3djaC8vTnpiOEsxL3VBZHN1d2VCbHI2c3hRSEFtL0RDS2ptcHJCVGVLeXhM?=
- =?utf-8?B?N0RndENhcENGby9PRXBzbTBhU1Azdm1ma3FQYzBzRXQ5WHlvakxOdTB5c3Z6?=
- =?utf-8?B?a0NuY3JoUWkwNm1udXJHaGQ2Z2cyd3ozWXFOTjgyTUVtYjFtUGVpVGpLbXFU?=
- =?utf-8?B?SmhZbEtWYVA2RkxHYWw1TFBlaWh3RUh1VnlTZXBNSmRkd2kxcE1iUU5oVnlq?=
- =?utf-8?B?UW1hQ01DQko4S1RzK0FVbmQwektsUnQ4UkRLVDlMeEQyQXQ2N09BMjJYK1Y2?=
- =?utf-8?B?WTN1bEt2TGppVGczUGh0ak5Sa2cvRit2SmphUVFoSHhFR1dEdzIwN2xhanpx?=
- =?utf-8?B?SVZob3c5M1FHVDRhWThLN2pSVTFDdU4vT05ycGJFb2NlUSt3M3ZrMW0xMnRT?=
- =?utf-8?B?ck1SdWIxb1c4OURQd2Rkc0lXR1FxVGRBUVBrdmZ6Z0VlSVNZK0dsT2dlSWlU?=
- =?utf-8?B?a3YxT00zb1N5V2syeFpjMml6bmhMcGpEV0lndC9PaVM5MHl0RFRDZUJOSHhm?=
- =?utf-8?B?dUNCZmtsNk5zWWcxUGNZeWZpWGcySGEwV0YvdEZsNkhrVkZtN081eTJJRFA4?=
- =?utf-8?B?cVVXaGF3M3lpZGFUYktIRFo1NmE0alR3Q3V0Rm9Xbm82YXhhdlZzb3kwS1Iv?=
- =?utf-8?B?dTJTV21rS3RCV0RNazdSbWlPNVA4RDZhVTVRczBUd212VlZZZC9YM05ITmxD?=
- =?utf-8?B?QWlHdDV5UlAyWmtubVB0SGkzU2pMVWhSZ1pMMzhXMm9yVDRNcjhTYlVIYWlJ?=
- =?utf-8?B?WVRUWUdUT3hQZGRCUis1WFFXU0tQTmdKQ1Q1Mkp1MVhyaWRrWG1sQWp0bEIx?=
- =?utf-8?B?aWV3K1R2TmZWdmtlQ0ZCbjBlWTNHZ3FuVUNVSnVUZGpKVW9ienBuUFVJTjBB?=
- =?utf-8?B?d0hWMGpyV2R1akJyZkdadGFRS1RyaGRadTJTdW50Z2dSdzVmZldiNnZhaERU?=
- =?utf-8?B?blVYeEtXTG01aVU0dnA1Wlp2cFhOdXVwUHdwYWdIN3BWb3BJSGx1TkJTWFls?=
- =?utf-8?B?dTlMcFdsR3pLREhoaDJzNkN5d1liWW1UZ0xXNlFSdy9SbVAvMDRhcDFzVTI1?=
- =?utf-8?B?OE9ldjRmUE5Lc2Z3UTRzQmJubHRiTHZ2ejJHMEVxUktQS09CeXZQd3h4QkQ1?=
- =?utf-8?B?SVNoT25BRDFtbHFXKy9lNE1BSCtYQXRqMVNkdUMzUHM2aVJqZnNGckFyVkJI?=
- =?utf-8?B?N3pGcVN6ajRXSnhtWXloS0llMFQ1SGV0czFyeUNiV1hEMi9NN0RwQmxXcGtP?=
- =?utf-8?B?aUVmaXVoQU9rWU81dXl2cHFvRXg2V1lWa0hHUzhzUTFUYmNlaURUK2I4ekUz?=
- =?utf-8?B?NFovdFRONzY3RDhFRnREdHJxUmNRcktUSkNSMGhRWDZPakR5Y0MxQUFqbzJU?=
- =?utf-8?B?V2ZDaElLVURKSjRKeHBvUS9HVkJRamdjYlVZWU1iUXJBVUU3dnRqam5ySld5?=
- =?utf-8?B?blFHdVB1L25CNDZqY0krMFVFNk02R1pjTVNyNlE5dWo1SmdCY2w2TVNlK0gr?=
- =?utf-8?B?U2xrNkUxOTNUVzU0ZVFSeFBLTWFZTGtlRlEyS3hkamJaMXNOcVU0THhsWHJ1?=
- =?utf-8?Q?13T0UQdxnEYdbXoIJ80ZgS4x30RdjDh2SNf1gfZO76A9?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DD79D21A940B2346B99E3C6474EFDC9B@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i/PRYFny"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-354f3f6c3b1so3167736f8f.2;
+        Sun, 09 Jun 2024 19:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717988031; x=1718592831; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jMY/nMr4YN1IlHT2+hgSevr1m7Z7kxrU0v76nsoWyeY=;
+        b=i/PRYFnyDR3ugLITI3lgyUmnie9tlPZM0RXKNanEUn0oPVEjWz4Q/RUDBNeScFUaql
+         oEYRtqiggoKIl9c+EXDIQMlXK0NbGGN8LqDc1w2YR4MBQ725+KQwOJt7JGk7vJeMFdgg
+         6v7CAWxOVK9b8wOiVavPiG98xRvFptDQqzFtSzBUkwU/TiEhN7SnbtASGstFKUni4P5o
+         Og0JwYf7j91rf65YnNJ0w4CjDfqCtgcyG2Sl7UtjcgSJ1E7G6YcoDLPlsIADlhTSyN5Z
+         MnP808wFQ+lF2oyCk3PmlCC2kGhjIJxfci8LvvL+LKhkzsspcqabjOR0N1cDSBjM4n5+
+         L97g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717988031; x=1718592831;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jMY/nMr4YN1IlHT2+hgSevr1m7Z7kxrU0v76nsoWyeY=;
+        b=mI5361tGl2JOzCxGzP0I2fnMrbRdiQlsWnix4F9MSREPtwgZAYO7j6xpnkt3et94ig
+         7q80/3OfpFPpZdy7qxKTc3LzorPJFht5QCUoYWAarrzdszDrjSxZ9ZZ18q7xFIkDCJV4
+         m6Wvrr8mWmJVbwGL70UPJ362u1n8dk3VVgknrtieNN5g7MJupmzrqFVNTGvuQl1H42qp
+         egtyE59ByOqfg4iBWxipEkp56iG12QPeWCaRaU6blr1alrCll7jzRMTlcjKZHPog6QLe
+         tZcW4ouRMc1CIHMTQ877MLCrB5I7mTiFPr6llAzIDg65UKtj7A6VhbRpsJG8mfF6J7k/
+         FS5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW5rOcoC00/1Qub/aZ077mLOca+O+44GVi/tUTnULBP/Vf0mLQjthh7XmMGGod4YcFzRE7pjDD6K3rEITI2o0BOdo/5IDUGEJo=
+X-Gm-Message-State: AOJu0Yw8QfneXaINsqZz+QSctRjm67pt++zLtoyFxoBmWBiTCI7Gc91c
+	PYeCzRT3kQFXsR/qNtP8YtDGyJ8sZfpspAzlEvussxNCMg+8V25ugbjyfxbg
+X-Google-Smtp-Source: AGHT+IFKJM11SpLqzLhMNwJkG2eukvCYMGlq1XGEliB8Y1HtC0PnUS/o6LTUxo9l7oWSL7enVLuwTQ==
+X-Received: by 2002:a5d:457a:0:b0:35f:1907:813c with SMTP id ffacd0b85a97d-35f190782d2mr2592280f8f.31.1717988031179;
+        Sun, 09 Jun 2024 19:53:51 -0700 (PDT)
+Received: from [192.168.42.136] ([148.252.129.53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35ef5d2da31sm9741966f8f.14.2024.06.09.19.53.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Jun 2024 19:53:50 -0700 (PDT)
+Message-ID: <97fe853f-1963-4304-b371-5fe596ae5fcf@gmail.com>
+Date: Mon, 10 Jun 2024 03:53:51 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c6672e2-8714-4e1e-e78a-08dc88f82f1c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2024 02:51:10.3104
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6wDV3d+/qML2D/FU0dsM4bbNEF5F04Vfy7GALHJXcF2+7kK06/eLn5JUHYn8SN+YdAyGWYSs1quQdoLYdQp7lw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7765
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 5/9] io_uring: support SQE group
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
+References: <20240511001214.173711-1-ming.lei@redhat.com>
+ <20240511001214.173711-6-ming.lei@redhat.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240511001214.173711-6-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-T24gNi81LzIwMjQgMTA6MjcgUE0sIENocmlzdG9waCBIZWxsd2lnIHdyb3RlOg0KPiBNZXRhZGF0
-YSBhZGRlZCBieSBiaW9faW50ZWdyaXR5X3ByZXAgaXMgdXNpbmcgcGxhaW4ga21hbGxvYywgd2hp
-Y2ggbGVhZHMNCj4gdG8gcmFuZG9tIGtlcm5lbCBtZW1vcnkgYmVpbmcgd3JpdHRlbiBtZWRpYS4g
-IEZvciBQSSBtZXRhZGF0YSB0aGlzIGlzDQo+IGxpbWl0ZWQgdG8gdGhlIGFwcCB0YWcgdGhhdCBp
-c24ndCB1c2VkIGJ5IGtlcm5lbCBnZW5lcmF0ZWQgbWV0YWRhdGEsDQo+IGJ1dCBmb3Igbm9uLVBJ
-IG1ldGFkYXRhIHRoZSBlbnRpcmUgYnVmZmVyIGxlYWtzIGtlcm5lbCBtZW1vcnkuDQo+IA0KPiBG
-aXggdGhpcyBieSBhZGRpbmcgdGhlIF9fR0ZQX1pFUk8gZmxhZyB0byBhbGxvY2F0aW9ucyBmb3Ig
-d3JpdGVzLg0KPiANCj4gRml4ZXM6IDdiYTFiYTEyZWVlZiAoImJsb2NrOiBCbG9jayBsYXllciBk
-YXRhIGludGVncml0eSBzdXBwb3J0IikNCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0b3BoIEhlbGx3
-aWc8aGNoQGxzdC5kZT4NCg0KTG9va3MgZ29vZC4NCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBL
-dWxrYXJuaSA8a2NoQG52aWRpYS5jb20+DQoNCi1jaw0KDQoNCg==
+On 5/11/24 01:12, Ming Lei wrote:
+> SQE group is defined as one chain of SQEs starting with the first SQE that
+> has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+> doesn't have it set, and it is similar with chain of linked SQEs.
+
+The main concern stays same, it adds overhead nearly to every
+single hot function I can think of, as well as lots of
+complexity.
+
+Another minor issue is REQ_F_INFLIGHT, as explained before,
+cancellation has to be able to find all REQ_F_INFLIGHT
+requests. Requests you add to a group can have that flag
+but are not discoverable by core io_uring code.
+
+Another note, I'll be looking deeper into this patch, there
+is too much of random tossing around of requests / refcounting
+and other dependencies, as well as odd intertwinings with
+other parts.
+
+> Not like linked SQEs, each sqe is issued after the previous one is completed.
+> All SQEs in one group are submitted in parallel, so there isn't any dependency
+> among SQEs in one group.
+> 
+> The 1st SQE is group leader, and the other SQEs are group member. The whole
+> group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
+> the two flags are ignored for group members.
+> 
+> When the group is in one link chain, this group isn't submitted until the
+> previous SQE or group is completed. And the following SQE or group can't
+> be started if this group isn't completed. Failure from any group member will
+> fail the group leader, then the link chain can be terminated.
+> 
+> When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
+> previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
+> group leader only, we respect IO_DRAIN by always completing group leader as
+> the last one in the group.
+> 
+> Working together with IOSQE_IO_LINK, SQE group provides flexible way to
+> support N:M dependency, such as:
+> 
+> - group A is chained with group B together
+> - group A has N SQEs
+> - group B has M SQEs
+> 
+> then M SQEs in group B depend on N SQEs in group A.
+> 
+> N:M dependency can support some interesting use cases in efficient way:
+> 
+> 1) read from multiple files, then write the read data into single file
+> 
+> 2) read from single file, and write the read data into multiple files
+> 
+> 3) write same data into multiple files, and read data from multiple files and
+> compare if correct data is written
+> 
+> Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
+> extend sqe->flags with one uring context flag, such as use __pad3 for
+> non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
+> 
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   include/linux/io_uring_types.h |  12 ++
+>   include/uapi/linux/io_uring.h  |   4 +
+>   io_uring/io_uring.c            | 255 +++++++++++++++++++++++++++++++--
+>   io_uring/io_uring.h            |  16 +++
+>   io_uring/timeout.c             |   2 +
+>   5 files changed, 277 insertions(+), 12 deletions(-)
+> 
+> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+> index 7a6b190c7da7..62311b0f0e0b 100644
+> --- a/include/linux/io_uring_types.h
+> +++ b/include/linux/io_uring_types.h
+> @@ -666,6 +674,10 @@ struct io_kiocb {
+>   		u64			extra1;
+>   		u64			extra2;
+>   	} big_cqe;
+> +
+> +	/* all SQE group members linked here for group lead */
+> +	struct io_kiocb			*grp_link;
+> +	int				grp_refs;
+>   };
+>   
+>   struct io_overflow_cqe {
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index c184c9a312df..b87c5452de43 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -109,7 +109,8 @@
+>   			  IOSQE_IO_HARDLINK | IOSQE_ASYNC)
+>   
+>   #define SQE_VALID_FLAGS	(SQE_COMMON_FLAGS | IOSQE_BUFFER_SELECT | \
+> -			IOSQE_IO_DRAIN | IOSQE_CQE_SKIP_SUCCESS)
+> +			IOSQE_IO_DRAIN | IOSQE_CQE_SKIP_SUCCESS | \
+> +			IOSQE_SQE_GROUP)
+>   
+>   #define IO_REQ_CLEAN_FLAGS (REQ_F_BUFFER_SELECTED | REQ_F_NEED_CLEANUP | \
+>   				REQ_F_POLLED | REQ_F_INFLIGHT | REQ_F_CREDS | \
+> @@ -915,6 +916,13 @@ static __always_inline void io_req_commit_cqe(struct io_kiocb *req,
+>   {
+>   	struct io_ring_ctx *ctx = req->ctx;
+>   
+> +	/*
+> +	 * For group leader, cqe has to be committed after all members are
+> +	 * committed, when the request becomes normal one.
+> +	 */
+> +	if (unlikely(req_is_group_leader(req)))
+> +		return;
+
+The copy of it inlined into flush_completions should
+maintain a proper fast path.
+
+if (req->flags & (CQE_SKIP | GROUP)) {
+	if (req->flags & CQE_SKIP)
+		continue;
+	if (req->flags & GROUP) {}
+}
+
+> +
+>   	if (unlikely(!io_fill_cqe_req(ctx, req))) {
+>   		if (lockless_cq) {
+>   			spin_lock(&ctx->completion_lock);
+> @@ -926,6 +934,116 @@ static __always_inline void io_req_commit_cqe(struct io_kiocb *req,
+>   	}
+>   }
+>   
+> +static inline bool need_queue_group_members(struct io_kiocb *req)
+> +{
+> +	return req_is_group_leader(req) && req->grp_link;
+> +}
+> +
+> +/* Can only be called after this request is issued */
+> +static inline struct io_kiocb *get_group_leader(struct io_kiocb *req)
+> +{
+> +	if (req->flags & REQ_F_SQE_GROUP) {
+> +		if (req_is_group_leader(req))
+> +			return req;
+> +		return req->grp_link;
+
+I'm missing something, it seems io_group_sqe() adding all
+requests of a group into a singly linked list via ->grp_link,
+but here we return it as a leader. Confused.
+
+> +	}
+> +	return NULL;
+> +}
+> +
+> +void io_cancel_group_members(struct io_kiocb *req, bool ignore_cqes)
+> +{
+> +	struct io_kiocb *member = req->grp_link;
+> +
+> +	while (member) {
+> +		struct io_kiocb *next = member->grp_link;
+> +
+> +		if (ignore_cqes)
+> +			member->flags |= REQ_F_CQE_SKIP;
+> +		if (!(member->flags & REQ_F_FAIL)) {
+> +			req_set_fail(member);
+> +			io_req_set_res(member, -ECANCELED, 0);
+> +		}
+> +		member = next;
+> +	}
+> +}
+> +
+> +void io_queue_group_members(struct io_kiocb *req, bool async)
+> +{
+> +	struct io_kiocb *member = req->grp_link;
+> +
+> +	if (!member)
+> +		return;
+> +
+> +	while (member) {
+> +		struct io_kiocb *next = member->grp_link;
+> +
+> +		member->grp_link = req;
+> +		if (async)
+> +			member->flags |= REQ_F_FORCE_ASYNC;
+> +
+> +		if (unlikely(member->flags & REQ_F_FAIL)) {
+> +			io_req_task_queue_fail(member, member->cqe.res);
+> +		} else if (member->flags & REQ_F_FORCE_ASYNC) {
+> +			io_req_task_queue(member);
+> +		} else {
+> +			io_queue_sqe(member);
+> +		}
+> +		member = next;
+> +	}
+> +	req->grp_link = NULL;
+> +}
+> +
+> +static inline bool __io_complete_group_req(struct io_kiocb *req,
+> +			     struct io_kiocb *lead)
+> +{
+> +	WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP));
+> +
+> +	if (WARN_ON_ONCE(lead->grp_refs <= 0))
+> +		return false;
+> +
+> +	/*
+> +	 * Set linked leader as failed if any member is failed, so
+> +	 * the remained link chain can be terminated
+> +	 */
+> +	if (unlikely((req->flags & REQ_F_FAIL) &&
+> +		     ((lead->flags & IO_REQ_LINK_FLAGS) && lead->link)))
+> +		req_set_fail(lead);
+> +	return !--lead->grp_refs;
+> +}
+> +
+> +/* Complete group request and collect completed leader for freeing */
+> +static inline void io_complete_group_req(struct io_kiocb *req,
+> +		struct io_wq_work_list *grp_list)
+> +{
+> +	struct io_kiocb *lead = get_group_leader(req);
+> +
+> +	if (__io_complete_group_req(req, lead)) {
+> +		req->flags &= ~REQ_F_SQE_GROUP;
+> +		lead->flags &= ~REQ_F_SQE_GROUP_LEADER;
+> +		if (!(lead->flags & REQ_F_CQE_SKIP))
+> +			io_req_commit_cqe(lead, lead->ctx->lockless_cq);
+> +
+> +		if (req != lead) {
+> +			/*
+> +			 * Add leader to free list if it isn't there
+> +			 * otherwise clearing group flag for freeing it
+> +			 * in current batch
+> +			 */
+> +			if (!(lead->flags & REQ_F_SQE_GROUP))
+> +				wq_list_add_tail(&lead->comp_list, grp_list);
+> +			else
+> +				lead->flags &= ~REQ_F_SQE_GROUP;
+> +		}
+> +	} else if (req != lead) {
+> +		req->flags &= ~REQ_F_SQE_GROUP;
+> +	} else {
+> +		/*
+> +		 * Leader's group flag clearing is delayed until it is
+> +		 * removed from free list
+> +		 */
+> +	}
+> +}
+> +
+>   static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
+>   {
+>   	struct io_ring_ctx *ctx = req->ctx;
+> @@ -1427,6 +1545,17 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
+>   						    comp_list);
+>   
+>   		if (unlikely(req->flags & IO_REQ_CLEAN_SLOW_FLAGS)) {
+> +			/*
+> +			 * Group leader may be removed twice, don't free it
+> +			 * if group flag isn't cleared, when some members
+> +			 * aren't completed yet
+> +			 */
+> +			if (req->flags & REQ_F_SQE_GROUP) {
+> +				node = req->comp_list.next;
+> +				req->flags &= ~REQ_F_SQE_GROUP;
+> +				continue;
+> +			}
+> +
+>   			if (req->flags & REQ_F_REFCOUNT) {
+>   				node = req->comp_list.next;
+>   				if (!req_ref_put_and_test(req))
+> @@ -1459,6 +1588,7 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+>   	__must_hold(&ctx->uring_lock)
+>   {
+>   	struct io_submit_state *state = &ctx->submit_state;
+> +	struct io_wq_work_list grp_list = {NULL};
+>   	struct io_wq_work_node *node;
+>   
+>   	__io_cq_lock(ctx);
+> @@ -1468,9 +1598,15 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+>   
+>   		if (!(req->flags & REQ_F_CQE_SKIP))
+>   			io_req_commit_cqe(req, ctx->lockless_cq);
+> +
+> +		if (req->flags & REQ_F_SQE_GROUP)
+
+Same note about hot path
+
+> +			io_complete_group_req(req, &grp_list);
+>   	}
+>   	__io_cq_unlock_post(ctx);
+>   
+> +	if (!wq_list_empty(&grp_list))
+> +		__wq_list_splice(&grp_list, state->compl_reqs.first);
+
+What's the point of splicing it here insted of doing all
+that under REQ_F_SQE_GROUP above?
+
+> +
+>   	if (!wq_list_empty(&ctx->submit_state.compl_reqs)) {
+>   		io_free_batch_list(ctx, state->compl_reqs.first);
+>   		INIT_WQ_LIST(&state->compl_reqs);
+> @@ -1677,8 +1813,12 @@ static u32 io_get_sequence(struct io_kiocb *req)
+>   	struct io_kiocb *cur;
+>   
+>   	/* need original cached_sq_head, but it was increased for each req */
+> -	io_for_each_link(cur, req)
+> -		seq--;
+> +	io_for_each_link(cur, req) {
+> +		if (req_is_group_leader(cur))
+> +			seq -= cur->grp_refs;
+> +		else
+> +			seq--;
+> +	}
+>   	return seq;
+>   }
+>   
+> @@ -1793,11 +1933,20 @@ struct io_wq_work *io_wq_free_work(struct io_wq_work *work)
+>   	struct io_kiocb *nxt = NULL;
+>   
+>   	if (req_ref_put_and_test(req)) {
+> -		if (req->flags & IO_REQ_LINK_FLAGS)
+> -			nxt = io_req_find_next(req);
+> +		/*
+> +		 * CQEs have been posted in io_req_complete_post() except
+> +		 * for group leader, and we can't advance the link for
+> +		 * group leader until its CQE is posted.
+> +		 *
+> +		 * TODO: try to avoid defer and complete leader in io_wq
+> +		 * context directly
+> +		 */
+> +		if (!req_is_group_leader(req)) {
+> +			req->flags |= REQ_F_CQE_SKIP;
+> +			if (req->flags & IO_REQ_LINK_FLAGS)
+> +				nxt = io_req_find_next(req);
+> +		}
+>   
+> -		/* we have posted CQEs in io_req_complete_post() */
+> -		req->flags |= REQ_F_CQE_SKIP;
+>   		io_free_req(req);
+>   	}
+>   	return nxt ? &nxt->work : NULL;
+> @@ -1863,6 +2012,8 @@ void io_wq_submit_work(struct io_wq_work *work)
+>   		}
+>   	}
+>   
+> +	if (need_queue_group_members(req))
+> +		io_queue_group_members(req, true);
+>   	do {
+>   		ret = io_issue_sqe(req, issue_flags);
+>   		if (ret != -EAGAIN)
+> @@ -1977,6 +2128,9 @@ static inline void io_queue_sqe(struct io_kiocb *req)
+>   	 */
+>   	if (unlikely(ret))
+>   		io_queue_async(req, ret);
+> +
+> +	if (need_queue_group_members(req))
+> +		io_queue_group_members(req, false);
+
+Request ownership is considered to be handed further at this
+point and requests should not be touched. Only ret==0 from
+io_issue_sqe it's still ours, but again it's handed somewhere
+by io_queue_async().
+
+>   }
+>   
+>   static void io_queue_sqe_fallback(struct io_kiocb *req)
+> @@ -2142,6 +2296,56 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>   	return def->prep(req, sqe);
+>   }
+>   
+> +static struct io_kiocb *io_group_sqe(struct io_submit_link *group,
+> +				     struct io_kiocb *req)
+> +{
+> +	/*
+> +	 * Group chain is similar with link chain: starts with 1st sqe with
+> +	 * REQ_F_SQE_GROUP, and ends with the 1st sqe without REQ_F_SQE_GROUP
+> +	 */
+> +	if (group->head) {
+> +		struct io_kiocb *lead = group->head;
+> +
+> +		/* members can't be in link chain, can't be drained */
+> +		req->flags &= ~(IO_REQ_LINK_FLAGS | REQ_F_IO_DRAIN);
+> +		lead->grp_refs += 1;
+> +		group->last->grp_link = req;
+> +		group->last = req;
+> +
+> +		if (req->flags & REQ_F_SQE_GROUP)
+> +			return NULL;
+> +
+> +		req->grp_link = NULL;
+> +		req->flags |= REQ_F_SQE_GROUP;
+> +		group->head = NULL;
+> +		return lead;
+> +	} else if (req->flags & REQ_F_SQE_GROUP) {
+> +		group->head = req;
+> +		group->last = req;
+> +		req->grp_refs = 1;
+> +		req->flags |= REQ_F_SQE_GROUP_LEADER;
+> +		return NULL;
+> +	} else {
+> +		return req;
+> +	}
+> +}
+> +
+> +static __cold struct io_kiocb *io_submit_fail_group(
+> +		struct io_submit_link *link, struct io_kiocb *req)
+> +{
+> +	struct io_kiocb *lead = link->head;
+> +
+> +	/*
+> +	 * Instead of failing eagerly, continue assembling the group link
+> +	 * if applicable and mark the leader with REQ_F_FAIL. The group
+> +	 * flushing code should find the flag and handle the rest
+> +	 */
+> +	if (lead && (lead->flags & IO_REQ_LINK_FLAGS) && !(lead->flags & REQ_F_FAIL))
+> +		req_fail_link_node(lead, -ECANCELED);
+> +
+> +	return io_group_sqe(link, req);
+> +}
+> +
+>   static __cold int io_submit_fail_link(struct io_submit_link *link,
+>   				      struct io_kiocb *req, int ret)
+>   {
+> @@ -2180,11 +2384,18 @@ static __cold int io_submit_fail_init(const struct io_uring_sqe *sqe,
+>   {
+>   	struct io_ring_ctx *ctx = req->ctx;
+>   	struct io_submit_link *link = &ctx->submit_state.link;
+> +	struct io_submit_link *group = &ctx->submit_state.group;
+>   
+>   	trace_io_uring_req_failed(sqe, req, ret);
+>   
+>   	req_fail_link_node(req, ret);
+>   
+> +	if (group->head || (req->flags & REQ_F_SQE_GROUP)) {
+> +		req = io_submit_fail_group(group, req);
+> +		if (!req)
+> +			return 0;
+> +	}
+> +
+>   	/* cover both linked and non-linked request */
+>   	return io_submit_fail_link(link, req, ret);
+>   }
+> @@ -2232,7 +2443,7 @@ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>   			 const struct io_uring_sqe *sqe)
+>   	__must_hold(&ctx->uring_lock)
+>   {
+> -	struct io_submit_link *link = &ctx->submit_state.link;
+> +	struct io_submit_state *state = &ctx->submit_state;
+>   	int ret;
+>   
+>   	ret = io_init_req(ctx, req, sqe);
+> @@ -2241,9 +2452,17 @@ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>   
+>   	trace_io_uring_submit_req(req);
+>   
+> -	if (unlikely(link->head || (req->flags & (IO_REQ_LINK_FLAGS |
+> -				    REQ_F_FORCE_ASYNC | REQ_F_FAIL)))) {
+> -		req = io_link_sqe(link, req);
+> +	if (unlikely(state->group.head ||
+
+A note rather to myself and for the future, all theese checks
+including links and groups can be folded under one common if.
+
+> +		     (req->flags & REQ_F_SQE_GROUP))) {
+> +		req = io_group_sqe(&state->group, req);
+> +		if (!req)
+> +			return 0;
+> +	}
+> +
+> +	if (unlikely(state->link.head ||
+> +		     (req->flags & (IO_REQ_LINK_FLAGS | REQ_F_FORCE_ASYNC |
+> +				    REQ_F_FAIL)))) {
+> +		req = io_link_sqe(&state->link, req);
+>   		if (!req)
+>   			return 0;
+>   	}
+> @@ -2258,6 +2477,17 @@ static void io_submit_state_end(struct io_ring_ctx *ctx)
+>   {
+>   	struct io_submit_state *state = &ctx->submit_state;
+>   
+> +	/* the last member must set REQ_F_SQE_GROUP */
+> +	if (unlikely(state->group.head)) {
+> +		struct io_kiocb *lead = state->group.head;
+> +
+> +		state->group.last->grp_link = NULL;
+> +		if (lead->flags & IO_REQ_LINK_FLAGS)
+> +			io_link_sqe(&state->link, lead);
+> +		else
+> +			io_queue_sqe_fallback(lead);
+> +	}
+> +
+>   	if (unlikely(state->link.head))
+>   		io_queue_sqe_fallback(state->link.head);
+>   	/* flush only after queuing links as they can generate completions */
+> @@ -2277,6 +2507,7 @@ static void io_submit_state_start(struct io_submit_state *state,
+>   	state->submit_nr = max_ios;
+>   	/* set only head, no need to init link_last in advance */
+>   	state->link.head = NULL;
+> +	state->group.head = NULL;
+>   }
+>   
+>   static void io_commit_sqring(struct io_ring_ctx *ctx)
+> diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
+> index 624ca9076a50..b11db3bdd8d8 100644
+> --- a/io_uring/io_uring.h
+> +++ b/io_uring/io_uring.h
+> @@ -67,6 +67,8 @@ void io_req_defer_failed(struct io_kiocb *req, s32 res);
+>   bool io_post_aux_cqe(struct io_ring_ctx *ctx, u64 user_data, s32 res, u32 cflags);
+>   bool io_req_post_cqe(struct io_kiocb *req, s32 res, u32 cflags);
+>   void __io_commit_cqring_flush(struct io_ring_ctx *ctx);
+> +void io_queue_group_members(struct io_kiocb *req, bool async);
+> +void io_cancel_group_members(struct io_kiocb *req, bool ignore_cqes);
+>   
+>   struct file *io_file_get_normal(struct io_kiocb *req, int fd);
+>   struct file *io_file_get_fixed(struct io_kiocb *req, int fd,
+> @@ -342,6 +344,16 @@ static inline void io_tw_lock(struct io_ring_ctx *ctx, struct io_tw_state *ts)
+>   	lockdep_assert_held(&ctx->uring_lock);
+>   }
+>   
+> +static inline bool req_is_group_leader(struct io_kiocb *req)
+> +{
+> +	return req->flags & REQ_F_SQE_GROUP_LEADER;
+> +}
+> +
+> +static inline bool req_is_group_member(struct io_kiocb *req)
+> +{
+> +	return !req_is_group_leader(req) && (req->flags & REQ_F_SQE_GROUP);
+> +}
+> +
+>   /*
+>    * Don't complete immediately but use deferred completion infrastructure.
+>    * Protected by ->uring_lock and can only be used either with
+> @@ -355,6 +367,10 @@ static inline void io_req_complete_defer(struct io_kiocb *req)
+>   	lockdep_assert_held(&req->ctx->uring_lock);
+>   
+>   	wq_list_add_tail(&req->comp_list, &state->compl_reqs);
+> +
+> +	/* members may not be issued when leader is completed */
+> +	if (unlikely(req_is_group_leader(req) && req->grp_link))
+> +		io_queue_group_members(req, false);
+>   }
+>   
+>   static inline void io_commit_cqring_flush(struct io_ring_ctx *ctx)
+
+-- 
+Pavel Begunkov
