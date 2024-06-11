@@ -1,39 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633CA38FA0;
-	Tue, 11 Jun 2024 16:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AD95820E
+	for <linux-block@vger.kernel.org>; Tue, 11 Jun 2024 16:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718123822; cv=none; b=SHpC4Mkd6wzBq6o6n8jfYx4EJktB6/t6OAi/c6InvYaft4O/EeB6zYFlbYNHakp0Nix51vxrtf3LqHsmIMOODXImDxahF6ptPz+lnNB2Wst7/EdR7ST4m9ZueDu6kQhcGSLEEhqCEfVBQ3Ntcv9sFUPaws2OI0G51cWvXyy9JxU=
+	t=1718124659; cv=none; b=dU840Yt8JcabsDXVnmdXZDyPuNk9z9tvmlcNgaJN6knpadIr9Lz1sRzUjHI8U7VgCzZoCRPrEBfFGLpoPriwwioPaHa87/cBjEA4zv84yEtRSJX8LRZbW+dD1KpUrpT8QUTusXd4l0l2ww5BTIdjL73NGQkC0y59rnZtEHluU+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718123822; c=relaxed/simple;
-	bh=tS4mBtev0mmLy3lUhLhA6wMYT89/wSilamRsW7TK4Z0=;
+	s=arc-20240116; t=1718124659; c=relaxed/simple;
+	bh=2FT/emrK48iE3dx07WXN0ST/iq8T21acuyaCQMRLCLQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RRbGUTkvNVidzaXYjuk9fvugH4zF5V9FhbD4QbehNxszmIQ+Q+dUGbfdgpJn0OlngsSN5kTjh8rb9LQd+kuVZw3ZPzWwAhWyLqhRuKAQcpf33sV9V4sdW7F6WPiATVcnzPbahwx8+afEPYyRPCYPnoQsKTVfwoG06LMvoSp2Q34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezPZlvOe; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=XzvBwb8DUStzyemn6gx/DpFIK3LRE0cbUoD5ICjA3bt3OrgNzeObmRJ1Sr1C1UX3pPROebC/wM8iN7HAqHJnctxdLyMYrf0xPrvWUPAS06vygwcFE/7e5G0uyRLd2Xi5hItlINFIzpX3E5H/67g/CV/VpC41r/e/cZ6N3G0YE08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=Zt6ibg/s; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezPZlvOe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC531C2BD10;
-	Tue, 11 Jun 2024 16:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718123821;
-	bh=tS4mBtev0mmLy3lUhLhA6wMYT89/wSilamRsW7TK4Z0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ezPZlvOewo90DgaMjlztZ0+/CgkFjfShTR0LnPfo5OFC0WKhYjURa2R0FpcHEwGYl
-	 Q9nQPvzxUIctA0sO65kcW6zp0zCnzNcaMGYYs7cnNzxDL+OeuWFlXcZPscT66JeFX5
-	 vk4CqJ2lpWnkcinNuMlME8kVPLEmrsi9kNN1TloYo0LS2QdzeCx6IAXdopI3iaI4nd
-	 lxWGwo22KhHY8d0bWb9Z3zpUbYQxyZnSAvx9GQDVzFKLiI6bVi6cBnRPRxohQmVbn1
-	 PErb78tadZbVB1WwQqMAZ0wSwCPpaD9T9/w8quRh9BqBbxdRw8oVJKIqLxeO3RrHLX
-	 UetDog6RgOvSw==
-Date: Tue, 11 Jun 2024 09:37:01 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>
-Cc: Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>,
-	linux-block@vger.kernel.org, fstests@vger.kernel.org
-Subject: Re: Flaky test: generic/085
-Message-ID: <20240611163701.GK52977@frogsfrogsfrogs>
-References: <20240611085210.GA1838544@mit.edu>
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="Zt6ibg/s"
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dfa4876a5bbso5531359276.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Jun 2024 09:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1718124657; x=1718729457; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k7qH/Egkqtc5OmSCKcG8suDn1pwScsKWRQ+gioBgKgY=;
+        b=Zt6ibg/sXDFPcB1PdqLbi9y9Lq84fI4dtsabAaKnS71DR4ge4yMuB1Z9lS7wA4wHrn
+         shpAYklqhBt+02fv/lI70+9yLugOwkE6jd95eVKnaVgZYxsTh2WCsmHTgQ1UVgNRVLal
+         wmO5N6RWxwgoiytstIBOrWyQFGmt3N38VbBAgwcFn/bnZiw+iwyuahz+8bpIWwoYMk5k
+         XMp/oVXEeglCEkIcBUpukavQm3svwzpoI5LogCeDIIPsZ/TBEY3fH93kounsMrkvv0iU
+         qwThWU60dMvFW8JzcIe4TZiEEXk0LdCstA848HdLhK4LdxhwQLIYyB46hHTq4v902MUD
+         ZUhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718124657; x=1718729457;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k7qH/Egkqtc5OmSCKcG8suDn1pwScsKWRQ+gioBgKgY=;
+        b=OQ6hGWXDleFz9Dob3KBiKuhXBuO79a5wOvVGv48ozWEKaMHxAVohsqwi7+wIAveuUV
+         xYJJUR7V3vxJTznz/7B/9Qeaio5u/xcULtmDOipyftZDC42f/kVZduTOjUr1LZJQc1wh
+         mHlKkhNIy6Cqg5dZdeQLDMCK9VHzUwoYZr0f5lEUYL/lRit+ptyof/qKUcgNEOM1/KBr
+         IF3Sj687D/rDASF6BJehUq+GrTL1YBn6KUELDTdNQf530cVpmKA3v4+f2kzMkLgrpeDw
+         SMDl+oWIATrLPRPRjKlvlBlNIrSMNLotF91lDlp5Pc+z2YnXTm5gs1Xqdjf+We4YAx/F
+         DTZA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1GCHg6ssX6c5f/u92sd37T2Kz213xTEnAUzxQuHfUYqng0GSCZCdt4nwQJhSqZDaqoX+g3GZVluQ70SXYbWz7YQtzyQFlcywww2k=
+X-Gm-Message-State: AOJu0YwCB+r46GAQY3bD1OhInnAglty0jc9IpTz7hFOneiaSXbLfTkNC
+	R0HMOstY9ycmC2uy2X4j4CoItRHLdbhpfJim6DD6dqJHI2rXhQN+UdbT/zI+Kxw=
+X-Google-Smtp-Source: AGHT+IFLbNcRGoXteJvsvQz9ePKtTqtffGprFSIVvQoC+S7q0aJ0DFFhhqHjAFy+KyUVXYjD8ktBew==
+X-Received: by 2002:a0d:d851:0:b0:618:95a3:70b9 with SMTP id 00721157ae682-62cd565129cmr130634777b3.36.1718124656832;
+        Tue, 11 Jun 2024 09:50:56 -0700 (PDT)
+Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-62ccaef2825sm20935207b3.139.2024.06.11.09.50.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jun 2024 09:50:56 -0700 (PDT)
+Date: Tue, 11 Jun 2024 12:50:55 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
+	Richard Weinberger <richard@nod.at>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
+	drbd-dev@lists.linbit.com, nbd@other.debian.org,
+	linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
+	virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
+	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+	linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 09/26] nbd: move setting the cache control flags to
+ __nbd_set_size
+Message-ID: <20240611165055.GD247672@perftesting>
+References: <20240611051929.513387-1-hch@lst.de>
+ <20240611051929.513387-10-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,55 +90,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240611085210.GA1838544@mit.edu>
+In-Reply-To: <20240611051929.513387-10-hch@lst.de>
 
-On Tue, Jun 11, 2024 at 09:52:10AM +0100, Theodore Ts'o wrote:
-> Hi, I've recently found a flaky test, generic/085 on 6.10-rc2 and
-> fs-next.  It's failing on both ext4 and xfs, and it reproduces more
-> easiy with the dax config:
+On Tue, Jun 11, 2024 at 07:19:09AM +0200, Christoph Hellwig wrote:
+> Move setting the cache control flags in nbd in preparation for moving
+> these flags into the queue_limits structure.
 > 
-> xfs/4k: 20 tests, 1 failures, 137 seconds
->   Flaky: generic/085:  5% (1/20)
-> xfs/dax: 20 tests, 11 failures, 71 seconds
->   Flaky: generic/085: 55% (11/20)
-> ext4/4k: 20 tests, 111 seconds
-> ext4/dax: 20 tests, 8 failures, 69 seconds
->   Flaky: generic/085: 40% (8/20)
-> Totals: 80 tests, 0 skipped, 20 failures, 0 errors, 388s
-> 
-> The failure is caused by a WARN_ON in fs_bdev_thaw() in fs/super.c:
-> 
-> static int fs_bdev_thaw(struct block_device *bdev)
-> {
-> 	...
-> 	sb = get_bdev_super(bdev);
-> 	if (WARN_ON_ONCE(!sb))
-> 		return -EINVAL;
-> 
-> 
-> The generic/085 test which exercises races between the fs
-> freeze/unfeeze and mount/umount code paths, so this appears to be
-> either a VFS-level or block device layer bug.  Modulo the warning, it
-> looks relatively harmless, so I'll just exclude generic/085 from my
-> test appliance, at least for now.  Hopefully someone will have a
-> chance to take a look at it?
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I think this can happen if fs_bdev_thaw races with unmount?
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Let's say that the _umount $lvdev in the second loop in generic/085
-starts the unmount process, which clears SB_ACTIVE from the super_block.
-Then the first loop tries to freeze the bdev (and fails), and
-immediately tries to thaw the bdev.  The thaw code calls fs_bdev_thaw
-because the unmount process is still running & so the fs is still
-holding the bdev.  But get_bdev_super sees that SB_ACTIVE has been
-cleared from the super_block so it returns NULL, which trips the
-warning.
+Thanks,
 
-If that's correct, then I think the WARN_ON_ONCE should go away.
-
---D
-
-> Thanks,
-> 
-> 					- Ted
-> 
+Josef
