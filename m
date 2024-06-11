@@ -1,262 +1,142 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2155.outbound.protection.outlook.com [40.92.62.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8E114B96C
-	for <linux-block@vger.kernel.org>; Tue, 11 Jun 2024 03:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718076594; cv=none; b=O7MORytkv95dql7m7TtGO9saTuHJm/4Q2fsRk5452cfCLdJlxaVd3utRaPU2/XtmxSZa5mqya9g5386BdXAFjMeLkXMZxS5Vu18JiJ7EJf/8cZ9YeymK3uUfYDxErYYphS2wx4u6cP92SJ5bdeD4aXYcsfzX1+nE/IBupw+IXF0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718076594; c=relaxed/simple;
-	bh=AVTALNiyXSnEHD61S9YGf/kJ1ytUo8vwc4A0jz6eDb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eZsql7saqrmT8UXFlkUg7yxovEQzbapktErwh75ndG9p4otCnYhzF8TbKkk2PhGbj/eP2CK/LrzCi58gqUz6ToYAWtQB/2CoY0g8Iz4EUyOd3XsakQbwDd4DF1rxYiW97sTFInIcqT64bmoc2CW+wWRdfCBT/NEjOCinqACxv8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K2twKw42; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9018764B;
+	Tue, 11 Jun 2024 03:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.62.155
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718077940; cv=fail; b=u5T3dQjdKJs0qo/NwFhFzb4BEDwP2A3afpPsKOO7kLzBE9NlkJeyhaYjERBJLRjLNUAg8tNbm7I0qgRoqJa7fHIEQbgEwMT+trHPN2WP4sjD5Be8ctkHecFRdMAOCjRvogZhNcKp8GBG5ki/hyMYbMhBLDJtT/Ha5a6ANUs7Z9Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718077940; c=relaxed/simple;
+	bh=FRineXL3ewsuHRFSCaUZzblmAmpxJIsYLuJy+YE88dI=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=bsPHV7qn99UN51spVXWpuuL8+ny28FKqPW5QUDwlNc3IkLelIFx4ciYduDt4PeWLUFy5+3WisfTdPSEbF9y6FH9fAcn57kYSbR/j+9hisAevfkF2rSdEVrCvQjTo2Uk4urrR6DEnHvMhntzHTlbzkMxdlRr+MDHJIV2jzCRIweY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=kYqshQHG; arc=fail smtp.client-ip=40.92.62.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2twKw42"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718076590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=agQl3Cw2FMTl0tGTwUnzAF1ytQE3h864ugiESEYDrZ8=;
-	b=K2twKw42+rsHdrlWI4MmZfMbWk/kGR7AR23FImbQ82wqaTDWaDanASChGlUnG0VPvF9hEF
-	HsMsTiCcp7W9PT/R0C8N8zXHBJjA3m3MKjh0Gb6RvuCqeS54ZJmmWwqnFnGikZpcGm4UXC
-	QgLhSBzNRIWn6qbsQ0POtMGt6i8MKRQ=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-477-81sbr3rfPLyiHmO6cotGug-1; Mon,
- 10 Jun 2024 23:29:48 -0400
-X-MC-Unique: 81sbr3rfPLyiHmO6cotGug-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7B7419560AB;
-	Tue, 11 Jun 2024 03:29:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.112.176])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E868630000C3;
-	Tue, 11 Jun 2024 03:29:40 +0000 (UTC)
-Date: Tue, 11 Jun 2024 11:29:35 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: "yebin (H)" <yebin10@huawei.com>
-Cc: yebin <yebin@huaweicloud.com>, axboe@kernel.dk,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ming.lei@redhat.com, Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH] block: bio-integrity: fix potential null-ptr-deref in
- bio_integrity_free
-Message-ID: <ZmfEn4ieO9EK/0z5@fedora>
-References: <20240606062655.2185006-1-yebin@huaweicloud.com>
- <ZmJQwvBXfm3zw+Xs@fedora>
- <6662632D.7020000@huaweicloud.com>
- <ZmJj5C4gz+gT9C4m@fedora>
- <6667BAED.7060809@huawei.com>
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="kYqshQHG"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k+j9t/1orjc6Vi79Wi5QRA6oV09w48m09Hv0KmAtAkkj77llXIaTAlKVa+o5BuG0xMFMDPCsVq0LtgwJnxNHPVuLrVUJbdTGBswekbvWvwNvC6R3VrAMuJSq7vXctcST+n3f8aKwKXp8shQCmIHly6SBURTKwiRt/Yi3HfXEYROTQNbwnHHI0lzho67lgcN23O8V0e4DEQgIvNmR8HZ1EQn5jYmO8mbZj9sSX2XU95EbtCvNbk/VXSmz9WBeR+v1694TbYlQ/6NMSRzi+nlzPc682JEsKkC1GF/PCftwWXXShUWqU57K/aPv0wRKyZyEpLyZ+R8lhIjjpwccuT5DXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=g8ZAoDwRPI3x/AIyFd0MQa/2e5enD6haWpvBAA21fqA=;
+ b=Lczw1JYeNy8Cx/riYOKML1Oc0LoV6yF8mAHzuaj45oYF6ku4cWsi2Mdn/pE7jZ4VftpvFAFJUXUpsAU88IdtQ5suGcRtRCNH0u7vd+E5N7ucm2WrZI7ub4eCuzkDqMGDS4FERiwq8aeg7/586OgCdSicq2RoMiHd+0YBtXZprvBN3P+WYTu9tGiVDFYt753eRc3F/PfujDvLjqKmyF0V9nR6el0sZN77CxdYsuzF7v81yOihWkKkei8GNtZnH4rUDvsPL5bUA8xejUwTbV3zaxPNIyELHU74e48GFVI6CMcARKfRUn7ic20omoDekgqIdvnArcDgj4E1HFz+u6m1MQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g8ZAoDwRPI3x/AIyFd0MQa/2e5enD6haWpvBAA21fqA=;
+ b=kYqshQHGthKa72gfwUPyiiAjPkRzThVdo/bWGJgVNs0TOa+jivGVfH7HZoyfJmcsvSlbQnjPpgLhNyC5AT/MFA2nm8kbNmB5B/GReX/xqGMocT6K4Gvk/Fv1stepP6qJRTxJgjkFg6C7B6VKA1xTt5TAPi6xm8I7unId/WIoO13UKqrrfXCPZA7znW/VNczpWaUCfQO6PtR4xvazHskjLSCQe47Qm77vUbQovmV4Xg0+NOtA4dMJ9AtHzZKxfR12M8PVQCvkfPIRpYlk9fUsOdoZUdMETeYAk/TE6Mfk9lXg1qLFuWxNN3QPUfMc6Mu7+z8ap+UW9i3/hOsuXdNL1w==
+Received: from ME3P282MB3617.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:186::10)
+ by MEYP282MB1639.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:c7::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Tue, 11 Jun
+ 2024 03:52:14 +0000
+Received: from ME3P282MB3617.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::ef09:453a:38f:15d9]) by ME3P282MB3617.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::ef09:453a:38f:15d9%3]) with mapi id 15.20.7633.036; Tue, 11 Jun 2024
+ 03:52:14 +0000
+From: Gui-Dong Han <hanguidong02@outlook.com>
+To: justin@coraid.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	Gui-Dong Han <hanguidong02@outlook.com>
+Subject: [PATCH] aoe: consolidate flags update to prevent race condition
+Date: Tue, 11 Jun 2024 11:52:04 +0800
+Message-ID:
+ <ME3P282MB3617DAD141ACDD21170355E0C0C72@ME3P282MB3617.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [V3bLihkrbbRRIeXTwI1pdOFhKHVuI9suIqLdPYefBx0YbCPJlk75L/oggdRqhUVC]
+X-ClientProxiedBy: SGBP274CA0010.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::22)
+ To ME3P282MB3617.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:186::10)
+X-Microsoft-Original-Message-ID:
+ <20240611035204.9238-1-hanguidong02@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6667BAED.7060809@huawei.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: ME3P282MB3617:EE_|MEYP282MB1639:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0a579dce-833e-4413-e51f-08dc89c9e19d
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199019|3430499023|3412199016|440099019|1710799017;
+X-Microsoft-Antispam-Message-Info:
+	4t3GqZDKo6YqOXgJ90yR1zo5AUiAK8Mbo564BueFANQSNFqxRY/c5xUTt9aIQOT9TRevQuttq/9UVuM92Yc/n3ZF50JQZ26zR1akwZxBZe5BHvGGbi0a8O7ZalxnJR2EJ7WO/52yhEN711DHe9W6ziGfwC4zML9U0UFouabrjbXaSbxgHzuNXuPTLmH7I3Yic1SEcb/zWrQGZtazznVcQTwnMhSsIsr+/SviBkHJBYfvM+OWcwqfZ0HNNkm9QvwgwnsE8XSGEVfN1mp7o0FDeFKw3Kdk33aD34+GPSVBspmW7X3oUX2mtduD9I4fJAjOqtBeIzOvIdgcOXqlJ0ouMlp6QsNJnufV5cDWdX1fcilFzoD1xaIxcNTvGlp8J4164s1z66VRzQTPI+omLMCg9kpI8JeHuSBSltQ/t4kz+j6AOaMpNInbgE2GUOEvrBnOFsjjPhJD++EZA6GuuEU+sp1hUrqe4O3aAIrc9tFCn+zONwAQP4+4u8fh4RZKKTuv014+LKZmfFlOV7UycuDJNIxnHxxbOo+xROHQXbwhSssOXfoAabxZ2HtEEPkek63cnNOwJEzJQTr9V/a+Rtvh7QbxivTetcEr4/zedpdSDnq4ONY3l0Z4Lx5k1Xd/PCGk
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?DE3LecUxnWuas0fwapjWkRsCZ4u0UtjDR7gSjeHwurki0W3NxJO8dnonzs0I?=
+ =?us-ascii?Q?oebkas3AuQfJsfNpF9kJheRmWbm14icQabXzoi1C0UBI5WSbMOaYWZ/dDgPs?=
+ =?us-ascii?Q?pv+RObOk/HKXAcR5moAJKRkxt0aChJ9yaE8a9PuRET3BkTfK/3srHtWGsoq8?=
+ =?us-ascii?Q?sc5mtXdVRYpLzTDhSd8pdQql9mC/Oky9P1DXmgcnjppkpwFSjHR7DEo1ePMi?=
+ =?us-ascii?Q?dz+w5Fss5IyZ10+4onNe+DW1HRZtlwG02JWjHJSKOKuPe4IEiiBIFBZpuAja?=
+ =?us-ascii?Q?VRwD+2qsvWWfo0ugCGj9mEpTbL1EgdhFgqozcK5xTwSxRVKBFrLTXkl/c/pX?=
+ =?us-ascii?Q?4BvVcTsbKIIBo0p9Ek0JLBldaZVWG9zxkJy2l8FxRCnF0jHO+WJPQuVDTrCG?=
+ =?us-ascii?Q?5wYBF1bOIGd9QnM8TswX+SE2yiUqUxnWKoOH6YEzEQSUIRx5T598VHmT0TZu?=
+ =?us-ascii?Q?dS8jqNaiCxcp8NR9kxXJflRBGzpgfNBxIuaIKM6Zk3gZG/UcuEeR+9kTd0L4?=
+ =?us-ascii?Q?C1vgzqPOEgOkt74OHdgpeH4xNRZ86P84OxqUrgtoOYVhfQr6brMRggd0Ogxu?=
+ =?us-ascii?Q?G086E1FQtBWggphmraX0anByXB6AjwIcy4wterzhnRgbwNEBzwmBZQjqK2UD?=
+ =?us-ascii?Q?7Afp4dYAB2nPPLcaukugQJl8rOzbMnyw5RNYsD6+sLvOEeOquPzYfM91xWuM?=
+ =?us-ascii?Q?ibh0FzOP4UdeyCpghVgiSadl37YCiYVbC7aYwQ/2JquFzGsr9owOe8IxSb2m?=
+ =?us-ascii?Q?eb84Bpt9u8SeKQbRH4TfvcFNAZi9F81nmFPW8yO1PKrrzSe3iI1suhdpX6Gd?=
+ =?us-ascii?Q?+4RmQDmpAIY6uWcUmZhOSWgCsVNCDTqgOE0ZoMZ7pVxc28ERfgqBvZ+Ae61G?=
+ =?us-ascii?Q?3fheiDUBAOSZjSLFw3xvvS0Y/955UyE2w7yBgiXBSlxgzfuSjzCQQvjnOlE6?=
+ =?us-ascii?Q?9DlenYpH1bIxev63nqHAGrfvS9lc2ExDU7BJlUr7qoTmsJAhDdAYD8mppLv7?=
+ =?us-ascii?Q?mb8OTV+VqwcIF0CSfi7P/9HDmUhk67o6A7Hzx0CA9MkOXQu7FL+1Dvx97V2w?=
+ =?us-ascii?Q?HnQc9cv+6ou21HYEvKhn2E1PXwZxDBcNkJRgAlA8ld9puGBLGR/HvJ8n6npR?=
+ =?us-ascii?Q?O28i2X6vgwnhaL/ssEaZSAq5mFp2awMUz/3iIx07SQLrQcBkv+cnGcbIPmtt?=
+ =?us-ascii?Q?x6nbplfMxj05eRhyCB4YjR8QmYLVmYyrpwzxqzmNVp0SArdyGwbSNf4v+gAv?=
+ =?us-ascii?Q?iSSOBO70qa+Bix4ItJ27qJx4C9tOJeYTAwNbOS39yGBg48T7fJjT+95BRDDM?=
+ =?us-ascii?Q?JjdqU6hOGR3MBOAjMmykqXSY?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a579dce-833e-4413-e51f-08dc89c9e19d
+X-MS-Exchange-CrossTenant-AuthSource: ME3P282MB3617.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2024 03:52:14.8965
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEYP282MB1639
 
-On Tue, Jun 11, 2024 at 10:48:13AM +0800, yebin (H) wrote:
-> 
-> 
-> On 2024/6/7 9:35, Ming Lei wrote:
-> > On Fri, Jun 07, 2024 at 09:32:29AM +0800, yebin wrote:
-> > > 
-> > > On 2024/6/7 8:13, Ming Lei wrote:
-> > > > On Thu, Jun 06, 2024 at 02:26:55PM +0800, Ye Bin wrote:
-> > > > > From: Ye Bin <yebin10@huawei.com>
-> > > > > 
-> > > > > There's a issue as follows when do format NVME with IO:
-> > > > > BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
-> > > > > PGD 101727f067 P4D 1011fae067 PUD fbed78067 PMD 0
-> > > > > Oops: 0000 [#1] SMP NOPTI
-> > > > > RIP: 0010:kfree+0x4f/0x160
-> > > > > RSP: 0018:ff705a800912b910 EFLAGS: 00010247
-> > > > > RAX: 0000000000000000 RBX: 0d06d30000000000 RCX: ff4fb320260ad990
-> > > > > RDX: ff4fb30ee7acba40 RSI: 0000000000000000 RDI: 00b04cff80000000
-> > > > > RBP: ff4fb30ee7acba40 R08: 0000000000000200 R09: ff705a800912bb60
-> > > > > R10: 0000000000000000 R11: ff4fb3103b67c750 R12: ffffffff9a62d566
-> > > > > R13: ff4fb30aa0530000 R14: 0000000000000000 R15: 000000000000000a
-> > > > > FS:  00007f4399b6b700(0000) GS:ff4fb31040140000(0000) knlGS:0000000000000000
-> > > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > > CR2: 0000000000000008 CR3: 0000001014cd4002 CR4: 0000000000761ee0
-> > > > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > > > DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-> > > > > PKRU: 55555554
-> > > > > Call Trace:
-> > > > >    bio_integrity_free+0xa6/0xb0
-> > > > >    __bio_integrity_endio+0x8c/0xa0
-> > > > >    bio_endio+0x2b/0x130
-> > > > >    blk_update_request+0x78/0x2b0
-> > > > >    blk_mq_end_request+0x1a/0x140
-> > > > >    blk_mq_try_issue_directly+0x5d/0xc0
-> > > > >    blk_mq_make_request+0x46b/0x540
-> > > > >    generic_make_request+0x121/0x300
-> > > > >    submit_bio+0x6c/0x140
-> > > > >    __blkdev_direct_IO_simple+0x1ca/0x3a0
-> > > > >    blkdev_direct_IO+0x3d9/0x460
-> > > > >    generic_file_read_iter+0xb4/0xc60
-> > > > >    new_sync_read+0x121/0x170
-> > > > >    vfs_read+0x89/0x130
-> > > > >    ksys_read+0x52/0xc0
-> > > > >    do_syscall_64+0x5d/0x1d0
-> > > > >    entry_SYSCALL_64_after_hwframe+0x65/0xca
-> > > > > 
-> > > > > Assuming a 512 byte directIO is issued, the initial logical block size of
-> > > > > the state block device is 512 bytes, and then modified to 4096 bytes.
-> > > > > Above issue may happen as follows:
-> > > > >            Direct read                    format NVME
-> > > > > __blkdev_direct_IO_simple(iocb, iter, nr_pages);
-> > > > >     if ((pos | iov_iter_alignment(iter)) & (bdev_logical_block_size(bdev) - 1))
-> > > > > 	-->The logical block size is 512, and the IO issued is 512 bytes,
-> > > > > 	   which can be checked
-> > > > >       return -EINVAL;
-> > > > >     submit_bio(&bio);
-> > > > >                                         nvme_dev_ioctl
-> > > > >                                           case NVME_IOCTL_RESCAN:
-> > > > >                                             nvme_queue_scan(ctrl);
-> > > > >                                                ...
-> > > > >                                               nvme_update_disk_info(disk, ns, id);
-> > > > >                                                 blk_queue_logical_block_size(disk->queue, bs);
-> > > > >                                                   --> 512->4096
-> > > > >        blk_queue_enter(q, flags)
-> > > > >        blk_mq_make_request(q, bio)
-> > > > >          bio_integrity_prep(bio)
-> > > > > 	 len = bio_integrity_bytes(bi, bio_sectors(bio));
-> > > > > 	   -->At this point, because the logical block size has increased to
-> > > > > 	      4096 bytes, the calculated 'len' here is 0
-> > > > >            buf = kmalloc(len, GFP_NOIO | q->bounce_gfp);
-> > > > > 	   -->Passed in len=0 and returned buf=16
-> > > > >            end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-> > > > >            start = ((unsigned long) buf) >> PAGE_SHIFT;
-> > > > >            nr_pages = end - start;  -->nr_pages == 1
-> > > > >            bip->bip_flags |= BIP_BLOCK_INTEGRITY;
-> > > > >            for (i = 0 ; i < nr_pages ; i++) {
-> > > > >              if (len <= 0)
-> > > > >                 -->Not initializing the bip_vec of bio_integrity, will result
-> > > > > 		 in null pointer access during subsequent releases. Even if
-> > > > > 		 initialized, it will still cause subsequent releases access
-> > > > > 		 null pointer because the buffer address is incorrect.
-> > > > >                break;
-> > > > > 
-> > > > > Firstly, it is unreasonable to format NVME in the presence of IO. It is also
-> > > > > possible to see IO smaller than the logical block size in the block layer for
-> > > > > this type of concurrency. It is expected that this type of IO device will
-> > > > > return an error, so exception handling should also be done for this type of
-> > > > > IO to prevent null pointer access from causing system crashes.
-> > > > Actually unaligned IO handling is one mess for nvme hardware. Yes, IO may fail,
-> > > > but it is observed that meta buffer is overwrite by DMA in read IO.
-> > > > 
-> > > > Ye and Yi, can you test the following patch in your 'nvme format' & IO workload?
-> > > > 
-> > > > 
-> > > > diff --git a/block/blk-core.c b/block/blk-core.c
-> > > > index 82c3ae22d76d..a41ab4a3a398 100644
-> > > > --- a/block/blk-core.c
-> > > > +++ b/block/blk-core.c
-> > > > @@ -336,6 +336,19 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
-> > > >    	return 0;
-> > > >    }
-> > > > +static bool bio_unaligned(struct bio *bio)
-> > > > +{
-> > > > +	unsigned int bs = bdev_logical_block_size(bio->bi_bdev);
-> > > > +
-> > > > +	if (bio->bi_iter.bi_size & (bs - 1))
-> > > > +	        return true;
-> > > > +
-> > > > +	if ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1))
-> > > > +	        return true;
-> > > > +
-> > > > +	return false;
-> > > > +}
-> > > I think this judgment is a bit incorrect. It should not be sufficient to
-> > > only determine whether
-> > > the length and starting sector are logically block aligned.
-> > Can you explain why the two are not enough? Other limits should be handled
-> > by bio split.
-> If logical block size is 512 bytes, BIO has 4 segments, each segment length
-> is 512 bytes,
-> bio->bi_iter.bi_sector == 0. If logical block size change to 4096 bytes,
-> bio_unaligned() will
-> return false.
+In aoecmd_sleepwork, there is a race condition caused by two consecutive
+writes to the 'flags' variable within a critical section. If a read 
+operation occurs between these writes, an intermediate state may be 
+read, potentially causing bugs.
 
-Yes, this IO is still 4096 aligned in block size level.
+To address this issue, the 'flags' variable should be updated in a 
+single operation to ensure atomicity and prevent any intermediate state
+from being read.
 
-It is just that each bvec buffer isn't page-aligned, for nvme, if virt_boundary
-is set, this bio will be split. However, we don't add logical block size
-check in submit_bio_noacct() yet, 512byte bio still can be sent to
-device.
+Fixes: 3ae1c24e395b ("[PATCH] aoe [2/8]: support dynamic resizing of AoE devices")
+Signed-off-by: Gui-Dong Han <hanguidong02@outlook.com>
+---
+ drivers/block/aoe/aoecmd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> I'm not sure if the example I gave is appropriate?
-
-Absolutely it is one good example.
-
-BTW, Yi have tested both your patch and my patch which checks lbs in
-blk_queue_enter(), looks slab corruption still can be triggered with
-either one.
-
-Yi, can you test the following patch?
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 82c3ae22d76d..c47e69795c86 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -336,6 +336,19 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 	return 0;
- }
+diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+index cc9077b588d7..37d556f019c0 100644
+--- a/drivers/block/aoe/aoecmd.c
++++ b/drivers/block/aoe/aoecmd.c
+@@ -897,8 +897,7 @@ aoecmd_sleepwork(struct work_struct *work)
+ 		set_capacity_and_notify(d->gd, d->ssize);
  
-+static inline bool bio_unaligned(struct bio *bio)
-+{
-+	unsigned int bs = bdev_logical_block_size(bio->bi_bdev);
-+
-+	if (bio->bi_iter.bi_size & (bs - 1))
-+	        return true;
-+
-+	if ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1))
-+	        return true;
-+
-+	return false;
-+}
-+
- int __bio_queue_enter(struct request_queue *q, struct bio *bio)
- {
- 	while (!blk_try_enter_queue(q, false)) {
-@@ -362,6 +375,15 @@ int __bio_queue_enter(struct request_queue *q, struct bio *bio)
- 			   test_bit(GD_DEAD, &disk->state));
- 		if (test_bit(GD_DEAD, &disk->state))
- 			goto dead;
-+		/*
-+		 * Not like other queue limits, logical block size is one
-+		 * fundamental limit which can't be covered by bio split.
-+		 *
-+		 * Device reconfiguration may happen and logical block size
-+		 * is changed, so fail the IO if that is true.
-+		 */
-+		if (bio_unaligned(bio))
-+			goto dead;
+ 		spin_lock_irq(&d->lock);
+-		d->flags |= DEVFL_UP;
+-		d->flags &= ~DEVFL_NEWSIZE;
++		d->flags = (d->flags | DEVFL_UP) & ~DEVFL_NEWSIZE;
+ 		spin_unlock_irq(&d->lock);
  	}
- 
- 	return 0;
-@@ -765,6 +787,8 @@ void submit_bio_noacct(struct bio *bio)
- 
- 	if (should_fail_bio(bio))
- 		goto end_io;
-+	if (bio->bi_iter.bi_size && bio_unaligned(bio))
-+		goto end_io;
- 	bio_check_ro(bio);
- 	if (!bio_flagged(bio, BIO_REMAPPED)) {
- 		if (unlikely(bio_check_eod(bio)))
-
-
-Thanks,
-Ming
+ }
+-- 
+2.34.1
 
