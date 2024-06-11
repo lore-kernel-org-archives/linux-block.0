@@ -1,83 +1,96 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6DD14D714
-	for <linux-block@vger.kernel.org>; Tue, 11 Jun 2024 08:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6057176FA7;
+	Tue, 11 Jun 2024 09:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718095961; cv=none; b=Pw3STukOm9za3fq3ETmVinmiCfV57TGzopy90HWxwxMUlQDMmdC5Lz/8yUsd/yGTORykMQaRIEiUCi5s4Zr+IcCBv3+4CL04Bn/rsZUzeKeTbg8lgZxIg2f+GaV2OWKWFeDGeBxFwNtC5r7asPN12AvrgamGhH+WuI7nFxb6YoM=
+	t=1718097639; cv=none; b=i3l2uVij7Ng5VHAaCRmlKwDovVRCdlhLTmbX4aTD7rT4ydfMIbAd99rOB+2vo0uOZhPAtT8uOktCoPDCuUItB4u0ZRkoZfYNWi9fY1275rahcdH91H/bb8vPO4jyZJWbpK/b99zvhrajWz4p2PpZ3xADo6mLwZPDdMldgWbe9RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718095961; c=relaxed/simple;
-	bh=e1jKfrVJvNRUjZ1G7GMXs/Auo65RBO7a6yZMmElGgzo=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FmPQA8aa48tKsTVH6lYVezBzdGgQKdUkyb30QcoxELTwFs62KZsRKk/hzkzMPp97lVB3hHqxnFgEq8230+3+F7l8Cu5Kws4MxPzQMwHFI3VbPDYxYfakGHVNth4Uw1i3mxo6zx/f+jd2q0spjB2B6/VaEDavaytRG7eLcgYsFSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=nkumsAtJ; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	s=arc-20240116; t=1718097639; c=relaxed/simple;
+	bh=eO/SU6/Ukvz9yz53+xanZdbexobUG1/nTCp0LPHQuOw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=O5Q4nkm2zIhQDslcjU1TkFdq/+qeduTMSBILKrYn4P6H5fXWj7eMNipF5/lPaAF+LBosLZclbhUQZSUlge66JB+9cMaQxIAd3B19Xb6/RLvA0h9jyRFrTTuNwkO3YhzIg/vvmSuz0Q5XdNz3cpHuwoQ5/RNMon1ZBVPWxuBZhfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=FftRtfIl; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="nkumsAtJ"
-Received: from macsyma.thunk.org (unn-37-19-197-199.datapacket.com [37.19.197.199] (may be forged))
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 45B8qFri013014
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jun 2024 04:52:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1718095944; bh=SeRNdQn2ssqgKAus6AWOugRGaJLxS3fn0v7E7U0Lyaw=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=nkumsAtJuXUyjG1S4kNF4T71+CDE1Sg/+yCCOV7PWS+Z4p0BcabCql9o97LZtT7nw
-	 yns/TZjLhbFNIwaR1wC7P6pkKC6AzJqJEsEjpOIlKMBX4vokEsqdSuNGuZBvCgi5Ll
-	 15gRYpAICP/GYnW+07M6y9t79Jr0vmHhCi2nJV04+V+1e0IFqogn42h6LJI/LiiXkt
-	 T9qH4fnJV1jTsJwVTrYmsU8q5ItIDDMvKRci09fq1IBlM3KGCNCAG3s8hf60qYphuT
-	 FxDFxtsBnN73ColJVKZfIgiplQ6oQJuzZHqw3njI+1sHOcBTSD4mFRFaN1BTvgd3gk
-	 fGLIm5pt1mmHA==
-Received: by macsyma.thunk.org (Postfix, from userid 15806)
-	id 67DBA341669; Tue, 11 Jun 2024 10:52:10 +0200 (CEST)
-Date: Tue, 11 Jun 2024 09:52:10 +0100
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, fstests@vger.kernel.org
-Subject: Flaky test: generic/085
-Message-ID: <20240611085210.GA1838544@mit.edu>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="FftRtfIl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1718097309; x=1718702109; i=markus.elfring@web.de;
+	bh=SSWdIHLeK6c5qkRxJRQIzSFopdFgLqZQ5bZ8370mvc4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=FftRtfIlHxGUAI3vCcm4yTpn/7z8WsjG+Em5dB5ND9N5eedR+QTMfkd+w7F2Zs2i
+	 WI1Yj0slkHGiDMKMlDkpOiP/MjEK/B6R2dAiV03zMK6+t4kT7xBeCDDQ888uoe/W3
+	 HMJ+HG6g52cDLWKEcQbr6xXdD9cRTtNwHwz+bFZPPzkQ7TcZrvW0MggwyEXpoOwch
+	 F1SP/+OJXN2UQv0MqjXDYRgbkFIKPiQyMGI39/lLF6bCcLm4PLaCKaVl0+whiFMsB
+	 SB0PgbV6ShDjyXNFTfm7jH/gkRm4xnMBSXmDKl3ZdmJohCKk1XemhGUQoO6np/E5N
+	 r5idNtThZcYbX7sxNg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MSqTK-1rq7cJ2zhW-00J0sU; Tue, 11
+ Jun 2024 11:15:09 +0200
+Message-ID: <0e1ac9ca-c241-4b48-a219-d1aaef2a752a@web.de>
+Date: Tue, 11 Jun 2024 11:15:06 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+To: Ye Bin <yebin10@huawei.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>
+Cc: LKML <linux-kernel@vger.kernel.org>, Christoph Hellwig
+ <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>
+References: <20240606062655.2185006-1-yebin@huaweicloud.com>
+Subject: Re: [PATCH] block: bio-integrity: fix potential null-ptr-deref in
+ bio_integrity_free
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240606062655.2185006-1-yebin@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:GHmc89SQ4Td/zPwUg//USd5islR+tdgleigB+jmBeZEuq6FZ7Dy
+ fkE7CjeiMfQNvzY0YK08nYlilwmnduxqbtLEXlZPIHy8TtJwqsAsxfDMtv1kVgp7vN7HY3T
+ IALqM09md0BMzdXXkahjw/wqc3/g/o4um3hx2fvO5m4g3LdePf+xlz9QuKO0YSskYbKSlDW
+ ouYkrcSzcG4LaTCOdkrZg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:w3g6y7385Ok=;4OLDESrn0lp0xrLZI+q1mYjtpDC
+ 9L4XwYlMGBU/2knpMHxRGtTguQQPeZkUn9hbbhdJEbPFwKVuasnXIFwsFPPZMJWGF9Gyi5AdU
+ p2/eh5PYU7JjePGFXBpZuGx5XzQAULZfIJqL3J5wx0xVh8v4k18N+f/UiMmgqVRhUdafKaK5A
+ Vjuvpu5YRwyP4ZaoiHmzSaLZxFMm8rAaGBoCp24NpeW8eOYXiBufOe+roIN7J+3U0i1RO20M5
+ ibiygZB/TDIGdrs9L4FzHsK0UZvGL93mO/3aLCDIdHIZtml9pvBSI9vMWtqOaQ1lZwN9GWrnn
+ XVz0VFlULaG85q/vFA2450eAeTuFWrQ+f0wPCIZ54LPwyy/bGCMqhtVdjGFY+/LHyZeMD3R6a
+ dqQytdUotZXhiS5/f3pfvC3DcWQZFmjSAJed9btt0ovvy25dK/EJiQMLyGp7ZS/w4i7TfZ5Sf
+ RpsDfzZ65tCEBD+iWOM2HkNTcH91z5c7FAQeclUgQeN/Fen8vAr2eZ5OMj7hPPJHya9BbL6rQ
+ JoiO5Gu3MYgjmhHYVNqdPaLjh1TLMVOvgth8ETDFRpS4sBh2VWPFhatcBaZYvOdP8eXxM8sjK
+ ftgSY1q05gPDkmgL3kVTG+xpDRT5wG/zQgS/gOcuzl5Bq6iGmjmXjyXVuqsQ2iYEhAOmZpXue
+ gCx8qIA+QByymh0Zwrxr4B+hHfguxyA3d1JmrVMKmS9XzrIsEbSBj0Uer8v/MBbU9k7tNblRI
+ FX09N3GphcrQdp2SBs4/aZi6w0LFVeRdWqpYu9CJhwdHpyxPlLEDJ9wjmNcyq9xiRm199crh4
+ h2dGqmiwCRC1yvvmWZpUy52+P348tLJ7LBdy0p3mQiSDo=
 
-Hi, I've recently found a flaky test, generic/085 on 6.10-rc2 and
-fs-next.  It's failing on both ext4 and xfs, and it reproduces more
-easiy with the dax config:
+=E2=80=A6
+> The root cause of this issue is the concurrency between the write proces=
+s
+> and the block size update process. However, this concurrency does not ex=
+ist
+> in actual production environments. To solve above issue, Verify if the
+> segments of BIO are aligned with integrity intervals.
 
-xfs/4k: 20 tests, 1 failures, 137 seconds
-  Flaky: generic/085:  5% (1/20)
-xfs/dax: 20 tests, 11 failures, 71 seconds
-  Flaky: generic/085: 55% (11/20)
-ext4/4k: 20 tests, 111 seconds
-ext4/dax: 20 tests, 8 failures, 69 seconds
-  Flaky: generic/085: 40% (8/20)
-Totals: 80 tests, 0 skipped, 20 failures, 0 errors, 388s
+* Please improve the change description with an imperative wording.
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
+Documentation/process/submitting-patches.rst?h=3Dv6.10-rc2#n94
 
-The failure is caused by a WARN_ON in fs_bdev_thaw() in fs/super.c:
+* Would you like to add the tag =E2=80=9CFixes=E2=80=9D accordingly?
 
-static int fs_bdev_thaw(struct block_device *bdev)
-{
-	...
-	sb = get_bdev_super(bdev);
-	if (WARN_ON_ONCE(!sb))
-		return -EINVAL;
+* How do you think about to use the summary phrase =E2=80=9CAvoid null poi=
+nter dereference
+  in bio_integrity_free()=E2=80=9D?
 
 
-The generic/085 test which exercises races between the fs
-freeze/unfeeze and mount/umount code paths, so this appears to be
-either a VFS-level or block device layer bug.  Modulo the warning, it
-looks relatively harmless, so I'll just exclude generic/085 from my
-test appliance, at least for now.  Hopefully someone will have a
-chance to take a look at it?
-
-Thanks,
-
-					- Ted
+Regards,
+Markus
