@@ -1,146 +1,164 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.130])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3FE1527A2;
-	Tue, 11 Jun 2024 21:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02AE155A47;
+	Tue, 11 Jun 2024 23:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718140942; cv=none; b=RLLPW1l9WzkWG6xoSR5i7l3Yksb+26jLZNUGdqZKpbry48ZeYyCqXPwGYek55Czs0C8Qe6vjWolYMxgfX5WDqoiMzAEsWvBPOT0BtR+8V8+ye+dN/0sumaxIQJMFshDuCqEJsPDc3b5vSlbV2tk0LKw1oDc1VRa1Wy4uzkBQ3hY=
+	t=1718147338; cv=none; b=umj28EI18UnVym2jq4fNjjsgpg9Yok3XhhnvtiZhoJMR2o8oE7LXiDfMzcd+KdpEgxthUiajPfwn269fsD5uCqxOr2wqEYxnxIs9+flFwXiLWtjXoiUJKOhUVznKsPEVsCpGhw1ZLP3oVeDOgx0RA4f2HxizzmtfsGG1BKgTd54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718140942; c=relaxed/simple;
-	bh=yjMBvWB5+B7dFt47iCo5AaFzQSISODEVKaHGFZRRL14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SuyFmFJ0dhFKtAHu8AqANUGveWUmKEug+EXC6VI7N+1vUKZZ5PouJ2Z5zVnNbZlG5/Eznq/7rj7aWgbPLRE9i6qk+0pvodrKFYXV9q/GZFC7L+4Zp3dOVSOtqkinv3aLfmcpjFym47FL5qLnAjtpATLPSgam0Et406iPoXbu0W4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=tUCJtIwU; arc=none smtp.client-ip=212.227.126.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+	s=arc-20240116; t=1718147338; c=relaxed/simple;
+	bh=SMsMnl/E19q1EZECqP3FDag1lE3b7Ahyh8DT0mGtfvE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=I3+RdSNkr4sjTWP0oXS+GyXNrwP3NXjbvALyga/51+S0Jwjbr6DU1IETWOl5knP3l9ppKexuNPgLAIcigJIzu8ukU2kgNy9F+6p/HFtTTzEFQwDlnsCIgzGE5uGD0NvkLqlhs1p12Ym0wawfzu+xofB9Yp4/pQNjTHtKkq0OpCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=39nJIEgh; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="tUCJtIwU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
-	s=s1-ionos; t=1718140907; x=1718745707; i=christian@heusel.eu;
-	bh=yjMBvWB5+B7dFt47iCo5AaFzQSISODEVKaHGFZRRL14=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:In-Reply-To:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=tUCJtIwUF7ZiqD2pwXcvForQaAd3wVXt5vBH9nYUVr/xme5Zd7BhMZK9RvySI2yR
-	 2EGBCHAruy0SobHSbdlWs4D7o0AGSXkQ28GroRXihc314MPYqTd1wLyhoaZoUu9mb
-	 pLXFhlWCmiWUTN6SAWii3fb8LgBoh/DuIZCRtzhJZW7JP5Ses6KZC1J5x6lW0LTnH
-	 Yiajw9Lv91pqdO7GaWpgiCSuOyD03mPTbKvTAg/hx26LsXC34qwwsQq+gkedWkUhq
-	 GaLuJAiEMIPvme+UnfrH0t3Xjdq8TcCX39qX2Kd+3fUU990L+AkCutf6jHn2rty94
-	 SUgKjYmq9Rn7TakP1g==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from localhost ([141.70.80.5]) by mrelayeu.kundenserver.de (mreue010
- [212.227.15.167]) with ESMTPSA (Nemesis) id 1MV5nC-1rsQF23SbO-00KKSj; Tue, 11
- Jun 2024 23:21:47 +0200
-Date: Tue, 11 Jun 2024 23:21:35 +0200
-From: Christian Heusel <christian@heusel.eu>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, 
-	"Martin K . Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
-	Daejun Park <daejun7.park@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, 
-	Damien Le Moal <dlemoal@kernel.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	regressions@lists.linux.dev
-Subject: Re: [PATCH v9 11/19] scsi: sd: Translate data lifetime information
-Message-ID: <678af54a-2f5d-451d-8a4d-9af4d88bfcbb@heusel.eu>
-References: <20240130214911.1863909-1-bvanassche@acm.org>
- <20240130214911.1863909-12-bvanassche@acm.org>
- <Zmi6QDymvLY5wMgD@surfacebook.localdomain>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="39nJIEgh"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VzPVw0Xr1z6CmSMs;
+	Tue, 11 Jun 2024 23:08:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:content-language:references:subject:subject:from:from
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1718147327; x=1720739328; bh=6DyzKM+DtIuobPzwKOhzgzP6
+	zkpd17hL1Aod6VJ/k68=; b=39nJIEghuNGK8K73AWmToVISBeoYV97i8RVEhARB
+	IRWhsd6ZL2QdIjPJ7QnzwRbKfRaZ87lsD7S5g5Z++gK4qzFWDrFiAET0BiuRs06o
+	USgIpJxgOyp7ofPPz/5l117TJMTR/6Zf+EKUZk13h1SdkDqopqVaDfyd4P3zj9kE
+	qvy4qDb7cImQyKSzUoJmxrIlDJSFBDKDpyIOX7rwQpPB9cLLQXnR3jw5FP7hUoQn
+	BlUUg8xfHQCTKMLpOXW0KJvGuuR/ziY/2UC7wMh/uIzdSA1HjNMFWU1GZ/zdAXeM
+	xWb6FFfP3xrcVN868iwkDsldcRYcDPDhMx3Sz435/+Cc/w==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id dk6etEF2j3HT; Tue, 11 Jun 2024 23:08:47 +0000 (UTC)
+Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VzPVk0Gv6z6Cnk8s;
+	Tue, 11 Jun 2024 23:08:45 +0000 (UTC)
+Message-ID: <9dae2056-792a-4bd0-ab1d-6c545ec781b9@acm.org>
+Date: Tue, 11 Jun 2024 16:08:44 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4sl6cuacyuhoilmf"
-Content-Disposition: inline
-In-Reply-To: <Zmi6QDymvLY5wMgD@surfacebook.localdomain>
-X-Provags-ID: V03:K1:foLHCmu243axhoMmi+81hYCdUWji/QUP2esFrCkTAjpwsLB54oR
- zGmiPvbsQF7NvPcIsjPCL3ZHOyI5OiMJ3lFKrW7ViasszasL824LGW4uFIMnbtk8rVg2A5I
- sZmfOH40DRJg+K4aue7Bq9NfN+Ufc7q/Vuy5XLPJ5ywNyLbM9Cq5DSw6Kv9L/s8Cdl8nFxv
- XYL/rNAsC4PGBYZygZCLA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:TufAOKclaEA=;UF5vsxXuoz8AKA5HiT/d/zDZq6F
- Tv/BiLgj9Cc++RvKVrXpPeHdng+V8sRUU76zV9DtySdKo1LHFrB3EqCSelgcXrRFn6JeHQGAz
- ZjMZnkE8Tm/utZ9BORO2vuPcASMo2DAqGJTQFnAVR7KwouZWmhCZTjYmwwR1t1h2bbXIRSBxX
- zskfQbXXuZfK0sMlJfTSy8wIyzjpID9cg+IWTJTTK1R/K1cTq45Y+MO1oVnqlogtC8jdBmWsQ
- cQe36eDWYja3ETnhzl+p8kQIf0/A9YlPEb4J92CyZl2ZSOrEEtpL+bdQwHpgbiE2323r2tiyo
- LfFBuraPgM6FhXqDyM3hZllvcv5n8OoDu6e5k5rZByq0jl2VBbuX1KCZh5obY7JpyKdtUsFLy
- Z0Y/XhhUbboszUH0InXQHVEOFKvEl9qElkUBa6VFHwaSAawhLcVe00nGYg2N8hYSLI9jFlPcg
- Iisvi8snmYEhuPnXaXlIFVzWlH/LtOF3TzE209o1hQEk/p31pHlt+FyXjhvhzJqi77IZwA/Ko
- kSPLkFOKDdF6C/7aUNCIMLFVcvOLG1wr88ZUsEZOEdLq37+r/a3z/MDhu9Sa6C4wzCNgWGtjx
- jBDO8I6xrq5q8hhXviZ27myjLy3ZtRZFoa+T4c4n9BmRsUllXS9CzG27z/valoIFiIGXsBFw6
- 3x+VhYPHcAL2nYfMGMYMSGlqMmFdLYrkn6MpOdKPozhkt+liWMXTpXLSS+l04EmRjjx2eruA+
- YU8IJIxou7syATcev1oodgXfLDxMbPwXf5G36lA5FHp7+AG6SpN0yinFY/oO7vby7E/t1UGNs
- qhUcd1Bn8gLqWQF91pb3X+qA==
+User-Agent: Mozilla Thunderbird
+From: Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v9 11/19] scsi: sd: Translate data lifetime information
+To: Christian Heusel <christian@heusel.eu>,
+ Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, Damien Le Moal <dlemoal@kernel.org>,
+ "James E.J. Bottomley" <jejb@linux.ibm.com>, regressions@lists.linux.dev
+References: <20240130214911.1863909-1-bvanassche@acm.org>
+ <20240130214911.1863909-12-bvanassche@acm.org>
+ <Zmi6QDymvLY5wMgD@surfacebook.localdomain>
+ <678af54a-2f5d-451d-8a4d-9af4d88bfcbb@heusel.eu>
+Content-Language: en-US
+In-Reply-To: <678af54a-2f5d-451d-8a4d-9af4d88bfcbb@heusel.eu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 6/11/24 2:21 PM, Christian Heusel wrote:
+> On 24/06/11 11:57PM, Andy Shevchenko wrote:
+>> Tue, Jan 30, 2024 at 01:48:37PM -0800, Bart Van Assche kirjoitti:
+>>> Recently T10 standardized SBC constrained streams. This mechanism allows
+>>> to pass data lifetime information to SCSI devices in the group number
+>>> field. Add support for translating write hint information into a
+>>> permanent stream number in the sd driver. Use WRITE(10) instead of
+>>> WRITE(6) if data lifetime information is present because the WRITE(6)
+>>> command does not have a GROUP NUMBER field.
+>>
+>> This patch broke very badly my connected Garmin FR35 sport watch. The boot time
+>> increased by 1 minute along with broken access to USB mass storage.
+>>
+>> On the reboot it takes ages as well.
+>>
+>> Revert of this and one little dependency (unrelated by functional means) helps.
+> 
+> We have tested that the revert fixes the issue on top of v6.10-rc3.
+> 
+> Also adding the regressions list in CC and making regzbot aware of this
+> issue.
+> 
+>> Details are here: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/issues/60
+>>
+>> P.S. Big thanks to Arch Linux team to help with bisection!
+> 
+> If this is fixed adding in a "Reported-by" or "Bisected-by" (depending
+> on what this subsystem uses) for me would be appreciated :)
+
+Thank you Christian for having gone through the painful process of
+bisecting this issue.
+
+Is the Garmin FR35 Flash device perhaps connected to a USB bus? If so,
+this is the second report of a USB storage device that resets if it
+receives a query for the IO Advice Hints Grouping mode page. Does the
+patch below help?
+
+Thanks,
+
+Bart.
 
 
---4sl6cuacyuhoilmf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 3a43e2209751..fcf3d7730466 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -63,6 +63,7 @@
+  #include <scsi/scsi_cmnd.h>
+  #include <scsi/scsi_dbg.h>
+  #include <scsi/scsi_device.h>
++#include <scsi/scsi_devinfo.h>
+  #include <scsi/scsi_driver.h>
+  #include <scsi/scsi_eh.h>
+  #include <scsi/scsi_host.h>
+@@ -3117,6 +3118,9 @@ static void sd_read_io_hints(struct scsi_disk *sdkp, unsigned char *buffer)
+  	struct scsi_mode_data data;
+  	int res;
 
-On 24/06/11 11:57PM, Andy Shevchenko wrote:
-> Tue, Jan 30, 2024 at 01:48:37PM -0800, Bart Van Assche kirjoitti:
-> > Recently T10 standardized SBC constrained streams. This mechanism allows
-> > to pass data lifetime information to SCSI devices in the group number
-> > field. Add support for translating write hint information into a
-> > permanent stream number in the sd driver. Use WRITE(10) instead of
-> > WRITE(6) if data lifetime information is present because the WRITE(6)
-> > command does not have a GROUP NUMBER field.
->=20
-> This patch broke very badly my connected Garmin FR35 sport watch. The boo=
-t time
-> increased by 1 minute along with broken access to USB mass storage.
->=20
-> On the reboot it takes ages as well.
->=20
-> Revert of this and one little dependency (unrelated by functional means) =
-helps.
++	if (sdp->sdev_bflags & BLIST_SKIP_IO_HINTS)
++		return;
++
+  	res = scsi_mode_sense(sdp, /*dbd=*/0x8, /*modepage=*/0x0a,
+  			      /*subpage=*/0x05, buffer, SD_BUF_SIZE, SD_TIMEOUT,
+  			      sdkp->max_retries, &data, &sshdr);
+diff --git a/drivers/usb/storage/scsiglue.c b/drivers/usb/storage/scsiglue.c
+index b31464740f6c..9a7185c68872 100644
+--- a/drivers/usb/storage/scsiglue.c
++++ b/drivers/usb/storage/scsiglue.c
+@@ -79,6 +79,8 @@ static int slave_alloc (struct scsi_device *sdev)
+  	if (us->protocol == USB_PR_BULK && us->max_lun > 0)
+  		sdev->sdev_bflags |= BLIST_FORCELUN;
 
-We have tested that the revert fixes the issue on top of v6.10-rc3.
++	sdev->sdev_bflags |= BLIST_SKIP_IO_HINTS;
++
+  	return 0;
+  }
 
-Also adding the regressions list in CC and making regzbot aware of this
-issue.
+diff --git a/include/scsi/scsi_devinfo.h b/include/scsi/scsi_devinfo.h
+index 6b548dc2c496..fa8721e49dec 100644
+--- a/include/scsi/scsi_devinfo.h
++++ b/include/scsi/scsi_devinfo.h
+@@ -69,8 +69,10 @@
+  #define BLIST_RETRY_ITF		((__force blist_flags_t)(1ULL << 32))
+  /* Always retry ABORTED_COMMAND with ASC 0xc1 */
+  #define BLIST_RETRY_ASC_C1	((__force blist_flags_t)(1ULL << 33))
++/* Do not read the I/O hints mode page */
++#define BLIST_SKIP_IO_HINTS	((__force blist_flags_t)(1ULL << 34))
 
-> Details are here: https://gitlab.archlinux.org/archlinux/packaging/packag=
-es/linux/-/issues/60
->=20
-> P.S. Big thanks to Arch Linux team to help with bisection!
+-#define __BLIST_LAST_USED BLIST_RETRY_ASC_C1
++#define __BLIST_LAST_USED BLIST_SKIP_IO_HINTS
 
-If this is fixed adding in a "Reported-by" or "Bisected-by" (depending
-on what this subsystem uses) for me would be appreciated :)
-
-Cheers,
-Christian
-
----
-
-#regzbot title: scsi/sd: Timeout/broken USB storage with Garmin FR35
-#regzbot introduced: 4f53138fffc2 ^
-#regzbot link: https://gitlab.archlinux.org/archlinux/packaging/packages/li=
-nux/-/issues/60
-
---4sl6cuacyuhoilmf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmZov98ACgkQwEfU8yi1
-JYWeyg/+JkWZBJNBC6sa1CMPAwFdLEuAJWQ1J2bAWgWMLrAL0ZlfnHSS0kUIbtml
-CccJeyyl4O5ets5b/dHRE9QAUGKVwQbp0LsVN0x5MQLtsrurNiOsT/gJFuNm+PPr
-mLAXPdclmL85+UpKNy4awNO+e35pTerreUcFzsJ+8Z9pJL7DdW0F+oYrOjo7uT09
-69gg2ZJw7miEVq4NtSsP/AabMp/vdbbNkXQS5wPHLsLzzIZ9vqbJM51hsk43kXXR
-tkBLkr1rLF5oKqBWjKVDtX4B1OsFX/Xmr+L09V7bmaclmKo/vh5baOznwH5aC0w3
-hv+U6jpVDlhroQTnfM2XHCbtX0mog9nl/pOh2WuxAg1RRaK8xLLJNA94oFnzCJU6
-sUXNDhEVNIny0/h0w8HRwhswLSg62p/1OprcC1hOf8t18/cv/apVGegiKVsfEOGH
-ZaeHxqWEu2sPuYIsDq3fojETdONPvaNpO4rYn9CZgUU9ydcuHDt1j+9x7kfFXa+b
-CLbP7fBmsdWoBgONIjni0a7RD1EqtWeOKf+frDwM9KZUV10hDVFqzX/uub5OVGif
-2sL8Xrg0NnRnFnR7Ig/u1X6Seun7k/BDKul/pgfdK/zk6JzsANUbyAGmSySD3JWn
-HBP2ylPjwixrlVKf6twDkC1QZ7UrV0urOKzXPTkLHsJsgHq1ywY=
-=avSc
------END PGP SIGNATURE-----
-
---4sl6cuacyuhoilmf--
+  #define __BLIST_HIGH_UNUSED (~(__BLIST_LAST_USED | \
+  			       (__force blist_flags_t) \
