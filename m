@@ -1,40 +1,39 @@
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6057176FA7;
-	Tue, 11 Jun 2024 09:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A634219E7;
+	Tue, 11 Jun 2024 09:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718097639; cv=none; b=i3l2uVij7Ng5VHAaCRmlKwDovVRCdlhLTmbX4aTD7rT4ydfMIbAd99rOB+2vo0uOZhPAtT8uOktCoPDCuUItB4u0ZRkoZfYNWi9fY1275rahcdH91H/bb8vPO4jyZJWbpK/b99zvhrajWz4p2PpZ3xADo6mLwZPDdMldgWbe9RQ=
+	t=1718099905; cv=none; b=cnRzySYuLX9rCPt25T6eq0wfK6UyTPnFRx0kM/owsZpKAEQS7Y9n2TXhPFgMGbIBJk8/u5ymIR1T4E+haQEjqgyMjqrNrAD48qlITJNpVYdVEmqLOS4Z/91meQ/kiNkg22lTu7YksvAwLIlD+0h/gsoZb7o4Qd5m++NzDGHgOZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718097639; c=relaxed/simple;
-	bh=eO/SU6/Ukvz9yz53+xanZdbexobUG1/nTCp0LPHQuOw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=O5Q4nkm2zIhQDslcjU1TkFdq/+qeduTMSBILKrYn4P6H5fXWj7eMNipF5/lPaAF+LBosLZclbhUQZSUlge66JB+9cMaQxIAd3B19Xb6/RLvA0h9jyRFrTTuNwkO3YhzIg/vvmSuz0Q5XdNz3cpHuwoQ5/RNMon1ZBVPWxuBZhfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=FftRtfIl; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="FftRtfIl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1718097309; x=1718702109; i=markus.elfring@web.de;
-	bh=SSWdIHLeK6c5qkRxJRQIzSFopdFgLqZQ5bZ8370mvc4=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=FftRtfIlHxGUAI3vCcm4yTpn/7z8WsjG+Em5dB5ND9N5eedR+QTMfkd+w7F2Zs2i
-	 WI1Yj0slkHGiDMKMlDkpOiP/MjEK/B6R2dAiV03zMK6+t4kT7xBeCDDQ888uoe/W3
-	 HMJ+HG6g52cDLWKEcQbr6xXdD9cRTtNwHwz+bFZPPzkQ7TcZrvW0MggwyEXpoOwch
-	 F1SP/+OJXN2UQv0MqjXDYRgbkFIKPiQyMGI39/lLF6bCcLm4PLaCKaVl0+whiFMsB
-	 SB0PgbV6ShDjyXNFTfm7jH/gkRm4xnMBSXmDKl3ZdmJohCKk1XemhGUQoO6np/E5N
-	 r5idNtThZcYbX7sxNg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MSqTK-1rq7cJ2zhW-00J0sU; Tue, 11
- Jun 2024 11:15:09 +0200
-Message-ID: <0e1ac9ca-c241-4b48-a219-d1aaef2a752a@web.de>
-Date: Tue, 11 Jun 2024 11:15:06 +0200
+	s=arc-20240116; t=1718099905; c=relaxed/simple;
+	bh=GlcK9twmEROghCOTMxdowP4M4uH0sygy/izeER+gQKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cUobu4WlGMThHCaoipIqXuiZIndrSPP6dMxD+Jpd8JCF7Id2qL1nQH2Tr4KhOfBnGsut3LmQW4Du5S9wAxZVtueU+JnSIjarcwxMw++3SHUkEGLUv2Btr4TogdKALt/pmk0yuBd6icm5aW99KnY2fsF1vcpawYWgu/IBSk1tjng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B119320601;
+	Tue, 11 Jun 2024 09:58:20 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 565AB13A55;
+	Tue, 11 Jun 2024 09:58:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Igo1E7wfaGa8fAAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 11 Jun 2024 09:58:20 +0000
+Message-ID: <34a7b2a4-b0cb-4580-85c9-b598fd70449e@suse.de>
+Date: Tue, 11 Jun 2024 11:58:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,55 +41,357 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Ye Bin <yebin10@huawei.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>
-Cc: LKML <linux-kernel@vger.kernel.org>, Christoph Hellwig
- <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>
-References: <20240606062655.2185006-1-yebin@huaweicloud.com>
-Subject: Re: [PATCH] block: bio-integrity: fix potential null-ptr-deref in
- bio_integrity_free
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240606062655.2185006-1-yebin@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:GHmc89SQ4Td/zPwUg//USd5islR+tdgleigB+jmBeZEuq6FZ7Dy
- fkE7CjeiMfQNvzY0YK08nYlilwmnduxqbtLEXlZPIHy8TtJwqsAsxfDMtv1kVgp7vN7HY3T
- IALqM09md0BMzdXXkahjw/wqc3/g/o4um3hx2fvO5m4g3LdePf+xlz9QuKO0YSskYbKSlDW
- ouYkrcSzcG4LaTCOdkrZg==
+Subject: Re: [PATCH 13/26] block: move cache control settings out of
+ queue->flags
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+ Richard Weinberger <richard@nod.at>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+ Josef Bacik <josef@toxicpanda.com>, Ming Lei <ming.lei@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
+ Yu Kuai <yukuai3@huawei.com>, Vineeth Vijayan <vneethv@linux.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
+ drbd-dev@lists.linbit.com, nbd@other.debian.org,
+ linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
+ virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
+ linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+ linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20240611051929.513387-1-hch@lst.de>
+ <20240611051929.513387-14-hch@lst.de>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240611051929.513387-14-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:w3g6y7385Ok=;4OLDESrn0lp0xrLZI+q1mYjtpDC
- 9L4XwYlMGBU/2knpMHxRGtTguQQPeZkUn9hbbhdJEbPFwKVuasnXIFwsFPPZMJWGF9Gyi5AdU
- p2/eh5PYU7JjePGFXBpZuGx5XzQAULZfIJqL3J5wx0xVh8v4k18N+f/UiMmgqVRhUdafKaK5A
- Vjuvpu5YRwyP4ZaoiHmzSaLZxFMm8rAaGBoCp24NpeW8eOYXiBufOe+roIN7J+3U0i1RO20M5
- ibiygZB/TDIGdrs9L4FzHsK0UZvGL93mO/3aLCDIdHIZtml9pvBSI9vMWtqOaQ1lZwN9GWrnn
- XVz0VFlULaG85q/vFA2450eAeTuFWrQ+f0wPCIZ54LPwyy/bGCMqhtVdjGFY+/LHyZeMD3R6a
- dqQytdUotZXhiS5/f3pfvC3DcWQZFmjSAJed9btt0ovvy25dK/EJiQMLyGp7ZS/w4i7TfZ5Sf
- RpsDfzZ65tCEBD+iWOM2HkNTcH91z5c7FAQeclUgQeN/Fen8vAr2eZ5OMj7hPPJHya9BbL6rQ
- JoiO5Gu3MYgjmhHYVNqdPaLjh1TLMVOvgth8ETDFRpS4sBh2VWPFhatcBaZYvOdP8eXxM8sjK
- ftgSY1q05gPDkmgL3kVTG+xpDRT5wG/zQgS/gOcuzl5Bq6iGmjmXjyXVuqsQ2iYEhAOmZpXue
- gCx8qIA+QByymh0Zwrxr4B+hHfguxyA3d1JmrVMKmS9XzrIsEbSBj0Uer8v/MBbU9k7tNblRI
- FX09N3GphcrQdp2SBs4/aZi6w0LFVeRdWqpYu9CJhwdHpyxPlLEDJ9wjmNcyq9xiRm199crh4
- h2dGqmiwCRC1yvvmWZpUy52+P348tLJ7LBdy0p3mQiSDo=
+X-Spam-Score: -4.00
+X-Rspamd-Queue-Id: B119320601
 
-=E2=80=A6
-> The root cause of this issue is the concurrency between the write proces=
-s
-> and the block size update process. However, this concurrency does not ex=
-ist
-> in actual production environments. To solve above issue, Verify if the
-> segments of BIO are aligned with integrity intervals.
+On 6/11/24 07:19, Christoph Hellwig wrote:
+> Move the cache control settings into the queue_limits so that they
+> can be set atomically and all I/O is frozen when changing the
+> flags.
+> 
+> Add new features and flags field for the driver set flags, and internal
+> (usually sysfs-controlled) flags in the block layer.  Note that we'll
+> eventually remove enough field from queue_limits to bring it back to the
+> previous size.
+> 
+> The disable flag is inverted compared to the previous meaning, which
+> means it now survives a rescan, similar to the max_sectors and
+> max_discard_sectors user limits.
+> 
+> The FLUSH and FUA flags are now inherited by blk_stack_limits, which
+> simplified the code in dm a lot, but also causes a slight behavior
+> change in that dm-switch and dm-unstripe now advertise a write cache
+> despite setting num_flush_bios to 0.  The I/O path will handle this
+> gracefully, but as far as I can tell the lack of num_flush_bios
+> and thus flush support is a pre-existing data integrity bug in those
+> targets that really needs fixing, after which a non-zero num_flush_bios
+> should be required in dm for targets that map to underlying devices.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   .../block/writeback_cache_control.rst         | 67 +++++++++++--------
+>   arch/um/drivers/ubd_kern.c                    |  2 +-
+>   block/blk-core.c                              |  2 +-
+>   block/blk-flush.c                             |  9 ++-
+>   block/blk-mq-debugfs.c                        |  2 -
+>   block/blk-settings.c                          | 29 ++------
+>   block/blk-sysfs.c                             | 29 +++++---
+>   block/blk-wbt.c                               |  4 +-
+>   drivers/block/drbd/drbd_main.c                |  2 +-
+>   drivers/block/loop.c                          |  9 +--
+>   drivers/block/nbd.c                           | 14 ++--
+>   drivers/block/null_blk/main.c                 | 12 ++--
+>   drivers/block/ps3disk.c                       |  7 +-
+>   drivers/block/rnbd/rnbd-clt.c                 | 10 +--
+>   drivers/block/ublk_drv.c                      |  8 ++-
+>   drivers/block/virtio_blk.c                    | 20 ++++--
+>   drivers/block/xen-blkfront.c                  |  9 ++-
+>   drivers/md/bcache/super.c                     |  7 +-
+>   drivers/md/dm-table.c                         | 39 +++--------
+>   drivers/md/md.c                               |  8 ++-
+>   drivers/mmc/core/block.c                      | 42 ++++++------
+>   drivers/mmc/core/queue.c                      | 12 ++--
+>   drivers/mmc/core/queue.h                      |  3 +-
+>   drivers/mtd/mtd_blkdevs.c                     |  5 +-
+>   drivers/nvdimm/pmem.c                         |  4 +-
+>   drivers/nvme/host/core.c                      |  7 +-
+>   drivers/nvme/host/multipath.c                 |  6 --
+>   drivers/scsi/sd.c                             | 28 +++++---
+>   include/linux/blkdev.h                        | 38 +++++++++--
+>   29 files changed, 227 insertions(+), 207 deletions(-)
+> 
+> diff --git a/Documentation/block/writeback_cache_control.rst b/Documentation/block/writeback_cache_control.rst
+> index b208488d0aae85..9cfe27f90253c7 100644
+> --- a/Documentation/block/writeback_cache_control.rst
+> +++ b/Documentation/block/writeback_cache_control.rst
+> @@ -46,41 +46,50 @@ worry if the underlying devices need any explicit cache flushing and how
+>   the Forced Unit Access is implemented.  The REQ_PREFLUSH and REQ_FUA flags
+>   may both be set on a single bio.
+>   
+> +Feature settings for block drivers
+> +----------------------------------
+>   
+> -Implementation details for bio based block drivers
+> ---------------------------------------------------------------
+> +For devices that do not support volatile write caches there is no driver
+> +support required, the block layer completes empty REQ_PREFLUSH requests before
+> +entering the driver and strips off the REQ_PREFLUSH and REQ_FUA bits from
+> +requests that have a payload.
+>   
+> -These drivers will always see the REQ_PREFLUSH and REQ_FUA bits as they sit
+> -directly below the submit_bio interface.  For remapping drivers the REQ_FUA
+> -bits need to be propagated to underlying devices, and a global flush needs
+> -to be implemented for bios with the REQ_PREFLUSH bit set.  For real device
+> -drivers that do not have a volatile cache the REQ_PREFLUSH and REQ_FUA bits
+> -on non-empty bios can simply be ignored, and REQ_PREFLUSH requests without
+> -data can be completed successfully without doing any work.  Drivers for
+> -devices with volatile caches need to implement the support for these
+> -flags themselves without any help from the block layer.
+> +For devices with volatile write caches the driver needs to tell the block layer
+> +that it supports flushing caches by setting the
+>   
+> +   BLK_FEAT_WRITE_CACHE
+>   
+> -Implementation details for request_fn based block drivers
+> ----------------------------------------------------------
+> +flag in the queue_limits feature field.  For devices that also support the FUA
+> +bit the block layer needs to be told to pass on the REQ_FUA bit by also setting
+> +the
+>   
+> -For devices that do not support volatile write caches there is no driver
+> -support required, the block layer completes empty REQ_PREFLUSH requests before
+> -entering the driver and strips off the REQ_PREFLUSH and REQ_FUA bits from
+> -requests that have a payload.  For devices with volatile write caches the
+> -driver needs to tell the block layer that it supports flushing caches by
+> -doing::
+> +   BLK_FEAT_FUA
+> +
+> +flag in the features field of the queue_limits structure.
+> +
+> +Implementation details for bio based block drivers
+> +--------------------------------------------------
+> +
+> +For bio based drivers the REQ_PREFLUSH and REQ_FUA bit are simplify passed on
+> +to the driver if the drivers sets the BLK_FEAT_WRITE_CACHE flag and the drivers
+> +needs to handle them.
+> +
+> +*NOTE*: The REQ_FUA bit also gets passed on when the BLK_FEAT_FUA flags is
+> +_not_ set.  Any bio based driver that sets BLK_FEAT_WRITE_CACHE also needs to
+> +handle REQ_FUA.
+>   
+> -	blk_queue_write_cache(sdkp->disk->queue, true, false);
+> +For remapping drivers the REQ_FUA bits need to be propagated to underlying
+> +devices, and a global flush needs to be implemented for bios with the
+> +REQ_PREFLUSH bit set.
+>   
+> -and handle empty REQ_OP_FLUSH requests in its prep_fn/request_fn.  Note that
+> -REQ_PREFLUSH requests with a payload are automatically turned into a sequence
+> -of an empty REQ_OP_FLUSH request followed by the actual write by the block
+> -layer.  For devices that also support the FUA bit the block layer needs
+> -to be told to pass through the REQ_FUA bit using::
+> +Implementation details for blk-mq drivers
+> +-----------------------------------------
+>   
+> -	blk_queue_write_cache(sdkp->disk->queue, true, true);
+> +When the BLK_FEAT_WRITE_CACHE flag is set, REQ_OP_WRITE | REQ_PREFLUSH requests
+> +with a payload are automatically turned into a sequence of a REQ_OP_FLUSH
+> +request followed by the actual write by the block layer.
+>   
+> -and the driver must handle write requests that have the REQ_FUA bit set
+> -in prep_fn/request_fn.  If the FUA bit is not natively supported the block
+> -layer turns it into an empty REQ_OP_FLUSH request after the actual write.
+> +When the BLK_FEA_FUA flags is set, the REQ_FUA bit simplify passed on for the
+> +REQ_OP_WRITE request, else a REQ_OP_FLUSH request is sent by the block layer
+> +after the completion of the write request for bio submissions with the REQ_FUA
+> +bit set.
+> diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
+> index cdcb75a68989dd..19e01691ea0ea7 100644
+> --- a/arch/um/drivers/ubd_kern.c
+> +++ b/arch/um/drivers/ubd_kern.c
+> @@ -835,6 +835,7 @@ static int ubd_add(int n, char **error_out)
+>   	struct queue_limits lim = {
+>   		.max_segments		= MAX_SG,
+>   		.seg_boundary_mask	= PAGE_SIZE - 1,
+> +		.features		= BLK_FEAT_WRITE_CACHE,
+>   	};
+>   	struct gendisk *disk;
+>   	int err = 0;
+> @@ -882,7 +883,6 @@ static int ubd_add(int n, char **error_out)
+>   	}
+>   
+>   	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
+> -	blk_queue_write_cache(disk->queue, true, false);
+>   	disk->major = UBD_MAJOR;
+>   	disk->first_minor = n << UBD_SHIFT;
+>   	disk->minors = 1 << UBD_SHIFT;
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 82c3ae22d76d88..2b45a4df9a1aa1 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -782,7 +782,7 @@ void submit_bio_noacct(struct bio *bio)
+>   		if (WARN_ON_ONCE(bio_op(bio) != REQ_OP_WRITE &&
+>   				 bio_op(bio) != REQ_OP_ZONE_APPEND))
+>   			goto end_io;
+> -		if (!test_bit(QUEUE_FLAG_WC, &q->queue_flags)) {
+> +		if (!bdev_write_cache(bdev)) {
+>   			bio->bi_opf &= ~(REQ_PREFLUSH | REQ_FUA);
+>   			if (!bio_sectors(bio)) {
+>   				status = BLK_STS_OK;
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 2234f8b3fc05f2..30b9d5033a2b85 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -381,8 +381,8 @@ static void blk_rq_init_flush(struct request *rq)
+>   bool blk_insert_flush(struct request *rq)
+>   {
+>   	struct request_queue *q = rq->q;
+> -	unsigned long fflags = q->queue_flags;	/* may change, cache */
+>   	struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
+> +	bool supports_fua = q->limits.features & BLK_FEAT_FUA;
 
-* Please improve the change description with an imperative wording.
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
-Documentation/process/submitting-patches.rst?h=3Dv6.10-rc2#n94
+Shouldn't we have a helper like blk_feat_fua() here?
 
-* Would you like to add the tag =E2=80=9CFixes=E2=80=9D accordingly?
+>   	unsigned int policy = 0;
+>   
+>   	/* FLUSH/FUA request must never be merged */
+> @@ -394,11 +394,10 @@ bool blk_insert_flush(struct request *rq)
+>   	/*
+>   	 * Check which flushes we need to sequence for this operation.
+>   	 */
+> -	if (fflags & (1UL << QUEUE_FLAG_WC)) {
+> +	if (blk_queue_write_cache(q)) {
+>   		if (rq->cmd_flags & REQ_PREFLUSH)
+>   			policy |= REQ_FSEQ_PREFLUSH;
+> -		if (!(fflags & (1UL << QUEUE_FLAG_FUA)) &&
+> -		    (rq->cmd_flags & REQ_FUA))
+> +		if ((rq->cmd_flags & REQ_FUA) && !supports_fua)
+>   			policy |= REQ_FSEQ_POSTFLUSH;
+>   	}
+>   
+> @@ -407,7 +406,7 @@ bool blk_insert_flush(struct request *rq)
+>   	 * REQ_PREFLUSH and FUA for the driver.
+>   	 */
+>   	rq->cmd_flags &= ~REQ_PREFLUSH;
+> -	if (!(fflags & (1UL << QUEUE_FLAG_FUA)))
+> +	if (!supports_fua)
+>   		rq->cmd_flags &= ~REQ_FUA;
+>   
+>   	/*
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 770c0c2b72faaa..e8b9db7c30c455 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -93,8 +93,6 @@ static const char *const blk_queue_flag_name[] = {
+>   	QUEUE_FLAG_NAME(INIT_DONE),
+>   	QUEUE_FLAG_NAME(STABLE_WRITES),
+>   	QUEUE_FLAG_NAME(POLL),
+> -	QUEUE_FLAG_NAME(WC),
+> -	QUEUE_FLAG_NAME(FUA),
+>   	QUEUE_FLAG_NAME(DAX),
+>   	QUEUE_FLAG_NAME(STATS),
+>   	QUEUE_FLAG_NAME(REGISTERED),
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index f11c8676eb4c67..536ee202fcdccb 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -261,6 +261,9 @@ static int blk_validate_limits(struct queue_limits *lim)
+>   		lim->misaligned = 0;
+>   	}
+>   
+> +	if (!(lim->features & BLK_FEAT_WRITE_CACHE))
+> +		lim->features &= ~BLK_FEAT_FUA;
+> +
+>   	err = blk_validate_integrity_limits(lim);
+>   	if (err)
+>   		return err;
+> @@ -454,6 +457,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>   {
+>   	unsigned int top, bottom, alignment, ret = 0;
+>   
+> +	t->features |= (b->features & BLK_FEAT_INHERIT_MASK);
+> +
+>   	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
+>   	t->max_user_sectors = min_not_zero(t->max_user_sectors,
+>   			b->max_user_sectors);
+> @@ -711,30 +716,6 @@ void blk_set_queue_depth(struct request_queue *q, unsigned int depth)
+>   }
+>   EXPORT_SYMBOL(blk_set_queue_depth);
+>   
+> -/**
+> - * blk_queue_write_cache - configure queue's write cache
+> - * @q:		the request queue for the device
+> - * @wc:		write back cache on or off
+> - * @fua:	device supports FUA writes, if true
+> - *
+> - * Tell the block layer about the write cache of @q.
+> - */
+> -void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
+> -{
+> -	if (wc) {
+> -		blk_queue_flag_set(QUEUE_FLAG_HW_WC, q);
+> -		blk_queue_flag_set(QUEUE_FLAG_WC, q);
+> -	} else {
+> -		blk_queue_flag_clear(QUEUE_FLAG_HW_WC, q);
+> -		blk_queue_flag_clear(QUEUE_FLAG_WC, q);
+> -	}
+> -	if (fua)
+> -		blk_queue_flag_set(QUEUE_FLAG_FUA, q);
+> -	else
+> -		blk_queue_flag_clear(QUEUE_FLAG_FUA, q);
+> -}
+> -EXPORT_SYMBOL_GPL(blk_queue_write_cache);
+> -
+>   int bdev_alignment_offset(struct block_device *bdev)
+>   {
+>   	struct request_queue *q = bdev_get_queue(bdev);
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 5c787965b7d09e..4f524c1d5e08bd 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -423,32 +423,41 @@ static ssize_t queue_io_timeout_store(struct request_queue *q, const char *page,
+>   
+>   static ssize_t queue_wc_show(struct request_queue *q, char *page)
+>   {
+> -	if (test_bit(QUEUE_FLAG_WC, &q->queue_flags))
+> -		return sprintf(page, "write back\n");
+> -
+> -	return sprintf(page, "write through\n");
+> +	if (q->limits.features & BLK_FLAGS_WRITE_CACHE_DISABLED)
 
-* How do you think about to use the summary phrase =E2=80=9CAvoid null poi=
-nter dereference
-  in bio_integrity_free()=E2=80=9D?
+Where is the difference between 'flags' and 'features'?
+Ie why is is named BLK_FEAT_FUA but BLK_FLAGS_WRITE_CACHE_DISABLED?
+And if the feature is the existence of a capability, and the flag is
+the setting of that capability, can you make it clear in the documentation?
 
+Cheers,
 
-Regards,
-Markus
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
