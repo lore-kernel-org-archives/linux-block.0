@@ -1,105 +1,73 @@
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AD95820E
-	for <linux-block@vger.kernel.org>; Tue, 11 Jun 2024 16:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894853BBED;
+	Tue, 11 Jun 2024 16:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718124659; cv=none; b=dU840Yt8JcabsDXVnmdXZDyPuNk9z9tvmlcNgaJN6knpadIr9Lz1sRzUjHI8U7VgCzZoCRPrEBfFGLpoPriwwioPaHa87/cBjEA4zv84yEtRSJX8LRZbW+dD1KpUrpT8QUTusXd4l0l2ww5BTIdjL73NGQkC0y59rnZtEHluU+s=
+	t=1718124868; cv=none; b=afRVQV6h3qyX8MwRhUSqIhLtngxmr6SJ5D96NKlFfuOylaQR7ojvDXQTBVxdGYZltfpNgtblO/uV9c+YIDTXg1uvCggE/b/DtOlq4a0C/Ay0ivkIHFrmqdjW/tSPI//OSwBzWpG60j58a2b98nFZfr24ui8SL7gGwxd8awqzKw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718124659; c=relaxed/simple;
-	bh=2FT/emrK48iE3dx07WXN0ST/iq8T21acuyaCQMRLCLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XzvBwb8DUStzyemn6gx/DpFIK3LRE0cbUoD5ICjA3bt3OrgNzeObmRJ1Sr1C1UX3pPROebC/wM8iN7HAqHJnctxdLyMYrf0xPrvWUPAS06vygwcFE/7e5G0uyRLd2Xi5hItlINFIzpX3E5H/67g/CV/VpC41r/e/cZ6N3G0YE08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=Zt6ibg/s; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="Zt6ibg/s"
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dfa4876a5bbso5531359276.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Jun 2024 09:50:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1718124657; x=1718729457; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k7qH/Egkqtc5OmSCKcG8suDn1pwScsKWRQ+gioBgKgY=;
-        b=Zt6ibg/sXDFPcB1PdqLbi9y9Lq84fI4dtsabAaKnS71DR4ge4yMuB1Z9lS7wA4wHrn
-         shpAYklqhBt+02fv/lI70+9yLugOwkE6jd95eVKnaVgZYxsTh2WCsmHTgQ1UVgNRVLal
-         wmO5N6RWxwgoiytstIBOrWyQFGmt3N38VbBAgwcFn/bnZiw+iwyuahz+8bpIWwoYMk5k
-         XMp/oVXEeglCEkIcBUpukavQm3svwzpoI5LogCeDIIPsZ/TBEY3fH93kounsMrkvv0iU
-         qwThWU60dMvFW8JzcIe4TZiEEXk0LdCstA848HdLhK4LdxhwQLIYyB46hHTq4v902MUD
-         ZUhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718124657; x=1718729457;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k7qH/Egkqtc5OmSCKcG8suDn1pwScsKWRQ+gioBgKgY=;
-        b=OQ6hGWXDleFz9Dob3KBiKuhXBuO79a5wOvVGv48ozWEKaMHxAVohsqwi7+wIAveuUV
-         xYJJUR7V3vxJTznz/7B/9Qeaio5u/xcULtmDOipyftZDC42f/kVZduTOjUr1LZJQc1wh
-         mHlKkhNIy6Cqg5dZdeQLDMCK9VHzUwoYZr0f5lEUYL/lRit+ptyof/qKUcgNEOM1/KBr
-         IF3Sj687D/rDASF6BJehUq+GrTL1YBn6KUELDTdNQf530cVpmKA3v4+f2kzMkLgrpeDw
-         SMDl+oWIATrLPRPRjKlvlBlNIrSMNLotF91lDlp5Pc+z2YnXTm5gs1Xqdjf+We4YAx/F
-         DTZA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1GCHg6ssX6c5f/u92sd37T2Kz213xTEnAUzxQuHfUYqng0GSCZCdt4nwQJhSqZDaqoX+g3GZVluQ70SXYbWz7YQtzyQFlcywww2k=
-X-Gm-Message-State: AOJu0YwCB+r46GAQY3bD1OhInnAglty0jc9IpTz7hFOneiaSXbLfTkNC
-	R0HMOstY9ycmC2uy2X4j4CoItRHLdbhpfJim6DD6dqJHI2rXhQN+UdbT/zI+Kxw=
-X-Google-Smtp-Source: AGHT+IFLbNcRGoXteJvsvQz9ePKtTqtffGprFSIVvQoC+S7q0aJ0DFFhhqHjAFy+KyUVXYjD8ktBew==
-X-Received: by 2002:a0d:d851:0:b0:618:95a3:70b9 with SMTP id 00721157ae682-62cd565129cmr130634777b3.36.1718124656832;
-        Tue, 11 Jun 2024 09:50:56 -0700 (PDT)
-Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-62ccaef2825sm20935207b3.139.2024.06.11.09.50.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 09:50:56 -0700 (PDT)
-Date: Tue, 11 Jun 2024 12:50:55 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
-	Richard Weinberger <richard@nod.at>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Vineeth Vijayan <vneethv@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
-	drbd-dev@lists.linbit.com, nbd@other.debian.org,
-	linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
-	virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
-	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 09/26] nbd: move setting the cache control flags to
- __nbd_set_size
-Message-ID: <20240611165055.GD247672@perftesting>
-References: <20240611051929.513387-1-hch@lst.de>
- <20240611051929.513387-10-hch@lst.de>
+	s=arc-20240116; t=1718124868; c=relaxed/simple;
+	bh=k1/dmpbynMnrbBscn/VmbNjjSCbrZOi5ZMoFxGslAcM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aSsa/U/gWR4dRLWZVStOUkVi6UGM7phEQwb7ZXZa20s4Q16+NmhXne5CX780yctOkARlswUgT6m/UobC/RwIcxWDkDIO+J1IZ9d2WXfW9dlRRqrWkDAVJyAPU15Dtbr94IFiqFQFrTKbQUG79JSifDWADF/kljIORks0wBkqSjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D4A4C2BD10;
+	Tue, 11 Jun 2024 16:54:25 +0000 (UTC)
+Date: Tue, 11 Jun 2024 12:54:40 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Dongliang Cui <dongliang.cui@unisoc.com>, axboe@kernel.dk,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, ebiggers@kernel.org,
+ ke.wang@unisoc.com, hongyu.jin.cn@gmail.com, niuzhiguo84@gmail.com,
+ hao_hao.wang@unisoc.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, akailash@google.com,
+ cuidongliang390@gmail.com
+Subject: Re: [PATCH v4] block: Add ioprio to block_rq tracepoint
+Message-ID: <20240611125440.6d095270@gandalf.local.home>
+In-Reply-To: <86eb3dd0-77a1-4d1d-8e62-38c46bd7563a@acm.org>
+References: <20240611073519.323680-1-dongliang.cui@unisoc.com>
+	<86eb3dd0-77a1-4d1d-8e62-38c46bd7563a@acm.org>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611051929.513387-10-hch@lst.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 11, 2024 at 07:19:09AM +0200, Christoph Hellwig wrote:
-> Move setting the cache control flags in nbd in preparation for moving
-> these flags into the queue_limits structure.
+On Tue, 11 Jun 2024 09:26:54 -0700
+Bart Van Assche <bvanassche@acm.org> wrote:
+
+> On 6/11/24 12:35 AM, Dongliang Cui wrote:
+> > +#define IOPRIO_CLASS_STRINGS \
+> > +	{ IOPRIO_CLASS_NONE,	"none" }, \
+> > +	{ IOPRIO_CLASS_RT,	"rt" }, \
+> > +	{ IOPRIO_CLASS_BE,	"be" }, \
+> > +	{ IOPRIO_CLASS_IDLE,	"idle" }, \
+> > +	{ IOPRIO_CLASS_INVALID,	"invalid"}  
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Shouldn't this array be defined in a C file instead of in a header file?
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+The way the TRACE_EVENT() macro works, this will not work in a C file.
 
-Thanks,
+> -	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
+> +	TP_printk("%d,%d %s (%s) %llu + %u %s,%u,%u [%d]",
+>  		  MAJOR(__entry->dev), MINOR(__entry->dev),
+>  		  __entry->rwbs, __get_str(cmd),
+> -		  (unsigned long long)__entry->sector,
+> -		  __entry->nr_sector, 0)
+> +		  (unsigned long long)__entry->sector, __entry->nr_sector,
+> +		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
+> +				   IOPRIO_CLASS_STRINGS),
+> +		  IOPRIO_PRIO_HINT(__entry->ioprio),
+> +		  IOPRIO_PRIO_LEVEL(__entry->ioprio),  0)
+>  );
+>  
 
-Josef
+It's used for __print_symbolic() which the TRACE_EVENT() macro logic (using
+header files) will expand it to something useful.
+
+-- Steve
