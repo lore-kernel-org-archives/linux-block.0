@@ -1,119 +1,156 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B769E2033E
-	for <linux-block@vger.kernel.org>; Tue, 11 Jun 2024 15:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7523839C;
+	Tue, 11 Jun 2024 15:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718120614; cv=none; b=lJoxCFnj1P6feKxhz6aeOxASae3d4UG00JfkX0xZck7lV9KesrcYbFaqFr1eSUzqn+TBVGK7ssLlxYl2wHfZKm/CPHxa6J6fE7gKGbAZn7GqBE4YxlGWBUiCt6rZToWxdJylbDFgvl7GAZXH+Q6vvas3RJ+YZTirvvLIPIVhu+Q=
+	t=1718120721; cv=none; b=k8dDiLxjUVTQhqgbI4Ylwup1VFMw2tfssqT9KNST+pPNydLo4EPYyKLMCdUpl1HvVUu6OwhHRS4aNhEDhJN6Zx7AN2joZOVS9CCg8Lw20e+0quw3Emx3o72rPkK4+5OFxcye/UBJ1QRKmj/kRnP/8BA1QfmObOWr0l3/8MT6B9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718120614; c=relaxed/simple;
-	bh=hxyesTbSn4JUu13b+/8fKE9DKC9Hdh6kphyvoTo4A04=;
+	s=arc-20240116; t=1718120721; c=relaxed/simple;
+	bh=alWpFRyGJPPxpA/qvEhIVLYBDfG5gKLw2O2vjFdIXBU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gpisrdJdjTJE/liLBYAKATSpwsJwUffkc5j/pLpGaLqf6nrVte6JWJZWfSiPBOqNergMB9caS48xURaPT3bg0B9Mt3I8FnjV3BEszuwOeWsDYvQbHbwHKzwQQZysIMME9HG+Twglat1BDNjF5GGPzuZHOpEJGGKbM7/zgpxglCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QK8zbXXz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=czunXMBSo9nYx1wQ169rUewIPe+WhxELmLSBnbIUgixTW/sVe7I6qhI1aAF0uciXWUg232p8cLB0KOjEPQDbkbEbw11eFheeDqVOgIqbhlr/N+3QwN4pqKnaqvG+ainypWLtptADGcMITxAVlEi6HdbrOqnvCKqlGIuyUy4hy0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Em6r9Li6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QK8zbXXz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718120611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m3mVOlE8X03VcFujwgTUstJqoq0FTNeRmucJ5uXzzb4=;
-	b=QK8zbXXzRhSszX1PpFlfrR4nCH9dB5Wh4CH/aecgzILJCjjSP9DchGylm02ZIIohQrN9qB
-	yoKJcb/Lq6V2h2swF6Yh7fyqegl556IT8LiRPGM0gdsW73NlXvovWtDjSE0c8e8FbjrfRo
-	8pD7ex7+gydjznQwzuI+wnXg630C2XY=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-541-M7gCHZsfNvaRoPk4wQQxjw-1; Tue,
- 11 Jun 2024 11:43:27 -0400
-X-MC-Unique: M7gCHZsfNvaRoPk4wQQxjw-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8414F1956068;
-	Tue, 11 Jun 2024 15:43:15 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.36])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DD4331954AC1;
-	Tue, 11 Jun 2024 15:43:10 +0000 (UTC)
-Date: Tue, 11 Jun 2024 11:43:09 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
-	Richard Weinberger <richard@nod.at>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Josef Bacik <josef@toxicpanda.com>, Ming Lei <ming.lei@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Em6r9Li6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06EE2C2BD10;
+	Tue, 11 Jun 2024 15:45:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718120719;
+	bh=alWpFRyGJPPxpA/qvEhIVLYBDfG5gKLw2O2vjFdIXBU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Em6r9Li64MS4dfA1Fm6Omrjb4w5oyfw2XsNlofj9qeCLh5G5cxfGwuZ4yQPTUgZzW
+	 6kxO2WwG1YbfeA57p9rgmFg6DOXF7B/o2lriNTV968OIdIJj6h+vJ28mFcLCklf+8k
+	 loMrtXfftGiWNK48qosW/nixEPYc2CM6BDV0pD+OBtk1iB7sMjJs6yl/UgKehavFC0
+	 ucx5PHa+Nq4Qc5SPa5Zz1cwEjWeiDWr0yVMVZnqrufT33mec/2ulkMu2y2JlMDYEFe
+	 LOKNY2IV8maq2WwEhsDrM6P7s8EXMvED5vtpoqf+uru1kkwcRDd4cMFZ+KsLRjANr5
+	 5MbGSb9lFaR2g==
+Date: Tue, 11 Jun 2024 18:45:15 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: "Zeng, Oak" <oak.zeng@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"Brost, Matthew" <matthew.brost@intel.com>,
+	"Hellstrom, Thomas" <thomas.hellstrom@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
 	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
-	drbd-dev@lists.linbit.com, nbd@other.debian.org,
-	linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
-	virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
-	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 08/26] virtio_blk: remove virtblk_update_cache_mode
-Message-ID: <20240611154309.GA371660@fedora.redhat.com>
-References: <20240611051929.513387-1-hch@lst.de>
- <20240611051929.513387-9-hch@lst.de>
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	"Bommu, Krishnaiah" <krishnaiah.bommu@intel.com>,
+	"Ghimiray, Himal Prasad" <himal.prasad.ghimiray@intel.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240611154515.GC4966@unreal>
+References: <cover.1709635535.git.leon@kernel.org>
+ <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
+ <20240503164239.GB901876@ziepe.ca>
+ <PH7PR11MB70047236290DC1CFF9150B8592C62@PH7PR11MB7004.namprd11.prod.outlook.com>
+ <20240610161826.GA4966@unreal>
+ <PH7PR11MB7004A071F27B4CF45740B87E92C62@PH7PR11MB7004.namprd11.prod.outlook.com>
+ <20240610172501.GJ791043@ziepe.ca>
+ <PH7PR11MB7004DDE9816D92F690A5C0B692C62@PH7PR11MB7004.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="RRHJimCDVdpqhQ+7"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240611051929.513387-9-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PH7PR11MB7004DDE9816D92F690A5C0B692C62@PH7PR11MB7004.namprd11.prod.outlook.com>
 
+On Mon, Jun 10, 2024 at 09:28:04PM +0000, Zeng, Oak wrote:
+> Hi Jason, Leon,
+> 
+> I was able to fix the issue from my side. Things work fine now. I got two questions though:
+> 
+> 1) The value returned from dma_link_range function is not contiguous, see below print. The "linked pa" is the function return.
+> I think dma_map_sgtable API would return some contiguous dma address. Is the dma-map_sgtable api is more efficient regarding the iommu page table? i.e., try to use bigger page size, such as use 2M page size when it is possible. With your new API, does it also have such consideration? I vaguely remembered Jason mentioned such thing, but my print below doesn't look like so. Maybe I need to test bigger range (only 16 pages range in the test of below printing). Comment?
 
---RRHJimCDVdpqhQ+7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+My API gives you the flexibility to use any page size you want. You can
+use 2M pages instead of 4K pages. The API doesn't enforce any page size.
 
-On Tue, Jun 11, 2024 at 07:19:08AM +0200, Christoph Hellwig wrote:
-> virtblk_update_cache_mode boils down to a single call to
-> blk_queue_write_cache.  Remove it in preparation for moving the cache
-> control flags into the queue_limits.
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/virtio_blk.c | 13 +++----------
->  1 file changed, 3 insertions(+), 10 deletions(-)
+> 
+> [17584.665126] drm_svm_hmmptr_map_dma_pages iova.dma_addr = 0x0, linked pa = 18ef3f000
+> [17584.665146] drm_svm_hmmptr_map_dma_pages iova.dma_addr = 0x0, linked pa = 190d00000
+> [17584.665150] drm_svm_hmmptr_map_dma_pages iova.dma_addr = 0x0, linked pa = 190024000
+> [17584.665153] drm_svm_hmmptr_map_dma_pages iova.dma_addr = 0x0, linked pa = 178e89000
+> 
+> 2) in the comment of dma_link_range function, it is said: " @dma_offset needs to be advanced by the caller with the size of previous page that was linked + DMA address returned for the previous page".
+> Is this description correct? I don't understand the part "+ DMA address returned for the previous page ".
+> In my codes, let's say I call this function to link 10 pages, the first dma_offset is 0, second is 4k, third 8k. This worked for me. I didn't add the previously returned dma address.
+> Maybe I need more test. But any comment?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+You did it perfectly right. This is the correct way to advance dma_offset.
 
---RRHJimCDVdpqhQ+7
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmZocI0ACgkQnKSrs4Gr
-c8gYxQf+MiHN7lIto5cvBArHuLRaYXdHSqN8WkOxjyk6pKDVJN3zByol4IsQ1or0
-gi3U/1yXaU1lyM8v76HhRI789ZE9OXHiRD8iKWM54w0uldvJLPNzByqsrvapKvmR
-XjYyMxgp/uFJZ4qxg3nonI2Fa2FzSjqA/ct/sTYj8AbXOsOEK/bUZasvnrwUuIhP
-FwODujdCtfIpzMvn4c262LUiz3TOY+p3nH/CSKsYZwR5xiUbbZCf30PKrwN4RcmU
-ti4hIKoOJcLH5gjgeXpfx7jOM/6Qr7eQrEelsDnuMAKYXC9WMj48+O6Cf8mFja4M
-N1txQKX0NepjOjzDmydD5Dx/69S/sg==
-=ehtQ
------END PGP SIGNATURE-----
-
---RRHJimCDVdpqhQ+7--
-
+> 
+> Thanks,
+> Oak
+> 
+> > -----Original Message-----
+> > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > Sent: Monday, June 10, 2024 1:25 PM
+> > To: Zeng, Oak <oak.zeng@intel.com>
+> > Cc: Leon Romanovsky <leon@kernel.org>; Christoph Hellwig <hch@lst.de>;
+> > Robin Murphy <robin.murphy@arm.com>; Marek Szyprowski
+> > <m.szyprowski@samsung.com>; Joerg Roedel <joro@8bytes.org>; Will
+> > Deacon <will@kernel.org>; Chaitanya Kulkarni <chaitanyak@nvidia.com>;
+> > Brost, Matthew <matthew.brost@intel.com>; Hellstrom, Thomas
+> > <thomas.hellstrom@intel.com>; Jonathan Corbet <corbet@lwn.net>; Jens
+> > Axboe <axboe@kernel.dk>; Keith Busch <kbusch@kernel.org>; Sagi
+> > Grimberg <sagi@grimberg.me>; Yishai Hadas <yishaih@nvidia.com>;
+> > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>; Tian, Kevin
+> > <kevin.tian@intel.com>; Alex Williamson <alex.williamson@redhat.com>;
+> > Jérôme Glisse <jglisse@redhat.com>; Andrew Morton <akpm@linux-
+> > foundation.org>; linux-doc@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > linux-block@vger.kernel.org; linux-rdma@vger.kernel.org;
+> > iommu@lists.linux.dev; linux-nvme@lists.infradead.org;
+> > kvm@vger.kernel.org; linux-mm@kvack.org; Bart Van Assche
+> > <bvanassche@acm.org>; Damien Le Moal
+> > <damien.lemoal@opensource.wdc.com>; Amir Goldstein
+> > <amir73il@gmail.com>; josef@toxicpanda.com; Martin K. Petersen
+> > <martin.petersen@oracle.com>; daniel@iogearbox.net; Williams, Dan J
+> > <dan.j.williams@intel.com>; jack@suse.com; Zhu Yanjun
+> > <zyjzyj2000@gmail.com>; Bommu, Krishnaiah
+> > <krishnaiah.bommu@intel.com>; Ghimiray, Himal Prasad
+> > <himal.prasad.ghimiray@intel.com>
+> > Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to
+> > two steps
+> > 
+> > On Mon, Jun 10, 2024 at 04:40:19PM +0000, Zeng, Oak wrote:
+> > > Thanks Leon and Yanjun for the reply!
+> > >
+> > > Based on the reply, we will continue use the current version for
+> > > test (as it is tested for vfio and rdma). We will switch to v1 once
+> > > it is fully tested/reviewed.
+> > 
+> > I'm glad you are finding it useful, one of my interests with this work
+> > is to improve all the HMM users.
+> > 
+> > Jason
