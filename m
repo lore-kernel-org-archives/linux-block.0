@@ -1,164 +1,162 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02AE155A47;
-	Tue, 11 Jun 2024 23:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1662E391
+	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 00:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718147338; cv=none; b=umj28EI18UnVym2jq4fNjjsgpg9Yok3XhhnvtiZhoJMR2o8oE7LXiDfMzcd+KdpEgxthUiajPfwn269fsD5uCqxOr2wqEYxnxIs9+flFwXiLWtjXoiUJKOhUVznKsPEVsCpGhw1ZLP3oVeDOgx0RA4f2HxizzmtfsGG1BKgTd54=
+	t=1718151742; cv=none; b=E/JgU7umKNXQMBG0cRPlXiG0i2rdtE0u5GHSAWA415tqO9zLFK0HXk1em1nCVJCCrZ0pEOO3O7m6FoQl4vDevxjduHhjam7zcvATFZMZgxIKJVxNI3UbDsLhZPkrY48iOsDF307UIbj6P/wcK/I4KpUAwUzTnbTHt7SG+RrfSr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718147338; c=relaxed/simple;
-	bh=SMsMnl/E19q1EZECqP3FDag1lE3b7Ahyh8DT0mGtfvE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=I3+RdSNkr4sjTWP0oXS+GyXNrwP3NXjbvALyga/51+S0Jwjbr6DU1IETWOl5knP3l9ppKexuNPgLAIcigJIzu8ukU2kgNy9F+6p/HFtTTzEFQwDlnsCIgzGE5uGD0NvkLqlhs1p12Ym0wawfzu+xofB9Yp4/pQNjTHtKkq0OpCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=39nJIEgh; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1718151742; c=relaxed/simple;
+	bh=1Oq7uWzOB/CtxkFvi7Oy9/x/1BoA9be4KYMj+KbSSXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XBt2Ua4oPZD8/ug046/1w/zlTuixmsPCHduet5mlB7Yh8lz1vnB2EFQggEf3A64V70TWwGoQo6sCl64M4sFCuxl+Pnui6tEweW+y1xOWUJqQumwaZ2mmzMx2ptvBppAlRjW47sVGP7LaGy+zFSKXcToTz33QUwB76cO37SN/Gf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZTfZ+Zze; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="39nJIEgh"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4VzPVw0Xr1z6CmSMs;
-	Tue, 11 Jun 2024 23:08:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:content-language:references:subject:subject:from:from
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1718147327; x=1720739328; bh=6DyzKM+DtIuobPzwKOhzgzP6
-	zkpd17hL1Aod6VJ/k68=; b=39nJIEghuNGK8K73AWmToVISBeoYV97i8RVEhARB
-	IRWhsd6ZL2QdIjPJ7QnzwRbKfRaZ87lsD7S5g5Z++gK4qzFWDrFiAET0BiuRs06o
-	USgIpJxgOyp7ofPPz/5l117TJMTR/6Zf+EKUZk13h1SdkDqopqVaDfyd4P3zj9kE
-	qvy4qDb7cImQyKSzUoJmxrIlDJSFBDKDpyIOX7rwQpPB9cLLQXnR3jw5FP7hUoQn
-	BlUUg8xfHQCTKMLpOXW0KJvGuuR/ziY/2UC7wMh/uIzdSA1HjNMFWU1GZ/zdAXeM
-	xWb6FFfP3xrcVN868iwkDsldcRYcDPDhMx3Sz435/+Cc/w==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id dk6etEF2j3HT; Tue, 11 Jun 2024 23:08:47 +0000 (UTC)
-Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTfZ+Zze"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718151740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y6m/s1j7JfiLAgujrqTYh/6UpGWIiGaquf8IHHLxyec=;
+	b=ZTfZ+ZzeScKFhO/neG4IzDOz2MFFnYOEoyyHsCSD2ZVnIqPJSgtSzQkOiNgdYBkpDsJNf4
+	PXfByUP23OAtjKAJwASIyPMFx1IxLJWREIYBmglS/GiOIePZwpIOJYfhKem6NjHy6qKthq
+	vmUxpH2zpEMVh+/4izU84texyFI0S6g=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-iA2LVOBhN92gy0ZiGUnbtQ-1; Tue,
+ 11 Jun 2024 20:22:18 -0400
+X-MC-Unique: iA2LVOBhN92gy0ZiGUnbtQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4VzPVk0Gv6z6Cnk8s;
-	Tue, 11 Jun 2024 23:08:45 +0000 (UTC)
-Message-ID: <9dae2056-792a-4bd0-ab1d-6c545ec781b9@acm.org>
-Date: Tue, 11 Jun 2024 16:08:44 -0700
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D107219560AB;
+	Wed, 12 Jun 2024 00:22:16 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.75])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E2D6C19560AD;
+	Wed, 12 Jun 2024 00:22:12 +0000 (UTC)
+Date: Wed, 12 Jun 2024 08:22:07 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH V3 7/9] io_uring: support providing sqe group buffer
+Message-ID: <ZmjqL+2JqBUSB5vZ@fedora>
+References: <20240511001214.173711-1-ming.lei@redhat.com>
+ <20240511001214.173711-8-ming.lei@redhat.com>
+ <ae3941f8-36a4-42fc-aaf8-027fe2de2d4d@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v9 11/19] scsi: sd: Translate data lifetime information
-To: Christian Heusel <christian@heusel.eu>,
- Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>,
- Kanchan Joshi <joshi.k@samsung.com>, Damien Le Moal <dlemoal@kernel.org>,
- "James E.J. Bottomley" <jejb@linux.ibm.com>, regressions@lists.linux.dev
-References: <20240130214911.1863909-1-bvanassche@acm.org>
- <20240130214911.1863909-12-bvanassche@acm.org>
- <Zmi6QDymvLY5wMgD@surfacebook.localdomain>
- <678af54a-2f5d-451d-8a4d-9af4d88bfcbb@heusel.eu>
-Content-Language: en-US
-In-Reply-To: <678af54a-2f5d-451d-8a4d-9af4d88bfcbb@heusel.eu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae3941f8-36a4-42fc-aaf8-027fe2de2d4d@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 6/11/24 2:21 PM, Christian Heusel wrote:
-> On 24/06/11 11:57PM, Andy Shevchenko wrote:
->> Tue, Jan 30, 2024 at 01:48:37PM -0800, Bart Van Assche kirjoitti:
->>> Recently T10 standardized SBC constrained streams. This mechanism allows
->>> to pass data lifetime information to SCSI devices in the group number
->>> field. Add support for translating write hint information into a
->>> permanent stream number in the sd driver. Use WRITE(10) instead of
->>> WRITE(6) if data lifetime information is present because the WRITE(6)
->>> command does not have a GROUP NUMBER field.
->>
->> This patch broke very badly my connected Garmin FR35 sport watch. The boot time
->> increased by 1 minute along with broken access to USB mass storage.
->>
->> On the reboot it takes ages as well.
->>
->> Revert of this and one little dependency (unrelated by functional means) helps.
+On Mon, Jun 10, 2024 at 03:00:23AM +0100, Pavel Begunkov wrote:
+> On 5/11/24 01:12, Ming Lei wrote:
+> > SQE group with REQ_F_SQE_GROUP_DEP introduces one new mechanism to share
+> > resource among one group of requests, and all member requests can consume
+> > the resource provided by group lead efficiently in parallel.
+> > 
+> > This patch uses the added sqe group feature REQ_F_SQE_GROUP_DEP to share
+> > kernel buffer in sqe group:
+> > 
+> > - the group lead provides kernel buffer to member requests
+> > 
+> > - member requests use the provided buffer to do FS or network IO, or more
+> > operations in future
+> > 
+> > - this kernel buffer is returned back after member requests use it up
+> > 
+> > This way looks a bit similar with kernel's pipe/splice, but there are some
+> > important differences:
+> > 
+> > - splice is for transferring data between two FDs via pipe, and fd_out can
+> > only read data from pipe; this feature can borrow buffer from group lead to
+> > members, so member request can write data to this buffer if the provided
+> > buffer is allowed to write to.
+> > 
+> > - splice implements data transfer by moving pages between subsystem and
+> > pipe, that means page ownership is transferred, and this way is one of the
+> > most complicated thing of splice; this patch supports scenarios in which
+> > the buffer can't be transferred, and buffer is only borrowed to member
+> > requests, and is returned back after member requests consume the provided
+> > buffer, so buffer lifetime is simplified a lot. Especially the buffer is
+> > guaranteed to be returned back.
+> > 
+> > - splice can't run in async way basically
+> > 
+> > It can help to implement generic zero copy between device and related
+> > operations, such as ublk, fuse, vdpa, even network receive or whatever.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >   include/linux/io_uring_types.h | 33 +++++++++++++++++++
+> >   io_uring/io_uring.c            | 10 +++++-
+> >   io_uring/io_uring.h            |  5 +++
+> >   io_uring/kbuf.c                | 60 ++++++++++++++++++++++++++++++++++
+> >   io_uring/kbuf.h                | 13 ++++++++
+> >   io_uring/net.c                 | 31 +++++++++++++++++-
+> >   io_uring/opdef.c               |  5 +++
+> >   io_uring/opdef.h               |  2 ++
+> >   io_uring/rw.c                  | 20 +++++++++++-
+> >   9 files changed, 176 insertions(+), 3 deletions(-)
+> > 
+> ...
+> > diff --git a/io_uring/net.c b/io_uring/net.c
+> > index 070dea9a4eda..83fd5879082e 100644
+> > --- a/io_uring/net.c
+> > +++ b/io_uring/net.c
+> > @@ -79,6 +79,13 @@ struct io_sr_msg {
+> ...
+> >   retry_bundle:
+> >   	if (io_do_buffer_select(req)) {
+> >   		struct buf_sel_arg arg = {
+> > @@ -1132,6 +1148,11 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
+> >   		if (unlikely(ret))
+> >   			goto out_free;
+> >   		sr->buf = NULL;
+> > +	} else if (req->flags & REQ_F_GROUP_KBUF) {
+> > +		ret = io_import_group_kbuf(req, user_ptr_to_u64(sr->buf),
+> > +				sr->len, ITER_DEST, &kmsg->msg.msg_iter);
+> > +		if (unlikely(ret))
+> > +			goto out_free;
+> >   	}
+> >   	kmsg->msg.msg_inq = -1;
+> > @@ -1334,6 +1355,14 @@ static int io_send_zc_import(struct io_kiocb *req, struct io_async_msghdr *kmsg)
+> >   		if (unlikely(ret))
+> >   			return ret;
+> >   		kmsg->msg.sg_from_iter = io_sg_from_iter;
+> > +	} else if (req->flags & REQ_F_GROUP_KBUF) {
+> > +		struct io_sr_msg *sr = io_kiocb_to_cmd(req, struct io_sr_msg);
+> > +
+> > +		ret = io_import_group_kbuf(req, user_ptr_to_u64(sr->buf),
+> > +				sr->len, ITER_SOURCE, &kmsg->msg.msg_iter);
+> > +		if (unlikely(ret))
+> > +			return ret;
+> > +		kmsg->msg.sg_from_iter = io_sg_from_iter;
 > 
-> We have tested that the revert fixes the issue on top of v6.10-rc3.
-> 
-> Also adding the regressions list in CC and making regzbot aware of this
-> issue.
-> 
->> Details are here: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/issues/60
->>
->> P.S. Big thanks to Arch Linux team to help with bisection!
-> 
-> If this is fixed adding in a "Reported-by" or "Bisected-by" (depending
-> on what this subsystem uses) for me would be appreciated :)
+> Not looking here too deeply I'm pretty sure it's buggy.
+> The buffer can only be reused once the notification
+> CQE completes, and there is nothing in regards to it.
 
-Thank you Christian for having gone through the painful process of
-bisecting this issue.
+OK. It isn't triggered in ublk-nbd because the buffer is still valid
+until the peer reply is received, when the notification is definitely
+ready.
 
-Is the Garmin FR35 Flash device perhaps connected to a USB bus? If so,
-this is the second report of a USB storage device that resets if it
-receives a query for the IO Advice Hints Grouping mode page. Does the
-patch below help?
+I will remove send zc support in the enablement series, and it can
+be added in future without much difficulty.
+
 
 Thanks,
+Ming
 
-Bart.
-
-
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 3a43e2209751..fcf3d7730466 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -63,6 +63,7 @@
-  #include <scsi/scsi_cmnd.h>
-  #include <scsi/scsi_dbg.h>
-  #include <scsi/scsi_device.h>
-+#include <scsi/scsi_devinfo.h>
-  #include <scsi/scsi_driver.h>
-  #include <scsi/scsi_eh.h>
-  #include <scsi/scsi_host.h>
-@@ -3117,6 +3118,9 @@ static void sd_read_io_hints(struct scsi_disk *sdkp, unsigned char *buffer)
-  	struct scsi_mode_data data;
-  	int res;
-
-+	if (sdp->sdev_bflags & BLIST_SKIP_IO_HINTS)
-+		return;
-+
-  	res = scsi_mode_sense(sdp, /*dbd=*/0x8, /*modepage=*/0x0a,
-  			      /*subpage=*/0x05, buffer, SD_BUF_SIZE, SD_TIMEOUT,
-  			      sdkp->max_retries, &data, &sshdr);
-diff --git a/drivers/usb/storage/scsiglue.c b/drivers/usb/storage/scsiglue.c
-index b31464740f6c..9a7185c68872 100644
---- a/drivers/usb/storage/scsiglue.c
-+++ b/drivers/usb/storage/scsiglue.c
-@@ -79,6 +79,8 @@ static int slave_alloc (struct scsi_device *sdev)
-  	if (us->protocol == USB_PR_BULK && us->max_lun > 0)
-  		sdev->sdev_bflags |= BLIST_FORCELUN;
-
-+	sdev->sdev_bflags |= BLIST_SKIP_IO_HINTS;
-+
-  	return 0;
-  }
-
-diff --git a/include/scsi/scsi_devinfo.h b/include/scsi/scsi_devinfo.h
-index 6b548dc2c496..fa8721e49dec 100644
---- a/include/scsi/scsi_devinfo.h
-+++ b/include/scsi/scsi_devinfo.h
-@@ -69,8 +69,10 @@
-  #define BLIST_RETRY_ITF		((__force blist_flags_t)(1ULL << 32))
-  /* Always retry ABORTED_COMMAND with ASC 0xc1 */
-  #define BLIST_RETRY_ASC_C1	((__force blist_flags_t)(1ULL << 33))
-+/* Do not read the I/O hints mode page */
-+#define BLIST_SKIP_IO_HINTS	((__force blist_flags_t)(1ULL << 34))
-
--#define __BLIST_LAST_USED BLIST_RETRY_ASC_C1
-+#define __BLIST_LAST_USED BLIST_SKIP_IO_HINTS
-
-  #define __BLIST_HIGH_UNUSED (~(__BLIST_LAST_USED | \
-  			       (__force blist_flags_t) \
