@@ -1,50 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B563F8F7;
-	Wed, 12 Jun 2024 21:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B433C28385;
+	Wed, 12 Jun 2024 22:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718228850; cv=none; b=Vubz/znzw3xkkz0Zhbx7+FRtkyWrZdLVm+LcpIr37wyP9GxCLlwQOPolu88jAOeAH0IlUsYFvAbVaGfu/FGiyianezeaztllYOep+Uy78MBiUWgSONic3n6FLa2ECJPjnVo5gC+mJDw69nKsYGoDGjuUhI90WL0HeosvVGeZ4Ss=
+	t=1718231876; cv=none; b=tLCf+n2Rg62o9iaq+cKVkksQlZgQionrgULmfVF+NYoiRx7rRK9yDBhSkmYPj9acnre97xZ3AsdqXF/CYJp+iJdoOWBa6V9hDUgcGQgcEKmGOP3P+vfGPiTfYHgDt3iGh5ETHrswC9nVTdwttuggy4UNWx6mVyev1w1rl9KzNQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718228850; c=relaxed/simple;
-	bh=+/VTydx8DuKC+hBaP5Tnh04ofGemNXKWLfDD9tjXUwo=;
+	s=arc-20240116; t=1718231876; c=relaxed/simple;
+	bh=oIsohZ+9uDXt1/szfbZNu9uZ6WH4ExPZbv0MeSABAuw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PeaZxoz1UF0A0Qnk/R/g3NXz2L2CT3W4Ocq+Zqsj+SQCJHHEKsAq/mmWSS4hMeT5uaLlE2I3ojvBOnrNpu2Bt7msFYQDoG6Q6KWhvfKlq/fcPRCHvtJ0mDDaJmDyuELkkGV1g+HBIlF8mbK9Go36RuLnnkYl+516TqZR+rMp8GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QffqexAz; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=VP11zNL1BHneE8u7HEMfsUdH+TTt58BXmUt97y5tCQSOCfZ+c7VbB8FRiO14JUZEt4dtU1L31WsStNJEZK8JyiIlGBhxjNfO/k28/iXk3q17jZ/hThZ4W31jnG/kIeDhC0V7w9PaloX3DW5SH85++t8gAu7XIcQivgAjyLov8LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gP+b8oI2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QffqexAz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA68EC116B1;
-	Wed, 12 Jun 2024 21:47:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gP+b8oI2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29078C116B1;
+	Wed, 12 Jun 2024 22:37:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718228849;
-	bh=+/VTydx8DuKC+hBaP5Tnh04ofGemNXKWLfDD9tjXUwo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QffqexAzs3KBLfngWw5SiR/LiYM9HWTJ+9du9kZ9zv+i8sSzY98yBnmXrjNyOZabB
-	 U/ck13+Vg9ga/wkTZMgvz071bhJcm6aAO+VOId0A4vJ1tpoYrK0Pxr9sZIFO1z+/55
-	 jNf0LSzjZcN81fAo7//dsmA5wDLGof5rgYgtaMIPuvCUrl6fQwiMApmoVoFmgUnKAM
-	 IB6Gc/ysLm/Z5qm7rDoqVGb73GLOZIqfGt2hdqleDljCHOeHg0mjybbOeSgAKoiO6a
-	 mZFQ2+6LCc8Rc70AZeesAubTqd5BfCNqrO3eX17/kjNmxlfQO8rv/YjLcY5VA31NSD
-	 6fOIRtOCqzeEg==
-Date: Wed, 12 Jun 2024 14:47:29 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, tytso@mit.edu, dchinner@redhat.com,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.com,
-	chandan.babu@oracle.com, hch@lst.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-xfs@vger.kernel.org, catherine.hoang@oracle.com,
-	ritesh.list@gmail.com, mcgrof@kernel.org,
-	mikulas@artax.karlin.mff.cuni.cz, agruenba@redhat.com,
-	miklos@szeredi.hu, martin.petersen@oracle.com
-Subject: Re: [PATCH v4 03/22] xfs: Use extent size granularity for
- iomap->io_block_size
-Message-ID: <20240612214729.GL2764752@frogsfrogsfrogs>
-References: <20240607143919.2622319-1-john.g.garry@oracle.com>
- <20240607143919.2622319-4-john.g.garry@oracle.com>
+	s=k20201202; t=1718231876;
+	bh=oIsohZ+9uDXt1/szfbZNu9uZ6WH4ExPZbv0MeSABAuw=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=gP+b8oI23RaN2auavn9kdJs6IaFxGfpTRers71TYsRO81EBkAJS1TEEGF9PeM+7wx
+	 JfjAorGHi0StC2tbEFL0bYR8ahwDNRtKXd/jEciawD5flFj7OxObqgTN+5TakbhJo9
+	 MYUohzqZDX+JJBX7UwG3NUQCOUrxFlzf999/p9+XDhMFm6el3kPv2V63iZvZ5wUcv5
+	 lQ5MrBltINH+5KZS/28WiZf4A+9rRX+iNrE09oOnoadekn/S8rZO8cAVOXqThDgSq8
+	 GX1/wlDqJccdnaongSnTXVexdmEnFHpo7BzVqTOxZtg9rbL/bdSMDg4px5jWTRJf+V
+	 LGtEBztw5cOtQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id BC95ACE0DEA; Wed, 12 Jun 2024 15:37:55 -0700 (PDT)
+Date: Wed, 12 Jun 2024 15:37:55 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,203 +60,88 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240607143919.2622319-4-john.g.garry@oracle.com>
+In-Reply-To: <20240612143305.451abf58@kernel.org>
 
-On Fri, Jun 07, 2024 at 02:39:00PM +0000, John Garry wrote:
-> Currently iomap->io_block_size is set to the i_blocksize() value for the
-> inode.
+On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
+> On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
+> > Since SLOB was removed, it is not necessary to use call_rcu
+> > when the callback only performs kmem_cache_free. Use
+> > kfree_rcu() directly.
+> > 
+> > The changes were done using the following Coccinelle semantic patch.
+> > This semantic patch is designed to ignore cases where the callback
+> > function is used in another way.
 > 
-> Expand the sub-fs block size zeroing to now cover RT extents, by calling
-> setting iomap->io_block_size as xfs_inode_alloc_unitsize().
-> 
-> In xfs_iomap_write_unwritten(), update the unwritten range fsb to cover
-> this extent granularity.
-> 
-> In xfs_file_dio_write(), handle a write which is not aligned to extent
-> size granularity as unaligned. Since the extent size granularity need not
-> be a power-of-2, handle this also.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  fs/xfs/xfs_file.c  | 24 +++++++++++++++++++-----
->  fs/xfs/xfs_inode.c | 17 +++++++++++------
->  fs/xfs/xfs_inode.h |  1 +
->  fs/xfs/xfs_iomap.c |  8 +++++++-
->  4 files changed, 38 insertions(+), 12 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> index b240ea5241dc..24fe3c2e03da 100644
-> --- a/fs/xfs/xfs_file.c
-> +++ b/fs/xfs/xfs_file.c
-> @@ -601,7 +601,7 @@ xfs_file_dio_write_aligned(
->  }
->  
->  /*
-> - * Handle block unaligned direct I/O writes
-> + * Handle unaligned direct IO writes.
->   *
->   * In most cases direct I/O writes will be done holding IOLOCK_SHARED, allowing
->   * them to be done in parallel with reads and other direct I/O writes.  However,
-> @@ -630,9 +630,9 @@ xfs_file_dio_write_unaligned(
->  	ssize_t			ret;
->  
->  	/*
-> -	 * Extending writes need exclusivity because of the sub-block zeroing
-> -	 * that the DIO code always does for partial tail blocks beyond EOF, so
-> -	 * don't even bother trying the fast path in this case.
-> +	 * Extending writes need exclusivity because of the sub-block/extent
-> +	 * zeroing that the DIO code always does for partial tail blocks
-> +	 * beyond EOF, so don't even bother trying the fast path in this case.
+> How does the discussion on:
+>   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
+>   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
+> reflect on this series? IIUC we should hold off..
 
-Hummm.  So let's say the fsblock size is 4k, the rt extent size is 16k,
-and you want to write bytes 8192-12287 of a file.  Currently we'd use
-xfs_file_dio_write_aligned for that, but now we'd use
-xfs_file_dio_write_unaligned?  Even though we don't need zeroing or any
-of that stuff?
+We do need to hold off for the ones in kernel modules (such as 07/14)
+where the kmem_cache is destroyed during module unload.
 
->  	 */
->  	if (iocb->ki_pos > isize || iocb->ki_pos + count >= isize) {
->  		if (iocb->ki_flags & IOCB_NOWAIT)
-> @@ -698,11 +698,25 @@ xfs_file_dio_write(
->  	struct xfs_inode	*ip = XFS_I(file_inode(iocb->ki_filp));
->  	struct xfs_buftarg      *target = xfs_inode_buftarg(ip);
->  	size_t			count = iov_iter_count(from);
-> +	bool			unaligned;
-> +	u64			unitsize;
->  
->  	/* direct I/O must be aligned to device logical sector size */
->  	if ((iocb->ki_pos | count) & target->bt_logical_sectormask)
->  		return -EINVAL;
-> -	if ((iocb->ki_pos | count) & ip->i_mount->m_blockmask)
-> +
-> +	unitsize = xfs_inode_alloc_unitsize(ip);
-> +	if (!is_power_of_2(unitsize)) {
-> +		if (isaligned_64(iocb->ki_pos, unitsize) &&
-> +		    isaligned_64(count, unitsize))
-> +			unaligned = false;
-> +		else
-> +			unaligned = true;
-> +	} else {
-> +		unaligned = (iocb->ki_pos | count) & (unitsize - 1);
-> +	}
+OK, I might as well go through them...
 
-Didn't I already write this?
+[PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	Needs to wait, see wg_allowedips_slab_uninit().
 
-> +	if (unaligned)
+[PATCH 02/14] net: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	I don't immediately see the rcu_barrier(), but if there isn't
+	one in there somewhere there probably should be.  Caution
+	suggests a need to wait.
 
-	if (!xfs_is_falloc_aligned(ip, iocb->ki_pos, count))
+[PATCH 03/14] KVM: PPC: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	I don't immediately see the rcu_barrier(), but if there isn't
+	one in there somewhere there probably should be.  Caution
+	suggests a need to wait.
 
->  		return xfs_file_dio_write_unaligned(ip, iocb, from);
->  	return xfs_file_dio_write_aligned(ip, iocb, from);
->  }
-> diff --git a/fs/xfs/xfs_inode.c b/fs/xfs/xfs_inode.c
-> index 58fb7a5062e1..93ad442f399b 100644
-> --- a/fs/xfs/xfs_inode.c
-> +++ b/fs/xfs/xfs_inode.c
-> @@ -4264,15 +4264,20 @@ xfs_break_layouts(
->  	return error;
->  }
->  
-> -/* Returns the size of fundamental allocation unit for a file, in bytes. */
+[PATCH 04/14] xfrm6_tunnel: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	Needs to wait, see xfrm6_tunnel_fini().
 
-Don't delete the comment, it has useful return type information.
+[PATCH 05/14] tracefs: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	This one is fine because the tracefs_inode_cachep kmem_cache
+	is created at boot and never destroyed.
 
-/*
- * Returns the size of fundamental allocation unit for a file, in
- * fsblocks.
- */
+[PATCH 06/14] eCryptfs: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	I don't see a kmem_cache_destroy(), but then again, I also don't
+	see the kmem_cache_create().  Unless someone can see what I am
+	not seeing, let's wait.
 
->  unsigned int
-> -xfs_inode_alloc_unitsize(
-> +xfs_inode_alloc_unitsize_fsb(
->  	struct xfs_inode	*ip)
->  {
-> -	unsigned int		blocks = 1;
-> -
->  	if (XFS_IS_REALTIME_INODE(ip))
-> -		blocks = ip->i_mount->m_sb.sb_rextsize;
-> +		return ip->i_mount->m_sb.sb_rextsize;
-> +
-> +	return 1;
-> +}
->  
-> -	return XFS_FSB_TO_B(ip->i_mount, blocks);
-> +/* Returns the size of fundamental allocation unit for a file, in bytes. */
-> +unsigned int
-> +xfs_inode_alloc_unitsize(
-> +	struct xfs_inode	*ip)
-> +{
-> +	return XFS_FSB_TO_B(ip->i_mount, xfs_inode_alloc_unitsize_fsb(ip));
->  }
-> diff --git a/fs/xfs/xfs_inode.h b/fs/xfs/xfs_inode.h
-> index 292b90b5f2ac..90d2fa837117 100644
-> --- a/fs/xfs/xfs_inode.h
-> +++ b/fs/xfs/xfs_inode.h
-> @@ -643,6 +643,7 @@ int xfs_inode_reload_unlinked(struct xfs_inode *ip);
->  bool xfs_ifork_zapped(const struct xfs_inode *ip, int whichfork);
->  void xfs_inode_count_blocks(struct xfs_trans *tp, struct xfs_inode *ip,
->  		xfs_filblks_t *dblocks, xfs_filblks_t *rblocks);
-> +unsigned int xfs_inode_alloc_unitsize_fsb(struct xfs_inode *ip);
->  unsigned int xfs_inode_alloc_unitsize(struct xfs_inode *ip);
->  
->  struct xfs_dir_update_params {
-> diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-> index ecb4cae88248..fbe69f747e30 100644
-> --- a/fs/xfs/xfs_iomap.c
-> +++ b/fs/xfs/xfs_iomap.c
-> @@ -127,7 +127,7 @@ xfs_bmbt_to_iomap(
->  	}
->  	iomap->offset = XFS_FSB_TO_B(mp, imap->br_startoff);
->  	iomap->length = XFS_FSB_TO_B(mp, imap->br_blockcount);
-> -	iomap->io_block_size = i_blocksize(VFS_I(ip));
-> +	iomap->io_block_size = xfs_inode_alloc_unitsize(ip);
+[PATCH 07/14] net: bridge: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	Needs to wait, see br_fdb_fini() and br_deinit().
 
-Oh, I see.  So io_block_size causes iomap to write zeroes to the storage
-backing surrounding areas of the file range.  In this case, for direct
-writes to the unwritten middle 4k of an otherwise written 16k extent,
-we'll write zeroes to 0-4k and 8k-16k even though that wasn't what the
-caller asked for?
+[PATCH 08/14] nfsd: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	I don't immediately see the rcu_barrier(), but if there isn't
+	one in there somewhere there probably should be.  Caution
+	suggests a need to wait.
 
-IOWs, if you start with:
+[PATCH 09/14] block: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	I don't see a kmem_cache_destroy(), but then again, I also don't
+	see the kmem_cache_create().  Unless someone can see what I am
+	not seeing, let's wait.
 
-WWuW
+[PATCH 10/14] can: gw: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	Needs to wait, see cgw_module_exit().
 
-write to the "U", then it'll write zeroes to the "W" areas?  That
-doesn't sound good...
+[PATCH 11/14] posix-timers: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	This one is fine because the posix_timers_cache kmem_cache is
+	created at boot and never destroyed.
 
->  	if (mapping_flags & IOMAP_DAX)
->  		iomap->dax_dev = target->bt_daxdev;
->  	else
-> @@ -577,11 +577,17 @@ xfs_iomap_write_unwritten(
->  	xfs_fsize_t	i_size;
->  	uint		resblks;
->  	int		error;
-> +	unsigned int	rounding;
->  
->  	trace_xfs_unwritten_convert(ip, offset, count);
->  
->  	offset_fsb = XFS_B_TO_FSBT(mp, offset);
->  	count_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)offset + count);
-> +	rounding = xfs_inode_alloc_unitsize_fsb(ip);
-> +	if (rounding > 1) {
-> +		offset_fsb = rounddown_64(offset_fsb, rounding);
-> +		count_fsb = roundup_64(count_fsb, rounding);
-> +	}
+[PATCH 12/14] workqueue: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	This one is fine because the pwq_cache kmem_cache is created at
+	boot and never destroyed.
 
-...and then the ioend handler is supposed to be smart enough to know
-that iomap quietly wrote to other parts of the disk.
+[PATCH 13/14] kcm: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	I don't immediately see the rcu_barrier(), but if there isn't
+	one in there somewhere there probably should be.  Caution
+	suggests a need to wait.
 
-Um, does this cause unwritten extent conversion for entire rtextents
-after writeback to a rtextsize > 1fsb file?
+[PATCH 14/14] netfilter: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+	Needs to wait, see hashlimit_mt_exit().
 
-Or am I really misunderstanding what's going on here with the io paths?
+So 05/14, 11/14 and 12/14 are OK and can go ahead.  The rest need some
+help.
 
---D
+Apologies for my having gotten overly enthusiastic about this change!
 
->  	count_fsb = (xfs_filblks_t)(count_fsb - offset_fsb);
->  
->  	/*
-> -- 
-> 2.31.1
-> 
-> 
+							Thanx, Paul
