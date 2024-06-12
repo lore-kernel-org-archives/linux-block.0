@@ -1,66 +1,70 @@
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310B61822DF
-	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 17:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D3D250EC
+	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 17:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718211635; cv=none; b=tpvhieOlUPFi4NXEQxSRLa8YwyyeUgHy1Le/VhKheo1QJDAk3Z+tLND6PDrOFt6MC4V5KyQbrVU4nv/eZtBdyiymKc62CUHI+LaCuFsmHPSNqjGVhiL1Uvs2Zf/g8iPkziHm3t4aFH7Zy7ugUwBk52NLHy7F8xb9jfQEJFWVE+g=
+	t=1718211672; cv=none; b=aXhGhK4SkENuGZzBo6UlI5xg1mj8wQCdz0hSlLaNA5GIzvYB87plFLIBMBw6pIwqpw/wcQ7dqj7IXEJfSkdvxq8utbd4r1vE+5e6Ep1R6mgBTUAezQ1zWo45lj8yMu3Ge4oMuwcf4hQwsCYUDn0mZlOou44v2l9Nz9L62M2hqLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718211635; c=relaxed/simple;
-	bh=z7OSESrLBJWD8/2P+n6PssT3cGyqehX+NT08g2ul/ak=;
+	s=arc-20240116; t=1718211672; c=relaxed/simple;
+	bh=wfvnKuTEuK82D4wpedQLQ1gILbKz5VUimIpfPZTTOO8=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=RfR5Q4EPo3BK5qC0hEEG3jG0OqlIfSKd+Y5mJFkKvEPxT8s5mbRiN/wnDG52Hy6fQRGRzKbKMAKSQzgTDAvpzfNr580f+TkzWrgC1tsVcfzGhnySJ/fqIW3kI4XuUyRFgmo9XBCyYdN2OL9I7ZjLmhsqKJXBdY4L7eVu9bMS9kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VQL6jN6w; arc=none smtp.client-ip=209.85.161.48
+	 MIME-Version:Content-Type; b=mgCZ3wxlueBhemZmpY8mseSLT2r0oE/VQyTCMqmrT6DXI5nCGQjpeYIRnmQFglGLNCY2sQu6J+Z3vOSJANxO1++jwcgxjmEqNweY39PmVUjgd3n0CswCGGXUPBjlmAZxt+um4aDzKAuuuYBXLUN5/v3Fr3PgGHu56l0117eFKgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1hVt9mrG; arc=none smtp.client-ip=209.85.161.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VQL6jN6w"
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5bb33237b60so4283eaf.0
-        for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 10:00:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1hVt9mrG"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5bad42fec2dso5017eaf.2
+        for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 10:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718211633; x=1718816433; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718211669; x=1718816469; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jIIMrgyJCYaT/orKY6h7hla5hxEimOF+QR3n0b8qkwQ=;
-        b=VQL6jN6wXII+0/GTI8ADCcDokINenQqRRIV3nL7RCIfeGDvpujUgG/wRDNTADE5Z7z
-         xTFtwoTr+rBrxNivi6StBO3hXeuL5eP5Eo4YEiK0kIhc24+NFULNS3S4EZGiB6CzKQTF
-         rIpeVRTMScffnIFXcB+TLOrWIbLwUqsg3qlTSQLAeFks43TixsGSCtT9/k8REK81oPI3
-         rRCx7/ZEgl4x2eVd7MgXOhdQTW+Melf0OITzrZIC8Ld4Z3O9XH8QHv/Ru2ImZB69Espr
-         tX5vd9oZSqGZ3YJsNDBrBF2DcwgrThhRC613+YcmTarhXcNNRGEo1xt+hZVPe2S2Bmee
-         QQLw==
+        bh=hksk4wAbIz8bSZzaWxnZT/zZszVoyi90hMirDssVrE4=;
+        b=1hVt9mrGZzKQxJ/7WLMz0Ys21KR3z1e9Lj0hWEiiJM129/zKQ6Atd/CN0QHgepfD/h
+         BLb5tlUi0PqBPSItqYqLUD7Al6umJQestI2JN0leN+LKb6/wjvVmEFDkiG3jMXdYow9L
+         8319A6aiNUjPCweOdkIqIkkUwNgCa9J8ASgN7yaU9buQj+1PjwOz+yHcfXeomE0Yl3ux
+         nYlLZNasuSdQLCofgXvPiy0EBwQ6giQlLo/mxsg4Urxv1y0Ax+TbADuAjH6t/RKrSjHZ
+         2yn1igRbKfTr4mLzzzmivxIoPkbJn7BCKOhhqB/Py+2AudZYYNfMBP1vkvbMAxYjyj7s
+         ERfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718211633; x=1718816433;
+        d=1e100.net; s=20230601; t=1718211669; x=1718816469;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jIIMrgyJCYaT/orKY6h7hla5hxEimOF+QR3n0b8qkwQ=;
-        b=KKWSvcZIoaBvqyRdwFy+eKv6pqer0EindjKCP7d79BOYadwICshDqXpjV5pTWpOGze
-         Q+PYrLhJJwlhnN288ny9L1yavYy9O43031f/Xp5VvLnO11k4LyDO3TyKhI5X2Br5oKQw
-         YFSo/oJJcpR0OW50kM+fQvPeX8M0TIHEAcEz5SUfi4gL23bGhXjJGvDrfkM802laF1k3
-         /1Q6VyiVgza5r7lFpWRVYlu6OmfYn3zI2dmsq3fiGUOhrQybGc+O5Uj3CO+5iPsohMn6
-         gikK+w9voB2xpQEEjRiBR3uwhHI1WgiYAwW5Efx7QQHWsGMBYrmn3KmX6PtvWYVmj8rH
-         +APQ==
-X-Gm-Message-State: AOJu0YzNQBznS5Aq7/JISI56kZBAHcNJrT2ScFRh8lmFfgrMS7pHdQGO
-	RYIt+7TxXgFYMQsz0CjqLLvmInBkmbxvYVIwAO6thho/MUJNCmquTnhRLRMZWdI=
-X-Google-Smtp-Source: AGHT+IFXpy0/wkthwrMNmOsZve5zPcmpq79rWCq5ChB1WBkOzd5P+ePWJWqvxcVOmqaENKj4ouM+4w==
-X-Received: by 2002:a05:6808:d4d:b0:3d2:1b8a:be58 with SMTP id 5614622812f47-3d23e17b4b3mr2893332b6e.3.1718211631029;
-        Wed, 12 Jun 2024 10:00:31 -0700 (PDT)
+        bh=hksk4wAbIz8bSZzaWxnZT/zZszVoyi90hMirDssVrE4=;
+        b=LkL3s2AK05mchUcl7ypXNnASABbjjpkiRljr64PIFmFT4BV8WclmvezGJGGXPJ0Ozp
+         22psUw1j8LwJ9XNOLAvZTkOY43BRplSjt1CbEmpxILIZGd2uYdADssywfqx2z3YlUXVi
+         SZsep5ivxj2lryJ6UfhCLwAT2zwrmuGV+f/03CQZt52lR88/SRiGPMQ9M7TPNK8xx70q
+         rcosQwwdsjEKdr29cnhtSLisbwEl2rYWEcIzSQVKFbZrb5qqhPHOmn2lzSRISN2HOqGY
+         lz0GVY5OPv2TDPULt2jmXwQbQ0XyjztZMw0Z/9rKekP1wnE5Oepnc7ThBN3j0HdYI9W0
+         iP3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUSvsMb9OfgJQWrNAnmplDybYrKcypqdGk+IgssVpD7zp0y4RP3MuoCXHrh6iN2zLXLBTK3jEjQS0IYyO3tQX5A958h0LHFUtMLlH8=
+X-Gm-Message-State: AOJu0Yz6dPseutQmdQHRlOrtjxp2dLRt93n0hvAUMoQ/ozVSAyQrVPwq
+	6vZ1LBqhbbqebPBrkDyTQAGqgfiKa4oes6zFq6Dw8i/tThvlyDpYEO9DmONLSTaewuE91h4PWah
+	O
+X-Google-Smtp-Source: AGHT+IEShVwbkX8uANOzA7Y6++m3AdDkF7i2edh/ZcjLmOq4mCjGmcRKppMnpDEeIrhOSy7IAhNZyw==
+X-Received: by 2002:a4a:a5ca:0:b0:5ba:e11d:a2ae with SMTP id 006d021491bc7-5bb3b9f4ef7mr2474760eaf.1.1718211667997;
+        Wed, 12 Jun 2024 10:01:07 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d242affa88sm115841b6e.1.2024.06.12.10.00.29
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5ba977e03d5sm2464036eaf.22.2024.06.12.10.01.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 10:00:30 -0700 (PDT)
+        Wed, 12 Jun 2024 10:01:07 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: ming.lei@redhat.com, hch@lst.de, f.weber@proxmox.com, 
- bvanassche@acm.org, Chengming Zhou <chengming.zhou@linux.dev>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- zhouchengming@bytedance.com
-In-Reply-To: <20240608143115.972486-1-chengming.zhou@linux.dev>
-References: <20240608143115.972486-1-chengming.zhou@linux.dev>
-Subject: Re: [PATCH v2] block: fix request.queuelist usage in flush
-Message-Id: <171821162990.49689.4088473696825322669.b4-ty@kernel.dk>
-Date: Wed, 12 Jun 2024 11:00:29 -0600
+To: hch@lst.de, kbusch@kernel.org, martin.petersen@oracle.com, 
+ Anuj Gupta <anuj20.g@samsung.com>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, 
+ Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240610111144.14647-1-anuj20.g@samsung.com>
+References: <CGME20240610111927epcas5p1bb534d0a093a9d1243a78a6a93065df7@epcas5p1.samsung.com>
+ <20240610111144.14647-1-anuj20.g@samsung.com>
+Subject: Re: [PATCH v3] block: unmap and free user mapped integrity via
+ submitter
+Message-Id: <171821166696.49890.9778377661533135590.b4-ty@kernel.dk>
+Date: Wed, 12 Jun 2024 11:01:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,22 +76,18 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.5-dev-2aabd
 
 
-On Sat, 08 Jun 2024 22:31:15 +0800, Chengming Zhou wrote:
-> Friedrich Weber reported a kernel crash problem and bisected to commit
-> 81ada09cc25e ("blk-flush: reuse rq queuelist in flush state machine").
+On Mon, 10 Jun 2024 16:41:44 +0530, Anuj Gupta wrote:
+> The user mapped intergity is copied back and unpinned by
+> bio_integrity_free which is a low-level routine. Do it via the submitter
+> rather than doing it in the low-level block layer code, to split the
+> submitter side from the consumer side of the bio.
 > 
-> The root cause is that we use "list_move_tail(&rq->queuelist, pending)"
-> in the PREFLUSH/POSTFLUSH sequences. But rq->queuelist.next == xxx since
-> it's popped out from plug->cached_rq in __blk_mq_alloc_requests_batch().
-> We don't initialize its queuelist just for this first request, although
-> the queuelist of all later popped requests will be initialized.
 > 
-> [...]
 
 Applied, thanks!
 
-[1/1] block: fix request.queuelist usage in flush
-      commit: d0321c812d89c5910d8da8e4b10c891c6b96ff70
+[1/1] block: unmap and free user mapped integrity via submitter
+      commit: e038ee6189842e9662d2fc59d09dbcf48350cf99
 
 Best regards,
 -- 
