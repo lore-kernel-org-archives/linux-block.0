@@ -1,162 +1,160 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1662E391
-	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 00:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35511A47
+	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 00:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718151742; cv=none; b=E/JgU7umKNXQMBG0cRPlXiG0i2rdtE0u5GHSAWA415tqO9zLFK0HXk1em1nCVJCCrZ0pEOO3O7m6FoQl4vDevxjduHhjam7zcvATFZMZgxIKJVxNI3UbDsLhZPkrY48iOsDF307UIbj6P/wcK/I4KpUAwUzTnbTHt7SG+RrfSr0=
+	t=1718153513; cv=none; b=nELGIotEbmwi2MJ+7VSjad0VNGkSA83AQuHYzklHZSkhfV5tRIZ6vGcx2ML9X4hwZyz4O/JJyrvaxS5AgkFEsq5VbVfxIjP6ODX/kA6AprfBqu3gfWhfF9v5g7DPnDJBfkrVClEwLiNluvdncQ6sl2Tpj1YWFW1gVO720E9OuT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718151742; c=relaxed/simple;
-	bh=1Oq7uWzOB/CtxkFvi7Oy9/x/1BoA9be4KYMj+KbSSXs=;
+	s=arc-20240116; t=1718153513; c=relaxed/simple;
+	bh=4BUd3gADcxPVhLJ7UT3ehfVLhvQyFL/fDHi1OnGfB3Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XBt2Ua4oPZD8/ug046/1w/zlTuixmsPCHduet5mlB7Yh8lz1vnB2EFQggEf3A64V70TWwGoQo6sCl64M4sFCuxl+Pnui6tEweW+y1xOWUJqQumwaZ2mmzMx2ptvBppAlRjW47sVGP7LaGy+zFSKXcToTz33QUwB76cO37SN/Gf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZTfZ+Zze; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=JDltZSI5CFpFo1A2Mi5lP0nWN8eCGxX+H3cWaVC9HP4fg2WPij7yOI3Fr6kuX0Tmlc7wp23hPQEIAIUWq/sDRczbqvqGWkgWLx5E192md15T9ntybYBjRTPtZ1wHUaZbetRwtxTyVp54KpKOVcVhYCAw3VPYV3GWeHzFdHwnsco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NYM9TAZV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTfZ+Zze"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NYM9TAZV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718151740;
+	s=mimecast20190719; t=1718153510;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y6m/s1j7JfiLAgujrqTYh/6UpGWIiGaquf8IHHLxyec=;
-	b=ZTfZ+ZzeScKFhO/neG4IzDOz2MFFnYOEoyyHsCSD2ZVnIqPJSgtSzQkOiNgdYBkpDsJNf4
-	PXfByUP23OAtjKAJwASIyPMFx1IxLJWREIYBmglS/GiOIePZwpIOJYfhKem6NjHy6qKthq
-	vmUxpH2zpEMVh+/4izU84texyFI0S6g=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=+cbImfAE6LYVQTuajTns2CjgdcBogG9TUuWs4/d0Geo=;
+	b=NYM9TAZV7n0LgFG9Si7ytZRe34Dav+67yj6nJbPyTPTdqcfAi4/4RU82cnF6br3tNt96mL
+	aCudCMWjxZRLUv2mi/LhKfnyrpKwKkLwboR6ZUiKYGYDhpQZFRabkGeNH/guRnMAhhpFf6
+	IqoWdcCGpbj3p0WSYPEw0JzaDN45kJ0=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-iA2LVOBhN92gy0ZiGUnbtQ-1; Tue,
- 11 Jun 2024 20:22:18 -0400
-X-MC-Unique: iA2LVOBhN92gy0ZiGUnbtQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-554-fGvMPbaCMmChERhGluNRlA-1; Tue,
+ 11 Jun 2024 20:51:47 -0400
+X-MC-Unique: fGvMPbaCMmChERhGluNRlA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D107219560AB;
-	Wed, 12 Jun 2024 00:22:16 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 45A91195609F;
+	Wed, 12 Jun 2024 00:51:45 +0000 (UTC)
 Received: from fedora (unknown [10.72.112.75])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E2D6C19560AD;
-	Wed, 12 Jun 2024 00:22:12 +0000 (UTC)
-Date: Wed, 12 Jun 2024 08:22:07 +0800
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5161F19560AB;
+	Wed, 12 Jun 2024 00:51:38 +0000 (UTC)
+Date: Wed, 12 Jun 2024 08:51:33 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH V3 7/9] io_uring: support providing sqe group buffer
-Message-ID: <ZmjqL+2JqBUSB5vZ@fedora>
-References: <20240511001214.173711-1-ming.lei@redhat.com>
- <20240511001214.173711-8-ming.lei@redhat.com>
- <ae3941f8-36a4-42fc-aaf8-027fe2de2d4d@gmail.com>
+Cc: YangYang <yang.yang@vivo.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v2] sbitmap: fix io hung due to race on
+ sbitmap_word::cleared
+Message-ID: <ZmjxFZ1Pt1CvNetL@fedora>
+References: <20240604031124.2261-1-yang.yang@vivo.com>
+ <CAFj5m9KV7OJ4_KjbSkpdtfrKamoLzV6EH-mJP3=y+VvoYOzC3w@mail.gmail.com>
+ <aa7246f9-f7df-3054-077e-eb21c7f423ac@huaweicloud.com>
+ <e1cdf579-007b-415f-9e4d-3fadd6f97b36@vivo.com>
+ <cf8bb1db-b601-4f54-bafc-d6c58f6ce946@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ae3941f8-36a4-42fc-aaf8-027fe2de2d4d@gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cf8bb1db-b601-4f54-bafc-d6c58f6ce946@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Jun 10, 2024 at 03:00:23AM +0100, Pavel Begunkov wrote:
-> On 5/11/24 01:12, Ming Lei wrote:
-> > SQE group with REQ_F_SQE_GROUP_DEP introduces one new mechanism to share
-> > resource among one group of requests, and all member requests can consume
-> > the resource provided by group lead efficiently in parallel.
+On Fri, Jun 07, 2024 at 01:59:07PM +0100, Pavel Begunkov wrote:
+> On 6/4/24 08:03, YangYang wrote:
+> > On 2024/6/4 14:12, Yu Kuai wrote:
+> > > Hi,
+> > > 
+> > > 在 2024/06/04 11:25, Ming Lei 写道:
+> > > > On Tue, Jun 4, 2024 at 11:12 AM Yang Yang <yang.yang@vivo.com> wrote:
+> > > > > 
+> > > > > Configuration for sbq:
+> > > > >    depth=64, wake_batch=6, shift=6, map_nr=1
+> > > > > 
+> > > > > 1. There are 64 requests in progress:
+> > > > >    map->word = 0xFFFFFFFFFFFFFFFF
+> > > > > 2. After all the 64 requests complete, and no more requests come:
+> > > > >    map->word = 0xFFFFFFFFFFFFFFFF, map->cleared = 0xFFFFFFFFFFFFFFFF
+> > > > > 3. Now two tasks try to allocate requests:
+> > > > >    T1:                                       T2:
+> > > > >    __blk_mq_get_tag                          .
+> > > > >    __sbitmap_queue_get                       .
+> > > > >    sbitmap_get                               .
+> > > > >    sbitmap_find_bit                          .
+> > > > >    sbitmap_find_bit_in_word                  .
+> > > > >    __sbitmap_get_word  -> nr=-1              __blk_mq_get_tag
+> > > > >    sbitmap_deferred_clear                    __sbitmap_queue_get
+> > > > >    /* map->cleared=0xFFFFFFFFFFFFFFFF */     sbitmap_find_bit
+> > > > >      if (!READ_ONCE(map->cleared))           sbitmap_find_bit_in_word
+> > > > >        return false;                         __sbitmap_get_word -> nr=-1
+> > > > >      mask = xchg(&map->cleared, 0)           sbitmap_deferred_clear
+> > > > >      atomic_long_andnot()                    /* map->cleared=0 */
+> > > > >                                                if (!(map->cleared))
+> > > > >                                                  return false;
+> > > > >                                       /*
+> > > > >                                        * map->cleared is cleared by T1
+> > > > >                                        * T2 fail to acquire the tag
+> > > > >                                        */
+> > > > > 
+> > > > > 4. T2 is the sole tag waiter. When T1 puts the tag, T2 cannot be woken
+> > > > > up due to the wake_batch being set at 6. If no more requests come, T1
+> > > > > will wait here indefinitely.
+> > > > > 
+> > > > > To fix this issue, simply revert commit 661d4f55a794 ("sbitmap:
+> > > > > remove swap_lock"), which causes this issue.
+> > > > 
+> > > > I'd suggest to add the following words in commit log:
+> > > > 
+> > > > Check on ->cleared and update on both ->cleared and ->word need to be
+> > > > done atomically, and using spinlock could be the simplest solution.
+> > > > 
+> > > > Otherwise, the patch looks fine for me.
+> > > 
+> > > Maybe I'm noob, but I'm confused how can this fix the problem, looks
+> > > like the race condition doesn't change.
+> > > 
+> > > In sbitmap_find_bit_in_word:
+> > > 
+> > > 1) __sbitmap_get_word read word;
+> > > 2) sbitmap_deferred_clear clear cleared;
+> > > 3) sbitmap_deferred_clear update word;
+> > > 
+> > > 2) and 3) are done atomically while 1) can still concurrent with 3):
+> > > 
+> > > t1:
+> > > sbitmap_find_bit_in_word
+> > >   __sbitmap_get_word
+> > >   -> read old word, return -1 >          t2:
+> > >          sbitmap_find_bit_in_word
+> > >           __sbitmap_get_word
+> > >           -> read old word, return -1
+> > >   sbitmap_deferred_clear
+> > >   -> clear cleared and update word
+> > >          sbitmap_deferred_clear
+> > >          -> cleared is cleared, fail
 > > 
-> > This patch uses the added sqe group feature REQ_F_SQE_GROUP_DEP to share
-> > kernel buffer in sqe group:
-> > 
-> > - the group lead provides kernel buffer to member requests
-> > 
-> > - member requests use the provided buffer to do FS or network IO, or more
-> > operations in future
-> > 
-> > - this kernel buffer is returned back after member requests use it up
-> > 
-> > This way looks a bit similar with kernel's pipe/splice, but there are some
-> > important differences:
-> > 
-> > - splice is for transferring data between two FDs via pipe, and fd_out can
-> > only read data from pipe; this feature can borrow buffer from group lead to
-> > members, so member request can write data to this buffer if the provided
-> > buffer is allowed to write to.
-> > 
-> > - splice implements data transfer by moving pages between subsystem and
-> > pipe, that means page ownership is transferred, and this way is one of the
-> > most complicated thing of splice; this patch supports scenarios in which
-> > the buffer can't be transferred, and buffer is only borrowed to member
-> > requests, and is returned back after member requests consume the provided
-> > buffer, so buffer lifetime is simplified a lot. Especially the buffer is
-> > guaranteed to be returned back.
-> > 
-> > - splice can't run in async way basically
-> > 
-> > It can help to implement generic zero copy between device and related
-> > operations, such as ublk, fuse, vdpa, even network receive or whatever.
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   include/linux/io_uring_types.h | 33 +++++++++++++++++++
-> >   io_uring/io_uring.c            | 10 +++++-
-> >   io_uring/io_uring.h            |  5 +++
-> >   io_uring/kbuf.c                | 60 ++++++++++++++++++++++++++++++++++
-> >   io_uring/kbuf.h                | 13 ++++++++
-> >   io_uring/net.c                 | 31 +++++++++++++++++-
-> >   io_uring/opdef.c               |  5 +++
-> >   io_uring/opdef.h               |  2 ++
-> >   io_uring/rw.c                  | 20 +++++++++++-
-> >   9 files changed, 176 insertions(+), 3 deletions(-)
-> > 
-> ...
-> > diff --git a/io_uring/net.c b/io_uring/net.c
-> > index 070dea9a4eda..83fd5879082e 100644
-> > --- a/io_uring/net.c
-> > +++ b/io_uring/net.c
-> > @@ -79,6 +79,13 @@ struct io_sr_msg {
-> ...
-> >   retry_bundle:
-> >   	if (io_do_buffer_select(req)) {
-> >   		struct buf_sel_arg arg = {
-> > @@ -1132,6 +1148,11 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
-> >   		if (unlikely(ret))
-> >   			goto out_free;
-> >   		sr->buf = NULL;
-> > +	} else if (req->flags & REQ_F_GROUP_KBUF) {
-> > +		ret = io_import_group_kbuf(req, user_ptr_to_u64(sr->buf),
-> > +				sr->len, ITER_DEST, &kmsg->msg.msg_iter);
-> > +		if (unlikely(ret))
-> > +			goto out_free;
-> >   	}
-> >   	kmsg->msg.msg_inq = -1;
-> > @@ -1334,6 +1355,14 @@ static int io_send_zc_import(struct io_kiocb *req, struct io_async_msghdr *kmsg)
-> >   		if (unlikely(ret))
-> >   			return ret;
-> >   		kmsg->msg.sg_from_iter = io_sg_from_iter;
-> > +	} else if (req->flags & REQ_F_GROUP_KBUF) {
-> > +		struct io_sr_msg *sr = io_kiocb_to_cmd(req, struct io_sr_msg);
-> > +
-> > +		ret = io_import_group_kbuf(req, user_ptr_to_u64(sr->buf),
-> > +				sr->len, ITER_SOURCE, &kmsg->msg.msg_iter);
-> > +		if (unlikely(ret))
-> > +			return ret;
-> > +		kmsg->msg.sg_from_iter = io_sg_from_iter;
+> > Yes, you are right, this patch cannot fix this issue.
 > 
-> Not looking here too deeply I'm pretty sure it's buggy.
-> The buffer can only be reused once the notification
-> CQE completes, and there is nothing in regards to it.
+> One other alternative is to kill ->cleared. It's not
+> immediately clear how important it is. Do we have any
+> numbers?
 
-OK. It isn't triggered in ublk-nbd because the buffer is still valid
-until the peer reply is received, when the notification is definitely
-ready.
+Please see commit ea86ea2cdced ("sbitmap: ammortize cost of clearing bits").
 
-I will remove send zc support in the enablement series, and it can
-be added in future without much difficulty.
+```
+In a threaded poll test case, half the overhead of getting and clearing
+tags is removed with this change.
+```
 
-
-Thanks,
+Thanks, 
 Ming
 
