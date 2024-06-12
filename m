@@ -1,157 +1,131 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F1216EC08
-	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 11:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0575416F0C3;
+	Wed, 12 Jun 2024 11:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718190294; cv=none; b=WSWvvWoFb8+VuszwS9++/PCG638gsoG1GFQMZWNB/ffYv9oO3mG1eXHeqSZ5i84JXNYKKK6n7zgieKRTGT1CHrGpGtuI+VgXRETQrGLLZqGWEDJmUBgOmqlN0VFsG+hPQNMeH9SMWacUV19xa2IJKaCEjSeUDTRLG34bgUBqkzs=
+	t=1718191512; cv=none; b=kZSHM0JtVAMzLEZ4ZUGJeaQVQ2fVsVA1iCr3VB+l0htd2TGdT7y7ZiLP9xR6MN9jxpGaTR3xqgk28fAYvoyRi2U3n94gT7jnvXfK8EFpq0ValSyvfqjXyLw0PmqZwDJ+Ehfw0Y1OCGLW/NzbPUGZdfdqSeL4Wg/k2E51ANWltCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718190294; c=relaxed/simple;
-	bh=3glKmUC/QNrTOj7LixpzZwLHEd4Xb2RvQxFV12W4CCw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VXOZtlegOPsjlRUspr4pLbz74H4KJ6CBEz8IcVFaDXwxVMUVJxNYzgjGALQJXr5LngmhawWfG1rflXRoJFYtqLt2fwL0klQTmdpp4MVGidmhfuWDwMx/cD7NWvlIkLwWTVDJFHBm2NJ9vqtp9SZgYxWJ8vSPq/oaDmVyy/hmOqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tJV/q19I; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MypfmEti; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Ukzd8zMl; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=VvGc9K05; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1718191512; c=relaxed/simple;
+	bh=/ZAo2DVsd+WeBWhmKYOCVsT3ZqZZs9Sle4+mvcJ8Bfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n+sTuJ/IpI0OVSElx+MiE1PooIv4eaGPcuo/3vmn5rcM+6hQtRpd0RWayxaYYAOXoBNDCIZgFqrNefQpF4kM/4rfHiRnMJJRCBWu4kGyS1S8S2fCKB81p8aSLXAalARgNx/oJvNEF4bPc5TVTYWWHhYScAJMvmj77idtFiO1Vss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LwUGJtCz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tJV/q19I";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MypfmEti";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Ukzd8zMl";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VvGc9K05"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5CF59342A9;
-	Wed, 12 Jun 2024 11:04:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1718190289; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=HPrEsNhrIiTbmPWriUWwjbFXqL/xJ8ZfeQ6NuIj/pgg=;
-	b=tJV/q19IKZjeyKh7poBV0R6j6pE+7GUWcHhyI/VELSRtyoThc9sol+RdQpzJx2mFehlYl2
-	DzXYvHa53w2YIi7Si/c4Pa1FoEvR81bbBMu2Y2TO0TqsIdTXPGGWRJIpaan6TZGcHJftOq
-	eXf+tAc49FKwLGg4W6batHpsMSTAxiw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1718190289;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=HPrEsNhrIiTbmPWriUWwjbFXqL/xJ8ZfeQ6NuIj/pgg=;
-	b=MypfmEtic9X9ey2isuqKZobK7QyBIJbHnMN4sPmrJaR/1zSj1nShPdGkvi/oRCEyo/Qrzo
-	ixoBm/+qJdQ5SjDQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Ukzd8zMl;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=VvGc9K05
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1718190288; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=HPrEsNhrIiTbmPWriUWwjbFXqL/xJ8ZfeQ6NuIj/pgg=;
-	b=Ukzd8zMlA6aoR1BCKymMmbOlPYabb4TJMb20ul9vgZ3+Ma8sRbU2wgBk4lzzn5F6Cy39F3
-	48zuv2KIZH9csmqPnCmKOeNHGxqGKse4jKwr7Y8zz/nFvZ7GrFBJaqnuwOPVltNEBW4n7V
-	MRRpyrAkViAC8ikIaBGZ9G84q8yfphE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1718190288;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=HPrEsNhrIiTbmPWriUWwjbFXqL/xJ8ZfeQ6NuIj/pgg=;
-	b=VvGc9K05OdkRqu/q6DrUgHZg8qhSHvNiMO9XbGNC6F7DtN+tqda3e63pZBt3J8S/L+KI0o
-	WW+VZVe15XXD9tAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 51697137DF;
-	Wed, 12 Jun 2024 11:04:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 0QbXE9CAaWaUDQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 12 Jun 2024 11:04:48 +0000
-From: Daniel Wagner <dwagner@suse.de>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Daniel Wagner <dwagner@suse.de>
-Subject: [RFC blktests v2 00/03] Add support to run against real target
-Date: Wed, 12 Jun 2024 13:04:41 +0200
-Message-ID: <20240612110444.4507-1-dwagner@suse.de>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LwUGJtCz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1518EC32789;
+	Wed, 12 Jun 2024 11:25:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718191511;
+	bh=/ZAo2DVsd+WeBWhmKYOCVsT3ZqZZs9Sle4+mvcJ8Bfk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LwUGJtCzgaZhb6D49YaEZKEY7jrqV0DMulZ90kEF0zRvwgoLPsqvQ3T5xFCK564Vp
+	 BABidUdDT5408f1tTbPO/aOu7rXJ7fpBzGpcbb5oWvA0ayXfuWlPS/yAB4GuHDHW6B
+	 +I+/oH13IhbPcpTNqnUqmyp+YsKHJOYNRkDEVlR+UqLRYvS1og9XO15a1opuWBghwg
+	 D7CqESBEmHhmoCAsvT9s3TvKOSO4xmAl4+rK3jfbgicR/FnLgsAVZ4o4ERw+d6bsOx
+	 uYcWmIE0V491kdGlYCq9lBZaOP+40rJsGq3TZEvgOrhhsQKQ9hMS/NSes4cx2AuC4h
+	 UfHblGxVe+q8A==
+Date: Wed, 12 Jun 2024 13:25:07 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: Theodore Ts'o <tytso@mit.edu>, 
+	Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>, linux-block@vger.kernel.org, fstests@vger.kernel.org
+Subject: Re: Flaky test: generic/085
+Message-ID: <20240612-abdrehen-popkultur-80006c9e4c8d@brauner>
+References: <20240611085210.GA1838544@mit.edu>
+ <20240611163701.GK52977@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.40 / 50.00];
-	BAYES_HAM(-1.39)[90.83%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 5CF59342A9
-X-Spam-Flag: NO
-X-Spam-Score: -1.40
-X-Spam-Level: 
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240611163701.GK52977@frogsfrogsfrogs>
 
-I've updated this series and added a simple example how to use it. I didn't
-really know where to put it, so I added this part to new directorty called
-'contrib'.
+On Tue, Jun 11, 2024 at 09:37:01AM -0700, Darrick J. Wong wrote:
+> On Tue, Jun 11, 2024 at 09:52:10AM +0100, Theodore Ts'o wrote:
+> > Hi, I've recently found a flaky test, generic/085 on 6.10-rc2 and
+> > fs-next.  It's failing on both ext4 and xfs, and it reproduces more
+> > easiy with the dax config:
+> > 
+> > xfs/4k: 20 tests, 1 failures, 137 seconds
+> >   Flaky: generic/085:  5% (1/20)
+> > xfs/dax: 20 tests, 11 failures, 71 seconds
+> >   Flaky: generic/085: 55% (11/20)
+> > ext4/4k: 20 tests, 111 seconds
+> > ext4/dax: 20 tests, 8 failures, 69 seconds
+> >   Flaky: generic/085: 40% (8/20)
+> > Totals: 80 tests, 0 skipped, 20 failures, 0 errors, 388s
+> > 
+> > The failure is caused by a WARN_ON in fs_bdev_thaw() in fs/super.c:
+> > 
+> > static int fs_bdev_thaw(struct block_device *bdev)
+> > {
+> > 	...
+> > 	sb = get_bdev_super(bdev);
+> > 	if (WARN_ON_ONCE(!sb))
+> > 		return -EINVAL;
+> > 
+> > 
+> > The generic/085 test which exercises races between the fs
+> > freeze/unfeeze and mount/umount code paths, so this appears to be
+> > either a VFS-level or block device layer bug.  Modulo the warning, it
+> > looks relatively harmless, so I'll just exclude generic/085 from my
+> > test appliance, at least for now.  Hopefully someone will have a
+> > chance to take a look at it?
+> 
+> I think this can happen if fs_bdev_thaw races with unmount?
+> 
+> Let's say that the _umount $lvdev in the second loop in generic/085
+> starts the unmount process, which clears SB_ACTIVE from the super_block.
+> Then the first loop tries to freeze the bdev (and fails), and
+> immediately tries to thaw the bdev.  The thaw code calls fs_bdev_thaw
+> because the unmount process is still running & so the fs is still
+> holding the bdev.  But get_bdev_super sees that SB_ACTIVE has been
+> cleared from the super_block so it returns NULL, which trips the
+> warning.
+> 
+> If that's correct, then I think the WARN_ON_ONCE should go away.
 
-Don't know if we want to keep adding environment variables for this or if it
-would be simpler to pass in a configuration file. The environemnt variable are
-fairly simple to handle and it works. Adding a configuraiton file adds more code
-to blktests.
+I've been trying to reproduce this with pmem yesterday and wasn't able to.
 
-changes:
-v2:
-  - many of the preperation patches have been merged, drop them
-  - added a python script which implements the blktests API
-  - add some documentation how to use it
-  - changed the casing of the environment variables to upper case
+SB_ACTIVE is cleared in generic_shutdown_super(). If we're in there we
+know that there are no active references to the superblock anymore. That
+includes freeze requests:
 
-v1:
-  - initial version
-  - https://lore.kernel.org/linux-nvme/20240318093856.22307-1-dwagner@suse.de/
-  
+* Freezes are nestable from kernel and userspace but all
+  nested freezers share a single active reference in sb->s_active.
+* The nested freeze requests are counted in
+  sb->s_writers.freeze_{kcount,ucount}.
+* The last thaw request (sb->s_writers.freeze_kcount +
+  sb->s_writers.freeze_ucount == 0) releases the sb->s_active reference.
+* Nested freezes from the block layer via bdev_freeze() are
+  additionally counted in bdev->bd_fsfreeze_count protected by
+  bdev->bd_fsfreeze_mutex.
 
+The device mapper suspend logic that generic/085 uses relies on
+bdev_freeze() and bdev_thaw() from the block layer. So all those dm
+freezes should be counted in bdev->bd_fsfreeze_count. And device mapper
+has logic to ensure that only a single freeze request is ever made. So
+bdev->bd_fsfreeze_count in that test should be 1. So when a bdev_thaw()
+request comes via dm_suspend():
 
-Daniel Wagner (3):
-  nvme/rc: introduce remote target support
-  nvme/030: only run against kernel soft target
-  contrib: add remote target setup/cleanup script
+* bdev_thaw() is called and encounters bdev->bd_fsfreeze_count == 1.
+  * As there aren't any fs initiated freezes we know that
+  sb->s_writers.kcount == 0 and sb->s_writer.ucount == 1 ==
+  bdev->bd_fsfreeze_count.
+* When fs_bdev_thaw() the superblock is still valid and we've got at
+  least one active reference taken during the bdev_freeze()
+    request.
+* get_bdev_super() tries to grab an active reference to the
+  superblock but fails.
 
- Documentation/running-tests.md |   9 +++
- contrib/nvme_target_control.py | 110 +++++++++++++++++++++++++++++++++
- contrib/nvmet-subsys.jinja2    |  71 +++++++++++++++++++++
- tests/nvme/030                 |   1 +
- tests/nvme/rc                  |  56 +++++++++++++++--
- 5 files changed, 243 insertions(+), 4 deletions(-)
- create mode 100755 contrib/nvme_target_control.py
- create mode 100644 contrib/nvmet-subsys.jinja2
+That can indeed happen because SB_ACTIVE is cleared. But for that to be
+the case we must've dropped the last active reference, forgot to take it
+during the original freeze, miscounted bdev->bd_fsfreeze_count, or
+missed a nested sb->s_writers.freeze_{kcount,ucount}.
 
--- 
-2.45.2
-
+What's the kernel config and test config that's used?
