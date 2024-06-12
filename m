@@ -1,78 +1,78 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F5916EC0B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1717A16EC1E
 	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 11:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718190293; cv=none; b=KEyr33AyKCgKHfmJycLcaSP1uHRFAjn8tgXzIvXnsfJAARsC4BsUXaPcUmyrU7+GSwppmzEqpy9pKqAoh63utCFT5xA0ABybAjSBQlRoKCQlhJZJMgY0ks72tVXvSxqRwVrpuQeiNay/SJtQqA/7P5LWTFH5Pgs2tcFblVri3lE=
+	t=1718190294; cv=none; b=q1Fc8j9SIaTpv1BeU+INqCfZqMadJqf87qPlcA/pw8WywzgEtXlGnr6kquwHgPZ0fjedzy0sq6bkf7RMG0nGMVzmhZuAzpciStYRK3W7ez/1HjsIL+vkK8fAUqYcp6GrxAEyk2FV8wWf+m/7sRx53gVbRTR6S/YT3xlAPdUI90U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718190293; c=relaxed/simple;
-	bh=MfsXhvitVxwUVhKxtMdkj0KHTCWx9bKsbqXnrqx946o=;
+	s=arc-20240116; t=1718190294; c=relaxed/simple;
+	bh=HQ0HaeVX/YJpIZtJ/s83uAyhmSd3WSTvGY9Q+fnaYLM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OROK31L5nUPmP+BM+Xm6mcrLpR5x4ir6LcAHL7zrxQFj7I/DhG644HGfAfd8pGLZA1/u/cRYc7KysTDwjSdsFKRbPSgxEqtE7UGsLcGgFdIYuBOkhLhAFyxhWjS7aVH3tDqoC+SB1oZr9aoMpfAU1dFeTIVOOWsbRMQO1kecyy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=URSWdNX1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nt1WNV7W; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=B8uU4uFD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0FixLTaF; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version; b=jat4wrfqnRKmEIB9lb0hbUuE+e281HalR+JNJQq9//X2Io3/AVOJdP6wDHkSW9TcL40ICanJufoFPIdBJg2j7ExKcBD0cB7fbW8jFkTSbfVO1C9yPj90NzS6iy0myaEcmsK6acJXGvU/zsOkbYmXzEZMnXSWK6MjGNN6GxboWwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x38winlz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oQTM+JZP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x38winlz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=oQTM+JZP; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="URSWdNX1";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nt1WNV7W";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="B8uU4uFD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0FixLTaF"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x38winlz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oQTM+JZP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x38winlz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="oQTM+JZP"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D9A56342AD;
-	Wed, 12 Jun 2024 11:04:48 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 11F705C0F5;
+	Wed, 12 Jun 2024 11:04:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1718190289; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1718190290; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vc0+Mr53d0DUtouPeGzTe8BUoIjf0xB82ogzO5qigBQ=;
-	b=URSWdNX1MT5C85dMa5SvDYkZXRYB1TRfaAinpyY711OhRy/uXKKzfhTFWT1chfD5ztPTxs
-	pyp7FKP5bp2PuA7e2a6JaWobJkl5+6b67x4C3mHFcccCZK1jY2quXUqSXxnv14VZEuDTls
-	0OJc0Q7AakkeErbN6Pwg7LciNZr82Pw=
+	bh=xmpOIK+pg0ncAZr27wblc5prJ7wNCFLAgD6NifKyPnk=;
+	b=x38winlzIFDyQuqq2IemBdTafMIRToSNxbliLMxGDLPdRdflM90KbXIdSFkDqbcI1JYSYH
+	j5JJDdn892J2eNKuAS7s+ek8UnM9k/jTEBSTAy4b7w9QHf6vGyPFiaZ1lVR/QhKlzVg5F6
+	AHD9+8kE34HXD97cMBw70gyDp2gBQR8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1718190289;
+	s=susede2_ed25519; t=1718190290;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vc0+Mr53d0DUtouPeGzTe8BUoIjf0xB82ogzO5qigBQ=;
-	b=nt1WNV7W7nnYal0TfDnq/hA95AwAZPE6hCUMwcF1lfw40V47IKZYUYGM5TDezgBTB8pH0x
-	5cMx1V8aCIiHyIAQ==
-Authentication-Results: smtp-out1.suse.de;
+	bh=xmpOIK+pg0ncAZr27wblc5prJ7wNCFLAgD6NifKyPnk=;
+	b=oQTM+JZPT8441Y75oSXv3q1kdJC1tzsiUxm2ESvVOYNTeTbxlBw9MsrUbof63Ve4t09NBT
+	nSPRPWxKl4h7QWBg==
+Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1718190288; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1718190290; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vc0+Mr53d0DUtouPeGzTe8BUoIjf0xB82ogzO5qigBQ=;
-	b=B8uU4uFDexu+vpuV5Ad8HN9GYBQq6x9zXxpmiD1D9dMmqlEMw52rhhTCLWUxGNPkAq4Wqn
-	2ftvIWFETotpE1w0AX/fktd1wfo2Ilotw0+PUtiVS8ICKmsi9WiizJqC6tHUIXHO9b+QDI
-	onI2AAG7OX/s0e0BDbiFq2k9776TgJQ=
+	bh=xmpOIK+pg0ncAZr27wblc5prJ7wNCFLAgD6NifKyPnk=;
+	b=x38winlzIFDyQuqq2IemBdTafMIRToSNxbliLMxGDLPdRdflM90KbXIdSFkDqbcI1JYSYH
+	j5JJDdn892J2eNKuAS7s+ek8UnM9k/jTEBSTAy4b7w9QHf6vGyPFiaZ1lVR/QhKlzVg5F6
+	AHD9+8kE34HXD97cMBw70gyDp2gBQR8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1718190288;
+	s=susede2_ed25519; t=1718190290;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vc0+Mr53d0DUtouPeGzTe8BUoIjf0xB82ogzO5qigBQ=;
-	b=0FixLTaFC5nW0e5HTgKsmsD6r7UKDFmlYI88MKixbnwn+opTrdGmDar5Mt6cc9q5MQAW5g
-	YvJIFmUXdzHHZZBQ==
+	bh=xmpOIK+pg0ncAZr27wblc5prJ7wNCFLAgD6NifKyPnk=;
+	b=oQTM+JZPT8441Y75oSXv3q1kdJC1tzsiUxm2ESvVOYNTeTbxlBw9MsrUbof63Ve4t09NBT
+	nSPRPWxKl4h7QWBg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CF0A913AAF;
-	Wed, 12 Jun 2024 11:04:48 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 03FA8137DF;
+	Wed, 12 Jun 2024 11:04:50 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id YIN8MtCAaWaXDQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 12 Jun 2024 11:04:48 +0000
+	id 5df4ANKAaWacDQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 12 Jun 2024 11:04:50 +0000
 From: Daniel Wagner <dwagner@suse.de>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
@@ -80,9 +80,9 @@ Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Daniel Wagner <dwagner@suse.de>
-Subject: [RFC blktests v2 1/3] nvme/rc: introduce remote target support
-Date: Wed, 12 Jun 2024 13:04:42 +0200
-Message-ID: <20240612110444.4507-2-dwagner@suse.de>
+Subject: [RFC blktests v2 3/3] contrib: add remote target setup/cleanup script
+Date: Wed, 12 Jun 2024 13:04:44 +0200
+Message-ID: <20240612110444.4507-4-dwagner@suse.de>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240612110444.4507-1-dwagner@suse.de>
 References: <20240612110444.4507-1-dwagner@suse.de>
@@ -93,15 +93,12 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spam-Flag: NO
 X-Spamd-Result: default: False [-2.80 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
@@ -116,163 +113,213 @@ X-Spamd-Result: default: False [-2.80 / 50.00];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email];
 	RCVD_TLS_ALL(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
+X-Spam-Level: 
 
-Most of the NVMEeoF tests are exercising the host code of the nvme
-subsystem. There is no real reason not to run these against a real
-target. We just have to skip the soft target setup and make it possible
-to setup a remote target.
-
-Because all tests use now the common setup/cleanup helpers we just need
-to intercept this call and forward it to an external component.
-
-As we already have various nvme variables to setup the target which we
-should allow to overwrite. Also introduce a NVME_TARGET_CONTROL variable
-which points to a script which gets executed whenever a targets needs to
-be created/destroyed.
+Use nvmetcli to setup/cleanup a remote soft target.
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
- Documentation/running-tests.md |  9 +++++++
- tests/nvme/rc                  | 48 +++++++++++++++++++++++++++++++---
- 2 files changed, 53 insertions(+), 4 deletions(-)
+ contrib/nvme_target_control.py | 110 +++++++++++++++++++++++++++++++++
+ contrib/nvmet-subsys.jinja2    |  71 +++++++++++++++++++++
+ 2 files changed, 181 insertions(+)
+ create mode 100755 contrib/nvme_target_control.py
+ create mode 100644 contrib/nvmet-subsys.jinja2
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 968702e76bb5..99dedaebfab0 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -120,6 +120,15 @@ The NVMe tests can be additionally parameterized via environment variables.
- - NVME_NUM_ITER: 1000 (default)
-   The number of iterations a test should do. This parameter had an old name
-   'nvme_num_iter'. The old name is still usable, but not recommended.
-+- NVME_TRADDR: transport address. Overwrites the default
-+  transport address. See also NVME_TARGET_CONTROL.
-+- NVME_HOST_TRADDR: host address. Overwrites the default
-+  host address. See also NVME_TARGET_CONTROL.
-+- NVME_TRSVID: transport service id. Overwrite the default
-+  transport service ide. See also NVME_TARGET_CONTROL.
-+- NVME_TARGET_CONTROL: When defined, the generic target setup/cleanup code will
-+  be skipped and this script gets called. This makes it possible to run
-+  the fabric nvme tests against a real target.
- 
- ### Running nvme-rdma and SRP tests
- 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index c1ddf412033b..aaa64453fe16 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -7,9 +7,10 @@
- . common/rc
- . common/multipath-over-rdma
- 
--def_traddr="127.0.0.1"
-+def_traddr="${NVME_TRADDR:-127.0.0.1}"
-+def_host_traddr="${NVME_HOST_TRADDDR:-}"
- def_adrfam="ipv4"
--def_trsvcid="4420"
-+def_trsvcid="${NVME_TRSVID:-4420}"
- def_remote_wwnn="0x10001100aa000001"
- def_remote_wwpn="0x20001100aa000001"
- def_local_wwnn="0x10001100aa000002"
-@@ -23,6 +24,7 @@ _check_conflict_and_set_default NVME_IMG_SIZE nvme_img_size 1G
- _check_conflict_and_set_default NVME_NUM_ITER nvme_num_iter 1000
- nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
- NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
-+nvme_target_control="${NVME_TARGET_CONTROL:-}"
- 
- _NVMET_TRTYPES_is_valid() {
- 	local type
-@@ -359,6 +361,10 @@ _cleanup_nvmet() {
- 		fi
- 	done
- 
-+	if [[ -n "${nvme_target_control}" ]]; then
-+		return
-+	fi
+diff --git a/contrib/nvme_target_control.py b/contrib/nvme_target_control.py
+new file mode 100755
+index 000000000000..97ed1c600dd2
+--- /dev/null
++++ b/contrib/nvme_target_control.py
+@@ -0,0 +1,110 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-3.0+
 +
- 	for port in "${NVMET_CFS}"/ports/*; do
- 		name=$(basename "${port}")
- 		echo "WARNING: Test did not clean up port: ${name}"
-@@ -403,11 +409,19 @@ _cleanup_nvmet() {
- 
- _setup_nvmet() {
- 	_register_test_cleanup _cleanup_nvmet
++# blktests calls this script to setup/teardown remote targets. blktests passes
++# all relevant information via the command line, e.g. --hostnqn. The interface
++# between blktests and this script is 'documentent' here in build_parser
++# function.
++#
++# This script uses nvmetcli to setup the remote target (it depends on the REST
++# API feature [1]). There is not technical need for nvmetcli to use but it makes
++# it simple to setup a remote Linux box. If you want to setup someting else
++# you should to replace this part.
++#
++# There are couple of global configuration options which need to be set.
++# Add ~/.config/blktests/nvme_target_control.toml file with something like:
++#
++# [main]
++# nvmetcli='/usr/bin/nvmetcli'
++# remote='http://nvmet.local:5000'
++#
++# And then start the nvmetcli server on the remote host.
++#
++# nvmetcli uses JSON configuration, thus this script creates a JSON configuration
++# using a jinja2 template. After this step we simple have to set the blktests
++# variable correctly and start blktests.
++#
++# $ host_ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
++# $ NVME_TRTYPE=tcp NVME_NVMET=nvmet.local NVME_HOST_TRADDR=${host_ip4} \
++#   NVME_TARGET_CONTROL=~/blktests/contrib/nvme_target_control.py ./check nvme
++#
++# [1] https://github.com/hreinecke/nvmetcli/tree/restapi
 +
-+	if [[ -n "${nvme_target_control}" ]]; then
-+		return
-+	fi
++import os
++import tomllib
++import argparse
++import subprocess
++from jinja2 import Environment, FileSystemLoader
 +
- 	modprobe -q nvmet
 +
- 	if [[ "${nvme_trtype}" != "loop" ]]; then
- 		modprobe -q nvmet-"${nvme_trtype}"
- 	fi
++XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME")
++if not XDG_CONFIG_HOME:
++    XDG_CONFIG_HOME = os.environ.get('HOME') + '/.config'
 +
- 	modprobe -q nvme-"${nvme_trtype}"
 +
- 	if [[ "${nvme_trtype}" == "rdma" ]]; then
- 		start_soft_rdma
- 		for i in $(rdma_network_interfaces)
-@@ -425,6 +439,7 @@ _setup_nvmet() {
- 			fi
- 		done
- 	fi
++with open(f'{XDG_CONFIG_HOME}/blktests/nvme_target_control.toml', 'rb') as f:
++    config = tomllib.load(f)
++    nvmetcli = config['main']['nvmetcli']
++    remote = config['main']['remote']
 +
- 	if [[ "${nvme_trtype}" = "fc" ]]; then
- 		modprobe -q nvme-fcloop
- 		_setup_fcloop "${def_local_wwnn}" "${def_local_wwpn}" \
-@@ -873,11 +888,13 @@ _find_nvme_passthru_loop_dev() {
- 
- _nvmet_target_setup() {
- 	local blkdev_type="${nvmet_blkdev_type}"
-+	local subsys_uuid="${def_subsys_uuid}"
-+	local subsysnqn="${def_subsysnqn}"
- 	local blkdev
-+	local ARGS=()
- 	local ctrlkey=""
- 	local hostkey=""
--	local subsysnqn="${def_subsysnqn}"
--	local subsys_uuid="${def_subsys_uuid}"
-+	local blkdev
- 	local port
- 
- 	while [[ $# -gt 0 ]]; do
-@@ -909,6 +926,22 @@ _nvmet_target_setup() {
- 		esac
- 	done
- 
-+	if [[ -n "${hostkey}" ]]; then
-+		ARGS+=(--hostkey "${hostkey}")
-+	fi
-+	if [[ -n "${ctrlkey}" ]]; then
-+		ARGS+=(--ctrkey "${ctrlkey}")
-+	fi
 +
-+	if [[ -n "${nvme_target_control}" ]]; then
-+		eval "${nvme_target_control}" setup \
-+			--subsysnqn "${subsysnqn}" \
-+			--subsys-uuid "${subsys_uuid}" \
-+			--hostnqn "${def_hostnqn}" \
-+			"${ARGS[@]}" > /dev/null 2>&1
-+		return
-+	fi
++def gen_conf(conf):
++    environment = Environment(loader=FileSystemLoader('.'))
++    template = environment.get_template('nvmet-subsys.jinja2')
++    filename = f'{conf["subsysnqn"]}.json'
++    content = template.render(conf)
++    with open(filename, mode='w', encoding='utf-8') as outfile:
++        outfile.write(content)
 +
- 	truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
- 	if [[ "${blkdev_type}" == "device" ]]; then
- 		blkdev="$(losetup -f --show "$(_nvme_def_file_path)")"
-@@ -948,6 +981,13 @@ _nvmet_target_cleanup() {
- 		esac
- 	done
- 
-+	if [[ -n "${nvme_target_control}" ]]; then
-+		eval "${nvme_target_control}" cleanup \
-+			--subsysnqn "${subsysnqn}" \
-+			> /dev/null
-+		return
-+	fi
 +
- 	_get_nvmet_ports "${subsysnqn}" ports
- 
- 	for port in "${ports[@]}"; do
++def target_setup(args):
++    conf = {
++        'subsysnqn': args.subsysnqn,
++        'subsys_uuid': args.subsys_uuid,
++        'hostnqn': args.hostnqn,
++        'allowed_hosts': args.hostnqn,
++        'ctrlkey': args.ctrlkey,
++        'hostkey': args.hostkey,
++        'blkdev': '/dev/vdc'
++    }
++
++    gen_conf(conf)
++
++    subprocess.call(['python3', nvmetcli, '--remote=' + remote,
++                     'restore', args.subsysnqn + '.json'])
++
++
++def target_cleanup(args):
++    subprocess.call(['python3', nvmetcli, '--remote=' + remote,
++                     'clear', args.subsysnqn + '.json'])
++
++
++def build_parser():
++    parser = argparse.ArgumentParser()
++    sub = parser.add_subparsers(required=True)
++
++    setup = sub.add_parser('setup')
++    setup.add_argument('--subsysnqn', required=True)
++    setup.add_argument('--subsys-uuid', required=True)
++    setup.add_argument('--hostnqn', required=True)
++    setup.add_argument('--ctrlkey', default='')
++    setup.add_argument('--hostkey', default='')
++    setup.set_defaults(func=target_setup)
++
++    cleanup = sub.add_parser('cleanup')
++    cleanup.add_argument('--subsysnqn', required=True)
++    cleanup.set_defaults(func=target_cleanup)
++
++    return parser
++
++
++def main():
++    import sys
++
++    parser = build_parser()
++    args = parser.parse_args()
++    args.func(args)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/contrib/nvmet-subsys.jinja2 b/contrib/nvmet-subsys.jinja2
+new file mode 100644
+index 000000000000..a446fbd9b784
+--- /dev/null
++++ b/contrib/nvmet-subsys.jinja2
+@@ -0,0 +1,71 @@
++{
++  "hosts": [
++    {
++      "nqn": "{{ hostnqn }}"
++    }
++  ],
++  "ports": [
++    {
++      "addr": {
++        "adrfam": "ipv4",
++        "traddr": "0.0.0.0",
++        "treq": "not specified",
++        "trsvcid": "4420",
++        "trtype": "tcp",
++        "tsas": "none"
++      },
++      "ana_groups": [
++        {
++          "ana": {
++            "state": "optimized"
++          },
++          "grpid": 1
++        }
++      ],
++      "param": {
++        "inline_data_size": "16384",
++        "pi_enable": "0"
++      },
++      "portid": 0,
++      "referrals": [],
++      "subsystems": [
++        "{{ subsysnqn }}"
++      ]
++    }
++  ],
++  "subsystems": [
++    {
++      "allowed_hosts": [
++        "{{ allowed_hosts }}"
++      ],
++      "attr": {
++        "allow_any_host": "0",
++        "cntlid_max": "65519",
++        "cntlid_min": "1",
++        "firmware": "yada",
++        "ieee_oui": "0x000000",
++        "model": "Linux",
++        "pi_enable": "0",
++        "qid_max": "128",
++        "serial": "0c74361069d9db6c65ef",
++        "version": "1.3"
++      },
++      "namespaces": [
++        {
++          "ana": {
++            "grpid": "1"
++          },
++          "ana_grpid": 1,
++          "device": {
++            "nguid": "00000000-0000-0000-0000-000000000000",
++            "path": "{{ blkdev }}",
++            "uuid": "{{ subsys_uuid }}"
++          },
++          "enable": 1,
++          "nsid": 1
++        }
++      ],
++      "nqn": "{{ subsysnqn }}"
++    }
++  ]
++}
 -- 
 2.45.2
 
