@@ -1,100 +1,135 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCF936124;
-	Wed, 12 Jun 2024 05:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B0516C6B4
+	for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 08:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718170986; cv=none; b=rSHB9c9idqdYJ/QZfHF4t1Ff9mPpDUrpJ6SEd6CFFUWjEkDudTxL+KfAkDWZEkMtn0YyWAXMRTu1Ba8xAq4NKll11iX5jfZZV/wQa9NMaKgM029iCNDfhHARkQCTFxslcTGXIdbC1OtyMbAe5JgHFIAJHvJIb71w5WKekWqebGI=
+	t=1718179285; cv=none; b=iilzzM0s4RWCKcznN/OnliLy5GCJ4dNBz//wxfj60XSlJFx6hJxLjRdkR54VLliAsp5oiubLrpW+Zu/3DIIEJDZvzeCpX7aJrHZ//csumZih4HhlGAXTCSFCx8vp4PFuFv9uNxcF5suzMilx+fe2WJ06EvbufOB+y8LuIHU9uPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718170986; c=relaxed/simple;
-	bh=63I+1dEzVeXn42wBYio/c7Yuzom9/7n5V8ZUh47gjH4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kRNMzyTLB1eHfPYrx8gK6ZeYbXEjDBjmrvLT8cAOBoZL4DdUWqv7148vfPdmjs1b/G0GZq7ibzTW6ZcpomG1x0f4gQwmAzcyfAunLMuEEw95V8bwgygtlTJIqSpTcNEp/qjQsHOqm+5aA70X07T0gd+84+44CDTZXebwyWxYkmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nr+1dpWY; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718179285; c=relaxed/simple;
+	bh=2cExcM3FQdKVHy7cL3IiNx2Bk/UFeUgrDgrQcqyJhl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oHQk7bpP6ts8iPbVra6eNmsUW0pHVhPPTo9SBylAtsIqC7GZngcoEA4AcZeo7BuMKwXb6szCUZKxxTw2z2NyyieoxK2/3Ihnd4mnOsixAwPXXitOuMQtEIOy+F5FucoFtD+mtwBipyvlEwQJ9IYtQGJ5TQV3WMfKwr19u+yYKeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=wGSiQ07I; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nr+1dpWY"
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a6f0dc80ab9so244796466b.2;
-        Tue, 11 Jun 2024 22:43:04 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="wGSiQ07I"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-62cecc3f949so23116127b3.2
+        for <linux-block@vger.kernel.org>; Wed, 12 Jun 2024 01:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718170983; x=1718775783; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=63I+1dEzVeXn42wBYio/c7Yuzom9/7n5V8ZUh47gjH4=;
-        b=nr+1dpWYf626QmxQ4oR4nohl2KZPeft5wckkivweA7kWdbztSnL3SOla/9ZnmNC4nk
-         DwwLyLG4mbLxx1FXJjIwYKWvEGyvC9Kn2NjHH05TH8Iai3VYSrsV0R3nSQbFZkE4uvbU
-         36ERylbPDfZQWHNjYuhYsM0N+QIlQebTipRt/7Xs9LkU/+HuP2JRUN88xH/tTjzYjYyz
-         i7LFvBwImFRutf9rywzx/FRHeBoz/y76iGiTFz4c7zRUEvGyzloa2dgqh5TPq0xUvPVM
-         nPNbThQTfnkEVO3tYbJoGNnlb4aMRzkjSXQXuBosLv6tqbu59sQz2hsKYEQDpemW6j8R
-         1xxA==
+        d=citrix.com; s=google; t=1718179283; x=1718784083; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1PGf6HlJc1ANQenmlixWu1Sno9FA8D3ndcnX4NZVy9I=;
+        b=wGSiQ07IIsz3I5o3sJPfsRh6+YQ4aS+dl8faDVi6tCb8oJsgDTIAJhb3nIcw252bU0
+         nDpxqZOv3GJrkXMrxGioYAsvh4Pq/cnolHHO/TtN2xI0rAGtwEWsQRY4QkfU7k3Bm65M
+         hGrDJE6dultwgkDJcvbr8RkJ/+8f2Omv1w+bg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718170983; x=1718775783;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=63I+1dEzVeXn42wBYio/c7Yuzom9/7n5V8ZUh47gjH4=;
-        b=tEmUg1w/GHFkgCbPcwbDu/xHpEan3XHtwBqyjeqKQ00jtvGN6O1TIbSlf8m9ktMcm1
-         hQTEO5T7temaBwoNVecZX45YYeF1+Ezvajo/GJDGRwtja4+Uk6tIKTfN969KyVGL9lt6
-         gFmQgwBJmkEamNiaq8qwHEkTziHvDFXQir3UUkKK4kn+vKa0znyZHnzH6grVHMqCb1Ec
-         Fbl5ceI0jTy9+awSrmAlwUlQyYTyGjAa4x1khLxul7Udp3xX5Uf++Yv6zdA3ulfbDRAc
-         Gv2UncfmWObqtPCGR8HvwIdj1piYFZLEQvCAveND8q6IwqR5/dJ81eS1PsKvOBPcEYhx
-         NngA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4VcjsG2GIriULeTz4Yvm5XUL9CSVAYMKHRm2nph+GsxtGU8xpg3MqwDKp+nnWo4/p/NKhCN2gHkt5Goiz4i2AoHxAn+uqAQvZSprLjIlCcAkVPqo36HaWTuJ+51tgnJFYUbEXQSP8VGyJ3zFEW7z7//QTHfQOCN1HAEfuNLVlmQ9IYImWWA==
-X-Gm-Message-State: AOJu0YywdVec4S4O3mHTXJVXtBTchf3ATvG7w7jhuUfHeaC7hVOrgSw2
-	GaoBd03FPkOfQcPas1+qKScy7VEMf1XjZtu9kwxq1ceYAxWEbmLaaILw80VS/O6/hiBXi4B7YEL
-	AcD/7PXWkLyKYhsF2cCADSG62eLM=
-X-Google-Smtp-Source: AGHT+IHGu/snvNpAD1Yi6gjHr6w3KtlYXskhYkbq4+1i981NUmF9usvoUiSCiFzsd+OnZAP06utH1HgoD4gnq5XsNuQ=
-X-Received: by 2002:a17:906:7251:b0:a6e:57ff:7700 with SMTP id
- a640c23a62f3a-a6f47cc20fcmr35560966b.42.1718170983090; Tue, 11 Jun 2024
- 22:43:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718179283; x=1718784083;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1PGf6HlJc1ANQenmlixWu1Sno9FA8D3ndcnX4NZVy9I=;
+        b=vVJg04tDYIZ1OsPw3OJ4ELyOVXOt+lc4dl0sxgbr1frXVgQJp780pCnFgKnWsT0HI0
+         WD+GR/sml3xUic4s7i3ClHRCByOD3nhrM5ZTLbamcmtGL3Lxl4+gEo68LIinh9WzBk45
+         t8tnTl6QhpeLZIy8kRsU974cK/rFCGJWJZ/xTE2NH3ZYDvpXkI40hUVA1jXrfUbYAMPL
+         peG5KdzyByxoImYGLzcDf7xV8+N5ejta0FgxlXnD+qDy1oZHFwesg0Vn6JWOTwQ0wpkh
+         seCNa3HbafAUkD2wKjGilFSVlmnaoeo/9JsaTgEhgz7nDVjqc7KIGtD8TTfE5nEr3BXX
+         Ndaw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9gmCTLf1a1XtDSZDf0M710pSVMW2zG9JCneChgM3aLHLyYfueciQIrFzNc/Y1UXAJSI3lzUzHfp6+P8iLXtRjGZtHR+90fL9y+w4=
+X-Gm-Message-State: AOJu0YwYZf4RvI3IynhzYjOVgQEYQ6x4XM6H3ovlbdOo2b806Bz1Jqql
+	IsaGj+t0d6rUw8d5wqYZTuu0Muas2IDYwe1xyhvuWLcDdTaP8Q8Rn71ifz3bBmc=
+X-Google-Smtp-Source: AGHT+IEk5bObzz8qCZsqdRqFNOU7a/dh67daOPgnEKJGJzh0sP06pKqPApTvT03CHGJxr8rf1zPYww==
+X-Received: by 2002:a81:b647:0:b0:61b:e62e:73f1 with SMTP id 00721157ae682-62fb8a58273mr12605907b3.3.1718179282688;
+        Wed, 12 Jun 2024 01:01:22 -0700 (PDT)
+Received: from localhost ([46.222.2.38])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b093aff889sm6894416d6.101.2024.06.12.01.01.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 01:01:22 -0700 (PDT)
+Date: Wed, 12 Jun 2024 10:01:18 +0200
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
+	Richard Weinberger <richard@nod.at>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Josef Bacik <josef@toxicpanda.com>, Ming Lei <ming.lei@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
+	drbd-dev@lists.linbit.com, nbd@other.debian.org,
+	linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
+	virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
+	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+	linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 10/26] xen-blkfront: don't disable cache flushes when
+ they fail
+Message-ID: <ZmlVziizbaboaBSn@macbook>
+References: <20240611051929.513387-1-hch@lst.de>
+ <20240611051929.513387-11-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130214911.1863909-1-bvanassche@acm.org> <20240130214911.1863909-12-bvanassche@acm.org>
- <Zmi6QDymvLY5wMgD@surfacebook.localdomain> <678af54a-2f5d-451d-8a4d-9af4d88bfcbb@heusel.eu>
- <9dae2056-792a-4bd0-ab1d-6c545ec781b9@acm.org> <CAHp75Vd02o_z2swHQ8Tajyvdi25do3ys7+GMES7RAg0NffgAUA@mail.gmail.com>
-In-Reply-To: <CAHp75Vd02o_z2swHQ8Tajyvdi25do3ys7+GMES7RAg0NffgAUA@mail.gmail.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 12 Jun 2024 08:42:27 +0300
-Message-ID: <CAHp75VePhicGBK3bP3eDmpdH6JLOBh0m7S_oTGxBOtgfhCtU6A@mail.gmail.com>
-Subject: Re: [PATCH v9 11/19] scsi: sd: Translate data lifetime information
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christian Heusel <christian@heusel.eu>, "Martin K . Petersen" <martin.petersen@oracle.com>, 
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Daejun Park <daejun7.park@samsung.com>, 
-	Kanchan Joshi <joshi.k@samsung.com>, Damien Le Moal <dlemoal@kernel.org>, 
-	"James E.J. Bottomley" <jejb@linux.ibm.com>, regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240611051929.513387-11-hch@lst.de>
 
-On Wed, Jun 12, 2024 at 8:35=E2=80=AFAM Andy Shevchenko
-<andy.shevchenko@gmail.com> wrote:
-> On Wed, Jun 12, 2024 at 2:08=E2=80=AFAM Bart Van Assche <bvanassche@acm.o=
-rg> wrote:
-> > On 6/11/24 2:21 PM, Christian Heusel wrote:
-> > > On 24/06/11 11:57PM, Andy Shevchenko wrote:
-...
+On Tue, Jun 11, 2024 at 07:19:10AM +0200, Christoph Hellwig wrote:
+> blkfront always had a robust negotiation protocol for detecting a write
+> cache.  Stop simply disabling cache flushes when they fail as that is
+> a grave error.
 
-> > >> This patch broke very badly my connected Garmin FR35 sport watch. Th=
-e boot time
-> > >> increased by 1 minute along with broken access to USB mass storage.
+It's my understanding the current code attempts to cover up for the
+lack of guarantees the feature itself provides:
 
-...
+ * feature-barrier
+ *      Values:         0/1 (boolean)
+ *      Default Value:  0
+ *
+ *      A value of "1" indicates that the backend can process requests
+ *      containing the BLKIF_OP_WRITE_BARRIER request opcode.  Requests
+ *      of this type may still be returned at any time with the
+ *      BLKIF_RSP_EOPNOTSUPP result code.
+ *
+ * feature-flush-cache
+ *      Values:         0/1 (boolean)
+ *      Default Value:  0
+ *
+ *      A value of "1" indicates that the backend can process requests
+ *      containing the BLKIF_OP_FLUSH_DISKCACHE request opcode.  Requests
+ *      of this type may still be returned at any time with the
+ *      BLKIF_RSP_EOPNOTSUPP result code.
 
-> > Is the Garmin FR35 Flash device perhaps connected to a USB bus? If so,
->
-> Yes. It is written above in my report here.
+So even when the feature is exposed, the backend might return
+EOPNOTSUPP for the flush/barrier operations.
 
-Hmm... Rereading myself and it seems it was not obvious that it's a
-USB mass storage device. Sorry for the confusion.
+Such failure is tied on whether the underlying blkback storage
+supports REQ_OP_WRITE with REQ_PREFLUSH operation.  blkback will
+expose "feature-barrier" and/or "feature-flush-cache" without knowing
+whether the underlying backend supports those operations, hence the
+weird fallback in blkfront.
 
---=20
-With Best Regards,
-Andy Shevchenko
+I'm unsure whether lack of REQ_PREFLUSH support is not something that
+we should worry about, it seems like it was when the code was
+introduced, but that's > 10y ago.
+
+Overall blkback should ensure that REQ_PREFLUSH is supported before
+exposing "feature-barrier" or "feature-flush-cache", as then the
+exposed features would really match what the underlying backend
+supports (rather than the commands blkback knows about).
+
+Thanks, Roger.
