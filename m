@@ -1,69 +1,220 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EE813F447;
-	Thu, 13 Jun 2024 09:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F394140E22;
+	Thu, 13 Jun 2024 09:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718271566; cv=none; b=IyLbHFKIFpUnKKlbwKSx8wf2Pyu4uZxUgV/Cw6mqtDaGvfjTZyWYIn8uFAa1o4z3xpBIuvIGvFRPwLfCtHkk8QAE1PiOVR5BTBH1db+v7xafIzz+zgkpsW8s3Sv0iC+Ppes4kmS+acDdTpK9ZknCuho1JmMJbc3g+5jQKWDvU1g=
+	t=1718272542; cv=none; b=fKX60B7m6jB/U1xYJLrvw3qvYkfsJnQXLQOFjIilJDNHMbVO1Q/hPmSvxzSUtI9+AUpP8VTpZHoNJ8d4/aYDnyaKXXl2ext6akw3AJmPHueDHEtIOLQAkIpmXWSubvNWoBBvIiHZc2KTb0lDT7+stJhJKtIbIyOneAeQy1rqKK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718271566; c=relaxed/simple;
-	bh=pRWDt1CymWhiVCIQGhuTbaxcmQTdtnlTPpKr9sPmjbg=;
+	s=arc-20240116; t=1718272542; c=relaxed/simple;
+	bh=XmS+lF9Ds2ss/fP43EzxkHbFuhkOym3rDSSC14WaCpw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lh0Fwn7cmYc21I9mA0518KG0rTkN1hEwdyBWcoDWWv/luEahuIgunuNT0bP3HwEkZUCQdw1g7LIvtYKbfQ9jGDNpBWrY4lqOBy7ceD87gaKiQ2SxgIahiM4u6/3Wv28BmSOaBOy430rgNmV9odeyHYwFrRtbQgpJsTt04OkpfhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7DE0E68B05; Thu, 13 Jun 2024 11:39:18 +0200 (CEST)
-Date: Thu, 13 Jun 2024 11:39:18 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Richard Weinberger <richard@nod.at>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Josef Bacik <josef@toxicpanda.com>, Ming Lei <ming.lei@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Vineeth Vijayan <vneethv@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
-	drbd-dev@lists.linbit.com, nbd@other.debian.org,
-	linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
-	virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
-	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 02/26] sd: move zone limits setup out of
- sd_read_block_characteristics
-Message-ID: <20240613093918.GA27629@lst.de>
-References: <20240611051929.513387-1-hch@lst.de> <20240611051929.513387-3-hch@lst.de> <40ca8052-6ac1-4c1b-8c39-b0a7948839f8@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GayyhwC6fmTSzP25e6kh5Y0ORw1SJWxlpMtvfpYLrfTJPUDD7K1XxSusy+sEePrq0eq9846z7nICmIfChBh7rvORsHlaySjit6/JCzahrZvPsuqCT7tjbyt6n7lyT19xc9OTuigpAr3hMEZOreWZeMXtpDyQLhG7hRrXwoamQJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqmuBfJy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqmuBfJy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4425EC3277B;
+	Thu, 13 Jun 2024 09:55:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718272541;
+	bh=XmS+lF9Ds2ss/fP43EzxkHbFuhkOym3rDSSC14WaCpw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eqmuBfJyQ4ulCxseiCrrkDyL3guNZ29qhM/nw9/qf902UeGvp+PzW/70QDUWHtXB/
+	 eJxK8BCW7uu/3vi4UosB69ghoU196sWwfaIhsQUQ4i/dE0eBjibdHnvPENskMtJ2CU
+	 O9SNGkbCeMfKv3fxMQjwjjk1K5FbafqpZamVKJmn5QEwffu8s8t/qs6fvQH4Afow9d
+	 TtxMeemVo9PifqenT0pJhdS4SJzfeQltd5M6J8OXETwPxlHvF66QDaWpiI+R0wI8BS
+	 YGdEjjUp+cdgZ20w4CJEzd8yFlYS64KParP7UdMaFzuJWG8BAjITTqYHSKVU9hNHAE
+	 ugTk/SRH+Zm5A==
+Date: Thu, 13 Jun 2024 11:55:37 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Theodore Ts'o <tytso@mit.edu>, "Darrick J. Wong" <djwong@kernel.org>
+Cc: Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>, 
+	linux-block@vger.kernel.org, fstests@vger.kernel.org
+Subject: Re: Flaky test: generic/085
+Message-ID: <20240613-lackmantel-einsehen-90f0d727358d@brauner>
+References: <20240611085210.GA1838544@mit.edu>
+ <20240611163701.GK52977@frogsfrogsfrogs>
+ <20240612-abdrehen-popkultur-80006c9e4c8d@brauner>
+ <20240612144716.GB1906022@mit.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="zhjf4qywshxgjish"
 Content-Disposition: inline
-In-Reply-To: <40ca8052-6ac1-4c1b-8c39-b0a7948839f8@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240612144716.GB1906022@mit.edu>
 
-On Tue, Jun 11, 2024 at 02:51:24PM +0900, Damien Le Moal wrote:
-> > +	if (sdkp->device->type == TYPE_ZBC)
+
+--zhjf4qywshxgjish
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+
+On Wed, Jun 12, 2024 at 03:47:16PM GMT, Theodore Ts'o wrote:
+> On Wed, Jun 12, 2024 at 01:25:07PM +0200, Christian Brauner wrote:
+> > I've been trying to reproduce this with pmem yesterday and wasn't able to.
+> > 
+> > What's the kernel config and test config that's used?
+> >
 > 
-> Nit: use sd_is_zoned() here ?
+> The kernel config can be found here:
+> 
+> https://github.com/tytso/xfstests-bld/blob/master/kernel-build/kernel-configs/config-6.1
+> 
+> Drop it into .config in the build directory of any kernel sources
+> newer than 6.1, and then run "make olddefconfig".  This is all
+> automated in the install-kconfig script which I use:
+> 
+> https://github.com/tytso/xfstests-bld/blob/master/kernel-build/install-kconfig
+> 
+> The VM has 4 CPU's, and 26GiB of memory, and kernel is booted with the
+> boot command line options "memmap=4G!9G memmap=9G!14G", which sets up
+> fake /dev/pmem0 and /dev/pmem1 devices backed by RAM.  This is my poor
+> engineer's way of testing DAX without needing to get access to
+> expensive VM's with pmem.  :-)
+> 
+> I'm assuming this is a timing-dependant bug which is easiest to
+> trigger on fast devices, so a ramdisk might also work.  FWIW, I also
+> can see failures relatively frequently using the ext4/nojournal
+> configuration on a SSD-backed cloud block device (GCE's Persistent
+> Disk SSD product).
+> 
+> As a result, if you grab my xfstests-bld repo from github, and then
+> run "qemu-xfstests -c ext4/nojournal C 20 generic/085" it should
+> also reproduce.  See the Documentation/kvm-quickstart.md for more details.
 
-Actually - is there much in even keeping sd_is_zoned now that the
-host aware support is removed?  Just open coding the type check isn't
-any more code, and probably easier to follow.
+Thanks, Ted! Ok, I think I figured it out.
 
+P1
+dm_resume()
+-> bdev_freeze()
+   mutex_lock(&bdev->bd_fsfreeze_mutex);
+   atomic_inc_return(&bdev->bd_fsfreeze_count); // == 1
+   mutex_unlock(&bdev->bd_fsfreeze_mutex);
+
+P2						P3
+setup_bdev_super()
+bdev_file_open_by_dev();
+atomic_read(&bdev->bd_fsfreeze_count); // != 0
+
+						bdev_thaw()
+						mutex_lock(&bdev->bd_fsfreeze_mutex);
+						atomic_dec_return(&bdev->bd_fsfreeze_count); // == 0
+						mutex_unlock(&bdev->bd_fsfreeze_mutex);
+						bd_holder_lock();
+						// grab passive reference on sb via sb->s_count
+						bd_holder_unlock();
+						// Sleep to be woken when superblock ready or dead
+bdev_fput()
+bd_holder_lock()
+// yield bdev
+bd_holder_unlock()
+
+deactivate_locked_super()
+// notify that superblock is dead
+
+						// get woken and see that superblock is dead; fail
+
+In words this basically means that P1 calls dm_suspend() which calls
+into bdev_freeze() before the block device has been claimed by the
+filesystem. This brings bdev->bd_fsfreeze_count to 1 and no call into
+fs_bdev_freeze() is required.
+
+Now P2 tries to mount that frozen block device. It claims it and checks
+bdev->bd_fsfreeze_count. As it's elevated it aborts mounting holding
+sb->s_umount all the time ofc.
+
+In the meantime P3 calls dm_resume() it sees that the block device is
+already claimed by a filesystem and calls into fs_bdev_thaw().
+
+It takes a passive reference and realizes that the filesystem isn't
+ready yet. So P3 puts itself to sleep to wait for the filesystem to
+become ready.
+
+P2 puts the last active reference to the filesystem and marks it as
+dying.
+
+Now P3 gets woken, sees that the filesystem is dying and
+get_bdev_super() fails.
+
+So Darrick is correct about the fix but the reasoning is a bit
+different. :)
+
+Patch appended and on #vfs.fixes.
+
+--zhjf4qywshxgjish
+Content-Type: text/x-diff; charset=utf-8
+Content-Disposition: attachment;
+	filename="0001-fs-don-t-misleadingly-warn-during-thaw-operations.patch"
+
+From 35224b919d6778ca5dd11f76659ae849594bd2bf Mon Sep 17 00:00:00 2001
+From: Christian Brauner <brauner@kernel.org>
+Date: Thu, 13 Jun 2024 11:38:14 +0200
+Subject: [PATCH] fs: don't misleadingly warn during thaw operations
+
+The block device may have been frozen before it was claimed by a
+filesystem. Concurrently another process might try to mount that
+frozen block device and has temporarily claimed the block device for
+that purpose causing a concurrent fs_bdev_thaw() to end up here. The
+mounter is already about to abort mounting because they still saw an
+elevanted bdev->bd_fsfreeze_count so get_bdev_super() will return
+NULL in that case.
+
+For example, P1 calls dm_suspend() which calls into bdev_freeze() before
+the block device has been claimed by the filesystem. This brings
+bdev->bd_fsfreeze_count to 1 and no call into fs_bdev_freeze() is
+required.
+
+Now P2 tries to mount that frozen block device. It claims it and checks
+bdev->bd_fsfreeze_count. As it's elevated it aborts mounting.
+
+In the meantime P3 calls dm_resume() it sees that the block device is
+already claimed by a filesystem and calls into fs_bdev_thaw().
+
+It takes a passive reference and realizes that the filesystem isn't
+ready yet. So P3 puts itself to sleep to wait for the filesystem to
+become ready.
+
+P2 puts the last active reference to the filesystem and marks it as
+dying. Now P3 gets woken, sees that the filesystem is dying and
+get_bdev_super() fails.
+
+Fixes: 49ef8832fb1a ("bdev: implement freeze and thaw holder operations")
+Cc: <stable@vger.kernel.org>
+Reported-by: Theodore Ts'o <tytso@mit.edu>
+Link: https://lore.kernel.org/r/20240611085210.GA1838544@mit.edu
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+ fs/super.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/fs/super.c b/fs/super.c
+index b72f1d288e95..095ba793e10c 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1502,8 +1502,17 @@ static int fs_bdev_thaw(struct block_device *bdev)
+ 
+ 	lockdep_assert_held(&bdev->bd_fsfreeze_mutex);
+ 
++	/*
++	 * The block device may have been frozen before it was claimed by a
++	 * filesystem. Concurrently another process might try to mount that
++	 * frozen block device and has temporarily claimed the block device for
++	 * that purpose causing a concurrent fs_bdev_thaw() to end up here. The
++	 * mounter is already about to abort mounting because they still saw an
++	 * elevanted bdev->bd_fsfreeze_count so get_bdev_super() will return
++	 * NULL in that case.
++	 */
+ 	sb = get_bdev_super(bdev);
+-	if (WARN_ON_ONCE(!sb))
++	if (!sb)
+ 		return -EINVAL;
+ 
+ 	if (sb->s_op->thaw_super)
+-- 
+2.43.0
+
+
+--zhjf4qywshxgjish--
