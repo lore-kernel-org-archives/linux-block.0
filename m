@@ -1,144 +1,55 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B869112D757
-	for <linux-block@vger.kernel.org>; Thu, 13 Jun 2024 16:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A844E4C6B;
+	Thu, 13 Jun 2024 17:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718296838; cv=none; b=UHjforH0XFE0lgC+jZV6ch1uwkZASYVz+LXmvN4Y9sy4xNQQXQjGhu7DXXJ/dSiK2nb/POKg8dal7xsQciGr8TjvaI2Cf7R79f/yUCZqPAQva7Q1yC3Gmj//IJXKT89ADYcPol7HBYvtBvXFDpnijUR50eUJkNpYAdY3P59AI28=
+	t=1718298706; cv=none; b=DWVALZPs2DjC2B2W1QkhTfAAwolAih2IwgVEUyWvxc6q3aBNRtOKtrqbMgueFAMs2hPR16E8qvGVFLUKdhTNTAM0kxZ6cZ029MGjHQ3vIXAtLZC2FG4dzyf3YXvszWYWNpu7BlPxUMsUFqVRlP17VTZvGmyZiMB8mvXV2/GG6Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718296838; c=relaxed/simple;
-	bh=oiRNwrOeX1J7zxk4Vb9PHPRoX4IWegI9xj73trv8KvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ujltCavuwPmYi3I0JNgpN2CWSrelW96cyfusn8y2o4fKCQvaNNtcDSMe8vR5TMdaXrmkpxKebye33zbwbn5lBcqBqg+cYBfT+y6jocTTaVFBqZQCwmj8fR9awYywtnTmD+xxd/lWnMFpdFjgAJITAuMlZArLaJv6dfy4zlSJp4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=ucw.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=ucw.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 96F3C22410;
-	Thu, 13 Jun 2024 16:40:33 +0000 (UTC)
-Authentication-Results: smtp-out1.suse.de;
-	dkim=none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 85FB413A7F;
-	Thu, 13 Jun 2024 16:40:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id jbKHHwEha2aqdwAAD6G6ig
-	(envelope-from <chrubis@suse.cz>); Thu, 13 Jun 2024 16:40:33 +0000
-From: Cyril Hrubis <metan@ucw.cz>
-To: linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Cyril Hrubis <chrubis@suse.cz>
-Subject: [PATCH] loop: Add regression test for unsupported backing file fallocate
-Date: Thu, 13 Jun 2024 18:40:07 +0200
-Message-ID: <20240613164007.22721-1-metan@ucw.cz>
-X-Mailer: git-send-email 2.44.2
+	s=arc-20240116; t=1718298706; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OOIhQlvvfDhvaj8VSajQOCPhBTq7i49glJXkxSMQXAVFZPa4p0KCT/U7jZHiy5h5QWs4TZ/KhVJwj8LAxilGNSDB1LFLAiQiHDOOJ6zPDvSJ2XcJqmnmOBavYlTMfencvOfD96BUTk2M/HvAqpgGnmHwuwCZMeDw5Y81VXvxoqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OiUx7Vkz; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OiUx7Vkz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=OiUx7Vkze1gNFA2Oqpthb42cdX
+	gNE1C8VABuJ/4ZXOTq8s1QwWxYN3OrpaLIhpPgKfzHxURqowEkLYol+yq2ASrq1iNFHJ1r0sEalti
+	E2HatZORf70bQkh1jTFGXwdw7iU40qzEdxdGIJag1SEcvkgF9fkDM6Q1R9jTQQiYXaTCmLDdBqFXB
+	ht5zYVPzkhMHYOOYxWEaca7Kvc6bQ8pV78+B+cOWxyS+/9DtzwmLhVfbNr0YKhBbzgtlc/GrNRDpH
+	59E4oiX8VuPUOyR+puu5tikLkcl22pflqYG+GsRKhvHmizQZ69jFpPUQ+y6cnaTmhEG7e7ZQSraju
+	Yz+rsHaw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sHnz8-0000000HTUX-3ZmG;
+	Thu, 13 Jun 2024 17:11:38 +0000
+Date: Thu, 13 Jun 2024 10:11:38 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Cyril Hrubis <chrubis@suse.cz>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v2] loop: Disable fallocate() zero and discard if not
+ supported
+Message-ID: <ZmsoSg74tzJ7SgoF@infradead.org>
+References: <20240613163817.22640-1-chrubis@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.39 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-0.998];
-	R_MISSING_CHARSET(0.50)[];
-	FORGED_SENDER(0.30)[metan@ucw.cz,chrubis@suse.cz];
-	NEURAL_HAM_SHORT(-0.18)[-0.901];
-	MIME_GOOD(-0.10)[text/plain];
-	FROM_NEQ_ENVFROM(0.10)[metan@ucw.cz,chrubis@suse.cz];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_HAS_DN(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	RCVD_TLS_ALL(0.00)[]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 96F3C22410
-X-Spam-Flag: NO
-X-Spam-Score: -2.39
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240613163817.22640-1-chrubis@suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Cyril Hrubis <chrubis@suse.cz>
+Looks good:
 
-Signed-off-by: Cyril Hrubis <chrubis@suse.cz>
----
- tests/loop/011     | 37 +++++++++++++++++++++++++++++++++++++
- tests/loop/011.out |  3 +++
- 2 files changed, 40 insertions(+)
- create mode 100755 tests/loop/011
- create mode 100644 tests/loop/011.out
-
-diff --git a/tests/loop/011 b/tests/loop/011
-new file mode 100755
-index 0000000..6a3dac7
---- /dev/null
-+++ b/tests/loop/011
-@@ -0,0 +1,37 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Cyril Hrubis
-+#
-+# Regression test for patch "loop: Disable fallocate() zero and discard if not supported".
-+#
-+
-+. tests/loop/rc
-+DESCRIPTION="Make sure unsupported backing file fallocate does not fill dmesg with errors"
-+
-+requires() {
-+	_have_program mkfs.ext2
-+}
-+
-+test() {
-+	local loop_dev;
-+	echo "Running ${TEST_NAME}"
-+
-+	mkdir "$TMPDIR/tmpfs"
-+	mount -t tmpfs testfs "$TMPDIR/tmpfs"
-+	dd if=/dev/zero of="$TMPDIR/tmpfs/disk.img" bs=1M count=100 &> /dev/null
-+
-+	if ! loop_dev="$(losetup -f --show "$TMPDIR/tmpfs/disk.img")"; then
-+		return 1
-+	fi
-+
-+	mkfs.ext2 /dev/loop0 &> /dev/null
-+
-+	errors=$(_dmesg_since_test_start |grep "operation not supported error, dev" |wc -l)
-+
-+	losetup -d "$loop_dev"
-+	umount "$TMPDIR/tmpfs"
-+
-+	echo "Found $errors error(s) in dmesg"
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/loop/011.out b/tests/loop/011.out
-new file mode 100644
-index 0000000..cd88fd5
---- /dev/null
-+++ b/tests/loop/011.out
-@@ -0,0 +1,3 @@
-+Running loop/011
-+Found 1 error(s) in dmesg
-+Test complete
--- 
-2.44.2
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
