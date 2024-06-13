@@ -1,193 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4001614B96D;
-	Thu, 13 Jun 2024 18:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A1D139CE2;
+	Thu, 13 Jun 2024 21:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718302433; cv=none; b=nXpBOBzOpX6pscU6B7TWZtTAEzKr5ITJyR2hw0NEofAnjqfI2n5zMQHfwX8s7QthcOMz9u1TD+9JKzBO7y4Eb7T++vIIfzrVKnoUxf4qLhrtCckUA2stxmsS9HkqDIaNqfa9KHuQT55U6+gvYusG7BZVVfxZk3hPXq5wgHT2gFE=
+	t=1718313016; cv=none; b=R+LgeZeAZeRwqKc6K+P6kZsu/LOY36KsD+hNyJXpcbOhe84sNAIiUz/MrOsrmX8NO3jgY53kBrlLgQhSI6aql9aEghcSlvrLM0aAz43GItNz7X7Y0JvH26qlzstBIZCPeo/6Qa+kjeDOgQrNhvHB9D5M6eavHfWzTZQ6127voO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718302433; c=relaxed/simple;
-	bh=fTIU120VbeRegu4fENGIN2pJl0vJUhORQvgqaO97OJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8tjbkIM7wbcaaSTT780vXxwFmpPD9v8z8a4DgcXxFt+BXHyMpipXSynG5ZC2sZ+69DzalOYQmA3DuDy3+dvN7cwUzAgeDI4nSrAzo6o+WnPmVCwTxM/5e8g/eYG1MnyjjgAJtpkDqsWl/cTJ5GcOzHGsl+gVXoSqTqsJUCaQUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jR/4hRHI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718313016; c=relaxed/simple;
+	bh=1J4WLBtZ95L8XtXYwCU1lBJTRVbRe4D591TuQlCYEHM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=HnrjlAuleO0nRK4dPAt1Y3F5lKR8qMtYWsNK2Q6HRogDTwDnJay4YN8Lwg9hTlt8xthdTgv9i2nA4eoArFTntde5zGGiFi4o/hf2MuA7Dg6LVCIbNuLLFT7b37xsHs1Uy4iiyXXc+dmqupQlDjEhDQGYAOOthEkzMaZ5c18amuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hauke-m.de; spf=pass smtp.mailfrom=hauke-m.de; dkim=pass (2048-bit key) header.d=hauke-m.de header.i=@hauke-m.de header.b=sivM0bTx; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hauke-m.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hauke-m.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jR/4hRHI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8EEBC32786;
-	Thu, 13 Jun 2024 18:13:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718302432;
-	bh=fTIU120VbeRegu4fENGIN2pJl0vJUhORQvgqaO97OJA=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=jR/4hRHIvjnr0HuKMd6n8Jn2KplP88ALqz/jBpAKC7iDEoEz5yTd6fMxpCs6goNdu
-	 n8elfLSow/niMrJmWbjyCFHbgDgF7GshXU3IoT7xdE5GNXUmv9oEGHq2mjc20rGLwp
-	 q0fYO1vllub6LyzhOYauiWoAoj8VOrLrRS7uM4A5UortmkOXNr3XN6j9g1Q0nw5rZI
-	 B++vgmEbZiZmvCkQbcm552PFvnT2ReJyoa6yOeebtcW7WCh7SbYjGbpp0bBNshQbGt
-	 UgwL7TFo2YOcNsL7tdoefLVWkIgw8OEUPXV25zDiL5YxSslrNLs6bwA797sM/3Spyz
-	 ebnTt6JASQjTg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 56F78CE0760; Thu, 13 Jun 2024 11:13:52 -0700 (PDT)
-Date: Thu, 13 Jun 2024 11:13:52 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
- <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
- <Zmru7hhz8kPDPsyz@pc636>
- <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
- <Zmsuswo8OPIhY5KJ@pc636>
- <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
+	dkim=pass (2048-bit key) header.d=hauke-m.de header.i=@hauke-m.de header.b="sivM0bTx"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4W0Zmy33WLz9sPq;
+	Thu, 13 Jun 2024 23:10:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hauke-m.de; s=MBO0001;
+	t=1718313010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zf/D0AMDmsG7+mRQtcpHFjZ6BvLst9hXH1WNYtGV8o0=;
+	b=sivM0bTxsqdxmFANQaTA5jst3UhQRRoBhxKaU4DCdHIjOp5u+0tVO/l4/8oPPdfXBuy0su
+	q+0bDukQL6xZ7573zc92yW924ivLssKZ/Q8gC3PFvj28t3GYmeC8IMJGYwB4MoH4LEUsNL
+	l9OC6FT83P2hXD0KbUyBkf3gETKgGWi2HWrwOtOII/lpj250pXPiKG+4xjzlaZ4xTwPSQI
+	0paINADGZDr8vTYHVc6eFPgXFa8L5N1mNNeL8MI7oBI9UE2negABMB8ecTyrhtuM2UYUX3
+	DnxZvp8BhZvWQCqLDhPup9ze6paM7fLaxfvKXM+6k7zHTas63jgmI63sCx6XiA==
+Message-ID: <93428cdd-301a-46d7-84ef-e5c8ad42f495@hauke-m.de>
+Date: Thu, 13 Jun 2024 23:09:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZmszOd5idhf2Cb-v@pc636>
+Subject: Re: [PATCH v2 2/9] block: partitions: populate fwnode
+To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+ Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+ Christian Brauner <brauner@kernel.org>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ Al Viro <viro@zeniv.linux.org.uk>, Li Lingfeng <lilingfeng3@huawei.com>,
+ Christian Heusel <christian@heusel.eu>, Min Li <min15.li@samsung.com>,
+ Avri Altman <avri.altman@wdc.com>, Adrian Hunter <adrian.hunter@intel.com>,
+ Hannes Reinecke <hare@suse.de>, Mikko Rapeli <mikko.rapeli@linaro.org>,
+ Yeqi Fu <asuk4.q@gmail.com>, Victor Shih <victor.shih@genesyslogic.com.tw>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ Li Zhijian <lizhijian@fujitsu.com>,
+ "Ricardo B. Marliere" <ricardo@marliere.net>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <cover.1717031992.git.daniel@makrotopia.org>
+ <3329bf2fa25695934b392944ff977ae95dc8c02d.1717031992.git.daniel@makrotopia.org>
+Content-Language: en-US
+From: Hauke Mehrtens <hauke@hauke-m.de>
+In-Reply-To: <3329bf2fa25695934b392944ff977ae95dc8c02d.1717031992.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4W0Zmy33WLz9sPq
 
-On Thu, Jun 13, 2024 at 07:58:17PM +0200, Uladzislau Rezki wrote:
-> On Thu, Jun 13, 2024 at 10:45:59AM -0700, Paul E. McKenney wrote:
-> > On Thu, Jun 13, 2024 at 07:38:59PM +0200, Uladzislau Rezki wrote:
-> > > On Thu, Jun 13, 2024 at 08:06:30AM -0700, Paul E. McKenney wrote:
-> > > > On Thu, Jun 13, 2024 at 03:06:54PM +0200, Uladzislau Rezki wrote:
-> > > > > On Thu, Jun 13, 2024 at 05:47:08AM -0700, Paul E. McKenney wrote:
-> > > > > > On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
-> > > > > > > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > > > > > > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > > > > > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > > > > > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > > > > > > > when the callback only performs kmem_cache_free. Use
-> > > > > > > > > > kfree_rcu() directly.
-> > > > > > > > > > 
-> > > > > > > > > > The changes were done using the following Coccinelle semantic patch.
-> > > > > > > > > > This semantic patch is designed to ignore cases where the callback
-> > > > > > > > > > function is used in another way.
-> > > > > > > > > 
-> > > > > > > > > How does the discussion on:
-> > > > > > > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > > > > > > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > > > > > > > reflect on this series? IIUC we should hold off..
-> > > > > > > > 
-> > > > > > > > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > > > > > > > where the kmem_cache is destroyed during module unload.
-> > > > > > > > 
-> > > > > > > > OK, I might as well go through them...
-> > > > > > > > 
-> > > > > > > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > > > > > > > 	Needs to wait, see wg_allowedips_slab_uninit().
-> > > > > > > 
-> > > > > > > Also, notably, this patch needs additionally:
-> > > > > > > 
-> > > > > > > diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> > > > > > > index e4e1638fce1b..c95f6937c3f1 100644
-> > > > > > > --- a/drivers/net/wireguard/allowedips.c
-> > > > > > > +++ b/drivers/net/wireguard/allowedips.c
-> > > > > > > @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
-> > > > > > > 
-> > > > > > >  void wg_allowedips_slab_uninit(void)
-> > > > > > >  {
-> > > > > > > -	rcu_barrier();
-> > > > > > >  	kmem_cache_destroy(node_cache);
-> > > > > > >  }
-> > > > > > > 
-> > > > > > > Once kmem_cache_destroy has been fixed to be deferrable.
-> > > > > > > 
-> > > > > > > I assume the other patches are similar -- an rcu_barrier() can be
-> > > > > > > removed. So some manual meddling of these might be in order.
-> > > > > > 
-> > > > > > Assuming that the deferrable kmem_cache_destroy() is the option chosen,
-> > > > > > agreed.
-> > > > > >
-> > > > > <snip>
-> > > > > void kmem_cache_destroy(struct kmem_cache *s)
-> > > > > {
-> > > > > 	int err = -EBUSY;
-> > > > > 	bool rcu_set;
-> > > > > 
-> > > > > 	if (unlikely(!s) || !kasan_check_byte(s))
-> > > > > 		return;
-> > > > > 
-> > > > > 	cpus_read_lock();
-> > > > > 	mutex_lock(&slab_mutex);
-> > > > > 
-> > > > > 	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
-> > > > > 
-> > > > > 	s->refcount--;
-> > > > > 	if (s->refcount)
-> > > > > 		goto out_unlock;
-> > > > > 
-> > > > > 	err = shutdown_cache(s);
-> > > > > 	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
-> > > > > 	     __func__, s->name, (void *)_RET_IP_);
-> > > > > ...
-> > > > > 	cpus_read_unlock();
-> > > > > 	if (!err && !rcu_set)
-> > > > > 		kmem_cache_release(s);
-> > > > > }
-> > > > > <snip>
-> > > > > 
-> > > > > so we have SLAB_TYPESAFE_BY_RCU flag that defers freeing slab-pages
-> > > > > and a cache by a grace period. Similar flag can be added, like
-> > > > > SLAB_DESTROY_ONCE_FULLY_FREED, in this case a worker rearm itself
-> > > > > if there are still objects which should be freed.
-> > > > > 
-> > > > > Any thoughts here?
-> > > > 
-> > > > Wouldn't we also need some additional code to later check for all objects
-> > > > being freed to the slab, whether or not that code is  initiated from
-> > > > kmem_cache_destroy()?
-> > > >
-> > > Same away as SLAB_TYPESAFE_BY_RCU is handled from the kmem_cache_destroy() function.
-> > > It checks that flag and if it is true and extra worker is scheduled to perform a
-> > > deferred(instead of right away) destroy after rcu_barrier() finishes.
-> > 
-> > Like this?
-> > 
-> > 	SLAB_DESTROY_ONCE_FULLY_FREED
-> > 
-> > 	Instead of adding a new kmem_cache_destroy_rcu()
-> > 	or kmem_cache_destroy_wait() API member, instead add a
-> > 	SLAB_DESTROY_ONCE_FULLY_FREED flag that can be passed to the
-> > 	existing kmem_cache_destroy() function.  Use of this flag would
-> > 	suppress any warnings that would otherwise be issued if there
-> > 	was still slab memory yet to be freed, and it would also spawn
-> > 	workqueues (or timers or whatever) to do any needed cleanup work.
-> > 
-> >
-> The flag is passed as all others during creating a cache:
+Hi Daniel,
+
+On 5/30/24 04:13, Daniel Golle wrote:
+> Let block partitions to be represented by a firmware node and hence
+> allow them to being referenced e.g. for use with blk-nvmem.
 > 
->   slab = kmem_cache_create(name, size, ..., SLAB_DESTROY_ONCE_FULLY_FREED | OTHER_FLAGS, NULL);
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>   block/partitions/core.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 41 insertions(+)
 > 
-> the rest description is correct to me.
+> diff --git a/block/partitions/core.c b/block/partitions/core.c
+> index ab76e64f0f6c..93d109409905 100644
+> --- a/block/partitions/core.c
+> +++ b/block/partitions/core.c
+> @@ -10,6 +10,8 @@
+>   #include <linux/ctype.h>
+>   #include <linux/vmalloc.h>
+>   #include <linux/raid/detect.h>
+> +#include <linux/property.h>
+> +
+>   #include "check.h"
+>   
+>   static int (*const check_part[])(struct parsed_partitions *) = {
+> @@ -281,6 +283,43 @@ static ssize_t whole_disk_show(struct device *dev,
+>   }
+>   static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
+>   
+> +static struct fwnode_handle *find_partition_fwnode(struct block_device *bdev)
+> +{
+> +	struct fwnode_handle *fw_parts, *fw_part;
+> +	struct device *ddev = disk_to_dev(bdev->bd_disk);
+> +	const char *partname, *uuid;
+> +	u32 partno;
+> +
+> +	fw_parts = device_get_named_child_node(ddev, "partitions");
+> +	if (!fw_parts)
+> +		fw_parts = device_get_named_child_node(ddev->parent, "partitions");
 
-Good catch, fixed, thank you!
+Could you please explain why you try to get the node from the device and 
+the parent when it is not available? I think this should go into the 
+commit description.
 
-							Thanx, Paul
+> +
+> +	if (!fw_parts)
+> +		return NULL;
+> +
+> +	fwnode_for_each_child_node(fw_parts, fw_part) {
+> +		if (!fwnode_property_read_string(fw_part, "uuid", &uuid) &&
+> +		    (!bdev->bd_meta_info || strncmp(uuid,
+> +						    bdev->bd_meta_info->uuid,
+> +						    PARTITION_META_INFO_UUIDLTH)))
+
+I think you should check that the uuid provided in the device tree is 
+not longer than PARTITION_META_INFO_UUIDLTH. Same for the volume name.
+
+> +			continue;
+> +
+> +		if (!fwnode_property_read_string(fw_part, "partname", &partname) &&
+> +		    (!bdev->bd_meta_info || strncmp(partname,
+> +						    bdev->bd_meta_info->volname,
+> +						    PARTITION_META_INFO_VOLNAMELTH)))
+> +			continue;
+> +
+> +		if (!fwnode_property_read_u32(fw_part, "partno", &partno) &&
+> +		    bdev_partno(bdev) != partno)
+> +			continue;
+> +
+> +		return fw_part;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+>   /*
+>    * Must be called either with open_mutex held, before a disk can be opened or
+>    * after all disk users are gone.
+> @@ -355,6 +394,8 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+>   			goto out_put;
+>   	}
+>   
+> +	device_set_node(pdev, find_partition_fwnode(bdev));
+> +
+>   	/* delay uevent until 'holders' subdir is created */
+>   	dev_set_uevent_suppress(pdev, 1);
+>   	err = device_add(pdev);
+
+Hauke
+
