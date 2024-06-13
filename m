@@ -1,40 +1,40 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C507132123;
-	Thu, 13 Jun 2024 05:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D9281207;
+	Thu, 13 Jun 2024 05:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718256936; cv=none; b=PO+x7ueGGKM1coEVsEh0gvEwgKSYcNRb5p0DdribK7MbMgrmRMYTxHOn/TU6DCbUFWvV+mCWQXq0yw6sJ19/pqK5YHi9HlKjzaOcDb5+1L9kxh9dveyPVCnGlKjB1rp5A3zjblxBnzbq4yxyym5L0lCDaaYwKS7D2RhJODvrWLw=
+	t=1718258047; cv=none; b=Ysj7pgUvnwr6vFHX1GfHN0Ma656QNRXI0OG4/P63Qr4WWZpJRcHmyneVDdjcgVwTmoeR+PMNndu8zRW6YdbQd1EpBqaFPagCAOkLKrSY9cu4cBPPqIE244aYhpCJlqeOubFZ6uk1MPq5iQN5r3CFE3P/M2qbTzQvlJ19zPV1Hzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718256936; c=relaxed/simple;
-	bh=6jSueb1RkmSpnl+3j/inMFJ2kmtKQxgvOzmIxq5phIM=;
+	s=arc-20240116; t=1718258047; c=relaxed/simple;
+	bh=Bo9w9ZSL4zxjvH+deU09KFW+rBmKUUYyQumKsggz4JM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cXgdmeCwF2GwYAZTJid84rvVLgYDIsKm3Mymt6/d3M3KlJCWt/lZVAWGSbsVEXAiBbRFUgzyd++BI0THjvk8P9iyNOjqIvkzSxxk32Szufyy4C7RyNzFozzmYpBpuxp+mENfOZ03xaG4hnlNkAZUxoj7zWiQDPTzKI95lljvGZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 680D568AFE; Thu, 13 Jun 2024 07:35:29 +0200 (CEST)
-Date: Thu, 13 Jun 2024 07:35:29 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH 03/11] block: remove the BIP_IP_CHECKSUM flag
-Message-ID: <20240613053528.GA17839@lst.de>
-References: <20240607055912.3586772-1-hch@lst.de> <20240607055912.3586772-4-hch@lst.de> <yq1frtl3tmw.fsf@ca-mkp.ca.oracle.com> <20240610115732.GA19790@lst.de> <yq1bk492dv3.fsf@ca-mkp.ca.oracle.com> <20240610122423.GB21513@lst.de> <yq1zfrrz2hj.fsf@ca-mkp.ca.oracle.com> <20240612035122.GA25733@lst.de> <yq1tthyw1jr.fsf@ca-mkp.ca.oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JwuzcLlf7PxhdOi1n0fC5TwrXfGM7tTyZLUEZjjcdUekqa6mFZyDHrM4HQVXVttK6HCuTtFjoOygnotu3l+yURJa1vSXFdOrQhUyfGGInZitMuAP7v/MABoxAKiG4F8EnxSuhCJujEePUwE8C98yGyfEj+IUQwHh7jey+KEAWDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WGr5nvc5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WGr5nvc5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D352C2BBFC;
+	Thu, 13 Jun 2024 05:54:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718258047;
+	bh=Bo9w9ZSL4zxjvH+deU09KFW+rBmKUUYyQumKsggz4JM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WGr5nvc5uG9oy8c8Mh/Qn4MYJxwmEWgYqgXTs8RKe16rnpPhvqGTl4+VRnfRCXHPB
+	 WgH1BK8tXCvcavqY1TRxtcQolrDItkI8nwOR+zAv211p+J9gEeT/UdqtDUGls0bFLw
+	 SrE/T4iSUbhZm2VmJ49EDZSyJI7BP/Wo0a3pb7jw=
+Date: Thu, 13 Jun 2024 07:54:03 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
+	lizefan.x@bytedance.com, hannes@cmpxchg.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: Re: [PATCH RFC -next 0/7] blk-iocost: support to build iocost as
+ kernel module
+Message-ID: <2024061342-walk-cavalier-7e48@gregkh>
+References: <20240613014937.1326020-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,25 +43,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq1tthyw1jr.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240613014937.1326020-1-yukuai1@huaweicloud.com>
 
-On Wed, Jun 12, 2024 at 01:27:47PM -0400, Martin K. Petersen wrote:
-> >> > Note that unlike the NOCHECK flag which I just cleaned up because they
-> >> > were unused, this one actually does get in the way of the architecture
-> >> > of the whole series :( We could add a per-bip csum_type but it would
-> >> > feel really weird.
-> >> 
-> >> Why would it feel weird? That's how it currently works.
-> >
-> > Because there's no way to have it set to anything but the per-queue
-> > one.
+On Thu, Jun 13, 2024 at 09:49:30AM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> That's what the io_uring passthrough changes enable.
+> Yu Kuai (7):
+>   kernfs: export pr_cont_kernfs_path()
+>   cgroup: export cgroup_parse_float
+>   block: export some API
+>   blk-iocost: factor out helpers to handle params from ioc_qos_write()
+>   blk-iocost: parse params before initializing iocost
+>   blk-iocost: support to free iocost
+>   blk-iocost: support to build iocost as kernel module
 
-The checksum type?  How is that compatible with nvme?
+No where do you say _why_ building this as a module is a good idea.
 
-Anyway, I'll just leave this flag in for the resend, but if we can't
-come up with a coherent user for it in a merge cycle or two (which
-I very much doubt) I'll send another patch to remove it.
+Why do this at all?
 
+thanks,
+
+greg k-h
