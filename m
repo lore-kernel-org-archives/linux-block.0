@@ -1,58 +1,59 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8FED512
-	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 16:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10DA2146D63
+	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 16:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718381441; cv=none; b=G2KWYdQTzeQsAeGm0+Dtx4NaxM3m0FNoqDLSIpoi6dkN3QeiALhWW1S2wR3K9/YrvSbclE/l78MQxhNn0lB7pWtMiWcmyvoZJq3cW4yBRux223xgMFoiYCvYtdvEjzaKmYG8xCCbhYjB9YbG7LIo3JS9IPbDwYyThzcwkTaYkKY=
+	t=1718381766; cv=none; b=skROIHA82QBZRz1XYMhULSErRGkkcj7UpMtOr/kGMZJeTOQGTAcubnuRy0mlZA2mjKEcbduF4RK7xlB+kkzFiumSsY4sb40fHkkDtYKD1VaZDy+VH/DpfGcQVH6ARGsZJHVL2TPeWECJ9f5j+xbKOYVNJCNodpExI9D7qEO5Qbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718381441; c=relaxed/simple;
-	bh=rSFC4D7aS9EiyGmAhNCTdaGRfp60cpXVRUGWnfTM4aQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=PfnOTOb/pNNFbMNpakDmi5freCPE/HZa33CmPoD7DWhssG7idVvU3ZC3xmjdfwNjAibz3jbTzsoJcYp79AklHT9V8Ma3Ji7qUdY/tS2JStO7RH6zuKOeCi+9hgxQSURTvMMByAeHAkSZoTih0qPxN1XiKmQOle9xHabOzDlubhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bBL2YCS2; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1718381766; c=relaxed/simple;
+	bh=Aad19hIjxSUfEbYh1/pSP2sHGv1iCwO+UAJvrB+cZ08=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BiUXIXLIrjLYBvF/mcgFp+bzTHGCAweMkb9BJsvfQczwM+zmLk6qmpopYliqR3i4Igs3Az2ZHQrYM0WYJkcQTe0lelhHc9eCedZw7u8WvVSm2AAKKSlru7AVqETKcE4bT9Hq2DI+9PgY5QOHYRSybCf6CB8NpMQt0yS+dxAyajI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gqQ2NMhY; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bBL2YCS2"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1f6e4f97c1eso2110335ad.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 09:10:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gqQ2NMhY"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7043684628cso61157b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 09:16:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718381439; x=1718986239; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RsV+icbHNEvqK0sIpeuIckx16kXzfAampuuf9lD+vqc=;
-        b=bBL2YCS24/mF2jDjt8s2x3/6zagc70iduBcornpqv4hCLNoW/eUKsnrSywUm9r4fMY
-         2eO2zkVqak7+P4xkkkE1i2J9uiUJBg6jRpvSCjP0lrIurt1IMQO0iPNiaG6wjhpXIddE
-         VxaLT2Ra3OYff0UlfNz72cGkR/GnL8LLUN2GY6z2SMMr6kfdP4S5O6j9yEeRDfaXQU+F
-         wwxIhwKEgDcVm1dFkr27ZSeT7KBOLP83XMousipEMG6z5HIXyVBFPfrVOtbHSwOWevJg
-         F6gBAnypegdVcgEVLTptn8BqmL2EfkzyMJ/8hidoE99c2ieUe2sSl36u6SdLtRcvenIj
-         qn8w==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718381764; x=1718986564; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BDixbra1HnV5DPgXv78teb+z8r3TOra1wJTUjH08YD4=;
+        b=gqQ2NMhYISubpA/O2zIDXj7REGCxPKs4R/Rde+ilKBlHNlj2PmjMPcpzq+17MEyRVe
+         IXc9gw+SrQ5Qxq6CbfSwf+KWf7KgvKBM9EpAAPrq4HhVhOyv98il/gX65LCRG2iL8H+D
+         vW05aaiimr1Pv6Cwo0NLKS2M/Uesj4UcctnZp5IigCyN95IAhb1VuyWt5RL41KpiG42d
+         vM/wwiYb2D+x0FuhVUhDmFLo90AxEkzwLxUSmEEs9nCgxq7tUQyoHSp/eg5x3NJK8g49
+         zk6+FGx/M/t+QDE1+M8/tj/qiVAtDYBXE7bcKVpSj8Jm24Z0f0UIFEFOChdO1Z2mgoDc
+         WPww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718381439; x=1718986239;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RsV+icbHNEvqK0sIpeuIckx16kXzfAampuuf9lD+vqc=;
-        b=QUpyyIf1xmIvl0Ae4mjqNoKxN1hKtqHuQgqsvPUXPw/f5nLYGUFqw5uEnJqly5SV5E
-         1R+ikgMPPJNLqTEcnM5/+ftC6U02xbZdI1cYn6TjlQGRNBar+rAjdsJvvmnhnR1EPoBS
-         pb6IinAi1+WKUmnURzAhHslE7wjc7Y4OSFAn8/mOhWczzWM0f5Ph9X4cn7nV81Wc2gFO
-         6NO01tX0tYuN/I8qkh6Mi6oVB1BgD+lruh5MqrXfyOABHdD+ssFcHSL6Hv4t4SCiAuYW
-         Przcepsvv0qp0TCNlmFAfbicaGOxEFIB8yAswZIQGL1pqByPy5NLXRprB68uvm//jT9H
-         9sbQ==
-X-Gm-Message-State: AOJu0Yz/EzCfyqMmBwZJ9qmurCRgq7iffdF7Wh3yKCNsqFnshEH5YQ37
-	+9fcG7gDd57zKMAaj0mBVVe5oIHdThGKxXbDraYhLzV4/X0ObciJ+SPnT/jruM9aQCyfyf2aMX8
-	W
-X-Google-Smtp-Source: AGHT+IElLe7J0m419Ng0ttmVvYDqs1DmE8kWX0JsqLjyeYil55cGe1lZzNSliwFBjEVh9SwSW3XGQA==
-X-Received: by 2002:a17:902:c94b:b0:1f7:346e:525e with SMTP id d9443c01a7336-1f8625bf902mr34582435ad.1.1718381439466;
-        Fri, 14 Jun 2024 09:10:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718381764; x=1718986564;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BDixbra1HnV5DPgXv78teb+z8r3TOra1wJTUjH08YD4=;
+        b=Zbm/mW3a5xo+LI67hcNUhYNWBUFkWL45HnCuYgcoAcWnJB0B9ztCH7P0z8jC7LJYCH
+         KzFZl76QNwLsNmdqzyvayJFoYVeVC45e2spfB0UrgN14B3xjchglUUauNp0uErSgY9Xj
+         2PdGqJT6XagU2K6M0ByxDJU6SuILDH7yasBTFl6BOgMFA9aGrinw5RQ1f+QgF1TraMWo
+         boSIMEXSJHN5aoks0lrzzgaFQqKfzEx079lsCUfIEyEsg+s5rUVB1Tem/LjrTG4hq8TD
+         vKiItvMWHzjCzdS8YdBF7k3Xor+w3sZUu9k1U85/P7GQStV+C2hz//zD0vICBzGdtLEC
+         3dBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUU51hmO0wJcmhyHCj5USic82B1SSsuAcsIymEGXh+mjSsBe9T9sivmf7HcjnkhF97yzO/CzevK8s5L4zNah9lTAkJBUMPnpf5Jjls=
+X-Gm-Message-State: AOJu0Ywm04XwfXe6RbfQe8pcllacyvjr71P8BelWwmo0012Xu2T6PGpe
+	4bbKIn9aOaMGx8eZ7BuHDflVFrh+2Kgi59SURcab8rdKo6AUFm/7zq3GwiRTQcc=
+X-Google-Smtp-Source: AGHT+IHcxyIgaaVTPfM4bd/lwoK3Ws05v5eakEhv+baleiJUj4MZMdoqwGuHfLvaj6ML51yAKT62Sg==
+X-Received: by 2002:a05:6a21:6d98:b0:1b4:e10c:62bd with SMTP id adf61e73a8af0-1bae7ed3e48mr3699835637.2.1718381764289;
+        Fri, 14 Jun 2024 09:16:04 -0700 (PDT)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855f463f6sm33559725ad.281.2024.06.14.09.10.38
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705ccb8d98bsm3224419b3a.191.2024.06.14.09.16.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jun 2024 09:10:39 -0700 (PDT)
-Message-ID: <2392bf6b-f048-4a80-a9b2-8703ead1fa10@kernel.dk>
-Date: Fri, 14 Jun 2024 10:10:38 -0600
+        Fri, 14 Jun 2024 09:16:03 -0700 (PDT)
+Message-ID: <6c5d4295-098c-4dc2-8ad2-f747a205f689@kernel.dk>
+Date: Fri, 14 Jun 2024 10:16:01 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,100 +61,47 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: move integrity settings to queue_limits v3
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+References: <20240613084839.1044015-1-hch@lst.de>
+ <f134f09a-69df-4860-90a9-ec9ad97507b2@kernel.dk>
+ <20240614160322.GA16649@lst.de>
+ <af0144b5-315e-4af0-a1df-ec422f55e5be@kernel.dk>
+ <20240614160708.GA17171@lst.de>
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.10-rc4
+In-Reply-To: <20240614160708.GA17171@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 6/14/24 10:07 AM, Christoph Hellwig wrote:
+> On Fri, Jun 14, 2024 at 10:04:28AM -0600, Jens Axboe wrote:
+>>> That sounds like you didn't apply the above mentioned
+>>> "convert the SCSI ULDs to the atomic queue limits API v2" series before?
+>>
+>> That might indeed explain it... Surprising it applied without.
+> 
+> Also as mentioned a couple weeks ago and again earlier this week,
+> can we please have a shared branch for the SCSI tree to pull in for
+> the limits conversions (including the flags series I need to resend
+> next week) so that Martin can pull it in?
 
-Fixes for block that should go into the 6.10 kernel release:
-
-- NVMe pull request via Keith
-	- Discard double free on error conditions (Chunguang)
-	- Target Fixes (Daniel)
-	- Namespace detachment regression fix (Keith)
-
-- Fix for an issue with flush requests and queuelist reuse (Chengming)
-
-- nbd sparse annotation fixes (Christoph)
-
-- unmap and free bio mapped data via submitter (Anuj)
-
-- loop discard/fallocate unsupported fix (Cyril)
-
-- Fix for the zoned write plugging added in this release (Damien)
-
-- sed-opal wrong address fix (Su)
-
-Please pull!
-
-
-The following changes since commit 27d024235bdb16af917809d33916392452c3ac85:
-
-  Merge tag 'nvme-6.10-2024-06-05' of git://git.infradead.org/nvme into block-6.10 (2024-06-05 12:13:00 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.10-20240614
-
-for you to fetch changes up to 5f75e081ab5cbfbe7aca2112a802e69576ee9778:
-
-  loop: Disable fallocate() zero and discard if not supported (2024-06-14 06:21:25 -0600)
-
-----------------------------------------------------------------
-block-6.10-20240614
-
-----------------------------------------------------------------
-Anuj Gupta (1):
-      block: unmap and free user mapped integrity via submitter
-
-Chengming Zhou (1):
-      block: fix request.queuelist usage in flush
-
-Christoph Hellwig (1):
-      nbd: Remove __force casts
-
-Chunguang Xu (1):
-      nvme: avoid double free special payload
-
-Cyril Hrubis (1):
-      loop: Disable fallocate() zero and discard if not supported
-
-Damien Le Moal (1):
-      block: Optimize disk zone resource cleanup
-
-Daniel Wagner (2):
-      nvmet-passthru: propagate status from id override functions
-      nvmet: always initialize cqe.result
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.10-2024-06-13' of git://git.infradead.org/nvme into block-6.10
-
-Keith Busch (1):
-      nvme: fix namespace removal list
-
-Su Hui (1):
-      block: sed-opal: avoid possible wrong address reference in read_sed_opal_key()
-
- block/bio-integrity.c                  | 26 +++++++++++++++--
- block/blk-flush.c                      |  3 +-
- block/blk-zoned.c                      |  3 ++
- block/sed-opal.c                       |  2 +-
- drivers/block/loop.c                   | 23 +++++++++++++++
- drivers/block/nbd.c                    | 51 +++++++++++++++-------------------
- drivers/nvme/host/core.c               | 10 ++++---
- drivers/nvme/host/ioctl.c              | 15 +++++++---
- drivers/nvme/target/core.c             |  1 +
- drivers/nvme/target/fabrics-cmd-auth.c |  3 --
- drivers/nvme/target/fabrics-cmd.c      |  6 ----
- drivers/nvme/target/passthru.c         |  6 ++--
- include/linux/bio.h                    |  4 +++
- 13 files changed, 100 insertions(+), 53 deletions(-)
+For some reason, lore is missing 12-14 of that series, which makes applying
+it a bit more difficult... But I can setup a for-6.11/block-limits branch
+off 6.10-rc3 and apply both series, then both scsi and block can pull that
+in.
 
 -- 
 Jens Axboe
+
 
