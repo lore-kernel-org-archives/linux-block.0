@@ -1,97 +1,120 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D773195FD1
-	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 12:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA75199243
+	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 12:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718367699; cv=none; b=nXMH5ZJj9n4w4p/YzHQ7V6YJmRKg+L8HroD43sWL3D71nPNzbUXDQEPmYJT6Hl87gNipzEBl/qJVgh31YAtYvHle/YKtNUixJzWmN3T3HkiSCFHBQqbnQ9RvdbZByhJwgJhs4USrIQgmY5Un74BW6N/uCOZWX5g14Z4H++82RA8=
+	t=1718368426; cv=none; b=KNRMhxzUNQPMx9m17cnHu5hIdLyGdXbwTOP1lPi0fOBLXxMVUi8g6SirvSiPF2zu1PC7qiKqLfWPABkQ3CFvrrcWXe3m0GSmAUVr6WA03JCZTnhEbkG7PB8WQuTlXbMeBPnxqtXFu7t/zbqopJekJ1J32bIuPVUZICQZ+bctrsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718367699; c=relaxed/simple;
-	bh=vVMnkKP23EquRnJbPIazwvrYt+/IR7+ZK7NhvQrGL3k=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=A0yWK5PDhVowbzbGT2KkLRBBK47SGyXcGzm3gjYfHJkQEpATbkn8lx+fdFsiA1Gall8VN6Cga1dQoxZXZynH7J9sdbeQSPXCaGIo6dRSvus4A4bokarzjmEqNI+18y/EgmIOer7oo5RmnwHF/QYNAAIuQGijK6RbIVGo2oukL5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NjiY0UgO; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1718368426; c=relaxed/simple;
+	bh=ViOeFSLpzBTfbhkwvbIOhDLgIujUpX169FCRqiXsZHw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=goxGfTokzx522qhLAl6uH5u0TiSzDIgs1osJl1KGgQdfHGaFlai6w310PGGWyCP8Bj7WAzqZowi4AnWybqrCJ4K7HVoVa0de5g9huuSurQJf9Mg7crVK4pPKBrwc/3FtZEB7bVnPlGQc1qnl8+P4G9TsnWdGSXMVXwDyAdhSq/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LuV9Yhz1; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NjiY0UgO"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f715fd5e60so1936905ad.2
-        for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 05:21:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LuV9Yhz1"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1f6f38b6278so1925445ad.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 05:33:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718367697; x=1718972497; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KBGz84Kp8zPxGVcYMqV/SC8aRcbUSCJ8X0DqtX5D0Kk=;
-        b=NjiY0UgOw6ApJ7NE+0JfNxdlS1kqzqHOZuCwSW9Wprg6hXrNyYDCx2NC7o66tPKTsE
-         WP/Y5GRqKDV4bFS6vvCkzPLI5Lbnn4e4USFv+y+0/RRkPtfWZwsPE1cyWb1fS1sDaHbj
-         vDSVuwC6rDSX47dcqv9C33zPKJcZP/b2FeotCnBWi2F8owsC2ToDBOaXqyIk6FqLROD+
-         FodCTNpnpeTZ+jeEvjAX+FLguRX5F75GT7g9cJhcGx/YcaP9bwIhqTS2Pu5X2eRBM8OQ
-         pHKIHO/aDEMGvxYQIXNQ7DsJqUFaqLdpwsI4ity9wq+zVD5/f+Vep9ONjrY312gOTMYk
-         5hcA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718368424; x=1718973224; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IQUOxKnD6CsmHDQ8zwTblKdKo9rITBkMiMcIVKNHWq0=;
+        b=LuV9Yhz17Xocu9NAHd9mQYpjvIl00VlVdGe7bRqWYO80L7X9/cHFM4n3N+EbTbLGaU
+         cOOh+b0dIwTDYwTQ3u8NpufJ5hrX031r4f7Le4p+T5I5LS0N5chAfXGpWC3WJrygda3B
+         13x+3F9MNOrx153LZj9GWVI8nLwXQTV/wQBgQGaDdOPP1O7xXPj3YOxYN2AAfVTB15bo
+         mdMNQyztKNqum/GqOIyJYh0vOND9T1Yt7qyGml6YnhqnszSaaEO9eWrnzxmOxS+VW+Qc
+         t7enjwOUGTU/cToDlqMxAKZOlcHiB1nMcSPXgtWED2i6NvjqRb+zM2sZGxNXioN0OpWx
+         w+RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718367697; x=1718972497;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KBGz84Kp8zPxGVcYMqV/SC8aRcbUSCJ8X0DqtX5D0Kk=;
-        b=Y40s+9iu4udSVbvT9GownyZBkduh9N88iOdNt/ff0xqCiy5vw/tiaC31xjXgTPnVsx
-         eizQQt+WbeniJy8EatXhDaAbLC4n3MCFLzozSHzOnyNWBevuYvz8pwp2GwVWG+R7hzxJ
-         EskYhzsyGiWZ4UTusWbhyiTbVxTNcJRW4GLcrSYOz6x+bSYbzmTaB3gsC/QxBX9bw6Qh
-         x+1BVjx7dnIS5uv+44FjJjy+OJ1g1iz9/sxnn8t2Id8SXeIywVr0C0r4zS2mvD5inM51
-         PLRrbmGBuscXit8Uld6iRWBr2HbEteBghS22zz22r3aAJlm7Ya12e9ODZOFZMGeI4Jea
-         2xcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVckKi68aHbRVbbopOesZmcA1Bgkx7CbMM8T1p33og2SjgyRYCbP5N+nDf6xX2j76W+wlN6DVed9peyOrKuw6AVsIZVx+DL3bwaFu8=
-X-Gm-Message-State: AOJu0Yz5zThQfL41U2BFhXx+8EE1mqAf45Cjw11wz9YLSYpsSt4Z9xZB
-	KH2QMI31SuDdM0c+74svknxgd6pbIkOUIFyS+f8/lWVV0zyZNU4TytmpWEWPIws=
-X-Google-Smtp-Source: AGHT+IGgrI5Z53eE6slIeb5D//L9zkN9U1Fpf2jCXTu1Zs6NpCOAXPFi1P0d0VowXih3bXAEQZq2Pg==
-X-Received: by 2002:a05:6a21:183:b0:1b2:53c5:9e67 with SMTP id adf61e73a8af0-1bae8259588mr3195150637.4.1718367697350;
-        Fri, 14 Jun 2024 05:21:37 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855f3947asm30750075ad.264.2024.06.14.05.21.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 05:21:36 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Cyril Hrubis <chrubis@suse.cz>
-Cc: Jan Kara <jack@suse.cz>
-In-Reply-To: <20240613163817.22640-1-chrubis@suse.cz>
-References: <20240613163817.22640-1-chrubis@suse.cz>
-Subject: Re: [PATCH v2] loop: Disable fallocate() zero and discard if not
- supported
-Message-Id: <171836769633.229112.12813343173922846778.b4-ty@kernel.dk>
-Date: Fri, 14 Jun 2024 06:21:36 -0600
+        d=1e100.net; s=20230601; t=1718368424; x=1718973224;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IQUOxKnD6CsmHDQ8zwTblKdKo9rITBkMiMcIVKNHWq0=;
+        b=kWrKg1k3BCRJWXDjRDiWiWkr/xTTc42sUYHBPMitzBzQaV/z6t2Ah4XL5UByuxH3i4
+         8wfOU8uNacybeomo+xIJQaGJiGalSmTVIg71eukP15qYwTHz15a2ex6b3EBHjCUIYE0B
+         H5b1xtEs6leKrxH1vgQeQ/4n8GHUZkDG149+e6F3mPUfIKyir0uzpUSz8vtKLRlpq6dB
+         fbe2MWhpB/0bR/NfrL2aHtWqnO3/R16nE+uexwdDHYfJfuEUi3QNTmoN0ROLyN5BtuMS
+         WH3xOjSkAAFInbJcRP5AsmXh3db5fKrvp+GcSkfOJ6ob7ZGHB1TBJjRVAqZlmGnzi3d+
+         wz9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWT6yiqEfLbQJWdp4HuY9C28VDsCRRmbTuO3xAU3XQpDX3s7m4Ujjo23K7514RQULih5agdslk3n5GkKs1iqXRos/GYHga2uetUV/Y=
+X-Gm-Message-State: AOJu0YyP7a/qXQyIwvZpgfFpMCw4LgOO81HaTLb9pRFRIg16SlngUhZE
+	lq3oMVpto5gdUnR1Lwn0sfqjLzB+7s2ryveQMhU8P9i2K13Dmkzjr9GXxaNkrJk=
+X-Google-Smtp-Source: AGHT+IFgr4iSfGSF5IPV3zZl5qFPlqcnaulUtE1TfAC51U6Q4NBcINjOTwVkZv2IxHULMCAp2GZWSA==
+X-Received: by 2002:a17:902:eccc:b0:1f7:1a37:d0b5 with SMTP id d9443c01a7336-1f862c30f6amr26779945ad.4.1718368424251;
+        Fri, 14 Jun 2024 05:33:44 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855e55c3bsm31084685ad.57.2024.06.14.05.33.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jun 2024 05:33:43 -0700 (PDT)
+Message-ID: <f134f09a-69df-4860-90a9-ec9ad97507b2@kernel.dk>
+Date: Fri, 14 Jun 2024 06:33:41 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+User-Agent: Mozilla Thunderbird
+Subject: Re: move integrity settings to queue_limits v3
+To: Christoph Hellwig <hch@lst.de>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+References: <20240613084839.1044015-1-hch@lst.de>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240613084839.1044015-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-On Thu, 13 Jun 2024 18:38:17 +0200, Cyril Hrubis wrote:
-> If fallcate is implemented but zero and discard operations are not
-> supported by the filesystem the backing file is on we continue to fill
-> dmesg with errors from the blk_mq_end_request() since each time we call
-> fallocate() on the loop device the EOPNOTSUPP error from lo_fallocate()
-> ends up propagated into the block layer. In the end syscall succeeds
-> since the blkdev_issue_zeroout() falls back to writing zeroes which
-> makes the errors even more misleading and confusing.
+On 6/13/24 2:48 AM, Christoph Hellwig wrote:
+> Hi Jens, hi Martin,
 > 
-> [...]
+> this series converts the blk-integrity settings to sit in the queue
+> limits and be updated through the atomic queue limits API.
+> 
+> I've mostly tested this with nvme, scsi is only covered by simple
+> scsi_debug based tests.
+> 
+> For MD I found an pre-existing error handling bug when combining PI
+> capable devices with not PI capable devices.  The fix was posted here
+> (and is included in the git branch below):
+> 
+>    https://lore.kernel.org/linux-raid/20240604172607.3185916-1-hch@lst.de/
+> 
+> For dm-integrity my testing showed that even the baseline fails to create
+> the luks-based dm-crypto with dm-integrity backing for the authentication
+> data.  As the failure is non-fatal I've not addressed it here.
+> 
+> Note that the support for native metadata in dm-crypt by Mikulas will
+> need a rebase on top of this, but as it already requires another
+> block layer patch and the changes in this series will simplify it a bit
+> I hope that is ok.
+> 
+> The series is based on top of my previously sent "convert the SCSI ULDs
+> to the atomic queue limits API v2" API.
 
-Applied, thanks!
+I was going to queue this up, but:
 
-[1/1] loop: Disable fallocate() zero and discard if not supported
-      commit: 5f75e081ab5cbfbe7aca2112a802e69576ee9778
+drivers/scsi/sd.c: In function ‘sd_revalidate_disk’:
+drivers/scsi/sd.c:3658:45: error: ‘lim’ undeclared (first use in this function)
+ 3658 |                 sd_config_protection(sdkp, &lim);
+      |                                             ^~~
+drivers/scsi/sd.c:3658:45: note: each undeclared identifier is reported only once for each function it appears in
 
-Best regards,
 -- 
 Jens Axboe
-
-
 
