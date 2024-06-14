@@ -1,189 +1,221 @@
-Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC5A12EBD6
-	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 07:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450F31822E3
+	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 07:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718351409; cv=none; b=de6HPgLcJzr8RWR3vvhp91hc2qthz3eD2Gj5F9vZADcrmhvxZrG8UwaCyTnqGntUjA7xtnpcMYL/r3UJX4vg3DcXSmlGC6Vrfhuoj8V/AVtxMMD93YvtbMOwdGblD/Qq58C5M3/brp2hAXV+yWFM0c0Tgqg6grufVCgCxvobyio=
+	t=1718351808; cv=none; b=ZNNcZxxOHJf6cbN1uysiVXy4UtRxLHsk6MHkXuZ7NbBO4IP79G64wd9LkbkooSQha1X2lZH5WeerLX7Sau/H7PmPzk7n+Yr1SYHv8mbKJ+U4QWI+apX5VULjRnVPH27pM6J+P4XSYjm+sMXhN5n5FabI0R5DgJIZMvr9e71iAU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718351409; c=relaxed/simple;
-	bh=Ia62ZQlXIBEvcF6Cn2AYPvblXrtFyt9cKO4gD7R9fhU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LnXNPuQRFI3E2twRRZdKSBJxMw2gC6goD+0Buac+LR+0eY4h5laPKrNKibLE5Fj3qA2xBJpWOTP80H54wIHeXQZasuFPB6JN4NRl46hBlYCZk/oeVGRlx/Jy51Sej88bqNlrgA6tFaHr4H4KB4gpQwNQgvDMrM0m7OX+Sg6tTGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
-Received: from dlp.unisoc.com ([10.29.3.86])
-	by SHSQR01.spreadtrum.com with ESMTP id 45E7nkcg067511;
-	Fri, 14 Jun 2024 15:49:46 +0800 (+08)
-	(envelope-from Dongliang.Cui@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
-	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4W0rsz65KPz2S7Bgg;
-	Fri, 14 Jun 2024 15:45:27 +0800 (CST)
-Received: from tj10379pcu.spreadtrum.com (10.5.32.15) by
- BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Fri, 14 Jun 2024 15:49:43 +0800
-From: Dongliang Cui <dongliang.cui@unisoc.com>
-To: <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
-        <mathieu.desnoyers@efficios.com>, <ebiggers@kernel.org>,
-        <bvanassche@acm.org>
-CC: <ke.wang@unisoc.com>, <hongyu.jin.cn@gmail.com>, <niuzhiguo84@gmail.com>,
-        <hao_hao.wang@unisoc.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <akailash@google.com>,
-        <cuidongliang390@gmail.com>, Dongliang Cui <dongliang.cui@unisoc.com>
-Subject: [PATCH v5] block: Add ioprio to block_rq tracepoint
-Date: Fri, 14 Jun 2024 15:49:36 +0800
-Message-ID: <20240614074936.113659-1-dongliang.cui@unisoc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1718351808; c=relaxed/simple;
+	bh=cCTHejGQxMi6RzmM8k0/qqpdwyLsfEJT+eXWS8ocifI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e8gR58dbNMsxxhZeomVnHmCwUd472dn46ptVLh/ml297pCMYCc2Dz+JiP4pJWV7b+uAoyTALPyW2HW2J/hYm3fiDQ2LzBNLnZPH00EmcA6fT+nEq77lyWbJ2ZkTIpIyinJeKD+v6NXqTLYWBmNTdM+xBdG9Xonl6TjO9zdwCGgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=Fm1tcN3V; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Fm1tcN3V"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-440f1d9377dso9547771cf.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 00:56:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1718351805; x=1718956605; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BedO1x12znmji4xt7UpC8XDe1FvgdzsEI86mvlWGudA=;
+        b=Fm1tcN3Vo3gJO6/SCGnqGesXhAtXTa/SULB8j+OCYKi91pBbnkv9madB1toyUbEmqU
+         n1PWVnReUBEajRAGUKRwA/n4y6aByM5MFtRcCVNryNdcI08bph4xYoVR37w9nTKZYbm2
+         Ey9Gr1/er1ywu6fbx5njWRb6cyHvBMvDWfQuU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718351805; x=1718956605;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BedO1x12znmji4xt7UpC8XDe1FvgdzsEI86mvlWGudA=;
+        b=Lw6F0XsBdDRCwVUJUT1eP7s6+yTGHU2q95diwS3fKQdFdcH8gHntozaqHH1NOTe/PT
+         9kPdZ+rUBis+nplTLNgQ0GjJ1XkEyaFIv3iUheq5f+pm1uHEODU/PntA8NAWC+0viWGj
+         eh5OsvY6nv9sOjFxBR3/shqLe8jSOpIcAkvrhTnc6qvORer0jJ+rPWQfRwENbMYEYFIw
+         98L3bW2yZPSDoaqZb+3Yanl/U3xPe7buNLrWiA4RuMaWrI9zniqywaKMMHlGWznXT+HP
+         rN838mK8fUTNtKnQVeWzX+etRVTLFuu2Y0/o/fMdQNkzKL7rbifh5nbFdFajXF6tUvVI
+         HN4g==
+X-Forwarded-Encrypted: i=1; AJvYcCUXSFjsnWmITmpCss5N1Chb/EthjklzmgZkfDTf/B2dSR4KvbF1jxOPxAAqc4nIZYkDGEHi4a6ZW9aMKEiMyAYD408xwn157ih2A48=
+X-Gm-Message-State: AOJu0YzdH1YMZ7T0WCtqK0ZQe4q6QX4fcLC4poi4nATV/v8JGXyKKpR8
+	CgwdxkBW3YcGJN7WoVZ6PIzrs9H7sO9ztX5BzplMvwOFGcpOByG0xH9/jquMk2Y=
+X-Google-Smtp-Source: AGHT+IEDi8BhVjLu2vbVbmBxB83hP6gyIibQXt+H84ODwaVrhmTedMPZYFZeMGGsfo/+7hGiDnXdRg==
+X-Received: by 2002:a05:622a:1822:b0:43e:2639:a987 with SMTP id d75a77b69052e-44216b3a874mr27744421cf.59.1718351804940;
+        Fri, 14 Jun 2024 00:56:44 -0700 (PDT)
+Received: from localhost ([213.195.124.163])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-441f2ff9ef8sm13823221cf.89.2024.06.14.00.56.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 00:56:44 -0700 (PDT)
+Date: Fri, 14 Jun 2024 09:56:42 +0200
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
+	Richard Weinberger <richard@nod.at>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Josef Bacik <josef@toxicpanda.com>, Ming Lei <ming.lei@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
+	drbd-dev@lists.linbit.com, nbd@other.debian.org,
+	linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
+	virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
+	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+	linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 10/26] xen-blkfront: don't disable cache flushes when
+ they fail
+Message-ID: <Zmv3usMvGGK7ZbMT@macbook>
+References: <20240611051929.513387-1-hch@lst.de>
+ <20240611051929.513387-11-hch@lst.de>
+ <ZmlVziizbaboaBSn@macbook>
+ <20240612150030.GA29188@lst.de>
+ <ZmnFH17bTV2Ot_iR@macbook>
+ <20240613140508.GA16529@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX02.spreadtrum.com (10.0.64.8)
-X-MAIL:SHSQR01.spreadtrum.com 45E7nkcg067511
+In-Reply-To: <20240613140508.GA16529@lst.de>
 
-Sometimes we need to track the processing order of requests with
-ioprio set. So the ioprio of request can be useful information.
+On Thu, Jun 13, 2024 at 04:05:08PM +0200, Christoph Hellwig wrote:
+> On Wed, Jun 12, 2024 at 05:56:15PM +0200, Roger Pau Monné wrote:
+> > Right.  AFAICT advertising "feature-barrier" and/or
+> > "feature-flush-cache" could be done based on whether blkback
+> > understand those commands, not on whether the underlying storage
+> > supports the equivalent of them.
+> > 
+> > Worst case we can print a warning message once about the underlying
+> > storage failing to complete flush/barrier requests, and that data
+> > integrity might not be guaranteed going forward, and not propagate the
+> > error to the upper layer?
+> > 
+> > What would be the consequence of propagating a flush error to the
+> > upper layers?
+> 
+> If you propage the error to the upper layer you will generate an
+> I/O error there, which usually leads to a file system shutdown.
+> 
+> > Given the description of the feature in the blkif header, I'm afraid
+> > we cannot guarantee that seeing the feature exposed implies barrier or
+> > flush support, since the request could fail at any time (or even from
+> > the start of the disk attachment) and it would still sadly be a correct
+> > implementation given the description of the options.
+> 
+> Well, then we could do something like the patch below, which keeps
+> the existing behavior, but insolates the block layer from it and
+> removes the only user of blk_queue_write_cache from interrupt
+> context:
 
-Example：
+LGTM, I'm not sure there's much else we can do.
 
-block_rq_insert: 8,0 RA 16384 () 6500840 + 32 be,0,6 [binder:815_3]
-block_rq_issue: 8,0 RA 16384 () 6500840 + 32 be,0,6 [binder:815_3]
-block_rq_complete: 8,0 RA () 6500840 + 32 be,0,6 [0]
+> ---
+> From e6e82c769ab209a77302994c3829cf6ff7a595b8 Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Thu, 30 May 2024 08:58:52 +0200
+> Subject: xen-blkfront: don't disable cache flushes when they fail
+> 
+> blkfront always had a robust negotiation protocol for detecting a write
+> cache.  Stop simply disabling cache flushes in the block layer as the
+> flags handling is moving to the atomic queue limits API that needs
+> user context to freeze the queue for that.  Instead handle the case
+> of the feature flags cleared inside of blkfront.  This removes old
+> debug code to check for such a mismatch which was previously impossible
+> to hit, including the check for passthrough requests that blkfront
+> never used to start with.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/xen-blkfront.c | 44 +++++++++++++++++++-----------------
+>  1 file changed, 23 insertions(+), 21 deletions(-)
+> 
+> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> index 9b4ec3e4908cce..e2c92d5095ff17 100644
+> --- a/drivers/block/xen-blkfront.c
+> +++ b/drivers/block/xen-blkfront.c
+> @@ -788,6 +788,14 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
+>  			 * A barrier request a superset of FUA, so we can
+>  			 * implement it the same way.  (It's also a FLUSH+FUA,
+>  			 * since it is guaranteed ordered WRT previous writes.)
+> +			 *
+> +			 * Note that can end up here with a FUA write and the
+> +			 * flags cleared.  This happens when the flag was
+> +			 * run-time disabled and raced with I/O submission in
+> +			 * the block layer.  We submit it as a normal write
 
-Signed-off-by: Dongliang Cui <dongliang.cui@unisoc.com>
----
-Changes in v5:
- - Remove redundant changes.
----
----
- include/trace/events/block.h | 41 ++++++++++++++++++++++++++++--------
- 1 file changed, 32 insertions(+), 9 deletions(-)
+Since blkfront no longer signals that FUA is no longer available for the
+device, getting a request with FUA is not actually a race I think?
 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 0e128ad51460..1527d5d45e01 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -9,9 +9,17 @@
- #include <linux/blkdev.h>
- #include <linux/buffer_head.h>
- #include <linux/tracepoint.h>
-+#include <uapi/linux/ioprio.h>
- 
- #define RWBS_LEN	8
- 
-+#define IOPRIO_CLASS_STRINGS \
-+	{ IOPRIO_CLASS_NONE,	"none" }, \
-+	{ IOPRIO_CLASS_RT,	"rt" }, \
-+	{ IOPRIO_CLASS_BE,	"be" }, \
-+	{ IOPRIO_CLASS_IDLE,	"idle" }, \
-+	{ IOPRIO_CLASS_INVALID,	"invalid"}
-+
- #ifdef CONFIG_BUFFER_HEAD
- DECLARE_EVENT_CLASS(block_buffer,
- 
-@@ -82,6 +90,7 @@ TRACE_EVENT(block_rq_requeue,
- 		__field(  dev_t,	dev			)
- 		__field(  sector_t,	sector			)
- 		__field(  unsigned int,	nr_sector		)
-+		__field(  unsigned short, ioprio		)
- 		__array(  char,		rwbs,	RWBS_LEN	)
- 		__dynamic_array( char,	cmd,	1		)
- 	),
-@@ -90,16 +99,20 @@ TRACE_EVENT(block_rq_requeue,
- 		__entry->dev	   = rq->q->disk ? disk_devt(rq->q->disk) : 0;
- 		__entry->sector    = blk_rq_trace_sector(rq);
- 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
-+		__entry->ioprio    = rq->ioprio;
- 
- 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
- 		__get_str(cmd)[0] = '\0';
- 	),
- 
--	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
-+	TP_printk("%d,%d %s (%s) %llu + %u %s,%u,%u [%d]",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev),
- 		  __entry->rwbs, __get_str(cmd),
--		  (unsigned long long)__entry->sector,
--		  __entry->nr_sector, 0)
-+		  (unsigned long long)__entry->sector, __entry->nr_sector,
-+		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
-+				   IOPRIO_CLASS_STRINGS),
-+		  IOPRIO_PRIO_HINT(__entry->ioprio),
-+		  IOPRIO_PRIO_LEVEL(__entry->ioprio),  0)
- );
- 
- DECLARE_EVENT_CLASS(block_rq_completion,
-@@ -113,6 +126,7 @@ DECLARE_EVENT_CLASS(block_rq_completion,
- 		__field(  sector_t,	sector			)
- 		__field(  unsigned int,	nr_sector		)
- 		__field(  int	,	error			)
-+		__field(  unsigned short, ioprio		)
- 		__array(  char,		rwbs,	RWBS_LEN	)
- 		__dynamic_array( char,	cmd,	1		)
- 	),
-@@ -122,16 +136,20 @@ DECLARE_EVENT_CLASS(block_rq_completion,
- 		__entry->sector    = blk_rq_pos(rq);
- 		__entry->nr_sector = nr_bytes >> 9;
- 		__entry->error     = blk_status_to_errno(error);
-+		__entry->ioprio    = rq->ioprio;
- 
- 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
- 		__get_str(cmd)[0] = '\0';
- 	),
- 
--	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
-+	TP_printk("%d,%d %s (%s) %llu + %u %s,%u,%u [%d]",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev),
- 		  __entry->rwbs, __get_str(cmd),
--		  (unsigned long long)__entry->sector,
--		  __entry->nr_sector, __entry->error)
-+		  (unsigned long long)__entry->sector, __entry->nr_sector,
-+		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
-+				   IOPRIO_CLASS_STRINGS),
-+		  IOPRIO_PRIO_HINT(__entry->ioprio),
-+		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->error)
- );
- 
- /**
-@@ -180,6 +198,7 @@ DECLARE_EVENT_CLASS(block_rq,
- 		__field(  sector_t,	sector			)
- 		__field(  unsigned int,	nr_sector		)
- 		__field(  unsigned int,	bytes			)
-+		__field(  unsigned short, ioprio		)
- 		__array(  char,		rwbs,	RWBS_LEN	)
- 		__array(  char,         comm,   TASK_COMM_LEN   )
- 		__dynamic_array( char,	cmd,	1		)
-@@ -190,17 +209,21 @@ DECLARE_EVENT_CLASS(block_rq,
- 		__entry->sector    = blk_rq_trace_sector(rq);
- 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
- 		__entry->bytes     = blk_rq_bytes(rq);
-+		__entry->ioprio	   = rq->ioprio;
- 
- 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
- 		__get_str(cmd)[0] = '\0';
- 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
- 	),
- 
--	TP_printk("%d,%d %s %u (%s) %llu + %u [%s]",
-+	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u,%u [%s]",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev),
- 		  __entry->rwbs, __entry->bytes, __get_str(cmd),
--		  (unsigned long long)__entry->sector,
--		  __entry->nr_sector, __entry->comm)
-+		  (unsigned long long)__entry->sector, __entry->nr_sector,
-+		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
-+				   IOPRIO_CLASS_STRINGS),
-+		  IOPRIO_PRIO_HINT(__entry->ioprio),
-+		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
- );
- 
- /**
--- 
-2.25.1
+> +			 * here.  A pure flush should never end up here with
+> +			 * the flags cleared as they are completed earlier for
+> +			 * the !feature_flush case.
+>  			 */
+>  			if (info->feature_flush && info->feature_fua)
+>  				ring_req->operation =
+> @@ -795,8 +803,6 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
+>  			else if (info->feature_flush)
+>  				ring_req->operation =
+>  					BLKIF_OP_FLUSH_DISKCACHE;
+> -			else
+> -				ring_req->operation = 0;
+>  		}
+>  		ring_req->u.rw.nr_segments = num_grant;
+>  		if (unlikely(require_extra_req)) {
+> @@ -887,16 +893,6 @@ static inline void flush_requests(struct blkfront_ring_info *rinfo)
+>  		notify_remote_via_irq(rinfo->irq);
+>  }
+>  
+> -static inline bool blkif_request_flush_invalid(struct request *req,
+> -					       struct blkfront_info *info)
+> -{
+> -	return (blk_rq_is_passthrough(req) ||
+> -		((req_op(req) == REQ_OP_FLUSH) &&
+> -		 !info->feature_flush) ||
+> -		((req->cmd_flags & REQ_FUA) &&
+> -		 !info->feature_fua));
+> -}
+> -
+>  static blk_status_t blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  			  const struct blk_mq_queue_data *qd)
+>  {
+> @@ -908,23 +904,30 @@ static blk_status_t blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	rinfo = get_rinfo(info, qid);
+>  	blk_mq_start_request(qd->rq);
+>  	spin_lock_irqsave(&rinfo->ring_lock, flags);
+> -	if (RING_FULL(&rinfo->ring))
+> -		goto out_busy;
+>  
+> -	if (blkif_request_flush_invalid(qd->rq, rinfo->dev_info))
+> -		goto out_err;
+> +	/*
+> +	 * Check if the backend actually supports flushes.
+> +	 *
+> +	 * While the block layer won't send us flushes if we don't claim to
+> +	 * support them, the Xen protocol allows the backend to revoke support
+> +	 * at any time.  That is of course a really bad idea and dangerous, but
+> +	 * has been allowed for 10+ years.  In that case we simply clear the
+> +	 * flags, and directly return here for an empty flush and ignore the
+> +	 * FUA flag later on.
+> +	 */
+> +	if (unlikely(req_op(qd->rq) == REQ_OP_FLUSH && !info->feature_flush))
+> +		goto out;
 
+Don't you need to complete the request here?
+
+Thanks, Roger.
