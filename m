@@ -1,103 +1,189 @@
-Received: from www.kot-begemot.co.uk (ns1.kot-begemot.co.uk [217.160.28.25])
+Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62F9ECC;
-	Fri, 14 Jun 2024 07:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.160.28.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC5A12EBD6
+	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 07:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718350236; cv=none; b=SrGiFoFQl6YVBms1ErarXkYSNVigcsiPeokSs3bvEHRfofesEQLIa/MQULPTkpSZ2hCLRBbV7Xoh2QY+r/6L44PqW0TTAUCIIx4EmJAfEmAR9scMb8y7lYvdgk2ZuSzTUAyozowkpmNkPaHJv0rp5kWa1jwsSjDmC0u8wdYnhZc=
+	t=1718351409; cv=none; b=de6HPgLcJzr8RWR3vvhp91hc2qthz3eD2Gj5F9vZADcrmhvxZrG8UwaCyTnqGntUjA7xtnpcMYL/r3UJX4vg3DcXSmlGC6Vrfhuoj8V/AVtxMMD93YvtbMOwdGblD/Qq58C5M3/brp2hAXV+yWFM0c0Tgqg6grufVCgCxvobyio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718350236; c=relaxed/simple;
-	bh=oLtasVYWOKLHBL3D/xrVIOFLQfLSJvF9p1FP70GLEgI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bg3iy3D+OAhANy+pQjvXWzz1WzUIh4ND6t7aaPn5PZ1iZnaTyAsPawlF5WIIJ/l7qJhCbOE1FAFFqqL1LBL0PsHrDy/ib/OK+KtKCtZn7T+rQQkNi2zL+EsusUXWEIWRjNCVZ9Uan/TBbLQv+hRtbqzPIsHESE0fj3TD5lnHEwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cambridgegreys.com; spf=pass smtp.mailfrom=cambridgegreys.com; arc=none smtp.client-ip=217.160.28.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cambridgegreys.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cambridgegreys.com
-Received: from [192.168.17.6] (helo=jain.kot-begemot.co.uk)
-	by www.kot-begemot.co.uk with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <anton.ivanov@cambridgegreys.com>)
-	id 1sI1NW-004AyG-4w; Fri, 14 Jun 2024 07:29:42 +0000
-Received: from jain.kot-begemot.co.uk ([192.168.3.3])
-	by jain.kot-begemot.co.uk with esmtp (Exim 4.96)
-	(envelope-from <anton.ivanov@cambridgegreys.com>)
-	id 1sI1NT-000Wne-0I;
-	Fri, 14 Jun 2024 08:29:41 +0100
-Message-ID: <b9909e61-7fc2-4d10-8000-d23b7def93de@cambridgegreys.com>
-Date: Fri, 14 Jun 2024 08:29:38 +0100
+	s=arc-20240116; t=1718351409; c=relaxed/simple;
+	bh=Ia62ZQlXIBEvcF6Cn2AYPvblXrtFyt9cKO4gD7R9fhU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LnXNPuQRFI3E2twRRZdKSBJxMw2gC6goD+0Buac+LR+0eY4h5laPKrNKibLE5Fj3qA2xBJpWOTP80H54wIHeXQZasuFPB6JN4NRl46hBlYCZk/oeVGRlx/Jy51Sej88bqNlrgA6tFaHr4H4KB4gpQwNQgvDMrM0m7OX+Sg6tTGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 45E7nkcg067511;
+	Fri, 14 Jun 2024 15:49:46 +0800 (+08)
+	(envelope-from Dongliang.Cui@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4W0rsz65KPz2S7Bgg;
+	Fri, 14 Jun 2024 15:45:27 +0800 (CST)
+Received: from tj10379pcu.spreadtrum.com (10.5.32.15) by
+ BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Fri, 14 Jun 2024 15:49:43 +0800
+From: Dongliang Cui <dongliang.cui@unisoc.com>
+To: <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
+        <mathieu.desnoyers@efficios.com>, <ebiggers@kernel.org>,
+        <bvanassche@acm.org>
+CC: <ke.wang@unisoc.com>, <hongyu.jin.cn@gmail.com>, <niuzhiguo84@gmail.com>,
+        <hao_hao.wang@unisoc.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <akailash@google.com>,
+        <cuidongliang390@gmail.com>, Dongliang Cui <dongliang.cui@unisoc.com>
+Subject: [PATCH v5] block: Add ioprio to block_rq tracepoint
+Date: Fri, 14 Jun 2024 15:49:36 +0800
+Message-ID: <20240614074936.113659-1-dongliang.cui@unisoc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/14] ubd: untagle discard vs write zeroes not support
- handling
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Richard Weinberger <richard@nod.at>,
- Johannes Berg <johannes@sipsolutions.net>, Josef Bacik
- <josef@toxicpanda.com>, Ilya Dryomov <idryomov@gmail.com>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- linux-um@lists.infradead.org, linux-block@vger.kernel.org,
- nbd@other.debian.org, ceph-devel@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-scsi@vger.kernel.org,
- Bart Van Assche <bvanassche@acm.org>, Damien Le Moal <dlemoal@kernel.org>
-References: <20240531074837.1648501-1-hch@lst.de>
- <20240531074837.1648501-3-hch@lst.de>
-From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-In-Reply-To: <20240531074837.1648501-3-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Score: -1.0
-X-Spam-Score: -1.0
-X-Clacks-Overhead: GNU Terry Pratchett
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX02.spreadtrum.com (10.0.64.8)
+X-MAIL:SHSQR01.spreadtrum.com 45E7nkcg067511
 
+Sometimes we need to track the processing order of requests with
+ioprio set. So the ioprio of request can be useful information.
 
+Example：
 
-On 31/05/2024 08:47, Christoph Hellwig wrote:
-> Discard and Write Zeroes are different operation and implemented
-> by different fallocate opcodes for ubd.  If one fails the other one
-> can work and vice versa.
-> 
-> Split the code to disable the operations in ubd_handler to only
-> disable the operation that actually failed.
-> 
-> Fixes: 50109b5a03b4 ("um: Add support for DISCARD in the UBD Driver")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> ---
->   arch/um/drivers/ubd_kern.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
-> index 0c9542d58c01b7..093c87879d08ba 100644
-> --- a/arch/um/drivers/ubd_kern.c
-> +++ b/arch/um/drivers/ubd_kern.c
-> @@ -449,10 +449,11 @@ static int bulk_req_safe_read(
->   
->   static void ubd_end_request(struct io_thread_req *io_req)
->   {
-> -	if (io_req->error == BLK_STS_NOTSUPP &&
-> -	    req_op(io_req->req) == REQ_OP_DISCARD) {
-> -		blk_queue_max_discard_sectors(io_req->req->q, 0);
-> -		blk_queue_max_write_zeroes_sectors(io_req->req->q, 0);
-> +	if (io_req->error == BLK_STS_NOTSUPP) {
-> +		if (req_op(io_req->req) == REQ_OP_DISCARD)
-> +			blk_queue_max_discard_sectors(io_req->req->q, 0);
-> +		else if (req_op(io_req->req) == REQ_OP_WRITE_ZEROES)
-> +			blk_queue_max_write_zeroes_sectors(io_req->req->q, 0);
->   	}
->   	blk_mq_end_request(io_req->req, io_req->error);
->   	kfree(io_req);
-Acked-By: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+block_rq_insert: 8,0 RA 16384 () 6500840 + 32 be,0,6 [binder:815_3]
+block_rq_issue: 8,0 RA 16384 () 6500840 + 32 be,0,6 [binder:815_3]
+block_rq_complete: 8,0 RA () 6500840 + 32 be,0,6 [0]
+
+Signed-off-by: Dongliang Cui <dongliang.cui@unisoc.com>
+---
+Changes in v5:
+ - Remove redundant changes.
+---
+---
+ include/trace/events/block.h | 41 ++++++++++++++++++++++++++++--------
+ 1 file changed, 32 insertions(+), 9 deletions(-)
+
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 0e128ad51460..1527d5d45e01 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -9,9 +9,17 @@
+ #include <linux/blkdev.h>
+ #include <linux/buffer_head.h>
+ #include <linux/tracepoint.h>
++#include <uapi/linux/ioprio.h>
+ 
+ #define RWBS_LEN	8
+ 
++#define IOPRIO_CLASS_STRINGS \
++	{ IOPRIO_CLASS_NONE,	"none" }, \
++	{ IOPRIO_CLASS_RT,	"rt" }, \
++	{ IOPRIO_CLASS_BE,	"be" }, \
++	{ IOPRIO_CLASS_IDLE,	"idle" }, \
++	{ IOPRIO_CLASS_INVALID,	"invalid"}
++
+ #ifdef CONFIG_BUFFER_HEAD
+ DECLARE_EVENT_CLASS(block_buffer,
+ 
+@@ -82,6 +90,7 @@ TRACE_EVENT(block_rq_requeue,
+ 		__field(  dev_t,	dev			)
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
++		__field(  unsigned short, ioprio		)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+@@ -90,16 +99,20 @@ TRACE_EVENT(block_rq_requeue,
+ 		__entry->dev	   = rq->q->disk ? disk_devt(rq->q->disk) : 0;
+ 		__entry->sector    = blk_rq_trace_sector(rq);
+ 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
++		__entry->ioprio    = rq->ioprio;
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+ 		__get_str(cmd)[0] = '\0';
+ 	),
+ 
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u %s,%u,%u [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+-		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, 0)
++		  (unsigned long long)__entry->sector, __entry->nr_sector,
++		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
++				   IOPRIO_CLASS_STRINGS),
++		  IOPRIO_PRIO_HINT(__entry->ioprio),
++		  IOPRIO_PRIO_LEVEL(__entry->ioprio),  0)
+ );
+ 
+ DECLARE_EVENT_CLASS(block_rq_completion,
+@@ -113,6 +126,7 @@ DECLARE_EVENT_CLASS(block_rq_completion,
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
+ 		__field(  int	,	error			)
++		__field(  unsigned short, ioprio		)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+@@ -122,16 +136,20 @@ DECLARE_EVENT_CLASS(block_rq_completion,
+ 		__entry->sector    = blk_rq_pos(rq);
+ 		__entry->nr_sector = nr_bytes >> 9;
+ 		__entry->error     = blk_status_to_errno(error);
++		__entry->ioprio    = rq->ioprio;
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+ 		__get_str(cmd)[0] = '\0';
+ 	),
+ 
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u %s,%u,%u [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+-		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->error)
++		  (unsigned long long)__entry->sector, __entry->nr_sector,
++		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
++				   IOPRIO_CLASS_STRINGS),
++		  IOPRIO_PRIO_HINT(__entry->ioprio),
++		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->error)
+ );
+ 
+ /**
+@@ -180,6 +198,7 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
+ 		__field(  unsigned int,	bytes			)
++		__field(  unsigned short, ioprio		)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__array(  char,         comm,   TASK_COMM_LEN   )
+ 		__dynamic_array( char,	cmd,	1		)
+@@ -190,17 +209,21 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		__entry->sector    = blk_rq_trace_sector(rq);
+ 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
+ 		__entry->bytes     = blk_rq_bytes(rq);
++		__entry->ioprio	   = rq->ioprio;
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+ 		__get_str(cmd)[0] = '\0';
+ 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+ 	),
+ 
+-	TP_printk("%d,%d %s %u (%s) %llu + %u [%s]",
++	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u,%u [%s]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __entry->bytes, __get_str(cmd),
+-		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->comm)
++		  (unsigned long long)__entry->sector, __entry->nr_sector,
++		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
++				   IOPRIO_CLASS_STRINGS),
++		  IOPRIO_PRIO_HINT(__entry->ioprio),
++		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
+ );
+ 
+ /**
 -- 
-Anton R. Ivanov
-Cambridgegreys Limited. Registered in England. Company Number 10273661
-https://www.cambridgegreys.com/
+2.25.1
+
