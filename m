@@ -1,77 +1,80 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF95B1922DB;
-	Fri, 14 Jun 2024 11:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D773195FD1
+	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 12:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718364097; cv=none; b=LQVPEgPe6SnCi32ZR9Tjx/NZHJmAjQQ4NDU5BBucKO4G3RkcYIgktjYc1k9HEpMMqwHMkIznYZYOsdBG+Gnbx7kMGkAcgLm0Vyclo0BRsNHB9lko87MrYgaO+03t4U90CnhIAGzRe4YUROd3CLQV1q5gyh5F1J2JCcYazNhs7yg=
+	t=1718367699; cv=none; b=nXMH5ZJj9n4w4p/YzHQ7V6YJmRKg+L8HroD43sWL3D71nPNzbUXDQEPmYJT6Hl87gNipzEBl/qJVgh31YAtYvHle/YKtNUixJzWmN3T3HkiSCFHBQqbnQ9RvdbZByhJwgJhs4USrIQgmY5Un74BW6N/uCOZWX5g14Z4H++82RA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718364097; c=relaxed/simple;
-	bh=Fk2bp+GIffzDwEC7aQtOfpug0emOQaAVjf3NSFbxpeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tcxkOlQTAnZe0c75SBLaNZOhxlF14UhGqRvN6jkhmFy1SnJGvB39Qf0q4xn3kEUOabfxrK+T0I00LiL+8EChtpmJrrMlgRyLvrfbdu6W/9mBeWjT0vDGSGKZdAhXz9URAn1gNZANMc3ayoW9Yfwav2ha7gJ2Xntm8nOgyjma+EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 017D43372A;
-	Fri, 14 Jun 2024 11:21:34 +0000 (UTC)
-Authentication-Results: smtp-out1.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E9D9D13AAF;
-	Fri, 14 Jun 2024 11:21:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /SALOb0nbGa/FgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 14 Jun 2024 11:21:33 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 8C4EAA0873; Fri, 14 Jun 2024 13:21:29 +0200 (CEST)
-Date: Fri, 14 Jun 2024 13:21:29 +0200
-From: Jan Kara <jack@suse.cz>
-To: Cyril Hrubis <chrubis@suse.cz>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jan Kara <jack@suse.cz>
+	s=arc-20240116; t=1718367699; c=relaxed/simple;
+	bh=vVMnkKP23EquRnJbPIazwvrYt+/IR7+ZK7NhvQrGL3k=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=A0yWK5PDhVowbzbGT2KkLRBBK47SGyXcGzm3gjYfHJkQEpATbkn8lx+fdFsiA1Gall8VN6Cga1dQoxZXZynH7J9sdbeQSPXCaGIo6dRSvus4A4bokarzjmEqNI+18y/EgmIOer7oo5RmnwHF/QYNAAIuQGijK6RbIVGo2oukL5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NjiY0UgO; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NjiY0UgO"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f715fd5e60so1936905ad.2
+        for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 05:21:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718367697; x=1718972497; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KBGz84Kp8zPxGVcYMqV/SC8aRcbUSCJ8X0DqtX5D0Kk=;
+        b=NjiY0UgOw6ApJ7NE+0JfNxdlS1kqzqHOZuCwSW9Wprg6hXrNyYDCx2NC7o66tPKTsE
+         WP/Y5GRqKDV4bFS6vvCkzPLI5Lbnn4e4USFv+y+0/RRkPtfWZwsPE1cyWb1fS1sDaHbj
+         vDSVuwC6rDSX47dcqv9C33zPKJcZP/b2FeotCnBWi2F8owsC2ToDBOaXqyIk6FqLROD+
+         FodCTNpnpeTZ+jeEvjAX+FLguRX5F75GT7g9cJhcGx/YcaP9bwIhqTS2Pu5X2eRBM8OQ
+         pHKIHO/aDEMGvxYQIXNQ7DsJqUFaqLdpwsI4ity9wq+zVD5/f+Vep9ONjrY312gOTMYk
+         5hcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718367697; x=1718972497;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KBGz84Kp8zPxGVcYMqV/SC8aRcbUSCJ8X0DqtX5D0Kk=;
+        b=Y40s+9iu4udSVbvT9GownyZBkduh9N88iOdNt/ff0xqCiy5vw/tiaC31xjXgTPnVsx
+         eizQQt+WbeniJy8EatXhDaAbLC4n3MCFLzozSHzOnyNWBevuYvz8pwp2GwVWG+R7hzxJ
+         EskYhzsyGiWZ4UTusWbhyiTbVxTNcJRW4GLcrSYOz6x+bSYbzmTaB3gsC/QxBX9bw6Qh
+         x+1BVjx7dnIS5uv+44FjJjy+OJ1g1iz9/sxnn8t2Id8SXeIywVr0C0r4zS2mvD5inM51
+         PLRrbmGBuscXit8Uld6iRWBr2HbEteBghS22zz22r3aAJlm7Ya12e9ODZOFZMGeI4Jea
+         2xcw==
+X-Forwarded-Encrypted: i=1; AJvYcCVckKi68aHbRVbbopOesZmcA1Bgkx7CbMM8T1p33og2SjgyRYCbP5N+nDf6xX2j76W+wlN6DVed9peyOrKuw6AVsIZVx+DL3bwaFu8=
+X-Gm-Message-State: AOJu0Yz5zThQfL41U2BFhXx+8EE1mqAf45Cjw11wz9YLSYpsSt4Z9xZB
+	KH2QMI31SuDdM0c+74svknxgd6pbIkOUIFyS+f8/lWVV0zyZNU4TytmpWEWPIws=
+X-Google-Smtp-Source: AGHT+IGgrI5Z53eE6slIeb5D//L9zkN9U1Fpf2jCXTu1Zs6NpCOAXPFi1P0d0VowXih3bXAEQZq2Pg==
+X-Received: by 2002:a05:6a21:183:b0:1b2:53c5:9e67 with SMTP id adf61e73a8af0-1bae8259588mr3195150637.4.1718367697350;
+        Fri, 14 Jun 2024 05:21:37 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855f3947asm30750075ad.264.2024.06.14.05.21.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 05:21:36 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Cyril Hrubis <chrubis@suse.cz>
+Cc: Jan Kara <jack@suse.cz>
+In-Reply-To: <20240613163817.22640-1-chrubis@suse.cz>
+References: <20240613163817.22640-1-chrubis@suse.cz>
 Subject: Re: [PATCH v2] loop: Disable fallocate() zero and discard if not
  supported
-Message-ID: <20240614112129.s7hvcyqmnwmngiko@quack3>
-References: <20240613163817.22640-1-chrubis@suse.cz>
+Message-Id: <171836769633.229112.12813343173922846778.b4-ty@kernel.dk>
+Date: Fri, 14 Jun 2024 06:21:36 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240613163817.22640-1-chrubis@suse.cz>
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Rspamd-Queue-Id: 017D43372A
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-On Thu 13-06-24 18:38:17, Cyril Hrubis wrote:
+
+On Thu, 13 Jun 2024 18:38:17 +0200, Cyril Hrubis wrote:
 > If fallcate is implemented but zero and discard operations are not
-     ^^^ fallocate
-
 > supported by the filesystem the backing file is on we continue to fill
 > dmesg with errors from the blk_mq_end_request() since each time we call
 > fallocate() on the loop device the EOPNOTSUPP error from lo_fallocate()
@@ -79,87 +82,16 @@ On Thu 13-06-24 18:38:17, Cyril Hrubis wrote:
 > since the blkdev_issue_zeroout() falls back to writing zeroes which
 > makes the errors even more misleading and confusing.
 > 
-> How to reproduce:
-> 
-> 1. make sure /tmp is mounted as tmpfs
-> 2. dd if=/dev/zero of=/tmp/disk.img bs=1M count=100
-> 3. losetup /dev/loop0 /tmp/disk.img
-> 4. mkfs.ext2 /dev/loop0
-> 5. dmesg |tail
-> 
-> [710690.898214] operation not supported error, dev loop0, sector 204672 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.898279] operation not supported error, dev loop0, sector 522 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.898603] operation not supported error, dev loop0, sector 16906 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.898917] operation not supported error, dev loop0, sector 32774 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.899218] operation not supported error, dev loop0, sector 49674 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.899484] operation not supported error, dev loop0, sector 65542 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.899743] operation not supported error, dev loop0, sector 82442 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.900015] operation not supported error, dev loop0, sector 98310 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.900276] operation not supported error, dev loop0, sector 115210 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [710690.900546] operation not supported error, dev loop0, sector 131078 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> 
-> This patch changes the lo_fallocate() to clear the flags for zero and
-> discard operations if we get EOPNOTSUPP from the backing file fallocate
-> callback, that way we at least stop spewing errors after the first
-> unsuccessful try.
-> 
-> CC: Jan Kara <jack@suse.cz>
-> Signed-off-by: Cyril Hrubis <chrubis@suse.cz>
+> [...]
 
-Thanks. Besides the spelling fix the patch looks good to me. Feel free to
-add:
+Applied, thanks!
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+[1/1] loop: Disable fallocate() zero and discard if not supported
+      commit: 5f75e081ab5cbfbe7aca2112a802e69576ee9778
 
-								Honza
-
->  drivers/block/loop.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 93780f41646b..1153721bc7c2 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -302,6 +302,21 @@ static int lo_read_simple(struct loop_device *lo, struct request *rq,
->  	return 0;
->  }
->  
-> +static void loop_clear_limits(struct loop_device *lo, int mode)
-> +{
-> +	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
-> +
-> +	if (mode & FALLOC_FL_ZERO_RANGE)
-> +		lim.max_write_zeroes_sectors = 0;
-> +
-> +	if (mode & FALLOC_FL_PUNCH_HOLE) {
-> +		lim.max_hw_discard_sectors = 0;
-> +		lim.discard_granularity = 0;
-> +	}
-> +
-> +	queue_limits_commit_update(lo->lo_queue, &lim);
-> +}
-> +
->  static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
->  			int mode)
->  {
-> @@ -320,6 +335,14 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
->  	ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
->  	if (unlikely(ret && ret != -EINVAL && ret != -EOPNOTSUPP))
->  		return -EIO;
-> +
-> +	/*
-> +	 * We initially configure the limits in a hope that fallocate is
-> +	 * supported and clear them here if that turns out not to be true.
-> +	 */
-> +	if (unlikely(ret == -EOPNOTSUPP))
-> +		loop_clear_limits(lo, mode);
-> +
->  	return ret;
->  }
->  
-> -- 
-> 2.44.2
-> 
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
+
