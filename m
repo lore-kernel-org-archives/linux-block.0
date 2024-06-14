@@ -1,128 +1,121 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD2B195F1D
-	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 12:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1C6C152
+	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 13:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718369215; cv=none; b=O3PLd4wWZRV/iOoqS08KHSOJfLKkp9F5POUGoSnt9qTJisrZU+fqWcDlvkmriMqjXCbn8SWm/OSpPeT46WMr+o2qXw9rnet/VOLNsM3ZHWRkj/rM9XNzDR8FrzT5D42Ssig2873LuV6AYeVE7bWY4suY2DlPz/PzrPJ0ne0Zxlk=
+	t=1718372735; cv=none; b=VaL1x6wiu2lvuBYNiV5OBf3vr2UHfiEQYukoiY3fChp/X9u6bnk2b+Fc6eMG+C3SGLWge/fCfvVCT81GS/sVCxkhHhL36McXc5xlhAIF6WJ3P48hMDHFaHoS4mVrxM5rUGkVUvPKJMWUBrzHfhiO6om/AZxdks7x3FVZ0t8tMYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718369215; c=relaxed/simple;
-	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=CmlB8AGLP26BzYsOsGadHSRgYEroH5US2DzXCoXDr9HnqBVyVtDNRnDK5/fMIzq0W+DdZZTRYybztq/S0Jm1HT+vvBq2zAakHAooqil6C2qqCxmCoDCk+KlDu+vtpGEstecWef8hrQQ1jB6ywXEpHr4Ms4XEnDqGY/FTHNpsbUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=F1XzyBcu; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1718372735; c=relaxed/simple;
+	bh=bkw/wY75bOQcJPR9sExzb0NjpK0DZZ2z5tR/Pyk+NQs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=kGl143Ls8qhLEhhY/rt7pxU2uXo9gg0yZfIN5BYAPYhjhGHm1EeWHDqj87Mm/+zHMH4IoKbAbs+eXcmaELmQ7RRn/x9CPs71XAODAIYJA8WJuxR39ZUSi78rNHGKI/2QCup9EocPYBCN8trSyOW8nOuk+vIHRbl0Zq6AV8y9BYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xGiXGTEO; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="F1XzyBcu"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240614124651epoutp01b13fc9bdc5667fdecb20e37957e2edfd~Y37GGZGH71862718627epoutp01T
-	for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 12:46:51 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240614124651epoutp01b13fc9bdc5667fdecb20e37957e2edfd~Y37GGZGH71862718627epoutp01T
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1718369211;
-	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=F1XzyBcu6Uq2gV4WLnJ6bOAtm4OU6+ML67ABjy3yF7niqAtGq5yznIA+zDHFBhjgq
-	 PypmrhxUQcAPI6tQUu4J4DEkcFYLnjbaPEReVeRCU1lrOlT4wtKKr8s0ceCKUD+8zB
-	 Sp103kGuqffjpwDWZbzw2E7d5F6NIBNzS54uozQ4=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240614124650epcas5p1829a89baff858f7e4b97c614d22f7990~Y37E9PJ9c2157921579epcas5p15;
-	Fri, 14 Jun 2024 12:46:50 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4W0zYj00kxz4x9Pr; Fri, 14 Jun
-	2024 12:46:48 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	E0.AF.19174.8BB3C666; Fri, 14 Jun 2024 21:46:48 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240614124648epcas5p4a2a09d0afa38f48df010836255055259~Y37Dd8bjT0231702317epcas5p4S;
-	Fri, 14 Jun 2024 12:46:48 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240614124648epsmtrp2711d90cd2d9a3ca4a853807fc67e0ac0~Y37Dc0EAz3233032330epsmtrp2O;
-	Fri, 14 Jun 2024 12:46:48 +0000 (GMT)
-X-AuditID: b6c32a50-b33ff70000004ae6-11-666c3bb8fa8d
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	0D.83.18846.8BB3C666; Fri, 14 Jun 2024 21:46:48 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240614124646epsmtip12aa138e5a5daa502a7a3b1f8f8cc43a1~Y37BIhnaI0421104211epsmtip1F;
-	Fri, 14 Jun 2024 12:46:45 +0000 (GMT)
-Message-ID: <675ba756-5361-f98a-52ca-2433c6669451@samsung.com>
-Date: Fri, 14 Jun 2024 18:16:45 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xGiXGTEO"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-254e7bdfac1so171699fac.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Jun 2024 06:45:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718372732; x=1718977532; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XwHxi2gZBAyY9Pth3TgUjB1fWtcztmwkH5X6Og4iAe4=;
+        b=xGiXGTEOhfgEbKEFyRWOg6I/pC9x7x589PfnPJk93gj1WAdyCHk2gHWcGHokTRQRev
+         QaNPnFngnFIYygJhYyyO6FpIJ+MSe9+7jRYx+6fkoa9eR1Aft/nRlXA7s6+z4Tt30gDl
+         ZbcFWf/ZvXLGN17Hth8n7MlTgfbilkP78erB+SH/OvRDIsIa3SnbBcQBhkZ03UhmUfwr
+         r5yJb0bpo+aelDqjgcMu/8IlH8Sw/0snBY4iOoWenO3cL4u+P6VoF6VtcDf0eRkTTlD6
+         obSl6EUdQstJRGGoItUP2ozmfj37yrzdls278gm2a8yBwVd4ECGSi7fq7KgLtD0OxCwr
+         JE3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718372732; x=1718977532;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XwHxi2gZBAyY9Pth3TgUjB1fWtcztmwkH5X6Og4iAe4=;
+        b=jqxDv81ZA/TpnrXvJgTcDfQfJzjG+5swCL1cAdOj+nu65IPrtRvHqWhcuvUEDcpHLx
+         mT4Bxd1+VYPNTNDy2fAy8xA4lIoqvJRSAzSw3/kEV8Vr+JFGQL7Od3abVX7Uihg+P0S0
+         Dn7V05gKVStLUaiqaV3786Ci7lEhUA1z4qb60YhcpmHpfCof2apRBfbUITj/ytY5ujXl
+         LY6Y2czTGTTrkSnfSs47sq/MS1JKFDYsRfZtTY848cygL6N1EZLH9gLmihBDohtfdOPA
+         tG2XozOTZRTN8/8NCeDLv0Ul0Qf5ZyhjOzeh9c560YDhxw9XoQ0hCYLWFlfPgYV4xnMy
+         w7yg==
+X-Forwarded-Encrypted: i=1; AJvYcCUcCWYH6IHyGO8IcymP2mXsbZtjs4Ij237jcFovlMLzZHdX2LG2pAQ+nX4AkKlsj0FJHYkbuslUMRU9HyOC9IeZaokCx3ZXvTbbyyU=
+X-Gm-Message-State: AOJu0YySA2fGbSVNMidS86OFnJ5Vz1IfmWKcUKdXv6WE7h3XeaPil2j7
+	TJBAwx5tA/W2Oe68EyT2nrTn5//7l3/Jh1YwWbkZuCJ1pwcsZSvXuV+oQoD2Ay+bbd1vxnadlbw
+	Z
+X-Google-Smtp-Source: AGHT+IHPJ3jg4O4CayCJVLz/XAlaPDCafPLLXbngTwTHtLC5YfmxuMPfjWHQ9h4w7Y2VgmE0awSFQQ==
+X-Received: by 2002:a05:6870:f112:b0:254:7e18:7e1a with SMTP id 586e51a60fabf-25842c5e66emr2860477fac.5.1718372732531;
+        Fri, 14 Jun 2024 06:45:32 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc97fd59sm3043883b3a.84.2024.06.14.06.45.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 06:45:31 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, 
+ Damien Le Moal <dlemoal@kernel.org>, Bart Van Assche <bvanassche@acm.org>, 
+ Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>, 
+ linux-block@vger.kernel.org, Andreas Hindborg <nmi@metaspace.dk>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>, 
+ Greg KH <gregkh@linuxfoundation.org>, Matthew Wilcox <willy@infradead.org>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Wedson Almeida Filho <wedsonaf@gmail.com>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+ Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Yexuan Yang <1182282462@bupt.edu.cn>, 
+ =?utf-8?q?Sergio_Gonz=C3=A1lez_Collado?= <sergio.collado@gmail.com>, 
+ Joel Granados <j.granados@samsung.com>, 
+ "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>, 
+ Daniel Gomez <da.gomez@samsung.com>, Niklas Cassel <Niklas.Cassel@wdc.com>, 
+ Philipp Stanner <pstanner@redhat.com>, Conor Dooley <conor@kernel.org>, 
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
+ =?utf-8?q?Matias_Bj=C3=B8rling?= <m@bjorling.me>, 
+ open list <linux-kernel@vger.kernel.org>, rust-for-linux@vger.kernel.org, 
+ lsf-pc@lists.linux-foundation.org, gost.dev@samsung.com
+In-Reply-To: <20240611114551.228679-1-nmi@metaspace.dk>
+References: <20240611114551.228679-1-nmi@metaspace.dk>
+Subject: Re: [PATCH v6 0/3] Rust block device driver API and null block
+ driver
+Message-Id: <171837272952.233538.14745417711842930177.b4-ty@kernel.dk>
+Date: Fri, 14 Jun 2024 07:45:29 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH 08/12] block: use kstrtoul in flag_store
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, "Martin K.
- Petersen" <martin.petersen@oracle.com>
-Cc: Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka
-	<mpatocka@redhat.com>, Song Liu <song@kernel.org>, Yu Kuai
-	<yukuai3@huawei.com>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg
-	<sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, Hannes Reinecke
-	<hare@suse.de>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20240613084839.1044015-9-hch@lst.de>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTdxTH97u3vdwamZdK019YovUumMEGttqWWwXdg5hrRjY2/tgkcdCU
-	W0BKW/uYCnErgzoGQwTdhCopdKgTMmSFMBA0Sl1gEwS28OpiB4E6HkNwLAEndGu56Pjvc875
-	npzX74ej/GksDM/UmhiDVqkhsU2cFldEZFTrPo1a7PLFUPUPSjGq2lHFoToc5Qh1rf5HhCrv
-	HAKUd9CGUDfdr1L2K94g6nP7DUAVD7di1NUuH0KVFQ76tcsrXKphdp5DdbtforqurmLUpRrs
-	9RC6z/M9hy64O8elf+010866LzC6qfZTeqqpEtDtoxaMLsl/hNGPvW4OPX9r0B+8l0svOrcl
-	bk7Ois1glGmMQcRoVbq0TG16HPl2UspbKTK5WBIlUVAxpEirzGbiyPiExKiDmRr/VKToY6XG
-	7HclKo1Gctf+WIPObGJEGTqjKY5k9GkavVQfbVRmG83a9GgtY9orEYt3y/zC1KyMld57XL30
-	xFDVGcQCoooAD4eEFDaPXUaLwCacT3QA+JnNg7DGXwD29Q6jz43Vy7NBz1K+Lb7AZQNtAE6X
-	+NBAgE/MAdj9Z3iAg4n90OO4gAWYQ4TDQk91EOsPgT9VTnICLCBU8EnR7TXNViIWtuR5QYBR
-	Qgjdk3YkwKGEGT6t9a61hBIuFDZZCv0iHMeICNh/zhzQ8IjdcLjlfhCbux3+MHdprWtILOOw
-	q+0BwnYdDy/ebkRZ3gpnuprXpwmDi49uYiyr4C+V99f1JjjRcWedD0Drz6VooC7qr3v9xi62
-	1ouw5OkkEnBDIhgWnuaz6h3QU+7lsiyE4xW160xD3+g8YPf2HYD1j68HnQUi24a12DaMb9sw
-	ju3/ytWAUwfCGL0xO51RyfSSKC1z/Pm9VbpsJ1h785GJraC+cTW6EyA46AQQR8nQYFvNUTU/
-	OE15Mocx6FIMZg1j7AQy/4HK0DCBSuf/NFpTikSqEEvlcrlUsUcuIYXBs9aqND6RrjQxWQyj
-	ZwzP8hCcF2ZBjvXkR3dy+yN3/Fbj5dkzS+ZfG/hAMpncYPUt7uwb63U6/ijfecrVFH90S1X7
-	vg5R1bx6QF1w+OWFD9/0Ji3yBEN527YLj3d89PBv0jYhlP1bxHgq7BON/7iv9GyZGoEY2p/z
-	yYHxpIKG4gHTyNTMocb6iW9KhZtVIQtxPTnFg4roogFBeGbMMcF750+OWS+ucGOW1AmOLMVo
-	bo1rQd6sC/nyGjd5xtpe8vWZhwqX5e4LWOy7mr2nlie+aj6C171f1l3Qe6tN4cpNVY/zpi2p
-	d5acsOncK76Rijd8S1P5tamH3HGnnYKDESdKZfY9qb+v5CmWeKEZjsp3EqoPPzkiPttNcowZ
-	SkkkajAq/wM8vNUffAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrIIsWRmVeSWpSXmKPExsWy7bCSnO4O65w0g9WzJS1W3+1ns1iwaC6L
-	xZ5Fk5gsVq4+ymQx6dA1RounV2cxWey9pW0xf9lTdov2+bsYLbqv72CzWH78H5PFxI6rQLU/
-	/rBarHv9nsXixC1pi+PL/7JZzFnI5iDocf7eRhaPliNvWT0uny312LSqk81j85J6jxebZzJ6
-	7L7ZwObR2/yOzePj01ssHu/3XQVKnq72+LxJLoAnissmJTUnsyy1SN8ugSvjz9nTrAUmFdfm
-	9jE1MOp2MXJySAiYSKzons7axcjFISSwnVFiSvNGdoiEuETztR9QtrDEyn/P2SGKXjNKTHu0
-	ggkkwStgJ3Fv0XQ2EJtFQFWi494Cdoi4oMTJmU9YQGxRgWSJl38mgsWFBWwktjU+ZQSxmYEW
-	3HoyH2yOiECpRP+/GUwgC5gFDjJLbHiwFOqktYwSn5auBurm4GAT0JS4MLkUpIFTwEji+rZz
-	7BCDzCS6tnZBDZWX2P52DvMERqFZSO6YhWTfLCQts5C0LGBkWcUomlpQnJuem1xgqFecmFtc
-	mpeul5yfu4kRHMtaQTsYl63/q3eIkYmD8RCjBAezkgjvrIVZaUK8KYmVValF+fFFpTmpxYcY
-	pTlYlMR5lXM6U4QE0hNLUrNTUwtSi2CyTBycUg1M3msK3+70l2NbLWLv3j+ble+Wu6HH74vL
-	Zsy+3SqX8DJ41V71209mWSxmebqvQfjhp8TIGx86BTzjL64O63uydt/fN6LMKiLTzs4ukjFl
-	vRQb6sCYEqqcu8THOP7/2knHSoua1d7L7tg/PSbP4uaMK1bLJ4osEL7Reuk204GE+FdBG7U2
-	HvrsNeV+5Y5rrwN9D4XP9bDMZd6je+vmw33bpr2wfrv57/Ml2eJta/wCBac+ehDf23xx2cJi
-	5lmnzsRuFnCeecRvG3uQ4YfD56zPTz1Zz3XKOnuW1z4H5ay3dp5m07PiXzSt0bihL8QTxqF2
-	b+Vpn6hXsjUSWu8TGS6f/LDK7oT9oh1C5tO0KtLvBSmxFGckGmoxFxUnAgCsmPLGVAMAAA==
-X-CMS-MailID: 20240614124648epcas5p4a2a09d0afa38f48df010836255055259
-X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240613085156epcas5p255d8a6182fa283caf1c7cd6938e19c49
-References: <20240613084839.1044015-1-hch@lst.de>
-	<CGME20240613085156epcas5p255d8a6182fa283caf1c7cd6938e19c49@epcas5p2.samsung.com>
-	<20240613084839.1044015-9-hch@lst.de>
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.5-dev-2aabd
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+
+On Tue, 11 Jun 2024 13:45:48 +0200, Andreas Hindborg wrote:
+> This series provides an initial Rust block layer device driver API, and a very
+> minimal null block driver to exercise the API. The driver has only one mode of
+> operation and cannot be configured.
+> 
+> These patches are an updated and trimmed down version of the v2 RFC [1]. One of
+> the requests for the v2 RFC was to split the abstractions into smaller pieces
+> that are easier to review. This is the first part of the split patches.
+> 
+> [...]
+
+Applied, thanks!
+
+[1/3] rust: block: introduce `kernel::block::mq` module
+      commit: 3253aba3408aa4eb2e4e09365eede3e63ef7536b
+[2/3] rust: block: add rnull, Rust null_blk implementation
+      commit: bc5b533b91ef0b8a09fe507e23d1c6c43c1fb0f5
+[3/3] MAINTAINERS: add entry for Rust block device driver API
+      commit: d37a9ab8331cfc0fc2eac0480f0af624c0144a92
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
