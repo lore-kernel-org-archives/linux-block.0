@@ -1,104 +1,108 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32018A20
-	for <linux-block@vger.kernel.org>; Sun, 16 Jun 2024 02:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F2245979;
+	Sun, 16 Jun 2024 18:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718505836; cv=none; b=a1PuNzEjOe+b7q/YjNKvn8ldN0Vmn4oJ+homMrXdtZzAZxHk6uZ3fFmBLx/22WvFx46158Xk/l35OPuHcK9/oLZ/8keKNWrLRauulr/pPK3uvyMRQhJcQfMWYUysJqlJfpHQNSZaQF86bdRgPO3yFRNuZdrcGYQx5G3hKevQxmg=
+	t=1718561303; cv=none; b=ij87apTDf2e3N29/7LaMswcdYreXTtUnlGYazfw3zaWStuWeJqppzzaqnWFwv0yxTzE0LIUyjoxzVsCKz7UGUleSAFoH3H6ezM5YNJkUCY+681OzyGdcHyPLly2IpAWJRQgbs5F1EHEWtvnPf5wDIcqKvO650exSYQjzr2a0oJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718505836; c=relaxed/simple;
-	bh=JrEOKQsZpx/43K9L0BGq2i0RXpBV5EJVJt92kSSy7a8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=H5grP+9t8aXQpXMpXt0VEzZ6UVS0QUrNttLXC4YF5Do1jxjsvd8mg226dvwGEzDefPKXxDvCL8pfnGq9eW4hCKF1nh0NftNWPQ7OItBkaDrMyZV9d9hlk9DR5TSDKP5B6bSKSJgR/RxGJPaPlch3qcdMm4JC/byTx4bGqfdVHBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Pp7tutGd; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1718561303; c=relaxed/simple;
+	bh=1uhZvGKbri1xOX6rBi5/6me1PZnwzaECzzClFjvB8YA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jIyCbyaQJXcAphI+WDxVPDze9YgusiE+zfYJ8qZH9grQCSHrVf3MEf5e2959XsV81ZEfiF/ICQQ42blyH5qREECwgaeOn11Co718AEdyOOCb1hF95HSpbMZEWunui6kSgomqtVU1tQXCeuzHVfWyLbJpJcSVoF3SLHUZ0EH84S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bw5lCHO/; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Pp7tutGd"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6f91cb79ad7so197957b3a.3
-        for <linux-block@vger.kernel.org>; Sat, 15 Jun 2024 19:43:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bw5lCHO/"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-421757d217aso38867855e9.3;
+        Sun, 16 Jun 2024 11:08:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718505834; x=1719110634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rR+Kktv2CqIfMF5pjxxJeGplqIvq6qtrGLHRMhsS3jE=;
-        b=Pp7tutGdcDTI26/HVSYVCkE50AQ91LtL/WdCvVU7CrkdQjM+mSxvlTefGzVIDL44iB
-         uHtjvuTwtc/ZBMd3FUPy+gtPZ9nKLfN4EFsvXp+OGD9LjP5H+OC+Xx2mCpbeH7oL06/R
-         /BL9ov4Z+Fr5zZ6VGqG4pYb7lTjK+hzZTuST277V68EHYJPm8x/udBEYAunsRb28ytJ9
-         O0Lr/V2gqyT2tHl38/ep03SMHYqBl9nigF9sYMikhQz6RKmG4gM16TQ3AqmoGWCbPrM/
-         UCJLucMM1g8q7Kfxid8IXCghg4M4CX6D3X3Lqs0cCAsT1mIUkCDP389RCH2kIZRxB09T
-         znPA==
+        d=gmail.com; s=20230601; t=1718561300; x=1719166100; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xmcC3FJvn7LpiPvaCityDyaQLc5wEQ3ToOQhM/Ofe5A=;
+        b=bw5lCHO/2FKjfT7k8LJG9u8/2O0OWeLF46OPzzw0gE4q2qcb4mBY+ciONGrFeMP5wP
+         /R4mF8L9+5ZpMQv1m/64y2mKpJ1gmycY8h01d/x2CjHNIGddiNSp3zgoX7VLveDlr97E
+         ipdrla5w95BAdt8jboEFfEUaw3DFmaxThMQwCMddkJkua40qwgi2oLvTrzDF3z88rLvs
+         yaBusCl6OzCuwXheo2j0nkfGWJYIjgkoMjc+HUmpYaHbkI9bXYdEVjAvz5aCNezP6RpA
+         u80mbjPXg+HvNsCG9JH3xm1b9bYQiecm7j8iiMsJfl/xS7tfg8sczYqfUQVC7aeGjS4Z
+         3LEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718505834; x=1719110634;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rR+Kktv2CqIfMF5pjxxJeGplqIvq6qtrGLHRMhsS3jE=;
-        b=xCnhJBGILu2F9NW8ezQlJqPXshv1v94XJ8eUDlRxOytqXg7UeT+EQdK5xuUzn1SA5u
-         rq8zeiu0g1ghXDguQWHHeDRyRdsDDA8LQCakPve9ivj70abm2o9kP3D89vvYUoFy1mFi
-         d9Mb/6cu184EcbEJ4bKSrB6QezSBh+7/CAjc0S39HQvyj4hJo4fTADRc0VcLJJm9Ij4z
-         FAfI+VCfiGJ/qJMtKvPqdDQ8gpgt0690g9N/bUviXLJjSvaqBUBZ/X/ktiShYDEq0/Iz
-         r7z/1m2bs1r9nVvFb6UlIG9dJoOVlVrjdpxB2tNHjCmDqjeXY8iTWf8lgYrRFDEqq74N
-         E3yg==
-X-Gm-Message-State: AOJu0YzBIP9pPLTIbfaxAng77STm/E01Lni/ZyB7e2JWzP++zWVmkdka
-	RVz09oDG3c7F332KU2o6Fbm9DY76qjsRK+R/yY6mW6phrRw8J1zTL1/f2A1lDLw=
-X-Google-Smtp-Source: AGHT+IG1i5cgwJVA8vh9SbkwE5581/PsKNj+PYwV5FvPNqF/jZtOgojMNgqOAycYGJO5VXIAErcOGQ==
-X-Received: by 2002:a05:6a00:310d:b0:704:23c3:5f8a with SMTP id d2e1a72fcca58-705d711f80emr7239744b3a.1.1718505834411;
-        Sat, 15 Jun 2024 19:43:54 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705ccb6b9b3sm5283246b3a.166.2024.06.15.19.43.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Jun 2024 19:43:53 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
- Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, 
- Benjamin Marzinski <bmarzins@redhat.com>
-In-Reply-To: <20240611023639.89277-1-dlemoal@kernel.org>
-References: <20240611023639.89277-1-dlemoal@kernel.org>
-Subject: Re: [PATCH v8 0/4] Fix DM zone resource limits stacking
-Message-Id: <171850583327.9871.12800424447881124530.b4-ty@kernel.dk>
-Date: Sat, 15 Jun 2024 20:43:53 -0600
+        d=1e100.net; s=20230601; t=1718561300; x=1719166100;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xmcC3FJvn7LpiPvaCityDyaQLc5wEQ3ToOQhM/Ofe5A=;
+        b=vpdhqeR+/ler410HXxBN9MrRVuD2GaeA15J4YtBeTxQtZGegMw5268vFyOZufAmGxm
+         MvBPLaNhjw0Y+Ah2xHaRFi8CK1qiW7hWP06uW5JLL2zSMxBkXSwpFPccw09G4b9XrJm2
+         rcBSHdDUY3PryZb9ZFDw1kyiVRd2KgqXW6xQYEmbJq1bCGm+MsG9p5o3dsm9y4qhRyU+
+         tOJMDjmOCNKlLzthqKJY9gwRMOKpcz9+8GEsoPOa2HLuiqRR7DwBD7UpE7XAMYwiIFB9
+         yUOU8nI5Z8OHMKKc4p09HTw9d8bTRrtzLid/RtuHHJjydlOUQ+0aLVg4dwbJ6zxCLvev
+         Fmyg==
+X-Forwarded-Encrypted: i=1; AJvYcCWAfErwxtuaR3iyUqs1zIhvaXmbP8109/CFAljUBD00DrzCfNNKKaw3JQ9spp23GjMW3JfnnYLvH2HRfJmXsRia8YxH2h5vUj0Ft8iK0obpJtQ+Nm2444kVECP/siLux377MPDb9Q==
+X-Gm-Message-State: AOJu0YykqBpqgsF3S7cFx8YKQzTRzPPtCK/FJbDCreqjoC0gtvUKxMaK
+	bXqVFra/5IZJANBHoUJ25QEY++drn/BXikUuLLPJtbZRdO8lF/oX
+X-Google-Smtp-Source: AGHT+IGK6olIz37cd2rcPur+t/H736lQyx9+D8tcxsS6flf5NFktKp0ueqO1Ip5nuzh0MuWGRMMoGQ==
+X-Received: by 2002:a05:600c:5487:b0:419:a3f:f4f6 with SMTP id 5b1f17b1804b1-4230481bc2fmr76578125e9.8.1718561300485;
+        Sun, 16 Jun 2024 11:08:20 -0700 (PDT)
+Received: from [192.168.42.249] ([148.252.147.74])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286eef970sm171302355e9.10.2024.06.16.11.08.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Jun 2024 11:08:20 -0700 (PDT)
+Message-ID: <0a9740ce-c78e-402b-99f6-046864025c54@gmail.com>
+Date: Sun, 16 Jun 2024 19:08:22 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 4/9] io_uring: move marking REQ_F_CQE_SKIP out of
+ io_free_req()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
+References: <20240511001214.173711-1-ming.lei@redhat.com>
+ <20240511001214.173711-5-ming.lei@redhat.com>
+ <f7b3164a-b9a5-4c61-84c9-ff5b18e2e92a@gmail.com> <ZmhQ8X6q2RvKpn38@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZmhQ8X6q2RvKpn38@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.0-rc0
 
-
-On Tue, 11 Jun 2024 11:36:35 +0900, Damien Le Moal wrote:
-> This is the updated patch 4/4 of the series "Zone write plugging and DM
-> zone fixes". This patch fixes DM zone resource limits stacking (max open
-> zones and max active zones limits). Patch 1 is new and is added to help
-> catch problems and eventual regressions of the handling of these limits.
+On 6/11/24 14:28, Ming Lei wrote:
+> On Mon, Jun 10, 2024 at 02:23:50AM +0100, Pavel Begunkov wrote:
+>> On 5/11/24 01:12, Ming Lei wrote:
+>>> Prepare for supporting sqe group, which requires to post group leader's
+>>> CQE after all members' CQEs are posted. For group leader request, we can't
+>>> do that in io_req_complete_post, and REQ_F_CQE_SKIP can't be set in
+>>> io_free_req().
+>>
+>> Can you elaborate what exactly we can't do and why?
 > 
-> Changes from v7:
->  - Moved v7 changes mistakenly added to patch 4 to patch 3 where they
->    belong.
+> group leader's CQE is always posted after other members are posted.
 > 
-> [...]
+>>
+>>> So move marking REQ_F_CQE_SKIP out of io_free_req().
+>>
+>> That makes io_free_req() a very confusing function, it tells
+>> that it just frees the request but in reality can post a
+>> CQE. If you really need it, just add a new function.
+> 
+> io_free_req() never posts CQE.
 
-Applied, thanks!
+Right, that's the intention and that's why it sets
+REQ_F_CQE_SKIP. Without it, even if you patch all call sites
+that they set it themselves, it turns into a misleading
+function.
 
-[1/4] block: Improve checks on zone resource limits
-      commit: e21d12c7cd5cef8a6c5367f96aaab01249216ded
-[2/4] dm: Call dm_revalidate_zones() after setting the queue limits
-      commit: 7f91ccd8a608dbe39b97a6e43d635378d493f77e
-[3/4] dm: Improve zone resource limits handling
-      commit: 73a74af0c72b7cfd843cbd93e088fc5c51471a84
-[4/4] dm: Remove unused macro DM_ZONE_INVALID_WP_OFST
-      commit: eaa3706fedc6a4142c251b2d4005d850caeabe50
+> This patch can help to move setting REQ_F_CQE_SKIP around
+> real post code, and it can make current code more readable.
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+Pavel Begunkov
