@@ -1,127 +1,176 @@
-Received: from mail-wr1-f98.google.com (mail-wr1-f98.google.com [209.85.221.98])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC64011CAB
-	for <linux-block@vger.kernel.org>; Mon, 17 Jun 2024 19:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C965A178387;
+	Mon, 17 Jun 2024 21:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718653501; cv=none; b=phiryY5MVfYo+IgW0AoCcBcm2SX8xry8hvozZKDijd1JOA6LfjXLNRpTtkLmCUrtTH79grTf5iTU3zhUEgUIZ3olKJSC33tR7Ge5E10uf+yFTtkesgRPdgBum2ZwgBQ+nptil1WMe+/O50p2D0m2xOyht/o3fOtU+jMN+84RfG8=
+	t=1718658480; cv=none; b=ucYQIwkJ9xNKHpio9Yusm31vQPvrfK8V/uLytzqUsHD17FNNIlON1K/RFOd4sxQiePwU3MNaqE8RmumIcR/E5ikG/zCo4uGJpSGl/LPOS9la8oGXQoQjXDH6DKkacY2hd1QnSTbvpMOOWTHmzYZXiVoa+yddRTqlfOFk2Yp/qw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718653501; c=relaxed/simple;
-	bh=q3OT82/5hPbQeWQRe7ZoRAYo/DmtuhC4FJtiSJ2ZuNg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Z363WBCDddo2grDnNbtbPJHNo2V8Q6dc8ggJBbvvU4or21sRR7TojfzbmXsR8sL9XAVJAOs2DGwlqvtmmIDbS2aG2fd9Kb9SC6gklP1lmF8KhXoLHeub5tAx4Lf3b4mc4aB/HRZik+Ju4moOg9CHXpDPvrnryPTNaUXcYDVVJcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dgAGDNvp; arc=none smtp.client-ip=209.85.221.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1718658480; c=relaxed/simple;
+	bh=k+TahLSrZQJeuAovXTUYK4EXgCZs7QSBpbkVUlcW2BY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PkwvFj/gMwfqVWFFOqCzklHwe5qZRPnZn64wIDz49KBgC3b8F7hPqcC1WMQTO9bmR6dow+009ywoMjZkrI7Oxv1F348p1lv8nv2zKRrO7y5fMKCKixhsdcDPLNCisqbSZGeZ/OIY6T8h+c7AlmKu/aNB4AmsWcJBaJ3KBErslTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=j8DR5IyT; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kBTrNAKz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ExLPViHA; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WLqXyqYV; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dgAGDNvp"
-Received: by mail-wr1-f98.google.com with SMTP id ffacd0b85a97d-35f23f3da44so4214617f8f.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Jun 2024 12:44:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1718653497; x=1719258297; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x2TV2BQQ7MB9qUDCbVKF9ekWJjR1zvRJg3acNlnp8OI=;
-        b=dgAGDNvpTJhmzqAUx8dmdr8J1A112cFesFhsetLSCsuoJ++qA6+iOlpRdO2lQayk8Q
-         Yhnn8IvCnkb8iEheEq2jnvGfGKyVyzWmEw7Lp6F52QpE0pxdLZHBGYXhM32Cr0YH9OXz
-         V/YZq6w8Xb9EDW7rtBK7x4MFK/URvc1FCgIM9++g06cuAsJxZsv3Jf1MIwKtRS+TuD+2
-         CN1JhrYAK+Q+lJnMf2aSExwwO1xrtpAz6NZwvwYsxEMmnk5f1wyN63u5dGntTxNTssfH
-         w3LIXZjcX+BhiiOlrBgd6UwBmaaMHuKrHoRjgawJD/6k8Pr71viWj4hUKggsr0w5myy9
-         9LiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718653497; x=1719258297;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x2TV2BQQ7MB9qUDCbVKF9ekWJjR1zvRJg3acNlnp8OI=;
-        b=XIMTA+T+Ad+KC8JaA+U2Z0QROIxgWnfYDp1nJmf/Df3sUZCe9/HZJhJQQ4jGSMHnM5
-         PPfJOdAbnV9bVblCkE+GOBqAYsRPZUpmcsQjKec72eJbzjmQz6KJ7ZV4HVFGg0+QXawt
-         7+97YoTvmjtxEOdSgmf8aGYqO5Ahdv/MK1Ds4rnByKhCqA6/mcUoIIkP1NOTdNxuYbrr
-         TRVDsNDUrX3tE4B7EjZKE/hiohHRHbcxlsXGP7a2qwSB3tO4RfY0XgNzxWU/VJPeXSoh
-         p6u7mNaaO5gi9cd5muX6Ogl24AahNJDIZRFvuvfQhYbbKoloNp2eMcvnU/Cc2U2oPkDn
-         OHuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUy3jgmuUAXpvjRYL+j3RMvBi16kTD+h2Yubfz6KiITZdZQg/MYjqAtpoT/4dqbIWaG/om4iFHj+SsCvbGsTKCbYNwU6LJRvlWlyiI=
-X-Gm-Message-State: AOJu0Ywxk0PLkcioyx080/bNTqYpIOwsIOl3/3qJ7cA5qZS6og9NBzwU
-	aRpqUtj6vQ5n8iqCLEgjDAD33GwuCzzbmwNzsoQxeFVxkQJDquxJYOIGRdES3G56Hd4/rK0Zx5C
-	mwdsuKB0XGW+k5vuEW2SJXJtZKrQg4Y89xYYifeaZVYvi8bVe
-X-Google-Smtp-Source: AGHT+IFoYx4fI/YGIm6N7q5kadC+ob/MIKwVAar81Ko+FTLLdZI7GiQypxjb9KJxUUwlblAHYD6fSYC9IQSl
-X-Received: by 2002:adf:cf0a:0:b0:360:7a44:12d9 with SMTP id ffacd0b85a97d-3607a7c20aemr8261296f8f.42.1718653497163;
-        Mon, 17 Jun 2024 12:44:57 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id ffacd0b85a97d-360750b75c5sm457968f8f.17.2024.06.17.12.44.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 12:44:57 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E7462340644;
-	Mon, 17 Jun 2024 13:44:55 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id D76B6E401A9; Mon, 17 Jun 2024 13:44:55 -0600 (MDT)
-From: Uday Shankar <ushankar@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/4] ublk: check recovery flags for validity
-Date: Mon, 17 Jun 2024 13:44:48 -0600
-Message-Id: <20240617194451.435445-2-ushankar@purestorage.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240617194451.435445-1-ushankar@purestorage.com>
-References: <20240617194451.435445-1-ushankar@purestorage.com>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="j8DR5IyT";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kBTrNAKz";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ExLPViHA";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WLqXyqYV"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E56CA1F395;
+	Mon, 17 Jun 2024 21:07:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718658477; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=j8DR5IyTlZofLM3Hvz795hVPWecqlsAUGRjaVX6rGmVl4s8wFxQjMCcsQeMN74lbbXwaaV
+	hTN4M7Abcua5OS9vlrq6S6k1bjXyNwXWZn96drMcZpBy6IsfS0RnVhSQAk37i7IstTDUWp
+	rpF3KkC5gtwzGDnovQkL5uqT0kkOzfE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718658477;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=kBTrNAKzCrUTsHKBNNdHM9fIefNunqMk9H0V2GRXVjqhJsp4yMpNQugUxDzwpIso8wl3sd
+	3X3+6JzZgyYXBTDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718658476; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=ExLPViHAvbM4j+i3e8gYnQrDA6vIdKvLTIxoCpcpkWQE2ZLqW4rwPiOg9UK5Wq/2VtWuYE
+	4sQygQz4l2h2KSa2NL3yNM/h8QwPSPSgJSY+nSqXRmCM222DXJCtB+sJBz+r3s6hc7e0Sc
+	3w6Tit18RpeR0sEumZnX+0dTL8N8c4k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718658476;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GhqD1JZCa8h9LMBNO3ezSkJWmrAJo6LNKwZwWzpwW1M=;
+	b=WLqXyqYVgXmVxEHMGDdUcfDT4nZ30EJhWlenIyGCKj3KY+2QIEZ0Hm3PDge/OK6kv6R0Xe
+	BryspmBkQnZmAQAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D268B13AAA;
+	Mon, 17 Jun 2024 21:07:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id MnYzMqulcGZ9SwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 17 Jun 2024 21:07:55 +0000
+Message-ID: <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+Date: Mon, 17 Jun 2024 23:08:58 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: paulmck@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+ wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+ ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+ linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ kasan-dev <kasan-dev@googlegroups.com>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <Zmov7ZaL-54T9GiM@zx2c4.com> <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
+ <Zmrkkel0Fo4_g75a@zx2c4.com> <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz> <ZnCDgdg1EH6V7w5d@pc636>
+From: Vlastimil Babka <vbabka@suse.cz>
+Content-Language: en-US
+In-Reply-To: <ZnCDgdg1EH6V7w5d@pc636>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-8.29 / 50.00];
+	REPLY(-4.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,zx2c4.com,inria.fr,vger.kernel.org,lists.linux.dev,efficios.com,lists.ozlabs.org,linux.ibm.com,csgroup.eu,gmail.com,lists.zx2c4.com,suse.de,netapp.com,oracle.com,talpey.com,netfilter.org,googlegroups.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLr583pch5u74edj9dsne3chzi)]
+X-Spam-Flag: NO
+X-Spam-Score: -8.29
+X-Spam-Level: 
 
-Only certain combinations of recovery flags are valid. For example,
-setting UBLK_F_USER_RECOVERY_REISSUE without also setting
-UBLK_F_USER_RECOVERY is currently silently equivalent to not setting any
-recovery flags. Check for such issues and fail add_dev if they are
-detected.
+On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
+>> +
+>> +	s = container_of(work, struct kmem_cache, async_destroy_work);
+>> +
+>> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
+> It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
+> wanted to avoid initially.
 
-Signed-off-by: Uday Shankar <ushankar@purestorage.com>
----
- drivers/block/ublk_drv.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+I wanted to avoid new API or flags for kfree_rcu() users and this would
+be achieved. The barrier is used internally so I don't consider that an
+API to avoid. How difficult is the implementation is another question,
+depending on how the current batching works. Once (if) we have sheaves
+proven to work and move kfree_rcu() fully into SLUB, the barrier might
+also look different and hopefully easier. So maybe it's not worth to
+invest too much into that barrier and just go for the potentially
+longer, but easier to implement?
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 4e159948c912..2752a9afe9d4 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -59,6 +59,9 @@
- 		| UBLK_F_USER_COPY \
- 		| UBLK_F_ZONED)
- 
-+#define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
-+		| UBLK_F_USER_RECOVERY_REISSUE)
-+
- /* All UBLK_PARAM_TYPE_* should be included here */
- #define UBLK_PARAM_TYPE_ALL                                \
- 	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
-@@ -2341,6 +2344,18 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	else if (!(info.flags & UBLK_F_UNPRIVILEGED_DEV))
- 		return -EPERM;
- 
-+	/* forbid nonsense combinations of recovery flags */
-+	switch (info.flags & UBLK_F_ALL_RECOVERY_FLAGS) {
-+	case 0:
-+	case UBLK_F_USER_RECOVERY:
-+	case (UBLK_F_USER_RECOVERY | UBLK_F_USER_RECOVERY_REISSUE):
-+		break;
-+	default:
-+		pr_warn("%s: invalid recovery flags %llx\n", __func__,
-+			info.flags & UBLK_F_ALL_RECOVERY_FLAGS);
-+		return -EINVAL;
-+	}
-+
- 	/*
- 	 * unprivileged device can't be trusted, but RECOVERY and
- 	 * RECOVERY_REISSUE still may hang error handling, so can't
--- 
-2.34.1
+> Since you do it asynchronous can we just repeat
+> and wait until it a cache is furry freed?
 
+The problem is we want to detect the cases when it's not fully freed
+because there was an actual read. So at some point we'd need to stop the
+repeats because we know there can no longer be any kfree_rcu()'s in
+flight since the kmem_cache_destroy() was called.
+
+> I am asking because inventing a new kfree_rcu_barrier() might not be so
+> straight forward.
+
+Agreed.
+
+> 
+> --
+> Uladzislau Rezki
