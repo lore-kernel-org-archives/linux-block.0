@@ -1,85 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1781822F3;
-	Mon, 17 Jun 2024 06:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1E8E554
+	for <linux-block@vger.kernel.org>; Mon, 17 Jun 2024 07:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718605589; cv=none; b=GXVwMdMmU6LdsyA6iCKdF85NBSnyPhCqRFGVjhQUvKMfmXhQJi1zKBj7xaD1OK0aFZYy8aqgyhkHKnQqmDmGgTxaj35HkDG/BctmidNVZ1/30gwNrTqx+GrL7b0UAbk9NFzMP9bPcmykpDOQsK22Fxn57FDhzHgkBHBIjbHfE4Y=
+	t=1718609619; cv=none; b=Tm6sQ2U1WQBCxNuJAdXlK4Hu2W1c5Jq7JlnHmzYtkNk0+KnRtwrWgVs68B9ghT33Zyeb/ydiCEFpwU/AKeXKZBkGS9Ank6at6JKtDTVAH2FmhxelXzaYAPL/x99sxARR5XAZC5nd5xTiYQpyXIHW3w4LOi2c9ZnzAM03DvmM5NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718605589; c=relaxed/simple;
-	bh=5ukl1My1jMqhSyTqZEFqdGlI+72qAecy5V2ti5Kc46U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eS1CAG9ixn7Y+VSNE6byZVc8CNzyjNkpGUnwwey3TLWcyF1QQvtwGjDdtxm7OMESpfCIYjbwrQU2zIUVeF08vq1QN+OL4QG5sEzt9CEVcBGPnyx7+OmIEBesD8PEYQ+qNQ904xf5dewlwBAhc54Af7342kOwqGBKXCoVB7319QM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OVa4VXa4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718609619; c=relaxed/simple;
+	bh=6Be1VBuJBuQx5WhlORRWbQbz/9PnkOafd1jCoOL3EyY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nn5MOXKFJMhTXTvQyS29gNkKmXNaoPc7i9F68bS8toDrjk5Gt3YonfSCQ7bTDC/FvTpKECTTmBFsT6RmnTPwrsxx3Lq04v7dYtbrvQjdcqUXFewn+812P0Sg7VZffhn2xgHcrfrk2n5OilKHyDgyw9VdIo/Bw2pvOUCvNALfvUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=In/UU8Zo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OVa4VXa4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 897D7C2BD10;
-	Mon, 17 Jun 2024 06:26:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718605589;
-	bh=5ukl1My1jMqhSyTqZEFqdGlI+72qAecy5V2ti5Kc46U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OVa4VXa4gPyN4KTWboLud3pwf0TJbbk/rQ5BM4+Ufc5q6edplugfrWWUEhonGkfMR
-	 QHtsT5neG8mJ3vHyVK4COzgFtMwuBSA3Ltr1Kmgg0P9h/SDaPK/4D4vixnSs7AOdoo
-	 HP6agM24471d/vJb4Hh8SFe0zewqIqWCGc3aXNawn13hq27CQJOtkzwEi0TWYKBp4l
-	 c0TLeE0D0RKiKV3rNJyqOIzjVOG/87Bt7edT59MQLl5UfWjsDRSx6vZMzrYnvW4QJA
-	 /RoDuAqhbb/WQma0tOFHLAJHwURkZ+Z0rxy3rGxoovWXWM4rnyYIVDHULrocVjTDvQ
-	 k66Zct4kG1uEw==
-Message-ID: <c9871979-de72-49ca-879b-5f2bd773d517@kernel.org>
-Date: Mon, 17 Jun 2024 15:26:23 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="In/UU8Zo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718609617;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VGyu5AtFOjrYW0RzXt8zeng+1SKzDJmAJ+4VL1VE6fw=;
+	b=In/UU8ZoYrzLGjaK0la4+qc3CU7DZmRbXccDk9fMxkE2x6i0J6X5nrpeXlKMOvQuThhT1C
+	Nz5aOrYgFy+Z9lY3WdXAisG3b7TImb4+WQosudRcShmWmvRKc2xvXDfjdFCuSZSLq7QKTo
+	+QiPXdYDF0L5JBu9tD8C/ji9wd/tJBI=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-586-uM0S3oo2On6hmLCXvq3YQA-1; Mon,
+ 17 Jun 2024 03:33:30 -0400
+X-MC-Unique: uM0S3oo2On6hmLCXvq3YQA-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D64B819560B3;
+	Mon, 17 Jun 2024 07:33:28 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.39.192.120])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 068F31956087;
+	Mon, 17 Jun 2024 07:33:24 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: linux-doc@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Adrian Bunk <bunk@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH] Documentation: Remove the unused "tp720" from kernel-parameters.txt
+Date: Mon, 17 Jun 2024 09:33:22 +0200
+Message-ID: <20240617073322.40679-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 19/26] block: move the nowait flag to queue_limits
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
- Richard Weinberger <richard@nod.at>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Josef Bacik <josef@toxicpanda.com>, Ming Lei <ming.lei@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
- Yu Kuai <yukuai3@huawei.com>, Vineeth Vijayan <vneethv@linux.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
- drbd-dev@lists.linbit.com, nbd@other.debian.org,
- linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
- virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
- linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20240617060532.127975-1-hch@lst.de>
- <20240617060532.127975-20-hch@lst.de>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20240617060532.127975-20-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 6/17/24 15:04, Christoph Hellwig wrote:
-> Move the nowait flag into the queue_limits feature field so that it can
-> be set atomically with the queue frozen.
-> 
-> Stacking drivers are simplified in that they now can simply set the
-> flag, and blk_stack_limits will clear it when the features is not
-> supported by any of the underlying devices.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The "tp720" switch once belonged to the ps2esdi driver, but this
+driver has been removed a long time ago in 2008 in the commit
+2af3e6017e53 ("The ps2esdi driver was marked as BROKEN more than two years ago due to being no longer working for some time.")
+already, so let's remove it from the documentation now, too.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Documentation/admin-guide/kernel-parameters.txt | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index b75852f1a789..89b784ec5ab1 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -6619,8 +6619,6 @@
+ 	torture.verbose_sleep_duration= [KNL]
+ 			Duration of each verbose-printk() sleep in jiffies.
+ 
+-	tp720=		[HW,PS2]
+-
+ 	tpm_suspend_pcr=[HW,TPM]
+ 			Format: integer pcr id
+ 			Specify that at suspend time, the tpm driver
 -- 
-Damien Le Moal
-Western Digital Research
+2.45.2
 
