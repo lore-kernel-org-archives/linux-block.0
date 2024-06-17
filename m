@@ -1,101 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE4719DF5B;
-	Mon, 17 Jun 2024 13:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743F11CF3FD;
+	Mon, 17 Jun 2024 13:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630853; cv=none; b=nlHPzKSDpV06MkcGScLboUatk3cNPEqaT4HFFoywUIesCVJNyIkEGb+MGtj9JR6ToML3HBTGgAzQnquIxYsDyj//imde/00IAJie4dk2Wyze0QBJzwmfVQcFkir3edCfdyY3XZQquy1Y0jDEMpDvDAHY+RMWGxqejKV2dplv5A0=
+	t=1718632264; cv=none; b=bTirE9dSE3NmoVZu+hH+I8X8BvI5i9HPoMYyAc3zFEJCLBB2qLuoh6vONS0Cnhba/wYRQAM7HTnd7rRw+S5iEsJ5EfgfDSsRDU4buOcJdmB9uV0qOZYofpY+zPPg1jj8Yi5S6hbLxFAC0J0JkDvJ+xFLD497TOCNbaslEXzD/1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630853; c=relaxed/simple;
-	bh=78W19AZSwVFkGnxOStZSDIIIYz516zKD+y3vSn8zV1k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cKbn9w1ICGF9Gq+8lCxyEe9kAQOnPahNjz8M5hrzpVkOGhQHKjjAlcxaZU/wBa87Ud81i67IktOhyHHnWhrENaruWT53Zw87EcEvJWWUNyuaOGrkHWUwwUadQGEypVVqqDf5ngknPuRJbs0oEGdXV+e5/a17sdu4nE+/3mxcKGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j3kQTiq7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718632264; c=relaxed/simple;
+	bh=WxO8wJJZE1Xds5hTG7TDExzo+Qsu32A6Rbf++HOL+EU=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GpvFiYgvD/axcnwSi4Jgr7aJ6itQPCQO8b4p/elxCZjQOoTgIddOX6Dhp9XkxoDp85qYzXMtFdDI6f0+ZRPguY2CDk97D7/Qq308weuh1K1oQazH1REZa2zTKlhjS/kAEQal6QRt/hP7zveLTbDw5JRSvWcc4ij4p0nDNATGbFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQKPf0Iq; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j3kQTiq7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A169EC2BD10;
-	Mon, 17 Jun 2024 13:27:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718630853;
-	bh=78W19AZSwVFkGnxOStZSDIIIYz516zKD+y3vSn8zV1k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=j3kQTiq7uWenUzxal3h5Sgp1r5wTXmY7pZBNjDZheBcydE8fNL/t0x11OWe5dcYSF
-	 wZsHdEYsH8+CLZoLvT2D+NPJnEMP6GtoKjYvlcu7PiNiOZTToemyhzFMyZbopm035T
-	 LNFOnCahh6c4h5Mu42ncKzwosg8NxrluvOKx0xqdQkDklS46F2hEP9M7Ux58twap1e
-	 MtZzPvqUfFaARnrh0CcUFt4yK/dugkAxk/A5RPopAUBKc08Ay8S/TA3pZJySl40TMz
-	 2GFiIlkLgBCb52qEwECXylSdJCRpHTOS9jyx0w5CLtvhII5t4ZeViCOayFWhH0obAR
-	 SjIRgcCPwWLRA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Andreas Hindborg <a.hindborg@samsung.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	dlemoal@kernel.org,
-	hare@suse.de,
-	johannes.thumshirn@wdc.com,
-	kch@nvidia.com,
-	zhouchengming@bytedance.com,
-	yanjun.zhu@linux.dev,
-	yukuai3@huawei.com,
-	shinichiro.kawasaki@wdc.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 11/13] null_blk: fix validation of block size
-Date: Mon, 17 Jun 2024 09:27:00 -0400
-Message-ID: <20240617132710.2590101-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240617132710.2590101-1-sashal@kernel.org>
-References: <20240617132710.2590101-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQKPf0Iq"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52c9034860dso5472308e87.2;
+        Mon, 17 Jun 2024 06:51:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718632261; x=1719237061; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7cjNgaPzx0K8Q2oE0VGfsHosS8QVWGPVVkZ0XS7HEDg=;
+        b=TQKPf0IqytFGGsqE2xDfJV+Yc75aA1GVgfltTY4XrrInwMIVCjx3BGZ2HlTDbMRnwJ
+         XRHsBKL6tbX9NklWtBn9G1kVOhmNQf4sMe56ykL4PUGZ+bBMRgt1fz+lzjHrFshmpNxt
+         3Ehb8nqYu4SNJbsYu2Bwvhy5GBpgF65YoUnh7r2JG0a43q7ag4ikgaBefGieszSUKUWC
+         +u/2IQY8h9V7c0/zz5Hxr4gjkM5QFZr/JR/tjbY6QKgCwcETuc+nXlJJ6diNXpu3XsHz
+         D8kOZYnSg7vFdFf8AIlVMJziVAtBXbYMqyg1pq73R2g3Q6wjMqZRH9KgQeucspWy6cKp
+         Dkug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718632261; x=1719237061;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7cjNgaPzx0K8Q2oE0VGfsHosS8QVWGPVVkZ0XS7HEDg=;
+        b=S5d4QM/PuVCo0B+/u/BEqzUjwZ8ms1Lw1DBKm5kTN5i6tr3nlSagb4MBnIrTIWsJkg
+         Pz7MfNY025VUpsD0JIgCOOo2f989iq+vCYGHpAK5rYzwOvyvahVKnZUBkEEGPTzs0ojV
+         7eCXSFUwbNm0pYkPZi2TWrWueX6THHNq5uxskxggkRuRVlqhvKeTRw0n4+/uvcLVDfaN
+         XEoJ0SGtVT/3xSvVtGkHyRTi0vGthUKB+VLI7LkXgTGq9J0cnLB3GjynDlO13N76kTc9
+         gLKiczHppRV8IEEF4H81SgrEJzU3LsRF4z/Tfgj/FbUAFIDKm+nRt8xX1XbxuX0WAWU/
+         0/Yg==
+X-Forwarded-Encrypted: i=1; AJvYcCVry97e54w1jMONLsqTN3iQPG8Q/In8s2mmyp6yrh7swqNFmafo9ZrgACCJX413o79jJuAlozTDaI+xcffuD2a5oica049dt4qVMgnn+hu+Gj46IWYL8/upcCeT9Ph6+wWA9I7QGpkoDsP9X71dG/ly8osgu3lDA5aLHV7x7pYU3aAKY4bFjE91XHnVURxT9u06fOl7UhoVEIbupdMaczqYAuW50sNXHyAufRcxsimtk0hVPg/ceQqUXExfaK9u8445wj2+eF8eukwbHmcAObsoR6M/jSKqKlpV6qswmF0/JGIQRlk3Ttq4B4M3JY4XibBSRdmOAhFM4yG1momRIxQif0HajIWaLUvjmSCH1ZKw0P4cy2wRMTqHmayzjPiaExUbrndO7xOupsbjVLTMZEPOmoXJAR45vaR2SaEb5rVLzuHiIvlvuB0/GspkTg==
+X-Gm-Message-State: AOJu0Yx44HaNSMGdV8qLfWJ7IGbEjTpeF3P27BEN/w/6rJODn8eFFjCW
+	GMV8zZ9B7K28Z7pPIpftBQfPKUcN3OdYimvSvk9ZIElfLSUFCAPd
+X-Google-Smtp-Source: AGHT+IHJ0CsNfqdOT8NJ8/aEvcd12bZPn1WcmZOT2dLARsLKNTs8V+RbkzjWhHb4g1pZvloY+oCxkw==
+X-Received: by 2002:a19:5e15:0:b0:51d:9f10:71b7 with SMTP id 2adb3069b0e04-52ca6e6812fmr7404820e87.28.1718632260306;
+        Mon, 17 Jun 2024 06:51:00 -0700 (PDT)
+Received: from pc636 (host-90-233-216-238.mobileonline.telia.com. [90.233.216.238])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52ca2887d56sm1239456e87.263.2024.06.17.06.50.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 06:50:59 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Mon, 17 Jun 2024 15:50:56 +0200
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZnA_QFvuyABnD3ZA@pc636>
+References: <ZmrfA1p2zSVIaYam@zx2c4.com>
+ <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
+ <Zmru7hhz8kPDPsyz@pc636>
+ <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
+ <Zmsuswo8OPIhY5KJ@pc636>
+ <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
+ <ZmszOd5idhf2Cb-v@pc636>
+ <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
+ <Zmw5FTX752g0vtlD@pc638.lan>
+ <ZmybGZDbXkw7JTjc@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.219
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZmybGZDbXkw7JTjc@zx2c4.com>
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
+On Fri, Jun 14, 2024 at 09:33:45PM +0200, Jason A. Donenfeld wrote:
+> On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
+> > +	/* Should a destroy process be deferred? */
+> > +	if (s->flags & SLAB_DEFER_DESTROY) {
+> > +		list_move_tail(&s->list, &slab_caches_defer_destroy);
+> > +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> > +		goto out_unlock;
+> > +	}
+> 
+> Wouldn't it be smoother to have the actual kmem_cache_free() function
+> check to see if it's been marked for destruction and the refcount is
+> zero, rather than polling every one second? I mentioned this approach
+> in: https://lore.kernel.org/all/Zmo9-YGraiCj5-MI@zx2c4.com/ -
+> 
+>     I wonder if the right fix to this would be adding a `should_destroy`
+>     boolean to kmem_cache, which kmem_cache_destroy() sets to true. And
+>     then right after it checks `if (number_of_allocations == 0)
+>     actually_destroy()`, and likewise on each kmem_cache_free(), it
+>     could check `if (should_destroy && number_of_allocations == 0)
+>     actually_destroy()`. 
+> 
+I do not find pooling as bad way we can go with. But your proposal
+sounds reasonable to me also. We can combine both "prototypes" to
+one and offer.
 
-[ Upstream commit c462ecd659b5fce731f1d592285832fd6ad54053 ]
+Can you post a prototype here?
 
-Block size should be between 512 and PAGE_SIZE and be a power of 2. The current
-check does not validate this, so update the check.
+Thanks!
 
-Without this patch, null_blk would Oops due to a null pointer deref when
-loaded with bs=1536 [1].
-
-Link: https://lore.kernel.org/all/87wmn8mocd.fsf@metaspace.dk/
-
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20240603192645.977968-1-nmi@metaspace.dk
-[axboe: remove unnecessary braces and != 0 check]
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/null_blk/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 35b390a785dd4..37beb94352728 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1743,8 +1743,8 @@ static int null_validate_conf(struct nullb_device *dev)
- 		return -EINVAL;
- 	}
- 
--	dev->blocksize = round_down(dev->blocksize, 512);
--	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
-+	if (blk_validate_block_size(dev->blocksize))
-+		return -EINVAL;
- 
- 	if (dev->queue_mode == NULL_Q_MQ && dev->use_per_node_hctx) {
- 		if (dev->submit_queues != nr_online_nodes)
--- 
-2.43.0
-
+--
+Uladzislau Rezki
