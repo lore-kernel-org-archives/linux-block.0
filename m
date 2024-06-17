@@ -1,186 +1,101 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C69171B0
-	for <linux-block@vger.kernel.org>; Mon, 17 Jun 2024 12:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4986D1B29BA;
+	Mon, 17 Jun 2024 13:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718625666; cv=none; b=QTCNBTlCV46E0On9rk07/0wV3/mXnusINjvv6dKRK2+9MQa0KncaWCofl0DVzeUyUybJPKScQq8XuvSpMEi6MeCkeI+4jo4c3v32/bP1Q1F3hICyUM0oY1QXjSueKURIY8ND35n7JEoFTyANeRPbBlSfmCQcQ4gYIuc8sq4tyvM=
+	t=1718630543; cv=none; b=pj7pRJ676xBcj0/FxYf4H+Puno+YxNlC9SRgn6C/Mcnea6PkuoDkQIzueomEGkZlTrPY3/UK52v4sApymI95YvjhvFhH2u5LA5KRKUJI4WpOhP/PHMAZOp4jD7TzAhsleTMTbu0XLAH8u/5P9LfyndNHbbaERoWlqEbbYS+pWpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718625666; c=relaxed/simple;
-	bh=LqmUPKAGwsiMlF6o8YqN7A9CuPqa7AJnVWySOnOQmCE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I58IwDIXaWMT6wimRqAvC4pTFPl+ZlueIhGDEe6Qq+fuUjx0lmIRQ22v+EcPfOeK5xYaoFFM5c/uciL8+K0wQdIKZsUQGdPC9opcbb4lkjrQFgYQ0qJmb1ikG1978r8AbV5oXBb4YaUyKP7PLnQ/eS6//HrP7VPSadYeJ1GIPgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SR6XwOSL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Y+0Gg+WF; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SR6XwOSL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Y+0Gg+WF; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1718630543; c=relaxed/simple;
+	bh=d5mtkQ4TSwEAW5aa2LmAOY5L8+c2WljHzZG5/10rc2o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Veagu8DbEASSxBQoDV+tXvtCBPRGh6tX1HcHENnFNq4SCyBFB0OJ4YUG+76xWCiVK4XkutUKuW2RlawT3ZW/8FFntBoG+76FTPMV84H/Y2TZ250eGoqKcvyg9f3uBq4VRwDO1H3zlkMhvOO/PGoM3XVCVl/AO6mp+d45ShMXlBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B9RmuRkX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="SR6XwOSL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Y+0Gg+WF";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="SR6XwOSL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Y+0Gg+WF"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AB44638134;
-	Mon, 17 Jun 2024 12:00:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718625656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=BmApUNZ35RCYIspe4sZrbLWqEHhX78sLaKAL3Fo75Mo=;
-	b=SR6XwOSLimwJR/d3I++llPXyRKHezRAc9Or9NU5ehAnLqL3KHt30JIBAYOGqXF8lrI0g/R
-	NC4MypQT126ig9ArBvCeUAZM1c1tGoMtuUwkKlPH1khzTy6T1pgaoiLR5K7RIzCpt7yetc
-	2gBNCbcvkzJjRW0GnsQxWwm6AF39o7A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718625656;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=BmApUNZ35RCYIspe4sZrbLWqEHhX78sLaKAL3Fo75Mo=;
-	b=Y+0Gg+WFMRKwBfeXWVOcFnhvwcrutCTPcB8+zgVGivvvsCBWcWMGL66Fqf9eecJYFVglWJ
-	Mjs43G9JS4g8NsBA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=SR6XwOSL;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Y+0Gg+WF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718625656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=BmApUNZ35RCYIspe4sZrbLWqEHhX78sLaKAL3Fo75Mo=;
-	b=SR6XwOSLimwJR/d3I++llPXyRKHezRAc9Or9NU5ehAnLqL3KHt30JIBAYOGqXF8lrI0g/R
-	NC4MypQT126ig9ArBvCeUAZM1c1tGoMtuUwkKlPH1khzTy6T1pgaoiLR5K7RIzCpt7yetc
-	2gBNCbcvkzJjRW0GnsQxWwm6AF39o7A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718625656;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=BmApUNZ35RCYIspe4sZrbLWqEHhX78sLaKAL3Fo75Mo=;
-	b=Y+0Gg+WFMRKwBfeXWVOcFnhvwcrutCTPcB8+zgVGivvvsCBWcWMGL66Fqf9eecJYFVglWJ
-	Mjs43G9JS4g8NsBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 98342139AB;
-	Mon, 17 Jun 2024 12:00:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id lLj7I3glcGZdJwAAD6G6ig
-	(envelope-from <chrubis@suse.cz>); Mon, 17 Jun 2024 12:00:56 +0000
-From: Cyril Hrubis <chrubis@suse.cz>
-To: linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Cyril Hrubis <chrubis@suse.cz>
-Subject: [PATCH v2] loop: Add regression test for unsupported backing file fallocate
-Date: Mon, 17 Jun 2024 14:00:18 +0200
-Message-ID: <20240617120018.13832-1-chrubis@suse.cz>
-X-Mailer: git-send-email 2.44.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B9RmuRkX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A067EC4AF48;
+	Mon, 17 Jun 2024 13:22:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718630543;
+	bh=d5mtkQ4TSwEAW5aa2LmAOY5L8+c2WljHzZG5/10rc2o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=B9RmuRkXMjc0cLtGqIXDR1ga1zjpbl8lFr0YhVuYGxRnMp2XXfcvzPsSZGKhfnh1Y
+	 2gQug2Y0U1Cy59jJcZjMgJqt0B34wzDzoycgfQeW4EVD6pBI+Ex24MYwmNcPy0joO7
+	 7+SmhTOvUuGsjsPKlLNOOu9tFTf9SDadQWJZSdEob20HC/TGLrMcVuTNLQgJgPtjQ7
+	 6WHyk+7zC89dvYUXhS15AdPJRPrw82Stv14EGfIubscTd1mcjTsiYSsVBpzy7VgEcH
+	 JAU3yJbfmkPlkceTH+cUFRcNadX8xou3KLIImIv7wO1k2Bo1cgk3Q/k19P8fxvATOZ
+	 rxnqfVtFMCVyw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Andreas Hindborg <a.hindborg@samsung.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	dlemoal@kernel.org,
+	hare@suse.de,
+	johannes.thumshirn@wdc.com,
+	kch@nvidia.com,
+	zhouchengming@bytedance.com,
+	yanjun.zhu@linux.dev,
+	yukuai3@huawei.com,
+	shinichiro.kawasaki@wdc.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 39/44] null_blk: fix validation of block size
+Date: Mon, 17 Jun 2024 09:19:52 -0400
+Message-ID: <20240617132046.2587008-39-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240617132046.2587008-1-sashal@kernel.org>
+References: <20240617132046.2587008-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.5
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AB44638134
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_DN_SOME(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-Signed-off-by: Cyril Hrubis <chrubis@suse.cz>
+From: Andreas Hindborg <a.hindborg@samsung.com>
+
+[ Upstream commit c462ecd659b5fce731f1d592285832fd6ad54053 ]
+
+Block size should be between 512 and PAGE_SIZE and be a power of 2. The current
+check does not validate this, so update the check.
+
+Without this patch, null_blk would Oops due to a null pointer deref when
+loaded with bs=1536 [1].
+
+Link: https://lore.kernel.org/all/87wmn8mocd.fsf@metaspace.dk/
+
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20240603192645.977968-1-nmi@metaspace.dk
+[axboe: remove unnecessary braces and != 0 check]
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
+ drivers/block/null_blk/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v2:
-  - make use of grep -c instead of wc -l
-  - Add WRITE_ZEROES string to the grep regexp
-
- tests/loop/011     | 37 +++++++++++++++++++++++++++++++++++++
- tests/loop/011.out |  3 +++
- 2 files changed, 40 insertions(+)
- create mode 100755 tests/loop/011
- create mode 100644 tests/loop/011.out
-
-diff --git a/tests/loop/011 b/tests/loop/011
-new file mode 100755
-index 0000000..baabe5c
---- /dev/null
-+++ b/tests/loop/011
-@@ -0,0 +1,37 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Cyril Hrubis
-+#
-+# Regression test for patch "loop: Disable fallocate() zero and discard if not supported".
-+#
-+
-+. tests/loop/rc
-+DESCRIPTION="Make sure unsupported backing file fallocate does not fill dmesg with errors"
-+
-+requires() {
-+	_have_program mkfs.ext2
-+}
-+
-+test() {
-+	local loop_dev;
-+	echo "Running ${TEST_NAME}"
-+
-+	mkdir "$TMPDIR/tmpfs"
-+	mount -t tmpfs testfs "$TMPDIR/tmpfs"
-+	dd if=/dev/zero of="$TMPDIR/tmpfs/disk.img" bs=1M count=100 &> /dev/null
-+
-+	if ! loop_dev="$(losetup -f --show "$TMPDIR/tmpfs/disk.img")"; then
-+		return 1
-+	fi
-+
-+	mkfs.ext2 /dev/loop0 &> /dev/null
-+
-+	errors=$(_dmesg_since_test_start |grep -c "operation not supported error, dev .*WRITE_ZEROES")
-+
-+	losetup -d "$loop_dev"
-+	umount "$TMPDIR/tmpfs"
-+
-+	echo "Found $errors error(s) in dmesg"
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/loop/011.out b/tests/loop/011.out
-new file mode 100644
-index 0000000..cd88fd5
---- /dev/null
-+++ b/tests/loop/011.out
-@@ -0,0 +1,3 @@
-+Running loop/011
-+Found 1 error(s) in dmesg
-+Test complete
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 620679a0ac381..26e2c22a87e1c 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1810,8 +1810,8 @@ static int null_validate_conf(struct nullb_device *dev)
+ 		dev->queue_mode = NULL_Q_MQ;
+ 	}
+ 
+-	dev->blocksize = round_down(dev->blocksize, 512);
+-	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
++	if (blk_validate_block_size(dev->blocksize))
++		return -EINVAL;
+ 
+ 	if (dev->use_per_node_hctx) {
+ 		if (dev->submit_queues != nr_online_nodes)
 -- 
-2.44.2
+2.43.0
 
