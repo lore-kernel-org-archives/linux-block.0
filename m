@@ -1,98 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B7110A19;
-	Sun, 16 Jun 2024 23:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1D419BC6
+	for <linux-block@vger.kernel.org>; Mon, 17 Jun 2024 01:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718578870; cv=none; b=Mocb2AbQaHfL1fvTZr+SJZKcWYjT+k5uOHiJM7PM84a4bRIYbQR06V7xu9CeKM5GVIj36lvFgh/3FxtLOxa5dXPCweIvLRYpJ9Fk/tH6tjjzUIBCLZkRKTl5tysVxSj/aoZ+gY0R3T7Y91Qqcwuw8jQnX/3lIEnqMLKwV5psDOg=
+	t=1718588577; cv=none; b=Z0nsFtn5wiPpq+pPVXTOYQ3Ftf1sT6IPUBdgjFTr+doeQ71Z6CBttNILawJdC+CIykg97I0Xu4wmREU2KkXj8C9ULUf0nO0qusZQ694wdNgbWzpiWDhfqL0jd7gfRvVQXsmu0YJzbLYsgS0nAuPDbowHMhIaZ1JOgCesdyPAo/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718578870; c=relaxed/simple;
-	bh=K48GiByJehCmQjwi20pmfnU+WsCyr4S6WxHNS+fcYIA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uh6pMmiFu5xqPR7Z/U1lymQeYPmCkA6GxGpBfT67r8jaQUVClVksoz0lp+nYju99c+cKHW9xhaz03bvBZhnlePOD2Tlitc4SDB4nD08kZSly4NpuSZ4js4wy35ORJjqJH0l4GEF4Ovb36l9Xuq/iNyLAmi2qiE+C3XDN8bn13NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gczAGXT2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718588577; c=relaxed/simple;
+	bh=l/SUyG922f0iQomiCu8eMu6cEZdnWcIvkvuq7uNlwUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N/kapDgPS8DkaN4LL+77e7mepeyjy99fdAW/gHZWCP0L8AvBqgKzLDk+xgaXI+9JwYTdjWbsGTw7i9GBc1zjaHvOW+KiWlfRVgPzTvqQSAkgBmremwrSKwKyPqb6naBnZ9Z68pIGXj2g1+YUWgeQoKqZ5/0RNXPmDFLuF3eOSa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AtgRDpW7; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gczAGXT2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CAA0C2BD10;
-	Sun, 16 Jun 2024 23:01:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718578869;
-	bh=K48GiByJehCmQjwi20pmfnU+WsCyr4S6WxHNS+fcYIA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gczAGXT2JgNBboue0aH6XDCajaGt0Tn9T6RNwUC8NdBoTEgjtTbwpmUfCPkjFQ9wM
-	 MM968k+DIaMHgn73yxqDo9X2C3EJ5/755Y+99nXMZx497l32DWuxyKEgkUS1Mfauzi
-	 zlSFlVj6tWpctoPTJ+wOY0xCMexSj4HtxdjXI3+rZfPjj6bie6Cukz6u7sVo5A7bEU
-	 9rKTuHOjY9Tr5Ii5b3jprMmIgspdDlLslR4qSbgMPqGu86/2ypBmGpS+m4Lh9tPaWA
-	 jbUd1obFjKTKufNm0BQAftChaDznmaK4Iq8S3q+7ZRNQrBkFu3/tvjG2xwv4gQQlB4
-	 JHm9Ls++1gm6g==
-Message-ID: <5a697233-0611-459d-b889-2e0133bbb541@kernel.org>
-Date: Mon, 17 Jun 2024 08:01:04 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtgRDpW7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718588575;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5HolzKzigdBw1BymILTK/m4wDYK4OrAakuyTQsRuWHo=;
+	b=AtgRDpW7hJzlPcMvBEyTf+WjD85TrFCQtIqn7iKVdKfEghSRWP5uspCe+BOF5M3YeUZztC
+	WIjdGxm4tZx1stcDMZIJsjzmy6LhoHdq1gnd5JiiQII4kXqrLqvJB55VJ2QOsd3Vh5IM1/
+	vvtBttb1+8Fa3aqx/oumChjug2mj0+Q=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-615-KDUT3vASPI-8vudV0F6yCA-1; Sun,
+ 16 Jun 2024 21:42:51 -0400
+X-MC-Unique: KDUT3vASPI-8vudV0F6yCA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A81D19560A2;
+	Mon, 17 Jun 2024 01:42:50 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.55])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A531019560AE;
+	Mon, 17 Jun 2024 01:42:42 +0000 (UTC)
+Date: Mon, 17 Jun 2024 09:42:37 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
+	ming.lei@redhat.com
+Subject: Re: [PATCH V3 5/9] io_uring: support SQE group
+Message-ID: <Zm+UjU+B6A/1hwk9@fedora>
+References: <20240511001214.173711-1-ming.lei@redhat.com>
+ <20240511001214.173711-6-ming.lei@redhat.com>
+ <ZkwNxxUM7jqzpqgg@fedora>
+ <3fd4451f-d30e-43f8-a01f-428a1073882d@gmail.com>
+ <ZmhR3/TipsQI5OxN@fedora>
+ <7a147171-df1b-49f5-8bf0-dd147c6b729f@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/26] sd: move zone limits setup out of
- sd_read_block_characteristics
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
- Richard Weinberger <richard@nod.at>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Josef Bacik <josef@toxicpanda.com>, Ming Lei <ming.lei@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, Song Liu <song@kernel.org>,
- Yu Kuai <yukuai3@huawei.com>, Vineeth Vijayan <vneethv@linux.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-m68k@lists.linux-m68k.org, linux-um@lists.infradead.org,
- drbd-dev@lists.linbit.com, nbd@other.debian.org,
- linuxppc-dev@lists.ozlabs.org, ceph-devel@vger.kernel.org,
- virtualization@lists.linux.dev, xen-devel@lists.xenproject.org,
- linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20240611051929.513387-1-hch@lst.de>
- <20240611051929.513387-3-hch@lst.de>
- <40ca8052-6ac1-4c1b-8c39-b0a7948839f8@kernel.org>
- <20240613093918.GA27629@lst.de>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20240613093918.GA27629@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7a147171-df1b-49f5-8bf0-dd147c6b729f@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 6/13/24 18:39, Christoph Hellwig wrote:
-> On Tue, Jun 11, 2024 at 02:51:24PM +0900, Damien Le Moal wrote:
->>> +	if (sdkp->device->type == TYPE_ZBC)
->>
->> Nit: use sd_is_zoned() here ?
+On Sun, Jun 16, 2024 at 07:14:37PM +0100, Pavel Begunkov wrote:
+> On 6/11/24 14:32, Ming Lei wrote:
+> > On Mon, Jun 10, 2024 at 02:55:22AM +0100, Pavel Begunkov wrote:
+> > > On 5/21/24 03:58, Ming Lei wrote:
+> > > > On Sat, May 11, 2024 at 08:12:08AM +0800, Ming Lei wrote:
+> > > > > SQE group is defined as one chain of SQEs starting with the first SQE that
+> > > > > has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+> > > > > doesn't have it set, and it is similar with chain of linked SQEs.
+> > > > > 
+> > > > > Not like linked SQEs, each sqe is issued after the previous one is completed.
+> > > > > All SQEs in one group are submitted in parallel, so there isn't any dependency
+> > > > > among SQEs in one group.
+> > > > > 
+> > > > > The 1st SQE is group leader, and the other SQEs are group member. The whole
+> > > > > group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
+> > > > > the two flags are ignored for group members.
+> > > > > 
+> > > > > When the group is in one link chain, this group isn't submitted until the
+> > > > > previous SQE or group is completed. And the following SQE or group can't
+> > > > > be started if this group isn't completed. Failure from any group member will
+> > > > > fail the group leader, then the link chain can be terminated.
+> > > > > 
+> > > > > When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
+> > > > > previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
+> > > > > group leader only, we respect IO_DRAIN by always completing group leader as
+> > > > > the last one in the group.
+> > > > > 
+> > > > > Working together with IOSQE_IO_LINK, SQE group provides flexible way to
+> > > > > support N:M dependency, such as:
+> > > > > 
+> > > > > - group A is chained with group B together
+> > > > > - group A has N SQEs
+> > > > > - group B has M SQEs
+> > > > > 
+> > > > > then M SQEs in group B depend on N SQEs in group A.
+> > > > > 
+> > > > > N:M dependency can support some interesting use cases in efficient way:
+> > > > > 
+> > > > > 1) read from multiple files, then write the read data into single file
+> > > > > 
+> > > > > 2) read from single file, and write the read data into multiple files
+> > > > > 
+> > > > > 3) write same data into multiple files, and read data from multiple files and
+> > > > > compare if correct data is written
+> > > > > 
+> > > > > Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
+> > > > > extend sqe->flags with one uring context flag, such as use __pad3 for
+> > > > > non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
+> > > > > 
+> > > > > Suggested-by: Kevin Wolf <kwolf@redhat.com>
+> > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > 
+> > > > BTW, I wrote one link-grp-cp.c liburing/example which is based on sqe group,
+> > > > and keep QD not changed, just re-organize IOs in the following ways:
+> > > > 
+> > > > - each group have 4 READ IOs, linked by one single write IO for writing
+> > > >     the read data in sqe group to destination file
+> > > 
+> > > IIUC it's comparing 1 large write request with 4 small, and
+> > 
+> > It is actually reasonable from storage device viewpoint, concurrent
+> > small READs are often fast than single big READ, but concurrent small
+> > writes are usually slower.
 > 
-> Actually - is there much in even keeping sd_is_zoned now that the
-> host aware support is removed?  Just open coding the type check isn't
-> any more code, and probably easier to follow.
+> It is, but that doesn't make the comparison apple to apple.
+> Even what I described, even though it's better (same number
+> of syscalls but better parallelism as you don't block next
+> batch of reads by writes), you can argues it's not a
+> completely fair comparison either since needs different number
+> of buffers, etc.
+> 
+> > > it's not exactly anything close to fair. And you can do same
+> > > in userspace (without links). And having control in userspace
+> > 
+> > No, you can't do it with single syscall.
+> 
+> That's called you _can_ do it. And syscalls is not everything,
 
-Removing this helper is fine by me. There are only 2 call sites in sd.c and the
-some of 4 calls in sd_zbc.c are not really needed:
-1) The call in sd_zbc_print_zones() is not needed at all since this function is
-called only for a zoned drive from sd_zbc_revalidate_zones().
-2) The calls in sd_zbc_report_zones() and sd_zbc_cmnd_checks() are probably
-useless as these are called only for zoned drives in the first place. The checks
-would be useful only for passthrough commands, but then we do not really care
-about these and the user will get a failure anyway if it tries to do ZBC
-commands on non-ZBC drives.
-3) That leaves only the call in sd_zbc_read_zones() but that check can probably
-be moved to sd.c to conditionally call  sd_zbc_read_zones().
+For ublk, syscall does mean something, because each ublk IO is
+handled by io_uring, if more syscalls are introduced for each ublk IO,
+performance definitely degrades a lot because IOPS can be million level.
+Now syscall PTI overhead does make difference, please see:
 
--- 
-Damien Le Moal
-Western Digital Research
+https://lwn.net/Articles/752587/
+
+> context switching turned to be a bigger problem, and to execute
+> links it does exactly that.
+
+If that is true, IO_LINK shouldn't have been needed, cause you can model
+dependency via io_uring syscall, unfortunately it isn't true. IO_LINK not
+only simplifies application programming, but also avoids extra syscall.
+
+If you compare io_uring-cp.c(282 LOC) with link-cp.c(193 LOC) in
+liburing/examples, you can see io_uring-cp.c is more complicated. Adding
+one extra syscall(wait point) makes application hard to write, especially in
+modern async/.await programming environment.
+
+
+Thanks,
+Ming
 
