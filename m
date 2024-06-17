@@ -1,257 +1,436 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910FB9474;
-	Mon, 17 Jun 2024 03:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00181D688
+	for <linux-block@vger.kernel.org>; Mon, 17 Jun 2024 03:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718596207; cv=none; b=dTKAErRH5IpqvVyTHfJ5LNw9D6+8iVYUYhEn991lWMv0eAjB4z6T77blm+i4sYFnKc7ecUh5ccwwsTs0Zr8sVcZsWRWA8WeDujS9xsZyKmLn/Kj9kkcjj6IMWrnpL9VOfMmQhmi4MDyE3HCnZVqXutK5o370y4lIyc6fq6D1lsA=
+	t=1718596494; cv=none; b=b4g+tIH7Po+nftUG7rYBm2nCNnbZfuEnbiApVAw6tgmgRODfFIitgMFNwFUxS7Xf7q6fZqdIBFPOloJ8adWoBD52awRhq2FLAmK0DDKjNk3hon4luy76+AxFgyokehPY4+gfkfQvJg4tcqan1FZcfhKoUcxMltVH92LpXT3KQt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718596207; c=relaxed/simple;
-	bh=/QLWBi+wAZR91DzwWnusNXqvdNQW97k9Owp3Blc8EAk=;
-	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=K8Lm+impr2M/4Wi7a+fvRVEK1RlNNXVxbhfeI4Iy52VZzqY3K8wUDWLO1i6GX85Y8XfJHyWoODpwOPUzicgT8HvQbKrqaV/FChyRtPu3DWTmdIqnrGlX+TNy9Um6oY1Un24/cp8m6Z3JcFdE6DUpVL/Qf+QcqWYebITXuLhPWdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4W2bPK60BpznVgf;
-	Mon, 17 Jun 2024 11:45:09 +0800 (CST)
-Received: from canpemm500010.china.huawei.com (unknown [7.192.105.118])
-	by mail.maildlp.com (Postfix) with ESMTPS id D07E914011B;
-	Mon, 17 Jun 2024 11:50:00 +0800 (CST)
-Received: from [10.174.178.185] (10.174.178.185) by
- canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 17 Jun 2024 11:50:00 +0800
-Subject: Re: [PATCH] block: bio-integrity: fix potential null-ptr-deref in
- bio_integrity_free
-To: Ming Lei <ming.lei@redhat.com>
-References: <20240606062655.2185006-1-yebin@huaweicloud.com>
- <ZmJQwvBXfm3zw+Xs@fedora> <6662632D.7020000@huaweicloud.com>
- <ZmJj5C4gz+gT9C4m@fedora> <6667BAED.7060809@huawei.com>
- <ZmfEn4ieO9EK/0z5@fedora>
-CC: yebin <yebin@huaweicloud.com>, <axboe@kernel.dk>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yi Zhang
-	<yi.zhang@redhat.com>
-From: "yebin (H)" <yebin10@huawei.com>
-Message-ID: <666FB267.7080809@huawei.com>
-Date: Mon, 17 Jun 2024 11:49:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.1.0
+	s=arc-20240116; t=1718596494; c=relaxed/simple;
+	bh=cPjR8KS8RP6Xoy+EMpwgxuC70e3KktkumW9L5k4ASME=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FxQHNB6T+gcfTrBW/+8UR2ShWP5GKlJDIcFH7UC7BO7mf1MQz4wlBolmEATdmQoG4izPupm7gD1JQIdLAUr/cXlpxHysQri5d+BK0WUdd9gVorFsSlS7oas9uic7T/V7rLnQEduJg75eAzpdTrNf/Ih6Q7xEicGcXUDM9usV/70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JuY51Z0z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuY51Z0z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718596490;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N0Fuf9hsx/rN40OII0BoWEnnGCP2nN8C0VoUryetpso=;
+	b=JuY51Z0z3dk25o0jEmVGV+R2DECOHYxFVC2t9gUlyeAKVEsLheXOTKekpfB2MJKTY29cay
+	KJXpSb8O+jOz4geYDNqqApzUj41B+/6ZHdIEqrf1TzABwWwv9YzxzNMSG6seh3LCpWoK7H
+	KEKPY/OOpGMDs/zuLAYybbArtaczLaY=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-581-b36gxjA1MFyAcxAhxANZgw-1; Sun,
+ 16 Jun 2024 23:54:46 -0400
+X-MC-Unique: b36gxjA1MFyAcxAhxANZgw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7CCD919560B7;
+	Mon, 17 Jun 2024 03:54:44 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.55])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B99323000218;
+	Mon, 17 Jun 2024 03:54:39 +0000 (UTC)
+Date: Mon, 17 Jun 2024 11:54:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
+	ming.lei@redhat.com
+Subject: Re: [PATCH V3 5/9] io_uring: support SQE group
+Message-ID: <Zm+zemW1Bi5ZF9DE@fedora>
+References: <20240511001214.173711-1-ming.lei@redhat.com>
+ <20240511001214.173711-6-ming.lei@redhat.com>
+ <97fe853f-1963-4304-b371-5fe596ae5fcf@gmail.com>
+ <ZmpPONHc8GajjoEm@fedora>
+ <f29e662c-5959-4b90-845a-0e3c81a174e6@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZmfEn4ieO9EK/0z5@fedora>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500010.china.huawei.com (7.192.105.118)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f29e662c-5959-4b90-845a-0e3c81a174e6@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+
+On Sun, Jun 16, 2024 at 08:13:26PM +0100, Pavel Begunkov wrote:
+> On 6/13/24 02:45, Ming Lei wrote:
+> > On Mon, Jun 10, 2024 at 03:53:51AM +0100, Pavel Begunkov wrote:
+> > > On 5/11/24 01:12, Ming Lei wrote:
+> > > > SQE group is defined as one chain of SQEs starting with the first SQE that
+> > > > has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+> > > > doesn't have it set, and it is similar with chain of linked SQEs.
+> > > 
+> > > The main concern stays same, it adds overhead nearly to every
+> > > single hot function I can think of, as well as lots of
+> > > complexity.
+> > 
+> > Almost every sqe group change is covered by REQ_F_SQE_GROUP, so I am
+> > not clear what the added overhead is.
+> 
+> Yes, and there is a dozen of such in the hot path.
+
+req->flags is supposed to be L1-cached in all these hot paths, and the
+check is basically zero cost, so SQE_GROUP shouldn't add extra cost for
+existed io_uring core code path.
+
+> 
+> > > Another minor issue is REQ_F_INFLIGHT, as explained before,
+> > > cancellation has to be able to find all REQ_F_INFLIGHT
+> > > requests. Requests you add to a group can have that flag
+> > > but are not discoverable by core io_uring code.
+> > 
+> > OK, we can deal with it by setting leader as REQ_F_INFLIGHT if the
+> > flag is set for any member, since all members are guaranteed to
+> > be drained when leader is completed. Will do it in V4.
+> 
+> Or fail if see one, that's also fine. REQ_F_INFLIGHT is
+> only set for POLL requests polling another io_uring.
+
+It is set for read-write/tee/splice op with normal file too, so looks
+not safe to fail.
+
+> 
+> > > Another note, I'll be looking deeper into this patch, there
+> > > is too much of random tossing around of requests / refcounting
+> > > and other dependencies, as well as odd intertwinings with
+> > > other parts.
+> > 
+> > The only thing wrt. request refcount is for io-wq, since request
+> > reference is grabbed when the req is handled in io-wq context, and
+> > group leader need to be completed after all members are done. That
+> > is all special change wrt. request refcounting.
+> 
+> I rather mean refcounting the group leader, even if it's not
+> atomic.
+
+If you mean reusing req->refs for refcounting the group leader, it may
+not work, cause member can complete from io-wq, but leader may not.
+Meantime using dedicated ->grp_refs actually simplifies things a lot.
+
+> 
+> > > > diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+> > > > index 7a6b190c7da7..62311b0f0e0b 100644
+> > > > diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> > > > index c184c9a312df..b87c5452de43 100644
+> > > > --- a/io_uring/io_uring.c
+> > > > +++ b/io_uring/io_uring.c
+> ...
+> > > >    	}
+> > > >    }
+> > > > +static inline bool need_queue_group_members(struct io_kiocb *req)
+> > > > +{
+> > > > +	return req_is_group_leader(req) && req->grp_link;
+> > > > +}
+> > > > +
+> > > > +/* Can only be called after this request is issued */
+> > > > +static inline struct io_kiocb *get_group_leader(struct io_kiocb *req)
+> > > > +{
+> > > > +	if (req->flags & REQ_F_SQE_GROUP) {
+> > > > +		if (req_is_group_leader(req))
+> > > > +			return req;
+> > > > +		return req->grp_link;
+> > > 
+> > > I'm missing something, it seems io_group_sqe() adding all
+> > > requests of a group into a singly linked list via ->grp_link,
+> > > but here we return it as a leader. Confused.
+> > 
+> > ->grp_link stores the singly linked list for group leader, and
+> > the same field stores the group leader pointer for group member requests.
+> > For later, we can add one union field to make code more readable.
+> > Will do that in V4.
+> 
+> So you're repurposing it in io_queue_group_members(). Since
+> it has different meaning at different stages of execution,
+> it warrants a comment (unless there is one I missed).
+
+OK, either adding comment or another union field for it.
+
+> 
+> > > > +	}
+> > > > +	return NULL;
+> > > > +}
+> > > > +
+> > > > +void io_cancel_group_members(struct io_kiocb *req, bool ignore_cqes)
+> > > > +{
+> > > > +	struct io_kiocb *member = req->grp_link;
+> > > > +
+> > > > +	while (member) {
+> > > > +		struct io_kiocb *next = member->grp_link;
+> > > > +
+> > > > +		if (ignore_cqes)
+> > > > +			member->flags |= REQ_F_CQE_SKIP;
+> > > > +		if (!(member->flags & REQ_F_FAIL)) {
+> > > > +			req_set_fail(member);
+> > > > +			io_req_set_res(member, -ECANCELED, 0);
+> > > > +		}
+> > > > +		member = next;
+> > > > +	}
+> > > > +}
+> > > > +
+> > > > +void io_queue_group_members(struct io_kiocb *req, bool async)
+> > > > +{
+> > > > +	struct io_kiocb *member = req->grp_link;
+> > > > +
+> > > > +	if (!member)
+> > > > +		return;
+> > > > +
+> > > > +	while (member) {
+> > > > +		struct io_kiocb *next = member->grp_link;
+> > > > +
+> > > > +		member->grp_link = req;
+> > > > +		if (async)
+> > > > +			member->flags |= REQ_F_FORCE_ASYNC;
+> > > > +
+> > > > +		if (unlikely(member->flags & REQ_F_FAIL)) {
+> > > > +			io_req_task_queue_fail(member, member->cqe.res);
+> > > > +		} else if (member->flags & REQ_F_FORCE_ASYNC) {
+> > > > +			io_req_task_queue(member);
+> > > > +		} else {
+> > > > +			io_queue_sqe(member);
+> 
+> io_req_queue_tw_complete() please, just like links deal
+> with it, so it's executed in a well known context without
+> jumping ahead of other requests.
+
+members needn't to be queued until leader is completed for plain
+SQE_GROUP, otherwise perf can drop.
+
+> 
+> > > > +		}
+> > > > +		member = next;
+> > > > +	}
+> > > > +	req->grp_link = NULL;
+> > > > +}
+> > > > +
+> > > > +static inline bool __io_complete_group_req(struct io_kiocb *req,
+> > > > +			     struct io_kiocb *lead)
+> > > > +{
+> > > > +	WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP));
+> > > > +
+> > > > +	if (WARN_ON_ONCE(lead->grp_refs <= 0))
+> > > > +		return false;
+> > > > +
+> > > > +	/*
+> > > > +	 * Set linked leader as failed if any member is failed, so
+> > > > +	 * the remained link chain can be terminated
+> > > > +	 */
+> > > > +	if (unlikely((req->flags & REQ_F_FAIL) &&
+> > > > +		     ((lead->flags & IO_REQ_LINK_FLAGS) && lead->link)))
+> > > > +		req_set_fail(lead);
+> > > > +	return !--lead->grp_refs;
+> > > > +}
+> > > > +
+> > > > +/* Complete group request and collect completed leader for freeing */
+> > > > +static inline void io_complete_group_req(struct io_kiocb *req,
+> > > > +		struct io_wq_work_list *grp_list)
+> > > > +{
+> > > > +	struct io_kiocb *lead = get_group_leader(req);
+> > > > +
+> > > > +	if (__io_complete_group_req(req, lead)) {
+> > > > +		req->flags &= ~REQ_F_SQE_GROUP;
+> > > > +		lead->flags &= ~REQ_F_SQE_GROUP_LEADER;
+> > > > +		if (!(lead->flags & REQ_F_CQE_SKIP))
+> > > > +			io_req_commit_cqe(lead, lead->ctx->lockless_cq);
+> > > > +
+> > > > +		if (req != lead) {
+> > > > +			/*
+> > > > +			 * Add leader to free list if it isn't there
+> > > > +			 * otherwise clearing group flag for freeing it
+> > > > +			 * in current batch
+> > > > +			 */
+> > > > +			if (!(lead->flags & REQ_F_SQE_GROUP))
+> > > > +				wq_list_add_tail(&lead->comp_list, grp_list);
+> > > > +			else
+> > > > +				lead->flags &= ~REQ_F_SQE_GROUP;
+> > > > +		}
+> > > > +	} else if (req != lead) {
+> > > > +		req->flags &= ~REQ_F_SQE_GROUP;
+> > > > +	} else {
+> > > > +		/*
+> > > > +		 * Leader's group flag clearing is delayed until it is
+> > > > +		 * removed from free list
+> > > > +		 */
+> > > > +	}
+> > > > +}
+> > > > +
+> > > >    static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
+> > > >    {
+> > > >    	struct io_ring_ctx *ctx = req->ctx;
+> > > > @@ -1427,6 +1545,17 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
+> > > >    						    comp_list);
+> > > >    		if (unlikely(req->flags & IO_REQ_CLEAN_SLOW_FLAGS)) {
+> > > > +			/*
+> > > > +			 * Group leader may be removed twice, don't free it
+> > > > +			 * if group flag isn't cleared, when some members
+> > > > +			 * aren't completed yet
+> > > > +			 */
+> > > > +			if (req->flags & REQ_F_SQE_GROUP) {
+> > > > +				node = req->comp_list.next;
+> > > > +				req->flags &= ~REQ_F_SQE_GROUP;
+> > > > +				continue;
+> > > > +			}
+> > > > +
+> > > >    			if (req->flags & REQ_F_REFCOUNT) {
+> > > >    				node = req->comp_list.next;
+> > > >    				if (!req_ref_put_and_test(req))
+> > > > @@ -1459,6 +1588,7 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+> > > >    	__must_hold(&ctx->uring_lock)
+> > > >    {
+> > > >    	struct io_submit_state *state = &ctx->submit_state;
+> > > > +	struct io_wq_work_list grp_list = {NULL};
+> > > >    	struct io_wq_work_node *node;
+> > > >    	__io_cq_lock(ctx);
+> > > > @@ -1468,9 +1598,15 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+> > > >    		if (!(req->flags & REQ_F_CQE_SKIP))
+> > > >    			io_req_commit_cqe(req, ctx->lockless_cq);
+> > > > +
+> > > > +		if (req->flags & REQ_F_SQE_GROUP)
+> > > 
+> > > Same note about hot path
+> > > 
+> > > > +			io_complete_group_req(req, &grp_list);
+> > > >    	}
+> > > >    	__io_cq_unlock_post(ctx);
+> > > > +	if (!wq_list_empty(&grp_list))
+> > > > +		__wq_list_splice(&grp_list, state->compl_reqs.first);
+> > > 
+> > > What's the point of splicing it here insted of doing all
+> > > that under REQ_F_SQE_GROUP above?
+> > 
+> > As mentioned, group leader can't be completed until all members are
+> > done, so any leaders in the current list have to be moved to this
+> > local list for deferred completion. That should be the only tricky
+> > part of the whole sqe group implementation.
+> > 
+> > > 
+> > > > +
+> > > >    	if (!wq_list_empty(&ctx->submit_state.compl_reqs)) {
+> > > >    		io_free_batch_list(ctx, state->compl_reqs.first);
+> > > >    		INIT_WQ_LIST(&state->compl_reqs);
+> ...
+> > > > @@ -1863,6 +2012,8 @@ void io_wq_submit_work(struct io_wq_work *work)
+> > > >    		}
+> > > >    	}
+> > > > +	if (need_queue_group_members(req))
+> > > > +		io_queue_group_members(req, true);
+> > > >    	do {
+> > > >    		ret = io_issue_sqe(req, issue_flags);
+> > > >    		if (ret != -EAGAIN)
+> > > > @@ -1977,6 +2128,9 @@ static inline void io_queue_sqe(struct io_kiocb *req)
+> > > >    	 */
+> > > >    	if (unlikely(ret))
+> > > >    		io_queue_async(req, ret);
+> > > > +
+> > > > +	if (need_queue_group_members(req))
+> > > > +		io_queue_group_members(req, false);
+> > > 
+> > > Request ownership is considered to be handed further at this
+> > > point and requests should not be touched. Only ret==0 from
+> > > io_issue_sqe it's still ours, but again it's handed somewhere
+> > > by io_queue_async().
+> > 
+> > Yes, you are right.
+> > 
+> > And it has been fixed in my local tree:
+> > 
+> > @@ -2154,8 +2154,7 @@ static inline void io_queue_sqe(struct io_kiocb *req)
+> >           */
+> >          if (unlikely(ret))
+> >                  io_queue_async(req, ret);
+> > -
+> > -       if (need_queue_group_members(req))
+> > +       else if (need_queue_group_members(req))
+> >                  io_queue_group_members(req, false);
+> >   }
+> 
+> In the else branch you don't own the request anymore
+> and shouldn't be poking into it.
+
+In theory, it is yes, but now all requests won't be freed unless
+returning from io_queue_sqe(), and it needs to be commented
+carefully.
+
+> 
+> It looks like you're trying to do io_queue_group_members()
+> when previously the request would get completed. It's not
+
+It is only true for REQ_F_SQE_GROUP_DEP, and there isn't such
+dependency for plain SQE_GROUP.
+
+> the right place, and apart from whack'a'moled
+> io_wq_submit_work() there is also io_poll_issue() missed.
+> 
+> Seems __io_submit_flush_completions() / io_free_batch_list()
+> would be more appropriate, and you already have a chunk with
+> GROUP check in there handling the leader appearing in there
+> twice.
+
+As mentioned, we need to queue members with leader together
+if there isn't dependency among them.
+
+> 
+> 
+> > > >    }
+> > > >    static void io_queue_sqe_fallback(struct io_kiocb *req)
+> ...
+> > > > @@ -2232,7 +2443,7 @@ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+> > > >    			 const struct io_uring_sqe *sqe)
+> > > >    	__must_hold(&ctx->uring_lock)
+> > > >    {
+> > > > -	struct io_submit_link *link = &ctx->submit_state.link;
+> > > > +	struct io_submit_state *state = &ctx->submit_state;
+> > > >    	int ret;
+> > > >    	ret = io_init_req(ctx, req, sqe);
+> > > > @@ -2241,9 +2452,17 @@ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+> > > >    	trace_io_uring_submit_req(req);
+> > > > -	if (unlikely(link->head || (req->flags & (IO_REQ_LINK_FLAGS |
+> > > > -				    REQ_F_FORCE_ASYNC | REQ_F_FAIL)))) {
+> > > > -		req = io_link_sqe(link, req);
+> > > > +	if (unlikely(state->group.head ||
+> > > 
+> > > A note rather to myself and for the future, all theese checks
+> > > including links and groups can be folded under one common if.
+> > 
+> > Sorry, I may not get the idea, can you provide one example?
+> 
+> To be clear, not suggesting you doing it.
+> 
+> Simplifying:
+> 
+> init_req() {
+> 	if (req->flags & GROUP|LINK) {
+> 		ctx->assembling;
+> 	}
+> }
+> 
+> io_submit_sqe() {
+> 	init_req();
+> 
+> 	if (ctx->assembling) {
+> 		check_groups/links();
+> 		if (done);
+> 			ctx->assembling = false;
+> 	}
+> }
+
+OK, I can work toward this way, and it is just to replace check over
+group.head/link.head & link/group flag with ->assembling, meantime
+with cost of setting ctx->assembling.
 
 
 
-On 2024/6/11 11:29, Ming Lei wrote:
-> On Tue, Jun 11, 2024 at 10:48:13AM +0800, yebin (H) wrote:
->>
->> On 2024/6/7 9:35, Ming Lei wrote:
->>> On Fri, Jun 07, 2024 at 09:32:29AM +0800, yebin wrote:
->>>> On 2024/6/7 8:13, Ming Lei wrote:
->>>>> On Thu, Jun 06, 2024 at 02:26:55PM +0800, Ye Bin wrote:
->>>>>> From: Ye Bin <yebin10@huawei.com>
->>>>>>
->>>>>> There's a issue as follows when do format NVME with IO:
->>>>>> BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
->>>>>> PGD 101727f067 P4D 1011fae067 PUD fbed78067 PMD 0
->>>>>> Oops: 0000 [#1] SMP NOPTI
->>>>>> RIP: 0010:kfree+0x4f/0x160
->>>>>> RSP: 0018:ff705a800912b910 EFLAGS: 00010247
->>>>>> RAX: 0000000000000000 RBX: 0d06d30000000000 RCX: ff4fb320260ad990
->>>>>> RDX: ff4fb30ee7acba40 RSI: 0000000000000000 RDI: 00b04cff80000000
->>>>>> RBP: ff4fb30ee7acba40 R08: 0000000000000200 R09: ff705a800912bb60
->>>>>> R10: 0000000000000000 R11: ff4fb3103b67c750 R12: ffffffff9a62d566
->>>>>> R13: ff4fb30aa0530000 R14: 0000000000000000 R15: 000000000000000a
->>>>>> FS:  00007f4399b6b700(0000) GS:ff4fb31040140000(0000) knlGS:0000000000000000
->>>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>>> CR2: 0000000000000008 CR3: 0000001014cd4002 CR4: 0000000000761ee0
->>>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>>>> DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
->>>>>> PKRU: 55555554
->>>>>> Call Trace:
->>>>>>     bio_integrity_free+0xa6/0xb0
->>>>>>     __bio_integrity_endio+0x8c/0xa0
->>>>>>     bio_endio+0x2b/0x130
->>>>>>     blk_update_request+0x78/0x2b0
->>>>>>     blk_mq_end_request+0x1a/0x140
->>>>>>     blk_mq_try_issue_directly+0x5d/0xc0
->>>>>>     blk_mq_make_request+0x46b/0x540
->>>>>>     generic_make_request+0x121/0x300
->>>>>>     submit_bio+0x6c/0x140
->>>>>>     __blkdev_direct_IO_simple+0x1ca/0x3a0
->>>>>>     blkdev_direct_IO+0x3d9/0x460
->>>>>>     generic_file_read_iter+0xb4/0xc60
->>>>>>     new_sync_read+0x121/0x170
->>>>>>     vfs_read+0x89/0x130
->>>>>>     ksys_read+0x52/0xc0
->>>>>>     do_syscall_64+0x5d/0x1d0
->>>>>>     entry_SYSCALL_64_after_hwframe+0x65/0xca
->>>>>>
->>>>>> Assuming a 512 byte directIO is issued, the initial logical block size of
->>>>>> the state block device is 512 bytes, and then modified to 4096 bytes.
->>>>>> Above issue may happen as follows:
->>>>>>             Direct read                    format NVME
->>>>>> __blkdev_direct_IO_simple(iocb, iter, nr_pages);
->>>>>>      if ((pos | iov_iter_alignment(iter)) & (bdev_logical_block_size(bdev) - 1))
->>>>>> 	-->The logical block size is 512, and the IO issued is 512 bytes,
->>>>>> 	   which can be checked
->>>>>>        return -EINVAL;
->>>>>>      submit_bio(&bio);
->>>>>>                                          nvme_dev_ioctl
->>>>>>                                            case NVME_IOCTL_RESCAN:
->>>>>>                                              nvme_queue_scan(ctrl);
->>>>>>                                                 ...
->>>>>>                                                nvme_update_disk_info(disk, ns, id);
->>>>>>                                                  blk_queue_logical_block_size(disk->queue, bs);
->>>>>>                                                    --> 512->4096
->>>>>>         blk_queue_enter(q, flags)
->>>>>>         blk_mq_make_request(q, bio)
->>>>>>           bio_integrity_prep(bio)
->>>>>> 	 len = bio_integrity_bytes(bi, bio_sectors(bio));
->>>>>> 	   -->At this point, because the logical block size has increased to
->>>>>> 	      4096 bytes, the calculated 'len' here is 0
->>>>>>             buf = kmalloc(len, GFP_NOIO | q->bounce_gfp);
->>>>>> 	   -->Passed in len=0 and returned buf=16
->>>>>>             end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
->>>>>>             start = ((unsigned long) buf) >> PAGE_SHIFT;
->>>>>>             nr_pages = end - start;  -->nr_pages == 1
->>>>>>             bip->bip_flags |= BIP_BLOCK_INTEGRITY;
->>>>>>             for (i = 0 ; i < nr_pages ; i++) {
->>>>>>               if (len <= 0)
->>>>>>                  -->Not initializing the bip_vec of bio_integrity, will result
->>>>>> 		 in null pointer access during subsequent releases. Even if
->>>>>> 		 initialized, it will still cause subsequent releases access
->>>>>> 		 null pointer because the buffer address is incorrect.
->>>>>>                 break;
->>>>>>
->>>>>> Firstly, it is unreasonable to format NVME in the presence of IO. It is also
->>>>>> possible to see IO smaller than the logical block size in the block layer for
->>>>>> this type of concurrency. It is expected that this type of IO device will
->>>>>> return an error, so exception handling should also be done for this type of
->>>>>> IO to prevent null pointer access from causing system crashes.
->>>>> Actually unaligned IO handling is one mess for nvme hardware. Yes, IO may fail,
->>>>> but it is observed that meta buffer is overwrite by DMA in read IO.
->>>>>
->>>>> Ye and Yi, can you test the following patch in your 'nvme format' & IO workload?
->>>>>
->>>>>
->>>>> diff --git a/block/blk-core.c b/block/blk-core.c
->>>>> index 82c3ae22d76d..a41ab4a3a398 100644
->>>>> --- a/block/blk-core.c
->>>>> +++ b/block/blk-core.c
->>>>> @@ -336,6 +336,19 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
->>>>>     	return 0;
->>>>>     }
->>>>> +static bool bio_unaligned(struct bio *bio)
->>>>> +{
->>>>> +	unsigned int bs = bdev_logical_block_size(bio->bi_bdev);
->>>>> +
->>>>> +	if (bio->bi_iter.bi_size & (bs - 1))
->>>>> +	        return true;
->>>>> +
->>>>> +	if ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1))
->>>>> +	        return true;
->>>>> +
->>>>> +	return false;
->>>>> +}
->>>> I think this judgment is a bit incorrect. It should not be sufficient to
->>>> only determine whether
->>>> the length and starting sector are logically block aligned.
->>> Can you explain why the two are not enough? Other limits should be handled
->>> by bio split.
->> If logical block size is 512 bytes, BIO has 4 segments, each segment length
->> is 512 bytes,
->> bio->bi_iter.bi_sector == 0. If logical block size change to 4096 bytes,
->> bio_unaligned() will
->> return false.
-> Yes, this IO is still 4096 aligned in block size level.
->
-> It is just that each bvec buffer isn't page-aligned, for nvme, if virt_boundary
-> is set, this bio will be split. However, we don't add logical block size
-> check in submit_bio_noacct() yet, 512byte bio still can be sent to
-> device.
->
->> I'm not sure if the example I gave is appropriate?
-> Absolutely it is one good example.
->
-> BTW, Yi have tested both your patch and my patch which checks lbs in
-> blk_queue_enter(), looks slab corruption still can be triggered with
-> either one.
-Yes, my patch only solves the integrity process in a single point to 
-avoid affecting
-the normal IO process. I am not sure if other processes will have 
-similar issues.
->
-> Yi, can you test the following patch?
->
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 82c3ae22d76d..c47e69795c86 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -336,6 +336,19 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
->   	return 0;
->   }
->   
-> +static inline bool bio_unaligned(struct bio *bio)
-> +{
-> +	unsigned int bs = bdev_logical_block_size(bio->bi_bdev);
-> +
-> +	if (bio->bi_iter.bi_size & (bs - 1))
-> +	        return true;
-> +
-> +	if ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1))
-> +	        return true;
-> +
-> +	return false;
-> +}
-> +
->   int __bio_queue_enter(struct request_queue *q, struct bio *bio)
->   {
->   	while (!blk_try_enter_queue(q, false)) {
-> @@ -362,6 +375,15 @@ int __bio_queue_enter(struct request_queue *q, struct bio *bio)
->   			   test_bit(GD_DEAD, &disk->state));
->   		if (test_bit(GD_DEAD, &disk->state))
->   			goto dead;
-> +		/*
-> +		 * Not like other queue limits, logical block size is one
-> +		 * fundamental limit which can't be covered by bio split.
-> +		 *
-> +		 * Device reconfiguration may happen and logical block size
-> +		 * is changed, so fail the IO if that is true.
-> +		 */
-> +		if (bio_unaligned(bio))
-> +			goto dead;
->   	}
->   
->   	return 0;
-> @@ -765,6 +787,8 @@ void submit_bio_noacct(struct bio *bio)
->   
->   	if (should_fail_bio(bio))
->   		goto end_io;
-> +	if (bio->bi_iter.bi_size && bio_unaligned(bio))
-> +		goto end_io;
-I think this check should be added after the bio_queue_enter() call. 
-Early judgment should be unreliable.
->   	bio_check_ro(bio);
->   	if (!bio_flagged(bio, BIO_REMAPPED)) {
->   		if (unlikely(bio_check_eod(bio)))
->
->
-> Thanks,
-> Ming
->
->
-> .
->
+Thanks,
+Ming
 
