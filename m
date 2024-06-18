@@ -1,27 +1,28 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FC51C69D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F56256D;
 	Tue, 18 Jun 2024 03:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718680728; cv=none; b=uh4XGc9rwek5BVzvqXlG7W6hB3L2SJwI/d5SpawQyvg5Evh5RCXHYshiNbhgKEyfdcEO3CAMjJLfjm2QvQHl+ztKhndyAou7X7he3nnEK6iKptpT512zJHqla83fdbX5RTtAlgIHBPQbure1aPScv2EsAM1h5fxIvonjIWZEKCM=
+	t=1718680729; cv=none; b=jsWpDVHd+/TlKZBd0q87Kf9jJ75i2kqR1+gn/AkXBBGYT75BXk6sHV7Y2SLYPwjnBR9+UOa5w7nPqPWV0UAxUDXhM9OLP8x1/jccQ1wh3LXRmCXA5111UaDPlRwEcnABDNYnDcEqZdgTbT0nT5J/+w9LEQ3y0DsADkoMHtcb+uA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718680728; c=relaxed/simple;
-	bh=iJDZc9m2RG0x8XpdmbtTCaEIW8kUeEyAjdeRKO/SaTk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Iwqavsf+/VWdgubR8cZO3BfvcavZHIIfw3WgJ2UR6LvkBvrtyR8fjS+pt4kgWLwnR5WvpsoYtYvwwY5EvBocHjVGPfDQwirUw54cNyQZdx1iI8AZ8zJO52IJH5wpRBLKife3hLUQIqef3xQGmF+Tc1UPGK2YYCe2JHyPY51NUoE=
+	s=arc-20240116; t=1718680729; c=relaxed/simple;
+	bh=e7+vDoIEVL1RlGQ3D7xQBG+dbRRC33wLqhnC22LJoPc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=UjCqGIvRCaEZrJsnnvbxqMoxaGRpDxKTxDCPBuZdtqfSQrEb8C2utvMIB7wC9cCtzqE7MGgJe1Ce+rSjAlsoMsJBWpU5lg0w7pLGaWH/IZi5k5rUywHeJDdOaH1gnGuXFYEutHS2D/QqEdfcjKdzffyd1fdEIEeTi3Oa7l2atGY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W3Bm36j0fz4f3kvt;
-	Tue, 18 Jun 2024 11:18:27 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W3BmD2dswz4f3jQd;
+	Tue, 18 Jun 2024 11:18:36 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id A89321A0181;
-	Tue, 18 Jun 2024 11:18:39 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 2840E1A016E;
+	Tue, 18 Jun 2024 11:18:43 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCXAQ+N_HBmFJj8AA--.12964S4;
-	Tue, 18 Jun 2024 11:18:39 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgCXAQ+N_HBmFJj8AA--.12964S10;
+	Tue, 18 Jun 2024 11:18:42 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: axboe@kernel.dk,
 	tj@kernel.org,
@@ -38,10 +39,12 @@ Cc: linux-block@vger.kernel.org,
 	yukuai1@huaweicloud.com,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com
-Subject: [PATCH RFC v2 0/7] blk-iocost: support to build iocost as kernel module
-Date: Tue, 18 Jun 2024 11:17:44 +0800
-Message-Id: <20240618031751.3470464-1-yukuai1@huaweicloud.com>
+Subject: [PATCH RFC v2 6/7] blk-iocost: support to free iocost
+Date: Tue, 18 Jun 2024 11:17:50 +0800
+Message-Id: <20240618031751.3470464-7-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240618031751.3470464-1-yukuai1@huaweicloud.com>
+References: <20240618031751.3470464-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,63 +52,160 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCXAQ+N_HBmFJj8AA--.12964S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF4rKw18AF45Xr18XrW8WFg_yoW8Xr4UpF
-	sIgr15Cay7Grs7J3WfGw1293Wftw4kWFWrJ3ZxXr95Aw17JF1Iy3Wvv348G34xZFW7Ar4Y
-	gFW3Jry3Kr1ayFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
-	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
-	UQvtAUUUUU=
+X-CM-TRANSID:gCh0CgCXAQ+N_HBmFJj8AA--.12964S10
+X-Coremail-Antispam: 1UD129KBjvJXoWxGry5Kr4DCFWfuFy7KF43GFg_yoW5KFy7pa
+	1ruw1akayqqrs7urnxXr42vw1Skws2gryxJ3yfG34ftrnFkr1FqF1kCry8CFy5JFZ5Ar4a
+	vFZ5trW7Gr48ArJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
+	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
+	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
+	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
+	kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
+	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
+	wI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
+	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQ
+	SdkUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Changes from RFC v1:
- - replace the first patch.
- - add commit message of our motivation and advantages to build iocost
- as kernel module.
+Currently if iocost is initialized, it can never be freed until the disk
+is deleted.
 
-The motivation is that iocost is not used widely in our production, and
-some customers don't want to increase kernel size to enable iocost that
-they will never use, and it'll be painful to maintain a new downstream
-kernel. Hence it'll be beneficially to build iocost as kernel module:
+A new param "free" is added to the blk-io cgroup api "io.cost.qos", and
+user can use it to free iocost. On the one hand prevent overhead from
+fast path, on the other hand prepare to build iocost as kernel module.
 
-- Kernel Size and Resource Usage, modules are loaded only when their
-specific functionality is required.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-iocost.c | 38 +++++++++++++++++++++++++++++++++-----
+ 1 file changed, 33 insertions(+), 5 deletions(-)
 
-- Flexibility and Maintainability, allows for dynamic loading and unloading
-of modules at runtime without the need to recompile and restart the kernel,
-for example we can just replace blk-iocost.ko to fix iocost CVE in our
-production environment.
-
-Yu Kuai (7):
-  blk-cgroup: add a new helper pr_cont_blkg_path()
-  cgroup: export cgroup_parse_float
-  block: export some API
-  blk-iocost: factor out helpers to handle params from ioc_qos_write()
-  blk-iocost: parse params before initializing iocost
-  blk-iocost: support to free iocost
-  blk-iocost: support to build iocost as kernel module
-
- block/Kconfig             |   2 +-
- block/blk-cgroup.c        |  10 ++
- block/blk-cgroup.h        |   1 +
- block/blk-iocost.c        | 225 ++++++++++++++++++++++++++------------
- block/blk-rq-qos.c        |   2 +
- include/linux/blk_types.h |   2 +-
- kernel/cgroup/cgroup.c    |   1 +
- 7 files changed, 170 insertions(+), 73 deletions(-)
-
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 34dcf4cdfadb..9765c988113f 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -324,6 +324,7 @@ enum ioc_running {
+ enum {
+ 	QOS_ENABLE,
+ 	QOS_CTRL,
++	QOS_FREE,
+ 	NR_QOS_CTRL_PARAMS,
+ };
+ 
+@@ -2847,11 +2848,9 @@ static void ioc_rqos_queue_depth_changed(struct rq_qos *rqos)
+ 	spin_unlock_irq(&ioc->lock);
+ }
+ 
+-static void ioc_rqos_exit(struct rq_qos *rqos)
++static void __ioc_exit(struct ioc *ioc)
+ {
+-	struct ioc *ioc = rqos_to_ioc(rqos);
+-
+-	blkcg_deactivate_policy(rqos->disk, &blkcg_policy_iocost);
++	blkcg_deactivate_policy(ioc->rqos.disk, &blkcg_policy_iocost);
+ 
+ 	spin_lock_irq(&ioc->lock);
+ 	ioc->running = IOC_STOP;
+@@ -2862,6 +2861,13 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+ 	kfree(ioc);
+ }
+ 
++static void ioc_rqos_exit(struct rq_qos *rqos)
++{
++	struct ioc *ioc = rqos_to_ioc(rqos);
++
++	__ioc_exit(ioc);
++}
++
+ static const struct rq_qos_ops ioc_rqos_ops = {
+ 	.throttle = ioc_rqos_throttle,
+ 	.merge = ioc_rqos_merge,
+@@ -3193,6 +3199,7 @@ static int ioc_qos_show(struct seq_file *sf, void *v)
+ static const match_table_t qos_ctrl_tokens = {
+ 	{ QOS_ENABLE,		"enable=%u"	},
+ 	{ QOS_CTRL,		"ctrl=%s"	},
++	{ QOS_FREE,		"free"		},
+ 	{ NR_QOS_CTRL_PARAMS,	NULL		},
+ };
+ 
+@@ -3210,6 +3217,7 @@ struct ioc_qos_params {
+ 	u32 qos[NR_QOS_PARAMS];
+ 	bool enable;
+ 	bool user;
++	bool free;
+ };
+ 
+ static void ioc_qos_params_init(struct ioc *ioc, struct ioc_qos_params *params)
+@@ -3228,6 +3236,8 @@ static void ioc_qos_params_init(struct ioc *ioc, struct ioc_qos_params *params)
+ 		params->enable = false;
+ 		params->user = false;
+ 	}
++
++	params->free = false;
+ }
+ 
+ static int ioc_qos_params_parse(struct blkg_conf_ctx *ctx,
+@@ -3260,6 +3270,9 @@ static int ioc_qos_params_parse(struct blkg_conf_ctx *ctx,
+ 			else
+ 				return -EINVAL;
+ 			continue;
++		case QOS_FREE:
++			params->free = true;
++			continue;
+ 		}
+ 
+ 		tok = match_token(p, qos_tokens, args);
+@@ -3338,6 +3351,15 @@ static void ioc_qos_params_update(struct gendisk *disk, struct ioc *ioc,
+ 	ioc_refresh_params(ioc, true);
+ }
+ 
++static void ioc_free(struct ioc *ioc)
++{
++	if (!ioc)
++		return;
++
++	rq_qos_del(&ioc->rqos);
++	__ioc_exit(ioc);
++}
++
+ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 			     size_t nbytes, loff_t off)
+ {
+@@ -3366,7 +3388,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	if (ret)
+ 		goto err;
+ 
+-	if (!ioc) {
++	if (!params.free && !ioc) {
+ 		ret = blk_iocost_init(disk);
+ 		if (ret)
+ 			goto err;
+@@ -3376,6 +3398,11 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	blk_mq_freeze_queue(disk->queue);
+ 	blk_mq_quiesce_queue(disk->queue);
+ 
++	if (params.free) {
++		ioc_free(ioc);
++		goto out;
++	}
++
+ 	spin_lock_irq(&ioc->lock);
+ 
+ 	ioc_qos_params_update(disk, ioc, &params);
+@@ -3386,6 +3413,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	else
+ 		wbt_enable_default(disk);
+ 
++out:
+ 	blk_mq_unquiesce_queue(disk->queue);
+ 	blk_mq_unfreeze_queue(disk->queue);
+ 
 -- 
 2.39.2
 
