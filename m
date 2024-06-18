@@ -1,98 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F257848D
-	for <linux-block@vger.kernel.org>; Tue, 18 Jun 2024 02:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FC51C69D;
+	Tue, 18 Jun 2024 03:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718676727; cv=none; b=XHJm6YVzttBqKU2XS3e8z9+HTjgG0Me6VClfNT2mInaCpnWvyw387gUXbYg1+iauf8LNrxJs6716jSeLQgow5MnEUDcz5K5yv0tqrte1RPx/zCR8Kgh9f49YvaHzO2lHlOtnWOYRlTX30SWwAIHX15f1iwwhABawoS55CeN9aSo=
+	t=1718680728; cv=none; b=uh4XGc9rwek5BVzvqXlG7W6hB3L2SJwI/d5SpawQyvg5Evh5RCXHYshiNbhgKEyfdcEO3CAMjJLfjm2QvQHl+ztKhndyAou7X7he3nnEK6iKptpT512zJHqla83fdbX5RTtAlgIHBPQbure1aPScv2EsAM1h5fxIvonjIWZEKCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718676727; c=relaxed/simple;
-	bh=zFrpeu6AbICHbaSPlg/hRH9auVFy/sdbDDujClEkYHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DFyQ5q7gdi4BTh8VqJybvBVMdglTvlz/9RPy8pDDiuk24u3aM6u91VwqrPs+qvvY/BRVAI//7B0gbaM8vvSBbWrJ2ZcLNsSvqrm/Qv9aBqL0N38vg8YXr4TQAp4mDDVPpSDkKtiCoVymcEeQGhvqTyDueqL+G2PCbzFXeWsjEz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b5LIGyQe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b5LIGyQe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718676724;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p/lTYCoRKMMo1EeW95bAsXwqnYlCChDryMr6+xmdd00=;
-	b=b5LIGyQeIcXj2irQNq2ymdNpDn3/sKbRbtS/p0h8ntxIQJF5omkU6xYXTgKCN6vX+1UXS3
-	1Tzu0PPrM70sZMsfN9G32ZfNSnkm7zv6hqwlpmn5BxGUK1kFjbo8DGenQUGd40xso9zIc9
-	TiR2xVKnUkjleKsx2HrpkSycByGNQW4=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-378-8NwKDRDGMPe8k05diRso6A-1; Mon,
- 17 Jun 2024 22:12:01 -0400
-X-MC-Unique: 8NwKDRDGMPe8k05diRso6A-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F891195609F;
-	Tue, 18 Jun 2024 02:12:00 +0000 (UTC)
-Received: from fedora (unknown [10.72.112.49])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CC18A1956087;
-	Tue, 18 Jun 2024 02:11:56 +0000 (UTC)
-Date: Tue, 18 Jun 2024 10:11:51 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
-Message-ID: <ZnDs5zLc5oA1jPVA@fedora>
-References: <20240617194451.435445-1-ushankar@purestorage.com>
- <20240617194451.435445-3-ushankar@purestorage.com>
+	s=arc-20240116; t=1718680728; c=relaxed/simple;
+	bh=iJDZc9m2RG0x8XpdmbtTCaEIW8kUeEyAjdeRKO/SaTk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Iwqavsf+/VWdgubR8cZO3BfvcavZHIIfw3WgJ2UR6LvkBvrtyR8fjS+pt4kgWLwnR5WvpsoYtYvwwY5EvBocHjVGPfDQwirUw54cNyQZdx1iI8AZ8zJO52IJH5wpRBLKife3hLUQIqef3xQGmF+Tc1UPGK2YYCe2JHyPY51NUoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W3Bm36j0fz4f3kvt;
+	Tue, 18 Jun 2024 11:18:27 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id A89321A0181;
+	Tue, 18 Jun 2024 11:18:39 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCXAQ+N_HBmFJj8AA--.12964S4;
+	Tue, 18 Jun 2024 11:18:39 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	tj@kernel.org,
+	gregkh@linuxfoundation.org,
+	bvanassche@acm.org,
+	hch@infradead.org,
+	josef@toxicpanda.com,
+	lizefan.x@bytedance.com,
+	hannes@cmpxchg.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH RFC v2 0/7] blk-iocost: support to build iocost as kernel module
+Date: Tue, 18 Jun 2024 11:17:44 +0800
+Message-Id: <20240618031751.3470464-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240617194451.435445-3-ushankar@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCXAQ+N_HBmFJj8AA--.12964S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7CF4rKw18AF45Xr18XrW8WFg_yoW8Xr4UpF
+	sIgr15Cay7Grs7J3WfGw1293Wftw4kWFWrJ3ZxXr95Aw17JF1Iy3Wvv348G34xZFW7Ar4Y
+	gFW3Jry3Kr1ayFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+	UQvtAUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Jun 17, 2024 at 01:44:49PM -0600, Uday Shankar wrote:
-> ublk currently supports the following behaviors on ublk server exit:
-> 
-> A: outstanding I/Os get errors, subsequently issued I/Os get errors
-> B: outstanding I/Os get errors, subsequently issued I/Os queue
-> C: outstanding I/Os get reissued, subsequently issued I/Os queue
-> 
-> and the following behaviors for recovery of preexisting block devices by
-> a future incarnation of the ublk server:
-> 
-> 1: ublk devices stopped on ublk server exit (no recovery possible)
-> 2: ublk devices are recoverable using start/end_recovery commands
-> 
-> The userspace interface allows selection of combinations of these
-> behaviors using flags specified at device creation time, namely:
-> 
-> default behavior: A + 1
-> UBLK_F_USER_RECOVERY: B + 2
-> UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_REISSUE: C + 2
+From: Yu Kuai <yukuai3@huawei.com>
 
-ublk is supposed to support A, B & C for both 1 and both 2, but it may
-depend on how ublk server is implemented.
+Changes from RFC v1:
+ - replace the first patch.
+ - add commit message of our motivation and advantages to build iocost
+ as kernel module.
 
-In cover letter, it is mentioned that "A + 2 is a currently unsupported
-behavior", can you explain it a bit? Such as, how does ublk server
-handle the I/O error? And when/how to recover? why doesn't this way
-work?
+The motivation is that iocost is not used widely in our production, and
+some customers don't want to increase kernel size to enable iocost that
+they will never use, and it'll be painful to maintain a new downstream
+kernel. Hence it'll be beneficially to build iocost as kernel module:
 
-For example, one rough way is to kill the daemon in case of A, then recovery
-can be started and new daemon is created for handling IO.
+- Kernel Size and Resource Usage, modules are loaded only when their
+specific functionality is required.
 
-But we are open to improve this area to support more flexible ublk
-server implementation.
+- Flexibility and Maintainability, allows for dynamic loading and unloading
+of modules at runtime without the need to recompile and restart the kernel,
+for example we can just replace blk-iocost.ko to fix iocost CVE in our
+production environment.
 
-Thanks,
-Ming
+Yu Kuai (7):
+  blk-cgroup: add a new helper pr_cont_blkg_path()
+  cgroup: export cgroup_parse_float
+  block: export some API
+  blk-iocost: factor out helpers to handle params from ioc_qos_write()
+  blk-iocost: parse params before initializing iocost
+  blk-iocost: support to free iocost
+  blk-iocost: support to build iocost as kernel module
+
+ block/Kconfig             |   2 +-
+ block/blk-cgroup.c        |  10 ++
+ block/blk-cgroup.h        |   1 +
+ block/blk-iocost.c        | 225 ++++++++++++++++++++++++++------------
+ block/blk-rq-qos.c        |   2 +
+ include/linux/blk_types.h |   2 +-
+ kernel/cgroup/cgroup.c    |   1 +
+ 7 files changed, 170 insertions(+), 73 deletions(-)
+
+-- 
+2.39.2
 
