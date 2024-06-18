@@ -1,110 +1,135 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC1F55E58;
-	Tue, 18 Jun 2024 06:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147621E53A
+	for <linux-block@vger.kernel.org>; Tue, 18 Jun 2024 06:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718691723; cv=none; b=VuEO5kWe9GxT2KpeFrGBBGjJuePR8XlO2uLKZOjtI1Wnv+0/z80KQcncRZ5couitkH4n2GKdJOaL6AXpv/rbaFaiQFaR4A2fJMoXWktd1BRKDJe0dIdn+iYupB4qF2k7RxB7+57t1X84oi6ZDhXyglItdRC/EMWq2mFqULR8sDA=
+	t=1718692001; cv=none; b=Xexi5wpUBhH7MGKBqGr6sLLsEGZY1mV2BMdug6iiDWjF9QKlvMMwZXUQjCte/qNW00H2Et6aAJX0PFgxmgqQnRDX1rAU1xX+mGvZGL32mPoc6bSKAHxdJnV/od2xRbhjr1awRaOcFN3vOe7s82eLBzBCDiWsHNywCcHnKC2w9t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718691723; c=relaxed/simple;
-	bh=m1zG2yEWX7cBjqsBzhezr80cVaRI1m/8Ekw9b0fms2c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LwlznVw7ggqdV4IOgxExIwwiTeCFB15yK1fg/iMNM8U4um1HpTtbNoAwI5D8Ea1zBaVQXQWB3sgtZSsius8K5iK36Dr+md2n+asef2+6AuH4BTJWYQDH6FwQ+CoTyzaY/mOLYfbHhbCmyXwQt9d54iYMedrcA3VtpozJ9+h8+r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W3Gqd6Qk9z4f3jLV;
-	Tue, 18 Jun 2024 14:21:49 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id AC8ED1A016E;
-	Tue, 18 Jun 2024 14:21:56 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCH7wyCJ3Fm1K4IAQ--.17725S4;
-	Tue, 18 Jun 2024 14:21:56 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH v2] blk-throttle: fix lower control under super low iops limit
-Date: Tue, 18 Jun 2024 14:21:08 +0800
-Message-Id: <20240618062108.3680835-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1718692001; c=relaxed/simple;
+	bh=ORrXPEfpl2xfCsPTesnMVcBVAmnwwqciKq5ebwjAytY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dwjUH9qvEC7wvYKDHeIGzmV6TSNixNZCBCm042N2pI+bQlwpz83mNDl/j6nrXtVGCD6b7OC1IVGWQihCuGC4w6jcZzrPrwvvE9BCpBHXlXaQh5qbqVK4augA7RoAEp0KKxEnPr9NA0DxpfoGYs/Poq/fgYo82CUga4zBlXeOuys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Va/xqwod; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=I39Jev6E; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Va/xqwod; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=I39Jev6E; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Va/xqwod";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="I39Jev6E";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Va/xqwod";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="I39Jev6E"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3B5DA227A2;
+	Tue, 18 Jun 2024 06:26:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1718691998; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3tfX5tiJZsH1uIItuRiPycHAkawcZY4G245vsmcwEcM=;
+	b=Va/xqwodyVllk0jjTYOcPyrmLhuZeqSn2inhTZr+CzHfhWkxcc4fcgtq2D3M0Tw6vWZhz5
+	kexBKf4IPHQjeyczWG7MaSkm/k5Ahz5OBtNsbYGVIWzPdrpgnJCJ+OVRxY6iewbvi1qv/U
+	6MXxhQITnDsl7kTvut390fTrFPWIYWU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1718691998;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3tfX5tiJZsH1uIItuRiPycHAkawcZY4G245vsmcwEcM=;
+	b=I39Jev6EpvEKA2c0PSUfrB7GqCUxq1jmpteZz4MFo64a5Ts8fM80TKKahzcqAPMEAo+CkG
+	fXyX/Yr2TQrroCCQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1718691998; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3tfX5tiJZsH1uIItuRiPycHAkawcZY4G245vsmcwEcM=;
+	b=Va/xqwodyVllk0jjTYOcPyrmLhuZeqSn2inhTZr+CzHfhWkxcc4fcgtq2D3M0Tw6vWZhz5
+	kexBKf4IPHQjeyczWG7MaSkm/k5Ahz5OBtNsbYGVIWzPdrpgnJCJ+OVRxY6iewbvi1qv/U
+	6MXxhQITnDsl7kTvut390fTrFPWIYWU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1718691998;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3tfX5tiJZsH1uIItuRiPycHAkawcZY4G245vsmcwEcM=;
+	b=I39Jev6EpvEKA2c0PSUfrB7GqCUxq1jmpteZz4MFo64a5Ts8fM80TKKahzcqAPMEAo+CkG
+	fXyX/Yr2TQrroCCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 288E01369F;
+	Tue, 18 Jun 2024 06:26:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3sOaCZ4ocWadXgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Tue, 18 Jun 2024 06:26:38 +0000
+Date: Tue, 18 Jun 2024 08:26:37 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+	Ofir Gal <ofir.gal@volumez.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH blktests] md: add regression test for "md/md-bitmap: fix
+ writing non bitmap pages"
+Message-ID: <tu77vp6rzu6spahkzost65igv22bmg24x5l5npgyljwdekbn45@hsswq7akbdpo>
+References: <20240613123019.3983399-1-ofir.gal@volumez.com>
+ <cnaunh75p4p45e4hgdaeaqry6whwdc2pqatil5v3oxjitwobda@p2oqftzlwv2r>
+ <34ee55e8-a23c-4e7e-b897-cfbcc8337136@volumez.com>
+ <zbeftlk6oti6uh5wx6m5ijvlvjv3xpxoqa6pj6mlasdr32eqfm@vyc5i3gyyj3s>
+ <1f245507-fc7d-4361-8f65-0015fe0de239@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCH7wyCJ3Fm1K4IAQ--.17725S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr1kCryfZFykGr47Kw4UJwb_yoW8GF45pr
-	W3Kr1jgF4DWFn7KF43Gw4ayFy8CFWkZr9xJ398uw1ayr13CF17Krn3CF4Yyw4xZFZa9FW7
-	ury8ta4kAF1UCaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
-	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvj
-	fUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f245507-fc7d-4361-8f65-0015fe0de239@nvidia.com>
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.995];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
+X-Spam-Level: 
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Tue, Jun 18, 2024 at 04:41:22AM GMT, Chaitanya Kulkarni wrote:
+> On 6/17/2024 6:24 PM, Shinichiro Kawasaki wrote:
+> >> nvme-tcp is used as the network device, I'm not sure it's related to
+> >> the nvme test group. What do you think?
+> > I see... The bug is in md sub-system, then it's the better to have the new test
+> > case in the new md test group. To avoid the cross reference, the nvmet related
+> > helper functions should move from tests/nvme/rc to common/nvmet, so that this
+> > test/md/001 can refer them. This will be another separated, preparation patch.
+> > 
+> > To nvme experts: If you have comments on this, please chime in.
+> 
+> no cross references please, above suggestion seems reasonable, however
+> I'd like to see actual prep patch before I comment further ..
 
-User will configure allowed iops limit in 1s, and calculate_io_allowed()
-will calculate allowed iops in the slice by:
-
-limit * HZ / throtl_slice
-
-However, if limit is quite low, the result can be 0, then
-allowed IO in the slice is 0, this will cause missing dispatch and
-control will be lower than limit.
-
-For example, set iops_limit to 5 with HD disk, and test will found that
-iops will be 3.
-
-This is usually not a big deal, because user will unlikely to configure
-such low iops limit, however, this is still a problem in the extreme
-scene.
-
-Fix the problem by making sure the wait time calculated by
-tg_within_iops_limit() should allow at least one IO to be dispatched.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
-Changes in v2:
- - instead of extend thorlt_slice, extend wait time;
- block/blk-throttle.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index c1bf73f8c75d..dc6140fa3de0 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -704,6 +704,9 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
- 
- 	/* Calc approx time to dispatch */
- 	jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
-+
-+	/* make sure at least one io can be dispatched after waiting */
-+	jiffy_wait = max(jiffy_wait, HZ / iops_limit + 1);
- 	return jiffy_wait;
- }
- 
--- 
-2.39.2
-
+Splitting the host from the target code in rc kind makes sense to me. I
+am fine with moving the nvmet code to common.
