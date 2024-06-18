@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCD815531B;
-	Tue, 18 Jun 2024 12:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABC415820C;
+	Tue, 18 Jun 2024 12:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718714387; cv=none; b=Rw8X8WwdUj+SoC4kx5P18kjVyDCi+393P8rnu9zCfyD/P/1VUo/AqKKLIAy3scm+iCzd0AAv3Xgb+O1rj1qrVRWBOwLr1pIPQKmZgtBXb8OB9EBZO+RA8WxnfTDj8gMx6DQpE7eguf2K1VPiOwxp+MEBZQZXaP/6AUNRouSc2O4=
+	t=1718714476; cv=none; b=cA08tMpdN8nTnN9P0WhV3yFIcrA0YfO1GU9WAWbc9B2y8YaLhNgicGrznDoogjmQEvG9zIaFQKez0snhJJdCa61ymwU395gmlnU5fkmlP9tbmUQLr7YViBSFFUXXP0GDpxGvIMNWVu46wyGIpGeFhP5j6J5EDtdIE1gHjZQ5qfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718714387; c=relaxed/simple;
-	bh=02JGWHfhWfg2HWwtQpkb82yHU0MEbN5MEFu8uNXbW+c=;
+	s=arc-20240116; t=1718714476; c=relaxed/simple;
+	bh=O6HQjA5C8MJ8iubKtctGkp5VYKVligBjZlLdnuQD9AM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q8npSUX2Tn3uQy8LlbzbtOKM2F7tTYx4xBsl4wq4T2Pmp+/0nQf88sY4z4Ys5ZrtuYHaBAhXCot/pOCY6bvKXphVtJlIPYtDnkDq+Eb31fXl/X15MwD+R5J3V0iET9yQNZ0EP/IKfxxGBETOOUGfRHZ81Qd2kN7j9Q8jpaQvF8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ngw33NO/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=pUaGsmlCHjmKrgD1h8WKehSz+U+TsOy2elmk8uym7S3sIxZo/sKTt70+4MdPR4aiRfpLFT5Ih1h71quokPgyYLNefefBrWvZv0sKe5KLI+AamMTjMwIypqbu2n29Tbefb9ZsszNkqUZHEyhZeKrUWDerPypp7PQEihS57Hf2hSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AVfmAiDp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ngw33NO/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F24C32786;
-	Tue, 18 Jun 2024 12:39:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVfmAiDp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00194C32786;
+	Tue, 18 Jun 2024 12:41:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718714387;
-	bh=02JGWHfhWfg2HWwtQpkb82yHU0MEbN5MEFu8uNXbW+c=;
+	s=k20201202; t=1718714475;
+	bh=O6HQjA5C8MJ8iubKtctGkp5VYKVligBjZlLdnuQD9AM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ngw33NO/WykZ2halXSj+MHOkEC6zTAvN3Cv6zCXjyuv71MwOIpvYOJn+XruzhzODi
-	 3pVcnthNDWo5N5aT4G4QYpwNrzScmmM4/a7YRzos0MiDw8ve4+XvC6Y7nfnQmESFXM
-	 YI4c7FgIZbOoxFuC3EJLvecCEmvpIhLwqx9a4lLbuciG67mJfgawaQ0ZEmgzdjm+yk
-	 hu7MqI9t6snTrIvrw4MlZVnH7BoExpJScwNKLUf/qN8u039LLfamZmjiAVpH51zNjF
-	 +zUHEgm1cDBgFCsnxsgryBqrQtczv2RPfOjkfzT2bGumtSUmsqiNKB6LUHhrpAaJ1V
-	 WAtQ3mm4ZNMgg==
+	b=AVfmAiDpkEJ9DREKyd9UCxuEx4Nqw/Sh0/r4xsrxv+DBXmwBvs+mTxrl9yC/53wbT
+	 +UrJPhDb9WhUFsp+e9GVR668p3/XUlBL6nX7mV8TEfrda8qascn6OV2YwrjsF2GBce
+	 fc5M0+DwGIiXdquevU4t5bE9ar5Gk6QzdTOh2XYTjY5zMO65kqfr6YJ63NCjR6ljkd
+	 66wZilgVc3jOrjVA91pzA3DoBBPjeC29p5m0BVrUbXd7ukyfFYCVIuAu5iDw71uyGf
+	 mABHp89iOflY4Rx0eGvDMRxJlj5aBADEvp1k73rXd5jBHeU8VshYc64kgZAZdDsk5e
+	 Od07opQLG6ZGQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,19 +35,19 @@ Cc: Andreas Hindborg <a.hindborg@samsung.com>,
 	Sasha Levin <sashal@kernel.org>,
 	dlemoal@kernel.org,
 	hare@suse.de,
-	kch@nvidia.com,
 	johannes.thumshirn@wdc.com,
+	kch@nvidia.com,
 	zhouchengming@bytedance.com,
 	yanjun.zhu@linux.dev,
 	yukuai3@huawei.com,
 	shinichiro.kawasaki@wdc.com,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 30/35] null_blk: fix validation of block size
-Date: Tue, 18 Jun 2024 08:37:50 -0400
-Message-ID: <20240618123831.3302346-30-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 26/29] null_blk: fix validation of block size
+Date: Tue, 18 Jun 2024 08:39:52 -0400
+Message-ID: <20240618124018.3303162-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240618123831.3302346-1-sashal@kernel.org>
-References: <20240618123831.3302346-1-sashal@kernel.org>
+In-Reply-To: <20240618124018.3303162-1-sashal@kernel.org>
+References: <20240618124018.3303162-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.34
+X-stable-base: Linux 6.1.94
 Content-Transfer-Encoding: 8bit
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
@@ -82,10 +82,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 561706fc2cd8e..f1b7d7fdffec8 100644
+index 220cedda2ca7d..4d78b5583dc6a 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -2013,8 +2013,8 @@ static int null_validate_conf(struct nullb_device *dev)
+@@ -1958,8 +1958,8 @@ static int null_validate_conf(struct nullb_device *dev)
  		return -EINVAL;
  	}
  
