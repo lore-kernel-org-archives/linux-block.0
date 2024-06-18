@@ -1,39 +1,47 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F066D1BB;
-	Tue, 18 Jun 2024 06:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C27918E1D;
+	Tue, 18 Jun 2024 07:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718693480; cv=none; b=Ln6VAWEZCzZfXYKXckMXsV7Lg5Xr4up2fjWaGWlCuIo3kvNNlzCmBM4jfZiQ4NRHWvhXIhKUuvUdV1LDhNLimb2TJpkkNNZcjXuILuWbDndWtxjRWN0FsjzSzbmDupVExWKW+yORfXx2ws6gzIHQCo35e77k1BkbiXStHoKTOaY=
+	t=1718694768; cv=none; b=J+WnbHtBZw7pFlwJ781GX90sCddCktsfQg02xBKyDvPzxl5CgzIEfAeeVNOynGxBmEc2+meMArrqPT2Fat8MfrMXeEFDemzD+CuxnJVdPB9S3qbp/eTmmJ7V/7M9JFi+fdfpaTTHMW8bqGP065f9p5/H/4oTrt735WKmf366yiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718693480; c=relaxed/simple;
-	bh=6BLzS+xoHDbfqDDfZtzzccJPWKtG+Rip0IyP0GUJYTM=;
+	s=arc-20240116; t=1718694768; c=relaxed/simple;
+	bh=84oEK2la+pdCXveM9q7mxMs8TSyM+0IrFfvfjlJkk+0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kHJSMH56PwkL9/ATuMeoy419BAuo/Wp2nloNVoXnAbqy8udVAIjsmX+3IhsuAyLeHR6lTZfyClZKzK7jQCtIWSWB9/FvSm/oocq/xSfdxCOd5Fytr0cRyVyb0f4bNAzK884pCij7mrhfYp+/Md/CrZvYkJCqtDqtuz+6jVi6Ats=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 70B8D67373; Tue, 18 Jun 2024 08:51:12 +0200 (CEST)
-Date: Tue, 18 Jun 2024 08:51:12 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, hch@lst.de,
-	sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-	jack@suse.cz, djwong@kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com,
-	linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-	io-uring@vger.kernel.org, nilay@linux.ibm.com,
-	ritesh.list@gmail.com, willy@infradead.org, agk@redhat.com,
-	snitzer@kernel.org, mpatocka@redhat.com, dm-devel@lists.linux.dev,
-	hare@suse.de, Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH v8 05/10] block: Add core atomic write support
-Message-ID: <20240618065112.GB29009@lst.de>
-References: <20240610104329.3555488-1-john.g.garry@oracle.com> <20240610104329.3555488-6-john.g.garry@oracle.com> <ZnCGwYomCC9kKIBY@kbusch-mbp.dhcp.thefacebook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JNIB7Z6h1ITlZ6qUiG1mTKRK/cg/B/sOchYi4TRntpMpjKZc7XNHHWdnCGuX4/A69VS0GHcA4BIVMILLCAtA+f4xZicEM6FJAJjrxy6Wwqaz+YIQRTjsofFUrETimYiE2N3GS2NAN++4m/qCQG+gyoss7DrTDazo/omxS7U5InQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3VPL7Qs5; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3VPL7Qs5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=SwIPm3HHHScXvzwW2YP/gyc4Q7ZKgoG76gRHm9Uog4I=; b=3VPL7Qs5nBb8dYE+xNNk3EILPn
+	W9BVxnOriB/n/KMSny7rhUHQrV6I3/1PyIqyVcxSuMt2Q16ClbgX01J2QVda3Zz7V8VNKipvBUO1p
+	uRh8lWRTB4C2Paea8e8S5HGG6jpT94k9z/NPBKt6EW/0sI+rCnSJSRbQLyx/dgv4HDE/G/wqeQbw0
+	pp1jO3kR084W244w+UOob9LruPvOfC7V/rZIRO4NfQEy2cosdkVClRPWxPtIHoUpmSR09x5Mztajq
+	4IRtKqIO7mIuwIjtQvTZz5GveM322Ci/GppSIoNZOs/oy/BOO9eS92wD1yy1YZwfHudMqlYuoBpZS
+	ZCV1Tq0A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sJT1D-0000000Dv6s-1VfH;
+	Tue, 18 Jun 2024 07:12:39 +0000
+Date: Tue, 18 Jun 2024 00:12:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, tj@kernel.org, gregkh@linuxfoundation.org,
+	bvanassche@acm.org, hch@infradead.org, josef@toxicpanda.com,
+	lizefan.x@bytedance.com, hannes@cmpxchg.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: Re: [PATCH RFC v2 0/7] blk-iocost: support to build iocost as kernel
+ module
+Message-ID: <ZnEzZ0Xslaxfm-it@infradead.org>
+References: <20240618031751.3470464-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,21 +50,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZnCGwYomCC9kKIBY@kbusch-mbp.dhcp.thefacebook.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240618031751.3470464-1-yukuai1@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jun 17, 2024 at 12:56:01PM -0600, Keith Busch wrote:
-> I'm not sure I follow why these two need to be the same. I can see
-> checking for 'chunk_sectors % boundary_sectors_hw == 0', but am I
-> missing something else?
+On Tue, Jun 18, 2024 at 11:17:44AM +0800, Yu Kuai wrote:
+> The motivation is that iocost is not used widely in our production, and
+> some customers don't want to increase kernel size to enable iocost that
+> they will never use, and it'll be painful to maintain a new downstream
+> kernel. Hence it'll be beneficially to build iocost as kernel module:
 > 
-> The reason I ask, zone block devices redefine the "chunk_sectors" to
-> mean the zone size, and I'm pretty sure the typical zone size is much
-> larger than the any common atomic write size.
+> - Kernel Size and Resource Usage, modules are loaded only when their
+> specific functionality is required.
+> 
+> - Flexibility and Maintainability, allows for dynamic loading and unloading
+> of modules at runtime without the need to recompile and restart the kernel,
+> for example we can just replace blk-iocost.ko to fix iocost CVE in our
+> production environment.
 
-Yeah.  Then again atomic writes in the traditional sense don't really
-make sense for zoned devices anyway as the zoned devices never overwrite
-and require all data up to the write pointer to be valid.  In theory
-they could be interpreted so that you don't get a partical write failure
-if you stick to the atomic write boundaries, but that is mostly
-pointless.
+Given the amount of new exports and infrastructure it adds this still
+feels like a bad tradeoff.
+
