@@ -1,271 +1,143 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5117E4A1D
-	for <linux-block@vger.kernel.org>; Wed, 19 Jun 2024 06:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528876F2E2
+	for <linux-block@vger.kernel.org>; Wed, 19 Jun 2024 06:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718776975; cv=none; b=A1tOFEBAfzW43G7pHVFkHZrGDfluzIEQQv2niiKm2PILiX9eLrDdyz8jmTb1I/HMJrXZxpctttah2tQZFTopm8htbB2oTeMehT1Xh+VNdzGWN6oLPXMWtek0GEb9lCKuBpvKp2CTNBW/Lc+f5p9jJNql0xFXrQFlegENq1txIcA=
+	t=1718779238; cv=none; b=dyD3zWYOQQwpgGQuLhmw3iigbRzlyrODZvZ0JPqNO5SH7C2lIsJXjVKJApmubr+9tmFEvbG1mD+7tSEKaBxJO2mfqw+uakavUBIOI61HI45rYNtI7JJzLwFx8jrSa1CvX/sBip+Vi4GFP0dXX7v36KcYL6ciLBT4bxLYttAu7IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718776975; c=relaxed/simple;
-	bh=tgRzNP72zy3s7ubo7bWFkqaXrWpybEPmvBDFnDsTODI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UWEQ0/VDZZNXH2OKblmQd1UqsV9Nyam9ToWuZ14PoLhWSKaaWdiXlxIypptozQdKBqcQkwIAFK2vMDF4wwjnSOtwuTgQmsQAvKPXrRUmVcupSMOm43t51vBEGTBbwDwsVYfMc4QMnAsvsLWEKs2KcYem7e8ZS3t1qLFQk2Umo1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AFWI53Df; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1718779238; c=relaxed/simple;
+	bh=STW330cWe99Pche2sdfTP7cbUeC0jxLPrB02JUX1kCQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=IEYLoSKFJQIcluRucMCQbr5syGOpzRhgoWK5RA65M25rHIrM+wZXyOBWE1o98dBXi5jrqRUS/0xZDqG6Wcq6AKuiyzHXjkSLzXW+4k0nSphKSo4/K5/JONbx8IgKWJuLj+vEpdvUs4skuuSiUcSrC1NknbORC/8MEJfdjEpfdrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=cLYq8ZZa; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AFWI53Df"
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45J5NsiB025729;
-	Wed, 19 Jun 2024 06:02:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	way1/l4P69aY4mTpwNKMc/Ob2jHq3H+EKszMjO9nRAs=; b=AFWI53DfT7ZLbQCW
-	T0BXkvnXSolB4zz2xoSzIGC7iL9wksEGheXy4L1PRO5e3ov/dHw9zega+YFW6tYZ
-	9noQ4c5UT7HoTVz/lTbL5PEZqtZ1JCMJa5k1AllS0ylPwVOVihIEgpB0lcBDMEp9
-	bdIqfn8oL3kzXTrsRuZW9X7CZmjhuMp+dKysud0CW6wsMTozzxpQeipF1Zra6ywE
-	HCDgZdITRYOgR+NjRL2SVO5e1+IopK52eEsP3FMGUtki8WJO5wgheh+sDAbomuxU
-	JPyLPwPxpHKxaj07uaI4Iud0b4ckgx5TOq0Pn3VBa3lVbopSE5EUOeNTk310VovT
-	ZZdBLw==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yus4yr2ec-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 06:02:31 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45J56Fgn019506;
-	Wed, 19 Jun 2024 06:02:31 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ysnp19s1v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 06:02:31 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45J62SOV19727014
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Jun 2024 06:02:30 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 19CAF5806C;
-	Wed, 19 Jun 2024 06:02:28 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A9D8258060;
-	Wed, 19 Jun 2024 06:02:23 +0000 (GMT)
-Received: from [9.43.48.107] (unknown [9.43.48.107])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 19 Jun 2024 06:02:23 +0000 (GMT)
-Message-ID: <7a535eb9-150d-49c2-8df3-95867d1ff901@linux.ibm.com>
-Date: Wed, 19 Jun 2024 11:32:21 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] loop: add test for creating/deleting file-ns
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: "kbusch@kernel.org" <kbusch@kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>, hch <hch@lst.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "venkat88@linux.vnet.ibm.com" <venkat88@linux.vnet.ibm.com>,
-        "sachinp@linux.vnet.com" <sachinp@linux.vnet.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "gjoyce@linux.ibm.com" <gjoyce@linux.ibm.com>
-References: <20240617092035.2755785-1-nilay@linux.ibm.com>
- <d0f6e41a-4cd3-42b9-865d-df75d3ffd2af@nvidia.com>
- <6jp45jz6ms42ue7eeto4ogjt5c3rdrlzc2bxmxk5myqg4x2hek@bir7rijdnw6c>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <6jp45jz6ms42ue7eeto4ogjt5c3rdrlzc2bxmxk5myqg4x2hek@bir7rijdnw6c>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: p-PbqiSZ1NknLERoJpgRV0h0HrdpM24D
-X-Proofpoint-ORIG-GUID: p-PbqiSZ1NknLERoJpgRV0h0HrdpM24D
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="cLYq8ZZa"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240619064034epoutp01c6601523a41dc816e7e14e6f1652d15f~aVJtsEzXY0949709497epoutp01L
+	for <linux-block@vger.kernel.org>; Wed, 19 Jun 2024 06:40:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240619064034epoutp01c6601523a41dc816e7e14e6f1652d15f~aVJtsEzXY0949709497epoutp01L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1718779234;
+	bh=Wxu+W8g/EmXfv0ETPHjj9NJMUXWZg033DcwmRKYmwGI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=cLYq8ZZa18XWKmw2INKMxW67YflQ/vSrbETavFCyMrJHv7QAqZvl7DRaKYbSctLxW
+	 U2+1aeIqVfSFLDlM7oRANLLTueMcUDh2+/YPCLl1vhKyHZJdID1r0FABE5yDdUDYgm
+	 JYas2dFhinC5lK/1A4km9dHKx8pyVfVL1o8PqZJk=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240619064034epcas5p44be878f430423954023f921f7310a575~aVJtdSLjC0248402484epcas5p4Y;
+	Wed, 19 Jun 2024 06:40:34 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4W3vBl0jKNz4x9Q1; Wed, 19 Jun
+	2024 06:40:31 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	2D.B0.10047.E5D72766; Wed, 19 Jun 2024 15:40:30 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240619063854epcas5p2d20a854d5e73a5f68f899dad45900cc0~aVIQiw8nc1860218602epcas5p2C;
+	Wed, 19 Jun 2024 06:38:54 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240619063854epsmtrp22949e38c1c7697d118ce69eece13fde0~aVIQiEFKd0989509895epsmtrp2u;
+	Wed, 19 Jun 2024 06:38:54 +0000 (GMT)
+X-AuditID: b6c32a49-1d5fa7000000273f-30-66727d5e6876
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	25.84.18846.EFC72766; Wed, 19 Jun 2024 15:38:54 +0900 (KST)
+Received: from testpc11818.samsungds.net (unknown [109.105.118.18]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240619063853epsmtip1e5e76735e46653f78953f3af3adea342~aVIPvWxc10048100481epsmtip1a;
+	Wed, 19 Jun 2024 06:38:53 +0000 (GMT)
+From: hexue <xue01.he@samsung.com>
+To: axboe@kernel.dk
+Cc: hch@infradead.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH] block: Avoid polling configuration errors
+Date: Wed, 19 Jun 2024 14:38:47 +0800
+Message-Id: <20240619063847.588031-1-xue01.he@samsung.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <693af28d-5e25-432b-ab1b-37eb9026c7cd@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-19_02,2024-06-17_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 impostorscore=0 adultscore=0 bulkscore=0 clxscore=1015
- priorityscore=1501 phishscore=0 mlxscore=0 suspectscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406190041
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgk+LIzCtJLcpLzFFi42LZdlhTXTeutijNYNoqK4vVd/vZLE5PWMRk
+	8av7LqPF3lvaFpd3zWGzODvhA6sDm8fmFVoel8+WevRtWcXo8XmTXABLVLZNRmpiSmqRQmpe
+	cn5KZl66rZJ3cLxzvKmZgaGuoaWFuZJCXmJuqq2Si0+ArltmDtBmJYWyxJxSoFBAYnGxkr6d
+	TVF+aUmqQkZ+cYmtUmpBSk6BSYFecWJucWleul5eaomVoYGBkSlQYUJ2xp+LjxgL+ngqHvxs
+	Zm1gfMjZxcjJISFgIvF+23nGLkYuDiGB3YwSexZNZQFJCAl8YpSY99ACzr58NQem4camZ2wQ
+	DTsZJZrWtDFDOD8YJb5M2soGUsUmoCSxf8sHRhBbREBYYn9HK9hUZoEgifau9WA1wgJOEi/m
+	HGcCsVkEVCWmPuxjBbF5Bawkrm48zA6xTV7iZtd+oAUcHJwCthJ/jhVClAhKnJz5BGqkvETz
+	1tnMEOXn2CWWH3KHsF0kem8uZ4GwhSVeHd8CNVJK4vO7vWwQdr7E5O/rGSHsGol1m99B1VtL
+	/LuyhwVkLbOApsT6XfoQYVmJqafWMUGs5ZPo/f2ECSLOK7FjHoytJLHkyAqokRISvycsYoWw
+	PSSevX0HDegJjBLn99xnm8CoMAvJO7OQvDMLYfUCRuZVjJKpBcW56anFpgWGeanl8ChOzs/d
+	xAhOilqeOxjvPvigd4iRiYPxEKMEB7OSCK/TtLw0Id6UxMqq1KL8+KLSnNTiQ4ymwOCeyCwl
+	mpwPTMt5JfGGJpYGJmZmZiaWxmaGSuK8r1vnpggJpCeWpGanphakFsH0MXFwSjUwpdz7Nn9W
+	1p3nWsyzqgO7X6XUXJD83xOUmqm5f+pOjvWFXDJHJmfUajU85u/LlNfzlRYsO3jse+8MyUT7
+	wvzYo/sFC24839XO9G/VnJg4a3f5C1nbj3Iv8bKNbTnhfPpfm6v+teYnT7csc5ToEwrPffcw
+	45FF4P6lceIMrJmvo5may04+zP7yPmL3xRQ5N4adX+T5FJfzrA58yDzp9PM1TdsnyK1TWd98
+	+9gemV2CyzM2flwRobNjivLyIzrrXFeLz2ve/lPG8K/O4fM1Cz2Yv4V9upvSp9E94QtPwEPl
+	B2cPucX/d1iqr/nh9A6+f+b8c5znyUQdM1gW9HTu9SP+WfE272OcT4hPnX9IeQ+TvhJLcUai
+	oRZzUXEiAIoxMssTBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrKLMWRmVeSWpSXmKPExsWy7bCSnO6/mqI0g/5GbovVd/vZLE5PWMRk
+	8av7LqPF3lvaFpd3zWGzODvhA6sDm8fmFVoel8+WevRtWcXo8XmTXABLFJdNSmpOZllqkb5d
+	AlfGn4uPGAv6eCoe/GxmbWB8yNnFyMkhIWAicWPTM7YuRi4OIYHtjBKL/01ihkhISOx49IcV
+	whaWWPnvOTtE0TdGiY19c8CK2ASUJPZv+cAIYosAFe3vaGUBsZkFQiQmn33OBGILCzhJvJhz
+	HMxmEVCVmPqwD2wor4CVxNWNh9khFshL3OzaDzSTg4NTwFbiz7FCkLCQgI3EnOapzBDlghIn
+	Zz6BGi8v0bx1NvMERoFZSFKzkKQWMDKtYhRNLSjOTc9NLjDUK07MLS7NS9dLzs/dxAgOWa2g
+	HYzL1v/VO8TIxMF4iFGCg1lJhNdpWl6aEG9KYmVValF+fFFpTmrxIUZpDhYlcV7lnM4UIYH0
+	xJLU7NTUgtQimCwTB6dUA9Ne3n3nHaODzm6Om7b+H8OLEydeG+1g0j4+/fq5B8cCd6yWn3bO
+	TNXFsuB794tD1cJme4L5qmYwRk8RlJ7zW4PN3rzBQttoYcbH+PdNaUfCHhyZf9pxz8pzmn+X
+	ximeL+0secJ/Iurhmb8bLaQrvgvvq4luWB371aQ35WkoU/ebj8cOv/zg6BC0o2SdppHRde9s
+	PfuJ+43rGJd2tnkcOby1yFvhmHnIrWX2dQ4ff51S8fvIt6X451ruKo3ozP5nJf9d65vvfCtf
+	+txG4cfpXjmh6H3JIfsmbCtpn/itodbvWfLqT0pn/hlkLzt0bK3C0UOXFWMsBfy+XM2a0NHc
+	IFw6u0Ig0cEk7nnnxCkHbM2VWIozEg21mIuKEwHn3ZK7yAIAAA==
+X-CMS-MailID: 20240619063854epcas5p2d20a854d5e73a5f68f899dad45900cc0
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240619063854epcas5p2d20a854d5e73a5f68f899dad45900cc0
+References: <693af28d-5e25-432b-ab1b-37eb9026c7cd@kernel.dk>
+	<CGME20240619063854epcas5p2d20a854d5e73a5f68f899dad45900cc0@epcas5p2.samsung.com>
 
+On 6/16/24 2:39 AM,, Jens Axboe wrote:
+>On 6/13/24 2:07 AM, Christoph Hellwig wrote:
+>>> We happily allow polled IO for async polled IO, even if the destination
+>>> queue isn't polled (or it doesn't exist). This is different than the old
+>>> sync polled support.
+>> 
+>> Yes, and for that to work we can't start returning -EOPNOTSUPP as in
+>> this patch, as BLK_QC_T_NONE an be cleared for all kinds of reasons.
+>> 
+>> So if we want some kind of error handling that people don't even
+>> bother to poll for devices where it is not supported we need that
+>> check much earlier (probably in io_uring).
+>
+>There's just no way we can do that, who knows if you'll run into a
+>polled queue or not further down the stack.
+>
+>IMHO there's nothing wrong with the current code. If you do stupid
+>things (do polled IO without having polled queues), then you get to
+>collect stupid prizes (potentially excessive CPU usage).
 
+I think the problem is that when the user makes this incorrect configuration,
+but doesn't have any error feedback, user is unware and easy to get some wrong
+performance information. So I hope to add some feedback for the user to help
+them more easily modify the configuration.
 
-On 6/18/24 14:58, Shinichiro Kawasaki wrote:
-> On Jun 18, 2024 / 01:35, Chaitanya Kulkarni wrote:
->> On 6/17/24 02:17, Nilay Shroff wrote:
->>
->> I think subject line should start with nvme ?
->>
->> nvme: add test for creating/deleting file-ns
->>
->>> This is regression test for commit be647e2c76b2
->>> (nvme: use srcu for iterating namespace list)
->>>
->>> This test uses a regulare file backed loop device
->>> for creating and then deleting an NVMe namespace
->>> in a loop.
->>
->>
->> s/regulare/regular/ ?
->>
->> nit:- commit log looks a bit short :-
->>
->> This is regression test for commit be647e2c76b2
->> (nvme: use srcu for iterating namespace list)
->>
->> This test uses a regulare file backed loop device for creating and
->> then deleting an NVMe namespace in a loop.
->>
->>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->>> ---
->>> This regression was first reported[1], and now it's
->>> fixed in 6.10-rc4[2]
->>>
->>> [1] https://lore.kernel.org/all/2312e6c3-a069-4388-a863-df7e261b9d70@linux.vnet.ibm.com/
->>> [2] commit ff0ffe5b7c3c (nvme: fix namespace removal list)
->>
->> it will be helpful in long run to add above information
->> into the commit log, Shinichiro any thoughts ?
-> 
-> Agreed. It is helpful to record the kernel side fix commit and the link to the
-> discussion threads in the blktests side commit log.
-Yeah I am going to updated the commit message with relevant information as suggested
-in the next patch.
-> 
->>
->>> ---
->>>   tests/nvme/051     | 65 ++++++++++++++++++++++++++++++++++++++++++++++
->>>   tests/nvme/051.out |  2 ++
->>>   2 files changed, 67 insertions(+)
->>>   create mode 100755 tests/nvme/051
->>>   create mode 100644 tests/nvme/051.out
->>>
->>> diff --git a/tests/nvme/051 b/tests/nvme/051
->>> new file mode 100755
->>> index 0000000..0de5c56
->>> --- /dev/null
->>> +++ b/tests/nvme/051
->>> @@ -0,0 +1,65 @@
->>> +#!/bin/bash
->>> +# SPDX-License-Identifier: GPL-3.0+
->>> +# Copyright (C) 2024 Nilay Shroff(nilay@linux.ibm.com)
->>
->> not sure we need to have email address here as it's a part of
->> commit log anyways ...
->>
->>> +#
->>> +# Regression test for commit be647e2c76b2(nvme: use srcu for iterating
->>> +# namespace list)
-> 
-> It is also good to enrich this header comment section. Especially, the kernel
-> side fix commit will be helpful.
-> 
->>> +
->>> +. tests/nvme/rc
->>> +
->>> +DESCRIPTION="Test file-ns creation/deletion under one subsystem"
->>> +
->>> +requires() {
->>> +	_nvme_requires
->>> +	_have_loop
->>> +	_require_nvme_trtype_is_loop
->>> +}
->>> +
->>> +set_conditions() {
->>> +	_set_nvme_trtype "$@"
->>> +}
->>> +
->>> +test() {
->>> +	echo "Running ${TEST_NAME}"
->>> +
->>> +	_setup_nvmet
->>> +
->>> +	local subsys="blktests-subsystem-1"
->>> +	local iterations="${NVME_NUM_ITER}"
->>
->> no need for above var, I think direct use of NVME_NUM_ITER is
->> clear here ...
-> 
-> I ran this test case on my baremetal test node and QEMU test node using the
-> kernel without the fix. On the baremetal test node, the kernel Oops was
-> created soon. Good. On the QEMU test node, the Oops was not recreated, and
-> the test case passed. For this pass case, it took more than 15 minutes to
-> complete the test case. I think the default NVME_NUM_ITER=1000 is too much.
-> Can we reduce it to 10 or 20?
-> 
-I also tested this case on my baremetal machine and I could recreate this crash 
-on the first iteration. However I didn't test it on QEMU. But agrees the default 
-iteration value of 1000 is too big and I think it's reasonable to make it 20. I 
-will change it in the next patch.
->>
->>> +	local loop_dev
->>> +	local port
->>> +
->>> +	truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
->>> +
->>> +	loop_dev="$(losetup -f --show "$(_nvme_def_file_path)")"
->>> +
->>> +	port="$(_create_nvmet_port "${nvme_trtype}")"
->>> +
->>> +	_nvmet_target_setup --subsysnqn "${subsys}" --blkdev "${loop_dev}"
->>> +
->>> +	_nvme_connect_subsys --subsysnqn "${subsys}"
->>> +
->>> +	for ((i = 2; i <= iterations; i++)); do {
->>
->> small comment would be useful to explain why are starting at 2 ...
->>
->>> +		truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path).$i"
->>> +		_create_nvmet_ns "${subsys}" "${i}" "$(_nvme_def_file_path).$i"
->>> +
->>> +		# allow async request to be processed
->>> +		sleep 1
->>> +
->>> +		_remove_nvmet_ns "${subsys}" "${i}"
->>> +		rm "$(_nvme_def_file_path).$i"
->>> +	}
->>> +	done
->>> +
->>> +	_nvme_disconnect_subsys --subsysnqn "${subsys}" >> "${FULL}" 2>&1
->>> +
->>> +	_nvmet_target_cleanup --subsysnqn "${subsys}" --blkdev "${loop_dev}"
->>> +
->>> +	_remove_nvmet_port "${port}"
->>> +
->>> +	losetup -d "$loop_dev"
->>> +
->>> +	rm "$(_nvme_def_file_path)"
->>> +
->>> +	echo "Test complete"
->>> +}
->>> diff --git a/tests/nvme/051.out b/tests/nvme/051.out
->>> new file mode 100644
->>> index 0000000..156f068
->>> --- /dev/null
->>> +++ b/tests/nvme/051.out
->>> @@ -0,0 +1,2 @@
->>> +Running nvme/051
->>> +Test complete
->>
->> thanks for the test, I think this is much needed test especially with
->> recent reported issues ...
-> 
-> I also appreciate this patch. Thanks!
-> 
-> One more request, recent commit added a test case to the nvme group and it has
-> the number nvme/051. Could you renumber this test case to nvme/052?
-
-Yes I will rebase my tree to the latest and update the test case to nvme/052.
-
-And thank you for testing my test case on your machine and your review comments!
-Much appreciated.... 
-
-I will soon post the patch v2.
-
-Thanks,
---Nilay
+I got your point, therefore, I'm considering whether it would be more
+resonable to not return -EOPNOTSUPP directly to stop the operation.
+Instead, we could detect this information and provide a prompt (like 
+warining?), allowing user to be aware without disrupting the original
+flow. Do you think this approach is more reasonable?
