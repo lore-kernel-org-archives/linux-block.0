@@ -1,205 +1,212 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5FEA29;
-	Wed, 19 Jun 2024 16:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718813324; cv=fail; b=edk0snHFAitSh42hSogov6BRDrc2ADEk9gYNqpLNIs/j+UrzAIU6gM3sbd2R/rnEpuyZStcC5LJnC8asBNOzbVricRNLyJURPq93yowuc71e9gtavV7H2GCcdljASTWQBOj7WBTUCC77cIbI9bDWzSWaoOe2iVPeLhx6U/0HGTs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718813324; c=relaxed/simple;
-	bh=Y69D1f0l2FZAn7qN47BMQ3ReyCzcF6wmwK47fNloPuk=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=ureFAez5Lu1chtHssWdvdYlMMsbVUZhIANoug/hGmgiGf1AcMud1oBayYVWNUPOX/tKaQHNpyhq5EV8uIFxil8pcr/GCAruV0RgMoCGIsEjO0zwhvO4clReIiSGWH8Swhp39Xp9d3dsXhG1smAOE37/GYLf1Ml6Fq0iZ03ktrFM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=LR60ILkA; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=IwwbkP0W; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929CB2262B;
+	Wed, 19 Jun 2024 16:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718815596; cv=none; b=a1/Cb2UNdUvQC4Pmw0B4YWM9yyv2/OFUUJJKpOoTBjFWJ57gMu9K9OGJiVbkOmSPaaJUFlpMJ9i64A9D4YYjDgBewIiDdJHCJMCkrn9vvmb+/lpG3oC6c5wPM2JHUUE45PAZ6C0gl9L4p/p2xYrl/bHJzD8dVes0STdQxzr5RFk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718815596; c=relaxed/simple;
+	bh=EYkeKSbtNt6ckvuCFzfSCizaZJeveGlRlQZbS2iiRBM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3XEZcnslU7UfPPApSN7e6PKOnz60D7GtxSNPqeHcmMw9e4M9XycHHGL+FbgKx1kwoe0FEYuAsHE+VIjEwK7wgK7ayQe0GikRDTCeErD7H82n1lD254DRgsj0pIaKTvb886yrYxuQdoHM9nme1R1VDmySejtYurB7T3gqoK37wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6v5z/sd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LR60ILkA";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="IwwbkP0W"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JFBSCJ009176;
-	Wed, 19 Jun 2024 16:08:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to
-	:cc:subject:from:in-reply-to:message-id:references:date
-	:content-type:mime-version; s=corp-2023-11-20; bh=hlaRwrfECDq2ec
-	5s6O6sz8PQj5ZQ0My5P1l9t7LwBkw=; b=LR60ILkAOiHgghlyKwH74kNubMfpvd
-	hOJfEwyWBnQUuLXV0PHN+AONivbj7zH4LonLTOK1WRgbbHP9Mqrr7Kf8QQ+n9EOw
-	hkkrpEzLQIqszJn35gCMfcUIs06lGLeHT+r++7usa81prQQpeRAwizyvWc+7JZUa
-	B9DDhGFYEuGRy0NS2Sco0oqr34XQKkIV82DGRTWePtRVOeAAYSIiAGjFP9Urddh4
-	ZCPSrclJGMMh2Ghx/lypBSkgz9EvpJ4GvI7f1ueFUE/MDS55Al2qCVil768lAJCO
-	GbJzmny6ZOgid/pffIwPlWjTXD3fqQIkuqIdOumdBYMPbh+nPECbLkoQ==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yuj9ghmec-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Jun 2024 16:08:01 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45JEC6Gv035062;
-	Wed, 19 Jun 2024 16:08:01 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2171.outbound.protection.outlook.com [104.47.58.171])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3ys1dg18y0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Jun 2024 16:08:01 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kyrD1FIgfOYW5tcjjlehzjUnJcpZ6pJn77jSAQGkFzHRp7AH66K5Lp0y3VLqsfvKTHR2m2buXKk67nxqtTxjPMMdCcFS9vAFemEM+3SmSYJrYiiCe/dgwO55XwonUj+P2LOF9yu6OaPLJlgcQExbo322b9A76DEEhfOHA87SXLqm3O+QQOpAGb+/wAw58fJZ3UjbqkpjJeK0ZlhXcV+3Fu6f0ldJ5AnRp9Lw2QNxQRwuNaXyfpW9b84kKH5DimWRgfdjXyIXEFnHaxbCYFdl5TIuBRxB6wLSQCqoDbGemCeZnckG66ZxGk4jaNqzGoMXjftWRdOoNy+PPUMC4P6KkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hlaRwrfECDq2ec5s6O6sz8PQj5ZQ0My5P1l9t7LwBkw=;
- b=X2nevUqX/ZyVb7D3fgqNf9KDhbmU0mw9/q+ypvl4NuZI7rrIv8FC0chtjTFODqRkJ4ahLJ+9bd56n5ByHQfey7VvjBSoCnxf+TtBNt1vTMv5XyNi+xtFetXvWc9oIkMHH44Fyj1pJQDd2H448Wuuwt1tkl0wxeSI14cKLeFnLXilWYIMNPXHcQfHdClkiiIYgjJ3o8u7XKoTOpgyemIqcbqlAzxp6EdSVjzm4B3BwG78yXgl12MqiTo+53X9Ds47sQkFsWbk8utLRHq/4kmOPb+/UlGyfwOUFmG0Wt7csY/NmUcrn0E9wPEDDB1ntmhzjlUm1mzxwq6VLOnqhMAmEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hlaRwrfECDq2ec5s6O6sz8PQj5ZQ0My5P1l9t7LwBkw=;
- b=IwwbkP0W5LqVlUPZfPx50+wQmDbERdZps18Q97LYDtkIefeCu1KoJK1VK2tDg1a2jSMQ2rjkkzy/Gdu5eYLmT7mnkYDEoFeIkM5U1ARh3n6iqwx6+/9WqcWkXL+ybT41z6SfEVNPVm8bVTEsaxqeTAveTeEQcRPECoRLFwcbQPI=
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by PH7PR10MB5813.namprd10.prod.outlook.com (2603:10b6:510:132::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Wed, 19 Jun
- 2024 16:07:58 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::5c74:6a24:843e:e8f7]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::5c74:6a24:843e:e8f7%4]) with mapi id 15.20.7698.019; Wed, 19 Jun 2024
- 16:07:58 +0000
-To: Christoph Hellwig <hch@lst.de>
-Cc: John Garry <john.g.garry@oracle.com>, Keith Busch <kbusch@kernel.org>,
-        axboe@kernel.dk, sagi@grimberg.me, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, viro@zeniv.linux.org.uk,
-        brauner@kernel.org, dchinner@redhat.com, jack@suse.cz,
-        djwong@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com, linux-aio@kvack.org,
-        linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org,
-        nilay@linux.ibm.com, ritesh.list@gmail.com, willy@infradead.org,
-        agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
-        dm-devel@lists.linux.dev, hare@suse.de,
-        Himanshu Madhani
- <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH v8 05/10] block: Add core atomic write support
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20240619080218.GA4437@lst.de> (Christoph Hellwig's message of
-	"Wed, 19 Jun 2024 10:02:18 +0200")
-Organization: Oracle Corporation
-Message-ID: <yq1v824or0e.fsf@ca-mkp.ca.oracle.com>
-References: <20240610104329.3555488-1-john.g.garry@oracle.com>
-	<20240610104329.3555488-6-john.g.garry@oracle.com>
-	<ZnCGwYomCC9kKIBY@kbusch-mbp.dhcp.thefacebook.com>
-	<20240618065112.GB29009@lst.de>
-	<91e9bbe3-75cf-4874-9d64-0785f7ea21d9@oracle.com>
-	<ZnHDCYiRA9EvuLTc@kbusch-mbp.dhcp.thefacebook.com>
-	<24b58c63-95c9-43d4-a5cb-78754c94cbfb@oracle.com>
-	<20240619080218.GA4437@lst.de>
-Date: Wed, 19 Jun 2024 12:07:56 -0400
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR17CA0028.namprd17.prod.outlook.com
- (2603:10b6:208:15e::41) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6v5z/sd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E5A8C2BBFC;
+	Wed, 19 Jun 2024 16:46:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718815596;
+	bh=EYkeKSbtNt6ckvuCFzfSCizaZJeveGlRlQZbS2iiRBM=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=U6v5z/sdVrRwT3ywPATsj7XmP7jMC/9Ue7euI2CV/THH1rdybzupp61Q3EwrfCb0Z
+	 oRYlNRBfdTqybOoKx/k80D0IFIG9kqzvnBfEhD0JRlH5VjuYxCM23EMd3xBXpXT4V1
+	 1uKiOxgwzsrXXxoSU+L5hezYeMeNJITqk3/QT2yQTixMKTvXNKFLINUqCcR1a6Eofa
+	 +OA6Ypzrq6AdcZ9WeH29C2vx0ekyMr+caeurBrnmo/hQuNhH7uVp+yJZMA3eeltGHh
+	 vqikZFgBg0Khso/7VAufzpVxv9ZrPvAsnpHAA9QtIEbrLcOlZKN9roRJ/XJu5hty2l
+	 uLXG9ZdVaWb9A==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id EC3CDCE09D8; Wed, 19 Jun 2024 09:46:35 -0700 (PDT)
+Date: Wed, 19 Jun 2024 09:46:35 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <04567347-c138-48fb-a5ab-44cc6a318549@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
+ <ZnCDgdg1EH6V7w5d@pc636>
+ <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+ <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+ <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|PH7PR10MB5813:EE_
-X-MS-Office365-Filtering-Correlation-Id: 13bfea69-0ea3-4483-7409-08dc9079fcd7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|7416011|366013|376011|1800799021;
-X-Microsoft-Antispam-Message-Info: 
-	=?us-ascii?Q?cbu/Z1zhSlfpvYqL0VDghhoKV7uLZ7uHiXFb7tE8+qnbH4dL8ASDyG0PuNsd?=
- =?us-ascii?Q?XL/zKbSe6VCQWSJX+AX3eEGRrK/z+RWiWtIzszCFmdYvviKfSlDBdalmmtdf?=
- =?us-ascii?Q?1Z81VJLwwZrWnS52cbGyTkVBsWG8FU2vOLc56QBfhAFQ0Y7T2Raj3ME++1IJ?=
- =?us-ascii?Q?U8nQwr+AhpNsKTFBhrPFsqXJIKj4rnoV1U+CiI0KLu9ejmGAP5WyzsUum/Q1?=
- =?us-ascii?Q?lfoUYU3Lq+uWx4faYZnd7zGtzYGOC5h1cs1kGD2t+5Oc49TGSz+LquMcGKW+?=
- =?us-ascii?Q?M9vQfrMTSFuDzAYCYT5yipGanXsry00oqQPyEifvZJWV9DU1hNHSJmaRml/o?=
- =?us-ascii?Q?5fGv4f1Kt57tWPrpSliAhSm2wLo3YxjnIejNf7Lzksv2JO0CepE1FdeezX54?=
- =?us-ascii?Q?zUWxgKjuLTNsOPjUhjTJUJNGeLbON361KR7u4tq3sfy/xC1TejkmZtAlLaSj?=
- =?us-ascii?Q?neEBnk0dIksuQReiVdZ+77mZBkadby9E+qbD+fYTZQzoxJHlD/Yax4xRbwv8?=
- =?us-ascii?Q?kwPJc6KD55J8YPJc7WRNzVoW8xKtgr4oz1twKwLr9gMXklYGkpEHyJzAPGjf?=
- =?us-ascii?Q?s238XztmyG+/0yHU3r8RSy5pffUUsP1OIiHGdW1sSbjjOzP8pu3S52l0l3Cj?=
- =?us-ascii?Q?cq7NFKsFbcqzFc5A4I4qmPpUDmhh9nDU/ME9bVtSEOoa/uRgqfs8v0qAipFt?=
- =?us-ascii?Q?GpuJIMmsEAeuN+jtEipT4cTSHpSZQ8AxAV+/9+FLW7uf5Z2gEyT/rp6t7zZK?=
- =?us-ascii?Q?riHwoXvOP4zenOtsPseqmjlA4vJf0MuFheVxQwPA2pAWxjTpx7Vmt9HS1WL4?=
- =?us-ascii?Q?7Y8m9XDdc6qP0RCvxIYfWnoCa6hR0at5pGfXYjXBFLb/4JMvID2aK/eKQ5Xj?=
- =?us-ascii?Q?GOERX/m6Z4pwHtaNbwKhve4jp6FVQ1N/WXCVdW8mmpCKLGwrcQ5PYETgk9xD?=
- =?us-ascii?Q?1yxyMnxQls+wXkuDm76yfs0TiCDXbcFtkWU7+w8afejC8Gw78sl9ANFrH1kq?=
- =?us-ascii?Q?itmyQlmvYZucxAL5mkFYRf3scUqcgHvtFxZLBos4ywA5KfELrYL0WTN8xA6D?=
- =?us-ascii?Q?wFKGmClEDSvyj5wK35cyaW1tRHK/CWtRN6i8+nuiTg/Hgw5vXBIVYbKvtT4C?=
- =?us-ascii?Q?/kSqK9Fsn6hDojXAwjZhVe6RlspYz88jiDtOSle2lDmfG+X3m/eS5kP3IZli?=
- =?us-ascii?Q?BJRTgiUZPXwXGv2dxpo3zo31cuM1SRXVSVCdYNIaURjJFlJH5jFxOlQYE/to?=
- =?us-ascii?Q?UqPgBTjva0tb9Ffej6/FW/puWazftY42AdGse9BOUJjf5Ny3qREbBTX1djPW?=
- =?us-ascii?Q?1ipNClzL/+v5m3lWhb/jhxlx?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(7416011)(366013)(376011)(1800799021);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?nn9/yQ4JTtPcN08F3RenhG4n8S8I0X6FNDYmFRVtdWbECiUOSbcn1VCZN2zy?=
- =?us-ascii?Q?ZWdKuLRxQqki0y5LdCbBfcHfV82koOMlOHWtvs8lZ001Pc9W4eiL6BSzRWjV?=
- =?us-ascii?Q?Co+ye7V8v+/CFAIdwTWHgixKV70StVsl9A3lkuQiorGtao1+T+l6ddgBCs9l?=
- =?us-ascii?Q?tpFKPUHO302wGvSfk7924ThXozldyTpIE8+DcY7kIGhAJXPDi3qvv3koaj0w?=
- =?us-ascii?Q?0EFlGHestQplntLCK4iRyr5Dqv7MQlJdd7VUol/SlJpjRxDncbFXNPmx9jai?=
- =?us-ascii?Q?9gIidaYGnxNkWdDa/2t9AhtmZHv4cqYz8pU1SAbFHolbSH7XZo5GVYQXldm5?=
- =?us-ascii?Q?Rk1KNoDP2Ea2pYkGnwsggZth+gHq6tTrIInb/y7y+fddrURo0xzumrXznYI1?=
- =?us-ascii?Q?k+b6p6gt+t2OISG5dS79Cc0OrZtHrtIe3AjmOErIEYDcQiXBdxa+INdsWqls?=
- =?us-ascii?Q?mfiO0gRackwNffm1sMRcrBllkgTpwvk9Aw35zZonRNu6t0Sxtan9MKeP4RVj?=
- =?us-ascii?Q?EI0t7RZP7iFy1b3tya610cp2HxHEpd+t5N7LwTRnCKniSidiRVouqSeNDfzM?=
- =?us-ascii?Q?NPdGoHP5WPYMxwBWfdAHwfcbskE4aOvrkX/bIzvye4lt1qVFnGjUk95gHpGO?=
- =?us-ascii?Q?BqKYG4i/MM8z8AVuiya6idb6uw5oCrv71Mqbd9qJTCXzbs2ojHYC7cbser7n?=
- =?us-ascii?Q?wTyqpu2H98YotMXxyazuDfq+eeTSydhEJGETNYCeoWyjFWmM1a/qCInOpQLw?=
- =?us-ascii?Q?5bwy8JIlCH1vgbcA0ldAT4mMhZWd1WKHV2rqmM+/R6kURSYzJlfVysUGfffu?=
- =?us-ascii?Q?Mo9J9RpaWKv7xTC6idWGRQ+7N/VDzF8Dc8xGQyf7yYkVGy9Kdgqd6vwiML8g?=
- =?us-ascii?Q?+7no6bOD8GY4DpdliGs1XNGVAMMSECjfbsdpvA/SGFl6s+pFm364styewjHC?=
- =?us-ascii?Q?XaFDoTH1zpeT5axZW93cc4VFzGyjLmpTtKlG1bOvKf2Z5fJpukq6uJjdHWlO?=
- =?us-ascii?Q?oxzdKkAi904ej9zggAFCTSwM/eOe4v0Zfw2SdHm8DNpp1KscJLCh/T/02v0a?=
- =?us-ascii?Q?2SCqDokX1ZB0sK0kZSObm9d6mQbGHCK1YatlR2FND0l96V5eQUTmsozxfpB3?=
- =?us-ascii?Q?AKlGCeMdiltWOyo0hF1s2+mC27YoL6yz2wbXY0QMX6TbDDubgMh9DAf6o8XW?=
- =?us-ascii?Q?En6/q2fBKKxx2Q9C31E0PJsMBBB6yIKVFwWM9c9OHlXtDHVwJC0UEAUXAo/u?=
- =?us-ascii?Q?pXIdGCddlHQJ5XsHJV8MuVBdoZyjtmilkNweZjAcRH0OCQ+uotOA5gUJI9CJ?=
- =?us-ascii?Q?sNdlVar28VOBPWVzv6Y8E2VekYUHRHsmcJNjDrdSgEZGI899GJlKQPy1PtiM?=
- =?us-ascii?Q?unwRsY3caTUFdPVGFDyhHLxuOrdDZE4BfvFQozqKsSl0pnoSI3UH1GhB8L4t?=
- =?us-ascii?Q?gCEgVBrI5BojYUWCpgtAI+auDwtH1gs6DGfU2UMYUA5JXu560dYRabg7Ec+2?=
- =?us-ascii?Q?veOdQE9s8V6RUuvdYYrAoQinGbIE+bXK0vw3VtaTcUrlyIfF29TeJs6tQ2HL?=
- =?us-ascii?Q?rIEHOlRF9NeoilAYGTlN8bt3dL2b5FdvKYMRYXcVhbD6ZZDOnoYuDYS5PZe3?=
- =?us-ascii?Q?kA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	/MIMDyO5oRTJz94X92z8pnALKzG9pevJEsWQS55lOi05VE0lhvAJE7vNLgjxloXxftavxDYnVtwEDc2mV7bhTT4xl3DU8945gfBfMC8HzX6/JQtHE/U7s7doa89F/hlHSdB8P1de7Hj9DwOzXvwpJypPdvZh9pTWH20wGgjV5LhiKJnyiM4BxFSyaYbaDnYUitCteDjXnwL7H2npJDZZF84ENW3hiUuwCfMaIs3JxtI4Peb2buiRUP07c6ZCyRzWgcXdTBqk1F9pS9uPQdX9Pi63/W+7fg4DfyKJsUct6I1KuDrwPgTfKpgwyCKG+VMGTl+BY9U0wF1qnaOa8tYjQ0MTnc5akeS+6JXIUzraWmIiz68Pu3cN1TNSSS+7nbCwty7E8qTzQWqA4OaMn9ghNrwmNHRcgqMm1cYao7Q4zB820gOUNz4EXYIGUpt0ZNuDjFMRryipSb2ulot4he7RWGHI2tMG2/igLGkXPR0y/P8fCtQ/EJPoI8D4inCk9pTAc8N24K397xlV6mvtw51pMx4LMIqh6iD2eghLGLrmutp0wSXIeQnFM+F+BTQqdEhUMO/1UiJxiKZ/BphOxj0PBhyYN+VEvOZIBoj7HtEKbqo=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13bfea69-0ea3-4483-7409-08dc9079fcd7
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 16:07:58.8854
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9WcCXRnuX5kATtzdVsyQAjhCdA42WgwMs/QX+HBnYHqHVrBOiSa8gWeSg82w70Wvo4LTY26FdczHcXcLz1Ersk70pZ+5LEsZhQcf5IDbWDs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB5813
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0
- mlxlogscore=970 adultscore=0 bulkscore=0 malwarescore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406190121
-X-Proofpoint-GUID: MzYBLmOmED3itMe25x-3yrUheCRHTCoO
-X-Proofpoint-ORIG-GUID: MzYBLmOmED3itMe25x-3yrUheCRHTCoO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
 
+On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
+> On 6/18/24 7:53 PM, Paul E. McKenney wrote:
+> > On Tue, Jun 18, 2024 at 07:21:42PM +0200, Vlastimil Babka wrote:
+> >> On 6/18/24 6:48 PM, Paul E. McKenney wrote:
+> >> > On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
+> >> >> > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
+> >> >> > >> +
+> >> >> > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
+> >> >> > >> +
+> >> >> > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
+> >> >> > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
+> >> >> > > wanted to avoid initially.
+> >> >> > 
+> >> >> > I wanted to avoid new API or flags for kfree_rcu() users and this would
+> >> >> > be achieved. The barrier is used internally so I don't consider that an
+> >> >> > API to avoid. How difficult is the implementation is another question,
+> >> >> > depending on how the current batching works. Once (if) we have sheaves
+> >> >> > proven to work and move kfree_rcu() fully into SLUB, the barrier might
+> >> >> > also look different and hopefully easier. So maybe it's not worth to
+> >> >> > invest too much into that barrier and just go for the potentially
+> >> >> > longer, but easier to implement?
+> >> >> > 
+> >> >> Right. I agree here. If the cache is not empty, OK, we just defer the
+> >> >> work, even we can use a big 21 seconds delay, after that we just "warn"
+> >> >> if it is still not empty and leave it as it is, i.e. emit a warning and
+> >> >> we are done.
+> >> >> 
+> >> >> Destroying the cache is not something that must happen right away. 
+> >> > 
+> >> > OK, I have to ask...
+> >> > 
+> >> > Suppose that the cache is created and destroyed by a module and
+> >> > init/cleanup time, respectively.  Suppose that this module is rmmod'ed
+> >> > then very quickly insmod'ed.
+> >> > 
+> >> > Do we need to fail the insmod if the kmem_cache has not yet been fully
+> >> > cleaned up?
+> >> 
+> >> We don't have any such link between kmem_cache and module to detect that, so
+> >> we would have to start tracking that. Probably not worth the trouble.
+> > 
+> > Fair enough!
+> > 
+> >> >  If not, do we have two versions of the same kmem_cache in
+> >> > /proc during the overlap time?
+> >> 
+> >> Hm could happen in /proc/slabinfo but without being harmful other than
+> >> perhaps confusing someone. We could filter out the caches being destroyed
+> >> trivially.
+> > 
+> > Or mark them in /proc/slabinfo?  Yet another column, yay!!!  Or script
+> > breakage from flagging the name somehow, for example, trailing "/"
+> > character.
+> 
+> Yeah I've been resisting such changes to the layout and this wouldn't be
+> worth it, apart from changing the name itself but not in a dangerous way
+> like with "/" :)
 
-Christoph,
+;-) ;-) ;-)
 
-> I'd be tempted to simply not support the case where NOIOB is not a
-> multiple of the atomic write boundary for now and disable atomic
-> writes with a big fat warning (and a good comment in the soure code).
-> If users show up with a device that hits this and want to use atomic
-> writes we can resolved it.
+> >> Sysfs and debugfs might be more problematic as I suppose directory names
+> >> would clash. I'll have to check... might be even happening now when we do
+> >> detect leaked objects and just leave the cache around... thanks for the
+> >> question.
+> > 
+> > "It is a service that I provide."  ;-)
+> > 
+> > But yes, we might be living with it already and there might already
+> > be ways people deal with it.
+> 
+> So it seems if the sysfs/debugfs directories already exist, they will
+> silently not be created. Wonder if we have such cases today already because
+> caches with same name exist. I think we do with the zsmalloc using 32 caches
+> with same name that we discussed elsewhere just recently.
+> 
+> Also indeed if the cache has leaked objects and won't be thus destroyed,
+> these directories indeed stay around, as well as the slabinfo entry, and can
+> prevent new ones from being created (slabinfo lines with same name are not
+> prevented).
 
-I agree.
+New one on me!
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+> But it wouldn't be great to introduce this possibility to happen for the
+> temporarily delayed removal due to kfree_rcu() and a module re-insert, since
+> that's a legitimate case and not buggy state due to leaks.
+
+Agreed.
+
+> The debugfs directory we could remove immediately before handing over to the
+> scheduled workfn, but if it turns out there was a leak and the workfn leaves
+> the cache around, debugfs dir will be gone and we can't check the
+> alloc_traces/free_traces files there (but we have the per-object info
+> including the traces in the dmesg splat).
+> 
+> The sysfs directory is currently removed only with the whole cache being
+> destryed due to sysfs/kobject lifetime model. I'd love to untangle it for
+> other reasons too, but haven't investigated it yet. But again it might be
+> useful for sysfs dir to stay around for inspection, as for the debugfs.
+> 
+> We could rename the sysfs/debugfs directories before queuing the work? Add
+> some prefix like GOING_AWAY-$name. If leak is detected and cache stays
+> forever, another rename to LEAKED-$name. (and same for the slabinfo). But
+> multiple ones with same name might pile up, so try adding a counter then?
+> Probably messy to implement, but perhaps the most robust in the end? The
+> automatic counter could also solve the general case of people using same
+> name for multiple caches.
+> 
+> Other ideas?
+
+Move the going-away files/directories to some new directoriesy?  But you
+would still need a counter or whatever.  I honestly cannot say what
+would be best from the viewpoint of existing software scanning those
+files and directories.
+
+							Thanx, Paul
+
+> Thanks,
+> Vlastimil
+> 
+> > 
+> > 							Thanx, Paul
+> > 
+> >> >> > > Since you do it asynchronous can we just repeat
+> >> >> > > and wait until it a cache is furry freed?
+> >> >> > 
+> >> >> > The problem is we want to detect the cases when it's not fully freed
+> >> >> > because there was an actual read. So at some point we'd need to stop the
+> >> >> > repeats because we know there can no longer be any kfree_rcu()'s in
+> >> >> > flight since the kmem_cache_destroy() was called.
+> >> >> > 
+> >> >> Agree. As noted above, we can go with 21 seconds(as an example) interval
+> >> >> and just perform destroy(without repeating).
+> >> >> 
+> >> >> --
+> >> >> Uladzislau Rezki
+> >> 
+> 
