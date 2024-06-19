@@ -1,153 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB551CAB3;
-	Tue, 18 Jun 2024 17:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF651CA89
+	for <linux-block@vger.kernel.org>; Wed, 19 Jun 2024 03:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718733192; cv=none; b=kSnnQIlXIyDZyMZIYrelGg5GpzzE6UVIcyin8UH+Cn7AikQJZPF1edfIg/CtsI+3QhrLSzWz/BdGb4Lhqgcik4J3r6Bbu1xp4dfhvaAk5tE3UbgB3lG0SGUE+s+KKQ2jmG0EiCcr8SJfHHDDLh31KRjqUovHz7Jsg2z5iI6Hb6w=
+	t=1718768100; cv=none; b=STFeUP1wEWotRT45ExgRqsXeuaXuRdFq7wqn5wNc2qysoCgenWrDV9H98384ZDfyDHcp0xrVU0CwZq5W8T2iCi7mD/xhXFaZi25jdUQy0K3lA/UpycP4B7rS+B0zKl+m13CszMSwvhKMBElfispgKEgxz8zvZ/e6CT09oyaVaxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718733192; c=relaxed/simple;
-	bh=1oG2z1L2HMCk/Y21GlrePdx7AXyrdRLAZGfQqNCTU9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hU2aa3P504iXMC1l6vLhXLIbQNepjd4AH8WLt94DPsNA7mEIN/5HYCHTkxQ6HT3Gci4rhNr5y0GLapeSQoG4woMhDbp8Lt9x2xb2Jgw5EUmVHAe2ppeVYx99Ci+xFayR5+C3nShY+YC/V11QrtUop5/rAzv6agxBm4meoPyyaMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QkOp7f3+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718768100; c=relaxed/simple;
+	bh=uUXc0LJNKs/vFo3L/r/u2J1QJ3gHT37bVcCa13HtFD4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LCDE66mekmaP8njzzCJ05NKHkP3oQK+YRX3EtV2f9z/YuVsS2bDOcAX9DoZD/n/3EHE8Prm6QXLxD2DpsZBx1HkEytSW3a2tM0AXCrSp0gZK/te1BLt1Lcjg9A9ClGPFNvZHHVQ+psiwatNi5Lvfa2jgvOAzuzEghEKoHz3hsh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YkqvrA5n; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QkOp7f3+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078A0C3277B;
-	Tue, 18 Jun 2024 17:53:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718733192;
-	bh=1oG2z1L2HMCk/Y21GlrePdx7AXyrdRLAZGfQqNCTU9I=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=QkOp7f3+vMry8cAs4SIc1hm/gEn1nrjiwL7M2c0KKPR9yiamR54iaHuuCRGK7piGG
-	 +n42AXTyIq0ngAFYyq7228+ThonPylf7E7oMdT2aYR9Pj835uWmAGVPiU6S9gfNyhB
-	 yfkIq9lqKnRI9OARD5J0WUk6ozDPQ5dA8rkdgqCxf/WalWf2keAEK6iXZgRM6fR4Ch
-	 vHY9axBAPsFEWk9+VWTA6AYH4XWKV//PM6aKm/qaUrDDo0afnO6WO7QxPGZLE4pl9Y
-	 oz/l1kLMvMAbKJ2LAF3HRzkHJxiudjKsFXTmeXVFEuWrvtx/MztlGXtyweNvs6fNs6
-	 OSLwxNqjqPupw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id A0B31CE05B6; Tue, 18 Jun 2024 10:53:11 -0700 (PDT)
-Date: Tue, 18 Jun 2024 10:53:11 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	kasan-dev <kasan-dev@googlegroups.com>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com>
- <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
- <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
- <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
- <ZnCDgdg1EH6V7w5d@pc636>
- <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
- <ZnFT1Czb8oRb0SE7@pc636>
- <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
- <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkqvrA5n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718768097;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q7yFKsN0T5sglge4djOlJzENEPOGUu/F3+tbN8T1RGA=;
+	b=YkqvrA5niVZZskf+OZfWkPI5s2MPD9lwh6dvLNpYltveNHFkZHvA8yAePGZUkU5VhcL6Cn
+	WqVKaa0KA2IoHoFuf7GzNJunB+Q6Dqv48x1Znq12XcVM5xueLRIugGVfWah6aJxWMY467u
+	c6gTuVTOoASo+P6VPB8oqbfG3wOVXc8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-119-7hsdMjM-M1ag1Wcc8YTjjg-1; Tue,
+ 18 Jun 2024 23:34:54 -0400
+X-MC-Unique: 7hsdMjM-M1ag1Wcc8YTjjg-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 22BFF195608C;
+	Wed, 19 Jun 2024 03:34:52 +0000 (UTC)
+Received: from localhost (unknown [10.72.112.109])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A07481956053;
+	Wed, 19 Jun 2024 03:34:48 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Ye Bin <yebin10@huawei.com>
+Subject: [PATCH] block: check bio alignment in blk_mq_submit_bio
+Date: Wed, 19 Jun 2024 11:34:43 +0800
+Message-ID: <20240619033443.3017568-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue, Jun 18, 2024 at 07:21:42PM +0200, Vlastimil Babka wrote:
-> On 6/18/24 6:48 PM, Paul E. McKenney wrote:
-> > On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
-> >> > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
-> >> > >> +
-> >> > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
-> >> > >> +
-> >> > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
-> >> > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
-> >> > > wanted to avoid initially.
-> >> > 
-> >> > I wanted to avoid new API or flags for kfree_rcu() users and this would
-> >> > be achieved. The barrier is used internally so I don't consider that an
-> >> > API to avoid. How difficult is the implementation is another question,
-> >> > depending on how the current batching works. Once (if) we have sheaves
-> >> > proven to work and move kfree_rcu() fully into SLUB, the barrier might
-> >> > also look different and hopefully easier. So maybe it's not worth to
-> >> > invest too much into that barrier and just go for the potentially
-> >> > longer, but easier to implement?
-> >> > 
-> >> Right. I agree here. If the cache is not empty, OK, we just defer the
-> >> work, even we can use a big 21 seconds delay, after that we just "warn"
-> >> if it is still not empty and leave it as it is, i.e. emit a warning and
-> >> we are done.
-> >> 
-> >> Destroying the cache is not something that must happen right away. 
-> > 
-> > OK, I have to ask...
-> > 
-> > Suppose that the cache is created and destroyed by a module and
-> > init/cleanup time, respectively.  Suppose that this module is rmmod'ed
-> > then very quickly insmod'ed.
-> > 
-> > Do we need to fail the insmod if the kmem_cache has not yet been fully
-> > cleaned up?
-> 
-> We don't have any such link between kmem_cache and module to detect that, so
-> we would have to start tracking that. Probably not worth the trouble.
+IO logical block size is one fundamental queue limit, and every IO has
+to be aligned with logical block size because our bio split can't deal
+with unaligned bio.
 
-Fair enough!
+The check has to be done with queue usage counter grabbed because device
+reconfiguration may change logical block size, and we can prevent the
+reconfiguration from happening by holding queue usage counter.
 
-> >  If not, do we have two versions of the same kmem_cache in
-> > /proc during the overlap time?
-> 
-> Hm could happen in /proc/slabinfo but without being harmful other than
-> perhaps confusing someone. We could filter out the caches being destroyed
-> trivially.
+logical_block_size stays in the 1st cache line of queue_limits, and this
+cache line is always fetched in fast path via bio_may_exceed_limits(),
+so IO perf won't be affected by this check.
 
-Or mark them in /proc/slabinfo?  Yet another column, yay!!!  Or script
-breakage from flagging the name somehow, for example, trailing "/"
-character.
+Cc: Yi Zhang <yi.zhang@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Ye Bin <yebin10@huawei.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-> Sysfs and debugfs might be more problematic as I suppose directory names
-> would clash. I'll have to check... might be even happening now when we do
-> detect leaked objects and just leave the cache around... thanks for the
-> question.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3b4df8e5ac9e..7bb50b6b9567 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2914,6 +2914,21 @@ static void blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
+ 	INIT_LIST_HEAD(&rq->queuelist);
+ }
+ 
++static bool bio_unaligned(const struct bio *bio,
++		const struct request_queue *q)
++{
++	unsigned int bs = queue_logical_block_size(q);
++
++	if (bio->bi_iter.bi_size & (bs - 1))
++		return true;
++
++	if (bio->bi_iter.bi_size &&
++	    ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & (bs - 1)))
++		return true;
++
++	return false;
++}
++
+ /**
+  * blk_mq_submit_bio - Create and send a request to block device.
+  * @bio: Bio pointer.
+@@ -2966,6 +2981,15 @@ void blk_mq_submit_bio(struct bio *bio)
+ 			return;
+ 	}
+ 
++	/*
++	 * Device reconfiguration may change logical block size, so alignment
++	 * check has to be done with queue usage counter held
++	 */
++	if (unlikely(bio_unaligned(bio, q))) {
++		bio_io_error(bio);
++		goto queue_exit;
++	}
++
+ 	if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
+ 		bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
+ 		if (!bio)
+-- 
+2.44.0
 
-"It is a service that I provide."  ;-)
-
-But yes, we might be living with it already and there might already
-be ways people deal with it.
-
-							Thanx, Paul
-
-> >> > > Since you do it asynchronous can we just repeat
-> >> > > and wait until it a cache is furry freed?
-> >> > 
-> >> > The problem is we want to detect the cases when it's not fully freed
-> >> > because there was an actual read. So at some point we'd need to stop the
-> >> > repeats because we know there can no longer be any kfree_rcu()'s in
-> >> > flight since the kmem_cache_destroy() was called.
-> >> > 
-> >> Agree. As noted above, we can go with 21 seconds(as an example) interval
-> >> and just perform destroy(without repeating).
-> >> 
-> >> --
-> >> Uladzislau Rezki
-> 
