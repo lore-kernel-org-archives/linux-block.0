@@ -1,190 +1,217 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AD515382F;
-	Wed, 19 Jun 2024 16:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF71F152166
+	for <linux-block@vger.kernel.org>; Wed, 19 Jun 2024 17:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718816389; cv=none; b=B1pZBA1aUZ3fho84tbbw7x7a1+WwICQFfZ6i1M2b81r99VsAu9rqD8mvEE8kvc4Ay8G1BPD5Xwf0lXhY6DGgAAi0rMLlp0SskgBh1PJgvhpfoPZATnEH6Cicx+xcrwJGCjhGyFTjgTAF64zSkYjEvfBPVtRl/f+Q7u/q+guhvrA=
+	t=1718817988; cv=none; b=hM06gVAk7r8BDTGfsoDqcsdjsrZIskXOG4snnuqO/UUlKSIvwju2t/vTIL/lpiIpIhHL2jLqoplLuh3DXD4f6yqynQmxAYBfCXV62KxodwuHZ5hrveMc77Eb2R2B5jN2fYSltWB3cRqfVGGhrkYIx6UYfaskWX1BfgpbiUlzYR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718816389; c=relaxed/simple;
-	bh=6YqZxcm83vpurH0rt6GpPHd/Crvf4o1d4oMnDTnOY1Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ixSJn7MxbBlH2DVcAyYPys6cdZm9CfNqdrXVXqcR2RHGwReNR8FB7aSiiYaxzMeSKpU3GISDLgRaNYCyl+c9v8wuGBT6sIfQtj6W7w8vAmWbo/n/e/0AU+n0R1to3i82yB/TySm6YdWEheF5iMBTbZpVNG48SRXiTJOqlC9kdU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxMLdwT9; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718817988; c=relaxed/simple;
+	bh=lVMR8SJ08IHitmcWBLFS1aBHtuZ4SRhXm+Kf9UExpKQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OdeHZc/9r4P96VSDRlG715wc1afPUTHkJMEd5NUulC9RWt4eZsYjJgf0CpPNpLwE9vXLpda3qP+ZQLqqnSGijzpVppGkYqij5ciof5Wadcmnda5NH/YtZi07R8t+69ORNrS8rUH0qw5K1UIisboD5rc3Q3kCWOBa7kmg25nrjBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IN3jF1i/; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxMLdwT9"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-797a7f9b52eso1729585a.2;
-        Wed, 19 Jun 2024 09:59:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718816385; x=1719421185; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FDzwqJUNGpd3ExrB77/2J3f2Tep+iv1xzWugmtBOTOY=;
-        b=hxMLdwT9wgOVCroyJYaN0TzLWHsb3hTPMBs2scDAwPu+qXHwERCLfpIZZFeYjropH/
-         QVUUQ8Lge/I6G5SY/DtwntZRTum3h2+i7hpDp7CATx/HUnHGvH6kfvaa9e13Lo58cgZa
-         mndJ4TwDOC4LnuuONUGNKStS5sgeehmHlRBgRuvF1UAFW5vqoSOhk/qbm2WgEVvjIWdk
-         9kvHFO2Rw4T782ibNNdsQAYgzpWyCilq4P5uH6ZvPpDkqtXDBLju3UhOmiWLGHWQM4jG
-         BYdOvkWJe5urQbSRVCUlt9fpKIA9e0U6IYS+f5TTIUt7V/ay/SyL4Ak58MLX2vR8lPA6
-         kGCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718816385; x=1719421185;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FDzwqJUNGpd3ExrB77/2J3f2Tep+iv1xzWugmtBOTOY=;
-        b=aV4K2nDszOvKh1hp/Ke1M0MS++pKjLWX2dRYma2wpewCZ7MgV7KbsEMBNErCqeO2Et
-         ghdBiA4QxTZkEXBf543DdfB5L9cHaPQBgngQJpYek8quFNKOGFzVXFwwgYeLLWgQCx4Y
-         CblxvGtphtbC4jkZXwULg8ZjVVIUd+mwI0zyumVMQu9yMMt8Sfs4XUMe/G9WZV4PsEzE
-         8demrvcr+fz8EVoSQfeNuibTlddCnJ5B9fKKuMJpH5BMy76ROHqPGBbdiXtSfs5E0fKm
-         Da8RtzPKj8FS3Sz2lvibn4ZhoCUBfOsUSW6uLajCj2s0L+ztnANlzcqQCCdZC6TPAQ5l
-         fkOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWchnoVfj9YuYDdmae4Fajd0sQ+h8cwvWQbuu2TeXKfE08RfeZbwSLWKVatiade2YJeLQYzxkBzrkuUi57+kGU7sWKW0auE7ZXNQSo2vUfKqLlL8zM9KCAxoDDib7i5YBZ+7YUzvYHtF3E=
-X-Gm-Message-State: AOJu0YwwoUsWqvTh+UUWhXKAVCI3wZN3GBK2RTbOVFw5Vga0psGV+hXY
-	BVutxH5EU7fnD5h5DCqwDy/sAIXD3l8PMqOzfOTy3EMRqV1TKqdUSEU34lruu06lqXF3ZLycTpL
-	lI8y0XgoL+lWjWPdUke8WbB8nFE8=
-X-Google-Smtp-Source: AGHT+IHgWZR86aet8NsFk6QADc3RY1LxeuyuNwE1KbtbYTnws2GoYWXftQeSoOkEBq6x4/iqOopzwgpA16mmiRZz1I4=
-X-Received: by 2002:a0c:e407:0:b0:6b4:f902:4ade with SMTP id
- 6a1803df08f44-6b501e3f9c7mr32557086d6.29.1718816385281; Wed, 19 Jun 2024
- 09:59:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IN3jF1i/"
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JGwhDE015117;
+	Wed, 19 Jun 2024 17:26:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:content-transfer-encoding
+	:mime-version; s=pp1; bh=22jZMfHoWIZi4QKhRjASc4xvc9/pgIrBjh6dPjp
+	e1Yk=; b=IN3jF1i/RThMDu4+9YXlrWixGA+zAL3Kfp1b5PtmUgBbzEXuMaQKgSM
+	sIuYatuPXfj7T7pPHPrYiPl0ENBWhwG8eu+mMiw2K/Q8cCuf2FNiYsXRWns8u7OA
+	7UFUh8oqoUFNkl83GWaI3wGE4RSPvCN/9Cms6tLY7KbYur4gN9plPd/iGRiiKLqe
+	E3ypAnoZ1DF+gQPLOUp6aiIOKiZewWwrpL2fxUXnn2E+caNiwruQYITxyEu9xuF9
+	cw9Y3317yluYbBcA73c6uQKwgqiKZC+NObuciZPKC4zVV84HsKXyHrdhpqzKKGlR
+	JLFHr8OkmMAf5IzXuXDRLHHpMkEARDw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yv3apg38d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 17:26:12 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45JFmT09023914;
+	Wed, 19 Jun 2024 17:26:11 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ysp9qesef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 17:26:11 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45JHQ58441419082
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Jun 2024 17:26:07 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1F3A420065;
+	Wed, 19 Jun 2024 17:26:05 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 25D3A2004B;
+	Wed, 19 Jun 2024 17:26:02 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.43.26.82])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 19 Jun 2024 17:26:01 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com, dwagner@suse.de
+Cc: kbusch@kernel.org, sagi@grimberg.me, hch@lst.de,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        venkat88@linux.vnet.ibm.com, sachinp@linux.vnet.ibm.com,
+        gjoyce@linux.ibm.com, Nilay Shroff <nilay@linux.ibm.com>
+Subject: [PATCHv4 blktests] nvme: add test for creating/deleting file-ns
+Date: Wed, 19 Jun 2024 22:55:02 +0530
+Message-ID: <20240619172556.2968660-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.45.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uWFTlt2BmnaNden0ILW7V8-YiyIWpoh_
+X-Proofpoint-GUID: uWFTlt2BmnaNden0ILW7V8-YiyIWpoh_
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000dc2e3d061b3d519c@google.com>
-In-Reply-To: <000000000000dc2e3d061b3d519c@google.com>
-From: Santosh Pradhan <santosh.pradhan@gmail.com>
-Date: Wed, 19 Jun 2024 22:29:32 +0530
-Message-ID: <CAOuNp5n7qaZnZ_5+kjfA6MD3QO=XDhE01G1ofN3rp72um-D2+w@mail.gmail.com>
-Subject: Re: [syzbot] [block?] KCSAN: data-race in block_uevent / inc_diskseq (2)
-To: syzbot <syzbot+c147f9175ec6cc7bd73b@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ adultscore=0 lowpriorityscore=0 mlxscore=0 priorityscore=1501
+ clxscore=1015 suspectscore=0 mlxlogscore=954 malwarescore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406190131
 
-Hi All,
-I guess this can be fixed by READ_ONCE(disk->diskseq) while reading
-and WRITE_ONCE(disk->diskseq, atomic64_inc_return(&diskseq)) in
-inc_diskseq() to avoid data race.
+This is regression test for commit be647e2c76b2 (nvme: use srcu for
+iterating namespace list)[1]. It is fixed in commit ff0ffe5b7c3c(nvme:
+fix namespace removal list)[2].
 
-I can probably send a patch if my understanding is correct.
+This test uses a regular file backed loop device for creating and then
+deleting an NVMe namespace in a loop.
 
-Best Regards,
-Santosh
+[1] https://lore.kernel.org/all/2312e6c3-a069-4388-a863-df7e261b9d70@linux.vnet.ibm.com/
+[2] https://lore.kernel.org/all/20240613164246.75205-1-kbusch@meta.com/
 
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+Changes from v3: 
+    - Instead of sleeping for async opeartion (ns creation) to finish, 
+      wait until the ns is created by polling ns/uuid (Daniel)
+Changes from v2: 
+    - Use defaults for creating and connecting to nvme target (Daniel)
+Changes from v1: 
+    - Add nvme prefix in the subject line instead of loop (Chaitanya)
+    - Enrich the commit log with details including link to regression 
+      discussion and fix commit (Chaitanya)
+    - Few other formatting cleanup (Chaitanya)
+    - Add fix commit information in the test header (Shinichiro)
+    - Instead of using default 1000 iteration for test,
+      set the test iteration count to 20 (Shinichiro)
+    - Update test case no. to nvme/052 (Shinichiro)
 
-On Wed, Jun 19, 2024 at 5:57=E2=80=AFPM syzbot
-<syzbot+c147f9175ec6cc7bd73b@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    3d54351c64e8 Merge tag 'lsm-pr-20240617' of git://git.ker=
-n..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D12426cfa98000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dcd45aedbb3f76=
-37b
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dc147f9175ec6cc7=
-bd73b
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
-ian) 2.40
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/ba0a777cccff/dis=
-k-3d54351c.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/a78193318c92/vmlinu=
-x-3d54351c.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/54456f3d3bfe/b=
-zImage-3d54351c.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+c147f9175ec6cc7bd73b@syzkaller.appspotmail.com
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KCSAN: data-race in block_uevent / inc_diskseq
->
-> write to 0xffff888101f05220 of 8 bytes by task 3101 on cpu 0:
->  inc_diskseq+0x2c/0x40 block/genhd.c:1472
->  disk_force_media_change+0x9f/0xf0 block/disk-events.c:297
->  __loop_clr_fd+0x270/0x3f0 drivers/block/loop.c:1193
->  loop_clr_fd drivers/block/loop.c:1276 [inline]
->  lo_ioctl+0xea6/0x1330 drivers/block/loop.c:1578
->  blkdev_ioctl+0x35f/0x450 block/ioctl.c:676
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:907 [inline]
->  __se_sys_ioctl+0xd3/0x150 fs/ioctl.c:893
->  __x64_sys_ioctl+0x43/0x50 fs/ioctl.c:893
->  x64_sys_call+0x1581/0x2d70 arch/x86/include/generated/asm/syscalls_64.h:=
-17
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xc9/0x1c0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> read to 0xffff888101f05220 of 8 bytes by task 3091 on cpu 1:
->  block_uevent+0x31/0x50 block/genhd.c:1206
->  dev_uevent+0x2f3/0x380 drivers/base/core.c:2687
->  uevent_show+0x11e/0x210 drivers/base/core.c:2745
->  dev_attr_show+0x3a/0xa0 drivers/base/core.c:2437
->  sysfs_kf_seq_show+0x17c/0x250 fs/sysfs/file.c:59
->  kernfs_seq_show+0x7c/0x90 fs/kernfs/file.c:205
->  seq_read_iter+0x2d7/0x940 fs/seq_file.c:230
->  kernfs_fop_read_iter+0xc6/0x310 fs/kernfs/file.c:279
->  new_sync_read fs/read_write.c:395 [inline]
->  vfs_read+0x5e6/0x6e0 fs/read_write.c:476
->  ksys_read+0xeb/0x1b0 fs/read_write.c:619
->  __do_sys_read fs/read_write.c:629 [inline]
->  __se_sys_read fs/read_write.c:627 [inline]
->  __x64_sys_read+0x42/0x50 fs/read_write.c:627
->  x64_sys_call+0x27e5/0x2d70 arch/x86/include/generated/asm/syscalls_64.h:=
-1
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xc9/0x1c0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> value changed: 0x0000000000000045 -> 0x0000000000000048
->
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 3091 Comm: udevd Not tainted 6.10.0-rc4-syzkaller-00035-g3d54=
-351c64e8 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 06/07/2024
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
->
+---
+ tests/nvme/052     | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/052.out |  2 ++
+ 2 files changed, 85 insertions(+)
+ create mode 100755 tests/nvme/052
+ create mode 100644 tests/nvme/052.out
+
+diff --git a/tests/nvme/052 b/tests/nvme/052
+new file mode 100755
+index 0000000..cf6061a
+--- /dev/null
++++ b/tests/nvme/052
+@@ -0,0 +1,83 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Nilay Shroff
++#
++# Regression test for commit be647e2c76b2(nvme: use srcu for iterating
++# namespace list). This regression is resolved with commit ff0ffe5b7c3c
++# (nvme: fix namespace removal list)
++
++. tests/nvme/rc
++
++DESCRIPTION="Test file-ns creation/deletion under one subsystem"
++
++requires() {
++	_nvme_requires
++	_have_loop
++	_require_nvme_trtype_is_loop
++}
++
++set_conditions() {
++	_set_nvme_trtype "$@"
++}
++
++nvmf_wait_for_ns() {
++	local ns
++	local timeout="5"
++	local uuid="$1"
++
++	ns=$(_find_nvme_ns "${uuid}")
++
++	start_time=$(date +%s)
++	while [[ -z "$ns" ]]; do
++		sleep 1
++		end_time=$(date +%s)
++		if (( end_time - start_time > timeout )); then
++			echo "namespace with uuid \"${uuid}\" not " \
++				"found within ${timeout} seconds"
++			return 1
++		fi
++		ns=$(_find_nvme_ns "${uuid}")
++	done
++
++	return 0
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	local iterations=20
++
++	_nvmet_target_setup
++
++	_nvme_connect_subsys
++
++	# start iteration from ns-id 2 because ns-id 1 is created
++	# by default when nvme target is setup. Also ns-id 1 is
++	# deleted when nvme target is cleaned up.
++	for ((i = 2; i <= iterations; i++)); do {
++		truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path).$i"
++		uuid="$(uuidgen -r)"
++
++		_create_nvmet_ns "${def_subsysnqn}" "${i}" "$(_nvme_def_file_path).$i" "${uuid}"
++
++		# wait until async request is processed and ns is created
++		nvmf_wait_for_ns "${uuid}"
++		if [ $? -eq 1 ]; then
++			echo "FAIL"
++			rm "$(_nvme_def_file_path).$i"
++			break
++		fi
++
++		_remove_nvmet_ns "${def_subsysnqn}" "${i}"
++		rm "$(_nvme_def_file_path).$i"
++	}
++	done
++
++	_nvme_disconnect_subsys >> "${FULL}" 2>&1
++
++	_nvmet_target_cleanup
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/052.out b/tests/nvme/052.out
+new file mode 100644
+index 0000000..f2d186d
+--- /dev/null
++++ b/tests/nvme/052.out
+@@ -0,0 +1,2 @@
++Running nvme/052
++Test complete
+-- 
+2.45.1
+
