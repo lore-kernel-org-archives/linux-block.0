@@ -1,63 +1,197 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9844374BE0
-	for <linux-block@vger.kernel.org>; Wed, 19 Jun 2024 07:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DFC73514
+	for <linux-block@vger.kernel.org>; Wed, 19 Jun 2024 07:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718782432; cv=none; b=OVDOY0rpzGt9WwWCEac+/3LFDxmV3rzdIycd6edGmKJyWifRNm0csCny3iT+ZoTV8UP8igGXrB7FQIzAhaQwwJYzmmb8KfiHGvsTKnlVqIWGYYyB7zuxonGNfGu7oT6RgAFFwIFzU2OauLp2em9iDUvrY5Yhv1rQy+TfXuHVyIw=
+	t=1718782956; cv=none; b=s9JuBdZK7Y2ZAx8vCupXGi+Qx0c8TAf/OsiUs5aL1G0Gx/uNFiI+VTcK1EhgC9gIMpQxaUQ+Y6BwPwUBanVldaoz3sj9Vi1iriKlxcLtaIKItoMz487DY8KxIUZZQ+pjsyauYpCDRktLo2AkIK432cQOTxRVj6KqeEN63x3HdL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718782432; c=relaxed/simple;
-	bh=ZZSNOm4HGvu76JOYyw4T2DI+91MN2NyKIOB4zCl3sKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LpgWWHSqzows0jBfKlsLFMClMfMNLx8g7KdEuJvY8s7WhXEFz0o+uwvRSOU4mm7dGpiLdqNYDeAPGaJatv5GRHGvbPcgRUgOTOyApdvs9UcnzwqA19sEvscxtOs8tmb9SkJdYK8da8UztBcrKVDMhqrJKilQLzV2PdrSUMi6+0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=iqCAc76A; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1718782956; c=relaxed/simple;
+	bh=F/XZAzCC3vnxgpvnFK+t2WuPn+nHqk1zshpyWzFfazk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T9T3w7fVe4AT2aO8zFkf8y92sj47rvqmseBPCs/TDHgukgPCV4r7O5FodPr929o7SJJaMbDYYSOS3PoITbqC5g92ipiL/u42aLYTdtSgg0e5n9QLQlxE/qNJ77GBp2GZSJxB8wPze/t4Bm+hnLGNySfbVQz5xLQY12R3zRqipV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fJx0weeH; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iqCAc76A"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=6sQS0LzXRXt6ViRydGpyYH1J8lgsRb1inZFjPQqDMJ0=; b=iqCAc76Avy66yhukPOZaJNFiZ+
-	4FdJedvJiNIDcrGz6l9Kd64O5Xbv2NnxMRm5hnihpwmmASnAwKrNlnREVs5TSE58iHK2kFKxg/N+y
-	GSY+YpdCLg2vWf2RmhnU1G/6NjdxioTlUTed0/rHN6QpSDxzPyyqjLZ6zsOnSly4p00Q1j1mfNqWn
-	SZYN4j/zI4vPB24sGwI2vLkFS0uiI91Yqw+c2COscwdKk5CQ5mvxTbRlWnSrb/3FTTTwk31x6YgGL
-	c+/RUqKVCgVlviaVHUQ1OhdkSy3t3AY+O/ul+e6xSaZUPnWWQy+WuC/cb84jUJig7REr0UXHs/1mF
-	qORm2k1A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sJppF-00000000DkG-0AbC;
-	Wed, 19 Jun 2024 07:33:51 +0000
-Date: Wed, 19 Jun 2024 00:33:49 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>, Ye Bin <yebin10@huawei.com>
-Subject: Re: [PATCH] block: check bio alignment in blk_mq_submit_bio
-Message-ID: <ZnKJ3d-18rzl32j2@infradead.org>
-References: <20240619033443.3017568-1-ming.lei@redhat.com>
- <7ed12f7e-f59a-4f6f-975b-ce7bb21652de@kernel.org>
- <355cc36f-e771-4f00-bfb0-0095674d5d49@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fJx0weeH"
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45J7egNf001818;
+	Wed, 19 Jun 2024 07:42:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:content-transfer-encoding
+	:mime-version; s=pp1; bh=U6bkFzY0Id/LoyyCyCFMSdw3FYnGF4rtcQdK9ky
+	QZZI=; b=fJx0weeH5m9jAdbNoe1l69SNZO8rln0+5e/ESUtngkr7KhkgC+Ti2/2
+	drOcr+wEfJwaxE7a+9Cwmox4D8DEENPUztUopElW/ouC7kEFxSnrTalOB7Eq952+
+	zvePvoLOfuv+16aqEpJuJRDkRafMLo5LbnMsUy34SR4yE6TojH0n4ZzXxEDqfe0r
+	MfABZAIgLlk7PVaoyG0ENJHxq6zSLD/BosKFRW9YB0EXdTi6ZOz9a0yQXdmbtHis
+	1cbMR8X4wxL2Z+1/GFfys9fdEBf+CA5vO+oAFtjQy76+GntoEDi9dXwOoqVZtrDr
+	M9HLRIrE1vi9RAo8giLlhfjg4GgP5Pw==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yuu50005f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 07:42:22 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45J6Cf8Z011037;
+	Wed, 19 Jun 2024 07:42:20 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yspsna33u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 07:42:20 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45J7gFiA45220264
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Jun 2024 07:42:17 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E927C20063;
+	Wed, 19 Jun 2024 07:42:14 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 411472004E;
+	Wed, 19 Jun 2024 07:42:12 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.43.48.107])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 19 Jun 2024 07:42:12 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com
+Cc: kbusch@kernel.org, sagi@grimberg.me, hch@lst.de,
+        linux-nvme@lists.infradead.org, venkat88@linux.vnet.ibm.com,
+        sachinp@linux.vnet.ibm.com, linux-block@vger.kernel.org,
+        gjoyce@linux.ibm.com, Nilay Shroff <nilay@linux.ibm.com>
+Subject: [PATCHv2 blktests] nvme: add test for creating/deleting file-ns
+Date: Wed, 19 Jun 2024 13:11:40 +0530
+Message-ID: <20240619074208.2900127-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.45.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zzGQqo71C-BGrqWr9nKq4mTixWjxME42
+X-Proofpoint-ORIG-GUID: zzGQqo71C-BGrqWr9nKq4mTixWjxME42
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <355cc36f-e771-4f00-bfb0-0095674d5d49@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-19_02,2024-06-17_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ spamscore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=869 malwarescore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406190053
 
-On Wed, Jun 19, 2024 at 01:22:27PM +0900, Damien Le Moal wrote:
-> static bool bio_unaligned(const struct bio *bio,
-> 		          const struct request_queue *q)
-> {
-> 	unsigned int bs_mask = queue_logical_block_size(q) - 1;
+This is regression test for commit be647e2c76b2 (nvme: use srcu for
+iterating namespace list)[1]. It is fixed in commit ff0ffe5b7c3c(nvme:
+fix namespace removal list)[2].
 
-Please avoid use of the queue helpers.  This should be:
+This test uses a regular file backed loop device for creating and then
+deleting an NVMe namespace in a loop.
 
-	unsigned int bs_mask = bdev_logical_block_size(bio->bi_bdev);
+[1] https://lore.kernel.org/all/2312e6c3-a069-4388-a863-df7e261b9d70@linux.vnet.ibm.com/
+[2] https://lore.kernel.org/all/20240613164246.75205-1-kbusch@meta.com/
+
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+Changes from v1:
+    - Add nvme prefix in the subject line instead of loop (Chaitanya)
+    - Enrich the commit log with details including link to regression 
+      discussion and fix commit (Chaitanya)
+    - Few other formatting cleanup (Chaitanya)
+    - Add fix commit information in the test header (Shinichiro)
+    - Instead of using default 1000 iteration for test,
+      set the test iteration count to 20 (Shinichiro)
+    - Update test case no. to nvme/052 (Shinichiro)
+---
+ tests/nvme/052     | 69 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/052.out |  2 ++
+ 2 files changed, 71 insertions(+)
+ create mode 100755 tests/nvme/052
+ create mode 100644 tests/nvme/052.out
+
+diff --git a/tests/nvme/052 b/tests/nvme/052
+new file mode 100755
+index 0000000..9daed8f
+--- /dev/null
++++ b/tests/nvme/052
+@@ -0,0 +1,69 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Nilay Shroff
++#
++# Regression test for commit be647e2c76b2(nvme: use srcu for iterating
++# namespace list). This regression is resolved with commit ff0ffe5b7c3c
++# (nvme: fix namespace removal list)
++
++. tests/nvme/rc
++
++DESCRIPTION="Test file-ns creation/deletion under one subsystem"
++
++requires() {
++	_nvme_requires
++	_have_loop
++	_require_nvme_trtype_is_loop
++}
++
++set_conditions() {
++	_set_nvme_trtype "$@"
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	local subsys="blktests-subsystem-1"
++	local iterations=20
++	local loop_dev
++	local port
++
++	truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
++
++	loop_dev="$(losetup -f --show "$(_nvme_def_file_path)")"
++
++	port="$(_create_nvmet_port "${nvme_trtype}")"
++
++	_nvmet_target_setup --subsysnqn "${subsys}" --blkdev "${loop_dev}"
++
++	_nvme_connect_subsys --subsysnqn "${subsys}"
++
++	# start iteration from ns-id 2 because ns-id 1 is created
++	# by default when nvme target is setup. Also ns-id 1 is
++	# deleted when nvme target is cleaned up.
++	for ((i = 2; i <= iterations; i++)); do {
++		truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path).$i"
++		_create_nvmet_ns "${subsys}" "${i}" "$(_nvme_def_file_path).$i"
++
++		# allow async request to be processed
++		sleep 1
++
++		_remove_nvmet_ns "${subsys}" "${i}"
++		rm "$(_nvme_def_file_path).$i"
++	}
++	done
++
++	_nvme_disconnect_subsys --subsysnqn "${subsys}" >> "${FULL}" 2>&1
++
++	_nvmet_target_cleanup --subsysnqn "${subsys}" --blkdev "${loop_dev}"
++
++	_remove_nvmet_port "${port}"
++
++	losetup -d "$loop_dev"
++
++	rm "$(_nvme_def_file_path)"
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/052.out b/tests/nvme/052.out
+new file mode 100644
+index 0000000..f2d186d
+--- /dev/null
++++ b/tests/nvme/052.out
+@@ -0,0 +1,2 @@
++Running nvme/052
++Test complete
+-- 
+2.45.1
 
