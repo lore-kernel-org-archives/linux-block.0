@@ -1,92 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD99762C1;
-	Wed, 19 Jun 2024 23:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D0D1BC5C
+	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 03:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718839050; cv=none; b=tPbBOenylJPXstG8ds9LW6FTIamJrBmvUI3uhy2PlZ/hmxVGjpzDb654RM4wiHfJyu+9G5Oc3hzuekk3Xrj6VAzySd43n85DL/y885oxrRUCLdqdjFErWdNMHf7iFppVeuAAtg/4hnkCmjhcUPpzZYU4oYCu5F/Bu+Gy/4/MYW4=
+	t=1718852818; cv=none; b=HlfObRk3CpGQVQgkd8l/9UTRKWWd87YPwB6qBItTZCoyJBFPR+O6oi/4RcuGN2+RkvfS1HRMuNBKfplj73S2sY9oeby0IcwRZ83zKS13w4hzebLUIH7KVDQL9UQfuID7Y2fLcGkY5TnlCbmNrTlcldWI2UjLkz34xn8B0H08ZxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718839050; c=relaxed/simple;
-	bh=af6OC184Aeh5hIidHpvhRsVZ27ISBkvr6kMN7hxhuik=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oFKx1qS8hrrxhxf1XMVbwyiCD7v68J47DWvotvtJz46KagOVgSPWUL2Pb9UF8Sn6coPagcYAHkSmUYhKuRIj83RU6WY2QsHaTVX4huiTcw2hzfxjo3C4y1DcM9jh3UFzNyK7uRR0cv520VCW6cVVI9S5KF2gO53Hf0RMgVK/xgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F6LFsmmt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718852818; c=relaxed/simple;
+	bh=ifmPhiYZd3G3X77dawvDR+TjUVXmHhCRoy3o1ykkH9E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=STyDY59zvSyPZkbheWmaUa3hkxtkU615Ox3dcQLa8uTIBN/2SkutdmtcADkYY9h/KiGF09E5cUvOIqWkiWK9uCK3TWll4/z22GAW7oatAL8C/Bgt4bE1KyBxZQdX3myn9YY4vnZnNMXsLBOUkT6Sk4u9THsyoJp95q/OydlPM9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JbbrlJlv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F6LFsmmt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 269F7C2BBFC;
-	Wed, 19 Jun 2024 23:17:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718839050;
-	bh=af6OC184Aeh5hIidHpvhRsVZ27ISBkvr6kMN7hxhuik=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=F6LFsmmt8D0ioXd0NB9FNQFhS6wy1IkuhEF7CWIMxtZrX3reYb4ZWkQi947eT13ma
-	 Lk2lUOXCb29Mtg5+Wmz1lXk7hG/7UtSmESo5WIFGCTpJoU12b78cHwuTOf9dSJZjBD
-	 VCU52TKpBA4n3seKoAeAiciSZaVFVpjXiv+hE+IxGyFeACUQHEZpr5170v078i95fl
-	 twFSUgYxw2fBi3ivGbCXrIcCMwW6cBz7EVNwCmL2JathMrTLu34ID7+0nDgkLzeNkO
-	 mrR9XnTvc3U+3NT3zim2Z0S+YHucVmoJ0jYv0f7Kl9V47RjEhsRYwPm+sP5+iW53LR
-	 W5kHiih2P9q+A==
-Message-ID: <74c0d236-b84e-479d-b163-07897cdcb0f0@kernel.org>
-Date: Thu, 20 Jun 2024 08:17:28 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbbrlJlv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718852815;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hvH01bT0cMA2mKMGKnh10BbPYy2Z2/WXu0SqZM0ypJ0=;
+	b=JbbrlJlveSKXA+xbe/GPTYWqtsLpmJb+beLjCCIo6usCTOKfXniYasKNHXjlTXkbjo0Oqh
+	nmX5ayaWw9Mzowquj6KcfmmlNucquyUCoZfgxWRu9FZvLWLYHoKngCzZZNWWbYxfnb6WBm
+	DUxqRxewwj5G7v5OWdtkBysZr6zmEe8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-F1KEVklwNkWNmxY4CHZEBg-1; Wed,
+ 19 Jun 2024 23:06:44 -0400
+X-MC-Unique: F1KEVklwNkWNmxY4CHZEBg-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D0331956094;
+	Thu, 20 Jun 2024 03:06:43 +0000 (UTC)
+Received: from localhost (unknown [10.72.112.108])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 24BFA1956048;
+	Thu, 20 Jun 2024 03:06:40 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Ye Bin <yebin10@huawei.com>,
+	stable@vger.kernel.org
+Subject: [PATCH V2 1/1] block: check bio alignment in blk_mq_submit_bio
+Date: Thu, 20 Jun 2024 11:06:31 +0800
+Message-ID: <20240620030631.3114026-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] block: fix spelling and grammar for in
- writeback_cache_control.rst
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org
-References: <20240619154623.450048-1-hch@lst.de>
- <20240619154623.450048-3-hch@lst.de>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20240619154623.450048-3-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 6/20/24 00:45, Christoph Hellwig wrote:
-> Suggested-by: Damien Le Moal <dlemoal@kernel.org>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+IO logical block size is one fundamental queue limit, and every IO has
+to be aligned with logical block size because our bio split can't deal
+with unaligned bio.
 
-You can remove "for" in the commit title. Other than that, looks good to me.
+The check has to be done with queue usage counter grabbed because device
+reconfiguration may change logical block size, and we can prevent the
+reconfiguration from happening by holding queue usage counter.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+logical_block_size stays in the 1st cache line of queue_limits, and this
+cache line is always fetched in fast path via bio_may_exceed_limits(),
+so IO perf won't be affected by this check.
 
-> ---
->  Documentation/block/writeback_cache_control.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/block/writeback_cache_control.rst b/Documentation/block/writeback_cache_control.rst
-> index c575e08beda8e3..c3707d07178045 100644
-> --- a/Documentation/block/writeback_cache_control.rst
-> +++ b/Documentation/block/writeback_cache_control.rst
-> @@ -70,8 +70,8 @@ flag in the features field of the queue_limits structure.
->  Implementation details for bio based block drivers
->  --------------------------------------------------
->  
-> -For bio based drivers the REQ_PREFLUSH and REQ_FUA bit are simplify passed on
-> -to the driver if the drivers sets the BLK_FEAT_WRITE_CACHE flag and the drivers
-> +For bio based drivers the REQ_PREFLUSH and REQ_FUA bit are simply passed on to
-> +the driver if the driver sets the BLK_FEAT_WRITE_CACHE flag and the driver
->  needs to handle them.
->  
->  *NOTE*: The REQ_FUA bit also gets passed on when the BLK_FEAT_FUA flags is
-> @@ -89,7 +89,7 @@ When the BLK_FEAT_WRITE_CACHE flag is set, REQ_OP_WRITE | REQ_PREFLUSH requests
->  with a payload are automatically turned into a sequence of a REQ_OP_FLUSH
->  request followed by the actual write by the block layer.
->  
-> -When the BLK_FEAT_FUA flags is set, the REQ_FUA bit simplify passed on for the
-> +When the BLK_FEAT_FUA flags is set, the REQ_FUA bit is simply passed on for the
->  REQ_OP_WRITE request, else a REQ_OP_FLUSH request is sent by the block layer
->  after the completion of the write request for bio submissions with the REQ_FUA
->  bit set.
+Cc: Yi Zhang <yi.zhang@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Ye Bin <yebin10@huawei.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- cover any zero sized bio which .bi_sector needs to be initialized too
 
+ block/blk-mq.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3b4df8e5ac9e..d161682ecd20 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2914,6 +2914,17 @@ static void blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
+ 	INIT_LIST_HEAD(&rq->queuelist);
+ }
+ 
++static bool bio_unaligned(const struct bio *bio, struct request_queue *q)
++{
++	unsigned int bs_mask = queue_logical_block_size(q) - 1;
++
++	/* .bi_sector of any zero sized bio need to be initialized */
++	if ((bio->bi_iter.bi_size & bs_mask) ||
++	    ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & bs_mask))
++		return true;
++	return false;
++}
++
+ /**
+  * blk_mq_submit_bio - Create and send a request to block device.
+  * @bio: Bio pointer.
+@@ -2966,6 +2977,15 @@ void blk_mq_submit_bio(struct bio *bio)
+ 			return;
+ 	}
+ 
++	/*
++	 * Device reconfiguration may change logical block size, so alignment
++	 * check has to be done with queue usage counter held
++	 */
++	if (unlikely(bio_unaligned(bio, q))) {
++		bio_io_error(bio);
++		goto queue_exit;
++	}
++
+ 	if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
+ 		bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
+ 		if (!bio)
 -- 
-Damien Le Moal
-Western Digital Research
+2.44.0
 
