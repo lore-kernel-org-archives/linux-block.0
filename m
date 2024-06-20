@@ -1,110 +1,161 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAF748CCD;
-	Thu, 20 Jun 2024 13:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3767D1ACE8B;
+	Thu, 20 Jun 2024 14:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718891656; cv=none; b=C97SFtVnQ1uXWdyk6pxUtxz71H1TVQqOwmOyFaUS15O3FxYyIcdOWWthgpmX5k/BqAgWnOsUoXu9bSZMe2KNMMZFg/5p5u8Hr0HmxoReo6kqzGrsDTycoWFcGcuyZYqrkDBx8XVuy+u39BNkTTnEnmr94mILMtqAoF7DbsjTVbs=
+	t=1718892778; cv=none; b=rZ1IXygB43zgWEcCDU/VxCN0ZK2AFW7Pxpiozjlf9+CJMmlrxXAObzJi6+PV7uaG8auytBpkVu5amrfFMihxivlcQXN6qnTCBQkVQfZMcFi6ePnZhE9dw4Wd1fvfUB5yohH9SURa5u+q8/4uvbG+Wd55+fBdzLLtSuxuH7XqP/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718891656; c=relaxed/simple;
-	bh=NOQGTWXdj9G8iFM3066oMr6y2PwQOndNQ8YChh2uMDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dQ1iYlguL3n3H6VlUAnVuxvxI+GQCmI6c0whBrtj7or9R9DuUOlHTWpu8f7pYqrz6h0/xcklv7nkL6J1vAkhvCvTOjEo8WYdNmjGwEsDe8qYlCAdVH+OWbP5BtIKRoDKBzFwVeizmSgqD/2g+Tp0Nehstl8Zzvw7DJYS+5JYYio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Lo2SxhaN; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1718892778; c=relaxed/simple;
+	bh=a2igiApBU77fBP9Tg9BAAqeh+G6mxLYKf93fVQlTysI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s01NqK6GU3r821pGpSzKqQkvKzjbUYT4wLZ1GRhvblHm1qISBgbqg/Uga571v+VsdegPuEtMFJ9rXwe0ZnIJ2ArmqOeBUo61N7UVNWzuUwRcV/kRhWJr5kv+RiciGp/Zs2mZUX+H1v53l0yDZGRHqW4bKnh+OxfpzdMqhAzJwEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zt1JXUWO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=miN6IEO0; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zt1JXUWO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=miN6IEO0; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lo2SxhaN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=nwO0+HfO+dip8/h67A8BnvwxWh0on9U35/Dl4WuOIfU=; b=Lo2SxhaN0/KQyxYCFidkI/xAp9
-	DFEjgCJIfDlorCZKzKfJG65hYbIY7OmkW3yhLnLJxMsB43CR2rBoqqln1K8R1S+i7nWmZkIBPxOrp
-	T/P7Q0KdNaD50g62HkP06PrX+ugCfcPOZaRfCJZ0C8u/waDheUEBMzrJEeWWSehNC1sxEhE94Xnjn
-	gI2Pzczh99bExFatTf25waUVQmyZAlWFH7+9VHw08wI+F96ypOmZFfp5UzTHrwA7K2ydkH8ne0j4p
-	yru1fLYtX0fKMpf1fOMOsn/DOIyBxQtr6y+VixWy2Ui0q9b1FNO/ZZKrFUujzwSdwZ5WaBGmDt3XM
-	JkHrFh5A==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sKIEr-000000067er-2uG5;
-	Thu, 20 Jun 2024 13:54:09 +0000
-Date: Thu, 20 Jun 2024 14:54:09 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Hongbo Li <lihongbo22@huawei.com>, linux-bcachefs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	axboe@kernel.dk, hch@lst.de
-Subject: Re: bvec_iter.bi_sector -> loff_t? (was: Re: [PATCH] bcachefs: allow
- direct io fallback to buffer io for) unaligned length or offset
-Message-ID: <ZnQ0gdpcplp_-aw7@casper.infradead.org>
-References: <20240620132157.888559-1-lihongbo22@huawei.com>
- <bbf7lnl2d5sxdzqbv3jcn6gxmtnsnscakqmfdf6vj4fcs3nasx@zvjsxfwkavgm>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zt1JXUWO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="miN6IEO0";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zt1JXUWO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="miN6IEO0"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 71E341F8A3;
+	Thu, 20 Jun 2024 14:12:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1718892775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2bOUA5QxJ31WCm6TPcJHCbjgJxpPmWHLpzok2TtDYqc=;
+	b=zt1JXUWOXSP38EVlKaw+5G4O5YWCV2Nlcx6R+3dFKt1zVJGR4gP7Vbn6WZCxRqF0IwJM6j
+	pFAR7qiyPX5cF3RCLcLfSPDkvVLJIjUKdo40QMdT+lqWYp/hEYMpPZORETKBnTQsfPxUgz
+	nmePGnARD5yj1dAqT1Kx5i/XaR/Lqhg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1718892775;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2bOUA5QxJ31WCm6TPcJHCbjgJxpPmWHLpzok2TtDYqc=;
+	b=miN6IEO0C7jAdufzLA7ujwgUOVZD2Kz32tibXGEWysr9O0buLyUIA2aBENYXrk12wrGJWa
+	nJp2TA0rIFLNnACA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1718892775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2bOUA5QxJ31WCm6TPcJHCbjgJxpPmWHLpzok2TtDYqc=;
+	b=zt1JXUWOXSP38EVlKaw+5G4O5YWCV2Nlcx6R+3dFKt1zVJGR4gP7Vbn6WZCxRqF0IwJM6j
+	pFAR7qiyPX5cF3RCLcLfSPDkvVLJIjUKdo40QMdT+lqWYp/hEYMpPZORETKBnTQsfPxUgz
+	nmePGnARD5yj1dAqT1Kx5i/XaR/Lqhg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1718892775;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2bOUA5QxJ31WCm6TPcJHCbjgJxpPmWHLpzok2TtDYqc=;
+	b=miN6IEO0C7jAdufzLA7ujwgUOVZD2Kz32tibXGEWysr9O0buLyUIA2aBENYXrk12wrGJWa
+	nJp2TA0rIFLNnACA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8419713AC1;
+	Thu, 20 Jun 2024 14:12:53 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id srm0HOU4dGZwWgAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 20 Jun 2024 14:12:53 +0000
+Message-ID: <cfb9db60-6ff0-4c3a-9252-57d5e9c64d65@suse.de>
+Date: Thu, 20 Jun 2024 16:12:52 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch v9 01/10] block: Pass blk_queue_get_max_sectors() a
+ request pointer
+Content-Language: en-US
+To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
+ martin.petersen@oracle.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+ dchinner@redhat.com, jack@suse.cz
+Cc: djwong@kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+ linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com, linux-aio@kvack.org,
+ linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org, nilay@linux.ibm.com,
+ ritesh.list@gmail.com, willy@infradead.org, agk@redhat.com,
+ snitzer@kernel.org, mpatocka@redhat.com, dm-devel@lists.linux.dev,
+ Luis Chamberlain <mcgrof@kernel.org>
+References: <20240620125359.2684798-1-john.g.garry@oracle.com>
+ <20240620125359.2684798-2-john.g.garry@oracle.com>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240620125359.2684798-2-john.g.garry@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <bbf7lnl2d5sxdzqbv3jcn6gxmtnsnscakqmfdf6vj4fcs3nasx@zvjsxfwkavgm>
+X-Spam-Score: -2.79
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.79 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	TAGGED_RCPT(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLusjj3u5c53i6g8q6enupwtij)];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.infradead.org,mit.edu,google.com,linux.ibm.com,kvack.org,gmail.com,infradead.org,redhat.com,lists.linux.dev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
 
-On Thu, Jun 20, 2024 at 09:36:42AM -0400, Kent Overstreet wrote:
-> On Thu, Jun 20, 2024 at 09:21:57PM +0800, Hongbo Li wrote:
-> > Support fallback to buffered I/O if the operation being performed on
-> > unaligned length or offset. This may change the behavior for direct
-> > I/O in some cases.
-> > 
-> > [Before]
-> > For length which aligned with 256 bytes (not SECTOR aligned) will
-> > read failed under direct I/O.
-> > 
-> > [After]
-> > For length which aligned with 256 bytes (not SECTOR aligned) will
-> > read the data successfully under direct I/O because it will fallback
-> > to buffer I/O.
-
-This is against the O_DIRECT requirements.
-
-   O_DIRECT
-       The O_DIRECT flag may impose alignment restrictions on  the  length  and
-       address  of  user-space  buffers  and the file offset of I/Os.  In Linux
-       alignment restrictions vary by filesystem and kernel version  and  might
-       be  absent  entirely.   The  handling  of  misaligned O_DIRECT I/Os also
-       varies; they can either fail with EINVAL or fall back to buffered I/O.
-
-       Since Linux 6.1, O_DIRECT support and alignment restrictions for a  file
-       can  be  queried using statx(2), using the STATX_DIOALIGN flag.  Support
-       for STATX_DIOALIGN varies by filesystem; see statx(2).
-
-       Some filesystems provide their  own  interfaces  for  querying  O_DIRECT
-       alignment restrictions, for example the XFS_IOC_DIOINFO operation in xf‐
-       sctl(3).  STATX_DIOALIGN should be used instead when it is available.
-
-       If none of the above is available, then direct I/O support and alignment
-       restrictions  can  only  be  assumed  from  known characteristics of the
-       filesystem, the individual file, the underlying storage  device(s),  and
-       the  kernel  version.  In Linux 2.4, most filesystems based on block de‐
-       vices require that the file offset and the length and memory address  of
-       all  I/O  segments  be multiples of the filesystem block size (typically
-       4096 bytes).  In Linux 2.6.0, this was relaxed to the logical block size
-       of the block device (typically 512 bytes).   A  block  device's  logical
-       block  size  can be determined using the ioctl(2) BLKSSZGET operation or
-       from the shell using the command:
-
-           blockdev --getss
-
-> The catch is that struct bio - bvec_iter - represents addresses with a
-> sector_t, and we'd want that to be a loff_t.
+On 6/20/24 14:53, John Garry wrote:
+> Currently blk_queue_get_max_sectors() is passed a enum req_op. In future
+> the value returned from blk_queue_get_max_sectors() may depend on certain
+> request flags, so pass a request pointer.
 > 
-> That's something we should do anyways; everything else in struct bio can
-> represent a byte-aligned io, bvec_iter.bi_sector is the only exception
-> and fixing that would help in consolidating our various scatter-gather
-> list data structures - but we'd need buy-in from Jens and Christoph
-> before doing that.
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Keith Busch <kbusch@kernel.org>
+> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>   block/blk-merge.c | 3 ++-
+>   block/blk-mq.c    | 2 +-
+>   block/blk.h       | 6 ++++--
+>   3 files changed, 7 insertions(+), 4 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-I'm against it.  Block devices only do sector-aligned IO and we should
-not pretend otherwise.
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
