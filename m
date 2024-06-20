@@ -1,126 +1,98 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D0D1BC5C
-	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 03:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB03639
+	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 03:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718852818; cv=none; b=HlfObRk3CpGQVQgkd8l/9UTRKWWd87YPwB6qBItTZCoyJBFPR+O6oi/4RcuGN2+RkvfS1HRMuNBKfplj73S2sY9oeby0IcwRZ83zKS13w4hzebLUIH7KVDQL9UQfuID7Y2fLcGkY5TnlCbmNrTlcldWI2UjLkz34xn8B0H08ZxM=
+	t=1718855263; cv=none; b=M9jm4MKWG4Uy8a/6WEapooDaNKQmwMJK3H4FMCtZ5OvP3MQ0t8K3GRMd2NaDAuLDRfpFNKvL6N9b+g86LRN26jRlSFCnXs+5jl2iNicCHdSlej2eGNMHX6arZSwjCOGdgp/MK8dVvlGLGfLS8cJxo6o2L9Z7l7HdI53BpJ9LL+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718852818; c=relaxed/simple;
-	bh=ifmPhiYZd3G3X77dawvDR+TjUVXmHhCRoy3o1ykkH9E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=STyDY59zvSyPZkbheWmaUa3hkxtkU615Ox3dcQLa8uTIBN/2SkutdmtcADkYY9h/KiGF09E5cUvOIqWkiWK9uCK3TWll4/z22GAW7oatAL8C/Bgt4bE1KyBxZQdX3myn9YY4vnZnNMXsLBOUkT6Sk4u9THsyoJp95q/OydlPM9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JbbrlJlv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1718855263; c=relaxed/simple;
+	bh=+YUp07J2DYCdj3ruz4guYSLwb+lqC6NAEd1FcCpdvFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l5osVm6mz0jR+QAhoD3aG/VeoMtpUC9oDOGawpRkpwpzmeFpxM3BIy3AlxXgbh0qu2IsOXb+BVlSErMbQo9J+VDD7ELTajdHSwm11ZJ+YycE4TK1W6J69buN7AeeFr0ZaXxgmotfZfMjhy+TX9QtkwIZxLhsgYCQJD/+PEQV2jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sdzUsGI5; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbbrlJlv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718852815;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hvH01bT0cMA2mKMGKnh10BbPYy2Z2/WXu0SqZM0ypJ0=;
-	b=JbbrlJlveSKXA+xbe/GPTYWqtsLpmJb+beLjCCIo6usCTOKfXniYasKNHXjlTXkbjo0Oqh
-	nmX5ayaWw9Mzowquj6KcfmmlNucquyUCoZfgxWRu9FZvLWLYHoKngCzZZNWWbYxfnb6WBm
-	DUxqRxewwj5G7v5OWdtkBysZr6zmEe8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-F1KEVklwNkWNmxY4CHZEBg-1; Wed,
- 19 Jun 2024 23:06:44 -0400
-X-MC-Unique: F1KEVklwNkWNmxY4CHZEBg-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D0331956094;
-	Thu, 20 Jun 2024 03:06:43 +0000 (UTC)
-Received: from localhost (unknown [10.72.112.108])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 24BFA1956048;
-	Thu, 20 Jun 2024 03:06:40 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Ye Bin <yebin10@huawei.com>,
-	stable@vger.kernel.org
-Subject: [PATCH V2 1/1] block: check bio alignment in blk_mq_submit_bio
-Date: Thu, 20 Jun 2024 11:06:31 +0800
-Message-ID: <20240620030631.3114026-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sdzUsGI5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=gUwGlgxiCPDT8MYzK6rxluGFfBSAzZkplULLRijn/x0=; b=sdzUsGI5atlro0MHcQFGapEFJu
+	1PLgBeNT+WRGIEAZMddbSscHGsttxLHUSB1yquRndN6z8YUvmbw37VRTsYz0WL8qOjfbvFbPGHeTL
+	SpgB24JBOJfKwsBgNWmLGvJ4WSd5M66/woPrDcX3WE24O6YcAfjnB8Mvy8ZV/GoqqIOxDh0hbHlIe
+	nH3ntaE/bSstrHVjql7ZUdgOk0Gb4pQrZD+tYoGxP904S8Lq6puxXZAwBsNW/2Z/vzzO2b83M1Iia
+	uVqHv/3YzhpZ+UEoajtP/HZaroi3QOqXBHOqjw+AyqwLud0UJSngGX9NDJrffdOYJUEYvQ7bCnQmI
+	buGiTwmg==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sK8lq-00000005Ywa-1Nwj;
+	Thu, 20 Jun 2024 03:47:34 +0000
+Date: Thu, 20 Jun 2024 04:47:34 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v5 1/3] block: Added folio-lized version of
+ bio_add_hw_page()
+Message-ID: <ZnOmVn6S2RNLDFWz@casper.infradead.org>
+References: <20240619023420.34527-1-kundan.kumar@samsung.com>
+ <CGME20240619024146epcas5p15357534fb7410c212743162b351e27e8@epcas5p1.samsung.com>
+ <20240619023420.34527-2-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240619023420.34527-2-kundan.kumar@samsung.com>
 
-IO logical block size is one fundamental queue limit, and every IO has
-to be aligned with logical block size because our bio split can't deal
-with unaligned bio.
+On Wed, Jun 19, 2024 at 08:04:18AM +0530, Kundan Kumar wrote:
+>  /**
+> - * bio_add_hw_page - attempt to add a page to a bio with hw constraints
+> + * bio_add_hw_page - a wrapper around function bio_add_hw_folio
 
-The check has to be done with queue usage counter grabbed because device
-reconfiguration may change logical block size, and we can prevent the
-reconfiguration from happening by holding queue usage counter.
+No.  You haven't changed what this function does, merely how it is
+implemented.  The reader of the API documentation doesn't care about the
+implementation, they just need to know what it does.
 
-logical_block_size stays in the 1st cache line of queue_limits, and this
-cache line is always fetched in fast path via bio_may_exceed_limits(),
-so IO perf won't be affected by this check.
+>   * @q: the target queue
+>   * @bio: destination bio
+>   * @page: page to add
+> @@ -972,13 +972,35 @@ bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
+>   * @offset: vec entry offset
+>   * @max_sectors: maximum number of sectors that can be added
+>   * @same_page: return if the segment has been merged inside the same page
+> - *
+> - * Add a page to a bio while respecting the hardware max_sectors, max_segment
+> - * and gap limitations.
 
-Cc: Yi Zhang <yi.zhang@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Ye Bin <yebin10@huawei.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- cover any zero sized bio which .bi_sector needs to be initialized too
+Likewise.
 
- block/blk-mq.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+> +/**
+> + * bio_add_hw_folio - attempt to add a folio to a bio with hw constraints
+> + * @q: the target queue
+> + * @bio: destination bio
+> + * @folio: folio to add
+> + * @len: vec entry length
+> + * @offset: vec entry offset in the folio
+> + * @max_sectors: maximum number of sectors that can be added
+> + * @same_page: return if the segment has been merged inside the same page
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3b4df8e5ac9e..d161682ecd20 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2914,6 +2914,17 @@ static void blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
- 	INIT_LIST_HEAD(&rq->queuelist);
- }
- 
-+static bool bio_unaligned(const struct bio *bio, struct request_queue *q)
-+{
-+	unsigned int bs_mask = queue_logical_block_size(q) - 1;
-+
-+	/* .bi_sector of any zero sized bio need to be initialized */
-+	if ((bio->bi_iter.bi_size & bs_mask) ||
-+	    ((bio->bi_iter.bi_sector << SECTOR_SHIFT) & bs_mask))
-+		return true;
-+	return false;
-+}
-+
- /**
-  * blk_mq_submit_bio - Create and send a request to block device.
-  * @bio: Bio pointer.
-@@ -2966,6 +2977,15 @@ void blk_mq_submit_bio(struct bio *bio)
- 			return;
- 	}
- 
-+	/*
-+	 * Device reconfiguration may change logical block size, so alignment
-+	 * check has to be done with queue usage counter held
-+	 */
-+	if (unlikely(bio_unaligned(bio, q))) {
-+		bio_io_error(bio);
-+		goto queue_exit;
-+	}
-+
- 	if (unlikely(bio_may_exceed_limits(bio, &q->limits))) {
- 		bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
- 		if (!bio)
--- 
-2.44.0
+... page?
+
+> + * Add a folio to a bio while respecting the hardware max_sectors, max_segment
+> + * and gap limitations.
+> + */
+> +int bio_add_hw_folio(struct request_queue *q, struct bio *bio,
+> +               struct folio *folio, unsigned int len, unsigned int offset,
+
+size_t for both of these parameters.  We're dangerously close to
+overflowing unsigned int (arm64 gets to 512MB folios, which is only 3
+bits from 4GB).
 
