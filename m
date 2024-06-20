@@ -1,148 +1,61 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7123B1B4C58;
-	Thu, 20 Jun 2024 17:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1188D1BB6A6;
+	Thu, 20 Jun 2024 17:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718906237; cv=none; b=FJ8phEsz78lRnitDHCh+w4eVHrzyGi3vpzRIvhrz06weKgk5cyYWuE3yQs1NitoS998K2+bYUik7yk1BIlPmPrveaCW3l55OwWvH74Mhtwem695h1yCxIFMwseUJKorXNQMvwHYX/XLWx10aR3QdRAtxqxhmG5bX/R5yKL3lLT8=
+	t=1718906239; cv=none; b=PdDPgUPiBzd11FJAFYvSNfbTJ11KraEv64Igh7suDgo/zDa8AotQ4PA+GZWjKCjp5o1paaCCLRqzEcCgWINW5c4MkfkcXuIIwx1CrsyQbNaYUNL6xQBdFLNqg4kIT68NO5Y392BBd3Dh2JRbBFBC02NlLd5Awt6t523mIjQVw6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718906237; c=relaxed/simple;
-	bh=AaGeTjrw0FfF+0h9/U20FA8dwnbicgFR6M2oz4CBhwo=;
+	s=arc-20240116; t=1718906239; c=relaxed/simple;
+	bh=IVOqRERikmBLXj/S4EhqDnNUn0svGtRW3/tF+qqU7rw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=saYHHK/gETN5oulQHjzRo+QjFppqP/bhScEzFupoMpZXpjHlXC676vdwyHmVjGxpJtgOjtsy8M5LZuXp3wFO0OIw7BhSZX8I21rTvoTi/kcy32AijbckXhOYSWUctodNyeFkLKGwzb8GtGvvKtuFYwH4KR6+YcKnSlogJlfwvEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKbhWgKz; arc=none smtp.client-ip=209.85.215.177
+	 MIME-Version; b=eWTidXXwn+dqHG1OEyJMO2Xx0VqY6x50e0QubUp/3r8H69MN9dvDj+mD95RdTUbISb6iYfmrP8FOQ1hRrQZy+ff4+B0r4kd2nHzxWShnLm4Po3DSq4vJeVt//kmp87w2LLaY9Nl6QHkMiN6cUcIQCX8AGSswgbCa6RMysM1saco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CbyNgHUn; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKbhWgKz"
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-6e3ff7c4cc8so879911a12.3;
-        Thu, 20 Jun 2024 10:57:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CbyNgHUn"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-706354409e1so1087930b3a.2;
+        Thu, 20 Jun 2024 10:57:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718906235; x=1719511035; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718906237; x=1719511037; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=93DcC67mVeY/+nPj/RabbHCmpdvAxDoR+WvyjbP4Fv8=;
-        b=KKbhWgKz9TSMkT6GJx+oHzkl14SBbVxhVprFE8KF/u/HwKkgFovEPas7JNigg1VVpd
-         IzxkpMh6nT0UVYcmNhjwq9MIlDRt7g4yYmm1O8iWkPVeTFXREfOb3nd8oxVGrFb4hivT
-         frnx7AjBvakMunPftb+HPJfaJzv7MEmRKL11bKx73fKKPvm19ZVUblrFVREqAa9HlPBz
-         RnyS7gfOlRGCSNyKlrjaT9fU7aG15/2c0Sivad/bbqBvx9C6z5bFVhQxYqskkBgTBcvI
-         dFbp2Vcg+7ym42AldglDeF/T0hQztGy2EkhncU7SuJCrN+Lx13DpCFbN8QA+JJYBhXJr
-         ugWw==
+        bh=HhrUk1+mUN1F/EY1c0kk41tZKguvC2y3hVnxrlEDx7A=;
+        b=CbyNgHUnnmxAeGqFpUvDlO/Xv4DSwaGYjDqTPsPpoVNg+ePvN0DNkLZlEj+WSsFn0E
+         kX2EXvwwmd5Xj0WF8ZTL49c4md3LlLAyqu6nv9GQr4cnyG9KIK9/xpC4tPQ+dkOJURmf
+         1xTYtxAiaPibRv4nO5IUyBebHKwjtLckoyvA/OwXVDjgfDOCdcinFhezZlUit//llQN7
+         ntZMzRzKWHyQWTg/+JeNSmeTECeuc7W5wollqg3ZiHNjmm9v7MgQy0BL9r4NEZ4DxKV2
+         XA/YEyQFECEE4LzeGIDKOc28iKzJbkPCyfHjcIXuNaDaUQ14EevbE1/5PHZu0qq/5H7u
+         /Lmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718906235; x=1719511035;
+        d=1e100.net; s=20230601; t=1718906237; x=1719511037;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=93DcC67mVeY/+nPj/RabbHCmpdvAxDoR+WvyjbP4Fv8=;
-        b=aUGjv/A8mdkdH7XtdU+XpiM18b9wp6RwlvA94ToqCLV3JXdwI8UxzOGZ4/Pe7s7Vrs
-         tYS3qxbCw8BrH3DA2S+Uw7m2acxtI8VWt3UGstQHXMwOeHQ9Y4RvWyhpYVpsyuKWYwx0
-         7W/mqV+n6PjY85hFK1TnEc2oKbj3TIdgKI8rfdV4gJgO3hS5szd5Dg+Ximz0NMcdAxx8
-         UAnfIyKkRewgk17aTUR8LpSw7iz1fiL7Mw/WxemlVlJC6J+BrDrp6mL6Jx2KepoJqPVd
-         okjrEEY9AjEj/rZPKkORGxp27RQgRjTeZ5twhRtfOVktktAOcg75oJRtMFKKsQE2q0zh
-         jHXg==
-X-Forwarded-Encrypted: i=1; AJvYcCWV+K9ndBXcS6nR4BZCdr5FZ4oAm28DWAbaj9VRGgYwjY6fUR68oH1iagyeEJVBdUKps7X87/GebWzADXXo6w6OzrnClXfJY87eLd3E2m4pT50G23zy4yri8dtA7nQU9A+6fzUTW3obwUBw0PAcTCrWeeHtl7EzDoh9XWk8ex0M8SekmlNEb0AnlgrOZ+KB5f7X5O0ii7i/jAONdEMK32sofaIWhTVqmyeXzfAzVF+9mRHzR80cbpLfQ5ev/N00Z0Yh/ROyXB+WSIeEcZajeO/odnO4SWWQMRDyWpnm6m15o8WfhGJs02LAEV+id3dUTxYT1kKfCLWzdY78Sj+bDnXp5N8BS8WHc0aQ6MoHUYpupvGFtkVRAah9ekciSunxeEuQJTY7onBVQ9J9D3SM/ATLzj+SrLhAD+F7BCUXRY+QWkYmn0VipDEP14SL94St6JmJPYNJQg+ajN8AJ9Z1OeLqB9UzcIms6BiF1P0T89EYthNGaiBDxaNEhxlK8suAGKHDDuEg9dO1r+lS4uw5TxCJHimQRooivTK4/xIBon44uO9wSxYwe7OEQHtUj3qXOuEs7FWJ2YNUPdEyzaITVE6xf/eHRMTdP1hMXEYdpyurFHUFDU9hOd0VWmhnjn4CZ1Oc4mkuYsfc12fFH/EPvNRI7cq823/C2uORlIyZw8eN2s2iSCcEzsjOUgpqHAKslh23shccBpso9RelSLs9SjETXtwyljbfrjwL/oq4Ox9u80UTZJFJQ6ADDftE3kskwueQZJTPqQ==
-X-Gm-Message-State: AOJu0Yx5frqbE7XwDrj7MGKWoBtAdKKoiU8VtdHN2IEA/JB4LxxmDYel
-	YuuoFvMDzov7GE7AMhbcIt4V2nRa0W4yqzZOH4x6UlAyn+vMhtKMV29e1XxwYF0=
-X-Google-Smtp-Source: AGHT+IF9ITZbJ7vVNEYTX8RCffN7BEtSM9imchEPcbZOZxImDJdvzQARxKbAqm1aXg+Hi0vjNW3ABQ==
-X-Received: by 2002:a17:902:f687:b0:1f6:fcd9:5b86 with SMTP id d9443c01a7336-1f9aa3ecca8mr64371665ad.12.1718906234591;
-        Thu, 20 Jun 2024 10:57:14 -0700 (PDT)
+        bh=HhrUk1+mUN1F/EY1c0kk41tZKguvC2y3hVnxrlEDx7A=;
+        b=FRvA+w9sSEDdoXvWu5A10gqGEBZle3ImqalrjlwONoqMBAKHH2xmRnW7CiyCjJKbWJ
+         4ua1z2nR9YGRGfl0nxcsTHkUn8VnO0AEKDjkEbH/uzGcBhsa/rWL2l7rudS0bQz/+4lo
+         8kVcRH5yYpB9M7Enf4wW1MJnKL6KxomUQQYO1FWfy2nPm/6mYKYwDpi9HPLGgnI9Avd9
+         5+LXHeeREeECfdgOPF1oQXT3Q25D/YZT2znniv7YnpwJ/7vXPyWFr+ipGABPQkJ0u0vG
+         Il2MMlilqviGpqsQqLKlwVCDsP79VgRgdae204Y2HTRLADxlyDZDvuynb/S3i7HqL8he
+         +JVw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4omB2ONhorDQQKIudg5r+rMK2KqiPOUvpyUovsPqvPDdwA3V1yOqR0MKT0dp6qH7A6iBO6fZisVnR8Eh1naNXDUBL8fJqz2RAngc=
+X-Gm-Message-State: AOJu0YyqbtGzI+v3xqPjQNOXIaYtrXY9QEad4+o0RcQOmmOFImup/e4J
+	OZxC0oL7D32pWuc+9ldTstuEBH/XtfLXGqW3m/Ebc6RMIYGgNW+xPIFv+39p
+X-Google-Smtp-Source: AGHT+IHpmxkoFebUUOkKdZ9h5TVM/Y2ZZ8tmFfJa0z1asysx1Lt0lrjXjd81Wa3PpwLPa2TUwX38TQ==
+X-Received: by 2002:a05:6a20:2056:b0:1b4:772d:2892 with SMTP id adf61e73a8af0-1bcbb594fdbmr5780731637.32.1718906237195;
+        Thu, 20 Jun 2024 10:57:17 -0700 (PDT)
 Received: from localhost ([216.228.127.128])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9d28ce155sm15196715ad.259.2024.06.20.10.57.13
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc91dcf8sm12602486b3a.27.2024.06.20.10.57.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 10:57:14 -0700 (PDT)
+        Thu, 20 Jun 2024 10:57:16 -0700 (PDT)
 From: Yury Norov <yury.norov@gmail.com>
 To: linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	David Disseldorp <ddiss@suse.de>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Hans Verkuil <hverkuil@xs4all.nl>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Hugh Dickins <hughd@google.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
 	Jens Axboe <axboe@kernel.dk>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Kees Cook <keescook@chromium.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Martin Habets <habetsm.xilinx@gmail.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Michal Simek <monstr@monstr.eu>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Oliver Neukum <oneukum@suse.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Rich Felker <dalias@libc.org>,
-	Rob Herring <robh@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuai Xue <xueshuai@linux.alibaba.com>,
-	Stanislaw Gruszka <stf_xl@wp.pl>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	alsa-devel@alsa-project.org,
-	ath10k@lists.infradead.org,
-	dmaengine@vger.kernel.org,
-	iommu@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-m68k@lists.linux-m68k.org,
-	linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-net-drivers@amd.com,
-	linux-pci@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	mpi3mr-linuxdrv.pdl@broadcom.com,
-	netdev@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	x86@kernel.org
+	linux-block@vger.kernel.org
 Cc: Yury Norov <yury.norov@gmail.com>,
 	Alexey Klimov <alexey.klimov@linaro.org>,
 	Bart Van Assche <bvanassche@acm.org>,
@@ -152,9 +65,9 @@ Cc: Yury Norov <yury.norov@gmail.com>,
 	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
 	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH v4 02/40] lib/find: add test for atomic find_bit() ops
-Date: Thu, 20 Jun 2024 10:56:25 -0700
-Message-ID: <20240620175703.605111-3-yury.norov@gmail.com>
+Subject: [PATCH v4 03/40] lib/sbitmap; optimize __sbitmap_get_word() by using find_and_set_bit()
+Date: Thu, 20 Jun 2024 10:56:26 -0700
+Message-ID: <20240620175703.605111-4-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240620175703.605111-1-yury.norov@gmail.com>
 References: <20240620175703.605111-1-yury.norov@gmail.com>
@@ -166,100 +79,95 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add basic functionality test for new API.
+__sbitmap_get_word() opencodes either find_and_set_bit_wrap(), or
+find_and_set_next_bit(), depending on wrap parameter. Simplify it
+by using atomic find_bit() API.
 
+While here, simplify sbitmap_find_bit_in_word(), which calls it.
+
+CC: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- lib/test_bitmap.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ lib/sbitmap.c | 47 ++++++++++-------------------------------------
+ 1 file changed, 10 insertions(+), 37 deletions(-)
 
-diff --git a/lib/test_bitmap.c b/lib/test_bitmap.c
-index 65a75d58ed9e..405f79dd2266 100644
---- a/lib/test_bitmap.c
-+++ b/lib/test_bitmap.c
-@@ -6,6 +6,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 1e453f825c05..3881996217c9 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -4,6 +4,7 @@
+  * Copyright (C) 2013-2014 Jens Axboe
+  */
  
- #include <linux/bitmap.h>
 +#include <linux/find_atomic.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-@@ -221,6 +222,65 @@ static void __init test_zero_clear(void)
- 	expect_eq_pbl("", bmap, 1024);
+ #include <linux/sched.h>
+ #include <linux/random.h>
+ #include <linux/sbitmap.h>
+@@ -133,38 +134,13 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
  }
+ EXPORT_SYMBOL_GPL(sbitmap_resize);
  
-+static void __init test_find_and_bit(void)
-+{
-+	unsigned long w, w_part, bit, cnt = 0;
-+	DECLARE_BITMAP(bmap, EXP1_IN_BITS);
-+
-+	/*
-+	 * Test find_and_clear{_next}_bit() and corresponding
-+	 * iterators
-+	 */
-+	bitmap_copy(bmap, exp1, EXP1_IN_BITS);
-+	w = bitmap_weight(bmap, EXP1_IN_BITS);
-+
-+	for_each_test_and_clear_bit(bit, bmap, EXP1_IN_BITS)
-+		cnt++;
-+
-+	expect_eq_uint(w, cnt);
-+	expect_eq_uint(0, bitmap_weight(bmap, EXP1_IN_BITS));
-+
-+	bitmap_copy(bmap, exp1, EXP1_IN_BITS);
-+	w = bitmap_weight(bmap, EXP1_IN_BITS);
-+	w_part = bitmap_weight(bmap, EXP1_IN_BITS / 3);
-+
-+	cnt = 0;
-+	bit = EXP1_IN_BITS / 3;
-+	for_each_test_and_clear_bit_from(bit, bmap, EXP1_IN_BITS)
-+		cnt++;
-+
-+	expect_eq_uint(bitmap_weight(bmap, EXP1_IN_BITS), bitmap_weight(bmap, EXP1_IN_BITS / 3));
-+	expect_eq_uint(w_part, bitmap_weight(bmap, EXP1_IN_BITS));
-+	expect_eq_uint(w - w_part, cnt);
-+
-+	/*
-+	 * Test find_and_set{_next}_bit() and corresponding
-+	 * iterators
-+	 */
-+	bitmap_copy(bmap, exp1, EXP1_IN_BITS);
-+	w = bitmap_weight(bmap, EXP1_IN_BITS);
-+	cnt = 0;
-+
-+	for_each_test_and_set_bit(bit, bmap, EXP1_IN_BITS)
-+		cnt++;
-+
-+	expect_eq_uint(EXP1_IN_BITS - w, cnt);
-+	expect_eq_uint(EXP1_IN_BITS, bitmap_weight(bmap, EXP1_IN_BITS));
-+
-+	bitmap_copy(bmap, exp1, EXP1_IN_BITS);
-+	w = bitmap_weight(bmap, EXP1_IN_BITS);
-+	w_part = bitmap_weight(bmap, EXP1_IN_BITS / 3);
-+	cnt = 0;
-+
-+	bit = EXP1_IN_BITS / 3;
-+	for_each_test_and_set_bit_from(bit, bmap, EXP1_IN_BITS)
-+		cnt++;
-+
-+	expect_eq_uint(EXP1_IN_BITS - bitmap_weight(bmap, EXP1_IN_BITS),
-+			EXP1_IN_BITS / 3 - bitmap_weight(bmap, EXP1_IN_BITS / 3));
-+	expect_eq_uint(EXP1_IN_BITS * 2 / 3 - (w - w_part), cnt);
-+}
-+
- static void __init test_find_nth_bit(void)
+-static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
++static inline int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 			      unsigned int hint, bool wrap)
  {
- 	unsigned long b, bit, cnt = 0;
-@@ -1482,6 +1542,8 @@ static void __init selftest(void)
- 	test_for_each_clear_bitrange_from();
- 	test_for_each_set_clump8();
- 	test_for_each_set_bit_wrap();
-+
-+	test_find_and_bit();
+-	int nr;
+-
+-	/* don't wrap if starting from 0 */
+-	wrap = wrap && hint;
+-
+-	while (1) {
+-		nr = find_next_zero_bit(word, depth, hint);
+-		if (unlikely(nr >= depth)) {
+-			/*
+-			 * We started with an offset, and we didn't reset the
+-			 * offset to 0 in a failure case, so start from 0 to
+-			 * exhaust the map.
+-			 */
+-			if (hint && wrap) {
+-				hint = 0;
+-				continue;
+-			}
+-			return -1;
+-		}
++	if (wrap)
++		return find_and_set_bit_wrap_lock(word, depth, hint);
+ 
+-		if (!test_and_set_bit_lock(nr, word))
+-			break;
+-
+-		hint = nr + 1;
+-		if (hint >= depth - 1)
+-			hint = 0;
+-	}
+-
+-	return nr;
++	return find_and_set_next_bit_lock(word, depth, hint);
  }
  
- KSTM_MODULE_LOADERS(test_bitmap);
+ static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
+@@ -175,15 +151,12 @@ static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
+ 	int nr;
+ 
+ 	do {
+-		nr = __sbitmap_get_word(&map->word, depth,
+-					alloc_hint, wrap);
+-		if (nr != -1)
+-			break;
+-		if (!sbitmap_deferred_clear(map))
+-			break;
+-	} while (1);
++		nr = __sbitmap_get_word(&map->word, depth, alloc_hint, wrap);
++		if (nr < depth)
++			return nr;
++	} while (sbitmap_deferred_clear(map));
+ 
+-	return nr;
++	return -1;
+ }
+ 
+ static int sbitmap_find_bit(struct sbitmap *sb,
 -- 
 2.43.0
 
