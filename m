@@ -1,96 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E13519EEBC;
-	Thu, 20 Jun 2024 16:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A974A1B29B6
+	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 16:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718900791; cv=none; b=YGHojYDEX0llV0GqYco8NSjcC4bjR5BGxhOGG6t0sSxGtVlJ84Y26qERWFKTn9gSFBw6QE4+oF5ifnTTor2olPZkStjYyPRN0d+ViAvTQVv9QP8LaE3aG6kdA8ws87Bp8rdoJgfsVRQoaL983EDFHwVH1GYM8dLC1M9fi1HGGcA=
+	t=1718902348; cv=none; b=QlIp2TDtQ4waoaVK5gSImsQsrvUt2PihSE8l9a06yxHjkCeMHJFIEXEepSmK81R68ukccDFvmBhN3XxDL0CbtrFnYtvMzpHvYKSG2zkcd+TdjddjQbE4GTtHlg7sjc+/i2gbHIkmTcTXadhLkGADLW6+vAsGWbaQugChh6T+SKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718900791; c=relaxed/simple;
-	bh=XxaT3nLSEdsGIJw+4O6ApGSvwQbasNX6lodtpqcsiio=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNNQ0BClGbbw+HzXT4fGCTVaQP0cUrZ+jMc/bEZ2Hp4XDVG4ZGCVTb4QfpC5IfB+IkbIA185O5aGTI0vyDvlefeEKN4K7+4udCCaKMaTRLjF5RW8PRdInCI0kreQ2p7JqYfNZjPpQsA6nfera9CXcFhzr9ucTEWL1Qf/8TBqHCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SgoUfhsz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718902348; c=relaxed/simple;
+	bh=IBnp0mdtl7oiBsGVq7Y5sFj0U18SH6MJj+qv1auMXiM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jOl6gL9BhB9I4km67Q/Mr8v/VV5tgzpS3YHYedbLQ8y+/Wj19iA5e5SkMnuLZhJZtKxdQrH+ZIuJHqb7Lq9bzKEoIA05ibXQBeMDoMC10VWh8i1K1nkww4TlEc8i3vc7yiLL1NUarRrEonIj/7OLKHqOIqW00clfP6f94PzOESU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=thxBXJsS; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SgoUfhsz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92BC2C2BD10;
-	Thu, 20 Jun 2024 16:26:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718900791;
-	bh=XxaT3nLSEdsGIJw+4O6ApGSvwQbasNX6lodtpqcsiio=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SgoUfhszSeuAtRk6+Zn1XWS2n7FCvAAyQn9Y5L3snT134zmlwZlrSiUaiFbNM/koo
-	 P2nPD4ng5TcRRfaf3jt2lFncH3nj/SHFLW9+h5bAzvlLEAtizhtBAoRcQeOg6Xlbdv
-	 mhaidGp6xZ3HRj6wFALxONfZ6GtOvsb/akS4mx81jBlRcwjLzgkNavXiBniCy0AtyF
-	 i6VLlcv4fyQ70aejBdTd04dr3tp91XTSpZD8obA6R7MLLZg259a+eBF/Jn+deoRrwZ
-	 QTcF5dHX1l0tpaSlw5gTtLKtV/Ql62Jh3shg91d/vCR5KCvaYmYK026iEG3kF89HPZ
-	 hBotBYOPLT5rw==
-Date: Thu, 20 Jun 2024 10:26:28 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Matthew Wilcox <willy@infradead.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Hongbo Li <lihongbo22@huawei.com>, linux-bcachefs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	hch@lst.de
-Subject: Re: bvec_iter.bi_sector -> loff_t?
-Message-ID: <ZnRYNKV6DqKAbxDx@kbusch-mbp.dhcp.thefacebook.com>
-References: <20240620132157.888559-1-lihongbo22@huawei.com>
- <bbf7lnl2d5sxdzqbv3jcn6gxmtnsnscakqmfdf6vj4fcs3nasx@zvjsxfwkavgm>
- <ZnQ0gdpcplp_-aw7@casper.infradead.org>
- <pfxno4kzdgk6imw7vt2wvpluybohbf6brka6tlx34lu2zbbuaz@khifgy2v2z5n>
- <ZnRBkr_7Ah8Hj-i-@casper.infradead.org>
- <0f74318e-2442-4d7d-b839-2277a40ca196@kernel.dk>
- <ZnRHi3Cfh_w7ZQa1@casper.infradead.org>
- <861a0926-40bf-4180-8092-c84a3749f1cf@kernel.dk>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="thxBXJsS"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4W4mkD36bdz6Cnk9Y;
+	Thu, 20 Jun 2024 16:52:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1718902339; x=1721494340; bh=z0XmAyG8x9QIfbm1e82GouJC
+	5DW8mogzHNByoXyWNS4=; b=thxBXJsSihqHqUm/y0vH3oTi/3E6C7JWU6mkvNpW
+	I6RUDakQOihQBX66rWiNS6aCCQDZ9d14Wh1w8FSqJ4FGsdMXENlrzDK7w0a9w2DW
+	kGwEdBevELujkWsZ2GM8iW9ND/bvSEyH+dQZDt3jbd1XZR0ajnxj3pgbyd4Mtfcf
+	hoLXePzzhnUD9FQDnfcUHxHrJtdOcdwqls8R2+USyETdxpd8t6hnj4e1N5ECNiD4
+	SfIuLj+05fgo/rGjw/7JQ5GCfHbp+Ne1tddOjKo2M5cqExDLTd2KDfrj7DLWP1Gu
+	62CQQRXTpYIG2kPdawe4q2lPVhRq3dfOftVKqQBjMvz9hQ==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id bLIXWTjTrn26; Thu, 20 Jun 2024 16:52:19 +0000 (UTC)
+Received: from [100.125.76.199] (unknown [104.132.0.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4W4mkB5ZcYz6Cnk9X;
+	Thu, 20 Jun 2024 16:52:18 +0000 (UTC)
+Message-ID: <4c98300f-bc0d-4267-acd4-6365de65713e@acm.org>
+Date: Thu, 20 Jun 2024 09:52:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <861a0926-40bf-4180-8092-c84a3749f1cf@kernel.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: 6.6 kernel block: blk_mq_freeze_queue_wait in suspend path but
+ userspace task held the queue->q_usage_counter in 'TASK_FROZEN' state
+To: Kassey Li <quic_yingangl@quicinc.com>, linux-block@vger.kernel.org
+References: <6fb677a4-b655-4395-9dd1-450217fec69d@quicinc.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <6fb677a4-b655-4395-9dd1-450217fec69d@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 20, 2024 at 09:18:58AM -0600, Jens Axboe wrote:
-> On 6/20/24 9:15 AM, Matthew Wilcox wrote:
-> > On Thu, Jun 20, 2024 at 08:56:39AM -0600, Jens Axboe wrote:
-> >> On 6/20/24 8:49 AM, Matthew Wilcox wrote:
-> >>> On Thu, Jun 20, 2024 at 10:16:02AM -0400, Kent Overstreet wrote:
-> >>> I'm more sympathetic to "lets relax the alignment requirements", since
-> >>> most IO devices actually can do IO to arbitrary boundaries (or at least
-> >>> reasonable boundaries, eg cacheline alignment or 4-byte alignment).
-> >>> The 512 byte alignment doesn't seem particularly rooted in any hardware
-> >>> restrictions.
-> >>
-> >> We already did, based on real world use cases to avoid copies just
-> >> because the memory wasn't aligned on a sector size boundary. It's
-> >> perfectly valid now to do:
-> >>
-> >> struct queue_limits lim {
-> >> 	.dma_alignment = 3,
-> >> };
-> >>
-> >> disk = blk_mq_alloc_disk(&tag_set, &lim, NULL);
-> >>
-> >> and have O_DIRECT with a 32-bit memory alignment work just fine, where
-> >> before it would EINVAL. The sector size memory alignment thing has
-> >> always been odd and never rooted in anything other than "oh let's just
-> >> require the whole combination of size/disk offset/alignment to be sector
-> >> based".
-> > 
-> > Oh, cool!  https://man7.org/linux/man-pages/man2/open.2.html
-> > doesn't know about this yet; is anyone working on updating it?
-> 
-> Probably not... At least we do have STATX_DIOALIGN which can be used to
-> figure out what the alignment is, but I don't recall if any man date
-> updates got done. Keith may remember, CC'ed.
+On 6/19/24 11:53 PM, Kassey Li wrote:
+> hello, linux block team:
 
-The man page already recommends statx if available, which tells you
-everything you need to know about your device's direct io alignment
-requirements. The man only suggests block size alignment for older
-kernels, so I think it's fine as-is, no?
+Please repost this message on the linux-scsi mailing list. I think this
+is a UFSHCD driver issue rather than a block layer issue.
 
-You can also query the queue's "dma_alignment" sysfs attribute.
+> userspace task A=C2=A0 ['TASK_FROZEN']
+>=20
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0c527f10>] __switch_to+0x1e8
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0c5287ec>] __schedule+0x6cc
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0c528c28>] schedule+0x78
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0c532bbc>] schedule_timeout+0x50
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0c529e48>] do_wait_for_common+0x10c
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0c529238>] wait_for_completion+0x48
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0b4def4c>] __flush_work+0xcc
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0b4dee70>] flush_work+0x14
+>  =C2=A0=C2=A0=C2=A0 [<ffffffdc0c091aec>] ufshcd_hold+0xc0
+
+Is ufshcd_hold() executing flush_work(&hba->clk_gating.ungate_work)?
+If so, why does the ungate work not complete?
+
+Thanks,
+
+Bart.
