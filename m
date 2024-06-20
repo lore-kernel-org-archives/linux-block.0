@@ -1,105 +1,74 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CF71AF6A4
-	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 15:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E9D1AED4D;
+	Thu, 20 Jun 2024 15:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718897721; cv=none; b=o2gP2kXLsg/kFd0tt1A2HYT/7htgtMe/VwNIuCis9wRJ3RSCGZ/94+9fEnt0Ezl8ST1WmMsMP3Ju6BqOkE1gL/3fgYtJgsOaYBLLwt1k+9a8WTBn/lN41WApjqPA7pyWy8vM8p3HdBw25whKDj8p4aAjziaQSQ/NhP8FHNbbJKg=
+	t=1718897771; cv=none; b=t5KgGvhUBllyVB/vWr2LVri1n7m4cwU4yyTFGxwtiXuvUbfaiMZsgz8xmo+s0xi2BVYkIWY6dE1aIEG3lmjvH02YtmxxdZLbMNQSo4FOxWcZMFEbnbStPaRiQpdJQYiurKsXXaqGI9I4jlvwDxS4kttGMnqiiMy7hK5k+w0vO8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718897721; c=relaxed/simple;
-	bh=aKr/khYMgPofHmZ3nzZibgJNgRuw/HbEgUEo0u0yw1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FcTG7X4OdxLrQ+fRQbbjqeQJXv/9x3wqQhgcoGO6g4/AUHBFcJRlvuXzHkwL4Wf1cnjICnjJxKP8Z3hVykZJPwv4FyOQPKSoqjRn98z7cBrnXaJagWIOrMC5d1HNYq5YBpTBSG7XWs5uV1ZfsFcFyMNE7qxJODYn2HsTfjB3TAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IZop2Neu; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1718897771; c=relaxed/simple;
+	bh=kDDXcqhifdQ0fs/vCmvlUw45BhHCVuzx3zFGWGlt0K4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=V9OhBjmUal5IkCOv91EBe78fDOLrmpXJcly08XJbS8lJWlczkWif/RL84O//jU2wlFNAzdayLdVKHnnICpsoPr4RzS/xKqnAIE2hzWawrpsWllTBqbI1jzqgO0rGnybd8pI6eeBoP35jXaaiFpDlyjwB2rOjgXtrAT7vQShxI+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rhKkWmLG; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TjVW9Jmb; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IZop2Neu"
-X-Envelope-To: willy@infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718897714;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rhKkWmLG";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TjVW9Jmb"
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718897763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y56GDm+cXkOTTXOBpxGVSCiDKUdkhFZ/N1N+WvHE7IU=;
-	b=IZop2NeuaHH4c5U30zcPDkSRwM6JsbNjk0Juii1ohEggo2FTEqCTVx1jbVOvgf6RzSRs7n
-	Y3PrdXUn3vtRuECXUBjH38aupsjkCn6Dpd27OcrxLhY+M1h9AofobQBxUt2YpGkj7lqrPP
-	KitNRqWXBf1huvME95/2bjtKpKrKvc8=
-X-Envelope-To: lihongbo22@huawei.com
-X-Envelope-To: linux-bcachefs@vger.kernel.org
-X-Envelope-To: linux-fsdevel@vger.kernel.org
-X-Envelope-To: linux-block@vger.kernel.org
-X-Envelope-To: axboe@kernel.dk
-X-Envelope-To: hch@lst.de
-Date: Thu, 20 Jun 2024 11:35:10 -0400
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Hongbo Li <lihongbo22@huawei.com>, linux-bcachefs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de
-Subject: Re: bvec_iter.bi_sector -> loff_t? (was: Re: [PATCH] bcachefs: allow
- direct io fallback to buffer io for) unaligned length or offset
-Message-ID: <gziks4sy42fyjskpbzwzrax6n7fkxvml36pvapofboo4nhy2mb@oi6j4z5afobp>
-References: <20240620132157.888559-1-lihongbo22@huawei.com>
- <bbf7lnl2d5sxdzqbv3jcn6gxmtnsnscakqmfdf6vj4fcs3nasx@zvjsxfwkavgm>
- <ZnQ0gdpcplp_-aw7@casper.infradead.org>
- <pfxno4kzdgk6imw7vt2wvpluybohbf6brka6tlx34lu2zbbuaz@khifgy2v2z5n>
- <ZnRBkr_7Ah8Hj-i-@casper.infradead.org>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RNQWo5IwnleQTCW7ZS1Sz2oq06SzzX0D8BBq0XEiYBk=;
+	b=rhKkWmLGbRa7otfu3MM/yrgzaXwmx9VxOMRNuzE/7K5sugdZiTxyqRqYKhcQ/DUX8IE0AC
+	jeE2tdcDj9gGEzKXkH4TLX6aBh5SwmtbOu0dq43sNFvKMAMjjXrvddbH3G0BPKisqO2z/w
+	Iyy3prJ8BctZb/FnjEWbGNvNLhV2HLRmFuOfrsz5n9ScMJp9Mwye9wTLs7iwQM5qMrIMXy
+	s0HoobY/ds/8bcv9dN9NXHYLQ5lSiJGw6tunxLeGaz00BU2P7znguoHusUd+mspphUpEwI
+	XhJiDrNAernMC7rqLeAUtG5wyP9JExnyDA9eM8PRtz1IIU9cB0yXULO2SN1PUg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718897763;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RNQWo5IwnleQTCW7ZS1Sz2oq06SzzX0D8BBq0XEiYBk=;
+	b=TjVW9JmbN1Zd/MajDsDQHkaOyJC29or/wkdmyUc8QdBVgngM6On85xzW77fmjDgBYsOwtr
+	8YjraAaCZd4ze3CQ==
+To: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Mike Galbraith <umgwanakikbuti@gmail.com>
+Subject: [PATCH v2 0/3] zram: Replace bit spinlocks with a spinlock_t.
+Date: Thu, 20 Jun 2024 17:28:49 +0200
+Message-ID: <20240620153556.777272-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnRBkr_7Ah8Hj-i-@casper.infradead.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 20, 2024 at 03:49:54PM +0100, Matthew Wilcox wrote:
-> On Thu, Jun 20, 2024 at 10:16:02AM -0400, Kent Overstreet wrote:
-> > That's really just descriptive, not prescriptive.
-> > 
-> > The intent of O_DIRECT is "bypass the page cache", the alignment
-> > restrictions are just a side effect of that. Applications just care
-> > about is having predictable performance characteristics.
-> 
-> But any application that has been written to use O_DIRECT already has the
-> alignment & size guarantees in place.  What this patch is attempting to do
-> is make it "more friendly" to use, and I'm not sure that's a great idea.
-> Not without buy-in from a large cross-section of filesystem people.
+Hi,
 
-The thing is, we're currently conflating "don't use the page cache" and
-"don't bounce", and we really shouldn't be.
+this is follow up to the previous posting, making the lock
+unconditionally. The original problem with bit spinlock is that it
+disabled preemption and the following operations (within the atomic
+section) perform operations that may sleep on PREEMPT_RT. Mike expressed
+that he would like to keep using zram on PREEMPT_RT.
 
-Sometimes performance is your main criteria and you do want the error if
-you misaligned the IO, but not always. The the main reason being that
-mixing buffered and O_DIRECT is _really_ expensive, and you will quite
-often have codepaths that don't care about performance, but do need to
-use O_DIRECT so they don't interfere with your paths that do care about
-performance.
+v1=E2=80=A6v2: https://lore.kernel.org/all/20240619150814.BRAvaziM@linutron=
+ix.de/:
+  - Add the spinlock_t unconditionally
+  - Remove ZRAM_LOCK since it has no user after the lock has been added.
+  - Make zram_table_entry::flags an integer so struct zram_table_entry
+    does not gain additional weight.
 
-So they're forced to deal with bouncing and alignment restrictions at
-the applicatoin level, even though they really don't want to be, and we
-(at least bcachefs) already have the code to do that bouncing when
-required - there's really no reason for them to be hand rolling that,
-and if writes are involved then it gets really nontrivial.
+Sebastian
 
-This is one of the reasons I'll likely be implementing sub-blocksize
-writes through the low level write path in bcachefs. O_DIRECT gives you
-things that buffered IO doesn't - it's much cheaper, and simpler to
-guarantee write ordering of O_DIRECT writes (c.f. untorn writes,
-O_DIRECT is much easier than buffered there as well, and it's even
-easier in a COW filesystem) - and it's going to be worthwhile to be able
-to provide that behaviour without the alignment restrictions that
-currently come with O_DIRECT.
-
-To sum all that up: "don't bounce" should really another rwf flag we can
-pass to preadv2/pwritev2 - RWF_NOBOUNCE.
-
-And for bcachefs I would implement bouncing-when-required even without
-that flag being available, simply because that's current behaviour (due
-to checksums being extent granularity). That flag really only makes
-sense for bcachefs once we get opt-in block granular checksums (which is
-coming, as well).
