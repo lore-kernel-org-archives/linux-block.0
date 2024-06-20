@@ -1,67 +1,54 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAF43D994
-	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 08:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E35199250
+	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 10:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718873886; cv=none; b=r9jnTaUy6BXOxyqDl0bMkEHKOYPnMJFj0zyZZ6/XEG85D8+rE25LPJevg7Y/qUHNZkLrea+BxXyQ1lfyt8sXCGcP28R+7wTt73jUbcxDIUMXx5a/wvexx32Kts6Zl8cf14QAjMtniXo/qGvMBvSEUZibbWL+IPYeOS1TP0HUrxw=
+	t=1718880110; cv=none; b=MIZCyYIPqts2matJ1C2aD2KDMfWgE4oT4uaFKFYciL/fx39Rp3721a2kCNsZrMu4emhG4pVoIDgbZYuI5rInx4NvCFjf81Dq72tC7YmqDyQpd9y1kZxAh4wXAWASmehEfCnIA6x7sVntUZCd8MZoKXaLu5FK6c/bRRdaBzQ1O8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718873886; c=relaxed/simple;
-	bh=R2m1iTMgAAfEnaRxsHj5OU4tT6yTo3Fl0TJXfy9fNwg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X8u/WKNv5Xy2noSrYanszIEF6ptWZrL2CO4PVt2LCLowvMT6lxRtc8w4H2tIt8K3uN4SKXKlIyTqS7DPR0Yozvo5z1MC97oeff6R5A1QYsRYPBgLQSBI3QK/4H6l62yGEU/pobj0a9I/W3/bZAUo1On2DGJZ3PqLaP70pHaY2fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=zPn3+QHG; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1718880110; c=relaxed/simple;
+	bh=ucgbnsMaL3Eu+SVIuoCLnvCcOsBV2MDh+bIIRYjYvFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JjTL5ZAf6i5vKySL9s6dyYicEQmA+sSUCzEpmOjshmAiDU93BfmIADnraUyiZFhcDx4SVZmaKBB5YwU9PFUq3cmiGDiL40Nl4IBmxvIg7Vu/JI6rA2oR/A9bn+1QvZUBpyFckHv/zbOd1+fm+a16zwtjHe4cRx7n0YCGhtYze0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=LNAvdT2S; arc=none smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="zPn3+QHG"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57a30dbdb7fso557739a12.3
-        for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 01:58:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1718873881; x=1719478681; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nxlm73kuKE2XKIMoWmSTWrBbAjROgxfrZ4Cghh1emzY=;
-        b=zPn3+QHGH3mGdt4J/BB0b0OjbkzZCjpMZIuXAHBEUuyMO46jcv/us/VID/LQQmu53x
-         ttG6miwEvnq3TFTJX489y3q/VQ8fcemswjZjqWPxnaV2xNgkF6U4+C2woh07pjgwamTp
-         a5M3/vTdTwc265yfigTzTOM1cLLej1d7OhC2q0ESPkR/pEpS9we3C5T/hV7SIViaRPKb
-         i2xrAnR5X+CSfbyvjmuKqdTvEpBzBbBmcYDHapJnxF37T2R9mKCGDdPlSxqBwpdWVCq1
-         UF5LP8qO8CKCy8bEqEHAuL1OWYAHEs6K0UWR2qG4Zj8PW8fng3u0o8AVtWSXkUaGMVA7
-         5Eqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718873881; x=1719478681;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nxlm73kuKE2XKIMoWmSTWrBbAjROgxfrZ4Cghh1emzY=;
-        b=IwwS1mN+D9VLBebFmzJJRSJDSfd06vFCa25sDRshbzcI5OatNP0rc9Ggie4IXOVaYm
-         jz82wGFAEXJJm9rhADZXVK8x5CjFfU/SoARErNDVDEMfZP/unKwdJVL3eIvGilztaDsJ
-         d5m79NW8VDQfXjVJJfUu1LIyYDlIwj8VVC+pmj9etFwybCXIXJdnp1yHkbxYXpyhMRgJ
-         GP8OKmDpUdTdooaOn8SJ7gW0fmJQ3XzzCErNd3dN7hN3vU17QhGM5MuEhbrwCsP5xkNd
-         bGEc+xzpVegAB6/yOBdljOiMN/5xxtISso9Erx4fzf/hVr93Lykg8GDv2QrTqU75qZNv
-         8qpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUe6X1LTcYAAhFo0ZagbMRBYVlfAC6+1F/fU1N2h0qG9pz2W3nyGdyNV+2u/ePo5i+PLYYCJhh/lwjg6eojpVsa5msO5lqd7trDlyI=
-X-Gm-Message-State: AOJu0YxI5voJ9COLfDzVmyWbwtMjJ5Iv4da4zgA2FdVUyB94tdQVnBgg
-	lZj/AS+FSRPARCiUi/RaJjD3h+IS60TyhPW4A+LOS/kE2p8u/CTxORLznOSN6go=
-X-Google-Smtp-Source: AGHT+IFNBPfPRC5d3WpzjNOlLtaGNXM1BXKDPBXyHCQb4RbbNdBlIV04IVIbPwWrAX9/Zw92/CFflw==
-X-Received: by 2002:a50:8d5a:0:b0:57c:6740:f47c with SMTP id 4fb4d7f45d1cf-57d07eabd35mr2962176a12.27.1718873881269;
-        Thu, 20 Jun 2024 01:58:01 -0700 (PDT)
-Received: from localhost ([194.62.217.2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cbe89005asm8226647a12.10.2024.06.20.01.58.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 01:58:00 -0700 (PDT)
-From: Andreas Hindborg <nmi@metaspace.dk>
-To: Jens Axboe <axboe@kernel.dk>,
-	"linux-block @ vger . kernel . org" <linux-block@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	rust-for-linux@vger.kernel.org,
-	Andreas Hindborg <nmi@metaspace.dk>,
-	Andreas Hindborg <a.hindborg@samsung.com>
-Subject: [PATCH] rust: block: do not use removed queue flag API
-Date: Thu, 20 Jun 2024 10:57:21 +0200
-Message-ID: <20240620085721.1218296-1-nmi@metaspace.dk>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LNAvdT2S"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1718880108; x=1750416108;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ucgbnsMaL3Eu+SVIuoCLnvCcOsBV2MDh+bIIRYjYvFw=;
+  b=LNAvdT2S49201j09A6VV21Z+R4DO+a9McpCKFdi6CQ1xkPBXSzGu/MAu
+   wQwM46o1RDaDj4B5McJF+PP2JXMA2jHhDRWERkXlsXZE5jfJGUFXDQOoD
+   HhjsbRaZKMZoYLk5/S0WTqaLf9Ua+C0GHHH0z6S8P3RagqeuQY4lbn7R1
+   FRKuQuF1G1chEC95ab3P+pqYLO4IVrzxvJ36HooSa6AUVkvEjAC9U3Vrb
+   Saq9O69hZvxBSqQyFudBJOQJQb1n4SqMqvfiKyWpHAOVH5H/2ilOlopuw
+   AuWlAwpf0q9agAEnN5iTuJOdq52xrM5wKq/O9lpQqcqkAyI7C9EDWLV5P
+   Q==;
+X-CSE-ConnectionGUID: nGWtt1t3S6i3lVX/X0IHDQ==
+X-CSE-MsgGUID: aEOpPoHqRmqJ6F2SqlwFfA==
+X-IronPort-AV: E=Sophos;i="6.08,252,1712592000"; 
+   d="scan'208";a="19586428"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2024 18:41:42 +0800
+IronPort-SDR: 6673f9a7_ORSXhlpklu8UyFCecndKWMid22hPu4ijWE449+ePmoyAw89
+ ZTHwbKDbBQ7qm5HOt5EnDCI6nEcdIHnma9Yr2+w==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2024 02:43:04 -0700
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip02.wdc.com with ESMTP; 20 Jun 2024 03:41:42 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: Gulam Mohamed <gulam.mohamed@oracle.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] loop/010: do not assume /dev/loop0
+Date: Thu, 20 Jun 2024 19:41:41 +0900
+Message-ID: <20240620104141.357143-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,55 +57,90 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
+The current implementation of the test case loop/010 assumes that the
+prepared loop device is /dev/loop0, which is not always true. When other
+loop devices are set up before the test case run, the assumption is
+wrong and the test case fails.
 
-`blk_queue_flag_set` and `blk_queue_flag_clear` was removed in favor of a
-new API. This caused a build error for Rust block device abstractions.
-Thus, use the new feature passing API instead of the old removed API.
+To avoid the failure, use the prepared loop device name stored in
+$loop_device instead of /dev/loop0. Adjust the grep string to meet the
+device name. Also use "losetup --detach" instead of
+"losetup --detach-all" to not detach the loop devices which existed
+before the test case runs.
 
-Fixes: bd4a633b6f7c ("block: move the nonrot flag to queue_limits")
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+Fixes: 1c4ae4fed9b4 ("loop: Detect a race condition between loop detach and open")
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- rust/kernel/block/mq/gen_disk.rs | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+ tests/loop/010 | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
 
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index e06044b549e0..f548a6199847 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -100,6 +100,9 @@ pub fn build<T: Operations>(
+diff --git a/tests/loop/010 b/tests/loop/010
+index ea396ec..f8c6f2c 100755
+--- a/tests/loop/010
++++ b/tests/loop/010
+@@ -16,18 +16,26 @@ requires() {
+ }
  
-         lim.logical_block_size = self.logical_block_size;
-         lim.physical_block_size = self.physical_block_size;
-+        if self.rotational {
-+            lim.features = bindings::BLK_FEAT_ROTATIONAL;
-+        }
+ create_loop() {
++	local dev
++
+ 	while true
+ 	do
+-		loop_device="$(losetup --partscan --find --show "${image_file}")"
+-		blkid /dev/loop0p1 >& /dev/null
++		dev="$(losetup --partscan --find --show "${image_file}")"
++		if [[ $dev != "$1" ]]; then
++			echo "Unepxected loop device set up: $dev"
++			return
++		fi
++		blkid "$dev" >& /dev/null
+ 	done
+ }
  
-         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
-         let gendisk = from_err_ptr(unsafe {
-@@ -152,20 +155,6 @@ pub fn build<T: Operations>(
-         // operation, so we will not race.
-         unsafe { bindings::set_capacity(gendisk, self.capacity_sectors) };
+ detach_loop() {
++	local dev=$1
++
+ 	while true
+ 	do
+-		if [ -e /dev/loop0 ]; then
+-			losetup --detach /dev/loop0 >& /dev/null
++		if [[ -e "$dev" ]]; then
++			losetup --detach "$dev" >& /dev/null
+ 		fi
+ 	done
+ }
+@@ -38,6 +46,7 @@ test() {
+ 	local create_pid
+ 	local detach_pid
+ 	local image_file="$TMPDIR/loopImg"
++	local grep_str
  
--        if !self.rotational {
--            // SAFETY: `gendisk` points to a valid and initialized instance of
--            // `struct gendisk`. This operation uses a relaxed atomic bit flip
--            // operation, so there is no race on this field.
--            unsafe { bindings::blk_queue_flag_set(bindings::QUEUE_FLAG_NONROT, (*gendisk).queue) };
--        } else {
--            // SAFETY: `gendisk` points to a valid and initialized instance of
--            // `struct gendisk`. This operation uses a relaxed atomic bit flip
--            // operation, so there is no race on this field.
--            unsafe {
--                bindings::blk_queue_flag_clear(bindings::QUEUE_FLAG_NONROT, (*gendisk).queue)
--            };
--        }
--
-         crate::error::to_result(
-             // SAFETY: `gendisk` points to a valid and initialized instance of
-             // `struct gendisk`.
-
-base-commit: 43ccacc7be96b71bf8c1461036034f1174be2f4d
+ 	truncate --size 1G "${image_file}"
+ 	parted --align none --script "${image_file}" mklabel gpt
+@@ -53,9 +62,9 @@ test() {
+ 	mkfs.xfs --force "${loop_device}p1" >& /dev/null
+ 	losetup --detach "${loop_device}" >&  /dev/null
+ 
+-	create_loop &
++	create_loop "${loop_device}" &
+ 	create_pid=$!
+-	detach_loop &
++	detach_loop "${loop_device}" &
+ 	detach_pid=$!
+ 
+ 	sleep "${TIMEOUT:-90}"
+@@ -66,8 +75,9 @@ test() {
+ 		sleep 1
+ 	} 2>/dev/null
+ 
+-	losetup --detach-all >& /dev/null
+-	if _dmesg_since_test_start | grep --quiet "partition scan of loop0 failed (rc=-16)"; then
++	losetup --detach "${loop_device}" >& /dev/null
++	grep_str="partition scan of ${loop_device##*/} failed (rc=-16)"
++	if _dmesg_since_test_start | grep --quiet "$grep_str"; then
+ 		echo "Fail"
+ 	fi
+ 	echo "Test complete"
 -- 
-2.45.2
+2.45.0
 
