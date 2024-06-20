@@ -1,118 +1,124 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CE43CF65
-	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 08:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAF43D994
+	for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 08:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718872129; cv=none; b=VJX8y6RTTMDNAiGp7BgccINY10FJG5nH8d66ULIw0uKCxLXdHnTfYlYxDTAlAWgBW/hBy9bl0uuJJsjKiLP3ZH6C9QbLK2ucQwyIgXFcdoF7O7C7h2MRy7ZuEy9DTBeSx+H+/tghjUGn5pV8uoBjTUYxdx+6/ixamdX/lGvWQA4=
+	t=1718873886; cv=none; b=r9jnTaUy6BXOxyqDl0bMkEHKOYPnMJFj0zyZZ6/XEG85D8+rE25LPJevg7Y/qUHNZkLrea+BxXyQ1lfyt8sXCGcP28R+7wTt73jUbcxDIUMXx5a/wvexx32Kts6Zl8cf14QAjMtniXo/qGvMBvSEUZibbWL+IPYeOS1TP0HUrxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718872129; c=relaxed/simple;
-	bh=dVn5Bw1bVgTHpDPA83GvDLheGsxnhDsfZHk2KFl6cw4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=NxILjuU+ZrpC+hpCScPy6FodK/aKLXulnlOW/hXI/kTVUnnE6BkP/U11pyoKVqvgWHEC+zb4impAQLWOLQLzN8BzLVR/kbD5ESpUAvMiFTJIIi6GGmdGcPK18c1EsRldEDut3WihPx7CnJtDOYcd65KhAhKYw3AvVhPkqaCUygc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nKqXwaJD; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+	s=arc-20240116; t=1718873886; c=relaxed/simple;
+	bh=R2m1iTMgAAfEnaRxsHj5OU4tT6yTo3Fl0TJXfy9fNwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X8u/WKNv5Xy2noSrYanszIEF6ptWZrL2CO4PVt2LCLowvMT6lxRtc8w4H2tIt8K3uN4SKXKlIyTqS7DPR0Yozvo5z1MC97oeff6R5A1QYsRYPBgLQSBI3QK/4H6l62yGEU/pobj0a9I/W3/bZAUo1On2DGJZ3PqLaP70pHaY2fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk; spf=none smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b=zPn3+QHG; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metaspace.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=metaspace.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nKqXwaJD"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45K8SMBk012665;
-	Thu, 20 Jun 2024 08:28:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	dmkn7pNoXvL/qudaa21sMLOq3EG7vGda5G+pgfuP5wg=; b=nKqXwaJDvkAVFomY
-	fEBARHhcoxhTE9g2QYK4kBpa7PQbOOfzmoe6zPozw2YbqnUZIycpY0TTn5zXs8Ed
-	OCVzfhFF1tqLTL8ZRgjr5LGptECriyBLd/lX0sLRXxteq01gvTRMvW4MWCC67Exx
-	9gDbcwMbcp7UulvgiENZf0xJdJwSnz0urNyw4yRj5KnVMJZEM3AY6Fd4grGpVDYT
-	TNN7m3/MGCAGEnqrO1lrMMZhbZXlMjsSSMy6vTIdVppH4JoTHiDoHdiz0k5BmRc2
-	eYut9aRmRsxYyfmASMAYN5+kK4v1lp+daqfN7PCqHLmgXKafuhoHj7ySF9uGqesG
-	JWMYgw==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yvgxm800m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Jun 2024 08:28:22 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45K7FA08009411;
-	Thu, 20 Jun 2024 08:28:21 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ysqgn3thp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Jun 2024 08:28:21 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45K8SHdJ62783982
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Jun 2024 08:28:20 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 92AC258051;
-	Thu, 20 Jun 2024 08:28:17 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 489C258069;
-	Thu, 20 Jun 2024 08:28:14 +0000 (GMT)
-Received: from [9.204.205.49] (unknown [9.204.205.49])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Jun 2024 08:28:13 +0000 (GMT)
-Message-ID: <2bc331ea-2514-47d9-8a58-8e682e400272@linux.vnet.ibm.com>
-Date: Thu, 20 Jun 2024 13:58:12 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv4 blktests] nvme: add test for creating/deleting file-ns
-To: Nilay Shroff <nilay@linux.ibm.com>, Daniel Wagner <dwagner@suse.de>
-Cc: shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com, kbusch@kernel.org,
-        sagi@grimberg.me, hch@lst.de, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sachinp@linux.vnet.ibm.com,
-        gjoyce@linux.ibm.com
-References: <20240619172556.2968660-1-nilay@linux.ibm.com>
- <rxeyn6susgjlguqg3jk7ntthjvhn6gt3meu4dcb5kchynz3b2e@uznnvlner6ri>
- <ec685e52-0ea9-4928-8b96-4ba503e8664b@linux.ibm.com>
-Content-Language: en-GB
-From: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-In-Reply-To: <ec685e52-0ea9-4928-8b96-4ba503e8664b@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: e8gBd7noQxOSON7YsueNmao_j5xyvykL
-X-Proofpoint-ORIG-GUID: e8gBd7noQxOSON7YsueNmao_j5xyvykL
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="zPn3+QHG"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57a30dbdb7fso557739a12.3
+        for <linux-block@vger.kernel.org>; Thu, 20 Jun 2024 01:58:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1718873881; x=1719478681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nxlm73kuKE2XKIMoWmSTWrBbAjROgxfrZ4Cghh1emzY=;
+        b=zPn3+QHGH3mGdt4J/BB0b0OjbkzZCjpMZIuXAHBEUuyMO46jcv/us/VID/LQQmu53x
+         ttG6miwEvnq3TFTJX489y3q/VQ8fcemswjZjqWPxnaV2xNgkF6U4+C2woh07pjgwamTp
+         a5M3/vTdTwc265yfigTzTOM1cLLej1d7OhC2q0ESPkR/pEpS9we3C5T/hV7SIViaRPKb
+         i2xrAnR5X+CSfbyvjmuKqdTvEpBzBbBmcYDHapJnxF37T2R9mKCGDdPlSxqBwpdWVCq1
+         UF5LP8qO8CKCy8bEqEHAuL1OWYAHEs6K0UWR2qG4Zj8PW8fng3u0o8AVtWSXkUaGMVA7
+         5Eqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718873881; x=1719478681;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nxlm73kuKE2XKIMoWmSTWrBbAjROgxfrZ4Cghh1emzY=;
+        b=IwwS1mN+D9VLBebFmzJJRSJDSfd06vFCa25sDRshbzcI5OatNP0rc9Ggie4IXOVaYm
+         jz82wGFAEXJJm9rhADZXVK8x5CjFfU/SoARErNDVDEMfZP/unKwdJVL3eIvGilztaDsJ
+         d5m79NW8VDQfXjVJJfUu1LIyYDlIwj8VVC+pmj9etFwybCXIXJdnp1yHkbxYXpyhMRgJ
+         GP8OKmDpUdTdooaOn8SJ7gW0fmJQ3XzzCErNd3dN7hN3vU17QhGM5MuEhbrwCsP5xkNd
+         bGEc+xzpVegAB6/yOBdljOiMN/5xxtISso9Erx4fzf/hVr93Lykg8GDv2QrTqU75qZNv
+         8qpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUe6X1LTcYAAhFo0ZagbMRBYVlfAC6+1F/fU1N2h0qG9pz2W3nyGdyNV+2u/ePo5i+PLYYCJhh/lwjg6eojpVsa5msO5lqd7trDlyI=
+X-Gm-Message-State: AOJu0YxI5voJ9COLfDzVmyWbwtMjJ5Iv4da4zgA2FdVUyB94tdQVnBgg
+	lZj/AS+FSRPARCiUi/RaJjD3h+IS60TyhPW4A+LOS/kE2p8u/CTxORLznOSN6go=
+X-Google-Smtp-Source: AGHT+IFNBPfPRC5d3WpzjNOlLtaGNXM1BXKDPBXyHCQb4RbbNdBlIV04IVIbPwWrAX9/Zw92/CFflw==
+X-Received: by 2002:a50:8d5a:0:b0:57c:6740:f47c with SMTP id 4fb4d7f45d1cf-57d07eabd35mr2962176a12.27.1718873881269;
+        Thu, 20 Jun 2024 01:58:01 -0700 (PDT)
+Received: from localhost ([194.62.217.2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cbe89005asm8226647a12.10.2024.06.20.01.58.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 01:58:00 -0700 (PDT)
+From: Andreas Hindborg <nmi@metaspace.dk>
+To: Jens Axboe <axboe@kernel.dk>,
+	"linux-block @ vger . kernel . org" <linux-block@vger.kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	rust-for-linux@vger.kernel.org,
+	Andreas Hindborg <nmi@metaspace.dk>,
+	Andreas Hindborg <a.hindborg@samsung.com>
+Subject: [PATCH] rust: block: do not use removed queue flag API
+Date: Thu, 20 Jun 2024 10:57:21 +0200
+Message-ID: <20240620085721.1218296-1-nmi@metaspace.dk>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-20_04,2024-06-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 mlxscore=0 clxscore=1011 malwarescore=0 impostorscore=0
- adultscore=0 spamscore=0 lowpriorityscore=0 phishscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406200058
+Content-Transfer-Encoding: 8bit
 
-Tested this patch, with and without the below fix, and observing 
-expected results.
+From: Andreas Hindborg <a.hindborg@samsung.com>
 
-https://lore.kernel.org/all/20240613164246.75205-1-kbusch@meta.com/
+`blk_queue_flag_set` and `blk_queue_flag_clear` was removed in favor of a
+new API. This caused a build error for Rust block device abstractions.
+Thus, use the new feature passing API instead of the old removed API.
 
-Tested-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
+Fixes: bd4a633b6f7c ("block: move the nonrot flag to queue_limits")
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+---
+ rust/kernel/block/mq/gen_disk.rs | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
 
-Regards,
-Venkat.
-On 20/06/24 12:10 pm, Nilay Shroff wrote:
->
-> On 6/20/24 12:05, Daniel Wagner wrote:
->> On Wed, Jun 19, 2024 at 10:55:02PM GMT, Nilay Shroff wrote:
->>> +		truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path).$i"
->>> +		uuid="$(uuidgen -r)"
->> This adds a new dependency on an external tool. It should be mentioned
->> in the README and added to the list of tools to check for:
->> _check_dependencies(). Alternatively you could skip the test if the tool
->> is not available. Anyway the rest looks good.
->>
-> The "uuidgen" is part of util-linux package and I saw that it's already mentioned
-> as one of the required packages for blktest: https://github.com/osandov/blktests
->
->> Reviewed-by: Daniel Wagner <dwagner@suse.de>
->>
-> Thanks,
-> --Nilay
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index e06044b549e0..f548a6199847 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -100,6 +100,9 @@ pub fn build<T: Operations>(
+ 
+         lim.logical_block_size = self.logical_block_size;
+         lim.physical_block_size = self.physical_block_size;
++        if self.rotational {
++            lim.features = bindings::BLK_FEAT_ROTATIONAL;
++        }
+ 
+         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
+         let gendisk = from_err_ptr(unsafe {
+@@ -152,20 +155,6 @@ pub fn build<T: Operations>(
+         // operation, so we will not race.
+         unsafe { bindings::set_capacity(gendisk, self.capacity_sectors) };
+ 
+-        if !self.rotational {
+-            // SAFETY: `gendisk` points to a valid and initialized instance of
+-            // `struct gendisk`. This operation uses a relaxed atomic bit flip
+-            // operation, so there is no race on this field.
+-            unsafe { bindings::blk_queue_flag_set(bindings::QUEUE_FLAG_NONROT, (*gendisk).queue) };
+-        } else {
+-            // SAFETY: `gendisk` points to a valid and initialized instance of
+-            // `struct gendisk`. This operation uses a relaxed atomic bit flip
+-            // operation, so there is no race on this field.
+-            unsafe {
+-                bindings::blk_queue_flag_clear(bindings::QUEUE_FLAG_NONROT, (*gendisk).queue)
+-            };
+-        }
+-
+         crate::error::to_result(
+             // SAFETY: `gendisk` points to a valid and initialized instance of
+             // `struct gendisk`.
+
+base-commit: 43ccacc7be96b71bf8c1461036034f1174be2f4d
+-- 
+2.45.2
+
