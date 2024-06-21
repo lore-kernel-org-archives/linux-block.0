@@ -1,126 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9944412BF25
-	for <linux-block@vger.kernel.org>; Fri, 21 Jun 2024 03:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C80329A5
+	for <linux-block@vger.kernel.org>; Fri, 21 Jun 2024 03:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718939709; cv=none; b=T6K2om152w5A5dMa6/RuUcawRw5GALM/vbm/SDTGkOnXWY/wn8r+OdxR6NCMxSHIUOvohdqkjLmiWt562xoZKLkgiB+glw8wyeq5VevixSz5WUQ+ph947smJsijk4lSWCwtyaX8gB0cmNg5+VfzjQlh7l48DkrTcYLPZPXqGuh0=
+	t=1718941000; cv=none; b=AuNaOdu6m3TlDyyXPWCXVNdtkbpLe2jJa7iBUQxQaNbOuRxSTCx1SwraJjsRyLoDNTbkfwuU/SZIg4ztvkDVPn/XTTsG240xhTKvYeL5r2tnmBkMoPiiomo8hPSg50FOSjdZemDMxmDQ/nwr06zrVnRLLk1P9YSxiG2eAHMgSrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718939709; c=relaxed/simple;
-	bh=QINgyjZ7UZVheyZ1tdvxh92Kxr1t65kNwRGhecM5Kfg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pzCz+oCZ3EaBEBUonNLXNC+FUdkfrq8XFv54MTCRML9xZH2MNcAfcXS1cnMlWhz4z0Q2LJq4z1tNF1eW8AtmXnHNntdunv08GkuhGcPQoaWnX9OJxL0Va1FPILtbB9K65AoNUlUgtf6WhBCQdw/J9Tn/urbr63Xw7KFhkt7ItVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fb7Tt69V; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718941000; c=relaxed/simple;
+	bh=OzuWfjvDVkYPdru22bOCoO7fZ/zOH1nszl6Ka9ZsOR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H2jI8dGcaX0vVWs5fhI0U4wCtJZF3OxJVhZXNFk16SXDwpiHXvhzvSsvHgXInWGJ8QPMwY3qI8fXx5W7r4DdBPb6AzoWF+BehCd03eWa3iZ7c9mB3mNpr6Cu8QoybRw64doAXPFF2/7YsSidRbv8iiSEHkk5Db/FyGQOq06x2Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYiXMaZZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fb7Tt69V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDA5FC4AF0A;
-	Fri, 21 Jun 2024 03:15:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718939709;
-	bh=QINgyjZ7UZVheyZ1tdvxh92Kxr1t65kNwRGhecM5Kfg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Fb7Tt69V/BTil6F/++xTRz4Nqggvg1rf+5suIigo5kVmubV3ikr2awOme0NahxGZp
-	 9IRFtild1kWZah7X9yq9OnC1zkU0FLp/wm6Fk/ZYlC4cok93P4O1U8cO+OWXhzmKZw
-	 TpCDnB3gVsWciCyKjjcPTwO5GKC5Yr7IZWpzSwH5x44k6bHyTtGiZrHGuoF+A3+mX3
-	 kA9VBdHXcgQlcVrJ8nzlT/UrRui82KOwk60Ynj2cXfU50xUna0gjV77l8udDBxm72T
-	 Z6+T3lTOmokN2801CiY6W0sHZlmcJt27Ab74d6QlEuE7k8eqRppJe7M3AvhuIV4/yh
-	 2wn9fGCyrkaIg==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/3] block: Cleanup block device zone helpers
-Date: Fri, 21 Jun 2024 12:15:06 +0900
-Message-ID: <20240621031506.759397-4-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240621031506.759397-1-dlemoal@kernel.org>
-References: <20240621031506.759397-1-dlemoal@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYiXMaZZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718940998;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+J4pnJmRK5h/j3crSEy+3KByPdeXUQjRA0gmWKVdzGU=;
+	b=aYiXMaZZQxcwXLwOSmFFJ2bXusQHYXdF5l7z52Y3/B0yyI2d9HcOggaxhQDWVxBKD8RbzN
+	0ENVnY8xodpcZLkmCLeYpNXgR+/I4JrJByYjnyGK+EZt7utvdGH5wnNve/+yvKpdKM5r6Q
+	3ZIAjd3qLvizjtNPQWA651wcw4Oz964=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-Z6d_GXS0OSm7Kpra84ncLg-1; Thu,
+ 20 Jun 2024 23:36:33 -0400
+X-MC-Unique: Z6d_GXS0OSm7Kpra84ncLg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D75ED195608B;
+	Fri, 21 Jun 2024 03:36:31 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.135])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0B0DB1955E72;
+	Fri, 21 Jun 2024 03:36:25 +0000 (UTC)
+Date: Fri, 21 Jun 2024 11:36:20 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Christoph Hellwig <hch@lst.de>, Matthew Wilcox <willy@infradead.org>,
+	Hongbo Li <lihongbo22@huawei.com>, linux-bcachefs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Subject: Re: bvec_iter.bi_sector -> loff_t? (was: Re: [PATCH] bcachefs: allow
+ direct io fallback to buffer io for) unaligned length or offset
+Message-ID: <ZnT1NGI7jcI//en+@fedora>
+References: <20240620132157.888559-1-lihongbo22@huawei.com>
+ <bbf7lnl2d5sxdzqbv3jcn6gxmtnsnscakqmfdf6vj4fcs3nasx@zvjsxfwkavgm>
+ <ZnQ0gdpcplp_-aw7@casper.infradead.org>
+ <20240620153050.GA26369@lst.de>
+ <hehodpowajdsfscwf7y3yaqsu2byhzkwpsiaesj5sz722efzg4@gwnod5qe7ed4>
+ <ZnTb25qQxSi+tNOk@fedora>
+ <6b45ixfmsxdsza6csmlnoatuv24ja3ffdp6lzijfhyjyylfofs@4tpl66qhxrr7>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6b45ixfmsxdsza6csmlnoatuv24ja3ffdp6lzijfhyjyylfofs@4tpl66qhxrr7>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-There is no need to conditionally define on CONFIG_BLK_DEV_ZONED the
-inline helper functions bdev_nr_zones(), bdev_max_open_zones(),
-bdev_max_active_zones() and disk_zone_no() as these function will return
-the correct valu in all cases (zoned device or not, including when
-CONFIG_BLK_DEV_ZONED is not set). Furthermore, disk_nr_zones()
-definition can be simplified as disk->nr_zones is always 0 for regular
-block devices.
+On Thu, Jun 20, 2024 at 11:07:19PM -0400, Kent Overstreet wrote:
+> On Fri, Jun 21, 2024 at 09:48:11AM +0800, Ming Lei wrote:
+> > On Thu, Jun 20, 2024 at 11:43:44AM -0400, Kent Overstreet wrote:
+> > > On Thu, Jun 20, 2024 at 05:30:50PM +0200, Christoph Hellwig wrote:
+> > > > On Thu, Jun 20, 2024 at 02:54:09PM +0100, Matthew Wilcox wrote:
+> > > > > I'm against it.  Block devices only do sector-aligned IO and we should
+> > > > > not pretend otherwise.
+> > > > 
+> > > > While I agree with that, the bvec_iter is actually used in a few other
+> > > > places and could be used in more, and the 512-byte sector unit bi_sector
+> > > > is the only weird thing that's not useful elsewhere.  So turning that
+> > > > into a
+> > > > 
+> > > > 	u64 bi_addr;
+> > > > 
+> > > > that is byte based where the meaning is specific to the user would
+> > > > actually be kinda nice.  For traditional block users we'd need a
+> > > > bio_sector() helpers similar to the existing bio_sectors() one,
+> > > > but a lot of non-trivial drivers actually need to translated to
+> > > > a variable LBA-based addressing, which would be (a tiny little bit)
+> > > > simpler with the byte address.   As bi_size is already in bytes
+> > > > it would also fit in pretty naturally with that.
+> > > > 
+> > > > The only thing that is really off putting is the amount of churn that
+> > > > this would cause.
+> > > 
+> > > I'm being imprecise when I just say 'struct bio'; there's things in
+> > > there that are block layer specific but there are also things in there
+> > > you want that aren't block layer specific (completion callback, write
+> > > flags, s/bi_bdev/bi_inode and that as well, perhaps). It's not at all
+> > > clear to me we'd want to deal with the churn to split that up or make
+> > > bio itself less block layer specific (although, but when I say 'aiming
+> > > for commality with struct bio' that sort of thing is what I have in
+> > > mind.
+> > > 
+> > > But more immediately, yes - bi_addr as all we need for this, and like
+> > > you said I think it'd be a worthwhile change.
+> > 
+> > Still not clear why you need unaligned bi_addr for bio, if this bio needs
+> > to call submit_bio(), it has to be aligned. Otherwise, you could invent any
+> > structure for this purpose, and the structure can be payload of bio for
+> > avoiding extra allocation, even it can be FS generic structure.
+> 
+> We want to have fewer scatter/gather list data structures, not more.
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- include/linux/blkdev.h | 44 ++++++++++++------------------------------
- 1 file changed, 12 insertions(+), 32 deletions(-)
+OK, that look fine to change to bi_addr since bvec_iter is widely used now,
+maybe .bi_sector can be moved into bio, cause bvec iterator needn't it.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1078a7d51295..e89003360c17 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -673,11 +673,21 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
- }
- 
- #ifdef CONFIG_BLK_DEV_ZONED
--
- static inline unsigned int disk_nr_zones(struct gendisk *disk)
- {
--	return blk_queue_is_zoned(disk->queue) ? disk->nr_zones : 0;
-+	return disk->nr_zones;
-+}
-+bool blk_zone_plug_bio(struct bio *bio, unsigned int nr_segs);
-+#else /* CONFIG_BLK_DEV_ZONED */
-+static inline unsigned int disk_nr_zones(struct gendisk *disk)
-+{
-+	return 0;
-+}
-+static inline bool blk_zone_plug_bio(struct bio *bio, unsigned int nr_segs)
-+{
-+	return false;
- }
-+#endif /* CONFIG_BLK_DEV_ZONED */
- 
- static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
- {
-@@ -701,36 +711,6 @@ static inline unsigned int bdev_max_active_zones(struct block_device *bdev)
- 	return bdev->bd_disk->queue->limits.max_active_zones;
- }
- 
--bool blk_zone_plug_bio(struct bio *bio, unsigned int nr_segs);
--#else /* CONFIG_BLK_DEV_ZONED */
--static inline unsigned int bdev_nr_zones(struct block_device *bdev)
--{
--	return 0;
--}
--
--static inline unsigned int disk_nr_zones(struct gendisk *disk)
--{
--	return 0;
--}
--static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
--{
--	return 0;
--}
--static inline unsigned int bdev_max_open_zones(struct block_device *bdev)
--{
--	return 0;
--}
--
--static inline unsigned int bdev_max_active_zones(struct block_device *bdev)
--{
--	return 0;
--}
--static inline bool blk_zone_plug_bio(struct bio *bio, unsigned int nr_segs)
--{
--	return false;
--}
--#endif /* CONFIG_BLK_DEV_ZONED */
--
- static inline unsigned int blk_queue_depth(struct request_queue *q)
- {
- 	if (q->queue_depth)
--- 
-2.45.2
+
+Thanks,
+Ming
 
