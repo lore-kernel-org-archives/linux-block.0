@@ -1,168 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02FE78C8E;
-	Thu, 20 Jun 2024 21:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B533D10E3
+	for <linux-block@vger.kernel.org>; Fri, 21 Jun 2024 01:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718918643; cv=none; b=jn/TCGYywP8ZkBHVbXCG9rq1AOId25kJTTdgcQBspU2ydrNUymQYAXwXORkF4GxSo0Xw/cAcK2U1SFiZl47sflIACc8oMEg3rsNlEAI8+ScXTxxuH87xzAmYd4vxNwQkNvME6UNUj1LRQ4O9cqG4MrI0njeiUSaSFLRDRTVU3so=
+	t=1718933998; cv=none; b=GOBi58leID+1dFJzvjE+yH9LFcU58aGOjNeq8DYFqHCONyddmSMltJhNKGVm+T9BMGxeA26qCzkDUYzqN+fsBuSJQMRRYv9qxloa3ZmQyRuB2iDWrkRMPP/zC4HtKamgBwzhJbCG/Orbur73yYDA1MjXO4wtk7YblK2WcEGCrmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718918643; c=relaxed/simple;
-	bh=J2GqEQCdBgJeMDsHOUD3ggS0L8MaxCNWl/BVWnLRCW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Klh52aQGeE2rm+1S/lVne1qMOtv44ALA3sso6+FQ0/MD+Xno5DrHOCaVgOaly34ujNaKTHct8zvolmUcuKjoAZjDGcZj+yR/foe+f0O2AGLNs0YsK+LGnZVQf6R3VfvgwTLkpHghJsYgUaN6KYGlv8Hu+64NrrIwdEgTCgS2QFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FlQZkEWX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718933998; c=relaxed/simple;
+	bh=IOfMoJALxxIvfxYGw+lS/rbmnhQlsAcBC1Nt87FjgOs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=cMj5v2cIlh2Fkv9PNd6r0vob4QgdZYi8CQhmyPboaSWHYF9wbr+ufEO9L7Z+iR1kZTANcM0XCziPTBzGiTGyOR6P8mKWGxcqFGubK0+6cBoQlHrJDDUBinXPjO2TkKE6aX2R5ZPzo8848hGczvGRJUA5IjYIfZGt00ZV6Sc6/GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MRtKfBC9; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FlQZkEWX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 578C8C2BD10;
-	Thu, 20 Jun 2024 21:24:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718918642;
-	bh=J2GqEQCdBgJeMDsHOUD3ggS0L8MaxCNWl/BVWnLRCW8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FlQZkEWXuYjG3lBPD+CbeqHswxAsU7y4iss7QjmrwwSkTw2iU3E6o6btinmhwPHrD
-	 lSF/mb5wOLfVwxtjYYm93dMIUn1hfwPO7/uvnuUvaMGfIVTVH8Kn/kMXsydRkfKkKk
-	 +q9uKCYgckPzfqcC2uHLzy4ZEe1BFH/G9Q8G00qfYW4ZlnjgKp1D8f5mbTBTzHet3f
-	 KJRe02ZO01MDudREL9gtQdj64PgKYAVNDPPdkW0hXvesX4jdchaliSxKMN5OssSrSq
-	 Ecnj4xZ09k4NozRYTQARzo3zXOkrOETiUmVHdKRiMwF75ak/8AVeIkVdoL0kbhtqfE
-	 xzqtOujZzBqdw==
-Date: Thu, 20 Jun 2024 14:24:01 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, tytso@mit.edu, dchinner@redhat.com,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.com,
-	chandan.babu@oracle.com, hch@lst.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-xfs@vger.kernel.org, catherine.hoang@oracle.com,
-	ritesh.list@gmail.com, mcgrof@kernel.org,
-	mikulas@artax.karlin.mff.cuni.cz, agruenba@redhat.com,
-	miklos@szeredi.hu, martin.petersen@oracle.com
-Subject: Re: [PATCH v4 01/22] fs: Add generic_atomic_write_valid_size()
-Message-ID: <20240620212401.GA3058325@frogsfrogsfrogs>
-References: <20240607143919.2622319-1-john.g.garry@oracle.com>
- <20240607143919.2622319-2-john.g.garry@oracle.com>
- <20240612211040.GJ2764752@frogsfrogsfrogs>
- <a123946e-1df2-48da-b120-67b50c3aa9f5@oracle.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MRtKfBC9"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45KHCruO009466;
+	Fri, 21 Jun 2024 01:39:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	VV7cHLl32IzayV5h0uSeZQpxWpkiWHM/wNDY1x1qvPE=; b=MRtKfBC9H6NrIDoc
+	tw1MvcfsBrPOPFrRIW/3GaCI/1iua2YhYZ88SoRwGC/sIm3IMtz3SSaEa8K3jaFI
+	ThJXOTSl2M48W73UtGSqJmHlJIpxxTnnVz1XQKRAWuDqrstlPMx4vWRmesu3sdIg
+	pHQKeVhPcPdjm8iYCo9kIBzJHV1yJ5aQ7PmXmF8N5S/AXDPueK6SqhyLN1wjxoz4
+	OYmO1UXKImj0gc6Kj7OxjyI/HWOALpEnZmk9usOcROhrCWVgBbjCjoxfN8ZDuQps
+	FJ9lZvgCE/y2dueaaWjaC74DRStXvwMzb3D+HAKOsrrOFn5qvY0XX5OKquRt+ciB
+	lntwyQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yvrm2h27e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Jun 2024 01:39:52 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45L1dpYe030281
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Jun 2024 01:39:51 GMT
+Received: from [10.232.65.248] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 20 Jun
+ 2024 18:39:49 -0700
+Message-ID: <c6fa7134-c99e-464d-9d5d-a9480aaf59fc@quicinc.com>
+Date: Fri, 21 Jun 2024 09:39:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a123946e-1df2-48da-b120-67b50c3aa9f5@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: 6.6 kernel block: blk_mq_freeze_queue_wait in suspend path but
+ userspace task held the queue->q_usage_counter in 'TASK_FROZEN' state
+Content-Language: en-US
+To: Bart Van Assche <bvanassche@acm.org>, <linux-block@vger.kernel.org>,
+        <",linux-scsi"@vger.kernel.org>
+References: <6fb677a4-b655-4395-9dd1-450217fec69d@quicinc.com>
+ <4c98300f-bc0d-4267-acd4-6365de65713e@acm.org>
+From: Kassey Li <quic_yingangl@quicinc.com>
+In-Reply-To: <4c98300f-bc0d-4267-acd4-6365de65713e@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: xZWVlMXgv5JzcF8b78iMNievi7PTxVVS
+X-Proofpoint-ORIG-GUID: xZWVlMXgv5JzcF8b78iMNievi7PTxVVS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-20_12,2024-06-20_04,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ clxscore=1011 suspectscore=0 mlxlogscore=999 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406210011
 
-On Thu, Jun 13, 2024 at 08:35:53AM +0100, John Garry wrote:
-> On 12/06/2024 22:10, Darrick J. Wong wrote:
-> > On Fri, Jun 07, 2024 at 02:38:58PM +0000, John Garry wrote:
-> > > Add a generic helper for FSes to validate that an atomic write is
-> > > appropriately sized (along with the other checks).
-> > > 
-> > > Signed-off-by: John Garry <john.g.garry@oracle.com>
-> > > ---
-> > >   include/linux/fs.h | 12 ++++++++++++
-> > >   1 file changed, 12 insertions(+)
-> > > 
-> > > diff --git a/include/linux/fs.h b/include/linux/fs.h
-> > > index 069cbab62700..e13d34f8c24e 100644
-> > > --- a/include/linux/fs.h
-> > > +++ b/include/linux/fs.h
-> > > @@ -3645,4 +3645,16 @@ bool generic_atomic_write_valid(loff_t pos, struct iov_iter *iter)
-> > >   	return true;
-> > >   }
-> > > +static inline
-> > > +bool generic_atomic_write_valid_size(loff_t pos, struct iov_iter *iter,
-> > > +				unsigned int unit_min, unsigned int unit_max)
-> > > +{
-> > > +	size_t len = iov_iter_count(iter);
-> > > +
-> > > +	if (len < unit_min || len > unit_max)
-> > > +		return false;
-> > > +
-> > > +	return generic_atomic_write_valid(pos, iter);
-> > > +}
-> > 
-> > Now that I look back at "fs: Initial atomic write support" I wonder why
-> > not pass the iocb and the iov_iter instead of pos and the iov_iter?
+
+
+On 2024/6/21 0:52, Bart Van Assche wrote:
+> On 6/19/24 11:53 PM, Kassey Li wrote:
+>> hello, linux block team:
 > 
-> The original user of generic_atomic_write_valid() [blkdev_dio_unaligned() or
-> blkdev_dio_invalid() with the rename] used these same args, so I just went
-> with that.
-
-Don't let the parameter types of static blockdev helpers determine the
-VFS API that filesystems need to implement untorn writes.
-
-In the block layer enablement patch, this could easily be:
-
-bool generic_atomic_write_valid(const struct kiocb *iocb,
-				const struct iov_iter *iter)
-{
-	size_t len = iov_iter_count(iter);
-
-	if (!iter_is_ubuf(iter))
-		return false;
-
-	if (!is_power_of_2(len))
-		return false;
-
-	if (!IS_ALIGNED(iocb->ki_pos, len))
-		return false;
-
-	return true;
-}
-
-Then this becomes:
-
-bool generic_atomic_write_valid_size(const struct kiocb *iocb,
-				     const struct iov_iter *iter,
-				     unsigned int unit_min,
-				     unsigned int unit_max)
-{
-	size_t len = iov_iter_count(iter);
-
-	if (len < unit_min || len > unit_max)
-		return false;
-
-	return generic_atomic_write_valid(iocb, iter);
-}
-
-Yes, that means you have to rearrange the calling conventions of
-blkdev_dio_invalid a little bit, but the first two arguments match
-->read_iter and ->write_iter.  Filesystem writers can see that the first
-two arguments are the first two parameters to foofs_write_iter() and
-focus on the hard part, which is figuring out unit_{min,max}.
-
-static ssize_t
-xfs_file_dio_write(
-	struct kiocb		*iocb,
-	struct iov_iter		*from)
-{
-...
-	if ((iocb->ki_flags & IOCB_ATOMIC) &&
-	    !generic_atomic_write_valid_size(iocb, from,
-			i_blocksize(inode),
-			XFS_FSB_TO_B(mp, ip->i_extsize)))
-		return -EINVAL;
-	}
-
-
-> > And can these be collapsed into a single generic_atomic_write_checks()
-> > function?
+> Please repost this message on the linux-scsi mailing list. I think this
+> is a UFSHCD driver issue rather than a block layer issue.
 > 
-> bdev file operations would then need to use
-> generic_atomic_write_valid_size(), and there is no unit_min and unit_max
-> size there, apart from bdev awu min and max. And if I checked them, we would
-> be duplicating checks (of awu min and max) in the block layer.
+>> userspace task A  ['TASK_FROZEN']
+>>
+>>      [<ffffffdc0c527f10>] __switch_to+0x1e8
+>>      [<ffffffdc0c5287ec>] __schedule+0x6cc
+>>      [<ffffffdc0c528c28>] schedule+0x78
+>>      [<ffffffdc0c532bbc>] schedule_timeout+0x50
+>>      [<ffffffdc0c529e48>] do_wait_for_common+0x10c
+>>      [<ffffffdc0c529238>] wait_for_completion+0x48
+>>      [<ffffffdc0b4def4c>] __flush_work+0xcc
+>>      [<ffffffdc0b4dee70>] flush_work+0x14
+>>      [<ffffffdc0c091aec>] ufshcd_hold+0xc0
+> 
+> Is ufshcd_hold() executing flush_work(&hba->clk_gating.ungate_work)?
+> If so, why does the ungate work not complete?
 
-Fair enough, I concede this point.
+userspace task A (pid 9453) sleep on 1919.065798809
+to __flush_work, where it  will insert wq_barrier_func
 
---D
+
+	Line 4289153:      kworker/u19:2-20272 [001] ..... 1919.091512: 
+workqueue_execute_start work_struct 0xffffff881cbba090 function 
+0xffffffdc0c0a647c ('ufshcd_ungate_work', 0)
+	Line 4289842:      kworker/u19:2-20272 [001] ..... 1919.096289: 
+workqueue_execute_end work_struct 0xffffff881cbba090 function 
+0xffffffdc0c0a647c ('ufshcd_ungate_work', 0)
+	Line 4289843:      kworker/u19:2-20272   [001] .....  1919.096291: 
+workqueue_execute_start  work_struct 0xffffffc0ceddb4f0 function 
+0xffffffdc0b4e322c ('wq_barrier_func', 0)
+	Line 4289844:      kworker/u19:2-20272   [001] .....  1919.096293: 
+workqueue_execute_end  work_struct 0xffffffc0ceddb4f0 function 
+0xffffffdc0b4e322c ('wq_barrier_func', 0)
+
+	the ftrace log showed ufshcd_ungate_work , wq_barrier_func were all done.
+
+	a sched_waking should happened for pid=9453 between 1919.096291 to 
+1919.096293
+		since 
+wq_barrier_func->complete->swake_up_locked->try_to_wake_up->ttwu_state_match
+	however, ttwu_state_match only wake up the task in TASK_NORMAL state.
+	
+here pid=9453 in TASK_FROZEN is not the case.
+
+do you have some suggest on break this ?
+
+	
+
+
 
 > 
-> Cheers,
-> John
+> Thanks,
 > 
+> Bart.
