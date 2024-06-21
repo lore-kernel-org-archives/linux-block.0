@@ -1,211 +1,132 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D351E482C8;
-	Fri, 21 Jun 2024 09:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED2716E887;
+	Fri, 21 Jun 2024 09:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718962338; cv=none; b=Uo8u30sQpnpgMhBssBYcui9caZahVcbWV8Qa3QoG7FiNo/xA8bJMvhrUn7yMHcr8w8HsiEgh+0qhocj+1E89TblcumCB+LZPoVeOfXdRpsO8hiivd1FP6YCxotsGhkAWeyynY1wfqh2MTDr+k4Q/eYAby2eBIIfUVe1jtSSNiok=
+	t=1718962828; cv=none; b=g3o4UwuA7hsUX1cIvGBpng3mpPbwxs9tq8FeueHYJ+/COt3kqyMW5LqCxhvZcA5yA9O6U9Gq/iUUdjC1X8a6+hbYHjIiWp93RwgGqcLyzMdAyl5IFD60P9c4HJpmq/tscRQxARza6l0va60Zdr5+9sCYG3HInp38dTSVDs+TN6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718962338; c=relaxed/simple;
-	bh=tX3lbP0oIbLXstNsFkYy7tmCmp7K2WDT7BZj38Vc58w=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V4HRfTm5EPxZyncVOyHzG2RwedWRBCeaNjk6VmLIkv2oE7EhMpw4YdqW6832zFwUAojLsEQmc/4saS8Ff8TqP57ecEjrauBP2PI/F8E1rknC9yWrOFPMsgX2FYfkI4KBd3wO+LTQMt5qjn2GpCaCaRMyjo0j9kSlpxiV4pplnI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DHWS9DXt; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718962828; c=relaxed/simple;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=jmbzOuL8z012A6rnlFJ6LpMtMKf+idHxw0M/EdH39KATLXzGaMz5WPXMdMep087l06TxUWqmXi/3oEjvU6Mc2cmJXMlR2IKZK+AT30ltUpzQ5kBv7AXvklK1b3dGw/pjKmNCUYbMarxi5oBz2ExldP1Q3WYPk3PIKDc/YoG775k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=gF5Mn5Cs; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DHWS9DXt"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57cc30eaf0aso951999a12.2;
-        Fri, 21 Jun 2024 02:32:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718962335; x=1719567135; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LXjbiUeKX1jEQnL+FwWLcen6cX7ksdYWye9qn3fwv6g=;
-        b=DHWS9DXt13LiribTgN2bFTRDmxtyLV6IugelHM34OjdJd2ZlVkJZrZVzo188uPm+6F
-         nJOebWgnUBywhTTS8Ax6m2BWlthz09YQm9I0ybOkWVpdiVl3ikslR7uqk/AeA7Dp0OHu
-         GxTcDEN2qtTwAZVEfitZKxqWR7Tzxvx9tY3FD3C1QoiS6kdr95Zf9Rp7NAY2dm0ebP8H
-         YamJigxkBQ+XWKofXRFmw2rEVpME2dPoRkqRz+RBxAPum+ADALYaM1UpF6KsyF2gV6gu
-         MMeMLSJ5M2eJThJU+tEyQHXT2unV7hp283rA7EcUVO1cKyfxJAx8eDaoXl2H9VZD7CS6
-         TGoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718962335; x=1719567135;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LXjbiUeKX1jEQnL+FwWLcen6cX7ksdYWye9qn3fwv6g=;
-        b=SEmlM5N11fHyWBqnA+j0sKITFQCOUyI1d740MV2oCGmlquzQ9K2F2/kkeNiouWsMhy
-         Hy4Dkke0nRk1mbNcj3FP5GG3r8n1wViYmjOlFT3+HQdhx8kjn8f144N8Wv3Gl5fWsYLr
-         pj4TbJST39aj3gpJ6L7ISKE+NPk7RKRu4VGB1RFtUhI7i7ZcEmj9crMwAPW6R/lGwo93
-         K67POJZPwSGheQe4pQSmtoeDNZCUNPBDH1DJ/R9aLywW+ezqJAqbpHZ82ZdddTEjlyd4
-         HUQe3sgh7A01I8ilUKUytwBxEChrbeCijlrmMfYBoSz81svheAucI2nfgbmQod6LEpW0
-         szKA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsHXq3IZ+DU1wQFIte1T+StCLSQKiubG5fdrMQbufCImFUw/+WmzKXpS+G94YxTHYZMYPLxa3UiWLNflmF6mQDzPzx7Fci7TkqIRCdv98/6daniRcZreiYVkVqgvm2ImhIftkgAMDDrGbKgDynA/cDcXn0PpM7vHeolSW3CzJ3yMRm98KGJLDPicOBeDsukR2VclJoyAgnKW1f2lJsT1QWJpn4wIXQZGLS+nrtVzo9RTMujH4bdXtUbMQeeWFaGXiSD5A/oS5PoJLaMfGl9O9R3rkeuEtEkmU0U7J9K/YVrrJQLOOI3ePWefYkMzPo5I8gqPpzxjZIkhPYPWf2HE2FtP3+4sxgAbdBtStPDJU9AdL6i8lQNv4QwOEqj8ntCPbeCJOsorwyRrzo1SGdoAYPRGjljsARK+Kvp4JkKOQVub+hbZdQOpa+xgPQFw==
-X-Gm-Message-State: AOJu0YwnrLyS2yw9Wh8270dYG9hHynYiiWubYziAsEyVia3LuPplYFp4
-	jTiLXRI/L+6xR22gTZE7xa6KqUdqkMrxgW3gVjoK5hXcqvLWuyElAILmhpnIGJ0=
-X-Google-Smtp-Source: AGHT+IEG3QIZH1aO0GWd9T0Xk/3yUg93srj60sGG+BwmRF3tpMGbSRtFwCmQB/INPoCeCqb37IZhUg==
-X-Received: by 2002:a50:d60b:0:b0:57a:79c2:e9d6 with SMTP id 4fb4d7f45d1cf-57d07ea9ccbmr5867695a12.33.1718962334727;
-        Fri, 21 Jun 2024 02:32:14 -0700 (PDT)
-Received: from pc636 (176-227-201-31.ftth.glasoperator.nl. [31.201.227.176])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf56e9f3sm62345066b.215.2024.06.21.02.32.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 02:32:14 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Fri, 21 Jun 2024 11:32:12 +0200
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: paulmck@kernel.org, Uladzislau Rezki <urezki@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	kasan-dev <kasan-dev@googlegroups.com>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <ZnVInAV8BXhgAjP_@pc636>
-References: <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
- <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
- <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
- <ZnCDgdg1EH6V7w5d@pc636>
- <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
- <ZnFT1Czb8oRb0SE7@pc636>
- <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
- <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
- <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
- <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="gF5Mn5Cs"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240621094017epoutp01e5024adbb5c4943331c36ea7f2622f4c~a_5MmQoD_1107311073epoutp01S;
+	Fri, 21 Jun 2024 09:40:17 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240621094017epoutp01e5024adbb5c4943331c36ea7f2622f4c~a_5MmQoD_1107311073epoutp01S
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1718962817;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=gF5Mn5Cs05hIZubDGl6N8HjV7/n3HUJ2xybSyGKT8ltlPNHWt40g89LHuiHboeYo3
+	 XwwIlyOtVYv4eQy/w96F2WssGZrLB6cS47xlEk8bpi6jUhLf+D/k7SxRrO5OClpPRQ
+	 +ZEj6Rf5xkruuha3als/5FIWVgJem2u6/+Xx+WqY=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240621094016epcas5p37e30c7a723101b07dad0e3c3fea25975~a_5MMdLDU0813208132epcas5p31;
+	Fri, 21 Jun 2024 09:40:16 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4W5C5C4m5dz4x9Pt; Fri, 21 Jun
+	2024 09:40:15 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E2.1E.19174.F7A45766; Fri, 21 Jun 2024 18:40:15 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240621094015epcas5p4ffcbc601f9a3ebe9ceb13a5fdac237bd~a_5KnhYrl2058420584epcas5p4c;
+	Fri, 21 Jun 2024 09:40:15 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240621094015epsmtrp2a861ecb2d60954e0a50a639e09564028~a_5KmUyur3234432344epsmtrp20;
+	Fri, 21 Jun 2024 09:40:15 +0000 (GMT)
+X-AuditID: b6c32a50-87fff70000004ae6-94-66754a7f85b5
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	27.A5.18846.E7A45766; Fri, 21 Jun 2024 18:40:14 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240621094009epsmtip1b013110a146e68d8e804e1eeeb926ab7~a_5FqZwgd2003020030epsmtip1e;
+	Fri, 21 Jun 2024 09:40:09 +0000 (GMT)
+Message-ID: <c890111a-08a0-4afe-dd3e-5ce41d64f54b@samsung.com>
+Date: Fri, 21 Jun 2024 15:10:08 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [Patch v9 10/10] nvme: Atomic write support
+Content-Language: en-US
+To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+	kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
+	martin.petersen@oracle.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	dchinner@redhat.com, jack@suse.cz
+Cc: djwong@kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+	linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com, linux-aio@kvack.org,
+	linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org, nilay@linux.ibm.com,
+	ritesh.list@gmail.com, willy@infradead.org, agk@redhat.com,
+	snitzer@kernel.org, mpatocka@redhat.com, dm-devel@lists.linux.dev,
+	hare@suse.de, Alan Adamson <alan.adamson@oracle.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240620125359.2684798-11-john.g.garry@oracle.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Te1BUZRT3u3u5u1CrtxXiGypZt8iRhsfSQh+MICXpHWpGymkqnQbusJeF
+	WC47+8gsZ2AIdAXiKSSvFlYskDGUJVyeIkQrDwVZQSNhgJYSUCAYS0GzXXYz/vudc37n+53z
+	O/PxOIIergcvgVUzSpaWiwgXvKl7p7dPSqQmzn9Utx3V9/3MQW25fRiqG88l0Hz3MkBX5yq4
+	yGzZjCr1FThq0xdgqLauB0MLGddwVPbNVxjqvbRIIP2tJgwNrRoBKugaBehkcRpA7WOvoeHf
+	ariorb0XR+aWcgLpvpvhoqybRgJ9b/oHQ/naEQw15i9h6HTtB+hyn5aLfphfxNGVsRdQRvZD
+	Lhp8bHJCaw/KiXAh1Vw6zqUqGzTU4MQFnDLUeFPmqxqq4ewJgmpYLuBSefpOQBmqU6g7hhJA
+	tf6SSlBpAz0c6s+ZMZxa7BghqIHKn7iUof/LKMHBxF3xDC1llEKGjU2WJrCyUNE7B6L3RAcG
+	+Yt9xMHoDZGQpZOYUFHEu1E+exPkVstEws9oucaaiqJVKpFf2C5lskbNCOOTVepQEaOQyhUS
+	ha+KTlJpWJkvy6hDxP7+AYFWYkxifJ/xDKYI+Hy0IgdLBT6ZgMeDpATm1FihC09AtgGY2X8G
+	twfLAHa0joCngXbW5JQJnNc7hv8qc7IXmgF8cvG6I7gH4MV754GNxSfDYHnJFG7DOOkFaycG
+	OPb8c7C3xLKedyNj4cPMTsKGt5IIZg7Nrec5pDscs+gw26Ou5BKAwzmzjsIJHFYsyGyDE+RO
+	OFSosUFnMhxmX9piZ3haRyjn2FohecwFakdvEPapI2DjtTzHBlvhnKmRa8cecGWh3cFJhJPT
+	k7gdH4VGQ46DvxumPrrlZNPiWGXrW/zsWpvh12sWzG4jH2qPCezs7XCiYMbR6Q6nTlU7MAV1
+	VUUcu1VXADx+cwbPA8LSDa6Ubti+dMM6pf8rVwL8LPBgFKokGRMbqBD7sMzhp+eOTU5qAOv/
+	yTvKCOrOP/btAhgPdAHI44hc+X9kKuMEfCl95AtGmRyt1MgZVRcItN4nn+PhFpts/ZCsOlos
+	CfaXBAUFSYJfDxKL3PnzGRVSASmj1UwiwygY5X99GM/ZIxXbv1+ofHFLnvZk1Hs1z9QTAcWH
+	/J5VzQ6NZJhD467HxNxOg4+Ga9NbDv5440h3moYNia+MNMd/+3KuXpdwZ4fkbc99xYlD52Se
+	ZEi1CQtH+sKelN2LNeLTnU0FFCOxSNnf2xOchaq28qLbvzZ3RMqXYpwf+D0xpm86F9L3t3BV
+	2n/gsltHcNWq7vkpk2BTWSTqYF85tCDaMzIiyxodPHV/bPKljyan3yxP/zC2acUjomj28I4s
+	stN1lbvNq10XtjfJws5/vMzPCvLeF76GvD4lh2m2qG5F09rdlA3i3lJM8wprL1TRVcb3B7R3
+	zTN3PzHef3WparOBHhccjQstK9x2XISr4mmxN0epov8Fognji9gEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHKsWRmVeSWpSXmKPExsWy7bCSnG6dV2mawZmdNhbrTx1jttjTf4rJ
+	YvXdfjaL14c/MVqcfTWX3eLyEz6LBYvmsljsWTSJyWLl6qNMFu9az7FYzJ7ezGRxcv97NotF
+	N7YxWVz4tYPRYtKha4wWU6Y1MVrsvaVtcenxCnaLPXtPslhc3jWHzWL+sqfsFt3Xd7BZLD/+
+	j8liYsdVJostEz8wWSxeGWpx8FQHu8W61+9ZLE7ckrZo7fnJbnH+73FWi98/5rA5KHjsnHWX
+	3WPBplKP8/c2snhsXqHlcflsqcemVZ1sHps+TWL3mLDoAKPH5iX1Hi82z2T02H2zgc2j6cxR
+	Zo+PT2+xeLzfd5XN48yCI+wem09XBwhFcdmkpOZklqUW6dslcGWc2rGUqcCo4trcPqYGRt0u
+	Rk4OCQETiUvfZrN2MXJxCAlsZ5T4PeMKI0RCXKL52g92CFtYYuW/5+wQRa8ZJeZfuc8GkuAV
+	sJOYM/MhC4jNIqAqsfLeGWaIuKDEyZlPwOKiAskSL/9MBBskLGAh0XXhFVicGWjBrSfzmUCG
+	igh8YJR4s3ENC4jDLNDJInF+WicbxLoTjBJz3j4FuomDg01AU+LC5FIQk1PAQaJnPz/EIDOJ
+	rq1djBC2vMT2t3OYJzAKzUJyxywk+2YhaZmFpGUBI8sqRtHUguLc9NzkAkO94sTc4tK8dL3k
+	/NxNjOAkpBW0g3HZ+r96hxiZOBgPMUpwMCuJ8D7vKkoT4k1JrKxKLcqPLyrNSS0+xCjNwaIk
+	zquc05kiJJCeWJKanZpakFoEk2Xi4JRqYGLn73xfPdNvWjyjYlpgq4t67Oc9q/4ElmUuDHzf
+	EFawMKIjzb7J9vFS4RvvJ9j/sBSRbtT7XlJl9Psoo31UYdqFMwfP1BSw/bLebRSmXCam/KB9
+	1tsci68HFeIPdlhEV9Se5dDrnH1J2XjRs+RjyZafVcPb6iYtK/6VGrXswtM6XnMnL4fzs6Ys
+	U3tz5cGxOboV3FXK9tEdc3e/bM0J1M3ZfEB674rTwlPjTttseSkV983+U8msBQcTvY982uK0
+	x3XboXdVud4HP17XPfw9r3ezjfWLGcdXXcu8kv/7+u/sz8JMj/5lPo38887v5u25b5cwPRRt
+	e1Zy79zNXXsP/Ah/+P0y274P+3Xnr/7BF2+sxFKckWioxVxUnAgAflXwpbEDAAA=
+X-CMS-MailID: 20240621094015epcas5p4ffcbc601f9a3ebe9ceb13a5fdac237bd
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240620130128epcas5p4fcf2266e390bc02fec23c89c9a3cf460
+References: <20240620125359.2684798-1-john.g.garry@oracle.com>
+	<CGME20240620130128epcas5p4fcf2266e390bc02fec23c89c9a3cf460@epcas5p4.samsung.com>
+	<20240620125359.2684798-11-john.g.garry@oracle.com>
 
-On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
-> On 6/18/24 7:53 PM, Paul E. McKenney wrote:
-> > On Tue, Jun 18, 2024 at 07:21:42PM +0200, Vlastimil Babka wrote:
-> >> On 6/18/24 6:48 PM, Paul E. McKenney wrote:
-> >> > On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
-> >> >> > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
-> >> >> > >> +
-> >> >> > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
-> >> >> > >> +
-> >> >> > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
-> >> >> > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
-> >> >> > > wanted to avoid initially.
-> >> >> > 
-> >> >> > I wanted to avoid new API or flags for kfree_rcu() users and this would
-> >> >> > be achieved. The barrier is used internally so I don't consider that an
-> >> >> > API to avoid. How difficult is the implementation is another question,
-> >> >> > depending on how the current batching works. Once (if) we have sheaves
-> >> >> > proven to work and move kfree_rcu() fully into SLUB, the barrier might
-> >> >> > also look different and hopefully easier. So maybe it's not worth to
-> >> >> > invest too much into that barrier and just go for the potentially
-> >> >> > longer, but easier to implement?
-> >> >> > 
-> >> >> Right. I agree here. If the cache is not empty, OK, we just defer the
-> >> >> work, even we can use a big 21 seconds delay, after that we just "warn"
-> >> >> if it is still not empty and leave it as it is, i.e. emit a warning and
-> >> >> we are done.
-> >> >> 
-> >> >> Destroying the cache is not something that must happen right away. 
-> >> > 
-> >> > OK, I have to ask...
-> >> > 
-> >> > Suppose that the cache is created and destroyed by a module and
-> >> > init/cleanup time, respectively.  Suppose that this module is rmmod'ed
-> >> > then very quickly insmod'ed.
-> >> > 
-> >> > Do we need to fail the insmod if the kmem_cache has not yet been fully
-> >> > cleaned up?
-> >> 
-> >> We don't have any such link between kmem_cache and module to detect that, so
-> >> we would have to start tracking that. Probably not worth the trouble.
-> > 
-> > Fair enough!
-> > 
-> >> >  If not, do we have two versions of the same kmem_cache in
-> >> > /proc during the overlap time?
-> >> 
-> >> Hm could happen in /proc/slabinfo but without being harmful other than
-> >> perhaps confusing someone. We could filter out the caches being destroyed
-> >> trivially.
-> > 
-> > Or mark them in /proc/slabinfo?  Yet another column, yay!!!  Or script
-> > breakage from flagging the name somehow, for example, trailing "/"
-> > character.
-> 
-> Yeah I've been resisting such changes to the layout and this wouldn't be
-> worth it, apart from changing the name itself but not in a dangerous way
-> like with "/" :)
-> 
-> >> Sysfs and debugfs might be more problematic as I suppose directory names
-> >> would clash. I'll have to check... might be even happening now when we do
-> >> detect leaked objects and just leave the cache around... thanks for the
-> >> question.
-> > 
-> > "It is a service that I provide."  ;-)
-> > 
-> > But yes, we might be living with it already and there might already
-> > be ways people deal with it.
-> 
-> So it seems if the sysfs/debugfs directories already exist, they will
-> silently not be created. Wonder if we have such cases today already because
-> caches with same name exist. I think we do with the zsmalloc using 32 caches
-> with same name that we discussed elsewhere just recently.
-> 
-> Also indeed if the cache has leaked objects and won't be thus destroyed,
-> these directories indeed stay around, as well as the slabinfo entry, and can
-> prevent new ones from being created (slabinfo lines with same name are not
-> prevented).
-> 
-> But it wouldn't be great to introduce this possibility to happen for the
-> temporarily delayed removal due to kfree_rcu() and a module re-insert, since
-> that's a legitimate case and not buggy state due to leaks.
-> 
-> The debugfs directory we could remove immediately before handing over to the
-> scheduled workfn, but if it turns out there was a leak and the workfn leaves
-> the cache around, debugfs dir will be gone and we can't check the
-> alloc_traces/free_traces files there (but we have the per-object info
-> including the traces in the dmesg splat).
-> 
-> The sysfs directory is currently removed only with the whole cache being
-> destryed due to sysfs/kobject lifetime model. I'd love to untangle it for
-> other reasons too, but haven't investigated it yet. But again it might be
-> useful for sysfs dir to stay around for inspection, as for the debugfs.
-> 
-> We could rename the sysfs/debugfs directories before queuing the work? Add
-> some prefix like GOING_AWAY-$name. If leak is detected and cache stays
-> forever, another rename to LEAKED-$name. (and same for the slabinfo). But
-> multiple ones with same name might pile up, so try adding a counter then?
-> Probably messy to implement, but perhaps the most robust in the end? The
-> automatic counter could also solve the general case of people using same
-> name for multiple caches.
-> 
-> Other ideas?
-> 
-One question. Maybe it is already late but it is better to ask rather than not.
-
-What do you think if we have a small discussion about it on the LPC 2024 as a
-topic? It might be it is already late or a schedule is set by now. Or we fix
-it by a conference time.
-
-Just a thought.
-
---
-Uladzislau Rezki
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
