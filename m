@@ -1,169 +1,115 @@
-Received: from mail.nearlyone.de (mail.nearlyone.de [49.12.199.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB3E171AB;
-	Fri, 21 Jun 2024 13:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.199.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1790D208A1
+	for <linux-block@vger.kernel.org>; Fri, 21 Jun 2024 14:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718978011; cv=none; b=mKGJSCw+2FYK4BQzqirZDqRIijZmx4Iw69qBUPyBvUMtxS+MeNSXzapC1oRHX/5M/zz94ZgqPbpM2l3BhgedXBZ6PfNcuCDRywPiBZk1hXh51KA193BSpB/wiOcWkf//JkV04kzgNj+6OSxeiHh5XEFvu2ACGl/2KP/Wz4L7PyE=
+	t=1718980143; cv=none; b=ppOych3I5T5as6UTmTdiP5h4Wwh1PtyESypibMMjM/6MrKdFpI/K98AUaf0pRiBPxli0N08ZTi2Z23xYt8qXrV12tH18xBjP3Ei6Oio/RJ89QjPHtmrKiIfKcR1X9RGGNzXfza8Mz/iJm7Ei2xofQpVv+L/g6uDNL61u4WJNcr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718978011; c=relaxed/simple;
-	bh=3ubbHzxDYLS7GUt9vO4bLHGBxIHFTHvMWZGjsN4/xPM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TmFVc1POhafM1isy73bEIrkP9XZQNSQK/GyI6dvqckMmPVDpG1TknV+9M6WBFSRJF8dqz2BjfoGgQ/GuaqU2VSWSyqaSkm/WqLrd4TD+6hAtA6tuL9qyS0YLDZ6XFDAjGp6VkNgN+6h9YvTkxMbT4b78a1eAQ/5fi/fZb1zn1Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=monom.org; dkim=pass (2048-bit key) header.d=monom.org header.i=@monom.org header.b=htY7I9hc; arc=none smtp.client-ip=49.12.199.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=monom.org
+	s=arc-20240116; t=1718980143; c=relaxed/simple;
+	bh=56Fo7ge/GaJ7kRUMXWtKUYd2boB/qHndzM21h2jkuTI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QfzSek3dly8cG5O4O46P3zvYpC/mHkl7Lf/s9ey3aAm8uXnYNOG0tUQ8l1EGGN1KLLpSJIA8VTOAZ/MnNV5S1eFJZb+JBXuDVucA4VnWwUGvo2xbA8uVQfX/o6Z38tG2W8rQsnAGAD+Q0If7sUsDdLAu6NPhg/WBliStFc2NDRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yCi9RXcW; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=monom.org header.i=@monom.org header.b="htY7I9hc"
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D7984DAD81;
-	Fri, 21 Jun 2024 15:53:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=monom.org; s=dkim;
-	t=1718978001; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=k5mhCBQQFyo/pEHelnW5w0jjgQcj3b/N98E7vKt3bO0=;
-	b=htY7I9hcSpMywnTn+OdfkPekbPSrDaFGG0Bk8oZvxcOj20UnFyizWaZbbvX6l30hPMhn4+
-	sS8V6IuJ31CF+3yVpZULD9v8xe5n2/l5fiSWlUmmgc85BQpraQA3/1K/FZO/pfCTU+cE/5
-	5JSaeKfljBcxXAW1NhYX1/ih6CJSc4skiphQJpWWTHjcTbKGY6N2kGaulSpejFH368lEua
-	70gwOBwGSJtrZp6t0Ccut8BPHOX9v/c2WMCM5cOPl01F18aV81g+B8y4tSkn+1EN+yz4Pf
-	J0P1KlokKjtL0yZE5g0ZyGYClpHHHL+tP4et8n60qp1+9TnNCBJo36Aj8fY5KA==
-From: Daniel Wagner <dwagner@suse.de>
-Date: Fri, 21 Jun 2024 15:53:12 +0200
-Subject: [PATCH 3/3] lib/group_cpus.c: honor housekeeping config when
- grouping CPUs
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yCi9RXcW"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5c1dddade45so23480eaf.2
+        for <linux-block@vger.kernel.org>; Fri, 21 Jun 2024 07:29:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1718980141; x=1719584941; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y1abM88BFe0lQRCbOZswUBP4pTWhgX2789Hxz6HQAYw=;
+        b=yCi9RXcWgPY73DTL0zaUltzOAbDSfPKRJzRtIzYuK08oTRM/DRLHaGs40qsavXAPMK
+         1L/oa52C+KHCoQmof6nrEDFJA3c+z5Dn8CmCPLZ5a0UNz7BY13/Yd5bmIaYI/RxzEskS
+         OC71P5Yldvz4O/Sw1sk58usICH1NeLiWdCYyREGRYLB2tvVxgN61VFyJgLiGxj+iPTVh
+         /zb822P4SfmTLKk5echBzTRL7mtzEX1lO9Vt8AUhARrnKH2w19QOXlbysljqMFXW1Zxy
+         s3kRSUKphl+I5f4a9RTU5mpkTxEmaKVjqR4X9PcysK7yNwZU2N35JqaS+/2EHJ1eu/9J
+         q4Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718980141; x=1719584941;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y1abM88BFe0lQRCbOZswUBP4pTWhgX2789Hxz6HQAYw=;
+        b=TbjePDO3XiHIK4GDwAGIqcNE9Mf6LPm2Tiyz7IbeP2Nnv35Ne3KTBdp2ctNyt/6ZA4
+         0BQIX9gi7tpnTNzDhrRu8YNB6s7TXqDpnW9xx/OpAbPkU4mN+fBPXqOAWcM1ha84zp49
+         QZlsWlkkAawfEbb+U41pSxe4+Z++HRFHOYNkRHnHC/CJEPbibQdO/MDxY7ewytzMi36h
+         YH12zfA+Gj2KvRiltNuA4BGkJsl+IAcloizhcOF593Oily0h56pcJ0hGurthEMdVX4ic
+         DmCevq3kxElfaZqIZWsiy/zvBWjMvIX4Mhw/vSHYvVks1g4/mOftvUhjMXu+qhTo4ft1
+         ducQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVocbKiNJaEY2ZVlWq48f18IKJLSZSFpf0UivBfG99m4lxEwnUgzmdsdJIA8GDDgXMsgsD5WwFusG4OqedBlDhAOjlIvtbzlD4ac/M=
+X-Gm-Message-State: AOJu0YzuO0a7O4S14lOZB1tZg+5yTAk5ykfgAEfcsgxyCKU+FLqBhr44
+	+p1YzP9tKEnxGzM4NBWsqT+JNuJ9UsWZJ+F/+L1lD6ivYWji9quPUWG9WZVqRYc=
+X-Google-Smtp-Source: AGHT+IEkuinnMEokNvg2WVwEkTmhWFZmN7sgYIOaiINLiCcfmqVoMGTXiCo/a5mwW2DIZdGNohN5Wg==
+X-Received: by 2002:a4a:c60f:0:b0:5bd:af39:c9d9 with SMTP id 006d021491bc7-5c1ad9093ebmr9612314eaf.0.1718980140889;
+        Fri, 21 Jun 2024 07:29:00 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5c1d58f236fsm276528eaf.37.2024.06.21.07.28.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jun 2024 07:29:00 -0700 (PDT)
+Message-ID: <2159f1ad-98c0-4a71-acb9-5e0360e28bfc@kernel.dk>
+Date: Fri, 21 Jun 2024 08:28:58 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch v9 00/10] block atomic writes
+To: John Garry <john.g.garry@oracle.com>, kbusch@kernel.org, hch@lst.de,
+ sagi@grimberg.me, jejb@linux.ibm.com, martin.petersen@oracle.com,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+ jack@suse.cz
+Cc: djwong@kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+ linux-scsi@vger.kernel.org, ojaswin@linux.ibm.com, linux-aio@kvack.org,
+ linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org, nilay@linux.ibm.com,
+ ritesh.list@gmail.com, willy@infradead.org, agk@redhat.com,
+ snitzer@kernel.org, mpatocka@redhat.com, dm-devel@lists.linux.dev,
+ hare@suse.de
+References: <20240620125359.2684798-1-john.g.garry@oracle.com>
+ <171891858790.154563.14863944476258774433.b4-ty@kernel.dk>
+ <674559cc-4ecf-43f0-9b76-94fa24a2cf72@oracle.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <674559cc-4ecf-43f0-9b76-94fa24a2cf72@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240621-isolcpus-io-queues-v1-3-8b169bf41083@suse.de>
-References: <20240621-isolcpus-io-queues-v1-0-8b169bf41083@suse.de>
-In-Reply-To: <20240621-isolcpus-io-queues-v1-0-8b169bf41083@suse.de>
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
- Sagi Grimberg <sagi@grimberg.me>, Thomas Gleixner <tglx@linutronix.de>, 
- Christoph Hellwig <hch@lst.de>
-Cc: Frederic Weisbecker <fweisbecker@suse.com>, 
- Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
- Sridhar Balaraman <sbalaraman@parallelwireless.com>, 
- "brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>, 
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-nvme@lists.infradead.org, Daniel Wagner <dwagner@suse.de>
-X-Mailer: b4 0.13.0
-X-Last-TLS-Session-Version: TLSv1.3
 
-group_cpus_evenly distributes all present CPUs into groups. This
-ignores the isolcpus configuration and assigns isolated CPUs into the
-groups.
+On 6/21/24 1:59 AM, John Garry wrote:
+> On 20/06/2024 22:23, Jens Axboe wrote:
+>> On Thu, 20 Jun 2024 12:53:49 +0000, John Garry wrote:
+>>> This series introduces a proposal to implementing atomic writes in the
+>>> kernel for torn-write protection.
+>>>
+>>> This series takes the approach of adding a new "atomic" flag to each of
+>>> pwritev2() and iocb->ki_flags - RWF_ATOMIC and IOCB_ATOMIC, respectively.
+>>> When set, these indicate that we want the write issued "atomically".
+>>>
+>>> [...]
+>> Applied, thanks!
+> 
+> Thanks Jens.
+> 
+> JFYI, we will probably notice a trivial conflict in
+> include/uapi/linux/stat.h when merging, as I fixed a comment there
+> which went into v6.10-rc4 . To resolve, the version in this series can
+> be used, as it also fixes that comment.
 
-Make group_cpus_evenly aware of isolcpus configuration and use the
-housekeeping CPU mask as base for distributing the available CPUs into
-groups.
-
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- lib/group_cpus.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 62 insertions(+), 2 deletions(-)
-
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index ee272c4cefcc..f1517a44abc9 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -8,6 +8,7 @@
- #include <linux/cpu.h>
- #include <linux/sort.h>
- #include <linux/group_cpus.h>
-+#include <linux/sched/isolation.h>
- 
- #ifdef CONFIG_SMP
- 
-@@ -330,7 +331,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
- }
- 
- /**
-- * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-+ * group_possible_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-  * @numgrps: number of groups
-  *
-  * Return: cpumask array if successful, NULL otherwise. And each element
-@@ -344,7 +345,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
-  * We guarantee in the resulted grouping that all CPUs are covered, and
-  * no same CPU is assigned to multiple groups
-  */
--struct cpumask *group_cpus_evenly(unsigned int numgrps)
-+static struct cpumask *group_possible_cpus_evenly(unsigned int numgrps)
- {
- 	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
- 	cpumask_var_t *node_to_cpumask;
-@@ -423,6 +424,65 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 	}
- 	return masks;
- }
-+
-+static struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
-+					      const struct cpumask *cpu_mask)
-+{
-+	cpumask_var_t *node_to_cpumask;
-+	cpumask_var_t nmsk;
-+	int ret = -ENOMEM;
-+	struct cpumask *masks = NULL;
-+
-+	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
-+		return NULL;
-+
-+	node_to_cpumask = alloc_node_to_cpumask();
-+	if (!node_to_cpumask)
-+		goto fail_nmsk;
-+
-+	masks = kcalloc(numgrps, sizeof(*masks), GFP_KERNEL);
-+	if (!masks)
-+		goto fail_node_to_cpumask;
-+
-+	build_node_to_cpumask(node_to_cpumask);
-+
-+	ret = __group_cpus_evenly(0, numgrps, node_to_cpumask, cpu_mask, nmsk,
-+				  masks);
-+
-+fail_node_to_cpumask:
-+	free_node_to_cpumask(node_to_cpumask);
-+
-+fail_nmsk:
-+	free_cpumask_var(nmsk);
-+	if (ret < 0) {
-+		kfree(masks);
-+		return NULL;
-+	}
-+	return masks;
-+}
-+
-+/**
-+ * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-+ * @numgrps: number of groups
-+ *
-+ * Return: cpumask array if successful, NULL otherwise. And each element
-+ * includes CPUs assigned to this group
-+ *
-+ * @group_possible_cpus_evently is used for distributing the cpus
-+ * on all possible cpus in absence of isolcpus command line argument.
-+ * If the isolcpus argument is used with io_queue option only
-+ * the housekeeping CPUs are considered.
-+ */
-+struct cpumask *group_cpus_evenly(unsigned int numgrps)
-+{
-+	const struct cpumask *io_queue_mask;
-+
-+	io_queue_mask = housekeeping_cpumask(HK_TYPE_IO_QUEUE);
-+	if (!cpumask_empty(io_queue_mask))
-+		return group_mask_cpus_evenly(numgrps, io_queue_mask);
-+	else
-+		return group_possible_cpus_evenly(numgrps);
-+}
- #else /* CONFIG_SMP */
- struct cpumask *group_cpus_evenly(unsigned int numgrps)
- {
+I did notice and resolved it when I merged it into my for-next branch.
+And then was kind of annoyed when I noticed it was caused by a patch
+from yourself as well, surely that should either have been part of the
+series, just ignored for -git, or done after the fact. Kind of pointless
+to cause conflicts with your own series right when it needs ready to go
+into the for-next tree.
 
 -- 
-2.45.2
+Jens Axboe
 
