@@ -1,152 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD52D4A3F;
-	Fri, 21 Jun 2024 21:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2222F3B;
+	Sat, 22 Jun 2024 05:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719005002; cv=none; b=YU+BxoZn1K6sxyI/7Ma29Z9wo0h2PJQVq1+0W2dqeWUajwVvXrpSU+TZCJTL9RkxhXbiatqiEWmgyCXmiUhBhGZJR8nfsBpgkOYfk3x2a00j7TsEu1uXDO3NdrqQivAq5t65WP/oyOzDKNTQ3CMJ5ltAABg4yTU3io7dCyiewbY=
+	t=1719033123; cv=none; b=lBBv3b3xu5XTnm5ans6POHtkDdSPGh7DK/MZzL1AquC3AZbYMfz6kpBV94RJA290nECWKtPkuvPT6/gUL+aIHihH6yClGqcG7waMuezUIr1a48krUvsa90kIRhsSjNrB4W1wCgpj84Ad5jDeWzfP+8SnoDO1NU0X66p6C/bXERA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719005002; c=relaxed/simple;
-	bh=N4ivVfcXJIy+QZ0gUdEeSMav33R3fT7xLRRwMgFHS5Q=;
+	s=arc-20240116; t=1719033123; c=relaxed/simple;
+	bh=N8OL5MbRF+25fuK878dj1vlC+U0d0d3B7mAxYg3cA1o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tLfjNcD60yOIApyoRlTz4LMauwUZqmDE3f0q09H33ae+0p7Y+6vN6dHS4BrJ9QyJCgxeTRaArtQQzDqz5P1JPYRKHcr4ytLeqGNMvUsob/cjTkLvOdDDN7f3/LQ12LHrezBXSJ+p/TzP4lykAjrqHDiWFryOpn3Zy9tOnJpEUSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KIjoAo9d; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KIjoAo9d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D506C2BBFC;
-	Fri, 21 Jun 2024 21:23:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719005001;
-	bh=N4ivVfcXJIy+QZ0gUdEeSMav33R3fT7xLRRwMgFHS5Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KIjoAo9dVPq/wWSw7vIa+LUCdLv/cy0F+UpK0V0o6GG4XtJGpPyWD7XS6VYSOCLbE
-	 96RxruHq6fyaGWj3Fcup4m2H2zjHCiaQsk2cwLejwCGTDk1h+CDL9GsEpDBeR+358D
-	 eVikhWol4HvrtRbxIVuPnG8/eXP7DgKHQJuJc+DHT3QbmE/Ug77DxemimyxG+bwVLd
-	 ayCRr4u6b+0c/fvSbv7PmeG3MeTeJovAWkBSk4O562mzy8+vpo9vIy6eLQV2Tb8vex
-	 6s75hABhrSF177DZx/ED7ySzT1gVAEo80N7qgJFHW46uWn0nuJwTC9rbYIeMvVkLYN
-	 /Y3Eol8tZh44w==
-Date: Fri, 21 Jun 2024 14:23:20 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>, axboe@kernel.dk, kbusch@kernel.org,
-	hch@lst.de, sagi@grimberg.me, jejb@linux.ibm.com,
-	martin.petersen@oracle.com, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, dchinner@redhat.com, jack@suse.cz,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	tytso@mit.edu, jbongio@google.com, linux-scsi@vger.kernel.org,
-	ojaswin@linux.ibm.com, linux-aio@kvack.org,
-	linux-btrfs@vger.kernel.org, io-uring@vger.kernel.org,
-	nilay@linux.ibm.com, ritesh.list@gmail.com, willy@infradead.org,
-	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
-	dm-devel@lists.linux.dev
-Subject: Re: [Patch v9 07/10] block: Add fops atomic write support
-Message-ID: <20240621212320.GE103020@frogsfrogsfrogs>
-References: <20240620125359.2684798-1-john.g.garry@oracle.com>
- <20240620125359.2684798-8-john.g.garry@oracle.com>
- <680ce641-729b-4150-b875-531a98657682@suse.de>
- <d3332752-52b1-4d24-88cf-3b5e7aa4b74a@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=q5zaAysc6jby6bH6+k6eM2xq+STk3MYtm5YNdd6mnn1HtsyBV19+mTVt8wHqOg/WYbcoVsVl0qw1KzVxs0RqedFKRhtcSE33glgu+aI6pmyYNRYs+W0B4X7ogpL2JchG0luHqcNH43cSBtqfFeUNUAihHBft+UrED2lbX1bxDMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 2E39668C7B; Sat, 22 Jun 2024 07:11:57 +0200 (CEST)
+Date: Sat, 22 Jun 2024 07:11:57 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Daniel Wagner <dwagner@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Christoph Hellwig <hch@lst.de>,
+	Frederic Weisbecker <fweisbecker@suse.com>,
+	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
+	Sridhar Balaraman <sbalaraman@parallelwireless.com>,
+	"brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/3] sched/isolation: Add io_queue housekeeping option
+Message-ID: <20240622051156.GA11303@lst.de>
+References: <20240621-isolcpus-io-queues-v1-0-8b169bf41083@suse.de> <20240621-isolcpus-io-queues-v1-1-8b169bf41083@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d3332752-52b1-4d24-88cf-3b5e7aa4b74a@oracle.com>
+In-Reply-To: <20240621-isolcpus-io-queues-v1-1-8b169bf41083@suse.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Jun 21, 2024 at 01:02:34PM +0100, John Garry wrote:
-> On 21/06/2024 07:13, Hannes Reinecke wrote:
-> > On 6/20/24 14:53, John Garry wrote:
-> > > Support atomic writes by submitting a single BIO with the REQ_ATOMIC set.
-> > > 
-> > > It must be ensured that the atomic write adheres to its rules, like
-> > > naturally aligned offset, so call blkdev_dio_invalid() ->
-> > > blkdev_atomic_write_valid() [with renaming blkdev_dio_unaligned() to
-> > > blkdev_dio_invalid()] for this purpose. The BIO submission path currently
-> > > checks for atomic writes which are too large, so no need to check here.
-> > > 
-> > > In blkdev_direct_IO(), if the nr_pages exceeds BIO_MAX_VECS, then we
-> > > cannot
-> > > produce a single BIO, so error in this case.
-> > > 
-> > > Finally set FMODE_CAN_ATOMIC_WRITE when the bdev can support atomic
-> > > writes
-> > > and the associated file flag is for O_DIRECT.
-> > > 
-> > > Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> > > Signed-off-by: John Garry <john.g.garry@oracle.com>
-> > > ---
-> > >   block/fops.c | 20 +++++++++++++++++---
-> > >   1 file changed, 17 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/block/fops.c b/block/fops.c
-> > > index 376265935714..be36c9fbd500 100644
-> > > --- a/block/fops.c
-> > > +++ b/block/fops.c
-> > > @@ -34,9 +34,12 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
-> > >       return opf;
-> > >   }
-> > > -static bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
-> > > -                  struct iov_iter *iter)
-> > > +static bool blkdev_dio_invalid(struct block_device *bdev, loff_t pos,
-> > > +                struct iov_iter *iter, bool is_atomic)
-> > >   {
-> > > +    if (is_atomic && !generic_atomic_write_valid(iter, pos))
-> > > +        return true;
-> > > +
-> > >       return pos & (bdev_logical_block_size(bdev) - 1) ||
-> > >           !bdev_iter_is_aligned(bdev, iter);
-> > >   }
-> > > @@ -72,6 +75,8 @@ static ssize_t __blkdev_direct_IO_simple(struct
-> > > kiocb *iocb,
-> > >       bio.bi_iter.bi_sector = pos >> SECTOR_SHIFT;
-> > >       bio.bi_write_hint = file_inode(iocb->ki_filp)->i_write_hint;
-> > >       bio.bi_ioprio = iocb->ki_ioprio;
-> > > +    if (iocb->ki_flags & IOCB_ATOMIC)
-> > > +        bio.bi_opf |= REQ_ATOMIC;
-> > >       ret = bio_iov_iter_get_pages(&bio, iter);
-> > >       if (unlikely(ret))
-> > > @@ -343,6 +348,9 @@ static ssize_t __blkdev_direct_IO_async(struct
-> > > kiocb *iocb,
-> > >           task_io_account_write(bio->bi_iter.bi_size);
-> > >       }
-> > > +    if (iocb->ki_flags & IOCB_ATOMIC)
-> > > +        bio->bi_opf |= REQ_ATOMIC;
-> > > +
-> > >       if (iocb->ki_flags & IOCB_NOWAIT)
-> > >           bio->bi_opf |= REQ_NOWAIT;
-> > > @@ -359,12 +367,13 @@ static ssize_t __blkdev_direct_IO_async(struct
-> > > kiocb *iocb,
-> > >   static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct
-> > > iov_iter *iter)
-> > >   {
-> > >       struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
-> > > +    bool is_atomic = iocb->ki_flags & IOCB_ATOMIC;
-> > >       unsigned int nr_pages;
-> > >       if (!iov_iter_count(iter))
-> > >           return 0;
-> > > -    if (blkdev_dio_unaligned(bdev, iocb->ki_pos, iter))
-> > > +    if (blkdev_dio_invalid(bdev, iocb->ki_pos, iter, is_atomic))
-> > 
-> > Why not passing in iocb->ki_flags here?
-> > Or, indeed, the entire iocb?
-> 
-> We could (pass the iocb), but we only need to look up one thing - ki_pos. We
-> already have is_atomic local. I am just trying to make things as efficient
-> as possible. If you really think it's better (to pass iocb), then it can be
-> changed.
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index 2b461129d1fa..fe751d704e99 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -16,6 +16,7 @@ enum hk_type {
+>  	HK_TYPE_WQ,
+>  	HK_TYPE_MANAGED_IRQ,
+>  	HK_TYPE_KTHREAD,
+> +	HK_TYPE_IO_QUEUE,
+>  	HK_TYPE_MAX
+>  };
 
-I certainly do. ;)
+It might be a good time to write comments explaining these types?
 
-https://lore.kernel.org/linux-xfs/20240620212401.GA3058325@frogsfrogsfrogs/
-
---D
-
-> Thanks,
-> John
-> 
-> 
