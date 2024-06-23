@@ -1,101 +1,145 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2762BB12;
-	Sun, 23 Jun 2024 07:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2FA18C335;
+	Sun, 23 Jun 2024 13:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719126233; cv=none; b=mAO5fdlFOu4KIwYxPhhNv1zwjjbkLceJkpb5aPq1019bkWoMUhy1VanuMMQs2UciY5xWa4pgjD5x61T7udjUsgQ1ABmh50rC0eNM8aUtu0hgpVClBHNLttQe/eLDFXp+xW+rmPQ6up79xWquqgiKYg9xvjKdcuVesI0HUZT1F1A=
+	t=1719150283; cv=none; b=HYLdnW+bMwfK6VfhbAYCXKd+Ob2W9i5HXgyz/iOgTDhE64ByMtWwjQYemxxNJIpDnAihchDCXhLyUZYvCKKCisHmcuI7eDrOadmO9ktueUbB+RR46I3GRy7EmLCbeHz8KY99c96KMqoBjOq2PSm5FNAyUHGi8Ve+B3ua811ChMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719126233; c=relaxed/simple;
-	bh=/5BmjUa7LwamVshyhd8I9KJHh/+blm0Ja3Sr9jm7QWo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p31rSQnaXq62co+rvflfm7bB/0l9+yLHss0Y+cyRqGa7vY22c9pGoIYXtu12jArtXSW6bhb993pEpwMMsY2ZEP6ioVTct/UKYFzod9kWc6zcuKTZSn15T2qEp/uz7U1dQUkfAQeXUw0mF1C5EfN1g859aHeiCZgiV2yECwAldkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42479dece93so4893785e9.0;
-        Sun, 23 Jun 2024 00:03:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719126230; x=1719731030;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wv+nb63jc8RX+XM579eAzoR3ORtF5l0kMJ0jYedplWM=;
-        b=VB6IV84nS3cbN60gN1NQMYu+Gizwr4sg7m2QhdMOsKTYy190jnMTAL7/eVyFDJW1rx
-         ci0UfVSxkHxD/yp9UrW5C75vSl11QH/BVJwlupCTv1AR7WrvvSpTnuuif5GqXQubrUIp
-         0fadkCJn0fLd4yg/2RXhXF5XHAkGYl82QVjlmmIdvu8m2v4py1RXX8W01mVcpXNmIMtV
-         wuymMKeFQBDuUyM5UGGDmJtEXuP0Ktkwmfi2fHLYO319Fa9EpIPalv5yA9x7BNJc4YYB
-         8dLxX0feUOeVM6eto5zTtVOZmQKhzZ2Je2nTY0P4Gxe/mSBuEiUGsoZDLsJOsV4ibAgA
-         veGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVlheAs45sZBr6ALCTUlEAvhW38oKdByritPxi2AwIzW+h/U8X4sw26cK+JapV+ixhdxvA9q9hNI6P5kJTndauP6n/CcM1gMl2jm62aj23HqkI/VTzS/8cA/LZGD6PzX+iCP5dYCmqfBU8=
-X-Gm-Message-State: AOJu0YwSFGcFZeQQ3UkMOjElTqBnw/G4J/gYpHMG6/yiX/5Bi1lW2kEp
-	PhutLNZfDT1C8idk7Uff8hR2L4ylpNKO9cy53CrSLvSNU7KoylwX
-X-Google-Smtp-Source: AGHT+IEFnKUhu/I1x5TTgU8A64wWsdGchv2Vq9HTIBSF0tK7sTEaqtJeSsf2sJNzJFpypmhL2ozVZw==
-X-Received: by 2002:a05:6000:2a7:b0:366:eb60:bd12 with SMTP id ffacd0b85a97d-366eb60beb4mr559833f8f.3.1719126229676;
-        Sun, 23 Jun 2024 00:03:49 -0700 (PDT)
-Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3663a8c7c79sm6575582f8f.96.2024.06.23.00.03.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Jun 2024 00:03:49 -0700 (PDT)
-Message-ID: <e1e35796-2d9e-41ac-a515-a39dc1866070@grimberg.me>
-Date: Sun, 23 Jun 2024 10:03:47 +0300
+	s=arc-20240116; t=1719150283; c=relaxed/simple;
+	bh=TIqYV/DnQm52v3SsiEvply4u33fseIDKi2tfoRZaOQg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WWLDhpjqg2ZnvZSTENXLTsGY1mFLBXDAq4L1OncOrOsFfWxNvS/KEthblYWid5e+VuermEIryWNefPwvx5vJJCVlJeESrqvsQSEnhMCcs2QtsCP2sAuzIJRtrYALrNM28P/z/H7gVoUfRR6xBFQoI5U7K6ecAb2PRh7ba8Xc+gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1qb005i; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1qb005i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84255C4AF07;
+	Sun, 23 Jun 2024 13:44:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719150283;
+	bh=TIqYV/DnQm52v3SsiEvply4u33fseIDKi2tfoRZaOQg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=u1qb005ijnbs6UgPT5vSDxr8BSLLsMEE68Yd8sQw0KiV+xrEBB2gYVwMc1WXLnwOI
+	 FAQKXWYT+DwiDoGGM0kRWaMHfZIdYyf0MX5CO1SnekcM1ND6x9j1f10RefcUUuMzZ4
+	 /WVYJ34MEXVq8HhLXt0ebK0ZzewXgaKYFRnI6aqSnUxZ/MTBTuCJk/seQZhe/FHsTB
+	 GUE0xyldhWcoYHKutiGtaugofpGu8iZjSrgKQRXhdRKMGcQNqbC7k+5dwOgoBuxyvz
+	 iJzdIPBvW0ukD4+DNjJxMUcyl8E6XN8OwMNOa/snFk/DG9qxssGOi/DucZc3CIpOJh
+	 TxQMZuaesQhLA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Cyril Hrubis <chrubis@suse.cz>,
+	Jan Kara <jack@suse.cz>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 21/21] loop: Disable fallocate() zero and discard if not supported
+Date: Sun, 23 Jun 2024 09:43:54 -0400
+Message-ID: <20240623134405.809025-21-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240623134405.809025-1-sashal@kernel.org>
+References: <20240623134405.809025-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] nvme-pci: limit queue count to housekeeping cpus
-To: Christoph Hellwig <hch@lst.de>, Daniel Wagner <dwagner@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>,
- Frederic Weisbecker <fweisbecker@suse.com>, Mel Gorman <mgorman@suse.de>,
- Hannes Reinecke <hare@suse.de>,
- Sridhar Balaraman <sbalaraman@parallelwireless.com>,
- "brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org
-References: <20240621-isolcpus-io-queues-v1-0-8b169bf41083@suse.de>
- <20240621-isolcpus-io-queues-v1-2-8b169bf41083@suse.de>
- <20240622051420.GC11303@lst.de>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240622051420.GC11303@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.6
+Content-Transfer-Encoding: 8bit
 
+From: Cyril Hrubis <chrubis@suse.cz>
 
+[ Upstream commit 5f75e081ab5cbfbe7aca2112a802e69576ee9778 ]
 
-On 22/06/2024 8:14, Christoph Hellwig wrote:
->> diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
->> index 9638b25fd521..43c039900ef6 100644
->> --- a/block/blk-mq-cpumap.c
->> +++ b/block/blk-mq-cpumap.c
->> @@ -11,10 +11,23 @@
->>   #include <linux/smp.h>
->>   #include <linux/cpu.h>
->>   #include <linux/group_cpus.h>
->> +#include <linux/sched/isolation.h>
->>   
->>   #include "blk.h"
->>   #include "blk-mq.h"
->>   
->> +unsigned int blk_mq_num_possible_queues(void)
->> +{
->> +	const struct cpumask *io_queue_mask;
->> +
->> +	io_queue_mask = housekeeping_cpumask(HK_TYPE_IO_QUEUE);
->> +	if (!cpumask_empty(io_queue_mask))
->> +		return cpumask_weight(io_queue_mask);
->> +
->> +	return num_possible_cpus();
->> +}
->> +EXPORT_SYMBOL_GPL(blk_mq_num_possible_queues);
-> This should be split into a separate patch.  And it could really use
-> a kerneldoc comment.
+If fallcate is implemented but zero and discard operations are not
+supported by the filesystem the backing file is on we continue to fill
+dmesg with errors from the blk_mq_end_request() since each time we call
+fallocate() on the loop device the EOPNOTSUPP error from lo_fallocate()
+ends up propagated into the block layer. In the end syscall succeeds
+since the blkdev_issue_zeroout() falls back to writing zeroes which
+makes the errors even more misleading and confusing.
 
-Agree.
+How to reproduce:
 
-Other than that, looks good.
+1. make sure /tmp is mounted as tmpfs
+2. dd if=/dev/zero of=/tmp/disk.img bs=1M count=100
+3. losetup /dev/loop0 /tmp/disk.img
+4. mkfs.ext2 /dev/loop0
+5. dmesg |tail
+
+[710690.898214] operation not supported error, dev loop0, sector 204672 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.898279] operation not supported error, dev loop0, sector 522 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.898603] operation not supported error, dev loop0, sector 16906 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.898917] operation not supported error, dev loop0, sector 32774 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.899218] operation not supported error, dev loop0, sector 49674 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.899484] operation not supported error, dev loop0, sector 65542 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.899743] operation not supported error, dev loop0, sector 82442 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.900015] operation not supported error, dev loop0, sector 98310 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.900276] operation not supported error, dev loop0, sector 115210 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+[710690.900546] operation not supported error, dev loop0, sector 131078 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+
+This patch changes the lo_fallocate() to clear the flags for zero and
+discard operations if we get EOPNOTSUPP from the backing file fallocate
+callback, that way we at least stop spewing errors after the first
+unsuccessful try.
+
+CC: Jan Kara <jack@suse.cz>
+Signed-off-by: Cyril Hrubis <chrubis@suse.cz>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Link: https://lore.kernel.org/r/20240613163817.22640-1-chrubis@suse.cz
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/loop.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 28a95fd366fea..95a468eaa7013 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -302,6 +302,21 @@ static int lo_read_simple(struct loop_device *lo, struct request *rq,
+ 	return 0;
+ }
+ 
++static void loop_clear_limits(struct loop_device *lo, int mode)
++{
++	struct queue_limits lim = queue_limits_start_update(lo->lo_queue);
++
++	if (mode & FALLOC_FL_ZERO_RANGE)
++		lim.max_write_zeroes_sectors = 0;
++
++	if (mode & FALLOC_FL_PUNCH_HOLE) {
++		lim.max_hw_discard_sectors = 0;
++		lim.discard_granularity = 0;
++	}
++
++	queue_limits_commit_update(lo->lo_queue, &lim);
++}
++
+ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+ 			int mode)
+ {
+@@ -320,6 +335,14 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+ 	ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
+ 	if (unlikely(ret && ret != -EINVAL && ret != -EOPNOTSUPP))
+ 		return -EIO;
++
++	/*
++	 * We initially configure the limits in a hope that fallocate is
++	 * supported and clear them here if that turns out not to be true.
++	 */
++	if (unlikely(ret == -EOPNOTSUPP))
++		loop_clear_limits(lo, mode);
++
+ 	return ret;
+ }
+ 
+-- 
+2.43.0
+
