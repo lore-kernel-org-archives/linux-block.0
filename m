@@ -1,47 +1,36 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A42A61FEB;
-	Mon, 24 Jun 2024 08:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D0718E29;
+	Mon, 24 Jun 2024 08:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719218593; cv=none; b=U1IXhPMWTL9dxMSkjt5ANT8BvdSfnNFT38ZrGqIsYtDI4AJGxQwQXoGRNQVDiGg9xR9IAQ9f3GfHSZLgDFWLq2/Dj5jqN94ku3lWrv6zfUm359ziiPrcXlhY0PB69KmuwXn+2GGaWubFB5acfJLbY77cih5BPTSYlLQEbgB/X3I=
+	t=1719218830; cv=none; b=B2VrdyQNEfYrxqcDZwlf2JHepuH4UwcYqxXLUkjP1btYFRGGE2rxOoy4uqVWJhnVB6y8B5YuwMUmDToz59Ycbxx7PjJ5yCnCRIU9819bAhKPpcRuOMhGOlNUiF0rvwPx1I1IHMNGtEZlebSnBnD80HBIJsIKf+0AH7uOEQbIQyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719218593; c=relaxed/simple;
-	bh=v0v6mdua10htkr5rmjnF+4yE/ELelGG2LLeUT4SmCz0=;
+	s=arc-20240116; t=1719218830; c=relaxed/simple;
+	bh=qeet0RtAm9g1lKDvB5CrRQDn6qEdIqwsJ93yWzBvHsg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Aq5WCSDoY1/PCxDsVKlCmf6zcVUJZ7DsqJfwVLZIfZzYgtHmLRAGomNrv7s3dSszALbOi3HFkwxzuJggKFp3tHUvpEfvTUSBz/Q7NJUpKKu/XU0TS8XhItoAWpUVj0ol1BfXn/GGZWfc+qzZq4RdVUmKbfr+vnCbNWW/K9NUqCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nIwx96pW; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nIwx96pW"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=7X88en6kIJuV7GibrV5exBa9x7h2ezZRUiFA95jmMeI=; b=nIwx96pWhzjYwMhsnIUjXamBSk
-	vBPDl0fnd0QWA5jzXPGtk1s8Qx1doUOm7yFPQQ1fOtK/r+/KIVwizdSZRQ2S1tomhwx2ytFXfe8fF
-	PDsMC3EziK7U7ZvziO6J1+7rYx4NSceIKXWzr459sxxBZ42ORhAVsjqkv2mYOQhvO1Jr6lbN6n2Ic
-	aU03Uvk4SV03LMCDRh8aSrzqmImilVzid2Y5/A4tZpCKXxINA3Bw5dqm/9T7JwFhY07pbIU4MM7Gb
-	NvGvKcnkU2rJ5cB/ko16APoLb+eJNOrJRMzx4C9P3D7BOoCUgFA/ueh0WRnHUw4F2N7leqkxYkMyN
-	PLdqwwCw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sLfI7-0000000G60A-1dJp;
-	Mon, 24 Jun 2024 08:43:11 +0000
-Date: Mon, 24 Jun 2024 01:43:11 -0700
-From: "hch@infradead.org" <hch@infradead.org>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	Bryan Gurney <bgurney@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>
-Subject: Re: blktests dm/002 always fails for me
-Message-ID: <Znkxn7LymUjD3Wac@infradead.org>
-References: <ZmqrzUyLcUORPdOe@infradead.org>
- <pysa5z7udtu2rotezahzhkxjif7kc4nutl3b2f74n3qi2sp7wr@nt5morq6exph>
- <ZmvezI1KcsyE3Unl@infradead.org>
- <42ecobcsduvlqh77iavjj2p3ewdh7u4opdz4xruauz4u5ddljz@yr7ye4fq72tr>
+	 Content-Type:Content-Disposition:In-Reply-To; b=raBOWYPn5MsoSAUUZIUhTOIpR35Zs4RrU8q/uDWIELCERropABo2T1WKuC9gHLbkZkQpciUZsHjGUnlsqh1d/Xocf+bLM0TnRwciyLGjEqcpiRn8URARKgKyokeB7NL8f4CKNYrlrltSlawins3993xA894UKVki/EUM787av+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id DDE1068B05; Mon, 24 Jun 2024 10:47:05 +0200 (CEST)
+Date: Mon, 24 Jun 2024 10:47:05 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Daniel Wagner <dwagner@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Frederic Weisbecker <fweisbecker@suse.com>,
+	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
+	Sridhar Balaraman <sbalaraman@parallelwireless.com>,
+	"brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/3] sched/isolation: Add io_queue housekeeping option
+Message-ID: <20240624084705.GA20292@lst.de>
+References: <20240621-isolcpus-io-queues-v1-0-8b169bf41083@suse.de> <20240621-isolcpus-io-queues-v1-1-8b169bf41083@suse.de> <20240622051156.GA11303@lst.de> <x2mjbnluozxykdtqns47f37ssdkziovkdzchon5zkcadgkuuif@qloym5wjwomm>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,13 +39,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <42ecobcsduvlqh77iavjj2p3ewdh7u4opdz4xruauz4u5ddljz@yr7ye4fq72tr>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <x2mjbnluozxykdtqns47f37ssdkziovkdzchon5zkcadgkuuif@qloym5wjwomm>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Jun 24, 2024 at 04:58:29AM +0000, Shinichiro Kawasaki wrote:
-> Based on this guess, I guess a change below may avoid the failure.
+On Mon, Jun 24, 2024 at 09:13:06AM +0200, Daniel Wagner wrote:
+> On Sat, Jun 22, 2024 at 07:11:57AM GMT, Christoph Hellwig wrote:
+> > > diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> > > index 2b461129d1fa..fe751d704e99 100644
+> > > --- a/include/linux/sched/isolation.h
+> > > +++ b/include/linux/sched/isolation.h
+> > > @@ -16,6 +16,7 @@ enum hk_type {
+> > >  	HK_TYPE_WQ,
+> > >  	HK_TYPE_MANAGED_IRQ,
+> > >  	HK_TYPE_KTHREAD,
+> > > +	HK_TYPE_IO_QUEUE,
+> > >  	HK_TYPE_MAX
+> > >  };
+> > 
+> > It might be a good time to write comments explaining these types?
 > 
-> Christoph, may I ask you to see if this change avoids the failure you observe?
+> Sure, will do.
+> 
+> Do you think we should introduce a new type or just use the existing
+> managed_irq for this?
 
-Still fails in exactly the same way with that patch.
-
+No idea really.  What was the reason for adding a new one?  The best
+person to comment on this is probably Thomas.
