@@ -1,42 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E44376;
-	Mon, 24 Jun 2024 07:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7743C488;
+	Mon, 24 Jun 2024 07:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719212756; cv=none; b=H77ib/vVDJeUB//NdLMqMeaW65u3rJNlyjWIFQwkuj1J4Aaq0Z21Jx8XFSl1sWJmRHqqVa5rwTpTIfu+4dHglGv6b83r8Lp4IM1h+kjyuT89Fxwe13eITsaMygEzA5UohRy2tLnIfw8jVlod8dk9fUn7wqrzl7DlIgvOlBrd95U=
+	t=1719213197; cv=none; b=jWg0bw6e4CRvwgdpGhzj3bOWRdAqEjXRKZ2WTIgReybEZYMNkOOwpfJBgUlQfVtUd5p28KmN9N1PusSPrdFaoWZ7ciHdnQVoCJiLTZAb8rpQzZA/Fg2lmwoWuiVG4cXloO0f2VYu3TuLycwMJ1h0+oOC3z6jaVT5Wx6PJzX7qrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719212756; c=relaxed/simple;
-	bh=afYDRNFVM8pcvIJP4tvmzkmT6QeFWMGtIsLSC0oDa1k=;
+	s=arc-20240116; t=1719213197; c=relaxed/simple;
+	bh=iTdtiEwt9/HJOLVwSAPvN2XojIrFY/KVShnhsvo1OKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dAAkQAon0olbwddR+Fc37pZY7noTogVKfoZBYWGPi8y69QidXDgUd0BlvqR7o2dmPsgrjST9PxRycVjL7nV13Rvrv+KlUoLB9cq4EpFwsTrxVr42QvWr9joXoj0SlRkqUrUx5fzdGjYIG7HQKuDERiRGseB5NdIE+n8jzOHA3T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=h7sqw2QW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZMI3u9rxGm63yTqv0gBcYpWUusZByENjFAFTJ1tgrXsXUIOkz3GYkv08RRYodrcFywojtzQBlNsNLDQLKe2flfZOA7EU81213z12/J3qo68vYbKBOzd5wF2HR2Ru5T+al3h9NbTtE6O37KOdpqivwMGo4NqxeEGkgjU9RMfFzrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XuPjne2P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IQUWtLYK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XuPjne2P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IQUWtLYK; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="h7sqw2QW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B821DC2BBFC;
-	Mon, 24 Jun 2024 07:05:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1719212756;
-	bh=afYDRNFVM8pcvIJP4tvmzkmT6QeFWMGtIsLSC0oDa1k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h7sqw2QWEulxyaQ4IqxxFfF/rlrwaq6zfYShXcbuY5Av9xgQpjih/48A8cJFg80Bb
-	 jXvg+iHotIalCcB5/yxMEwcz9I8uFVjUF1lGxHe9ITsnTazF3BBU+herdvfRs6GFF5
-	 SbcFQ11FqvOSl4zHwtJUNCKkChyZI0oHrNeFptZs=
-Date: Mon, 24 Jun 2024 09:05:59 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Chun-Yi Lee <joeyli.kernel@gmail.com>
-Cc: Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Emelianov <xemul@openvz.org>,
-	Kirill Korotaev <dev@openvz.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Nicolai Stange <nstange@suse.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Chun-Yi Lee <jlee@suse.com>
-Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
- places
-Message-ID: <2024062448-crushable-custody-dc7e@gregkh>
-References: <20240624064418.27043-1-jlee@suse.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XuPjne2P";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IQUWtLYK";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XuPjne2P";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IQUWtLYK"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 111491F7B8;
+	Mon, 24 Jun 2024 07:13:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719213193; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hGdwXDllEsEEQ9aIN8vKYDMClfAsoO/eykqwd28TUUY=;
+	b=XuPjne2PyEnx/QmjaV2VH09wnLKuzfWRUZDgbILUusIx8RpTMRM3Oy0gEL+cJORAdZY4cT
+	B30BsktTIx0plmkuGKGBpqpT8K43oyl3V9ayV7X31XiaRLjD8R9GQLJ8BzMbOfFcWvEWPQ
+	+oWlfpePxbm/2TKv5joEhtmReGFTslw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719213193;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hGdwXDllEsEEQ9aIN8vKYDMClfAsoO/eykqwd28TUUY=;
+	b=IQUWtLYKVJ88s/pwDMVLWk8DekxzAQGD1ArYT24w84Hqdu/YKuZGNh5m8bTqxHa0iamvX/
+	it1sVNVoYXZ5mkBA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719213193; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hGdwXDllEsEEQ9aIN8vKYDMClfAsoO/eykqwd28TUUY=;
+	b=XuPjne2PyEnx/QmjaV2VH09wnLKuzfWRUZDgbILUusIx8RpTMRM3Oy0gEL+cJORAdZY4cT
+	B30BsktTIx0plmkuGKGBpqpT8K43oyl3V9ayV7X31XiaRLjD8R9GQLJ8BzMbOfFcWvEWPQ
+	+oWlfpePxbm/2TKv5joEhtmReGFTslw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719213193;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hGdwXDllEsEEQ9aIN8vKYDMClfAsoO/eykqwd28TUUY=;
+	b=IQUWtLYKVJ88s/pwDMVLWk8DekxzAQGD1ArYT24w84Hqdu/YKuZGNh5m8bTqxHa0iamvX/
+	it1sVNVoYXZ5mkBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7DCAD13ACD;
+	Mon, 24 Jun 2024 07:13:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3YGmEIUceWZReAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Mon, 24 Jun 2024 07:13:09 +0000
+Date: Mon, 24 Jun 2024 09:13:06 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
+	Sagi Grimberg <sagi@grimberg.me>, Thomas Gleixner <tglx@linutronix.de>, 
+	Frederic Weisbecker <fweisbecker@suse.com>, Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
+	Sridhar Balaraman <sbalaraman@parallelwireless.com>, "brookxu.cn" <brookxu.cn@gmail.com>, 
+	Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/3] sched/isolation: Add io_queue housekeeping option
+Message-ID: <x2mjbnluozxykdtqns47f37ssdkziovkdzchon5zkcadgkuuif@qloym5wjwomm>
+References: <20240621-isolcpus-io-queues-v1-0-8b169bf41083@suse.de>
+ <20240621-isolcpus-io-queues-v1-1-8b169bf41083@suse.de>
+ <20240622051156.GA11303@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,31 +91,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240624064418.27043-1-jlee@suse.com>
+In-Reply-To: <20240622051156.GA11303@lst.de>
+X-Spamd-Result: default: False [-2.26 / 50.00];
+	BAYES_HAM(-2.96)[99.81%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,grimberg.me,linutronix.de,suse.com,suse.de,parallelwireless.com,gmail.com,redhat.com,vger.kernel.org,lists.infradead.org];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -2.26
+X-Spam-Level: 
 
-On Mon, Jun 24, 2024 at 02:44:18PM +0800, Chun-Yi Lee wrote:
-> For fixing CVE-2023-6270, f98364e92662 ("aoe: fix the potential
-> use-after-free problem in aoecmd_cfg_pkts") makes tx() calling dev_put()
-> instead of doing in aoecmd_cfg_pkts(). It avoids that the tx() runs
-> into use-after-free.
+On Sat, Jun 22, 2024 at 07:11:57AM GMT, Christoph Hellwig wrote:
+> > diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> > index 2b461129d1fa..fe751d704e99 100644
+> > --- a/include/linux/sched/isolation.h
+> > +++ b/include/linux/sched/isolation.h
+> > @@ -16,6 +16,7 @@ enum hk_type {
+> >  	HK_TYPE_WQ,
+> >  	HK_TYPE_MANAGED_IRQ,
+> >  	HK_TYPE_KTHREAD,
+> > +	HK_TYPE_IO_QUEUE,
+> >  	HK_TYPE_MAX
+> >  };
 > 
-> Then Nicolai Stange found more places in aoe have potential use-after-free
-> problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
-> and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
-> packet to tx queue. So they should also use dev_hold() to increase the
-> refcnt of skb->dev.
-> 
-> Link: https://nvd.nist.gov/vuln/detail/CVE-2023-6270
-> Fixes: f98364e92662 ("aoe: fix the potential use-after-free problem in aoecmd_cfg_pkts")
-> Reported-by: Nicolai Stange <nstange@suse.com>
-> Signed-off-by: Chun-Yi Lee <jlee@suse.com>
-> ---
+> It might be a good time to write comments explaining these types?
 
-<formletter>
+Sure, will do.
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
-
-</formletter>
+Do you think we should introduce a new type or just use the existing
+managed_irq for this?
