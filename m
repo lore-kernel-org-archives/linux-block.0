@@ -1,62 +1,183 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC05F13D52C;
-	Mon, 24 Jun 2024 13:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438F613BAFA;
+	Mon, 24 Jun 2024 13:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719234528; cv=none; b=bHSGagT4YKrv6H+zmxXuO6npI3Xxcfud/oC2JGBmzAln6QZ8N7aiQPYwkmtpsURDi07MAxjubzggFj36azuK6oguJKnvIO+ovfUJrga+HN/H4eN99sKzluxnfb0ZAEJXtzlvqyO1sa3oRIrJhlNlQlMeNwFxfRsDFQAGe1e7v28=
+	t=1719234658; cv=none; b=imMz4LsgcHLZEQ4a7uhufFLgfPzTlbgNul8yUTE0gjnlI3kNQxbLazHjPlxFL6bBAdNiRg0/A25dxxl4zzg1zHi7tNo/q0BTPqNP2Bd3ft77HI3eDdt5T1Mnxf6Sx0eswXlob6ucKysIAT0kNM8rcfLcMZWAR5lPvZ9rxjri5B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719234528; c=relaxed/simple;
-	bh=elktvRmRWMFF3akLMYTbgALaJAk0J9jAD/5pgrqU9LQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tVGBpVD14dyYJqiOraGE/PVrw76QN5EDh2olXPCw3VDLSg7wO7SlS+k3HeFXa/xmJIeaSq+VS4P+uXlq5pK7LMEQIjthS3KnacqlMcuQVb+5J9Elg3P0XB5K/BnqPOC+48x9YcnLFvuGLOh52Mf/hmg/UiZl7n6+wLX3P5QHrtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1evnTsom; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1evnTsom"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=RAYpch24oHtj+2O2FrYbUvGaHv5G6WBMIUIZdXLEKU4=; b=1evnTsomBZyZR14QUzFVZobyjQ
-	3IOgsgJqPrx6vY6rs0Z3YSijrHQD5TrbzvQ0knj9pownYk/hUDqJRDkFtTWWqrJZV3J9SNUQRee1p
-	Aw9BGn24ATN91SBdBYXATfxOnZs5yS9tgphTAcOzsd5lUCN8MgPqsFDpOe6FEysYkmnukpMWq8F34
-	3KwPPvQB13UPCWOUbPCJOs6Oo6zJyrtJdTFNNOkivqtG3RN3HNsAsYHijc8UP5YhHKwWUbZfiEk1W
-	uZ645aczMJz20bMkt9Cr/JmdRc1iztzqFScq6JmcoPaCk/Ae7lQEIq3GaO6/nOwC5/DyNNo8efd9v
-	b6l2jNlg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sLjR8-0000000Grz4-0J4d;
-	Mon, 24 Jun 2024 13:08:46 +0000
-Date: Mon, 24 Jun 2024 06:08:46 -0700
-From: "hch@infradead.org" <hch@infradead.org>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	Bryan Gurney <bgurney@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>
-Subject: Re: blktests dm/002 always fails for me
-Message-ID: <Znlv3iR74jbi8Rc9@infradead.org>
-References: <ZmqrzUyLcUORPdOe@infradead.org>
- <pysa5z7udtu2rotezahzhkxjif7kc4nutl3b2f74n3qi2sp7wr@nt5morq6exph>
- <ZmvezI1KcsyE3Unl@infradead.org>
- <42ecobcsduvlqh77iavjj2p3ewdh7u4opdz4xruauz4u5ddljz@yr7ye4fq72tr>
- <Znkxn7LymUjD3Wac@infradead.org>
- <i4skne2yegneuyuw7nqt2mziuywjwo2p54emgba3fjcg5rflhe@dvqy65je7boc>
- <ZnlcrgxYvqqy5uoK@infradead.org>
- <lkgvrxzyxf5gpxzdb5yq5epbhhxdz72rfqnjbzg4qyi6npndsw@g6wkv5jh37wj>
+	s=arc-20240116; t=1719234658; c=relaxed/simple;
+	bh=HtblSTw1nKDAHfs2ii6UyHOamhA9qGV0kkZxWsC7jWY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GmM/wXHtMxHm+J9m4NF8p10ylNO4AEth8nvrpuvrnwtFHAdFQerQclMa8LE8ftxE67nbftjQYhbY6/Va5uRq1Zan7SWmiQjCxtnXk6Q54GhNMCosp3KjpSGhey+Z502ohcYmzmfpeeYGz/qk0d349TjkMp4e+0HQ+8KsrS4m/14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W77cZ26MHz4f3m78;
+	Mon, 24 Jun 2024 21:10:38 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 5680E1A0572;
+	Mon, 24 Jun 2024 21:10:50 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP2 (Coremail) with SMTP id Syh0CgB334RZcHlmcrLaAA--.31654S4;
+	Mon, 24 Jun 2024 21:10:50 +0800 (CST)
+From: Li Lingfeng <lilingfeng@huaweicloud.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	hch@lst.de,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yangerkun@huawei.com,
+	yukuai1@huaweicloud.com,
+	houtao1@huawei.com,
+	yi.zhang@huawei.com,
+	lilingfeng@huaweicloud.com,
+	lilingfeng3@huawei.com
+Subject: [PATCH] block: cancel all throttled bios when deleting the cgroup
+Date: Mon, 24 Jun 2024 21:09:40 +0800
+Message-Id: <20240624130940.3751791-1-lilingfeng@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <lkgvrxzyxf5gpxzdb5yq5epbhhxdz72rfqnjbzg4qyi6npndsw@g6wkv5jh37wj>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgB334RZcHlmcrLaAA--.31654S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxWr4xWF47tryrZrWUKr13twb_yoWrJFWxpr
+	WfuFyYkw1Utr9I9r4agr4UJFWSq395XrWag397Ga1ayrWIyw1jqF1kZa4rXFWrJF93Cr4a
+	vF45tr48WF18W37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
+	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+	fUF9a9DUUUU
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-Yes, it is a 4k block size device.  With your patch the test passes
-fine.
+From: Li Lingfeng <lilingfeng3@huawei.com>
+
+When a process migrates to another cgroup and the original cgroup is deleted,
+the restrictions of throttled bios cannot be removed. If the restrictions
+are set too low, it will take a long time to complete these bios.
+
+Refer to the process of deleting a disk to remove the restrictions and
+issue bios when deleting the cgroup.
+
+References:
+https://lore.kernel.org/r/20220318130144.1066064-4-ming.lei@redhat.com
+
+Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+---
+ block/blk-throttle.c | 68 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 44 insertions(+), 24 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index c1bf73f8c75d..a0e5b28951ca 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1534,6 +1534,42 @@ static void throtl_shutdown_wq(struct request_queue *q)
+ 	cancel_work_sync(&td->dispatch_work);
+ }
+ 
++static void tg_cancel_bios(struct throtl_grp *tg)
++{
++	struct throtl_service_queue *sq = &tg->service_queue;
++
++	if (tg->flags & THROTL_TG_CANCELING)
++		return;
++	/*
++	 * Set the flag to make sure throtl_pending_timer_fn() won't
++	 * stop until all throttled bios are dispatched.
++	 */
++	tg->flags |= THROTL_TG_CANCELING;
++
++	/*
++	 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
++	 * will be inserted to service queue without THROTL_TG_PENDING
++	 * set in tg_update_disptime below. Then IO dispatched from
++	 * child in tg_dispatch_one_bio will trigger double insertion
++	 * and corrupt the tree.
++	 */
++	if (!(tg->flags & THROTL_TG_PENDING))
++		return;
++
++	/*
++	 * Update disptime after setting the above flag to make sure
++	 * throtl_select_dispatch() won't exit without dispatching.
++	 */
++	tg_update_disptime(tg);
++
++	throtl_schedule_pending_timer(sq, jiffies + 1);
++}
++
++static void throtl_pd_offline(struct blkg_policy_data *pd)
++{
++	tg_cancel_bios(pd_to_tg(pd));
++}
++
+ struct blkcg_policy blkcg_policy_throtl = {
+ 	.dfl_cftypes		= throtl_files,
+ 	.legacy_cftypes		= throtl_legacy_files,
+@@ -1541,6 +1577,7 @@ struct blkcg_policy blkcg_policy_throtl = {
+ 	.pd_alloc_fn		= throtl_pd_alloc,
+ 	.pd_init_fn		= throtl_pd_init,
+ 	.pd_online_fn		= throtl_pd_online,
++	.pd_offline_fn		= throtl_pd_offline,
+ 	.pd_free_fn		= throtl_pd_free,
+ };
+ 
+@@ -1561,32 +1598,15 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+ 	 */
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
+-		struct throtl_grp *tg = blkg_to_tg(blkg);
+-		struct throtl_service_queue *sq = &tg->service_queue;
+-
+-		/*
+-		 * Set the flag to make sure throtl_pending_timer_fn() won't
+-		 * stop until all throttled bios are dispatched.
+-		 */
+-		tg->flags |= THROTL_TG_CANCELING;
+-
+ 		/*
+-		 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
+-		 * will be inserted to service queue without THROTL_TG_PENDING
+-		 * set in tg_update_disptime below. Then IO dispatched from
+-		 * child in tg_dispatch_one_bio will trigger double insertion
+-		 * and corrupt the tree.
++		 * disk_release will call pd_offline_fn to cancel bios.
++		 * However, disk_release can't be called if someone get
++		 * the refcount of device and issued bios which are
++		 * inflight after del_gendisk.
++		 * Cancel bios here to ensure no bios are inflight after
++		 * del_gendisk.
+ 		 */
+-		if (!(tg->flags & THROTL_TG_PENDING))
+-			continue;
+-
+-		/*
+-		 * Update disptime after setting the above flag to make sure
+-		 * throtl_select_dispatch() won't exit without dispatching.
+-		 */
+-		tg_update_disptime(tg);
+-
+-		throtl_schedule_pending_timer(sq, jiffies + 1);
++		tg_cancel_bios(blkg_to_tg(blkg));
+ 	}
+ 	rcu_read_unlock();
+ 	spin_unlock_irq(&q->queue_lock);
+-- 
+2.31.1
 
