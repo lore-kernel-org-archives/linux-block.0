@@ -1,107 +1,230 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472A3135A7C
-	for <linux-block@vger.kernel.org>; Mon, 24 Jun 2024 11:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0939C13791B
+	for <linux-block@vger.kernel.org>; Mon, 24 Jun 2024 11:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719226906; cv=none; b=qr0GDpQSZN+exWQ0VnXxZWtPWUHgrkECEfxNSER6JeQt0JILBl1ACaHHFQzdpxM9A438s/VHWwsjL7EidyxItb7M92P4qkhZ+MF9Bn/hZYxyBHHkt+RFy3uWPegoBke65iIRNNW3dDbpt5uTPBS9RKJZsxXUI0cYPqevWDjq7NI=
+	t=1719226991; cv=none; b=FbcQRjTde2BCaRJ8IO01JEv20yF14tO8vZ13Yp6NfPkzYoLDHCAIyogM9tLAtKcPMWgD6t5UFWRJXgd9wZ2r78h7YMvVgjGkAe+f+Sp+Rhz/UQFrpSSa7V9ThCUfDldwcTidx8WjOjg+DPxFOqk+JlWT45ug5BB0RoALo66k3Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719226906; c=relaxed/simple;
-	bh=g+UI2h+MbGePnkXweRNbz/BpFp2mvZy8j4UxIIDhLSE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dm4AIWKA6jG0ag43OBn4/WtqY9ZDU9dsBwGH07DU+EqemAhsHFqw0oqmJJglwbnoOxsc3rhVhUufECIXj+u1tA5ckE7kMBIozj2BObys2/EyhrnLKT/775I/Y1A33I9kynd9LSWgWmJhrNSUsA/WSoEtyzeKR0TMqs/CJ2s6efs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NhEKSraQ; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1719226991; c=relaxed/simple;
+	bh=aBpS1pkDlNpJM7K9xxkzLUHegsLBeWyXpD5uLOOeVhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=czq5q7VFDNmTbC4Qm7jY2twk2gUA5v/mUE7Hxt0C2x/XXkz/tm1Qs9NVoQaMwLyQ05dENyeLzBt6Tg31Q5XoRFiYhaTaBJn1J66I7PJSnBVuSNfJqh9s8iJ/3U0s6JkYok3jjdC4nU58l8ug4Ipx2PamrhLT8ypCey/i2ZM7VWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=JLflTxBU; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NhEKSraQ"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ec50d4e47bso26187031fa.2
-        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2024 04:01:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1719226902; x=1719831702; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-transfer-encoding
-         :content-disposition:mime-version:references:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xbk+wnOEmNszGUoP4v3r9GEXmsbbE+/wd4rojn5Lqnw=;
-        b=NhEKSraQ2m7+vetuQcQhJEq/Ty+XV+HIdFQEaDlkgmRIbn607Z6WctVCqsPx9RKf0H
-         ZCL8p7muO8fk6Ov7tBeevYjxuKpDKUfsSfPHSjCLviIgfuQr0Vojmfcp/gQ/d0RFD3Q5
-         FPPv5gkUT3tlzhscPsWTrrE4UuLBcbTpBbC2BST284anEl/ETKvnQpuNs8SdNpiKo9uI
-         R27W5keEUdeZUI6J3KG5EHmydeBguwdQxpjYCFYRcmeUjWuPoLy2AdmGChtghFNNw5bh
-         oHMtIhcD/cMVlRYWXi9gPtaTKLf8JuhoQ6GxGfWu6xUAmKmV5FrmNqOB33rcGJBQAWV1
-         suDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719226902; x=1719831702;
-        h=user-agent:in-reply-to:content-transfer-encoding
-         :content-disposition:mime-version:references:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xbk+wnOEmNszGUoP4v3r9GEXmsbbE+/wd4rojn5Lqnw=;
-        b=eaqod21hPo1hklyOR1TYD5QpRq4sMiIWLYWv+9AETNhuC910AkYLhq3EP750bxIRr2
-         7tnTUrKwBCFWiu6hBsz+2YMUsWhaznLuNWtuxOl0eVCvxNpOyzL6vW8UTOH+aitPDLW5
-         gOVJ5FB/dRnycdn8F+YzWdlupNYw1X2pqlsDGEfcK+hyG0OxmM8jwb/ZrR1uxSOhwBuB
-         f6jdZCeGc3IOXVI6Hwq6TBvABNGoFj6Q3jjhYW+DfcdYo8aFzJz5DPRYy5Yes3C+3fRE
-         56gy4oICU4FJn97TpG0s54+QP3+s/3vtqi5ojOOWZSFsJMJqEXgwADkhfzRENXYRJZBn
-         tlzQ==
-X-Gm-Message-State: AOJu0YzLAPISCP0a8gGnWoVGGloz8x+zw1M90xxmmCjfeJhnjCPZ58mp
-	4wR44FcOSpHBMhakiB2wLtqKpnhzJ6uPezMaHTC0iLrTgOOGhx3FwzH0hXZ04GE=
-X-Google-Smtp-Source: AGHT+IHSWtAgQHovXxTzoDGYAhW6mCaubV6lUO2+ifOmfKeJEhvEGMv6lloJzC1GDEF/16hsCBqg+Q==
-X-Received: by 2002:a2e:b011:0:b0:2ec:5019:becd with SMTP id 38308e7fff4ca-2ec5b2e937amr25874761fa.49.1719226902144;
-        Mon, 24 Jun 2024 04:01:42 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c819dd0cf7sm6407091a91.48.2024.06.24.04.01.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Jun 2024 04:01:41 -0700 (PDT)
-Date: Mon, 24 Jun 2024 19:01:37 +0800
-From: joeyli <jlee@suse.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: linux-block@vger.kernel.org, Justin Sanders <justin@coraid.com>,
-	Chun-Yi Lee <joeyli.kernel@gmail.com>, stable@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jens Axboe <axboe@kernel.dk>, Kirill Korotaev <dev@openvz.org>,
-	Nicolai Stange <nstange@suse.com>,
-	Pavel Emelianov <xemul@openvz.org>
-Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
- places
-Message-ID: <20240624110137.GI7611@linux-l9pv.suse>
-References: <20240624064418.27043-1-jlee@suse.com>
- <b75a3e00-f3ec-4d06-8de8-6e93f74597e4@web.de>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="JLflTxBU"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240624110306epoutp01f8a68d8451239dc2c93e9cad8a693012~b69XQG2aZ2624826248epoutp01h
+	for <linux-block@vger.kernel.org>; Mon, 24 Jun 2024 11:03:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240624110306epoutp01f8a68d8451239dc2c93e9cad8a693012~b69XQG2aZ2624826248epoutp01h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1719226986;
+	bh=uxpMOuA3IRgLqQWXX8+eqtJkWwddlx/GN7rdVWV2/6g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JLflTxBU070L20Ugm/A+/Dt0F7x6DQp5L5lpX/pqEyk0zue6JVzb0+f1K50kGRwIF
+	 zOeDFNP1CNgOc1JkJCWsvapVrdeL2DSGMYsVVplCj6UNquW+ZgaIJcXBbeU7kio2Yz
+	 dmx8omQMkOOG2og1ZnMCbWcIR9nHh0fdSitznPU4=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240624110304epcas5p4c8ab6937c499617cbbaaa96fc5a4769f~b69Vn-po40506905069epcas5p4q;
+	Mon, 24 Jun 2024 11:03:04 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4W74nL5C7Kz4x9Pt; Mon, 24 Jun
+	2024 11:03:02 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	24.C9.09989.66259766; Mon, 24 Jun 2024 20:03:02 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20240624105121epcas5p3a5a8c73bd5ef19c02e922e5829a4dff0~b6zG9Ypk82450824508epcas5p3C;
+	Mon, 24 Jun 2024 10:51:21 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240624105121epsmtrp130aa2d7a4474a6eba09309959ab71409~b6zG3AObb1223312233epsmtrp1c;
+	Mon, 24 Jun 2024 10:51:21 +0000 (GMT)
+X-AuditID: b6c32a4a-bffff70000002705-3d-6679526612e3
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E4.9B.29940.9AF49766; Mon, 24 Jun 2024 19:51:21 +0900 (KST)
+Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240624105114epsmtip2b4e30650a5edb6427c3e9344921bba5e~b6zAu4Mi31228012280epsmtip2c;
+	Mon, 24 Jun 2024 10:51:14 +0000 (GMT)
+Date: Mon, 24 Jun 2024 16:14:07 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>, Damien Le Moal
+	<dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>, Jonathan Corbet
+	<corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>, Mike Snitzer
+	<snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Keith Busch
+	<kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
+	<kch@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
+	Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	martin.petersen@oracle.com, david@fromorbit.com, hare@suse.de,
+	damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
+	nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
+ and request layer.
+Message-ID: <20240624103212.2donuac5apwwqaor@nj.shetty@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20240605082028.GC18688@lst.de>
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TezBcdxTH53fv3buXic56lB8aNTeTZCReKx4/EZI2hlvRjKnRaZsRNvay
+	Brs7ux5lmnqE1CPeCWMboZh6pQyhg41SaiUEI0JCSyWlJSJIUn1k0OXSyX+f8z2P3++cM4fC
+	Ddr4ZlS4NJpVSEWRNKlLfN9rZWUT+lF8qL36AY0aBzQ4SsnbwFH9dC6JlnpfAFS0+g+O5rq/
+	Auj10AiOWjQzAM12nUTlFaUEmuxux9DtigIM1db3Yejr4ksY6ttaJlFBzwRA8+MqDHVOHUXf
+	XK4i0O3OuwQa67hOorJv5/moun8TQ/np4xhqm0sGqGFphUB3pszRyEY/79Q7zNiDM8xABWTa
+	VdN8ZmSmiWDGhmKY5roMkrlVlcgs3CoBjHoyiWQqcwp5TPal5yTTnvYrj1mbnyKYlR/GSSan
+	pQ4w98p/4vsZfhZxQsKKxKzCkpWGyMTh0jB3+ox/0OkgJ2d7oY3QFbnQllJRFOtOe/r62XiF
+	R2oHRFvGiiJjtJKfSKmk7TxOKGQx0aylRKaMdqdZuThS7ii3VYqilDHSMFspG31caG/v4KQN
+	DI6QPKzr48snLT5fy7rPSwIq00ygQ0GBI/z7+hQvE+hSBgI1gBnDMxhnvACwsbCd5Ix1AOsr
+	urG9lCcNVbtRnQC+nMgDnPESwP5Hs+R2FCE4CDc0an4moChScBQOblHbspGAhvNPh3biccEw
+	CTNUi/i2w1AQDJcH8nnbrCc4DRueP+JzrA/vlswR26wjsIbFqYM7yVDwuw4saV3BuS95wt6y
+	Nh7HhvBpfwufYzO4mHt5l+Ng7dUakktOBVD1UAU4x0mYNpC7UwgXSOCf7RW7hfbDawMNGKe/
+	BbNfz+32rwfbbuzxAXizsZzk2BRO/JW8ywxc6lojuLF8R8AbeXP8PGCheqMj1RvvcXwcZqym
+	aJnSsjms3qQ42Rj+PNZMcLIVbOywKwdkHTBl5cqoMFbpJHeQsnH/7zxEFtUMdk7oiE8beDy7
+	atsDMAr0AEjhtJFecWJsqIGeWBSfwCpkQYqYSFbZA5y028rHzd4OkWlvUBodJHR0tXd0dnZ2
+	dD3mLKRN9JbSSsUGgjBRNBvBsnJWsZeHUTpmSViryuXxoXsL+rUf+L6XzE9/NhJS16V+FXjB
+	7tr7M+fjE0BA+NRFz4yFL0267cStg8fKhgJ6fvF3e/KhxPKL0Ua3aqGJcSl12NvbxKLoj+HZ
+	bM+O0voLqfir3qIf/bxaazSTBz2dmvwT9xeMBGY7eI9nBRSfX3Itai431WgS0yvfDRqc8Lji
+	bxVXzRwIoD2fxQ8e9vDgZyxWjpjonjvrsFXKD6uB+r5SbFQhLfx3dH2fzELswpu56Y6bNzcl
+	ZeWqvTOTw+yj9k0nSGM/7lodDUw4t6zc8nEzu5KCZfetR2Sfihu2u+9l/UlHs91Fec7Z2uBu
+	v08PGY0vxltvsoXGv6kTfe7QhFIiEh7BFUrRfzJEnsTLBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xTZxzG855zejjFoMdTL29pRdNpIqAo0W3vB68x6IvGeIlfqovQ2SMQ
+	oUJL6XTZQAG5TAXUQSzIXZQyQS4y7kqhMOgIItYIBkYZDQ6E4iXLFCla2DK+PXl+z/N/vvwZ
+	kosVuDMhqkherVKEymhXqrpFtnpj8aFzpze3TolRWWcbiS6mzpCoZCCFRuMtbwBKn3pPopFH
+	CQBNd3WTqKptEKChhztRbv4tCvU9qiVQQ/41AhWXmAiUmRFLINPsBI2uGZ8BZLPoCdTY743y
+	LhVSqKGxg0K9dVk0yimyuaA77Q4CpSVaCFQzcgGg0nE7hX7rl6DumXbBLinufXoAd+ZDXKsf
+	cMHdg+UU7u3S4gpDEo0rC6Pxy8qbANf3xdC44Op1Ab4SO0nj2vg/BPi1rZ/C9iYLja9WGQD+
+	PbfV5bDouOs2JR8aEsWrN+0IdA22FpRQ4W8l383eeyiIAT0rkoGQgexWOFxaSDg1x9YDmG3n
+	530xLJppJee1CBY7Rl2SgevnzGsAe5rMlBNQ7Do401b/GTAMzXpD8yzjtJexMmgb6wLOPMk+
+	oWHjg0yBE4jYQDjRmTan3dg9sHTy+b9H+0jYOhVHzIOlsOPmyNwAyX4Fsyut5LxeAV/0VlDO
+	MZKVwDuOuTEhuwFmxJlBKliqX9DWL2jrF7T1/7dzAWUAYj5cExYUpvEN91XxOh+NIkyjVQX5
+	nDobVgHm/sTLswb8apjyMQKCAUYAGVK2zC0jOuo056ZUnDvPq88GqLWhvMYIJAwlW+m28uUV
+	JccGKSL5Mzwfzqv/owQjdI8hKkwmd6tw2hKR5/FjkviLA8bpg7QuoTs7aktdAs+M9r/bZjpx
+	+YglxCw5KVovlZd/neZ312N3k277t2aD3+hs+2K5yfCD50FlYAkTcXvfPb/OBNhSdLQOJh+r
+	Pp/FLTekZy1xVJX/aU+ps8n3x9vE/2SO+W+Rft9jTdG+WPX4ho5jh/ePld33ePVL9cdF9T+T
+	uqyLggGHPEpIK4+mNhxrnvQY3rAx3hNX2Q0dlYnyDuUhf+6D9q61OW5iyJH5tC/RXMCtvRDR
+	tHc7aX0VII0cbNM/qJFvHvJeI/a6/KW03b9Z8CY4qWxc+fYv9u9vcuDeZz8Ne93Wr1FFB3B7
+	RM/TZZQmWOHrRao1ik966v6UlgMAAA==
+X-CMS-MailID: 20240624105121epcas5p3a5a8c73bd5ef19c02e922e5829a4dff0
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_b15cc_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240624105121epcas5p3a5a8c73bd5ef19c02e922e5829a4dff0
+References: <eda6c198-3a29-4da4-94db-305cfe28d3d6@acm.org>
+	<9f1ec1c1-e1b8-48ac-b7ff-8efb806a1bc8@kernel.org>
+	<a866d5b5-5b01-44a2-9ccb-63bf30aa8a51@acm.org>
+	<665850bd.050a0220.a5e6b.5b72SMTPIN_ADDED_BROKEN@mx.google.com>
+	<abe8c209-d452-4fb5-90eb-f77b5ec1a2dc@acm.org>
+	<20240601055931.GB5772@lst.de>
+	<d7ae00c8-c038-4bed-937e-222251bc627a@acm.org>
+	<20240604044042.GA29094@lst.de>
+	<4ffad358-a3e6-4a88-9a40-b7e5d05aa53c@acm.org>
+	<20240605082028.GC18688@lst.de>
+	<CGME20240624105121epcas5p3a5a8c73bd5ef19c02e922e5829a4dff0@epcas5p3.samsung.com>
+
+------atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_b15cc_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b75a3e00-f3ec-4d06-8de8-6e93f74597e4@web.de>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Description: 
 
-Hi Markus,
+On 05/06/24 10:20AM, Christoph Hellwig wrote:
+>On Tue, Jun 04, 2024 at 04:44:34AM -0700, Bart Van Assche wrote:
+>> On 6/3/24 21:40, Christoph Hellwig wrote:
+>>> There is no requirement to process them synchronously, there is just
+>>> a requirement to preserve the order.  Note that my suggestion a few
+>>> arounds ago also included a copy id to match them up.  If we don't
+>>> need that I'm happy to leave it away.  If need it it to make stacking
+>>> drivers' lifes easier that suggestion still stands.
+>>
+>> Including an ID in REQ_OP_COPY_DST and REQ_OP_COPY_SRC operations sounds
+>> much better to me than abusing the merge infrastructure for combining
+>> these two operations into a single request. With the ID-based approach
+>> stacking drivers are allowed to process copy bios asynchronously and it
+>> is no longer necessary to activate merging for copy operations if
+>> merging is disabled (QUEUE_FLAG_NOMERGES).
+>
+>Again, we can decided on QUEUE_FLAG_NOMERGES per request type.  In fact
+>I think we should not use it for discards as that just like copy
+>is a very different kind of "merge".
+>
+>I'm in fact much more happy about avoiding the copy_id IFF we can.  It
+>it a fair amout of extra overhead, so we should only add it if there
+>is a real need for it
 
-On Mon, Jun 24, 2024 at 10:40:13AM +0200, Markus Elfring wrote:
-> >                   … So they should also use dev_hold() to increase the
-> > refcnt of skb->dev.
-> …
-> 
->   reference counter of “skb->dev”?
-> 
+Christoph, Martin, Bart, Hannes, Damien
 
-Yes, I will update my wording. Thanks!
+We have iterated over couple of designs for copy offload, but ended up
+with changing them owing to some drawbacks. I would like to take your
+opinion on how we can plumb copy offload in block and dm layer.
 
-Joey Lee
+For reference, I have listed the approaches we have taken in the past.
 
-> 
-> …
-> > Fixes: f98364e92662 ("aoe: fix the potential use-after-free problem in aoecmd_cfg_pkts")
-> 
-> Would you like to add a “stable tag”?
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/stable-kernel-rules.rst?h=v6.10-rc4#n34
-> 
-> 
-> Will an adjusted summary phrase become more helpful?
-> 
-> Regards,
-> Markus
+a. Token/payload based approach:
+1. Here we allocate a buffer/payload.
+2. First source BIO is sent along with the buffer.
+3. Once the buffer reaches driver, it is filled with the source LBA
+and length and namespace info. And the request is completed.
+4. Then destination BIO is sent with same buffer.
+5. Once the buffer reaches driver, it retrieves the source information from
+the BIO and forms a copy command and sends it down to device.
+
+We received feedback that putting anything inside payload which is not
+data, is not a good idea[1].
+
+
+b. Plug based approach:
+1. We take a plug.
+2. Send a destination BIO, this forms a copy request and waits for source BIO
+to arrive.
+3. Send a source BIO, this merges with the copy request which was formed
+by destination BIO.
+4. We release the plug, then copy request reaches driver layer and forms
+a copy command.
+
+This approach won't work with stacked devices which has asynchronous
+submission.
+Overall taking plug and merging BIOs received not so good feedback from
+community.
+
+c. List/ctx based approach:
+A new member is added to bio, bio_copy_ctx, which will a union with
+bi_integrity. Idea is once a copy bio reaches blk_mq_submit_bio, it will
+add the bio to this list.
+1. Send the destination BIO, once this reaches blk_mq_submit_bio, this
+will add the destination BIO to the list inside bi_copy_ctx and return
+without forming any request.
+2. Send source BIO, once this reaches blk_mq_submit_bio, this will
+retrieve the destination BIO from bi_copy_ctx and form a request with
+destination BIO and source BIO. After this request will be sent to
+driver.
+
+This work is still in POC phase[2]. But this approach makes lifetime
+management of BIO complicated, especially during failure cases.
+
+Thank You,
+Nitesh Shetty
+
+[1] https://lore.kernel.org/linux-block/20230605121732.28468-1-nj.shetty@samsung.com/
+[2] https://github.com/SamsungDS/linux/tree/feat/co/v21/ctx
+
+------atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_b15cc_
+Content-Type: text/plain; charset="utf-8"
+
+
+------atUsqPFm-1W_PDIhMRaVeMNpJ8wr1jcbO3GdUizRktR65zpR=_b15cc_--
