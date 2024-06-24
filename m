@@ -1,90 +1,136 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4C44503C
-	for <linux-block@vger.kernel.org>; Mon, 24 Jun 2024 19:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F724962C;
+	Mon, 24 Jun 2024 21:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719255996; cv=none; b=XQCiptNrFmdHt43uTeu9TI+BS8QAKxLfRm/BsDjlYbuvZbWQeyZoOoyiNA0o+D/Xs0md8+QImdPCuPxpr4tP0M/nZoi6HXeBn1yVgxS0Mw+D1NebtGEfLuPIdqzMOCXto18i9kV7CxtFrM+kZhpxNq3wQY5Yl4ioTQQI+DN5aeE=
+	t=1719266135; cv=none; b=HLQovh15a2hkFZYb6sDBT2iPU7sPqE26SqHEAoRe1itFaCzgi7V7lojG1xP8isnIieTghJ8VvmK0D4SpWkHrSXQWUfcqMZUZvS0CWlTCl2blYnmnH79OuVr8m5QQPjMUa3j4zoD9aCF4rVG1azllP77Raarb9Vq8SgypCIDbNyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719255996; c=relaxed/simple;
-	bh=OqWeQVvsUI5YBiAgMDyrQoAEq3yLGhUFkHm8BLPS2Fs=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=d8Ejvce7hSFVsQJmB//6TUEaYEbimz8GseNE97kiFemiIgm9Hx92wofssWYZ8e5x/EqhEQD8OuReFvEP/apftEK5BrXrX0fefLz7oEIt/n4Gw+t/L3qv3yC58GlWfeyYX62jeLBfxx35iY1g4NH/BCnPMV/t+BEVYo3SpZ++aLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=whadlr0k; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1719266135; c=relaxed/simple;
+	bh=ssw0CE3X6rtJAiVWYNCh9l8N9P1eQeBKDrj05miOGGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g/ukruaTQM3JZ/XBK1u8DqqjJSK4xM/8uOYR+POGJOnD9q9QSEMu3L9x53BhJGNjbrZHcxNOZpN/cflj+9RRBq8QSRTLjH4aURcA28a/mkrRLjNiOV84QOXeTJ9pSQNf7ukXW/DlfvS0boh7YSIerLbt7HBznUYk2JWFHFKle+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5e5otEl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="whadlr0k"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-6c386a3ac43so599351a12.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Jun 2024 12:06:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719255993; x=1719860793; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zt+XckMCgwoVkrDTdIIAkFkXvtaQX7cPyosJFtPFqoQ=;
-        b=whadlr0kvhqTaKbQM8AGDkG/FGpNcNOrI8SEKOZA7muT5soiwQr44qIGR4CmeEmmcE
-         yPC/aYTPXdUfGMbOvWT0luM1gz+F4eGwUeY/N7heNhgVuhVRTxDKntHLAQ7uvZaWzeVq
-         nETCqMPoIpCOI4cUuBI7ZmnVXJmzzPykm2eYJgOnyrRAwQKS2KmcaBNxqf5CrYjIlsGa
-         kgqH9k2iCKXbNwGadn5o4x+T+4/Mikz8g2wOjCLpoJi68pDUe1s8+jsv56Zr4xIRhL6g
-         HRUY/LQaB8MAbiDbHzeaDYW/+MjVWcHPLF6IrD/L9XBcanDmqKE1KqyQB2i/xGsq9ZRl
-         LWtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719255993; x=1719860793;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zt+XckMCgwoVkrDTdIIAkFkXvtaQX7cPyosJFtPFqoQ=;
-        b=otXyv9Dekvg0gT/+2thsvr1nHFIcp5bWIAyHwIWQk3rCbHO5G9gTcndC/0H7STAaju
-         MZzr0LEOXe3AKE/T89QOxkB9F7X2y7qAozKqNRse76MhpcrxL3N6ZXYj7RoPcMGoiACE
-         EhX8Tcu2cOPzvfMNzycQZ+WkGOwVTxwV//WsKPBolQB3xDC7fDmr+NKwrwTS/XhE10tm
-         IgoiiUXBJJwjGoik3L4r7tjldXoFKXKZAY+JLTmJ/T9Tu7Tqfut/P577G2RUolSn1QhJ
-         qa+rVV76hmdtrPA5JV5O9laUP3sfvD9gmLpt0WAzGiyRQENbykt+P6G7dkXNswtURIdc
-         Jupg==
-X-Gm-Message-State: AOJu0YwjHeOIdiwixcuASD9L8SnH/lAyws819qM1KyELHmMHL33JfHiK
-	3f1IziDclFm5SckJUgbP/o3DGBb6H7y4RursvcD3Og5XlsrUQ1Bv1a/PtAE52yM=
-X-Google-Smtp-Source: AGHT+IH6KRgxuAO7sJVn3jqgvuwaWMZ+ajh8iY1fyJwVrd/GB7OmWgccJmKTQ6x/UE8c1viA0sBjbg==
-X-Received: by 2002:a05:6a00:8604:b0:704:23c3:5f8a with SMTP id d2e1a72fcca58-70667c4e286mr7053907b3a.1.1719255993169;
-        Mon, 24 Jun 2024 12:06:33 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-716b364680fsm4972107a12.5.2024.06.24.12.06.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jun 2024 12:06:32 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, kernel test robot <oliver.sang@intel.com>, 
- Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20240624173835.76753-1-hch@lst.de>
-References: <20240624173835.76753-1-hch@lst.de>
-Subject: Re: [PATCH] block: fix the blk_queue_nonrot polarity
-Message-Id: <171925599216.326063.1788159845342471524.b4-ty@kernel.dk>
-Date: Mon, 24 Jun 2024 13:06:32 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5e5otEl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11C22C2BBFC;
+	Mon, 24 Jun 2024 21:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719266134;
+	bh=ssw0CE3X6rtJAiVWYNCh9l8N9P1eQeBKDrj05miOGGg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=h5e5otElt6qUnWFncwXReRgalS93n3GWdHfZI61HaUNM702vEiLU2OL3hRtmeZ7pW
+	 ohhQ3/5IVk0g8hUUHWlUqfFBEMPtZPqq9cQTQXiwSXMSd207XtxM9X16zMkpmCwa1h
+	 P7loUD40U+W2bSN567WlBElAPghrvm140h9uxIRABpJMhzaJxKaale7wIivArgxwds
+	 17sJnrpbor04AXrsi4bw/9WuT16U52EHU+4DHQipBM/gHcQC+G9CN1yr9Xg4UveXWD
+	 yQLKSBhNO7cmx1X2iEik5+dutOQ4SzhHG4PwsLAFryjtPCKpTROi/LdExZix+Cs8Gm
+	 97NMXmBhfGsSg==
+Message-ID: <de54c406-9270-4145-ab96-5fc3dd51765e@kernel.org>
+Date: Tue, 25 Jun 2024 06:55:29 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
+ and request layer.
+To: Bart Van Assche <bvanassche@acm.org>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ martin.petersen@oracle.com, david@fromorbit.com, hare@suse.de,
+ damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com, joshi.k@samsung.com,
+ nitheshshetty@gmail.com, gost.dev@samsung.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org
+References: <eda6c198-3a29-4da4-94db-305cfe28d3d6@acm.org>
+ <9f1ec1c1-e1b8-48ac-b7ff-8efb806a1bc8@kernel.org>
+ <a866d5b5-5b01-44a2-9ccb-63bf30aa8a51@acm.org>
+ <665850bd.050a0220.a5e6b.5b72SMTPIN_ADDED_BROKEN@mx.google.com>
+ <abe8c209-d452-4fb5-90eb-f77b5ec1a2dc@acm.org> <20240601055931.GB5772@lst.de>
+ <d7ae00c8-c038-4bed-937e-222251bc627a@acm.org>
+ <20240604044042.GA29094@lst.de>
+ <4ffad358-a3e6-4a88-9a40-b7e5d05aa53c@acm.org>
+ <20240605082028.GC18688@lst.de>
+ <CGME20240624105121epcas5p3a5a8c73bd5ef19c02e922e5829a4dff0@epcas5p3.samsung.com>
+ <6679526f.170a0220.9ffd.aefaSMTPIN_ADDED_BROKEN@mx.google.com>
+ <4ea90738-afd1-486c-a9a9-f7e2775298ff@acm.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <4ea90738-afd1-486c-a9a9-f7e2775298ff@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.0
 
-
-On Mon, 24 Jun 2024 19:38:35 +0200, Christoph Hellwig wrote:
-> Take care of the inverse polarity of the BLK_FEAT_ROTATIONAL flag
-> vs the old nonrot helper.
+On 2024/06/25 1:25, Bart Van Assche wrote:
+> On 6/24/24 3:44 AM, Nitesh Shetty wrote:
+>> For reference, I have listed the approaches we have taken in the past.
+>>
+>> a. Token/payload based approach:
+>> 1. Here we allocate a buffer/payload.
+>> 2. First source BIO is sent along with the buffer.
+>> 3. Once the buffer reaches driver, it is filled with the source LBA
+>> and length and namespace info. And the request is completed.
+>> 4. Then destination BIO is sent with same buffer.
+>> 5. Once the buffer reaches driver, it retrieves the source information from
+>> the BIO and forms a copy command and sends it down to device.
+>>
+>> We received feedback that putting anything inside payload which is not
+>> data, is not a good idea[1].
 > 
+> A token-based approach (pairing copy_src and copy_dst based on a token)
+> is completely different from a payload-based approach (copy offload
+> parameters stored in the bio payload). From [1] (I agree with what has
+> been quoted): "In general every time we tried to come up with a request
+> payload that is not just data passed to the device it has been a
+> nightmare." [ ... ] "The only thing we'd need is a sequence number / idr
+> / etc to find an input and output side match up, as long as we
+> stick to the proper namespace scope."
 > 
+>> c. List/ctx based approach:
+>> A new member is added to bio, bio_copy_ctx, which will a union with
+>> bi_integrity. Idea is once a copy bio reaches blk_mq_submit_bio, it will
+>> add the bio to this list.
+>> 1. Send the destination BIO, once this reaches blk_mq_submit_bio, this
+>> will add the destination BIO to the list inside bi_copy_ctx and return
+>> without forming any request.
+>> 2. Send source BIO, once this reaches blk_mq_submit_bio, this will
+>> retrieve the destination BIO from bi_copy_ctx and form a request with
+>> destination BIO and source BIO. After this request will be sent to
+>> driver.
+>>
+>> This work is still in POC phase[2]. But this approach makes lifetime
+>> management of BIO complicated, especially during failure cases.
+> 
+> Associating src and dst operations by embedding a pointer to a third
+> data structure in struct bio is an implementation choice and is not the
+> only possibility for assocating src and dst operations. Hence, the
+> bio lifetime complexity mentioned above is not inherent to the list
+> based approach but is a result of the implementation choice made for
+> associating src and dst operations.
+> 
+> Has it been considered to combine the list-based approach for managing
+> unpaired copy operations with the token based approach for pairing copy
+> src and copy dst operations?
 
-Applied, thanks!
+I am still a little confused as to why we need 2 BIOs, one for src and one for
+dst... Is it because of the overly complex scsi extended copy support ?
 
-[1/1] block: fix the blk_queue_nonrot polarity
-      commit: 44348870de4b8f292f97b84583a298d66fbaf738
+Given that the main use case is copy offload for data within the same device,
+using a single BIO which somehow can carry a list of LBA sources and a single
+destination LBA would be far simpler and perfectly matching nvme simple copy and
+ATA write gathered. And I think that this would also match the simplest case for
+scsi extended copy as well.
 
-Best regards,
 -- 
-Jens Axboe
-
-
+Damien Le Moal
+Western Digital Research
 
