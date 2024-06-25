@@ -1,281 +1,190 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F29172BD4;
-	Tue, 25 Jun 2024 15:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31D616F91A
+	for <linux-block@vger.kernel.org>; Tue, 25 Jun 2024 15:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719327635; cv=none; b=fwSiMzhzjxw28GAuDFJx8dR4Neufk2v2v4pNBPGUWOsQ+5QwgsYPYS18bC4dx6O4ajLYJjXtE3HH5DF9w6XshQitVpci4WHhcH4WwasnGopP1U46QqwgWOjVm/USY+SXBjsTFea5cGpRdMDux0jtYsAFINu/+YDMiVvdcL06PS4=
+	t=1719327718; cv=none; b=r0ikud28YWIOQwY+s6U75zH6CLj/BKF5vTbbTa4J9ap08l/qj+ki2YqqF7F/8jD5/20l0m1raamafBxWEncOjDxTgsbRedlNzLw0SLzUEBnaE7bxd2BQtnPPEb9fEY5bc9CYB5BhBBrY92gek9WemXk68Isdk43TfVfZT6w55ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719327635; c=relaxed/simple;
-	bh=zVBP4Cu0/dpyRDGnoxj7Jux4WsGQKWo/gPMjOJoSirw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fFFiX1feYjbhWPlZx7PHQOWMuL7Osoap9lXtjMxN/QU1zW3xJLCV7Dl2Ov3hoH4GO9CHlcRTHBDz6I7PUKkp7+DGcIPD7eZjRdnkjl0gi1j3j4xotPrgLcLVjpBzbolr0YtY89Al3TiiQb3CkqsoXdsXjgxq7dS+GiADEYk6F7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lI2qMqkG; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1719327718; c=relaxed/simple;
+	bh=C0mrL+ZXJ6RRw3q098areJ0Xl0+mL4T0nEj7A1MRTF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gTsBZmhqt6Y2zJhlQkYMO2I0oqNqe+cIYtbT2zURjH4bcWsSK7kxxWY/zEXJ3g5LdcUuMTEDD/Q8I9Q1+6q3VvI9o28LG9BqZyb5h8Bsq6A4FxhYy5QzllYnE1L16OpPQJxhu2xT6/WEnJeOtBsQ1YeoFjXO8nNKTtMx0g24lKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yqyj9Thb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j0FrsEWu; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yqyj9Thb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j0FrsEWu; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lI2qMqkG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=zRT1CYNvoO7tMNqGIj3uWkqCcX1V4Wx4UfwKk5yrZes=; b=lI2qMqkGdaGoEQCGWfQGrspK6A
-	8et7sI2q4ssMClYCVxLKCagk8UgfXj3IFcJ9RYtPbPpwLISw2WL4IsLp9xnQ81p++VDnue/vcxTVX
-	U/IYcMDZwLfjIfyvdrHnTwR/ZdpGw+Jb0eieJpmy4ckK6fs8K80xY5GlZx8t62ggcyRLujmFxgqQZ
-	G86DbsfaJ9x9V/wftE/JL83TbBWQP7WjK2cI6D9KCCEr1xGFgee1es1D3pj+/i33N3etaD6doMGN/
-	qx6DUVKHHJvwWpGCZ+6fFb7Ffems4tjRbT8BiANGV6lvWas+u+/9tKb1/XmfzAI8y96FO4d1hEAJk
-	yLuz8fQg==;
-Received: from [2001:4bb8:2c2:e897:e635:808f:2aad:e9c8] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sM7en-00000003IyZ-3Vo1;
-	Tue, 25 Jun 2024 15:00:30 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Avri Altman <avri.altman@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 8/8] block: move dma_pad_mask into queue_limits
-Date: Tue, 25 Jun 2024 16:59:53 +0200
-Message-ID: <20240625145955.115252-9-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240625145955.115252-1-hch@lst.de>
-References: <20240625145955.115252-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yqyj9Thb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j0FrsEWu";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yqyj9Thb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j0FrsEWu"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D39A421A76;
+	Tue, 25 Jun 2024 15:01:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719327714; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VjZDIayh6/TZRdInMusXNeKuRzRsJ0NplLQuSxJFviw=;
+	b=yqyj9ThbWIHHEO/eC4VYWWJJmsOJdccIVDMxJyeQ0T/Lr4pFobpiwYGN7ZoUzHcPsYyzDl
+	Om+4fGjFnPQO6i3WFnTCy318gTQBcue9DqXr/anKiqGmBoDUHbxriDCLc1hfbkvcmC9knI
+	qN4lKhoUPiBoASr0PIBC/rxwZhV6qhM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719327714;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VjZDIayh6/TZRdInMusXNeKuRzRsJ0NplLQuSxJFviw=;
+	b=j0FrsEWu1Xcf70dRtbcije90VywZHgqFgCrtMdWLSYRCXoDZCNN5UQalc5MNYPXHU1AYk8
+	W8b0Y/cSsvdyLHDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719327714; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VjZDIayh6/TZRdInMusXNeKuRzRsJ0NplLQuSxJFviw=;
+	b=yqyj9ThbWIHHEO/eC4VYWWJJmsOJdccIVDMxJyeQ0T/Lr4pFobpiwYGN7ZoUzHcPsYyzDl
+	Om+4fGjFnPQO6i3WFnTCy318gTQBcue9DqXr/anKiqGmBoDUHbxriDCLc1hfbkvcmC9knI
+	qN4lKhoUPiBoASr0PIBC/rxwZhV6qhM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719327714;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VjZDIayh6/TZRdInMusXNeKuRzRsJ0NplLQuSxJFviw=;
+	b=j0FrsEWu1Xcf70dRtbcije90VywZHgqFgCrtMdWLSYRCXoDZCNN5UQalc5MNYPXHU1AYk8
+	W8b0Y/cSsvdyLHDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C59721384C;
+	Tue, 25 Jun 2024 15:01:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id hIhAL+LbemZqNwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Tue, 25 Jun 2024 15:01:54 +0000
+Date: Tue, 25 Jun 2024 17:01:46 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Ofir Gal <ofir.gal@volumez.com>
+Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, chaitanyak@nvidia.com
+Subject: Re: [PATCH blktests v2 2/2] md: add regression test for
+ "md/md-bitmap: fix writing non bitmap pages"
+Message-ID: <wgza656pr5scdqiaxi4vekoffp42jvzao5kcxy7zptdgwstyik@zfcgftuzn6pf>
+References: <20240624104620.2156041-1-ofir.gal@volumez.com>
+ <20240624104620.2156041-3-ofir.gal@volumez.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240624104620.2156041-3-ofir.gal@volumez.com>
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
+X-Spam-Level: 
 
-dma_pad_mask is a queue_limits by all ways of looking at it, so move it
-there and set it through the atomic queue limits APIs.
+On Mon, Jun 24, 2024 at 01:46:18PM GMT, Ofir Gal wrote:
+> +#restrict test to nvme-tcp only
+> +nvme_trtype=tcp
+> +nvmet_blkdev_type="device"
+> +
+> +requires() {
+> +	# Require dm-stripe
+> +	_have_program dmsetup
+> +	_have_driver dm-mod
+> +
+> +	_require_nvme_trtype tcp
+> +	_have_brd
+> +}
+> +
+> +# Sets up a brd device of 1G with optimal-io-size of 256K
+> +setup_underlying_device() {
+> +	if ! _init_brd rd_size=1048576 rd_nr=1; then
+> +		return 1
+> +	fi
+> +
+> +	dmsetup create ram0_big_optio --table \
+> +		"0 $(blockdev --getsz /dev/ram0) striped 1 512 /dev/ram0 0"
+> +}
+> +
+> +cleanup_underlying_device() {
+> +	dmsetup remove ram0_big_optio
+> +	_cleanup_brd
+> +}
+> +
+> +# Sets up a local host nvme over tcp
+> +setup_nvme_over_tcp() {
+> +	_setup_nvmet
+> +
+> +	local port
+> +	port="$(_create_nvmet_port "${nvme_trtype}")"
+> +
+> +	_create_nvmet_subsystem "blktests-subsystem-0" "/dev/mapper/ram0_big_optio"
+> +	_add_nvmet_subsys_to_port "${port}" "blktests-subsystem-0"
 
-Add a little helper that takes the alignment and pad into account to
-simply the code that is touched a bit.
+Use the defaults from blktests, e.g. ${def_subsysnqn}"
 
-Note that there never was any need for the > check in
-blk_queue_update_dma_pad, this probably was just copy and paste from
-dma_update_dma_alignment.
+> +
+> +	_create_nvmet_host "blktests-subsystem-0" "${def_hostnqn}"
+> +
+> +	_nvme_connect_subsys --subsysnqn "blktests-subsystem-0"
+> +
+> +	local nvmedev
+> +	nvmedev=$(_find_nvme_dev "blktests-subsystem-0")
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio-integrity.c     |  2 +-
- block/blk-map.c           |  2 +-
- block/blk-settings.c      | 17 -----------------
- drivers/ata/libata-scsi.c |  3 +--
- drivers/ata/pata_macio.c  |  4 ++--
- drivers/scsi/scsi_lib.c   |  4 ++--
- drivers/ufs/core/ufshcd.c |  9 +++++----
- include/linux/blkdev.h    | 12 ++++++++----
- 8 files changed, 20 insertions(+), 33 deletions(-)
+here too
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 173ffd4d623788..356ca0d3d62f5a 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -312,7 +312,7 @@ int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t bytes,
- 			   u32 seed)
- {
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
--	unsigned int align = q->dma_pad_mask | queue_dma_alignment(q);
-+	unsigned int align = blk_lim_dma_alignment_and_pad(&q->limits);
- 	struct page *stack_pages[UIO_FASTIOV], **pages = stack_pages;
- 	struct bio_vec stack_vec[UIO_FASTIOV], *bvec = stack_vec;
- 	unsigned int direction, nr_bvecs;
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 71210cdb34426d..bce144091128f6 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -634,7 +634,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
- 			const struct iov_iter *iter, gfp_t gfp_mask)
- {
- 	bool copy = false, map_bvec = false;
--	unsigned long align = q->dma_pad_mask | queue_dma_alignment(q);
-+	unsigned long align = blk_lim_dma_alignment_and_pad(&q->limits);
- 	struct bio *bio = NULL;
- 	struct iov_iter i;
- 	int ret = -EINVAL;
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c692e80bb4f890..2e559cf97cc834 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -768,23 +768,6 @@ bool queue_limits_stack_integrity(struct queue_limits *t,
- }
- EXPORT_SYMBOL_GPL(queue_limits_stack_integrity);
- 
--/**
-- * blk_queue_update_dma_pad - update pad mask
-- * @q:     the request queue for the device
-- * @mask:  pad mask
-- *
-- * Update dma pad mask.
-- *
-- * Appending pad buffer to a request modifies the last entry of a
-- * scatter list such that it includes the pad buffer.
-- **/
--void blk_queue_update_dma_pad(struct request_queue *q, unsigned int mask)
--{
--	if (mask > q->dma_pad_mask)
--		q->dma_pad_mask = mask;
--}
--EXPORT_SYMBOL(blk_queue_update_dma_pad);
--
- /**
-  * blk_set_queue_depth - tell the block layer about the device queue depth
-  * @q:		the request queue for the device
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index cdf29b178ddc1e..682971c4cbe418 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -1024,7 +1024,6 @@ EXPORT_SYMBOL_GPL(ata_scsi_dma_need_drain);
- int ata_scsi_dev_config(struct scsi_device *sdev, struct queue_limits *lim,
- 		struct ata_device *dev)
- {
--	struct request_queue *q = sdev->request_queue;
- 	int depth = 1;
- 
- 	if (!ata_id_has_unload(dev->id))
-@@ -1038,7 +1037,7 @@ int ata_scsi_dev_config(struct scsi_device *sdev, struct queue_limits *lim,
- 		sdev->sector_size = ATA_SECT_SIZE;
- 
- 		/* set DMA padding */
--		blk_queue_update_dma_pad(q, ATA_DMA_PAD_SZ - 1);
-+		lim->dma_pad_mask = ATA_DMA_PAD_SZ - 1;
- 
- 		/* make room for appending the drain */
- 		lim->max_segments--;
-diff --git a/drivers/ata/pata_macio.c b/drivers/ata/pata_macio.c
-index 3cb455a32d9266..1b85e8bf4ef91b 100644
---- a/drivers/ata/pata_macio.c
-+++ b/drivers/ata/pata_macio.c
-@@ -816,7 +816,7 @@ static int pata_macio_device_configure(struct scsi_device *sdev,
- 	/* OHare has issues with non cache aligned DMA on some chipsets */
- 	if (priv->kind == controller_ohare) {
- 		lim->dma_alignment = 31;
--		blk_queue_update_dma_pad(sdev->request_queue, 31);
-+		lim->dma_pad_mask = 31;
- 
- 		/* Tell the world about it */
- 		ata_dev_info(dev, "OHare alignment limits applied\n");
-@@ -831,7 +831,7 @@ static int pata_macio_device_configure(struct scsi_device *sdev,
- 	if (priv->kind == controller_sh_ata6 || priv->kind == controller_k2_ata6) {
- 		/* Allright these are bad, apply restrictions */
- 		lim->dma_alignment = 15;
--		blk_queue_update_dma_pad(sdev->request_queue, 15);
-+		lim->dma_pad_mask = 15;
- 
- 		/* We enable MWI and hack cache line size directly here, this
- 		 * is specific to this chipset and not normal values, we happen
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e2f7bfb2b9e450..3958a6d14bf457 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1139,9 +1139,9 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *cmd)
- 	 */
- 	count = __blk_rq_map_sg(rq->q, rq, cmd->sdb.table.sgl, &last_sg);
- 
--	if (blk_rq_bytes(rq) & rq->q->dma_pad_mask) {
-+	if (blk_rq_bytes(rq) & rq->q->limits.dma_pad_mask) {
- 		unsigned int pad_len =
--			(rq->q->dma_pad_mask & ~blk_rq_bytes(rq)) + 1;
-+			(rq->q->limits.dma_pad_mask & ~blk_rq_bytes(rq)) + 1;
- 
- 		last_sg->length += pad_len;
- 		cmd->extra_len += pad_len;
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index 0cf07194bbe89d..62d20eef13537d 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -5193,17 +5193,18 @@ static int ufshcd_change_queue_depth(struct scsi_device *sdev, int depth)
- }
- 
- /**
-- * ufshcd_slave_configure - adjust SCSI device configurations
-+ * ufshcd_device_configure - adjust SCSI device configurations
-  * @sdev: pointer to SCSI device
-  *
-  * Return: 0 (success).
-  */
--static int ufshcd_slave_configure(struct scsi_device *sdev)
-+static int ufshcd_device_configure(struct scsi_device *sdev,
-+		struct queue_limits *lim)
- {
- 	struct ufs_hba *hba = shost_priv(sdev->host);
- 	struct request_queue *q = sdev->request_queue;
- 
--	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
-+	lim->dma_pad_mask = PRDT_DATA_BYTE_COUNT_PAD - 1;
- 
- 	/*
- 	 * Block runtime-pm until all consumers are added.
-@@ -8907,7 +8908,7 @@ static const struct scsi_host_template ufshcd_driver_template = {
- 	.queuecommand		= ufshcd_queuecommand,
- 	.mq_poll		= ufshcd_poll,
- 	.slave_alloc		= ufshcd_slave_alloc,
--	.slave_configure	= ufshcd_slave_configure,
-+	.device_configure	= ufshcd_device_configure,
- 	.slave_destroy		= ufshcd_slave_destroy,
- 	.change_queue_depth	= ufshcd_change_queue_depth,
- 	.eh_abort_handler	= ufshcd_abort,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 94fcbc91231208..a53e3434e1a28c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -401,6 +401,7 @@ struct queue_limits {
- 	 * due to possible offsets.
- 	 */
- 	unsigned int		dma_alignment;
-+	unsigned int		dma_pad_mask;
- 
- 	struct blk_integrity	integrity;
- };
-@@ -509,8 +510,6 @@ struct request_queue {
- 	 */
- 	int			id;
- 
--	unsigned int		dma_pad_mask;
--
- 	/*
- 	 * queue settings
- 	 */
-@@ -981,7 +980,6 @@ extern int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 			    sector_t offset);
- void queue_limits_stack_bdev(struct queue_limits *t, struct block_device *bdev,
- 		sector_t offset, const char *pfx);
--extern void blk_queue_update_dma_pad(struct request_queue *, unsigned int);
- extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
- 
- struct blk_independent_access_ranges *
-@@ -1433,10 +1431,16 @@ static inline bool bdev_iter_is_aligned(struct block_device *bdev,
- 				   bdev_logical_block_size(bdev) - 1);
- }
- 
-+static inline int blk_lim_dma_alignment_and_pad(struct queue_limits *lim)
-+{
-+	return lim->dma_alignment | lim->dma_pad_mask;
-+}
-+
- static inline int blk_rq_aligned(struct request_queue *q, unsigned long addr,
- 				 unsigned int len)
- {
--	unsigned int alignment = queue_dma_alignment(q) | q->dma_pad_mask;
-+	unsigned int alignment = blk_lim_dma_alignment_and_pad(&q->limits);
-+
- 	return !(addr & alignment) && !(len & alignment);
- }
- 
--- 
-2.43.0
+> +	echo "${nvmedev}"
+> +}
+> +
+> +cleanup_nvme_over_tcp() {
+> +	local nvmedev=$1
+> +	_nvme_disconnect_ctrl "${nvmedev}"
+> +	_nvmet_target_cleanup --subsysnqn "blktests-subsystem-0"
 
+same here
+
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	setup_underlying_device
+> +	local nvmedev
+> +	nvmedev=$(setup_nvme_over_tcp)
+> +
+> +	# Hangs here without the fix
+> +	mdadm --quiet --create /dev/md/blktests_md --level=1 --bitmap=internal \
+> +		--bitmap-chunk=1024K --assume-clean --run --raid-devices=2 \
+> +		/dev/"${nvmedev}"n1 missing
+
+Instead hard coding the namespace ID, this should be made a bit more
+robust by looking it up with _find_nvme_ns.
