@@ -1,48 +1,33 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748E0178CFD;
-	Tue, 25 Jun 2024 18:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1F2181D16;
+	Tue, 25 Jun 2024 21:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719339558; cv=none; b=gUU9Y9hf5sqER3wpzzMvlz4iWF+IOxMlZLzb9UrOOrxSwUpW/V3/hM5VCFRciM7ToceGWEgrUQjTC8PEprE5PfxAjlez2T86imNhHbJNQhaDhmLTHeYNns2h9Pvf32BPpxQfIgyojm2AqpAq4INqxl+pTz7YxVx0n2F4hx0k5nI=
+	t=1719350306; cv=none; b=fJ09/dSwS7xxd8pnb6JPRwl9rcjvaUYBKmRqpN4a4vDFPgeyopCRk2uzAuApEZEEzArpYsWM5RkW0XxnhTV4DGLzV2+tlJLd+hXTFLauQapXsaVMQJI2iFZLs0IcHg5wyuPC19r2aUDIfDJgILuBBPRMOBxHdFjTB3tRUo+a63o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719339558; c=relaxed/simple;
-	bh=bKef7Avgq+mcJuGN8qxZn//nRWibbU3fWR0IDDoFJZU=;
+	s=arc-20240116; t=1719350306; c=relaxed/simple;
+	bh=KPOiqngDeZl30NH1XxIF5gTrFiubBnjvbTlQRWh4xYg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EFgFYmhbHRx7TRRnp6yOntjWfblYntpXshsVI/uYgu94qxz21chYicmS6IwpIvvttViafLw8AxubDBpgc6/F2O1xL6YnMv7CiqwQ3q7Nb6PXaifDHEBEUxu1/YLEHoD7LOxOXD1psw/0JPrkJ1DGpdqrB9hXexgk149rx+RyzOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=VJtFrKlW; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=ZBsSoabBQiGV8VYX737BpVkvQhInv1DycI9uCSOvEa6nR43yR5ecTy9yzkv70++e+qOcGLdmCmgy0+aBr0mGRoOfwbKu2a4LqusvbnlySO8fFNErM6Yg2gPIIRgOlHz8BdxOw5C/3KyX7KrQ2qcAsMpa5n02STkG693tk4fECkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0hfLTOH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="VJtFrKlW"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4W7tQ572yWz6Cnk9F;
-	Tue, 25 Jun 2024 18:19:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1719339540; x=1721931541; bh=YzvkjLDvBzgff6/Y2UShPenz
-	q+MiJByf5DuVF2Ma4LE=; b=VJtFrKlWbGSrbirv0j3fQqvdos967ZrYLzAxYJgm
-	PXwvoE0aJJklxBf4QXD/c1iDHZop7cYBum5ylRh6MG+DHkP4noMMd9/wGUbD+CaP
-	P2+4A4qB5jq3sTTummCbWw4jx3ZfypYZW6wJ1dhX8By6ha/HTnuyxALoaBdrEA0p
-	9ed49lLfeZoa+DoMO2kJ5kIQUmeXeNSlZRQHnxk8jlVDNC+ffqKC8TrzL2NaI4SZ
-	c+dUsSsmj8xofSXGA4qMOMyPgcvxz2uLthFm6DDhMTUpUQfNPIXmz80QQ7tfsoTm
-	hIVbH9sPkKVIAXWFts/Ks3kvlDKUEl1ZmyhH2XxKcZ0voQ==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id AFhXlXXr1W3q; Tue, 25 Jun 2024 18:19:00 +0000 (UTC)
-Received: from [100.96.154.26] (unknown [104.132.0.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4W7tPs1TX4z6Cnk97;
-	Tue, 25 Jun 2024 18:18:56 +0000 (UTC)
-Message-ID: <b5d93f2c-29fc-4ee4-9936-0f134abc8063@acm.org>
-Date: Tue, 25 Jun 2024 11:18:56 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0hfLTOH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91760C32781;
+	Tue, 25 Jun 2024 21:18:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719350305;
+	bh=KPOiqngDeZl30NH1XxIF5gTrFiubBnjvbTlQRWh4xYg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=t0hfLTOHb4/Mwqe3tFIXULykvTPoVb2REU4j7462zAQty0DovUsgeBXIqkLjqTLCw
+	 HAGGft70l/PDuzHefiOHehrFlRKSrR2du/bLm5kK/kbDVcfh5m4xuWI0nWWxN56Lse
+	 xoUzU8Gzwq8KVXsiWU7/X+KQsUpd/zU0nzfWUbMkzVLwAg5YNaPWJvF4vmbMa+Jo//
+	 ejLlCdHGRNNyLNU47GweDERCIXIrzxqnH6i4N7xmQwTBfwy2yhYXdAO9k3GDtb+dyH
+	 MVVxfnSkqkn+xi+mkIsrRuWCPS7HdZdlkTRY04vfu/n9mTzh99hGbiMKV9MjDu+sWU
+	 wHnnw0LQ19EWA==
+Message-ID: <05c7c08d-f512-4727-ae3c-aba6e8f2973f@kernel.org>
+Date: Wed, 26 Jun 2024 06:18:18 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,8 +37,8 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
  and request layer.
-To: Damien Le Moal <dlemoal@kernel.org>, Nitesh Shetty
- <nj.shetty@samsung.com>, Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bvanassche@acm.org>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
  Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
  Mikulas Patocka <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>,
@@ -79,28 +64,37 @@ References: <eda6c198-3a29-4da4-94db-305cfe28d3d6@acm.org>
  <6679526f.170a0220.9ffd.aefaSMTPIN_ADDED_BROKEN@mx.google.com>
  <4ea90738-afd1-486c-a9a9-f7e2775298ff@acm.org>
  <de54c406-9270-4145-ab96-5fc3dd51765e@kernel.org>
+ <b5d93f2c-29fc-4ee4-9936-0f134abc8063@acm.org>
+From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <de54c406-9270-4145-ab96-5fc3dd51765e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: Western Digital Research
+In-Reply-To: <b5d93f2c-29fc-4ee4-9936-0f134abc8063@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/24/24 2:55 PM, Damien Le Moal wrote:
-> I am still a little confused as to why we need 2 BIOs, one for src and one for
-> dst... Is it because of the overly complex scsi extended copy support ?
+On 6/26/24 03:18, Bart Van Assche wrote:
+> On 6/24/24 2:55 PM, Damien Le Moal wrote:
+>> I am still a little confused as to why we need 2 BIOs, one for src and one for
+>> dst... Is it because of the overly complex scsi extended copy support ?
+>>
+>> Given that the main use case is copy offload for data within the same device,
+>> using a single BIO which somehow can carry a list of LBA sources and a single
+>> destination LBA would be far simpler and perfectly matching nvme simple copy and
+>> ATA write gathered. And I think that this would also match the simplest case for
+>> scsi extended copy as well.
 > 
-> Given that the main use case is copy offload for data within the same device,
-> using a single BIO which somehow can carry a list of LBA sources and a single
-> destination LBA would be far simpler and perfectly matching nvme simple copy and
-> ATA write gathered. And I think that this would also match the simplest case for
-> scsi extended copy as well.
+> Hi Damien,
+> 
+> What are the implications for the device mapper code if the copy source
+> and destination LBAs are encoded in the bio payload instead of in
+> bio->bi_sector?
 
-Hi Damien,
+DM can deal with "abnormal" BIOs on its own. There is code for that.
+See is_abnormal_io() and __process_abnormal_io(). Sure, that will need more code
+compared to a bio sector+size based simple split, but I do not think it is a big
+deal given the potential benefits of the offloading.
 
-What are the implications for the device mapper code if the copy source
-and destination LBAs are encoded in the bio payload instead of in
-bio->bi_sector?
+-- 
+Damien Le Moal
+Western Digital Research
 
-Thanks,
-
-Bart.
