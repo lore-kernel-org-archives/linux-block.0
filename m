@@ -1,59 +1,59 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10B91922FE
-	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 19:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855041922FC
+	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 19:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719431036; cv=none; b=UXSQV/QBPsJAdkyP66OEK5fgXfp2cxqrMROTKMRLzJO/+635atjhH9Rro8/VQE7INKIAXer5dRrrHzBBMgXI6+7vQODLHtJQTWveeRRcOP5ZDTuumewfz04RV3zVsarDolScGxSl/MqtgW/3lEr8EUbsg4BoghitPU8zFkkw7/U=
+	t=1719431215; cv=none; b=GtnFsy/fapfGbPrM5zxGbDGbpstkX4ZUzVuIQ0W6K0iR8+1y/Wpv3D45jUl8MGLZqOqleyscDdr1FXpYHiNWD0TiOe46w+9f9lIfm7nYa0ooNAWYSg70vJ0Cf1VZn8h4+2hSMHqn3mybB1SCxtKmzvtiY7GhSqBYBdyqFv4UYzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719431036; c=relaxed/simple;
-	bh=HQY4AWs4bi0pQXEv6LtI3f0RcQnw7yA5Mz/tA64yBog=;
+	s=arc-20240116; t=1719431215; c=relaxed/simple;
+	bh=90IFLVAimWlxflMq5YOSkklPtSnG+d0tK9j19/4wy+k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=CJKYDQlbJExWGrij4OSv6VQ/HNlaYuaVjbXpLraFNkhMEp3N7oEpkFGaGL86AMgs7QlUpmqTa7qDIFEasVWHQ+rafcGOn7rWXbkVfvBxDFGXpiWrJj5ZQHj5cL7DrFFMTMcwiku8KGAuisMMWaw6KAtm3r+QMhbj8bZyTdDhP00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KccNg6bD; arc=none smtp.client-ip=209.85.210.182
+	 In-Reply-To:Content-Type; b=ss3LnU6YjeI+waHdH0V4RV5MByxTGWR3zIyu0RO2Kce+tglxrNCatTccqDUZriHRwyQnVaqCajxxVxeUqNENlRWyp07fvajmXWE9+NnxYjGiaUdjZ4xVLJPRNWicn/LMUHzgqr66pmtiYAszc7W40QWApE4aowEi1SOmThz6Xf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=J/HoTc6D; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KccNg6bD"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-70675c617e7so198492b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 12:43:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="J/HoTc6D"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7180e6ed01cso108590a12.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 12:46:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719431033; x=1720035833; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719431214; x=1720036014; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=INsSPbtGqJGHOkblxtNd1zECa7M89eF2RAFMCb8l9+E=;
-        b=KccNg6bDpWkRMxvch/pvqhFKGF+73MN9ncTHlHU5Zf1bnhZ8e1ckA/PH4JOlfE3Bvh
-         k3iBpq8WcS3UGYv95C5vt6V3qneK8EaM8VWJqHCINCaGyfFp1vlzoyHekq4UfFCJmLiz
-         fhBmFh3uuwD+YDnQdpuY0VQKJp+OBSenfCYARKAzefbfVKySCQnAM46RXdj9stwNUp0C
-         uuOwuWJBqOBun7RcQND4pvs/Do+MMRqJ0YxIAeO7b8OB2dRvRSzm/AQ+HhXo8Eo3Weeg
-         F0htQ90QmJtm60KoBbt5ohWJkRnqX0oAj0qH3TGjHa194AkFN5ZgUxC/fmTso78xa9lA
-         OrpA==
+        bh=tFQCYxkTWkVTkeG4pmT0NAA774VOsw4t919VmGwibAQ=;
+        b=J/HoTc6DvBbXkVC/M33JaTxGUpNOKP352At2Mv2yNXqE1bHJ7j79D2yD7IF40yBI1y
+         7uFIbLOy1nNaAFBITORNneL3Qcn46H40YdqbvyCPbc3C59N9rY4a42IvQfXbS9k5YjJU
+         lP0Aaz8sdqL9hBVBsakxI/xgNG9sYQO0q+t0iNDhXqIjDD3Wpk+WpVjB2/3VeI823FjC
+         NiGE30Krk7uVFTPgOXM96z9jsCNYrPOYA6Dq3CAt+2mcvIVU/CPg4g7VhtCyOd1domlx
+         OOXy0g/HeGHgeXnlNfKXK1l9atv/xIfkEoDmlmjtcArnZYlPSjfI1CWs1I2t7Et8mqA2
+         HnDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719431033; x=1720035833;
+        d=1e100.net; s=20230601; t=1719431214; x=1720036014;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=INsSPbtGqJGHOkblxtNd1zECa7M89eF2RAFMCb8l9+E=;
-        b=jkiC7b05NJ+aQCPXIE/6tCfX6lWQ5mt/m/xC4prmAKMRDFzpWNGQkREuUub/01qckP
-         qTEcJfQFSd2L/VTYGnP7c/MwsHINWtAOmkWF6O1DtKSIum3mvKf3j+aBs+z1i1e9D/K0
-         CRLukZGdNHd1rNlHw0AN/TuiuqbUxRdRUFvvjUTsihhCl9t5oA/ikg5FxvNAyLAiTy6X
-         Mv//qfeqgmRnVpX2KkGTGygTo1FpdktlRLJ1x71iz4v0nrlyNXSL+m59GtQKKAyAgbc1
-         26z0GR5+QlGdacOSdExlsOke5VM+kvfo7blZUl+7wmCjbJwgngAzGrQnaw0rME5xo00V
-         9/pw==
-X-Forwarded-Encrypted: i=1; AJvYcCVPH/OBZO5KbDJAvaHDVA25/xIeB+c4ey6dFzckZGaxJJzN9rWeX2RYx583FuP3oejqHVnFDJy6gRGCM5cydPtPqxUD+dQASodAeEI=
-X-Gm-Message-State: AOJu0YxDBx0ZqYqxmvP5rhs8Q86dMIKQB/pBk8CBoiTnScMUU5RUwJ2L
-	4Hec1Ei1MlZLF87gTOw4WSqhqBCrvgtNQDLiQw/2nSlxxpjZveGXgNe3p3gQKMk=
-X-Google-Smtp-Source: AGHT+IHOftT8C5pvp5IDdZLc3OtfymMvuC7JHSCp3Kk76L/dndWQHnczRDkTKXHWtsTvTLaHozfsYw==
-X-Received: by 2002:a05:6a00:6013:b0:704:173c:5111 with SMTP id d2e1a72fcca58-70667e04c57mr13186939b3a.3.1719431033252;
-        Wed, 26 Jun 2024 12:43:53 -0700 (PDT)
+        bh=tFQCYxkTWkVTkeG4pmT0NAA774VOsw4t919VmGwibAQ=;
+        b=M8UHZt0HNGpOvT7TKhju9Grg2bCNXe2Q7m3u8AUUIHYUMe43lc6Gg9Cf6rNMXv73cP
+         zTu9s0KAJH8HuZr0q+QTv1cphmJHeUHV1uJDqELi0R3sk4acCxUKbvC8/d+VJOksuY+Q
+         CJSRhgbaMulNcxhBOlMHQ/U0KBdhhDUwM9sl0OWbmkmfETfuJE2YIWyZog+8jdQjH4uu
+         ApmNrerULHn7+Z+PdjyWYbRwfnS4nlxM9g5MKRJozl7jHxjP7kPW5eMRw4tSNAbaJKgW
+         T1l1iK04t7c/kEPD6x08bXbb6nBpNnU+ag5LeRITuQTzdrr5OIxq4OOgOAQu9iX35Cxf
+         1ETw==
+X-Forwarded-Encrypted: i=1; AJvYcCWhKjCdXVcPM3dx9tBauMbDvfOvnre6O+Qu6uBDdue4TEFeB4u7jwtTi3dTWYoh30F6SEJM5KUezNErYVlY3o6Q/nj8w1W4ieCFoeA=
+X-Gm-Message-State: AOJu0YxHFWp8Ir/ywcqHKFSoDP/WsM9SImCxShWM3PRRLMdLfwcUOPvj
+	FpgtkSkXtTMtYFYaBkNg/bydtx9EIXmfTtV4cwp1w3Fx4t4jSsWKlmgf9b8KFNs=
+X-Google-Smtp-Source: AGHT+IEsqyry2dKkQyVU+KqpfX7PK/KlBwJ1aJo473T1bK1fv3LN794lmHlDZiHq/jj1q1c90ArWNA==
+X-Received: by 2002:a05:6a00:3e24:b0:706:7d86:487f with SMTP id d2e1a72fcca58-7067d864f28mr10467895b3a.1.1719431213873;
+        Wed, 26 Jun 2024 12:46:53 -0700 (PDT)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70690b37fabsm4667534b3a.1.2024.06.26.12.43.50
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7069d65dfc7sm3287078b3a.133.2024.06.26.12.46.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jun 2024 12:43:52 -0700 (PDT)
-Message-ID: <2de992b3-d71c-40f2-ad68-76a9f48338d4@kernel.dk>
-Date: Wed, 26 Jun 2024 13:43:49 -0600
+        Wed, 26 Jun 2024 12:46:53 -0700 (PDT)
+Message-ID: <58cc9e3a-bb69-4205-9f11-d262f811ea9a@kernel.dk>
+Date: Wed, 26 Jun 2024 13:46:50 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,7 +61,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/4] block: partitions: populate fwnode
+Subject: Re: [PATCH v3 3/4] block: add support for notifications
 To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
  <conor+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
@@ -81,60 +81,56 @@ To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
  linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
  linux-block@vger.kernel.org
 References: <cover.1719368448.git.daniel@makrotopia.org>
- <afa870ec6ac1027561d1c002205ab1e05358a46c.1719368448.git.daniel@makrotopia.org>
+ <609f654800583feb016d96d9c3fc2f029f0f460a.1719368448.git.daniel@makrotopia.org>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <afa870ec6ac1027561d1c002205ab1e05358a46c.1719368448.git.daniel@makrotopia.org>
+In-Reply-To: <609f654800583feb016d96d9c3fc2f029f0f460a.1719368448.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/25/24 8:50 PM, Daniel Golle wrote:
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index ab76e64f0f6c..f88829e254e6 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -10,6 +10,8 @@
->  #include <linux/ctype.h>
->  #include <linux/vmalloc.h>
->  #include <linux/raid/detect.h>
-> +#include <linux/property.h>
-> +
->  #include "check.h"
->  
->  static int (*const check_part[])(struct parsed_partitions *) = {
-> @@ -281,6 +283,42 @@ static ssize_t whole_disk_show(struct device *dev,
->  }
->  static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
->  
-> +static struct fwnode_handle *find_partition_fwnode(struct block_device *bdev)
+On 6/25/24 8:51 PM, Daniel Golle wrote:
+> +static int blk_call_notifier_add(struct device *dev)
 > +{
-> +	struct fwnode_handle *fw_parts, *fw_part;
-> +	struct device *ddev = disk_to_dev(bdev->bd_disk);
-> +	const char *partname, *uuid;
-> +	u32 partno;
+> +	struct blk_device_list *new_blkdev;
 > +
-> +	fw_parts = device_get_named_child_node(ddev, "partitions");
-> +	if (!fw_parts)
-> +		fw_parts = device_get_named_child_node(ddev->parent, "partitions");
+> +	new_blkdev = kmalloc(sizeof(*new_blkdev), GFP_KERNEL);
+> +	if (!new_blkdev)
+> +		return -ENOMEM;
 > +
-> +	if (!fw_parts)
-> +		return NULL;
-
-That last if check should to inside the previous one.
-
-> +	fwnode_for_each_child_node(fw_parts, fw_part) {
-> +		if (!fwnode_property_read_string(fw_part, "uuid", &uuid) &&
-> +		    (!bdev->bd_meta_info || strlen(uuid) > PARTITION_META_INFO_UUIDLTH ||
-> +		     strncmp(uuid, bdev->bd_meta_info->uuid, PARTITION_META_INFO_UUIDLTH)))
-> +			continue;
+> +	new_blkdev->dev = dev;
+> +	mutex_lock(&blk_notifier_lock);
+> +	list_add_tail(&new_blkdev->list, &blk_devices);
+> +	raw_notifier_call_chain(&blk_notifier_list, BLK_DEVICE_ADD, dev);
+> +	mutex_unlock(&blk_notifier_lock);
 > +
-> +		if (!fwnode_property_read_string(fw_part, "partname", &partname) &&
-> +		    (!bdev->bd_meta_info || strlen(uuid) > PARTITION_META_INFO_VOLNAMELTH ||
-> +		     strncmp(partname, bdev->bd_meta_info->volname,
-> +			     PARTITION_META_INFO_VOLNAMELTH)))
-> +			continue;
+> +	return 0;
+> +}
 
-This is pretty hard to make sense of...
+Nit: redundant newline.
+
+> +device_initcall(blk_notifications_init);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index b2f1362c4681..8d22ba03e3e1 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1687,4 +1687,12 @@ static inline bool bdev_can_atomic_write(struct block_device *bdev)
+>  
+>  #define DEFINE_IO_COMP_BATCH(name)	struct io_comp_batch name = { }
+>  
+> +
+> +#ifdef CONFIG_BLOCK_NOTIFIERS
+
+#if defined(CONFIG_BLOCK_NOTIFIERS)
+
+> +#define BLK_DEVICE_ADD		1
+> +#define BLK_DEVICE_REMOVE	2
+> +void blk_register_notify(struct notifier_block *nb);
+> +void blk_unregister_notify(struct notifier_block *nb);
+> +#endif
+
+Surely these helpers should have a !CONFIG_BLOCK_NOTIFIERS failure case
+definition? Either that, or dummies. As it stands, any caller would need
+to check if it's enabled or not.
 
 -- 
 Jens Axboe
