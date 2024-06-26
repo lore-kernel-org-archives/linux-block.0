@@ -1,68 +1,52 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D76217FAD5
-	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 11:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47F245C07;
+	Wed, 26 Jun 2024 14:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719402187; cv=none; b=e6fbxGljVKSjVKZHxQX84a9Hz/7Fr1uiKxNGgPPt+gN4BKcnV2uz8+rL3p854/GaiL1QTp/bFPNL8PXkmXxUt9B0QFglDJbTXGNHvnnrEAmAVwUU/n/WwPlg8YDjb/8kEAZqYV5OEqAZKidYb2rpdgmQYuWSalr5bd9WSfIzhK8=
+	t=1719412010; cv=none; b=XdU7glbWbqT+8c6f6hc7Kwt3zIJqsD/nUKEAnDVQI35Lu2fNZXM0Dicsf4rbeL1tEyx1TyaI3VOK2RJRi2lo/grMXKMKnd03CM7t8IwrgIy1JHOSHT/kFhPbcKmA1VE5/nymJJe3meGpbULbrR7f0ONgAsqfcPlJORoubf4XudA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719402187; c=relaxed/simple;
-	bh=BR6YcHCHB1ivRnqbuz3YxQ4s/sYhuuun8DuDqSP5tr4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=oaUHDKvvCVs5PuEZjMA5zC+S1ZNldsdZn8/YST0NgULe3Vd/nIIH2Ze18tVqU7xHRG37erel5yQhPSJb+aVbm9uyhYdHk8u2gp0ARb99rvRAKDHK+dilrHZTmEyNzdqIlsOMbMFMVo+dHzl8Mp/x0ljAHeD5a35oQHdPZ2KczYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=DvznAlIs; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1719412010; c=relaxed/simple;
+	bh=gpKXemNbYHWOqH2GHVu6mRpMdKo90maFTmdXXV0nR5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VqBNkCbeFFRIcCj6x63UeMSchByusMJ+zVG+mYBEU30BBJG/vZwaz4OIEP5Vs0DRprukeTId5cWb5W0wANgsCyYs/wLyzW0D9cRylU+y3fUuMA6KfXcd6srrTm4WBvI2tS2Y2kRc2FjwlK3Vnt+Xny5cEIsS3r2Vutx49q+dbhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HVQz5QHo; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="DvznAlIs"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240626114303epoutp043e15f10d07f6069d59f2b2346b8cca21~ciy0N0I6Y2316323163epoutp044
-	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 11:43:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240626114303epoutp043e15f10d07f6069d59f2b2346b8cca21~ciy0N0I6Y2316323163epoutp044
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1719402183;
-	bh=8L/mX8O6BFJO/aguMkBtonWEoWBnd7DsBSRj6RxPZwA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DvznAlIs9UqqQJ6VYiRGTQeuIL+sVKtUYCJn325AgNl/3rUvDhWUoEgTdONJwJK9g
-	 NHH12vhlGL0LSeZ8iw+Q56J2uwbzP1blJsEUYHIriTl3Jvk3Y5lXiF2JOe4oMBVl5U
-	 AFfaDVFAg09iwDtAo74Asv1fz6G+3KduFpGCl2sE=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20240626114302epcas5p35cf1dce423571350bd5b717f6e19a8e8~ciyzyVQun2534525345epcas5p3F;
-	Wed, 26 Jun 2024 11:43:02 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.174]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4W8KZY09f7z4x9Px; Wed, 26 Jun
-	2024 11:43:01 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	BD.95.19174.4CEFB766; Wed, 26 Jun 2024 20:43:00 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240626101529epcas5p49976c46701337830c400cefd8f074b40~chmW58ILl2295722957epcas5p45;
-	Wed, 26 Jun 2024 10:15:29 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240626101529epsmtrp284792c42758cdf9b87c024ce28673c1a~chmW5ITko1237112371epsmtrp2i;
-	Wed, 26 Jun 2024 10:15:29 +0000 (GMT)
-X-AuditID: b6c32a50-87fff70000004ae6-41-667bfec42212
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	67.04.07412.14AEB766; Wed, 26 Jun 2024 19:15:29 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240626101527epsmtip1f357ba9816aaf746029621e642cca8bf~chmVN_59n0370603706epsmtip1I;
-	Wed, 26 Jun 2024 10:15:27 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: asml.silence@gmail.com, mpatocka@redhat.com, axboe@kernel.dk,
-	hch@lst.de, kbusch@kernel.org, martin.petersen@oracle.com
-Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH v2 10/10] nvme: add handling for user integrity buffer
-Date: Wed, 26 Jun 2024 15:37:00 +0530
-Message-Id: <20240626100700.3629-11-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240626100700.3629-1-anuj20.g@samsung.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HVQz5QHo"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=lFf8qNmjo6Nj33hDTbujEk2BDEk3+cT37RSj9EYUc6E=; b=HVQz5QHoUBHle3oNOh86oc/Gdc
+	0L7GbPiDEHY3ykjKzgIAE82lnPKYlCfYHhVdr0H504mRBLElPU7c6m8lovpOJMWfh0YwQ5UsbXg5j
+	3uoCzisuR5W7Nh63ySI8Wduy6wpBy18BeqkHBEpEas8rJwSmwZLlwIvS7C/qqqMcQS4yTSUnYCjh+
+	uYs1Neg7UKh7umxbevBRwVQnlnORd2v85qcOQxH3/Hvo7OZ5CI8t0cWI0s8CJXmKR6SRb8KPBnhv7
+	Hdio5BdzgCD/a3xXae1S2eUtbYT24/QSe5vjJp/woIShTRnMKlMELRtnEVrhTLnL5Rc4NWfGTzyPZ
+	bzsJMzEQ==;
+Received: from [2001:4bb8:2cd:5bfc:fac4:f2e7:8d6c:958e] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sMTbc-000000079bk-3nxT;
+	Wed, 26 Jun 2024 14:26:41 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai3@huawei.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: queue_limits fixups and tidyups v3
+Date: Wed, 26 Jun 2024 16:26:21 +0200
+Message-ID: <20240626142637.300624-1-hch@lst.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,180 +54,41 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrIJsWRmVeSWpSXmKPExsWy7bCmlu6Rf9VpBu37zC3mrNrGaLH6bj+b
-	xcrVR5ks3rWeY7E4+v8tm8WkQ9cYLfbe0raYv+wpu8Xy4/+YLCZ2XGVy4PLYOesuu8fls6Ue
-	m1Z1snlsXlLvsftmA5vHx6e3WDze77vK5tG3ZRWjx+dNcgGcUdk2GamJKalFCql5yfkpmXnp
-	tkrewfHO8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6ZOUBnKimUJeaUAoUCEouLlfTtbIryS0tS
-	FTLyi0tslVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyMx7vO8hYcFexYumEjSwNjE3S
-	XYycHBICJhJP995nA7GFBPYwSqxq5upi5AKyPzFKNK25zgbhfGOU+PzmJzNMx7tZfewQib2M
-	Er/e/WaFcD4zSsya8oUJpIpNQF3iyPNWRhBbRKBWYmXrdLAOZoEGRonuCd/ZQRLCAm4SPb+m
-	gTWwCKhKzN+wFijOwcErYClxar4cxDZ5iZmXIMo5gcJ3Nm8Hm8krIChxcuYTFhCbGaimeets
-	ZpD5EgIzOSTuN/5hgWh2kbj+5RPU2cISr45vYYewpSQ+v9vLBmGnS/y4/JQJwi6QaD62jxHC
-	tpdoPdXPDHIPs4CmxPpd+hBhWYmpp9YxQezlk+j9/QSqlVdixzwYW0mifeUcKFtCYu+5Bijb
-	Q2L26VVMkMDqYZQ4MOs74wRGhVlI/pmF5J9ZCKsXMDKvYpRKLSjOTU9NNi0w1M1LLYdHc3J+
-	7iZGcNrVCtjBuHrDX71DjEwcjIcYJTiYlUR4Q0uq0oR4UxIrq1KL8uOLSnNSiw8xmgIDfCKz
-	lGhyPjDx55XEG5pYGpiYmZmZWBqbGSqJ875unZsiJJCeWJKanZpakFoE08fEwSnVwLT83P47
-	r/qXX3u2tO/NxFuSAQXbT38399B+yqh3Y6/L0ZbsF6HFm/pDkyq+ZlaWZT+c68Mk7rqueibL
-	wtmWHOffnXpfXWjm+Xdicq9KqHGivnD/m6YZ87I3vbURnPpl/pk80bX7vZSa5c9cCnF6oKRd
-	emWN2PRN5xnmK39wUs9I0b5tdGbZHOb9eyreSTzRNtIX9Xu9/7ntl5fqhkIvZKR6zSZyfujZ
-	9iZO4ea7Q4uOcTMK3/E61m0n38Zp4Wla75T+ij9UI+9/mde6yS6b7m4RjnV988zS0+VRzmv/
-	r1WHAjf8e94pss1wlcLDF4Zz97vw/HyV2vZ0j2Da85WWIh0HDjOIaOhmXWSRDQvalqLEUpyR
-	aKjFXFScCADXjF6dRAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOLMWRmVeSWpSXmKPExsWy7bCSnK7jq+o0g8UvWC3mrNrGaLH6bj+b
-	xcrVR5ks3rWeY7E4+v8tm8WkQ9cYLfbe0raYv+wpu8Xy4/+YLCZ2XGVy4PLYOesuu8fls6Ue
-	m1Z1snlsXlLvsftmA5vHx6e3WDze77vK5tG3ZRWjx+dNcgGcUVw2Kak5mWWpRfp2CVwZj/cd
-	ZCy4q1ixdMJGlgbGJukuRk4OCQETiXez+ti7GLk4hAR2M0r0zO1jgkhISJx6uYwRwhaWWPnv
-	OTuILSTwkVFi2y1VEJtNQF3iyPNWRpBmEYFWRokDU1vAHGaBFkaJua0tYB3CAm4SPb+mgU1l
-	EVCVmL9hLVCcg4NXwFLi1Hw5iAXyEjMvfQcr5wQK39m8nRFimYXEg+fNrCA2r4CgxMmZT1hA
-	bGag+uats5knMArMQpKahSS1gJFpFaNkakFxbnpusmGBYV5quV5xYm5xaV66XnJ+7iZGcFxo
-	aexgvDf/n94hRiYOxkOMEhzMSiK8oSVVaUK8KYmVValF+fFFpTmpxYcYpTlYlMR5DWfMThES
-	SE8sSc1OTS1ILYLJMnFwSjUw2R/25Axlbgir05tkbcTxea630w3WYBPZGl6Jc/se9wfM+rLy
-	7lPLciPnFu9tDpU5i2sOzrsl8UJrfdmv1gkPZqkYPRU/8e/kpKmxt9i23Lbe6b/RZOcduQdP
-	yk6GRjlpPHGLiJtWIL/3o6CWJKdHp8apM4mK86R2VQil76pM67/FNWNx+b3LJ7ayfHYsZw/7
-	UuxZ3eQdKFVW3CkmPf/ozzOXJv9NnNKZmNS7Z4v3jl9KJzjDL9defbf75IzpC/OTtkqe5A2+
-	EcrbHxgxh+mxuojIj8yrs+YzPtK8FeBknTLT19tYsVd8o/Tq0pxPpiH79uhdM/vMvs7jPnea
-	woRJ6w2Pdi1PSHquOlXk7vwzSizFGYmGWsxFxYkA2SNuovoCAAA=
-X-CMS-MailID: 20240626101529epcas5p49976c46701337830c400cefd8f074b40
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240626101529epcas5p49976c46701337830c400cefd8f074b40
-References: <20240626100700.3629-1-anuj20.g@samsung.com>
-	<CGME20240626101529epcas5p49976c46701337830c400cefd8f074b40@epcas5p4.samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Kanchan Joshi <joshi.k@samsung.com>
+Hi Jens,
 
-Create a new helper that contains the handling for both kernel and user
-generated integrity buffer.
-For user provided integrity buffer, convert bip flags
-(guard/reftag/apptag checks) to protocol specific flags. Also pass
-apptag and reftag down.
+this series has a few fixes for the queue_limits conversion in the first
+few patches and then has a bunch more cleanups and improvements in that
+area.
 
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
----
- drivers/nvme/host/core.c | 85 ++++++++++++++++++++++++++++------------
- 1 file changed, 60 insertions(+), 25 deletions(-)
+Changes since v2:
+ - export md_init_stacking_limits
+ - use blk_queue_write_cache instead of open coding it
+ - various spelling fixes
+ - document a new paramter in ufshcd
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index ab0429644fe3..d17428a2b1dd 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -870,6 +870,13 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
- 	return BLK_STS_OK;
- }
- 
-+static void nvme_set_app_tag(struct nvme_command *cmnd, u16 apptag)
-+{
-+	cmnd->rw.apptag = cpu_to_le16(apptag);
-+	/* use 0xfff as mask so that apptag is used in entirety*/
-+	cmnd->rw.appmask = cpu_to_le16(0xffff);
-+}
-+
- static void nvme_set_ref_tag(struct nvme_ns *ns, struct nvme_command *cmnd,
- 			      struct request *req)
- {
-@@ -927,6 +934,55 @@ static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
- 	return BLK_STS_OK;
- }
- 
-+static blk_status_t nvme_setup_rw_meta(struct nvme_ns *ns, struct request *req,
-+				      struct nvme_command *cmnd, u16 *control,
-+				      enum nvme_opcode op)
-+{
-+	struct bio_integrity_payload *bip = bio_integrity(req->bio);
-+
-+	if (!bip || !(bip->bip_flags & BIP_INTEGRITY_USER)) {
-+		/*
-+		 * If formated with metadata, the block layer always provides a
-+		 * metadata buffer if CONFIG_BLK_DEV_INTEGRITY is enabled.  Else
-+		 * we enable the PRACT bit for protection information or set the
-+		 * namespace capacity to zero to prevent any I/O.
-+		 */
-+		if (!blk_integrity_rq(req)) {
-+			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)))
-+				return BLK_STS_NOTSUPP;
-+			*control |= NVME_RW_PRINFO_PRACT;
-+		}
-+
-+		switch (ns->head->pi_type) {
-+		case NVME_NS_DPS_PI_TYPE3:
-+			*control |= NVME_RW_PRINFO_PRCHK_GUARD;
-+			break;
-+		case NVME_NS_DPS_PI_TYPE1:
-+		case NVME_NS_DPS_PI_TYPE2:
-+			*control |= NVME_RW_PRINFO_PRCHK_GUARD |
-+					NVME_RW_PRINFO_PRCHK_REF;
-+			if (op == nvme_cmd_zone_append)
-+				*control |= NVME_RW_APPEND_PIREMAP;
-+			nvme_set_ref_tag(ns, cmnd, req);
-+			break;
-+		}
-+	} else {
-+		unsigned short bip_flags = bip->bip_flags;
-+
-+		if (bip_flags & BIP_USER_CHK_GUARD)
-+			*control |= NVME_RW_PRINFO_PRCHK_GUARD;
-+		if (bip_flags & BIP_USER_CHK_REFTAG) {
-+			*control |= NVME_RW_PRINFO_PRCHK_REF;
-+			nvme_set_ref_tag(ns, cmnd, req);
-+		}
-+		if (bip_flags & BIP_USER_CHK_APPTAG) {
-+			*control |= NVME_RW_PRINFO_PRCHK_APP;
-+			nvme_set_app_tag(cmnd, bip->apptag);
-+		}
-+	}
-+	return 0;
-+}
-+
- /*
-  * NVMe does not support a dedicated command to issue an atomic write. A write
-  * which does adhere to the device atomic limits will silently be executed
-@@ -963,6 +1019,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- {
- 	u16 control = 0;
- 	u32 dsmgmt = 0;
-+	blk_status_t ret;
- 
- 	if (req->cmd_flags & REQ_FUA)
- 		control |= NVME_RW_FUA;
-@@ -990,31 +1047,9 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 	cmnd->rw.appmask = 0;
- 
- 	if (ns->head->ms) {
--		/*
--		 * If formated with metadata, the block layer always provides a
--		 * metadata buffer if CONFIG_BLK_DEV_INTEGRITY is enabled.  Else
--		 * we enable the PRACT bit for protection information or set the
--		 * namespace capacity to zero to prevent any I/O.
--		 */
--		if (!blk_integrity_rq(req)) {
--			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)))
--				return BLK_STS_NOTSUPP;
--			control |= NVME_RW_PRINFO_PRACT;
--		}
--
--		switch (ns->head->pi_type) {
--		case NVME_NS_DPS_PI_TYPE3:
--			control |= NVME_RW_PRINFO_PRCHK_GUARD;
--			break;
--		case NVME_NS_DPS_PI_TYPE1:
--		case NVME_NS_DPS_PI_TYPE2:
--			control |= NVME_RW_PRINFO_PRCHK_GUARD |
--					NVME_RW_PRINFO_PRCHK_REF;
--			if (op == nvme_cmd_zone_append)
--				control |= NVME_RW_APPEND_PIREMAP;
--			nvme_set_ref_tag(ns, cmnd, req);
--			break;
--		}
-+		ret = nvme_setup_rw_meta(ns, req, cmnd, &control, op);
-+		if (unlikely(ret))
-+			return ret;
- 	}
- 
- 	cmnd->rw.control = cpu_to_le16(control);
--- 
-2.25.1
+Changes since v1:
+ - remove an incorrect use of a flag on the features field
+ - add a patch to switch to __bitwise annotations for features and flags
+ - update a commit log
 
+Diffstat:
+ block/bio-integrity.c     |    2 
+ block/blk-map.c           |    2 
+ block/blk-settings.c      |   46 +++++----------------
+ block/blk-sysfs.c         |   12 ++---
+ block/blk.h               |    2 
+ block/genhd.c             |    2 
+ drivers/ata/libata-scsi.c |    3 -
+ drivers/ata/pata_macio.c  |    4 -
+ drivers/md/md.c           |   14 ++++--
+ drivers/md/md.h           |    1 
+ drivers/md/raid0.c        |    2 
+ drivers/md/raid1.c        |    2 
+ drivers/md/raid10.c       |    2 
+ drivers/md/raid5.c        |    2 
+ drivers/scsi/scsi_lib.c   |    4 -
+ drivers/ufs/core/ufshcd.c |   10 ++--
+ include/linux/blkdev.h    |  100 +++++++++++++++++++++++-----------------------
+ 17 files changed, 99 insertions(+), 111 deletions(-)
