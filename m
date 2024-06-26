@@ -1,209 +1,360 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D6B148FE3;
-	Wed, 26 Jun 2024 11:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2885717F4EB
+	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 11:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719401626; cv=none; b=jkJpyu6B9rChLX3OLKLmKjYTvVWVuZwl59LwKZn12Ufi6iwrduRiq20GK+9wfJ6wmdTVW070kb2YfcFDYSdDXhQGR9PocD0gzTvW2sp/vqckmknHO/nZwLxGO8lagHzwyYiXBr4mezDPIPX9VMXIE7yRzigRn/elkCE5TBde5yw=
+	t=1719402112; cv=none; b=NInCOclVa3Tk4O0qmWsU06rGLPxrXuo2LLqdpw92bjhOrfD2h7Dhq54M+auluyOMUq+yhW5US+lrgRuQ7j09Pr6o72mAjotyq+hZhbCtpLa2wDnQzHwpu78HFlqNkHSDZTa9qTfPs7QMtdr72TRh//YJHg5a7Dh1fILAaoDoFAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719401626; c=relaxed/simple;
-	bh=rqGqww5P0DmeSRDWfh4o6RftNlXOzXNa7nE43WLEL7I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oO95oMJvm77E4ECDTofFVQ5UsP8RDv7102uB+gEy+a/M4M0Way/Ok1T5z6+pOzG1dMqfciCnt84XVbxRZF8Sa1VGL3vY+/oXTP83VHvNO7r93RgA2h4ooIsqm9Mxhi1+LF3pL0Op+t1WWKJfnFrou6Nk8oDc1UI7re/SLbxKE1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UI6SJYWU; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1719402112; c=relaxed/simple;
+	bh=W3RMzDViQh4gqMhmybXU7mNEOtXMO8SRkOTSDiQ6Dlg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=g4zHO2VHQhbooMi4B+Al7p9gvZmdRD1AlCZoxdVsLAYo5094DcNLBt06Qj7meZXHaoS4VNdwnyT0MCNXMirpkp2OXofrj/ImYyVBO3Z4tPSWPoVUW+ISYEcy+kV/6ocrgHzLCFt/sE+/qtgjRLf+zJ5ScFSJn4Jve+QA4p6yOLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=XU7uaino; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UI6SJYWU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719401625; x=1750937625;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rqGqww5P0DmeSRDWfh4o6RftNlXOzXNa7nE43WLEL7I=;
-  b=UI6SJYWUihDxc3bXS1Lat5M369LoLRSL2hglBSq2k6TXJ2BUgrvzywGO
-   I8UjYLEgAY5DIdQnBaiNjUE/ygxV8UaG889xwBjwMp9j2Mu+6HGhOqV7C
-   wo11FaqTu+x3OtBMPcgsaJ7VKWn430r3ietlp3+xK+eYfUhsJj18OIy39
-   V0tk/R2b5zzJrdANVpXdHKGWcCy6K/zQ+aJM3GG8Snko3Czwl1t1WWpyQ
-   CEcN//xk1UHRBjUQ4uDkUTdb8m3Krnz/euOm2AeAu0QlnuLpbzmkEAsOD
-   ds4IW8s0cJqZxsp0SW9jIAMCdsc1fLOATLR2hwVeP4nEHvJDWeGv4LXdU
-   A==;
-X-CSE-ConnectionGUID: SOZxoHEGQVqlgybHttTJRw==
-X-CSE-MsgGUID: /HmwxkyhQtO8qWa9snS2IA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="27057360"
-X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
-   d="scan'208";a="27057360"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 04:33:44 -0700
-X-CSE-ConnectionGUID: toXJogU2R8+CcIJ8Dldbog==
-X-CSE-MsgGUID: QUSJrV7jSTufBolgt3ek9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
-   d="scan'208";a="48423315"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 26 Jun 2024 04:33:39 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sMQu8-000FEM-2S;
-	Wed, 26 Jun 2024 11:33:36 +0000
-Date: Wed, 26 Jun 2024 19:32:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>, Song Liu <song@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Avri Altman <avri.altman@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	kernel test robot <oliver.sang@intel.com>
-Subject: Re: [PATCH 1/7] md: set md-specific flags for all queue limits
-Message-ID: <202406261925.u3nz0p2g-lkp@intel.com>
-References: <20240625110603.50885-2-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XU7uaino"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240626114140epoutp0391dd991de46af31a340c0d8e667ce2a5~cixnX3svr0791607916epoutp03E
+	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 11:41:40 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240626114140epoutp0391dd991de46af31a340c0d8e667ce2a5~cixnX3svr0791607916epoutp03E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1719402100;
+	bh=AiYF3SvzbJSOOU9YaBYI5hh4dDdtFAHbd8Yk/ZuJRac=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=XU7uainox3ieFkj6lKbJp4RdHjSxbscYsynXkRgnoHINyLyphuJVTq78cdPvyWYbZ
+	 jzOwYxA1h84tSyyS82CjXotDwqmj384maHxOlMG9LoKq2HVxEMgLu/NfHCdla1aJCL
+	 /LD/lvcvBnrDqCYvbX2n2H84h2WmXanQo5rBJBBA=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240626114140epcas5p35428e65ab929ff0f1a7e2ab94d35cb2f~cixm1JCu02483924839epcas5p3Y;
+	Wed, 26 Jun 2024 11:41:40 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.178]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4W8KXy3bLBz4x9Pp; Wed, 26 Jun
+	2024 11:41:38 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	77.5B.06857.27EFB766; Wed, 26 Jun 2024 20:41:38 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20240626101415epcas5p3b06a963aa0b0196d6599fb86c90bc38c~chlSN__Xh1180011800epcas5p3P;
+	Wed, 26 Jun 2024 10:14:15 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240626101415epsmtrp24b09ca7def050861363084196318513a~chlSNPRkx1187111871epsmtrp2I;
+	Wed, 26 Jun 2024 10:14:15 +0000 (GMT)
+X-AuditID: b6c32a4b-88bff70000021ac9-25-667bfe72c043
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	54.3C.18846.7F9EB766; Wed, 26 Jun 2024 19:14:15 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240626101413epsmtip10ad8b44a48c3bfcd84e91742fe72acdf~chlQLwbJ20093400934epsmtip1c;
+	Wed, 26 Jun 2024 10:14:13 +0000 (GMT)
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: asml.silence@gmail.com, mpatocka@redhat.com, axboe@kernel.dk,
+	hch@lst.de, kbusch@kernel.org, martin.petersen@oracle.com
+Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Anuj Gupta <anuj20.g@samsung.com>
+Subject: [PATCH v2 00/10] Read/Write with meta/integrity
+Date: Wed, 26 Jun 2024 15:36:50 +0530
+Message-Id: <20240626100700.3629-1-anuj20.g@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625110603.50885-2-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrMJsWRmVeSWpSXmKPExsWy7bCmum7Rv+o0g64dQhZNE/4yW8xZtY3R
+	YvXdfjaLlauPMlm8az3HYjHp0DVGi723tC3mL3vKbrH8+D8mi4kdV5kcuDx2zrrL7nH5bKnH
+	plWdbB6bl9R77L7ZwObx8ektFo/3+66yefRtWcXo8XmTXABnVLZNRmpiSmqRQmpecn5KZl66
+	rZJ3cLxzvKmZgaGuoaWFuZJCXmJuqq2Si0+ArltmDtCZSgpliTmlQKGAxOJiJX07m6L80pJU
+	hYz84hJbpdSClJwCkwK94sTc4tK8dL281BIrQwMDI1OgwoTsjAWnnjAVHLKvmHaykb2B8b92
+	FyMnh4SAicTxzXeZuhi5OIQEdjNKTO76xQLhfGKUaJvVyA7nLH23jrGLkQOs5fx3qKKdjBIN
+	q1uhnM9ARdebmEDmsgmoSxx53soIYosI1EqsbJ3ODmIzC9RJzLrxH8wWFrCQ+LZ9AwuIzSKg
+	KnG39ThYLy9QvO/sGWaI++QlZl76zg4RF5Q4OfMJC8QceYnmrbOZQRZLCPxll+j9vJgNosFF
+	4tiVw1DNwhKvjm9hh7ClJD6/2wtVky7x4/JTJgi7QKL52D5GCNteovVUPzPIl8wCmhLrd+lD
+	hGUlpp5axwSxl0+i9/cTqFZeiR3zYGwlifaVc6BsCYm95xqgbA+Jw88gaoQEYiU2n1/BNIFR
+	fhaSd2YheWcWwuYFjMyrGCVTC4pz01OLTQuM81LL4RGbnJ+7iRGcWrW8dzA+evBB7xAjEwfj
+	IUYJDmYlEd7Qkqo0Id6UxMqq1KL8+KLSnNTiQ4ymwDCeyCwlmpwPTO55JfGGJpYGJmZmZiaW
+	xmaGSuK8r1vnpggJpCeWpGanphakFsH0MXFwSjUwSV06ezAkplKL902/L59o+6n4xONtZzf1
+	ebz+mXbzeP683H86i/NmCdv/YXe/vrjfVOnICl2xglnxziLx3ebPnSdu+KrZ7bZv8nqhk4oq
+	Bz6yFN6amhThs/uaV9r5mg+CRqf/XCzxkuPVWGqU9v+y7mLNNT1my9u7f7xbOctzzhJJmWOc
+	t6/cKO999u94zZTErt9BhcqLJmowOopWM/2ZoeMlcu6pg5V9sJoT82Gzd1JHv6c7KczdVnRz
+	xzWf2KReyercF8yR7ryHdJ7sEvVY6W34v/DK1W06Kq8nr1zw9O3n1TIf4qxn5ZgvrnCoXtSm
+	rbOFJ/QnV+feh0eXsgY6yEyu/cRf9uBsovaf6XkcSizFGYmGWsxFxYkAzcFFljYEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrDLMWRmVeSWpSXmKPExsWy7bCSnO73l9VpBj9viVk0TfjLbDFn1TZG
+	i9V3+9ksVq4+ymTxrvUci8WkQ9cYLfbe0raYv+wpu8Xy4/+YLCZ2XGVy4PLYOesuu8fls6Ue
+	m1Z1snlsXlLvsftmA5vHx6e3WDze77vK5tG3ZRWjx+dNcgGcUVw2Kak5mWWpRfp2CVwZC049
+	YSo4ZF8x7WQjewPjf+0uRg4OCQETifPfWboYuTiEBLYzSjz4t4uxi5ETKC4hcerlMihbWGLl
+	v+fsEEUfGSWmNu4DS7AJqEsced7KCJIQEWhllDgwtQXMYRZoYpRY9eAEG0iVsICFxLftG1hA
+	bBYBVYm7rceZQGxeoHjf2TPMECvkJWZe+s4OEReUODnzCVg9M1C8eets5gmMfLOQpGYhSS1g
+	ZFrFKJpaUJybnptcYKhXnJhbXJqXrpecn7uJERzgWkE7GJet/6t3iJGJg/EQowQHs5IIb2hJ
+	VZoQb0piZVVqUX58UWlOavEhRmkOFiVxXuWczhQhgfTEktTs1NSC1CKYLBMHp1QDU+Ktr73l
+	C30vWey+FfYmRmqB7pJPD9Xddr/IcxWZfmrmBt5pe+Kcbu32OLesaeN87UQmpS2HhUMEI1jO
+	HHhUfa0vO2KS0sy+iX+n8Gi6zN/z/vm7Za4hnb184k2cAntCrPRUOxte/frFcDPU8svn/ztP
+	Cx+Uqvjz/fP6jnUvLk1T+rZJ4avKuWilmVfVS403xKVfzTt/71/nzyajUwXbTFRm72LaW971
+	i0lKleOd5Qft6wbGEx8GWsXY9QgoMrUaHDEOzmVze5h0p8fN7tWu6V6/1Pj5mFe5LTlxxnjP
+	rKavR89H+M3fzvvdY/KqwMwU+8lzVwmLMNzc+GGPvPLj/50Jcrkqx9PrL1YnyxUVLVdiKc5I
+	NNRiLipOBAAQh07h3wIAAA==
+X-CMS-MailID: 20240626101415epcas5p3b06a963aa0b0196d6599fb86c90bc38c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240626101415epcas5p3b06a963aa0b0196d6599fb86c90bc38c
+References: <CGME20240626101415epcas5p3b06a963aa0b0196d6599fb86c90bc38c@epcas5p3.samsung.com>
 
-Hi Christoph,
+This adds a new io_uring interface to exchange meta along with read/write.
 
-kernel test robot noticed the following build errors:
+Interface:
+Meta information is represented using a newly introduced 'struct io_uring_meta'.
+Application sets up a SQE128 ring, and prepares io_uring_meta within unused
+portion of SQE. Application populates 'struct io_uring_meta' fields as below:
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on next-20240625]
-[cannot apply to linus/master v6.10-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+* meta_type: describes type of meta that is passed. Currently one type
+"Integrity" is supported.
+* meta_flags: these are meta-type specific flags. Three flags are exposed for
+integrity type, namely INTEGRITY_CHK_GUARD/APPTAG/REFTAG.
+* meta_len: length of the meta buffer
+* meta_addr: address of the meta buffer
+* apptag: optional application-specific 16b value; this goes along with
+INTEGRITY_CHK_APPTAG flag.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/block-correctly-report-cache-type/20240626-012117
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20240625110603.50885-2-hch%40lst.de
-patch subject: [PATCH 1/7] md: set md-specific flags for all queue limits
-config: arm64-randconfig-004-20240626 (https://download.01.org/0day-ci/archive/20240626/202406261925.u3nz0p2g-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project ad79a14c9e5ec4a369eed4adf567c22cc029863f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240626/202406261925.u3nz0p2g-lkp@intel.com/reproduce)
+Block path (direct IO) and NVMe driver are modified to support
+this.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406261925.u3nz0p2g-lkp@intel.com/
+The first patch is borrowed from Mikulas series[1] to make the metadata split
+work correctly.
+Next 5 patches are enhancements in the block/nvme so that user meta buffer
+is handled correctly (mostly when it gets split).
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+Patch 8 adds the io_uring support.
+Patch 9 adds the support for block direct IO, and patch 10 for NVMe.
 
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8183-apmixedsys.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8183.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8183-audio.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8183-ipu0.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8183-ipu_conn.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8183-vdec.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-apmixedsys.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-topckgen.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-peri_ao.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-infra_ao.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-adsp_audio26m.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-cam.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-ccu.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-img.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-imp_iic_wrap.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-ipe.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-mfg.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-vdec.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-vdo0.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-vdo1.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-venc.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-vpp0.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-vpp1.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-wpe.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-mdp.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-vdec.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-venc.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8195-img.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8195-mfg.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8195-vdo0.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8195-vdo1.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8195-vpp0.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8195-vpp1.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sophgo/clk-sophgo-cv1800.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sprd/clk-sprd.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/clk_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/qcom/clk-qcom.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/soc/imx/soc-imx8m.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/soc/amlogic/meson-clk-measure.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/pmdomain/amlogic/meson-ee-pwrc.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/pmdomain/amlogic/meson-secure-pwrc.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/regulator/da9121-regulator.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/reset/hisilicon/hi6220_reset.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/hw_random/omap3-rom-rng.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_kunit_helpers.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_buddy_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_cmdline_parser_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_connector_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_damage_helper_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_dp_mst_helper_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_exec_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_format_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_framebuffer_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_gem_shmem_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_managed_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_mm_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_modes_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_plane_helper_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_probe_helper_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_rect_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/panel/panel-orisetech-ota5601a.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-kunit.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-ram.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-raw-ram.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-slimbus.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-w1.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-sccb.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mfd/vexpress-sysreg.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mfd/qcom-pm8008.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dax/dax.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/input/touchscreen/cyttsp_i2c_common.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/rtc/rtc-rc5t583.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/rtc/rtc-twl.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/i2c/busses/i2c-qup.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/tuners/tda9887.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/platform/marvell/mmp_camera.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/platform/marvell/mcam-core.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/platform/samsung/exynos4-is/exynos-fimc-lite.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/platform/samsung/exynos4-is/exynos-fimc-is.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/platform/samsung/exynos4-is/exynos4-is-common.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/platform/ti/vpe/ti-vpdma.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-async.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-fwnode.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/radio/si470x/radio-si470x-common.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cpufreq/cpufreq-dt-platdev.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/leds/flash/leds-rt4505.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/firmware/meson/meson_sm.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_performance.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/nvmem/nvmem_brcm_nvram.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-aspeed.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-gpio.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/interconnect/imx/imx-interconnect.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/interconnect/imx/imx8mm-interconnect.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/interconnect/imx/imx8mq-interconnect.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/interconnect/imx/imx8mn-interconnect.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/interconnect/imx/imx8mp-interconnect.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/pcmcia/pcmcia_rsrc.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/iio/adc/ingenic-adc.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/iio/adc/xilinx-ams.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/iio/buffer/kfifo_buf.o
->> ERROR: modpost: "md_init_stacking_limits" [drivers/md/raid1.ko] undefined!
->> ERROR: modpost: "md_init_stacking_limits" [drivers/md/raid10.ko] undefined!
->> ERROR: modpost: "md_init_stacking_limits" [drivers/md/raid456.ko] undefined!
+Example program on how to use the interface is appended below [2]
+
+Tree:
+https://github.com/SamsungDS/linux/tree/feat/pi_us_v2
+Testing:
+has been done by modifying fio to use this interface.
+https://github.com/samsungds/fio/commits/feat/test-meta-v3
+
+Changes since v1:
+https://lore.kernel.org/linux-block/20240425183943.6319-1-joshi.k@samsung.com/
+- Do not use new opcode for meta, and also add the provision to introduce new
+meta types beyond integrity (Pavel)
+- Stuff IOCB_HAS_META check in need_complete_io (Jens)
+- Split meta handling in NVMe into a separate handler (Keith)
+- Add meta handling for __blkdev_direct_IO too (Keith)
+- Don't inherit BIP_COPY_USER flag for cloned bio's (Christoph)
+- Better commit descriptions (Christoph)
+
+Changes since RFC:
+- modify io_uring plumbing based on recent async handling state changes
+- fixes/enhancements to correctly handle the split for meta buffer
+- add flags to specify guard/reftag/apptag checks
+- add support to send apptag
+
+[1] https://lore.kernel.org/linux-block/719d2e-b0e6-663c-ec38-acf939e4a04b@redhat.com/
+
+[2]
+
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <linux/io_uring.h>
+#include <linux/types.h>
+#include "liburing.h"
+
+/* write data/meta. read both. compare. send apptag too.
+* prerequisite:
+* unprotected xfer: format namespace with 4KB + 8b, pi_type = 0
+* protected xfer: format namespace with 4KB + 8b, pi_type = 1
+*/
+
+#define DATA_LEN 4096
+#define META_LEN 8
+
+struct t10_pi_tuple {
+        __be16  guard;
+        __be16  apptag;
+        __be32  reftag;
+};
+
+int main(int argc, char *argv[])
+{
+         struct io_uring ring;
+         struct io_uring_sqe *sqe = NULL;
+         struct io_uring_cqe *cqe = NULL;
+         void *wdb,*rdb;
+         char wmb[META_LEN], rmb[META_LEN];
+         char *data_str = "data buffer";
+         char *meta_str = "meta";
+         int fd, ret, blksize;
+         struct stat fstat;
+         unsigned long long offset = DATA_LEN;
+         struct t10_pi_tuple *pi;
+	 struct io_uring_meta *md;
+
+         if (argc != 2) {
+                 fprintf(stderr, "Usage: %s <block-device>", argv[0]);
+                 return 1;
+         };
+
+         if (stat(argv[1], &fstat) == 0) {
+                 blksize = (int)fstat.st_blksize;
+         } else {
+                 perror("stat");
+                 return 1;
+         }
+
+         if (posix_memalign(&wdb, blksize, DATA_LEN)) {
+                 perror("posix_memalign failed");
+                 return 1;
+         }
+         if (posix_memalign(&rdb, blksize, DATA_LEN)) {
+                 perror("posix_memalign failed");
+                 return 1;
+         }
+
+         strcpy(wdb, data_str);
+         strcpy(wmb, meta_str);
+
+         fd = open(argv[1], O_RDWR | O_DIRECT);
+         if (fd < 0) {
+                 printf("Error in opening device\n");
+                 return 0;
+         }
+
+         ret = io_uring_queue_init(8, &ring, IORING_SETUP_SQE128);
+         if (ret) {
+                 fprintf(stderr, "ring setup failed: %d\n", ret);
+                 return 1;
+         }
+
+         /* write data + meta-buffer to device */
+         sqe = io_uring_get_sqe(&ring);
+         if (!sqe) {
+                 fprintf(stderr, "get sqe failed\n");
+                 return 1;
+         }
+
+         io_uring_prep_write(sqe, fd, wdb, DATA_LEN, offset);
+
+	 md = (struct io_uring_meta *) sqe->cmd;
+	 md->meta_type = META_TYPE_INTEGRITY;
+	 md->meta_addr = (__u64)wmb;
+	 md->meta_len = META_LEN;
+         /* flags to ask for guard/reftag/apptag*/
+	 md->meta_flags = INTEGRITY_CHK_APPTAG;
+         md->apptag = 0x1234;
+
+	 pi = (struct t10_pi_tuple *)wmb;
+         pi->apptag = 0x3412;
+
+         ret = io_uring_submit(&ring);
+         if (ret <= 0) {
+                 fprintf(stderr, "sqe submit failed: %d\n", ret);
+                 return 1;
+         }
+
+         ret = io_uring_wait_cqe(&ring, &cqe);
+         if (!cqe) {
+                 fprintf(stderr, "cqe is NULL :%d\n", ret);
+                 return 1;
+         }
+         if (cqe->res < 0) {
+                 fprintf(stderr, "write cqe failure: %d", cqe->res);
+                 return 1;
+         }
+
+         io_uring_cqe_seen(&ring, cqe);
+
+         /* read data + meta-buffer back from device */
+         sqe = io_uring_get_sqe(&ring);
+         if (!sqe) {
+                 fprintf(stderr, "get sqe failed\n");
+                 return 1;
+         }
+
+         io_uring_prep_read(sqe, fd, rdb, DATA_LEN, offset);
+
+	 md = (struct io_uring_meta *) sqe->cmd;
+	 md->meta_type = META_TYPE_INTEGRITY;
+	 md->meta_addr = (__u64)rmb;
+	 md->meta_len = META_LEN;
+	 md->meta_flags = INTEGRITY_CHK_APPTAG;
+         md->apptag = 0x1234;
+
+         ret = io_uring_submit(&ring);
+         if (ret <= 0) {
+                 fprintf(stderr, "sqe submit failed: %d\n", ret);
+                 return 1;
+         }
+
+         ret = io_uring_wait_cqe(&ring, &cqe);
+         if (!cqe) {
+                 fprintf(stderr, "cqe is NULL :%d\n", ret);
+                 return 1;
+         }
+
+         if (cqe->res < 0) {
+                 fprintf(stderr, "read cqe failure: %d", cqe->res);
+                 return 1;
+         }
+         io_uring_cqe_seen(&ring, cqe);
+
+         if (strncmp(wmb, rmb, META_LEN))
+                 printf("Failure: meta mismatch!, wmb=%s, rmb=%s\n", wmb, rmb);
+
+         if (strncmp(wdb, rdb, DATA_LEN))
+                 printf("Failure: data mismatch!\n");
+
+         io_uring_queue_exit(&ring);
+         free(rdb);
+         free(wdb);
+         return 0;
+}
+
+Anuj Gupta (5):
+  block: set bip_vcnt correctly
+  block: copy bip_max_vcnt vecs instead of bip_vcnt during clone
+  block: Handle meta bounce buffer correctly in case of split
+  block: modify bio_integrity_map_user to accept iov_iter as argument
+  io_uring/rw: add support to send meta along with read/write
+
+Kanchan Joshi (4):
+  block: introduce BIP_CLONED flag
+  block: define meta io descriptor
+  block: add support to pass user meta buffer
+  nvme: add handling for user integrity buffer
+
+Mikulas Patocka (1):
+  block: change rq_integrity_vec to respect the iterator
+
+ block/bio-integrity.c         | 75 ++++++++++++++++++++++++++-----
+ block/fops.c                  | 28 +++++++++++-
+ block/t10-pi.c                |  6 +++
+ drivers/nvme/host/core.c      | 85 ++++++++++++++++++++++++-----------
+ drivers/nvme/host/ioctl.c     | 11 ++++-
+ drivers/nvme/host/pci.c       |  6 +--
+ include/linux/bio.h           | 25 +++++++++--
+ include/linux/blk-integrity.h | 16 +++----
+ include/linux/fs.h            |  1 +
+ include/uapi/linux/io_uring.h | 30 ++++++++++++-
+ io_uring/io_uring.c           |  7 +++
+ io_uring/rw.c                 | 68 ++++++++++++++++++++++++++--
+ io_uring/rw.h                 |  9 +++-
+ 13 files changed, 308 insertions(+), 59 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
