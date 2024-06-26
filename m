@@ -1,42 +1,42 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F389313CFBC
-	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 04:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A012E1411EB
+	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 05:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719378001; cv=none; b=vGsrrK3oo+PQzqCCPC5kRzyun0Xsax0QZNJ4mRWQI2YRF3THkFrKpCndH+Oq40vD93rVhMB4HHrSOieGsUP8Oe8rLhN6oKud0jVTmdFoEcq436dHvdiuXvp+/vsVX52ocSmZFn9Dgmc5bEtE8vNsZWDLJrk68mYCZtBePRbHHak=
+	t=1719378004; cv=none; b=Nv81644tKllxf1OFcISOQczJwQbPTnB4RO+w5UrDKsSJDpLMNmn3u4m8yPTOOq/qCgCen0SNuZk2DNB2gOcM6skGNXSCL9Ais8Qk4J81gplJHSb2kQ46crn6/6hbZfbYweU8uxjeFkqsONSiMTiArAgYB/dmvOW+0u98HQYbBQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719378001; c=relaxed/simple;
-	bh=OkUz3D4zTiO+M92ZwlVv+M7E3coDi1XTWr/8s2b1Q8Y=;
+	s=arc-20240116; t=1719378004; c=relaxed/simple;
+	bh=FdBOCXIwcT5j4YtBiY8rkX7d+qIIjkK1n4El5jSYJ6g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WUNwGpsUc+cTBBAVgkmfIzv5zlHyb5U88MBrVA9xShuyh/O5WwpWwV9OSwkgdyqVRDvf9Fk2QK55h+sra45Bk1TMGBUAS5c36fz1a2nCBDnGlHPgCSrIJoubahS3fwbzIDiGkwgQHnf4MIpu+pdmfVlOmu1xzA/gzYjVdH1Svvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=m/brbMqs; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=EP1YXfQPm1zWsZITrr1UGaGxS/KVF/XmWJ6UFNYmfSPgCiNWhVu7a+ly9YzJ+NL+14wRTVoZgsj1dqgBmSVIg/4NEYYBfVoNy6U5pxQgbZ9kvLrlGMa8ReGwvftbjCqckOd9DS8qiBTrf2iXna1okW07+QKVpRqltEt2VhgAg+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=B/UW8Byx; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="m/brbMqs"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B/UW8Byx"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=Lnzs8yVYRfhv6PKYE+JHT4C8PmQeaT+ZxW6JYLi2Evw=; b=m/brbMqsrEu0/KK99VfmITEFpW
-	1bhqfSJW5A3ZJxSOUHVHQ5wcu/LXV9tQqYUS/cQ0KrKMNw9sMn02SNiQmuNq2G6utEBst+09hCFLW
-	isCmx5iY+I6nVa1KkcmCY4QqtbG+wLoGUaqTJa+zFEt6KuJiNvB2VQTFSIZAM4OJgHqGSKKqIIMTc
-	DePWLGrA/9VWIV101Ow1+ADQ85Qk+U/recHXn0i4FCvfthTD5mpWx4HJkCRGQ5LFr2bggaJ8zyfLe
-	0ZlO8EJOobPywaA8GIUm273+GqNb3qZAK3LLDtNsdPCzHgthshDllQ3w1uxMoc8WFX+vvqPROsmI0
-	UrrH6qsw==;
+	bh=XzP272gxGewxI5PdYCImorh/ghJpKV6N9gdcybQzjSM=; b=B/UW8ByxCKO429PN2s+QI+Q6g3
+	sknsqSlgBdfMClbhUFyJZ2xmm2k/HVe6+0tJSDzpe1wgLWnzjBb7yV4sxeXgch4+DRq8qH0AL50jg
+	LwnNspDzfC+XWJ9+73/PWrgSSJ73jcZLNqCoEWcS/nQLWvbVz9wBAbwx+esI8IjMUhDI6c0+dX3O8
+	HsjgKG0SpGaCHLBLuDIPB5xay/mk+GGlagDVSaPG0QE5liJi/BHyuHZAoYbil2k+Hc6jjItts/85K
+	/212OAcIp86QAf9MbieXsCKh0xTxfIVqR+FPsGzZ6/EQd2BvxFS8TY4dt+kaog7tu2DrjkPRy/GS2
+	Hm/YHdWA==;
 Received: from [2001:4bb8:2cd:5bfc:fac4:f2e7:8d6c:958e] (helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sMKlC-00000005Nkm-49UC;
-	Wed, 26 Jun 2024 04:59:59 +0000
+	id 1sMKlF-00000005Nkv-3DS1;
+	Wed, 26 Jun 2024 05:00:02 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 2/5] block: simplify adding the payload in bio_integrity_prep
-Date: Wed, 26 Jun 2024 06:59:35 +0200
-Message-ID: <20240626045950.189758-3-hch@lst.de>
+Subject: [PATCH 3/5] block: remove allocation failure warnings in bio_integrity_prep
+Date: Wed, 26 Jun 2024 06:59:36 +0200
+Message-ID: <20240626045950.189758-4-hch@lst.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240626045950.189758-1-hch@lst.de>
 References: <20240626045950.189758-1-hch@lst.de>
@@ -49,72 +49,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-bio_integrity_add_page can add physically contiguous regions of any size,
-so don't bother chunking up the kmalloced buffer.
+Allocation failures already leave a stack trace, so don't spew another
+warning.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio-integrity.c | 32 ++++++--------------------------
- 1 file changed, 6 insertions(+), 26 deletions(-)
+ block/bio-integrity.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 8c5991a1c535af..2efab4b3957978 100644
+index 2efab4b3957978..1017984552baf8 100644
 --- a/block/bio-integrity.c
 +++ b/block/bio-integrity.c
-@@ -428,10 +428,8 @@ bool bio_integrity_prep(struct bio *bio)
- {
- 	struct bio_integrity_payload *bip;
- 	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
-+	unsigned int len;
- 	void *buf;
--	unsigned long start, end;
--	unsigned int len, nr_pages;
--	unsigned int bytes, offset, i;
- 	gfp_t gfp = GFP_NOIO;
- 
- 	if (!bi)
-@@ -471,12 +469,7 @@ bool bio_integrity_prep(struct bio *bio)
+@@ -465,13 +465,11 @@ bool bio_integrity_prep(struct bio *bio)
+ 	len = bio_integrity_bytes(bi, bio_sectors(bio));
+ 	buf = kmalloc(len, gfp);
+ 	if (unlikely(buf == NULL)) {
+-		printk(KERN_ERR "could not allocate integrity buffer\n");
  		goto err_end_io;
  	}
  
--	end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
--	start = ((unsigned long) buf) >> PAGE_SHIFT;
--	nr_pages = end - start;
--
--	/* Allocate bio integrity payload and integrity vectors */
--	bip = bio_integrity_alloc(bio, GFP_NOIO, nr_pages);
-+	bip = bio_integrity_alloc(bio, GFP_NOIO, 1);
+ 	bip = bio_integrity_alloc(bio, GFP_NOIO, 1);
  	if (IS_ERR(bip)) {
- 		printk(KERN_ERR "could not allocate data integrity bioset\n");
+-		printk(KERN_ERR "could not allocate data integrity bioset\n");
  		kfree(buf);
-@@ -489,23 +482,10 @@ bool bio_integrity_prep(struct bio *bio)
- 	if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
- 		bip->bip_flags |= BIP_IP_CHECKSUM;
- 
--	/* Map it */
--	offset = offset_in_page(buf);
--	for (i = 0; i < nr_pages && len > 0; i++) {
--		bytes = PAGE_SIZE - offset;
--
--		if (bytes > len)
--			bytes = len;
--
--		if (bio_integrity_add_page(bio, virt_to_page(buf),
--					   bytes, offset) < bytes) {
--			printk(KERN_ERR "could not attach integrity payload\n");
--			goto err_end_io;
--		}
--
--		buf += bytes;
--		len -= bytes;
--		offset = 0;
-+	if (bio_integrity_add_page(bio, virt_to_page(buf), len,
-+			offset_in_page(buf)) < len) {
-+		printk(KERN_ERR "could not attach integrity payload\n");
-+		goto err_end_io;
+ 		goto err_end_io;
  	}
- 
- 	/* Auto-generate integrity metadata if this is a write */
 -- 
 2.43.0
 
