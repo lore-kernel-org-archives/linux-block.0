@@ -1,117 +1,312 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6967E18C341
-	for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 15:37:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59350190047;
+	Wed, 26 Jun 2024 17:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719416276; cv=none; b=bTbZWkYQffuFyNBE7ne9AP0RUn0LG8GH8tVMVZOQNs5UyBCFb2xCu3SMFI17xFi7DFNGXgzcu6sZzrG28d7EwvH0lL6dTZzMJ2aMt9GEw4sRxt8xuUg6hwugznwmyQizbVdWedi+1FdR5XtpNh7ZmQiLqQfUnJ/BhUyqJgEul4Q=
+	t=1719422258; cv=none; b=JtfH6J8VXJUBntTie4hn5EprfRKAUddqQA0o07Eob0csZgdDZS+qR4VdqaED32iTaWPv34Z7trtN7doXud9TyP8hZHOrW/6jzjxtlZ+bMeNLck8TNdJTy78ga9nPvSZVgwkmzKPJjvLYQQUYkZvpJZLWq0T4v9DqmLaBK271LI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719416276; c=relaxed/simple;
-	bh=qswXWhuzIZ+h28u39X/TbxoZXcqH/jfAdkbI/EQrJp8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=k7lrAQz1Hrfyiejj3CJwnrW6Geh/Puk28snZ2IDh41ol9tpJkhOgPYnARbzr18ZJnj6xDbY1dAtROg+ugnqw69PnbEKm97zoaIXrwANvOfOXJyCrRw7ebrCizAnaKycIG9bOnIyNx63higIbMaibTjl+exk4p0YRQ5vvTVMf+0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=h/BAZk0+; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1719422258; c=relaxed/simple;
+	bh=GpeZhrulOlXBfGexVpGjpazhJnwi7OM07pnieAgX1Sw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pAcDEOeIobNfcg1q5M+iC9A+JAZjNcRCyVy+CJHYSWw+r7+Fw4a4DVFLLoTUAPt55LeTXlLAeyvMIeqvYobjL0bnMZk2n7uX0L6Wxqi04LhnJpPeDck1g5XP5fQOz95GA1YpsFTcRJVn+xva2ZzJHzPplNOjfBUUw9NOPPqEnso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ii9pCUro; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/HBLR4wi; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hHuqArdz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ue0EyvPp; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="h/BAZk0+"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-706798e7ceeso134342b3a.3
-        for <linux-block@vger.kernel.org>; Wed, 26 Jun 2024 08:37:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719416274; x=1720021074; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8625LYB5aaVg0lsF/zrXcJOla9BjQc91ZD1HdTRXaQc=;
-        b=h/BAZk0+ipeRczd8YfGYreu3scYDtUUB0/+ovRSG061NGdQMfWvvh8VWm2ieG9IHl6
-         7SJ6IFPU19Y7rRYxvoyn8FFJMPfyWLBGJ52EFkngH4OfzE2FGIsRpzs4G1pycnCyaWrW
-         E1NMaZ0LVKbcTSvz3bbcfdRJsfkfPAsR33QIlsqIM4uY67ZiPhAHgw5GBxs305KKVmfx
-         qBu7mKFjtKEMtsGFFcjtlSI1hhq+fpmqiXDTv+YLpezCIsiTSk8a7dP5D7fYdiaoXqAj
-         1T/tGZhcyKEuFCHgNJER+q/9QKrkx5Mjj3hMM84sBXlfMDad1rmK5zIIWFXmQxZrFzej
-         e4Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719416274; x=1720021074;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8625LYB5aaVg0lsF/zrXcJOla9BjQc91ZD1HdTRXaQc=;
-        b=EGprwMwTVJZIMxIQdpl7uc2CXKn/K3fQW0n78ykUHCereEhrZfaDC4O6crjaGM9oTZ
-         ZCcVdv0hXimytrxhDAOX9KeEXu9kg6RZZfAIwgwN+mBaZNymn3O6ZzQAhGxQjXSeq7NU
-         Cf/DoSyUMVeU01VswkeVbTp/muZ/9PloI/BZ5cwV+JLcEVOJWPBZrzFPD3kb1rpqHJVP
-         QajjU00+9FscXFjDlSaKz1/+ksd15HF+GE8RvAyTwadsX10G6kfA/hRQtqXgEkqhn6uQ
-         QtbhSobHPGD28UYhv6DwX7/lT6Ql2FrpCdNp6FeQM876RvyvX5r7RPsfaVRxqQafFc/B
-         Jmkw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgGRorUCqKJoQaUpiuwXRGZxFDnqEw/bpKOgASQbuq2HQrjNrwTcM+bL1lXYPdganIvUegAsAuN4oF0rPiUq5jp7a+W+BIhOPxPY0=
-X-Gm-Message-State: AOJu0Yzi1u+J8OIPEPUf+77ulN/m3W9/W9b/U0geTdmhRTPtNAt8KGhO
-	OqmU9Wn83B/XPF/Ilt+Wq8vcvAgd0bGZmYuNC92EN6Yvl/VduQAJJ8nQNRTFQk0=
-X-Google-Smtp-Source: AGHT+IE1B3Foc1AGbVxgYLJqURuiVuiq4RlkiwEooUHzwNaoAi0MxEgooHMiiE1u87mf4aGEOgty8g==
-X-Received: by 2002:a05:6a20:158e:b0:1bc:eebe:cc82 with SMTP id adf61e73a8af0-1bceebecd89mr13899066637.3.1719416274580;
-        Wed, 26 Jun 2024 08:37:54 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-706a9842478sm1340538b3a.117.2024.06.26.08.37.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 08:37:53 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
- Song Liu <song@kernel.org>, Yu Kuai <yukuai3@huawei.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>, 
- Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org, 
- linux-ide@vger.kernel.org, linux-raid@vger.kernel.org, 
- linux-scsi@vger.kernel.org
-In-Reply-To: <20240626142637.300624-1-hch@lst.de>
-References: <20240626142637.300624-1-hch@lst.de>
-Subject: Re: queue_limits fixups and tidyups v3
-Message-Id: <171941627257.837674.361966910045628144.b4-ty@kernel.dk>
-Date: Wed, 26 Jun 2024 09:37:52 -0600
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ii9pCUro";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/HBLR4wi";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hHuqArdz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ue0EyvPp"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A11591FB6E;
+	Wed, 26 Jun 2024 17:17:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719422251; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NcQeDRhLMlH4Z7xqdQnN7buLz2LWXR3v3A1y122z5XA=;
+	b=ii9pCUrowURihyt6Ysfsc7oquo//MHDhsg5yKlc+RN04UB6T/pFx3gvSqwe7WliAbdm12I
+	JRdf8mOzRDZraZj7ojcNbc+Vb99Gn+Ox8pzkheM+oEKpSIKcSWFKQJ3cUgDzWnmU7nBuE5
+	gp6mx+4thmlZdhkVI3thm0lFHbB9sA0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719422251;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NcQeDRhLMlH4Z7xqdQnN7buLz2LWXR3v3A1y122z5XA=;
+	b=/HBLR4wioAoy8UJsW2fc5BPsaNRtC5u1vUD8SNY36OPqKghid4LCj9htqkJz0mHgd8lxT2
+	Q0+0u78ZyEvO8MBw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719422249; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NcQeDRhLMlH4Z7xqdQnN7buLz2LWXR3v3A1y122z5XA=;
+	b=hHuqArdzT+WLgVXnSCFHa2GL+j7nmbbpGhnHesWla7PrXhIKoaDS98Xn1xONRtC3UIifNF
+	be3hGVlNduGQmjthrXdK7o95Uk8WfdDBJF3Lk96wceRCHnp4O9V7hmvjqPOiI+R+W/xaba
+	Ztap4CeP09kU+qCjT5xOXH3V1jXxOUg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719422249;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NcQeDRhLMlH4Z7xqdQnN7buLz2LWXR3v3A1y122z5XA=;
+	b=ue0EyvPp+5AueWmylmFT+01yYgfjVYd9PJzoPgzXE1d3Sn9113ztvzKN2UWxifWEMpdgqN
+	5vXcrQyYD1B2ZjDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5DE81139C2;
+	Wed, 26 Jun 2024 17:17:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id w9XAEClNfGakDAAAD6G6ig
+	(envelope-from <krisman@suse.de>); Wed, 26 Jun 2024 17:17:29 +0000
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: asml.silence@gmail.com,  mpatocka@redhat.com,  axboe@kernel.dk,
+  hch@lst.de,  kbusch@kernel.org,  martin.petersen@oracle.com,
+  io-uring@vger.kernel.org,  linux-nvme@lists.infradead.org,
+  linux-block@vger.kernel.org,  Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v2 08/10] io_uring/rw: add support to send meta along
+ with read/write
+In-Reply-To: <20240626100700.3629-9-anuj20.g@samsung.com> (Anuj Gupta's
+	message of "Wed, 26 Jun 2024 15:36:58 +0530")
+References: <20240626100700.3629-1-anuj20.g@samsung.com>
+	<CGME20240626101525epcas5p4dbcef84714e4e9214b951fe2ff649521@epcas5p4.samsung.com>
+	<20240626100700.3629-9-anuj20.g@samsung.com>
+Date: Wed, 26 Jun 2024 13:17:28 -0400
+Message-ID: <87y16rmxnb.fsf@mailhost.krisman.be>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.0
+Content-Type: text/plain
+X-Spam-Score: -2.80
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TAGGED_RCPT(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,kernel.dk,lst.de,kernel.org,oracle.com,vger.kernel.org,lists.infradead.org,samsung.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,samsung.com:email]
 
+Anuj Gupta <anuj20.g@samsung.com> writes:
 
-On Wed, 26 Jun 2024 16:26:21 +0200, Christoph Hellwig wrote:
-> this series has a few fixes for the queue_limits conversion in the first
-> few patches and then has a bunch more cleanups and improvements in that
-> area.
-> 
-> Changes since v2:
->  - export md_init_stacking_limits
->  - use blk_queue_write_cache instead of open coding it
->  - various spelling fixes
->  - document a new paramter in ufshcd
-> 
-> [...]
+> This patch adds the capability of sending meta along with read/write.
+> This meta is represented by a newly introduced 'struct io_uring_meta'
+> which specifies information such as meta type/flags/buffer/length and
+> apptag.
+> Application sets up a SQE128 ring, prepares io_uring_meta within the SQE
+> at offset pointed by sqe->cmd.
+> The patch processes the user-passed information to prepare uio_meta
+> descriptor and passes it down using kiocb->private.
+>
+> Meta exchange is supported only for direct IO.
+> Also vectored read/write operations with meta are not supported
+> currently.
+>
+> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> ---
+>  include/linux/fs.h            |  1 +
+>  include/uapi/linux/io_uring.h | 30 +++++++++++++++-
+>  io_uring/io_uring.c           |  7 ++++
+>  io_uring/rw.c                 | 68 +++++++++++++++++++++++++++++++++--
+>  io_uring/rw.h                 |  9 ++++-
+>  5 files changed, 110 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index db26b4a70c62..0132565288c2 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -330,6 +330,7 @@ struct readahead_control;
+>  #define IOCB_NOIO		(1 << 20)
+>  /* can use bio alloc cache */
+>  #define IOCB_ALLOC_CACHE	(1 << 21)
+> +#define IOCB_HAS_META		(1 << 22)
+>  /*
+>   * IOCB_DIO_CALLER_COMP can be set by the iocb owner, to indicate that the
+>   * iocb completion can be passed back to the owner for execution from a safe
+> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> index 2aaf7ee256ac..9140c66b315b 100644
+> --- a/include/uapi/linux/io_uring.h
+> +++ b/include/uapi/linux/io_uring.h
+> @@ -101,12 +101,40 @@ struct io_uring_sqe {
+>  		__u64	optval;
+>  		/*
+>  		 * If the ring is initialized with IORING_SETUP_SQE128, then
+> -		 * this field is used for 80 bytes of arbitrary command data
+> +		 * this field is starting offset for 80 bytes of data.
+> +		 * This data is opaque for uring command op. And for meta io,
+> +		 * this contains 'struct io_uring_meta'.
+>  		 */
+>  		__u8	cmd[0];
+>  	};
+>  };
+>  
+> +enum io_uring_sqe_meta_type_bits {
+> +	META_TYPE_INTEGRITY_BIT,
+> +	/* not a real meta type; just to make sure that we don't overflow */
+> +	META_TYPE_LAST_BIT,
+> +};
+> +
+> +/* meta type flags */
+> +#define META_TYPE_INTEGRITY	(1U << META_TYPE_INTEGRITY_BIT)
+> +
+> +struct io_uring_meta {
+> +	__u16	meta_type;
+> +	__u16	meta_flags;
+> +	__u32	meta_len;
+> +	__u64	meta_addr;
+> +	/* the next 64 bytes goes to SQE128 */
+> +	__u16	apptag;
+> +	__u8	pad[62];
+> +};
+> +
+> +/*
+> + * flags for integrity meta
+> + */
+> +#define INTEGRITY_CHK_GUARD	(1U << 0)	/* enforce guard check */
+> +#define INTEGRITY_CHK_APPTAG	(1U << 1)	/* enforce app tag check */
+> +#define INTEGRITY_CHK_REFTAG	(1U << 2)	/* enforce ref tag check */
+> +
+>  /*
+>   * If sqe->file_index is set to this for opcodes that instantiate a new
+>   * direct descriptor (like openat/openat2/accept), then io_uring will allocate
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index 7ed1e009aaec..0d26ee1193ca 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -3704,6 +3704,13 @@ static int __init io_uring_init(void)
+>  	/* top 8bits are for internal use */
+>  	BUILD_BUG_ON((IORING_URING_CMD_MASK & 0xff000000) != 0);
+>  
+> +	BUILD_BUG_ON(sizeof(struct io_uring_meta) >
+> +		     2 * sizeof(struct io_uring_sqe) -
+> +		     offsetof(struct io_uring_sqe, cmd));
+> +
+> +	BUILD_BUG_ON(META_TYPE_LAST_BIT >
+> +		     8 * sizeof_field(struct io_uring_meta, meta_type));
+> +
+>  	io_uring_optable_init();
+>  
+>  	/*
+> diff --git a/io_uring/rw.c b/io_uring/rw.c
+> index c004d21e2f12..e8f5b5af4d2f 100644
+> --- a/io_uring/rw.c
+> +++ b/io_uring/rw.c
+> @@ -23,6 +23,8 @@
+>  #include "poll.h"
+>  #include "rw.h"
+>  
+> +#define	INTEGRITY_VALID_FLAGS (INTEGRITY_CHK_GUARD | INTEGRITY_CHK_APPTAG | \
+> +			       INTEGRITY_CHK_REFTAG)
+>  struct io_rw {
+>  	/* NOTE: kiocb has the file as the first member, so don't do it here */
+>  	struct kiocb			kiocb;
+> @@ -247,6 +249,42 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
+>  	return 0;
+>  }
+>  
+> +static int io_prep_rw_meta(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+> +			   struct io_rw *rw, int ddir)
+> +{
+> +	const struct io_uring_meta *md = (struct io_uring_meta *)sqe->cmd;
+> +	u16 meta_type = READ_ONCE(md->meta_type);
+> +	const struct io_issue_def *def;
+> +	struct io_async_rw *io;
+> +	int ret;
+> +
+> +	if (!meta_type)
+> +		return 0;
+> +	if (!(meta_type & META_TYPE_INTEGRITY))
+> +		return -EINVAL;
+> +
+> +	/* should fit into two bytes */
+> +	BUILD_BUG_ON(INTEGRITY_VALID_FLAGS >= (1 << 16));
+> +
+> +	def = &io_issue_defs[req->opcode];
+> +	if (def->vectored)
+> +		return -EOPNOTSUPP;
+> +
+> +	io = req->async_data;
+> +	io->meta.flags = READ_ONCE(md->meta_flags);
+> +	if (io->meta.flags & ~INTEGRITY_VALID_FLAGS)
+> +		return -EINVAL;
+> +
+> +	io->meta.apptag = READ_ONCE(md->apptag);
+> +	ret = import_ubuf(ddir, u64_to_user_ptr(READ_ONCE(md->meta_addr)),
+> +			  READ_ONCE(md->meta_len), &io->meta.iter);
+> +	if (unlikely(ret < 0))
+> +		return ret;
+> +	rw->kiocb.ki_flags |= IOCB_HAS_META;
+> +	iov_iter_save_state(&io->meta.iter, &io->iter_meta_state);
+> +	return ret;
+> +}
+> +
+>  static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+>  		      int ddir, bool do_import)
+>  {
+> @@ -269,11 +307,16 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+>  		rw->kiocb.ki_ioprio = get_current_ioprio();
+>  	}
+>  	rw->kiocb.dio_complete = NULL;
+> +	rw->kiocb.ki_flags = 0;
+>  
+>  	rw->addr = READ_ONCE(sqe->addr);
+>  	rw->len = READ_ONCE(sqe->len);
+>  	rw->flags = READ_ONCE(sqe->rw_flags);
+> -	return io_prep_rw_setup(req, ddir, do_import);
+> +	ret = io_prep_rw_setup(req, ddir, do_import);
+> +
+> +	if (unlikely(req->ctx->flags & IORING_SETUP_SQE128 && !ret))
+> +		ret = io_prep_rw_meta(req, sqe, rw, ddir);
+> +	return ret;
 
-Applied, thanks!
+Would it be useful to have a flag to differentiate a malformed SQE from
+a SQE with io_uring_meta, instead of assuming sqe->cmd has it? We don't
+check for addr3 at the moment and differently from uring_cmd, userspace
+will be mixing writes commands with and without metadata to different
+files, so it would be useful to catch that.
 
-[1/8] md: set md-specific flags for all queue limits
-      commit: 573d5abf3df00c879fbd25774e4cf3e22c9cabd0
-[2/8] block: correctly report cache type
-      commit: 78887d004fb2bb03233122a048eaf46e850dabf4
-[3/8] block: rename BLK_FEAT_MISALIGNED
-      commit: ec9b1cf0b0ebfb52274971a8a0e74e0a133f64fb
-[4/8] block: convert features and flags to __bitwise types
-      commit: fcf865e357f80285af12c0c9a49f89d71acb7f4b
-[5/8] block: conding style fixup for blk_queue_max_guaranteed_bio
-      commit: 3302f6f09052274945f877beeb83f74641de2418
-[6/8] block: remove disk_update_readahead
-      commit: 73781b3b81e76583708a652c853d54d03dce031d
-[7/8] block: remove the fallback case in queue_dma_alignment
-      commit: abfc9d810926dfbf5645c7755c8d5ab96273f27d
-[8/8] block: move dma_pad_mask into queue_limits
-      commit: e94b45d08b5d1c230c0f59c3eed758d28658851e
+Also, just styling, but can you turn that !ret into a separate if leg?
+We are bound to add more code here eventually, and the next patch to
+touch it will end up doing it anyway. I mean:
 
-Best regards,
+ret = io_prep_rw_setup(req, ddir, do_import);
+if (unlikely(ret))
+	return ret;
+if (unlikely(req->ctx->flags & IORING_SETUP_SQE128))
+	ret = io_prep_rw_meta(req, sqe, rw, ddir);
+return ret;
+
 -- 
-Jens Axboe
-
-
-
+Gabriel Krisman Bertazi
