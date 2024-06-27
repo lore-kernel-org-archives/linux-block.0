@@ -1,204 +1,286 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B7414EC75
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 12:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719490160; cv=fail; b=EF8jza8a5n4UIpf6gr0yY/C+Nz8TL7ywztkVfL2Idn0UbAKwvmJUoaJ+JbSJWQ1lygsBtP+i7cuWWogtsq59WL05abpJKayx66TEsNY3+U28HA0PmUX3TrTSg6UsEA8kFgidMhXbz0ofqdYrM9Eb7qfgvg8sg1XpHklBEBsFlqA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719490160; c=relaxed/simple;
-	bh=yVsmzy1dxSqNz8zD+Ksf+WChULgYR1pClFKf884ZPW8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XvXTZUR4FAcmba/8OzPc3x0csnR8Jx/nA9+69/EYjn8hcqtxf+F4iOb+TI4WPH67HW4KLsUsKzZuwSog4S6P2c5zeIPY5gY+BT4aRJf1sDzU/ySz0jBTFbmc/CMNPUQ5Jx4XWgemhCP/MxTDjpqJfXHVSNrXikK+OnUdlJP4q2g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=IXf9HRxV; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=lV+oMU8F; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IXf9HRxV";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="lV+oMU8F"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45R7tWdn029141;
-	Thu, 27 Jun 2024 12:09:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	corp-2023-11-20; bh=U25GTOH4i77Nv3pRIxVQ3q7DzozEd3/nR1o4e2i8/qQ=; b=
-	IXf9HRxVbM3q8/q59wveIM033TDLo7sPbAd3hkHJ5qdBMM7jO2zRGYb+2q+K5FlJ
-	fHw6hy9mnKhBi5YC8TNwfciGN1mgmaw2d1WTHc3XDXb67OWuWswX3231qIyTavNl
-	+B7O62LWINL8hmza0x2C+ECqyj3lHy2pZKirBEVRiQtVH4mNw+xqe7lVuF6+WdEz
-	0PA91WzoYUTODIf+QAtvoisau47icYAE1aKDCbiZLpRH/F5/ICkw6fg1z2gjIE8x
-	OmHnrCMnK4vjYSk4a1k7fanEWjkmSdW+kt/Q47I04843lTejLBLDi4pSsVLHKtL1
-	VmK4vn3dKIWqf6N+Gamlng==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 400ttn9exj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Jun 2024 12:09:14 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45RAWhBP010948;
-	Thu, 27 Jun 2024 12:09:13 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2043.outbound.protection.outlook.com [104.47.55.43])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3ywn2gtf8r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Jun 2024 12:09:13 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E4O66RZdLOVkHEDLGIipilcDKhYn9iJ+TwGCMExEth8e+OqgmSHM/CcgU9IaJ565rm2erd2Z9UgC+dwosrLMtBFFBT7/taEwQYAEom33T5F+d04fp07X5a+NkGsbBvKZqR20lWCq3/J4NP6be3W893J7GYRLx82xejUDKRZISA/3eFLeodmDXnA4ew5Q9Ig3K6hs41k+8ggXL+6AvokcDOB67mJYEz9I/lDWStvi71T17OoYjV097gH5S8m0qbnpX/fMkRgs+Isvr1fcEuhRoZk6cGqPDprB+Ro+LeB8ungQKxJJqaiHwqmEMVkcUCDxsfH/3P9w+TTZsPHKT6etrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U25GTOH4i77Nv3pRIxVQ3q7DzozEd3/nR1o4e2i8/qQ=;
- b=UCShMWWr/5jDfPNlyeLFyOheJow6yvP821P1OVq6KFPfoxVkgqMjR6SfX0yfKwdcR5qqWIYVypcm59PwQ3pzTfIkJZy9hRt7F83fG97OKk71VwGik+rqy4i0OJsR8ELAzCKoeE5OOQs6wHw0jpTphvgsrWFZQ/tUgX2XIdHkeZN75p5vdVsxBSBKA2+FxnxoCe9FllzD7oWZHtU8q45vWtJjifHsjUArwbYC9/PZFCOOS+4TYWzbLp0BpGxK7IANvYxbe5T61NALaQHNKWNUMuwtj4hWd2BXtJgC2qRvxLQ9VgDQuzGRo6FEh4UkHhiVaz6E/JaWiq/DtKjl4QTwgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U25GTOH4i77Nv3pRIxVQ3q7DzozEd3/nR1o4e2i8/qQ=;
- b=lV+oMU8FhfNbIwYCmWp2+gftp2414hfHGGiyhwlmQ5GI1ltpl4OnoDw+2dsoVMWdYqOvc/SXPV8FAVwfqgSYw2wHDV7ZMcJ6hgxpB67sxc7dc39EaIuDXazijZGjCtZtdxhH8HELUEjE4YDGJKjFDFgd7Gtt/ABujzWxFzENZ3Q=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by CH3PR10MB7908.namprd10.prod.outlook.com (2603:10b6:610:1d1::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.32; Thu, 27 Jun
- 2024 12:09:11 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%6]) with mapi id 15.20.7698.033; Thu, 27 Jun 2024
- 12:09:11 +0000
-Message-ID: <7a8768a6-f128-419a-8994-9f3b68c6dbcb@oracle.com>
-Date: Thu, 27 Jun 2024 13:09:08 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] block: simplify queue_logical_block_size
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-References: <20240627111407.476276-1-hch@lst.de>
- <20240627111407.476276-2-hch@lst.de>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20240627111407.476276-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0110.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2c3::14) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED8A149009;
+	Thu, 27 Jun 2024 12:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719490181; cv=none; b=PjS056iQWEkqE2K5pNuD13VwDBVRS/joOoOvrbd7enz+VPb8aroSBPiTXktiR27uzlXHpKTwT5dwI0DHVxhS7pOshvIja6zr94yJnSfubaVf7ocqr/2XdXpKs5XnjdNtr0HQFCVHkY+0lue3inUIDNM3bVfmaifT3q/GkbicmLE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719490181; c=relaxed/simple;
+	bh=SGuMbfsY8dKPuaDoIA3Dzb2gzG7cu+HgkpPDVQ92aYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rwjrESe0is2JP7ZOgGctQplQ5FmQMpxz2qpFd5fFhGUx+dyVHe9u43dDKR9vNlhaNDsPh4pT5uac2TWH2/JpG5lEehto9kn1j1M+JD1Z9nmPMfZdDWXd93gE1oL5yknphM/sh9P7zdkwjixuEk79zqLNvfIX4mwJIb6FYUZv1nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id CC68F68BFE; Thu, 27 Jun 2024 14:09:33 +0200 (CEST)
+Date: Thu, 27 Jun 2024 14:09:33 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: asml.silence@gmail.com, mpatocka@redhat.com, axboe@kernel.dk,
+	hch@lst.de, kbusch@kernel.org, martin.petersen@oracle.com,
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v2 05/10] block: introduce BIP_CLONED flag
+Message-ID: <20240627120933.GA8620@lst.de>
+References: <20240626100700.3629-1-anuj20.g@samsung.com> <CGME20240626101519epcas5p163b0735c1604a228196f0e8c14773005@epcas5p1.samsung.com> <20240626100700.3629-6-anuj20.g@samsung.com> <20240627062142.GC16047@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|CH3PR10MB7908:EE_
-X-MS-Office365-Filtering-Correlation-Id: 228d6936-adb1-4fc9-3e4e-08dc96a1f42b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: 
-	=?utf-8?B?SUxWQjNYTkVDbUNwekRzajFqQXVnSEhWQjNjYmc1OEZWTzFkd09ZTDBFUGtU?=
- =?utf-8?B?UUtDOThNYSttdWpFM3BZVGRZclVQSnhaUEJoWmZLS1lhdklWUnlzcWhJUUF6?=
- =?utf-8?B?SWFyN2QyVHRIL09MaDRpeXlKYXZwNlFybjJiSnRnVkJYY1ZidGJUS0QxZ0ZK?=
- =?utf-8?B?RGN5SGhhNHZDMTgvZnJOa3U4RVNZNnpKdVQvR3NoNFdqbWR6bFhIaFdhdFUv?=
- =?utf-8?B?OHIxVVFvUzgrb2o2NmxhTUQyTTEwaGQxaXY3YzQ1bThsRUwwc09objZ2TWZN?=
- =?utf-8?B?RDhEQjY5LzI0L29EYkxoRjdPbDRoU0FJK3lLajh3ZmtHUGg3NEpFeXZnSGxh?=
- =?utf-8?B?OGNIWEpQQy9ORWtPalFCS3NScmtXeWNmZVlYeld0THdGTzVwZFZFcVJOUy9H?=
- =?utf-8?B?SSsrbGNoN01QMmptN1ZkOVc2a2RsY2EyclA3Q0RRTHVKVFFld21kRzcvNnJy?=
- =?utf-8?B?NUdCUjBDYXNqSklFd0JtZjRYa3dBM2JkSDY1WGY2MkUreWZYcUFEbkgzdlZR?=
- =?utf-8?B?MnBYMEt1cU9TWVNwbEtPWjJkdXNIRGticHEvRnlVTHdRQVBOVTNyV0w5Zlhl?=
- =?utf-8?B?NzlrL0J3T1lrZy83OGRORU9ySXFWVmpwUVloLzFWc1k3NTdMb1JmT0djUXN5?=
- =?utf-8?B?Z0RLNGRrSEJiM2l4SU5NMTgwcnV0QklFTXpEZmlITnVuQlNiMnJPTmUxUVI3?=
- =?utf-8?B?NFNNMFJVRExHTTRibytuNlVPUEJQeVNDTUJFRW9jS0ZjdTBDTURiTWJmQWNI?=
- =?utf-8?B?RU5yTncxUGRWOFBZVFo0ODg2cG56RzJYdjhMbDJyc2hjbEpRcERFcWpvK1FQ?=
- =?utf-8?B?ZXV5VnZ3eitQTU4weXR6RGNCUXJBYzJJWlJZaHB2Q0UyZ0o1bklJOGxPT08z?=
- =?utf-8?B?cmY5NlZRT0lUdTV4OEY3NUx1YUk5TVhtRm5LQUpoMlVzN2ZseFkzaTdNdGJS?=
- =?utf-8?B?cndWMFJuT1Q3Tkx5NGtnZm1yMERQeWwvdjlGazBVRHdMVUQ3aGxrd1pDTnp2?=
- =?utf-8?B?b0pOQ0FBMUVkTjdpWkxZYkdPZE50dmorb1NQYmFiSEdtS2lLSUtlUTZmQ1BZ?=
- =?utf-8?B?YkIrSy9qQmNaMC9YcnFCWE5Bb0lybkx5UWIwRjZkcVRtUlZISEJPVThGWFU5?=
- =?utf-8?B?Nng0ZmNMWCtVU0dZYTRueXlrYTl0bVUvdER6UXdTc2x2WjdFcCttQWFWQno3?=
- =?utf-8?B?QnVSZDdiZkhhdElVMjV4cVhSUXJEeXNyUnZhYU5vK3djVUtqWXc5aVAyYkdH?=
- =?utf-8?B?Mk1IcERrdEhUNHpFc3ZHRGRMUHJxS3EzYUxBSy9XdVR6b3E5QWRqTGpSZmcv?=
- =?utf-8?B?OTE2SUVWR1F2Nm90ZlpUbHlqR2p6cEp1VUJYeitVblNEZ0NVaGlNNEVQZW9M?=
- =?utf-8?B?L3NxbUNVQUlUUlVpZjVJdTd5ckUwNnRraVMwaytGa01jaTBVVk4zRExzL0ht?=
- =?utf-8?B?SnRlWnNmK25EYjA4MmMzYVBvc3F1Y1hQaldhSGtsYnZ0R3ZYbUROV055WDBZ?=
- =?utf-8?B?cmY0ZEtyRWIvUUFoUFNSTnVKTHNVZnZLL3ZTODZSekxoL05ET3FSK2J1QTFG?=
- =?utf-8?B?S0pORGo5OUtaZGkzc2pZOUxQMStxTVNqYzZkeFFZOTRmUG1NYmZaeUt2eldI?=
- =?utf-8?B?MjhLMGd2WmpHMTlrUlZXeUErZEw2R2tFQVlrVWFTb1hQZDNpR1FQZ3VTZTBp?=
- =?utf-8?B?cnFrdUpUTXFxdXVqN3dnaDlVd08rdGtUQXRSODEzcG9ZTXY5ZGM0Z0sveU5q?=
- =?utf-8?B?WDJxUHRrS2NKckg5S0paWXAwN29KWHgxcFhSUzRGNnA3S3lpN3dSVHY5R2w2?=
- =?utf-8?B?ODRQczEyZkNsU1hUcFYwQT09?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?eDlBbjlrcExwSmovUmdhanJ2NDRXWmRCWjhZVzhyMTBYSEljRmw0MXdtYlg2?=
- =?utf-8?B?RHQ2TmZFbzFnQnVScUQwSzFId25aUjhWaVJNYWdMb1crTDZWWXJoR3RoNDEv?=
- =?utf-8?B?bWpPYVRLMkJYUU0vRkJSandwbDNIejEreTNmNDJEQnRRZmRUN0VyNEsybS9R?=
- =?utf-8?B?c1FwbmV3VnZ3ajdZOVNmLzRKcXVEY1Fhc1NZYkRUWFYvVGtUN2tVTE5xb1k5?=
- =?utf-8?B?cjRKU0lPamFhRlZMbHNUMGZ4MnRwZ2tobzVzdHpaMGhzRVlERDdxeG4xdy9P?=
- =?utf-8?B?ZWJib2padlhRckU3b0ZxK05Ob01XL0t2U1M4YWh3U0pjd2JYTDkvNDZDL3Jl?=
- =?utf-8?B?UjF4a05vTDNoaVhOKzhBMmRabkhreHBKeklGeXkzR2NNQ0Z6VE9zMVBEM1J0?=
- =?utf-8?B?emVaQzNUTmZOeUR2YXduWjA5NmJGb3ROWDZEb3czUmcvVFkzdnpOU3BTSFJn?=
- =?utf-8?B?NkV6M2RBelVKUVg3V1hWTnN6WFlTVXlqeWg5Z0dMMkgvaGV6dHlIc1hhalUy?=
- =?utf-8?B?REpvNWllUmZzVlJPQlJzbk1EOHphNjhTTEZiMXJLbkRDZGFyZ2FqMEpveC9l?=
- =?utf-8?B?S00yQXZiSGxnYU84UHFpTkVKQlQzdEE5ekJ5ekVzOXJZajJ3cGZJOXNuOVBV?=
- =?utf-8?B?OXBLU3FyRGRBeUh2d011dDBnYm1lalRjWDFkNW5uRmhGVzRvbUNPOXA4Ykd6?=
- =?utf-8?B?TUVES1MrUGtTV3RoWTg4bkxBbXBhRmgrTWQyMHFjTCtEZnNaTVg4cFRCNEVU?=
- =?utf-8?B?OEx3V0RPd0hRUm5FRk9yUEttSngwb2ZWUGtvaFJuQSs1bzR0OXdpRGFZN0Nz?=
- =?utf-8?B?dzFtNXFNSkg1R3dNMjlqZUFubGR6eXVRcGM0bWdXbGlGU29tbG5aTHh1Wmxp?=
- =?utf-8?B?TGdlY0YyLy80RHFkMVJhRlpIejl6QzAzVEk5OVd5OEFmbkVpV0IvRFFsdkxS?=
- =?utf-8?B?WWxyNjJVcGR1aDFiMFI0WVM5Y01CbytpVXcxaWF0V1RYTUZxY1dONXNLdWxs?=
- =?utf-8?B?Zm5JWjJCRWJqZ1RieVpDY2pCNGY5VDFMZnBTTFRTUzJZdDNyZFp4S1JJVlB1?=
- =?utf-8?B?dGJOQzVWTDRFdnUwWnBsV1EvRU9aRndnQVdOWXR3RTFtaWF3Unp0RC9Qam05?=
- =?utf-8?B?TFM1UnMvUXpBa09NVEdUTStRaWZjVjJVMk5vY1d3U3l6amlybGE2U2k5VWdN?=
- =?utf-8?B?R3pLSzVwUkJzN0FLREEzVUprZHA2MFpEQ1R0VDJ5NG5Ia3BJYjUzMFpsMkIy?=
- =?utf-8?B?Q3owWk0yMDdwVmRXVmh4VGlqa2xGS1NOSWhXcnB6R1I1MVk2aDRaSXhqWXpz?=
- =?utf-8?B?Nnh2Ni81K2tyRUppczZ1Y0h5V3hkMXZMRisxSzZ2NTZ6cTFQNER0c3BhcXJL?=
- =?utf-8?B?a0ZKeGJUVlB4OEhNcjY3d3hSZHVaSlRCV1REcjd0RnUwWWdaM0Jta2QwWXdW?=
- =?utf-8?B?dURNQ3lPR0xCZjI5SExtMXN0TWdrQzZ6TXRiZUpMeU5WNmdVMjVob0ExNlha?=
- =?utf-8?B?R0NYQldCZkZ4K3g1ZERDNmNuTWJITnZHWDBUeHZqQ08zbzNsUWhZbUlydDZr?=
- =?utf-8?B?V0VORUN4a0JyWW9LaWVMalJhTzd0V2phcFkzeE9aNXRQSS9kUEVObk1vUks0?=
- =?utf-8?B?UjcvOWdPYWtJMWJaUDB0WHZac2tSRkx4enpCeVM1b1pWZ2JtQm9ZVzM1VEk1?=
- =?utf-8?B?bUtWaUdJUEgxNk9ldW9lbjhyUkFudG5iSzVzMGFjQ21EZGdxS09kZUJPTGdm?=
- =?utf-8?B?TVcyQmNrSUs5eUZpOUEwQy9ObXpKN3dvU29Cb1R6aUU4RjE1WGlGdXZ4NVhh?=
- =?utf-8?B?WnpxZ3g5RVRhZHJHQW5aaFpYWDgrTHhzRk52a1Z5bnl4MnpxZHpPNVBDVHZo?=
- =?utf-8?B?UjJLcUNaMExHQzFVZDFhVGo1K3dvM0ZpT09VeHFNTFFqY1I0SXFqRTVvS1dH?=
- =?utf-8?B?ejB1cjRCQTlmUWF5TVBPcHpVMXdIajVVR2RHVW1ud3Rmd3BjZ1lDaDE1aTFH?=
- =?utf-8?B?VXVlc0NkVjIrRWdINHNydEYrSGZZakZDYlNqM2l3cnpOMkk3VjRrL3YyRzVs?=
- =?utf-8?B?V1NmSUxOWTE0cUl2bE5xbnlqZ244RGJxVlk3aFBEV295NnBtS09sd0pyTGpq?=
- =?utf-8?Q?Im7e7p+XkC8hd4Y8U+FnU9+HY?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	Hp5dIPZXeICZwn/qvF3S/4Caq2tgogRpv0JhcMiXph55RR1WE+lVPknk4BnX2kmW4MkGZyK1ALGrI9yE8U7q6nEcGogBhROoALxTn/u2wR+baZLLUxDFVGCekda1qRYf2xIm+iddfzMuSVtNwU2W23TkJiaSIkuK4EXOllG8q62gq6l+Wa4zyg+x6lq2+G2kcQAFLd10aL0O1SBqCCRU4uH2jeMeEkZxeUs4GiEHXW+IU2CFfYep53V5An8bSYzgKOtikq72/Y5rbI8tU39P2hhboDicgjS9f9tQ7JmbwMBrQnYlqe2InYS+LYj5w6n/hLdVV3PUShWGxrIGry5p6ltqftpZESVM9Ci8PgFvQ/baREJKt83qK21tGBykkYZ3n4EnE2pmJVzh8lWXAAcJ1Zx/VyZ28LLsorrMYjla5cpUZrRejcwiAVs8VPImNCDsO8Wf4VQ3mlAiIj9tDo2DThApaR2z+jVZ8Cx1KhYlpRYX7hkEw+TRLxzDM1PVjs2kLD3891WIQ4PlCCn47jMJKOr86HhvHe3c6fKJgmXHc9qY/3Q6BCeox6P6mFigd6dCZ4WPDGSoz368o0qFJZ15yDQQWDcFPS59vJSVq40Y5k8=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 228d6936-adb1-4fc9-3e4e-08dc96a1f42b
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 12:09:11.2336
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xvhXud2MNddHch8L07ywetfEeLiUzHos16pzxkV8T2lFpMbWSA8MOZrd63G0a9eSxHhIDAnQ4caUXJsZDChG1g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB7908
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-27_06,2024-06-27_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- spamscore=0 suspectscore=0 adultscore=0 phishscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2406180000 definitions=main-2406270092
-X-Proofpoint-GUID: SUltdEtqj_DsH3pHnvHbDLs5LFQdSEjY
-X-Proofpoint-ORIG-GUID: SUltdEtqj_DsH3pHnvHbDLs5LFQdSEjY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240627062142.GC16047@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 27/06/2024 12:14, Christoph Hellwig wrote:
-> queue_logical_block_size is never called with a 0 queue, and the
+On Thu, Jun 27, 2024 at 08:21:42AM +0200, Christoph Hellwig wrote:
+> this is probably best done by moving the bip_flags checks out of
+> bio_integrity_free and have bio_integrity_free just do the
+> unconditional freeing, and have a new helper for
+> __bio_integrity_endio / bio_integrity_verify_fn to also
+> free the payload.
 
-nit: could use NULL queue
+Something like the patch below, against my "integrity cleanups" series
+from yesterday.  Lightly tested.
 
-> logical_block_size field in queue_limits is always initialized for
-> a live queue.
-> 
-> Signed-off-by: Christoph Hellwig<hch@lst.de>
+---
+From f312de8ae5e329569c4810ddf977195e997e03ec Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Thu, 27 Jun 2024 13:25:28 +0200
+Subject: block: don't free submitter owned integrity payload on I/O completion
 
-Reviewed-by: John Garry <john.g.garry@oracle.com>
+Currently __bio_integrity_endio unconditionally frees the integrity
+payload.  While this works really well for block-layer generated
+integrity payloads, it is a bad idea for those passed in by the
+submitter, as it can't access the integrity data from the I/O completion
+handler.
+
+Change bio_integrity_endio to only call __bio_integrity_endio for
+block layer generated integrity data, and leave freeing of submitter
+allocated integrity data to bio_uninit which also gets called from
+the final bio_put.  This requires that unmapping user mapped or copied
+integrity data is done by the caller now.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio-integrity.c | 68 ++++++++++++++++++++-----------------------
+ block/blk-map.c       |  3 ++
+ block/blk.h           |  4 ++-
+ include/linux/bio.h   |  4 +--
+ 4 files changed, 40 insertions(+), 39 deletions(-)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 20bbfd5730dadd..d21ad6624f0062 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -22,9 +22,17 @@ void blk_flush_integrity(void)
+ 	flush_workqueue(kintegrityd_wq);
+ }
+ 
+-static void __bio_integrity_free(struct bio_set *bs,
+-				 struct bio_integrity_payload *bip)
++/**
++ * bio_integrity_free - Free bio integrity payload
++ * @bio:	bio containing bip to be freed
++ *
++ * Description: Free the integrity portion of a bio.
++ */
++void bio_integrity_free(struct bio *bio)
+ {
++	struct bio_integrity_payload *bip = bio_integrity(bio);
++	struct bio_set *bs = bio->bi_pool;
++
+ 	if (bs && mempool_initialized(&bs->bio_integrity_pool)) {
+ 		if (bip->bip_vec)
+ 			bvec_free(&bs->bvec_integrity_pool, bip->bip_vec,
+@@ -33,6 +41,8 @@ static void __bio_integrity_free(struct bio_set *bs,
+ 	} else {
+ 		kfree(bip);
+ 	}
++	bio->bi_integrity = NULL;
++	bio->bi_opf &= ~REQ_INTEGRITY;
+ }
+ 
+ /**
+@@ -49,19 +59,21 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
+ 						  gfp_t gfp_mask,
+ 						  unsigned int nr_vecs)
+ {
+-	struct bio_integrity_payload *bip;
+ 	struct bio_set *bs = bio->bi_pool;
++	bool has_mempool = bs && mempool_initialized(&bs->bio_integrity_pool);
++	struct bio_integrity_payload *bip;
+ 	unsigned inline_vecs;
+ 
+ 	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
+ 		return ERR_PTR(-EOPNOTSUPP);
+ 
+-	if (!bs || !mempool_initialized(&bs->bio_integrity_pool)) {
+-		bip = kmalloc(struct_size(bip, bip_inline_vecs, nr_vecs), gfp_mask);
+-		inline_vecs = nr_vecs;
+-	} else {
++	if (has_mempool) {
+ 		bip = mempool_alloc(&bs->bio_integrity_pool, gfp_mask);
+ 		inline_vecs = BIO_INLINE_VECS;
++	} else {
++		bip = kmalloc(struct_size(bip, bip_inline_vecs, nr_vecs),
++				gfp_mask);
++		inline_vecs = nr_vecs;
+ 	}
+ 
+ 	if (unlikely(!bip))
+@@ -86,7 +98,10 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
+ 
+ 	return bip;
+ err:
+-	__bio_integrity_free(bs, bip);
++	if (has_mempool)
++		mempool_free(bip, &bs->bio_integrity_pool);
++	else
++		kfree(bip);
+ 	return ERR_PTR(-ENOMEM);
+ }
+ EXPORT_SYMBOL(bio_integrity_alloc);
+@@ -118,9 +133,10 @@ static void bio_integrity_uncopy_user(struct bio_integrity_payload *bip)
+ 	bio_integrity_unpin_bvec(copy, nr_vecs, true);
+ }
+ 
+-static void bio_integrity_unmap_user(struct bio_integrity_payload *bip)
++void bio_integrity_unmap_user(struct bio *bio)
+ {
+-	bool dirty = bio_data_dir(bip->bip_bio) == READ;
++	struct bio_integrity_payload *bip = bio_integrity(bio);
++	bool dirty = bio_data_dir(bio) == READ;
+ 
+ 	if (bip->bip_flags & BIP_COPY_USER) {
+ 		if (dirty)
+@@ -131,28 +147,7 @@ static void bio_integrity_unmap_user(struct bio_integrity_payload *bip)
+ 
+ 	bio_integrity_unpin_bvec(bip->bip_vec, bip->bip_max_vcnt, dirty);
+ }
+-
+-/**
+- * bio_integrity_free - Free bio integrity payload
+- * @bio:	bio containing bip to be freed
+- *
+- * Description: Used to free the integrity portion of a bio. Usually
+- * called from bio_free().
+- */
+-void bio_integrity_free(struct bio *bio)
+-{
+-	struct bio_integrity_payload *bip = bio_integrity(bio);
+-	struct bio_set *bs = bio->bi_pool;
+-
+-	if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
+-		kfree(bvec_virt(bip->bip_vec));
+-	else if (bip->bip_flags & BIP_INTEGRITY_USER)
+-		bio_integrity_unmap_user(bip);
+-
+-	__bio_integrity_free(bs, bip);
+-	bio->bi_integrity = NULL;
+-	bio->bi_opf &= ~REQ_INTEGRITY;
+-}
++EXPORT_SYMBOL_GPL(bio_integrity_unmap_user);
+ 
+ /**
+  * bio_integrity_add_page - Attach integrity metadata
+@@ -252,7 +247,7 @@ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
+ 		goto free_bip;
+ 	}
+ 
+-	bip->bip_flags |= BIP_INTEGRITY_USER | BIP_COPY_USER;
++	bip->bip_flags |= BIP_COPY_USER;
+ 	bip->bip_iter.bi_sector = seed;
+ 	return 0;
+ free_bip:
+@@ -272,7 +267,6 @@ static int bio_integrity_init_user(struct bio *bio, struct bio_vec *bvec,
+ 		return PTR_ERR(bip);
+ 
+ 	memcpy(bip->bip_vec, bvec, nr_vecs * sizeof(*bvec));
+-	bip->bip_flags |= BIP_INTEGRITY_USER;
+ 	bip->bip_iter.bi_sector = seed;
+ 	bip->bip_iter.bi_size = len;
+ 	return 0;
+@@ -479,6 +473,8 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ 	struct bio *bio = bip->bip_bio;
+ 
+ 	blk_integrity_verify(bio);
++
++	kfree(bvec_virt(bip->bip_vec));
+ 	bio_integrity_free(bio);
+ 	bio_endio(bio);
+ }
+@@ -499,13 +495,13 @@ bool __bio_integrity_endio(struct bio *bio)
+ 	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 
+-	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status &&
+-	    (bip->bip_flags & BIP_BLOCK_INTEGRITY) && bi->csum_type) {
++	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status && bi->csum_type) {
+ 		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
+ 		queue_work(kintegrityd_wq, &bip->bip_work);
+ 		return false;
+ 	}
+ 
++	kfree(bvec_virt(bip->bip_vec));
+ 	bio_integrity_free(bio);
+ 	return true;
+ }
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 71210cdb34426d..e7fc1f13f6b8d4 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -757,6 +757,9 @@ int blk_rq_unmap_user(struct bio *bio)
+ 			bio_release_pages(bio, bio_data_dir(bio) == READ);
+ 		}
+ 
++		if (bio_integrity(bio))
++			bio_integrity_unmap_user(bio);
++
+ 		next_bio = bio;
+ 		bio = bio->bi_next;
+ 		blk_mq_map_bio_put(next_bio);
+diff --git a/block/blk.h b/block/blk.h
+index 7917f86cca0ebd..5de7ce11f149b5 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -205,7 +205,9 @@ bool __bio_integrity_endio(struct bio *);
+ void bio_integrity_free(struct bio *bio);
+ static inline bool bio_integrity_endio(struct bio *bio)
+ {
+-	if (bio_integrity(bio))
++	struct bio_integrity_payload *bip = bio_integrity(bio);
++
++	if (bip && (bip->bip_flags & BIP_BLOCK_INTEGRITY))
+ 		return __bio_integrity_endio(bio);
+ 	return true;
+ }
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d5379548d684e1..622cf9c36c7e87 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -327,8 +327,7 @@ enum bip_flags {
+ 	BIP_CTRL_NOCHECK	= 1 << 2, /* disable HBA integrity checking */
+ 	BIP_DISK_NOCHECK	= 1 << 3, /* disable disk integrity checking */
+ 	BIP_IP_CHECKSUM		= 1 << 4, /* IP checksum */
+-	BIP_INTEGRITY_USER	= 1 << 5, /* Integrity payload is user address */
+-	BIP_COPY_USER		= 1 << 6, /* Kernel bounce buffer in use */
++	BIP_COPY_USER		= 1 << 5, /* Kernel bounce buffer in use */
+ };
+ 
+ /*
+@@ -731,6 +730,7 @@ static inline bool bioset_initialized(struct bio_set *bs)
+ 		bip_for_each_vec(_bvl, _bio->bi_integrity, _iter)
+ 
+ int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t len, u32 seed);
++void bio_integrity_unmap_user(struct bio *bio);
+ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
+ extern bool bio_integrity_prep(struct bio *);
+-- 
+2.43.0
 
