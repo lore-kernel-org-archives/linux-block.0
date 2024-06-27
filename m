@@ -1,192 +1,307 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2040.outbound.protection.outlook.com [40.107.96.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C1813A245;
-	Thu, 27 Jun 2024 09:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719482350; cv=fail; b=CT11c+vPOpMcxDJjWwuTrZ5kRzybtN4OJr+kU2fHk02BXPbIVd6v+rBPjxjDqjr0/4o/jdffpMf3jpRly6k6apCJ2IEv8p0KhWsTg3pLryvtsUJXW+q1fkgTsAc/QZOqjjvn46sxLkvZ+k564In5S99h+qh/WFSQOXePI3dFwZg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719482350; c=relaxed/simple;
-	bh=b+F1fwXy/4cYAmFvaHjfVNUGmjIOL3Y+eM93OcFc2ro=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CMAyRTsSZz6CmpREQWLGLR7OMAQnGla1xGQI70G/m195wv0JqL1CREVH17bIK/BdgasUybJ2oLZWEnJT8BcNMQOWAcJxyPhIWbFhYAjhA5BvVxkPC7rZJozWwgjfX35mmPbBrpQLyvjLSiBQWIK/w6gC8r45p467FODME0UupAw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HF8LrhvW; arc=fail smtp.client-ip=40.107.96.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HF8LrhvW"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pv9TOI7oAhI/fJAOcT9SRl5L+jTRcfiI5vBmodT3NxY7BwA4GaT5Q7UwkQAKTSx5DdbBs5S0K1bK5V6Rs9OZ6ADvsnqwZek+jQixJBaMQ8AnuICcnIPHIIx0IFf6K0aTbfgetsmxEDewr8tpoyQpcCow/Hl9s8PefoWXyFlU7msvrvmNST9nHHdyuR9vrSDJfCYShkAArisgBM/BVORPSgEGfe3Wvgkmil9scjtYObvniBfe6c2T2P/Sg66qoMSGW6I5GaA2LzNNrqPl5/BvZCmReGm7VI3i3L4sOxnZgSpl5kiaifktBVyCKGMfZ5olAmDoc8TNac2ShZ8HBKOXwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zlWtaCgawQK+6MshhW0hQum/UMxvfkHug5My9VxhFxA=;
- b=FMfruTCb13BhM8mQwNPbcEjCXEKxi71X6VAzI8KfLbndkoJdW7zbAy0PdIuD1TeJxIgiae6DgX9Xzf+x4FlaKZlAtgvPP2bK/SPeXZX0g3iSSZQDHk5cNY31RUPKORvEXc7LBCEXEjZMQQ4D6iZuHhXEol1qGZ4JON+F/o3XRwzaaaBaMC80/zhSmm5YUYpaPDm9VquivtJ6v886SXv6Ar9Ji31bFUfkoPZph7pNrHW9qNlo+Cz3JARpAzH2GzVdneHhfZHdmK2bWHu59FdmTOEuppsbq8Aq8uN3XcPxm4ogz77WfOHEi6mSiFLM0E4fbNURuJSdL32NbZqPL2lR/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zlWtaCgawQK+6MshhW0hQum/UMxvfkHug5My9VxhFxA=;
- b=HF8LrhvWQBCFDdlX7PkmhsJRXRzqXzx85HM63mciPRFRwFHHy2/5cwEoe9az1q4JFluHSnOnKP0Q08eoHwl91y5hFn/oGGil4Q8FYAj8WOZHYjjl0ZXi1XgTtpFLi5v+0Ayzbh6JQ6ygcJ3nES1o+02QAhaJTQJxjj7pnh9a5L0X6I5Km4xwWT4pS8aAWmgK5FF6UMj0SopEabtYS6FyzwKcwe9GtNuY7epw6+VyyzHDdWAi7Z+12Ixwv1PzbyoXBthftI/x7bdqb4zkfAdIo+Gaj3B1KMHMF9ppQzLDGD6pIBRl59+qGei86dkYLhzXsrDKFqpT+DHA+aeAGpwF0w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com (2603:10b6:5:35e::8) by
- BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7698.32; Thu, 27 Jun 2024 09:59:06 +0000
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3]) by CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3%6]) with mapi id 15.20.7719.022; Thu, 27 Jun 2024
- 09:59:05 +0000
-Message-ID: <23aa9894-f913-409d-a385-8813711e2898@nvidia.com>
-Date: Thu, 27 Jun 2024 10:58:58 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/17] mmc: pass queue_limits to blk_mq_alloc_disk
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>, Justin Sanders
- <justin@coraid.com>, Denis Efremov <efremov@linux.com>,
- Josef Bacik <josef@toxicpanda.com>, Geoff Levand <geoff@infradead.org>,
- Ilya Dryomov <idryomov@gmail.com>, "Md. Haris Iqbal"
- <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>,
- Ming Lei <ming.lei@redhat.com>, Maxim Levitsky <maximlevitsky@gmail.com>,
- Alex Dubov <oakad@yahoo.com>, Ulf Hansson <ulf.hansson@linaro.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Vignesh Raghavendra <vigneshr@ti.com>,
- Vineeth Vijayan <vneethv@linux.ibm.com>, linux-block@vger.kernel.org,
- nbd@other.debian.org, ceph-devel@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <20240215070300.2200308-1-hch@lst.de>
- <20240215070300.2200308-18-hch@lst.de>
- <89164197-7218-4f24-bf24-0e67a1882c78@nvidia.com>
- <20240627094950.GA30655@lst.de>
-From: Jon Hunter <jonathanh@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20240627094950.GA30655@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0688.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:37b::17) To CO6PR12MB5444.namprd12.prod.outlook.com
- (2603:10b6:5:35e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A3513A245
+	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 09:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719482355; cv=none; b=peZ0d01DwCCAzWhDMNuoFvCu4gascMDxDNb3RG0LoVcIKsLLrYPG/AOsN1c/ZOrawVXzMtWRh1BGvHx7rLbV2k6nlgppXtE+4i1tsx5am9Jls1WvHZ65EjgwzLYrRuOZMzt+t9LjY0sDXzq6OAfVZAmMs7RmnOx+duhIOEgj8J8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719482355; c=relaxed/simple;
+	bh=iVI4ZkNifioWtzq9s0rxPM5dCY9Xs2i4PtaTrWU9u5k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s0brMRy6rvigNwRlVXfgtpwtjBUI1r3XaJxmnP88YCU+Whf90AiViGN9TasQ9BaNCcXUYQVKI8BP2nRmHxox8rltRk/O0CDZVbwP020HYVFaK0wYwdLwSeS/Yx6a+Q96rSVfsXrx3sSHT2+pLUCJmB3zpIEMKaCqibbrliKZR9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id AC16E21B00;
+	Thu, 27 Jun 2024 09:59:11 +0000 (UTC)
+Authentication-Results: smtp-out1.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 81C7D137DF;
+	Thu, 27 Jun 2024 09:59:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id MPC6Hu83fWaaJAAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 27 Jun 2024 09:59:11 +0000
+Message-ID: <c3475515-e776-41cd-8c60-e0f5fccea052@suse.de>
+Date: Thu, 27 Jun 2024 11:59:11 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5444:EE_|BL1PR12MB5946:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94269348-8a13-4b70-96fd-08dc968fc7ca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bFpVcEN0V3ZDVkhMbTJ2dEJRbEhhNHd6b1drdHdiYjZWQWhFYU5Cb2ZjVG16?=
- =?utf-8?B?aktqaU5HNXdDbTB4dVE1Z1VUNkdrYnZYSHJBU2p5Uk42RHUrd0JSM3ZTdGZI?=
- =?utf-8?B?NmtUdHlETVJla1ZBRUlQZlZqbUxuT1JKN1dtSHhKdGRFVm5lZjlFaGk1c3Yz?=
- =?utf-8?B?azlIYnhKbCtMcmo3b3d0cUJ6eG5RUlI0dFIvUkJjNk9iSVkwbGZYYkY1N0ox?=
- =?utf-8?B?ZVJLdWl1TnpDd3Z5Z25RVEpPMmxlcGQ1dU1yTkxCeUZkRzAwSFAvQkROTTJZ?=
- =?utf-8?B?V2ZvUFFwWGlvRXRRWXJJajZscHdmZ3lxS2N1RGVhaXdOSkFSRkEvemZJbXQ2?=
- =?utf-8?B?MlpBR1dJTnR5V1VMQnQ1SGlzSFpMU1dCZnJRRGhZVUhTNnZUbXZpd3hCQ0Fq?=
- =?utf-8?B?eTlLRjJBNmpFR1FqaFZCUUZpSGRzYTZnTU1zcVZkbXE5Um5UbHc1NmNGWTVj?=
- =?utf-8?B?ZEhLVytuTkc4aHpnZml5SnFuR0NiajZ2TjdCTkxHYzJoc2dFRm01R1pKd0RI?=
- =?utf-8?B?bFNYRDdFYnhDeU9qQWR1NVhKejR1WCs2VUJpUXhob1R2Z0ZZQkkrQTRMYzEx?=
- =?utf-8?B?czhSUmVQYUdSZGJnQ1I4WlZ6amg0aStYS3AwbUptRnFQTGFNeFZEbEFXbmpr?=
- =?utf-8?B?czNoMzFmVWJhTndmWUc0akEySnNOd01pbk5jalp4MkovVndSOFV5ZDhLS1ZQ?=
- =?utf-8?B?YXFraTRQRFc3dGFSWGVLanNVdHVOdXFSZ3dLVURRVWVPVUFBZWVpMDczMDNa?=
- =?utf-8?B?N2hid1dQUzNKdzlLaDV6RFN1dXhiMFVSVld4SlhTMDFZMEl3NE96S0kyVG9t?=
- =?utf-8?B?RXZNWDEwbklqR3ZiNVhURFBCVkluRFpDcmE4eGRNNVZyamo0N3BCZnVxS052?=
- =?utf-8?B?b2NPd2NkRjVSUUI3eTEyZ2pwRXhhbmY5UjBJS090V2lLTk5RNUxpTTQ2S1hR?=
- =?utf-8?B?YU40TDZHUUxrd2IrL21uN3lGYWJjZFN4dWF2TXZsOWZQRDhZa0JyQ0VhajJN?=
- =?utf-8?B?NVNjeVRUQURyTGtITHVRTmMvck9LeDBJUHNQNkhxNTFBVFhWR1Fab0FUVmdV?=
- =?utf-8?B?UnlwSkoyOFBUa3lNbWdzb01HeVF5MHhybzFMNURDR0ovQ2tXUmRjTnRuRlhV?=
- =?utf-8?B?M3VyTWRYYWRSSjIyS25taGJ1a3cyeWt6bVdVelROcTJpdXdvVWNmUjNCWXFm?=
- =?utf-8?B?c0x5S3U3SjdSRlBYOHg4Y2VaTm53ZmFOZ2hRcXBNWHh3c3gzMFFqbm9jL3pI?=
- =?utf-8?B?MmprTFhCSWlWRW1aTlZDMVZKN0haWS83NW8ydlhkbGZIcVRMRjNFYW5HR3I5?=
- =?utf-8?B?UG15R3ErcjVZNlZXY1BLU21aTDNxRWltYVBVVzJvSDk0aHl6RGZaOFJNL2JM?=
- =?utf-8?B?aUZab1NUME1mWURyelh2TjRGTHBocGNuRXNlL2dYVXFibU8ySzYxZjd3ekZL?=
- =?utf-8?B?RTR0NEozbDdUOGk5T3BqdXpKb1VwR2RYUFUreGxxZWdFZ2srcnNtVUhRd3dp?=
- =?utf-8?B?QkhhaWdYMTNRNUlYMXliK3dkQ1o3cnZkalJxK29PUWFTbWxQZFBUZ1VKU0U4?=
- =?utf-8?B?SDdhQWJaMjlqbXNoS0p5Q3VlRVppQW5kclYvejMzdk1VM0xqRCtMM1Foc2xx?=
- =?utf-8?B?bUMvemNXZmR2aXp4NDZyM1BNc2NQNWdsa3VxcGg0UUdSS0pyZWgyRHMvUHdO?=
- =?utf-8?B?bjdGVkJkUWRoTmVSV3QxVVJLVDkvVlRMZldIb0t2dFVQSDMzMnQzOVpFWnNy?=
- =?utf-8?B?WWxrc0dXVlpnTGdoWGk4NjVuZHlqcG5pWFFnd1VYME1NWVhlVU40ekptS29C?=
- =?utf-8?B?cnNrUGQ2Sk5rK00vb3YxUT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5444.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VEk3dmhNYmEweE5ZUGhCeW5rYitOV29FY0lVMktVRTUzQU9pRDNGTFR5UUk0?=
- =?utf-8?B?YUNGZXNRdjZsYVZReEE5SWd5UnpZWGpMUjUrVmRJZnRGMkREalZtejlJenAr?=
- =?utf-8?B?UWFNekdXeXZQVEdGeTRGaWNwYnF5U0NsTlpnVTNDKzUzdmQ0b2FNMmhCaHlt?=
- =?utf-8?B?WmJ6dXBIdUcrZThiQXMwUXE5YW1TWjlLWXlWczQxUmlKQmhLRml1QkliT3Nr?=
- =?utf-8?B?eFVFMm5CbmJIZ2JwaUV3ZUxEY3FNWkQ0ODY2OHlZODM1SWFtTVhVMGJyZUJJ?=
- =?utf-8?B?SXNEZVREb1VXTjNUdUovelJxSUUzRmZsMXNocnRnbmdxaTFZOG5HVmw2SGFP?=
- =?utf-8?B?MDROY3JjMHowcjU3SDlZQlpvMHlMZ1lTbWx1b1FtUzljNGx5bnIwY0ZUbWFC?=
- =?utf-8?B?MmVUNEljY1NVbzloY1E1Wk5yaFZab1ZBSGJ4YndoYkR1dVNTL1dTN1kxYm40?=
- =?utf-8?B?YmxoVnJNdHZPSFJMa1RpTGsyaVpVdjE4Rit6K0dnODlJUHRSSDVYNnhzcEtz?=
- =?utf-8?B?ZXVBQjJMQUg4dStUcUtvOHc2RW94VGRYanBqb24vVFFWZnZqbEJMbDhFOWFs?=
- =?utf-8?B?UHM0QmRvR1RvL3dwWkR5Z3BibEFDVzJMandqUno5KzFuVW1hTEU4RkpxSXBv?=
- =?utf-8?B?aWloWFlZS3d0QStJMHFyQ3lERVhuMFB6WHdCTEdkZ0duL0ZDcEplSDJhVmJo?=
- =?utf-8?B?cTRsU3dmenJFdG1wcTJFcG9LeFY0SjNYa3NVNnFBcHovVkEwZ1BkbkoySXFk?=
- =?utf-8?B?Y2w5dnZsSjNDZUFrN0QzaC9iOVJaVEhNdjZZT2lMNjVobGN3VG9XbE5HeEFY?=
- =?utf-8?B?cExrbGRUaTFzcU42cnVXOTE5Q05hYW4wenM5dTBvRTU5blJlMURGODRUY3RQ?=
- =?utf-8?B?MjJPTXNUbnlVWmJsb1duR1lCckdrS0tCbGo2OVEvM0ZZRUlGWU12Ui9XR1ZH?=
- =?utf-8?B?VlR6bzlIQVh2TEVvTk9XZk42dU5udVNjb1FZaEozampGcXdaTk5ENjk2S1lm?=
- =?utf-8?B?NWF4emJQRHZ4YTJTVmt4aTBGeHI3RUpjeGgyVk4rSXUzTHRoVjY1bkxjbzNz?=
- =?utf-8?B?bHozWjAvUkpEVjc1K3hrdTAxSThjMUhnVmZhR1ZIZXFkQTVqQ0dlalY1STZq?=
- =?utf-8?B?MW0rc1ZldXlYQytBeHdsMk85VmtwY1NJZlh5Q0xJUWRmbndBdEkweHNSb3Jx?=
- =?utf-8?B?RUVpazg5N0IvcWpnY3FxRGlVSlM3VFVYYmpMeUVTRkNJRk1teTZYdUhTSUYy?=
- =?utf-8?B?eTlMbmNkVTBlbjZrb1E2ZW1Kd3JRaWZCTlk3TlJuNnUxeHdrbWYveWdtMFZj?=
- =?utf-8?B?ZTdrV2xrT2drbFcvVnVzRWM2SVY4SGN4aTM5WlljdytLSnZyWUlNVHRJMlY1?=
- =?utf-8?B?a2pRU21FTDJHM05yT0Y2RjZYbm9GVWg1K1RIQVpia09namttVGZtbFBtUkd2?=
- =?utf-8?B?OCtRMGJ4T1VXSi9DNUE1cWM5ak1oanhOQUxQYW0xVlJuckVReGpROTcvd3RU?=
- =?utf-8?B?Q0JnSUVXbUMyeXdRK09nbDloVVM0UExzdHhxNk9tRWEwM1A5bElsN0tWb1lv?=
- =?utf-8?B?a0poV3kwMWtWeWllenRSemJXN2M4UUp4c1hMOEhndEJVRUxweUR6MHlBKzRN?=
- =?utf-8?B?TUFlQ214OGhDbzlJUms5TEltVStmTmpRcEYzUFZsOHB2dkdJSlJ1aG83N3h6?=
- =?utf-8?B?OFRZUWlkeG9IUjhxdVBDajVUME9pcThVRURYcVA1eHBPNVJFL0FpYW8xaHgr?=
- =?utf-8?B?QzNRbXF4aGhsT1VsemgwMUc2WUJKUzFtekpLN0l0d3ZBRXBNRmdjeGRPdEhB?=
- =?utf-8?B?OVE3MDlsQ0F6ZlA0RXR0eU5jczkyVS9HREpySTEvL2dTV1MvOGJ6VnQzVjNt?=
- =?utf-8?B?TlZaaVNjUDVMZi9yVFRvVEV0akZkRWhvU2ZWWUJ3VU1rMFIxdmFuUFV5Q2lP?=
- =?utf-8?B?dkVrOS8yOHFVaTVDT1FtcEJOWDkxd1BKTDZvZkZ3K2ZvYUZpOXE5b1dpNDBs?=
- =?utf-8?B?b0FhWUpsNHBsTjVYUVJCK2todkV1SU1qUWZrUUpZWms1R3pvcjliQ0UxOXdQ?=
- =?utf-8?B?bHJ0QkQ3QU1wOVdNVi9BQTdVeURIU0Jud09xdzZxWWx5R2RSUFE2VTM1bTA1?=
- =?utf-8?Q?yAfFSNp8f6RhjjVJuXyEvUCDM?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94269348-8a13-4b70-96fd-08dc968fc7ca
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR12MB5444.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 09:59:05.8383
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZpbSr9FaMDliw5SKcgIlGcSbimQk8pnSWcQDrYtYSaxdYcQABJ/4j6jr0lYb5LR9XQRRdJ+eyG4H3fegXf12JQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5946
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v3 1/3] nvme/rc: introduce remote target support
+To: Daniel Wagner <dwagner@suse.de>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20240627091016.12752-1-dwagner@suse.de>
+ <20240627091016.12752-2-dwagner@suse.de>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240627091016.12752-2-dwagner@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Spam-Level: 
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Queue-Id: AC16E21B00
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-
-On 27/06/2024 10:49, Christoph Hellwig wrote:
-> On Thu, Jun 27, 2024 at 10:43:24AM +0100, Jon Hunter wrote:
->> We have just noticed that since Linux v6.9 was released, that if we
->> build the kernel with 64kB MMU pages, then we see the following WARNING
->> and probe failure ...
+On 6/27/24 11:10, Daniel Wagner wrote:
+> Most of the NVMEeoF tests are exercising the host code of the nvme
+> subsystem. There is no real reason not to run these against a real
+> target. We just have to skip the soft target setup and make it possible
+> to setup a remote target.
 > 
-> The old code upgraded the limits to the PAGE_SIZE for this case after
-> issunig a warning.  Your driver probably incorrectly advertised the
-> lower max_segment_size.  Try setting it to 64k.  I would have sent you
-> a patch for that, but I can't see what mmc host driver you are using.
+> Because all tests use now the common setup/cleanup helpers we just need
+> to intercept this call and forward it to an external component.
+> 
+> As we already have various nvme variables to setup the target which we
+> should allow to overwrite. Also introduce a NVME_TARGET_CONTROL variable
+> which points to a script which gets executed whenever a targets needs to
+> be created/destroyed.
+> 
+> Signed-off-by: Daniel Wagner <dwagner@suse.de>
+> ---
+>   Documentation/running-tests.md | 33 ++++++++++++++++++++
+>   check                          |  4 +++
+>   tests/nvme/rc                  | 57 ++++++++++++++++++++++++++++++++--
+>   3 files changed, 92 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+> index 968702e76bb5..fe4f729bd037 100644
+> --- a/Documentation/running-tests.md
+> +++ b/Documentation/running-tests.md
+> @@ -120,6 +120,9 @@ The NVMe tests can be additionally parameterized via environment variables.
+>   - NVME_NUM_ITER: 1000 (default)
+>     The number of iterations a test should do. This parameter had an old name
+>     'nvme_num_iter'. The old name is still usable, but not recommended.
+> +- NVME_TARGET_CONTROL: When defined, the generic target setup/cleanup code will
+> +  be skipped and this script gets called. This makes it possible to run
+> +  the fabric nvme tests against a real target.
+>   
+>   ### Running nvme-rdma and SRP tests
+>   
+> @@ -167,3 +170,33 @@ if ! findmnt -t configfs /sys/kernel/config > /dev/null; then
+>   	mount -t configfs configfs /sys/kernel/config
+>   fi
+>   ```
+> +### NVME_TARGET_CONTROL
+> +
+> +When NVME_TARGET_CONTROL is set, blktests will call the script which the
+> +environment variable points to, to fetch the configuration values to be used for
+> +the runs, e.g subsysnqn or hostnqn. This allows the blktest to be run against
+> +external configured/setup targets.
+> +
+> +The blktests expects that the script interface implements following
+> +commands:
+> +
+> +config:
+> +  --show-blkdev-type
+> +  --show-trtype
+> +  --show-hostnqn
+> +  --show-hostid
+> +  --show-host-traddr
+> +  --show-traddr
+> +  --show-trsvid
+> +  --show-subsys-uuid
+> +  --show-subsysnqn
+> +
+> +setup:
+> +  --subsysnqn SUBSYSNQN
+> +  --subsys-uuid SUBSYS_UUID
+> +  --hostnqn HOSTNQN
+> +  --ctrlkey CTRLKEY
+> +  --hostkey HOSTKEY
+> +
+> +cleanup:
+> +  --subsysnqn SUBSYSNQN
+> diff --git a/check b/check
+> index 3ed4510f3f40..d0475629773d 100755
+> --- a/check
+> +++ b/check
+> @@ -603,6 +603,10 @@ _run_group() {
+>   	# shellcheck disable=SC1090
+>   	. "tests/${group}/rc"
+>   
+> +	if declare -fF group_setup >/dev/null; then
+> +		group_setup
+> +	fi
+> +
+>   	if declare -fF group_requires >/dev/null; then
+>   		group_requires
+>   		if [[ -v SKIP_REASONS ]]; then
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index c1ddf412033b..4465dea0370b 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -23,6 +23,7 @@ _check_conflict_and_set_default NVME_IMG_SIZE nvme_img_size 1G
+>   _check_conflict_and_set_default NVME_NUM_ITER nvme_num_iter 1000
+>   nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
+>   NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
+> +nvme_target_control="${NVME_TARGET_CONTROL:-}"
+>   
+>   _NVMET_TRTYPES_is_valid() {
+>   	local type
+> @@ -135,6 +136,13 @@ _nvme_requires() {
+>   	return 0
+>   }
+>   
+> +group_setup() {
+> +	if [[ -n "${nvme_target_control}" ]]; then
+> +		NVMET_TRTYPES="$(${nvme_target_control} config --show-trtype)"
+> +		NVMET_BLKDEV_TYPES="$(${nvme_target_control} config --show-blkdev-type)"
+> +	fi
+> +}
+> +
+>   group_requires() {
+>   	_have_root
+>   	_NVMET_TRTYPES_is_valid
+> @@ -359,6 +367,10 @@ _cleanup_nvmet() {
+>   		fi
+>   	done
+>   
+> +	if [[ -n "${nvme_target_control}" ]]; then
+> +		return
+> +	fi
+> +
+>   	for port in "${NVMET_CFS}"/ports/*; do
+>   		name=$(basename "${port}")
+>   		echo "WARNING: Test did not clean up port: ${name}"
+> @@ -403,11 +415,26 @@ _cleanup_nvmet() {
+>   
+>   _setup_nvmet() {
+>   	_register_test_cleanup _cleanup_nvmet
+> +
+> +	if [[ -n "${nvme_target_control}" ]]; then
+> +		def_hostnqn="$(${nvme_target_control} config --show-hostnqn)"
+> +		def_hostid="$(${nvme_target_control} config --show-hostid)"
+> +		def_host_traddr="$(${nvme_target_control} config --show-host-traddr)"
+> +		def_traddr="$(${nvme_target_control} config --show-traddr)"
+> +		def_trsvcid="$(${nvme_target_control} config --show-trsvid)"
+> +		def_subsys_uuid="$(${nvme_target_control} config --show-subsys-uuid)"
+> +		def_subsysnqn="$(${nvme_target_control} config --show-subsysnqn)"
+> +		return
+> +	fi
+> +
+>   	modprobe -q nvmet
+> +
+>   	if [[ "${nvme_trtype}" != "loop" ]]; then
+>   		modprobe -q nvmet-"${nvme_trtype}"
+>   	fi
+> +
+>   	modprobe -q nvme-"${nvme_trtype}"
+> +
+>   	if [[ "${nvme_trtype}" == "rdma" ]]; then
+>   		start_soft_rdma
+>   		for i in $(rdma_network_interfaces)
+> @@ -425,6 +452,7 @@ _setup_nvmet() {
+>   			fi
+>   		done
+>   	fi
+> +
+>   	if [[ "${nvme_trtype}" = "fc" ]]; then
+>   		modprobe -q nvme-fcloop
+>   		_setup_fcloop "${def_local_wwnn}" "${def_local_wwpn}" \
+> @@ -873,11 +901,13 @@ _find_nvme_passthru_loop_dev() {
+>   
+>   _nvmet_target_setup() {
+>   	local blkdev_type="${nvmet_blkdev_type}"
+> +	local subsys_uuid="${def_subsys_uuid}"
+> +	local subsysnqn="${def_subsysnqn}"
+>   	local blkdev
+> +	local ARGS=()
+>   	local ctrlkey=""
+>   	local hostkey=""
+> -	local subsysnqn="${def_subsysnqn}"
+> -	local subsys_uuid="${def_subsys_uuid}"
+> +	local blkdev
+>   	local port
+>   
+>   	while [[ $# -gt 0 ]]; do
+> @@ -909,6 +939,22 @@ _nvmet_target_setup() {
+>   		esac
+>   	done
+>   
+> +	if [[ -n "${hostkey}" ]]; then
+> +		ARGS+=(--hostkey "${hostkey}")
+> +	fi
+> +	if [[ -n "${ctrlkey}" ]]; then
+> +		ARGS+=(--ctrkey "${ctrlkey}")
+> +	fi
+> +
+> +	if [[ -n "${nvme_target_control}" ]]; then
+> +		eval "${nvme_target_control}" setup \
+> +			--subsysnqn "${subsysnqn}" \
+> +			--subsys-uuid "${subsys_uuid}" \
+> +			--hostnqn "${def_hostnqn}" \
+> +			"${ARGS[@]}" &> /dev/null
+> +		return
+> +	fi
+> +
+>   	truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
+>   	if [[ "${blkdev_type}" == "device" ]]; then
+>   		blkdev="$(losetup -f --show "$(_nvme_def_file_path)")"
+> @@ -948,6 +994,13 @@ _nvmet_target_cleanup() {
+>   		esac
+>   	done
+>   
+> +	if [[ -n "${nvme_target_control}" ]]; then
+> +		eval "${nvme_target_control}" cleanup \
+> +			--subsysnqn "${subsysnqn}" \
+> +			> /dev/null
+> +		return
+> +	fi
+> +
+>   	_get_nvmet_ports "${subsysnqn}" ports
+>   
+>   	for port in "${ports[@]}"; do
 
+Hmm. This wasn't quite what I had in mind; I think it'd be simpler
+if we could just check if the requested controller is visible to the
+host already (ie checking sysfs here), and then skip all the setup
+steps at they are obviously not required anymore.
+That would save quite a lot of issues, and we wouldn't need to specify
+a target setup script (or whatever).
 
-We are using the sdhci-tegra.c driver. I don't see it set in there, but 
-I see references to max_seg_size in the main sdhci.c driver.
+Quite a bit of churn, I agree, as that would mean we have to roll
 
-Thanks,
-Jon
+	_setup_nvmet
 
+	_nvmet_target_setup
+
+	_nvme_connect_subsys
+
+all into one function. But it might be easier in the long run.
+Hmm?
+
+Cheers,
+
+Hannes
 -- 
-nvpublic
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
