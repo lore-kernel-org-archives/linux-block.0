@@ -1,180 +1,193 @@
-Received: from mail.nearlyone.de (mail.nearlyone.de [49.12.199.46])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C7F195FE6;
-	Thu, 27 Jun 2024 14:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.199.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CC713A259;
+	Thu, 27 Jun 2024 14:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719497486; cv=none; b=qH/+EsrZLVxTas+g5RBg6s97JpwiLk75/ZgrVoyTQu/iNAry4SbujgRwcLoCtn1W+SJTsD0XJqA+qpQnLmabCIrOObDakwLkLe5McYNynhSjtZ3Vbwl+krGd++QqGz6h17vbyiqcnVsQbYNX1rZ0pFwdklXeYKpt5jGEEfpZjaA=
+	t=1719498453; cv=none; b=P2b5Q6pTSKfaHCHIS7BcPC4DV/EtNbKE9kciQ7GeQ4mYLTqbDC1hsJrI/cTnpsV1GbkxGVnMTAmA7Y9OpL6Pm1Td7jRSygfvD/OsGX8l0wzAVQXaGY7+9e0+ei36lqCWuhlp24oWjghGALK7u9ZzAVbF2uGH9j0rDbv9nV2DsdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719497486; c=relaxed/simple;
-	bh=scPvWNw3hpillcEd+nWhCCDrjstdBXT5pxTlLbAMjXI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tSPoBmkfGUNMaUze+/Qe1ER15viKAd2kaWqX+EamDGUH5BsfVvsJmCPa0K4NKx6tTjo+WvhM1a2IYkGO/2+vypJc8V7poeMI4eR6Pld1pqHPsIanc8r1CZeOIj1kS5wIL8zdb7qTfri7FiPCkh5KzKP9gdP8ogo+h53CQUxp0z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=monom.org; dkim=pass (2048-bit key) header.d=monom.org header.i=@monom.org header.b=TBSa/VW0; arc=none smtp.client-ip=49.12.199.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=monom.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=monom.org header.i=@monom.org header.b="TBSa/VW0"
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8A320DAD95;
-	Thu, 27 Jun 2024 16:11:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=monom.org; s=dkim;
-	t=1719497477; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Nkl4SSxNIrBpfNEBv/GE9DiJBjq3oTyTgR3zzoHTSJo=;
-	b=TBSa/VW0F7MgASJWdBxd+i0xd5Qo40RT1tgbWvqWgJtpR6PP/jIxnKKvkPzlGMvLzZ+qDb
-	Q7HNuPGKlX4vAJOxXhwrNB8vueggY+5cypioKqyFIxoS+Cpf00b5vlB/HDn4pxwcx4ncOW
-	v5dn1jZ4tmq/S+/YDueN9QBc8+V5Km0VIHFMioFUtSvMaQXN+9Qy0bcb6m76S9jyrd/Hzt
-	C3M0mnywpHldvCjlnirR0CyHVzqIo9EAtP6fPkoguTOBqebJAUcbB4MF5XcjA+YOnro6sa
-	M5e/GnVbQrawx84af8PJeyflU1YlNKKsuB6DgT2vvzqal1389dbjp8fP827Sgw==
-From: Daniel Wagner <dwagner@suse.de>
-Date: Thu, 27 Jun 2024 16:10:53 +0200
-Subject: [PATCH v2 3/3] lib/group_cpus.c: honor housekeeping config when
- grouping CPUs
+	s=arc-20240116; t=1719498453; c=relaxed/simple;
+	bh=+hA94nBp0Z2NOG+7XiSePdvJo4tjMM+AEioEA4rngWg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q5Sovy3ud5FOXaNwllGJgskTuDSHHUDvvY2qGGfEt/fgaQIELq5resOK+n3pS40MvFHwvTXDTgsjML3xGd4+mjTufcePF2Q3rOFV0ApISLMlPcFouIGEbQjkH2zIZmw1z+ajoIWAQJazN37Elcjr0aO91UGPEbp8Bl5CmEo2SOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W919h10fwz4f3jt1;
+	Thu, 27 Jun 2024 22:27:20 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 478F21A0189;
+	Thu, 27 Jun 2024 22:27:27 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP2 (Coremail) with SMTP id Syh0CgBXwIXNdn1mUQAAAg--.25162S4;
+	Thu, 27 Jun 2024 22:27:27 +0800 (CST)
+From: Li Lingfeng <lilingfeng@huaweicloud.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	hch@lst.de,
+	axboe@kernel.dk,
+	mkoutny@suse.com
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yangerkun@huawei.com,
+	yukuai1@huaweicloud.com,
+	houtao1@huawei.com,
+	yi.zhang@huawei.com,
+	lilingfeng@huaweicloud.com,
+	lilingfeng3@huawei.com
+Subject: [PATCH v2] block: flush all throttled bios when deleting the cgroup
+Date: Thu, 27 Jun 2024 22:26:06 +0800
+Message-Id: <20240627142606.3709394-1-lilingfeng@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240627-isolcpus-io-queues-v2-3-26a32e3c4f75@suse.de>
-References: <20240627-isolcpus-io-queues-v2-0-26a32e3c4f75@suse.de>
-In-Reply-To: <20240627-isolcpus-io-queues-v2-0-26a32e3c4f75@suse.de>
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
- Sagi Grimberg <sagi@grimberg.me>, Thomas Gleixner <tglx@linutronix.de>, 
- Christoph Hellwig <hch@lst.de>
-Cc: Frederic Weisbecker <fweisbecker@suse.com>, 
- Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
- Sridhar Balaraman <sbalaraman@parallelwireless.com>, 
- "brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>, 
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-nvme@lists.infradead.org, Daniel Wagner <dwagner@suse.de>
-X-Mailer: b4 0.14.0
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgBXwIXNdn1mUQAAAg--.25162S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxWr4xWF48Gw1xGry3tr47urg_yoWrWF4rpr
+	WS9a4Ykw1Dtr9I9r4agr45JFWSva95XrWav397Ca1ayrWxtw1jqF9Yva48XFWrJFn3Cr4Y
+	vr15tr18uF18G37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUF9
+	a9DUUUU
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-group_cpus_evenly distributes all present CPUs into groups. This ignores
-the isolcpus configuration and assigns isolated CPUs into the groups.
+From: Li Lingfeng <lilingfeng3@huawei.com>
 
-Make group_cpus_evenly aware of isolcpus configuration and use the
-housekeeping CPU mask as base for distributing the available CPUs into
-groups.
+When a process migrates to another cgroup and the original cgroup is deleted,
+the restrictions of throttled bios cannot be removed. If the restrictions
+are set too low, it will take a long time to complete these bios.
 
-Fixes: 11ea68f553e2 ("genirq, sched/isolation: Isolate from handling managed interrupts")
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
+Refer to the process of deleting a disk to remove the restrictions and
+issue bios when deleting the cgroup.
+
+This makes difference on the behavior of throttled bios:
+Before: the limit of the throttled bios can't be changed and the bios will
+complete under this limit;
+Now: the limit will be canceled and the throttled bios will be flushed
+immediately.
+
+References:
+https://lore.kernel.org/r/20220318130144.1066064-4-ming.lei@redhat.com
+
+Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
 ---
- lib/group_cpus.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 73 insertions(+), 2 deletions(-)
+  v1->v2:
+    Use "flush" instead of "cancel";
+    Add description of the affect of throttled bios.
+ block/blk-throttle.c | 68 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 44 insertions(+), 24 deletions(-)
 
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index ee272c4cefcc..19fb7186f9d4 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -8,6 +8,7 @@
- #include <linux/cpu.h>
- #include <linux/sort.h>
- #include <linux/group_cpus.h>
-+#include <linux/sched/isolation.h>
- 
- #ifdef CONFIG_SMP
- 
-@@ -330,7 +331,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index c1bf73f8c75d..a0e5b28951ca 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1534,6 +1534,42 @@ static void throtl_shutdown_wq(struct request_queue *q)
+ 	cancel_work_sync(&td->dispatch_work);
  }
  
- /**
-- * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-+ * group_possible_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-  * @numgrps: number of groups
-  *
-  * Return: cpumask array if successful, NULL otherwise. And each element
-@@ -344,7 +345,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
-  * We guarantee in the resulted grouping that all CPUs are covered, and
-  * no same CPU is assigned to multiple groups
-  */
--struct cpumask *group_cpus_evenly(unsigned int numgrps)
-+static struct cpumask *group_possible_cpus_evenly(unsigned int numgrps)
- {
- 	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
- 	cpumask_var_t *node_to_cpumask;
-@@ -423,6 +424,76 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
++static void tg_cancel_bios(struct throtl_grp *tg)
++{
++	struct throtl_service_queue *sq = &tg->service_queue;
++
++	if (tg->flags & THROTL_TG_CANCELING)
++		return;
++	/*
++	 * Set the flag to make sure throtl_pending_timer_fn() won't
++	 * stop until all throttled bios are dispatched.
++	 */
++	tg->flags |= THROTL_TG_CANCELING;
++
++	/*
++	 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
++	 * will be inserted to service queue without THROTL_TG_PENDING
++	 * set in tg_update_disptime below. Then IO dispatched from
++	 * child in tg_dispatch_one_bio will trigger double insertion
++	 * and corrupt the tree.
++	 */
++	if (!(tg->flags & THROTL_TG_PENDING))
++		return;
++
++	/*
++	 * Update disptime after setting the above flag to make sure
++	 * throtl_select_dispatch() won't exit without dispatching.
++	 */
++	tg_update_disptime(tg);
++
++	throtl_schedule_pending_timer(sq, jiffies + 1);
++}
++
++static void throtl_pd_offline(struct blkg_policy_data *pd)
++{
++	tg_cancel_bios(pd_to_tg(pd));
++}
++
+ struct blkcg_policy blkcg_policy_throtl = {
+ 	.dfl_cftypes		= throtl_files,
+ 	.legacy_cftypes		= throtl_legacy_files,
+@@ -1541,6 +1577,7 @@ struct blkcg_policy blkcg_policy_throtl = {
+ 	.pd_alloc_fn		= throtl_pd_alloc,
+ 	.pd_init_fn		= throtl_pd_init,
+ 	.pd_online_fn		= throtl_pd_online,
++	.pd_offline_fn		= throtl_pd_offline,
+ 	.pd_free_fn		= throtl_pd_free,
+ };
+ 
+@@ -1561,32 +1598,15 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+ 	 */
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
+-		struct throtl_grp *tg = blkg_to_tg(blkg);
+-		struct throtl_service_queue *sq = &tg->service_queue;
+-
+-		/*
+-		 * Set the flag to make sure throtl_pending_timer_fn() won't
+-		 * stop until all throttled bios are dispatched.
+-		 */
+-		tg->flags |= THROTL_TG_CANCELING;
+-
+ 		/*
+-		 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
+-		 * will be inserted to service queue without THROTL_TG_PENDING
+-		 * set in tg_update_disptime below. Then IO dispatched from
+-		 * child in tg_dispatch_one_bio will trigger double insertion
+-		 * and corrupt the tree.
++		 * disk_release will call pd_offline_fn to cancel bios.
++		 * However, disk_release can't be called if someone get
++		 * the refcount of device and issued bios which are
++		 * inflight after del_gendisk.
++		 * Cancel bios here to ensure no bios are inflight after
++		 * del_gendisk.
+ 		 */
+-		if (!(tg->flags & THROTL_TG_PENDING))
+-			continue;
+-
+-		/*
+-		 * Update disptime after setting the above flag to make sure
+-		 * throtl_select_dispatch() won't exit without dispatching.
+-		 */
+-		tg_update_disptime(tg);
+-
+-		throtl_schedule_pending_timer(sq, jiffies + 1);
++		tg_cancel_bios(blkg_to_tg(blkg));
  	}
- 	return masks;
- }
-+
-+/**
-+ * group_mask_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-+ * @numgrps: number of groups
-+ * @cpu_mask: CPU to consider for the grouping
-+ *
-+ * Return: cpumask array if successful, NULL otherwise. And each element
-+ * includes CPUs assigned to this group.
-+ *
-+ * Try to put close CPUs from viewpoint of CPU and NUMA locality into
-+ * same group. Allocate present CPUs on these groups evenly.
-+ */
-+static struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
-+					      const struct cpumask *cpu_mask)
-+{
-+	cpumask_var_t *node_to_cpumask;
-+	cpumask_var_t nmsk;
-+	int ret = -ENOMEM;
-+	struct cpumask *masks = NULL;
-+
-+	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
-+		return NULL;
-+
-+	node_to_cpumask = alloc_node_to_cpumask();
-+	if (!node_to_cpumask)
-+		goto fail_nmsk;
-+
-+	masks = kcalloc(numgrps, sizeof(*masks), GFP_KERNEL);
-+	if (!masks)
-+		goto fail_node_to_cpumask;
-+
-+	build_node_to_cpumask(node_to_cpumask);
-+
-+	ret = __group_cpus_evenly(0, numgrps, node_to_cpumask, cpu_mask, nmsk,
-+				  masks);
-+
-+fail_node_to_cpumask:
-+	free_node_to_cpumask(node_to_cpumask);
-+
-+fail_nmsk:
-+	free_cpumask_var(nmsk);
-+	if (ret < 0) {
-+		kfree(masks);
-+		return NULL;
-+	}
-+	return masks;
-+}
-+
-+/**
-+ * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-+ * @numgrps: number of groups
-+ *
-+ * Return: cpumask array if successful, NULL otherwise.
-+ *
-+ * group_possible_cpus_evently() is used for distributing the cpus on all
-+ * possible cpus in absence of isolcpus command line argument.
-+ * group_mask_cpu_evenly() is used when the isolcpus command line
-+ * argument is used with managed_irq option. In this case only the
-+ * housekeeping CPUs are considered.
-+ */
-+struct cpumask *group_cpus_evenly(unsigned int numgrps)
-+{
-+	const struct cpumask *hk_mask;
-+
-+	hk_mask = housekeeping_cpumask(HK_TYPE_MANAGED_IRQ);
-+	if (!cpumask_empty(hk_mask))
-+		return group_mask_cpus_evenly(numgrps, hk_mask);
-+
-+	return group_possible_cpus_evenly(numgrps);
-+}
- #else /* CONFIG_SMP */
- struct cpumask *group_cpus_evenly(unsigned int numgrps)
- {
-
+ 	rcu_read_unlock();
+ 	spin_unlock_irq(&q->queue_lock);
 -- 
-2.45.2
+2.39.2
 
