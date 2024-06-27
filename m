@@ -1,133 +1,124 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178681E4A4
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 19:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7B945BE4;
+	Thu, 27 Jun 2024 20:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719515562; cv=none; b=hkOEHKHzE5no2OAuk6qnR94J2DUv1VMq0543zKgYccf2P4EjWoNixFLHZYXl2oby5MxLS8Aa7MH0k+/7KPYkERlm5NVh5zq4198Qt5dpUXlbmfGzLDDIbrp2MRjpiL5KqoIa7Q29xoL7TDSHq0HGdwFj1Mz/idVxu+OLvIP42EA=
+	t=1719519010; cv=none; b=YFRHR7wRxOGWDmtce+g60VBJJSwoc15AO4XlovFDqNOEIBB3FXx0BgZ7yTrJknFGw+snZ/6OBxJI9Sk37VdQRCBBurcKS4Zh3ldgwWsIwyivFN4MsFzBGDtVQD2D0Fi5qIx2QKyqyxNyEBjWygoaoZUK7yjS+cevtV1ZsCRMPkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719515562; c=relaxed/simple;
-	bh=7947z4N3Xt6MPRRyYa0MU/Z+XbBd5jCQ01H98uUj5nA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=txr1W0Jx+ZsJE42rqZTlg6LSVZrCQ2Bpq3nVzqZS/A36IH2Ft6rEC27uUFB+Fp291N3Ofi8YuWLfruV41mYgnl1w6kb6QdYvHwSqUrFnBSy+dWEwYQfD+nlun8XNPoJTJk/PjKRXs/L5t4StM6c8/gk4Lu7xmMRjExwZX/BBkok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=WRe2XyF/; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1719519010; c=relaxed/simple;
+	bh=DpfdFuOhqUucDrMCIF6H7EJVyqbWI7XGELgzC5TEoxc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BaK/PzzmcwkqznU8D10F1IQ1KdQ8t5+ki0kgw10IoJuQeX1vEroHzhSHbx7HGa4O1VIDieig87YSCNRRs18GjXnz/2lmarohnd+4cVFVOUlp+Bsuv9kVRxc0DHE7BYGVtKfvE1CBy93WtLrDxhVAA/vV5zPTvqb3X9Y46ckHHmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+iqcigL; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="WRe2XyF/"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240627191236epoutp04c79894c27504d79a32fc7b404785ea2b~c8knZyeZY1996419964epoutp04h
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 19:12:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240627191236epoutp04c79894c27504d79a32fc7b404785ea2b~c8knZyeZY1996419964epoutp04h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1719515556;
-	bh=VFJ+R0W4VBM/ZPRO2/oEWy6H0wpUpaesLbI39eTznDs=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=WRe2XyF/7Tgu7gnWgllcghdMumCvGGjieBGAQQQlDbDoxhG46Kjl0+AtOk5ufRWsh
-	 e7fnQQfxUkaPYBm7jiyjcXnixJdKKiSiqfB+5hZScvaRoDqHXbHTIXmBbi3y0d1gVJ
-	 vYGP+RDA5PnJBOuJ3LnZhk2ek29oW13uDdBxS5F8=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20240627191236epcas5p3cd1df03377d81b907f9895527a1d766a~c8kmySVQe2544125441epcas5p3Q;
-	Thu, 27 Jun 2024 19:12:36 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.178]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4W97Vp1mNSz4x9Pr; Thu, 27 Jun
-	2024 19:12:34 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	FA.92.06857.2A9BD766; Fri, 28 Jun 2024 04:12:34 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240627191233epcas5p229cce8f33030fcc4514ea68c81e317f7~c8kkcqO8u0834308343epcas5p2q;
-	Thu, 27 Jun 2024 19:12:33 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240627191233epsmtrp14e3ffbcad4219ce52526dda9bc5d2d3a~c8kkcFA6k3020330203epsmtrp1u;
-	Thu, 27 Jun 2024 19:12:33 +0000 (GMT)
-X-AuditID: b6c32a4b-ae9fa70000021ac9-57-667db9a24ced
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	8A.54.18846.1A9BD766; Fri, 28 Jun 2024 04:12:33 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240627191231epsmtip1ff21b5a86114e5f783ab7db6288e320a~c8kizCYsb0661406614epsmtip1C;
-	Thu, 27 Jun 2024 19:12:31 +0000 (GMT)
-Message-ID: <05eee4ff-c821-f285-ea2f-375c0cf4ac6a@samsung.com>
-Date: Fri, 28 Jun 2024 00:42:30 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+iqcigL"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-70685ab8fb1so4008151b3a.2;
+        Thu, 27 Jun 2024 13:10:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719519008; x=1720123808; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yMywSyrqyqgtj9q+Vb/QcUbABYB2OnAWGsqqi1w/fr8=;
+        b=D+iqcigLsUn9wCx9hdpSvgfSttUbkOBNkIoPJF8/7V3VKwGhdeJOa2RL5q1WXf6YZR
+         1I7kZ7sb17+DDTAgWkWDHBsaHA6WyGhknXnUue0mBHWJBnaYmbI81kbdyZ8Egy6reOqg
+         sk3LkD7bCh+XCRmkvwagYlpkL4UK4e1XFKdfOQKXyVT0H4cAYzBlxEWmFQGi6XtLgEEs
+         hXg37qN9CK8f/yhvgeq28CTYGKguE+OkOOxyvdin715jCeb9zjWG3BhBx2dZnxZ2FqbD
+         mL/t6NN+kPqOnTIssBrUXF7RcRF2hOGCK4//sKHr+XxSDD6XyMiVyk8GyBa4qN88tSVi
+         pBMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719519008; x=1720123808;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yMywSyrqyqgtj9q+Vb/QcUbABYB2OnAWGsqqi1w/fr8=;
+        b=p/Z6N9HKlpqn2kg4s72miJ/Bj1NnfalAuF7i4z0y4YuE+F5nkkm5NbNohmqkwfqmxD
+         mpBnnk6xttZ35V86gniQxrQuE6SaZvZ2nR7t3xCfj0GiojxCFCzyYkP4KtsX83XXk/xT
+         s5KB4hRHPEWy66iROFbIACGNYUPGxAAUbcQ4oYJ39KMFs9ucseVVMPCc/y9cnxr+qKyi
+         xPBUTGgeLaaNa3SI/ePwa1WuC2BU00OVzwayEtx+Q21geTEyCJVC0aQVH2ftLpl0uN3E
+         /UTm8DmgeufE1eRYKUTkRs6ZpGThJf626pbOlbVigPvlRIoEWvMbQ4FbSumaIAIWW0vl
+         1kJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXm1obwMXB8zJuqp1ds0ast8iXxNTt44roZJt6CVKVKe9Kjj/xsJt5Ex61+ThiCdd5soAtgRBDz95nXDrOaYMBarAcIrsKCR+u11gc3uKzzVH+8ip35D3DDbRcuorTBMiM3w5xxJOtCuKYxZlD3HqK+VRSq4yCG+6umG7xBcjaH8DK0
+X-Gm-Message-State: AOJu0YwH4cYvO0Zw3pW98byCLMmUi6K9ZiWziqbAGnuxlOVIAemDlAgX
+	Hn/cR7/wcsA96KKyPqrsnQ/veO9pO+bun0j79gPqp4jJ6g6hJmor
+X-Google-Smtp-Source: AGHT+IFnebtZIe/zK82pVrS8B8BYadWfNxg2e/WCrOLvCIC1x2GR4N2qDT/roI6qLuCfzPAU+E/z4w==
+X-Received: by 2002:a05:6a20:96c3:b0:1b5:ae2c:c729 with SMTP id adf61e73a8af0-1bcf7e7ec21mr14632064637.19.1719519008272;
+        Thu, 27 Jun 2024 13:10:08 -0700 (PDT)
+Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10d1498sm1629115ad.8.2024.06.27.13.10.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 13:10:07 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Thu, 27 Jun 2024 10:10:06 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc: josef@toxicpanda.com, hch@lst.de, axboe@kernel.dk, longman@redhat.com,
+	ming.lei@redhat.com, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yangerkun@huawei.com, yukuai1@huaweicloud.com, houtao1@huawei.com,
+	yi.zhang@huawei.com, lilingfeng3@huawei.com
+Subject: Re: [PATCH] blk-cgroup: don't clear stat in blkcg_reset_stats()
+Message-ID: <Zn3HHvcgZruLkMdn@slm.duckdns.org>
+References: <20240627090856.2345018-1-lilingfeng@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH v2 00/10] Read/Write with meta/integrity
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>
-Cc: asml.silence@gmail.com, mpatocka@redhat.com, axboe@kernel.dk,
-	kbusch@kernel.org, martin.petersen@oracle.com, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20240627060542.GA15865@lst.de>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNJsWRmVeSWpSXmKPExsWy7bCmlu6inbVpBosvcVo0TfjLbDFn1TZG
-	i9V3+9ksVq4+ymTxrvUci8WkQ9cYLfbe0raYv+wpu8Xy4/+YLCZ2XGVy4PLYOesuu8fls6Ue
-	m1Z1snlsXlLvsftmA5vHx6e3WDze77vK5tG3ZRWjx+dNcgGcUdk2GamJKalFCql5yfkpmXnp
-	tkrewfHO8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6ZOUBnKimUJeaUAoUCEouLlfTtbIryS0tS
-	FTLyi0tslVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM6Zuec9ccIW5Yv3PKSwNjP+Y
-	uhg5OSQETCSmPtwLZHNxCAnsZpT4176DGcL5xCjx8dEzRjhnysmb7DAtDzt3s0IkdjJK9K/7
-	BNX/llHiy+JrzCBVvAJ2Em0NrUBVHBwsAqoSK54YQIQFJU7OfMICYosKJEv87DrABmILC9hI
-	HN52EGwBs4C4xK0n88HuExFwlTj14CLYScwCpxgluvtmsoHMZBPQlLgwuRSkhlNAR6Jrz06o
-	XnmJ7W/ngNVLCGzhkHh8cxEbxNUuEldWz2aFsIUlXh3fAvWNlMTL/jYoO1viwaMHLBB2jcSO
-	zX1Q9fYSDX9ugP3CDLR3/S59iF18Er2/nzCBhCUEeCU62oQgqhUl7k16CtUpLvFwxhIo20Pi
-	8LMn0KBawyhxfMtlxgmMCrOQgmUWkvdnIXlnFsLmBYwsqxglUwuKc9NTi00LjPNSy+ERnpyf
-	u4kRnIq1vHcwPnrwQe8QIxMH4yFGCQ5mJRHe0JKqNCHelMTKqtSi/Pii0pzU4kOMpsDomcgs
-	JZqcD8wGeSXxhiaWBiZmZmYmlsZmhkrivK9b56YICaQnlqRmp6YWpBbB9DFxcEo1MD2d8fbB
-	VI3P7+Il7CUjG3RMZUS+rT98hSPW5CXPF71rbxbNt/lcKnvyW51T2oxpzIev3Pn960LMv16x
-	TeEfvsx3WX/i2rJvCpuyme5fc/+z7h//0YUTj67YczXv3ycDM65Hn5bfTFzpcebP2W38KfZM
-	/0Xe+v57Zbaqq0B/WY6ckzbrIjvHb7fOfVQJqkmbnubE0/xtRsmRnQ84bqYu2hiRt/r9Hm9z
-	vuvRd81DLt165HxrYeBpg7q3j747dt96wxJiO+GYr8XGtoMd7v2z71yPrSyyV7iadewia+IK
-	kzmJMuc0srcH39MWmrqiUnB17LXJfifnTAlgiOE5nna1KEL/ZtH25cozlk7dxPV6sfl5OSWW
-	4oxEQy3mouJEAGBwSFlOBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprMIsWRmVeSWpSXmKPExsWy7bCSnO7CnbVpBhcmSVk0TfjLbDFn1TZG
-	i9V3+9ksVq4+ymTxrvUci8WkQ9cYLfbe0raYv+wpu8Xy4/+YLCZ2XGVy4PLYOesuu8fls6Ue
-	m1Z1snlsXlLvsftmA5vHx6e3WDze77vK5tG3ZRWjx+dNcgGcUVw2Kak5mWWpRfp2CVwZU7e8
-	Zy64wlyx/ucUlgbGf0xdjJwcEgImEg87d7N2MXJxCAlsZ5T43NHPCpEQl2i+9oMdwhaWWPnv
-	OTtE0WtGiWMHz4B18wrYSbQ1tAI1cHCwCKhKrHhiABEWlDg58wkLiC0qkCzx8s9EsDnCAjYS
-	h7cdBLOZgebfejIfbIyIgKvEqQcXmUHmMwucYpTY2XCOBWLZGkaJR4vmgS1gE9CUuDC5FKSB
-	U0BHomvPTqhBZhJdW7sYIWx5ie1v5zBPYBSaheSOWUj2zULSMgtJywJGllWMoqkFxbnpuckF
-	hnrFibnFpXnpesn5uZsYwfGmFbSDcdn6v3qHGJk4GA8xSnAwK4nwhpZUpQnxpiRWVqUW5ccX
-	leakFh9ilOZgURLnVc7pTBESSE8sSc1OTS1ILYLJMnFwSjUwrbU/bZNqIvVCeeU9B+/nl4tX
-	HdRXsmFN6jzS+vyRTsDpx+qmX3o3yi7uuzG7ddZ2/ifZgU3H5+uIaR6PKd/E4pHo5Fwf0XV5
-	UXyU+Nd6/iDFKKMLWx5ucOGz/2xXfNSJpbZg6pW34vXRX3lS6x9Em/uz/PxqdLLrwvLlWWd/
-	WayVfmT+y1P6tAoro7i4Ods8uUVRTgrfvhXHzg/NNPoyX+DofOPafX0XwmwWznxoe3RR60Mp
-	h50M4mxTfxqu3eh78/TXr6evvT++YvumAxe0Vvddzzrveq7mMqPgNDlXzrrMWS2zJupKO/6+
-	vVhu5/89Mb6aB70XylZerwtuqtT7wCQ5rVSX9WL/3371gqtBSizFGYmGWsxFxYkATT7OsSYD
-	AAA=
-X-CMS-MailID: 20240627191233epcas5p229cce8f33030fcc4514ea68c81e317f7
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240626101415epcas5p3b06a963aa0b0196d6599fb86c90bc38c
-References: <CGME20240626101415epcas5p3b06a963aa0b0196d6599fb86c90bc38c@epcas5p3.samsung.com>
-	<20240626100700.3629-1-anuj20.g@samsung.com> <20240627060542.GA15865@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240627090856.2345018-1-lilingfeng@huaweicloud.com>
 
-On 6/27/2024 11:35 AM, Christoph Hellwig wrote:
-> What tree does this apply to?  There's quite a few rejects vs
-> for-6.11/block.
+Hello,
+
+On Thu, Jun 27, 2024 at 05:08:56PM +0800, Li Lingfeng wrote:
+> The list corruption described in commit 6da668063279 ("blk-cgroup: fix
+> list corruption from resetting io stat") has no effect. It's unnecessary
+> to fix it.
+
+I find this paragraph a bit confusing. At the time, it was broken, right?
+And if we were to memset() now, it'd break again.
+
+> As for cgroup v1, it does not use iostat any more after commit
+> ad7c3b41e86b("blk-throttle: Fix io statistics for cgroup v1"), so using
+> memset to clear iostat has no real effect.
+
+Ah, okay, this is because we made the stats blk-throtl specific but didn't
+implement ->pd_reset_stat_fn(), right?
+
+> As for cgroup v2, it will not call blkcg_reset_stats() to corrupt the
+> list.
 > 
+> The list of root cgroup can be used by both cgroup v1 and v2 while
+> non-root cgroup can't since it must be removed before switch between
+> cgroup v1 and v2.
+> So it may has effect if the list of root used by cgroup v2 was corrupted
+> after switching to cgroup v1, and switch back to cgroup v2 to use the
+> corrupted list again.
+> However, the root cgroup will not use the list any more after commit
+> ef45fe470e1e("blk-cgroup: show global disk stats in root cgroup io.stat").
 
-Jens for-next. On top of:
+Hmm... I'm still having a bit of trouble following this line of argument
+given that all the patch does is dropping stat clearing.
 
-commit f078c063b954085cfa185aea2be6a836529d04fc
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Mon Jun 24 19:38:35 2024 +0200
+> @@ -668,7 +645,6 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+>  	 * anyway.  If you get hit by a race, retry.
+>  	 */
+>  	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
+> -		blkg_clear_stat(blkg);
+>  		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+>  			struct blkcg_policy *pol = blkcg_policy[i];
 
-     block: fix the blk_queue_nonrot polarity
+The patch looks fine to me although it'd be nice to follow up with a patch
+to implement ->pd_reset_stat_fn() for blk-throtl. I'm not quite following
+the list corruption part of argument.
 
-And as mentioned in cover letter, a tree is available here:
-https://github.com/SamsungDS/linux/commits/feat/pi_us_v2/
+Thanks.
+
+-- 
+tejun
