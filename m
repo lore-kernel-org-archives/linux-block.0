@@ -1,124 +1,207 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7B945BE4;
-	Thu, 27 Jun 2024 20:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719519010; cv=none; b=YFRHR7wRxOGWDmtce+g60VBJJSwoc15AO4XlovFDqNOEIBB3FXx0BgZ7yTrJknFGw+snZ/6OBxJI9Sk37VdQRCBBurcKS4Zh3ldgwWsIwyivFN4MsFzBGDtVQD2D0Fi5qIx2QKyqyxNyEBjWygoaoZUK7yjS+cevtV1ZsCRMPkw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719519010; c=relaxed/simple;
-	bh=DpfdFuOhqUucDrMCIF6H7EJVyqbWI7XGELgzC5TEoxc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BaK/PzzmcwkqznU8D10F1IQ1KdQ8t5+ki0kgw10IoJuQeX1vEroHzhSHbx7HGa4O1VIDieig87YSCNRRs18GjXnz/2lmarohnd+4cVFVOUlp+Bsuv9kVRxc0DHE7BYGVtKfvE1CBy93WtLrDxhVAA/vV5zPTvqb3X9Y46ckHHmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+iqcigL; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56FD45BE4;
+	Thu, 27 Jun 2024 20:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719519232; cv=fail; b=UA0UEWiEFgcophxkFyu4EzHr+t9C1B3aE0FsM5uB10SUCZt8BhBUJkVTAOGc82+q1Ux2g1SKOU7LQgfa55WPF5U0i19WSPi4NrzlNqViwsu1mbHgCFa+z0EbRTbA8KqXZ1IamN9as5BU9oNz0sL0jiyIIZfn84Q3Dau9f6ZCIZc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719519232; c=relaxed/simple;
+	bh=0K9TTg+Q6c3ON6r1YwIcfaAyOTIUaXrzx1Wts4YQ9ZQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Y8QU1DpaSR544jg6gyWtDb1Ke0keibILyWEFHkh9fwOatHOAOcEzeV9AXEq+Fx2RHSSFR3QBP3N56L3s1mDxDq9Aw2IF6Ucs5efw9L+bQzKeibMV0cgGJl9Vih2Ty+kYMuw2NjPdYQM6r11vA8m/7UGTrNDSnHA/XSJ25kaLuLI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ba93GSJ2; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=R0xoLTtH; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+iqcigL"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-70685ab8fb1so4008151b3a.2;
-        Thu, 27 Jun 2024 13:10:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ba93GSJ2";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="R0xoLTtH"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45RKBW8V010354;
+	Thu, 27 Jun 2024 20:13:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	from:to:cc:subject:date:message-id:references:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=
+	corp-2023-11-20; bh=QIWAGT4PDXlsKQphSQSDm1aovQ88f51W8I8s2EBsM1o=; b=
+	ba93GSJ2fPh8BbM5KGvmZ7nCK8BkrSQt70GqSSJ7uLPiC/uQXpHtiCR8ftct0bwD
+	otg63NalRJFhmisfRoGUeBcjY5vZFT3PZrACUg7XVeyYHXWIa8M/VCX8jOTbMSVW
+	5OGFaOXxiDjfTXx0UGzFO0OR6WdTtKHxLhEmHRXDhBRBDwNL/Ln1t5vCWZ63+CHj
+	6npnFfXpEiFgUpCTw6oSAPm1JqsU/DRM7K5poC3NF8nsK7Bg5g14BW1bOCY7yamq
+	S49DbRRPuV52f/bmawCsUa9EQvOjn+MGgGL4gUGpdOYPik8Xz7Br5xx4Rr41BTXT
+	tHdhEIj6Au2jy9qi7Yazlw==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 400ttnaj65-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 27 Jun 2024 20:13:37 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45RJ6DqI037120;
+	Thu, 27 Jun 2024 20:13:36 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2173.outbound.protection.outlook.com [104.47.55.173])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3ywn2bgv96-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 27 Jun 2024 20:13:36 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XNp4+1lhM0P3mjhetCJ4h+49Rgq1kpMHkeYh6glhGeT5QsRxUWRhQdm9/sm2GlHdkXBk6Txej5B0PRqt1eCZVjr5izL9b5tE1b9LF9cvSn/vyGr6WESIJtkwJIJStmb7LZ5N2Kc6SKsyQB48Bi9Y0eO06forw0lwvn2q6O5NgOOKQPo2uM0HONlcdv9eb8aZuU1Q7PZVQWQ9NqpKbHeyILmSzLx347iSdXN+PRMrpxm8QIXFckNmHPeMctRNYTmPzu9NBfKYgQmf3hugT1cALYFOE8ihWQqOtCisgXvpLWXsuD2uRzfCLzgy8qWW/hfDeXDwMVS9JqI9wqVcprcCEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QIWAGT4PDXlsKQphSQSDm1aovQ88f51W8I8s2EBsM1o=;
+ b=T4cOgKfbEtZLvagKoAlr6Q4l6tJUdv/jv91QCyrdK/1R5kZup74EI3lPJY3EktIviowe870tMyOLqYmp7qwCCGj5G7soqPO6Ga4i9IgmAoY3h6g/5wY9v8j2m117BWBza+dwpBe0BygJjD98p3TRvi7IvSO6ZkNOEVrJrqDkPTPmY+FUnoMARfG84X71hcLmDkjPoJ/soIlfXoJIKTrUjmK7d2mT4WmxmZNJM91YQSM4Hn4E+FfVyd/X6LQilR9IP/NDxYDJKcIY8INHTfqCkrJERjgcJJCCb73NYU22cn/SnMs6ndhy+MyZqsUKGZFxBDsKhPHkwQbpyYTlV5UPiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719519008; x=1720123808; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yMywSyrqyqgtj9q+Vb/QcUbABYB2OnAWGsqqi1w/fr8=;
-        b=D+iqcigLsUn9wCx9hdpSvgfSttUbkOBNkIoPJF8/7V3VKwGhdeJOa2RL5q1WXf6YZR
-         1I7kZ7sb17+DDTAgWkWDHBsaHA6WyGhknXnUue0mBHWJBnaYmbI81kbdyZ8Egy6reOqg
-         sk3LkD7bCh+XCRmkvwagYlpkL4UK4e1XFKdfOQKXyVT0H4cAYzBlxEWmFQGi6XtLgEEs
-         hXg37qN9CK8f/yhvgeq28CTYGKguE+OkOOxyvdin715jCeb9zjWG3BhBx2dZnxZ2FqbD
-         mL/t6NN+kPqOnTIssBrUXF7RcRF2hOGCK4//sKHr+XxSDD6XyMiVyk8GyBa4qN88tSVi
-         pBMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719519008; x=1720123808;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yMywSyrqyqgtj9q+Vb/QcUbABYB2OnAWGsqqi1w/fr8=;
-        b=p/Z6N9HKlpqn2kg4s72miJ/Bj1NnfalAuF7i4z0y4YuE+F5nkkm5NbNohmqkwfqmxD
-         mpBnnk6xttZ35V86gniQxrQuE6SaZvZ2nR7t3xCfj0GiojxCFCzyYkP4KtsX83XXk/xT
-         s5KB4hRHPEWy66iROFbIACGNYUPGxAAUbcQ4oYJ39KMFs9ucseVVMPCc/y9cnxr+qKyi
-         xPBUTGgeLaaNa3SI/ePwa1WuC2BU00OVzwayEtx+Q21geTEyCJVC0aQVH2ftLpl0uN3E
-         /UTm8DmgeufE1eRYKUTkRs6ZpGThJf626pbOlbVigPvlRIoEWvMbQ4FbSumaIAIWW0vl
-         1kJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXm1obwMXB8zJuqp1ds0ast8iXxNTt44roZJt6CVKVKe9Kjj/xsJt5Ex61+ThiCdd5soAtgRBDz95nXDrOaYMBarAcIrsKCR+u11gc3uKzzVH+8ip35D3DDbRcuorTBMiM3w5xxJOtCuKYxZlD3HqK+VRSq4yCG+6umG7xBcjaH8DK0
-X-Gm-Message-State: AOJu0YwH4cYvO0Zw3pW98byCLMmUi6K9ZiWziqbAGnuxlOVIAemDlAgX
-	Hn/cR7/wcsA96KKyPqrsnQ/veO9pO+bun0j79gPqp4jJ6g6hJmor
-X-Google-Smtp-Source: AGHT+IFnebtZIe/zK82pVrS8B8BYadWfNxg2e/WCrOLvCIC1x2GR4N2qDT/roI6qLuCfzPAU+E/z4w==
-X-Received: by 2002:a05:6a20:96c3:b0:1b5:ae2c:c729 with SMTP id adf61e73a8af0-1bcf7e7ec21mr14632064637.19.1719519008272;
-        Thu, 27 Jun 2024 13:10:08 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10d1498sm1629115ad.8.2024.06.27.13.10.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 13:10:07 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 27 Jun 2024 10:10:06 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: josef@toxicpanda.com, hch@lst.de, axboe@kernel.dk, longman@redhat.com,
-	ming.lei@redhat.com, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yangerkun@huawei.com, yukuai1@huaweicloud.com, houtao1@huawei.com,
-	yi.zhang@huawei.com, lilingfeng3@huawei.com
-Subject: Re: [PATCH] blk-cgroup: don't clear stat in blkcg_reset_stats()
-Message-ID: <Zn3HHvcgZruLkMdn@slm.duckdns.org>
-References: <20240627090856.2345018-1-lilingfeng@huaweicloud.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QIWAGT4PDXlsKQphSQSDm1aovQ88f51W8I8s2EBsM1o=;
+ b=R0xoLTtHwK/O8THUWgkE/w5mSOk4ry1bgaY69r+8EvKtGvayW49Eru+4WDee0PFxU8RJUGmL/ib5LX/PBq0FR+g5wulGwwZw8N7JjoXglN4u0jAemCD86DvEMK3FXHwPC8jlxXSSmn7Id0vdvom4iD0G6nEQ0pA5jfst2WjCm18=
+Received: from IA1PR10MB7240.namprd10.prod.outlook.com (2603:10b6:208:3f5::9)
+ by BN0PR10MB4837.namprd10.prod.outlook.com (2603:10b6:408:116::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.35; Thu, 27 Jun
+ 2024 20:13:08 +0000
+Received: from IA1PR10MB7240.namprd10.prod.outlook.com
+ ([fe80::962f:da30:466c:6a1]) by IA1PR10MB7240.namprd10.prod.outlook.com
+ ([fe80::962f:da30:466c:6a1%2]) with mapi id 15.20.7698.025; Thu, 27 Jun 2024
+ 20:13:08 +0000
+From: Gulam Mohamed <gulam.mohamed@oracle.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "yukuai1@huaweicloud.com" <yukuai1@huaweicloud.com>,
+        Christoph Hellwig
+	<hch@lst.de>
+Subject: RE: [PATCH V6 for-6.11/block] loop: Fix a race between loop detach
+ and loop open
+Thread-Topic: [PATCH V6 for-6.11/block] loop: Fix a race between loop detach
+ and loop open
+Thread-Index: AQHawiDxSOf+1W/UnkG1CxXEGa2wWbHcF+oA
+Date: Thu, 27 Jun 2024 20:13:07 +0000
+Message-ID: 
+ <IA1PR10MB72407980A58E57E91F80777F98D72@IA1PR10MB7240.namprd10.prod.outlook.com>
+References: <20240618164042.343777-1-gulam.mohamed@oracle.com>
+ <20240619081601.GA5434@lst.de>
+In-Reply-To: <20240619081601.GA5434@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR10MB7240:EE_|BN0PR10MB4837:EE_
+x-ms-office365-filtering-correlation-id: e79a07a3-53b9-4bd3-69ce-08dc96e58f8e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: 
+ =?us-ascii?Q?c6DxOqwD5blAKgj1Tw6uCH4nwYc73cAoXnijYMM8o3oT4s8/6mcY/cj7nbwO?=
+ =?us-ascii?Q?9NRClbHXGTqOdhJWO58qVR3TPGCHOTYI4Cgmw0G89Pu3o5HXBNVd2yiPwXnT?=
+ =?us-ascii?Q?uYQd61NELeSgbm5uhT3ypZg20gaYNOMBbb7vUIvXS1hFiVfRXazkgf5u3W6P?=
+ =?us-ascii?Q?kiDg5CT9OHKMoVqvHToBMgBxoXRFCGdbPfIgmaIa7tK08HmVgvy/2H6t7dVs?=
+ =?us-ascii?Q?opxxw4Dq6CFd1wbmZo+u9qEUPPS4++/OP3RYuWl/YHqYy2l1tv83cQH8VXiH?=
+ =?us-ascii?Q?ZVctFCi8q+y7es8jqsyuhp0Z+YGKP5gSDRTPBaj7J+kA8987WnF8+8zRwz/I?=
+ =?us-ascii?Q?fAQqKE/9Kv/oFtXpyJN7xKrOzo2B7YYWV87q6pF8nP1ht47Lpq8PCToQ28ys?=
+ =?us-ascii?Q?QsD0SaLuqApHL3/IJ1kXzIs3J+zRth5YiphtW0AlvhFNz9INfNsDm9Byd5Mo?=
+ =?us-ascii?Q?NWwRM7Mu2Y5qKvW5f5eR05+Y+fYajiW+VyVgAkXSK2TH091gGb8W6oOuz7hQ?=
+ =?us-ascii?Q?jeamjsLs5Nqfe1x3mU1itE1AeHN3lKSO6n9TSnAgCrR9rhtTP4s5RGrWZVH8?=
+ =?us-ascii?Q?G6mTDP5dsi9ulHBu0eg/3O6viFgwcfyJdBtaC44m4+Gp0pzVui0pzcMwE+07?=
+ =?us-ascii?Q?+Cy+MeIQURfwfmTcPybnBFb+QLAyHAPTKtKlPdYtEg0+y5oA6Lh7UlnYdypq?=
+ =?us-ascii?Q?aYXSF6xXN9uTRlmzGOt9Hf0Fivi0YR7m2s5a9N//NsQSWVQdSbYTupy+uYvr?=
+ =?us-ascii?Q?mO9rIzJUmaBM9hGagweWxLaAvHu7TXQsxiIqg3n/3gx0767K/N/qPNVGAVc/?=
+ =?us-ascii?Q?6jJ1unTNIJPBy3FDHNYJpcwXoIQ/qPwVskMEzQ7LJV6GFQE0XjsaNI25z103?=
+ =?us-ascii?Q?GRHOONELHajYSWldhu4c1uaLXrCJ676S8UPCOOumsyof3bnNbNCMmcpgifD3?=
+ =?us-ascii?Q?26w3PnrKD+7K5XLpTLopHP9QkxYgOMbm53L2wvERDJDICcgD3JckWAA9eqOH?=
+ =?us-ascii?Q?5smbfHa0zYhovWwe4VhJXh2Hf5+ce2cgbqlXayZbz+xVX70n5v4+bpSy+9Wc?=
+ =?us-ascii?Q?2H/ua7Gg1lHGpxOcdRHsgzoEBFMS1Tjfjrt8CPNX54BVsf5IQqlVc27RTXVn?=
+ =?us-ascii?Q?p/m3qGi9MO4zM0SzDuum37nUBcTJ6494L3C+UHX62bOq5v5GjiJOp8Yn4vCx?=
+ =?us-ascii?Q?siuHIz1fTIxmZlcf80S7qFSXhvJioot9BFDW1aL4w4Qu15v7kY+W/icBv2D5?=
+ =?us-ascii?Q?/p2K35V0UV53OEV/ES+QcvHCPNk95NcZjEniKa7p02t9nvhKPPE8t6rI93Wv?=
+ =?us-ascii?Q?+Ybe+7FeVGhee7OL/1HL8b5Eb2L062pnHTxVEF9K59sP6yJAU0A0Er8rSf64?=
+ =?us-ascii?Q?KzGAG62GJiS8NfGL8wIzuV1LfkoX8oIocpC/hY4wbcnoBsu5bw=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR10MB7240.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?d+bYwkZcSf2YO6nSwx1CpLP2VXNXxX6mgsZk19A7khgMjd3DmAhZGgvhHEzJ?=
+ =?us-ascii?Q?M5IAitjMsSOWGHCjf3DkR3G9doDF8DsM1ojbYUFxCyjPIpYTWf9p61f6UXsV?=
+ =?us-ascii?Q?hNX7NKBpUKkdbDS0eNh/hNoJ+Nh2M04O+ItmPiyX9X3+XAldVqO5WcdrJyYx?=
+ =?us-ascii?Q?+LgqwPeME2P/JdqosGYQUxbtLwaJZ3+O8au+8KqP9f/K6+wYGn5uPJRInT3U?=
+ =?us-ascii?Q?3gW4MlvgJm6DSvAKBCDa74lcEYD81j88gzQrluu2Ck3QoTAjPihMh4QkvGr4?=
+ =?us-ascii?Q?U/V4lisOFe0ONvURiqPWWiqlzezmNHshR/Wj6Rawmhnl6ZbTfJkFjkV/CZoO?=
+ =?us-ascii?Q?dwTBF/bvz6CQF8fF+loE/o5Ai1mvJLsw1Lz5au3wQ9pRRsLG0XVSl/KqCvOO?=
+ =?us-ascii?Q?yxxZ8BxLew9BxbRwOxwE8WyNEG7cONqSRX6ItcjyiY3fy/RGAD61CNJEkUlz?=
+ =?us-ascii?Q?8gfZ9He1OAsu4AQtKMVLPk26xIo2bT075T20qltDNHnW4Qo6brp6Q8xdih9B?=
+ =?us-ascii?Q?C4SwESfOr96vrdJnvQeWHtOyDC+B80EJ9AJFx3gcKYRUrmWUEE6mj3t0Whg2?=
+ =?us-ascii?Q?sPAwZX8Ah67dmhRT5YROtwsvMCGMoI46W56PXkGU0Nt53fUPJFfnQpAplMWV?=
+ =?us-ascii?Q?eHsMnOmV6kdxEkdhU1ayvvOB+13ZTgDtzWQyCTfJ7TqGWbLdsUARBr4EmZj9?=
+ =?us-ascii?Q?CP5YkjP0i34iy4yi84L6bT1Sx45+zHeSNxkkRP82/quk91jsSfW575oY3QGl?=
+ =?us-ascii?Q?n5eWxOD3fVargNmLFZ9aHlI9PpOTTq2jMkcoESTNPiyfa0CZpXOtfC4a3oiH?=
+ =?us-ascii?Q?1l2OJ++fpVvM2/yY5H3E+23MLB3I/1Tfm3dJihXkWsoibuqhx1rFJM979KST?=
+ =?us-ascii?Q?f3P8NEUinMtRbuxzWn+QfBU81HCMkAoN0lTfRukOANZXuB9P9ZvJmsfwXWaa?=
+ =?us-ascii?Q?V3W7APbWzRFN/fYg7+f6letjQMoEoaHX4gCQ/XhMeYuTxXWpQAYKEqKVC3U9?=
+ =?us-ascii?Q?j2iEcGAtdzayWVxx5m+nRvklqB5eL34TyqnpM/d0jfIEgNawJP4xkAic5992?=
+ =?us-ascii?Q?yhECKI8loMxf64Uvuw7lz7fHEeTrdk2eyhpJTzzyEcGppCPM5WjIKIUCrCfo?=
+ =?us-ascii?Q?gb7oUbWiA3ZVntLWAi2lTnoJXomE9stUcnlOHPtQ5oHKtjFfDtcMMVOzUpmy?=
+ =?us-ascii?Q?qg9h7HLT2EPN0JkDSiFjW+aqn7GIIYU3JrWGZv4oHMzpNvgQxILWdJt4fq6A?=
+ =?us-ascii?Q?qGcnPisozMN6UrUF5QEdN431SFsOKVUX/ocBdbN20KFPM5bllR/9wgAKALsW?=
+ =?us-ascii?Q?OIMC8j3gYZ0YthDh1pI10J0O27pHE0eSmUDNTc8iKqjVdPto+69Sput2kfZR?=
+ =?us-ascii?Q?yfq4dpVI0ZZT+0g5B6RWs4FO+4elDqmCkPAyIi2166qlHuGjNpM0dkuAOdKu?=
+ =?us-ascii?Q?bdvLahYcqcGRh6XzlKYneXFc4ZwH6EMQ9nGNgWXJJgDdq9tCkzDrZJLSQJB6?=
+ =?us-ascii?Q?qiq14z1r+4hBFQDrpI/I5p9x4cHUxosp9fKpCLV0R33Nk5VbYH0BmOaC8SuN?=
+ =?us-ascii?Q?BUdtMgLsreHmYBdPlN/TMSoQDIR1eiq0bFqXykwB?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240627090856.2345018-1-lilingfeng@huaweicloud.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	KSK9bbix1xSJ/JTYxwShx9Vubxr7StolRLfjPf4J6xcn0Viq06YBEEXpasvHHGKxvUAaTeXQEmCStHygQJ2RVmB6/XMpSwcz0wBHGUsA6U6i7xZEDXkZ6V8i9eXp3a839lZP4wh0wbUVPCNJNV/TwnLHgN7WjHPbl+RXwCMyy+UZUjnuAvrOUxtmsosGP/23KLPH+kjIAl8WlFKU2h5tJi6hjS+Tl7mtI1BNA0hrzF51/NhD1xsjCa3LrC9Z0ZXORIz1EBEVIuLutvk/htWJ7MX1GkgUwu1npaT9TIxa1FcjK72qagP6f3xafFBKQDlLBEy2dXnmjGy2m9siwsFRqYYlmVwbyUpVB1UAlz8JLq2YoR8fSycFDw/U1bItBCERt6vNVHnnKZrc6I9m2jAjOz6NH8cBt89/YVA9jioEWiu3zMJ2lf9ireZQI6KOwsx2O9xni7xhM/rF6ZAG3aiBufeeNCgzx3tbPD5ANFj3yX6okkCjq3GwgHI7QGUKaAJ9gCT0iCA77ONROxLxE6/uHkBH/R8Y5rONOdH5oHAiTavT07b8yTaoFOJSBge280axXwVw+9h4lkM+Gl+p71HuBU8/3plflVwiqyHECbffdSk=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR10MB7240.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e79a07a3-53b9-4bd3-69ce-08dc96e58f8e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2024 20:13:07.9852
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jSlEp0gisal2eJBMKuxKRrurOyrCR+o4arzn+7bxRUuKMQ5ezHIUDJBdN6OI5HCwCs9Izul2qdqj0p7xLwGfG7X1HT6TfzWVsp1+rfjX60U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB4837
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-27_14,2024-06-27_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2406180000
+ definitions=main-2406270150
+X-Proofpoint-GUID: TPY4RFimPOdt5bDdsIBOiai9AuNuOpM_
+X-Proofpoint-ORIG-GUID: TPY4RFimPOdt5bDdsIBOiai9AuNuOpM_
 
-Hello,
+Hi Jens,
 
-On Thu, Jun 27, 2024 at 05:08:56PM +0800, Li Lingfeng wrote:
-> The list corruption described in commit 6da668063279 ("blk-cgroup: fix
-> list corruption from resetting io stat") has no effect. It's unnecessary
-> to fix it.
+     This patch is reviewed by Chirstoph, can you please take a look and pu=
+ll it if it is good to you?
 
-I find this paragraph a bit confusing. At the time, it was broken, right?
-And if we were to memset() now, it'd break again.
+Regards,
+Gulam Mohamed.
 
-> As for cgroup v1, it does not use iostat any more after commit
-> ad7c3b41e86b("blk-throttle: Fix io statistics for cgroup v1"), so using
-> memset to clear iostat has no real effect.
+> -----Original Message-----
+> From: Christoph Hellwig <hch@lst.de>
+> Sent: Wednesday, June 19, 2024 1:46 PM
+> To: Gulam Mohamed <gulam.mohamed@oracle.com>
+> Cc: linux-block@vger.kernel.org; linux-kernel@vger.kernel.org;
+> yukuai1@huaweicloud.com; hch@lst.de; axboe@kernel.dk
+> Subject: Re: [PATCH V6 for-6.11/block] loop: Fix a race between loop deta=
+ch
+> and loop open
+>=20
+> Do we need the re-addition of the open method to fix the ltp test case?  =
+I
+> kinda hate it, but if that is what it takes:
+>=20
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Ah, okay, this is because we made the stats blk-throtl specific but didn't
-implement ->pd_reset_stat_fn(), right?
-
-> As for cgroup v2, it will not call blkcg_reset_stats() to corrupt the
-> list.
-> 
-> The list of root cgroup can be used by both cgroup v1 and v2 while
-> non-root cgroup can't since it must be removed before switch between
-> cgroup v1 and v2.
-> So it may has effect if the list of root used by cgroup v2 was corrupted
-> after switching to cgroup v1, and switch back to cgroup v2 to use the
-> corrupted list again.
-> However, the root cgroup will not use the list any more after commit
-> ef45fe470e1e("blk-cgroup: show global disk stats in root cgroup io.stat").
-
-Hmm... I'm still having a bit of trouble following this line of argument
-given that all the patch does is dropping stat clearing.
-
-> @@ -668,7 +645,6 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
->  	 * anyway.  If you get hit by a race, retry.
->  	 */
->  	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
-> -		blkg_clear_stat(blkg);
->  		for (i = 0; i < BLKCG_MAX_POLS; i++) {
->  			struct blkcg_policy *pol = blkcg_policy[i];
-
-The patch looks fine to me although it'd be nice to follow up with a patch
-to implement ->pd_reset_stat_fn() for blk-throtl. I'm not quite following
-the list corruption part of argument.
-
-Thanks.
-
--- 
-tejun
