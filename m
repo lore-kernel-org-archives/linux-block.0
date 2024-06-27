@@ -1,117 +1,141 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4904C62;
-	Thu, 27 Jun 2024 00:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE8817E9
+	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 01:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719446969; cv=none; b=cTLXI0/0ZRGPkdr/GTjmHeN/rAhUKbB7V7PvolBGNEDITbLHrszQDLfKSJiCYqiow+GB7xD82gCqLMlxmNKfTwTrEj1ziGFFCAkMd5hK/lLTE/D0Wvq1M7uqngClEsdkOEIlvkN9jkU2JMQljYn1Q8qO6dHC7+KAer765v5poZk=
+	t=1719451087; cv=none; b=Je0Roxrmkw0CPFhYGej+kwUZnq4fMng7UniYshNK6a+aYmmjQ3B18I0svRfsyIpAImFbMT8JQKIiP2KxfeoeGz8xin05+G7qUwUcPMK4wqqpuSA5Wuh0058bJqL8SqRfvXyRTLdQ/hp0g9nLJTQFlYvD1Teh6rSTzguMc/3Yv5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719446969; c=relaxed/simple;
-	bh=g6aSf05EzYYETlf2o9BOCJG4fdLkL9sKEIU7uhFD1/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GtWtaWETB9a2p33VW4oP5jdY6OUMlJCGyMx1+oVGByamEysCG80uQmXdCl2SGGJaIOfOCf2JCKwELsKaGptvlmQoCnwS8u/wjxzJ261Nl5LaTeDu1rTaArRvXKIPCjShv5lzv4WUZA+KqmynjeLeeiUzheXo5YqdwS9YSI4f9MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4tsWEX2w; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1719451087; c=relaxed/simple;
+	bh=Iu4VxMXTKgcdQVLF+y6tVDtxFjBBguB86mD+5zt4W5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WWUHW3jVdVh/HELY9XR2qLUgB8TSMPwJo21mbfJRDNSFl/UTCoI9WFQy7AretiQdVCxyMlkO3iZ9s8fj9Os1wGG3FajbzA8d7xDqK4taIqCCNxsLlfZ39V5MR+z8gFqfnvSR2htbcMgvctvrvRNvgFaOGNVxL7DpMrek11yCD+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QUBIcgn8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4tsWEX2w"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=EBkUb0Zod9PMNfEgCDDzkHALc55cp6jjtgA5Pre3tic=; b=4tsWEX2wHYGMaDcp38dowwnbkY
-	siqhLhl1H0IrtLIwoKDNc+MYS9LC7kcNE/5IvFDhXXFFRRK/bkDPGWoi7CbhCYZYVPiSzxiCJU84y
-	s6oMkHrHMLYyTmjCjfuOONBN4sc/F6MFjzyZBg9sYpobJ/DbK2oW0EAAK6g8uJGr9nW+4G7tj9KXB
-	GilaFrcZkkCykbjXLLI1cJh89Lz2ESHDIgQDsPnLvVzMKtT25DxgA/rKfn+iBvzenUl427Jp/nqSG
-	xJuwUMO+RMK3DXoBFWKWyRffIWBUtpGq8VgkMDtOR2w5Sfu3CfSjOIcdvsLLQPzq+Z+iAUHT/RfOH
-	3MAM7X3A==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sMchZ-00000008hnT-2iFu;
-	Thu, 27 Jun 2024 00:09:25 +0000
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: p.raghav@samsung.com,
-	hare@suse.de,
-	kbusch@kernel.org,
-	david@fromorbit.com,
-	neilb@suse.de
-Cc: mcgrof@kernel.org,
-	gost.dev@samsung.com,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	patches@lists.linux.dev
-Subject: [RFC] swapfile: disable swapon for bs > ps devices
-Date: Wed, 26 Jun 2024 17:09:23 -0700
-Message-ID: <20240627000924.2074949-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QUBIcgn8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719451084;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1ABEcaaZBAbz+HG3L93P6o0S5XyX63mDoJBSbvJQY4k=;
+	b=QUBIcgn8d8yVMxphOj9hyQ3dEBpZnB0ZYYXWzck84HpUuGhpMZ7JBtKnuCr6hNXkJynPnp
+	kJ2rgIMIa2fhyR5RIsmJ99NtycXST/wqsIDnCEul03R5bzPS3SRE2LVDcDscsPyPp+7SE7
+	RwEBeADjvT9Hxwm9xFOqdg5h8HPpRZ0=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-OUly0LGwMMKCbfRH0P0Hvw-1; Wed,
+ 26 Jun 2024 21:18:00 -0400
+X-MC-Unique: OUly0LGwMMKCbfRH0P0Hvw-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 254D3195609F;
+	Thu, 27 Jun 2024 01:17:59 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.95])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A5D5D1955E84;
+	Thu, 27 Jun 2024 01:17:55 +0000 (UTC)
+Date: Thu, 27 Jun 2024 09:17:50 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
+Message-ID: <Zny9vr/2iHIkc2bC@fedora>
+References: <20240617194451.435445-1-ushankar@purestorage.com>
+ <20240617194451.435445-3-ushankar@purestorage.com>
+ <ZnDs5zLc5oA1jPVA@fedora>
+ <ZnxOYyWV/E54qOAM@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZnxOYyWV/E54qOAM@dev-ushankar.dev.purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Devices which have a requirement for bs > ps cannot be supported for
-swap as swap still needs work. Once the block device cache sets the
-min order for block devices [0] we need this stop gap otherwise all
-swap operations are rejected.
+On Wed, Jun 26, 2024 at 11:22:43AM -0600, Uday Shankar wrote:
+> On Tue, Jun 18, 2024 at 10:11:51AM +0800, Ming Lei wrote:
+> > On Mon, Jun 17, 2024 at 01:44:49PM -0600, Uday Shankar wrote:
+> > > ublk currently supports the following behaviors on ublk server exit:
+> > > 
+> > > A: outstanding I/Os get errors, subsequently issued I/Os get errors
+> > > B: outstanding I/Os get errors, subsequently issued I/Os queue
+> > > C: outstanding I/Os get reissued, subsequently issued I/Os queue
+> > > 
+> > > and the following behaviors for recovery of preexisting block devices by
+> > > a future incarnation of the ublk server:
+> > > 
+> > > 1: ublk devices stopped on ublk server exit (no recovery possible)
+> > > 2: ublk devices are recoverable using start/end_recovery commands
+> > > 
+> > > The userspace interface allows selection of combinations of these
+> > > behaviors using flags specified at device creation time, namely:
+> > > 
+> > > default behavior: A + 1
+> > > UBLK_F_USER_RECOVERY: B + 2
+> > > UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_REISSUE: C + 2
+> > 
+> > ublk is supposed to support A, B & C for both 1 and both 2, but it may
+> > depend on how ublk server is implemented.
+> > 
+> > In cover letter, it is mentioned that "A + 2 is a currently unsupported
+> > behavior", can you explain it a bit? Such as, how does ublk server
+> > handle the I/O error? And when/how to recover? why doesn't this way
+> > work?
+> 
+> Sorry if this was unclear - the behaviors I describe in A, B, C, 1, 2
+> are all referring to what is seen by the application using the ublk
+> block device when the ublk server crashes. There is no sense in which
 
-[0] https://lore.kernel.org/all/20240510102906.51844-6-hare@kernel.org/T/#md09501306c649dd84db0a711f9359570c17a197f
+Yes, usually the app using ublk is supposed to be completely generic,
+and won't be taken into account.
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
+> the ublk server can "handle" the I/O error because during this time,
+> there is no ublk server and all decisions on how to handle I/O are made
+> by ublk_drv directly (based on configuration flags specified when the
+> device was created).
+> 
+> If the ublk server created the device with UBLK_F_USER_RECOVERY, then
+> when the ublk server has crashed (and not restarted yet), I/Os issued by
+> the application will queue/hang until the ublk server comes back and
+> recovers the device, because the underlying request_queue is left in a
+> quiesced state. So in this case, behavior A is not possible.
 
-This is super *way* forward looking after LBS patches and once we square away
-how to support things on the block device cache. Only then does it make
-sense to start to consider this. But this is just a stop gap.
+When ublk server is crashed, ublk_abort_requests() will be called to fail
+queued inflight requests. Meantime ubq->canceling is set to requeue
+new request instead of forwarding it to ublk server.
 
-But if you think about it, in practice since we are going forward with a
-world where we have AWUPF >= NPWG to enable the physical_block_size to
-be >= NPWG, the corner case we want to help users *try* to avoid is to enable
-swap not when the LBA format is > PAGE_SIZE (although for sport we can
-support that) but when the NPWG > PAGE_SIZE. So we'd warn about that until
-swap gets a facelift. That is 4k writes will work for devices with 4k
-LBA format for example but NPWG = 16k, they would work with a RMW
-penalty, just as RMWs today happen with drives formatted with 512 LBA
-format and today's default world of 4k IU.
+So behavior A should be supported easily by failing request in
+ublk_queue_rq() if ubq->canceling is set.
 
-As it turns out we have no topology information for the IU today.  It used
-to be that physical_block_size used to have a language about RMW.
-During the 2024 LSFMM thread about Large Block for IO that Hannes
-proposed we reviewed this discrepancy [1] but we seemed to conclude then
-that no changes are required.
+> 
+> If the ublk server created the device without UBLK_F_USER_RECOVERY, then
+> when the ublk server has crashed (and not restarted yet), I/Os issued by
+> the application will immediately error (since in this case, ublk will
+> call del_gendisk).  However, when the ublk server restarts, it cannot
+> recover the existing ublk device - the disk has been deleted and the
+> ublk device is in state UBLK_S_DEV_DEAD from which recovery is not
+> permitted. So in this case, behavior 2 is not possible.
 
-I'm starting to think that exposing the IU might make sense now. The
-below would not capture the case of the IU > PAGE_SIZE, in theory that
-should work but then its just RMWs, but users likely should be informed
-it is stupid for them to do that. The other more important use case
-would be for STATX_DIOALIGN for the dio_offset_align. That seems
-incorrect today even for existing drives with 4k IU and 512 LBA format.
+UBLK_F_USER_RECOVERY is supposed for supporting to recover device, and
+if this flag isn't enabled, we don't support the feature simply, so
+looks behavior 2 isn't one valid case, is it?
 
-Thoughts?
+> 
+> Hence A + 2 is impossible with the current ublk_drv implementation.
+> Please correct me if I missed something.
 
-[1] https://lore.kernel.org/all/ZekfZdchUnRZoebo@bombadil.infradead.org/
+Please see if the above reply can address this case.
 
- mm/swapfile.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 2f5203aa2d2c..9ff168760bc2 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -3153,6 +3153,11 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
- 		goto bad_swap_unlock_inode;
- 	}
- 
-+	if (mapping_min_folio_order(mapping) > 0) {
-+		error = -EINVAL;
-+		goto bad_swap_unlock_inode;
-+	}
-+
- 	/*
- 	 * Read the swap header.
- 	 */
--- 
-2.43.0
+Thanks,
+Ming
 
