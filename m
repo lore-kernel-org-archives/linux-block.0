@@ -1,193 +1,85 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CC713A259;
-	Thu, 27 Jun 2024 14:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF554195FEF;
+	Thu, 27 Jun 2024 14:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719498453; cv=none; b=P2b5Q6pTSKfaHCHIS7BcPC4DV/EtNbKE9kciQ7GeQ4mYLTqbDC1hsJrI/cTnpsV1GbkxGVnMTAmA7Y9OpL6Pm1Td7jRSygfvD/OsGX8l0wzAVQXaGY7+9e0+ei36lqCWuhlp24oWjghGALK7u9ZzAVbF2uGH9j0rDbv9nV2DsdY=
+	t=1719499248; cv=none; b=gwIQmji75GANb+QWl+rqQ51960JPLAvjKYwzfFQSd6EmJifv27WyEMbGqIHNxcfOEzZZ5yauhJeOAfadjJi7JK1fHqtkyYpHN7oWnJ+bK9r8VOSiVsB/bfCor0hHBaXnyKs0IOb6NBXzdDLjxLa3LwFkoczXHguhgJVYu24htUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719498453; c=relaxed/simple;
-	bh=+hA94nBp0Z2NOG+7XiSePdvJo4tjMM+AEioEA4rngWg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q5Sovy3ud5FOXaNwllGJgskTuDSHHUDvvY2qGGfEt/fgaQIELq5resOK+n3pS40MvFHwvTXDTgsjML3xGd4+mjTufcePF2Q3rOFV0ApISLMlPcFouIGEbQjkH2zIZmw1z+ajoIWAQJazN37Elcjr0aO91UGPEbp8Bl5CmEo2SOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W919h10fwz4f3jt1;
-	Thu, 27 Jun 2024 22:27:20 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 478F21A0189;
-	Thu, 27 Jun 2024 22:27:27 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP2 (Coremail) with SMTP id Syh0CgBXwIXNdn1mUQAAAg--.25162S4;
-	Thu, 27 Jun 2024 22:27:27 +0800 (CST)
-From: Li Lingfeng <lilingfeng@huaweicloud.com>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	hch@lst.de,
-	axboe@kernel.dk,
-	mkoutny@suse.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yangerkun@huawei.com,
-	yukuai1@huaweicloud.com,
-	houtao1@huawei.com,
-	yi.zhang@huawei.com,
-	lilingfeng@huaweicloud.com,
-	lilingfeng3@huawei.com
-Subject: [PATCH v2] block: flush all throttled bios when deleting the cgroup
-Date: Thu, 27 Jun 2024 22:26:06 +0800
-Message-Id: <20240627142606.3709394-1-lilingfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1719499248; c=relaxed/simple;
+	bh=NINHKb8FIlfx0+6iUSTr7gqb1HKbB0I//0MT6wTMqC4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aSLQsfpE6IC7wMT6FEQ7egQmOYdYQhqNfhrqQHCm+Ea6amZOPeFxHg5CnAMzY/y1mEuHtMDv/XN67aymiMHzBLdvM15kJIZllrVdTH22OZCaMSsCXTUnTSM7OUYBWC/aHb5uzrieiqF6RHU74ctmElWAnrN/2K8OqoGd6CF7LsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RaqP7sub; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RaqP7sub"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4W91T96QtBz6Cnv3g;
+	Thu, 27 Jun 2024 14:40:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1719499241; x=1722091242; bh=EtC9symTgPYYUVBekMSlXR6p
+	wPouqgrhp8HSMzezDo0=; b=RaqP7subSlMFc+IkU0X1XvD9cfLdfswMVeAPEjzC
+	YkjNyS2P1/JvQrhpaGuTFaMato2kPl7g+t/EE/2EX2Ece8rp/VWQ9+1qWbYkqUpH
+	8n/Mfw0+YZOtJYD2lqoaAKMu7Q7+1WIKwCycNujOLspp2tpztoHoBfvHgWSYhZtM
+	sfd8IMwxoQTOclUfLex6vJwugFOsO2aZXttghjgoa3jw9senLZmn0S0rS81WQ6hZ
+	K/XGF5StqK1BwaNPYch3waSlw1VNPrhTgHeeX7FzuZDwOePzlbKMBBQCjmzJjWGS
+	7WBh8JuSZTr+zFzgXBFxitbSsLSkgy/yckTRRd5NW9iFJQ==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 5oERRB6kd5Jj; Thu, 27 Jun 2024 14:40:41 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4W91T23Ww1z6Cnv3Q;
+	Thu, 27 Jun 2024 14:40:38 +0000 (UTC)
+Message-ID: <fcec8bfa-8e9b-41e8-a3df-99b3bf72a060@acm.org>
+Date: Thu, 27 Jun 2024 07:40:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgBXwIXNdn1mUQAAAg--.25162S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr4xWF48Gw1xGry3tr47urg_yoWrWF4rpr
-	WS9a4Ykw1Dtr9I9r4agr45JFWSva95XrWav397Ca1ayrWxtw1jqF9Yva48XFWrJFn3Cr4Y
-	vr15tr18uF18G37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUF9
-	a9DUUUU
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: get drivers out of setting queue flags
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, "Md. Haris Iqbal"
+ <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Sumit Saxena <sumit.saxena@broadcom.com>,
+ Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+ Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Sathya Prakash <sathya.prakash@broadcom.com>,
+ Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+ Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+ linux-block@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
+ linux-scsi@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com
+References: <20240627124926.512662-1-hch@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240627124926.512662-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Li Lingfeng <lilingfeng3@huawei.com>
+On 6/27/24 5:49 AM, Christoph Hellwig wrote:
+> now that driver features have been moved out of the queue flags,
+> the abuses where drivers set random internal queue flags stand out
+> even more.  This series fixes them up.
 
-When a process migrates to another cgroup and the original cgroup is deleted,
-the restrictions of throttled bios cannot be removed. If the restrictions
-are set too low, it will take a long time to complete these bios.
+For the entire series:
 
-Refer to the process of deleting a disk to remove the restrictions and
-issue bios when deleting the cgroup.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-This makes difference on the behavior of throttled bios:
-Before: the limit of the throttled bios can't be changed and the bios will
-complete under this limit;
-Now: the limit will be canceled and the throttled bios will be flushed
-immediately.
+Thanks!
 
-References:
-https://lore.kernel.org/r/20220318130144.1066064-4-ming.lei@redhat.com
-
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
-  v1->v2:
-    Use "flush" instead of "cancel";
-    Add description of the affect of throttled bios.
- block/blk-throttle.c | 68 ++++++++++++++++++++++++++++----------------
- 1 file changed, 44 insertions(+), 24 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index c1bf73f8c75d..a0e5b28951ca 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1534,6 +1534,42 @@ static void throtl_shutdown_wq(struct request_queue *q)
- 	cancel_work_sync(&td->dispatch_work);
- }
- 
-+static void tg_cancel_bios(struct throtl_grp *tg)
-+{
-+	struct throtl_service_queue *sq = &tg->service_queue;
-+
-+	if (tg->flags & THROTL_TG_CANCELING)
-+		return;
-+	/*
-+	 * Set the flag to make sure throtl_pending_timer_fn() won't
-+	 * stop until all throttled bios are dispatched.
-+	 */
-+	tg->flags |= THROTL_TG_CANCELING;
-+
-+	/*
-+	 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
-+	 * will be inserted to service queue without THROTL_TG_PENDING
-+	 * set in tg_update_disptime below. Then IO dispatched from
-+	 * child in tg_dispatch_one_bio will trigger double insertion
-+	 * and corrupt the tree.
-+	 */
-+	if (!(tg->flags & THROTL_TG_PENDING))
-+		return;
-+
-+	/*
-+	 * Update disptime after setting the above flag to make sure
-+	 * throtl_select_dispatch() won't exit without dispatching.
-+	 */
-+	tg_update_disptime(tg);
-+
-+	throtl_schedule_pending_timer(sq, jiffies + 1);
-+}
-+
-+static void throtl_pd_offline(struct blkg_policy_data *pd)
-+{
-+	tg_cancel_bios(pd_to_tg(pd));
-+}
-+
- struct blkcg_policy blkcg_policy_throtl = {
- 	.dfl_cftypes		= throtl_files,
- 	.legacy_cftypes		= throtl_legacy_files,
-@@ -1541,6 +1577,7 @@ struct blkcg_policy blkcg_policy_throtl = {
- 	.pd_alloc_fn		= throtl_pd_alloc,
- 	.pd_init_fn		= throtl_pd_init,
- 	.pd_online_fn		= throtl_pd_online,
-+	.pd_offline_fn		= throtl_pd_offline,
- 	.pd_free_fn		= throtl_pd_free,
- };
- 
-@@ -1561,32 +1598,15 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
- 	 */
- 	rcu_read_lock();
- 	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
--		struct throtl_grp *tg = blkg_to_tg(blkg);
--		struct throtl_service_queue *sq = &tg->service_queue;
--
--		/*
--		 * Set the flag to make sure throtl_pending_timer_fn() won't
--		 * stop until all throttled bios are dispatched.
--		 */
--		tg->flags |= THROTL_TG_CANCELING;
--
- 		/*
--		 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
--		 * will be inserted to service queue without THROTL_TG_PENDING
--		 * set in tg_update_disptime below. Then IO dispatched from
--		 * child in tg_dispatch_one_bio will trigger double insertion
--		 * and corrupt the tree.
-+		 * disk_release will call pd_offline_fn to cancel bios.
-+		 * However, disk_release can't be called if someone get
-+		 * the refcount of device and issued bios which are
-+		 * inflight after del_gendisk.
-+		 * Cancel bios here to ensure no bios are inflight after
-+		 * del_gendisk.
- 		 */
--		if (!(tg->flags & THROTL_TG_PENDING))
--			continue;
--
--		/*
--		 * Update disptime after setting the above flag to make sure
--		 * throtl_select_dispatch() won't exit without dispatching.
--		 */
--		tg_update_disptime(tg);
--
--		throtl_schedule_pending_timer(sq, jiffies + 1);
-+		tg_cancel_bios(blkg_to_tg(blkg));
- 	}
- 	rcu_read_unlock();
- 	spin_unlock_irq(&q->queue_lock);
--- 
-2.39.2
-
+Bart.
