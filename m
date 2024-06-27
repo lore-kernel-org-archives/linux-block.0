@@ -1,64 +1,67 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBF63FBA5
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 22:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEB31A08DA
+	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 22:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719526272; cv=none; b=fKMaRHoQrkLOKRMrUAj6GSNKW/owegXAKn84izHdXvOMtl1s2av2u02c7Ukb3vyMHuDfGU+PYoA5somOI+kRojRXfrYCC2yRyo6K1x/mP9QjViFJ8J9DyDAZRtZuBScPqAlGoTD3WZhSFq8eE2HizReI11InsUUa0a88oQlEcTg=
+	t=1719526273; cv=none; b=aN69RBvIwc4M3YMeBulD92wmbcb+bN2nusHIZRftNYV35k2Nw2HGjpKl7xtILHZOiSNIe2i+cHeffvGR7gGYhw7AIgBfKtzTiI+2S4CFXM8svyiEMk2WCzZbryel0A22l3xFddBj5GoxfQUbqx0iJYaNUDduodbKni5njD9D8Sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719526272; c=relaxed/simple;
-	bh=EX9aKmROo4c7JTykDxscjYtpoG74oujWzENK0S/GbtY=;
+	s=arc-20240116; t=1719526273; c=relaxed/simple;
+	bh=X9E4Qk1wxYtBh5bxl/u2UGW8UBo30DycI6hdjoQ0HLQ=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=AMskLIDIVq9Uv2+WiwW+CoLZria/S3C5fJODrylVScxMj49TVfbNxtPw7qj70/16T/GE4DS1WL4uMk0/5Mwohr29vj+42gpLCb1Udkyofq3w5+TAqpW2XU01kZDimmJ5ZNqcRFMNyrDpRuSx2q6ov+lXlwIioQuH3XEeLx9eNoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fOmYTlZX; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version:Content-Type; b=qPNECUg/otDQ7JOWDrtr6zcTMKY+818jO5EhjbUwQQzGj+8rDWUs6tBNBooiZ3++XCZqNjWqPujoE3oRcRt5KlubhG3K3dGylVuB6lMfgY39D8sZxyP1ioeB0n6JCT0d/YOvLj5hzp6HdMwJ1JnLxmZ9aTtneUjImBCLbwX5cTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hc+5DR/9; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fOmYTlZX"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70675c617e7so3780b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 15:11:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hc+5DR/9"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1f9f6f41898so2635775ad.1
+        for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 15:11:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719526268; x=1720131068; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719526270; x=1720131070; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P5GFwm9HJor8xNvkgSFItuQKSYYaP3ZZ8yGVfphSv6w=;
-        b=fOmYTlZX7goNeCk1TEU3kl24uqggWMeeT7oq/cqLEAls/uhrnnFMLU+GiASH9WVVqY
-         CP/kaZkNuN8Ggtp4A7psfTZxYkqjwP02zizzkvcaZANYHgzMFG9SKNuvZ5EhhSiIL0J7
-         i4qd9Tk6uLgIrIWzz/TziJJXIKEgfJ4Lq7HrEKUSEoMjHfoXje8H6lTGTwpDguToiDYP
-         Z5JtMbfRUr5EGhmbG+RyINQg2VtYyhDIebLYLrXNMUYSpR7GGshsEtgqMAxX3fSLl28J
-         S+E1gzfssUzRRWUV6wIHCyjBwcdHSphCdq9UJJ13Ig2NojKhBMa6j6GAGsdR8R5/rG3Q
-         sStQ==
+        bh=xzUeJSzA7O0i1y/5o3j5JniUi5itc+6L3iH7CyccPZ8=;
+        b=hc+5DR/9ezmyFy+ezlVzhhoM9li1lzAnIqfMEb7ANQtP8TSn4Zx6TORh9zl7kPehA2
+         xrWSAqq+CCjTECKAR1oLOSUEwZO93dqtvLsgj8OvQusCWgieOQtWLZ/KTY0ezG5XDBks
+         fHVNlFyDHsc6JFYGsLxo/6N0K+YLyfdX6fIeS0BSFYdHF2vPK8wGxC8fFBEuMHzySdzu
+         IsCorEczkAeEntbWPs0FvG7OA7WR5kvpPKojaiuqA040XIccYfwTOzuVXaDWYAWEmMQw
+         lwOxRXJx3Ag5ByKz4zKLvaloLBS3duIAw9BEWpym8Ef9pzG8cvAfiv5whFZI/wo+WST4
+         DYtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719526268; x=1720131068;
+        d=1e100.net; s=20230601; t=1719526270; x=1720131070;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=P5GFwm9HJor8xNvkgSFItuQKSYYaP3ZZ8yGVfphSv6w=;
-        b=gRtsuMMlqtIrHD277qSRXL6vOt1LV1+1N1snzfmBfQxUz2xeVTH78/Jd/8IFOW4yBk
-         3LXPBif6oTKlsEwKmaQfQDxu21ltr56lBQaB3OAq39oTao9ksoGXuP+McYUw8wugL93X
-         O503KcgfM5KYrjICDuu3UhlsojfEfumoWGDTwGrdR94vb491kL59KRTxmfXbX8DouNvo
-         Vb5m8rQv6pdcT8vR5JCeqah7RUDtSCtxd/xZGQSZ1Nk+Edd/SIZmxHBqEEs/KAAs3RHv
-         CgidGlQ+2t66AJSBugBHCihOnsmJpXO4WZX3dOtOc+OQDONc8yS+PCTJoV+5XIHFmGrm
-         VwbA==
-X-Gm-Message-State: AOJu0YxsOLdjjMz67jAl3qBIW+hKJTWGah3YeaE6B9btGsr1PtNviyQG
-	2xNWKe475xJ7dOeVPWMXDesD9FUcNCbQS0RUsFoD5UUukUxsQiVMfkWDlR8siRk=
-X-Google-Smtp-Source: AGHT+IFUl3MslHmav3EUFv7d0OGnZ8VHPIYeWottgX6C8d0OfiFEQ8tBj7Mf7BiRIXxv3qMjKqj6bg==
-X-Received: by 2002:a05:6a20:a10a:b0:1be:c7d9:ecd6 with SMTP id adf61e73a8af0-1bec7d9ef6bmr5393570637.0.1719526268056;
-        Thu, 27 Jun 2024 15:11:08 -0700 (PDT)
+        bh=xzUeJSzA7O0i1y/5o3j5JniUi5itc+6L3iH7CyccPZ8=;
+        b=TsM7olcXfkhBvklM9gn2r5KF4SWehN6GVCMr1xrVKdH8Tla7Zdec9Whm/OhHRheVUz
+         0AL58dHMmmzwslScl+q6XfnQZp7t2mg0sFN5aSk3v5WWMiAPWaVJ32cyLdmAniXiJYed
+         5gmFzYSDGX1LPJNMOBJJZmuAwsDQHV/xXe3devw47mxcfxcxPF1eit37z8Sf8uxPzbZu
+         LPqMoWSy4kKJ7pYkmrhJ0KbE+FCzbBIQ5Vj65VW07UIMbIb+XCxqv8BgqatDpq47aYlE
+         xBxowXI8lU6VkDRFbcDAJ1mcfFdcLA413ZIbIXjbLC8d6HPhug9XSUvqpTv9cNEMsrZL
+         vXdg==
+X-Gm-Message-State: AOJu0Yx/9bRhVjenhUu9rfkwR61Ngq5g5Xvvn+izqhjPRpg+OygVYlY8
+	i0N6WIKuagTLQUDiJbWHcV3yIcwLQTaFobnVpdzQ+DZIO2DsLhZOsaU/prhoB6GYJ1RxojVLHxi
+	i4HE=
+X-Google-Smtp-Source: AGHT+IEkdnMzrHEj0QWgi0YI2EZP5KXthKiSAx47k9DNWh0/wM03ckJYoBxjLYbIctXBLkeKN91eLA==
+X-Received: by 2002:a17:903:1c7:b0:1f7:2576:7fbe with SMTP id d9443c01a7336-1fa09e8a5e7mr177124265ad.5.1719526270012;
+        Thu, 27 Jun 2024 15:11:10 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac156957fsm2513215ad.228.2024.06.27.15.11.07
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac156957fsm2513215ad.228.2024.06.27.15.11.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 15:11:07 -0700 (PDT)
+        Thu, 27 Jun 2024 15:11:08 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de
-In-Reply-To: <20240627160735.842189-1-john.g.garry@oracle.com>
-References: <20240627160735.842189-1-john.g.garry@oracle.com>
-Subject: Re: [PATCH] block: Delete blk_queue_flag_test_and_set()
-Message-Id: <171952626715.874041.12006671061451213287.b4-ty@kernel.dk>
-Date: Thu, 27 Jun 2024 16:11:07 -0600
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Gulam Mohamed <gulam.mohamed@oracle.com>
+Cc: yukuai1@huaweicloud.com, hch@lst.de
+In-Reply-To: <20240618164042.343777-1-gulam.mohamed@oracle.com>
+References: <20240618164042.343777-1-gulam.mohamed@oracle.com>
+Subject: Re: [PATCH V6 for-6.11/block] loop: Fix a race between loop detach
+ and loop open
+Message-Id: <171952626823.874041.3335958762310133859.b4-ty@kernel.dk>
+Date: Thu, 27 Jun 2024 16:11:08 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,16 +73,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.0
 
 
-On Thu, 27 Jun 2024 16:07:35 +0000, John Garry wrote:
-> Since commit 70200574cc22 ("block: remove QUEUE_FLAG_DISCARD"),
-> blk_queue_flag_test_and_set() has not been used, so delete it.
+On Tue, 18 Jun 2024 16:40:42 +0000, Gulam Mohamed wrote:
+> 1. Userspace sends the command "losetup -d" which uses the open() call
+>    to open the device
+> 2. Kernel receives the ioctl command "LOOP_CLR_FD" which calls the
+>    function loop_clr_fd()
+> 3. If LOOP_CLR_FD is the first command received at the time, then the
+>    AUTOCLEAR flag is not set and deletion of the
+>    loop device proceeds ahead and scans the partitions (drop/add
+>    partitions)
 > 
-> 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: Delete blk_queue_flag_test_and_set()
-      commit: 63db4a1f795a19e4e12f036a12a5f61c48b03e5c
+[1/1] loop: Fix a race between loop detach and loop open
+      commit: 18048c1af7836b8e31739d9eaefebc2bf76261f7
 
 Best regards,
 -- 
