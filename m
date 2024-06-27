@@ -1,214 +1,160 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638481386BF
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 16:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719504472; cv=fail; b=OXgmj1nMrIu/w7bOgw40mtPEWjacUGimVTgrZhHzWwnpGPu2RUGP4qTzCIf8LW9xb/sUSYkbdOI8PnIfLIuH6TlnkzaUShKOdxWbKKhhYcB2ePuutHU88ngX+UMN72i9wpJRppDV1WmCwEslHm7MoJ4F40zWK6N9kIsxlW9Amhk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719504472; c=relaxed/simple;
-	bh=6WkvyB3awcs85dofyJI4ol0Yq8K+olj2876RustdzpU=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=BKO76Rhzx6lHqQs7K1jTrChxP2ZzzaN3TNxbgqC/4JIcsy6tQoLUGRhUI4ojkpfdqmXQiCbiWg6ATpDrVoOJKsvpGwYIM0SMM2ZEa8YFTaCaeZK3xIQgnSfuMTQpjbxZpTfmdVtEp4mwXKdz+HvLC7bN9v8THBb1ywe/TC8PlSQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AERSVUyo; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=JFmGNx2u; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CA21993B6
+	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 17:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719508189; cv=none; b=hpIDEw3fqqpASAqf0dZF8vEOI6tzIPN89tKRmdiBDsw3jpPLG9exUKgD38zAULkgD2Nhw2PSRZnWlMEXaz3wnPyvZmqi6JU4lEsg5KoE+zgYx59u71M4GFWXEaeJohRv/EzNBFxf4bYZdWUTyfYKuJisrWhQzTzVGLZMD4wQMvQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719508189; c=relaxed/simple;
+	bh=UasIsFgC/Np7owc61PPznWhFbrGni4PAljcsDfeiJ3k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dEwJzxoPJNE8MlpnEaK51ypBQN/5CwNppM8tlGvignoriG0VQtAPu5y8j09q2oFcn48scPtGRKF8Y53Ayl8oEySbbQsN14aYna8TRCqUHU7WSRs152OrJvVKR4JmQmTgjKUkmexzKg9URrGkOZyMAZCxBqlbKB6xFL3AQaIwUjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=HR49OlVk; arc=none smtp.client-ip=209.85.214.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AERSVUyo";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="JFmGNx2u"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45RFtWT6013779;
-	Thu, 27 Jun 2024 16:07:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:content-transfer-encoding
-	:content-type:mime-version; s=corp-2023-11-20; bh=vRd2DEuIM7Mz9O
-	7GAqQIWeexTxPEEDZR+1X5rvj6RI8=; b=AERSVUyo70T7rnzq/Kp0V7qF205ltO
-	f7uY8rWumsvuzw6+bR6gyFRbJL9lLr4PenEfpucd3PkasOZctEt4PmNjnvhZegck
-	/1+Cjz1QPGthx24hG0qr4FbNTU6zXiWA8JOdQRRahofdhqUiHE7Ufc0JlPLe/J1i
-	WT7otgHtY4rv8f6mvc5LB78CJ48tLCnmY01XWhSrgX01v/TjaQGF/F9vnArTxIil
-	Dy8hhS7KvZl1W5shd9JFJ62tNWfWF9b7dM40e0U/8kOB1NoF1Wi2QIa8hTjb6RCE
-	+y5EDQZslZCNrq88rNJJS5c/FrVLQ/1Q7V5o6H+L908REFYcdLkpLcvA==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ywn1d66kg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Jun 2024 16:07:44 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45REeJ8e037093;
-	Thu, 27 Jun 2024 16:07:43 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3ywn2b72kd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Jun 2024 16:07:43 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rait+xOp3PC7SG88TdBkFOaqhZMFwu6NkRXxbvksimMaqkcBEV3t5ed2JWQoovpOqoQA6RI7xx8GUvv4Kk9h3mnyW4SyraUV1BcaoogXxPdHBwiArTyAc+LX2dD6dVF0x8xK1pM4iWhe33LmkpgBXtxiUXppBIv/Rf4FqTnnHludvHFk/q30oTeZM5Ud3y8iDTnc3ejTnhqmMx1hhXO3Q0KuPNQ7lbNTzUH1LlS7/G4YakRdiUnniVZsbpyL+AxYZ7Wr67qMk0iGM6e2z1BnSDlC+sfMia1AonF9UdzinkvXHRdlm61cUwFrHDv/8iWl7f/M+KRvjsWUrgTebfo8IQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vRd2DEuIM7Mz9O7GAqQIWeexTxPEEDZR+1X5rvj6RI8=;
- b=HMkInEuuLZmjbZHbnqhUNGJHObDR4AiCk7n3l6jy37yuJsD27NUCryOgrDdk/wkmkYbV5K+WDHVUnnBg4rX1VXMMSK0LgdE/UMkwfAXUAKjhhgriI250FE61ta7iMK2MPCzpvGKeDmw3Pqu5xH8sZy8aY/o6vGo3fgGtmxW+XdnBOqW7dc3dAstbtkj2fnd64eP2+vagFG9N9e7kkCwWjK+QRI/2h+WAOlA3RCN4F6PsOl83rS8B+cfciZCKCe9qbUO/vs4OnXudqbUrFjZlD+o9Fapf/3BUo1hDByGa7GDQlC6KqBxJq2DAT7KE1sYJs49au9cFRGINX9tXp14HZg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="HR49OlVk"
+Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-1fa9f540f45so12867745ad.1
+        for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 10:09:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vRd2DEuIM7Mz9O7GAqQIWeexTxPEEDZR+1X5rvj6RI8=;
- b=JFmGNx2u+33NhNqOlivHsB9zH7XT+0WKzTj25HwZjGfab0WE7UWLfjMf+vG68PtpjjGYKFUZwJwdF+NQctQfQxf+NXndwCHTkhAK5CiUybxRKW2Amhu1cACZJEygtIk7oU8lsnCW320puvwoDxtRKyZBvpLd4iw0B+Y0CI337SQ=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by CY8PR10MB7337.namprd10.prod.outlook.com (2603:10b6:930:7b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.34; Thu, 27 Jun
- 2024 16:07:41 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%6]) with mapi id 15.20.7698.033; Thu, 27 Jun 2024
- 16:07:40 +0000
-From: John Garry <john.g.garry@oracle.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, hch@lst.de,
-        John Garry <john.g.garry@oracle.com>
-Subject: [PATCH] block: Delete blk_queue_flag_test_and_set()
-Date: Thu, 27 Jun 2024 16:07:35 +0000
-Message-Id: <20240627160735.842189-1-john.g.garry@oracle.com>
-X-Mailer: git-send-email 2.31.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR01CA0004.prod.exchangelabs.com (2603:10b6:a02:80::17)
- To DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+        d=purestorage.com; s=google2022; t=1719508187; x=1720112987; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Ey7PDxlbBydmaDDR4O+E1QsS0ExfjQTrEnzypmXxfQ=;
+        b=HR49OlVkKy0OI0OGBa6uQ8CWSoy9pnL79LPTWyGo+C8Cj3F92MK7HMoe+E/oa3SBil
+         2yTW2yCROS3zJzZhBxI2ggt/LQEGZPYWHLSNx0LpcN/xaQupv6mxJacaa1Zgts22j3rX
+         B1W80zqUnjbaKp4i4cypLN5QmT1oNqOfj+tuJ+WeIeMBVTqxLWx2zFAD5LD4thRVIFv0
+         F0bcQJflIbRGWsmWodVRJt3i71LbysDNGxg0LUfuDd+71ZZP6qIDihMNYzGirTQmM24G
+         OwPEOQodSeMjw5btsxU9S0QdATlEeOLuVZY6FUX8gW53rNurjY2REewPhFTXj0f1BDN3
+         OpHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719508187; x=1720112987;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Ey7PDxlbBydmaDDR4O+E1QsS0ExfjQTrEnzypmXxfQ=;
+        b=FdKQmy9QKvKoRsM072tIBHzp6iYMYNPgwjAPUGduwfw+s6kbQkpS/5ZKTE0FGfOUO4
+         gW/lSWq1xPa8LjXEV7EQKZ0G2JLZbCMN+8He5xboCIL9d8fbgZ2RG9eQPvrGXA6XHs6P
+         hr49rYMH6TIc5SqbZiZE0E9Fox4a8YnvRtSQIr/+9BHR43wBZoCto5Sx0ZGJAEaJbybF
+         nSqm3bpaExCWsq7huK4Adj1s62VYwlxkuy3GkcKcQ+CChVjZ8bcUwFNzx+LcN5lKZ+gL
+         ++lIhx0wv0gVta32+Lon9OI6SsSqrPitd9820l00GIV1m6lOmtfSOEWtO/JSV2cHzcLh
+         fUQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFgPQnAPRcx/mWGDmGEyD2MTWqw7YoaIXm4mmh2s7uob4kpg8HNcI2if2Ylk8SPkIuQHj0XgutUaLmwxuTcf75zQdnu45HCRyrMoU=
+X-Gm-Message-State: AOJu0YxdksSv+soH2CLJksStrcahvkzm5ZcQl8HU58wQWVabOuW3YFkG
+	AvOBiiCeNZwRiDhSnh4uiHGHsQm9oTvW4SewJx48HE5B8Q7vj5cHB6BG2XH+f7Wp7AyBib+S0Od
+	P/m8TFqHBamm2s3ipPxw5e27b2pvhoxLK
+X-Google-Smtp-Source: AGHT+IGoXBqC4LP5PEevJmvuW0GeUxY+m7FHBcQAD6IX8+DKfHeyU8LA/PnVIQJJHUD607O9cTl9QnWkx3HA
+X-Received: by 2002:a17:902:da86:b0:1f9:d817:1fb0 with SMTP id d9443c01a7336-1fa158d0809mr149482135ad.14.1719508186774;
+        Thu, 27 Jun 2024 10:09:46 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-1faac9a5f08sm594455ad.125.2024.06.27.10.09.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 10:09:46 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4EEC63404A4;
+	Thu, 27 Jun 2024 11:09:45 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 39045E40301; Thu, 27 Jun 2024 11:09:15 -0600 (MDT)
+Date: Thu, 27 Jun 2024 11:09:15 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
+Message-ID: <Zn2cuwpM+/dK/682@dev-ushankar.dev.purestorage.com>
+References: <20240617194451.435445-1-ushankar@purestorage.com>
+ <20240617194451.435445-3-ushankar@purestorage.com>
+ <ZnDs5zLc5oA1jPVA@fedora>
+ <ZnxOYyWV/E54qOAM@dev-ushankar.dev.purestorage.com>
+ <Zny9vr/2iHIkc2bC@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|CY8PR10MB7337:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96b73d6c-c7f4-41f8-a6b8-08dc96c34572
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: 
-	=?us-ascii?Q?qXuSsoAhNWN3puwT1ZRWJI8R5uCSkqsdtOfIWdUL4iZ0oHd9OG4ek0GyJ4wy?=
- =?us-ascii?Q?rlE0BtZ5JkS3XktbYd0wQ9FnuihOvstzO3Ogult79tpPeJ8kLchUHkmmhJUd?=
- =?us-ascii?Q?jSc80UJtxcMZRkXZ6yUoIDsHlSLpIskzAT+sdu0iPxKiGn93oA6rX1mRZ0ui?=
- =?us-ascii?Q?FmFWOYmo5B6ixkqyy2cXLZnDod/5Ys5/IG948X9sGQssYft9xlEPWnkctX0Q?=
- =?us-ascii?Q?MXG1Q3NHKXEBSt5c7NxQpJwkZ+mmGUqfDu6xigvOok7mld4WoQvsRjnUGA3i?=
- =?us-ascii?Q?7pzHR9gRBR9MRgz6Eg98+JiZlzpEJbQYmmp1i+r9IG2AgohapP5Cn5s4LJCE?=
- =?us-ascii?Q?j9AoP3sQqxWfI8nsIGrmr/ZnhnSOASXyl3fC0iIy30UVVhBygAevQ7waab1D?=
- =?us-ascii?Q?XxyN1MKWmMXM9hEMl43jPz5aDTeSbq3DQzza7fc27flnoWxIMW74TqBPLxCw?=
- =?us-ascii?Q?z94Dxlv/6Ffuw2uYl0LIUKpCUvh5VsHfqcGGgbahliL4PIvdteTPdX0zxxn9?=
- =?us-ascii?Q?FaTh4Bw0HOydl76/Q43W0lm0Mhdsq4XvHAuJnx/nWRmeZpAIMxIvnEnXGRv2?=
- =?us-ascii?Q?whxxv/ocaH0tUqKnMbMVMAS7Qgrp5RgQafWiYTkJ390F1rbvGyMRoKuaclVb?=
- =?us-ascii?Q?BtC5gRHCh2Dzy9LdcfKsBwBIlHKLGkUBSJjwrHbEfdkeLrcIlpnouP0N1NQ2?=
- =?us-ascii?Q?dZjHjmBuzYIauCirotDQllYttx2OZheofX9eitKpC5AjzPKWCE6qUBnCmNxO?=
- =?us-ascii?Q?BP9flxARYu8c+NWWj7N/j3E9PpZoHkTNa7x18AGrJX7bqgxH3UxDJYZbNWei?=
- =?us-ascii?Q?I2+2EVvnX4J99gwkKhPpYMgC0T5G7gIchhcDillLBlMZ+tOsbTtPDnHuJ8LL?=
- =?us-ascii?Q?2DEbFBXkqDWDsbmltTZ3q+Qg7VxfusRmI3tIzXXTSZJnOA5rmrWpMVizrKKz?=
- =?us-ascii?Q?8GTUdJ7W1F0biKFqow/nnjRo4tgFAtw8SBVygWDEo9U7+rUCDqhOD3dNFLje?=
- =?us-ascii?Q?DfV1SIQAcl4KF8CB5UIJEuKEaF/83/FpntzxpqRk/W/veEiyxCeWowdeCwFZ?=
- =?us-ascii?Q?d7kVzJ8yPw+k6S3I7GYJh/RQ3tZTe8zKA0FUCX6vcm+cdpDYFeWQzOv8K+Bw?=
- =?us-ascii?Q?VD9XMJuVwpF3R/ujuDpXWNZ9pivlrZqS6S2zfMurwDSNn6nSdNTDFlMHKask?=
- =?us-ascii?Q?nLqz2IbdKwJcDvEmp80gDC0Nux7HisGfS8nDqJyZgIft01RSEwEKuixMLuIF?=
- =?us-ascii?Q?ply0qn+nWA9Hc7PTOtG8Yq6FbK/fE/y2TZfUXDP02r191AQ5W580CL0VQNBV?=
- =?us-ascii?Q?DjMoFnY3Hr73MllNHcMaLhWRlfxmeRciNHAYyTrBUl2ABA=3D=3D?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?CVV4D+ITy09aJcuEWMkxhBegu6IjPAQ7GS+Z+uA35LFTvjUS055gS0IDe9eL?=
- =?us-ascii?Q?sJrsljKoDRzFhOsMqrHsPKAodTFc6uX+fKx5qC1tEZa7XcKMikJhcKhmBcHF?=
- =?us-ascii?Q?MfQ4ex/yyxiGRks+R8LVN5lEUsLR34lxLyfVArmhzKbXibhveOzhQjnJQB7v?=
- =?us-ascii?Q?fj6G2vMnBS72sf8jLKrKXCzR+L374G91SyL7F27cumdRbAFI8QtUWyR3/zQe?=
- =?us-ascii?Q?+NY09szjXC/OTkzKCJNOZR8GF4dtotsKcdvH9kh7AY7wixXb3vSoOcvG8Aqw?=
- =?us-ascii?Q?uhg16EYWTobHb49Cvo8YTAkOgv7UC0DZqho7H8Jqh5sfwmTLS/MaMRHqzSCH?=
- =?us-ascii?Q?TJuUYpNy1zI/UvBob9+aQPYw76zvD/l66GngGxoLwCKsC1c/ylBe3eAY3okF?=
- =?us-ascii?Q?W9adxOo1bC44NwG/7iZCDcrxvt2Jyrw550upL7735RbVeJJmF1ogC8wv5HT3?=
- =?us-ascii?Q?TH+G1M11cgP9THNHdTd+1jRqRHfOdLvukCQ4fj5qU+KXJngsZKADHqAGW2cj?=
- =?us-ascii?Q?1u/szI+OBb9DjiAleD3vBmnn2O0TFaRgwRWlOn09CIgnwwiPjP519mK0rIZz?=
- =?us-ascii?Q?t2PRMLgoKkOC9SH2HGDetrMHRoTY/waAEzsx47Z9ZidwUVlcD/apmi7DX+dZ?=
- =?us-ascii?Q?LePpKNiSDXS7tyP1aCzYDthSd3XYs2+CMl2/I2TLD/ti9T48iAR6QOr0xhO6?=
- =?us-ascii?Q?jtT7RoMYPtUdmgw8x7iDdDhwGrSZNSB6Za4IZg4hHUbxMO1R03OVTEvFyXri?=
- =?us-ascii?Q?59XNgGA2mPlJdiqCdxTQGONoccHvw6RO87EDrYSqpJ1joCjl5tOcCmK4sKBP?=
- =?us-ascii?Q?U49a7B2CFwLsQXrGmfM9NI9+HQ2qiHHTJlH61hbp79Gjll17qLYFJfZBGd6j?=
- =?us-ascii?Q?vwd+g54IiWP3q+r/3S6WYY7hWqI2NOLzgDziv2XsIfVrVwDLaSXb1/3Ihg5U?=
- =?us-ascii?Q?4BDnpSi61lnQWx09XW/UXcSOIuQj8DmBZ4n5i1udSeLvyQhvrs4lHglu9Na5?=
- =?us-ascii?Q?8m64X1ZDsq3dIbPxTrja+tDPnQ4uDqRcYvf6zl5EV+uYie1uID76nK1NQJim?=
- =?us-ascii?Q?rHD8NqhcKRl2g3Vj3GTITrTtvUPHgVy2Vx8kDNy21cgrWSurAII0ySF04Ndj?=
- =?us-ascii?Q?MwLCyLtEkOK0kCUIWTwyMm5D+ka9V63WJcnSKOpx+jCAqurqSo3gvMSObV6S?=
- =?us-ascii?Q?Pgso2N3bfkpeIxOMsit+Cj7GvcBe5bdv9BxR4ojGb6vkB4rdvd9r2rYZBAfP?=
- =?us-ascii?Q?yPbxRJnjmitr3s5lqlonBcnsEP35uYMp+Wy07bjYhBizaQivSxi/s7cq9AIU?=
- =?us-ascii?Q?+YcUyqpA1rGbsz451DcQG/IGbQ4fDsFkdMmZ8QoSTm3Fz7rU1E4kVIzjLHoU?=
- =?us-ascii?Q?WbElet4BFMITOMawyHYgZvJDRiME8Uc3eVt9XHDq0SxwfSgyTWJoHfPriWPN?=
- =?us-ascii?Q?xCxDZtyW7aeuvNZikuM/f0JPTS18nGBMJ1zJJd/X/0u2gy1nZHpwfwyytj8Y?=
- =?us-ascii?Q?KX/qLtpqdYr4nyKIZd5n2X6qzbIjwf3SJ63DKOoY2r8s9UGziDdtfVrd5u/H?=
- =?us-ascii?Q?Z4bjYh8zGA34K1A77tqX1ETVS9Y6rxqs4/iSvinbFoudmVrH+ugbAIezsAIv?=
- =?us-ascii?Q?Qw=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	mz0TnrsmbOCR+lAgMGGxEx1UmJ/I7YkmPqP5Mi7TCFycHzu1HwGw4NNK7BmISTrY9SYZx6dZx1jBplwTVdVgzRF1qal1XSvLO4rwRqkq8pFa5gbysXNkzbqSVDN45B0kDRvqc4VpiCdFNZB1uA3Gv3at0AwPwtQ0Sw1vB/fbDyvzr7uF/TAWoJpfOX5yz5KGt0c8E3bo6/qF3HbwnPo8VaTOoIasHjEL3BVp49KJGKGBQZ2zqzZE+My0VI0ixit9va7fw2axPVIZK9ZnYSkMvgAmJVIfQIGES9ZpeGMUWFZ+jlG21hBZEtN8YYJTx5OmIJ4usmOzakzGm78NjYSujuqF6dvzkR20guifdk8TydnoOUKDc39ZHtNfPIfBSY6pyAF5P2Q1jr4Sv9kCuQV+kgedf/zCILN8DoFqL/1tR8XhdUU7aJHz/k0z5EqxgY2jscMndcBNIOnptmndAhxOzD4LPymIvETHnYi10zLoiZcVIfoKeviv4iKOs1juu2vW0P6dmtYvBrCaScrJLKiktReIyroUDZisv6WYm1NvmmehMsmwmpFQS2BF3sXfs1FlU2pJPAzGQROLGmIhxSYf6oJlpvykQHrTL1kRyXUvDRI=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96b73d6c-c7f4-41f8-a6b8-08dc96c34572
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 16:07:40.8949
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cYkiO8y0aGRc3McBtUWmrIYFVfG7b4tWFhyhJ7FYrBe6pLadtyci+VrR+Ui/6oeSuoTWf3D1ckD10K27CIJYyA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB7337
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-27_12,2024-06-27_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2406180000
- definitions=main-2406270122
-X-Proofpoint-GUID: lXKTGhFjZQs0MkVsEXVBDbM3tNapZLZB
-X-Proofpoint-ORIG-GUID: lXKTGhFjZQs0MkVsEXVBDbM3tNapZLZB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zny9vr/2iHIkc2bC@fedora>
 
-Since commit 70200574cc22 ("block: remove QUEUE_FLAG_DISCARD"),
-blk_queue_flag_test_and_set() has not been used, so delete it.
+When I say "behavior A + 2," I mean behavior A and behavior 2 at the
+same time on the same ublk device. I still think this is not supported
+with current ublk_drv, see below.
 
-Signed-off-by: John Garry <john.g.garry@oracle.com>
+> > the ublk server can "handle" the I/O error because during this time,
+> > there is no ublk server and all decisions on how to handle I/O are made
+> > by ublk_drv directly (based on configuration flags specified when the
+> > device was created).
+> > 
+> > If the ublk server created the device with UBLK_F_USER_RECOVERY, then
+> > when the ublk server has crashed (and not restarted yet), I/Os issued by
+> > the application will queue/hang until the ublk server comes back and
+> > recovers the device, because the underlying request_queue is left in a
+> > quiesced state. So in this case, behavior A is not possible.
+> 
+> When ublk server is crashed, ublk_abort_requests() will be called to fail
+> queued inflight requests. Meantime ubq->canceling is set to requeue
+> new request instead of forwarding it to ublk server.
+> 
+> So behavior A should be supported easily by failing request in
+> ublk_queue_rq() if ubq->canceling is set.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 6fc1a5a1980d..71b7622c523a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -94,20 +94,6 @@ void blk_queue_flag_clear(unsigned int flag, struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_queue_flag_clear);
- 
--/**
-- * blk_queue_flag_test_and_set - atomically test and set a queue flag
-- * @flag: flag to be set
-- * @q: request queue
-- *
-- * Returns the previous value of @flag - 0 if the flag was not set and 1 if
-- * the flag was already set.
-- */
--bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q)
--{
--	return test_and_set_bit(flag, &q->queue_flags);
--}
--EXPORT_SYMBOL_GPL(blk_queue_flag_test_and_set);
--
- #define REQ_OP_NAME(name) [REQ_OP_##name] = #name
- static const char *const blk_op_name[] = {
- 	REQ_OP_NAME(READ),
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a53e3434e1a2..53c41ef4222c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -609,7 +609,6 @@ struct request_queue {
- 
- void blk_queue_flag_set(unsigned int flag, struct request_queue *q);
- void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
--bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- 
- #define blk_queue_stopped(q)	test_bit(QUEUE_FLAG_STOPPED, &(q)->queue_flags)
- #define blk_queue_dying(q)	test_bit(QUEUE_FLAG_DYING, &(q)->queue_flags)
--- 
-2.31.1
+This argument only works for devices created without
+UBLK_F_USER_RECOVERY. If UBLK_F_USER_RECOVERY is set, then the
+request_queue for the device is left in a quiesced state and so I/Os
+will not even get to ublk_queue_rq. See the following as proof (using a
+build of ublksrv master):
+
+# ./ublk add -t loop -f file -r 1
+dev id 0: nr_hw_queues 1 queue_depth 128 block size 4096 dev_capacity 2097152
+        max rq size 524288 daemon pid 244608 flags 0x4a state LIVE
+        ublkc: 240:0 ublkb: 259:0 owner: 0:0
+        queue 0: tid 244610 affinity(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 )
+        target {"backing_file":"file","dev_size":1073741824,"direct_io":1,"name":"loop","type":1}
+# kill -9 244608
+# dd if=/dev/urandom of=/dev/ublkb0 count=1 bs=4096 oflag=direct
+(hung)
+
+# ps aux | grep " D"
+root      244626  0.0  0.0   5620  1880 pts/0    D+   16:57   0:00 dd if=/dev/urandom of=/dev/ublkb0 count=1 bs=4096 oflag=direct
+root      244656  0.0  0.0   6408  2188 pts/1    S+   16:58   0:00 grep --color=auto  D
+# cat /proc/244626/stack
+[<0>] submit_bio_wait+0x63/0x90
+[<0>] __blkdev_direct_IO_simple+0xd9/0x1e0
+[<0>] blkdev_write_iter+0x1b4/0x230
+[<0>] vfs_write+0x2ae/0x3d0
+[<0>] ksys_write+0x4f/0xc0
+[<0>] do_syscall_64+0x5d/0x160
+[<0>] entry_SYSCALL_64_after_hwframe+0x4b/0x53
+# cat /sys/kernel/debug/block/ublkb0/state
+SAME_COMP|NONROT|IO_STAT|INIT_DONE|STATS|REGISTERED|QUIESCED|NOWAIT|SQ_SCHED
+
+Therefore, in order to obtain behavior A with current ublk_drv, one must
+not set UBLK_F_USER_RECOVERY.
+
+> > 
+> > If the ublk server created the device without UBLK_F_USER_RECOVERY, then
+> > when the ublk server has crashed (and not restarted yet), I/Os issued by
+> > the application will immediately error (since in this case, ublk will
+> > call del_gendisk).  However, when the ublk server restarts, it cannot
+> > recover the existing ublk device - the disk has been deleted and the
+> > ublk device is in state UBLK_S_DEV_DEAD from which recovery is not
+> > permitted. So in this case, behavior 2 is not possible.
+> 
+> UBLK_F_USER_RECOVERY is supposed for supporting to recover device, and
+> if this flag isn't enabled, we don't support the feature simply, so
+> looks behavior 2 isn't one valid case, is it?
+
+Sure, so we're in agreement that recovery is impossible if
+UBLK_F_USER_RECOVERY is not set.
+
+So:
+- To get behavior A, UBLK_F_USER_RECOVERY must be unset
+- To get behavior 2, UBLK_F_USER_RECOVERY must be set
+
+Hence, having behavior A and behavior 2, at the same time, on the same
+device, would require UBLK_F_USER_RECOVERY to be both set and unset when
+that device is created. Obviously that's impossible.
 
