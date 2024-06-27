@@ -1,69 +1,78 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2091350FD
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 09:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893A513C67D
+	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 09:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719479434; cv=none; b=Mtm1gAF/eRvtqdT8May68qWDTE4gb/xgE2vHXm+FjUXWnhRzy22KEFILrokEePNLvrZilywP62A2UgVItorH+szRSAuayFbRN3A91GfDdhsHANNmI2EHqiopGnoi2R7wqm/MpJ5Iouw9nJQqrThWFgDre4C/o0F5qCj4g37VgFs=
+	t=1719479435; cv=none; b=Tn9jSL7N66WzBb9SLppYf+4/SjNHP591hVOpiBAt6v5+yQUlO03NnhhuCT+TwyndLyghnE17jSQ03WkOENwgFNjkoeDkSThJTsplWq1OBTa5GFLAR/f+Ybv3SroIn83+/VEG0yauZYgJvtZcBeEELGhbmdBJTO2mzsAWRFg2/DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719479434; c=relaxed/simple;
-	bh=nr9ojk5LONvcpIDIKt/G1zPW/6O8nzCdpDNCbVEC8n0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LfgkaV5RuSl0Pw35K8lJ16c9CFTOq+PvgrmpF5fXW7Hndv64zmcrKrTN06U9ZOz0rkSSut0/B0OCy56hJ4dTwFTz5foFEfRg/IEDzTeLvWLFq0bJAjH4CWQ4nUPLnvj6MdzN7EptBY+x0KSXDd2nuetXpb6MTrDpboDAQZwKFVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Af9EZ+qP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bnHqfboV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xp0NI0f/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2uZSBmqn; arc=none smtp.client-ip=195.135.223.131
+	s=arc-20240116; t=1719479435; c=relaxed/simple;
+	bh=pGeGgzHyUr4f92IxFN78mhlUFH/1qaLv7MOvrdi5TQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RiXQKkuLutgaY69SJCZwnIOubkx4c0AB/WSpg8VloAnKbYVkKqkQ3e99jnqIqBGriQbP3e0JyWJ3EeSRoaza91eDXZ/AqaO8xyrWOGAoVT6V4IbVkJYzJVPzv+Fxms7MHZV3VTNcU0yfi+MvZb2t7d5P2VXXfcuiOE27bnuxOf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lHoy3bOv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GtnQSqfe; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lHoy3bOv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GtnQSqfe; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Af9EZ+qP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bnHqfboV";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xp0NI0f/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2uZSBmqn"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lHoy3bOv";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GtnQSqfe";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lHoy3bOv";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GtnQSqfe"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 133731FBB1;
-	Thu, 27 Jun 2024 09:10:23 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id A3100219B8;
+	Thu, 27 Jun 2024 09:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1719479424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=zbby7y/4D2GAaGFRYuMjkPb03xd9SNWETTVFoF3fiFY=;
-	b=Af9EZ+qPOmTyIQq2LJ42C6aRhh/8maJcq3a/74Qrh8D4HUWtCPsUV4j417GbPq6kCFfva3
-	gfTsd0p+t0u/EPxhDt6YTc6HBBcbWQ2BFW+vTcE8nqROV08zxoTMaHjWeA6muHUtzYoeKk
-	ToU2AJ/2soK3KVRTxa7Aop3aGsSCfnE=
+	t=1719479431; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vO3mLwiht/6bxAJcfiCnSj/vjI0rh0zJmWK/xqVj/fg=;
+	b=lHoy3bOvUYHxQ8fQ5HGrGD3MN55s5W85PjTkcoYyqLinZ7PNv51yL4NtQt3ySgOi9g82my
+	+mNjXLe/1soQycMg/jFsBBitFO5s8Gq0HuRktW+GJlG1OVjAbRqR51fXwl8uyNureL3Efa
+	x9tErSBNBvckuHT5Dk7dDnK2pVIII9Q=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1719479424;
+	s=susede2_ed25519; t=1719479431;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=zbby7y/4D2GAaGFRYuMjkPb03xd9SNWETTVFoF3fiFY=;
-	b=bnHqfboVPzmlFu+8fbQTXw8nzmbUFkckubJA4EyFbDkk/SDgZaavezGGzg5NEAlLuzD5sU
-	afLoiAZRumO8qUBg==
-Authentication-Results: smtp-out2.suse.de;
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vO3mLwiht/6bxAJcfiCnSj/vjI0rh0zJmWK/xqVj/fg=;
+	b=GtnQSqfeCUdYQ6+Fm9+6CO/MFv1Jp0JPAlqzDOCo6L4HLzoJBaRI99+D0Um28NlpW0N/DQ
+	sOEykrGxS7QzBlAA==
+Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1719479423; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=zbby7y/4D2GAaGFRYuMjkPb03xd9SNWETTVFoF3fiFY=;
-	b=xp0NI0f/E2XD8bgipG7pQ5gFyeekD0UEJojqMj3UziBsm2MfLTq86+sHWyubn7X2b/A3lp
-	6odLsnd/QVoGyfwU0vpZ44VmqwBbNblQAdbJlXQasyTNiu1bz8jg6mw8enz+Xx8OXEx2fo
-	CzNkicBBjeRZRoXqi5Tdonyagw4ctDo=
+	t=1719479431; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vO3mLwiht/6bxAJcfiCnSj/vjI0rh0zJmWK/xqVj/fg=;
+	b=lHoy3bOvUYHxQ8fQ5HGrGD3MN55s5W85PjTkcoYyqLinZ7PNv51yL4NtQt3ySgOi9g82my
+	+mNjXLe/1soQycMg/jFsBBitFO5s8Gq0HuRktW+GJlG1OVjAbRqR51fXwl8uyNureL3Efa
+	x9tErSBNBvckuHT5Dk7dDnK2pVIII9Q=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1719479423;
+	s=susede2_ed25519; t=1719479431;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=zbby7y/4D2GAaGFRYuMjkPb03xd9SNWETTVFoF3fiFY=;
-	b=2uZSBmqne57ZP16wWnoY3ckjJd42JGiNGH+I+pIVSZb6E/3NUwz7+TWjb00acNT2t9CDwu
-	m28GvPZK3L9tifCA==
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vO3mLwiht/6bxAJcfiCnSj/vjI0rh0zJmWK/xqVj/fg=;
+	b=GtnQSqfeCUdYQ6+Fm9+6CO/MFv1Jp0JPAlqzDOCo6L4HLzoJBaRI99+D0Um28NlpW0N/DQ
+	sOEykrGxS7QzBlAA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 04E051384C;
-	Thu, 27 Jun 2024 09:10:23 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 943401384C;
+	Thu, 27 Jun 2024 09:10:31 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id n3E4AH8sfWa1FgAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Thu, 27 Jun 2024 09:10:23 +0000
+	id a6FrI4csfWa9FgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 27 Jun 2024 09:10:31 +0000
 From: Daniel Wagner <dwagner@suse.de>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
@@ -71,186 +80,252 @@ Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v3 0/3] Add support to run against real target
-Date: Thu, 27 Jun 2024 11:10:13 +0200
-Message-ID: <20240627091016.12752-1-dwagner@suse.de>
+Subject: [PATCH blktests v3 1/3] nvme/rc: introduce remote target support
+Date: Thu, 27 Jun 2024 11:10:14 +0200
+Message-ID: <20240627091016.12752-2-dwagner@suse.de>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240627091016.12752-1-dwagner@suse.de>
+References: <20240627091016.12752-1-dwagner@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -2.80
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -6.80
 X-Spam-Level: 
 X-Spam-Flag: NO
-X-Spamd-Result: default: False [-2.80 / 50.00];
+X-Spamd-Result: default: False [-6.80 / 50.00];
+	REPLY(-4.00)[];
 	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
 	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_TWO(0.00)[2];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvmet:url,imap1.dmz-prg2.suse.org:helo];
-	RCVD_TLS_ALL(0.00)[]
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
 
-I've added a new hook so that the default variables can be configured via t=
-he
-script. This simple overwrite of the defaults allows to use external config=
-ured
-setups (there is some trickery involved as it's not possible to do it only =
-once
-due to include orders). The upside of this approach is that we don't have t=
-o add
-more environment variables.
+Most of the NVMEeoF tests are exercising the host code of the nvme
+subsystem. There is no real reason not to run these against a real
+target. We just have to skip the soft target setup and make it possible
+to setup a remote target.
 
-I've run blktests against a PowerStore. That worked fairly okay but there w=
-ere
-some fallouts which is kind of expected at this stage:
+Because all tests use now the common setup/cleanup helpers we just need
+to intercept this call and forward it to an external component.
 
-# cat ~/.config/blktests/nvme_target_control.toml
-[main]
-skip_setup_cleanup=3Dtrue
-nvmetcli=3D'/home/wagi/work/nvmetcli/nvmetcli'
-remote=3D'http://nvmet:5000'
+As we already have various nvme variables to setup the target which we
+should allow to overwrite. Also introduce a NVME_TARGET_CONTROL variable
+which points to a script which gets executed whenever a targets needs to
+be created/destroyed.
 
-[host]
-blkdev_type=3D'device'
-trtype=3D'tcp'
-hostnqn=3D'nqn.2014-08.org.nvmexpress:uuid:1a9e23dd-466e-45ca-9f43-a29aaf47=
-cb21'
-hostid=3D'1a9e23dd-466e-45ca-9f43-a29aaf47cb21'
-host_traddr=3D'10.161.16.48'
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+ Documentation/running-tests.md | 33 ++++++++++++++++++++
+ check                          |  4 +++
+ tests/nvme/rc                  | 57 ++++++++++++++++++++++++++++++++--
+ 3 files changed, 92 insertions(+), 2 deletions(-)
 
-[subsys_0]
-traddr=3D'10.162.198.45'
-trsvid=3D'4420'
-subsysnqn=3D'nqn.1988-11.com.dell:powerstore:00:f03028e73ef7D032D81E'
-subsys_uuid=3D'3a5c104c-ee41-38a1-8ccf-0968003d54e7'
-
-
-# NVME_TARGET_CONTROL=3D/root/blktests/contrib/nvme_target_control.py ./che=
-ck nvme
-
-nvme/002 (tr=3Dtcp) (create many subsystems and test discovery) [not run]
-    nvme_trtype=3Dtcp is not supported in this test
-nvme/003 (tr=3Dtcp) (test if we're sending keep-alives to a discovery contr=
-oller)
-nvme/003 (tr=3Dtcp) (test if we're sending keep-alives to a discovery contr=
-oller) [passed]
-    runtime    ...  15.397s
-nvme/004 (tr=3Dtcp) (test nvme and nvmet UUID NS descriptors)  [failed]
-    runtime    ...  42.584s
-    --- tests/nvme/004.out      2024-06-27 09:45:35.496518067 +0200
-    +++ /root/blktests/results/nodev_tr_tcp/nvme/004.out.bad    2024-06-27 =
-10:38:59.424409636 +0200
-    @@ -1,3 +1,4 @@
-     Running nvme/004
-    -disconnected 1 controller(s)
-    +No namespaces found
-    +disconnected 13 controller(s)
-     Test complete
-nvme/005 (tr=3Dtcp) (reset local loopback target)              [passed]
-    runtime    ...  11.160s
-nvme/006 (tr=3Dtcp bd=3Ddevice) (create an NVMeOF target)        [passed]
-    runtime    ...  1.350s
-nvme/008 (tr=3Dtcp bd=3Ddevice) (create an NVMeOF host)          [failed]
-    runtime    ...  8.748s
-    --- tests/nvme/008.out      2024-06-27 09:45:35.496518067 +0200
-    +++ /root/blktests/results/nodev_tr_tcp_bd_device/nvme/008.out.bad  202=
-4-06-27 10:39:23.624408817 +0200
-    @@ -1,3 +1,4 @@
-     Running nvme/008
-    +UUID 3a5c104c-ee41-38a1-8ccf-0968003d54e7 mismatch (wwid eui.3a5c104ce=
-e4138a18ccf0968003d54e7)
-     disconnected 1 controller(s)
-     Test complete
-nvme/010 (tr=3Dtcp bd=3Ddevice) (run data verification fio job)  [passed]
-    runtime    ...  29.798s
-nnvme/012 (tr=3Dtcp bd=3Ddevice) (run mkfs and data verification fio) [fail=
-ed]
-    runtime    ...  162.299s
-    --- tests/nvme/012.out      2024-06-27 09:45:35.500518066 +0200
-    +++ /root/blktests/results/nodev_tr_tcp_bd_device/nvme/012.out.bad  202=
-4-06-27 10:42:38.008402238 +0200
-    @@ -1,3 +1,6 @@
-     Running nvme/012
-    +fio: io_u error on file /mnt/blktests//verify.0.0: No space left on de=
-vice: write offset=3D44917682176, buflen=3D4096
-    +fio exited with status 1
-    +4;fio-3.23;verify;0;28;0;0;0;0;0;0;0.000000;0.000000;0;0;0.000000;0.00=
-0000;1.000000%=3D0;5.000000%=3D0;10.000000%=3D0;20.000000%=3D0;30.000000%=
-=3D0;40.000000%=3D0;50.000000%=3D0;60.000000%=3D0;70.000000%=3D0;80.000000%=
-=3D0;90.000000%=3D0;95.000000%=3D0;99.000000%=3D0;99.500000%=3D0;99.900000%=
-=3D0;99.950000%=3D0;99.990000%=3D0;0%=3D0;0%=3D0;0%=3D0;0;0;0.000000;0.0000=
-00;0;0;0.000000%;0.000000;0.000000;3508332;24662;6165;142251;5;19501;35.466=
-984;172.426891;127;60177;2556.665370;1420.047447;1.000000%=3D1056;5.000000%=
-=3D1548;10.000000%=3D1646;20.000000%=3D1777;30.000000%=3D1908;40.000000%=3D=
-2072;50.000000%=3D2277;60.000000%=3D2441;70.000000%=3D2637;80.000000%=3D293=
-2;90.000000%=3D3653;95.000000%=3D4554;99.000000%=3D8224;99.500000%=3D10027;=
-99.900000%=3D14745;99.950000%=3D17956;99.990000%=3D39583;0%=3D0;0%=3D0;0%=
-=3D0;418;60193;2592.427453;1433.177059;18632;44736;100.000000%;24704.690141=
-;4469.952445;0;0;0;0;0;0;0.000000;0.000000;0;0;0.000000;0.000000;1.000000%=
-=3D0;5.000000%=3D0;10.000000%=3D0;20.000000%=3D0;30.000000%=3D0;40.000000%=
-=3D0;50.000000%=3D0;60.000000%=3D0;70.000000%=3D0;80.000000%=3D0;90.000000%=
-=3D0;95.000000%=3D0;99.000000%=3D0;99.500000%=3D0;99.900000%=3D0;99.950000%=
-=3D0;99.990000%=3D0;0%=3D0;0%=3D0;0%=3D0;0;0;0.000000;0.000000;0;0;0.000000=
-%;0.000000;0.000000;5.627417%;9.681547%;711749;0;22200;0.1%;0.1%;0.1%;0.1%;=
-100.0%;0.0%;0.0%;0.00%;0.00%;0.00%;0.00%;0.00%;0.00%;0.01%;0.12%;0.29%;0.43=
-%;35.65%;56.04%;6.95%;0.47%;0.03%;0.01%;0.00%;0.00%;0.00%;0.00%;0.00%;0.00%=
-;nvme0n1;0;1739486;0;0;0;4596624;4596624;100.00%
-     disconnected 1 controller(s)
-     Test complete
-nvme/014 (tr=3Dtcp bd=3Ddevice) (flush a command from host)
-^C^C^C
-
-The flush test hanged forever but this could just be an outdated host kerne=
-l.
-
-changes:
-v3:
-  - added support for previous configured target
-  - renamed nvme_nvme_target to	_require_kernel_nvme_target
-  - use shorter redirect operator
-  - https://lore.kernel.org/all/20240612110444.4507-1-dwagner@suse.de/
-v2:
-  - many of the preperation patches have been merged, drop them
-  - added a python script which implements the blktests API
-  - add some documentation how to use it
-  - changed the casing of the environment variables to upper case
-
-v1:
-  - initial version
-  - https://lore.kernel.org/linux-nvme/20240318093856.22307-1-dwagner@suse.=
-de/
-
-Daniel Wagner (3):
-  nvme/rc: introduce remote target support
-  nvme/030: only run against kernel soft target
-  contrib: add remote target setup/cleanup script
-
- Documentation/running-tests.md |  33 ++++++
- check                          |   4 +
- contrib/nvme_target_control.py | 181 +++++++++++++++++++++++++++++++++
- contrib/nvmet-subsys.jinja2    |  71 +++++++++++++
- tests/nvme/030                 |   1 +
- tests/nvme/rc                  |  65 +++++++++++-
- 6 files changed, 353 insertions(+), 2 deletions(-)
- create mode 100755 contrib/nvme_target_control.py
- create mode 100644 contrib/nvmet-subsys.jinja2
-
---=20
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index 968702e76bb5..fe4f729bd037 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -120,6 +120,9 @@ The NVMe tests can be additionally parameterized via environment variables.
+ - NVME_NUM_ITER: 1000 (default)
+   The number of iterations a test should do. This parameter had an old name
+   'nvme_num_iter'. The old name is still usable, but not recommended.
++- NVME_TARGET_CONTROL: When defined, the generic target setup/cleanup code will
++  be skipped and this script gets called. This makes it possible to run
++  the fabric nvme tests against a real target.
+ 
+ ### Running nvme-rdma and SRP tests
+ 
+@@ -167,3 +170,33 @@ if ! findmnt -t configfs /sys/kernel/config > /dev/null; then
+ 	mount -t configfs configfs /sys/kernel/config
+ fi
+ ```
++### NVME_TARGET_CONTROL
++
++When NVME_TARGET_CONTROL is set, blktests will call the script which the
++environment variable points to, to fetch the configuration values to be used for
++the runs, e.g subsysnqn or hostnqn. This allows the blktest to be run against
++external configured/setup targets.
++
++The blktests expects that the script interface implements following
++commands:
++
++config:
++  --show-blkdev-type
++  --show-trtype
++  --show-hostnqn
++  --show-hostid
++  --show-host-traddr
++  --show-traddr
++  --show-trsvid
++  --show-subsys-uuid
++  --show-subsysnqn
++
++setup:
++  --subsysnqn SUBSYSNQN
++  --subsys-uuid SUBSYS_UUID
++  --hostnqn HOSTNQN
++  --ctrlkey CTRLKEY
++  --hostkey HOSTKEY
++
++cleanup:
++  --subsysnqn SUBSYSNQN
+diff --git a/check b/check
+index 3ed4510f3f40..d0475629773d 100755
+--- a/check
++++ b/check
+@@ -603,6 +603,10 @@ _run_group() {
+ 	# shellcheck disable=SC1090
+ 	. "tests/${group}/rc"
+ 
++	if declare -fF group_setup >/dev/null; then
++		group_setup
++	fi
++
+ 	if declare -fF group_requires >/dev/null; then
+ 		group_requires
+ 		if [[ -v SKIP_REASONS ]]; then
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index c1ddf412033b..4465dea0370b 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -23,6 +23,7 @@ _check_conflict_and_set_default NVME_IMG_SIZE nvme_img_size 1G
+ _check_conflict_and_set_default NVME_NUM_ITER nvme_num_iter 1000
+ nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
+ NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
++nvme_target_control="${NVME_TARGET_CONTROL:-}"
+ 
+ _NVMET_TRTYPES_is_valid() {
+ 	local type
+@@ -135,6 +136,13 @@ _nvme_requires() {
+ 	return 0
+ }
+ 
++group_setup() {
++	if [[ -n "${nvme_target_control}" ]]; then
++		NVMET_TRTYPES="$(${nvme_target_control} config --show-trtype)"
++		NVMET_BLKDEV_TYPES="$(${nvme_target_control} config --show-blkdev-type)"
++	fi
++}
++
+ group_requires() {
+ 	_have_root
+ 	_NVMET_TRTYPES_is_valid
+@@ -359,6 +367,10 @@ _cleanup_nvmet() {
+ 		fi
+ 	done
+ 
++	if [[ -n "${nvme_target_control}" ]]; then
++		return
++	fi
++
+ 	for port in "${NVMET_CFS}"/ports/*; do
+ 		name=$(basename "${port}")
+ 		echo "WARNING: Test did not clean up port: ${name}"
+@@ -403,11 +415,26 @@ _cleanup_nvmet() {
+ 
+ _setup_nvmet() {
+ 	_register_test_cleanup _cleanup_nvmet
++
++	if [[ -n "${nvme_target_control}" ]]; then
++		def_hostnqn="$(${nvme_target_control} config --show-hostnqn)"
++		def_hostid="$(${nvme_target_control} config --show-hostid)"
++		def_host_traddr="$(${nvme_target_control} config --show-host-traddr)"
++		def_traddr="$(${nvme_target_control} config --show-traddr)"
++		def_trsvcid="$(${nvme_target_control} config --show-trsvid)"
++		def_subsys_uuid="$(${nvme_target_control} config --show-subsys-uuid)"
++		def_subsysnqn="$(${nvme_target_control} config --show-subsysnqn)"
++		return
++	fi
++
+ 	modprobe -q nvmet
++
+ 	if [[ "${nvme_trtype}" != "loop" ]]; then
+ 		modprobe -q nvmet-"${nvme_trtype}"
+ 	fi
++
+ 	modprobe -q nvme-"${nvme_trtype}"
++
+ 	if [[ "${nvme_trtype}" == "rdma" ]]; then
+ 		start_soft_rdma
+ 		for i in $(rdma_network_interfaces)
+@@ -425,6 +452,7 @@ _setup_nvmet() {
+ 			fi
+ 		done
+ 	fi
++
+ 	if [[ "${nvme_trtype}" = "fc" ]]; then
+ 		modprobe -q nvme-fcloop
+ 		_setup_fcloop "${def_local_wwnn}" "${def_local_wwpn}" \
+@@ -873,11 +901,13 @@ _find_nvme_passthru_loop_dev() {
+ 
+ _nvmet_target_setup() {
+ 	local blkdev_type="${nvmet_blkdev_type}"
++	local subsys_uuid="${def_subsys_uuid}"
++	local subsysnqn="${def_subsysnqn}"
+ 	local blkdev
++	local ARGS=()
+ 	local ctrlkey=""
+ 	local hostkey=""
+-	local subsysnqn="${def_subsysnqn}"
+-	local subsys_uuid="${def_subsys_uuid}"
++	local blkdev
+ 	local port
+ 
+ 	while [[ $# -gt 0 ]]; do
+@@ -909,6 +939,22 @@ _nvmet_target_setup() {
+ 		esac
+ 	done
+ 
++	if [[ -n "${hostkey}" ]]; then
++		ARGS+=(--hostkey "${hostkey}")
++	fi
++	if [[ -n "${ctrlkey}" ]]; then
++		ARGS+=(--ctrkey "${ctrlkey}")
++	fi
++
++	if [[ -n "${nvme_target_control}" ]]; then
++		eval "${nvme_target_control}" setup \
++			--subsysnqn "${subsysnqn}" \
++			--subsys-uuid "${subsys_uuid}" \
++			--hostnqn "${def_hostnqn}" \
++			"${ARGS[@]}" &> /dev/null
++		return
++	fi
++
+ 	truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
+ 	if [[ "${blkdev_type}" == "device" ]]; then
+ 		blkdev="$(losetup -f --show "$(_nvme_def_file_path)")"
+@@ -948,6 +994,13 @@ _nvmet_target_cleanup() {
+ 		esac
+ 	done
+ 
++	if [[ -n "${nvme_target_control}" ]]; then
++		eval "${nvme_target_control}" cleanup \
++			--subsysnqn "${subsysnqn}" \
++			> /dev/null
++		return
++	fi
++
+ 	_get_nvmet_ports "${subsysnqn}" ports
+ 
+ 	for port in "${ports[@]}"; do
+-- 
 2.45.2
 
