@@ -1,160 +1,141 @@
-Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CA21993B6
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 17:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6326C2139D6
+	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 18:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719508189; cv=none; b=hpIDEw3fqqpASAqf0dZF8vEOI6tzIPN89tKRmdiBDsw3jpPLG9exUKgD38zAULkgD2Nhw2PSRZnWlMEXaz3wnPyvZmqi6JU4lEsg5KoE+zgYx59u71M4GFWXEaeJohRv/EzNBFxf4bYZdWUTyfYKuJisrWhQzTzVGLZMD4wQMvQ=
+	t=1719513199; cv=none; b=djcMN3b9FIU70JDvFDsreMoJCqt2x2f1QTLUaLWP+gr4/Q6+XqoUuDxVulyAHhA7DSka6GPnNgLhJ5+q5a3HRc//+tos7ONkBJVPN9KXcOqFrUZ449oy6hh2Cee3seLi3WeJhysy79xK27d6/LlK1xMwR4CfaPrth6eWBOsWZGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719508189; c=relaxed/simple;
-	bh=UasIsFgC/Np7owc61PPznWhFbrGni4PAljcsDfeiJ3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dEwJzxoPJNE8MlpnEaK51ypBQN/5CwNppM8tlGvignoriG0VQtAPu5y8j09q2oFcn48scPtGRKF8Y53Ayl8oEySbbQsN14aYna8TRCqUHU7WSRs152OrJvVKR4JmQmTgjKUkmexzKg9URrGkOZyMAZCxBqlbKB6xFL3AQaIwUjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=HR49OlVk; arc=none smtp.client-ip=209.85.214.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1719513199; c=relaxed/simple;
+	bh=HgFhDG1X3upg9nMzm5lde1P1nuSPBBFmAIwLNBYCpU4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=d6Y2nkleDPuGOQ77C2fpUp207Z9mjpgR6Z0V+chKSATeBeHHGVjSbWINUN4U3t5AiC/nx98lNpssNxZqKj8ktJNsW005fJI74uFHna1vzZCqyU9e6AcZdCB78ikKlwCCl7dI9RSbW4kffnl+XG5go5tzt1T1FHaBnws91vsj+n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QiEs6P3h; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="HR49OlVk"
-Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-1fa9f540f45so12867745ad.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 10:09:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1719508187; x=1720112987; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Ey7PDxlbBydmaDDR4O+E1QsS0ExfjQTrEnzypmXxfQ=;
-        b=HR49OlVkKy0OI0OGBa6uQ8CWSoy9pnL79LPTWyGo+C8Cj3F92MK7HMoe+E/oa3SBil
-         2yTW2yCROS3zJzZhBxI2ggt/LQEGZPYWHLSNx0LpcN/xaQupv6mxJacaa1Zgts22j3rX
-         B1W80zqUnjbaKp4i4cypLN5QmT1oNqOfj+tuJ+WeIeMBVTqxLWx2zFAD5LD4thRVIFv0
-         F0bcQJflIbRGWsmWodVRJt3i71LbysDNGxg0LUfuDd+71ZZP6qIDihMNYzGirTQmM24G
-         OwPEOQodSeMjw5btsxU9S0QdATlEeOLuVZY6FUX8gW53rNurjY2REewPhFTXj0f1BDN3
-         OpHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719508187; x=1720112987;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5Ey7PDxlbBydmaDDR4O+E1QsS0ExfjQTrEnzypmXxfQ=;
-        b=FdKQmy9QKvKoRsM072tIBHzp6iYMYNPgwjAPUGduwfw+s6kbQkpS/5ZKTE0FGfOUO4
-         gW/lSWq1xPa8LjXEV7EQKZ0G2JLZbCMN+8He5xboCIL9d8fbgZ2RG9eQPvrGXA6XHs6P
-         hr49rYMH6TIc5SqbZiZE0E9Fox4a8YnvRtSQIr/+9BHR43wBZoCto5Sx0ZGJAEaJbybF
-         nSqm3bpaExCWsq7huK4Adj1s62VYwlxkuy3GkcKcQ+CChVjZ8bcUwFNzx+LcN5lKZ+gL
-         ++lIhx0wv0gVta32+Lon9OI6SsSqrPitd9820l00GIV1m6lOmtfSOEWtO/JSV2cHzcLh
-         fUQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWFgPQnAPRcx/mWGDmGEyD2MTWqw7YoaIXm4mmh2s7uob4kpg8HNcI2if2Ylk8SPkIuQHj0XgutUaLmwxuTcf75zQdnu45HCRyrMoU=
-X-Gm-Message-State: AOJu0YxdksSv+soH2CLJksStrcahvkzm5ZcQl8HU58wQWVabOuW3YFkG
-	AvOBiiCeNZwRiDhSnh4uiHGHsQm9oTvW4SewJx48HE5B8Q7vj5cHB6BG2XH+f7Wp7AyBib+S0Od
-	P/m8TFqHBamm2s3ipPxw5e27b2pvhoxLK
-X-Google-Smtp-Source: AGHT+IGoXBqC4LP5PEevJmvuW0GeUxY+m7FHBcQAD6IX8+DKfHeyU8LA/PnVIQJJHUD607O9cTl9QnWkx3HA
-X-Received: by 2002:a17:902:da86:b0:1f9:d817:1fb0 with SMTP id d9443c01a7336-1fa158d0809mr149482135ad.14.1719508186774;
-        Thu, 27 Jun 2024 10:09:46 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-1faac9a5f08sm594455ad.125.2024.06.27.10.09.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 10:09:46 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4EEC63404A4;
-	Thu, 27 Jun 2024 11:09:45 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 39045E40301; Thu, 27 Jun 2024 11:09:15 -0600 (MDT)
-Date: Thu, 27 Jun 2024 11:09:15 -0600
-From: Uday Shankar <ushankar@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
-Message-ID: <Zn2cuwpM+/dK/682@dev-ushankar.dev.purestorage.com>
-References: <20240617194451.435445-1-ushankar@purestorage.com>
- <20240617194451.435445-3-ushankar@purestorage.com>
- <ZnDs5zLc5oA1jPVA@fedora>
- <ZnxOYyWV/E54qOAM@dev-ushankar.dev.purestorage.com>
- <Zny9vr/2iHIkc2bC@fedora>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QiEs6P3h"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240627183314epoutp038ab51811d7653534f5b1d1c3c8a9903f~c8CO9GE9U2810328103epoutp03X
+	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 18:33:14 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240627183314epoutp038ab51811d7653534f5b1d1c3c8a9903f~c8CO9GE9U2810328103epoutp03X
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1719513194;
+	bh=LeeS3mzNAHp/KygIL8uRYQf61jRwdU46yOoymoQIX9o=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=QiEs6P3hG1A0RLCBtTya20mGlKYnunfab0THHfIstCd7FYo1u0v8o8gjr5NgH/p9Y
+	 FwojV+dMMVqygivZVBPXZ815H5JiaDAaQQg5gF5UeTTpqQyopZ/WzbeXwqDHcHkHW4
+	 mYAjEgvEjp0fFPlLqVAz20o89KR9DnCn3bjhjzP8=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240627183313epcas5p4b610d56f2f11fc9b99f88b6b6ac4f3d7~c8CObcLHi1026110261epcas5p4S;
+	Thu, 27 Jun 2024 18:33:13 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.182]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4W96dM5ynzz4x9Pp; Thu, 27 Jun
+	2024 18:33:11 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	16.2B.09989.760BD766; Fri, 28 Jun 2024 03:33:11 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240627183311epcas5p463bfb0ad5ba319ab9efbf4b46d967918~c8CMknoHR1026110261epcas5p4O;
+	Thu, 27 Jun 2024 18:33:11 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240627183311epsmtrp2db54af5ff44eb852a0faed9a6e5e188d~c8CMj9mO51214112141epsmtrp2x;
+	Thu, 27 Jun 2024 18:33:11 +0000 (GMT)
+X-AuditID: b6c32a4a-bffff70000002705-fd-667db06783c2
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E8.83.18846.760BD766; Fri, 28 Jun 2024 03:33:11 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240627183310epsmtip1927f53799ad3fa354e639584e967e237~c8CL1GmV31627116271epsmtip1N;
+	Thu, 27 Jun 2024 18:33:10 +0000 (GMT)
+Message-ID: <d482d9a0-9d9f-1b4b-5511-c787f43a31af@samsung.com>
+Date: Fri, 28 Jun 2024 00:03:09 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zny9vr/2iHIkc2bC@fedora>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH 5/5] block: remove bio_integrity_process
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, linux-block@vger.kernel.org
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240627154759.GA25261@lst.de>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmphk+LIzCtJLcpLzFFi42LZdlhTUzd9Q22awb7n+har7/azWaxcfZTJ
+	Yu8tbYvlx/8xObB4XD5b6rH7ZgObx8ent1g8Pm+SC2CJyrbJSE1MSS1SSM1Lzk/JzEu3VfIO
+	jneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQdcvMAVqopFCWmFMKFApILC5W0rezKcovLUlVyMgv
+	LrFVSi1IySkwKdArTswtLs1L18tLLbEyNDAwMgUqTMjOmHMmu+A9e8WlmX/YGhgXs3UxcnJI
+	CJhIHHnwnaWLkYtDSGA3o0Tj9TWMEM4nRonJk66ywjlnpi9hh2nZfvUHVMtORomru2+zQThv
+	GSXWf97GClLFK2AncWprC5jNIqAqMfHPaXaIuKDEyZlPWEBsUYFkiZ9dB8AOERawkTgytZMJ
+	xGYWEJe49WQ+mC0ioCTx9NVZRoh4scSyhVOB6jk42AQ0JS5MLgUJcwroSOyd+pkZokReYvvb
+	Ocwg90gI3GOXOPdsKiPE1S4SX6/OYoWwhSVeHd8C9Y2UxOd3e6GBkS3x4NEDFgi7RmLH5j6o
+	enuJhj83WEH2MgPtXb9LH2IXn0Tv7ydMIGEJAV6JjjYhiGpFiXuTnkJ1iks8nLEEyvaQOHG/
+	iwkSVE1MEutPTmKfwKgwCylUZiH5fhaSd2YhbF7AyLKKUTK1oDg3PbXYtMAoL7UcHt/J+bmb
+	GMHJUctrB+PDBx/0DjEycTAeYpTgYFYS4Q0tqUoT4k1JrKxKLcqPLyrNSS0+xGgKjJ6JzFKi
+	yfnA9JxXEm9oYmlgYmZmZmJpbGaoJM77unVuipBAemJJanZqakFqEUwfEwenVANTK1Pf1dCd
+	n351CqzcGZK8xbJL6HbVV5Hnh3vm8Uws0q5TlKg/drpMlyfiQPaJtet/LRM4G7htdkYJ6z/e
+	pB0OxnHTOY/v1Is59ul9v+3njy8lvZfGyrJelmieGZx16Ef1u/pbaUJ5rtohrwS2RBlWzTYL
+	ds5ddT/lTFxaQFTuE921MaGnVPZPbvjjP+f1wXONT5Le9hj1JET29AiHvkgQvaiUff2B148T
+	eSE7bu1/uHuvocqza1LaT+tca0pCVi9ccTxn29+qV+b/RUoDU/48O/Yjvy/UUtXVbt3MSRm7
+	P8RzM19b/v2TbunWu1p9Me5iJ1r0a9mzJH9zRHjV9V84mx5frPX0Dm9VgC/TQQUlluKMREMt
+	5qLiRABSnsgBFwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrNLMWRmVeSWpSXmKPExsWy7bCSnG76hto0gz13JC1W3+1ns1i5+iiT
+	xd5b2hbLj/9jcmDxuHy21GP3zQY2j49Pb7F4fN4kF8ASxWWTkpqTWZZapG+XwJUx50x2wXv2
+	iksz/7A1MC5m62Lk5JAQMJHYfvUHSxcjF4eQwHZGiUtTd7NDJMQlmq/9gLKFJVb+e84OUfSa
+	UWLOhd+MIAleATuJU1tbWEFsFgFViYl/TrNDxAUlTs58wgJiiwokS7z8MxEsLixgI3FkaicT
+	iM0MtODWk/lgtoiAksTTV2cZIeKlEl9uXACLCwk0MUksWq/dxcjBwSagKXFhcilImFNAR2Lv
+	1M/MEOVmEl1bu6Ba5SW2v53DPIFRaBaSK2Yh2TYLScssJC0LGFlWMYqmFhTnpucmFxjqFSfm
+	Fpfmpesl5+duYgSHv1bQDsZl6//qHWJk4mA8xCjBwawkwhtaUpUmxJuSWFmVWpQfX1Sak1p8
+	iFGag0VJnFc5pzNFSCA9sSQ1OzW1ILUIJsvEwSnVwCSR7lU8h80gy+OD40r/kn6ZB5Mdf73i
+	b3ros1rK2qI48OcRrn/Rp1ZNmrxJ0dt0ebVF/D1f/czVVWrat7S+JxQ09S9IDDF9uOeaUNgW
+	vcCrDDFPzjy9Un2Ts/ewFLNG/hnuya3i/PWHF99RNkpqz/qRzbfIs9Xk1qVNqpe45PLEm4yE
+	H0T1tap8XcL+0XaWnkSP21y3Zi2G3dc9YuruL3X2UQ3kiCj3Xhh9KDt18wJbLu2Uqg6pQtFZ
+	kV4u6WdX7QxRUpHo2xSX//F+/OEbCxhEgzpO18wJ8ZWcPCl4++uDHRz71j085TB/zQeWPtOk
+	mE6RRA/9dd5vyq93OQUnPq4+qbQvmNXgyM3LLpJKLMUZiYZazEXFiQCi9e9T7gIAAA==
+X-CMS-MailID: 20240627183311epcas5p463bfb0ad5ba319ab9efbf4b46d967918
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240626050052epcas5p29fc1cf1ef40fdec63860f6d6df9ffad1
+References: <20240626045950.189758-1-hch@lst.de>
+	<CGME20240626050052epcas5p29fc1cf1ef40fdec63860f6d6df9ffad1@epcas5p2.samsung.com>
+	<20240626045950.189758-6-hch@lst.de>
+	<a7fd0e31-63bd-8fff-d7d4-6ba990098e7a@samsung.com>
+	<20240627154759.GA25261@lst.de>
 
-When I say "behavior A + 2," I mean behavior A and behavior 2 at the
-same time on the same ublk device. I still think this is not supported
-with current ublk_drv, see below.
-
-> > the ublk server can "handle" the I/O error because during this time,
-> > there is no ublk server and all decisions on how to handle I/O are made
-> > by ublk_drv directly (based on configuration flags specified when the
-> > device was created).
-> > 
-> > If the ublk server created the device with UBLK_F_USER_RECOVERY, then
-> > when the ublk server has crashed (and not restarted yet), I/Os issued by
-> > the application will queue/hang until the ublk server comes back and
-> > recovers the device, because the underlying request_queue is left in a
-> > quiesced state. So in this case, behavior A is not possible.
+On 6/27/2024 9:17 PM, Christoph Hellwig wrote:
+> On Thu, Jun 27, 2024 at 09:06:56PM +0530, Kanchan Joshi wrote:
+>> The bi->csum_type is constant as far as this bio_for_each_segment loop
+>> is concerned.
+>> Seems wasteful processing, and can rather be moved out where we set a
+>> function pointer to point to either ext_pi_crc64_generate or
+>> t10_pi_generate once.
+> A function pointer is way more expensive than a few branches, especially
+> easily predictable ones.
 > 
-> When ublk server is crashed, ublk_abort_requests() will be called to fail
-> queued inflight requests. Meantime ubq->canceling is set to requeue
-> new request instead of forwarding it to ublk server.
-> 
-> So behavior A should be supported easily by failing request in
-> ublk_queue_rq() if ubq->canceling is set.
 
-This argument only works for devices created without
-UBLK_F_USER_RECOVERY. If UBLK_F_USER_RECOVERY is set, then the
-request_queue for the device is left in a quiesced state and so I/Os
-will not even get to ublk_queue_rq. See the following as proof (using a
-build of ublksrv master):
+In general yes. Maybe I can profile this particular case someday and get 
+myself convinced. But regardless, I am unsure what the patch buys.
 
-# ./ublk add -t loop -f file -r 1
-dev id 0: nr_hw_queues 1 queue_depth 128 block size 4096 dev_capacity 2097152
-        max rq size 524288 daemon pid 244608 flags 0x4a state LIVE
-        ublkc: 240:0 ublkb: 259:0 owner: 0:0
-        queue 0: tid 244610 affinity(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 )
-        target {"backing_file":"file","dev_size":1073741824,"direct_io":1,"name":"loop","type":1}
-# kill -9 244608
-# dd if=/dev/urandom of=/dev/ublkb0 count=1 bs=4096 oflag=direct
-(hung)
+During write:
+-               bio_integrity_process(bio, &bio->bi_iter);
++               blk_integrity_generate(bio);
 
-# ps aux | grep " D"
-root      244626  0.0  0.0   5620  1880 pts/0    D+   16:57   0:00 dd if=/dev/urandom of=/dev/ublkb0 count=1 bs=4096 oflag=direct
-root      244656  0.0  0.0   6408  2188 pts/1    S+   16:58   0:00 grep --color=auto  D
-# cat /proc/244626/stack
-[<0>] submit_bio_wait+0x63/0x90
-[<0>] __blkdev_direct_IO_simple+0xd9/0x1e0
-[<0>] blkdev_write_iter+0x1b4/0x230
-[<0>] vfs_write+0x2ae/0x3d0
-[<0>] ksys_write+0x4f/0xc0
-[<0>] do_syscall_64+0x5d/0x160
-[<0>] entry_SYSCALL_64_after_hwframe+0x4b/0x53
-# cat /sys/kernel/debug/block/ublkb0/state
-SAME_COMP|NONROT|IO_STAT|INIT_DONE|STATS|REGISTERED|QUIESCED|NOWAIT|SQ_SCHED
+During read:
+-       bio->bi_status = bio_integrity_process(bio, &bip->bio_iter);
++       blk_integrity_verify(bio);
 
-Therefore, in order to obtain behavior A with current ublk_drv, one must
-not set UBLK_F_USER_RECOVERY.
-
-> > 
-> > If the ublk server created the device without UBLK_F_USER_RECOVERY, then
-> > when the ublk server has crashed (and not restarted yet), I/Os issued by
-> > the application will immediately error (since in this case, ublk will
-> > call del_gendisk).  However, when the ublk server restarts, it cannot
-> > recover the existing ublk device - the disk has been deleted and the
-> > ublk device is in state UBLK_S_DEV_DEAD from which recovery is not
-> > permitted. So in this case, behavior 2 is not possible.
-> 
-> UBLK_F_USER_RECOVERY is supposed for supporting to recover device, and
-> if this flag isn't enabled, we don't support the feature simply, so
-> looks behavior 2 isn't one valid case, is it?
-
-Sure, so we're in agreement that recovery is impossible if
-UBLK_F_USER_RECOVERY is not set.
-
-So:
-- To get behavior A, UBLK_F_USER_RECOVERY must be unset
-- To get behavior 2, UBLK_F_USER_RECOVERY must be set
-
-Hence, having behavior A and behavior 2, at the same time, on the same
-device, would require UBLK_F_USER_RECOVERY to be both set and unset when
-that device is created. Obviously that's impossible.
-
+One less argument is passed, but common code of bio_integrity_process 
+got mostly duplicated into blk_integrity_generate/verify now.
