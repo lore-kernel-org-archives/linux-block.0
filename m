@@ -1,70 +1,53 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004821A00C4;
-	Thu, 27 Jun 2024 20:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D78414D6EB;
+	Thu, 27 Jun 2024 20:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719520999; cv=none; b=vBrMVGVjmVvjkqdFB/sD1sJ+F5AdobfLJ6IZJ9HOq4x+4AgYTqbcatR9YAw/snftQv4gVQDWrhTYorki2QKJTknapGgH9Ii+lVhOZslBDcqCB8fdHDEoGrRmx0NTqL9Jrtff7dEkwwtgvNRQabTRolGce/D6I9Y1FcXPisfzWXs=
+	t=1719521429; cv=none; b=NVA79cUI/QY8KhFGQkgKoghHkHkiSg0Q9grO3xc6TbmV7mb0ZqVoETLApfWbB4GLhZBZI1prvyWtmYuRM53DhoqHxRPflkps2pRwTJDLzV+ZoIzeHxyHQZ6ZFs7yWzp1zAodgNNIK595UP24JW8w4JOHqLIRW8/Si6sTpL4MRs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719520999; c=relaxed/simple;
-	bh=or3tXPxmZQcQXEMx7ZufWzIeCCGkxsi4d0TtOVYe8Bs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jap3itqppbXk6fFD7L9bn4VRboP8BL177Wwlpa+dQcnMO5pVJnkMKBypWDy0eImrNFWqhf9o63v4sAodjgxlJzyFxZQM9I4YhaHHFeoh9NR3I+pl/jHnr0rx+EfFnOPFejKZPUUusTdEOy0wSl81UbZe6adMl8Iygz1EduXUf8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QzclhgEZ; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QzclhgEZ"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70671ecd334so4410214b3a.0;
-        Thu, 27 Jun 2024 13:43:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719520997; x=1720125797; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AmbP74t1WdClNJFAyZoGdlFmmzMTPo/VGn5UfNyVcRo=;
-        b=QzclhgEZZz3/z3JLRkyh2YoB+D10uh0ubaF7k9+x2cMrahApRM4HA5jNlkHJoDb2l4
-         fs/L4GEtC0iEPYb4Boq6jajtLYTGP9H8i49kHSSPUAWRMPKq7rYWpPKE3pHUI2jkqHkZ
-         khtzBjM3Dg0irBM2JfSuoHF+WPRKF93aOl/WaMkODzKsdrSTyzsRvmE4KHJvrtc5ML9L
-         ZHJ3NV7mtqIG84ELq/4+MZzPD6Cdwubbpo35RZmLslE79v5HjRW2g9v/Azk2TDIFJgIZ
-         huth6q4vCQvOJyzhtPmkagJnjIzH64w3XDCDMob8z4ZMDXCcRHDsgImggvJOlSTNzuol
-         pyow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719520997; x=1720125797;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AmbP74t1WdClNJFAyZoGdlFmmzMTPo/VGn5UfNyVcRo=;
-        b=dxP65vKyXcIoi+85SKVysg8YVxBn4KhipSixvYQ4pUKvAHl8W7JPj/379oeXrRGF0L
-         3BHKj6TZEpAAfKC0Jf3mq1vzCIJMX0Tb6ZVSSUrd1XeXCWHvIfbw6Xh4WggGrsm3x22i
-         TJ5eUnzR4UZVBiK/E0ZcaKdUArI8XO3v38ngn9Jo+Tw1vr7t+WMKxAiXItywZxk8HTF4
-         9IvSAYvZgOyVJtf0J9+iznNVN0xTrTPIsUnxLMBOvDBGYItULUSZuIHRrtO+FI6NLsfC
-         8Mohu1n0xun41/gIpnM31MlQ0qMCmUDMsm9IQBl+6JoO6flIYmu3nOM8dNGdiLIu38oO
-         uTWw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6IEYgEXvSWVQgN+zr4DmvBkbelcaEs0GOmUp2zoEeWr5N+fBQHHDIlwwDlik1TWII1k933MpCqQVqnhCJRKzESZIS3Jz5Ajf4zomk34NHg3xIEeTtS1qs3Yos3/fsxWwiOsf49/O33mLLWNSgnuPxcOfb5TaT2HNchwXxM19iSBoI
-X-Gm-Message-State: AOJu0Yx6WN6L4q3lcVu1q9Kzk2eHmlC71wfmUJIHyMvxdlTtyHS+xq8+
-	wibuGQ+Xe5CrepUZJMGlOYDUfmn2CTMoK5XR1qdQwheSh2U+1bzH
-X-Google-Smtp-Source: AGHT+IH6pmQLEKw2AO2fCP76GxlrYGFKQ3AadXu/oeJoCw5rYN4A8ilD9PG6xUDHtvEcafM4U7QabQ==
-X-Received: by 2002:a05:6a20:3ca3:b0:1bd:6413:2cb1 with SMTP id adf61e73a8af0-1bd64133794mr7548128637.7.1719520997122;
-        Thu, 27 Jun 2024 13:43:17 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70802666489sm147281b3a.85.2024.06.27.13.43.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 13:43:16 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 27 Jun 2024 10:43:15 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: josef@toxicpanda.com, hch@lst.de, axboe@kernel.dk, mkoutny@suse.com,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yangerkun@huawei.com,
-	yukuai1@huaweicloud.com, houtao1@huawei.com, yi.zhang@huawei.com,
-	lilingfeng3@huawei.com
-Subject: Re: [PATCH v2] block: flush all throttled bios when deleting the
- cgroup
-Message-ID: <Zn3O47DUoLliwbWm@slm.duckdns.org>
-References: <20240627142606.3709394-1-lilingfeng@huaweicloud.com>
+	s=arc-20240116; t=1719521429; c=relaxed/simple;
+	bh=WPFaZBrlfCiwjGwhmit5XS3Xl7hiIoT4zjKTjRB2fNg=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b6/3AA0u8MJi/w6X3ry+J3Wv1a3yE33NyeAKRpkg6XTTIwrNuhpljw8hRsINNCUGm92y/hx4S9d6Y4JiHaBxNio4leDxGw39RhK37P+2S1xkN3ByF2i5X9gA8LF4vizK2k2J2K4bBKepTi8yRT38sSdlUcjQajGhh/PSWMMrHQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sMw4F-000000007kc-3jVp;
+	Thu, 27 Jun 2024 20:50:08 +0000
+Date: Thu, 27 Jun 2024 21:50:03 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+	Hauke Mehrtens <hauke@hauke-m.de>, Felix Fietkau <nbd@nbd.name>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+	Christian Brauner <brauner@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Heusel <christian@heusel.eu>,
+	Min Li <min15.li@samsung.com>, Avri Altman <avri.altman@wdc.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Mikko Rapeli <mikko.rapeli@linaro.org>, Yeqi Fu <asuk4.q@gmail.com>,
+	Victor Shih <victor.shih@genesyslogic.com.tw>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Li Zhijian <lizhijian@fujitsu.com>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH v4 1/4] dt-bindings: block: add basic bindings for block
+ devices
+Message-ID: <e47915bb8cc7af980a74bb3bef7a9691f92836e3.1719520771.git.daniel@makrotopia.org>
+References: <cover.1719520771.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,30 +56,131 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240627142606.3709394-1-lilingfeng@huaweicloud.com>
+In-Reply-To: <cover.1719520771.git.daniel@makrotopia.org>
 
-Hello, Li.
+Add bindings for block devices which are used to allow referencing
+nvmem bits on them.
 
-On Thu, Jun 27, 2024 at 10:26:06PM +0800, Li Lingfeng wrote:
-> From: Li Lingfeng <lilingfeng3@huawei.com>
-> 
-> When a process migrates to another cgroup and the original cgroup is deleted,
-> the restrictions of throttled bios cannot be removed. If the restrictions
-> are set too low, it will take a long time to complete these bios.
-> 
-> Refer to the process of deleting a disk to remove the restrictions and
-> issue bios when deleting the cgroup.
-> 
-> This makes difference on the behavior of throttled bios:
-> Before: the limit of the throttled bios can't be changed and the bios will
-> complete under this limit;
-> Now: the limit will be canceled and the throttled bios will be flushed
-> immediately.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ .../bindings/block/block-device.yaml          | 22 ++++++++
+ .../devicetree/bindings/block/partition.yaml  | 51 +++++++++++++++++++
+ .../devicetree/bindings/block/partitions.yaml | 20 ++++++++
+ 3 files changed, 93 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/block/block-device.yaml
+ create mode 100644 Documentation/devicetree/bindings/block/partition.yaml
+ create mode 100644 Documentation/devicetree/bindings/block/partitions.yaml
 
-I'm not necessarily against this but the description doesn't explain why
-this is better either. Can you please detail why this behavior is better?
-
-Thanks.
-
+diff --git a/Documentation/devicetree/bindings/block/block-device.yaml b/Documentation/devicetree/bindings/block/block-device.yaml
+new file mode 100644
+index 000000000000..c83ea525650b
+--- /dev/null
++++ b/Documentation/devicetree/bindings/block/block-device.yaml
+@@ -0,0 +1,22 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/block/block-device.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: block storage device
++
++description: |
++  This binding is generic and describes a block-oriented storage device.
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++properties:
++  partitions:
++    $ref: /schemas/block/partitions.yaml
++
++  nvmem-layout:
++    $ref: /schemas/nvmem/layouts/nvmem-layout.yaml#
++
++unevaluatedProperties: false
+diff --git a/Documentation/devicetree/bindings/block/partition.yaml b/Documentation/devicetree/bindings/block/partition.yaml
+new file mode 100644
+index 000000000000..86b61e30f9a4
+--- /dev/null
++++ b/Documentation/devicetree/bindings/block/partition.yaml
+@@ -0,0 +1,51 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/block/partition.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Partition on a block device
++
++description: |
++  This binding describes a partition on a block device.
++  Partitions may be matched by a combination of partition number, name,
++  and UUID.
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++properties:
++  $nodename:
++    pattern: '^block-partition-.+$'
++
++  partnum:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      Matches partition by number if present.
++
++  partname:
++    $ref: /schemas/types.yaml#/definitions/string
++    description:
++      Matches partition by PARTNAME if present.
++
++  partuuid:
++    $ref: /schemas/types.yaml#/definitions/string
++    description:
++      Matches partition by PARTUUID if present.
++
++  nvmem-layout:
++    $ref: /schemas/nvmem/layouts/nvmem-layout.yaml#
++    description:
++      This container may reference an NVMEM layout parser.
++
++anyOf:
++  - required:
++      - partnum
++
++  - required:
++      - partname
++
++  - required:
++      - partuuid
++
++unevaluatedProperties: false
+diff --git a/Documentation/devicetree/bindings/block/partitions.yaml b/Documentation/devicetree/bindings/block/partitions.yaml
+new file mode 100644
+index 000000000000..fd84c3ba8493
+--- /dev/null
++++ b/Documentation/devicetree/bindings/block/partitions.yaml
+@@ -0,0 +1,20 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/block/partitions.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Partitions on block devices
++
++description: |
++  This binding is generic and describes the content of the partitions container
++  node.
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++patternProperties:
++  "^block-partition-.+$":
++    $ref: partition.yaml
++
++unevaluatedProperties: false
 -- 
-tejun
+2.45.2
