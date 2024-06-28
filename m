@@ -1,54 +1,41 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D4E1514DD;
-	Fri, 28 Jun 2024 12:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4362E64A;
+	Fri, 28 Jun 2024 12:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719577448; cv=none; b=ls8i2lZe3GKoHACu4TcIUPoyFlxeF3u4Him+h6/7bl2xQb0WIqLpWSKOkkYRAh6q7UXwZhpPmkAGWOCL4yWl9z/d7P0ufxOZCGUdFUEJld1qhrilASseV/RU3l7d477b+rDz1U6wc2UK7a0nkxA4VSL0DLk1UGEn9rXH+nVYK6E=
+	t=1719577828; cv=none; b=t6p0vENkwA0QELIU6nipIhGA87S/Uvl6GC9YllHR6UeAv3YT3+TCtrEZxzjFX/R72ibZlJIl9mGQVIi/JmEYZYtswVgH+dpiMRXytFHcFTsFCmYn+T/qbQ0sBxElmyO0Y9KP73uFx1MQ1BQbHao764hRx2dvpVxIC89Mx4ItikU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719577448; c=relaxed/simple;
-	bh=d+r8oOYodumHjWb4/1A1r6mqSgsc+MjymPkD+3M1T4A=;
+	s=arc-20240116; t=1719577828; c=relaxed/simple;
+	bh=DEd6fYnQdW1eGRC/v3qIp4/j35TYIZwX4UyhWHLTJAk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A7adUUuBrfkdhWMqwEBPEKxNNP7p0oOVi8QkRRYKAagzghvqLwe3bcVtHMuX3zA+X0FGks9tOAy+28KSm2k9WTPv78oa3i3QRo1N+UDDAaxbc+ORki200J6fPg0MtT0YJJPnCANpAXTjgBTmBVnZpDj71VpPbfpG4nsoWlipv7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sNAdr-000000002r5-3X5l;
-	Fri, 28 Jun 2024 12:23:51 +0000
-Date: Fri, 28 Jun 2024 13:23:47 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
-	Hauke Mehrtens <hauke@hauke-m.de>, Felix Fietkau <nbd@nbd.name>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
-	Christian Brauner <brauner@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Li Lingfeng <lilingfeng3@huawei.com>,
-	Christian Heusel <christian@heusel.eu>,
-	Min Li <min15.li@samsung.com>, Avri Altman <avri.altman@wdc.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Mikko Rapeli <mikko.rapeli@linaro.org>, Yeqi Fu <asuk4.q@gmail.com>,
-	Victor Shih <victor.shih@genesyslogic.com.tw>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Li Zhijian <lizhijian@fujitsu.com>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v4 3/4] block: add support for notifications
-Message-ID: <Zn6rU-mCYQcyCkGT@makrotopia.org>
-References: <cover.1719520771.git.daniel@makrotopia.org>
- <4ebef78f07ff1ea4d553c481ffa9e130d65db772.1719520771.git.daniel@makrotopia.org>
- <Zn4_-alKtxuZ6zNt@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=putWwTQdEvstqZsgZfQtrSuqnv5gFfixuH4W5r6HI/ABjoULoFf6zkJFcWwV203A2Q3Pt32cnt4nbf4RBEM4eyTL/45UGJklSMYG/geekXNoCI9Bf1APg25SSwfT0jKnM8lBOHmaZpmgfUdCjY/rIOOlYoMHCbnmxV212kKJqLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id EF15468CFE; Fri, 28 Jun 2024 14:30:19 +0200 (CEST)
+Date: Fri, 28 Jun 2024 14:30:19 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Ming Lei <ming.lei@redhat.com>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Sathya Prakash <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	linux-block@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
+	linux-scsi@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com
+Subject: Re: get drivers out of setting queue flags
+Message-ID: <20240628123019.GA17080@lst.de>
+References: <20240627124926.512662-1-hch@lst.de> <e93e3171-3b30-4af1-80d8-acb9ff4900a2@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,60 +44,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zn4_-alKtxuZ6zNt@infradead.org>
+In-Reply-To: <e93e3171-3b30-4af1-80d8-acb9ff4900a2@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Jun 27, 2024 at 09:45:45PM -0700, Christoph Hellwig wrote:
-> On Thu, Jun 27, 2024 at 09:50:50PM +0100, Daniel Golle wrote:
-> > Add notifier block to notify other subsystems about the addition or
-> > removal of block devices.
-> 
-> Notification for what?  I really hate the concept of random modular
-> code being able to hook into device discovery / partition scanning.
-
-Adding a dedicated notification interface (instead of using block
-internals in the nvmem driver) has been requested in a previous review
-by Bart Van Assche:
-
-https://patchwork.kernel.org/comment/25771998/
-
-Quote from that previous review comment:
->>> Why to add this functionality to the block layer instead of somewhere
->>> in the drivers/ directory?
->> 
->> Simply because we need notifications about appearing and disappearing
->> block devices, or a way to iterate over all block devices in a system.
->> For both there isn't currently any other interface than using a
->> class_interface for that, and that requires access to &block_class
->> which is considered a block subsystem internal.
+On Fri, Jun 28, 2024 at 08:46:08AM +0100, John Garry wrote:
+> On 27/06/2024 13:49, Christoph Hellwig wrote:
+>> Hi all,
+>>
+>> now that driver features have been moved out of the queue flags,
+>> the abuses where drivers set random internal queue flags stand out
+>> even more.  This series fixes them up.
 >
-> That's an argument for adding an interface to the block layer that
-> implements this functionality but not for adding this code in the block
-> layer.
----
+> If no driver needs to know about these flags, could they now live in 
+> block/*.h ?
 
-So that's what I did consequently. Using the notification interface
-the NVMEM driver can live in drivers/nvmem/ and doesn't need to be
-using block internals.
+That is my ultimate plan, but currently they still are checked in
+a few places in drivers.  I'll need some more time to sort this
+out properly, but I hope that we'll get there.
 
-> And not actually having a user for it is a complete no-go.
-> 
-
-The user will be the nvmem provider, you can see the code in earlier
-versions of the patchset where I had included it:
-
-https://patchwork.kernel.org/project/linux-block/patch/96554d6b4d9fa72f936c2c476eb0b023cdd60a64.1717031992.git.daniel@makrotopia.org/
-
-Being another subsystem I thought it'd be better to deal with the
-block related things first, and once that has been sorted out I will
-move on to add the NVMEM driver and make the necessary changes for
-using it on eMMC.
-
-
-Thank you for taking a look at this. Let me know if anything else
-is not clear or needs to be changed.
-
-
-Cheers
-
-
-Daniel
