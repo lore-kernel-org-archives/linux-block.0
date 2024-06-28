@@ -1,93 +1,93 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74F92139A8;
-	Fri, 28 Jun 2024 10:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A0D1DFF7;
+	Fri, 28 Jun 2024 12:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719571734; cv=none; b=BPtQX0EGi+sk+atKlW7tJo/4QWIzrRannc6KUspjSrjMjwVF8sIIRpoO0o9NimN/rt9TGG/gdx2F/+MO17NUMidT/YAP2HaYBETR7Ndnj54guzWBuXjv22Imc6mtlmAIyWCshrPFKGTTL2lUlp6HU1qESlMt9SJnV8KgfqCac4k=
+	t=1719577024; cv=none; b=ng/pf89OhO9TaAGd1e+XKLtgUzBi5GQa3tWBaQ5CTC9Fwh09b/Kg58zVq+hX3Zr0uoeF54d7kLaSAMuLekAJ+smx6Moxgruy7FAS3Qs1uoPEf3tR4d3nmwCuo4xJqH+Mf3jwPKt8n++mHJulgKYR/F7Ku2NIQc8KaemtgnWY8YU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719571734; c=relaxed/simple;
-	bh=Op2EZDW7bEpEd1g89RuuVLQ70Z2yr1cScl8+vTX5zaA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=We+FvKzb1IwKTdSg1erpnup5DI72jGBOuPf5T8+WegY5w0OEUPxu6A8RsNEcO2wDdFYvGKND4oAbzUpN2LrJ5+KXUKFXTkKcrtd1Km5TAJJqpnphX18G6VkO0eRzBgX77ybzQ+5Q36jOpVI+iZO0fUd5b8TPpMb0rJpK0BwXxz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZgsZ7Fj9; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZgsZ7Fj9"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2c92d00059eso240200a91.3;
-        Fri, 28 Jun 2024 03:48:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719571732; x=1720176532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Op2EZDW7bEpEd1g89RuuVLQ70Z2yr1cScl8+vTX5zaA=;
-        b=ZgsZ7Fj9gYsfDzwWkJb/SBPKLP+USvaQUx1xqVOBa+OosiQxmBylVn62WfQua761OY
-         lwMAixVKCY+h+I3puc8KsAD5/n+VLBBDFWnCd71Ynxl+QV35vw1NS1k1DhDi5pOn+tBk
-         3c+lI3pkwBp6QWIzb05Y1zr4nZ3nml4Bs9FjtSqWMOLVeSrrOq6eDh6gk66TmnhMkMIA
-         J8rSw9Q5JA6/yBI8QMCm2KJVmkTLP15h88sLVa5u2OW3wkgehUVK5dC63PUxgHMea5DN
-         HEOns0LiMt/soFi9Hgrzlz7PwK01xYusbvkHFDpHlzFVFG2A0ds0jyHAnaL+qafWO/38
-         haGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719571732; x=1720176532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Op2EZDW7bEpEd1g89RuuVLQ70Z2yr1cScl8+vTX5zaA=;
-        b=VYDBhtBQ7w9vf+ytV2nsi9044JvL6HhbnqeAPs9qwQJDEeEIWX7kPhXVLsLjtMsCxu
-         Uk8t+FOhFDx1fD9T5ibrbS75ZUO4Jq7+3XFcKs8gyCSNsVUS9zg2bLS+b5sY+mXLQDoH
-         aNjBFJGP80CIFx+MOsMHylaMGdLS1J6Wn3YJra7QTEJNfAv9tomXN4PVM9QuY/U/rWyw
-         vFa5hfUkDxoxG26AKQoNHVvd9xJO1GwwlOVD9l/Qz+jFryQaEf2xx/SltYCx0rdFHWIU
-         dRDJUOiljWUAByCcTELS7TF4rz7Xu5lYC50SX5RgigKM1FNjzPgoXClexDMQvueTWLe7
-         bOkg==
-X-Forwarded-Encrypted: i=1; AJvYcCXcaDrlE5GWwybdp2igFgGY7VPwHHLScBctFVtzxsdJG31sv5cAOojeyxvLAy3Axs4jOo5oxrzvVQCKA2UYmzTd12HB5GmTAlU6v81efaAQxOPqkm7QNgB9m+eUxAJ5CIDmXTgPNJu8hKgzfQ==
-X-Gm-Message-State: AOJu0Yy/JfHWG7x7kbwSv6K83htpbiyjey/38bvgAVmvTD5ElgXZvQhn
-	8jj/WWuD1Yu8BlRbUguuQBpzmqL+srPZQTMyLlHZbVmZ896biy2ddRGMu12lVeHlBjyPJ0KyPwT
-	akbjC8cgzVz+p2etwKgGqef0scRI=
-X-Google-Smtp-Source: AGHT+IEnlPA3unm2hvL+8/Nw2bpDU3oCs8qNUA5UJKm6KDDlJWlJGO0dUH5ShuIfEibra/czyTvMZPQBQryLqwL1c4Y=
-X-Received: by 2002:a17:90a:ea95:b0:2c8:fc52:6a11 with SMTP id
- 98e67ed59e1d1-2c8fc526c13mr3612337a91.36.1719571731964; Fri, 28 Jun 2024
- 03:48:51 -0700 (PDT)
+	s=arc-20240116; t=1719577024; c=relaxed/simple;
+	bh=TFtNw1QJxkB2xWynZD+N88ma/reysTzvF3rsH+P5DIs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aDfCgGJg6Ht1ohNMVJl7mbtJGrUpZqOeoVzKxHLNLeCF0+d7lr8qfCm2su/vxma1BRzDJWLG/pm6iV61TntMNX+MsjShefnpqRo72XNKpASq/DzE4yRmr3tGy5MVI+opRI8xTf+KZ1XHiNRTuwbgJBv7dON3xwQiaEEK3farfZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sNAWa-000000002oo-2LIO;
+	Fri, 28 Jun 2024 12:16:20 +0000
+Date: Fri, 28 Jun 2024 13:16:13 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+	Hauke Mehrtens <hauke@hauke-m.de>, Felix Fietkau <nbd@nbd.name>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+	Christian Brauner <brauner@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Heusel <christian@heusel.eu>,
+	Min Li <min15.li@samsung.com>, Avri Altman <avri.altman@wdc.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Mikko Rapeli <mikko.rapeli@linaro.org>, Yeqi Fu <asuk4.q@gmail.com>,
+	Victor Shih <victor.shih@genesyslogic.com.tw>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Li Zhijian <lizhijian@fujitsu.com>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v4 2/4] block: partitions: populate fwnode
+Message-ID: <Zn6pje4DcAYEk6Kw@makrotopia.org>
+References: <cover.1719520771.git.daniel@makrotopia.org>
+ <6acc459a392d562abc58f7e55c6f04dba8073257.1719520771.git.daniel@makrotopia.org>
+ <Zn4_rMJVm6cpIEZV@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240628091152.2185241-1-nmi@metaspace.dk>
-In-Reply-To: <20240628091152.2185241-1-nmi@metaspace.dk>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 28 Jun 2024 12:48:39 +0200
-Message-ID: <CANiq72n--xSedbAmZD=LUD1AxM+aUbByVzMgXXgYQnP9JeQFdQ@mail.gmail.com>
-Subject: Re: [PATCH] rust: block: fix generated bindings after refactoring of features
-To: Andreas Hindborg <nmi@metaspace.dk>
-Cc: Jens Axboe <axboe@kernel.dk>, 
-	"linux-block @ vger . kernel . org" <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org, 
-	Andreas Hindborg <a.hindborg@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zn4_rMJVm6cpIEZV@infradead.org>
 
-On Fri, Jun 28, 2024 at 11:12=E2=80=AFAM Andreas Hindborg <nmi@metaspace.dk=
-> wrote:
->
-> From: Andreas Hindborg <a.hindborg@samsung.com>
->
-> Block device features and flags were refactored from `enum` to `#define`.
-> This broke Rust binding generation. This patch fixes the binding
-> generation.
->
-> Fixes: fcf865e357f8 ("block: convert features and flags to __bitwise type=
-s")
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+Hi Christoph,
 
-I saw this failure too in next-20240627, so:
+thank you for reviewing.
 
-Acked-by: Miguel Ojeda <ojeda@kernel.org>
+On Thu, Jun 27, 2024 at 09:44:28PM -0700, Christoph Hellwig wrote:
+> On Thu, Jun 27, 2024 at 09:50:39PM +0100, Daniel Golle wrote:
+> > +		/*
+> > +		 * In case 'uuid' is defined in the partitions firmware node require
+> > +		 * partition meta info being present and the specified uuid to match.
+> > +		 */
+> 
+> Overly long lines, which is really annyoing for block comments.
 
-Thanks!
+Should I use 80 chars as limit everywhere?
 
-Cheers,
-Miguel
+> 
+> > +		got_uuid = !fwnode_property_read_string(fw_part, "uuid", &uuid);
+> > +		if (got_uuid && (!bdev->bd_meta_info ||
+> > +				 !part_meta_match(uuid, bdev->bd_meta_info->uuid,
+> > +						  PARTITION_META_INFO_UUIDLTH)))
+> 
+> Can we please not use the crazy part_meta stuff for anything new?
+> We should never have merge it, and right now it is at least isolated
+> to the boot time root dev_t partsing, and I'd really prefer to keep it
+> in that corner.
+> 
+
+At least up to my understanding there isn't any other to know a
+partitions UUID or volume name.
+
+If there is another way to access this information I'd happily make
+use of it, but I couldn't find any.
