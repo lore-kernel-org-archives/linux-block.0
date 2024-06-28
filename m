@@ -1,102 +1,185 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094321E89A;
-	Fri, 28 Jun 2024 13:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878711E889;
+	Fri, 28 Jun 2024 14:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719582842; cv=none; b=SiSSM2AW41AVebeWh2YvMWwidBIZsZxc6BVuj8nsKQ5Q6PlOgVUCK+cdxVWJttNgzAqbFQBDMs+mBYJV34WAMfBmxAntzR/uM1+cyxBP9cxTHQ/lXwu138tHXUz5G44YARv5HCxjwjG1JSBvrkUyRv54uNqHXuySx+ps+/erFbE=
+	t=1719583242; cv=none; b=EOGFEVf3RGpXyouZNcZYZhYxjJCPYs2bpW+U1Bq1GQfGDBx7R3/XkNQpag46d+S6gBThpOGWwr+0NjtJyVWn/KW3MasU7DZyiQc5UAG+a6atZ275kyn6rYzpNT6crYE6DpYIB4UA9dvygmCZf3k6Vp4RAUQmCorUFlKW8nMea7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719582842; c=relaxed/simple;
-	bh=hlCxSbXY/zYRj0hehwmqLqtkVoKWHqJrAMGLXDfKaQI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ld9Z4s0GO+SUYwz5I0aGpEPSmYd2XyykrutfzKp/czI4zBSHphzMWvfhNIRxaihJE9x5paVs1FpmsTsqA7wb3+3DnVZWVeH4mW7tK7Zc7ovxsFQ3teufqyQktuAnrlOarlk4v07d4938Is8B5LwevFyouF1wcbpewPI0l+Es7TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=cPu8Yqjz; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="cPu8Yqjz"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4W9cNf08FXz6Cnv3Q;
-	Fri, 28 Jun 2024 13:53:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1719582824; x=1722174825; bh=VbKwt14gFQqPYlFlJyY3C86g
-	+aG7f2ya06N7n4GnsqM=; b=cPu8YqjzwECf6/Cvud2z6XgE7OuVVZpV4zNBFDKq
-	Qnz6dXkmXMG2hdXwgF0J3DCK5KFzyBzii2dwcGWleHWJ0WrScYadFKPOir+f0Aft
-	/nFDLgOsb+aUTixwvE92CC+CZi0xZcge2zzA/ZdpZorE/6XyzkqpmdRbSOiEXzIc
-	AIoi+BoRmjAPh7VWDnm7wd1TEmcZFp4uUjTW7gHOGaZ6dZHjoce+WokXQ0w2ipzx
-	If5KRynp2k6se3CDq+a3umpwSLVrJOttaF4yociv9RlGG09v7sScsKMkWi+zxTb6
-	eStAs+EBoGJELvA9i2svY+GIP9bm/QSbqgSdu3JoyhFI3Q==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id d1VM3CVtcbxI; Fri, 28 Jun 2024 13:53:44 +0000 (UTC)
-Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4W9cNJ4zk2z6Cnk9Y;
-	Fri, 28 Jun 2024 13:53:36 +0000 (UTC)
-Message-ID: <4c7f30af-9fbc-4f19-8f48-ad741aa557c4@acm.org>
-Date: Fri, 28 Jun 2024 06:53:32 -0700
+	s=arc-20240116; t=1719583242; c=relaxed/simple;
+	bh=gJSDCDl2ZLDs8dW8dJhpapFBbEIcKabxr5MXo+v0kGI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oa4SzKBfxxCyjPxSiji2nmVWpVv0opmYtUIraXk8ddaAdzV4aY4QVqZv95vAB7GC4pMLfmWCNbM9KMkqgyhlu2pc8bF6aRw/40I8m2nt613Y9NxZsV5k79C8hLhOObgYGHep41ip+t39qf+BHMS+L8MmU+ur/n23DSlr33KeyDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sNC94-000000003K2-3H22;
+	Fri, 28 Jun 2024 14:00:10 +0000
+Date: Fri, 28 Jun 2024 15:00:05 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+	Hauke Mehrtens <hauke@hauke-m.de>, Felix Fietkau <nbd@nbd.name>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+	Christian Brauner <brauner@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Heusel <christian@heusel.eu>,
+	Min Li <min15.li@samsung.com>, Avri Altman <avri.altman@wdc.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Mikko Rapeli <mikko.rapeli@linaro.org>, Yeqi Fu <asuk4.q@gmail.com>,
+	Victor Shih <victor.shih@genesyslogic.com.tw>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Li Zhijian <lizhijian@fujitsu.com>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v4 3/4] block: add support for notifications
+Message-ID: <Zn7B5adt82suLrRq@makrotopia.org>
+References: <cover.1719520771.git.daniel@makrotopia.org>
+ <4ebef78f07ff1ea4d553c481ffa9e130d65db772.1719520771.git.daniel@makrotopia.org>
+ <Zn4_-alKtxuZ6zNt@infradead.org>
+ <Zn6rU-mCYQcyCkGT@makrotopia.org>
+ <Zn6xjP8eH470wWXC@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 02/12] Add infrastructure for copy offload in block
- and request layer.
-To: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
-Cc: Nitesh Shetty <nj.shetty@samsung.com>, Jens Axboe <axboe@kernel.dk>,
- Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, martin.petersen@oracle.com, david@fromorbit.com,
- hare@suse.de, damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com,
- joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-References: <d7ae00c8-c038-4bed-937e-222251bc627a@acm.org>
- <20240604044042.GA29094@lst.de>
- <4ffad358-a3e6-4a88-9a40-b7e5d05aa53c@acm.org>
- <20240605082028.GC18688@lst.de>
- <CGME20240624105121epcas5p3a5a8c73bd5ef19c02e922e5829a4dff0@epcas5p3.samsung.com>
- <6679526f.170a0220.9ffd.aefaSMTPIN_ADDED_BROKEN@mx.google.com>
- <4ea90738-afd1-486c-a9a9-f7e2775298ff@acm.org>
- <de54c406-9270-4145-ab96-5fc3dd51765e@kernel.org>
- <b5d93f2c-29fc-4ee4-9936-0f134abc8063@acm.org>
- <05c7c08d-f512-4727-ae3c-aba6e8f2973f@kernel.org>
- <20240626052238.GC21996@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240626052238.GC21996@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zn6xjP8eH470wWXC@infradead.org>
 
-On 6/25/24 10:22 PM, Christoph Hellwig wrote:
-> It's not just dm.  You also need it in the partition remapping code
-> (mandatory), md (nice to have), etc.
+Hi Christoph,
+
+On Fri, Jun 28, 2024 at 05:50:20AM -0700, Christoph Hellwig wrote:
+> On Fri, Jun 28, 2024 at 01:23:47PM +0100, Daniel Golle wrote:
+> > So that's what I did consequently. Using the notification interface
+> > the NVMEM driver can live in drivers/nvmem/ and doesn't need to be
+> > using block internals.
+> > 
+> > > And not actually having a user for it is a complete no-go.
+> > > 
+> > 
+> > The user will be the nvmem provider, you can see the code in earlier
+> > versions of the patchset where I had included it:
+> > 
+> > https://patchwork.kernel.org/project/linux-block/patch/96554d6b4d9fa72f936c2c476eb0b023cdd60a64.1717031992.git.daniel@makrotopia.org/
+> > 
+> > Being another subsystem I thought it'd be better to deal with the
+> > block related things first, and once that has been sorted out I will
+> > move on to add the NVMEM driver and make the necessary changes for
+> > using it on eMMC.
 > 
-> And then we have the whole mess of what is in the payload for the I/O
-> stack vs what is in the payload for the on the wire protocol, which
-> will have different formatting and potentially also different sizes.
+> It is rather hard to review an interface without the users.
 
-Drivers like dm-linear rely on bio splitting. If the COPY_SRC and
-COPY_DST operations travel independently down a stacked block driver
-hierarchy, a separate data structure is needed to keep track of which
-operations have been split and to combine the split operations into
-requests. Isn't this an argument in favor of storing the source and
-destination parameters in a single bio?
+I understand that, please take a look at previous iterations of this very
+series or use the link to the patch which I have sent before (see above).
 
-Thanks,
+> 
+> I still dislike the idea of notifications from bdev discovery /
+> partition scanning into the users of them.  We have one such users
+> in the MD legacy autodetect code, but that has largely been considered
+> at bad idea and distros tend to use mdadm based assembly from initramfs
+> instead.  Which IMHO feels like the right thing for nvmem as well,
+> just have an nvmem provider that opens a file for a user provided
+> path and use kernel_read on it.  This can covered block devices,
+> character devices and even regular files.  It will require initramfs
+> support, but that is pretty much used everywhere for storage discovery
+> and setup anyway.
 
-Bart.
+The problem there is that then we cannot use Device Tree to device the
+NVMEM layouts, and reference NVMEM bits to the dirvers which need them.
+Hence also the definition of the NVMEM layout would have to happen in
+userspace, inside an initramfs. I know that having an initramfs is
+common for classic desktop or server distributions, but the same is not
+true on more simple embedded devices such as router/firewall or WiFi
+access point appliances running OpenWrt.
+
+Carrying all that board-specific knowledge in the form of scripts
+identifying the board is not exactly nice, nor is creating an individual
+initramfs for each of the 1000+ boards supported by OpenWrt, for
+example. Extracting the layout information from /sys/firmware/devicetree
+in userspace just to then somehow use libblkid to identify the block
+device and throw that information back at the kernel which requested it
+e.g. using a firmware hotplug call is an option, but imho an unnecessary
+complication. And obviously it would still prevent things like nfsroot
+(which requires the MAC address and potentially a WiFi calibration data
+to be setup) from working out of the box.
+
+Doing the detour via userspace only for devices with an eMMC would be
+different from how it is done for any other type of backing storage such
+as simple I2C EEPROMs, (SPI-)flashes or UBI volumes.
+Having a unified approach for all of them would make things much more
+convenient, as typically the actual layouts are even the same and can be
+reused accross devices of the same vendor. GL-iNet or ASUS router
+devices are a good example for that: The more high-end ones come with an
+eMMC and use the same NVMEM layout inside a GPT partition than mid-field
+devices on SPI-NAND or UBI, and older and/or lower-end devices on an
+SPI-NOR flash MTD partition.
+
+To better understand the situation, maybe look at a few examples for
+which we are currently already using this patchset downstream at
+OpenWrt:
+
+Inside a GPT partition on an eMMC:
+https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/mediatek/dts/mt7981b-unielec-u7981-01-emmc.dts;h=abd4d4e59d74cc0d24e8c9e10e16c0859844e003;hb=HEAD#l39
+
+On raw SPI-NAND (already possible with vanilla Linux):
+https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/mediatek/dts/mt7981b-unielec-u7981-01-nand.dts;h=230a612a34f7d370eb09e92284950d9949bf10cd;hb=HEAD#l45
+
+Inside a UBI volume (also already possible with vanilla Linux):
+https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/mediatek/dts/mt7986a-asus-tuf-ax4200.dts;h=e40602fa215e1a677b534c85b767e824af041518;hb=HEAD#l255
+
+Inside the boot hwpartition of the eMMC:
+https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/mediatek/dts/mt7981b-glinet-gl-mt2500.dts;h=15818a90fca02955879d1bcca55ba2153e390621;hb=HEAD#l156
+
+Inside a GPT partition on an eMMC:
+https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/mediatek/dts/mt7986a-glinet-gl-mt6000.dts;h=fd0e1a69157ed0f27c32376aabab0fcc85ce23b9;hb=HEAD#l317
+
+https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/mediatek/dts/mt7988a-smartrg-mt-stuart.dtsi;h=2b468f9bb311141d083e51ca5edaa7dce253c91c;hb=HEAD#l504
+
+Those are just the examples I have been working on myself, so it was
+easy to come up with them. There are also ASUS devices with Qualcomm
+SoC using the same layout as the MediaTek-based devices inside a UBI
+volume.
+
+Once a unified way to describe the loaction of the NVMEM bits is also
+present in upstream Linux, all those downstream device trees could be
+submitted for inclusion in Linux, and one could install a
+general-purpose OS like Debian **which wouldn't need to know anything
+about the details of where to read MAC addresses or calibration data
+from**, all hardware-specific knowledge would reside in DT.
+
+The failure of defining this in a nice way results in very ugly
+situations such as distributions carrying the (board-specific!)
+calibration data for very few but very common single-board computers
+like the RaspberryPi in their rootfs or even in initramfs. Each
+distribution with a different level of hacks to give them individual MAC
+addresses and to load the correct file... And while this doesn't look so
+bad for systems which anyway come only with removable microSD storage,
+it **does* get ugly when it comes to systems which do store that
+information on their eMMC (typically "appliances" rather than SBCs meant
+for tinkerers).
+
+Please take all that into consiration and also note that obviously, on
+systems not making use of any of that, you may simple not enable
+CONFIG_BLOCK_NOTIFIERS -- other than in previous iterations of the
+patchset this is all completely optional now.
+
+
+Cheers
+
+
+Daniel
