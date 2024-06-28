@@ -1,67 +1,70 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11107CF3E
-	for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 20:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F69D7BB0A
+	for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 20:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719606970; cv=none; b=s/w8kFPgv47ns19NrGHwj0RM05ckldEIXC6xvbetSLlToZv+Fugtujptbz+KTntGxM+/EVx04/qgxro7nEFHLdOnVhRalwSj9Y+8uYZMea8WOPkfn9wJu+FrVAL2BGM/lawXfMN/xRauJdUtvenskf9/4tvtcN87eJgw/TV+LGI=
+	t=1719606971; cv=none; b=o1ToQhcVY3ER8u7Q12iZwWyXeyT3bNTAeXrsWm5vDeXpxtCSd2srN43iwg52iRXUL/bNTeDeAvbrreuC3UmBOGeb4DW8IkrfjRHZbMyPHPeG4cZ9iWmYBYOuHBezqXTQ3mnSzR2OI1cCEytZW79PumEWgXqAbAtrYZ3jkOAygJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719606970; c=relaxed/simple;
-	bh=yrYs3zAVNq2kwCVGuRx1pSvpf151YbkI4EAnWLUAmvw=;
+	s=arc-20240116; t=1719606971; c=relaxed/simple;
+	bh=2K3dQB3zpbRSQ4zNsm2kr2egLTbsrKEaC+HcN9qfUYY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SvcJKkpqKW7a7MJFzU+mFE7+QhdVy0NxvIEGc25MbSszc4zGddJygXxgf1nw54FazMvhGHA2RmrfERH8lKnVdwxarvZ/UPl1YSP7JkW2v1ytL02BeWmZ7iUUU1p9r/HI9WigWQ1NR8Ofj4OmKhJIZAZcCN98qL3MQX/PviJs3qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=O5YfIGGo; arc=none smtp.client-ip=209.85.160.41
+	 MIME-Version:Content-Type; b=ljbP/xNkAHjywfE7YmRoSxIFq7tGv4f97a9vF3GSmwEkTGcNzBNrIBkRN+zaeW0X+zkXwkduLSbTIwuPMpZOWvoZB/I5Fhk3I9K3cxIoaiexiVrUM2whlbxvt3OFTW8kPyVNwU5s9GtQLWJiqGzYBTmYn1lfHYPYKYxqISLnfhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yNUB2Ncs; arc=none smtp.client-ip=209.85.161.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="O5YfIGGo"
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-25075f3f472so111653fac.2
-        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 13:36:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yNUB2Ncs"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5b3364995b4so85194eaf.0
+        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 13:36:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719606968; x=1720211768; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719606969; x=1720211769; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HXjPL4lzWlI7eeaad+faprpE9Kk5VhEtAm4oytxFR08=;
-        b=O5YfIGGoOxcS1H9S8k3UzhlwKY9VjUGLVXPsjyV+cX0Sl7P6Q7hEytSI3Uar0Drb9x
-         gCwCM8CJf4WXz+gxU9Af0Rbc31/Q07GIgszhEg1ywjN9Uy9xhqwIATdKfMIKMA+zGFwS
-         LWLSN6jHlyCdQc5lOmbJc3bXMmeChJxoGeRXwvVgz4E9/OxOS/cw50FRSZinkzSE9AJV
-         PxMIws9jtS0P/9FmLhu58q/BL3RCFPPUeMev15gsH73NBM4Y5PSqBwaohqS5n4Ac/E0r
-         xms4vy7YXqe2qLZxKg1wTUl3nLRRjoM2wRV2B4f1245nKsSerEpfEwRaqyN9x3nG4dpr
-         SNdQ==
+        bh=5l0qovf4jTVxYzo2d0+ddTKgfILRCCXgo0o1Ulo6Ekk=;
+        b=yNUB2NcsuUo9AAjBGJ30Z/C5gP4BG/PE2245Bc4XiMD1X4HPlihN/4UgsNhUezL4rW
+         QAbNjahKDm2mv+U64uMrNxRuIWrxFd68XF7rZR3KyKc8IT/thloY8VDYOqyYKynHDk95
+         KHR1ZEdtaluaq3qQ/zsHx5vpLOFXuQJudp8C/C81/TgJo10wh6o9AqZZaAlUU+Wyyc9w
+         VFjk5NlgHYFgdStBK5JfJpMJy8y8BnFAC6E3yNPik0aJNO0Ml6At3GgMVMJyZRUOXgCN
+         Fs5HRHMCQUmtlctRZq07LBsXe53/QrfjatQWDRYIuaVYRq1N6vPL7ujXBfhCUNkbHcti
+         9j4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719606968; x=1720211768;
+        d=1e100.net; s=20230601; t=1719606969; x=1720211769;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HXjPL4lzWlI7eeaad+faprpE9Kk5VhEtAm4oytxFR08=;
-        b=Aq5bgIde3ZFhUQB8k8POOWgbOx3O2D5jmRLX57fQ0G0mBR8fteXY6zVBXmGqsxygu/
-         /GtGenvn6lQxFHKvzwCt+2x8XsRtXZsM35NawH59lUVP7k+d4uizo5G2NkSJKteJ5yEI
-         GbcJvNbxLvIADkE2tk598X9xVcgRegJgJb3+wFEthWtE9e77LCqRgXyO8uDpGh56srZK
-         HczqAQDc/O/ZJkR8d5O5vt+1aBsy/HvsMEOrhUvm1yxl2hgUd053Ax5WWHfyrOk6awbX
-         uUqZPVmSyUfBAxSF1hf5VTjsKK2hXs/hRVYTkpcJvWOfEAsTGGuMPT3yh7qFgZHpR98+
-         4OIA==
-X-Gm-Message-State: AOJu0YyrvF+bf7je3q/p+fznu8xIccfaGOUy4mQ8ia/DmHEuf3qdzec7
-	xFifsyaoqNel3eaMS62qrxxh7BYq6W58b+9U9EMw+oEviisHGvoCA1vnr2qBWn4=
-X-Google-Smtp-Source: AGHT+IHjfrwNSbJ4RZgns/gNJ6BkxPazhuod6QRaKqFrsMPvegUYFHfIEbIG1j06uuW36wHeHnLcTg==
-X-Received: by 2002:a4a:dc90:0:b0:5c4:24e0:26cd with SMTP id 006d021491bc7-5c424e02941mr2735657eaf.1.1719606967865;
-        Fri, 28 Jun 2024 13:36:07 -0700 (PDT)
+        bh=5l0qovf4jTVxYzo2d0+ddTKgfILRCCXgo0o1Ulo6Ekk=;
+        b=EqJ1YLHtcJZuUgsX9nc4+2TjGtqkg9hhyD8faC5ECnJqv9PSui5AWBqwIiN9GRxWsY
+         GRjlNp8xc/VoDfWKH+aqhwe4t16Ft8Z7wOfdutm0e++QPmhZwKirEErmDTNi0kKEjCkC
+         1dhklhJ4zBh+44epISK06Z7AoLYlBQpm1Oh4yinYxr7jEt6JMAAa9KirnhKER+5vZOSN
+         TIuhfh3Wus5g6DsGhoeNNUjXC4ALitTEROY0oVTkVM8NcvPelMKa3+MyLzq3Xhtv/vvj
+         Ski/XsUG+OtV2IXciFhZurGqccMIUPVlRVxlYRcs6XaxHj5AP7JveY4fN1xbDTusWYCK
+         y3sw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHrs6TrZOkotlyihdo+djtPQdKO8XAUIhjM+TR0vu7ZWBs8D3F+i34NK7quvszM1kRa7BctSQiwg3KF6I0ELlm0sMqyr4gJztu1Bg=
+X-Gm-Message-State: AOJu0YwfTK56WcEckGBrM/13qGEXCEu8RGG5dcPkAhehL/7pxQ79uZUv
+	eKkgLWYRCSbtFo7MuN0MkN0UAc+qZm6VIW/eDZtXDKVmC0/eSoYOeNbkQDBZDamDzNkuq/EEPHh
+	fM0g=
+X-Google-Smtp-Source: AGHT+IH4WazrWMA1Jhl7+Mv0AnHm21EMJQcJF3b3HRLS4CUfPejixBcFUyOtlBC/ESyNwt5bq0+QDw==
+X-Received: by 2002:a4a:c186:0:b0:5c2:25cb:e6c6 with SMTP id 006d021491bc7-5c225cbe811mr7965464eaf.0.1719606969571;
+        Fri, 28 Jun 2024 13:36:09 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5c4149c37c4sm367003eaf.42.2024.06.28.13.36.06
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5c4149c37c4sm367003eaf.42.2024.06.28.13.36.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 13:36:07 -0700 (PDT)
+        Fri, 28 Jun 2024 13:36:08 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: "linux-block @ vger . kernel . org" <linux-block@vger.kernel.org>, 
- Andreas Hindborg <nmi@metaspace.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Miguel Ojeda <ojeda@kernel.org>, 
- rust-for-linux@vger.kernel.org, Andreas Hindborg <a.hindborg@samsung.com>
-In-Reply-To: <20240628091152.2185241-1-nmi@metaspace.dk>
-References: <20240628091152.2185241-1-nmi@metaspace.dk>
-Subject: Re: [PATCH] rust: block: fix generated bindings after refactoring
- of features
-Message-Id: <171960696681.897195.304829009055681051.b4-ty@kernel.dk>
-Date: Fri, 28 Jun 2024 14:36:06 -0600
+To: asml.silence@gmail.com, mpatocka@redhat.com, hch@lst.de, 
+ kbusch@kernel.org, martin.petersen@oracle.com, 
+ Anuj Gupta <anuj20.g@samsung.com>
+Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ linux-block@vger.kernel.org
+In-Reply-To: <20240626100700.3629-1-anuj20.g@samsung.com>
+References: <CGME20240626101415epcas5p3b06a963aa0b0196d6599fb86c90bc38c@epcas5p3.samsung.com>
+ <20240626100700.3629-1-anuj20.g@samsung.com>
+Subject: Re: (subset) [PATCH v2 00/10] Read/Write with meta/integrity
+Message-Id: <171960696798.897195.9522006867615686131.b4-ty@kernel.dk>
+Date: Fri, 28 Jun 2024 14:36:07 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,17 +76,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.0
 
 
-On Fri, 28 Jun 2024 11:11:52 +0200, Andreas Hindborg wrote:
-> Block device features and flags were refactored from `enum` to `#define`.
-> This broke Rust binding generation. This patch fixes the binding
-> generation.
+On Wed, 26 Jun 2024 15:36:50 +0530, Anuj Gupta wrote:
+> This adds a new io_uring interface to exchange meta along with read/write.
 > 
+> Interface:
+> Meta information is represented using a newly introduced 'struct io_uring_meta'.
+> Application sets up a SQE128 ring, and prepares io_uring_meta within unused
+> portion of SQE. Application populates 'struct io_uring_meta' fields as below:
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] rust: block: fix generated bindings after refactoring of features
-      commit: 5b026e34120766408e76ba19a0e33a9dc996f9f0
+[02/10] block: set bip_vcnt correctly
+        commit: 3991657ae7074c3c497bf095093178bed37ea1b4
 
 Best regards,
 -- 
