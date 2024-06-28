@@ -1,32 +1,45 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797A037143;
-	Fri, 28 Jun 2024 06:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE0B6F06D;
+	Fri, 28 Jun 2024 06:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719554689; cv=none; b=rtGpoCOQ6yul1qq3OUuds4T8yvzRqAJ5BBkTY4dq6DnohQfcjk04FK1AzLso3BnWqLTtLLq0JQLgW1sQh+M7/eH+J5Kwg5Rf4jgj929DadBGrYcMBWxd7b9KXZvmsMlcdUhh36AdW6L6Bj5GYt+iTl/Myi/kML46dkhChfnMGUM=
+	t=1719554733; cv=none; b=uJ1etkcI46JUKDfPxp0sdZbsTxzyt+12vCaAA8+lHuLisxT7jN4mI+ineb/elgPrsGpi5f1nr//osFJlDX0xHSZ3/QF89u9cWIRTIq5bvd7b9OWv/E8q4aKFgufj0vjbpXvAHbRyywKqeL00YC29QkhuH2gPMY5fWxwdK8QBDhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719554689; c=relaxed/simple;
-	bh=6ODeKOE4/e/Vo+oOIjM9vkmo5av3kJbjbJUl8hpcuIY=;
+	s=arc-20240116; t=1719554733; c=relaxed/simple;
+	bh=cYlytjrE/bKtc6RiMlg5OwDG5WbZdwx0IPiQq0LqYVA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nGAV9pDHEBl6k1nHcMR5n/rw8J7DYtuGqL3HIP3A0HBIMW5O+ZIlTnUoMWB/WAKJYEBqCKmXl3UvNy5aouuzfIlfFtaKBDkYTrRyV5/IM/HpnoTdXhcw3R0t+xpqlUZdq4oVfhAL0enI6q/M856fg3j8YmaIje+hBENeOiYRjRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 67D2D68D05; Fri, 28 Jun 2024 08:04:45 +0200 (CEST)
-Date: Fri, 28 Jun 2024 08:04:44 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Anuj Gupta <anuj20.g@samsung.com>, asml.silence@gmail.com,
-	mpatocka@redhat.com, axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-	martin.petersen@oracle.com, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v2 02/10] block: set bip_vcnt correctly
-Message-ID: <20240628060444.GA26351@lst.de>
-References: <20240626100700.3629-1-anuj20.g@samsung.com> <CGME20240626101513epcas5p10b3f8470148abb10ce3edfb90814cd94@epcas5p1.samsung.com> <20240626100700.3629-3-anuj20.g@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AnfpIQm/yqGdzcYcvDsi2TtfOBQIB8zd4v8+6zeyNzlhMzAPzBVass81kGzrDhxo5J4or2aoPIma3sndNQt/16w5Cn5WBAL3I57bANXpXEzCDF6n4n38Df/CPQvlqeELk4CZm585KKxqrrVqX0l9RUah3diqIoBj7fMmnsZ4kF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=emtMEFI1; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="emtMEFI1"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=V+OYYj8uq+pqoK/5F3d/Osi7mEas3i3Dbm15mfp2I+A=; b=emtMEFI1Qr78cOOrca2+ypoGyg
+	KVgWGdbkscOWXQAKvhuypw4hBW+gR/7BAG03/lJNaNP6l8IC6JGVy+gHnE4zWKUQMxgKbBo2M/kNY
+	ZWKqAh9XiPIPsaaW8ixWGrODDM7awRkw6/GcUI4TyYSCXX/LLkQOLaFy+EVT+uCvGIW4ebDc51/2B
+	pOanlmk0ZpQKvkofBk2jlkIkyFcEjK6wO9KhhTNnVUcTaQ7XpWcWhY7pOEle0JKcxOBkvEaKNVsnf
+	3XBH2BIMyFK3LwjqheiidB02lu9H+GGf9kHe5/zl2g6o+drydQeJo0Rf4Im3G8t1e9NtMhg8lQYUM
+	orRYf2BA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sN4ji-0000000Chag-3fH0;
+	Fri, 28 Jun 2024 06:05:30 +0000
+Date: Thu, 27 Jun 2024 23:05:30 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>, Ye Bin <yebin10@huawei.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH V2 1/1] block: check bio alignment in blk_mq_submit_bio
+Message-ID: <Zn5SqkFikVt14I6J@infradead.org>
+References: <20240620030631.3114026-1-ming.lei@redhat.com>
+ <ZnOucQM5ic6I3iE0@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,11 +48,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240626100700.3629-3-anuj20.g@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <ZnOucQM5ic6I3iE0@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Jens, can you pick this one up for 6.11?  We can't really trigger
-it as-is, but it would be good to get it out of the way and avoid
-someone else triggering the issue (e.g. Mikulas with his dm-integrity
-work).
+So make this a:
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+so that we can get it included and the ball rolling.
+
+On Wed, Jun 19, 2024 at 09:22:09PM -0700, Christoph Hellwig wrote:
+> Module the q argument mess I'll just fix up when I get to it this
+> looks fine.
+> 
+> 
+---end quoted text---
