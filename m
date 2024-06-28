@@ -1,115 +1,88 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCB11864C;
-	Fri, 28 Jun 2024 03:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D04520DC4;
+	Fri, 28 Jun 2024 04:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719545678; cv=none; b=aacTKMNL7Ceh6RhbX8IuwlAL5ALMhmeoaknE21j9XoeJ76aao4gBdu9V7ftXPBqvJqb8KPMD6KrfRRPjE58iT4VTMfZGLsm4gmEdZpgYQZ1lJtbGm99sTVLVPCVJl13ovv2SYXWHnsyNOirn5hvRRbm80PTDniG4EYKN9J0Dz80=
+	t=1719549922; cv=none; b=if1HGPNS6FX46RGSN7dxy7c0wjX610wVC24gh4ltCzjYufk4V9gPG5W8bt48tco0330EaUp13+VvOiWyBJUxfj49RhQYzH1CF5YPHdWhwOjfDMIF3K0LoQgG3DKFA9hfhnq9mNCRCvhsUw8YWXnlyJAJcAkJazR7sBsk608NLA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719545678; c=relaxed/simple;
-	bh=6/RKlUp2gvVHc6BtNL7Ra0pEQmPGmmm4ZXbXIocCvjI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=l4u9qtBqZFIVAYkGD2SYqhSV0XEu1bFoIenllbDcwfhcunvEg2bFrKxh7munH4ZhHrn6NSikRLJuTi+WHPGKdoewKTgmgA4DSKvJu1GzdQWk8Rm4ZxOVonyuQdTwbq/5/LWllafmXoAUHRQ52HSLu8WDmAVjNHlG6viL7LSHNuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W9Ldm6qk6z4f3kvv;
-	Fri, 28 Jun 2024 11:34:20 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 3388B1A058E;
-	Fri, 28 Jun 2024 11:34:33 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP2 (Coremail) with SMTP id Syh0CgCXAYdIL35mX7Q0Ag--.48902S3;
-	Fri, 28 Jun 2024 11:34:33 +0800 (CST)
-Subject: Re: [PATCH v2] blk-throttle: fix lower control under super low iops
- limit
-To: Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, josef@toxicpanda.com,
- axboe@kernel.dk
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240618062108.3680835-1-yukuai1@huaweicloud.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <19568a6b-66a8-bb93-7c8c-3b523972535a@huaweicloud.com>
-Date: Fri, 28 Jun 2024 11:34:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1719549922; c=relaxed/simple;
+	bh=OcpG87jtg7Dv0PAMKSGRgGXu/GawmMhztBU/EXz1nUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hFDl/M04vAzhBHulXnCaaKF58ei56Pk8XcaXdmWyAgrvmi0xAnXJs/hAGVnIDXODB65oIM1Fjt6F89joxsHZ88iIicpv4t3BaVHARtFU2LRaRPTg3PmIbJLhaN94UhifSdhd5p14TpolmCW49gTKz877Ka7XHmGvOTlY9fuAIIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=b4zHeiiW; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="b4zHeiiW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=AuGXcFp46j8hEZLTqyhcBDETCrdK2Us76EDIl8uIXno=; b=b4zHeiiWw24VTy2jJCaHz/9CRf
+	sVRawGO7UzIJzziRBzKLuzMs6c15UI/JDa0suxHGYeIKp61TlpBBHc/gztTmn1d3hKreND0o+eLld
+	U1NxC3hZ+pmbceurTA4QZZQUMwDDcaW6QuugY2yQH1uJmhnq1LZxGjPpCRd0p+aPsI1nxE0DarFRJ
+	3ghBiYVAXvLBUKNAVj1+fFIPHQppTmzX48Xlzjs2tO9KmxQINIciDTT+iLZnRP+nr/gBGHrhr7yzc
+	UVpllbjov36mEGswdYCYEv8Yfkd+g6zY9DDaarGXYn2wI/8bnfT2z3LI8Go2jlbIKAxgmXm4Q1vI+
+	lMfetGRQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sN3TI-0000000CYIG-257i;
+	Fri, 28 Jun 2024 04:44:28 +0000
+Date: Thu, 27 Jun 2024 21:44:28 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+	Hauke Mehrtens <hauke@hauke-m.de>, Felix Fietkau <nbd@nbd.name>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
+	Christian Brauner <brauner@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Heusel <christian@heusel.eu>,
+	Min Li <min15.li@samsung.com>, Avri Altman <avri.altman@wdc.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Mikko Rapeli <mikko.rapeli@linaro.org>, Yeqi Fu <asuk4.q@gmail.com>,
+	Victor Shih <victor.shih@genesyslogic.com.tw>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Li Zhijian <lizhijian@fujitsu.com>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v4 2/4] block: partitions: populate fwnode
+Message-ID: <Zn4_rMJVm6cpIEZV@infradead.org>
+References: <cover.1719520771.git.daniel@makrotopia.org>
+ <6acc459a392d562abc58f7e55c6f04dba8073257.1719520771.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240618062108.3680835-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgCXAYdIL35mX7Q0Ag--.48902S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1ftrW3Ar13ArWDJw45trb_yoW8XrWfpF
-	W3Kw4UCFsFqFn7KF43G3WayFy8C3y8Zr98J3s8Xr1ayr13CF1DKrn3CF4Yyw4IvFsa9FW0
-	gr1ktas7Ar1UuaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWU
-	JwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUouWlDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6acc459a392d562abc58f7e55c6f04dba8073257.1719520771.git.daniel@makrotopia.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi,
+On Thu, Jun 27, 2024 at 09:50:39PM +0100, Daniel Golle wrote:
+> +		/*
+> +		 * In case 'uuid' is defined in the partitions firmware node require
+> +		 * partition meta info being present and the specified uuid to match.
+> +		 */
 
-ÔÚ 2024/06/18 14:21, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> User will configure allowed iops limit in 1s, and calculate_io_allowed()
-> will calculate allowed iops in the slice by:
-> 
-> limit * HZ / throtl_slice
-> 
-> However, if limit is quite low, the result can be 0, then
-> allowed IO in the slice is 0, this will cause missing dispatch and
-> control will be lower than limit.
-> 
-> For example, set iops_limit to 5 with HD disk, and test will found that
-> iops will be 3.
-> 
-> This is usually not a big deal, because user will unlikely to configure
-> such low iops limit, however, this is still a problem in the extreme
-> scene.
-> 
-> Fix the problem by making sure the wait time calculated by
-> tg_within_iops_limit() should allow at least one IO to be dispatched.
+Overly long lines, which is really annyoing for block comments.
 
-Friendly ping ...
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
-> Changes in v2:
->   - instead of extend thorlt_slice, extend wait time;
->   block/blk-throttle.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index c1bf73f8c75d..dc6140fa3de0 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -704,6 +704,9 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
->   
->   	/* Calc approx time to dispatch */
->   	jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
-> +
-> +	/* make sure at least one io can be dispatched after waiting */
-> +	jiffy_wait = max(jiffy_wait, HZ / iops_limit + 1);
->   	return jiffy_wait;
->   }
->   
-> 
+> +		got_uuid = !fwnode_property_read_string(fw_part, "uuid", &uuid);
+> +		if (got_uuid && (!bdev->bd_meta_info ||
+> +				 !part_meta_match(uuid, bdev->bd_meta_info->uuid,
+> +						  PARTITION_META_INFO_UUIDLTH)))
+
+Can we please not use the crazy part_meta stuff for anything new?
+We should never have merge it, and right now it is at least isolated
+to the boot time root dev_t partsing, and I'd really prefer to keep it
+in that corner.
 
