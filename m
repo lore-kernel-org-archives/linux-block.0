@@ -1,63 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC00D1CE098
-	for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 17:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751F11C9ED6;
+	Fri, 28 Jun 2024 17:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719594073; cv=none; b=re4Ex13KO83c3fRg66TDwp+RziPSPIklWOQ41G4NqKD5ZpKg0NBD9FHqg0ZmT0MHIDPsxx3G1BHRZE2Pd6S6AQjAZZK/wWxBcNdF/qvRd/cHqgADd56tzRqVMl6RdNBg0sguzZ20/bp79yFFLRS+UnS+aR1V4z8mvLZbtYPNUHI=
+	t=1719595014; cv=none; b=oxeZDyhZmODdrsIXorWlCSe0oGGcz/xVpgdoEIeAwyzd7PILlLOuOeNuGIOgRFaDDiGsmmk6qPwupBRgG1yHsIoI4ugad2kqHpM5fsQDB7d45GRoKhkO1L+2RCmKJJJZIxbvE/jzN6muawSJMifcFEmqVFwuvaOptyEwaIY0OtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719594073; c=relaxed/simple;
-	bh=+oElqHtaPsO7VefS8Guz9e7i4ftTfesV6q86fjVp0S8=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=AiSjGPOzLP3p6P4DzYwwIXBx4lRO+ibMirI1DBr24FZ+5LIcA7Eh20DEUOeu1CdHoRFwX85Y+RNyt3wI7Vs5lcG+nsu3D7SxvLCYqnP3NDr3+bKd3gxN0TaGgQXOeHBWkixjiyeXkHMPhyQEbXFfwJtkoLzqjE4ueE2MmSbRpnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ExZes9aE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719595014; c=relaxed/simple;
+	bh=PnSNJFMxI0eBUk/rmHNR9tDCSYkUAzwxlRBmBPkvKS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bqhAy5CLXsWk1ZYDRrPvhl8AaW6Jh3NszyVwVLH6qyzF0aYUwkf/mvqq0mk8ix5ouZQTn1gwV8JnTQZGL1HNuKc5XDF+Vv8g2ZNMqTDZDvMesLqG83QA1afIWyUfNVVI6K3Yb/nnC5IFE/wGOGn4S6UXBZ4ILKYXcSZdqv1Arig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HY433JNO; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ExZes9aE"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CDD0DC2BD10;
-	Fri, 28 Jun 2024 17:01:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719594072;
-	bh=+oElqHtaPsO7VefS8Guz9e7i4ftTfesV6q86fjVp0S8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=ExZes9aE9UttzJLG26vuwxsl/AFAT5AXB+vbKVzJmRp5EEAGmdi1zmjXaWY1sZnhM
-	 uDz54Zfy/ciA62QaR+SGYXhT5qcZ4I6mC69RxCEnvgx8jBwb1J3pcBjBZPl40kUutO
-	 kasUHlSASfHDXTYtm+2qDfDwmBa0MS9lKpZfdTIRfSSOJSNRl7ra2kMVLh4aod+0Vj
-	 viIlSglQM4aQFqkmzA+Y5ylAjLx0LqnOAppEnu+jYyd9Yd/LZw/2/IoKB1bO3vjo3s
-	 hc4zAEmkHwYCIfgMpasYAA452CYsOt/khoiiCuH1gk2o7K/Yjy/FRPX3lQQARgF2kX
-	 TI8YfhORmBiNA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C35F9C433A2;
-	Fri, 28 Jun 2024 17:01:12 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.10-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <57af218d-4c23-41b2-bc1a-401eaf393888@kernel.dk>
-References: <57af218d-4c23-41b2-bc1a-401eaf393888@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <57af218d-4c23-41b2-bc1a-401eaf393888@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.10-20240628
-X-PR-Tracked-Commit-Id: cab598bcef0971f11679b048cc9f502cc8143c88
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cd17613f464e15ad0ca83de7ca79ba72e4e72f75
-Message-Id: <171959407279.14402.2314861456774730134.pr-tracker-bot@kernel.org>
-Date: Fri, 28 Jun 2024 17:01:12 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HY433JNO"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fa2ea1c443so6505075ad.0;
+        Fri, 28 Jun 2024 10:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719595013; x=1720199813; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8QkcssybePnrl4JAQOb0kLe4ztyV51oH74DZAkItL50=;
+        b=HY433JNOpC0xdqoIdU1vV2zurUuq1TBwP89/+lJ4UF8y9tVxBjbC0KutozzI7qjUN2
+         dhGHkEHUcKUy6FlBKzQeFlXfHmPI9JgCQbl4+LiJjiKuhIdiCQoTDyEBj6CWzP+lz3ug
+         W2txzwkUwg5xAXud9mAX4fZpkEmmWg55pZLF/BEAMmbDBLYGEZpt92xHBD1XzWLctgRt
+         nhiptrvaohXuVv8NDOgkwJlEOk5amnroKWtavZHBZ7N0Syp3G/y61nECI9R/cZjxGVak
+         ixdr0ksN9bxBgf4ux0mST91YmcO+iveyPfHq2qt1qZ4R8K1g/MvbYBSYeidGcQTz3XE2
+         LZFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719595013; x=1720199813;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8QkcssybePnrl4JAQOb0kLe4ztyV51oH74DZAkItL50=;
+        b=fKuZyeHtz9KUOTC11Yn5W63uf9biFIefADMyFpShqdAlvoJb0b23F0GSos0wgAzd2N
+         /6h8RE+ZWU0ewm6QJRfs6+owB6nTFkHy5NPk6ssqZimPTWO7gMayyVHWyl5P8rgDvtcS
+         wqUABcLaD7NRTd10sGxPTZ0s0twlAVerL9yoQNs4Qg+onJs+vDzReSiIx6kNOSXbmXkj
+         KSaUwuUs1H+G3aZ/dK566b7PWNokaajHWVJDJo6x1AGLr9c7NYNixfzNNnWB+sS08NtS
+         yFeCf01PEoGwpT9YyCgOamMc6qzuQmvGmIzUauIwUDE25bEXunS6GSWyhZOQ3QHakFBH
+         aijw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQjnP6s11bXajCB5BE12peIt9zj/hiCQhOA6Rh9d2fccCn0ky0raOuOpj8IMcG5ed3UFpkz1k8YITGmfuHsGM5lBRLBEMu1+vmMRXoMnNw8I08ZE9kMZoevKkMjQBBDuI2YBvopM3/VcFkpMoDebebhVnoiac+5eXSR3UcDnC6uX/t
+X-Gm-Message-State: AOJu0Yw2pS1qgqqgivC13z9V+VW+yEUiw4lmbDupdr5Dvef8xvc78j6D
+	6za5VAx7UZNEM7hbWvkUjBzUijizmAU9/YsGB0hu0hovNzT2eU2T
+X-Google-Smtp-Source: AGHT+IE1nAigDirdGXsv0n03CgMxZClyloPe7+W9S5Gw9RkG4ZBwvHR4DVubB1qcbpLe8IHnzVRj/Q==
+X-Received: by 2002:a17:902:e810:b0:1f9:b974:cbd6 with SMTP id d9443c01a7336-1fa238e4711mr183634555ad.1.1719595012620;
+        Fri, 28 Jun 2024 10:16:52 -0700 (PDT)
+Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10c8af8sm17896355ad.34.2024.06.28.10.16.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 10:16:52 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 28 Jun 2024 07:16:51 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH v2] blk-throttle: fix lower control under super low iops
+ limit
+Message-ID: <Zn7wA-C9LcjOmFe_@slm.duckdns.org>
+References: <20240618062108.3680835-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618062108.3680835-1-yukuai1@huaweicloud.com>
 
-The pull request you sent on Fri, 28 Jun 2024 09:08:48 -0600:
+Sorry about the delay.
 
-> git://git.kernel.dk/linux.git tags/block-6.10-20240628
+On Tue, Jun 18, 2024 at 02:21:08PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> User will configure allowed iops limit in 1s, and calculate_io_allowed()
+> will calculate allowed iops in the slice by:
+> 
+> limit * HZ / throtl_slice
+> 
+> However, if limit is quite low, the result can be 0, then
+> allowed IO in the slice is 0, this will cause missing dispatch and
+> control will be lower than limit.
+> 
+> For example, set iops_limit to 5 with HD disk, and test will found that
+> iops will be 3.
+> 
+> This is usually not a big deal, because user will unlikely to configure
+> such low iops limit, however, this is still a problem in the extreme
+> scene.
+> 
+> Fix the problem by making sure the wait time calculated by
+> tg_within_iops_limit() should allow at least one IO to be dispatched.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cd17613f464e15ad0ca83de7ca79ba72e4e72f75
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Thank you!
+Thanks.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+tejun
