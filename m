@@ -1,126 +1,102 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EAC1EB40
-	for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 22:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6219B23A8;
+	Fri, 28 Jun 2024 02:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719526530; cv=none; b=k75bZ95NOz5kyYgu2FLUgxkDZSNFtb+RJ0Y94UaxPwSlNZXP4Ht1P5kRg5UA/m+St77Efdj1dxlgsdFvdgagktvzvgmeu7/N+LJbw5DVCQZ7QOInuF6JWt2+DZ5TGm/M7YyEdU8k/UkEsCwN34NZrrfUuxpOUz7DJ3V0J1+NsNA=
+	t=1719540267; cv=none; b=DWtQ5XDRaaI9uW5cwcOiVEk1zkx2ocM92PZvKrtdYBwFK+5z84STkqgoZ3oKsP/wzMcRZz2FlxaA/qh61mVUkKi4MQufOdzyVxcVNLF8ebZvqcnFzRWALh/KgfYsWz5m9DqwXXMmRGueCD4jF8k8lyrc1CxYyN8vVw5YW3WT0L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719526530; c=relaxed/simple;
-	bh=4H4YR0/K52vVw0BEDoTImD+JL5bNhzc9m0ae+WYCdSo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=uqAxktjwbIlBKa17GhsORy0V2clfNTLb4r33MSeGYzL3bBQZ50CGOw+NB5qx/YxMd1OTVhyszVXg15C/mDNMeZwVGPdRh4+WJGfqGkJoq9GQq49+dCLsslmkATynbZ4zGSGMTNgukv6T0bmaNyRNjFUk1bEV2jGmJNolI4KRxl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=diOMoWRu; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="diOMoWRu"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3764dd53b5aso2697315ab.2
-        for <linux-block@vger.kernel.org>; Thu, 27 Jun 2024 15:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719526528; x=1720131328; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=X+U5P6sQtlqvHqVMqUmWBld5jM5RmHwrjJ1USH3XW9c=;
-        b=diOMoWRux+Z5jH1wwm0MXZNVX/tmVkhOl7guHntKH7lzqUXRoNbmp33hz58EBXqMbs
-         BuHixE2ObB+tc1UTBuO5VPVJ828uXPiC0xFEMKMvTETYAusX9d6Tk8eWdFPC53ecqegs
-         DRvdCi2AL9QLL54d9lYhLlBZtuBfTfhsJXJzNjTYDyP0wR7/WGdn5dL2FfwuhCB+2ZBh
-         J+3zm8JGsE1GXIHfBa1rznBytn/QlhZooK/d5nQb1DMP2C7B+/bg3rje7mBgoVmdb9fe
-         AjoQDq6YXbRvYYV8497A9K4CcK1qx1+SHFD32qP/bOMfGBxTeY6HvG91ZNR5e86e/yNR
-         c6Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719526528; x=1720131328;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X+U5P6sQtlqvHqVMqUmWBld5jM5RmHwrjJ1USH3XW9c=;
-        b=hnlL1cLFU3t21TInq2zLC0kaS/pGx4FziyO5xea86ICcpOXjePxnjOhLphuW8pGBrM
-         zI6Lv2DWLIHEFtFT1xjI2/VFIPWE+3eSZMMREDopROGwqxK0iV9cJGIS/zVXeoFptHn0
-         Zg5toaaLNd8FCZpMKsL/jzD2RsfEKHYscoQsRvu0s5DVC7XGqcfie6bwU/nkLpooW4IE
-         Gdo3wRbtJzzb1hhAkG6t4uMP02UMBE0DYjAqhRlz2rT3KiIQiS05j9/eZHODVyWTJU1j
-         hsERYrHieMLYvnxmGle/H/5YfNiMY122yswj5tqmsFRnHYvW8nlBsFoTj/TxpOCEgUnm
-         ae4w==
-X-Forwarded-Encrypted: i=1; AJvYcCVFyuKJEs9fWHHLgaY0Wtpjf4b5E2Owow71ppj4Xu7JYVwNYupOsxzguRjBqWYz9CJHzO+YHf6qlClFfM7YgU+jdCYggFGYN45M2hI=
-X-Gm-Message-State: AOJu0Yy8bU+ATZ/AB7nlTP5cVdGt+b6H56uBzc3EGIiwfWdNX1HlcNvE
-	iNtH9CDaiupjsBhuOg5sfOJXkwRncrGgFVR+m5/PpHAtVxino0qYulrPTaLtlj8=
-X-Google-Smtp-Source: AGHT+IE+c3oTCSG4DXvfFxRH7ZmI2eqlsqlemsaW1irAg97d62AxsEpde/+Ps9QA1t3PJ2h5vj0L4Q==
-X-Received: by 2002:a6b:4f0b:0:b0:7f3:cd61:32f5 with SMTP id ca18e2360f4ac-7f3cd613354mr658652339f.2.1719526528386;
-        Thu, 27 Jun 2024 15:15:28 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70801e54936sm222787b3a.35.2024.06.27.15.15.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jun 2024 15:15:27 -0700 (PDT)
-Message-ID: <5ac45dc2-f434-4ec3-9f9a-dab6bb029deb@kernel.dk>
-Date: Thu, 27 Jun 2024 16:15:25 -0600
+	s=arc-20240116; t=1719540267; c=relaxed/simple;
+	bh=ofbM0xcK0jusdVrO6osOKxJNrsO1OiueOBSmdDE4d5A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CP3LDbAgoIciNKe/UCpyn4eHGm4LQLUhhcDgYw0dWZo/zsAsMXl5RCna8q2HlvgYXOMV/knG1zC5T238gscG+O2PYfZN56KjjZtXe2lBQYybyECVlcJB2F5QQFozvXHzhwql2Y3VOe/51U8tMueWR2cow8MB/mmkzyINhA4vjsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W9Jdp6S6Fz4f3jtc;
+	Fri, 28 Jun 2024 10:04:14 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 1095F1A016E;
+	Fri, 28 Jun 2024 10:04:22 +0800 (CST)
+Received: from [10.174.179.155] (unknown [10.174.179.155])
+	by APP2 (Coremail) with SMTP id Syh0CgBn0YYkGn5meawuAg--.45870S3;
+	Fri, 28 Jun 2024 10:04:21 +0800 (CST)
+Message-ID: <c9802312-d9c9-f262-e1d3-9d3343255b6b@huaweicloud.com>
+Date: Fri, 28 Jun 2024 10:04:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/4] block: preparations for NVMEM provider
-To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Hauke Mehrtens <hauke@hauke-m.de>, Felix Fietkau <nbd@nbd.name>,
- Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
- Dave Chinner <dchinner@redhat.com>, Jan Kara <jack@suse.cz>,
- Christian Brauner <brauner@kernel.org>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
- Al Viro <viro@zeniv.linux.org.uk>, Li Lingfeng <lilingfeng3@huawei.com>,
- Christian Heusel <christian@heusel.eu>, Min Li <min15.li@samsung.com>,
- Avri Altman <avri.altman@wdc.com>, Adrian Hunter <adrian.hunter@intel.com>,
- Hannes Reinecke <hare@suse.de>, Mikko Rapeli <mikko.rapeli@linaro.org>,
- Yeqi Fu <asuk4.q@gmail.com>, Victor Shih <victor.shih@genesyslogic.com.tw>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Li Zhijian <lizhijian@fujitsu.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <cover.1719520771.git.daniel@makrotopia.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <cover.1719520771.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
+ Thunderbird/104.0
+Subject: Re: [PATCH v2] block: flush all throttled bios when deleting the
+ cgroup
+To: Tejun Heo <tj@kernel.org>
+Cc: josef@toxicpanda.com, hch@lst.de, axboe@kernel.dk, mkoutny@suse.com,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yangerkun@huawei.com, yukuai1@huaweicloud.com,
+ houtao1@huawei.com, yi.zhang@huawei.com, lilingfeng3@huawei.com
+References: <20240627142606.3709394-1-lilingfeng@huaweicloud.com>
+ <Zn3O47DUoLliwbWm@slm.duckdns.org>
+From: Li Lingfeng <lilingfeng@huaweicloud.com>
+In-Reply-To: <Zn3O47DUoLliwbWm@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgBn0YYkGn5meawuAg--.45870S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7try3Cw45XrWkur1fCw18AFb_yoW8JFy7pF
+	WfZ347KryDJr9I9F4rZr4SvrWrZrZ7Jr45Ar93K345JrW3Wr1xtFy3trWFqFy7ZF93C3Wa
+	vr1Fyr9rAF4DCFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UWE__UUUUU=
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-On 6/27/24 2:49 PM, Daniel Golle wrote:
-> On embedded devices using an eMMC it is common that one or more (hw/sw)
-> partitions on the eMMC are used to store MAC addresses and Wi-Fi
-> calibration EEPROM data.
-> 
-> Typically the NVMEM framework is used to have kernel drivers read and
-> use binary data from EEPROMs, efuses, flash memory (MTD), ...
-> 
-> Using references to NVMEM bits in Device Tree allows the kernel to
-> access and apply e.g. the Ethernet MAC address, which can be a requirement
-> for userland to come up (e.g. for nfsroot).
-> 
-> The goal of this series is to prepare the block subsystem to allow for
-> the implementation of an NVMEM provider similar to other types of
-> non-volatile storage, so the same approach already used for EEPROMs, MTD
-> (raw flashes) and UBI-managed NAND can also be used for devices storing
-> those bits on an eMMC.
-> 
-> Define a device tree schema for block devices and partitions on them,
-> which (similar to how it now works also for UBI volumes) can be matched
-> by one or more properties.
-> 
-> Also add a simple notification API for other subsystems to be notified
-> about additions and removals of block devices, which is going to be used
-> by the block-backed NVMEM provider.
-> 
-> Overall, this enables uniform handling across practially all flash
-> storage types used for this purpose (MTD, UBI, and soon also MMC or and
-> in future maybe also other block devices).
 
-2-4 look fine to me now, but I don't know anything about the device
-bindings so someone qualified should review that before it gets queued
-up.
- 
--- 
-Jens Axboe
+在 2024/6/28 4:43, Tejun Heo 写道:
+> Hello, Li.
+>
+> On Thu, Jun 27, 2024 at 10:26:06PM +0800, Li Lingfeng wrote:
+>> From: Li Lingfeng <lilingfeng3@huawei.com>
+>>
+>> When a process migrates to another cgroup and the original cgroup is deleted,
+>> the restrictions of throttled bios cannot be removed. If the restrictions
+>> are set too low, it will take a long time to complete these bios.
+>>
+>> Refer to the process of deleting a disk to remove the restrictions and
+>> issue bios when deleting the cgroup.
+>>
+>> This makes difference on the behavior of throttled bios:
+>> Before: the limit of the throttled bios can't be changed and the bios will
+>> complete under this limit;
+>> Now: the limit will be canceled and the throttled bios will be flushed
+>> immediately.
+> I'm not necessarily against this but the description doesn't explain why
+> this is better either. Can you please detail why this behavior is better?
+I think it may be more appropriate to remove the limit of bios after the
+cgroup is deleted, rather than let the bios continue to be throttled by a
+non-existent cgroup.
+
+If the limit is set too low, and the original cgourp has been deleted, we
+now have no way to make the bios complete immediately, but to wait for the
+bios to slowly complete under the limit.
+
+Thanks.
+
+>
+> Thanks.
+>
 
