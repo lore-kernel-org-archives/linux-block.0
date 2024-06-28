@@ -1,65 +1,154 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE0B6F06D;
-	Fri, 28 Jun 2024 06:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684E43398B;
+	Fri, 28 Jun 2024 06:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719554733; cv=none; b=uJ1etkcI46JUKDfPxp0sdZbsTxzyt+12vCaAA8+lHuLisxT7jN4mI+ineb/elgPrsGpi5f1nr//osFJlDX0xHSZ3/QF89u9cWIRTIq5bvd7b9OWv/E8q4aKFgufj0vjbpXvAHbRyywKqeL00YC29QkhuH2gPMY5fWxwdK8QBDhI=
+	t=1719555842; cv=none; b=XzaTzXnWBoVpr9UprK9eAxznV/jcLbDWNfRlNlMCJqv3rnjQqUrnoihYYExSoMd0qarhJ8B+Xa78pobprc4h/VjIY2D9bx7zdBdzk2PSuTjy2O5MJzbfxKFwMoTqqGULPXarojyu7JL2fkjSOsAfXmc27PSykUTIbGq3CHtNU50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719554733; c=relaxed/simple;
-	bh=cYlytjrE/bKtc6RiMlg5OwDG5WbZdwx0IPiQq0LqYVA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AnfpIQm/yqGdzcYcvDsi2TtfOBQIB8zd4v8+6zeyNzlhMzAPzBVass81kGzrDhxo5J4or2aoPIma3sndNQt/16w5Cn5WBAL3I57bANXpXEzCDF6n4n38Df/CPQvlqeELk4CZm585KKxqrrVqX0l9RUah3diqIoBj7fMmnsZ4kF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=emtMEFI1; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1719555842; c=relaxed/simple;
+	bh=B7xR2DpQaDDiqf1vLloyVprc+qQgznT9DfoPUl/Vllg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EuZK6z/J8TOhCO454Yy50tPeaATJpFiyrbnAl6GX90KjnO3DFyB5rjeMT9hiy3IdaVzS4iG1ZGj2EGgCmw6s3ZI02mlCI+NmIydx07VL/lvPcYeKGqOA7dX24biT17rsykKBGAvhz3KPLDDwwZA0jD0DwrE+WtKqM7j4gJC6Nds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eP7Ur/tz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=13Z7Q+zq; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eP7Ur/tz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=13Z7Q+zq; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="emtMEFI1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=V+OYYj8uq+pqoK/5F3d/Osi7mEas3i3Dbm15mfp2I+A=; b=emtMEFI1Qr78cOOrca2+ypoGyg
-	KVgWGdbkscOWXQAKvhuypw4hBW+gR/7BAG03/lJNaNP6l8IC6JGVy+gHnE4zWKUQMxgKbBo2M/kNY
-	ZWKqAh9XiPIPsaaW8ixWGrODDM7awRkw6/GcUI4TyYSCXX/LLkQOLaFy+EVT+uCvGIW4ebDc51/2B
-	pOanlmk0ZpQKvkofBk2jlkIkyFcEjK6wO9KhhTNnVUcTaQ7XpWcWhY7pOEle0JKcxOBkvEaKNVsnf
-	3XBH2BIMyFK3LwjqheiidB02lu9H+GGf9kHe5/zl2g6o+drydQeJo0Rf4Im3G8t1e9NtMhg8lQYUM
-	orRYf2BA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sN4ji-0000000Chag-3fH0;
-	Fri, 28 Jun 2024 06:05:30 +0000
-Date: Thu, 27 Jun 2024 23:05:30 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>, Ye Bin <yebin10@huawei.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH V2 1/1] block: check bio alignment in blk_mq_submit_bio
-Message-ID: <Zn5SqkFikVt14I6J@infradead.org>
-References: <20240620030631.3114026-1-ming.lei@redhat.com>
- <ZnOucQM5ic6I3iE0@infradead.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eP7Ur/tz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="13Z7Q+zq";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eP7Ur/tz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="13Z7Q+zq"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6BF99219B6;
+	Fri, 28 Jun 2024 06:23:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719555838; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nwidLcLTExnOFfQnmGAyzq9ZdPX1wP8vAw0uYxLpxnQ=;
+	b=eP7Ur/tzJGYpMtNU3jRrLCqrpPVB5WCDOcJ3VW2VwSUdkrc8/FxV+9sSKuyBuu0hHYZy/k
+	WrMzMIZfYxRGDQvTYcSKZO9l7M6TiBLOcX3xDgUhgBOmBTrBRy3PM5b3Vu2RtmlQ4PbgZn
+	CMb4QHpoRJETzCbgeFnntplaT8U4svU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719555838;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nwidLcLTExnOFfQnmGAyzq9ZdPX1wP8vAw0uYxLpxnQ=;
+	b=13Z7Q+zqEJ/VQR9P7OvKkTE+Oa7J7N+Tj0iaK/2CZnt/vmiTJq6Z2d5QJHA6xP4f4fV5Lv
+	t56x4znd/6a6nsBQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719555838; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nwidLcLTExnOFfQnmGAyzq9ZdPX1wP8vAw0uYxLpxnQ=;
+	b=eP7Ur/tzJGYpMtNU3jRrLCqrpPVB5WCDOcJ3VW2VwSUdkrc8/FxV+9sSKuyBuu0hHYZy/k
+	WrMzMIZfYxRGDQvTYcSKZO9l7M6TiBLOcX3xDgUhgBOmBTrBRy3PM5b3Vu2RtmlQ4PbgZn
+	CMb4QHpoRJETzCbgeFnntplaT8U4svU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719555838;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nwidLcLTExnOFfQnmGAyzq9ZdPX1wP8vAw0uYxLpxnQ=;
+	b=13Z7Q+zqEJ/VQR9P7OvKkTE+Oa7J7N+Tj0iaK/2CZnt/vmiTJq6Z2d5QJHA6xP4f4fV5Lv
+	t56x4znd/6a6nsBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C15E51373E;
+	Fri, 28 Jun 2024 06:23:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id EP1NK/1WfmZ4ewAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 28 Jun 2024 06:23:57 +0000
+Message-ID: <9f86cc6b-c18f-4696-a134-767beea24d23@suse.de>
+Date: Fri, 28 Jun 2024 08:23:57 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnOucQM5ic6I3iE0@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] blk-mq: add blk_mq_num_possible_queues helper
+Content-Language: en-US
+To: Daniel Wagner <dwagner@suse.de>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Thomas Gleixner <tglx@linutronix.de>, Christoph Hellwig <hch@lst.de>
+Cc: Frederic Weisbecker <fweisbecker@suse.com>, Mel Gorman <mgorman@suse.de>,
+ Sridhar Balaraman <sbalaraman@parallelwireless.com>,
+ "brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20240627-isolcpus-io-queues-v2-0-26a32e3c4f75@suse.de>
+ <20240627-isolcpus-io-queues-v2-1-26a32e3c4f75@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240627-isolcpus-io-queues-v2-1-26a32e3c4f75@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.79 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[suse.com,suse.de,parallelwireless.com,gmail.com,redhat.com,vger.kernel.org,lists.infradead.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Score: -2.79
+X-Spam-Level: 
 
-So make this a:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-
-so that we can get it included and the ball rolling.
-
-On Wed, Jun 19, 2024 at 09:22:09PM -0700, Christoph Hellwig wrote:
-> Module the q argument mess I'll just fix up when I get to it this
-> looks fine.
+On 6/27/24 16:10, Daniel Wagner wrote:
+> Multi queue devices which use managed IRQs should only allocate queues
+> for the housekeeping CPUs when isolcpus is set. This avoids that the
+> isolated CPUs get disturbed with OS workload.
 > 
+> Add a helper which calculates the correct number of queues which should
+> be used.
 > 
----end quoted text---
+> Signed-off-by: Daniel Wagner <dwagner@suse.de>
+> ---
+>   block/blk-mq-cpumap.c  | 20 ++++++++++++++++++++
+>   include/linux/blk-mq.h |  1 +
+>   2 files changed, 21 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
