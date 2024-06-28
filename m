@@ -1,91 +1,93 @@
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64ADA7BB0A
-	for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 20:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11107CF3E
+	for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 20:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719606956; cv=none; b=dpmwR6s9SwS2VKNozRCHHERlBaxlyKIOqiyo+UGPzNE0JS24s5iwWPgk7wcwcob4YrNHnU5Ufbp7GLUeW4rh3hM4DT0QuS4DU+Q3UoHDPnJL/lVJvUxId0EVbwgz3X5/6pfO03HTOgbiLWRcb78z0HioHtzEbeHym/DTiQIJEtg=
+	t=1719606970; cv=none; b=s/w8kFPgv47ns19NrGHwj0RM05ckldEIXC6xvbetSLlToZv+Fugtujptbz+KTntGxM+/EVx04/qgxro7nEFHLdOnVhRalwSj9Y+8uYZMea8WOPkfn9wJu+FrVAL2BGM/lawXfMN/xRauJdUtvenskf9/4tvtcN87eJgw/TV+LGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719606956; c=relaxed/simple;
-	bh=2nK2ZjmuMglhk0yaxdHKn3zTOaIl4xSOLewXX/lrfIo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kdj7+7XVbgNuAqHKd0wvmZ2Wxr1Cu9GQLzTTeVVB8ieYuznEyukQDduBozi6gAMuFl6VwDd2OpexOwCxYG2Ewv1urSymgZhUM2N438bPgSV4IHVfRDzYPX+PR40q3vT1xom/ZrYYc3p7r937K5gjlCKDTe+4mn1Y5fCNKsj5n44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZdWNNS6Y; arc=none smtp.client-ip=209.85.160.42
+	s=arc-20240116; t=1719606970; c=relaxed/simple;
+	bh=yrYs3zAVNq2kwCVGuRx1pSvpf151YbkI4EAnWLUAmvw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=SvcJKkpqKW7a7MJFzU+mFE7+QhdVy0NxvIEGc25MbSszc4zGddJygXxgf1nw54FazMvhGHA2RmrfERH8lKnVdwxarvZ/UPl1YSP7JkW2v1ytL02BeWmZ7iUUU1p9r/HI9WigWQ1NR8Ofj4OmKhJIZAZcCN98qL3MQX/PviJs3qE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=O5YfIGGo; arc=none smtp.client-ip=209.85.160.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZdWNNS6Y"
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-25cb022c0e6so140125fac.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 13:35:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="O5YfIGGo"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-25075f3f472so111653fac.2
+        for <linux-block@vger.kernel.org>; Fri, 28 Jun 2024 13:36:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719606953; x=1720211753; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=knIuVjnXEJJ+j66MeUZ5fq37co54uOPBN7W+VUSdPRA=;
-        b=ZdWNNS6Y4sWEegiSiVGc+tAC0AXgr2h5kIPlCVj2/VdKSAHWccBtYJ0RuCqz5arL+Q
-         p6HNY6osXGaFmV/K5vybhFXfOapRAh+iiaMO1CXfJO+q92g5QNOUZfN4g4e9SP1W90PN
-         CIbNVv2llJlmPJKBUGiGLnJfNqVmNO4tm2WMYdhMfsI9sjWSapkt6/iB3VrcZKlLK0Is
-         zBi5lvOHH9EaL05V5J9ug7wqtVGhrqbsdkxWGs+bbaMeB3hVBuqXnK6zR9m5DV0+EbIZ
-         1Kfo2pO+4xNkDvZnAtNcvTSR6nzWkZns1KLjAiYVEd+X2u3bjJhg+JbQrb5Feh5stQpp
-         OJlQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719606968; x=1720211768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HXjPL4lzWlI7eeaad+faprpE9Kk5VhEtAm4oytxFR08=;
+        b=O5YfIGGoOxcS1H9S8k3UzhlwKY9VjUGLVXPsjyV+cX0Sl7P6Q7hEytSI3Uar0Drb9x
+         gCwCM8CJf4WXz+gxU9Af0Rbc31/Q07GIgszhEg1ywjN9Uy9xhqwIATdKfMIKMA+zGFwS
+         LWLSN6jHlyCdQc5lOmbJc3bXMmeChJxoGeRXwvVgz4E9/OxOS/cw50FRSZinkzSE9AJV
+         PxMIws9jtS0P/9FmLhu58q/BL3RCFPPUeMev15gsH73NBM4Y5PSqBwaohqS5n4Ac/E0r
+         xms4vy7YXqe2qLZxKg1wTUl3nLRRjoM2wRV2B4f1245nKsSerEpfEwRaqyN9x3nG4dpr
+         SNdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719606953; x=1720211753;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=knIuVjnXEJJ+j66MeUZ5fq37co54uOPBN7W+VUSdPRA=;
-        b=AgMqKMxtc70KHzhHjTKqb+CYjse6EeeHJ5OIc0PSuIXgjaEcareNxNDaZ7bO6bMn02
-         ZsiZ4gfdkcDNaqy7wqGeOA67B8ucQimS+hOt3UWaC870z6A0P+xBU1D7pzvhSUNQuNJ9
-         V4sDKbzJl2Vcfd8k6nfcTpEMwoQE3Z0dPoemzUfPQH/tbbCK/wnaWCDf+SfE48pEsxdL
-         U3dPXT0PaXKnhR+wQUNYJ9YStNoWG0i1ohihAcXr6EShRiRctoM0alW60JiqKe/mRVAq
-         3eZKea89kHrgdMHe2KcybeVDVX0S6JrZXZVajpYMuS3HxeEcgigKBC9YW4MapZcggX1+
-         2V5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXQbcDwr7pt+spjeJ6HiJUIyFswEV9suM8355Yd0QmZ1qu62eaSFR9Gt15GCp6kNOsxyFi4gTZ8UuGpatJk19ARhwbCYXbGXTu+RjE=
-X-Gm-Message-State: AOJu0YwX4yuN2tpRygENZ/r1x7ET5wiZ1mBisY+lH5TqoXopdZc6T/X+
-	pFR6WWpBLgcZxG5wj73zDZi0U5kRJKLEUJ1XNcv2Ng2y542ohrl/VxGm6HtjtaQ=
-X-Google-Smtp-Source: AGHT+IEb27cDCyXqmGni9JEqeFfVr+iPwZqfQQ0Azcu74e0UA/6M2OvYs4xelVHD0QGZqahyFDcDGA==
-X-Received: by 2002:a05:6830:3d87:b0:700:ce5f:968c with SMTP id 46e09a7af769-700ce5f9712mr10578115a34.3.1719606953383;
-        Fri, 28 Jun 2024 13:35:53 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-701f7a98f39sm438118a34.3.2024.06.28.13.35.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jun 2024 13:35:52 -0700 (PDT)
-Message-ID: <0d5d9177-8e3c-4ee2-8a77-8bcd59920118@kernel.dk>
-Date: Fri, 28 Jun 2024 14:35:51 -0600
+        d=1e100.net; s=20230601; t=1719606968; x=1720211768;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HXjPL4lzWlI7eeaad+faprpE9Kk5VhEtAm4oytxFR08=;
+        b=Aq5bgIde3ZFhUQB8k8POOWgbOx3O2D5jmRLX57fQ0G0mBR8fteXY6zVBXmGqsxygu/
+         /GtGenvn6lQxFHKvzwCt+2x8XsRtXZsM35NawH59lUVP7k+d4uizo5G2NkSJKteJ5yEI
+         GbcJvNbxLvIADkE2tk598X9xVcgRegJgJb3+wFEthWtE9e77LCqRgXyO8uDpGh56srZK
+         HczqAQDc/O/ZJkR8d5O5vt+1aBsy/HvsMEOrhUvm1yxl2hgUd053Ax5WWHfyrOk6awbX
+         uUqZPVmSyUfBAxSF1hf5VTjsKK2hXs/hRVYTkpcJvWOfEAsTGGuMPT3yh7qFgZHpR98+
+         4OIA==
+X-Gm-Message-State: AOJu0YyrvF+bf7je3q/p+fznu8xIccfaGOUy4mQ8ia/DmHEuf3qdzec7
+	xFifsyaoqNel3eaMS62qrxxh7BYq6W58b+9U9EMw+oEviisHGvoCA1vnr2qBWn4=
+X-Google-Smtp-Source: AGHT+IHjfrwNSbJ4RZgns/gNJ6BkxPazhuod6QRaKqFrsMPvegUYFHfIEbIG1j06uuW36wHeHnLcTg==
+X-Received: by 2002:a4a:dc90:0:b0:5c4:24e0:26cd with SMTP id 006d021491bc7-5c424e02941mr2735657eaf.1.1719606967865;
+        Fri, 28 Jun 2024 13:36:07 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5c4149c37c4sm367003eaf.42.2024.06.28.13.36.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 13:36:07 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: "linux-block @ vger . kernel . org" <linux-block@vger.kernel.org>, 
+ Andreas Hindborg <nmi@metaspace.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Miguel Ojeda <ojeda@kernel.org>, 
+ rust-for-linux@vger.kernel.org, Andreas Hindborg <a.hindborg@samsung.com>
+In-Reply-To: <20240628091152.2185241-1-nmi@metaspace.dk>
+References: <20240628091152.2185241-1-nmi@metaspace.dk>
+Subject: Re: [PATCH] rust: block: fix generated bindings after refactoring
+ of features
+Message-Id: <171960696681.897195.304829009055681051.b4-ty@kernel.dk>
+Date: Fri, 28 Jun 2024 14:36:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/10] block: set bip_vcnt correctly
-To: Christoph Hellwig <hch@lst.de>
-Cc: Anuj Gupta <anuj20.g@samsung.com>, asml.silence@gmail.com,
- mpatocka@redhat.com, kbusch@kernel.org, martin.petersen@oracle.com,
- io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-References: <20240626100700.3629-1-anuj20.g@samsung.com>
- <CGME20240626101513epcas5p10b3f8470148abb10ce3edfb90814cd94@epcas5p1.samsung.com>
- <20240626100700.3629-3-anuj20.g@samsung.com> <20240628060444.GA26351@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240628060444.GA26351@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.0
 
-On 6/28/24 12:04 AM, Christoph Hellwig wrote:
-> Jens, can you pick this one up for 6.11?  We can't really trigger
-> it as-is, but it would be good to get it out of the way and avoid
-> someone else triggering the issue (e.g. Mikulas with his dm-integrity
-> work).
 
-Yeah done - worth noting that patch 1 in this series is already in
-my tree as well.
+On Fri, 28 Jun 2024 11:11:52 +0200, Andreas Hindborg wrote:
+> Block device features and flags were refactored from `enum` to `#define`.
+> This broke Rust binding generation. This patch fixes the binding
+> generation.
+> 
+> 
 
+Applied, thanks!
+
+[1/1] rust: block: fix generated bindings after refactoring of features
+      commit: 5b026e34120766408e76ba19a0e33a9dc996f9f0
+
+Best regards,
 -- 
 Jens Axboe
+
 
 
