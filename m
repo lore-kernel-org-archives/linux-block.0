@@ -1,67 +1,68 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED4B22071;
-	Sun, 30 Jun 2024 05:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732727B3FE;
+	Sun, 30 Jun 2024 08:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719726869; cv=none; b=JdmyT6s4DNKIfXrnB7N1kcFLiaR4tvAKUowZ3TO578C1dny0SdTxtKTIrhe2Vr+ItPKeZMm17SDs1c4xlVojK1TOq0PUjmkkaztP4kxZsejjkVamdSY1wT6XMT3JDMr2BCP/2MiPDmXh2xMTwlEaEyO76TrSax1qUbbn97fcf4E=
+	t=1719735897; cv=none; b=COKaVhvHQbykgwLtm3qbU0e2nQK3LW3/4zg2W2srGwUm/FRsqch8fldgyPasQnj78P/OP9th/YUG/4exh9+mh7tet7kFdfark8wi+WnmKVpSM4zEvCKBPnBTlVHnJZL+Vqq4DJcSsz1kMZBFKPyGwh9ecDIrG3hIzqsKO/uJE7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719726869; c=relaxed/simple;
-	bh=AaSeG/ppe1MQyPwe/yInLbpnQcq0SdsndSm0rSxouaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IuSsV6GRJ35OgCQUeCsmZTjrgdvZvMcJQYw3ESuIbC4cJUiV8xuwOF44chm6OQR69tUNjX6Jh+v23XhkBmj5bAykK8CUL/vMirhGbKRxhvkfY2P3Dau/fDBJzPUdCovLis0e2vMnMt8VFccS7TfnVtGX93EKHDwcmSsTXM/OLv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pAw9B0ZN; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pAw9B0ZN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=MDg59NLD8mUHhsfqYDYe3xfqVav3nveSTGnE40tHyWc=; b=pAw9B0ZNJZLkNlWApMjk1qFNk9
-	YdiUmqu3vga+oR9gDG6Iy30X5Wg0zVdLSmMa5dvEURHSVf5hV2UlMyUL8TKd8EOQOhV+DcT2Gznxx
-	+XgUDLD5BOmiTCHyjUrUf5WB+hR2+GvNQR+IO9P0N+iJmI7TdpElBdclA7sGCEdr7JyZZI9CPsTvr
-	xJ7sH6QSZQP5jhRer1WE1yjzqYSidlYjy+Ah3DfM5OWxbcIOPguI+HfEp2c2JQfBJZwIMHGItIYN4
-	mvv2+QDJI4cB4xLyDVCQMZ1Ccz/494RfTfxzhcqowMAP8hhTDuMfI1SS+rHiveLnSbyxzfLeZHEJB
-	sZtG7Yvw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sNnW0-0000000HRiR-03o2;
-	Sun, 30 Jun 2024 05:54:20 +0000
-Date: Sat, 29 Jun 2024 22:54:19 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, martin.petersen@oracle.com,
-	ebiggers@google.com, p.raghav@samsung.com, hare@suse.de,
-	kbusch@kernel.org, david@fromorbit.com, neilb@suse.de,
-	gost.dev@samsung.com, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, patches@lists.linux.dev
-Subject: Re: [RFC] bdev: use bdev_io_min() for statx DIO min IO
-Message-ID: <ZoDzC1qlEYTBkLPA@infradead.org>
-References: <20240628212350.3577766-1-mcgrof@kernel.org>
- <Zn-o3jQj4RkJobjS@infradead.org>
- <ZoDP0LgeLV3H1JbB@bombadil.infradead.org>
+	s=arc-20240116; t=1719735897; c=relaxed/simple;
+	bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AKkYCrhwOvJpL5qymmG0e5VnZQdKm9lHV1wuaruZQxQ4SOhStw2awxYGWA8HXpfJM8AVMnVzu3i3DG3XyejVSEazc1EKPvF7xwfWPkdr80w7+tQLY84Qs9A53S/NiouTKPzP59q4aNYYxsnDdqy1HOcej34f8pBwhcUAi4+250o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3635f991f4bso111878f8f.0;
+        Sun, 30 Jun 2024 01:24:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719735894; x=1720340694;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=h3+k3y8/58kY1WbZDESYLmrqsdM8kWQ9idr+7LGhaI/ZqacmPCPtq/4icmgXsyyK05
+         gPAr7zAwelufZT1H5cUblQelIUckjQHLTKu8XqQY5XlDi24AtleZ4qTIVMVU5aIEhO25
+         XTYUFcEavdt5lvPxSRwY0LIB/Sp45IA9VdgweXJByQdg4erLKq8nI+g8KAahsfITsrNR
+         6pyTgYYzku6sb63rDBk/sSR/KbqJ222VZJKvkk2Na9UZIkZTdICVNAPjRCCZob2ll7de
+         QEnUY0ZW5qMUQ5I39t42t3aptZlrQwbCmHT3lmq8mAcBF3as7Ft3PcfiDczFjr1FEY+C
+         2Njw==
+X-Forwarded-Encrypted: i=1; AJvYcCVgmVt6HDXOUkL9Wk9afjP1MPCW4bF0w3ASnAVcc9s9uxfIKUv8h9/z18Fy2SqT8cXdk8HdGiA7prc/cdChSqldbZi/j8BTdBr37aqJLAfbmoTtithsAlnnIZta+G78ybts+xwk6hpQ2AI=
+X-Gm-Message-State: AOJu0Yxb2SaKLsBbNwpxi/KjmZjvCi3Y0KOqoaPY7ZV4ofUIAsZxvCh0
+	CjGjZjU+jdJCXLb+pVufWl5kn8KwP09nJyNNg4cdC5JmN4bhl7t5
+X-Google-Smtp-Source: AGHT+IF5j4Vvn/c1MwtD4Sq5KqVqB2yPZ6w2Wu759kgeCpnor3yzD4Ab/b8p68qtUYiSQzSM/GC5fQ==
+X-Received: by 2002:a05:600c:4848:b0:425:7ac6:96f7 with SMTP id 5b1f17b1804b1-4257ac69876mr15928965e9.0.1719735893588;
+        Sun, 30 Jun 2024 01:24:53 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b097b77sm102371405e9.33.2024.06.30.01.24.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Jun 2024 01:24:53 -0700 (PDT)
+Message-ID: <f9790913-fbf6-4a05-bf2c-56051ab07eab@grimberg.me>
+Date: Sun, 30 Jun 2024 11:24:50 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZoDP0LgeLV3H1JbB@bombadil.infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] blk-mq: add blk_mq_num_possible_queues helper
+To: Daniel Wagner <dwagner@suse.de>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <kbusch@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Christoph Hellwig <hch@lst.de>
+Cc: Frederic Weisbecker <fweisbecker@suse.com>, Mel Gorman <mgorman@suse.de>,
+ Hannes Reinecke <hare@suse.de>,
+ Sridhar Balaraman <sbalaraman@parallelwireless.com>,
+ "brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20240627-isolcpus-io-queues-v2-0-26a32e3c4f75@suse.de>
+ <20240627-isolcpus-io-queues-v2-1-26a32e3c4f75@suse.de>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240627-isolcpus-io-queues-v2-1-26a32e3c4f75@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 29, 2024 at 08:24:00PM -0700, Luis Chamberlain wrote:
-> > The minimum_io_size clearly is the minimum I/O size, not the minimal
-> > nice to have one. 
-> 
-> I may have misread the below documentation then, because it seems to
-> suggest this is a performance parameter, not a real minimum. Do we need
-> to update it?
-
-queue_limits.min_io is corretly described and a performance hint.
-The statx dio_offset_align is actual minimum I/O size and alignment and
-not in any way related to the performance hint in minimum_io_size.
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
