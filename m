@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1458C16DEA5;
-	Mon,  1 Jul 2024 16:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3039B16DC35;
+	Mon,  1 Jul 2024 16:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719852759; cv=none; b=PJIIXMwOuZBT+ESwKWeoF7A7Q66xPw8hxLa0ruRimeNg6kWMrCwq0MkpzszPris1OdSyO4S2ogMd2tW3DB/l0VKZUvUuMNdspG8gQpCyQBeqZcS/BTkhK/XtJzhYedbEJJZdkEatOCh2YrHONMCN3noq1icPBs5KNKOuBOqcS0g=
+	t=1719852762; cv=none; b=mEmPMlHzHAWJ4iXwzEJDP3XK56eX0vBFIDmU6fec3Ref9N3Tf4JF7TcPoI5SZHf8DLQtYvwTIFsoAaqItZQPBtgYlELGvtfQXbcZHIS7LOoB9Slb6ElKzF6TYij7bY7YD03ugn6IZruWTlqJ/44v9aHUUL7kFWEZ0lfolpG0HWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719852759; c=relaxed/simple;
-	bh=G5L5Plq19X5GAfeTFNcX9uW9PU0zoLG5mzqe5KDW/+c=;
+	s=arc-20240116; t=1719852762; c=relaxed/simple;
+	bh=VEMRQwfeIWs70rHujqfrqoaMQ9Uh6Mfmgvpl96QOpwM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cIcRAC9+Yl0eKiYVE8jWRaQdnNxOc/ad46+nq1cpFbECkcGuNI7lfhdVjsZHmdiz/ZPCe5DVy1EkJBPChzc1evnHn9P/ujVrq1tXMsX8KmCsP9mUs0H0UsvKUOAaJnW0PMk742Aj0do9rOv+OWnw9fE92VLPFOorMiBAucnuhn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=34MTjUIP; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=QK6FtPek+anfOVHxYQGwRQA51ibCz2ZRSpOlO0n9/x67AU38IZSme79zsLzSbyIegoS3ruI0zDzS7aoshkHEi6aXhljvTbuCvypIg4XKV6Hs25u2xsod6Z5+4ixhBbcVwadoTLk3jXLIV/H69H5HXoTPuGknMbLqefgqgjCBpDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3zbsQa4i; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="34MTjUIP"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3zbsQa4i"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=DwD7MjTvJx+hlHOHPGd5dcyVJZrseYQmaHXTz3yhQ8Y=; b=34MTjUIPfC/B8bUTCiroNNKR+9
-	yir0icGQTNEiZnH+dfKQO58vG0s4AH3KUiWkMWtkfwXOA1X7XmnYxzRnGo3hj9IBz3EMBg2rcf+dj
-	SIP2yT4eThKCMjqHmQCyPASi/7RtLzLQZNs5wbFlmhpxqYtuhdvjb86O5rbWCSnmlB+5aB7yuQnuf
-	vfnAoi1rNai4sUKWS7yOI+aghKOHoGtg7nJrETtTKOTYiti8C6+qYKMqY1lcBmr8O+DZy0DeGmaoZ
-	5DEFrr9K6gWiApsVt2/UMlKv1wr4H+Cla2zEamyD9Nn9OeZ9t+hvQTzIaZc6QNKpobd9JEJvIyEHQ
-	x8Y0wlUQ==;
+	bh=Oqdc6V8xwAdvyBJbY3RHzAse+UGgP4u6Afcst4sdYMk=; b=3zbsQa4iYn/8FdgbtQAMm9GHjz
+	/NqRlhiaxbEOMvyQOxPRJyhjZWOK81jVMi5yS/NGVCQBL5bi2vIK1TC1ba7mfkAZYGbfgaU0dV1Vy
+	y95UDYEu0CrJMEckAwUXGp0c2EO/TjLGxGNphVFJIItIUMZZU9vGjm7yQh2VBXRkX73K9u9e8k9hV
+	ooAYPwwWvYD+9la9ClcSV1kJGVNp4qmVF2pWusl4h2OY6BFXu4WJMmcd+vw3QZ6lVpDABotTft5ja
+	GdvVI1MgC/51iCOSuni4G4WfwNlh4xa5G//R0z6xzVFtMHnP6yTksijHHA+QMEfqnx7/lP5TOW4Zt
+	V0b6pxbg==;
 Received: from 2a02-8389-2341-5b80-6bfa-ffbf-d1d1-ec94.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:6bfa:ffbf:d1d1:ec94] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sOKGZ-00000004Bcj-33T6;
-	Mon, 01 Jul 2024 16:52:36 +0000
+	id 1sOKGd-00000004Bdw-2AQA;
+	Mon, 01 Jul 2024 16:52:40 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Keith Busch <kbusch@kernel.org>,
@@ -37,9 +37,9 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	Ulf Hansson <ulf.hansson@linaro.org>,
 	linux-mmc@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 03/10] block: add a blk_alloc_secure_erase_bio helper
-Date: Mon,  1 Jul 2024 18:51:13 +0200
-Message-ID: <20240701165219.1571322-4-hch@lst.de>
+Subject: [PATCH 04/10] blk-lib: check for kill signal in ioctl BLKSECDISCARD
+Date: Mon,  1 Jul 2024 18:51:14 +0200
+Message-ID: <20240701165219.1571322-5-hch@lst.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240701165219.1571322-1-hch@lst.de>
 References: <20240701165219.1571322-1-hch@lst.de>
@@ -52,81 +52,78 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Factor out a helper from blkdev_issue_secure_erase that chews off as much
-as possible from a secure_erase range and allocates a bio for it.
+Secure Erase can access a significant capacity and take longer than the
+user expected.  A user may change their mind about wanting to run that
+command and attempt to kill the process and do something else with their
+device. But since the task is uninterruptable, they have to wait for it
+to finish, which could be many hours.
 
+Open code blkdev_issue_secure_erase in the BLKSECDISCARD ioctl handler
+and check for a fatal signal at each iteration so the user doesn't have
+to wait for their regretted operation to complete naturally.
+
+Heavily based on an earlier patch from Keith Busch.
+
+Reported-by: Conrad Meyer <conradmeyer@meta.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-lib.c     | 36 +++++++++++++++++++++++-------------
- include/linux/bio.h |  2 ++
- 2 files changed, 25 insertions(+), 13 deletions(-)
+ block/ioctl.c | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index ff12c3d2de5aae..cf4f0ee6b14503 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -293,26 +293,36 @@ static sector_t bio_secure_erase_limit(struct block_device *bdev)
- 		(UINT_MAX >> SECTOR_SHIFT) & ~bs_mask);
- }
- 
-+struct bio *blk_alloc_secure_erase_bio(struct block_device *bdev,
-+		sector_t *sector, sector_t *nr_sects, gfp_t gfp)
-+{
-+	sector_t bio_sects = min(*nr_sects, bio_secure_erase_limit(bdev));
-+	struct bio *bio;
-+
-+	if (!bio_sects)
-+		return NULL;
-+	bio = bio_alloc(bdev, 0, REQ_OP_SECURE_ERASE, gfp);
-+	if (!bio)
-+		return NULL;
-+	bio->bi_iter.bi_sector = *sector;
-+	bio->bi_iter.bi_size = bio_sects << SECTOR_SHIFT;
-+	*sector += bio_sects;
-+	*nr_sects -= bio_sects;
-+	cond_resched();
-+	return bio;
-+}
-+
- int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp)
+diff --git a/block/ioctl.c b/block/ioctl.c
+index f53121edb9a15f..45668a21cdb374 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -164,6 +164,9 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 		void __user *argp)
  {
--	unsigned int max_sectors = bio_secure_erase_limit(bdev);
--	struct bio *bio = NULL;
-+	struct bio *bio = NULL, *next;
- 	struct blk_plug plug;
- 	int ret = 0;
+ 	unsigned int bs_mask = bdev_logical_block_size(bdev) - 1;
++	struct bio *prev = NULL, *bio;
++	sector_t sector, nr_sects;
++	struct blk_plug plug;
+ 	uint64_t start, len;
+ 	uint64_t range[2];
+ 	int err;
+@@ -187,11 +190,36 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 	if (start + len > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
  
- 	blk_start_plug(&plug);
--	while (nr_sects) {
--		unsigned int len = min_t(sector_t, nr_sects, max_sectors);
--
--		bio = blk_next_bio(bio, bdev, 0, REQ_OP_SECURE_ERASE, gfp);
--		bio->bi_iter.bi_sector = sector;
--		bio->bi_iter.bi_size = len << SECTOR_SHIFT;
--
--		sector += len;
--		nr_sects -= len;
--		cond_resched();
--	}
-+	while ((next = blk_alloc_secure_erase_bio(bdev, &sector, &nr_sects,
-+			gfp)))
-+		bio = bio_chain_and_submit(bio, next);
- 	if (bio) {
- 		ret = submit_bio_wait(bio);
- 		bio_put(bio);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d5379548d684e1..e1da5fe49baca1 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -835,5 +835,7 @@ struct bio *bio_chain_and_submit(struct bio *prev, struct bio *new);
- 
- struct bio *blk_alloc_discard_bio(struct block_device *bdev,
- 		sector_t *sector, sector_t *nr_sects, gfp_t gfp_mask);
-+struct bio *blk_alloc_secure_erase_bio(struct block_device *bdev,
-+		sector_t *sector, sector_t *nr_sects, gfp_t gfp);
- 
- #endif /* __LINUX_BIO_H */
++	sector = start >> SECTOR_SHIFT;
++	nr_sects = len >> SECTOR_SHIFT;
++
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+-	if (!err)
+-		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+-						GFP_KERNEL);
++	if (err)
++		goto out_unlock;
++
++	blk_start_plug(&plug);
++	while (1) {
++		if (fatal_signal_pending(current)) {
++			if (prev)
++				bio_await_chain(prev);
++			err = -EINTR;
++			goto out_unplug;
++		}
++		bio = blk_alloc_secure_erase_bio(bdev, &sector, &nr_sects,
++				GFP_KERNEL);
++		if (!bio)
++			break;
++		prev = bio_chain_and_submit(prev, bio);
++	}
++	if (prev) {
++		err = submit_bio_wait(prev);
++		bio_put(prev);
++	}
++
++out_unplug:
++	blk_finish_plug(&plug);
++out_unlock:
+ 	filemap_invalidate_unlock(bdev->bd_mapping);
+ 	return err;
+ }
 -- 
 2.43.0
 
