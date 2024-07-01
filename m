@@ -1,101 +1,147 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E84815A86E
-	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 12:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F62154BE7
+	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 13:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719838412; cv=none; b=CZboopg+rBU0QAPqn47HB3EgYo9bSZGSyutyzLuZKXeZM5fSvYjspy9fTyDnc6xh6pE7rOlkaFCAQhdqi6MNxC8PtihcV3M8u0JapFWBji51Ns1g91DcH0kBvWucTd6JIlQCy9wr7nvdFj8WP2XGcVtZkkZ4xuk868aac9RxkN4=
+	t=1719838856; cv=none; b=oGbWrgp3I+Vcf+gd0Mv1nmWdrVb9fzWLsLlh+vSyD2VF6Z/qReK0kKCeAJfva7sdQS9JDBSFFTJSDYigDalh4FWym+016R3tKo8KQl+k5cBGvfXLJy+xxOKFoeOZK9WlnVQhD8kQ3eN3CFY29LPXheFN8qdIuZgXIv3MMhd8wJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719838412; c=relaxed/simple;
-	bh=c5whlHHCbZabxJ/nGPaupq/1J4RzzZ6i9f4RWj061KY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=auzIMUvpwsDmyWva8iSx6Yk5MKmmhRLf3W0W9BCYKU0yp/MMwz602HoLt+biQi2pTPyrbgk6eO48Lnt+K2UU/7y1qM3g+VRTZd/H6bXsbaQtK3dICcPJoASmSZ4ghFhX4BraMfceFG2CDmE1CJy5S6rOJaikC8Tr+9STx7geivY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pRnApJzh; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1719838856; c=relaxed/simple;
+	bh=W9bltCBYFM+C2WucMMKme+Rkf/CG0xwlsXfIgc1ettM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=I1zrM7vT8n7oOTAAucB5wFjeljJs2G1GgyhQ/cRqXtgpxMu2CCmYxVfV5PyDGZBR+djoz7g6m9GQcnFlTcBD/jfNcTgoJOH0fMK96dWrQNY49ZXi79pMjAjQ5GMchvzoPagiad3yp0qhCT0Br+OUH3v1iiQc/rYjy+HKqj9SQv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=BrTij7pc; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pRnApJzh"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2c7a480c146so578540a91.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2024 05:53:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719838409; x=1720443209; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wn96sL16xMTjEGY+KDMGbaKdAgdCeHEBQjOm3fWFWdA=;
-        b=pRnApJzh0l4MZLOKinHhEEnqj0RvWtVAVfiqVAHIcIaHnX0f1z5lxOsK6vuhkboYJM
-         o+z3R0GCATOKSEdmNzn/69qqETCKrn0XXo3q8fLk6rlJTIEDXj/QYrLjYMP01U9zsTnv
-         LE2IXjowFXYEfdquIwOn+BU0E5q6109kC/QQt5zcZH84MECQdlXC/M2z2VSWWHavUI8O
-         1TyhnYTQSTrzydrM6p3lScbUM9wq6BTaY28Mmxnsg7o2i5wQQauP8cpepJGbSEgDk983
-         wqOfQkOfZGzjmYE8DlGk4wrDWpRdfGn68XFspxmhZatedstdD9HJK3D0hJ/T0nIePmCB
-         Qusw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719838409; x=1720443209;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wn96sL16xMTjEGY+KDMGbaKdAgdCeHEBQjOm3fWFWdA=;
-        b=CH+ZEp5BjzPYdyfNx5AzJa96WptiS5FyFt0l25SpSufzm/SWlJm3gdPEfMh+i7IJwm
-         o2CIBFhzXhnknfhrNXJh8zx77Cq+2Y+V+G3L6JNLe+3JOkL+VpLsZeS/XbCNUBLJRgV3
-         xwoOwwLdct8u0xdRYR5/EnBF/mLOhg/9rDMIwGo7FTzp3TdOW+p33M2P+0iw2TKDNOKA
-         L9fB9t1Hbj/VE816Cxww9ichjXtryNdkBJDTj8WUx3YPX7OEJdOvC3ZmmQYd2KPZAtl5
-         IaDa0emh/V8s+XqpDLPOaofbRmJ1KdgK26ULHMC2EiQdgJBo3+V6Twyxc5oqdhRz6zaW
-         UTeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSt8DrzVwHX80Vs0powgwu5P0iMqLy9nQ/Qc9w8QlSFIpixMC8F5mD/Wa2CyomNFG2Mvx+m1nxeWT7cXOnq7KBWar1QoZC38z92vY=
-X-Gm-Message-State: AOJu0Yytf+i+JGK71VbRe+21yjJHRPqpEfk3nCd9zClEXzbTgVMtXo07
-	aEZPcOzo+2tmB1IIGGhYALqiE1JDab1p6iWcwwalBFL4DmL7Z2MP3yaJ/bh7wOSODsc/j/D2AL+
-	Xm+Y=
-X-Google-Smtp-Source: AGHT+IF/M2rq2rCBfYzi9F3zCZdGntRWmhfn9lWdC/EOhqP+6hOiG2RJprL5YE6Wf8HY38GAC8yAQw==
-X-Received: by 2002:a17:90b:151:b0:2c7:dfb6:dbe9 with SMTP id 98e67ed59e1d1-2c93d7a0329mr5630186a91.4.1719838409371;
-        Mon, 01 Jul 2024 05:53:29 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c91ce1a292sm6648820a91.7.2024.07.01.05.53.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 05:53:28 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
- "Martin K . Petersen" <martin.petersen@oracle.com>, 
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-In-Reply-To: <20240701051800.1245240-1-hch@lst.de>
-References: <20240701051800.1245240-1-hch@lst.de>
-Subject: Re: io_opt fixups
-Message-Id: <171983840808.13284.3309840121093222072.b4-ty@kernel.dk>
-Date: Mon, 01 Jul 2024 06:53:28 -0600
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="BrTij7pc"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240701130046epoutp03208cadfc6d32dde563484162ae43add4~eGFGdOiLw3081530815epoutp03b
+	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 13:00:46 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240701130046epoutp03208cadfc6d32dde563484162ae43add4~eGFGdOiLw3081530815epoutp03b
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1719838846;
+	bh=DE/RiLhiBXHk6GIVAh1+ja3dSByWB2NgP310dqUrp/8=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=BrTij7pc6xUsCrvzI5i9pZ2wGpFMIWiDkLDvVHZ3u9d+VgUKu6mGzFciWuprpANGs
+	 seWlzevyYdvwVy6gC5jt9rxm83bSCHnsP7Dsk1sDAS+qfBGKrMDmVr/7CzDxENdv/u
+	 2H2HYrvTAKcWuHDui0PobLSMc2mPiiH7A9M9ckUk=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20240701130046epcas5p2cd75d9c70d4ed9b0ab2a3f5eaed66d9b~eGFGCxSbk0231402314epcas5p2I;
+	Mon,  1 Jul 2024 13:00:46 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.180]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4WCR3w3LV8z4x9Pr; Mon,  1 Jul
+	2024 13:00:44 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	8F.58.09989.A78A2866; Mon,  1 Jul 2024 22:00:42 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20240701130041epcas5p3dc11ba75cf5a207d40ceb702eeb68c1d~eGFB1ioU60520505205epcas5p3f;
+	Mon,  1 Jul 2024 13:00:41 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240701130041epsmtrp2f89d9dc8c2a291c8398606ebf4e97767~eGFB0tuwk3210132101epsmtrp2Y;
+	Mon,  1 Jul 2024 13:00:41 +0000 (GMT)
+X-AuditID: b6c32a4a-bffff70000002705-7a-6682a87ac434
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	68.FB.18846.978A2866; Mon,  1 Jul 2024 22:00:41 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240701130040epsmtip2c18da06f70c800542161d2b743626204~eGFA9_rj61280212802epsmtip2e;
+	Mon,  1 Jul 2024 13:00:40 +0000 (GMT)
+Message-ID: <a4c7b88a-7dca-c443-15c0-a0699976f057@samsung.com>
+Date: Mon, 1 Jul 2024 18:30:34 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH 4/5] block: don't free submitter owned integrity payload
+ on I/O completion
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>, Anuj Gupta
+	<anuj20.g@samsung.com>, linux-block@vger.kernel.org
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240701050918.1244264-5-hch@lst.de>
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.0
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupik+LIzCtJLcpLzFFi42LZdlhTQ7dqRVOawbYudoumCX+ZLVbf7Wez
+	WLn6KJPF3lvaFsuP/2NyYPW4fLbUY/fNBjaPj09vsXj0bVnF6PF5k1wAa1S2TUZqYkpqkUJq
+	XnJ+SmZeuq2Sd3C8c7ypmYGhrqGlhbmSQl5ibqqtkotPgK5bZg7QaiWFssScUqBQQGJxsZK+
+	nU1RfmlJqkJGfnGJrVJqQUpOgUmBXnFibnFpXrpeXmqJlaGBgZEpUGFCdsbzq7EF1zgrZpyf
+	w9jA+IK9i5GTQ0LAROLp8XUsXYxcHEICuxklnrzoYAFJCAl8YpT4fVYfIgFkt+//wAzT0Tbh
+	LStE0U5GiRdftCCK3jJKTO68DdTNwcErYCdx6YgPSA2LgIpE+7E2sHpeAUGJkzOfgC0QFUiW
+	+Nl1gA3EFhZIkHg6Zy+YzSwgLnHryXwmEFtEwEFi9oalUPEKian3nrGBjGcT0JS4MLkUxOQU
+	MJK4fDYVokJeYvvbOcwg10gI/GSXWHj3AyvEyS4SLYsnMELYwhKvjm+Bel5K4vM7iLUSAtkS
+	Dx49YIGwayR2bO6D6rWXaPhzgxVkFzPQ2vW79CF28Un0/n7CBBKWEOCV6GgTgqhWlLg36SlU
+	p7jEwxlLoGwPiXN7WpghAbWWUaL71m7mCYwKs5ACZRaS52cheWcWwuYFjCyrGCVTC4pz01OL
+	TQuM8lLL4XGdnJ+7iRGcKLW8djA+fPBB7xAjEwfjIUYJDmYlEd7AX/VpQrwpiZVVqUX58UWl
+	OanFhxhNgbEzkVlKNDkfmKrzSuINTSwNTMzMzEwsjc0MlcR5X7fOTRESSE8sSc1OTS1ILYLp
+	Y+LglGpg2mzyo2K2e4rbwvwnPNPnmdX6HKzNtS3+JLHtRb641MtW778NcwVEdX5VNU59dJDj
+	meYs0Yv2U6f0vg9N4Incv9T49rqdnsk6V+eHvJ+/rjFfNGuRoe3is4KWxXJT2s/bJCikzJO9
+	qnfj+5LZnLsnXlyd07uz779yzda1+3dfCeIK41z1991kL43tgqy3r9Sfj+18krP1/F83Te7J
+	XLJK4Qn/XFx93umVKJVKJ9556nLAfV6NZ/z76eKHdbi9d5at/SfGzyJWd6sgY85dKVs1y9nT
+	87jtTtQEbtu2VpH74DXjx1seH5dkZeF9OU++cM02v7qXx2Pkfv1h7fNv5nzY2b0j8Gx79yf9
+	y6bbg+dHK7EUZyQaajEXFScCADTJTgIdBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMLMWRmVeSWpSXmKPExsWy7bCSvG7liqY0g6cPpC2aJvxltlh9t5/N
+	YuXqo0wWe29pWyw//o/JgdXj8tlSj903G9g8Pj69xeLRt2UVo8fnTXIBrFFcNimpOZllqUX6
+	dglcGc+vxhZc46yYcX4OYwPjC/YuRk4OCQETibYJb1m7GLk4hAS2M0rMurqVGSIhLtF87QdU
+	kbDEyn/P2SGKXjNKzNz5h6mLkYODV8BO4tIRH5AaFgEVifZjbawgNq+AoMTJmU9YQGxRgWSJ
+	l38mgs0RFkiQeDpnLxuIzQw0/9aT+UwgtoiAg8TsDUvZQEYyC1RI3FlZCLFqLaPE+wd7mEHi
+	bAKaEhcml4KYnAJGEpfPpkJMMZPo2trFCGHLS2x/O4d5AqPQLCRHzEKybBaSlllIWhYwsqxi
+	FE0tKM5Nz00uMNQrTswtLs1L10vOz93ECI4HraAdjMvW/9U7xMjEwXiIUYKDWUmEN/BXfZoQ
+	b0piZVVqUX58UWlOavEhRmkOFiVxXuWczhQhgfTEktTs1NSC1CKYLBMHp1QDk+XXy71r/u2/
+	vqvJcLfgzNUr7L1uBq4/yOLz6er1jcdFpZ9ue54U0vnlTn7Jt4vanReOxskIb1fTOLNIMMf2
+	kpWpnnP2xrkr1Lbyumxv32J+MXflh4L9859qv9qTYDp3+eSCE2l72Ofuu/xpAn/dFjuT0q8T
+	V5o1abKU6zYl5kvxvbjVcfpd+Bv2q8ddrbZbndWvW23SyuA5p+Qr+7IWz6lh39ecf7Bkrh/j
+	+xeRYZlK+zyP3H0so/9nY2Hj+vmFyz+31QQ6a8tm8AR4FLnbWH2uYHn0d3dsLdPJVnFN/4ig
+	29rM03kDL1fG8S3QFkl7+6XlwTyVt7Pa1JWrl4a/5tm4romhK4FlO8udX9HPdyixFGckGmox
+	FxUnAgArCBZ29gIAAA==
+X-CMS-MailID: 20240701130041epcas5p3dc11ba75cf5a207d40ceb702eeb68c1d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240701050934epcas5p4b2a829697ea9e0f90bf510f511abf19d
+References: <20240701050918.1244264-1-hch@lst.de>
+	<CGME20240701050934epcas5p4b2a829697ea9e0f90bf510f511abf19d@epcas5p4.samsung.com>
+	<20240701050918.1244264-5-hch@lst.de>
 
+On 7/1/2024 10:39 AM, Christoph Hellwig wrote:
+> +/*
+> + * Integrity payloads can either be owned by the submitter, in which case
+> + * bio_uninit will free them, or owned and generated by the block layer,
+> + * in which case we'll verify them here (for reads) and free them before
+> + * the bio is handed back to the submitted.
+> + */
+> +bool __bio_integrity_endio(struct bio *bio);
+>   static inline bool bio_integrity_endio(struct bio *bio)
+>   {
+> -	if (bio_integrity(bio))
+> +	struct bio_integrity_payload *bip = bio_integrity(bio);
+> +
+> +	if (bip && (bip->bip_flags & BIP_BLOCK_INTEGRITY))
+>   		return __bio_integrity_endio(bio);
 
-On Mon, 01 Jul 2024 07:17:49 +0200, Christoph Hellwig wrote:
-> I recently noticed that on my test VMs with the Qemu NVMe emulations I
-> see a zero max_setors_kb limit in sysfs.  It turns out Qemu advertises
-> a one-LBA optimal write size, which is a bit silly.
-> 
-> This series handles this odd case properly both in the block layer and
-> the nvme driver as a sort of defense in depth.
-> 
-> [...]
+The patch will cause regression for nvme-passthrough. For that 
+completion order is:
+(a) bio_endio()
+(b) req->end_io
+(c) blk_rq_unmap_user.
 
-Applied, thanks!
+And current code ensures that integrity is freed explicitly only after 
+(a) and (b).
+With the patch, integrity will get freed during (a) itself.
 
-[1/3] block: remove a duplicate io_min check in blk_validate_limits
-      commit: f62e8edc0a9fda84fe5bf32d5f5874b489d6c301
-[2/3] block: don't reduce max_sectors based on io_opt
-      commit: 37105615f73125cb0466c09796f277a4c46d9295
-[3/3] nvme: don't set io_opt if NOWS is zero
-      commit: f3bf25d5135539603f24e377c6dec3016fbd9786
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+There are two places in bio_endio() that can free the integrity.
+It first calls bio_integrity_endio() - which is handled fine above.
+But it also calls bio_uninit() - which will free the integrity. We don't 
+want that to happen before passthrough gets the chance to unpin/copy-back.
