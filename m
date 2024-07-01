@@ -1,227 +1,115 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f226.google.com (mail-vk1-f226.google.com [209.85.221.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35B315E5DC;
-	Mon,  1 Jul 2024 16:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85014381C4
+	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 21:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719852785; cv=none; b=tplQi4zZK6uVRNLdLb+L4CsYEsRGi4KSxKoI6kL9dFyZHQqTUq2n/6ton2nWehNQbflOlQweeI67w1fUGYZvj+lzUz9RuOT3X9MSG6wqQoMOENqovh9idbWAp7JEjrher1sLoXz/O1ifV7SrIXPB2MhHhdsY0Nzl7abJc67R1ws=
+	t=1719867803; cv=none; b=HaEHgt11d4pVtvO/HeOeSsq4qI578vBJycv0i+/5topzEVnjfF4p6z+HhMZAbzD+dhiul8x1MqjG1G/hoqgUIyN2el9zftZAqNDN29brE/nxomF3EOC2MFV47uVv06Q06VyUQoaQM19HnQrRSGjQ5kPw3KrzAC7RBHNUVSV6Aso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719852785; c=relaxed/simple;
-	bh=OsCtO5bX5Zh7jx6XhKJoZDIlc/TsSDiOuwMVUSQJ11A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J5BRrcIbz1KpTA/Al/Ofsd0AwXG2Q0+sGVGkC7ctGlDUCiavRfMGmHi3VDyTtIoOnMCPxFtAbecD9cxeicvyW7AeLzipEwPjvkpgLQ0UuSA6avv72FSBHiHOyNlibeDCiNhTQ6i4mqf4dYNgu1xaZONJqA5/Ujv9Iq2u8QGDmyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WszWtJzm; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1719867803; c=relaxed/simple;
+	bh=LR0b/O13CTgzTuYWkjcpZsu7TTutw6ZnD6dz55Udfp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iYT1f0WxSy4yaRK2e48QIh1J46+xlOM7Yjx8LI6kHJA154AyKDEYrxXnKXpoVRmDz7O5JJCtOIVNsf3zauMmhwDSLmrcwmjXFkGBPY7dF51JzxU/rt4VNM9sTxtohTsIBKjAoOUUCS8yqI/m+rme6RVyYQtHnPilg6XtYYmwGPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fWRHQVLW; arc=none smtp.client-ip=209.85.221.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WszWtJzm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=W3UEqxM+W8WMDFLwQ70hzXAIh72AVtbpUh2WCLbswBM=; b=WszWtJzmd939XviNuIChjlFDqX
-	hwKZsEv64eV1dzTFGxcZAhpVenbgBIvnj9khD4pSHwRC3JipXQ16Ijtswqm7Wkryx0E1FTAr7SphQ
-	9Ma0PhDDvRQma8oUVFLrcff7+3v9jsmnHvM46S6qMzTO8ZxJP3MXK1tFbur1t4BGeyv3c7BPdi75+
-	RRA9Un8GRsPP2EYVQBxWfSc1PAFn17NfLQXNobKx+eSBdNEXRwnsCfeX/hkFD8p3W+5MGNy3pdjZG
-	ROKrjmlLiaDEri7qc/tU0DfM8i5DjjyY2Js5RDYxnsJNSaV0HmTFiTSaQlXbPzIX/7UblOQ0/ixjM
-	gMfY3MmQ==;
-Received: from 2a02-8389-2341-5b80-6bfa-ffbf-d1d1-ec94.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:6bfa:ffbf:d1d1:ec94] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sOKGz-00000004Bq6-2fTK;
-	Mon, 01 Jul 2024 16:53:02 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>,
-	Conrad Meyer <conradmeyer@meta.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	linux-mmc@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 10/10] blk-lib: check for kill signal in ioctl BLKZEROOUT
-Date: Mon,  1 Jul 2024 18:51:20 +0200
-Message-ID: <20240701165219.1571322-11-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240701165219.1571322-1-hch@lst.de>
-References: <20240701165219.1571322-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fWRHQVLW"
+Received: by mail-vk1-f226.google.com with SMTP id 71dfb90a1353d-4ef780ae561so1937371e0c.1
+        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2024 14:03:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1719867800; x=1720472600; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DqGG29yuvpaxq8YxBPYIVI2DBBbkQ+aDkAyAZUIZKG4=;
+        b=fWRHQVLWgQ83kBgHwEohsTeNYMXQG+jxXVrjpTKZ4dOPtcP8fTZp6dd5ndnbZak6Wf
+         tEGSLy70SG1glnBv2T0vFqlPmU9/hgrgg9V7liiDmefQw0DCsd3rurOYJKsgjyghIQ0Z
+         2dnumoqpXD9uJ7WCYb+mfF1UH9B+4g/B9IwcZayBB1+BOYbZq9BPg+pUbaTgnpVbPWD7
+         O7WSvjY0xUrK/rhs7vLahwNoAGNWeyv7BljychajmeL1iw2wccCSVEGUBhLuHughpIDf
+         ga4RHVbww+kkHrXCSrm1d5M9sFP9ZfneAamy6i+Fm1+kYhrWVXdO2lJAbgk0tfdbcM67
+         nmsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719867800; x=1720472600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DqGG29yuvpaxq8YxBPYIVI2DBBbkQ+aDkAyAZUIZKG4=;
+        b=S9SxF4KJuSVJc14QBueQ3UfdrvjFYFIl4+wFp/PUsdqmrPQT5kIfWyQpKqXPbd8Jol
+         bR4AVTRSiopDhh1KDpBzrxZIBJMY6dfGvZgKM2mRh9uWbCXs1iA1xfcDkB9qXvH/3Qi7
+         89mdsmLvk7CuY4fgZJpr8a2dOzZ2IqAdEnCXkuBVcm/Z7EsavXaqUl2Kabj94QCL9dFp
+         90ZMj5bVT3WImd15bLwnfSnUMXuje/SCugZqjVsZJ9KAUlwftvFaRMm2a1nHkS643Hcz
+         E01GagEyQkB3YPjFGOl3cmOgyjNQDyiKtpNie/z/baPiCQp9SVi/Ev2MgLIEN4IY8tLs
+         5Yqw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgGafIyW6i7vDeJHcouNdBQX9pFveB22Ynb4zgrifWeTZqITT33upi/+fopa0jp8jpK9wZ62iKcnIdVchfQ8339jcnyXzFmdh/mkU=
+X-Gm-Message-State: AOJu0Yy9VEYhB/Wdwy9k0r651rW5KQneib1V3hV3aXOJvLNCVGGJ7aY3
+	+gBqcunsNzhOn6Eiyh4OCvBuRC6n3nl84zMPY26gx6LPzMcqdbUByLy3hHvwwKY5v8jmN3Eu9jN
+	o1j2OeQNfQXEvmlcCIx01dmBDI2A1DzlB9rzzrWutr2ZES8Zg
+X-Google-Smtp-Source: AGHT+IHmmWr1SgkPXfYy0+vwxILRWcMdybEndT2rqnzFvYVTmWb2oK2QCC6XJzx+KUV1IM5fSyx1SYt7YuYi
+X-Received: by 2002:a05:6122:3706:b0:4da:ae51:b755 with SMTP id 71dfb90a1353d-4f2a57045d8mr4464950e0c.3.1719867800330;
+        Mon, 01 Jul 2024 14:03:20 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-4f2922677d3sm356116e0c.14.2024.07.01.14.03.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 14:03:20 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 8518C3401FD;
+	Mon,  1 Jul 2024 15:03:19 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 85368E42CA2; Mon,  1 Jul 2024 15:02:49 -0600 (MDT)
+Date: Mon, 1 Jul 2024 15:02:49 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
+Message-ID: <ZoMZeWrQclRu2k9s@dev-ushankar.dev.purestorage.com>
+References: <20240617194451.435445-1-ushankar@purestorage.com>
+ <20240617194451.435445-3-ushankar@purestorage.com>
+ <ZnDs5zLc5oA1jPVA@fedora>
+ <ZnxOYyWV/E54qOAM@dev-ushankar.dev.purestorage.com>
+ <Zny9vr/2iHIkc2bC@fedora>
+ <Zn2cuwpM+/dK/682@dev-ushankar.dev.purestorage.com>
+ <ZoFkFB8Fcw5gCDln@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZoFkFB8Fcw5gCDln@fedora>
 
-Zeroout can access a significant capacity and take longer than the user
-expected.  A user may change their mind about wanting to run that
-command and attempt to kill the process and do something else with their
-device. But since the task is uninterruptable, they have to wait for it
-to finish, which could be many hours.
+On Sun, Jun 30, 2024 at 09:56:36PM +0800, Ming Lei wrote:
+> I meant that the following one-line patch may address your issue:
+> 
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 4e159948c912..a89240f4f7b0 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1068,7 +1068,7 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+>  		struct request *rq)
+>  {
+>  	/* We cannot process this rq so just requeue it. */
+> -	if (ublk_queue_can_use_recovery(ubq))
+> +	if (ublk_queue_can_use_recovery_reissue(ubq))
+>  		blk_mq_requeue_request(rq, false);
+>  	else
+>  		blk_mq_end_request(rq, BLK_STS_IOERR);
 
-Add a new BLKDEV_ZERO_KILLABLE flag for blkdev_issue_zeroout that checks
-for a fatal signal at each iteration so the user doesn't have to wait for
-their regretted operation to complete naturally.
+It does not work (ran the same test from my previous email, got the same
+results), and how could it? As I've already mentioned several times, the
+root of the issue is that when UBLK_F_USER_RECOVERY is set, the request
+queue remains quiesced when the server has exited. Quiescing the queue
+means that the block layer will not call the driver's queue_rq when I/Os
+are submitted. Instead the block layer will queue those I/Os internally,
+only submitting them to the driver when the queue is unquiesced, which,
+in the current ublk_drv, only happens when the device is recovered or
+deleted.
 
-Heavily based on an earlier patch from Keith Busch.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-lib.c        | 66 +++++++++++++++++++++++++++---------------
- block/ioctl.c          |  2 +-
- include/linux/blkdev.h |  1 +
- 3 files changed, 45 insertions(+), 24 deletions(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 95a22e7b1d3b85..729a2669681773 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -115,24 +115,27 @@ static void __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
- 		struct bio **biop, unsigned flags)
- {
--	struct bio *bio = *biop;
--
- 	while (nr_sects) {
- 		unsigned int len = min_t(sector_t, nr_sects,
- 				bio_write_zeroes_limit(bdev));
-+		struct bio *bio;
-+
-+		if ((flags & BLKDEV_ZERO_KILLABLE) &&
-+		    fatal_signal_pending(current))
-+			break;
- 
--		bio = blk_next_bio(bio, bdev, 0, REQ_OP_WRITE_ZEROES, gfp_mask);
-+		bio = bio_alloc(bdev, 0, REQ_OP_WRITE_ZEROES, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		if (flags & BLKDEV_ZERO_NOUNMAP)
- 			bio->bi_opf |= REQ_NOUNMAP;
- 
- 		bio->bi_iter.bi_size = len << SECTOR_SHIFT;
-+		*biop = bio_chain_and_submit(*biop, bio);
-+
- 		nr_sects -= len;
- 		sector += len;
- 		cond_resched();
- 	}
--
--	*biop = bio;
- }
- 
- static int blkdev_issue_write_zeroes(struct block_device *bdev, sector_t sector,
-@@ -145,6 +148,12 @@ static int blkdev_issue_write_zeroes(struct block_device *bdev, sector_t sector,
- 	blk_start_plug(&plug);
- 	__blkdev_issue_write_zeroes(bdev, sector, nr_sects, gfp, &bio, flags);
- 	if (bio) {
-+		if ((flags & BLKDEV_ZERO_KILLABLE) &&
-+		    fatal_signal_pending(current)) {
-+			bio_await_chain(bio);
-+			blk_finish_plug(&plug);
-+			return -EINTR;
-+		}
- 		ret = submit_bio_wait(bio);
- 		bio_put(bio);
- 	}
-@@ -176,29 +185,34 @@ static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
- 
- static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
--		struct bio **biop)
-+		struct bio **biop, unsigned int flags)
- {
--	struct bio *bio = *biop;
--	int bi_size = 0;
--	unsigned int sz;
-+	while (nr_sects) {
-+		unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
-+		struct bio *bio;
- 
--	while (nr_sects != 0) {
--		bio = blk_next_bio(bio, bdev, __blkdev_sectors_to_bio_pages(nr_sects),
--				   REQ_OP_WRITE, gfp_mask);
-+		bio = bio_alloc(bdev, nr_vecs, REQ_OP_WRITE, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 
--		while (nr_sects != 0) {
--			sz = min((sector_t) PAGE_SIZE, nr_sects << 9);
--			bi_size = bio_add_page(bio, ZERO_PAGE(0), sz, 0);
--			nr_sects -= bi_size >> 9;
--			sector += bi_size >> 9;
--			if (bi_size < sz)
-+		if ((flags & BLKDEV_ZERO_KILLABLE) &&
-+		    fatal_signal_pending(current))
-+			break;
-+
-+		do {
-+			unsigned int len, added;
-+
-+			len = min_t(sector_t,
-+				PAGE_SIZE, nr_sects << SECTOR_SHIFT);
-+			added = bio_add_page(bio, ZERO_PAGE(0), len, 0);
-+			if (added < len)
- 				break;
--		}
-+			nr_sects -= added >> SECTOR_SHIFT;
-+			sector += added >> SECTOR_SHIFT;
-+		} while (nr_sects);
-+
-+		*biop = bio_chain_and_submit(*biop, bio);
- 		cond_resched();
- 	}
--
--	*biop = bio;
- }
- 
- static int blkdev_issue_zero_pages(struct block_device *bdev, sector_t sector,
-@@ -212,8 +226,14 @@ static int blkdev_issue_zero_pages(struct block_device *bdev, sector_t sector,
- 		return -EOPNOTSUPP;
- 
- 	blk_start_plug(&plug);
--	__blkdev_issue_zero_pages(bdev, sector, nr_sects, gfp, &bio);
-+	__blkdev_issue_zero_pages(bdev, sector, nr_sects, gfp, &bio, flags);
- 	if (bio) {
-+		if ((flags & BLKDEV_ZERO_KILLABLE) &&
-+		    fatal_signal_pending(current)) {
-+			bio_await_chain(bio);
-+			blk_finish_plug(&plug);
-+			return -EINTR;
-+		}
- 		ret = submit_bio_wait(bio);
- 		bio_put(bio);
- 	}
-@@ -255,7 +275,7 @@ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 		if (flags & BLKDEV_ZERO_NOFALLBACK)
- 			return -EOPNOTSUPP;
- 		__blkdev_issue_zero_pages(bdev, sector, nr_sects, gfp_mask,
--				biop);
-+				biop, flags);
- 	}
- 	return 0;
- }
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 45668a21cdb374..83899d06a9d30d 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -258,7 +258,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
- 		goto fail;
- 
- 	err = blkdev_issue_zeroout(bdev, start >> 9, len >> 9, GFP_KERNEL,
--				   BLKDEV_ZERO_NOUNMAP);
-+				   BLKDEV_ZERO_NOUNMAP | BLKDEV_ZERO_KILLABLE);
- 
- fail:
- 	filemap_invalidate_unlock(bdev->bd_mapping);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4d0d4b83bc740f..538bb9b9b6cb32 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1100,6 +1100,7 @@ int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
- 
- #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
- #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
-+#define BLKDEV_ZERO_KILLABLE	(1 << 2)  /* interruptible by fatal signals */
- 
- extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
--- 
-2.43.0
+Having ublk_drv return errors to I/Os issued while there is no ublk
+server requires the queue to be unquiesced. My patchset actually does
+this (see patch 4/4).
 
