@@ -1,115 +1,93 @@
-Received: from mail-vk1-f226.google.com (mail-vk1-f226.google.com [209.85.221.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85014381C4
-	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 21:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A419838DD9
+	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 23:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719867803; cv=none; b=HaEHgt11d4pVtvO/HeOeSsq4qI578vBJycv0i+/5topzEVnjfF4p6z+HhMZAbzD+dhiul8x1MqjG1G/hoqgUIyN2el9zftZAqNDN29brE/nxomF3EOC2MFV47uVv06Q06VyUQoaQM19HnQrRSGjQ5kPw3KrzAC7RBHNUVSV6Aso=
+	t=1719876091; cv=none; b=RQphMpEiwwaQO8qNAUg19BLx5p80hC9j6ejGyjA7BmA3DpSAOEai80xxrcAWJx+09HpnHR7GJ1bzNqmm6lJRduc+v128rAgxkMQqQ9Mudx3Dn2BuxbibUVK3GHlNclSBTL1DdScFl7zFHJ452sUARLktg1LUBTVuUI8whM2iRdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719867803; c=relaxed/simple;
-	bh=LR0b/O13CTgzTuYWkjcpZsu7TTutw6ZnD6dz55Udfp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iYT1f0WxSy4yaRK2e48QIh1J46+xlOM7Yjx8LI6kHJA154AyKDEYrxXnKXpoVRmDz7O5JJCtOIVNsf3zauMmhwDSLmrcwmjXFkGBPY7dF51JzxU/rt4VNM9sTxtohTsIBKjAoOUUCS8yqI/m+rme6RVyYQtHnPilg6XtYYmwGPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fWRHQVLW; arc=none smtp.client-ip=209.85.221.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1719876091; c=relaxed/simple;
+	bh=RxxzTAlf6M0F+FdydyHWlXK4JD9TgbumFM6PV61w53Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jhGHW+twkRR/KMe2KVlvs1SAIXwiSlAhPjWogQ8Q93Q5/72i9hkTAA5VM6+DoP0tdwj9OV5FWoYoHRUNTt/Mo5q/NV4xuAdM1gpn+VF3u+ezXaL7VRGTwwLgXDI8M0Ea20MvszEhyMTdDCE3XEtIi2a9PfbGNCGNAIMSIB86uss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=x6q/reZu; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fWRHQVLW"
-Received: by mail-vk1-f226.google.com with SMTP id 71dfb90a1353d-4ef780ae561so1937371e0c.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Jul 2024 14:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1719867800; x=1720472600; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DqGG29yuvpaxq8YxBPYIVI2DBBbkQ+aDkAyAZUIZKG4=;
-        b=fWRHQVLWgQ83kBgHwEohsTeNYMXQG+jxXVrjpTKZ4dOPtcP8fTZp6dd5ndnbZak6Wf
-         tEGSLy70SG1glnBv2T0vFqlPmU9/hgrgg9V7liiDmefQw0DCsd3rurOYJKsgjyghIQ0Z
-         2dnumoqpXD9uJ7WCYb+mfF1UH9B+4g/B9IwcZayBB1+BOYbZq9BPg+pUbaTgnpVbPWD7
-         O7WSvjY0xUrK/rhs7vLahwNoAGNWeyv7BljychajmeL1iw2wccCSVEGUBhLuHughpIDf
-         ga4RHVbww+kkHrXCSrm1d5M9sFP9ZfneAamy6i+Fm1+kYhrWVXdO2lJAbgk0tfdbcM67
-         nmsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719867800; x=1720472600;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DqGG29yuvpaxq8YxBPYIVI2DBBbkQ+aDkAyAZUIZKG4=;
-        b=S9SxF4KJuSVJc14QBueQ3UfdrvjFYFIl4+wFp/PUsdqmrPQT5kIfWyQpKqXPbd8Jol
-         bR4AVTRSiopDhh1KDpBzrxZIBJMY6dfGvZgKM2mRh9uWbCXs1iA1xfcDkB9qXvH/3Qi7
-         89mdsmLvk7CuY4fgZJpr8a2dOzZ2IqAdEnCXkuBVcm/Z7EsavXaqUl2Kabj94QCL9dFp
-         90ZMj5bVT3WImd15bLwnfSnUMXuje/SCugZqjVsZJ9KAUlwftvFaRMm2a1nHkS643Hcz
-         E01GagEyQkB3YPjFGOl3cmOgyjNQDyiKtpNie/z/baPiCQp9SVi/Ev2MgLIEN4IY8tLs
-         5Yqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgGafIyW6i7vDeJHcouNdBQX9pFveB22Ynb4zgrifWeTZqITT33upi/+fopa0jp8jpK9wZ62iKcnIdVchfQ8339jcnyXzFmdh/mkU=
-X-Gm-Message-State: AOJu0Yy9VEYhB/Wdwy9k0r651rW5KQneib1V3hV3aXOJvLNCVGGJ7aY3
-	+gBqcunsNzhOn6Eiyh4OCvBuRC6n3nl84zMPY26gx6LPzMcqdbUByLy3hHvwwKY5v8jmN3Eu9jN
-	o1j2OeQNfQXEvmlcCIx01dmBDI2A1DzlB9rzzrWutr2ZES8Zg
-X-Google-Smtp-Source: AGHT+IHmmWr1SgkPXfYy0+vwxILRWcMdybEndT2rqnzFvYVTmWb2oK2QCC6XJzx+KUV1IM5fSyx1SYt7YuYi
-X-Received: by 2002:a05:6122:3706:b0:4da:ae51:b755 with SMTP id 71dfb90a1353d-4f2a57045d8mr4464950e0c.3.1719867800330;
-        Mon, 01 Jul 2024 14:03:20 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-4f2922677d3sm356116e0c.14.2024.07.01.14.03.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 14:03:20 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 8518C3401FD;
-	Mon,  1 Jul 2024 15:03:19 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 85368E42CA2; Mon,  1 Jul 2024 15:02:49 -0600 (MDT)
-Date: Mon, 1 Jul 2024 15:02:49 -0600
-From: Uday Shankar <ushankar@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
-Message-ID: <ZoMZeWrQclRu2k9s@dev-ushankar.dev.purestorage.com>
-References: <20240617194451.435445-1-ushankar@purestorage.com>
- <20240617194451.435445-3-ushankar@purestorage.com>
- <ZnDs5zLc5oA1jPVA@fedora>
- <ZnxOYyWV/E54qOAM@dev-ushankar.dev.purestorage.com>
- <Zny9vr/2iHIkc2bC@fedora>
- <Zn2cuwpM+/dK/682@dev-ushankar.dev.purestorage.com>
- <ZoFkFB8Fcw5gCDln@fedora>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="x6q/reZu"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WChr86ktSz6Cnk9X;
+	Mon,  1 Jul 2024 23:21:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1719876086; x=1722468087; bh=RxxzTAlf6M0F+FdydyHWlXK4
+	JD9TgbumFM6PV61w53Q=; b=x6q/reZuYw+swaPbVvKO3WgzDaOe/A2Q6rj5M4Nq
+	FyKnL8hFvlTU7awnh1m8yuuFsYSA8MhXhoS5PsrFi3iv1q7zQ2MLTkJKFRA87YqO
+	E/OGWDnNJpfpS6lFoh1b6O4CY6Glv5EGiyYark/IRmhcc4pSPBbvRALVAAelC5iE
+	LU9RIukek1xXsCQSQ0caVp4Tp1FL3HZq3tN6HdyZLluHq6Tpp0YE2DRBogWLiBN3
+	GtUBNSpFbmvDSCxfWFUgo7TBNgegcGFyeun9TePTyRiOIPVax3Rad3R76UiBEQ4t
+	93ININxN5i3tIibv9VJE4Z94jO9UsVj3Apf4bYy06M9UGw==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 4BdspZc2xxeW; Mon,  1 Jul 2024 23:21:26 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WChr44hXvz6Cnk9V;
+	Mon,  1 Jul 2024 23:21:24 +0000 (UTC)
+Message-ID: <0b028352-8554-4075-9500-d10ff21e8cb6@acm.org>
+Date: Mon, 1 Jul 2024 16:21:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZoFkFB8Fcw5gCDln@fedora>
+User-Agent: Mozilla Thunderbird
+Subject: =?UTF-8?B?UmU6IOetlOWkjTog562U5aSNOiBbUEFUQ0ggdjIgMi8yXSBibG9jay9t?=
+ =?UTF-8?Q?q-deadline=3A_Fix_the_tag_reservation_code?=
+To: =?UTF-8?B?54mb5b+X5Zu9IChaaGlndW8gTml1KQ==?= <Zhiguo.Niu@unisoc.com>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ =?UTF-8?B?546L55qTIChIYW9faGFvIFdhbmcp?= <Hao_hao.Wang@unisoc.com>
+References: <20240509170149.7639-1-bvanassche@acm.org>
+ <20240509170149.7639-3-bvanassche@acm.org>
+ <fcaa5844-e2fb-41d6-8a38-2e318b3e3311@vivo.com>
+ <c9900a6e-889d-4b7c-8aba-4ab1a89c3672@acm.org>
+ <8bdfaa1201874892b166a5b5c59ee9c7@BJMBX02.spreadtrum.com>
+ <366285cb-b099-4c8e-ba52-63c34b55db7f@acm.org>
+ <e0edef374df6415cb2e68539c0189614@BJMBX02.spreadtrum.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <e0edef374df6415cb2e68539c0189614@BJMBX02.spreadtrum.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 30, 2024 at 09:56:36PM +0800, Ming Lei wrote:
-> I meant that the following one-line patch may address your issue:
-> 
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 4e159948c912..a89240f4f7b0 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1068,7 +1068,7 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
->  		struct request *rq)
->  {
->  	/* We cannot process this rq so just requeue it. */
-> -	if (ublk_queue_can_use_recovery(ubq))
-> +	if (ublk_queue_can_use_recovery_reissue(ubq))
->  		blk_mq_requeue_request(rq, false);
->  	else
->  		blk_mq_end_request(rq, BLK_STS_IOERR);
+On 6/30/24 6:30 PM, =E7=89=9B=E5=BF=97=E5=9B=BD (Zhiguo Niu) wrote:
+> Can you help review this serials patch from Bart Van Assche?
+> https://lore.kernel.org/all/20240509170149.7639-1-bvanassche@acm.org/
+> [PATCH v2 1/2] block: Call .limit_depth() after .hctx has been set
+> [PATCH v2 2/2] block/mq-deadline: Fix the tag reservation code
+>=20
+> These patch will fix the issue "there may warning happen if we set dd a=
+sync_depth from user",
+> For more information about warnings, please refer to commit msg:
+> https://lore.kernel.org/all/CAHJ8P3KEOC_DXQmZK3u7PHgZFmWpMVzPa6pgkOgpyo=
+H7wgT5nw@mail.gmail.com/
 
-It does not work (ran the same test from my previous email, got the same
-results), and how could it? As I've already mentioned several times, the
-root of the issue is that when UBLK_F_USER_RECOVERY is set, the request
-queue remains quiesced when the server has exited. Quiescing the queue
-means that the block layer will not call the driver's queue_rq when I/Os
-are submitted. Instead the block layer will queue those I/Os internally,
-only submitting them to the driver when the queue is unquiesced, which,
-in the current ublk_drv, only happens when the device is recovered or
-deleted.
+Hi Zhiguo,
 
-Having ublk_drv return errors to I/Os issued while there is no ublk
-server requires the queue to be unquiesced. My patchset actually does
-this (see patch 4/4).
+If these patches pass your tests then you can reply to these patches=20
+with your own Tested-by.
+
+Thanks,
+
+Bart.
 
