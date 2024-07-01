@@ -1,44 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9862AD05
-	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 05:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6E32AD05
+	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 05:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719810573; cv=none; b=L8HXzH5IepCjepAc9sFVdRbjqck3fuVyrzkCyp0ZjFWg7/K/sbWbPasWMMuaXwjwAX/JKe31LjGkVM85ScJCHE4FDa+uFt6D+haBRpwosZ+w/IecVOPP03ouUGLwCUp3Mcbf9FnUSAfLNfSrffmFsCzYxk3/CV9bdbXUKqdEsTA=
+	t=1719810576; cv=none; b=F0fr92bHw/Vk+Su/hZPN4aO8dg8JDnxlo6PjQKEDMmyyJl+w488ASHf2Gz3SPo8Wsz02UBpQztGsO+K5w/oxKrpA21xiOWZE3ooTNVUFM8ZnMvoqsF3P/KZbA5n1vV4J3jjgte3aWyHiMDZFT8E2VRvFcGWElMZ/EXqhfy+KbPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719810573; c=relaxed/simple;
-	bh=bJZFcwmZb/ow39OQ1nA3teqy0nDQ5YgxWmIBix3Nc8M=;
+	s=arc-20240116; t=1719810576; c=relaxed/simple;
+	bh=6qzbI9W0dIjuMs0tR6+1cR/DQHZG+GO9fhr825YOT+U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iXnxumx0gN5rV9sJrRg9G0SQ6SYe+KcfJqfBVTs96XdM+Xg3KDtd6BJySEV50TAPW5Uhxj9ShOTTppowNTdJtRs/olTRor6J6eReGidt1rp+WFSqCjn3fSZ3YRj6E8M97F3r2yROBZnWAgZqZpTwEsSPmNNgtwWmMqWkWrCXO0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nYXFxGwU; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=SKAD8TSswUCqnEGIcqFGPPG7/rRF/WCKFcqPtbVI39ByYnW9GZimeIBZ0OTEE6NAhWtrBj8nouCXbbDp1LbbX6QrO2p9kWtM0+Jmir/1bYx2zmVnkvwNS8gC18oa0M4p55T6OfCfu3G4vjFTId+fTit1xPcwt7YmJbYbUhk+dYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=C2Zfbt+v; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nYXFxGwU"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="C2Zfbt+v"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=PV92L0B9im4Kj3OftYV0nbZwAZGJpIrUAX90xBRCuGQ=; b=nYXFxGwUqcqUeMRvNo+uAvKSnB
-	QXI+NLDWSh4B17JB6fAIzwVCI/JXCCbdo0xZtktRAmgSGTUciIIDEd3rdVaiwQT6u6xf3farXKgs9
-	zTeYB8vv/GWXuOb2eq9m00TkwJOP2u35+FI7ddcMQziaXGEFUkGjwhhbdqGJ0nvuD0uaS8Z12FFgJ
-	p6u1IWReyIjRamdPjPed8XPt9YdUUglqnZPsclfqgBtX7wiFtwjdkXFhJ02JiOKxghoUHESKyKCD8
-	xCE1yrf+pJZsblRAp1yW671aUNOiOBQBrgsv50oWOuSLn5EUhAsFlM6AZuDruAT8j8ng3GPtKOMkE
-	q45alR2w==;
+	bh=qnVQ0Zsyk5yLVE9nCi8pUTdqtQJmDy7FRD4pSkUnbOQ=; b=C2Zfbt+vjL4w9KbSzHZO6zRlsf
+	id0RhaGONqi/yZ3uZNuHMT2LEgy0Tmani4at3cU1ndu9ZJq/nk2w1UoXn98TrwyvLV2ltZwb09jx8
+	GJztotoJl7ak0pQOgtiJSBE2UwJmD5asldPtrdVVT+zO3vdpIcXLH4SO+QxCIiC89wvcSp14fWOyj
+	818NGQugWZ1dA4TJwlhurX+Dsa0YvUtR4CGvvViryPuImJhiv8T1XM+92c8S2XBJJ6VV6JeHJUPeR
+	INo3UU/BDjxjTuoWrya/dj0TSDi1upj3cCanGnTMFWn5OvxsmgHchFbayCtrCXI79ubE3KrpH4LUf
+	/vQZFrfg==;
 Received: from 2a02-8389-2341-5b80-ec0f-1986-7d09-2a29.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:ec0f:1986:7d09:2a29] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sO9IB-00000001iDO-11Gf;
-	Mon, 01 Jul 2024 05:09:31 +0000
+	id 1sO9ID-00000001iDa-3q5s;
+	Mon, 01 Jul 2024 05:09:34 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
 	Anuj Gupta <anuj20.g@samsung.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 4/5] block: don't free submitter owned integrity payload on I/O completion
-Date: Mon,  1 Jul 2024 07:09:00 +0200
-Message-ID: <20240701050918.1244264-5-hch@lst.de>
+Subject: [PATCH 5/5] block: don't free the integrity payload in bio_integrity_unmap_free_user
+Date: Mon,  1 Jul 2024 07:09:01 +0200
+Message-ID: <20240701050918.1244264-6-hch@lst.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240701050918.1244264-1-hch@lst.de>
 References: <20240701050918.1244264-1-hch@lst.de>
@@ -51,200 +51,103 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Currently __bio_integrity_endio frees the integrity payload unless it is
-explicitly marked as user-mapped.  This means in-kernel callers that
-allocate their own integrity payload never get to see it on I/O
-completion.  The current two users don't need it as they just pre-mapped
-PI tuples received over the network, but this limits uses of integrity
-data lot.
-
-Change bio_integrity_endio to call __bio_integrity_endio for block layer
-generated integrity data only, and leave freeing of submitter
-allocated integrity data to bio_uninit which also gets called from
-the final bio_put.  This requires that unmapping user mapped or copied
-integrity data is now always done by the caller, and the special
-BIP_INTEGRITY_USER flag can go away.
+Now that the integrity payload is always freed in bio_uninit, don't
+bother freeing it a little earlier in bio_integrity_unmap_free_user.
+With that the separate bio_integrity_unmap_free_user can go away by
+just passing the bio to bio_integrity_unmap_user.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio-integrity.c         | 57 ++++++++++++++---------------------
- block/blk.h                   | 13 ++++++--
- include/linux/bio-integrity.h |  3 +-
- 3 files changed, 34 insertions(+), 39 deletions(-)
+ block/bio-integrity.c         | 31 +++++++++++--------------------
+ block/blk-map.c               |  2 +-
+ include/linux/bio-integrity.h |  4 ++--
+ 3 files changed, 14 insertions(+), 23 deletions(-)
 
 diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index c8757d47e0ef62..4aa836d603fb23 100644
+index 4aa836d603fb23..4b5c604585561e 100644
 --- a/block/bio-integrity.c
 +++ b/block/bio-integrity.c
-@@ -22,9 +22,17 @@ void blk_flush_integrity(void)
- 	flush_workqueue(kintegrityd_wq);
+@@ -131,34 +131,25 @@ static void bio_integrity_uncopy_user(struct bio_integrity_payload *bip)
+ 	bio_integrity_unpin_bvec(copy, nr_vecs, true);
  }
  
--static void __bio_integrity_free(struct bio_set *bs,
--				 struct bio_integrity_payload *bip)
+-static void bio_integrity_unmap_user(struct bio_integrity_payload *bip)
 +/**
-+ * bio_integrity_free - Free bio integrity payload
-+ * @bio:	bio containing bip to be freed
++ * bio_integrity_unmap_user - Unmap user integrity payload
++ * @bio:	bio containing bip to be unmapped
 + *
-+ * Description: Free the integrity portion of a bio.
++ * Unmap the user mapped integrity portion of a bio.
 + */
-+void bio_integrity_free(struct bio *bio)
++void bio_integrity_unmap_user(struct bio *bio)
  {
+-	bool dirty = bio_data_dir(bip->bip_bio) == READ;
 +	struct bio_integrity_payload *bip = bio_integrity(bio);
-+	struct bio_set *bs = bio->bi_pool;
-+
- 	if (bs && mempool_initialized(&bs->bio_integrity_pool)) {
- 		if (bip->bip_vec)
- 			bvec_free(&bs->bvec_integrity_pool, bip->bip_vec,
-@@ -33,6 +41,8 @@ static void __bio_integrity_free(struct bio_set *bs,
- 	} else {
- 		kfree(bip);
+ 
+ 	if (bip->bip_flags & BIP_COPY_USER) {
+-		if (dirty)
++		if (bio_data_dir(bio) == READ)
+ 			bio_integrity_uncopy_user(bip);
+ 		kfree(bvec_virt(bip->bip_vec));
+ 		return;
  	}
-+	bio->bi_integrity = NULL;
-+	bio->bi_opf &= ~REQ_INTEGRITY;
- }
  
- /**
-@@ -86,7 +96,10 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
- 
- 	return bip;
- err:
--	__bio_integrity_free(bs, bip);
-+	if (bs && mempool_initialized(&bs->bio_integrity_pool))
-+		mempool_free(bip, &bs->bio_integrity_pool);
-+	else
-+		kfree(bip);
- 	return ERR_PTR(-ENOMEM);
- }
- EXPORT_SYMBOL(bio_integrity_alloc);
-@@ -132,28 +145,6 @@ static void bio_integrity_unmap_user(struct bio_integrity_payload *bip)
- 	bio_integrity_unpin_bvec(bip->bip_vec, bip->bip_max_vcnt, dirty);
- }
- 
--/**
-- * bio_integrity_free - Free bio integrity payload
-- * @bio:	bio containing bip to be freed
-- *
-- * Description: Used to free the integrity portion of a bio. Usually
-- * called from bio_free().
-- */
--void bio_integrity_free(struct bio *bio)
--{
--	struct bio_integrity_payload *bip = bio_integrity(bio);
--	struct bio_set *bs = bio->bi_pool;
--
--	if (bip->bip_flags & BIP_INTEGRITY_USER)
--		return;
--	if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
--		kfree(bvec_virt(bip->bip_vec));
--
--	__bio_integrity_free(bs, bip);
--	bio->bi_integrity = NULL;
--	bio->bi_opf &= ~REQ_INTEGRITY;
+-	bio_integrity_unpin_bvec(bip->bip_vec, bip->bip_max_vcnt, dirty);
 -}
 -
- /**
-  * bio_integrity_unmap_free_user - Unmap and free bio user integrity payload
-  * @bio:	bio containing bip to be unmapped and freed
-@@ -165,14 +156,9 @@ void bio_integrity_free(struct bio *bio)
- void bio_integrity_unmap_free_user(struct bio *bio)
- {
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
--	struct bio_set *bs = bio->bi_pool;
- 
--	if (WARN_ON_ONCE(!(bip->bip_flags & BIP_INTEGRITY_USER)))
--		return;
- 	bio_integrity_unmap_user(bip);
--	__bio_integrity_free(bs, bip);
--	bio->bi_integrity = NULL;
--	bio->bi_opf &= ~REQ_INTEGRITY;
-+	bio_integrity_free(bio);
+-/**
+- * bio_integrity_unmap_free_user - Unmap and free bio user integrity payload
+- * @bio:	bio containing bip to be unmapped and freed
+- *
+- * Description: Used to unmap and free the user mapped integrity portion of a
+- * bio. Submitter attaching the user integrity buffer is responsible for
+- * unmapping and freeing it during completion.
+- */
+-void bio_integrity_unmap_free_user(struct bio *bio)
+-{
+-	struct bio_integrity_payload *bip = bio_integrity(bio);
+-
+-	bio_integrity_unmap_user(bip);
+-	bio_integrity_free(bio);
++	bio_integrity_unpin_bvec(bip->bip_vec, bip->bip_max_vcnt,
++			bio_data_dir(bio) == READ);
  }
  
  /**
-@@ -273,7 +259,7 @@ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
- 		goto free_bip;
- 	}
+diff --git a/block/blk-map.c b/block/blk-map.c
+index df5f82d114720f..0e1167b239342f 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -758,7 +758,7 @@ int blk_rq_unmap_user(struct bio *bio)
+ 		}
  
--	bip->bip_flags |= BIP_INTEGRITY_USER | BIP_COPY_USER;
-+	bip->bip_flags |= BIP_COPY_USER;
- 	bip->bip_iter.bi_sector = seed;
- 	bip->bip_vcnt = nr_vecs;
- 	return 0;
-@@ -294,7 +280,6 @@ static int bio_integrity_init_user(struct bio *bio, struct bio_vec *bvec,
- 		return PTR_ERR(bip);
+ 		if (bio_integrity(bio))
+-			bio_integrity_unmap_free_user(bio);
++			bio_integrity_unmap_user(bio);
  
- 	memcpy(bip->bip_vec, bvec, nr_vecs * sizeof(*bvec));
--	bip->bip_flags |= BIP_INTEGRITY_USER;
- 	bip->bip_iter.bi_sector = seed;
- 	bip->bip_iter.bi_size = len;
- 	bip->bip_vcnt = nr_vecs;
-@@ -502,6 +487,8 @@ static void bio_integrity_verify_fn(struct work_struct *work)
- 	struct bio *bio = bip->bip_bio;
- 
- 	blk_integrity_verify(bio);
-+
-+	kfree(bvec_virt(bip->bip_vec));
- 	bio_integrity_free(bio);
- 	bio_endio(bio);
- }
-@@ -522,13 +509,13 @@ bool __bio_integrity_endio(struct bio *bio)
- 	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
- 
--	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status &&
--	    (bip->bip_flags & BIP_BLOCK_INTEGRITY) && bi->csum_type) {
-+	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status && bi->csum_type) {
- 		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
- 		queue_work(kintegrityd_wq, &bip->bip_work);
- 		return false;
- 	}
- 
-+	kfree(bvec_virt(bip->bip_vec));
- 	bio_integrity_free(bio);
- 	return true;
- }
-diff --git a/block/blk.h b/block/blk.h
-index 401e604f35d2cf..2233dc8d36b82a 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -202,11 +202,20 @@ static inline unsigned int blk_queue_get_max_sectors(struct request *rq)
- 
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- void blk_flush_integrity(void);
--bool __bio_integrity_endio(struct bio *);
- void bio_integrity_free(struct bio *bio);
-+
-+/*
-+ * Integrity payloads can either be owned by the submitter, in which case
-+ * bio_uninit will free them, or owned and generated by the block layer,
-+ * in which case we'll verify them here (for reads) and free them before
-+ * the bio is handed back to the submitted.
-+ */
-+bool __bio_integrity_endio(struct bio *bio);
- static inline bool bio_integrity_endio(struct bio *bio)
- {
--	if (bio_integrity(bio))
-+	struct bio_integrity_payload *bip = bio_integrity(bio);
-+
-+	if (bip && (bip->bip_flags & BIP_BLOCK_INTEGRITY))
- 		return __bio_integrity_endio(bio);
- 	return true;
- }
+ 		next_bio = bio;
+ 		bio = bio->bi_next;
 diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
-index cac24dac06fff0..3823d9be0d0790 100644
+index 3823d9be0d0790..dd831c269e9948 100644
 --- a/include/linux/bio-integrity.h
 +++ b/include/linux/bio-integrity.h
-@@ -10,8 +10,7 @@ enum bip_flags {
- 	BIP_CTRL_NOCHECK	= 1 << 2, /* disable HBA integrity checking */
- 	BIP_DISK_NOCHECK	= 1 << 3, /* disable disk integrity checking */
- 	BIP_IP_CHECKSUM		= 1 << 4, /* IP checksum */
--	BIP_INTEGRITY_USER	= 1 << 5, /* Integrity payload is user address */
--	BIP_COPY_USER		= 1 << 6, /* Kernel bounce buffer in use */
-+	BIP_COPY_USER		= 1 << 5, /* Kernel bounce buffer in use */
- };
+@@ -73,7 +73,7 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio, gfp_t gfp,
+ int bio_integrity_add_page(struct bio *bio, struct page *page, unsigned int len,
+ 		unsigned int offset);
+ int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t len, u32 seed);
+-void bio_integrity_unmap_free_user(struct bio *bio);
++void bio_integrity_unmap_user(struct bio *bio);
+ bool bio_integrity_prep(struct bio *bio);
+ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done);
+ void bio_integrity_trim(struct bio *bio);
+@@ -104,7 +104,7 @@ static inline int bio_integrity_map_user(struct bio *bio, void __user *ubuf,
+ 	return -EINVAL;
+ }
  
- struct bio_integrity_payload {
+-static inline void bio_integrity_unmap_free_user(struct bio *bio)
++static inline void bio_integrity_unmap_user(struct bio *bio)
+ {
+ }
+ 
 -- 
 2.43.0
 
