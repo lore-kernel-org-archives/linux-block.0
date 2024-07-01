@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3039B16DC35;
-	Mon,  1 Jul 2024 16:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D8516D4F4;
+	Mon,  1 Jul 2024 16:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719852762; cv=none; b=mEmPMlHzHAWJ4iXwzEJDP3XK56eX0vBFIDmU6fec3Ref9N3Tf4JF7TcPoI5SZHf8DLQtYvwTIFsoAaqItZQPBtgYlELGvtfQXbcZHIS7LOoB9Slb6ElKzF6TYij7bY7YD03ugn6IZruWTlqJ/44v9aHUUL7kFWEZ0lfolpG0HWA=
+	t=1719852766; cv=none; b=h2TjbfpJUgy/7X1yqs95PUoasUFgPHrYCxhjyJl1mzbmqOJlQMx//hpV97qs+HNoVG/XF9pYjcpCiY1QqONKmi2YgzICap6kPPEQ5j4hbv0CmFOAPNA48Dv0d3A0f1wFtOOtZXnLQSyae553PJkZBF5ULe/r1Uk1oVadwXNUk/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719852762; c=relaxed/simple;
-	bh=VEMRQwfeIWs70rHujqfrqoaMQ9Uh6Mfmgvpl96QOpwM=;
+	s=arc-20240116; t=1719852766; c=relaxed/simple;
+	bh=bkBqvU8+udzDY3YWr9bvQ3s+zzZXwra3PaEaBxKtj2k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QK6FtPek+anfOVHxYQGwRQA51ibCz2ZRSpOlO0n9/x67AU38IZSme79zsLzSbyIegoS3ruI0zDzS7aoshkHEi6aXhljvTbuCvypIg4XKV6Hs25u2xsod6Z5+4ixhBbcVwadoTLk3jXLIV/H69H5HXoTPuGknMbLqefgqgjCBpDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3zbsQa4i; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=lghOv3QssqZ/KLj4DBoWEPCtiMF92IZrIaXYJjXY1Pg9uYyQhQha75FwKkUB4QCbC05ukadpMYEgklyoq2zH5OJ2W4hcJtL3dMwtDCGJgMVYa6Ry1s8OSCgysJv+Pi2KzfmMGwGif+TlTyTEemFwHiyHqFM3uhLvz3M8Do46hC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CfPrCIkd; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3zbsQa4i"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CfPrCIkd"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=Oqdc6V8xwAdvyBJbY3RHzAse+UGgP4u6Afcst4sdYMk=; b=3zbsQa4iYn/8FdgbtQAMm9GHjz
-	/NqRlhiaxbEOMvyQOxPRJyhjZWOK81jVMi5yS/NGVCQBL5bi2vIK1TC1ba7mfkAZYGbfgaU0dV1Vy
-	y95UDYEu0CrJMEckAwUXGp0c2EO/TjLGxGNphVFJIItIUMZZU9vGjm7yQh2VBXRkX73K9u9e8k9hV
-	ooAYPwwWvYD+9la9ClcSV1kJGVNp4qmVF2pWusl4h2OY6BFXu4WJMmcd+vw3QZ6lVpDABotTft5ja
-	GdvVI1MgC/51iCOSuni4G4WfwNlh4xa5G//R0z6xzVFtMHnP6yTksijHHA+QMEfqnx7/lP5TOW4Zt
-	V0b6pxbg==;
+	bh=PF/pH6GqS8l9M6N2BcoMrMWTHNBHwOz4qGTXXLsturA=; b=CfPrCIkdMKmx7SlbwEi8FaDRfc
+	Cvrq2It5W1Vv/d3nw4XoJCmR51wq0K3AMzS3V7uilHuU20fFnydJJZJNRpjwZ3Ngn+jQfg3kMiu1l
+	6TdB1RkiMROvxBGoX6YP5PNq/jLndh/wICFKNw+5HgT1U3Ljgs5yOM0471rajytsAPmgaoaacR/Li
+	EMxbR88bn6hySGuiAB0uIhItMZd78eiacGI3pBNgD+IlSvQgPfS/JG4+XWrcqky3qwyVMYhcKB21W
+	DBVR8lu131AgKbhSnT/QAmiLOjuzsxhwp48RocKdOCe2wemOubuUDtcgxJVyre/SuvdA1eTEGuaa6
+	F8el2uOw==;
 Received: from 2a02-8389-2341-5b80-6bfa-ffbf-d1d1-ec94.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:6bfa:ffbf:d1d1:ec94] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sOKGd-00000004Bdw-2AQA;
-	Mon, 01 Jul 2024 16:52:40 +0000
+	id 1sOKGh-00000004BfP-1HbS;
+	Mon, 01 Jul 2024 16:52:43 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Keith Busch <kbusch@kernel.org>,
@@ -37,9 +37,9 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	Ulf Hansson <ulf.hansson@linaro.org>,
 	linux-mmc@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 04/10] blk-lib: check for kill signal in ioctl BLKSECDISCARD
-Date: Mon,  1 Jul 2024 18:51:14 +0200
-Message-ID: <20240701165219.1571322-5-hch@lst.de>
+Subject: [PATCH 05/10] block: factor out a blk_write_zeroes_limit helper
+Date: Mon,  1 Jul 2024 18:51:15 +0200
+Message-ID: <20240701165219.1571322-6-hch@lst.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240701165219.1571322-1-hch@lst.de>
 References: <20240701165219.1571322-1-hch@lst.de>
@@ -52,78 +52,55 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Secure Erase can access a significant capacity and take longer than the
-user expected.  A user may change their mind about wanting to run that
-command and attempt to kill the process and do something else with their
-device. But since the task is uninterruptable, they have to wait for it
-to finish, which could be many hours.
+Contrary to the comment in __blkdev_issue_write_zeroes, nothing here
+checks for a potential bi_size overflow.  Add a helper mirroring
+the secure erase code for the check.
 
-Open code blkdev_issue_secure_erase in the BLKSECDISCARD ioctl handler
-and check for a fatal signal at each iteration so the user doesn't have
-to wait for their regretted operation to complete naturally.
-
-Heavily based on an earlier patch from Keith Busch.
-
-Reported-by: Conrad Meyer <conradmeyer@meta.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/ioctl.c | 34 +++++++++++++++++++++++++++++++---
- 1 file changed, 31 insertions(+), 3 deletions(-)
+ block/blk-lib.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index f53121edb9a15f..45668a21cdb374 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -164,6 +164,9 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
- 		void __user *argp)
- {
- 	unsigned int bs_mask = bdev_logical_block_size(bdev) - 1;
-+	struct bio *prev = NULL, *bio;
-+	sector_t sector, nr_sects;
-+	struct blk_plug plug;
- 	uint64_t start, len;
- 	uint64_t range[2];
- 	int err;
-@@ -187,11 +190,36 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
- 	if (start + len > bdev_nr_bytes(bdev))
- 		return -EINVAL;
- 
-+	sector = start >> SECTOR_SHIFT;
-+	nr_sects = len >> SECTOR_SHIFT;
-+
- 	filemap_invalidate_lock(bdev->bd_mapping);
- 	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
--	if (!err)
--		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
--						GFP_KERNEL);
-+	if (err)
-+		goto out_unlock;
-+
-+	blk_start_plug(&plug);
-+	while (1) {
-+		if (fatal_signal_pending(current)) {
-+			if (prev)
-+				bio_await_chain(prev);
-+			err = -EINTR;
-+			goto out_unplug;
-+		}
-+		bio = blk_alloc_secure_erase_bio(bdev, &sector, &nr_sects,
-+				GFP_KERNEL);
-+		if (!bio)
-+			break;
-+		prev = bio_chain_and_submit(prev, bio);
-+	}
-+	if (prev) {
-+		err = submit_bio_wait(prev);
-+		bio_put(prev);
-+	}
-+
-+out_unplug:
-+	blk_finish_plug(&plug);
-+out_unlock:
- 	filemap_invalidate_unlock(bdev->bd_mapping);
- 	return err;
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index cf4f0ee6b14503..f338709aef0c30 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -103,24 +103,28 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
  }
+ EXPORT_SYMBOL(blkdev_issue_discard);
+ 
++static sector_t bio_write_zeroes_limit(struct block_device *bdev)
++{
++	sector_t bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
++
++	return min(bdev_write_zeroes_sectors(bdev),
++		(UINT_MAX >> SECTOR_SHIFT) & ~bs_mask);
++}
++
+ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+ 		struct bio **biop, unsigned flags)
+ {
+ 	struct bio *bio = *biop;
+-	unsigned int max_sectors;
+ 
+ 	if (bdev_read_only(bdev))
+ 		return -EPERM;
+-
+-	/* Ensure that max_sectors doesn't overflow bi_size */
+-	max_sectors = bdev_write_zeroes_sectors(bdev);
+-
+-	if (max_sectors == 0)
++	if (!bdev_write_zeroes_sectors(bdev))
+ 		return -EOPNOTSUPP;
+ 
+ 	while (nr_sects) {
+-		unsigned int len = min_t(sector_t, nr_sects, max_sectors);
++		unsigned int len = min_t(sector_t, nr_sects,
++				bio_write_zeroes_limit(bdev));
+ 
+ 		bio = blk_next_bio(bio, bdev, 0, REQ_OP_WRITE_ZEROES, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
 -- 
 2.43.0
 
