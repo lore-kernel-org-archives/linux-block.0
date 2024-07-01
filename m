@@ -1,141 +1,163 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3AA1EB21
-	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 07:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC55AF9E6;
+	Mon,  1 Jul 2024 08:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719819152; cv=none; b=pTzk+Lf0Aq0wiZzf74IzjhkVQ23Gzy3msaxNN0hNprDVEoTgk7hEiOJ+M42tltWmRXUibkJGd5ssOci6712xDCmKKx1mXzHoGAFGTPd068ISDiFnt+nzMFd4SPSbSrMNph+hj4L04kB+7ia4oyUeICTMQN31knGMORx8j9B/IkI=
+	t=1719821969; cv=none; b=jQwXAZbmOefdwSeLuezuGUhyGRx2PuEADXBNpmBNa6ftJO6Vg5TH5Qorha+QNAqAns0RiYQB7EJqsp1r5lpTahzCQIkRVjXGAAyyyuEimMj8AD4PfphTIutgf8bumSh1asfuo//ZATEheAJkKQH3VjWANqnGxcgCmKA4IVgxHyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719819152; c=relaxed/simple;
-	bh=1eccIISYqvnEKmw23BCurpF5bGx/iXGcbUmObz942UU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=ljulbN9FtgLtYB8h5LZb+XOmJSHQtMNLRgCpvR8mb//Qh72vG1Qw1VIvFIAWy5+sPbeTQE9cF7beCIFnSvIR9fMIIgQUTHEi4FtwS7g1aE13qgNXNPK2yhfUrmyLtMqae271k5jBwhdOR4SAWmzSG9zhhJsdGk7+qZ2Edlx9b/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=idF4f0Xi; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1719821969; c=relaxed/simple;
+	bh=Zfwgg5urJiTJNYF1K+OAuafUdjK/ushBhJWj8/v0Rf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sM7aWLIquoEfIAYyM2OmbMupquS7qOQvtx4ASS7W/1zRQUe0J++TF4dQ9dVggaPDyfWY92mf25BHMCT8yWKmvtlu8tYXTIiY+bNE0WdqoOo/uMMC0rAFFCPXafbW5D6alQ0Tuem83WIR59dAjYxkupknY9Va/FfzmRu1L/3mHIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iAlJRtBK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ncJjRUcV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iAlJRtBK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ncJjRUcV; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="idF4f0Xi"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240701073221epoutp0270491af5c73e47f3ef8c8501ffc3d88f~eBmW5CJCN2168121681epoutp02J
-	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 07:32:21 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240701073221epoutp0270491af5c73e47f3ef8c8501ffc3d88f~eBmW5CJCN2168121681epoutp02J
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1719819141;
-	bh=WWxKY9oZHJuFLW7GFgRgK3KCqiFp5Mp6py/ldwZb0+4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=idF4f0Xiqo7+NthdZVlic2KC/dFKGWHa711zJne34VwXuh1dyvTA3PtyrB2Zml9O5
-	 BRrd7ikhtFSowscKS27GrjzA3Cg+ozx26VhsZfHzmJYaRuSC+4tIn4DEW1bNIUgeG9
-	 2zcJbyLtDp0LOmd9LWWLivVrOjO3V/2W1t/1KAWA=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240701073221epcas5p10f0caa3928d8dfbd1ea0b307ed09c781~eBmWqBc9E1699116991epcas5p10;
-	Mon,  1 Jul 2024 07:32:21 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.182]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4WCHn00t4vz4x9Pw; Mon,  1 Jul
-	2024 07:32:20 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	E9.2B.07307.28B52866; Mon,  1 Jul 2024 16:32:18 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240701073115epcas5p3e2758375e272cba80281fe0ac37394d0~eBlZdJv7g3170731707epcas5p3c;
-	Mon,  1 Jul 2024 07:31:15 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240701073115epsmtrp1a718b5b491b28138bfef63f31c6f7263~eBlZcZpUS0471704717epsmtrp1E;
-	Mon,  1 Jul 2024 07:31:15 +0000 (GMT)
-X-AuditID: b6c32a44-3f1fa70000011c8b-7f-66825b8264ce
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	F5.9A.19057.34B52866; Mon,  1 Jul 2024 16:31:15 +0900 (KST)
-Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240701073113epsmtip202f1b5eb771d3ad76dc6fca5098d946d~eBlXyDV_J1952619526epsmtip2J;
-	Mon,  1 Jul 2024 07:31:13 +0000 (GMT)
-Date: Mon, 1 Jul 2024 12:54:05 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Sagi
-	Grimberg <sagi@grimberg.me>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: io_opt fixups
-Message-ID: <20240701072405.pnlqogwgyw52xwk3@nj.shetty@samsung.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iAlJRtBK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ncJjRUcV";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iAlJRtBK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ncJjRUcV"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B9EE0219DC;
+	Mon,  1 Jul 2024 08:19:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719821965; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CRYGLoPAgz4Kckx8H1tNt+H/fOv5Rx00dQoQrq5R2vY=;
+	b=iAlJRtBKDdJCzLp4krfRz1Gp3xutLSrvwNCbAVLeLp3+a5jnsBJSSG8yxSotc9Ta3aTd5e
+	UpZYtz6lS5d3vV/Pflcw5iOY1Hv6nV4UsOG29QTzScnIh+mpw7l3B5XFrqJDUniR84Wn/0
+	1RApYSkWXG5qe+gFfauK4LuQf8vvXYw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719821965;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CRYGLoPAgz4Kckx8H1tNt+H/fOv5Rx00dQoQrq5R2vY=;
+	b=ncJjRUcV9XT0IyhBAswqvNfj0WrsL57g89+QO33bAmgfKE739GJoRooHosGuaGcuJYsKLZ
+	goPzb3fsJsp8pzCg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1719821965; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CRYGLoPAgz4Kckx8H1tNt+H/fOv5Rx00dQoQrq5R2vY=;
+	b=iAlJRtBKDdJCzLp4krfRz1Gp3xutLSrvwNCbAVLeLp3+a5jnsBJSSG8yxSotc9Ta3aTd5e
+	UpZYtz6lS5d3vV/Pflcw5iOY1Hv6nV4UsOG29QTzScnIh+mpw7l3B5XFrqJDUniR84Wn/0
+	1RApYSkWXG5qe+gFfauK4LuQf8vvXYw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1719821965;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CRYGLoPAgz4Kckx8H1tNt+H/fOv5Rx00dQoQrq5R2vY=;
+	b=ncJjRUcV9XT0IyhBAswqvNfj0WrsL57g89+QO33bAmgfKE739GJoRooHosGuaGcuJYsKLZ
+	goPzb3fsJsp8pzCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A2A9213800;
+	Mon,  1 Jul 2024 08:19:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id cIlsJ41mgmYCfwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Mon, 01 Jul 2024 08:19:25 +0000
+Date: Mon, 1 Jul 2024 10:19:25 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
+	Sagi Grimberg <sagi@grimberg.me>, Thomas Gleixner <tglx@linutronix.de>, 
+	Christoph Hellwig <hch@lst.de>, Frederic Weisbecker <fweisbecker@suse.com>, 
+	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
+	Sridhar Balaraman <sbalaraman@parallelwireless.com>, "brookxu.cn" <brookxu.cn@gmail.com>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v2 3/3] lib/group_cpus.c: honor housekeeping config when
+ grouping CPUs
+Message-ID: <pmnqhamoec7u7ibtt4vccjfecp3ixgdlxzgncelvgczfbt74x5@26rjmpubji6s>
+References: <20240627-isolcpus-io-queues-v2-0-26a32e3c4f75@suse.de>
+ <20240627-isolcpus-io-queues-v2-3-26a32e3c4f75@suse.de>
+ <ZoFgLxGXrk4VCR03@fedora>
+ <b2ncik6c7xicsnzihhwfjjqood2yys52tzotohjnxj6o2mapg5@m364yzsjbvs2>
+ <ZoJY6a1CHCENAZZ8@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240701051800.1245240-1-hch@lst.de>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKJsWRmVeSWpSXmKPExsWy7bCmpm5TdFOawbfr0har7/azWaxcfZTJ
-	YtKha4wWe29pW8xf9pTdYvnxf0wW616/Z3Fg9zh/byOLx+WzpR6bVnWyeWxeUu+x+2YDm8fH
-	p7dYPD5vkgtgj8q2yUhNTEktUkjNS85PycxLt1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ
-	0HXLzAG6RkmhLDGnFCgUkFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYFKgV5yYW1yal66Xl1pi
-	ZWhgYGQKVJiQnTH1aF7BDPaKs6t+MTcwtrJ1MXJySAiYSCxY9Y65i5GLQ0hgN6PE3juTGSGc
-	T4wSl07OZINwvjFK/Jn7jBGm5c/EDqiqvYwSL861MEE4nxkldmx6xA5SxSKgIrHh4EeWLkYO
-	DjYBbYnT/zlAwiICShJPX50Fa2YWuMUoca/rP1i9sICUxKZtc5hA6nkFnCX+n1IACfMKCEqc
-	nPmEBcTmFDCSONe6hBWkV0LgJ7vEiTVbWSAucpE4d6iJHcIWlnh1fAuULSXxsr8Nyi6XWDll
-	BRtEcwujxKzrs6DesZdoPdXPDLKYWSBDYvlSLoiwrMTUU+uYQGxmAT6J3t9PmCDivBI75sHY
-	yhJr1i+ABqSkxLXvjVC2h8T5lU3QQGlllFj/7CbbBEa5WUgemoWwbhbYCiuJzg9NrBBhaYnl
-	/zggTE2J9bv0FzCyrmKUTC0ozk1PTTYtMMxLLYfHcXJ+7iZGcPrUctnBeGP+P71DjEwcjIcY
-	JTiYlUR4A3/VpwnxpiRWVqUW5ccXleakFh9iNAVGz0RmKdHkfGACzyuJNzSxNDAxMzMzsTQ2
-	M1QS533dOjdFSCA9sSQ1OzW1ILUIpo+Jg1OqgenZvZnV2WtuupVbyr9avMbd1/Ifa7Gt7ak/
-	j98+2fj0tx1Tq+HrtXO9t9uyGmy+o88Wv1X/rPGF/Nvr976690wtjG+z/K9y3d7ovIYE79aA
-	pjzD/WtdX26+Inv4ZdOWsv3S6/UmMzwqLxdlvfnP+7T+zUk1LL8mup5sLMgpuatqtUjvkBjT
-	fGObT+zHNLxv+zlmb7nzs/z/ymlav56r6HX+OipnZ/53S2HNEnWpAMPqidM3rGG/uvHuvsuc
-	WgzLHus+vrSZ7cun7gT/G9EaskJmW4Lvnnll0BDDu/iizvG7Qjq2Vr3GOrdWMenNrlrLYd0+
-	aUH25wuHdlnNlNwyf2HvXI65B7avSJ8/VWnHihf3lViKMxINtZiLihMBj/RdBygEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsWy7bCSvK5zdFOawd7jKhar7/azWaxcfZTJ
-	YtKha4wWe29pW8xf9pTdYvnxf0wW616/Z3Fg9zh/byOLx+WzpR6bVnWyeWxeUu+x+2YDm8fH
-	p7dYPD5vkgtgj+KySUnNySxLLdK3S+DKeDq1iangFEvFj46fjA2MF5m7GDk5JARMJP5M7GDs
-	YuTiEBLYzShxYcV1doiEpMSyv0egioQlVv57DhYXEvjIKNH5qQDEZhFQkdhw8CNLFyMHB5uA
-	tsTp/xwgYREBJYmnr84ygtjMArcYJfZ9VAaxhQWkJDZtm8MEUs4r4Czx/5QCxERDicMrd4Jt
-	4hUQlDg58wkLRKuZxLzND5lBypkFpCWW/wObzilgJHGudQnrBEaBWUg6ZiHpmIXQsYCReRWj
-	ZGpBcW56brFhgVFearlecWJucWleul5yfu4mRnDIa2ntYNyz6oPeIUYmDsZDjBIczEoivIG/
-	6tOEeFMSK6tSi/Lji0pzUosPMUpzsCiJ83573ZsiJJCeWJKanZpakFoEk2Xi4JRqYGo0bhLL
-	aBUvv5eZ7CDzIiWmy8Xws9bOEtXt7aYXq7i5FhyeVfj24/Pj22/4mM1t3cB/skzEw/nA+yo9
-	3vUfFZ6bfzs5acKGSVd2VRnvmGhysPIHm83TgooITjH1G9VGp6O25cwRzM+STcspyLnnulV5
-	WdqULkFjWRH39VMvHd9wdl3evNMBlyre7j3Mb+Ac8Gfq/v/y7MGsPOdVEisT9qj8jEqZVeH8
-	Uy1CdMrRrYKy0k9UotWjvMVcpzTwMHxL+Vm8u/5g3psDKvfV4xdL92QULUjYpGV4SmNL92XG
-	hcrRO97snn7QqeSR0j/vsDzGC93cu+76yxwsD5Ju6LdfeG2fzOH29snyKgUH6/bXKrEUZyQa
-	ajEXFScCAGZzINfoAgAA
-X-CMS-MailID: 20240701073115epcas5p3e2758375e272cba80281fe0ac37394d0
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----LZGu4PYXs2BAW_XTHz_lwyKyr.30uhOcduHjiEfMHTkCTgtA=_a96da_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240701073115epcas5p3e2758375e272cba80281fe0ac37394d0
-References: <20240701051800.1245240-1-hch@lst.de>
-	<CGME20240701073115epcas5p3e2758375e272cba80281fe0ac37394d0@epcas5p3.samsung.com>
-
-------LZGu4PYXs2BAW_XTHz_lwyKyr.30uhOcduHjiEfMHTkCTgtA=_a96da_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <ZoJY6a1CHCENAZZ8@fedora>
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,grimberg.me,linutronix.de,lst.de,suse.com,suse.de,parallelwireless.com,gmail.com,vger.kernel.org,lists.infradead.org];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
+X-Spam-Level: 
 
-On 01/07/24 07:17AM, Christoph Hellwig wrote:
->Hi all,
+On Mon, Jul 01, 2024 at 03:21:13PM GMT, Ming Lei wrote:
+> On Mon, Jul 01, 2024 at 09:08:32AM +0200, Daniel Wagner wrote:
+> > On Sun, Jun 30, 2024 at 09:39:59PM GMT, Ming Lei wrote:
+> > > > Make group_cpus_evenly aware of isolcpus configuration and use the
+> > > > housekeeping CPU mask as base for distributing the available CPUs into
+> > > > groups.
+> > > > 
+> > > > Fixes: 11ea68f553e2 ("genirq, sched/isolation: Isolate from handling managed interrupts")
+> > > 
+> > > isolated CPUs are actually handled when figuring out irq effective mask,
+> > > so not sure how commit 11ea68f553e2 is wrong, and what is fixed in this
+> > > patch from user viewpoint?
+> > 
+> > IO queues are allocated/spread on the isolated CPUs and if there is an
+> > thread submitting IOs from an isolated CPU it will cause noise on the
+> > isolated CPUs. The question is this a use case you need/want to support?
+> 
+> I have talked RH Openshift team weeks ago and they have such usage.
+> 
+> userspace is free to run any application from isolated CPUs via 'taskset
+> -c' even though 'isolcpus=' is passed from command line.
 >
->I recently noticed that on my test VMs with the Qemu NVMe emulations I
->see a zero max_setors_kb limit in sysfs.  It turns out Qemu advertises
->a one-LBA optimal write size, which is a bit silly.
->
->This series handles this odd case properly both in the block layer and
->the nvme driver as a sort of defense in depth.
->
->Diffstat:
-> block/blk-settings.c     |    5 ++---
-> drivers/nvme/host/core.c |    3 ++-
-> 2 files changed, 4 insertions(+), 4 deletions(-)
+> Kernel can not add such new constraint on userspace.
 
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+Okay, that is why I asked if we need an additional HK type.
 
-------LZGu4PYXs2BAW_XTHz_lwyKyr.30uhOcduHjiEfMHTkCTgtA=_a96da_
-Content-Type: text/plain; charset="utf-8"
+> > We have customers who are complaining that even with isolcpus provided
+> > they still see IO noise on the isolated CPUs.
+> 
+> That is another issue, which has been fixed by the following patch:
+> 
+> a46c27026da1 blk-mq: don't schedule block kworker on isolated CPUs
 
+I've checked our downstream kernels and we don't have this one yet. I'll
+ask our customer to test if this patch addressed their issue.
 
-------LZGu4PYXs2BAW_XTHz_lwyKyr.30uhOcduHjiEfMHTkCTgtA=_a96da_--
+Thanks!
+Daniel
