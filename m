@@ -1,107 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAF6179AF
-	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 04:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCE879DF
+	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 05:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719893269; cv=none; b=aWf0li6vBrd0oZZGBEsdkfcErFrnGKwPkqPfILajME7ytkrcugxrS9/WLpz0shE7QkLdauaCKg4+YTnw7IdC3Vv6+t1Q5Gem9YpKaOPdy3pUwnHykI3x0ZhUyW670QfQle2gn9TnelQ+JT3ctOyzKoYnVahM/ykgSosY5AfOn2g=
+	t=1719898278; cv=none; b=SYB2yXeSoyCHTDZHLikJnVpxyCG8xbFLC+NNVluyjpZV9i8CdoTAuf0m1mdXCsVwckcl8jLfHeDmbQLjH0v4fKXqfO69e8VvhjlhLF4VVmmy21vfV++ZlQ2sEIdaREB9J2oRAkHnEa0oqyZna/H5cE72rMiY5a1TcBXz5CgFzZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719893269; c=relaxed/simple;
-	bh=n9Uv7Lg612H7kfDZRxwHPiO03reyWzef2B5d428Gj7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/hrbSJJggCgxc5ay20I3cy89cQ9jtgi2btt99nVF6T51rsKox+b/b+tfEMXGU0owECYW/0FHtTF/Fo2TP7s6XEdnXUrvT0KjmCFzH2la6kF/0wj5UKEu+qkt+lpb3efxr3Q+nMICoTrMlb1olxRk+E8IuuMUfccSIDE03/ENHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bGr2z1u0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1719898278; c=relaxed/simple;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=qVAtyxi1NYyKaXUc79D7aoO371JppKwgrAQSdMqRqvUcU05btRL/NbQhlmSCNGw5Xe2cP+fj31++nLmJ9e44TiIpcvhSNWhFrgZNypMJFYp2+c9TtTnUqERdPzRTsEUNHpYLh4McMHwW/Y2YrlgxnKQoXnMO+mtKuRPICWHvkPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=D0SQdCdE; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bGr2z1u0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719893266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S0CaLZl2ERm7GNxDGtayS0f5Prh3DdPwGYJckExMLKw=;
-	b=bGr2z1u06u9TFv3gpcJi0SB+Zd/CzWe9QL51B1SmNZOk8LSaZT7V42QdPX/ssLlpe/3a/a
-	342QVYzNXm5b8zyE1D+BqqXe9BZVFCuoDYljPKKO2eIg4bBlQusGr4g1m0DWrmMh0UK6hG
-	/HEOf7xoboouoIYjNLUFxiiq0zIxiYA=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-664-ZEUE_xkkMXmtZVsVH3faVw-1; Tue,
- 02 Jul 2024 00:07:41 -0400
-X-MC-Unique: ZEUE_xkkMXmtZVsVH3faVw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 76AD418D6506;
-	Tue,  2 Jul 2024 04:07:33 +0000 (UTC)
-Received: from fedora (unknown [10.72.112.45])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6102F19560A3;
-	Tue,  2 Jul 2024 04:07:24 +0000 (UTC)
-Date: Tue, 2 Jul 2024 12:07:18 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
-Message-ID: <ZoN89mOKhynY/zbn@fedora>
-References: <20240617194451.435445-1-ushankar@purestorage.com>
- <20240617194451.435445-3-ushankar@purestorage.com>
- <ZnDs5zLc5oA1jPVA@fedora>
- <ZnxOYyWV/E54qOAM@dev-ushankar.dev.purestorage.com>
- <Zny9vr/2iHIkc2bC@fedora>
- <Zn2cuwpM+/dK/682@dev-ushankar.dev.purestorage.com>
- <ZoFkFB8Fcw5gCDln@fedora>
- <ZoMZeWrQclRu2k9s@dev-ushankar.dev.purestorage.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="D0SQdCdE"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240702053113epoutp012a9d556308aa2a36ec9eb1288d3949f1~eTl4G_wGe1891118911epoutp01x
+	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 05:31:13 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240702053113epoutp012a9d556308aa2a36ec9eb1288d3949f1~eTl4G_wGe1891118911epoutp01x
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1719898273;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=D0SQdCdERY6AovQJPlYDH5bRwRXIy+WnXwaCD9hXXXp6IjP8OTuuymggw6dWlsH5C
+	 WO89HTVijpqBuRSkd5whiESLcRZFYEw22F96pb89CKVokMXc/kZDRY91H4l1B1i+vf
+	 GcxWXsaRSdYGMvl4KHa2Y/47H7cigSeCMJ0Eke3o=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240702053113epcas5p43fa0c2841a9155e4b3e6c2ef0451352b~eTl34HDIb0574905749epcas5p4L;
+	Tue,  2 Jul 2024 05:31:13 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.176]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4WCs2l4PFjz4x9QG; Tue,  2 Jul
+	2024 05:31:11 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	75.D5.06857.D9093866; Tue,  2 Jul 2024 14:31:09 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240702053109epcas5p1fb15553a105a5eff0fc3cf0efe30d981~eTl0QIyV11176211762epcas5p1r;
+	Tue,  2 Jul 2024 05:31:09 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240702053109epsmtrp1b3a412508497e9adcbf1419528e31fc4~eTl0PY0LT0850708507epsmtrp1H;
+	Tue,  2 Jul 2024 05:31:09 +0000 (GMT)
+X-AuditID: b6c32a4b-88bff70000021ac9-74-6683909df300
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	DA.8E.18846.D9093866; Tue,  2 Jul 2024 14:31:09 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240702053108epsmtip28eec64da5a72ea5530e7c83cbab0934c~eTlzZlEzI1994019940epsmtip23;
+	Tue,  2 Jul 2024 05:31:08 +0000 (GMT)
+Message-ID: <107bb908-18b6-4c59-ad29-12330be6cf1f@samsung.com>
+Date: Tue, 2 Jul 2024 11:01:07 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZoMZeWrQclRu2k9s@dev-ushankar.dev.purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH 1/5] block: split integrity support out of bio.h
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>, Anuj Gupta
+	<anuj20.g@samsung.com>, linux-block@vger.kernel.org
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240701050918.1244264-2-hch@lst.de>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuplk+LIzCtJLcpLzFFi42LZdlhTQ3fuhOY0gzMv9CyaJvxltlh9t5/N
+	YuXqo0wWe29pWyw//o/JgdXj8tlSj903G9g8Pj69xeLRt2UVo8fnTXIBrFHZNhmpiSmpRQqp
+	ecn5KZl56bZK3sHxzvGmZgaGuoaWFuZKCnmJuam2Si4+AbpumTlAq5UUyhJzSoFCAYnFxUr6
+	djZF+aUlqQoZ+cUltkqpBSk5BSYFesWJucWleel6eaklVoYGBkamQIUJ2Rl/zp5mLTCpuDa3
+	j6mBUbeLkZNDQsBE4vHaHuYuRi4OIYHdjBKPzrSzQTifGCV+LHrOCufMnXWWEabl55pmqJad
+	jBL/+xYyQThvGSVmv7vODlLFK2AnsevcBmYQm0VARaJhwiRGiLigxMmZT1hAbFGBZImfXQfY
+	QGxhAReJXXvvgMWZBcQlbj2ZzwRiiwg4SMzesJQNIl4hMfXeMyCbg4NNQFPiwuRSkDCngJHE
+	8m+/GCFK5CW2v50DdpyEwFt2iUOv10Bd7SLx9VEjG4QtLPHq+BZ2CFtK4mV/G5SdLfHg0QMW
+	CLtGYsfmPlYI216i4c8NVpC9zEB71+/Sh9jFJ9H7+wkTSFhCgFeio00IolpR4t6kp1Cd4hIP
+	ZyyBsj0k/v08yg4JqrWMEuubV7NOYFSYhRQqs5B8PwvJO7MQNi9gZFnFKJlaUJybnlpsWmCc
+	l1oOj+7k/NxNjOB0qeW9g/HRgw96hxiZOBgPMUpwMCuJ8Ab+qk8T4k1JrKxKLcqPLyrNSS0+
+	xGgKjJ6JzFKiyfnAhJ1XEm9oYmlgYmZmZmJpbGaoJM77unVuipBAemJJanZqakFqEUwfEwen
+	VAMT+0cPkZo7hi9NPoY9lOnmt12T2l3yha8iuCt245eSaU8/3uBfP8e33d7h6kafOU9yjJpT
+	nE0iBD1EH/3dEGjc9Me45bdQm4Cj4rWXeS47fWwaLm75GModoXFyq8+EQjNrHYcP3Pv0XY7/
+	umHq7VKbv+xPw4Lab++PuLMf2hE2/V+r/U8Pi1yHVYfaY26pn3b6auzy3VmJVX7L1El3l9Ur
+	/UjQZaz20zj35+CGt2t0GHNiZ4udy97SOKt/xkXZb/L7m/mOT+IPu1y0mdem6gST9Rb1iY0N
+	4SuTfP1rF9TO1+qyF5O9GiNiufIOh65h4DeX3GUfpqzNZFEMF9Ja6VvwM6uHZ8W3Y1lBrC+X
+	iyixFGckGmoxFxUnAgD77UYMIAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMLMWRmVeSWpSXmKPExsWy7bCSvO7cCc1pBuuO8Fk0TfjLbLH6bj+b
+	xcrVR5ks9t7Stlh+/B+TA6vH5bOlHrtvNrB5fHx6i8Wjb8sqRo/Pm+QCWKO4bFJSczLLUov0
+	7RK4Mv6cPc1aYFJxbW4fUwOjbhcjJ4eEgInEzzXNzCC2kMB2RombG1wg4uISzdd+sEPYwhIr
+	/z0HsrmAal4zSvzecwKsgVfATmLXuQ1gNouAikTDhEmMEHFBiZMzn7CA2KICyRIv/0wEGyQs
+	4CKxa+8dsDgz0IJbT+YzgdgiAg4SszcsZeti5ACKV0jcWVkIsWsto8TMM7uYQeJsApoSFyaX
+	gpRzChhJLP/2ixFijJlE19YuKFteYvvbOcwTGIVmIbliFpJts5C0zELSsoCRZRWjaGpBcW56
+	bnKBoV5xYm5xaV66XnJ+7iZGcDxoBe1gXLb+r94hRiYOxkOMEhzMSiK8gb/q04R4UxIrq1KL
+	8uOLSnNSiw8xSnOwKInzKud0pggJpCeWpGanphakFsFkmTg4pRqYQoLT1nuHvX+V+dPpdHZ0
+	jddjTp2CCJblx27P/RXRE7MpJvz7b6E3W699X3M3JFRZ8/Ey3ZVWqy6yqolNSewXOio7bfL7
+	3ZMmNvxRkkpS/iW3+O8OfzlTte0ZXTfn9NXUHn0p+TLrsq0On/mzeacTHttM6ytKS73y7eGb
+	hs17knnvaJ3b9nZDks6Wx9lJEf5R6pMWxE+IDzeX3sVbr+686qfjh9sZZ3/fP2TufnCyl+nF
+	uVL/e5ocEsqUY1lEiu+GP67cef26s4FauPJE4w+ZNgGqba/NvGudcspPsrt7+7queV0kP9um
+	2XqKhubne7fb/m35XnLf3fzsHWaRm5HLFKfLcp/TP76GVf3frTvXlFiKMxINtZiLihMB7RHq
+	zfYCAAA=
+X-CMS-MailID: 20240702053109epcas5p1fb15553a105a5eff0fc3cf0efe30d981
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240701050930epcas5p22a9554f29db41d8e693babdc2e7aba51
+References: <20240701050918.1244264-1-hch@lst.de>
+	<CGME20240701050930epcas5p22a9554f29db41d8e693babdc2e7aba51@epcas5p2.samsung.com>
+	<20240701050918.1244264-2-hch@lst.de>
 
-On Mon, Jul 01, 2024 at 03:02:49PM -0600, Uday Shankar wrote:
-> On Sun, Jun 30, 2024 at 09:56:36PM +0800, Ming Lei wrote:
-> > I meant that the following one-line patch may address your issue:
-> > 
-> > 
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 4e159948c912..a89240f4f7b0 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -1068,7 +1068,7 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
-> >  		struct request *rq)
-> >  {
-> >  	/* We cannot process this rq so just requeue it. */
-> > -	if (ublk_queue_can_use_recovery(ubq))
-> > +	if (ublk_queue_can_use_recovery_reissue(ubq))
-> >  		blk_mq_requeue_request(rq, false);
-> >  	else
-> >  		blk_mq_end_request(rq, BLK_STS_IOERR);
-> 
-> It does not work (ran the same test from my previous email, got the same
-> results), and how could it? As I've already mentioned several times, the
-> root of the issue is that when UBLK_F_USER_RECOVERY is set, the request
-> queue remains quiesced when the server has exited. Quiescing the queue
-> means that the block layer will not call the driver's queue_rq when I/Os
-> are submitted. Instead the block layer will queue those I/Os internally,
-> only submitting them to the driver when the queue is unquiesced, which,
-> in the current ublk_drv, only happens when the device is recovered or
-> deleted.
-> 
-> Having ublk_drv return errors to I/Os issued while there is no ublk
-> server requires the queue to be unquiesced. My patchset actually does
-> this (see patch 4/4).
-
-Sorry for ignoring the fact that queue is kept as quiesced after ublk
-server is crashed, and I will review patch 4 soon.
-
-
-Thanks,
-Ming
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
