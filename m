@@ -1,98 +1,84 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDCC15B995
-	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 14:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859A571B51
+	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 15:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719932337; cv=none; b=OH0NFICK7Nxj1BsZXHRpv+N/+ilNVYUgzIrWxkJLaPlnK2xL2uQ4AFV6RcLytS9fI8Axbd7iDr8nfKjieDaIVgYp6U0bNoeqap5/byobmct8ZowjDjReMXwCupCYZGsESTWIs6jCWxKQBJsMriRUUlCzFYUAkkePDam6/fS9HuY=
+	t=1719933054; cv=none; b=IIFA1zf6hBg/Fdn1k0pELAop1gijb4SeCzwiOP8j29U1hht+dzL5OACuQ6lVmO9Iv8Fg36lOgpZO9DIjemG1zinIKLNAlIUGpG9Z2DrvKCYPDHuyjYEOjjWTQzWb9tp/+hvcYQB1DOFsOLqhWwwP+mWIm2TD6cMb/00x8SeHM50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719932337; c=relaxed/simple;
-	bh=nbhLAnikyJsyO3UO/Jdya66pjvoJCEJ3TWMvR6Vsis8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=WrHrtWjUpM8pG4Ae6SrQDb5BGfL6QwE7p+I8M3u+OLFER4QUp5/+HvjaJH9vbgGNiA4Gx4TSEcMwj57W5rtzQ3F0rUOO74V+xoaDudpO6e3Y8fpRDL/SpqJCIyrBH7HUrABDsfR2+UDkcmSlVmuHD//3sElZgr10QG3DgJGA3T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hCcqVnBs; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1719933054; c=relaxed/simple;
+	bh=r+sA2FkVHZlrGE0E+NOGsx8k0tByT0MbeIv2MCAHOFA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BTI13kGo4waTNbwBd/KNvQSfte+HkEVrb5Yw19RBEgV7WqBbvygwjL2WgatBQ/DRbKfOQri7JfojGZXsnc4eMmFDJr+kfV7IRfegAkLbcAgpQzNXGZDRa9Iqwtjm2D605pyUdyyAcwLS9+ufmy96drAMAImN+47tcps7fZP1g8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eA4q2Wrb; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hCcqVnBs"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d56102f134so209576b6e.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Jul 2024 07:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719932334; x=1720537134; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YLJvrCKp8MLcu/+RMIXBzlT9gAnXUofdIoGhevdTams=;
-        b=hCcqVnBsdKTcbM7lQFPqC3y7fvSM0xdMpQHvaRVFraPjxL/9igZpk1a7ZHTv1l4GJj
-         I4N9ynd0ReVfmvrpEYEKhO7ugclb5PWXMDVfBAef6ZWRBFP3gDZN1aFNKkcsqHhIQGJ6
-         KeK5nwG7aUUQxXOZPPwJ1ag+OHTVijfaENIA1skbVv87IywgDO3/5BL7jUy8uGLu2xGr
-         R0EJc5Mzx42Bl58HR8JQa8WGyeDlozzK8ZDXKHfNoGL7HdBNMYRY6ktLjE9uv9faQJW8
-         KWSU6cCz1bUxkJy8zA6lL3zI9JuBIVqIbfkmWTbTXG138yqVTLpaOyUliv4GIZ/S1f39
-         OdAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719932334; x=1720537134;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YLJvrCKp8MLcu/+RMIXBzlT9gAnXUofdIoGhevdTams=;
-        b=HBC+qJKd14kt4iCCnP+KtWZPzR0LLxuKlWrn4jFlGJLaQmucPvjYTuxbToYVTu5qxs
-         15cDrlaFPFnheCCblyyRpJcfTsSo6fw09CakovcvG2EUnnzA70cwM4csKz4qvLRNdxQD
-         YRqalBOLquMHImv78ZvQt8ErY1dQuScqH0xJeXHRRKyKj4IjIVtISaEpoe+veyFfxAk8
-         rWsTmD+QG/nRhN7knHsE6k1y/hCvoe6VNwGPiIHtgxHoyJZFNLuT01j4Zl9uYEQXfNRZ
-         7t7lyoEo/QFTIvc6LcV8/s4CkFrhWLKpGCvZla6UYoZuYKHIHaaL5D0JhLyC4p8dO+4Z
-         /+5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXB2Uf0SWdig4e21ytlcbQGEWfHAKu0O8HEqZXOvmMdKkQjzL07EYcpKnVDrH9c+dzy98FXgUBdZV2JJNi51USXgcMcbU1E4WKsQgk=
-X-Gm-Message-State: AOJu0Yw7mSDPlV4CK2LQBZ7Lrp3a/e0973E40/FtotjiEsKbh4V3mh4c
-	mv754tfCLWpc5+oa85WpjVMJF5eFEy1GIPF2D5R4rH+IRuPq/lrrN/ydmoR7iCxOajw4CjN9Bl+
-	jZH8=
-X-Google-Smtp-Source: AGHT+IEyS9oKtRMN8bwuH7h258UqecHYDZYqumNvgtOD1xV0BYd67tKCeRFF+kfE9D14plOte1qhsw==
-X-Received: by 2002:a05:6808:210c:b0:3d6:303f:5989 with SMTP id 5614622812f47-3d6afcbd885mr9690375b6e.0.1719932334045;
-        Tue, 02 Jul 2024 07:58:54 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d62fb48ab1sm1698965b6e.54.2024.07.02.07.58.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 07:58:53 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: roger.pau@citrix.com, Christoph Hellwig <hch@lst.de>
-Cc: jgross@suse.com, marmarek@invisiblethingslab.com, 
- xen-devel@lists.xenproject.org, linux-block@vger.kernel.org, 
- Rusty Bird <rustybird@net-c.com>
-In-Reply-To: <20240625055238.7934-1-hch@lst.de>
-References: <20240625055238.7934-1-hch@lst.de>
-Subject: Re: [PATCH] xen-blkfront: fix sector_size propagation to the block
- layer
-Message-Id: <171993233260.107674.762169022819526197.b4-ty@kernel.dk>
-Date: Tue, 02 Jul 2024 08:58:52 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eA4q2Wrb"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=Y5Qjwm1FX2Sbd3iwFDEtKhm+rBtic7SLBqwOHCOMh20=; b=eA4q2WrbIbxrWvUVfmR36L0Lvh
+	YhlnIWfMu7oSz7dtLwyCSJ4ld51XeZChiIhHxqZ6Z1w1ynMgZepZB13zsMsEdTRKNXxUqPCT7ceZc
+	2lbKv44hCwfbpNSFgl5NPfzN9dAXusaSqeZlnw+Xngq9bdawNK0PXuJhVj+jtRWydhCeOV56gPDEZ
+	dfxdA8P/qih1232KAXHATjOfBirwTqlA8hZrUpcg3SIMpHbLXO40bTnEMQ0eB7CDOQeO2OfbYi/UZ
+	KGYdplGcsTNPB+SJ4l7HWygg+SrwoI/t3fkhMy/mjXk+0F6ApPQM9I7J/2VxZdCU8EAckON97WcVY
+	+Z7i+AGA==;
+Received: from 2a02-8389-2341-5b80-4c69-cf21-4832-bbca.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:4c69:cf21:4832:bbca] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sOf9d-000000079T2-1c0a;
+	Tue, 02 Jul 2024 15:10:50 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	linux-block@vger.kernel.org
+Subject: more integrity cleanups v3
+Date: Tue,  2 Jul 2024 17:10:18 +0200
+Message-ID: <20240702151047.1746127-1-hch@lst.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.14.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+Hi Jens and Martin,
 
-On Tue, 25 Jun 2024 07:52:38 +0200, Christoph Hellwig wrote:
-> Ensure that info->sector_size and info->physical_sector_size are set
-> before the call to blkif_set_queue_limits by doing away with the
-> local variables and arguments that propagate them.
-> 
-> Thanks to Marek Marczykowski-Górecki and Jürgen Groß for root causing
-> the issue.
-> 
-> [...]
+this series has more cleanups to the block layer integrity code.
+It splits the bio integrity APIs into their own header as they are
+only used by very few source files, cleans up their stubs a little
+bit, and then in the last patch change when the bio_integrity_payload
+is freed when it is not owned by the block layer.  This avoids having
+to know the submitter in the core code and will simplify adding other
+consuer of the API like file systems or the io_uring non-passthrough
+PI support.
 
-Applied, thanks!
+This series is based on the block for-next branch as there are
+conflicting changes in 6.10-rc but not in the for-6.11/block branch.
 
-[1/1] xen-blkfront: fix sector_size propagation to the block layer
-      commit: 98d34c087249d39838874b83e17671e7d5eb1ca7
+Changes since v2:
+ - stop calling bio_uninit in bio_endio
+ - fix a commit message typo
 
-Best regards,
--- 
-Jens Axboe
+Changes since v1:
+ - rebased to for-next
 
-
-
+Diffstat:
+ block/bio-integrity.c         |   87 ++++++++---------------
+ block/bio.c                   |   16 +++-
+ block/blk-map.c               |    3 
+ block/blk.h                   |   14 +++
+ block/bounce.c                |    2 
+ drivers/md/dm.c               |    1 
+ drivers/nvme/host/ioctl.c     |   16 +---
+ drivers/scsi/sd.c             |    3 
+ include/linux/bio-integrity.h |  152 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/bio.h           |  156 ------------------------------------------
+ include/linux/blk-integrity.h |    1 
+ 11 files changed, 222 insertions(+), 229 deletions(-)
