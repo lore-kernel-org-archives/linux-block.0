@@ -1,137 +1,96 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC161B583E;
-	Tue,  2 Jul 2024 14:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BE61BA067
+	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 14:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930324; cv=none; b=N4lG2xGL5TpbxLRNi4HwFBJRLppGkwooywlHvq6oqeHbTWVZj11dG4cXgbYLGCY9ncxEtHTRJirMOTCu8TJioMWcfmTiQFCGsh9qPkScMH9PEdSDGMgW0/CDeaarNteDyvE3cnXFfbRnkrLsjHtqiwxdxK8xQvnxt6erdfM8NP0=
+	t=1719931737; cv=none; b=msq0Nsc6i4hgpQ6hbIgHt2F9Red74sjZYpS46Kb+FqZRhrc/9YVnQL3cLHKxd1WtYmyWbKDMQSoUCkq/BGnflieY5PXOXkfdIsPf38+x3se3G/vg95gNve1HQZeZKtUEn/tZW4Jg4ckBhe2g9vc1brHZE8wzwStiAThp1/6ebiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719930324; c=relaxed/simple;
-	bh=iVY1vfSsFSEYqt9XQodSWGL/2M6yIcSREvR7X1WLMJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VuC+MWQ5LUF/dDpZpNZQdG2UELqa2B7M9axktkYG/v+1CR2xco7ReOhmV8QUK5BIbXwstZZKpqhRp6Gr04BJzYYZ7oQx5SHH8JvRMbHdpNxMdx3qIOMTg+w3wGuS3aLKWGXxt9T9I3PZXNXrtU+2h0UUaZIldKIZUO0ovwqwtOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=kNeqxcg/; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=mfCIB0yu; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1719931737; c=relaxed/simple;
+	bh=pPl3S4AWXA8O4LcN4bVo88mfkzn27iXY9OELuXrnGzg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=tP0u1v0ipJBdpZdt8W7n5Y/j6O2B2LuzcibHTec103aulXOkhRQT1P5hCdRyFJyyC1XM2Kg6qgpITJY52v1n9pMIvCTxxgQgjxocxzrcRFMU/68fBOa/I+bYjnxKAdelJFJZqeNzn5xRHHR35TAKN7a1OHk9THfMb2EK6dzuiDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=drUXIlBb; arc=none smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="kNeqxcg/";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="mfCIB0yu"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8D8151FBAB;
-	Tue,  2 Jul 2024 14:25:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1719930320; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iVY1vfSsFSEYqt9XQodSWGL/2M6yIcSREvR7X1WLMJk=;
-	b=kNeqxcg/3M8efqVZyYkPUn3QNc54WivORPj22uyg7GexEq0pPKf9R5O4rC0hEIsABgyoBQ
-	APVSnZIHPp/kIbtWtgoqHYo5j50sNsTvYEvgrM4ASjDMtBZaRoJbryOq7KWy5GtDSQgTjv
-	UdALnOg3s3ZoYtbQxLMY4a/ZFafy33Q=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1719930318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iVY1vfSsFSEYqt9XQodSWGL/2M6yIcSREvR7X1WLMJk=;
-	b=mfCIB0yupx8ZNeMCkxp/wOhvrORO7czh9Tub99cpA1ewU0MWIdReZkM2u5gYekPAkofzPP
-	GHCCgeFqdEaX8Erc0yoOOLHP4oCwhBRKKhGCfEXjX2mxTSKgd5JqdAjcfaYEAn4F34fJM/
-	flwZoLAHbIxrAA6aeJIl0HWtSBzh7G0=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7A64213A9A;
-	Tue,  2 Jul 2024 14:25:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id gWOjHc4NhGbDEgAAD6G6ig
-	(envelope-from <mkoutny@suse.com>); Tue, 02 Jul 2024 14:25:18 +0000
-Date: Tue, 2 Jul 2024 16:25:13 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: Tejun Heo <tj@kernel.org>, josef@toxicpanda.com, hch@lst.de, 
-	axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, yangerkun@huawei.com, yukuai1@huaweicloud.com, 
-	houtao1@huawei.com, yi.zhang@huawei.com, lilingfeng3@huawei.com
-Subject: Re: [PATCH v2] block: flush all throttled bios when deleting the
- cgroup
-Message-ID: <7kmlqdvltacofugn7tzg6ylu25louwnmvdfa64cgdrecpveow7@rxvvbduuvjlz>
-References: <20240627142606.3709394-1-lilingfeng@huaweicloud.com>
- <Zn3O47DUoLliwbWm@slm.duckdns.org>
- <c9802312-d9c9-f262-e1d3-9d3343255b6b@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="drUXIlBb"
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3d62fc85d6cso128376b6e.3
+        for <linux-block@vger.kernel.org>; Tue, 02 Jul 2024 07:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1719931732; x=1720536532; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m3l+LBXCTol6JGz+55J1LFZ/qEAbK3KSLhxsv0ZDDH0=;
+        b=drUXIlBbSrUOYvsrY8TKBFknLMXU22uClMC7yIEi6mS61ANxhZ/Rn9wfBwRgUDdg1k
+         jTIG35ydVmAfIEWmUGmL0yg1hpLj6qT91fjoj1ehD5FImkLxmwPHKz83op0cND1RUCNl
+         9mmO+qMoOCMUhcwV6+/fLM0ChyCAyeYltxyNvOqx0Iv6nxHTHMq1bejxANx4c+nGWqL3
+         4JNT1qlOMYn600DN+Yb1z1Gp599dwElwWTPOCnuPb/yOwXj3tG29ZQxM1BjdR99WittB
+         N6EuiJXZ++QdeqzEo42u2YKs3lH2yWyCVG/NE/B6purJvf8Qv+9uPNeryC1fcN/ZFS2a
+         kM4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719931732; x=1720536532;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m3l+LBXCTol6JGz+55J1LFZ/qEAbK3KSLhxsv0ZDDH0=;
+        b=o+qf0mYsXrE6nkPdHlEIk035bbvSdNiql8G9WbwDUJ41aelz5v9s4K4S+Ox5rq8rdv
+         9bGA0Tg45O2Ltgkd3zL+agsesfWjuiXMow7M/WbdgwZ4ccyu7uzxo8tMisaarcGWQh1y
+         psuhoTRhYUdEaAXYsB+/RTyEc0DpsL1jEZ9qHsbedGl+o3QNsqNvwkHCyzsnTldZEO31
+         WLiGW+4tuuNUhX3CpM5iHtldCdTRP1xA8BB2tTdbcOzqPtRVhrwikWWKzitMwQTy0NSC
+         7A9RYPfJVVri/jXjQUmLDyzXNUbvAMhSn0/Q1Qp7VMsfBQ2GnncodYEaYjTEQu6xPuj8
+         Qf/w==
+X-Gm-Message-State: AOJu0Yxu0GPNLB55+hQzUO8rzdnc6RdIM+1X5anQi81VjOjxQDX3ZXeP
+	TePLfnIYblDvoPAUuEi3u4+V8SWWLkm+X8ZIhap5Wu9TXkO+myU40InK9PuqT86TXcUWpkG8myz
+	A/d8=
+X-Google-Smtp-Source: AGHT+IH77fOlmz3AC7xuDdlL/stTFbWeChuo3g/0hUdImM/13k1flMKgEMywwmVpkszbRPIV+EDvhw==
+X-Received: by 2002:a05:6808:2187:b0:3d6:2dd2:80a with SMTP id 5614622812f47-3d6b5e3ddadmr9948415b6e.5.1719931732095;
+        Tue, 02 Jul 2024 07:48:52 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d62f9b9029sm1743041b6e.5.2024.07.02.07.48.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 07:48:51 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20240509170149.7639-1-bvanassche@acm.org>
+References: <20240509170149.7639-1-bvanassche@acm.org>
+Subject: Re: [PATCH v2 0/2] Fix the mq-deadline async_depth implementation
+Message-Id: <171993173102.106736.3773541970780391323.b4-ty@kernel.dk>
+Date: Tue, 02 Jul 2024 08:48:51 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="iyowxzavzfjl2dg3"
-Content-Disposition: inline
-In-Reply-To: <c9802312-d9c9-f262-e1d3-9d3343255b6b@huaweicloud.com>
-X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huaweicloud.com:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -5.90
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.0
 
 
---iyowxzavzfjl2dg3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Thu, 09 May 2024 10:01:47 -0700, Bart Van Assche wrote:
+> The mq-deadline 'async_depth' sysfs attribute doesn't behave as intended. This
+> patch series fixes the implementation of that attribute.
+> 
+> Please consider this patch series for the next merge window.
+> 
+> Thanks,
+> 
+> [...]
 
-On Fri, Jun 28, 2024 at 10:04:20AM GMT, Li Lingfeng <lilingfeng@huaweicloud.com> wrote:
-> I think it may be more appropriate to remove the limit of bios after the
-> cgroup is deleted, rather than let the bios continue to be throttled by a
-> non-existent cgroup.
+Applied, thanks!
 
-I'm not that familiar with this part -- can this also happen for IOs
-submitted by an exited task? (In contrast to a running task migrated
-elsewhere.)
+[1/2] block: Call .limit_depth() after .hctx has been set
+      commit: 6259151c04d4e0085e00d2dcb471ebdd1778e72e
+[2/2] block/mq-deadline: Fix the tag reservation code
+      commit: 39823b47bbd40502632ffba90ebb34fff7c8b5e8
 
-> If the limit is set too low, and the original cgourp has been deleted, we
-> now have no way to make the bios complete immediately, but to wait for the
-> bios to slowly complete under the limit.
+Best regards,
+-- 
+Jens Axboe
 
-It makes some sense, it's not unlike reparenting of memcg objects, IIRC
-flushed bios would actually be passed to a parent throtl_grp, right?
 
-Thanks,
-Michal
 
---iyowxzavzfjl2dg3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZoQNxgAKCRAt3Wney77B
-SWUqAP40GfmMEfXmFIR+/auvUwxfLvyefVIhE2VoOxRf/T4L2gEAsJBHXpz3Tv9h
-FBSUq6Z4uXLPnCUQ94faVWq/eJLDpQA=
-=n7yG
------END PGP SIGNATURE-----
-
---iyowxzavzfjl2dg3--
