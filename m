@@ -1,93 +1,187 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A419838DD9
-	for <linux-block@vger.kernel.org>; Mon,  1 Jul 2024 23:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761E5374C6
+	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 03:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719876091; cv=none; b=RQphMpEiwwaQO8qNAUg19BLx5p80hC9j6ejGyjA7BmA3DpSAOEai80xxrcAWJx+09HpnHR7GJ1bzNqmm6lJRduc+v128rAgxkMQqQ9Mudx3Dn2BuxbibUVK3GHlNclSBTL1DdScFl7zFHJ452sUARLktg1LUBTVuUI8whM2iRdc=
+	t=1719891272; cv=none; b=o4mlZLcKNlyxYQNQImP9Bd31EjMaODDsRLxO8kYRyfGTmR5h066+ip7bExPNwPZ0OiFne+R+SYtCwk+xVEf0At/6J2oTfyUXlcR0ZAkrY6pWf8Aqtnuj5Bw7NqtRaOOrRryJCm4MODQaGXUEYpppeRXDzvS2m39yr7Nlvt1wuAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719876091; c=relaxed/simple;
-	bh=RxxzTAlf6M0F+FdydyHWlXK4JD9TgbumFM6PV61w53Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jhGHW+twkRR/KMe2KVlvs1SAIXwiSlAhPjWogQ8Q93Q5/72i9hkTAA5VM6+DoP0tdwj9OV5FWoYoHRUNTt/Mo5q/NV4xuAdM1gpn+VF3u+ezXaL7VRGTwwLgXDI8M0Ea20MvszEhyMTdDCE3XEtIi2a9PfbGNCGNAIMSIB86uss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=x6q/reZu; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1719891272; c=relaxed/simple;
+	bh=503ZizKRyOSSKuX/bUsyXVDaoDNRwwaYTCc70WniP00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X7ocsnjVjMFfYf4/4pQ3XofIq6b+LMkbxKTxe8M3Xrq3NFGKR7RMN2AZb9equsQA+0r7KGZ8644hiFP1RZ460UNzyvyq1J8EYDiNfQJdr/0m7lZlwxTMqxPZDARVQJhZhDzsSXRIzr3znns2jFPvcFghWZ3jE8D3hSvKJembkiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QPAN0RFF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="x6q/reZu"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WChr86ktSz6Cnk9X;
-	Mon,  1 Jul 2024 23:21:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1719876086; x=1722468087; bh=RxxzTAlf6M0F+FdydyHWlXK4
-	JD9TgbumFM6PV61w53Q=; b=x6q/reZuYw+swaPbVvKO3WgzDaOe/A2Q6rj5M4Nq
-	FyKnL8hFvlTU7awnh1m8yuuFsYSA8MhXhoS5PsrFi3iv1q7zQ2MLTkJKFRA87YqO
-	E/OGWDnNJpfpS6lFoh1b6O4CY6Glv5EGiyYark/IRmhcc4pSPBbvRALVAAelC5iE
-	LU9RIukek1xXsCQSQ0caVp4Tp1FL3HZq3tN6HdyZLluHq6Tpp0YE2DRBogWLiBN3
-	GtUBNSpFbmvDSCxfWFUgo7TBNgegcGFyeun9TePTyRiOIPVax3Rad3R76UiBEQ4t
-	93ININxN5i3tIibv9VJE4Z94jO9UsVj3Apf4bYy06M9UGw==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 4BdspZc2xxeW; Mon,  1 Jul 2024 23:21:26 +0000 (UTC)
-Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QPAN0RFF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719891269;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V6yOa8Xcw2ywxRoH8sabNGsvq6y6iQPejDnzWLSDKoA=;
+	b=QPAN0RFFnaZu3sIOw8Ck7tKY/3tlDAje91FCPna/uv+VmJ2tcXdjtw5/T9KFLc4c6pDSo1
+	RS5/n7l3H4hC4GXBzLyWwPhdaCfHSRuGP8cYjvwW4h1wPvSUnicgLbHq8pZCFVtN+eIreC
+	iBdQ0gRjtZdkFolD4RrHfxaIw6LlYC4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-452-GmvpbKZnPU-YB03RO9w14w-1; Mon,
+ 01 Jul 2024 23:34:26 -0400
+X-MC-Unique: GmvpbKZnPU-YB03RO9w14w-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WChr44hXvz6Cnk9V;
-	Mon,  1 Jul 2024 23:21:24 +0000 (UTC)
-Message-ID: <0b028352-8554-4075-9500-d10ff21e8cb6@acm.org>
-Date: Mon, 1 Jul 2024 16:21:22 -0700
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1624F195608C;
+	Tue,  2 Jul 2024 03:34:24 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.45])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8A95419560AD;
+	Tue,  2 Jul 2024 03:34:17 +0000 (UTC)
+Date: Tue, 2 Jul 2024 11:34:13 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yang Yang <yang.yang@vivo.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	ming.lei@redhat.com
+Subject: Re: [PATCH v4] sbitmap: fix io hung due to race on
+ sbitmap_word::cleared
+Message-ID: <ZoN1NXSHap19qa+B@fedora>
+References: <20240617024556.211451-1-yang.yang@vivo.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?B?UmU6IOetlOWkjTog562U5aSNOiBbUEFUQ0ggdjIgMi8yXSBibG9jay9t?=
- =?UTF-8?Q?q-deadline=3A_Fix_the_tag_reservation_code?=
-To: =?UTF-8?B?54mb5b+X5Zu9IChaaGlndW8gTml1KQ==?= <Zhiguo.Niu@unisoc.com>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Damien Le Moal <dlemoal@kernel.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- =?UTF-8?B?546L55qTIChIYW9faGFvIFdhbmcp?= <Hao_hao.Wang@unisoc.com>
-References: <20240509170149.7639-1-bvanassche@acm.org>
- <20240509170149.7639-3-bvanassche@acm.org>
- <fcaa5844-e2fb-41d6-8a38-2e318b3e3311@vivo.com>
- <c9900a6e-889d-4b7c-8aba-4ab1a89c3672@acm.org>
- <8bdfaa1201874892b166a5b5c59ee9c7@BJMBX02.spreadtrum.com>
- <366285cb-b099-4c8e-ba52-63c34b55db7f@acm.org>
- <e0edef374df6415cb2e68539c0189614@BJMBX02.spreadtrum.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <e0edef374df6415cb2e68539c0189614@BJMBX02.spreadtrum.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240617024556.211451-1-yang.yang@vivo.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 6/30/24 6:30 PM, =E7=89=9B=E5=BF=97=E5=9B=BD (Zhiguo Niu) wrote:
-> Can you help review this serials patch from Bart Van Assche?
-> https://lore.kernel.org/all/20240509170149.7639-1-bvanassche@acm.org/
-> [PATCH v2 1/2] block: Call .limit_depth() after .hctx has been set
-> [PATCH v2 2/2] block/mq-deadline: Fix the tag reservation code
->=20
-> These patch will fix the issue "there may warning happen if we set dd a=
-sync_depth from user",
-> For more information about warnings, please refer to commit msg:
-> https://lore.kernel.org/all/CAHJ8P3KEOC_DXQmZK3u7PHgZFmWpMVzPa6pgkOgpyo=
-H7wgT5nw@mail.gmail.com/
+On Mon, Jun 17, 2024 at 10:45:51AM +0800, Yang Yang wrote:
+> Configuration for sbq:
+>   depth=64, wake_batch=6, shift=6, map_nr=1
+> 
+> 1. There are 64 requests in progress:
+>   map->word = 0xFFFFFFFFFFFFFFFF
+> 2. After all the 64 requests complete, and no more requests come:
+>   map->word = 0xFFFFFFFFFFFFFFFF, map->cleared = 0xFFFFFFFFFFFFFFFF
+> 3. Now two tasks try to allocate requests:
+>   T1:                                       T2:
+>   __blk_mq_get_tag                          .
+>   __sbitmap_queue_get                       .
+>   sbitmap_get                               .
+>   sbitmap_find_bit                          .
+>   sbitmap_find_bit_in_word                  .
+>   __sbitmap_get_word  -> nr=-1              __blk_mq_get_tag
+>   sbitmap_deferred_clear                    __sbitmap_queue_get
+>   /* map->cleared=0xFFFFFFFFFFFFFFFF */     sbitmap_find_bit
+>     if (!READ_ONCE(map->cleared))           sbitmap_find_bit_in_word
+>       return false;                         __sbitmap_get_word -> nr=-1
+>     mask = xchg(&map->cleared, 0)           sbitmap_deferred_clear
+>     atomic_long_andnot()                    /* map->cleared=0 */
+>                                               if (!(map->cleared))
+>                                                 return false;
+>                                      /*
+>                                       * map->cleared is cleared by T1
+>                                       * T2 fail to acquire the tag
+>                                       */
+> 
+> 4. T2 is the sole tag waiter. When T1 puts the tag, T2 cannot be woken
+> up due to the wake_batch being set at 6. If no more requests come, T1
+> will wait here indefinitely.
+> 
+> This patch achieves two purposes:
+> 1. Check on ->cleared and update on both ->cleared and ->word need to
+> be done atomically, and using spinlock could be the simplest solution.
+> So revert commit 661d4f55a794 ("sbitmap: remove swap_lock"), which
+> may cause potential race.
+> 
+> 2. Add extra check in sbitmap_deferred_clear(), to identify whether
+> ->word has free bits.
+> 
+> Fixes: 661d4f55a794 ("sbitmap: remove swap_lock")
+> Signed-off-by: Yang Yang <yang.yang@vivo.com>
+> 
+> ---
+> Changes from v3:
+>   - Add more arguments to sbitmap_deferred_clear(), for those who
+>     don't care about the return value, just pass 0
+>   - Consider the situation when using sbitmap_get_shallow()
+>   - Consider the situation when ->round_robin is true
+>   - Modify commit message
+> Changes from v2:
+>   - Modify commit message by suggestion
+>   - Add extra check in sbitmap_deferred_clear() by suggestion
+> Changes from v1:
+>   - simply revert commit 661d4f55a794 ("sbitmap: remove swap_lock")
+> ---
+>  include/linux/sbitmap.h |  5 +++++
+>  lib/sbitmap.c           | 45 ++++++++++++++++++++++++++++++++---------
+>  2 files changed, 41 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index d662cf136021..ec0b0e73c906 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -36,6 +36,11 @@ struct sbitmap_word {
+>  	 * @cleared: word holding cleared bits
+>  	 */
+>  	unsigned long cleared ____cacheline_aligned_in_smp;
+> +
+> +	/**
+> +	 * @swap_lock: Held while swapping word <-> cleared
+> +	 */
+> +	spinlock_t swap_lock;
+>  } ____cacheline_aligned_in_smp;
+>  
+>  /**
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 1e453f825c05..9bd85a9b74b9 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -60,12 +60,32 @@ static inline void update_alloc_hint_after_get(struct sbitmap *sb,
+>  /*
+>   * See if we have deferred clears that we can batch move
+>   */
+> -static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
+> -{
+> -	unsigned long mask;
+> +static inline bool sbitmap_deferred_clear(struct sbitmap_word *map,
+> +		unsigned int depth, unsigned int alloc_hint, bool wrap)
+> +{
+> +	unsigned long mask, flags, word_mask;
+> +	bool ret = false;
+> +
+> +	spin_lock_irqsave(&map->swap_lock, flags);
+> +
+> +	if (!map->cleared) {
+> +		if (depth > 0) {
+> +#if BITS_PER_LONG == 64
+> +			word_mask = U64_MAX >> (BITS_PER_LONG - depth);
+> +#else
+> +			word_mask = U32_MAX >> (BITS_PER_LONG - depth);
+> +#endif
 
-Hi Zhiguo,
+Can we avoid the above conditional compiling by the following way?
 
-If these patches pass your tests then you can reply to these patches=20
-with your own Tested-by.
+	word_mask = (~0UL) >> (BITS_PER_LONG - depth);
 
-Thanks,
 
-Bart.
+> +			if (!wrap && alloc_hint)
+> +				word_mask &= ~((1UL << alloc_hint) - 1);
+
+The current behavior is to always retry after moving ->cleared to
+word, and we change it to retry in case of any free bits. So here
+is it for avoiding dead loop by taking wrap & alloc_hint into
+account? If yes, this way looks fine, but I'd suggest to document
+this change.
+
+
+Thanks, 
+Ming
 
