@@ -1,207 +1,154 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404571591E3
-	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 11:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA450200A9
+	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 11:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719918579; cv=none; b=Ez/y8IF6MQ0YgW309rvXisM28lPjT9RbpwO1wBs3PvnBZlCXhcQfxx7AOrgq/GP2ISt+vNSeys/2DGrHecexduDkVICoxBnVFJ+3yXWV3Q4PrBgXnU4BP1NDiQITBBypWUfCF9Fq3GX+b60oukwVM4YaIyCcQFjHMymuGvIZqAc=
+	t=1719920299; cv=none; b=eUZPmpx3YiG+WfBJT3RT9Al+yRs8FvWGYbohPKP16hGqASKNFyrytbkf1GykSP3ANrHoQxxRijM9VMHN9zJ5c5RKexqfDsCKHq7ZYKEW+g9GDbQ5AUWfATy23AZn9ZwUL68atW53rN03Voxjk4rg9eihKkeG70OT5iRHZEb7DWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719918579; c=relaxed/simple;
-	bh=DbUNLek8zj18Y975k7dzgxrRivbLDM61IDMY3zhb8Wk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ap1uNsq3nSpEoqTzjShjrxdo0F4G4aH4q2zBccV2JjscQVpiTKVASq8hgSOqZ4hs/1GJMrvbCiLPdSR6DEK/gS0dL/nsD+g5OCD2HjQF3c+o3FWBSox0U1ftthURscWtYRcyfBa/mCe7zt+mLuzGJvLtYjKr1tSYJhslmSn+Q20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dXfQb9SK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1719920299; c=relaxed/simple;
+	bh=1uDkxv9daYSuVmkrYhsthvmuV6Aki8PHutQ1jOwgfDU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=t+4M+EzPPk7GB5zjbU/wcqwz4NxdpRcQSwvnJYz/Hwy+icB+hD+9gd5g2Lv/Dp5W6ea82tzNv0jmBjbP4zOFHK90tXdaUwZe8Ra81a7XIPA0MTJG4MX/LMz6YdZpg/SK6ISMVVQOM/Za240fUUSYrCUL0TywnrQksKrtzL2XcVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=WcjM5ZyV; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dXfQb9SK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719918576;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ujUbLs2RVkArm6dyFIELfSCgR0Pb1M78bLtNyoJl5TY=;
-	b=dXfQb9SKqlI5ZJi2MUQDJZ3wBcy19Sgpt8Su1ouS1pclny7Eok0rESnUpuLczu+m4UYDuI
-	kExofm6uxQJ3Rl+g9DdU3lU0M6ehQQ7BtTVifHOhfTjlT9HjW/ExlQxn4TzP2fPYfk2Jlz
-	LGD34fBMd7p26mfNDBVnYEiaIFG0SeM=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-562-yFh0GLlVOt-PIoSFwHJKUQ-1; Tue,
- 02 Jul 2024 07:09:34 -0400
-X-MC-Unique: yFh0GLlVOt-PIoSFwHJKUQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A46791977317;
-	Tue,  2 Jul 2024 11:09:33 +0000 (UTC)
-Received: from fedora (unknown [10.72.112.45])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C486019560A3;
-	Tue,  2 Jul 2024 11:09:29 +0000 (UTC)
-Date: Tue, 2 Jul 2024 19:09:24 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	ming.lei@redhat.com
-Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
-Message-ID: <ZoPf5L4oihlZJ1rW@fedora>
-References: <20240617194451.435445-1-ushankar@purestorage.com>
- <20240617194451.435445-3-ushankar@purestorage.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="WcjM5ZyV"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240702113809epoutp02dee63f5c90da68c41a261e0bdb6292c1~eYmPsAew82770427704epoutp02F
+	for <linux-block@vger.kernel.org>; Tue,  2 Jul 2024 11:38:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240702113809epoutp02dee63f5c90da68c41a261e0bdb6292c1~eYmPsAew82770427704epoutp02F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1719920289;
+	bh=iQzYuDQ4SIKZGQgqCoimg/bdqvm2vf5CbeMF5l77MPw=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=WcjM5ZyVMIqDYcIIeCq1JkkuDnyyD3lkZ6h49WzMPJKJ9m2d2v9xZ3kNxhFBZUX0F
+	 tp7ZVI49N0H+YAIljEG8LUva3fmpnmy1g88rCiOP++PqaWJsstUfItKN2OLT2oCWub
+	 oy/SGQeBb95AxI34kM9UWibUnsDcZMm62YPAkfpA=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240702113808epcas5p437f5930aab5e182b5bf58b88c768efa7~eYmPap0It0054000540epcas5p40;
+	Tue,  2 Jul 2024 11:38:08 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4WD1B706fvz4x9Pt; Tue,  2 Jul
+	2024 11:38:07 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	43.19.11095.E96E3866; Tue,  2 Jul 2024 20:38:06 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20240702101517epcas5p3f651d9307bab6ece4d3e450ed61deb82~eXd5v_smP1123511235epcas5p3K;
+	Tue,  2 Jul 2024 10:15:17 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240702101517epsmtrp2963b6a79d7928d4fa307f4edf9b251eb~eXd5vWoJR1129911299epsmtrp2-;
+	Tue,  2 Jul 2024 10:15:17 +0000 (GMT)
+X-AuditID: b6c32a49-423b770000012b57-14-6683e69e25ea
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	8F.63.18846.533D3866; Tue,  2 Jul 2024 19:15:17 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240702101516epsmtip26a9712122d80529936a15fc36a9bc1be~eXd40UL_22519925199epsmtip2I;
+	Tue,  2 Jul 2024 10:15:16 +0000 (GMT)
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
+	joshi.k@samsung.com
+Cc: linux-block@vger.kernel.org, Anuj Gupta <anuj20.g@samsung.com>
+Subject: [PATCH] block: reuse original bio_vec array for integrity during
+ clone
+Date: Tue,  2 Jul 2024 15:37:53 +0530
+Message-Id: <20240702100753.2168-1-anuj20.g@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240617194451.435445-3-ushankar@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNKsWRmVeSWpSXmKPExsWy7bCmlu68Z81pBu3dphZNE/4yW6y+289m
+	sXL1USaLo//fslnsvaVtsfz4PyYHNo/LZ0s9dt9sYPP4+PQWi0ffllWMHp83yQWwRmXbZKQm
+	pqQWKaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE6Lpl5gDtV1IoS8wpBQoF
+	JBYXK+nb2RTll5akKmTkF5fYKqUWpOQUmBToFSfmFpfmpevlpZZYGRoYGJkCFSZkZ8z7c42l
+	YBFXxfnjW5kaGLdzdDFyckgImEjcWrSLvYuRi0NIYDejxNvlu5ghnE+MEh2z37PBOb9fz2KD
+	aZnZc4YJIrGTUWLXpgtQVZ8ZJY6dnsAOUsUmoC5x5HkrYxcjB4eIQJBE8x4PkDCzgJPElJMN
+	zCC2sECgxMVbp5lASlgEVCX6f9iAhHkFLCRObT/CCrFLXmLmpe/sEHFBiZMzn7BAjJGXaN46
+	G+xSCYFd7BIP37xih2hwkTiwvZsRwhaWeHV8C1RcSuLzu71QD6RL/Lj8lAnCLpBoPrYPqt5e
+	ovVUPzPIPcwCmhLrd+lDhGUlpp5axwSxl0+i9/cTqFZeiR3zYGwlifaVc6BsCYm95xqgbA+J
+	K6eOga0VEoiV+DFzF9sERvlZSN6ZheSdWQibFzAyr2KUTC0ozk1PLTYtMMxLLYfHa3J+7iZG
+	cCrU8tzBePfBB71DjEwcjIcYJTiYlUR4A3/VpwnxpiRWVqUW5ccXleakFh9iNAUG8URmKdHk
+	fGAyziuJNzSxNDAxMzMzsTQ2M1QS533dOjdFSCA9sSQ1OzW1ILUIpo+Jg1OqgWnbTXm+svKD
+	t1qZrbTWHq/3+nv1hfS1wOVHe47dCAja+u3y9oiOmaeffUu4tHDRXYUp3Mk/tm/ybzZp/rXm
+	pv4EBq8vveo7nW4cqLh2r0Rt+s8mtu/OrNv7mPvkaqdOaV2w/dvXhIVRDdNnt33RtA1b8l5t
+	w7ZNru//9H8VcLH+XL44iDf6U8cRg3Nn9M6+uhJ3YfZm5wknm7s8c6t/rw9MvBJw3+ZT1mE9
+	4+NKU3hC77Gu99ptnPmKc4WT+bK7jipa7/cz9Ymtt7mRd8M6fkfqzGdHZpS5p3Hc4pALizny
+	fA3/7a8ZcyYrCd4uqYvbu+rxxDV3jXaltzu+Oflt2g+PLc5Wom3V/JxP+OMnXA55rsRSnJFo
+	qMVcVJwIAPU0J4MOBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrILMWRmVeSWpSXmKPExsWy7bCSvK7p5eY0g74PyhZNE/4yW6y+289m
+	sXL1USaLo//fslnsvaVtsfz4PyYHNo/LZ0s9dt9sYPP4+PQWi0ffllWMHp83yQWwRnHZpKTm
+	ZJalFunbJXBlzPtzjaVgEVfF+eNbmRoYt3N0MXJySAiYSMzsOcMEYgsJbGeUmPKKGyIuIXHq
+	5TJGCFtYYuW/5+wQNR8ZJW63WIHYbALqEkeet4LViAiESfz/ORushlnAReL+2k6wuLCAv8Sb
+	nzNZuhg5OFgEVCX6f9iAhHkFLCRObT/CCjFeXmLmpe/sEHFBiZMzn7BAjJGXaN46m3kCI98s
+	JKlZSFILGJlWMYqmFhTnpucmFxjqFSfmFpfmpesl5+duYgSHolbQDsZl6//qHWJk4mA8xCjB
+	wawkwhv4qz5NiDclsbIqtSg/vqg0J7X4EKM0B4uSOK9yTmeKkEB6YklqdmpqQWoRTJaJg1Oq
+	gamyPjdjyXJdaWHZ/zd0F/aXpGzRjn58eMu7412NGYzvJAwTty/ddnDx3spn232nuCxKcl3o
+	9VsxQD5potAPD0MVE73l0TPPPVyT3H/u1O/w2qrJ67ZE2pXsz4+pm1Yd2+PAyMbSG/n/rHb8
+	q3wO+1erHylbCzzN6VzNWXNa5MkmTRO7YwtPTrT0vh4cwH7WRcVFYXX6lulVXC+P/JN8cr66
+	uOWzfOVeNa15AY1lLXkPt8vumMy3d/Lvp8dmMTjW2e1/FftatKzx1MZdUjNXZz+cb6AfUj5h
+	eX7W8zP260Ln8/yXjdZcEFL6XPVQtWE968ICE0+mv0pLvgvcrphjb9Jj+Up+DqPpp7dz+8rL
+	TyqxFGckGmoxFxUnAgD1Jd8VtAIAAA==
+X-CMS-MailID: 20240702101517epcas5p3f651d9307bab6ece4d3e450ed61deb82
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240702101517epcas5p3f651d9307bab6ece4d3e450ed61deb82
+References: <CGME20240702101517epcas5p3f651d9307bab6ece4d3e450ed61deb82@epcas5p3.samsung.com>
 
-On Mon, Jun 17, 2024 at 01:44:49PM -0600, Uday Shankar wrote:
-> ublk currently supports the following behaviors on ublk server exit:
-> 
-> A: outstanding I/Os get errors, subsequently issued I/Os get errors
-> B: outstanding I/Os get errors, subsequently issued I/Os queue
-> C: outstanding I/Os get reissued, subsequently issued I/Os queue
-> 
-> and the following behaviors for recovery of preexisting block devices by
-> a future incarnation of the ublk server:
-> 
-> 1: ublk devices stopped on ublk server exit (no recovery possible)
-> 2: ublk devices are recoverable using start/end_recovery commands
-> 
-> The userspace interface allows selection of combinations of these
-> behaviors using flags specified at device creation time, namely:
-> 
-> default behavior: A + 1
-> UBLK_F_USER_RECOVERY: B + 2
-> UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_REISSUE: C + 2
-> 
-> We can't easily change the userspace interface to allow independent
-> selection of one of {A, B, C} and one of {1, 2}, but we can refactor the
-> internal helpers which test for the flags. Replace the existing helpers
-> with the following set:
-> 
-> ublk_nosrv_should_reissue_outstanding: tests for behavior C
-> ublk_nosrv_should_queue_io: tests for behavior B
-> ublk_nosrv_should_stop_dev: tests for behavior 1
-> 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> ---
->  drivers/block/ublk_drv.c | 55 +++++++++++++++++++++++++---------------
->  1 file changed, 34 insertions(+), 21 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2752a9afe9d4..e8cca58a71bc 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -652,22 +652,35 @@ static inline int ublk_queue_cmd_buf_size(struct ublk_device *ub, int q_id)
->  			PAGE_SIZE);
->  }
->  
-> -static inline bool ublk_queue_can_use_recovery_reissue(
-> -		struct ublk_queue *ubq)
-> +/*
-> + * Should I/O outstanding to the ublk server when it exits be reissued?
-> + * If not, outstanding I/O will get errors.
-> + */
-> +static inline bool ublk_nosrv_should_reissue_outstanding(struct ublk_device *ub)
->  {
-> -	return (ubq->flags & UBLK_F_USER_RECOVERY) &&
-> -			(ubq->flags & UBLK_F_USER_RECOVERY_REISSUE);
-> +	return (ub->dev_info.flags & UBLK_F_USER_RECOVERY) &&
-> +	       (ub->dev_info.flags & UBLK_F_USER_RECOVERY_REISSUE);
->  }
->  
-> -static inline bool ublk_queue_can_use_recovery(
-> -		struct ublk_queue *ubq)
-> +/*
-> + * Should I/O issued while there is no ublk server queue? If not, I/O
-> + * issued while there is no ublk server will get errors.
-> + */
-> +static inline bool ublk_nosrv_should_queue_io(struct ublk_device *ub)
->  {
-> -	return ubq->flags & UBLK_F_USER_RECOVERY;
-> +	return ub->dev_info.flags & UBLK_F_USER_RECOVERY;
->  }
->  
-> -static inline bool ublk_can_use_recovery(struct ublk_device *ub)
-> +/*
-> + * Should ublk devices be stopped (i.e. no recovery possible) when the
-> + * ublk server exits? If not, devices can be used again by a future
-> + * incarnation of a ublk server via the start_recovery/end_recovery
-> + * commands.
-> + */
-> +static inline bool ublk_nosrv_should_stop_dev(struct ublk_device *ub)
->  {
-> -	return ub->dev_info.flags & UBLK_F_USER_RECOVERY;
-> +	return (!(ub->dev_info.flags & UBLK_F_USER_RECOVERY)) &&
-> +	       (!(ub->dev_info.flags & UBLK_F_USER_RECOVERY_REISSUE));
->  }
->  
->  static void ublk_free_disk(struct gendisk *disk)
-> @@ -1043,7 +1056,7 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
->  {
->  	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
->  
-> -	if (ublk_queue_can_use_recovery_reissue(ubq))
-> +	if (ublk_nosrv_should_reissue_outstanding(ubq->dev))
->  		blk_mq_requeue_request(req, false);
->  	else
->  		ublk_put_req_ref(ubq, req);
-> @@ -1071,7 +1084,7 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
->  		struct request *rq)
->  {
->  	/* We cannot process this rq so just requeue it. */
-> -	if (ublk_queue_can_use_recovery(ubq))
-> +	if (ublk_nosrv_should_queue_io(ubq->dev))
+Modify bio_integrity_clone to reuse the original bvec array instead of
+allocating and copying it, similar to how bio data path is cloned.
 
-I feel the name of ublk_nosrv_should_queue_io() is a bit misleading.
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+---
+ block/bio-integrity.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-The difference between ublk_queue_can_use_recovery() and
-ublk_queue_can_use_recovery_reissue() is clear, and
-both two need to queue ios actually in case of nosrv most times
-except for this one.
-
-However, looks your patch just tries to replace
-ublk_queue_can_use_recovery() with ublk_nosrv_should_queue_io().
-
->  		blk_mq_requeue_request(rq, false);
->  	else
->  		blk_mq_end_request(rq, BLK_STS_IOERR);
-> @@ -1216,10 +1229,10 @@ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
->  		struct ublk_device *ub = ubq->dev;
->  
->  		if (ublk_abort_requests(ub, ubq)) {
-> -			if (ublk_can_use_recovery(ub))
-> -				schedule_work(&ub->quiesce_work);
-> -			else
-> +			if (ublk_nosrv_should_stop_dev(ub))
-
-The helper looks easy to follow, include the following conversions.
-
->  				schedule_work(&ub->stop_work);
-> +			else
-> +				schedule_work(&ub->quiesce_work);
->  		}
->  		return BLK_EH_DONE;
->  	}
-> @@ -1248,7 +1261,7 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	 * Note: force_abort is guaranteed to be seen because it is set
->  	 * before request queue is unqiuesced.
->  	 */
-> -	if (ublk_queue_can_use_recovery(ubq) && unlikely(ubq->force_abort))
-> +	if (ublk_nosrv_should_queue_io(ubq->dev) && unlikely(ubq->force_abort))
->  		return BLK_STS_IOERR;
-
-I'd rather to not fetch ublk_device in fast io path since ublk is MQ
-device, and only the queue structure should be touched in fast io path,
-but it is fine to check device in any slow path.
-
-
-Thanks, 
-Ming
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index c4aed1dfa497..b78c145eb026 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -76,7 +76,7 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
+ 					  &bip->bip_max_vcnt, gfp_mask);
+ 		if (!bip->bip_vec)
+ 			goto err;
+-	} else {
++	} else if (nr_vecs) {
+ 		bip->bip_vec = bip->bip_inline_vecs;
+ 	}
+ 
+@@ -584,14 +584,11 @@ int bio_integrity_clone(struct bio *bio, struct bio *bio_src,
+ 
+ 	BUG_ON(bip_src == NULL);
+ 
+-	bip = bio_integrity_alloc(bio, gfp_mask, bip_src->bip_vcnt);
++	bip = bio_integrity_alloc(bio, gfp_mask, 0);
+ 	if (IS_ERR(bip))
+ 		return PTR_ERR(bip);
+ 
+-	memcpy(bip->bip_vec, bip_src->bip_vec,
+-	       bip_src->bip_vcnt * sizeof(struct bio_vec));
+-
+-	bip->bip_vcnt = bip_src->bip_vcnt;
++	bip->bip_vec = bip_src->bip_vec;
+ 	bip->bip_iter = bip_src->bip_iter;
+ 	bip->bip_flags = bip_src->bip_flags & ~BIP_BLOCK_INTEGRITY;
+ 
+-- 
+2.25.1
 
