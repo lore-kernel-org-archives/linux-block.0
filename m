@@ -1,55 +1,60 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C24B537E7;
-	Tue,  2 Jul 2024 07:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BC074047;
+	Tue,  2 Jul 2024 07:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719905165; cv=none; b=SU3PHm+ZTYNbN/nS5b8725lHtWKkSmdgan7Con1IPVdXEtnIcrfBhm35Zg/dsj9CZafw29mXwDD4IS/yNlNeCtkifodBC5gIxMykqmtPdAjfQdkTKOOhj8JuO4C5gYIqWIYP4cNVHFeF3QCajPQwYhSgTyW8Rxlh3P38l6tFIaU=
+	t=1719905532; cv=none; b=OvO62cmax8M2GKtAhZTpx9uYAp1LE5T0i5QOMKQKt82Eu7XVrUikK8vPHYl4XLzfTAx6yZ0ZA6X9b6iNH7QdXsAC4p0NtgpGCGOxfX3+tImdOSMlk5o28pxMgDoUxd6ZEJwaVEY/B3KabdPI4RkpGgRGUQoEjFfgSNoRiMbEx0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719905165; c=relaxed/simple;
-	bh=WFHHEkv8N9Bai32nGXrq7y2Iy0SVdznCs033vBYYBMo=;
+	s=arc-20240116; t=1719905532; c=relaxed/simple;
+	bh=+sMR8Y+fELBV98VkEZAmEYgkVwqnEdYtSXSzNoB2jX0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XQDSc4CByCrOfbR6x4wbzvmmtQeE84VEXShpVLniNLqS5bmDVJt968AeSo78eaTcqqyKP8fPjTn8LOeccTBfsE1BxZeG7B/S/Hk7cIMo7DbtAdrvdQ3Ax+WfLQrmLIipTo3sbwEhamFQ4oM/M0tD1LMqhbIXibNyAVFvDyZ2g7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4D15F2128C;
-	Tue,  2 Jul 2024 07:26:01 +0000 (UTC)
-Authentication-Results: smtp-out1.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 394121395F;
-	Tue,  2 Jul 2024 07:26:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WZlBDYmrg2bJBAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Tue, 02 Jul 2024 07:26:01 +0000
-Date: Tue, 2 Jul 2024 09:25:52 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
-	Thomas Gleixner <tglx@linutronix.de>, Christoph Hellwig <hch@lst.de>, 
-	Frederic Weisbecker <fweisbecker@suse.com>, Mel Gorman <mgorman@suse.de>, 
-	Sridhar Balaraman <sbalaraman@parallelwireless.com>, "brookxu.cn" <brookxu.cn@gmail.com>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v2 3/3] lib/group_cpus.c: honor housekeeping config when
- grouping CPUs
-Message-ID: <irhdgxgnyz76ss7p74dnriix6llnxquowvzh3dxb7mgwd54zd7@euhdihb5spgw>
-References: <20240627-isolcpus-io-queues-v2-0-26a32e3c4f75@suse.de>
- <20240627-isolcpus-io-queues-v2-3-26a32e3c4f75@suse.de>
- <ZoIPzQNEsUWOWp3f@fedora>
- <1a1a4684-a55d-4c27-8509-9bf61408872f@suse.de>
- <ZoJWXRgycA8UeYB3@fedora>
- <c797bdc1-b949-4d88-a65f-904d909755dc@suse.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lEgNYpEfVRJpi3fpemItYdBPZC818qgDpHPv++lA20MSyP3ZtHMJxN7DJLhv41LQOGinttCvLdRvuQls6x06GeWz5hPzqtcO96aPbabEizIAQMVGY3qJdn7dGDh7E7qygiHavAq8eeyRPdOJLjcn9a4pPGFFvm1/ysaGMTzY3DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nxBkkv55; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nxBkkv55"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=yRJduJ4b13YGEVnBaImf8MBMoj+rPcyZfPfJ5uybrn0=; b=nxBkkv5533e0ibSUtWu/FWqca9
+	T02UNeMXerA742jTnmxcJDpprQYJhN+AB5mjSyF1tkFtaC9NWv/DI0JPbLwQgi37wPeed5cA37c0e
+	+2f4q+qCCkqKwjebfWNgYqdh3KcmHS4SeimB2eXIojre3wqBiKfJ74iCTIY0nzAi/62xdvvQQ9QVV
+	ggumCBVJg78P9RdScYdX17RSGD42SxwMGXnk/F0Te2sI20BEGRBsqQOtoGA/KEqDDyMxAk9wtOs1O
+	z/1WMLlWsZ6latPxKW85ISPYOrT1dPDdYNH/mzAspCJntQyhFPayqTd56frrg1OjYGXYjfO03yN/a
+	E+Zh4hIw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sOXzk-00000005s56-0D5a;
+	Tue, 02 Jul 2024 07:32:08 +0000
+Date: Tue, 2 Jul 2024 00:32:07 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Oliver Sang <oliver.sang@intel.com>
+Cc: Christoph Hellwig <hch@infradead.org>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, Jens Axboe <axboe@kernel.dk>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org, linux-um@lists.infradead.org,
+	drbd-dev@lists.linbit.com, nbd@other.debian.org,
+	linuxppc-dev@lists.ozlabs.org, virtualization@lists.linux.dev,
+	xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+	nvdimm@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, ying.huang@intel.com,
+	feng.tang@intel.com, fengwei.yin@intel.com
+Subject: Re: [axboe-block:for-next] [block]  1122c0c1cc:  aim7.jobs-per-min
+ 22.6% improvement
+Message-ID: <ZoOs9wdR1yBPB-7J@infradead.org>
+References: <202406250948.e0044f1d-oliver.sang@intel.com>
+ <ZnqGf49cvy6W-xWf@infradead.org>
+ <Znt4qTr/NdeIPyNp@xsang-OptiPlex-9020>
+ <ZnuNhkH26nZi8fz6@infradead.org>
+ <ZnzP+nUrk8+9bANK@xsang-OptiPlex-9020>
+ <ZnzwbYSaIlT0SIEy@infradead.org>
+ <ZoJnO09LBj6kApY7@xsang-OptiPlex-9020>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,28 +63,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c797bdc1-b949-4d88-a65f-904d909755dc@suse.de>
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[];
-	TAGGED_RCPT(0.00)[]
-X-Rspamd-Queue-Id: 4D15F2128C
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
-X-Spam-Level: 
+In-Reply-To: <ZoJnO09LBj6kApY7@xsang-OptiPlex-9020>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jul 01, 2024 at 10:37:46AM GMT, Hannes Reinecke wrote:
-> Hmm. Guess we need to modify the grouping algorithm to group across all
-> cpus, but ensure that each group consists either of all housekeeping CPUs or
-> all isolated cpus.
+On Mon, Jul 01, 2024 at 04:22:19PM +0800, Oliver Sang wrote:
+> from below, it seems the patchset doesn't introduce any performance improvement
+> but a regression now. is this expected?
 
-This is what this series does, though just for the housekeeping CPUs. v1
-introduces the io_queue option for isolcpus which made sure the
-managed_irq behavior doesn't change.
+Not having the improvement at least alleviate my concerns about data
+integrity.  I'm still curious where it comes from as it isn't exactly
+expected.
+
