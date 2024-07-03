@@ -1,90 +1,64 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BB917C60
-	for <linux-block@vger.kernel.org>; Wed,  3 Jul 2024 05:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6EA17996;
+	Wed,  3 Jul 2024 05:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719983923; cv=none; b=nKBkm2kwTh5j7QufeRFnufDXbNy9nvcuOaZ2eQxbdPJ8+t4XBNZOdyskS7KhkcKsEZHlhJDs2ywpNQcL8LAtwuDiMS5CKgh1rechyqmsMJlqDhX0sHss2Q2kx8yYGNWELMnBLOgB5CymPyCRKBeaos0dI8LL9l6q4kQHJzoOrmY=
+	t=1719985365; cv=none; b=jHYwAvBebV9RujS5U8flo8gjctvc72sxAHctIb2I8A8KD0KLkWww0TMTSxo2pAGQcigpcojiuUvBmB4GKpOzSPxx12xUn4551mkE9c5VfjJpOVi9EBfdkJy8n6uejFbrsnLWd3yvfY8Tejk7Z8MNArytKcoFweMFi1W6M2Sg6Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719983923; c=relaxed/simple;
-	bh=OzLnIYKgPcU/TLD1JRO5cXKasaZ8up+zkavkYFYeCx4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hSt1ltFRigQspyzSaUYW6PPYSA1mtFcY0k64kfTes4BkJJhEFsa79lgXP11nmOnTT0OhK0ABOX9wU/CflEg+I4DuVlZRVvrcOOIziif8g+jj3Jqs0/3TbRVUff1ntjo3ThKsgLA1ibOPnlgxSA5gSwqlb3BiMlKCKnGe1X1DOGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=iC5fx6oP; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1719985365; c=relaxed/simple;
+	bh=6WmyRvCngSkDLedfR0fbdwfNbhQErAClQWhqYP9cFps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UHcGgaO+Ff2jwJbFzg0iQVc7EbOYODYbx2eXAF8iS9BoS16v9mmraNfZDvbdUzVDFW2bnPwppKukJIKG6oxZIGOSZzkpcx6MlRQzT1VvMbot5qhleWFqCTMI7mac2uEBZSKNtde0Bxldf9A6OkZhPaFhRDrM/4XSzPmvCzppA44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iC5fx6oP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=IUk+gsWibGlyWllIWsTUa19ftnAVOQSGX+v+sHKE0mg=; b=iC5fx6oPBnUmE3G5iWybpEVbCW
-	NOat7BBm4vxS3/2Mn+mmrt5HCrkgGPbtG6tmGo9igSeLvZcHhlCD+oIzClUw8Q0xcteV9L4Dg2rxR
-	kIdJ7+Ugv6rTiTgR6zN2nH99LlPypBR9InAYI5HNYUg2tPKZwsMNrVJLt6oBUoHbi0xSL1M8xZfIR
-	vTyzKEJlj2BI6Vp8wx9M8xuCpLrOwtC843+9AteYPlDtxJtQO378JeXrri1dmwdlk6pGLSDg77pX3
-	k2rqZkj/i/2WzrqiAIjkgLAYG3wyg2tPNCZbRsy2FqW8EEGPzstBskSSYE6L7Tdjv5q3iwHkYrJQz
-	hOPEP3Kw==;
-Received: from 2a02-8389-2341-5b80-5426-fccf-3409-1082.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:5426:fccf:3409:1082] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sOsO9-000000092H6-2N69;
-	Wed, 03 Jul 2024 05:18:41 +0000
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A3C19227A87; Wed,  3 Jul 2024 07:42:38 +0200 (CEST)
+Date: Wed, 3 Jul 2024 07:42:38 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] block: remove QUEUE_FLAG_STOPPED
-Date: Wed,  3 Jul 2024 07:18:34 +0200
-Message-ID: <20240703051834.1771374-1-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, "Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240703054238.GA25366@lst.de>
+References: <cover.1719909395.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1719909395.git.leon@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-QUEUE_FLAG_STOPPED is entirely unused.
+I just tried to boot this on my usual qemu test setup with emulated
+nvme devices, and it dead-loops with messages like this fairly late
+in the boot cycle:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-debugfs.c | 1 -
- include/linux/blkdev.h | 2 --
- 2 files changed, 3 deletions(-)
+[   43.826627] iommu: unaligned: iova 0xfff7e000 pa 0x000000010be33650 size 0x1000 min_pagesz 0x1000
+[   43.826982] dma_mapping_error -12
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 344f9e503bdb32..03d0409e5018c4 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -79,7 +79,6 @@ static int queue_pm_only_show(void *data, struct seq_file *m)
- 
- #define QUEUE_FLAG_NAME(name) [QUEUE_FLAG_##name] = #name
- static const char *const blk_queue_flag_name[] = {
--	QUEUE_FLAG_NAME(STOPPED),
- 	QUEUE_FLAG_NAME(DYING),
- 	QUEUE_FLAG_NAME(NOMERGES),
- 	QUEUE_FLAG_NAME(SAME_COMP),
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4d0d4b83bc740f..26fb272ec5d3bf 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -590,7 +590,6 @@ struct request_queue {
- };
- 
- /* Keep blk_queue_flag_name[] in sync with the definitions below */
--#define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
- #define QUEUE_FLAG_DYING	1	/* queue being torn down */
- #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
- #define QUEUE_FLAG_SAME_COMP	4	/* complete on same CPU-group */
-@@ -610,7 +609,6 @@ struct request_queue {
- void blk_queue_flag_set(unsigned int flag, struct request_queue *q);
- void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
- 
--#define blk_queue_stopped(q)	test_bit(QUEUE_FLAG_STOPPED, &(q)->queue_flags)
- #define blk_queue_dying(q)	test_bit(QUEUE_FLAG_DYING, &(q)->queue_flags)
- #define blk_queue_init_done(q)	test_bit(QUEUE_FLAG_INIT_DONE, &(q)->queue_flags)
- #define blk_queue_nomerges(q)	test_bit(QUEUE_FLAG_NOMERGES, &(q)->queue_flags)
--- 
-2.43.0
+passing intel_iommu=off instead of intel_iommu=on (expectedly) makes
+it go away.
 
