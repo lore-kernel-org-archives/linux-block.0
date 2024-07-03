@@ -1,129 +1,107 @@
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB641836DA
-	for <linux-block@vger.kernel.org>; Wed,  3 Jul 2024 17:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8390D1C68D;
+	Wed,  3 Jul 2024 23:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720029122; cv=none; b=dSXKtIRJhqR4kiZpqP40iTGIda61joayTXBp7ftw530fdIqbla0mvBXkHHCi15ohAyshy6Q9yRFifcrvec4VQuT+/djM3D+JgXklRkHMtMMLYhRmhNUU1tRFCrzK7/D7aG0iSSecSwyVot6dkVxnbPcBvMbWXIwGOlOxjJsXN9w=
+	t=1720049975; cv=none; b=HRA0yXiIPAM/ejokMBbzZ5YKC3eJcHkgK7n4NwHKI0OdY5VL5vHkNbKGHi8YYrt6RKDKUL6MObcsHX4oOraxyIygVLXl+l8Fh777VUAUattssv83Pev8paqOsCnm6iLzAnxPPp/81WBjltolfwu9xrH4iB5uf2dkTNzAJh43sg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720029122; c=relaxed/simple;
-	bh=I/SyeQYOGfLQAUSaryB4epiEujHxOBhpHqyBsKYQnmg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=noYkLLrJmeRJ8k79a5cets0XDM3ElMdj3a1c3Sulp0L71vBQkBQlE0FQhlXdBSAQ6Akj+fh0ite1CvfgwK0wL1OOBfHMlvHYf2MvCKJsw1M0vxKtmAKqiLQxtZJgxd56LFytbw4vVcCnH2UNJjNOdyylg1rvU/TZfTwHdHYnfcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vsssUqfH; arc=none smtp.client-ip=209.85.217.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1720049975; c=relaxed/simple;
+	bh=70oZk3WGpCc2R8nFA9z2IwUmbQv7wspIH1lOKMc/FmY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=QCWLguf5Ee+GiFHteEdtof0S7v7oJ1qdFlklqW3udQEWcsrew6uvW4PmGxLILUYl+JmGRTBShXbkPcxrYYC4MjQg6E367qbnwqfs+9y0weJSaeKcIR0UqiRJwgWrc6U+wW7LZ2mXyk453Y+8C7xyWl8OiWVc8MyV/w4iKzsBZSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YaBcf6Ln; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vsssUqfH"
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-48c2d353b01so1937970137.2
-        for <linux-block@vger.kernel.org>; Wed, 03 Jul 2024 10:51:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1720029118; x=1720633918; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=i8jcvDGwHGDOUPj1r3ad1ZdHqvoFYLPPd5l4l3bI77w=;
-        b=vsssUqfH9ffgsx3yjTvNTWTN5YxgiyP0EO0n6BcdTHelomytRQavfMYdDosTo+DkIg
-         slq2uc+0JAAvN082Z4Uet6rzEeE/7W0/bQ+lE7ix4rwI4PugwtabNJcc3BPIKSQqH93u
-         J9+72jM3ECC96zFkTkqHb4bUhP5yM9xhoBk+N7kKVzZY+PDE2oiwgDLjZzSCWEjdtBxO
-         z1hVkJvDaAyNX9CCZnyfueChL+HHpX81M9G1+/7vfdA25Vw0SzB1/TBdzOONKPgVFZl3
-         xqSQJQGxe0i/PBMwZv60j8bxaFymgSJhWAAjpBsdikcgfNxWqBOlUxzaLE9K19WR+0rF
-         mX1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720029118; x=1720633918;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i8jcvDGwHGDOUPj1r3ad1ZdHqvoFYLPPd5l4l3bI77w=;
-        b=FmuSZl2hEDPrv87wSmZwQ1//tJKBT2QQaDZGhkufDUGsKokAvPgdyh1MFQy1iEkWxc
-         5lwqAB6OxYcjQ96gdxfhGXZUst3Wm7T/9PScqSdZbPzkIkvcJQQrOdQ0OQ3KRLhpWllL
-         +ASIcg8Iyc/+nJI0KtT0a/+9OTGzu+AqkwWx3WIIpETpv7eWhMLEPsXX22c0f0JHMf/V
-         ZUdYV02nrTz6KlbbduWpga4xIW9jzphdh2xg5EPIs6GM4qPLMyxVdrcSt2un5UMMbBKt
-         iJxqWu5Ud8fqKYKTAv5GOy8m11aIxJiVg4khRB/lce9sIS/iq/REN7Vi+l7F5ygOEyaU
-         hTvw==
-X-Forwarded-Encrypted: i=1; AJvYcCU06MMIQOYOWB1eoQb6YqroMvshDiKjR1nAZC70wTJ1FDczASCLkbVZ9mZ8/ZTHGIrAUJ1BHMscRycCkRXXHuEqutcWJa1BwjQ+ri0=
-X-Gm-Message-State: AOJu0Yy1f9Jz6wPfiEkD2vxyp3B4+O5Dver1AzdhTQ8aDYrySUUz6rRS
-	wHQsiBbZLMvrgPt/SHJV2HJNgfByZjRmRc/ihUmersAcQ8ji3OqmHNIR1E1/Z0GTKEClY3eAdet
-	hemEQcMgbz0UnEzZI/DvLtHJ0VeIVaNVnPkCoqQ==
-X-Google-Smtp-Source: AGHT+IHhubxatrzSaA5HKwryk/uHLQRo61FC6EY73fx40maWnrKKGtHLfWp7my6T+SlQSv0KB+ZvBb6CauO9auPbwxg=
-X-Received: by 2002:a05:6102:e14:b0:48f:9751:198b with SMTP id
- ada2fe7eead31-48faf12de8cmr14916609137.23.1720029118386; Wed, 03 Jul 2024
- 10:51:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YaBcf6Ln"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4B95C2BD10;
+	Wed,  3 Jul 2024 23:39:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720049975;
+	bh=70oZk3WGpCc2R8nFA9z2IwUmbQv7wspIH1lOKMc/FmY=;
+	h=From:To:Subject:Date:From;
+	b=YaBcf6Lnd2MZyeVhF2AvgfefkjjxtCc9kLkHPzQ+ouW9dFheT415RrJ19oFWwXn+3
+	 tHaFXMPBQ6WBqQXPI9a6Ufph/E0SpDALbW1ulAw3D9pOlRvMD3ClRfsTEiU37z31NX
+	 HSzOzbWkrlphO8Yu9LzcbWyfZ6m1SamRN58D0ZKbT+gxDB843MdVGk51GpEAnEXh1L
+	 aodPd9FXrw7j80JVgA+Wt93jsGSbPETAlUSavhfax+uEsKmwdGIEuviKMVM2uAEOOc
+	 gdsTxDa6OYxHyZAMzGIOQhn38p/9DiPEecp0bkvEXjj5+Zo7R8yxcspgcD2/wyBSlZ
+	 M8mXCeSRlFbzQ==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 0/5] Remove zone reset all emulation
+Date: Thu,  4 Jul 2024 08:39:27 +0900
+Message-ID: <20240703233932.545228-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240702170243.963426416@linuxfoundation.org> <CA+G9fYuK+dFrz3dcuUkxbP3R-5NUiSVNJ3tAcRc=Wn=Hs0C5ng@mail.gmail.com>
- <c440be12-3c22-4bb6-9a10-e3fd03b87974@app.fastmail.com>
-In-Reply-To: <c440be12-3c22-4bb6-9a10-e3fd03b87974@app.fastmail.com>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 3 Jul 2024 23:21:47 +0530
-Message-ID: <CA+G9fYtuiiV0FDFoSZOaKQbKiQYw+SphhWZDjK8R-bH7dBfs5w@mail.gmail.com>
-Subject: Re: [PATCH 6.9 000/222] 6.9.8-rc1 review
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, 
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Guenter Roeck <linux@roeck-us.net>, shuah <shuah@kernel.org>, patches@kernelci.org, 
-	lkft-triage@lists.linaro.org, Pavel Machek <pavel@denx.de>, 
-	Jon Hunter <jonathanh@nvidia.com>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>, srw@sladewatkins.net, rwarsow@gmx.de, 
-	Conor Dooley <conor@kernel.org>, Allen <allen.lkml@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Can Guo <quic_cang@quicinc.com>, Ziqi Chen <quic_ziqichen@quicinc.com>, 
-	Bart Van Assche <bvanassche@acm.org>, "Martin K. Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 3 Jul 2024 at 14:55, Arnd Bergmann <arnd@arndb.de> wrote:
->
-> On Wed, Jul 3, 2024, at 11:08, Naresh Kamboju wrote:
-> > On Tue, 2 Jul 2024 at 22:36, Greg Kroah-Hartman
-> > <gregkh@linuxfoundation.org> wrote:
-> >>
-> >> This is the start of the stable review cycle for the 6.9.8 release.
-> >> There are 222 patches in this series, all will be posted as a response
-> >> to this one.  If anyone has any issues with these being applied, please
-> >> let me know.
-> >>
-> >> Responses should be made by Thu, 04 Jul 2024 17:01:55 +0000.
-> >> Anything received after that time might be too late.
-> >>
-> >> The whole patch series can be found in one patch at:
-> >>         https://www.kernel.org/pub/linux/kernel/v6.x/stable-review/patch-6.9.8-rc1.gz
-> >> or in the git tree and branch at:
-> >>         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-6.9.y
-> >> and the diffstat can be found below.
-> >>
-> >> thanks,
-> >>
-> >> greg k-h
-> >>
-> >
-> > The following kernel warning was noticed on arm64 Qualcomm db845c device while
-> > booting stable-rc 6.9.8-rc1.
-> >
-> > This is not always a reproducible warning.
->
-> I see that commit 77691af484e2 ("scsi: ufs: core: Quiesce request
-> queues before checking pending cmds") got backported, and
-> this adds direct calls to the function that warns, so this
-> is my first suspicion without having done a detailed analysis.
->
-> Adding everyone from that commit to Cc.
->
-> Naresh, could you try reverting that commit?
+Jens, Mike,
 
-I have reverted the above patch and boot tested and it works.
-Since the reported problem is not easy to reproduce It is hard
-to  confirm that the issue has been fixed.
+Here is a set of patches based on block/for-next to remove the emulation
+for zone reset all from the block layer and move it to device mapper.
+This is done because device mapper is the only zoned device driver that
+does not natively support REQ_OP_ZONE_RESET_ALL. With this change, the
+emulation that may be required depending on a mapped device zone mapping
+is moved to device mapper and the reset all feature
+(BLK_FEAT_ZONE_RESETALL) can be deleted, as well as all the code
+handling this feature in blk-zoned.c. The DM-based handling of
+REQ_OP_ZONE_RESET_ALL can also be much faster than the block layer
+emulation as that operation can be forwarded as is to targets mapping
+all sequential write required zones.
 
-However, I have submitted jobs with and without the patch and
-running tests in a loop.
+Patch 1 modifies null_blk to add the zone_full parameter to initialize
+the sequential zones of a zoned null_blk device to be full. This is
+convenient when testing read workloads as well as zone management
+operations as that avoids having to first write to device to make the
+zones full.
 
->
->       Arnd
+Patch 2 is a simple prep patch for patch 3. Patch 3 implements the
+emulation for zone reset all in device mapper core code.
 
-- Naresh
+Patch 4 removes the block layer based emulation and modifies all drivers
+setting the BLK_FEAT_ZONE_RESETALL queue limit feature to not set this
+feature (and the feature is removed). This enables the use of the device
+mapper emulation.
+
+Patch 5 is a cleanup of blk-zoned.c made possible with patch 4.
+
+Damien Le Moal (5):
+  null_blk: Introduce the zone_full parameter
+  dm: Refactor is_abnormal_io()
+  dm: handle REQ_OP_ZONE_RESET_ALL
+  block: Remove REQ_OP_ZONE_RESET_ALL emulation
+  block: Remove blk_alloc_zone_bitmap()
+
+ block/blk-core.c                  |   2 +-
+ block/blk-zoned.c                 |  88 +----------------
+ drivers/block/null_blk/main.c     |   9 +-
+ drivers/block/null_blk/null_blk.h |   1 +
+ drivers/block/null_blk/zoned.c    |  12 ++-
+ drivers/block/ublk_drv.c          |   2 +-
+ drivers/block/virtio_blk.c        |   2 +-
+ drivers/md/dm-zone.c              |  50 +++++++++-
+ drivers/md/dm.c                   | 159 +++++++++++++++++++++++++++---
+ drivers/md/dm.h                   |  10 ++
+ drivers/nvme/host/zns.c           |   2 +-
+ drivers/scsi/sd_zbc.c             |   2 +-
+ include/linux/blkdev.h            |   5 -
+ include/linux/device-mapper.h     |   7 ++
+ 14 files changed, 236 insertions(+), 115 deletions(-)
+
+-- 
+2.45.2
+
