@@ -1,64 +1,71 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6EA17996;
-	Wed,  3 Jul 2024 05:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4687B22067
+	for <linux-block@vger.kernel.org>; Wed,  3 Jul 2024 05:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719985365; cv=none; b=jHYwAvBebV9RujS5U8flo8gjctvc72sxAHctIb2I8A8KD0KLkWww0TMTSxo2pAGQcigpcojiuUvBmB4GKpOzSPxx12xUn4551mkE9c5VfjJpOVi9EBfdkJy8n6uejFbrsnLWd3yvfY8Tejk7Z8MNArytKcoFweMFi1W6M2Sg6Co=
+	t=1719985604; cv=none; b=m/e0G8pxWqNFRleyZWjJWsrLNjUVhb8bMPqnWRcHBq1fLBOhARn36WuaTmQ7oL1ndahztH5Zz5Qgy6DMfChr+bZSEeKMmhnUVKZsWFnvEyUsdFBKfe3hyhEuuo7nG6pJURun5I18nXVZ5U2ifYE/g5qwVPDxBJy6IT06zaWXa0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719985365; c=relaxed/simple;
-	bh=6WmyRvCngSkDLedfR0fbdwfNbhQErAClQWhqYP9cFps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UHcGgaO+Ff2jwJbFzg0iQVc7EbOYODYbx2eXAF8iS9BoS16v9mmraNfZDvbdUzVDFW2bnPwppKukJIKG6oxZIGOSZzkpcx6MlRQzT1VvMbot5qhleWFqCTMI7mac2uEBZSKNtde0Bxldf9A6OkZhPaFhRDrM/4XSzPmvCzppA44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id A3C19227A87; Wed,  3 Jul 2024 07:42:38 +0200 (CEST)
-Date: Wed, 3 Jul 2024 07:42:38 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, "Zeng, Oak" <oak.zeng@intel.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
-Message-ID: <20240703054238.GA25366@lst.de>
-References: <cover.1719909395.git.leon@kernel.org>
+	s=arc-20240116; t=1719985604; c=relaxed/simple;
+	bh=8Q85iIG4kybj4IksJlwSaJ8xZkYrpEHTlKkEFMsI1lk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o4A4Ht0RKsZoZv9QO7E5d7aTC6eTG0eUGrZZm9Z+Ueb0284Kkq8rjjfAglQ7wR8uicmqV/75oReZERvcbMmxeqK8f29ZPuz9wjbxkoUr3k4TLTMbxngtmzk1r8qfZQUT7y8vSeRK7fgCTopvsaexAWpLBsDukD7DomgEuldO8bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=HT8EnYbz; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="HT8EnYbz"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WDTLB4Gdcz6Cnv3Q;
+	Wed,  3 Jul 2024 05:46:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1719985601; x=1722577602; bh=8Q85iIG4kybj4IksJlwSaJ8x
+	ZkYrpEHTlKkEFMsI1lk=; b=HT8EnYbz2nU7tt4HaxBB7x0qj0yiCbGdKCqaQRIl
+	M7BMgWhSSxfTRRgALqR94SmaBdWfolViG1eqteMUvhJpEpq6JVMuxDiVHgjSdl+3
+	rOZnLpj3YLDvEdIe+eYZuOJvjQ92k7XzB305SoiyNTYWkKpglInxBOJyTIRC9oZp
+	sTlYPpiuaJqcyeoKdMDB9NDunJY0CL5VlhAnyV6P1tHdvbADBzDr0QxcHWiWZubV
+	l49/4AiYLiz4EHpIWShZZmU16JLr2h8/bXgCDXg9NugFJN568EXVoGyAd89lhffB
+	G1yyue7sfiycu/LggUiJuxtO722n+EKLus2DlX9dmqBipA==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 2ALc1iQiAPdF; Wed,  3 Jul 2024 05:46:41 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WDTL84Y8sz6Cnk9X;
+	Wed,  3 Jul 2024 05:46:40 +0000 (UTC)
+Message-ID: <a4c47014-04a3-4c37-9877-6aa90dc2fc95@acm.org>
+Date: Tue, 2 Jul 2024 22:46:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1719909395.git.leon@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: remove QUEUE_FLAG_STOPPED
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+References: <20240703051834.1771374-1-hch@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240703051834.1771374-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I just tried to boot this on my usual qemu test setup with emulated
-nvme devices, and it dead-loops with messages like this fairly late
-in the boot cycle:
+On 7/2/24 10:18 PM, Christoph Hellwig wrote:
+> QUEUE_FLAG_STOPPED is entirely unused.
 
-[   43.826627] iommu: unaligned: iova 0xfff7e000 pa 0x000000010be33650 size 0x1000 min_pagesz 0x1000
-[   43.826982] dma_mapping_error -12
+Is this perhaps the patch that removed all QUEUE_FLAG_STOPPED users?
+a1ce35fa4985 ("block: remove dead elevator code")
 
-passing intel_iommu=off instead of intel_iommu=on (expectedly) makes
-it go away.
+Anyway:
 
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
