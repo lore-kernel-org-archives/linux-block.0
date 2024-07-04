@@ -1,69 +1,84 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44134A31
-	for <linux-block@vger.kernel.org>; Thu,  4 Jul 2024 01:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F0C8BFF;
+	Thu,  4 Jul 2024 01:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720055226; cv=none; b=ugV9ejKJFnvPjvr8+WJaR3CqkkcQMZSJGTWFT14YHOOmgg+Q/wS0+E7t0dJcSS0DI+RPJ/mG423bXP7dAX6if7tuN00n7raLGi2bUpRQPvZcFSpXxC4xilDzSH3x1eC/mxkGdGPctFsVHwCurYadko455IDU3fwmlr95cM0HrT8=
+	t=1720055661; cv=none; b=Xf9KKolyy7x12XWIE3yh2mP209wxzVzLOz6P31evCpfPZKtaQrjLwG2gBYb9DcHwgh5a2ggEwN88uIM3aRk2rqmX7XiuvsLduzmcMBhJ0d1IA+U4HIrBMYVCjDiJA3vI51SONZFe4MfaKurcQwGiWMm4oqIJ1m11/8UeafIzP9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720055226; c=relaxed/simple;
-	bh=c/Iht3r0UfI1cVQ1ma1/TCpMCYslvZdtxmTVm6ugyq4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pZgK6RBptwHeG8L9XTEprT3KBv8oWsCKnaxHLMlK1ziKaCJVBZsZ5OI7+TWwr8AHOWoHoZ5YE7JgYTl5I8BZAtTmjyK68Pbs+wrIQxPoTjqqXDUOwu017zdIQrAT6/lKNSt2AjuzEr+dozFGxiVo7HEL13FqpqipIw5eT+2Vra8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PG004taA; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1720055661; c=relaxed/simple;
+	bh=IT/0qmpouGjAntmssXPWkmLwzlopcZSsDDAtvyNgKEI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=q0LZkdv5EXOMSx+ISPJQvQzYe0GAc+ywC1Zs1LRPwX13/vQCsKLq4CTk+3Zjtmkz7xBpifzgO9e+42vyrV0YEl8qsFaPWbHuyTBsz2kEEFdQgVyzqtsO/Qf7BgIT9zpEujavU7l6kjodiuq1I2o55r6/thEgTTDaYaqLrbGbOv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bIUrsvSc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PG004taA"
-X-Envelope-To: axboe@kernel.dk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1720055222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dHyyOptbTiBT2cmj/dHDIeLqkK+pMjugcq4UvIUbf8M=;
-	b=PG004taAPGyyaSshSXaVuJKNIVWRci2IPTe6GKfGlq10CW10d8ocgb0kpjqH6yhl/nz34e
-	WZ/HNQ92A1N04n66RnzekW0QOEau6xn1wtA/gt1MKvRDtfOYYau0xUQ/1nfyOmJFLUedhb
-	GcfOrH19CWyjcbvPEOhLpYEWERT3hgs=
-X-Envelope-To: linux-block@vger.kernel.org
-X-Envelope-To: yanjun.zhu@linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: [PATCH 1/1] null_blk: Fix error "ERROR:INITIALISED_STATIC: do not initialise statics to false"
-Date: Thu,  4 Jul 2024 03:06:38 +0200
-Message-Id: <20240704010638.324349-1-yanjun.zhu@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bIUrsvSc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2958C2BD10;
+	Thu,  4 Jul 2024 01:14:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720055660;
+	bh=IT/0qmpouGjAntmssXPWkmLwzlopcZSsDDAtvyNgKEI=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=bIUrsvScsVgHP5PZtTZzAEYE8G+B2DRTUd4NbTIpfBpU27Eh19za6EANkCFIEB/0Y
+	 0P0rGf4AvotTsziZ+/8U6tULA+zNfel+9XCB/+YxUIeN8fLJvEkGsxWm4jjyCKLL1G
+	 0MTwPILpAKPkDM1+1/a0qXzwVZXuxe2UmQahzN9H3pH8lM0NSIVWqP4bG/SNzyEHF0
+	 S64XrqXy0uaYQ/thWgtKJcMu6fgXg5+kHGnpd6OPHPMV3xpQR76mZ1UQDU8+9cwZl9
+	 pidfLOqu8r15doN+QqZJWo2M23Qz8ou4+LVCunG34K+zOkClBUOUY3qwaF809ut/3N
+	 xanmDc018kSrw==
+Message-ID: <b011fe29-3602-4857-ac30-f47ce84d43d5@kernel.org>
+Date: Thu, 4 Jul 2024 10:14:17 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/5] block: Remove REQ_OP_ZONE_RESET_ALL emulation
+To: =?UTF-8?B?RWQgVHNhaSAo6JSh5a6X6LuSKQ==?= <Ed.Tsai@mediatek.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "hch@lst.de" <hch@lst.de>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "mpatocka@redhat.com" <mpatocka@redhat.com>, "mst@redhat.com"
+ <mst@redhat.com>, "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "snitzer@kernel.org" <snitzer@kernel.org>
+References: <20240703233932.545228-1-dlemoal@kernel.org>
+ <20240703233932.545228-5-dlemoal@kernel.org>
+ <c2022791ae3b082d9da3694aadb4b089a991570a.camel@mediatek.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <c2022791ae3b082d9da3694aadb4b089a991570a.camel@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-No functional changes intended.
+On 7/4/24 09:07, Ed Tsai (蔡宗軒) wrote:
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 71b7622c523a..0c25df9758d0 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -834,7 +834,7 @@ void submit_bio_noacct(struct bio *bio)
+>>  			goto not_supported;
+>>  		break;
+>>  	case REQ_OP_ZONE_RESET_ALL:
+>> -		if (!bdev_is_zoned(bio->bi_bdev) ||
+>> !blk_queue_zone_resetall(q))
+>> +		if (!bdev_is_zoned(bio->bi_bdev))
+>>  			goto not_supported;
+>>  		break;
+>>  	case REQ_OP_DRV_IN:
+> 
+> It does the same thing as other zone operations, putting these together
+> will be more cleaner?
 
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
----
- drivers/block/null_blk/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Indeed. Will do that in v2.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 75f189e42f88..ea3989dce3be 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -77,7 +77,7 @@ enum {
- 	NULL_IRQ_TIMER		= 2,
- };
- 
--static bool g_virt_boundary = false;
-+static bool g_virt_boundary;
- module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
- MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
- 
 -- 
-2.34.1
+Damien Le Moal
+Western Digital Research
 
