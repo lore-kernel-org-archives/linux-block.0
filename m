@@ -1,83 +1,130 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22C71AB51D
-	for <linux-block@vger.kernel.org>; Thu,  4 Jul 2024 09:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6EB1ABCC0;
+	Thu,  4 Jul 2024 11:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720085950; cv=none; b=bRFnGQs2DCDLn+TC12joZngjIA4WjIlgufwRzn2JWSwN4gXd5Oxlz3bbWl7dBibV7aRdEE4xJyoUswDdQgfpXZDMtplpEMUBKm9DX042+k2C75GcoSLJJIthpQ68lLHPxNeYaLtWkjCYaH4APo9RkCUWPfhHO0y9Dobh7is1ElU=
+	t=1720091482; cv=none; b=eylKD1niaP1W3FMc0uwiCrQneWoM+/d5rG2JM51pyIzNF0gnU3cM7adUeH2X7Q+E47+ofDkfJwr7sQLmuNh8PVBc1GSdHSKsmJ9IBtnndrY1fWZU9gZWwflSc0vAESmvNsZg/7cC2cWEOF0PFFbPSLW4KPoii6SSSEuNfIy7tIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720085950; c=relaxed/simple;
-	bh=Ys2s6wfPKTdNY6st1Y3BR4Waa735ufPB0CWHvUkIhOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M17VWV5iBHpWstMvkd49VT+cY2dqyPm1ojTQL+vLJcpe7QyDcJDCDPvB7ZIGWewj4D3IVR8pWvBnw/Kh2fOH+m1Iy4Dol3Ej8b2ldg1vJ07nG9YFZWqRgvMHEt0aMapXuMt2m/H01jhwhoLjndPR0E+Dx/J0SwZdDuEcB1jzqT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=H5ky8x62; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1720091482; c=relaxed/simple;
+	bh=TwoVc/A5cvcKyYqBk85IeSoXm8WueZBsy4xxLnttTxM=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=tmwlqUlopYjHTOcnxa3V9+3j8EqLLbnYgx82qagPMZLyfpFxuBeT4b/djFcZQayRN9XbAO3OIG9al09zvhY24BWYjfvlsbnk/BATtaNP8UBqgVk4wONiv1uu7h3Ylgvui80xSvJ7coyAtAs0Y1bIDclyRnYsnEG/h0YvJ6WcyxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DVwMuNkq; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="H5ky8x62"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-6bce380eb9bso242073a12.0
-        for <linux-block@vger.kernel.org>; Thu, 04 Jul 2024 02:39:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DVwMuNkq"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-36786081ac8so349222f8f.0;
+        Thu, 04 Jul 2024 04:11:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1720085948; x=1720690748; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ys2s6wfPKTdNY6st1Y3BR4Waa735ufPB0CWHvUkIhOc=;
-        b=H5ky8x62uOfZP27NKJ+GSjCaqr4WU2MrZG2Z8swDrw5xAIDMW8h0gRtuZLAkDnXzVu
-         3CqOY5MmljnRimy+6FsEDRpyRCmFe0KCmzbJ4yEb1+5HvFk46jw+Fn0nA/byTb+xISNT
-         ncT+oOs3XLSzZvrfvhDIpC5dNHyLeWTcOp3is=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720085948; x=1720690748;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1720091479; x=1720696279; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ys2s6wfPKTdNY6st1Y3BR4Waa735ufPB0CWHvUkIhOc=;
-        b=AcIhd0FVQn7HeBMplyy4LDGF/Bk1mTPm+9DkIUiWMvLpAZoh9M5GsS+upvzJDMGS0I
-         WxVtJSvtvjX36Q5NvjNSeu+oKvlFdQdJVy3WRULVcWyHe7jbHeivod10LUrtCtN5BX5w
-         uB8dZq0npFLqcy/af9MmW7+xkTUDycWXg4+dWqqPbDpq7gPubRXD75chO3wi8DZhOymV
-         RFkdxB4+Rhl4xRabZLMlnJkXBvtymytJSx5Q0yzNaPtonsJF6YhbX0PHXSeCXwfT9Lq/
-         8H2Jz12OQhOUS9DWR3V3aWs315vNFYey9qX3H1STqbxAdLGIKJuvvd+vg7GprYeJvPnr
-         CC5w==
-X-Gm-Message-State: AOJu0Yz5ImywKJrx6eUvQNLPwH0esx3/76Ud2rj7qsRVIJwVa+K1olzR
-	BLIaJAKRF+tO7vt0BhCh5D8ESfMhQYBowbT9nFo4BpOFXuxRalplROj+/MTPZg==
-X-Google-Smtp-Source: AGHT+IHFV8ODDEu8wWKjCCRauRPD0y8C2a9w//eCdb5ZIFlSE8Kk9VDC/aqHLbkN7rsLC2/o2VT4pQ==
-X-Received: by 2002:a05:6a20:6a0d:b0:1c0:bdf5:2a2a with SMTP id adf61e73a8af0-1c0cc73ea39mr1127241637.24.1720085948067;
-        Thu, 04 Jul 2024 02:39:08 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:3db1:715f:c72d:16f7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c99aa321cesm1033744a91.56.2024.07.04.02.39.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 02:39:07 -0700 (PDT)
-Date: Thu, 4 Jul 2024 18:39:03 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Minchan Kim <minchan@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>,
-	Mike Galbraith <umgwanakikbuti@gmail.com>
-Subject: Re: [PATCH v2 0/3] zram: Replace bit spinlocks with a spinlock_t.
-Message-ID: <20240704093903.GC3232210@google.com>
-References: <20240620153556.777272-1-bigeasy@linutronix.de>
+        bh=qwBmB9TZGFjcG5R2+2N2tz93DvezoEGxh6PsIk8IO/w=;
+        b=DVwMuNkqn+2XTBypJEguND4yU8ZLt/XCn2Rvvwjwn91IWH1oe1bp5nF7YelyIo6Aof
+         PGzrkUJnD/afC5RbxYs0jxQOCW15tG8pCg5zJ+ojuyIOTmkn3P8zdLKbWKqPYYnFNmtJ
+         3ZCTjLm1HcilZKiDwLpk2UPxvNY66g6DH5nYYf8GITmrmNiesvpDlUJVIkG8NEyVVom8
+         kAPftQeFsPA1tCPbALMUCe5WurN0VVxrJVxSSVOvTyPD65adG8ML73VRBjk0VlY6G8Ez
+         tX70faa2b6tdI/78pXvVP8ub7qRieBucgNTvNZ38S4R9NoLgoHTvD+O70rxLUJGHKE6z
+         hAlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720091479; x=1720696279;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qwBmB9TZGFjcG5R2+2N2tz93DvezoEGxh6PsIk8IO/w=;
+        b=GOgGX4KiCmxV4F2434WjNsNGyyz3RKdNgB1Pf3Bv6uyGfgGOkM8Pb+yVWffU8IWLSi
+         8E2NSwHBV+1GDQ17f7ukqMI2a7nOJU35e9n6lEqV8eAGdTA3BJ6skutgZIrhmg8HIgKa
+         dQ5bMCO3oqQMaR3lZxHMcQUwbwP9qzYSow5H/jeiCqcBHwR7IGtxz+b5WNTz6WCqE6pK
+         KdxwkyPI3bPwTpAV201Q9UHx7lpf5FSeYavrQabkEOHnEaVZcE1LAWFrLhLR+UfiT8zj
+         SaektvU9KQa5J7yXuEt0SQO5TM0GAakpU9gFAbbMvc8wv49SdRLcQrmhz8KwNRelqBHT
+         67aA==
+X-Forwarded-Encrypted: i=1; AJvYcCUq+56FaN0zIJqcWsJmItbCW58aH2Jh97TYBkd5ZYdzi0qAkwg7X69KwUe/hcwmKhVtsPpob/ttD5MxA2+xKuGXBlsZdbcx3mDZbpV8ihWUaaMhYnI696CL+OUFoRdzMlyLc49PgQs/tVeneEiKYn2B/8oqHlpboQXgB2764v1/DdydYE1F2UvrY+ruLkYXcghX7QmHlbbBH9HSHCRN3ETZ4vY/t+hpK0VUF5GuRym/Vr54VzSwowORbKFpLKLIaYmX+nVm0EG9X5U4iTtRKESQHVHoAPXxn7ApXZaZVQr+Jvlj2lE6/axS2DZma1VlSO8BrF6U
+X-Gm-Message-State: AOJu0YwW4QvKglXPMHCvZZYtBkq0dlKbQXsnkYd9AavBo4Er98F+EmXF
+	2rXxBQI73GGXs85q0pSbBLqf9Wvyzdm87kXqQ9A/4bMWtdskHK7p
+X-Google-Smtp-Source: AGHT+IFEzvL2jC2faLe/uaMvaq/UCJ26KrH1XFm9Ol6h8w0Rebt6hjx4X+gdY7pIVUfbtqQYexMuPw==
+X-Received: by 2002:a5d:5712:0:b0:367:94e7:958a with SMTP id ffacd0b85a97d-3679dd17ec1mr1153338f8f.6.1720091479417;
+        Thu, 04 Jul 2024 04:11:19 -0700 (PDT)
+Received: from [10.14.0.2] ([139.28.176.164])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36787db4d12sm6821051f8f.110.2024.07.04.04.11.17
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Jul 2024 04:11:18 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240620153556.777272-1-bigeasy@linutronix.de>
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.7\))
+Subject: Re: [PATCH 14/26] block: move the nonrot flag to queue_limits
+From: Simon Fernandez <fernandez.simon@gmail.com>
+In-Reply-To: <ZnmoANp0TgpxWuF-@kbusch-mbp.dhcp.thefacebook.com>
+Date: Thu, 4 Jul 2024 12:11:16 +0100
+Cc: Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Richard Weinberger <richard@nod.at>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ =?utf-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+ Josef Bacik <josef@toxicpanda.com>,
+ Ming Lei <ming.lei@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Alasdair Kergon <agk@redhat.com>,
+ Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ Song Liu <song@kernel.org>,
+ Yu Kuai <yukuai3@huawei.com>,
+ Vineeth Vijayan <vneethv@linux.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-m68k@lists.linux-m68k.org,
+ linux-um@lists.infradead.org,
+ drbd-dev@lists.linbit.com,
+ nbd@other.debian.org,
+ linuxppc-dev@lists.ozlabs.org,
+ ceph-devel@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ xen-devel@lists.xenproject.org,
+ linux-bcache@vger.kernel.org,
+ dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org,
+ linux-mmc@vger.kernel.org,
+ linux-mtd@lists.infradead.org,
+ nvdimm@lists.linux.dev,
+ linux-nvme@lists.infradead.org,
+ linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org,
+ linux-block@vger.kernel.org,
+ Damien Le Moal <dlemoal@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <78BDDF6A-1FC7-4DD7-AABF-E0B055772CBF@gmail.com>
+References: <20240617060532.127975-1-hch@lst.de>
+ <20240617060532.127975-15-hch@lst.de>
+ <ZnmoANp0TgpxWuF-@kbusch-mbp.dhcp.thefacebook.com>
+To: Keith Busch <kbusch@kernel.org>
+X-Mailer: Apple Mail (2.3608.120.23.2.7)
 
-On (24/06/20 17:28), Sebastian Andrzej Siewior wrote:
-> this is follow up to the previous posting, making the lock
-> unconditionally. The original problem with bit spinlock is that it
-> disabled preemption and the following operations (within the atomic
-> section) perform operations that may sleep on PREEMPT_RT. Mike expressed
-> that he would like to keep using zram on PREEMPT_RT.
+Hi folks, how can I unsubscribe from this group.?
+Thanks in advance.
+S
 
-Sorry for the delay.
+> On 24 Jun 2024, at 18:08, Keith Busch <kbusch@kernel.org> wrote:
+>=20
+> On Mon, Jun 17, 2024 at 08:04:41AM +0200, Christoph Hellwig wrote:
+>> -#define blk_queue_nonrot(q)	test_bit(QUEUE_FLAG_NONROT, =
+&(q)->queue_flags)
+>> +#define blk_queue_nonrot(q)	((q)->limits.features & =
+BLK_FEAT_ROTATIONAL)
+>=20
+> This is inverted. Should be:
+>=20
+> #define blk_queue_nonrot(q)	(!((q)->limits.features & =
+BLK_FEAT_ROTATIONAL))
+>=20
 
-I guess this works for me, FWIW:
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-
-Minchan, any objections?
