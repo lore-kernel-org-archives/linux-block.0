@@ -1,89 +1,118 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2422125779;
-	Thu,  4 Jul 2024 12:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC377E9;
+	Thu,  4 Jul 2024 13:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720095553; cv=none; b=WWbg8P5I+a5AFJNLlp39RzYhsPJdpVSFY/p6uqvsr6/EzLGsDRlvJn9tgmn9J2jl93jcknvRvCEHezJ4DBFpHcgyLVEM/hGMYC+oNS/mffXaJkG0TcJr2xtQuKK6HYdYMAen/93pQL/U8wzqbMm6dsXjk0zBp89F1Eobxd4t9qI=
+	t=1720099125; cv=none; b=Cd3Oq5FROlN2cmWhNuf6CWLbi+G/3Yqp9irgCUD27yC2o+JDLUMzi99Lw5Sa7FFT6ABbO4J1dAgIDWA/o+rj6dx6pdyWHV9QUmAjNC9v3xs5MtIWSwWzVcPrWDhsdE7WGaZua8F5SQyP8AfhtwUoBzlehEfVRk7NosE7gVNkX28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720095553; c=relaxed/simple;
-	bh=Nnlx2nHqz0VPl3CWDgzgXFLf1nEKUzyfRv56y/zLLtk=;
+	s=arc-20240116; t=1720099125; c=relaxed/simple;
+	bh=nkzC1R2Sn6KADvFNDPp0hrnIwln3xVG+eb9R42IPSdQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WVugdObJ0oJ7hePlLpFnHhrrdN/uXPPBCggYD3sknKQxt6ee/uGrG2UyDMAQfHPNRzBpkEQOdihPAcDDnWEJiSXgtTCMJjoeamm6DXuc5+ljFzxktehFk72w4l+WQ9AsCglQtP5pi4kxcJuTx5k4stATvcoIwKeJlzFWPdz3zpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zibf5UeN; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FC/+YWlj; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=VsSMcTzcsbyiGYoOpFqQH4/YM3fyL9SB7SHhF+aWCkS//437E/E9pPZWigixewpzn/P9N462CeAWLWNHpMXpz0Ti7r1V0dh3O9RBJYqMJuZ6382D0UR20xjJ6DPlYJaihfpiojqnqMvBV78Qk556H7FT+OIvxjUVFS78lQ8jDZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/KR/8A6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zibf5UeN";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FC/+YWlj"
-Date: Thu, 4 Jul 2024 14:19:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1720095550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bAv0pawrlTY1HxGYFhyoC+vPlRm/ofgkenUj6RqKG+8=;
-	b=zibf5UeNO2SvoaMy/Fmrk4rG1LXq+drMULDUKoNV6B+MZA48UpRCtUHeIQn/ldsIIuSzRw
-	cZ01KjDKWumFaAUsS6sX66QtiHZz5kv7CuEdVTKT50Wr/9rf4opT7YxX7Qj2Zm35BgXb2m
-	RK3lVo7CIwuWojjs2FnKAkl7HyAVeDfQUYtoC0hDUXOrob/zcSlVOKRHv8GApU/vQkXfac
-	4Vk7n7TeEO7PoCDeWFcF59q0ySjvPkd3IbL0RkkCcpVcwPTABI16F1VQeE0jZjsxE4bJw9
-	+eDizpmcHjC1bpBnw4+U3DVsh9d1nhbDp14mu2bOnwwZ6DRJOB9c91LXpMsH9Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1720095550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bAv0pawrlTY1HxGYFhyoC+vPlRm/ofgkenUj6RqKG+8=;
-	b=FC/+YWljnqh8L9IpnFdXPnrZooaGcGd0M3aqtJvVZcnn5x4cuq2m5MiBfXOp16JkGNWTwj
-	2M1MLhCUOSF5V0Cg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>,
-	Mike Galbraith <umgwanakikbuti@gmail.com>
-Subject: Re: [PATCH v2 1/3] zram: Replace bit spinlocks with a spinlock_t.
-Message-ID: <20240704121908.GjH4p40u@linutronix.de>
-References: <20240620153556.777272-1-bigeasy@linutronix.de>
- <20240620153556.777272-2-bigeasy@linutronix.de>
- <27fb4f62-d656-449c-9f3c-5d0b61a88cca@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/KR/8A6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0368AC3277B;
+	Thu,  4 Jul 2024 13:18:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720099124;
+	bh=nkzC1R2Sn6KADvFNDPp0hrnIwln3xVG+eb9R42IPSdQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D/KR/8A6xd5D4R/wyMmVXVBhTLC00uoxpBMQxG4XlqhIi5KAQVaC2WfSC/JKuTQBK
+	 kEFxwYczrrp8jHD/rU7Io7O7FanCrAZSqBu/PdOnbPEDswb3D7N14ui//u++auZfNR
+	 SUqz2Rl1HBcmgvgZwCQlOkR19edRQbzDh6tI/mypTJD/RTH4hYtagEvYh76WNN1/VY
+	 UCe/SDCeqqwlLAKAvWNk+uJtnN8vjygt8Gaomlc3u7lhSQZuSImjGamtHE5l/qm9H/
+	 l7cdU0pdx3G3PZZgD6CMT+HJGLLMzzhXBkWp2c6sJY4t+AJp3EHJFmV84AgiTky6jN
+	 DmhQgo4POHvOw==
+Date: Thu, 4 Jul 2024 16:18:39 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240704131839.GD95824@unreal>
+References: <cover.1719909395.git.leon@kernel.org>
+ <20240703054238.GA25366@lst.de>
+ <20240703105253.GA95824@unreal>
+ <20240703143530.GA30857@lst.de>
+ <20240703155114.GB95824@unreal>
+ <20240704074855.GA26913@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <27fb4f62-d656-449c-9f3c-5d0b61a88cca@intel.com>
+In-Reply-To: <20240704074855.GA26913@lst.de>
 
-On 2024-07-04 13:38:04 [+0200], Alexander Lobakin wrote:
-> > index 3acd7006ad2cc..036845cd4f25e 100644
-> > --- a/drivers/block/zram/zram_drv.c
-> > +++ b/drivers/block/zram/zram_drv.c
-> > @@ -57,19 +57,34 @@ static void zram_free_page(struct zram *zram, size_t index);
-> >  static int zram_read_page(struct zram *zram, struct page *page, u32 index,
-> >  			  struct bio *parent);
-> >  
-> > +static void zram_meta_init_table_locks(struct zram *zram, size_t num_pages)
-> > +{
-> > +	size_t index;
-> > +
-> > +	for (index = 0; index < num_pages; index++)
+On Thu, Jul 04, 2024 at 09:48:56AM +0200, Christoph Hellwig wrote:
+> On Wed, Jul 03, 2024 at 06:51:14PM +0300, Leon Romanovsky wrote:
+> > If we put aside this issue, do you think that the proposed API is the right one?
 > 
-> Maybe declare @index right here?
+> I haven't look at it in detail yet, but from a quick look there is a
+> few things to note:
+> 
+> 
+> 1) The amount of code needed in nvme worries me a bit.  Now NVMe a messy
+> driver due to the stupid PRPs vs just using SGLs, but needing a fair
+> amount of extra boilerplate code in drivers is a bit of a warning sign.
+> I plan to look into this to see if I can help on improving it, but for
+> that I need a working version first.
 
-But why? Declarations at the top followed by code. 
+Chaitanya is working on this and I'll join him to help on next Sunday,
+after I'll return to the office from my sick leave/
 
 > 
-> > +		spin_lock_init(&zram->table[index].lock);
-> > +}
 > 
-> [...]
-> 
-> Thanks,
-> Olek
+> 2) The amount of seemingly unrelated global headers pulled into other
+> global headers.  Some of this might just be sloppiness, e.g. I can't
+> see why dma-mapping.h would actually need iommu.h to start with,
+> but pci.h in dma-map-ops.h is a no-go.
 
-Sebastian
+pci.h was pulled because I needed to call to pci_p2pdma_map_type()
+in dma_can_use_iova().
+
+> 
+> 3) which brings me to real layering violations.  dev_is_untrusted and
+> dev_use_swiotlb are DMA API internals, no way I'd ever want to expose
+> them. dma-map-ops.h is a semi-internal header only for implementations
+> of the dma ops (as very clearly documented at the top of that file),
+> it must not be included by drivers.  Same for swiotlb.h.
+
+These item shouldn't worry you and will be changed in the final version.
+They are outcome of patch "RDMA/umem: Prevent UMEM ODP creation with SWIOTLB".
+https://lore.kernel.org/all/d18c454636bf3cfdba9b66b7cc794d713eadc4a5.1719909395.git.leon@kernel.org/
+
+All HMM users need such "prevention" so it will be moved to a common place.
+
+> 
+> Not quite as concerning, but doing an indirect call for each map
+> through dma_map_ops in addition to the iommu ops is not every efficient.
+> We've through for a while to allow direct calls to dma-iommu similar
+> how we do direct calls to dma-direct from the core mapping.c code.
+> This might be a good time to do that as a prep step for this work.
+
+Sure, no problem, will start in parallel to work on this.
+
+> 
