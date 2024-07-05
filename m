@@ -1,71 +1,60 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A19916B3BA;
-	Fri,  5 Jul 2024 17:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B73A955;
+	Fri,  5 Jul 2024 18:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720199614; cv=none; b=rXo7WdJ8yqHhiC7bIQb1zC81O6lk6aaYfqtk9qN5KapI9pn2TZl4kPMsjUtwAw+QW0WlLVeNgDaHR7bmc0EEYFYBaY14bPMFbnVQZgOuKwAFMO1CKbwOPoikTNEQlPzNZ1u1tMBLtagQND91hut6Pwwa8zQ8J8ISiSDkS84tydE=
+	t=1720205332; cv=none; b=mxo4bqYlqGV3arZLnd3h5xdSarTRP7IHhkMRbKaEJbLUJoX1hSoBFjW1PZi8BXgWuUQztUZRr6p1j430aiF+C2QnJpRmJGXQszztHesRGRiKi47ICR09SMDyTgokvzEMrHgxyW/N4/ZmMbK3jZlTXp8paRhfVLUIwe+vjX7Awx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720199614; c=relaxed/simple;
-	bh=VGVomkM/rYHhvPwoV2bSDwfdJBUjSxyszcJm5AMp2fQ=;
+	s=arc-20240116; t=1720205332; c=relaxed/simple;
+	bh=3gQdxm9rrq4HH+3IgyK33e5U18PihTEsMAv3ZFMKGl4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=apxl1vQ5z4BCrIEVthAL+IYEulz8J2JGtWdKKHn+ABY2QKjLuS43lLedfy9I1cy6nTUWDuci8lZ0atk9sjj+CyX+OYevGLCyFuA9yabFiFO4sAlxS787glYnFIcdZqoMj3f5pMzlsSqYIIvpYistM93H7ic0dPUz7lCxnst5SZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQSdstOt; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=n7cJcpkzqsPw1YsYGmiGRJ7dhq9Cl+rI7cU1j6SertII/9DAuQYBCk01jiO03k3oHaL47F25qx6e8onWv1ta1yDMRGuczxAOZEtFtb2XWBVt2nzdxQJO5kx2tdxiBSc205vUmbRyO9rgoFkcmIWP5DXLtn4AGX7guIsBHBZn/ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ht2Sg2t2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQSdstOt"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fb4fa1bb34so4844665ad.0;
-        Fri, 05 Jul 2024 10:13:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720199612; x=1720804412; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jVFbWqs/ujGoWS6V+Wtmkt0OqRspry6ZAA+kHzk0dpg=;
-        b=NQSdstOtTF9ZZMGADBw8fYWGmyUt9hHlPiIaNiwVzDTvFLRxK5vzNiNgQ+zMqYOO5T
-         OOCmnLfUheCLM11LKYzx+O3Raltm/Hc7uta419CXzmZ19mP0cw7fQF0CV+n884WDEz33
-         v6mCioBVPJTRRfQXlSpU0h5GG94dYT8+7xZUb57MJD2pTBZ1Ft9NLE2o8yltvB4AU8Ml
-         oovdOI7j/BKiFE1dTybrShnEutPN1g3HTpVzE3rA5bgOnUcP6D+AWweE25oqgwzS1anV
-         1nRcCcBMLnrH0D+eQkAQOw+QSVFRu6gkK9fzYRK39Wua6cTR8N7FuIotmrtvURNe6r+n
-         QyUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720199612; x=1720804412;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jVFbWqs/ujGoWS6V+Wtmkt0OqRspry6ZAA+kHzk0dpg=;
-        b=dfFiUYBDJg4quF/H+KmHp9LimyCG2gHxGZpDVN25wERQpJONECTE6F34pi0OKLgWnQ
-         Rua9cIgoIDYLIyRlXwZxmKSdZub3Q0jZBmNYMReYcYDLOCM3lzVc1Bytk0KMCoIZ0rtB
-         bsJITTM7j/ervg3QrYLRQhTxJPZgOnbA3Q8ulZPbwM45PFWBXbfBXUJHbAldK6wzti8o
-         p4KaNVIQokMm4+BHpOP2GWJxni9Ac5uTmXlVtnNwBIHq4KHjPWVzbdk3HvyGDcLffx3C
-         1KjbIe5v1Vg4YLhXkUIVMhmEikvCdoHGlJZC20FSRZjERA1BEN7M40bFHNN4SZGLAzBD
-         qgZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFev5TZSaFIQu6TqcZaJotj0D85WvghgKcq54FBcgHPu7co3jp9n+/yCW2S+0S2cLeECwTq009CN8U+htnm/9Gbg60MsNf50hMcAaW/7kqnr4Twf1wFxNprk/Dm2mPbBzmDvZDCD1WXxrpHN2SORCn7sV1dkgAyxMzzbIU2HosSRA5
-X-Gm-Message-State: AOJu0YxjmjxkKFgM8nXqVBxINglY3zn3I3hvbOE+vttswycvf1gr/3LC
-	EmY0HcSHb6UTVII8EUl5bfrym268Ev2Hib+evwwTIHLiZAapi17O
-X-Google-Smtp-Source: AGHT+IH31dSGm35koHtTUahNqqOpbaEin66n8iLUwVNuXlEOt+qvmQRWPJFKWZW/d4uoEwNBfCOkVQ==
-X-Received: by 2002:a17:902:6805:b0:1fb:3474:9527 with SMTP id d9443c01a7336-1fb34749830mr30241585ad.25.1720199612155;
-        Fri, 05 Jul 2024 10:13:32 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb57299335sm10136725ad.128.2024.07.05.10.13.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jul 2024 10:13:31 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 5 Jul 2024 07:13:30 -1000
-From: Tejun Heo <tj@kernel.org>
-To: "boy.wu" <boy.wu@mediatek.com>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Boris Burkov <boris@bur.io>, cgroups@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ht2Sg2t2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D17E5C116B1;
+	Fri,  5 Jul 2024 18:48:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720205331;
+	bh=3gQdxm9rrq4HH+3IgyK33e5U18PihTEsMAv3ZFMKGl4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ht2Sg2t2ndCjMGA6QKO2lqpTrzx5fDYVZJW7Ovgfr1eplx4adbkUHrvVY0Fu92JLt
+	 mU5W84MEOLzWeruLzCzFJBMcezP+9RWb4w2qbxVzYCrWWzfG7s4lg/Gv7+t1mLvgfO
+	 2fdSWrA5Q1UyDcQM7GTChwnkpqlcbSPsNUt/V748Qr4OW0E18YwIXE9gUZ8xqbm3Pa
+	 QZ5HR5+kS74PefChnaUbAqlutm/0zUWk4Ir6koict+0o/SIMktXHfmKvALkPRAwy7e
+	 60A1hFUaIMAvaXkUU5Xx3C78C3VfTgwAozfACG4DXiep2AGvT26MouaYytY3hJ3pYn
+	 tSYLgRXYv+5hA==
+Date: Fri, 5 Jul 2024 21:48:46 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>, Jens Axboe <axboe@kernel.dk>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, iverlin.wang@mediatek.com
-Subject: Re: [PATCH] blk-cgroup: add spin_lock for u64_stats_update
-Message-ID: <Zogpum23mjHZC8yO@slm.duckdns.org>
-References: <20240705075544.11315-1-boy.wu@mediatek.com>
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 18/18] nvme-pci: use new dma API
+Message-ID: <20240705184846.GF95824@unreal>
+References: <cover.1719909395.git.leon@kernel.org>
+ <47eb0510b0a6aa52d9f5665d75fa7093dd6af53f.1719909395.git.leon@kernel.org>
+ <249ec228-4ffd-4121-bd51-f4a19275fee1@arm.com>
+ <20240704171602.GE95824@unreal>
+ <20240705055806.GA11885@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,25 +63,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240705075544.11315-1-boy.wu@mediatek.com>
+In-Reply-To: <20240705055806.GA11885@lst.de>
 
-Hello,
-
-On Fri, Jul 05, 2024 at 03:55:44PM +0800, boy.wu wrote:
-> From: Boy Wu <boy.wu@mediatek.com>
+On Fri, Jul 05, 2024 at 07:58:06AM +0200, Christoph Hellwig wrote:
+> > This is exactly how dma_map_sg() works.
 > 
-> In 32bit SMP systems, if the system is stressed on the sys node
-> by processes, it may cause blkcg_fill_root_iostats to have a concurrent
+> Which dma_map_sg?  swiotlb handling is implemented in the underlying
+> ops, dma-direct and dma-iommu specifically.
+> 
+> dma-direct just iterates over the entries and calls dma_direct_map_page,
+> which does a per-entry decision to bounce based on
+> is_swiotlb_force_bounce, dma_capable and dma_kmalloc_needs_bounce.
 
-What is sys node?
+dma-direct is not going to have "use_iova" flag. Robin pointed to
+dma-iommu path.
 
-> problem on the seqlock in u64_stats_update, which will cause a deadlock 
-> on u64_stats_fetch_begin in blkcg_print_one_stat.
+In that case the flow is dma_map_sg()->iommu_dma_map_sg()->dev_use_sg_swiotlb().
 
-I'm not following the scenario. Can you please detail the scenario where
-this leads to deadlocks?
+Thanks
 
-Thanks.
-
--- 
-tejun
+> 
+> 
