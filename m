@@ -1,76 +1,76 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC90581E
-	for <linux-block@vger.kernel.org>; Fri,  5 Jul 2024 12:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E6A14A0B7
+	for <linux-block@vger.kernel.org>; Fri,  5 Jul 2024 13:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720184233; cv=none; b=r0q+chBnm836/wfHQmQ/iFxrSWyWhrmdj94NOuLDXFzZGxfWZomdbFQjFwKbBCG9JAVaAITh00cGLx1x9oHS+mSJygiT9A6ndIbVamkSe5InchnNRNXuEH3SeSWydJN4yNxzRD8suDwHzbae4DeQuaHldSdFCc9UnEY9GtxG6ow=
+	t=1720185771; cv=none; b=TmvKJZSVtxlRtVnY8rZDNET0+6U6ilbYoz76vMVOfvHPEij6QZRK+SvYZyAsU5qYaSAI9YzCvRgGclcxHMSfjST4TvKfCsv/tu1pn8qVCXsb1yGdCocrBJsAhNfV2pca2QfBYGA9zdEi+CWNkeix+m1ONkltECY9lwpZxWRG2CE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720184233; c=relaxed/simple;
-	bh=Oc63CIWc2BD0IPwLC5glX6C+82UclApN4REy29JWhTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=afBy18yXbyZVLQ/U0U3OZBn/BgcSEgndjUP6n2wCLQK+GW0J/qZTJM1W+upppLzxGqaANCkj3IrJ7Xe2IrfwrTZUEeIqzeE5inTiVbbBzV4RVGaSJAu5Pu8Y/IwkpL6OgvSt0A+Y+S/izCkCZ9iPKpn3uCt6t5hyaXwct9nGSn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3cDzSsJ5; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1720185771; c=relaxed/simple;
+	bh=5ZI1opG3x0dgqXkVUaoIxovNwoAeuTlTuiZ/kdAimoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kJaCglXog37/Fp31WhSu5HOOxca1pGrLLn+MRPviY2UnkoJ6aP4k0cM/40POpj7UmnQK6KF9W3pP6iwOsv+mgv8FPBsJ+VukVdokD4ZWBkZVWIzPflS6O8qmUBfLDMePS6t4Pvog9p/Od0qYw3qoSyXSPKHz+AB9dNYbsMHOeT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CVaTQnwI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3cDzSsJ5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=nbxcwmP7c5XQb1JlQ9KDPdCjNlEGItoBUTyWzTVXhds=; b=3cDzSsJ5kYIjSCG73eAkjeq9Q1
-	YkLz05hdMDyzItO+OG+qlyU6QsCwoPA7HSmg8IgNvjMVpbHdY1iTHbaxD0lh5cTrHIHz6Z43TbZfH
-	pVYq1xaTXECzQX514BXynSC93gogMBvPZjzbRwBgVisrMc0Tf8UFpcHiSXm3V/GPWAFRVx8AhBN9j
-	ASIKz0rwVdYHkhBbOdGv/8PtI3JIvRc1W7CkRVHA+hrg7gI8FdoSS3jOEZQofiYIBmLadrgE1pPHc
-	Jz1fYkxaHL4NugTceLFrKGaEUCDwx0lPrgKXVuqcd4fl53egEDXYJroZny1fej+knjoVLYTF2MLao
-	lkLbtjEA==;
-Received: from 2a02-8389-2341-5b80-e919-81a4-5d6c-0d5c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:e919:81a4:5d6c:d5c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sPiUw-0000000FyZK-49PJ;
-	Fri, 05 Jul 2024 12:57:11 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] brd: remove sector alignment checks
-Date: Fri,  5 Jul 2024 14:56:51 +0200
-Message-ID: <20240705125700.2174367-3-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240705125700.2174367-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CVaTQnwI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720185768;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5ZI1opG3x0dgqXkVUaoIxovNwoAeuTlTuiZ/kdAimoU=;
+	b=CVaTQnwI2E0RPa6s9DaNd9gkOhi1k/E8bkFmdnkI6gNoCVG0BDk2h23IEv7IGp2sJhXyGw
+	cXIW3G95m/AQJ4gdPxFPoRDRD746sXu3a5EEZAyGNQeqmP1TRZqWeHz4RAXTnigqNzdjbw
+	XfuiNfrOSk6XUFOwvAxBuob1fHVvTTU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-637-0iIhh97YPhupfvhKkoRsIw-1; Fri,
+ 05 Jul 2024 09:22:47 -0400
+X-MC-Unique: 0iIhh97YPhupfvhKkoRsIw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 828F81954B35;
+	Fri,  5 Jul 2024 13:22:45 +0000 (UTC)
+Received: from fedora (unknown [10.72.112.111])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4542E3000184;
+	Fri,  5 Jul 2024 13:22:40 +0000 (UTC)
+Date: Fri, 5 Jul 2024 21:22:35 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] block: also check bio alignment for bio based drivers
+Message-ID: <Zofzm6TRrOFb5iy9@fedora>
 References: <20240705125700.2174367-1-hch@lst.de>
+ <20240705125700.2174367-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240705125700.2174367-2-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-The block layer now takes care of these.
+On Fri, Jul 05, 2024 at 02:56:50PM +0200, Christoph Hellwig wrote:
+> Extend the checks added in 0676c434a99b ("block: check bio alignment
+> in blk_mq_submit_bio") for blk-mq drivers to bio based drivers as
+> all the same reasons apply for them as well.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/brd.c | 4 ----
- 1 file changed, 4 deletions(-)
+Do we have bio based driver which may re-configure logical block size?
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 2fd1ed1017481b..42545e4ddfac4b 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -256,10 +256,6 @@ static void brd_submit_bio(struct bio *bio)
- 		unsigned int len = bvec.bv_len;
- 		int err;
- 
--		/* Don't support un-aligned buffer */
--		WARN_ON_ONCE((bvec.bv_offset & (SECTOR_SIZE - 1)) ||
--				(len & (SECTOR_SIZE - 1)));
--
- 		err = brd_do_bvec(brd, bvec.bv_page, len, bvec.bv_offset,
- 				  bio->bi_opf, sector);
- 		if (err) {
--- 
-2.43.0
+If yes, is it enough to do so? Cause queue usage counter is only held
+during bio submission, and it won't cover the whole bio lifetime.
+
+
+Thanks,
+Ming
 
