@@ -1,43 +1,43 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF0F143726;
-	Fri,  5 Jul 2024 12:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4438D143726;
+	Fri,  5 Jul 2024 12:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720182764; cv=none; b=QxJnTDN/19yfAut+c1b/fL9B5VQxWT67PQ4EUyrC1+ANiQUVA6Fv8AMmOSlKsZ5xPsntVeAjauIlbc3dp6QaqOLrHovH/rrH8MGYitFRhe+CcehiHDHwF6jLW6ZYZk7EYhnD+rM71bwFlbHmaW+gCd/xKlS+/jorg9j90hB9hmQ=
+	t=1720182767; cv=none; b=ppWauSZUm38ECmot4VE4iONjPWxNAyuaVVcEpGmaSXZgXiqOeMa5FyoWBzTig+UXzc0bdhthMih4NPPg0dDD/G1/5qzXD0HMkNJtz1tNSzasbdqZcMXO1R9cwZJ0mMbX7bO7jI9U6uu/r3tulYTqHi4zTLU6vStD5RDQ4PT79V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720182764; c=relaxed/simple;
-	bh=6AmjPKFOvBcokm1Hsm96lBP/aqegWa8U0Q9PVCC6LAs=;
+	s=arc-20240116; t=1720182767; c=relaxed/simple;
+	bh=ZFcXVOmCGsymWSXB/+o1jgfKqoTbeoChMUHzD6YGn4w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JRaiYS8HWkpw07sIHBx1tsO8j63oth2Eo6kvDVS0QNR8l3VVJ4J/qrXe2HFLL8qY0cR7Rd4OzW4DnfRbCQnnPT3z4LcGCd2JJlXffZci1J1Is1+7RGRr+BAOrpBVZc6V3YzXu2iK7nZb+t2TC9Y9ob0MkF1/uYz5vYtYjUl/DxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mKIF6z4B; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=IBnauR9R4JQKyd/7NC8gR0yPjy/hWAVeQAhKMypq9vbgqV1ckIytsj5puFoXaq6Mwd928OSJH00R/MyZ/SE3AIXA9S3W1z5cKESxDTAvxfmnvt8EC/ftfPNRc7JTPc7y7TDEZ+zn9B/dHbJsf6lLIuHAWXGNljqvSl6ZwGSKPjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Og6xb9Io; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mKIF6z4B"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Og6xb9Io"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=0XHBGZLJYh3tY7bCTnGfXIOctYm8jqm89lOwpnosniY=; b=mKIF6z4BT+zeLdY0gGtCNusxs6
-	pw+Iv9kCL0J1Pc/+gYkZWHttvdeTCIepe27qskO16HEgMCOAnLnWPWsvBq4hhLS1rATath+HSLxMA
-	jqj3kpYKxq28n2rTorr/ZOL77wjcd7dzn5quhKCO9eVzYYp5coMMCMK2Ndgx74ndWYLtNSF342DNO
-	78QL7R3ku+kEzkh3u2gD3zQaWNELqlLSV4X7ZLTpw7/CFJoc/6Ju+rrMXgNjY6Hg/7Y/WIc4g0Qpy
-	UvmjpKCFFAVoskj35SW0BpYMjGHbTZmRTkn+dG+KEYjlG3uY+oU3LloebJ7VMJwicl8oLxziLk8WQ
-	D8+F+SlA==;
+	bh=67fp9uDtW2CQklPy6RYwHi3RXDhIY4u45ucrmxZ3R0A=; b=Og6xb9IoR1JHgOjxuFbCHVaAuz
+	5cTY1AGIFLUEMR1ZqMpm2EQ/Cosl0tyhLqSo8RUWV+2npJ26KxFDI+ytyeUTa+YgRuTjbtj8EVxHH
+	ig/oJ9e4H5ydfte30JQHsYVbwO/yKAq8Y7XCf6vyAYwHWnrkEa331zo9DpNwA8rKr7kCHfTzNuCCU
+	m2QcdgctAyD/2XhzBKwRPfgd5Lh4VLV0D53lqqY3ddj+V89Bo1YhNAip+BnmhxI1oAcKCFOavNa/l
+	sM2lGqIAmt/YcVCj4HVOeTF/d6cphACfYUEYFERgBTK+2AeO+qCug2GOjRY/UXbHXKu5JepMryq08
+	3HP143MA==;
 Received: from 2a02-8389-2341-5b80-e919-81a4-5d6c-0d5c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:e919:81a4:5d6c:d5c] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sPi7F-0000000Fuw0-1WEx;
-	Fri, 05 Jul 2024 12:32:41 +0000
+	id 1sPi7I-0000000FuwB-0gGU;
+	Fri, 05 Jul 2024 12:32:44 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
 	linux-m68k@lists.linux-m68k.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: add a bvec_phys helper
-Date: Fri,  5 Jul 2024 14:32:19 +0200
-Message-ID: <20240705123232.2165187-2-hch@lst.de>
+Subject: [PATCH 2/2] block: pass a phys_addr_t to get_max_segment_size
+Date: Fri,  5 Jul 2024 14:32:20 +0200
+Message-ID: <20240705123232.2165187-3-hch@lst.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240705123232.2165187-1-hch@lst.de>
 References: <20240705123232.2165187-1-hch@lst.de>
@@ -50,82 +50,75 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Get callers out of poking into bvec internals a bit more.  Not a huge win
-right now, but with the proposed new DMA mapping API we might end up with
-a lot more of this otherwise.
+Work on a single address to simplify the logic, and prepare the callers
+from using better helpers.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- arch/m68k/emu/nfblock.c |  2 +-
- block/bio.c             |  2 +-
- block/blk.h             |  4 ++--
- include/linux/bvec.h    | 14 ++++++++++++++
- 4 files changed, 18 insertions(+), 4 deletions(-)
+ block/blk-merge.c | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/arch/m68k/emu/nfblock.c b/arch/m68k/emu/nfblock.c
-index 8eea7ef9115146..874fe958877388 100644
---- a/arch/m68k/emu/nfblock.c
-+++ b/arch/m68k/emu/nfblock.c
-@@ -71,7 +71,7 @@ static void nfhd_submit_bio(struct bio *bio)
- 		len = bvec.bv_len;
- 		len >>= 9;
- 		nfhd_read_write(dev->id, 0, dir, sec >> shift, len >> shift,
--				page_to_phys(bvec.bv_page) + bvec.bv_offset);
-+				bvec_phys(&bvec));
- 		sec += len;
- 	}
- 	bio_endio(bio);
-diff --git a/block/bio.c b/block/bio.c
-index e9e809a63c5975..a3b1b2266c50be 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -953,7 +953,7 @@ bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
- 		bool *same_page)
- {
- 	unsigned long mask = queue_segment_boundary(q);
--	phys_addr_t addr1 = page_to_phys(bv->bv_page) + bv->bv_offset;
-+	phys_addr_t addr1 = bvec_phys(bv);
- 	phys_addr_t addr2 = page_to_phys(page) + offset + len - 1;
- 
- 	if ((addr1 | mask) != (addr2 | mask))
-diff --git a/block/blk.h b/block/blk.h
-index 47dadd2439b1ca..8e8936e97307c6 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -98,8 +98,8 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
- 		struct bio_vec *vec1, struct bio_vec *vec2)
- {
- 	unsigned long mask = queue_segment_boundary(q);
--	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
--	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
-+	phys_addr_t addr1 = bvec_phys(vec1);
-+	phys_addr_t addr2 = bvec_phys(vec2);
- 
- 	/*
- 	 * Merging adjacent physical pages may not work correctly under KMSAN
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index bd1e361b351c5a..f41c7f0ef91ed5 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -280,4 +280,18 @@ static inline void *bvec_virt(struct bio_vec *bvec)
- 	return page_address(bvec->bv_page) + bvec->bv_offset;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index cff20bcc0252a7..b1e1b7a6933511 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -207,25 +207,24 @@ static inline unsigned get_max_io_size(struct bio *bio,
  }
  
-+/**
-+ * bvec_phys - return the physical address for a bvec
-+ * @bvec: bvec to return the physical address for
-+ */
-+static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
-+{
-+	/*
-+	 * Note this open codes page_to_phys because page_to_phys is defined in
-+	 * <asm/io.h>, which we don't want to pull in here.  If it ever moves to
-+	 * a sensible place we should start using it.
-+	 */
-+	return PFN_PHYS(page_to_pfn(bvec->bv_page)) + bvec->bv_offset;
-+}
-+
- #endif /* __LINUX_BVEC_H */
+ /**
+- * get_max_segment_size() - maximum number of bytes to add as a single segment
++ * get_max_segment_size() - maximum number of bytes to add to a single segment
+  * @lim: Request queue limits.
+- * @start_page: See below.
+- * @offset: Offset from @start_page where to add a segment.
++ * @paddr: address of the range to add
++ * @max_len: maximum length available to add at @paddr
+  *
+- * Returns the maximum number of bytes that can be added as a single segment.
++ * Returns the maximum number of bytes of the range starting at @paddr that can
++ * be added to a single segment.
+  */
+ static inline unsigned get_max_segment_size(const struct queue_limits *lim,
+-		struct page *start_page, unsigned long offset)
++		phys_addr_t paddr, unsigned int len)
+ {
+-	unsigned long mask = lim->seg_boundary_mask;
+-
+-	offset = mask & (page_to_phys(start_page) + offset);
+-
+ 	/*
+ 	 * Prevent an overflow if mask = ULONG_MAX and offset = 0 by adding 1
+ 	 * after having calculated the minimum.
+ 	 */
+-	return min(mask - offset, (unsigned long)lim->max_segment_size - 1) + 1;
++	return min_t(unsigned long, len,
++		min(lim->seg_boundary_mask - (lim->seg_boundary_mask & paddr),
++		    (unsigned long)lim->max_segment_size - 1) + 1);
+ }
+ 
+ /**
+@@ -258,9 +257,7 @@ static bool bvec_split_segs(const struct queue_limits *lim,
+ 	unsigned seg_size = 0;
+ 
+ 	while (len && *nsegs < max_segs) {
+-		seg_size = get_max_segment_size(lim, bv->bv_page,
+-						bv->bv_offset + total_len);
+-		seg_size = min(seg_size, len);
++		seg_size = get_max_segment_size(lim, bvec_phys(bv) + total_len, len);
+ 
+ 		(*nsegs)++;
+ 		total_len += seg_size;
+@@ -494,8 +491,8 @@ static unsigned blk_bvec_map_sg(struct request_queue *q,
+ 
+ 	while (nbytes > 0) {
+ 		unsigned offset = bvec->bv_offset + total;
+-		unsigned len = min(get_max_segment_size(&q->limits,
+-				   bvec->bv_page, offset), nbytes);
++		unsigned len = get_max_segment_size(&q->limits, bvec_phys(bvec),
++			nbytes);
+ 		struct page *page = bvec->bv_page;
+ 
+ 		/*
 -- 
 2.43.0
 
