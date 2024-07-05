@@ -1,97 +1,104 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E47F1448E0
-	for <linux-block@vger.kernel.org>; Fri,  5 Jul 2024 07:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D67933C7;
+	Fri,  5 Jul 2024 07:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720162993; cv=none; b=p66TAtZe+gVOdI43LGkmalWOet3VPed1BbLSqISRGOZU51gLLAG+ZrlViSXt9ZAGxoGakXusxcffZs3uTLOO9EGJpdQASTFpwM9PZfqQnMuPg0FECoO4V4M7dVOJbIDogf5cFiyBT2sqqlXGlY1KVuN2JvqqEVW7NqLpEpowzKc=
+	t=1720166170; cv=none; b=nYKwmo5/XVuU6F+KNe4wrJOSiNlLxoDkzLqiSSNDpIYRim6kCJ0TnaSuWbTD/TQcmtVe64ToT2vA53PHORIt/i8Q7pA3VmSwhzWFS+YVMziKSaUeiaxoVrCqXBF8n5nmTG5OprNCs9OjK7at3eoUiMtzXNX7Ygwbh1XojktWQLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720162993; c=relaxed/simple;
-	bh=rxaavTr2I9nl3fSrmr6ylQi37pJsR83Anc77isEaRlk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=P8S+lG1QeZ809/PvoCWtwBoM6nHSNT1sU3vqD9/pmxZrhBMEZCmGCsDswED3vVyM3n2w6yxXr/xEbxgecJUdvsU9LpHFsyLMXz+YHkJ6Clp4nu5ZwJC6lRA1a1doWP8SCpCzhfIbJrJ2/tBiwhSS5iDQYSe1vAkNf/9yTZ6VwQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mkfzFs1m; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1720166170; c=relaxed/simple;
+	bh=P93m1oYYdGYsw4jp2zJ54KKFIj+wILBPMAUNZzIeFNM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HJtVca7yMXE9p1ZuFJGXdrHdqfYTTG9zacfto8rNKyy7IjsQCssMpqPkUffgcv7poOEVXzO5xfUSQHBCdutKL5hZKvqEb9iuZvrjkk+4Xj9kZBagfzrFMNGTqNn7rvCquDsKOyEG1lXJHzxko31Ih4nNyj0eGa0sX0MS/JS65U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=PZCxoNrg; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mkfzFs1m"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52a559e4429so98664e87.0
-        for <linux-block@vger.kernel.org>; Fri, 05 Jul 2024 00:03:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1720162989; x=1720767789; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tGYR6LV3kb22UuES5i/CxEB1mMcG3Owc6N4vso5tYIQ=;
-        b=mkfzFs1mDaQokkMSY4Qhf2AddThOlGqX74mE66v8GbyRr0FwVf2YzoQDPSMN0WtOHM
-         7RxfCDCUcT0KBz2dCebXnoZJU8MoJRqmb72qKceYljOwsmuSxcWUgWRigatAKw7JOQEc
-         OUdYTpgKrGOmxxgi5cBU2nMvu3sejYrvYEcVyJPa+7ZIc5a1I5sF8YhuOSSuAw+ph545
-         P1c94ikXeLFl2J2syZgOIvxz2XESESC252HZ9QsP1xDGEnvHV+e67rcuabFuqntImEdD
-         hFmnV6pcvLbjfFzl55+4y3ggZ8IowgQdSHBD9aM5xo+tN4Ol6n8ELBkGmtmDfCJNrwHU
-         ThoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720162989; x=1720767789;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tGYR6LV3kb22UuES5i/CxEB1mMcG3Owc6N4vso5tYIQ=;
-        b=jp32jpkWRs3de1IcVx1j6njQPlZl+nYR+/lCrIhRxfk96GmdxwscucXpHx/KOUToIx
-         bZEOpbeJChSFKZZZQJtKsShVJv/kZvcBr19UC/nZ0VZpXeBkglCx0cD03Sl1KuFoAiE3
-         YcovFb8cfc2+Zm3NrYeivZ6imeSKD4GK0+VSFO0LeRMTmIHa/qb48i4LO2Try1xRgYAV
-         J7TPK5+5giH8vEWrRzbGp5L80lzpRx7VGBG2ugUdaJpO+xHR97e1iyrdMjH/AqrNGydU
-         jraNZVl6Q945tkKUtXRJO6UhUUUDLpRjoHqlFlhiWUeMtJCx2sW4ePwgNRCWvFCzvgFJ
-         7+SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVPxU0uz5H4gY27PowjHKp5HOAjm+Ot4tQVmy82R1NspsdjCqW9QCAunXHBgds7uIq2nAxz4OjNSWzJ6S5vbfYoCS+pj0+LvcyCJkk=
-X-Gm-Message-State: AOJu0YzZ4sY//6m8SotelT0NsHprP8E31KIrILH5KEtzkvAiMJNLEPKf
-	mUmwf7DPk/gRI+EOlXdsfpPq7VjfoSzf+93jbBTWclzYQ7a8YAlNns8+ySN2QZU=
-X-Google-Smtp-Source: AGHT+IGnWKiTVywt8pQ6SRb7v9O5oNkOKR3YWTKskwtBydCui5N9lMxR7u1GI9ud38OZAu9sDGe+TQ==
-X-Received: by 2002:a19:6b1a:0:b0:52e:93d9:8f39 with SMTP id 2adb3069b0e04-52ea06bca91mr2289303e87.3.1720162989347;
-        Fri, 05 Jul 2024 00:03:09 -0700 (PDT)
-Received: from [192.168.1.68] (87-52-80-167-dynamic.dk.customer.tdc.net. [87.52.80.167])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab3b1f3sm2740066e87.256.2024.07.05.00.03.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jul 2024 00:03:08 -0700 (PDT)
-Message-ID: <5364ce86-1222-4f30-bb8b-42e68846a2e5@kernel.dk>
-Date: Fri, 5 Jul 2024 01:03:07 -0600
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="PZCxoNrg"
+X-UUID: 001cd07a3aa411ef99dc3f8fac2c3230-20240705
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=e2ch6CN6/2ILQFX9s+8Go6wgcVOVLzjEhdIrftGsDFs=;
+	b=PZCxoNrgopqO0OEo+W6tMrAnRZ+AuqpbidZmuFsKTnMg/5EKUjDPW6oP59+3EIE0Lz9A3oXgCAcZIwJJfT50ZEsjko3q/E230dh6/SzMlQzWHeGWGgxoLfrqTB276eyWg1Y/+w3fvIpDVHtkZ/AvvY3M6t3fqBT5p0Kv+FkYj54=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.40,REQID:bbd7d2e5-1417-431b-9189-aa162cac2592,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:ba885a6,CLOUDID:f782f144-a117-4f46-a956-71ffeac67bfa,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 001cd07a3aa411ef99dc3f8fac2c3230-20240705
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw02.mediatek.com
+	(envelope-from <boy.wu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1486524761; Fri, 05 Jul 2024 15:55:52 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 5 Jul 2024 15:55:51 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 5 Jul 2024 15:55:51 +0800
+From: boy.wu <boy.wu@mediatek.com>
+To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, Jens Axboe
+	<axboe@kernel.dk>
+CC: Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Boris Burkov <boris@bur.io>,
+	<cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <iverlin.wang@mediatek.com>, Boy Wu
+	<boy.wu@mediatek.com>
+Subject: [PATCH] blk-cgroup: add spin_lock for u64_stats_update
+Date: Fri, 5 Jul 2024 15:55:44 +0800
+Message-ID: <20240705075544.11315-1-boy.wu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: Re: make secure erase and write zeroes ioctls interruptible as well
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
- Conrad Meyer <conradmeyer@meta.com>, Ulf Hansson <ulf.hansson@linaro.org>,
- linux-mmc@vger.kernel.org, linux-block@vger.kernel.org
-References: <20240701165219.1571322-1-hch@lst.de>
- <b4940767-b5ba-477d-98c6-a9671b2bc290@kernel.dk>
- <20240705065053.GA12771@lst.de>
-Content-Language: en-US
-In-Reply-To: <20240705065053.GA12771@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-MTK: N
 
-On Fri, Jul 5, 2024 at 12:50?AM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Fri, Jul 05, 2024 at 12:45:08AM -0600, Jens Axboe wrote:
-> > In lieu of that, qemu does support mmc it looks like?
->
-> Hmm, I can take a look.
->
-> > Wanted to get this queued up, but would probably be best to have
-> > that tested first.
->
-> The write zeroes patches do not depend on the secure erase patches, and
-> they are what people really care about.  Maybe just skip the secure
-> erase patches and apply the rest for now?
+From: Boy Wu <boy.wu@mediatek.com>
 
-Done - please just resend the secure erase bits when the mmc side is
-happy.
+In 32bit SMP systems, if the system is stressed on the sys node
+by processes, it may cause blkcg_fill_root_iostats to have a concurrent
+problem on the seqlock in u64_stats_update, which will cause a deadlock 
+on u64_stats_fetch_begin in blkcg_print_one_stat.
 
+To prevent this problem, add spin_locks.
+
+Fixes: ef45fe470e1e ("blk-cgroup: show global disk stats in root cgroup io.stat")
+Signed-off-by: Boy Wu <boy.wu@mediatek.com>
+---
+ block/blk-cgroup.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 37e6cc91d576..a633b7431e91 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1134,9 +1134,15 @@ static void blkcg_fill_root_iostats(void)
+ 				cpu_dkstats->sectors[STAT_DISCARD] << 9;
+ 		}
+ 
++#if BITS_PER_LONG == 32
++		spin_lock_irq(&blkg->q->queue_lock);
++#endif
+ 		flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
+ 		blkg_iostat_set(&blkg->iostat.cur, &tmp);
+ 		u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
++#if BITS_PER_LONG == 32
++		spin_unlock_irq(&blkg->q->queue_lock);
++#endif
+ 	}
+ }
+ 
 -- 
-Jens Axboe
+2.18.0
 
