@@ -1,56 +1,79 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE71E6A039;
-	Fri,  5 Jul 2024 12:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B111494BA;
+	Fri,  5 Jul 2024 12:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720183127; cv=none; b=NLB3H5O0MfEm1zbdeSa5X/xVZMk77m59ve4qDNnQKWxNtM3R1OpxBUH9UUajKeHYjdWFFYgOY5gf1bIsPvOzLG+oV/yCKcakM8GumFg2GzYcDvBgqlz7sGgkhcwbx5Mw1cjLubMbn4JbCOt1dBj5W6p1VGELOnYMAnpt8/LXmcw=
+	t=1720183864; cv=none; b=WqpdhqMQS33zi0iNX2ehnBJqGJtzQu0XdqUQN0Xzyca68/kyUBcTf93RMYvEmezOkdp8yCeZQdH0kPxaH+OJCkbWahhZg4f/h2R24sBhyss7hYDuPWoyuX6/+w28aKrY+TiAKcHL+C6xh0k98sjAt0YnqCpODLS9zj+isdzx5nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720183127; c=relaxed/simple;
-	bh=fJWmofLgLjlJ9zvIj88KU79hilYpcd4wf59y6F0DPHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azg4FgUwXCrijpk6xZVeUmxBd06mShTAlL+Ic99cIEPOUA8HHHoRfhSpJh3vzJwhEFtHr/VN+X5gIHAH86VHv02R4CpeHDR+CXWo28PEh3z+weglgFcGZR25wOh1oDXYTgcTycqNVSvkrwpY/8yenK4lKvxk2Gt4NVee11wjVXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7C2EF68B05; Fri,  5 Jul 2024 14:38:42 +0200 (CEST)
-Date: Fri, 5 Jul 2024 14:38:42 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, mst@redhat.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
-	hare@suse.de, kbusch@kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH 2/5] block: Validate logical block size in
- blk_validate_limits()
-Message-ID: <20240705123842.GA29995@lst.de>
-References: <20240705115127.3417539-1-john.g.garry@oracle.com> <20240705115127.3417539-3-john.g.garry@oracle.com> <20240705121600.GB29559@lst.de> <d4f02398-977f-47ef-9868-d3b08313c126@oracle.com>
+	s=arc-20240116; t=1720183864; c=relaxed/simple;
+	bh=vqcwLqVppRivNG9d58H2sbjIO2fXjQX8Aleb/qnFdn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JYwlqW0+g/9AgfOS7b91+KPaDocdIsuFLmgoGrk7oHXkindDwlhM8t6fWTb13oaS9htt0KEnY3N3ZX2M2RsVlg+UqZHnyL15FrY4xiIeld1QHuWJWAUTrmKwOok6Qnk4MaMHCKxnAcakLQClkIx1pYegX7sUseRhZm9jjExed+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jyD83IjX; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=s8UIfu5V; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jyD83IjX";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="s8UIfu5V"
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1720183860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LN3ffcMa+ufsjTIDpcIMpCJTf5ZZVSlO79qg6mbrhvo=;
+	b=jyD83IjXJLHtd29C2tdwQe7YbCTyhCU6fvKBhIiNKhgBvRSsMdglk1g//FDv4CHpxvNnH7
+	N4RKD3vjG0NRdEvR7Fl4g25nFV08GXvLrcYSmK4WST8v4d9cI8FP0rqrE2v7bVL2YGSgOJ
+	g1xK/5ZnR8oOr99IZJnBr8dqV67LZ2Mxw1AJ7+JGkoUEN8B5qgWLo3f7IvylW5avZSXxSA
+	961M0C6ovRIMPf853JKomGUh7g12888UcqMVf+cKb92vgN79GB4ClrCsDlpvj4sXCWOY/q
+	E+rnTxR0XD3pdaVpaypoD4hfKT0PtH/iz+XzXF/vLdpjbUCMyfRtvtyW6gB2mQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1720183860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LN3ffcMa+ufsjTIDpcIMpCJTf5ZZVSlO79qg6mbrhvo=;
+	b=s8UIfu5VVjsX4H3pzNVXxgqXKQ161INgFj93C8UwMUl184UvJd1HZvaP+V9/RYxq9Gxvf5
+	PDV4BBMn92ftS3DQ==
+To: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Mike Galbraith <umgwanakikbuti@gmail.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH v3 0/3] zram: Replace bit spinlocks with a spinlock_t.
+Date: Fri,  5 Jul 2024 14:49:13 +0200
+Message-ID: <20240705125058.1564001-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4f02398-977f-47ef-9868-d3b08313c126@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 05, 2024 at 01:34:37PM +0100, John Garry wrote:
->> This should print a message.  Unfortunately we don't have the device
->> name here (for that we'd need to set it at disk/queue allocation time,
->> which will require a bit of work), but even without that it will be
->> very useful.
->
-> Ok, I can print a message, like:
->
-> 	pr_warn("Invalid logical block size (%d)\n", bsize);
->
-> I am wary though that userspace could trigger this message from the various 
-> ioctls to set the bsize.
+Hi,
 
-As anything ending up here is a configuration interface, such a message
-should be perfectly fine.
+this is follow up to the previous posting, making the lock
+unconditionally. The original problem with bit spinlock is that it
+disabled preemption and the following operations (within the atomic
+section) perform operations that may sleep on PREEMPT_RT. Mike expressed
+that he would like to keep using zram on PREEMPT_RT.
+
+v2=E2=80=A6v3 https://lore.kernel.org/all/20240620153556.777272-1-bigeasy@l=
+inutronix.de/
+  - Do "size_t index" within the for loop.
+
+v1=E2=80=A6v2: https://lore.kernel.org/all/20240619150814.BRAvaziM@linutron=
+ix.de/:
+  - Add the spinlock_t unconditionally
+  - Remove ZRAM_LOCK since it has no user after the lock has been added.
+  - Make zram_table_entry::flags an integer so struct zram_table_entry
+    does not gain additional weight.
+
+Sebastian
+
