@@ -1,88 +1,119 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D7BA48;
-	Fri,  5 Jul 2024 08:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE8AA48
+	for <linux-block@vger.kernel.org>; Fri,  5 Jul 2024 08:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720168330; cv=none; b=GCd8+xdVmAn4rVg/j8oLiYfIfF/11ESXuJG8Ica3SF35rFHBaj1egh/fIl2jjmRI8Xi82TkamGANDF/qkf3LoWJB++IOzq6PafEPDsjwjyaQn78QAHPbWTDF46L1bjGxqinyG2BG99C1rJ/ZGP+vcvXu2gNH6VbiiaeSetyDWe8=
+	t=1720168933; cv=none; b=f21nbw/MVRgOeHO/ilhgEx8EgtkmU0BEN5BmYvbfdFHWPJTFf5+tyQ+o7HkjFK7yyXiVLoIiXw6k+wSkzKg5jVz560k7x8oOGbc2GUx3LvsXBD4XDBlfDCXaiAkBkHfjlVJok8rbfnDZ+AqmutbdXnyqqcJx8l31t+dx3h6Y9pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720168330; c=relaxed/simple;
-	bh=a6UXqQ0PashLa/Gd5TVsr8YP/9RWVulgubUaVgbBIfI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tfm/4aoWzCHDLAXIauapDs30PhFcppyvFlvmcaodTVhoORIXmsoriq3cQUsd/EP0fQQK1EGOA5AZvG1EX1DYsOsPMX03wJIbmVAB4BT36hpztYDc5A6HvsKBVxaA8EZuyvLA8fIK85dTjmMXRhixLLkIx98uhkb3OyswkqPOmwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hzsHEVRY; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hzsHEVRY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=VMFWiI7e+j+R5r7N/1miL++JtqstPr0aKimqvCuzBHA=; b=hzsHEVRYGUHKZe3ELJuegzx3Gk
-	n6ax7vbuSmJc9h4TwO1aHpewcgo598doiQGVv6nEt+xAQcbz8fO9z6wPGmI9LtCOYzwoboLuSLrew
-	hLPPDP80utXrxjQAVrtvMipFfbZXjsT6iMg3HL7AsNl1l0nqSDD37yOsp11e39G3bbddMG0gngCNo
-	qPfHesUMu3c/+xHie/1ABAh/lbQG5mxp2YUqb9/JmnrteDE+tkWvKf/xmgkew9entrsgFfJAF7US4
-	UD3GuxIo+D/zsuL1hx+m7CwWg5mkZvEmKyJV+W5+BIzlV/7mQGNRRrCez3fnR32DmnGwkv6HBxq3I
-	6p49tm/w==;
-Received: from 2a02-8389-2341-5b80-7f6c-d254-a41c-2a9c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:7f6c:d254:a41c:2a9c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sPeMR-0000000FHg9-108N;
-	Fri, 05 Jul 2024 08:32:07 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: fine-grained PI control
-Date: Fri,  5 Jul 2024 10:32:04 +0200
-Message-ID: <20240705083205.2111277-1-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1720168933; c=relaxed/simple;
+	bh=MdoD1uQx97BWhsq7cxMfuLw5Tx+Ae9TieFeMHspDm5s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jGqq1UpbiTw1PFyfkU/Q/ODaI7ITWN+cDijp+4u9FKY3cN9QSueCVdgUubLkcT1ZgVa8E5Wj7HDYF5bzGTASEsTmymH3hgtAT3jtFdUzaPIdjjQeKcp9kr/4zkaO1L6PhsjeFljj5P1i8pkaTT/QPTYFercMNy0vS9V/LoCHOCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6325b04c275so12906467b3.3
+        for <linux-block@vger.kernel.org>; Fri, 05 Jul 2024 01:42:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720168930; x=1720773730;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fb3nvPpoeDCMYNDscdzi/DI3phzoUDDiLMAUKJgL9UA=;
+        b=JIQdXGIK0hFsLxts9aKTR6T/ngyWsz6Knul3+sL3X6eDKW9URj0wRupg1gEoF4qCEM
+         W2D1Cp5e4a3ipFgikEyZeE3BBRKiiKAzJ5pSnKo7lJYTCFduQascSBiAtUpMt/MisL9s
+         1c7fPWsTrzM0WnOrgUrfUYVI7eGIBqlEjMuMNSbd0Svsf6vIEGo0vUQwVKPUXjTz/8xQ
+         NPsSL9h7ktLHqDNKcpWAUVkyoV1+PWO6HwGYidfoCCoZUbPigmg/1xg55AO6EfVjNkxs
+         9RXwO34uauEzZ8LSMbWU88b5Bnu3jSlcKwblZLkk14jJiL/uMZasuVYJe2yfl0vwfWbx
+         KonQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVri/L914hR7uOggbySNTvMCTjxiA82TAJLEhqGKP6WuBjukF/n2McBi9sehdOm1EW/royqbHj0thv/cD1+aNUCpQeBPfnnNa7hpuU=
+X-Gm-Message-State: AOJu0Yx/QdD4JlGMqFuPm7y+6FV1DiaN0BO0Bg6jF4Hoj+wmLHo6J4bH
+	gZnDyhfAzv8xp14YRC1eSI0F51xnF+/okuIhRJyeHe4U1lpUFjdTehfAW85W
+X-Google-Smtp-Source: AGHT+IGtbxVVWaaNBHFrDORGf7KdMsxK71w6R7LsS/4ZXzRTvA8EQHN6udhTWzeeNsBZtVPpk5mZ5w==
+X-Received: by 2002:a05:690c:986:b0:632:58ba:cbad with SMTP id 00721157ae682-652d522632bmr35862897b3.10.1720168930449;
+        Fri, 05 Jul 2024 01:42:10 -0700 (PDT)
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com. [209.85.128.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-64a9bb4f299sm28055757b3.84.2024.07.05.01.42.10
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jul 2024 01:42:10 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6325b04c275so12906397b3.3
+        for <linux-block@vger.kernel.org>; Fri, 05 Jul 2024 01:42:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVE3jXIwImAwt1rCTBqFZ+/HK37Itqxqhz9ba4PEO6chKgtw9DVVlgYSky8nY8SG/q92olg7ADW9+koZv5cp05Xc7umx3eFg5khakk=
+X-Received: by 2002:a81:9253:0:b0:647:eaea:f4de with SMTP id
+ 00721157ae682-652d823ea66mr38523167b3.47.1720168929990; Fri, 05 Jul 2024
+ 01:42:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20240705081508.2110169-1-hch@lst.de> <20240705081508.2110169-2-hch@lst.de>
+In-Reply-To: <20240705081508.2110169-2-hch@lst.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 5 Jul 2024 10:41:58 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdUCHRtRVQ4Vp40OmhwVz=KXgD3pdF6jkX4-UwQrQ_XtQw@mail.gmail.com>
+Message-ID: <CAMuHMdUCHRtRVQ4Vp40OmhwVz=KXgD3pdF6jkX4-UwQrQ_XtQw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] block: pass a phys_addr_t to get_max_segment_size
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-m68k@lists.linux-m68k.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+Hi Christoph,
 
-I'm trying to kick of a discussion on fine grained control of T10 PI
-flags.  This concerns the new io_uring metadata interface including
-comments made by Martin in response to earlier series, and observations
-on how block devices with PI enabled don't work quite right right now
-for a few uses cases.
+On Fri, Jul 5, 2024 at 10:15=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+> Work on a single address to simplify the logic, and prepare the callers
+> from using better helpers.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-The SCSI and NVMe PI interfaces allow fine-grained checking of the guard,
-reference and app tags.  The io_uring interface exposes them to
-userspace, which is useful.  The in-kernel implementation in the posted
-patch set only uses these flags when detecting user passthrough and
-currently only in the nvme driver.  I think we'll need to change the
-in-kernel interface matches the user one, and the submitter of the PI
-data chooses which of the tags to generate and check.
+Thanks for your patch!
 
-Martin also mentioned he wanted to see the BIP_CTRL_NOCHECK,
-BIP_DISK_NOCHECK and BIP_IP_CHECKSUM checksum flags exposed.  Can you
-explain how you want them to fit into the API?  Especially as AFAIK
-they can't work generically, e.g. NVMe never has an IP checksum and
-SCSI controllers might not offer them either.  NVMe doesn't have a way
-to distinguish between disk and controller.
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -207,25 +207,22 @@ static inline unsigned get_max_io_size(struct bio *=
+bio,
+>  }
+>
+>  /**
+> - * get_max_segment_size() - maximum number of bytes to add as a single s=
+egment
+> + * get_max_segment_size() - maximum number of bytes to add to a single s=
+egment
+>   * @lim: Request queue limits.
+> - * @start_page: See below.
+> - * @offset: Offset from @start_page where to add a segment.
+> + * @paddr: address of the range to add
+>   *
+> - * Returns the maximum number of bytes that can be added as a single seg=
+ment.
+> + * Returns the maximum number of bytes of the range starting at @addr th=
+at can
 
-Last but not least the fact that all reads and writes on PI enabled
-devices by default check the guard (and reference if available for the
-PI type) tags leads to a lot of annoying warnings when the kernel or
-userspace does speculative reads.  Most of this is to read signatures
-of file systems or partitions, and that previously always succeeded,
-but now returns an error and warns in the block layer.  I've been
-wondering a few things here:
+@paddr
 
- - is there much of a point in having block layer and driver warnings
-   (for NVMe we'll currently get both) by default, or should we leave
-   that to the submitter that needs to check errors anyway?
- - should we have an opt-out or even opt-in for guard tag verification
-   to avoid the higher level code tripping up on returned errors where
-   they just want to check if a signature matches?
+> + * be added to a single request.
+>   */
+
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
