@@ -1,89 +1,73 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3981A29A;
-	Sat,  6 Jul 2024 07:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACC520DD2;
+	Sat,  6 Jul 2024 07:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720250514; cv=none; b=lS+kNqofGaWzsC+TQgie2pjeifvZL6lvLc0LeC6ArJw2MAJP36xBQHu3GS8guQXGKqYoGyFUh8JEO3Wr4aHeOTlPDM/Bt/2nBhpx/PPq/3nzwCaj2pjMO9hYT6oHXlFu569O0dgYG9I61ghKSW+8s0cOkbwZdvS5dHTFEVNNBCk=
+	t=1720252354; cv=none; b=acq4PC4DvLzWHjz2D77t6rP8HuryXKcjU3OZdSB59FtqTnXMs3E5EEBNKWVI/AZYx/2j8/bF4CV4I/FOMGvctz1itXKgqWUW4oPUXfY6tBpFkmvqNcNeeuTpRV9OXevqtF38XELaiK9HrNPynDTyhpn3uzcB+ZBdtqPqldgFCZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720250514; c=relaxed/simple;
-	bh=4PkIHvSsshrnvwvckcHor1cUfA6KuhrSvtJeWYyvYHU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h5vgf+cfmNWFXSt7w9ijMPyymdQxNOUqs7mGC41qNvCshQ0Bmprcsh/X9rDJRDxpohm46sFTp5feCMjYvLHmTKMhy0M4dwxRJFMAFPkZtgfhdXlTC8MNCh6mA6TGe0gk6S63Zg4hYrBNNr8iyV7slbO7faGXkrjGJnDGP9QUqgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WGMJH6ryPz4f3jkc;
-	Sat,  6 Jul 2024 15:21:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 6CB4F1A0189;
-	Sat,  6 Jul 2024 15:21:43 +0800 (CST)
-Received: from [10.174.179.155] (unknown [10.174.179.155])
-	by APP2 (Coremail) with SMTP id Syh0CgB34YaF8Ihmzu5EBQ--.55910S3;
-	Sat, 06 Jul 2024 15:21:43 +0800 (CST)
-Message-ID: <c900fece-14a4-0b64-babb-053b38ed0dbe@huaweicloud.com>
-Date: Sat, 6 Jul 2024 15:21:41 +0800
+	s=arc-20240116; t=1720252354; c=relaxed/simple;
+	bh=XD7xvQzS/c6AU/JYvDJt1Ce7auaKvy4i5vk2fnvOKQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U8Zrwnod3nPnWov8r3eSUE+2fB90PxCweVuQ4CDoDlq4wDm0+WDrKgNSZf5PTuYSGyg0xVZ74pYkoiBkHCo3kLB5hAP+W5IRE9IINV43ThYZU1+AYHeYukToFv5Fm76lPBmnk2ObuTpAP6OEvB9/YZjMTlZilzj9XPeCunHRK7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OShA6qa8; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OShA6qa8"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=dsTTu515nhE3EiNHghMRN8VuppmfZeLHwdnzi/+9rcA=; b=OShA6qa8g6swWbtH1MLEVUlFqb
+	S6PyutFBlglENgIlSZQFwzDckgjpMchmdj6cd0uAHV2Mkh1Cm800DAYh+wEKkgHF8FUAjbO+DECJW
+	n8MLZYxSmg8NRKJOVEvGBntmsgfzJOOk+WYQpn+GAOXAg8Fj9M+1MU3xRWK/r52NVb8mTq5p5M8vH
+	jNzWMvMyrVFdrffCA+G7UvlBV1pyhEZdnrOcLlTLUzf0/mHx+53uiEzpwdiG+IufdZryBPMZeKiX6
+	PRiabsoxUfwYRSRpA2Z3paB1kgQyRI1HSmtusIMIiLHUsHP3L/jbfCOuyfShueVuKDtSTE7PyZeuc
+	dfe4dKyg==;
+Received: from 2a02-8389-2341-5b80-918c-9045-e0f1-f54a.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:918c:9045:e0f1:f54a] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sQ0De-0000000HUu1-3Y4O;
+	Sat, 06 Jul 2024 07:52:31 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	linux-m68k@lists.linux-m68k.org,
+	linux-block@vger.kernel.org
+Subject: add a bvec_phys helper v3
+Date: Sat,  6 Jul 2024 09:52:16 +0200
+Message-ID: <20240706075228.2350978-1-hch@lst.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
-Subject: Re: [PATCH v2] block: flush all throttled bios when deleting the
- cgroup
-To: =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-Cc: Tejun Heo <tj@kernel.org>, josef@toxicpanda.com, hch@lst.de,
- axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangerkun@huawei.com, yukuai1@huaweicloud.com,
- houtao1@huawei.com, yi.zhang@huawei.com, lilingfeng3@huawei.com
-References: <20240627142606.3709394-1-lilingfeng@huaweicloud.com>
- <Zn3O47DUoLliwbWm@slm.duckdns.org>
- <c9802312-d9c9-f262-e1d3-9d3343255b6b@huaweicloud.com>
- <7kmlqdvltacofugn7tzg6ylu25louwnmvdfa64cgdrecpveow7@rxvvbduuvjlz>
-From: Li Lingfeng <lilingfeng@huaweicloud.com>
-In-Reply-To: <7kmlqdvltacofugn7tzg6ylu25louwnmvdfa64cgdrecpveow7@rxvvbduuvjlz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgB34YaF8Ihmzu5EBQ--.55910S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw15CFy3Zry5WFWrZw4DCFg_yoWfKFgEva
-	yjqa1vganxXa92kay7GFykCrW5GayUZryDX3yvqr47WryYyF1kJFW8uFZ5u343Aa1S9r9r
-	GFZxJas7ur1q9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
-	04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+Hi Jens,
 
-在 2024/7/2 22:25, Michal Koutný 写道:
-> On Fri, Jun 28, 2024 at 10:04:20AM GMT, Li Lingfeng <lilingfeng@huaweicloud.com> wrote:
->> I think it may be more appropriate to remove the limit of bios after the
->> cgroup is deleted, rather than let the bios continue to be throttled by a
->> non-existent cgroup.
-> I'm not that familiar with this part -- can this also happen for IOs
-> submitted by an exited task? (In contrast to a running task migrated
-> elsewhere.)
-Yes, IOs will be throttled no matter whether the task that delivers them
-exits.
->> If the limit is set too low, and the original cgourp has been deleted, we
->> now have no way to make the bios complete immediately, but to wait for the
->> bios to slowly complete under the limit.
-> It makes some sense, it's not unlike reparenting of memcg objects, IIRC
-> flushed bios would actually be passed to a parent throtl_grp, right?
-Yes, flushed bios would be throttled by the parent throtl_grp.
-> Thanks,
-> Michal
+this series adds a bvec_phys helper to get the physical address
+of a bio_vec so that callers don't have to poke into bvec internals.
+There aren't a whole lot of user of it yet, but with the new proposed
+DMA mapping API we might grow a lot more soon.
 
+Changes since v2:
+ - keep the existing (somewhat weird) description of get_max_segment_size
+
+Changes since v1:
+ - reorder the two patches as suggested by Geert
+ - fix a comment typo
+ - use PFN_PHYS instead of open coding it
+ - also pass a len argument to get_max_segment_size instead of open
+   coding a min in both callers
+
+Diffstat:
+ arch/m68k/emu/nfblock.c |    2 +-
+ block/bio.c             |    2 +-
+ block/blk-merge.c       |   25 +++++++++++--------------
+ block/blk.h             |    4 ++--
+ include/linux/bvec.h    |   14 ++++++++++++++
+ 5 files changed, 29 insertions(+), 18 deletions(-)
