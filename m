@@ -1,97 +1,71 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC5C1C2A3
-	for <linux-block@vger.kernel.org>; Sat,  6 Jul 2024 06:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1E118E06;
+	Sat,  6 Jul 2024 06:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720247055; cv=none; b=u16BM3N8+rIC0wQlBZm+EoglWa2ew/pjmRa/AQ3cIA2k5MB8vqv1w0wSr/a0WEzsaNwJUzep+5qsk2aCC4TItX4nm1EorNldrf1biusgv6y5ijwZks+8WhugwuhfgaIUF3bzo9met6OGqKH0dEE22Obbcv/IL+oOgTFRrGRd4eM=
+	t=1720247171; cv=none; b=itD6WTkqIdURCgSMKiXfelltqhEzbQ6HQpTsxZLuQ4jbS1y4rovX/JQNgvh3uQ+kyZtRx5ncNWfphHp8a1E2Kko2FSuKnhqXQo4H7RMAajBCq/VRrXWAJE5bhL3mfUMobWeVc4zduzZdEN8H8MJ0QK/s4u3yHBNKs4SYezxFOLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720247055; c=relaxed/simple;
-	bh=JKse070+sS5qDKWVbIFCfU3xee3WglP9rsaYjbsPCGw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DoL3aWih5COYCTo8Gd0MrGtWUY0M5KXKmqw+0oC9L56iNYgVjUoV6G/HotmARuSpLd3vx+8iuxwRZEtokwI+VR5KwTt/UsFDOEsvtGLHIspBuAgIlafG5hk5E18VRQYADjSDcpGfNgD0oEyTrFSaoJf/wuNV9uVRgizXDNbxmLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=P0JOG1KS; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="P0JOG1KS"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-760df01858cso154652a12.2
-        for <linux-block@vger.kernel.org>; Fri, 05 Jul 2024 23:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1720247053; x=1720851853; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yNowAKT2Yx4bsVVhZtPKWhVqvIPgWNNxysVwRFzN78A=;
-        b=P0JOG1KSpgqCrAzIjNFXbTUzx0MN+4xBv0/tGOj/WpbfE+7enGyuKYKBGDjGIs07j9
-         flFh1BvPJKT3rD68tYT3xN7eni7IFfXRWaue1Ms3C6bQjFPhto0zcg2LY9b1loeupzS/
-         m9y9Dj8YufA8g9zz1tyiLIZHAV0tfrskS1f6Qh8nYgZEA1QDEfpxJQSQCq9nKjYMFG/q
-         hTitjxoKMiGDcTpBOb+bgThrxEmx6WX13mNmi0vrywm9EUuu3DwMsbjObZpCYicVq8wn
-         IVs4OnuiGmvI2lxgbOwHQbIkFS16P0Q2uHSWHicOg1j2TFcsR/LweqzCN6MOSBRMw045
-         IhSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720247053; x=1720851853;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yNowAKT2Yx4bsVVhZtPKWhVqvIPgWNNxysVwRFzN78A=;
-        b=gn7i7KaLFIrK7jwAZIDsgAxBen4w4f+h7ofRpdjCmRbLdznrcKIDHGpPE55ngRSrR+
-         tSUrCJ6SaeBLZA6fuyTpVtQy9JbV0MhmepZC1qh5cq/xcU2czgCl/zRguGzqq4FuWmgy
-         OqdqVzlUyUzaoWr2ihDUXsSL+P9M7Md6XRthQNc8ty6RNq3UeXpix9PrVxbvKL6A9GzV
-         N1xJdjRKHqn230feKVLbr20VtI+VkYgDbnIFJAs1itRpwhh7IqUIHUsCQ/tuxPs3Ph1Q
-         VK/7uZG5w2Qyo/lovUf9yL9vRoatn7Dyz4wWlZcVIpwZeHV6VgTN2b75Lnk7nqqtkoin
-         fdTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVXWcFYMBlpm/wLua3K5ACYERd71ssanEKBbyewoeJnehjHqAosHt0xtxKy+BVQIxVg06qgNFzhtCORY4C/1twvMUqCh6M8DcMXHw=
-X-Gm-Message-State: AOJu0YwNpI4KTr/kLTKMMyfw6t5AwZHFYJtpVGHl4xfWiZcvJXYGKaXc
-	tRwYU5CrO/YhDW/QUlJh0Ze2EJmhjw5S9L7BHzIdx7T7di9zTZFADS1jM9gBhIXIJtHOpjHmnE0
-	4jctSPr8U
-X-Google-Smtp-Source: AGHT+IHkATLu1IOVXZo0JSeysD65rehYU+N2CceBVCaz6QV3RMSnuU+l7AFk6tgRwEv2nx+DTk2O3A==
-X-Received: by 2002:a17:902:e747:b0:1f7:1bb7:39db with SMTP id d9443c01a7336-1fb3402a38dmr74437755ad.5.1720247052790;
-        Fri, 05 Jul 2024 23:24:12 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c085:21c8::1011? ([2620:10d:c090:400::5:7b2d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10c8b3fsm149983025ad.5.2024.07.05.23.24.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jul 2024 23:24:12 -0700 (PDT)
-Message-ID: <bfd407d2-64bf-4e3b-961d-adb51269170a@kernel.dk>
-Date: Sat, 6 Jul 2024 00:24:07 -0600
+	s=arc-20240116; t=1720247171; c=relaxed/simple;
+	bh=qSS2aQCHFsEoF8vnLdLxeJXMBQprUWrDR4lqJIC0dEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EPDf9mezaClkhyD0erbPXGbhv5Gb8FOEQay96HG1axJt85dddyqZFLtWzB2Y/OVgUkgIftFxZBIsEKxHl2665JUqJsijnwh+GmOFYnT6YcwP4CBO6kbMPoRs/hKDH4A3eBNJGLcHD0RpCwvkwwURAlyLo417REBWz0z91sfw48g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id AA8AA68D0E; Sat,  6 Jul 2024 08:26:04 +0200 (CEST)
+Date: Sat, 6 Jul 2024 08:26:04 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240706062604.GA13874@lst.de>
+References: <cover.1719909395.git.leon@kernel.org> <20240703054238.GA25366@lst.de> <20240703105253.GA95824@unreal> <20240703143530.GA30857@lst.de> <a7f1c69a-bbaf-4263-b2c2-3c92d65522c2@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: pass a phys_addr_t to get_max_segment_size
-To: Christoph Hellwig <hch@lst.de>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
- linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org
-References: <20240705123232.2165187-1-hch@lst.de>
- <20240705123232.2165187-3-hch@lst.de>
- <c2333a14-04bc-49be-8cc6-a03dcdb2eec3@kernel.dk>
- <20240706062228.GA13842@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240706062228.GA13842@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a7f1c69a-bbaf-4263-b2c2-3c92d65522c2@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 7/6/24 12:22 AM, Christoph Hellwig wrote:
-> On Sat, Jul 06, 2024 at 12:21:06AM -0600, Jens Axboe wrote:
->>>  /**
->>> - * get_max_segment_size() - maximum number of bytes to add as a single segment
->>> + * get_max_segment_size() - maximum number of bytes to add to a single segment
->>
->> v1 had this change too, not sure why? The previous description seems
->> better than the changed one.
+On Fri, Jul 05, 2024 at 10:53:06PM +0000, Chaitanya Kulkarni wrote:
+> I tried to reproduce this issue somehow it is not reproducible.
 > 
-> Because it is used to also append data from another bio_vec to a
-> pre-existing SG segment, not just to create new ones.
+> I'll try again on Leon's setup on my Saturday night, to fix that
+> case.
 
-Sure, but then let's make it something that makes more sense at least.
-Maximum size to consider as a single segment, or something like that.
+It is passthrough I/O from userspace.  The address is not page aligned
+as seen in the printk.  Forcing bounce buffering of all passthrough
+I/O makes it go away.
 
--- 
-Jens Axboe
-
+The problem is the first mapped segment does not have to be aligned
+and we're missing the code to places it at the aligned offset into
+the IOVA space.
 
