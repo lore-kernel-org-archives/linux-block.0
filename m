@@ -1,31 +1,64 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF2FE546
-	for <linux-block@vger.kernel.org>; Sun,  7 Jul 2024 06:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB448F9E8;
+	Sun,  7 Jul 2024 09:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720334443; cv=none; b=TiFNfj1Ke5rgLUBP3+VCWiLGxPoDIhPzWmLjE8u+uWIy0vf7nyN/YBPuG3XtwZSBdp3/VTbB+rVBT2PJ0tTuaOTstHzU2xBeO7dvvkIxNT3ElALBhgi7W2STKh8HkXm+3GMUlN1VUlaLCoCMahFg2F1yeAHwSjSOKbifSbghuI0=
+	t=1720343790; cv=none; b=MMjHHxnTYEWu+AbFMm1i/H9FAUuAVIQgo7du67r5PLEeZmXCdbvxVXFm+MiR2nnaGtACutkRbJ9Dc1Bz5zlA6zp/QVd/QA9cMVWYqhiK9D4/VystGNrn4ui5CzbQ4OIwT1Kf2Zz0NdnoqJckYzKcEEEVKrUWnwZaK3kknQO09ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720334443; c=relaxed/simple;
-	bh=8rqcjuavurAPTmObuXxHiEBeEan0G6zgTieq7hAEm3g=;
+	s=arc-20240116; t=1720343790; c=relaxed/simple;
+	bh=izDf2P+sHbjiti59EE/8GV6nvVep7QKF5KGW0AiU1Mc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IGixEW3zB9tUwsneillthz+iMncXXI1JXHshwsRpsU72Xwlfw0nO34MHbqMCqkbMjYZPqLVXgIxUO2J7lp+zwSxSjOZ9Tdp8A6Rukg0hjc1iItMmYIKd3alEFH98k1Utj6bj5Z0PEP8DIFp7AoIDkTMBJiQbqh65uNfakYT54qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id BA46268AFE; Sun,  7 Jul 2024 08:40:37 +0200 (CEST)
-Date: Sun, 7 Jul 2024 08:40:37 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	"linux-m68k@lists.linux-m68k.org" <linux-m68k@lists.linux-m68k.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 2/2] block: pass a phys_addr_t to get_max_segment_size
-Message-ID: <20240707064037.GA432@lst.de>
-References: <20240706075228.2350978-1-hch@lst.de> <20240706075228.2350978-3-hch@lst.de> <6ae64d5e-bc86-4c4b-bc3a-3d72e86d0dbf@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=V9reP2PqMclml2dOmO2JWWxuGowhCQMaZOZcCC5T31r39cban/wyZfzz6HyWhedoTRGM6Vjsc0b5wJ2jzldPmXzzCRbnpbWAuP7hieku8CFXC9d4qspt50Ju8o4sFrj7Bkvj53ICRkqWoj3OGg9N9SWyra8MvNCTv2xitPgK+fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CrzWOY/i; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrzWOY/i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98E6FC3277B;
+	Sun,  7 Jul 2024 09:16:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720343790;
+	bh=izDf2P+sHbjiti59EE/8GV6nvVep7QKF5KGW0AiU1Mc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CrzWOY/iDzSJOaiIMaP3xE97eiLSDi4CB0wI1+TEQAHNCz2g05KYsFt/aL1GPMP5r
+	 HBnYK2RTylUHc0Vx3NyVD3bOosNt0zckrQesG42uJ6MRet5D6FmAW0PeAe7m5PvfaN
+	 iwrSjlS4jkggMxmOqgmohWVRswxNEnNV8RBiej41b/zEaRlr+A3diLegBHOwF8ZWa6
+	 9dtd/aY/wBeNy4rWL2+0ucK1I0ZgukePTbNlgwltGYYIXxXU7unResX6O/FNT5nk51
+	 W41NViVj5N3M41fW4A1fLX7G15TRIE214CPnx2WARzr2ky472lBfuc0iEJOgY0DDB3
+	 Pn2He452QkIyw==
+Date: Sun, 7 Jul 2024 12:16:26 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240707091626.GH6695@unreal>
+References: <cover.1719909395.git.leon@kernel.org>
+ <20240703054238.GA25366@lst.de>
+ <20240703105253.GA95824@unreal>
+ <20240703143530.GA30857@lst.de>
+ <a7f1c69a-bbaf-4263-b2c2-3c92d65522c2@nvidia.com>
+ <20240706062604.GA13874@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,37 +67,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6ae64d5e-bc86-4c4b-bc3a-3d72e86d0dbf@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240706062604.GA13874@lst.de>
 
-On Sat, Jul 06, 2024 at 10:37:11AM +0000, Chaitanya Kulkarni wrote:
-> > -	return min(mask - offset, (unsigned long)lim->max_segment_size - 1) + 1;
-> > +	return min_t(unsigned long, len,
-> > +		min(lim->seg_boundary_mask - (lim->seg_boundary_mask & paddr),
-> > +		    (unsigned long)lim->max_segment_size - 1) + 1);
-> >   }
-> >   
+On Sat, Jul 06, 2024 at 08:26:04AM +0200, Christoph Hellwig wrote:
+> On Fri, Jul 05, 2024 at 10:53:06PM +0000, Chaitanya Kulkarni wrote:
+> > I tried to reproduce this issue somehow it is not reproducible.
+> > 
+> > I'll try again on Leon's setup on my Saturday night, to fix that
+> > case.
 > 
-> Looks good, is it possible to re-write last
-> return min_t(..., ..., min(..., ...)) statement something like totally
-> untested in [1] ?
-
->          paddr_seg_boundry =
->                  lim->seg_boundary_mask - (lim->seg_boundary_mask & paddr);
->          /*
->           * Prevent an overflow if mask = ULONG_MAX and offset = 0 by 
-> adding 1
->           * after having calculated the minimum.
->           */
->          paddr_max_seg_allowed_len = min(paddr_seg_boundry,
->                                   (unsigned long)lim->max_segment_size - 
-> 1) + 1;
->          return min_t(unsigned long, paddr_len, paddr_max_seg_allowed_len);
-> }
-
-What would be the point of that?  It is way harder to read and longer.
-But except for that we probably could.
-
+> It is passthrough I/O from userspace.  The address is not page aligned
+> as seen in the printk.  Forcing bounce buffering of all passthrough
+> I/O makes it go away.
 > 
-> 
----end quoted text---
+> The problem is the first mapped segment does not have to be aligned
+> and we're missing the code to places it at the aligned offset into
+> the IOVA space.
+
+Thanks for the explanation.
