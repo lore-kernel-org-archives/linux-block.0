@@ -1,98 +1,137 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF8025745;
-	Mon,  8 Jul 2024 14:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64067147C7F
+	for <linux-block@vger.kernel.org>; Mon,  8 Jul 2024 16:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720448318; cv=none; b=sg89ityHvfEK9hcBTpu7cJcrFZsv7DuQ0rECfR5hkJ8wL4pvzn7MkzXMoW34zwwabDSKwkezp/2LenMjqtdJfnYkojr3ZnzlMa0fF1OzOaMy/cd18y/igVCW+hTWsdUPVnR6pWChh6TPFPc3wLf3mzHnfjtTYfom9tAZ7NziFs8=
+	t=1720457562; cv=none; b=p/4vu8/iVV6Ql3zt5zZxFEHgknw8Dls5FTlJx6VAhah0x4OOdW00h0ytz3Ld2uHaeKkavnz7dUvrGJbp7wS/90sTTxY+oh5QkVXkR49xEMhjCchnvk1wczd7GYrVqGevpp/V9TNqGXrvSATLhFni709b9RGphjs+jd6PzEeSurQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720448318; c=relaxed/simple;
-	bh=GmM0j3P51qYNYcB9FB5GbSrbtyWecjbiPcPIsW4vHQc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GmvWZ9j6CFqAv3wUlpqvB630CyxAldJMomGFiaXokMxZpjwf0DdP/rmj7qFfJHz4/nANQ31BQ9fCnObpsj57IJTSrzARFtBvQu4W/f+HIYZOHlEAxcG3aytkvJrEekleDyxIu5jE9Df85ShTkU7guJ5N+HfdZPoOZQ1uLM19s0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SuD/cDXB; arc=none smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720457562; c=relaxed/simple;
+	bh=1B5tJgkSM04kGIIt7Bd4CwyiBDyOxIVq095mpakxwCo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D9M1G4J4tWDPpVc+cvbRLLG8GjOKEjrvEDyczIIfkV+eEuVcXK+UmWTznHxoOiEZdUoTNHlW0hyp0PD84IQESZ7QqeMPSVgRDETIAX4eJJkhORiWMNHmPH3ad/7FcTtJbjDrUeTa5aaNFKacI3kzi2p7ETOg09bIQuPOkBfeWiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=P+TUbkpO; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SuD/cDXB"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-48ff8aa6081so1032274137.1;
-        Mon, 08 Jul 2024 07:18:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="P+TUbkpO"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-444fdb6c1cfso27632581cf.3
+        for <linux-block@vger.kernel.org>; Mon, 08 Jul 2024 09:52:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720448315; x=1721053115; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vzZ0t+6EA44YYeZ1nSKnkOHgB4WgwxxqFBIuc3oST+w=;
-        b=SuD/cDXBzSAqnuSZNQLSbGCQcMQzMboMEJNUAzwYTgTOTuH647gBXxzuJv8n0jw4LM
-         W+1UjBVVOa4grTFgn0EtJ6d+dVhdYoJYP1NsPt1qdrAuyciCdZ35+lSQ9012wkL+A/sq
-         SqzVGkJpQHdpMXNflUWHi0P7LlFJ+vEgs/JZnhcype3NxPX8hkcisdwQwSyZHW+fQF7C
-         X3WSs1tuEooShKh4PCJLt2mmvQCBKthmwYHRJag7yIMr0BaRdb4BLcHeJWcDFU8gU+i7
-         2W+KMDZqi+WWIBV7B5PtK2HO+xG5OAMcooPS42wTZFLcYEuuFLPa8dIE8RAX+ICCadp9
-         OGOQ==
+        d=ziepe.ca; s=google; t=1720457559; x=1721062359; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=44iLSgmAA8Jj5OzeQp5q3uGTMuRJb4ek81IJRNbfP50=;
+        b=P+TUbkpOGqpFLTWb4t5NSUvguJ5/6rVKfyrEcU8M/gVD35r280+g1ipvBHqy4Ujl89
+         4BSnWWR1YvaygNAqn4Ow6KuQclsaKNZLcCNhj3cCkaDjZtDd+UmOiH4NWHVUH+68msas
+         M1GFdT4yQHwcmbdKWavJjZJNCX5zEFCR9jqzxxoNB7ibBJqOQn8nhJRqWfq3XCjOQMPa
+         2esubhBzgBcBXIUSdSvYYkXotdxLTl37i654frtw9D1Y6CsM1HQLdgLWFZi9zwgIKx14
+         kfqe8LNIY3cwxvPKoDhXEHc9ekKXEy+9xugONCBQ+fbE0zdKmpvXn7PxxvQgEtxCmgjV
+         bzRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720448315; x=1721053115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vzZ0t+6EA44YYeZ1nSKnkOHgB4WgwxxqFBIuc3oST+w=;
-        b=NYGmwRr8te/qNXv8oowdfQQCEK6AcOqupzI2kNlAtmWuZSNuW5rfoxCfFERF88LY7D
-         X8WYj9nS7AqrvOk10mN8QFVsrPeHUcbgCJbyh3odKTmhuc6WfyDoFRA31NEnYr40cJ5L
-         9FHNybqW9mzsQY4SBUmYnANvNveRWSGzwL+UpvR8l3EWGHjxeGe8NkAiNQ+mFdWE8SjE
-         ANKsvHQxEqbQSfhG/oDTARfOz1fvMCQ1q1QEmfZ6kyfmEkGmPMPoVk1pnTktMKAmypzS
-         KKEbfkor/P4S1jlJu87z35HfPRYgpLMzxCQZftXcoeF9+Fuq0pqtSj8df4xskY7dp1KC
-         FBRA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQqyFa/1mYZI86/NxEwTE6Jn15d30EQb7uZJTGhZ9B4zjd0E3uvJpabXRgNDJlZ7aWEczSaaQY6wO8tgVsEW2t0QPs1TWubfwK2IN4abCwzfJLRyO8q/TX5ejmTNwyw+/UvCOrO4fM
-X-Gm-Message-State: AOJu0YzTRmXS7JU7tKXC5XiKKf0bbjgDMk9UFtTrhuap8TVrPsv8m12d
-	VBXOw0xMFyFChaFJ8+iE9alzQbuHGtGf6pSaBYLNOvZpDVlwGLPN6ttbpdQNI6gDuoIMpLet0nG
-	bdeFCUbp3pgPEOF6I+8JMirMyqQ==
-X-Google-Smtp-Source: AGHT+IGBZ+nfOhagN9EruogOZmg7A5VWL+nHpS7DVh+j85DRP1XireqJnFUSTtEzQm9VwJ5uppvB8QfKb3CsC3X5BvU=
-X-Received: by 2002:a05:6122:d1a:b0:4ec:f9ad:d21a with SMTP id
- 71dfb90a1353d-4f2f3fd1102mr14678174e0c.10.1720448315692; Mon, 08 Jul 2024
- 07:18:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720457559; x=1721062359;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=44iLSgmAA8Jj5OzeQp5q3uGTMuRJb4ek81IJRNbfP50=;
+        b=l8Oym5h8We/VcUwmltan2rL+0ZTpFug0Rwbdjhr4Dyj5NIKT2BXDh8LKF1AcMTfNev
+         Z7u4KqBuWkFrjf9y7VKZr1FyLq/ixVrEZoxt02Gsrasl+vdjFpmNQCOmpAkrNlBanzYc
+         uMOlxX5pZN5xuntQ9KCg9Wpx/4g888hpmo7CS//RskVUzFvAuRAvJ6QemKoWZ0q3IsTI
+         AQ7k6qF2rGR5HtIPrSAqLEzbSpJHZhc53k0Fn7lmQTHakSGP1roWPLSRF1xnqTobgvNv
+         YSmIo4lzVFvIfa29OPfeYeM1aEY55HAx0JJJQaRE/1JFBbstpgz2LDKDqUe6kAQ5s96M
+         Rw0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWmvnonRExOcfzjUzXgaWcwnWqu9nmRWACmHQraXW/c3yddKMP0h7aRWaL8v4IIFznztepGhu/ELKkLgCqbIlpNhKr4BZrijXicKK0=
+X-Gm-Message-State: AOJu0YxiXXQNCgparVSD78vQmVhqgadfv9iAMkgMQN1PZbA4V5LbKfOL
+	27RHqufVP5p0MKvaXc5cXxKCiimLiCiEVHJxlrk7VOdJwbo8PKuiL/OfoNqR9jk=
+X-Google-Smtp-Source: AGHT+IHmTDKEE4X7UqSrEePQ2yW2AFHAIlc2Xn5bxdXHYF1pSNmcIuJQ4brop8xp0q/dd20hJkGD6Q==
+X-Received: by 2002:ac8:58c6:0:b0:447:e532:b370 with SMTP id d75a77b69052e-447fa8aefa5mr156831cf.10.1720457559408;
+        Mon, 08 Jul 2024 09:52:39 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-447f9b40389sm1202611cf.36.2024.07.08.09.52.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 09:52:38 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sQrbS-000Uky-FO;
+	Mon, 08 Jul 2024 13:52:38 -0300
+Date: Mon, 8 Jul 2024 13:52:38 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240708165238.GE14050@ziepe.ca>
+References: <cover.1719909395.git.leon@kernel.org>
+ <20240703054238.GA25366@lst.de>
+ <20240703105253.GA95824@unreal>
+ <20240703143530.GA30857@lst.de>
+ <20240703155114.GB95824@unreal>
+ <20240704074855.GA26913@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240705083205.2111277-1-hch@lst.de>
-In-Reply-To: <20240705083205.2111277-1-hch@lst.de>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Mon, 8 Jul 2024 19:47:59 +0530
-Message-ID: <CACzX3AvXAhcjE0PEB_PO7B2e0pRB7mj2QMdw5Gj_sNH-acTfYg@mail.gmail.com>
-Subject: Re: fine-grained PI control
-To: Christoph Hellwig <hch@lst.de>
-Cc: Kanchan Joshi <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>, 
-	"Martin K . Petersen" <martin.petersen@oracle.com>, linux-block@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240704074855.GA26913@lst.de>
 
-On Fri, Jul 5, 2024 at 2:02=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrote=
-:
->
-> Hi all,
->
-> Martin also mentioned he wanted to see the BIP_CTRL_NOCHECK,
-> BIP_DISK_NOCHECK and BIP_IP_CHECKSUM checksum flags exposed.  Can you
-> explain how you want them to fit into the API?  Especially as AFAIK
-> they can't work generically, e.g. NVMe never has an IP checksum and
-> SCSI controllers might not offer them either.  NVMe doesn't have a way
-> to distinguish between disk and controller.
-Yes, these flags are only valid in the context of SCSI. One possible
-scheme can be that the API still has the ability to pass these flags
-and the NVMe driver fails if the user specifies these flags.
+On Thu, Jul 04, 2024 at 09:48:56AM +0200, Christoph Hellwig wrote:
 
->
-> Last but not least the fact that all reads and writes on PI enabled
-> devices by default check the guard (and reference if available for the
-> PI type) tags leads to a lot of annoying warnings when the kernel or
-> userspace does speculative reads.
-In the current series the application can choose not to specify the
-GUARD check flag, which would disable the guard checking even for PI
-enabled devices. Did you still encounter errors or am I missing
-something here?
+> 1) The amount of code needed in nvme worries me a bit.  Now NVMe a messy
+> driver due to the stupid PRPs vs just using SGLs, but needing a fair
+> amount of extra boilerplate code in drivers is a bit of a warning sign.
+> I plan to look into this to see if I can help on improving it, but for
+> that I need a working version first.
 
---
-Anuj Gupta
+It would be nice to have less.  So much now depends on the caller to
+provide both the input and output data structure.
+
+Ideally we'd have some template code that consolidates these loops to
+common code with driver provided hooks - there are a few ways to get
+that efficiently in C.
+
+I think it will be clearer when we get to RDMA and there we have the
+same SGL/PRP kind of split up and we can see what is sharable.
+
+> Not quite as concerning, but doing an indirect call for each map
+> through dma_map_ops in addition to the iommu ops is not every
+> efficient.
+
+Yeah, there is no reason to support anything other than dma-iommu.c
+for the iommu path, so the dma_map_op indirection for this could just
+be removed.
+
+I'm also cooking something that should let us build a way to iommu map
+a bio_vec very efficiently, which should transform this into a single
+indirect call into the iommu driver per bio_vec, and a single radix
+walk/etc.
+
+> We've through for a while to allow direct calls to dma-iommu similar
+> how we do direct calls to dma-direct from the core mapping.c code.
+> This might be a good time to do that as a prep step for this work.
+
+I think there is room to benchmark and further improve these
+paths. Even the fast direct map path is not compiling down to a single
+load/store instruction per bio_vec entry as would be ideal.
+
+Jason
