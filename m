@@ -1,32 +1,32 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0C915F31D
-	for <linux-block@vger.kernel.org>; Tue,  9 Jul 2024 13:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC3D15FA73
+	for <linux-block@vger.kernel.org>; Tue,  9 Jul 2024 13:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720530256; cv=none; b=g7khdKLukO0+B2j8JrlzFdC2YkLbq8VfX4rmwiLjZ9GiFj1OSOoLb80FFyLCN/jQIB2KnW7ggfPeVsXT9ONyq3Wl+vmbfq+FZmTBtYw+OZjmuL4ysCZsqWIV7Ty4xZXtJUtKRdjVCGi9UmCR2itCfEHrn7HPTaV2I6aTygHJQx4=
+	t=1720530260; cv=none; b=qo3W3vBoa5aMU2TGCATEgaiceZMh0qvRs14w6rdc6ydruQU+iKUBO7nNjYK1BU3pKr5vVV5SxhEDz1OmL5YmFsu8gjCyLJr2zUQI4PgVgVuf9yz0N3SEn/99Bhy5h/VTFjc3A7zBRcFNB/mc7AEdCqMFtzyNjAVQPc06LsCkTEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720530256; c=relaxed/simple;
-	bh=3AqQ6rQbpTCvoAvcKGmJOdgsZSrhu1/nQOnM8PzJYa0=;
+	s=arc-20240116; t=1720530260; c=relaxed/simple;
+	bh=hvhpy66Gc8oejRX39juQpQFCclZDEUiL26OSBUg4mZ4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Qb71yrEjKR1Fzo6sx3bMnIXin5e78u3vS50rwbq5eqZVC0pryLaCxQCZ6+CG+cQrFf0XVr7ZCjlceVMNUzg81xBXGJO9mVZr6Ov7619FZl7um9UOUNbHefjXu+DSzYUqAMfCcLGd7Asp7H99+yYxPeBfBT7cHYA3f5I6BuwECsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RCCCS8KB; arc=none smtp.client-ip=91.218.175.189
+	 MIME-Version; b=fXyqPbWsEZxmbA2KvW43yrY5OfQHPxgAlfV2cIEvYd8TpjGJiOVewYJn7fO2gx4KhamOmG3KVayNlB3s4SK+31Nz9xlHw/c18LPJDdiOPYHH3E2KmST5NLG4jcD2gVI7yury1ZpNXce/FfKVwPTS+pjSFGp0rwAeDdehLziq/fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YI6thhKT; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RCCCS8KB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YI6thhKT"
 X-Envelope-To: axboe@kernel.dk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1720530253;
+	t=1720530257;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RRCjIxxlVUsZSRY4Vf+rUKFCfBfbcJNcq5M4wid/7sU=;
-	b=RCCCS8KBfUSfQW8acoRakZWci/X0yneda1Zaacwl8UweCKvjItcLUIhm3i5wa/2a4jMAcp
-	ZjoiAsdv1FeizyMK/sPXkC/ndX0cKYldnhZsRJhS1Pmr5ukbCkm5hOHrRycwManoVrtiZN
-	5ox7plCXf8pg+Oj8omEDP4ZrmXyXuqo=
+	bh=xfVUwPRPdY2A+8L+N0xioepstag5VyQiEpJ3XEOu87A=;
+	b=YI6thhKTugepeStXCE0hzsFOYKlB4zXoqzBkf7qS+awMcFu5QxtlJW6afy9rS71Xj4XOBs
+	Uybh0C+m3YHO0WZpTpjIfD1ljPHnTDDPrGy84ryVwzZFvsrYDVU0g5PMSPL/xcYes04l6N
+	BWiTvn0wlq4hrAJnxoNEnZeSqM8D7rI=
 X-Envelope-To: dan.j.williams@intel.com
 X-Envelope-To: gregory.price@memverge.com
 X-Envelope-To: john@groves.net
@@ -52,9 +52,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-cxl@vger.kernel.org,
 	Dongsheng Yang <dongsheng.yang@linux.dev>
-Subject: [PATCH v1 3/7] cbd: introduce cbd_segment
-Date: Tue,  9 Jul 2024 13:03:39 +0000
-Message-Id: <20240709130343.858363-4-dongsheng.yang@linux.dev>
+Subject: [PATCH v1 4/7] cbd: introduce cbd_channel
+Date: Tue,  9 Jul 2024 13:03:40 +0000
+Message-Id: <20240709130343.858363-5-dongsheng.yang@linux.dev>
 In-Reply-To: <20240709130343.858363-1-dongsheng.yang@linux.dev>
 References: <20240709130343.858363-1-dongsheng.yang@linux.dev>
 Precedence: bulk
@@ -66,134 +66,177 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The `cbd_segments` is an abstraction of the data area in transport. The
-data area in transport is divided into segments.
+The "cbd_channel" is the component responsible for the interaction
+between the blkdev and the backend. It mainly provides the functions
+"cbdc_copy_to_bio", "cbdc_copy_from_bio" and "cbd_channel_crc"
 
-The specific use of this area is determined by `cbd_seg_type`. For example,
-`cbd_blkdev` and `cbd_backend` data transfers
-need to access a segment of the type `cbds_type_channel`.
-
-The segment also allows for more scenarios and more segment types to be expanded.
+If the blkdev or backend is alive, that means there is active
+user for this channel, then channel is alive.
 
 Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
 ---
- drivers/block/cbd/cbd_segment.c | 108 ++++++++++++++++++++++++++++++++
- 1 file changed, 108 insertions(+)
- create mode 100644 drivers/block/cbd/cbd_segment.c
+ drivers/block/cbd/cbd_channel.c | 153 ++++++++++++++++++++++++++++++++
+ 1 file changed, 153 insertions(+)
+ create mode 100644 drivers/block/cbd/cbd_channel.c
 
-diff --git a/drivers/block/cbd/cbd_segment.c b/drivers/block/cbd/cbd_segment.c
+diff --git a/drivers/block/cbd/cbd_channel.c b/drivers/block/cbd/cbd_channel.c
 new file mode 100644
-index 000000000000..855bfa473b4c
+index 000000000000..9a63e98b0c13
 --- /dev/null
-+++ b/drivers/block/cbd/cbd_segment.c
-@@ -0,0 +1,108 @@
++++ b/drivers/block/cbd/cbd_channel.c
+@@ -0,0 +1,153 @@
 +#include "cbd_internal.h"
 +
-+static ssize_t cbd_seg_detail_show(struct device *dev,
-+				   struct device_attribute *attr,
-+				   char *buf)
++static void channel_format(struct cbd_transport *cbdt, u32 id)
 +{
-+	struct cbd_segment_device *segment;
-+	struct cbd_segment_info *segment_info;
++	struct cbd_channel_info *channel_info = cbdt_get_channel_info(cbdt, id);
 +
-+	segment = container_of(dev, struct cbd_segment_device, dev);
-+	segment_info = segment->segment_info;
++	cbdt_zero_range(cbdt, channel_info, CBDC_META_SIZE);
++}
 +
-+	if (segment_info->state == cbd_segment_state_none)
-+		return 0;
++int cbd_get_empty_channel_id(struct cbd_transport *cbdt, u32 *id)
++{
++	int ret;
 +
-+	if (segment_info->type == cbds_type_channel)
-+		return cbd_channel_seg_detail_show((struct cbd_channel_info *)segment_info, buf);
++	ret = cbdt_get_empty_segment_id(cbdt, id);
++	if (ret)
++		return ret;
++
++	channel_format(cbdt, *id);
 +
 +	return 0;
 +}
 +
-+static ssize_t cbd_seg_type_show(struct device *dev,
-+				 struct device_attribute *attr,
-+				 char *buf)
++void cbdc_copy_to_bio(struct cbd_channel *channel,
++		u64 data_off, u32 data_len, struct bio *bio)
 +{
-+	struct cbd_segment_device *segment;
-+	struct cbd_segment_info *segment_info;
++	struct bio_vec bv;
++	struct bvec_iter iter;
++	void *src, *dst;
++	u64 data_head = data_off;
++	u32 to_copy, page_off = 0;
 +
-+	segment = container_of(dev, struct cbd_segment_device, dev);
-+	segment_info = segment->segment_info;
++next:
++	bio_for_each_segment(bv, bio, iter) {
++		dst = kmap_local_page(bv.bv_page);
++		page_off = bv.bv_offset;
++again:
++		if (data_head >= CBDC_DATA_SIZE)
++			data_head %= CBDC_DATA_SIZE;
 +
-+	if (segment_info->state == cbd_segment_state_none)
-+		return 0;
++		flush_dcache_page(bv.bv_page);
++		src = channel->data + data_head;
++		to_copy = min(bv.bv_offset + bv.bv_len - page_off,
++			      CBDC_DATA_SIZE - data_head);
++		memcpy_flushcache(dst + page_off, src, to_copy);
 +
-+	return sprintf(buf, "%s\n", cbds_type_str(segment_info->type));
-+}
++		/* advance */
++		data_head += to_copy;
++		page_off += to_copy;
 +
-+static DEVICE_ATTR(detail, 0400, cbd_seg_detail_show, NULL);
-+static DEVICE_ATTR(type, 0400, cbd_seg_type_show, NULL);
-+
-+CBD_OBJ_HEARTBEAT(segment);
-+
-+static struct attribute *cbd_segment_attrs[] = {
-+	&dev_attr_detail.attr,
-+	&dev_attr_type.attr,
-+	&dev_attr_alive.attr,
-+	NULL
-+};
-+
-+static struct attribute_group cbd_segment_attr_group = {
-+	.attrs = cbd_segment_attrs,
-+};
-+
-+static const struct attribute_group *cbd_segment_attr_groups[] = {
-+	&cbd_segment_attr_group,
-+	NULL
-+};
-+
-+static void cbd_segment_release(struct device *dev)
-+{
-+}
-+
-+const struct device_type cbd_segment_type = {
-+	.name		= "cbd_segment",
-+	.groups		= cbd_segment_attr_groups,
-+	.release	= cbd_segment_release,
-+};
-+
-+const struct device_type cbd_segments_type = {
-+	.name		= "cbd_segments",
-+	.release	= cbd_segment_release,
-+};
-+
-+void cbd_segment_init(struct cbd_segment *segment, struct cbd_transport *cbdt, u32 seg_id)
-+{
-+	struct cbd_segment_info *segment_info = cbdt_get_segment_info(cbdt, seg_id);
-+
-+	segment->cbdt = cbdt;
-+	segment->segment_info = segment_info;
-+	segment->seg_id = seg_id;
-+
-+	segment_info->state = cbd_segment_state_running;
-+
-+	INIT_DELAYED_WORK(&segment->hb_work, segment_hb_workfn);
-+	queue_delayed_work(cbd_wq, &segment->hb_work, 0);
-+}
-+
-+void cbd_segment_exit(struct cbd_segment *segment)
-+{
-+	cancel_delayed_work_sync(&segment->hb_work);
-+
-+	segment->segment_info->state = cbd_segment_state_none;
-+}
-+
-+int cbd_segment_clear(struct cbd_transport *cbdt, u32 seg_id)
-+{
-+	struct cbd_segment_info *segment_info;
-+
-+	segment_info = cbdt_get_segment_info(cbdt, seg_id);
-+	if (cbd_segment_info_is_alive(segment_info)) {
-+		cbdt_err(cbdt, "segment %u is still alive\n", seg_id);
-+		return -EBUSY;
++		/* more data in this bv page */
++		if (page_off < bv.bv_offset + bv.bv_len)
++			goto again;
++		kunmap_local(dst);
 +	}
 +
-+	cbdt_zero_range(cbdt, segment_info, CBDT_SEG_SIZE);
++	if (bio->bi_next) {
++		bio = bio->bi_next;
++		goto next;
++	}
++}
 +
-+	return 0;
++void cbdc_copy_from_bio(struct cbd_channel *channel,
++		u64 data_off, u32 data_len, struct bio *bio)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++	void *src, *dst;
++	u64 data_head = data_off;
++	u32 to_copy, page_off = 0;
++
++next:
++	bio_for_each_segment(bv, bio, iter) {
++		src = kmap_local_page(bv.bv_page);
++		page_off = bv.bv_offset;
++again:
++		if (data_head >= CBDC_DATA_SIZE)
++			data_head %= CBDC_DATA_SIZE;
++
++		dst = channel->data + data_head;
++		to_copy = min(bv.bv_offset + bv.bv_len - page_off,
++			      CBDC_DATA_SIZE - data_head);
++
++		memcpy_flushcache(dst, src + page_off, to_copy);
++		flush_dcache_page(bv.bv_page);
++
++		/* advance */
++		data_head += to_copy;
++		page_off += to_copy;
++
++		/* more data in this bv page */
++		if (page_off < bv.bv_offset + bv.bv_len)
++			goto again;
++		kunmap_local(src);
++	}
++
++	if (bio->bi_next) {
++		bio = bio->bi_next;
++		goto next;
++	}
++}
++
++u32 cbd_channel_crc(struct cbd_channel *channel, u64 data_off, u32 data_len)
++{
++	u32 crc = 0;
++	u32 crc_size;
++	u64 data_head = data_off;
++
++	while (data_len) {
++		if (data_head >= CBDC_DATA_SIZE)
++			data_head %= CBDC_DATA_SIZE;
++
++		crc_size = min(CBDC_DATA_SIZE - data_head, data_len);
++
++		crc = crc32(crc, channel->data + data_head, crc_size);
++
++		data_len -= crc_size;
++		data_head += crc_size;
++	}
++
++	return crc;
++}
++
++ssize_t cbd_channel_seg_detail_show(struct cbd_channel_info *channel_info, char *buf)
++{
++	return sprintf(buf, "channel backend id: %u\n"
++			"channel blkdev id: %u\n",
++			channel_info->backend_id,
++			channel_info->blkdev_id);
++}
++
++
++void cbd_channel_init(struct cbd_channel *channel, struct cbd_transport *cbdt, u32 seg_id)
++{
++	struct cbd_channel_info *channel_info = cbdt_get_channel_info(cbdt, seg_id);
++
++	cbd_segment_init(&channel->segment, cbdt, seg_id);
++
++	channel->cbdt = cbdt;
++	channel->channel_info = channel_info;
++	channel->seg_id = seg_id;
++	channel->submr = (void *)channel_info + CBDC_SUBMR_OFF;
++	channel->compr = (void *)channel_info + CBDC_COMPR_OFF;
++	channel->data = (void *)channel_info + CBDC_DATA_OFF;
++	channel->data_size = CBDC_DATA_SIZE;
++
++	spin_lock_init(&channel->submr_lock);
++	spin_lock_init(&channel->compr_lock);
++}
++
++void cbd_channel_exit(struct cbd_channel *channel)
++{
++	cbd_segment_exit(&channel->segment);
 +}
 -- 
 2.34.1
