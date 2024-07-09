@@ -1,223 +1,400 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E1915099C
-	for <linux-block@vger.kernel.org>; Tue,  9 Jul 2024 11:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720525885; cv=fail; b=JkWiXUsl4uc+2wDlXQysqRXJTx6MwwFfu4nHZJrId6/49508MdkMmawz9bnzZyksHAf97NYLVO9379KP9byg60sS5uWVg07An/O7EVxawcQaWHSxfWTA0FpkR8N1GcIbvWEjboyHB4OGbwv/bRNbX/nLECrRph0mzZytjiDFA2s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720525885; c=relaxed/simple;
-	bh=iKPJiL7EaT1bYvlJ23QwboX448+1T4vFuLxqCPJHJro=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=tDVeqbv++jbCRrPNyWfo0HkYmak63FeuMVxhQWgoiv1NOGs0G+ISmQhiYOfusiTWudIBqYEHu+RVURaB99HHR+mk86Qqp7cyWSj0KqRPhbK3x+xq2o7EY6CfmFkCmz7VwulxOd6FAX1ba1GadEc6aQveXzjlovSQXE1OPVUmjfM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=XER2rmd2; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=rdEhPTp9; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XER2rmd2";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="rdEhPTp9"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4697tf7C006468;
-	Tue, 9 Jul 2024 11:51:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	corp-2023-11-20; bh=/S6Q/5g5ZkbnXzRC+eX0eqApGe2E2KOgT4zS+3g2i6E=; b=
-	XER2rmd2Gexot3HT7eXu7vIli1BsDS1wfPkiCRGwttesPMKOQ+W/y3I17byMaAAi
-	7EjTCdCuOdEtEB0jFjm5q87St5JiIuxJ9DuDj0k5zVPUa8HT7Fa93RB1xn1GcN7G
-	OfgyTMsKLt8pgdhMGPPf6BA270MdsPKgg0g1ZifvfVjUdvxZ1rd+xvD2Ui8EqRzl
-	CG7Zq0rJB083QhoxTQue5FalBtDPDLSTIU6nZrSgcDnmC7XIBs8oNDA6gDD6Uu5X
-	YtJ+eMeYit23xDh0pgiM2xM5NkhorqlZ/xtpbb3yLF5PmgJ+P6vBIHohfhnGprQS
-	nX2C7xBQN1rpepC43CHiAg==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 406wt8cp2s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 09 Jul 2024 11:51:19 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 469AELLO029822;
-	Tue, 9 Jul 2024 11:51:19 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2040.outbound.protection.outlook.com [104.47.56.40])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 407ttthqpq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 09 Jul 2024 11:51:18 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Iv+huJ5sZtBJFziDK+Od4CEzgFGSFd1wITXvrixJtvGYGtqxVYq1fA+oyx7z6vjjYCqpJ55/UMY4bgzljWEQcRblYiyAkYnR7RHTCu1MX9D3P/YlQHDXi+lcO6er1z/w1uDX0pSIjSj3311Y/URtEkbe3QWt/+Wyz5q36PavoUQvRgt5SHUO+sihx8KlkoOrUguyvJa74ICMg6+QqhGs14GgtF63TpvY7BaTYbf+9Axc+9Gn21o+/0L47Sv7pJalnnDTVmds/6mBFL5orjckrZOoSselc/hK1Hmt8dIx+QmiR8D7n9e8vNgTLmHd0TVEmw/6fTgONJjfHD1k+HSekQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/S6Q/5g5ZkbnXzRC+eX0eqApGe2E2KOgT4zS+3g2i6E=;
- b=TdBQvSLRYr9Ow53nrLBugPf6OFmXNS+pTgXwnK7Cyw6HUqFvTapkziZKy9dgSdSgyel1mAeouQOj1ko2Zdi0ggmLKHxdM3mwZb33TotUHt95D672C/Vo0xh7Xx2OKBhqp6v+vEX+xGXioyJ/rBCE1Ufa82fgA6E9+b8/4yba3cQ7WDwvvBVZbFKZjxmwCD05jNilaj9tmpy9fmiGW674eSLw7soqO1jqEppyGkIx9ro95PcAKePF1/ufPJxEp9jJBW0/wdHG7ubr+eH/m9xvsT4Hmdvbqj0hKvtcb/y7GHQKCKX2yPQfqpRilwPgemheGMnyQZd9DvO+W/fX4YeKVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/S6Q/5g5ZkbnXzRC+eX0eqApGe2E2KOgT4zS+3g2i6E=;
- b=rdEhPTp92SeKclU6tpolDJJhOL3LGPoXooz4qs5w1+6qTKR0ujp+5j/XzjMc934tQp8vkpeG7+g3tmHkjnHilbtXf2kkOpLsjH3YNYzgPtX5gj5RQBJq4tRA9i870npWgYi2MUUFVBqG8klTpnzjiZB1hM83wwAUdGLbUt3dnD4=
-Received: from CH2PR10MB4312.namprd10.prod.outlook.com (2603:10b6:610:7b::9)
- by MN2PR10MB4397.namprd10.prod.outlook.com (2603:10b6:208:1d4::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Tue, 9 Jul
- 2024 11:51:16 +0000
-Received: from CH2PR10MB4312.namprd10.prod.outlook.com
- ([fe80::fd5e:682a:f1ac:d0a2]) by CH2PR10MB4312.namprd10.prod.outlook.com
- ([fe80::fd5e:682a:f1ac:d0a2%4]) with mapi id 15.20.7741.033; Tue, 9 Jul 2024
- 11:51:16 +0000
-Message-ID: <b1539d6b-63ab-4bc9-97f9-e45cc8803630@oracle.com>
-Date: Tue, 9 Jul 2024 12:51:12 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/11] block: Make RQF_x as an enum
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org
-References: <20240709110538.532896-1-john.g.garry@oracle.com>
- <20240709110538.532896-10-john.g.garry@oracle.com>
- <20240709112318.GA5358@lst.de>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20240709112318.GA5358@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0263.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:194::16) To CH2PR10MB4312.namprd10.prod.outlook.com
- (2603:10b6:610:7b::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCCF13A25F;
+	Tue,  9 Jul 2024 12:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720528760; cv=none; b=iCdJLWM74o1h8Xd8huOZfuv/2Jry/TtxIR7GKd/iCGE8bBOtX6W/GQyjJahMIjIctpe2qDSaDl/llihg8eGvhVOlxV7QFoOx4l+usq8+qOB/YHmfQ2+wKBCFyY3bVN5AYNSRyCJRujMX0L/1Ax/1gzpJURd00mwHMVovKw9B9Kg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720528760; c=relaxed/simple;
+	bh=uc8f3I9FjT4ddzKf5AdW/NsGUiFiP6hsnUEvrfc7Kuc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mpC2LrRE5cVxYr7GZYqGwDnHgMDidYezlhU04BtiZeMiC5ZCT1V3LLgnisHQ82tMiraEps7TgSlRzhKJbdVpjMdHaBfknFhv4312ba+SGmzk2SxZyrETybQZrqAxfxFYFsX3mrcVaFrgIyTvPTW1CZbhxTt9syWI/90SfRWPoQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-64b3655297aso49349837b3.1;
+        Tue, 09 Jul 2024 05:39:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720528756; x=1721133556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3ENGgw6ue9S7M03KBHk+pRSFUONWY6uW3wiK1b5+M7g=;
+        b=F8lakUVK/kyJHw+Uj8BzFNgQLqEKA6K/t8YQdxNaNUjgTl5ptkMIA3yeW9kZl8Lqa7
+         ADOp2fa74xZs+WTkSY7sFtqhY863lJi/AKUYhZOSp3wDFBROZW596EyFzVcnoSIVPlk7
+         yU7scG6c8/amLkRFu3TNY1iMdQAjwbqhIdh9aGVFr58W+/r6rvaBO1KRdm9Y0q2doalc
+         qviQYi4Rj9691ql9j9AmfIyxPK2ifoUkydeK40IHflTF6EimSZT3E5FZ/Kic+LN93ddt
+         3KhR4wmcMSBsa238rh/YlI1DbWaJirptloW8TcZ8BbSPilsEkP+Is/GqDwglN/agM0z7
+         LTsg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhEISElO/dIRLiHNoanVoPPhMU5t2wAlQjuc69nO+QfgZlUhNiazEKsLc4I7CSXtgLYkL28x/DYUySykfXiKvhaq/u/Sk//r9C/KDp9Bk00cabvrrHSm2wQL+iQbE/48e9kUD5356SklQ=
+X-Gm-Message-State: AOJu0Yw6/rtaMBsXt8jIye/nFoLEzyCpBW9RR4NC7kTh4xe9Ap1VasYm
+	r6fiR/y6agY5ZvtyvCviysE8S95jPePxyPRZh627NUCvuPhH9nSqVT62F5lu
+X-Google-Smtp-Source: AGHT+IGOqsEaK+2y45ypFvHz4TTp8bcBZzle58Y0shZtw1GwNhmzeCDfT1cyj5rgRfL+WDXf0Je9nQ==
+X-Received: by 2002:a05:690c:7484:b0:627:e43f:7dd4 with SMTP id 00721157ae682-658f0fb3102mr32165237b3.45.1720528755799;
+        Tue, 09 Jul 2024 05:39:15 -0700 (PDT)
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-658e5310f3asm3223167b3.69.2024.07.09.05.39.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jul 2024 05:39:15 -0700 (PDT)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-65465878c1fso40646837b3.2;
+        Tue, 09 Jul 2024 05:39:15 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUOaryIGf9tnrdkzSkLaCz0hL64DAyHP5jdC8G9t/Ef+GD3svO23sxXyh2B/u+ky7u9h4edYCTpzss1NnVtI7K84HQIsU7GEOtnzZN8IWeHpdfEkgwM9VA/Y3ChUGNKv++CNZloqADC8oo=
+X-Received: by 2002:a0d:c686:0:b0:64b:7859:a92f with SMTP id
+ 00721157ae682-658ee790bf9mr26399557b3.5.1720528755101; Tue, 09 Jul 2024
+ 05:39:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4312:EE_|MN2PR10MB4397:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6dfd0d65-a2c4-4cce-5060-08dca00d705e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: 
-	=?utf-8?B?ejI3bTVVVVVMZ3NGVHJLMkhVbVJvcjgxZUtmYmVsWm85VHhodjRvTzRLM3lY?=
- =?utf-8?B?NndCa1ZtSHN1cnZaV1oyQW0zcGhMNE9WekUzSUNtT2xlNTM0OVBIRTcraXg0?=
- =?utf-8?B?SHR4WW9Qd3Jvb3d4eFlnSTlOSjc1YWd0QWc3OGVpT0tFcnJnUi9wTm03VjBm?=
- =?utf-8?B?aFlSeCtyWTE4TWVUVXNrdVp2TWNZZXN5TExUNkdVNGt3ZVIxeVBab1F2Sm85?=
- =?utf-8?B?RVJTOHZOUUplelBNNno3QzNKQndtZTNWT1VuekJtRU0zS3ZtSzhwTEhFeTIy?=
- =?utf-8?B?T0RlQTdpblQ5Sm1Tb2tTdG02VjlXQmx6V05aakJRVExaMUwyZ0hJd01nek56?=
- =?utf-8?B?aFJZK3lTY1IwSEJ2MGdKcC9rU2FMNVZmenI0UXpKbXdCUEs2enY5emg0RGxU?=
- =?utf-8?B?WXZNYllwaFA0bG95TzdOOEJNU2VXMnNlbjVueVByVEdldkt0NE1NeVJsQ05x?=
- =?utf-8?B?N2Njbm90MllLR0VMS0hBbXJUdkdMTXJEa0tWVjJaeXhOMUJBTytiQy92R3VU?=
- =?utf-8?B?aFNaUzdBQksyREEvZFJONHRzZW1uNXhMcXc1VWZ1aXZ5SFJNcFdXQUwzWnlB?=
- =?utf-8?B?UWVCaHRyN0ZuclBBQjdMUG5oZngvNWRvbkVWb21DUDNaSTlRbHNPYWF4emFl?=
- =?utf-8?B?MjJjWEFSNnNXaFlDOEdUQ1QvTEdWOTJ0QmpQWHZ3c3N5UFE0RVJBak96cWxJ?=
- =?utf-8?B?Uk8xeUpxYmt5UWc5UnAvYXFqeERUN0cwclhJZUdvWVdaUWRscWVTSlVVeGdJ?=
- =?utf-8?B?cHAyd3piMW0rQzdkSTg4WGc2RFYvMjVNdzh3emlGZjBDYzJLOWE3WnRjZzRu?=
- =?utf-8?B?anRNWUlHOU0ycFNJa01aNmdQcjZrY0J4Skk4cEVXcnZPSkZvd3ViUm1aNU5V?=
- =?utf-8?B?UW95d0J4cHE5clFqMXlGZklqTGllT1J4MFg2aW1iTE5XS3BKWHFteDR3aHZu?=
- =?utf-8?B?WTlMMktNaWJVS0FsSUVEcGU2L2VMZzFWelVNd3RDOUVFUU8zVVFsKy93RWRK?=
- =?utf-8?B?MWFwNlBwVSt4b0RVYU42NEZGME5jQnA3ZVFodks4b0poOEVKUnphRG9SQWV4?=
- =?utf-8?B?VXpBMlFSNUpwY2trT29vangweGo3dlZqckpDL1ZERlhqN0N3WWprZ2tQM1k2?=
- =?utf-8?B?VHVKanBoMHZyVHpaZFpqRUxQOEVYZEJDck5aSG9yK293dkdVd01uZENnSzVZ?=
- =?utf-8?B?S1hHWEs0QXljRmRLSHdmK3pobzJIZGs0Snk1V21JTjh6ZjZCN0tUaStXbVAz?=
- =?utf-8?B?R2tpbWdpckhYNjM5ak5VRFN0OHRCRlhybUp4SXVvSDA3elNjMTdiQ1lPalBj?=
- =?utf-8?B?bVgyOHBPdTVpZHg4RDVKeSt6bkpBamR4UXN3WHhPc2xTdmV6UjE4anppVG9o?=
- =?utf-8?B?QTJsL1VucjNZaG54aE92TTIrYzNzNC82NWtTRlliZEFQd3FXR3lvM2JGWU1w?=
- =?utf-8?B?cGVOb3QxNVB3eVQxc3FwNkVaVGYxeC8xRGhNcDczQ1VjSkZhOVhKZS93RVVy?=
- =?utf-8?B?SFRlZFdBeEdkUHBmdlBrdWFocTRXeGZUS1Fvb0dCQ1hab0tGS2MxNUVkd1U0?=
- =?utf-8?B?cTcyUDVCUXFvS2krMUhqb1FwQW4wdEZiM2t0S0ljQStmUnY4VHVwU3JLWExR?=
- =?utf-8?B?em9pb1BoSi9MZElMeGpWN0dHazg3d0NtK2w3ekJ5UW4rdkEzcmJQSVdVZ0tS?=
- =?utf-8?B?VHlvOG8wbnByZDF4OHlSaUQraGNtY1JFTU5EMXFFcElJYTJTWlpqdXBTWGl0?=
- =?utf-8?B?bm9LVE5VUU5udnJDOVJhUDl3S0ZYb2dWWjVQc0hNZGVvWlk1dGlzUzgzc2Ru?=
- =?utf-8?B?eWlhZFhlK2VnY1k2N1lZUT09?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4312.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?QVB5UzRWK0x2Q0dFNkNESGtWTGpKMDNiMEgvVHhnUVNYT2ozbE9lWjNGQXpR?=
- =?utf-8?B?YUhQTXowa3dvMXRGOEpmbjFwVlh0bk4rbnFPNTdUK2ZqVFVGQkdxYWpnQklW?=
- =?utf-8?B?c001eDM0NmhRU3RDSGZEZ2dNOGhrcFAwOHdvWkV6T1l6d3JnUVNyZ2REM3Uz?=
- =?utf-8?B?WlMvdzdnVUJmRUZzYm9VSUo1ajhPUTFLdE1HTCtNeUFZYUJ4YlVwN1pjQVVj?=
- =?utf-8?B?cW15dWQ0TmU1OGt3b3dxZXY5UDlOaWltL0F0a0h1MEh4Y01kVmdoN0RJKzhC?=
- =?utf-8?B?MjBSNERoYWhzNHh1VUJpd1JFY2krcFRaQUhDQ0JZdUx4SUUrUG1CdGF0NE1I?=
- =?utf-8?B?WTVtZjBtSG9RUEdSYzM4OVFsc2NGcDF0SElkSVU5bWppR0FyMU0rbE1PN1Ax?=
- =?utf-8?B?TXlzNEtwenc3aE5GV25weU5NaHBOMmsrd1luZ2dLblpZRUNjdTBvZVRVdHFD?=
- =?utf-8?B?aWRtWW14aVhxQ2RMaldjK1dpUDZzbm0yREI3WWRLQk9UWnFPSnhGYmcvT3dR?=
- =?utf-8?B?K0l5cHBBektwMzRaM2VkOGZJS0VlK3gxaERkYWpLVUxpYTNFN04vQzFUSk1B?=
- =?utf-8?B?QWVwYW0zd2J4MkVhN0tPbkI4dXRRS0Vaa21XOWVMUkRoU0VBbWdVK3kxdGN3?=
- =?utf-8?B?eHFGaEZFUE1CbnhQWVpVbmJOQ0lFUGwxYmROOHdvRTRYSlFXNHVYZGl2QTY3?=
- =?utf-8?B?NTNJUVNvREp6KzJWdThnb1NpNTFDQ2NNeWpITWdobzdvbVU2NndRM2FWVjlC?=
- =?utf-8?B?bU40bnN5Z3d5dzU2Rm92c2FPNFNGL0FOOWoxdzZGcFhGbjNjOWVrZTcyV3Zk?=
- =?utf-8?B?OHFmNGdPSDE3WnhLVnludmczTFRTUzRBdmk0MC9tOFJXdllVbkg2bXc1bXFU?=
- =?utf-8?B?aXd0R25FME14OVZpTFBOK1BKL3hCTmJUVCtpQ0RCVFNiRVNxNEw2aWIyR0ZF?=
- =?utf-8?B?MWlIRmgyQkVIQy9sNW0yc3EzWmY5L0NHdjlLTGZVQVlKTUNMODdoVHZxUHIr?=
- =?utf-8?B?TzFsWG9ObDg5am5xbHViT2wvanlPcCtMYTc2b1phL1gwRHBWZ3pLVUNjL2Yr?=
- =?utf-8?B?RVQyemJDMUNyN3JtM1M3SlJ0RmNXdEpBZWprQUlGZDhjT3VqckpkOVlmSU9J?=
- =?utf-8?B?eHZtVHltb1YxUVRNSTh4R01vVE16YXcycUhDbE5raGdzM2Q0UER0SU11bklw?=
- =?utf-8?B?NGV2NDdwcEw1WFE3TkFmUDNEY2VDRGtSYzhEUmg4K1FUTkZvQkZzVGRmWXBh?=
- =?utf-8?B?OU5Wc2RyajdPbU94eHRlSmdmM0xtT0hkTmVybDNpb1FoY1orOVg4TlUzakRS?=
- =?utf-8?B?VkhtVzFxTGxoTEYzWE11VG96V1pyY0ZhK3VUWWcyS2MrcmhXV3JQMUpnMDdq?=
- =?utf-8?B?ZnNLV1c3eEVCMkRhbXRDR3BBNEpTRHBlaWZUSWJRVXdHQjZKS0dBblN1cWt4?=
- =?utf-8?B?b0FKMXd3SmJFQlNiQjJ4QjlWSTc1c3R0UktpMTRtN01SbmRSVWR5Y2s2NDM5?=
- =?utf-8?B?VVNJRnpHNlE0ZytQeDM3ck1mYmhOQTFSQ3E2c1g3SVQ4UGtNQWQ1eVFCaG1Z?=
- =?utf-8?B?N2lqVVozQkZLc2szZ2xyOG1WSW9yT1E4aTRuN21NWnJ1dzJvUm1XOGFPQ2Y2?=
- =?utf-8?B?L1NhWnhtcVIxZ1ZJNXVGS0s1bG5rUk1tY1lwRmttcUJYSnZEN3BBNmNBY2x3?=
- =?utf-8?B?SEh2RVJlNmxWaVM0UTkwR0E2V25iLzNDZFBRK2VLNHh4Y3V3UUlUaXdlUlVq?=
- =?utf-8?B?WTA5b1ZrYk13WE9mU3dlOFp0Z0tEVkJvaWlzbzcwZnBjWjdTOGFiRlk5aWdq?=
- =?utf-8?B?cXRrdCtMaHg4NzhSYnlEemlsSXNYTDlhK293cEd1WTJ0MXRrbllxeS90RlpL?=
- =?utf-8?B?eWtmaGt5T1NTVWNzTW9LTFZvOWtteWZia1EvR213eERXOWk0M1YxRnFRZzVT?=
- =?utf-8?B?TmN0ZUlZM0ZZVktRRFliWVBXVVJ6NGRBMTREK1NCNkNhVnNmZGkrdzdtc1Jw?=
- =?utf-8?B?WEVZOWhwSFgwTVdpVGZTcUNXMk91bFI5YUVyeE0wNENQVE44MFlMbjl6RHZD?=
- =?utf-8?B?aDkwRVZ1NmpMTmluVkVIZExtdzB5VlF1anN0VHI5R1lSU2gycmQ4ajJveWVX?=
- =?utf-8?B?eTMwRXZGZmtSZmNrZ1JYbUFvUU9JLzRlN0FtZlhLeHpKRk1tRGdjOWsyTVhi?=
- =?utf-8?B?VUE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	LuDJGc1xE8NAXPV3BInjD5+HN2KJPuODY18SLLZYOxOxyHkIGuCj6FmKqawxwzmH+X6wwIv+TlkzWgrdZk/b9+kvvG3QsKsmWc00Zo91ea/02K8Ev45qvrOYiodTUQgdgKpWWirXyZBs84z0x1fJuppHOa+4w8xbQyva4Iq4RnM82DFQi0w47tHAr1/S0IOMNqTwa8yOFfl0NwnUM9szfGiMC+8ad2YO4fIpdp1nud4N6nuz1NUb0WHwPcfArU4RUwwsL791hHQbeUMRs09dovgnCsGFsvy7hZszIubAFZ5heA2N9FjNNqm6PZFlIsCCpyL/aoUgSl/UlK2hTblyKttnWd00moXAzzG/LXmCZJuxcB/teu+RCx8g84CP+beRc7wrHPUoYo562hdtQZVOR7LoHF/poTbP/XS+CjTosQ6djGh9m9+yIcQQ9RO1Zu7iBEMdfc5xgyg4i9XOytbR8myQ7tTeRJUhTT8FBJv/200AM6jGJKAbylp52Ro+aSPYx+eYBX0mK6d/kogiy5QbekxSHmbjdCdB9kLFGH/3G1PkAbfxM+1H/3Hyj3EpYGnJH383XgbTsvAsXEhmiFDMQlv6wG8KVOXuKeWZ8Ci8kIo=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6dfd0d65-a2c4-4cce-5060-08dca00d705e
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4312.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2024 11:51:16.3563
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zV88b3F0HADT2F38r0luQNZMyLs9435NkhgaTizPkLkjY+DjT5aniGRCFfmk80ybYVxlcMjcMguzGp7dgNjpgQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4397
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-09_02,2024-07-09_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 adultscore=0 suspectscore=0
- malwarescore=0 spamscore=0 phishscore=0 mlxlogscore=788 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2406180000
- definitions=main-2407090079
-X-Proofpoint-GUID: TkmMDztmzY0oDpKUYbah3n5CjsKjQyVG
-X-Proofpoint-ORIG-GUID: TkmMDztmzY0oDpKUYbah3n5CjsKjQyVG
+References: <20240706075228.2350978-1-hch@lst.de> <20240706075228.2350978-3-hch@lst.de>
+In-Reply-To: <20240706075228.2350978-3-hch@lst.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 9 Jul 2024 14:39:02 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdV95g78=2GmLP95Kn3_0DL5zVuv2KCDYVsk8D2gNnu7SQ@mail.gmail.com>
+Message-ID: <CAMuHMdV95g78=2GmLP95Kn3_0DL5zVuv2KCDYVsk8D2gNnu7SQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] block: pass a phys_addr_t to get_max_segment_size
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-m68k@lists.linux-m68k.org, 
+	linux-block@vger.kernel.org, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09/07/2024 12:23, Christoph Hellwig wrote:
->> +enum {
->> +	/* drive already may have started this one */
->> +	RQF_STARTED		=	((__force req_flags_t)(1 << 0)),
-> 
-> Last time I tried to mix __bitwise and enums sparse was very unhappy.
-> Did this get fixed?
+Hi Christoph,
 
-For me, sparse only complains about RQF_MAX, which is added later.
+On Sat, Jul 6, 2024 at 9:52=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrote=
+:
+> Work on a single address to simplify the logic, and prepare the callers
+> from using better helpers.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-But, as I noted, I think that needs to change to a bit count from a flag 
-anyway. I am not sure how that would look, maybe:
+Thanks for your patch, which is now commit 09595e0c9d654743 ("block:
+pass a phys_addr_t to get_max_segment_size") in block/for-next
 
-enum {
+This is causing the following crash on landisk when starting
+a Debian userspace:
 
-	RQF_STARTED_BIT = 0,
+Run /sbin/init as init process
+process '/sbin/init' started with executable stack
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1 at block/blk-merge.c:607 __blk_rq_map_sg+0x74/0x240
+Modules linked in:
 
-	...
-	RQF_MAX_BITS
+CPU: 0 PID: 1 Comm: init Not tainted 6.10.0-rc3-landisk-00178-g09595e0c9d65=
+ #228
+PC is at __blk_rq_map_sg+0x74/0x240
+PR is at __blk_rq_map_sg+0x1ee/0x240
+PC  : 8c1d58f8 SP  : 8c825bec SR  : 40008100 TEA : 295ce8b0
+R0  : 00000002 R1  : 00000002 R2  : fffffffe R3  : 8c1fc2a0
+R4  : 8c825c0c R5  : 8c825c00 R6  : 00000000 R7  : 00000001
+R8  : 8cb2c040 R9  : 8c825c50 R10 : 00000000 R11 : 00000003
+R12 : 00000000 R13 : 8cb2c158 R14 : 00000000
+MACH: 0000565d MACL: 00000000 GBR : 00000000 PR  : 8c1d5a72
 
-};
+Call trace:
+ [<8c26a1c8>] scsi_alloc_sgtables+0xb8/0x1ac
+ [<8c2736aa>] sd_init_command+0x2a2/0x70a
+ [<8c03a910>] irqd_irq_disabled.isra.0+0x0/0xc
+ [<8c26b296>] scsi_queue_rq+0x512/0x634
+ [<8c1db0d0>] blk_mq_dispatch_rq_list+0x1c8/0x358
+ [<8c1dac28>] blk_mq_get_driver_tag+0x0/0x14
+ [<8c20ef8e>] sbitmap_get+0x5a/0x78
+ [<8c1dab01>] blk_mq_dequeue_from_ctx+0xd/0x64
+ [<8c1deaf6>] __blk_mq_sched_dispatch_requests+0x24a/0x38c
+ [<8c1dec9a>] blk_mq_sched_dispatch_requests+0x22/0x50
+ [<8c1d86fa>] blk_rq_is_passthrough.isra.0+0x0/0xc
+ [<8c1dec78>] blk_mq_sched_dispatch_requests+0x0/0x50
+ [<8c1de8ac>] __blk_mq_sched_dispatch_requests+0x0/0x38c
+ [<8c1da158>] blk_mq_run_hw_queue+0xc8/0xf8
+ [<8c1db3d4>] blk_mq_flush_plug_list+0x174/0x28c
+ [<8c1d86fa>] blk_rq_is_passthrough.isra.0+0x0/0xc
+ [<8c1d1e32>] __blk_flush_plug+0x3e/0xd8
+ [<8c0025d8>] arch_local_irq_restore+0x0/0x24
+ [<8c071838>] arch_local_irq_save+0x0/0x24
+ [<8c071a0c>] readahead_folio+0x0/0x60
+ [<8c1d1ee4>] blk_finish_plug+0x18/0x30
+ [<8c0025d8>] arch_local_irq_restore+0x0/0x24
+ [<8c071838>] arch_local_irq_save+0x0/0x24
+ [<8c071a0c>] readahead_folio+0x0/0x60
+ [<8c071ada>] read_pages+0x4c/0x106
+ [<8c071c26>] page_cache_ra_unbounded+0x92/0x14c
+ [<8c06c37c>] filemap_fault+0x2c8/0x43c
+ [<8c087d30>] __do_fault+0x1c/0x6c
+ [<8c08b0cc>] handle_mm_fault+0x588/0x780
+ [<8c00cb14>] do_page_fault+0x10c/0x1a0
+ [<8c006108>] ret_from_exception+0x0/0xc
+ [<8c006108>] ret_from_exception+0x0/0xc
+ [<8c006108>] ret_from_exception+0x0/0xc
 
-and then use a macro to define RQF_STARTED as ((__force 
-req_flags_t)(RQF_STARTED_BIT  << 0))
+---[ end trace 0000000000000000 ]---
+------------[ cut here ]------------
+kernel BUG at drivers/scsi/scsi_lib.c:1160!
+Kernel BUG: 003e [#1]
+Modules linked in:
 
-But do you remember how you generated the sparse warning specifically?
+CPU: 0 PID: 1 Comm: init Tainted: G        W
+6.10.0-rc3-landisk-00178-g09595e0c9d65 #228
+PC is at scsi_alloc_sgtables+0x144/0x1ac
+PR is at scsi_alloc_sgtables+0xb8/0x1ac
+PC  : 8c26a254 SP  : 8c825c50 SR  : 40008100 TEA : 295ce8b0
+R0  : 00000003 R1  : 00000002 R2  : 8cb2c180 R3  : 000000bc
+R4  : 8c825c0c R5  : 8c825c00 R6  : 00000000 R7  : 00000000
+R8  : 8cb2c09c R9  : 8cb4cafc R10 : 8c51b12c R11 : 8cb2c118
+R12 : 8cb2c000 R13 : 00000000 R14 : 00000003
+MACH: 0000565d MACL: 00000000 GBR : 00000000 PR  : 8c26a1c8
 
-> 
+Call trace:
+ [<8c2736aa>] sd_init_command+0x2a2/0x70a
+ [<8c03a910>] irqd_irq_disabled.isra.0+0x0/0xc
+ [<8c26b296>] scsi_queue_rq+0x512/0x634
+ [<8c1db0d0>] blk_mq_dispatch_rq_list+0x1c8/0x358
+ [<8c1dac28>] blk_mq_get_driver_tag+0x0/0x14
+ [<8c20ef8e>] sbitmap_get+0x5a/0x78
+ [<8c1dab01>] blk_mq_dequeue_from_ctx+0xd/0x64
+ [<8c1deaf6>] __blk_mq_sched_dispatch_requests+0x24a/0x38c
+ [<8c1dec9a>] blk_mq_sched_dispatch_requests+0x22/0x50
+ [<8c1d86fa>] blk_rq_is_passthrough.isra.0+0x0/0xc
+ [<8c1dec78>] blk_mq_sched_dispatch_requests+0x0/0x50
+ [<8c1de8ac>] __blk_mq_sched_dispatch_requests+0x0/0x38c
+ [<8c1da158>] blk_mq_run_hw_queue+0xc8/0xf8
+ [<8c1db3d4>] blk_mq_flush_plug_list+0x174/0x28c
+ [<8c1d86fa>] blk_rq_is_passthrough.isra.0+0x0/0xc
+ [<8c1d1e32>] __blk_flush_plug+0x3e/0xd8
+ [<8c0025d8>] arch_local_irq_restore+0x0/0x24
+ [<8c071838>] arch_local_irq_save+0x0/0x24
+ [<8c071a0c>] readahead_folio+0x0/0x60
+ [<8c1d1ee4>] blk_finish_plug+0x18/0x30
+ [<8c0025d8>] arch_local_irq_restore+0x0/0x24
+ [<8c071838>] arch_local_irq_save+0x0/0x24
+ [<8c071a0c>] readahead_folio+0x0/0x60
+ [<8c071ada>] read_pages+0x4c/0x106
+ [<8c071c26>] page_cache_ra_unbounded+0x92/0x14c
+ [<8c06c37c>] filemap_fault+0x2c8/0x43c
+ [<8c087d30>] __do_fault+0x1c/0x6c
+ [<8c08b0cc>] handle_mm_fault+0x588/0x780
+ [<8c00cb14>] do_page_fault+0x10c/0x1a0
+ [<8c006108>] ret_from_exception+0x0/0xc
+ [<8c006108>] ret_from_exception+0x0/0xc
+ [<8c006108>] ret_from_exception+0x0/0xc
 
+Process: init (pid: 1, stack limit =3D (ptrval))
+Stack: (0x8c825c50 to 0x8c826000)
+5c40:                                     8cb2c180 c4b8bd37 8c2736aa 8cb2c0=
+00
+5c60: 00000001 00000000 8c93e800 00000088 0008d350 8cb2c09c 8cb25200 8c03a9=
+10
+5c80: 8c807840 8cb4c800 8cb28600 00000088 00080700 00000000 00000020 8c26b2=
+96
+5ca0: 8cb2c118 8cb2c11c 8cb4c800 8c93e800 8cb2c000 8cb4c800 8cb2c09c 8cb2c1=
+3c
+5cc0: 8c93e800 00000003 8cb28014 8cb4cafc 8cb29000 8c825d20 8cb4c8fc 8c1db0=
+d0
+5ce0: 00000000 8c1dac28 8cb2c034 8cb25100 8cb2c000 8cb25100 8c825d5c 000000=
+00
+5d00: 8c20ef8e 8c825d20 00000000 00000000 ffffffff 00000000 00000000 8cb290=
+00
+5d20: 8cb2c000 8c1dab01 c4b8bd37 8c1deaf6 00000000 00000002 8cb28c00 000000=
+00
+5d40: 00000001 8c825d5c 8cb25100 00000000 fffede60 8c825d54 8c825d54 8c825d=
+5c
+5d60: 8c825d5c 8cb2c000 8cb29000 c4b8bd37 8c1dec9a 00000000 8c1d86fa 8cb251=
+40
+5d80: 8c1dec78 00000000 8c1de8ac 8cb25100 8c1da158 8cb25100 8c93e8a0 8c1db3=
+d4
+5da0: 8c1d86fa 8cb25140 8cb2c034 8cb25100 8c825dd0 8c825e2c 00000000 8ff766=
+6c
+5dc0: 00000000 8c825dcc 8cb25100 00000000 8c825dd0 8c825dd0 c4b8bd37 8c1d1e=
+32
+5de0: 8c0025d8 8c071838 8c071a0c 00000000 8c51b12c 8c825e44 8c825e2c 000000=
+01
+5e00: 8c825e10 c4b8bd37 8c1d1ee4 8c0025d8 8c071838 8c071a0c 8c51b12c 00112c=
+ca
+5e20: 00000000 8c825eac 8c071ada 00000000 00000000 ce7eb754 00000002 000000=
+01
+5e40: 00110100 8c825e44 8c825e44 c4b8bd37 8c071c26 00000011 8c825eac 8cb95c=
+ec
+5e60: 0000002a 00112cca 8cb95ce0 8ff8cb20 0000003a 00000011 00402100 000000=
+08
+5e80: 8c06c37c 0000003a 8cb95ce0 8cb95ce0 8ca56280 8c825f18 8ca56280 8ca562=
+c0
+5ea0: 00000000 8ca56280 8cb95c0c 8ca56280 8cb95ce0 8ca562c0 0000003b 000000=
+00
+5ec0: 00000000 00000000 00000000 c4b8bd37 8c087d30 01000000 00000000 00000d=
+73
+5ee0: 295ce8b0 8cbc81f8 8c825f18 8cbc81f8 8c08b0cc 00000001 8ff8c900 8cbc81=
+f8
+5f00: ffffffff 8c931784 295ce000 00000255 8c825fa4 00000040 8cbc81f8 00100c=
+ca
+5f20: 0000003a 295ce000 295ce8b0 00000a55 8cc06294 8cc06294 00000000 8ff8c9=
+00
+5f40: 00000000 00000000 8c9317ac 00000000 c4b8bd37 8c00cb14 01000000 8c825f=
+e4
+5f60: 295ce8b0 00000255 00000001 8c825fa4 00000001 00000812 0000003a 8c9317=
+80
+5f80: 00000001 8c006108 7bb436b4 295d8de4 29581000 295ce8b0 8c006108 8c0061=
+08
+5fa0: 00000001 00000007 00000000 0000f686 000000ea 295ce8b0 00000000 000000=
+00
+5fc0: 295ce8b0 295cf000 7bb43668 29581a58 295ce8b0 29581000 295d8de4 7bb436=
+b4
+5fe0: 7bb43650 2956c3d8 2955cd1a 00008000 00000000 0000002c 00000030 ffffff=
+ff
+---[ end trace 0000000000000000 ]---
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1 at kernel/exit.c:823 do_exit+0x68/0x704
+Modules linked in:
+
+CPU: 0 PID: 1 Comm: init Tainted: G      D W
+6.10.0-rc3-landisk-00178-g09595e0c9d65 #228
+PC is at do_exit+0x68/0x704
+PR is at do_exit+0x5c/0x704
+PC  : 8c011a2c SP  : 8c825b5c SR  : 40008100 TEA : 295ce8b0
+R0  : 00000040 R1  : 8c825e2c R2  : 40008100 R3  : 00000000
+R4  : 00000000 R5  : ffd0b128 R6  : 00000000 R7  : 00000001
+R8  : 8c822000 R9  : 8c010da4 R10 : 8c8222fc R11 : 8c010d94
+R12 : 0000000b R13 : 8c3b4d70 R14 : 00000003
+MACH: 00000244 MACL: 0000afa8 GBR : 00000000 PR  : 8c011a20
+
+Call trace:
+ [<8c035e60>] vprintk_emit+0xc0/0x13c
+ [<8c3b4d70>] _printk+0x0/0x48
+ [<8c0121a2>] make_task_dead+0xda/0x130
+ [<8c3b4d70>] _printk+0x0/0x48
+ [<8c003ede>] die+0xde/0x14c
+ [<8c1fce6c>] bust_spinlocks+0x0/0x38
+ [<8c0025d8>] arch_local_irq_restore+0x0/0x24
+ [<8c0040f8>] bug_trap_handler+0x8c/0xc8
+ [<8c26a254>] scsi_alloc_sgtables+0x144/0x1ac
+ [<8c0061be>] debug_trap+0xe/0x18
+ [<8c00406c>] bug_trap_handler+0x0/0xc8
+ [<8c26a254>] scsi_alloc_sgtables+0x144/0x1ac
+ [<8c26a1c8>] scsi_alloc_sgtables+0xb8/0x1ac
+ [<8c2736aa>] sd_init_command+0x2a2/0x70a
+ [<8c03a910>] irqd_irq_disabled.isra.0+0x0/0xc
+ [<8c26b296>] scsi_queue_rq+0x512/0x634
+ [<8c1db0d0>] blk_mq_dispatch_rq_list+0x1c8/0x358
+ [<8c1dac28>] blk_mq_get_driver_tag+0x0/0x14
+ [<8c20ef8e>] sbitmap_get+0x5a/0x78
+ [<8c1dab01>] blk_mq_dequeue_from_ctx+0xd/0x64
+ [<8c1deaf6>] __blk_mq_sched_dispatch_requests+0x24a/0x38c
+ [<8c1dec9a>] blk_mq_sched_dispatch_requests+0x22/0x50
+ [<8c1d86fa>] blk_rq_is_passthrough.isra.0+0x0/0xc
+ [<8c1dec78>] blk_mq_sched_dispatch_requests+0x0/0x50
+ [<8c1de8ac>] __blk_mq_sched_dispatch_requests+0x0/0x38c
+ [<8c1da158>] blk_mq_run_hw_queue+0xc8/0xf8
+ [<8c1db3d4>] blk_mq_flush_plug_list+0x174/0x28c
+ [<8c1d86fa>] blk_rq_is_passthrough.isra.0+0x0/0xc
+ [<8c1d1e32>] __blk_flush_plug+0x3e/0xd8
+ [<8c0025d8>] arch_local_irq_restore+0x0/0x24
+ [<8c071838>] arch_local_irq_save+0x0/0x24
+ [<8c071a0c>] readahead_folio+0x0/0x60
+ [<8c1d1ee4>] blk_finish_plug+0x18/0x30
+ [<8c0025d8>] arch_local_irq_restore+0x0/0x24
+ [<8c071838>] arch_local_irq_save+0x0/0x24
+ [<8c071a0c>] readahead_folio+0x0/0x60
+ [<8c071ada>] read_pages+0x4c/0x106
+ [<8c071c26>] page_cache_ra_unbounded+0x92/0x14c
+ [<8c06c37c>] filemap_fault+0x2c8/0x43c
+ [<8c087d30>] __do_fault+0x1c/0x6c
+ [<8c08b0cc>] handle_mm_fault+0x588/0x780
+ [<8c00cb14>] do_page_fault+0x10c/0x1a0
+ [<8c006108>] ret_from_exception+0x0/0xc
+ [<8c006108>] ret_from_exception+0x0/0xc
+ [<8c006108>] ret_from_exception+0x0/0xc
+
+---[ end trace 0000000000000000 ]---
+Kernel panic - not syncing: Attempted to kill init! exitcode=3D0x0000000b
+Rebooting in 10 seconds..
+
+Other people seem to have run into similar issues
+https://lore.kernel.org/all/58a667c3-e884-4fa0-9855-3a73a1880260@nvidia.com=
+/
+
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -209,23 +209,22 @@ static inline unsigned get_max_io_size(struct bio *=
+bio,
+>  /**
+>   * get_max_segment_size() - maximum number of bytes to add as a single s=
+egment
+>   * @lim: Request queue limits.
+> - * @start_page: See below.
+> - * @offset: Offset from @start_page where to add a segment.
+> + * @paddr: address of the range to add
+> + * @max_len: maximum length available to add at @paddr
+>   *
+> - * Returns the maximum number of bytes that can be added as a single seg=
+ment.
+> + * Returns the maximum number of bytes of the range starting at @paddr t=
+hat can
+> + * be added to a single segment.
+>   */
+>  static inline unsigned get_max_segment_size(const struct queue_limits *l=
+im,
+> -               struct page *start_page, unsigned long offset)
+> +               phys_addr_t paddr, unsigned int len)
+>  {
+> -       unsigned long mask =3D lim->seg_boundary_mask;
+> -
+> -       offset =3D mask & (page_to_phys(start_page) + offset);
+> -
+>         /*
+>          * Prevent an overflow if mask =3D ULONG_MAX and offset =3D 0 by =
+adding 1
+>          * after having calculated the minimum.
+>          */
+> -       return min(mask - offset, (unsigned long)lim->max_segment_size - =
+1) + 1;
+> +       return min_t(unsigned long, len,
+> +               min(lim->seg_boundary_mask - (lim->seg_boundary_mask & pa=
+ddr),
+> +                   (unsigned long)lim->max_segment_size - 1) + 1);
+>  }
+>
+>  /**
+> @@ -258,9 +257,7 @@ static bool bvec_split_segs(const struct queue_limits=
+ *lim,
+>         unsigned seg_size =3D 0;
+>
+>         while (len && *nsegs < max_segs) {
+> -               seg_size =3D get_max_segment_size(lim, bv->bv_page,
+> -                                               bv->bv_offset + total_len=
+);
+> -               seg_size =3D min(seg_size, len);
+> +               seg_size =3D get_max_segment_size(lim, bvec_phys(bv) + to=
+tal_len, len);
+>
+>                 (*nsegs)++;
+>                 total_len +=3D seg_size;
+> @@ -494,8 +491,8 @@ static unsigned blk_bvec_map_sg(struct request_queue =
+*q,
+>
+>         while (nbytes > 0) {
+>                 unsigned offset =3D bvec->bv_offset + total;
+> -               unsigned len =3D min(get_max_segment_size(&q->limits,
+> -                                  bvec->bv_page, offset), nbytes);
+> +               unsigned len =3D get_max_segment_size(&q->limits, bvec_ph=
+ys(bvec),
+> +                       nbytes);
+>                 struct page *page =3D bvec->bv_page;
+>
+>                 /*
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
