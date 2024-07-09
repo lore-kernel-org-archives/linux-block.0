@@ -1,32 +1,32 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E3E15B999;
-	Tue,  9 Jul 2024 13:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D0B168481
+	for <linux-block@vger.kernel.org>; Tue,  9 Jul 2024 13:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720530270; cv=none; b=MRuPI44NvsXSiqpZ6HEIhDw3UoUy/bNlR6rHRY33i2w87SEWMm7jAWDhPJI3sXvO/64Gc1csaFR2vZ2AAmCJRMX4uZkJgYw3ydOfvDmStEI1pc62HJ+DCDXj4RKE+ojnt7GnukKZ0wHyKOvdogBoVeI9rVrEYCGzmWpnudxTXVw=
+	t=1720530273; cv=none; b=q9YF0UsGUfhbQLeIEIw7FV4zrm5iqcrwyEyJNZexR1sImmtYt8QyzogNezmm4lbPUepLxTEDPD6DmY4D0zh/P+j3PjOWT8z4JJjaoZaE3DUpDcD7pTVK6h7/zuacU1M79xXls9XlnX/7SVZ0aLDa1J73qnlNTjbPvlAH155VUng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720530270; c=relaxed/simple;
-	bh=MXB9GSup0Po66C8x47QE/E0pNqzsIqspqUtvXFptV3o=;
+	s=arc-20240116; t=1720530273; c=relaxed/simple;
+	bh=ISZfsX1sdR8oYMUfg9cddXkliIBzshRgiXFd855cu5M=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GjIlgVaZ9jiWJl8fmsGbAku+KVsSbZtV5koUX6NNPExiyqX0Xv8mOW3J0MZ+W2mLw8wS1n/ujuZy0bqo66TIrdopiEmrwPEkg0RKQwzNR51euDkkZKpyrEbh5iPGp2q6gf4Vphwv3gBJRvlsisTySPD4nrrKX68TS287O3fT/bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xCzrjzcF; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=m2rssFbVoJepPN3PFsPD+9t0LBI3hTD9jMFVnc66sU0U5Q7WXBy+HgRxEtNzjWgVGPZg7wwq3OhxHlXc2f8pX3J1bfKQ874eCtFb35KOeDnIP0MzWUG6WL3+cpjtipLMDyCzyBm/+F5cLtln7DlvQEI4SD7wjitNPcjeaGva/N8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cujlNaFv; arc=none smtp.client-ip=91.218.175.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xCzrjzcF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cujlNaFv"
 X-Envelope-To: axboe@kernel.dk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1720530266;
+	t=1720530270;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P0FkqXu9BeDc2usX+K3ZVx5UWH0yJAYfqo6PPwB3+6I=;
-	b=xCzrjzcF8/q6ycFrCBtNoJ6Ba1FKuJ/f/qWAEZK0w11+vPK2NJGQ3sTRxHmwpTDtY+w/6p
-	se1SBB/mkyLGbgajAAU+csafUdp4Rw0oSAqL2XQWKh0jfndCBwcBFSssv/9xGxkRUyjFjJ
-	vBPF/tpdMKbhy4iTNMD0vm3pmveMcqY=
+	bh=qIq//PVyAZav9RH/O/YvXvb4luJfe+YlS74Qx3jJG5g=;
+	b=cujlNaFvYcbREiHVbZGK1ZduR03z82mwda/PzKcqsUKu7Dl5kxKjxfPRM+ra28RllQqkZI
+	0QtnjXN3qefLz4VJ2ZtV+Pb6t0FBwkcF9nDZLlwJn4+lZMq9AE+lGluYM/sF4vzBb4sRPi
+	vzbu42IT2zfsxzHuRwlT4YwDafyYe0g=
 X-Envelope-To: dan.j.williams@intel.com
 X-Envelope-To: gregory.price@memverge.com
 X-Envelope-To: john@groves.net
@@ -52,9 +52,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-cxl@vger.kernel.org,
 	Dongsheng Yang <dongsheng.yang@linux.dev>
-Subject: [PATCH v1 6/7] cbd: introduce cbd_backend
-Date: Tue,  9 Jul 2024 13:03:42 +0000
-Message-Id: <20240709130343.858363-7-dongsheng.yang@linux.dev>
+Subject: [PATCH v1 7/7] block: Init for CBD(CXL Block Device) module
+Date: Tue,  9 Jul 2024 13:03:43 +0000
+Message-Id: <20240709130343.858363-8-dongsheng.yang@linux.dev>
 In-Reply-To: <20240709130343.858363-1-dongsheng.yang@linux.dev>
 References: <20240709130343.858363-1-dongsheng.yang@linux.dev>
 Precedence: bulk
@@ -66,595 +66,349 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
+As shared memory is supported in CXL3.0 spec, we can transfer data
+via CXL shared memory. CBD means CXL block device, it use CXL shared memory
+to transfer command and data to access block device in different
+host, as shown below:
+
+     +-------------------------------+                               +------------------------------------+
+     |          node-1               |                               |              node-2                |
+     +-------------------------------+                               +------------------------------------+
+     |                               |                               |                                    |
+     |                       +-------+                               +---------+                          |
+     |                       | cbd0  |                               | backend0+------------------+       |
+     |                       +-------+                               +---------+                  |       |
+     |                       | pmem0 |                               | pmem0   |                  v       |
+     |               +-------+-------+                               +---------+----+     +---------------+
+     |               |    cxl driver |                               | cxl driver   |     |   /dev/sda    |
+     +---------------+--------+------+                               +-----+--------+-----+---------------+
+                              |                                            |
+                              |                                            |
+                              |        CXL                         CXL     |
+                              +----------------+               +-----------+
+                                               |               |
+                                               |               |
+                                               |               |
+                                           +---+---------------+-----+
+                                           |   shared memory device  |
+                                           +-------------------------+
+
+any read/write to cbd0 on node-1 will be transferred to node-2 /dev/sda. It works similar with
+nbd (network block device), but it transfer data via CXL shared memory rather than network.
+
 The "cbd_backend" is responsible for exposing a local block device (such
 as "/dev/sda") through the "cbd_transport" to other hosts.
 
 Any host that registers this transport can map this backend to a local
-"cbd device"(such as "/dev/cbd0"). All reads and writes to "cbd0" are
-transmitted through the channel inside the transport to the backend. The handler
+"cbd device"(such as "/dev/cbd0"). All reads and writes to "cbd0" are transmitted
+through the channel inside the transport to the backend. The handler
 inside the backend is responsible for processing these read and write
-requests, converting them into read and write requests corresponding to
-"sda".
+requests, converting them into read and write requests corresponding to "sda".
 
 Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
 ---
- drivers/block/cbd/cbd_backend.c | 296 ++++++++++++++++++++++++++++++++
- drivers/block/cbd/cbd_handler.c | 263 ++++++++++++++++++++++++++++
- 2 files changed, 559 insertions(+)
- create mode 100644 drivers/block/cbd/cbd_backend.c
- create mode 100644 drivers/block/cbd/cbd_handler.c
+ drivers/block/Kconfig        |   2 +
+ drivers/block/Makefile       |   2 +
+ drivers/block/cbd/Kconfig    |  23 ++++
+ drivers/block/cbd/Makefile   |   3 +
+ drivers/block/cbd/cbd_main.c | 224 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 254 insertions(+)
+ create mode 100644 drivers/block/cbd/Kconfig
+ create mode 100644 drivers/block/cbd/Makefile
+ create mode 100644 drivers/block/cbd/cbd_main.c
 
-diff --git a/drivers/block/cbd/cbd_backend.c b/drivers/block/cbd/cbd_backend.c
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 5b9d4aaebb81..1f6376828af9 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -219,6 +219,8 @@ config BLK_DEV_NBD
+ 
+ 	  If unsure, say N.
+ 
++source "drivers/block/cbd/Kconfig"
++
+ config BLK_DEV_RAM
+ 	tristate "RAM block device support"
+ 	help
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index 101612cba303..8be2a39f5a7c 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -39,4 +39,6 @@ obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
+ 
+ obj-$(CONFIG_BLK_DEV_UBLK)			+= ublk_drv.o
+ 
++obj-$(CONFIG_BLK_DEV_CBD)	+= cbd/
++
+ swim_mod-y	:= swim.o swim_asm.o
+diff --git a/drivers/block/cbd/Kconfig b/drivers/block/cbd/Kconfig
 new file mode 100644
-index 000000000000..42c60b1881a8
+index 000000000000..5171ddd9eab8
 --- /dev/null
-+++ b/drivers/block/cbd/cbd_backend.c
-@@ -0,0 +1,296 @@
++++ b/drivers/block/cbd/Kconfig
+@@ -0,0 +1,23 @@
++config BLK_DEV_CBD
++	tristate "CXL Block Device"
++	help
++	  CBD allows you to register a CXL memory device as a CBD transport.
++	  This enables you to expose any block device through this CBD
++	  transport for access by others. Any machine that has registered
++	  the same CXL memory device can see the block devices exposed
++	  through this CBD transport and can map them locally, allowing
++	  remote block devices to be accessed as if they were local block
++	  devices.
++
++	  Select 'y' to build this module directly into the kernel.
++	  Select 'm' to build this module as a loadable kernel module.
++
++	  If unsure say 'N'.
++
++config CBD_CRC
++	bool "Enable CBD checksum"
++	help
++	  When CBD_CRC is enabled, all data sent by CBD will include
++	  a checksum. This includes a data checksum, a submit entry checksum,
++	  and a completion entry checksum. This ensures the integrity of the
++	  data transmitted through the CXL memory device.
+diff --git a/drivers/block/cbd/Makefile b/drivers/block/cbd/Makefile
+new file mode 100644
+index 000000000000..646d087ae058
+--- /dev/null
++++ b/drivers/block/cbd/Makefile
+@@ -0,0 +1,3 @@
++cbd-y := cbd_main.o cbd_transport.o cbd_channel.o cbd_host.o cbd_backend.o cbd_handler.o cbd_blkdev.o cbd_queue.o cbd_segment.o
++
++obj-$(CONFIG_BLK_DEV_CBD) += cbd.o
+diff --git a/drivers/block/cbd/cbd_main.c b/drivers/block/cbd/cbd_main.c
+new file mode 100644
+index 000000000000..bbc268676694
+--- /dev/null
++++ b/drivers/block/cbd/cbd_main.c
+@@ -0,0 +1,224 @@
++/*
++ * Copyright(C) 2024, Dongsheng Yang <dongsheng.yang@linux.dev>
++ */
++
++#include <linux/module.h>
++#include <linux/io.h>
++#include <linux/blk-mq.h>
++#include <linux/blkdev.h>
++#include <linux/kernel.h>
++#include <linux/device.h>
++#include <linux/bio.h>
++#include <linux/module.h>
++#include <linux/blk-mq.h>
++#include <linux/fs.h>
++#include <linux/blkdev.h>
++#include <linux/slab.h>
++#include <linux/idr.h>
++#include <linux/workqueue.h>
++#include <linux/delay.h>
++#include <net/genetlink.h>
++
++#include <linux/types.h>
++
 +#include "cbd_internal.h"
 +
-+static ssize_t backend_host_id_show(struct device *dev,
-+			       struct device_attribute *attr,
-+			       char *buf)
-+{
-+	struct cbd_backend_device *backend;
-+	struct cbd_backend_info *backend_info;
++struct workqueue_struct	*cbd_wq;
 +
-+	backend = container_of(dev, struct cbd_backend_device, dev);
-+	backend_info = backend->backend_info;
-+
-+	if (backend_info->state == cbd_backend_state_none)
-+		return 0;
-+
-+	return sprintf(buf, "%u\n", backend_info->host_id);
-+}
-+
-+static DEVICE_ATTR(host_id, 0400, backend_host_id_show, NULL);
-+
-+static ssize_t backend_path_show(struct device *dev,
-+			       struct device_attribute *attr,
-+			       char *buf)
-+{
-+	struct cbd_backend_device *backend;
-+	struct cbd_backend_info *backend_info;
-+
-+	backend = container_of(dev, struct cbd_backend_device, dev);
-+	backend_info = backend->backend_info;
-+
-+	if (backend_info->state == cbd_backend_state_none)
-+		return 0;
-+
-+	return sprintf(buf, "%s\n", backend_info->path);
-+}
-+
-+static DEVICE_ATTR(path, 0400, backend_path_show, NULL);
-+
-+CBD_OBJ_HEARTBEAT(backend);
-+
-+static struct attribute *cbd_backend_attrs[] = {
-+	&dev_attr_path.attr,
-+	&dev_attr_host_id.attr,
-+	&dev_attr_alive.attr,
-+	NULL
++enum {
++	CBDT_REG_OPT_ERR		= 0,
++	CBDT_REG_OPT_FORCE,
++	CBDT_REG_OPT_FORMAT,
++	CBDT_REG_OPT_PATH,
++	CBDT_REG_OPT_HOSTNAME,
 +};
 +
-+static struct attribute_group cbd_backend_attr_group = {
-+	.attrs = cbd_backend_attrs,
++static const match_table_t register_opt_tokens = {
++	{ CBDT_REG_OPT_FORCE,		"force=%u" },
++	{ CBDT_REG_OPT_FORMAT,		"format=%u" },
++	{ CBDT_REG_OPT_PATH,		"path=%s" },
++	{ CBDT_REG_OPT_HOSTNAME,	"hostname=%s" },
++	{ CBDT_REG_OPT_ERR,		NULL	}
 +};
 +
-+static const struct attribute_group *cbd_backend_attr_groups[] = {
-+	&cbd_backend_attr_group,
-+	NULL
-+};
-+
-+static void cbd_backend_release(struct device *dev)
++static int parse_register_options(
++		char *buf,
++		struct cbdt_register_options *opts)
 +{
-+}
++	substring_t args[MAX_OPT_ARGS];
++	char *o, *p;
++	int token, ret = 0;
 +
-+const struct device_type cbd_backend_type = {
-+	.name		= "cbd_backend",
-+	.groups		= cbd_backend_attr_groups,
-+	.release	= cbd_backend_release,
-+};
++	o = buf;
 +
-+const struct device_type cbd_backends_type = {
-+	.name		= "cbd_backends",
-+	.release	= cbd_backend_release,
-+};
-+
-+void cbdb_add_handler(struct cbd_backend *cbdb, struct cbd_handler *handler)
-+{
-+	mutex_lock(&cbdb->lock);
-+	list_add(&handler->handlers_node, &cbdb->handlers);
-+	mutex_unlock(&cbdb->lock);
-+}
-+
-+void cbdb_del_handler(struct cbd_backend *cbdb, struct cbd_handler *handler)
-+{
-+	mutex_lock(&cbdb->lock);
-+	list_del_init(&handler->handlers_node);
-+	mutex_unlock(&cbdb->lock);
-+}
-+
-+static struct cbd_handler *cbdb_get_handler(struct cbd_backend *cbdb, u32 seg_id)
-+{
-+	struct cbd_handler *handler, *handler_next;
-+	bool found = false;
-+
-+	mutex_lock(&cbdb->lock);
-+	list_for_each_entry_safe(handler, handler_next,
-+				 &cbdb->handlers, handlers_node) {
-+		if (handler->channel.seg_id == seg_id) {
-+			found = true;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&cbdb->lock);
-+
-+	if (found)
-+		return handler;
-+
-+	return NULL;
-+}
-+
-+static void state_work_fn(struct work_struct *work)
-+{
-+	struct cbd_backend *cbdb = container_of(work, struct cbd_backend, state_work.work);
-+	struct cbd_transport *cbdt = cbdb->cbdt;
-+	struct cbd_segment_info *segment_info;
-+	struct cbd_channel_info *channel_info;
-+	u32 blkdev_state, backend_state, backend_id;
-+	int ret;
-+	int i;
-+
-+	for (i = 0; i < cbdt->transport_info->segment_num; i++) {
-+		segment_info = cbdt_get_segment_info(cbdt, i);
-+		if (segment_info->type != cbds_type_channel)
++	while ((p = strsep(&o, ",\n")) != NULL) {
++		if (!*p)
 +			continue;
 +
-+		channel_info = (struct cbd_channel_info *)segment_info;
-+
-+		blkdev_state = channel_info->blkdev_state;
-+		backend_state = channel_info->backend_state;
-+		backend_id = channel_info->backend_id;
-+
-+		if (blkdev_state == cbdc_blkdev_state_running &&
-+				backend_state == cbdc_backend_state_none &&
-+				backend_id == cbdb->backend_id) {
-+
-+			ret = cbd_handler_create(cbdb, i);
-+			if (ret) {
-+				cbdb_err(cbdb, "create handler for %u error", i);
-+				continue;
++		token = match_token(p, register_opt_tokens, args);
++		switch (token) {
++		case CBDT_REG_OPT_PATH:
++			if (match_strlcpy(opts->path, &args[0],
++				CBD_PATH_LEN) == 0) {
++				ret = -EINVAL;
++				break;
 +			}
-+		}
-+
-+		if (blkdev_state == cbdc_blkdev_state_none &&
-+				backend_state == cbdc_backend_state_running &&
-+				backend_id == cbdb->backend_id) {
-+			struct cbd_handler *handler;
-+
-+			handler = cbdb_get_handler(cbdb, i);
-+			if (!handler)
-+				continue;
-+			cbd_handler_destroy(handler);
-+		}
-+	}
-+
-+	queue_delayed_work(cbd_wq, &cbdb->state_work, 1 * HZ);
-+}
-+
-+static int cbd_backend_init(struct cbd_backend *cbdb)
-+{
-+	struct cbd_backend_info *b_info;
-+	struct cbd_transport *cbdt = cbdb->cbdt;
-+
-+	b_info = cbdt_get_backend_info(cbdt, cbdb->backend_id);
-+	cbdb->backend_info = b_info;
-+
-+	b_info->host_id = cbdb->cbdt->host->host_id;
-+
-+	cbdb->backend_io_cache = KMEM_CACHE(cbd_backend_io, 0);
-+	if (!cbdb->backend_io_cache)
-+		return -ENOMEM;
-+
-+	cbdb->task_wq = alloc_workqueue("cbdt%d-b%u",  WQ_UNBOUND | WQ_MEM_RECLAIM,
-+					0, cbdt->id, cbdb->backend_id);
-+	if (!cbdb->task_wq) {
-+		kmem_cache_destroy(cbdb->backend_io_cache);
-+		return -ENOMEM;
-+	}
-+
-+	cbdb->bdev_file = bdev_file_open_by_path(cbdb->path,
-+			BLK_OPEN_READ | BLK_OPEN_WRITE, cbdb, NULL);
-+	if (IS_ERR(cbdb->bdev_file)) {
-+		cbdt_err(cbdt, "failed to open bdev: %d", (int)PTR_ERR(cbdb->bdev_file));
-+		destroy_workqueue(cbdb->task_wq);
-+		kmem_cache_destroy(cbdb->backend_io_cache);
-+		return PTR_ERR(cbdb->bdev_file);
-+	}
-+	cbdb->bdev = file_bdev(cbdb->bdev_file);
-+	b_info->dev_size = bdev_nr_sectors(cbdb->bdev);
-+
-+	INIT_DELAYED_WORK(&cbdb->state_work, state_work_fn);
-+	INIT_DELAYED_WORK(&cbdb->hb_work, backend_hb_workfn);
-+	INIT_LIST_HEAD(&cbdb->handlers);
-+	cbdb->backend_device = &cbdt->cbd_backends_dev->backend_devs[cbdb->backend_id];
-+
-+	mutex_init(&cbdb->lock);
-+
-+	queue_delayed_work(cbd_wq, &cbdb->state_work, 0);
-+	queue_delayed_work(cbd_wq, &cbdb->hb_work, 0);
-+
-+	return 0;
-+}
-+
-+int cbd_backend_start(struct cbd_transport *cbdt, char *path, u32 backend_id)
-+{
-+	struct cbd_backend *backend;
-+	struct cbd_backend_info *backend_info;
-+	int ret;
-+
-+	if (backend_id == U32_MAX) {
-+		ret = cbdt_get_empty_backend_id(cbdt, &backend_id);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	backend_info = cbdt_get_backend_info(cbdt, backend_id);
-+
-+	backend = kzalloc(sizeof(struct cbd_backend), GFP_KERNEL);
-+	if (!backend)
-+		return -ENOMEM;
-+
-+	strscpy(backend->path, path, CBD_PATH_LEN);
-+	memcpy(backend_info->path, backend->path, CBD_PATH_LEN);
-+	INIT_LIST_HEAD(&backend->node);
-+	backend->backend_id = backend_id;
-+	backend->cbdt = cbdt;
-+
-+	ret = cbd_backend_init(backend);
-+	if (ret)
-+		goto backend_free;
-+
-+	backend_info->state = cbd_backend_state_running;
-+
-+	cbdt_add_backend(cbdt, backend);
-+
-+	return 0;
-+
-+backend_free:
-+	kfree(backend);
-+
-+	return ret;
-+}
-+
-+int cbd_backend_stop(struct cbd_transport *cbdt, u32 backend_id, bool force)
-+{
-+	struct cbd_backend *cbdb;
-+	struct cbd_backend_info *backend_info;
-+	struct cbd_handler *handler, *next;
-+
-+	cbdb = cbdt_get_backend(cbdt, backend_id);
-+	if (!cbdb)
-+		return -ENOENT;
-+
-+	mutex_lock(&cbdb->lock);
-+	if (!list_empty(&cbdb->handlers) && !force) {
-+		mutex_unlock(&cbdb->lock);
-+		return -EBUSY;
-+	}
-+	cbdt_del_backend(cbdt, cbdb);
-+
-+	cancel_delayed_work_sync(&cbdb->hb_work);
-+	cancel_delayed_work_sync(&cbdb->state_work);
-+
-+	mutex_unlock(&cbdb->lock);
-+	list_for_each_entry_safe(handler, next, &cbdb->handlers, handlers_node) {
-+		cbd_handler_destroy(handler);
-+	}
-+	mutex_lock(&cbdb->lock);
-+
-+	backend_info = cbdt_get_backend_info(cbdt, cbdb->backend_id);
-+	backend_info->state = cbd_backend_state_none;
-+	mutex_unlock(&cbdb->lock);
-+
-+	drain_workqueue(cbdb->task_wq);
-+	destroy_workqueue(cbdb->task_wq);
-+
-+	kmem_cache_destroy(cbdb->backend_io_cache);
-+
-+	fput(cbdb->bdev_file);
-+	kfree(cbdb);
-+
-+	return 0;
-+}
-+
-+int cbd_backend_clear(struct cbd_transport *cbdt, u32 backend_id)
-+{
-+	struct cbd_backend_info *backend_info;
-+
-+	backend_info = cbdt_get_backend_info(cbdt, backend_id);
-+	if (cbd_backend_info_is_alive(backend_info)) {
-+		cbdt_err(cbdt, "backend %u is still alive\n", backend_id);
-+		return -EBUSY;
-+	}
-+
-+	if (backend_info->state == cbd_backend_state_none)
-+		return 0;
-+
-+	backend_info->state = cbd_backend_state_none;
-+
-+	return 0;
-+}
-diff --git a/drivers/block/cbd/cbd_handler.c b/drivers/block/cbd/cbd_handler.c
-new file mode 100644
-index 000000000000..fdbfffbb09d5
---- /dev/null
-+++ b/drivers/block/cbd/cbd_handler.c
-@@ -0,0 +1,263 @@
-+#include "cbd_internal.h"
-+
-+static inline struct cbd_se *get_se_head(struct cbd_handler *handler)
-+{
-+	return (struct cbd_se *)(handler->channel.submr + handler->channel_info->submr_head);
-+}
-+
-+static inline struct cbd_se *get_se_to_handle(struct cbd_handler *handler)
-+{
-+	return (struct cbd_se *)(handler->channel.submr + handler->se_to_handle);
-+}
-+
-+static inline struct cbd_ce *get_compr_head(struct cbd_handler *handler)
-+{
-+	return (struct cbd_ce *)(handler->channel.compr + handler->channel_info->compr_head);
-+}
-+
-+static inline void complete_cmd(struct cbd_handler *handler, struct cbd_se *se, int ret)
-+{
-+	struct cbd_ce *ce = get_compr_head(handler);
-+
-+	memset(ce, 0, sizeof(*ce));
-+	ce->req_tid = se->req_tid;
-+	ce->result = ret;
-+#ifdef CONFIG_CBD_CRC
-+	if (se->op == CBD_OP_READ)
-+		ce->data_crc = cbd_channel_crc(&handler->channel, se->data_off, se->data_len);
-+	ce->ce_crc = cbd_ce_crc(ce);
-+#endif
-+	CBDC_UPDATE_COMPR_HEAD(handler->channel_info->compr_head,
-+			       sizeof(struct cbd_ce),
-+			       handler->channel_info->compr_size);
-+}
-+
-+static void backend_bio_end(struct bio *bio)
-+{
-+	struct cbd_backend_io *backend_io = bio->bi_private;
-+	struct cbd_se *se = backend_io->se;
-+	struct cbd_handler *handler = backend_io->handler;
-+	struct cbd_backend *cbdb = handler->cbdb;
-+
-+	complete_cmd(handler, se, bio->bi_status);
-+
-+	bio_put(bio);
-+	kmem_cache_free(cbdb->backend_io_cache, backend_io);
-+}
-+
-+static int cbd_map_pages(struct cbd_transport *cbdt, struct cbd_handler *handler,
-+			 struct cbd_backend_io *io)
-+{
-+	struct cbd_se *se = io->se;
-+	u64 off = se->data_off;
-+	u32 size = se->data_len;
-+	u32 done = 0;
-+	struct page *page;
-+	u32 page_off;
-+	int ret = 0;
-+	int id;
-+
-+	id = dax_read_lock();
-+	while (size) {
-+		unsigned int len = min_t(size_t, PAGE_SIZE, size);
-+		u64 channel_off = off + done;
-+
-+		if (channel_off >= CBDC_DATA_SIZE)
-+			channel_off %= CBDC_DATA_SIZE;
-+		u64 transport_off = (void *)handler->channel.data -
-+					(void *)cbdt->transport_info + channel_off;
-+
-+		page = cbdt_page(cbdt, transport_off, &page_off);
-+
-+		ret = bio_add_page(io->bio, page, len, 0);
-+		if (unlikely(ret != len)) {
-+			cbdt_err(cbdt, "failed to add page");
++			break;
++		case CBDT_REG_OPT_FORCE:
++			if (match_uint(args, &token)) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->force = (token != 0);
++			break;
++		case CBDT_REG_OPT_FORMAT:
++			if (match_uint(args, &token)) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->format = (token != 0);
++			break;
++		case CBDT_REG_OPT_HOSTNAME:
++			if (match_strlcpy(opts->hostname, &args[0],
++				CBD_NAME_LEN) == 0) {
++				ret = -EINVAL;
++				break;
++			}
++			break;
++		default:
++			pr_err("unknown parameter or missing value '%s'\n", p);
++			ret = -EINVAL;
 +			goto out;
 +		}
-+
-+		done += len;
-+		size -= len;
 +	}
 +
-+	ret = 0;
 +out:
-+	dax_read_unlock(id);
 +	return ret;
 +}
 +
-+static struct cbd_backend_io *backend_prepare_io(struct cbd_handler *handler,
-+						 struct cbd_se *se, blk_opf_t opf)
++static ssize_t transport_unregister_store(const struct bus_type *bus, const char *ubuf,
++				      size_t size)
 +{
-+	struct cbd_backend_io *backend_io;
-+	struct cbd_backend *cbdb = handler->cbdb;
-+
-+	backend_io = kmem_cache_zalloc(cbdb->backend_io_cache, GFP_KERNEL);
-+	if (!backend_io)
-+		return NULL;
-+	backend_io->se = se;
-+
-+	backend_io->handler = handler;
-+	backend_io->bio = bio_alloc_bioset(cbdb->bdev,
-+				DIV_ROUND_UP(se->len, PAGE_SIZE),
-+				opf, GFP_KERNEL, &handler->bioset);
-+
-+	backend_io->bio->bi_iter.bi_sector = se->offset >> SECTOR_SHIFT;
-+	backend_io->bio->bi_iter.bi_size = 0;
-+	backend_io->bio->bi_private = backend_io;
-+	backend_io->bio->bi_end_io = backend_bio_end;
-+
-+	return backend_io;
-+}
-+
-+static int handle_backend_cmd(struct cbd_handler *handler, struct cbd_se *se)
-+{
-+	struct cbd_backend *cbdb = handler->cbdb;
-+	struct cbd_backend_io *backend_io = NULL;
++	u32 transport_id;
 +	int ret;
 +
-+	if (cbd_se_flags_test(se, CBD_SE_FLAGS_DONE))
-+		return 0;
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
 +
-+	switch (se->op) {
-+	case CBD_OP_READ:
-+		backend_io = backend_prepare_io(handler, se, REQ_OP_READ);
-+		break;
-+	case CBD_OP_WRITE:
-+		backend_io = backend_prepare_io(handler, se, REQ_OP_WRITE);
-+		break;
-+	case CBD_OP_DISCARD:
-+		ret = blkdev_issue_discard(cbdb->bdev, se->offset >> SECTOR_SHIFT,
-+				se->len, GFP_KERNEL);
-+		goto complete_cmd;
-+	case CBD_OP_WRITE_ZEROS:
-+		ret = blkdev_issue_zeroout(cbdb->bdev, se->offset >> SECTOR_SHIFT,
-+				se->len, GFP_KERNEL, 0);
-+		goto complete_cmd;
-+	case CBD_OP_FLUSH:
-+		ret = blkdev_issue_flush(cbdb->bdev);
-+		goto complete_cmd;
-+	default:
-+		cbd_handler_err(handler, "unrecognized op: 0x%x", se->op);
-+		ret = -EIO;
-+		goto complete_cmd;
++	if (sscanf(ubuf, "transport_id=%u", &transport_id) != 1)
++		return -EINVAL;
++
++	ret = cbdt_unregister(transport_id);
++	if (ret < 0)
++		return ret;
++
++	return size;
++}
++
++static ssize_t transport_register_store(const struct bus_type *bus, const char *ubuf,
++				      size_t size)
++{
++	struct cbdt_register_options opts = { 0 };
++	char *buf;
++	int ret;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
++	buf = kmemdup(ubuf, size + 1, GFP_KERNEL);
++	if (IS_ERR(buf)) {
++		pr_err("failed to dup buf for adm option: %d", (int)PTR_ERR(buf));
++		return PTR_ERR(buf);
 +	}
++	buf[size] = '\0';
 +
-+	if (!backend_io)
-+		return -ENOMEM;
-+
-+	ret = cbd_map_pages(cbdb->cbdt, handler, backend_io);
-+	if (ret) {
-+		kmem_cache_free(cbdb->backend_io_cache, backend_io);
++	ret = parse_register_options(buf, &opts);
++	if (ret < 0) {
++		kfree(buf);
 +		return ret;
 +	}
++	kfree(buf);
 +
-+	submit_bio(backend_io->bio);
++	ret = cbdt_register(&opts);
++	if (ret < 0)
++		return ret;
 +
-+	return 0;
-+
-+complete_cmd:
-+	complete_cmd(handler, se, ret);
-+	return 0;
++	return size;
 +}
 +
-+static void handle_work_fn(struct work_struct *work)
-+{
-+	struct cbd_handler *handler = container_of(work, struct cbd_handler,
-+						   handle_work.work);
-+	struct cbd_se *se;
-+	u64 req_tid;
-+	int ret;
-+again:
-+	/* channel ctrl would be updated by blkdev queue */
-+	se = get_se_to_handle(handler);
-+	if (se == get_se_head(handler))
-+		goto miss;
++static BUS_ATTR_WO(transport_unregister);
++static BUS_ATTR_WO(transport_register);
 +
-+	req_tid = se->req_tid;
-+	if (handler->req_tid_expected != U64_MAX &&
-+			req_tid != handler->req_tid_expected) {
-+		cbd_handler_err(handler, "req_tid (%llu) is not expected (%llu)",
-+				req_tid, handler->req_tid_expected);
-+		goto miss;
-+	}
-+
-+#ifdef CONFIG_CBD_CRC
-+	if (se->se_crc != cbd_se_crc(se)) {
-+		cbd_handler_err(handler, "se crc(0x%x) is not expected(0x%x)",
-+				cbd_se_crc(se), se->se_crc);
-+		goto miss;
-+	}
-+
-+	if (se->op == CBD_OP_WRITE &&
-+		se->data_crc != cbd_channel_crc(&handler->channel,
-+						se->data_off,
-+						se->data_len)) {
-+		cbd_handler_err(handler, "data crc(0x%x) is not expected(0x%x)",
-+				cbd_channel_crc(&handler->channel, se->data_off, se->data_len),
-+				se->data_crc);
-+		goto miss;
-+	}
-+#endif
-+
-+	cbdwc_hit(&handler->handle_worker_cfg);
-+	ret = handle_backend_cmd(handler, se);
-+	if (!ret) {
-+		/* this se is handled */
-+		handler->req_tid_expected = req_tid + 1;
-+		handler->se_to_handle = (handler->se_to_handle + sizeof(struct cbd_se)) %
-+							handler->channel_info->submr_size;
-+	}
-+
-+	goto again;
-+
-+miss:
-+	if (cbdwc_need_retry(&handler->handle_worker_cfg))
-+		goto again;
-+
-+	cbdwc_miss(&handler->handle_worker_cfg);
-+
-+	queue_delayed_work(handler->cbdb->task_wq, &handler->handle_work, 0);
-+}
-+
-+int cbd_handler_create(struct cbd_backend *cbdb, u32 channel_id)
-+{
-+	struct cbd_transport *cbdt = cbdb->cbdt;
-+	struct cbd_handler *handler;
-+
-+	handler = kzalloc(sizeof(struct cbd_handler), GFP_KERNEL);
-+	if (!handler)
-+		return -ENOMEM;
-+
-+	handler->cbdb = cbdb;
-+	cbd_channel_init(&handler->channel, cbdt, channel_id);
-+	handler->channel_info = handler->channel.channel_info;
-+
-+	handler->se_to_handle = handler->channel_info->submr_tail;
-+	handler->req_tid_expected = U64_MAX;
-+
-+	INIT_DELAYED_WORK(&handler->handle_work, handle_work_fn);
-+	INIT_LIST_HEAD(&handler->handlers_node);
-+
-+	bioset_init(&handler->bioset, 256, 0, BIOSET_NEED_BVECS);
-+	cbdwc_init(&handler->handle_worker_cfg);
-+
-+	cbdb_add_handler(cbdb, handler);
-+	handler->channel_info->backend_state = cbdc_backend_state_running;
-+
-+	queue_delayed_work(cbdb->task_wq, &handler->handle_work, 0);
-+
-+	return 0;
++static struct attribute *cbd_bus_attrs[] = {
++	&bus_attr_transport_unregister.attr,
++	&bus_attr_transport_register.attr,
++	NULL,
 +};
 +
-+void cbd_handler_destroy(struct cbd_handler *handler)
++static const struct attribute_group cbd_bus_group = {
++	.attrs = cbd_bus_attrs,
++};
++__ATTRIBUTE_GROUPS(cbd_bus);
++
++const struct bus_type cbd_bus_type = {
++	.name		= "cbd",
++	.bus_groups	= cbd_bus_groups,
++};
++
++static void cbd_root_dev_release(struct device *dev)
 +{
-+	cbdb_del_handler(handler->cbdb, handler);
-+
-+	cancel_delayed_work_sync(&handler->handle_work);
-+
-+	cbd_channel_exit(&handler->channel);
-+	handler->channel_info->backend_state = cbdc_backend_state_none;
-+
-+	bioset_exit(&handler->bioset);
-+	kfree(handler);
 +}
++
++struct device cbd_root_dev = {
++	.init_name =    "cbd",
++	.release =      cbd_root_dev_release,
++};
++
++static int __init cbd_init(void)
++{
++	int ret;
++
++	cbd_wq = alloc_workqueue(CBD_DRV_NAME, WQ_MEM_RECLAIM, 0);
++	if (!cbd_wq)
++		return -ENOMEM;
++
++	ret = device_register(&cbd_root_dev);
++	if (ret < 0) {
++		put_device(&cbd_root_dev);
++		goto destroy_wq;
++	}
++
++	ret = bus_register(&cbd_bus_type);
++	if (ret < 0)
++		goto device_unregister;
++
++	ret = cbd_blkdev_init();
++	if (ret < 0)
++		goto bus_unregister;
++
++	return 0;
++
++bus_unregister:
++	bus_unregister(&cbd_bus_type);
++device_unregister:
++	device_unregister(&cbd_root_dev);
++destroy_wq:
++	destroy_workqueue(cbd_wq);
++
++	return ret;
++}
++
++static void cbd_exit(void)
++{
++	cbd_blkdev_exit();
++	bus_unregister(&cbd_bus_type);
++	device_unregister(&cbd_root_dev);
++
++	destroy_workqueue(cbd_wq);
++}
++
++MODULE_AUTHOR("Dongsheng Yang <dongsheng.yang@linux.dev>");
++MODULE_DESCRIPTION("CXL(Compute Express Link) Block Device");
++MODULE_LICENSE("GPL v2");
++module_init(cbd_init);
++module_exit(cbd_exit);
 -- 
 2.34.1
 
