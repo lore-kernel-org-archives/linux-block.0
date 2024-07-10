@@ -1,74 +1,94 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C115BAF0;
-	Wed, 10 Jul 2024 06:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6716EB4C
+	for <linux-block@vger.kernel.org>; Wed, 10 Jul 2024 06:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720592539; cv=none; b=ehRfjnBLffcoV6YgiCpuc+cxdmxbNrbZT6V6Jf9u0v79mYkDlXM/peFXTRjCuAy8kEOO/RhWUpxz1uoUsDv7fw9TKL2pZKK11J6sLut5CDioai3ZWFyjnNqlcIt6rG3l1MHn6aU4tke5k1jFcZXlBIhhQmUWA5raE7SXyTDRocg=
+	t=1720592630; cv=none; b=pv2aQUcS4C5Crz/4FzldTr/tVUkcxT26zOG5zF1HWbN8h5MQ0ZM1oritqXjbjETteAQPVHJx0LdtVq1oHfSrGuKi8hmJNBSn9S4kRp3WIXRYXiBx4RwcVaIbhDp4lyougxMNrKuwqh06g86PFXe6+CcVoEIjflaqS0cdaxtuguE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720592539; c=relaxed/simple;
-	bh=NGY6+a5EweXEppSGRkflKSDqFxD1LoZFRBntbil7k4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PmSyOAwZE3d2YSfLl9Dt976QbrPsBEdrpqzDa3eqGxfn3oq+4uO+7HddSmmKRx+8gRr1xC+2QR3wpE13877RgaDLurM8J0fCZIIfE89bQUOsGWdsHBW+31KhYdPzDS54e0UYrAPTFgNazP7W4RmUiyFlIAi6dgMg9wTafJ4uwgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id ACBCC227A87; Wed, 10 Jul 2024 08:22:12 +0200 (CEST)
-Date: Wed, 10 Jul 2024 08:22:12 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Robin Murphy <robin.murphy@arm.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Keith Busch <kbusch@kernel.org>, "Zeng, Oak" <oak.zeng@intel.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
-Message-ID: <20240710062212.GA25895@lst.de>
-References: <cover.1719909395.git.leon@kernel.org> <20240705063910.GA12337@lst.de> <20240708235721.GF14050@ziepe.ca> <20240709062015.GB16180@lst.de> <20240709190320.GN14050@ziepe.ca>
+	s=arc-20240116; t=1720592630; c=relaxed/simple;
+	bh=1MzlV2SivzQk+toU9O0s1wYx7Gxy0Hx2ackzSFFM4U4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Eg03SHyk9vzFrE1+BZtcUsyN1weShtHQAFXdN0z2ERFEOeUawyXJSgxWJ2qO11/s/MQ0GpKF57vCWD8lu1xySkFWYnUC3Q4en7qxaKen2mvCS0wBxbLVxFDZ6RZXWHlTLwquFcVEAvXdMnzpI+p9AW+QwrxLRogRoQ2fwUtZlLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=K41vxN1X; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="K41vxN1X"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52e98c72d2bso665004e87.0
+        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2024 23:23:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1720592627; x=1721197427; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=peZsNPj1BNH4twyiHnIZz89+5SLDTDtVFfp9lmKUxv4=;
+        b=K41vxN1XBNHWYrqcnA2JNGiZrMzESpr1xyF0sCMrLXUppgzkOqwSgl8T28ralCx9MO
+         rW7PqW7bA0k8kfs17fYRBRuu7qa0khlMPPpik93IN83tdf5AAIyut176qWDI6/wX9VML
+         KVfZ3SWsUco0E4FJStAks+xlgKX+ulbWtBtS4j7vjDePEl3lyitlczoUvxvG3yY+FxNt
+         OfyvcDt6+zhIwijAfqZ4zVM3+RNKLgadUiEdPnM8lzhAxd3+QPRgc1W2rvqfRdtxuFDt
+         PzHRnO3VV6HIDP5jspeb9irs+tKqaUX+RxtFvsGmaSd5CMkdS6BwfitvCQXuj59mfv7O
+         +npw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720592627; x=1721197427;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=peZsNPj1BNH4twyiHnIZz89+5SLDTDtVFfp9lmKUxv4=;
+        b=MMHHsTRXZq+VCDqb8ulk95dY4Oz0MEghNY1mocy/WLEPWGbOAeMdZmpp56XrSUTlnF
+         FvYIoF12v52BSx0NhIaAisEdtAfLfNdncSs9r0tY5ho0O0eeGBj96cq3uiAv044RZzGs
+         oZll33roDrHG/0Gqdwlw23SG8LGk98gf8IgZ0x3NK32wC7+i6dXB7OXy4ItC2MZgSQdR
+         qpJwp7EZwgPno/jej3fNRmXJs2BUFVG71IzADGY1Yx/7S46NlxD+nvru8aXFjLWOEOqg
+         7EbKaVLgJxok1R8KlqHfiYuyGK/VDjmZJsV2jf+9AdbEdbCFkCFqq8ZRO7iIPBMTCLAc
+         WEKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwEK8dac7t50i3M4yhx+OVNnNSUXf400v3/iZQcMMzYHoSIF9aU9En3oja1y7MpdscLOoeW4ZTTGOeY2N5JIAMEvZ6oDfWF4xxQQ0=
+X-Gm-Message-State: AOJu0Yx1pHASH/CNK6QCdObK0lUGjfMw8nIsdm0iLoI6N0w/oDd48bYn
+	RefBfnO0KtCOICcpZ8+iJoigLCuk4dXhWFaG0S63nlLOoaSfclK83hCnZNA/zlU=
+X-Google-Smtp-Source: AGHT+IH5aoFqMDetAj6DeM6xs7OgL2qyb/6WTEb5Xw8gbWI7SvdV3F54U25nwN6xMLvlPI5WP9QFwA==
+X-Received: by 2002:a05:6512:3d8e:b0:52c:f533:1e21 with SMTP id 2adb3069b0e04-52eb97586acmr3136252e87.0.1720592626693;
+        Tue, 09 Jul 2024 23:23:46 -0700 (PDT)
+Received: from [127.0.0.1] (87-52-80-167-dynamic.dk.customer.tdc.net. [87.52.80.167])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52eb90670b6sm463892e87.197.2024.07.09.23.23.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 23:23:46 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: =?utf-8?q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
+ Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+In-Reply-To: <20240602-md-block-xen-blkback-v1-1-6ff5b58bdee1@quicinc.com>
+References: <20240602-md-block-xen-blkback-v1-1-6ff5b58bdee1@quicinc.com>
+Subject: Re: [PATCH] xen/blkback: add missing MODULE_DESCRIPTION() macro
+Message-Id: <172059262581.380385.3520658420031785227.b4-ty@kernel.dk>
+Date: Wed, 10 Jul 2024 00:23:45 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240709190320.GN14050@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.0
 
-On Tue, Jul 09, 2024 at 04:03:20PM -0300, Jason Gunthorpe wrote:
-> > Except for the powerpc bypass IOMMU or not is a global decision,
-> > and the bypass is per I/O.  So I'm not sure what else you want there?
+
+On Sun, 02 Jun 2024 17:37:28 -0700, Jeff Johnson wrote:
+> make allmodconfig && make W=1 C=1 reports:
+> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/xen-blkback/xen-blkback.o
 > 
-> For P2P we know if the DMA will go through the IOMMU or not based on
-> the PCIe fabric path between the initiator (the one doing the DMA) and
-> the target (the one providing the MMIO memory).
+> Add the missing invocation of the MODULE_DESCRIPTION() macro.
+> 
+> 
 
-Oh, yes.  So effectively you are asking if we can arbitrarily mix
-P2P sources in a single map request.  I think the only sane answer
-from the iommu/dma subsystem perspective is: hell no.
+Applied, thanks!
 
-But that means the upper layer need to split at such a boundary.
-E.g. get_user_pages needs to look at this and stop at the boundary,
-leaving the rest to the next call.
+[1/1] xen/blkback: add missing MODULE_DESCRIPTION() macro
+      commit: 4c33e39f6201ab130719d44d6f6f25ec02e1b306
 
-For the block layer just having one kind per BIO is fine right now,
-although I could see use cases where people would want to combine
-them.  We can probably defer that until it is needed, though.
+Best regards,
+-- 
+Jens Axboe
+
+
 
