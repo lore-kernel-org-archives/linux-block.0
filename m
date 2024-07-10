@@ -1,48 +1,48 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC2B257D;
-	Wed, 10 Jul 2024 16:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FF4DDB2;
+	Wed, 10 Jul 2024 19:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720629715; cv=none; b=nSsUiWyHUINwx5xNlbSQIlsC5bxZTiZs4dUAMHWXy0//6PtAkNwPbRUmTWW8trpTDh05+gqhsqmL7kKjgFtVqjxbgACJRwa4hZIW/dQJP+rflxG7g+FBOE0zBBOCJ0YM5gw4/oEyVruFBNODEC/4/sdBFtl/UsspLI/T9ow10z4=
+	t=1720641253; cv=none; b=NaJgGxgaZPAJJR2oxuknEqkZlhq6PGwG433HelgxcRSMG1IvqJ6HKB8coIGKtpeVqLTsnSpLMltMR4JIGMoUtMYPR9NX5cdrRswdWJrcFwqIM558W0ZYbRxcGIECAIvpH6qndX6PW6PSPg6aiw0JQQNbvT94v4NWlUFTEnMthCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720629715; c=relaxed/simple;
-	bh=PoKxAIKtlOKLK7nQkCY1kP9FtSz8M9HmTymuhjmmnjQ=;
+	s=arc-20240116; t=1720641253; c=relaxed/simple;
+	bh=EKMCeAS57TE550yBaeOFrP8YAT+/kLTYbYMNOa4LwGs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=mtGQ8ApU/Z9RKAMMef7gOFiCY6mKUeSJQQfUuuoDdshvmvFFXENp/CC7VhnADez1NAlr7AuuCsRo/TmLpLLh740m65WqIhMl279gVuS/8hObEbdN4FgA+e8djDz9z5w7PbmYZVoRSt8yuo3P0b6p9xUo750hcNGg5Ej+5G54q7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=j2tS4mbK; arc=none smtp.client-ip=199.89.1.12
+	 In-Reply-To:Content-Type; b=ZpSTK58VFGvYjpz+FQ+XTK47iaxTyrDuz35H6dReQlSfNOIlbUDWLTmQUyKegewbX9cHAthOZArYIrbAr//vAA8b9ViB9GOStgjmI2VRB2HKiHJFbc1+cW4UrAL0bbVBXWXpeYNxOZSJmS7CdWz9/m6UFS+2ajiGqGrVNUryNcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=p/4sLBk5; arc=none smtp.client-ip=199.89.1.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="j2tS4mbK"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="p/4sLBk5"
 Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4WK3Xx2XBKzll9bb;
-	Wed, 10 Jul 2024 16:41:53 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WK7pj2rg3z6ClbFZ;
+	Wed, 10 Jul 2024 19:54:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1720629710; x=1723221711; bh=xWd2IKu2oYhPTt7Qc1nOLYhk
-	MWMTyWkCKb85BbkUmDA=; b=j2tS4mbKjd2JFa0OKIaCQ2ED9lQ0PX+3qw7+3wlh
-	++Q66kBL7oDcyU2X3ZnLYA+8CghbrrcUSWq3vpayZPYz/dfOf2CKqWGwnKrC2vXT
-	0NkeVGkJa9M2mZ33TQoHxYM5t++9yI/l9TPqGgqsR6+Orw60rZ4zkg5ISHaGhS13
-	vcYrTuqafi6kaLy5hacVNWR9qO4nX01QDEw+Le6BciSNGY3kcC0iNoub+0m1HVu3
-	scQG2Gqsm9R1Mnbk8Te/g0DUl0os7sT9CbG1FNwvfzyfpXt/b/H5ipeypkRefesT
-	J3dE4sTPaxMjsj4sBSh+apgxZx5LUBbPqGjnzgBzKMfN2A==
+	 s=mr01; t=1720641243; x=1723233244; bh=M749JjHhNHCAKUEXV/3E1vJ7
+	nZgEUsDMi5XwoDq+L4g=; b=p/4sLBk5C+BJ6P4MyqsUFeL1XAWLjUU30iJH9rGd
+	T/qK+S+4EJPk/kQl1nDzAykoEmCf2cwO+/NFtF4BBQhJhyW6X8CP8kQgaiYYaRky
+	V7bl2+8Q3J51EFFOKbPkxY7+7y/hLyI4S9gWlrCDL+R1X21UOgZQ0Qh+6tkj3KRF
+	yeQ96Mmo+bmDHfq/nrjj+QddeYy2MkbgNRs02OqfH+nj5ArVPuvrXDCIquYlyIzs
+	hFUq9bn/yvvdK5zfc3yD77T0QTo8p03Pl9gXRSoNcOsr3rpBPgYOmA17AWowvC63
+	gc1p2dCZt1R5EztigEeACPr7Gb4E0YfOqWj8Qqzmftuimg==
 X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id wMfm8cbxVuAE; Wed, 10 Jul 2024 16:41:50 +0000 (UTC)
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 7lIpeoc1bMRP; Wed, 10 Jul 2024 19:54:03 +0000 (UTC)
 Received: from [100.96.154.26] (unknown [104.132.0.90])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4WK3Xt1Gc3zll9bC;
-	Wed, 10 Jul 2024 16:41:50 +0000 (UTC)
-Message-ID: <ff5cc2b2-bf8e-4a48-8422-cdaac4129043@acm.org>
-Date: Wed, 10 Jul 2024 09:41:48 -0700
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WK7pf3zXNz6ClbFV;
+	Wed, 10 Jul 2024 19:54:02 +0000 (UTC)
+Message-ID: <29e50fff-fa7f-4b92-bfe9-7665c934b7dc@acm.org>
+Date: Wed, 10 Jul 2024 12:54:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,36 +64,15 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 7/9/24 11:56 PM, Yang Yang wrote:
-> +	spin_lock_irqsave(&map->swap_lock, flags);
+> +	/**
+> +	 * @swap_lock: Held while swapping word <-> cleared
+> +	 */
+> +	spinlock_t swap_lock;
 
-Please use guard(spinlock_irqsave) in new code instead of 
-spin_lock_irqsave() + goto out_unlock + spin_unlock_irqrestore().
-That will make this function significantly easier to read and to
-maintain.
-
-> +
-> +	if (!map->cleared) {
-> +		if (depth > 0) {
-> +			word_mask = (~0UL) >> (BITS_PER_LONG - depth);
-> +			/*
-> +			 * The current behavior is to always retry after moving
-> +			 * ->cleared to word, and we change it to retry in case
-> +			 * of any free bits. To avoid dead loop, we need to take
-
-What is a "dead loop"? Did you perhaps want to write "infinite loop"?
-
-> +			 * wrap & alloc_hint into account. Without this, a soft
-> +			 * lockup was detected in our test environment.
-
-Source code comments should not refer to "our test environment". Code
-that is intended for upstream inclusion should work for all setups.
-
-> +			 */
-> +			if (!wrap && alloc_hint)
-> +				word_mask &= ~((1UL << alloc_hint) - 1);
-
-Above I see an open-coded __clear_bit() operation. Has it been
-considered to use __clear_bit() instead of open-coding it?
+Why is only swapping 'word' with 'cleared' protected by the spinlock?
+If all 'cleared' changes would be protected by this spinlock then
+that would allow to eliminate the expensive xchg() call from
+sbitmap_deferred_clear().
 
 Thanks,
 
