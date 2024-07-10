@@ -1,93 +1,89 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C8383CA1
-	for <linux-block@vger.kernel.org>; Wed, 10 Jul 2024 06:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928626F31C;
+	Wed, 10 Jul 2024 06:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720592635; cv=none; b=jcKvyLUBmxR8q+2eKEyrRWuxM1CR7/vLlHhBL50fKGeN/wJ8kiEYBDheMcsSjj4CrDQuo06o854CPvO1Ymirey/XvmXNsRl6xxw2xUnT/EInWrEHvVhHp4W/1+7DPNSbihUFGGJPiuKtiKyCxz6XvXqG0fDUT7TMb2/j6dBfWxY=
+	t=1720592832; cv=none; b=E1yzBDxfaRT1UUWMztAqJfhUvqX5FdQh0siCx+1vPzTZdw1MwiymJlz53I8hAR+JjT2FMYmxJSNPlcACJLhSam5Rofn+ZBNoYaRW1ThtqDN0ps1JvPFomcVT/+ijsjg/YO7C90meXF46PKmSnsKM4SULguVFc3d6G/ozanolP08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720592635; c=relaxed/simple;
-	bh=6s7so5c7HOknihvumh3Haewm4qizE8uH5cVOjlcBNW4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=R5BEBkdwV7sIWrAkHdAXGoXhmG9oibbtwnqBTsRy8Hn2VbNFEQp/239yROAnSSCZDO9W0G+bmawg9/x5sRq37quQ8I5WrxKQ/WuGhXpHGfWVP86PVhIVIc6qug/RbyOdwjpCm2/yPYsM7E6kDO4B4gcfX4Pg5nOn/L5/jyL5+Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=cAoOEajs; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="cAoOEajs"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ee9cb8d487so2834991fa.1
-        for <linux-block@vger.kernel.org>; Tue, 09 Jul 2024 23:23:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1720592632; x=1721197432; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=assg/spa4cOMqEpYiqy3ecAcAwnhbvPRfb3jWzWA0iQ=;
-        b=cAoOEajsdhDU8va5s4PHGyPaNulXDepCAefXzmlZnAWnst8moQ5y7AQaqh1jXiBNp2
-         7FOQa29N26sqz2xs3H5NgHjg2EPhZQ5rCO/UDgkpEAoRG2+BH+9K3bMd+qwXNIWgENDq
-         9VLav8cwsJSYX/99U7eQ5qR7feS374tthDGjz2/mRzqy+mADE83nrHuBgDu+zurQH8SG
-         sopn9KeaOoqC7O1fxdYOJvnz/D/dakD+NPrUeDkxMvF36yLdSEKWZGBHbldggjgbEPWO
-         BCmofiytZC/E2Aqy7eoGb7rispIIIHC/XO/N+yi041IBqCLujFD3+1Llrn+ZI/mJ1A0R
-         nH3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720592632; x=1721197432;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=assg/spa4cOMqEpYiqy3ecAcAwnhbvPRfb3jWzWA0iQ=;
-        b=fIcvnr7Qvsr4XrdMIdT/LN7GQNK6EBIXDGsgekEJKoD58lUeHd9CrzqiBajOPq37Vr
-         XdKeD2oZU6etgPz1BWxEeiiVjYtQYJPBDd4zMRvEfZJa2CS03JyaVa1bDJvoBN7yu8DG
-         IKI1My/T/xS/oyrokvAV8d19dMa7rM/ktxhVMYZluFf2fD7/38BWymaEXUwJwQ++XNuN
-         sdgLdKCCZsBHFiIY2wyViWrFiS2cDJmnu7X8EUreh23rpi2l32jHdOWy3xDp1gRTyvF2
-         hcJOmlr7saltaa5EmCby9GasxMI9Z6f50cskj0JC14bo9bVmcbevcrZwUY3kRh4zSYb3
-         OG2g==
-X-Gm-Message-State: AOJu0YyJ7sfBOr6h3S1xrLWusnxlORs0+ZmBBvUIVdCHsurZ9b4f4MTU
-	7sn1HVXcBNk4mQmt656boC+tQowJVKx2OBpW6iPMh3CY4Gi0gidb9flT5MFwc18=
-X-Google-Smtp-Source: AGHT+IFrolNW5lOMuUJhl618lI6yjdNOR6K82mCSLOdcX6udq8FJVW5dASBzQo09mgslsZx9YSpn/g==
-X-Received: by 2002:a05:6512:31cc:b0:52c:dd58:1a97 with SMTP id 2adb3069b0e04-52eb9a0498bmr3119303e87.5.1720592632042;
-        Tue, 09 Jul 2024 23:23:52 -0700 (PDT)
-Received: from [127.0.0.1] (87-52-80-167-dynamic.dk.customer.tdc.net. [87.52.80.167])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52eb90670b6sm463892e87.197.2024.07.09.23.23.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 23:23:50 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Denis Efremov <efremov@linux.com>, 
- Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-janitors@vger.kernel.org
-In-Reply-To: <20240602-md-block-floppy-v1-1-bc628ea5eb84@quicinc.com>
-References: <20240602-md-block-floppy-v1-1-bc628ea5eb84@quicinc.com>
-Subject: Re: [PATCH] floppy: add missing MODULE_DESCRIPTION() macro
-Message-Id: <172059263066.380385.1122582379768544116.b4-ty@kernel.dk>
-Date: Wed, 10 Jul 2024 00:23:50 -0600
+	s=arc-20240116; t=1720592832; c=relaxed/simple;
+	bh=66r1q88ch9VtoTiN4TFn3SCBV6+FPnySmnxU4V8acQo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=syyCgOHf3yYZ6XNOWOa/CULpS+lPLoOD4jVz/zrFuJ0HdOQpWlHAzYQJOcOeD7cgdu49z1op6dTTCCHci3oKyxhUXPKWCw1hSCAW++uDMUa3Vac9A+YK3n0Qg/Eq2K49tLYEqeW7GvNc6LB5JWuOr/wpRCYz81owOHIVj81ZU0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5C935227A87; Wed, 10 Jul 2024 08:27:04 +0200 (CEST)
+Date: Wed, 10 Jul 2024 08:27:04 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Keith Busch <kbusch@kernel.org>, "Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240710062704.GA25953@lst.de>
+References: <cover.1719909395.git.leon@kernel.org> <20240703054238.GA25366@lst.de> <20240703105253.GA95824@unreal> <20240703143530.GA30857@lst.de> <20240703155114.GB95824@unreal> <20240704074855.GA26913@lst.de> <20240708165238.GE14050@ziepe.ca> <20240709061721.GA16180@lst.de> <20240709185315.GM14050@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240709185315.GM14050@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-
-On Sun, 02 Jun 2024 17:05:31 -0700, Jeff Johnson wrote:
-> make allmodconfig && make W=1 C=1 reports:
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/floppy.o
+On Tue, Jul 09, 2024 at 03:53:15PM -0300, Jason Gunthorpe wrote:
+> > That whole thing of course opens the question if we want a pure
+> > in-memory version of the dma_addr_t/len tuple.  IMHO that is the best
+> > way to migrate and allows to share code easily.  We can look into ways
+> > to avoiding that more for drivers that care, but most drivers are
+> > probably best serve with it to keep the code simple and make the
+> > conversion easier.
 > 
-> Add the missing invocation of the MODULE_DESCRIPTION() macro.
-> 
-> 
+> My feeling has been that this RFC is the low level interface and we
+> can bring our own data structure on top.
+>
+> It would probably make sense to build a scatterlist v2 on top of this
+> that has an in-memory dma_addr_t/len list close to today
 
-Applied, thanks!
+Yes, the usage of the dma_vec would be in a higher layer.  But I'd
+really like to see it from the beginning.
 
-[1/1] floppy: add missing MODULE_DESCRIPTION() macro
-      commit: 3c1743a685b19bc17cf65af4a2eb149fd3b15c50
+> . Yes it costs
+> a memory allocation, or a larger initial allocation, but many places
+> may not really care. Block drivers have always allocated a SGL, for
+> instance.
 
-Best regards,
--- 
-Jens Axboe
+Except for those optimizing for snall transfer of a single segment
+(like nvme). 
 
+> My main take away was that we should make the dma_ops interface
+> simpler and more general so we can have this choice instead of welding
+> a single datastructure through everything.
 
+Yes, I don't think the dma_vec should be the low-level interface.
+I think a low-level interface based on physical address is the right
+one.  I'll see what I can do to move the single segment map interface
+to be physical address based instead of page based so that we can
+unify them.
 
