@@ -1,30 +1,30 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040D015CB;
-	Wed, 10 Jul 2024 05:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A48C15CB
+	for <linux-block@vger.kernel.org>; Wed, 10 Jul 2024 05:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720590730; cv=none; b=SWrWOgK4R5F85dw3PCgjsghHkKFq8UBhn1IdfpjqKBmXW5gokagkEacDLbUy7hYL4DEmAX8HruRj3xVepGB4aGlFUn4TAr+DAVTo4bVDD3bUC63Yc0IEcXCURhNByMgse8QnUy5/gAyQXy/7jmVxvBrWDkhwk97nk/wC8DtIk2M=
+	t=1720590830; cv=none; b=uRk1crgbIGnCdvG67y0Eea1iz/0WNua0kck+o5DPId4sB6XtHnsPsoGJ4Lh+mNedU1Ak04HqcGDGMYfCm6M/bPOahZ3APEN0fs8ojzHeA34kEqvHio7GBOnbnWM8DFpuwQcP4ud7KMbWbo/CgmcbBeEgPHI03qgJ12kvsJk2diY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720590730; c=relaxed/simple;
-	bh=CwzolPh5wXutE+8LiEJsz2B7+6zSTi1yf7RqHufm/WE=;
+	s=arc-20240116; t=1720590830; c=relaxed/simple;
+	bh=q3P8IuyThO/IBXH7LtSwuFFu7hbPTKupi2i4cP2YH+w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QRBXFHNrVlNpSINTwBCb7nT/rmZmFCNgHHXZohetnpTiUCxwDlPGUYpK+ZQva++J7UOpVAFP+SYvNBuYqb7iFAtYLJYNgUF2j4pLKIUBndxGh6FV2wSsHVPAicF/0uU6FZqkPj/MILRCca5gcBI1Zn1U+/UZqPCLtHRUAbhaCt4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ogN4NwUpg2Fi0L09es78nckA+oSjark6FSNhkXti+BSTqgrwP8c6OuAs26DmccTPgCx3xlyf+RqbwwIX9/EeqLoW6eA11d3ynhwB6pqfiadaRQQLcnZZzSr3/3YcG/toFUUAiYFPbzpdpG8VXTlVRkIUIIgDKTX37OPlQamE2WE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3C088227A87; Wed, 10 Jul 2024 07:52:04 +0200 (CEST)
-Date: Wed, 10 Jul 2024 07:52:03 +0200
+	id F3DDC227A87; Wed, 10 Jul 2024 07:53:44 +0200 (CEST)
+Date: Wed, 10 Jul 2024 07:53:44 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] block: pass a phys_addr_t to get_max_segment_size
-Message-ID: <20240710055203.GA25248@lst.de>
-References: <20240706075228.2350978-1-hch@lst.de> <20240706075228.2350978-3-hch@lst.de> <CAMuHMdV95g78=2GmLP95Kn3_0DL5zVuv2KCDYVsk8D2gNnu7SQ@mail.gmail.com>
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: also check bio alignment for bio based
+ drivers
+Message-ID: <20240710055344.GA25282@lst.de>
+References: <20240705125700.2174367-1-hch@lst.de> <20240705125700.2174367-2-hch@lst.de> <Zofzm6TRrOFb5iy9@fedora> <20240705133630.GA30748@lst.de> <Zo1AOKOK7dCpPll2@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,15 +33,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdV95g78=2GmLP95Kn3_0DL5zVuv2KCDYVsk8D2gNnu7SQ@mail.gmail.com>
+In-Reply-To: <Zo1AOKOK7dCpPll2@fedora>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hi Geert,
+On Tue, Jul 09, 2024 at 09:50:48PM +0800, Ming Lei wrote:
+> > That doesn't mean we shouldn't look into actually holding q_usage_count
+> > over the entire bio lifetime for bio based drivers, but that's a
+> > separate project.
+> 
+> What if logical block size is changed between bio submission and
+> completion?
+> 
+> For blk-mq device, we need to drain any IO when re-configuring device,
+> however it can't be supported generically for bio based driver.
 
-the fix is queued up here:
+Many bio based drivers do the same, just reimplemented without
+block helpers (e.g. md/dm).
 
-https://git.kernel.dk/cgit/linux-block/commit/?h=for-6.11/block&id=61353a63a22890f2c642232ae1ab4a2e02e6a27c
-
-and should be in linux-next.  And next time I need to do a full
-retest after doing your suggested patch order change :)
+But as I said the point is that I really want the sanity check to
+always be there.  I'd also like to eventually make freeze work for
+bio based drivers, but that is a separate issue.
 
