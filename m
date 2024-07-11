@@ -1,129 +1,142 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E6015CD79
-	for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 22:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EA419FA96
+	for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 23:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720736800; cv=none; b=QdJHV8ulN88d3PsNi7LgOazW8m0Zf6HnEhF+o/naUSOm9NSMjn7cXnV5E/sVbWfrebl0QUztFGaJYgiVRDNjg9xTEjW0HVaynbV2QDmIhzUqKR5Nsn4XEq9QDG2OW2XebYmk8fy7NYNopogQzEE0nPjR587DaH0V1nbseZJPL9c=
+	t=1720740109; cv=none; b=dncfqSDUSTRxQ0rcRwVPRx48vDr0GgKonDb2nEwdFZm8hITAaDuVQ5qslfiNd7ORXeLO6Kd4vGPuxHi2/7sYIO5eWVFKHT6JmEosDZCtMqEfh+C2PkeCrw9NlHYapD0WnSbo0HPno6RDjb4eG4H+uXzJXYBtSvoonCM1DdddaZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720736800; c=relaxed/simple;
-	bh=ZNjJ99i29mWpXemb25I6kT7UoYapxyZAsBWwprarwoU=;
+	s=arc-20240116; t=1720740109; c=relaxed/simple;
+	bh=yBzw/fpawDv/KPcPaY2/FkE3DGz3iFhkQCMcidhYJy0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mqtc9IJji2fo8h9VUQT7tKp3fpXlCAZ2rJSGzbQ4vPbjcQUgFLVCuNjiY7tp/X0H1HdT1aJAHpxn8owykudxSNRLPnECGJ8czAScLVk0lP3+j1Bc6ZX3aYbMnI4Cax0G1P5Qk3XwxPDJwx98gbLQ670b0gl/GZEtO+aT+Ru9580=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=M3KVSzNr; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=WTDoXEWj4/cVPtyOIzzigmV11YJJFBio5t+0nvv1Qsayh71YxCmyk7zseKpdoENk7n3P4sQLaajCkONv8MEivYpSqLDxp9qPeEoYskwEd/zXH+1PLeSSsjHzDzzROcTqpLxUsGWe0Uu8U/n7Q1QzLn9WUQ/ctr8tlUxF1cX9dyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=nIPKSS+K; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="M3KVSzNr"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1fb3b7d0d3aso9090505ad.2
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 15:26:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="nIPKSS+K"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6b5d6ba7c90so8085016d6.1
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 16:21:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1720736798; x=1721341598; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YsuiOBusLRDWI99QW9bV16tHkAO5K+vCBNIughlrrA0=;
-        b=M3KVSzNrQhqJcOSMP1y9X+uduW3/30NBS2Z5vPduxfSuSJ8JcxfT1AK9UYt+pLZCRL
-         KbQH+NB28qc1mDG2/wUmCfSovKQiarOZYjyfrE+dclukE5/8vlFEJUxVx5JeN09Gj1UJ
-         UHnXL7sDMp7YSleLIpALCvZ67sM4slDAnj+eSfSkC+pUdBwx5zGVaocnSvSZQicAkrFr
-         eRyZdSj9Pk9Z5syhQt0zP4nwzDeR3yUfJ9g0CZUpqNOSR4CJAespGlhq97jiqBsVXYUs
-         NS5ftshjdzk6gw9TOniThaPyRZZ1giAGyX8N4OLAvA3jvICDjEb67TauYCHtremCfqWF
-         0DtA==
+        d=ziepe.ca; s=google; t=1720740107; x=1721344907; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iA5EkoKdOMHWMqTqv30k2JtFjPGSRguy2LMuZP+mDPQ=;
+        b=nIPKSS+KTzMPGs/qhTb/4shsJL1+iGXNyq3KD9UF+NJO+MJdrFqd2U8wHvKOpCv6Bp
+         vMhprI2QaXObRppIrhKXDvr0k13uEHaJ0VvqaWRKuCA5P+yzacerw3YQEj0OdWdxAZ95
+         qrbqmqtYdQH3D6ISXGGxdeuuy3lasqj02WoRVtPW7QRsDUuRuHcLsHmqvfp5toIAvZDC
+         6h43YjEE8/7M2usehzHD94FO6bNCoqaee9TIk1HYXGgZl1KqTKiVlqMc1NboIyptS6pQ
+         VPL2KtBPU0tv1GT7TemzEtXkiYBjECJ9W3HEBL5maqCxvIwpGpL3Ke6qed/HfnzmF7cl
+         198A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720736798; x=1721341598;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YsuiOBusLRDWI99QW9bV16tHkAO5K+vCBNIughlrrA0=;
-        b=nzGenSHMMnvAugbFpJFGzcNyH+rt/yfAvefRcl5XVR9XO2a0VIxYstXq3V/RzZm9ok
-         f2hsZY7yZNavo71AcijsaHPDPmu4CBi+lmBuCrHDkcVo1pmqPZB6OgSaIoXu4P3PcaJq
-         6w1RCLNhMASKTVhHOENJ+ik3z+sco8oS1V6daBA7SNL7LOFwEi5t26dhvnxxPr25y3ut
-         nyp8cdaFtJYY7fJWHbJBLjc3BO3fPdphDlj4beW2Fyqbdfbz1GzOeNbIFnZzWlaxMitZ
-         RLVWhNMvo24+cr0DeekxViG8pD76Fl38YYRWRIYC9lVuPvmIwKS4KEgATBXF3z+Qtl2N
-         t5mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYRwNoyhqY24yRE6OuQUrb6/R1MsrzKfLuKGV2jTf67y6lp6ybqICuLRYH+CffFoZxfTM66tO9a4Trndqd8Wa1co09m+iT0IV+NtM=
-X-Gm-Message-State: AOJu0YzCkEwrW4w9Coqum02iVLfewqKi6ruJTHl5/HcCUTN99kMLsMl8
-	m4HsTLHiEMcDyeRpSoHRW8k12OACHjSZK3Fun5sldsyR6OvnZhJgFQVa/MDTcMM=
-X-Google-Smtp-Source: AGHT+IET6FaCTxzISPW5bh3OZAtCu3S0k+pjz/14SbMrLU6oTB1Hrgolgk4KCNDxcuTsNlwiOwlxCA==
-X-Received: by 2002:a17:902:f541:b0:1fb:8864:e20 with SMTP id d9443c01a7336-1fbb6d03e33mr82007115ad.23.1720736798082;
-        Thu, 11 Jul 2024 15:26:38 -0700 (PDT)
-Received: from dread.disaster.area (pa49-179-32-121.pa.nsw.optusnet.com.au. [49.179.32.121])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ac5c9fsm55037955ad.231.2024.07.11.15.26.37
+        d=1e100.net; s=20230601; t=1720740107; x=1721344907;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iA5EkoKdOMHWMqTqv30k2JtFjPGSRguy2LMuZP+mDPQ=;
+        b=YbfVI9jFjaVnnZwxa/malUtkAvbJySg7nrpNtp3mRO8kfpdwwL8H7SEoDkf+5HnzY3
+         q8hDYOywGNGarHuo65LX/cbmo+43ZJ+vVFOwSbCj/SAzHQ74nhxBK9fYPMAKp8Xc/5S8
+         Ey344r5Iva8rg90moeQYZjx94JYD3entZ1M600uYgbDaNrBGBuj5AoCCwZeKsWkcVvuc
+         QTKu/hFLarlNMgS+udrZNz9mOtOgz3dTDv8vxUjs/tCiS9tYpO1Ji82Gfj2eGNjNUoLd
+         rWWtN7BzUUUl/JMNF5jCxSpOfpoBJwDnO2AOGgNMtIHGfnH1fcsYKs7AoTBQ9kbaOQm0
+         SRNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUuI4I8wZ6JW3BU64foF5YNEvPy4cdDB6uUIqTbTvNe/BOgOafhF5v2Ls68BlWgU0oEOuqjIO9MUi5WrV57OB9LEGUnotY3qV9W7L8=
+X-Gm-Message-State: AOJu0Yz+RVAD/x0JJAWV6wpU0BxrMiVnD193fKZRNClUgnDD1IKEsmHW
+	eQbEc5r6hnp7urAqeacSy/8MGZ6/JlDdLslJuQyYr2MkY73hoHqvGg/ukk97CBM=
+X-Google-Smtp-Source: AGHT+IE3EReOFfP9Gp9yOBbEQdd9ZoxHQTHmzRvm3onKx9Jai/yPhMccTCjhIICDfGTUxTuCo6A+VA==
+X-Received: by 2002:a05:6214:1c83:b0:6b0:6a57:c982 with SMTP id 6a1803df08f44-6b61bcff6edmr121290886d6.28.1720740107241;
+        Thu, 11 Jul 2024 16:21:47 -0700 (PDT)
+Received: from ziepe.ca ([128.77.69.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba7a437sm29827036d6.85.2024.07.11.16.21.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jul 2024 15:26:37 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1sS2FH-00CWOQ-0I;
-	Fri, 12 Jul 2024 08:26:35 +1000
-Date: Fri, 12 Jul 2024 08:26:35 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Andre Noll <maan@tuebingen.mpg.de>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>, linux-raid@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org, it+linux-raid@molgen.mpg.de
-Subject: Re: How to debug intermittent increasing md/inflight but no disk
- activity?
-Message-ID: <ZpBcG1HPeahYqwDd@dread.disaster.area>
-References: <4a706b9c-5c47-4e51-87fc-9a1c012d89ba@molgen.mpg.de>
- <Zo8VXAy5jTavSIO8@dread.disaster.area>
- <Zo_AoEPrCl0SfK1Z@tuebingen.mpg.de>
+        Thu, 11 Jul 2024 16:21:46 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sS36e-00FPgi-P3;
+	Thu, 11 Jul 2024 20:21:44 -0300
+Date: Thu, 11 Jul 2024 20:21:44 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240711232144.GQ14050@ziepe.ca>
+References: <cover.1719909395.git.leon@kernel.org>
+ <20240703054238.GA25366@lst.de>
+ <20240703105253.GA95824@unreal>
+ <20240703143530.GA30857@lst.de>
+ <20240703155114.GB95824@unreal>
+ <20240704074855.GA26913@lst.de>
+ <20240708165238.GE14050@ziepe.ca>
+ <20240709061721.GA16180@lst.de>
+ <20240709185315.GM14050@ziepe.ca>
+ <20240710062704.GA25953@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zo_AoEPrCl0SfK1Z@tuebingen.mpg.de>
+In-Reply-To: <20240710062704.GA25953@lst.de>
 
-On Thu, Jul 11, 2024 at 01:23:12PM +0200, Andre Noll wrote:
-> On Thu, Jul 11, 09:12, Dave Chinner wrote
-> 
-> > > Of course it’s not reproducible, but any insight how to debug this next time
-> > > is much welcomed.
+On Wed, Jul 10, 2024 at 08:27:04AM +0200, Christoph Hellwig wrote:
+> On Tue, Jul 09, 2024 at 03:53:15PM -0300, Jason Gunthorpe wrote:
+> > > That whole thing of course opens the question if we want a pure
+> > > in-memory version of the dma_addr_t/len tuple.  IMHO that is the best
+> > > way to migrate and allows to share code easily.  We can look into ways
+> > > to avoiding that more for drivers that care, but most drivers are
+> > > probably best serve with it to keep the code simple and make the
+> > > conversion easier.
 > > 
-> > Probably not a lot you can do short of reconfiguring your RAID6
-> > storage devices to handle small IOs better. However, in general,
-> > RAID6 /always sucks/ for small IOs, and the only way to fix this
-> > problem is to use high performance SSDs to give you a massive excess
-> > of write bandwidth to burn on write amplification....
+> > My feeling has been that this RFC is the low level interface and we
+> > can bring our own data structure on top.
+> >
+> > It would probably make sense to build a scatterlist v2 on top of this
+> > that has an in-memory dma_addr_t/len list close to today
 > 
-> FWIW, our approach to mitigate the write amplification suckage of large
-> HDD-backed raid6 arrays for small I/Os is to set up a bcache device
-> by combining such arrays with two small SSDs (configured as raid1).
+> Yes, the usage of the dma_vec would be in a higher layer.  But I'd
+> really like to see it from the beginning.
 
-Which is effectively the same sort of setup as having a NVRAM cache
-in front of the RAID6 volume (i.e. hardware RAID controller).
+Well, lets start with agreeing on this layer's API and be confident it
+can succeed.
 
-That can work if the cache is large enough to soak up bursts of
-small writes followed by enough idle time for the back end RAID6
-device to do all it's RMW cycles to clean the cache.
+Then I'd say to look at RDMA as it is a logical place to build such a
+data structure and we can build something that at least does what RDMA
+needs.
 
-However, if the cache fills up with small writes, then slowdowns and
-IO latencies get even worse than if you are just using a plain RAID6
-device. Think about a cache with several million cached random 4kB
-writes, and how long that will take to flush to the RAID6 volume
-that might only be able to do 100 IOPS.
+I need something anyhow to plumb through to DMABUF and over to iommufd
+and VFIO, can't skip out on it :)
 
-It's not uncommon to see such setups stall for *hours* in situations
-like this. We get stalls like this on hardware RAID reported to us
-at least a couple of times a year. There's little we can do about it
-because writeback caching mode is being used to boost burst
-performance and there's not enough idle time between the bursts to
-drain the cache. Yes, they could use write-through caching, but that
-doesn't improve the performance of bursty workloads.
+> Yes, I don't think the dma_vec should be the low-level interface.
+> I think a low-level interface based on physical address is the right
+> one.  I'll see what I can do to move the single segment map interface
+> to be physical address based instead of page based so that we can
+> unify them.
 
-Hence deploying a fast cache in front of a very slow drive is not
-exactly straight forward. Making it work reliably requires
-awareness of workload IO patterns. Special attention needs to be
-paid to the amount of idle time. If there isn't enough idle time,
-the cache will eventually stall and it will take much longer to
-recover than a stall on a plain RAID volume.
+Yeah, I've been talking to Matthew explaining that starting at the DMA
+API makes the most sense and lets remove mandatory struct page
+entanglements there. Then we can start to examine other layers. Having
+a consistent option in the DMA API to be physically based with a
+memory type fits with that plan.
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Jason
