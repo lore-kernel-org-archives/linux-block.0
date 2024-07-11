@@ -1,48 +1,48 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869206EB7C
-	for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 17:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9174917BB3C;
+	Thu, 11 Jul 2024 18:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720720778; cv=none; b=jH1Z3i9BF+WIzy8il7sqsZuS5W8Yu7nXSy/95AvnVPQSbVCqyyoS07UjyTVrF2jFxOmbNYFcRaaVn3dUPVXpyfsty9M9dUgwiJnQVmoXD45IFehAwv77MWA2zOJ/Vm/t1BTdrDi3M3TG6ddgvHQD5caTzf+4afc3J8KkIctIPNI=
+	t=1720720871; cv=none; b=A0D3BAKkWFCsJyMFprXCeq+75ULovVLT/mkaMrhL9qeUB7t9oWjm1tm99VTvTDHoKI0e1a1uYdyQS0w3+DPgA707XxelNy8zXsVbCPa0tw3DLGTg5cmE2/Z2YEiveEESqw6nyDH8NcRqQTp1n4YhWtmqFhyPPB1/ZwYfDA1T2jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720720778; c=relaxed/simple;
-	bh=ylJ6o6bHYygfqwj8nQodeINNa6RSg4/HCe8TwGomfL0=;
+	s=arc-20240116; t=1720720871; c=relaxed/simple;
+	bh=EukfsqD8rodAYY6/mdsuH05IFV/tsORH99jQjePUr/o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MZDa1H8lk3TRUs7zZnXyfPlYKjEWa1KKfZEVJUBrTPUYk35BJHZFa2YblMxd4M3ksYuIoBVLhtcspcWYzCtEKw8lJvC8vcTr7UOe7R2SZUNMRf9MVWxubiV4CgeDeXVES6V0j0xfA20PqdkxpfZZfMj3V70jHL4GJyafrBlWq/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=U5zdrOk3; arc=none smtp.client-ip=199.89.1.11
+	 In-Reply-To:Content-Type; b=HSvTnY0tqEizZJPoUr3/rmBxzHvqNK9d0Szuit6ptkWXN259BSQM5tippCe2OHHjeigTOUzBhdbz4Ay5ayUNRBgL9grcM20yb+t9OwfTCPpUL7o5KTT1b7pmAtIKNlUwfCmAZQjfvwfpaWXccJSX+QIBOcOfnCKFi8aHslIR1N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=pAkdR3P2; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="U5zdrOk3"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="pAkdR3P2"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WKjD90HC0z6CmM6X;
-	Thu, 11 Jul 2024 17:59:37 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4WKjFq0s98zll9ds;
+	Thu, 11 Jul 2024 18:01:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1720720774; x=1723312775; bh=ylJ6o6bHYygfqwj8nQodeINN
-	a6RSg4/HCe8TwGomfL0=; b=U5zdrOk3OoTtE/kXICPQkF/BfHov8F9vkpYDngSf
-	Po++M9IWA40/6gPtzLxe5sphv4CIuONqRCJBW+Z12402HAAqCF1Hs8ZbYAZY26iH
-	iLMHhOoJEiJA9kdMedAKkAgMmSzzXbVo/z5tE+vzH1Hso03Uv+BY/2jXisZLb7Hb
-	gG7QQKv7fBWmF/KIH8IENrRMqZRLlaoDXfoX7iQ03hYdPAmXXJN5KYLzCjaNMtPW
-	GbKNJ7gbvvrNAk320MLAdWZKXQZhKjZ6VH+9i5TYrzvh8IF75LmvbQS41+LZ9uX9
-	Yz2bwbw4+0yt8P6jJRSSXmJsdNjge8h85RB08mAql+/43A==
+	 s=mr01; t=1720720860; x=1723312861; bh=EukfsqD8rodAYY6/mdsuH05I
+	FV/tsORH99jQjePUr/o=; b=pAkdR3P2cNKI1EjW6Lup76PiL/mb7/2edJ3lc1ZO
+	DJUumiBUxLo4zU933ze1/d8jQzuzKHDCzAGAhq6GH0kaHvAIk0gp9UO3H6jhzToY
+	RblQMLyFphN92AAlB4csFqP/RHiyBHXiu7qUYRApEnrWmdhwDVnxbHuabqqs6SU+
+	DbSkZ8MOhzAkjn0gfCwHC47/CaQsJ6Py7TOVZYdES7Rgr7Npf8930lisyrohHQQy
+	T8Rz8NtNxoPMkV1DjZZ+UNaGGCR4w3XNqvep808OaC2hGspELXQvEUBKRxD7DaQm
+	Cm4WQ5gSG8JmdgvwZws/2TCvcfsADYPo9i9XR9CT+xsrrA==
 X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 7HQ2kdDD27Qc; Thu, 11 Jul 2024 17:59:34 +0000 (UTC)
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id mp6sO_zfjB68; Thu, 11 Jul 2024 18:01:00 +0000 (UTC)
 Received: from [100.96.154.26] (unknown [104.132.0.90])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WKjD6103vz6CmM6V;
-	Thu, 11 Jul 2024 17:59:33 +0000 (UTC)
-Message-ID: <bba377b4-16f8-4a28-9177-bcfec2f75c89@acm.org>
-Date: Thu, 11 Jul 2024 10:59:32 -0700
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4WKjFl0QBgzllBd6;
+	Thu, 11 Jul 2024 18:00:58 +0000 (UTC)
+Message-ID: <20957ae8-2d05-4852-b149-64edb071426f@acm.org>
+Date: Thu, 11 Jul 2024 11:00:58 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,33 +50,29 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] dm/002: repeat dmsetup remove command on failure
- with EBUSY
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Mikulas Patocka <mpatocka@redhat.com>
-Cc: Bryan Gurney <bgurney@redhat.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
- "snitzer@kernel.org" <snitzer@kernel.org>
-References: <20240709124441.139769-1-shinichiro.kawasaki@wdc.com>
- <CAHhmqcT6F_b8ZJMbm9jbL0Zg-vv6zq9oxfMttzf1K4GH-zz=NQ@mail.gmail.com>
- <e767864a-7ecf-8459-30d5-daa654b4c0d2@redhat.com>
- <nmildf5tauvp34aeibmzwcxao4ujbwnkkkesollifa4w5uwf2v@qi3pzxidduca>
+Subject: Re: [PATCH 1/2] blk-ioprio: remove ioprio_blkcg_from_bio()
+To: Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, josef@toxicpanda.com,
+ jack@suse.cz, axboe@kernel.dk
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+ yangerkun@huawei.com
+References: <20240711090059.3998565-1-yukuai1@huaweicloud.com>
+ <20240711090059.3998565-2-yukuai1@huaweicloud.com>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <nmildf5tauvp34aeibmzwcxao4ujbwnkkkesollifa4w5uwf2v@qi3pzxidduca>
+In-Reply-To: <20240711090059.3998565-2-yukuai1@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/11/24 3:39 AM, Shinichiro Kawasaki wrote:
-> It showed "Comm: (udev-worker)" is the process which keeps the DM
-> device open. [ ... ] Just adding "udevadm settle" before "dmsetup
-> remove" will avoid the failure.
+On 7/11/24 2:00 AM, Yu Kuai wrote:
+> Currently, if config is enabled, then ioprio is always enabeld by
 
-I'm OK with either the retry loop from the patch at the start of this
-email thread or adding "udevadm settle"
+enabeld -> enabled
 
-Thanks,
+> default from blkcg_init_disk(), hence there is no point to check if
+> the policy is enabled from blkg in ioprio_blkcg_from_bio(). Hence remove
+> it and get blkcg directly from bio.
 
-Bart.
+Anyway:
 
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
