@@ -1,94 +1,96 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F9B174EF8;
-	Fri, 12 Jul 2024 17:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8FF16F8F5;
+	Fri, 12 Jul 2024 17:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720804790; cv=none; b=AaVJ2PCGGwpcHqcZ+VOk7aCpGwliC1yS28MXbLsdyTVKYy+WoEHf86rhuD1zu3/pR3Z+rxq7NuU4lUBC6fJSr9Bto7HvA1mN/b5aFWNTKWCTZ3X4HNKTcP6JETV2RCdV4mjNXq95SvFC89Q1gUDNECWUGDwIWyjHfzLc62sQmRk=
+	t=1720806823; cv=none; b=hsO7e1PEqY5ZDHK8DP4KVTkhyq0KZtyJwzhKIrXGwS+Xyg3XhOKkELyqGLxK8++FAovKlhWUeegXxU7Z3vL3Cg1+j1ugE6zZZu8qKQmCi1hL+wqIDx31P/rFKZbf3r0jFyKb90b52txqsdyLPVj95uMBetAignq9KKynPE/rTx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720804790; c=relaxed/simple;
-	bh=ttLF7O7mJmLLIvwZHUjJVnPnrdw+2UYWswNcOiIGEyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DrZqwPV0TnrwNzHi+E/c72OeHAUSj0MLolwDIDm3w0c+t23YQ2e6H6RzvnNwSiVRypfuwUMnLQ7vX0X7P9GPFpxY79glzNL+484cK3Q1xeyNVmJBkeUGE5zQVHbWETbvylm9vZ3fQdsaGY9lZBg+GO635Ad8Z9keay2ihQ4mQlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kF2Hy2Ow; arc=none smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720806823; c=relaxed/simple;
+	bh=6XXrmX7z0sJhUPuzc/d7CRMR71UcuWhAgefjKvfTRpI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wm+nb+ySiIH+F8dveMQ69kBJxk4X5m65auLC2yh419zbJiu3fxUwCVnLnVPbwGaqiGCAzaDrRSyj02FMHUuJwZLtGiiQKr2OYfmKcf0PPv8YQSr6gCt9ru65b1qj1prPsTlxMMLJeuNWTIGXIUH4OC4+loaEt0CzmPFWXAdGws4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=U+4CyYIX; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kF2Hy2Ow"
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5c47c41eb84so1235971eaf.0;
-        Fri, 12 Jul 2024 10:19:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720804788; x=1721409588; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8/Gn627AZPe/QQaHzaSIrwpojyhT7Q6TwyJkki/9ctw=;
-        b=kF2Hy2OwnMiBvaCa5G1U/zm+/6GrHYz81abQaMER3kPTgnW+Qws/Mb2WTkGmx7rnUH
-         lLtcjQfijvDowbihjIzWbKWAuWo8XirWOmOFrmmgxnfcmBHe3DwMP0NQ3AwU+0/Vhlbu
-         PKEV1gsmDflVN8vtD+VsAqC6YPfqbr/UcxdUv5rl+RGUur6tG1awbcQYRRAcsnMtqEO+
-         6VgC8QTDhe8n7DQ1PbY9Yy4X2RPXoPcQG7yeXQBDhs2dju/Da0EykHPo6B5cnaGFyPlO
-         dMcpomK92O0jCbwDo/lEy014uilTKazPNNGSxvKn8NXaNw75CCnoPqlTxkCmSt+GRqzU
-         iwGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720804788; x=1721409588;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8/Gn627AZPe/QQaHzaSIrwpojyhT7Q6TwyJkki/9ctw=;
-        b=LELSW6Gon0FopOSBR8DqcemLQIpoQR38QSnstnVM0SQCCXOZAYoHuETzt5FaosGNYU
-         Fko7uzJiW2b0+/6K/c0o1IZwBvGs4dob95qOAt+czI/IjHuW3Wkxtk7aUPJlhYA7C2eb
-         9Ce9VDi9rvDla/C5/Bt8n1sFJXD2sGbI3zNOVhboIICS4IMZsbs1yKehYDTy1nxxrZMv
-         2hEpyAdpbjhc5V30oW9qZ4isyXHg5RdchMqmrR2SCIyBHfjNA3Da6TH5QeZEyb5YBz2A
-         iKhCeP0a3JDTER3ULv3dUJl1lY0rvqHDwaiYiXFKTqU3+8iUQ4CiQYxlFE59MnsI9iBw
-         nlhg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQyAS+oZvnA3W5Ck2yJOCs40QPbQTutdEhCIddezfmhqVFSw1nuf+VkFE9IzPuo8Lms6vExLDeQoyvuAqM0GZBKQfWlowBgf/en7QU8xTUsc9594KrQH3iXuQKlCRrOvdwis8OT1czyeLVSw1DBkD8fwzvkwe8ZTjeC5kOUTm/cJAf
-X-Gm-Message-State: AOJu0YygCXd+p2/qADqhg5FzGRvpFVy7LhGCZQOdqbslve9lM7T9GBg+
-	39LiCba1ZIFmp8fIvTFHmbdv6U8SrN5AZAl4RbnG/Bt/nEkDsC+N
-X-Google-Smtp-Source: AGHT+IFFT3R/DrZI1RkYPgoNrfL7xkIuMXcw08FwJ9gDOppfwcBuOZw9mcLBD9zJAd4yMgZcdTp7Iw==
-X-Received: by 2002:a05:6358:c3a8:b0:1a5:575d:def with SMTP id e5c5f4694b2df-1aade041a1emr949599055d.2.1720804787707;
-        Fri, 12 Jul 2024 10:19:47 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-77d60da9d16sm6121583a12.38.2024.07.12.10.19.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 10:19:47 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 12 Jul 2024 07:19:46 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Xiu Jianfeng <xiujianfeng@huawei.com>
-Cc: josef@toxicpanda.com, axboe@kernel.dk, lizefan.x@bytedance.com,
-	hannes@cmpxchg.org, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] blk-cgroup: move congestion_count to struct blkcg
-Message-ID: <ZpFlsrNMMUMnT_Lq@slm.duckdns.org>
-References: <20240712085141.3288708-1-xiujianfeng@huawei.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="U+4CyYIX"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WLK2k6zNPz6CmM5x;
+	Fri, 12 Jul 2024 17:53:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1720806812; x=1723398813; bh=Ui5K+5Z74KfkcStMuHfzuZ36
+	85TuJxJZarO60+eBfz0=; b=U+4CyYIXoyVhY/dnhefBF2YqA1u8h8IbgtysjcnP
+	Fku+K+aS0zkEjzPidqFUvZembJVs/UFSO2SfxW4vTgRMw8CrqqJlgmFnchNM5zvH
+	5T1IV6oxL0evslAppERQTmFxQAcXaOBxJiZDayeusHz4kiDEhwxxLDs51fkO10yP
+	T9Qlhd3PQz8re5eyyrqRD+nO6UCBZZ84Yc7hCfrE6ykikBJs9mT1UK8/710By/Bc
+	j9OB2wnprIgWk/H+beIB0g2J59mYG2MImJrvA2DftY6SFXdr8ndpVp04G+gHuO13
+	Flmh9RFaLF6RT/RkoGREVv9DND7z9oGRsk3mMW2fPGbV7Q==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ghXhushBKFiw; Fri, 12 Jul 2024 17:53:32 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WLK2d6rm3z6CmQvG;
+	Fri, 12 Jul 2024 17:53:29 +0000 (UTC)
+Message-ID: <293dff44-8ae2-431b-a002-b31a09ddd34e@acm.org>
+Date: Fri, 12 Jul 2024 10:53:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240712085141.3288708-1-xiujianfeng@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6] sbitmap: fix io hung due to race on
+ sbitmap_word::cleared
+To: Ming Lei <ming.lei@redhat.com>
+Cc: YangYang <yang.yang@vivo.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20240710065616.1060803-1-yang.yang@vivo.com>
+ <29e50fff-fa7f-4b92-bfe9-7665c934b7dc@acm.org>
+ <ead047aa-d9dc-4b2f-869f-610b309b5092@vivo.com> <Zo/gevNqftePGvic@fedora>
+ <6acb93c3-f11b-40a4-bec0-b17fb77ad0c9@acm.org>
+ <CAFj5m9L2qin-h1qfPbhotSr-2Xh+mnQbsWhpzeK3dA_YTQ=JpA@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAFj5m9L2qin-h1qfPbhotSr-2Xh+mnQbsWhpzeK3dA_YTQ=JpA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On 7/11/24 6:01 PM, Ming Lei wrote:
+> On Fri, Jul 12, 2024 at 12:33=E2=80=AFAM Bart Van Assche <bvanassche@ac=
+m.org> wrote:
+>> The comment above 'swap_lock' in this patch is as follows:
+>>
+>>          /**
+>>           * @swap_lock: Held while swapping word <-> cleared
+>>           */
+>>
+>> In other words, 'swap_lock' is used to serialize *code*. Using
+>> synchronization objects to serialize code is known as an anti-pattern,
+>> something that shouldn't be done.
+>=20
+>> Synchronization objects should be used
+>> to serialize access to data.
+>=20
+> It can be thought of serializing UPDATE on both ->word and ->cleared,
+> instead of code.
 
-On Fri, Jul 12, 2024 at 08:51:41AM +0000, Xiu Jianfeng wrote:
-> The congestion_count was introduced by commit d09d8df3a294 ("blkcg:
-> add generic throttling mechanism"), but since it is closely related
-> to the blkio subsys, it is not appropriate to put it in the struct
-> cgroup, so move it to struct blkcg.
-> 
-> Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
-> ---
-> only compiling tested
+It would be appreciated if the comment above swap_lock would be modified
+such that it reflects that it serializes simultaneous updates of ->word
+and ->cleared.
 
-blkcg is per cgroup and blkg is per cgroup-device pair, so the change isn't
-just moving the field but updating what it means and how it works. The
-change needs a lot more thinking, justification and testing.
+Thanks,
 
-Thanks.
+Bart.
 
--- 
-tejun
