@@ -1,117 +1,96 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C5710E3
-	for <linux-block@vger.kernel.org>; Fri, 12 Jul 2024 01:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9D0646;
+	Fri, 12 Jul 2024 01:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720746086; cv=none; b=qD6NN7J4IfY+nS5105YJBJfANRlEn0S10fyeg6/scTcEbPDPERum4H46MNE84uHPj1/Nfj5ZBYxUu/qLE5HOIlp8tKE9cRTfxLxLZ32NEhlzb8ada5LC45qjgmIKYn7nvBhgg+7ICu65CfB0jaYKyxdtgnOh4FPZbUuOm/z/Eds=
+	t=1720746639; cv=none; b=HF3BCAEK1HJNAVQqlMfpIaei4ie6XQ5QHcJKIqKHdzJ5KlZXLh/hmaanZziaU2Ee+1AxxXq/we93rRrv9vYVZ8BM4x2LBGmKEunuC9QpfzB1l9SonOjsxPHHltT9JI06YYFDQwvJY7XFqHasFx4D5esU7YyIlPJnbX5m9XYncUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720746086; c=relaxed/simple;
-	bh=0lzGgMccgOsb1N/R6m8AEmk1oMrFdCaXnfbBbMXMHRk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U7NTrwnPMhDKp6Tdu7Bv1Vz0W3gZ/Ga5UkPT6IHK9vx///9AM0BXPyKv6TlXv/4PANQEj8ZYHqr7ib7tSH28Vmr194mVtq2RyqhBRFj7HypSQAf9GrklJc60TXK+3xqWUWAPLmtutwM4JUZ/6gqhoZyxI3KP+EbeleF1qP3ix5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KxCvCc5t; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxCvCc5t"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720746083;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E9wm45KJYHSR6EG4gUE0pW1MnhXS5B56DsrXLuti6lY=;
-	b=KxCvCc5tmkfejammXW90LAybYP+YdFtQGLN2w8vUs5enIdSfd4Ii9rqhPe65AMRSjEosiR
-	IgZNju8gtno6FPIiVN+DZUVak+CM5kTHv2HlZJwG7mRTVcdxMRmSuwVkG6DDFxDMW/GbHF
-	EbiYgXgtIfDY3b8QE+7G1gtWSvO4tBo=
-Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
- [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-418-Lbj7StPGMzy60FQ-ivPiNA-1; Thu, 11 Jul 2024 21:01:21 -0400
-X-MC-Unique: Lbj7StPGMzy60FQ-ivPiNA-1
-Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-81016668febso123358241.3
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 18:01:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720746080; x=1721350880;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E9wm45KJYHSR6EG4gUE0pW1MnhXS5B56DsrXLuti6lY=;
-        b=QlKo/BSWjoFRxFJ/qgMcGZURooC9693G9RwOHLeOfGOGAWFqYxU9MaEV/52R4YVx7v
-         OWnYt+wLrQGMJFacwK1ujrI2wzWo8XU4y0VaORC64m4TY15yw9f99nQAIXQMnw07DqZu
-         TwQ5DPXnOycIUogRQuHCTMOVMuFeA9Gef+oiIo93AVEeBGDAc9fjO/XePKE+ATaHVBHi
-         9Gb+54eindw7/VnYQZsKPfq8iS/zsj/WI8/hzAfRv2DrTWr0iSzNxx5u7Rjblzizdq5B
-         7VcS/jRSekG1S3vWHpOvdfLd5x3dCmDR8OnJ3Fm+lF0bY/G2qq4mh6/s0dbzqTSw9Sh0
-         eCag==
-X-Forwarded-Encrypted: i=1; AJvYcCVCWgevn/6raDRPvg2rMmxFr5GE4q0JELvjwcdJyo9IzQ6CX1UULo3P5/YcfWTc8bjUSie1uOk4nPpsoKwFOern9Bm55L2qTXPz2yQ=
-X-Gm-Message-State: AOJu0YxpLQ1g+cjz1UcRXzfieC0HLk+4Gn5xgCti+07U728h7wzSxjUF
-	+LecZwfqgHiU6my+oGXfnWEKcW/wpSb8GgJs30AtkauK4X5grjSmGOBrqeB0vtayMnwRUrxjeVx
-	ZN6/nfLpUWtrmEghJOi4NDWInT+4el9sZ9gG0PvGiPbp6WRirFpPtPwvB3GFi5R3KPLgYjjbvqL
-	b8dOmyH8N/mW1jWmCJLC4Gwpr3+E96yGO4Azo=
-X-Received: by 2002:a05:6122:3c8d:b0:4f2:aa91:34eb with SMTP id 71dfb90a1353d-4f485296ad9mr4395852e0c.1.1720746080271;
-        Thu, 11 Jul 2024 18:01:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9qAJCd/UDkXooJxLP3polnc0tAxXfY/AZlFlnhbfWI+/TnM9trFyVB+qIUz+wEKL7J4r0h72VhTW6a3A80Wk=
-X-Received: by 2002:a05:6122:3c8d:b0:4f2:aa91:34eb with SMTP id
- 71dfb90a1353d-4f485296ad9mr4395840e0c.1.1720746079952; Thu, 11 Jul 2024
- 18:01:19 -0700 (PDT)
+	s=arc-20240116; t=1720746639; c=relaxed/simple;
+	bh=DjglkLB/XUhl1kVTjdWb/er00Rjbo3C/06LUWOMJp3k=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=sVTxAqTMnwSeEQ5EyzqiaRsJS/33G8pMUOEUJU5/hFIY38e5hxOJ9k61LALuaw+rY7RIzL1eY5zL5QbWBGe+jPQFwITRg1HE9zfS+hMCWOzuccmf7zDFwguT2f0u8GaLIaB5JKQvu1iDB7zsn0GNpGCdWPRQbOBec8WQHWrJq4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WKtnD4h6gz4f3jJ4;
+	Fri, 12 Jul 2024 09:10:24 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 5D7E31A0184;
+	Fri, 12 Jul 2024 09:10:32 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP2 (Coremail) with SMTP id Syh0CgBXwIWGgpBmoOlpBw--.16436S3;
+	Fri, 12 Jul 2024 09:10:32 +0800 (CST)
+Subject: Re: [PATCH 2/2] blk-ioprio: remove per-disk structure
+To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ tj@kernel.org, josef@toxicpanda.com, jack@suse.cz, axboe@kernel.dk
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240711090059.3998565-1-yukuai1@huaweicloud.com>
+ <20240711090059.3998565-3-yukuai1@huaweicloud.com>
+ <4c8f1e4e-1b15-4afa-b1e2-084e0c4caeec@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <520b9c10-c152-77f3-bd5a-b86a1f5ac8ea@huaweicloud.com>
+Date: Fri, 12 Jul 2024 09:10:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710065616.1060803-1-yang.yang@vivo.com> <29e50fff-fa7f-4b92-bfe9-7665c934b7dc@acm.org>
- <ead047aa-d9dc-4b2f-869f-610b309b5092@vivo.com> <Zo/gevNqftePGvic@fedora> <6acb93c3-f11b-40a4-bec0-b17fb77ad0c9@acm.org>
-In-Reply-To: <6acb93c3-f11b-40a4-bec0-b17fb77ad0c9@acm.org>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Fri, 12 Jul 2024 09:01:08 +0800
-Message-ID: <CAFj5m9L2qin-h1qfPbhotSr-2Xh+mnQbsWhpzeK3dA_YTQ=JpA@mail.gmail.com>
-Subject: Re: [PATCH v6] sbitmap: fix io hung due to race on sbitmap_word::cleared
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: YangYang <yang.yang@vivo.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <4c8f1e4e-1b15-4afa-b1e2-084e0c4caeec@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgBXwIWGgpBmoOlpBw--.16436S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruF4rGrykKF4fGr4Dur4fAFb_yoWfXrb_Ga
+	95X3sFk3y3Ars7Gan3Ar45JrZ7tFWjgr1xX34jqF9rtr4rWrWrWrnFg3yfur13Cw18Cr9r
+	Cryq9w18Gw4agjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+	3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Fri, Jul 12, 2024 at 12:33=E2=80=AFAM Bart Van Assche <bvanassche@acm.or=
-g> wrote:
->
-> On 7/11/24 6:39 AM, Ming Lei wrote:
-> > There are only two WRITE on 'cleared':
-> >
-> > - xchg(&map->cleared, 0) in sbitmap_deferred_clear()
-> >
-> > - set_bit() in sbitmap_deferred_clear_bit()
-> >
-> > xchg() supposes to provide such protection already.
->
-> Hi Ming,
->
-> The comment above 'swap_lock' in this patch is as follows:
->
->         /**
->          * @swap_lock: Held while swapping word <-> cleared
->          */
->
-> In other words, 'swap_lock' is used to serialize *code*. Using
-> synchronization objects to serialize code is known as an anti-pattern,
-> something that shouldn't be done.
+Hi,
 
-> Synchronization objects should be used
-> to serialize access to data.
+在 2024/07/12 2:03, Bart Van Assche 写道:
+> On 7/11/24 2:00 AM, Yu Kuai wrote:
+>> ioprio works on the blk-cgroup level, all disks in the same cgroup
+>> are the same, and the struct ioprio_blkg doesn't have anything in it.
+>> Hence register the policy is enough, because cpd_alloc/free_fn will
+>> be handled for each blk-cgroup, and there is no need to activate the
+>> policy for disk.
+> 
+> As one can see in the output of git grep -nHEB1 '>pd_(alloc|free)_fn\(',
+> none of the pd_alloc_fn / pd_free_fn callers checks whether or not these
+> pointers are NULL. Hence my question why this patch does not trigger any
+> NULL pointer dereferences?
 
-It can be thought of serializing UPDATE on both ->word and ->cleared,
-instead of code.
-
-> Hence my question whether it would be
-> appropriate to protect all 'cleared' changes with the newly introduced
-> spinlock.
-
-Wrt. ->cleared only update, xchag() is enough.
+Because the blkcg_deactivate_policy() is removed as well, there are no
+callers now... blkcg_policy_register() is still called to make sure
+cpd_(alloc|free)_fn will still be called.
 
 Thanks,
-Ming
+Kuai
+
+> 
+> Thanks,
+> 
+> Bart.
+> .
+> 
 
