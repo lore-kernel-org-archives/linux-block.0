@@ -1,123 +1,117 @@
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249241A071C
-	for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 23:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C5710E3
+	for <linux-block@vger.kernel.org>; Fri, 12 Jul 2024 01:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720740562; cv=none; b=TVPt6cn8RsEueXAD8qQwOMkSZAWacq0fffnFnES35uoR2AJkSt7HFq2+fyN57MlHsezzejxbbvfXM1LL/zkcKDg9G8vS3mcdL+bbR9aE5NkyA9S3LCg+x4PPoWmNjUlNfCZrihE9eVdiPPwrUJ527Opm+5Lss9INHLiTfYb19xE=
+	t=1720746086; cv=none; b=qD6NN7J4IfY+nS5105YJBJfANRlEn0S10fyeg6/scTcEbPDPERum4H46MNE84uHPj1/Nfj5ZBYxUu/qLE5HOIlp8tKE9cRTfxLxLZ32NEhlzb8ada5LC45qjgmIKYn7nvBhgg+7ICu65CfB0jaYKyxdtgnOh4FPZbUuOm/z/Eds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720740562; c=relaxed/simple;
-	bh=xaEoCHgxGFkkaE365hqIb2Uz8DfpXp/vyPGTl63S9F0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lFpfseNq6ix2WrWZoeKDlz7dcvrwBfmjnKGqZb49feHdnAmUjDq+OMfn2maCOEik3LMxP6s8YIqaRIj48hP4tHgOGepJd0unSwttuqFgLPSjgvyIZEoWGvRxFicNBHEw5hnvXtBHxaAXXiPJ9blJ3OD7WADORjx9WoTXe5xU81E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=nz/0cXuE; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1720746086; c=relaxed/simple;
+	bh=0lzGgMccgOsb1N/R6m8AEmk1oMrFdCaXnfbBbMXMHRk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U7NTrwnPMhDKp6Tdu7Bv1Vz0W3gZ/Ga5UkPT6IHK9vx///9AM0BXPyKv6TlXv/4PANQEj8ZYHqr7ib7tSH28Vmr194mVtq2RyqhBRFj7HypSQAf9GrklJc60TXK+3xqWUWAPLmtutwM4JUZ/6gqhoZyxI3KP+EbeleF1qP3ix5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KxCvCc5t; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="nz/0cXuE"
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-df4d5d0b8d0so1365468276.2
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 16:29:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1720740560; x=1721345360; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sqjQlEH3CKHFjb6SyBS/N/HAG+tY7keJdf7Z8lIqTro=;
-        b=nz/0cXuEwIStaA0oAwpp1wkGKcQBjfrSApwM32tnvn3RhiIjxuSY26bM1PK28WOTpi
-         XySlNeg8PHIlDdCcsIb67uyNZ23PbkeIJ7JVORXTIUcsn3gi7jlq7wSSSrGljzjfUmvu
-         wQXR4GbTzr86ljYEBB0GSmDtsa+6R0I7sq/ALgclKzw6Cj2u4wK1u79kB6FajJAFh1u+
-         8n0gCiF2KhWXTuD7lAEp4vQzS5tm3ic1pCx6CMy3ABXNNeMK0rE/diWZhV0iSeYhX8ed
-         U9yrjQH5lLUZc0vaGVU54SYPkmSq7pZfZ6TSO7K9aT+ak0J1gIM9+tEcnwoXlOthu3iw
-         4X2w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxCvCc5t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720746083;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E9wm45KJYHSR6EG4gUE0pW1MnhXS5B56DsrXLuti6lY=;
+	b=KxCvCc5tmkfejammXW90LAybYP+YdFtQGLN2w8vUs5enIdSfd4Ii9rqhPe65AMRSjEosiR
+	IgZNju8gtno6FPIiVN+DZUVak+CM5kTHv2HlZJwG7mRTVcdxMRmSuwVkG6DDFxDMW/GbHF
+	EbiYgXgtIfDY3b8QE+7G1gtWSvO4tBo=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-418-Lbj7StPGMzy60FQ-ivPiNA-1; Thu, 11 Jul 2024 21:01:21 -0400
+X-MC-Unique: Lbj7StPGMzy60FQ-ivPiNA-1
+Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-81016668febso123358241.3
+        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 18:01:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720740560; x=1721345360;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sqjQlEH3CKHFjb6SyBS/N/HAG+tY7keJdf7Z8lIqTro=;
-        b=wnRpQXqaimBkerkmF/qmhPHBFbtZPqnLPDSfKQ45n1RLixCyuiTuEokOqjeeT9+ZUN
-         GRkXLSv42bnv+u4HCAGRL0EELxZCjoww5gR2Inrk506cnCU8wI2NxqJ0pQZvwVt6hEUc
-         W2ECdCwZgU9mcIfOb0dFr5568eTBifl7RIXlspzxVAVzeNqLT5XoogtqrM1Y8Kj9s+O1
-         9pf9a/9//gz9osiR7dmHW4ZXd2CmIiK1VK1nm0Fpjpq5b/TT9RTCA2KQYZXkchSVZCLo
-         NBGF+86N+8aGmc9xkXCvTQpX2V0ZAUeXynCaUuvTJ7YTUTbw6KeFWJIgEZ6FSSGQ7jQ0
-         Uc1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUCXPCx2yiGNC4awu4iI5O5ZPbVj6g9uwTbyM3h5w/D8qWLet3nLmuX0TaC9Yb6wzcaRNgJ5ZYiW3RxMMrpAmsVt5pOw8hn47/dO8M=
-X-Gm-Message-State: AOJu0YxdwC44TT6nZ08L429JT7REmxFeYtlgjE/3GskF8G0gl2+O8K3I
-	KOVJyqGgXfUImM94T7gBuhQ2QeDAbbxWGneIR6nIZ1QjEzu+J3mtSIWTzK+HCYA=
-X-Google-Smtp-Source: AGHT+IGo/R/9vr/JQ8/zyNR81M/Hy4HYANX0IxAKDGShf5hUDU3ZGhkQLcCJ3hGHl6ul2XGkV4cgvA==
-X-Received: by 2002:a25:aa66:0:b0:e03:5fee:66a with SMTP id 3f1490d57ef6-e041b123aefmr11985783276.42.1720740560216;
-        Thu, 11 Jul 2024 16:29:20 -0700 (PDT)
-Received: from ziepe.ca ([128.77.69.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190128d0sm341135085a.44.2024.07.11.16.29.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jul 2024 16:29:19 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sS3Dx-00FQzB-7b;
-	Thu, 11 Jul 2024 20:29:17 -0300
-Date: Thu, 11 Jul 2024 20:29:17 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	"Zeng, Oak" <oak.zeng@intel.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
-Message-ID: <20240711232917.GR14050@ziepe.ca>
-References: <cover.1719909395.git.leon@kernel.org>
- <20240705063910.GA12337@lst.de>
- <20240708235721.GF14050@ziepe.ca>
- <20240709062015.GB16180@lst.de>
- <20240709190320.GN14050@ziepe.ca>
- <20240710062212.GA25895@lst.de>
+        d=1e100.net; s=20230601; t=1720746080; x=1721350880;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E9wm45KJYHSR6EG4gUE0pW1MnhXS5B56DsrXLuti6lY=;
+        b=QlKo/BSWjoFRxFJ/qgMcGZURooC9693G9RwOHLeOfGOGAWFqYxU9MaEV/52R4YVx7v
+         OWnYt+wLrQGMJFacwK1ujrI2wzWo8XU4y0VaORC64m4TY15yw9f99nQAIXQMnw07DqZu
+         TwQ5DPXnOycIUogRQuHCTMOVMuFeA9Gef+oiIo93AVEeBGDAc9fjO/XePKE+ATaHVBHi
+         9Gb+54eindw7/VnYQZsKPfq8iS/zsj/WI8/hzAfRv2DrTWr0iSzNxx5u7Rjblzizdq5B
+         7VcS/jRSekG1S3vWHpOvdfLd5x3dCmDR8OnJ3Fm+lF0bY/G2qq4mh6/s0dbzqTSw9Sh0
+         eCag==
+X-Forwarded-Encrypted: i=1; AJvYcCVCWgevn/6raDRPvg2rMmxFr5GE4q0JELvjwcdJyo9IzQ6CX1UULo3P5/YcfWTc8bjUSie1uOk4nPpsoKwFOern9Bm55L2qTXPz2yQ=
+X-Gm-Message-State: AOJu0YxpLQ1g+cjz1UcRXzfieC0HLk+4Gn5xgCti+07U728h7wzSxjUF
+	+LecZwfqgHiU6my+oGXfnWEKcW/wpSb8GgJs30AtkauK4X5grjSmGOBrqeB0vtayMnwRUrxjeVx
+	ZN6/nfLpUWtrmEghJOi4NDWInT+4el9sZ9gG0PvGiPbp6WRirFpPtPwvB3GFi5R3KPLgYjjbvqL
+	b8dOmyH8N/mW1jWmCJLC4Gwpr3+E96yGO4Azo=
+X-Received: by 2002:a05:6122:3c8d:b0:4f2:aa91:34eb with SMTP id 71dfb90a1353d-4f485296ad9mr4395852e0c.1.1720746080271;
+        Thu, 11 Jul 2024 18:01:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9qAJCd/UDkXooJxLP3polnc0tAxXfY/AZlFlnhbfWI+/TnM9trFyVB+qIUz+wEKL7J4r0h72VhTW6a3A80Wk=
+X-Received: by 2002:a05:6122:3c8d:b0:4f2:aa91:34eb with SMTP id
+ 71dfb90a1353d-4f485296ad9mr4395840e0c.1.1720746079952; Thu, 11 Jul 2024
+ 18:01:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240710062212.GA25895@lst.de>
+References: <20240710065616.1060803-1-yang.yang@vivo.com> <29e50fff-fa7f-4b92-bfe9-7665c934b7dc@acm.org>
+ <ead047aa-d9dc-4b2f-869f-610b309b5092@vivo.com> <Zo/gevNqftePGvic@fedora> <6acb93c3-f11b-40a4-bec0-b17fb77ad0c9@acm.org>
+In-Reply-To: <6acb93c3-f11b-40a4-bec0-b17fb77ad0c9@acm.org>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Fri, 12 Jul 2024 09:01:08 +0800
+Message-ID: <CAFj5m9L2qin-h1qfPbhotSr-2Xh+mnQbsWhpzeK3dA_YTQ=JpA@mail.gmail.com>
+Subject: Re: [PATCH v6] sbitmap: fix io hung due to race on sbitmap_word::cleared
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: YangYang <yang.yang@vivo.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 10, 2024 at 08:22:12AM +0200, Christoph Hellwig wrote:
-> On Tue, Jul 09, 2024 at 04:03:20PM -0300, Jason Gunthorpe wrote:
-> > > Except for the powerpc bypass IOMMU or not is a global decision,
-> > > and the bypass is per I/O.  So I'm not sure what else you want there?
-> > 
-> > For P2P we know if the DMA will go through the IOMMU or not based on
-> > the PCIe fabric path between the initiator (the one doing the DMA) and
-> > the target (the one providing the MMIO memory).
-> 
-> Oh, yes.  So effectively you are asking if we can arbitrarily mix
-> P2P sources in a single map request.  I think the only sane answer
-> from the iommu/dma subsystem perspective is: hell no.
+On Fri, Jul 12, 2024 at 12:33=E2=80=AFAM Bart Van Assche <bvanassche@acm.or=
+g> wrote:
+>
+> On 7/11/24 6:39 AM, Ming Lei wrote:
+> > There are only two WRITE on 'cleared':
+> >
+> > - xchg(&map->cleared, 0) in sbitmap_deferred_clear()
+> >
+> > - set_bit() in sbitmap_deferred_clear_bit()
+> >
+> > xchg() supposes to provide such protection already.
+>
+> Hi Ming,
+>
+> The comment above 'swap_lock' in this patch is as follows:
+>
+>         /**
+>          * @swap_lock: Held while swapping word <-> cleared
+>          */
+>
+> In other words, 'swap_lock' is used to serialize *code*. Using
+> synchronization objects to serialize code is known as an anti-pattern,
+> something that shouldn't be done.
 
-Well, today we can mix them and the dma_map_sg will sort it out. With
-this new API we can't anymore.
+> Synchronization objects should be used
+> to serialize access to data.
 
-So this little detail needs to be taken care of somehow as well, and I
-didn't see it in this RFC.
+It can be thought of serializing UPDATE on both ->word and ->cleared,
+instead of code.
 
-> For the block layer just having one kind per BIO is fine right now,
-> although I could see use cases where people would want to combine
-> them.  We can probably defer that until it is needed, though.
+> Hence my question whether it would be
+> appropriate to protect all 'cleared' changes with the newly introduced
+> spinlock.
 
-Do you have an application in mind that would want multi-kind per BIO?
+Wrt. ->cleared only update, xchag() is enough.
 
-Jason
+Thanks,
+Ming
+
