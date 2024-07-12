@@ -1,46 +1,48 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F631754B;
-	Fri, 12 Jul 2024 04:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC7F17BCE;
+	Fri, 12 Jul 2024 05:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720760069; cv=none; b=qVosB9TmoKmUiRNzVZ90TqqQUs/AXWZUdON/OUobjOc43LoLHTdqiZWhx9yeI+N5srrghu3iSidhn0cuqI/9jGlVLAnbN2qnVG5TcpeUcFY4qqHpaMy6uDzs8bkeTahfuaUZNDR9xTMO34NBrqlz7ZZcbKC9NDOxIH+AxMJ/cKE=
+	t=1720761754; cv=none; b=Gum1xdk2KBMwinQndG4wvEE9HmzUqqEUcXMB0f2KOavAUZcyIFbrGLzp03Upqn9X15/S1HIdhMKqrw1fYLLbCU//hh7B9JOUe2Bb84PaoXUZsQ17ZSLznuH0ftuh51S3/z4VfITHSI6ECVjTdaCvzki1LZJJyi2PdtW/zDVUjuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720760069; c=relaxed/simple;
-	bh=TMu0MQvA9M0EFsXQs2/I0o+BYZmm1BaNxhY+TcEXn20=;
+	s=arc-20240116; t=1720761754; c=relaxed/simple;
+	bh=yYhkpWKuNyOfelB/DoE6wEZxyjXupvKjhO+ljCTAlT0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FjSWn5pee+HO83jG/R7hK0v0KPUZRh/lPxzF8EPoK7GTxV9TVwXXreIf9fsv5/OuslK1jov9wdI+N72vr7JO0RX4RUWCptWU7B6/3khgcNWt9sqFbxJatXyUGe+6nIOGVpOYzZ8jYMfKoewAZlhZDh1zwF7Fr+QPbtUCkhWumoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1F8DD68BEB; Fri, 12 Jul 2024 06:54:23 +0200 (CEST)
-Date: Fri, 12 Jul 2024 06:54:22 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Robin Murphy <robin.murphy@arm.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Keith Busch <kbusch@kernel.org>, "Zeng, Oak" <oak.zeng@intel.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
-Message-ID: <20240712045422.GA4774@lst.de>
-References: <cover.1719909395.git.leon@kernel.org> <20240705063910.GA12337@lst.de> <20240708235721.GF14050@ziepe.ca> <20240709062015.GB16180@lst.de> <20240709190320.GN14050@ziepe.ca> <20240710062212.GA25895@lst.de> <20240711232917.GR14050@ziepe.ca>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZbCiTUrEL1DT1K9JIiv1IaaI8jfahMJ1U2BupNiuVBykK/ZljtoCIPv68Nj7j02nctw7FGSPo3Anpnj6pZG+6Da070gil9sZhahmduxef1LOpEO3r9ZBUVRPWcOtNYC6T2/efMLylR9Ewe+gBGaJBTgtnQK8Mu91lgvLclIAOB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YBAguu1d; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YBAguu1d"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=r8ds7ED84zDbQqXZ9HWPwxGYHxYypOI8tFg8jRYWVIs=; b=YBAguu1d+NcuhO+fk33IKgKsJQ
+	3VqO/ebXIhVuA1gQB9hzG0yl/7wIfcdj/zg0xT6TodIuZrJpu1ERzUwMQ5fQrkNMYn1cys6IJCHOl
+	VDh73BhzQ6lH+xpSMtt7aMv0layrnZXFx9H60sa9cN3S55q6e6HRXMSuVUPvfEJ9p7K7pzNEDTZ3S
+	weu0h2wPwcbRHt9KcJkoRaQ+izG6QNsOfX+Sl30fKdwMDJoj3Az0JEAlqMe7Ik9NZLe8YzcFoOfWz
+	2gz1uDHxblmq60x+/rg0fwuzFJQbCj2d3EbjB41ejlnWSvRSclJhdOVtqyFXeBUmfdrVVsCkyHn9h
+	rn7TAr/w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sS8jl-0000000GVF4-2cQ9;
+	Fri, 12 Jul 2024 05:22:29 +0000
+Date: Thu, 11 Jul 2024 22:22:29 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, tj@kernel.org,
+	josef@toxicpanda.com, jack@suse.cz, axboe@kernel.dk,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 2/2] blk-ioprio: remove per-disk structure
+Message-ID: <ZpC9le_FsIO0FCJQ@infradead.org>
+References: <20240711090059.3998565-1-yukuai1@huaweicloud.com>
+ <20240711090059.3998565-3-yukuai1@huaweicloud.com>
+ <4c8f1e4e-1b15-4afa-b1e2-084e0c4caeec@acm.org>
+ <520b9c10-c152-77f3-bd5a-b86a1f5ac8ea@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,25 +51,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240711232917.GR14050@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <520b9c10-c152-77f3-bd5a-b86a1f5ac8ea@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Jul 11, 2024 at 08:29:17PM -0300, Jason Gunthorpe wrote:
-> So this little detail needs to be taken care of somehow as well, and I
-> didn't see it in this RFC.
-
-Yes.  Same about generally not mixing P2P and non-P2P.
-
+On Fri, Jul 12, 2024 at 09:10:30AM +0800, Yu Kuai wrote:
+> > As one can see in the output of git grep -nHEB1 '>pd_(alloc|free)_fn\(',
+> > none of the pd_alloc_fn / pd_free_fn callers checks whether or not these
+> > pointers are NULL. Hence my question why this patch does not trigger any
+> > NULL pointer dereferences?
 > 
-> > For the block layer just having one kind per BIO is fine right now,
-> > although I could see use cases where people would want to combine
-> > them.  We can probably defer that until it is needed, though.
-> 
-> Do you have an application in mind that would want multi-kind per BIO?
+> Because the blkcg_deactivate_policy() is removed as well, there are no
+> callers now... blkcg_policy_register() is still called to make sure
+> cpd_(alloc|free)_fn will still be called.
 
-If you are doing say garbage collection in a file system, and do write
-that sources data from multiple devices, where some sit directly on the
-root port and others behind a switch.
+Can you throw in a patch documenting this?  Any maybe add a check
+that pd_alloc_fn / pd_free_fn exist in blkcg_activate_policy and
+WARN and return an error otherwise?
 
-This is all purely hypothetical, and I'm happy to just check for it
-and reject it for it now.
