@@ -1,103 +1,73 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2844168B1
-	for <linux-block@vger.kernel.org>; Fri, 12 Jul 2024 03:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F631754B;
+	Fri, 12 Jul 2024 04:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720756451; cv=none; b=Nw4Yowo6zgidydRMJJjmpHCOtl6qMNTAbGYWCvOF8mRuGaDfqlxkFr/IV3zENFWMXLmpFzY+Vuf5HJmInCwD8qoSAbX4ZbaK4bvlF3/y3KaYwUWzEuHUHBBN//70Rx6nXwEflPacXv1VLqOIn8PUC1fQlcCmRKiVzO987B4gqcI=
+	t=1720760069; cv=none; b=qVosB9TmoKmUiRNzVZ90TqqQUs/AXWZUdON/OUobjOc43LoLHTdqiZWhx9yeI+N5srrghu3iSidhn0cuqI/9jGlVLAnbN2qnVG5TcpeUcFY4qqHpaMy6uDzs8bkeTahfuaUZNDR9xTMO34NBrqlz7ZZcbKC9NDOxIH+AxMJ/cKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720756451; c=relaxed/simple;
-	bh=Oywlvc41O/fZ15OgbUg3HsIF1kxs6Qcld6yz5tZjlCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TGNez7CcoNgaHbdD6qlRvdZe4h9sK8sgRKZR6m++10n6EXfiAc793RB2jKL/1lHfNPicmrr8wPuWijH2UMtZepe8KkLZUVuFACE55vPN+i7stmuJsRvvuONspETpBR+qKZyYFIQd7BM6wNPYkCfhp1G+0/P3iOTPVt7NlkJJQwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pkm-inc.com; spf=pass smtp.mailfrom=pkm-inc.com; dkim=pass (2048-bit key) header.d=pkm-inc.com header.i=@pkm-inc.com header.b=CHrzjI83; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pkm-inc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pkm-inc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pkm-inc.com header.i=@pkm-inc.com header.b="CHrzjI83"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a77b311a4daso8434666b.0
-        for <linux-block@vger.kernel.org>; Thu, 11 Jul 2024 20:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pkm-inc.com; s=google; t=1720756448; x=1721361248; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EiszlIMmh6W5WfqcNN/QT9VWluIrTdOMcpksL1/8loc=;
-        b=CHrzjI83JsW2/AuE4JQqxuxi1GCeyVPHXgAQyusro7o0cNAmdK0zshAF1e3oEW5KEY
-         vKrIQoRw9h8Sfc3Oc9X+HxwwmyYdLhs6F9SpCfnQwojVYAIRAA0MdDuqUimOk/9TmOXs
-         ixz6T3hoPoNFkWo0P77nvfsqpoBsTvgSQSNO4oFvGn3x455G2WIMisX6/ZgPAz8Iuhdj
-         dasK0LMvTmkABd4vTLmM+YHASrqpgwC08/jY08bpUgwmXB3Ri5TtDYTh9osUAMgTP8c9
-         k8FSMoqfitN2vpj+OSF2GweczdizQcr0wDh4Teoo7kq6gBorBQzTldYcrtfywVJzYisP
-         2ajw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720756448; x=1721361248;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EiszlIMmh6W5WfqcNN/QT9VWluIrTdOMcpksL1/8loc=;
-        b=Q5rFa6wwImjMBEsUGOOx3sSE9LgONuCHQbeVWPR2M8MPw7uiNAWqC0IUU2gGRSuVQy
-         OG99OTNU6TT4NAlac6NLYmg51q5DiEL3GcfS8Eag+0GoGPNgHHI/ESsxg+Ls+1LyJNC9
-         U7bCjo449Pc4eAbnwnDFxw6vt8kGm7dKESFTV51PZ6EqOHVE/+yGdgpS8d9nZx3nmFL6
-         KXXX9Af+nBJbhiKYq87ggDp1FElqpXEzQhn+g5Hv94A7NmpfXQafuqNHN794+4tb48PL
-         hy7bPnT4PegfYHmnuwIOMQoUgiQPMblUDFUmSWLoaBgM7rUxItqy/alEXcQX1FWFTBP5
-         vmrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvXNPPwHr7zM3b80kSswEXWOqcB7O9icO/OK1co3F8+uLwoyFiF3LQRx1IucT6Wc582iytJJ4qcASN1lLpgHwWt2aCpDAI0TEny/M=
-X-Gm-Message-State: AOJu0YzLbgwzUiqNj9i12ereVec3dnYPPtfGc7ccbfI3KEiyyT+WPlWt
-	VC3SrzJso7cSTQaGA3XReCYeRe1NHbVLgR0O8MPXTd4VKUVz+vM7aL3PEkDiU+7sHOVEcbqMoYH
-	Ysik=
-X-Google-Smtp-Source: AGHT+IGxkEIyhKXzPo0M6Zvyu+W8hbsXRGJ6rwe60tOLQEueZg+jdx48+DugAfVnS6bDG1ecm27afg==
-X-Received: by 2002:a17:907:1c27:b0:a79:a1a7:1254 with SMTP id a640c23a62f3a-a79a1a712a7mr25729766b.10.1720756447885;
-        Thu, 11 Jul 2024 20:54:07 -0700 (PDT)
-Received: from ?IPV6:2001:470:1f1a:1c9::2? (tunnel923754-pt.tunnel.tserv1.bud1.ipv6.he.net. [2001:470:1f1a:1c9::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6dfa4esm307811566b.61.2024.07.11.20.54.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jul 2024 20:54:07 -0700 (PDT)
-Message-ID: <7c300510-bab8-4389-adba-c3219a11578d@pkm-inc.com>
-Date: Fri, 12 Jul 2024 05:54:05 +0200
+	s=arc-20240116; t=1720760069; c=relaxed/simple;
+	bh=TMu0MQvA9M0EFsXQs2/I0o+BYZmm1BaNxhY+TcEXn20=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FjSWn5pee+HO83jG/R7hK0v0KPUZRh/lPxzF8EPoK7GTxV9TVwXXreIf9fsv5/OuslK1jov9wdI+N72vr7JO0RX4RUWCptWU7B6/3khgcNWt9sqFbxJatXyUGe+6nIOGVpOYzZ8jYMfKoewAZlhZDh1zwF7Fr+QPbtUCkhWumoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 1F8DD68BEB; Fri, 12 Jul 2024 06:54:23 +0200 (CEST)
+Date: Fri, 12 Jul 2024 06:54:22 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Keith Busch <kbusch@kernel.org>, "Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240712045422.GA4774@lst.de>
+References: <cover.1719909395.git.leon@kernel.org> <20240705063910.GA12337@lst.de> <20240708235721.GF14050@ziepe.ca> <20240709062015.GB16180@lst.de> <20240709190320.GN14050@ziepe.ca> <20240710062212.GA25895@lst.de> <20240711232917.GR14050@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to debug intermittent increasing md/inflight but no disk
- activity?
-To: Dave Chinner <david@fromorbit.com>, Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-raid@vger.kernel.org, linux-nfs@vger.kernel.org,
- linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- it+linux-raid@molgen.mpg.de
-References: <4a706b9c-5c47-4e51-87fc-9a1c012d89ba@molgen.mpg.de>
- <Zo8VXAy5jTavSIO8@dread.disaster.area>
-Content-Language: en-GB
-From: =?UTF-8?Q?Dragan_Milivojevi=C4=87?= <galileo@pkm-inc.com>
-In-Reply-To: <Zo8VXAy5jTavSIO8@dread.disaster.area>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240711232917.GR14050@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 11/07/2024 01:12, Dave Chinner wrote:
-> Probably not a lot you can do short of reconfiguring your RAID6
-> storage devices to handle small IOs better. However, in general,
-> RAID6 /always sucks/ for small IOs, and the only way to fix this
-> problem is to use high performance SSDs to give you a massive excess
-> of write bandwidth to burn on write amplification....
-  
-RAID5/6 has the same issues with NVME drives.
-Major issue is the bitmap.
+On Thu, Jul 11, 2024 at 08:29:17PM -0300, Jason Gunthorpe wrote:
+> So this little detail needs to be taken care of somehow as well, and I
+> didn't see it in this RFC.
 
-5 disk NVMe RAID5, 64K chunk
+Yes.  Same about generally not mixing P2P and non-P2P.
 
-Test                   BW         IOPS
-bitmap internal 64M    700KiB/s   174
-bitmap internal 128M   702KiB/s   175
-bitmap internal 512M   1142KiB/s  285
-bitmap internal 1024M  40.4MiB/s  10.3k
-bitmap internal 2G     66.5MiB/s  17.0k
-bitmap external 64M    67.8MiB/s  17.3k
-bitmap external 1024M  76.5MiB/s  19.6k
-bitmap none            80.6MiB/s  20.6k
-Single disk 1K         54.1MiB/s  55.4k
-Single disk 4K         269MiB/s   68.8k
+> 
+> > For the block layer just having one kind per BIO is fine right now,
+> > although I could see use cases where people would want to combine
+> > them.  We can probably defer that until it is needed, though.
+> 
+> Do you have an application in mind that would want multi-kind per BIO?
 
-Tested with fio --filename=/dev/md/raid5 --direct=1 --rw=randwrite --bs=4k --ioengine=libaio --iodepth=1 --runtime=60 --numjobs=1 --group_reporting --time_based --name=Raid5
+If you are doing say garbage collection in a file system, and do write
+that sources data from multiple devices, where some sit directly on the
+root port and others behind a switch.
+
+This is all purely hypothetical, and I'm happy to just check for it
+and reject it for it now.
