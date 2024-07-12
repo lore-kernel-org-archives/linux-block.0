@@ -1,92 +1,67 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F9F14E2E9
-	for <linux-block@vger.kernel.org>; Fri, 12 Jul 2024 12:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F9B174EF8;
+	Fri, 12 Jul 2024 17:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720788161; cv=none; b=dUIF/O7FMmEvopDn2iCM/Gh7K3ozpxD9J11OwfRJXjqs3L3HKjJmCK2/PTFg6uXmmXjG5LzKPb/JpuU+ek4hOyXoRmU45qKF7x9o45NYydWnDK49qmuSQmgUjalj0YJES0sz3XLRtinq0G/2VkAywRQtEmk1MyfMYuvy2b6gDCg=
+	t=1720804790; cv=none; b=AaVJ2PCGGwpcHqcZ+VOk7aCpGwliC1yS28MXbLsdyTVKYy+WoEHf86rhuD1zu3/pR3Z+rxq7NuU4lUBC6fJSr9Bto7HvA1mN/b5aFWNTKWCTZ3X4HNKTcP6JETV2RCdV4mjNXq95SvFC89Q1gUDNECWUGDwIWyjHfzLc62sQmRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720788161; c=relaxed/simple;
-	bh=kBJT8YbrNHkTssvswA9gJLT8aMBMcBvE6Xo16vVg1no=;
+	s=arc-20240116; t=1720804790; c=relaxed/simple;
+	bh=ttLF7O7mJmLLIvwZHUjJVnPnrdw+2UYWswNcOiIGEyA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G1uuRHRyd1faMXR3uw5rjaWsyiNuJdUFQRXqQXCmlmEkH0E36of3gqDOa1Nt7L1VhxoxcCEwuPUIsSo45fimdEyqOPTMmHNxmoUD2UWWQMyptpJfr8o07fJWWmGC5AKLbPih6fNyRFxLIMUWzBqH6HR5CMkhn29RS3EmvYvlpgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=TuVR3Foc; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrZqwPV0TnrwNzHi+E/c72OeHAUSj0MLolwDIDm3w0c+t23YQ2e6H6RzvnNwSiVRypfuwUMnLQ7vX0X7P9GPFpxY79glzNL+484cK3Q1xeyNVmJBkeUGE5zQVHbWETbvylm9vZ3fQdsaGY9lZBg+GO635Ad8Z9keay2ihQ4mQlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kF2Hy2Ow; arc=none smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="TuVR3Foc"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-79f323f084eso127613585a.3
-        for <linux-block@vger.kernel.org>; Fri, 12 Jul 2024 05:42:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kF2Hy2Ow"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5c47c41eb84so1235971eaf.0;
+        Fri, 12 Jul 2024 10:19:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1720788159; x=1721392959; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720804788; x=1721409588; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kBJT8YbrNHkTssvswA9gJLT8aMBMcBvE6Xo16vVg1no=;
-        b=TuVR3FocARcpqfy530ragffG6U+brCvhWS74eVbcK7zuwsGCjwYxyLVWPeCrW8Tl1Z
-         keThHek33bvykJW6zX6kX1mNKTFcGKYArF07Lhfka5PtwUFxF02HtD8kXJrw28+zvshz
-         z4op9+LIk59enAtbsw38HLzLvvkiKZ9xNLjmPlJO6UaNCm+oKss4tfy/JU2mkZHvYcs5
-         VNGR8sF/olPMkoj1z3PC0/B6VXwgq4l/Sy3r+Xa+Ku64ejfMbrySZOrE6M0ZZ+qcjfMw
-         cB48If94KqPkEJkiivRvonLkUNG26hhA+RLDyQBBDYt8nKt3spEwhEnlaZnw08TdGVoQ
-         iPQw==
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8/Gn627AZPe/QQaHzaSIrwpojyhT7Q6TwyJkki/9ctw=;
+        b=kF2Hy2OwnMiBvaCa5G1U/zm+/6GrHYz81abQaMER3kPTgnW+Qws/Mb2WTkGmx7rnUH
+         lLtcjQfijvDowbihjIzWbKWAuWo8XirWOmOFrmmgxnfcmBHe3DwMP0NQ3AwU+0/Vhlbu
+         PKEV1gsmDflVN8vtD+VsAqC6YPfqbr/UcxdUv5rl+RGUur6tG1awbcQYRRAcsnMtqEO+
+         6VgC8QTDhe8n7DQ1PbY9Yy4X2RPXoPcQG7yeXQBDhs2dju/Da0EykHPo6B5cnaGFyPlO
+         dMcpomK92O0jCbwDo/lEy014uilTKazPNNGSxvKn8NXaNw75CCnoPqlTxkCmSt+GRqzU
+         iwGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720788159; x=1721392959;
+        d=1e100.net; s=20230601; t=1720804788; x=1721409588;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kBJT8YbrNHkTssvswA9gJLT8aMBMcBvE6Xo16vVg1no=;
-        b=I7HnhsygXauKHzeGF16EVhnXA4lPe/iBE4UwiZBwNiSlX/cNbT/wXQcYY/kHXMvsfX
-         F/RiAs8PCKYjEnwRGaEO8YEy5yQ4b2spW2oOUtXz263vCPxX8GBR6H+StV3Cv9LlRBYz
-         Aczwb/teQKnzjUlxSsJFRBfhjacfKyfq0xOOod5cEF5CCeG2noFXdXm/ECi84AcWxYoX
-         63vEZpGQsvsmP2JhEfkzHlZ4yUE66ht0VptC19b2/kLIGnJwcBXtApGloXcJh+f1R+c1
-         qMZUmpPDkp//QNCJmZLQHnuAT3OzIA5EubvNULGbn4zmHMJqSoh7b2TfJ0yGn1o4T1Qe
-         vVsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVlPZfhrdUX7ZjgEzWN0bwKxu1ocVyoFkzIKKpaRMCK1FWIKUY+jWelILE4aQQmsLvQhmbdKMfobaJizcllFO36mMIydu9V4Kk/DUg=
-X-Gm-Message-State: AOJu0YyimCNBDOMMunj+sxi7LPllcGItXpNWeyVbrdxBU0mUzXKRC7o5
-	lrANSNPhcZTZ7D7f+qEHydowbMLwhbByp7ixW0bSmFryQs3IBujHrXKGuU4GZ14=
-X-Google-Smtp-Source: AGHT+IFNcSNXyjLCUq4DHk3R2ij71BFERvS9sNsM3zBakmLtTWzYOjs3C+yBv/o3LvcwnsHGWOmY4Q==
-X-Received: by 2002:ae9:e315:0:b0:79f:1836:b143 with SMTP id af79cd13be357-79f19ae5454mr1218368285a.50.1720788159083;
-        Fri, 12 Jul 2024 05:42:39 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f1902ac2esm394037485a.59.2024.07.12.05.42.38
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8/Gn627AZPe/QQaHzaSIrwpojyhT7Q6TwyJkki/9ctw=;
+        b=LELSW6Gon0FopOSBR8DqcemLQIpoQR38QSnstnVM0SQCCXOZAYoHuETzt5FaosGNYU
+         Fko7uzJiW2b0+/6K/c0o1IZwBvGs4dob95qOAt+czI/IjHuW3Wkxtk7aUPJlhYA7C2eb
+         9Ce9VDi9rvDla/C5/Bt8n1sFJXD2sGbI3zNOVhboIICS4IMZsbs1yKehYDTy1nxxrZMv
+         2hEpyAdpbjhc5V30oW9qZ4isyXHg5RdchMqmrR2SCIyBHfjNA3Da6TH5QeZEyb5YBz2A
+         iKhCeP0a3JDTER3ULv3dUJl1lY0rvqHDwaiYiXFKTqU3+8iUQ4CiQYxlFE59MnsI9iBw
+         nlhg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQyAS+oZvnA3W5Ck2yJOCs40QPbQTutdEhCIddezfmhqVFSw1nuf+VkFE9IzPuo8Lms6vExLDeQoyvuAqM0GZBKQfWlowBgf/en7QU8xTUsc9594KrQH3iXuQKlCRrOvdwis8OT1czyeLVSw1DBkD8fwzvkwe8ZTjeC5kOUTm/cJAf
+X-Gm-Message-State: AOJu0YygCXd+p2/qADqhg5FzGRvpFVy7LhGCZQOdqbslve9lM7T9GBg+
+	39LiCba1ZIFmp8fIvTFHmbdv6U8SrN5AZAl4RbnG/Bt/nEkDsC+N
+X-Google-Smtp-Source: AGHT+IFFT3R/DrZI1RkYPgoNrfL7xkIuMXcw08FwJ9gDOppfwcBuOZw9mcLBD9zJAd4yMgZcdTp7Iw==
+X-Received: by 2002:a05:6358:c3a8:b0:1a5:575d:def with SMTP id e5c5f4694b2df-1aade041a1emr949599055d.2.1720804787707;
+        Fri, 12 Jul 2024 10:19:47 -0700 (PDT)
+Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-77d60da9d16sm6121583a12.38.2024.07.12.10.19.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 05:42:38 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sSFbh-000FUg-Ne;
-	Fri, 12 Jul 2024 09:42:37 -0300
-Date: Fri, 12 Jul 2024 09:42:37 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	"Zeng, Oak" <oak.zeng@intel.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
-Message-ID: <20240712124237.GX14050@ziepe.ca>
-References: <cover.1719909395.git.leon@kernel.org>
- <20240705063910.GA12337@lst.de>
- <20240708235721.GF14050@ziepe.ca>
- <20240709062015.GB16180@lst.de>
- <20240709190320.GN14050@ziepe.ca>
- <20240710062212.GA25895@lst.de>
- <20240711232917.GR14050@ziepe.ca>
- <20240712045422.GA4774@lst.de>
+        Fri, 12 Jul 2024 10:19:47 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 12 Jul 2024 07:19:46 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Xiu Jianfeng <xiujianfeng@huawei.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, lizefan.x@bytedance.com,
+	hannes@cmpxchg.org, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] blk-cgroup: move congestion_count to struct blkcg
+Message-ID: <ZpFlsrNMMUMnT_Lq@slm.duckdns.org>
+References: <20240712085141.3288708-1-xiujianfeng@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -95,18 +70,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240712045422.GA4774@lst.de>
+In-Reply-To: <20240712085141.3288708-1-xiujianfeng@huawei.com>
 
-On Fri, Jul 12, 2024 at 06:54:22AM +0200, Christoph Hellwig wrote:
+Hello,
 
-> This is all purely hypothetical, and I'm happy to just check for it
-> and reject it for it now.
+On Fri, Jul 12, 2024 at 08:51:41AM +0000, Xiu Jianfeng wrote:
+> The congestion_count was introduced by commit d09d8df3a294 ("blkcg:
+> add generic throttling mechanism"), but since it is closely related
+> to the blkio subsys, it is not appropriate to put it in the struct
+> cgroup, so move it to struct blkcg.
+> 
+> Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
+> ---
+> only compiling tested
 
-I do know a patch set is cooking to allow mixing ZONE_DEVICE P2P and
-anon memory in the same VMA ala HMM with transparent migration of
-ZONE_DEVICE to anon.
+blkcg is per cgroup and blkg is per cgroup-device pair, so the change isn't
+just moving the field but updating what it means and how it works. The
+change needs a lot more thinking, justification and testing.
 
-In this situation userspace will be generating IO with no idea about
-any P2P/!P2P boundaries.
+Thanks.
 
-Jason
+-- 
+tejun
