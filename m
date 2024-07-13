@@ -1,95 +1,114 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from xmailer.gwdg.de (xmailer.gwdg.de [134.76.10.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D0FF51B;
-	Sat, 13 Jul 2024 10:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A8B1BC40;
+	Sat, 13 Jul 2024 15:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.76.10.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720868226; cv=none; b=k+yx6f5YVmPjxPcbsb5h6Nw8ZHrJeMmzK29uSnxDZ2CvbC+elNJwUJybeILDjbfQfSxVTEPoRD2sNXeolZi3h5qV/YPiQDa4dJy6s+dZAQyo8xeW7AZqGMlHsvuhDREf23Ek7ouBPn1bAC9NaWXGQHlbCanKtvz5nj7U4f+h8dI=
+	t=1720885655; cv=none; b=dcK0zoI34JKVS0OOkZP9Tex7NJGqXeYrdJetoWUvjhdWEimJ+u5DfnHpjOuVCuSTComCSTH3TgeocOPvDYGF6TAFm7e6AP7eRzz4pXGamz6nqj1hFBo+0Nvh89Q4iDMmAWBbvpfchROzqAqTiZllyKXJcmFtyHwVnF0wXf+VJJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720868226; c=relaxed/simple;
-	bh=QzVXk7APsQy77nrz5fXBLxvDVTuBB5pTDsN5HIi/ots=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=il275qKJIrvf+ZW3wKZnG8rzfZ6q6Amzae+kVwbsKd5GIM6BXLHGH+pw5jiumu7jWRaANjYZP7FwV7sPKbc5zB0X2quK7bJRsgqSriKxJPAAi9x4FDQ3FADVNn0rtgiUDwM4iaeHFTF3F3jZ5W741S74Wqkgh1F/90SZcbwj7NA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WLllR301nz4f3jMJ;
-	Sat, 13 Jul 2024 18:56:51 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 35E521A016E;
-	Sat, 13 Jul 2024 18:56:59 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgCHazl5XZJmoREJAA--.5337S3;
-	Sat, 13 Jul 2024 18:56:59 +0800 (CST)
-Subject: Re: [PATCH -next] blk-cgroup: move congestion_count to struct blkcg
-To: Tejun Heo <tj@kernel.org>, Xiu Jianfeng <xiujianfeng@huawei.com>
-Cc: josef@toxicpanda.com, axboe@kernel.dk, lizefan.x@bytedance.com,
- hannes@cmpxchg.org, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240712085141.3288708-1-xiujianfeng@huawei.com>
- <ZpFlsrNMMUMnT_Lq@slm.duckdns.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a39656fd-f34c-fa69-7d20-8b86fc1cb0c4@huaweicloud.com>
-Date: Sat, 13 Jul 2024 18:56:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1720885655; c=relaxed/simple;
+	bh=S+UaN2pzf9tiXr3mgca+BKasLQdxNloIWhX48I2KP5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BTwC6CFM7j8PZ+tidBGuvl8Ln+9/EjaIRos52QQVnUyZG4Psc4VRKz0kGDTkgEpOky6HED9AVQw0UNtNiVj7edn1/Lxl18GkXxhRbWtRg3ykVTqleS5TadjOUkyHusZZERh1yY4NDLdI4yeyCj3hrXk9PO/lgF6xgvDjN4HciRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de; spf=pass smtp.mailfrom=tuebingen.mpg.de; arc=none smtp.client-ip=134.76.10.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuebingen.mpg.de
+Received: from mailgw.tuebingen.mpg.de ([192.124.27.5] helo=tuebingen.mpg.de)
+	by mailer.gwdg.de with esmtp (GWDG Mailer)
+	(envelope-from <maan@tuebingen.mpg.de>)
+	id 1sSey2-0007zB-2S;
+	Sat, 13 Jul 2024 17:47:22 +0200
+Received: from [10.35.40.80] (HELO mailhost.tuebingen.mpg.de)
+  by tuebingen.mpg.de (CommuniGate Pro SMTP 6.2.6)
+  with SMTP id 59083440; Sat, 13 Jul 2024 17:47:21 +0200
+Received: by mailhost.tuebingen.mpg.de (sSMTP sendmail emulation); Sat, 13 Jul 2024 17:47:21 +0200
+Date: Sat, 13 Jul 2024 17:47:21 +0200
+From: Andre Noll <maan@tuebingen.mpg.de>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>, linux-raid@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, it+linux-raid@molgen.mpg.de
+Subject: Re: How to debug intermittent increasing md/inflight but no disk
+ activity?
+Message-ID: <ZpKhiUxdrRFTM8SO@tuebingen.mpg.de>
+References: <4a706b9c-5c47-4e51-87fc-9a1c012d89ba@molgen.mpg.de>
+ <Zo8VXAy5jTavSIO8@dread.disaster.area>
+ <Zo_AoEPrCl0SfK1Z@tuebingen.mpg.de>
+ <ZpBcG1HPeahYqwDd@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZpFlsrNMMUMnT_Lq@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCHazl5XZJmoREJAA--.5337S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruw1kCF47tFy8Wryxtry7Jrb_yoWDJFc_ur
-	Wjv397urWUJr48A3W3Kw15t390k3y5Gry5Jryqq3yUXa4Fyr18Kw1vg3y3Zry8JF40qF9x
-	CF93AayFkrn2gjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbaxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYx
-	BIdaVFxhVjvjDU0xZFpf9x07UAwIDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+In-Reply-To: <ZpBcG1HPeahYqwDd@dread.disaster.area>
+User-Agent: Mutt/2.2.13 (00d56288) (2024-03-09)
+X-Spam-Level: $
+X-Virus-Scanned: (clean) by clamav
 
-Hi, Tejun!
-
-ÔÚ 2024/07/13 1:19, Tejun Heo Ð´µÀ:
-> Hello,
+On Fri, Jul 12, 08:26, Dave Chinner wrote
+> On Thu, Jul 11, 2024 at 01:23:12PM +0200, Andre Noll wrote:
+> > On Thu, Jul 11, 09:12, Dave Chinner wrote
+> > 
+> > > > Of course itâ€™s not reproducible, but any insight how to debug this next time
+> > > > is much welcomed.
+> > > 
+> > > Probably not a lot you can do short of reconfiguring your RAID6
+> > > storage devices to handle small IOs better. However, in general,
+> > > RAID6 /always sucks/ for small IOs, and the only way to fix this
+> > > problem is to use high performance SSDs to give you a massive excess
+> > > of write bandwidth to burn on write amplification....
+> > 
+> > FWIW, our approach to mitigate the write amplification suckage of large
+> > HDD-backed raid6 arrays for small I/Os is to set up a bcache device
+> > by combining such arrays with two small SSDs (configured as raid1).
 > 
-> On Fri, Jul 12, 2024 at 08:51:41AM +0000, Xiu Jianfeng wrote:
->> The congestion_count was introduced by commit d09d8df3a294 ("blkcg:
->> add generic throttling mechanism"), but since it is closely related
->> to the blkio subsys, it is not appropriate to put it in the struct
->> cgroup, so move it to struct blkcg.
->>
->> Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
->> ---
->> only compiling tested
-> 
-> blkcg is per cgroup and blkg is per cgroup-device pair, so the change isn't
-> just moving the field but updating what it means and how it works. The
-> change needs a lot more thinking, justification and testing
-I understand blkcg and blkg, however, maybe I'm being noob, I don't see
-how this patch is related to blkg, the change is that 'congestion_count'
-is moved from cgroup to blkcg. This look quite straightforward to me,
-maybe I'm missing something, can you explain more?
+> Which is effectively the same sort of setup as having a NVRAM cache
+> in front of the RAID6 volume (i.e. hardware RAID controller).
 
-Thanks,
-Kuai
+Yes, bcache is cachevault on the cheap, plus the additional benefit
+that bcache tries to detect and skip sequential I/O, bypassing
+the cache.
 
+> That can work if the cache is large enough to soak up bursts of
+> small writes followed by enough idle time for the back end RAID6
+> device to do all it's RMW cycles to clean the cache.
 > 
-> Thanks.
-> 
+> However, if the cache fills up with small writes, then slowdowns and
+> IO latencies get even worse than if you are just using a plain RAID6
+> device. Think about a cache with several million cached random 4kB
+> writes, and how long that will take to flush to the RAID6 volume
+> that might only be able to do 100 IOPS.
 
+Indeed, we also see these stalls occasionally, especially under
+mixed workloads where large file copies happen in parallel with heavy
+metadata I/O such as a recursive chmod/chown. However, the stalls we
+see are usually short. At most a couple of minutes, but not hours.
+
+> Hence deploying a fast cache in front of a very slow drive is not
+> exactly straight forward. Making it work reliably requires
+> awareness of workload IO patterns. Special attention needs to be
+> paid to the amount of idle time.
+
+The problem is that knowing the I/O patterns might be too much to ask
+for. In our case, many scientists use the servers at the same time,
+and in very different ways. Some are experimenting with closed source
+special purpose software that has unknown I/O characteristics. So the
+workload and the I/O patterns are kind of unpredictable and vary a lot.
+
+If people complain about slowness or high latencies, I usually
+recommend to write to SSD-only scratch space first, then copy over
+the results to the large HDD-backed arrays. Sometimes it's the
+unsophisticated solutions that work best :)
+
+Thanks
+Andre
+-- 
+Max Planck Institute for Biology
+Tel: (+49) 7071 601 829
+Max-Planck-Ring 5, 72076 TÃ¼bingen, Germany
+http://people.tuebingen.mpg.de/maan/
