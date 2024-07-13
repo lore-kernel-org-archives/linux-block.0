@@ -1,41 +1,70 @@
-Received: from xmailer.gwdg.de (xmailer.gwdg.de [134.76.10.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A8B1BC40;
-	Sat, 13 Jul 2024 15:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.76.10.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B9822097;
+	Sat, 13 Jul 2024 17:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720885655; cv=none; b=dcK0zoI34JKVS0OOkZP9Tex7NJGqXeYrdJetoWUvjhdWEimJ+u5DfnHpjOuVCuSTComCSTH3TgeocOPvDYGF6TAFm7e6AP7eRzz4pXGamz6nqj1hFBo+0Nvh89Q4iDMmAWBbvpfchROzqAqTiZllyKXJcmFtyHwVnF0wXf+VJJM=
+	t=1720892130; cv=none; b=Agfka/HZuHskv1c1UAW4veymyzkIzxGVWsTCjRpmpM7T7CAJcPJgfNnmpja4ArwALWMjoV+GXAeVTOBvk6OvS5fjhhU92g+EGtCVM5hqM3mYSDXedoQij2GLN50BGH+tTaDjMQTxFqXDA43A299idbhLnSUWjVqe+/mgnuLBTxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720885655; c=relaxed/simple;
-	bh=S+UaN2pzf9tiXr3mgca+BKasLQdxNloIWhX48I2KP5Y=;
+	s=arc-20240116; t=1720892130; c=relaxed/simple;
+	bh=+jnLG0Fr2OjsjvLbG9Ojqjh1KhRzmEHrMLuEQFOkJx0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BTwC6CFM7j8PZ+tidBGuvl8Ln+9/EjaIRos52QQVnUyZG4Psc4VRKz0kGDTkgEpOky6HED9AVQw0UNtNiVj7edn1/Lxl18GkXxhRbWtRg3ykVTqleS5TadjOUkyHusZZERh1yY4NDLdI4yeyCj3hrXk9PO/lgF6xgvDjN4HciRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de; spf=pass smtp.mailfrom=tuebingen.mpg.de; arc=none smtp.client-ip=134.76.10.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuebingen.mpg.de
-Received: from mailgw.tuebingen.mpg.de ([192.124.27.5] helo=tuebingen.mpg.de)
-	by mailer.gwdg.de with esmtp (GWDG Mailer)
-	(envelope-from <maan@tuebingen.mpg.de>)
-	id 1sSey2-0007zB-2S;
-	Sat, 13 Jul 2024 17:47:22 +0200
-Received: from [10.35.40.80] (HELO mailhost.tuebingen.mpg.de)
-  by tuebingen.mpg.de (CommuniGate Pro SMTP 6.2.6)
-  with SMTP id 59083440; Sat, 13 Jul 2024 17:47:21 +0200
-Received: by mailhost.tuebingen.mpg.de (sSMTP sendmail emulation); Sat, 13 Jul 2024 17:47:21 +0200
-Date: Sat, 13 Jul 2024 17:47:21 +0200
-From: Andre Noll <maan@tuebingen.mpg.de>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>, linux-raid@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org, it+linux-raid@molgen.mpg.de
-Subject: Re: How to debug intermittent increasing md/inflight but no disk
- activity?
-Message-ID: <ZpKhiUxdrRFTM8SO@tuebingen.mpg.de>
-References: <4a706b9c-5c47-4e51-87fc-9a1c012d89ba@molgen.mpg.de>
- <Zo8VXAy5jTavSIO8@dread.disaster.area>
- <Zo_AoEPrCl0SfK1Z@tuebingen.mpg.de>
- <ZpBcG1HPeahYqwDd@dread.disaster.area>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W2B0Ers1xCy0PR3Oycw6Az8PF1LGoLtnhQha3qSobLmztJgdXDSNVGK0K65ouQkhXcjO0STNWJ+jvv+w5uE+40XrYwLazEaB3o1Icm9swI0Ke/eIpsX80gblVcvTGO2YrQd+gvyzELEWx0okOKeOFwoc1V854gjGW+Mf10O84Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gZV8d5mF; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZV8d5mF"
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3c9cc681ee4so1595379b6e.0;
+        Sat, 13 Jul 2024 10:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720892128; x=1721496928; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P/z/MjDmwb7f1zxziuaLHYeOx76PjmytDEOERDpZ6t4=;
+        b=gZV8d5mFCzl2FEDQSvzpdjTWYOjkOFb/5MLedDitBg0LFHVBNLnB1DJs0XU9G7VB+Z
+         NgVVUQVDk7Oq17Oun/ZrtgILT5l5kcAfSVqUq5315sRvyHNkSSQTSFd+Sj3Qd+GlZ7Pc
+         Evk2VriW+c2Trnssm1G44yf9/uqMtFu8sZ5M/OQk3ImolYCtJFy07by9Yc7BL20THEcm
+         V3rpqOHsb6myDBudpXM4SznqzgbxiIA9qiwyMcbI4yP322gqbO92vDPCVsoCRLvT1YvO
+         oznk2wml3aDoyKoh4ngrHHddP+xelotEyf8lfoZ7avsQQEMQCULOdRSclBEo8Y37fasI
+         w0rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720892128; x=1721496928;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P/z/MjDmwb7f1zxziuaLHYeOx76PjmytDEOERDpZ6t4=;
+        b=L9q9H1klcEXMhLoaNZh+T4N+ZnyuoKjH84pTHMnIoT8LxIFe7/Cbpo2cHE5jTy+KpG
+         tlcR5y1dZsy70LPil5ZLzHhkihkC94zOr7Z9Zy6/ZNY9omJADDJgc+WLiKvnMuXhAKl/
+         6aydBL22e38u8F0FJoAqRBHZY7sGVieWuHSGngHQ46e9Pjo5n7+5rMK7uVYngiJBase1
+         YB3xEalwRQY+sBHBTjxMfbUA94U0XUSCL7duAaDbhVpMLS3q+ajYFpqkTqc62cVdAOZ+
+         OBR5SwicmN5u/6Ri9sWMNJgTXKW12J5KAfJ5RFjwKztFg1br2g354jl1f5ZcmH0HQdyD
+         /CAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTiL6rFd8OceVlZbTSWT9XuL2GcxZRjl6T2U+WC0wfy2AkoeSEBmn8NTHn50GDnnQ0PkmRCsUwdx5F+1PGOJmcLHN+m1Pxa1Bh8gYnSis9H+EtaMPacDJ4QiWqZu8EyLA3Uu+RsUrPxCRMEbvNFxlaUQROpNi23CZdDVojX0YV6tP+
+X-Gm-Message-State: AOJu0YxqEXsdKnOHSzxjB6gtpCN2ygUpGJCnmX/+FqN41APci0XGk2Mj
+	yDQ3Q4l/+k49ddkxOunwcnUE/ovtTkD6OcuDxTPHR/Ab6k2JXDaO
+X-Google-Smtp-Source: AGHT+IHoZqfQDPgzJUnfokLQqFz5qFXhiTmF1BuCY/zvSBWE7r65z6xFnJvI1G8KyRWXpUc80J0+gw==
+X-Received: by 2002:a05:6808:148b:b0:3d9:385d:8747 with SMTP id 5614622812f47-3d93c04356bmr17627614b6e.32.1720892128043;
+        Sat, 13 Jul 2024 10:35:28 -0700 (PDT)
+Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-78e32b6ba67sm1076129a12.11.2024.07.13.10.35.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jul 2024 10:35:27 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Sat, 13 Jul 2024 07:35:26 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Xiu Jianfeng <xiujianfeng@huawei.com>, josef@toxicpanda.com,
+	axboe@kernel.dk, lizefan.x@bytedance.com, hannes@cmpxchg.org,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH -next] blk-cgroup: move congestion_count to struct blkcg
+Message-ID: <ZpK63tsWBNMGFR2t@slm.duckdns.org>
+References: <20240712085141.3288708-1-xiujianfeng@huawei.com>
+ <ZpFlsrNMMUMnT_Lq@slm.duckdns.org>
+ <a39656fd-f34c-fa69-7d20-8b86fc1cb0c4@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,70 +74,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZpBcG1HPeahYqwDd@dread.disaster.area>
-User-Agent: Mutt/2.2.13 (00d56288) (2024-03-09)
-X-Spam-Level: $
-X-Virus-Scanned: (clean) by clamav
+In-Reply-To: <a39656fd-f34c-fa69-7d20-8b86fc1cb0c4@huaweicloud.com>
 
-On Fri, Jul 12, 08:26, Dave Chinner wrote
-> On Thu, Jul 11, 2024 at 01:23:12PM +0200, Andre Noll wrote:
-> > On Thu, Jul 11, 09:12, Dave Chinner wrote
+Hello,
+
+On Sat, Jul 13, 2024 at 06:56:57PM +0800, Yu Kuai wrote:
+> 在 2024/07/13 1:19, Tejun Heo 写道:
+> > Hello,
 > > 
-> > > > Of course it’s not reproducible, but any insight how to debug this next time
-> > > > is much welcomed.
+> > On Fri, Jul 12, 2024 at 08:51:41AM +0000, Xiu Jianfeng wrote:
+> > > The congestion_count was introduced by commit d09d8df3a294 ("blkcg:
+> > > add generic throttling mechanism"), but since it is closely related
+> > > to the blkio subsys, it is not appropriate to put it in the struct
+> > > cgroup, so move it to struct blkcg.
 > > > 
-> > > Probably not a lot you can do short of reconfiguring your RAID6
-> > > storage devices to handle small IOs better. However, in general,
-> > > RAID6 /always sucks/ for small IOs, and the only way to fix this
-> > > problem is to use high performance SSDs to give you a massive excess
-> > > of write bandwidth to burn on write amplification....
+> > > Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
+> > > ---
+> > > only compiling tested
 > > 
-> > FWIW, our approach to mitigate the write amplification suckage of large
-> > HDD-backed raid6 arrays for small I/Os is to set up a bcache device
-> > by combining such arrays with two small SSDs (configured as raid1).
-> 
-> Which is effectively the same sort of setup as having a NVRAM cache
-> in front of the RAID6 volume (i.e. hardware RAID controller).
+> > blkcg is per cgroup and blkg is per cgroup-device pair, so the change isn't
+> > just moving the field but updating what it means and how it works. The
+> > change needs a lot more thinking, justification and testing
+> I understand blkcg and blkg, however, maybe I'm being noob, I don't see
+> how this patch is related to blkg, the change is that 'congestion_count'
+> is moved from cgroup to blkcg. This look quite straightforward to me,
+> maybe I'm missing something, can you explain more?
 
-Yes, bcache is cachevault on the cheap, plus the additional benefit
-that bcache tries to detect and skip sequential I/O, bypassing
-the cache.
+Oh, my apologies. That was me confidently misreading the patch. Sorry about
+that. I'll re-read the patch.
 
-> That can work if the cache is large enough to soak up bursts of
-> small writes followed by enough idle time for the back end RAID6
-> device to do all it's RMW cycles to clean the cache.
-> 
-> However, if the cache fills up with small writes, then slowdowns and
-> IO latencies get even worse than if you are just using a plain RAID6
-> device. Think about a cache with several million cached random 4kB
-> writes, and how long that will take to flush to the RAID6 volume
-> that might only be able to do 100 IOPS.
+Thanks.
 
-Indeed, we also see these stalls occasionally, especially under
-mixed workloads where large file copies happen in parallel with heavy
-metadata I/O such as a recursive chmod/chown. However, the stalls we
-see are usually short. At most a couple of minutes, but not hours.
-
-> Hence deploying a fast cache in front of a very slow drive is not
-> exactly straight forward. Making it work reliably requires
-> awareness of workload IO patterns. Special attention needs to be
-> paid to the amount of idle time.
-
-The problem is that knowing the I/O patterns might be too much to ask
-for. In our case, many scientists use the servers at the same time,
-and in very different ways. Some are experimenting with closed source
-special purpose software that has unknown I/O characteristics. So the
-workload and the I/O patterns are kind of unpredictable and vary a lot.
-
-If people complain about slowness or high latencies, I usually
-recommend to write to SSD-only scratch space first, then copy over
-the results to the large HDD-backed arrays. Sometimes it's the
-unsophisticated solutions that work best :)
-
-Thanks
-Andre
 -- 
-Max Planck Institute for Biology
-Tel: (+49) 7071 601 829
-Max-Planck-Ring 5, 72076 Tübingen, Germany
-http://people.tuebingen.mpg.de/maan/
+tejun
