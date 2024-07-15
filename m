@@ -1,92 +1,103 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE435189F5E
-	for <linux-block@vger.kernel.org>; Mon, 15 Jul 2024 11:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A46188CDE;
+	Mon, 15 Jul 2024 12:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721044289; cv=none; b=X/VICJCDZjPwjb0iKxwhAueKGjPg+CTgsi6ZUgLnJyU5M0f564J8I4eFtgoPOgoSmt6jfpodQv8tj/DPyxuP5ZLFleQWkh6ft96ru4deXPEypStDK5o/65+hon37661ME9xR6Fv9fRDU6hfteWuSZGAujMGPSJUXMl+O0zGVxBc=
+	t=1721046938; cv=none; b=u+YI94+OrDZaYUdILFbOifzIQjR3nooEBhatytDi6FhlhID1SeKd97dVC49MgTl9A1L9eW6z0t83FTImq9J5Vwz8YlNEbvBqgJTCw+0r4LSspPaIRDTpvMZ/JvAfctlY1q5ZX17iM6/KXS9fL/gTa6SPfOuZwpHcKzNEK2mLaLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721044289; c=relaxed/simple;
-	bh=70APk2vup2aHyqBd4lj4d+RNYSh3+IZ/TMN9NL5v7N0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VsA0KE+YDak5/h6r1IoYEvwemiv+c4d9rl4p+EoURAdNNHe+JfJQjEXJOPo7s7mMATMxZVC2CnL+JUuIeRhG6OlZiaizupCHncigPZxeaczKyUgz8TEEiv0A2PIgws8XprW20ZSGjPfiZgc0dwEFe9L2MaS5hSjRIvnl9MHr3Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-389cc381cdfso35983455ab.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2024 04:51:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721044287; x=1721649087;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MS0q14/CC5LEx5UrysUIC6G0ZW/iY8eAsqkG0XIzx2k=;
-        b=GjLw0QdLfue+/HRUuEMI42tZ8FUVmZSE4roFHnR1Tw9pDzboBGzMwusq/4r0vnzB9T
-         MKSPGZw4NNjsJXbOojN5akeNDrBMnx4OEBznMUr/plyM5FFN5YXcBfLwFxzB5voRUS2K
-         MYW6LWo3Y1toyteKH2QS/A+PrBEohwjgdEgfQm9TMj/GGhQqR2ppQDpBH7asofnLUh/y
-         4ZMmrakSvN7zfcDFff/hF+pLZPUVrP74hv7HRzObeKkY9LxhG+aAhUgZdMZB5X1iUpQ8
-         a2OxLvJcTTU4o7Ov565sCViHR9guVVl/dRxqxupaMkHX6M+brnazR0qy91jR7QiCniER
-         ovsQ==
-X-Gm-Message-State: AOJu0Yxee+kWL3CzCoGzCNEoL51W2d+w+V8yDb2e9pXazA5fktLkKHQq
-	DyexsoCAfT1RjunYAjmJkCLYi2Uw7UOLyLhpiWRQS7zOWE7O/LgcJSBHWEkMe7tFtUZToWD+w68
-	zZ4cXjCAgXF5hVuM5UlxZG2pk05awy4YHDkoUEkNWcXiri0vwsSoWbO4=
-X-Google-Smtp-Source: AGHT+IFxGMUdmYwcDaF97K7JOQraDIdqZoCsALLxxX7csz2iErGbhBm0S2j0iJe5X6hEvvAQLbJdDjVd9RQlT12chqoyENeSwsRx
+	s=arc-20240116; t=1721046938; c=relaxed/simple;
+	bh=f/IoyPJRtU8HcxhEgeP6DA0rm03S9PM75FzmRXAvQug=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=XreBfRn5/xK6bwltMXNz6x5Fm2L1lp4OW4/RcoFs7ZzDZYceObwXRSCcAx1wQ/oiEkMrikyW9L+RQua8OF3/adUfezHGxYZg25FJSwtBcrKZ0efMu134yBncht/S9pidwLFawdqvYpHd6eP3xGBY9VsbKeYb1xxiQKSLNCDdkV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WN1kp4GZNzxStB;
+	Mon, 15 Jul 2024 20:30:42 +0800 (CST)
+Received: from dggpeml500023.china.huawei.com (unknown [7.185.36.114])
+	by mail.maildlp.com (Postfix) with ESMTPS id 057D11800A0;
+	Mon, 15 Jul 2024 20:35:32 +0800 (CST)
+Received: from [10.67.110.112] (10.67.110.112) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 15 Jul 2024 20:35:31 +0800
+Message-ID: <57994fe4-edd0-bc28-c134-83f72579c6c8@huawei.com>
+Date: Mon, 15 Jul 2024 20:35:30 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b47:b0:381:37d6:e590 with SMTP id
- e9e14a558f8ab-38e617d58eamr10704675ab.2.1721044286880; Mon, 15 Jul 2024
- 04:51:26 -0700 (PDT)
-Date: Mon, 15 Jul 2024 04:51:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005cccb5061d47d942@google.com>
-Subject: [syzbot] Monthly block report (Jul 2024)
-From: syzbot <syzbot+listd7ef59b4c72526c29e94@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH -next] blk-cgroup: move congestion_count to struct blkcg
+Content-Language: en-US
+To: Tejun Heo <tj@kernel.org>
+CC: <josef@toxicpanda.com>, <axboe@kernel.dk>, <lizefan.x@bytedance.com>,
+	<hannes@cmpxchg.org>, <cgroups@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240712085141.3288708-1-xiujianfeng@huawei.com>
+ <ZpK8Nup6_sOvSZ7E@slm.duckdns.org>
+From: xiujianfeng <xiujianfeng@huawei.com>
+In-Reply-To: <ZpK8Nup6_sOvSZ7E@slm.duckdns.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
 
-Hello block maintainers/developers,
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 29 issues are still open and 92 have been fixed so far.
+On 2024/7/14 1:41, Tejun Heo wrote:
+> Hello,
+> 
+> Sorry about the previous reply. I completely misread the patch.
+> 
+> On Fri, Jul 12, 2024 at 08:51:41AM +0000, Xiu Jianfeng wrote:
+> ...
+>> only compiling tested
+> 
+> It'd be better if there's a bit more verification.
+> 
+>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>> index 37e6cc91d576..01d3408c2fc6 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -2183,11 +2183,13 @@ void blk_cgroup_bio_start(struct bio *bio)
+>>  bool blk_cgroup_congested(void)
+>>  {
+>>  	struct cgroup_subsys_state *css;
+>> +	struct blkcg *blkcg;
+> 
+> It'd be better to define this within the loop.
+> 
+>>  	bool ret = false;
+>>  
+>>  	rcu_read_lock();
+>>  	for (css = blkcg_css(); css; css = css->parent) {
+> 
+> Also, if we're now dealing with blkcg's, there's no reason to go blkcg ->
+> css -> blkcg again. It'd be better to get the initial blkcg and then walk up
+> using blkcg_parent().
 
-Some of the still happening issues:
+Thanks, will do in v2.
 
-Ref Crashes Repro Title
-<1> 1363    Yes   INFO: task hung in bdev_release
-                  https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<2> 746     Yes   INFO: task hung in blkdev_fallocate
-                  https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<3> 299     No    INFO: task hung in bdev_open
-                  https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
-<4> 36      Yes   INFO: task hung in nbd_add_socket (2)
-                  https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
-<5> 28      Yes   INFO: rcu detected stall in schedule (7)
-                  https://syzkaller.appspot.com/bug?extid=005409b89b9a9675cb2a
-<6> 26      Yes   WARNING in blk_register_tracepoints
-                  https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
-<7> 7       Yes   WARNING in get_probe_ref
-                  https://syzkaller.appspot.com/bug?extid=8672dcb9d10011c0a160
-<8> 3       No    KCSAN: data-race in block_uevent / inc_diskseq (2)
-                  https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+>> @@ -95,6 +95,8 @@ struct blkcg {
+>>  	struct cgroup_subsys_state	css;
+>>  	spinlock_t			lock;
+>>  	refcount_t			online_pin;
+>> +	/* If there is block congestion on this cgroup. */
+>> +	atomic_t congestion_count;
+> 
+> Can you please match the indentation?
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Sure, I copied it from the original place, will do in v2
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+> 
+> Thanks.
+> 
