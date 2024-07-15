@@ -1,101 +1,105 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FA746556
-	for <linux-block@vger.kernel.org>; Mon, 15 Jul 2024 16:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BBA20323;
+	Mon, 15 Jul 2024 17:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721062684; cv=none; b=A+/DPi4sQj1au5FEVUQ9+cKnrOVrvQYUDGE/lp2OOLO8bzX4YQ2SkL8B1Oxt/7FSvianJuwzDklG4rTGwTcKPV2TOKhZsO5EhlxvL1BnsvVv6/FIf7RSANpkJY5CZRk/BTjgepby/JCdyzw61l7z7VdipAolLW8v++YbEmeCW9w=
+	t=1721064090; cv=none; b=fvdYf1L7mrujacCoHKBbPDl8X/5MhJmc4wkzZRnzKFlNKJT1HX6qZ/QzjHyyjKgRRIiiehAfkOE9+l4qlEC/G/Ya6PyojY/+T0fARyWvQRASNoTe/y9zVAWMABarPGeI+RxJVllNJaDSOfTm673pTpLKTFTaIXj9PyuYigwTJPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721062684; c=relaxed/simple;
-	bh=IxJz1HEy+JpE1vJBiifQpmCm2PJ240J6ITqDKSCG/L8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Pd28bGr20/D0bGIMEO7nXSswGDpko/y1IYTtqNd0PZF4nZAVl3iIlnQrTYn23c86zQZKkhgJj788L/hWS0v20/b5fNmEBK31KM7t2R+9u2V75mFcFBA65bK8hNI6R87Fdl/+8plTzhxEDNv8/oZd9ivH0GdncjoWVcUq2fIBVSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Zwm6SCo4; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1721064090; c=relaxed/simple;
+	bh=YuKyZRtkNIBHN5jbSweMr/laqNyoENl8JTxzcP5OZ9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uAlJYcZ9KIjokujm3Bk4LPR+0NwIDp1tBat139TAmX9M6d5WkkuFEmzdCzAJod9yH7OOOXtX/11GJ94W8C/Iqk/7ea9kop41wLJw0JFA6yxa0DOEROn3yteiP0p9c84zbSHSTxI+tZ5Unh8BEhT2X18s/DXVdRMrAYu16bs6x1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YTaZ1blY; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Zwm6SCo4"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a77cdae5caaso39479566b.0
-        for <linux-block@vger.kernel.org>; Mon, 15 Jul 2024 09:58:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YTaZ1blY"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-76cb5b6b3e4so2723502a12.1;
+        Mon, 15 Jul 2024 10:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721062680; x=1721667480; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Dp6fCCpQAFiJ7LQFdQvbhCZwILPCOZWlXEg9XyHob0=;
-        b=Zwm6SCo4IORJmyW5XhWW+BGQhOx+9ph2Gl+ysuliRCbfxrX62SDz53gwU5df6XLTvl
-         JTQE8DdCFPAdQGWW+90dxL4rGIk7G6IpsAT2eMydlrPM9uAZpqhpfhWrn93aayoRtQfA
-         nyE/+mvXlR9WS654Yjh7skzZMFvoNSziTVLdTPjEQoCuQorXt0F56mYC4McLgqOtB7lW
-         9wTqbshcASWBAhG9lFJpHVotUKQdsYhoaI0c6bpO7k4Nh5IkbHOyqYhbGnKBJD+q83z2
-         SYm8E8n7hz/7vYvLbQW8cw5aatHU3AqQC+ayDpquPyGTDu6QcBo0+qLIUZN329GinNSD
-         hibQ==
+        d=gmail.com; s=20230601; t=1721064088; x=1721668888; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i9k73sA4KaYZWSPUciUi3HDdqr3lc/EAyIdqeVOGRMM=;
+        b=YTaZ1blYWRt2Ea8jiJadxWiTrHvxZ8liJrSaFMFJIOG60c6NvziOkSZInwfwBNKI7o
+         idm2qUcg/OPphaWP49uMNAgrLvavwElkU+sKsbOtevAgjJql0AJmQhtKnYUM0aGVfpym
+         mGZm7gW1eyL+daErf/B2sQd4HKLIcpDO0hQavhcXAXm7WimsV6cKHhrCTfRBDWwkmKeY
+         hcr7VYDEuP9eNxSgRbj8o5LQRZ/IYARat+yWAlHwVBvJcBBOYYZrAUGFMpoF/gWWBb4t
+         WLd8q0XzdW+DDxz65fRTCVL4ohr5RiWK7+AHOREIh0LddwfjHLEYHFYkcxjPOw1H98B8
+         absA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721062680; x=1721667480;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4Dp6fCCpQAFiJ7LQFdQvbhCZwILPCOZWlXEg9XyHob0=;
-        b=ap/C4rJA9v7YwYHe+8SSaIxVt9SyyFqfmnmHZe+A3/2ov0HlDRVDWp7FepowVc30Rf
-         6378exVcTZoQAAbMWmG1LldURRn4JgM8+m5ZbvrzK58IFiMZjrSCwe3XebSE6j/WaKiD
-         kZyaLCsGE+UAAWGIMTzRNEtcwYMcAvPF8hZ3nAznhl14GkCw7AC1IWtsgsEci17SKAwt
-         nkSzXqVsB4TuFDml+0expO/owJvDXWyM3xBexuwsfHfAEtdyQdNfNKWL3A/cim281eKP
-         7Tjb2jGgq0yX+rzVNkzWGui1v0TrcjXNagerAqRWTB9x1o5/m2/Ro+4DB6kLvlSVEHLu
-         A8YQ==
-X-Gm-Message-State: AOJu0Yykz6pUeDrRYRm5lj/crsCAD4BvUUePHy/q/tzLRFDT6cCk2/3d
-	FHZeSVhTi6lPHn6RKlb0kQ5fAqm80vyp7ErD9FLlqI9ZnT4cP8eWCSxclygMl+U=
-X-Google-Smtp-Source: AGHT+IFXHNVR4+Mql83LD/nzPrlDHiA9SFqIznByjudVAKR6dxhYzi7ejPm9gDaXQitj7dgXQ0e+oQ==
-X-Received: by 2002:a17:906:7216:b0:a77:cb9c:e806 with SMTP id a640c23a62f3a-a79e6a915e0mr18337566b.3.1721062680449;
-        Mon, 15 Jul 2024 09:58:00 -0700 (PDT)
-Received: from [127.0.0.1] ([80.208.65.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc821809sm221453866b.208.2024.07.15.09.57.59
+        d=1e100.net; s=20230601; t=1721064088; x=1721668888;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i9k73sA4KaYZWSPUciUi3HDdqr3lc/EAyIdqeVOGRMM=;
+        b=hFx9gywq0RW8Icbv+JEv7nOMtDZ4Gquz1biXBO6WIe+L/u7GTdEcE1iaZOnfRGmirb
+         xC5vzo2CXoUGBesz0P6YUDQRG3RSOFdPGtya0X/9T5oUKISx/vBX6XzsRZMcWLV7ZYUZ
+         cx1SgaWFjzuuR5kpkQBzSB5n2h7ULUyP2nmQ9dWdzxZBQLhEVnIQGiw9GwKxni5nLElr
+         1gaDJXEsxKQFBnQlDiWVtuAoeqqVozIiU89zOC3TshT/vITHNbGm18Off0F2PRBomDkS
+         etxqh+c6luepkK1E0l0ice6eN6SqRwJYk3Uno/jDEWP+tsrJNHZgxoDTQVjbeTo6H5Ok
+         VdoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvOYUDZDtULEOdUFS5ClhidKIKPvVMXyw9Y5UNiG88FZRi7CONY7SEWdV2XQn4Zk6nV86lNGh7HlvLaO3qQkwS6/wZVScxmPZBbeVKqZUCgTB2GgkQQoZqqNsI3gSa+aAvoOY5
+X-Gm-Message-State: AOJu0YwgVfuMlbgdg3ni3sKEopkR4+YKFLPsL/QzU0hwI68PxBU2z1Oa
+	IvvowNIDBTwjpBc7QPEsawwxqBBWKMsDbpaAK47Fe1qjlOiX4bjD
+X-Google-Smtp-Source: AGHT+IGMeZvsUWpVQkC9G9DR/tknpdedHPhniJeUBf540YOjexOrwcOmXJRbjo2pfRCHhHE9MPBbzw==
+X-Received: by 2002:a05:6a21:10b:b0:1c2:94ad:1c5d with SMTP id adf61e73a8af0-1c3ee506766mr603367637.2.1721064087793;
+        Mon, 15 Jul 2024 10:21:27 -0700 (PDT)
+Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cacd6da7b4sm6688202a91.46.2024.07.15.10.21.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jul 2024 09:57:59 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Stefan Haberland <sth@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
- Vasily Gorbik <gor@linux.ibm.com>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
- Carlos Lopez <clopez@suse.de>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20240715112434.2111291-1-sth@linux.ibm.com>
-References: <20240715112434.2111291-1-sth@linux.ibm.com>
-Subject: Re: [PATCH 0/2] s390/dasd: module warning and error check fix
-Message-Id: <172106267901.10201.11169554689467623987.b4-ty@kernel.dk>
-Date: Mon, 15 Jul 2024 10:57:59 -0600
+        Mon, 15 Jul 2024 10:21:27 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 15 Jul 2024 07:21:26 -1000
+From: "tj@kernel.org" <tj@kernel.org>
+To: Boy Wu =?utf-8?B?KOWQs+WLg+iqvCk=?= <Boy.Wu@mediatek.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"boris@bur.io" <boris@bur.io>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	Iverlin Wang =?utf-8?B?KOeOi+iLs+mclik=?= <Iverlin.Wang@mediatek.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH v2] blk-cgroup: Replace u64_sync with blkg_stat_lock for
+ stats update
+Message-ID: <ZpVals5maZs4L3e0@slm.duckdns.org>
+References: <20240710061334.1888-1-boy.wu@mediatek.com>
+ <Zo8HTD2AD-b51q0C@slm.duckdns.org>
+ <6114fbad7bce9b15806bb9fee25a1075ecb53dd1.camel@mediatek.com>
+ <ZpBIfwThiVwstlXL@slm.duckdns.org>
+ <70c37035f006de3a4fde895ceeee92826cd280e0.camel@mediatek.com>
+ <ZpF4Pfu83W9Wp_R9@slm.duckdns.org>
+ <5a1e1bd5168696a0857b62572336c5e598cb5493.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.14.0
+In-Reply-To: <5a1e1bd5168696a0857b62572336c5e598cb5493.camel@mediatek.com>
 
+Hello,
 
-On Mon, 15 Jul 2024 13:24:32 +0200, Stefan Haberland wrote:
-> please apply the following two patches for the merge window.
-> They fix module description warnings and an error check in a dasd function.
-> 
-> Carlos López (1):
->   s390/dasd: fix error checks in dasd_copy_pair_store()
-> 
-> Jeff Johnson (1):
->   s390/dasd: add missing MODULE_DESCRIPTION() macros
-> 
-> [...]
+On Mon, Jul 15, 2024 at 07:15:24AM +0000, Boy Wu (吳勃誼) wrote:
+> I think I get your idea. You want to replace all the u64 sync for
+> iostat. However, I have one question: why use blkg_stat_lock instead of
+> adding a spin lock for each iostat like iostat.spinlock? We don't need
+> to lock between updating different iostats, but only lock when updating
+> the same iostat.
 
-Applied, thanks!
+Oh yeah, that'd be even better.
 
-[1/2] s390/dasd: add missing MODULE_DESCRIPTION() macros
-      commit: 1f5a33315362cb8ade2b15489c985ada0cc8623b
-[2/2] s390/dasd: fix error checks in dasd_copy_pair_store()
-      commit: 8e64d2356cbc800b4cd0e3e614797f76bcf0cdb8
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+tejun
