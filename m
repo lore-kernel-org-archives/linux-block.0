@@ -1,105 +1,121 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BBA20323;
-	Mon, 15 Jul 2024 17:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707B912E71;
+	Mon, 15 Jul 2024 17:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721064090; cv=none; b=fvdYf1L7mrujacCoHKBbPDl8X/5MhJmc4wkzZRnzKFlNKJT1HX6qZ/QzjHyyjKgRRIiiehAfkOE9+l4qlEC/G/Ya6PyojY/+T0fARyWvQRASNoTe/y9zVAWMABarPGeI+RxJVllNJaDSOfTm673pTpLKTFTaIXj9PyuYigwTJPQ=
+	t=1721064370; cv=none; b=Q9eNXbOV/CSzXej1+EWOkbNCVB/A7kU6wKWIEKO/WryvjfeEGpNZHtDi9fmxQEAuttIwTMeMkt1XOC4ezXFaE/YTfvy3F5sLgBFot1i3SKw90j5ewpTqP28hwMcF1WUXVBezwIkLhRJabVNdHOFkmkRoUXpoMnoT7xIRIlVp20o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721064090; c=relaxed/simple;
-	bh=YuKyZRtkNIBHN5jbSweMr/laqNyoENl8JTxzcP5OZ9w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uAlJYcZ9KIjokujm3Bk4LPR+0NwIDp1tBat139TAmX9M6d5WkkuFEmzdCzAJod9yH7OOOXtX/11GJ94W8C/Iqk/7ea9kop41wLJw0JFA6yxa0DOEROn3yteiP0p9c84zbSHSTxI+tZ5Unh8BEhT2X18s/DXVdRMrAYu16bs6x1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YTaZ1blY; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721064370; c=relaxed/simple;
+	bh=uKuHsbv4jGYyMGBfTyyD2xkIBlkTwnThjcKpU2QB5kQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=eCE3p7cHqsK2zpYdwj+db/yPBAUnKgNdfe+0VUpmIP9aJew6RypLN0DtCqyKggvBkjS0JxNeo9vW2RvjjZ78kjrEfw6a/cvjENkZ9OVdqWBjAGMZTLqaj86LyjzypjPBYsVgvQj0grWCLEIA86p0vTFIW+Cbl0sg939HVT03f84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=vG9InMy4; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YTaZ1blY"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-76cb5b6b3e4so2723502a12.1;
-        Mon, 15 Jul 2024 10:21:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721064088; x=1721668888; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=i9k73sA4KaYZWSPUciUi3HDdqr3lc/EAyIdqeVOGRMM=;
-        b=YTaZ1blYWRt2Ea8jiJadxWiTrHvxZ8liJrSaFMFJIOG60c6NvziOkSZInwfwBNKI7o
-         idm2qUcg/OPphaWP49uMNAgrLvavwElkU+sKsbOtevAgjJql0AJmQhtKnYUM0aGVfpym
-         mGZm7gW1eyL+daErf/B2sQd4HKLIcpDO0hQavhcXAXm7WimsV6cKHhrCTfRBDWwkmKeY
-         hcr7VYDEuP9eNxSgRbj8o5LQRZ/IYARat+yWAlHwVBvJcBBOYYZrAUGFMpoF/gWWBb4t
-         WLd8q0XzdW+DDxz65fRTCVL4ohr5RiWK7+AHOREIh0LddwfjHLEYHFYkcxjPOw1H98B8
-         absA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721064088; x=1721668888;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i9k73sA4KaYZWSPUciUi3HDdqr3lc/EAyIdqeVOGRMM=;
-        b=hFx9gywq0RW8Icbv+JEv7nOMtDZ4Gquz1biXBO6WIe+L/u7GTdEcE1iaZOnfRGmirb
-         xC5vzo2CXoUGBesz0P6YUDQRG3RSOFdPGtya0X/9T5oUKISx/vBX6XzsRZMcWLV7ZYUZ
-         cx1SgaWFjzuuR5kpkQBzSB5n2h7ULUyP2nmQ9dWdzxZBQLhEVnIQGiw9GwKxni5nLElr
-         1gaDJXEsxKQFBnQlDiWVtuAoeqqVozIiU89zOC3TshT/vITHNbGm18Off0F2PRBomDkS
-         etxqh+c6luepkK1E0l0ice6eN6SqRwJYk3Uno/jDEWP+tsrJNHZgxoDTQVjbeTo6H5Ok
-         VdoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWvOYUDZDtULEOdUFS5ClhidKIKPvVMXyw9Y5UNiG88FZRi7CONY7SEWdV2XQn4Zk6nV86lNGh7HlvLaO3qQkwS6/wZVScxmPZBbeVKqZUCgTB2GgkQQoZqqNsI3gSa+aAvoOY5
-X-Gm-Message-State: AOJu0YwgVfuMlbgdg3ni3sKEopkR4+YKFLPsL/QzU0hwI68PxBU2z1Oa
-	IvvowNIDBTwjpBc7QPEsawwxqBBWKMsDbpaAK47Fe1qjlOiX4bjD
-X-Google-Smtp-Source: AGHT+IGMeZvsUWpVQkC9G9DR/tknpdedHPhniJeUBf540YOjexOrwcOmXJRbjo2pfRCHhHE9MPBbzw==
-X-Received: by 2002:a05:6a21:10b:b0:1c2:94ad:1c5d with SMTP id adf61e73a8af0-1c3ee506766mr603367637.2.1721064087793;
-        Mon, 15 Jul 2024 10:21:27 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cacd6da7b4sm6688202a91.46.2024.07.15.10.21.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jul 2024 10:21:27 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 15 Jul 2024 07:21:26 -1000
-From: "tj@kernel.org" <tj@kernel.org>
-To: Boy Wu =?utf-8?B?KOWQs+WLg+iqvCk=?= <Boy.Wu@mediatek.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"boris@bur.io" <boris@bur.io>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	Iverlin Wang =?utf-8?B?KOeOi+iLs+mclik=?= <Iverlin.Wang@mediatek.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH v2] blk-cgroup: Replace u64_sync with blkg_stat_lock for
- stats update
-Message-ID: <ZpVals5maZs4L3e0@slm.duckdns.org>
-References: <20240710061334.1888-1-boy.wu@mediatek.com>
- <Zo8HTD2AD-b51q0C@slm.duckdns.org>
- <6114fbad7bce9b15806bb9fee25a1075ecb53dd1.camel@mediatek.com>
- <ZpBIfwThiVwstlXL@slm.duckdns.org>
- <70c37035f006de3a4fde895ceeee92826cd280e0.camel@mediatek.com>
- <ZpF4Pfu83W9Wp_R9@slm.duckdns.org>
- <5a1e1bd5168696a0857b62572336c5e598cb5493.camel@mediatek.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="vG9InMy4"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4WN8Hg6MtRzlgMVQ;
+	Mon, 15 Jul 2024 17:26:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1721064365; x=1723656366; bh=xzvgrre+HJgfaADmusVjaYvJ
+	yf2ILqrGPTKg4Ps2YVc=; b=vG9InMy4gHp1nGXdLX85iEf7YJAXCqZkliNFIDuZ
+	fBpKz3zS+BvRifkbNRrSitMB+v1iy4KnsPejzgCKi3NYHy7gP7DpaMHa+NgTjV3N
+	nLD0rr53xlwLby1edMDQstTlJsVLW0DikWOmpSE8JY/0S3ph4EDVgGiaYHGv1QKW
+	u6k9Nn6XCd3bwJL8Vrsdi0vPP19xYuKNliOKcLeIfX8hNa3QfXYNSH6PKQEArN55
+	ZI9vi8Vde9CbPBIjqHg7pE2UvzzXN+hBi89uQAdBNyklVv+31DnYrssxLK7HyQQ5
+	YvzymyjzZfUFXR/qundDj7EJ+qvrgN1VGWo9Lz56obBLSg==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id V40ZX-cgwAAb; Mon, 15 Jul 2024 17:26:05 +0000 (UTC)
+Received: from [IPV6:2a00:79e0:2e14:8:30c:88a5:456e:8b88] (unknown [104.135.204.80])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4WN8Hc1nQ5zlgMVL;
+	Mon, 15 Jul 2024 17:26:04 +0000 (UTC)
+Message-ID: <263282cd-dadc-43f7-be8f-892248bc3318@acm.org>
+Date: Mon, 15 Jul 2024 10:26:03 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5a1e1bd5168696a0857b62572336c5e598cb5493.camel@mediatek.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7] sbitmap: fix io hung due to race on
+ sbitmap_word::cleared
+To: Yang Yang <yang.yang@vivo.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20240715091125.36381-1-yang.yang@vivo.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240715091125.36381-1-yang.yang@vivo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 7/15/24 2:11 AM, Yang Yang wrote:
+> +
+> +	/**
+> +	 * @swap_lock: serializes simultaneous updates of ->word and ->cleared
+> +	 */
+> +	spinlock_t swap_lock;
+>   } ____cacheline_aligned_in_smp;
 
-On Mon, Jul 15, 2024 at 07:15:24AM +0000, Boy Wu (吳勃誼) wrote:
-> I think I get your idea. You want to replace all the u64 sync for
-> iostat. However, I have one question: why use blkg_stat_lock instead of
-> adding a spin lock for each iostat like iostat.spinlock? We don't need
-> to lock between updating different iostats, but only lock when updating
-> the same iostat.
+Thank you for having updated this comment.
 
-Oh yeah, that'd be even better.
+> -static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
+> +static inline bool sbitmap_deferred_clear(struct sbitmap_word *map,
+> +		unsigned int depth, unsigned int alloc_hint, bool wrap)
+>   {
+> -	unsigned long mask;
+> +	unsigned long mask, word_mask;
+> +	bool ret = false;
+>   
+> -	if (!READ_ONCE(map->cleared))
+> -		return false;
+> +	guard(spinlock_irqsave)(&map->swap_lock);
+> +
+> +	if (!map->cleared) {
+> +		if (depth > 0) {
+> +			word_mask = (~0UL) >> (BITS_PER_LONG - depth);
+> +			/*
+> +			 * The current behavior is to always retry after moving
+> +			 * ->cleared to word, and we change it to retry in case
+> +			 * of any free bits. To avoid an infinite loop, we need
+> +			 * to take wrap & alloc_hint into account, otherwise a
+> +			 * soft lockup may occur.
+> +			 */
+> +			if (!wrap && alloc_hint)
+> +				word_mask &= ~((1UL << alloc_hint) - 1);
+> +
+> +			if ((READ_ONCE(map->word) & word_mask) == word_mask)
+> +				ret = false;
+> +			else
+> +				ret = true;
+> +		}
+> +
+> +		return ret;
+> +	}
 
-Thanks.
+Now that guard()() is being used, the local variable 'ret' can be 
+eliminated. The if (READ_ONCE() ...) statement can be changed into the
+following: return (READ_ONCE(map->word) & word_mask) != word_mask;
+and "return ret;" can be changed into "return false;". Additionally,
+the indentation depth can be reduced by changing "if (depth > 0) {" ...
+into "if (depth == 0) return false;".
 
--- 
-tejun
+Otherwise this patch looks good to me.
+
+Thanks,
+
+Bart.
