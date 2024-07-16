@@ -1,198 +1,119 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7F9142E86;
-	Tue, 16 Jul 2024 21:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5516713C693;
+	Tue, 16 Jul 2024 23:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721164420; cv=none; b=WwTf26G1/i1227I2KAFJoeYZbQxH0tkl2zmn3QyJ4hMcfyVoVvugA6jH1Bd6BCHbM+j+JZBH4HMFGS+67uEkeRLZI8+FplYVwhamZcyPSsMAO74SQXZQpDDS+QbgzHUfRC4vzJCubTsVzsvmroum/d3yE4ztFAKipub2B/t0xBY=
+	t=1721171240; cv=none; b=BuRW5uY7J5EDPWabaO/mGeVzGP6yD/zUbUxi0IAigdJOVoiVLsL8CV7nuiypXRSOYS61wmbL/psJT2MWCqPhlIIzAAN+AS0kdUZaX+bCTX0aIwq0df2Xh+sgN1X3M7LpRjjESS8UXmGn52+7pzmzkegZLkmUmmE8QYTmZl5XIPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721164420; c=relaxed/simple;
-	bh=9iC87dpWlEete4vWmjJZ/0kZqeyGrcAPBgky9h1AQi8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A3k3e1blXzJpp6H6IgFkY14id928aJ6ReGsv7dKDIYadAg95YxjTmqsY+Q9g1lIqJF4HjYqlFT56XLfdWJkhQlF/CKbEPNwyYnStFA5ZNaMT7fGoA6vQh4q/sX82wrvPR3xiMwsM6QnZ9s4HRE8+uZh6SA5rGmcI3LbtrN1F3EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OmB+ltOQ; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721171240; c=relaxed/simple;
+	bh=kZuZ0X0RPT/O4DsNTfXIg6bB6btR6kfVX63MOeO57YQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fjqDoVmCeybtWMvOrffpc1/Zf5cThZKQt/Bwv7XmdGnAfo+UA14ei94LzsT+HUX/Yqo/weZjW9LaClJxUiWSve4Dr8MOYkABhLCJdYJ7eGP47KhHj1QxKRwfQ3V603gBCi0EXhFyDHfbWsOchUp4uI3moESmdbUQ0EPig+tPHmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qx1sskeI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OmB+ltOQ"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-70b2a0542c2so5664813b3a.3;
-        Tue, 16 Jul 2024 14:13:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721164417; x=1721769217; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ag5NdJlDjgGBhuGOZDzJcu7IZkmLpKyxnSbjG+hkilc=;
-        b=OmB+ltOQAbD1cnIF8uvsqBkbzhH/3coeN9/3JSRxQcqlgpeQzRrbj8iqf5FsBki3gR
-         gBwFrnYQyibour3nRSjN5J3VYF9SlUiY2kNs2OIORFGK99yFVAcq9c40wzFE5anSJTDe
-         QyHu1whwCLZt9ygTOLJZkQCkBTanpFt9Hd9swgsN1ANSoRy2dhqKKxoOrwQoOaoWLI84
-         DC1wUABcsCaZbyY2SEh2MHPDzt0QfXvCsJIevAHZ44Y8u6U1vQgqmRJ+4shCGcHblVbL
-         kniBMFzGLTHl4UcWrdjoeVb1kccNTZYD9E2Qy4vyCtb79aKse7U7RK1EqT9ToFh4jGrh
-         DF0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721164417; x=1721769217;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ag5NdJlDjgGBhuGOZDzJcu7IZkmLpKyxnSbjG+hkilc=;
-        b=qKS1DIhOduu4ecJ/Ebk4xIbkAQDfYfR7GoXU0yfYHkIleP/xD3tEYgFCpNYcUZEUQI
-         At4GwLE37XaWi6jmaoNYYKcKnn37aPQBpRucKTS2RYiP4Amn/j0yxua5BXuc35UDtOcT
-         gf2Nl+WIQu0amsaXz2aXI6Ca/ltCU/zGQGFQrT4YP9C8lDJRDZN8T7/L5qxsgiZ9bmNU
-         y24k4MXJFGMJdYeqxAjMD0KRCyt/dusiNe6TwTKesIR+pHZoD/OcswiaGfG9jaKh//gT
-         C3I1Yo+A7gJMicGMV99uBj693hGs0FOhSkoTpT4QibakXYB6CNJqPlEGGb6hAJvtSx95
-         rKyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVXNEYHgOz9yik8ewFEkdm56PxZ9yryNcQN6jnvRsJ8d3WXqriGQHPI8MDH7QRA54K/Ef4LZ17PMoaKKxnx+pLGP2lrECcH09COe89ddWmwMRXmvUbnS3LguZ9SsD73+gGIgqDq330Xd/zgtVIFggXx3Za6mgtUBoglIvoFRVpa6eBc
-X-Gm-Message-State: AOJu0Yxdw0/7IJPnxGZwd8MPrwKP6kOnqwMYwpjt70X+G7fJDnsuCxDj
-	aYdgwQrKRg7Lng8oLu7zEdzCjwYIkiGkqdrMnrDbyVhyuEsS1/zA
-X-Google-Smtp-Source: AGHT+IEvPNah8o8ElhR2lXdjKaUmNu2BHdD7tWO6AdHw+HwAq26CaXaLi2pF9DM3SbCMdFzYQrtBvg==
-X-Received: by 2002:a05:6a20:729c:b0:1c1:89f8:8609 with SMTP id adf61e73a8af0-1c3f10e02d5mr4669359637.0.1721164417106;
-        Tue, 16 Jul 2024 14:13:37 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7eca7a7bsm6795727b3a.152.2024.07.16.14.13.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 14:13:36 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 16 Jul 2024 11:13:35 -1000
-From: Tejun Heo <tj@kernel.org>
-To: "boy.wu" <boy.wu@mediatek.com>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Boris Burkov <boris@bur.io>, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, iverlin.wang@mediatek.com
-Subject: Re: [PATCH v3] blk-cgroup: Replace u64 sync with spinlock for iostat
- update
-Message-ID: <Zpbify32lel9J-5I@slm.duckdns.org>
-References: <20240716075206.23121-1-boy.wu@mediatek.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qx1sskeI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF62C116B1;
+	Tue, 16 Jul 2024 23:07:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721171239;
+	bh=kZuZ0X0RPT/O4DsNTfXIg6bB6btR6kfVX63MOeO57YQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qx1sskeIOvDqIJtZBHF32At0++OfaTeGlW3ut/AWOyiRfE/8odxFnYKKx4W37cYIT
+	 MeN7MMx2rD+XPsAInafDPXhDjaJTi2QTU/5+SA0GqpYbzUnRWP1Usp5SxXDfOJ1uNx
+	 1GScStNSgYePQjgEd10YO9mVYMuPmo+it8QhIKBSCrR1TravNiLrOH4guCHTWlYZfc
+	 CMxW8ze6zXW0ur52m1lQA6OwCvRpBaQi583lRSGQ8FFQb+UhY+ktlemt6u3W+zY2h+
+	 qOiHr2kYEmUaM8OOqh/AWqhN1bVjCSCp5pBU2Y/RWruluTRBoF/k/1xdPpxPiaozm2
+	 ZaADh6BdsG2ug==
+Message-ID: <b69d54af-2ac2-406a-ab32-9bad9d8a3000@kernel.org>
+Date: Wed, 17 Jul 2024 08:07:18 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240716075206.23121-1-boy.wu@mediatek.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: SCSI error indicating misalignment on part of Linux scsi or block
+ layer?
+To: David Howells <dhowells@redhat.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <483247.1721159741@warthog.procyon.org.uk>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <483247.1721159741@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello, Boy.
+On 7/17/24 04:55, David Howells wrote:
+> Hi James,
+> 
+> I'm wondering if I'm seeing a problem with DIO writes through Ext4 or XFS
+> manifesting as SCSI misalignment errors.  This has occurred with two different
+> drives.  I saw it first with v6.10-rc6, I think, but I haven't tried
+> cachefiles for a while.  It does happen with v6.10.
+> 
+> ata1.00: exception Emask 0x60 SAct 0x1 SErr 0x800 action 0x6 frozen
+> ata1.00: irq_stat 0x20000000, host bus error
 
-So, looking at the patch, I'm not sure per-blkg lock makes sense.
+Bus error is a serious error...
 
-On Tue, Jul 16, 2024 at 03:52:06PM +0800, boy.wu wrote:
-> @@ -995,15 +995,13 @@ static void blkcg_iostat_update(struct blkcg_gq *blkg, struct blkg_iostat *cur,
->  				struct blkg_iostat *last)
->  {
->  	struct blkg_iostat delta;
-> -	unsigned long flags;
->  
->  	/* propagate percpu delta to global */
-> -	flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
-> +	guard(spinlock_irqsave)(&blkg->iostat.spinlock);
->  	blkg_iostat_set(&delta, cur);
->  	blkg_iostat_sub(&delta, last);
->  	blkg_iostat_add(&blkg->iostat.cur, &delta);
->  	blkg_iostat_add(last, &delta);
-> -	u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
->  }
+> ata1: SError: { HostInt }
+> ata1.00: failed command: WRITE FPDMA QUEUED
+> ata1.00: cmd 61/68:00:b0:93:34/00:00:02:00:00/40 tag 0 ncq dma 53248 out
+>          res 40/00:00:00:00:00/00:00:00:00:00/00 Emask 0x60 (host bus error)
+> ata1.00: status: { DRDY }
+> ata1: hard resetting link
+> ata1: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
 
-This is already called with blkg_stat_lock held.
+That is very low... Old hardware ?
 
-> @@ -1051,10 +1048,8 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
->  			goto propagate_up; /* propagate up to parent only */
->  
->  		/* fetch the current per-cpu values */
-> -		do {
-> -			seq = u64_stats_fetch_begin(&bisc->sync);
-> +		scoped_guard(spinlock_irqsave, &bisc->spinlock)
->  			blkg_iostat_set(&cur, &bisc->cur);
-> -		} while (u64_stats_fetch_retry(&bisc->sync, seq));
+> ata1.00: configured for UDMA/133
+> sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=3s
+> sd 0:0:0:0: [sda] tag#0 Sense Key : Illegal Request [current] 
+> sd 0:0:0:0: [sda] tag#0 Add. Sense: Unaligned write command
 
-This is per-cpu stat and we should keep using u64_sync for them.
+That is likely the result of the automatice generation of sense data for failed
+commands based on ata status and error fields for a failed command, which
+defaults to this when nothing else matches (yeah, I know, that is not pretty.
+But the SAT specs in that area are a nightmare and following them actually ends
+up with this asc/ascq. Will try to do something about it).
 
-> @@ -1134,9 +1128,8 @@ static void blkcg_fill_root_iostats(void)
->  				cpu_dkstats->sectors[STAT_DISCARD] << 9;
->  		}
->  
-> -		flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
-> +		guard(spinlock_irqsave)(&blkg->iostat.spinlock);
->  		blkg_iostat_set(&blkg->iostat.cur, &tmp);
-> -		u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
->  	}
->  }
-...
-> @@ -1157,16 +1149,14 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
->  
->  	seq_printf(s, "%s ", dname);
->  
-> -	do {
-> -		seq = u64_stats_fetch_begin(&bis->sync);
-> -
-> +	scoped_guard(spinlock_irqsave, &bis->spinlock) {
->  		rbytes = bis->cur.bytes[BLKG_IOSTAT_READ];
->  		wbytes = bis->cur.bytes[BLKG_IOSTAT_WRITE];
->  		dbytes = bis->cur.bytes[BLKG_IOSTAT_DISCARD];
->  		rios = bis->cur.ios[BLKG_IOSTAT_READ];
->  		wios = bis->cur.ios[BLKG_IOSTAT_WRITE];
->  		dios = bis->cur.ios[BLKG_IOSTAT_DISCARD];
-> -	} while (u64_stats_fetch_retry(&bis->sync, seq));
-> +	}
+The host bus error is the issue. Not sure what triggers it though.
+What is the adapter model you are using ?
 
-The above two are the only places which can potentially benefit from
-per-blkg lock but these aren't hot paths. I'd just use blkg_stat_lock for
-the above.
-
-> @@ -2152,30 +2141,29 @@ void blk_cgroup_bio_start(struct bio *bio)
->  
->  	cpu = get_cpu();
->  	bis = per_cpu_ptr(bio->bi_blkg->iostat_cpu, cpu);
-> -	flags = u64_stats_update_begin_irqsave(&bis->sync);
-> -
-> -	/*
-> -	 * If the bio is flagged with BIO_CGROUP_ACCT it means this is a split
-> -	 * bio and we would have already accounted for the size of the bio.
-> -	 */
-> -	if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
-> -		bio_set_flag(bio, BIO_CGROUP_ACCT);
-> -		bis->cur.bytes[rwd] += bio->bi_iter.bi_size;
-> -	}
-> -	bis->cur.ios[rwd]++;
-> +	scoped_guard(spinlock_irqsave, &bis->spinlock) {
-> +		/*
-> +		 * If the bio is flagged with BIO_CGROUP_ACCT it means this is a split
-> +		 * bio and we would have already accounted for the size of the bio.
-> +		 */
-> +		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
-> +			bio_set_flag(bio, BIO_CGROUP_ACCT);
-> +			bis->cur.bytes[rwd] += bio->bi_iter.bi_size;
-> +		}
-> +		bis->cur.ios[rwd]++;
->  
-> -	/*
-> -	 * If the iostat_cpu isn't in a lockless list, put it into the
-> -	 * list to indicate that a stat update is pending.
-> -	 */
-> -	if (!READ_ONCE(bis->lqueued)) {
-> -		struct llist_head *lhead = this_cpu_ptr(blkcg->lhead);
-> +		/*
-> +		 * If the iostat_cpu isn't in a lockless list, put it into the
-> +		 * list to indicate that a stat update is pending.
-> +		 */
-> +		if (!READ_ONCE(bis->lqueued)) {
-> +			struct llist_head *lhead = this_cpu_ptr(blkcg->lhead);
->  
-> -		llist_add(&bis->lnode, lhead);
-> -		WRITE_ONCE(bis->lqueued, true);
-> +			llist_add(&bis->lnode, lhead);
-> +			WRITE_ONCE(bis->lqueued, true);
-> +		}
-
-These are per-cpu stat updates which should keep using u64_sync. We don't
-want to incur locking overhead for stat updates in the hot issue path.
-
-Thanks.
+> sd 0:0:0:0: [sda] tag#0 CDB: Write(10) 2a 00 02 34 93 b0 00 00 68 00
+> I/O error, dev sda, sector 37000112 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 0
+> ata1: EH complete
+> 
+> For reference, I made it dump the result of the READ CAPACITY 16 command:
+> 
+> sd 0:0:0:0: [sda] RC16 000000003a38602f000002000000000000000000000000000000000000000000
+> 
+> The drive says it has 512-byte logical and physical block sizes.
+> 
+> The DIO writes are being generated by cachefiles and are all
+> PAGE_SIZED-aligned in terms of file offset and request length.
+> 
+> I also saw this:
+> 
+> 	CacheFiles: I/O Error: Trunc-to-dio-size failed -95 [o=000001cb]
+> 
+> which indicates that ext4/xfs returned EOPNOTSUPP to vfs_truncate() and thence
+> to cachefiles.  I'm not sure why it would do that.
+> 
+> Any idea what might cause this or how to investigate it further?  Is it
+> possible it's some sort of hardware error in the I/O bridge or IOMMU?
+> 
+> Thanks,
+> David
+> 
+> 
 
 -- 
-tejun
+Damien Le Moal
+Western Digital Research
+
