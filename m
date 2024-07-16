@@ -1,75 +1,91 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4A423A8;
-	Tue, 16 Jul 2024 20:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7740D1A08BB;
+	Tue, 16 Jul 2024 20:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721160215; cv=none; b=ULboT2v8SocnujupHSZicETFzUYdDxx9ukVyYZpGnVrnOfSD7/M5KeoSESBczEXNbLmUsoaiT8BLFLyOSeRB6+zGFib4hFkdve5zoox033nH9MzGzPpDZcAU/9ctGKvNMRqs/GnB1g9Knv4zUaKXcYrtk/8a0lR181q8HVUI2rQ=
+	t=1721160728; cv=none; b=I4lXxZkNd3msKj7WxSAt7OxTFTT9cJvesQd25cNEN9bJqD5GMoDscVLL09fX+eBNZqK/DR1hLcidyjSALYpaT37rLbdJOoTs12eP4Xrml5wO21c4/xGtSau1S0EmCDSSkWRhJnbJ7IYJk1YeW29YEgSVgUFodjA2OfYp4//A2MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721160215; c=relaxed/simple;
-	bh=3isCtw49gjTNxSl4rT4/wCPsTUypsJfNTuh4OxGYI/A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oYootTTxG35nnXdhk+aYqOx1Ke4PjjEb1o9bVvKpCN2cMP9ZGOUlXcBQ3ea57h/uQv51gZcOCrSNBROIzkV/ITrpaz4BB/3BcUxxGshIGLr2CywtlV0F411DWDINMXsJhUg5fvtBX0MjQBq/Tt8QDVfe6J6phf0AZxrl009z8+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=OqS/PqaT; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1721160728; c=relaxed/simple;
+	bh=8i+xenZ6D+Nhq+d8YXvmWzsEvf8PaAiQ8YBh/ZlbcVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GeRZuauTmhyFxPYbFxIVlzCIaBjFAUfJQDQHejiMdde8OFRbweZxdM4sbOBzogIhUrPSg1h7sDiX1YGGzpbmRW61dfRCPq64FiBIHZz4EffSEDJj/ht5SOT8MuyH7ly620wbqVyTSw5y5SZQW6x8WQjrOo6/y8hBIWVyWYOo2ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PCa2hcXd; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="OqS/PqaT"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WNqks1pcyz6CmM6Q;
-	Tue, 16 Jul 2024 20:03:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1721160210; x=1723752211; bh=3isCtw49gjTNxSl4rT4/wCPs
-	TUypsJfNTuh4OxGYI/A=; b=OqS/PqaT1uBIIjqi2SnBuIOBa8nOUAFZacT6iXK9
-	wyuOTv9U1MHTv4iYT8IaO4Lozvt/mfWz9zQ429WJje3I+HHKaBrMtnnn11AV7S+R
-	Mh7l23b/gXv4psoo/kQRNTJD5Vpv9UM5yn0/TKIgdYf8jkXXx6Zz7EuGTd/1x6p4
-	5gxFg77Vw29LX4EPCPRWHubaATfVDzN/2F1QjHUiah54h0por4S5pamEZOPNxYlS
-	aDjquWid5wyjWinN0+vEbMM4HdugYu3eDxrROvWicKAN7xzm/wwoSQFHE/dJmpuo
-	jEmIQJ4gnXuqqPLWEta2UnnM5XLFzKst9oU3nUekibJRuQ==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id QqI_rDm8Yjbh; Tue, 16 Jul 2024 20:03:30 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WNqkm4bMGz6CmM5x;
-	Tue, 16 Jul 2024 20:03:28 +0000 (UTC)
-Message-ID: <637875b5-104c-4df7-a7ae-181d6eab7ad6@acm.org>
-Date: Tue, 16 Jul 2024 13:03:26 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PCa2hcXd"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fb1c69e936so33472725ad.3;
+        Tue, 16 Jul 2024 13:12:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721160726; x=1721765526; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hlTyfm1/jbIYhBi2yrrQIo4CESDXS0z+TL86f8EeJbQ=;
+        b=PCa2hcXdTc0HQ+CDSWwKcSzw4dLj5CorCaSOEbkKHTk7qkPh2msOyGxav6otX2h4EY
+         F/1mI4U/HWfnZCWjlqREPyoeDckscUPCOPNYvoZB75aAEA6JxsZVdJE/pUHoZWJkw/+7
+         PAU9c1ZpmywYtIuKnuPbT6nssoOYHgOHUt3l0OVssFhtB7Wdq2bu981ykjvjxHjjeoZF
+         Q7LmTPiIKxBYpgvWi7cQ36Hqz7WESdsgAc+JD+8VzaNM4ZTjYJCJ0S2P+mzu40kGtY6E
+         kpHi36a1dTZp5rkC18WGXf1Qq7ktITX09thW3wlrySNRL2B2yzDm57mph3jyrYgMpSzK
+         9YKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721160726; x=1721765526;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hlTyfm1/jbIYhBi2yrrQIo4CESDXS0z+TL86f8EeJbQ=;
+        b=apnehST9EqDwOsp1y2JvO9D92TIuVOSMZRTefodtvPb9FtCYKXO07jGf+N8DI2DXUE
+         6EJDzwJBdQFfHYEDF5OjkDAPD99JD3Y2Dc9e7okYxUJCpfAuL1H3KLGXkWuiff79EeTU
+         KOYVWC91N4CFIDnruunMoG/8LZiHQfq6z9GZo4HFmfpqoiyNMAVnypmzK+b/BZig2WFM
+         PDjrVPsHlCtLJ/gOh/jqORFx9cB+gcOQgLhzIQRBaxwp12ZZ+4hLr8idQU13I21F6lFu
+         FmnEkSSgueb+cFaIEqvfiUM3Q/V20wknklgssY2NIvdc66ZHsp3xGhtEllY5TJgjaQ9C
+         1zcA==
+X-Forwarded-Encrypted: i=1; AJvYcCXGb0mpIwt+AHw6lr00E/SIKy8sgx5/yIj3FcelkVwrYayaIwQ2V2npsgXlbPisQW3iYM4x873KR4NmSe5SaQJ3IMdoK11cmmxO4QJZJq2uBr6QEvxgr4WwQCAffjM935T47ZMLVunU9y/lD7c1XRKVmsKjbMD4GeT0YnugxqZPf7hy
+X-Gm-Message-State: AOJu0YwgUhdHrZuZcg0wIUjaCKma5s/5s3yPFrbVW6Qw/2kB8J/8CphJ
+	4yJGmPoZNIWJwffEwSkvo5m0tl1GemmYiWpM0xHk9NtmbDWkRQmp
+X-Google-Smtp-Source: AGHT+IGyPQVB25mxI2bZvFvTBBskLBjCYGwvrV/m9+G+S0nNa5G9734Iaw/DiNbm/Vw6oSvWmCBqog==
+X-Received: by 2002:a17:903:1105:b0:1fa:fbe1:284e with SMTP id d9443c01a7336-1fc3d822fe9mr30385695ad.0.1721160725509;
+        Tue, 16 Jul 2024 13:12:05 -0700 (PDT)
+Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc263c5sm62536995ad.174.2024.07.16.13.12.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jul 2024 13:12:05 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 16 Jul 2024 10:12:03 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Xiu Jianfeng <xiujianfeng@huawei.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, lizefan.x@bytedance.com,
+	hannes@cmpxchg.org, mkoutny@suse.com, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 -next] blk-cgroup: move congestion_count to struct
+ blkcg
+Message-ID: <ZpbUE3L4Xd0R9-SU@slm.duckdns.org>
+References: <20240716133058.3491350-1-xiujianfeng@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] block: uapi: Fix compliation warning of using
- IOPRIO_PRIO_DATA
-To: Zhiguo Niu <niuzhiguo84@gmail.com>, Zhiguo Niu <zhiguo.niu@unisoc.com>
-Cc: axboe@kernel.dk, dlemoal@kernel.org, hch@lst.de,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- ke.wang@unisoc.com, Hao_hao.Wang@unisoc.com
-References: <1720518712-28301-1-git-send-email-zhiguo.niu@unisoc.com>
- <CAHJ8P3LTxcMK0fuM5XCr5fmXffQUGxXsRSYdW46MtPoX8961UA@mail.gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAHJ8P3LTxcMK0fuM5XCr5fmXffQUGxXsRSYdW46MtPoX8961UA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240716133058.3491350-1-xiujianfeng@huawei.com>
 
-On 7/16/24 2:28 AM, Zhiguo Niu wrote:
-> kindly ping...
+On Tue, Jul 16, 2024 at 01:30:58PM +0000, Xiu Jianfeng wrote:
+> The congestion_count was introduced into the struct cgroup by
+> commit d09d8df3a294 ("blkcg: add generic throttling mechanism"),
+> but since it is closely related to the blkio subsys, it is not
+> appropriate to put it in the struct cgroup, so let's move it to
+> struct blkcg. There should be no functional changes because blkcg
+> is per cgroup.
+> 
+> Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
 
-Please repost this patch after the merge window has closed.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Thanks,
+Thanks.
 
-Bart.
-
+-- 
+tejun
