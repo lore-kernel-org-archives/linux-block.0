@@ -1,62 +1,58 @@
-Received: from HK2PR02CU002.outbound.protection.outlook.com (mail-eastasiaazon11010013.outbound.protection.outlook.com [52.101.128.13])
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2046.outbound.protection.outlook.com [40.107.215.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396C8335D3;
-	Tue, 16 Jul 2024 08:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.128.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A7F17B419;
+	Tue, 16 Jul 2024 08:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721118444; cv=fail; b=dGhZZu/UczIhPx97Z3rSYzUxHBZVxHZsESXjngnL0jACAbmsbk/XJIT3pce7BfZzRfvhAkD6CP3Op7/3bvTHQbPVwAfD0zF3yAqSbHjo76V5ektKG91ujwmxSRARYsVZjOo66f5FLr4bN63VKOi5ec8rql9FUVq0s+EjbD24Z7A=
+	t=1721119134; cv=fail; b=PG+ecW7jv3J8I9k97fBH+4z8usdGUiXveOVd2E+suXBGn4EHaBH8Cn/6d7eL7q06z9OxcIH9eQqEFy19bhnvRDpKpuAD8tFjLTGrEo9hEsm+0NG1BD/b+k6isYD/UYV24oqKvr5GR6UxKnnkl3m3boydYTGp4kPdvIKvZpSCAt8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721118444; c=relaxed/simple;
-	bh=kFm/4fO6pJ6wd9qnhWDPqmZf8GIxpap5TMtHU+5ElsU=;
-	h=From:To:Subject:Date:Message-Id:Content-Type:MIME-Version; b=LJhTHTzRnMwbUnkjhdvq9M2Mq8IHnTX6IrRCO7NxIKA0h6koAxTvItCufNsF0sPYqsW97DTJYrTd35OXuXPAoKxtIzI+liSliVj+8wugZ8Sd4k6vEIbI0k0VRygenk7FAZYE+UtVGMhjSEng2vVJfINrInswfKBIs+ACiaKQ4xc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=ZH5aDFZk; arc=fail smtp.client-ip=52.101.128.13
+	s=arc-20240116; t=1721119134; c=relaxed/simple;
+	bh=PHH61avaQP4fcfL7xy4E77T3GQuXi/r4ZFMLPhCaGv0=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=dH2s2OcQXMT33J9mJTAcbaslpQMfSpNGwC74t/7ftSUC4MZa9nbAYZh9RQa7k75HLzKtuAKUcDNSzetLltGof++94xIRfNqEk4eD8x5BmOLykebFo64k7M9AsvCnV73EGRc6vC2EW071ljrRPryjsyJyyjgldf3uaK6HcjIqBHQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=iWGvOR1F; arc=fail smtp.client-ip=40.107.215.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="ZH5aDFZk"
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="iWGvOR1F"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bDlhpK88cfdLxw6f6g5tpDRt4m9m1TF4PNxqWOPjoyj8mp6cTJLM3Pa5g77jJ23x5RJEvVaDJ6p3JC+SCDQGMq7n8/J4iynQssuE5vvreCzhKXr94JtJERahqODcJwazgMM3fN5mNFNw1B0Zso5FQWF1FlkwQvneSNzdfJuUbyI/NsYJHDKdgI9X3t0EVTojK1bTKGZNGfFEdvv1pfluLR/hh7wX+toYAIYpGC57sKFpDdikbgTRGzQ9Ztf0g6t03DpYBrYroNVZPsa+iDqvJnsqLriGpA2lV0DX/1Ju3FZEqp3+U958pbZJvmsipagybLfzzQm1ZcrlkZmY26WRhg==
+ b=jVt/07rF1NUlxE+ZHKqIgdtqImGF2Z27ESfZGaJ+Y8mSzRUqYJSnaJWErTnzC2C3x/Z1UuaxGqCFe6aLNOXfZXk7jhwoJPu1Vh4qdODpPu9DPv5GX2G6BM9b4beeDx2iOg4MqLSSs1U2FTXa2st1XEn1E2Ks3PAQSy8Ifh8eXoJdDPs8WfMM3lluktVFf9qYiooAjcSG6h14+iIcbzvgkcZqOd2eyaV5xm2ywZ88KVk3MJChJPDFFP3x0Lyqpltrlteyyju+OFyMS8/ZueWKgRtQQ+S1a8vTZhPOts3yyGzSLTp8Ty65gmSeDxzeDjuo/X7dTmS7OTEs71cjr7o+cA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iOPKAKQSH4dxwTS9czIJg2CZB+v8bh8ZNvQK1iWRQ3g=;
- b=jy7AT9+FFpb+o7l6j6HdMvSMSkWzqMI6rM5zZkdbxziT1Awx9JLdieQF8dus1yccUEPgMzJQC1ha/3tP/dPZleZL1FUkUjSAWtQY22bhY5+SVhIOsMfAALM/i/K3N40Q38078doX+0LBT1s3WBNO3haIc9NZs0g8+iPjuBcfcGZai2vrrS4+yBo6Ftb6hfTj2On4MZgxonInJuwwMQQfbP68y56CWOHVmv9CrkYHJNhz9Sy42sdKFn/imo76Kzcbq8OSyt1MMWeLv4jvIzxJ67YCfuQoBuJHMh3Nl+Y7GjJVtsqgbKLGnYOUREM3JhhEOJ8dP15fEaRb8GSgsbaI+w==
+ bh=R8jAdShYLCXygWpLiTMSsbCk2Ry5gKfnJV2ytGPiSx4=;
+ b=CVkhgV+0NfzS6q1q3UqeUihHCqWpDpgU9Eo83Vazf6CPJ6z8MtWAnymdMmo5q84c6VX3+PsWehcWoIVWeZzXjGO6WM+OHlGB6ZhoTlZNbZX69KZU4FOqidPdYvRUW3fG3ATbxX4J0M6JBpSTRJrCmKe4Ck7VckBfmlg9yIxbiDxjmV13fefDhxJtrCS/183Xf2MOrdeWas7YhCCgDJy+YNUuZaZdVf3Yo1ls8/o2S9M0iamo0fUr8LIdQcFE0VaixWvMZVqhtCDtE2uCC3WP0DpfR+OEVBE3mgPK7P6tN/GX+sQJaoy+bQ5piYvtIYh6IQjmwx3lToZXdjjFd8rCJQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
  dkim=pass header.d=vivo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iOPKAKQSH4dxwTS9czIJg2CZB+v8bh8ZNvQK1iWRQ3g=;
- b=ZH5aDFZkLbosG+UOado9GXKuywPZEe78ckyWNr4hJELH6lwYYHy8odRLgEQ2jTRpT1BtfcDbSje6l/K663QU1R1dFY8pNZBV6pGXk9wxyy6rlvtjKYAhyvnWBQCF6BuAaOtYPoPl+RP8XDrkGx/7v8xYf+a+4lkdJVXU03BQ+lRqFDvF9s7S8CdVJULO1WUIxPkhEYyIt8K7LXK9/ST+Cg/ed802gycR7v7xlu66jc84bdPAxEYNpnXObSL4nmR4+wLfJ07bYilwC6n5YQFjm3wctkDm6B0RmhObQyuwMgtQW0IMmFk/OnONdzlC3HYS/Q2HpgQ6UxhfoJPCvuSkhA==
+ bh=R8jAdShYLCXygWpLiTMSsbCk2Ry5gKfnJV2ytGPiSx4=;
+ b=iWGvOR1F8Zg478hyRCSPYZ5Fh3zTFouAPTPKdFwxUPy+k91pbF0EUgTI2uhmMFTikImPBDPTl5UZCm3ykZiKDBgmpRdB6nQpuT7FT0hv/CPvlqYmo/0IA7Rau736+gIejSESinGGs2nkNqL9DWFJkCfYennbEI43bZ5Xia2PxznJeuryKR+tAcXfflCFZCoL8pvEooUV7qFiWKq0PrTrcuk+1F6ElJ3HMO3clyn24su3ZIAIfi/LprILbfGNgTcZwTnn4BtVd2wNwBD3pc7GdruzBkEhLr4Ff6QBl5eIke8gfw06AsQGBHf6ERZuinBV6tO5MMB1WPjoYlWj9UL3VA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=vivo.com;
 Received: from KL1PR06MB7401.apcprd06.prod.outlook.com (2603:1096:820:146::12)
- by TY0PR06MB6801.apcprd06.prod.outlook.com (2603:1096:405:12::5) with
+ by OS8PR06MB7324.apcprd06.prod.outlook.com (2603:1096:604:28b::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Tue, 16 Jul
- 2024 08:27:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.14; Tue, 16 Jul
+ 2024 08:38:47 +0000
 Received: from KL1PR06MB7401.apcprd06.prod.outlook.com
  ([fe80::f4f:43c4:25e5:394e]) by KL1PR06MB7401.apcprd06.prod.outlook.com
  ([fe80::f4f:43c4:25e5:394e%4]) with mapi id 15.20.7762.027; Tue, 16 Jul 2024
- 08:27:16 +0000
+ 08:38:46 +0000
 From: Yang Yang <yang.yang@vivo.com>
-To: Bart Van Assche <bvanassche@acm.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Yang Yang <yang.yang@vivo.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v8] sbitmap: fix io hung due to race on sbitmap_word::cleared
-Date: Tue, 16 Jul 2024 16:26:27 +0800
-Message-Id: <20240716082644.659566-1-yang.yang@vivo.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Yang Yang <yang.yang@vivo.com>
+Subject: [PATCH] block: fix deadlock between sd_remove & sd_release
+Date: Tue, 16 Jul 2024 16:38:00 +0800
+Message-Id: <20240716083801.809763-1-yang.yang@vivo.com>
 X-Mailer: git-send-email 2.34.1
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: TYCP301CA0054.JPNP301.PROD.OUTLOOK.COM
- (2603:1096:400:384::12) To KL1PR06MB7401.apcprd06.prod.outlook.com
+X-ClientProxiedBy: TYBP286CA0005.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:404:ce::17) To KL1PR06MB7401.apcprd06.prod.outlook.com
  (2603:1096:820:146::12)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -65,250 +61,176 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR06MB7401:EE_|TY0PR06MB6801:EE_
-X-MS-Office365-Filtering-Correlation-Id: 23216f78-f85f-4417-bb37-08dca57119ef
+X-MS-TrafficTypeDiagnostic: KL1PR06MB7401:EE_|OS8PR06MB7324:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24afaac4-0a71-4682-d1b0-08dca572b568
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|52116014|38350700014;
+	BCL:0;ARA:13230040|366016|376014|1800799024|52116014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Y9L3zqJmVIs7ws8w7CiPZVKL1EcNmpOphhhuLphwXV0zH1IAVV9rLL7pJrxS?=
- =?us-ascii?Q?NMOTiEITuGeb0tTVK7tnPwTDUQErEUQjGh55JxtOP/8yelwg976X9QLifjq4?=
- =?us-ascii?Q?Z6ceZZtNG18DZvJlNstboNuQJwRGb4dUlctC2wrMjL7KeTSuDP1qhZyiXCWa?=
- =?us-ascii?Q?OUxD18A/zi75/KVGS7l0Fed0KF3p+Nz8lr/BgT8wnFhx1e7XbkFEs76AnLbk?=
- =?us-ascii?Q?E41pmW64IXyHoZD2rXa7D3EceNWt3vj/XHwZtMBGzQs2bQMEqOXU531bhiHe?=
- =?us-ascii?Q?matAAV0HEXnmebmtlpuc7jRGYoeMZzIlb7QzgeTYgBvwacQtzidFqYbrxHZ6?=
- =?us-ascii?Q?GzR4W23XnnysnDbo/gCa2KPKC/f5RkWjlb4xr3h0noirxTo8j1hu+oeYqddz?=
- =?us-ascii?Q?aUeKFB3hFq0LjaMrncOaLpX50zbvDDLsaCVce6rMgDuo0KpcD4d89t7GHmUN?=
- =?us-ascii?Q?ruyhqK2c7lcGUwS6Nq3GJePjpL0sH3k6JmLEriY6uUEi83tf6MASpGTk/0z9?=
- =?us-ascii?Q?eEd1aY7fnXxrEd3vriv+tix71MqzHWT/L4nWJcK5Tc105zfk6LMbxvg3Ps3N?=
- =?us-ascii?Q?J8Bb2imIjYUSyj0g+zR0LPN7Zp4EhggdUg2XqllD+WUvZ4jReioNSueeHss/?=
- =?us-ascii?Q?feG24A0x7ld4ORmSi+9lcU0Rdfa32g3fGRAmkHKG1O9bIU9OxHxFgCUKvB2E?=
- =?us-ascii?Q?9RUETbPKECDrWC+ZvqTBRRPxUX/CpmN0ezmS1E5wNEiI60LvyaOPOhbOsAIH?=
- =?us-ascii?Q?z8FL59X2z14TASpQmmbmm7y03mewjySWUR3/8tij/Jwzo4Xc0J6LG/QCgvnT?=
- =?us-ascii?Q?vR/10ZLfPM9lJkonLkPyG4JOjQ6PwIAAwmPhyKiY/Sa69svpyYCK2HKAoztP?=
- =?us-ascii?Q?K9eNHA1aCzINcdjF9Os519SmSZNWE1KW88dSoX2riIPxr9/R4GUDonQk1q4G?=
- =?us-ascii?Q?MTWquzVNtlLYb49Z+2vkcARf3e7GEQWTK6KqDvCwNSTPYXpwwOOJJqwUtl7D?=
- =?us-ascii?Q?3O3pOsw9ffV6bvwQAayiNY/09wpCjwC/6Yaq7hc1UP4rTpKi8UT9CYd1sHbp?=
- =?us-ascii?Q?ZATp1cHDg9GixkUGQQz2uZMQeBUwxd4l7XYXHjhR7F8U2QWJIX9LXBY9+V5b?=
- =?us-ascii?Q?NHl0RaTg669f6R32QAh0KsLHcFPgI1PwrKKSmEcE1quO5b0yypN5InI334Pm?=
- =?us-ascii?Q?/LgtnAqDqg5PHZCAKQojpxsn+q/i4AJczfmoXg+3CufKgxHqqZj9za3tUxb+?=
- =?us-ascii?Q?KA8mkysrMI/0PQxpgEzrcTL7lM/E2ccWLrFnH/pFFvkWrS6xcPJv8YJl+Woz?=
- =?us-ascii?Q?Pz9iZrPddYyj3BDtNXNQeFNvEOPYYMm0s426IZKDlY5c6/XS6keiR0oOsQrZ?=
- =?us-ascii?Q?x5KYd/kOYiFiYeMuHczbP+6giKJKK++OB7lcQ1yzzhy1NunOlQ=3D=3D?=
+	=?us-ascii?Q?AS5NjzDOeczTu9emHPe+JjW6WY+yFs+1kkSwQKafvYZx/pmdsKLh61pJAGrA?=
+ =?us-ascii?Q?QK6WEKUAhGuzl5/58Y3ZoXO7wZwlKiceN3WmGU9xN0xVso6O5c/HNknvbvPD?=
+ =?us-ascii?Q?EawypRzJdLDTDYSIjPT+OdcBV3hN/k86QpjUcch7AH2FLWxvd18QT8Spmg6L?=
+ =?us-ascii?Q?1qHPAY0eK36sDcPq6kLDFYm/jtmagsOkGBsjR+DlECveAwGnbPhSjU7vddJi?=
+ =?us-ascii?Q?tj8wo682PlUyk8AQXrOCe6PeztJ0VmWhDXQtyaUM6sWK/TqLe7KVjjMXOk0U?=
+ =?us-ascii?Q?0shxSiU3J+XaENlq1jLK6FDXXV+sJ3qLxU7NowaXiud4G9rALKYCqo+IKien?=
+ =?us-ascii?Q?HGgo+fHYFAcDuXGfFOAs4SoFu83i6sBnQi2FegO4NRBftk8yEwvU+I+1jB66?=
+ =?us-ascii?Q?65xnPcWBeJ3/rqyU+L97yX/KgP6FEZkRz8DsbfjfyyU0bhyHEcFFXLkr6yv4?=
+ =?us-ascii?Q?lKctNxyYNMyFnVXolUWFXCQloQJmBIIK9Ib+eS3mf3eli7iic6yKBRYawKmN?=
+ =?us-ascii?Q?x3m+CbsU6fvL7PXSSEbTpINE5hvCbiKRMO4v/tmPlTBuSdFWhHlgPggIgPXc?=
+ =?us-ascii?Q?JXwvhUN396GYyH86hHXer9f9FPg/y7r5hbTjByhiNjpeNGLcCDxoAvOob0vk?=
+ =?us-ascii?Q?EZA1vQJ8ZlRPLFm68agR/H6SeCa95iE74p/LV7SLtI9tdCsvzoAe0z1QWJKs?=
+ =?us-ascii?Q?3l3+2c9aoaXfPOJwnLzq+WM5PBXAkE0pPYIUkSFye2G1GArf3zkfTv77xXZb?=
+ =?us-ascii?Q?qhl+FILKVJAXsZZq8OL6laNbufDpsXtmhbdVfLrMka0smoIEHTDbydeQkQRo?=
+ =?us-ascii?Q?GBTuFnXBJaQtf0P1NtYTJ7E9RzTOuO9Fxl+Tzcf5xNFtyximO6KwVYJhC4bR?=
+ =?us-ascii?Q?AvWN5Z0jCJ1/wTU4DAY3JahFWLh5YJOlOXbI8Z++/zrErcqTouzSSIMZWoaj?=
+ =?us-ascii?Q?A43nvg57YgtejAVTzlBOqBxez1irIpP/0G/N5xrOdJQjEzLb7bhh7Dl2WvL7?=
+ =?us-ascii?Q?meqqhtARzKXqn22boBa7QVcCo5GS9Agg7y/Jk2s5F0yayBNMUku4w96SKCdw?=
+ =?us-ascii?Q?arBZ72SLtITuBLSb1JZG5L+EcpsVrdRxS+605UtfzpAP8c6y+0ierE8Uvklg?=
+ =?us-ascii?Q?0TWtFNdNShsMjxcfAprHMMyGTw8u8dt2E7ZsbSh6Ks20jWfypgPKrJMDbqg8?=
+ =?us-ascii?Q?OPLDrbxRkLZCdPKgUn82FrRFVF/q//jg+bK7JJ6o5cNBHI+RB6cT/7k7dKHF?=
+ =?us-ascii?Q?mt7+zmRtEYoqpLXbXMrxV67GsR02jepq6w1PuDRof+hj44NFrW8QnbKyGbus?=
+ =?us-ascii?Q?3uxemj9EfSpW4n3IVdfXyVDSxlbT86Fn1qfMdeNnl+msaGa0B8laVyqwEaRl?=
+ =?us-ascii?Q?fPF/Z5vHtWUb4+Xm9lqLX4IkzQOGbSu5wN3jSwX0/yJOFkke6w=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR06MB7401.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR06MB7401.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(52116014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?HMwIf8mxe9ThNg4isM4FssiqovJzaIdtF20n/fOi4XdxRPzSppqA2zQeAfQB?=
- =?us-ascii?Q?wj5ISxaXII0TVM2P8jhKLuqZ8ehJGZMVbdD11ALFkX+q7sqHU9oI+JElpWlp?=
- =?us-ascii?Q?OEupFtOO/BVIWi563ZQj/W42u+imomsuondnhmteng5yThYFWyV38x/gtYMZ?=
- =?us-ascii?Q?87yfc7Cpm0JXbJEwiDNQWaHh2YK+M5w1H0fe52j3tUEDI2PhTzoFNCVqnwGo?=
- =?us-ascii?Q?661TnL7uSUYEPRBnIQTiGq7JBQazG6gAoNl61ziQVMmoFumKxX/mdUli44OU?=
- =?us-ascii?Q?47kqwJjzu0KynFrm7FTXsRy4LfoLzk9IMb9lWSe2WDrDA6woVhokEaeKSeQY?=
- =?us-ascii?Q?6ylkRUhliP0KOwyh+fdZWl1Q1RFQ2wlg/xUXlH8aHoc4FgnoD46tHKEwT5vL?=
- =?us-ascii?Q?+uA2EogUQIIDtF1YaCvIUfo5OSIzljVloP4RjjamN+wggdY+0WOs+TbU8KKP?=
- =?us-ascii?Q?RxN8H6mNUdtl+2iLWohk5uZzOBrUpYue6GDP/BcQnJsN4MI9RGaXq1bqDzvv?=
- =?us-ascii?Q?oNIwXkQMyYmXGIulgVbB+iTKZDEzy5qUL3NCe27WDBk7qaDaNPN4MJ6/8mcV?=
- =?us-ascii?Q?y86afUhOzr2zFwDvcVnSS/y8O6ZbrHvC2ZH3NjQ7NTSH1gka5JL9Uam7Ahtz?=
- =?us-ascii?Q?GZnK8EYhRHtBw8vi6fT/9OcgdChqi+/uOf5GLUu+jwhibDvDMB160UNoJ695?=
- =?us-ascii?Q?x5wOr7qG5cpS1NjizLxPOzvI3/Ymokf9pKmeN+Ek6n4Jx3XLXL4JadrmUepa?=
- =?us-ascii?Q?zbLe7e5KUFb8/58ED60EMpD2WGSwYY+clWFsE7up13BNzhKoh7vU40Jif2M8?=
- =?us-ascii?Q?j5gawlyzqrY+4a5GSvWMqVakcoQJ21mOS7QZrts7zwXgCDCJ7Djp29PDc96Z?=
- =?us-ascii?Q?j+76KOmvejGz56/QyzugaSmyTP7o0W0Xk6pOzny8/9VQIhYJgdsbiVoi9bOs?=
- =?us-ascii?Q?FFDmuIZJe8uQ5T7A6n8vZ91/LWwLjIrhI2BCZgljaTaZQcRCFdtqx24e8zay?=
- =?us-ascii?Q?olnihBuLaPgMlLSmnV+fhOyzRGKu3eFeUmDS/TLB+JUnOvNt2Bvf/REsfQJK?=
- =?us-ascii?Q?xfwEJ42aOzBz8wYUE37aDZ4Xabx72S5wBFKR/MRuck05Y6njeZu18A0ughkQ?=
- =?us-ascii?Q?uZaw6k7PWKfsAA2R9PbXXts5yjzv2VPGJ9aIe4e7sHmH2PV4hdElZfBy8lMU?=
- =?us-ascii?Q?CHQZ1SHYlFOU7mTCvMk8OQK5Xzug6hKI7vPhbWbmsy2IQG4pNFro+5vCJpDF?=
- =?us-ascii?Q?PdvWhh42YRVFO081XV0WHoGkqrcQm+8hK851+XczOMEPB5HmfGpP5sIq8CPi?=
- =?us-ascii?Q?YOXiIiYOX7+XD/WIl+fmAtXSFwHkZCPa88RC9DQFn5AByvH2khNZrSmKBHz5?=
- =?us-ascii?Q?tviP9gtiOhjF2X5rTS3h6omdU+lD4+DfVIoMwm9m/ntQaB3KZJ+HCg4gsCAB?=
- =?us-ascii?Q?o+ib/YoAu0upYaUWm+yUBcdCthVCxffYKGeq9AP2FTJMLgjnK6Ajn7OYlEnB?=
- =?us-ascii?Q?ozZW20CwHc+/kFsyKIOpicIm18S8CmjWwpnJoM+tNs8poV4DqZbGV+zMjaM2?=
- =?us-ascii?Q?01en7DS8EfAIqy5id6gZJjM9MPRlEY0XPjM8n4V0?=
+	=?us-ascii?Q?mB1z+ZnIdbGtiCncRASNJ240+9KIQetS5YOJvzoujJAt7jHRzmM4jGTe7kyv?=
+ =?us-ascii?Q?nC2RCcMymyrsV14YpMJx9vKvTevlpoq4EGgX4/AdDRMkT7pcEasklbXsNiwh?=
+ =?us-ascii?Q?YAGDk+v9vhrTjDUhVbyZti1hZv/DNQFj4HRAt2PDfKbCQYBveLOTfsB4wKhx?=
+ =?us-ascii?Q?UZwyLgB+4toF61Z05injOdcESmkiutxfa2QXi1x8bWtQHkfPrO+LtpjQ2TxU?=
+ =?us-ascii?Q?PNPaU93zQviJEe/e5NQxlDyKR+ZC4vQOe9K5nOdQCJ+0hJYvd0mpQP1eu1s5?=
+ =?us-ascii?Q?/YdNGfA1z+pVCNGQs+GyI1hqo31DQQrRGcBMc9At9h+GlcUUXpSFDQzVHuw9?=
+ =?us-ascii?Q?MyhZhp6rd7iGhnbiaD7T+DXT9slRvowSBUvOEfGVaCtgoKSRRtCYyUokrzt2?=
+ =?us-ascii?Q?uXdJ77KDPNtZyM39l6d0HOWxUEY34NZ14D5fVPjuLzOg57QmsCj9j9+tJOIB?=
+ =?us-ascii?Q?ZspDsqY1sQuhQaCn+eJ2F6kzgmMrYufBcM3imVbt8qDx1MEan5iZ/wWeVVMG?=
+ =?us-ascii?Q?VpFSJbHxNdUnQ9miDxGWTmRvft0HLsxCe5bCe1z1ie2aSUEFPQijWiOZx3UW?=
+ =?us-ascii?Q?MqucaYh2XKHjuXP2jpVTOhcdTW1N4cODVom15tRiO7QL51nZDNoEsx+R4NfK?=
+ =?us-ascii?Q?Jmq/p9uOLTVfvmHZoyyvWs5eZtTTFRPmE8SiAKZPyjJ/jOWU6cNWrACQWgCu?=
+ =?us-ascii?Q?9+3IGetbWoIBQLHJvqd+MVUlH5SR13hwpo5shQqvTIKIWP5bt02G7O/9S1t6?=
+ =?us-ascii?Q?nMh1hxFftW8+O/hGeLYKx62uE1OIYCh6jIx9XiA5iK+0K+LUNBe8JRTxhSZY?=
+ =?us-ascii?Q?zyeFYQ++luHMLwMUarrPGQMQhomseegyQ0rQqWzUXjbXwh/b+WLraEpYpXUe?=
+ =?us-ascii?Q?Ur4yfkv8JKmZYvZgvC4B5cBUdsFjNYndYrUhJWiqL27ECfbzrOgwt39HYOCF?=
+ =?us-ascii?Q?yVkF0w7BgelI1uKwKpkrc+WiuYI+6hxR2TBdtF7gxQJkoElkoOHXpixEeWGq?=
+ =?us-ascii?Q?vaP98d2u0HxXL9RhspSNijc8l1m1vkX3VKEKVFf7dIfOW7E/HT8F0Ejf+HIB?=
+ =?us-ascii?Q?7wflAUlIcOYqcXW2V00R1JG4yf88rpBJxywDkVCWGaMvT+3PAPJZuyck4SWJ?=
+ =?us-ascii?Q?gfW64ugyLbC5AX/55LCTVI1tZRicdW5y7eePO5its6nNr81b+x8nZ1TuPVQU?=
+ =?us-ascii?Q?Fe6z/GMcggEc8JNTt/alWCK1oBxZepR4hnys2/W/Wyu44lvWAeTjzhDqsKKZ?=
+ =?us-ascii?Q?+dwfqC/6prk8O0w4FQSdHqD2i8mY1/nd+erPs+RGsNUAWA0EMtue+wwY60mR?=
+ =?us-ascii?Q?nYC8xU37RfMp3AWGjymKEO/462gTfE3WsvZ82ahB3UjuM0w57ioUd8ywvLDP?=
+ =?us-ascii?Q?PXpxeiLYaY3giiGA+HHD3w2NrOB0CkWbUyvd4OH1NkvM0Z9a/vw2TC7d8rV2?=
+ =?us-ascii?Q?JdIFY/SGzEsx+DJ88vPIYr88sOGkZwBYZ+FCgp6UCRa7Gi9VSOsdWXR5sUF7?=
+ =?us-ascii?Q?pYWA29O2m9DKvCxTG6xQgMafq0pDD+HfxC2f+vNnLg5Bm6vm81v0kIPgZRSy?=
+ =?us-ascii?Q?BZ4GEk8xofIdsmcMf10xVMyFoRYOn+532PBJnTCx?=
 X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23216f78-f85f-4417-bb37-08dca57119ef
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24afaac4-0a71-4682-d1b0-08dca572b568
 X-MS-Exchange-CrossTenant-AuthSource: KL1PR06MB7401.apcprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2024 08:27:16.6639
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2024 08:38:46.9462
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OL0P5B8xmmZze9g6XK2MZ11NSirsoeMPpncm42sLCAQr0HAi0qIfLv3TqaKvkMkcgiAv2VI2RpB4sapA2doUOw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB6801
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ut+0lFKKHMt/YidCyZPw2++fWGiYefJrSw+mmzx9setqW1xaZBzFq+dPt3yBk8iVnHz/P1TfYYjmomBzIOzuVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS8PR06MB7324
 
-Configuration for sbq:
-  depth=64, wake_batch=6, shift=6, map_nr=1
+Our test report the following hung task:
 
-1. There are 64 requests in progress:
-  map->word = 0xFFFFFFFFFFFFFFFF
-2. After all the 64 requests complete, and no more requests come:
-  map->word = 0xFFFFFFFFFFFFFFFF, map->cleared = 0xFFFFFFFFFFFFFFFF
-3. Now two tasks try to allocate requests:
-  T1:                                       T2:
-  __blk_mq_get_tag                          .
-  __sbitmap_queue_get                       .
-  sbitmap_get                               .
-  sbitmap_find_bit                          .
-  sbitmap_find_bit_in_word                  .
-  __sbitmap_get_word  -> nr=-1              __blk_mq_get_tag
-  sbitmap_deferred_clear                    __sbitmap_queue_get
-  /* map->cleared=0xFFFFFFFFFFFFFFFF */     sbitmap_find_bit
-    if (!READ_ONCE(map->cleared))           sbitmap_find_bit_in_word
-      return false;                         __sbitmap_get_word -> nr=-1
-    mask = xchg(&map->cleared, 0)           sbitmap_deferred_clear
-    atomic_long_andnot()                    /* map->cleared=0 */
-                                              if (!(map->cleared))
-                                                return false;
-                                     /*
-                                      * map->cleared is cleared by T1
-                                      * T2 fail to acquire the tag
-                                      */
+[ 2538.459400] INFO: task "kworker/0:0":7 blocked for more than 188 seconds.
+[ 2538.459427] Call trace:
+[ 2538.459430]  __switch_to+0x174/0x338
+[ 2538.459436]  __schedule+0x628/0x9c4
+[ 2538.459442]  schedule+0x7c/0xe8
+[ 2538.459447]  schedule_preempt_disabled+0x24/0x40
+[ 2538.459453]  __mutex_lock+0x3ec/0xf04
+[ 2538.459456]  __mutex_lock_slowpath+0x14/0x24
+[ 2538.459459]  mutex_lock+0x30/0xd8
+[ 2538.459462]  del_gendisk+0xdc/0x350
+[ 2538.459466]  sd_remove+0x30/0x60
+[ 2538.459470]  device_release_driver_internal+0x1c4/0x2c4
+[ 2538.459474]  device_release_driver+0x18/0x28
+[ 2538.459478]  bus_remove_device+0x15c/0x174
+[ 2538.459483]  device_del+0x1d0/0x358
+[ 2538.459488]  __scsi_remove_device+0xa8/0x198
+[ 2538.459493]  scsi_forget_host+0x50/0x70
+[ 2538.459497]  scsi_remove_host+0x80/0x180
+[ 2538.459502]  usb_stor_disconnect+0x68/0xf4
+[ 2538.459506]  usb_unbind_interface+0xd4/0x280
+[ 2538.459510]  device_release_driver_internal+0x1c4/0x2c4
+[ 2538.459514]  device_release_driver+0x18/0x28
+[ 2538.459518]  bus_remove_device+0x15c/0x174
+[ 2538.459523]  device_del+0x1d0/0x358
+[ 2538.459528]  usb_disable_device+0x84/0x194
+[ 2538.459532]  usb_disconnect+0xec/0x300
+[ 2538.459537]  hub_event+0xb80/0x1870
+[ 2538.459541]  process_scheduled_works+0x248/0x4dc
+[ 2538.459545]  worker_thread+0x244/0x334
+[ 2538.459549]  kthread+0x114/0x1bc
 
-4. T2 is the sole tag waiter. When T1 puts the tag, T2 cannot be woken
-up due to the wake_batch being set at 6. If no more requests come, T1
-will wait here indefinitely.
+[ 2538.461001] INFO: task "fsck.":15415 blocked for more than 188 seconds.
+[ 2538.461014] Call trace:
+[ 2538.461016]  __switch_to+0x174/0x338
+[ 2538.461021]  __schedule+0x628/0x9c4
+[ 2538.461025]  schedule+0x7c/0xe8
+[ 2538.461030]  blk_queue_enter+0xc4/0x160
+[ 2538.461034]  blk_mq_alloc_request+0x120/0x1d4
+[ 2538.461037]  scsi_execute_cmd+0x7c/0x23c
+[ 2538.461040]  ioctl_internal_command+0x5c/0x164
+[ 2538.461046]  scsi_set_medium_removal+0x5c/0xb0
+[ 2538.461051]  sd_release+0x50/0x94
+[ 2538.461054]  blkdev_put+0x190/0x28c
+[ 2538.461058]  blkdev_release+0x28/0x40
+[ 2538.461063]  __fput+0xf8/0x2a8
+[ 2538.461066]  __fput_sync+0x28/0x5c
+[ 2538.461070]  __arm64_sys_close+0x84/0xe8
+[ 2538.461073]  invoke_syscall+0x58/0x114
+[ 2538.461078]  el0_svc_common+0xac/0xe0
+[ 2538.461082]  do_el0_svc+0x1c/0x28
+[ 2538.461087]  el0_svc+0x38/0x68
+[ 2538.461090]  el0t_64_sync_handler+0x68/0xbc
+[ 2538.461093]  el0t_64_sync+0x1a8/0x1ac
 
-This patch achieves two purposes:
-1. Check on ->cleared and update on both ->cleared and ->word need to
-be done atomically, and using spinlock could be the simplest solution.
-2. Add extra check in sbitmap_deferred_clear(), to identify whether
-->word has free bits.
+  T1:				T2:
+  sd_remove
+  del_gendisk
+  __blk_mark_disk_dead
+  blk_freeze_queue_start
+  ++q->mq_freeze_depth
+  				bdev_release
+ 				mutex_lock(&disk->open_mutex)
+  				sd_release
+ 				scsi_execute_cmd
+ 				blk_queue_enter
+ 				wait_event(!q->mq_freeze_depth)
+  mutex_lock(&disk->open_mutex)
 
-Fixes: ea86ea2cdced ("sbitmap: ammortize cost of clearing bits")
+This is a classic ABBA deadlock. To fix the deadlock, make sure we don't
+try to acquire disk->open_mutex after freezing the queue.
+
 Signed-off-by: Yang Yang <yang.yang@vivo.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
 ---
-Changes from v7:
-  - Eliminate the local variable 'ret' by suggestion
-  - Simplify and optimize the if (READ_ONCE() ...) by suggestion
-Changes from v6:
-  - Use guard() for locking by suggestion
-  - Modify comments by suggestion
-Changes from v5:
-  - Modify commit message
-  - Change the fixes tag
-Changes from v4:
-  - Add some comments according to suggestion
-Changes from v3:
-  - Add more arguments to sbitmap_deferred_clear(), for those who
-    don't care about the return value, just pass 0
-  - Consider the situation when using sbitmap_get_shallow()
-  - Consider the situation when ->round_robin is true
-  - Modify commit message
-Changes from v2:
-  - Modify commit message by suggestion
-  - Add extra check in sbitmap_deferred_clear() by suggestion
-Changes from v1:
-  - simply revert commit 661d4f55a794 ("sbitmap: remove swap_lock")
----
- include/linux/sbitmap.h |  5 +++++
- lib/sbitmap.c           | 36 +++++++++++++++++++++++++++++-------
- 2 files changed, 34 insertions(+), 7 deletions(-)
+ block/genhd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index d662cf136021..c09cdcc99471 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -36,6 +36,11 @@ struct sbitmap_word {
- 	 * @cleared: word holding cleared bits
+diff --git a/block/genhd.c b/block/genhd.c
+index 8f1f3c6b4d67..c5fca3e893a0 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -663,12 +663,12 @@ void del_gendisk(struct gendisk *disk)
  	 */
- 	unsigned long cleared ____cacheline_aligned_in_smp;
-+
-+	/**
-+	 * @swap_lock: serializes simultaneous updates of ->word and ->cleared
-+	 */
-+	spinlock_t swap_lock;
- } ____cacheline_aligned_in_smp;
- 
- /**
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 1e453f825c05..5e2e93307f0d 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -60,12 +60,30 @@ static inline void update_alloc_hint_after_get(struct sbitmap *sb,
- /*
-  * See if we have deferred clears that we can batch move
-  */
--static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
-+static inline bool sbitmap_deferred_clear(struct sbitmap_word *map,
-+		unsigned int depth, unsigned int alloc_hint, bool wrap)
- {
--	unsigned long mask;
-+	unsigned long mask, word_mask;
- 
--	if (!READ_ONCE(map->cleared))
--		return false;
-+	guard(spinlock_irqsave)(&map->swap_lock);
-+
-+	if (!map->cleared) {
-+		if (depth == 0)
-+			return false;
-+
-+		word_mask = (~0UL) >> (BITS_PER_LONG - depth);
-+		/*
-+		 * The current behavior is to always retry after moving
-+		 * ->cleared to word, and we change it to retry in case
-+		 * of any free bits. To avoid an infinite loop, we need
-+		 * to take wrap & alloc_hint into account, otherwise a
-+		 * soft lockup may occur.
-+		 */
-+		if (!wrap && alloc_hint)
-+			word_mask &= ~((1UL << alloc_hint) - 1);
-+
-+		return (READ_ONCE(map->word) & word_mask) != word_mask;
-+	}
+ 	if (!test_bit(GD_DEAD, &disk->state))
+ 		blk_report_disk_dead(disk, false);
+-	__blk_mark_disk_dead(disk);
  
  	/*
- 	 * First get a stable cleared mask, setting the old mask to 0.
-@@ -85,6 +103,7 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
- 		      bool alloc_hint)
- {
- 	unsigned int bits_per_word;
-+	int i;
- 
- 	if (shift < 0)
- 		shift = sbitmap_calculate_shift(depth);
-@@ -116,6 +135,9 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
- 		return -ENOMEM;
- 	}
- 
-+	for (i = 0; i < sb->map_nr; i++)
-+		spin_lock_init(&sb->map[i].swap_lock);
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(sbitmap_init_node);
-@@ -126,7 +148,7 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
- 	unsigned int i;
- 
- 	for (i = 0; i < sb->map_nr; i++)
--		sbitmap_deferred_clear(&sb->map[i]);
-+		sbitmap_deferred_clear(&sb->map[i], 0, 0, 0);
- 
- 	sb->depth = depth;
- 	sb->map_nr = DIV_ROUND_UP(sb->depth, bits_per_word);
-@@ -179,7 +201,7 @@ static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
- 					alloc_hint, wrap);
- 		if (nr != -1)
- 			break;
--		if (!sbitmap_deferred_clear(map))
-+		if (!sbitmap_deferred_clear(map, depth, alloc_hint, wrap))
- 			break;
- 	} while (1);
- 
-@@ -496,7 +518,7 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
- 		unsigned int map_depth = __map_depth(sb, index);
- 		unsigned long val;
- 
--		sbitmap_deferred_clear(map);
-+		sbitmap_deferred_clear(map, 0, 0, 0);
- 		val = READ_ONCE(map->word);
- 		if (val == (1UL << (map_depth - 1)) - 1)
- 			goto next;
+ 	 * Drop all partitions now that the disk is marked dead.
+ 	 */
+ 	mutex_lock(&disk->open_mutex);
++	__blk_mark_disk_dead(disk);
+ 	xa_for_each_start(&disk->part_tbl, idx, part, 1)
+ 		drop_partition(part);
+ 	mutex_unlock(&disk->open_mutex);
 -- 
 2.34.1
 
