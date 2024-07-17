@@ -1,193 +1,197 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76A817F39B;
-	Wed, 17 Jul 2024 16:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B601EB31
+	for <linux-block@vger.kernel.org>; Wed, 17 Jul 2024 17:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721235350; cv=none; b=nx1yXADfmdkH7PLsz7OhtQgCCwM+kqVjs7P5fe8fxQ/pfMFPmNJgOpqq4EOwgZl/70HgERs+RLEiZ4lYNsCw2AXeGiynRC5c6ZUb4OnOCgxgQyUSXwwCxAKt5tBlxpo6GH6e9lYx7tJ2wWGrQh3iND4faODsmcjOQjQ0tiJ2DaI=
+	t=1721237897; cv=none; b=pMDXhRKTURfD+hB8HlOTKAmKjDKtesFecWJFYLyk2XYp/wERjwRNCO9GkEvIwYviRJ1IyxRtbfnKJLf7eJww3AZlyfFIQjaYxertq9lYgfUOHkNsdjYT9JNizgGfnbkID0UK+Y23f4Q95DXOpsqozA+cVBsjh4mDcEWQIyEDA4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721235350; c=relaxed/simple;
-	bh=OMKDrp/asr1LQFTLOo46Z1gdnD0fhU2xBx0AsoHdoM4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XUClbf/7xTvJ6Xz9wBGy4bOPQ5nBLt27mryzUad78Ou1fH9WCj7aqW3bzKPKimxL4dPofeiCdFAZ5LwftIc1Em4DQ2qA66t3wSIuRARbSFuBjxiLhdMF2fF1GOoR5h2JojNHQP20X5XUHRosqJ/2bzUYfvK5Z86cYtmRYCijlWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bPSgql4I; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721237897; c=relaxed/simple;
+	bh=y4XpeGRxkRobm+17Rc4jFcUaNZp43qIiW26ADRi71zQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rntK1//fQ5VgfBWWAQhLAnuoPWtNKcS0utXFGn0EzGHAU279eWwf1JbYtXgxRjK/qeqcWPnoJKl1Gai07c/wIrfMd1M7WiRbeNiCOEU957ltTASpTExTjF6Nn63cgWEAuztEUpJo7/2U58HMBZU4gzmNkQ8+QiE8762q+mnyR4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eWe5JKPb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPSgql4I"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fc5549788eso5136165ad.1;
-        Wed, 17 Jul 2024 09:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721235348; x=1721840148; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=68LWjL5/SKjz0tO65i0BltVGGa8T/WWLEoQAHGMQU/Q=;
-        b=bPSgql4IZhW9Didboyc9a1e3GYBVIkqHHy+eaMB/g8bARWNhlzw0BkBjpzVlbWuGAV
-         Q7JeW8D0Gl25YL56smDrIZ+UQs08kBVYpo2yqz4UIyymQVi1nCtTy2bi4+ONtQDl6+CL
-         NSLTNLyw0pjMDe+Vmke89Uq2k6/86asP3+HtO837ZUasVuAwo5zQQLwAFFf4X62zWm0o
-         au23U8aBqI1VOK31ySETNiHoXS7l5jY02ptYCdE97ZXYOELgJMI63NOfZdThOhH1i2Y2
-         /MrSJ39Pa0QIp7/Qhm0De+EjMhLx0bKQqM+TLEsbYFWRfq4MOidFVDa8NLJ0BFJRJFIa
-         CCcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721235348; x=1721840148;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=68LWjL5/SKjz0tO65i0BltVGGa8T/WWLEoQAHGMQU/Q=;
-        b=ubsRie6xYaOi7rSRP8MyALchnh2b9L/0NW/BytQrxjlGoffK0sj68VTbfMZilU8jWi
-         qbpNlfb3mudjHvCr+C1n5uduSg1po75la504O8wr8He0z/1UquKgld8wLe7coZ9ZpxIu
-         urzChe5Qj0tZhZHYuqY+LjcPHrJ8QCaVF97KBWerAaOjwEVJALoeEcmKdtict6bMcKBV
-         iH/kJFHr4kqOU8qlxq903sY36J6qXZfcpE20HbzrAozXYmvo5jaDR1cTZ8CCwK349Aic
-         0ycP46Vh3MJDDrFdJ0V1pgvVCz/ZFHIp0EQuLKCIhCBXXOdRn/k4pnSlKZKRrZKJ9ySR
-         WhrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMS5l0NlUd0QicuPamQjjFgElAiyrtIYzxGcLq7Z8IDkFQYvXobhPUR7rmv47nhjrE1srXfPjb1ALmJA3rlLbzMOXxRNq+QvcthgrNz8Na50CgmMoQp0/4gQsi4d7JH19/cIueMej2IrqMWO2TeltGIsloCXZs7dz0OHDh7E39lm2f
-X-Gm-Message-State: AOJu0YzEsL+dELT5UUFvrRFOy5aK7Y9DJMdbIvAoJ2hyLzdLIH3LwIQ+
-	0Mto00B8GSqN58Wgy1JmRA/2g1zFUqw8s2Efot5/gVlQkomJLbAuV95BRQ==
-X-Google-Smtp-Source: AGHT+IEh/cgX/fwSr/Qf+rkCnE+FwhUG7QRMVZIlEKOXguTlAFPyDJHm9nWwN1jNvQkd90th0Ikb6Q==
-X-Received: by 2002:a17:903:234d:b0:1fb:67ee:6de7 with SMTP id d9443c01a7336-1fc4e131d9fmr23895775ad.23.1721235348035;
-        Wed, 17 Jul 2024 09:55:48 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc384ecsm77469445ad.208.2024.07.17.09.55.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jul 2024 09:55:47 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 17 Jul 2024 06:55:46 -1000
-From: "tj@kernel.org" <tj@kernel.org>
-To: Boy Wu =?utf-8?B?KOWQs+WLg+iqvCk=?= <Boy.Wu@mediatek.com>
-Cc: "boris@bur.io" <boris@bur.io>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	Iverlin Wang =?utf-8?B?KOeOi+iLs+mclik=?= <Iverlin.Wang@mediatek.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH v3] blk-cgroup: Replace u64 sync with spinlock for iostat
- update
-Message-ID: <Zpf3ks2drDZ7ULTa@slm.duckdns.org>
-References: <20240716075206.23121-1-boy.wu@mediatek.com>
- <Zpbify32lel9J-5I@slm.duckdns.org>
- <c5bcbcbaeacdb805adc75c26f92ec69f26ad7706.camel@mediatek.com>
- <5560c690cc6de67139a9b2e45c7a11938b70fc58.camel@mediatek.com>
- <1b19b68adb34410bf6dc8fd3f50e4b82c1a014e4.camel@mediatek.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eWe5JKPb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721237894;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ho73z9I5NiBU0wesdxPZDVws1RgteUppy4Fw+aIYmBI=;
+	b=eWe5JKPb1SyzKye8YMmkwq/aTaCO2PgumUlnJTE85RhPM1q4IomfNdIpaywahrZ2R2bGrx
+	mNvu6M6WWGQ+0f1JUEqfrI+5vfnvujLhg38c+/7Ta8WJqbV/E1zGSt6XWJYE7NsCAqwgyq
+	TFVBTfV4eqsNrbZca8jghrRn77SknLw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-55-LpNPs6eCMKmdR_gguvlxMQ-1; Wed,
+ 17 Jul 2024 13:38:09 -0400
+X-MC-Unique: LpNPs6eCMKmdR_gguvlxMQ-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 54DE619560B3;
+	Wed, 17 Jul 2024 17:38:07 +0000 (UTC)
+Received: from [10.22.16.209] (unknown [10.22.16.209])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5B6A01955F40;
+	Wed, 17 Jul 2024 17:37:58 +0000 (UTC)
+Message-ID: <f448f66b-7a91-4281-8f77-159541cbacff@redhat.com>
+Date: Wed, 17 Jul 2024 13:37:56 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b19b68adb34410bf6dc8fd3f50e4b82c1a014e4.camel@mediatek.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] blk-cgroup: Replace u64 sync with spinlock for iostat
+ update
+To: "tj@kernel.org" <tj@kernel.org>, =?UTF-8?B?Qm95IFd1ICjlkLPli4Poqrwp?=
+ <Boy.Wu@mediatek.com>
+Cc: "boris@bur.io" <boris@bur.io>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+ "linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ =?UTF-8?B?SXZlcmxpbiBXYW5nICjnjovoi7PpnJYp?= <Iverlin.Wang@mediatek.com>,
+ "josef@toxicpanda.com" <josef@toxicpanda.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+ "angelogioacchino.delregno@collabora.com"
+ <angelogioacchino.delregno@collabora.com>
+References: <20240716075206.23121-1-boy.wu@mediatek.com>
+ <Zpbify32lel9J-5I@slm.duckdns.org>
+ <c5bcbcbaeacdb805adc75c26f92ec69f26ad7706.camel@mediatek.com>
+ <5560c690cc6de67139a9b2e45c7a11938b70fc58.camel@mediatek.com>
+ <1b19b68adb34410bf6dc8fd3f50e4b82c1a014e4.camel@mediatek.com>
+ <Zpf3ks2drDZ7ULTa@slm.duckdns.org>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <Zpf3ks2drDZ7ULTa@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hello,
+On 7/17/24 12:55, tj@kernel.org wrote:
+> Hello,
+>
+> Does something like the following work for you?
+>
+> Thanks.
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 37e6cc91d576..ec1d191f5c83 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -329,7 +329,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
+>   	INIT_WORK(&blkg->async_bio_work, blkg_async_bio_workfn);
+>   #endif
+>   
+> -	u64_stats_init(&blkg->iostat.sync);
+>   	for_each_possible_cpu(cpu) {
+>   		u64_stats_init(&per_cpu_ptr(blkg->iostat_cpu, cpu)->sync);
+>   		per_cpu_ptr(blkg->iostat_cpu, cpu)->blkg = blkg;
+> @@ -632,24 +631,26 @@ static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
+>   static void __blkg_clear_stat(struct blkg_iostat_set *bis)
+>   {
+>   	struct blkg_iostat cur = {0};
+> -	unsigned long flags;
+>   
+> -	flags = u64_stats_update_begin_irqsave(&bis->sync);
+>   	blkg_iostat_set(&bis->cur, &cur);
+>   	blkg_iostat_set(&bis->last, &cur);
+> -	u64_stats_update_end_irqrestore(&bis->sync, flags);
+>   }
+>   
+>   static void blkg_clear_stat(struct blkcg_gq *blkg)
+>   {
+> +	unsigned long flags;
+>   	int cpu;
+>   
+> +	raw_spin_lock_irqsave(&blkg_stat_lock, flags);
+> +
+>   	for_each_possible_cpu(cpu) {
+>   		struct blkg_iostat_set *s = per_cpu_ptr(blkg->iostat_cpu, cpu);
+>   
+>   		__blkg_clear_stat(s);
+>   	}
+>   	__blkg_clear_stat(&blkg->iostat);
+> +
+> +	raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
+>   }
+>   
+>   static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+> @@ -998,12 +999,10 @@ static void blkcg_iostat_update(struct blkcg_gq *blkg, struct blkg_iostat *cur,
+>   	unsigned long flags;
+>   
+>   	/* propagate percpu delta to global */
+> -	flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
+>   	blkg_iostat_set(&delta, cur);
+>   	blkg_iostat_sub(&delta, last);
+>   	blkg_iostat_add(&blkg->iostat.cur, &delta);
+>   	blkg_iostat_add(last, &delta);
+> -	u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
+>   }
+>   
+>   static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+> @@ -1134,9 +1133,9 @@ static void blkcg_fill_root_iostats(void)
+>   				cpu_dkstats->sectors[STAT_DISCARD] << 9;
+>   		}
+>   
+> -		flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
+> +		raw_spin_lock_irqsave(&blkg_stat_lock, flags);
+>   		blkg_iostat_set(&blkg->iostat.cur, &tmp);
+> -		u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
+> +		raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
+>   	}
+>   }
+>   
+> @@ -1145,7 +1144,6 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+>   	struct blkg_iostat_set *bis = &blkg->iostat;
+>   	u64 rbytes, wbytes, rios, wios, dbytes, dios;
+>   	const char *dname;
+> -	unsigned seq;
+>   	int i;
+>   
+>   	if (!blkg->online)
+> @@ -1157,16 +1155,14 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+>   
+>   	seq_printf(s, "%s ", dname);
+>   
+> -	do {
+> -		seq = u64_stats_fetch_begin(&bis->sync);
+> -
+> -		rbytes = bis->cur.bytes[BLKG_IOSTAT_READ];
+> -		wbytes = bis->cur.bytes[BLKG_IOSTAT_WRITE];
+> -		dbytes = bis->cur.bytes[BLKG_IOSTAT_DISCARD];
+> -		rios = bis->cur.ios[BLKG_IOSTAT_READ];
+> -		wios = bis->cur.ios[BLKG_IOSTAT_WRITE];
+> -		dios = bis->cur.ios[BLKG_IOSTAT_DISCARD];
+> -	} while (u64_stats_fetch_retry(&bis->sync, seq));
+> +	raw_spin_lock_irq(&blkg_stat_lock);
+> +	rbytes = bis->cur.bytes[BLKG_IOSTAT_READ];
+> +	wbytes = bis->cur.bytes[BLKG_IOSTAT_WRITE];
+> +	dbytes = bis->cur.bytes[BLKG_IOSTAT_DISCARD];
+> +	rios = bis->cur.ios[BLKG_IOSTAT_READ];
+> +	wios = bis->cur.ios[BLKG_IOSTAT_WRITE];
+> +	dios = bis->cur.ios[BLKG_IOSTAT_DISCARD];
+> +	raw_spin_unlock_irq(&blkg_stat_lock, flags);
+>   
+>   	if (rbytes || wbytes || rios || wios) {
+>   		seq_printf(s, "rbytes=%llu wbytes=%llu rios=%llu wios=%llu dbytes=%llu dios=%llu",
+>
+bis->sync is still being used in blk_cgroup_bio_start(). Replacing it 
+with a global lock may kill performance. We may have to use a per-cpu 
+lock if we want to go this route of eliminating bis->sync.
 
-Does something like the following work for you?
+Cheers,
+Longman
 
-Thanks.
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 37e6cc91d576..ec1d191f5c83 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -329,7 +329,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	INIT_WORK(&blkg->async_bio_work, blkg_async_bio_workfn);
- #endif
- 
--	u64_stats_init(&blkg->iostat.sync);
- 	for_each_possible_cpu(cpu) {
- 		u64_stats_init(&per_cpu_ptr(blkg->iostat_cpu, cpu)->sync);
- 		per_cpu_ptr(blkg->iostat_cpu, cpu)->blkg = blkg;
-@@ -632,24 +631,26 @@ static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
- static void __blkg_clear_stat(struct blkg_iostat_set *bis)
- {
- 	struct blkg_iostat cur = {0};
--	unsigned long flags;
- 
--	flags = u64_stats_update_begin_irqsave(&bis->sync);
- 	blkg_iostat_set(&bis->cur, &cur);
- 	blkg_iostat_set(&bis->last, &cur);
--	u64_stats_update_end_irqrestore(&bis->sync, flags);
- }
- 
- static void blkg_clear_stat(struct blkcg_gq *blkg)
- {
-+	unsigned long flags;
- 	int cpu;
- 
-+	raw_spin_lock_irqsave(&blkg_stat_lock, flags);
-+
- 	for_each_possible_cpu(cpu) {
- 		struct blkg_iostat_set *s = per_cpu_ptr(blkg->iostat_cpu, cpu);
- 
- 		__blkg_clear_stat(s);
- 	}
- 	__blkg_clear_stat(&blkg->iostat);
-+
-+	raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
- }
- 
- static int blkcg_reset_stats(struct cgroup_subsys_state *css,
-@@ -998,12 +999,10 @@ static void blkcg_iostat_update(struct blkcg_gq *blkg, struct blkg_iostat *cur,
- 	unsigned long flags;
- 
- 	/* propagate percpu delta to global */
--	flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
- 	blkg_iostat_set(&delta, cur);
- 	blkg_iostat_sub(&delta, last);
- 	blkg_iostat_add(&blkg->iostat.cur, &delta);
- 	blkg_iostat_add(last, &delta);
--	u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
- }
- 
- static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
-@@ -1134,9 +1133,9 @@ static void blkcg_fill_root_iostats(void)
- 				cpu_dkstats->sectors[STAT_DISCARD] << 9;
- 		}
- 
--		flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
-+		raw_spin_lock_irqsave(&blkg_stat_lock, flags);
- 		blkg_iostat_set(&blkg->iostat.cur, &tmp);
--		u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
-+		raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
- 	}
- }
- 
-@@ -1145,7 +1144,6 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
- 	struct blkg_iostat_set *bis = &blkg->iostat;
- 	u64 rbytes, wbytes, rios, wios, dbytes, dios;
- 	const char *dname;
--	unsigned seq;
- 	int i;
- 
- 	if (!blkg->online)
-@@ -1157,16 +1155,14 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
- 
- 	seq_printf(s, "%s ", dname);
- 
--	do {
--		seq = u64_stats_fetch_begin(&bis->sync);
--
--		rbytes = bis->cur.bytes[BLKG_IOSTAT_READ];
--		wbytes = bis->cur.bytes[BLKG_IOSTAT_WRITE];
--		dbytes = bis->cur.bytes[BLKG_IOSTAT_DISCARD];
--		rios = bis->cur.ios[BLKG_IOSTAT_READ];
--		wios = bis->cur.ios[BLKG_IOSTAT_WRITE];
--		dios = bis->cur.ios[BLKG_IOSTAT_DISCARD];
--	} while (u64_stats_fetch_retry(&bis->sync, seq));
-+	raw_spin_lock_irq(&blkg_stat_lock);
-+	rbytes = bis->cur.bytes[BLKG_IOSTAT_READ];
-+	wbytes = bis->cur.bytes[BLKG_IOSTAT_WRITE];
-+	dbytes = bis->cur.bytes[BLKG_IOSTAT_DISCARD];
-+	rios = bis->cur.ios[BLKG_IOSTAT_READ];
-+	wios = bis->cur.ios[BLKG_IOSTAT_WRITE];
-+	dios = bis->cur.ios[BLKG_IOSTAT_DISCARD];
-+	raw_spin_unlock_irq(&blkg_stat_lock, flags);
- 
- 	if (rbytes || wbytes || rios || wios) {
- 		seq_printf(s, "rbytes=%llu wbytes=%llu rios=%llu wios=%llu dbytes=%llu dios=%llu",
