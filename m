@@ -1,104 +1,151 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6677470;
-	Wed, 17 Jul 2024 18:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7649D33997;
+	Wed, 17 Jul 2024 20:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721242628; cv=none; b=d/9EgneJl0Tx7OFhRZUF6db19rHehcIvWrDnB4L5TjSNPEqQ72zhJg1UuOhXUTSnLkat1+rI/RIU7ghIHlIdcEzcq2Imb2NDHDHaoWRs0ETSDB5ovQnsQzebTJdPiDxMqtEq6DPrpKbMApo15iOcCOf0RJElWQtuzrWt8jsz2UY=
+	t=1721247984; cv=none; b=dX2lcvs7Z6+NlS55i1L24kX6wzUfDmVsxhXDXrPUaVe5NopqlC0th8RhD64HhEvJGijti6nTN/O0VQ053h2ff8LHL+R6RVM7G9gEDBpQqgSg/xMDU8VvlDVdQFtvpJ+JYrW6B8IJQ6ltVC/BjmNLt7vSX2l3IxaH2DRN1YuVy0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721242628; c=relaxed/simple;
-	bh=nlGu9ATzmRDZuQG1S8SgP+DAxKYsS8oizcEo/kGejXo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rWgiCKHiJ63ET40BkpHVEkOrG9ISusd3FU+yo+1GF9G5HsMcovVPoc7vJNrSGM0CZ8DE3xijwUBd2Wk2dSNUCMqowt396OBkvD+RcOlzJwupcgVW9Rkk3nWU0stTOAyXgLDlFIpxlkQ7TG6GMzMFWLSkwGYFpX2AVEW2Y+xEtB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LhC9osbf; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	s=arc-20240116; t=1721247984; c=relaxed/simple;
+	bh=sEpwm454qhpVCnOenxLpI0TxqK/C6/vZIZluX9S0+DY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U48dwu2WJpcl9CaK9v+ppuYFPtYwKYIQUKsnkq95EtgJsU3k4wrjLSqMjCxECBeGLkWkKZTKOx5LOinFquvHK5SOI7cMhBM5DT6Ot5SFqabwTm42bWSJBZ4saLwwehqKJ2RlvfHihXYvDInehLwyQuAmlH5d7XfFSh/FJpiEQiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F8MdDVYn; arc=none smtp.client-ip=209.85.161.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LhC9osbf"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70b5117ae06so5138372b3a.2;
-        Wed, 17 Jul 2024 11:57:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F8MdDVYn"
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5c651c521f2so15075eaf.1;
+        Wed, 17 Jul 2024 13:26:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721242626; x=1721847426; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JL/3fZ/KL80SbG0gxIevxprQw4yP8Zt7WBtlleXdZVg=;
-        b=LhC9osbfMAktn0MJ18LXAUTq6r6Yvi1Ed8t0xmSY0r9bDU72sk8K5T9NLRxMBqgQcg
-         DBeedfVv/ckMuhJa0VnepXzLDLoneuQ7zTiEuXqoo1UwFJmTU2Q3+UExUeBdDmcp7XQX
-         3KhjF9f+MlO+DCafbUE6oy8IYj5E+XaK+1PzdLs/i5457in+2HXSn1G5oh7dHWqiWLbo
-         o80MEeHm36ybpi7bjT1HNuZXRxiOdDuieSvI44FqF3BTZFH41V1bWTok3r56G2RLmfta
-         UP95K1+vFpDt/YqBoheyoqXvBBUxu20zq4cXjnnJkx7UYg1mhNYqgmgHKh5rI7uqip0M
-         ff5g==
+        d=gmail.com; s=20230601; t=1721247982; x=1721852782; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ncSYgCH2yObWoew5+X7CbTEVtAMvPgWthTFHHeqOzls=;
+        b=F8MdDVYnUd9rxE3x+HJDTXh5rc/euAdwP8HcYJwXPywvl8trfU2HD7EhkQ7vyGHLhc
+         W45ab7idzdutIxyCAEf1HUtl6v34ZO85KUhTnpouCutjMWYC2xlbP28M49DiZtuy39ID
+         8MMZb6libjr4N8XWo+Lw4RCMZWdolB0RFs8/Bfde0LN3IzkcVr0Jxd7k4uIF9oBk6BCs
+         0bNL2hoaX+xAlCxfFMyZxlcMY11ChvmJIAviqTihfN9lLIoJecJBEW6XbLEx4uc4BLKt
+         wmOUZpLrapMsDA/69q/I81LUMk6l+SHkN1zC1/uc8ITmhx5cfYZWImXhanGaohbj8Yzw
+         +0gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721242626; x=1721847426;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JL/3fZ/KL80SbG0gxIevxprQw4yP8Zt7WBtlleXdZVg=;
-        b=FAl4f2IeDmZ0wiA6i5lpCsQwO7PdqiPNEVJ+sVS+NkCMNuzFaWgODs4OK5l3a9/QKh
-         TCyvQ4cTB1/L/H3rrsEPzgkQc8oXiL1P7ZDyoJoEIJaMXZt2wN6EYPQ68Q6VebmnupIQ
-         fffYG9zro0WAOzT6yeD/SmZ/O4xM7u7HWEhilU2vL8Ig1I1RI7JtED7hKqLCxhofNufg
-         caciX/yrL1+Rd3tFXlU6NvsYB9S3TZxHb1jHRpL3StePbLzq767JYfsP5AC23QvDItPq
-         jUlVQUHwL7eyy8MR4cJtPbFl+2EGwK54adlZ0Huw3Rfxxq91t+wBhFpS6yPvqTL8YT0G
-         KQAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUs+PoJZUMFclwwQB8WqseJzmyKFPkZ/s+bQaH7wgc6fUpMu7JkkhzuMc3L7doWD/ZVi4lYdB8yr0noSe01j8akehTkBHA4yq+D6qDr7EnEh6o9/4qfToTtpm3QFlCbIX44VVG9dSIzUhEaERHyaknwUItPKTVxPyGo8A7iwfivHciu
-X-Gm-Message-State: AOJu0YzQPAJemkU8gmDCKNc8pI+kf21ZZW6WgKSgYS26NLd6OuNDwWrU
-	AKMcTi+Sxwt3hIwA1TetnMEJQqbEjC3jcEeJzMOWYh0xxI6TBlWR
-X-Google-Smtp-Source: AGHT+IH3DCORNRV66+DX2G4j/+aDcK3/wP21M12HIrSoFR/73qsZi0G8Yd6O/P2L+EWP1V3eBSr4Mw==
-X-Received: by 2002:a05:6a21:9997:b0:1c2:1ed4:4f91 with SMTP id adf61e73a8af0-1c3fdd2bf9fmr3817008637.31.1721242626016;
-        Wed, 17 Jul 2024 11:57:06 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc52bbcsm78305985ad.291.2024.07.17.11.57.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jul 2024 11:57:05 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 17 Jul 2024 08:57:04 -1000
-From: "tj@kernel.org" <tj@kernel.org>
-To: Waiman Long <longman@redhat.com>
-Cc: Boy Wu =?utf-8?B?KOWQs+WLg+iqvCk=?= <Boy.Wu@mediatek.com>,
-	"boris@bur.io" <boris@bur.io>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	Iverlin Wang =?utf-8?B?KOeOi+iLs+mclik=?= <Iverlin.Wang@mediatek.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH v3] blk-cgroup: Replace u64 sync with spinlock for iostat
- update
-Message-ID: <ZpgUAJn-ypO-0JZg@slm.duckdns.org>
-References: <Zpbify32lel9J-5I@slm.duckdns.org>
- <c5bcbcbaeacdb805adc75c26f92ec69f26ad7706.camel@mediatek.com>
- <5560c690cc6de67139a9b2e45c7a11938b70fc58.camel@mediatek.com>
- <1b19b68adb34410bf6dc8fd3f50e4b82c1a014e4.camel@mediatek.com>
- <Zpf3ks2drDZ7ULTa@slm.duckdns.org>
- <f448f66b-7a91-4281-8f77-159541cbacff@redhat.com>
- <ZpgB9kCAxAAXAtSi@slm.duckdns.org>
- <134fc34c-10b8-4d00-aaca-8285efce9899@redhat.com>
- <ZpgMajKn2O521H2s@slm.duckdns.org>
- <48fa8bc9-9f8d-4406-9137-88a555883ea2@redhat.com>
+        d=1e100.net; s=20230601; t=1721247982; x=1721852782;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ncSYgCH2yObWoew5+X7CbTEVtAMvPgWthTFHHeqOzls=;
+        b=o42mJEGcXGkq+7nPVCU6oCnq3ICKuBFqMiltljCucDbOEAHC/2qr1AXRJp1TALRZK1
+         dgDkF6MwOUktgJJuHkZaTQe2zbQzjuO7u8mWas2+U7ps8yldvvIUgEm1EKKxJ/g51Ym6
+         FjVdo0Gf4udq3I5IiNZXOZW4rvpanoM7EhqR0NfxLXYGLTzAyq4jlyzl58Quo7e7ioHo
+         BCb2TGEwd2pCQmJkLEO2dEV27hi0x+UkVj9WMJ7b3lOswyD7SwAEbqlNUWdZnQ4XbJ6m
+         8q71IUZXVkI1E9jVOHcOFxQZEZM14Lv8+yeelvtb/mcp3nGLmLQHmOelVYp8gunb0z/k
+         BMrg==
+X-Forwarded-Encrypted: i=1; AJvYcCXaD2fmtmkRDJtRfobOkY3sn7XtmD2Q2fZ24meOldeyvADL4Zen0fVWCgGkVxRpSGRngtTX7xmPtS7hKyrinBoR0HPNRXA7abpce2RTvpEG88+Sx2ffKTZj7BWafIZFTcET84PWcXz33HytxhZILzdT0IiQ96BUJBzJsgem5wdW
+X-Gm-Message-State: AOJu0Yw1Sc7dd3YF03wqn7C1qOjX89ZK1iXkfFnppvCSBFtJBPcLTj/T
+	VxVGn+UAGnKe0UGQMntmMJlebbUbZZ9+dDeTZxuae8an9akkmPkXlUdqqtIEGEIQNbx2Z2iyAVr
+	gWhxY5sGa5le6vzJFB48CtmaOFcs=
+X-Google-Smtp-Source: AGHT+IFSRPf4iO7FOIYwpaSrJDKwLNrX/hn2v8uBVQCD1+mp0QuUcyPuSVjRdHo2DHuixjUvNAimZaelOjd9P+sqgHg=
+X-Received: by 2002:a05:6871:58c:b0:25e:b8c2:8367 with SMTP id
+ 586e51a60fabf-260d915c40fmr2312531fac.11.1721247982433; Wed, 17 Jul 2024
+ 13:26:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <48fa8bc9-9f8d-4406-9137-88a555883ea2@redhat.com>
+References: <20240611063618.106485-1-ofir.gal@volumez.com> <20240611063618.106485-5-ofir.gal@volumez.com>
+ <2695367b-8c67-47ab-aa2c-3529b50b1a83@volumez.com>
+In-Reply-To: <2695367b-8c67-47ab-aa2c-3529b50b1a83@volumez.com>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Wed, 17 Jul 2024 22:26:10 +0200
+Message-ID: <CAOi1vP96JtsP02hpsZpeknKN_dh3JdnQomO8aTbuH6Bz247rxA@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] libceph: use sendpages_ok() instead of sendpage_ok()
+To: Ofir Gal <ofir.gal@volumez.com>
+Cc: davem@davemloft.net, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, netdev@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, dhowells@redhat.com, edumazet@google.com, 
+	pabeni@redhat.com, kbusch@kernel.org, xiubli@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 17, 2024 at 02:55:37PM -0400, Waiman Long wrote:
-> I was wrong about __blkcg_rstat_flush(). Right, the main updater of
-> iostat_cpu is  blk_cgroup_bio_start(). We do need to drop down some comment
-> on what is protected by u64_sync and what is by blkg_stat_lock though. It
-> can be confusing.
+On Tue, Jul 16, 2024 at 2:46=E2=80=AFPM Ofir Gal <ofir.gal@volumez.com> wro=
+te:
+>
+> Xiubo/Ilya please take a look
+>
+> On 6/11/24 09:36, Ofir Gal wrote:
+> > Currently ceph_tcp_sendpage() and do_try_sendpage() use sendpage_ok() i=
+n
+> > order to enable MSG_SPLICE_PAGES, it check the first page of the
+> > iterator, the iterator may represent contiguous pages.
+> >
+> > MSG_SPLICE_PAGES enables skb_splice_from_iter() which checks all the
+> > pages it sends with sendpage_ok().
+> >
+> > When ceph_tcp_sendpage() or do_try_sendpage() send an iterator that the
+> > first page is sendable, but one of the other pages isn't
+> > skb_splice_from_iter() warns and aborts the data transfer.
+> >
+> > Using the new helper sendpages_ok() in order to enable MSG_SPLICE_PAGES
+> > solves the issue.
+> >
+> > Signed-off-by: Ofir Gal <ofir.gal@volumez.com>
+> > ---
+> >  net/ceph/messenger_v1.c | 2 +-
+> >  net/ceph/messenger_v2.c | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/ceph/messenger_v1.c b/net/ceph/messenger_v1.c
+> > index 0cb61c76b9b8..a6788f284cd7 100644
+> > --- a/net/ceph/messenger_v1.c
+> > +++ b/net/ceph/messenger_v1.c
+> > @@ -94,7 +94,7 @@ static int ceph_tcp_sendpage(struct socket *sock, str=
+uct page *page,
+> >        * coalescing neighboring slab objects into a single frag which
+> >        * triggers one of hardened usercopy checks.
+> >        */
+> > -     if (sendpage_ok(page))
+> > +     if (sendpages_ok(page, size, offset))
+> >               msg.msg_flags |=3D MSG_SPLICE_PAGES;
+> >
+> >       bvec_set_page(&bvec, page, size, offset);
+> > diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
+> > index bd608ffa0627..27f8f6c8eb60 100644
+> > --- a/net/ceph/messenger_v2.c
+> > +++ b/net/ceph/messenger_v2.c
+> > @@ -165,7 +165,7 @@ static int do_try_sendpage(struct socket *sock, str=
+uct iov_iter *it)
+> >                * coalescing neighboring slab objects into a single frag
+> >                * which triggers one of hardened usercopy checks.
+> >                */
+> > -             if (sendpage_ok(bv.bv_page))
+> > +             if (sendpages_ok(bv.bv_page, bv.bv_len, bv.bv_offset))
+> >                       msg.msg_flags |=3D MSG_SPLICE_PAGES;
+> >               else
+> >                       msg.msg_flags &=3D ~MSG_SPLICE_PAGES;
+>
 
-Oh yeah, definitely. It is confusing.
+Hi Ofir,
 
--- 
-tejun
+Ceph should be fine as is -- there is an internal "cursor" abstraction
+that that is limited to PAGE_SIZE chunks, using bvec_iter_bvec() instead
+of mp_bvec_iter_bvec(), etc.  This means that both do_try_sendpage() and
+ceph_tcp_sendpage() should be called only with
+
+  page_off + len <=3D PAGE_SIZE
+
+being true even if the page is contiguous (and that we lose out on the
+potential performance benefit, of course...).
+
+That said, if the plan is to remove sendpage_ok() so that it doesn't
+accidentally grow new users who are unaware of this pitfall, consider
+this
+
+Acked-by: Ilya Dryomov <idryomov@gmail.com>
+
+Thanks,
+
+                Ilya
