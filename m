@@ -1,104 +1,185 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81D43A28D;
-	Thu, 18 Jul 2024 21:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721337333; cv=none; b=Oe81KO6OSd0EviIxoQl0BT3cvS4lPNURi7IJh/5lDlHlNovDMmZ1SXMfH+KE3tVdHVY0iFbXNe9Oj5vg09SkS+q/7MOsrrN+y58m5uGAIBBAAeH21PDy3fouyUEO61jRVw0YslqWD3ONRLKWmbewOeZWcmmPD1W2HtKcDTIi9ro=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721337333; c=relaxed/simple;
-	bh=9mJ5wmdO4bm4+n7EafdLXeF8u89gMbbd3ZwBipeTu6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQ3V+QxtyRMULGX9g0QvVUMs0g4jEbFYMWYv8kmondDQ9lyoxlRG77qRnhsPuoySIHtUXyKw5rUuOjR+4cJufMu04RQzS/f9O6TAe9o5lVoJuirAkPXaUOB82NLt5NSHaCsSKSFu6aRJiwl32VaIhB+wWN4cdo3BZAsS/G2QpNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ChBNs4ui; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5420D1465BA
+	for <linux-block@vger.kernel.org>; Thu, 18 Jul 2024 23:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721345004; cv=fail; b=eKeMo5brBHM4DS4Dn8E6e2fcGASVfIDQprRTMEsVqy/tnGjZgOuc6vC2aOnD4pXQYXHizsd+GUNanrOjWV8Lx8roxddSc9zE2BUqr1zidlZ5PPjCm2+j+BESXVprJFRu51s5F5eVmmL6lPiHjrTVYy0OlG+cgVT2E4L0kP4ik18=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721345004; c=relaxed/simple;
+	bh=Us7mvwMGWY9PqNALaEQD0Q5Q+hzIAdDxvSlctwsmKV4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qBKR7vK5OCpODm82WfQcUyfIL2TIcMoIElfS+trmB/GX6E1YzExdogoevuJYEf/OWpZ2NX4ugaJe9uzBQkpO1npTs2umtVYcIL8zxd76NeZvldAez3WXUqutn4X0MyMUg2b89VvZ5qL/bnY8Y9gTW4X8fF2Anzl57aMmbuYGxhk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=oTgOl2YU; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=KUMtheK6; arc=fail smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ChBNs4ui"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-75e7e110e89so791837a12.3;
-        Thu, 18 Jul 2024 14:15:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oTgOl2YU";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="KUMtheK6"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1721345002; x=1752881002;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Us7mvwMGWY9PqNALaEQD0Q5Q+hzIAdDxvSlctwsmKV4=;
+  b=oTgOl2YUogw5pdOVc37940A804rL6eOnSEjOqszwYnKRTYT9+hV1n7jx
+   qZc1HabthaRbvy8sMX2NvaLyjpidGNUDjlEclbxUV/Klbw/rpO11rpLsI
+   SYI88a3mD0SPe33BYh8ytPaTjdfyCiEcwPv09eJ0LnA38keAi3DmffxaG
+   Qm23RT7cfUT+155xMJx4OtZu9fhiARYdstz7pOWs7RFIlI4gFubQiO5Xh
+   6m7t3LBzzC+KHNxGIg1yP5TMoSL1UB5ivIZN//cJ8KAWSgsaS8wkN3FYr
+   R+6KpB7Sj9V+aAn4f6UJZQjW5NsQZ5ex7W2sB0FAwWRbJzfzewXBCITKe
+   g==;
+X-CSE-ConnectionGUID: axqNFA4NT9abvpZtMPGoLA==
+X-CSE-MsgGUID: NgK/W5LgTaKPjrhFJEyxgA==
+X-IronPort-AV: E=Sophos;i="6.09,219,1716220800"; 
+   d="scan'208";a="22225863"
+Received: from mail-centralusazlp17010007.outbound.protection.outlook.com (HELO DM1PR04CU001.outbound.protection.outlook.com) ([40.93.13.7])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Jul 2024 07:22:12 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=paDb9F+qGheO6/WfR8b5Ovgnn9TWNNYGOHyz6C3zjZGomkOLOt+UFcaOtf/DQWJK011A4C40BdLHvzauJUFf+hErLquhAZl3yv0ZyRKvC2IXt5CZWsTPnom7+/0STKm9x9WqmBpQaVrxzVz4YBtGze0zcEU3Qtf5Ru55ht/0CPsTiEIuV9ySMfoxRlCjF+8DwQmP55Mym+GZyIBwSxHZkieBaQAJ8S47kYPaM9XqTvPM5ZmBAj7NQHMDfQ7wX05AxngqQEyRn673rtwBZSKWNZJbxupqYKZX8NKtCTQuXCwOsSMKIXZ3+fevkRLuXOrD8ZNx/kSwLXGyFCYrYMnyAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Us7mvwMGWY9PqNALaEQD0Q5Q+hzIAdDxvSlctwsmKV4=;
+ b=OWFGZa2xH7t5Ll0KEp2VZN7AUPDAu19REA2RZMjhQ1CEjC0S2sBYl2r7O9R9HmxP1Xp9vjp5xfPi3AACpZU6ojBQsqDvLq1ohGvgps9tplcAGhBmx5sX8Q2XZITIZGrpFHG/BtgjF4A4E6qx/kVxTIYWfHbZhx1RjmmXhM6OaavrcEIp2MJS/LUmO8aNjn8W98+Km2l4g6ITEmCxq6BkLFg69lgVMK693h6BC/U5EPo/RsKj8+ZsK9rzcqt59RI+HXX/yUUoFZ1Sog4OSrkuv1LPLmmOJ+4eUa6qdo5yzhmLSAN7OZ9slUgxrwDFUHobbtZA9/6hFwpeAaYH85d3Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721337330; x=1721942130; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/0auihaX9QkuNb5Qm1JcvF0jC8t0q/ycofneQ+RbNug=;
-        b=ChBNs4uim19hnSoNEJIdJbKfsfaHx4fHq9607fIi2uJkTqloRgBzd+eF7+OEHBUMCf
-         5wvmdoHrKQBRqDU/223Teo88B/xmPpuHJqc64GZH/yVrKQBDExieZFfW9PFuDArQL1gS
-         1F9bzGIbwjosW2AFzBMpvw2kK+Lo5FD25YKUYzG/PPNSKjPUk1dTg7R3oJevaleGrcqv
-         3DtDxFpXuul3U2MNpLfS/Yafk7AjKmPznB5gzkitCQRCPP+Rx0yGc8h0ENdkoV3wYTaS
-         qPh7UdFHeyHAxPexNuutGEZT5nRS1a8z6ap2lU7JuniOWumE//ih8m/zVIUUvbdvpjQB
-         IiTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721337330; x=1721942130;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/0auihaX9QkuNb5Qm1JcvF0jC8t0q/ycofneQ+RbNug=;
-        b=Ua9GXaZpdFQ10FyBBjjS0YBgM3pJ1hk7zBv67g+lloA67r20ib2N94kwNvI548g+Nw
-         YZaD0xww9RemKE2kIc/fG6MBmPL8gWAc3FcWiQNMncibwJV+en+eQ9J4J1C/r9PR+2fH
-         S21rfWWCZ+v4fgrSQJ1pMdaq3XPu+OFH8QJl0Yxc4W6vf7c8R3K6p5LYdaFlMicC4QU+
-         PX7S1B8p8yDa/bIYuaFHI6KEtvHkwmubT2B23A0e6d6VqsAv/tuvNcqoiqYqSE5qUt5S
-         QAvZmGtbNvuFqt3V3MMKih0HAlB+CeQOlcbtvggXpvWP4uFEyWU7//zScCUh9jFbXglV
-         +sIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZXkFYuC/RaLMuzjuvIV289hqTn0+dOUJ/bIXU5f+Xq3UEEpEOJCnXTilqpARbxXuQ0Sk+GasCD6qcIIU03EIuByWM2VHHzlfil93qmZrDf0mybuZV5RX6zA6aOZVFfG2xid5nnzgGub0mh4Vb8PXjZ3fJO5l9Q44jnv0vw+rhFq9Z
-X-Gm-Message-State: AOJu0YwyBXzBDs0XuFDqf8rtWF3E2JPT+HOup928YUyDjfVONG3i4Gdj
-	uWsc19XGxCExWvaJYIpGD/DrhXAYd9id+qzSTH0uEkmLfAzqbYTX
-X-Google-Smtp-Source: AGHT+IEzvKX6abFCuyAD2x0BS8ix3G4cXfdKksDDsoZuZtDnnZow0Vh1MnuqD3v6DJxjydy4SuuorQ==
-X-Received: by 2002:a05:6a20:c901:b0:1c3:b2da:cdff with SMTP id adf61e73a8af0-1c3fdb10556mr6962771637.0.1721337330009;
-        Thu, 18 Jul 2024 14:15:30 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd64b4a29bsm174255ad.15.2024.07.18.14.15.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 14:15:29 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 18 Jul 2024 11:15:28 -1000
-From: Tejun Heo <tj@kernel.org>
-To: "boy.wu" <boy.wu@mediatek.com>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Boris Burkov <boris@bur.io>, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, iverlin.wang@mediatek.com
-Subject: Re: [PATCH v4] blk-cgroup: Replace u64 sync with spinlock for iostat
-Message-ID: <ZpmF8HJsuefjC7Xr@slm.duckdns.org>
-References: <20240718084112.12202-1-boy.wu@mediatek.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Us7mvwMGWY9PqNALaEQD0Q5Q+hzIAdDxvSlctwsmKV4=;
+ b=KUMtheK6+MTR7clk0+yxCU5Hnjw4Hd5oTaNjni8m4rjGzXXjN1LUN1ZHUWwfQT9L7p7S/TNwU2sJonFf6Q7d7ZFXsHxWC3Kj4/mc5Dk0YpkqdeTKBhPc2rrgvq3E/Jy5xg9sxeWIxHBqcWilBb8BETbdhjiuh+FvVWXBGmHDYKQ=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ DM6PR04MB6667.namprd04.prod.outlook.com (2603:10b6:5:247::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7784.16; Thu, 18 Jul 2024 23:22:09 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%3]) with mapi id 15.20.7784.017; Thu, 18 Jul 2024
+ 23:22:09 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Bart Van Assche <bvanassche@acm.org>
+CC: Mikulas Patocka <mpatocka@redhat.com>, Bryan Gurney <bgurney@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>, "snitzer@kernel.org"
+	<snitzer@kernel.org>
+Subject: Re: [PATCH blktests] dm/002: repeat dmsetup remove command on failure
+ with EBUSY
+Thread-Topic: [PATCH blktests] dm/002: repeat dmsetup remove command on
+ failure with EBUSY
+Thread-Index: AQHa0f3JF69jGThgokq1G+bfO/sP+bHv+mCAgAAiRYCAATywgIAAetkAgAtadAA=
+Date: Thu, 18 Jul 2024 23:22:09 +0000
+Message-ID: <o5wik4yvo2teffpjlwycbaek6znrtde5kml3hkof5r2w5rxttj@bhokt2ksdcbj>
+References: <20240709124441.139769-1-shinichiro.kawasaki@wdc.com>
+ <CAHhmqcT6F_b8ZJMbm9jbL0Zg-vv6zq9oxfMttzf1K4GH-zz=NQ@mail.gmail.com>
+ <e767864a-7ecf-8459-30d5-daa654b4c0d2@redhat.com>
+ <nmildf5tauvp34aeibmzwcxao4ujbwnkkkesollifa4w5uwf2v@qi3pzxidduca>
+ <bba377b4-16f8-4a28-9177-bcfec2f75c89@acm.org>
+In-Reply-To: <bba377b4-16f8-4a28-9177-bcfec2f75c89@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DM6PR04MB6667:EE_
+x-ms-office365-filtering-correlation-id: 360ffb6d-f964-4409-6ec9-08dca7807245
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?Wi4Lj12t4fsf3HE+8FYpNviSJ01CmoOZEGJS8Eyws7Vt+4qaj7dnmkZf9VP1?=
+ =?us-ascii?Q?yoyyheNFKP7wf/WItJ4sBYKehG9bmNMQKECnoq0f7nnbxu2UNHlPSt374DvB?=
+ =?us-ascii?Q?RU3fOZUzsFtNEBmkdIrzZ4Zy082fQZYV4ipHZuZY/4XZeSYgdzFxRgGM4OFe?=
+ =?us-ascii?Q?ENCr4DrP/kCf1Xi+LPpuvouQjSsGM1XnKK2KqLxAIHLtILseMbTLaEvgyZwD?=
+ =?us-ascii?Q?UekF/H+pcgV/QZzcJj6LYPPsEIg88hLAQS8sOQfzlM16MOyCWouqcr5GsYJs?=
+ =?us-ascii?Q?++YwVwJEb3nr8AIdISrk6KK30AqRiP94Dtw5t2d7NlemdlFrQlEMg2UFArub?=
+ =?us-ascii?Q?wi6yo/EMEpK42eARLgEAnJgIfS7dlMvO5rD7dAkwCv1rK6ooxEFU//P5S0QY?=
+ =?us-ascii?Q?DFwOeqJEpVMqNmShvMCSroQcMBYsVem83o3mbTexYA3MfeliS4N8pJtrCeQA?=
+ =?us-ascii?Q?9Tfm6M9F2Qo9vwozXeURKLVdNXedDWINXo6cGe1k6w9vtVjdT/DkEERBh+BU?=
+ =?us-ascii?Q?7E4WuRKN060NkLtbVfsYCxyAVvagFOEILAmJKbEBrk1uvyLn1/NbEO8Urr+x?=
+ =?us-ascii?Q?+1mYJ/xr7hb2yitxbBvOTdZRErVx2oVTP3ot7L4PFW90SYaVqfCwLzExAio4?=
+ =?us-ascii?Q?7FyMZsSl5Vzy2zUOWp55aAhdzf15PCJFZRE50I+VaGhVV7mPRGceDq6PjWiv?=
+ =?us-ascii?Q?XFQ1CKTe8e18uqKpFJZ6HM12YUEFfTe8Gx65JrdM2TuCk+LaJZ8KthC7s/ey?=
+ =?us-ascii?Q?2djg0F5rnTlkM4FQcvFxklMXd/v4PRem6vBokCTUliKWtP1sVhO+Q2v/zZVB?=
+ =?us-ascii?Q?oBhgmio8Z6QI22X0Fx82rSYxuSnWPierwO0l4wNmkw5GR5B6rsXM427he6Cy?=
+ =?us-ascii?Q?LB+MJZScf8vpomGm5U0xLfNQWpHE0EqC4uoTiKZK5f592AUygKCDykx4KtR3?=
+ =?us-ascii?Q?4VjckufKK1U6w1Ylw38rOHCFgzjqSH+a7EAWGllZmw+x78nw9kH/+AaR+ntX?=
+ =?us-ascii?Q?/M7hnRnghYJQzYSv183ITChhXO5U/+T2B6HHo0s5kDdQZqBaHrfmP3FmjYrj?=
+ =?us-ascii?Q?dvnsHINz+rOSn7o806jkJGTSEDKdYmp4aJXuFJ5EJKvZsDgl+Jn3YCSUbi7v?=
+ =?us-ascii?Q?Sqe9zY6RGq9DsqrOkQUikxvvs4/G8Pk1mNX9z5mk/VG/aUNb/jaqjPkPF8u+?=
+ =?us-ascii?Q?jG2ZXshlzWslXu4ERMrkVQUlqjHc2HHtk3qRIm4M/CLw7BPE7hFx2gyevCzL?=
+ =?us-ascii?Q?JHlgxzr8ejNO+d4JYCCnGfgKhVEEpzjAlSxV6+wKz/tuKydPRm+jP6A/z4/V?=
+ =?us-ascii?Q?/9/f5Up0WszbBvJbDIqg2ZZYZpVaG9kObjjW4ch2vOlxK3NKRiCqRBExTsT4?=
+ =?us-ascii?Q?UkaeTmYI/ToQEyrhthJDYfiwY68LL/HaAPUrLtTg716EQqBUAA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?zJDZq5S6qpMLaZrfjCIH93m8ooTCzdUBrv68AratDFKyIvqd106vQz4M3CcY?=
+ =?us-ascii?Q?PgImKcIhYS6jfQLxPZwZjJlUomypbnpjnKZ5PrhIs/TKkyykrbGQu54fubVK?=
+ =?us-ascii?Q?SQlPmjqdZnVVtsMpLp/LTzhr/oQEQe5/U1CvSOgBGwooeQewh3MFaO3nEHwk?=
+ =?us-ascii?Q?+sJSGOIDsD2iPU7OxiDh00kPXTdKgQeS7zXgwRkTWXfPSth9Pqa6PuAeNWVU?=
+ =?us-ascii?Q?on9ab3xGkQ9dRh2SzzlV9Pg6WvLHfvO3dFqjJQrlLgJXpug01qbs+M+UzVN0?=
+ =?us-ascii?Q?RiTfib6zcceDIEXqtzOYRPF6l2SVgKjHllTEj+v0Tp3LCXJw7zfmeJEF0z9u?=
+ =?us-ascii?Q?AifgLBdnVy4eZjMIGLk8VGcQjXLmY51eavQuByIPokW0tZqWw7KkxdsCoWBa?=
+ =?us-ascii?Q?N1FAO8pEn0cmwar4HoRKGzGct8vjJP3Do0pMv+HPFwjv9ln/AOB/WbK7qYs4?=
+ =?us-ascii?Q?kQYb5TtNpqN4LsAY+atX48IVX5VFBWtZJX/IdhrP0ySvNk2rFh2PiKywjsBh?=
+ =?us-ascii?Q?RlRUdrmUrca6qAd1Xed8Pe3CJrgEy9cDAVgwBNnqhJtqDFQD1XJ9N9m+aS75?=
+ =?us-ascii?Q?Wl6+j+94EDUz4CJhAlmxQLiNpEWL+5BOA+RDxkZ7wQBj/gGmrg1V9BCLIRu2?=
+ =?us-ascii?Q?DWNKGfGoqiAj93N3lN+02AeYEkcsH36dC4Mpj9bG+V1NF9698pyvvmWIfvXk?=
+ =?us-ascii?Q?tDxKamn1yOlQkRtfIAk5SoqioPcnrRi+35klPXJWY1pkCouXooF++8RS6SEA?=
+ =?us-ascii?Q?Y5msKlSxHBDIXqmK47CWgtdoiHMtTLFc3qthjCo0Q98uCx2Hno4SpqLb+TsY?=
+ =?us-ascii?Q?nCdSioA69+rIzJeBpplIlErdPyC2fgQ/kr8pq1oIFPTnC/3+F87Cr+S+kHCw?=
+ =?us-ascii?Q?BohLAictLcqeCc6gqqISK46B5Ny5aa+Rw0qyHmvO5LsyfqQ+oHQRd43YdruJ?=
+ =?us-ascii?Q?TLkr7vmaNje2pRH/4f1JIdhNAjwCqOmIv60U0dPcfTUM65QKfdd7x34vst5c?=
+ =?us-ascii?Q?aEgJ/70pAvvMSkl7eYx4aqxt4tMNtya8L5m6pqkQeLU6jT8uA11usYHU/91y?=
+ =?us-ascii?Q?gHYG/zHjCNC5J0TF4KxRZpMP8X1/ipEY432K+KnRoeg40LKxiIangqHxWM9D?=
+ =?us-ascii?Q?om3RLK1nkeXygDWKlxmsb0KZdBpJJy+998L6V6Lc/aFMAWd1PguGmzo20Cer?=
+ =?us-ascii?Q?xaKCHKNRQhq9qLERU40eCvG3KaWxiqskPE0RAthcMv/AvPwqSoG8J/y03GkE?=
+ =?us-ascii?Q?ew4SLsCEbZw/fBpo21c4JUaZ2rdCVTVsYtOm5UX9K0O+7t+Z1Oj+hphjCFXD?=
+ =?us-ascii?Q?UhUa5CF2opbTdt5v1qnbdItETByK1q8nfxOOTeWu4eUA9eXu8E0bxcXn47qB?=
+ =?us-ascii?Q?4nwGsu28tzrKI+oXNYeTTfepB/8qxUG5Skfs2FFJLvROJ2cPefzTGAMqdqSB?=
+ =?us-ascii?Q?sM8cuJIHO1njYrMvkL1KfM4Ltz32tO/Sbs9m12o3myCeSSv3v7CCYpfItHMy?=
+ =?us-ascii?Q?nwah6EDNLzwh2JIjfBbCaccFMTgtAUQYt58M02bIEKiHGp+HyQpxyAGUqWkb?=
+ =?us-ascii?Q?pjekb50A0dezPwkTO+eGsOQE+n9Iyvv0YwFv5QMHV5skB4OvdrDVWUmA/C6a?=
+ =?us-ascii?Q?VjdHDK1o5OzlCy0dTUFomjk=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <E6580A0C1719E045BEDAE028015ADBC8@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240718084112.12202-1-boy.wu@mediatek.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	j/QEZhgt8rSNqJQ/ZOFZebGjyNL2N4A644nkBnRxSubZpE/wFcf96uKFtnfl0FvAR0DJqKe+qUj7eP5ACMb1YTzZ4GWzWOuIZdqTmCWTRQFhkAznLhaIHXdVrWIy8N00zYL/JhgXzPKBsVF+tARQ+0sUmtokZfWKfCe9aBs+G5XVEowpRnNYegtdPzE7hcYMAoszPhiGtD7uuDEvXOkOS44cxCXB+tISzqFaf2M32qHxyQpfuHCYiYPiWB0JkQMB/QkFI9nwq36et2VnQNKJpkesrEHLFEByTIzVfjF4XBd0xlo6hmhwRXAcIoVchIGOjR9JiI9vedNjxS8pez/1n9fwSVPO72NM6qXvHMF6D90wDXsA3umrCRjOX6Je7HVQLtAarQFk+/JIFiGaIDuYlgucjlS5/9HEbsStugpAu+6wZooyL9Ku6EbQ+tH9nXpOPEiCnZ27FapvrAuaeJak8U2QiPgtT3G41HrOiq9n2Mbvf/2uP4duswL3+jedAEgqvtDfOvKX616ojacPWlIAMF1FB+Ktfs0/xoMcupduKuEi8P1tALYzA9gMBvNqQeqwnfiQrLAutP++4cZbTUu/sxCUUJWY8YbRlCFqVS0EN9CJ91OOOvypbjpu+IVMvTN3
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 360ffb6d-f964-4409-6ec9-08dca7807245
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jul 2024 23:22:09.4174
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: l8588irJgBeNYRJGcRjb6ZDBPZgPfAX2ZH97kkUlIun8fCqKRYXIyIPc/K9E/A5xw7QIxJ1SQMX6fLBL+0ASkS309dZI3dNUTjMSRiiu7pc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6667
 
-Hello,
+On Jul 11, 2024 / 10:59, Bart Van Assche wrote:
+> On 7/11/24 3:39 AM, Shinichiro Kawasaki wrote:
+> > It showed "Comm: (udev-worker)" is the process which keeps the DM
+> > device open. [ ... ] Just adding "udevadm settle" before "dmsetup
+> > remove" will avoid the failure.
+>=20
+> I'm OK with either the retry loop from the patch at the start of this
+> email thread or adding "udevadm settle"
 
-On Thu, Jul 18, 2024 at 04:41:12PM +0800, boy.wu wrote:
->  static void blkg_clear_stat(struct blkcg_gq *blkg)
->  {
->  	int cpu;
->  
-> +#if BITS_PER_LONG == 32
-> +	guard(raw_spinlock_irqsave)(&blkg_stat_lock);
-> +#endif
-
-Can you please collect the ifdefs into a single place? If guard can be used
-for that, that's great. If not, just spin_lock/unlock wrappers are fine too,
-but please collect them into a single place and add a comment explaining why
-this is necessary and why u64_sync isn't being used.
-
-Also, for blkg_clear_stat(), we're running a slight chance of clearing of
-iostat_cpu racing against state updates from the hot path. Given the
-circumstances - stat reset is an cgroup1-only feature which isn't used
-widely and a problematic interface to begin with, I believe this is a valid
-choice but it needs to be noted.
-
-Thanks.
-
--- 
-tejun
+Thanks Bart. I think "udevadm settle" is the better. Will post v2.=
