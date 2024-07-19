@@ -1,129 +1,143 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17250146A72;
-	Fri, 19 Jul 2024 17:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B871B86D5;
+	Fri, 19 Jul 2024 17:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721410317; cv=none; b=J8OA4QF4eLv5IuzECrfdOzWGwkjK3ClE0z9Pm8Ky1gS4LwWgHcju8IzcFY7V5Oj7ntBgnMG52STycJEMRX6HeqCrSTsUff2Vm7/i2r7gPBTfFbW3vnAMSyACaZJJkEhpajIufZTIlecKXx3bGRIr/0e4mqu/Kp1bkBZPeDWrDyA=
+	t=1721411026; cv=none; b=LLf9CIemLQftVOkk++sbfryfjonIQaKcf29loS0+37+DAnB9bHS4Vw69FFEwd60usF0sCRUr22LW2fXK2UkzFpo/SFem6uoTY9sA4LEkGEFDLP3yQLpAb2dvX4YfCfbG21NcV1ao1XhlAvbrRen70U6OvtCxo/Rkb8fPTrLepdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721410317; c=relaxed/simple;
-	bh=kwetyPKGOW4u/OrTUJz8Yw6DPPnSPhY2KQ5TC6vHHeA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JQnw1ae6m1Qb6pwGddeMy3paTvQxF8GKCOAEe/mMYjM5iQV5GrI03Tji/WCsGJ5YNRSqm6gYHvMWv6gnN7k6na7Ojm7H67iih6aYp5EVZDVUVsXb0c4kizNPKPGsf0n+FWycaFqPolc22uK71IL72vCoEw7nroSMC+10QuzGmXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQHGVkWw; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721411026; c=relaxed/simple;
+	bh=KVsBhDaO8D1jYNs6pDclEnNjXeKtbtSCS2VYT4HR+Uo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=axS7B3+LCaTdBqS5rpi++n2+J6zxKd7sMga5iGW63IBtqz8q9/+Y3TsXzb+gLjf7taDYrW0j4N8KvFum/YrXWKI6/BU/ZHEhsTBGiBlH9gynsVjisf/23teJDRwUAL9FMy2+ZpvYsqyhqQzJAp3si8wa+IgiYYYw+oUkxEFjvs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=W9gxKBro; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=DVDsbkGy; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=W9gxKBro; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=DVDsbkGy; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQHGVkWw"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fc65329979so15664585ad.0;
-        Fri, 19 Jul 2024 10:31:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721410315; x=1722015115; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6ZbMHz0p5DWuVseBb2N8rhX28Nxn5bBUC6D+VNe4hHM=;
-        b=gQHGVkWwSp8T6LffMGm2bRwfKY/sSdMkSP1Vi37rK6A1voQnOfLQ7mZEXAxXmkuGNI
-         9nkFaE6hsez2Oa+taaKGUBB6jtSCVXWvwUdoE7tioR0poQN7NJPEkkOJ4QKiLfcOmoZk
-         zyYHyrdr1dmmGPBafg1+RClwxnMKj7bNFObxdaGrnZiEK7zH4SChyI0yPtMWYAZ6SLXn
-         aO7206XkSapP4sxIDBrQXsbPGhHe47TVMcEBAIvHnpPvuZK9M034lR7DTfMe3zFNjwst
-         c8/UR52Hvto1sXJPpt0xVtRdhxQlqzQmlhn/wgiGUp/dB7M3Y53rq4wbR5R3UngLMIbx
-         9KJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721410315; x=1722015115;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ZbMHz0p5DWuVseBb2N8rhX28Nxn5bBUC6D+VNe4hHM=;
-        b=bartIFUSmJGSxk5AUlA5Z572/eQpfWr5aeu+kKtKmlFOm/dF9kMRVAxA6N6++rit6v
-         m3wvW6Le9JK4etlvie+bhJO9SuVVYCLsM0xOUYxqLqtCZJasKziEelwzPO/iSPJZY2ze
-         B1rHtm2QGjdKm/foEO92fEcfbDnftgrviPxR7TWi29biKa7KcUfZ4eM95IDfG+wgYob2
-         4Jz9jJRRkEzf/OI9EupI7/KJqNI6dhQslBGmWf8sQ3TEnnHzMAWXmNUQZyCe0QI+Ki8O
-         DEumr1AfL99nAxFfyLvbXE66Ewc/Sr+s1O6khzO6QydMCNDPPR7CL3bLkQwiZuqq5D0n
-         nT1g==
-X-Forwarded-Encrypted: i=1; AJvYcCW4pap9c4JCK3nX8l1rHJunix4w9hDK8Xa1E1mjqOhXyW5YE00I81Z6pFl+W+GMLcLuu4lFGZRTzF/CRfRKKwcKrd6y3+Yoj8q/owlURXjY16QwNB1UwdyyDH1wWb9v/22FIT7sZR1M9xxyZvfAoFbXGGPM5tfKb4yJga5bCM8HAoxj
-X-Gm-Message-State: AOJu0YwHmMens86LZ9hERJtxwn+4IAdQBjWKAKINgfUao8aLB/uFgxiO
-	XOLpvtvzBz05HGv/rNimpRgrOeBEVYVYuuSSOYJybTGUSRHb9XHhrQqTRA==
-X-Google-Smtp-Source: AGHT+IFsThoFkOXcqDTCyPseR9byS+0442uGUbWIB1NvdVDLi0q/DrexI8yvkm4IqTHzGS1Ss2DQJQ==
-X-Received: by 2002:a17:902:ec91:b0:1f9:d0da:5b2f with SMTP id d9443c01a7336-1fd745879femr4471445ad.39.1721410315354;
-        Fri, 19 Jul 2024 10:31:55 -0700 (PDT)
-Received: from localhost (dhcp-141-239-149-160.hawaiiantel.net. [141.239.149.160])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f48875esm7196225ad.287.2024.07.19.10.31.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jul 2024 10:31:54 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 19 Jul 2024 07:31:53 -1000
-From: "tj@kernel.org" <tj@kernel.org>
-To: Boy Wu =?utf-8?B?KOWQs+WLg+iqvCk=?= <Boy.Wu@mediatek.com>
-Cc: "boris@bur.io" <boris@bur.io>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	Iverlin Wang =?utf-8?B?KOeOi+iLs+mclik=?= <Iverlin.Wang@mediatek.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH v4] blk-cgroup: Replace u64 sync with spinlock for iostat
-Message-ID: <ZpqjCVxSAV-Q7Yhy@slm.duckdns.org>
-References: <20240718084112.12202-1-boy.wu@mediatek.com>
- <ZpmF8HJsuefjC7Xr@slm.duckdns.org>
- <00c595a16b4e96ae56973ac2ce586f6ad736059f.camel@mediatek.com>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="W9gxKBro";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="DVDsbkGy";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="W9gxKBro";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="DVDsbkGy"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D19A71F7A5;
+	Fri, 19 Jul 2024 17:43:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1721411022;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=KVsBhDaO8D1jYNs6pDclEnNjXeKtbtSCS2VYT4HR+Uo=;
+	b=W9gxKBromI/sNsrKIOevP2RIcbkC+BCV1at+g2SUEg543FAXNyzS+atZV0v9A+c9GFghPm
+	RhMLb5gPDGoWSw6zxnhWMptQX4D81Aw13IMWI33kXHMRtJn04fMTrChOK0mCPav711Fqcy
+	OM7wFyhX33jHrWNNKjtGkg9F9Ey6Gbs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1721411022;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=KVsBhDaO8D1jYNs6pDclEnNjXeKtbtSCS2VYT4HR+Uo=;
+	b=DVDsbkGyUEW9DxctpXXrcSxh/3o9uwW4tcwZzPoPvfBvN9PwuDrOhpt1E3T1xaCc+GonZQ
+	DnIz4j3tolsM9PCA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1721411022;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=KVsBhDaO8D1jYNs6pDclEnNjXeKtbtSCS2VYT4HR+Uo=;
+	b=W9gxKBromI/sNsrKIOevP2RIcbkC+BCV1at+g2SUEg543FAXNyzS+atZV0v9A+c9GFghPm
+	RhMLb5gPDGoWSw6zxnhWMptQX4D81Aw13IMWI33kXHMRtJn04fMTrChOK0mCPav711Fqcy
+	OM7wFyhX33jHrWNNKjtGkg9F9Ey6Gbs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1721411022;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=KVsBhDaO8D1jYNs6pDclEnNjXeKtbtSCS2VYT4HR+Uo=;
+	b=DVDsbkGyUEW9DxctpXXrcSxh/3o9uwW4tcwZzPoPvfBvN9PwuDrOhpt1E3T1xaCc+GonZQ
+	DnIz4j3tolsM9PCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 05F2B13808;
+	Fri, 19 Jul 2024 17:43:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id yOZaO82lmmaiJwAAD6G6ig
+	(envelope-from <pvorel@suse.cz>); Fri, 19 Jul 2024 17:43:41 +0000
+Date: Fri, 19 Jul 2024 19:43:25 +0200
+From: Petr Vorel <pvorel@suse.cz>
+To: ltp@lists.linux.it
+Cc: linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-xfs@vger.kernel.org, fstests@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+	David Sterba <dsterba@suse.com>, Filipe Manana <fdmanana@suse.com>,
+	Amir Goldstein <amir73il@gmail.com>, Cyril Hrubis <chrubis@suse.cz>,
+	Andrea Cervesato <andrea.cervesato@suse.com>,
+	Avinesh Kumar <akumar@suse.de>
+Subject: [RFC] Slow down of LTP tests aiodio_sparse.c and dio_sparse.c in
+ kernel 6.6
+Message-ID: <20240719174325.GA775414@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <00c595a16b4e96ae56973ac2ce586f6ad736059f.camel@mediatek.com>
+X-Spam-Score: 0.70
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [0.70 / 50.00];
+	MID_RHS_NOT_FQDN(0.50)[];
+	HAS_REPLYTO(0.30)[pvorel@suse.cz];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.dk,suse.cz,suse.com,gmail.com,suse.de];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:replyto];
+	RCVD_COUNT_TWO(0.00)[2];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Spam-Level: 
 
-Hello, Boy.
+Hi all,
 
-On Fri, Jul 19, 2024 at 01:47:35AM +0000, Boy Wu (吳勃誼) wrote:
-...
-> If it is for readability, I think keeping using u64 sync instead of
-> replacing it with spinlock is better, because what u64 sync protects is
-> 64-bit data for 32-bit systems, while spinlock can be used for many
-> other reasons. The root cause of this issue is just the incorrect use
+LTP AIO DIO tests aiodio_sparse.c [1] and dio_sparse.c [2] (using [3]) slowed
+down on kernel 6.6 on Btrfs and XFS, when run with default parameters. These
+tests create 100 MB sparse file and write zeros (using libaio or O_DIRECT) while
+16 other processes reads the buffer and check only zero is there.
 
-Yeah, but it can't be used when there are multiple updaters.
+Runtime of this particular setup (i.e. 100 MB file) on Btrfs and XFS on the
+same system slowed down 9x (6.5: ~1 min 6.6: ~9 min). Ext4 is not affected.
+(Non default parameter creates much smaller file, thus the change is not that
+obvious).
 
-> of u64 sync. Adding back the missing spinlock for the correct usage of
-> u64 sync is simpler. Is there any benefit to replacing u64 sync with
-> spinlock?
+Because the slowdown has been here for few kernel releases I suppose nobody
+complained and the test is somehow artificial (nobody uses this in a real world).
+But still it'd be good to double check the problem. I can bisect a particular
+commit.
 
-It doesn't make sense to protect u64_sync with a spinlock. Both are only
-needed on 32bit. What's the point of having both? Also, note that iostat_cpu
-is also updated from two paths - bio issue and stat reset. If you want to
-keep that u64_sync, the only way to avoid possible deadlocks is adding
-spinlock in the bio issue path too, which will be pretty expensive.
+Because 2 filesystems affected, could be "Improve asynchronous iomap DIO
+performance" [4] block layer change somehow related?
 
-> > Also, for blkg_clear_stat(), we're running a slight chance of
-> > clearing of
-> > iostat_cpu racing against state updates from the hot path. Given the
-> > circumstances - stat reset is an cgroup1-only feature which isn't
-> > used
-> > widely and a problematic interface to begin with, I believe this is a
-> > valid
-> > choice but it needs to be noted.
-> 
-> I don't get this part, but if this is another issue, maybe another
-> patch would be better?
+Kind regards,
+Petr
 
-It's the same issue. Reset is another writer and whenever you have more than
-one writers w/ u64_sync, there's a chance of deadlocks. So, iostat_cpu also
-has two writers - bio issue and stat reset. If you want to keep using
-u64_sync in both places, the only way to do it is adding spinlock protection
-to both paths, which is an expensive thing to do for the bio issue path. So,
-here, we'd rather just give up and let stat resetting be racy on 32bit.
-
-Thanks.
-
--- 
-tejun
+[1] https://github.com/linux-test-project/ltp/tree/master/testcases/kernel/io/ltp-aiodio/aiodio_sparse.c
+[2] https://github.com/linux-test-project/ltp/tree/master/testcases/kernel/io/ltp-aiodio/dio_sparse.c
+[3] https://github.com/linux-test-project/ltp/tree/master/testcases/kernel/io/ltp-aiodio/common.h
+[4] https://kernelnewbies.org/Linux_6.6#Block_layer
