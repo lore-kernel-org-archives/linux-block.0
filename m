@@ -1,66 +1,65 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5323D144316
-	for <linux-block@vger.kernel.org>; Fri, 19 Jul 2024 15:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB8A1448C9
+	for <linux-block@vger.kernel.org>; Fri, 19 Jul 2024 15:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721403549; cv=none; b=qH1gf9qUafU+xoP00nNft97gxeu3tIqGTrJkyWAwWX7cOvShIIuRU73LoVAOoyNWgpsPWTu+nu97t54oO4LTa+DknCDZDrMuL6S0kYQOzJDwpvElI4jXxf2RZcxKeSHIrOC5eyXvu6BdGad7eZC6vfZVZRUyRZlnTsXXijxnOHw=
+	t=1721403549; cv=none; b=prYQEIFW4H9Cora2aTiJnirkzOVLPdderWCT4EHHIVbmB3YeqgGcjPLXIENxiVSAoI7QHeFiGU2SYrJGBAJ6EBwks5mhfOidypq2RkGVfgvQM1FKuRDCz3f+CqKyGV3m3TLxGMngVSJqrT7dI3W1+knS5SL15FIXB+5addTZK4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1721403549; c=relaxed/simple;
-	bh=ePCv7FrHAMQuHZByR0Lq3P3iY134Y6c6QShxRU3pue8=;
+	bh=F+8BO+nL9tUeStijZ7/zk/oJIQiMAzjjqxNdJwAMyPw=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Xk+MPdYZldEbcLPKODifuI/zhXjhsY8kSo37+XXOUZlNfhcI4vw9MEkIV9hK9c2wAMhhzFyGCshou138WEtVcxrWrsdlglsJAE42lQwQRE0sHFGvOcRyNfNUBgo5/LoI21psVfS5hQuVWceaSPiFutDaHMhNaF2GR0n3IIHmjYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ovAA7C23; arc=none smtp.client-ip=209.85.215.173
+	 MIME-Version:Content-Type; b=J49g7blaDAvBYGigxXLT9RgvZk3+SzB4XVOK0c6jHgeWhOSpix12nZi32MAtTsGDWxKn+qe0nLqcbWHDqg1bjZTVWT/PmAPaSlFM2rrS8ZbgWAsGvISyD253VkZRStR9cu5bHM8ljeW4192wbfxQuaw42vNmNOPx1y2SEK/Nv3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vb1ByTTP; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ovAA7C23"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-72703dd2b86so263621a12.1
-        for <linux-block@vger.kernel.org>; Fri, 19 Jul 2024 08:39:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vb1ByTTP"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70b22b785aaso36011b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 19 Jul 2024 08:39:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721403544; x=1722008344; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721403546; x=1722008346; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4gTt8DwdypGVam8YxhAR/m0jn8yv1n/KN+heoOXMT8k=;
-        b=ovAA7C234Smuo8JJNwF0wzXejCQUUNKoI/iPVah6/H6QxvOVlUl4JWGgVFWClmq91b
-         2+/zF06IPK+bqUKd+j/pEEGLDqHjPCj1L2o5GNFWKW7Xxw3B4SAQl6A4elnqU7ZI9n+T
-         KWQ+aGKkBq6/PO7r3FJy7DdaIwqwmfL1V84cQGkPKiJyEmTZQBNWkyR5AwKCreAHIycG
-         BvQfbYFX/l2L79AX/rxmUgiMzZIauBxDtP1U4SEo0/NzC2FbALHuI+/xmafCb8k+hOVz
-         JANvVumxZj3AI3hvqDh0wt8tGbo5NWx/oiRsyFWIySuP7zAEvlSSXpeu9aX0lvOBl+KA
-         OAHg==
+        bh=3Y45Z0aWbIeprdMq8sDDAIFPdliCDk9r0AJWqhvLPYw=;
+        b=vb1ByTTPLxKjHfH8XpgmL11fKEqFYvkc127ugyWhdLdK0VPruuRsvPvtBV09QpkweU
+         cqEJaSWBnQQjvkQetqHTAB7tf4jYtI0lA3IjWkq+bCuVFYYzS3GRxKMmIeHHDqqJ35km
+         nV4y++FZFo58B043HWPkOnSDso2TKPZYExicmEx18Lrl09uhLA5S1ngnwqD4FmDzuAgp
+         KlifUS9miesxVMawuGAShzgszHZcAIKC1GPYyzdYEwTO5PXTRxZWOEs1cfX+k7kWuktl
+         NF7qrzR2sEifkgXaO8AcyazPZ1S0J0XHArp7VPdrO5yrs5tSoYYPa4RFGySegRpQ7iqs
+         cmrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721403544; x=1722008344;
+        d=1e100.net; s=20230601; t=1721403546; x=1722008346;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4gTt8DwdypGVam8YxhAR/m0jn8yv1n/KN+heoOXMT8k=;
-        b=vqPu4WmrMXNnIP1KQq8glELLOC4bIBjmbVVJ37sTzq+7QEHnGYTMWTJ8+QAVQ8S0SU
-         OMm3I2lYPzr0/mdbzLwmi9MXyFkP+VZ9qIqsBSPYG5RFA5+XQE8sTfCAeMyB3cpG+K/1
-         hV4JesHe0HAnD0OEKpTkkN0JIEQtzr+9rqD2pKD7kznNK9lywGAlVS9kEFcYzk4mKnhH
-         KM9Ex3bZMutsvv5/iZcWynBmJut3+C1woDd8GSV4IQBAv1y1FcKVqOTfEsZWSWEiAsCz
-         t6iMiWia87GRVz7HGEweFfCkMYTEhUR4v0LtcZiOVKVm3rLAi3ycDRlNHGH6IKf/otpM
-         pdMw==
-X-Gm-Message-State: AOJu0YweWdZDvMzFhEwgnt1+XXKj0RYJ7HLttSrakeX+kgttW5nzqHzN
-	w92p8lIQR9/Gzro3/8BCTNFK8Tp20b+Uksej+3yB4aozsC3P/3H8gzuFxf/pAKqow4HVG5vU4oi
-	9eDY=
-X-Google-Smtp-Source: AGHT+IH5FXJwCaJXY+48M4dJBPSShl2xPForrjegT6TOsHYpxbCfZoB+ljSYgrtd3Jz5ULv7gGuetA==
-X-Received: by 2002:a17:90a:d38e:b0:2ca:8577:bce8 with SMTP id 98e67ed59e1d1-2cd15f572d6mr245403a91.2.1721403543775;
-        Fri, 19 Jul 2024 08:39:03 -0700 (PDT)
+        bh=3Y45Z0aWbIeprdMq8sDDAIFPdliCDk9r0AJWqhvLPYw=;
+        b=YKvIUvsSbJk7vJk9OYWmmjgY0Qz0vvhwtSVHycpUrodA5zCvZJazpWLcq6JMZFlTnH
+         //BNuLJf2U3ACxB1zR4pbIvfru2ceQzloBzlKRkOphoHKc9xAg2LB07WS6kqEH+67ESY
+         z8Pz2h8+PurgyzLGhsKjB905pXAuqPRbg0MGF8swdcxicEMGrQXEj6+9HOk3Ghgsv619
+         ByU5YW3IElaYgiSMQviJWnWBFk6s43gW15AJ03MfMu5dPLq3dty/0q8o+YWwmJDoQNiG
+         BjUi+8nhM0CO06c2SPIZDI+LX4vglKVvv5V4gYVdj9MzrMitBP/WeuEgL+ZDm4PgzRzH
+         KCGg==
+X-Gm-Message-State: AOJu0YyG8BY1OoRF2SkbJTIq0JXYFER0fFnCBqEyI3hkKtRxTjogxQr7
+	KV8Yso6mlhkynj7Wne00nzjHL+OKa44WuMVsbwob/BPlf4wNw3Zvv9W4zfSPdAg=
+X-Google-Smtp-Source: AGHT+IEjRqRmzclUos+dFxnPhen++ZHfL43eH/uNmW18o7F1OMwvwdKgrvgILJUX7PonpmivtolN8g==
+X-Received: by 2002:a05:6a21:6e4b:b0:1c3:b106:d293 with SMTP id adf61e73a8af0-1c42287e800mr274401637.3.1721403545947;
+        Fri, 19 Jul 2024 08:39:05 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cb77353847sm2969930a91.33.2024.07.19.08.39.02
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cb77353847sm2969930a91.33.2024.07.19.08.39.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jul 2024 08:39:03 -0700 (PDT)
+        Fri, 19 Jul 2024 08:39:04 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: hch@lst.de, John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org, bvanassche@acm.org
-In-Reply-To: <20240719112912.3830443-1-john.g.garry@oracle.com>
-References: <20240719112912.3830443-1-john.g.garry@oracle.com>
-Subject: Re: [PATCH v3 00/15] block: Catch missing blk-mq debugfs flag
- array members
-Message-Id: <172140354242.11595.1311965862995279441.b4-ty@kernel.dk>
-Date: Fri, 19 Jul 2024 09:39:02 -0600
+To: hexue <xue01.he@samsung.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20240718070817.1031494-1-xue01.he@samsung.com>
+References: <CGME20240718070823epcas5p14445a1ab8f8bf8a496405a1424ea067f@epcas5p1.samsung.com>
+ <20240718070817.1031494-1-xue01.he@samsung.com>
+Subject: Re: [PATCH v3] block: Avoid polling configuration errors
+Message-Id: <172140354394.11595.16629364160282327340.b4-ty@kernel.dk>
+Date: Fri, 19 Jul 2024 09:39:03 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,48 +71,27 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.0
 
 
-On Fri, 19 Jul 2024 11:28:57 +0000, John Garry wrote:
-> Currently we rely on the developer to remember to add the appropriate
-> entry to a blk-mq debugfs flag array when we add a new member.
+On Thu, 18 Jul 2024 15:08:17 +0800, hexue wrote:
+> This patch add a poll queue check, aims to help users to use poll tolls
+> accurately.
 > 
-> This has shown to be error prone.
-> 
-> Add compile-time assertions that we are not missing flag array entries.
+> If users do polled IO but device doesn't have poll queues, they will get
+> wrong perfromance data and waste CPU resources. So here adding a poll queue
+> check, if users do this misconfiguration, it will return users that device
+> does not support this operation, to help users adjust their configuration
+> promptly.
+> --
+> changes from v2:
+> - move check into block layer
+> - return -EOPNOTSUPP instead of print a warning in io_uring
+> v2: https://lore.kernel.org/io-uring/20240711082430.609597-1-xue01.he@samsung.com/T/#u
 > 
 > [...]
 
 Applied, thanks!
 
-[01/15] block: Add missing entries from cmd_flag_name[]
-        commit: 6b3789e6c5310a8f517796b0f4a11039f9e5cf8f
-[02/15] block: Add zone write plugging entry to rqf_name[]
-        commit: af54963f193533dd7c1fe8f3d4e7af18de2406d8
-[03/15] block: Add missing entry to hctx_flag_name[]
-        commit: 1c83c5375e2f1bc7b59fa3ec5aa1e5909ec8710c
-[04/15] block: remove QUEUE_FLAG_STOPPED
-        commit: c8f51feee135f37f0d77b4616083c25524daa7b0
-[05/15] block: Relocate BLK_MQ_CPU_WORK_BATCH
-        commit: 3dff6155733f25872530ad358c6f5559800f4ccb
-[06/15] block: Relocate BLK_MQ_MAX_DEPTH
-        commit: 793356d23f8a817e164a917c792741a6d6d651ed
-[07/15] block: Make QUEUE_FLAG_x as an enum
-        commit: 55177adf1837bc56f878f7f6f7123947a2088148
-[08/15] block: Catch possible entries missing from blk_queue_flag_name[]
-        commit: cce496de061d09794825b7c7c7d57faca4772d82
-[09/15] block: Catch possible entries missing from hctx_state_name[]
-        commit: 23827310cce7eff3477aeaeb59ea3718f5c9c633
-[10/15] block: Catch possible entries missing from hctx_flag_name[]
-        commit: 226f0f6afc3e5c8903c6e57e1f6073ad8ad189b5
-[11/15] block: Catch possible entries missing from alloc_policy_name[]
-        commit: 26d3bdb57ec3fa56eaf8d2e74b5d488e55f43013
-[12/15] block: Catch possible entries missing from cmd_flag_name[]
-        commit: 6fa99325ec86bcd442363d77561a1babd8d9a427
-[13/15] block: Use enum to define RQF_x bit indexes
-        commit: 5f89154e8e9e3445f9b592e58a7045e06153b822
-[14/15] block: Simplify definition of RQF_NAME()
-        commit: 2d61a6c2ca7aadce3771f81a3624848f97dcc39e
-[15/15] block: Catch possible entries missing from rqf_name[]
-        commit: 8a47e33f50dd779f94bc277c6d3de81672463c5e
+[1/1] block: Avoid polling configuration errors
+      commit: 73e59d3eeca4feaf0814a077df8ec5edc53ccf77
 
 Best regards,
 -- 
