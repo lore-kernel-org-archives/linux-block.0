@@ -1,122 +1,108 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDCA1474BC
-	for <linux-block@vger.kernel.org>; Fri, 19 Jul 2024 20:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D451A28B;
+	Sat, 20 Jul 2024 07:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721420491; cv=none; b=Cvw5UFbKRnYv1hjsozz8eWIuAWa2g//tkOYIAZu42lSuY798mYydVOY2yNIBIYXNCP5gNSwkm6s898n5HFVF6tbrQLSUgcur2diP9Ol+9OTDUFDsnPqbK7miP2/cFSxNIq90/6XXjcCkhEw1kyVeYqk/A+sEiuxY4/hJ012gJ+I=
+	t=1721459850; cv=none; b=UHeRgUOH41zne6peqmB0UcA23jyb00k8nQUQB8o0v1wQfwm+O4+C3xvu/gwEe0jVVRrxSGh+Pt7sCbi06yR+y4VjZW5wceUc4F7pFZRyKN82RgBO/NuddBM8K9yrRVxlmbaNbZ320h+uDYcD5cnEB3irhgC4+V5l6Mn5Y76ZzKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721420491; c=relaxed/simple;
-	bh=2bdZRPhF5gtq5KfiHg0howVDk4CBQylJ5J6dEvTrmyI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LtMtAnWFF4QAexLKP3ygdeVg9d1s2b2ROqaHTOtqggZZfr6ZDt4j3pDSfoujkCiBkkjbzUY4odleh+ZuUJHNqzmNDziBwuZ48f7oQN4siZ6VRh8Ul1kjP+/oGiYn2PXgRqvtXz+In93SuvA3GmYhyYVTsq8sRU7E1x7YotD5zjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TRA1j8ck; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TRA1j8ck"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1fb3460b416so3033515ad.0
-        for <linux-block@vger.kernel.org>; Fri, 19 Jul 2024 13:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721420489; x=1722025289; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7TdICET9y2kBW1nT7B+XzjYYxpouKddOEs+h65MAYd8=;
-        b=TRA1j8ckik8ax/Q1BwONUZwzcAG2ha8D7/6KofXQVTWrFpt8uPd34O2EbQGdfD/V8w
-         bP6KYG0Ki+X6Gm5rNIfwauAqo4ozwLDHtkhHIShri+wTc+TiwfnAkTPqBrRkHaWH7FLI
-         cMpPPDy+472BJSGfioMP7P7m7lkQ/Us+7Sct4Bf+JTLFeq4U7k922e1t3GE+V6G+wNGV
-         KP7FRCBmmN9KmCe8hIhOzrnUvoHcaTkbllRTzNjhVAKcpUlY7eGzDQ+k63VUyyxt/1zz
-         we9+m0E4z93IUyoxvu37nyeL8HptzMSHSY8EbPPprbiFUSeuB2H2N96MODsfU43uOzjK
-         46Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721420489; x=1722025289;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7TdICET9y2kBW1nT7B+XzjYYxpouKddOEs+h65MAYd8=;
-        b=DGUoZ1vAdzph2XtLtw6VkYaZ4wTvAmiM0nfvG/6og0QAhgHH2Bmluosy/5DJZX7J4K
-         HHn6CIeM/8GG//ohJFhFZfjjINdbyQAInMpPkmk5/AHFBIVAOwkKxN3yZP3KW8Hm4CuZ
-         QyAhQViSbwjtKiSQ3C7GCPEIWKe/ptUiGPiy8tGOL70SlsOc6l8NhWYn2AyiAQNR7cSO
-         yxx2uquydLablzi7x+ERto+tzF8vovrxKp+F+Q8PrOVLT//2r0n1fRjbRpNYw3DwtRt5
-         lFmhPx4qtyb0r4bUtBWUsR3KkNyGLHtXmM8LxRppAFwVSw+TfFUKJinOdIShuCK3Wtms
-         9YPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWZluFNpbLC17VWKehdCG72qZBVRhf+tyrvkRIK7tcC5ck58+iBzXMRgvErQ/HohnwPH0v8Vnq21Z5wjxE173K0QD88Vt4wUwUUTXY=
-X-Gm-Message-State: AOJu0YxCVHeBVnc6U6e5qUzE6FHQ8bmaLX78dwjk0+Omp5Bk0K6Mc583
-	yxPS2Q7grpa7Y9Wf83eLbQhDYbL2QqdEFBlRj0wunhFz+991bzbv9zfgyEYwOqQ=
-X-Google-Smtp-Source: AGHT+IFBmO+K7zL/agidVg2Z92TSxmmwPsuaZhiJ7FdU+invzsnYzP+ED6r48gQMg6agGpkBHJtLpw==
-X-Received: by 2002:a05:6a21:6e4b:b0:1c3:b106:d293 with SMTP id adf61e73a8af0-1c42287e800mr783432637.3.1721420488617;
-        Fri, 19 Jul 2024 13:21:28 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff552c39sm1565712b3a.136.2024.07.19.13.21.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jul 2024 13:21:27 -0700 (PDT)
-Message-ID: <173c7d32-2fae-40e4-a1d8-490cee3bba15@kernel.dk>
-Date: Fri, 19 Jul 2024 14:21:25 -0600
+	s=arc-20240116; t=1721459850; c=relaxed/simple;
+	bh=g33cO39/dECaVib2E4a0T9tP60uC6g8GGtd/8FIiKsw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=mQX5jLBb8hf2ykBTp7apFJei6VJqOHhQsBWXT9MoQSt/A7SMGr6BcJWPgQBEEF2i+DYHbzsq2b4xtPjWQzPsluIQoBC46bZSlmXF4ikXuTiE1ZJSISnJ8FGJMwLFwEaKficNhGTULgqMXFV8XVUWnrkF6L9TUNtpMufwX/Cqc34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WQyXl2wnRz4f3kvw;
+	Sat, 20 Jul 2024 15:17:11 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id BD85E1A07E8;
+	Sat, 20 Jul 2024 15:17:24 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgA3GzmCZJtmyCyWAg--.45887S3;
+	Sat, 20 Jul 2024 15:17:24 +0800 (CST)
+Subject: Re: [PATCH v2 1/3] blk-cgroup: check for pd_(alloc|free)_fn in
+ blkcg_activate_policy()
+To: Bart Van Assche <bvanassche@acm.org>,
+ Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240719023431.3800647-1-yukuai1@huaweicloud.com>
+ <20240719023431.3800647-2-yukuai1@huaweicloud.com>
+ <Zpn5zvcC4TbDxeKU@infradead.org>
+ <ab8f117b-0e0a-4157-b261-471328f6b4e3@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <febb4bcb-5908-382f-db9a-42b62347aa7e@huaweicloud.com>
+Date: Sat, 20 Jul 2024 15:17:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Slow down of LTP tests aiodio_sparse.c and dio_sparse.c in
- kernel 6.6
-To: Petr Vorel <pvorel@suse.cz>
-Cc: ltp@lists.linux.it, linux-block@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-xfs@vger.kernel.org,
- fstests@vger.kernel.org, Jan Kara <jack@suse.cz>,
- David Sterba <dsterba@suse.com>, Filipe Manana <fdmanana@suse.com>,
- Amir Goldstein <amir73il@gmail.com>, Cyril Hrubis <chrubis@suse.cz>,
- Andrea Cervesato <andrea.cervesato@suse.com>, Avinesh Kumar <akumar@suse.de>
-References: <20240719174325.GA775414@pevik>
- <a59b75dd-8e82-4508-a34e-230827557dcb@kernel.dk>
- <20240719201352.GA782769@pevik>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240719201352.GA782769@pevik>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ab8f117b-0e0a-4157-b261-471328f6b4e3@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgA3GzmCZJtmyCyWAg--.45887S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrKw43Gw1DGry8CF13Wry7Awb_yoWDCFb_Ww
+	s8ury2g3srJw40yayDtr1qvrZ7Kryrtr18Xr15CFW5GFs0gas5Gr15Xwn5Gw1fGw4jvryU
+	C390vayayr429jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbfAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 7/19/24 2:13 PM, Petr Vorel wrote:
-> Hi Jens, all,
-> 
->> On 7/19/24 11:43 AM, Petr Vorel wrote:
->>> Hi all,
-> 
->>> LTP AIO DIO tests aiodio_sparse.c [1] and dio_sparse.c [2] (using [3]) slowed
->>> down on kernel 6.6 on Btrfs and XFS, when run with default parameters. These
->>> tests create 100 MB sparse file and write zeros (using libaio or O_DIRECT) while
->>> 16 other processes reads the buffer and check only zero is there.
-> 
->>> Runtime of this particular setup (i.e. 100 MB file) on Btrfs and XFS on the
->>> same system slowed down 9x (6.5: ~1 min 6.6: ~9 min). Ext4 is not affected.
->>> (Non default parameter creates much smaller file, thus the change is not that
->>> obvious).
-> 
->>> Because the slowdown has been here for few kernel releases I suppose nobody
->>> complained and the test is somehow artificial (nobody uses this in a real world).
->>> But still it'd be good to double check the problem. I can bisect a particular
->>> commit.
-> 
->>> Because 2 filesystems affected, could be "Improve asynchronous iomap DIO
->>> performance" [4] block layer change somehow related?
-> 
->> No, because that got disabled before release for unrelated reasons. Why
->> don't you just bisect it, since you have a simple test case?
-> 
-> Jens, thanks for info. Sure, I'll bisect next week and report.
-> 
-> The reason I reported before bisecting is because it wouldn't be the
-> first time the test was "artificial" and therefore reported problem
-> was not fixed. If it's a real problem I would expect it would be also
-> caught by other people or even by fstests.
+Hi,
 
-Didn't look at the test cases, so yeah may very well be bogus. But it
-also may not... And a bisection may help shine some light on that too,
-outside of just highlighting what commit made it slower.
+在 2024/07/20 0:25, Bart Van Assche 写道:
+> On 7/18/24 10:29 PM, Christoph Hellwig wrote:
+>> On Fri, Jul 19, 2024 at 10:34:29AM +0800, Yu Kuai wrote:
+>>> +    /*
+>>> +     * Make sure cpd/pd_alloc_fn and cpd/pd_free_fn in pairs, and 
+>>> policy
+>>> +     * without pd_alloc_fn/pd_free_fn can't be activated.
+>>> +     */
+>>>       if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
+>>>           (!pol->pd_alloc_fn ^ !pol->pd_free_fn))
+>>>           goto err_unlock;
+>>> -- 
+>>
+>> I know this is existing code, but can you fix up the incorrect
+>> indentation while you touch this:
+>>
+>>       if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
+>>           (!pol->pd_alloc_fn ^ !pol->pd_free_fn))
+> 
+> Using xor (^) for booleans seems weird to me. Is there any preference in
+> Linux kernel code whether to use ^ or != to check whether to booleans
+> are different?
 
--- 
-Jens Axboe
+I don't know, but I feel more comfortable to use '!=' myself.
+
+Thanks,
+Kuai
+
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> .
+> 
 
