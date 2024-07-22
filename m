@@ -1,85 +1,94 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60A51CF83
-	for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 18:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D0E1CF83
+	for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 18:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721673248; cv=none; b=dP9eF9Hk4+t+1cUFqJEk4OCLRt3pZZo96q6MWc1PJd8GcUtKgNK7bBEno1pXgzU7rtwiGFGz7tQYomwJNY1226MKJ0dVxK68oOqGBw/z3ET+zedDW3CVTKYNShTLzO3O012H4qLhmc4zXGtb5TCXTK/qy/RoGZzMRragt7Ze9bg=
+	t=1721673332; cv=none; b=YEh/11J/cPrJPCjDSUeEOlYhOYtSuFv/BX0bCcXEV2eHKwMOjYlpdURfx/qOhTwVc7jjX4MykSt4DilzLk8OEGUNk+bELLxI8LMlBm5Lj2G45uliyUqnG6yRn3JrFXn8yS6KNeUob28vuM0qPEZveVcXDVZkh1nBFw/i9ip36F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721673248; c=relaxed/simple;
-	bh=MSU5S4V+t38USte59PcMgw5GmQljSrHol8w9IdUg2XQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B0cymdcqyrUDpY2j2ITjFzQt4L0WIGK7sZwxwiPR6hb01iIIKBhLixn3SE72Ri+CFbqkfp844BrPHgU1Ucw3t/u8ZHuB7FEBnia5ARLsu5eGphRE7i06rmybZjcfKEWVO4V3quXVWqrS+Y58144YRRgvXlq3BRwbsa7udE5f52s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=hEj0UYvT; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1721673332; c=relaxed/simple;
+	bh=1YkRfjJYK+v2WeTTZB/f3vz7KrZOC3goeVcTxWDizWM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mh74YrQZiZDfPTwiJENceRP8doPggh7A4evGTu8TzVN5fLunurqKNmomwgnXYmmP3geZ9PpWVuLKSSf+hVJOvphPTU32o82EC9md7ZlYDXmGuBU+qt7r1rFXiZgHP8Ds2MbDRcFn81sotxg3a6hJsgH7G+jK/VckIfW7tLUImuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=v8iprpZo; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="hEj0UYvT"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52f04b3cb33so2349573e87.0
-        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 11:34:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="v8iprpZo"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3d9db1eb9e1so351454b6e.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 11:35:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1721673243; x=1722278043; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IYMflACHpw89XVKfwMzWogugqWjlq2hKPfUFOYlPunM=;
-        b=hEj0UYvTppjNoiu5CfbqA2wjsCzA+WIS6adOV+tH2R0JxJw4e9dU8cMfHgiEwJ3EoV
-         3t8cdjjukzRalhOtvCs+cSHbxcjUV59h4k5xsmzUD2+QUhA6hNdjUIpnR5ZHn/8OeEub
-         vkExARM5EFgngf/CehWnV+5B51q60pwTFC9Lg=
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721673327; x=1722278127; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3Wy3kNJM/AIcd/f42JHEVSdo0AihN0SXrXnST2xpsoU=;
+        b=v8iprpZoHthD2JWfyVWONQmBBLW8OB3ieNNcnKli5FxiV/Oy3UbEnDbb/Cx/JXm9Ey
+         3nAoxR+ayyvUTkt2pctJTq0f9uhzVGLw1GTe6ikdJhfm4FHol1T8gyABVmkzLxr2UIzA
+         GJPqM3e3KnorpEAECo46DdRY9dXuhek6zOAUpF3id/slT2g78jxwsOB4z/zUKX5xgu62
+         1Xy+7s2l33Vqs7CCY3t7nnjomeeY2qfkE1ovbYIfPT6qgmWXnbD2rUENZJxEP1s1q+cJ
+         ZA2ykJPB6d3Xow7o2gF2COsUqzNHCp4nv0jlLhfLuZCat4ZDxWHPUK4FIeMbd/DEOaaK
+         afQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721673243; x=1722278043;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IYMflACHpw89XVKfwMzWogugqWjlq2hKPfUFOYlPunM=;
-        b=TrDhpunwrqA741t6+T1oM8JJ7QHeKSuN+0Jql5mnVzL5qoV8W7+D3Pxgo5kMy8k7mA
-         8T8N0pYVlT998PjqhYvKhpyXhMZfhT3yvWvrrqeMfqG09bdEWEIxDdrdC7Qo8HlmUIZ6
-         J4mfJ72FIwtfgt5LaqoKiPMf+0HzizNqK+nI6C1P7uvJx6J9ltoU1eGwH+Pa3xSU/e9p
-         itDNbq7hUf55JEMZ8bG4e7r3EmQJ4QdyEBU52wxzYyOn+wFFoizrE3gGib3iW1b60anB
-         rk4krdQrSPDHMNrC/x3xqqb7lZfdBQbAdZWs3vDbpu1fD2KQJnG7RoBv47Vj9LVSLZpX
-         vNEA==
-X-Gm-Message-State: AOJu0YxGSlLNeCJZkdwR38VtXPKnTSp8o+yvjr1ZChT+OLWzinm+XYc2
-	p+H2FL3MuToI/38C2tjxs7jUVCkYI6fC8qBIiIvkwgVlE1tfd+8f2IQleYcPCGAnCqDR5ekgpJe
-	eIfM=
-X-Google-Smtp-Source: AGHT+IHb49lajwvwa6aZeGYO58cJOnlqLLp1XxMeCSMc5uDghsv4gQ+oShJVEuFn5C7MZ8PPfOw+rQ==
-X-Received: by 2002:a05:6512:10c2:b0:52c:9ae0:beed with SMTP id 2adb3069b0e04-52efb7cafdamr6261237e87.52.1721673243243;
-        Mon, 22 Jul 2024 11:34:03 -0700 (PDT)
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7a3c785d4esm450170666b.31.2024.07.22.11.34.02
-        for <linux-block@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1721673327; x=1722278127;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Wy3kNJM/AIcd/f42JHEVSdo0AihN0SXrXnST2xpsoU=;
+        b=NWPCdsje3h8MtYPXt3qZOrpRsBUhTdyALENP8URlsGwf6KpJerf5ICiqJaJHtfPOWa
+         E9hbWg7tizmP7o5kuUjoniT+dMGNMj58LtYXpMRZojOOE4cboyJqd3tDKxKjwhTEDfNI
+         WmedtlTbqvp3zoFwxknYsF27/7y2cgC3WNl6gtbqKkA4TyPdQ6Y4NPl/IVw8rDdarpPq
+         rEI4sUlJNQOAzonvSz4D3sIcD5pBaCHEPVCWH27I6uXTKYajYUOQyMwHrsM10TsZZY5L
+         4LomQqnqhbMt2V8z6A7OXHtYo5LIf8kLajDOUgJZI3/hgTjrnMmA4RhxkqwRiGtipwVB
+         bKaA==
+X-Gm-Message-State: AOJu0YyK++f7PaitTIeZd7y2QG4vYb9zKySWEQxcMZgyqfV+4aPyIE0y
+	oH+Kl3cJpcHa+5Ki0whqkYAgVu11x4SU1+pY+KfAmyhSMas6MV+0Zx/TWEcoXHmlxhFyd15oZGq
+	V2QQ=
+X-Google-Smtp-Source: AGHT+IEoQU7+Z6txbdlB186vto4v/00swp2Oa5fVCjOwu4F+pG8NlWyQ6tSrkMvQgWH/rQA640gBTw==
+X-Received: by 2002:a05:6830:63c5:b0:708:b80a:de0b with SMTP id 46e09a7af769-708fdbb972dmr4049433a34.4.1721673327507;
+        Mon, 22 Jul 2024 11:35:27 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-708f60a4b4esm1639136a34.15.2024.07.22.11.35.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jul 2024 11:34:02 -0700 (PDT)
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5a1c496335aso1906168a12.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 11:34:02 -0700 (PDT)
-X-Received: by 2002:a05:6402:35d5:b0:57d:3df:f881 with SMTP id
- 4fb4d7f45d1cf-5a478b65c3amr5392684a12.3.1721673242210; Mon, 22 Jul 2024
- 11:34:02 -0700 (PDT)
+        Mon, 22 Jul 2024 11:35:26 -0700 (PDT)
+Message-ID: <ba203fb5-9bde-40e0-9cb8-7026a49dc1fc@kernel.dk>
+Date: Mon, 22 Jul 2024 12:35:26 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <505fe3f1-27bb-4791-b4c2-12c99d0da624@kernel.dk>
-In-Reply-To: <505fe3f1-27bb-4791-b4c2-12c99d0da624@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 22 Jul 2024 11:33:44 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whqD58W_cn_2vE12ZGTJHboT+iQ4SYC7YPTP6ApXjB8bw@mail.gmail.com>
-Message-ID: <CAHk-=whqD58W_cn_2vE12ZGTJHboT+iQ4SYC7YPTP6ApXjB8bw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [GIT PULL] Follow-up block changes for 6.11-rc1
-To: Jens Axboe <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <505fe3f1-27bb-4791-b4c2-12c99d0da624@kernel.dk>
+ <CAHk-=whqD58W_cn_2vE12ZGTJHboT+iQ4SYC7YPTP6ApXjB8bw@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHk-=whqD58W_cn_2vE12ZGTJHboT+iQ4SYC7YPTP6ApXjB8bw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 22 Jul 2024 at 06:57, Jens Axboe <axboe@kernel.dk> wrote:
->
->   git://git.kernel.dk/linux.git for-6.11/block
+On 7/22/24 12:33 PM, Linus Torvalds wrote:
+> On Mon, 22 Jul 2024 at 06:57, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>>   git://git.kernel.dk/linux.git for-6.11/block
+> 
+> This is not a signed tag.
+> 
+> You actually meant tags/for-6.11/block-20240722
 
-This is not a signed tag.
+Gah sorry, yes that's the right tag.
+> I've pulled that, but please check your workflow and correct whatever
+> went wrong here,
 
-You actually meant tags/for-6.11/block-20240722
+Thanks. Looks like I inadvertently used the branch instead of the tag
+for the script :/
 
-I've pulled that, but please check your workflow and correct whatever
-went wrong here,
+-- 
+Jens Axboe
 
-              Linus
+
