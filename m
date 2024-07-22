@@ -1,166 +1,122 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E8516A38B;
-	Mon, 22 Jul 2024 13:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D491316D9D0
+	for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 13:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721654040; cv=none; b=FVEkexlv9qzpIHrkaLc7QpjBZBtgpiFgDnFbGRzrJMpQV3fRqdISMEqIMYMzRnh5RhChvHOD/Gu8toH+IEyObwEsonPXNtVA/kjgIatyZ7MswHYM0KI2opaO84OVWC6zTzEyjc+KYgtLMcrSiYJtVVSmkhn7UA+4R6h2UJsgQtg=
+	t=1721656326; cv=none; b=bGnoTEkmqxxpliblfZQg0WSGcHdo2fUyB/kEmCN18uQGs6NEOUSmjbz71OuNuLiLOFaAXXF6iPJ+j5gQ5MA3RgTFiegqk+iAkMdANDwlWZfK+TFmFSKEo1jQX/JkcgmwhV/GsSm2vg/58fuUSpYMqSecYUVt4XjbfEsXcs43kFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721654040; c=relaxed/simple;
-	bh=E7rO4+raxSImGQ+Lcvo8Hj4gA2KG0L/pi5voylWaDJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bU3DxlBjasT2jpgJzLakyzzzCX7E1C3NLmvn9ZsZe+5Jny1ZPvLYCOJCtf1hO3pIuVPsDXxt19pYfuJhoxZgpmRxBT9csMdWdqZ0zx2VfnC2IJhTKBAqloE2CKFinN9gAm9Y5RGJqwmjuN5JfgvbhgCeSW2RYgihFC55/6QLUGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=DnrlcPpe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=k8V40oSO; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=DnrlcPpe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=k8V40oSO; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1721656326; c=relaxed/simple;
+	bh=oslvVjlL9bBAKgAZAmJYTp/sRU6Pd4qruSleAFmI0cY=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=o7w7uUVAZmq77tqQ/ca3XTGFN99Gn6zCndtc8bb//RPUe30r/KWxQ/l5YiCfCngcYOHZi1BPvYeTpH0AZ3a3Ug3EcGcJUDamCXObpJ/toSQtTAav/i3fLXhA/9yUodgORSX3Deh5goVb22JlXj9JVVp46iUoWFhTV7JVgs1jdI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zGocYcYW; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="DnrlcPpe";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="k8V40oSO";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="DnrlcPpe";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="k8V40oSO"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AE43121B49;
-	Mon, 22 Jul 2024 13:13:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1721654036;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eO+kWLDsrIeY9mjf6qkCfwNZXpmlrMP0lUZZv7XChsI=;
-	b=DnrlcPpe3Ryh2Ac3vewtY2k6bQM7+wu1YJX0CahKi3yE5N51G3zL9WEWenroKYneSNCzNd
-	w555qxHnXtiJZR9Afm1rRveVOyBW98iPQ+z45anB2ErQcKEV+4tW389x4eZWDYTEO3hNwh
-	BzHY/Tc2fETyKXkf98u+qG1+/CGek3w=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1721654036;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eO+kWLDsrIeY9mjf6qkCfwNZXpmlrMP0lUZZv7XChsI=;
-	b=k8V40oSOrSysVQaDlq2nGICzlZsL88be1X8mCxHYWPSMTc2GVbatr7G9syghOi9DKL7AJT
-	9/FwoaozLW3hZbBw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=DnrlcPpe;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=k8V40oSO
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1721654036;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eO+kWLDsrIeY9mjf6qkCfwNZXpmlrMP0lUZZv7XChsI=;
-	b=DnrlcPpe3Ryh2Ac3vewtY2k6bQM7+wu1YJX0CahKi3yE5N51G3zL9WEWenroKYneSNCzNd
-	w555qxHnXtiJZR9Afm1rRveVOyBW98iPQ+z45anB2ErQcKEV+4tW389x4eZWDYTEO3hNwh
-	BzHY/Tc2fETyKXkf98u+qG1+/CGek3w=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1721654036;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eO+kWLDsrIeY9mjf6qkCfwNZXpmlrMP0lUZZv7XChsI=;
-	b=k8V40oSOrSysVQaDlq2nGICzlZsL88be1X8mCxHYWPSMTc2GVbatr7G9syghOi9DKL7AJT
-	9/FwoaozLW3hZbBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6B3AB136A9;
-	Mon, 22 Jul 2024 13:13:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id DzdLGRRbnmZgMwAAD6G6ig
-	(envelope-from <pvorel@suse.cz>); Mon, 22 Jul 2024 13:13:56 +0000
-Date: Mon, 22 Jul 2024 15:13:54 +0200
-From: Petr Vorel <pvorel@suse.cz>
-To: Jan Kara <jack@suse.cz>
-Cc: ltp@lists.linux.it, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-xfs@vger.kernel.org,
-	fstests@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	David Sterba <dsterba@suse.com>, Filipe Manana <fdmanana@suse.com>,
-	Amir Goldstein <amir73il@gmail.com>, Cyril Hrubis <chrubis@suse.cz>,
-	Andrea Cervesato <andrea.cervesato@suse.com>,
-	Avinesh Kumar <akumar@suse.de>
-Subject: Re: [RFC] Slow down of LTP tests aiodio_sparse.c and dio_sparse.c in
- kernel 6.6
-Message-ID: <20240722131354.GA858324@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20240719174325.GA775414@pevik>
- <20240722090012.mlvkaenuxar2x3vr@quack3>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zGocYcYW"
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7a20ab5997eso94725a12.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 06:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721656322; x=1722261122; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FnwrOq4JX1x44i2N6FR6eZ3sfwu4QJiy3eMq/H6ePlM=;
+        b=zGocYcYWxgGlm9Qbs6hC1NbcAINsFFAWEtJzj8+OzJYOD4yeh2/aRgz/yIt2al7qNp
+         pOucoxpLqeem+LGaJP4b6hJ+ty9CBC7wFKYGCH8ro/4xTTR4JHK/qG9EQFJeLvU1eVwl
+         6w7g2+Z1pYIda8u/+CXu8dgaO7aqfs8KLPE15halwAd5GWWmk8z7wd1IEDd7kboAmbBj
+         Yshf3RyrDmnayBMhPxiozq6DFZ40FFTLxZxpxLUonIXVgZHK8TNVIKqbPAQ9JELrPbsE
+         cjoGF8cOL6ddDO6+qPX5gOH141EITq5n321lppl+yYSGSnklVuRjs+KT6ehhIwWT2S5G
+         n+BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721656322; x=1722261122;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FnwrOq4JX1x44i2N6FR6eZ3sfwu4QJiy3eMq/H6ePlM=;
+        b=Wp49HRCE8JjZR5yaeJyCIafA4QbHmA6hItubqYQtgNptBzan+QhB8jXpt+lRJ7qrOW
+         EsQPCAXgKPwCS1T5TWXyi2mN94dq7EcHFFB3j3pAosIh2k13UsvMvH+fXU25kIhtBem6
+         RGkRbZJDmhvzoOsYdBpp9Nfw6H5KRw8gF2CbSxH8xDTo3zlED8mr6SHWVmI3o/7Q3xtw
+         QQgtthmmUwqN5pyBHuetFNXfKSKjxQ4c8e2cCXIOBE8Xthy/Diuge/JzeXYdqs/k8OKe
+         VdB1Af3nLHyxYsFXtYAUrRRiL8RjzRsXF/5QfWGEjjMm46X++JgixVHed23KpgPBvcwM
+         3Z5Q==
+X-Gm-Message-State: AOJu0YxQgnVWZ06MRmze+zs19N/c1v9JfNjBluZZiOuhTdh5kH/Z5cLF
+	AoHGumEbd+Pg5dYnfh/72b8k73QXVjnbm5cd5pOiAAASmcrW4rVROHYo+E6uOqco8LyJYHoSX1+
+	upGI=
+X-Google-Smtp-Source: AGHT+IGaK2a+XeeCW+SqU2aG/QPxLLrWQxYWI0uf0DiPyUbuDCRZXncakzITEfckWaZPCm1BjRqjcw==
+X-Received: by 2002:a05:6a21:e89:b0:1be:c3fc:1ccf with SMTP id adf61e73a8af0-1c42285ddefmr7193309637.2.1721656321739;
+        Mon, 22 Jul 2024 06:52:01 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ccf7c76fe7sm6997279a91.33.2024.07.22.06.52.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jul 2024 06:52:01 -0700 (PDT)
+Message-ID: <5e4f743c-9919-4c9d-92cd-2bfabb4ff35e@kernel.dk>
+Date: Mon, 22 Jul 2024 07:52:00 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240722090012.mlvkaenuxar2x3vr@quack3>
-X-Spam-Score: -3.51
-X-Rspamd-Action: no action
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: AE43121B49
-X-Spamd-Result: default: False [-3.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	HAS_REPLYTO(0.30)[pvorel@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.it,vger.kernel.org,kernel.dk,suse.com,gmail.com,suse.cz,suse.de];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:replyto];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	REPLYTO_EQ_FROM(0.00)[]
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block integrity mapping updates
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Jan, all,
+Hi Linus,
 
-> Hi!
+Set of cleanups and fixes for the block integrity support. Sent
+separately from the main block changes from last week, as they depended
+on later fixes in the 6.10-rc cycle.
 
-> On Fri 19-07-24 19:43:25, Petr Vorel wrote:
-> > LTP AIO DIO tests aiodio_sparse.c [1] and dio_sparse.c [2] (using [3])
-> > slowed down on kernel 6.6 on Btrfs and XFS, when run with default
-> > parameters. These tests create 100 MB sparse file and write zeros (using
-> > libaio or O_DIRECT) while 16 other processes reads the buffer and check
-> > only zero is there.
+Please pull!
 
-> So the performance of this test is irrelevant because combining buffered
-> reads with direct IO writes was always in "better don't do it" territory.
-> Definitely not if you care about perfomance.
 
-Thanks a lot for having a look, Jan!
+The following changes since commit 98d34c087249d39838874b83e17671e7d5eb1ca7:
 
-> > Runtime of this particular setup (i.e. 100 MB file) on Btrfs and XFS on the
-> > same system slowed down 9x (6.5: ~1 min 6.6: ~9 min). Ext4 is not affected.
-> > (Non default parameter creates much smaller file, thus the change is not that
-> > obvious).
+  xen-blkfront: fix sector_size propagation to the block layer (2024-07-02 08:58:12 -0600)
 
-> But still it's kind of curious what caused the 9x slow down. So I'd be
-> curious to know the result of the bisection :). Thanks for report!
+are available in the Git repository at:
 
-I'm already working on it, report soon.
+  git://git.kernel.dk/linux.git tags/for-6.11/block-post-20240722
 
-Kind regards,
-Petr
+for you to fetch changes up to 74cc150282e41c6c0704cd305c9a4392dc64ef4d:
 
-> 								Honza
+  block: don't free the integrity payload in bio_integrity_unmap_free_user (2024-07-03 10:21:16 -0600)
+
+----------------------------------------------------------------
+for-6.11/block-post-20240722
+
+----------------------------------------------------------------
+Christoph Hellwig (6):
+      block: split integrity support out of bio.h
+      block: also return bio_integrity_payload * from stubs
+      block: don't call bio_uninit from bio_endio
+      block: call bio_integrity_unmap_free_user from blk_rq_unmap_user
+      block: don't free submitter owned integrity payload on I/O completion
+      block: don't free the integrity payload in bio_integrity_unmap_free_user
+
+Jens Axboe (1):
+      Merge tag 'v6.10-rc6' into for-6.11/block-post
+
+ block/bio-integrity.c         |  87 +++++++------------
+ block/bio.c                   |  16 +++-
+ block/blk-map.c               |   3 +
+ block/blk.h                   |  14 ++-
+ block/bounce.c                |   2 +-
+ drivers/md/dm.c               |   1 +
+ drivers/nvme/host/ioctl.c     |  16 ++--
+ drivers/scsi/sd.c             |   3 +-
+ include/linux/bio-integrity.h | 152 +++++++++++++++++++++++++++++++++
+ include/linux/bio.h           | 156 ----------------------------------
+ include/linux/blk-integrity.h |   1 +
+ 11 files changed, 222 insertions(+), 229 deletions(-)
+
+-- 
+Jens Axboe
+
