@@ -1,58 +1,58 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D491316D9D0
-	for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 13:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D57716D9C6
+	for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 13:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721656326; cv=none; b=bGnoTEkmqxxpliblfZQg0WSGcHdo2fUyB/kEmCN18uQGs6NEOUSmjbz71OuNuLiLOFaAXXF6iPJ+j5gQ5MA3RgTFiegqk+iAkMdANDwlWZfK+TFmFSKEo1jQX/JkcgmwhV/GsSm2vg/58fuUSpYMqSecYUVt4XjbfEsXcs43kFE=
+	t=1721656633; cv=none; b=rkXm+vQ+Ql/hW83jWZmEzzczAVPtLdXeswimwZ0mehDAFbkZ46/IVltmEZ/gyfgtzbdWMv73bO/ZmsG/dNBHCgy+Ei68w5OxyKIWW27dqv2lkjCMKoUbj3pp+BhaxVgmd4RT4ngA22oHTgfaz+f1JvikbK0b8QAWCDN9VVan0G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721656326; c=relaxed/simple;
-	bh=oslvVjlL9bBAKgAZAmJYTp/sRU6Pd4qruSleAFmI0cY=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=o7w7uUVAZmq77tqQ/ca3XTGFN99Gn6zCndtc8bb//RPUe30r/KWxQ/l5YiCfCngcYOHZi1BPvYeTpH0AZ3a3Ug3EcGcJUDamCXObpJ/toSQtTAav/i3fLXhA/9yUodgORSX3Deh5goVb22JlXj9JVVp46iUoWFhTV7JVgs1jdI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zGocYcYW; arc=none smtp.client-ip=209.85.215.171
+	s=arc-20240116; t=1721656633; c=relaxed/simple;
+	bh=eYSh8jI4hweP8NnvZkr/LQy4UID6pERkGFTbGnYC9GM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=egvb42i1odaKvX9/FvXZ6d2LHeLONubPZMxzhiZHMQ1IjeWP6Hvq0/iIyrpa9o7C6ihRoN5Y4IzcJXFoczfoJZYPzj2xqYCIwxpr/lq4/onkbiPk7vmABRkj6EXnCp2TpLT8mZYMevjO8dgWJMwHlVvDmM6QPDOkU9NSEY3vg1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Wx+0d5E+; arc=none smtp.client-ip=209.85.210.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zGocYcYW"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7a20ab5997eso94725a12.2
-        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 06:52:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Wx+0d5E+"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-70378348d59so210866a34.1
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 06:57:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721656322; x=1722261122; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721656629; x=1722261429; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
          :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FnwrOq4JX1x44i2N6FR6eZ3sfwu4QJiy3eMq/H6ePlM=;
-        b=zGocYcYWxgGlm9Qbs6hC1NbcAINsFFAWEtJzj8+OzJYOD4yeh2/aRgz/yIt2al7qNp
-         pOucoxpLqeem+LGaJP4b6hJ+ty9CBC7wFKYGCH8ro/4xTTR4JHK/qG9EQFJeLvU1eVwl
-         6w7g2+Z1pYIda8u/+CXu8dgaO7aqfs8KLPE15halwAd5GWWmk8z7wd1IEDd7kboAmbBj
-         Yshf3RyrDmnayBMhPxiozq6DFZ40FFTLxZxpxLUonIXVgZHK8TNVIKqbPAQ9JELrPbsE
-         cjoGF8cOL6ddDO6+qPX5gOH141EITq5n321lppl+yYSGSnklVuRjs+KT6ehhIwWT2S5G
-         n+BQ==
+        bh=MvI3GQ4C89Lan7kG6Dr+E3WKZclgag45bdH3FgwbtcY=;
+        b=Wx+0d5E+t+YfOOojyKo33KU/qMydoTf7j6KMR2gjMlVL9Jq+d0saiadln2yz4sUePY
+         W61oGo/b3t1zfWDsriFDpjVVzWszjie4Fei9tYhLHt23sYWz/hUcjF4oQb6BF94UQMUo
+         ESWtPTqUb7HEzuHzAXm2KROz903Y2ps9EnaFbQ+OwVhvWAJPaE4k5p4LiFzwcuNIbfJA
+         Rv2fRSr3qAVNaSqv1oCqN5G12/S3tV3a5QQNYvH22CIjBMpDJSLKcyjNgw5VWMU0maQm
+         zsQxuafaNGBIU5zKJs2rKQZ1GdMWpUzhTUpbn3h9q5ixJVQStV4SCI+mUgbTzePlvXHm
+         UARA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721656322; x=1722261122;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
+        d=1e100.net; s=20230601; t=1721656629; x=1722261429;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
          :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=FnwrOq4JX1x44i2N6FR6eZ3sfwu4QJiy3eMq/H6ePlM=;
-        b=Wp49HRCE8JjZR5yaeJyCIafA4QbHmA6hItubqYQtgNptBzan+QhB8jXpt+lRJ7qrOW
-         EsQPCAXgKPwCS1T5TWXyi2mN94dq7EcHFFB3j3pAosIh2k13UsvMvH+fXU25kIhtBem6
-         RGkRbZJDmhvzoOsYdBpp9Nfw6H5KRw8gF2CbSxH8xDTo3zlED8mr6SHWVmI3o/7Q3xtw
-         QQgtthmmUwqN5pyBHuetFNXfKSKjxQ4c8e2cCXIOBE8Xthy/Diuge/JzeXYdqs/k8OKe
-         VdB1Af3nLHyxYsFXtYAUrRRiL8RjzRsXF/5QfWGEjjMm46X++JgixVHed23KpgPBvcwM
-         3Z5Q==
-X-Gm-Message-State: AOJu0YxQgnVWZ06MRmze+zs19N/c1v9JfNjBluZZiOuhTdh5kH/Z5cLF
-	AoHGumEbd+Pg5dYnfh/72b8k73QXVjnbm5cd5pOiAAASmcrW4rVROHYo+E6uOqco8LyJYHoSX1+
-	upGI=
-X-Google-Smtp-Source: AGHT+IGaK2a+XeeCW+SqU2aG/QPxLLrWQxYWI0uf0DiPyUbuDCRZXncakzITEfckWaZPCm1BjRqjcw==
-X-Received: by 2002:a05:6a21:e89:b0:1be:c3fc:1ccf with SMTP id adf61e73a8af0-1c42285ddefmr7193309637.2.1721656321739;
-        Mon, 22 Jul 2024 06:52:01 -0700 (PDT)
+        bh=MvI3GQ4C89Lan7kG6Dr+E3WKZclgag45bdH3FgwbtcY=;
+        b=kLuzeqPT/2xxjU2b7zX3V4gxWiHlpIQWdvhCoFLIp0kaaHaNBcFUYg5w8YuawxmzAH
+         nDYKQsoko9R43OvVvr/nhfKpV3lwpq9jOAjoDB5Wtk8ZgnJn+WXnK2K9HMXDTBU5QV8C
+         8DFKNiovGDQxoDQphxw7WbeBnfxEb8p5M31cTs/y/wfm3EyytUrXKMsv363PEp/5d5IQ
+         M6nquUDiSsUqfAZSkGeYmMRBfv82BaDe8MTvG5x8LhNSQh9ToWblZtyJq7E+ViOg8U9H
+         NO3ABlrgjhTWmB6Denrc03nwVMExeylo6FN6ibZnK8pNvn1RewXBxU1WGWm0dO3ZKpvE
+         cPVQ==
+X-Gm-Message-State: AOJu0YyAZtiGlhrcqC9+lFZKnfaLsERbjXGegSJGTjLdWg9rulljoMXf
+	PShz6wQOn6tpsHGYTh+3hyW08QoADYNK5BHt4Q4uPwJ9vA+6Re8qaxto8QhttiIg3yE1XOOlszF
+	TJEM=
+X-Google-Smtp-Source: AGHT+IE61axABVzr1TpBY10aSHTIdhBacRTtSjX5onvj35gWtniCuAyztaowfEeRN62QzRvAII5Tow==
+X-Received: by 2002:a05:6871:295:b0:25e:14d9:da27 with SMTP id 586e51a60fabf-261210889c2mr4333290fac.0.1721656628985;
+        Mon, 22 Jul 2024 06:57:08 -0700 (PDT)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ccf7c76fe7sm6997279a91.33.2024.07.22.06.52.00
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff49159bsm5347733b3a.21.2024.07.22.06.57.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jul 2024 06:52:01 -0700 (PDT)
-Message-ID: <5e4f743c-9919-4c9d-92cd-2bfabb4ff35e@kernel.dk>
-Date: Mon, 22 Jul 2024 07:52:00 -0600
+        Mon, 22 Jul 2024 06:57:08 -0700 (PDT)
+Message-ID: <505fe3f1-27bb-4791-b4c2-12c99d0da624@kernel.dk>
+Date: Mon, 22 Jul 2024 07:57:07 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,60 +62,113 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Content-Language: en-US
 To: Linus Torvalds <torvalds@linux-foundation.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block integrity mapping updates
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Follow-up block changes for 6.11-rc1
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 Hi Linus,
 
-Set of cleanups and fixes for the block integrity support. Sent
-separately from the main block changes from last week, as they depended
-on later fixes in the 6.10-rc cycle.
+Set of updates for the block side that weren't ready by the time I had
+to close up the initial 6.11-rc pull request, due to being away on
+vacation. This pull request contains:
+
+- MD fixes via Song
+	- md-cluster fixes (Heming Zhao)
+	- raid1 fix (Mateusz Jończyk)
+
+- s390/dasd module description (Jeff) 
+
+- Series cleaning up and hardening the blk-mq debugfs flag handling
+  (John, Christoph)
+
+- blk-cgroup cleanup (Xiu)
+
+- Error polled IO attempts if backend doesn't support it (hexue)
+
+- Fix for an sbitmap hang (Yang)
 
 Please pull!
 
 
-The following changes since commit 98d34c087249d39838874b83e17671e7d5eb1ca7:
+The following changes since commit 3c1743a685b19bc17cf65af4a2eb149fd3b15c50:
 
-  xen-blkfront: fix sector_size propagation to the block layer (2024-07-02 08:58:12 -0600)
+  floppy: add missing MODULE_DESCRIPTION() macro (2024-07-10 00:22:03 -0600)
 
 are available in the Git repository at:
 
-  git://git.kernel.dk/linux.git tags/for-6.11/block-post-20240722
+  git://git.kernel.dk/linux.git for-6.11/block
 
-for you to fetch changes up to 74cc150282e41c6c0704cd305c9a4392dc64ef4d:
+for you to fetch changes up to 89ed6c9ac69ec398ccb648f5f675b43e8ca679ca:
 
-  block: don't free the integrity payload in bio_integrity_unmap_free_user (2024-07-03 10:21:16 -0600)
-
-----------------------------------------------------------------
-for-6.11/block-post-20240722
+  blk-cgroup: move congestion_count to struct blkcg (2024-07-19 09:40:07 -0600)
 
 ----------------------------------------------------------------
-Christoph Hellwig (6):
-      block: split integrity support out of bio.h
-      block: also return bio_integrity_payload * from stubs
-      block: don't call bio_uninit from bio_endio
-      block: call bio_integrity_unmap_free_user from blk_rq_unmap_user
-      block: don't free submitter owned integrity payload on I/O completion
-      block: don't free the integrity payload in bio_integrity_unmap_free_user
+Carlos López (1):
+      s390/dasd: fix error checks in dasd_copy_pair_store()
+
+Christoph Hellwig (1):
+      block: remove QUEUE_FLAG_STOPPED
+
+Heming Zhao (2):
+      md-cluster: fix hanging issue while a new disk adding
+      md-cluster: fix no recovery job when adding/re-adding a disk
+
+Jeff Johnson (1):
+      s390/dasd: add missing MODULE_DESCRIPTION() macros
 
 Jens Axboe (1):
-      Merge tag 'v6.10-rc6' into for-6.11/block-post
+      Merge tag 'md-6.11-20240712' of git://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-6.11/block
 
- block/bio-integrity.c         |  87 +++++++------------
- block/bio.c                   |  16 +++-
- block/blk-map.c               |   3 +
- block/blk.h                   |  14 ++-
- block/bounce.c                |   2 +-
- drivers/md/dm.c               |   1 +
- drivers/nvme/host/ioctl.c     |  16 ++--
- drivers/scsi/sd.c             |   3 +-
- include/linux/bio-integrity.h | 152 +++++++++++++++++++++++++++++++++
- include/linux/bio.h           | 156 ----------------------------------
- include/linux/blk-integrity.h |   1 +
- 11 files changed, 222 insertions(+), 229 deletions(-)
+John Garry (14):
+      block: Add missing entries from cmd_flag_name[]
+      block: Add zone write plugging entry to rqf_name[]
+      block: Add missing entry to hctx_flag_name[]
+      block: Relocate BLK_MQ_CPU_WORK_BATCH
+      block: Relocate BLK_MQ_MAX_DEPTH
+      block: Make QUEUE_FLAG_x as an enum
+      block: Catch possible entries missing from blk_queue_flag_name[]
+      block: Catch possible entries missing from hctx_state_name[]
+      block: Catch possible entries missing from hctx_flag_name[]
+      block: Catch possible entries missing from alloc_policy_name[]
+      block: Catch possible entries missing from cmd_flag_name[]
+      block: Use enum to define RQF_x bit indexes
+      block: Simplify definition of RQF_NAME()
+      block: Catch possible entries missing from rqf_name[]
+
+Mateusz Jończyk (1):
+      md/raid1: set max_sectors during early return from choose_slow_rdev()
+
+Xiu Jianfeng (1):
+      blk-cgroup: move congestion_count to struct blkcg
+
+Yang Yang (1):
+      sbitmap: fix io hung due to race on sbitmap_word::cleared
+
+hexue (1):
+      block: avoid polling configuration errors
+
+ block/blk-cgroup.c               |   7 ++-
+ block/blk-cgroup.h               |  10 +--
+ block/blk-core.c                 |   5 +-
+ block/blk-mq-debugfs.c           |  26 ++++++--
+ block/blk-mq.h                   |   2 +
+ drivers/md/md-cluster.c          |  49 ++++++++++++---
+ drivers/md/md-cluster.h          |   2 +
+ drivers/md/md.c                  |  17 +++++-
+ drivers/md/raid1.c               |   1 +
+ drivers/s390/block/dasd_devmap.c |  10 ++-
+ drivers/s390/block/dasd_diag.c   |   1 +
+ drivers/s390/block/dasd_eckd.c   |   1 +
+ drivers/s390/block/dasd_fba.c    |   1 +
+ include/linux/blk-mq.h           | 127 ++++++++++++++++++++++++---------------
+ include/linux/blk_types.h        |   1 +
+ include/linux/blkdev.h           |  31 +++++-----
+ include/linux/cgroup-defs.h      |   3 -
+ include/linux/sbitmap.h          |   5 ++
+ lib/sbitmap.c                    |  36 ++++++++---
+ 19 files changed, 233 insertions(+), 102 deletions(-)
 
 -- 
 Jens Axboe
