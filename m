@@ -1,101 +1,87 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13A11E891
-	for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 21:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA8938DEC
+	for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 22:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721683650; cv=none; b=fnZB1A80el8TdPpTb240x3J+B8+thZ7nCyuCF5SdF6vHmyNB5beSf7r3v/nJ7hfmMAvHQkyeLTiihzDYgWhOsIcGqNHJjnUBGfTooPr7GK3MqoHkmwq6rcBuIMKjoZunW++FeZWCbhkwRyB35ITPuSOh74gYyoKAgrvL5Q6Sayk=
+	t=1721686901; cv=none; b=E8B9989XC4PFHZr3PA9R3ou2jC0IS1mp37URx+ouqQAKJKzXqfc/T8oVGE1VC6YyRAJXsa63eSaJEw0YtOiISnxm9BawO043xnbYpDAtvPzYz4e669T6CRT67gfBu7wDSppNtXxNOP0Tc4w+F+9+qoqCgURPUyLFErZZ2tpqr2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721683650; c=relaxed/simple;
-	bh=KSEr02aPxS7eCpS+oLhULOf70IzaL+DIYBzgfG2U64w=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Xh94sm7LduJWgBqJylu1H3vfVUl5Kn+9koW/5QDMNmVbW4AOZYur8II60UxsrW9PNLiA1BQ52VtnyrIhJAikta5ek62kfMUWXx7JBtusR35LjTH0wrv3AGAnhIag1MLLUb6+Y0htIAmSCWfF9PTbEAiqcB1oqTz4Sk3IBl2RQ5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=v7o2+mfA; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1721686901; c=relaxed/simple;
+	bh=34HtSC4duPhf+8JCQbGf+fUCRFdJigXMf/wWHTIHDeM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ph1jf/nw1k+ffe0YwedlxIDD4km7T0TMosVmL3qntbjK+aJj36SwMUu8izEneT4ot4ssLnBFS/tR/smhHcoU2yOgb3yO/JTwVlDbU5GA/fsFWMv7M7D3bgyTfL0bo0AOUtWpOqbY/nV68bKg6J0/LiiHXCtRTQbXq32g7zJAjKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=U2espImN; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="v7o2+mfA"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70d39a836ccso74919b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 14:27:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="U2espImN"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7a12bb0665eso33335a12.3
+        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 15:21:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721683648; x=1722288448; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZGt3lheMt+lc1BVjdL4ueCYWnv9Mr0HaYdLgUbRMfMk=;
-        b=v7o2+mfAUglR+NRMTMI8od2Dg7YgEw/ABk3p412idAxShdwtd9eYjszQL58U1Pp7ZA
-         PLF2L1WJttVKrbAA5ha4dRbYWGRtgwAIDHeW7y4XUcF6pJHlsyZllijKKC8KiSh+zLec
-         VNruSe6DOz9c6vTop6SZSaIyaOl6M/JLUZFknehMbZKfbvERwuPQUShjVEjWiUbvvFq9
-         ftQdBuZZTfOK1F6VkPpDJ+s8OJQ9LkbETjh0mGFxfnbQ1Ciib/J5ZIwa4+W770xNx0qx
-         w1fDZ1eOm6yEfqiiTlpGEt2PVxTbm/Dhs5Up3U2Gv7JAz9hMuNmh4Zk3yne2hXWrZl4p
-         DtyQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721686900; x=1722291700; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gRJ2uTLG4AE1W2r135WxVjYfrIn0tz9jHJj9trzpqw0=;
+        b=U2espImN/kPsCHZbznGWrO8qY5uFiuMkyF5juS6aLqDjSgJ7FJzi7fEJ1Dy0V7PAVi
+         gBfSnQgp30/hARg/uio5lqpLqJVaPmlFBRUMFBv8+r+Hm6OJmyeX7YI9HwqgXlymjx4S
+         c5LN5YKsrMOWcTi+v2ogYl3Vo2F7oxhzKtwbzAttGrdux8szT/DebBdBjuBD7XjZt0kP
+         J2TW30lvPN6JfO1C6w4ELbER3oszH5Sh/PePfCrYaUo3xUs4nz6iqtib/PkmAEVTGiJE
+         ARHqFEFBYeAh6TkTwknAigQi9Rbo9ucwor2WorhalcwIiHbA6wQNKh9s9Mz1iSdgFokq
+         hHCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721683648; x=1722288448;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZGt3lheMt+lc1BVjdL4ueCYWnv9Mr0HaYdLgUbRMfMk=;
-        b=ICKvz1MgddlsebCppnMxsEV80NcjfCykL+lAx8FtEDh58F0Rovml9oeg/GA7LZYeHX
-         o5FFu9rB2KAe9Yqtrl77JjdXcKpmqFD0IvcLgHCvVtw5SLTKYHK8nyZpcLhSiv6dTHih
-         ga9hOMeFqp0WkTXo0XgM782G4XcvAz/V1L0YfIVBZVlOABlk0RAHrQFR1tCspCdRxZ8/
-         PmvtdK0UwWiMAPe60rl3uKluidkQlW/dZrPwsXOsAbXWuP0KrAj/oFUhywwXfJJGr8na
-         DayNY+nuaEFZyFi5nnOTUYY1Vhob3AEBkKjaWwQpMn3MXsErhsAscKm6eJx8TRSRe49p
-         XKHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcZKj0BHFQ8VhbizXuXqQKdBweWhDLD7dtwN4KUWD3vM62F16MlnKJLkw7fbtjFoCIINc57QmBLlIlqtn3fFrz8sbFXc1iAvHC2zY=
-X-Gm-Message-State: AOJu0YyC6hHZWiiqbuGQSI+CR0B/I4VC70crrejlkEVZU69lN4Bc+wna
-	r3XPGSJaZGRL2QnVbbpUGqnyRRVQD8EKP147Qb3CyDfV2mJ1qI+DZ034KL3bDpg=
-X-Google-Smtp-Source: AGHT+IEDiejvIpcexU0W0F4+e8vzu49qV66LWWfHeuWIe4HWwR8f7B1+Uh0psbY5TZ2Sj/3FVCrFNw==
-X-Received: by 2002:a17:903:32cf:b0:1fb:19fc:1b44 with SMTP id d9443c01a7336-1fd74555185mr74726715ad.3.1721683647814;
-        Mon, 22 Jul 2024 14:27:27 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f457c6asm59766625ad.242.2024.07.22.14.27.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 14:27:27 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: hch@infradead.org, bvanassche@acm.org, jack@suse.cz, tj@kernel.org, 
- josef@toxicpanda.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
- yangerkun@huawei.com
-In-Reply-To: <20240719071506.158075-1-yukuai1@huaweicloud.com>
-References: <20240719071506.158075-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v3 0/3] blk-ioprio: remove per-disk structure
-Message-Id: <172168364572.147162.16825198001885724526.b4-ty@kernel.dk>
-Date: Mon, 22 Jul 2024 15:27:25 -0600
+        d=1e100.net; s=20230601; t=1721686900; x=1722291700;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gRJ2uTLG4AE1W2r135WxVjYfrIn0tz9jHJj9trzpqw0=;
+        b=UAOBur857xF9jCReggF21BfKoY6VkWiEPbIGuaiyn+o1Lt8hMfkvSzBMZEZaxfUdnP
+         msDB4x2rcBl2vQmIxOqjnwEASj+m6cc6f6DhAeel6yYRyhSF5auFBK9jddvMz0qacyAH
+         EohXBC+5B+syRmdd67L4o2WvzYJiR+ZODr0et3nGRxWMGWjcjjRPecGxKrxvR+6JxZqY
+         ptPvqdoQ+EcNCZewutShv775BKwAjX2BV7TT+bzFw9BOya/N4xTsCKQNLjDwJVNByypO
+         Evt6iCvTwrXOvXiRDg8YxVhuixY2uTV3nUQIkSoPMsiHY7WZO9Mvr5VUKddp7cZJz45L
+         KBnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVI01q9EVxIpMRIE7t1nPUw+7rgFNMJxM98Ag3oRJ1y+WkP09JEnoRBVf/P2JGseHPSN/LdiCPCOnNk/68+EFB7X62Yi+p5CpxRKTE=
+X-Gm-Message-State: AOJu0YwlhIhyjc6q9HNSLIPH/iODz5eVs+q/0Xj20nsUiCa17lC1Qnj+
+	IbKcFJkJAR63M9nab+3N2mIlegJEERoVU8eQ8us+Aes50YR9ONh4lets7+EMyms=
+X-Google-Smtp-Source: AGHT+IGScHD6XHoPrstmVFPw+Xo8947sWS5UFvpK8ufwAvqfdOvxadY9ZmmXoO25QdpiwaLvvRLgSA==
+X-Received: by 2002:a05:6a00:6006:b0:70d:2cf6:598 with SMTP id d2e1a72fcca58-70d2cf6127amr2260050b3a.5.1721686899902;
+        Mon, 22 Jul 2024 15:21:39 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70d1fc869cdsm2974888b3a.170.2024.07.22.15.21.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jul 2024 15:21:39 -0700 (PDT)
+Message-ID: <0cc50a53-fd8f-433d-bb69-c9d3f73ceace@kernel.dk>
+Date: Mon, 22 Jul 2024 16:21:37 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/3] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc: dhowells@redhat.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+ philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240718084515.3833733-1-ofir.gal@volumez.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240718084515.3833733-1-ofir.gal@volumez.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.0
 
+Hi,
 
-On Fri, 19 Jul 2024 15:15:03 +0800, Yu Kuai wrote:
-> Changes in v3:
->  - also fix indentation in path 1;
->  - add reviewed tag by hch;
-> 
-> Changes in v2:
->  - add patch 1;
-> 
-> [...]
+Who's queuing up these patches? I can certainly do it, but would be nice
+with an ack on the networking patch if so.
 
-Applied, thanks!
-
-[1/3] blk-cgroup: check for pd_(alloc|free)_fn in blkcg_activate_policy()
-      commit: b925680cf08356a27ab83c0b707c0fcf61ab0bb9
-[2/3] blk-ioprio: remove ioprio_blkcg_from_bio()
-      commit: 746af0f4f529ba40bfa474c5b7509bd52f9863d9
-[3/3] blk-ioprio: remove per-disk structure
-      commit: 19c8bb716c283093a355a95a4162dc6a880dbeb0
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
