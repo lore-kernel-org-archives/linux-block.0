@@ -1,91 +1,102 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-ot1-f98.google.com (mail-ot1-f98.google.com [209.85.210.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5F3381B1;
-	Tue, 23 Jul 2024 17:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFF8141987
+	for <linux-block@vger.kernel.org>; Tue, 23 Jul 2024 19:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721757106; cv=none; b=uyr6kRTGauY6BYSDrjs/84vOsd1njDOOdN9J44rlrg9lxDrY3vGhgMOoOYdRCYcIdU11rd/y6dOYmA1i+wc1BwtHLLwx+T1V/8tPJAke7gXyb53GDtfVLxbsXoMgmRFn7386Wq+V7l4Fpeg4jD9AzgezzDPpibpOjp5SLg5F2wc=
+	t=1721763171; cv=none; b=utHtgupHJ3hx0DqLoLVD7V8BwiTGK/lKXWkwM6tR+svXioh8hJ77cI+6lySUlSUZvj12uxutqc4PGSBR9Q6B/IS7HOvWBeLNmfMk6hOD+aDggjnHc4WcUu6NUbD+EHL4bjRKI+YVfsyvqKsxTT0eBvaGs+S1uJ2KU0WJnQRHNpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721757106; c=relaxed/simple;
-	bh=q/906rZhLsSEmkkYt9iPHA1Kz16OIGT4ctkfGoPky5w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S6YpPjtqW5ONKSzAgdrH2uGec+xmImy6fHViftrYhoaMUViqmbbu3rYmrLBvuiJRxRuCX0vanxJq8PHYvpf7Hvp7ASUk3a4D1uhT00Sl1sGK79iHxFxh6mOJX7T0K+75+IAKnEFr0AuxK/4cp73/F7e7xHrBmX45JyB62zamM6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fc53171e56so736435ad.3;
-        Tue, 23 Jul 2024 10:51:45 -0700 (PDT)
+	s=arc-20240116; t=1721763171; c=relaxed/simple;
+	bh=M2VnkXo+wbUsmtT3hFPjzXd79QIp/PWy8S9j37kl0q8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nG1xlVXcftdLIDMUMxS7dYJsaQT4vEWIFAy+myGRmcgH0NSLy4MmhlP5VSCjVyQSLmam6ou2BTtN43qVo4SyWsMo+65fpm1M8Lb9dzgsGaTORIWA+gXBeGlqEflJhsazgmKkUEb/eKKtNr806Dg8ybNzsijOH5skMO7BHGyfK4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GYZiNaz2; arc=none smtp.client-ip=209.85.210.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GYZiNaz2"
+Received: by mail-ot1-f98.google.com with SMTP id 46e09a7af769-7035b717880so82468a34.1
+        for <linux-block@vger.kernel.org>; Tue, 23 Jul 2024 12:32:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1721763169; x=1722367969; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3nW34kFipKS6pHjf6ZslXgNG7V/SAs8zrfAbzCW7a/g=;
+        b=GYZiNaz2q4DLOuGRkECJWcwU9oLhWWasbLWOQVbL31LY9uvMrfhsF0O1nx8/EDBNTq
+         g4oA+1Hnvh3S1YpUZOSiiBBReNZss48PzbUtF72RU+kehfpBxit72eQH5Atk8zDB4MBy
+         dPoEMGA+h29e7X3OIVvy7AjKRYxOhVp97WsYhrCCYQuz5Q4/IRzlZV+YBqoW+S2+/f8x
+         II9pRAKyxcb/s4w0oNi3ym8YT/h0We5r4OkK/m1oJ2imgZ6PD0i5qXazq3ltUn5Pfi5l
+         ouIwuqVSz98w5NJJzsj8Nxz0Ihl4UYECWQ+c6bBf1VtjsN6EaDWFIUG7xae29lS7ES7i
+         Cdng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721757104; x=1722361904;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VoeGtHSXB64zwiuwvms6AcLkRLb38MEJZx4ZT1nmMD0=;
-        b=wa2y1R+yFBtgBwE09xRS//fjt9+3wgJ4N2WXoK51/80fE+LG0H+r3liCn8AvqYP0jA
-         eEArRJAlYdeaW9px7F+UjJvVn8lXLZHX2JX3P7TsKZyMygEMdW4byhXrCcjYMm982YAH
-         hlnd8SNZuMPjwDjMOdaFruwXqeEEjGs97zOFxF8E0ccWmL3ySJ7bJHJKmOfwKZ3EsZU8
-         J7etZLGxLvkmGrIDDNV3BYvxDKNwOAIge2RBnKcIgE6uHpsn9ebqe7lBi8fD1KN1Dqk/
-         FD42D9W3BfqqY2dr9lYtdvxs+EzFpa/nDxLx5YZ7F4LiGRTQWmXXyeO8kgHx4DdP6udP
-         6+IA==
-X-Forwarded-Encrypted: i=1; AJvYcCXqGo2vhhIHfi/Ur/QbEKCGbx3M2eOyVASRVpUArmWSnZuHMGoJVPttaFfTm3KmmNnMiUBAWsSaBmiXYdsTiF6cECNZfhMsKOlE/uPtMikXrDoYvwVAOGUaWI+AnoH5nnhagrzv5QWkK1qQ1E4aIgxu6vt65WDSM4QBW/paF6Ax
-X-Gm-Message-State: AOJu0Ywpkw3orfPuupdrq1GLYCWsJmaRFBmk9DE2tYj6gVGqTuleST9K
-	JFt45R7g4apFc6q6Upwr8C3Fbd9w+V68ABN3/o8ZzedWIq5T1y0++NpyBg==
-X-Google-Smtp-Source: AGHT+IEWZwnlQ/uVz5RIULJVj6dMBCxAtD4yCOb6ArLoAjAlN3bT5GK7xeRd3S5Zevx1CkOR4GghGQ==
-X-Received: by 2002:a17:902:e5d0:b0:1fc:5cc8:bb1b with SMTP id d9443c01a7336-1fd746009a8mr88898525ad.7.1721757102488;
-        Tue, 23 Jul 2024 10:51:42 -0700 (PDT)
-Received: from [192.168.68.149] ([70.90.172.18])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f2947a1sm78061045ad.86.2024.07.23.10.51.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jul 2024 10:51:41 -0700 (PDT)
-Message-ID: <54cba15d-6598-47c4-9a62-81c4f463ef64@grimberg.me>
-Date: Tue, 23 Jul 2024 10:51:38 -0700
+        d=1e100.net; s=20230601; t=1721763169; x=1722367969;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3nW34kFipKS6pHjf6ZslXgNG7V/SAs8zrfAbzCW7a/g=;
+        b=gf36++GYj3/QsFFKMFX0mowlN0DG8Qfw9FBHKPoEk7LJwfZ5/xKcOWNB2DOBU/Xk7c
+         FGT2jmpBqispRsqgTyXZOT/BuLHZUjk2e8kBWnWAaeIxbh3HMiYoOObWnNh3TegADu7e
+         lmAKWMzXgVy9j9jY5t274DSYm9PkL2lCotPGcXfiAY0omQpGqNrB5/oBjHNf3tsGQjm5
+         7XsmB8Z1EfblrTh9aQcy7bAsyBBidzuZ9fGey31GKIQXm/MXAI/TRx02vzUBvABxjYwH
+         fd7pg/bouQOl0uh/0HO5D1QyWfkQ5PR9MuoPXlt7SLRDaXPOgW7vpngYRsOgX0wF2bD7
+         O0Tg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7Ufn+IUNVbrKANCpvr7ii6HKSlzaO6FVDI7mlxaPaCHZFmPGDyJjLjPeFQ13hyYORDRecDI+ayM7SxwTnPvd4Tx98artWW7+tOrw=
+X-Gm-Message-State: AOJu0Yx6+pHI0A3mCXFd4ro1OCrdSbQvyulaA55b/nPPAiagaPM+CHIB
+	KhmQA2rlNvN2x5tK0JYm70I4rm9u8qIPwxb8Ff9otyYRBxrGtsXTbUwymBOJr1ulfQ/J3+Y1gzm
+	LA9lGdWgck8082vNtYlxr+v2C6lkKKuIa+OhkmJmaNRRP3XNV
+X-Google-Smtp-Source: AGHT+IFzWgVgqawrpDF4VKKw96nb679NrtkvKkbq+xeP++uHwgqtUjQX++gCvXBx3U0oLWFUpeqUpAd2Zkjg
+X-Received: by 2002:a05:6870:9a89:b0:260:28c0:669a with SMTP id 586e51a60fabf-2646ec7a740mr1346601fac.25.1721763168734;
+        Tue, 23 Jul 2024 12:32:48 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-2610ca7d34fsm470316fac.32.2024.07.23.12.32.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jul 2024 12:32:48 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id BCB023402DC;
+	Tue, 23 Jul 2024 13:32:47 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 9439DE40EBE; Tue, 23 Jul 2024 13:32:47 -0600 (MDT)
+Date: Tue, 23 Jul 2024 13:32:47 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] ublk: check recovery flags for validity
+Message-ID: <ZqAFX9QorUzcHMK/@dev-ushankar.dev.purestorage.com>
+References: <20240617194451.435445-1-ushankar@purestorage.com>
+ <20240617194451.435445-2-ushankar@purestorage.com>
+ <ZnDqKFtBULaddzov@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/3] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-To: Jens Axboe <axboe@kernel.dk>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org,
- Ofir Gal <ofir.gal@volumez.com>
-Cc: dhowells@redhat.com, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kbusch@kernel.org, hch@lst.de,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240718084515.3833733-1-ofir.gal@volumez.com>
- <172174144805.171126.5886411285955173900.b4-ty@kernel.dk>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <172174144805.171126.5886411285955173900.b4-ty@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZnDqKFtBULaddzov@fedora>
 
+On Tue, Jun 18, 2024 at 10:00:08AM +0800, Ming Lei wrote:
+> > +	/* forbid nonsense combinations of recovery flags */
+> > +	switch (info.flags & UBLK_F_ALL_RECOVERY_FLAGS) {
+> > +	case 0:
+> > +	case UBLK_F_USER_RECOVERY:
+> > +	case (UBLK_F_USER_RECOVERY | UBLK_F_USER_RECOVERY_REISSUE):
+> > +		break;
+> > +	default:
+> > +		pr_warn("%s: invalid recovery flags %llx\n", __func__,
+> > +			info.flags & UBLK_F_ALL_RECOVERY_FLAGS);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> 
+> It could be cleaner and more readable to check the fail condition only:
+> 
+> 	if ((info.flags & UBLK_F_USER_RECOVERY_REISSUE) &&
+> 		!(info.flags & UBLK_F_USER_RECOVERY)) {
+> 		...
+> 	}
 
-
-On 23/07/2024 16:30, Jens Axboe wrote:
-> On Thu, 18 Jul 2024 11:45:11 +0300, Ofir Gal wrote:
->> skb_splice_from_iter() warns on !sendpage_ok() which results in nvme-tcp
->> data transfer failure. This warning leads to hanging IO.
->>
->> nvme-tcp using sendpage_ok() to check the first page of an iterator in
->> order to disable MSG_SPLICE_PAGES. The iterator can represent a list of
->> contiguous pages.
->>
->> [...]
-> Applied, thanks!
->
-> [1/3] net: introduce helper sendpages_ok()
->        commit: 80b272a6f50b2a76f7d2c71a5c097c56d103a9ed
-> [2/3] nvme-tcp: use sendpages_ok() instead of sendpage_ok()
->        commit: 41669803e5001f674083c9c176a4749eb1abbe29
-> [3/3] drbd: use sendpages_ok() instead of sendpage_ok()
->        commit: e601087934f178a9a9ae8f5a3938b4aa76379ea1
->
-> Best regards,
-
-Thanks Jens.
+Will do. But note that in patch 4 this check gets more complex so we may
+change it back to a switch statement.
