@@ -1,28 +1,48 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6EE15445E;
-	Tue, 23 Jul 2024 15:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D991581EB;
+	Tue, 23 Jul 2024 16:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721747615; cv=none; b=Wv67X7x6L4G5ss5NxDNZzpWP3SEZ6XTr+hyICpMz8WgAgP8O5CZSujQQhfQNY073Nzq9TCZG5O7jxN0o6QsqUNZNUeeTBmKr1IGWDi048Odz+mZeS3jG+YW8SAWc/rEojnN/t03KKkVs4FXM+53cTSrQIoiTEWRQ53p1gKDu5rQ=
+	t=1721752114; cv=none; b=gCmL/B1ECeQ2ullMOk/HtPFs+Uj1Xr+oC39UWuIvSVV+NWO8ycq2Hnl66ght1jZvDzxHQKC7QzMP1xZ+vJIcTNWZuDJcyn2lHeWjMtAtQxf8OQAPLb1iF0BXrtshKotxMh3hZz7xJvl/jIl9fLo8mhMoM3+P4HU5nORkZQ/k5Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721747615; c=relaxed/simple;
-	bh=Za5OmoIPnwYq3WL7lttx6A0b9aUoBbyxeW7yzzYMZEE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UBAMgY2r5HCpkTGc1Y5Clsy0UezrNONt1TLHVTfu0MaSSaQicaPfgao3774+xgfBOCOYLMbXWvwfbWUc0C0Ypi61dyXeMQuXMBL/+Hxw8uS7RjkqoHUfLeS3lQECoePRxV+DnJlFl5nCBPBqMQExwyq/NmwLStnx/6/XRRnSvw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	s=arc-20240116; t=1721752114; c=relaxed/simple;
+	bh=RbOdrvcsDjEz/icRhaCs+TKTGqgAzQUcydt4ZuKFJTw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PoJNnNXovwigkNo+q0F3VVGgo3CuhJsdpkw6D/KF7aly1/Jk+BrIEM11JKcrJzwiuTU9KBvUzdJvQuKsTo7SHAw9F3plbf747ogaqLpIdupQvvG1+h2yUgJgf4JohOxe1s7kFx0VGc1G4NGffCWK26A0RfyvAgn7ZZJmleJCK3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=FNSjfJDi; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="FNSjfJDi"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4WT2dW2twpzlgVnY;
+	Tue, 23 Jul 2024 16:28:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1721752110; x=1724344111; bh=iX6Rbk01cfhxdEBIAeNsq9o7
+	6Ulzdi/G4DWyZljlrv4=; b=FNSjfJDiO7wDugYnGz8MiekqoEBIUixTpqS2IbI+
+	1QgwfsayLBMkWz/oeXdI8qrS0rmsB7+W+LSoi/7Dg0F85HowxI5fH8DbEbOHL1n2
+	Z+UriPOYkLQAHCt0p+EBsphBUbPdiKsZZm6iva6SLuoE/PBmeaZMWNb2YgQLUOqN
+	/3oWnSNhK0xOgKwq9P6PoGCoqcsiuXBimCFIMCuiZCiv04d6oGQYfw8lbkS4pP8x
+	TQOox200SyItADeLkwZ6t04ZvA+luELPlXO4KEASy1qiYtx2mxVZzVKC+6uNHoJW
+	By+3llWORI847x6ibG5x8ujUC931H6M2GdMQqkJu0teaoA==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Creij_MQ9KzB; Tue, 23 Jul 2024 16:28:30 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3B68961E5FE01;
-	Tue, 23 Jul 2024 17:13:22 +0200 (CEST)
-Message-ID: <e49eb11d-bd62-434a-9480-7d7a6f20e946@molgen.mpg.de>
-Date: Tue, 23 Jul 2024 17:13:21 +0200
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4WT2dT1fYkzlgTGW;
+	Tue, 23 Jul 2024 16:28:28 +0000 (UTC)
+Message-ID: <51421cc8-ef09-4d13-ae92-bc0839a8b3b3@acm.org>
+Date: Tue, 23 Jul 2024 09:28:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -30,83 +50,25 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: How to debug intermittent increasing md/inflight but no disk
- activity?
-To: Andre Noll <maan@tuebingen.mpg.de>, Dave Chinner <david@fromorbit.com>
-Cc: linux-raid@vger.kernel.org, linux-nfs@vger.kernel.org,
- linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- it+linux-raid@molgen.mpg.de
-References: <4a706b9c-5c47-4e51-87fc-9a1c012d89ba@molgen.mpg.de>
- <Zo8VXAy5jTavSIO8@dread.disaster.area> <Zo_AoEPrCl0SfK1Z@tuebingen.mpg.de>
+Subject: Re: [PATCH v2] block: fix deadlock between sd_remove & sd_release
+To: Yang Yang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240722091633.13128-1-yang.yang@vivo.com>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <Zo_AoEPrCl0SfK1Z@tuebingen.mpg.de>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240722091633.13128-1-yang.yang@vivo.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Dear Andre, dear Dave,
-
-
-Thank you for your replies.
-
-
-Am 11.07.24 um 13:23 schrieb Andre Noll:
-> On Thu, Jul 11, 09:12, Dave Chinner wrote
+On 7/22/24 2:16 AM, Yang Yang wrote:
+> SCSI does not set GD_OWNS_QUEUE, so QUEUE_FLAG_DYING is not set in
+> this scenario. This is a classic ABBA deadlock. To fix the deadlock,
+> make sure we don't try to acquire disk->open_mutex after freezing
+> the queue.
 > 
->>> Of course it’s not reproducible, but any insight how to debug this next time
->>> is much welcomed.
->>
->> Probably not a lot you can do short of reconfiguring your RAID6
->> storage devices to handle small IOs better. However, in general,
->> RAID6 /always sucks/ for small IOs, and the only way to fix this
->> problem is to use high performance SSDs to give you a massive excess
->> of write bandwidth to burn on write amplification....
-> 
-> FWIW, our approach to mitigate the write amplification suckage of large
-> HDD-backed raid6 arrays for small I/Os is to set up a bcache device
-> by combining such arrays with two small SSDs (configured as raid1).
+> Signed-off-by: Yang Yang <yang.yang@vivo.com>
 
-Now that file servers with software RAID proliferate in our institute 
-due to old systems with battery backed hardware RAID controllers are 
-taken offline, we noticed performance problems. (We still have not found 
-the silver bullet yet.) My colleague Donald was testing bcache in March, 
-but due to the slightly more complex setup, a colleague is currently 
-experimenting with a write journal for the software RAID.
+Fixes: and Cc: stable tags are missing. Otherwise this patch looks fine
+to me, hence:
 
-
-Kind regards,
-
-Paul
-
-
-PS: *bcache* performance test:
-
-     time bash -c '(cd /jbod/MG002/scratch/x && for i in $(seq -w 1000); 
-do echo a >  data.$i; done)'
-
-| setting                                | time/s  | time/s  | time/s |
-|----------------------------------------|---------|---------|--------|
-| xfs/raid6                              | 40.826 | 41.638 | 44.685 |
-| bcache/xfs/raid6 mode none             | 32.642 | 29.274 | 27.491 |
-| bcache/xfs/raid6 mode writethrough     | 27.028 | 31.754 | 28.884 |
-| bache/xfs/raid6 mode writearound       | 24.526 | 30.808 | 28.940 |
-| bcache/xfs/raid6 mode writeback        |  5.795 |  6.456 |  7.230 |
-| bcachefs 10+2                          | 10,321 | 11,832 | 12,671 |
-| bcachefs 10+2+nvme (writeback)         |  9.026 |  8.676 |  8.619 |
-| xfs/raid6 (12*100GB)                   | 32.446 | 25.583 | 24.007 |
-| xfs/raid5 (12*100GB)                   | 27.934 | 23.705 | 22.558 |
-| xfs/bcache(10*raid6,2*raid1 cache) writethrough | 56.240 | 47.997 | 
-45.321 |
-| xfs/bcache(10*raid6,2*raid1 cache) writeback  | 82.230 | 85.779 | 85.814 |
-| xfs/bcache(10*raid6,2*raid1 cache(ssd)) writethrough | 26.459 | 23.631 
-| 23.586 |
-| xfs/bcache(10*raid6,2*raid1 cache(ssd)) writeback  |  7.729 |  7.073 | 
-  6.958 |
-| as above with sequential_cutoff=0      |  6.397 |  6.826 |  6.759 |
-
-`sequential_cutoff=0` significantly speeds up the `tar xf 
-node-v20.11.0.tar.gz` from 13m45.108s to 5m31.379s ! Maybe the 
-sequential cutoff thing doesn't work well over nfs.
-
-1.  Build kernel over NFS with the usual setup: 27m38s
-2.  Build kernel over NFS with xfs+bcache with two (raid1) SSDs: 10m27s
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
