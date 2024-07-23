@@ -1,195 +1,213 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2E32F5E
-	for <linux-block@vger.kernel.org>; Tue, 23 Jul 2024 01:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721698417; cv=none; b=JJoZD2mQ9UZrsdUGOaXVXty6XTAQjsRENtJVVbgkAz2523i8gxF1jCnIaO8BibMF3B3T3/RCJbRiKnCRoTpJeho8JKIgPc5+XU/a8xMzEf0HO5OptSACM0axlhKhmkxuVfens7gKKhffi4lIqpSo10pXSbh0QyWAW1vNjTdd+4s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721698417; c=relaxed/simple;
-	bh=iR5/Ko0O48z1kXSjGR3c8tnJbfBcmoXdFMaxFeSgim0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B2cLdkx3V+jQvWFESXVOgyu4wVgosjB2oVDh2WzWoS6u72a3FSj3FIJ6n2NGPkmSKxLM32+5L99HMv+iFLbA4pLmhzeEVbw1X9FknM284N+UQirBqZ05MfKEhMTQUvLgDvZwKiT0DI2VBhTxUcE+Ls85/c1BViaSDhpR7C8PD/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YMTblas0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C2E647
+	for <linux-block@vger.kernel.org>; Tue, 23 Jul 2024 03:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721706675; cv=fail; b=BH5upMAZW2YpoOD93aouo7XZObl9xk2IUaeT9fzoywPp/UrhZL1a6kuE/61IaSH5qRxvbs6JXwy3z8+TonsZSTbBkDQXCYTmuPOpmghf1f1K9UqgwyFxfLW57METiqfp6QXzJ2oCBhTTARkkGBXbYnzswyzxG7X59F0exfGWYoA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721706675; c=relaxed/simple;
+	bh=bKtBa11NeYmmr380UN5Ay7ITh6FihljXByUc6ry7G+U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XoufK2NvkLQENmoA5vd4dE7Kvm9nGr8Q9a55Mvcex43APfVgLxBvGUsxr8AtKIWwU/U+/ydfejGPjMN+jydxqiMr3CrPMMZqdJx0QFp96BEgt90EGP9xjAYapiiC6GcU6wBaXEBVsiXCqB3ZcLLu+MYsX9du+grM1lGl+4XM23o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=OmQnACH0; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=G43s2qmK; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YMTblas0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721698414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PyTO09t2j6PJnV6GXy5HbssjwomZxDpFfV/46yXQB4w=;
-	b=YMTblas0x25g6wBYYrUFn0OEKkH2lZTqd9QJza9QG+1qjX/8RMnH0TqbYsi3wlDZgxWtNp
-	2E0E8iwOuXiqPpUrNglBshlh7+zBJW1mYdC9QBnCvKwisPMRK7A2h+BCIfdGX1LH+RBXXa
-	ueHhpuIO9SeHhK/YSdrkfhxxQOPuOKI=
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
- [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-YRRpvAZNOuW6l6Nd-Vetrw-1; Mon, 22 Jul 2024 21:33:32 -0400
-X-MC-Unique: YRRpvAZNOuW6l6Nd-Vetrw-1
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-49298970b4aso106778137.0
-        for <linux-block@vger.kernel.org>; Mon, 22 Jul 2024 18:33:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721698412; x=1722303212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PyTO09t2j6PJnV6GXy5HbssjwomZxDpFfV/46yXQB4w=;
-        b=fgT6AIaroIMTOqv63+UXFHxPxLQPQL7pI1Fkl2K+c4ZQKFx3F5YLr4+NKWJq6ucxNi
-         Iq4o0q6coXpmiU1F6CRIktl/S3eFaUDaorlXIv+YtxDU6XrScMF+nYhrntw6c0MAxqmi
-         TfdDlfeeaFGWkm8ty2iml0dk3ARbkaE45H55eU33Q/NdG8b9PJTOkCpwaOeia0w293HV
-         kylySah5Tqj1rxc9WRKXRxCgPT5LbHhcC/nlUYeefE6naWlG5VguOpweWHFut9tpna7y
-         8uoVmQ26ZK+aPfLFLl8LBmDsOCtmXmldBDi7pGqBAwDhXESwTeJw4LlesDjDriurVJmL
-         p4rw==
-X-Forwarded-Encrypted: i=1; AJvYcCWK9NQ3ZPsCpnVQmHEbGuyVB/udIwjVpwJMSSUA8EQeaZP4omevT1JOMoYKu6t52fonNso0fOAK6WcKJQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxcgX5CspdrZp59cLWk3as078hjHPb5AbN5J8+4MuLh9R30osS
-	W4SkVrDfVJ+qmm82ugavwsOl2LjRAP0XGAqZkzvwsxuVFCNamglnNY9iptvbYhoZMM2E/IIvT6l
-	dmdjNnO9m7/+oOx3uentb1Vnnz3/TZJQo3+ck6+7Ps2pX3AJ9wCAQ68LvNy1wsjozz0/YAz3fIU
-	AwSiMPyoiHv0FP39wzj8l3LqbKsAbIAdi2BkY=
-X-Received: by 2002:a05:6102:26c5:b0:48d:b0a3:fe25 with SMTP id ada2fe7eead31-49283deb38emr4674610137.1.1721698412331;
-        Mon, 22 Jul 2024 18:33:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEpJ7mOQ5NJSO0Xet0Ie67tI97YCdUbMKgYtIoMWSKaBdm0SzDHQoCTtuhhgjR2rZHnL7PcjTQOIBTcn5bEsXg=
-X-Received: by 2002:a05:6102:26c5:b0:48d:b0a3:fe25 with SMTP id
- ada2fe7eead31-49283deb38emr4674598137.1.1721698411904; Mon, 22 Jul 2024
- 18:33:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OmQnACH0";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="G43s2qmK"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1721706673; x=1753242673;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=bKtBa11NeYmmr380UN5Ay7ITh6FihljXByUc6ry7G+U=;
+  b=OmQnACH081kSkYF0ippFPJCs90JqotL6Wms6oy0zQ8TJgCHzvTA+cG+C
+   RvlCdI3Zpxf6UvSoBaTy+LyzxGTrfUXsTxuu4F5/NPAnjEW7lgZMYz91N
+   iDHxzJKxZZQFhFo3acUu3Tma0iYyZAH1KlqKeUdnrzbDMbo4xmmTiZOka
+   nevp3SpZq2q4+4FFiqWYf9bMDx40Gc9hIygLl0zDckeFbv3jI4/uyIJ7e
+   lJ6az9tz8Lpkf/QDqO0Eq/5vpN3bJH4lpacMYMlOci4tqAVINazIcjrAG
+   bMZwM3uMDkVTqcfX0hNyhEoTmyDnwb0lyWJe92tNAsEBCPi1TEfxVeI2f
+   Q==;
+X-CSE-ConnectionGUID: EyUg9CD+SJyp9Nd+Sd9CMA==
+X-CSE-MsgGUID: uVNW8zM5S/O6yc7uV3NuRw==
+X-IronPort-AV: E=Sophos;i="6.09,229,1716220800"; 
+   d="scan'208";a="22721580"
+Received: from mail-westcentralusazlp17010004.outbound.protection.outlook.com (HELO CY4PR05CU001.outbound.protection.outlook.com) ([40.93.6.4])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Jul 2024 11:51:06 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M3oiWZqapR7br+y07/mQurhf82FTn0BrSPVlTHeiw6biE9ip+k4h557TyO3XXR8TgDZDq+yi/V3Qu2ef6U/PMTtk2NStsDIDC/7Gf19o4YNvlVCYZUP4PBZHs9HZ3A8kMpzdJyOrY+7OvMk9vik9Tdt8lUkhyERUX7JLNHjXEPcA8dpp69lJm2zhzGvLqv5RCWvdrTg5uJaargLwXmqVfRD8UBFD+S0Tp1r6lAbiq9fTit6v4nD94lWOdIOS37vfW3MKPnRcZV9UCmgdmoAW5OkDNuGCdl8eigkoNm5G1wlIRtvQl609SD4Fniu8SIpZjA6gdVZxNvMDNABdAeHtjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VG8FV03cFYX65IlrkFowRkt5n2Ysq39z7SAYD7h5UZM=;
+ b=aPLdmv65O19QPxnnOXgexIcM7nHZb4FYEXHz5ih8t9rsPGCVoh5OE9HcUiOYcTNIq/JoWZBQ81Ruo+snfkXSOqmhQZJismZmpnkm1QnYIOMbGC9YE3uWF4birRrjBOWb3Pv/IxJUW8Lu8zN/gdRxGXXn9zphRjU2pw4g/mWOXidsHXlwnC5oSlE/8FpiR5w/dYU1pnTB3tPk5SNESAwGvOixRslg4sBkNgZ6IL+sNF56UR2V7ixNmB/43h56uBjW+zYhErr0GtBDPl32txYBRdIvmCUx73GehqZ99iapfCsD7Bm4gGi5erMIyv9oiPCO9IaGfbYCxxJmGmLBc8MdEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VG8FV03cFYX65IlrkFowRkt5n2Ysq39z7SAYD7h5UZM=;
+ b=G43s2qmKZHIVjzSZFRtyG7fryIp0L3QU0lKdA9yWeb2jCLsBJW7VAgbJLeiKieBzm2gejTOar6zs0BlPz19OiaVYQuXV6h7VVEeUXuB75hP3k1nG8Uvc9qmgNr3LI5rBYMmMawvBg+iIS/qnnJnA9lo86meyNxuQJz2a/VStDhk=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ IA3PR04MB9403.namprd04.prod.outlook.com (2603:10b6:208:50c::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.19; Tue, 23 Jul
+ 2024 03:51:05 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%3]) with mapi id 15.20.7784.017; Tue, 23 Jul 2024
+ 03:51:05 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Milan Broz <gmazyland@gmail.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>, Bart Van Assche
+	<bvanassche@acm.org>, Mikulas Patocka <mpatocka@redhat.com>, Bryan Gurney
+	<bgurney@redhat.com>
+Subject: Re: [PATCH blktests v2] dm/002: avoid device access by udev at
+ dmsetup remove
+Thread-Topic: [PATCH blktests v2] dm/002: avoid device access by udev at
+ dmsetup remove
+Thread-Index: AQHa2ZNlldtWYewTdEqTlH0AgYoE0bH9o1QAgAYQmIA=
+Date: Tue, 23 Jul 2024 03:51:05 +0000
+Message-ID: <jzqlbsnwukr55s6gl2ajneo4fzj44il7d6235sguhjgsopa7zt@xld57gkaf5us>
+References: <20240719042318.265227-1-shinichiro.kawasaki@wdc.com>
+ <b53ffb90-096f-41f6-b7be-ecbe8e8ac786@gmail.com>
+In-Reply-To: <b53ffb90-096f-41f6-b7be-ecbe8e8ac786@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|IA3PR04MB9403:EE_
+x-ms-office365-filtering-correlation-id: e3be59d6-73f1-4ec5-444f-08dcaacaadd2
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?fxdnoylHNr7bpgk3xoNX5HC9TrW58YpUvVaxscPekd7O2YQgKpMTKHkegl0Y?=
+ =?us-ascii?Q?6gL3CJFAfcWtqajHlU1jCEw4IyjvQ1kprgudULNBdifMJG6uO84TWFlcEkqM?=
+ =?us-ascii?Q?bv8I+QuOn+V/UEQOMbIMTK+uMqDV6vixZ89t0DXVuVcKzyBXQLEcRJy1vGQB?=
+ =?us-ascii?Q?fl9984gKCxcll6Z31E0P5EDYBdiYJ1ra+GB/5LPAUZ0LqrGleCS7XYBJrCoP?=
+ =?us-ascii?Q?DY0JJMDJq/InbrMZwbCuoIFG7/AfdmXZSJUsHeT+3KEySdz/g+UXvxYDWxYE?=
+ =?us-ascii?Q?35G1DJNje4diFjJ0HfD1cSQ6YoBCR/wloz5nAbVRoXuxXtmKD7Pq7m4nw708?=
+ =?us-ascii?Q?poOb8YvzBRJNgplRQWLtM1MT+XXcWA77tlpqe+A1Qqcvqet7D51FcHgHemJw?=
+ =?us-ascii?Q?oJjG4uUqN9qz0JXKUGE6WPEGmCdPz570iNK5PpP/20FqKbJDG1T98g69K7jj?=
+ =?us-ascii?Q?eElREh2n7ybaSZS/2UgyGqCH4CmkPzPZaZuDcSpq102I55Z/JqFBgT4p+NUt?=
+ =?us-ascii?Q?7BlXIefwMlNwF9R1UNnC77PzG7a49+9U1Q0wJWNRqKodDJL4uoy41rg9UnNx?=
+ =?us-ascii?Q?5wW/U8IVj6x4kaqjMiwnBLaPadFyi2DvUBLC+okBfLdQSUoVuNBJOgUhhve0?=
+ =?us-ascii?Q?MuLE+7k0MAAPoB3CRo0e/Aj13qTUk5t3I+FoAi4mq3PWrVxy4iS468z3s/do?=
+ =?us-ascii?Q?27P1BmGMsFJ2NMLjY4QZxtFPtk42BAZ25eo7T7a7kEYQqB66nkXWvOlPdnVL?=
+ =?us-ascii?Q?5E+lxhGkesaAIz07a438bXQ9efMn0vLie+iIQ78BTIinSV9VcsMPFFFCXSYB?=
+ =?us-ascii?Q?fgXTbOcAofKk/cEsAKo1VSjklGR6hI4shvduOhzEzv+sOwPeq35iAeEZwqy5?=
+ =?us-ascii?Q?2vb+50V/B8Faj+VYKmyZQAcJmIUJYYB35msXXyWLvxbHyXzRPFzao8JexsfW?=
+ =?us-ascii?Q?DAGMxnZhQvjM9H0AKcP4xViHRmhKftMnfNTktwDyXIxr+BTKTf/acsn0EX1X?=
+ =?us-ascii?Q?7H/XP/uCiqJQaTil4W2EbnAaBOZdTmYJcn7rqSlrdL5hm79NKyaVaoX67p9w?=
+ =?us-ascii?Q?ce89HYW4mk0ynLoCHx/sCP9V9LSnaQRzSzJJMdnC4f+ykwPydmezZgOcRhke?=
+ =?us-ascii?Q?iYO4SVWBwZip2UTvrnJQRLE3kMwVMl6Pjp0OQ+RgflfoR3BvgoSD2QN5UNK8?=
+ =?us-ascii?Q?FehreJFwnICssLlwmXkY01Zo7eMFAZdthjwv+4QIBEH5lYfh3M9P+lMNzbxU?=
+ =?us-ascii?Q?YGgNgAoQhrnJ4BU1uL/Nkcy1kwXVGqMeOvYLFA+RN4Y4vewIppC2IoXiAtOt?=
+ =?us-ascii?Q?0OwhnVUWgr2vPeJ2wcRkNk7dx7qhLrlsFtXUqj0E6Mz/XHdsvE7T/8xVu1Bo?=
+ =?us-ascii?Q?rzHVDfBJqziK5sKPXQ0ZbsFrIhfa5uXn0k3s7XAs6Jd1COq0UA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Set/cmq6F+wNfy1x0e8gk/1Y0S1lM2FdGVAvlfApJ8+dfE134JY/O8v88OW0?=
+ =?us-ascii?Q?fLkEsPGG28dXCA+mU/wJiwXuOKV74lujk59MRZCFcJOGhwvdYwLzv4/z1rbz?=
+ =?us-ascii?Q?1z7p6IsqSx10jsetNj9WzK4b7l4vfrtOWTkHxjboeSQziXVeB6yLHA1lCi5N?=
+ =?us-ascii?Q?K1mrsWeXBYN21dL+ORo0XsbJPu3RYtO7KyO5pvAbf3OpdHv4kxUsBKv2LWCo?=
+ =?us-ascii?Q?EXxWWC213qHijRuAnpBeVAs92292q3p4VrPWminpN2aimi4/bKCKE0wvjGg6?=
+ =?us-ascii?Q?cqcXPOHPMpwHri1PBOnWr4+MZDDCAA1mhSBCKB4ADlHRhneKSGU3Vy9m3JLT?=
+ =?us-ascii?Q?XIr5yfrqMOQcdEXyGZJUieYhGP4LezpW0tIxAEn3Ku6tVzXv7GHEugW81N/K?=
+ =?us-ascii?Q?idT4CfvRzYps5ZnyeJCjEKbbBECN213pkFIidWwKje0yVxVYZ7t7JxYv5H3J?=
+ =?us-ascii?Q?SbGX6t9oSii53JLAgox3dKXcc1e+0Kb1+8M9+BQQHxV4TEaewDouhRxR3pVt?=
+ =?us-ascii?Q?lXyfQqmJhWNv7Na4sa2vIM433sHPDliavO00jF51etEyfKyhkSuOVkznKw9W?=
+ =?us-ascii?Q?9qPSy92RTr/WUA9bwUe4ITc/9Pky8cJf2DgDG6uBXWqSFZ+7woUQ+caI3umV?=
+ =?us-ascii?Q?JUczzmzd5efrHX82LaWJBgYTrURXI5/PmDS9MzwB5EI2RreAaUWCUdNwHEOw?=
+ =?us-ascii?Q?tHFMyUGF4n0CjXLIkd/MxLeh79reCRuBD57yXQ9w82SkJ6WG0srthdaYr1XU?=
+ =?us-ascii?Q?YF5/0pLlWK2W4zUliBLR3lcSQzgSwxvIg3ZIhHt6KdhCa1PzX8srtPUOxtkJ?=
+ =?us-ascii?Q?okToQp09PZ3Km1QnOw0cIUJ07XzBSqk5OR/x7EGDl3GnwQWOGrxTnpv1w9VS?=
+ =?us-ascii?Q?o98X7XYus63osLxitIiQ/ZHLvKOVu1ImjjWSLjSUhHYhrjJHG1lNZ8BQgXs1?=
+ =?us-ascii?Q?A0bx4QGwxNivgpR8t/3xBFfVYIVmHj6wyZ2NcJZ8m9IMLX3XNjxoNI2jTDS3?=
+ =?us-ascii?Q?9Os5A8y77P2PooQ8XY0h9Q+P37+yxWnrqtch2XaagVRkQENFITa3RqOzLwv3?=
+ =?us-ascii?Q?pwZpsu4kefTtodk6KObyfKbQsL8g0HFid+RPXT5AtqvoHhCNhIJh7MwcZDd6?=
+ =?us-ascii?Q?csPraldoouTnl+lBNeVrYRSBfGuLFRUX3mxhb6icyevbGgRLl4NOLgSRpuI2?=
+ =?us-ascii?Q?HY/eO7lhoQhet6N1d72junF3hu5ob+UKQTNAGTaME2WF/5BGxixrc479XW6G?=
+ =?us-ascii?Q?ZkxqFz7yVdgZJg8S2CFe7OpH9T6Mopgq6ySuK2Zu6J9EEgGG5Y/zRkGObcXJ?=
+ =?us-ascii?Q?WjdnaMrCFxYjFtVvlGT21P4DP0cRcLOPljaegdxyywvtS7RW8t526goP/jMf?=
+ =?us-ascii?Q?FQtVa60UeCPXBwfCF/5RKkBZVxRbJlPGlHgfXWGZvcNpyHxfufXdUF/xiEmy?=
+ =?us-ascii?Q?pSysOLz6weG3bCiCRP/eK9NsR2TZdy2oypQpue+OYUZdgGH4M9GlKXFyXgcY?=
+ =?us-ascii?Q?3WrQbmNIDm/IKayyowZxqQJvkB0B+fzlPGZKbKL7lNsBNC2TeFo8KxBQDoNH?=
+ =?us-ascii?Q?ihUD6ktWkQdxAWVzSt4WCuUpE+Z3PGkf4JiUTqZRzTHbrZv/u6B7WMCJ/ogt?=
+ =?us-ascii?Q?wYGywM/O6bnuFgiJniMNpcE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <978630DB471D8040B54905DE77BC56FD@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240722091633.13128-1-yang.yang@vivo.com>
-In-Reply-To: <20240722091633.13128-1-yang.yang@vivo.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Tue, 23 Jul 2024 09:33:21 +0800
-Message-ID: <CAFj5m9LKfOFs2XC4dDmatuwRMaNxx0=QM-_9noeOj5VMQg++3w@mail.gmail.com>
-Subject: Re: [PATCH v2] block: fix deadlock between sd_remove & sd_release
-To: Yang Yang <yang.yang@vivo.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	ZUW5EO1UXTqFy1fo0rpDuMhJubEGz6/W5gXRR5SUdOHPxYBkTQ+AyAl+4qQhEHnjx5w9KsIm5NJkTLUoOjKO7y1xr/TdqbQzI1rATQj4bQe0MfOFwLfLrgXTKHCJAzDB72g8qArFCfMZbWSx61TF1HrPZfyDV5z+2gnFND0WodGn8eNeRutVyUniXpH85WfKDpJjfHUZe9QQpt5kRnLN/lmVkNb8bZx/OlwNqcpngcH0dQV5mZxItfZGxgmaIKWdvSA7B8l4X8OsV2MkB435ZL1ZMDDD1FaSglKYqE4nOXHGh9xNHP0YYWnzPoiQBvllVevk5WEeIYOkF+NIlZAKGB1wQ3gttn9mF7YuZhOZuAzjlw7UiyvEP/46unDI4Fe7gZ9511YxJo8BlnqY7FIQUtQkAGm6HZZ7asYyODfSlihMaHw7pxwIB1RJYVIOVni/FzhpIT9xej/mTLOgrlzlwbL1mtfJUd/3HHEqLGF58cwLpSVzNf04HPJbaoNRJjniRgATMrNldH8+ZF/iX6SHAzeOFCyEKlUKuD9OmXy4QgX24KjKT4+C50iRMT2LyINIG4NM+QLyXSVG17X+sipY9qF6TfQlsG3bZewwNGeGVAZnoY5tjnQCfOcCfiuiNXY/
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3be59d6-73f1-4ec5-444f-08dcaacaadd2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2024 03:51:05.5926
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: l8yhu4+j8HIHHJai5HWuWY+K0g9VWy71wyFMAymiLPYuWo7zUgH6itOD1LQ3JAAMn3vLadka5dvSMNKwTmdQ8byKhA2lGKPKHFDsqQRBpGI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR04MB9403
 
-On Mon, Jul 22, 2024 at 5:17=E2=80=AFPM Yang Yang <yang.yang@vivo.com> wrot=
-e:
->
-> Our test report the following hung task:
->
-> [ 2538.459400] INFO: task "kworker/0:0":7 blocked for more than 188 secon=
-ds.
-> [ 2538.459427] Call trace:
-> [ 2538.459430]  __switch_to+0x174/0x338
-> [ 2538.459436]  __schedule+0x628/0x9c4
-> [ 2538.459442]  schedule+0x7c/0xe8
-> [ 2538.459447]  schedule_preempt_disabled+0x24/0x40
-> [ 2538.459453]  __mutex_lock+0x3ec/0xf04
-> [ 2538.459456]  __mutex_lock_slowpath+0x14/0x24
-> [ 2538.459459]  mutex_lock+0x30/0xd8
-> [ 2538.459462]  del_gendisk+0xdc/0x350
-> [ 2538.459466]  sd_remove+0x30/0x60
-> [ 2538.459470]  device_release_driver_internal+0x1c4/0x2c4
-> [ 2538.459474]  device_release_driver+0x18/0x28
-> [ 2538.459478]  bus_remove_device+0x15c/0x174
-> [ 2538.459483]  device_del+0x1d0/0x358
-> [ 2538.459488]  __scsi_remove_device+0xa8/0x198
-> [ 2538.459493]  scsi_forget_host+0x50/0x70
-> [ 2538.459497]  scsi_remove_host+0x80/0x180
-> [ 2538.459502]  usb_stor_disconnect+0x68/0xf4
-> [ 2538.459506]  usb_unbind_interface+0xd4/0x280
-> [ 2538.459510]  device_release_driver_internal+0x1c4/0x2c4
-> [ 2538.459514]  device_release_driver+0x18/0x28
-> [ 2538.459518]  bus_remove_device+0x15c/0x174
-> [ 2538.459523]  device_del+0x1d0/0x358
-> [ 2538.459528]  usb_disable_device+0x84/0x194
-> [ 2538.459532]  usb_disconnect+0xec/0x300
-> [ 2538.459537]  hub_event+0xb80/0x1870
-> [ 2538.459541]  process_scheduled_works+0x248/0x4dc
-> [ 2538.459545]  worker_thread+0x244/0x334
-> [ 2538.459549]  kthread+0x114/0x1bc
->
-> [ 2538.461001] INFO: task "fsck.":15415 blocked for more than 188 seconds=
+On Jul 19, 2024 / 09:14, Milan Broz wrote:
+> On 7/19/24 6:23 AM, Shin'ichiro Kawasaki wrote:
+> > The test case dm/002 rarely fails with the message below:
+> >=20
+> > dm/002 =3D> nvme0n1 (dm-dust general functionality test)       [failed]
+> >      runtime  0.204s  ...  0.174s
+> >      --- tests/dm/002.out        2024-06-14 14:37:40.480794693 +0900
+> >      +++ /home/shin/Blktests/blktests/results/nvme0n1/dm/002.out.bad   =
+  2024-06-14 21:38:18.588976499 +0900
+> >      @@ -7,4 +7,6 @@
+> >       countbadblocks: 0 badblock(s) found
+> >       countbadblocks: 3 badblock(s) found
+> >       countbadblocks: 0 badblock(s) found
+> >      +device-mapper: remove ioctl on dust1  failed: Device or resource =
+busy
+> >      +Command failed.
+> >       Test complete
+> > modprobe: FATAL: Module dm_dust is in use.
+> >=20
+> > This failure happens when udev opens the dm device at "dmsetup remove"
+> > command. To avoid the failure, call "udevadm settle" before the "dmsetu=
+p
+> > remove" command.
+>=20
+> I think udevadm settle is overkill as it waits for everything, not only t=
+hat device.
+>=20
+> Did you consider to use "dmsetup remove --retry <dev>"? This is one
+> liner and you do not need to implement the retry yourself.
+>=20
+> We have many such situations in cryptsetup tests and --retry was enough
+> to fix it (as the busy comes usually from blkid scan that is fast enough)=
 .
-> [ 2538.461014] Call trace:
-> [ 2538.461016]  __switch_to+0x174/0x338
-> [ 2538.461021]  __schedule+0x628/0x9c4
-> [ 2538.461025]  schedule+0x7c/0xe8
-> [ 2538.461030]  blk_queue_enter+0xc4/0x160
-> [ 2538.461034]  blk_mq_alloc_request+0x120/0x1d4
-> [ 2538.461037]  scsi_execute_cmd+0x7c/0x23c
-> [ 2538.461040]  ioctl_internal_command+0x5c/0x164
-> [ 2538.461046]  scsi_set_medium_removal+0x5c/0xb0
-> [ 2538.461051]  sd_release+0x50/0x94
-> [ 2538.461054]  blkdev_put+0x190/0x28c
-> [ 2538.461058]  blkdev_release+0x28/0x40
-> [ 2538.461063]  __fput+0xf8/0x2a8
-> [ 2538.461066]  __fput_sync+0x28/0x5c
-> [ 2538.461070]  __arm64_sys_close+0x84/0xe8
-> [ 2538.461073]  invoke_syscall+0x58/0x114
-> [ 2538.461078]  el0_svc_common+0xac/0xe0
-> [ 2538.461082]  do_el0_svc+0x1c/0x28
-> [ 2538.461087]  el0_svc+0x38/0x68
-> [ 2538.461090]  el0t_64_sync_handler+0x68/0xbc
-> [ 2538.461093]  el0t_64_sync+0x1a8/0x1ac
->
->   T1:                           T2:
->   sd_remove
->   del_gendisk
->   __blk_mark_disk_dead
->   blk_freeze_queue_start
->   ++q->mq_freeze_depth
->                                 bdev_release
->                                 mutex_lock(&disk->open_mutex)
->                                 sd_release
->                                 scsi_execute_cmd
->                                 blk_queue_enter
->                                 wait_event(!q->mq_freeze_depth)
->   mutex_lock(&disk->open_mutex)
->
-> SCSI does not set GD_OWNS_QUEUE, so QUEUE_FLAG_DYING is not set in
-> this scenario. This is a classic ABBA deadlock. To fix the deadlock,
+> It will print a few benign messages while retrying, though.
+>=20
+> (Just a hint, I am not nacking the patch :)
 
-del_gendisk() shouldn't fail scsi_execute_cmd(), so QUEUE_FLAG_DYING
-can't be set.
-
-> make sure we don't try to acquire disk->open_mutex after freezing
-> the queue.
->
-> Signed-off-by: Yang Yang <yang.yang@vivo.com>
->
-> ---
-> Changes from v1:
->   - Modify commit message by suggestion
-> ---
->  block/genhd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 8f1f3c6b4d67..c5fca3e893a0 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -663,12 +663,12 @@ void del_gendisk(struct gendisk *disk)
->          */
->         if (!test_bit(GD_DEAD, &disk->state))
->                 blk_report_disk_dead(disk, false);
-> -       __blk_mark_disk_dead(disk);
->
->         /*
->          * Drop all partitions now that the disk is marked dead.
->          */
->         mutex_lock(&disk->open_mutex);
-> +       __blk_mark_disk_dead(disk);
->         xa_for_each_start(&disk->part_tbl, idx, part, 1)
->                 drop_partition(part);
->         mutex_unlock(&disk->open_mutex);
-
-This fix looks fine, and the added lock dependency is safe since
-mq_freeze_lock is block layer internal lock, so:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-Thanks,
-
+Thanks Milan, I was not aware of the --retry option. I confirmed it avoids =
+the
+failure. I think it's the better than "udevadm settle". Will post v3.=
