@@ -1,48 +1,45 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D991581EB;
-	Tue, 23 Jul 2024 16:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5F3381B1;
+	Tue, 23 Jul 2024 17:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721752114; cv=none; b=gCmL/B1ECeQ2ullMOk/HtPFs+Uj1Xr+oC39UWuIvSVV+NWO8ycq2Hnl66ght1jZvDzxHQKC7QzMP1xZ+vJIcTNWZuDJcyn2lHeWjMtAtQxf8OQAPLb1iF0BXrtshKotxMh3hZz7xJvl/jIl9fLo8mhMoM3+P4HU5nORkZQ/k5Og=
+	t=1721757106; cv=none; b=uyr6kRTGauY6BYSDrjs/84vOsd1njDOOdN9J44rlrg9lxDrY3vGhgMOoOYdRCYcIdU11rd/y6dOYmA1i+wc1BwtHLLwx+T1V/8tPJAke7gXyb53GDtfVLxbsXoMgmRFn7386Wq+V7l4Fpeg4jD9AzgezzDPpibpOjp5SLg5F2wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721752114; c=relaxed/simple;
-	bh=RbOdrvcsDjEz/icRhaCs+TKTGqgAzQUcydt4ZuKFJTw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PoJNnNXovwigkNo+q0F3VVGgo3CuhJsdpkw6D/KF7aly1/Jk+BrIEM11JKcrJzwiuTU9KBvUzdJvQuKsTo7SHAw9F3plbf747ogaqLpIdupQvvG1+h2yUgJgf4JohOxe1s7kFx0VGc1G4NGffCWK26A0RfyvAgn7ZZJmleJCK3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=FNSjfJDi; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="FNSjfJDi"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4WT2dW2twpzlgVnY;
-	Tue, 23 Jul 2024 16:28:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1721752110; x=1724344111; bh=iX6Rbk01cfhxdEBIAeNsq9o7
-	6Ulzdi/G4DWyZljlrv4=; b=FNSjfJDiO7wDugYnGz8MiekqoEBIUixTpqS2IbI+
-	1QgwfsayLBMkWz/oeXdI8qrS0rmsB7+W+LSoi/7Dg0F85HowxI5fH8DbEbOHL1n2
-	Z+UriPOYkLQAHCt0p+EBsphBUbPdiKsZZm6iva6SLuoE/PBmeaZMWNb2YgQLUOqN
-	/3oWnSNhK0xOgKwq9P6PoGCoqcsiuXBimCFIMCuiZCiv04d6oGQYfw8lbkS4pP8x
-	TQOox200SyItADeLkwZ6t04ZvA+luELPlXO4KEASy1qiYtx2mxVZzVKC+6uNHoJW
-	By+3llWORI847x6ibG5x8ujUC931H6M2GdMQqkJu0teaoA==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Creij_MQ9KzB; Tue, 23 Jul 2024 16:28:30 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4WT2dT1fYkzlgTGW;
-	Tue, 23 Jul 2024 16:28:28 +0000 (UTC)
-Message-ID: <51421cc8-ef09-4d13-ae92-bc0839a8b3b3@acm.org>
-Date: Tue, 23 Jul 2024 09:28:27 -0700
+	s=arc-20240116; t=1721757106; c=relaxed/simple;
+	bh=q/906rZhLsSEmkkYt9iPHA1Kz16OIGT4ctkfGoPky5w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S6YpPjtqW5ONKSzAgdrH2uGec+xmImy6fHViftrYhoaMUViqmbbu3rYmrLBvuiJRxRuCX0vanxJq8PHYvpf7Hvp7ASUk3a4D1uhT00Sl1sGK79iHxFxh6mOJX7T0K+75+IAKnEFr0AuxK/4cp73/F7e7xHrBmX45JyB62zamM6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fc53171e56so736435ad.3;
+        Tue, 23 Jul 2024 10:51:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721757104; x=1722361904;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VoeGtHSXB64zwiuwvms6AcLkRLb38MEJZx4ZT1nmMD0=;
+        b=wa2y1R+yFBtgBwE09xRS//fjt9+3wgJ4N2WXoK51/80fE+LG0H+r3liCn8AvqYP0jA
+         eEArRJAlYdeaW9px7F+UjJvVn8lXLZHX2JX3P7TsKZyMygEMdW4byhXrCcjYMm982YAH
+         hlnd8SNZuMPjwDjMOdaFruwXqeEEjGs97zOFxF8E0ccWmL3ySJ7bJHJKmOfwKZ3EsZU8
+         J7etZLGxLvkmGrIDDNV3BYvxDKNwOAIge2RBnKcIgE6uHpsn9ebqe7lBi8fD1KN1Dqk/
+         FD42D9W3BfqqY2dr9lYtdvxs+EzFpa/nDxLx5YZ7F4LiGRTQWmXXyeO8kgHx4DdP6udP
+         6+IA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqGo2vhhIHfi/Ur/QbEKCGbx3M2eOyVASRVpUArmWSnZuHMGoJVPttaFfTm3KmmNnMiUBAWsSaBmiXYdsTiF6cECNZfhMsKOlE/uPtMikXrDoYvwVAOGUaWI+AnoH5nnhagrzv5QWkK1qQ1E4aIgxu6vt65WDSM4QBW/paF6Ax
+X-Gm-Message-State: AOJu0Ywpkw3orfPuupdrq1GLYCWsJmaRFBmk9DE2tYj6gVGqTuleST9K
+	JFt45R7g4apFc6q6Upwr8C3Fbd9w+V68ABN3/o8ZzedWIq5T1y0++NpyBg==
+X-Google-Smtp-Source: AGHT+IEWZwnlQ/uVz5RIULJVj6dMBCxAtD4yCOb6ArLoAjAlN3bT5GK7xeRd3S5Zevx1CkOR4GghGQ==
+X-Received: by 2002:a17:902:e5d0:b0:1fc:5cc8:bb1b with SMTP id d9443c01a7336-1fd746009a8mr88898525ad.7.1721757102488;
+        Tue, 23 Jul 2024 10:51:42 -0700 (PDT)
+Received: from [192.168.68.149] ([70.90.172.18])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f2947a1sm78061045ad.86.2024.07.23.10.51.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jul 2024 10:51:41 -0700 (PDT)
+Message-ID: <54cba15d-6598-47c4-9a62-81c4f463ef64@grimberg.me>
+Date: Tue, 23 Jul 2024 10:51:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,25 +47,45 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: fix deadlock between sd_remove & sd_release
-To: Yang Yang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240722091633.13128-1-yang.yang@vivo.com>
+Subject: Re: [PATCH v5 0/3] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Jens Axboe <axboe@kernel.dk>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org,
+ Ofir Gal <ofir.gal@volumez.com>
+Cc: dhowells@redhat.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kbusch@kernel.org, hch@lst.de,
+ philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240718084515.3833733-1-ofir.gal@volumez.com>
+ <172174144805.171126.5886411285955173900.b4-ty@kernel.dk>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240722091633.13128-1-yang.yang@vivo.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <172174144805.171126.5886411285955173900.b4-ty@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/22/24 2:16 AM, Yang Yang wrote:
-> SCSI does not set GD_OWNS_QUEUE, so QUEUE_FLAG_DYING is not set in
-> this scenario. This is a classic ABBA deadlock. To fix the deadlock,
-> make sure we don't try to acquire disk->open_mutex after freezing
-> the queue.
-> 
-> Signed-off-by: Yang Yang <yang.yang@vivo.com>
 
-Fixes: and Cc: stable tags are missing. Otherwise this patch looks fine
-to me, hence:
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+On 23/07/2024 16:30, Jens Axboe wrote:
+> On Thu, 18 Jul 2024 11:45:11 +0300, Ofir Gal wrote:
+>> skb_splice_from_iter() warns on !sendpage_ok() which results in nvme-tcp
+>> data transfer failure. This warning leads to hanging IO.
+>>
+>> nvme-tcp using sendpage_ok() to check the first page of an iterator in
+>> order to disable MSG_SPLICE_PAGES. The iterator can represent a list of
+>> contiguous pages.
+>>
+>> [...]
+> Applied, thanks!
+>
+> [1/3] net: introduce helper sendpages_ok()
+>        commit: 80b272a6f50b2a76f7d2c71a5c097c56d103a9ed
+> [2/3] nvme-tcp: use sendpages_ok() instead of sendpage_ok()
+>        commit: 41669803e5001f674083c9c176a4749eb1abbe29
+> [3/3] drbd: use sendpages_ok() instead of sendpage_ok()
+>        commit: e601087934f178a9a9ae8f5a3938b4aa76379ea1
+>
+> Best regards,
+
+Thanks Jens.
