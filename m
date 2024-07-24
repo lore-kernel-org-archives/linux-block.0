@@ -1,119 +1,57 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBE815B0ED;
-	Wed, 24 Jul 2024 14:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B52C54759;
+	Wed, 24 Jul 2024 15:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721832840; cv=none; b=DL0pxFizTGPEIZrKS7jciXkehgeYXYsFfzKFxwSxeXYxfCy7y9v2AlEXzL3Lx7/FZLdY+erVpwZ6QH5qI+6zdH2q+8FC0L3q1xV5fb9xMoL9ZCZm9vK08bIL37u4nyLyPlBPsnX0YvijpaAlSEqIF0gAa03HcLRa/7sL1eYtOSU=
+	t=1721835237; cv=none; b=OVgrebm33tPXGl2EECtQ/qs4W/jpjr2InOHeTIJxW0f51R6a5/ex0q/MQkjyBoWomHZ42wlQgVWMiQqFhvhwO6Bw/CSUHt1+aQgEdXTf8pk7o2xtCKofXZcycZYsLufpdm3ZHWBmlnyKxHng0lv9+VMFuIULfyjuSVhLQ6nJmwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721832840; c=relaxed/simple;
-	bh=WNzOf9x61mMuDRez1uJMbxBR6eqhL7BIbfckeqnYXUw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VqRIN52TjXGZG3NnJiN4cUr0lYoUz6IDBO6tsDuOYD/Jsjkk39Ko3/ZlAr2js6awnleoCq4oX/Wd1eKF0o0P6zTeMiAtauADE2Tv1X42M2gj4V9mKRqq5mbd1mS0/KWYNtPcO9S+Zmx76nCJEkS66yFaBQzwsndn+YyKc0VBDSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fgb317i2; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721835237; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fWg/IieacvpRVloLyJA+xY8YfyZ6CxQt6V3H7eUXcSjeKZGrDFZub7OEvB3RVu32HDgi3np9rv8LVDyW6nHgWislnHjJ47JTiJr2MekqDvFhLs217Bo4m1ckfQTR56B2LCHwVViFutRsTEFgUN7tLseRhZvHxV+BXFQSsrgd4xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qntWUtga; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fgb317i2"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a7a9a369055so195824966b.3;
-        Wed, 24 Jul 2024 07:53:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721832838; x=1722437638; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0MgXC9MqivH0JROXD+X8B13PkkRSopqzKEyAhb3+nXA=;
-        b=Fgb317i2hvuFtAow/UpcBG4/qhwm6tpCcy77y9UzX5GXFgEzcMh84X5FZ5+Ho+Vkdm
-         aZ0OCDMI1yGiD2Myheyq/tW/VAWYKcIrCVTqUVHPhmumlNFWN5gIMfRKYZHQlBpaTyfI
-         GUaGe+tAzEroNaWEA/71PeWfXZNCZNbxJeWp5TJNupFeJvRb0KdCdCdryfxnqS/IcbOb
-         NBZILFC3tnHYs+xjXMtjX2GJUTQSWy3hiuzV0A5i/VyxqZShsH0aqIkFZbqf+77KKnWy
-         zCpl1nn2yiSR+252UYtOmmx6oCawTV1y89hKmHoMaGFt2nOwq/voD/Wd6qSz/VF83uRP
-         St5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721832838; x=1722437638;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0MgXC9MqivH0JROXD+X8B13PkkRSopqzKEyAhb3+nXA=;
-        b=Gsh/XCSAhxQM3kTFyWX4Y5dxdjXXUAP4ZBT39DeSX+xuh2qlfcR9nlN4dqtlnbvvKU
-         1ai3O9Ss2lQ4LG1dFHCNHdv2Bg77TXNyme3H6VwCYFWqvpuSon56fpBgM1cI+c+r0W3E
-         Ba5X2sB+CxcoRfFbMl6PFrycp+K7QAWs8hnScxDFyEU3efU52IggcOfXb9ljcfTG2kGX
-         IxP8WYU3ninNuMD5lzVCGz4KpmZQyIBALKj1ApMluVw7hPZU2qFQMWvzr0Mq5hUk00F0
-         /b023bnd7zABJQrGPyjmFxHZMg2kfEY4Gc4n79CWdbpOCF/nm0TCTLJiT/Y70534Lv6N
-         rj7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUBUbMRdWbMf/05rfyuVLUGDn/NULPz+a5e/017UVzv8M+22a5t5a1Ds08bT04iBH09cs2qTD927IKYJNIzqTi0xefyQZyqZq8pq9mRfaBjSfP72qxw9iT+OpFnN5j3V/3BEyAiWQ==
-X-Gm-Message-State: AOJu0YwK7CmHAVh7gTGOMPpKAc8+pN1XYcQhj0W6gHFWan0ggIwXyohi
-	iTGr4PKAsYGrIqM6Lhs9x+r11sSNv2C/2uhhWytFT5MZgrP7TTeCnz2PDg==
-X-Google-Smtp-Source: AGHT+IEzhsL+reKAEC2aXIzwA37y8ftrpeNTJ05+SvlV0WiidMattXMPIdgeunWG7gPAVX2yeZ/o1g==
-X-Received: by 2002:a17:907:2d0a:b0:a7a:b070:92c6 with SMTP id a640c23a62f3a-a7ab10c3cc7mr173609866b.50.1721832837587;
-        Wed, 24 Jul 2024 07:53:57 -0700 (PDT)
-Received: from [192.168.42.176] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7aa439e40esm139350066b.48.2024.07.24.07.53.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jul 2024 07:53:57 -0700 (PDT)
-Message-ID: <cb88fbce-fbae-456e-8f8e-e49202fc7149@gmail.com>
-Date: Wed, 24 Jul 2024 15:54:21 +0100
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qntWUtga"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=qntWUtgaJv05pn0/K+VH6SrL9y
+	eHq9CJRbWzDhpvfk4ZC0toFAjF0fS+adcayh2rsN9BJ7fOdhsx+9Rqlbf9xB5vaOS/EwmcdfTEPaN
+	NnKMyAWgXFtKZoG4WZFZerzHQobaVWtS9J7jMRWT8eNk9QNav3PqpsKCiFVz7gvHh956h5sWzN4Pv
+	HUBOLqwTqt4uAt1qgTkq8hi06ZzGHnhCaThtz5iR4XP2WcBHuovyIc5KsmA+XYhiFj2XTPEsMEQyZ
+	+8o11bZVqqWoZknEexb8xKQUUVFHtfdI0B7FO+ufMYQQKUePhsG+r75G6gxWrCDCfGYNzSnL6dROI
+	ZsElJy/g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sWe02-0000000FmX4-3hlG;
+	Wed, 24 Jul 2024 15:33:54 +0000
+Date: Wed, 24 Jul 2024 08:33:54 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Yang Yang <yang.yang@vivo.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Dave Chinner <dchinner@redhat.com>,
+	Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v3] block: fix deadlock between sd_remove & sd_release
+Message-ID: <ZqEe4oXZfRf6t8VW@infradead.org>
+References: <20240724070412.22521-1-yang.yang@vivo.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 4/8] io_uring: support SQE group
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-References: <20240706031000.310430-1-ming.lei@redhat.com>
- <20240706031000.310430-5-ming.lei@redhat.com>
- <fa5e8098-f72f-43c1-90c1-c3eaebfea3d5@gmail.com> <Zp+/hBwCBmKSGy5K@fedora>
- <0fa0c9b9-cfb9-4710-85d0-2f6b4398603c@gmail.com>
-Content-Language: en-US
-In-Reply-To: <0fa0c9b9-cfb9-4710-85d0-2f6b4398603c@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240724070412.22521-1-yang.yang@vivo.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 7/24/24 14:41, Pavel Begunkov wrote:
-...> io_free_batch_list() {
->      if (req->flags & GROUP) {
->          if (req_is_member(req)) {
->              req->grp_leader->grp_refs--;
->              if (req->grp_leader->grp_refs == 0) {
->                  req->io_task_work.func = io_req_task_complete;
->                  io_req_task_work_add(req->grp_leader);
->                  // can be done better....
->              }
->              goto free_req;
->          }
->          WARN_ON_ONCE(!req_is_leader());
-> 
->          if (!(req->flags & SEEN_FIRST_TIME)) {
->              // already posted it just before coming here
->              req->flags |= SKIP_CQE;
->              // we'll see it again when grp_refs hit 0
->              req->flags |= SEEN_FIRST_TIME;
+Looks good:
 
-Forgot queue_group_members() here
-  
->              // Don't free the req, we're leaving it alive for now.
->              // req->ref/REQ_F_REFCOUNT will be put next time we get here.
->              return; // or continue
->          }
-> 
->          clean_up_request_resources(); // calls back into ublk
->          // and now free the leader
->      }
-> 
-> free_req:
->      // the rest of io_free_batch_list()
->      if (flags & REQ_F_REFCOUNT) {
->          req_drop_ref();
->          ....
->      }
->      ...
-> }
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
--- 
-Pavel Begunkov
