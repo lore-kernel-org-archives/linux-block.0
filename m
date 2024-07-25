@@ -1,90 +1,92 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F45539AD5
-	for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 18:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA60A63C7
+	for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 19:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721932247; cv=none; b=ID3DpJVI/6LihJpADEieIUr3eKj2ZJPWd3tvbX1ZzBSZn/BP3SVUaE32GSrzMzVS+r+PXGlepW1SWYJSMRTzWV8GvC2tQHJXBMf8LB72Bq3dyphhdIu9l+BQL7UqDmQhKUHH8ZoGSoKOum2ApTbX3PyOVNaptVmeSCpYz7NNZ18=
+	t=1721937596; cv=none; b=UPo9ChLVucJ5Qkk4x7Ci5m+Vz17D9UJM30iWWSo+VBj6L4YoLeIRLVsfXClPAtVhhwTTqfW2YEFn1d5bAFge/ke6n3NLBCaIQXOAifqlIirVYuNtvD4bGZ7qYZWZwdKpCqmUWBi6bnCQESIvQhvRx9u2J82ip6jcoFGPZf1SVYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721932247; c=relaxed/simple;
-	bh=qyrHzsvZ+fr4cYGQYpVCy8DTG9FS25Klp9PEKJaPtmY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DxQcqQ075WU9UnXeknViws1WpI+V5JagY76PdRBVMToHRugGCw3HJ/yLtu1cauIGR1fbT6A+ryp3ODuTkUE3rIeRXDkLOzMCOiaN0wmL2HCG7MiFHke660mxK6MdFHbNtPuFeyHIw+W7W0qdeAqmjJ1I1k4c+Fggrtleyh9ykSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PSMlvKU8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1721937596; c=relaxed/simple;
+	bh=6ZUzZwHdx1h+7YIaHAeHl+LavvOCO8czLFp/Rn64mHg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=R7HBXBdBLj4SE/sHXVa8A820I4yC46YpuTs8032qHUu1/7xSZj1ILewF2rMcUAHYvcTWN7O7SEEezF7ayU2DV5o6wAyNIvukFzxM9zCMdK9n0ZKovMQLxK5tDYT9321n11iCBIh3bD3C22WcsKnMhOsx1YQ0eczoieWOCqug0IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DiXpuKZ/; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSMlvKU8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721932244;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s1EgtC5Zyd0+M7dW8BgWSZUgLMCFLsbULmk/eMJ3Z2o=;
-	b=PSMlvKU8qXU0cWGIleJwmz/zXxZUDNg+K/FmeQWSIZbLkj7+TUcp8r0HpraPtwdyLu3h8o
-	STqP2OxItmQuGgtBRSIP2WLIisVMnT/nV2LVJ+qSoaOCqiIWBJR12CCCesA7MEInLlhTIm
-	vgZdop39Nw2D5bL6my1yXi1Wn7FAAoM=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-592-c6HQHpleMdWs_xEVZUrgrQ-1; Thu,
- 25 Jul 2024 14:30:42 -0400
-X-MC-Unique: c6HQHpleMdWs_xEVZUrgrQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 12AE5195608A;
-	Thu, 25 Jul 2024 18:30:41 +0000 (UTC)
-Received: from redhat.com (unknown [10.2.16.72])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F8241955D42;
-	Thu, 25 Jul 2024 18:30:38 +0000 (UTC)
-Date: Thu, 25 Jul 2024 13:30:35 -0500
-From: Eric Blake <eblake@redhat.com>
-To: Wouter Verhelst <w@uter.be>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
-	linux-block@vger.kernel.org, nbd@other.debian.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] nbd: add support for rotational devices
-Message-ID: <xdq3z4oosh2l4hzlkgxsfbqza6z2q2c2zyznmo24rtt6svlixr@c2w2tpzqlzbp>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DiXpuKZ/"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-81f861f36a8so3438339f.0
+        for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 12:59:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721937593; x=1722542393; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8XgXgmEtMXg4oQLwkxOMS2HSqq9McBzQIGAGBjn5i0o=;
+        b=DiXpuKZ/jmJ8CFXRqq0z5KhjzhH+W3IGdndLAHyKn3/EYSohWks5+Nb4t+VPpfTWJh
+         9ctmxEuR/X8ChyEQg1W1w3F2TDAGsjCdwA4/JcgFvvN07Bomo3h3ssLfyCyuyVar/B+5
+         fO+ZYiYKtaN9gSuaNI5SBVKgo4+V8Ll9IPTUFnKBOTih0gDxUgw3wnghdorJgPBSGs0Z
+         +AOUKpIrjtY5AaLv/Nx/xbGRHpfb0/DMPp9mOononEyUPxl3fmrLX79wq6ru6tGISU4s
+         mD2V8G6gyzU+wTL/hcMMI6eqM2rq5pPTclj8fLka/oKaLc5cLERT3z6wbyMLKRMNa4ba
+         dw8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721937593; x=1722542393;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8XgXgmEtMXg4oQLwkxOMS2HSqq9McBzQIGAGBjn5i0o=;
+        b=Iw90Hai4XHaQR7KyyI/N/xuGLZhpzMHT8dgqv2+9KVGOpYI8+CUAYeCRkEcUPZVXRj
+         RFJLOrfRzJo8mKPGY4pyy0K9ZxV0iiSnXiyUFsECWBjNFq1OPlLVZx4CpCN0tnJi8lBN
+         dGfwL4LGDSNnOLGtkiz6yGex64TybI77wLOR+oE0mLCQVergRK4qKAVOJvspM6SI1hpg
+         qQdKjdXyC3Pqdu5Z+/7mo8CDgbErl3i5mpJueCIjT0SF4iYlXNDqXL0PScXeD72Gb8tW
+         N21J9mG+QduBVovW0ulDZ6Gz4acwng+HG6Ef8M0KmauWOvSMGb0qhuMLkZlfwKFs4BQ3
+         PfCA==
+X-Gm-Message-State: AOJu0YxozAb40Ya+cqYoHSB6nPW8mIn7EGz47RGN1hLVZmHIW2Q1y2rY
+	oOmXDPb7GYPnZKCDtlRlXArtPfsBWgJjrSwWHHe0N9U7ETSL4IgrEK/PhYGPZeE=
+X-Google-Smtp-Source: AGHT+IF+lE4LX6x0dgB+LLPvr0TYy3W68X/rGR/pknwS8jlOUdzMZKOI1TdeSmQVEohLB0xExWkSHg==
+X-Received: by 2002:a92:c54a:0:b0:38e:cdf9:601c with SMTP id e9e14a558f8ab-39a22d4c4bamr24209705ab.5.1721937593023;
+        Thu, 25 Jul 2024 12:59:53 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39a231070d3sm8533405ab.84.2024.07.25.12.59.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jul 2024 12:59:52 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Josef Bacik <josef@toxicpanda.com>, Wouter Verhelst <w@uter.be>
+Cc: linux-block@vger.kernel.org, nbd@other.debian.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20240725164536.1275851-1-w@uter.be>
 References: <20240725164536.1275851-1-w@uter.be>
+Subject: Re: [PATCH] nbd: add support for rotational devices
+Message-Id: <172193759229.89672.9311368505409768084.b4-ty@kernel.dk>
+Date: Thu, 25 Jul 2024 13:59:52 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240725164536.1275851-1-w@uter.be>
-User-Agent: NeoMutt/20240425
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
-On Thu, Jul 25, 2024 at 06:45:36PM GMT, Wouter Verhelst wrote:
+
+On Thu, 25 Jul 2024 18:45:36 +0200, Wouter Verhelst wrote:
 > The NBD protocol defines the flag NBD_FLAG_ROTATIONAL to flag that the
 > export in use should be treated as a rotational device.
 > 
 > Add support for that flag to the kernel driver.
 > 
-> Signed-off-by: Wouter Verhelst <w@uter.be>
-> ---
->  drivers/block/nbd.c      | 3 +++
->  include/uapi/linux/nbd.h | 3 ++-
->  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Applied, thanks!
 
-For what it's worth, the nbdkit project recently made it possible to
-aad a filter on top of any existing NBD server to change the setting
-of the rotational bit[1], as well as a filter to intentionally
-simulate delays of a rotational device[2], in order to experiment with
-how much impact changing the bit can have when it is not ignored.
+[1/1] nbd: add support for rotational devices
+      commit: 45c7d3321b0ce575705bb62b6069efad48a51d67
 
-[1] https://libguestfs.org/nbdkit-rotational-filter.1.html
-[2] https://libguestfs.org/nbdkit-spinning-filter.1.html
-
+Best regards,
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.
-Virtualization:  qemu.org | libguestfs.org
+Jens Axboe
+
+
 
