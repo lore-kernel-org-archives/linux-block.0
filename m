@@ -1,92 +1,127 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA60A63C7
-	for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 19:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E881B376E0
+	for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 20:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721937596; cv=none; b=UPo9ChLVucJ5Qkk4x7Ci5m+Vz17D9UJM30iWWSo+VBj6L4YoLeIRLVsfXClPAtVhhwTTqfW2YEFn1d5bAFge/ke6n3NLBCaIQXOAifqlIirVYuNtvD4bGZ7qYZWZwdKpCqmUWBi6bnCQESIvQhvRx9u2J82ip6jcoFGPZf1SVYk=
+	t=1721940065; cv=none; b=sfq1qp6GiY38iFOaHyeaZ96BpUxi2jgwWMmHqNxesUcEdsf489buC6e+3xvAZSpb4UkkYk9vydG+zy4UAb0ZtGaQk3OLTRzM3oauHoAb7/4GlTLCcC3kmdNeFx1CwFA6bY2YjQsyMV9YQ9KF3mMo110QiNIdpt571RuoeiEh5+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721937596; c=relaxed/simple;
-	bh=6ZUzZwHdx1h+7YIaHAeHl+LavvOCO8czLFp/Rn64mHg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=R7HBXBdBLj4SE/sHXVa8A820I4yC46YpuTs8032qHUu1/7xSZj1ILewF2rMcUAHYvcTWN7O7SEEezF7ayU2DV5o6wAyNIvukFzxM9zCMdK9n0ZKovMQLxK5tDYT9321n11iCBIh3bD3C22WcsKnMhOsx1YQ0eczoieWOCqug0IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DiXpuKZ/; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1721940065; c=relaxed/simple;
+	bh=0K1ZuBg27fCGG1YL6PCQQr5J9nm+PFHlNtTK/B6czjY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YpRXRlvvWeVOBc/NZtqc6f9qOixudvspEiPrZ2gPlDFW9USsy0Lyz461xojcA0i6oWzgs+dTQ6oV/irmJ6JrQsQRauYEqsPD91NEsEAa0Y+4MuW1/WKU1052Bhxm+1Z5pJ24D2M3W+heFRy7zxPE8jbmy2juBgpTcjfoApWVS3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TmcSLJ+i; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DiXpuKZ/"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-81f861f36a8so3438339f.0
-        for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 12:59:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TmcSLJ+i"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4f52c326501so625102e0c.1
+        for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 13:41:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721937593; x=1722542393; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1721940063; x=1722544863; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8XgXgmEtMXg4oQLwkxOMS2HSqq9McBzQIGAGBjn5i0o=;
-        b=DiXpuKZ/jmJ8CFXRqq0z5KhjzhH+W3IGdndLAHyKn3/EYSohWks5+Nb4t+VPpfTWJh
-         9ctmxEuR/X8ChyEQg1W1w3F2TDAGsjCdwA4/JcgFvvN07Bomo3h3ssLfyCyuyVar/B+5
-         fO+ZYiYKtaN9gSuaNI5SBVKgo4+V8Ll9IPTUFnKBOTih0gDxUgw3wnghdorJgPBSGs0Z
-         +AOUKpIrjtY5AaLv/Nx/xbGRHpfb0/DMPp9mOononEyUPxl3fmrLX79wq6ru6tGISU4s
-         mD2V8G6gyzU+wTL/hcMMI6eqM2rq5pPTclj8fLka/oKaLc5cLERT3z6wbyMLKRMNa4ba
-         dw8Q==
+        bh=qRm4FmtR2qmDFfNNBtVfrM3O+fun4c+DuwgUlbPMbS8=;
+        b=TmcSLJ+i8KZMKIuJrQOszPYRcnHXGZw/kYoPRCzU1JFHIZfXeT1+wL4lIb9wHvFDck
+         6aUb2S3XXmIc8M5utiRv/6I1H/y5dGeCMkKZ0e9UAZDKJyiC22/oV4NICisJ7brTgkH5
+         3E9oUaUrnna10g+yTfPjvJK+r83WzySyXSeONanlJWDD3xf5CZjuy2nfiKYMMj6eT2j2
+         3gC68v6ZZ8SoO8eP2T8vMJ5xBTuos+FZn2plFIiZy/Y2Vek/rpaUW+53vmU0SUPgE5Aa
+         UGkSP5svYE+kUmLyGBrPYUtKakbdVPOFAhlwxAapDXZs+yhBBKEXRqToWMRRMASK6Hb3
+         skrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721937593; x=1722542393;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1721940063; x=1722544863;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8XgXgmEtMXg4oQLwkxOMS2HSqq9McBzQIGAGBjn5i0o=;
-        b=Iw90Hai4XHaQR7KyyI/N/xuGLZhpzMHT8dgqv2+9KVGOpYI8+CUAYeCRkEcUPZVXRj
-         RFJLOrfRzJo8mKPGY4pyy0K9ZxV0iiSnXiyUFsECWBjNFq1OPlLVZx4CpCN0tnJi8lBN
-         dGfwL4LGDSNnOLGtkiz6yGex64TybI77wLOR+oE0mLCQVergRK4qKAVOJvspM6SI1hpg
-         qQdKjdXyC3Pqdu5Z+/7mo8CDgbErl3i5mpJueCIjT0SF4iYlXNDqXL0PScXeD72Gb8tW
-         N21J9mG+QduBVovW0ulDZ6Gz4acwng+HG6Ef8M0KmauWOvSMGb0qhuMLkZlfwKFs4BQ3
-         PfCA==
-X-Gm-Message-State: AOJu0YxozAb40Ya+cqYoHSB6nPW8mIn7EGz47RGN1hLVZmHIW2Q1y2rY
-	oOmXDPb7GYPnZKCDtlRlXArtPfsBWgJjrSwWHHe0N9U7ETSL4IgrEK/PhYGPZeE=
-X-Google-Smtp-Source: AGHT+IF+lE4LX6x0dgB+LLPvr0TYy3W68X/rGR/pknwS8jlOUdzMZKOI1TdeSmQVEohLB0xExWkSHg==
-X-Received: by 2002:a92:c54a:0:b0:38e:cdf9:601c with SMTP id e9e14a558f8ab-39a22d4c4bamr24209705ab.5.1721937593023;
-        Thu, 25 Jul 2024 12:59:53 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39a231070d3sm8533405ab.84.2024.07.25.12.59.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 12:59:52 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Josef Bacik <josef@toxicpanda.com>, Wouter Verhelst <w@uter.be>
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20240725164536.1275851-1-w@uter.be>
-References: <20240725164536.1275851-1-w@uter.be>
-Subject: Re: [PATCH] nbd: add support for rotational devices
-Message-Id: <172193759229.89672.9311368505409768084.b4-ty@kernel.dk>
-Date: Thu, 25 Jul 2024 13:59:52 -0600
+        bh=qRm4FmtR2qmDFfNNBtVfrM3O+fun4c+DuwgUlbPMbS8=;
+        b=P3QjBr2iOzbrM7kGBntB1QFF/XCuCZ8YBRN2GzdU4Rtw0w2SL+aukXfI1R5dnDN9uk
+         499gHlKYzHRrlrFCF7AkHzS8A8v3ErTwSsBC1V6qNsaVWo5zE6ZKYohSJ4+e6oRbXYsP
+         DOK0IHK7tVSdf/6Mdnd5K6SYWJMgIpHNJkkJoMr5tBaRk5zezPI0EkpIzkf0DRbNiUoA
+         /cYSKWGmTMGw7jklpRY9+e8NXXc6dpjnZeQgUNtjwUclAAzMNwxmpohZZa55dxeDY6BP
+         y8+j8gzIAu21A4LmlhQo4lyscW7Ht4YaBuRPp5I9LFejzJ7YQK6+CNIMXQ3e2oJgL2zL
+         WTnw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+vFV9r4CoNuiy+A8eHjP5XLj0D/wm3UvHfInS52VRNNSGpjvOkkBuyEUyxWBEFdAhVCP+wUHhj/MfsU4ciy1EHx9y9I5/1pUm4BE=
+X-Gm-Message-State: AOJu0YygPwcx8gIQsEW7G8VRcBwor68lzaeT0Ah9PXoFNKn2IYJ1qW2Q
+	qMudJNxch3vnfUHeuBvWwSf5B8bDopade76Z/6bdKJkVLu49dG/E9BlVYLgLghzjYZM61dFsnRh
+	zD6nhOfy+nTjqdQ6nClD5Btd6zRTzYz706w==
+X-Google-Smtp-Source: AGHT+IF00RwQk1BW0i12hmkzBYvF+O0rjqB5B7I1uJFA7l6Gx8QmuWpR56pmXs6/SocIMOuJkknpZkShe9gOI7V82F0=
+X-Received: by 2002:a05:6122:2a48:b0:4eb:499a:2453 with SMTP id
+ 71dfb90a1353d-4f6ca2ea87bmr3639791e0c.8.1721940062757; Thu, 25 Jul 2024
+ 13:41:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.1
+References: <CGME20240711051543epcas5p364f770974e2367d27c685a626cc9dbb5@epcas5p3.samsung.com>
+ <20240711050750.17792-1-kundan.kumar@samsung.com> <20240711050750.17792-6-kundan.kumar@samsung.com>
+In-Reply-To: <20240711050750.17792-6-kundan.kumar@samsung.com>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Fri, 26 Jul 2024 02:10:26 +0530
+Message-ID: <CACzX3AsbqdMZVR0at-oZ=pNiwXJtLY5uh0NXqw18Y4ucbh75=A@mail.gmail.com>
+Subject: Re: [PATCH v8 5/5] block: unpin user pages belonging to a folio at once
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, willy@infradead.org, kbusch@kernel.org, 
+	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org, 
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com, 
+	gost.dev@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jul 11, 2024 at 10:50=E2=80=AFAM Kundan Kumar <kundan.kumar@samsung=
+.com> wrote:
+>
+> @@ -1215,12 +1214,9 @@ void __bio_release_pages(struct bio *bio, bool mar=
+k_dirty)
+>                         folio_mark_dirty(fi.folio);
+>                         folio_unlock(fi.folio);
+>                 }
+> -               page =3D folio_page(fi.folio, fi.offset / PAGE_SIZE);
+>                 nr_pages =3D (fi.offset + fi.length - 1) / PAGE_SIZE -
+>                            fi.offset / PAGE_SIZE + 1;
+> -               do {
+> -                       bio_release_page(bio, page++);
+> -               } while (--nr_pages !=3D 0);
+> +               bio_release_folio(bio, fi.folio, nr_pages);
+Wouldn't it be better to use unpin_user_folio (introduced in the previous
+patch) here, rather than using bio_release_folio.
 
-On Thu, 25 Jul 2024 18:45:36 +0200, Wouter Verhelst wrote:
-> The NBD protocol defines the flag NBD_FLAG_ROTATIONAL to flag that the
-> export in use should be treated as a rotational device.
-> 
-> Add support for that flag to the kernel driver.
-> 
-> 
-
-Applied, thanks!
-
-[1/1] nbd: add support for rotational devices
-      commit: 45c7d3321b0ce575705bb62b6069efad48a51d67
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+>         }
+>  }
+>  EXPORT_SYMBOL_GPL(__bio_release_pages);
+> diff --git a/block/blk.h b/block/blk.h
+> index 777e1486f0de..8e266f0ace2b 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -558,6 +558,12 @@ static inline void bio_release_page(struct bio *bio,=
+ struct page *page)
+>                 unpin_user_page(page);
+>  }
+>
+> +static inline void bio_release_folio(struct bio *bio, struct folio *foli=
+o,
+> +                                    unsigned long npages)
+> +{
+> +       unpin_user_folio(folio, npages);
+> +}
+> +
+This function takes bio as a parameter but doesn't really use it. Also if
+we use unpin_user_folio at the previous place, we wouldn't really need to
+introduce this function.
+.
+>  struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node=
+_id);
+>
+>  int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode);
+> --
+> 2.25.1
+>
+>
+Could you give this series a respin against the latest for-next, some patch=
+es
+don't apply cleanly now.
+--
+Anuj Gupta
