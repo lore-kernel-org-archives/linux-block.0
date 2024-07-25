@@ -1,178 +1,455 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E973288DB
-	for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 04:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42CB16A95E
+	for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 10:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721883511; cv=none; b=tzSSNNd7iOaA8773OpsxejDcHRY0MwKgtLiaUq3+/sRc4N7TUiQ1tKd7fj/7twq88y+RppiHSrLtwzgPUzUaxwjWtbcT2SzM1MeP1YfrtSW0nc/dIGW0iGwNnV1fTYVNEnRlt1NVknBpMae1ON5XWgk+emJ+c+t7wDLbv+qYwOI=
+	t=1721903616; cv=none; b=CDHWd5yvh72Y2++W9yGnQMsQFvk3NcrZ1xWfFJfEsV+hoLOp0XiuqRVAY5hW/kyYfQ9++Hc05tBWZqpzP0egy7veaR+uN8ZOoj/piEZmzg6COjg1XF4SC9IQK8rvD8+9anx2CFwVPZj4aI6ZgjxdnI5vux71Btzc8wfUIn6bD3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721883511; c=relaxed/simple;
-	bh=LrinzDRt6dPz/chiwGnyu9iDQwMj3R8JpBKPysg8pPI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=ceTQLEyDHxAyYA4b/h0zsq5G7FdFJI5t8H0SENU0iKokP+ODLMUKXxGp5gTsajcrKn5y1Pq5kVSWBegz5EfEDoY8M9pAflqBbkp97lG+dD9Ot83q8+lDbRFBJVtLRfp8aOvK1dcoMvsqNPb8JX7Z9KNyGR5Y9WCmWMVT7w2nIOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=CCSzwFSZ; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1721903616; c=relaxed/simple;
+	bh=t8EfNAIQs89ioAvtNtLk/PILdSsjztR8hmLdNh/zlS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KdTsYfJBURUign/NQjM4ZDvJWo9PqnY3TmWoQFH+yES3ErKtX4pezbAx+EIT64W+sXACrEk6IZ07WSDUrVMNoUnB2cXMWkTJn/6xg+j8Gcnuztk27TwQO9NEHn4+noiNrApHLthTqqRP3UzFo5cLUmZkkgt0+4BO/isX4+ICcdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EfltfysV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="CCSzwFSZ"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240725045825epoutp021e4bcd206d4b295f62b9486cac4b7cf3~lW_zGWuiV0981909819epoutp02k
-	for <linux-block@vger.kernel.org>; Thu, 25 Jul 2024 04:58:25 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240725045825epoutp021e4bcd206d4b295f62b9486cac4b7cf3~lW_zGWuiV0981909819epoutp02k
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1721883505;
-	bh=W4naWMM7dPSQ3+1LzanpK71B6slavNy1FiY1Ow1nhtU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CCSzwFSZrg1J85cUo7K4qRqtDCeEXDqYv3RiDWHxa+r6K8mX/x1W77D4jACTqFbTv
-	 +yHM5LX6EVWRoc2zwzuCvB02iUGeMx6QaX37VtCdLg/yR/6Hh9KXA7MdAFOtpMSAWD
-	 3CssqePY9nuBZsEzc4qpLh7zX7eeAYbX6yBBqQcQ=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240725045824epcas5p2723c72b0a972dcca5a4271f21f592fc8~lW_ykhlBD2901229012epcas5p2A;
-	Thu, 25 Jul 2024 04:58:24 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4WTzDH17bPz4x9Q6; Thu, 25 Jul
-	2024 04:58:23 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	69.13.08855.E6BD1A66; Thu, 25 Jul 2024 13:58:23 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240724183644epcas5p4120e64a2de7faeafaa5995f68c710b86~lOgAcaSFF3133031330epcas5p4l;
-	Wed, 24 Jul 2024 18:36:44 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240724183644epsmtrp2677b03bc900ccc3092fbdaf5e336a6dd~lOgAb2b8p1193811938epsmtrp2S;
-	Wed, 24 Jul 2024 18:36:44 +0000 (GMT)
-X-AuditID: b6c32a44-15fb870000002297-a9-66a1db6e1427
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	D5.D9.08456.CB941A66; Thu, 25 Jul 2024 03:36:44 +0900 (KST)
-Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240724183643epsmtip1a2e1e318fada5110c9c2d1917587bfc3~lOf-QLkeO2887828878epsmtip1o;
-	Wed, 24 Jul 2024 18:36:43 +0000 (GMT)
-Date: Wed, 24 Jul 2024 23:59:29 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, Bart Van Assche
-	<bvanassche@acm.org>, Mikulas Patocka <mpatocka@redhat.com>, Milan Broz
-	<gmazyland@gmail.com>, Bryan Gurney <bgurney@redhat.com>
-Subject: Re: dm/002: add --retry option to dmsetup remove command
-Message-ID: <20240724182929.j6s6odzizlbs6en2@nj.shetty@samsung.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EfltfysV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721903612;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T/kss0pqBfkcMmuy9eEWZx1fj+0pvoMMZEaSz09rFqQ=;
+	b=EfltfysVj/mBvl9m4mPs4iiDH/CFSLMrZHKSqx0DfHuB2SXfpGaLUsdvHkDxuQOXXRp5Tl
+	9oFbpPDbkA+tQoTdzGrcuithAg1p6qRPEUqwBPUY4Nt5ipq6UI9k3nGgKDlrJsrmSVn9/C
+	Yh2Mq2TwA9B04CTqqMUb5gVjZQUvFo8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-531-nxZtrHsgPlGviz7EFDJrIg-1; Thu,
+ 25 Jul 2024 06:33:31 -0400
+X-MC-Unique: nxZtrHsgPlGviz7EFDJrIg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65E001955F0D;
+	Thu, 25 Jul 2024 10:33:30 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.46])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 455C519560AE;
+	Thu, 25 Jul 2024 10:33:24 +0000 (UTC)
+Date: Thu, 25 Jul 2024 18:33:19 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
+	ming.lei@redhat.com
+Subject: Re: [PATCH V4 4/8] io_uring: support SQE group
+Message-ID: <ZqIp7/Ci+abGcZLG@fedora>
+References: <20240706031000.310430-1-ming.lei@redhat.com>
+ <20240706031000.310430-5-ming.lei@redhat.com>
+ <fa5e8098-f72f-43c1-90c1-c3eaebfea3d5@gmail.com>
+ <Zp+/hBwCBmKSGy5K@fedora>
+ <0fa0c9b9-cfb9-4710-85d0-2f6b4398603c@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240723045855.304279-1-shinichiro.kawasaki@wdc.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAJsWRmVeSWpSXmKPExsWy7bCmhm7+7YVpBv+amSyeb/nMZDHtw09m
-	iwWL5rJYHNs/i91i7y1ti4kdV5ks9s3ydGD3uHzF22PnrLvsHi82z2T0eL/vKpvH501yHu0H
-	upkC2KKybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTdMnOA
-	DlFSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFJgU6BUn5haX5qXr5aWWWBkaGBiZ
-	AhUmZGf0zVnOWLBcsOLTulWMDYwr+LoYOTgkBEwkmt9odDFycggJ7GaUaG+v7mLkArI/MUqc
-	OL+cBcL5xihx5kUHO0gVSMO1R2eYIBJ7GSWWXe5ghHA+M0rcWLKHGaSKRUBVYt6bo2wgK9gE
-	tCVO/+cACYsImElcOfaGHaSeWeA8o8Sh6RcYQRLCAo4Su1c/A+vlFXCWOL7iFguELShxcuYT
-	FpA5nAJOEi/3yoH0Sgh8ZZfYeWolM8RFLhIbztxjhbCFJV4d3wJ1qZTE53d72SDscomVU1aw
-	QTS3MErMuj6LESJhL9F6qh9sELNAhsS/NZ+ZIOKyElNPrWOCiPNJ9P5+AhXnldgxD8ZWlliz
-	fgHUAkmJa98b2SBh6iHROF0XEihTGSU6bzWyT2CUm4Xkn1lI1kHYVhKdH5pYZwG1MwtISyz/
-	xwFhakqs36W/gJF1FaNkakFxbnpqsmmBYV5qOTyOk/NzNzGCk6aWyw7GG/P/6R1iZOJgPMQo
-	wcGsJML75NXcNCHelMTKqtSi/Pii0pzU4kOMpsD4mcgsJZqcD0zbeSXxhiaWBiZmZmYmlsZm
-	hkrivK9b56YICaQnlqRmp6YWpBbB9DFxcEo1MB1d3qh5bkdRzVr2FRbMz6Ocu9Z2lRWsnHpN
-	ceYuK/+qT2d/HwqYX1esPJfz6imWry/YFm7n/3zqczTPYunNt14fmLTFPkcm73LcLZ7+fj5h
-	qwyjY5cbTqWxfnip+sbm5LQ38yZM2xq24PSNz0uffcmunf+l8sqN6W6/Z0gZv2V71yUakZm2
-	NULEauFCVj/Gdq4o25NVoZxuE2NXL2s75cN/2tlD235V8KIrERUhVV1ndSo+8lg+D249Ede/
-	oWRinlBrRfKOoClmMz6nCMfsCP7qV5d8MYCJeVXk31U/V/iqFC46P6m6cOLqGQuWqNlUHXon
-	4BWXN+fm1U3sl+aFPjkT67N29/sGwVWmp3TDmdKVWIozEg21mIuKEwG7OmMLIwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrALMWRmVeSWpSXmKPExsWy7bCSnO4ez4VpBnfeyFo83/KZyWLah5/M
-	FgsWzWWxOLZ/FrvF3lvaFhM7rjJZ7Jvl6cDucfmKt8fOWXfZPV5snsno8X7fVTaPz5vkPNoP
-	dDMFsEVx2aSk5mSWpRbp2yVwZfyeZVNwk6/i+fkfzA2MX7i7GDk5JARMJK49OsMEYgsJ7GaU
-	eDhRASIuKbHs7xFmCFtYYuW/5+xdjFxANR8ZJW6fu8UKkmARUJWY9+YoWxcjBwebgLbE6f8c
-	IGERATOJK8fegNUzC1xklDg5pxdskLCAo8Tu1c/AbF4BZ4njK26xQCx2lGjaMpkdIi4ocXLm
-	E7A4M9CgeZsfMoPMZxaQllj+jwPE5BRwkni5V24Co8AsJA2zkDTMQmhYwMi8ilEytaA4Nz23
-	2LDAKC+1XK84Mbe4NC9dLzk/dxMjONC1tHYw7ln1Qe8QIxMH4yFGCQ5mJRHeJ6/mpgnxpiRW
-	VqUW5ccXleakFh9ilOZgURLn/fa6N0VIID2xJDU7NbUgtQgmy8TBKdXAVMTXpLolKnO9U4S2
-	KveafVNSvG/NmaDIZhT5+c+xC91xq+TfbS1WXdOoI6N55cmxzvw9mzj2beNLnWW470TXVv+3
-	hxsrJnSKNj4tebr74IHC/vgHxxu5eIrOC3YWbmw8lDtP5PcvgcSFzYWPO4SWFhl4Sh3x0bmV
-	ndq2ZctblqMfaz0Frs19FnDu2rQ1H+fah5oFFPhdDxRL2scodO+r4r0w2y4e3gcLHl/cM9vT
-	6vuzJaJmO/XPB51WuFO0XahSopBHL3bul1uOpqqZU76uOKn10f3/ktKYyalSG3yO/XbWW3Zl
-	Synreca3T2SZuizl2ROnFIrwMv3gvvhx1eotWv4Zi298kzqkN+XZxquH9yqxFGckGmoxFxUn
-	AgDpXwZL4wIAAA==
-X-CMS-MailID: 20240724183644epcas5p4120e64a2de7faeafaa5995f68c710b86
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----RCuM6wVB48pawI-qxLd.rstOHb-XiW.9xtXF.Se3-DdujaWQ=_3e802_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240724183644epcas5p4120e64a2de7faeafaa5995f68c710b86
-References: <20240723045855.304279-1-shinichiro.kawasaki@wdc.com>
-	<CGME20240724183644epcas5p4120e64a2de7faeafaa5995f68c710b86@epcas5p4.samsung.com>
-
-------RCuM6wVB48pawI-qxLd.rstOHb-XiW.9xtXF.Se3-DdujaWQ=_3e802_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <0fa0c9b9-cfb9-4710-85d0-2f6b4398603c@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 23/07/24 01:58PM, Shin'ichiro Kawasaki wrote:
->The test case dm/002 rarely fails with the message below:
->
->dm/002 => nvme0n1 (dm-dust general functionality test)       [failed]
->    runtime  0.204s  ...  0.174s
->    --- tests/dm/002.out        2024-06-14 14:37:40.480794693 +0900
->    +++ /home/shin/Blktests/blktests/results/nvme0n1/dm/002.out.bad     2024-06-14 21:38:18.588976499 +0900
->    @@ -7,4 +7,6 @@
->     countbadblocks: 0 badblock(s) found
->     countbadblocks: 3 badblock(s) found
->     countbadblocks: 0 badblock(s) found
->    +device-mapper: remove ioctl on dust1  failed: Device or resource busy
->    +Command failed.
->     Test complete
->modprobe: FATAL: Module dm_dust is in use.
->
->When udev opens the dm device, "dmsetup remove" command also tries to
->open the device and fails with EBUSY. To avoid the failure, add the
->--retry option to the dmsetup command.
->
->Suggested-by: Milan Broz <gmazyland@gmail.com>
->Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->---
->This patch addresses a failure found during the debug work for another
->dm/002 failure [1].
->
->[1] https://lore.kernel.org/linux-block/42ecobcsduvlqh77iavjj2p3ewdh7u4opdz4xruauz4u5ddljz@yr7ye4fq72tr/
->
-Tested-by: Nitesh Shetty <nj.shetty@samsung.com>
+On Wed, Jul 24, 2024 at 02:41:38PM +0100, Pavel Begunkov wrote:
+> On 7/23/24 15:34, Ming Lei wrote:
+> > Hi Pavel,
+> > 
+> > Thanks for the review!
+> > 
+> > On Mon, Jul 22, 2024 at 04:33:05PM +0100, Pavel Begunkov wrote:
+> > > On 7/6/24 04:09, Ming Lei wrote:
+> > > > SQE group is defined as one chain of SQEs starting with the first SQE that
+> > > > has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+> > > > doesn't have it set, and it is similar with chain of linked SQEs.
+> > > > 
+> ...
+> > > > ---
+> > > > diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> > > > index 7597344a6440..b5415f0774e5 100644
+> > > > --- a/io_uring/io_uring.c
+> > > > +++ b/io_uring/io_uring.c
+> > > ...
+> > > > @@ -421,6 +422,10 @@ static inline void io_req_track_inflight(struct io_kiocb *req)
+> > > >    	if (!(req->flags & REQ_F_INFLIGHT)) {
+> > > >    		req->flags |= REQ_F_INFLIGHT;
+> > > >    		atomic_inc(&req->task->io_uring->inflight_tracked);
+> > > > +
+> > > > +		/* make members' REQ_F_INFLIGHT discoverable via leader's */
+> > > > +		if (req_is_group_member(req))
+> > > > +			io_req_track_inflight(req->grp_leader);
+> > > 
+> > > Requests in a group can be run in parallel with the leader (i.e.
+> > > io_issue_sqe()), right? In which case it'd race setting req->flags. We'd
+> > > need to think how make it sane.
+> > 
+> > Yeah, another easier way could be to always mark leader as INFLIGHT.
+> 
+> I've been thinking a bit more about it, there should be an easier way
+> out since we now have lazy file assignment. I sent a patch closing
+> a gap, I need to double check if that's enough, but let's forget
+> about additional REQ_F_INFLIGHT handling here.
 
->Changes from v2:
->* "dmsetup remove --retry " instead of "udevadm settle"
->Changes from v1:
->* "udevadm settle" instead of retrying "dmsetup remove"
->
-> tests/dm/002 | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/tests/dm/002 b/tests/dm/002
->index fae3986..ea3f684 100755
->--- a/tests/dm/002
->+++ b/tests/dm/002
->@@ -37,7 +37,7 @@ test_device() {
-> 	sync
-> 	dmsetup message dust1 0 countbadblocks
-> 	sync
->-	dmsetup remove dust1
->+	dmsetup remove --retry dust1 |& grep -v "Device or resource busy"
->
-> 	echo "Test complete"
+Great, thanks!
+
+> 
+> ...
+> > > > @@ -1420,6 +1553,7 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+> > > >    	__must_hold(&ctx->uring_lock)
+> > > >    {
+> > > >    	struct io_submit_state *state = &ctx->submit_state;
+> > > > +	struct io_wq_work_list grp_list = {NULL};
+> > > >    	struct io_wq_work_node *node;
+> > > >    	__io_cq_lock(ctx);
+> > > > @@ -1427,11 +1561,22 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+> > > >    		struct io_kiocb *req = container_of(node, struct io_kiocb,
+> > > >    					    comp_list);
+> > > > -		if (!(req->flags & REQ_F_CQE_SKIP))
+> > > > +		/*
+> > > > +		 * For group leader, cqe has to be committed after all
+> > > > +		 * members are committed, when the group leader flag is
+> > > > +		 * cleared
+> > > > +		 */
+> > > > +		if (!(req->flags & REQ_F_CQE_SKIP) &&
+> > > > +				likely(!req_is_group_leader(req)))
+> > > >    			io_req_commit_cqe(ctx, req);
+> > > > +		if (req->flags & REQ_F_SQE_GROUP)
+> > > > +			io_complete_group_req(req, &grp_list);
+> > > 
+> > > 
+> > > if (unlikely(flags & (SKIP_CQE|GROUP))) {
+> > > 	<sqe group code>
+> > > 	if (/* needs to skip CQE posting */)
+> > > 		continue;
+> > 
+> > io_complete_group_req() needs to be called too in case of CQE_SKIP
+> > because the current request may belong to group.
+> 
+> What's the problem? You can even do
+> 
+> if (flags & GROUP) {
+> 	// do all group specific stuff
+> 	// handle CQE_SKIP if needed
+> } else if (flags & CQE_SKIP) {
+> 	continue;
 > }
->-- 
->2.45.2
->
+> 
+> And call io_complete_group_req() and other group stuff
+> at any place there.
 
-------RCuM6wVB48pawI-qxLd.rstOHb-XiW.9xtXF.Se3-DdujaWQ=_3e802_
-Content-Type: text/plain; charset="utf-8"
+It depends on if leader CQE posting need to be the last one posted.
+
+> 
+> > > 	<more sqe group code>
+> > > }
+> > > 
+> > > io_req_commit_cqe();
+> > > 
+> > > 
+> > > Please. And, what's the point of reversing the CQE order and
+> > > posting the "leader" completion last? It breaks the natural
+> > > order of how IO complete, that is first the "leader" completes
+> > > what it has need to do including IO, and then "members" follow
+> > > doing their stuff. And besides, you can even post a CQE for the
+> > > "leader" when its IO is done and let the user possibly continue
+> > > executing. And the user can count when the entire group complete,
+> > > if that's necessary to know.
+> > 
+> > There are several reasons for posting leader completion last:
+> > 
+> > 1) only the leader is visible in link chain, IO drain has to wait
+> > the whole group by draining the leader
+> 
+> Let's forget about IO drain. It's a feature I'd love to see killed
+> (if only we can), it's a slow path, for same reasons I'll discourage
+> anyone using it.
+
+Then we have to fail io group in case of IO_DRAIN, otherwise, it may
+fail liburing test.
+
+I am fine with this way, at least ublk doesn't use IO_DRAIN at all.
+
+> 
+> For correctness we can just copy the link trick, i.e. mark the next
+> request outside of the current group/link as drained like below or
+> just fail the group.
+> 
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index 7ed1e009aaec..aa0b93765406 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -1975,7 +1975,7 @@ static void io_init_req_drain(struct io_kiocb *req)
+>  	struct io_kiocb *head = ctx->submit_state.link.head;
+>  	ctx->drain_active = true;
+> -	if (head) {
+> +	if (head || ctx->submit_state.group.head) {
+>  		/*
+>  		 * If we need to drain a request in the middle of a link, drain
+>  		 * the head request and the next request/link after the current
+> 
+> 
+> 
+> > 2) when members depend on leader, leader holds group-wide resource,
+> > so it has to be completed after all members are done
+> 
+> I'm talking about posting a CQE but not destroying the request
+> (and associated resources).
+
+Such as, in ublk, the group leader is one uring command for providing
+buffer, if its cqe is observed before member consumers's CQE, this way
+may confuse application, cause consumer is supposed to be consuming
+the provided buffer/resource, and it shouldn't have been completed
+before all consumers.
+
+> 
+> > > >    	}
+> > > >    	__io_cq_unlock_post(ctx);
+> > > > +	if (!wq_list_empty(&grp_list))
+> > > > +		__wq_list_splice(&grp_list, state->compl_reqs.first);
+> > > > +
+> > > >    	if (!wq_list_empty(&state->compl_reqs)) {
+> > > >    		io_free_batch_list(ctx, state->compl_reqs.first);
+> > > >    		INIT_WQ_LIST(&state->compl_reqs);
+> > > ...
+> > > > @@ -1754,9 +1903,18 @@ struct io_wq_work *io_wq_free_work(struct io_wq_work *work)
+> > > >    	struct io_kiocb *nxt = NULL;
+> > > >    	if (req_ref_put_and_test(req)) {
+> > > > -		if (req->flags & IO_REQ_LINK_FLAGS)
+> > > > -			nxt = io_req_find_next(req);
+> > > > -		io_free_req(req);
+> > > > +		/*
+> > > > +		 * CQEs have been posted in io_req_complete_post() except
+> > > > +		 * for group leader, and we can't advance the link for
+> > > > +		 * group leader until its CQE is posted.
+> > > > +		 */
+> > > > +		if (!req_is_group_leader(req)) {
+> > > > +			if (req->flags & IO_REQ_LINK_FLAGS)
+> > > > +				nxt = io_req_find_next(req);
+> > > > +			io_free_req(req);
+> > > > +		} else {
+> > > > +			__io_free_req(req, false);
+> > > 
+> > > Something fishy is going on here. io-wq only holds a ref that the
+> > > request is not killed, but it's owned by someone else. And the
+> > > owner is responsible for CQE posting and logical flow of the
+> > > request.
+> > 
+> > io_req_complete_post() is always called in io-wq for CQE posting
+> > before io-wq drops ref.
+> > 
+> > The ref held by io-wq prevents the owner from calling io_free_req(),
+> > so the owner actually can't run CQE post.
+> > 
+> > > 
+> > > Now, the owner put the request down but for some reason didn't
+> > > finish with the request like posting a CQE, but it's delayed to
+> > > iowq dropping the ref?
+> > > 
+> > > I assume the refcounting hierarchy, first grp_refs go down,
+> > > and when it hits zero it does whatever it needs, posting a
+> > > CQE at that point of prior, and then puts the request reference
+> > > down.
+> > 
+> > Yes, that is why the patch doesn't mark CQE_SKIP for leader in
+> > io_wq_free_work(), meantime leader->link has to be issued after
+> > leader's CQE is posted in case of io-wq.
+> 
+> The point is that io_wq_free_work() doesn't need to know
+> anything about groups and can just continue setting the
+> skip cqe flag as before if it's done differently
+> 
+> > But grp_refs is dropped after io-wq request reference drops to
+> > zero, then both io-wq and nor-io-wq code path can be unified
+> > wrt. dealing with grp_refs, meantime it needn't to be updated
+> > in extra(io-wq) context.
+> 
+> Let's try to describe how it can work. First, I'm only describing
+> the dep mode for simplicity. And for the argument's sake we can say
+> that all CQEs are posted via io_submit_flush_completions.
+> 
+> io_req_complete_post() {
+> 	if (flags & GROUP) {
+> 		req->io_task_work.func = io_req_task_complete;
+> 		io_req_task_work_add(req);
+> 		return;
+> 	}
+> 	...
+> }
+
+OK.
+
+io_wq_free_work() still need to change to not deal with
+next link & ignoring skip_cqe, because group handling(
+cqe posting, link advance) is completely moved into
+io_submit_flush_completions().
+
+> 
+> You can do it this way, nobody would ever care, and it shouldn't
+> affect performance. Otherwise everything down below can probably
+> be extended to io_req_complete_post().
+> 
+> To avoid confusion in terminology, what I call a member below doesn't
+> include a leader. IOW, a group leader request is not a member.
+> 
+> At the init we have:
+> grp_refs = nr_members; /* doesn't include the leader */
+> 
+> Let's also say that the group leader can and always goes
+> through io_submit_flush_completions() twice, just how it's
+> with your patches.
+> 
+> 1) The first time we see the leader in io_submit_flush_completions()
+> is when it's done with resource preparation. For example, it was
+> doing some IO into a buffer, and now is ready to give that buffer
+> with data to group members. At this point it should queue up all group
+> members. And we also drop 1 grp_ref. There will also be no
+> io_issue_sqe() for it anymore.
+
+Ok, then it is just the case with dependency.
+
+> 
+> 2) Members are executed and completed, in io_submit_flush_completions()
+> they drop 1 grp_leader->grp_ref reference each.
+> 
+> 3) When all members complete, leader's grp_ref becomes 0. Here
+> the leader is queued for io_submit_flush_completions() a second time,
+> at which point it drops ublk buffers and such and gets destroyed.
+> 
+> You can post a CQE in 1) and then set CQE_SKIP. Can also be fitted
+> into 3). A pseudo code for when we post it in step 1)
+
+This way should work, but it confuses application because
+the leader is completed before all members:
+
+- leader usually provide resources in group wide
+- member consumes this resource
+- leader is supposed to be completed after all consumer(member) are
+done.
+
+Given it is UAPI, we have to be careful with CQE posting order.
+
+> 
+> io_free_batch_list() {
+> 	if (req->flags & GROUP) {
+> 		if (req_is_member(req)) {
+> 			req->grp_leader->grp_refs--;
+> 			if (req->grp_leader->grp_refs == 0) {
+> 				req->io_task_work.func = io_req_task_complete;
+> 				io_req_task_work_add(req->grp_leader);
+> 				// can be done better....
+> 			}
+> 			goto free_req;
+> 		}
+> 		WARN_ON_ONCE(!req_is_leader());
+> 
+> 		if (!(req->flags & SEEN_FIRST_TIME)) {
+> 			// already posted it just before coming here
+> 			req->flags |= SKIP_CQE;
+> 			// we'll see it again when grp_refs hit 0
+> 			req->flags |= SEEN_FIRST_TIME;
+> 
+> 			// Don't free the req, we're leaving it alive for now.
+> 			// req->ref/REQ_F_REFCOUNT will be put next time we get here.
+> 			return; // or continue
+> 		}
+> 
+> 		clean_up_request_resources(); // calls back into ublk
+> 		// and now free the leader
+> 	}
+> 
+> free_req:
+> 	// the rest of io_free_batch_list()
+> 	if (flags & REQ_F_REFCOUNT) {
+> 		req_drop_ref();
+> 		....
+> 	}
+> 	...
+> }
+> 
+> 
+> This way
+> 1) There are relatively easy request lifetime rules.
+> 2) No special ownership/lifetime rules for the group link field.
+> 3) You don't need to touch io_req_complete_defer()
+> 4) io-wq doesn't know anything about grp_refs and doesn't play tricks
+> with SKIP_CQE.
+
+io_wq_free_work() still need to change for not setting SKIP_CQE and
+not advancing the link.
+
+> 5) All handling is in one place, doesn't need multiple checks in common
+> hot path. You might need some extra, but at least it's contained.
+> 
+> 
+> > > > +		}
+> > > >    	}
+> > > >    	return nxt ? &nxt->work : NULL;
+> > > >    }
+> > > > @@ -1821,6 +1979,8 @@ void io_wq_submit_work(struct io_wq_work *work)
+> > > >    		}
+> > > >    	}
+> > > > +	if (need_queue_group_members(req->flags))
+> > > > +		io_queue_group_members(req, true);
+> > > >    	do {
+> > > >    		ret = io_issue_sqe(req, issue_flags);
+> > > >    		if (ret != -EAGAIN)
+> > > > @@ -1932,9 +2092,17 @@ static inline void io_queue_sqe(struct io_kiocb *req)
+> > > >    	/*
+> > > >    	 * We async punt it if the file wasn't marked NOWAIT, or if the file
+> > > >    	 * doesn't support non-blocking read/write attempts
+> > > > +	 *
+> > > > +	 * Request is always freed after returning from io_queue_sqe(), so
+> > > > +	 * it is fine to check its flags after it is issued
+> > > > +	 *
+> > > > +	 * For group leader, members holds leader references, so it is safe
+> > > > +	 * to touch the leader after leader is issued
+> > > >    	 */
+> > > >    	if (unlikely(ret))
+> > > >    		io_queue_async(req, ret);
+> > > > +	else if (need_queue_group_members(req->flags))
+> > > > +		io_queue_group_members(req, false);
+> > > 
+> > > It absolutely cannot be here. There is no relation between this place
+> > > in code and lifetime of the request. It could've been failed or
+> > > completed, it can also be flying around in a completely arbitrary
+> > > context being executed. We're not introducing weird special lifetime
+> > > rules for group links. It complicates the code, and no way it can be
+> > > sanely supported.
+> > > For example, it's not forbidden for issue_sqe callbacks to queue requests
+> > > to io-wq and return 0 (IOU_ISSUE_SKIP_COMPLETE which would be turned
+> > > into 0), and then we have two racing io_queue_group_members() calls.
+> > 
+> > It can by handled by adding io_queue_sqe_group() in which:
+> > 
+> > - req->grp_link is moved to one local variable, and make every
+> >    member's grp_leader point to req
+> > 
+> > - call io_queue_sqe() for leader
+> > 
+> > - then call io_queue_group_members() for all members, and make sure
+> > not touch leader in io_queue_group_members()
+> > 
+> > What do you think of this way?
+> 
+> By the end of the day, io_queue_sqe is just not the right place for
+> it. Take a look at the scheme above, I believe it should work
+
+OK, thanks again for the review!
 
 
-------RCuM6wVB48pawI-qxLd.rstOHb-XiW.9xtXF.Se3-DdujaWQ=_3e802_--
+Thanks,
+Ming
+
