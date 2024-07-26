@@ -1,184 +1,221 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BA829A5
-	for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 08:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721983959; cv=fail; b=iix2ARZV5V0pwax3RfReYBaMg/kA666prPjjd9dmSKGGMRehnEr42eWWSW3BQi7dCOrPqS9+ADawIoIzO+/rxgseBgwwG79YFPhuDfaOZQAGDIWSFXiQdn/ulTYlTzxh3N9T/hnyotpNTAV6vjp1G+BaBLpR2+biDAeQ2ZDu5RQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721983959; c=relaxed/simple;
-	bh=ATcVSqgHdNzlkK3bleChxUAiT+lT4MDAqXMZqYQTJb4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=dlhQEMvs3tDPQiJpU3iKIF4xogHjtNkqn97haNCEoTUK+xqk7JBWH055UymINf5Tw3ZWpM2C2xEkV+CTHxFIHb8fAilovfv7oAb6Ho3ST8HmQ+ikOqWW00FVo3Jq8Br3JHrGysEv23n1z21HNt/f9dfop6HB08oF1+VDv/vIvOA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=RWiKi+pb; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=SEzemJ6i; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDB07F8
+	for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 10:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721991024; cv=none; b=G3X8Fj0nThL3I5f4w674Ha4m+k24Ag+b78uBsJFmdU5Dz26bA4+/rIn5gF9DL4Nv00R2EkZl58gPANnKY2SuEccKQC2NCgJX6rdXOs54IyiZCdAPZbdzabNMvI/VrlYJGvGeqfirXvty9LwlwLy7ZNPD/2mPgtI1csNal1BIdHM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721991024; c=relaxed/simple;
+	bh=jGPRczautyuMMj4CcPFfYRBIAc/wsQuQSJqJruFd9Tw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=Nv9cRrsyWBnkN3AlXsgF/s7TQC9zZZaTwl+Z/72MZrhLRR552ls3LD7RJsSv1e39HxGjN9kJ8+YYmXejcVdNWUFtWfv6JpmVUes4zKiMFyHe8wCAc447/mkCcvUzcFeJkOy9EGxk8hj3wJaF5AjttlLSIKQMtLD2qdq1dsDpj/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QkEunvA1; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RWiKi+pb";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="SEzemJ6i"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1721983958; x=1753519958;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ATcVSqgHdNzlkK3bleChxUAiT+lT4MDAqXMZqYQTJb4=;
-  b=RWiKi+pbsgHmG78XXHPtobxiea2FUDCyXKmds4tg2mc3X8X/0w9v3nmq
-   jwK/eBjGFbA/kIa5/m63+bu+Nb62eONs0inrbxCNkL1u7RTvlWE/myVb1
-   r/dJ+L/ElEdljadIVQVUV72vuIsA2T2ZmwjRd2GQZVOtmpxX/Q8eZakNW
-   biLcKoHs3Lvqh+ihauZxXbSxN5Q8llIdj91HwsrwlAYkNaRAuaW9MGGyk
-   54lUwEiqApyUXicBJ4RuthQLqyc3qzlbDsYcoA6xcOphAPBxR4Jnryq/k
-   GQ+lgEtGmB67Ryw6m6FPvzPZMsNG4l4Fugz9Pykr2xqaP1hpimY5bBMUX
-   Q==;
-X-CSE-ConnectionGUID: PLoKeR1gS4OcWHET/9eEsA==
-X-CSE-MsgGUID: rBV66ut5Qa6FbUj44T5GFg==
-X-IronPort-AV: E=Sophos;i="6.09,238,1716220800"; 
-   d="scan'208";a="22702559"
-Received: from mail-eastus2azlp17011028.outbound.protection.outlook.com (HELO BN8PR05CU002.outbound.protection.outlook.com) ([40.93.12.28])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jul 2024 16:52:31 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SaaNZ/BzHN42f/juLZgv1vvNLxcy3fkBsNfNrIuCt0RYny2CY+/Odn3Yl7bs2rf3n7M4FpuLmdl9vqJjERmOJGPFoSv/HBZ+QR8lGPBEapQgBXVLLbZvzpV80XRJQPsc2j2hsReDc8uxXtoJHgzLW4oi+2vjKMe1X89RrfDmY+rEFeDobwD57tAUvOuIBA3fE7gK2xynvVCfYRN3NCEFgHzNQ308k93GfLMHPG6KzD7FZnxFE8AFiKA38ocEYUKoQAePAsKUmrcuKUkSMTmbzhbhjztT8VBwYbUwO/aS8bvNlkMyHp6aKfI3fZ4Z8Tcxd1y4qgJpBnGX/+NMAFwiCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ATcVSqgHdNzlkK3bleChxUAiT+lT4MDAqXMZqYQTJb4=;
- b=Z31aG6KPjFApSzg+BQRjmEgWSjX2lkYeMeXVXPWargMzIx53JhsAk6CYpBBQ39lYHRT4URSHcaznHWF/WXxya9rtUrC+4RPae5D3cKrTsSvyYB/gFYAv0FHmR4MIkSaFgLm/kBfPFyd/mI4lTABi2IBB4WI00QMkosuxxmI58U3gkjWLeh24a4CqGBEq8g3uagZ0to6ypEo7eYZHJa2ItJRDeacC//w+xiFOuiK8e1TwNGQkQ0zbTqzSkJQ9ifrqJZ3yxG6dlB7aqYpsZf2ov7jGxkIVJgIgJ9mCllBU7CYeWmzxMhDTS6X2KbGa9cThnYbl/5BSoZ7XmGTtR4fRyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ATcVSqgHdNzlkK3bleChxUAiT+lT4MDAqXMZqYQTJb4=;
- b=SEzemJ6iX7Pbe+biIsIE/URcku8m/RbbiY/cws3qh38eVB5fzwKuVjK3Jf+LHuRCSCcF8NRcunvWeb4rnCG5L/EmRbEH9zS1ZwEIFKhS3kdhB5iavMUFNEt+HItStOovu0kmeYFMH3qMWJZpQkVbIrO6SMK/3rQKjsjaTud6SI8=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- PH0PR04MB8321.namprd04.prod.outlook.com (2603:10b6:510:4b::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7784.29; Fri, 26 Jul 2024 08:52:29 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a%4]) with mapi id 15.20.7784.020; Fri, 26 Jul 2024
- 08:52:28 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"nbd@other.debian.org" <nbd@other.debian.org>
-CC: Bart Van Assche <bvanassche@acm.org>, Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH blktests v2] nbd/rc: check nbd-server port readiness in
- _start_nbd_server()
-Thread-Topic: [PATCH blktests v2] nbd/rc: check nbd-server port readiness in
- _start_nbd_server()
-Thread-Index: AQHa2ZmSZ+ugpydVYE6Vfv3S6nGSYrIIvxUA
-Date: Fri, 26 Jul 2024 08:52:28 +0000
-Message-ID: <5wsnkq6pivit2v2gmzioixnopjsxc4ir6ogkfujatxwuryn4fy@2swh5qfjlqwp>
-References: <20240719050726.265769-1-shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20240719050726.265769-1-shinichiro.kawasaki@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH0PR04MB8321:EE_
-x-ms-office365-filtering-correlation-id: 1d3ce0df-d01a-474e-7e5c-08dcad504784
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?LzyA24YSqa4jsVMMwgzg0QQ57uOrWTLwyyESsZxdMwrTdTvydORTaZly2x2T?=
- =?us-ascii?Q?ltLUVNv4Kf/F3wrGg8sU8gIr5epPvI0DeIxW5MpQvRikoazmBB14XI8A82Pc?=
- =?us-ascii?Q?CjAdh2czn9Fgk9acOFcCCx/LkQdkwLxzOyewCPeFIBtwcBYhGzIYt1sNPq5t?=
- =?us-ascii?Q?IaszAIlEIcI1rbRn2M+1QRL4DSKhUvJjCZXjU/VpWL9wCDjPxx595nfaf6gH?=
- =?us-ascii?Q?ypUPnYcrKiUzWF73IAm9119jl4PVprlwDEP9jE5Avm0uABMZRWXlqyh0IApR?=
- =?us-ascii?Q?dAEHaEktLeGC+4Je98epzQ+glCDM959UCydt4/7eNrsspvH85dsRhHu3c/CS?=
- =?us-ascii?Q?GKAFkngN+e5xwZ57VJKdXmEuruuWPZ/vaPCfxIx3VeCBoliI655hwsYXNGoF?=
- =?us-ascii?Q?Gxzhb1AMoXqkzYWTdhz6zMGyboblOBsZGZIT9ZNKZFWCkjMxCUgLnnPj2Aj6?=
- =?us-ascii?Q?DTUxqMtab9i8z0sFaueW/ME8++E0YBzFFSrhLdxKUCnby3n6sI98KQy00+Fj?=
- =?us-ascii?Q?2ouJn5Iptw8/GaOm8EQd31CE3A+cnsJmTMnCoVt2nkZFeFDzn+Jz92Fl9Ini?=
- =?us-ascii?Q?V9D0Rnc37r1lJRmHnaWTXtWpoNck+LYhDR5lUXXsXMM32x/laX7goMAq7wIW?=
- =?us-ascii?Q?Cilc7+R/1NstO7c0F723NupNmO2f0SIwLoschrZPGz/k+Gnd4RNeHCf6iOWk?=
- =?us-ascii?Q?w3B3woTrXmvsz2uLTwgRmWdHl6PTRAvM63vRJorxd90U9COwMXSb456d7siZ?=
- =?us-ascii?Q?d5viru2EzpZ6Rr+vKmdclhW5jUW8QztABPPtd7C1Dbdwy+QueqI1uW4iyUHO?=
- =?us-ascii?Q?5CNtgG9oAM4RbrzyRig7qP22ztvP/RcVeuvHslgw8PAVQd/9NFw9wTJt5Rcc?=
- =?us-ascii?Q?x/qmAeipAc/DH0QYpLehtdf/Hq6Kzai0iZn7DZ9nZ+vqApWXLVt8wBrVUztz?=
- =?us-ascii?Q?y5y1H50upF3ijzJJ4yIh6NusxeJaMsognI9oo61ghmeNwqilqi8refvhIVEB?=
- =?us-ascii?Q?sIeibb0pdD66oqM4eNAA0XUdVkb3cTwckD6Ljp8cpp9rNfVeyrTsafRJXdyO?=
- =?us-ascii?Q?imjkZULQV7NRkS3qobjN9/AKR9GyEPxepyUQe9cPon5aLgbIMCRHNnWis4gg?=
- =?us-ascii?Q?W1mQSzRAQCJYsf/bNHfD/TFR77cH9ZJqsSnm4iyWQMYBzemslMgNrg0h2kO3?=
- =?us-ascii?Q?WzwTQe1fjb+GcfB3ZAmgG8HtfPtE+/I0tG7NcMK9kRVp5gJ/47tPwIC328j/?=
- =?us-ascii?Q?+zptChPY+qm+dfnUhFmNAzghZySLOgWC/2Q7EzdnKH6Aypod3Gblc9MDUZjI?=
- =?us-ascii?Q?+WnQkpDQgOW8G0x+VmkqBhX64rMIm6a9RX+CCklwBiucd4X61xHgjELY5fO6?=
- =?us-ascii?Q?/isFmb8=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?GaCbqc6iGuJ0SicG0rrFjWDeRcUirx3H5JXv0zZBDZotumtg7uOtADrd4aOW?=
- =?us-ascii?Q?rBMQdPBNfgJrK8wqnMyxCt8XX2qbO6aaN3fBCHUZ/9JCHwcFojCpO5KLAWG7?=
- =?us-ascii?Q?7sITnabRfnHqIX4xp8FE/RGD3Uea89xgRoatS5NmPFAi21tz4/j1QVq42e5w?=
- =?us-ascii?Q?BjvWNAlwlOB5e5CFS8drNH6aQ+qde7qaOw334+NC4kY6CzkGbqpGBUm6b2HG?=
- =?us-ascii?Q?x/048atDGb7ccobPHGGRI4x/LIFSHZF7HyXkoJSvE1rifbUZM3baaXwlseac?=
- =?us-ascii?Q?qfh+jW1e7S2bKFjirDI/PnQPFpNL5kTfbWuqrDTqZu5IG8CT94I7gTLOJSkx?=
- =?us-ascii?Q?JMor3QWghkX6WlKITQENt0kyn7yyJVmjgQR+ntRNS50awh0W+X/ZT7GvL3sp?=
- =?us-ascii?Q?/OhDt3RqGPP4Igo0s79C3HJajy+m+g/pbuvv7XeSfoZtr2tPfq8LoMLYo9an?=
- =?us-ascii?Q?qgS8uLQJUMnZAjodllaB1Tm8k3Zq9khR68sc+k4T+LRrbdYy3aPeOCBvLR+M?=
- =?us-ascii?Q?Z5QL4cSkq2bcCiMjFvXvjjEuMee3L9gQscRbuvJ0hHYFC9xTcTL15se1WtWm?=
- =?us-ascii?Q?t4jGpQDiNY2n04tKj+KIuouUYvKunYdDJL3kRosKtmrfg8SZpFUa2h8eSslb?=
- =?us-ascii?Q?wviqowknoZfFnIYOYUtUme/uwCAnu9+GpcJF6b/H5ZlU35DiacVM50eAebzb?=
- =?us-ascii?Q?s1L1l8dPxljCmYKg0exohbT+tpv4MDIeC3AFHBBIQeL9tBC6gQ6nznwNw7Mw?=
- =?us-ascii?Q?ZgL2Ghf2JYcI9hPigiSJp7SV0X7h+k2HI+LxbpIsyaNoO3sp0gYyuhIBYZ46?=
- =?us-ascii?Q?6xWzWw3LM3cOvn91dCIqJqTEatGvWrCnO1N75emR94pnwBmuqFKR0ImNR0Cx?=
- =?us-ascii?Q?IEjmqTvXhYttz/Jos5dBDcy+ozEmqBwuooR80R1Gz9a3ACONGNjNESIUa092?=
- =?us-ascii?Q?lkbq9UnTuhYu46NGyGPMmBo7617N090AKSqhxvyQM6cwOUUD/8UwTd9ebNqJ?=
- =?us-ascii?Q?DPcqWZS9iVGN3TUAExtkFHc2FC7d2PdUPNHclQOHS+b6pphhSefGMb0LRF0I?=
- =?us-ascii?Q?igjOu7YE0uY57VkF6+3aGwURKb/Iy+X9RmRRAs+rc+Ttn8A6vrW1HHBnvevc?=
- =?us-ascii?Q?dAZ6glO/vZrXrOeMSTCMuWvJvOZoqiWk6ov5HCovYdBLCKDyQxJp0a+KkgSt?=
- =?us-ascii?Q?SxxLI8q3YvowwYnolzehJCuKriBNhLMsedVewNJn2zN9bjyMwDTFyUaHzkVp?=
- =?us-ascii?Q?GOhVJ/TFEQtHKSIRPaSV6x8+hVM2Lr2HFlCn+4H7LgYEvZO85jVrvWsVN7Gm?=
- =?us-ascii?Q?elOedEZ9yPxgWL0sSBSNToXztJji9z3wRLoq7HqkEiRuTsZcWXidI87q3S6B?=
- =?us-ascii?Q?s9VBt85Wwnw1FLO/omOT5iyxs6glYw2RwV107zZz8HdKNXpWqHj1udeSegSy?=
- =?us-ascii?Q?3idvrArABKqZzrRm8tpy6xO0gGKLC9Ixw/E93lAi8C6y7JyCNVnqc3wblv/L?=
- =?us-ascii?Q?CMStINQrjWbhEO2pNEW5I45h4tRHpzPzEb2CWdjSZx8muIc6Me2eIcJ1XWzh?=
- =?us-ascii?Q?enkWl+NWZHturLFh96CNVlDBpmtEVL4ekwYwCCaIrDKjQaqn0VFzUy6AU28q?=
- =?us-ascii?Q?fUElm3xwkCbphm3yGZvkKkU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6BA48C1903CF3F488EFB9EA07E2D22CC@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QkEunvA1"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240726105012epoutp04f511f849b291327ccd47e7dbe620f7e9~lvbPbSJ0N0887408874epoutp04r
+	for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 10:50:12 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240726105012epoutp04f511f849b291327ccd47e7dbe620f7e9~lvbPbSJ0N0887408874epoutp04r
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1721991012;
+	bh=H5uMvEvG4y3d8iyedbenWXf5zTg9mXTk6BN4CXr3xA0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QkEunvA1zUX9/9PDaRCLdQfPTpM0+8OKz+lOMe73ONQKqfp3Q56NyM6SzLAPxEZHF
+	 vIme5s3cVwJqhqC1YQO1p8IEMptrsLPvvxM4hvHveeZ1+m1BNV7Gi2YoaVhRTjH6HH
+	 VYCycIx60gu61EfuFZVstHABgR5lLJoI3VdBpuR8=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240726105012epcas5p3b4e4e6a7078b76fd5636fa607ef3ef25~lvbO_6kpi2185221852epcas5p3j;
+	Fri, 26 Jul 2024 10:50:12 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4WVkzl06Vxz4x9Py; Fri, 26 Jul
+	2024 10:50:11 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	78.99.09640.26F73A66; Fri, 26 Jul 2024 19:50:10 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240726102916epcas5p10f8e5c7b97ed95887bda7de79a30781d~lvI9FbL2e2814828148epcas5p1F;
+	Fri, 26 Jul 2024 10:29:16 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240726102916epsmtrp1996ac98a173fd383a314f7bd61ea24bc~lvI9EvW3-0866008660epsmtrp1s;
+	Fri, 26 Jul 2024 10:29:16 +0000 (GMT)
+X-AuditID: b6c32a49-a57ff700000025a8-83-66a37f62c2a0
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	50.2E.19367.B7A73A66; Fri, 26 Jul 2024 19:29:15 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20240726102914epsmtip1e230faaf6160f35cc915b564bec04fe4~lvI8D_rFM1720917209epsmtip1w;
+	Fri, 26 Jul 2024 10:29:14 +0000 (GMT)
+Date: Fri, 26 Jul 2024 15:51:56 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi
+	<joshi.k@samsung.com>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: fine-grained PI control
+Message-ID: <20240726102156.GA17572@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	Jyp3kM1+wqZaxG0X8MaVzQOGM5ShXy2lE64+qmPULAdDpCMOxNgh88IzJqI3lpNgBy8GqpkZd3EwHz6gdZSKOBN8VvaacvB3AI0ahUjrHkBkm0ojK/u3NLyStHeSO8IYiNVNT+1lcqT4x6/6GoPaTTLh6gcVHVZqR4JDdexCxFuj4a55Ptibx2S4NWtgHodXmKy6Pi/FReso3cXAdhATCjVqz+mSiPn6QDMo4VI39tLvu4si95qg6RDYWblqSxTdNvNnv9TStZkI0wtHXiAJbale2duqSOKd6dCMI5R1RKMJ3ux6MB1lEuVCQuF9RPyke9vErswTR7iDmnbkMOg1GqIVK/MJWvMME8pDuFfvfK+tj24OuuCzmTNjBCBmVkP2IZKG/AYGJHhKwsygFcrA4jzLljXtnFWNF06ClWLXrpBuG0yRc3x+eFrkfgfRyCu0c8CrNRAnulzkZdDRzFAhakJjPd4M9H69KwetSFOb21THWl6LLPju/6t2DO1GEcarp/3aQmbtVgdhN8rz3c5lTIcvYbFW/myGO25ytwjIVU5N0xsFU7PBCR7cmwO+DFm1uq1IMSIAFPi0bntmoXr5+rE01AtyguWWdCG0SQ7nLwahFMBDZJVk+PDTGecKmWkk
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d3ce0df-d01a-474e-7e5c-08dcad504784
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2024 08:52:28.8076
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YpN0ACXVHpMfPp7fopmxwfokQ7MUMrie6WXlFl9/+dyst7fKgRUENRKrEkBF9boCbfCADDStaXfrIn4AFzMwbS78+5SyG0EVpxCVccSrqZE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB8321
+In-Reply-To: <20240709071604.GB18993@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprCJsWRmVeSWpSXmKPExsWy7bCmhm5S/eI0g+eLzCxWrj7KZHH0/1s2
+	i723tC3mL3vKbtF9fQebxfLj/5gc2Dw2L6n32H2zgc3j49NbLB59W1YxenzeJBfAGpVtk5Ga
+	mJJapJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQO0X0mhLDGnFCgU
+	kFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYFKgV5yYW1yal66Xl1piZWhgYGQKVJiQndHzWaKg
+	XaFi/orKBsZDUl2MnBwSAiYSy558Ye9i5OIQEtjNKLFy0VsmCOcTo8SmBy8Z4Zz5Z/8BlXGA
+	teyaEwYR38ko8fv/EhYI5xlQx4mlbCBzWQRUJZZ9ncEOYrMJqEsced7KCGKLCChJPH11Fmwq
+	s8B2RokZTeeYQBLCAioS22fcAmvmFdCVmLTuHhOELShxcuYTFhCbU0BHYunfD6wgtqiAssSB
+	bcfBbpUQ+Mgu0d1ymAXiIxeJp9//sEHYwhKvjm9hh7ClJF72t0HZ6RI/Lj9lgrALJJqP7WOE
+	sO0lWk/1M4PYzAIZEsu2fIeql5WYemodE0ScT6L39xOoXl6JHfNgbCWJ9pVzoGwJib3nGqBs
+	D4k7s2cxQ4LoAqPEiUd3mSYwys9C8twsJPsgbB2JBbs/sc0CBjezgLTE8n8cEKamxPpd+gsY
+	WVcxSqYWFOempxabFhjmpZbDIzw5P3cTIzh5annuYLz74IPeIUYmDsZDjBIczEoivMvuL0wT
+	4k1JrKxKLcqPLyrNSS0+xGgKjK2JzFKiyfnA9J1XEm9oYmlgYmZmZmJpbGaoJM77unVuipBA
+	emJJanZqakFqEUwfEwenVAOTKvudZPELRRZM2qtfGt3g6Kz6/OtK/eZFbUf0/07LLclYeimC
+	84rols+CvWYxnDUbe99fi1mh/9Ogf9Vuv2lv5LtUxQ8xcpyfkfP2n3BeSx73i+2rk9J7JDfM
+	WahmmpE4nY2Vh51d+uHOY6ZG8yRSGCav/nBkntGil0tSd2RMYT+vrLXCm/HAtb1r1/79ui02
+	bP8poZ1LNj4L9Fm80P2nx8Xn0+pub71xUcM/NUvstMyWe708GepenUcr1No+Nzet+lC/4d6E
+	EhODHcd1gqZy3ncxsXWQPjZHUWLhA2mv/xt7dfs3bihlr685k3JO8ENTmEJmHGf2pNiAmP5K
+	MSfLtmO2D1qnMSYJfGMtqnBTYinOSDTUYi4qTgQAtyxLQicEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrELMWRmVeSWpSXmKPExsWy7bCSnG511eI0gzWXLCxWrj7KZHH0/1s2
+	i723tC3mL3vKbtF9fQebxfLj/5gc2Dw2L6n32H2zgc3j49NbLB59W1YxenzeJBfAGsVlk5Ka
+	k1mWWqRvl8CV0X3hMXPBcdmK51fCGhhnS3QxcnBICJhI7JoT1sXIxSEksJ1R4u/ChcxdjJxA
+	cQmJUy+XMULYwhIr/z1nhyh6wijx8d9mNpAEi4CqxLKvM9hBbDYBdYkjz1vBGkQElCSevjrL
+	CNLADDL1Y8c0sCJhARWJ7TNugTXzCuhKTFp3jwli6gVGiTnfXrFDJAQlTs58wgJiMwtoSdz4
+	95IJ5FRmAWmJ5f84QMKcAjoSS/9+YAWxRQWUJQ5sO840gVFwFpLuWUi6ZyF0L2BkXsUomlpQ
+	nJuem1xgqFecmFtcmpeul5yfu4kRHOxaQTsYl63/q3eIkYmD8RCjBAezkgjvsvsL04R4UxIr
+	q1KL8uOLSnNSiw8xSnOwKInzKud0pggJpCeWpGanphakFsFkmTg4pRqYDM1jk22VeTvqHgR0
+	TOfSXcF8vLAp732jT7t9Z3LY9U8GF8o3vYu0urixdkaFH6eO7l7hyZtXCii1BSfbb7HVZN0s
+	/E529cU9Z3fObzvg5F+wlqvq/r/dah21t286hKucbTb7PFNQ/PvWLr8LfUGe0vmHts21+rrZ
+	Z3ff7R9LauQrNnBFd7jWT9RX87uXpxHYJZ947KGLLN+q9lDVc63h4ufZZBuMlBk27btsUNAx
+	0+Sg+5mZv+/sFVyyhWtpQEz+3OMvBbkfmotsnP2L71SAlUahcukRefYVx4TXqURtfnBrSt80
+	Qf17kSe27/714E6F7quJHYrxJ1Pauav2XvVp2rgv5q9lksmGRLfolG4lluKMREMt5qLiRAB2
+	JQxw5QIAAA==
+X-CMS-MailID: 20240726102916epcas5p10f8e5c7b97ed95887bda7de79a30781d
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240709071611epcas5p1c5f2b59325d562658522842f89a31861
+References: <20240705083205.2111277-1-hch@lst.de>
+	<yq1ttgz5l6d.fsf@ca-mkp.ca.oracle.com>
+	<CGME20240709071611epcas5p1c5f2b59325d562658522842f89a31861@epcas5p1.samsung.com>
+	<20240709071604.GB18993@lst.de>
 
-On Jul 19, 2024 / 14:07, Shin'ichiro Kawasaki wrote:
-> Recently, CKI project reported nbd/001 and nbd/002 failure with the
-> error message "Socket failed: Connection refused". It is suspected nbd-
-> server is not yet ready when nbd-client connects for the first time.
->=20
-> To avoid the failure, wait for the nbd-server start listening to the
-> port at the end of _start_nbd_server(). For that purpose, use
-> "nbd-client -l" command, which connects to the server and asks to list
-> available exports.
->=20
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Link: https://github.com/osandov/blktests/issues/142
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-FYI, the patch has got applied.=
+On Tue, Jul 09, 2024 at 09:16:04AM +0200, Christoph Hellwig wrote:
+> On Mon, Jul 08, 2024 at 11:35:13PM -0400, Martin K. Petersen wrote:
+> > I don't like having the BIP_USER_CHECK_FOO flags exposed in the block
+> > layer. The io_uring interface obviously needs to expose some flags in
+> > the user API. But there should not be a separate set of BIP_USER_* flags
+> > bolted onto the side of the existing kernel integrity flags.
+> >
+> > The bip flags should describe the contents of the integrity buffer and
+> > how the hardware needs to interpret and check that information.
+> 
+> Yes, that was also my review comments.
+
+Hi Christoph, Martin,
+
+I was thinking something like below patch[*] could help us get rid of the
+BIP_USER_CHECK_FOO flags, and also driver can now check flags passed by block
+layer instead of checking if it's user passthrough data. Haven't plumbed the
+scsi side of things, but do you think it can work with scsi? 
+
+Subject: [PATCH] block: introduce BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags
+
+This patch introduces BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags which
+indicate how the hardware should check the payload. The driver can now
+just rely on block layer flags, and doesn't need to know the integrity
+source. Submitter of PI chooses which tags to check. This would also
+give us a unified interface for user and kernel generated integrity.
+
+Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+---
+ block/bio-integrity.c         |  5 +++++
+ drivers/nvme/host/core.c      | 12 +++---------
+ include/linux/bio-integrity.h |  3 +++
+ 3 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 8d1fb38f745f..d179b0134e1d 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -443,6 +443,11 @@ bool bio_integrity_prep(struct bio *bio)
+ 	if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
+ 		bip->bip_flags |= BIP_IP_CHECKSUM;
+ 
++	/* describe what tags to check in payload */
++	if (bi->csum_type)
++		bip->bip_flags |= BIP_CHECK_GUARD;
++	if (bi->flags & BLK_INTEGRITY_REF_TAG)
++		bip->bip_flags |= BIP_CHECK_REFTAG;
+ 	if (bio_integrity_add_page(bio, virt_to_page(buf), len,
+ 			offset_in_page(buf)) < len) {
+ 		printk(KERN_ERR "could not attach integrity payload\n");
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 19917253ba7b..5991f048f394 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1001,19 +1001,13 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
+ 				return BLK_STS_NOTSUPP;
+ 			control |= NVME_RW_PRINFO_PRACT;
+ 		}
+-
+-		switch (ns->head->pi_type) {
+-		case NVME_NS_DPS_PI_TYPE3:
++		if (bio_integrity_flagged(req->bio, BIP_CHECK_GUARD))
+ 			control |= NVME_RW_PRINFO_PRCHK_GUARD;
+-			break;
+-		case NVME_NS_DPS_PI_TYPE1:
+-		case NVME_NS_DPS_PI_TYPE2:
+-			control |= NVME_RW_PRINFO_PRCHK_GUARD |
+-					NVME_RW_PRINFO_PRCHK_REF;
++		if (bio_integrity_flagged(req->bio, BIP_CHECK_REFTAG)) {
++			control |= NVME_RW_PRINFO_PRCHK_REF;
+ 			if (op == nvme_cmd_zone_append)
+ 				control |= NVME_RW_APPEND_PIREMAP;
+ 			nvme_set_ref_tag(ns, cmnd, req);
+-			break;
+ 		}
+ 	}
+ 
+diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
+index dd831c269e99..a7e3dfc994b0 100644
+--- a/include/linux/bio-integrity.h
++++ b/include/linux/bio-integrity.h
+@@ -11,6 +11,9 @@ enum bip_flags {
+ 	BIP_DISK_NOCHECK	= 1 << 3, /* disable disk integrity checking */
+ 	BIP_IP_CHECKSUM		= 1 << 4, /* IP checksum */
+ 	BIP_COPY_USER		= 1 << 5, /* Kernel bounce buffer in use */
++	BIP_CHECK_GUARD		= 1 << 6,
++	BIP_CHECK_REFTAG	= 1 << 7,
++	BIP_CHECK_APPTAG	= 1 << 8,
+ };
+ 
+ struct bio_integrity_payload {
+-- 
+2.25.1
+
+------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_
+Content-Type: text/plain; charset="utf-8"
+
+
+------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_--
