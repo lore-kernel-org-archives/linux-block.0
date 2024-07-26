@@ -1,221 +1,145 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDB07F8
-	for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 10:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FDB1428E5
+	for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 20:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721991024; cv=none; b=G3X8Fj0nThL3I5f4w674Ha4m+k24Ag+b78uBsJFmdU5Dz26bA4+/rIn5gF9DL4Nv00R2EkZl58gPANnKY2SuEccKQC2NCgJX6rdXOs54IyiZCdAPZbdzabNMvI/VrlYJGvGeqfirXvty9LwlwLy7ZNPD/2mPgtI1csNal1BIdHM=
+	t=1722026928; cv=none; b=Jyiq0xKReTjki8uLTeBIWfdyiLQDK/aT7TX5ZrmP7LfYwgmhUyqRCLA2X+Y5nlk7fS2ujglFzgnbnbQXb01x5JDjxYUr6hhsu3F7/fBPEASlMr46Vp7vnfci12rOw28lVWciINjAL5Twfla6cAbP/3nl9x7Civ0sYdxVFxfDGjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721991024; c=relaxed/simple;
-	bh=jGPRczautyuMMj4CcPFfYRBIAc/wsQuQSJqJruFd9Tw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=Nv9cRrsyWBnkN3AlXsgF/s7TQC9zZZaTwl+Z/72MZrhLRR552ls3LD7RJsSv1e39HxGjN9kJ8+YYmXejcVdNWUFtWfv6JpmVUes4zKiMFyHe8wCAc447/mkCcvUzcFeJkOy9EGxk8hj3wJaF5AjttlLSIKQMtLD2qdq1dsDpj/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QkEunvA1; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1722026928; c=relaxed/simple;
+	bh=0ptgAo76sEALm0wWfTfRkIhC3WoPOl25PxfbjjWdvOc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:MIME-Version:
+	 Content-Type; b=scdnDlpSKI0wdYH+iETIm81MgNOzL5fIwVxLvyXVRtcEp8DJf/Dfi3eyM5fHz2rOkbFWzmCdkn777OZx4f/f6Foa9n76V4qCIi/ArEPpLkTho4IufwnelTj+4iagyrfy1JRcxPQ53Oyt/ngHNcuh9YR0fCQseKOjzR0G+6V40uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VDRxJUgT; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QkEunvA1"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240726105012epoutp04f511f849b291327ccd47e7dbe620f7e9~lvbPbSJ0N0887408874epoutp04r
-	for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 10:50:12 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240726105012epoutp04f511f849b291327ccd47e7dbe620f7e9~lvbPbSJ0N0887408874epoutp04r
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1721991012;
-	bh=H5uMvEvG4y3d8iyedbenWXf5zTg9mXTk6BN4CXr3xA0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QkEunvA1zUX9/9PDaRCLdQfPTpM0+8OKz+lOMe73ONQKqfp3Q56NyM6SzLAPxEZHF
-	 vIme5s3cVwJqhqC1YQO1p8IEMptrsLPvvxM4hvHveeZ1+m1BNV7Gi2YoaVhRTjH6HH
-	 VYCycIx60gu61EfuFZVstHABgR5lLJoI3VdBpuR8=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-	20240726105012epcas5p3b4e4e6a7078b76fd5636fa607ef3ef25~lvbO_6kpi2185221852epcas5p3j;
-	Fri, 26 Jul 2024 10:50:12 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4WVkzl06Vxz4x9Py; Fri, 26 Jul
-	2024 10:50:11 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	78.99.09640.26F73A66; Fri, 26 Jul 2024 19:50:10 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240726102916epcas5p10f8e5c7b97ed95887bda7de79a30781d~lvI9FbL2e2814828148epcas5p1F;
-	Fri, 26 Jul 2024 10:29:16 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240726102916epsmtrp1996ac98a173fd383a314f7bd61ea24bc~lvI9EvW3-0866008660epsmtrp1s;
-	Fri, 26 Jul 2024 10:29:16 +0000 (GMT)
-X-AuditID: b6c32a49-a57ff700000025a8-83-66a37f62c2a0
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	50.2E.19367.B7A73A66; Fri, 26 Jul 2024 19:29:15 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20240726102914epsmtip1e230faaf6160f35cc915b564bec04fe4~lvI8D_rFM1720917209epsmtip1w;
-	Fri, 26 Jul 2024 10:29:14 +0000 (GMT)
-Date: Fri, 26 Jul 2024 15:51:56 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi
-	<joshi.k@samsung.com>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: fine-grained PI control
-Message-ID: <20240726102156.GA17572@green245>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VDRxJUgT"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a7d26c2297eso197471266b.2
+        for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 13:48:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722026925; x=1722631725; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:in-reply-to:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GBMgfixy+x8J4chK+XEr8yM6u1+DycWp9/E02fNR+AA=;
+        b=VDRxJUgTZSHxpnVMdJh+/y8vRSXieitfNd4ynNT2knNOe48yEifRLYAnAHLyklnsY8
+         wY+jhL4Qbw7qBpYw4KD/aqBvdHZ7fSJ0q8s3NzEZDuq5kmwfaoVwQEZTSysTA9/ioFr0
+         HxtZqBzhW8zka5xdgzrvVnJufSXwJ3GGhz31p4RHhu2rEndFRiiPLKnECyBxMDwVfIPm
+         DB+vCJjQnP35qMjv/WU11fdOUB1csLsUjvBBXYXVLWlmKKV+ldPW/ZEGdjq44ONOh87P
+         iOqF8LpnepqQdhW7FLukNJ0IAgx9G8+FOqUeZI1exFM+M7x0bGFuqeYXLoZyyM5A0QcV
+         ZsUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722026925; x=1722631725;
+        h=content-transfer-encoding:mime-version:in-reply-to:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GBMgfixy+x8J4chK+XEr8yM6u1+DycWp9/E02fNR+AA=;
+        b=YAHLZm3wTkhAmEnpFt8LPtK1WdAbggoMfUktw1mVv2NS8wehUgwrVtb752fGrgLFLY
+         pPKhP8+26tZ1Kq6U44kYoG/GWbWldMJggl6KMk0wFul7lgb2a4mLlRU9hGbtO6OiszdN
+         NjnmzyE6pA8sPW4eqaFC5c1pvYIqismNHkE1dMH0NVmy1VLMVklZHk9UywJpGt60UGIZ
+         /ZS72hRuV29Af5WdhPkpeg9eQLeWX2ucX3EZbBbtZ9loccoJDqe02uxtJ3Dsy/uXFXkT
+         IopnO9XCVTlGlfbhInn5/5Ak0gQTrbnNrm8WGgidgkqfgsnE2vHlLu5uYeLzwrgatYTT
+         SH/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWkFvZGgReG+ed8ivIXZNALBF4QodljEUQO8YIsBRsgGIPp3qcfC5NtP3tM/WIE+0frJr318Ou5XGYL+w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKXr1cNIExXOERqSXsYdgmfVS04WkyTlH5vtcOnX1wBzP9YNeg
+	76YiHO2NMUJASbF/YWbmcNKqI69HtPMffQ/uEY1u/Asg5wg+QNUs
+X-Google-Smtp-Source: AGHT+IH/Wk3yKHVOGm6Q2V0uGvjeJYCJriHVdyxX3OVHO2TxkE0uWiwh2D6R3c+mhA8SO2IVFuazNQ==
+X-Received: by 2002:a17:907:72cc:b0:a7a:9d74:21c3 with SMTP id a640c23a62f3a-a7d400a1a61mr52676966b.35.1722026924592;
+        Fri, 26 Jul 2024 13:48:44 -0700 (PDT)
+Received: from shift.daheim (p200300d5ff30930050f496fffe46beef.dip0.t-ipconnect.de. [2003:d5:ff30:9300:50f4:96ff:fe46:beef])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab2302dsm212952766b.39.2024.07.26.13.48.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 13:48:44 -0700 (PDT)
+Received: from localhost.daheim ([127.0.0.1] helo=shift.localnet)
+	by shift.daheim with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <chunkeey@gmail.com>)
+	id 1sXSkR-00000000zGU-3SKI;
+	Fri, 26 Jul 2024 22:48:43 +0200
+From: Christian Lamparter <chunkeey@gmail.com>
+To: hch@lst.de
+Cc: axboe@kernel.dk, dlemoal@kernel.org, jasowang@redhat.com,
+ kbusch@kernel.org, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, martin.petersen@oracle.com, mst@redhat.com,
+ pbonzini@redhat.com, sagi@grimberg.me, stefanha@redhat.com,
+ virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
+ linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 04/15] block: add an API to atomically update queue limits
+Date: Fri, 26 Jul 2024 22:48:43 +0200
+Message-ID: <2011786.tdWV9SEqCh@shift>
+In-Reply-To: <20240213073425.1621680-5-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240709071604.GB18993@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprCJsWRmVeSWpSXmKPExsWy7bCmhm5S/eI0g+eLzCxWrj7KZHH0/1s2
-	i723tC3mL3vKbtF9fQebxfLj/5gc2Dw2L6n32H2zgc3j49NbLB59W1YxenzeJBfAGpVtk5Ga
-	mJJapJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQO0X0mhLDGnFCgU
-	kFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYFKgV5yYW1yal66Xl1piZWhgYGQKVJiQndHzWaKg
-	XaFi/orKBsZDUl2MnBwSAiYSy558Ye9i5OIQEtjNKLFy0VsmCOcTo8SmBy8Z4Zz5Z/8BlXGA
-	teyaEwYR38ko8fv/EhYI5xlQx4mlbCBzWQRUJZZ9ncEOYrMJqEsced7KCGKLCChJPH11Fmwq
-	s8B2RokZTeeYQBLCAioS22fcAmvmFdCVmLTuHhOELShxcuYTFhCbU0BHYunfD6wgtqiAssSB
-	bcfBbpUQ+Mgu0d1ymAXiIxeJp9//sEHYwhKvjm9hh7ClJF72t0HZ6RI/Lj9lgrALJJqP7WOE
-	sO0lWk/1M4PYzAIZEsu2fIeql5WYemodE0ScT6L39xOoXl6JHfNgbCWJ9pVzoGwJib3nGqBs
-	D4k7s2cxQ4LoAqPEiUd3mSYwys9C8twsJPsgbB2JBbs/sc0CBjezgLTE8n8cEKamxPpd+gsY
-	WVcxSqYWFOempxabFhjmpZbDIzw5P3cTIzh5annuYLz74IPeIUYmDsZDjBIczEoivMvuL0wT
-	4k1JrKxKLcqPLyrNSS0+xGgKjK2JzFKiyfnA9J1XEm9oYmlgYmZmZmJpbGaoJM77unVuipBA
-	emJJanZqakFqEUwfEwenVAOTKvudZPELRRZM2qtfGt3g6Kz6/OtK/eZFbUf0/07LLclYeimC
-	84rols+CvWYxnDUbe99fi1mh/9Ogf9Vuv2lv5LtUxQ8xcpyfkfP2n3BeSx73i+2rk9J7JDfM
-	WahmmpE4nY2Vh51d+uHOY6ZG8yRSGCav/nBkntGil0tSd2RMYT+vrLXCm/HAtb1r1/79ui02
-	bP8poZ1LNj4L9Fm80P2nx8Xn0+pub71xUcM/NUvstMyWe708GepenUcr1No+Nzet+lC/4d6E
-	EhODHcd1gqZy3ncxsXWQPjZHUWLhA2mv/xt7dfs3bihlr685k3JO8ENTmEJmHGf2pNiAmP5K
-	MSfLtmO2D1qnMSYJfGMtqnBTYinOSDTUYi4qTgQAtyxLQicEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrELMWRmVeSWpSXmKPExsWy7bCSnG511eI0gzWXLCxWrj7KZHH0/1s2
-	i723tC3mL3vKbtF9fQebxfLj/5gc2Dw2L6n32H2zgc3j49NbLB59W1YxenzeJBfAGsVlk5Ka
-	k1mWWqRvl8CV0X3hMXPBcdmK51fCGhhnS3QxcnBICJhI7JoT1sXIxSEksJ1R4u/ChcxdjJxA
-	cQmJUy+XMULYwhIr/z1nhyh6wijx8d9mNpAEi4CqxLKvM9hBbDYBdYkjz1vBGkQElCSevjrL
-	CNLADDL1Y8c0sCJhARWJ7TNugTXzCuhKTFp3jwli6gVGiTnfXrFDJAQlTs58wgJiMwtoSdz4
-	95IJ5FRmAWmJ5f84QMKcAjoSS/9+YAWxRQWUJQ5sO840gVFwFpLuWUi6ZyF0L2BkXsUomlpQ
-	nJuem1xgqFecmFtcmpeul5yfu4kRHOxaQTsYl63/q3eIkYmD8RCjBAezkgjvsvsL04R4UxIr
-	q1KL8uOLSnNSiw8xSnOwKInzKud0pggJpCeWpGanphakFsFkmTg4pRqYDM1jk22VeTvqHgR0
-	TOfSXcF8vLAp732jT7t9Z3LY9U8GF8o3vYu0urixdkaFH6eO7l7hyZtXCii1BSfbb7HVZN0s
-	/E529cU9Z3fObzvg5F+wlqvq/r/dah21t286hKucbTb7PFNQ/PvWLr8LfUGe0vmHts21+rrZ
-	Z3ff7R9LauQrNnBFd7jWT9RX87uXpxHYJZ947KGLLN+q9lDVc63h4ufZZBuMlBk27btsUNAx
-	0+Sg+5mZv+/sFVyyhWtpQEz+3OMvBbkfmotsnP2L71SAlUahcukRefYVx4TXqURtfnBrSt80
-	Qf17kSe27/714E6F7quJHYrxJ1Pauav2XvVp2rgv5q9lksmGRLfolG4lluKMREMt5qLiRAB2
-	JQxw5QIAAA==
-X-CMS-MailID: 20240726102916epcas5p10f8e5c7b97ed95887bda7de79a30781d
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240709071611epcas5p1c5f2b59325d562658522842f89a31861
-References: <20240705083205.2111277-1-hch@lst.de>
-	<yq1ttgz5l6d.fsf@ca-mkp.ca.oracle.com>
-	<CGME20240709071611epcas5p1c5f2b59325d562658522842f89a31861@epcas5p1.samsung.com>
-	<20240709071604.GB18993@lst.de>
-
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_
+Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
 
-On Tue, Jul 09, 2024 at 09:16:04AM +0200, Christoph Hellwig wrote:
-> On Mon, Jul 08, 2024 at 11:35:13PM -0400, Martin K. Petersen wrote:
-> > I don't like having the BIP_USER_CHECK_FOO flags exposed in the block
-> > layer. The io_uring interface obviously needs to expose some flags in
-> > the user API. But there should not be a separate set of BIP_USER_* flags
-> > bolted onto the side of the existing kernel integrity flags.
-> >
-> > The bip flags should describe the contents of the integrity buffer and
-> > how the hardware needs to interpret and check that information.
-> 
-> Yes, that was also my review comments.
+Hi,
 
-Hi Christoph, Martin,
+got a WARNING splatch (=> boot harddrive is inaccessible - device fails to boot) 
 
-I was thinking something like below patch[*] could help us get rid of the
-BIP_USER_CHECK_FOO flags, and also driver can now check flags passed by block
-layer instead of checking if it's user passthrough data. Haven't plumbed the
-scsi side of things, but do you think it can work with scsi? 
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 29 at block/blk-settings.c:185 blk_validate_limits+0x154/0x294
+Modules linked in:
+CPU: 0 PID: 29 Comm: kworker/u4:2 Tainted: G        W          6.10.0+ #1
+Hardware name: MyBook Live APM821XX 0x12c41c83 PowerPC 44x Platform
+Workqueue: async async_run_entry_fn
+NIP:  c02f1f00 LR: c02eef3c CTR: 00000000
+REGS: c114bbc0 TRAP: 0700   Tainted: G        W           (6.10.0+)
+MSR:  0002b000 <CE,EE,FP,ME>  CR: 84000008  XER: 00000000
 
-Subject: [PATCH] block: introduce BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags
+GPR00: c02eef28 c114bcb0 c116cf40 c114bda8 00000082 ffffffff ffffffff 00000200
+GPR08: 00000200 0000ffff 00001fff c114bc80 44000008 00000000 c00433f0 c119b440
+GPR16: 00000000 00000000 00000000 00000000 c105d505 c1101880 c11b6250 00000001
+GPR24: 00000000 c0ab0000 c114bda8 ffffffff c0a1eb68 00000000 00000014 c1b683d0
+NIP [c02f1f00] blk_validate_limits+0x154/0x294
+LR [c02eef3c] blk_alloc_queue+0x80/0x1f0
+Call Trace:
+[c114bcb0] [c02ffa54] blk_alloc_queue_stats+0x20/0x48 (unreliable)
+[c114bcc0] [c02eef28] blk_alloc_queue+0x6c/0x1f0
+[c114bcf0] [c02fde24] blk_mq_alloc_queue+0x50/0xa8
+[c114bd90] [c04393b4] scsi_alloc_sdev+0x190/0x2b8
+[c114be40] [c04395a8] scsi_probe_and_add_lun+0xcc/0x2a0
+[c114bea0] [c043a008] __scsi_add_device+0xe4/0x134
+[c114bee0] [c045296c] ata_scsi_scan_host+0x84/0x27c
+[c114bf30] [c0048158] async_run_entry_fn+0x34/0xcc
+[c114bf50] [c003c800] process_scheduled_works+0x170/0x244
+[c114bf90] [c003cc48] worker_thread+0x184/0x1d4
+[c114bfc0] [c00434bc] kthread+0xcc/0xd0
+[c114bff0] [c000c210] start_kernel_thread+0x10/0x14
+Code: 81430050 7c085040 40810008 91030050 81430004 2c0a0000 40820010 3940ffff 91430004 48000014 280a3ffe 41a1000c <0fe00000> 48000130 80c30008 81430020
+---[ end trace 0000000000000000 ]---
+scsi_alloc_sdev: Allocation failure during SCSI scanning, some SCSI devices might not be configured
 
-This patch introduces BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags which
-indicate how the hardware should check the payload. The driver can now
-just rely on block layer flags, and doesn't need to know the integrity
-source. Submitter of PI chooses which tags to check. This would also
-give us a unified interface for user and kernel generated integrity.
-
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 ---
- block/bio-integrity.c         |  5 +++++
- drivers/nvme/host/core.c      | 12 +++---------
- include/linux/bio-integrity.h |  3 +++
- 3 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 8d1fb38f745f..d179b0134e1d 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -443,6 +443,11 @@ bool bio_integrity_prep(struct bio *bio)
- 	if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
- 		bip->bip_flags |= BIP_IP_CHECKSUM;
- 
-+	/* describe what tags to check in payload */
-+	if (bi->csum_type)
-+		bip->bip_flags |= BIP_CHECK_GUARD;
-+	if (bi->flags & BLK_INTEGRITY_REF_TAG)
-+		bip->bip_flags |= BIP_CHECK_REFTAG;
- 	if (bio_integrity_add_page(bio, virt_to_page(buf), len,
- 			offset_in_page(buf)) < len) {
- 		printk(KERN_ERR "could not attach integrity payload\n");
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 19917253ba7b..5991f048f394 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1001,19 +1001,13 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 				return BLK_STS_NOTSUPP;
- 			control |= NVME_RW_PRINFO_PRACT;
- 		}
--
--		switch (ns->head->pi_type) {
--		case NVME_NS_DPS_PI_TYPE3:
-+		if (bio_integrity_flagged(req->bio, BIP_CHECK_GUARD))
- 			control |= NVME_RW_PRINFO_PRCHK_GUARD;
--			break;
--		case NVME_NS_DPS_PI_TYPE1:
--		case NVME_NS_DPS_PI_TYPE2:
--			control |= NVME_RW_PRINFO_PRCHK_GUARD |
--					NVME_RW_PRINFO_PRCHK_REF;
-+		if (bio_integrity_flagged(req->bio, BIP_CHECK_REFTAG)) {
-+			control |= NVME_RW_PRINFO_PRCHK_REF;
- 			if (op == nvme_cmd_zone_append)
- 				control |= NVME_RW_APPEND_PIREMAP;
- 			nvme_set_ref_tag(ns, cmnd, req);
--			break;
- 		}
- 	}
- 
-diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
-index dd831c269e99..a7e3dfc994b0 100644
---- a/include/linux/bio-integrity.h
-+++ b/include/linux/bio-integrity.h
-@@ -11,6 +11,9 @@ enum bip_flags {
- 	BIP_DISK_NOCHECK	= 1 << 3, /* disable disk integrity checking */
- 	BIP_IP_CHECKSUM		= 1 << 4, /* IP checksum */
- 	BIP_COPY_USER		= 1 << 5, /* Kernel bounce buffer in use */
-+	BIP_CHECK_GUARD		= 1 << 6,
-+	BIP_CHECK_REFTAG	= 1 << 7,
-+	BIP_CHECK_APPTAG	= 1 << 8,
- };
- 
- struct bio_integrity_payload {
--- 
-2.25.1
+This is due to this patch adds
+| /*
+|   * By default there is no limit on the segment boundary alignment,
+|   * but if there is one it can't be smaller than the page size as
+|   * that would break all the normal I/O patterns.
+|   */
+|   if (!lim->seg_boundary_mask)
+|           lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
+|   if (WARN_ON_ONCE(lim->seg_boundary_mask < PAGE_SIZE - 1)) <----- this warning gets triggered
+|          return -EINVAL;
 
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_
-Content-Type: text/plain; charset="utf-8"
+My guess is that this is caused by the kernel has a 16K page size.
+
+CONFIG_HAVE_PAGE_SIZE_16KB=y
+CONFIG_PAGE_SIZE_16KB=y
+CONFIG_PAGE_SIZE_LESS_THAN_64KB=y
+CONFIG_PAGE_SIZE_LESS_THAN_256KB=y
+CONFIG_PAGE_SHIFT=14
+
+This worked fine (sata driver is sata_dwc_460ex.c) in the past (and using 16K pages was
+slightly faster than 4k pages)... and yes: using a 4K page size works (as in: device boots again).
+
+Regards,
+Christian
 
 
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_1f5e4_--
