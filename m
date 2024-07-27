@@ -1,145 +1,151 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FDB1428E5
-	for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 20:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6631459F5
+	for <linux-block@vger.kernel.org>; Sat, 27 Jul 2024 13:07:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722026928; cv=none; b=Jyiq0xKReTjki8uLTeBIWfdyiLQDK/aT7TX5ZrmP7LfYwgmhUyqRCLA2X+Y5nlk7fS2ujglFzgnbnbQXb01x5JDjxYUr6hhsu3F7/fBPEASlMr46Vp7vnfci12rOw28lVWciINjAL5Twfla6cAbP/3nl9x7Civ0sYdxVFxfDGjg=
+	t=1722085667; cv=none; b=WKICJzJJe7l8uRnIvUlKW/3BaPerjiy3Ne3+NvyZe1L70/0Me0gEMjhgOd7KghRjpxs+RsP/tOo8o8k01fjs+p8O6isNzF45EyoRXM/d0nH/BIjgXhYoHFl+aKFVFe05Vx1FHELEXbtkbnfbKvxaOl1xY4cU/lfBB4jWXWLm3DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722026928; c=relaxed/simple;
-	bh=0ptgAo76sEALm0wWfTfRkIhC3WoPOl25PxfbjjWdvOc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:MIME-Version:
-	 Content-Type; b=scdnDlpSKI0wdYH+iETIm81MgNOzL5fIwVxLvyXVRtcEp8DJf/Dfi3eyM5fHz2rOkbFWzmCdkn777OZx4f/f6Foa9n76V4qCIi/ArEPpLkTho4IufwnelTj+4iagyrfy1JRcxPQ53Oyt/ngHNcuh9YR0fCQseKOjzR0G+6V40uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VDRxJUgT; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722085667; c=relaxed/simple;
+	bh=FbrPr/bIFUHo/4UCFBntOKowKvnkJxJyCBBKaUza2AE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=r8STfCe514k+C70q6tNRYKDa/w69r0cPPIgEWzcnfq0rj3KvB7LfeNIe22GGUG7I2oJ2Azbg/SwfnH7RLeSIeGvfJJ71Bo76iJoH3VAnN9+9g3ECbw1HIEod4zSkjpTjuxOS9vEt7nN2ixNS71qGCzeqGk4w8C6BsX+EMGTh/fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZfDN6jMq; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VDRxJUgT"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a7d26c2297eso197471266b.2
-        for <linux-block@vger.kernel.org>; Fri, 26 Jul 2024 13:48:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZfDN6jMq"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2cd16900ec5so334469a91.3
+        for <linux-block@vger.kernel.org>; Sat, 27 Jul 2024 06:07:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722026925; x=1722631725; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:in-reply-to:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GBMgfixy+x8J4chK+XEr8yM6u1+DycWp9/E02fNR+AA=;
-        b=VDRxJUgTZSHxpnVMdJh+/y8vRSXieitfNd4ynNT2knNOe48yEifRLYAnAHLyklnsY8
-         wY+jhL4Qbw7qBpYw4KD/aqBvdHZ7fSJ0q8s3NzEZDuq5kmwfaoVwQEZTSysTA9/ioFr0
-         HxtZqBzhW8zka5xdgzrvVnJufSXwJ3GGhz31p4RHhu2rEndFRiiPLKnECyBxMDwVfIPm
-         DB+vCJjQnP35qMjv/WU11fdOUB1csLsUjvBBXYXVLWlmKKV+ldPW/ZEGdjq44ONOh87P
-         iOqF8LpnepqQdhW7FLukNJ0IAgx9G8+FOqUeZI1exFM+M7x0bGFuqeYXLoZyyM5A0QcV
-         ZsUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722026925; x=1722631725;
-        h=content-transfer-encoding:mime-version:in-reply-to:message-id:date
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1722085664; x=1722690464; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:content-language:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GBMgfixy+x8J4chK+XEr8yM6u1+DycWp9/E02fNR+AA=;
-        b=YAHLZm3wTkhAmEnpFt8LPtK1WdAbggoMfUktw1mVv2NS8wehUgwrVtb752fGrgLFLY
-         pPKhP8+26tZ1Kq6U44kYoG/GWbWldMJggl6KMk0wFul7lgb2a4mLlRU9hGbtO6OiszdN
-         NjnmzyE6pA8sPW4eqaFC5c1pvYIqismNHkE1dMH0NVmy1VLMVklZHk9UywJpGt60UGIZ
-         /ZS72hRuV29Af5WdhPkpeg9eQLeWX2ucX3EZbBbtZ9loccoJDqe02uxtJ3Dsy/uXFXkT
-         IopnO9XCVTlGlfbhInn5/5Ak0gQTrbnNrm8WGgidgkqfgsnE2vHlLu5uYeLzwrgatYTT
-         SH/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWkFvZGgReG+ed8ivIXZNALBF4QodljEUQO8YIsBRsgGIPp3qcfC5NtP3tM/WIE+0frJr318Ou5XGYL+w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKXr1cNIExXOERqSXsYdgmfVS04WkyTlH5vtcOnX1wBzP9YNeg
-	76YiHO2NMUJASbF/YWbmcNKqI69HtPMffQ/uEY1u/Asg5wg+QNUs
-X-Google-Smtp-Source: AGHT+IH/Wk3yKHVOGm6Q2V0uGvjeJYCJriHVdyxX3OVHO2TxkE0uWiwh2D6R3c+mhA8SO2IVFuazNQ==
-X-Received: by 2002:a17:907:72cc:b0:a7a:9d74:21c3 with SMTP id a640c23a62f3a-a7d400a1a61mr52676966b.35.1722026924592;
-        Fri, 26 Jul 2024 13:48:44 -0700 (PDT)
-Received: from shift.daheim (p200300d5ff30930050f496fffe46beef.dip0.t-ipconnect.de. [2003:d5:ff30:9300:50f4:96ff:fe46:beef])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab2302dsm212952766b.39.2024.07.26.13.48.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 13:48:44 -0700 (PDT)
-Received: from localhost.daheim ([127.0.0.1] helo=shift.localnet)
-	by shift.daheim with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98)
-	(envelope-from <chunkeey@gmail.com>)
-	id 1sXSkR-00000000zGU-3SKI;
-	Fri, 26 Jul 2024 22:48:43 +0200
-From: Christian Lamparter <chunkeey@gmail.com>
-To: hch@lst.de
-Cc: axboe@kernel.dk, dlemoal@kernel.org, jasowang@redhat.com,
- kbusch@kernel.org, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, martin.petersen@oracle.com, mst@redhat.com,
- pbonzini@redhat.com, sagi@grimberg.me, stefanha@redhat.com,
- virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 04/15] block: add an API to atomically update queue limits
-Date: Fri, 26 Jul 2024 22:48:43 +0200
-Message-ID: <2011786.tdWV9SEqCh@shift>
-In-Reply-To: <20240213073425.1621680-5-hch@lst.de>
+        bh=zCfB5nGzwsS6GaMsmiVVBT7q15CiVsElOGAqiQ062s8=;
+        b=ZfDN6jMqZyNpCpNM831AIbIaERUaxLrANQ1tt906WJLMIHNmSJ4COpRc6ENYJ2TGOD
+         29lpKt7qglvq9oOMFzZ9w+JfQurvIGtV1iSwjQX6VFkZ1nWe2x4H5PgiSyiRrbVQqOZW
+         uBFwpk7n/es96I31aqnVJjlTqsxLFKdyJum5Yeof0hv9vLSqWD0CK6rdAw13uxhv1lcp
+         Oah3m5lIf17sKCfBTeBWqTD0AAz/IxN1IYpxyiA6ZiB3AD35/Bb8HNggn/XDs1GInrqt
+         UN2/mkPkv62ic2OqTRozM88HolSNm/ShtAW95OGFGGlWuKYrZz1w2o3meLGIAmxndYpO
+         btrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722085664; x=1722690464;
+        h=content-transfer-encoding:cc:content-language:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zCfB5nGzwsS6GaMsmiVVBT7q15CiVsElOGAqiQ062s8=;
+        b=WOdzGlJ1616rnjY3F8e0HHbYN9OuyovCpj5rPFQ5MlVaB/QMMmISjUitHM9ONG+UOt
+         935czo4QoOjoz+VFd0Sn/IKXuF+KH6C/jiVOiEhLyGAg0vRbJvy63nkVPdpyZTbkFUeW
+         3R2V6+XJjCXwDQ6rrcs0eSKeGjARol4NQaRVOEcZUbBalYn4BudvSRCTZsrTav0/woAW
+         /bzeax9XnK5ET7sQJskL5eKFLOm6fRMTe6HvTYaU3WR2IRWdM4WIJd16nvqEBd6Ph255
+         UamNmMezL5PNbuLQJ916VvMEnJ1a02thz1nwZwuBr7QbaeOxGdB82bkLKyPwJyDZ5u55
+         6Smw==
+X-Gm-Message-State: AOJu0YweTJ4C3IOlCPtNXC6ICAMm9bvC0uPtDMgTBdhPBRGyF4heCwVm
+	CNbXcNWd9iIa8kzYzZw0rhZ1aKq+XFhmXpnH0x51zEDcCHSnZdH441eAcPBhFrmJ+V+XJCO5urh
+	B
+X-Google-Smtp-Source: AGHT+IETTLBuFBQ+puU3hl4pMToOY1dpamRlf1sub53ordKjKYNIgdyNj6GfR1BL06YVSBs2JlKC7A==
+X-Received: by 2002:a17:902:c40b:b0:1fc:52f4:9486 with SMTP id d9443c01a7336-1fed6d3938amr58786385ad.10.1722085663989;
+        Sat, 27 Jul 2024 06:07:43 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7ee8177sm50116835ad.124.2024.07.27.06.07.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Jul 2024 06:07:43 -0700 (PDT)
+Message-ID: <b1213d87-c86b-4105-9630-e92b2834a08a@kernel.dk>
+Date: Sat, 27 Jul 2024 07:07:42 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla Thunderbird
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.11-rc1
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Language: en-US
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+(resend with linux-block actually CC'ed...)
 
-got a WARNING splatch (=> boot harddrive is inaccessible - device fails to boot) 
+Hi Linus,
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 29 at block/blk-settings.c:185 blk_validate_limits+0x154/0x294
-Modules linked in:
-CPU: 0 PID: 29 Comm: kworker/u4:2 Tainted: G        W          6.10.0+ #1
-Hardware name: MyBook Live APM821XX 0x12c41c83 PowerPC 44x Platform
-Workqueue: async async_run_entry_fn
-NIP:  c02f1f00 LR: c02eef3c CTR: 00000000
-REGS: c114bbc0 TRAP: 0700   Tainted: G        W           (6.10.0+)
-MSR:  0002b000 <CE,EE,FP,ME>  CR: 84000008  XER: 00000000
+Block fixes that should go into the 6.11-rc1 release:
 
-GPR00: c02eef28 c114bcb0 c116cf40 c114bda8 00000082 ffffffff ffffffff 00000200
-GPR08: 00000200 0000ffff 00001fff c114bc80 44000008 00000000 c00433f0 c119b440
-GPR16: 00000000 00000000 00000000 00000000 c105d505 c1101880 c11b6250 00000001
-GPR24: 00000000 c0ab0000 c114bda8 ffffffff c0a1eb68 00000000 00000014 c1b683d0
-NIP [c02f1f00] blk_validate_limits+0x154/0x294
-LR [c02eef3c] blk_alloc_queue+0x80/0x1f0
-Call Trace:
-[c114bcb0] [c02ffa54] blk_alloc_queue_stats+0x20/0x48 (unreliable)
-[c114bcc0] [c02eef28] blk_alloc_queue+0x6c/0x1f0
-[c114bcf0] [c02fde24] blk_mq_alloc_queue+0x50/0xa8
-[c114bd90] [c04393b4] scsi_alloc_sdev+0x190/0x2b8
-[c114be40] [c04395a8] scsi_probe_and_add_lun+0xcc/0x2a0
-[c114bea0] [c043a008] __scsi_add_device+0xe4/0x134
-[c114bee0] [c045296c] ata_scsi_scan_host+0x84/0x27c
-[c114bf30] [c0048158] async_run_entry_fn+0x34/0xcc
-[c114bf50] [c003c800] process_scheduled_works+0x170/0x244
-[c114bf90] [c003cc48] worker_thread+0x184/0x1d4
-[c114bfc0] [c00434bc] kthread+0xcc/0xd0
-[c114bff0] [c000c210] start_kernel_thread+0x10/0x14
-Code: 81430050 7c085040 40810008 91030050 81430004 2c0a0000 40820010 3940ffff 91430004 48000014 280a3ffe 41a1000c <0fe00000> 48000130 80c30008 81430020
----[ end trace 0000000000000000 ]---
-scsi_alloc_sdev: Allocation failure during SCSI scanning, some SCSI devices might not be configured
+- NVMe pull request via Keith
+	- Fix request without payloads cleanup  (Leon)
+	- Use new protection information format (Francis)
+	- Improved debug message for lost pci link (Bart)
+	- Another apst quirk (Wang)
+	- Use appropriate sysfs api for printing chars (Markus)
 
----
+- ublk async device deletion fix (Ming)
 
-This is due to this patch adds
-| /*
-|   * By default there is no limit on the segment boundary alignment,
-|   * but if there is one it can't be smaller than the page size as
-|   * that would break all the normal I/O patterns.
-|   */
-|   if (!lim->seg_boundary_mask)
-|           lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
-|   if (WARN_ON_ONCE(lim->seg_boundary_mask < PAGE_SIZE - 1)) <----- this warning gets triggered
-|          return -EINVAL;
+- drbd kerneldoc fixups (Simon)
 
-My guess is that this is caused by the kernel has a 16K page size.
+- Fix deadlock between sd removal and release (Yang)
 
-CONFIG_HAVE_PAGE_SIZE_16KB=y
-CONFIG_PAGE_SIZE_16KB=y
-CONFIG_PAGE_SIZE_LESS_THAN_64KB=y
-CONFIG_PAGE_SIZE_LESS_THAN_256KB=y
-CONFIG_PAGE_SHIFT=14
+Please pull!
 
-This worked fine (sata driver is sata_dwc_460ex.c) in the past (and using 16K pages was
-slightly faster than 4k pages)... and yes: using a 4K page size works (as in: device boots again).
 
-Regards,
-Christian
+The following changes since commit 66ebbdfdeb093e097399b1883390079cd4c3022b:
 
+  Merge tag 'irq-msi-2024-07-22' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2024-07-22 14:02:19 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.11-20240726
+
+for you to fetch changes up to f6bb5254b777453618a12d3bbf4a2a487acc8ee2:
+
+  Merge tag 'nvme-6.11-2024-07-26' of git://git.infradead.org/nvme into block-6.11 (2024-07-26 08:06:15 -0600)
+
+----------------------------------------------------------------
+block-6.11-20240726
+
+----------------------------------------------------------------
+Bart Van Assche (1):
+      nvme-pci: Fix the instructions for disabling power management
+
+Francis Pravin (1):
+      nvme-core: choose PIF from QPIF if QPIFS supports and PIF is QTYPE
+
+Israel Rukshin (1):
+      nvme: remove redundant bdev local variable
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.11-2024-07-26' of git://git.infradead.org/nvme into block-6.11
+
+Leon Romanovsky (1):
+      nvme-pci: add missing condition check for existence of mapped data
+
+Markus Elfring (1):
+      nvme-fabrics: Use seq_putc() in __nvmf_concat_opt_tokens()
+
+Ming Lei (1):
+      ublk: fix UBLK_CMD_DEL_DEV_ASYNC handling
+
+Simon Horman (1):
+      drbd: Add peer_device to Kernel doc
+
+WangYuli (1):
+      nvme/pci: Add APST quirk for Lenovo N60z laptop
+
+Yang Yang (1):
+      block: fix deadlock between sd_remove & sd_release
+
+ block/genhd.c                  |  2 +-
+ drivers/block/drbd/drbd_main.c |  4 ++++
+ drivers/block/ublk_drv.c       |  5 ++++-
+ drivers/nvme/host/core.c       |  8 +++++++-
+ drivers/nvme/host/fabrics.c    |  4 ++--
+ drivers/nvme/host/pci.c        | 12 ++++++++++--
+ drivers/nvme/host/sysfs.c      |  5 ++---
+ include/linux/nvme.h           |  9 +++++++++
+ 8 files changed, 39 insertions(+), 10 deletions(-)
+
+-- 
+Jens Axboe
 
