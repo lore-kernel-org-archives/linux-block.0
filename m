@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E441AA3C5;
-	Tue, 30 Jul 2024 19:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EEE1AA3C5;
+	Tue, 30 Jul 2024 19:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722367575; cv=none; b=W4fCVymt2qaY/UaMRZRJSFZkiEm/qoRYUxqmAfgAWiaEdYMot7SmwlZJ0kS1q1gvTquOQSBOgmgHiRzTcJd3GYuDktGMnp8p4np0aW134w75Q9WDiWZ1P1/tqAQl+01m79Ry8h09AKErkmbVgzsbULXw5p9eFsaVAjX2X9F5+vc=
+	t=1722367616; cv=none; b=RNmbzQ3aa9geIwIpVB/h0vNx2caitDGMZpEdLx5UuLdVXqAyQBlkQKtlHm3Or0TGAyPNnxXmHmwHacEOXeunycudpOHDTRUoah82+LRVpuLmrKOh1XY28glsGHt+3EFtxJctkIrmfdctUMnianv+aigX8AKTDUaEbEGEskqHepw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722367575; c=relaxed/simple;
-	bh=Vqr43TWMp2ey/8RIG6AR6Moccf1jabXlNXNjAQhYzso=;
+	s=arc-20240116; t=1722367616; c=relaxed/simple;
+	bh=amJzB5NcNAWV7wK3o3+i8FZDKA6RWy8Btwkm9lbCgX8=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tO/pldzawCJgx3C0jH7IP9rICsUndbUL3XWt9cH1zjOS9PWP4pBX5Ic8wpMZ443Z/spQhlgxsHmZQdk5eCAJ8XU2nr0ZHJ3YNoaGc1uObcLVZQoGz7VAQRaresFtTuuMX2reQS23JlkAIv4ID52iESvmqTJ1iVFgRRKYRgHt6k0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=bW+XuFRsI73bMeToU17Hqr7zZoC/DkLwSfiOWdzAPuGEiMbfzJs2HsH7e03yPvA2bDmULa3o9tZ41VEh6j5jkOFdaNri5Xya9j/tKXrsbhDH6U+hYtMr+SNt+FzFGa9/9R7cePqHDz5Xp609grVjYVm3hDh3fV6pwj6Z0E4nuoc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1sYsTz-000000003DV-18SB;
-	Tue, 30 Jul 2024 19:26:03 +0000
-Date: Tue, 30 Jul 2024 20:25:59 +0100
+	id 1sYsUg-000000003EJ-1BpC;
+	Tue, 30 Jul 2024 19:26:46 +0000
+Date: Tue, 30 Jul 2024 20:26:42 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>, Jens Axboe <axboe@kernel.dk>,
@@ -38,8 +38,8 @@ To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Chuanhong Guo <gch981213@gmail.com>,
 	Chen Minqiang <ptpt52@gmail.com>, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH v5 2/4] block: partitions: populate fwnode
-Message-ID: <3051ac090ad3b3e2f5adb6b67c923261ead729a5.1722365899.git.daniel@makrotopia.org>
+Subject: [PATCH v5 3/4] block: add support for notifications
+Message-ID: <ca0022886e8f211a323a716653a1396a3bc91653.1722365899.git.daniel@makrotopia.org>
 References: <cover.1722365899.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -51,110 +51,156 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1722365899.git.daniel@makrotopia.org>
 
-Assign matching firmware nodes to block partitions in order to allow
-them to be referenced e.g. as NVMEM providers.
+Add notifier block to notify other subsystems about the addition or
+removal of block devices.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- block/partitions/core.c | 72 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ block/Kconfig          |  6 +++
+ block/Makefile         |  1 +
+ block/blk-notify.c     | 87 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h | 11 ++++++
+ 4 files changed, 105 insertions(+)
+ create mode 100644 block/blk-notify.c
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index ab76e64f0f6c3..cd54300e1d621 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -10,6 +10,8 @@
- #include <linux/ctype.h>
- #include <linux/vmalloc.h>
- #include <linux/raid/detect.h>
-+#include <linux/property.h>
+diff --git a/block/Kconfig b/block/Kconfig
+index 5b623b876d3b4..67cd4f92378af 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -209,6 +209,12 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+ 	  by falling back to the kernel crypto API when inline
+ 	  encryption hardware is not present.
+ 
++config BLOCK_NOTIFIERS
++	bool "Enable support for notifications in block layer"
++	help
++	  Enable this option to provide notifiers for other subsystems
++	  upon addition or removal of block devices.
 +
- #include "check.h"
+ source "block/partitions/Kconfig"
  
- static int (*const check_part[])(struct parsed_partitions *) = {
-@@ -281,6 +283,74 @@ static ssize_t whole_disk_show(struct device *dev,
- }
- static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
- 
-+static bool part_meta_match(const char *attr, const char *member, size_t length)
+ config BLK_MQ_PCI
+diff --git a/block/Makefile b/block/Makefile
+index ddfd21c1a9ffc..a131fa7d6b26e 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -38,3 +38,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
+ 					   blk-crypto-sysfs.o
+ obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
+ obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)	+= holder.o
++obj-$(CONFIG_BLOCK_NOTIFIERS) += blk-notify.o
+diff --git a/block/blk-notify.c b/block/blk-notify.c
+new file mode 100644
+index 0000000000000..fd727288ea19a
+--- /dev/null
++++ b/block/blk-notify.c
+@@ -0,0 +1,87 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Notifiers for addition and removal of block devices
++ *
++ * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
++ */
++
++#include <linux/list.h>
++#include <linux/mutex.h>
++#include <linux/notifier.h>
++
++#include "blk.h"
++
++struct blk_device_list {
++	struct device *dev;
++	struct list_head list;
++};
++
++static RAW_NOTIFIER_HEAD(blk_notifier_list);
++static DEFINE_MUTEX(blk_notifier_lock);
++static LIST_HEAD(blk_devices);
++
++void blk_register_notify(struct notifier_block *nb)
 +{
-+	/* check if length of attr exceeds specified maximum length */
-+	if (strnlen(attr, length) == length)
-+		return false;
++	struct blk_device_list *existing_blkdev;
 +
-+	/* return true if strings match */
-+	return !strncmp(attr, member, length);
++	mutex_lock(&blk_notifier_lock);
++	raw_notifier_chain_register(&blk_notifier_list, nb);
++
++	list_for_each_entry(existing_blkdev, &blk_devices, list)
++		nb->notifier_call(nb, BLK_DEVICE_ADD, existing_blkdev->dev);
++
++	mutex_unlock(&blk_notifier_lock);
++}
++EXPORT_SYMBOL_GPL(blk_register_notify);
++
++void blk_unregister_notify(struct notifier_block *nb)
++{
++	mutex_lock(&blk_notifier_lock);
++	raw_notifier_chain_unregister(&blk_notifier_list, nb);
++	mutex_unlock(&blk_notifier_lock);
++}
++EXPORT_SYMBOL_GPL(blk_unregister_notify);
++
++static int blk_call_notifier_add(struct device *dev)
++{
++	struct blk_device_list *new_blkdev;
++
++	new_blkdev = kmalloc(sizeof(*new_blkdev), GFP_KERNEL);
++	if (!new_blkdev)
++		return -ENOMEM;
++
++	new_blkdev->dev = dev;
++	mutex_lock(&blk_notifier_lock);
++	list_add_tail(&new_blkdev->list, &blk_devices);
++	raw_notifier_call_chain(&blk_notifier_list, BLK_DEVICE_ADD, dev);
++	mutex_unlock(&blk_notifier_lock);
++	return 0;
 +}
 +
-+static struct fwnode_handle *find_partition_fwnode(struct block_device *bdev)
++static void blk_call_notifier_remove(struct device *dev)
 +{
-+	struct fwnode_handle *fw_parts, *fw_part;
-+	struct device *ddev = disk_to_dev(bdev->bd_disk);
-+	const char *partname, *uuid;
-+	u32 partno;
-+	bool got_uuid, got_partname, got_partno;
++	struct blk_device_list *old_blkdev, *tmp;
 +
-+	fw_parts = device_get_named_child_node(ddev, "partitions");
-+	if (!fw_parts)
-+		return NULL;
-+
-+	fwnode_for_each_child_node(fw_parts, fw_part) {
-+		got_uuid = false;
-+		got_partname = false;
-+		got_partno = false;
-+		/*
-+		 * In case 'uuid' is defined in the partitions firmware node
-+		 * require partition meta info being present and the specified
-+		 * uuid to match.
-+		 */
-+		got_uuid = !fwnode_property_read_string(fw_part, "uuid", &uuid);
-+		if (got_uuid && (!bdev->bd_meta_info ||
-+				 !part_meta_match(uuid, bdev->bd_meta_info->uuid,
-+						  PARTITION_META_INFO_UUIDLTH)))
++	mutex_lock(&blk_notifier_lock);
++	list_for_each_entry_safe(old_blkdev, tmp, &blk_devices, list) {
++		if (old_blkdev->dev != dev)
 +			continue;
 +
-+		/*
-+		 * In case 'partname' is defined in the partitions firmware node
-+		 * require partition meta info being present and the specified
-+		 * volname to match.
-+		 */
-+		got_partname = !fwnode_property_read_string(fw_part, "partname",
-+							    &partname);
-+		if (got_partname && (!bdev->bd_meta_info ||
-+				     !part_meta_match(partname,
-+						      bdev->bd_meta_info->volname,
-+						      PARTITION_META_INFO_VOLNAMELTH)))
-+			continue;
-+
-+		/*
-+		 * In case 'partno' is defined in the partitions firmware node
-+		 * the specified partno needs to match.
-+		 */
-+		got_partno = !fwnode_property_read_u32(fw_part, "partno", &partno);
-+		if (got_partno && bdev_partno(bdev) != partno)
-+			continue;
-+
-+		/* Skip if no matching criteria is present in firmware node */
-+		if (!got_uuid && !got_partname && !got_partno)
-+			continue;
-+
-+		return fw_part;
++		list_del(&old_blkdev->list);
++		kfree(old_blkdev);
 +	}
-+
-+	return NULL;
++	raw_notifier_call_chain(&blk_notifier_list, BLK_DEVICE_REMOVE, dev);
++	mutex_unlock(&blk_notifier_lock);
 +}
 +
- /*
-  * Must be called either with open_mutex held, before a disk can be opened or
-  * after all disk users are gone.
-@@ -355,6 +425,8 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 			goto out_put;
- 	}
- 
-+	device_set_node(pdev, find_partition_fwnode(bdev));
++static struct class_interface blk_notifications_bus_interface __refdata = {
++	.class = &block_class,
++	.add_dev = &blk_call_notifier_add,
++	.remove_dev = &blk_call_notifier_remove,
++};
 +
- 	/* delay uevent until 'holders' subdir is created */
- 	dev_set_uevent_suppress(pdev, 1);
- 	err = device_add(pdev);
++static int __init blk_notifications_init(void)
++{
++	return class_interface_register(&blk_notifications_bus_interface);
++}
++device_initcall(blk_notifications_init);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e85ec73a07d57..2f871158d2860 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1682,4 +1682,15 @@ static inline bool bdev_can_atomic_write(struct block_device *bdev)
+ 
+ #define DEFINE_IO_COMP_BATCH(name)	struct io_comp_batch name = { }
+ 
++
++#define BLK_DEVICE_ADD		1
++#define BLK_DEVICE_REMOVE	2
++#if defined(CONFIG_BLOCK_NOTIFIERS)
++void blk_register_notify(struct notifier_block *nb);
++void blk_unregister_notify(struct notifier_block *nb);
++#else
++static inline void blk_register_notify(struct notifier_block *nb) { };
++static inline void blk_unregister_notify(struct notifier_block *nb) { };
++#endif
++
+ #endif /* _LINUX_BLKDEV_H */
 -- 
 2.45.2
