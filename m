@@ -1,118 +1,164 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFE91B0106
-	for <linux-block@vger.kernel.org>; Wed, 31 Jul 2024 12:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E475618C91D
+	for <linux-block@vger.kernel.org>; Wed, 31 Jul 2024 12:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722429703; cv=none; b=D2OXlMIKohMCb9lF6xiNKsVGDOG971TZxQo0hW3p8BKrSMV58OdK18XLMnLQcX5DRcEvT+i0uxuG6LiEmDbWRDAIooxSwit+ZAe18Nov1WyI7IlBjFtK7//6lQ3Ta/bozqtnsXAKB3mkEHk9VLT37ltxIBYmJeSm/ssbl47DqeM=
+	t=1722430016; cv=none; b=OTL8n3DYYFOlPgpdr9t0zFniuNVTfi4dffgZ9AWyqVihPPf7caarnRKc5bL2Fa6FqS8ezC6yLtF7ZZsr10smP+bLVt/42XnJH80d7/1k4oNKARFdPVmciNlSW1oaz/wA+cf5EXTg+wkmo+MMmJo+AEQ47I6yEwktKmXkzhMHZw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722429703; c=relaxed/simple;
-	bh=sRteEa73YtvhRGdjwHLPjYoJgKjapvQ9DRoboKU9azk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CaBBNsYaDQwQa4m23H5sSp0U1eBuuUAITaD29MMm4pGAetTVkYmXx71709MpUPcBtgTW9pHy24OTdyzL5M6XGOv9g5bOKmbyydvUVA1l4j9gjS4EiPsV6YVbpT2P227Bc1aY58UhaZDuoowSxtJPF8TU75z0KD1pJgeuITqJcdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nBQvhdXs; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1722430016; c=relaxed/simple;
+	bh=ud1anLOOLNG2VP/XYZpJ8TNu4KFwnbv32Rm8vxaTyOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6YLOsw/rYcp5bFqyQuOFAljSiKaVgDfUsbuw9nimsDTR6Vwq+zRBjud0YbqF0xi7VJXAA5GMsrA93DR9+Zaebc+0VDBm1qClOyfXS7TLzY8nj1mWrtPu4Gq1OpWNUve4nGzS6Zhl7wTHo6dGM+kxdL6CuI5A2jAjdgz8rbCiPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xGNjPpyK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zWfheIxd; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xGNjPpyK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zWfheIxd; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nBQvhdXs"
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46VBDiXB023693;
-	Wed, 31 Jul 2024 12:41:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=0
-	+TUpAzJWsWS63xgELDP3bvwHYGBBXn6EOPe3BG4ZF4=; b=nBQvhdXs8XRSgCIeY
-	WrYBpBNYXMFl+lNTmSbxMMXTi06c/qbJeJLuP2Wvk612tnBuVNbufOsgkP5pO5aW
-	cEiDwGe4nSEDExjGuGr9Ztyn5yEX2Q+RwHCYHnIYGKQ5CT0a1eSUI4uNZtvaHjzA
-	XSh15AH42XYUCOYCk9tv4LBcBFtUjJRlcH2c/1AXYm/JzhaxVQ7uFiFoUI9E3z01
-	IUYGfBUYrS4xfeyHuOewWNn3cHYOAIuUWAVyO0OsES3ktokmYIHkX28VIGanj1C8
-	TagG39mggLK4PQQrHumJ1HrlFDF+uLvZIYY9i7nUWCx+xROANmXAgJppWJVDgMt4
-	PQhCA==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qhkf8m1p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 Jul 2024 12:41:37 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46VAB5UX009181;
-	Wed, 31 Jul 2024 12:41:36 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 40ndx3363q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 Jul 2024 12:41:36 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46VCfXGS22872752
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 31 Jul 2024 12:41:36 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B3C8258059;
-	Wed, 31 Jul 2024 12:41:33 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64DC25805D;
-	Wed, 31 Jul 2024 12:41:32 +0000 (GMT)
-Received: from [9.171.15.87] (unknown [9.171.15.87])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 31 Jul 2024 12:41:32 +0000 (GMT)
-Message-ID: <914eec96-eb46-4cf1-9cbd-0e1f98059d1b@linux.ibm.com>
-Date: Wed, 31 Jul 2024 18:11:31 +0530
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xGNjPpyK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zWfheIxd";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xGNjPpyK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zWfheIxd"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0520821A76;
+	Wed, 31 Jul 2024 12:46:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1722430004; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q1KUF7B1GVDWVuiQ3nC3saB72D6UOFJs35Qg2kxMV/w=;
+	b=xGNjPpyK8n0dFhYuffBi0f2PBpn5jjj188lfna9xNpmQ3MTdHreVF+A3QOoXCOY5J6/Uo6
+	FEoKxhrcIVrJgUGW7JIUHhl19AcTB3Jw+jE9yeowXeFPuvCwM3cHyI2+nBSDktr2XleVLY
+	eoE/I0pZHa3u5GeYPTK5WdR2sMhDrMo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1722430004;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q1KUF7B1GVDWVuiQ3nC3saB72D6UOFJs35Qg2kxMV/w=;
+	b=zWfheIxduwPdI0EfStKC6fYKQtPNPoCHQeGQ6BdE4+BOQqVO/KqcIZmOoBXPrOZS9g6V7y
+	ATNn9R2DNJvoWADw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1722430004; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q1KUF7B1GVDWVuiQ3nC3saB72D6UOFJs35Qg2kxMV/w=;
+	b=xGNjPpyK8n0dFhYuffBi0f2PBpn5jjj188lfna9xNpmQ3MTdHreVF+A3QOoXCOY5J6/Uo6
+	FEoKxhrcIVrJgUGW7JIUHhl19AcTB3Jw+jE9yeowXeFPuvCwM3cHyI2+nBSDktr2XleVLY
+	eoE/I0pZHa3u5GeYPTK5WdR2sMhDrMo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1722430004;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q1KUF7B1GVDWVuiQ3nC3saB72D6UOFJs35Qg2kxMV/w=;
+	b=zWfheIxduwPdI0EfStKC6fYKQtPNPoCHQeGQ6BdE4+BOQqVO/KqcIZmOoBXPrOZS9g6V7y
+	ATNn9R2DNJvoWADw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E6F2713297;
+	Wed, 31 Jul 2024 12:46:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id AhAeODMyqmZ1VAAAD6G6ig
+	(envelope-from <chrubis@suse.cz>); Wed, 31 Jul 2024 12:46:43 +0000
+Date: Wed, 31 Jul 2024 14:46:06 +0200
+From: Cyril Hrubis <chrubis@suse.cz>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"gjoyce@linux.ibm.com" <gjoyce@linux.ibm.com>
+Subject: Re: [PATCH blktests] loop/011: skip if running on kernel older than
+ v6.10
+Message-ID: <ZqoyDjCpaXPaU1uN@yuki>
+References: <20240731111804.1161524-1-nilay@linux.ibm.com>
+ <ZqoelLy4Wp33YAGD@yuki>
+ <yuz6jvqbsctjhm47fpftvfpgea3x4sbji6kdmk47e5s6hz63ig@gvbiphrvl7wk>
+ <914eec96-eb46-4cf1-9cbd-0e1f98059d1b@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] loop/011: skip if running on kernel older than
- v6.10
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Cyril Hrubis <chrubis@suse.cz>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "gjoyce@linux.ibm.com" <gjoyce@linux.ibm.com>
-References: <20240731111804.1161524-1-nilay@linux.ibm.com>
- <ZqoelLy4Wp33YAGD@yuki>
- <yuz6jvqbsctjhm47fpftvfpgea3x4sbji6kdmk47e5s6hz63ig@gvbiphrvl7wk>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <yuz6jvqbsctjhm47fpftvfpgea3x4sbji6kdmk47e5s6hz63ig@gvbiphrvl7wk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: K2r_XlYtRPEBrubZMh5dx4nS-MIPthk-
-X-Proofpoint-ORIG-GUID: K2r_XlYtRPEBrubZMh5dx4nS-MIPthk-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-31_08,2024-07-31_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=636
- impostorscore=0 mlxscore=0 bulkscore=0 spamscore=0 suspectscore=0
- adultscore=0 malwarescore=0 phishscore=0 clxscore=1015 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407310091
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <914eec96-eb46-4cf1-9cbd-0e1f98059d1b@linux.ibm.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-0.60 / 50.00];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -0.60
 
+Hi!
+> > According to www.kernel.org, the 6.9 stable branch is already EOL. Is it planned
+> > to backport the kernel fix to other longterm branches?
+> I just checked this commit 5f75e081ab5c ("loop: Disable fallocate() zero and discard
+> if not supported") hasn't been backported to any of the longterm stable kernel yet.
+> However I don't know if there's any plan to backport it on longterm stable kernel.
 
+The patch will not apply into older branches since the in kernel API did
+change, so I suppose that nobody will invest into rewriting the patch
+since it's mostly cosmetic.
 
-On 7/31/24 17:31, Shinichiro Kawasaki wrote:
-> On Jul 31, 2024 / 13:23, Cyril Hrubis wrote:
->> Hi!
->>> The loop/011 is regression test for kernel commit 5f75e081ab5c ("loop: 
->>> Disable fallocate() zero and discard if not supported") which requires 
->>> minimum kernel version 6.10. So running this test on kernel version
->>> older than v6.10 would FAIL. This patch ensures that we skip running 
->>> loop/011 if kernel version is older than v6.10.
->>
->> The patch has been backported to 6.9 stable as well.
+> Maybe, Cyril should know about it? 
 > 
-> Hi Cyril, Nilay,
-> 
-> According to www.kernel.org, the 6.9 stable branch is already EOL. Is it planned
-> to backport the kernel fix to other longterm branches?
-I just checked this commit 5f75e081ab5c ("loop: Disable fallocate() zero and discard
-if not supported") hasn't been backported to any of the longterm stable kernel yet.
-However I don't know if there's any plan to backport it on longterm stable kernel.
+> If not planned for backport on longterm stable kernel then we may consider the
+> proposed changes in loop/011 as-is.
 
-Maybe, Cyril should know about it? 
+That's strange, I got an email shortly after the patch got into
+mailinine about the backport:
 
-If not planned for backport on longterm stable kernel then we may consider the
-proposed changes in loop/011 as-is.
+Subject: Patch "loop: Disable fallocate() zero and discard if not supported" has been added to the 6.9-stable tree
+Reply-To: stable@vger.kernel.org
 
-Thanks,
---Nilay
+This is a note to let you know that I've just added the patch titled
+
+    loop: Disable fallocate() zero and discard if not supported
+
+to the 6.9-stable tree which can be found at:
+    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+
+The filename of the patch is:
+     loop-disable-fallocate-zero-and-discard-if-not-suppo.patch
+and it can be found in the queue-6.9 subdirectory.
+
+If you, or anyone else, feels it should not be added to the stable tree,
+please let <stable@vger.kernel.org> know about it.
+
+
+
+commit 6718aa792b7d297ece53024a138ea679e8153ea6
+Author: Cyril Hrubis <chrubis@suse.cz>
+Date:   Thu Jun 13 18:38:17 2024 +0200
+
+    loop: Disable fallocate() zero and discard if not supported
+
+
+-- 
+Cyril Hrubis
+chrubis@suse.cz
