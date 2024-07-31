@@ -1,143 +1,106 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6A31AC45E;
-	Wed, 31 Jul 2024 11:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283B61A4B34
+	for <linux-block@vger.kernel.org>; Wed, 31 Jul 2024 11:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722424074; cv=none; b=XfCNGKkmFArgk0lBKUVT/1nCn2M2rV2bz2D+iKfpqvSDhVIOt3um3jeyDwp0IrqeUkE1NUxT92vUaiQ8QuOxNXiDxIGIVrVjalmlyZbsVvxld8jrEYnw6gLcL8cjqt7oEkGlk2rl6AtrpPuGdGMU15m6OlMGMvBp1nJ4Ljr9KaM=
+	t=1722424715; cv=none; b=sxqIPogLBdt/jJOjD3Gw0ksoIN7woDvKo/+cqAiM3NwG+MPsUrH2MfA0NkRfwHKEyk8yxSQGdE+Fg0vNjPT1FWH9/R+nk01O+1b6EpULMQxJA8C6/ipxE2cRXzLTfdFJBag3Ksq8Kyq9/r6e7Zwgi/o5/L9Dk5XKkS4WBIpWalY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722424074; c=relaxed/simple;
-	bh=2XIezujcd96fYdk+kidrvyJZCZzYRLsW4NQmN9b+SME=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s0SdasY+hYMBTabsASS4jNaKPa6BgvUMRe/vkDh7BgbZjphWYdpocAgo5pqDPuynnhYugV3TVEI71byRtoQRjemp3i6DFIjZamfsUxs2Dwc11ZtY8eKnoeQJGnmG0H+oTIRui5URdlraEweiRB6OzJRG0O2MPJKo5PGembim9sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UKmcsp7v; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722424715; c=relaxed/simple;
+	bh=FfSNEDF/5tkICZwcRvjUZmvy8eC0TCiHi+p8jXxPTtg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TRDJcSsCUpHzXrRPDIMJIp+mDQXPFFwHQoaZfJ+tYt3JkRD3MO7x6aYN/PVBsaoQ5b+RMurAN/Y/coYsiMcs2bG5MAagc/7vJ6f7HQnNfcRLCJ578JQ/W/yfhmy7+ernfNO5S+/HEX7w8tfWNiYWIB8F6pUUWgnCbMqkJUx1Crg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=j3LAd8gj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UKmcsp7v"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-368584f9e36so2675228f8f.2;
-        Wed, 31 Jul 2024 04:07:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722424071; x=1723028871; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rPLojDhXru3wmfjBui5fentX1cCzpIegWmfdDJsI8hc=;
-        b=UKmcsp7vwtHgGqVfLobm60pnynHkoeJr6J34sv5vPjc+AazKy+m1NN3yGCvBlwDvC4
-         PX3SGQLYP+fbkMTMZTy/7Ch9tKuaw9twKogaR8GOdv+IG4ZnNAKTS0ESGpjGY6AqG8a9
-         S8i8V9bPPk2R6o7pt09UhEYldXop6Y+c3eeY6GNk9h3cUgGABmY8aBw3XaJMz54ujXpD
-         +UPsQrFgPF5Apu2KGLUSIgBupD5y2LkUVZTMigNCQ9OlrQoGqtp0xp9nN/VPZ3m6E5sE
-         /aEVfTIsn5iwNwolTGsTFqk8WbXCEK1oQktlA5Ac6I04cjjXZYXyNe0hImmJI/AZ9oCA
-         t2IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722424071; x=1723028871;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rPLojDhXru3wmfjBui5fentX1cCzpIegWmfdDJsI8hc=;
-        b=JNpRG+TEI1Vn1Em5148OcTTeERA8uV5+Gc+Lh+ihh2oBw+SwlfF4hlgN6j1BhflBwy
-         d4RCHjYZoBOLtrbWNsRAPbUCi7wwtqoJ+dxSnkkq4IO9lE9IGFv5pU35N+TlHuhnGCuv
-         2gjgPanY7XcmbS0nHy477uXZCY54pngJ3HVz0oNSY1KFE36xUxWGuB31J6N/c7enEQKB
-         xOyf7OKM64dUmFvmLfm6IT6lWQaIfQY5QbRBWd+6BIn3uu+dCXX+HXKAggD9J3gMZYGT
-         hkk/ygR4TYza5dwuDXdpJ14JhthHeLPAzDgC43E4TBMjj8WbIrPSiLiDKrZjCSGThLAW
-         /d9g==
-X-Forwarded-Encrypted: i=1; AJvYcCVejbH1bsxI1H2l+ALgFDXX/f8eot0gTENkF6CmUZWnMKqJ5/QxDbx6Mj/Kb9fdaXlaPGbAhDmzSCGE3w==@vger.kernel.org, AJvYcCXwxVYoXwKagjOQkyiS0kmzw11qsSevFQBu9BywI4gAy2f80rWn3feVS1Tu6TpzQ7SlIn/qKFn13HrUeuga@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPkgEnCzn+sG4NozAMv4xJYOLfWJsTVe0I/aLp4JXVeSuTNuwm
-	t6mkFLbGtbtGoDFsnUIV4H59llG1Bqn/XCxQfFg/YsqUYrwygyf7Sv8DekC+gurQyUWNA/d9qnL
-	Afj19D4CniVsySq5EzXCCy1vLPttwzbva
-X-Google-Smtp-Source: AGHT+IFEk68WStqcMrl0oS7X+TXKSqrVofXQ06JUXcRCm6IrEvickdLTwqz/xcOS8mtd6/P2zU7zs7wlHXqCt9AdBb8=
-X-Received: by 2002:a05:6000:1861:b0:368:3789:1b6 with SMTP id
- ffacd0b85a97d-36b5d073e6emr10342628f8f.47.1722424070778; Wed, 31 Jul 2024
- 04:07:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j3LAd8gj"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46V7wJcP014667;
+	Wed, 31 Jul 2024 11:18:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=vdFRjJSWwj3Dpd8KwddpPJ8VsJ
+	GMlFGdweU3RcYI4sw=; b=j3LAd8gjOf0JDH7SlQsWFVCsNX+YM01Dnj+IvbzFAi
+	mKIe5nEwTioxN45T4290Av/OVcfRJ9OTL7TTcO3a7stMvNmcQsU1l+KxqINndIhz
+	FbpWi+NA7dyq6mu/S4oa44Ql4xzozY2xpK7uyVFFyVfyX27aH8M6wOZFyoFptEFA
+	PzhKopK08KdJAg+Gfq8sqXZtYz5fn28OlKFifPEUr1GaYcoPwHprKebLHR+lVeVj
+	3KIEYZelyE9iyu8XuG8M7MBO7g3+FdDZeUTqMWhxH5ZvpGhIcx/gBEzpcx7bM/b9
+	XEGyha10PiVuwBLP2P5e17ifIbFlTP6ltD36f7HY9jxA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qhbk0fd6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 11:18:25 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46V8AADA029106;
+	Wed, 31 Jul 2024 11:18:24 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nbm0ua2t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 11:18:24 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46VBIJC252101472
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 31 Jul 2024 11:18:21 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E906420043;
+	Wed, 31 Jul 2024 11:18:18 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 702CB2004D;
+	Wed, 31 Jul 2024 11:18:17 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.171.15.87])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 31 Jul 2024 11:18:17 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: chrubis@suse.cz, shinichiro.kawasaki@wdc.com, gjoyce@linux.ibm.com,
+        Nilay Shroff <nilay@linux.ibm.com>
+Subject: [PATCH blktests] loop/011: skip if running on kernel older than v6.10
+Date: Wed, 31 Jul 2024 16:47:45 +0530
+Message-ID: <20240731111804.1161524-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1722409287-12183-1-git-send-email-zhiguo.niu@unisoc.com> <dafe01f5-5f08-4298-b020-7e3c80e4f15d@kernel.org>
-In-Reply-To: <dafe01f5-5f08-4298-b020-7e3c80e4f15d@kernel.org>
-From: Zhiguo Niu <niuzhiguo84@gmail.com>
-Date: Wed, 31 Jul 2024 19:07:39 +0800
-Message-ID: <CAHJ8P3K6sN2_pNWUNc3C0XhLZJfmFnN7gzC7N70U2M4w6MgJPg@mail.gmail.com>
-Subject: Re: [PATCH V3] block: uapi: Use unsigned int type for IOPRIO_PRIO_MASK
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>, axboe@kernel.dk, hch@lst.de, bvanassche@acm.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, ke.wang@unisoc.com, 
-	Hao_hao.Wang@unisoc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _5dphM8bkcvUW_awO6gvJzw5_vHKRdDN
+X-Proofpoint-ORIG-GUID: _5dphM8bkcvUW_awO6gvJzw5_vHKRdDN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-31_08,2024-07-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 phishscore=0 clxscore=1011
+ mlxlogscore=672 malwarescore=0 priorityscore=1501 suspectscore=0
+ bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407310077
 
-Hi Damien Le Moal
+The loop/011 is regression test for kernel commit 5f75e081ab5c ("loop: 
+Disable fallocate() zero and discard if not supported") which requires 
+minimum kernel version 6.10. So running this test on kernel version
+older than v6.10 would FAIL. This patch ensures that we skip running 
+loop/011 if kernel version is older than v6.10.
 
-Damien Le Moal <dlemoal@kernel.org> =E4=BA=8E2024=E5=B9=B47=E6=9C=8831=E6=
-=97=A5=E5=91=A8=E4=B8=89 17:28=E5=86=99=E9=81=93=EF=BC=9A
->
-> On 7/31/24 16:01, Zhiguo Niu wrote:
-> > Generally, the input of IOPRIO_PRIO_DATA has 16 bits, but the output of
-> > IOPRIO_PRIO_DATA will be expanded to "UL" from IOPRIO_PRIO_MASK.
-> >  #define IOPRIO_PRIO_MASK     ((1UL << IOPRIO_CLASS_SHIFT) - 1)
-> > This is not reasonable and meaningless, unsigned int is more suitable f=
-or it.
-> >
-> > So if use format "%d" to print IOPRIO_PRIO_DATA directly, theire will b=
-e a
-> > build warning or error showned as the following, which is from the
-> > local test when I modify f2fs codes.
-> >
-> > fs/f2fs/sysfs.c:348:31: warning: format =E2=80=98%d=E2=80=99 expects ar=
-gument of type =E2=80=98int=E2=80=99,
-> > but argument 4 has type =E2=80=98long unsigned int=E2=80=99 [-Wformat=
-=3D]
-> >    return sysfs_emit(buf, "%s,%d\n",
-> >                               ~^
-> >                               %ld
-> >
-> > When modules use IOPRIO_PRIO_CLASS & IOPRIO_PRIO_LEVEL get ioprio's cla=
-ss and
-> > level, their outputs are both unsigned int.
-> >  IOPRIO_CLASS_MASK is:
-> >  #define IOPRIO_CLASS_SHIFT   13
-> >  #define IOPRIO_NR_CLASSES    8
-> >  #define IOPRIO_CLASS_MASK    (IOPRIO_NR_CLASSES - 1)
-> >  IOPRIO_LEVEL_MASK is:
-> >  #define IOPRIO_LEVEL_NR_BITS 3
-> >  #define IOPRIO_NR_LEVELS     (1 << IOPRIO_LEVEL_NR_BITS)
-> >  #define IOPRIO_LEVEL_MASK    (IOPRIO_NR_LEVELS - 1)
-> >
-> > Ioprio is passed along as an int internally, so we should not be using =
-an
-> > unsigned long for IOPRIO_PRIO_MASK to not end up with IOPRIO_PRIO_DATA
-> > returning an unsigned long as well.
->
-> I would write this commit message like this:
->
->
-> An ioprio is passed internally as an int value. When IOPRIO_PRIO_CLASS() =
-and
-> IOPRIO_PRIO_LEVEL() are used to extract from it the priority class and le=
-vel,
-> the values obtained are thus also int.
-> However, the IOPRIO_PRIO_MASK() macro used to define the IOPRIO_PRIO_DATA=
-()
-> macro is defined as:
->
-> #define IOPRIO_PRIO_MASK        ((1UL << IOPRIO_CLASS_SHIFT) - 1)
->
-> that is, the macro gives an unsigned long value, which leads to
-> IOPRIO_PRIO_DATA() also returning an unsigned long.
->
-> Make things consistent between class, level and data and use int everywhe=
-re by
-> removing forced unsigned long from IOPRIO_PRIO_MASK.
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ tests/loop/011 | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thank you for your professional advice and sharing. I will update this.
+diff --git a/tests/loop/011 b/tests/loop/011
+index 35eb39b..b674dd7 100755
+--- a/tests/loop/011
++++ b/tests/loop/011
+@@ -9,6 +9,7 @@
+ DESCRIPTION="Make sure unsupported backing file fallocate does not fill dmesg with errors"
+ 
+ requires() {
++	_have_kver 6 10
+ 	_have_program mkfs.ext2
+ }
+ 
+-- 
+2.45.2
 
->
->
->
-> --
-> Damien Le Moal
-> Western Digital Research
->
