@@ -1,117 +1,121 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132FD1C2BD;
-	Fri,  2 Aug 2024 09:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE18417995;
+	Fri,  2 Aug 2024 12:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722592478; cv=none; b=NgXQsdbl04TFqvqMvEXOya4QUGuCBlh81rdTt6efHR4EnoVF3uvCUwSpypiXXmBUXWCyxfDAIinbSKAz+z0WglHLwfIUlkbLJNGtXwElsznNdduoKvpCflsWgZYVvdAs1yEo3yd7mhUKvLwc76TSUXMyszNbE4RzIkhJqvp+c+Q=
+	t=1722601033; cv=none; b=H2RQBTKNbyepFl2J9vM6sy4A/DReuFoSKOYrUWsYC0DveVvlLHR/+x+KaUhZynYqvNJTPx8bLhL4obhpKbuO4E7iwJYqHb56KBf4zMel8ZBwl/F7SwUcN/HnsjCXgfwexbbe3AI5558xBp7sb35ABw9we1xW6FrAKzvKzXr1GGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722592478; c=relaxed/simple;
-	bh=pG7QYf5atpiLxIdlu12CXatOzGN8tq3O56ZKUROVJlI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SPmyQX75Yj0Ta1ZPBHMT2OPXkTh16QN0NskWzHlUGY5xPLI7up0VI/dNhRWUt7JrpVExDQSFPYGFxXYsX5mrHgpm/4yw7tmXHIZ2Zk/WiaA1/cwgMEWr2bCtLGsnbNtWdwnXaHCohqs9RFyCvrCIabV9hdvGwZUvevgdLd3ssWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Wb1KB0j6vz20l2V;
-	Fri,  2 Aug 2024 17:50:06 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id CAFB91402CF;
-	Fri,  2 Aug 2024 17:54:26 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 2 Aug
- 2024 17:54:26 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <philipp.reisner@linbit.com>, <lars.ellenberg@linbit.com>,
-	<christoph.boehmwalder@linbit.com>, <axboe@kernel.dk>, <brauner@kernel.org>,
-	<yuehaibing@huawei.com>
-CC: <drbd-dev@lists.linbit.com>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH -next] drbd: Remove unused extern declarations
-Date: Fri, 2 Aug 2024 17:51:47 +0800
-Message-ID: <20240802095147.2788218-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1722601033; c=relaxed/simple;
+	bh=pntlmoLOjjYedygTE9gtLKLKcSeyqC/Hz99kbii3rjc=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=THttospwtQ6vU5jMlqsIu5dh9rv+CoW/lEJ/aGh8ttXWlr51tFVgyiedp0d7gDzU/O+5bC8iNWSmnvYrvSDbNV5Jhjgz8+wVJjHu9tVJB5vDvfbOgmdDyj4NdRCLSd/iZKyX0uhVhwIppZ9mrZKj/vf2I4BX+dboi/YKWIeikWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WbN0ni5j; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WbN0ni5j"
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 472AuAU3022965;
+	Fri, 2 Aug 2024 12:16:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:subject:to:references:from:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	gfrQUcaV+s7Gq+mfEJj2TyZrzhoHEQtKSiBupzjJV6w=; b=WbN0ni5jlWG+TLVK
+	tjVqme9RTMj8HccdsCMCd+LnwFdp+l1FboMEB6tD/JrW0MK/x0qAN3VF+6xyikKJ
+	YV/DXHoPzp/rXirQmwroXXop/oNkC3UuE5NoFx+lvPnXAH69/X26WIGpB+m1K6Gg
+	rctsAE2V7NOQxxvrImmEk5W3H8P+oO2fQclFWJlu9UHR0IJO0gIrqQpIold1o6d4
+	YwjyR/VdYAfBvxhLd2wKUynfQ+fbAzUwrksUno3aV8qy/8NkB0/KbEEr3lN1Fw5b
+	3uaxtZzJ6fk/tyBLZPPVQLWdDYn/G+DYE1WblYRjU5HDj14Ly5uGNJ2Pjp8nd2Sn
+	LnzDMA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40ru3grjp0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 Aug 2024 12:16:54 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 472A02Gl007682;
+	Fri, 2 Aug 2024 12:16:53 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40nb7uqd6e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 Aug 2024 12:16:53 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 472CGpuZ25625122
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 2 Aug 2024 12:16:53 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 379225805D;
+	Fri,  2 Aug 2024 12:16:51 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 11C6758052;
+	Fri,  2 Aug 2024 12:16:49 +0000 (GMT)
+Received: from [9.109.198.216] (unknown [9.109.198.216])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  2 Aug 2024 12:16:48 +0000 (GMT)
+Message-ID: <ab363932-ab3d-49b1-853d-7313f02cce9e@linux.ibm.com>
+Date: Fri, 2 Aug 2024 17:46:47 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: blktests failures with v6.11-rc1 kernel
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "nbd@other.debian.org" <nbd@other.debian.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+References: <5yal5unzvisrvfhhvsqrsqgu4tfbjp2fsrnbuyxioaxjgbojsi@o2arvhebzes3>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <5yal5unzvisrvfhhvsqrsqgu4tfbjp2fsrnbuyxioaxjgbojsi@o2arvhebzes3>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bGpNXLnrJPuFn3RsWliBR8kq6B5Dy3Py
+X-Proofpoint-ORIG-GUID: bGpNXLnrJPuFn3RsWliBR8kq6B5Dy3Py
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-02_08,2024-08-01_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0
+ mlxlogscore=999 malwarescore=0 mlxscore=0 clxscore=1011 spamscore=0
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408020081
 
-From: YueHaibing <yuehaibing@huawei.com>
 
-Commit b411b3637fa7 ("The DRBD driver") declared but never implemented
-drbd_read_remote(), is_valid_ar_handle() and drbd_set_recv_tcq().
-And commit 668700b40a7c ("drbd: Create a dedicated workqueue for sending acks on the control connection")
-never implemented drbd_send_ping_wf().
 
-Commit 2451fc3b2bd3 ("drbd: Removed the BIO_RW_BARRIER support form the receiver/epoch code")
-leave w_e_reissue() declaration unused.
+On 8/2/24 14:39, Shinichiro Kawasaki wrote:
+> 
+> #3: nvme/052 (CKI failure)
+> 
+>    The CKI project reported that nvme/052 fails occasionally [4].
+>    This needs further debug effort.
+> 
+>   nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [failed]
+>       runtime    ...  22.209s
+>       --- tests/nvme/052.out	2024-07-30 18:38:29.041716566 -0400
+>       +++ /mnt/tests/gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/production/kernel-tests-production.zip/storage/blktests/nvme/nvme-loop/blktests/results/nodev_tr_loop/nvme/052.out.bad	2024-07-30 18:45:35.438067452 -0400
+>       @@ -1,2 +1,4 @@
+>        Running nvme/052
+>       +cat: /sys/block/nvme1n2/uuid: No such file or directory
+>       +cat: /sys/block/nvme1n2/uuid: No such file or directory
+>        Test complete
+> 
+>    [4] https://datawarehouse.cki-project.org/kcidb/tests/13669275
 
-Commit 8fe605513ab4 ("drbd: Rename drbdd_init() -> drbd_receiver()")
-rename drbdd_init() and leave unsued declaration. Also drbd_asender() is removed in
-commit 1c03e52083c8 ("drbd: Rename asender to ack_receiver").
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/block/drbd/drbd_int.h | 10 ----------
- 1 file changed, 10 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index 94dc0a235919..d2937bca1fe4 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -297,10 +297,6 @@ struct drbd_epoch {
- 	unsigned long flags;
- };
+I just checked the console logs of the nvme/052 and from the logs it's 
+apparent that all namespaces were created successfully and so it's strange
+to see that the test couldn't access "/sys/block/nvme1n2/uuid". Do you know
+if there's any chance of simultaneous blktests running on this machine?
  
--/* Prototype declaration of function defined in drbd_receiver.c */
--int drbdd_init(struct drbd_thread *);
--int drbd_asender(struct drbd_thread *);
--
- /* drbd_epoch flag bits */
- enum {
- 	DE_HAVE_BARRIER_NUMBER,
-@@ -1390,9 +1386,6 @@ extern void conn_free_crypto(struct drbd_connection *connection);
- extern void do_submit(struct work_struct *ws);
- extern void __drbd_make_request(struct drbd_device *, struct bio *);
- void drbd_submit_bio(struct bio *bio);
--extern int drbd_read_remote(struct drbd_device *device, struct drbd_request *req);
--extern int is_valid_ar_handle(struct drbd_request *, sector_t);
--
- 
- /* drbd_nl.c */
- 
-@@ -1474,7 +1467,6 @@ extern int w_resync_timer(struct drbd_work *, int);
- extern int w_send_write_hint(struct drbd_work *, int);
- extern int w_send_dblock(struct drbd_work *, int);
- extern int w_send_read_req(struct drbd_work *, int);
--extern int w_e_reissue(struct drbd_work *, int);
- extern int w_restart_disk_io(struct drbd_work *, int);
- extern int w_send_out_of_sync(struct drbd_work *, int);
- 
-@@ -1488,7 +1480,6 @@ extern int drbd_issue_discard_or_zero_out(struct drbd_device *device,
- 		sector_t start, unsigned int nr_sectors, int flags);
- extern int drbd_receiver(struct drbd_thread *thi);
- extern int drbd_ack_receiver(struct drbd_thread *thi);
--extern void drbd_send_ping_wf(struct work_struct *ws);
- extern void drbd_send_acks_wf(struct work_struct *ws);
- extern bool drbd_rs_c_min_rate_throttle(struct drbd_device *device);
- extern bool drbd_rs_should_slow_down(struct drbd_peer_device *peer_device, sector_t sector,
-@@ -1504,7 +1495,6 @@ extern void __drbd_free_peer_req(struct drbd_device *, struct drbd_peer_request
- #define drbd_free_peer_req(m,e) __drbd_free_peer_req(m, e, 0)
- #define drbd_free_net_peer_req(m,e) __drbd_free_peer_req(m, e, 1)
- extern struct page *drbd_alloc_pages(struct drbd_peer_device *, unsigned int, bool);
--extern void drbd_set_recv_tcq(struct drbd_device *device, int tcq_enabled);
- extern void _drbd_clear_done_ee(struct drbd_device *device, struct list_head *to_be_freed);
- extern int drbd_connected(struct drbd_peer_device *);
- 
--- 
-2.34.1
+On my test machine, I couldn't reproduce this issue on 6.11-rc1 kernel.
 
+Thanks,
+--Nilay
+ 
