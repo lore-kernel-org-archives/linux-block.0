@@ -1,145 +1,98 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC47C16BE3D;
-	Fri,  2 Aug 2024 16:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EDE1ABEAF
+	for <linux-block@vger.kernel.org>; Fri,  2 Aug 2024 19:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722617391; cv=none; b=EBUE7atETARbOPXX7EHV5uUFvu1oiA8uHfL7eqFn9zledKn3cFOMKegqLgmlsGlYu+7ZEThLAV7hfYVTwIbXvV0hb3ubOrE40LnGUPtRKOBdLEACiqicCrDst85W1epZFhBgHZL2HM+k1EIxYWaU1/bGPtcY5Fxqrhzdgyzsqsg=
+	t=1722627462; cv=none; b=hq4uyk6qNZi7j9BeBco4seWpvHsjAJVv4UtxpxWCtU46xEW4y3CLubdFLlIjw9YiT+n3bF1Ul7kFp3WGag93Ss80/UqoNkJEGcZwxXVMVaemZsAvXspf5caYThfQuUTpeCCbhjqpU2plP4CKYBsxz3rKZXALR7SddphPG2e380A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722617391; c=relaxed/simple;
-	bh=cSNgKJAuE43cxsIbzCafaUQZQjln2GGWeW9rtMq+TCQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IPpC/bhqRZNAmTEP76MEZR7RIirrJpwZgZD4rRxPVpGaYfLnGugwxYQGLBwtTr2chfulkjPZfLklCD1vy7pqEohSYsTgEfAQnTXIKuc1o/W2llfgwrk5KV9wUs25KKT/wRIK0hvj1rvq3BvXUhZqKeZRvkPqzw6CrGKii64PzLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nbwlj3xP; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1722627462; c=relaxed/simple;
+	bh=CV4GXsYsfgo4q6hKJxBuFlLUCtWcIZ6hQ16Fz+Sbo4k=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=kTAFj/aGIUOIkAELOAhfwL04HWjOy9Pt/JNMLL3c0E9awVZrzSSbRb+odPZn9Xjt/TsMaDEmg8POPJ+BxEKxbA4p9ScN0W3CzSKQWJ2DcLYWRr/TBpQmu4i4sFjGBHINFVGUFUP98E4ZZYuSSI2AfJzISyWpop5C8Iby5/nCOKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lfvmRb15; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nbwlj3xP"
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 472FTBA7011799;
-	Fri, 2 Aug 2024 16:49:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	cg/bndupk50rnRSsxm4uXdUIHZrNSZ5AzvafipUGmz8=; b=nbwlj3xPgqLjq4hn
-	BiMRfwpOq2AnIqP8YUvW+A7E9apEy/G92t3teOEmJ7tok9sCwLwRLaEY8mxlknSA
-	PeWIEjCoKgyx8L2LizMomvysWqlDZbIyz2Cb7nXIYIdeoCJLJJfT/3lqnMQmu1fh
-	4KGUTtA71ymfWwgSFLExdrDtrQJbxcpBLptN/JIkHUt4Mft0NqwGZkDZfVTQCJJS
-	nWbR1nuBIGYB27uucrrRlap9wiHjgs/pP66WoJYUBuZOg/eanxLxijXrUpItt7nK
-	/dtdR1GBDuUx4zXimMChvduXm42l5AyGY3rTrd/Auaqtjq19uDIxOK2fl6t+kxEo
-	8gZN/g==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40s1pf07d3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Aug 2024 16:49:37 +0000 (GMT)
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 472Gnbuk018859;
-	Fri, 2 Aug 2024 16:49:37 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40s1pf07d2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Aug 2024 16:49:37 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 472DmSUY029103;
-	Fri, 2 Aug 2024 16:49:36 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nbm18a24-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Aug 2024 16:49:36 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 472GnYmA16974424
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 2 Aug 2024 16:49:36 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 255C758043;
-	Fri,  2 Aug 2024 16:49:34 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8D97758053;
-	Fri,  2 Aug 2024 16:49:31 +0000 (GMT)
-Received: from [9.171.33.192] (unknown [9.171.33.192])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  2 Aug 2024 16:49:31 +0000 (GMT)
-Message-ID: <79a7ec0d-c22d-44cf-a832-13da05a1fcbd@linux.ibm.com>
-Date: Fri, 2 Aug 2024 22:19:29 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: blktests failures with v6.11-rc1 kernel
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "nbd@other.debian.org" <nbd@other.debian.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Yi Zhang <yi.zhang@redhat.com>
-References: <5yal5unzvisrvfhhvsqrsqgu4tfbjp2fsrnbuyxioaxjgbojsi@o2arvhebzes3>
- <ab363932-ab3d-49b1-853d-7313f02cce9e@linux.ibm.com>
- <ljqlgkvhkojsmehqddmeo4dng6l3yaav6le2uslsumfxivluwu@m7lkx3j4mkkw>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <ljqlgkvhkojsmehqddmeo4dng6l3yaav6le2uslsumfxivluwu@m7lkx3j4mkkw>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: tkuW1usVc4_L-ZsXnVMafpq53k4_2E6j
-X-Proofpoint-GUID: a115jAe8d2xS4aK9ey4Ffkuh_ApZccBy
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lfvmRb15"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-39b26410e0cso540375ab.1
+        for <linux-block@vger.kernel.org>; Fri, 02 Aug 2024 12:37:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1722627460; x=1723232260; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Aq0OPmiAfzDwBhbEkdc5d+5HiIl+Llio3iq8YdlnX14=;
+        b=lfvmRb15Yoch4WtjVBrNK2iXfM/nrtA568MImD+etDI3CSkQvjs0LEkggzbO1Z+veN
+         WGyBRtZY0Jc1b0YC84MA1mPkdkb5K+HUdacqq1KY1mpp4I0DJ1RTyli1fw5aV9mPYjUn
+         zcCMNS6WYhavncVEjkip6hwGopM3BbSAUDj+/AfdJ7Sh4X3xcZuo1evye3AqKpC4/0pY
+         Xs0E713zp+8Wvn92Tm6jElT+EnbNXkEwcfOiYLY3uAOUcZS08HWj7snG4UXceELnle1Y
+         e6lsCIGN59pJEOJE01U4mZy7WmCVUnhyugl15FA+UvfHkZLW/MbLEL7CaBrwp1c+72nk
+         R2/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722627460; x=1723232260;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Aq0OPmiAfzDwBhbEkdc5d+5HiIl+Llio3iq8YdlnX14=;
+        b=hWVS36DpXb1utC/FolgCQobFXbrofjGudDuHO+dLHbDl0vLv8w1HPblWtrXmM9wzGg
+         0ywBzi/Sn0AA36eGlLwHC6hd0q7vurrT4VpZ0IqPLj6ibNWEBqmVQGczt1X0bOLSJUK2
+         UgjfON/FMIXD8NniFeapj2zaL0z6krkI4o+deQE6gppIbAem4p1XDmOhyl6NmgreDR7S
+         RCy7qAoxXkz+J52Ggy0TYITJpp/YbIzs9dJ3lcnoy34zR+k+UbELR92/5jU5d9jS3Bum
+         +P+ln8zlCEVzc1wdS1DW+qcceqfoj0lQhYDLrW7+pprb7MQA4v4qN8U+LNBaiNZs2jvY
+         NFRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWlp/VLZXjSfVvBt8ZrHyz1Cpd/YRlWzCa5zBtGrEBempgZmtdZTrV6xnxJU5xRryc2Dc9mikXBUnDCsg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzN5DU4W0gYVQPYj7RFTKjY2O0w7RRqfIY7Bkg58m0B9sfhpWRf
+	gcxpEwDDMULUyUIBVCf3XuFkLEMpoV+n+9sWT3hP/k7vEjIUwb67rEDuaxopIPI=
+X-Google-Smtp-Source: AGHT+IF38B2WBsg1Z9PGLO03sa2FOioYxYdCZ030WghdBOYn5rYnHGGG2VBaYVKz14EzsjdIgN7zTA==
+X-Received: by 2002:a05:6e02:1c21:b0:383:297a:bdfb with SMTP id e9e14a558f8ab-39b1fb736eemr34987515ab.2.1722627460233;
+        Fri, 02 Aug 2024 12:37:40 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39b209d833esm9710825ab.0.2024.08.02.12.37.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 12:37:39 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
+ christoph.boehmwalder@linbit.com, brauner@kernel.org, 
+ Yue Haibing <yuehaibing@huawei.com>
+Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20240802095147.2788218-1-yuehaibing@huawei.com>
+References: <20240802095147.2788218-1-yuehaibing@huawei.com>
+Subject: Re: [PATCH -next] drbd: Remove unused extern declarations
+Message-Id: <172262745942.170878.5478919565358638351.b4-ty@kernel.dk>
+Date: Fri, 02 Aug 2024 13:37:39 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-02_12,2024-08-02_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 phishscore=0 suspectscore=0 impostorscore=0 spamscore=0
- adultscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408020114
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
 
-
-On 8/2/24 18:04, Shinichiro Kawasaki wrote:
-> CC+: Yi Zhang,
+On Fri, 02 Aug 2024 17:51:47 +0800, Yue Haibing wrote:
+> Commit b411b3637fa7 ("The DRBD driver") declared but never implemented
+> drbd_read_remote(), is_valid_ar_handle() and drbd_set_recv_tcq().
+> And commit 668700b40a7c ("drbd: Create a dedicated workqueue for sending acks on the control connection")
+> never implemented drbd_send_ping_wf().
 > 
-> On Aug 02, 2024 / 17:46, Nilay Shroff wrote:
->>
->>
->> On 8/2/24 14:39, Shinichiro Kawasaki wrote:
->>>
->>> #3: nvme/052 (CKI failure)
->>>
->>>    The CKI project reported that nvme/052 fails occasionally [4].
->>>    This needs further debug effort.
->>>
->>>   nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [failed]
->>>       runtime    ...  22.209s
->>>       --- tests/nvme/052.out	2024-07-30 18:38:29.041716566 -0400
->>>       +++ /mnt/tests/gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/production/kernel-tests-production.zip/storage/blktests/nvme/nvme-loop/blktests/results/nodev_tr_loop/nvme/052.out.bad	2024-07-30 18:45:35.438067452 -0400
->>>       @@ -1,2 +1,4 @@
->>>        Running nvme/052
->>>       +cat: /sys/block/nvme1n2/uuid: No such file or directory
->>>       +cat: /sys/block/nvme1n2/uuid: No such file or directory
->>>        Test complete
->>>
->>>    [4] https://datawarehouse.cki-project.org/kcidb/tests/13669275
->>
->> I just checked the console logs of the nvme/052 and from the logs it's 
->> apparent that all namespaces were created successfully and so it's strange
->> to see that the test couldn't access "/sys/block/nvme1n2/uuid".
+> Commit 2451fc3b2bd3 ("drbd: Removed the BIO_RW_BARRIER support form the receiver/epoch code")
+> leave w_e_reissue() declaration unused.
 > 
-> I agree that it's strange. I think the "No such file or directory" error
-> happened in _find_nvme_ns(), and it checks existence of the uuid file before
-> the cat command. I have no idea why the error happens.
-> 
-Yes exactly, and these two operations (checking the existence of uuid
-and cat command) are not atomic. So the only plausible theory I have at this 
-time is "if namespace is deleted after checking the existence of uuid but 
-before cat command is executed" then this issue may potentially manifests. 
-Furthermore, as you mentioned, this issue is seen on the test machine 
-occasionally, so I asked if there's a possibility of simultaneous blktest 
-or some other tests running on this system.
+> [...]
 
-Thanks,
---Nilay
+Applied, thanks!
+
+[1/1] drbd: Remove unused extern declarations
+      commit: f48ada402d2f1e46fa241bcc6725bdde70725e15
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
