@@ -1,115 +1,125 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92EB1849;
-	Fri,  2 Aug 2024 04:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910E4F4FB
+	for <linux-block@vger.kernel.org>; Fri,  2 Aug 2024 05:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722572653; cv=none; b=GCpt7B+rzDxqqlk+yri1f3FTPqI10DbcTceYcMhJqXicF1nRBmgcnwjnnuaWKJ6IJ+xeiYTLU3gVWxRA5P+7wlIeD2pGbobxhWQGZBCIrbuVwJ37lIspmbW7HUK4td7D5PpDupcIQhKNE7HbpU2LA8lYUZmJk7c7BHVPg3kxux8=
+	t=1722576750; cv=none; b=u52nzb/bYUORlAitI3bcXvn+Xlw078IsUyHlLkhEM8EBOnnfB2na1gzErWUkDfNR1wNxgWgvIBA/uJdi6lYx8xu/FPmo2hY2f5wNJSrTvDbsdf46K7ktHdRuoraTN6KkVx+QExara9lLlISuOSF+39WygDw8D8ytjUwYHbb/6Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722572653; c=relaxed/simple;
-	bh=QmNwr3lsB5Zwkp+KlwWIdj9bsNKp3PtP6oMvA/7wYT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sfN8r6Gxt4QVUxq/HGqbdyOj7B9vDdot4rqchaiVGSh1djWHarN83V9xPdOgKfPFg7cbIsWk5b1mH0Czk/gcFjlIcH5bopgZ79IbjJEjunTBGmproXnUbV/FhiQbGudT+uSHbzm5yxdU8BgYeNulDmsXlz+H9gCr6QsWDqcluL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JoWQZFVy; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1722576750; c=relaxed/simple;
+	bh=YKEsxTXeKx8+xnIFgaXm5tcvK1FC7UkUYnlDSYWVYkk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LNsLt7ldVNGbeXLaL1j/3MNC9/NwezKYf5IwCp05ZUn4YLEgzZ6bmNN60pkGWQ2124d91OebtITwzeSMRQQdr6fMpj3/GsyiLZB0H3Y6y0REH06+eUPWW64LqWKpopayuPUWgLjxbxuHlbblOnBN+HgCx3kCH3VLhAu1lZTwyPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=X6m5jkpG; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JoWQZFVy"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 471LaP75030334;
-	Fri, 2 Aug 2024 04:23:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Yc4I7idyrxzQa/AbB5FzqC6ekVPfwrY+aDIwwsos468=; b=JoWQZFVyDRJyENAS
-	VX77AYfJv4NSDZDUyaO9PHKZTq3Yv/T7ZJQqmziasgWeqxq1UWUnyWm5pC58sGhY
-	fx/BoAgq+bbnLBtr+HK2piGyYbfSweHSeWRLENoGtHme7OK8HvUiJiI3KlN3hHyN
-	99Dc09hUyQllEh4UOkTCT/cw2mGo/X9Zf6Y7tx/jzjCfvD8DPFgxTIOgM9sgtaL2
-	vU24PBRDgWontnWKwOLsTssS9UmQUVUrNKg4/CC1r0O5ZPiM1VFDJJshHEB4ZrGC
-	sNsJoAbruBxo4qfihUc78M1TEhjWb9cIhBz+HXaWK31kVz/qC/+ZsAsFbZTTAyDK
-	4q2Izw==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40rje38nmf-1
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="X6m5jkpG"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4725QAlJ014022;
+	Fri, 2 Aug 2024 05:32:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:subject:to:cc:references:from:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	wfyHgERp2ixvB9HfQ/my7S3LhWGhRyeP3C/zBDncEbE=; b=X6m5jkpGtvDqugC4
+	071uKWuC/r+JlyYJ26N+dPOeBNHZuMgOQYSQu4p3N6IehAyZmRDjDU1KEp8mwc/R
+	weGkvRHOgyuNqI0HmPCNm7mo+9Q4YvjF5V5/B4YcrY80FHUTSbHTAypk7oZ0xJo0
+	vgDZg/6CtjLhb12pbpeLyTaLZErz1NOY0wZd2+Lbywf0DKmddpwRMG12iIY+0fY7
+	X91AeC1/0INn372+Xr0CPybyKeXYlqsSJ/WvPmVIiTyWQc8txJAW3kxqt/EGFFDI
+	uIaTC0V3hhdiT5/UhqH/t7QuLD9vWR81uMpgegxknlmS2tMjdtXkCZc3u9mKF/K+
+	bQIb5g==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40rrfh039m-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Aug 2024 04:23:29 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4724NSkJ023055
+	Fri, 02 Aug 2024 05:32:10 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4723OSmQ003748;
+	Fri, 2 Aug 2024 05:32:10 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 40ndemwda6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 2 Aug 2024 04:23:28 GMT
-Received: from [10.216.16.55] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 1 Aug 2024
- 21:23:21 -0700
-Message-ID: <15eddfa1-aed4-b18e-dfbe-ab23bb411873@quicinc.com>
-Date: Fri, 2 Aug 2024 09:53:18 +0530
+	Fri, 02 Aug 2024 05:32:10 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4725W71g24379986
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 2 Aug 2024 05:32:09 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 55B0358043;
+	Fri,  2 Aug 2024 05:32:07 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 61C8B5805D;
+	Fri,  2 Aug 2024 05:32:05 +0000 (GMT)
+Received: from [9.109.198.216] (unknown [9.109.198.216])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  2 Aug 2024 05:32:05 +0000 (GMT)
+Message-ID: <676078d7-3312-40d9-ba76-ee9b7101f68a@linux.ibm.com>
+Date: Fri, 2 Aug 2024 11:02:03 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 blktests] loop/011: skip if running on kernel older than
+ v6.9.11
+To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
+Cc: chrubis@suse.cz, shinichiro.kawasaki@wdc.com, gjoyce@linux.ibm.com
+References: <20240801092904.1258520-1-nilay@linux.ibm.com>
+ <932044b9-fd7b-44aa-a5df-ff6eedfb2aeb@acm.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <932044b9-fd7b-44aa-a5df-ff6eedfb2aeb@acm.org>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: F2whRFKaC7QczGFYa2UQEgUwFEbE9cDv
+X-Proofpoint-GUID: F2whRFKaC7QczGFYa2UQEgUwFEbE9cDv
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 0/6] Add Additional algo mode for inline encryption
-Content-Language: en-US
-To: Mikulas Patocka <mpatocka@redhat.com>
-CC: <axboe@kernel.dk>, <gmazyland@gmail.com>, <agk@redhat.com>,
-        <snitzer@kernel.org>, <adrian.hunter@intel.com>,
-        <quic_asutoshd@quicinc.com>, <ritesh.list@gmail.com>,
-        <ulf.hansson@linaro.org>, <andersson@kernel.org>,
-        <konrad.dybcio@linaro.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <dm-devel@lists.linux.dev>,
-        <linux-mmc@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_viswanat@quicinc.com>, <quic_srichara@quicinc.com>,
-        <quic_varada@quicinc.com>
-References: <20240730115838.3507302-1-quic_mdalam@quicinc.com>
- <cbf18ce7-f9bd-c05d-d22-f56ca4ae3240@redhat.com>
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-In-Reply-To: <cbf18ce7-f9bd-c05d-d22-f56ca4ae3240@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: YCUjs79D2phKMszWOC2fayLXduWCRL5F
-X-Proofpoint-GUID: YCUjs79D2phKMszWOC2fayLXduWCRL5F
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-02_01,2024-08-01_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 malwarescore=0 adultscore=0
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408020027
+ definitions=2024-08-02_02,2024-08-01_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=998 impostorscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 spamscore=0 phishscore=0 bulkscore=0 mlxscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408020035
 
 
 
-On 7/31/2024 6:18 PM, Mikulas Patocka wrote:
-> 
-> 
-> On Tue, 30 Jul 2024, Md Sadre Alam wrote:
-> 
->> This series of patches add additional modes for inline encryption
+On 8/1/24 21:52, Bart Van Assche wrote:
+> On 8/1/24 2:28 AM, Nilay Shroff wrote:
+>> The loop/011 is regression test for commit 5f75e081ab5c ("loop: Disable
+>> fallocate() zero and discard if not supported") which requires minimum
+>> kernel version 6.9.11. So running this test on kernel version older than
+>> v6.9.11 would FAIL. This patch ensures that we skip running loop/011 if
+>> kernel version is older than v6.9.11.
 >>
->> This series of patches depends on [1] Add inline encryption support for dm-crypt
+>> Link: https://lore.kernel.org/all/20240731111804.1161524-1-nilay@linux.ibm.com/
+>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>> ---
+>>    Changes from v1:
+>>      - loop/011 requires minimum kernel version 6.9.11 (Cyril, Shinichiro)
+>> ---
+>>   tests/loop/011 | 1 +
+>>   1 file changed, 1 insertion(+)
 >>
->> [1]: https://lore.kernel.org/all/b45d3b40-2587-04dc-9601-a9251dacf806@opensource.wdc.com/T/#ma01f08a941107217c93680fa25e96e8d406df790
->>
->> These patches tested on IPQ9574 with eMMC ICE for raw partition
->> encryption/decryption.
+>> diff --git a/tests/loop/011 b/tests/loop/011
+>> index 35eb39b..a454848 100755
+>> --- a/tests/loop/011
+>> +++ b/tests/loop/011
+>> @@ -9,6 +9,7 @@
+>>   DESCRIPTION="Make sure unsupported backing file fallocate does not fill dmesg with errors"
+>>     requires() {
+>> +    _have_kver 6 9 11
+>>       _have_program mkfs.ext2
+>>   }
 > 
-> Hi
+> Please add a comment in tests/loop/011 that explains why the kernel
+> version check is present.
 > 
-> I discussed it with Milan Broz <gmazyland@gmail.com> and we concluded that
-> there is no need to bloat dm-crypt with this logic.
-> 
-> We believe that you should create your own target (like
-> "dm-inline-crypt"), it would work like a linear target and it will attach
-> encryption requests to the bios that it processes.
-> 
-   Thanks for reviewing. Will create new target driver "dm-inline-crypt".
+OK, I will add a relevant comment and resend the patch.
 
-> Mikulas
-> 
+Thanks,
+--Nilay
