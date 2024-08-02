@@ -1,141 +1,136 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28911B9B32
-	for <linux-block@vger.kernel.org>; Thu,  1 Aug 2024 17:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2AA79E5;
+	Fri,  2 Aug 2024 04:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722534989; cv=none; b=aUpA0EGc+zOmChqVIfj+ENXB0iY4OyFGuiJIDSIwaqqhVscCDNqoOsdg5yQDslToQPzBHfsfTncbRhSvUXS3ToS1K5PpJBmncW4jiF2KFRXw62iowbmb49NRWukuM24lXA8OlklxocM0AnoJULyZ94cMzCrq8bawdasK50FFakY=
+	t=1722572582; cv=none; b=l1VnV902g3Wi9ClMYw4Nv7RmVTOhep+UKljGdMsUWqVdwmVPvcqtpDeeSlCciQvYFynpE+joG6hc+pyon8E8cqb8nhB3S57syEl/xfKrJWOAjUXTeBSlk87ge7hlTDjabyZA7shMbQBrOKza9+McgTMERcv4EBMaGxfTVuJHzuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722534989; c=relaxed/simple;
-	bh=C5svpa1fPsliHutAflKdjrMRwnUl28cggDEP+yfJEe4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jCS1DfLcUGh8Uw9FdBqO+oOPrbN1tUs9d26xFu4kmXeGbhhZtVhSY4a5edihwkWE0TwZtYqbWpYnhKA3iQB+UrzqI850AQH15txkKi+IzuNKldpwoKDRZcIfxYbRauph2v0PKm6Hx4NOmpXky8rfx7qAVCmSbroyg16UAfjYxeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JyInv+Ah; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1722572582; c=relaxed/simple;
+	bh=3ORW/fD0Ep6n3DQmpaTVum7vWFjXkSkdTlzSd3jeshM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=bkADn8rl0ZeuluGwqy0l/dQU0F8EYzRD6EnXx2sQzmmHDbHvw4MBtut/pGesqnaHWR1tnN7QhiLLTEJsPya0JyZ+KnmqWCjbeHbo9mxI6vgRXHfEAfg89Tr1dWyKqop2bm5ee2oA3THI7zs7M4d6BvhD1rMe8iKYeKaExqdo05Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Oipho2WI; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JyInv+Ah"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722534986;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C5svpa1fPsliHutAflKdjrMRwnUl28cggDEP+yfJEe4=;
-	b=JyInv+Ah0an8pT+rp25s/R/3u+NRjN36F0kuP+LPUrCmFAGatJZnK5gQF6T36+WF5lFXV+
-	T9VNyWfhnPzPcgwAsdNqc4FpeGH2HS1xKm7ultjYuw04Ctxp2/PMl+mp3+ZoZuIFCKzcje
-	IBeFzye3yNHwN4Ghv0q4IbwPDhb/reI=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-414-DdLC8e1wNLmXp9KCuo5Odg-1; Thu,
- 01 Aug 2024 13:56:22 -0400
-X-MC-Unique: DdLC8e1wNLmXp9KCuo5Odg-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C533019560A3;
-	Thu,  1 Aug 2024 17:56:19 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.116])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6658C19560AE;
-	Thu,  1 Aug 2024 17:56:18 +0000 (UTC)
-Date: Thu, 1 Aug 2024 13:56:17 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev,
-	axboe@kernel.dk, kvm@vger.kernel.org, linux-block@vger.kernel.org,
-	oren@nvidia.com
-Subject: Re: [PATCH 1/1] virtio_blk: implement init_hctx MQ operation
-Message-ID: <20240801175617.GA1133773@fedora.redhat.com>
-References: <20240801151137.14430-1-mgurtovoy@nvidia.com>
- <20240801111337-mutt-send-email-mst@kernel.org>
- <0888da3b-3283-405b-b1a8-a315e2623289@nvidia.com>
- <20240801112843-mutt-send-email-mst@kernel.org>
- <9400fb28-47c2-4629-af17-df2a95f2d3d8@nvidia.com>
- <20240801114205-mutt-send-email-mst@kernel.org>
- <6a8f0c72-ba77-42c3-8d85-6bb23a23f025@nvidia.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Oipho2WI"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 471LbKPH009482;
+	Fri, 2 Aug 2024 04:22:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	eee2pD8O4aEZsVujc0se8xleY3KuTmsCvP2EL3/ttjk=; b=Oipho2WI2oaivVEF
+	eplSRrg5esmScWX0RSm9Zey5KArh+3md24UBr6/CtUZKKASscVTqkqW8mAl9HmxN
+	Jtzirkk9Q+FtCQhuTJTDkUqXVHmbQX4P6LXHnOt+IyYH56IFkPIHz4VC0zLi4zX7
+	kubtxKVJskh1cf+mKwTVjw8Nsair0LvGKkP5N6wRA2A5ffjZYEKAdd+XhkCr3qLq
+	6cudqa1T1XH3EIqHh8prFcRSeEqcEbMSWpjVoVPEYPiQLnKIuPmmIA5zkMKBf1yR
+	PgdeWpm28MNzkqVX8fc2tGi1BtObKVg7OCSexzYzE1ffEK+QIBbyYLwa6w7kY0e0
+	L9FVaA==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40rje6rnc4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 Aug 2024 04:22:12 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4724MBnp015592
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 2 Aug 2024 04:22:11 GMT
+Received: from [10.216.16.55] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 1 Aug 2024
+ 21:22:05 -0700
+Message-ID: <345bde7b-ac61-8265-8dce-d6a9dc1ca2fe@quicinc.com>
+Date: Fri, 2 Aug 2024 09:51:44 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="c2XeR3n4E+7rtcIW"
-Content-Disposition: inline
-In-Reply-To: <6a8f0c72-ba77-42c3-8d85-6bb23a23f025@nvidia.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH 2/6] md: dm-crypt: Set cc->iv_size to 4 bytes
+Content-Language: en-US
+To: Milan Broz <gmazyland@gmail.com>, <axboe@kernel.dk>, <agk@redhat.com>,
+        <snitzer@kernel.org>, <mpatocka@redhat.com>, <adrian.hunter@intel.com>,
+        <quic_asutoshd@quicinc.com>, <ritesh.list@gmail.com>,
+        <ulf.hansson@linaro.org>, <andersson@kernel.org>,
+        <konrad.dybcio@linaro.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <dm-devel@lists.linux.dev>,
+        <linux-mmc@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <quic_viswanat@quicinc.com>, <quic_srichara@quicinc.com>,
+        <quic_varada@quicinc.com>
+References: <20240730115838.3507302-1-quic_mdalam@quicinc.com>
+ <20240730115838.3507302-3-quic_mdalam@quicinc.com>
+ <c897b521-0520-429e-9e94-ba7da74a921f@gmail.com>
+From: Md Sadre Alam <quic_mdalam@quicinc.com>
+In-Reply-To: <c897b521-0520-429e-9e94-ba7da74a921f@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: N2fic3gubwvizZS42k8gs0OxAHQmF50K
+X-Proofpoint-GUID: N2fic3gubwvizZS42k8gs0OxAHQmF50K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-02_01,2024-08-01_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ spamscore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 suspectscore=0 mlxlogscore=999 clxscore=1011
+ adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408020027
 
 
---c2XeR3n4E+7rtcIW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 01, 2024 at 06:56:44PM +0300, Max Gurtovoy wrote:
->=20
-> On 01/08/2024 18:43, Michael S. Tsirkin wrote:
-> > On Thu, Aug 01, 2024 at 06:39:16PM +0300, Max Gurtovoy wrote:
-> > > On 01/08/2024 18:29, Michael S. Tsirkin wrote:
-> > > > On Thu, Aug 01, 2024 at 06:17:21PM +0300, Max Gurtovoy wrote:
-> > > > > On 01/08/2024 18:13, Michael S. Tsirkin wrote:
-> > > > > > On Thu, Aug 01, 2024 at 06:11:37PM +0300, Max Gurtovoy wrote:
-> > > > > > > In this operation set the driver data of the hctx to point to=
- the virtio
-> > > > > > > block queue. By doing so, we can use this reference in the an=
-d reduce
-> > > > > > in the .... ?
-> > > > > sorry for the type.
-> > > > >=20
-> > > > > should be :
-> > > > >=20
-> > > > > "By doing so, we can use this reference and reduce the number of =
-operations in the fast path."
-> > > > ok. what kind of benefit do you see with this patch?
-> > > As mentioned. This is a micro optimization that reduce the number of
-> > > instructions/dereferences in the fast path.
-> > By how much? How random code tweaks affect object code is unpredictable.
-> > Pls show results of objdump to prove it does anything
-> > useful.
->=20
-> This is the way all modern block drivers such as NVMe PCI/RDMA/TCP use the
-> driver_data.
->=20
-> These drivers don't have driver specific mechanisms to find the queue from
-> the hctx->queue->queuedata like vblk driver has for some unknown reason.
->=20
-> It is pretty easy to review this patch and see its benefits, isn't it ?
->=20
-> It is not expected to provide extreme perf improvement.
->=20
-> It is introduced for aligning the driver to use common MQ mechanisms and
-> reduce dereferences.
->=20
-> This is not "random code tweaks".
+On 7/31/2024 6:11 PM, Milan Broz wrote:
+> On 7/30/24 1:58 PM, Md Sadre Alam wrote:
+>> Set cc->iv_size to 4 bytes instead of 8 bytes, since
+>> this cc->iv_size is passing as data unit bytes to
+>> blk_crypto_init_key(). Since CQHCI driver having
+>> limitation for data unit bytes to 32-bit only.
+> 
+> In dm-crypt, plain64 IV is defined as "little-endian 64bit IV"
+> and was introduced to fix security problem when 32bit "plain" IV
+> overflows and IV is reused.
+> 
+> In that case you can move ciphertext sector between places with
+> the same IV (but different offsets) and these will be still
+> correctly decrypted.
+> 
+> If I understand it correctly, this reintroduces the same problem here.
+> If you have 32bit only, just use "plain" and do not support plain64 here.
+> 
+> (In general, I do not understand why you are sending patches
+> for dm-crypt code that is clearly not upstream.
+> I hope this code will never be accepted.)
 
-If you cannot observe a performance change, then adjusting the commit
-description to explain this as a code cleanup to reduce dereferences and
-local variables, improving code readability seems fine to me. I think
-it's a nice cleanup when presented as such rather than a performance
-optimization.
+  Thanks for reviewing. As Mikulas suggested for
+  new target driver for "inline-crypt". Will create
+  new target driver and post it.
 
-Stefan
-
---c2XeR3n4E+7rtcIW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmarzEAACgkQnKSrs4Gr
-c8jZyQf/Z3f/9y0UpEZzE/+QHEVZJvD55lQQZOw8ARH01kX2XfoQyGqHgujocw1k
-j12kKIk1PmgmjKMnV8vCxSF5s+LpPON1J0fnBm3Ke3uJuKYwcK9T0xdV0ECKc0+e
-pXEYV96W9OrB9t9NN7fgSAhRXfWmefVcIn8+fG1/waltnBJMowPHlgnjVMrTT2bE
-FC6z8PqbAjcTGZab4IE12ZA1AAlfmkVH7fULl6kWlLXfV+RuxkLNsRSP0nRmSBbM
-WmMtinpOhSg2n0o/qxsR0LAd4mqbEAL+9PYnYKhVS5P6LuG5ENBwcvkJp0gx7Ftd
-+pQ20Kc0BvzxAYosRTVY632SeZTvjg==
-=n19p
------END PGP SIGNATURE-----
-
---c2XeR3n4E+7rtcIW--
-
+> 
+> Milan
+> 
+>>
+>> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
+>> ---
+>>   drivers/md/dm-crypt.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+>> index 37add222b169..c0257d961968 100644
+>> --- a/drivers/md/dm-crypt.c
+>> +++ b/drivers/md/dm-crypt.c
+>> @@ -2490,7 +2490,7 @@ static int crypt_select_inline_crypt_mode(struct dm_target *ti, char *cipher,
+>>       }
+>>       if (ivmode == NULL || (strcmp(ivmode, "plain64") == 0)) {
+>> -        cc->iv_size = 8;
+>> +        cc->iv_size = 4;
+>>       } else {
+>>           ti->error = "Invalid IV mode for inline_crypt";
+>>           return -EINVAL;
+> 
