@@ -1,28 +1,28 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABEC7482;
-	Sat,  3 Aug 2024 06:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ECCF14D2AC;
+	Sat,  3 Aug 2024 06:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722665328; cv=none; b=AAninhZy8jlS3hyH+7NMPyh4GF/nLt8Ny1ZpsFwitZNCSQg3IbWW4C+xltHbgIARWNu9hlbzqrVqh/PjvWjLQWeCXdkvozNgpgc6YbwyG7urXLVqpZFjNI2Lm6Q1DHKXVkDPo/ySKD1FtI5i9cHLcZ2Q1JLPJT+WzO0+2F0/++k=
+	t=1722665330; cv=none; b=TunKwRrc83vpI5qSaA5YO+aKEaGVNBb5z+mmh4nPo7lvgyHFBmkAjXvSyi/M+1Ot9kRMO4XMv5iBsQzGOeqsTYJyepScHZ5kD+GuC2cOx736BKmiGklMcuA42xbLs+86+05GBbyQbTYBCsRA5wIBwL8BztPI4Lp6fGETlk/BoD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722665328; c=relaxed/simple;
-	bh=BRuo/7KAMIIWw75oitZiO941m0vpSaDPYDB8E6jNpiY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=E1mWR3NEHHB5ZM8mLy3+kB9KCGRr1TxKvBektIsf2QH66tbOvnOlRf69jRIA/U/RVxMKYYhsg3lhHBNdV9FltibLjLqqFNZEWkfXMaumaj1SE9syVqGHldrIIA7TkqQUDi8YWNmFg/hiJdNcvxKicfKhk/zM5dOAY4+OW8v8qoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NIvfoTl0; arc=none smtp.client-ip=13.77.154.182
+	s=arc-20240116; t=1722665330; c=relaxed/simple;
+	bh=sy6NBm7410TH9PETxs9BxIS8V23ww+2VGqUQ4Q/m2J8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=eLmuEj4y9+SBnD9PUhqWWyWSfK5Y2tRrZzBoL7JzmPY3gSU2VWOeJqXr5ZytwwIh/DaIxSgCC3zSeuQ3dyFlxeleGmeXxGuzShlY823puZQJ36qNx9eY9mrsHi8JcWnNUWLeEsyBALfeKpKeebVO3VITBn+BvE9Dl25NpfUqgwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=n17SCVDc; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NIvfoTl0"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="n17SCVDc"
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-	id 68ACD20B6F29; Fri,  2 Aug 2024 23:08:40 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 68ACD20B6F29
+	id DC99320B7408; Fri,  2 Aug 2024 23:08:40 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DC99320B7408
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
 	s=default; t=1722665320;
-	bh=GaWLqYwRaPXZ6JpemK5kwIdsNQ0iZtK+0haLzDxzEBI=;
+	bh=NRI1M+kKAFqAQzE8ALTQyDtvYuEm+/cmnGvSKIeyRtE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NIvfoTl0zLQ4LmApSoohnWGi3S15oH41G/DZXHQkpR/+mlPHNpuvNQlKNVw7edmoW
-	 Xq++Vok97jW+CkBYpw1WXWyEfPRgWc6PMe1QBbcU6opA9Iz65oAEixG9VYRpIfyql+
-	 FQLhFp6na3yPkPUF/4Dc0A8k6DJIgxClDGnr68Vg=
+	b=n17SCVDc/JwtiGPtabmPLUEapLxp3EvP8yX7jQM7xWF6xFhTpMxAPq26IjWADfufp
+	 pwVXr0o5JIVzBqVsN1Kl6y0SNqk8oGlT2IoDoejA4GtuqrFAGgOk2i+cVOkqMeYRHH
+	 V0RT3NU/PwzahX6B/zPw03MSoQU/1pNpgmVxz/r4=
 From: Fan Wu <wufan@linux.microsoft.com>
 To: corbet@lwn.net,
 	zohar@linux.ibm.com,
@@ -44,11 +44,10 @@ Cc: linux-doc@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	audit@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Fan Wu <wufan@linux.microsoft.com>,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: [PATCH v20 06/20] ipe: introduce 'boot_verified' as a trust provider
-Date: Fri,  2 Aug 2024 23:08:20 -0700
-Message-Id: <1722665314-21156-7-git-send-email-wufan@linux.microsoft.com>
+	Fan Wu <wufan@linux.microsoft.com>
+Subject: [PATCH v20 14/20] security: add security_inode_setintegrity() hook
+Date: Fri,  2 Aug 2024 23:08:28 -0700
+Message-Id: <1722665314-21156-15-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
 References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
@@ -58,358 +57,112 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-IPE is designed to provide system level trust guarantees, this usually
-implies that trust starts from bootup with a hardware root of trust,
-which validates the bootloader. After this, the bootloader verifies
-the kernel and the initramfs.
+This patch introduces a new hook to save inode's integrity
+data. For example, for fsverity enabled files, LSMs can use this hook to
+save the existence of verified fsverity builtin signature into the inode's
+security blob, and LSMs can make access decisions based on this data.
 
-As there's no currently supported integrity method for initramfs, and
-it's typically already verified by the bootloader. This patch introduces
-a new IPE property `boot_verified` which allows author of IPE policy to
-indicate trust for files from initramfs.
-
-The implementation of this feature utilizes the newly added
-`initramfs_populated` hook. This hook marks the superblock of the rootfs
-after the initramfs has been unpacked into it.
-
-Before mounting the real rootfs on top of the initramfs, initramfs
-script will recursively remove all files and directories on the
-initramfs. This is typically implemented by using switch_root(8)
-(https://man7.org/linux/man-pages/man8/switch_root.8.html).
-Therefore the initramfs will be empty and not accessible after the real
-rootfs takes over. It is advised to switch to a different policy
-that doesn't rely on the `boot_verified` property after this point.
-This ensures that the trust policies remain relevant and effective
-throughout the system's operation.
-
-Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 
----
-v2:
-  +No Changes
-
-v3:
-  + Remove useless caching system
-  + Move ipe_load_properties to this match
-  + Minor changes from checkpatch --strict warnings
-
-v4:
-  + Remove comments from headers that was missed previously.
-  + Grammatical corrections.
-
-v5:
-  + No significant changes
-
-v6:
-  + No changes
-
-v7:
-  + Reword and refactor patch 04/12 to [09/16], based on changes in
-the underlying system.
-  + Add common audit function for boolean values
-  + Use common audit function as implementation.
-
-v8:
-  + No changes
-
-v9:
-  + No changes
-
-v10:
-  + Replace struct file with struct super_block
-
-v11:
-  + Fix code style issues
-
-v12:
-  + Switch to use unpack_initramfs hook and security blob
-
-v13:
-  + Update the hook name
-  + Rename the security blob field to initramfs
-  + Remove the dependency on CONFIG_BLK_DEV_INITRD
-
-v14:
-  + No changes
+--
+v1-v14:
+  + Not present
 
 v15:
-  + No changes
+  + Introduced
 
 v16:
-  + No changes
+  + Switch to call_int_hook()
 
 v17:
-  + Fix code and documentation style issues
+  + Fix a typo
 
 v18:
   + No changes
 
 v19:
-  + No changes
+  + Refactor hook declaration
 
 v20:
   + No changes
 ---
- security/ipe/eval.c          | 41 +++++++++++++++++++++++++++++++++---
- security/ipe/eval.h          |  5 +++++
- security/ipe/hooks.c         |  9 ++++++++
- security/ipe/hooks.h         |  2 ++
- security/ipe/ipe.c           |  8 +++++++
- security/ipe/ipe.h           |  1 +
- security/ipe/policy.h        |  2 ++
- security/ipe/policy_parser.c | 39 +++++++++++++++++++++++++++++++---
- 8 files changed, 101 insertions(+), 6 deletions(-)
+ include/linux/lsm_hook_defs.h |  2 ++
+ include/linux/security.h      | 10 ++++++++++
+ security/security.c           | 20 ++++++++++++++++++++
+ 3 files changed, 32 insertions(+)
 
-diff --git a/security/ipe/eval.c b/security/ipe/eval.c
-index 1739327f082b..d73d73dfed52 100644
---- a/security/ipe/eval.c
-+++ b/security/ipe/eval.c
-@@ -16,6 +16,18 @@
+diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+index 909cf6f4b9fe..3c82d4e37ec8 100644
+--- a/include/linux/lsm_hook_defs.h
++++ b/include/linux/lsm_hook_defs.h
+@@ -179,6 +179,8 @@ LSM_HOOK(void, LSM_RET_VOID, inode_getsecid, struct inode *inode, u32 *secid)
+ LSM_HOOK(int, 0, inode_copy_up, struct dentry *src, struct cred **new)
+ LSM_HOOK(int, -EOPNOTSUPP, inode_copy_up_xattr, struct dentry *src,
+ 	 const char *name)
++LSM_HOOK(int, 0, inode_setintegrity, const struct inode *inode,
++	 enum lsm_integrity_type type, const void *value, size_t size)
+ LSM_HOOK(int, 0, kernfs_init_security, struct kernfs_node *kn_dir,
+ 	 struct kernfs_node *kn)
+ LSM_HOOK(int, 0, file_permission, struct file *file, int mask)
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 0604893f2f9e..e0adf599efe4 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -410,6 +410,9 @@ int security_inode_listsecurity(struct inode *inode, char *buffer, size_t buffer
+ void security_inode_getsecid(struct inode *inode, u32 *secid);
+ int security_inode_copy_up(struct dentry *src, struct cred **new);
+ int security_inode_copy_up_xattr(struct dentry *src, const char *name);
++int security_inode_setintegrity(const struct inode *inode,
++				enum lsm_integrity_type type, const void *value,
++				size_t size);
+ int security_kernfs_init_security(struct kernfs_node *kn_dir,
+ 				  struct kernfs_node *kn);
+ int security_file_permission(struct file *file, int mask);
+@@ -1026,6 +1029,13 @@ static inline int security_inode_copy_up(struct dentry *src, struct cred **new)
+ 	return 0;
+ }
  
- struct ipe_policy __rcu *ipe_active_policy;
- 
-+#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
-+
-+/**
-+ * build_ipe_sb_ctx() - Build initramfs field of an ipe evaluation context.
-+ * @ctx: Supplies a pointer to the context to be populated.
-+ * @file: Supplies the file struct of the file triggered IPE event.
-+ */
-+static void build_ipe_sb_ctx(struct ipe_eval_ctx *ctx, const struct file *const file)
++static inline int security_inode_setintegrity(const struct inode *inode,
++					      enum lsm_integrity_type type,
++					      const void *value, size_t size)
 +{
-+	ctx->initramfs = ipe_sb(FILE_SUPERBLOCK(file))->initramfs;
++	return 0;
 +}
 +
- /**
-  * ipe_build_eval_ctx() - Build an ipe evaluation context.
-  * @ctx: Supplies a pointer to the context to be populated.
-@@ -28,6 +40,22 @@ void ipe_build_eval_ctx(struct ipe_eval_ctx *ctx,
+ static inline int security_kernfs_init_security(struct kernfs_node *kn_dir,
+ 						struct kernfs_node *kn)
  {
- 	ctx->file = file;
- 	ctx->op = op;
-+
-+	if (file)
-+		build_ipe_sb_ctx(ctx, file);
-+}
-+
+diff --git a/security/security.c b/security/security.c
+index 9baab988be7b..39841ec33ab7 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -2708,6 +2708,26 @@ int security_inode_copy_up_xattr(struct dentry *src, const char *name)
+ }
+ EXPORT_SYMBOL(security_inode_copy_up_xattr);
+ 
 +/**
-+ * evaluate_boot_verified() - Evaluate @ctx for the boot verified property.
-+ * @ctx: Supplies a pointer to the context being evaluated.
++ * security_inode_setintegrity() - Set the inode's integrity data
++ * @inode: inode
++ * @type: type of integrity, e.g. hash digest, signature, etc
++ * @value: the integrity value
++ * @size: size of the integrity value
 + *
-+ * Return:
-+ * * %true	- The current @ctx match the @p
-+ * * %false	- The current @ctx doesn't match the @p
++ * Register a verified integrity measurement of a inode with LSMs.
++ * LSMs should free the previously saved data if @value is NULL.
++ *
++ * Return: Returns 0 on success, negative values on failure.
 + */
-+static bool evaluate_boot_verified(const struct ipe_eval_ctx *const ctx)
++int security_inode_setintegrity(const struct inode *inode,
++				enum lsm_integrity_type type, const void *value,
++				size_t size)
 +{
-+	return ctx->initramfs;
- }
- 
- /**
-@@ -35,8 +63,8 @@ void ipe_build_eval_ctx(struct ipe_eval_ctx *ctx,
-  * @ctx: Supplies a pointer to the context to be evaluated.
-  * @p: Supplies a pointer to the property to be evaluated.
-  *
-- * This is a placeholder. The actual function will be introduced in the
-- * latter commits.
-+ * This function Determines whether the specified @ctx
-+ * matches the conditions defined by a rule property @p.
-  *
-  * Return:
-  * * %true	- The current @ctx match the @p
-@@ -45,7 +73,14 @@ void ipe_build_eval_ctx(struct ipe_eval_ctx *ctx,
- static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
- 			      struct ipe_prop *p)
- {
--	return false;
-+	switch (p->type) {
-+	case IPE_PROP_BOOT_VERIFIED_FALSE:
-+		return !evaluate_boot_verified(ctx);
-+	case IPE_PROP_BOOT_VERIFIED_TRUE:
-+		return evaluate_boot_verified(ctx);
-+	default:
-+		return false;
-+	}
- }
- 
- /**
-diff --git a/security/ipe/eval.h b/security/ipe/eval.h
-index 00ed8ceca10e..0fa6492354dd 100644
---- a/security/ipe/eval.h
-+++ b/security/ipe/eval.h
-@@ -15,10 +15,15 @@
- 
- extern struct ipe_policy __rcu *ipe_active_policy;
- 
-+struct ipe_superblock {
-+	bool initramfs;
-+};
-+
- struct ipe_eval_ctx {
- 	enum ipe_op_type op;
- 
- 	const struct file *file;
-+	bool initramfs;
- };
- 
- void ipe_build_eval_ctx(struct ipe_eval_ctx *ctx,
-diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
-index 0da4607cc4bc..0bd351e2b32a 100644
---- a/security/ipe/hooks.c
-+++ b/security/ipe/hooks.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/fs.h>
-+#include <linux/fs_struct.h>
- #include <linux/types.h>
- #include <linux/binfmts.h>
- #include <linux/mman.h>
-@@ -182,3 +183,11 @@ int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents)
- 	ipe_build_eval_ctx(&ctx, NULL, op);
- 	return ipe_evaluate_event(&ctx);
- }
-+
-+/**
-+ * ipe_unpack_initramfs() - Mark the current rootfs as initramfs.
-+ */
-+void ipe_unpack_initramfs(void)
-+{
-+	ipe_sb(current->fs->root.mnt->mnt_sb)->initramfs = true;
++	return call_int_hook(inode_setintegrity, inode, type, value, size);
 +}
-diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
-index c22c3336d27c..4de5fabebd54 100644
---- a/security/ipe/hooks.h
-+++ b/security/ipe/hooks.h
-@@ -22,4 +22,6 @@ int ipe_kernel_read_file(struct file *file, enum kernel_read_file_id id,
- 
- int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents);
- 
-+void ipe_unpack_initramfs(void);
-+
- #endif /* _IPE_HOOKS_H */
-diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
-index 729334812636..28555eadb7f3 100644
---- a/security/ipe/ipe.c
-+++ b/security/ipe/ipe.c
-@@ -5,9 +5,11 @@
- #include <uapi/linux/lsm.h>
- 
- #include "ipe.h"
-+#include "eval.h"
- #include "hooks.h"
- 
- static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
-+	.lbs_superblock = sizeof(struct ipe_superblock),
- };
- 
- static const struct lsm_id ipe_lsmid = {
-@@ -15,12 +17,18 @@ static const struct lsm_id ipe_lsmid = {
- 	.id = LSM_ID_IPE,
- };
- 
-+struct ipe_superblock *ipe_sb(const struct super_block *sb)
-+{
-+	return sb->s_security + ipe_blobs.lbs_superblock;
-+}
-+
- static struct security_hook_list ipe_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(bprm_check_security, ipe_bprm_check_security),
- 	LSM_HOOK_INIT(mmap_file, ipe_mmap_file),
- 	LSM_HOOK_INIT(file_mprotect, ipe_file_mprotect),
- 	LSM_HOOK_INIT(kernel_read_file, ipe_kernel_read_file),
- 	LSM_HOOK_INIT(kernel_load_data, ipe_kernel_load_data),
-+	LSM_HOOK_INIT(initramfs_populated, ipe_unpack_initramfs),
- };
- 
- /**
-diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
-index adc3c45e9f53..7f1c818193a0 100644
---- a/security/ipe/ipe.h
-+++ b/security/ipe/ipe.h
-@@ -12,5 +12,6 @@
- #define pr_fmt(fmt) "ipe: " fmt
- 
- #include <linux/lsm_hooks.h>
-+struct ipe_superblock *ipe_sb(const struct super_block *sb);
- 
- #endif /* _IPE_H */
-diff --git a/security/ipe/policy.h b/security/ipe/policy.h
-index 8292ffaaff12..69ca8cdecd64 100644
---- a/security/ipe/policy.h
-+++ b/security/ipe/policy.h
-@@ -30,6 +30,8 @@ enum ipe_action_type {
- #define IPE_ACTION_INVALID __IPE_ACTION_MAX
- 
- enum ipe_prop_type {
-+	IPE_PROP_BOOT_VERIFIED_FALSE,
-+	IPE_PROP_BOOT_VERIFIED_TRUE,
- 	__IPE_PROP_MAX
- };
- 
-diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
-index 32064262348a..84cc688be3a2 100644
---- a/security/ipe/policy_parser.c
-+++ b/security/ipe/policy_parser.c
-@@ -270,13 +270,19 @@ static enum ipe_action_type parse_action(char *t)
- 	return match_token(t, action_tokens, args);
- }
- 
-+static const match_table_t property_tokens = {
-+	{IPE_PROP_BOOT_VERIFIED_FALSE,	"boot_verified=FALSE"},
-+	{IPE_PROP_BOOT_VERIFIED_TRUE,	"boot_verified=TRUE"},
-+	{IPE_PROP_INVALID,		NULL}
-+};
++EXPORT_SYMBOL(security_inode_setintegrity);
 +
  /**
-  * parse_property() - Parse a rule property given a token string.
-  * @t: Supplies the token string to be parsed.
-  * @r: Supplies the ipe_rule the parsed property will be associated with.
-  *
-- * This is a placeholder. The actual function will be introduced in the
-- * latter commits.
-+ * This function parses and associates a property with an IPE rule based
-+ * on a token string.
-  *
-  * Return:
-  * * %0		- Success
-@@ -285,7 +291,34 @@ static enum ipe_action_type parse_action(char *t)
-  */
- static int parse_property(char *t, struct ipe_rule *r)
- {
--	return -EBADMSG;
-+	substring_t args[MAX_OPT_ARGS];
-+	struct ipe_prop *p = NULL;
-+	int rc = 0;
-+	int token;
-+
-+	p = kzalloc(sizeof(*p), GFP_KERNEL);
-+	if (!p)
-+		return -ENOMEM;
-+
-+	token = match_token(t, property_tokens, args);
-+
-+	switch (token) {
-+	case IPE_PROP_BOOT_VERIFIED_FALSE:
-+	case IPE_PROP_BOOT_VERIFIED_TRUE:
-+		p->type = token;
-+		break;
-+	default:
-+		rc = -EBADMSG;
-+		break;
-+	}
-+	if (rc)
-+		goto err;
-+	list_add_tail(&p->next, &r->props);
-+
-+	return rc;
-+err:
-+	kfree(p);
-+	return rc;
- }
- 
- /**
+  * security_kernfs_init_security() - Init LSM context for a kernfs node
+  * @kn_dir: parent kernfs node
 -- 
 2.44.0
 
