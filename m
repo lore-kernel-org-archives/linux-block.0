@@ -1,48 +1,53 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lounge.grep.be (lounge.grep.be [144.76.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6061D540;
-	Mon,  5 Aug 2024 18:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D770161310;
+	Tue,  6 Aug 2024 07:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722883895; cv=none; b=rV6IlLO2tY6Me+jmagYzXgwDOmnyctXAEjm5Ln0EhKjB+JldjJubRjuIhIQh/3GHZQgBpCPGgEZ0ATRnWpbIds5uZX458UPK1GVaosCv7t2MTe0j1RJW1YoaE/OYPH4DHH010nRBZSp4MVwkz/FlEV7xPniq+qVInSfJagjr1oY=
+	t=1722930564; cv=none; b=WUjsCg+NfRerPOkij3TbfMQ0ARjwN4pxUgmUcdNcSI1uph1JTKROx8Yr8rUk7dFlIoJC6y02gjMKj/+2rfiGM+T+z7tstA72x1YiRkvdlPNgrcHMgggAz1rrBnphT8/X4z+T3MlUhyqGkQH5jRU5nTt/kseNMMcNNpVCIxqJqd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722883895; c=relaxed/simple;
-	bh=uf8ILAskZN/4P/S4F7SKa3SGrBWodGKtmv2kZoh7MLg=;
+	s=arc-20240116; t=1722930564; c=relaxed/simple;
+	bh=9s0qX9EcCdK9Cz1xzXalamrvaY9+4khYtkIME4JNusk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AMsKY4XqP4toGx9mb03nqi6KmI/x0dlU076EHz7HoK4T9csZpZrFK/xIasHUaX1sUtJNMVb5JM2GErVDvunGba/p4ntmh0gi71cdJGXhigmdaTJjciD18Lz0a2o4ZXthrWW6GyW2RkcSAmiX87yMYUQYhaSvhi8YQOxl8lAw/+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3pyDbbA; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=mYAck2gS7x1LQurI1iaHF2ePm/I1+8vK4hwk29vw3x8s5ufIFHGUxSixqVEK+BbKCtqe50+ADI1GnlHPdSs2cA18pWfsTqORzzv4VMGMtKgn3vBAq8aVmnDrUwhpZtkKl7s4DQnMTJMFMlcoX4qCUjWrNlGjnLc2QScQVidltDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be; spf=pass smtp.mailfrom=uter.be; dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b=gdqWBr2O; arc=none smtp.client-ip=144.76.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uter.be
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3pyDbbA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25914C32782;
-	Mon,  5 Aug 2024 18:51:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722883894;
-	bh=uf8ILAskZN/4P/S4F7SKa3SGrBWodGKtmv2kZoh7MLg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F3pyDbbAzcvONmuquDw8PZ6flxoE46it5ePJVAuMwygCo/wGsmYpgJVJ7p9MzEJqD
-	 9ectkAhOEZoTUJz9r5RZ54q/pujI84cU6X4o3xzNRV4IGgUaRUgmwJJNrsBp7qoyPs
-	 RYtYLOXeyPac2aKqmsjr3M3MExOj8mVd4KC8mmd6Rhdx5KTd75sw3mlQ1vma60VRe6
-	 IJKXxmRXfMEvWGx9NpeG7XCIxv8XKud0y24Gs+GEQP30a1QLMTPE6vpcVCexMz+Frr
-	 71TZOsBY0fwczfFhAYylvjyHoCcCvIHjfrDun0Xl/r+rM0zxm5kqHEn2OHEGN/fIMA
-	 A9ZYjjwyFvq7Q==
-Date: Mon, 5 Aug 2024 11:51:32 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-	serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk, agk@redhat.com,
-	snitzer@kernel.org, mpatocka@redhat.com, eparis@redhat.com,
-	paul@paul-moore.com, linux-doc@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	audit@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH v20 15/20] fsverity: expose verified fsverity built-in
- signatures to LSMs
-Message-ID: <20240805185132.GC1564@sol.localdomain>
-References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
- <1722665314-21156-16-git-send-email-wufan@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b="gdqWBr2O"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
+	s=2021.lounge; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=3G8kWmCY8+8ycTTQtwqTo5kt3QPEPxhAtSHYBuxzt1E=; b=gdqWBr2OGUd+hdjhz2vxPeQx2g
+	tYa1cZgdCCmtGvBVJKiqukSWovODXy9AF73NwJ8Qf/AtniKznQVGWkmU9jMDTVhzvayS875AjGTaX
+	7TO4T/IjNtQpk62abcOGI5Sx5HaQYoxJbxTOqz6DdOD3GJ7NxXLTAW0e//OUc8C9ctLhOgqA/1wPC
+	jM2HvgAqVfS0/4J9CwQLVMZmh2UpNSd5rZpv0TMDr1j2RUi/xrw0ylbEDIITVYoOE9RBiZ8IMtTAS
+	DkVU2LJuOcvUksG2bPXPc1xCtdHEQOHJbrpsmKIraWzT3Eu69PCw17ZFY8paloR5DuQybcWY1LfDD
+	tuR/PPBA==;
+Received: from [102.39.154.62] (helo=pc220518)
+	by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <w@uter.be>)
+	id 1sbEwP-00EW3a-1L;
+	Tue, 06 Aug 2024 09:49:09 +0200
+Received: from wouter by pc220518 with local (Exim 4.98)
+	(envelope-from <w@uter.be>)
+	id 1sbEwH-000000002oc-0XVH;
+	Tue, 06 Aug 2024 09:49:01 +0200
+Date: Tue, 6 Aug 2024 09:49:01 +0200
+From: Wouter Verhelst <w@uter.be>
+To: Eric Blake <eblake@redhat.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, nbd@other.debian.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] nbd: implement the WRITE_ZEROES command
+Message-ID: <ZrHVbQ5_lvCCegK_@pc220518.home.grep.be>
+References: <20240803130432.5952-1-w@uter.be>
+ <f2kaityrjmmstzvqq7xu755ikstida2hcnnng634oeo6fxjfbj@zrgbeik6fwz6>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,35 +56,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1722665314-21156-16-git-send-email-wufan@linux.microsoft.com>
+In-Reply-To: <f2kaityrjmmstzvqq7xu755ikstida2hcnnng634oeo6fxjfbj@zrgbeik6fwz6>
+X-Speed: Gates' Law: Every 18 months, the speed of software halves.
+Organization: none
 
-On Fri, Aug 02, 2024 at 11:08:29PM -0700, Fan Wu wrote:
-> This patch enhances fsverity's capabilities to support both integrity and
-> authenticity protection by introducing the exposure of built-in
-> signatures through a new LSM hook. This functionality allows LSMs,
-> e.g. IPE, to enforce policies based on the authenticity and integrity of
-> files, specifically focusing on built-in fsverity signatures. It enables
-> a policy enforcement layer within LSMs for fsverity, offering granular
-> control over the usage of authenticity claims. For instance, a policy
-> could be established to only permit the execution of all files with
-> verified built-in fsverity signatures.
+On Mon, Aug 05, 2024 at 07:52:42AM -0500, Eric Blake wrote:
+> On Sat, Aug 03, 2024 at 03:04:30PM GMT, Wouter Verhelst wrote:
+> > The NBD protocol defines a message for zeroing out a region of an export
+> > 
+> > Add support to the kernel driver for that message.
+> > 
+> > Signed-off-by: Wouter Verhelst <w@uter.be>
+> > ---
+> >  drivers/block/nbd.c      | 8 ++++++++
+> >  include/uapi/linux/nbd.h | 5 ++++-
+> >  2 files changed, 12 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index 5b1811b1ba5f..215e7ea9a3c3 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -352,6 +352,8 @@ static int __nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
+> >  	}
+> >  	if (nbd->config->flags & NBD_FLAG_ROTATIONAL)
+> >  		lim.features |= BLK_FEAT_ROTATIONAL;
+> > +	if (nbd->config->flags & NBD_FLAG_SEND_WRITE_ZEROES)
+> > +		lim.max_write_zeroes_sectors = UINT_MAX;
 > 
-> The introduction of a security_inode_setintegrity() hook call within
-> fsverity's workflow ensures that the verified built-in signature of a file
-> is exposed to LSMs. This enables LSMs to recognize and label fsverity files
-> that contain a verified built-in fsverity signature. This hook is invoked
-> subsequent to the fsverity_verify_signature() process, guaranteeing the
-> signature's verification against fsverity's keyring. This mechanism is
-> crucial for maintaining system security, as it operates in kernel space,
-> effectively thwarting attempts by malicious binaries to bypass user space
-> stack interactions.
-> 
-> The second to last commit in this patch set will add a link to the IPE
-> documentation in fsverity.rst.
-> 
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> Is that number accurate, when the kernel has not yet been taught to
+> use 64-bit transactions and can therefore only request a 32-bit byte
+> length on any one transaction?  Would a better limit be
+> UINT_MAX/blksize?
 
-Acked-by: Eric Biggers <ebiggers@google.com>
+Thanks, good catch.
 
-- Eric
+I copied the logic from the handling of the TRIM command (i.e., the
+discard logic), which has the same flawed UINT_MAX behavior. I will fix
+this in v2 and add a fix for the discard code.
+
+-- 
+     w@uter.{be,co.za}
+wouter@{grep.be,fosdem.org,debian.org}
+
+I will have a Tin-Actinium-Potassium mixture, thanks.
