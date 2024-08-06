@@ -1,53 +1,60 @@
-Received: from lounge.grep.be (lounge.grep.be [144.76.219.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D770161310;
-	Tue,  6 Aug 2024 07:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D337A1BD00C
+	for <linux-block@vger.kernel.org>; Tue,  6 Aug 2024 08:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722930564; cv=none; b=WUjsCg+NfRerPOkij3TbfMQ0ARjwN4pxUgmUcdNcSI1uph1JTKROx8Yr8rUk7dFlIoJC6y02gjMKj/+2rfiGM+T+z7tstA72x1YiRkvdlPNgrcHMgggAz1rrBnphT8/X4z+T3MlUhyqGkQH5jRU5nTt/kseNMMcNNpVCIxqJqd0=
+	t=1722933508; cv=none; b=eCkeIq/MJ159tpU8uBxcq/Cq5u0A4v786/TqXPYyl5SfcNH42qK55SpVdN4eiEnZ++2RqZxhBcC4EpfVx1C5tpY1Z6ke8j7FshbbrOKwwbJtQsgIGGa1bDA2m0yHog9M2d++9gqfizKyG3iljdRah9qP+05gaus6rp2fDNZ2yRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722930564; c=relaxed/simple;
-	bh=9s0qX9EcCdK9Cz1xzXalamrvaY9+4khYtkIME4JNusk=;
+	s=arc-20240116; t=1722933508; c=relaxed/simple;
+	bh=WVZWyIP6uJ5BOtupNx5wwqFBgsVUdt07yyyfBwZFEMg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mYAck2gS7x1LQurI1iaHF2ePm/I1+8vK4hwk29vw3x8s5ufIFHGUxSixqVEK+BbKCtqe50+ADI1GnlHPdSs2cA18pWfsTqORzzv4VMGMtKgn3vBAq8aVmnDrUwhpZtkKl7s4DQnMTJMFMlcoX4qCUjWrNlGjnLc2QScQVidltDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be; spf=pass smtp.mailfrom=uter.be; dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b=gdqWBr2O; arc=none smtp.client-ip=144.76.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uter.be
+	 Content-Type:Content-Disposition:In-Reply-To; b=EIcdyK5O7kboKEw6mP1H/ktFTdgr/gzg8u3a9C0a40wy13b/pSqUdQy6jOJGdzxECVLR4N4g8NpozYuhJ5L38EqUiD+Olc9/I6KHiLYzWBfV3q8VW2ZeWWmN0nto+DMz2oE1dtt5TLaJwaNE27ILq+g9rIHAWB2OFXDfddAPtyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UFqTV3lv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b="gdqWBr2O"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
-	s=2021.lounge; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=3G8kWmCY8+8ycTTQtwqTo5kt3QPEPxhAtSHYBuxzt1E=; b=gdqWBr2OGUd+hdjhz2vxPeQx2g
-	tYa1cZgdCCmtGvBVJKiqukSWovODXy9AF73NwJ8Qf/AtniKznQVGWkmU9jMDTVhzvayS875AjGTaX
-	7TO4T/IjNtQpk62abcOGI5Sx5HaQYoxJbxTOqz6DdOD3GJ7NxXLTAW0e//OUc8C9ctLhOgqA/1wPC
-	jM2HvgAqVfS0/4J9CwQLVMZmh2UpNSd5rZpv0TMDr1j2RUi/xrw0ylbEDIITVYoOE9RBiZ8IMtTAS
-	DkVU2LJuOcvUksG2bPXPc1xCtdHEQOHJbrpsmKIraWzT3Eu69PCw17ZFY8paloR5DuQybcWY1LfDD
-	tuR/PPBA==;
-Received: from [102.39.154.62] (helo=pc220518)
-	by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <w@uter.be>)
-	id 1sbEwP-00EW3a-1L;
-	Tue, 06 Aug 2024 09:49:09 +0200
-Received: from wouter by pc220518 with local (Exim 4.98)
-	(envelope-from <w@uter.be>)
-	id 1sbEwH-000000002oc-0XVH;
-	Tue, 06 Aug 2024 09:49:01 +0200
-Date: Tue, 6 Aug 2024 09:49:01 +0200
-From: Wouter Verhelst <w@uter.be>
-To: Eric Blake <eblake@redhat.com>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, nbd@other.debian.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] nbd: implement the WRITE_ZEROES command
-Message-ID: <ZrHVbQ5_lvCCegK_@pc220518.home.grep.be>
-References: <20240803130432.5952-1-w@uter.be>
- <f2kaityrjmmstzvqq7xu755ikstida2hcnnng634oeo6fxjfbj@zrgbeik6fwz6>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UFqTV3lv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722933504;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0lKOIM5Vmzv0yyg6noKLYeHXDJklfR3/ebBux3lZFnI=;
+	b=UFqTV3lvpUsdKYJDp0ybF65jVr/Vd/Ko+0txfamwNLMy4Tm6X+TcwKJZKJ7WjNU3g5aulz
+	VczPs5UB/nTccYSN5+wAjAfmrIhsrPOtXJFo77IsAA/EcOX0yeCml9SuPYEdfqZH/iixbh
+	ISts8/2IeSfIhmyPF0HL4qmpzOMZuXU=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-IfEobIgOPoiJsZPjxi7YPA-1; Tue,
+ 06 Aug 2024 04:38:23 -0400
+X-MC-Unique: IfEobIgOPoiJsZPjxi7YPA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E5CD71955F42;
+	Tue,  6 Aug 2024 08:38:21 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.158])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 588CE19560AE;
+	Tue,  6 Aug 2024 08:38:14 +0000 (UTC)
+Date: Tue, 6 Aug 2024 16:38:08 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
+	ming.lei@redhat.com
+Subject: Re: [PATCH V4 4/8] io_uring: support SQE group
+Message-ID: <ZrHg8LUOeM23318x@fedora>
+References: <20240706031000.310430-1-ming.lei@redhat.com>
+ <20240706031000.310430-5-ming.lei@redhat.com>
+ <fa5e8098-f72f-43c1-90c1-c3eaebfea3d5@gmail.com>
+ <Zp+/hBwCBmKSGy5K@fedora>
+ <0fa0c9b9-cfb9-4710-85d0-2f6b4398603c@gmail.com>
+ <ZqIp7/Ci+abGcZLG@fedora>
+ <5fd602d8-0c0b-418a-82bc-955ab0444b1e@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,46 +63,138 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f2kaityrjmmstzvqq7xu755ikstida2hcnnng634oeo6fxjfbj@zrgbeik6fwz6>
-X-Speed: Gates' Law: Every 18 months, the speed of software halves.
-Organization: none
+In-Reply-To: <5fd602d8-0c0b-418a-82bc-955ab0444b1e@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Aug 05, 2024 at 07:52:42AM -0500, Eric Blake wrote:
-> On Sat, Aug 03, 2024 at 03:04:30PM GMT, Wouter Verhelst wrote:
-> > The NBD protocol defines a message for zeroing out a region of an export
+On Mon, Jul 29, 2024 at 02:58:58PM +0100, Pavel Begunkov wrote:
+> On 7/25/24 11:33, Ming Lei wrote:
+> > On Wed, Jul 24, 2024 at 02:41:38PM +0100, Pavel Begunkov wrote:
+> > > On 7/23/24 15:34, Ming Lei wrote:
+> ...
+> > > > But grp_refs is dropped after io-wq request reference drops to
+> > > > zero, then both io-wq and nor-io-wq code path can be unified
+> > > > wrt. dealing with grp_refs, meantime it needn't to be updated
+> > > > in extra(io-wq) context.
+> > > 
+> > > Let's try to describe how it can work. First, I'm only describing
+> > > the dep mode for simplicity. And for the argument's sake we can say
+> > > that all CQEs are posted via io_submit_flush_completions.
+> > > 
+> > > io_req_complete_post() {
+> > > 	if (flags & GROUP) {
+> > > 		req->io_task_work.func = io_req_task_complete;
+> > > 		io_req_task_work_add(req);
+> > > 		return;
+> > > 	}
+> > > 	...
+> > > }
 > > 
-> > Add support to the kernel driver for that message.
+> > OK.
 > > 
-> > Signed-off-by: Wouter Verhelst <w@uter.be>
-> > ---
-> >  drivers/block/nbd.c      | 8 ++++++++
-> >  include/uapi/linux/nbd.h | 5 ++++-
-> >  2 files changed, 12 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > index 5b1811b1ba5f..215e7ea9a3c3 100644
-> > --- a/drivers/block/nbd.c
-> > +++ b/drivers/block/nbd.c
-> > @@ -352,6 +352,8 @@ static int __nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
-> >  	}
-> >  	if (nbd->config->flags & NBD_FLAG_ROTATIONAL)
-> >  		lim.features |= BLK_FEAT_ROTATIONAL;
-> > +	if (nbd->config->flags & NBD_FLAG_SEND_WRITE_ZEROES)
-> > +		lim.max_write_zeroes_sectors = UINT_MAX;
+> > io_wq_free_work() still need to change to not deal with
+> > next link & ignoring skip_cqe, because group handling(
 > 
-> Is that number accurate, when the kernel has not yet been taught to
-> use 64-bit transactions and can therefore only request a 32-bit byte
-> length on any one transaction?  Would a better limit be
-> UINT_MAX/blksize?
+> No, it doesn't need to know about all that.
+> 
+> > cqe posting, link advance) is completely moved into
+> > io_submit_flush_completions().
+> 
+> It has never been guaranteed that io_req_complete_post()
+> will be the one completing the request,
+> io_submit_flush_completions() can always happen.
+> 
+> 
+> struct io_wq_work *io_wq_free_work(struct io_wq_work *work)
+> {
+> 	...
+> 	if (req_ref_put_and_test(req)) {
+> 		nxt = io_req_find_next(req);
+> 		io_free_req();
+> 	}
+> }
+> 
+> We queue linked requests only when all refs are dropped, and
+> the group handling in my snippet is done before we drop the
+> owner's reference.
+> 
+> IOW, you won't hit io_free_req() in io_wq_free_work() for a
+> leader unless all members in its group got completed and
+> the leader already went through the code dropping those shared
+> ublk buffers.
 
-Thanks, good catch.
+If io_free_req() won't be called for leader, leader won't be added
+to ->compl_reqs, and it has to be generated when all members are
+completed in __io_submit_flush_completions().
 
-I copied the logic from the handling of the TRIM command (i.e., the
-discard logic), which has the same flawed UINT_MAX behavior. I will fix
-this in v2 and add a fix for the discard code.
+For !io_wq, we can align to this way by not completing leader in
+io_req_complete_defer().
 
--- 
-     w@uter.{be,co.za}
-wouter@{grep.be,fosdem.org,debian.org}
+The above implementation looks simpler, and more readable.
 
-I will have a Tin-Actinium-Potassium mixture, thanks.
+> 
+> 
+> > > You can do it this way, nobody would ever care, and it shouldn't
+> > > affect performance. Otherwise everything down below can probably
+> > > be extended to io_req_complete_post().
+> > > 
+> > > To avoid confusion in terminology, what I call a member below doesn't
+> > > include a leader. IOW, a group leader request is not a member.
+> > > 
+> > > At the init we have:
+> > > grp_refs = nr_members; /* doesn't include the leader */
+> > > 
+> > > Let's also say that the group leader can and always goes
+> > > through io_submit_flush_completions() twice, just how it's
+> > > with your patches.
+> > > 
+> > > 1) The first time we see the leader in io_submit_flush_completions()
+> > > is when it's done with resource preparation. For example, it was
+> > > doing some IO into a buffer, and now is ready to give that buffer
+> > > with data to group members. At this point it should queue up all group
+> > > members. And we also drop 1 grp_ref. There will also be no
+> > > io_issue_sqe() for it anymore.
+> > 
+> > Ok, then it is just the case with dependency.
+> > 
+> > > 
+> > > 2) Members are executed and completed, in io_submit_flush_completions()
+> > > they drop 1 grp_leader->grp_ref reference each.
+> > > 
+> > > 3) When all members complete, leader's grp_ref becomes 0. Here
+> > > the leader is queued for io_submit_flush_completions() a second time,
+> > > at which point it drops ublk buffers and such and gets destroyed.
+> > > 
+> > > You can post a CQE in 1) and then set CQE_SKIP. Can also be fitted
+> > > into 3). A pseudo code for when we post it in step 1)
+> > 
+> > This way should work, but it confuses application because
+> > the leader is completed before all members:
+> > 
+> > - leader usually provide resources in group wide
+> > - member consumes this resource
+> > - leader is supposed to be completed after all consumer(member) are
+> > done.
+> > 
+> > Given it is UAPI, we have to be careful with CQE posting order.
+> 
+> That's exactly what I was telling about the uapi previously,
+> I don't believe we want to inverse the natural CQE order.
+> 
+> Regardless, the order can be inversed like this:
+> 
+> __io_flush_completions() {
+> 	...
+> 	if (req->flags & (SKIP_CQE|GROUP)) {
+> 		if (req->flags & SKIP_CQE)
+> 			continue;
+> 		// post a CQE only when we see it for a 2nd time in io_flush_completion();
+> 		if (is_leader() && !(req->flags & ALREADY_SEEN))
+> 			continue;
+
+I am afraid that ALREADY_SEEN can't work, since leader can only be added
+to ->compl_reqs once.
+
+
+Thanks, 
+Ming
+
