@@ -1,28 +1,25 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C1019066D;
-	Wed,  7 Aug 2024 04:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1F57C6D4;
+	Wed,  7 Aug 2024 07:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723006174; cv=none; b=ObcmirSX4ms/Aks4wBwOrAc7T1hSyf2ZAbYcYgYYImP86pF+iMBavd5OvlgdvK3xXUvykIctX89aL9fW/4TT3u+sNYlx1tvJWZOcyAxNRSSU26LonA2o10jc4lv3pL49oMZOUccYoNwSHh1NBX6RtJ6XTGoVUwa4/GC7UObIkEU=
+	t=1723016318; cv=none; b=UR/cTadlYAn3YxdupXRHOhUt/KxUTpkLcaZGgwAwIziT8kvWO0FA0AjdE4p6E9HomZu3COLqjHzcU5Kd9NkzX0MK6q11iy+GYd5PHc+DlUXJKSWQ72YiriIu2pELPtXGVcYiHD9Hf9Q4Nv0ClCpNOplUIhOLowsNCsCtsP84mAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723006174; c=relaxed/simple;
-	bh=qa39epjqjdsOVNsHgEqDKXlLdppVmF7MiqUmOzTRPYU=;
+	s=arc-20240116; t=1723016318; c=relaxed/simple;
+	bh=XRA9gxRLFd+aej8AzR4p1woSAT7nCVx80V+h4XrJ6rk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EF8cDiGg5EOwtW6MB53m2768zxfbRU5XMaQ5GPMP89z1O9mg/aTuB/f3i3kMZo5U+x+Vy2MBGVam1KUnjcX2VQ7zTzSgzb0rtGqahEi8/fVMcDIrxH03oH4S0NlFmTZ1TzC0812f7NinOF9ZavXGGFNxe2NfWGV4MojuulyJCKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.3] (ip5f5af7d2.dynamic.kabel-deutschland.de [95.90.247.210])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4D7E161E5FE01;
-	Wed,  7 Aug 2024 06:48:21 +0200 (CEST)
-Message-ID: <5880e801-e896-4bf0-9a69-2cf5acb51ec3@molgen.mpg.de>
-Date: Wed, 7 Aug 2024 06:48:20 +0200
+	 In-Reply-To:Content-Type; b=QIt5P6av5lPWFpta5NWDFOlgfbPLgY5UJQjDPMuTxJmlEnIMYVifV+O4s0aqi89i6x3T4hoKblI1suVmBwHWdxIwFjluSUPD1wybSeDI8jwmFGBxiPFu0b0AfncrOMU6fO66kUblocfOa62RVovmrpK7aVFNBhowtGOkEV3sg9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6FBB2FEC;
+	Wed,  7 Aug 2024 00:38:55 -0700 (PDT)
+Received: from [10.57.81.112] (unknown [10.57.81.112])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 687A53F5A1;
+	Wed,  7 Aug 2024 00:38:25 -0700 (PDT)
+Message-ID: <e693ed7a-97bf-486b-84fb-f57e44a399b4@arm.com>
+Date: Wed, 7 Aug 2024 08:38:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -30,102 +27,64 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 20/20] MAINTAINERS: ipe: add ipe maintainer
- information
-To: Paul Moore <paul@paul-moore.com>
-Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com,
- jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
- axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
- eparis@redhat.com, linux-doc@vger.kernel.org,
- linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
- fsverity@lists.linux.dev, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
- <1722665314-21156-21-git-send-email-wufan@linux.microsoft.com>
- <de7857fb-63d9-42fc-af1e-12ffcdfcdda8@molgen.mpg.de>
- <CAHC9VhRmcReVM_Le5bYor2deotnSe4OT08UYhL6xhiKCu0+3kA@mail.gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CAHC9VhRmcReVM_Le5bYor2deotnSe4OT08UYhL6xhiKCu0+3kA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [linux-next:master] [fs] cdc4ad36a8:
+ kernel_BUG_at_include/linux/page-flags.h
+Content-Language: en-GB
+To: Matthew Wilcox <willy@infradead.org>,
+ kernel test robot <oliver.sang@intel.com>,
+ Christian Brauner <brauner@kernel.org>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, linux-bcachefs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
+ jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+ linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
+ ocfs2-devel@lists.linux.dev, linux-karma-devel@lists.sourceforge.net,
+ devel@lists.orangefs.org, reiserfs-devel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <202408062249.2194d51b-lkp@intel.com>
+ <ZrLuBz1eBdgFzIyC@casper.infradead.org>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <ZrLuBz1eBdgFzIyC@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Dear Paul,
-
-
-Am 06.08.24 um 22:54 schrieb Paul Moore:
-> On Sat, Aug 3, 2024 at 4:15 AM Paul Menzel wrote:
-
->> Thank you very much for your patch. Two nits, should you sent another
->> interation: A more specific summary would avoid people having to look at
->> the message body or diff, and `git log --oneline` would be enough.
+On 07/08/2024 04:46, Matthew Wilcox wrote:
+> On Tue, Aug 06, 2024 at 10:26:17PM +0800, kernel test robot wrote:
+>> kernel test robot noticed "kernel_BUG_at_include/linux/page-flags.h" on:
 >>
->> MAINTAINERS: Add IPE entry with M: Fan Wu
+>> commit: cdc4ad36a871b7ac43fcc6b2891058d332ce60ce ("fs: Convert aops->write_begin to take a folio")
+>> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
 >>
->> MAINTAINERS: Add IPE entry with Fan Wu as maintainer
+>> [test failed on linux-next/master 1e391b34f6aa043c7afa40a2103163a0ef06d179]
 >>
->> Am 03.08.24 um 08:08 schrieb Fan Wu:
->>> Update MAINTAINERS to include ipe maintainer information.
->>
->> I’d at least mention Integrity Policy Enforcement. As you not only
->> include the maintainer information but add a new entry, I’d leave the
->> body out, or mention that a new entry is added.
->>
->>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+>> in testcase: boot
 > 
-> Working under the current assumption that a new revision is not
-> needed, I can fix this up during the merge.  Fan, other-Paul, are you
-> both okay with the following:
+> This patch should fix it.
 > 
->    "MAINTAINERS: add IPE entry with Fan Wu as maintainer
+> Christian, can you squash the fix in?
 > 
->     Add a MAINTAINERS entry for the Integrity Policy Enforcement (IPE) LSM."
+> 
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index 7d28304aea0f..66ff87417090 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -2904,7 +2904,8 @@ shmem_write_begin(struct file *file, struct address_space *mapping,
+>  	if (ret)
+>  		return ret;
+>  
+> -	if (folio_test_has_hwpoisoned(folio)) {
+> +	if (folio_test_hwpoison(folio) ||
+> +	    (folio_test_large(folio) && folio_test_has_hwpoisoned(folio))) {
 
-Thank you. That is fine by me.
+Reviewed-by: Ryan Roberts <ryan.roberts@arm.com>
+Tested-by: Ryan Roberts <ryan.roberts@arm.com>
 
 
-Kind regards,
+>  		folio_unlock(folio);
+>  		folio_put(folio);
+>  		return -EIO;
 
-Paul
-
-
->>> --
->>> v1-v16:
->>>     + Not present
->>>
->>> v17:
->>>     + Introduced
->>>
->>> v18:
->>>     + No changes
->>>
->>> v19:
->>>     + No changes
->>>
->>> v20:
->>>     + No changes
->>> ---
->>>    MAINTAINERS | 10 ++++++++++
->>>    1 file changed, 10 insertions(+)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 8766f3e5e87e..4cdf2d5a2058 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -11118,6 +11118,16 @@ T:   git git://git.kernel.org/pub/scm/linux/kernel/git/zohar/linux-integrity.git
->>>    F:  security/integrity/
->>>    F:  security/integrity/ima/
->>>
->>> +INTEGRITY POLICY ENFORCEMENT (IPE)
->>> +M:   Fan Wu <wufan@linux.microsoft.com>
->>> +L:   linux-security-module@vger.kernel.org
->>> +S:   Supported
->>> +T:   git https://github.com/microsoft/ipe.git
->>> +F:   Documentation/admin-guide/LSM/ipe.rst
->>> +F:   Documentation/security/ipe.rst
->>> +F:   scripts/ipe/
->>> +F:   security/ipe/
->>> +
->>>    INTEL 810/815 FRAMEBUFFER DRIVER
->>>    M:  Antonino Daplas <adaplas@gmail.com>
->>>    L:  linux-fbdev@vger.kernel.org
