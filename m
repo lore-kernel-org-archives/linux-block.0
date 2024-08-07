@@ -1,172 +1,260 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628911448C7;
-	Wed,  7 Aug 2024 20:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723061186; cv=none; b=Mgeh4ELADpYwMfDzgXf+n7bs8EusmADJS6DC9Ei4uCTatdli1VBry2CHB3gOh37O9+bXYcecHMVr/egZh5KhlPgS2zDly5V/pvOZCVgdDpBnYDxVuBBXAP8cUhaGcjMAs16gxiEY35nKqUoSrPDae0K/o0SNQ40puqQx4Wn7HHc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723061186; c=relaxed/simple;
-	bh=PROBiw0sarCM3nOobK70TOAENhBCdBEH39cijO+nsW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Edj7gI+Ybnpay+OxWTjCs0md+XQL2CCGYLcN86vqVrsjofpehEydhi4mtJWInH1By76krGZTiO8ZxEANSQEcF9gGzCWENlXmePI9dt6Y9WOUBQowLiIcEC82gcWNwvvQOMUh9yb28oKaPrcuo1C8+yO6Xm6Iy0vw3vKDnxqxd8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lw6sEx9b; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B30F84037;
+	Wed,  7 Aug 2024 22:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723070511; cv=fail; b=aSet6G5pPVXg9qEXhbhsijxSMqI0PpwsKVNNqV9A+ALDjmbSCdhobPjXes8RGXfsbWxwpphsvhJduhGrEUSkqa547js8ExmdCXCyiozlTer84mZCHrmXoneVGDvfTOg9v3BucuTco8/OT83PfDHEAlJV3xY8GJK7G3+NvMFvcUw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723070511; c=relaxed/simple;
+	bh=+OOVJx+oZ3mA7y2n2ucNNovYvh+RsakGflK1nEG3wmo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E+LESF9uYx1WbLHUW2JPnryn9mUmtXJ/ccyzUEB8eB2QNJH8nYDNUL7cNpXzaxYk7CzoKGfSD/YbJB07QyZBwVD0dhR7SnTM5YJkYaVksHUuLcKex49Rp3+E5QwYxH7GMZPXoGsMxfLgGu93kfkvK7SF6WCXv8m74Hi4591JL2A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Xmny7Ji3; arc=fail smtp.client-ip=40.107.243.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lw6sEx9b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723061184; x=1754597184;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PROBiw0sarCM3nOobK70TOAENhBCdBEH39cijO+nsW0=;
-  b=Lw6sEx9bTAniWCHreS04uxbyLHzSZG3/6KXbkkvYCEsOQunHzeJh0Vbe
-   63AhytopqhAz+kJMzQw4Pwe2CVKvhL9IZuvQdqCwh9nIgc/6ZxhOIyxSe
-   /HkpU7lDxYt+NbUbv84+vD0XN/Wg+oflMdFENQ2bef9hS4jLtNT2YQbod
-   IzuA6ANAKniSiXrnWIoVPZKZ1zvWSrAOZ2/764L5JhfFMZtn/FZa6N9Rm
-   0KMqm0SkgMpNuggPWA2MKlpcJ510EL14Zg3jX5ECttJXpy82g7WqXZgcK
-   N4ZKGjl9WGaiVRO97DHc80d0DA+tf1sbewNeqShjQayah9+vtRup+Tzwl
-   Q==;
-X-CSE-ConnectionGUID: SBD719i6QdGquvcMxx61fw==
-X-CSE-MsgGUID: kcycni7wQ2+oJ673SWg5mA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="31826399"
-X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="31826399"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 13:06:24 -0700
-X-CSE-ConnectionGUID: V83V2bC7SHOzgT8cTDJKtQ==
-X-CSE-MsgGUID: kwcFdcVaQnG70uwLbTcSwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="56918330"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by fmviesa009.fm.intel.com with ESMTP; 07 Aug 2024 13:06:21 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sbmvL-0005gW-1r;
-	Wed, 07 Aug 2024 20:06:19 +0000
-Date: Thu, 8 Aug 2024 04:05:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: 824731276@qq.com, axboe@kernel.dk
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	baiguo@kylinos.cn
-Subject: Re: [PATCH] block:added printing when bio->bi_status fails
-Message-ID: <202408080348.jL0uiVq7-lkp@intel.com>
-References: <tencent_F71A15579D1E52ED0B58EF2F3607AA883308@qq.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Xmny7Ji3"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=p0ld5f1CngEpcnZvbltQKgWiUukeVg6J1SxqkXhn6rN3pjhAv3bVrm0Lct+UKbA72Rk4HS/tcxXRSe4/ThSPDCwT+mILkZkpZsXyFYtmn8KNIAKTuDBiNMSkDvXfKez7+3oob3GX7YPCT9MsAV3xWOkcUDyNQvFgp//K6Zae9HQ1WsU3zvSQZ3ix8sm1YcUaGoQfhYk+/IL6ratd+/Ny3DeJRwsHVZ7ftJ1yU0gJt2kzifNnLgXqAyf7u4tsPhLW2Hf791TcrOowgMppFFHHKjKnv0REdxQ8t04s4XrJURIC89Gx6svki/cBFdhnkCD1l453mEvebhBjN6Qdn7ocLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H2CzQ0CmMxzzrpO0I/9AQ4gzwGh/pa5CVmBoWKnSsZc=;
+ b=KCGf43v9+NCvy5WcETB/rDuUDBb2dKaGVKB0UMV9478H06OZk3lO9VHOq58qKCx/QwpmkUsOfJnTfcKir0PF8U7yA+3HwSqrh/2aPpHP0ZixUFGOATBPfn99JDnYI7ceC3q1uV3s2Dr787rIa2isFnklZ1St8y42xqzYouchzN5HnFXmWvBMwZFlxz+gY/n8Jggh05yDOr6e1WD9gEdW8AP66S/hZG6NZHnnE9DH6vG/6ltpfCJzlrlBCH2UNil84BG4WcY97EkjwnZMR7FH3bqOEbF2V/1ixJ/PMFsnlq352gIpYuDTCLVtXMI7JZi1bcLHAfNNb95aOpgH4S769g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H2CzQ0CmMxzzrpO0I/9AQ4gzwGh/pa5CVmBoWKnSsZc=;
+ b=Xmny7Ji3CSFqwdGYS4W0LPvMDIrYeo0D/BfHtNE0t4hRsERowuJqYYXdiIRrRlgroo9tVswQJZYRizcwBi+InZ5nUtWiUBkBAtzO8/l/nM3rVgVmGWn9WkZAGpX/mQ927yBVoVmgSHJUzLCGx40DUhwkP3Oo1J41P0v7fJH+L+/VhS8hnK2uVALHdJkbHSiz8/h2ctVhPxVpYHJ0SzQBfpNAScQClNQp5BQMRUHRys1S7KZdD8FntgkD2bR5ggdZljMlvxN2l7SvzndZnNNkx681/8RYdTQsjdBbywPeKh+4yeF/ayCJhlVm472ftuUGRHUZck04xOLtApj25l11Iw==
+Received: from BN9PR03CA0589.namprd03.prod.outlook.com (2603:10b6:408:10d::24)
+ by PH8PR12MB6699.namprd12.prod.outlook.com (2603:10b6:510:1ce::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Wed, 7 Aug
+ 2024 22:41:46 +0000
+Received: from BN2PEPF000044A1.namprd02.prod.outlook.com
+ (2603:10b6:408:10d:cafe::d2) by BN9PR03CA0589.outlook.office365.com
+ (2603:10b6:408:10d::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.30 via Frontend
+ Transport; Wed, 7 Aug 2024 22:41:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BN2PEPF000044A1.mail.protection.outlook.com (10.167.243.152) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.8 via Frontend Transport; Wed, 7 Aug 2024 22:41:45 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 7 Aug 2024
+ 15:41:32 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 7 Aug 2024 15:41:32 -0700
+Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 7 Aug 2024 15:41:30 -0700
+From: Max Gurtovoy <mgurtovoy@nvidia.com>
+To: <stefanha@redhat.com>, <virtualization@lists.linux.dev>, <mst@redhat.com>,
+	<axboe@kernel.dk>
+CC: <kvm@vger.kernel.org>, <linux-block@vger.kernel.org>, <oren@nvidia.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH v2] virtio_blk: implement init_hctx MQ operation
+Date: Thu, 8 Aug 2024 01:41:29 +0300
+Message-ID: <20240807224129.34237-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_F71A15579D1E52ED0B58EF2F3607AA883308@qq.com>
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A1:EE_|PH8PR12MB6699:EE_
+X-MS-Office365-Filtering-Correlation-Id: 288d3d4b-9851-41e4-0805-08dcb7321dc1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Nbh1s61WkqWkJ59r+u4oEixuIC3hmGzTKkfp54xN6IQeGFhxA7fTlwzUx6Tt?=
+ =?us-ascii?Q?5ABH42pflMB7PqhARL0E+M5jA0pjUOTXVIwgDLQ+Bvlwzd7u+CjQkiPHrXkJ?=
+ =?us-ascii?Q?UCnG44yDEoy16aT1QdD4+o/ws21aUEBYUvLZUfB2h3r8HiO9IZ5YcjyAqk5o?=
+ =?us-ascii?Q?hbORji387daofbw2afzhR1curlai6Gnyozspn7Rg/MLCFmKfLqM2j1m5H24R?=
+ =?us-ascii?Q?QI3GYD8e5e8SgZccHLscR+pj36tC9lAMke+XzK2YFXuwJejviRljNUa5aC3R?=
+ =?us-ascii?Q?I8HuR+7dIYj73eGVxS2/5gfpV0s3cU5sJxfsfnwZUtbJNUWDfTAO2oMTXOj/?=
+ =?us-ascii?Q?UTpwf0Dhjaaagg3Plk8Ur3ZOBr9Ao3eL+FVsWlwpbhtaYepAyLCwOWkzNecE?=
+ =?us-ascii?Q?NE0jWX0KdreMINl9TU8UnGWgke5/omKhD5tw23PNAD2pPWIFvKag0xBeccNS?=
+ =?us-ascii?Q?JLhUPIyHLPwwcNurn1U2tGUUVulKfmzLcXZ+eA9oRHaDt3ZewSTaB8A67SdK?=
+ =?us-ascii?Q?5QjoKl4Zootkngu0egUeGJTdKw/ATT10hzriQwEkdZAa9U1mpMzlwW53eNO4?=
+ =?us-ascii?Q?4UIVbXCDAjaEpB5FA1cY1KQkoBIcFcPnJsG2Tsqw/LhfJDlAvXLReQEmmg03?=
+ =?us-ascii?Q?t01iEBM081OHXnG6RA1wGi3tS+FcbQbUwpVVaX14OnboDMdHrZEQ3r6eDbff?=
+ =?us-ascii?Q?EAS0T1BzzrPF5MZDhcR/xS4L0LPt+BqwhiSZj1dYs7OaccaC0G2UG2kLM/Gd?=
+ =?us-ascii?Q?RFXav87GeynPi1PhPIVe4TCbdYS5XoaynkrSytoWdAd5pN7o6108MRIxlcrZ?=
+ =?us-ascii?Q?2laPBeRqewdASJ6Gwf/Ql3pl3nLF/GjCeI9fgGtZQ8Sg6Ybz8gemWv8wZ+aw?=
+ =?us-ascii?Q?VqKAEi+Wcgy/X+W3zeotK8vQdvrZeHYl3Hk1FJ+0A07wsd8PaGGQnde6h2sS?=
+ =?us-ascii?Q?zV5cztCxvmvbjPZ5+jAInj8Prg41D4TqCCP9DCd4XfQSNzkd86ZK9QS+7Rqb?=
+ =?us-ascii?Q?lwdbpnLkOag2VSOIU1oLQf7F5wpyrlVRfaKNBrcdJWW409tManxu1K+ZtS33?=
+ =?us-ascii?Q?KSdqsAJhGq7mAb0agjvFwmUehUKDkfTDKW3VNpntr4zcBQfXP2UC/cKmzVX+?=
+ =?us-ascii?Q?93mrvwMSHABe6YNNCiFMj8pGGtQ43djexGrlyjrisdPFs1/6vt/7HsdIKVyB?=
+ =?us-ascii?Q?fTAIKeFEmZMoxN+u1hY20f4jj2yNjwAWW2bYWvstiAZcKK1Esv698rP/2lEH?=
+ =?us-ascii?Q?wLQLSeHH3XlfzfAeLgWbemn9ICVTZRNQ+D8yGKkajyQRa5kuHJgYlyCZmCpl?=
+ =?us-ascii?Q?nsllLNcFEmOr72OSLm7hCZuO0NVLjgJR4UCJ220Sb0/si1xGtrgvhr3tO7W9?=
+ =?us-ascii?Q?UPqEKjLSCj/Klj+kk/c+lht7X5LTyxBZp6skCrHDLIDdnfroO5j/W5vgPjXH?=
+ =?us-ascii?Q?jh5HhI3EpqzRzgSbRtGpIBBts/S5YRKH?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 22:41:45.3330
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 288d3d4b-9851-41e4-0805-08dcb7321dc1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044A1.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6699
 
-Hi,
+Set the driver data of the hardware context (hctx) to point directly to
+the virtio block queue. This cleanup improves code readability and
+reduces the number of dereferences in the fast path.
 
-kernel test robot noticed the following build errors:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ drivers/block/virtio_blk.c | 42 ++++++++++++++++++++------------------
+ 1 file changed, 22 insertions(+), 20 deletions(-)
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on linus/master v6.11-rc2 next-20240807]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/824731276-qq-com/block-added-printing-when-bio-bi_status-fails/20240807-174005
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/tencent_F71A15579D1E52ED0B58EF2F3607AA883308%40qq.com
-patch subject: [PATCH] block:added printing when bio->bi_status fails
-config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20240808/202408080348.jL0uiVq7-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080348.jL0uiVq7-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408080348.jL0uiVq7-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> block/bio.c:1620:29: error: no member named 'bi_disk' in 'struct bio'
-    1620 |         if (bio->bi_status && bio->bi_disk)
-         |                               ~~~  ^
-   block/bio.c:1622:36: error: no member named 'bi_disk' in 'struct bio'
-    1622 |                                 __func__, bio->bi_status, bio->bi_disk->major,\
-         |                                                           ~~~  ^
-   include/linux/printk.h:465:60: note: expanded from macro 'printk'
-     465 | #define printk(fmt, ...) printk_index_wrap(_printk, fmt, ##__VA_ARGS__)
-         |                                                            ^~~~~~~~~~~
-   include/linux/printk.h:437:19: note: expanded from macro 'printk_index_wrap'
-     437 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
-         |                                 ^~~~~~~~~~~
-   block/bio.c:1623:10: error: no member named 'bi_disk' in 'struct bio'
-    1623 |                                 bio->bi_disk->first_minor);
-         |                                 ~~~  ^
-   include/linux/printk.h:465:60: note: expanded from macro 'printk'
-     465 | #define printk(fmt, ...) printk_index_wrap(_printk, fmt, ##__VA_ARGS__)
-         |                                                            ^~~~~~~~~~~
-   include/linux/printk.h:437:19: note: expanded from macro 'printk_index_wrap'
-     437 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
-         |                                 ^~~~~~~~~~~
-   3 errors generated.
-
-
-vim +1620 block/bio.c
-
-  1589	
-  1590	/**
-  1591	 * bio_endio - end I/O on a bio
-  1592	 * @bio:	bio
-  1593	 *
-  1594	 * Description:
-  1595	 *   bio_endio() will end I/O on the whole bio. bio_endio() is the preferred
-  1596	 *   way to end I/O on a bio. No one should call bi_end_io() directly on a
-  1597	 *   bio unless they own it and thus know that it has an end_io function.
-  1598	 *
-  1599	 *   bio_endio() can be called several times on a bio that has been chained
-  1600	 *   using bio_chain().  The ->bi_end_io() function will only be called the
-  1601	 *   last time.
-  1602	 **/
-  1603	void bio_endio(struct bio *bio)
-  1604	{
-  1605	again:
-  1606		if (!bio_remaining_done(bio))
-  1607			return;
-  1608		if (!bio_integrity_endio(bio))
-  1609			return;
-  1610	
-  1611		blk_zone_bio_endio(bio);
-  1612	
-  1613		rq_qos_done_bio(bio);
-  1614	
-  1615		if (bio->bi_bdev && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
-  1616			trace_block_bio_complete(bdev_get_queue(bio->bi_bdev), bio);
-  1617			bio_clear_flag(bio, BIO_TRACE_COMPLETION);
-  1618		}
-  1619	
-> 1620		if (bio->bi_status && bio->bi_disk)
-  1621			printk(KERN_ERR "bio: %s status is %d, disk[%d:%d]\n",\
-  1622					__func__, bio->bi_status, bio->bi_disk->major,\
-  1623					bio->bi_disk->first_minor);
-  1624	
-  1625		/*
-  1626		 * Need to have a real endio function for chained bios, otherwise
-  1627		 * various corner cases will break (like stacking block devices that
-  1628		 * save/restore bi_end_io) - however, we want to avoid unbounded
-  1629		 * recursion and blowing the stack. Tail call optimization would
-  1630		 * handle this, but compiling with frame pointers also disables
-  1631		 * gcc's sibling call optimization.
-  1632		 */
-  1633		if (bio->bi_end_io == bio_chain_endio) {
-  1634			bio = __bio_chain_endio(bio);
-  1635			goto again;
-  1636		}
-  1637	
-
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 2351f411fa46..35a7a586f6f5 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -129,14 +129,6 @@ static inline blk_status_t virtblk_result(u8 status)
+ 	}
+ }
+ 
+-static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
+-{
+-	struct virtio_blk *vblk = hctx->queue->queuedata;
+-	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
+-
+-	return vq;
+-}
+-
+ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
+ {
+ 	struct scatterlist out_hdr, in_hdr, *sgs[3];
+@@ -377,8 +369,7 @@ static void virtblk_done(struct virtqueue *vq)
+ 
+ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+ {
+-	struct virtio_blk *vblk = hctx->queue->queuedata;
+-	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
++	struct virtio_blk_vq *vq = hctx->driver_data;
+ 	bool kick;
+ 
+ 	spin_lock_irq(&vq->lock);
+@@ -428,10 +419,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 			   const struct blk_mq_queue_data *bd)
+ {
+ 	struct virtio_blk *vblk = hctx->queue->queuedata;
++	struct virtio_blk_vq *vq = hctx->driver_data;
+ 	struct request *req = bd->rq;
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+ 	unsigned long flags;
+-	int qid = hctx->queue_num;
+ 	bool notify = false;
+ 	blk_status_t status;
+ 	int err;
+@@ -440,26 +431,26 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (unlikely(status))
+ 		return status;
+ 
+-	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+-	err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
++	spin_lock_irqsave(&vq->lock, flags);
++	err = virtblk_add_req(vq->vq, vbr);
+ 	if (err) {
+-		virtqueue_kick(vblk->vqs[qid].vq);
++		virtqueue_kick(vq->vq);
+ 		/* Don't stop the queue if -ENOMEM: we may have failed to
+ 		 * bounce the buffer due to global resource outage.
+ 		 */
+ 		if (err == -ENOSPC)
+ 			blk_mq_stop_hw_queue(hctx);
+-		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
++		spin_unlock_irqrestore(&vq->lock, flags);
+ 		virtblk_unmap_data(req, vbr);
+ 		return virtblk_fail_to_queue(req, err);
+ 	}
+ 
+-	if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
++	if (bd->last && virtqueue_kick_prepare(vq->vq))
+ 		notify = true;
+-	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
++	spin_unlock_irqrestore(&vq->lock, flags);
+ 
+ 	if (notify)
+-		virtqueue_notify(vblk->vqs[qid].vq);
++		virtqueue_notify(vq->vq);
+ 	return BLK_STS_OK;
+ }
+ 
+@@ -504,7 +495,7 @@ static void virtio_queue_rqs(struct request **rqlist)
+ 	struct request *requeue_list = NULL;
+ 
+ 	rq_list_for_each_safe(rqlist, req, next) {
+-		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
++		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
+ 		bool kick;
+ 
+ 		if (!virtblk_prep_rq_batch(req)) {
+@@ -1164,6 +1155,16 @@ static const struct attribute_group *virtblk_attr_groups[] = {
+ 	NULL,
+ };
+ 
++static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
++		unsigned int hctx_idx)
++{
++	struct virtio_blk *vblk = data;
++	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
++
++	hctx->driver_data = vq;
++	return 0;
++}
++
+ static void virtblk_map_queues(struct blk_mq_tag_set *set)
+ {
+ 	struct virtio_blk *vblk = set->driver_data;
+@@ -1205,7 +1206,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
+ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ {
+ 	struct virtio_blk *vblk = hctx->queue->queuedata;
+-	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
++	struct virtio_blk_vq *vq = hctx->driver_data;
+ 	struct virtblk_req *vbr;
+ 	unsigned long flags;
+ 	unsigned int len;
+@@ -1236,6 +1237,7 @@ static const struct blk_mq_ops virtio_mq_ops = {
+ 	.queue_rqs	= virtio_queue_rqs,
+ 	.commit_rqs	= virtio_commit_rqs,
+ 	.complete	= virtblk_request_done,
++	.init_hctx	= virtblk_init_hctx,
+ 	.map_queues	= virtblk_map_queues,
+ 	.poll		= virtblk_poll,
+ };
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.18.1
+
