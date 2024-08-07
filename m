@@ -1,61 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1545D1C3D
-	for <linux-block@vger.kernel.org>; Wed,  7 Aug 2024 03:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879001A269;
+	Wed,  7 Aug 2024 03:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723001194; cv=none; b=YQwSzrElaYrDL2m5Rxoy+GP7IhfKsjbuhpY5tps4hdjyyBOwtHJo4Gd9oSFK/9qy6ETleKyqX4RKs73hmu05d9yD1WnaWL40m6G3HMmJS50jsKEiupQTTK0+D3Ewa0SD+PnUcnoDmzcohqmCNWjs6fh+BuLrL7i5m+587oKoNbg=
+	t=1723002383; cv=none; b=d+oXrm4eGJTsTMXQ2RqhY79GEMDWhXj5HG/Zo0RQdQ2sWKJvc4NSNgCIs3OldNS96zMDFFqhKe0Oi+bAZp2/1M2xUNh20RzbKTC1pblivQbimA/SrsNyqQqtS0zLsR60JLTd+zZkHahRymC2xlmGTuZXyGq+69NzkjlcQahH85E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723001194; c=relaxed/simple;
-	bh=1l34040akgDNhA0MPqyRJin1rk9XrjEMhPDOAr2jRNw=;
+	s=arc-20240116; t=1723002383; c=relaxed/simple;
+	bh=S7xTj1+BRrFzibxP14qb9afX2Rlcc7Yzirv1sNhukC4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GbuAO3V8fhTNkDtd3HhRowAXEoa3PF6pu1T7BbydClidOXkbONa1UeeHcZR/8zJEUl+lU8PcYHAEhYtQoqbaC9Vomes7miLv2FdoVvRFxUkX4ZqxcZnFVYOm9S5TUiL6acHsWtvC2bEEPhg3yNKJlm/uXfDkq3Xu7BcXR1vhlUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FJtCuqP9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=r35b0so3qFIjK2gQC4RJydfRZCD3att8F6kgWZ9yFNloc9sqTHdBSYbttKQ4PSFkeOf0+PJMuXYMuuhm5WiJlM/frXCteqFGAQ3eUZtE1U8p3Efn4QCnjhxQ27+USrURN5v3GOEN/o4/Cdm6xCoLOfCQc3/cvrDAB15fhumu5Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kBpsMhbZ; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FJtCuqP9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723001192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0/dinE0U3DXgNF3It9WDdE2sY9Vm7epHjtCAMrzNLFo=;
-	b=FJtCuqP90vdXkXR/fW6JzkoLlpwsLJCtzKeUL0rmEBPOqL6UZxekYeM1tL/A5URj8oBii/
-	ofrGgy5zSanNbQb5/+oS5khDLArS0GRwHY7HQ5RWy6unGiPLx6pJvaWkt71P+hbE4TdM77
-	8IUCddIPxUW0mbnVFZI2R86Kt4ZpdTA=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-V2oa1_0DMp6eo3kUr37_yQ-1; Tue,
- 06 Aug 2024 23:26:28 -0400
-X-MC-Unique: V2oa1_0DMp6eo3kUr37_yQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CD9A1955D44;
-	Wed,  7 Aug 2024 03:26:27 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.110])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA0873001D8E;
-	Wed,  7 Aug 2024 03:26:22 +0000 (UTC)
-Date: Wed, 7 Aug 2024 11:26:17 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH V4 4/8] io_uring: support SQE group
-Message-ID: <ZrLpWT/sBGll1OmS@fedora>
-References: <20240706031000.310430-1-ming.lei@redhat.com>
- <20240706031000.310430-5-ming.lei@redhat.com>
- <fa5e8098-f72f-43c1-90c1-c3eaebfea3d5@gmail.com>
- <Zp+/hBwCBmKSGy5K@fedora>
- <0fa0c9b9-cfb9-4710-85d0-2f6b4398603c@gmail.com>
- <ZqIp7/Ci+abGcZLG@fedora>
- <5fd602d8-0c0b-418a-82bc-955ab0444b1e@gmail.com>
- <ZrHg8LUOeM23318x@fedora>
- <ZrIyqrnc15PSRrCz@fedora>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kBpsMhbZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Jy5sBXXGr2voNP18guOdqKk17MKFMl8ptCuzk1nlp0Q=; b=kBpsMhbZ+1Pgy99WHBD3YzI4XG
+	Hqy0KiWbREOfNTGd4D85Ztw2vyfymYiId0v/fTjNdlVAQK/i5x/NoKEy/QsyytCQ29qGuUAPcq9Qm
+	vjWq9+4BtI6nienJ8u7m7JMTT8t8SpdKlmHFaOFuyV61i2voDWVr/HNRi6uBFNEFEKkv5wF5jsRT4
+	QsFXi0/Oqo98Wx1ic4RCpOZYs5IrLeuD9EiwRoO7eiq16UpiiqcAEe8uXB9oQygLNDqEwGOxHUSal
+	larh/IiUtXsxc/JN3FDf2sNmqYdwc6o9DNqJ+ZGljoforqQ0namjXayDrOo23zksSQNAh0C4Om5cd
+	UgGbrBrg==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sbXct-00000006gRT-3Off;
+	Wed, 07 Aug 2024 03:46:16 +0000
+Date: Wed, 7 Aug 2024 04:46:15 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: kernel test robot <oliver.sang@intel.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Christian Brauner <brauner@kernel.org>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, linux-bcachefs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
+	jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
+	ocfs2-devel@lists.linux.dev,
+	linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
+	reiserfs-devel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [linux-next:master] [fs]  cdc4ad36a8:
+ kernel_BUG_at_include/linux/page-flags.h
+Message-ID: <ZrLuBz1eBdgFzIyC@casper.infradead.org>
+References: <202408062249.2194d51b-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,103 +58,34 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZrIyqrnc15PSRrCz@fedora>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <202408062249.2194d51b-lkp@intel.com>
 
-On Tue, Aug 06, 2024 at 10:26:50PM +0800, Ming Lei wrote:
-> On Tue, Aug 06, 2024 at 04:38:08PM +0800, Ming Lei wrote:
-> > On Mon, Jul 29, 2024 at 02:58:58PM +0100, Pavel Begunkov wrote:
-> > > On 7/25/24 11:33, Ming Lei wrote:
-> > > > On Wed, Jul 24, 2024 at 02:41:38PM +0100, Pavel Begunkov wrote:
-> > > > > On 7/23/24 15:34, Ming Lei wrote:
-> > > ...
-> > > > > > But grp_refs is dropped after io-wq request reference drops to
-> > > > > > zero, then both io-wq and nor-io-wq code path can be unified
-> > > > > > wrt. dealing with grp_refs, meantime it needn't to be updated
-> > > > > > in extra(io-wq) context.
-> > > > > 
-> > > > > Let's try to describe how it can work. First, I'm only describing
-> > > > > the dep mode for simplicity. And for the argument's sake we can say
-> > > > > that all CQEs are posted via io_submit_flush_completions.
-> > > > > 
-> > > > > io_req_complete_post() {
-> > > > > 	if (flags & GROUP) {
-> > > > > 		req->io_task_work.func = io_req_task_complete;
-> > > > > 		io_req_task_work_add(req);
-> > > > > 		return;
-> > > > > 	}
-> > > > > 	...
-> > > > > }
-> > > > 
-> > > > OK.
-> > > > 
-> > > > io_wq_free_work() still need to change to not deal with
-> > > > next link & ignoring skip_cqe, because group handling(
-> > > 
-> > > No, it doesn't need to know about all that.
-> > > 
-> > > > cqe posting, link advance) is completely moved into
-> > > > io_submit_flush_completions().
-> > > 
-> > > It has never been guaranteed that io_req_complete_post()
-> > > will be the one completing the request,
-> > > io_submit_flush_completions() can always happen.
-> > > 
-> > > 
-> > > struct io_wq_work *io_wq_free_work(struct io_wq_work *work)
-> > > {
-> > > 	...
-> > > 	if (req_ref_put_and_test(req)) {
-> > > 		nxt = io_req_find_next(req);
-> > > 		io_free_req();
-> > > 	}
-> > > }
-> > > 
-> > > We queue linked requests only when all refs are dropped, and
-> > > the group handling in my snippet is done before we drop the
-> > > owner's reference.
-> > > 
-> > > IOW, you won't hit io_free_req() in io_wq_free_work() for a
-> > > leader unless all members in its group got completed and
-> > > the leader already went through the code dropping those shared
-> > > ublk buffers.
-> > 
-> > If io_free_req() won't be called for leader, leader won't be added
-> > to ->compl_reqs, and it has to be generated when all members are
-> > completed in __io_submit_flush_completions().
-> > 
-> > For !io_wq, we can align to this way by not completing leader in
-> > io_req_complete_defer().
-> > 
-> > The above implementation looks simpler, and more readable.
+On Tue, Aug 06, 2024 at 10:26:17PM +0800, kernel test robot wrote:
+> kernel test robot noticed "kernel_BUG_at_include/linux/page-flags.h" on:
 > 
-> Thinking of this issue further, looks the above is still not doable:
+> commit: cdc4ad36a871b7ac43fcc6b2891058d332ce60ce ("fs: Convert aops->write_begin to take a folio")
+> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
 > 
-> 1) for avoiding to hit io_free_req(), extra req->refs has to be grabbed,
-> then the leader's completion may not be notified.
+> [test failed on linux-next/master 1e391b34f6aa043c7afa40a2103163a0ef06d179]
 > 
-> 2) 1) may be avoided by holding one leader's refcount for each member,
-> and call req_ref_put_and_test(leader) when leader or member is
-> completed, and post leader's CQE when leader's refs drops to zero.
-> But there are other issues:
-> 
-> 	- other req_ref_inc_not_zero() or req_ref_get() may cause leader's
-> 	CQE post missed
-> 
-> 	- the req_ref_put_and_test() in io_free_batch_list() can be called
-> 	on group leader unexpectedly.
-> 
-> both 1) and 2) need to touch io_req_complete_defer() for completing group
-> leader
+> in testcase: boot
 
-oops, looks I missed the point of completing request from
-io_req_complete_post() directly in the following link:
+This patch should fix it.
 
-https://lore.kernel.org/linux-block/0fa0c9b9-cfb9-4710-85d0-2f6b4398603c@gmail.com/
+Christian, can you squash the fix in?
 
-Please ignore yesterday's replies, and now I should get the whole
-picture of your point.
 
-Thanks,
-Ming
-
+diff --git a/mm/shmem.c b/mm/shmem.c
+index 7d28304aea0f..66ff87417090 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -2904,7 +2904,8 @@ shmem_write_begin(struct file *file, struct address_space *mapping,
+ 	if (ret)
+ 		return ret;
+ 
+-	if (folio_test_has_hwpoisoned(folio)) {
++	if (folio_test_hwpoison(folio) ||
++	    (folio_test_large(folio) && folio_test_has_hwpoisoned(folio))) {
+ 		folio_unlock(folio);
+ 		folio_put(folio);
+ 		return -EIO;
