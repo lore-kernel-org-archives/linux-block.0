@@ -1,59 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995C257CBB;
-	Wed,  7 Aug 2024 19:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628911448C7;
+	Wed,  7 Aug 2024 20:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723060525; cv=none; b=EwZF7ZiPxJt0t6CMAPLdq5EHRa2QC0805ttrdZI9hNWH38hhXThW7pKSNGa4b8Ax5vgGvznezV6wqTrSozRwdCjqtSd2urTl6q1SRdt3UZLVCfQM0V+oQQnO9ub7h8ECzzIAYSqT2OUtSP9zUvYDDkLfQqKAMbldI8kGNEq9M2w=
+	t=1723061186; cv=none; b=Mgeh4ELADpYwMfDzgXf+n7bs8EusmADJS6DC9Ei4uCTatdli1VBry2CHB3gOh37O9+bXYcecHMVr/egZh5KhlPgS2zDly5V/pvOZCVgdDpBnYDxVuBBXAP8cUhaGcjMAs16gxiEY35nKqUoSrPDae0K/o0SNQ40puqQx4Wn7HHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723060525; c=relaxed/simple;
-	bh=RKALN1MHgOVJVqePwTXnjIhOh9hyZF92BM3lVOga2yY=;
+	s=arc-20240116; t=1723061186; c=relaxed/simple;
+	bh=PROBiw0sarCM3nOobK70TOAENhBCdBEH39cijO+nsW0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GtbVnHr+4PFREyON9tigcslUIClcg5/rG06zADDkHjk7L+8pDfserqKV1ykaVXOBuOxxC9ZvWDaLdcfQeiLHpRxzyIysDJRnbLYN55Phx1hfu59HwrLHpD1iYWG6bu1C4c2pwSLtuZWH2fyp3M5trZOk7fh0+MQLYG27l2FKDs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YbGE+BG2; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=Edj7gI+Ybnpay+OxWTjCs0md+XQL2CCGYLcN86vqVrsjofpehEydhi4mtJWInH1By76krGZTiO8ZxEANSQEcF9gGzCWENlXmePI9dt6Y9WOUBQowLiIcEC82gcWNwvvQOMUh9yb28oKaPrcuo1C8+yO6Xm6Iy0vw3vKDnxqxd8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lw6sEx9b; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YbGE+BG2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lw6sEx9b"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723060524; x=1754596524;
+  t=1723061184; x=1754597184;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=RKALN1MHgOVJVqePwTXnjIhOh9hyZF92BM3lVOga2yY=;
-  b=YbGE+BG2X0xJ9ExIrrcNyIs9qJc2jOwU/Qr33hZsN0TcrC5mNs9kC0Qb
-   gPTHSKML99NPz8I31Oghv967hrxBAqrkq6/xdRBx9VBroL+5mp0XWI6La
-   /DWT4Saxp3gjFS837MqPeFvhLM6iH+5mPpY/7I8eVjIOZdtP8zQWnpWug
-   AZkzvlGplyqFAlwrt1T1yLJHgjQkEK+fXBEUNovD7LFQqUyJlpg+oK55z
-   WN9Ca0ywHDFVdd+9fxDDbR3Pmpv/yb4qvbGZWwDKTY1jz4FJ7yNGou69m
-   9mmeDICxGDctatymqccqr1FupvJzqLXkxe5VlOu9PpfHywUtdG/xyGl6J
-   g==;
-X-CSE-ConnectionGUID: Tfyo9vwZRKm0lb+PIBUiIQ==
-X-CSE-MsgGUID: BAOU3Xu3RbaSsU0VBxtrnw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="21326066"
+  bh=PROBiw0sarCM3nOobK70TOAENhBCdBEH39cijO+nsW0=;
+  b=Lw6sEx9bTAniWCHreS04uxbyLHzSZG3/6KXbkkvYCEsOQunHzeJh0Vbe
+   63AhytopqhAz+kJMzQw4Pwe2CVKvhL9IZuvQdqCwh9nIgc/6ZxhOIyxSe
+   /HkpU7lDxYt+NbUbv84+vD0XN/Wg+oflMdFENQ2bef9hS4jLtNT2YQbod
+   IzuA6ANAKniSiXrnWIoVPZKZ1zvWSrAOZ2/764L5JhfFMZtn/FZa6N9Rm
+   0KMqm0SkgMpNuggPWA2MKlpcJ510EL14Zg3jX5ECttJXpy82g7WqXZgcK
+   N4ZKGjl9WGaiVRO97DHc80d0DA+tf1sbewNeqShjQayah9+vtRup+Tzwl
+   Q==;
+X-CSE-ConnectionGUID: SBD719i6QdGquvcMxx61fw==
+X-CSE-MsgGUID: kcycni7wQ2+oJ673SWg5mA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="31826399"
 X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="21326066"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 12:55:23 -0700
-X-CSE-ConnectionGUID: srXxKOTER3CFdoyls1tzXw==
-X-CSE-MsgGUID: WkFTE3fxS5SQE37NlZ7rIg==
+   d="scan'208";a="31826399"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 13:06:24 -0700
+X-CSE-ConnectionGUID: V83V2bC7SHOzgT8cTDJKtQ==
+X-CSE-MsgGUID: kwcFdcVaQnG70uwLbTcSwQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="56647724"
+   d="scan'208";a="56918330"
 Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 07 Aug 2024 12:55:21 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 07 Aug 2024 13:06:21 -0700
 Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1sbmkh-0005fy-19;
-	Wed, 07 Aug 2024 19:55:19 +0000
-Date: Thu, 8 Aug 2024 03:55:17 +0800
+	id 1sbmvL-0005gW-1r;
+	Wed, 07 Aug 2024 20:06:19 +0000
+Date: Thu, 8 Aug 2024 04:05:29 +0800
 From: kernel test robot <lkp@intel.com>
 To: 824731276@qq.com, axboe@kernel.dk
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, baiguo@kylinos.cn
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	baiguo@kylinos.cn
 Subject: Re: [PATCH] block:added printing when bio->bi_status fails
-Message-ID: <202408080303.bwOWkFK1-lkp@intel.com>
+Message-ID: <202408080348.jL0uiVq7-lkp@intel.com>
 References: <tencent_F71A15579D1E52ED0B58EF2F3607AA883308@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -79,45 +80,39 @@ url:    https://github.com/intel-lab-lkp/linux/commits/824731276-qq-com/block-ad
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
 patch link:    https://lore.kernel.org/r/tencent_F71A15579D1E52ED0B58EF2F3607AA883308%40qq.com
 patch subject: [PATCH] block:added printing when bio->bi_status fails
-config: openrisc-allnoconfig (https://download.01.org/0day-ci/archive/20240808/202408080303.bwOWkFK1-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080303.bwOWkFK1-lkp@intel.com/reproduce)
+config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20240808/202408080348.jL0uiVq7-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080348.jL0uiVq7-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408080303.bwOWkFK1-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408080348.jL0uiVq7-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   block/bio.c: In function 'bio_endio':
->> block/bio.c:1620:34: error: 'struct bio' has no member named 'bi_disk'
+>> block/bio.c:1620:29: error: no member named 'bi_disk' in 'struct bio'
     1620 |         if (bio->bi_status && bio->bi_disk)
-         |                                  ^~
-   In file included from include/asm-generic/bug.h:22,
-                    from arch/openrisc/include/asm/bug.h:5,
-                    from include/linux/bug.h:5,
-                    from include/linux/mmdebug.h:5,
-                    from include/linux/mm.h:6,
-                    from block/bio.c:5:
-   block/bio.c:1622:62: error: 'struct bio' has no member named 'bi_disk'
+         |                               ~~~  ^
+   block/bio.c:1622:36: error: no member named 'bi_disk' in 'struct bio'
     1622 |                                 __func__, bio->bi_status, bio->bi_disk->major,\
-         |                                                              ^~
-   include/linux/printk.h:437:33: note: in definition of macro 'printk_index_wrap'
+         |                                                           ~~~  ^
+   include/linux/printk.h:465:60: note: expanded from macro 'printk'
+     465 | #define printk(fmt, ...) printk_index_wrap(_printk, fmt, ##__VA_ARGS__)
+         |                                                            ^~~~~~~~~~~
+   include/linux/printk.h:437:19: note: expanded from macro 'printk_index_wrap'
      437 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
          |                                 ^~~~~~~~~~~
-   block/bio.c:1621:17: note: in expansion of macro 'printk'
-    1621 |                 printk(KERN_ERR "bio: %s status is %d, disk[%d:%d]\n",\
-         |                 ^~~~~~
-   block/bio.c:1623:36: error: 'struct bio' has no member named 'bi_disk'
+   block/bio.c:1623:10: error: no member named 'bi_disk' in 'struct bio'
     1623 |                                 bio->bi_disk->first_minor);
-         |                                    ^~
-   include/linux/printk.h:437:33: note: in definition of macro 'printk_index_wrap'
+         |                                 ~~~  ^
+   include/linux/printk.h:465:60: note: expanded from macro 'printk'
+     465 | #define printk(fmt, ...) printk_index_wrap(_printk, fmt, ##__VA_ARGS__)
+         |                                                            ^~~~~~~~~~~
+   include/linux/printk.h:437:19: note: expanded from macro 'printk_index_wrap'
      437 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
          |                                 ^~~~~~~~~~~
-   block/bio.c:1621:17: note: in expansion of macro 'printk'
-    1621 |                 printk(KERN_ERR "bio: %s status is %d, disk[%d:%d]\n",\
-         |                 ^~~~~~
+   3 errors generated.
 
 
 vim +1620 block/bio.c
