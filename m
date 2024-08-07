@@ -1,91 +1,131 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879001A269;
-	Wed,  7 Aug 2024 03:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C1019066D;
+	Wed,  7 Aug 2024 04:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723002383; cv=none; b=d+oXrm4eGJTsTMXQ2RqhY79GEMDWhXj5HG/Zo0RQdQ2sWKJvc4NSNgCIs3OldNS96zMDFFqhKe0Oi+bAZp2/1M2xUNh20RzbKTC1pblivQbimA/SrsNyqQqtS0zLsR60JLTd+zZkHahRymC2xlmGTuZXyGq+69NzkjlcQahH85E=
+	t=1723006174; cv=none; b=ObcmirSX4ms/Aks4wBwOrAc7T1hSyf2ZAbYcYgYYImP86pF+iMBavd5OvlgdvK3xXUvykIctX89aL9fW/4TT3u+sNYlx1tvJWZOcyAxNRSSU26LonA2o10jc4lv3pL49oMZOUccYoNwSHh1NBX6RtJ6XTGoVUwa4/GC7UObIkEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723002383; c=relaxed/simple;
-	bh=S7xTj1+BRrFzibxP14qb9afX2Rlcc7Yzirv1sNhukC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r35b0so3qFIjK2gQC4RJydfRZCD3att8F6kgWZ9yFNloc9sqTHdBSYbttKQ4PSFkeOf0+PJMuXYMuuhm5WiJlM/frXCteqFGAQ3eUZtE1U8p3Efn4QCnjhxQ27+USrURN5v3GOEN/o4/Cdm6xCoLOfCQc3/cvrDAB15fhumu5Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kBpsMhbZ; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kBpsMhbZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Jy5sBXXGr2voNP18guOdqKk17MKFMl8ptCuzk1nlp0Q=; b=kBpsMhbZ+1Pgy99WHBD3YzI4XG
-	Hqy0KiWbREOfNTGd4D85Ztw2vyfymYiId0v/fTjNdlVAQK/i5x/NoKEy/QsyytCQ29qGuUAPcq9Qm
-	vjWq9+4BtI6nienJ8u7m7JMTT8t8SpdKlmHFaOFuyV61i2voDWVr/HNRi6uBFNEFEKkv5wF5jsRT4
-	QsFXi0/Oqo98Wx1ic4RCpOZYs5IrLeuD9EiwRoO7eiq16UpiiqcAEe8uXB9oQygLNDqEwGOxHUSal
-	larh/IiUtXsxc/JN3FDf2sNmqYdwc6o9DNqJ+ZGljoforqQ0namjXayDrOo23zksSQNAh0C4Om5cd
-	UgGbrBrg==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sbXct-00000006gRT-3Off;
-	Wed, 07 Aug 2024 03:46:16 +0000
-Date: Wed, 7 Aug 2024 04:46:15 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: kernel test robot <oliver.sang@intel.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Christian Brauner <brauner@kernel.org>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, linux-bcachefs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
-	jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev,
-	linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
-	reiserfs-devel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [linux-next:master] [fs]  cdc4ad36a8:
- kernel_BUG_at_include/linux/page-flags.h
-Message-ID: <ZrLuBz1eBdgFzIyC@casper.infradead.org>
-References: <202408062249.2194d51b-lkp@intel.com>
+	s=arc-20240116; t=1723006174; c=relaxed/simple;
+	bh=qa39epjqjdsOVNsHgEqDKXlLdppVmF7MiqUmOzTRPYU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EF8cDiGg5EOwtW6MB53m2768zxfbRU5XMaQ5GPMP89z1O9mg/aTuB/f3i3kMZo5U+x+Vy2MBGVam1KUnjcX2VQ7zTzSgzb0rtGqahEi8/fVMcDIrxH03oH4S0NlFmTZ1TzC0812f7NinOF9ZavXGGFNxe2NfWGV4MojuulyJCKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.3] (ip5f5af7d2.dynamic.kabel-deutschland.de [95.90.247.210])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4D7E161E5FE01;
+	Wed,  7 Aug 2024 06:48:21 +0200 (CEST)
+Message-ID: <5880e801-e896-4bf0-9a69-2cf5acb51ec3@molgen.mpg.de>
+Date: Wed, 7 Aug 2024 06:48:20 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202408062249.2194d51b-lkp@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 20/20] MAINTAINERS: ipe: add ipe maintainer
+ information
+To: Paul Moore <paul@paul-moore.com>
+Cc: Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net, zohar@linux.ibm.com,
+ jmorris@namei.org, serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+ axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
+ eparis@redhat.com, linux-doc@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
+ fsverity@lists.linux.dev, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
+ <1722665314-21156-21-git-send-email-wufan@linux.microsoft.com>
+ <de7857fb-63d9-42fc-af1e-12ffcdfcdda8@molgen.mpg.de>
+ <CAHC9VhRmcReVM_Le5bYor2deotnSe4OT08UYhL6xhiKCu0+3kA@mail.gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CAHC9VhRmcReVM_Le5bYor2deotnSe4OT08UYhL6xhiKCu0+3kA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 06, 2024 at 10:26:17PM +0800, kernel test robot wrote:
-> kernel test robot noticed "kernel_BUG_at_include/linux/page-flags.h" on:
+Dear Paul,
+
+
+Am 06.08.24 um 22:54 schrieb Paul Moore:
+> On Sat, Aug 3, 2024 at 4:15 AM Paul Menzel wrote:
+
+>> Thank you very much for your patch. Two nits, should you sent another
+>> interation: A more specific summary would avoid people having to look at
+>> the message body or diff, and `git log --oneline` would be enough.
+>>
+>> MAINTAINERS: Add IPE entry with M: Fan Wu
+>>
+>> MAINTAINERS: Add IPE entry with Fan Wu as maintainer
+>>
+>> Am 03.08.24 um 08:08 schrieb Fan Wu:
+>>> Update MAINTAINERS to include ipe maintainer information.
+>>
+>> I’d at least mention Integrity Policy Enforcement. As you not only
+>> include the maintainer information but add a new entry, I’d leave the
+>> body out, or mention that a new entry is added.
+>>
+>>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 > 
-> commit: cdc4ad36a871b7ac43fcc6b2891058d332ce60ce ("fs: Convert aops->write_begin to take a folio")
-> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
+> Working under the current assumption that a new revision is not
+> needed, I can fix this up during the merge.  Fan, other-Paul, are you
+> both okay with the following:
 > 
-> [test failed on linux-next/master 1e391b34f6aa043c7afa40a2103163a0ef06d179]
+>    "MAINTAINERS: add IPE entry with Fan Wu as maintainer
 > 
-> in testcase: boot
+>     Add a MAINTAINERS entry for the Integrity Policy Enforcement (IPE) LSM."
 
-This patch should fix it.
-
-Christian, can you squash the fix in?
+Thank you. That is fine by me.
 
 
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 7d28304aea0f..66ff87417090 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -2904,7 +2904,8 @@ shmem_write_begin(struct file *file, struct address_space *mapping,
- 	if (ret)
- 		return ret;
- 
--	if (folio_test_has_hwpoisoned(folio)) {
-+	if (folio_test_hwpoison(folio) ||
-+	    (folio_test_large(folio) && folio_test_has_hwpoisoned(folio))) {
- 		folio_unlock(folio);
- 		folio_put(folio);
- 		return -EIO;
+Kind regards,
+
+Paul
+
+
+>>> --
+>>> v1-v16:
+>>>     + Not present
+>>>
+>>> v17:
+>>>     + Introduced
+>>>
+>>> v18:
+>>>     + No changes
+>>>
+>>> v19:
+>>>     + No changes
+>>>
+>>> v20:
+>>>     + No changes
+>>> ---
+>>>    MAINTAINERS | 10 ++++++++++
+>>>    1 file changed, 10 insertions(+)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 8766f3e5e87e..4cdf2d5a2058 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -11118,6 +11118,16 @@ T:   git git://git.kernel.org/pub/scm/linux/kernel/git/zohar/linux-integrity.git
+>>>    F:  security/integrity/
+>>>    F:  security/integrity/ima/
+>>>
+>>> +INTEGRITY POLICY ENFORCEMENT (IPE)
+>>> +M:   Fan Wu <wufan@linux.microsoft.com>
+>>> +L:   linux-security-module@vger.kernel.org
+>>> +S:   Supported
+>>> +T:   git https://github.com/microsoft/ipe.git
+>>> +F:   Documentation/admin-guide/LSM/ipe.rst
+>>> +F:   Documentation/security/ipe.rst
+>>> +F:   scripts/ipe/
+>>> +F:   security/ipe/
+>>> +
+>>>    INTEL 810/815 FRAMEBUFFER DRIVER
+>>>    M:  Antonino Daplas <adaplas@gmail.com>
+>>>    L:  linux-fbdev@vger.kernel.org
