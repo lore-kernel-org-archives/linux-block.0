@@ -1,89 +1,87 @@
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131FA189F33;
-	Thu,  8 Aug 2024 10:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D51918DF70
+	for <linux-block@vger.kernel.org>; Thu,  8 Aug 2024 13:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723111988; cv=none; b=SlHOkkdZPGM4/6yKnJ5yzllVZNBmAvdQrRA/p5JbYopnAgnWbAsME0AxcxNMcV7IS7uXbiDBT/Ct8jzjSIFeoNRxCLKAk+i69G3J/jATU28yGIu/7mgK7743JxqUJeo8BC2EdSK1dX+F7VzPui+jnH3ec03fQnEdYAjcfplOQ7Y=
+	t=1723124245; cv=none; b=mOGYjZsZiTJdpfFX22h5fcqkHwWnvVSNjgMTVUPHIDoDGt5nq3e2nxEIJWARg5uY3ppPztdtS7S4wna0btN2R1Lzp0rCCUpZ6o2pza+Ec/M1JKap0DIA/0qpQUAzg+vEvf46Y2cY+m1bJ4CZPt+KtTWsKKZhzQtMQQDqMed/kF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723111988; c=relaxed/simple;
-	bh=ouPA6ZrahlF54R4HPTBRnYcpfrAsj1xJHWagR7bwEPg=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=VAZJRUpyvW1PfRM7il8/yvwNnySGHIURmPNthGrOJb/HnLDYFj/zoHpm88xpN9/CQ3PejWS1jO7tjex8TAPc6TgLRC0V7WbChsJv2qStPJzb4hT3ArHexHfEWZgJmcDZXbJ3uJdCz566OQnfzLcQlP2jEtjs0jp20ly80pBVQJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=SSh4DpBT; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1723124245; c=relaxed/simple;
+	bh=3ZiTOAaXUPmHMS+kcP/7fLCSSJvy0HJAPk8oCSO93e4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C0a7cCJS5NgMb5J23lcvwCz1MEEFEvSUN5nEpnf4KUb2PPlNR5k3I3y/DNehoX9gjPEhYcXEsXuPyu42hrjl1CtVsb7XA3zUArnK4HyUs1CBopjW4NUI04hd8tpdO++3SRo4Yo8AiWy6wlZ5f+Yt/oWVbCzBDOMkqhz3MV7NEM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sJ6wbF9N; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="SSh4DpBT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1723111974; bh=mfUonZG/C+QDJMq8H/BlxiTC4EXPl9wK66ybZn66nho=;
-	h=From:To:Cc:Subject:Date;
-	b=SSh4DpBTmvsAan2sf0kQ2JglXirYEBMGu2GtOSde8tiwpNh0W/xnuf04q7/Q15+PA
-	 cFtVV52iyWdB6TeWLSHpiLmQbNE9YU80L5EftPm26ImFChTF92STWAb30fmKfV8ofL
-	 CMV2MdzUGTk7AIUdU5KOJfSZtAZe2BQzo3wa0suY=
-Received: from localhost.localdomain ([123.150.8.42])
-	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
-	id DB32546F; Thu, 08 Aug 2024 17:54:51 +0800
-X-QQ-mid: xmsmtpt1723110891tvw1l3xep
-Message-ID: <tencent_9A3345EA79C1EE9DC4464BB576C6A602A105@qq.com>
-X-QQ-XMAILINFO: MIAHdi1iQo+zW6xu5i8c99xvDD8u1RYFkfUoGob7cHiYe6CLAgMVTwiC/6ImLo
-	 VdVTh+YuWZ4RkoxTjANVW6Ab40A7jqAqZamUnu6TYQ3Y0QUQF4Vn8P2VZu1hN9n387G0zesJrFbi
-	 qpS8D8feVAT/4FzJlHEpN0ujM6K0XGdbexhcXgFB30ia5DspdKRO+ht55TTtMaCE6SqXolB6bgfg
-	 37THZsAj2xT8bShU/tCsAl5xpF9P4WLUUWol6K3JEwKNLvt5jJ2XAdcFiv8AOUX5Iysdf9SRz6VP
-	 XiARAib8dRY7KdJgvf2La39ixs8+LZhgzbleWi/UWjQFcg01TGqOdj6at8YiGzCwe5EiGtvKi9dN
-	 iYznpCqIJi+loBHl3GN10j0E0cErrYVap18rclMlrZKvbJnMxKrEOkaFA+x8/lc+jwAIQE9LiSD1
-	 fyRqdTy+MoCQ7qsrLB/Oru/JPQsWeBN6aL8AYEWMgF4CuVjBYpmq6e57PnRIjck57h1O9G1ThFc8
-	 1T379W1Bi6IZp82x2yAnwxVHpbsDkwWbXXTjeaij3tz1camucB8XGWaWwXTJK5hBiFDuDKoKW+uP
-	 3RUl6oB5iLJVoxZwIeNOjNuuH/b9CGwJP1I40nsl8GT0vv/Xu4MAjFer8ROxX5r5/GCEVmOMmJ8X
-	 AfP6UCLyNFnURYcMERFuOXh7kiQO5quqgJ33GDAwhE5p7z75ZecWOSHuz/HC+jB2aw8zvw/IdFWF
-	 a6KylLu2v5UG2lbsjvM8u2cWxZPCiQ2eT/kkY+n3yviALvDrsHSybA8f2Pv4kI03yWKxinmsdsJB
-	 haPqu0ty/nNIVT8g8GtZGYQJqYI5UEBpQsHej09ckj5qCiAHhAS/AueHvbQml3KLZnV6ER5XqD7c
-	 YwG+5NMdg61G8CvrFyzUEhShK21m5MDDbE2Sy1cH3uDkoIbfsx/7q8NASdnh13Gg==
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: 824731276@qq.com
-To: axboe@kernel.dk
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	baiguo@kylinos.cn
-Subject: [PATCH] block:added printing when bio->bi_status fails
-Date: Thu,  8 Aug 2024 17:54:48 +0800
-X-OQ-MSGID: <20240808095448.360239-1-824731276@qq.com>
-X-Mailer: git-send-email 2.33.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sJ6wbF9N"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-6c386a3ac43so90263a12.0
+        for <linux-block@vger.kernel.org>; Thu, 08 Aug 2024 06:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723124241; x=1723729041; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XVChcYY30Mpv4pcrAWYyddiPC20nI4GsEyGh5Z8PoV4=;
+        b=sJ6wbF9NuWemgk+CVIcZ7ElWmsHZUhNO5Thb4E59bsBhgy8ROvRpz4XfGqIhCBM+m1
+         oanCivvzQ+H8IdyfKAAggF64Hr8L67dPaowYXjdqP/JNqFrIzcYa/3wQ5H5YonJGjJX4
+         w4KFUdu8wxIBFv5zFDe3nbHtIxd9etzXBliwnFCdzIgIB1aVL4k9X4xYcpnHVo9k32qg
+         u/YNLNECNKbynU7HNUdy0Zg8Gm0KENVVga/605HMY7C4Yj8qFWJ9pubJntwpXRs5aBaJ
+         g8diXNllRWq6qxymLu5eHwmskQYtfzfwmgJpVo6+Ca+GZekTlelfBpI6AXmD9AVkotIo
+         V27Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723124241; x=1723729041;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XVChcYY30Mpv4pcrAWYyddiPC20nI4GsEyGh5Z8PoV4=;
+        b=aFGc4GsbUYuON/dX8zjoQOpVCXmrrLu9zeRhq6SPyZQiMRWYXcvCTjwuh3q+6diKgj
+         PxX/XYvIo6UTxJeI/Ne2IK1vGtkSPX7bYJ+Y787cwm2HPDbYPR1s8DqnkVxTEl6fDwbe
+         bTxWtvz8aELce29yKiJ2OHvNO5Y8b0zu8uW9L6MJVQFkHXNWhCVE50kudNRJblqMZiSF
+         08f9klhPpE3SVnQiv/aDfcDWi+Ikz5/t5tx62X0HuISignmkfvlUkfDImC70y4obNTQ/
+         zHrmNAiNd1SAEnLXrNCtpfqp69ofbp3Prtztq94k+C91azUW9OTU/upIbK6QTLlRtgD3
+         nMAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWPgnyBI6JhSVYpPi4FonWX1eCm7zyN/9WpooAnsl1jNQsTpnB62vc4knPMG569u+VqJn7nesoXks6FhGsUvkXeS5VwqvCVP0/dwQ=
+X-Gm-Message-State: AOJu0Yxhf4VudsCzVfyIXwt5w0dpM7gdqYuo8qobuLjm4gLGoDChK+Hi
+	XH05RiBt9HpSYp2Hyz1+hB5rJeNnQVHrstS2DMm+1Y3fBAV7Sw7Trk4yFI3RbAE=
+X-Google-Smtp-Source: AGHT+IEk6xoZ/zlRSb3U/GJSm3CHUT6KiD1J07T2LKOms6ygd4Jc8qBlHMKfZG58uLAif+L2dix3TA==
+X-Received: by 2002:a05:6a20:7487:b0:1c4:84ee:63d1 with SMTP id adf61e73a8af0-1c6fd05f845mr1187450637.9.1723124241540;
+        Thu, 08 Aug 2024 06:37:21 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f219f5sm124997345ad.29.2024.08.08.06.37.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Aug 2024 06:37:20 -0700 (PDT)
+Message-ID: <35c7b39f-415d-4d23-bf44-75e655f3eb8a@kernel.dk>
+Date: Thu, 8 Aug 2024 07:37:19 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] virtio_blk: implement init_hctx MQ operation
+To: Max Gurtovoy <mgurtovoy@nvidia.com>, stefanha@redhat.com,
+ virtualization@lists.linux.dev, mst@redhat.com
+Cc: kvm@vger.kernel.org, linux-block@vger.kernel.org, oren@nvidia.com
+References: <20240807224129.34237-1-mgurtovoy@nvidia.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240807224129.34237-1-mgurtovoy@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: baiguo <baiguo@kylinos.cn>
+On 8/7/24 4:41 PM, Max Gurtovoy wrote:
+> Set the driver data of the hardware context (hctx) to point directly to
+> the virtio block queue. This cleanup improves code readability and
+> reduces the number of dereferences in the fast path.
 
-    When ftrace is not enabled and bio is not OK,
-    the system cannot actively record which disk is abnormal.
-    Add a message record to bio_endio.
+Looks good, and that is the idiomatic way to do this.
 
-Signed-off-by: baiguo <baiguo@kylinos.cn>
----
- block/bio.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-diff --git a/block/bio.c b/block/bio.c
-index c4053d496..fb07589c8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1617,6 +1617,11 @@ void bio_endio(struct bio *bio)
- 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
- 	}
- 
-+	if (bio->bi_status && bio->bi_bdev)
-+		printk(KERN_ERR "bio: %s status is %d, disk[%d:%d]\n",\
-+				__func__, bio->bi_status, bio->bi_bdev->bd_disk->major,\
-+				bio->bi_bdev->bd_disk->first_minor);
-+
- 	/*
- 	 * Need to have a real endio function for chained bios, otherwise
- 	 * various corner cases will break (like stacking block devices that
 -- 
-2.33.0
+Jens Axboe
+
 
