@@ -1,44 +1,44 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1C718E752
-	for <linux-block@vger.kernel.org>; Thu,  8 Aug 2024 16:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C4218B47A
+	for <linux-block@vger.kernel.org>; Thu,  8 Aug 2024 16:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723134293; cv=none; b=mtcn10ftEmbkc0ljKUTMQEbNS1o+jsXW7n5Yp8yVubXdI3nhzpRSLefvS0UUelVNxEGDiviGmQHfFZkoar+x4U6BZJWJG+lqGervGZOnVYSZ2D4vcOqjrdE3KFRQS35R2B24mAuc2smA5nr2MZ8M4tAX/1CatrVCmz9gggTGQJI=
+	t=1723134321; cv=none; b=c2nqe8qShL3vxpzrxohEj4oQhRmW5gC4ENJMm2d9Jc2znCIG8fFo4qRVSezbQJzqccDKaPbO71h+yC487TSmkEOxUOqRYeBOBSFVoer+ZWRx7yHDpuye7kM/4UurBgKD0WZcOgl39oeg3rQwQnsREfBCFMDne22snlluoCP5Nq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723134293; c=relaxed/simple;
+	s=arc-20240116; t=1723134321; c=relaxed/simple;
 	bh=goLjLGKXLxxfU24JVFqFOLm3RrLf6nKyUBY1Oi5Sb+0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JhZK3pvJJnCZY7KhbkHFpt7CKcf5XsXQ7pQBikColnFMkgG6RFGQdDAf9Ca/2E7jJuRnNIogCanLchSK51eMqwe86D9GmtPKkoB8shw0K0vTRl8upSCx2FJqdumxIBlXkpG8DddzH0KCNzTRb90k8XUeB7YPQujuXIBtV4OwGbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IymJ7KRL; arc=none smtp.client-ip=170.10.129.124
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ezTVGveiOsDhSE5gB+CnvoMW9yCfUG8RS6WWDUIlG9yFSn0cSehrw9JpF1rM2KXI4wyFYWaDnXwBAeA58mtWqP8NUSTwa8YnJZMv6qDKTv9BY8nF+mRXFhKY6Kk/c+DV0XX+wRT1HW/4Hxu7SMxAbf8po1g98ksvyGm6hicsibQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iXtSiefG; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IymJ7KRL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iXtSiefG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723134290;
+	s=mimecast20190719; t=1723134318;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
 	bh=zyMi9Ro6GIfw7SugBcpTjwyoSOpWoq8JwyMq/fjCsAY=;
-	b=IymJ7KRLpbxR5mpu/9Uq3Xhvz8YIh9Rjac7Wht/v9rHndcLsrH6xu5n6i3scfNGauainxP
-	shS/eSPbHvUw7H8U3nhFPRtR11Fl3Hv4D/PtvYcoDRTLjslJRmPIlCgDP39gBWtw9DTdOV
-	x/SVoSwz42AqSARqJ8xhtMbCSDD1LqQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	b=iXtSiefGjFK3/BmU78luRzYu4aLmytjGH1yg9YkQSJtdY7ja82fSC4FsVBWsKrLJl83u96
+	1YYo1ZnXHXY1qUkIOvKE+SspHmC+TTWvjRpZV2kIUficzy5sT1f7f3itbHMz4It2AzLWCU
+	lKQgxxbId3/6HVrMSDKkwIrDkuTdKB0=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-pPUOQiLjOUCuvt4o2vR9Cw-1; Thu,
- 08 Aug 2024 12:24:47 -0400
-X-MC-Unique: pPUOQiLjOUCuvt4o2vR9Cw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-383-y_JKNgyKO_elWNRL6JDW0Q-1; Thu,
+ 08 Aug 2024 12:25:15 -0400
+X-MC-Unique: y_JKNgyKO_elWNRL6JDW0Q-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B747196CDFE;
-	Thu,  8 Aug 2024 16:24:46 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA5791955BCF;
+	Thu,  8 Aug 2024 16:25:13 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.29])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F0D403000197;
-	Thu,  8 Aug 2024 16:24:44 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A8F9A1955F35;
+	Thu,  8 Aug 2024 16:25:11 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	io-uring@vger.kernel.org,
@@ -46,8 +46,8 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Pavel Begunkov <asml.silence@gmail.com>
 Cc: Ming Lei <ming.lei@redhat.com>
 Subject: [PATCH V5 0/8] io_uring: support sqe group and provide group kbuf
-Date: Fri,  9 Aug 2024 00:24:38 +0800
-Message-ID: <20240808162438.345884-1-ming.lei@redhat.com>
+Date: Fri,  9 Aug 2024 00:24:49 +0800
+Message-ID: <20240808162503.345913-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
 Hello,
 
