@@ -1,55 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A7D18EFDC
-	for <linux-block@vger.kernel.org>; Thu,  8 Aug 2024 16:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEC618FC85
+	for <linux-block@vger.kernel.org>; Thu,  8 Aug 2024 16:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723134325; cv=none; b=afAMuMBM4GW2Yd8Tbjml+5/oZ4nFXnOYD+/04oMPoxKcNxtllVTRiNHtBpHQYdLZmRU1jxwxAhtsnNdRQeBsuSodiZV9GKqKSTP0WFa9RMxBz6GNRg0jMWjBQp1KQLCvyO/37HHt5SW+mCKoZ1vDmvqO251xriFruav4WSKaAUU=
+	t=1723134327; cv=none; b=cu+0txzQpuodTt+5zPU/aqSmAjy2JPIQXjvUlwbQ0R0n4AK9mOucJVZoHnwMfspgbxE2VOQ3qatmcHw7k8vXUUrLHtkggjrlPZdBUC+/5rnhw9N4qbppVor3DZxu6SbSq66BMaNyjoyKk5h3+yIM6FzKmAlz1B1f4FieF+pRD+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723134325; c=relaxed/simple;
-	bh=ZN6RtllCV9P/qOkJtjoGwrXPn2f9WJYcytuQKk5YMPU=;
+	s=arc-20240116; t=1723134327; c=relaxed/simple;
+	bh=ALO5J+VQ8/3IDtPrrTF02WDfeN8cw5/793BtZEdNqNA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K4/gEsUMhDZigDeGN/zZdnoQLTw9rbSWamDbbl5ujX1XnJ16S5PJbmdZPt54dk0iWgKiO7KM1RJQoEuG5HOORGvx5cv8bsjQjakTQ9uvui32rZqOy769n18/T3v+rpwDyWG1CygmxrNlEVC31H95RyJB45uRjJiqiNS/1yTi/34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KJ+xKyJs; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=uDCRxXkvyHsj04NSLWIzwkVwunp0Ng9/ir4+NBsNO6tg6w69FNKjr92vw0KwxGomaNLQ73QsLsQrRw+QrjqYKEeIrEvbYHIHgE+mb/KnQXKUQWrnr5jL+XOXtwaD66lPG1vQ+vV8WT/tZa3J+sJX4t37yt20xhV316CSxRWB0Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fO8SeyQs; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJ+xKyJs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fO8SeyQs"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723134322;
+	s=mimecast20190719; t=1723134325;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+45M5B7M8BTS/QiTJ/v79XHflqB+HB41GM1XdDUDGWM=;
-	b=KJ+xKyJsWJ8DI4seDRmzXqrHBgERe0fwa0IFL3gxBad1sDlNRKyDY76HfnO4V+F1r5U2SC
-	1jXDE9E1J1ScfzijVFppUiuUdAfdwIn3N+MHcfFiIwDqX9o2u0HhzT9coV+UllgGg4gnD8
-	dlazW0r7W7Xdd3SeFArpWjrxAKtXGSE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=vDrT67P8Y0hVrPae1hqC0kgkuX3HWn+0sZdkMhfAGNE=;
+	b=fO8SeyQsjv+QM5Qan8TmcVbTw05rp7YlYsbjlQO8WVEIWC277VIy3koqxg6fX513MuqNvJ
+	2i/ne162LIyC60LvDvfEj/m0Mc5xiyLn79aMqtuCPs0nMfGp30GvtbILXC84tmoFzCCnd2
+	A0ucnEmLUUa9jm8/iAFTr6Sf34JSnEk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-578-YMMNq04zONGNcMrvwwXr4g-1; Thu,
- 08 Aug 2024 12:25:19 -0400
-X-MC-Unique: YMMNq04zONGNcMrvwwXr4g-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-171-0Tr8A2hjOS6WYwqQJGVOKA-1; Thu,
+ 08 Aug 2024 12:25:23 -0400
+X-MC-Unique: 0Tr8A2hjOS6WYwqQJGVOKA-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65A9419560AB;
-	Thu,  8 Aug 2024 16:25:18 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9FAEA1956054;
+	Thu,  8 Aug 2024 16:25:22 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.29])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1C3C0300018D;
-	Thu,  8 Aug 2024 16:25:16 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8A0BC19560A3;
+	Thu,  8 Aug 2024 16:25:21 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	io-uring@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Pavel Begunkov <asml.silence@gmail.com>
 Cc: Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 1/8] io_uring: add io_link_req() helper
-Date: Fri,  9 Aug 2024 00:24:50 +0800
-Message-ID: <20240808162503.345913-2-ming.lei@redhat.com>
+Subject: [PATCH V5 2/8] io_uring: add io_submit_fail_link() helper
+Date: Fri,  9 Aug 2024 00:24:51 +0800
+Message-ID: <20240808162503.345913-3-ming.lei@redhat.com>
 In-Reply-To: <20240808162503.345913-1-ming.lei@redhat.com>
 References: <20240808162503.345913-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -59,84 +59,72 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Add io_link_req() helper, so that io_submit_sqe() becomes more readable.
+Add io_submit_fail_link() helper and put linking fail logic into this
+helper.
+
+This way simplifies io_submit_fail_init(), and becomes easier to add
+sqe group failing logic.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- io_uring/io_uring.c | 41 +++++++++++++++++++++++++++--------------
- 1 file changed, 27 insertions(+), 14 deletions(-)
+ io_uring/io_uring.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index 3942db160f18..4848cd84af3d 100644
+index 4848cd84af3d..34020cadee03 100644
 --- a/io_uring/io_uring.c
 +++ b/io_uring/io_uring.c
-@@ -2132,19 +2132,11 @@ static __cold int io_submit_fail_init(const struct io_uring_sqe *sqe,
- 	return 0;
+@@ -2095,22 +2095,17 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	return def->prep(req, sqe);
  }
  
--static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
--			 const struct io_uring_sqe *sqe)
--	__must_hold(&ctx->uring_lock)
-+/*
-+ * Return NULL if nothing to be queued, otherwise return request for queueing */
-+static struct io_kiocb *io_link_sqe(struct io_submit_link *link,
-+				    struct io_kiocb *req)
+-static __cold int io_submit_fail_init(const struct io_uring_sqe *sqe,
++static __cold int io_submit_fail_link(struct io_submit_link *link,
+ 				      struct io_kiocb *req, int ret)
  {
+-	struct io_ring_ctx *ctx = req->ctx;
 -	struct io_submit_link *link = &ctx->submit_state.link;
--	int ret;
--
--	ret = io_init_req(ctx, req, sqe);
--	if (unlikely(ret))
--		return io_submit_fail_init(sqe, req, ret);
--
--	trace_io_uring_submit_req(req);
+ 	struct io_kiocb *head = link->head;
+ 
+-	trace_io_uring_req_failed(sqe, req, ret);
 -
  	/*
- 	 * If we already have a head request, queue this one for async
- 	 * submittal once the head completes. If we don't have a head but
-@@ -2158,7 +2150,7 @@ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 		link->last = req;
+ 	 * Avoid breaking links in the middle as it renders links with SQPOLL
+ 	 * unusable. Instead of failing eagerly, continue assembling the link if
+ 	 * applicable and mark the head with REQ_F_FAIL. The link flushing code
+ 	 * should find the flag and handle the rest.
+ 	 */
+-	req_fail_link_node(req, ret);
+ 	if (head && !(head->flags & REQ_F_FAIL))
+ 		req_fail_link_node(head, -ECANCELED);
  
- 		if (req->flags & IO_REQ_LINK_FLAGS)
--			return 0;
-+			return NULL;
- 		/* last request of the link, flush it */
- 		req = link->head;
- 		link->head = NULL;
-@@ -2174,9 +2166,30 @@ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- fallback:
- 			io_queue_sqe_fallback(req);
- 		}
--		return 0;
-+		return NULL;
- 	}
-+	return req;
-+}
+@@ -2129,9 +2124,24 @@ static __cold int io_submit_fail_init(const struct io_uring_sqe *sqe,
+ 	else
+ 		link->head = req;
+ 	link->last = req;
 +
-+static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
-+			 const struct io_uring_sqe *sqe)
-+	__must_hold(&ctx->uring_lock)
-+{
-+	struct io_submit_link *link = &ctx->submit_state.link;
-+	int ret;
- 
-+	ret = io_init_req(ctx, req, sqe);
-+	if (unlikely(ret))
-+		return io_submit_fail_init(sqe, req, ret);
-+
-+	trace_io_uring_submit_req(req);
-+
-+	if (unlikely(link->head || (req->flags & (IO_REQ_LINK_FLAGS |
-+				    REQ_F_FORCE_ASYNC | REQ_F_FAIL)))) {
-+		req = io_link_sqe(link, req);
-+		if (!req)
-+			return 0;
-+	}
- 	io_queue_sqe(req);
  	return 0;
  }
+ 
++static __cold int io_submit_fail_init(const struct io_uring_sqe *sqe,
++				      struct io_kiocb *req, int ret)
++{
++	struct io_ring_ctx *ctx = req->ctx;
++	struct io_submit_link *link = &ctx->submit_state.link;
++
++	trace_io_uring_req_failed(sqe, req, ret);
++
++	req_fail_link_node(req, ret);
++
++	/* cover both linked and non-linked request */
++	return io_submit_fail_link(link, req, ret);
++}
++
+ /*
+  * Return NULL if nothing to be queued, otherwise return request for queueing */
+ static struct io_kiocb *io_link_sqe(struct io_submit_link *link,
 -- 
 2.42.0
 
