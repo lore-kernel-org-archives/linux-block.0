@@ -1,321 +1,168 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D91015A85E;
-	Thu,  8 Aug 2024 22:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132F71D554
+	for <linux-block@vger.kernel.org>; Thu,  8 Aug 2024 23:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723156722; cv=none; b=DRjT26TMSRJLM1JBdTrzOUz+YTY9epqxIyW9ppS6d9Nd7vHSvjsMdF5NwrXpCUSkr54SnmAN8fZ8ThA1TogwzTXbk6g8htixehdt7aUOtI6EbpcDmAkNosDQ9RIUDgkYd9A5L+niMjnr9BCL1JJPTNDSDVFA/CxQE3S1rZvINyg=
+	t=1723158252; cv=none; b=OKO3kYfG5Nnj1GqwkPfRSD6DKgvbyu5q9aZVLFBPOLDosCFD2VhCEYwPAcMzwBo8HmeFgrZYU3py4kFfpmyjQy2zfMbEPOy66CJeyi29ZSyno+lEbbMAkiuee+ouLNi4+EQbpfN990DrpBZAmQ1Nuz0yIeTdUyF28Nb9cwxSKoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723156722; c=relaxed/simple;
-	bh=vZpsZCSq8m3vqkCqwtEtToVRyRwVVJuDvKSNYBexa4A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sFB/yHst0V54ktphl7ZkFHuzJzl7/OtQjy6a1yUkCzTiehnFi5YX4nrDxuxkQ7Sc9B+FFQNn4GhfZ7SZVNBgzAHENIhaUR3Q9BEXxqIzYvh7V8NjNxZ/uH2KZUOVmQGZmpTaTZwG3SSDUrg6A1ktRluQohQ57ueTy0FmsYw5bHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=RKirm/xx; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1723158252; c=relaxed/simple;
+	bh=SvHZf/C0tDGAUqgkrjBcxne6PiF7buBIIGKzZRPr0JA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vh+3UNk3mAnQcP/GdB4pqletpaH1U8Pcvdnb9Nx+o+yt3ZEqUM5Wjjq/NCOn1n3lc/rm2zXpnrf8dl/IuJjOzMKTjp3py8jUVosbTTRYZ3K7wjaWnzibwqJVCb41Rya00f91b2Fg0esW1iu1W/MW6XmB3Dsax1G108aYH/aNVTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QImrcImS; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="RKirm/xx"
-Received: from [10.137.106.151] (unknown [131.107.174.23])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 22ACA20B7165;
-	Thu,  8 Aug 2024 15:38:40 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 22ACA20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1723156720;
-	bh=yEDlBFY+f+khsxqRPGWjYMySWcnVDqiEKYWuZNRMm9g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RKirm/xxB+ARGZJYw79dlEwDWLHR2so6XHtk72RPoVvV7/Zik6Uqnl/w80Pes/b/Z
-	 jG8NWAe3CMJ0PE+1yx2+2jTFAivLABFSh21NLcwLtJAfsClg3scru+2FPmG7MNT0U/
-	 h86mIqeha/XcUfsC/XV7AnDTA+4R6bBy99vmeg48=
-Message-ID: <9dc30ca6-486c-4fa9-910d-ed1dc6da0e95@linux.microsoft.com>
-Date: Thu, 8 Aug 2024 15:38:39 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QImrcImS"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=PkaypJxHIExuieGjiWVM2I2C08w1opLrrrOI0ovrnyc=; b=QImrcImSdFqksIR6LD9pVFLcEB
+	IVwGVze8l2mkkLsV7lgOij2KRqI6pJinhqOc3dHnFGvudDgyagySgr9gB3G7ql/ir7ritwTLxNbkE
+	HuokL306SBnhbiNFI5YdiTxJALtc617ppvZDx9HVwGfxHVd910AtBDGUXX1yPBrhXXZp1QjcaTrpq
+	t0eyD0ThISWY4vr+UfMtKdVC6XaiXzFSLSIbd4VGJeil3uAQTkgPNYPW2KXh2dpAssihl7HDoFa7L
+	VYEHIjNiHU/+6s1z04gTyt4vTg9Y0uvJLiV/DlZi282yGCBlhJQq6dTeRRKAr748StCu62iANQI8R
+	pyEwtt5g==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1scCAu-00000009gBL-0Br6;
+	Thu, 08 Aug 2024 23:04:04 +0000
+Date: Thu, 8 Aug 2024 16:04:03 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Pankaj Raghav <p.raghav@samsung.com>, kernel@pankajraghav.com
+Cc: axboe@kernel.dk, hch@lst.de, willy@infradead.org, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v8 0/5] block: add larger order folio instead of pages
+Message-ID: <ZrVO45fvpn4uVmFH@bombadil.infradead.org>
+References: <CGME20240711051521epcas5p348f2cd84a1a80577754929143255352b@epcas5p3.samsung.com>
+ <20240711050750.17792-1-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 12/20] dm verity: expose root hash digest and
- signature data to LSMs
-To: mpatocka@redhat.com
-Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
- linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- audit@vger.kernel.org, linux-kernel@vger.kernel.org,
- Paul Moore <paul@paul-moore.com>
-References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
- <1722665314-21156-13-git-send-email-wufan@linux.microsoft.com>
-Content-Language: en-US
-From: Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <1722665314-21156-13-git-send-email-wufan@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240711050750.17792-1-kundan.kumar@samsung.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-Hi Mikulas,
+On Thu, Jul 11, 2024 at 10:37:45AM +0530, Kundan Kumar wrote:
+> User space memory is mapped in kernel in form of pages array. These pages
+> are iterated and added to BIO. In process, pages are also checked for
+> contiguity and merged.
+> 
+> When mTHP is enabled the pages generally belong to larger order folio. This
+> patch series enables adding large folio to bio. It fetches folio for
+> page in the page array. The page might start from an offset in the folio
+> which could be multiples of PAGE_SIZE. Subsequent pages in page array
+> might belong to same folio. Using the length of folio, folio_offset and
+> remaining size, determine length in folio which can be added to the bio.
+> Check if pages are contiguous and belong to same folio. If yes then skip
+> further processing for the contiguous pages.
+> 
+> This complete scheme reduces the overhead of iterating through pages.
+> 
+> perf diff before and after this change(with mTHP enabled):
+> 
+> Perf diff for write I/O with 128K block size:
+>     1.24%     -0.20%  [kernel.kallsyms]  [k] bio_iov_iter_get_pages
+>     1.71%             [kernel.kallsyms]  [k] bvec_try_merge_page
+> Perf diff for read I/O with 128K block size:
+>     4.03%     -1.59%  [kernel.kallsyms]  [k] bio_iov_iter_get_pages
+>     5.14%             [kernel.kallsyms]  [k] bvec_try_merge_page
 
-I hope you’re doing well. I wanted to thank you again for your thorough 
-review for the last version. I’ve since made some minor updates for this 
-version, including adding more comments and refactoring the way the hash 
-algorithm name is obtained due to recent changes in dm-verity.
+This is not just about mTHP uses though, this can also affect buffered IO and
+direct IO patterns as well and this needs to be considered and tested as well.
 
-Would you mind if we keep the Review-by tag on the latest version since 
-the changes are minor? Your feedback is greatly valued, and I’d 
-appreciate it if you could take a quick look when you have a moment.
+I've given this a spin on top of of the LBS patches [0] and used the LBS
+patches as a baseline. The good news is I see a considerable amount of
+larger IOs for buffered IO and direct IO, however for buffered IO there
+is an increase on unalignenment to the target filesystem block size and
+that can affect performance.
 
--Fan
+You can test this with Daniel Gomez's blkalgn tool for IO introspection:
 
-On 8/2/2024 11:08 PM, Fan Wu wrote:
-> From: Deven Bowers <deven.desai@linux.microsoft.com>
-> 
-> dm-verity provides a strong guarantee of a block device's integrity. As
-> a generic way to check the integrity of a block device, it provides
-> those integrity guarantees to its higher layers, including the filesystem
-> level.
-> 
-> However, critical security metadata like the dm-verity roothash and its
-> signing information are not easily accessible to the LSMs.
-> To address this limitation, this patch introduces a mechanism to store
-> and manage these essential security details within a newly added LSM blob
-> in the block_device structure.
-> 
-> This addition allows LSMs to make access control decisions on the integrity
-> data stored within the block_device, enabling more flexible security
-> policies. For instance, LSMs can now revoke access to dm-verity devices
-> based on their roothashes, ensuring that only authorized and verified
-> content is accessible. Additionally, LSMs can enforce policies to only
-> allow files from dm-verity devices that have a valid digital signature to
-> execute, effectively blocking any unsigned files from execution, thus
-> enhancing security against unauthorized modifications.
-> 
-> The patch includes new hook calls, `security_bdev_setintegrity()`, in
-> dm-verity to expose the dm-verity roothash and the roothash signature to
-> LSMs via preresume() callback. By using the preresume() callback, it
-> ensures that the security metadata is consistently in sync with the
-> metadata of the dm-verity target in the current active mapping table.
-> The hook calls are depended on CONFIG_SECURITY.
-> 
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> ---
-...
-> 
-> v20:
->    + Adding more documentation regarding the new setintegrity hook call
->    + Update the code for getting hash algorithm from either v->ahash_tfm
->      or v->shash_tfm
-> ---
->   drivers/md/dm-verity-target.c | 118 ++++++++++++++++++++++++++++++++++
->   drivers/md/dm-verity.h        |   6 ++
->   include/linux/security.h      |   9 ++-
->   3 files changed, 132 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-> index cf659c8feb29..24ba9a10444c 100644
-> --- a/drivers/md/dm-verity-target.c
-> +++ b/drivers/md/dm-verity-target.c
-> @@ -22,6 +22,7 @@
->   #include <linux/scatterlist.h>
->   #include <linux/string.h>
->   #include <linux/jump_label.h>
-> +#include <linux/security.h>
->   
->   #define DM_MSG_PREFIX			"verity"
->   
-> @@ -930,6 +931,41 @@ static void verity_io_hints(struct dm_target *ti, struct queue_limits *limits)
->   	limits->dma_alignment = limits->logical_block_size - 1;
->   }
->   
-> +#ifdef CONFIG_SECURITY
-> +
-> +static int verity_init_sig(struct dm_verity *v, const void *sig,
-> +			   size_t sig_size)
-> +{
-> +	v->sig_size = sig_size;
-> +
-> +	if (sig) {
-> +		v->root_digest_sig = kmemdup(sig, v->sig_size, GFP_KERNEL);
-> +		if (!v->root_digest_sig)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void verity_free_sig(struct dm_verity *v)
-> +{
-> +	kfree(v->root_digest_sig);
-> +}
-> +
-> +#else
-> +
-> +static inline int verity_init_sig(struct dm_verity *v, const void *sig,
-> +				  size_t sig_size)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline void verity_free_sig(struct dm_verity *v)
-> +{
-> +}
-> +
-> +#endif /* CONFIG_SECURITY */
-> +
->   static void verity_dtr(struct dm_target *ti)
->   {
->   	struct dm_verity *v = ti->private;
-> @@ -949,6 +985,7 @@ static void verity_dtr(struct dm_target *ti)
->   	kfree(v->initial_hashstate);
->   	kfree(v->root_digest);
->   	kfree(v->zero_digest);
-> +	verity_free_sig(v);
->   
->   	if (v->ahash_tfm) {
->   		static_branch_dec(&ahash_enabled);
-> @@ -1418,6 +1455,13 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->   		ti->error = "Root hash verification failed";
->   		goto bad;
->   	}
-> +
-> +	r = verity_init_sig(v, verify_args.sig, verify_args.sig_size);
-> +	if (r < 0) {
-> +		ti->error = "Cannot allocate root digest signature";
-> +		goto bad;
-> +	}
-> +
->   	v->hash_per_block_bits =
->   		__fls((1 << v->hash_dev_block_bits) / v->digest_size);
->   
-> @@ -1559,8 +1603,79 @@ int dm_verity_get_root_digest(struct dm_target *ti, u8 **root_digest, unsigned i
->   	return 0;
->   }
->   
-> +#ifdef CONFIG_SECURITY
-> +
-> +#ifdef CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG
-> +
-> +static int verity_security_set_signature(struct block_device *bdev,
-> +					 struct dm_verity *v)
-> +{
-> +	/*
-> +	 * if the dm-verity target is unsigned, v->root_digest_sig will
-> +	 * be NULL, and the hook call is still required to let LSMs mark
-> +	 * the device as unsigned. This information is crucial for LSMs to
-> +	 * block operations such as execution on unsigned files
-> +	 */
-> +	return security_bdev_setintegrity(bdev,
-> +					  LSM_INT_DMVERITY_SIG_VALID,
-> +					  v->root_digest_sig,
-> +					  v->sig_size);
-> +}
-> +
-> +#else
-> +
-> +static inline int verity_security_set_signature(struct block_device *bdev,
-> +						struct dm_verity *v)
-> +{
-> +	return 0;
-> +}
-> +
-> +#endif /* CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG */
-> +
-> +/*
-> + * Expose verity target's root hash and signature data to LSMs before resume.
-> + *
-> + * Returns 0 on success, or -ENOMEM if the system is out of memory.
-> + */
-> +static int verity_preresume(struct dm_target *ti)
-> +{
-> +	struct block_device *bdev;
-> +	struct dm_verity_digest root_digest;
-> +	struct dm_verity *v;
-> +	int r;
-> +
-> +	v = ti->private;
-> +	bdev = dm_disk(dm_table_get_md(ti->table))->part0;
-> +	root_digest.digest = v->root_digest;
-> +	root_digest.digest_len = v->digest_size;
-> +	if (static_branch_unlikely(&ahash_enabled) && !v->shash_tfm)
-> +		root_digest.alg = crypto_ahash_alg_name(v->ahash_tfm);
-> +	else
-> +		root_digest.alg = crypto_shash_alg_name(v->shash_tfm);
-> +
-> +	r = security_bdev_setintegrity(bdev, LSM_INT_DMVERITY_ROOTHASH, &root_digest,
-> +				       sizeof(root_digest));
-> +	if (r)
-> +		return r;
-> +
-> +	r =  verity_security_set_signature(bdev, v);
-> +	if (r)
-> +		goto bad;
-> +
-> +	return 0;
-> +
-> +bad:
-> +
-> +	security_bdev_setintegrity(bdev, LSM_INT_DMVERITY_ROOTHASH, NULL, 0);
-> +
-> +	return r;
-> +}
-> +
-> +#endif /* CONFIG_SECURITY */
-> +
->   static struct target_type verity_target = {
->   	.name		= "verity",
-> +/* Note: the LSMs depend on the singleton and immutable features */
->   	.features	= DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
->   	.version	= {1, 10, 0},
->   	.module		= THIS_MODULE,
-> @@ -1571,6 +1686,9 @@ static struct target_type verity_target = {
->   	.prepare_ioctl	= verity_prepare_ioctl,
->   	.iterate_devices = verity_iterate_devices,
->   	.io_hints	= verity_io_hints,
-> +#ifdef CONFIG_SECURITY
-> +	.preresume	= verity_preresume,
-> +#endif /* CONFIG_SECURITY */
->   };
->   module_dm(verity);
->   
-> diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-> index aac3a1b1d94a..ea2da450f173 100644
-> --- a/drivers/md/dm-verity.h
-> +++ b/drivers/md/dm-verity.h
-> @@ -45,6 +45,9 @@ struct dm_verity {
->   	u8 *salt;		/* salt: its size is salt_size */
->   	u8 *initial_hashstate;	/* salted initial state, if shash_tfm is set */
->   	u8 *zero_digest;	/* digest for a zero block */
-> +#ifdef CONFIG_SECURITY
-> +	u8 *root_digest_sig;	/* signature of the root digest */
-> +#endif /* CONFIG_SECURITY */
->   	unsigned int salt_size;
->   	sector_t data_start;	/* data offset in 512-byte sectors */
->   	sector_t hash_start;	/* hash start in blocks */
-> @@ -58,6 +61,9 @@ struct dm_verity {
->   	bool hash_failed:1;	/* set if hash of any block failed */
->   	bool use_bh_wq:1;	/* try to verify in BH wq before normal work-queue */
->   	unsigned int digest_size;	/* digest size for the current hash algorithm */
-> +#ifdef CONFIG_SECURITY
-> +	unsigned int sig_size;	/* root digest signature size */
-> +#endif /* CONFIG_SECURITY */
->   	unsigned int hash_reqsize; /* the size of temporary space for crypto */
->   	enum verity_mode mode;	/* mode for handling verification errors */
->   	unsigned int corrupted_errs;/* Number of errors for corrupted blocks */
-> diff --git a/include/linux/security.h b/include/linux/security.h
-> index 39aec1c96d6a..0604893f2f9e 100644
-> --- a/include/linux/security.h
-> +++ b/include/linux/security.h
-> @@ -83,8 +83,15 @@ enum lsm_event {
->   	LSM_POLICY_CHANGE,
->   };
->   
-> +struct dm_verity_digest {
-> +	const char *alg;
-> +	const u8 *digest;
-> +	size_t digest_len;
-> +};
-> +
->   enum lsm_integrity_type {
-> -	__LSM_INT_MAX
-> +	LSM_INT_DMVERITY_SIG_VALID,
-> +	LSM_INT_DMVERITY_ROOTHASH,
->   };
->   
->   /*
+wget https://raw.githubusercontent.com/dkruces/bcc/lbs/tools/blkalgn.py
+mv blkalgn.py /usr/local/bin/
+apt-get install python3-bpfcc
+
+And so let's try to make things "bad" by forcing a million of small 4k files
+on a 64k block size fileystem, we see an increase in alignment by a
+factor of about 2133:
+
+fio -name=1k-files-per-thread --nrfiles=1000 -direct=0 -bs=512 \
+	-ioengine=io_uring --group_reporting=1 \
+	--alloc-size=2097152 --filesize=4KiB --readwrite=randwrite \
+	--fallocate=none --numjobs=1000 --create_on_open=1 --directory=$DIR
+
+# Force any pending IO from the page cache
+umount /xfs-64k/
+
+You can use blkalgn with something like this:
+
+The left hand side are order, so for example we see only six 4k IOs
+aligned to 4k with the baseline of just LBS on top of next-20240723.
+However with these patches that increases to 11 4k IOs, but 23,468 IOs
+are aligned to 4k.
+
+mkfs.xfs -f -b size=64k /dev/nvme0n1
+blkalgn -d nvme0n1 --ops Write --json-output 64k-next-20240723.json
+
+# Hit CTRL-C after you umount above.
+
+cat 64k-next-20240723.json
+{
+    "Block size": {
+        "13": 1,
+        "12": 6,
+        "18": 244899,
+        "16": 5236751,
+        "17": 13088
+    },
+    "Algn size": {
+        "18": 244899,
+        "12": 6,
+        "17": 9793,
+        "13": 1,
+        "16": 5240047
+    }
+}
+
+And with this series say 64k-next-20240723-block-folios.json
+
+{
+    "Block size": {
+        "16": 1018244,
+        "9": 7,
+        "17": 507163,
+        "13": 16,
+        "10": 4,
+        "15": 51671,
+        "12": 11,
+        "14": 43,
+        "11": 5
+    },
+    "Algn size": {
+        "15": 6651,
+        "16": 1018244,
+        "13": 17620,
+        "12": 23468,
+        "17": 507163,
+        "14": 4018
+    }
+}
+
+When using direct IO, since applications typically do the right thing,
+I see only improvements. And so this needs a bit more testing and
+evaluation for impact on alignment for buffered IO.
+
+[0] https://github.com/linux-kdevops/linux/tree/large-block-folio-for-next
+
+  Luis
