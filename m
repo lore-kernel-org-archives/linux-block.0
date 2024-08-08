@@ -1,78 +1,89 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0AC189BA0;
-	Thu,  8 Aug 2024 09:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131FA189F33;
+	Thu,  8 Aug 2024 10:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723107803; cv=none; b=kmu5dC9kfAW15BJ6Jn1fHOT5aNsuT0+2qQHVB5hm4t7NcZxH3IMf/teau/a2YH2SEjaodWMJo6JKQtWTEmF0TuOuX7Fhc4vChu16duy/G1c3K8318BJFD0WF/+4gy2V2viW9K4YpuuJ9CJlmGiwDiz7QM776n/V/kGmKt4TgaF4=
+	t=1723111988; cv=none; b=SlHOkkdZPGM4/6yKnJ5yzllVZNBmAvdQrRA/p5JbYopnAgnWbAsME0AxcxNMcV7IS7uXbiDBT/Ct8jzjSIFeoNRxCLKAk+i69G3J/jATU28yGIu/7mgK7743JxqUJeo8BC2EdSK1dX+F7VzPui+jnH3ec03fQnEdYAjcfplOQ7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723107803; c=relaxed/simple;
-	bh=2ChP9h6uvmcLLnCbTjZZ0+YBvy42YPx8xhOigoYtrO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kpiDyN1b7cpbTgf8EC/PNGeyO165d43Q6DQCU2LkpR3/4ZG2x26uoeyE4rs0EWwfns16TuYCq0kUDl817ob1Fw0S1tt6tl6VfIUbCnxOyd4qArmQd2COmrWEq4eUk+PxrJFRywdQvCc11X3wwGX5OIpINPxCCppYJ0BuvNCpErQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VyArdnMf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cpHKDo6+; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1723111988; c=relaxed/simple;
+	bh=ouPA6ZrahlF54R4HPTBRnYcpfrAsj1xJHWagR7bwEPg=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=VAZJRUpyvW1PfRM7il8/yvwNnySGHIURmPNthGrOJb/HnLDYFj/zoHpm88xpN9/CQ3PejWS1jO7tjex8TAPc6TgLRC0V7WbChsJv2qStPJzb4hT3ArHexHfEWZgJmcDZXbJ3uJdCz566OQnfzLcQlP2jEtjs0jp20ly80pBVQJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=SSh4DpBT; arc=none smtp.client-ip=162.62.58.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VyArdnMf";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cpHKDo6+"
-Date: Thu, 8 Aug 2024 11:03:18 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1723107800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9/1t1xXO8srYRXGtZtBYUSTKE21fIlSAdIBoEh9+Jk4=;
-	b=VyArdnMfM6Ft0V5xk7epE8/UB0F3FKEMT70DZTJHylxo6VX/VTC5lxOw9lSlC83Mxz29Ni
-	zJuW2+rb11RlCdasd/K5mnC0j56mZNgamBhlrh3xjC8NA9xTCDrMr7jkGqDNO+yQ3y6iwz
-	EQoXnPxMxPaNKHY4OSFe6r7jKtWp9hg761ZJ6Fm7D5uKVJZ0DFtQKSraqk1zt0eRkzNuaD
-	P2or1FxPG/HxRESGM9BPiBJZTWo3sC0+czBwlXyb6SwPmsjEcaaaZF12UxDjnoID/rbJNm
-	2Nb2gj7ZBkxzv1iFZG49Vhvxcd1MTVnRurRxcwVIEgEgwCh7v44dgSyae7l7Lw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1723107800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9/1t1xXO8srYRXGtZtBYUSTKE21fIlSAdIBoEh9+Jk4=;
-	b=cpHKDo6+t2vQgs76o3VqWotu/aNi1haMWUtVYkgaX7EB1szHkh8YkjWZZITyff+gtx3jkc
-	1slHVbD2r/Jm6PDQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Mike Galbraith <umgwanakikbuti@gmail.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH v3 0/3] zram: Replace bit spinlocks with a spinlock_t.
-Message-ID: <20240808090318.OYWITKyu@linutronix.de>
-References: <20240705125058.1564001-1-bigeasy@linutronix.de>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="SSh4DpBT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1723111974; bh=mfUonZG/C+QDJMq8H/BlxiTC4EXPl9wK66ybZn66nho=;
+	h=From:To:Cc:Subject:Date;
+	b=SSh4DpBTmvsAan2sf0kQ2JglXirYEBMGu2GtOSde8tiwpNh0W/xnuf04q7/Q15+PA
+	 cFtVV52iyWdB6TeWLSHpiLmQbNE9YU80L5EftPm26ImFChTF92STWAb30fmKfV8ofL
+	 CMV2MdzUGTk7AIUdU5KOJfSZtAZe2BQzo3wa0suY=
+Received: from localhost.localdomain ([123.150.8.42])
+	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
+	id DB32546F; Thu, 08 Aug 2024 17:54:51 +0800
+X-QQ-mid: xmsmtpt1723110891tvw1l3xep
+Message-ID: <tencent_9A3345EA79C1EE9DC4464BB576C6A602A105@qq.com>
+X-QQ-XMAILINFO: MIAHdi1iQo+zW6xu5i8c99xvDD8u1RYFkfUoGob7cHiYe6CLAgMVTwiC/6ImLo
+	 VdVTh+YuWZ4RkoxTjANVW6Ab40A7jqAqZamUnu6TYQ3Y0QUQF4Vn8P2VZu1hN9n387G0zesJrFbi
+	 qpS8D8feVAT/4FzJlHEpN0ujM6K0XGdbexhcXgFB30ia5DspdKRO+ht55TTtMaCE6SqXolB6bgfg
+	 37THZsAj2xT8bShU/tCsAl5xpF9P4WLUUWol6K3JEwKNLvt5jJ2XAdcFiv8AOUX5Iysdf9SRz6VP
+	 XiARAib8dRY7KdJgvf2La39ixs8+LZhgzbleWi/UWjQFcg01TGqOdj6at8YiGzCwe5EiGtvKi9dN
+	 iYznpCqIJi+loBHl3GN10j0E0cErrYVap18rclMlrZKvbJnMxKrEOkaFA+x8/lc+jwAIQE9LiSD1
+	 fyRqdTy+MoCQ7qsrLB/Oru/JPQsWeBN6aL8AYEWMgF4CuVjBYpmq6e57PnRIjck57h1O9G1ThFc8
+	 1T379W1Bi6IZp82x2yAnwxVHpbsDkwWbXXTjeaij3tz1camucB8XGWaWwXTJK5hBiFDuDKoKW+uP
+	 3RUl6oB5iLJVoxZwIeNOjNuuH/b9CGwJP1I40nsl8GT0vv/Xu4MAjFer8ROxX5r5/GCEVmOMmJ8X
+	 AfP6UCLyNFnURYcMERFuOXh7kiQO5quqgJ33GDAwhE5p7z75ZecWOSHuz/HC+jB2aw8zvw/IdFWF
+	 a6KylLu2v5UG2lbsjvM8u2cWxZPCiQ2eT/kkY+n3yviALvDrsHSybA8f2Pv4kI03yWKxinmsdsJB
+	 haPqu0ty/nNIVT8g8GtZGYQJqYI5UEBpQsHej09ckj5qCiAHhAS/AueHvbQml3KLZnV6ER5XqD7c
+	 YwG+5NMdg61G8CvrFyzUEhShK21m5MDDbE2Sy1cH3uDkoIbfsx/7q8NASdnh13Gg==
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: 824731276@qq.com
+To: axboe@kernel.dk
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	baiguo@kylinos.cn
+Subject: [PATCH] block:added printing when bio->bi_status fails
+Date: Thu,  8 Aug 2024 17:54:48 +0800
+X-OQ-MSGID: <20240808095448.360239-1-824731276@qq.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240705125058.1564001-1-bigeasy@linutronix.de>
+Content-Transfer-Encoding: 8bit
 
-On 2024-07-05 14:49:13 [+0200], To linux-block@vger.kernel.org wrote:
-Hi,
+From: baiguo <baiguo@kylinos.cn>
 
-> this is follow up to the previous posting, making the lock
-> unconditionally. The original problem with bit spinlock is that it
-> disabled preemption and the following operations (within the atomic
-> section) perform operations that may sleep on PREEMPT_RT. Mike expressed
-> that he would like to keep using zram on PREEMPT_RT.
->=20
-> v2=E2=80=A6v3 https://lore.kernel.org/all/20240620153556.777272-1-bigeasy=
-@linutronix.de/
->   - Do "size_t index" within the for loop.
+    When ftrace is not enabled and bio is not OK,
+    the system cannot actively record which disk is abnormal.
+    Add a message record to bio_endio.
 
-Can this be applied, please? Or v2 ;)
+Signed-off-by: baiguo <baiguo@kylinos.cn>
+---
+ block/bio.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Sebastian
+diff --git a/block/bio.c b/block/bio.c
+index c4053d496..fb07589c8 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1617,6 +1617,11 @@ void bio_endio(struct bio *bio)
+ 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
+ 	}
+ 
++	if (bio->bi_status && bio->bi_bdev)
++		printk(KERN_ERR "bio: %s status is %d, disk[%d:%d]\n",\
++				__func__, bio->bi_status, bio->bi_bdev->bd_disk->major,\
++				bio->bi_bdev->bd_disk->first_minor);
++
+ 	/*
+ 	 * Need to have a real endio function for chained bios, otherwise
+ 	 * various corner cases will break (like stacking block devices that
+-- 
+2.33.0
+
