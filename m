@@ -1,96 +1,63 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C54168DC
-	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 15:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4518915A853
+	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 17:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723217702; cv=none; b=YPv5tZTteLO4dBvX21eXAP9voz5W8O6Aml3n6V708do+EVawz5a1FiE4NyWkgcelCp17kQgD/cbnAtAtD2qgxeMOF6zVoxysaXEPiTkiHi1v+CXogfRDbM/Os7WI0CCr6WHbTb1t3vZgBxbK36TbQS4SRNJmEm5S03cKPL2u3CA=
+	t=1723224684; cv=none; b=alX5kGIbcYoGwAZg6PQIXxN5FRr20g/XtZN5F6CofFBNx1j3zgccp3yLh1fPLp8rg1WgEJ+trhSEeFtQ1omnI86ZCN/6SGjXjEMXybqYT2xVopWVFxJXuIDfzyI4e/+nAg1d3CWn6lkilFMT5wVdw2qDfS1y50S5+K2r8VpF+Mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723217702; c=relaxed/simple;
-	bh=vU/48LIHdzatnXaFk6tIUtMI9cD5TMpV3hQrTpJeqbM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IsRMGCKe9MtvtKrwdrFcV3OBT6j2U0fAlT8QbGuZnpNVbk1agLUxiZwIW7KIvCSHB78n74J00B7yyM8l5cSnhE3KltTkZtdaLTrpEP06/1tmRUDm/azRx0l2GaekuioOZkdkViyZT8mDUai2VRIVMAdvu0vodg0WzJnQbqdew0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kessrLd8; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1723224684; c=relaxed/simple;
+	bh=STIyrd0dJ9eyVFYGdt+vwhxASgXRaVWpFJtNz//znmw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=d3f5ik7STUW15JCxg5UEdBv5km9GLXbo5Ku/B7u3oDxjPOrCs5oX7p3mFhh63TJMLZVvAcYauqaSYX8cNzCrLWJ8sC6fHxr6H31GLems3GqLZpi+hEuYquudoppVEWyw9pcg/nxtfMSpwKR9hJrxU2ujsAGVaTMiJqBMG9KqMzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npDHgaVl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kessrLd8"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3989f6acc90so1117315ab.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 08:34:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723217697; x=1723822497; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oId9STgLfdIGQ+LhZbW6hxg3skZFfi+5Ez0mg+R4Joc=;
-        b=kessrLd8YrFFikw1IFW7wJMou3wAUtuzxio2HpNQCwFgFea/Ulo4ujDqY6aAI9Z5/w
-         h5T3UlZaPpYL/5EtkqTT4k/lUa4cYOVA/v10pvIPpHbQF++BMc/FxJSfy6Eu3JzDVmH+
-         97xoI6ogorufHHA2pj6UEuo+8ADXQzBpDPHu0VPTVt7OxpldrzRi/FsIarXg5cjOMxhk
-         LdKr4tzfgmzDhAo9Dc8KEbrasX20KtiIIsgRqJAzcq82wV9vUcGuRGhSamqdkhVnKyax
-         vc73c54o0ZJwZ3qWSAVlGeit5G+AY46OT8EAiswK1FhkggzWDxViYpCXwb+8mHCuF5qV
-         jj2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723217697; x=1723822497;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oId9STgLfdIGQ+LhZbW6hxg3skZFfi+5Ez0mg+R4Joc=;
-        b=cSKjNwFquZnUIkkdwgyfoljR1eEfy66jlzllDC6eEbZrtYUlQI1/owmA8pJ6okZCJf
-         X5JeZe+jJqILxfP6QsOZC/N64WHdAntFiRAyzpH6Ahc1w3mRszK872gg3m2OM9aTmqNf
-         Z3yQYfghYntS69YdQGNNC7cZwlUVyiY9gCI+Bt8kjRq/RVSB1PKnOPWqEp6cAWllZ9Mq
-         phLDslWpe3njbWgPe+hWS+rymTqABLyhDwAykDTdy9zffzeE2u+j7F61ucQeAMYEzKsZ
-         eYDWj2kyl4Z7e6m5G64QwhGSpTOBONMmDuEBwaMJTnglQDoNxS4EX/Ogbx18V7orU5kG
-         +2Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuELJj6EQp7BfljZq9nMP1igxGjUHZ2K7uSjEQdkrEBjCE9N6WwM3vLONhScexkzmuFrXQm5b4iprhyl17YsmEQ8JhKl+439vveH0=
-X-Gm-Message-State: AOJu0YwLELwlhBIM9XbBn3EOu1WMaX4oR8zFqB5C9BgKgo25RicFaolE
-	ZCek3ZIZcsUYuCj7gYR/pR4d2s4VCgH3SlmcIp4TvHbGIIqTAckZkcf3kDqgZ4M=
-X-Google-Smtp-Source: AGHT+IFLRZmDl+ZxbjcJJ8qEWSq27UMzqEjFndcG5q43EFzp3g4B7kGjU8tgMo9TiYr31X2+hClk/A==
-X-Received: by 2002:a05:6e02:1d0b:b0:39a:ef62:4eb2 with SMTP id e9e14a558f8ab-39b8134a5eamr16121925ab.4.1723217696883;
-        Fri, 09 Aug 2024 08:34:56 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4c8d69878d2sm4188811173.26.2024.08.09.08.34.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Aug 2024 08:34:56 -0700 (PDT)
-Message-ID: <584a1774-0268-4b3c-9a78-0f00073b9d74@kernel.dk>
-Date: Fri, 9 Aug 2024 09:34:55 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npDHgaVl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C47EEC4AF09;
+	Fri,  9 Aug 2024 17:31:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723224683;
+	bh=STIyrd0dJ9eyVFYGdt+vwhxASgXRaVWpFJtNz//znmw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=npDHgaVl03cHJ+OGY5WGBzCUOXEy1n9i3HZIpKLPUmaFZMY+rz74huvCeggg1OLjK
+	 uKvbPZ6ki3qv1H2SlQkq+/ADIrp4hr+V6AIy+OIlM6ZsoD8DxK/RG2MLyCHK1z8Lde
+	 RuXqWxxEo/9zeRC0rnuAS49izfPphc7idNq8BxxkdkXMC5KTnACNIGuninjdY9rwfN
+	 nDJNYv9VjZv3jwwwh7H2FCblgPOqkSXU6SLkoZmQaecOPLc8uEfNqtd4z1x2R/C0YG
+	 hlLCXox+NwRgTGyL3J8fWehbsdo6KZXq25zNKBqbz4IFf/PJvpI/2wrWZVWBGN4A32
+	 cfwBRDbdAh/Uw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE00382333D;
+	Fri,  9 Aug 2024 17:31:23 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.11-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <4e41d24b-fff4-4ec6-b963-cc1b8fdf64a0@kernel.dk>
+References: <4e41d24b-fff4-4ec6-b963-cc1b8fdf64a0@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <4e41d24b-fff4-4ec6-b963-cc1b8fdf64a0@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.11-20240809
+X-PR-Tracked-Commit-Id: eded04fe3bdad9b11bc82b972b4c6fa79f1726ba
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b7768c4881d1b69bd95dad149d3b558c8e7de91a
+Message-Id: <172322468255.3855220.9475691496268784788.pr-tracker-bot@kernel.org>
+Date: Fri, 09 Aug 2024 17:31:22 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/3] nbd: correct the maximum value for discard sectors
-To: Wouter Verhelst <w@uter.be>, Josef Bacik <josef@toxicpanda.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- nbd@other.debian.org, linux-kernel@vger.kernel.org
-References: <20240803130432.5952-1-w@uter.be>
- <20240808070604.179799-1-w@uter.be> <20240808070604.179799-3-w@uter.be>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240808070604.179799-3-w@uter.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 8/8/24 1:06 AM, Wouter Verhelst wrote:
-> The version of the NBD protocol implemented by the kernel driver
-> currently has a 32 bit field for length values. As the NBD protocol uses
-> bytes as a unit of length, length values larger than 2^32 bytes cannot
-> be expressed.
-> 
-> Update the max_hw_discard_sectors field to match that.
-> 
-> Signed-off-by: Wouter Verhelst <w@uter.be>
-> Fixes: 268283244c0f018dec8bf4a9c69ce50684561f46
+The pull request you sent on Fri, 9 Aug 2024 09:00:13 -0600:
 
-This isn't the correct way to have a fixes line.
+> git://git.kernel.dk/linux.git tags/block-6.11-20240809
 
-In general, please don't nest next versions under the previous posting,
-and it's strongly recommended to have a cover letter that includes that
-changed from version N to N+1. Otherwise we have to guess... So please
-include that when posting v4.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b7768c4881d1b69bd95dad149d3b558c8e7de91a
+
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
