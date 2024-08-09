@@ -1,223 +1,96 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45836197543
-	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 15:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C54168DC
+	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 15:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723217074; cv=none; b=SwPvhmpOOFSIho4fYReTD9nTif3LoFaeS2PopuV9P5dPOg/qgJDoeH631W4TE2pcs1V9ofxY4gqOgjCVJRtxbZmSkJ+Tj09pIFInRW6OfYpMkUCqMCcl67Kyg09LWBrreh/wUXja3AINIBbbpddqeDw3PVWGG0MmQ7vOwSZALF0=
+	t=1723217702; cv=none; b=YPv5tZTteLO4dBvX21eXAP9voz5W8O6Aml3n6V708do+EVawz5a1FiE4NyWkgcelCp17kQgD/cbnAtAtD2qgxeMOF6zVoxysaXEPiTkiHi1v+CXogfRDbM/Os7WI0CCr6WHbTb1t3vZgBxbK36TbQS4SRNJmEm5S03cKPL2u3CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723217074; c=relaxed/simple;
-	bh=g2iDrSBzxfQonyXIKogSC1gkM1FpY3qwgPMDIgnkaXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LDdeFieriIp3LuRr/IqajvMwi+WD991u2lPBxiKdiTiHP5mIjJd3CGZcoqB1QcgM37lGngtmNfN0kDSnmrP+aqRgTVCgKw3Vr5XcgFM5ZT9wZy4QNDRRgTfi+qG8S3EIzQBDr0fOEv29vN9o15zYT+jSnxdZKYSga7HWofBvg50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f3j5EVXt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1723217702; c=relaxed/simple;
+	bh=vU/48LIHdzatnXaFk6tIUtMI9cD5TMpV3hQrTpJeqbM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IsRMGCKe9MtvtKrwdrFcV3OBT6j2U0fAlT8QbGuZnpNVbk1agLUxiZwIW7KIvCSHB78n74J00B7yyM8l5cSnhE3KltTkZtdaLTrpEP06/1tmRUDm/azRx0l2GaekuioOZkdkViyZT8mDUai2VRIVMAdvu0vodg0WzJnQbqdew0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kessrLd8; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3j5EVXt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723217072;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O0M5zXAWQyeF4Jzk4EMsV0bzXAk2k6LTOOLJMOg7+eQ=;
-	b=f3j5EVXtsPK7qvUfov2ChLkEzhCL5aa9F/7k/lPIeIb8Qf3qSEH6THs3cAYkLDXOY5qSFx
-	O9aXfvZJiVa8us45wgb2D2lt+WYuTLJyGMP+Bw/nXHBuWacW0qZaZVcVzhnpXifabXOt5H
-	jku0IDcxowq2esyxg6u+O5hV1PdUoDc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-185-uBgThbOOPc2IUzmiZF41Lw-1; Fri,
- 09 Aug 2024 11:24:29 -0400
-X-MC-Unique: uBgThbOOPc2IUzmiZF41Lw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50FBF1944CC9;
-	Fri,  9 Aug 2024 15:24:24 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.16])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D74043000199;
-	Fri,  9 Aug 2024 15:24:04 +0000 (UTC)
-Date: Fri, 9 Aug 2024 23:23:58 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	John Garry <john.g.garry@oracle.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Sumit Saxena <sumit.saxena@broadcom.com>,
-	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
-	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Jonathan Corbet <corbet@lwn.net>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Sridhar Balaraman <sbalaraman@parallelwireless.com>,
-	"brookxu.cn" <brookxu.cn@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
-	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
-	MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 15/15] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-Message-ID: <ZrY0jp7S0Xnk9VUw@fedora>
-References: <20240806-isolcpus-io-queues-v3-0-da0eecfeaf8b@suse.de>
- <20240806-isolcpus-io-queues-v3-15-da0eecfeaf8b@suse.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kessrLd8"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3989f6acc90so1117315ab.3
+        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 08:34:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723217697; x=1723822497; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oId9STgLfdIGQ+LhZbW6hxg3skZFfi+5Ez0mg+R4Joc=;
+        b=kessrLd8YrFFikw1IFW7wJMou3wAUtuzxio2HpNQCwFgFea/Ulo4ujDqY6aAI9Z5/w
+         h5T3UlZaPpYL/5EtkqTT4k/lUa4cYOVA/v10pvIPpHbQF++BMc/FxJSfy6Eu3JzDVmH+
+         97xoI6ogorufHHA2pj6UEuo+8ADXQzBpDPHu0VPTVt7OxpldrzRi/FsIarXg5cjOMxhk
+         LdKr4tzfgmzDhAo9Dc8KEbrasX20KtiIIsgRqJAzcq82wV9vUcGuRGhSamqdkhVnKyax
+         vc73c54o0ZJwZ3qWSAVlGeit5G+AY46OT8EAiswK1FhkggzWDxViYpCXwb+8mHCuF5qV
+         jj2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723217697; x=1723822497;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oId9STgLfdIGQ+LhZbW6hxg3skZFfi+5Ez0mg+R4Joc=;
+        b=cSKjNwFquZnUIkkdwgyfoljR1eEfy66jlzllDC6eEbZrtYUlQI1/owmA8pJ6okZCJf
+         X5JeZe+jJqILxfP6QsOZC/N64WHdAntFiRAyzpH6Ahc1w3mRszK872gg3m2OM9aTmqNf
+         Z3yQYfghYntS69YdQGNNC7cZwlUVyiY9gCI+Bt8kjRq/RVSB1PKnOPWqEp6cAWllZ9Mq
+         phLDslWpe3njbWgPe+hWS+rymTqABLyhDwAykDTdy9zffzeE2u+j7F61ucQeAMYEzKsZ
+         eYDWj2kyl4Z7e6m5G64QwhGSpTOBONMmDuEBwaMJTnglQDoNxS4EX/Ogbx18V7orU5kG
+         +2Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCWuELJj6EQp7BfljZq9nMP1igxGjUHZ2K7uSjEQdkrEBjCE9N6WwM3vLONhScexkzmuFrXQm5b4iprhyl17YsmEQ8JhKl+439vveH0=
+X-Gm-Message-State: AOJu0YwLELwlhBIM9XbBn3EOu1WMaX4oR8zFqB5C9BgKgo25RicFaolE
+	ZCek3ZIZcsUYuCj7gYR/pR4d2s4VCgH3SlmcIp4TvHbGIIqTAckZkcf3kDqgZ4M=
+X-Google-Smtp-Source: AGHT+IFLRZmDl+ZxbjcJJ8qEWSq27UMzqEjFndcG5q43EFzp3g4B7kGjU8tgMo9TiYr31X2+hClk/A==
+X-Received: by 2002:a05:6e02:1d0b:b0:39a:ef62:4eb2 with SMTP id e9e14a558f8ab-39b8134a5eamr16121925ab.4.1723217696883;
+        Fri, 09 Aug 2024 08:34:56 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4c8d69878d2sm4188811173.26.2024.08.09.08.34.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Aug 2024 08:34:56 -0700 (PDT)
+Message-ID: <584a1774-0268-4b3c-9a78-0f00073b9d74@kernel.dk>
+Date: Fri, 9 Aug 2024 09:34:55 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240806-isolcpus-io-queues-v3-15-da0eecfeaf8b@suse.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/3] nbd: correct the maximum value for discard sectors
+To: Wouter Verhelst <w@uter.be>, Josef Bacik <josef@toxicpanda.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ nbd@other.debian.org, linux-kernel@vger.kernel.org
+References: <20240803130432.5952-1-w@uter.be>
+ <20240808070604.179799-1-w@uter.be> <20240808070604.179799-3-w@uter.be>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240808070604.179799-3-w@uter.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 06, 2024 at 02:06:47PM +0200, Daniel Wagner wrote:
-> When isolcpus=io_queue is enabled all hardware queues should run on the
-> housekeeping CPUs only. Thus ignore the affinity mask provided by the
-> driver. Also we can't use blk_mq_map_queues because it will map all CPUs
-> to first hctx unless, the CPU is the same as the hctx has the affinity
-> set to, e.g. 8 CPUs with isolcpus=io_queue,2-3,6-7 config
+On 8/8/24 1:06 AM, Wouter Verhelst wrote:
+> The version of the NBD protocol implemented by the kernel driver
+> currently has a 32 bit field for length values. As the NBD protocol uses
+> bytes as a unit of length, length values larger than 2^32 bytes cannot
+> be expressed.
 > 
->   queue mapping for /dev/nvme0n1
->         hctx0: default 2 3 4 6 7
->         hctx1: default 5
->         hctx2: default 0
->         hctx3: default 1
+> Update the max_hw_discard_sectors field to match that.
 > 
->   PCI name is 00:05.0: nvme0n1
->         irq 57 affinity 0-1 effective 1 is_managed:0 nvme0q0
->         irq 58 affinity 4 effective 4 is_managed:1 nvme0q1
->         irq 59 affinity 5 effective 5 is_managed:1 nvme0q2
->         irq 60 affinity 0 effective 0 is_managed:1 nvme0q3
->         irq 61 affinity 1 effective 1 is_managed:1 nvme0q4
-> 
-> where as with blk_mq_hk_map_queues we get
-> 
->   queue mapping for /dev/nvme0n1
->         hctx0: default 2 4
->         hctx1: default 3 5
->         hctx2: default 0 6
->         hctx3: default 1 7
-> 
->   PCI name is 00:05.0: nvme0n1
->         irq 56 affinity 0-1 effective 1 is_managed:0 nvme0q0
->         irq 61 affinity 4 effective 4 is_managed:1 nvme0q1
->         irq 62 affinity 5 effective 5 is_managed:1 nvme0q2
->         irq 63 affinity 0 effective 0 is_managed:1 nvme0q3
->         irq 64 affinity 1 effective 1 is_managed:1 nvme0q4
-> 
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
->  block/blk-mq-cpumap.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 56 insertions(+)
-> 
-> diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-> index c1277763aeeb..7e026c2ffa02 100644
-> --- a/block/blk-mq-cpumap.c
-> +++ b/block/blk-mq-cpumap.c
-> @@ -60,11 +60,64 @@ unsigned int blk_mq_num_online_queues(unsigned int max_queues)
->  }
->  EXPORT_SYMBOL_GPL(blk_mq_num_online_queues);
->  
-> +static bool blk_mq_hk_map_queues(struct blk_mq_queue_map *qmap)
-> +{
-> +	struct cpumask *hk_masks;
-> +	cpumask_var_t isol_mask;
-> +
-> +	unsigned int queue, cpu;
-> +
-> +	if (!housekeeping_enabled(HK_TYPE_IO_QUEUE))
-> +		return false;
-> +
-> +	/* map housekeeping cpus to matching hardware context */
-> +	hk_masks = group_cpus_evenly(qmap->nr_queues);
-> +	if (!hk_masks)
-> +		goto fallback;
-> +
-> +	for (queue = 0; queue < qmap->nr_queues; queue++) {
-> +		for_each_cpu(cpu, &hk_masks[queue])
-> +			qmap->mq_map[cpu] = qmap->queue_offset + queue;
-> +	}
-> +
-> +	kfree(hk_masks);
-> +
-> +	/* map isolcpus to hardware context */
-> +	if (!alloc_cpumask_var(&isol_mask, GFP_KERNEL))
-> +		goto fallback;
-> +
-> +	queue = 0;
-> +	cpumask_andnot(isol_mask,
-> +		       cpu_possible_mask,
-> +		       housekeeping_cpumask(HK_TYPE_IO_QUEUE));
-> +
-> +	for_each_cpu(cpu, isol_mask) {
-> +		qmap->mq_map[cpu] = qmap->queue_offset + queue;
-> +		queue = (queue + 1) % qmap->nr_queues;
-> +	}
-> +
-> +	free_cpumask_var(isol_mask);
-> +
-> +	return true;
-> +
-> +fallback:
-> +	/* map all cpus to hardware context ignoring any affinity */
-> +	queue = 0;
-> +	for_each_possible_cpu(cpu) {
-> +		qmap->mq_map[cpu] = qmap->queue_offset + queue;
-> +		queue = (queue + 1) % qmap->nr_queues;
-> +	}
-> +	return true;
-> +}
-> +
->  void blk_mq_map_queues(struct blk_mq_queue_map *qmap)
->  {
->  	const struct cpumask *masks;
->  	unsigned int queue, cpu;
->  
-> +	if (blk_mq_hk_map_queues(qmap))
-> +		return;
-> +
->  	masks = group_cpus_evenly(qmap->nr_queues);
->  	if (!masks) {
->  		for_each_possible_cpu(cpu)
-> @@ -118,6 +171,9 @@ void blk_mq_dev_map_queues(struct blk_mq_queue_map *qmap,
->  	const struct cpumask *mask;
->  	unsigned int queue, cpu;
->  
-> +	if (blk_mq_hk_map_queues(qmap))
-> +		return;
-> +
->  	for (queue = 0; queue < qmap->nr_queues; queue++) {
->  		mask = get_queue_affinity(dev_data, dev_off, queue);
->  		if (!mask)
+> Signed-off-by: Wouter Verhelst <w@uter.be>
+> Fixes: 268283244c0f018dec8bf4a9c69ce50684561f46
 
-From above implementation, "isolcpus=io_queue" is actually just one
-optimization on "isolcpus=managed_irq", and there isn't essential
-difference between the two.
+This isn't the correct way to have a fixes line.
 
-And I'd suggest to optimize 'isolcpus=managed_irq' directly, such as:
+In general, please don't nest next versions under the previous posting,
+and it's strongly recommended to have a cover letter that includes that
+changed from version N to N+1. Otherwise we have to guess... So please
+include that when posting v4.
 
-- reduce nr_queues or numgrps for group_cpus_evenly() according to
-house-keeping cpu mask
-
-- spread house-keeping & isolate cpu mask evenly on each queue, and
-you can use the existed two-stage spread for doing that
-
-
-thanks,
-Ming
+-- 
+Jens Axboe
 
