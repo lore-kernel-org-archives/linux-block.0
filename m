@@ -1,117 +1,243 @@
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB17E197549
-	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 13:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10613197A8F
+	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 14:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723211648; cv=none; b=dXRbXarC9iHltKpLZ+7lBkKxzIpofPAwK5eb8tUYqumL0lTEvMSBBAQYoQiL6JCyTNEZdcmcnPZZ3L9wGgWubCwBtmI143QJuQ4nxia9o6eRFEr2AnGPNNT39BwPx10WnNtgFK5NxNMJ37Io3uPBubAQsIDpscDCYwsV924uT24=
+	t=1723215236; cv=none; b=E5/yJ2x7LrYQi8w/+NpfbTJKep9GcFaTJ1MIT+p9Ro62Qm5UiD3IMJ/am6exxnCgZjBcfCu42wp0Zbx6EWhuEDl4jLW+rxV98n86G/QFvmPL5Rz/3RO4Zsqt0W/hOjfT1mLOX2pNnMcGVhx532ytdw/Rgk5PG4Xhr48J4dzf3dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723211648; c=relaxed/simple;
-	bh=wb2H8LXCtQm3rmPQGZqDqB+UQaTy7Plk58G3H8COpcM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iGX/qmpg+KaEyPDhJb4IdfmLEmRCp8kWTS3Sx6wF4s/iN8UQbhuOe7/V7GqP0QIPKJQ6zChJBo4JKJI5hE2sCySmPtfOhhHL/EH6RBA1563G3KUQaGPoXKEnv1OrvDBcfncvUj/o3YpoicxiQ6rf2PvNqM4GTfojXTSkiFAdYR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=cHAQNle3; arc=none smtp.client-ip=209.85.221.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	s=arc-20240116; t=1723215236; c=relaxed/simple;
+	bh=GSzMuwNbO0R/haLtymCCrn2VcacmkVi1sA+7fw+Ikp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ge9kvD4Rn3ZRI6X29bp/3WBc4dLilo/81xgPDtzPN6ODlnZ6VB3X2spfjcFbZaK1tq3WEWzufXXy9aIL8BLeBqjxTtTgB18CBF4rV7RiVyTW/aD5lQArGsED4SRz9xMPTwO+ySqlrucWIWggyHgKyG4bMAaGBIFNo7wen5QeEzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dEL1kvmI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="cHAQNle3"
-Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-369c609d0c7so1583620f8f.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 06:54:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1723211644; x=1723816444; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RG/tP5hyJj5FvmvIHghD0+xuIqwyjsENrdzSDblOPb0=;
-        b=cHAQNle3BOhJ22WLXWM7WDrWxnZ0FmN6mCu/KgX4F7id36saqBhA3ezvJBzTuOiJsF
-         nTT0QYWYUCxSveGeMFAwAXq+T1T00aqeg90/ItpzYhH4wtqY7RyJlJMUN10ZHw+qu+rF
-         vXVwVWzZbrYkIBXmbVX1qykbvGCdkUhyvMsXZphI4pwVsxjupjCL+e7Ddx3vtOdGQGaD
-         LdK/4SkpqyLhdpMPmwzsQImDxllgQcnZdQqH8ilsaem0o19+6kyX8bRmCHCWRKJ4cMXF
-         H1CziUUQzeuHgPaKATgQlF234aMBv08X60UhzHbeRAaa1cm6FqvnhjdYoGKf5e8SAuKA
-         4Uwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723211644; x=1723816444;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RG/tP5hyJj5FvmvIHghD0+xuIqwyjsENrdzSDblOPb0=;
-        b=hVMaH5sgc8SPGAp6zLvq9Dg2AfGmyNuy+nGeIxiZY4OLyOfkJ6ZgSCqUuyWeVaw+rC
-         wSkFzZGnKUU1Kh5ek5HCQMlPYZHcGq0h6wXiPb8xMVUuT/ZjF3BAFgt4vKIHX09LSBh5
-         C7DHX8iN0+vMSFnKvRRIKtkTaQIHfXhzJTj3+FTSpfx4NreGvZA1GeRWMQFvT4/toAuD
-         LMkoOjl01M0EzAaF5CKwMOtu1fzERpaYHjf2cIegJqHD8+MkuylCoOJwI+83Ec/nNai2
-         1oWBtAug0XVtZPMQAoK7e4cbWeYMUQRor2tor37lH3ECdWDyLQXIlCUtrz//y+hyyaHN
-         mvDA==
-X-Gm-Message-State: AOJu0YwpjpUKdUEpvN7Z4Ui5GYvqIZMSePw+ZLKG56DPx8zwR3+j76Cd
-	UVC2/DLpGaRdV1zZwwQYrDo4g8eo4JfbhtwUr+KQq+ON7kRPpdHLvXenN17usVq3SlRyiOXQW3r
-	a+P3s9Q==
-X-Google-Smtp-Source: AGHT+IFxz7+Egi9wV3uhJxmSJ8JXmfyhJP2NnCIYuUZe8/iz+EIhUggFlAV0w2mW2wyuE1KbiXSKzg==
-X-Received: by 2002:adf:b189:0:b0:368:7f53:6b57 with SMTP id ffacd0b85a97d-36d5e1c73efmr1287525f8f.18.1723211643905;
-        Fri, 09 Aug 2024 06:54:03 -0700 (PDT)
-Received: from lb01533.fkb.profitbricks.net ([212.227.34.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d2716c93csm5406588f8f.29.2024.08.09.06.54.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 06:54:03 -0700 (PDT)
-From: Md Haris Iqbal <haris.iqbal@ionos.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	hch@infradead.org,
-	sagi@grimberg.me,
-	bvanassche@acm.org,
-	haris.iqbal@ionos.com,
-	jinpu.wang@ionos.com,
-	Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
-Subject: [PATCH for-next] block/rnbd-srv: Add sanity check and remove redundant assignment
-Date: Fri,  9 Aug 2024 15:53:46 +0200
-Message-Id: <20240809135346.978320-1-haris.iqbal@ionos.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dEL1kvmI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723215234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S3hmYgUok+ozXUThpLpe+47uXAQDhVMRnl+vdYpiArY=;
+	b=dEL1kvmI80s436Tr4fmzTpScvPelGrHOCsXQWCd0u5ziwz1vGGWl/pBdfk+cBBV1CLXzVw
+	1ZvEkg+XUBxGjvPlkrLAiE2HxwSLeaeEYd+eiRbzB0FB2riG3KpQcZXW/uqmOOmf9gLplV
+	huzJeRdBUhJlmXXfwuQ+XppE4ZUdUsw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-112-tLJEm6q_PmKvEMMDC9bkdg-1; Fri,
+ 09 Aug 2024 10:53:47 -0400
+X-MC-Unique: tLJEm6q_PmKvEMMDC9bkdg-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B25119560A2;
+	Fri,  9 Aug 2024 14:53:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.16])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0EEFF19560AA;
+	Fri,  9 Aug 2024 14:53:22 +0000 (UTC)
+Date: Fri, 9 Aug 2024 22:53:16 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Daniel Wagner <dwagner@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Jonathan Corbet <corbet@lwn.net>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
+	Sridhar Balaraman <sbalaraman@parallelwireless.com>,
+	"brookxu.cn" <brookxu.cn@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
+	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+	MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v3 15/15] blk-mq: use hk cpus only when isolcpus=io_queue
+ is enabled
+Message-ID: <ZrYtXDrdPjn48r6k@fedora>
+References: <20240806-isolcpus-io-queues-v3-0-da0eecfeaf8b@suse.de>
+ <20240806-isolcpus-io-queues-v3-15-da0eecfeaf8b@suse.de>
+ <ZrI5TcaAU82avPZn@fedora>
+ <253ec223-98e1-4e7e-b138-0a83ea1a7b0e@flourine.local>
+ <ZrRXEUko5EwKJaaP@fedora>
+ <856091db-431f-48f5-9daa-38c292a6bbd2@flourine.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <856091db-431f-48f5-9daa-38c292a6bbd2@flourine.local>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-The bio->bi_iter.bi_size is updated when bio_add_page() is called. So we
-do not need to assign msg->bi_size again to it, since its redudant and
-can also be harmful. Instead we can use it to add a sanity check, which
-checks the locally calculated bi_size, with the one sent in msg.
+On Fri, Aug 09, 2024 at 09:22:11AM +0200, Daniel Wagner wrote:
+> On Thu, Aug 08, 2024 at 01:26:41PM GMT, Ming Lei wrote:
+> > Isolated CPUs are removed from queue mapping in this patchset, when someone
+> > submit IOs from the isolated CPU, what is the correct hctx used for handling
+> > these IOs?
+> 
+> No, every possible CPU gets a mapping. What this patch series does, is
+> to limit/aligns the number of hardware context to the number of
+> housekeeping CPUs. There is still a complete ctx-hctc mapping. So
 
-Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
-Signed-off-by: Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
----
- drivers/block/rnbd/rnbd-srv.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+OK, then I guess patch 1~7 aren't supposed to belong to this series,
+cause you just want to reduce nr_hw_queues, meantime spread
+house-keeping CPUs first for avoiding queues with all isolated cpu mask.
 
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index f6e3a3c4b76c..08ce6d96d04c 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -149,15 +149,22 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
- 			rnbd_to_bio_flags(le32_to_cpu(msg->rw)), GFP_KERNEL);
- 	if (bio_add_page(bio, virt_to_page(data), datalen,
- 			offset_in_page(data)) != datalen) {
--		rnbd_srv_err(sess_dev, "Failed to map data to bio\n");
-+		rnbd_srv_err_rl(sess_dev, "Failed to map data to bio\n");
- 		err = -EINVAL;
- 		goto bio_put;
- 	}
+> whenever an user thread on an isolated CPU is issuing an IO a
+> housekeeping CPU will also be involved (with the additional overhead,
+> which seems to be okay for these users).
+> 
+> Without hardware queue on the isolated CPUs ensures we really never get
+> any unexpected IO on those CPUs unless userspace does it own its own.
+> It's a safety net.
+> 
+> Just to illustrate it, the non isolcpus configuration (default) map
+> for an 8 CPU setup:
+> 
+> queue mapping for /dev/vda
+>         hctx0: default 0
+>         hctx1: default 1
+>         hctx2: default 2
+>         hctx3: default 3
+>         hctx4: default 4
+>         hctx5: default 5
+>         hctx6: default 6
+>         hctx7: default 7
+> 
+> and with isolcpus=io_queue,2-3,6-7
+> 
+> queue mapping for /dev/vda
+>         hctx0: default 0 2
+>         hctx1: default 1 3
+>         hctx2: default 4 6
+>         hctx3: default 5 7
+
+OK, Looks I missed the point in patch 15 in which you added isolated cpu
+into mapping manually, just wondering why not take the current two-stage
+policy to cover both house-keeping and isolated CPUs in group_cpus_evenly()?
+
+Such as spread house-keeping CPUs first, then isolated CPUs, just like
+what we did for present & non-present cpus.
+
+Then the whole patchset can be simplified a lot.
+
+> 
+> > From current implementation, it depends on implied zero filled
+> > tag_set->map[type].mq_map[isolated_cpu], so hctx 0 is used.
+> > 
+> > During CPU offline, in blk_mq_hctx_notify_offline(),
+> > blk_mq_hctx_has_online_cpu() returns true even though the last cpu in
+> > hctx 0 is offline because isolated cpus join hctx 0 unexpectedly, so IOs in
+> > hctx 0 won't be drained.
+> > 
+> > However managed irq core code still shutdowns the hw queue's irq because all
+> > CPUs in this hctx are offline now. Then IO hang is triggered, isn't
+> > it?
+> 
+> Thanks for the explanation. I was able to reproduce this scenario, that
+> is a hardware context with two CPUs which go offline. Initially, I used
+> fio for creating the workload but this never hit the hanger. Instead
+> some background workload from systemd-journald is pretty reliable to
+> trigger the hanger you describe.
+> 
+> Example:
+> 
+>   hctx2: default 4 6
+> 
+> CPU 0 stays online, CPU 1-5 are offline. CPU 6 is offlined:
+> 
+>   smpboot: CPU 5 is now offline
+>   blk_mq_hctx_has_online_cpu:3537 hctx3 offline
+>   blk_mq_hctx_has_online_cpu:3537 hctx2 offline
+> 
+> and there is no forward progress anymore, the cpuhotplug state machine
+> is blocked and an IO is hanging:
+> 
+>   # grep busy /sys/kernel/debug/block/*/hctx*/tags | grep -v busy=0
+>   /sys/kernel/debug/block/vda/hctx2/tags:busy=61
+> 
+> and blk_mq_hctx_notify_offline busy loops forever:
+> 
+>    task:cpuhp/6         state:D stack:0     pid:439   tgid:439   ppid:2      flags:0x00004000
+>    Call Trace:
+>     <TASK>
+>     __schedule+0x79d/0x15c0
+>     ? lockdep_hardirqs_on_prepare+0x152/0x210
+>     ? kvm_sched_clock_read+0xd/0x20
+>     ? local_clock_noinstr+0x28/0xb0
+>     ? local_clock+0x11/0x30
+>     ? lock_release+0x122/0x4a0
+>     schedule+0x3d/0xb0
+>     schedule_timeout+0x88/0xf0
+>     ? __pfx_process_timeout+0x10/0x10d
+>     msleep+0x28/0x40
+>     blk_mq_hctx_notify_offline+0x1b5/0x200
+>     ? cpuhp_thread_fun+0x41/0x1f0
+>     cpuhp_invoke_callback+0x27e/0x780
+>     ? __pfx_blk_mq_hctx_notify_offline+0x10/0x10
+>     ? cpuhp_thread_fun+0x42/0x1f0
+>     cpuhp_thread_fun+0x178/0x1f0
+>     smpboot_thread_fn+0x12e/0x1c0
+>     ? __pfx_smpboot_thread_fn+0x10/0x10
+>     kthread+0xe8/0x110
+>     ? __pfx_kthread+0x10/0x10
+>     ret_from_fork+0x33/0x40
+>     ? __pfx_kthread+0x10/0x10
+>     ret_from_fork_asm+0x1a/0x30
+>     </TASK>
+> 
+> I don't think this is a new problem this code introduces. This problem
+> exists for any hardware context which has more than one CPU. As far I
+> understand it, the problem is that there is no forward progress possible
+> for the IO itself (I assume the corresponding resources for the CPU
+
+When blk_mq_hctx_notify_offline() is running, the current CPU isn't
+offline yet, and the hctx is active, same with the managed irq, so it is fine
+to wait until all in-flight IOs originated from this hctx completed there.
+
+The reason is why these requests can't be completed? And the forward
+progress is provided by blk-mq. And these requests are very likely
+allocated & submitted from CPU6.
+
+Can you figure out what is effective mask for irq of hctx2?  It is
+supposed to be cpu6. And block debugfs for vda should provide helpful
+hint.
+
+> going offline have already been shutdown, thus no progress?) and
+> blk_mq_hctx_notifiy_offline isn't doing anything in this scenario.
+
+RH has internal cpu hotplug stress test, but not see such report so far.
+
+I will try to setup such kind of setting and see if it can be
+reproduced.
+
+> 
+> Couldn't we do something like:
+
+I usually won't thinking about any solution until root-cause is figured
+out, :-)
  
-+	bio->bi_opf = rnbd_to_bio_flags(le32_to_cpu(msg->rw));
-+	if (bio_has_data(bio) &&
-+	    bio->bi_iter.bi_size != le32_to_cpu(msg->bi_size)) {
-+		rnbd_srv_err_rl(sess_dev, "Datalen mismatch:  bio bi_size (%u), bi_size (%u)\n",
-+				bio->bi_iter.bi_size, msg->bi_size);
-+		err = -EINVAL;
-+		goto bio_put;
-+	}
- 	bio->bi_end_io = rnbd_dev_bi_end_io;
- 	bio->bi_private = priv;
- 	bio->bi_iter.bi_sector = le64_to_cpu(msg->sector);
--	bio->bi_iter.bi_size = le32_to_cpu(msg->bi_size);
- 	prio = srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
- 	       usrlen < sizeof(*msg) ? 0 : le16_to_cpu(msg->prio);
- 	bio_set_prio(bio, prio);
--- 
-2.25.1
+
+Thanks, 
+Ming
 
