@@ -1,243 +1,112 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10613197A8F
-	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 14:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49AFA19306F
+	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 15:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723215236; cv=none; b=E5/yJ2x7LrYQi8w/+NpfbTJKep9GcFaTJ1MIT+p9Ro62Qm5UiD3IMJ/am6exxnCgZjBcfCu42wp0Zbx6EWhuEDl4jLW+rxV98n86G/QFvmPL5Rz/3RO4Zsqt0W/hOjfT1mLOX2pNnMcGVhx532ytdw/Rgk5PG4Xhr48J4dzf3dE=
+	t=1723215621; cv=none; b=GRT49Lg4LH2raLx2w6wFfbgzB0XQYB7Ar9hFvDv/wtFGQC7mkoV6bEK6wGsrt8tdbr0ImYdIG1OePtHWWdzFUFYDfmtaRaGf8nr9HcF8QzmkJTG50eBCxofNmBhMCYL73Lf05jczpa3OAPZmSQO4YMr9VVz563giBHay0/ZsXTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723215236; c=relaxed/simple;
-	bh=GSzMuwNbO0R/haLtymCCrn2VcacmkVi1sA+7fw+Ikp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ge9kvD4Rn3ZRI6X29bp/3WBc4dLilo/81xgPDtzPN6ODlnZ6VB3X2spfjcFbZaK1tq3WEWzufXXy9aIL8BLeBqjxTtTgB18CBF4rV7RiVyTW/aD5lQArGsED4SRz9xMPTwO+ySqlrucWIWggyHgKyG4bMAaGBIFNo7wen5QeEzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dEL1kvmI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1723215621; c=relaxed/simple;
+	bh=/qp6PF3pa0MpI2HSzGeh9ftvwJzaHN8BV8V/pKyw2Ng=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=T8L//v2pMQEU04XIQBvFIfnweYCEW05osayeKifrSz8h0LJQ+kd3zdi3eznCdyKmKVji6aKe8E7rTPbQHy9cjIURIHYu98NNYzKcqjilbEkEi9oTX1Xv2rZG17qrP0YpGAEo61jxddBuNICeDewZwk/SrLaWiFjlvaMEp9oZGaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OIEbtZGb; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dEL1kvmI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723215234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S3hmYgUok+ozXUThpLpe+47uXAQDhVMRnl+vdYpiArY=;
-	b=dEL1kvmI80s436Tr4fmzTpScvPelGrHOCsXQWCd0u5ziwz1vGGWl/pBdfk+cBBV1CLXzVw
-	1ZvEkg+XUBxGjvPlkrLAiE2HxwSLeaeEYd+eiRbzB0FB2riG3KpQcZXW/uqmOOmf9gLplV
-	huzJeRdBUhJlmXXfwuQ+XppE4ZUdUsw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-112-tLJEm6q_PmKvEMMDC9bkdg-1; Fri,
- 09 Aug 2024 10:53:47 -0400
-X-MC-Unique: tLJEm6q_PmKvEMMDC9bkdg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B25119560A2;
-	Fri,  9 Aug 2024 14:53:42 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.16])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0EEFF19560AA;
-	Fri,  9 Aug 2024 14:53:22 +0000 (UTC)
-Date: Fri, 9 Aug 2024 22:53:16 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	John Garry <john.g.garry@oracle.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Sumit Saxena <sumit.saxena@broadcom.com>,
-	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
-	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Jonathan Corbet <corbet@lwn.net>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Sridhar Balaraman <sbalaraman@parallelwireless.com>,
-	"brookxu.cn" <brookxu.cn@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
-	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
-	MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 15/15] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-Message-ID: <ZrYtXDrdPjn48r6k@fedora>
-References: <20240806-isolcpus-io-queues-v3-0-da0eecfeaf8b@suse.de>
- <20240806-isolcpus-io-queues-v3-15-da0eecfeaf8b@suse.de>
- <ZrI5TcaAU82avPZn@fedora>
- <253ec223-98e1-4e7e-b138-0a83ea1a7b0e@flourine.local>
- <ZrRXEUko5EwKJaaP@fedora>
- <856091db-431f-48f5-9daa-38c292a6bbd2@flourine.local>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OIEbtZGb"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-39aeccc63deso1060195ab.2
+        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 08:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723215618; x=1723820418; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PbruoYphIt2LOWAoMbWrsERKtX3GRrMmqjT6C2LpNbc=;
+        b=OIEbtZGbzOyx/41FrJuI7d5L0msdwZf/WxiMOdEHEm86uupUadxpFFliJj9BKhdYVB
+         iIy0mR7Gk1y8lyFFR5BAhkl1BmUQ6KCsiuYVweB5KnJT5uzuBdApN8Baduu+ys2+852W
+         VYrU1pth3ogjY2Ks+OKooB3EZmqWMPhx2dApGoCiMC7RLdnWFVFOWtuWSQnl3FGZk1Z/
+         gT436zhz/pYAObwF6mMSv4LHaKTGD0eHyviFJF99FLXSq7hRw35zm2JGNjx9S1129SE7
+         N9VowmjQtDYlLq92unQVSs1RrhY8lqQt/ceLhRlkV564ZqsW4VQqTeOKGRL0BVg2etAR
+         JXzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723215618; x=1723820418;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PbruoYphIt2LOWAoMbWrsERKtX3GRrMmqjT6C2LpNbc=;
+        b=eZDB9I2AgKbYk0oBX2xu0LhOElNK9MhJ78hScNNcN39SX+PFt7By9IX9dwX4BpfAUa
+         IIbjXlfwdGShT4X2PMVsAdfGKivtQD51X6DW8jtqUVCPkUakZHj8UhnhC+E5Ohwog6VK
+         IuTboH+uuR+UeNGyMZ7qnxH/HenmETRRRz9f0BX9SSGhsFiFAEeelz66a0XRWHtmetrH
+         HVPGWpwF6XzTGxfkQ/ikOPxO4pqJbP62Vhx+3B+r1vGxC2/GupFBYS4nbtEWPMdaCnqr
+         gmJrP0wM4FodmCLNhNgOjwxBE9LZ+fysPFwuQ++jL6SwZzY8iWWFWFmNWhDPguByZmt5
+         N78Q==
+X-Gm-Message-State: AOJu0YyZm+Ptc6e/6fPtdpZNbG58GXTmphg7q9MJG1l3PU+p4zodLi3C
+	/+9Ix3MTwb6s2/pIwj47X2u8+8J1fISJ6ud/s6GfaM6j9oVqWFdW9LCQz4il900K8fXg8X9g7ly
+	m
+X-Google-Smtp-Source: AGHT+IEtJ0RGy1Ve9TgQYxcw9G321vA5Fw/qM7Fudf9z5ohz24NBYXbSuTZiTsfaH5IwV9H2Ijmjwg==
+X-Received: by 2002:a92:c566:0:b0:39a:f26b:3557 with SMTP id e9e14a558f8ab-39b81359911mr15346225ab.5.1723215617269;
+        Fri, 09 Aug 2024 08:00:17 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39b20ab5cc2sm65164725ab.44.2024.08.09.08.00.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Aug 2024 08:00:16 -0700 (PDT)
+Message-ID: <4e41d24b-fff4-4ec6-b963-cc1b8fdf64a0@kernel.dk>
+Date: Fri, 9 Aug 2024 09:00:13 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <856091db-431f-48f5-9daa-38c292a6bbd2@flourine.local>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.11-rc3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 09, 2024 at 09:22:11AM +0200, Daniel Wagner wrote:
-> On Thu, Aug 08, 2024 at 01:26:41PM GMT, Ming Lei wrote:
-> > Isolated CPUs are removed from queue mapping in this patchset, when someone
-> > submit IOs from the isolated CPU, what is the correct hctx used for handling
-> > these IOs?
-> 
-> No, every possible CPU gets a mapping. What this patch series does, is
-> to limit/aligns the number of hardware context to the number of
-> housekeeping CPUs. There is still a complete ctx-hctc mapping. So
+Hi Linus,
 
-OK, then I guess patch 1~7 aren't supposed to belong to this series,
-cause you just want to reduce nr_hw_queues, meantime spread
-house-keeping CPUs first for avoiding queues with all isolated cpu mask.
+Just a set of cleanups for blk-throttle and nvme structures. Please
+pull!
 
-> whenever an user thread on an isolated CPU is issuing an IO a
-> housekeeping CPU will also be involved (with the additional overhead,
-> which seems to be okay for these users).
-> 
-> Without hardware queue on the isolated CPUs ensures we really never get
-> any unexpected IO on those CPUs unless userspace does it own its own.
-> It's a safety net.
-> 
-> Just to illustrate it, the non isolcpus configuration (default) map
-> for an 8 CPU setup:
-> 
-> queue mapping for /dev/vda
->         hctx0: default 0
->         hctx1: default 1
->         hctx2: default 2
->         hctx3: default 3
->         hctx4: default 4
->         hctx5: default 5
->         hctx6: default 6
->         hctx7: default 7
-> 
-> and with isolcpus=io_queue,2-3,6-7
-> 
-> queue mapping for /dev/vda
->         hctx0: default 0 2
->         hctx1: default 1 3
->         hctx2: default 4 6
->         hctx3: default 5 7
 
-OK, Looks I missed the point in patch 15 in which you added isolated cpu
-into mapping manually, just wondering why not take the current two-stage
-policy to cover both house-keeping and isolated CPUs in group_cpus_evenly()?
+The following changes since commit f6bb5254b777453618a12d3bbf4a2a487acc8ee2:
 
-Such as spread house-keeping CPUs first, then isolated CPUs, just like
-what we did for present & non-present cpus.
+  Merge tag 'nvme-6.11-2024-07-26' of git://git.infradead.org/nvme into block-6.11 (2024-07-26 08:06:15 -0600)
 
-Then the whole patchset can be simplified a lot.
+are available in the Git repository at:
 
-> 
-> > From current implementation, it depends on implied zero filled
-> > tag_set->map[type].mq_map[isolated_cpu], so hctx 0 is used.
-> > 
-> > During CPU offline, in blk_mq_hctx_notify_offline(),
-> > blk_mq_hctx_has_online_cpu() returns true even though the last cpu in
-> > hctx 0 is offline because isolated cpus join hctx 0 unexpectedly, so IOs in
-> > hctx 0 won't be drained.
-> > 
-> > However managed irq core code still shutdowns the hw queue's irq because all
-> > CPUs in this hctx are offline now. Then IO hang is triggered, isn't
-> > it?
-> 
-> Thanks for the explanation. I was able to reproduce this scenario, that
-> is a hardware context with two CPUs which go offline. Initially, I used
-> fio for creating the workload but this never hit the hanger. Instead
-> some background workload from systemd-journald is pretty reliable to
-> trigger the hanger you describe.
-> 
-> Example:
-> 
->   hctx2: default 4 6
-> 
-> CPU 0 stays online, CPU 1-5 are offline. CPU 6 is offlined:
-> 
->   smpboot: CPU 5 is now offline
->   blk_mq_hctx_has_online_cpu:3537 hctx3 offline
->   blk_mq_hctx_has_online_cpu:3537 hctx2 offline
-> 
-> and there is no forward progress anymore, the cpuhotplug state machine
-> is blocked and an IO is hanging:
-> 
->   # grep busy /sys/kernel/debug/block/*/hctx*/tags | grep -v busy=0
->   /sys/kernel/debug/block/vda/hctx2/tags:busy=61
-> 
-> and blk_mq_hctx_notify_offline busy loops forever:
-> 
->    task:cpuhp/6         state:D stack:0     pid:439   tgid:439   ppid:2      flags:0x00004000
->    Call Trace:
->     <TASK>
->     __schedule+0x79d/0x15c0
->     ? lockdep_hardirqs_on_prepare+0x152/0x210
->     ? kvm_sched_clock_read+0xd/0x20
->     ? local_clock_noinstr+0x28/0xb0
->     ? local_clock+0x11/0x30
->     ? lock_release+0x122/0x4a0
->     schedule+0x3d/0xb0
->     schedule_timeout+0x88/0xf0
->     ? __pfx_process_timeout+0x10/0x10d
->     msleep+0x28/0x40
->     blk_mq_hctx_notify_offline+0x1b5/0x200
->     ? cpuhp_thread_fun+0x41/0x1f0
->     cpuhp_invoke_callback+0x27e/0x780
->     ? __pfx_blk_mq_hctx_notify_offline+0x10/0x10
->     ? cpuhp_thread_fun+0x42/0x1f0
->     cpuhp_thread_fun+0x178/0x1f0
->     smpboot_thread_fn+0x12e/0x1c0
->     ? __pfx_smpboot_thread_fn+0x10/0x10
->     kthread+0xe8/0x110
->     ? __pfx_kthread+0x10/0x10
->     ret_from_fork+0x33/0x40
->     ? __pfx_kthread+0x10/0x10
->     ret_from_fork_asm+0x1a/0x30
->     </TASK>
-> 
-> I don't think this is a new problem this code introduces. This problem
-> exists for any hardware context which has more than one CPU. As far I
-> understand it, the problem is that there is no forward progress possible
-> for the IO itself (I assume the corresponding resources for the CPU
+  git://git.kernel.dk/linux.git tags/block-6.11-20240809
 
-When blk_mq_hctx_notify_offline() is running, the current CPU isn't
-offline yet, and the hctx is active, same with the managed irq, so it is fine
-to wait until all in-flight IOs originated from this hctx completed there.
+for you to fetch changes up to eded04fe3bdad9b11bc82b972b4c6fa79f1726ba:
 
-The reason is why these requests can't be completed? And the forward
-progress is provided by blk-mq. And these requests are very likely
-allocated & submitted from CPU6.
+  Merge tag 'nvme-6.11-2024-08-08' of git://git.infradead.org/nvme into block-6.11 (2024-08-08 12:27:40 -0600)
 
-Can you figure out what is effective mask for irq of hctx2?  It is
-supposed to be cpu6. And block debugfs for vda should provide helpful
-hint.
+----------------------------------------------------------------
+block-6.11-20240809
 
-> going offline have already been shutdown, thus no progress?) and
-> blk_mq_hctx_notifiy_offline isn't doing anything in this scenario.
+----------------------------------------------------------------
+Dr. David Alan Gilbert (1):
+      blk-throttle: remove more latency dead-code
 
-RH has internal cpu hotplug stress test, but not see such report so far.
+Jens Axboe (1):
+      Merge tag 'nvme-6.11-2024-08-08' of git://git.infradead.org/nvme into block-6.11
 
-I will try to setup such kind of setting and see if it can be
-reproduced.
+Kanchan Joshi (4):
+      nvme: remove unused parameter
+      nvme: remove a field from nvme_ns_head
+      nvme: change data type of lba_shift
+      nvme: reorganize nvme_ns_head fields
 
-> 
-> Couldn't we do something like:
+ block/blk-throttle.c     | 11 -----------
+ drivers/nvme/host/core.c | 18 +++++++++---------
+ drivers/nvme/host/nvme.h | 13 ++++++-------
+ 3 files changed, 15 insertions(+), 27 deletions(-)
 
-I usually won't thinking about any solution until root-cause is figured
-out, :-)
- 
-
-Thanks, 
-Ming
+-- 
+Jens Axboe
 
