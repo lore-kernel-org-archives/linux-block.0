@@ -1,122 +1,104 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5F0194C93
-	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 13:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A591818C93F
+	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 13:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723210127; cv=none; b=IAuNDaEo6Ergkt1kRe4A69Cf724nVIz4qzBags+2uzbrRcqNLAawJTZd0x1HnMJK7z/9oNbrVbJUw+e6i0zzGkyfp+OJrlb6TujtWWkaNQg5qzOb1RiLkKRv0U366HB5wnqHkdDZTjt+UrIM/nsc7LmxJXfD3n/lv9U0qSKZPNY=
+	t=1723210732; cv=none; b=L7P7Yo0DD4LqQBTy2h8E7A818KJZvLYJ7XZVPuDFULWxSvoZ3st6LUPNzHZbOEHTyHCBDdydI2N8WxKcfwnaPBdYh/ZU8bPlWGH8AqKqW+dPSE3Ps+/jaCRqxCRQaNl7Y+MRT/AkW5vtQMq8L4THpJGJbbsHEF+9fnGfb/TK3wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723210127; c=relaxed/simple;
-	bh=TKrlbvQ2RBE1CAygDIaFqr2REf5/DdScuXMZOsqWBGY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Vj292IX7diNGTcnXHHMwLNL6pglejC92tVWnjvEM1yLk1Mv2Y7ULa4NuL58NFpc60g/mdY5kFIYy9fXEhk3uHEMlon0bAohe78/JX4Xdapg8S4ca242ttRl2iOrmEtcoRUiW7ZLnA4OgYgkiqT5SK/CpDhOBwjdS+uQjiYUilgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KVXHPUhw; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1723210732; c=relaxed/simple;
+	bh=U9PgHMmXwArkaS49p8aX1dEbXHZP/CRcN0LvOlL7M5k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e4r5+OaDjWRLPRVCVx+X4aL9D0iiSvjEip4R6yAKl7IRZcCHTWMeSpgKRzJ2ZW61ZT1+dpBf9xaA4u232Miz/Ba+x/OnGP6bSRG6V70i2EvDCvkzknS0p6NZrl/TOs7ptlqURULvF/nGwzo5VVrWdtSKYIkPM4M+sQPGy4b+YXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D3ew+NPR; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KVXHPUhw"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e087ed145caso3517806276.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 06:28:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D3ew+NPR"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-428f5c0833bso18041915e9.0
+        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 06:38:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723210125; x=1723814925; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=mEjC4VEg02CeBQFpnsdd9qSm0bn37HEVzOCrEJrAluY=;
-        b=KVXHPUhwhEP2K/9reE0fmUUzuIqeWzuM3hnDvv/X7ggF2NGtV2jijyqOMhZVhhn2p/
-         NRL3+P0ddmKlHlCKmshqq2P+BXoJOv4pFE3ueppSTTLSN6i7C2BTXLvGGFHo1twutpo3
-         2GTG4qTH51kZn3EgOZojjxJ9yEYYMDUISSrlxBPp4SmHH+4UYI+Xp7K4843Kn/sX4zaU
-         CaE+hAiUYxAIKOt9bwJi1oXHGf4rTVlHevwXIPCVYBNzS+qu3bSzS9matGEA093OuBwh
-         OgaFJf7kWJs00UNS/g3WY/Xkiq1VXRIX+97GbusCQtOIV244hFs9JdWcMqQctaHclzZz
-         KjKg==
+        d=google.com; s=20230601; t=1723210729; x=1723815529; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q+NGAfmPnXsWwgUAptnJ+cd0Pt188Yd+YvqSzH2iizw=;
+        b=D3ew+NPRUjJG7Xvl1GaRZYqEYe1sm7k6CyHsqKMyzebfFha+gvyPm0PSFUx4Rk5j7A
+         m//CgC/GRFGESBz1zWNxVt9MPepsJSW72NljtWbjwyjW7a0W5q3w5HEbvG/XHsBq7RCG
+         mMID2K35NBJmjIyRZu1Q3OflyDoihE3jaY/dDIzvSDkNrWZL8PDMjL9ZalJp2QV3b4XJ
+         GETyyvPDcI61PSAoO8lsKJeSJELXidMmxHbKUm7inVbjJR0VGOoERWBe3ljcmy6lAngl
+         WZqMzdcLwcRmnsb+tuK2ml+GR9XlAo/PZVD/HkYeAmE4w241JnLe5TFOznj2QGyE65nF
+         9q9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723210125; x=1723814925;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mEjC4VEg02CeBQFpnsdd9qSm0bn37HEVzOCrEJrAluY=;
-        b=LUSs9aa+ecjGdcaokyIAAih+hI7j4U4VC7yNLLZIlHENJ9Byyf3qS2x9JfHFsuATr7
-         zl7bX6Q3czDTENzpWp9HWu2uDTuxPvmPsQwJ4WTavovIgX/dAYBlHNoYhQiAf4hsiC+f
-         0m1eRuwfTd8vn09hz3R0L03BKWIp1kJ3Tm3V8nCLLLVm9O1UhJF4xBeG45T0mpukhjrL
-         2nN/EgLtjDfXGTUfbkSvg/s+cQVtNLbOf2e1OH60TjPACbLviOQvgKXuL02f5peyrGVK
-         KTAJmsCyt3Jr5Kafth8nlbYw5KgoFPQS9vAjagqU6WwScSp+nKP69LKsajCLqa7DX5Uf
-         oNGA==
-X-Gm-Message-State: AOJu0Yx823Wgtcio5GbvfdCKifQeAj2giGOiI8AMLr5uVfCUWqaDE7oR
-	Ttg+xNSFVX79wRMPc6EIs9JYHQNgr/atVnQ9KbqR5uNXJIKIvXmAQFmanoyR0p8qrnlfvLoZZjt
-	OhsBFeXokvTSodQ==
-X-Google-Smtp-Source: AGHT+IFhPkSX4arFZVxfmCknNV75exeBowe3iFO2iPGRwr9I5E7GBwi1+h3ISvKyUximqYRz+7sMLcahCRDmMkU=
-X-Received: from aliceryhl.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:35bd])
- (user=aliceryhl job=sendgmr) by 2002:a25:d307:0:b0:e0b:958a:3344 with SMTP id
- 3f1490d57ef6-e0eb9a27b3emr37724276.10.1723210125238; Fri, 09 Aug 2024
- 06:28:45 -0700 (PDT)
-Date: Fri,  9 Aug 2024 13:28:35 +0000
+        d=1e100.net; s=20230601; t=1723210729; x=1723815529;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q+NGAfmPnXsWwgUAptnJ+cd0Pt188Yd+YvqSzH2iizw=;
+        b=M+qXLQ7kTZ6HnHENrw0sCcpQ4v4dwD0WNpSvCw7Mu/PJQwFZsX6kEhhYsrKkrjs1aN
+         NhdMpC4HvIZ5ccKWxqtan3kN0ucNea7xHeX63Jvpb2jYdOHsWhaXKEmZmo/fUUA7UZmV
+         KdqU9/d0zLf8gu44uNYGlxZW+HonURk2HZv5BMpcG26eB3ZUeIXSjqs/AGw0Zy4BI+dc
+         Bkmvjclcl/Zaq/arX+xLLhWPAV1gcrM4Dd4pOrITMI5bAXCekC2vrcSd2HuMGNJRgL4e
+         rIJzbV8ZI/qzqL2TJRug87q+Bsxf6bCjRp6KYuA7mS/9B/MRXC/lcSh56QLe7w4+AN0z
+         trfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbxzSCv9XKKKSJe0NnMQ6LjtPrDjZDmaXjcoGXzuWnsJmTVUm0fQMUQqBezffmUQHw9iLPr1ae/0+f0j51crH2P+7dbJR6RDqdlsI=
+X-Gm-Message-State: AOJu0YwKeNfui8/UAWj0TdjdqhVKRjXtz+Do+fYoC5nxpbOoPCN/KLQS
+	H4me8uVI3TS8mEDsm9FCqIHlVwH9hZisQpOdEBZiCsu/hx8TOo/Dkj/RSyU93nm/uLoSEswZaTB
+	YbfC+QGogz0cW/plwf5B0CzkG7XqZ0K+dREiy
+X-Google-Smtp-Source: AGHT+IGLCN0hdBaFSgURlEBmYzXSiLipHSTPGxPeeVAfZBF3FCClOKXB0C2KWuYJCS7FyPZ+RAPHoq/m3t48/wKHerI=
+X-Received: by 2002:adf:f208:0:b0:360:8c88:ab82 with SMTP id
+ ffacd0b85a97d-36d6a75842cmr1629625f8f.30.1723210728768; Fri, 09 Aug 2024
+ 06:38:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1382; i=aliceryhl@google.com;
- h=from:subject; bh=TKrlbvQ2RBE1CAygDIaFqr2REf5/DdScuXMZOsqWBGY=;
- b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBmthkVGeukdJHM4rXEjs2fvGiX8fDwDb74qbeAC
- NLHqH9dKJCJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCZrYZFQAKCRAEWL7uWMY5
- RopxD/9rjsU5witSF5p+HQFTk/IrWKnpZECfiU0QeqIfbvMGKe6flARIcFMcAC3aP/RbIE7QnAg
- rDQ8swBeQT8kjgNJWZveU8CLrwrztKuk9l9ytFFDTiSa64XS671+ftwAo6JhCWmKCPyElJvGniU
- XUrX0r1Ww9IBhCsjnm1dM8q1Wa/6BAtxXBB9ECIC1q53N4TXFXvaV8fKcqq0e9G4CCeITiY7D6m
- VvhW85siOY7itusPxInWsHW0IDlvTadkk+blz/THctXT7h8EmqsC9RPWZJXMAZ5ueVfNId5tdmE
- Z98BrLKpnLpQKXWRlyx1mAEOdjT+M0KFvLUJbPNGVQVHgzWJF/O/f9h9xmMbf6k8TiKw1SzOtsT
- SU3lMG6axUD00Ocy0nTDyZ1NEw0Khp3mL1VIh/tjBdNkFtbvj4a4hntM+8gaaI2Sn/8H9xEze8f
- 2N1NK3aRf80wjoxOvf5zAfE3XX314E8PgUsO7FUV0ff0yGQN3exkVd8Zj0tUFAFCoA3dbqMiNt+
- fQB1jbc8sks+6aDlH+bhpcpKrZG4tybBbvA3PO2hZzQEIDB58URud3dG0XX9+pH8bwF6gfSl1tG
- jAIAllDF/SSWCdhpLp7xIr780pScLU1VaVUc+NiSfGmepnlPIOoZVFI2x+9GR7oOhxIBFZswUe/ nNOsse3CJQ7Rmuw==
-X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240809132835.274603-1-aliceryhl@google.com>
-Subject: [PATCH v2] rust: sort blk includes in bindings_helper.h
+MIME-Version: 1.0
+References: <20240809064222.3527881-1-aliceryhl@google.com> <CANiq72nP+pL7fEvaB7HA-mHJFs1j9SKMoSMSCif61YCy4QDFoA@mail.gmail.com>
+In-Reply-To: <CANiq72nP+pL7fEvaB7HA-mHJFs1j9SKMoSMSCif61YCy4QDFoA@mail.gmail.com>
 From: Alice Ryhl <aliceryhl@google.com>
-To: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
-	Andreas Hindborg <a.hindborg@samsung.com>, Danilo Krummrich <dakr@kernel.org>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>
+Date: Fri, 9 Aug 2024 15:38:37 +0200
+Message-ID: <CAH5fLghQ9dRqGdvRxGfiby9-xG4kY3QN8adyH2gVA5urZXpq=Q@mail.gmail.com>
+Subject: Re: [PATCH] rust: sort includes in bindings_helper.h
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
+	Andreas Hindborg <a.hindborg@samsung.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The headers in this file are sorted alphabetically, which makes it
-easy to quickly resolve conflicts by selecting all of the headers and
-invoking :'<,'>sort to sort them. To keep this technique to resolve
-conflicts working, also apply sorting to symbols that are not letters.
+On Fri, Aug 9, 2024 at 2:58=E2=80=AFPM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> On Fri, Aug 9, 2024 at 8:42=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> =
+wrote:
+> >
+> > Dash has ascii value 45 and underscore has ascii value 95, so to
+> > correctly sort the includes, the underscore should be last.
+> >
+> > Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module=
+")
+>
+> Looks good to me (`LC_ALL=3DC`), thanks!
+>
+> I can take it; otherwise:
+>
+>     Acked-by: Miguel Ojeda <ojeda@kernel.org>
+>
+> I am not sure if this should count as a bug/fix (there is an
+> recent/ongoing debate about the Fixes tag).
 
-This file is very prone to merge conflicts, so I think keeping conflict
-resolution really easy is more important than not messing with git blame
-history.
+I fix merge conflicts in this file almost daily, so I think there's a
+case to be made for taking it as a fix. I should have clarified this
+in my commit message. I sent a v2 with more info:
+https://lore.kernel.org/r/20240809132835.274603-1-aliceryhl@google.com
 
-These includes were originally introduced in commit 3253aba3408a ("rust:
-block: introduce `kernel::block::mq` module").
+> (This kind of issues can be also opened as "good first issues", by the
+> way, i.e. as a way to get contributors to set their email workflow.)
 
-Signed-off-by: Alice Ryhl <aliceryhl@google.com>
----
-Changes since v1:
-- Reword commit message.
+I didn't think of that, but if I had I would probably still have
+submitted it myself for the above reason.
 
-v1: https://lore.kernel.org/r/20240809064222.3527881-1-aliceryhl@google.com
-
- rust/bindings/bindings_helper.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-index b940a5777330..ae82e9c941af 100644
---- a/rust/bindings/bindings_helper.h
-+++ b/rust/bindings/bindings_helper.h
-@@ -6,9 +6,9 @@
-  * Sorted alphabetically.
-  */
- 
- #include <kunit/test.h>
--#include <linux/blk_types.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk_types.h>
- #include <linux/blkdev.h>
- #include <linux/errname.h>
- #include <linux/ethtool.h>
-
-base-commit: de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed
--- 
-2.46.0.76.ge559c4bf1a-goog
-
+Alice
