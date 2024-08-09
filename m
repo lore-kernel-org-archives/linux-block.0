@@ -1,312 +1,223 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F63172BD6;
-	Fri,  9 Aug 2024 07:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723188137; cv=none; b=NroOYfvdsipkMp0bYdD7zD4n0BVA9xvBher0btMdPNbsaKdq3MKkgkadh5N/91D1z9W7FaUZn/2A+OBrUgCYpK/atRkY8TUJhCK1s43k28XisWQLQcEcipXlmuN3lbfYi5ZB4CxNm7yPczsi7Z56K2dzG/gHc2AH80pwlw5iuJs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723188137; c=relaxed/simple;
-	bh=gYlIP+lBGZf9p56OPaappGgP1Xv0GKlrY9dqQFRES04=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QXrRuDXLT+iG46WO8YmVZhduuCUx6O9EiRZ05ej6cSjSFRTij0e7yKEv3IA70Cqo6KaIxWtCZTj3abPfUUiIM2LXHtEXLd2K+hLExZauL2RXr4FB67oavKslO5he6RFct4S+xDb2wtoeHkbYZ2ohqy9NQDRuIDNe2tQmeL8iRHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qRBJYlZP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NTTbxdNS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qRBJYlZP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NTTbxdNS; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD16F1552EB;
+	Fri,  9 Aug 2024 07:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=210.61.82.184
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723189859; cv=fail; b=Uw0u6GMqeOpg9acIuCdGoCg0bJ9Mimf2/ZkSGIpvJlmccob8DM79o1hAkoBupp4pktS0y3tJMe3QvIqeRyNgzK5/rVtxbqCw12b6QcftHJTK1LVd2UTm/DJSBMHTVchler0u5zzk/+G+XsxyMxzJeW8soj2D0H2g0gPvi+UG0UE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723189859; c=relaxed/simple;
+	bh=VfDpX6TTsPmoGU6BJjKmRpYgcb7i6842OUjhvF8/lgE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=F9tikPpZurq2BrDu+HSoCaSOYSfN1jiyGpUoGWGYKxrd3+1zDW2siR7wR9qIz7wNvcpvBxPCbomN5EriYsX75CAENLVMeM+xUdFE70N/l/Le2PxLchdP3W7yHQaqfHFI8fy7rt25mHbTosQDMulXoX6gh6D2F+8m7uGLOoL6HQA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=knLXgRKs; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=lsXsUYbN; arc=fail smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qRBJYlZP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NTTbxdNS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qRBJYlZP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NTTbxdNS"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 9170B21EB4;
-	Fri,  9 Aug 2024 07:22:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723188132; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ahmUJlG6cvn11dfUj1+gsMh+RJ6l5CH2DKkmdQtjC1M=;
-	b=qRBJYlZP10SZWLOuW224PwXJnb9NdkAwHqyzI4zJIbxa7x82Kn5LIRVQo6gYVBZJq/fRhb
-	jWCfop6Rgz7eKAjnPVkWyPujE5f1ZWPn/Td/6U1/1QIQrXNw7NV1SxMc0TZBIg/oh8VFE+
-	GigUI+02Aw/lncykX5e1s4atPk9xdak=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723188132;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ahmUJlG6cvn11dfUj1+gsMh+RJ6l5CH2DKkmdQtjC1M=;
-	b=NTTbxdNSv22I/uNcvvM5kXc2YMty5QSKzyvVojSy9LCXC0bfiOUc+vbfTpPux/FGx2cW/V
-	7qqDBipp3r8IDEAA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723188132; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ahmUJlG6cvn11dfUj1+gsMh+RJ6l5CH2DKkmdQtjC1M=;
-	b=qRBJYlZP10SZWLOuW224PwXJnb9NdkAwHqyzI4zJIbxa7x82Kn5LIRVQo6gYVBZJq/fRhb
-	jWCfop6Rgz7eKAjnPVkWyPujE5f1ZWPn/Td/6U1/1QIQrXNw7NV1SxMc0TZBIg/oh8VFE+
-	GigUI+02Aw/lncykX5e1s4atPk9xdak=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723188132;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ahmUJlG6cvn11dfUj1+gsMh+RJ6l5CH2DKkmdQtjC1M=;
-	b=NTTbxdNSv22I/uNcvvM5kXc2YMty5QSKzyvVojSy9LCXC0bfiOUc+vbfTpPux/FGx2cW/V
-	7qqDBipp3r8IDEAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 77DA513A7D;
-	Fri,  9 Aug 2024 07:22:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5Yc7HaTDtWbgEAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Fri, 09 Aug 2024 07:22:12 +0000
-Date: Fri, 9 Aug 2024 09:22:11 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-	Sagi Grimberg <sagi@grimberg.me>, Thomas Gleixner <tglx@linutronix.de>, 
-	Christoph Hellwig <hch@lst.de>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	John Garry <john.g.garry@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Kashyap Desai <kashyap.desai@broadcom.com>, 
-	Sumit Saxena <sumit.saxena@broadcom.com>, Shivasharan S <shivasharan.srikanteshwara@broadcom.com>, 
-	Chandrakanth patil <chandrakanth.patil@broadcom.com>, Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>, 
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>, Nilesh Javali <njavali@marvell.com>, 
-	GR-QLogic-Storage-Upstream@marvell.com, Jonathan Corbet <corbet@lwn.net>, 
-	Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
-	Sridhar Balaraman <sbalaraman@parallelwireless.com>, "brookxu.cn" <brookxu.cn@gmail.com>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev, megaraidlinux.pdl@broadcom.com, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com, 
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 15/15] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-Message-ID: <856091db-431f-48f5-9daa-38c292a6bbd2@flourine.local>
-References: <20240806-isolcpus-io-queues-v3-0-da0eecfeaf8b@suse.de>
- <20240806-isolcpus-io-queues-v3-15-da0eecfeaf8b@suse.de>
- <ZrI5TcaAU82avPZn@fedora>
- <253ec223-98e1-4e7e-b138-0a83ea1a7b0e@flourine.local>
- <ZrRXEUko5EwKJaaP@fedora>
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="knLXgRKs";
+	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="lsXsUYbN"
+X-UUID: 146fe256562411ef87684b57767b52b1-20240809
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=VfDpX6TTsPmoGU6BJjKmRpYgcb7i6842OUjhvF8/lgE=;
+	b=knLXgRKsm8czCNIZTJXg5yFsC0pd8iUntRHyBgl+iPek+LLPaZINOGsHz+W3VFVHV21VGZUTNBT5ZKKiVv6t18KDUXG4k075pt2u30IHoGw+A1HgXK8RYRjKaZj5K0k/8d/ugn2xVRcU9g8J0UhW9Sm4afCKo4EXidikw/7xZm0=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:8cbb5ea9-3336-444b-a9f8-0606d79a2fef,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6dc6a47,CLOUDID:e94163c1-acff-4a0f-9582-14bcdf4ed7e0,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 146fe256562411ef87684b57767b52b1-20240809
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw02.mediatek.com
+	(envelope-from <boy.wu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1381976759; Fri, 09 Aug 2024 15:50:43 +0800
+Received: from mtkmbs10n1.mediatek.inc (172.21.101.34) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 9 Aug 2024 00:50:43 -0700
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (172.21.101.237)
+ by mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 9 Aug 2024 15:50:43 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IwBz+QtlfHPgIwRnG9UjRFx9CQEupzFPUKFOI+zJAf3ohWsQ1y+/MKzUXNEoJDZdC/22uAPmT44CNReObovwLkj3pnFRxZqg48hXk1nJmmdmktnm9mzCYJrzxlkJKBxpDmuO9mrM0OdZr13WGd+FasoaXDc7XvYWm89e+c5qhu9T1IIH3TU0QfkU434wCpuPZgNi6ZQ+MHiZK9ZJVAcFbvwGWkmAScZ9WiMLXjSMlpmdarGUjmdv8GQODRxrMnnI316mANg63Ij33Yt656eEtwCyOK/L/7QavgYCgMxnTB5yH4JsoXbjoR4QPEFCagOMI+8TelmX4LVwJsX6rs8kuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VfDpX6TTsPmoGU6BJjKmRpYgcb7i6842OUjhvF8/lgE=;
+ b=YSsPEKPf8rcxKICAmHD4Rqsn3m69rHDI4qNx5fng++Li8e+E2OBIsezU4RdU4Q6SXnF+GXpIFcKnPvJsBqdE1VSAgqDZOXLHirP9jDI0PoEv9YAmfSLIJva7VpimjoKe1248hBTcov9KSQDt6ZVlUWWvIQFcDL1KHwE4ZA/bd5EcP8MsUd1iXEBLZ72Wkw2DhIwnjUuM0iuErUgCuRXdpqO6ikkZgHdEFukj7wBf/7bjY4qzRLR26QhVUMSlf80K7W4YgRPo96WtNtbeR9Kfk5VBSo/o0VOz+3MBEWNINyWY54cVXZOlQgby2ltEV/jUAFL4i6IBUrxbQJHnv8MkcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
+ dkim=pass header.d=mediatek.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VfDpX6TTsPmoGU6BJjKmRpYgcb7i6842OUjhvF8/lgE=;
+ b=lsXsUYbNZm2GHPJopwp3ZSIBtJGp/HBqe2Sas/5HH3kRt1sIK4oxqlCb7o//oSuMJ/4NkAPZt05tcTnZZh4vPoE9sIsWwJ2ZWmZfnmeyIAsnoSeuq9lKSNdGs03pqyxZfGt4Jls8qpU3d+6TzfrBUzDo6H2POhpRGDiK1R2yRn8=
+Received: from TYZPR03MB7867.apcprd03.prod.outlook.com (2603:1096:400:465::7)
+ by SI2PR03MB6463.apcprd03.prod.outlook.com (2603:1096:4:1a3::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.15; Fri, 9 Aug
+ 2024 07:50:41 +0000
+Received: from TYZPR03MB7867.apcprd03.prod.outlook.com
+ ([fe80::f95:7de7:753d:4b9]) by TYZPR03MB7867.apcprd03.prod.outlook.com
+ ([fe80::f95:7de7:753d:4b9%5]) with mapi id 15.20.7828.023; Fri, 9 Aug 2024
+ 07:50:41 +0000
+From: =?utf-8?B?Qm95IFd1ICjlkLPli4Poqrwp?= <Boy.Wu@mediatek.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"boris@bur.io" <boris@bur.io>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-mediatek@lists.infradead.org"
+	<linux-mediatek@lists.infradead.org>, "cgroups@vger.kernel.org"
+	<cgroups@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	=?utf-8?B?SXZlcmxpbiBXYW5nICjnjovoi7PpnJYp?= <Iverlin.Wang@mediatek.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "matthias.bgg@gmail.com"
+	<matthias.bgg@gmail.com>, "angelogioacchino.delregno@collabora.com"
+	<angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH v4] blk-cgroup: Replace u64 sync with spinlock for iostat
+Thread-Topic: [PATCH v4] blk-cgroup: Replace u64 sync with spinlock for iostat
+Thread-Index: AQHa2O5aruOvW4TdxkyHU/91XL9eyrH8/V0AgABMBgCAAQfXgIAKGNoAgAdXXoCADu5ZAA==
+Date: Fri, 9 Aug 2024 07:50:41 +0000
+Message-ID: <4f06abd438009266997bd41901c05c9139e19472.camel@mediatek.com>
+References: <20240718084112.12202-1-boy.wu@mediatek.com>
+	 <ZpmF8HJsuefjC7Xr@slm.duckdns.org>
+	 <00c595a16b4e96ae56973ac2ce586f6ad736059f.camel@mediatek.com>
+	 <ZpqjCVxSAV-Q7Yhy@slm.duckdns.org>
+	 <e944e61fb64e5094aa6a0afef652359734619ba5.camel@mediatek.com>
+	 <ZqlD5WXx39E8xVnA@slm.duckdns.org>
+In-Reply-To: <ZqlD5WXx39E8xVnA@slm.duckdns.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=mediatek.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TYZPR03MB7867:EE_|SI2PR03MB6463:EE_
+x-ms-office365-filtering-correlation-id: 62cf3a45-ad64-4c77-404e-08dcb847f780
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?RVFUUWw2UHcvT0xwNnQ2YjhRaXZ6VWxxMUl3NFQ2NDNNMGlkK0dUNkM4Wm81?=
+ =?utf-8?B?NlpRZm5BeWNob3l4ZkR5V3VSM3RYRTAyV3JkSFJML0szdXk4Y0RiM2lnSWYw?=
+ =?utf-8?B?V2tjUVdsMDVZenljVW5IVEpmb3dIcU12encvczh4M3BGYllFVjdEaGh5cUJX?=
+ =?utf-8?B?OGJHdlpQRjlEK0FqY2xtK05TZ2QxcDYvWm8wQzUyM05KY3o2NW9mbHdubU40?=
+ =?utf-8?B?d0ErQVZCTmJkbEhKOVpOSXRNd1Myb3Y1UituZU5qL244M2pJSmdEbTlGYmp2?=
+ =?utf-8?B?clA4M0psanFnK3FuYkUxbkQ3YmlSRmk5UnVJNm1tL1JXejRYd01ValZvd2tM?=
+ =?utf-8?B?b0IzMUhKNHdhcFAvQkw3aVBKdCtSOE9yeGM2L1hUQzJJcFdYei9XZjZzdWJ2?=
+ =?utf-8?B?OEV0LzFtU3YrT1R0WEp6bjJSTThDRXVQTTA1SWlNN0xicWJrQTdNWXk5Tjhj?=
+ =?utf-8?B?WEFxeTBzME9vMkRYY0krRTNmV0RUOGxiTkpOZzUzSVpEMm5NSWt1T3ZlNHpI?=
+ =?utf-8?B?bXBQRzNZOU9kRWFWVCs1SmVHM3Bwa0lUUFIvZ2tkdlFVblJsMjhaT0pCUndJ?=
+ =?utf-8?B?R21TVGVBbytPdmVTSXZKS3RtWlFQNjIvbFoxRnhzSm9GdjQ1VjJDcjk3eXJt?=
+ =?utf-8?B?TnlKeUgxWUQ3YVY2bkhoUFFtWEEwWDh6eTJ4SDkwYTZRTE9BbDJTeGg1UUxY?=
+ =?utf-8?B?OFJ4R0loSFFHdjduVUtqbndXWXczdGIwaVIwa0RpV0h0RTkxQTBhbml2NDJO?=
+ =?utf-8?B?NTJYaGRzT2RCZnZXU3Zxb0JWMzJzdTRSUUtzSW9ib0syZnJnTFhYVTNNejJI?=
+ =?utf-8?B?MmlSOG9RVlQwRVpoUGlZZGNSV1RabWk2NTFPckJPRmUyeGl0ajBqK3ovTEh0?=
+ =?utf-8?B?bEJNZTNYQ3V4K1JodHFJazA1NW96RzFyOGYzR1hTeHNrV0QrQ3lmU0UxTFFn?=
+ =?utf-8?B?cHNqenJLaktwdjR5bHBBeVJqZUhxd1I5c0tBSG1zb3RaSm01eVBxWGpWVUpq?=
+ =?utf-8?B?U0hHQ1lPQ042cVhLaWRVNG9VSlNvUGJPT0p4M1dydDF5RDdXYU1MY0gxUi9u?=
+ =?utf-8?B?TWdITHZOK0pYWFBBZE5GZW1ndmZzOXJzSG5TKzZFbDF1Z3hKWlNrOGVOSVls?=
+ =?utf-8?B?OWFUcW9PQWRGNUt3YVpoWFVFSU16eGdxWUozNUJxQTRJTlFUQ2RUUEphYWNM?=
+ =?utf-8?B?by9TTCs1czhOVktRdVhmUnBub0ltaWJjYnNoMG5yNGJ6WVRXaEJ5eDFhR2Nk?=
+ =?utf-8?B?S1V6aDZVSFVRVXplcWdPOFlhOXYrQVhOcVpRVkFLeHl1NUhidjhmeEpLZFpN?=
+ =?utf-8?B?c0JWRGZ4Y1VyS21zcytiMlFvY0hQT21RLzBIdEJqQ1FNbkVWN1gra2xVOXNQ?=
+ =?utf-8?B?b1hqTTZ5R3ZrdGdCU3hFa0JaYmdDUHBNK1pUTXVvbldvckhzaVVyNThNZFpG?=
+ =?utf-8?B?WXVWZXMraWZXR2VpOGdDeWNHOGxSNGlrSS9hWUQvU1phMGkyODBaODdLNGYx?=
+ =?utf-8?B?bkRlVmRkVkFqODNERXFGOTA0cWh3bytGV3oyeDZPeHg4WDJ6anNZSlNBK3Nu?=
+ =?utf-8?B?VS84Z3NIM2QrRnRFQXJKOFJSbmU2Q21aRWQ4Vkxvd0wzOWg1YUFNeXNES29X?=
+ =?utf-8?B?cndOb2x4T2VQWXRrYlljL3NNSUcreFhwaEFnb0V6MHhzR1MzMmtqVFJGUDAw?=
+ =?utf-8?B?Tm9HRVphVTYvK3VvOGphTm1CdFI4cVhTU0c3NTFKS21GdVdNVm53K2F1Z2Ev?=
+ =?utf-8?B?SlJFYmYwUFRoNUlLeFgycXJ1UjNIMXpIVVFrcVlwUVpEY2tkcVk4VjN4WDdv?=
+ =?utf-8?Q?82CX8OhVWGoqIM/cJAX09E7ooxGcHy+tNHW3I=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR03MB7867.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZEtlVC9YdmlyZmcreGdFWERWcGdqVTFBOE5Za0dhWFhsL2FqT1ZjWW43QWVh?=
+ =?utf-8?B?VzQ4SW10R01DT0RraExaTGJ1ZTdETCtlSGh1VHU5U0RCaE5DSThOTUNwVHdz?=
+ =?utf-8?B?dXc2V01xRC9xeWFPUmxhQVB5OEpzWjlTMTR3VWFGSjZkb3J0eTQ1a0Z6cGRQ?=
+ =?utf-8?B?bDV5Qkh0bjROa05weS9ENHN2MDNxbklqZFBQMEZpaWR1Rjg2UFJ6M3RTYTFK?=
+ =?utf-8?B?L1YxeUFVa2RaL2REWEtVNEhucXRsQnNDcTVEMFFteVdWV2luRkVyL0grV2hF?=
+ =?utf-8?B?MzdaVmY3QUFycWlvcmJsTXZBU1UzWmNLRFdyU3lWZHRLZ3d5dDJjN3FnRVZJ?=
+ =?utf-8?B?WVhsNTJJb1BHWUh2c2hDUU05clp1cmJRNGhFNG90TTY0T013Q2hJRDkzbGx0?=
+ =?utf-8?B?ZnYvTEh6Umo2QjBJUWVGaFVaVDc3MXJNb0p4em45Z2NnZExLcnNWd2JoUVZ0?=
+ =?utf-8?B?V1pscnhIZkVDcm5WRVB2STBBV1BSVkJZOHlhRkUyaDNyb3pQTkxXNEt4bzd3?=
+ =?utf-8?B?cUliQlpkQkd6bHBSU1BlZUdDalNhWWpWU0M4UHJWSk82ZHlROGtUVVBaMUl5?=
+ =?utf-8?B?eGd0L2FKWiszOUtid3dHb1B2dGR3ckI0QkIxUTJlb3BhNVl6UEtNZ201MnVU?=
+ =?utf-8?B?WEhQbk43UzRrNm1aNXhZMVUralQyRE9wWDY0eXhVRHZYTk1WMkxnUjFzbTJy?=
+ =?utf-8?B?aWQydTYvS3ZsZWYxS1A3S2NzNDhmYnNxM2JodTRrT01zVm1qYnRtL0EvSkJy?=
+ =?utf-8?B?Ky9XT3FoZElZMGEvNDdKMGV4RDFZcGlDSmNXTXUxQ3N3b2dNaHVpdTkzWEg2?=
+ =?utf-8?B?NEREdTRDMWRHZUtLdnNJYVIxT3I2cUhMblgzQ0pKY09xSkZTSURrNDlZWnlt?=
+ =?utf-8?B?N3NOT1hIWXorTXJKSTVrWFdieEZCUjBwdFJuZ25xUHYvNnFvbGl2dFhCUDgy?=
+ =?utf-8?B?Rmh4dWl6d2lrWVU5c1N0SFB2b0o5Y1BwTGRSdXovbTBxNWsxZitmbENCU1lL?=
+ =?utf-8?B?TXlhMXh2TjhLZ2I5Z1VXVmg0czJoaDMrdWFjaEVaODRHNVZQTUVuZmZ4SlVu?=
+ =?utf-8?B?b2pnazdveFBXcFlpVEYyUmh3ckVlcW1UMmRUanM3TUFWQ0R6TVVmRXU2R2E5?=
+ =?utf-8?B?TW0vczdxVmt1NE93YlpJUHBET3JRMGdBT2lHWGhZY2MxKzkxOTFqZ3hPWDlz?=
+ =?utf-8?B?R2ticVV2RjBZUVI1QzI0dm5XdWxOdTk1dDhIV3g5MTcvck1FbjA5NHM2MEUz?=
+ =?utf-8?B?aXc2YjkxbFpkSU93WDl1VnFLQ09HdWdyTkowbjZuYXFESU85SExqL3lGSDdI?=
+ =?utf-8?B?WmNyazlQMHZNODNpMnBNaU5PNnlxL2lpRkdCOHRKL0xFVjA5aUsxbDU5eTJO?=
+ =?utf-8?B?S3RsbXFtcmtiTWdPSGFBOXROR2lHK2lvdjdIS1NiWFVWY29QdEgrNXhvTEZt?=
+ =?utf-8?B?cUlhQXBiaVVTWTFsK2RxT3NQeCtSVEx1alJod1ZvNTdWbGxwOTZGNXh6Q1gy?=
+ =?utf-8?B?alAxSERsQzRROXpManNXQWxXZ3NTd05ZSjBPQW8zVnBydnNmSVJ5K0FUemdy?=
+ =?utf-8?B?ZFZJYTkyK0tmZjRkL0pxQXYrcFZrQVI4UkxhRXRWVEk3NTFmckIrMnJNcmNR?=
+ =?utf-8?B?RkpMdmJLYTQ2SElEUzNtNXNZS2hoM2dlYU5rRGVtYWIxNlJUVkxWVWtnMVBa?=
+ =?utf-8?B?UHhYUmFtemxsOVlnZHVlOXFoQTM4N2ZyVTIvamFjYlEzZ0pibWpaSExFNytu?=
+ =?utf-8?B?YmVCVjZXc1gwK2RqUisyakZUN2VsVzhRNldFcCtvdXJ0WExPdTNaWFQ1ZE15?=
+ =?utf-8?B?SzU3RnB6Nmx3Z0RFT3pvd2ZjbzZ1TWJxTHVqazNUL2xRRHBsNW0rL3hnWjk5?=
+ =?utf-8?B?RGJRUG1GRUg2eVZRZGlNeGk4TzY0aElpREpzUDNNYnNXNXcyZWd1aVlHSUVS?=
+ =?utf-8?B?bWdvQVJIbkdUSXJiN0JTdmFra1p1VHpmNG81M2VsWHNjU0pNMWRkNW9ZTFhm?=
+ =?utf-8?B?elBHZkgvV1FSYUxITFZJT1ptM2txK2wvWTQzVFZDRkFFTE41VVk3OVZQMmNa?=
+ =?utf-8?B?SSthb08wdlYyZ1hFcXcvV3R5R2F1RXdETjYrNWN0S0c2NUFyeFJ6R1NNY1dG?=
+ =?utf-8?Q?LgjGtmfgUK4XiF9KLQ0BHqR51?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <61F27D18F469F644B5BF1A4EA7809DE6@apcprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZrRXEUko5EwKJaaP@fedora>
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,grimberg.me,linutronix.de,lst.de,oracle.com,redhat.com,broadcom.com,marvell.com,lwn.net,suse.de,parallelwireless.com,gmail.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,microchip.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR03MB7867.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62cf3a45-ad64-4c77-404e-08dcb847f780
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2024 07:50:41.3580
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vDGtXxrhKUu8g5sPj8VKhNU2SId25sSG0a/Zy6exeU5ot0wQqUQOKUXo+ddbhiMjozSddfvnvhjaMdDqOyLuFw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2PR03MB6463
 
-On Thu, Aug 08, 2024 at 01:26:41PM GMT, Ming Lei wrote:
-> Isolated CPUs are removed from queue mapping in this patchset, when someone
-> submit IOs from the isolated CPU, what is the correct hctx used for handling
-> these IOs?
-
-No, every possible CPU gets a mapping. What this patch series does, is
-to limit/aligns the number of hardware context to the number of
-housekeeping CPUs. There is still a complete ctx-hctc mapping. So
-whenever an user thread on an isolated CPU is issuing an IO a
-housekeeping CPU will also be involved (with the additional overhead,
-which seems to be okay for these users).
-
-Without hardware queue on the isolated CPUs ensures we really never get
-any unexpected IO on those CPUs unless userspace does it own its own.
-It's a safety net.
-
-Just to illustrate it, the non isolcpus configuration (default) map
-for an 8 CPU setup:
-
-queue mapping for /dev/vda
-        hctx0: default 0
-        hctx1: default 1
-        hctx2: default 2
-        hctx3: default 3
-        hctx4: default 4
-        hctx5: default 5
-        hctx6: default 6
-        hctx7: default 7
-
-and with isolcpus=io_queue,2-3,6-7
-
-queue mapping for /dev/vda
-        hctx0: default 0 2
-        hctx1: default 1 3
-        hctx2: default 4 6
-        hctx3: default 5 7
-
-> From current implementation, it depends on implied zero filled
-> tag_set->map[type].mq_map[isolated_cpu], so hctx 0 is used.
-> 
-> During CPU offline, in blk_mq_hctx_notify_offline(),
-> blk_mq_hctx_has_online_cpu() returns true even though the last cpu in
-> hctx 0 is offline because isolated cpus join hctx 0 unexpectedly, so IOs in
-> hctx 0 won't be drained.
-> 
-> However managed irq core code still shutdowns the hw queue's irq because all
-> CPUs in this hctx are offline now. Then IO hang is triggered, isn't
-> it?
-
-Thanks for the explanation. I was able to reproduce this scenario, that
-is a hardware context with two CPUs which go offline. Initially, I used
-fio for creating the workload but this never hit the hanger. Instead
-some background workload from systemd-journald is pretty reliable to
-trigger the hanger you describe.
-
-Example:
-
-  hctx2: default 4 6
-
-CPU 0 stays online, CPU 1-5 are offline. CPU 6 is offlined:
-
-  smpboot: CPU 5 is now offline
-  blk_mq_hctx_has_online_cpu:3537 hctx3 offline
-  blk_mq_hctx_has_online_cpu:3537 hctx2 offline
-
-and there is no forward progress anymore, the cpuhotplug state machine
-is blocked and an IO is hanging:
-
-  # grep busy /sys/kernel/debug/block/*/hctx*/tags | grep -v busy=0
-  /sys/kernel/debug/block/vda/hctx2/tags:busy=61
-
-and blk_mq_hctx_notify_offline busy loops forever:
-
-   task:cpuhp/6         state:D stack:0     pid:439   tgid:439   ppid:2      flags:0x00004000
-   Call Trace:
-    <TASK>
-    __schedule+0x79d/0x15c0
-    ? lockdep_hardirqs_on_prepare+0x152/0x210
-    ? kvm_sched_clock_read+0xd/0x20
-    ? local_clock_noinstr+0x28/0xb0
-    ? local_clock+0x11/0x30
-    ? lock_release+0x122/0x4a0
-    schedule+0x3d/0xb0
-    schedule_timeout+0x88/0xf0
-    ? __pfx_process_timeout+0x10/0x10d
-    msleep+0x28/0x40
-    blk_mq_hctx_notify_offline+0x1b5/0x200
-    ? cpuhp_thread_fun+0x41/0x1f0
-    cpuhp_invoke_callback+0x27e/0x780
-    ? __pfx_blk_mq_hctx_notify_offline+0x10/0x10
-    ? cpuhp_thread_fun+0x42/0x1f0
-    cpuhp_thread_fun+0x178/0x1f0
-    smpboot_thread_fn+0x12e/0x1c0
-    ? __pfx_smpboot_thread_fn+0x10/0x10
-    kthread+0xe8/0x110
-    ? __pfx_kthread+0x10/0x10
-    ret_from_fork+0x33/0x40
-    ? __pfx_kthread+0x10/0x10
-    ret_from_fork_asm+0x1a/0x30
-    </TASK>
-
-I don't think this is a new problem this code introduces. This problem
-exists for any hardware context which has more than one CPU. As far I
-understand it, the problem is that there is no forward progress possible
-for the IO itself (I assume the corresponding resources for the CPU
-going offline have already been shutdown, thus no progress?) and
-blk_mq_hctx_notifiy_offline isn't doing anything in this scenario.
-
-Couldn't we do something like:
-
-+static bool blk_mq_hctx_timeout_rq(struct request *rq, void *data)
-+{
-+       blk_mq_rq_timed_out(rq);
-+       return true;
-+}
-+
-+static void blk_mq_hctx_timeout_rqs(struct blk_mq_hw_ctx *hctx)
-+{
-+       struct blk_mq_tags *tags = hctx->sched_tags ?
-+                       hctx->sched_tags : hctx->tags;
-+       blk_mq_all_tag_iter(tags, blk_mq_hctx_timeout_rq, NULL);
-+}
-+
-+
- static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- {
-        struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
-                        struct blk_mq_hw_ctx, cpuhp_online);
-+       int i;
-
-        if (blk_mq_hctx_has_online_cpu(hctx, cpu))
-                return 0;
-@@ -3551,9 +3589,16 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
-         * requests.  If we could not grab a reference the queue has been
-         * frozen and there are no requests.
-         */
-+       i = 0;
-        if (percpu_ref_tryget(&hctx->queue->q_usage_counter)) {
--               while (blk_mq_hctx_has_requests(hctx))
-+               while (blk_mq_hctx_has_requests(hctx) && i++ < 10)
-                        msleep(5);
-+               if (blk_mq_hctx_has_requests(hctx)) {
-+                       pr_info("%s:%d hctx %d force timeout request\n",
-+                               __func__, __LINE__, hctx->queue_num);
-+                       blk_mq_hctx_timeout_rqs(hctx);
-+               }
-+
-
-This guarantees forward progress and it worked in my test scenario, got
-the corresponding log entries
-
-  blk_mq_hctx_notify_offline:3598 hctx 2 force timeout request
-
-and the hotplug state machine continued. Didn't see an IO error either,
-but I haven't looked closely, this is just a POC.
-
-BTW, when looking at the tag allocator, I didn't see any hctx state
-checks for the batched alloction path. Don't we need to check if the
-corresponding hardware context is active there too?
-
-@ -486,6 +487,15 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
-        if (data->nr_tags > 1) {
-                rq = __blk_mq_alloc_requests_batch(data);
-                if (rq) {
-+                       if (unlikely(test_bit(BLK_MQ_S_INACTIVE,
-+                                             &data->hctx->state))) {
-+                               blk_mq_put_tag(blk_mq_tags_from_data(data),
-+                                              rq->mq_ctx, rq->tag);
-+                               msleep(3);
-+                               goto retry;
-+                       }
-                        blk_mq_rq_time_init(rq, alloc_time_ns);
-                        return rq;
-                }
-
-But given this is the hotpath and the hotplug path is very unlikely to
-be used at all, at least for the majority of users, I would suggest to
-try to get blk_mq_hctx_notify_offline to guarantee forward progress?.
-This would make the hotpath an 'if' less.
+T24gVHVlLCAyMDI0LTA3LTMwIGF0IDA5OjQ5IC0xMDAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
+PiAgCSANCj4gRXh0ZXJuYWwgZW1haWwgOiBQbGVhc2UgZG8gbm90IGNsaWNrIGxpbmtzIG9yIG9w
+ZW4gYXR0YWNobWVudHMgdW50aWwNCj4geW91IGhhdmUgdmVyaWZpZWQgdGhlIHNlbmRlciBvciB0
+aGUgY29udGVudC4NCj4gIEhlbGxvLCBCb3kuDQo+IA0KPiBPbiBGcmksIEp1bCAyNiwgMjAyNCBh
+dCAwMzo0MzoyN0FNICswMDAwLCBCb3kgV3UgKOWQs+WLg+iqvCkgd3JvdGU6DQo+IC4uLg0KPiA+
+IFRoZSB1c2Ugb2YgYSBzcGlubG9jayB3aXRoIHU2NCBzeW5jIGlzIHN1Z2dlc3RlZCBpbg0KPiA+
+IGluY2x1ZGUvbGludXgvdTY0X3N0YXRzX3N5bmMuaDozMy4NCj4gPiANCj4gPiAgKiBVc2FnZSA6
+DQo+ID4gICoNCj4gPiAgKiBTdGF0cyBwcm9kdWNlciAod3JpdGVyKSBzaG91bGQgdXNlIGZvbGxv
+d2luZyB0ZW1wbGF0ZSBncmFudGVkIGl0DQo+ID4gYWxyZWFkeSBnb3QNCj4gPiAgKiBhbiBleGNs
+dXNpdmUgYWNjZXNzIHRvIGNvdW50ZXJzIChhIGxvY2sgaXMgYWxyZWFkeSB0YWtlbiwgb3IgcGVy
+DQo+IGNwdQ0KPiA+ICAqIGRhdGEgaXMgdXNlZCBbaW4gYSBub24gcHJlZW1wdGFibGUgY29udGV4
+dF0pDQo+ID4gICoNCj4gPiAgKiAgIHNwaW5fbG9ja19iaCguLi4pIG9yIG90aGVyIHN5bmNocm9u
+aXphdGlvbiB0byBnZXQgZXhjbHVzaXZlDQo+IGFjY2Vzcw0KPiA+ICAqICAgLi4uDQo+ID4gICog
+ICB1NjRfc3RhdHNfdXBkYXRlX2JlZ2luKCZzdGF0cy0+c3luY3ApOw0KPiA+ICAqICAgdTY0X3N0
+YXRzX2FkZCgmc3RhdHMtPmJ5dGVzNjQsIGxlbik7IC8vIG5vbiBhdG9taWMgb3BlcmF0aW9uDQo+
+ID4gICogICB1NjRfc3RhdHNfaW5jKCZzdGF0cy0+cGFja2V0czY0KTsgICAgLy8gbm9uIGF0b21p
+YyBvcGVyYXRpb24NCj4gPiAgKiAgIHU2NF9zdGF0c191cGRhdGVfZW5kKCZzdGF0cy0+c3luY3Ap
+Ow0KPiA+IA0KPiA+IElzIHRoaXMgYSBpbmNvcnJlY3Qgc3RhdG1lbnQ/DQo+IA0KPiBUaGF0J3Mg
+bm90IGluY29ycmVjdCBhbmQgaXQnZCBtYWtlIHNlbnNlIGlmIHdlIHJlYWxseSB3YW50IHRvIHVz
+ZQ0KPiB1NjRfc3luYyAtDQo+IGUuZy4gdGhlIHJlYWRlciBpcyBob3QgcGF0aC4gSGVyZSwganVz
+dCBhIHNwaW5sb2NrIHdvdWxkIGJlIHNpbXBsZXINCj4gYW5kIGRvDQo+IGZpbmUuDQo+IA0KPiBU
+aGFua3MuDQo+IA0KPiAtLSANCj4gdGVqdW4NCg0KDQp1NjRfc3luYyB3aXRoIHNwaW4gbG9jayBo
+YXMgdGhlIGJlbmVmaXQgb2YgbG9ja2luZyBvbmx5IHdoZW4gd3JpdGluZw0KaW9zdGF0LCBidXQg
+cmVwbGFjaW5nIHU2NF9zeW5jIHdpdGggc3BpbiBsb2NrIHdpbGwgbG9jayBub3Qgb25seSB3aGVu
+DQp3cml0aW5nIGlvc3RhdCBidXQgYWxzbyB3aGVuIHJlYWRpbmcgaW9zdGF0LiBEb2VzIGl0IGhh
+dmUgZW5vdWdoDQpiZW5lZml0IHRvIHJlcGxhY2UgdTY0X3N5bmMgYW5kIGFkZCB0aGUgY29zdCBv
+ZiBsb2NraW5nIHdoZW4gcmVhZGluZw0KaW9zdGF0Pw0KDQotLQ0KQm95Lld1DQo=
