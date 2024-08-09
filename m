@@ -1,86 +1,89 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42B3194A5C
-	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 13:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058D62F37
+	for <linux-block@vger.kernel.org>; Fri,  9 Aug 2024 13:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723208863; cv=none; b=CJn1EetNxSVVlsnovjw0rA1FGjZjuLsd82WjJR67QyZACeVCyjyXiBMbj0QHvd163zq3mpeN68gYI+c9YqRrfgDet+dzsv9ByrCkN655W2Us6Zsh9hW2a6hOydaUWODO7bH/0+esAZzdu6xCVWboliLkPtLH/Cqa+GEtWG3cQ/o=
+	t=1723209389; cv=none; b=UBAHE1SMo3LcmfWpAj/95u34rewZYuJjXwBdQoFo2KrNLFX5TSxA4BKqHj9Irv6dSIGreeblRsng5F6fHlB6Fyx5y6GJcfCTOdkWyIsW1p3pP5P0CKFeNyvN731apRx8rktlOZtHzVSe5UfQinAt3NnmvuFPKrmS36K6ctrpGls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723208863; c=relaxed/simple;
-	bh=kCFVoFCFuy0U30o31BMxvy7Ab0XDZIvqSHyEB+oQ4CY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AI/UKF6wKz3cgCJ3UPaZ8S3zbkQDRupU5lQtirqFUlMd/kWqmE4OYZZ+qCtWmnE46uZGZIvXSXmZPIomiX8H6i0QIa3FOj1qaMEoaovmvm6u5PWAi9fekH0im8ST/6eMm/WBN0y1OaV4LBrvphuAhdLBkEjiwJHgrU694VXWHtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sWx5JMoU; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1723209389; c=relaxed/simple;
+	bh=92qOkLCSYu9nmceUlAEJm9hX6RmjzSfHnPjdMwunYvU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Knzw3isNKkdeYSzCsWVkRCVglMvYIZqQQPtsp0XND/dYV8yQkGFfASTwdn+FHq9PRCrhY4Fm0/AOsfSxdD7W8Ac/m2OSodIlRwfqtG9pt5JoIm/uvABG3aJuro++sOUHEabBhQnsihwbNikoZxeFgooBUtMzcce6jWkR2xvKrR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ij8QSxps; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sWx5JMoU"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2cd16900ec5so368466a91.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 06:07:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ij8QSxps"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso14845205e9.1
+        for <linux-block@vger.kernel.org>; Fri, 09 Aug 2024 06:16:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723208861; x=1723813661; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ThAFzPMUuQHD9VLFPcfFOW6T/XOpVMlWLGK4CG7KhUc=;
-        b=sWx5JMoUrEXTmPDiP6frb30Bgv47n39B9+cDu2l5M1jIpxCppBDOqzF86XdUU8/yCb
-         xl+J53PYMKqQLBuYmSv636vgSXmIBkdSf/o2r8mfWffDNWM+ZK9+K0qX7tUNyT00ZD1Z
-         kAVe6M6qDdrGeRu+EjzqQRwvV7fDnZCCqABtz4XgxTftKMuAFicHKAs5kZFb7IR1btB8
-         q20WqFSk8ebG2uqhNL9ySAwLg2FO16D2f16EbgtXaATeYja3pDwdFEz+saN47xZsDaGe
-         hJChZdUxp0g05UwY7JWMt60Ii6ejXwE1kV4d1GzRYliejubDTDCqHpU+RZI1ioOz/VRu
-         JI5A==
+        d=google.com; s=20230601; t=1723209386; x=1723814186; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=92qOkLCSYu9nmceUlAEJm9hX6RmjzSfHnPjdMwunYvU=;
+        b=ij8QSxpsg2UMcdzOEQX4CYZL1OeZI4vWBGBX5QHtR3glQk7bQDkbcfZhjuXimJCudH
+         HS5Qro1ADMVr/yIVw9KUDRSoYTGNYoBN/PN8EGYzuOGYGcBWeAJxMKCrbw2g7Ol6YTXy
+         ZrckBN1y/ao7E8gjfUxDlFipKqZBIM1IEoxzy/a2Zrp/wgmYa8fjd0Y1oMml3OXg77OM
+         5GlzIJ/Gh4dAwfe5hrPUNoMgeCzDM63gLQ5D+qwvtPS3WksSw643bob6/XSPO7QC07GH
+         J2CgivjRtgZslYmjhwokSkBfNPFGpotCtDXHVk2g7PVASHrSVPCFVjuyuL9eREjEPrQO
+         5Kww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723208861; x=1723813661;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ThAFzPMUuQHD9VLFPcfFOW6T/XOpVMlWLGK4CG7KhUc=;
-        b=pC2p+zzkWaY4cNSQl1p7VB+iqzAW9j5UwSY+YNZnHM+ByD6LS9x2qQVtHXF801OSYH
-         zUd+uRq416zcSDkJl3QekJNxOsrMGtCR1b9w/hzQlF9BGVZybuew8jvU8trfBGmp01iu
-         7a9ElLVfIc006ai2d0fh4mjWB1G2RTrCI9oLbCoS5Ga6RJftg5g3zKaVq0ZBDFkRXgKu
-         2b/Q6q7bpW4Goi/RlFdVcm8eyoxKg0nalN3uACSWfucVM2lp6HLL7LEKNhY7AOGiCE8R
-         VWukzT1lDefkfYswcjHjC2XSc0KozQnckWyYUh1Btt+l+hepnbtdKaMAPLFA9gk6EPva
-         j3fA==
-X-Gm-Message-State: AOJu0Yws8K2vPQsBMI6QTgIhFIpzoeviftqJQnk+yllVKtIg5fCQP8IM
-	jMsot3f7Tg3daV7QXBbybMDkPt2n4swp9XuWktRDpy0fUP/bxsHa6Nd95v+lC9I=
-X-Google-Smtp-Source: AGHT+IG/sFw9tqM0pOt5/pXk9bnpnz3hLNgW6nFzjVujbZLZQ4Vzu051dTL4L9BrTEGMcHavnDGmNw==
-X-Received: by 2002:a17:90b:224b:b0:2c8:4623:66cd with SMTP id 98e67ed59e1d1-2d1e7fa2c8bmr901226a91.1.1723208860658;
-        Fri, 09 Aug 2024 06:07:40 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d1b3ab3baesm5285151a91.15.2024.08.09.06.07.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Aug 2024 06:07:40 -0700 (PDT)
-Message-ID: <975158d8-4f26-4b5c-9cc7-eec15d901eb6@kernel.dk>
-Date: Fri, 9 Aug 2024 07:07:37 -0600
+        d=1e100.net; s=20230601; t=1723209386; x=1723814186;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=92qOkLCSYu9nmceUlAEJm9hX6RmjzSfHnPjdMwunYvU=;
+        b=eN7gCMJX8eALHObU3RH8jrJKEuqIrrbp8bz0Iac+GNMs385a5yJdFpnPluI+d+2QDS
+         +wuztN3SKx7LbCLnxptQxV7NdBlzhkqogPp6Dxfhibz9GcIAPJmZFJAmJUQ/+VoUrBMu
+         +3e0hlTl2iM5q9W42pQSSYyZsDqkUZvDKI3PAybmh1QxKi/ubOu3gNpyXWcry2yVUwEU
+         KJk7oeSnyrLuQLwiRw+AFHmjK4RlaU951Cc0MoycIXppjN/Qh+qckun1TJP5HeJ6qO4D
+         laY9qJhA+b3RdPNYcwpTKrk+sw9bjPmPKv7xNnTOgnWZPfWyu/Aj4ojW1Cw/mVHcq8iS
+         6Saw==
+X-Forwarded-Encrypted: i=1; AJvYcCXfOavakVjcQm8zOt96bfb6ecJgsrgQ0ZgcT5rNh+uliw7p5JVBAwLAuXxhKy1TVFqctSZtKxYWYhaVbg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4e6aS4wuCokmo9drnnoR80mth0JYqxPG2Bcor22Uwen0XzsAm
+	YU4DASNwsbhG987zw1h/WsKMlibeBVGi8FAvJOKFYKCOZu+HrfBMJbbEHG2Lx2yBSlsjvhX/Sk3
+	G944CemTElSU0iZkeTUVOsxAGpkBTBDszXRIF
+X-Google-Smtp-Source: AGHT+IEencuwb5ZiZqBxrl2yiXarWFIGCnvBaoEIUj3k90VcnrheSq2WUA4koqg2hebfaLRX95IYrP+jEef8wEWRJhg=
+X-Received: by 2002:adf:f545:0:b0:369:c6d7:7b93 with SMTP id
+ ffacd0b85a97d-36d5ea00d30mr1177252f8f.28.1723209386152; Fri, 09 Aug 2024
+ 06:16:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20240809064222.3527881-1-aliceryhl@google.com> <975158d8-4f26-4b5c-9cc7-eec15d901eb6@kernel.dk>
+In-Reply-To: <975158d8-4f26-4b5c-9cc7-eec15d901eb6@kernel.dk>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Fri, 9 Aug 2024 15:16:13 +0200
+Message-ID: <CAH5fLgiqQ6GxPk4-JCdRnKmi9ECgzVj+MkoUnZLYtUp8-yCebQ@mail.gmail.com>
 Subject: Re: [PATCH] rust: sort includes in bindings_helper.h
-To: Alice Ryhl <aliceryhl@google.com>, Miguel Ojeda <ojeda@kernel.org>,
- Andreas Hindborg <a.hindborg@samsung.com>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240809064222.3527881-1-aliceryhl@google.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240809064222.3527881-1-aliceryhl@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/9/24 12:42 AM, Alice Ryhl wrote:
-> Dash has ascii value 45 and underscore has ascii value 95, so to
-> correctly sort the includes, the underscore should be last.
+On Fri, Aug 9, 2024 at 3:07=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 8/9/24 12:42 AM, Alice Ryhl wrote:
+> > Dash has ascii value 45 and underscore has ascii value 95, so to
+> > correctly sort the includes, the underscore should be last.
+>
+> This commit message lacks an explanation for why the change is
+> being done. Yes it states that it brings the headers in ascii
+> sort order, but WHY?
 
-This commit message lacks an explanation for why the change is
-being done. Yes it states that it brings the headers in ascii
-sort order, but WHY?
+I can add the following to the commit message:
 
--- 
-Jens Axboe
+The headers in this file are sorted alphabetically, which makes it
+easy to quickly resolve conflicts by selecting all of the headers and
+invoking :'<,'>sort to sort them. To keep this technique to resolve
+conflicts working, also apply sorting to symbols that are not letters.
 
-
+Alice
