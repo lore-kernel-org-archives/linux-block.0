@@ -1,91 +1,93 @@
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3805E16C698;
-	Fri,  9 Aug 2024 09:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3D1194AD6;
+	Fri,  9 Aug 2024 12:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723195971; cv=none; b=dVaB95MItoBM1gOuEjfzOxGUUhZFa0NgrGd4EBeZLz4TCMUlyIPr9LUnVZM3Vly9Hbv8Jr9rtYNrkXVGGCyY2b7JNFOL/FR532GfA+aN8cLYStyiTCL9wCew2tS9jiKhHzUicq449YGKp1wOnqk67xSoLJ8u/0vdEl7yHNrH5xI=
+	t=1723208325; cv=none; b=fyzeB4TWh/2dFAs+/0Vp7INBoMJGhE4YhrUBIXBXn3tQIhW8XJS3sLfk1UpjObmTSV+aj1DkUGll8imEe/86RWwjvxIr3AaSLVrbSxrchnpxvmDUhMBAzN/xEyzo8UXPo7BFv1D7AZQyGGQRJm9Ic3il/xBCQXZWPgxPnRqHXqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723195971; c=relaxed/simple;
-	bh=4KW1ROBDhFMm2b3dGG4xSpJKmeyZw3F35ER4kQ/Yf4w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uoWGGMohdfxZsvf0R0AeoSIQ1iUueRRFUoYe8VojAP0+e+w/Qxgs5WiLFQ/TP2PZtf9qZr8ZXX3ss0jD+AhuGgOhjLPJ8RMoXZklCqwJmGodsIeBmsME0GSeVRsz5k6Gd+t6TWMpxNpkAPngkPO4Nf6OoOUOb8QIA9puZroVNwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mGEVNzHB; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1723208325; c=relaxed/simple;
+	bh=FGRFfoKrCyjpQ1L1xKhEW2Z5ELvYBvnzVXI9tJ5zXpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xmk7T7AXWpbMJtRWqagxntA/ssl9hRb7ifZcwzIquJjIqunvRQRsqymDypHNJdN+B72Zc200qdbS8eRURQR+2yb42MC0sYFMRztBuKt3YHR6sJWgNTiVkzqpDDqPBHM1sX2MBHEuUBiwrvs3+hsXwZq1JaVZzsK/YF8b2efFO2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dJQyaNBK; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mGEVNzHB"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1723195964; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=gZ93c15PmjBf9iKf8+aNnVB3ru9vORti3RxMK+6EHUM=;
-	b=mGEVNzHBtfTlt6BggMg57l4EPMorFIQZ1a1xV5wwXMjmgat3eNn8afiYDyUKjenXjQep8MbWjFxEnon5gGhB1VDlwxansZTE/hVQQAs0lsDPSECn8qxhQdi5tQwEu9RCXDPQq0IglVXJwZ+DW0QSMBMXGQVbWNBjgQomVGXYHcg=
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0WCPTBTz_1723195963)
-          by smtp.aliyun-inc.com;
-          Fri, 09 Aug 2024 17:32:44 +0800
-From: Yang Li <yang.lee@linux.alibaba.com>
-To: axboe@kernel.dk,
-	christoph.boehmwalder@linbit.com
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yang Li <yang.lee@linux.alibaba.com>
-Subject: [PATCH -next] drbd: Add missing kernel-doc function comments.
-Date: Fri,  9 Aug 2024 17:32:33 +0800
-Message-Id: <20240809093233.8627-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dJQyaNBK"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2cb4b7fef4aso1651827a91.0;
+        Fri, 09 Aug 2024 05:58:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723208323; x=1723813123; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6v9350Nj3vlAUY0CEodJkrVSeYBUy8/gULVsctF3FR4=;
+        b=dJQyaNBKCki5A060PHBAhEahD5oSk4rvyIwlAECfDxauo9Ii6RM2Vd/P+fSzoYzcLn
+         4dyez+XMHqEYe4+XWjpVGzKhOZKJGm64/iIK6A/pjrmv/8TBG3pEtxmB0t7PpPM8Th7P
+         fdQTefaDpit6fovn8bUB+Jn1Z/1fey8E4srr3FGQm/V1KBsOrzTF3yCsvego7JqLySud
+         XW206Z78tC7klUjeiPr7dxVLjy28c2cfcn0uMON2+PxYNTzCUUq4zhFlGzVRuN7Q59t/
+         Ba9ABUKzS3NlkoZjl4n5ceZeXN+WGZhg9sz96XeO7LovsqAFIGnJCpQ9FHUgI3oaMs0s
+         iofw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723208323; x=1723813123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6v9350Nj3vlAUY0CEodJkrVSeYBUy8/gULVsctF3FR4=;
+        b=BaBT38WWNQuBZWQOO91y3LOqUp0gD1UVRkSBsQK3sRVT9iOJDbFfsvUGz7Kp1n6Qf0
+         rtlv5+bf4buDcNTIkUfmY7ddkKYH4J07au3niZKxyFtR08GlKpUlcMqwPQJ9KsXmKVf+
+         7vTDKmeSxMLIOs2kqVZDaGN+1tNfuwp6p6WPgnKiEm6QS4DEqtDUgUQ7DkcVhZ7LztKq
+         rl96ie2V/XNdlc3obbrdCLJnRFZ7/7aTnOE/i+thY+pRvN494kvpu9m5YhHUVVyL0Kz7
+         iH+VjnbRr/CQ5EfNkzLEaMA9Wi0t1tm1ldejJ9FPPq4inzEx502R7Ty29yQEaFMyCY86
+         db0A==
+X-Forwarded-Encrypted: i=1; AJvYcCWos16VxmMUIpQ8CRU3eB9B9QwzMHPa8awje+Lu+1JSpqo59eomm7fIPVAXfD9+AYFdUnHuntzvz9WifujxIR3akJow5rvut6/I08zWWEpfSZfSLdUCOrqTpzD4PP9V+/inzAWse/mR3ziji1LBSLN297WArtqkOhajw34eXK9cpIXhP4eZB+yEdA==
+X-Gm-Message-State: AOJu0Yxsm+IDfpKc0z0LIm76r2+Mc9przcBsJGulrR9tJiDqQuKErtW3
+	Jwpr17OG8/ExCRC207QQmDtauf5fd1oCdv0jKN6c19mGBGB9uJOa9kUx53ketGjfd8LoFak2ZBu
+	VIzzEYbShuz6rT6mgY31247rWEr0=
+X-Google-Smtp-Source: AGHT+IEQc5kyXmolW0Sis7l41/WL9/1/vMoeqxdlcXNfi8hS5iNTv0gWd+JH9Ib8sWecYe9p6gOg94R1Pplbq30RUXo=
+X-Received: by 2002:a17:90b:124f:b0:2c9:cbdd:acd with SMTP id
+ 98e67ed59e1d1-2d1e807165amr1599804a91.35.1723208323234; Fri, 09 Aug 2024
+ 05:58:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240809064222.3527881-1-aliceryhl@google.com>
+In-Reply-To: <20240809064222.3527881-1-aliceryhl@google.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 9 Aug 2024 14:58:30 +0200
+Message-ID: <CANiq72nP+pL7fEvaB7HA-mHJFs1j9SKMoSMSCif61YCy4QDFoA@mail.gmail.com>
+Subject: Re: [PATCH] rust: sort includes in bindings_helper.h
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
+	Andreas Hindborg <a.hindborg@samsung.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add missing kernel-doc function comments to enhance code readability and
-maintainability in accordance with the kernel coding standards.
+On Fri, Aug 9, 2024 at 8:42=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> wr=
+ote:
+>
+> Dash has ascii value 45 and underscore has ascii value 95, so to
+> correctly sort the includes, the underscore should be last.
+>
+> Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
 
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- drivers/block/drbd/drbd_bitmap.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Looks good to me (`LC_ALL=3DC`), thanks!
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-index 85ca000a0564..746bb75ab2a4 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -1213,6 +1213,7 @@ static int bm_rw(struct drbd_device *device, const unsigned int flags, unsigned
- /**
-  * drbd_bm_read() - Read the whole bitmap from its on disk location.
-  * @device:	DRBD device.
-+ * @peer_device:	DRBD peer device.
-  */
- int drbd_bm_read(struct drbd_device *device,
- 		 struct drbd_peer_device *peer_device) __must_hold(local)
-@@ -1224,6 +1225,7 @@ int drbd_bm_read(struct drbd_device *device,
- /**
-  * drbd_bm_write() - Write the whole bitmap to its on disk location.
-  * @device:	DRBD device.
-+ * @peer_device:	DRBD peer device.
-  *
-  * Will only write pages that have changed since last IO.
-  */
-@@ -1236,6 +1238,7 @@ int drbd_bm_write(struct drbd_device *device,
- /**
-  * drbd_bm_write_all() - Write the whole bitmap to its on disk location.
-  * @device:	DRBD device.
-+ * @peer_device:	DRBD peer device.
-  *
-  * Will write all pages.
-  */
-@@ -1258,6 +1261,7 @@ int drbd_bm_write_lazy(struct drbd_device *device, unsigned upper_idx) __must_ho
- /**
-  * drbd_bm_write_copy_pages() - Write the whole bitmap to its on disk location.
-  * @device:	DRBD device.
-+ * @peer_device:	DRBD peer device.
-  *
-  * Will only write pages that have changed since last IO.
-  * In contrast to drbd_bm_write(), this will copy the bitmap pages
--- 
-2.32.0.3.g01195cf9f
+I can take it; otherwise:
 
+    Acked-by: Miguel Ojeda <ojeda@kernel.org>
+
+I am not sure if this should count as a bug/fix (there is an
+recent/ongoing debate about the Fixes tag).
+
+(This kind of issues can be also opened as "good first issues", by the
+way, i.e. as a way to get contributors to set their email workflow.)
+
+Cheers,
+Miguel
