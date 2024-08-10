@@ -1,194 +1,94 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EF93FEC
-	for <linux-block@vger.kernel.org>; Sat, 10 Aug 2024 04:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1E6158524
+	for <linux-block@vger.kernel.org>; Sat, 10 Aug 2024 14:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723262582; cv=none; b=ZrbsNSFx3HKqJ9Bq79S5cK3YCJJyi9dqiTld8rGCc04da8iLuHZn++TXaqQVUxpON4rhsiQcGFpyUQ3m6Qw3YxrZ6M8SxvNU18K/pBSkfUpurk1A7fgOdAGddMdzlXwByEq13JYWtwpzt7NJzSzUXWZudRSItkJny5MpcgTv7Fs=
+	t=1723300018; cv=none; b=E8haQTez97ESYhcAGvNOpCDUSmCHVd33F2qzcGFxwg1PDXnrkCjt8kZDrxkaSlhI8ox9yl/GXTDSd+fOO2v7XJ8TtLL6M4g8Fp8OYROP6JJb+BmQe2SG/Gk3QJ+gSve8LqW+loNvgDlHow25/+jjVGSpZEK39J79Ssbc1QW8sME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723262582; c=relaxed/simple;
-	bh=8XC0U/VPysFi9si6UmJbM45ljr3f40dzr2kY37TzLYE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OBzlfyQqHZEETqmX4MjsjBdoqA9TkwnAQukfg3sDp+D6hdDuPOqLWdMAJs5QGbMUxkimXsewOU9mNy0etrRJvxB8elaEbI2Hl6UhdG0crrWXIq7Db8wFzvs7m7Bph1LuE4speM8/rf9Myb24ot/V0pW7Hq6Wyw8pxNMPTykptSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MdBxx7/R; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1723300018; c=relaxed/simple;
+	bh=IJp2AjlCbDDMAxgFElz/+oD0a/gSVGG9gyoKqu/gdaw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QTAaeVKgdG2cMPgNVBcQVCW0cThJ6Q/PWjiatew+QGe9sF78Bsjpgdb5dYstPeoRwN39EcT9facQLGmNj4NdWsJFzOmNNe7qTHSsNhyRJTbmSVi+8Ht4ijFiZ0imQnuahO1Ezy5En2GWeMUNqThCDz0dZ/hXXDwUjIbDhguvNhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=knhQqHpt; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdBxx7/R"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723262578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=/HzBfH6xrgVs9IqWruyPYxdcch9/sRkazCZFJwOaGT4=;
-	b=MdBxx7/RwWi6rAAaME4L3quTaT0SBmiSZ3JtKHRN108TCx9vNDX4TFFjcaU7SWycrNhIbv
-	bdQAusdNeMo3PAfijv+7kFEgaQ4rq84WYvqEx5LYTVG9RCwPcUg8i9sz5S6GNXKSBlDaEN
-	xoX+FXzqhwsM8blfspTwzUbWlzU0acU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-w9LscJEfMCqzY6bA1l0h1g-1; Sat,
- 10 Aug 2024 00:02:51 -0400
-X-MC-Unique: w9LscJEfMCqzY6bA1l0h1g-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB12719560A6;
-	Sat, 10 Aug 2024 04:02:50 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.9])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 36D2E19560A7;
-	Sat, 10 Aug 2024 04:02:48 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Andreas Hindborg <a.hindborg@samsung.com>
-Subject: [PATCH] ublk: move zone report data out of request pdu
-Date: Sat, 10 Aug 2024 12:02:39 +0800
-Message-ID: <20240810040239.437215-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="knhQqHpt"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1fc4b03fca0so1065965ad.3
+        for <linux-block@vger.kernel.org>; Sat, 10 Aug 2024 07:26:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723300014; x=1723904814; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I9hrNrZucd6ueEvwXG7IfGc0zmVsa2VOceWwqA+nd20=;
+        b=knhQqHpt/Sz8mNniBVMiqU1EFlytA20IAcChh8bfb60+JuYC+NVpfX6xl92o9ekKzM
+         9HBao/y+X0+7GzfxhkQLxmidYBkl9Tb6Ug52r0DtlkTvq3oXSkGyd0FrYP4jeuBEGGiv
+         cUs4GpBSj3qPJOfKqaDFIKRO/pfkMRY7sjsjz97WuJaX8J6hIgac8LTKt/2bChk6zybY
+         n1xutFYmv6kcNu7btFDFYKj0DN+NeCM1oA01g14LOJ72fGm7dXfDp7oaIpFAoGUPA5Th
+         1rR94vjuoBvW/7xXDaFyOw5UdvSorp4giPPUMhJbnXUXeXnPelc+1oZgRClog8rq8yxw
+         oQsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723300014; x=1723904814;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I9hrNrZucd6ueEvwXG7IfGc0zmVsa2VOceWwqA+nd20=;
+        b=q0SKZfCa9xEXVJwE4o9K4B+gcoTeDg2juR0xU4Qm1cf0vBNT6hylD1b/NgquFAGBYS
+         lNKEti7QeNfN3dqCVwTvyriJzHkhbjunNI+HdCWz0S6d7wdBXrQOa+odjNFO8rFnWb3F
+         vxdHpmo7NorsADfs9CA/VnYFKaTHaRYWzXTUmxxzEmasoVOTFlnYGUbHEZ7SxENT76WZ
+         PXXXkeUqQEhSWPUW3qXCzWpVfpCzNOds3DLbdroahZQVzOLjW5nOPhlp57y1uy6anAHR
+         Bjr+/lyXM9NcqscCyFLifKWA2Y/9v9bcfW0fr//CL1+jCd7G6WT0igwQwdfRrL47+GdB
+         7tdg==
+X-Forwarded-Encrypted: i=1; AJvYcCXkLRIXds969otQRP2b+gqork5hK5XvvrAvz+KytgiHcgaj2SbAnX2WwvzGkyWJgAiboW52ZXE22sS3+g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY+gcwxME81GYASuL139LLBoMFIQ5MVwExedXlZfsshb+yrkCC
+	/HpZHStKkiRJ3Z5rgQCQFYkQsz9ANH/WKS+izJWs8U3QJ92+qK8n//oUtE3JWcA=
+X-Google-Smtp-Source: AGHT+IEwTDx0LNxYlSvdNLNK+StLPiVAkwaH3dREOyjG9CY++jrQOwbxRHAJHFpecktNqnAGeaYc8Q==
+X-Received: by 2002:a17:902:c948:b0:1fd:d4c4:3627 with SMTP id d9443c01a7336-200ae5f0142mr34076605ad.6.1723300014489;
+        Sat, 10 Aug 2024 07:26:54 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb8f8f88sm12438385ad.63.2024.08.10.07.26.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 10 Aug 2024 07:26:53 -0700 (PDT)
+Message-ID: <7828bf84-ad8b-4fd5-b55e-0cd3fc320fc6@kernel.dk>
+Date: Sat, 10 Aug 2024 08:26:52 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ublk: move zone report data out of request pdu
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+ Andreas Hindborg <a.hindborg@samsung.com>
+References: <20240810040239.437215-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240810040239.437215-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-ublk zoned takes 16 bytes in each request pdu just for handling REPORT_ZONE
-operation, this way does waste memory since request pdu is allocated
-statically.
+On 8/9/24 10:02 PM, Ming Lei wrote:
+> ublk zoned takes 16 bytes in each request pdu just for handling REPORT_ZONE
+> operation, this way does waste memory since request pdu is allocated
+> statically.
+> 
+> Store the transient zone report data into one global xarray, and remove
+> it after the report zone request is completed. This way is reasonable
+> since report zone is run in slow code path.
 
-Store the transient zone report data into one global xarray, and remove
-it after the report zone request is completed. This way is reasonable
-since report zone is run in slow code path.
+Oof yes, that's a lot better. I think this warrants a:
 
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 62 +++++++++++++++++++++++++++++-----------
- 1 file changed, 46 insertions(+), 16 deletions(-)
+Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 890c08792ba8..0e295471318a 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -71,9 +71,6 @@ struct ublk_rq_data {
- 	struct llist_node node;
- 
- 	struct kref ref;
--	__u64 sector;
--	__u32 operation;
--	__u32 nr_zones;
- };
- 
- struct ublk_uring_cmd_pdu {
-@@ -214,6 +211,33 @@ static inline bool ublk_queue_is_zoned(struct ublk_queue *ubq)
- 
- #ifdef CONFIG_BLK_DEV_ZONED
- 
-+struct ublk_zoned_report_desc {
-+	__u64 sector;
-+	__u32 operation;
-+	__u32 nr_zones;
-+};
-+
-+static DEFINE_XARRAY(ublk_zoned_report_descs);
-+
-+static int ublk_zoned_insert_report_desc(const struct request *req,
-+		struct ublk_zoned_report_desc *desc)
-+{
-+	return xa_insert(&ublk_zoned_report_descs, (unsigned long)req,
-+			    desc, GFP_KERNEL);
-+}
-+
-+static struct ublk_zoned_report_desc *ublk_zoned_erase_report_desc(
-+		const struct request *req)
-+{
-+	return xa_erase(&ublk_zoned_report_descs, (unsigned long)req);
-+}
-+
-+static struct ublk_zoned_report_desc *ublk_zoned_get_report_desc(
-+		const struct request *req)
-+{
-+	return xa_load(&ublk_zoned_report_descs, (unsigned long)req);
-+}
-+
- static int ublk_get_nr_zones(const struct ublk_device *ub)
- {
- 	const struct ublk_param_basic *p = &ub->params.basic;
-@@ -308,7 +332,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
- 		unsigned int zones_in_request =
- 			min_t(unsigned int, remaining_zones, max_zones_per_request);
- 		struct request *req;
--		struct ublk_rq_data *pdu;
-+		struct ublk_zoned_report_desc desc;
- 		blk_status_t status;
- 
- 		memset(buffer, 0, buffer_length);
-@@ -319,20 +343,23 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
- 			goto out;
- 		}
- 
--		pdu = blk_mq_rq_to_pdu(req);
--		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
--		pdu->sector = sector;
--		pdu->nr_zones = zones_in_request;
-+		desc.operation = UBLK_IO_OP_REPORT_ZONES;
-+		desc.sector = sector;
-+		desc.nr_zones = zones_in_request;
-+		ret = ublk_zoned_insert_report_desc(req, &desc);
-+		if (ret)
-+			goto free_req;
- 
- 		ret = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
- 					GFP_KERNEL);
--		if (ret) {
--			blk_mq_free_request(req);
--			goto out;
--		}
-+		if (ret)
-+			goto erase_desc;
- 
- 		status = blk_execute_rq(req, 0);
- 		ret = blk_status_to_errno(status);
-+erase_desc:
-+		ublk_zoned_erase_report_desc(req);
-+free_req:
- 		blk_mq_free_request(req);
- 		if (ret)
- 			goto out;
-@@ -366,7 +393,7 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
- {
- 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
- 	struct ublk_io *io = &ubq->ios[req->tag];
--	struct ublk_rq_data *pdu = blk_mq_rq_to_pdu(req);
-+	struct ublk_zoned_report_desc *desc;
- 	u32 ublk_op;
- 
- 	switch (req_op(req)) {
-@@ -389,12 +416,15 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
- 		ublk_op = UBLK_IO_OP_ZONE_RESET_ALL;
- 		break;
- 	case REQ_OP_DRV_IN:
--		ublk_op = pdu->operation;
-+		desc = ublk_zoned_get_report_desc(req);
-+		if (!desc)
-+			return BLK_STS_IOERR;
-+		ublk_op = desc->operation;
- 		switch (ublk_op) {
- 		case UBLK_IO_OP_REPORT_ZONES:
- 			iod->op_flags = ublk_op | ublk_req_build_flags(req);
--			iod->nr_zones = pdu->nr_zones;
--			iod->start_sector = pdu->sector;
-+			iod->nr_zones = desc->nr_zones;
-+			iod->start_sector = desc->sector;
- 			return BLK_STS_OK;
- 		default:
- 			return BLK_STS_IOERR;
+as that's a pretty big waste, especially when most would not even be
+using the zoned support.
+
 -- 
-2.45.2
+Jens Axboe
+
 
