@@ -1,171 +1,139 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CCC56452
-	for <linux-block@vger.kernel.org>; Sun, 11 Aug 2024 10:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAAD27447;
+	Sun, 11 Aug 2024 17:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723371588; cv=none; b=DxZQWw4Dyv6eVVnob2/oSYKyEGh4HrtBYcBvZu22Z6QblZK2tXmSdk1bMAwktKY7ROg58RPdxzVvdIwt01SbPB8lOx9b7agnKN+GfeuK9gNAArzHRCiHNJJOzsv4oKQRaa4v01YbGPx6kv26ei9r/4Ahk1lFAdcJd4nw742mh58=
+	t=1723398104; cv=none; b=GtNX9aDe6PBEJP6ekhjtk+EApcgqGw3rk00+cxHzBzMtMCY/0CEGJLzFTnHdSVmyRUqSGKoJihd0zQPDbC0ZtFxpz7LmE+kCCICxbg+0EuSrIgqRakuQxXAdUaRnvETjqUR5u/3g1epTJIp/KlLO4Ga3C8K26LUoVKZFlDQy9QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723371588; c=relaxed/simple;
-	bh=yv62PE+HHdpS6svbT+CRG1qAc/38LkE6TMF1vR09V/0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iURvo9/UQoud/tJYdgdHm0l08X/XRJTAHGXLqNMOeExGcdXvgGsHAFiS0iFsPk3c6vs2/vXQp2Zhyyvf8uQMrcMAjabSb6lcsEhVr3ZtUIxdSEzsS5sYJQysPv9ifuXektawpe81mm7lXR+Krza6BbrPCxXaniCckCZTj56r1r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OTwUzk6L; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OTwUzk6L"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1fc4fcbb131so26121405ad.3
-        for <linux-block@vger.kernel.org>; Sun, 11 Aug 2024 03:19:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1723371586; x=1723976386; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YeL46knJ+ZqHC6WT5dXT2aP7zuNbEux3//I19LuUM/0=;
-        b=OTwUzk6L5nbjJxLvTk57t2KBqvW1ZODkQks7xyGlW9FJXhnQxFnZVagL4ECEzMFg9U
-         9/J9GkvjfRQKeLjxV5i2hCMnb3hMMpUrMUpZEalrVwsrRSbYUZTBuFWNaa0T7Xavw+Cj
-         Rt5mCKkx+kNGo6YwZNDAsyWwtUD9+bs1pyjWxqgT5EafV70n4UZFOhB3yrbR1KSRieUx
-         gjI62/b3XrfBFUOLc8bYEnHXoqkQbh166rcWJSpwj10bjHeDbREs6oeMTC9bHLM1p3Za
-         Gf8sFp8OTrmENp+C/mpqIk10P7mrm2iw6tD19hLTqqUbyulnI8xfiMYAr6gqIJguKYUy
-         iaCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723371586; x=1723976386;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YeL46knJ+ZqHC6WT5dXT2aP7zuNbEux3//I19LuUM/0=;
-        b=PYjhH+bMB9mF9DeglYuPOjifxIIq2xYe95gKvSXAZq+8BUNeqIIgivttJJnVyP0ZZd
-         MU8cHBDX5Wwr35zAwZhBygaiVeF7Nmxkuo2pJAf7dTZOlh8VPCJaiVY8pQBG2xWzB2TF
-         DaWv8i9luPbFjr7GnXC2uZARYfoa595RL1ALPzS1YUTHw5wrwhss2nqpKqdTDB1m9ccg
-         pz9ENn/WWqBKvvHAf5JA1WUEsh7cezPC8S/56kMjJu7YMDY5p4WdQZlK7RRO4dLfUNwt
-         fCVLaWyv9s8FAyU/1ILGTxds1GOEDpIb04cvVq9bs/0UPW4m3jy1ZEondzosj+R+R0Jz
-         BciA==
-X-Gm-Message-State: AOJu0YxZfl8HLdB8I3Abt1aQlDT9wp0ky3QAcd9Ow3HGiZdhQqx3a4B0
-	SdQPRoU4kLKm/rb+FQHBuW9DQkGwWfvW5c8m2oPje6B7A7tZLuQRoLh48tsa/1A=
-X-Google-Smtp-Source: AGHT+IEQlVNibHSTFhZ2s10HfYkPh8ARzQx4wM3RfJLUDq+guzel8WQQIkhmkI9Swx2NtwrIvNj/lw==
-X-Received: by 2002:a17:902:ced0:b0:1fb:2e9a:beea with SMTP id d9443c01a7336-200ae258491mr73318225ad.0.1723371585843;
-        Sun, 11 Aug 2024 03:19:45 -0700 (PDT)
-Received: from PXLDJ45XCM.bytedance.net ([139.177.225.239])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bbb48b81sm20992155ad.297.2024.08.11.03.19.43
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 11 Aug 2024 03:19:45 -0700 (PDT)
-From: Muchun Song <songmuchun@bytedance.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Muchun Song <songmuchun@bytedance.com>
-Subject: [PATCH 4/4] block: fix fix ordering between checking QUEUE_FLAG_QUIESCED and adding requests to hctx->dispatch
-Date: Sun, 11 Aug 2024 18:19:21 +0800
-Message-Id: <20240811101921.4031-5-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20240811101921.4031-1-songmuchun@bytedance.com>
-References: <20240811101921.4031-1-songmuchun@bytedance.com>
+	s=arc-20240116; t=1723398104; c=relaxed/simple;
+	bh=hphTYSkZTnY9Y9aQRf2FyLxh27Y2wAch0ANmN7fhwXo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qD7pE/sRWCAAbFCfN5cYXXmT/jNUegbhQrmpokKFt6vManDxY09LobBUpYo35OP07XqCtxO5jISf3EWpkG4I+Qz+mCNtFax39cYKmgduoCXOZaMfa03PgnVnkCA9b0bky0jLt9FVT8Hi/8YJZfV6frixjsxMgUqLp+JE4rv/SZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ADE92FEC;
+	Sun, 11 Aug 2024 10:42:00 -0700 (PDT)
+Received: from [192.168.13.84] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A98D3F71E;
+	Sun, 11 Aug 2024 10:41:14 -0700 (PDT)
+Message-ID: <c151b6d5-7e02-48ee-951f-c23594f6be6f@arm.com>
+Date: Sun, 11 Aug 2024 19:41:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
+ capacities are different"
+To: MANISH PANDEY <quic_mapa@quicinc.com>,
+ Bart Van Assche <bvanassche@acm.org>, Qais Yousef <qyousef@layalina.io>,
+ Christian Loehle <christian.loehle@arm.com>
+Cc: axboe@kernel.dk, mingo@kernel.org, peterz@infradead.org,
+ vincent.guittot@linaro.org, linux-block@vger.kernel.org,
+ sudeep.holla@arm.com, Jaegeuk Kim <jaegeuk@kernel.org>,
+ Christoph Hellwig <hch@infradead.org>, kailash@google.com, tkjos@google.com,
+ dhavale@google.com, bvanassche@google.com, quic_nitirawa@quicinc.com,
+ quic_cang@quicinc.com, quic_rampraka@quicinc.com, quic_narepall@quicinc.com,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
+ <3feb5226-7872-432b-9781-29903979d34a@arm.com>
+ <20240805020748.d2tvt7c757hi24na@airbuntu>
+ <25909f08-12a5-4625-839d-9e31df4c9c72@acm.org>
+ <1d9c27b2-77c7-462f-bde9-1207f931ea9f@quicinc.com>
+ <17bf99ad-d64d-40ef-864f-ce266d3024c7@acm.org>
+ <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
+From: Dietmar Eggemann <dietmar.eggemann@arm.com>
+Content-Language: en-US
+In-Reply-To: <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Supposing the following scenario.
++ linux-kernel@vger.kernel.org
 
-CPU0                                                                CPU1
+On 08/08/2024 08:05, MANISH PANDEY wrote:
+>  
+> On 8/5/2024 11:22 PM, Bart Van Assche wrote:
+>> On 8/5/24 10:35 AM, MANISH PANDEY wrote:
 
-blk_mq_request_issue_directly()                                     blk_mq_unquiesce_queue()
-    if (blk_queue_quiesced())                                           blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)   3) store
-        blk_mq_insert_request()                                         blk_mq_run_hw_queues()
-            /*                                                              blk_mq_run_hw_queue()
-             * Add request to dispatch list or set bitmap of                    if (!blk_mq_hctx_has_pending())     4) load
-             * software queue.                  1) store                            return
-             */
-        blk_mq_run_hw_queue()
-            if (blk_queue_quiesced())           2) load
-                return
-            blk_mq_sched_dispatch_requests()
+[...]
 
-The full memory barrier should be inserted between 1) and 2), as well as
-between 3) and 4) to make sure that either CPU0 sees QUEUE_FLAG_QUIESCED is
-cleared or CPU1 sees dispatch list or setting of bitmap of software queue.
-Otherwise, either CPU will not re-run the hardware queue causing starvation.
+>> Please use an approach that is supported by the block layer. I don't
+>> think that dynamically changing the IRQ affinity is compatible with the
+>> block layer.
+> 
+> For UFS with MCQ, ESI IRQs are bounded at the time of initialization.
+> so basically i would like to use High Performance cluster CPUs to
+> migrate few completions from Mid clusters and take the advantage of high
+> capacity CPUs. The new change takes away this opportunity from driver.
+> So basically we should be able to use High Performance CPUs like below
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e3c3c0c21b55..a4a2500c4ef6 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1164,7 +1164,7 @@ static inline bool blk_mq_complete_need_ipi(struct
+> request *rq)
+>         if (cpu == rq->mq_ctx->cpu ||
+>             (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
+>              cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
+> -            cpus_equal_capacity(cpu, rq->mq_ctx->cpu)))
+> +            arch_scale_cpu_capacity(cpu) >=     
+> arch_scale_cpu_capacity(rq->mq_ctx->cpu)))
+>                 return false;
+> 
+> This way driver can use best possible CPUs for it's use case.
 
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
----
- block/blk-mq.c | 38 +++++++++++++++++++++++++++-----------
- 1 file changed, 27 insertions(+), 11 deletions(-)
+So the issue for you with commit af550e4c9682 seems to be that those
+completions don't happen on big CPUs (cpu_capacity = 1024) anymore,
+since the condition in  blk_mq_complete_need_ipi() (1):
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 385a74e566874..66b21407a9a6c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -264,6 +264,13 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
- 		;
- 	} else if (!--q->quiesce_depth) {
- 		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-+		/**
-+		 * The need of memory barrier is in blk_mq_run_hw_queues() to
-+		 * make sure clearing of QUEUE_FLAG_QUIESCED is before the
-+		 * checking of dispatch list or bitmap of any software queue.
-+		 *
-+		 * smp_mb__after_atomic();
-+		 */
- 		run_queue = true;
- 	}
- 	spin_unlock_irqrestore(&q->queue_lock, flags);
-@@ -2222,6 +2229,21 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	bool need_run;
- 
-+	/*
-+	 * This barrier is used to order adding of dispatch list or setting
-+	 * of bitmap of any software queue outside of this function and the
-+	 * test of BLK_MQ_S_STOPPED in the following routine. Pairs with the
-+	 * barrier in blk_mq_start_stopped_hw_queue(). So dispatch code could
-+	 * either see BLK_MQ_S_STOPPED is cleared or dispatch list or setting
-+	 * of bitmap of any software queue to avoid missing dispatching
-+	 * requests.
-+	 *
-+	 * This barrier is also used to order adding of dispatch list or
-+	 * setting of bitmap of any software queue outside of this function
-+	 * and test of QUEUE_FLAG_QUIESCED below.
-+	 */
-+	smp_mb();
-+
- 	/*
- 	 * We can't run the queue inline with interrupts disabled.
- 	 */
-@@ -2244,17 +2266,6 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 	if (!need_run)
- 		return;
- 
--	/*
--	 * This barrier is used to order adding of dispatch list or setting
--	 * of bitmap of any software queue outside of this function and the
--	 * test of BLK_MQ_S_STOPPED in the following routine. Pairs with the
--	 * barrier in blk_mq_start_stopped_hw_queue(). So dispatch code could
--	 * either see BLK_MQ_S_STOPPED is cleared or dispatch list or setting
--	 * of bitmap of any software queue to avoid missing dispatching
--	 * requests.
--	 */
--	smp_mb();
--
- 	if (async || !cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
- 		blk_mq_delay_run_hw_queue(hctx, 0);
- 		return;
-@@ -2308,6 +2319,11 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- 	 * either see BLK_MQ_S_STOPPED is cleared or dispatch list or setting
- 	 * of bitmap of any software queue to avoid missing dispatching
- 	 * requests.
-+	 *
-+	 * This barrier is also used to order clearing of QUEUE_FLAG_QUIESCED
-+	 * outside of this function in blk_mq_unquiesce_queue() and checking
-+	 * of dispatch list or bitmap of any software queue in
-+	 * blk_mq_run_hw_queue().
- 	 */
- 	smp_mb();
- 
--- 
-2.20.1
+ if (!QUEUE_FLAG_SAME_FORCE && cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
+     cpus_equal_capacity(cpu, rq->mq_ctx->cpu))
 
+is no longer true if 'rq->mq_ctx->cpu != big CPU' so (1) returns true
+and blk_mq_complete_request_remote() sends an ipi to 'rq->mq_ctx->cpu'.
+
+
+I tried to simulate this with a 6 CPUs aarch64 QEMU tri-gear (3
+different cpu_capacity values) system:
+
+cat /sys/devices/system/cpu/online
+0-5
+
+# cat /sys/devices/system/cpu/cpu*/cpu_capacity
+446
+446
+871
+871
+1024
+1024
+
+# grep -i virtio /proc/interrupts | while read a b; do grep -aH .
+/proc/irq/${a%:}/smp_affinity; done
+/proc/irq/15/smp_affinity:3f /* block device */
+/proc/irq/16/smp_affinity:3f /* network device */
+
+So you set the block device irq affine to the big CPUs (0x30).
+
+# echo 30 > /proc/irq/15/smp_affinity
+
+And with the patch, you send ipi's in blk_mq_complete_request_remote()
+in case 'rq->mq_ctx->cpu=[0-4]' whereas w/o the patch or the change to:
+
+ arch_scale_cpu_capacity(cpu) >=
+                            arch_scale_cpu_capacity(rq->mq_ctx->cpu) (2)
+
+you would complete the request locally (i.e. on CPU4/5):
+
+gic_handle_irq() -> ... -> handle_irq_event() -> ... -> vm_interrupt()
+-> ... -> virtblk_done() (callback) -> blk_mq_complete_request() ->
+blk_mq_complete_request_remote(), rq->q->mq_ops->complete(rq)
+
+The patch IMHO was introduced to avoid running local when 'local =
+little CPU'. Since you use system knowledge and set IRQ affinity
+explicitly to big CPU's to run local on them, maybe (2) is the way to
+allow both?
