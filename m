@@ -1,296 +1,100 @@
-Received: from mail.hallyn.com (mail.hallyn.com [178.63.66.53])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3078E44C68;
-	Sat, 10 Aug 2024 20:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.63.66.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5BC6AB8
+	for <linux-block@vger.kernel.org>; Sun, 11 Aug 2024 02:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723320331; cv=none; b=PDwpMA9SpFyD48hnc7qOAxUxQ+qoCub490PFMZjWc1tXhXcp/cVuRKbnCoc0Kj9wvg4w3vqe05unoLtauqDeKZ3OhOmSgEbvkJorIhSlUiKmVK9w+3szNlSWpSawD2vICCRMgR69qp8cZtaCZDS/qgJnhbK5UTr2F7Aru8zvZdQ=
+	t=1723341824; cv=none; b=M+nkB4pS4yXdPrdi/0jY+2BwVYegRe3XR4ZELxBxOXoK2FjDsO/jamSfaNKwa0BJBU2zd42imQ6CPtOUmEty0MTyqHJpj1/cqUAYc/MiIVhASk0nD8iNhWghjm1GQ0R9Pjxvh43QhmqHkFTmCV/yhQirallr+i3WIzSkc0n7rRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723320331; c=relaxed/simple;
-	bh=V8k+LowYYOyKVujwCvCYLKZqEzPBWcRIa/WNWwRJxt4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AXZlOlabBHE6PIlja5Z+LrOXDH7Ck5mZV5M5PyIAchsGXmMJ9RXAI851JNPUlFvGlfoAumhfzACozZK8XMwHX4L1O5LoxeMrtz3RvaoC1vQgd0Qmpc/6Vlh729FHRaEGnXOz2mUC/ElI8paiHLfgRKqZlx67UXJ8UkkzTPg1rrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com; spf=pass smtp.mailfrom=mail.hallyn.com; arc=none smtp.client-ip=178.63.66.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.hallyn.com
-Received: by mail.hallyn.com (Postfix, from userid 1001)
-	id 4E34950; Sat, 10 Aug 2024 15:05:26 -0500 (CDT)
-Date: Sat, 10 Aug 2024 15:05:26 -0500
-From: "Serge E. Hallyn" <serge@hallyn.com>
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-	serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-	axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-	mpatocka@redhat.com, eparis@redhat.com, paul@paul-moore.com,
-	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	audit@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH v20 03/20] ipe: add evaluation loop
-Message-ID: <20240810200526.GA40028@mail.hallyn.com>
-References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
- <1722665314-21156-4-git-send-email-wufan@linux.microsoft.com>
+	s=arc-20240116; t=1723341824; c=relaxed/simple;
+	bh=ot0EAQwbev+udmLqRWxI4NRSmQ8yUYXZGnybEZsxokE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V18VjbiTFIRyLEl2vo7T3/tfY127yphwyLDa1OSo+8sfeshIa4boPBCpSIGTL36EPvvhVjvTyZtjBt6FHQuOMxN0kZfTMur3Q5hA0Fn/QylFuxUhlUMrCu5qQCNX/uJvchWiT72dcQ93XkKP2IWQeC6IRUAoEvCrns1uPF2x3bM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V9CFp09V; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V9CFp09V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723341821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ot0EAQwbev+udmLqRWxI4NRSmQ8yUYXZGnybEZsxokE=;
+	b=V9CFp09Vr/ITSy7QUfxxrvbsqVQBLsSjL+sIZrxoItV24TpGyCvhIiD7NGAFzEfMSC8B69
+	FEFIxkTK6N0/4HY1DMxdW/sP9BFFXE1wCLO1v/PYyFtm8WK8APbS/S7wLMsQKRJi7m16wj
+	44YSXOorWLBGLcpHHFhw2/zCIVJ4r6Q=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-307-WWghZBmJPa-pdPgpTU3mhg-1; Sat, 10 Aug 2024 22:03:40 -0400
+X-MC-Unique: WWghZBmJPa-pdPgpTU3mhg-1
+Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-8407b0b7b3bso83499241.0
+        for <linux-block@vger.kernel.org>; Sat, 10 Aug 2024 19:03:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723341819; x=1723946619;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ot0EAQwbev+udmLqRWxI4NRSmQ8yUYXZGnybEZsxokE=;
+        b=KqLBM9gvVjKvJ+VdbyS57dpjWJjliysle9w12rb+Dsqze0TbjZ7ilrOumCedRoIjY3
+         c1VVy1RfsV2wrJXJxv6+wcSFjY4quhOvp+Eunv7CdtGj2JwUUzK/D3j6mfqHMFWcHKoa
+         6c1jMuv+4wMLbtBb3zXXgXJPFn7YCFVTcUXBZ7E00cfQdV75Vbu594s6YK33123Z/zv3
+         ccEUM6pEzt7ZG/nikkQq+yzfRO7iqoRYksxgYmgSEHFJ63Y7QVIjAE0alxoRsPMwNWN3
+         fLRO0prdKJYnI3Ry0DhjdVk44IdA7luXq2sEYUPh9buIYOkk0X+3gaqOgKaXkj/GcuQw
+         koZA==
+X-Gm-Message-State: AOJu0YxI/Uu83KDNY+xhwzYwN6ip3+zw5Ga6Uc5cW6v3wIq3ZGXA6Zwy
+	Qlwx/0fo6qolUJMyFbnfd7YccsGQdPoC/vY6UmCwnhV/9XY/wad62JgGjU8z4RiOeCHBfpi+qvZ
+	YCp9OU3yY2lyoadESHj3FnFFZepwTLRk/8UVZomzr9SbxLTAgSOvA3WvmmleTbgwrWklJBFdGH0
+	0v8nvDQ3vB3zEV2lJekzNIN3mXG29fzOqJVxOYKT4XdMY=
+X-Received: by 2002:a05:6102:440c:b0:493:c75f:4c71 with SMTP id ada2fe7eead31-495d862d753mr2582462137.4.1723341819581;
+        Sat, 10 Aug 2024 19:03:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHlYdU14+Jr4JJ7pDFc8cm44paW/AG1Pbnrh1K0z347jIy9MgkZJX4YqDhP1+UzPylEpu2xo9szvioKVJ0mVoo=
+X-Received: by 2002:a05:6102:440c:b0:493:c75f:4c71 with SMTP id
+ ada2fe7eead31-495d862d753mr2582460137.4.1723341819330; Sat, 10 Aug 2024
+ 19:03:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1722665314-21156-4-git-send-email-wufan@linux.microsoft.com>
+References: <20240810040239.437215-1-ming.lei@redhat.com> <7828bf84-ad8b-4fd5-b55e-0cd3fc320fc6@kernel.dk>
+In-Reply-To: <7828bf84-ad8b-4fd5-b55e-0cd3fc320fc6@kernel.dk>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Sun, 11 Aug 2024 10:03:27 +0800
+Message-ID: <CAFj5m9LavduSW2zF29RvmJjPc+tm1CJVU_AGeuQr0sPN4SLoRg@mail.gmail.com>
+Subject: Re: [PATCH] ublk: move zone report data out of request pdu
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>, 
+	Andreas Hindborg <a.hindborg@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 02, 2024 at 11:08:17PM -0700, Fan Wu wrote:
-> From: Deven Bowers <deven.desai@linux.microsoft.com>
-> 
-> Introduce a core evaluation function in IPE that will be triggered by
-> various security hooks (e.g., mmap, bprm_check, kexec). This function
-> systematically assesses actions against the defined IPE policy, by
-> iterating over rules specific to the action being taken. This critical
-> addition enables IPE to enforce its security policies effectively,
-> ensuring that actions intercepted by these hooks are scrutinized for policy
-> compliance before they are allowed to proceed.
-> 
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+On Sat, Aug 10, 2024 at 10:27=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote=
+:
+>
+> On 8/9/24 10:02 PM, Ming Lei wrote:
+> > ublk zoned takes 16 bytes in each request pdu just for handling REPORT_=
+ZONE
+> > operation, this way does waste memory since request pdu is allocated
+> > statically.
+> >
+> > Store the transient zone report data into one global xarray, and remove
+> > it after the report zone request is completed. This way is reasonable
+> > since report zone is run in slow code path.
+>
+> Oof yes, that's a lot better. I think this warrants a:
+>
+> Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
+>
+> as that's a pretty big waste, especially when most would not even be
+> using the zoned support.
 
-(started at this longer than I care to admit)
+Indeed, the patch itself is easy enough for backport, will add Fixes tag in=
+ V2.
 
-Reviewed-by: Serge Hallyn <serge@hallyn.com>
+Thanks,
 
-> 
-> ---
-> v2:
-> + Split evaluation loop, access control hooks, and evaluation loop from policy parser and userspace interface to pass mailing list character limit
-> 
-> v3:
-> + Move ipe_load_properties to patch 04.
-> + Remove useless 0-initializations Prefix extern variables with ipe_
-> + Remove kernel module parameters, as these are exposed through sysctls.
-> + Add more prose to the IPE base config option help text.
-> + Use GFP_KERNEL for audit_log_start.
-> + Remove unnecessary caching system.
-> + Remove comments from headers
-> + Use rcu_access_pointer for rcu-pointer null check
-> + Remove usage of reqprot; use prot only.
-> +Move policy load and activation audit event to 03/12
-> 
-> v4:
-> + Remove sysctls in favor of securityfs nodes
-> + Re-add kernel module parameters, as these are now exposed through securityfs.
-> + Refactor property audit loop to a separate function.
-> 
-> v5:
-> + fix minor grammatical errors
-> + do not group rule by curly-brace in audit record,
-> + reconstruct the exact rule.
-> 
-> v6:
-> + No changes
-> 
-> v7:
-> + Further split lsm creation into a separate commit from the evaluation loop and audit system, for easier review.
-> + Propagating changes to support the new ipe_context structure in the evaluation loop.
-> 
-> v8:
-> + Remove ipe_hook enumeration; hooks can be correlated via syscall record.
-> 
-> v9:
-> + Remove ipe_context related code and simplify the evaluation loop.
-> 
-> v10:
-> + Split eval part and boot_verified part
-> 
-> v11:
-> + Fix code style issues
-> 
-> v12:
-> + Correct an rcu_read_unlock usage
-> + Add a WARN to unknown op during evaluation
-> 
-> v13:
-> + No changes
-> 
-> v14:
-> + No changes
-> 
-> v15:
-> + No changes
-> 
-> v16:
-> + No changes
-> 
-> v17:
-> + Add years to license header
-> + Fix code and documentation style issues
-> 
-> v18:
-> + No changes
-> 
-> v19:
-> + No changes
-> 
-> v20:
-> + No changes
-> ---
->  security/ipe/Makefile |   1 +
->  security/ipe/eval.c   | 102 ++++++++++++++++++++++++++++++++++++++++++
->  security/ipe/eval.h   |  24 ++++++++++
->  3 files changed, 127 insertions(+)
->  create mode 100644 security/ipe/eval.c
->  create mode 100644 security/ipe/eval.h
-> 
-> diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-> index 3093de1afd3e..4cc17eb92060 100644
-> --- a/security/ipe/Makefile
-> +++ b/security/ipe/Makefile
-> @@ -6,6 +6,7 @@
->  #
->  
->  obj-$(CONFIG_SECURITY_IPE) += \
-> +	eval.o \
->  	ipe.o \
->  	policy.o \
->  	policy_parser.o \
-> diff --git a/security/ipe/eval.c b/security/ipe/eval.c
-> new file mode 100644
-> index 000000000000..f6a681ca49f6
-> --- /dev/null
-> +++ b/security/ipe/eval.c
-> @@ -0,0 +1,102 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2020-2024 Microsoft Corporation. All rights reserved.
-> + */
-> +
-> +#include <linux/fs.h>
-> +#include <linux/types.h>
-> +#include <linux/slab.h>
-> +#include <linux/file.h>
-> +#include <linux/sched.h>
-> +#include <linux/rcupdate.h>
-> +
-> +#include "ipe.h"
-> +#include "eval.h"
-> +#include "policy.h"
-> +
-> +struct ipe_policy __rcu *ipe_active_policy;
-> +
-> +/**
-> + * evaluate_property() - Analyze @ctx against a rule property.
-> + * @ctx: Supplies a pointer to the context to be evaluated.
-> + * @p: Supplies a pointer to the property to be evaluated.
-> + *
-> + * This is a placeholder. The actual function will be introduced in the
-> + * latter commits.
-> + *
-> + * Return:
-> + * * %true	- The current @ctx match the @p
-> + * * %false	- The current @ctx doesn't match the @p
-> + */
-> +static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
-> +			      struct ipe_prop *p)
-> +{
-> +	return false;
-> +}
-> +
-> +/**
-> + * ipe_evaluate_event() - Analyze @ctx against the current active policy.
-> + * @ctx: Supplies a pointer to the context to be evaluated.
-> + *
-> + * This is the loop where all policy evaluations happen against the IPE policy.
-> + *
-> + * Return:
-> + * * %0		- Success
-> + * * %-EACCES	- @ctx did not pass evaluation
-> + */
-> +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
-> +{
-> +	const struct ipe_op_table *rules = NULL;
-> +	const struct ipe_rule *rule = NULL;
-> +	struct ipe_policy *pol = NULL;
-> +	struct ipe_prop *prop = NULL;
-> +	enum ipe_action_type action;
-> +	bool match = false;
-> +
-> +	rcu_read_lock();
-> +
-> +	pol = rcu_dereference(ipe_active_policy);
-> +	if (!pol) {
-> +		rcu_read_unlock();
-> +		return 0;
-> +	}
-> +
-> +	if (ctx->op == IPE_OP_INVALID) {
-> +		if (pol->parsed->global_default_action == IPE_ACTION_DENY) {
-> +			rcu_read_unlock();
-> +			return -EACCES;
-> +		}
-> +		if (pol->parsed->global_default_action == IPE_ACTION_INVALID)
-> +			WARN(1, "no default rule set for unknown op, ALLOW it");
-> +		rcu_read_unlock();
-> +		return 0;
-> +	}
-> +
-> +	rules = &pol->parsed->rules[ctx->op];
-> +
-> +	list_for_each_entry(rule, &rules->rules, next) {
-> +		match = true;
-> +
-> +		list_for_each_entry(prop, &rule->props, next) {
-> +			match = evaluate_property(ctx, prop);
-> +			if (!match)
-> +				break;
-> +		}
-> +
-> +		if (match)
-> +			break;
-> +	}
-> +
-> +	if (match)
-> +		action = rule->action;
-> +	else if (rules->default_action != IPE_ACTION_INVALID)
-> +		action = rules->default_action;
-> +	else
-> +		action = pol->parsed->global_default_action;
-> +
-> +	rcu_read_unlock();
-> +	if (action == IPE_ACTION_DENY)
-> +		return -EACCES;
-> +
-> +	return 0;
-> +}
-> diff --git a/security/ipe/eval.h b/security/ipe/eval.h
-> new file mode 100644
-> index 000000000000..b137f2107852
-> --- /dev/null
-> +++ b/security/ipe/eval.h
-> @@ -0,0 +1,24 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2024 Microsoft Corporation. All rights reserved.
-> + */
-> +
-> +#ifndef _IPE_EVAL_H
-> +#define _IPE_EVAL_H
-> +
-> +#include <linux/file.h>
-> +#include <linux/types.h>
-> +
-> +#include "policy.h"
-> +
-> +extern struct ipe_policy __rcu *ipe_active_policy;
-> +
-> +struct ipe_eval_ctx {
-> +	enum ipe_op_type op;
-> +
-> +	const struct file *file;
-> +};
-> +
-> +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx);
-> +
-> +#endif /* _IPE_EVAL_H */
-> -- 
-> 2.44.0
