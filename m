@@ -1,100 +1,123 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5BC6AB8
-	for <linux-block@vger.kernel.org>; Sun, 11 Aug 2024 02:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52102E646
+	for <linux-block@vger.kernel.org>; Sun, 11 Aug 2024 10:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723341824; cv=none; b=M+nkB4pS4yXdPrdi/0jY+2BwVYegRe3XR4ZELxBxOXoK2FjDsO/jamSfaNKwa0BJBU2zd42imQ6CPtOUmEty0MTyqHJpj1/cqUAYc/MiIVhASk0nD8iNhWghjm1GQ0R9Pjxvh43QhmqHkFTmCV/yhQirallr+i3WIzSkc0n7rRA=
+	t=1723371576; cv=none; b=SKVRZRjnNxLw0u2nOcERu55dzJl8Y2PyZZGvJ4wnRFnSowoOJNyz6Q7Upmq6hx2rg+dLY94ltqh32IWNUV5Qcu9vjgtG8XJ9E7CRl2wuvN1Y4etjTEMheQyIWmFsQBFz1Sgb/6Vfrpa8Y+8f6rRwcv7l1E0VrOwclIEN2jhVKN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723341824; c=relaxed/simple;
-	bh=ot0EAQwbev+udmLqRWxI4NRSmQ8yUYXZGnybEZsxokE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V18VjbiTFIRyLEl2vo7T3/tfY127yphwyLDa1OSo+8sfeshIa4boPBCpSIGTL36EPvvhVjvTyZtjBt6FHQuOMxN0kZfTMur3Q5hA0Fn/QylFuxUhlUMrCu5qQCNX/uJvchWiT72dcQ93XkKP2IWQeC6IRUAoEvCrns1uPF2x3bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V9CFp09V; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1723371576; c=relaxed/simple;
+	bh=v5jSDFfK2NHEbMWosQWn6G/sglvlKQQhmlLCRg1Qa+0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ly2IFDnYPtsNOSH/WKswM4GdFnUDqgmfgXW5BSDYYG9rfJfRKOxUwXJYIlW24coLEkYG9+l48na7Cztp78bMdj9SpculdJSWf6X8XZ3YwJGeqGdohZ00BFhbYQloOiUar/r/nd9UWqNqqbfEx1gIkYq9Oa5mcQFh59PCj9Xl8k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=e8XkSEQ0; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V9CFp09V"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723341821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ot0EAQwbev+udmLqRWxI4NRSmQ8yUYXZGnybEZsxokE=;
-	b=V9CFp09Vr/ITSy7QUfxxrvbsqVQBLsSjL+sIZrxoItV24TpGyCvhIiD7NGAFzEfMSC8B69
-	FEFIxkTK6N0/4HY1DMxdW/sP9BFFXE1wCLO1v/PYyFtm8WK8APbS/S7wLMsQKRJi7m16wj
-	44YSXOorWLBGLcpHHFhw2/zCIVJ4r6Q=
-Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
- [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-307-WWghZBmJPa-pdPgpTU3mhg-1; Sat, 10 Aug 2024 22:03:40 -0400
-X-MC-Unique: WWghZBmJPa-pdPgpTU3mhg-1
-Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-8407b0b7b3bso83499241.0
-        for <linux-block@vger.kernel.org>; Sat, 10 Aug 2024 19:03:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="e8XkSEQ0"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1fd9e70b592so26308525ad.3
+        for <linux-block@vger.kernel.org>; Sun, 11 Aug 2024 03:19:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1723371574; x=1723976374; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qHD6u79EjEv29RNRwjvBd/7eFbzoXwrn3wscnjegDn4=;
+        b=e8XkSEQ0qgJnnMxMR9IClm61xMA/aEiPiVpy0ZUrPkbKY55R+rzH7dJ1GFdTuWNY+S
+         91HF8kZaGDLEHs9dwEybieO0maTIv1mYbBI2gc/M5XCXZmpIMUaygux1WJmxFBAk0ym6
+         yMmeO8UPBhr+9GgQ5K+eXxAl/aobI4fD17bW62RgoOX/BJ1KqcuxxV5VHhn5lR2TMPWc
+         sQ2P16F5u8W7djiFDng1m4pE6bCFz2FHe2MkPIfDCcZwaAyD4xl9vuSrd7aHmpFUhTZe
+         fcVCx25xSNjLcBNV42wA2ibVteZq/PBlL/xL6fHVd8pEc4y4mP3vwHPRHiL5gfU2M/i3
+         tYKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723341819; x=1723946619;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ot0EAQwbev+udmLqRWxI4NRSmQ8yUYXZGnybEZsxokE=;
-        b=KqLBM9gvVjKvJ+VdbyS57dpjWJjliysle9w12rb+Dsqze0TbjZ7ilrOumCedRoIjY3
-         c1VVy1RfsV2wrJXJxv6+wcSFjY4quhOvp+Eunv7CdtGj2JwUUzK/D3j6mfqHMFWcHKoa
-         6c1jMuv+4wMLbtBb3zXXgXJPFn7YCFVTcUXBZ7E00cfQdV75Vbu594s6YK33123Z/zv3
-         ccEUM6pEzt7ZG/nikkQq+yzfRO7iqoRYksxgYmgSEHFJ63Y7QVIjAE0alxoRsPMwNWN3
-         fLRO0prdKJYnI3Ry0DhjdVk44IdA7luXq2sEYUPh9buIYOkk0X+3gaqOgKaXkj/GcuQw
-         koZA==
-X-Gm-Message-State: AOJu0YxI/Uu83KDNY+xhwzYwN6ip3+zw5Ga6Uc5cW6v3wIq3ZGXA6Zwy
-	Qlwx/0fo6qolUJMyFbnfd7YccsGQdPoC/vY6UmCwnhV/9XY/wad62JgGjU8z4RiOeCHBfpi+qvZ
-	YCp9OU3yY2lyoadESHj3FnFFZepwTLRk/8UVZomzr9SbxLTAgSOvA3WvmmleTbgwrWklJBFdGH0
-	0v8nvDQ3vB3zEV2lJekzNIN3mXG29fzOqJVxOYKT4XdMY=
-X-Received: by 2002:a05:6102:440c:b0:493:c75f:4c71 with SMTP id ada2fe7eead31-495d862d753mr2582462137.4.1723341819581;
-        Sat, 10 Aug 2024 19:03:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHlYdU14+Jr4JJ7pDFc8cm44paW/AG1Pbnrh1K0z347jIy9MgkZJX4YqDhP1+UzPylEpu2xo9szvioKVJ0mVoo=
-X-Received: by 2002:a05:6102:440c:b0:493:c75f:4c71 with SMTP id
- ada2fe7eead31-495d862d753mr2582460137.4.1723341819330; Sat, 10 Aug 2024
- 19:03:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723371574; x=1723976374;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qHD6u79EjEv29RNRwjvBd/7eFbzoXwrn3wscnjegDn4=;
+        b=LMQ5ViQ73l7V7GnGy3fDt/lr7zbbFBruGmKRdKhEWTZlyobUEfNySiK97qvedYwfFL
+         +HaR0ZVm/QXsN0KnaUoidbxno/nMydWre8WFCDgqt+HE8PWP3m9G2jKjm/UVB4Y+c5Lw
+         N6Hwxk5IWKqDnl930oxw6Zln6l80stT3SuTBEP3BMtqJo1D0ux9UtfzPgVQ6St3ph3hd
+         l554o6IYlZ1z3wEc9x4H/wli+fJe+ePnM3rVhw3ak5jn3DigXopN0JEXAXkgtB8VbLLM
+         1+1IEo6afcaxlTiKtIvKCnHcJjEsRYwJz+dcFOBA9NTM1MjaQ+tLHAZpLL0cus5nYngy
+         +mhA==
+X-Gm-Message-State: AOJu0YzSO7U/bhoctdNH/RIgKaniXzIVWJQA+bp1NI4uxLBJqOBfrTRz
+	XasqAzEVabxfAolLAkchM789HfyREEk2+SNIbGNLjl5Pz9fXu+QVSEUz6Pu3U5c=
+X-Google-Smtp-Source: AGHT+IGnfFBgy7ehBxC2BcVfMoI1OSpkPsLoKJsbaGtA2u9Fcei/Z4OQpt6ly4oSLVcYPET3eEeJKw==
+X-Received: by 2002:a17:902:e747:b0:1f8:44f8:a364 with SMTP id d9443c01a7336-200ae5abed8mr79055675ad.48.1723371573903;
+        Sun, 11 Aug 2024 03:19:33 -0700 (PDT)
+Received: from PXLDJ45XCM.bytedance.net ([139.177.225.239])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bbb48b81sm20992155ad.297.2024.08.11.03.19.31
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 11 Aug 2024 03:19:33 -0700 (PDT)
+From: Muchun Song <songmuchun@bytedance.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Muchun Song <songmuchun@bytedance.com>
+Subject: [PATCH 0/4] Fix some starvation problems
+Date: Sun, 11 Aug 2024 18:19:17 +0800
+Message-Id: <20240811101921.4031-1-songmuchun@bytedance.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240810040239.437215-1-ming.lei@redhat.com> <7828bf84-ad8b-4fd5-b55e-0cd3fc320fc6@kernel.dk>
-In-Reply-To: <7828bf84-ad8b-4fd5-b55e-0cd3fc320fc6@kernel.dk>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sun, 11 Aug 2024 10:03:27 +0800
-Message-ID: <CAFj5m9LavduSW2zF29RvmJjPc+tm1CJVU_AGeuQr0sPN4SLoRg@mail.gmail.com>
-Subject: Re: [PATCH] ublk: move zone report data out of request pdu
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>, 
-	Andreas Hindborg <a.hindborg@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Aug 10, 2024 at 10:27=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote=
-:
->
-> On 8/9/24 10:02 PM, Ming Lei wrote:
-> > ublk zoned takes 16 bytes in each request pdu just for handling REPORT_=
-ZONE
-> > operation, this way does waste memory since request pdu is allocated
-> > statically.
-> >
-> > Store the transient zone report data into one global xarray, and remove
-> > it after the report zone request is completed. This way is reasonable
-> > since report zone is run in slow code path.
->
-> Oof yes, that's a lot better. I think this warrants a:
->
-> Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
->
-> as that's a pretty big waste, especially when most would not even be
-> using the zoned support.
+We encounter a problem on our servers where there are hundreds of
+UNINTERRUPTED processes which are all waiting in the WBT wait queue.
+And the IO hung detector logged so many messages about "blocked for
+more than 122 seconds". The call trace is as follows:
 
-Indeed, the patch itself is easy enough for backport, will add Fixes tag in=
- V2.
+    Call Trace:
+        __schedule+0x959/0xee0
+        schedule+0x40/0xb0
+        io_schedule+0x12/0x40
+        rq_qos_wait+0xaf/0x140
+        wbt_wait+0x92/0xc0
+        __rq_qos_throttle+0x20/0x30
+        blk_mq_make_request+0x12a/0x5c0
+        generic_make_request_nocheck+0x172/0x3f0
+        submit_bio+0x42/0x1c0
+        ...
 
-Thanks,
+The WBT module is used to throttle buffered writeback, which will
+block any buffered writeback IO request until the previous inflight
+IOs have been completed. So I checked the inflight IO counter. That
+was one meaning one IO request was submitted to the downstream
+interface like block core layer or device driver (virtio_blk driver
+in our case). We need to figure out why the inflight IO is not
+completed in time. I confirmed that all the virtio ring buffers of
+virtio_blk are empty, so the root cause is not related to the block
+device or the virtio_blk driver since the driver has never received
+that IO request.
+
+We know that block core layer could submit IO requests to the driver
+through kworker (the callback function is blk_mq_run_work_fn). I
+thought maybe the kworker was blocked by some other resources causing
+the callback to not be evoked in time. So I checked all the kworkers
+and workqueues and confirmed there was no pending work on any kworker
+or workqueue.
+
+Integrate all the investigation information, I guess the problem should
+be in block core layer missing a chance to submit an IO request. After
+some investigation of code, I found some following scenarios which could
+cause similar symptoms. I am not sure whether this is the root cause or
+not, but maybe it is a reasonable suspect.
+
+Muchun Song (4):
+  block: fix request starvation when queue is stopped or quiesced
+  block: fix ordering between checking BLK_MQ_S_STOPPED and adding
+    requests to hctx->dispatch
+  block: fix missing smp_mb in blk_mq_{delay_}run_hw_queues
+  block: fix fix ordering between checking QUEUE_FLAG_QUIESCED and
+    adding requests to hctx->dispatch
+
+ block/blk-mq.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
+
+-- 
+2.20.1
 
