@@ -1,100 +1,87 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA32118733E
-	for <linux-block@vger.kernel.org>; Mon, 12 Aug 2024 16:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF40D1494B8
+	for <linux-block@vger.kernel.org>; Mon, 12 Aug 2024 16:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723480295; cv=none; b=eJ/5cgP+tozNy5aT2DVaQBAHx8altCq0+oLTAFjGb4KybC5La/7Lg7XrJiokOjRcLrzAoVlzJ9xwBUzgIOuPTStKYoEKfmEjUhxe1ZUROMm7BvPoR/tn2POm9W/RBGkIwXa49rEGCE8mtWxDKXIdOFlIv/C8B/t8VDd29b60Sjs=
+	t=1723480522; cv=none; b=KWYtFQ+5HQB/mEiTc0t+1A+mY4KPiD15CarEML+WydW4HoNsLWpl/zE9KaLGcqSpIpD4Ajt1xcifod/Dw8f+jZULAgYUA4YtmdpXwdvyMTmUbsCTXkY3nPh66CJSJqgwcUCS1i0akN60CzBZgPlF23K6Lvo/iqpFBd1YETcWVvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723480295; c=relaxed/simple;
-	bh=vV42uFlNHjRhikigd8R5YeRbBMde/8oSv7wiwK70bMw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=rarkWiyU+J6CuufHSGeKcI4lb53g6vEhDgb2dSAlG4BzRDpYgaSG8COrLO8J8XBcF87j0EjeDeIPKwqgB+ymQaTRaoDnk+1u60WvSr9kbVGoagpiqw9JMA8ObAh6RgfqXlm+TQbpokD/BwkUoYVaVN1Ubi8tzNOywj8m/9rtuEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sMo54D9L; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1723480522; c=relaxed/simple;
+	bh=bYBwW6XOIAo39GfNhIvu5RjaqM65aUGLBF0ZJ3LIDRI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gA21oabAPIGjNJ3lYXPZewXA5q4iymNJz9uv0K1pn9qHehBbSu1Uzk73Mcf6TyuAD1jteElz9cOzkhT8X3UeIeN9t9OgGGAFJHON/ggobUObVyBVb5XXFUhtAFIK2eQZz+8gtV+6dxzv4vjdj+U80XYjqcT8bSLkphO3kQWmuXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=azrEYN/6; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sMo54D9L"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1fc53171e56so2693155ad.3
-        for <linux-block@vger.kernel.org>; Mon, 12 Aug 2024 09:31:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723480293; x=1724085093; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b2UAaYeSFYZuqxhC5aYMcc0ucXXN9OuwyKenGborE1k=;
-        b=sMo54D9LezfxwMhXmMkc934dYwmemM3zXy4dpYhgJXsg4hagUxlXG0rrs4MSm21XUH
-         gW0Sm7eCa2VhnhX02bLPCUmYfHqURxSzENplnEOLQlHzUvssDl7/2ovKc4rb6CRYeO7f
-         8JQblXCJsSWVOuTUJloud4pCU2N4mICUn1DKMDxbKjFeaAGN1wREiNgFuU6xpYRk76vF
-         Z3bj6LPaD5eEvMvGohuusmH86oHZguoHHA2Jw/h8CuwDMPUfVvexYjSw6byS9z+9zHNA
-         7LD26hx9on9Rk3+tk/XgPKrZ/T4wJp58rGDamnjZvBVy+ZrqIoLde4Z825+eOnZHtQtr
-         XniA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723480293; x=1724085093;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b2UAaYeSFYZuqxhC5aYMcc0ucXXN9OuwyKenGborE1k=;
-        b=T5o05orHz4orwf518y4ntwN3qgxFiJfh9bnTUjFRMPoGjWkOtCh1kmJS1a9K+PBgO+
-         0kkf2th+7LYUZItsMsOy8tI+NL2tqYWQq/iMn10MQbdkVijwomN6D3oGHPVZ7wbz4bJ2
-         jHuMDFZLOvgXvGH0q3cqNXSvJqtYEuTCJ0wXmwinP6mnU1n+R9E17L8DkH2MclEW2mN3
-         1T59x8s1d7l8xaFNnCjTYBv1vuflGfx5btwwZpr8D026dDk3h8D0oILJdGd8rGfSzjiz
-         YBcakN5NnrYjnf/CAa/nqThdXvs2ULZeIDz6PLuoR/h/sBTAJ1jEhbf61Fv9KtTIMz3m
-         B7Iw==
-X-Gm-Message-State: AOJu0YxYspKzvOHdg8KnyHrJ/RfH9gq0tstuUEGbATScNzz/WljCVl5H
-	Sdey/9PklOkO/RKt14FGOanOwpIuVZRjTuTY/xpq3lrwLn1t94REuza2GKUJjmDcS1ldzMY2u1I
-	B
-X-Google-Smtp-Source: AGHT+IFItJVuiZ9trvnECd1Rb/2m30tH/qd+ElSTJLje9djjPwf97IPaxfdkD3VW/CI9gEt0KJVK4g==
-X-Received: by 2002:a17:902:e748:b0:1fd:a0b9:2be6 with SMTP id d9443c01a7336-201ca120518mr6008725ad.2.1723480292451;
-        Mon, 12 Aug 2024 09:31:32 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb7e8bf8sm40070205ad.29.2024.08.12.09.31.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 09:31:31 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Stefan Haberland <sth@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
- Vasily Gorbik <gor@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20240812125733.126431-1-sth@linux.ibm.com>
-References: <20240812125733.126431-1-sth@linux.ibm.com>
-Subject: Re: [PATCH 0/2] s390/dasd: fixes for data corruption and DMA
- alignment
-Message-Id: <172348029070.92314.3161917624446152391.b4-ty@kernel.dk>
-Date: Mon, 12 Aug 2024 10:31:30 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="azrEYN/6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=dywFelliws6FM4c0Lj8ZrMCn0rQSphqxFUzWSn3/gs4=; b=azrEYN/6vrOY3nyV7UxzBbCtdN
+	P3Ugau8iQGIbMtCsUYsfQ+4WLVT6rO4/xZu6wwOxZKUqWmyP6cGbSIrzn2D6PQil1/MlKe7z4OJmA
+	uNoG+RE5JBDdjfAhcK2aGLbfrfgZYFOIrvV5Iu1NX0n2iN2ILEL5Aiw1TEeRFBQYuSykipR7dCpA4
+	KX7bzkqGd6EaOXTlwiw5pvxjGcr0nbJxyNkDoJLuKOsH93MAFy4XRWHj0c8kwcQ8dBxuOfANukb+w
+	ApjJUeYWT0eUpKXcy6CmY9RL216jdk7HfWNNz/U5yXzdC/ECntm7QEPa5pw66AIwxffvMIkYmLnkS
+	MeWqVXzQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sdY0q-00000000trC-0o9L;
+	Mon, 12 Aug 2024 16:35:16 +0000
+Date: Mon, 12 Aug 2024 09:35:16 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Kundan Kumar <kundan.kumar@samsung.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Pankaj Raghav <p.raghav@samsung.com>, kernel@pankajraghav.com,
+	axboe@kernel.dk, willy@infradead.org, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v8 0/5] block: add larger order folio instead of pages
+Message-ID: <Zro5xJgcVlSaM4zP@bombadil.infradead.org>
+References: <CGME20240711051521epcas5p348f2cd84a1a80577754929143255352b@epcas5p3.samsung.com>
+ <20240711050750.17792-1-kundan.kumar@samsung.com>
+ <ZrVO45fvpn4uVmFH@bombadil.infradead.org>
+ <20240812133843.GA24570@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812133843.GA24570@lst.de>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-
-On Mon, 12 Aug 2024 14:57:31 +0200, Stefan Haberland wrote:
-> please apply the following two patches that fix two rather severe issues.
-> The first reverts a DMA alignment patch leading to errors with xfs and 512b
-> blocksize DASDs.
+On Mon, Aug 12, 2024 at 03:38:43PM +0200, Christoph Hellwig wrote:
+> On Thu, Aug 08, 2024 at 04:04:03PM -0700, Luis Chamberlain wrote:
+> > This is not just about mTHP uses though, this can also affect buffered IO and
+> > direct IO patterns as well and this needs to be considered and tested as well.
 > 
-> The second patch fixes a possible data corruption for certain storage
-> server errors.
+> Not sure what the above is supposed to mean.  Besides small tweaks
+> to very low-level helpers the changes are entirely in the direct I/O
+> path, and they optimize that path for folios larger than PAGE_SIZE.
+
+Which was my expectation as well.
+
+> > I've given this a spin on top of of the LBS patches [0] and used the LBS
+> > patches as a baseline. The good news is I see a considerable amount of
+> > larger IOs for buffered IO and direct IO, however for buffered IO there
+> > is an increase on unalignenment to the target filesystem block size and
+> > that can affect performance.
 > 
-> [...]
+> Compared to what?  There is nothing in the series here changing buffered
+> I/O patterns.  What do you compare?  If this series changes buffered
+> I/O patterns that is very well hidden and accidental, so we need to
+> bisect which patch does it and figure out why, but it would surprise me
+> a lot.
 
-Applied, thanks!
+The comparison was the without the patches Vs with the patches on the
+same fio run with buffered IO. I'll re-test more times and bisect.
 
-[1/2] s390/dasd: Remove DMA alignment
-      commit: 2a07bb64d80152701d507b1498237ed1b8d83866
-[2/2] s390/dasd: fix error recovery leading to data corruption on ESE devices
-      commit: 7db4042336580dfd75cb5faa82c12cd51098c90b
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+  Luis
