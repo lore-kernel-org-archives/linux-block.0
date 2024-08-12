@@ -1,55 +1,44 @@
-Received: from lounge.grep.be (lounge.grep.be [144.76.219.42])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F6B18757D
-	for <linux-block@vger.kernel.org>; Mon, 12 Aug 2024 13:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579CB11C92;
+	Mon, 12 Aug 2024 14:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723470784; cv=none; b=THB/WmlYknvVtjER9AYFqKXO6iXaOJxsDxu1/BslhSSEyWQlW3Hc7PEV9l5AU3he4Q4QmpM9Bkzm141s2yMg5H7IxIqVaYCEIoggIIJrksWI9QMDX6s7uu62TP/KKGT4bSNAdS8BNzD73eyNgqXXUVBleUd/grsHadZXXYfp+Us=
+	t=1723471416; cv=none; b=dwf3/e9vnbKIEE2ADcMIH0+oN3sPumeJ9RKZzd/f7wpShyRAQegBGHQj8PvGfqMgldzacZoVktRZb8FCBh0njzpQu8UDcqurelaQBQ+I9ibc6GMOBnjFTazlZLStereaXyMQOZIaDkmjc+/KCFdqbfqJfeO3vlXKjN+wmoZ6klc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723470784; c=relaxed/simple;
-	bh=VrDFm2znvH0Xam8Lf4Ov3deiQ8TtNeXvK2GaXRqaEj4=;
+	s=arc-20240116; t=1723471416; c=relaxed/simple;
+	bh=mNhqE5gg6GonYn7gRji/mmpLvAAcv2kW3DdfCyvo6Ho=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LGcOrSzUTvRaCdTYE43MdnjXK9hO1C6c7VS2lt52jZnsfe4KgXahDrE3ozBG5h7Mif7pLyMHBgRhdlGPH27Y9Hid0jR1BRoX4jowt/WSAfkpA++aCPZqv84jLZFMAjG4mwcTagiu1FICmh/eHB/tBTclG4rp6ILT/gwmsxfhD40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be; spf=pass smtp.mailfrom=uter.be; dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b=muIgzAd7; arc=none smtp.client-ip=144.76.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uter.be
+	 Content-Type:Content-Disposition:In-Reply-To; b=PApoJ8Egr4QREODT90SUaafGyXnY5j50GuYQhRmFE0GO79vAd38XkgQUSrm5rL1iI2DeYUsv1IA6RWaMcO/vGY9k++a1iXj+LkZYM5ywr2syAlaLSn1mktHLLzFHkVgx53/cuyu+bYCJLUc+HBrLBIdXpJ5OOF/66Qn4NmYct0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Wgm4Y2Fy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b="muIgzAd7"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
-	s=2021.lounge; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=tsOaNUnXsW8E+PfttAxy3/HK27PU6Ot2r+AEqAMuPS0=; b=muIgzAd7z2Rrw4e5+fjQK9d4nq
-	Csa6WTM0ct0M8SFKikpETUDEtg+RZrsERFdS4aPh1CDhygeVDd78aSXZ3eEr8c8BwNr9I+AKKcDsn
-	thLbNmEitzcrxADd+wz42zQ32bYeDeyktXIrdDVQuHMxHR6ILyYXp1aJIqu7G43hbgnT94RXP2S7H
-	TV1tS4dqFcHbXqrtalY1HVsDBeuLvh9+c+8fviS7EOtMZiuUOerZC8XANq6L4Pw2VwPQXSY/98vA1
-	Yjyran9KjtgRtEo0rbrWIKuehyd/6JBUHeUA73nWdMQVly2iq7dRSv+indXCtPvKd+JdS1cDJ8z8Q
-	ZI3L/KRw==;
-Received: from vc-gp-n-105-245-229-160.umts.vodacom.co.za ([105.245.229.160] helo=pc220518)
-	by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <w@uter.be>)
-	id 1sdVTn-009YGx-2b;
-	Mon, 12 Aug 2024 15:52:59 +0200
-Received: from wouter by pc220518 with local (Exim 4.98)
-	(envelope-from <w@uter.be>)
-	id 1sdUyk-00000000Twm-1jVC;
-	Mon, 12 Aug 2024 15:20:54 +0200
-Date: Mon, 12 Aug 2024 15:20:22 +0200
-From: Wouter Verhelst <w@uter.be>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <josef@toxicpanda.com>, Damien Le Moal <dlemoal@kernel.org>,
-	linux-block@vger.kernel.org, nbd@other.debian.org,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Wgm4Y2Fy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B181C32782;
+	Mon, 12 Aug 2024 14:03:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723471415;
+	bh=mNhqE5gg6GonYn7gRji/mmpLvAAcv2kW3DdfCyvo6Ho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Wgm4Y2FysWteo2f2FA8VsChMIfTIaW665HFPe5q6AS0d4dRMNus5+FbWVUYRDKwZI
+	 2hfUvBdUAQBBLK9ntiLtRTFDIeXCjax5mWaBX/M2f0FJ42WB0sTDqDxKp1gtsH/E2o
+	 Bpqct28A+N8kny87E1ijs+rk7SOpJIeAy069JMEY=
+Date: Mon, 12 Aug 2024 16:03:31 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, kbusch@kernel.org, sagi@grimberg.me,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] nbd: correct the maximum value for discard sectors
-Message-ID: <ZroMFpaP69uUfC14@pc220518.home.grep.be>
-References: <20240803130432.5952-1-w@uter.be>
- <20240808070604.179799-1-w@uter.be>
- <20240808070604.179799-3-w@uter.be>
- <584a1774-0268-4b3c-9a78-0f00073b9d74@kernel.dk>
+Subject: Re: [PATCH AUTOSEL 6.10 13/16] block: change rq_integrity_vec to
+ respect the iterator
+Message-ID: <2024081223-thriving-yo-yo-0787@gregkh>
+References: <20240728004739.1698541-1-sashal@kernel.org>
+ <20240728004739.1698541-13-sashal@kernel.org>
+ <7f38f5bc-6bd2-4e3a-92e6-c232761fafc6@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,32 +47,70 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <584a1774-0268-4b3c-9a78-0f00073b9d74@kernel.dk>
-X-Speed: Gates' Law: Every 18 months, the speed of software halves.
-Organization: none
+In-Reply-To: <7f38f5bc-6bd2-4e3a-92e6-c232761fafc6@kernel.org>
 
-On Fri, Aug 09, 2024 at 09:34:55AM -0600, Jens Axboe wrote:
-> On 8/8/24 1:06 AM, Wouter Verhelst wrote:
-> > Fixes: 268283244c0f018dec8bf4a9c69ce50684561f46
+On Mon, Aug 12, 2024 at 03:51:12PM +0200, Matthieu Baerts wrote:
+> Hi Sasha, Greg,
 > 
-> This isn't the correct way to have a fixes line.
+> On 28/07/2024 02:47, Sasha Levin wrote:
+> > From: Mikulas Patocka <mpatocka@redhat.com>
+> > 
+> > [ Upstream commit cf546dd289e0f6d2594c25e2fb4e19ee67c6d988 ]
+> > 
+> > If we allocate a bio that is larger than NVMe maximum request size,
+> > attach integrity metadata to it and send it to the NVMe subsystem, the
+> > integrity metadata will be corrupted.
+> 
+> (...)
+> 
+> > diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
+> > index 7428cb43952da..d16dd24719841 100644
+> > --- a/include/linux/blk-integrity.h
+> > +++ b/include/linux/blk-integrity.h
+> > @@ -100,14 +100,13 @@ static inline bool blk_integrity_rq(struct request *rq)
+> >  }
+> >  
+> >  /*
+> > - * Return the first bvec that contains integrity data.  Only drivers that are
+> > - * limited to a single integrity segment should use this helper.
+> > + * Return the current bvec that contains the integrity data. bip_iter may be
+> > + * advanced to iterate over the integrity data.
+> >   */
+> > -static inline struct bio_vec *rq_integrity_vec(struct request *rq)
+> > +static inline struct bio_vec rq_integrity_vec(struct request *rq)
+> >  {
+> > -	if (WARN_ON_ONCE(queue_max_integrity_segments(rq->q) > 1))
+> > -		return NULL;
+> > -	return rq->bio->bi_integrity->bip_vec;
+> > +	return mp_bvec_iter_bvec(rq->bio->bi_integrity->bip_vec,
+> > +				 rq->bio->bi_integrity->bip_iter);
+> >  }
+> >  #else /* CONFIG_BLK_DEV_INTEGRITY */
+> >  static inline int blk_rq_count_integrity_sg(struct request_queue *q,
+> > @@ -169,7 +168,8 @@ static inline int blk_integrity_rq(struct request *rq)
+> >  
+> >  static inline struct bio_vec *rq_integrity_vec(struct request *rq)
+> >  {
+> > -	return NULL;
+> > +	/* the optimizer will remove all calls to this function */
+> > +	return (struct bio_vec){ };
+> 
+> If CONFIG_BLK_DEV_INTEGRITY is not defined, there is a compilation error
+> here in v6.10 with the recently queued patches because the signature has
+> not been updated:
+> 
+> > In file included from block/bdev.c:15:                                                                                                                                             
+> > include/linux/blk-integrity.h: In function 'rq_integrity_vec':
+> > include/linux/blk-integrity.h:172:16: error: incompatible types when returning type 'struct bio_vec' but 'struct bio_vec *' was expected
+> >   172 |         return (struct bio_vec){ };                 
+> >       |                ^
+> 
+> Could it be possible to backport the following fix to v6.10 as well please?
+> 
+>   69b6517687a4 ("block: use the right type for stub rq_integrity_vec()")
+> 
+> It is also needed for v6.6 and v6.1.
 
-Apologies Jens; beginner's mistake.
+Now queued up, thanks!
 
-> In general, please don't nest next versions under the previous posting,
-> and it's strongly recommended to have a cover letter that includes that
-> changed from version N to N+1. Otherwise we have to guess... So please
-> include that when posting v4.
-
-Right, sorry. "git help send-email" gave an example of how to do
-something like this for a "v2" patch series, which made me assume
-(incorrectly) that this is what would be wanted. I should have checked
-first, I guess.
-
-Will send v4 (hopefully the last one) shortly with those fixes.
-
--- 
-     w@uter.{be,co.za}
-wouter@{grep.be,fosdem.org,debian.org}
-
-I will have a Tin-Actinium-Potassium mixture, thanks.
+greg k-h
