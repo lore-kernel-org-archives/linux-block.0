@@ -1,54 +1,43 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F52167DA4;
-	Mon, 12 Aug 2024 09:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE9543AA1;
+	Mon, 12 Aug 2024 11:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723453785; cv=none; b=RUoLrGZ1gNOxb7Vu6OsYsOb02sGPrm7nc3fML5vV5Egpi9jZ/JHRtRgATiqpOkLLIXN6ED5n1AszYlrVrD/YsgPrI2v3wv2UP0GuP6oIAL/oVQrNDMuKTIdYc2RUuPz0xHHD639jUxNQWeR7h8Ml/wJ1UnxVC3mE4RwB80XDPdU=
+	t=1723461356; cv=none; b=IXnzViMnF1lz3mFRT5wjCaM1RX4xSzDFKuRZWCbl7Vkjp69j2drr9q97EqdilKlCmRRmgjykTixceWN9nwECCjhd+40NHgTWFU3OUu3z/iAmGLlvCah64M0JMjv3PNxcD+ZjtnKenphkK5KG/1wCIrs+RPj1bR10iX76J9ojZuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723453785; c=relaxed/simple;
+	s=arc-20240116; t=1723461356; c=relaxed/simple;
 	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OoEtYWeNy7mNE2ymB1JDvgUCYocokgC2lobvo5RWf/GJOt8ep93vVyn8154CgvdLaDLmAuGjt3QwyT69vgwI5HpZtR2zIas7tyi5+6Aux8a77AA5G6ghKVRXdP/us3vMHEkhxb6pJGt2TAcoNKnszMalLnKFq1AYPNGbMJ5Go08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id ECC7568BEB; Mon, 12 Aug 2024 11:09:39 +0200 (CEST)
-Date: Mon, 12 Aug 2024 11:09:39 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	John Garry <john.g.garry@oracle.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Sumit Saxena <sumit.saxena@broadcom.com>,
-	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
-	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Jonathan Corbet <corbet@lwn.net>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Sridhar Balaraman <sbalaraman@parallelwireless.com>,
-	"brookxu.cn" <brookxu.cn@gmail.com>, Ming Lei <ming.lei@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	virtualization@lists.linux.dev, megaraidlinux.pdl@broadcom.com,
-	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
-	storagedev@microchip.com, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 14/15] lib/group_cpus.c: honor housekeeping config
- when grouping CPUs
-Message-ID: <20240812090939.GJ5497@lst.de>
-References: <20240806-isolcpus-io-queues-v3-0-da0eecfeaf8b@suse.de> <20240806-isolcpus-io-queues-v3-14-da0eecfeaf8b@suse.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=loy+FW5FUVYnspbqBHlt+U1L5Cn5QH3ncdUbJnyIr99ZvFbwBcu+2AE6UNMd/zqOkGg4IsblO8KLCGiFbn1jpoGlCJ5UtkPA9Nm7zRAW/hD36qMBHlaTDj1bCRRdnGKj+h+LkuFozd03xh+FFtJpgu3OCNcCj1uLPj5ZV04g2LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=yYPVFWy5; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yYPVFWy5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=yYPVFWy5VbmlQx8WOa8RtCLZMU
+	NybJsBjE2ZCMRIbLxm0cIabzTWnUzoNCJO7ydmGVPvEHRmwAn1W9moHoEZdxsE+1wQdqOGgxeDSBT
+	tEO67Q3dZEoLbdKcBffyKI2MZLTrBQfkv66LivA8zoW9oD5vqIGvpdqigpTmf4vO5bMSDnVHK6+Gj
+	gmbyFqnoRUclBDl98UOcIFfoqYfJ7qbKtcfwHQmSdnvUZq723JE4vQt0Y9BFfGsZs0ww0PSK3HfZe
+	5Y0V0vt0QvbXB9XmT5sT3InKoYJz+Pzk7pI5N0WR60trirVYfvrBIDKbbCP32PuwB3Xyl2+SIFnQl
+	sbMbzRmg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sdT1l-0000000071x-3jSj;
+	Mon, 12 Aug 2024 11:15:53 +0000
+Date: Mon, 12 Aug 2024 04:15:53 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc: stefanha@redhat.com, virtualization@lists.linux.dev, mst@redhat.com,
+	axboe@kernel.dk, kvm@vger.kernel.org, linux-block@vger.kernel.org,
+	oren@nvidia.com
+Subject: Re: [PATCH v2] virtio_blk: implement init_hctx MQ operation
+Message-ID: <Zrnu6V5lsQLpo_3W@infradead.org>
+References: <20240807224129.34237-1-mgurtovoy@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,8 +46,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240806-isolcpus-io-queues-v3-14-da0eecfeaf8b@suse.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240807224129.34237-1-mgurtovoy@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
 Looks good:
 
