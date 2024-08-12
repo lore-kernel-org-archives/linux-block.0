@@ -1,139 +1,198 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAAD27447;
-	Sun, 11 Aug 2024 17:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6E5136A
+	for <linux-block@vger.kernel.org>; Mon, 12 Aug 2024 01:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723398104; cv=none; b=GtNX9aDe6PBEJP6ekhjtk+EApcgqGw3rk00+cxHzBzMtMCY/0CEGJLzFTnHdSVmyRUqSGKoJihd0zQPDbC0ZtFxpz7LmE+kCCICxbg+0EuSrIgqRakuQxXAdUaRnvETjqUR5u/3g1epTJIp/KlLO4Ga3C8K26LUoVKZFlDQy9QA=
+	t=1723426598; cv=none; b=Z6zb/9Kf5WnLkEVnBN1TPUgW3lERI6oEGqa7RLPp0ZW8fSxOiEZ9a0lROD2H5g9x9dE9BWhSdz0uOFMo6CsYml+diM9mjT6/fQ1/IS1KXQJguIUxGJ7DKLb0LFPcpd7SVhq62j8AxInzymE05iLPpMdq2HzL6njySdI+fWWq1KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723398104; c=relaxed/simple;
-	bh=hphTYSkZTnY9Y9aQRf2FyLxh27Y2wAch0ANmN7fhwXo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qD7pE/sRWCAAbFCfN5cYXXmT/jNUegbhQrmpokKFt6vManDxY09LobBUpYo35OP07XqCtxO5jISf3EWpkG4I+Qz+mCNtFax39cYKmgduoCXOZaMfa03PgnVnkCA9b0bky0jLt9FVT8Hi/8YJZfV6frixjsxMgUqLp+JE4rv/SZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ADE92FEC;
-	Sun, 11 Aug 2024 10:42:00 -0700 (PDT)
-Received: from [192.168.13.84] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A98D3F71E;
-	Sun, 11 Aug 2024 10:41:14 -0700 (PDT)
-Message-ID: <c151b6d5-7e02-48ee-951f-c23594f6be6f@arm.com>
-Date: Sun, 11 Aug 2024 19:41:08 +0200
+	s=arc-20240116; t=1723426598; c=relaxed/simple;
+	bh=eAK3BjKMXTVmUSN+lrMuMdOrsqzTRJyLy/RaYP9PfvI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h03m9aUYCyJ8tBsrbXkumoNlfBVcF7kITIBlSZvGABCaR0r+h/zvdtSDRqwnyoJ6OcRcxzFT8v1jp3QK15BS/NNphawuKo5EhBmm2PFTgdcVHaxMjoFLvGsstxwt1OdTLbpXkbdwzABoyxgKTZSQzlQhjQ+yqvW9zL66wpinywU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aCFDI2SX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCFDI2SX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723426594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FzppdRZiv70dCEJjIPVWz8CpsvHgLQ+ALGeumJKpJgo=;
+	b=aCFDI2SXYaaKlgBMuPDLqLX6gqk2aMjVT/+q6XkOj7IEudla5xpMgqufuYUY4gevf162ob
+	lqRBDQNkX8vJ9gX3jwbBpP3SG2/WgphZMyXasW1B6zQ+sKc45qV2dc/DJvY0Ufcacah19P
+	GISOFznia7uZJnnenVnZxgaPRrSSpjE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-644-OKgwF9hcNg23v5ewEdefJQ-1; Sun,
+ 11 Aug 2024 21:36:33 -0400
+X-MC-Unique: OKgwF9hcNg23v5ewEdefJQ-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CB981955F1E;
+	Mon, 12 Aug 2024 01:36:31 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.110])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 16DFD1955F3E;
+	Mon, 12 Aug 2024 01:36:29 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Andreas Hindborg <a.hindborg@samsung.com>
+Subject: [PATCH V2] ublk: move zone report data out of request pdu
+Date: Mon, 12 Aug 2024 09:36:24 +0800
+Message-ID: <20240812013624.587587-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
- capacities are different"
-To: MANISH PANDEY <quic_mapa@quicinc.com>,
- Bart Van Assche <bvanassche@acm.org>, Qais Yousef <qyousef@layalina.io>,
- Christian Loehle <christian.loehle@arm.com>
-Cc: axboe@kernel.dk, mingo@kernel.org, peterz@infradead.org,
- vincent.guittot@linaro.org, linux-block@vger.kernel.org,
- sudeep.holla@arm.com, Jaegeuk Kim <jaegeuk@kernel.org>,
- Christoph Hellwig <hch@infradead.org>, kailash@google.com, tkjos@google.com,
- dhavale@google.com, bvanassche@google.com, quic_nitirawa@quicinc.com,
- quic_cang@quicinc.com, quic_rampraka@quicinc.com, quic_narepall@quicinc.com,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
- <3feb5226-7872-432b-9781-29903979d34a@arm.com>
- <20240805020748.d2tvt7c757hi24na@airbuntu>
- <25909f08-12a5-4625-839d-9e31df4c9c72@acm.org>
- <1d9c27b2-77c7-462f-bde9-1207f931ea9f@quicinc.com>
- <17bf99ad-d64d-40ef-864f-ce266d3024c7@acm.org>
- <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
-From: Dietmar Eggemann <dietmar.eggemann@arm.com>
-Content-Language: en-US
-In-Reply-To: <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-+ linux-kernel@vger.kernel.org
+ublk zoned takes 16 bytes in each request pdu just for handling REPORT_ZONE
+operation, this way does waste memory since request pdu is allocated
+statically.
 
-On 08/08/2024 08:05, MANISH PANDEY wrote:
->  
-> On 8/5/2024 11:22 PM, Bart Van Assche wrote:
->> On 8/5/24 10:35 AM, MANISH PANDEY wrote:
+Store the transient zone report data into one global xarray, and remove
+it after the report zone request is completed. This way is reasonable
+since report zone is run in slow code path.
 
-[...]
+Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Andreas Hindborg <a.hindborg@samsung.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- add fixes tag(Jens)
 
->> Please use an approach that is supported by the block layer. I don't
->> think that dynamically changing the IRQ affinity is compatible with the
->> block layer.
-> 
-> For UFS with MCQ, ESI IRQs are bounded at the time of initialization.
-> so basically i would like to use High Performance cluster CPUs to
-> migrate few completions from Mid clusters and take the advantage of high
-> capacity CPUs. The new change takes away this opportunity from driver.
-> So basically we should be able to use High Performance CPUs like below
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index e3c3c0c21b55..a4a2500c4ef6 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1164,7 +1164,7 @@ static inline bool blk_mq_complete_need_ipi(struct
-> request *rq)
->         if (cpu == rq->mq_ctx->cpu ||
->             (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
->              cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
-> -            cpus_equal_capacity(cpu, rq->mq_ctx->cpu)))
-> +            arch_scale_cpu_capacity(cpu) >=     
-> arch_scale_cpu_capacity(rq->mq_ctx->cpu)))
->                 return false;
-> 
-> This way driver can use best possible CPUs for it's use case.
+ drivers/block/ublk_drv.c | 62 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 46 insertions(+), 16 deletions(-)
 
-So the issue for you with commit af550e4c9682 seems to be that those
-completions don't happen on big CPUs (cpu_capacity = 1024) anymore,
-since the condition in  blk_mq_complete_need_ipi() (1):
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 890c08792ba8..0e295471318a 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -71,9 +71,6 @@ struct ublk_rq_data {
+ 	struct llist_node node;
+ 
+ 	struct kref ref;
+-	__u64 sector;
+-	__u32 operation;
+-	__u32 nr_zones;
+ };
+ 
+ struct ublk_uring_cmd_pdu {
+@@ -214,6 +211,33 @@ static inline bool ublk_queue_is_zoned(struct ublk_queue *ubq)
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 
++struct ublk_zoned_report_desc {
++	__u64 sector;
++	__u32 operation;
++	__u32 nr_zones;
++};
++
++static DEFINE_XARRAY(ublk_zoned_report_descs);
++
++static int ublk_zoned_insert_report_desc(const struct request *req,
++		struct ublk_zoned_report_desc *desc)
++{
++	return xa_insert(&ublk_zoned_report_descs, (unsigned long)req,
++			    desc, GFP_KERNEL);
++}
++
++static struct ublk_zoned_report_desc *ublk_zoned_erase_report_desc(
++		const struct request *req)
++{
++	return xa_erase(&ublk_zoned_report_descs, (unsigned long)req);
++}
++
++static struct ublk_zoned_report_desc *ublk_zoned_get_report_desc(
++		const struct request *req)
++{
++	return xa_load(&ublk_zoned_report_descs, (unsigned long)req);
++}
++
+ static int ublk_get_nr_zones(const struct ublk_device *ub)
+ {
+ 	const struct ublk_param_basic *p = &ub->params.basic;
+@@ -308,7 +332,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+ 		unsigned int zones_in_request =
+ 			min_t(unsigned int, remaining_zones, max_zones_per_request);
+ 		struct request *req;
+-		struct ublk_rq_data *pdu;
++		struct ublk_zoned_report_desc desc;
+ 		blk_status_t status;
+ 
+ 		memset(buffer, 0, buffer_length);
+@@ -319,20 +343,23 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+ 			goto out;
+ 		}
+ 
+-		pdu = blk_mq_rq_to_pdu(req);
+-		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
+-		pdu->sector = sector;
+-		pdu->nr_zones = zones_in_request;
++		desc.operation = UBLK_IO_OP_REPORT_ZONES;
++		desc.sector = sector;
++		desc.nr_zones = zones_in_request;
++		ret = ublk_zoned_insert_report_desc(req, &desc);
++		if (ret)
++			goto free_req;
+ 
+ 		ret = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
+ 					GFP_KERNEL);
+-		if (ret) {
+-			blk_mq_free_request(req);
+-			goto out;
+-		}
++		if (ret)
++			goto erase_desc;
+ 
+ 		status = blk_execute_rq(req, 0);
+ 		ret = blk_status_to_errno(status);
++erase_desc:
++		ublk_zoned_erase_report_desc(req);
++free_req:
+ 		blk_mq_free_request(req);
+ 		if (ret)
+ 			goto out;
+@@ -366,7 +393,7 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
+ {
+ 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
+ 	struct ublk_io *io = &ubq->ios[req->tag];
+-	struct ublk_rq_data *pdu = blk_mq_rq_to_pdu(req);
++	struct ublk_zoned_report_desc *desc;
+ 	u32 ublk_op;
+ 
+ 	switch (req_op(req)) {
+@@ -389,12 +416,15 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
+ 		ublk_op = UBLK_IO_OP_ZONE_RESET_ALL;
+ 		break;
+ 	case REQ_OP_DRV_IN:
+-		ublk_op = pdu->operation;
++		desc = ublk_zoned_get_report_desc(req);
++		if (!desc)
++			return BLK_STS_IOERR;
++		ublk_op = desc->operation;
+ 		switch (ublk_op) {
+ 		case UBLK_IO_OP_REPORT_ZONES:
+ 			iod->op_flags = ublk_op | ublk_req_build_flags(req);
+-			iod->nr_zones = pdu->nr_zones;
+-			iod->start_sector = pdu->sector;
++			iod->nr_zones = desc->nr_zones;
++			iod->start_sector = desc->sector;
+ 			return BLK_STS_OK;
+ 		default:
+ 			return BLK_STS_IOERR;
+-- 
+2.45.2
 
- if (!QUEUE_FLAG_SAME_FORCE && cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
-     cpus_equal_capacity(cpu, rq->mq_ctx->cpu))
-
-is no longer true if 'rq->mq_ctx->cpu != big CPU' so (1) returns true
-and blk_mq_complete_request_remote() sends an ipi to 'rq->mq_ctx->cpu'.
-
-
-I tried to simulate this with a 6 CPUs aarch64 QEMU tri-gear (3
-different cpu_capacity values) system:
-
-cat /sys/devices/system/cpu/online
-0-5
-
-# cat /sys/devices/system/cpu/cpu*/cpu_capacity
-446
-446
-871
-871
-1024
-1024
-
-# grep -i virtio /proc/interrupts | while read a b; do grep -aH .
-/proc/irq/${a%:}/smp_affinity; done
-/proc/irq/15/smp_affinity:3f /* block device */
-/proc/irq/16/smp_affinity:3f /* network device */
-
-So you set the block device irq affine to the big CPUs (0x30).
-
-# echo 30 > /proc/irq/15/smp_affinity
-
-And with the patch, you send ipi's in blk_mq_complete_request_remote()
-in case 'rq->mq_ctx->cpu=[0-4]' whereas w/o the patch or the change to:
-
- arch_scale_cpu_capacity(cpu) >=
-                            arch_scale_cpu_capacity(rq->mq_ctx->cpu) (2)
-
-you would complete the request locally (i.e. on CPU4/5):
-
-gic_handle_irq() -> ... -> handle_irq_event() -> ... -> vm_interrupt()
--> ... -> virtblk_done() (callback) -> blk_mq_complete_request() ->
-blk_mq_complete_request_remote(), rq->q->mq_ops->complete(rq)
-
-The patch IMHO was introduced to avoid running local when 'local =
-little CPU'. Since you use system knowledge and set IRQ affinity
-explicitly to big CPU's to run local on them, maybe (2) is the way to
-allow both?
