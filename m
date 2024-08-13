@@ -1,148 +1,140 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179DD18A94E;
-	Tue, 13 Aug 2024 13:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE3A61FCF;
+	Tue, 13 Aug 2024 16:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723554708; cv=none; b=SzMbdR8o/4wFtAQFujCKZswKiQleiBWUgvkR8MFOCPqsYaoA2XooFeKGzuky9nhQLOtDz0GBjfvFjXSk9Q7lmuq2HoTBsmQZxxXq3nB/8+gswDQI296kPkw4UvVkauKob/+528o8jvW1SKau6vusFHmtPrpC/PtnsokMXZqH1E4=
+	t=1723566034; cv=none; b=o7kVVteOmXVfV6aF0O9WknzbY/8fotOQOxN8OEpBmwK30bHUPILY2/O8BPvFVVPC59ti8TRYd7Wl2SEMnqvUkSaklRFsUn1joAKjgDkQhEV9vwqTvR44Vnz8GoXlPQ1YA9exveJ/RB6ZGOZwzUOAIsEgfY+3mU8wfOHWAClldf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723554708; c=relaxed/simple;
-	bh=nwrRtJCWatyFdWExCpf1lT5rClcrqjnVxyIfQtEz6Gk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rQD1ZWly2giJMtz4hNfb8TauzoIzJdVGiHJryYzd6Sg8tVblfvWmfttp2nk3oNpJPXD8QK57j200rtsuC1QDROQlgNrKA2hTDofOn1QQUCGRNuDaA8YHZsBcDflsePjwzzgI98z78TCpsrVyi1SaQ6QKSvYBCo1JcEOVakiwEm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YdDshMQ7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jgOPz3i3; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YdDshMQ7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jgOPz3i3; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YdDshMQ7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jgOPz3i3";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YdDshMQ7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jgOPz3i3"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 25794203AD;
-	Tue, 13 Aug 2024 13:11:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723554705; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nwrRtJCWatyFdWExCpf1lT5rClcrqjnVxyIfQtEz6Gk=;
-	b=YdDshMQ7mxAV0JmLSj07L+9KBwxzqqdROUsHk7zW52djSfjt2r1H+mR0AfJZRzuk2w8yfX
-	vv5bj/v6JTTBnlWHHXZ4Ss3AtQLlYksZuydh38qcf0wxRJg74gpxtK2rIsgwb85A4c7jeU
-	Nns7Nr84GgwQXduUdiV1cIG9Nwke9Kk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723554705;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nwrRtJCWatyFdWExCpf1lT5rClcrqjnVxyIfQtEz6Gk=;
-	b=jgOPz3i3I+pHId0uPcovGl1gP+PcrknurukRnQ9/MIRbTNL2FznL1bIx+X+VU/S0YIXfBU
-	3Bi2rUnnKahamfCQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=YdDshMQ7;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=jgOPz3i3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723554705; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nwrRtJCWatyFdWExCpf1lT5rClcrqjnVxyIfQtEz6Gk=;
-	b=YdDshMQ7mxAV0JmLSj07L+9KBwxzqqdROUsHk7zW52djSfjt2r1H+mR0AfJZRzuk2w8yfX
-	vv5bj/v6JTTBnlWHHXZ4Ss3AtQLlYksZuydh38qcf0wxRJg74gpxtK2rIsgwb85A4c7jeU
-	Nns7Nr84GgwQXduUdiV1cIG9Nwke9Kk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723554705;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nwrRtJCWatyFdWExCpf1lT5rClcrqjnVxyIfQtEz6Gk=;
-	b=jgOPz3i3I+pHId0uPcovGl1gP+PcrknurukRnQ9/MIRbTNL2FznL1bIx+X+VU/S0YIXfBU
-	3Bi2rUnnKahamfCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F16EB13983;
-	Tue, 13 Aug 2024 13:11:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 7myfOpBbu2buDwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Tue, 13 Aug 2024 13:11:44 +0000
-Date: Tue, 13 Aug 2024 15:11:44 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-	Sagi Grimberg <sagi@grimberg.me>, Thomas Gleixner <tglx@linutronix.de>, 
-	Christoph Hellwig <hch@lst.de>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	John Garry <john.g.garry@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Kashyap Desai <kashyap.desai@broadcom.com>, 
-	Sumit Saxena <sumit.saxena@broadcom.com>, Shivasharan S <shivasharan.srikanteshwara@broadcom.com>, 
-	Chandrakanth patil <chandrakanth.patil@broadcom.com>, Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>, 
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>, Nilesh Javali <njavali@marvell.com>, 
-	GR-QLogic-Storage-Upstream@marvell.com, Jonathan Corbet <corbet@lwn.net>, 
-	Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
-	Sridhar Balaraman <sbalaraman@parallelwireless.com>, "brookxu.cn" <brookxu.cn@gmail.com>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev, megaraidlinux.pdl@broadcom.com, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com, 
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 15/15] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-Message-ID: <6449daa0-b8e1-4c5d-86ad-19dada7c849e@flourine.local>
-References: <20240806-isolcpus-io-queues-v3-0-da0eecfeaf8b@suse.de>
- <20240806-isolcpus-io-queues-v3-15-da0eecfeaf8b@suse.de>
- <ZrtX4pzqwVUEgIPS@fedora>
+	s=arc-20240116; t=1723566034; c=relaxed/simple;
+	bh=rUjKakylGmaur9CYp1scGQ8kw8n7K7iDDZ1hQtQBJQo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HN7bCbuprxVb1AIdqWvWosi9yP4+5NfxK+an8srRpFLXQVNchX9yhstQDt9I55Fg4wCrUvqhe8O7OZN31SYjAX5TmIaktmpYgY4/uey1GZrIYzqicM5e+9qMDczgEfGyMIHiOkeKRkN7IeuY1SmiqUeSS/Luf1/UAePJ9Jy/5ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6304F12FC;
+	Tue, 13 Aug 2024 09:20:57 -0700 (PDT)
+Received: from [10.57.84.20] (unknown [10.57.84.20])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 178B53F6A8;
+	Tue, 13 Aug 2024 09:20:26 -0700 (PDT)
+Message-ID: <a225f9e0-5335-4c58-8e94-960c2557f9c0@arm.com>
+Date: Tue, 13 Aug 2024 17:20:25 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZrtX4pzqwVUEgIPS@fedora>
-X-Rspamd-Queue-Id: 25794203AD
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,grimberg.me,linutronix.de,lst.de,oracle.com,redhat.com,broadcom.com,marvell.com,lwn.net,suse.de,parallelwireless.com,gmail.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,microchip.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	R_RATELIMIT(0.00)[to_ip_from(RLbomrtoisjzkgzhj6iko5ju7u)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,flourine.local:mid,suse.de:dkim]
-X-Spam-Score: -3.01
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
+ capacities are different"
+To: Qais Yousef <qyousef@layalina.io>
+Cc: MANISH PANDEY <quic_mapa@quicinc.com>, axboe@kernel.dk, mingo@kernel.org,
+ peterz@infradead.org, vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+ linux-block@vger.kernel.org, sudeep.holla@arm.com,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
+ Christoph Hellwig <hch@infradead.org>, kailash@google.com, tkjos@google.com,
+ dhavale@google.com, bvanassche@google.com, quic_nitirawa@quicinc.com,
+ quic_cang@quicinc.com, quic_rampraka@quicinc.com, quic_narepall@quicinc.com,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
+ <3feb5226-7872-432b-9781-29903979d34a@arm.com>
+ <20240805020748.d2tvt7c757hi24na@airbuntu>
+ <e5f0349e-6c72-4847-bf0c-4afb57404907@arm.com>
+ <20240809002321.3k5g2isqmiuflrmd@airbuntu>
+Content-Language: en-US
+From: Christian Loehle <christian.loehle@arm.com>
+In-Reply-To: <20240809002321.3k5g2isqmiuflrmd@airbuntu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 13, 2024 at 08:56:02PM GMT, Ming Lei wrote:
-> With patch 14 and the above change, managed irq's affinity becomes not
-> matched with blk-mq mapping any more.
+On 8/9/24 01:23, Qais Yousef wrote:
+> On 08/05/24 11:18, Christian Loehle wrote:
+> 
+>>> My understanding of rq_affinity=1 is to match the perf of requester. Given that
+>>> the characteristic of HMP system is that power has an equal importance to perf
+>>> (I think this now has become true for all systems by the way), saying that the
+>>> match in one direction is better than the other is sort of forcing a policy of
+>>> perf first which I don't think is a good thing to enforce. We don't have enough
+>>> info to decide at this level. And our users care about both.
+>>
+>> I would argue rq_affinity=1 matches the perf, so that flag should already bias
+>> perf in favor of power slightly?
+> 
+> Not on this type of systems. If perf was the only thing important, just use
+> equally big cpus. Balancing perf and power is important on those systems, and
+> I don't think we have enough info to decide which decision is best when
+> capacities are not the same. Matching the perf level the requesting on makes
+> sense when irq_affinity=1.
 
-Ah, got it. The problem here is that I need to update also the irq
-affinity mask for the hctx when offlining a CPU.
+Well you could still want a
+"IO performance always beats power considerations" and still go HMP because
+sometimes for non-IO you prefer power, but I agree that we don't have enough
+information about what the user wants from the system/kernel.
+
+> 
+>> Although the actual effect on power probably isn't that significant, given
+>> that the (e.g. big) CPU has submitted the IO, is woken up soon, so you could
+>> almost ignore a potential idle wakeup and the actual CPU time spent in the block
+>> completion is pretty short of course.
+>>
+>>> If no matching is required, it makes sense to set rq_affinity to 0. When
+>>> matching is enabled, we need to rely on per-task iowait boost to help the
+>>> requester to run at a bigger CPU, and naturally the completion will follow when
+>>> rq_affinity=1. If the requester doesn't need the big perf, but the irq
+>>> triggered on a bigger core, I struggle to understand why it is good for
+>>> completion to run on bigger core without the requester also being on a similar
+>>> bigger core to truly maximize perf.
+>>
+>> So first of all, per-task iowait boosting has nothing to do with it IMO.
+> 
+> It has. If the perf is not good because the requester is running on little
+> core, the requester need to move up to ensure the overall IO perf is better.
+
+See below but also
+"the requester need to move up to ensure the overall IO perf is better" is
+just not true, with asynchronous IO submission done right, the submission
+runtime isn't critical to the IO throughput, therefore it should run the
+most power-efficient way.
+This can be observed e.g. with any io_uring fio workload with significant
+iodepth (and possibly multi-threading).
+Completion may be a different story, depending on the device stack, if we're
+dealing with !MCQ then the completion path (irq + block layer completion)
+is absolutely critical.
+For any mmc / ufs<4.0 system the performance difference between
+fio --name=little --filename=/dev/sda --runtime=10 --rw=randread --bs=4k --ioengine=io_uring --numjobs=4 --iodepth=32 --group_reporting --cpus_allowed=$LITTLE_CPUS
+and
+fio --name=big --filename=/dev/sda --runtime=10 --rw=randread --bs=4k --ioengine=io_uring --numjobs=4 --iodepth=32 --group_reporting --cpus_allowed=$BIG_CPUS
+is (usually) only because of the completion path and setting irq affinity of
+/dev/sda to $BIG_CPUS will make the difference disappear (rq_affinity=0 and
+implying LLC is the same).
+Running the submission on little CPUs will usually be the most power-efficient
+way then.
+
+> 
+>> Plenty of IO workloads build up utilization perfectly fine.
+> 
+> These ones have no problems, no? They should migrate to big core and the
+> completion will follow them when they move.
+
+So if I understood Manish correctly the only reason they want the completion
+to run on a bigger CPU than the submission is because the submission is already
+saturating the CPU, therefore utilization of submission is no issue whatsoever.
+They don't want to run (submission) on big though because of power
+considerations.
+
+> 
+>> I wouldn't consider the setup: requester little perf, irq+completion big perf
+>> invalid necessarily, it does decrease IO latency for the application.
+> 
+> I didn't say invalid. But it is not something we can guess automatically when
+> irq_affinity=1. We don't have enough info to judge. The only info we have the
+> requester that originated the request is running at different perf level
+> (whther higher or lower), so we follow it.
+>
+Anyway, Manish's problem should be solved by rq_affinity=0 in that case (with
+irq affinities set to big CPU then the completion will be run on the irq CPU)
+and "rq_affinity=1 <=> equal capacity CPU" is the correct interpretation, is that
+more or less agreed upon now?
+
