@@ -1,25 +1,32 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE3A61FCF;
-	Tue, 13 Aug 2024 16:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE0B55892;
+	Tue, 13 Aug 2024 17:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723566034; cv=none; b=o7kVVteOmXVfV6aF0O9WknzbY/8fotOQOxN8OEpBmwK30bHUPILY2/O8BPvFVVPC59ti8TRYd7Wl2SEMnqvUkSaklRFsUn1joAKjgDkQhEV9vwqTvR44Vnz8GoXlPQ1YA9exveJ/RB6ZGOZwzUOAIsEgfY+3mU8wfOHWAClldf4=
+	t=1723571677; cv=none; b=t5YcTDVWcsFuVTP5JdrAwZYTRDPM5nkOXYRN19XWTGnzKIn3sgUYEtWGSCbQ/f75aMyEwhdKeQ5PeoMzORMGKbXHpFNt1mbl8aAnAsPbYJomo9HO9Y5tB4lu7dcCypJjVaX+FQnYKfUGbzFqcuxOyT24j/k6ZAIfPXPsB2Q+SxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723566034; c=relaxed/simple;
-	bh=rUjKakylGmaur9CYp1scGQ8kw8n7K7iDDZ1hQtQBJQo=;
+	s=arc-20240116; t=1723571677; c=relaxed/simple;
+	bh=OZ8AP9XkMsyzC1rp7t6xBJ1ljv/JLSQ6tTrIq+3/6jM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HN7bCbuprxVb1AIdqWvWosi9yP4+5NfxK+an8srRpFLXQVNchX9yhstQDt9I55Fg4wCrUvqhe8O7OZN31SYjAX5TmIaktmpYgY4/uey1GZrIYzqicM5e+9qMDczgEfGyMIHiOkeKRkN7IeuY1SmiqUeSS/Luf1/UAePJ9Jy/5ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6304F12FC;
-	Tue, 13 Aug 2024 09:20:57 -0700 (PDT)
-Received: from [10.57.84.20] (unknown [10.57.84.20])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 178B53F6A8;
-	Tue, 13 Aug 2024 09:20:26 -0700 (PDT)
-Message-ID: <a225f9e0-5335-4c58-8e94-960c2557f9c0@arm.com>
-Date: Tue, 13 Aug 2024 17:20:25 +0100
+	 In-Reply-To:Content-Type; b=rYtOWGB+hytqUr7YOCQDLTbSJ71qZ6f8FQhPSgquk71DTg3wYHTJ3/qmdmehxi0azb+ZiWqlHwyJ+gHVjiUgR5NH8QBiuqhYqHl5AOmSEBYed0FFnP3gwfo7GPfedtgofahwIR+MOT84/s/73SnbWyhLKgMWLUtyRoV85k9Ca1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=dmb1BZne; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="dmb1BZne"
+Received: from [10.137.106.151] (unknown [131.107.174.23])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 3B9FE20B7165;
+	Tue, 13 Aug 2024 10:54:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3B9FE20B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1723571670;
+	bh=nytHXNFUCvkjmExa31/IXH9nsS7Ke1ecqy5aOeZ0RVQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dmb1BZneqM72oPSe5DHw6ecIL62wYqVSoAd4vHn1OI6tbReWkMBOsAQwHOD1uJj15
+	 ici03yt3QfhtBQViHqWGIFo0+ZmMtlFPo/guJBTjh1+RFYmPmkUTt5X40IoxKyuN0+
+	 Imj1rgCamzVJDKZ83X9QPeow5gpEbDFPehT/Kkys=
+Message-ID: <e1dd4dcf-8e2e-4e7b-9d40-533efd123103@linux.microsoft.com>
+Date: Tue, 13 Aug 2024 10:54:29 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -27,114 +34,93 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
- capacities are different"
-To: Qais Yousef <qyousef@layalina.io>
-Cc: MANISH PANDEY <quic_mapa@quicinc.com>, axboe@kernel.dk, mingo@kernel.org,
- peterz@infradead.org, vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
- linux-block@vger.kernel.org, sudeep.holla@arm.com,
- Jaegeuk Kim <jaegeuk@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
- Christoph Hellwig <hch@infradead.org>, kailash@google.com, tkjos@google.com,
- dhavale@google.com, bvanassche@google.com, quic_nitirawa@quicinc.com,
- quic_cang@quicinc.com, quic_rampraka@quicinc.com, quic_narepall@quicinc.com,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
- <3feb5226-7872-432b-9781-29903979d34a@arm.com>
- <20240805020748.d2tvt7c757hi24na@airbuntu>
- <e5f0349e-6c72-4847-bf0c-4afb57404907@arm.com>
- <20240809002321.3k5g2isqmiuflrmd@airbuntu>
+Subject: Re: [PATCH v20 02/20] ipe: add policy parser
+To: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, tytso@mit.edu,
+ ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+ mpatocka@redhat.com, eparis@redhat.com, paul@paul-moore.com,
+ linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+ linux-security-module@vger.kernel.org, fsverity@lists.linux.dev,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
+ <1722665314-21156-3-git-send-email-wufan@linux.microsoft.com>
+ <20240810155000.GA35219@mail.hallyn.com>
 Content-Language: en-US
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <20240809002321.3k5g2isqmiuflrmd@airbuntu>
-Content-Type: text/plain; charset=UTF-8
+From: Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <20240810155000.GA35219@mail.hallyn.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/9/24 01:23, Qais Yousef wrote:
-> On 08/05/24 11:18, Christian Loehle wrote:
-> 
->>> My understanding of rq_affinity=1 is to match the perf of requester. Given that
->>> the characteristic of HMP system is that power has an equal importance to perf
->>> (I think this now has become true for all systems by the way), saying that the
->>> match in one direction is better than the other is sort of forcing a policy of
->>> perf first which I don't think is a good thing to enforce. We don't have enough
->>> info to decide at this level. And our users care about both.
+
+
+On 8/10/2024 8:50 AM, Serge E. Hallyn wrote:
+> On Fri, Aug 02, 2024 at 11:08:16PM -0700, Fan Wu wrote:
+>> From: Deven Bowers <deven.desai@linux.microsoft.com>
 >>
->> I would argue rq_affinity=1 matches the perf, so that flag should already bias
->> perf in favor of power slightly?
+>> IPE's interpretation of the what the user trusts is accomplished through
 > 
-> Not on this type of systems. If perf was the only thing important, just use
-> equally big cpus. Balancing perf and power is important on those systems, and
-> I don't think we have enough info to decide which decision is best when
-> capacities are not the same. Matching the perf level the requesting on makes
-> sense when irq_affinity=1.
-
-Well you could still want a
-"IO performance always beats power considerations" and still go HMP because
-sometimes for non-IO you prefer power, but I agree that we don't have enough
-information about what the user wants from the system/kernel.
-
+> nit: "of what the user trusts" (drop the extra 'the')
 > 
->> Although the actual effect on power probably isn't that significant, given
->> that the (e.g. big) CPU has submitted the IO, is woken up soon, so you could
->> almost ignore a potential idle wakeup and the actual CPU time spent in the block
->> completion is pretty short of course.
+>> its policy. IPE's design is to not provide support for a single trust
+>> provider, but to support multiple providers to enable the end-user to
+>> choose the best one to seek their needs.
 >>
->>> If no matching is required, it makes sense to set rq_affinity to 0. When
->>> matching is enabled, we need to rely on per-task iowait boost to help the
->>> requester to run at a bigger CPU, and naturally the completion will follow when
->>> rq_affinity=1. If the requester doesn't need the big perf, but the irq
->>> triggered on a bigger core, I struggle to understand why it is good for
->>> completion to run on bigger core without the requester also being on a similar
->>> bigger core to truly maximize perf.
+>> This requires the policy to be rather flexible and modular so that
+>> integrity providers, like fs-verity, dm-verity, or some other system,
+>> can plug into the policy with minimal code changes.
 >>
->> So first of all, per-task iowait boosting has nothing to do with it IMO.
+>> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 > 
-> It has. If the perf is not good because the requester is running on little
-> core, the requester need to move up to ensure the overall IO perf is better.
-
-See below but also
-"the requester need to move up to ensure the overall IO perf is better" is
-just not true, with asynchronous IO submission done right, the submission
-runtime isn't critical to the IO throughput, therefore it should run the
-most power-efficient way.
-This can be observed e.g. with any io_uring fio workload with significant
-iodepth (and possibly multi-threading).
-Completion may be a different story, depending on the device stack, if we're
-dealing with !MCQ then the completion path (irq + block layer completion)
-is absolutely critical.
-For any mmc / ufs<4.0 system the performance difference between
-fio --name=little --filename=/dev/sda --runtime=10 --rw=randread --bs=4k --ioengine=io_uring --numjobs=4 --iodepth=32 --group_reporting --cpus_allowed=$LITTLE_CPUS
-and
-fio --name=big --filename=/dev/sda --runtime=10 --rw=randread --bs=4k --ioengine=io_uring --numjobs=4 --iodepth=32 --group_reporting --cpus_allowed=$BIG_CPUS
-is (usually) only because of the completion path and setting irq affinity of
-/dev/sda to $BIG_CPUS will make the difference disappear (rq_affinity=0 and
-implying LLC is the same).
-Running the submission on little CPUs will usually be the most power-efficient
-way then.
+> This all looks fine.  Just one comment below.
+> 
+Thank you for reviewing this!
 
 > 
->> Plenty of IO workloads build up utilization perfectly fine.
+>> +/**
+>> + * parse_rule() - parse a policy rule line.
+>> + * @line: Supplies rule line to be parsed.
+>> + * @p: Supplies the partial parsed policy.
+>> + *
+>> + * Return:
+>> + * * 0		- Success
+>> + * * %-ENOMEM	- Out of memory (OOM)
+>> + * * %-EBADMSG	- Policy syntax error
+>> + */
+>> +static int parse_rule(char *line, struct ipe_parsed_policy *p)
+>> +{
+>> +	enum ipe_action_type action = IPE_ACTION_INVALID;
+>> +	enum ipe_op_type op = IPE_OP_INVALID;
+>> +	bool is_default_rule = false;
+>> +	struct ipe_rule *r = NULL;
+>> +	bool first_token = true;
+>> +	bool op_parsed = false;
+>> +	int rc = 0;
+>> +	char *t;
+>> +
+>> +	r = kzalloc(sizeof(*r), GFP_KERNEL);
+>> +	if (!r)
+>> +		return -ENOMEM;
+>> +
+>> +	INIT_LIST_HEAD(&r->next);
+>> +	INIT_LIST_HEAD(&r->props);
+>> +
+>> +	while (t = strsep(&line, IPE_POLICY_DELIM), line) {
 > 
-> These ones have no problems, no? They should migrate to big core and the
-> completion will follow them when they move.
-
-So if I understood Manish correctly the only reason they want the completion
-to run on a bigger CPU than the submission is because the submission is already
-saturating the CPU, therefore utilization of submission is no issue whatsoever.
-They don't want to run (submission) on big though because of power
-considerations.
-
+> If line is passed in as NULL, t will be NULL on the first test.  Then
+> you'll break out and call parse_action(NULL), which calls
+> match_token(NULL, ...), which I do not think is safe.
 > 
->> I wouldn't consider the setup: requester little perf, irq+completion big perf
->> invalid necessarily, it does decrease IO latency for the application.
+> I realize the current caller won't pass in NULL, but it seems worth
+> checking for here in case some future caller is added by someone
+> who's unaware.
 > 
-> I didn't say invalid. But it is not something we can guess automatically when
-> irq_affinity=1. We don't have enough info to judge. The only info we have the
-> requester that originated the request is running at different perf level
-> (whther higher or lower), so we follow it.
->
-Anyway, Manish's problem should be solved by rq_affinity=0 in that case (with
-irq affinities set to big CPU then the completion will be run on the irq CPU)
-and "rq_affinity=1 <=> equal capacity CPU" is the correct interpretation, is that
-more or less agreed upon now?
+> Or, maybe add 'line must not be null' to the function description.
+> 
 
+Yes, I agree that adding a NULL check would be better. I will include it 
+in the next version.
+
+-Fan
