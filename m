@@ -1,128 +1,171 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF446143879;
-	Wed, 14 Aug 2024 11:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEAA15C9;
+	Wed, 14 Aug 2024 12:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723635603; cv=none; b=UmcHc61IKnEfmR784vCXjEEhte9sQwaICCjOdF+q9RrHQF3J0asuq6hJ6nOpQ4DatKpb4nFBqsuwE0vEZvKhLselr2TCQgjkZ/nffm3osINIjMy+MlzQKRAxaQhHfEwppfImkIXrdog0aYIc/ZjrIrL52gXJtaKrphgEeE2bCYU=
+	t=1723638980; cv=none; b=YQGGQ/wMpdAryVDP+7KQHc1eO1m8ivYbgCvYYhpBw830t8n1HjIRPshV2Va+HrCb08oGwhWKkBhy8Dj6R95UIYyh0tHVwnzDJHJVYJu1A7BXITeiU+a+WFqYaF+zqnfihZ1UqsrnQbjVQsxlRLYpFHIgmxGvRBwMwBQEIJnyVNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723635603; c=relaxed/simple;
-	bh=btKu8VJ1jfYs9rI6c/X0Ble913oRKf3tSZDypJGz7K0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=atbJSLpj6KRbRAEvyBuHhg4zOBh3o0PiE+91ucqHs+VisI2XiG+lMXY9VCIExfiaBHOowiXXzeh62Wf26yvWaBZc04IMTfE5/wfb6qTUvySGP6JMmeio0BlOvHKI6UitrE9W3zYQMNJJlaHJnkLaNpc0tsve5DM2XoxoK4+FOQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4WkRB52J1xz4f3jd9;
-	Wed, 14 Aug 2024 19:39:41 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 176B41A0A22;
-	Wed, 14 Aug 2024 19:39:55 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgBXfoSJl7xmeVisBg--.53651S4;
-	Wed, 14 Aug 2024 19:39:54 +0800 (CST)
-From: Li Lingfeng <lilingfeng@huaweicloud.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	jack@suse.cz,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: yukuai1@huaweicloud.com,
-	yukuai3@huawei.com,
-	houtao1@huawei.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	lilingfeng@huaweicloud.com,
-	lilingfeng3@huawei.com
-Subject: [PATCH] block: Fix potential deadlock warning in blk_mq_mark_tag_wait
-Date: Wed, 14 Aug 2024 19:35:42 +0800
-Message-Id: <20240814113542.911023-1-lilingfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1723638980; c=relaxed/simple;
+	bh=79dG+D+T7/+ulJhwwOgcEPXhSbXn9pvu+hH7MP7VOwI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y51VxDt+juvjdnwi4XCiUWOSYpSG2oB7DDc4rDY/g1aMAgGUlBMN5hcm+KBP8YV0rzlOfi7myh6urFdnx/58ANTogdV6GoVsoQ/g59Wm5vSyVQWd/38mA4HoZYNpp8Jn8mA62yzP1iOVjkg51pJw6VZPs+TAyQw37/1fhiy1b18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A6F2nRUb; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A6F2nRUb"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47EC9HUj019945;
+	Wed, 14 Aug 2024 12:36:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=b
+	sJPjT/6Ea1B7rvnaKDKbL7b/QMQrCsYxYBpyNtiNFM=; b=A6F2nRUbU1zjPcORI
+	Bz7EeeyOhYO37pvAubqIQ6ZvoFPMz5mePk1GLN4quSFMG33GOpZX5xY3v10Ro8Ym
+	U/vT5AbABl2Ye3K3zrwn1oKp5ukmwRDI7nyAahFb2GDQ3+Z4JxvrJvZxzEruXL9O
+	xVRPR0dJa9s2mnpkOvXMEtEiJSrNQsX3fudlGMbbogle4TkPsvKVjOJkBrGaPj54
+	pXJnQMgq3XEyC3dk0u9pCu29z+wJeex85yRs1+dqLh6MXSPGmy3gmA0wNn4OUjjI
+	6/8KgSBaaGT2IeSn+btyEjT3d6x9siTzru1ILZcmpalTkpLe4a3XvC/dqkoE8UDB
+	y3eJQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 410vayg3kn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Aug 2024 12:36:05 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47ECa4sF011177;
+	Wed, 14 Aug 2024 12:36:04 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 410vayg3kk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Aug 2024 12:36:04 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47EA6eiF015654;
+	Wed, 14 Aug 2024 12:36:03 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40xm1ms7ny-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Aug 2024 12:36:03 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47ECa1Mv37159306
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 14 Aug 2024 12:36:03 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32C1F58059;
+	Wed, 14 Aug 2024 12:36:01 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0250458057;
+	Wed, 14 Aug 2024 12:35:59 +0000 (GMT)
+Received: from [9.179.26.14] (unknown [9.179.26.14])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 14 Aug 2024 12:35:58 +0000 (GMT)
+Message-ID: <1f917bc1-8a6a-4c88-a619-cf8ddc4534a4@linux.ibm.com>
+Date: Wed, 14 Aug 2024 18:05:57 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: blktests failures with v6.11-rc1 kernel
+To: Yi Zhang <yi.zhang@redhat.com>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "nbd@other.debian.org" <nbd@other.debian.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+References: <5yal5unzvisrvfhhvsqrsqgu4tfbjp2fsrnbuyxioaxjgbojsi@o2arvhebzes3>
+ <ab363932-ab3d-49b1-853d-7313f02cce9e@linux.ibm.com>
+ <ljqlgkvhkojsmehqddmeo4dng6l3yaav6le2uslsumfxivluwu@m7lkx3j4mkkw>
+ <79a7ec0d-c22d-44cf-a832-13da05a1fcbd@linux.ibm.com>
+ <CAHj4cs-5DPDFuBzm3aymeAi6UWHhgXSYsgaCACKbjXp=i0SyTA@mail.gmail.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <CAHj4cs-5DPDFuBzm3aymeAi6UWHhgXSYsgaCACKbjXp=i0SyTA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBXfoSJl7xmeVisBg--.53651S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7KF1DJF13KFWrJF48tryfXrb_yoW8Ary5pF
-	WUGa15Kw48XryjqF4DKa9Fqr4I9anYgr4UJrs3Z3WfAr1Ykry3Wr18Ar1vvF40gFs7ArsF
-	vr4UtrWFyF4DC37anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUpwZcUUUUU=
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bp1rq0apsdM9niQJZVvNn3tTd7kViB8H
+X-Proofpoint-ORIG-GUID: vAX11F9Zt3keo_Gii_MidOWxXLeQu6YU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-14_09,2024-08-13_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 clxscore=1011 bulkscore=0 adultscore=0 mlxlogscore=999
+ phishscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408140088
 
-From: Li Lingfeng <lilingfeng3@huawei.com>
 
-When interrupt is turned on while a lock holding by spin_lock_irq it
-throws a warning because of potential deadlock.
 
-blk_mq_mark_tag_wait
- spin_lock_irq(&wq->lock)
-      --> turn off interrupt and get lockA
- blk_mq_get_driver_tag
-  __blk_mq_tag_busy
-   spin_lock_irq(&tags->lock)
-   spin_unlock_irq(&tags->lock)
-      --> release lockB and turn on interrupt accidentally
-...
-  --> Interrupt may be triggered and try get wq->lock while it is held
-                                           blk_complete_reqs
-                                            ...
-                                            blk_mq_put_tag
-                                             ...
-                                             __wake_up_common_lock
-                                              spin_lock_irqsave
-                                              --> try get lock again
-...
- spin_unlock_irq(&wq->lock)
+On 8/13/24 12:36, Yi Zhang wrote:
+> On Sat, Aug 3, 2024 at 12:49 AM Nilay Shroff <nilay@linux.ibm.com> wrote:
+> 
+> There are no simultaneous tests during the CKI tests running.
+> I reproduced the failure on that server and always can be reproduced
+> within 5 times:
+> # sh a.sh
+> ==============================0
+> nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [passed]
+>     runtime  21.496s  ...  21.398s
+> ==============================1
+> nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [failed]
+>     runtime  21.398s  ...  21.974s
+>     --- tests/nvme/052.out 2024-08-10 00:30:06.989814226 -0400
+>     +++ /root/blktests/results/nodev_tr_loop/nvme/052.out.bad
+> 2024-08-13 02:53:51.635047928 -0400
+>     @@ -1,2 +1,5 @@
+>      Running nvme/052
+>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
+>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
+>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
+>      Test complete
+> # uname -r
+> 6.11.0-rc3
 
-Fix it by using spin_lock_irqsave to get lockB instead of spin_lock_irq.
-Fixes: 4f1731df60f9 ("blk-mq: fix potential io hang by wrong 'wake_batch'")
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
- block/blk-mq-tag.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+We may need to debug this further. Is it possible to patch blktest and 
+collect some details when this issue manifests? If yes then can you please
+apply the below diff and re-run your test? This patch would capture output 
+of "nvme list" and "sysfs attribute tree created under namespace head node"
+and store those details in 052.full file. 
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index cc57e2dd9a0b..2cafcf11ee8b 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -38,6 +38,7 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
- void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
- 	unsigned int users;
-+	unsigned long flags;
- 	struct blk_mq_tags *tags = hctx->tags;
- 
- 	/*
-@@ -56,11 +57,11 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- 			return;
- 	}
- 
--	spin_lock_irq(&tags->lock);
-+	spin_lock_irqsave(&tags->lock, flags);
- 	users = tags->active_queues + 1;
- 	WRITE_ONCE(tags->active_queues, users);
- 	blk_mq_update_wake_batch(tags, users);
--	spin_unlock_irq(&tags->lock);
-+	spin_unlock_irqrestore(&tags->lock, flags);
- }
- 
- /*
--- 
-2.31.1
+diff --git a/common/nvme b/common/nvme
+index 9e78f3e..780b5e3 100644
+--- a/common/nvme
++++ b/common/nvme
+@@ -589,8 +589,23 @@ _find_nvme_ns() {
+                if ! [[ "${ns}" =~ nvme[0-9]+n[0-9]+ ]]; then
+                        continue
+                fi
++               echo -e "\nBefore ${ns}/uuid check:\n" >> ${FULL}
++               echo -e "\n`nvme list -v`\n" >> ${FULL}
++               echo -e "\n`tree ${ns}`\n" >> ${FULL}
++
+                [ -e "${ns}/uuid" ] || continue
+                uuid=$(cat "${ns}/uuid")
++
++               if [ "$?" = "1" ]; then
++                       echo -e "\nFailed to read $ns/uuid\n" >> ${FULL}
++                       echo "`nvme list -v`" >> ${FULL}
++                       if [ -d "${ns}" ]; then
++                               echo -e "\n`tree ${ns}`\n" >> ${FULL}
++                       else
++                               echo -e "\n${ns} doesn't exist!\n" >> ${FULL}
++                       fi
++               fi
++
+                if [[ "${subsys_uuid}" == "${uuid}" ]]; then
+                        basename "${ns}"
+                fi
+
+
+After applying the above diff, when this issue occurs on your system copy this 
+file "</path/to/blktests>/results/nodev_tr_loop/nvme/052.full" and send it across. 
+This may give us some clue about what might be going wrong. 
+
+Thanks,
+--Nilay
 
