@@ -1,70 +1,44 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556311AE86B;
-	Wed, 14 Aug 2024 10:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF446143879;
+	Wed, 14 Aug 2024 11:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723632332; cv=none; b=j2b3QwXwltRQGlopdqc3ujPqWb+oojZZ8MzPa3u0jV4rlGIaGyuS8R4J4Kb/LXRquNn/xZwS6b5vviLR11eMdGzqZJ/YWiyQS2viotT7Ztr3CLOYyf1fGxRnlZpB7/E5EO6tNRemAcZRHQh/n0wy2W3l4K1I10okpsXKcXgTZN0=
+	t=1723635603; cv=none; b=UmcHc61IKnEfmR784vCXjEEhte9sQwaICCjOdF+q9RrHQF3J0asuq6hJ6nOpQ4DatKpb4nFBqsuwE0vEZvKhLselr2TCQgjkZ/nffm3osINIjMy+MlzQKRAxaQhHfEwppfImkIXrdog0aYIc/ZjrIrL52gXJtaKrphgEeE2bCYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723632332; c=relaxed/simple;
-	bh=psn+4V45YBQ+6tX8s9X4iuZogIB3QAGe6mFbj/cnPUY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ME2T3SmbgUlt43mVJlGxP68nakdo75nMQo1/wkXzwKmLzpBG4WbPHJUPikwWJgJ4TsItevhdgiqDAfk1pawG2wXYgSdkkgItJjx/aXow1hAYdwkoKeN96639t/J0sQ6AODKtKNFkRcWmEeI9yfDTWwcEExUIl0/YmF0xYR+LHTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tciig4Ci; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tciig4Ci"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5bd13ea7604so5210258a12.1;
-        Wed, 14 Aug 2024 03:45:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723632328; x=1724237128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tuo5pTUVgRqd7+Wu/p/7uLxEPhnfCWa8o0PxSIfrqWo=;
-        b=Tciig4CiwyeK5rFGAdG+sTvwjGeUzncrLU32i8RXoT9A0Hdqe5dEzOKUIgAZ3HZuN9
-         4cC5LV69zTWPI13ZzoscZc0vQFLa7jqtfCqQvl/LzDApgI+pg/e05QRUKmTxi3Zw1Wap
-         nTZXZsNG59ioW9wlO/w3nefOqXWg4/PGnH0dxui4AXb/nWbsdYq5ltVT5R9RieZ/1Afw
-         lF07W1YXc328ObPZ73rUMZRiUq/mwhTC4l0kuLRVlfB3OxtfKJ+q+YRY/Spy9ZE8M941
-         cxXxXWiRqmdFbIe/4J7vYvfFgO42ofvLus7c0paXGOkVKX0k5BGleyKSfEEaQnPeJ+Xu
-         SR0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723632328; x=1724237128;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tuo5pTUVgRqd7+Wu/p/7uLxEPhnfCWa8o0PxSIfrqWo=;
-        b=OLJU+1AZpOkvvN8ub/zsonwkMoO3ZVrEwYg73i5iYT8ARjtRIdcOXrIBOoGNbtaTS6
-         b/Dpya87ZhxeTnMLWAp31PYq4D3wUQZXSomj/3UaiKlVvN3NgCuZeLyteQHg0sJw6e9L
-         1SbzXJYXBpyl1Z08bp1XHUUJmMz5lM/rMAcqRpZI2HP6ySaftEYFQMBym4PXRXe8RtaO
-         2f51UBTB8/1JirTVU08Ui+ZkaDii+HkUA2+4pC7Ytkby9LMOj/nugnnkDlHSZ6qpexB/
-         5ii4sAi4WzCwvOnZ2kxOJz/6CCfCb8NWYkChMBaPEjt/5QI50XE70YCh28L07D9I4NXO
-         CtTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUW/1T6dY0vSEn6JO5OinSIZ/LPdsg6Ae37OaJLHT1ZsO/cSg8J0c2GAbJ7nlKihmhnFoMJYbKTU27EDC47d7ETTdlTY4ytBLXk0U=
-X-Gm-Message-State: AOJu0YxWTpj8lhvzcwpo5MRsokYVSH4md2+AjEb+rvSFm9JNktErvhpy
-	KF1xpNolV2xeAF7sQJwq+7wSLAs/ogXVj5Qcj+7PlXv//JoBoU9IcnDXeqlJ
-X-Google-Smtp-Source: AGHT+IG1KkX6wMcxGFIa+KqlcGfRZzjy0lHz5phQrjiJN6wASSWoiIqHMLk5BznC58MpKrZaWW6grA==
-X-Received: by 2002:a17:907:84c:b0:a7a:bc34:a4c9 with SMTP id a640c23a62f3a-a83670bf16cmr128595066b.69.1723632328176;
-        Wed, 14 Aug 2024 03:45:28 -0700 (PDT)
-Received: from 127.0.0.1localhost ([148.252.132.251])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f418692asm157212766b.224.2024.08.14.03.45.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 03:45:27 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com,
-	Conrad Meyer <conradmeyer@meta.com>,
+	s=arc-20240116; t=1723635603; c=relaxed/simple;
+	bh=btKu8VJ1jfYs9rI6c/X0Ble913oRKf3tSZDypJGz7K0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=atbJSLpj6KRbRAEvyBuHhg4zOBh3o0PiE+91ucqHs+VisI2XiG+lMXY9VCIExfiaBHOowiXXzeh62Wf26yvWaBZc04IMTfE5/wfb6qTUvySGP6JMmeio0BlOvHKI6UitrE9W3zYQMNJJlaHJnkLaNpc0tsve5DM2XoxoK4+FOQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4WkRB52J1xz4f3jd9;
+	Wed, 14 Aug 2024 19:39:41 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 176B41A0A22;
+	Wed, 14 Aug 2024 19:39:55 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgBXfoSJl7xmeVisBg--.53651S4;
+	Wed, 14 Aug 2024 19:39:54 +0800 (CST)
+From: Li Lingfeng <lilingfeng@huaweicloud.com>
+To: axboe@kernel.dk,
+	hch@lst.de,
+	jack@suse.cz,
 	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [RFC 5/5] block: implement io_uring discard cmd
-Date: Wed, 14 Aug 2024 11:45:54 +0100
-Message-ID: <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1723601133.git.asml.silence@gmail.com>
-References: <cover.1723601133.git.asml.silence@gmail.com>
+	linux-kernel@vger.kernel.org
+Cc: yukuai1@huaweicloud.com,
+	yukuai3@huawei.com,
+	houtao1@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	lilingfeng@huaweicloud.com,
+	lilingfeng3@huawei.com
+Subject: [PATCH] block: Fix potential deadlock warning in blk_mq_mark_tag_wait
+Date: Wed, 14 Aug 2024 19:35:42 +0800
+Message-Id: <20240814113542.911023-1-lilingfeng@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,178 +46,83 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXfoSJl7xmeVisBg--.53651S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF1DJF13KFWrJF48tryfXrb_yoW8Ary5pF
+	WUGa15Kw48XryjqF4DKa9Fqr4I9anYgr4UJrs3Z3WfAr1Ykry3Wr18Ar1vvF40gFs7ArsF
+	vr4UtrWFyF4DC37anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUpwZcUUUUU=
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-Add ->uring_cmd callback for block device files and use it to implement
-asynchronous discard. Normally, it first tries to execute the command
-from non-blocking context, which we limit to a single bio because
-otherwise one of sub-bios may need to wait for other bios, and we don't
-want to deal with partial IO. If non-blocking attempt fails, we'll retry
-it in a blocking context.
+From: Li Lingfeng <lilingfeng3@huawei.com>
 
-Suggested-by: Conrad Meyer <conradmeyer@meta.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+When interrupt is turned on while a lock holding by spin_lock_irq it
+throws a warning because of potential deadlock.
+
+blk_mq_mark_tag_wait
+ spin_lock_irq(&wq->lock)
+      --> turn off interrupt and get lockA
+ blk_mq_get_driver_tag
+  __blk_mq_tag_busy
+   spin_lock_irq(&tags->lock)
+   spin_unlock_irq(&tags->lock)
+      --> release lockB and turn on interrupt accidentally
+...
+  --> Interrupt may be triggered and try get wq->lock while it is held
+                                           blk_complete_reqs
+                                            ...
+                                            blk_mq_put_tag
+                                             ...
+                                             __wake_up_common_lock
+                                              spin_lock_irqsave
+                                              --> try get lock again
+...
+ spin_unlock_irq(&wq->lock)
+
+Fix it by using spin_lock_irqsave to get lockB instead of spin_lock_irq.
+Fixes: 4f1731df60f9 ("blk-mq: fix potential io hang by wrong 'wake_batch'")
+Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
 ---
- block/blk.h             |  1 +
- block/fops.c            |  2 +
- block/ioctl.c           | 94 +++++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/fs.h |  2 +
- 4 files changed, 99 insertions(+)
+ block/blk-mq-tag.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index e180863f918b..5178c5ba6852 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -571,6 +571,7 @@ blk_mode_t file_to_blk_mode(struct file *file);
- int truncate_bdev_range(struct block_device *bdev, blk_mode_t mode,
- 		loff_t lstart, loff_t lend);
- long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
-+int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags);
- long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index cc57e2dd9a0b..2cafcf11ee8b 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -38,6 +38,7 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+ 	unsigned int users;
++	unsigned long flags;
+ 	struct blk_mq_tags *tags = hctx->tags;
  
- extern const struct address_space_operations def_blk_aops;
-diff --git a/block/fops.c b/block/fops.c
-index 9825c1713a49..8154b10b5abf 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -17,6 +17,7 @@
- #include <linux/fs.h>
- #include <linux/iomap.h>
- #include <linux/module.h>
-+#include <linux/io_uring/cmd.h>
- #include "blk.h"
+ 	/*
+@@ -56,11 +57,11 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 			return;
+ 	}
  
- static inline struct inode *bdev_file_inode(struct file *file)
-@@ -873,6 +874,7 @@ const struct file_operations def_blk_fops = {
- 	.splice_read	= filemap_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= blkdev_fallocate,
-+	.uring_cmd	= blkdev_uring_cmd,
- 	.fop_flags	= FOP_BUFFER_RASYNC,
- };
- 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index c7a3e6c6f5fa..f7f9c4c6d6b5 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -11,6 +11,8 @@
- #include <linux/blktrace_api.h>
- #include <linux/pr.h>
- #include <linux/uaccess.h>
-+#include <linux/pagemap.h>
-+#include <linux/io_uring/cmd.h>
- #include "blk.h"
- 
- static int blkpg_do_ioctl(struct block_device *bdev,
-@@ -744,4 +746,96 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 
- 	return ret;
+-	spin_lock_irq(&tags->lock);
++	spin_lock_irqsave(&tags->lock, flags);
+ 	users = tags->active_queues + 1;
+ 	WRITE_ONCE(tags->active_queues, users);
+ 	blk_mq_update_wake_batch(tags, users);
+-	spin_unlock_irq(&tags->lock);
++	spin_unlock_irqrestore(&tags->lock, flags);
  }
-+
-+struct blk_cmd {
-+	blk_status_t status;
-+	bool nowait;
-+};
-+
-+static void blk_cmd_complete(struct io_uring_cmd *cmd, unsigned int issue_flags)
-+{
-+	struct blk_cmd *bc = io_uring_cmd_to_pdu(cmd, struct blk_cmd);
-+	int res = blk_status_to_errno(bc->status);
-+
-+	if (res == -EAGAIN && bc->nowait)
-+		io_uring_cmd_issue_blocking(cmd);
-+	else
-+		io_uring_cmd_done(cmd, res, 0, issue_flags);
-+}
-+
-+static void bio_cmd_end(struct bio *bio)
-+{
-+	struct io_uring_cmd *cmd = bio->bi_private;
-+	struct blk_cmd *bc = io_uring_cmd_to_pdu(cmd, struct blk_cmd);
-+
-+	if (unlikely(bio->bi_status) && !bc->status)
-+		bc->status = bio->bi_status;
-+
-+	io_uring_cmd_do_in_task_lazy(cmd, blk_cmd_complete);
-+	bio_put(bio);
-+}
-+
-+static int blkdev_cmd_discard(struct io_uring_cmd *cmd,
-+			      struct block_device *bdev,
-+			      uint64_t start, uint64_t len, bool nowait)
-+{
-+	sector_t sector = start >> SECTOR_SHIFT;
-+	sector_t nr_sects = len >> SECTOR_SHIFT;
-+	struct bio *prev = NULL, *bio;
-+	int err;
-+
-+	err = blk_validate_discard(bdev, file_to_blk_mode(cmd->file),
-+				   start, len);
-+	if (err)
-+		return err;
-+	err = filemap_invalidate_pages(bdev->bd_mapping, start,
-+					start + len - 1, nowait);
-+	if (err)
-+		return err;
-+
-+	while ((bio = blk_alloc_discard_bio(bdev, &sector, &nr_sects,
-+					    GFP_KERNEL))) {
-+		if (nowait) {
-+			if (unlikely(nr_sects)) {
-+				bio_put(bio);
-+				return -EAGAIN;
-+			}
-+			bio->bi_opf |= REQ_NOWAIT;
-+		}
-+		prev = bio_chain_and_submit(prev, bio);
-+	}
-+	if (!prev)
-+		return -EFAULT;
-+
-+	prev->bi_private = cmd;
-+	prev->bi_end_io = bio_cmd_end;
-+	submit_bio(prev);
-+	return -EIOCBQUEUED;
-+}
-+
-+int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
-+{
-+	struct block_device *bdev = I_BDEV(cmd->file->f_mapping->host);
-+	struct blk_cmd *bc = io_uring_cmd_to_pdu(cmd, struct blk_cmd);
-+	const struct io_uring_sqe *sqe = cmd->sqe;
-+	u32 cmd_op = cmd->cmd_op;
-+	uint64_t start, len;
-+
-+	if (unlikely(sqe->ioprio || sqe->__pad1 || sqe->len ||
-+		     sqe->rw_flags || sqe->file_index))
-+		return -EINVAL;
-+
-+	bc->status = BLK_STS_OK;
-+	bc->nowait = issue_flags & IO_URING_F_NONBLOCK;
-+
-+	start = READ_ONCE(sqe->addr);
-+	len = READ_ONCE(sqe->addr3);
-+
-+	switch (cmd_op) {
-+	case BLOCK_URING_CMD_DISCARD:
-+		return blkdev_cmd_discard(cmd, bdev, start, len, bc->nowait);
-+	}
-+	return -EINVAL;
-+}
-+
- #endif
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 753971770733..0016e38ed33c 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -208,6 +208,8 @@ struct fsxattr {
-  * (see uapi/linux/blkzoned.h)
-  */
  
-+#define BLOCK_URING_CMD_DISCARD			0
-+
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
- #define FIGETBSZ   _IO(0x00,2)	/* get the block size used for bmap */
+ /*
 -- 
-2.45.2
+2.31.1
 
