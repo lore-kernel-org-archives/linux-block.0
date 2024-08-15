@@ -1,105 +1,96 @@
-Received: from mail-4018.proton.ch (mail-4018.proton.ch [185.70.40.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EF1199393;
-	Thu, 15 Aug 2024 07:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184FF1A08CB
+	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 08:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723708192; cv=none; b=W5DivVQR+iUtMIu/8zKWt1ghgtISNQcZTkaeA5QXoDMMzGjmidVswev4V5pPl3yXVqO0jvgplp8pZPvZr1XloKLSpBEpd2Hnj8CANu5ajZ4+oN3kbugwFKt6sUi3e4xl8iivfX8yEVDoSw73255Ip5elsSwC6Bj02sEKDYX9nes=
+	t=1723708986; cv=none; b=exqFubWaL26Hj0CiM6XE8oeuM9lIcdGTFfG80XseLztIoRCT6oJ+2c1dvpBvQj/6YtIg7N8LD6cYIl1OCEz4ZP2iQiSkZ/xJj9VswrJ2v7MW40gGJE/bEPQTMSF/WiYuWvmgqHCzGxAUV6OO9WhaCFIYUab6Q1iDdv7ySRTW0Aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723708192; c=relaxed/simple;
-	bh=J5y8uAimX4xtr2yE+uLu/aFPB+ejQEqX9bmDJAkAXiQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=saSE83b0YmZaEEE/oaTwO1Ecgdzmwx0o99UEkvhY+6dPXHuRLNymYP1OkC73K/XiDzsZBCDWyybJhhcKROOjTZHCT01pFIzhbfWDPsZh+maAuSxEigxUOsCnf04dUPIw9ewQfp6Be+kw40cySR/1XHtYd8yU36w2wJlOhz5YNUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=metaspace.dk; spf=pass smtp.mailfrom=metaspace.dk; dkim=pass (2048-bit key) header.d=metaspace.dk header.i=@metaspace.dk header.b=Gn6fAWTu; arc=none smtp.client-ip=185.70.40.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=metaspace.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=metaspace.dk
+	s=arc-20240116; t=1723708986; c=relaxed/simple;
+	bh=cw4HOzF9efUrQHUoHgeWaw9GKc7xDSDNuyZWlW0WFOo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GmHXqttR31guzb+MCGWOD+jqICfkybm5uR8MWNjo/tbV7etJhmYGhmri4VCIgVDBDmfO2CYVLc48677gxvPQuH0RX2uvLRUkf/ZU/wE/v2P5gGuRsO2tCPoOLi8j11oqi7xR7Wx4DsKsmZ61NZH8rWq8+PQ7isU2c4M1PcllV6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iyiBunrt; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metaspace.dk header.i=@metaspace.dk header.b="Gn6fAWTu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=metaspace.dk;
-	s=protonmail; t=1723708187; x=1723967387;
-	bh=tMjFdwYIY6C6jB1odGF7Z3jQj5z8jwdgu9RMhv9fvok=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Gn6fAWTuWn5k1JjallCtmi4z6szjz9LNdtgGbnQElbUsRGlClLQPiAuBs36UxNyct
-	 18SFPrg0mgp11BXhJLfa9Zr5Ok/3Zzfy1an1d2RmM9OILRK/mpEETJwHTOF/Z35EFA
-	 n1sXv5gl4pAdO0NIw+W2syh5/PCk73RQmj2CH+gglDxeEYn5vyZ1GdPhok6hFnx1aX
-	 HXSh+UvSRnovW2W+7XGawx8/tsq7rhi9zI3knJMMINNfyRaUBibEkFZAwjv/lXdvWv
-	 TmEotzHZMQe5tfyS0cKv0ejzNmj3Nka7Wg02IQzwDADjhsWXRALzNO8oMYdLUKq8p3
-	 6b1zePNN/phKA==
-Date: Thu, 15 Aug 2024 07:49:43 +0000
-To: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>
-From: Andreas Hindborg <nmi@metaspace.dk>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>, "Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] rust: block: fix wrong usage of lockdep API
-Message-ID: <20240815074519.2684107-3-nmi@metaspace.dk>
-In-Reply-To: <20240815074519.2684107-1-nmi@metaspace.dk>
-References: <20240815074519.2684107-1-nmi@metaspace.dk>
-Feedback-ID: 113830118:user:proton
-X-Pm-Message-ID: a38f9a24aeb93474486611d5e3c90e014f6b1790
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iyiBunrt"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52ed741fe46so705478e87.0
+        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 01:03:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723708983; x=1724313783; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cw4HOzF9efUrQHUoHgeWaw9GKc7xDSDNuyZWlW0WFOo=;
+        b=iyiBunrtdyRuXIyKPp9Pphr9t0fBQWgg3w9IDz5Q3C7HJMtvUYMru/udVzxV0ad1+6
+         Ymd1KpO7346en3v9nr5QBBMiVGCflMJmBj/tSdD7AznPEFFtq2UH99D9u7MYe3pWvxwf
+         iX+sWGbSFPYwsJuAyaKeYK3Pa0FdnevJydicpBRfjM683sVrmlnxvPFzhTnEH3t0WDno
+         0NWjCuOYT859tfH4Ib44LpUAh0dsFK4b0NlY4bJlBmodwWsDsyTxHqCqLH7cY9Ozse6t
+         F+UnZE8bYoKVpKgz9X1SL0zrOs8Iy+At7f4oh2XeyZ4TQu/zuIk8J2NaHb0fOl5k4Ax2
+         Pz1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723708983; x=1724313783;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cw4HOzF9efUrQHUoHgeWaw9GKc7xDSDNuyZWlW0WFOo=;
+        b=BGOS53rIhvJg1cz+neUsYqHANGcmXoLAQhs7t3O3ysetMdSvRueytbiaVBA5PUUlgM
+         sY/nkFeQUKiWUrEmpHt46GBnn6XE7mokm94cE4qfpBr8SVyYgAx0623EkWwRWWBPMl7N
+         ggi6v0LdtPddQeyYyzBftB6PJHiu7vMXRxTT/zIY1/H0wW15TS5rTk0W2naSEenWXbGV
+         hLacg6RkKyzKliyMTpcbpnX5mcMNHClx8AIWVgM03xTCJZ4dWhG4XBOczU0ZLgcLcECZ
+         Cwi1WxcNkPgdsYWUnxycwD9Yz1u9KHbkGjbSVickDfmWmaY3Ex7jDmlcM/4MtPjpX5Ow
+         7Tyw==
+X-Forwarded-Encrypted: i=1; AJvYcCXLK6/Wuk5WcpC3mEHUUEdZ4AsSNSvh+JB0C26vELsoZ/S487kA6PdRvw44lSlyKETRa3NLP6dnWi1N2UpTllpSnp5ZMrgDYWAQoXA=
+X-Gm-Message-State: AOJu0YyRFpZip871MpmBNrFlyWSIX5n3Vz+8Lphm0sGAViIr91R7qmJx
+	/ZGf4fkB4vJsGx40I0tio3nYUUU4VKjsRccUZrgfMTZ9ui6qALQfLfD+lfeIzDOnUmM+Cv8U739
+	U/uhHsxBLiy6el4ilec4P7/mGg4k47R/kdvc1
+X-Google-Smtp-Source: AGHT+IFsQKTSHXbcYSYVRfO6L0p/unFzrhWsL62YkDkRkGxv+SKfw1LPGgC/R+8Wi49EsiT5RHmeVtUn2IL0tXEmOvk=
+X-Received: by 2002:a05:6512:39cb:b0:530:e228:77ae with SMTP id
+ 2adb3069b0e04-532edbad7a7mr3564938e87.40.1723708982792; Thu, 15 Aug 2024
+ 01:03:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240815074519.2684107-2-nmi@metaspace.dk>
+In-Reply-To: <20240815074519.2684107-2-nmi@metaspace.dk>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Thu, 15 Aug 2024 10:02:51 +0200
+Message-ID: <CAH5fLgiEcyGqV4USTvMGhaMBFrwY5winmGC7ymYT2Qr7R=OBug@mail.gmail.com>
+Subject: Re: [PATCH 1/2] rust: fix export of bss symbols
+To: Andreas Hindborg <nmi@metaspace.dk>
+Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
+	Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, 
+	"Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
+On Thu, Aug 15, 2024 at 9:49=E2=80=AFAM Andreas Hindborg <nmi@metaspace.dk>=
+ wrote:
+>
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+>
+> Symbols in the bss segment are not currently exported. This is a problem
+> for rust modules that link against statics, that are resident in the kern=
+el
+> image. This patch enables export of symbols in the bss segment.
+>
+> Fixes: 2f7ab1267dc9 ("Kbuild: add Rust support")
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 
-When allocating `struct gendisk`, `GenDiskBuilder` is using a dynamic lock
-class key without registering the key. This is incorrect use of the API,
-which causes a `WARN` trace. This patch fixes the issue by using a static
-lock class key, which is more appropriate for the situation anyway.
+Looks good to me. I was using this change myself for some period of
+time when looking into loading Rust Binder as a module, so I've
+verified that the change works as intended in that context. I also
+tried it again just now. Thanks for sending this upstream.
 
-Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
-Reported-by: "Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>
-Closes: https://rust-for-linux.zulipchat.com/#narrow/stream/288089-General/=
-topic/6.2E11.2E0-rc1.3A.20rust.2Fkernel.2Fblock.2Fmq.2Ers.3A.20doctest.20lo=
-ck.20warning
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
- rust/kernel/block/mq/gen_disk.rs | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_di=
-sk.rs
-index f548a6199847..dbe560b09953 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -6,7 +6,7 @@
- //! C header: [`include/linux/blk_mq.h`](srctree/include/linux/blk_mq.h)
-=20
- use crate::block::mq::{raw_writer::RawWriter, Operations, TagSet};
--use crate::error;
-+use crate::{error, static_lock_class};
- use crate::{bindings, error::from_err_ptr, error::Result, sync::Arc};
- use core::fmt::{self, Write};
-=20
-@@ -93,8 +93,6 @@ pub fn build<T: Operations>(
-         name: fmt::Arguments<'_>,
-         tagset: Arc<TagSet<T>>,
-     ) -> Result<GenDisk<T>> {
--        let lock_class_key =3D crate::sync::LockClassKey::new();
--
-         // SAFETY: `bindings::queue_limits` contain only fields that are v=
-alid when zeroed.
-         let mut lim: bindings::queue_limits =3D unsafe { core::mem::zeroed=
-() };
-=20
-@@ -110,7 +108,7 @@ pub fn build<T: Operations>(
-                 tagset.raw_tag_set(),
-                 &mut lim,
-                 core::ptr::null_mut(),
--                lock_class_key.as_ptr(),
-+                static_lock_class!().as_ptr(),
-             )
-         })?;
-=20
---=20
-2.46.0
-
-
-
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Tested-by: Alice Ryhl <aliceryhl@google.com>
