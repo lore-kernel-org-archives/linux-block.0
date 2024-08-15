@@ -1,206 +1,186 @@
-Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020072.outbound.protection.outlook.com [52.101.195.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32CF83CC7;
-	Thu, 15 Aug 2024 19:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.72
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723748866; cv=fail; b=XHaFUcaF5JQFgYP+7Tgq4nfEm77JiO+zyXwrBSvWAdTXrbyat5KdFgWFDhedzlkMclG1kY8mGF6ijHQvUCCWLnU9XPMdPHUNg0Upp0ZFAH99fzBvAy0HD/f4TE5W3PZfITX4xHZG9+578FEaPQpLyUVkNEOZgpKWeKxKqvt1By4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723748866; c=relaxed/simple;
-	bh=qaIheY5KiGQ3bRRh6B6jXI9EnCMTHAIXz6segCPE07Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZTdaJHqrnvsMaGF/Ts0Lu+Qcm/kWpAO5rsnekZO57FJzNXy+Hvm1IN813HS5tfqVzTEekGSDaFyuSGw81tMR6rf9oEZxHt4/xj31z9JpUUSJQjwOvFbqL9HX8TcT4DGWSKHpCs5lOcBlX67qsfD6ETz24O8MfI0UFfqtrAvelxI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=pzwCMEbd; arc=fail smtp.client-ip=52.101.195.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C605E78C8B
+	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 19:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723749099; cv=none; b=cuy6SN72YzHLriLamhRmpal9cAoQRFNtB69AVVERhlaZiWZRMv3d/p+fz/ymA2r1PAcb1a54ajNwjIINgGUU37bjCGs8YQpwSQx4YzHieG2xmvFYMrmVC0wlI68jBU4RSdNfzojxq+v6jaJNQI93hikVVfe7AuerLq9ITi5CeoE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723749099; c=relaxed/simple;
+	bh=iT8KcNkm5Vc4rWXXWzYad5f95oy1oD7zS37mBnhk8qY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HfEwdGKhUOI8Ovo9rEpDUyU5hKqi63IGdy2Nkep77rA1FfjDP+NjI3oIB21Ydwz2B0gtPv8c0r0u8BzXdGtPTgpQwi2BXZhRwMSC7JIW+/MiLy4Tp8dUkRMOP9CV+cPwnAWU/qGBuVG8HlBMqPFv2ujPrPok0sll72d0JLoHung=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=b/833JVa; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="pzwCMEbd"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a08+O0JHL6cG7euKVGfItFOGqDbjakJyVFXE8a0R7eDXLN5krlEK89gxS+jGIhwOoqbcIfLMgO/Mi1TQFihXz9n0K1ygX8Np7sxan/cBdx9M97ueTPXsN9onKomKb+meiBu53qYCfl4GDEihZERo/mB6IcNIAqobXK8SnDl7a6HmwOpKc46/YE6NItgeSdjQ2TBKnQqIO3pv+i3LK6EUJLseXjNwVlJz+DC7eeSrAJwZqhiUieH0Dk3WgGA+KtUwkJDYA2VguNvg3lAZ2rA6z8EEa8eYtKxkXsK7oGv1ET+tYgF0hGq9hqvtFUnQgHjNy2/hqN6vIKTMclBnZ/zarQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qaIheY5KiGQ3bRRh6B6jXI9EnCMTHAIXz6segCPE07Q=;
- b=EHN0YojfKUMHAi2DFD3frZYaP1tmVU3r9dbr/AMKUoOl6v3r146OJyNM27h/PjeRahbjf357tqgm8fa1uY5TjkSuAUusub4yCIZtlFXYZ3VOZPKhZ5fq2jx5MFVX1Q4vS+x+3JwIhIZjJZOxbhqeYZvg/gu7PdwXaBM5Q+rd+Rt9S3bHPcENEzFdA1ljMjyRHI2akUz5uf2rrV3I1ZxCXXkSuZtyjzq6NvmrfqXU1lrqIsMjUNZhjuFOLPPRLkHSf64oOCygXHuseAK9sly6+Cu88306slyqcbr3HjiUBrCUvRhlbA8g+qntCLN8lRLYyr1jCayyqP4N48H3LjD32A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qaIheY5KiGQ3bRRh6B6jXI9EnCMTHAIXz6segCPE07Q=;
- b=pzwCMEbduNrMcwG2c4LGRgnLtBIno43PLBHTcsEJTpEJpsaqkLal1K9vbuIa+lAs+nzFKfE8+YaszrfOR9j6Ja506NApYz5RqEugTgHo7t1ABeLZDQrniUuBH1faXQX6cRpBREgA/sFAdySOSDhcpQ8chf+D9D7zPLugkY8DxrI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:253::10)
- by CW1P265MB7484.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:216::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.19; Thu, 15 Aug
- 2024 19:07:41 +0000
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1818:a2bf:38a7:a1e7]) by LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1818:a2bf:38a7:a1e7%7]) with mapi id 15.20.7875.016; Thu, 15 Aug 2024
- 19:07:41 +0000
-Date: Thu, 15 Aug 2024 20:07:38 +0100
-From: Gary Guo <gary@garyguo.net>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
- Wedson Almeida Filho <wedsonaf@gmail.com>, Andreas Hindborg
- <a.hindborg@samsung.com>, "Behme Dirk (XC-CP/ESB5)"
- <Dirk.Behme@de.bosch.com>, Boqun Feng <boqun.feng@gmail.com>,
- =?UTF-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin
- <benno.lossin@proton.me>, "linux-block@vger.kernel.org"
- <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] rust: block: fix wrong usage of lockdep API
-Message-ID: <20240815200738.096dca4a.gary@garyguo.net>
-In-Reply-To: <CAH5fLgih1QtO-ACyoifNsgqd=VtJimoGV+aD=3iHG0wb+iDGyw@mail.gmail.com>
-References: <20240815074519.2684107-1-nmi@metaspace.dk>
-	<20240815074519.2684107-3-nmi@metaspace.dk>
-	<CAH5fLgih1QtO-ACyoifNsgqd=VtJimoGV+aD=3iHG0wb+iDGyw@mail.gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: LO0P123CA0008.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:354::7) To LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:253::10)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="b/833JVa"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6b0e93b7426so5056417b3.0
+        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 12:11:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1723749097; x=1724353897; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FG2S68ohhhN7mqN86rt7i0TQ0nSZljd6+7LgE4Sf4cU=;
+        b=b/833JVasD5s+Lj2eNJN9jLnSsWYatnDAHjM1TpBEDLfvTCzdph28c07nXTW4vkNYa
+         QNrtI9G6N03ZSyXP+X8DRCBBYaqyvFHplkKg3XID3R83mc3lnzs1PaxCzNkt92CH5MWn
+         cJoq0TL2TVsv4dQBuffE2O8RZ+WEEzWg9FTAw4XTTHviYXNapnutLobklKFGJttPj0bU
+         Z3VKBCxhXxoOT9MW1UbVMoVwAOlr8EReuMy7YG2UMdJyHazEZ00oL/nQGvuRrYZ8Ftwy
+         UHrq5tRJfuqtLEEwxuZWdCRCgx5G2O/znxclKJWi2QZM975aH4ctNrQEQy+oKMFSfn9M
+         dpBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723749097; x=1724353897;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FG2S68ohhhN7mqN86rt7i0TQ0nSZljd6+7LgE4Sf4cU=;
+        b=nhUNIRsk8MiUAe+y+KmvhlQ7J02RL6qNPn4dJqgUN1aTRt2E3YADDBoGZ+i/4AZlh0
+         bA/D5jLdHOdnDchbhi/Z3Sl3ZkVO/vvPU2GXc4lFrBsJZ1OpTUVeb90pdZ3ti/KV071k
+         +a4z/G7aCs3N793/i3MTTXnRSXp/31DfUPp8xsMsbTvDK1EOB34fa3SafdIImjV3CcQG
+         f6rxGW/XQEDBxYMNuI4w/hAPxe2gqEY91Mx3dvI57q0xvAYIK89qXARO+QSb3rCdaFGS
+         K/31iTIqlTXcb3rJgJhS3+MbdwDcVpLOklI8zCW+hIwXImhPisWrgEV6duux+nD3L2JZ
+         4bKw==
+X-Forwarded-Encrypted: i=1; AJvYcCXQjQP2NQyHBp9nxp1IKCpBOGpfrVYZ1/8Ih40G2AfNsOXuzWIVcsxFtKNqKxsb+BX9MX25ZYs2zm/OG4dwNaA8sgP1L2EBIRKISEk=
+X-Gm-Message-State: AOJu0Yzac6uvZBSwLrCM+Z2uNog2XRu9XKYi8ql+wsx0U4rpnjO4IjUM
+	m42vvAS4jSx3b9Df9Gb0KV1jRGppf2Jz1BTwVVdEjxMOdb8qwZpG6Q02ryvDW9gBVp1IMhFmUEz
+	MCVnZfFQX8yJ9ITG2QUKU0YB/5sSbF9HCrriV
+X-Google-Smtp-Source: AGHT+IHDMOF+V1detUBYqlec+/ieaF+20T3NZqgS/3i5J9m5G5afNPzd29f7rdg4GSJXu5gGfjj7nsQ0DdDhqrEmFZo=
+X-Received: by 2002:a05:690c:3342:b0:651:4b29:403c with SMTP id
+ 00721157ae682-6af1b83243amr43005767b3.2.1723749095960; Thu, 15 Aug 2024
+ 12:11:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LO2P265MB5183:EE_|CW1P265MB7484:EE_
-X-MS-Office365-Filtering-Correlation-Id: a2931c31-fb7a-4765-d222-08dcbd5d8988
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?T0RLbmpHMUZSUnh1TS95MXBXUTZDUDhBby9QU0pIbHBBWVpBQ2tYdHp4K2lH?=
- =?utf-8?B?VGxTMVRvSXdGdmJlczNPVy9OdWRPRE9XL0JqcTNXN2psVmZOQm9MckYyMWhm?=
- =?utf-8?B?bG9YMGl6MzVFSnV6ekRFSEpHZFNiVWFUMTF6eWk1MXRBRGdNY3V5NWV5UDNZ?=
- =?utf-8?B?ODg4VkNUc0lEcTBVRDN3a1Q0NTAwRitGamhhNWFtcW1IMUI3d1R1Tkt1VTdI?=
- =?utf-8?B?eFI2Mk5XS0tMclV4Tk5HdXZHWWhqTW91RFovT09aUHMwUmZMNzBnNUh3Q0dn?=
- =?utf-8?B?QU9ZR0E2VDBzMkorMTU2cE8vOWt2ZEFBNXNGNnhzZ09wK3c4VjhDTjJwZkJL?=
- =?utf-8?B?aDN5QnliNTZGdmRrUjZFVjFnODVtRXZ3akZoYTk1b252dm9FUEJLVGsrNW1M?=
- =?utf-8?B?NzUvelA3TTVZOEczdVVUNVk2ZlNweEhaWUVRY3M1M09ZaHpxVVVQd0RGT2lQ?=
- =?utf-8?B?azRWeDAxSCtwWVBjYy9pUjdsRWU2aS84T2tqa1N4RlRhRDZBODFucUNwZWl6?=
- =?utf-8?B?SXA1bjAvN1h6N2g3WCt6Y251Z1VXU011b2xDYk9KRTZHMWpxeStiVS9pL3dQ?=
- =?utf-8?B?NzljOEkxQjZML0hGRGd3QjY3SFc0dnVUV3lkSkZCZ2ZwU3RyU055Skp3N3Vn?=
- =?utf-8?B?bzJsaW84WG84eDZMdkdZNE1xM3lWNHp6YWdkWUE1R1hMM2NtbnhSa211TFpz?=
- =?utf-8?B?b0hKU1NEaTlBYUsyTzdXUW5ZVEx3RFVONW5lZDl2UUhFdDM3M2tOR3VRT2NO?=
- =?utf-8?B?T1Rsa0F6SWlGckZ0cGhyaVpHVC9Qd3ZIUXlzRmQ5akp1Qm0yMWlEa2lmTzFt?=
- =?utf-8?B?cSttR0hFM242bzdFRk1aN09VYnFZLzJnOGdMMitIWXl0Wm5BNUNXeWxXWWp2?=
- =?utf-8?B?SEJvd1ZzQWlPVDdLci9QSmhmN3RWdmI5WS9VczhEUDdNam1MZEt5MzE2Sy9Y?=
- =?utf-8?B?RG0xMnN1U3lBbW9rajVJZ01Eanloa1JwT3R5bnpPOThQemFtQlFGRmJ2L1R0?=
- =?utf-8?B?SitlWjAzSDhjZExHYmt2cTdmVnFCMHRtWnoyOEUrazQxVmgyTlpGUmd5R3RL?=
- =?utf-8?B?ZElrYUNIVDIyaEFkRWdGdTFtbHUvd2Z0RXVHS3V3d1RUYTFONHF1SDlEbXJ3?=
- =?utf-8?B?OE1MNFA4d1p6Ylp6VXRyYVdCYjNSU3pXNXVNd1NjaFhGL2pNZlVIcW5hVmpZ?=
- =?utf-8?B?dFB0Nm9Tamk4dkd3WTZwbzh1SUkrNlgyamwxOC9xVlo3WXMyZXdTZlhwL1kv?=
- =?utf-8?B?U29xSDV0SFJ1WFNkamhFb01Hbno3WGpYeUdrZ05MNWQ2Q1dqZTRzeGJtZnBE?=
- =?utf-8?B?VzhlWERhcmg0dFFSRW9uM3Z4WWhzWXV1K1BSNktIbmRCVGhNMGw3eXhkTUYz?=
- =?utf-8?B?eVBBYzFpSW9jREFSbGpBYlVSdFVxV1BUTGR0TUI2ZmtpUlBsTWlhWGtPRGNm?=
- =?utf-8?B?MTVhY25iY2NndXNtWGJtSjB0eUkyYXRXdk5wdit4ZFhpVkNka2RTUkFTZ29J?=
- =?utf-8?B?Y2VqeTJMRGxsYmM2MS95NzMzTjhFeC9NZGFCRFlDK0xmQlhSS2Y5L3VIZW9S?=
- =?utf-8?B?V3FwMkpnK2RQQmY1RHRyUy9rLzJkOStaQjBaZUdtNWlyd3RsbmNPcnFtVVlN?=
- =?utf-8?B?UG5MNmxKOFR5WFhoUy9KQlp2Z3JyS0ljQWxpSzYwdyswVnBOYm5jYk5wcVBQ?=
- =?utf-8?B?aUQ1enBSMTNtc3lMY3BLYTlXakpLNjZicXJ6alZSbjhpWkg1djBxK2xtVXVq?=
- =?utf-8?Q?b4HNzq4qTjNLg1Sx+A=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TmtQQ01xbGphZFNhT0xvMUJBNkVLdi92V2FMaHNuQmtZRWFXZW1EYjdhekZW?=
- =?utf-8?B?dU5PTEtsc0l5WVZXZEdhY1dvNE13M2ZXaktFMENNOTR6VGNHK0RxWXZ3VlNW?=
- =?utf-8?B?WjZ3d0xGSDNwdThhSDYxZ0xPVjF2VFVKcTk2YWR2QzM0Tnc1N1lkR3p5ZXAw?=
- =?utf-8?B?VER1Ymw2WVlDUUJoTjBmRUovRCtVUVI3OGtpZ0daeVlHNG5lVk1CcDY0c2FR?=
- =?utf-8?B?SzVWYkNvdHJOcmtwbS84NlhOdW1Yc0g1R3A4alowZVNMelhJMDFVWGR3VnNl?=
- =?utf-8?B?b3VGbGRPb3NEME8wZWRML0FCTGFzemtocmRJVVpyeVBrRS9BZ3JObGY1bGlK?=
- =?utf-8?B?bWZiT05SYmZ6UkZ4THBsTnJ1UVYzamdSOXc1QVNnTThoSU1FbGJTclBZWFcy?=
- =?utf-8?B?NytpcGNQQ1FIZ3Q5bXFjQlNrZWd5UEF5RlRvVG5lRmJldVFNdmt6dHQvQzNn?=
- =?utf-8?B?QVhEVUxuUGlBM3N6MDFKV0RkYUdURGZIeWllN2NsRGF5NGxqZGk2eXlpNllS?=
- =?utf-8?B?VzhXQnNPTDBySFF6V05pZ2RUZnZ1K1JRdG9kS1JIR3lCS0c1cS8wQnBDTVhJ?=
- =?utf-8?B?SU5QZHBtSEJ1UERqMmN4SE15M2VWNllFYUhQQ2trVjBsdWFXbEE5ZGFMTlVm?=
- =?utf-8?B?eU5qZDN4MVFiTDBWbDBIcVNlanhrRXQyRmxYMFhzNHVNaC92dWpPbmFSejZu?=
- =?utf-8?B?NlhnNTg1dDlFaVBQeDFkL0pvdHlsS1ZaY0Jxc2JGSUpKcHJSakRld1U2bHVR?=
- =?utf-8?B?V0NzNXFkb25NNGlkbHlvTFQ0WFBkczhKM1dGeGxrOXprT0pKV1BOVEI2ZW9G?=
- =?utf-8?B?V29zWWpMbTNES2pvY2hMZHpBb2pSbTl1QmJlVk1icnM4Z28vcXlXakJRdm1Q?=
- =?utf-8?B?ekd6cHFOenQ5M1NReTV3TWlPWHl5MkU5M0lnNnlhbVQweFdrWlVDWFpiRXVr?=
- =?utf-8?B?ZElQNng5NzJYTlU2SThicFBFUHFxUGZ3cU5SYVJiZFpMeTdMWENNTytzTC9x?=
- =?utf-8?B?cXR6OGNBTVlvbHMxbEN4NEVMcFlEUVpiNjZCcnFKVG1memRyUnJlSGtiUnBQ?=
- =?utf-8?B?THN2TUVIT1JLcXVFd2lSYUVsWVdJano5ckN0VUFYaGsvRUJGUWlRK0lyUndM?=
- =?utf-8?B?VDh5UzBQT3B1RlBvclJmdUhOR2hZR3JaYmJFV25YTnd2U05XbUEyVVJSMkdy?=
- =?utf-8?B?SG5TSENGZm5xOXNuRlZSK0hFczBUU2M0V0dtL3dSdkVlemg0OElLVkgvbS9j?=
- =?utf-8?B?czF1cHI3MExnc3EzNHZnTWljdnY5dmFLWVN3VnNXQk01Q0V1a2NzYXM1d2hp?=
- =?utf-8?B?M2JZd2ROTzNueElya0VPeVI4RHJMaVdIZmdhWHpLenVva3hPTWRaQUNjL25P?=
- =?utf-8?B?ZFpORzBWc2N2U01LcE5ZVzd6VDRpNmd5N3FVSWdLa1dJN3lTUnRJSVhPNzIv?=
- =?utf-8?B?ZjdzZDR6YzExSVV1RWJOL3dVaE9xcHBvUUZMaHdDWkZxRVRaL0xrYjBCdXdm?=
- =?utf-8?B?K0FpcnhMQmx2Ry9YRHhEdzEvOStuVnJsVUkxcUJLV3NKRXFvdno0OS9RaU9M?=
- =?utf-8?B?L2RHd29ZZGlxVGQ1TkV4U1ZNZUdpTXYwczM2SmhvbzgvOUswcWp5dGhkTXRa?=
- =?utf-8?B?TXFlRDVkdHpUNThHa0Q1a2lkZktMcXg1UmphRS9WV3NWYUU0NVVlSkppUGtk?=
- =?utf-8?B?bWdQQmVyRmpuQnNhcXNPaUJZNXVjaGlIamZxVWc1REpXTjk2aXVxZVM0VzI3?=
- =?utf-8?B?ZytvUFN3OFVFZEdtUVVFRWpEeHFrWTMyOWYzTVVJU1Z5MWVzVUh2elRUNE1R?=
- =?utf-8?B?VEV6RzdweEVqVzA3ZmUyLzRnb3I3VGIyUTIvVWlhWU4yWExvZmRRbXNyRm9X?=
- =?utf-8?B?aGE5M0plaW9DSi9sOGdSMmJBdTE3OVRLU3Fta3lBL1VEbWxBaEJrcHRCLzEv?=
- =?utf-8?B?YWRXWlRrM2pIWUtWb3lXRk8zS0EvQTJwdEtEMngwbHdiQmRrUHVPR0dvTFRv?=
- =?utf-8?B?QS8yNWJiWFJuVk1qN25FRTkwbVVVQm5lekhDV0pPMG4wbEROdGZjKzAvSUoy?=
- =?utf-8?B?ZWpPL0Fjb3NMRWt1R3VXYzBxUlM3dk4vZkZ1Lzh6Tzk4akcvZzV4VWJrSDBP?=
- =?utf-8?Q?GPHIFPpEIYC3JRuYDw/ylvYfe?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2931c31-fb7a-4765-d222-08dcbd5d8988
-X-MS-Exchange-CrossTenant-AuthSource: LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 19:07:41.8530
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z+yVrkYNZrsWk4QJcwGiqjg2q97yWjciO2MUVLnbhUDlqgOfpOrqX6W+rPrU432ubXHiSbtgmq+JGFhwFdchJw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P265MB7484
+References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
+ <1722665314-21156-3-git-send-email-wufan@linux.microsoft.com>
+ <20240810155000.GA35219@mail.hallyn.com> <e1dd4dcf-8e2e-4e7b-9d40-533efd123103@linux.microsoft.com>
+ <CAHC9VhTYT3RTG1FbnZQ2F68a16gU9_QJ-=LSGbroP-40tpRTiw@mail.gmail.com> <cbf1caa0-835b-4d1d-aed5-9741eb10cf8b@linux.microsoft.com>
+In-Reply-To: <cbf1caa0-835b-4d1d-aed5-9741eb10cf8b@linux.microsoft.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 15 Aug 2024 15:11:24 -0400
+Message-ID: <CAHC9VhQ6ndv4wU4CBBhABHuriPDg=CmBi+_TbjCg+DNsCRuRSA@mail.gmail.com>
+Subject: Re: [PATCH v20 02/20] ipe: add policy parser
+To: Fan Wu <wufan@linux.microsoft.com>, "Serge E. Hallyn" <serge@hallyn.com>
+Cc: corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org, tytso@mit.edu, 
+	ebiggers@kernel.org, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, 
+	mpatocka@redhat.com, eparis@redhat.com, linux-doc@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	fsverity@lists.linux.dev, linux-block@vger.kernel.org, 
+	dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Deven Bowers <deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 15 Aug 2024 10:04:56 +0200
-Alice Ryhl <aliceryhl@google.com> wrote:
-
-> On Thu, Aug 15, 2024 at 9:49=E2=80=AFAM Andreas Hindborg <nmi@metaspace.d=
-k> wrote:
-> >
-> > From: Andreas Hindborg <a.hindborg@samsung.com>
-> >
-> > When allocating `struct gendisk`, `GenDiskBuilder` is using a dynamic l=
-ock
-> > class key without registering the key. This is incorrect use of the API=
+On Wed, Aug 14, 2024 at 2:23=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
+wrote:
+> On 8/13/2024 6:53 PM, Paul Moore wrote:
+> > On Tue, Aug 13, 2024 at 1:54=E2=80=AFPM Fan Wu <wufan@linux.microsoft.c=
+om> wrote:
+> >> On 8/10/2024 8:50 AM, Serge E. Hallyn wrote:
+> >>> On Fri, Aug 02, 2024 at 11:08:16PM -0700, Fan Wu wrote:
+> >>>> From: Deven Bowers <deven.desai@linux.microsoft.com>
+> >>>>
+> >>>> IPE's interpretation of the what the user trusts is accomplished thr=
+ough
+> >>>
+> >>> nit: "of what the user trusts" (drop the extra 'the')
+> >>>
+> >>>> its policy. IPE's design is to not provide support for a single trus=
+t
+> >>>> provider, but to support multiple providers to enable the end-user t=
+o
+> >>>> choose the best one to seek their needs.
+> >>>>
+> >>>> This requires the policy to be rather flexible and modular so that
+> >>>> integrity providers, like fs-verity, dm-verity, or some other system=
 ,
-> > which causes a `WARN` trace. This patch fixes the issue by using a stat=
-ic
-> > lock class key, which is more appropriate for the situation anyway.
+> >>>> can plug into the policy with minimal code changes.
+> >>>>
+> >>>> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> >>>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> >>>
+> >>> This all looks fine.  Just one comment below.
+> >>>
+> >> Thank you for reviewing this!
+> >>
+> >>>
+> >>>> +/**
+> >>>> + * parse_rule() - parse a policy rule line.
+> >>>> + * @line: Supplies rule line to be parsed.
+> >>>> + * @p: Supplies the partial parsed policy.
+> >>>> + *
+> >>>> + * Return:
+> >>>> + * * 0              - Success
+> >>>> + * * %-ENOMEM       - Out of memory (OOM)
+> >>>> + * * %-EBADMSG      - Policy syntax error
+> >>>> + */
+> >>>> +static int parse_rule(char *line, struct ipe_parsed_policy *p)
+> >>>> +{
+> >>>> +    enum ipe_action_type action =3D IPE_ACTION_INVALID;
+> >>>> +    enum ipe_op_type op =3D IPE_OP_INVALID;
+> >>>> +    bool is_default_rule =3D false;
+> >>>> +    struct ipe_rule *r =3D NULL;
+> >>>> +    bool first_token =3D true;
+> >>>> +    bool op_parsed =3D false;
+> >>>> +    int rc =3D 0;
+> >>>> +    char *t;
+> >>>> +
+> >>>> +    r =3D kzalloc(sizeof(*r), GFP_KERNEL);
+> >>>> +    if (!r)
+> >>>> +            return -ENOMEM;
+> >>>> +
+> >>>> +    INIT_LIST_HEAD(&r->next);
+> >>>> +    INIT_LIST_HEAD(&r->props);
+> >>>> +
+> >>>> +    while (t =3D strsep(&line, IPE_POLICY_DELIM), line) {
+> >>>
+> >>> If line is passed in as NULL, t will be NULL on the first test.  Then
+> >>> you'll break out and call parse_action(NULL), which calls
+> >>> match_token(NULL, ...), which I do not think is safe.
+> >>>
+> >>> I realize the current caller won't pass in NULL, but it seems worth
+> >>> checking for here in case some future caller is added by someone
+> >>> who's unaware.
+> >>>
+> >>> Or, maybe add 'line must not be null' to the function description.
+> >>
+> >> Yes, I agree that adding a NULL check would be better. I will include =
+it
+> >> in the next version.
 > >
-> > Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module=
-")
-> > Reported-by: "Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>
-> > Closes: https://rust-for-linux.zulipchat.com/#narrow/stream/288089-Gene=
-ral/topic/6.2E11.2E0-rc1.3A.20rust.2Fkernel.2Fblock.2Fmq.2Ers.3A.20doctest.=
-20lock.20warning
-> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com> =20
->=20
-> LGTM. This makes me wonder if there's some design mistake in how we
-> handle lock classes in Rust.
->=20
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> > We're still waiting to hear back from the device-mapper devs, but if
+> > this is the only change required to the patchset I can add a NULL
+> > check when I merge the patchset as it seems silly to resend the entire
+> > patchset for this.  Fan, do you want to share the code snippet with
+> > the NULL check so Serge can take a look?
+>
+> Sure, here is the diff.
+>
+> diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
+> index 32064262348a..0926b442e32a 100644
+> --- a/security/ipe/policy_parser.c
+> +++ b/security/ipe/policy_parser.c
+> @@ -309,6 +309,9 @@ static int parse_rule(char *line, struct
+> ipe_parsed_policy *p)
+>          int rc =3D 0;
+>          char *t;
+>
+> +       if (IS_ERR_OR_NULL(line))
+> +               return -EBADMSG;
+> +
+>          r =3D kzalloc(sizeof(*r), GFP_KERNEL);
+>          if (!r)
+>                  return -ENOMEM;
+>
 
-I agree. The API that we current have is designed without much
-consideration into dynamically allocated keys, and we use `&'static
-LockClassKey` in a lot of kernel crate APIs.
+Thanks.
 
-This arguably is wrong, because presence of `&'static LockClassKey`
-doesn't mean the key is static. If we do a
-`Box::leak(Box::new(LockClassKey::new()))`, then this is a `&'static
-LockClassKey`, but lockdep wouldn't consider this as a static object.
+Serge, it looks like this should resolve your concern?
 
-Maybe we should make the `new` function unsafe.
-
-For the patch itself:
-
-Reviewed-by: Gary Guo <gary@garyguo.net>
+--=20
+paul-moore.com
