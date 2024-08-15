@@ -1,266 +1,139 @@
-Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021109.outbound.protection.outlook.com [52.101.100.109])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA69214F9F8;
-	Thu, 15 Aug 2024 21:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.109
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723758161; cv=fail; b=jadWW/TXOdCly9YgDz2H4lw9dQGoiHP6GSZvXhuxZW3KKkGoBfYVenT27V9Y1SQQxQB8BBZlBxhclq31H4vc94JYowhwO4Ao7p0gQ81jBMd+KZNYcAwekc0SgDftVaFI6n/L1XxzYvgKT7TmKPC9sH0tLdX8pAJ2b55T28GQcRs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723758161; c=relaxed/simple;
-	bh=Pk/sxh6kg0RPURZ+r1rMIPNW+Dx6Wg+uba9ObULHwGg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=F1vP4oqpSXGt+UDzZ4f7B3Uxs1F4sarmj4vXltwbunOBjzr3U/HXQtpb/pbTBsP52im7ZfZzIvMgtJfCoH2qRDY9rTkVPD0KrZCtAJYvs7txtmq6BwRhVi/eSTAc4vlG+q0ChBWp+uDkiHeZP6uOrZifxfaI/Xpk4xiQCXqUacA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=YIDfK5+m; arc=fail smtp.client-ip=52.101.100.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB2E156236
+	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 23:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723765495; cv=none; b=nabgJ5Dy3e8C+Z6nK6E6nBuzetxaTk3UqkNtOHbX4He5b83yRWhua6dxxkgFKBG5nSMtLPatyaOw+ONwcgzr39nQgRJD4yywuVuxwArlMIZM1fd7QmRC5CK6OEhC442DJTqsB2tJCvgv5IEbPMCTiHA7IJqFQ3sy+p/CtUyt4UM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723765495; c=relaxed/simple;
+	bh=jJUmaLK0878WgZ26lY0pHs7F7N4leXfF8/Z9sGtr1vA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fTFzIMZIFCxjThpy9aYbH1KHfg3N5WYWd23dkVTFVUJbh4OSixeLCpKeq5QLrh3u8NRhydgHcrSAT82635cIjxzLu9JvpFePn8lM3bqt6C/16j7tBgm0R5jkwv++S2eOFkUx73dwldCaGbVHdJrDj3WlQaXM9MAomsOz0Se8RZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V3WxxFYB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="YIDfK5+m"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Wtq+odl5T0ORTE7JcMaAPtljHEYdohLKVpCUJbj0wKf1KrDd/Xl9zdX4XvcHtJbAVQweUMB6gVIH+pQ8H4bV2R1KDRn3zDgVCgNmBTHY2U0+VnQc8NhRwIEmNSaBgfh/66iJjjmN6y2tcCUF4EvNP/sQYuXdBB3qJuDlkY8AiBcYmAviYpDh/onrXXNOEfuaV45410eCYJb+MJqxPtkMO3ts9/edpvAZnuOyeRBXInlLtgAyMtxBrUD95hkJ1GS7y/spnmrOws1ThmD9Th3jlc5aKCjbw357JKpeCzNZ3ipDeS5N4pWyUuBo7+mCT1mLRJI2puhaSxR8/8dNCTteTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SZdXQrb5jLzuZwDEFyVo5IYobTQdQCP5z/3jBPr5/B0=;
- b=AlWb90jez6lGXGQjGQ3da/Q58a/TUs415eXZMTjrTa9Xc/IDS+E3Q/PExcCl7CwcGtj3BLL9XsGdIMthsMJAxRJlmXKRRGu+GeudoqIm7uPbRr/OYeBFkxpxPtFBDqHrSXZoruho3hH3p/fl0fLTP4vgl47iIx/8J0aFU0OjmZZCt/6KMTA8iW1JdtWiMit+R67R7JFXWG39OndLU+lA+1LG91M6gUgdPpjYap7nEVD5vyyPr144oKLitFI75gkuV2n9gGFDT8WhYLcxvyJFwRL0ddf8kcspl2MfEGfdI4PV8C6uzyMeLEk/OIbgLoZrHUGX3FyLM7qJEi+TNYExwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SZdXQrb5jLzuZwDEFyVo5IYobTQdQCP5z/3jBPr5/B0=;
- b=YIDfK5+mL7E/H1Pm6nG2UWqCKb/KeN69uIPr15LvgqgqcsfTqQCGDo4ROVDHUqklLhVWTaU3yKJZxOVwZdBibP4yddGKnjaMyUsGJ8Xs0p8HDO5cjTzqY0uu+kbcSziAUlHRhktLUC1HoYfiB8pL9P1IZIBAlsVWTTgAymGO/hs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:253::10)
- by CWLP265MB2452.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:97::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.19; Thu, 15 Aug
- 2024 21:42:36 +0000
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1818:a2bf:38a7:a1e7]) by LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1818:a2bf:38a7:a1e7%7]) with mapi id 15.20.7875.018; Thu, 15 Aug 2024
- 21:42:36 +0000
-Date: Thu, 15 Aug 2024 22:42:34 +0100
-From: Gary Guo <gary@garyguo.net>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Alice Ryhl <aliceryhl@google.com>, Andreas Hindborg <nmi@metaspace.dk>,
- Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
- <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Andreas
- Hindborg <a.hindborg@samsung.com>, "Behme Dirk (XC-CP/ESB5)"
- <Dirk.Behme@de.bosch.com>, =?UTF-8?B?QmrDtnJu?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] rust: block: fix wrong usage of lockdep API
-Message-ID: <20240815224234.561de1b5.gary@garyguo.net>
-In-Reply-To: <Zr5z7N2JCMBbQ_YK@boqun-archlinux>
-References: <20240815074519.2684107-1-nmi@metaspace.dk>
-	<20240815074519.2684107-3-nmi@metaspace.dk>
-	<CAH5fLgih1QtO-ACyoifNsgqd=VtJimoGV+aD=3iHG0wb+iDGyw@mail.gmail.com>
-	<20240815200738.096dca4a.gary@garyguo.net>
-	<Zr5z7N2JCMBbQ_YK@boqun-archlinux>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: LO4P265CA0216.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:33a::8) To LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:253::10)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3WxxFYB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723765493;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QOb3UN1CKWbBfb8ov4q73kqKN1ZyoosgZ8TwQ+HhtV4=;
+	b=V3WxxFYBA5R9MxL72JEWaboLuM82Iyq1CFq2FHbIfYZzZ7ebrF4byhJcCQsXDyy0LFodqG
+	YqVndruTNylCCwY1J6QG/jh99PWoWhM3xJNdPIo+3gNsjzgJTGGFFvZk7qSNRoDiZQxxkz
+	o5rKwvsFYwTfiK5xNrfNsl8oROOvi3I=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-93-piKqWIi-NImKipJMIY-Dig-1; Thu,
+ 15 Aug 2024 19:44:47 -0400
+X-MC-Unique: piKqWIi-NImKipJMIY-Dig-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1680A1956064;
+	Thu, 15 Aug 2024 23:44:46 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.41])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9AF0719560A3;
+	Thu, 15 Aug 2024 23:44:40 +0000 (UTC)
+Date: Fri, 16 Aug 2024 07:44:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, ming.lei@redhat.com
+Subject: Re: [RFC 5/5] block: implement io_uring discard cmd
+Message-ID: <Zr6S4sHWtdlbl/dd@fedora>
+References: <cover.1723601133.git.asml.silence@gmail.com>
+ <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
+ <CAFj5m9+CXS_b5kgFioFHTWivb6O+R9HytsSQEHcEzUM5SqHfgw@mail.gmail.com>
+ <fd357721-7ba7-4321-88da-28651754f8a4@kernel.dk>
+ <e06fd325-f20f-44d8-8f72-89b97cf4186f@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LO2P265MB5183:EE_|CWLP265MB2452:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0a305fef-6404-4a90-415a-08dcbd732d4e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?c3NpUVJvbERZVnlXemdpa3c5WTkxSHcxZ3hVMkx0S1pGVTE3eGdsWjFhZXc0?=
- =?utf-8?B?cU1oa3JHWVpJRUV6MVF1RXZTTDZJU25NT3U0RzUveVRnSEJHbzV5MzZCcVlH?=
- =?utf-8?B?OHJScEZZZHJzNW5lVUJYcC8wQmFjTTcxNERrZ29VWTkwNnNXSFZLcjJoUitx?=
- =?utf-8?B?TE9jRnpXbE52eitieDI3QjNRMjZWU0JCNlZEL1ZKSjhnQWpkODlKUXpYQTFL?=
- =?utf-8?B?c0xKYW9ERlFhRVVQR1k3OC9oRnI4RTZ2bi9teGVicDZJTEhuSkRVbUJta1Zz?=
- =?utf-8?B?OWlWMHg1K1dmdmxlMHg3MmxSbmhKaGxvOGFQTU1zOFQzNCtRYVlSYzRRNGM3?=
- =?utf-8?B?b1FXSDR0ZkZCRDE3dnNzTUN1N1NUeVlJVUM0N0htc2kyS3dmaWd5NnpzdUZW?=
- =?utf-8?B?c2wxNEE0VU1nRnlEelhJMXNxTWVsQmVMdjZhc2ZPdVZZd2IydFV2bkhhTlFK?=
- =?utf-8?B?WVZTZ0pXY1RacDZGdlpqS3E3Y01YS0hsbVFCUlpGaGtpWlQwQU9CT2tpYW1n?=
- =?utf-8?B?N0FJbit3N1MrSWZIUVFYVDBCV0VUOVVxVnpPem80aHRQaHRuMStiSUxQSFVO?=
- =?utf-8?B?Q01udmhGb2hkdHFoVlRmQjFGZVNiZngxZzBPQ0owSy9GSTRNWDZiT2NMWTc2?=
- =?utf-8?B?MGMybGxyV2I4ZzE3K0kxZkx0czNOZ1cyR2ZGNmZzRVV5VXU2Z1Z4SHlYYWdk?=
- =?utf-8?B?TTFDTVdtaHR4WWNKajNhc2FYUkJaSFZLVmRac3RtOW9jVS84VnhYWkNoMzJE?=
- =?utf-8?B?Nm8xUjVlT24zWmNYLzJkcTJvTU9vV1YvR1FrRkJmdVo3Mi9ac0Zpb3Y5VFMw?=
- =?utf-8?B?akNNZnhScGtCSnlRTUFkZTlpRUdzbHBFQWxvSFNXSlRUeUNHMW01SG82aUk4?=
- =?utf-8?B?NTdJZ0FqUndBRHdRU2NjR2VvWlQ5UVdBcWtpNWMvWnRPdHBFeEc1MjU3a1Vk?=
- =?utf-8?B?S2lNeU01SE5zSGVVWEp6bTM2b3pkdy9NTlg2SFpjZmYxY001NFYrRUlDM0M0?=
- =?utf-8?B?VU1FK3NLS1lVR1MzUkgwbmkremU5Y1JVd2pFT3JpYmJjZzVLWTYyZ3RBNXJM?=
- =?utf-8?B?SThWTVpndzJRM2ZVRUI5L240TFcrelpTdmxoSk1zRjdyZTZqTGE0TkRINEx2?=
- =?utf-8?B?QlZmYkNqSXdMbGx2RGhndzJvY3VMNk11T1FWSzd5TEVybE1PVk9HcXh2cHN2?=
- =?utf-8?B?c2dvcExFSDRCcnpUanZ1UmtpWDVjc3FwUWpqdnRWbXJlMnY4TitCWjZ5Q0t1?=
- =?utf-8?B?YTQ3OG1Ycm9iMjduWnBSWjJJZ1IrK2hCNStHbzg0N25ITWdpUHJmend1ZlAx?=
- =?utf-8?B?azFSTW5DM0JHZFhDZ1F6aWxMSEsvWktsaytrODdjaGpOa0ZFZTY5UXlHNGJz?=
- =?utf-8?B?NFJnQzRwV1RuNk1NUG5oZzlXT3huNkZzK3pVb0FIWG9vQm1PUFBnTFkrbkt3?=
- =?utf-8?B?UElWbkNaZEVwZEllVnFmSHRXNFg1cmJCQXJnMjFubUZhY2FERXhLalNvWUtS?=
- =?utf-8?B?cVlPRUllTXJQbUxaUkcrRXl1ZnZoUEpkU0tBL0tES3ptdTNJQWFYWE8yNFBj?=
- =?utf-8?B?NEkwc3BwdDVWRk4wR2NHbDZUWHppRno3bXFhQXlwRW50V1duNjdYa0VKMUVm?=
- =?utf-8?B?cWIvR0Q2NUx0cmJ1U1hiQTIrUHlrTFJGa1BYZW1oSTcycTdnL1h0SnBqa0lm?=
- =?utf-8?B?RzZ3UWJ5YUJOSDRjNVc2U2duZDl6N1hYUGNlcDhXeDBqRXl4dEw0NHcwYU1n?=
- =?utf-8?Q?VPggAClNqv5tUh84cA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M1dBQ2sxK0NsTGpuMSsvcVFTamM3dmlTTDAwT2NkMGxJaU9qVCs1T0U5TVZI?=
- =?utf-8?B?UkFaLzVnRFo3ZE14NEU3b0NkWnhHSFNFMnB0cjlUbVJpanFUR2NiZGs4cFpP?=
- =?utf-8?B?d3VXR2pDS0VoOEVGRVJ5ZitoUzFwSnpMb3Y0U0RsY1d0dmtsU29UT0htRHoy?=
- =?utf-8?B?QzdSdXlWQ2U1Q0ZHSnExbElENHY0OEtvUGJGajRYY3I5T2RNSitraTdJcUR2?=
- =?utf-8?B?cXVqOVZoT2dJNVZMNGVDM2NFSU56MGV3UVJoeGN5NlNwbFIrMmdqTmpMT2lN?=
- =?utf-8?B?ZzlNYWtwRUFXQlhIWkcvQzBzMGtpNzMxU3hJRFpQMDBJY2NjQUhSQ2pkc2pR?=
- =?utf-8?B?VW41NXd3NHdaTmt1SUpnZ1dzcXBvYUREUzBLbUZ2bXYydHovNVpwNzFlME9Z?=
- =?utf-8?B?WS9BbHEzaW5UN3lSU0ZBNEVORU44V3Z4clI3eERkOVJaUUszeE9YM00yL3h6?=
- =?utf-8?B?T0RpNkVTL2I1N0hFdkJXMDlhdDRaR1V3bGsrTzExQ2ZlQk5lK3ZrOXhCUHhN?=
- =?utf-8?B?NVpIaWc2TEtRcmszSmJ3aFdHSWE5SThtNXRhcm9DT01ISTJJTmxOLzFrVThj?=
- =?utf-8?B?TEIxR2poOWI0SFBjcUVZbU10d1h2bG50NFZYTlExR2VYa21kVFMxeWFORDlL?=
- =?utf-8?B?MmtLQmQySmE5cUtXd1RhQUY1N0t1Z3BvaEJlamFkUUh5SzdyQXk2UUhUMUlm?=
- =?utf-8?B?WkgzQ1R0ZHVsSGdlUzZ4VWJIWWs1SkRXcUZWQ1drOGtnUytRSFVyRktYNVhX?=
- =?utf-8?B?NG1BVXlhZjduSjJiNWlXeHpUSHpnclIxUEVJaG1oOHpJeDMra05LT2tJZHor?=
- =?utf-8?B?TzZCajBsTkF4ZWVETzJmY1VvMFZrdU9iS0RYWVNnL2dDVlp1RzNINGljNm9w?=
- =?utf-8?B?YlU5NDZMNjZEazZmWmgzdURMc0k0c3ZVRWcyN0R0TU9vMk91Y2dmK0dhREFL?=
- =?utf-8?B?NjJPQ2NMSjA3RkRta0srZitKWnFLYTF4V3NIUXNaQm80RTdJWDFTa2hCaitH?=
- =?utf-8?B?Rlo0TEVRQktCRzVudHRKRUxHeGxPNnpNdXg3Q1YwcWY1MUxaM2k4ZGR4T0FV?=
- =?utf-8?B?ZVFGQ1lqYVdOTy9hQmdvMlJKbU5EekhoeUFTTFU0YW1ZUy84TUlpQkdlZlcy?=
- =?utf-8?B?ZExBZ2U1NzB6OVhJSDAvVEhMTzl2ZnBaTnJQaHlWTkZIV1VQVXlEVVFTNkpa?=
- =?utf-8?B?azZFa3dGVXRadFpBR3E4NVpJOWo0OENRdG1paFlTbmJ3ZE5Xckh1L3c1Zm52?=
- =?utf-8?B?SzlNMnFNYnhmVHZwMnNSUTl4ZFM1NU9sVW1STjlSYytVdURxRDZXcC9SQURP?=
- =?utf-8?B?bDBua0Z5dkxMRUNwYi96WWpCdFB4SVN1enBRWHprUlRxd3YvWUpvbU1Wb29m?=
- =?utf-8?B?THppS08wTkYyempwdU1zdHY5YnM4T3dxTVlpR3Q1c1kyZjRlbk9ielRWcExj?=
- =?utf-8?B?VEVBOE1FcExwcDM5MVZaMTBiVXhVbEw4Z3p4b1drUTV1ZDlnWnBXK2JFRTJD?=
- =?utf-8?B?YUNMS1hSaEFaUUVvVWJ5QmlnNHZHeGp3MTUvbjlUd3dFQ3Q1L0lnR212ekJP?=
- =?utf-8?B?dVNhZ2FVMWVMWmtFUkR5eFVqZjJ1Z1JBV3FwdEovYXJXeUdVQjNWUC9NeWx5?=
- =?utf-8?B?T2o1WVpwYUtaUC83U0NWZGVYZWYwcEZOczR1UFYwOXNOVDhmWmp5OUcxMG50?=
- =?utf-8?B?VkhGS1VKOTVJd2lBWC80MzVlMnRvTjN1UXhRemZZcUlkMFpHcmFNWEZtV1ZM?=
- =?utf-8?B?U04rQ0tYanlpWE44ZCtzV203aEw5UFpHWTFnVFBOb1A2elBnaUF4cjlxcjJ2?=
- =?utf-8?B?cXdHODVIT0l6T1BVSmdNQ3U1bERmcjkrMTY3SXl6dzc2ZnZmcmdDODA2dUxT?=
- =?utf-8?B?OGtLT0J5N0paMVBrNU5nUndhaDU5NXg3ckNOTW4zM1F5WnlVTFRrQXlXaFZB?=
- =?utf-8?B?b3IreFk4NUcyMUpwQ3IweGwyVW5idCtmcmFMd09weURPdm9RL2Jla2c3Wm1x?=
- =?utf-8?B?QTY2ejd6R2g0TEdzNldHM09pbWUvYTYyMzRkOXN5L3FTNXUwSEJtRDBkSGFG?=
- =?utf-8?B?RXpMWFNZeUVOblZBT012SHRraEUxRjRsak5Fc3RZdmJXMWZDa21kckl3b2li?=
- =?utf-8?Q?E6eLeK2n1iQzkKM41KhO9sLo/?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a305fef-6404-4a90-415a-08dcbd732d4e
-X-MS-Exchange-CrossTenant-AuthSource: LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 21:42:36.0468
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FYm/xBtascZlZSssqjcmAUs73Ym+1UudYg4jzPzrmpzuFaLReWp0TyHU0EqgBXbMaftrTDe80I4VHrmjXBAE1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP265MB2452
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e06fd325-f20f-44d8-8f72-89b97cf4186f@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Thu, 15 Aug 2024 14:32:28 -0700
-Boqun Feng <boqun.feng@gmail.com> wrote:
+On Thu, Aug 15, 2024 at 06:11:13PM +0100, Pavel Begunkov wrote:
+> On 8/15/24 15:33, Jens Axboe wrote:
+> > On 8/14/24 7:42 PM, Ming Lei wrote:
+> > > On Wed, Aug 14, 2024 at 6:46?PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> > > > 
+> > > > Add ->uring_cmd callback for block device files and use it to implement
+> > > > asynchronous discard. Normally, it first tries to execute the command
+> > > > from non-blocking context, which we limit to a single bio because
+> > > > otherwise one of sub-bios may need to wait for other bios, and we don't
+> > > > want to deal with partial IO. If non-blocking attempt fails, we'll retry
+> > > > it in a blocking context.
+> > > > 
+> > > > Suggested-by: Conrad Meyer <conradmeyer@meta.com>
+> > > > Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> > > > ---
+> > > >   block/blk.h             |  1 +
+> > > >   block/fops.c            |  2 +
+> > > >   block/ioctl.c           | 94 +++++++++++++++++++++++++++++++++++++++++
+> > > >   include/uapi/linux/fs.h |  2 +
+> > > >   4 files changed, 99 insertions(+)
+> > > > 
+> > > > diff --git a/block/blk.h b/block/blk.h
+> > > > index e180863f918b..5178c5ba6852 100644
+> > > > --- a/block/blk.h
+> > > > +++ b/block/blk.h
+> > > > @@ -571,6 +571,7 @@ blk_mode_t file_to_blk_mode(struct file *file);
+> > > >   int truncate_bdev_range(struct block_device *bdev, blk_mode_t mode,
+> > > >                  loff_t lstart, loff_t lend);
+> > > >   long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+> > > > +int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags);
+> > > >   long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+> > > > 
+> > > >   extern const struct address_space_operations def_blk_aops;
+> > > > diff --git a/block/fops.c b/block/fops.c
+> > > > index 9825c1713a49..8154b10b5abf 100644
+> > > > --- a/block/fops.c
+> > > > +++ b/block/fops.c
+> > > > @@ -17,6 +17,7 @@
+> > > >   #include <linux/fs.h>
+> > > >   #include <linux/iomap.h>
+> > > >   #include <linux/module.h>
+> > > > +#include <linux/io_uring/cmd.h>
+> > > >   #include "blk.h"
+> > > > 
+> > > >   static inline struct inode *bdev_file_inode(struct file *file)
+> > > > @@ -873,6 +874,7 @@ const struct file_operations def_blk_fops = {
+> > > >          .splice_read    = filemap_splice_read,
+> > > >          .splice_write   = iter_file_splice_write,
+> > > >          .fallocate      = blkdev_fallocate,
+> > > > +       .uring_cmd      = blkdev_uring_cmd,
+> > > 
+> > > Just be curious, we have IORING_OP_FALLOCATE already for sending
+> > > discard to block device, why is .uring_cmd added for this purpose?
+> 
+> Which is a good question, I haven't thought about it, but I tend to
+> agree with Jens. Because vfs_fallocate is created synchronous
+> IORING_OP_FALLOCATE is slow for anything but pretty large requests.
+> Probably can be patched up, which would  involve changing the
+> fops->fallocate protot, but I'm not sure async there makes sense
+> outside of bdev (?), and cmd approach is simpler, can be made
+> somewhat more efficient (1 less layer in the way), and it's not
+> really something completely new since we have it in ioctl.
 
-> On Thu, Aug 15, 2024 at 08:07:38PM +0100, Gary Guo wrote:
-> > On Thu, 15 Aug 2024 10:04:56 +0200
-> > Alice Ryhl <aliceryhl@google.com> wrote:
-> >  =20
-> > > On Thu, Aug 15, 2024 at 9:49=E2=80=AFAM Andreas Hindborg <nmi@metaspa=
-ce.dk> wrote: =20
-> > > >
-> > > > From: Andreas Hindborg <a.hindborg@samsung.com>
-> > > >
-> > > > When allocating `struct gendisk`, `GenDiskBuilder` is using a dynam=
-ic lock
-> > > > class key without registering the key. This is incorrect use of the=
- API,
-> > > > which causes a `WARN` trace. This patch fixes the issue by using a =
-static
-> > > > lock class key, which is more appropriate for the situation anyway.
-> > > >
-> > > > Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` mo=
-dule")
-> > > > Reported-by: "Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>
-> > > > Closes: https://rust-for-linux.zulipchat.com/#narrow/stream/288089-=
-General/topic/6.2E11.2E0-rc1.3A.20rust.2Fkernel.2Fblock.2Fmq.2Ers.3A.20doct=
-est.20lock.20warning
-> > > > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>   =20
-> > >=20
-> > > LGTM. This makes me wonder if there's some design mistake in how we
-> > > handle lock classes in Rust.
-> > >=20
-> > > Reviewed-by: Alice Ryhl <aliceryhl@google.com> =20
-> >=20
-> > I agree. The API that we current have is designed without much
-> > consideration into dynamically allocated keys, and we use `&'static
-> > LockClassKey` in a lot of kernel crate APIs.
-> >=20
-> > This arguably is wrong, because presence of `&'static LockClassKey`
-> > doesn't mean the key is static. If we do a
-> > `Box::leak(Box::new(LockClassKey::new()))`, then this is a `&'static
-> > LockClassKey`, but lockdep wouldn't consider this as a static object.
-> >=20
-> > Maybe we should make the `new` function unsafe.
-> >  =20
->=20
-> I think a more proper fix is to make LockClassKey pin-init, for
-> dynamically allocated LockClassKey, we just use lockdep_register_key()
-> as the initializer and lockdep_unregister_key() as the desconstructor.
-> And instead of a `&'static LockClassKey`, we should use `Pin<&'static
-> LockClassKey>` to pass a lock class key. Of course we will need some =20
-> special treatment on static allocated keys (e.g. assume they are
-> initialized since lockdep doesn't require initialization for them).
->=20
->=20
-> Pin initializer:
->=20
-> 	impl LockClassKey {
-> 	    pub fn new() -> impl PinInit<Self> {
-> 		pin_init!(Self {
-> 		    inner <- Opaque::ffi_init(|slot| { lockdep_register_key(slot) })
-> 		})
-> 	    }
-> 	}
->=20
-> LockClassKey::new_uninit() for `static_lock_class!`:
->=20
->=20
-> 	impl LockClassKey {
-> 	    pub const fn new_uninit() -> MaybeUninit<Self> {
-> 	        ....
-> 	    }
-> 	}
->=20
-> and the new `static_lock_class!`:
->=20
-> 	macro_rules! static_lock_class {
-> 	    () =3D> {{
-> 		static CLASS: MaybeUninit<$crate::sync::LockClassKey> =3D $crate::sync:=
-:LockClassKey::new_uninit();
+Yeah, we have ioctl(DISCARD), which acquires filemap_invalidate_lock,
+same with blkdev_fallocate().
 
-nit: this could just be `MaybeUninit::uninit()`
+But this patch drops this exclusive lock, so it becomes async friendly,
+but may cause stale page cache. However, if the lock is required, it can't
+be efficient anymore and io-wq may be inevitable, :-)
 
->=20
-> 	        // SAFETY: `CLASS` is pinned because it's static
-> 		// allocated. And it's OK to assume it's initialized
-> 		// because lockdep support uninitialized static
-> 		// allocated key.
-> 		unsafe { Pin::new_unchecked(CLASS.assume_init_ref()) }
+Thanks,
+Ming
 
-nit: this could be `Pin::from_static(unsafe { CLASS.assume_init_ref() })`
-
-> 	    }};
-> 	}
->=20
-> Thoughts?
-
-I think this design looks good. I suggested adding unsafe as a quick
-way to address the pontential misuse, when we have no user for
-dynamically allocated keys.
-
-Best,
-Gary
