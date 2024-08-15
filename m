@@ -1,67 +1,67 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4DC15383B;
-	Thu, 15 Aug 2024 21:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3F214EC6E;
+	Thu, 15 Aug 2024 21:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723757643; cv=none; b=ELdGTUo5MOfVR5blIryTNA6iXj9lDuI8+OogTXZdcrEJSUoxA9kVSqRwJ3zw5UTW+CInLEQpuDsGOBlN2dSWUHY1H9b7Gn5uoLZBW0xd4D5feiZYsTXX6rt02TG9dI9Co2AL+8uqK1hf/yfAolaH57nw8ZTkaxrqkwLauYgfCUI=
+	t=1723757793; cv=none; b=d1r/YClMnYlLWJqgNWsY2knfjIqtGxkchCo6JnIWEiCHU5/ppwu4QQdyhpWdjNqrN5E3lw9vMal81HkNsf7D9K2fkC1bRyU0Gq7wIMXwOflSA2E4ZkAgw6xy7bDgdOzyJV2BHk3hyxpDPk7sBX9u0nm4i/tqCK2y8fpcuHHLHcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723757643; c=relaxed/simple;
-	bh=RSrImnI26Mo0f9XuPAwK3HwRGo6HYNUAhl91ruFjRGg=;
+	s=arc-20240116; t=1723757793; c=relaxed/simple;
+	bh=ZCcc9HqDPOzn45zNAgvp3hsz2gD+XHy9B3j9ffwJRp8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GFF8yIJJLkLEqQJOqEzzdcuFIVq5+vJn6DbhWIMvNJ6oFMiVJL/HGfzGsp5epaKVnwPafEcftk951MHz8MtDfDZdPGUoq3609DA9en3LNkFZchntpt7VCJGtTrr+5RQSyjmlP8BdVwzDAzVs5ShEiRHenkff8MVs5XjXcxaE4bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hrFIoTVy; arc=none smtp.client-ip=209.85.219.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=UPdi7zz/z0iSVFcjMj7a1qH5AXtGHz1jsusU1Mn2nrs86orEiySNbJNuF4Mv5X4B95BruoRYk5guClgs9v1cE/wOmb3luD+/6tIDfnMZd5rLqUJV+ggJM/zFwSUSvLa68+IKSjTXylI9qR38iunfio8auwkRxpmw+JZXWmAYfYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lHbQ1/uM; arc=none smtp.client-ip=209.85.167.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hrFIoTVy"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6b79293a858so6975446d6.3;
-        Thu, 15 Aug 2024 14:34:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lHbQ1/uM"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3db145c8010so857492b6e.3;
+        Thu, 15 Aug 2024 14:36:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723757640; x=1724362440; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723757791; x=1724362591; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=z2jIJr2MkBoBBw06sdkqmr4Bu0hhBeX1gGKR5UMrb0o=;
-        b=hrFIoTVyNXfy7VC1Q+WhMAtdPhP1H/AD9/OJFwNyy0zyJkE1JloajS82McC65gKCKq
-         W4YPSpYvafOA/LpghyyvTPNumJ6y4CCqZsMs8yhj9van0RZeaRDlfp3uhHjZurC1pT3v
-         Wv8pmzt5Uk+Zc73u9rb4NKT/PgNvKNrIEEos/8oguPGNFG2opXSoBfQs51l/RMJUq1vH
-         5lNtWkEWur+hlHnJwOAs1OyDvcfL6Ng5gXxKeTmSoSZO9MLufuNxqZiiBnUyJzamrcNt
-         H2tKvy2uSYYOySMR64PWHQcI7SBsOD6z8AnsqNbd2Xfdle3f9NsHyTdOMwl02dyW+uF4
-         t1MA==
+        bh=boY978HFCv0Axv89OgNUkRO86F3ZJlrIJAY5GpXOUpE=;
+        b=lHbQ1/uMDAuLsonBhyz2nWLJMl42cFStlh9Qob+AceXFnOOFrulCZesB/OThT8mkYa
+         8BODgvF6I4aCXQxCry5UVN/D+0k3Em+SwtFgrIRFD50v5j4TXIDiLEH1/uSjMSerwzfP
+         s2n/YVKmXjlxPM0hGVHcm27yXo3BjMfP7my2aylbeM3YCR0Ea+Z9yFU9Il/ir7APpowT
+         3zU8zoavOW7AN7HLn/cZ9VLqqusssqqakKpBdf7GVH3gcfx0O/LiTWwZV36uxjgGItrH
+         fw5ePs/3+WTpLyr8fHpBOG92WbBmQMgqDljM7zcebgW7UcK+lLDtSb2VxrILrhHvThXd
+         RSpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723757640; x=1724362440;
+        d=1e100.net; s=20230601; t=1723757791; x=1724362591;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=z2jIJr2MkBoBBw06sdkqmr4Bu0hhBeX1gGKR5UMrb0o=;
-        b=Gh788yS/zwwCX6Utuffd+dl7wy2HCWvX2y5zq2QGYGM3fKTY3A2BBR5o/jAe2aZmpO
-         tisgPJE4Bwvrcy5Uc1VIVBJxYq/XGwHCTjTBWkh4jbmRSBipoMaRaHFwYDt8au0XOqQm
-         vLz/XmnlI18Z7J8URNEGfoifL3vP1TfVmc/pHlwow/Z5gRJfcD5E9Q3LXD5CG5qhnywn
-         Cpfy9WcZ2LlrGiopX6mZdG5eImpgUSHUZrkPVU+qL6uYiP9c3I1dzhfdvSlZPP6vFC9y
-         EXDHn6OJw1RgY5FB6SHLD36LEvTno+TGZlONX7rAw4rctwaDKHSDXM+Y4/+I+ruzhI4E
-         BlnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXB/bEiMY91aZuCmA6022sWgwDumotyqfL2TgS6+xXH62fFDfhfbcZOJ3oqhoPsO5/QToyZMvbtwftJmCX+zPhQXgYb3rcyqSQyKZ5TtURzInlqHxMt+KUlwj7IIE1A4B2zPACY1BM7aVbcphfjj9QNtRw/p9NnGPlJ8xm2UPNXihNFkV0GoXMURw==
-X-Gm-Message-State: AOJu0YwXhH9RpyQZ0QIWZQBM6UAsghKrpamsobJ3ZNdyCGiOOQ7WpPAO
-	YeTx1P7cwswmmbTczerv1ymPwZcGAs1a0gi185S8MDC0ngIK7joLBVaxnQ==
-X-Google-Smtp-Source: AGHT+IHyjaZebrZBLdl2QbomoWKhII/28c0GgEpouwSlQ+Oz3+e7o+jzgs4lXyImEasQd2Q0ltpZ5g==
-X-Received: by 2002:a05:6214:311b:b0:6b5:e51d:441d with SMTP id 6a1803df08f44-6bf7ce81df7mr8712666d6.41.1723757640289;
-        Thu, 15 Aug 2024 14:34:00 -0700 (PDT)
+        bh=boY978HFCv0Axv89OgNUkRO86F3ZJlrIJAY5GpXOUpE=;
+        b=L9MZtilolDorsuSpLpwKk2M781q1fGvWJz3xCt2e6vf4WPtjT7GXbGmOmawywdRxP7
+         9XTMG6FOZrbPhMPkQ3VbxeRy5UETZsKQyDwjtM0BhoPtKTaYmiwkqpx3bHSioYdFY4zH
+         VdnJgxBao9kPFR9gUPbbWKF5H3KLqpaXhLfrZ++RXkFHgUq+FmJDo172uA7Clt41kzq9
+         l7O3eQVkFLITDMU5CditVcoeqsCpL45BBoCNDY/2H5YgNZ27F4CpJxBnLc2AjcjNzSTB
+         NSKliAADTWx+uiqhgRAqvwgz61P9k70N6gfcYwhV1x/NpMn1CAmCASSR6jjnvW8xxQFy
+         77RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmHGReelh2Jo5Qko2Z1MG3FCMYpGPv67hwh3Us9Cp8xVQC6lbMBwQP8Q0Krt5CW0/bpKDWQvMBBIQwGcDjk2+g0192CJ6Mjs8IHtRARLxdUY1EkvxV6PNkJEuXkokj5paFHUnl85yKJXCdB1r+BQ63CoAh5aKZVXjcU04rl7itWRyD+QTqw6NmqQ==
+X-Gm-Message-State: AOJu0YxXPI1wp5WtspCV3cbps3CR8uvn7D9jBwcJGUZZgsjNRXnDkOdf
+	Wo8nrpBLPD102lYCYviG3Twbff611KHefrseS7h6BQRSJ19wg+Jx
+X-Google-Smtp-Source: AGHT+IGbhxYMBCHqihTCooTG4du3cUopb5vduPPerg+ffjGVv6XPT3/iDHDtos+Da8vlG8UNXZJC+w==
+X-Received: by 2002:a05:6808:1820:b0:3db:15ed:2a21 with SMTP id 5614622812f47-3dd3acfa64cmr1034563b6e.16.1723757791103;
+        Thu, 15 Aug 2024 14:36:31 -0700 (PDT)
 Received: from fauth1-smtp.messagingengine.com (fauth1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fec909dsm10004816d6.100.2024.08.15.14.33.59
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4536a072683sm9473611cf.85.2024.08.15.14.36.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 14:34:00 -0700 (PDT)
-Received: from phl-compute-05.internal (phl-compute-05.nyi.internal [10.202.2.45])
-	by mailfauth.nyi.internal (Postfix) with ESMTP id 6F32B120006A;
-	Thu, 15 Aug 2024 17:33:59 -0400 (EDT)
+        Thu, 15 Aug 2024 14:36:30 -0700 (PDT)
+Received: from phl-compute-03.internal (phl-compute-03.nyi.internal [10.202.2.43])
+	by mailfauth.nyi.internal (Postfix) with ESMTP id 5A9331200068;
+	Thu, 15 Aug 2024 17:36:30 -0400 (EDT)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Thu, 15 Aug 2024 17:33:59 -0400
-X-ME-Sender: <xms:R3S-Zmtx8AtLrCuWhjcdz0WHaLAJYJZUhG74nO6eKFu9uElSS8aRzg>
-    <xme:R3S-ZreI4LvldSiKftaUZc7iFTzc2G1GWgl8RRAZBxV7lfnkNI3zbpb8AKLngncjS
-    iYmVBbdWpys5cgBIw>
-X-ME-Received: <xmr:R3S-Zhz4gmsnCom0A1kchwZEwM1aGTo1q0BPVnUTe5ldDVDm4-G2qqa2OrfwHQ>
+  by phl-compute-03.internal (MEProxy); Thu, 15 Aug 2024 17:36:30 -0400
+X-ME-Sender: <xms:3nS-Zh97Rn47S3nNlIMTGYPHjGjNXMr8VvTVZqY1uRgg0MLlirRNXw>
+    <xme:3nS-ZltiKsGowxoHuMsn1zs3iTOa0Ye93A5f7C_f2I-Q1Um7AhGU3c3jsoM6_3N8w
+    ThZQ1-h9Jl98kR6lQ>
+X-ME-Received: <xmr:3nS-ZvD6reDnZBPwYnax44rGohxmR8uD9DbrBezYSH9e0kBp719IDuVHeSC47w>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddtjedgtdduucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
     rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
@@ -73,40 +73,41 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddtjedgtdduucetufdoteggod
     qhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqd
     dujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihm
     vgdrnhgrmhgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtg
-    hpthhtohepghgrrhihsehgrghrhihguhhordhnvghtpdhrtghpthhtoheprghlihgtvghr
-    hihhlhesghhoohhglhgvrdgtohhmpdhrtghpthhtohepnhhmihesmhgvthgrshhprggtvg
-    drughkpdhrtghpthhtoheprgigsghovgeskhgvrhhnvghlrdgukhdprhgtphhtthhopeho
-    jhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrghgrhihnohhrse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepfigvughsohhnrghfsehgmhgrihhlrdgtohhm
-    pdhrtghpthhtoheprgdrhhhinhgusghorhhgsehsrghmshhunhhgrdgtohhmpdhrtghpth
-    htohepughirhhkrdgsvghhmhgvseguvgdrsghoshgthhdrtghomh
-X-ME-Proxy: <xmx:R3S-ZhM4YLjHI78r4CyfKqn3lIhQvygtXm_VRCIzoefGFxw0P273cQ>
-    <xmx:R3S-Zm-2IFvQJX9Y6li0ow_HJ0IETduUQHw3CAl-szxy-SsdkP4CTw>
-    <xmx:R3S-ZpUDECKxhGqQXvs9tSCbcPSkxpIakpwYicQ-kA7YIAEvMnxpnA>
-    <xmx:R3S-Zvf1AtqWRnSzpo1m9WaFsnTDm_EqJI9DRJG6yIpE2YtfXUHoEA>
-    <xmx:R3S-Zgdxo3bHZbm78QcLFWWXfECPyJSnPk5UNTyeMuxZs4YdXuq5PjvE>
+    hpthhtohepsggvnhhnohdrlhhoshhsihhnsehprhhothhonhdrmhgvpdhrtghpthhtohep
+    rghlihgtvghrhihhlhesghhoohhglhgvrdgtohhmpdhrtghpthhtohepnhhmihesmhgvth
+    grshhprggtvgdrughkpdhrtghpthhtoheprgigsghovgeskhgvrhhnvghlrdgukhdprhgt
+    phhtthhopehojhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrgh
+    grhihnohhrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepfigvughsohhnrghfsehgmhgr
+    ihhlrdgtohhmpdhrtghpthhtoheprgdrhhhinhgusghorhhgsehsrghmshhunhhgrdgtoh
+    hmpdhrtghpthhtohepughirhhkrdgsvghhmhgvseguvgdrsghoshgthhdrtghomh
+X-ME-Proxy: <xmx:3nS-ZlfkqrNaOvWi4oAKNEjASFLSMC2-g1wyGsy2GiJD2a2WiTCXjg>
+    <xmx:3nS-ZmMnYTdLhMQTVikRoFqIhCjJ1ySV2CouDGsQqOBU4Cs7U3ffRA>
+    <xmx:3nS-ZnlT64cKgfhWWvn-V5O6Gj2om1aWEWzGP7ypo8ROILP5OYItrw>
+    <xmx:3nS-ZgvSWqA1DMwlRmmS9A5-O5Ks6ftrcGZuVkXyfK-t_XzFplmTBQ>
+    <xmx:3nS-ZosdNhQK2cBj6S8_11HVCromYbVQT9w4Y4vIF9l098gTfloBLpw5>
 Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 15 Aug 2024 17:33:58 -0400 (EDT)
-Date: Thu, 15 Aug 2024 14:32:28 -0700
+ 15 Aug 2024 17:36:29 -0400 (EDT)
+Date: Thu, 15 Aug 2024 14:34:59 -0700
 From: Boqun Feng <boqun.feng@gmail.com>
-To: Gary Guo <gary@garyguo.net>
+To: Benno Lossin <benno.lossin@proton.me>
 Cc: Alice Ryhl <aliceryhl@google.com>, Andreas Hindborg <nmi@metaspace.dk>,
 	Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>,
 	Alex Gaynor <alex.gaynor@gmail.com>,
 	Wedson Almeida Filho <wedsonaf@gmail.com>,
 	Andreas Hindborg <a.hindborg@samsung.com>,
 	"Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>,
+	Gary Guo <gary@garyguo.net>,
 	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 2/2] rust: block: fix wrong usage of lockdep API
-Message-ID: <Zr5z7N2JCMBbQ_YK@boqun-archlinux>
+Message-ID: <Zr50gxz8oH-mcuMq@boqun-archlinux>
 References: <20240815074519.2684107-1-nmi@metaspace.dk>
  <20240815074519.2684107-3-nmi@metaspace.dk>
  <CAH5fLgih1QtO-ACyoifNsgqd=VtJimoGV+aD=3iHG0wb+iDGyw@mail.gmail.com>
- <20240815200738.096dca4a.gary@garyguo.net>
+ <10ae8a5a-5dbc-4d6a-8f86-30236dacc5b3@proton.me>
+ <5b251842-564c-4b7a-8d4d-d7fc2b1b857c@proton.me>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -116,90 +117,68 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240815200738.096dca4a.gary@garyguo.net>
+In-Reply-To: <5b251842-564c-4b7a-8d4d-d7fc2b1b857c@proton.me>
 
-On Thu, Aug 15, 2024 at 08:07:38PM +0100, Gary Guo wrote:
-> On Thu, 15 Aug 2024 10:04:56 +0200
-> Alice Ryhl <aliceryhl@google.com> wrote:
-> 
-> > On Thu, Aug 15, 2024 at 9:49 AM Andreas Hindborg <nmi@metaspace.dk> wrote:
-> > >
-> > > From: Andreas Hindborg <a.hindborg@samsung.com>
-> > >
-> > > When allocating `struct gendisk`, `GenDiskBuilder` is using a dynamic lock
-> > > class key without registering the key. This is incorrect use of the API,
-> > > which causes a `WARN` trace. This patch fixes the issue by using a static
-> > > lock class key, which is more appropriate for the situation anyway.
-> > >
-> > > Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
-> > > Reported-by: "Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>
-> > > Closes: https://rust-for-linux.zulipchat.com/#narrow/stream/288089-General/topic/6.2E11.2E0-rc1.3A.20rust.2Fkernel.2Fblock.2Fmq.2Ers.3A.20doctest.20lock.20warning
-> > > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>  
+On Thu, Aug 15, 2024 at 07:15:43PM +0000, Benno Lossin wrote:
+> On 15.08.24 21:05, Benno Lossin wrote:
+> > On 15.08.24 10:04, Alice Ryhl wrote:
+> >> On Thu, Aug 15, 2024 at 9:49 AM Andreas Hindborg <nmi@metaspace.dk> wrote:
+> >>>
+> >>> From: Andreas Hindborg <a.hindborg@samsung.com>
+> >>>
+> >>> When allocating `struct gendisk`, `GenDiskBuilder` is using a dynamic lock
+> >>> class key without registering the key. This is incorrect use of the API,
+> >>> which causes a `WARN` trace. This patch fixes the issue by using a static
+> >>> lock class key, which is more appropriate for the situation anyway.
+> >>>
+> >>> Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
+> >>> Reported-by: "Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>
+> >>> Closes: https://rust-for-linux.zulipchat.com/#narrow/stream/288089-General/topic/6.2E11.2E0-rc1.3A.20rust.2Fkernel.2Fblock.2Fmq.2Ers.3A.20doctest.20lock.20warning
+> >>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> >>
+> >> LGTM. This makes me wonder if there's some design mistake in how we
+> >> handle lock classes in Rust.
 > > 
-> > LGTM. This makes me wonder if there's some design mistake in how we
-> > handle lock classes in Rust.
+> > So `LockClassKey::new` doesn't initialize the `lock_class_key` and is
+> > also movable. I think in this case we either just overlooked it or
+> > thought that the C side would initialize it.
 > > 
-> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> > For those people that know about this, are there APIs that initialize
+> > `lock_class_key` themselves? (ie not a function to initialize a lock
+> > class key, but rather an API like `__blk_mq_alloc_disk`)
+> > Because if it is usually expected that the class key is already
+> > initialized, then I think we should change our abstraction.
 > 
-> I agree. The API that we current have is designed without much
-> consideration into dynamically allocated keys, and we use `&'static
-> LockClassKey` in a lot of kernel crate APIs.
-> 
-> This arguably is wrong, because presence of `&'static LockClassKey`
-> doesn't mean the key is static. If we do a
-> `Box::leak(Box::new(LockClassKey::new()))`, then this is a `&'static
-> LockClassKey`, but lockdep wouldn't consider this as a static object.
-> 
-> Maybe we should make the `new` function unsafe.
+> Sorry, I got confused, this has nothing to do with initialization.
 > 
 
-I think a more proper fix is to make LockClassKey pin-init, for
-dynamically allocated LockClassKey, we just use lockdep_register_key()
-as the initializer and lockdep_unregister_key() as the desconstructor.
-And instead of a `&'static LockClassKey`, we should use `Pin<&'static
-LockClassKey>` to pass a lock class key. Of course we will need some
-special treatment on static allocated keys (e.g. assume they are
-initialized since lockdep doesn't require initialization for them).
-
-
-Pin initializer:
-
-	impl LockClassKey {
-	    pub fn new() -> impl PinInit<Self> {
-		pin_init!(Self {
-		    inner <- Opaque::ffi_init(|slot| { lockdep_register_key(slot) })
-		})
-	    }
-	}
-
-LockClassKey::new_uninit() for `static_lock_class!`:
-
-
-	impl LockClassKey {
-	    pub const fn new_uninit() -> MaybeUninit<Self> {
-	        ....
-	    }
-	}
-
-and the new `static_lock_class!`:
-
-	macro_rules! static_lock_class {
-	    () => {{
-		static CLASS: MaybeUninit<$crate::sync::LockClassKey> = $crate::sync::LockClassKey::new_uninit();
-
-	        // SAFETY: `CLASS` is pinned because it's static
-		// allocated. And it's OK to assume it's initialized
-		// because lockdep support uninitialized static
-		// allocated key.
-		unsafe { Pin::new_unchecked(CLASS.assume_init_ref()) }
-	    }};
-	}
-
-Thoughts?
+For static allocated key, no initialization is needed, for dynamic
+allocated key, lockdep_register_key() will need to be called before
+using the key.
 
 Regards,
 Boqun
 
-> For the patch itself:
+> ---
+> Cheers,
+> Benno
 > 
-> Reviewed-by: Gary Guo <gary@garyguo.net>
+> > Additionally, I think that it needs to be pinned, since it contains an
+> > `struct hlist_node` (I might be wrong on this, but that looks and sounds
+> > like an intrusive linked list).
+> > 
+> > Also the `new` function is probably prone for misuse, since it will
+> > create a new lock class key every time it is run. But as I learned in
+> > [1], the more common use-case is a single lock class key for several
+> > locks. Therefore it might be a good idea to at least rename it to
+> > `new_dynamic` or similar and add appropriate documentation pointing to
+> > `static_lock_class!`.
+> > 
+> > [1]: https://rust-for-linux.zulipchat.com/#narrow/stream/288089-General/topic/.E2.9C.94.206.2E11.2E0-rc1.3A.20rust.2Fkernel.2Fblock.2Fmq.2Ers.3A.20doctest.20lock.20warning/near/460074755
+> > 
+> > ---
+> > Cheers,
+> > Benno
+> > 
+> > 
+> 
