@@ -1,132 +1,134 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9AC10FF
-	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 01:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115FBBA20;
+	Thu, 15 Aug 2024 01:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723686162; cv=none; b=XFlUO69Zn/UIhj2xa3CHlJLVNI68YfulfRcoRhOriGSssESW54ZeZXZ52PQW0XVUWJP0qkIirGL8bDUDa2BSqdWcQDC9jLhi2QqSA2T3JUkmxk6surIchZNiV8glDwvvtgnRyYk7+aPjy3Azhzlm/h7PpstkwAE0V5dgchWsDa8=
+	t=1723686865; cv=none; b=VP3Im9mC27effFVF48YQkXh8LULiqlIXykFZKawK0OSfkMTDwo+g5vcA0/FyjMaimTsmsAPtQs6BARaj7zMGSDtAbqDZFXA1Gm2VLBpnXUxU0mm2y3nL30Ws9VvMHmQqMxhQ2byPySm0pAfaFCCOYxyoAKDmVBzaSuCbV33dKwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723686162; c=relaxed/simple;
-	bh=E6FKHKidRonGKOHEN40H7P70gEg4mgWPuWn21CDjAUQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aglzQvK3YCAJkEWh0cEc6bdVvYGu/OWP/A8HV3NcHjYWjM5X4x9oZFX7AoyC7M5nlL4KfY2MGRMx0ARJcCHG7zky3hxZNk3f6qhWwRodci13oO6ekOX2Wzf/EmnJjyP/54TFhs2Z6VJb6GhxkZsBseZAjmugAsjXe0lFlU6Tmj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UecL9i5D; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UecL9i5D"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723686159;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SDO7p1/rCt/Ulp3/NJW+f3wt6sswEX3iXmzKx2IC/YQ=;
-	b=UecL9i5DgLJ1s01aef+sVOxzH2/5byQVcBFlxc/qAvJaLA9tYFgHsvK0Zqx2QvKvPVCBsf
-	M8mOvsF+C8wrdpKHpSmC9iwnF+fDsFi9/nJ+VOHoXHpd09OH8Yi5JchwmmzBdKwnc1++p6
-	NqFtoCh+cy/LkHsbXVpBtw/5zL9YL2o=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-592-2If6Px_OM5quuGkZX88g6g-1; Wed, 14 Aug 2024 21:42:37 -0400
-X-MC-Unique: 2If6Px_OM5quuGkZX88g6g-1
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-81ef745969aso2708241.1
-        for <linux-block@vger.kernel.org>; Wed, 14 Aug 2024 18:42:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723686157; x=1724290957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SDO7p1/rCt/Ulp3/NJW+f3wt6sswEX3iXmzKx2IC/YQ=;
-        b=ao5iXXDPwtK5cO0hyWyJmJG/FfTuDREnfa1oqI7pNXLQ4tZWwdeAKp2UGP551JQBc1
-         etkBg11QpyYCmglx9xb7pXCuCDzxXTefCRxWz0wAwoR8ElffFEkOEUddynY5cXxHtmdc
-         Lk5vMpF1VUmAIbMTCspYQLsSGBGYhywI4S8FNo7NhX+K5gKZFO2xXBl52ApRrfcdqB5W
-         fwCYd4Ox8dsYH2c78peRNvrCqWEKhq89xzobn+PWlNHEYPIMRPSvOcV3SjIm3DR+84bh
-         H9b78De/tCHTSKDD+xWFUQq/Swtixm96hTvlJn8zhuGHMwEXGye7ygqmiT8Gk+rwSgN+
-         UXnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXkSh3YT3RaGkizAAgnDhFGVsIBCU2SQAjWYbMzM0RUycIChLwgw1NPFdix35PBnV7RQg9kZ4LBtcAY8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrDwyoS97ryU2ASZ/8/vm+slqgN44/pE5fdVM80Y1+Cx7/6orM
-	+x8rOnW3V5FO9GjkLqtmPbb/5DZ4Rd+hYmKoBLhr0D+oxgDYt1SY9isLVhICmQVmFgYMbpcaAoi
-	pLfkmbIZF4794UiElJOw/iGFXkYKoceYgC7saMcAjldiHm3qOyDZ+zO7kW6z+gjip7xFFY1QIol
-	aPsqo4zFGUWNY1/+IqFaYN/izvB4NbgYJGypg=
-X-Received: by 2002:a05:6122:1685:b0:4f5:312a:658a with SMTP id 71dfb90a1353d-4fc5aa5ccdamr732816e0c.0.1723686157202;
-        Wed, 14 Aug 2024 18:42:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGkXgg3KEei4df4ZQe2BBMOv0cgXLjhI//+DZyaCr9SlaZy09JMcILmazo/fy8v4koEzrDcRzwJjOp/HiyDrY=
-X-Received: by 2002:a05:6122:1685:b0:4f5:312a:658a with SMTP id
- 71dfb90a1353d-4fc5aa5ccdamr732804e0c.0.1723686156775; Wed, 14 Aug 2024
- 18:42:36 -0700 (PDT)
+	s=arc-20240116; t=1723686865; c=relaxed/simple;
+	bh=9Vt7bZj3r8ykVXUlYSK9XbLtW9JOWLDtf3YeFYfQX9A=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=QTpiQuYMkHpWFVerwC49QWCde3hr2KfqqAPLUws1MtVVLpVPFIjplgBMkcNzhP/HdceirMPKvSd9ryV3c4KhrwISZGiIrj1HiuTeRElT3m31QNK6hL8aES3DP8etLvIFGuSj3JoxphMxQmzgoamxR4rODv98jzieTgUrkicY/PA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Wkp7x4Qxcz4f3js2;
+	Thu, 15 Aug 2024 09:54:05 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 66BDB1A0568;
+	Thu, 15 Aug 2024 09:54:19 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgAHL4XJX71mMjTkBg--.10385S3;
+	Thu, 15 Aug 2024 09:54:19 +0800 (CST)
+Subject: Re: [PATCH] block: Fix potential deadlock warning in
+ blk_mq_mark_tag_wait
+To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+ Li Lingfeng <lilingfeng@huaweicloud.com>, hch@lst.de, jack@suse.cz,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yukuai1@huaweicloud.com, houtao1@huawei.com, yi.zhang@huawei.com,
+ yangerkun@huawei.com, lilingfeng3@huawei.com, "yukuai (C)"
+ <yukuai3@huawei.com>
+References: <20240814113542.911023-1-lilingfeng@huaweicloud.com>
+ <ad92f738-9ba5-4cfc-aef5-3918a35e77ec@acm.org>
+ <6e729890-7374-4335-ab7d-ead00775057e@kernel.dk>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <a3271107-f6d2-a689-78d5-f98d53fd497b@huaweicloud.com>
+Date: Thu, 15 Aug 2024 09:54:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1723601133.git.asml.silence@gmail.com> <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
-In-Reply-To: <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Thu, 15 Aug 2024 09:42:24 +0800
-Message-ID: <CAFj5m9+CXS_b5kgFioFHTWivb6O+R9HytsSQEHcEzUM5SqHfgw@mail.gmail.com>
-Subject: Re: [RFC 5/5] block: implement io_uring discard cmd
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <6e729890-7374-4335-ab7d-ead00775057e@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAHL4XJX71mMjTkBg--.10385S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF4rCFWxJrWxJr17Jw1UZFb_yoW8Zw45pF
+	WxXan8Kan8JrZ29w4jkrsFvr1S9ws5Wr13Jrn5Wr45Z34jvr1fWa4xAF1q9FWvgrs3AF4q
+	vr1jq395KF4DA3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Wed, Aug 14, 2024 at 6:46=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> Add ->uring_cmd callback for block device files and use it to implement
-> asynchronous discard. Normally, it first tries to execute the command
-> from non-blocking context, which we limit to a single bio because
-> otherwise one of sub-bios may need to wait for other bios, and we don't
-> want to deal with partial IO. If non-blocking attempt fails, we'll retry
-> it in a blocking context.
->
-> Suggested-by: Conrad Meyer <conradmeyer@meta.com>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  block/blk.h             |  1 +
->  block/fops.c            |  2 +
->  block/ioctl.c           | 94 +++++++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/fs.h |  2 +
->  4 files changed, 99 insertions(+)
->
-> diff --git a/block/blk.h b/block/blk.h
-> index e180863f918b..5178c5ba6852 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -571,6 +571,7 @@ blk_mode_t file_to_blk_mode(struct file *file);
->  int truncate_bdev_range(struct block_device *bdev, blk_mode_t mode,
->                 loff_t lstart, loff_t lend);
->  long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
-> +int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)=
-;
->  long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long =
-arg);
->
->  extern const struct address_space_operations def_blk_aops;
-> diff --git a/block/fops.c b/block/fops.c
-> index 9825c1713a49..8154b10b5abf 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -17,6 +17,7 @@
->  #include <linux/fs.h>
->  #include <linux/iomap.h>
->  #include <linux/module.h>
-> +#include <linux/io_uring/cmd.h>
->  #include "blk.h"
->
->  static inline struct inode *bdev_file_inode(struct file *file)
-> @@ -873,6 +874,7 @@ const struct file_operations def_blk_fops =3D {
->         .splice_read    =3D filemap_splice_read,
->         .splice_write   =3D iter_file_splice_write,
->         .fallocate      =3D blkdev_fallocate,
-> +       .uring_cmd      =3D blkdev_uring_cmd,
+Hi,
 
-Just be curious, we have IORING_OP_FALLOCATE already for sending
-discard to block device, why is .uring_cmd added for this purpose?
+在 2024/08/15 4:22, Jens Axboe 写道:
+> On 8/14/24 1:52 PM, Bart Van Assche wrote:
+>> On 8/14/24 4:35 AM, Li Lingfeng wrote:
+>>> When interrupt is turned on while a lock holding by spin_lock_irq it
+>>> throws a warning because of potential deadlock.
+>>
+>> Which tool reported the warning? Please mention this in the patch
+>> description.
+>>>
+>>> blk_mq_mark_tag_wait
+>>>    spin_lock_irq(&wq->lock)
+>>>         --> turn off interrupt and get lockA
+>>>    blk_mq_get_driver_tag
+>>>     __blk_mq_tag_busy
+>>>      spin_lock_irq(&tags->lock)
+>>>      spin_unlock_irq(&tags->lock)
+>>>         --> release lockB and turn on interrupt accidentally
+
+This looks correct, however, many details are hidden:
+
+t1: IO dispatch
+blk_mq_prep_dispatch_rq
+  blk_mq_get_driver_tag
+   __blk_mq_get_driver_tag
+    __blk_mq_alloc_driver_tag
+     blk_mq_tag_busy -> tag is already busy
+     // failed to get driver tag
+
+  blk_mq_mark_tag_wait
+   spin_lock_irq(&wq->lock) -> lock A
+   __add_wait_queue(wq, wait) -> wait queue active
+   blk_mq_get_driver_tag
+   __blk_mq_tag_busy
+-> 1) tag must be idle, which means there can't be inflight IO
+    spin_lock_irq(&tags->lock) -> lock B
+    spin_unlock_irq(&tags->lock) -> unlock B
+-> 2) context must be preempt by IO interrupt to trigger deadlock.
+
+So, the deadlock is not possible in theory, there can't be inflight IO
+if __blk_mq_tag_busy what to hold the second lock, while deadlock
+require IO to be done.
+
+Any way, the change looks good to me.
 
 Thanks,
+Kuai
+
+>>
+>> The above call chain does not match the code in Linus' master tree.
+>> Please fix this.
+>>
+>>> Fix it by using spin_lock_irqsave to get lockB instead of spin_lock_irq.
+>>> Fixes: 4f1731df60f9 ("blk-mq: fix potential io hang by wrong 'wake_batch'")
+>>> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+>>
+>> Please leave a blank line between the patch description and the section
+>> with tags.
+> 
+> Please just include the actual lockdep trace rather than a doctored up
+> one, it's a lot more descriptive. And use the real lock names rather
+> than turn it into hypotheticals.
+> 
 
