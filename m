@@ -1,67 +1,70 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFDA39AEB
-	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 03:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7B6383A5;
+	Thu, 15 Aug 2024 03:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723692883; cv=none; b=Ry3SOY6lCLx11hJn/Mhpe/r5EyGWz6Yd0EMnHLX256zOvL+Cn6mr3eqRdp7zibPVaqMVlKgQRG1sMmwCE9M9UI0Wtgvem+twKqrRt6YpZ69OVjrGVOdjsaXGmuQDMpxS4ZIcV0cLc9jzw8L/vNFjEemUeH8ibhrHxzE2T7azT08=
+	t=1723693876; cv=none; b=d0Zy0bLZPUCUTWfpc4MJpqNHDx96KkiDukZk9f2RMmzDMZENxXoJQKm/FwUlhHko1JLp4IKQxo6x1UQojgNi56lPs3mW2sBfEvp7C9wc7HW0bkCwpmhmfGkcpMLUbZX8pyVHjKtLzPZkfDqX79Fj0HQouKMXkJeParKYL1alPEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723692883; c=relaxed/simple;
-	bh=jc9sBh8DnOYiFOcaqDcoGd3baG4qz+wX3LpE+ghM+qA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZhoUZao+w38wtjBsxGsq5LTxQ9z/lht7iGtk0t8YOLPqDrD2tIOy/s3qul4hHArV7NS0wbyjsU+pu8EW7l37EI7y7kEYxb08v2ViqfxLqFt8PGptTJ8q6ykNHByl2xZEsQcsyJaSjXbXvIY+VqmfzjkXSqoVwI1dPOB8gmRTJxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hqFw0TFK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hqFw0TFK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723692879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6K1TI3jnfsF1USfFDB2QIyPomo8kjJEpGvQ1xDYo0cg=;
-	b=hqFw0TFKS0DugC1AVIvSSdo0268jjdtJOnB3ML+WVXxaqxq6ov/pkEy2S6G2phP+uZy8AG
-	GOzQUTf35wCrsitNzyY3Hq+MaN28mFzSjKk9QWSLCbVtfLFYkKgy+ahoxDgE5dXBd9J956
-	G671pfaHRfv/k1WpwZKfeS0jPDEry7k=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-z-y9NpPmOIqFoDPIrUtwRg-1; Wed,
- 14 Aug 2024 23:34:34 -0400
-X-MC-Unique: z-y9NpPmOIqFoDPIrUtwRg-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAD8F1944EBA;
-	Thu, 15 Aug 2024 03:34:31 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.87])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 672E619560AA;
-	Thu, 15 Aug 2024 03:34:19 +0000 (UTC)
-Date: Thu, 15 Aug 2024 11:34:14 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: axboe@kernel.dk, bvanassche@acm.org, hch@lst.de, jack@suse.cz,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yukuai1@huaweicloud.com, yukuai3@huawei.com, houtao1@huawei.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com, lilingfeng3@huawei.com
+	s=arc-20240116; t=1723693876; c=relaxed/simple;
+	bh=U0TBTbxXEIpezm0dT4/KMAvaTf0c0uReoXdHZJpUOe8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=XOcN4P3q/ZrSA3ZTzGiI5zR3/gvK6KyvS+kbubML9CEFQJPky5KrWqgHemT8xSy5IP7/uNTEIeD/9eyUsSF6Jv0LDSEgj9IlrRN+/AEqCbSyZ7LWVebKr0xAwlf53OLgvo2Y6p9AZcpFfmOejp9Lw/eN+7ilriAvROf+pLO7NwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Wkrkp4Mqsz4f3jjk;
+	Thu, 15 Aug 2024 11:50:58 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 00F931A058E;
+	Thu, 15 Aug 2024 11:51:07 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgAHL4Uoe71mbAHsBg--.13791S3;
+	Thu, 15 Aug 2024 11:51:06 +0800 (CST)
 Subject: Re: [PATCH v2] block: Fix lockdep warning in blk_mq_mark_tag_wait
-Message-ID: <Zr13NpFfPgMtGJas@fedora>
+To: Li Lingfeng <lilingfeng@huaweicloud.com>, axboe@kernel.dk,
+ bvanassche@acm.org, hch@lst.de, jack@suse.cz, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: yukuai1@huaweicloud.com, houtao1@huawei.com, yi.zhang@huawei.com,
+ yangerkun@huawei.com, lilingfeng3@huawei.com, "yukuai (C)"
+ <yukuai3@huawei.com>
 References: <20240815024736.2040971-1-lilingfeng@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5fe25552-66ac-6859-9c11-85dff75d517e@huaweicloud.com>
+Date: Thu, 15 Aug 2024 11:51:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20240815024736.2040971-1-lilingfeng@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAHL4Uoe71mbAHsBg--.13791S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw17ZrW8KF17JF4xtr4rGrg_yoWDGr4kpF
+	4aqaySkw40gryaqws2kwsFqrWxCa1DWFnrGrZ7GF1fXF1xCr47JF18Cr10grWUCrWkCFsx
+	AF1qgrW8XF4qyrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Thu, Aug 15, 2024 at 10:47:36AM +0800, Li Lingfeng wrote:
+ÔÚ 2024/08/15 10:47, Li Lingfeng Ð´µÀ:
 > From: Li Lingfeng <lilingfeng3@huawei.com>
 > 
 > Lockdep reported a warning in Linux version 6.6:
@@ -120,7 +123,7 @@ On Thu, Aug 15, 2024 at 10:47:36AM +0800, Li Lingfeng wrote:
 > [  414.365629] softirqs last  enabled at (428444): [<ffffffff85474780>] __do_softirq+0x540/0x7a2
 > [  414.366522] softirqs last disabled at (428419): [<ffffffff813f65ab>] irq_exit_rcu+0x14b/0x1a0
 > [  414.367425]
->                other info that might help us debug this:
+>                 other info that might help us debug this:
 > [  414.368194]  Possible unsafe locking scenario:
 > [  414.368900]        CPU0
 > [  414.369225]        ----
@@ -128,7 +131,7 @@ On Thu, Aug 15, 2024 at 10:47:36AM +0800, Li Lingfeng wrote:
 > [  414.370000]   <Interrupt>
 > [  414.370342]     lock(&sbq->ws[i].wait);
 > [  414.370802]
->                 *** DEADLOCK ***
+>                  *** DEADLOCK ***
 > [  414.371569] 5 locks held by kworker/u10:3/1152:
 > [  414.372088]  #0: ffff88810130e938 ((wq_completion)writeback){+.+.}-{0:0}, at: process_scheduled_works+0x357/0x13f0
 > [  414.373180]  #1: ffff88810201fdb8 ((work_completion)(&(&wb->dwork)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x3a3/0x13f0
@@ -136,7 +139,7 @@ On Thu, Aug 15, 2024 at 10:47:36AM +0800, Li Lingfeng wrote:
 > [  414.375342]  #3: ffff88810edd1098 (&sbq->ws[i].wait){+.?.}-{2:2}, at: blk_mq_dispatch_rq_list+0x131c/0x1ee0
 > [  414.376377]  #4: ffff888106205a08 (&hctx->dispatch_wait_lock){+.-.}-{2:2}, at: blk_mq_dispatch_rq_list+0x1337/0x1ee0
 > [  414.378607]
->                stack backtrace:
+>                 stack backtrace:
 > [  414.379177] CPU: 0 PID: 1152 Comm: kworker/u10:3 Not tainted 6.6.0-07439-gba2303cacfda #6
 > [  414.380032] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
 > [  414.381177] Workqueue: writeback wb_workfn (flush-253:0)
@@ -205,19 +208,19 @@ On Thu, Aug 15, 2024 at 10:47:36AM +0800, Li Lingfeng wrote:
 > throws a warning because of potential deadlock.
 > 
 > blk_mq_prep_dispatch_rq
->  blk_mq_get_driver_tag
->   __blk_mq_get_driver_tag
->    __blk_mq_alloc_driver_tag
->     blk_mq_tag_busy -> tag is already busy
->     // failed to get driver tag
->  blk_mq_mark_tag_wait
->   spin_lock_irq(&wq->lock) -> lock A (&sbq->ws[i].wait)
->   __add_wait_queue(wq, wait) -> wait queue active
 >   blk_mq_get_driver_tag
->   __blk_mq_tag_busy
+>    __blk_mq_get_driver_tag
+>     __blk_mq_alloc_driver_tag
+>      blk_mq_tag_busy -> tag is already busy
+>      // failed to get driver tag
+>   blk_mq_mark_tag_wait
+>    spin_lock_irq(&wq->lock) -> lock A (&sbq->ws[i].wait)
+>    __add_wait_queue(wq, wait) -> wait queue active
+>    blk_mq_get_driver_tag
+>    __blk_mq_tag_busy
 > -> 1) tag must be idle, which means there can't be inflight IO
->    spin_lock_irq(&tags->lock) -> lock B (hctx->tags)
->    spin_unlock_irq(&tags->lock) -> unlock B, turn on interrupt accidentally
+>     spin_lock_irq(&tags->lock) -> lock B (hctx->tags)
+>     spin_unlock_irq(&tags->lock) -> unlock B, turn on interrupt accidentally
 > -> 2) context must be preempt by IO interrupt to trigger deadlock.
 > 
 > As shown above, the deadlock is not possible in theory, but the warning
@@ -228,8 +231,39 @@ On Thu, Aug 15, 2024 at 10:47:36AM +0800, Li Lingfeng wrote:
 > Fixes: 4f1731df60f9 ("blk-mq: fix potential io hang by wrong 'wake_batch'")
 > Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+LGTM
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-Thanks,
-Ming
+Thanks
+> ---
+>   block/blk-mq-tag.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index cc57e2dd9a0b..2cafcf11ee8b 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -38,6 +38,7 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+>   void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>   {
+>   	unsigned int users;
+> +	unsigned long flags;
+>   	struct blk_mq_tags *tags = hctx->tags;
+>   
+>   	/*
+> @@ -56,11 +57,11 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>   			return;
+>   	}
+>   
+> -	spin_lock_irq(&tags->lock);
+> +	spin_lock_irqsave(&tags->lock, flags);
+>   	users = tags->active_queues + 1;
+>   	WRITE_ONCE(tags->active_queues, users);
+>   	blk_mq_update_wake_batch(tags, users);
+> -	spin_unlock_irq(&tags->lock);
+> +	spin_unlock_irqrestore(&tags->lock, flags);
+>   }
+>   
+>   /*
+> 
 
