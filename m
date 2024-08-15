@@ -1,434 +1,266 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983F910F1;
-	Thu, 15 Aug 2024 01:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3F6383A3;
+	Thu, 15 Aug 2024 02:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723687198; cv=none; b=Tj+1w4kCTARIRkosnPeXjJsn7sfVERmxQqjdBZRT43kBfGk+Af1Xj0QE19PObLmt4GD95twSVgUWQE8QHQU98r9uTgaWDUumTQKVTE3YUcc3rgjAYTky/jHsinjHKZB5k4q56XnIc5+U1+Q26Ca0IbEmOBCR5por0XFMOH/mnAE=
+	t=1723690323; cv=none; b=s4nsfVPTqM1XVolHmOAN5n0Uqq0lKhKPLtzDedWuvCerwyamDbJT/gSBVB+XmwmwVO7sNFhJS3hx+Pz0YKhTb0Q8hF4Rdy6j3EwOYerUKCOVCUpWlURSG+N6GtrVUoLAJcUfx0BoWm8t0xnDkkF1KGaqI5I7USKh+7rPAQ3+stA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723687198; c=relaxed/simple;
-	bh=P8cL7PJL3H6XupR00I33XgtMFOknii2H/OBA/mUEbqA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hMd9snJ1UArI8lcOcM321chv79aY75L5bgj3b1lt0qmIemyf8i8NPc6ovO/KLnJVToYqp0+hRnGagL/Bhq4cTB8NHTpZ1XgQ1UFTLIH+gX+KfBYWWTA7SmJcEyEEEPBj7KzubfPpan+PXFQ8yu//xnBxNNxGPVydEwuiGoc15gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fWturdic; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fWturdic"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5af326eddb2so2470694a12.1;
-        Wed, 14 Aug 2024 18:59:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723687195; x=1724291995; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F5M2kShGXyDR1Geq5rz4axGkWcle2bfeUFW2zqe1cx8=;
-        b=fWturdic7XoPKrJgRWTbdUiwHFiNI8lbdO4t8y4PjbCFdu0p4mV8kXimw8+/qUNDmJ
-         nl5CzrsJW612Uzw/A+V/GpfpSnTQ+DtIP8LQ2OCldrAV5+U8//mcIJLX7rTrRzbq2fPO
-         YDRBzYLoqtfKa1CSWxL/wvGFp7E6y6qx+5yT8q/+by2oBCd0R3IpI+LIO3bokvKV+fzs
-         0b+kU+gb5j0EUH1BpQKDpSG4m/x/CkpYPUVJlq1eEpWQEym09jGln5h2hXy8QBcg0eLv
-         f40+5HuiXJAAkQCI6uPS3TmKZRWBYhxQKePtc2NcGCk0A1ZPsBj6r/AiLS3NYNtbrB2S
-         i+lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723687195; x=1724291995;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F5M2kShGXyDR1Geq5rz4axGkWcle2bfeUFW2zqe1cx8=;
-        b=eMc8qEBqYym5yjpbbBLAcaryXUCbkadgxI0vt8i6+uSiuV+sRD8MkaB3mSMSYA0N18
-         PYQtw5LJr77Wd3tgEi4Y/tAkU509XLei0JcMYYfa7kWD8PS1GdiBk/ih4LKAyhT8ZUln
-         0VONxFcpXaT1TGaly9Y36HscdV9XTOG2bEM1LVD1hZvQCTo3b5zf5YhRTgiyM1Mmx4PU
-         QE19WvfOrOTuWIbMz9C36iBIPuFeoV84Vf9ATyLv9816Bfw1jQgcqg7jFU+Q4joikiIF
-         200qY29iQjCl9e6+hnsVCFuipWOaaJnZW4+0BHv7NWHqeyFDgC149ITAqXF+TM64ljjH
-         3pjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWpYHDtErl1sxj8nSHuhzut1rWIMgaAlcv3wlKt7CtuU0GMQ+acNHwg78SI+8sG7u8jp1XnDRsKMN02Jmo8Wh8GOxWRe0/DmTcsNl3dtpPdoUj6PmZJ+z2M1MfmBhmMM1fgDbGn3MpMoy35PncCy34CqDBnj885eultHnA7zd0+zc4+
-X-Gm-Message-State: AOJu0YzId3AxebSa3x3/Rv7CLDyJ/s3T6DKP9kYlX2Kmo+9pi15uwf7k
-	6cOPjIF33MK5RLqk2NGfLp0o8BGUzgHA2Iho0+1FgTezi8T/zNoOY40tzoqc2GOClmKc79+4kGx
-	G61qpJzVWh4b3sZ7fTbWxUozOxfU=
-X-Google-Smtp-Source: AGHT+IHyI3/Gx6+mN8IuZMBEsk36H0MA/+wRoo1GrXR1EOE3B074mBwM2t1Ui0ouHOwYM+zv6eMsbiK7yY4mAZdY6oA=
-X-Received: by 2002:a05:6402:26d0:b0:57d:3e48:165d with SMTP id
- 4fb4d7f45d1cf-5beb3a5b193mr1306075a12.4.1723687194447; Wed, 14 Aug 2024
- 18:59:54 -0700 (PDT)
+	s=arc-20240116; t=1723690323; c=relaxed/simple;
+	bh=maS2RJwNGAupAIZKohXruZ2tTcVbp5f+/p4moxjZG6Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cGpYARUk1lIIDW1JBqHOjrnbJnyQMNxa47FBmq/BNJClAKus8N5EHeZpyFta60b96+YhgJ6HDHan7kC6jQrDex5EcFCXDu1l2u0uL5lI8Z1ygbbic93DKCDIjRWIzKEj0PbHXyRTCGkOae5LmAbPvdr+94yr/pXSZvO9crwW8HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WkqQP6FFnz4f3jZL;
+	Thu, 15 Aug 2024 10:51:41 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 3D49A1A058E;
+	Thu, 15 Aug 2024 10:51:51 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgB37IJGbb1mhQ7oBg--.13227S4;
+	Thu, 15 Aug 2024 10:51:50 +0800 (CST)
+From: Li Lingfeng <lilingfeng@huaweicloud.com>
+To: axboe@kernel.dk,
+	bvanassche@acm.org,
+	hch@lst.de,
+	jack@suse.cz,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: yukuai1@huaweicloud.com,
+	yukuai3@huawei.com,
+	houtao1@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	lilingfeng@huaweicloud.com,
+	lilingfeng3@huawei.com
+Subject: [PATCH v2] block: Fix lockdep warning in blk_mq_mark_tag_wait
+Date: Thu, 15 Aug 2024 10:47:36 +0800
+Message-Id: <20240815024736.2040971-1-lilingfeng@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240812150049.8252-1-ioworker0@gmail.com> <zjbn575huc6pk7jpv2ipoayfk4bvfu5z5imb5muk5drksa7p3q@xcr5imtt4zro>
- <9ede36af-fca4-ed41-6b7e-cef157c640bb@huaweicloud.com> <CAK1f24mwzXa8Az5WFYu+1UopTCStDWx3yDr1RugLwphS-hWizw@mail.gmail.com>
- <eef1f655-4fff-618d-4b8e-447230ec8ed9@huaweicloud.com> <7c3499ac-faa7-cc0c-2d90-b8291fce5492@huaweicloud.com>
-In-Reply-To: <7c3499ac-faa7-cc0c-2d90-b8291fce5492@huaweicloud.com>
-From: Lance Yang <ioworker0@gmail.com>
-Date: Thu, 15 Aug 2024 09:59:18 +0800
-Message-ID: <CAK1f24kx7W=aQEodg4eyii6R8a4e-f3MfCbB4ozAV3AV6urdTg@mail.gmail.com>
-Subject: Re: [BUG] cgroupv2/blk: inconsistent I/O behavior in Cgroup v2 with
- set device wbps and wiops
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	cgroups@vger.kernel.org, josef@toxicpanda.com, tj@kernel.org, 
-	fujita.tomonori@lab.ntt.co.jp, boqun.feng@gmail.com, a.hindborg@samsung.com, 
-	paolo.valente@unimore.it, axboe@kernel.dk, vbabka@kernel.org, 
-	david@redhat.com, 21cnbao@gmail.com, baolin.wang@linux.alibaba.com, 
-	libang.li@antgroup.com, "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgB37IJGbb1mhQ7oBg--.13227S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw1rXr4ftFyDKFy7Kw13twb_yoWftF1fpF
+	4aqayayw48Wr12qw4vkanFqr4xCa1DWFnrGrZ7GF1fuF17ur4UXF18Cr10vrWDGrZ7A39r
+	A3WqgrWrXr4DtrUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUFg4SDUUUU
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-On Tue, Aug 13, 2024 at 3:19=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
->
-> Hi,
->
-> =E5=9C=A8 2024/08/13 14:39, Yu Kuai =E5=86=99=E9=81=93:
-> > Hi,
-> >
-> > =E5=9C=A8 2024/08/13 13:00, Lance Yang =E5=86=99=E9=81=93:
-> >> Hi Kuai,
-> >>
-> >> Thanks a lot for jumping in!
-> >>
-> >> On Tue, Aug 13, 2024 at 9:37=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.c=
-om> wrote:
-> >>>
-> >>> Hi,
-> >>>
-> >>> =E5=9C=A8 2024/08/12 23:43, Michal Koutn=C3=BD =E5=86=99=E9=81=93:
-> >>>> +Cc Kuai
-> >>>>
-> >>>> On Mon, Aug 12, 2024 at 11:00:30PM GMT, Lance Yang
-> >>>> <ioworker0@gmail.com> wrote:
-> >>>>> Hi all,
-> >>>>>
-> >>>>> I've run into a problem with Cgroup v2 where it doesn't seem to
-> >>>>> correctly limit
-> >>>>> I/O operations when I set both wbps and wiops for a device.
-> >>>>> However, if I only
-> >>>>> set wbps, then everything works as expected.
-> >>>>>
-> >>>>> To reproduce the problem, we can follow these command-based steps:
-> >>>>>
-> >>>>> 1. **System Information:**
-> >>>>>      - Kernel Version and OS Release:
-> >>>>>        ```
-> >>>>>        $ uname -r
-> >>>>>        6.10.0-rc5+
-> >>>>>
-> >>>>>        $ cat /etc/os-release
-> >>>>>        PRETTY_NAME=3D"Ubuntu 24.04 LTS"
-> >>>>>        NAME=3D"Ubuntu"
-> >>>>>        VERSION_ID=3D"24.04"
-> >>>>>        VERSION=3D"24.04 LTS (Noble Numbat)"
-> >>>>>        VERSION_CODENAME=3Dnoble
-> >>>>>        ID=3Dubuntu
-> >>>>>        ID_LIKE=3Ddebian
-> >>>>>        HOME_URL=3D"https://www.ubuntu.com/"
-> >>>>>        SUPPORT_URL=3D"https://help.ubuntu.com/"
-> >>>>>        BUG_REPORT_URL=3D"https://bugs.launchpad.net/ubuntu/"
-> >>>>>
-> >>>>> PRIVACY_POLICY_URL=3D"https://www.ubuntu.com/legal/terms-and-polici=
-es/privacy-policy"
-> >>>>>
-> >>>>>        UBUNTU_CODENAME=3Dnoble
-> >>>>>        LOGO=3Dubuntu-logo
-> >>>>>        ```
-> >>>>>
-> >>>>> 2. **Device Information and Settings:**
-> >>>>>      - List Block Devices and Scheduler:
-> >>>>>        ```
-> >>>>>        $ lsblk
-> >>>>>        NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
-> >>>>>        sda     8:0    0   4.4T  0 disk
-> >>>>>        =E2=94=94=E2=94=80sda1  8:1    0   4.4T  0 part /data
-> >>>>>        ...
-> >>>>>
-> >>>>>        $ cat /sys/block/sda/queue/scheduler
-> >>>>>        none [mq-deadline] kyber bfq
-> >>>>>
-> >>>>>        $ cat /sys/block/sda/queue/rotational
-> >>>>>        1
-> >>>>>        ```
-> >>>>>
-> >>>>> 3. **Reproducing the problem:**
-> >>>>>      - Navigate to the cgroup v2 filesystem and configure I/O
-> >>>>> settings:
-> >>>>>        ```
-> >>>>>        $ cd /sys/fs/cgroup/
-> >>>>>        $ stat -fc %T /sys/fs/cgroup
-> >>>>>        cgroup2fs
-> >>>>>        $ mkdir test
-> >>>>>        $ echo "8:0 wbps=3D10485760 wiops=3D100000" > io.max
-> >>>>>        ```
-> >>>>>        In this setup:
-> >>>>>        wbps=3D10485760 sets the write bytes per second limit to 10 =
-MB/s.
-> >>>>>        wiops=3D100000 sets the write I/O operations per second limi=
-t
-> >>>>> to 100,000.
-> >>>>>
-> >>>>>      - Add process to the cgroup and verify:
-> >>>>>        ```
-> >>>>>        $ echo $$ > cgroup.procs
-> >>>>>        $ cat cgroup.procs
-> >>>>>        3826771
-> >>>>>        3828513
-> >>>>>        $ ps -ef|grep 3826771
-> >>>>>        root     3826771 3826768  0 22:04 pts/1    00:00:00 -bash
-> >>>>>        root     3828761 3826771  0 22:06 pts/1    00:00:00 ps -ef
-> >>>>>        root     3828762 3826771  0 22:06 pts/1    00:00:00 grep
-> >>>>> --color=3Dauto 3826771
-> >>>>>        ```
-> >>>>>
-> >>>>>      - Observe I/O performance using `dd` commands and `iostat`:
-> >>>>>        ```
-> >>>>>        $ dd if=3D/dev/zero of=3D/data/file1 bs=3D512M count=3D1 &
-> >>>>>        $ dd if=3D/dev/zero of=3D/data/file1 bs=3D512M count=3D1 &
-> >>>
-> >>> You're testing buffer IO here, and I don't see that write back cgroup=
- is
-> >>> enabled. Is this test intentional? Why not test direct IO?
-> >>
-> >> Yes, I was testing buffered I/O and can confirm that
-> >> CONFIG_CGROUP_WRITEBACK
-> >> was enabled.
-> >>
-> >> $ cat /boot/config-6.10.0-rc5+ |grep CONFIG_CGROUP_WRITEBACK
-> >> CONFIG_CGROUP_WRITEBACK=3Dy
-> >>
-> >> We intend to configure both wbps (write bytes per second) and wiops
-> >> (write I/O operations
-> >> per second) for the containers. IIUC, this setup will effectively
-> >> restrict both their block device
-> >> I/Os and buffered I/Os.
-> >>
-> >>> Why not test direct IO?
-> >>
-> >> I was testing direct IO as well. However it did not work as expected w=
-ith
-> >> `echo "8:0 wbps=3D10485760 wiops=3D100000" > io.max`.
-> >>
-> >> $ time dd if=3D/dev/zero of=3D/data/file7 bs=3D512M count=3D1 oflag=3D=
-direct
-> >
-> > So, you're issuing one huge IO, with 512M.
-> >> 1+0 records in
-> >> 1+0 records out
-> >> 536870912 bytes (537 MB, 512 MiB) copied, 51.5962 s, 10.4 MB/s
-> >
-> > And this result looks correct. Please noted that blk-throtl works befor=
-e
-> > IO submit, while iostat reports IO that are done. A huge IO can be
-> > throttled for a long time.
-> >>
-> >> real 0m51.637s
-> >> user 0m0.000s
-> >> sys 0m0.313s
-> >>
-> >> $ iostat -d 1 -h -y -p sda
-> >>   tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn
-> >> kB_dscd Device
-> >>       9.00         0.0k         1.3M         0.0k       0.0k       1.3=
-M
-> >>        0.0k sda
-> >>       9.00         0.0k         1.3M         0.0k       0.0k       1.3=
-M
-> >>        0.0k sda1
-> >
-> > I don't understand yet is why there are few IO during the wait. Can you
-> > test for a raw disk to bypass filesystem?
->
-> To be updated, I add a debug patch for this:
+From: Li Lingfeng <lilingfeng3@huawei.com>
 
-Kuai, sorry for the delayed response ;(
+Lockdep reported a warning in Linux version 6.6:
 
-I'll give this debug patch a try and do other tests for a raw disk to bypas=
-s
-the file system as well, and get back to you ASAP.
+[  414.344659] ================================
+[  414.345155] WARNING: inconsistent lock state
+[  414.345658] 6.6.0-07439-gba2303cacfda #6 Not tainted
+[  414.346221] --------------------------------
+[  414.346712] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+[  414.347545] kworker/u10:3/1152 [HC0[0]:SC0[0]:HE0:SE1] takes:
+[  414.349245] ffff88810edd1098 (&sbq->ws[i].wait){+.?.}-{2:2}, at: blk_mq_dispatch_rq_list+0x131c/0x1ee0
+[  414.351204] {IN-SOFTIRQ-W} state was registered at:
+[  414.351751]   lock_acquire+0x18d/0x460
+[  414.352218]   _raw_spin_lock_irqsave+0x39/0x60
+[  414.352769]   __wake_up_common_lock+0x22/0x60
+[  414.353289]   sbitmap_queue_wake_up+0x375/0x4f0
+[  414.353829]   sbitmap_queue_clear+0xdd/0x270
+[  414.354338]   blk_mq_put_tag+0xdf/0x170
+[  414.354807]   __blk_mq_free_request+0x381/0x4d0
+[  414.355335]   blk_mq_free_request+0x28b/0x3e0
+[  414.355847]   __blk_mq_end_request+0x242/0xc30
+[  414.356367]   scsi_end_request+0x2c1/0x830
+[  414.345155] WARNING: inconsistent lock state
+[  414.345658] 6.6.0-07439-gba2303cacfda #6 Not tainted
+[  414.346221] --------------------------------
+[  414.346712] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+[  414.347545] kworker/u10:3/1152 [HC0[0]:SC0[0]:HE0:SE1] takes:
+[  414.349245] ffff88810edd1098 (&sbq->ws[i].wait){+.?.}-{2:2}, at: blk_mq_dispatch_rq_list+0x131c/0x1ee0
+[  414.351204] {IN-SOFTIRQ-W} state was registered at:
+[  414.351751]   lock_acquire+0x18d/0x460
+[  414.352218]   _raw_spin_lock_irqsave+0x39/0x60
+[  414.352769]   __wake_up_common_lock+0x22/0x60
+[  414.353289]   sbitmap_queue_wake_up+0x375/0x4f0
+[  414.353829]   sbitmap_queue_clear+0xdd/0x270
+[  414.354338]   blk_mq_put_tag+0xdf/0x170
+[  414.354807]   __blk_mq_free_request+0x381/0x4d0
+[  414.355335]   blk_mq_free_request+0x28b/0x3e0
+[  414.355847]   __blk_mq_end_request+0x242/0xc30
+[  414.356367]   scsi_end_request+0x2c1/0x830
+[  414.356863]   scsi_io_completion+0x177/0x1610
+[  414.357379]   scsi_complete+0x12f/0x260
+[  414.357856]   blk_complete_reqs+0xba/0xf0
+[  414.358338]   __do_softirq+0x1b0/0x7a2
+[  414.358796]   irq_exit_rcu+0x14b/0x1a0
+[  414.359262]   sysvec_call_function_single+0xaf/0xc0
+[  414.359828]   asm_sysvec_call_function_single+0x1a/0x20
+[  414.360426]   default_idle+0x1e/0x30
+[  414.360873]   default_idle_call+0x9b/0x1f0
+[  414.361390]   do_idle+0x2d2/0x3e0
+[  414.361819]   cpu_startup_entry+0x55/0x60
+[  414.362314]   start_secondary+0x235/0x2b0
+[  414.362809]   secondary_startup_64_no_verify+0x18f/0x19b
+[  414.363413] irq event stamp: 428794
+[  414.363825] hardirqs last  enabled at (428793): [<ffffffff816bfd1c>] ktime_get+0x1dc/0x200
+[  414.364694] hardirqs last disabled at (428794): [<ffffffff85470177>] _raw_spin_lock_irq+0x47/0x50
+[  414.365629] softirqs last  enabled at (428444): [<ffffffff85474780>] __do_softirq+0x540/0x7a2
+[  414.366522] softirqs last disabled at (428419): [<ffffffff813f65ab>] irq_exit_rcu+0x14b/0x1a0
+[  414.367425]
+               other info that might help us debug this:
+[  414.368194]  Possible unsafe locking scenario:
+[  414.368900]        CPU0
+[  414.369225]        ----
+[  414.369548]   lock(&sbq->ws[i].wait);
+[  414.370000]   <Interrupt>
+[  414.370342]     lock(&sbq->ws[i].wait);
+[  414.370802]
+                *** DEADLOCK ***
+[  414.371569] 5 locks held by kworker/u10:3/1152:
+[  414.372088]  #0: ffff88810130e938 ((wq_completion)writeback){+.+.}-{0:0}, at: process_scheduled_works+0x357/0x13f0
+[  414.373180]  #1: ffff88810201fdb8 ((work_completion)(&(&wb->dwork)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x3a3/0x13f0
+[  414.374384]  #2: ffffffff86ffbdc0 (rcu_read_lock){....}-{1:2}, at: blk_mq_run_hw_queue+0x637/0xa00
+[  414.375342]  #3: ffff88810edd1098 (&sbq->ws[i].wait){+.?.}-{2:2}, at: blk_mq_dispatch_rq_list+0x131c/0x1ee0
+[  414.376377]  #4: ffff888106205a08 (&hctx->dispatch_wait_lock){+.-.}-{2:2}, at: blk_mq_dispatch_rq_list+0x1337/0x1ee0
+[  414.378607]
+               stack backtrace:
+[  414.379177] CPU: 0 PID: 1152 Comm: kworker/u10:3 Not tainted 6.6.0-07439-gba2303cacfda #6
+[  414.380032] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+[  414.381177] Workqueue: writeback wb_workfn (flush-253:0)
+[  414.381805] Call Trace:
+[  414.382136]  <TASK>
+[  414.382429]  dump_stack_lvl+0x91/0xf0
+[  414.382884]  mark_lock_irq+0xb3b/0x1260
+[  414.383367]  ? __pfx_mark_lock_irq+0x10/0x10
+[  414.383889]  ? stack_trace_save+0x8e/0xc0
+[  414.384373]  ? __pfx_stack_trace_save+0x10/0x10
+[  414.384903]  ? graph_lock+0xcf/0x410
+[  414.385350]  ? save_trace+0x3d/0xc70
+[  414.385808]  mark_lock.part.20+0x56d/0xa90
+[  414.386317]  mark_held_locks+0xb0/0x110
+[  414.386791]  ? __pfx_do_raw_spin_lock+0x10/0x10
+[  414.387320]  lockdep_hardirqs_on_prepare+0x297/0x3f0
+[  414.387901]  ? _raw_spin_unlock_irq+0x28/0x50
+[  414.388422]  trace_hardirqs_on+0x58/0x100
+[  414.388917]  _raw_spin_unlock_irq+0x28/0x50
+[  414.389422]  __blk_mq_tag_busy+0x1d6/0x2a0
+[  414.389920]  __blk_mq_get_driver_tag+0x761/0x9f0
+[  414.390899]  blk_mq_dispatch_rq_list+0x1780/0x1ee0
+[  414.391473]  ? __pfx_blk_mq_dispatch_rq_list+0x10/0x10
+[  414.392070]  ? sbitmap_get+0x2b8/0x450
+[  414.392533]  ? __blk_mq_get_driver_tag+0x210/0x9f0
+[  414.393095]  __blk_mq_sched_dispatch_requests+0xd99/0x1690
+[  414.393730]  ? elv_attempt_insert_merge+0x1b1/0x420
+[  414.394302]  ? __pfx___blk_mq_sched_dispatch_requests+0x10/0x10
+[  414.394970]  ? lock_acquire+0x18d/0x460
+[  414.395456]  ? blk_mq_run_hw_queue+0x637/0xa00
+[  414.395986]  ? __pfx_lock_acquire+0x10/0x10
+[  414.396499]  blk_mq_sched_dispatch_requests+0x109/0x190
+[  414.397100]  blk_mq_run_hw_queue+0x66e/0xa00
+[  414.397616]  blk_mq_flush_plug_list.part.17+0x614/0x2030
+[  414.398244]  ? __pfx_blk_mq_flush_plug_list.part.17+0x10/0x10
+[  414.398897]  ? writeback_sb_inodes+0x241/0xcc0
+[  414.399429]  blk_mq_flush_plug_list+0x65/0x80
+[  414.399957]  __blk_flush_plug+0x2f1/0x530
+[  414.400458]  ? __pfx___blk_flush_plug+0x10/0x10
+[  414.400999]  blk_finish_plug+0x59/0xa0
+[  414.401467]  wb_writeback+0x7cc/0x920
+[  414.401935]  ? __pfx_wb_writeback+0x10/0x10
+[  414.402442]  ? mark_held_locks+0xb0/0x110
+[  414.402931]  ? __pfx_do_raw_spin_lock+0x10/0x10
+[  414.403462]  ? lockdep_hardirqs_on_prepare+0x297/0x3f0
+[  414.404062]  wb_workfn+0x2b3/0xcf0
+[  414.404500]  ? __pfx_wb_workfn+0x10/0x10
+[  414.404989]  process_scheduled_works+0x432/0x13f0
+[  414.405546]  ? __pfx_process_scheduled_works+0x10/0x10
+[  414.406139]  ? do_raw_spin_lock+0x101/0x2a0
+[  414.406641]  ? assign_work+0x19b/0x240
+[  414.407106]  ? lock_is_held_type+0x9d/0x110
+[  414.407604]  worker_thread+0x6f2/0x1160
+[  414.408075]  ? __kthread_parkme+0x62/0x210
+[  414.408572]  ? lockdep_hardirqs_on_prepare+0x297/0x3f0
+[  414.409168]  ? __kthread_parkme+0x13c/0x210
+[  414.409678]  ? __pfx_worker_thread+0x10/0x10
+[  414.410191]  kthread+0x33c/0x440
+[  414.410602]  ? __pfx_kthread+0x10/0x10
+[  414.411068]  ret_from_fork+0x4d/0x80
+[  414.411526]  ? __pfx_kthread+0x10/0x10
+[  414.411993]  ret_from_fork_asm+0x1b/0x30
+[  414.412489]  </TASK>
 
-Thanks a lot for reaching out!
-Lance
+When interrupt is turned on while a lock holding by spin_lock_irq it
+throws a warning because of potential deadlock.
 
->
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index dc6140fa3de0..3b2648c17079 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -1119,8 +1119,10 @@ static void blk_throtl_dispatch_work_fn(struct
-> work_struct *work)
->
->          if (!bio_list_empty(&bio_list_on_stack)) {
->                  blk_start_plug(&plug);
-> -               while ((bio =3D bio_list_pop(&bio_list_on_stack)))
-> +               while ((bio =3D bio_list_pop(&bio_list_on_stack))) {
-> +                       printk("%s: bio done %lu %px\n", __func__,
-> bio_sectors(bio), bio);
->                          submit_bio_noacct_nocheck(bio);
-> +               }
->                  blk_finish_plug(&plug);
->          }
->   }
-> @@ -1606,6 +1608,8 @@ bool __blk_throtl_bio(struct bio *bio)
->          bool throttled =3D false;
->          struct throtl_data *td =3D tg->td;
->
-> +       printk("%s: bio start %lu %px\n", __func__, bio_sectors(bio), bio=
-);
-> +
->          rcu_read_lock();
->          spin_lock_irq(&q->queue_lock);
->          sq =3D &tg->service_queue;
-> @@ -1649,6 +1653,7 @@ bool __blk_throtl_bio(struct bio *bio)
->                  tg =3D sq_to_tg(sq);
->                  if (!tg) {
->                          bio_set_flag(bio, BIO_BPS_THROTTLED);
-> +                       printk("%s: bio done %lu %px\n", __func__,
-> bio_sectors(bio), bio);
->                          goto out_unlock;
->                  }
->          }
->
-> For dirct IO with raw disk:
->
-> with or without wiops, the result is the same:
->
-> [  469.736098] __blk_throtl_bio: bio start 2128 ffff8881014c08c0
-> [  469.736903] __blk_throtl_bio: bio start 2144 ffff88817852ec80
-> [  469.737585] __blk_throtl_bio: bio start 2096 ffff88817852f080
-> [  469.738392] __blk_throtl_bio: bio start 2096 ffff88817852f480
-> [  469.739358] __blk_throtl_bio: bio start 2064 ffff88817852e880
-> [  469.740330] __blk_throtl_bio: bio start 2112 ffff88817852fa80
-> [  469.741262] __blk_throtl_bio: bio start 2080 ffff88817852e280
-> [  469.742280] __blk_throtl_bio: bio start 2096 ffff88817852e080
-> [  469.743281] __blk_throtl_bio: bio start 2104 ffff88817852f880
-> [  469.744309] __blk_throtl_bio: bio start 2240 ffff88817852e680
-> [  469.745050] __blk_throtl_bio: bio start 2184 ffff88817852e480
-> [  469.745857] __blk_throtl_bio: bio start 2120 ffff88817852f680
-> [  469.746779] __blk_throtl_bio: bio start 2512 ffff88817852fe80
-> [  469.747611] __blk_throtl_bio: bio start 2488 ffff88817852f280
-> [  469.748242] __blk_throtl_bio: bio start 2120 ffff88817852ee80
-> [  469.749159] __blk_throtl_bio: bio start 2256 ffff88817852fc80
-> [  469.750087] __blk_throtl_bio: bio start 2576 ffff88817852ea80
-> [  469.750802] __blk_throtl_bio: bio start 2112 ffff8881014a3a80
-> [  469.751586] __blk_throtl_bio: bio start 2240 ffff8881014a2880
-> [  469.752383] __blk_throtl_bio: bio start 2160 ffff8881014a2e80
-> [  469.753289] __blk_throtl_bio: bio start 2248 ffff8881014a3c80
-> [  469.754024] __blk_throtl_bio: bio start 2536 ffff8881014a2680
-> [  469.754913] __blk_throtl_bio: bio start 2088 ffff8881014a3080
-> [  469.766036] __blk_throtl_bio: bio start 211344 ffff8881014a3280
-> [  469.842366] blk_throtl_dispatch_work_fn: bio done 2128 ffff8881014c08c=
-0
-> [  469.952627] blk_throtl_dispatch_work_fn: bio done 2144 ffff88817852ec8=
-0
-> [  470.048729] blk_throtl_dispatch_work_fn: bio done 2096 ffff88817852f08=
-0
-> [  470.152642] blk_throtl_dispatch_work_fn: bio done 2096 ffff88817852f48=
-0
-> [  470.256661] blk_throtl_dispatch_work_fn: bio done 2064 ffff88817852e88=
-0
-> [  470.360662] blk_throtl_dispatch_work_fn: bio done 2112 ffff88817852fa8=
-0
-> [  470.464626] blk_throtl_dispatch_work_fn: bio done 2080 ffff88817852e28=
-0
-> [  470.568652] blk_throtl_dispatch_work_fn: bio done 2096 ffff88817852e08=
-0
-> [  470.672623] blk_throtl_dispatch_work_fn: bio done 2104 ffff88817852f88=
-0
-> [  470.776620] blk_throtl_dispatch_work_fn: bio done 2240 ffff88817852e68=
-0
-> [  470.889801] blk_throtl_dispatch_work_fn: bio done 2184 ffff88817852e48=
-0
-> [  470.992686] blk_throtl_dispatch_work_fn: bio done 2120 ffff88817852f68=
-0
-> [  471.112633] blk_throtl_dispatch_work_fn: bio done 2512 ffff88817852fe8=
-0
-> [  471.232680] blk_throtl_dispatch_work_fn: bio done 2488 ffff88817852f28=
-0
-> [  471.336695] blk_throtl_dispatch_work_fn: bio done 2120 ffff88817852ee8=
-0
-> [  471.448645] blk_throtl_dispatch_work_fn: bio done 2256 ffff88817852fc8=
-0
-> [  471.576632] blk_throtl_dispatch_work_fn: bio done 2576 ffff88817852ea8=
-0
-> [  471.680709] blk_throtl_dispatch_work_fn: bio done 2112 ffff8881014a3a8=
-0
-> [  471.792680] blk_throtl_dispatch_work_fn: bio done 2240 ffff8881014a288=
-0
-> [  471.896682] blk_throtl_dispatch_work_fn: bio done 2160 ffff8881014a2e8=
-0
-> [  472.008698] blk_throtl_dispatch_work_fn: bio done 2248 ffff8881014a3c8=
-0
-> [  472.136630] blk_throtl_dispatch_work_fn: bio done 2536 ffff8881014a268=
-0
-> [  472.240678] blk_throtl_dispatch_work_fn: bio done 2088 ffff8881014a308=
-0
-> [  482.560633] blk_throtl_dispatch_work_fn: bio done 211344 ffff8881014a3=
-280
->
-> Hence the upper layer issue some small IO first, then with a 100+MB IO,
-> and wait time looks correct.
->
-> Then, I retest for xfs, result are still the same with or without wiops:
->
-> [ 1175.907019] __blk_throtl_bio: bio start 8192 ffff88816daf8480
-> [ 1175.908224] __blk_throtl_bio: bio start 8192 ffff88816daf8e80
-> [ 1175.910618] __blk_throtl_bio: bio start 8192 ffff88816daf9280
-> [ 1175.911991] __blk_throtl_bio: bio start 8192 ffff88816daf8280
-> [ 1175.913187] __blk_throtl_bio: bio start 8192 ffff88816daf9080
-> [ 1175.914904] __blk_throtl_bio: bio start 8192 ffff88816daf9680
-> [ 1175.916099] __blk_throtl_bio: bio start 8192 ffff88816daf8880
-> [ 1175.917844] __blk_throtl_bio: bio start 8192 ffff88816daf8c80
-> [ 1175.919025] __blk_throtl_bio: bio start 8192 ffff88816daf8a80
-> [ 1175.920868] __blk_throtl_bio: bio start 8192 ffff888178a84080
-> [ 1175.922068] __blk_throtl_bio: bio start 8192 ffff888178a84280
-> [ 1175.923819] __blk_throtl_bio: bio start 8192 ffff888178a84480
-> [ 1175.925017] __blk_throtl_bio: bio start 8192 ffff888178a84680
-> [ 1175.926851] __blk_throtl_bio: bio start 8192 ffff888178a84880
-> [ 1175.928025] __blk_throtl_bio: bio start 8192 ffff888178a84a80
-> [ 1175.929806] __blk_throtl_bio: bio start 8192 ffff888178a84c80
-> [ 1175.931007] __blk_throtl_bio: bio start 8192 ffff888178a84e80
-> [ 1175.932852] __blk_throtl_bio: bio start 8192 ffff888178a85080
-> [ 1175.934041] __blk_throtl_bio: bio start 8192 ffff888178a85280
-> [ 1175.935892] __blk_throtl_bio: bio start 8192 ffff888178a85480
-> [ 1175.937074] __blk_throtl_bio: bio start 8192 ffff888178a85680
-> [ 1175.938860] __blk_throtl_bio: bio start 8192 ffff888178a85880
-> [ 1175.940053] __blk_throtl_bio: bio start 8192 ffff888178a85a80
-> [ 1175.941824] __blk_throtl_bio: bio start 8192 ffff888178a85c80
-> [ 1175.943040] __blk_throtl_bio: bio start 8192 ffff888178a85e80
-> [ 1175.944945] __blk_throtl_bio: bio start 8192 ffff88816b046080
-> [ 1175.946156] __blk_throtl_bio: bio start 8192 ffff88816b046280
-> [ 1175.948261] __blk_throtl_bio: bio start 8192 ffff88816b046480
-> [ 1175.949521] __blk_throtl_bio: bio start 8192 ffff88816b046680
-> [ 1175.950877] __blk_throtl_bio: bio start 8192 ffff88816b046880
-> [ 1175.952051] __blk_throtl_bio: bio start 8192 ffff88816b046a80
-> [ 1175.954313] __blk_throtl_bio: bio start 8192 ffff88816b046c80
-> [ 1175.955530] __blk_throtl_bio: bio start 8192 ffff88816b046e80
-> [ 1175.957370] __blk_throtl_bio: bio start 8192 ffff88816b047080
-> [ 1175.958818] __blk_throtl_bio: bio start 8192 ffff88816b047280
-> [ 1175.960093] __blk_throtl_bio: bio start 8192 ffff88816b047480
-> [ 1175.961900] __blk_throtl_bio: bio start 8192 ffff88816b047680
-> [ 1175.963070] __blk_throtl_bio: bio start 8192 ffff88816b047880
-> [ 1175.965262] __blk_throtl_bio: bio start 8192 ffff88816b047a80
-> [ 1175.966527] __blk_throtl_bio: bio start 8192 ffff88816b047c80
-> [ 1175.967928] __blk_throtl_bio: bio start 8192 ffff88816b047e80
-> [ 1175.969124] __blk_throtl_bio: bio start 8192 ffff888170e84080
-> [ 1175.971369] __blk_throtl_bio: bio start 8192 ffff888170e84280
->
->
-> Hence xfs is always issuing 4MB IO, that's whay stable wbps can be
-> observed by iostat. The main difference is that a 100+MB IO is issued
-> from the last test and throttle for about 10+s.
->
-> Then for your case, you might want to comfirm what kind of IO are
-> submitted from upper layer.
->
-> Thanks,
-> Kuai
-> >
-> > Thanks,
-> > Kuai
-> >
-> >
-> > .
-> >
->
+blk_mq_prep_dispatch_rq
+ blk_mq_get_driver_tag
+  __blk_mq_get_driver_tag
+   __blk_mq_alloc_driver_tag
+    blk_mq_tag_busy -> tag is already busy
+    // failed to get driver tag
+ blk_mq_mark_tag_wait
+  spin_lock_irq(&wq->lock) -> lock A (&sbq->ws[i].wait)
+  __add_wait_queue(wq, wait) -> wait queue active
+  blk_mq_get_driver_tag
+  __blk_mq_tag_busy
+-> 1) tag must be idle, which means there can't be inflight IO
+   spin_lock_irq(&tags->lock) -> lock B (hctx->tags)
+   spin_unlock_irq(&tags->lock) -> unlock B, turn on interrupt accidentally
+-> 2) context must be preempt by IO interrupt to trigger deadlock.
+
+As shown above, the deadlock is not possible in theory, but the warning
+still need to be fixed.
+
+Fix it by using spin_lock_irqsave to get lockB instead of spin_lock_irq.
+
+Fixes: 4f1731df60f9 ("blk-mq: fix potential io hang by wrong 'wake_batch'")
+Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+---
+ block/blk-mq-tag.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index cc57e2dd9a0b..2cafcf11ee8b 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -38,6 +38,7 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+ 	unsigned int users;
++	unsigned long flags;
+ 	struct blk_mq_tags *tags = hctx->tags;
+ 
+ 	/*
+@@ -56,11 +57,11 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 			return;
+ 	}
+ 
+-	spin_lock_irq(&tags->lock);
++	spin_lock_irqsave(&tags->lock, flags);
+ 	users = tags->active_queues + 1;
+ 	WRITE_ONCE(tags->active_queues, users);
+ 	blk_mq_update_wake_batch(tags, users);
+-	spin_unlock_irq(&tags->lock);
++	spin_unlock_irqrestore(&tags->lock, flags);
+ }
+ 
+ /*
+-- 
+2.31.1
+
