@@ -1,389 +1,205 @@
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533EA55897
-	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 19:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4DC15383B;
+	Thu, 15 Aug 2024 21:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723749574; cv=none; b=dVaKux6x3I8zC9KVEzNsqKm7/p3c1TS3VHq/2uk3eZy74w94I3Si4QqZ5mWvItUXkRd3l6qTo16ZLWMNkDzMycNJPRF4AM5urTEu+Plh/CV8xHv2OMxFHO+vvLTo1iIRLhPwyKzWPVT/ib3QRGmGrBFMNU1DIDIckdQ8xVqIyiI=
+	t=1723757643; cv=none; b=ELdGTUo5MOfVR5blIryTNA6iXj9lDuI8+OogTXZdcrEJSUoxA9kVSqRwJ3zw5UTW+CInLEQpuDsGOBlN2dSWUHY1H9b7Gn5uoLZBW0xd4D5feiZYsTXX6rt02TG9dI9Co2AL+8uqK1hf/yfAolaH57nw8ZTkaxrqkwLauYgfCUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723749574; c=relaxed/simple;
-	bh=SbZHk1oE4YjfHvEGvCc6lxbgHJVuoZ7v5vaCTK8aF8w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Piy/MLEapK+GpraDI4h3te/4VFzCowMiJYUSs1NUkqHg609NVZd1PerNHgWwj7+asXZLDzcDaKYrfdVo6QcncUMWHGnUwgIlIVJGVcrio+UORAZ7NfdKQROXrBQDUGl5fU3MHJkszi1ADNkTkeHxqWlfu9DRM6PYgM5fGkIbMWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=U5APwX8E; arc=none smtp.client-ip=209.85.219.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1723757643; c=relaxed/simple;
+	bh=RSrImnI26Mo0f9XuPAwK3HwRGo6HYNUAhl91ruFjRGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GFF8yIJJLkLEqQJOqEzzdcuFIVq5+vJn6DbhWIMvNJ6oFMiVJL/HGfzGsp5epaKVnwPafEcftk951MHz8MtDfDZdPGUoq3609DA9en3LNkFZchntpt7VCJGtTrr+5RQSyjmlP8BdVwzDAzVs5ShEiRHenkff8MVs5XjXcxaE4bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hrFIoTVy; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="U5APwX8E"
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e02c4983bfaso1332946276.2
-        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 12:19:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hrFIoTVy"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6b79293a858so6975446d6.3;
+        Thu, 15 Aug 2024 14:34:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1723749571; x=1724354371; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dmJ/U6oso6NBeJGhn3TIkS50+Qahr6/dljLdoPN7uPY=;
-        b=U5APwX8E/azTdFyT9kJzOkgw/gSKztknJ3zUB0xirfG7gjhWUmWYqZ6v/x93jbuOg3
-         1Df/nHDpJMAdeMNBLPcawYn2+X8M4OqS/VWSNPO8nWwZMuqCmbWIM3v9Xytn0DH1Y36V
-         sBBANvtauD3f2sQEMMl4/8sri4bUiEgL4jPEEUlXu3LCs9yUkfXozWegUWMrCQgGxaGP
-         Hqxz5hJLjlJ702rjQLvDOHVEvdo6sYfBWn6xJY30iUmP5kh3zcZEJ+xkhhcpkuUo8WCx
-         Gki23R2o3xZVklrWrSKwfcYspU0GrQ+LYx8NCKf+PwaxvHt692HM9z5mqfbCXT1NwXqL
-         OXvg==
+        d=gmail.com; s=20230601; t=1723757640; x=1724362440; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=z2jIJr2MkBoBBw06sdkqmr4Bu0hhBeX1gGKR5UMrb0o=;
+        b=hrFIoTVyNXfy7VC1Q+WhMAtdPhP1H/AD9/OJFwNyy0zyJkE1JloajS82McC65gKCKq
+         W4YPSpYvafOA/LpghyyvTPNumJ6y4CCqZsMs8yhj9van0RZeaRDlfp3uhHjZurC1pT3v
+         Wv8pmzt5Uk+Zc73u9rb4NKT/PgNvKNrIEEos/8oguPGNFG2opXSoBfQs51l/RMJUq1vH
+         5lNtWkEWur+hlHnJwOAs1OyDvcfL6Ng5gXxKeTmSoSZO9MLufuNxqZiiBnUyJzamrcNt
+         H2tKvy2uSYYOySMR64PWHQcI7SBsOD6z8AnsqNbd2Xfdle3f9NsHyTdOMwl02dyW+uF4
+         t1MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723749571; x=1724354371;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dmJ/U6oso6NBeJGhn3TIkS50+Qahr6/dljLdoPN7uPY=;
-        b=CcuEnM4wIGa4XVSQsO/8scc6CKErsVQS8ve23BN9R+8mmtQi0Ee+Ap2uivAe/15Uqj
-         DAdC/onXjzySYxWdSnesshe7BfLE1d5uTiKiO+K2Vq5n+eAdC3GznNuWneZ8/THWmZr0
-         JwTk/MPMDhIdXQp/QtoOxw9pFpitdipGbFgrgOKUUFaw2nU5SRJYxRKN/F3W6Jt5LsKM
-         bNGv3E2kS53fyt8baM4jESAjHELJ8W7/H+V1UcmzSQBioQdJilhoMAwAaQHBSGtUObK4
-         LxrR0oi3epdeRLo4rUw6ws3jXLMBJO5mQhVazxzsFLBVzCYNejgo3UIFQ4aexrzprRdS
-         7HHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgygf6ph65oeOa4g72pmtViPhCL1UgsFu5GeI0snfUquiWGkmsvmzdbM03m4MqRVZaH2EBVFqrqxsRbdPzPHSLF8+zthdHReETyns=
-X-Gm-Message-State: AOJu0YxVRlZyIDauaDIi8UQAJRET4EJEKYPWhzJaonRkkZgPJmDfaAz2
-	6LbrS+unNCHDEAxAiEzAnEvJVOMqivg6OavYtVKZ8DX7A5Ka/UA5NVj001ib7DllPlnWpDvBEe8
-	2hNhaOOL4mipCFDbyAJY0jRkR9633dOZMaqo4
-X-Google-Smtp-Source: AGHT+IFRYVjjf2rtsZ0DyXa1m00KXA39o8EICR0pfI/3jm6Xtm5EJ6DWPa9xtJ2UUS6AmdDcjWbNeaxbcw/BVpXnv5o=
-X-Received: by 2002:a05:6902:240a:b0:e11:7e70:a9b2 with SMTP id
- 3f1490d57ef6-e1180fa47bbmr989460276.42.1723749571251; Thu, 15 Aug 2024
- 12:19:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723757640; x=1724362440;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z2jIJr2MkBoBBw06sdkqmr4Bu0hhBeX1gGKR5UMrb0o=;
+        b=Gh788yS/zwwCX6Utuffd+dl7wy2HCWvX2y5zq2QGYGM3fKTY3A2BBR5o/jAe2aZmpO
+         tisgPJE4Bwvrcy5Uc1VIVBJxYq/XGwHCTjTBWkh4jbmRSBipoMaRaHFwYDt8au0XOqQm
+         vLz/XmnlI18Z7J8URNEGfoifL3vP1TfVmc/pHlwow/Z5gRJfcD5E9Q3LXD5CG5qhnywn
+         Cpfy9WcZ2LlrGiopX6mZdG5eImpgUSHUZrkPVU+qL6uYiP9c3I1dzhfdvSlZPP6vFC9y
+         EXDHn6OJw1RgY5FB6SHLD36LEvTno+TGZlONX7rAw4rctwaDKHSDXM+Y4/+I+ruzhI4E
+         BlnA==
+X-Forwarded-Encrypted: i=1; AJvYcCXB/bEiMY91aZuCmA6022sWgwDumotyqfL2TgS6+xXH62fFDfhfbcZOJ3oqhoPsO5/QToyZMvbtwftJmCX+zPhQXgYb3rcyqSQyKZ5TtURzInlqHxMt+KUlwj7IIE1A4B2zPACY1BM7aVbcphfjj9QNtRw/p9NnGPlJ8xm2UPNXihNFkV0GoXMURw==
+X-Gm-Message-State: AOJu0YwXhH9RpyQZ0QIWZQBM6UAsghKrpamsobJ3ZNdyCGiOOQ7WpPAO
+	YeTx1P7cwswmmbTczerv1ymPwZcGAs1a0gi185S8MDC0ngIK7joLBVaxnQ==
+X-Google-Smtp-Source: AGHT+IHyjaZebrZBLdl2QbomoWKhII/28c0GgEpouwSlQ+Oz3+e7o+jzgs4lXyImEasQd2Q0ltpZ5g==
+X-Received: by 2002:a05:6214:311b:b0:6b5:e51d:441d with SMTP id 6a1803df08f44-6bf7ce81df7mr8712666d6.41.1723757640289;
+        Thu, 15 Aug 2024 14:34:00 -0700 (PDT)
+Received: from fauth1-smtp.messagingengine.com (fauth1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fec909dsm10004816d6.100.2024.08.15.14.33.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 14:34:00 -0700 (PDT)
+Received: from phl-compute-05.internal (phl-compute-05.nyi.internal [10.202.2.45])
+	by mailfauth.nyi.internal (Postfix) with ESMTP id 6F32B120006A;
+	Thu, 15 Aug 2024 17:33:59 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Thu, 15 Aug 2024 17:33:59 -0400
+X-ME-Sender: <xms:R3S-Zmtx8AtLrCuWhjcdz0WHaLAJYJZUhG74nO6eKFu9uElSS8aRzg>
+    <xme:R3S-ZreI4LvldSiKftaUZc7iFTzc2G1GWgl8RRAZBxV7lfnkNI3zbpb8AKLngncjS
+    iYmVBbdWpys5cgBIw>
+X-ME-Received: <xmr:R3S-Zhz4gmsnCom0A1kchwZEwM1aGTo1q0BPVnUTe5ldDVDm4-G2qqa2OrfwHQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddtjedgtdduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
+    necuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilh
+    drtghomheqnecuggftrfgrthhtvghrnhephfdvveevkeektefhheejgfefhedtkeetieeh
+    tdeufeduheffteeffeejheetfefhnecuffhomhgrihhnpeiiuhhlihhptghhrghtrdgtoh
+    hmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsgho
+    qhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqd
+    dujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihm
+    vgdrnhgrmhgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtg
+    hpthhtohepghgrrhihsehgrghrhihguhhordhnvghtpdhrtghpthhtoheprghlihgtvghr
+    hihhlhesghhoohhglhgvrdgtohhmpdhrtghpthhtohepnhhmihesmhgvthgrshhprggtvg
+    drughkpdhrtghpthhtoheprgigsghovgeskhgvrhhnvghlrdgukhdprhgtphhtthhopeho
+    jhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrghgrhihnohhrse
+    hgmhgrihhlrdgtohhmpdhrtghpthhtohepfigvughsohhnrghfsehgmhgrihhlrdgtohhm
+    pdhrtghpthhtoheprgdrhhhinhgusghorhhgsehsrghmshhunhhgrdgtohhmpdhrtghpth
+    htohepughirhhkrdgsvghhmhgvseguvgdrsghoshgthhdrtghomh
+X-ME-Proxy: <xmx:R3S-ZhM4YLjHI78r4CyfKqn3lIhQvygtXm_VRCIzoefGFxw0P273cQ>
+    <xmx:R3S-Zm-2IFvQJX9Y6li0ow_HJ0IETduUQHw3CAl-szxy-SsdkP4CTw>
+    <xmx:R3S-ZpUDECKxhGqQXvs9tSCbcPSkxpIakpwYicQ-kA7YIAEvMnxpnA>
+    <xmx:R3S-Zvf1AtqWRnSzpo1m9WaFsnTDm_EqJI9DRJG6yIpE2YtfXUHoEA>
+    <xmx:R3S-Zgdxo3bHZbm78QcLFWWXfECPyJSnPk5UNTyeMuxZs4YdXuq5PjvE>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 15 Aug 2024 17:33:58 -0400 (EDT)
+Date: Thu, 15 Aug 2024 14:32:28 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Gary Guo <gary@garyguo.net>
+Cc: Alice Ryhl <aliceryhl@google.com>, Andreas Hindborg <nmi@metaspace.dk>,
+	Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	"Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] rust: block: fix wrong usage of lockdep API
+Message-ID: <Zr5z7N2JCMBbQ_YK@boqun-archlinux>
+References: <20240815074519.2684107-1-nmi@metaspace.dk>
+ <20240815074519.2684107-3-nmi@metaspace.dk>
+ <CAH5fLgih1QtO-ACyoifNsgqd=VtJimoGV+aD=3iHG0wb+iDGyw@mail.gmail.com>
+ <20240815200738.096dca4a.gary@garyguo.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
- <1722665314-21156-13-git-send-email-wufan@linux.microsoft.com> <9dc30ca6-486c-4fa9-910d-ed1dc6da0e95@linux.microsoft.com>
-In-Reply-To: <9dc30ca6-486c-4fa9-910d-ed1dc6da0e95@linux.microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 15 Aug 2024 15:19:20 -0400
-Message-ID: <CAHC9VhQrnu8Sj=XnDvg=wGTBxacvMSW6OJyG3-tpwrsbGat6vA@mail.gmail.com>
-Subject: Re: [PATCH v20 12/20] dm verity: expose root hash digest and
- signature data to LSMs
-To: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-	Alasdair Kergon <agk@redhat.com>
-Cc: linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240815200738.096dca4a.gary@garyguo.net>
 
-On Thu, Aug 8, 2024 at 6:38=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> w=
-rote:
->
-> Hi Mikulas,
->
-> I hope you=E2=80=99re doing well. I wanted to thank you again for your th=
-orough
-> review for the last version. I=E2=80=99ve since made some minor updates f=
-or this
-> version, including adding more comments and refactoring the way the hash
-> algorithm name is obtained due to recent changes in dm-verity.
->
-> Would you mind if we keep the Review-by tag on the latest version since
-> the changes are minor? Your feedback is greatly valued, and I=E2=80=99d
-> appreciate it if you could take a quick look when you have a moment.
+On Thu, Aug 15, 2024 at 08:07:38PM +0100, Gary Guo wrote:
+> On Thu, 15 Aug 2024 10:04:56 +0200
+> Alice Ryhl <aliceryhl@google.com> wrote:
+> 
+> > On Thu, Aug 15, 2024 at 9:49 AM Andreas Hindborg <nmi@metaspace.dk> wrote:
+> > >
+> > > From: Andreas Hindborg <a.hindborg@samsung.com>
+> > >
+> > > When allocating `struct gendisk`, `GenDiskBuilder` is using a dynamic lock
+> > > class key without registering the key. This is incorrect use of the API,
+> > > which causes a `WARN` trace. This patch fixes the issue by using a static
+> > > lock class key, which is more appropriate for the situation anyway.
+> > >
+> > > Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
+> > > Reported-by: "Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>
+> > > Closes: https://rust-for-linux.zulipchat.com/#narrow/stream/288089-General/topic/6.2E11.2E0-rc1.3A.20rust.2Fkernel.2Fblock.2Fmq.2Ers.3A.20doctest.20lock.20warning
+> > > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>  
+> > 
+> > LGTM. This makes me wonder if there's some design mistake in how we
+> > handle lock classes in Rust.
+> > 
+> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> 
+> I agree. The API that we current have is designed without much
+> consideration into dynamically allocated keys, and we use `&'static
+> LockClassKey` in a lot of kernel crate APIs.
+> 
+> This arguably is wrong, because presence of `&'static LockClassKey`
+> doesn't mean the key is static. If we do a
+> `Box::leak(Box::new(LockClassKey::new()))`, then this is a `&'static
+> LockClassKey`, but lockdep wouldn't consider this as a static object.
+> 
+> Maybe we should make the `new` function unsafe.
+> 
 
-To add a bit more to this, this patchset now looks like it is in a
-state where we would like to merge it into the LSM tree for the
-upcoming merge window, but I would really like to make sure that the
-device-mapper folks are okay with these changes; an
-Acked-by/Reviewed-by on this patch would be appreciated, assuming you
-are still okay with this patch.
-
-For those who may be missing the context, the full patchset can be
-found on lore at the link below:
-
-https://lore.kernel.org/linux-security-module/1722665314-21156-1-git-send-e=
-mail-wufan@linux.microsoft.com
-
-> On 8/2/2024 11:08 PM, Fan Wu wrote:
-> > From: Deven Bowers <deven.desai@linux.microsoft.com>
-> >
-> > dm-verity provides a strong guarantee of a block device's integrity. As
-> > a generic way to check the integrity of a block device, it provides
-> > those integrity guarantees to its higher layers, including the filesyst=
-em
-> > level.
-> >
-> > However, critical security metadata like the dm-verity roothash and its
-> > signing information are not easily accessible to the LSMs.
-> > To address this limitation, this patch introduces a mechanism to store
-> > and manage these essential security details within a newly added LSM bl=
-ob
-> > in the block_device structure.
-> >
-> > This addition allows LSMs to make access control decisions on the integ=
-rity
-> > data stored within the block_device, enabling more flexible security
-> > policies. For instance, LSMs can now revoke access to dm-verity devices
-> > based on their roothashes, ensuring that only authorized and verified
-> > content is accessible. Additionally, LSMs can enforce policies to only
-> > allow files from dm-verity devices that have a valid digital signature =
-to
-> > execute, effectively blocking any unsigned files from execution, thus
-> > enhancing security against unauthorized modifications.
-> >
-> > The patch includes new hook calls, `security_bdev_setintegrity()`, in
-> > dm-verity to expose the dm-verity roothash and the roothash signature t=
-o
-> > LSMs via preresume() callback. By using the preresume() callback, it
-> > ensures that the security metadata is consistently in sync with the
-> > metadata of the dm-verity target in the current active mapping table.
-> > The hook calls are depended on CONFIG_SECURITY.
-> >
-> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> > ---
-> ...
-> >
-> > v20:
-> >    + Adding more documentation regarding the new setintegrity hook call
-> >    + Update the code for getting hash algorithm from either v->ahash_tf=
-m
-> >      or v->shash_tfm
-> > ---
-> >   drivers/md/dm-verity-target.c | 118 +++++++++++++++++++++++++++++++++=
-+
-> >   drivers/md/dm-verity.h        |   6 ++
-> >   include/linux/security.h      |   9 ++-
-> >   3 files changed, 132 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-targe=
-t.c
-> > index cf659c8feb29..24ba9a10444c 100644
-> > --- a/drivers/md/dm-verity-target.c
-> > +++ b/drivers/md/dm-verity-target.c
-> > @@ -22,6 +22,7 @@
-> >   #include <linux/scatterlist.h>
-> >   #include <linux/string.h>
-> >   #include <linux/jump_label.h>
-> > +#include <linux/security.h>
-> >
-> >   #define DM_MSG_PREFIX                       "verity"
-> >
-> > @@ -930,6 +931,41 @@ static void verity_io_hints(struct dm_target *ti, =
-struct queue_limits *limits)
-> >       limits->dma_alignment =3D limits->logical_block_size - 1;
-> >   }
-> >
-> > +#ifdef CONFIG_SECURITY
-> > +
-> > +static int verity_init_sig(struct dm_verity *v, const void *sig,
-> > +                        size_t sig_size)
-> > +{
-> > +     v->sig_size =3D sig_size;
-> > +
-> > +     if (sig) {
-> > +             v->root_digest_sig =3D kmemdup(sig, v->sig_size, GFP_KERN=
-EL);
-> > +             if (!v->root_digest_sig)
-> > +                     return -ENOMEM;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static void verity_free_sig(struct dm_verity *v)
-> > +{
-> > +     kfree(v->root_digest_sig);
-> > +}
-> > +
-> > +#else
-> > +
-> > +static inline int verity_init_sig(struct dm_verity *v, const void *sig=
-,
-> > +                               size_t sig_size)
-> > +{
-> > +     return 0;
-> > +}
-> > +
-> > +static inline void verity_free_sig(struct dm_verity *v)
-> > +{
-> > +}
-> > +
-> > +#endif /* CONFIG_SECURITY */
-> > +
-> >   static void verity_dtr(struct dm_target *ti)
-> >   {
-> >       struct dm_verity *v =3D ti->private;
-> > @@ -949,6 +985,7 @@ static void verity_dtr(struct dm_target *ti)
-> >       kfree(v->initial_hashstate);
-> >       kfree(v->root_digest);
-> >       kfree(v->zero_digest);
-> > +     verity_free_sig(v);
-> >
-> >       if (v->ahash_tfm) {
-> >               static_branch_dec(&ahash_enabled);
-> > @@ -1418,6 +1455,13 @@ static int verity_ctr(struct dm_target *ti, unsi=
-gned int argc, char **argv)
-> >               ti->error =3D "Root hash verification failed";
-> >               goto bad;
-> >       }
-> > +
-> > +     r =3D verity_init_sig(v, verify_args.sig, verify_args.sig_size);
-> > +     if (r < 0) {
-> > +             ti->error =3D "Cannot allocate root digest signature";
-> > +             goto bad;
-> > +     }
-> > +
-> >       v->hash_per_block_bits =3D
-> >               __fls((1 << v->hash_dev_block_bits) / v->digest_size);
-> >
-> > @@ -1559,8 +1603,79 @@ int dm_verity_get_root_digest(struct dm_target *=
-ti, u8 **root_digest, unsigned i
-> >       return 0;
-> >   }
-> >
-> > +#ifdef CONFIG_SECURITY
-> > +
-> > +#ifdef CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG
-> > +
-> > +static int verity_security_set_signature(struct block_device *bdev,
-> > +                                      struct dm_verity *v)
-> > +{
-> > +     /*
-> > +      * if the dm-verity target is unsigned, v->root_digest_sig will
-> > +      * be NULL, and the hook call is still required to let LSMs mark
-> > +      * the device as unsigned. This information is crucial for LSMs t=
-o
-> > +      * block operations such as execution on unsigned files
-> > +      */
-> > +     return security_bdev_setintegrity(bdev,
-> > +                                       LSM_INT_DMVERITY_SIG_VALID,
-> > +                                       v->root_digest_sig,
-> > +                                       v->sig_size);
-> > +}
-> > +
-> > +#else
-> > +
-> > +static inline int verity_security_set_signature(struct block_device *b=
-dev,
-> > +                                             struct dm_verity *v)
-> > +{
-> > +     return 0;
-> > +}
-> > +
-> > +#endif /* CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG */
-> > +
-> > +/*
-> > + * Expose verity target's root hash and signature data to LSMs before =
-resume.
-> > + *
-> > + * Returns 0 on success, or -ENOMEM if the system is out of memory.
-> > + */
-> > +static int verity_preresume(struct dm_target *ti)
-> > +{
-> > +     struct block_device *bdev;
-> > +     struct dm_verity_digest root_digest;
-> > +     struct dm_verity *v;
-> > +     int r;
-> > +
-> > +     v =3D ti->private;
-> > +     bdev =3D dm_disk(dm_table_get_md(ti->table))->part0;
-> > +     root_digest.digest =3D v->root_digest;
-> > +     root_digest.digest_len =3D v->digest_size;
-> > +     if (static_branch_unlikely(&ahash_enabled) && !v->shash_tfm)
-> > +             root_digest.alg =3D crypto_ahash_alg_name(v->ahash_tfm);
-> > +     else
-> > +             root_digest.alg =3D crypto_shash_alg_name(v->shash_tfm);
-> > +
-> > +     r =3D security_bdev_setintegrity(bdev, LSM_INT_DMVERITY_ROOTHASH,=
- &root_digest,
-> > +                                    sizeof(root_digest));
-> > +     if (r)
-> > +             return r;
-> > +
-> > +     r =3D  verity_security_set_signature(bdev, v);
-> > +     if (r)
-> > +             goto bad;
-> > +
-> > +     return 0;
-> > +
-> > +bad:
-> > +
-> > +     security_bdev_setintegrity(bdev, LSM_INT_DMVERITY_ROOTHASH, NULL,=
- 0);
-> > +
-> > +     return r;
-> > +}
-> > +
-> > +#endif /* CONFIG_SECURITY */
-> > +
-> >   static struct target_type verity_target =3D {
-> >       .name           =3D "verity",
-> > +/* Note: the LSMs depend on the singleton and immutable features */
-> >       .features       =3D DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
-> >       .version        =3D {1, 10, 0},
-> >       .module         =3D THIS_MODULE,
-> > @@ -1571,6 +1686,9 @@ static struct target_type verity_target =3D {
-> >       .prepare_ioctl  =3D verity_prepare_ioctl,
-> >       .iterate_devices =3D verity_iterate_devices,
-> >       .io_hints       =3D verity_io_hints,
-> > +#ifdef CONFIG_SECURITY
-> > +     .preresume      =3D verity_preresume,
-> > +#endif /* CONFIG_SECURITY */
-> >   };
-> >   module_dm(verity);
-> >
-> > diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-> > index aac3a1b1d94a..ea2da450f173 100644
-> > --- a/drivers/md/dm-verity.h
-> > +++ b/drivers/md/dm-verity.h
-> > @@ -45,6 +45,9 @@ struct dm_verity {
-> >       u8 *salt;               /* salt: its size is salt_size */
-> >       u8 *initial_hashstate;  /* salted initial state, if shash_tfm is =
-set */
-> >       u8 *zero_digest;        /* digest for a zero block */
-> > +#ifdef CONFIG_SECURITY
-> > +     u8 *root_digest_sig;    /* signature of the root digest */
-> > +#endif /* CONFIG_SECURITY */
-> >       unsigned int salt_size;
-> >       sector_t data_start;    /* data offset in 512-byte sectors */
-> >       sector_t hash_start;    /* hash start in blocks */
-> > @@ -58,6 +61,9 @@ struct dm_verity {
-> >       bool hash_failed:1;     /* set if hash of any block failed */
-> >       bool use_bh_wq:1;       /* try to verify in BH wq before normal w=
-ork-queue */
-> >       unsigned int digest_size;       /* digest size for the current ha=
-sh algorithm */
-> > +#ifdef CONFIG_SECURITY
-> > +     unsigned int sig_size;  /* root digest signature size */
-> > +#endif /* CONFIG_SECURITY */
-> >       unsigned int hash_reqsize; /* the size of temporary space for cry=
-pto */
-> >       enum verity_mode mode;  /* mode for handling verification errors =
-*/
-> >       unsigned int corrupted_errs;/* Number of errors for corrupted blo=
-cks */
-> > diff --git a/include/linux/security.h b/include/linux/security.h
-> > index 39aec1c96d6a..0604893f2f9e 100644
-> > --- a/include/linux/security.h
-> > +++ b/include/linux/security.h
-> > @@ -83,8 +83,15 @@ enum lsm_event {
-> >       LSM_POLICY_CHANGE,
-> >   };
-> >
-> > +struct dm_verity_digest {
-> > +     const char *alg;
-> > +     const u8 *digest;
-> > +     size_t digest_len;
-> > +};
-> > +
-> >   enum lsm_integrity_type {
-> > -     __LSM_INT_MAX
-> > +     LSM_INT_DMVERITY_SIG_VALID,
-> > +     LSM_INT_DMVERITY_ROOTHASH,
-> >   };
-> >
-> >   /*
+I think a more proper fix is to make LockClassKey pin-init, for
+dynamically allocated LockClassKey, we just use lockdep_register_key()
+as the initializer and lockdep_unregister_key() as the desconstructor.
+And instead of a `&'static LockClassKey`, we should use `Pin<&'static
+LockClassKey>` to pass a lock class key. Of course we will need some
+special treatment on static allocated keys (e.g. assume they are
+initialized since lockdep doesn't require initialization for them).
 
 
+Pin initializer:
 
---=20
-paul-moore.com
+	impl LockClassKey {
+	    pub fn new() -> impl PinInit<Self> {
+		pin_init!(Self {
+		    inner <- Opaque::ffi_init(|slot| { lockdep_register_key(slot) })
+		})
+	    }
+	}
+
+LockClassKey::new_uninit() for `static_lock_class!`:
+
+
+	impl LockClassKey {
+	    pub const fn new_uninit() -> MaybeUninit<Self> {
+	        ....
+	    }
+	}
+
+and the new `static_lock_class!`:
+
+	macro_rules! static_lock_class {
+	    () => {{
+		static CLASS: MaybeUninit<$crate::sync::LockClassKey> = $crate::sync::LockClassKey::new_uninit();
+
+	        // SAFETY: `CLASS` is pinned because it's static
+		// allocated. And it's OK to assume it's initialized
+		// because lockdep support uninitialized static
+		// allocated key.
+		unsafe { Pin::new_unchecked(CLASS.assume_init_ref()) }
+	    }};
+	}
+
+Thoughts?
+
+Regards,
+Boqun
+
+> For the patch itself:
+> 
+> Reviewed-by: Gary Guo <gary@garyguo.net>
