@@ -1,59 +1,60 @@
 Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC8C19FA99
-	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 14:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A370A1B9B5B
+	for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 14:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723732420; cv=none; b=AVzqoQ9Qs30drDffxLclY/8CVXcOIT+7uXnKMG1Ro7Qp+uafF5XjZyi6ojhfmRMLcKDLe1Y8c/7bB99KYrsZl4hDLpsE6jnEO/5U6vMN8jS1MwBxuNHnxpTou93EFVdK5Y3mn9livpx3wjgyXHzPWGeJPoViddu6xZvLsz+r4Xs=
+	t=1723732981; cv=none; b=VZkCP3j2lqQaUviMUHJ0YX0RXDYyTmSxJzXkaAN5/WA+IMygNNZzkvWN65O/C3kSbQb4YS4UR3189JT639MXx2UtUizf/2y3sq5IClkyea9UgqYrBhzKcq/cc9FjWv+BNwPl9Jrzb2UMPD17WT1PmLMP1Zj0Hf7Gpxk4m+6R5dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723732420; c=relaxed/simple;
-	bh=DSUGtq/9K941kinoQIx3PPemHfZMHkN9rIaiuu2LfGQ=;
+	s=arc-20240116; t=1723732981; c=relaxed/simple;
+	bh=BdkFx2l/WomPo83NMJAsTV54fOrmRMhpw8MfNgdmLvs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a/FzY0OZ88H6AY6M+N8daCmNaYlth8oCq93bJ1rb+lpV3XwnEE0Mf9xKuc1c7CBgHRs1c02LidTqQwrObXi+z3owkJ033divB4TP6QZMNn6bGVHdSNnEYSuImXjZMlKnTJH4+402Us+rabRRMF9bmcug2kamE6kHn47l3/0EHhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FKl1OVJw; arc=none smtp.client-ip=209.85.166.41
+	 In-Reply-To:Content-Type; b=eGUZ1wDOM3Q0iYRxOVUcMCzJENo3DvSSBq4AkvZUjzIrYQKXUIYDLM/DJUiTGCoh2+1lqAiR8mff2kJjUXS662RtsOD71DaNNQPduE84ziXdT6yLWmXsktxR2/ld6Dpf2gJWXDLepF3pNPjUQsidknvb5PWR87af7vVii2MN2as=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VW2CgO0o; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FKl1OVJw"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-81f902e94e6so3523439f.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 07:33:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VW2CgO0o"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-81f8add99b6so2134639f.2
+        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 07:42:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723732416; x=1724337216; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723732978; x=1724337778; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6rICprDujQR2UM4HfjMuX0CO7+q7wHZGrKy7Agwu530=;
-        b=FKl1OVJwAR1kZuBLBeUXm1I2Pj9nn+wI4xSPZWhpWnYc5wTSn6U4qU/zl21sMBWGlG
-         5rJVOGvq6Ws4Nqc6Ppp5jLVjgLkd568kTW3q91duWRM0zIFPZ9roLnwLI59sMmnRIXRJ
-         7b/nmDFbPemPGm/zcmSfvOPGnGMnTes4tvtCwAs9LVv4N9VY1xgMmBMk5rzLlsnUUPOr
-         Z1LOyWOQshsScLd3wrec6ABcmTahHO+FnwFR3dfecSS4rWzWv34H0MNR1b3IReIh4Ola
-         kKfmjGMtZ8byxyhRksWgjcQuIkVA5Lvc9akLRCaoCGLrb0qo3dIfCv6NYUPqAHKwkmAE
-         TJEQ==
+        bh=kLQVxjToRHTTsTWidnkDOxtormh+P4ETVsPs0u31nWw=;
+        b=VW2CgO0ofzCdY1R0grU75fsW+cOFSJPR7+1VtfE/2hKMavw6R/Qf61w/Tcz491mn5Q
+         v2Oo6FwHCb2K+mw1CnrEmPpWGJNYZD83BGZEgnQpQrZdE7fPdbvBxX3uMGkv1+tv798a
+         P/ouOzVN4ONLLWGhvWfVJ3ALb/yiNS8aNDea1At1GcSKiECne3yz9U7hNRph6gPwR6pq
+         VjhYHOJRKBRIXU0awaDzhg6temsMU2+GzsY04gSJFH1Ae7mapFBTJJQ9b/HUvXgVFsZc
+         vfp8TWE8PK8xFgk/dNCWjKgWWBryBLajbGi754nPBvKXWQvN1taKZP/nCv7RGWUSFf8d
+         wrtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723732416; x=1724337216;
+        d=1e100.net; s=20230601; t=1723732978; x=1724337778;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6rICprDujQR2UM4HfjMuX0CO7+q7wHZGrKy7Agwu530=;
-        b=wIXBDXj/QAIqrttgO6nemuF/mGjyWoTlqI7RTenx7hr3oFID7AbIU5xejDNbHsokc6
-         gajuwpVs7Xke/YNFu7+33nLyFSL80nezodskCki2tNUcHb0cWIAnYZ4PXjZSIiij2aqe
-         oTzNBVVq5Y4c2dKevUgBkuvUTs3gwHIPHTPFbynnfguC0rQq96tvWz/5UsOlREkSc7ou
-         1JlojvBBTlHEqupOg8RKZKKMvccBg+wSJMIQ/Bxj1bsw0XeF3Apq0k6130/Gfcz139WC
-         rMXlhomXm7GPWgrL7S7KHWDJa684aP1H4MPsQZTU5mz8gvyB5YScesJFGx9ahqNby56s
-         rf9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUP8u0YRDPYvOlLngovA2KrzwYqim/HFDpPX3nkNDazzifcHbtbeCCPMRNrpFOLaGEogECy20dndCKm4NgEh4HHsOGh+lfD7Mg3WPk=
-X-Gm-Message-State: AOJu0YwFN3QFKQGCCaENnacxb6v2LtmBoYSnf630+mwvzbyHx2gnmogl
-	Q+Sqx1vDGOcD338n5pvq0AaGDSXAVDzBBoMlaaxNmwDBxthFIj7TwxroQCK08xs=
-X-Google-Smtp-Source: AGHT+IGvpiwXjlJpt5son2O8gjjV3rFX1h5+5bydBPLKRSpEg1HWIUur+IBQ2exWat+kjseYTgNOvQ==
-X-Received: by 2002:a6b:6305:0:b0:7f6:85d1:f81a with SMTP id ca18e2360f4ac-824e86c307dmr186663439f.2.1723732416308;
-        Thu, 15 Aug 2024 07:33:36 -0700 (PDT)
+        bh=kLQVxjToRHTTsTWidnkDOxtormh+P4ETVsPs0u31nWw=;
+        b=qfvG8ERBwX2UeHqr/QM6G8fkvOVASibJFY0cgGDwmcAutAWr717JdI5DGBtFx0CVvn
+         Zf6Fr3YJ6ycRpOuvEXIVh55TWljXb+0wktLeBM/4X3KXMJWBgDUJGCDbV78VCOyyi2+B
+         MKRUZRBbTyb7fq+JjIcYrhJi3Q2ZdrPMkxgBjcknwlkYAGDCTUnHIczbylhEA1NwXV3U
+         FSQd9WxNvn1FRDh4+++cDOL+51adg/vjvfwi/k/YhhrmS3IIusTZfA90sBJSvSYoMp+1
+         5uFxnPTDTC0a1ApcaZAVahwh7Z9ev4Yb0dW1jBdeGbFQKnuvVGESAydU5kPJUmCe9a8q
+         RPpw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/LgxwJte0W3TwQlFJcv5pS2HIGJ69OLilRar9+Cb+zFgcpOhVrr/755l7GLa2rC7idkVryygLE2+QbA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOUc1vCddsWq9xEPzY7tSwTa6jhmEXn7Lh8E1WB5OfoQfEpnJR
+	GqnG43+QtSP4kXfImoaj7jTbQQLX/R8zmogh83wobBdaiJH78WL/JifctVgeUbaDo9sfXrwqHBP
+	U
+X-Google-Smtp-Source: AGHT+IFzaXrg2hNk3mBUNAtA5z5C3113LDJGI8/gSRITKFMwrG8Z4L861A6eJ+m0YKVu9a5r7Zss9g==
+X-Received: by 2002:a05:6602:314f:b0:81f:8295:fec5 with SMTP id ca18e2360f4ac-824f261391dmr1020039f.1.1723732977636;
+        Thu, 15 Aug 2024 07:42:57 -0700 (PDT)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-824e98eda17sm52953239f.6.2024.08.15.07.33.35
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-824e990d5b4sm53016239f.14.2024.08.15.07.42.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Aug 2024 07:33:35 -0700 (PDT)
-Message-ID: <fd357721-7ba7-4321-88da-28651754f8a4@kernel.dk>
-Date: Thu, 15 Aug 2024 08:33:34 -0600
+        Thu, 15 Aug 2024 07:42:56 -0700 (PDT)
+Message-ID: <57951efc-2f43-4cd1-a053-f4a8f323118f@kernel.dk>
+Date: Thu, 15 Aug 2024 08:42:56 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,82 +63,128 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC 5/5] block: implement io_uring discard cmd
-To: Ming Lei <ming.lei@redhat.com>, Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, Conrad Meyer <conradmeyer@meta.com>,
- linux-block@vger.kernel.org, linux-mm@kvack.org
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org,
+ linux-mm@kvack.org
 References: <cover.1723601133.git.asml.silence@gmail.com>
  <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
- <CAFj5m9+CXS_b5kgFioFHTWivb6O+R9HytsSQEHcEzUM5SqHfgw@mail.gmail.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAFj5m9+CXS_b5kgFioFHTWivb6O+R9HytsSQEHcEzUM5SqHfgw@mail.gmail.com>
+In-Reply-To: <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 8/14/24 7:42 PM, Ming Lei wrote:
-> On Wed, Aug 14, 2024 at 6:46?PM Pavel Begunkov <asml.silence@gmail.com> wrote:
->>
->> Add ->uring_cmd callback for block device files and use it to implement
->> asynchronous discard. Normally, it first tries to execute the command
->> from non-blocking context, which we limit to a single bio because
->> otherwise one of sub-bios may need to wait for other bios, and we don't
->> want to deal with partial IO. If non-blocking attempt fails, we'll retry
->> it in a blocking context.
->>
->> Suggested-by: Conrad Meyer <conradmeyer@meta.com>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> ---
->>  block/blk.h             |  1 +
->>  block/fops.c            |  2 +
->>  block/ioctl.c           | 94 +++++++++++++++++++++++++++++++++++++++++
->>  include/uapi/linux/fs.h |  2 +
->>  4 files changed, 99 insertions(+)
->>
->> diff --git a/block/blk.h b/block/blk.h
->> index e180863f918b..5178c5ba6852 100644
->> --- a/block/blk.h
->> +++ b/block/blk.h
->> @@ -571,6 +571,7 @@ blk_mode_t file_to_blk_mode(struct file *file);
->>  int truncate_bdev_range(struct block_device *bdev, blk_mode_t mode,
->>                 loff_t lstart, loff_t lend);
->>  long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
->> +int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags);
->>  long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
->>
->>  extern const struct address_space_operations def_blk_aops;
->> diff --git a/block/fops.c b/block/fops.c
->> index 9825c1713a49..8154b10b5abf 100644
->> --- a/block/fops.c
->> +++ b/block/fops.c
->> @@ -17,6 +17,7 @@
->>  #include <linux/fs.h>
->>  #include <linux/iomap.h>
->>  #include <linux/module.h>
->> +#include <linux/io_uring/cmd.h>
->>  #include "blk.h"
->>
->>  static inline struct inode *bdev_file_inode(struct file *file)
->> @@ -873,6 +874,7 @@ const struct file_operations def_blk_fops = {
->>         .splice_read    = filemap_splice_read,
->>         .splice_write   = iter_file_splice_write,
->>         .fallocate      = blkdev_fallocate,
->> +       .uring_cmd      = blkdev_uring_cmd,
-> 
-> Just be curious, we have IORING_OP_FALLOCATE already for sending
-> discard to block device, why is .uring_cmd added for this purpose?
+On 8/14/24 4:45 AM, Pavel Begunkov wrote:
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index c7a3e6c6f5fa..f7f9c4c6d6b5 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -11,6 +11,8 @@
+>  #include <linux/blktrace_api.h>
+>  #include <linux/pr.h>
+>  #include <linux/uaccess.h>
+> +#include <linux/pagemap.h>
+> +#include <linux/io_uring/cmd.h>
+>  #include "blk.h"
+>  
+>  static int blkpg_do_ioctl(struct block_device *bdev,
+> @@ -744,4 +746,96 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+>  
+>  	return ret;
+>  }
+> +
+> +struct blk_cmd {
+> +	blk_status_t status;
+> +	bool nowait;
+> +};
+> +
+> +static void blk_cmd_complete(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> +{
+> +	struct blk_cmd *bc = io_uring_cmd_to_pdu(cmd, struct blk_cmd);
+> +	int res = blk_status_to_errno(bc->status);
+> +
+> +	if (res == -EAGAIN && bc->nowait)
+> +		io_uring_cmd_issue_blocking(cmd);
+> +	else
+> +		io_uring_cmd_done(cmd, res, 0, issue_flags);
+> +}
+> +
+> +static void bio_cmd_end(struct bio *bio)
+> +{
+> +	struct io_uring_cmd *cmd = bio->bi_private;
+> +	struct blk_cmd *bc = io_uring_cmd_to_pdu(cmd, struct blk_cmd);
+> +
+> +	if (unlikely(bio->bi_status) && !bc->status)
+> +		bc->status = bio->bi_status;
+> +
+> +	io_uring_cmd_do_in_task_lazy(cmd, blk_cmd_complete);
+> +	bio_put(bio);
+> +}
+> +
+> +static int blkdev_cmd_discard(struct io_uring_cmd *cmd,
+> +			      struct block_device *bdev,
+> +			      uint64_t start, uint64_t len, bool nowait)
+> +{
+> +	sector_t sector = start >> SECTOR_SHIFT;
+> +	sector_t nr_sects = len >> SECTOR_SHIFT;
+> +	struct bio *prev = NULL, *bio;
+> +	int err;
+> +
+> +	err = blk_validate_discard(bdev, file_to_blk_mode(cmd->file),
+> +				   start, len);
+> +	if (err)
+> +		return err;
+> +	err = filemap_invalidate_pages(bdev->bd_mapping, start,
+> +					start + len - 1, nowait);
+> +	if (err)
+> +		return err;
+> +
+> +	while ((bio = blk_alloc_discard_bio(bdev, &sector, &nr_sects,
+> +					    GFP_KERNEL))) {
+> +		if (nowait) {
+> +			if (unlikely(nr_sects)) {
+> +				bio_put(bio);
+> +				return -EAGAIN;
+> +			}
+> +			bio->bi_opf |= REQ_NOWAIT;
+> +		}
+> +		prev = bio_chain_and_submit(prev, bio);
+> +	}
+> +	if (!prev)
+> +		return -EFAULT;
+> +
+> +	prev->bi_private = cmd;
+> +	prev->bi_end_io = bio_cmd_end;
+> +	submit_bio(prev);
+> +	return -EIOCBQUEUED;
+> +}
+> +
+> +int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> +{
+> +	struct block_device *bdev = I_BDEV(cmd->file->f_mapping->host);
+> +	struct blk_cmd *bc = io_uring_cmd_to_pdu(cmd, struct blk_cmd);
+> +	const struct io_uring_sqe *sqe = cmd->sqe;
+> +	u32 cmd_op = cmd->cmd_op;
+> +	uint64_t start, len;
+> +
+> +	if (unlikely(sqe->ioprio || sqe->__pad1 || sqe->len ||
+> +		     sqe->rw_flags || sqe->file_index))
+> +		return -EINVAL;
+> +
+> +	bc->status = BLK_STS_OK;
+> +	bc->nowait = issue_flags & IO_URING_F_NONBLOCK;
+> +
+> +	start = READ_ONCE(sqe->addr);
+> +	len = READ_ONCE(sqe->addr3);
+> +
+> +	switch (cmd_op) {
+> +	case BLOCK_URING_CMD_DISCARD:
+> +		return blkdev_cmd_discard(cmd, bdev, start, len, bc->nowait);
+> +	}
+> +	return -EINVAL;
+> +}
 
-I think wiring up a bdev uring_cmd makes sense, because:
-
-1) The existing FALLOCATE op is using vfs_fallocate, which is inherently
-   sync and hence always punted to io-wq.
-
-2) There will most certainly be other async ops that would be
-   interesting to add, at which point we'd need it anyway.
-
-3) It arguably makes more sense to have a direct discard op than use
-   fallocate for this, if working on a raw bdev.
-
-And probably others...
+This is inside the CONFIG_COMPAT section, which doesn't seem right.
 
 -- 
 Jens Axboe
