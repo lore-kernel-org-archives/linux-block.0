@@ -1,207 +1,129 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0624B1BE85C
-	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 16:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1681C27
+	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 19:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723824750; cv=none; b=C52bReVE5b5KZP6cl5EcBRDWFYlW+Bn4NMIb7E4f2ZwSvWuS8d6yDFIp2IUDLRDsmY5RdAzl+gTgsfYquizC1NLwBILGoGgmW7E/eDKuxNz4QTSUw82pqZ4etmb7pH67eRvfwrFgptVIzn01gRGQfEymp0YW0X5hahw9sNo7b4M=
+	t=1723834975; cv=none; b=Q44d5Lhrs9a0sZEp40qWPvo2pG0m1+lvQ99AlM06ki0t7I22ittbBthNGaAQlBBs525Qlnvfbz0Z8aaDL4bcraYpjm9/1QtFVJz0O69upP3n5W3OP9uOK3Ev+8P8WLEr8nN95sBZoW950Wl88C+jLqceuaHohcIz4xBl83aNA8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723824750; c=relaxed/simple;
-	bh=wgeJia9bjdiNDXCX3q482jNRCcsVA80+lDPe86g7+YA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DTxFgMWWZezXEHw/GRL9skBHy9Ul7kd9jktBh+Vc/HPgt4q71ILKNA7YwzF+miHFfUJ8XNGQIjbp5DM456ciN+wBQ0IJxEpYyZ6K9yh2cdeRwi5XmNke5CBCO1ykko2igKEjfoeZVUhvDTYsbuYQbuR4yODBTnOw0aBlvrYe8ZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LHDvZUpt; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1723834975; c=relaxed/simple;
+	bh=yJulIx5Jdu/ANiHZgztyyQgFODLRkmcuOLK7sWJyujs=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=btLxbE4TOxw4biZOcWsn7NU2E4Hd/N+A8XuNTUKKpCnSdpseJ8jovN4/YXnhm+GKITX2QiQ1Sj0kP+8wQGvDcZ4I9FeOrZrDtFC0wkcB4lLw2wKEwtJ4Yp/mqCXnuAmBHT+VGwwXg/CbjKFWgEJ93LXB86j0mqGpmBKEXkwR1WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zrmZjwSX; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LHDvZUpt"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47GCTfRc002675;
-	Fri, 16 Aug 2024 16:12:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:subject:from:reply-to:to:cc:date:in-reply-to
-	:references:content-type:content-transfer-encoding:mime-version;
-	 s=pp1; bh=u0r69LUg5vLyZ30neeYD6QcQzQ8qLxsvmEJOsTxP/l4=; b=LHDvZ
-	UptmI2pegfbx5TFrF9bJYB0RPxvadA7qpCTvdzoCAqh78fgHt2L5NvYuD7kUP4jJ
-	wbRdoRvxHS+6QTbWLWTRPW9VWW0na7wA9XIHzBzyTtw2EI2SE4elScRyl28f5907
-	hByTL2onOa8GDIOxOdG43pgRGro3h85aaQyzlK1CgdBUQJjJh/7lt1YTrPzpQ5Z0
-	eI9OGO2+iTgWf5FirFAK60mwzugH4u5l1OsGlzMtTw8H/do2KmqcDNh2QY1FSa/N
-	2gwy1sc/hEzMEwxy52JuqKFBTHXo22eL0rnNoe5aMUGHOFqBNBokrFwGw5aADfOr
-	tF4J/tkq580cl6a/w==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6s6h4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Aug 2024 16:12:17 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47GD0w52020896;
-	Fri, 16 Aug 2024 16:12:16 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 40xn83m0ex-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Aug 2024 16:12:16 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47GGCDfe28312078
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Aug 2024 16:12:15 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4F37058058;
-	Fri, 16 Aug 2024 16:12:13 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3755858057;
-	Fri, 16 Aug 2024 16:12:13 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.61.43.239])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 16 Aug 2024 16:12:13 +0000 (GMT)
-Message-ID: <1d566fa1305d80d3704af6d4159658f13f10c590.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] block: sed-opal: add ioctl IOC_OPAL_SET_SID_PW
-From: Greg Joyce <gjoyce@linux.ibm.com>
-Reply-To: gjoyce@linux.ibm.com
-To: Michal =?ISO-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, jonathan.derrick@linux.dev
-Date: Fri, 16 Aug 2024 11:12:13 -0500
-In-Reply-To: <20240816154021.GX26466@kitsune.suse.cz>
-References: <20240816153557.11734-1-gjoyce@linux.ibm.com>
-	 <20240816153557.11734-2-gjoyce@linux.ibm.com>
-	 <20240816154021.GX26466@kitsune.suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 (3.52.3-1.fc40app2) 
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zrmZjwSX"
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-39b3a9f9f4fso1466545ab.0
+        for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 12:02:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723834971; x=1724439771; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+YfrnOBpAm6Irhcb5VIa1tWyOWS9/ezixO/rJOuImx0=;
+        b=zrmZjwSXJkwVDpRQABGDAS4gK/d9GepOzTCynsWelSxZU7CryOwPEJWYoqM311jTJK
+         vfOmhD/Vv7dGpK62kRW++6Zz/aPA2v1cBrK6KLAxNvocJrSyKaLMRQkG7FVhxvxv4tFA
+         UkO6YZAllEoUoenXaW7D5plaeKk2+pidbfJ7ISzb50TcodcjQR05fyD38c2CnRYwnx34
+         soNmNSfZIOGuRqzSGuq9tPaow0C6Tea+XULq02rLX+McLIhFzy3cvVaiIcauOpHvIKZl
+         09QdHSHkdVRMzZ1cs8u02/te8mi+/mfYpQ77Qww/ob2+rM8kKZiSqRxXyCdxI82qnv+f
+         mJfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723834971; x=1724439771;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+YfrnOBpAm6Irhcb5VIa1tWyOWS9/ezixO/rJOuImx0=;
+        b=xK/SUz1HvEauEkYNhhm2TOPNNdZhRfvfoKMG/FOOvpJfiZOc39yNzO5qfv/HtYYL+4
+         VxryPR3Fa4bI0O4TQ7S+hMjpntUbj2UjtgjdGFYl+8jKIGyTCW1fD9aVdYTwZhkck8ie
+         1dui/7cn3OVWJBEtuJ8pzk74h7444SQK/4VwAhyEGbzBp7byAJOHjg3Gz9YCTcz8kvUY
+         +/nNTkIdNnFIX6JpYRJMzK0kYjRua7P9196bfZhk/LxeERXSThpG5faj9Q4VgpVzvaBU
+         im6dXJ0Wp6uqnOCZo1VW9IzIfRTXw+CkqFVUuAZouR2CWMG5XpGrWSZ3kz4rEVG7aBzp
+         BvQA==
+X-Gm-Message-State: AOJu0Yy7gfnpxXO4h6lsitxXBYjV7S38Lbun9e1RChfoK2bZuO2Dhvpu
+	Dvq/lE7tyy3mY30DBvlDjNHYTVC7A7j+IQsBTl0RhT7tfjIwbsRCBbjfPlEx815MbN6d6MXDWNA
+	Y
+X-Google-Smtp-Source: AGHT+IGruKZ0lNFTJgZMWDkgbHeDk/bD5Ae8EkvdOWDKw4sMIxrCGC0Jum03tDmMij0WrRxkZhENeg==
+X-Received: by 2002:a5d:91c9:0:b0:822:3c35:5fc0 with SMTP id ca18e2360f4ac-824f2721fa8mr262560439f.3.1723834971404;
+        Fri, 16 Aug 2024 12:02:51 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ccd6f74c38sm1388166173.135.2024.08.16.12.02.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Aug 2024 12:02:50 -0700 (PDT)
+Message-ID: <1c41cbc8-dd07-42ba-a192-665103012e64@kernel.dk>
+Date: Fri, 16 Aug 2024 13:02:50 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4NebHTeKKCsAYuuAO6tj4cFHdmz5U97z
-X-Proofpoint-GUID: 4NebHTeKKCsAYuuAO6tj4cFHdmz5U97z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-16_09,2024-08-16_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 impostorscore=0
- priorityscore=1501 suspectscore=0 malwarescore=0 mlxlogscore=848
- phishscore=0 mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408160111
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.11-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hi Linus,
+
+A few fixes for the block side for the 6.11 release:
+
+- Fix corruption issues with s390/dasd (Eric, Stefan)
+
+- Fix a misuse of non irq locking grab of a lock (Li)
+
+- MD pull request with a single data corruption fix for raid1 (Yu)
+
+And I just now notice that I used the wrong data on both this one and
+the io_uring pull request. Oh well, it's just a tag name.
+
+Please pull!
 
 
-Yes, I'll have a pull request for nvme-cli later today or Monday at the
-latest. The changes will be dependent on IOC_OPAL_SET_SID_PW being
-defined so that the cli isn't dependent on kernel version.
+The following changes since commit eded04fe3bdad9b11bc82b972b4c6fa79f1726ba:
 
-Greg
+  Merge tag 'nvme-6.11-2024-08-08' of git://git.infradead.org/nvme into block-6.11 (2024-08-08 12:27:40 -0600)
 
-On Fri, 2024-08-16 at 17:40 +0200, Michal Such=C3=A1nek wrote:
-> Hello,
->=20
-> is there a corresponding change to an userspace tool to make use of
-> this?
->=20
-> Thanks
->=20
-> Michal
->=20
-> On Fri, Aug 16, 2024 at 10:35:57AM -0500, gjoyce@linux.ibm.com=C2=A0wrote=
-:
-> > From: Greg Joyce <gjoyce@linux.ibm.com>
-> >=20
-> > After a SED drive is provisioned, there is no way to change the SID
-> > password via the ioctl() interface. A new ioctl IOC_OPAL_SET_SID_PW
-> > will allow the password to be changed. The valid current password
-> > is
-> > required.
-> >=20
-> > Signed-off-by: Greg Joyce <gjoyce@linux.ibm.com>
-> > ---
-> > =C2=A0block/sed-opal.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++++
-> > =C2=A0include/linux/sed-opal.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 =
-+
-> > =C2=A0include/uapi/linux/sed-opal.h |=C2=A0 1 +
-> > =C2=A03 files changed, 28 insertions(+)
-> >=20
-> > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> > index 598fd3e7fcc8..5a28f23f7f22 100644
-> > --- a/block/sed-opal.c
-> > +++ b/block/sed-opal.c
-> > @@ -3037,6 +3037,29 @@ static int opal_set_new_pw(struct opal_dev
-> > *dev, struct opal_new_pw *opal_pw)
-> > =C2=A0	return ret;
-> > =C2=A0}
-> > =C2=A0
-> > +static int opal_set_new_sid_pw(struct opal_dev *dev, struct
-> > opal_new_pw *opal_pw)
-> > +{
-> > +	int ret;
-> > +	struct opal_key *newkey =3D &opal_pw->new_user_pw.opal_key;
-> > +	struct opal_key *oldkey =3D &opal_pw->session.opal_key;
-> > +
-> > +	const struct opal_step pw_steps[] =3D {
-> > +		{ start_SIDASP_opal_session, oldkey },
-> > +		{ set_sid_cpin_pin, newkey },
-> > +		{ end_opal_session, }
-> > +	};
-> > +
-> > +	if (!dev)
-> > +		return -ENODEV;
-> > +
-> > +	mutex_lock(&dev->dev_lock);
-> > +	setup_opal_dev(dev);
-> > +	ret =3D execute_steps(dev, pw_steps, ARRAY_SIZE(pw_steps));
-> > +	mutex_unlock(&dev->dev_lock);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > =C2=A0static int opal_activate_user(struct opal_dev *dev,
-> > =C2=A0			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct opal_session_info
-> > *opal_session)
-> > =C2=A0{
-> > @@ -3286,6 +3309,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned
-> > int cmd, void __user *arg)
-> > =C2=A0	case IOC_OPAL_DISCOVERY:
-> > =C2=A0		ret =3D opal_get_discv(dev, p);
-> > =C2=A0		break;
-> > +	case IOC_OPAL_SET_SID_PW:
-> > +		ret =3D opal_set_new_sid_pw(dev, p);
-> > +		break;
-> > =C2=A0
-> > =C2=A0	default:
-> > =C2=A0		break;
-> > diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-> > index 2ac50822554e..80f33a93f944 100644
-> > --- a/include/linux/sed-opal.h
-> > +++ b/include/linux/sed-opal.h
-> > @@ -52,6 +52,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
-> > =C2=A0	case IOC_OPAL_GET_GEOMETRY:
-> > =C2=A0	case IOC_OPAL_DISCOVERY:
-> > =C2=A0	case IOC_OPAL_REVERT_LSP:
-> > +	case IOC_OPAL_SET_SID_PW:
-> > =C2=A0		return true;
-> > =C2=A0	}
-> > =C2=A0	return false;
-> > diff --git a/include/uapi/linux/sed-opal.h
-> > b/include/uapi/linux/sed-opal.h
-> > index d3994b7716bc..9025dd5a4f0f 100644
-> > --- a/include/uapi/linux/sed-opal.h
-> > +++ b/include/uapi/linux/sed-opal.h
-> > @@ -215,5 +215,6 @@ struct opal_revert_lsp {
-> > =C2=A0#define IOC_OPAL_GET_GEOMETRY=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- _IOR('p', 238, struct
-> > opal_geometry)
-> > =C2=A0#define IOC_OPAL_DISCOVERY=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 _IOW('p', 239, struct
-> > opal_discovery)
-> > =C2=A0#define IOC_OPAL_REVERT_LSP=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 _IOW('p', 240, struct
-> > opal_revert_lsp)
-> > +#define IOC_OPAL_SET_SID_PW=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 _IOW('p', 241, struct
-> > opal_new_pw)
-> > =C2=A0
-> > =C2=A0#endif /* _UAPI_SED_OPAL_H */
-> > --=20
-> > gjoyce@linux.ibm.com
-> >=20
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.11-20240824
+
+for you to fetch changes up to b313a8c835516bdda85025500be866ac8a74e022:
+
+  block: Fix lockdep warning in blk_mq_mark_tag_wait (2024-08-15 19:25:03 -0600)
+
+----------------------------------------------------------------
+block-6.11-20240824
+
+----------------------------------------------------------------
+Eric Farman (1):
+      s390/dasd: Remove DMA alignment
+
+Jens Axboe (1):
+      Merge tag 'md-6.11-20240815' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.11
+
+Li Lingfeng (1):
+      block: Fix lockdep warning in blk_mq_mark_tag_wait
+
+Stefan Haberland (1):
+      s390/dasd: fix error recovery leading to data corruption on ESE devices
+
+Yu Kuai (1):
+      md/raid1: Fix data corruption for degraded array with slow disk
+
+ block/blk-mq-tag.c                 |  5 ++--
+ drivers/md/raid1.c                 | 14 +++++++---
+ drivers/s390/block/dasd.c          | 36 ++++++++++++++++---------
+ drivers/s390/block/dasd_3990_erp.c | 10 ++-----
+ drivers/s390/block/dasd_eckd.c     | 55 +++++++++++++++++---------------------
+ drivers/s390/block/dasd_genhd.c    |  1 -
+ drivers/s390/block/dasd_int.h      |  2 +-
+ 7 files changed, 63 insertions(+), 60 deletions(-)
+
+-- 
+Jens Axboe
 
