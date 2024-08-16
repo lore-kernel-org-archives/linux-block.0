@@ -1,227 +1,155 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20545B647
-	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 01:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D32F29CEF
+	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 01:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723771522; cv=none; b=T0FP71IGVjJOJCyfaHnU80KuATWODMqUEua0uM4aAePqLJJNuIxbvWRkJ2GyD32FTrGKtm4Fkl3jKBITBaP/vgH9ZZPCNmN6VzpB1RgU3dG2nwnVguKFiPq1Yu8bA12Lb3hxKfXbhwX4thNUx1uP0UPjefB2dOy6jPZjxIno5qo=
+	t=1723772726; cv=none; b=pLNg29cxsx8v1MxgR8plUvzhibC8DzKxLg5q9Kf5aI6Ulfr07Yk3Im6KMDJAaCkl2Oq3Vsfr5ZuP/sfZxHDz4nZ+jOBihxowbdWSwA5ytNTzLX0BDrLipw7xYCJsbcFFdtBt0m4i3JFSnYfAzdgl+zsTkcLotnEFFHWv4F6qVDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723771522; c=relaxed/simple;
-	bh=CYpwr6StzSj2+7DzSMHAY4aXezq3O6/CadyyDKmzt1U=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=e1AMimXPkQJ8c+eNNLA9HO/VSPnFjnhvFk55LDkITT130yI9l+S60vuBY3YKSktOvogIGIsRUji4FcDE8ESIIB61EvrSmBlCie5xlPdXSoDYB9BL0ahNcJRU27+y61AVH3YwwTxgP8n0xNop6PRaRYT41/XuYmTd/cur3kty/30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SBtZUkZu; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1723772726; c=relaxed/simple;
+	bh=s/nwH08NlRsAyxnKAea0guN+gj5xC4Yb7Z1jzGw+MO0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A9wICveyt7f7qJdZzzrEPYb6blXpGrqY/T4jA8u1hs8RMgGsmqEhVZ1OCQHtFq3UcT9LIZqLAZZNLt/myVN8HWkfWj8yidqrmDjaOn2tOmzZyBJwQnNKM73glN06pH3Pvnm+nc3XwwruTeT7/u1AF0k+5g3dweMIo2J9Cmu+Wkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=grPcC2GI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SBtZUkZu"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2d3d486d8bdso151670a91.3
-        for <linux-block@vger.kernel.org>; Thu, 15 Aug 2024 18:25:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723771519; x=1724376319; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ESMhcPFphyXhqA8QukLZ6cV9TYtHR+VBt5t6iYkD0kQ=;
-        b=SBtZUkZu3qfMIMyjHakeQKOnRsthZxN0kue4inhDjl9xnma5K2WKoKyl3bBTFKhMvL
-         WNHwZwAi/1zEakbiWXuSWQivkNKu0YmZ9sgFXV3CL4xqHslWbzPd/1r5Vwdn4M57n0F4
-         035ONPcURelaHoK5Kxc/RGZXnD4JAwC22itaHAZUZ6HyeiVR9DBrKBmdro6qt4uOMSAJ
-         pG2h2b73Z4NMVB/hfB5L/mMAaGBUHUoKhLYtw21DUx7sZZoiK969mOg0fbzMFpTsh6PR
-         KlMmf8yQqlrcavYHYBGcqPzSYEqzW4D+x1qCu+0BdY/FSm3YZAflRoYCgLDduyzqwNXl
-         DaJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723771519; x=1724376319;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ESMhcPFphyXhqA8QukLZ6cV9TYtHR+VBt5t6iYkD0kQ=;
-        b=qMcIPrSM99TMU8Ovp4tPE6+LzJyvp2sTFF+l2czmUc76l9cZjw7X599yFBcnh/xdzP
-         S5X8mDmej9cOAhscI8EHUC/aGcdC+G8OmvICQ5GbBZM9G2/2o1kek66u+fOuiSSzS9iT
-         MYaXgPwJ/OU9W4J91TyRMSMyNrb5wmc0zLvh0nnoHLqsZ/oO1IdAiOZtnoyY6tfQmfdi
-         aK03Jf3ticB+20pOEj/IirrXdPDiuct/LbUXvaNHDZdBMqwPQR6o5ZoWU/pZjtKFFSoT
-         D+u3PEphqfPTcnRq8kkHn59HstssK//Z1MiLHM+PM2KfMn73qWYCsOxXnQ9ZAgqLIxK9
-         9hUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWD1m0pAj741nzjP8ggsaTlnlvBLNP26wT0wOBu/RBli98TeZTPc2AOU/FLlm34tzfZC4+60P8yE/E4we3R1erhXABNvlf0I7lOnBc=
-X-Gm-Message-State: AOJu0YwQHLyS3MX6LCwY7OlDDl+OvkH0F562yfZhu4pGGlZhFPEEvEQt
-	7kxcI0ww483kGpG0q69Nd/zlZ1kyqlJ1jA4uZkLdO7NynUOs+Bf/5XRIc974q78=
-X-Google-Smtp-Source: AGHT+IEmPxntCuqf16ABuO4U2q3vD1ru4bN8oaWiUd542npnxXCCHFqNnh1QyOtbYK+souYGazCsng==
-X-Received: by 2002:a17:902:e5d0:b0:1fa:ab4a:fb02 with SMTP id d9443c01a7336-20203b110edmr10091285ad.0.1723771519299;
-        Thu, 15 Aug 2024 18:25:19 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f0301f8csm16038475ad.50.2024.08.15.18.25.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 18:25:18 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: bvanassche@acm.org, hch@lst.de, jack@suse.cz, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: yukuai1@huaweicloud.com, yukuai3@huawei.com, houtao1@huawei.com, 
- yi.zhang@huawei.com, yangerkun@huawei.com, lilingfeng3@huawei.com
-In-Reply-To: <20240815024736.2040971-1-lilingfeng@huaweicloud.com>
-References: <20240815024736.2040971-1-lilingfeng@huaweicloud.com>
-Subject: Re: [PATCH v2] block: Fix lockdep warning in blk_mq_mark_tag_wait
-Message-Id: <172377151781.214020.14270712076295454810.b4-ty@kernel.dk>
-Date: Thu, 15 Aug 2024 19:25:17 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="grPcC2GI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723772723;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Mxy0rtdNdtcD3NoIzzm3sQ/N1TTdvcPBZq39L7HnMHg=;
+	b=grPcC2GIzUaxBP+pG7UpfGIDNLa8rk056GC6x6unqoWhL2ab7n8U2AW19tqHcy3jHmwHlh
+	jIUDLhzq5SL37jxu7eucGMCaa8Y3hOL3RdfeTewkinrHuU5Aj3ywJwsCaVI3R7aJMm1+fJ
+	2dpKFi1svM8bAiBVKxItXZ//JoJUNBI=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-253-Uz1QAaw1Ni6II1qQQ0QGBQ-1; Thu,
+ 15 Aug 2024 21:45:18 -0400
+X-MC-Unique: Uz1QAaw1Ni6II1qQQ0QGBQ-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E4FD1955D52;
+	Fri, 16 Aug 2024 01:45:17 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.112])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5FD6C19560AA;
+	Fri, 16 Aug 2024 01:45:11 +0000 (UTC)
+Date: Fri, 16 Aug 2024 09:45:06 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+	Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, ming.lei@redhat.com
+Subject: Re: [RFC 5/5] block: implement io_uring discard cmd
+Message-ID: <Zr6vIt1uSe9/xguH@fedora>
+References: <cover.1723601133.git.asml.silence@gmail.com>
+ <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
+ <CAFj5m9+CXS_b5kgFioFHTWivb6O+R9HytsSQEHcEzUM5SqHfgw@mail.gmail.com>
+ <fd357721-7ba7-4321-88da-28651754f8a4@kernel.dk>
+ <e06fd325-f20f-44d8-8f72-89b97cf4186f@gmail.com>
+ <Zr6S4sHWtdlbl/dd@fedora>
+ <4d016a30-d258-4d0e-b3bc-18bf0bd48e32@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4d016a30-d258-4d0e-b3bc-18bf0bd48e32@kernel.dk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-
-On Thu, 15 Aug 2024 10:47:36 +0800, Li Lingfeng wrote:
-> Lockdep reported a warning in Linux version 6.6:
+On Thu, Aug 15, 2024 at 07:24:16PM -0600, Jens Axboe wrote:
+> On 8/15/24 5:44 PM, Ming Lei wrote:
+> > On Thu, Aug 15, 2024 at 06:11:13PM +0100, Pavel Begunkov wrote:
+> >> On 8/15/24 15:33, Jens Axboe wrote:
+> >>> On 8/14/24 7:42 PM, Ming Lei wrote:
+> >>>> On Wed, Aug 14, 2024 at 6:46?PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> >>>>>
+> >>>>> Add ->uring_cmd callback for block device files and use it to implement
+> >>>>> asynchronous discard. Normally, it first tries to execute the command
+> >>>>> from non-blocking context, which we limit to a single bio because
+> >>>>> otherwise one of sub-bios may need to wait for other bios, and we don't
+> >>>>> want to deal with partial IO. If non-blocking attempt fails, we'll retry
+> >>>>> it in a blocking context.
+> >>>>>
+> >>>>> Suggested-by: Conrad Meyer <conradmeyer@meta.com>
+> >>>>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> >>>>> ---
+> >>>>>   block/blk.h             |  1 +
+> >>>>>   block/fops.c            |  2 +
+> >>>>>   block/ioctl.c           | 94 +++++++++++++++++++++++++++++++++++++++++
+> >>>>>   include/uapi/linux/fs.h |  2 +
+> >>>>>   4 files changed, 99 insertions(+)
+> >>>>>
+> >>>>> diff --git a/block/blk.h b/block/blk.h
+> >>>>> index e180863f918b..5178c5ba6852 100644
+> >>>>> --- a/block/blk.h
+> >>>>> +++ b/block/blk.h
+> >>>>> @@ -571,6 +571,7 @@ blk_mode_t file_to_blk_mode(struct file *file);
+> >>>>>   int truncate_bdev_range(struct block_device *bdev, blk_mode_t mode,
+> >>>>>                  loff_t lstart, loff_t lend);
+> >>>>>   long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+> >>>>> +int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags);
+> >>>>>   long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+> >>>>>
+> >>>>>   extern const struct address_space_operations def_blk_aops;
+> >>>>> diff --git a/block/fops.c b/block/fops.c
+> >>>>> index 9825c1713a49..8154b10b5abf 100644
+> >>>>> --- a/block/fops.c
+> >>>>> +++ b/block/fops.c
+> >>>>> @@ -17,6 +17,7 @@
+> >>>>>   #include <linux/fs.h>
+> >>>>>   #include <linux/iomap.h>
+> >>>>>   #include <linux/module.h>
+> >>>>> +#include <linux/io_uring/cmd.h>
+> >>>>>   #include "blk.h"
+> >>>>>
+> >>>>>   static inline struct inode *bdev_file_inode(struct file *file)
+> >>>>> @@ -873,6 +874,7 @@ const struct file_operations def_blk_fops = {
+> >>>>>          .splice_read    = filemap_splice_read,
+> >>>>>          .splice_write   = iter_file_splice_write,
+> >>>>>          .fallocate      = blkdev_fallocate,
+> >>>>> +       .uring_cmd      = blkdev_uring_cmd,
+> >>>>
+> >>>> Just be curious, we have IORING_OP_FALLOCATE already for sending
+> >>>> discard to block device, why is .uring_cmd added for this purpose?
+> >>
+> >> Which is a good question, I haven't thought about it, but I tend to
+> >> agree with Jens. Because vfs_fallocate is created synchronous
+> >> IORING_OP_FALLOCATE is slow for anything but pretty large requests.
+> >> Probably can be patched up, which would  involve changing the
+> >> fops->fallocate protot, but I'm not sure async there makes sense
+> >> outside of bdev (?), and cmd approach is simpler, can be made
+> >> somewhat more efficient (1 less layer in the way), and it's not
+> >> really something completely new since we have it in ioctl.
+> > 
+> > Yeah, we have ioctl(DISCARD), which acquires filemap_invalidate_lock,
+> > same with blkdev_fallocate().
+> > 
+> > But this patch drops this exclusive lock, so it becomes async friendly,
+> > but may cause stale page cache. However, if the lock is required, it can't
+> > be efficient anymore and io-wq may be inevitable, :-)
 > 
-> [  414.344659] ================================
-> [  414.345155] WARNING: inconsistent lock state
-> [  414.345658] 6.6.0-07439-gba2303cacfda #6 Not tainted
-> [  414.346221] --------------------------------
-> [  414.346712] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-> [  414.347545] kworker/u10:3/1152 [HC0[0]:SC0[0]:HE0:SE1] takes:
-> [  414.349245] ffff88810edd1098 (&sbq->ws[i].wait){+.?.}-{2:2}, at: blk_mq_dispatch_rq_list+0x131c/0x1ee0
-> [  414.351204] {IN-SOFTIRQ-W} state was registered at:
-> [  414.351751]   lock_acquire+0x18d/0x460
-> [  414.352218]   _raw_spin_lock_irqsave+0x39/0x60
-> [  414.352769]   __wake_up_common_lock+0x22/0x60
-> [  414.353289]   sbitmap_queue_wake_up+0x375/0x4f0
-> [  414.353829]   sbitmap_queue_clear+0xdd/0x270
-> [  414.354338]   blk_mq_put_tag+0xdf/0x170
-> [  414.354807]   __blk_mq_free_request+0x381/0x4d0
-> [  414.355335]   blk_mq_free_request+0x28b/0x3e0
-> [  414.355847]   __blk_mq_end_request+0x242/0xc30
-> [  414.356367]   scsi_end_request+0x2c1/0x830
-> [  414.345155] WARNING: inconsistent lock state
-> [  414.345658] 6.6.0-07439-gba2303cacfda #6 Not tainted
-> [  414.346221] --------------------------------
-> [  414.346712] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-> [  414.347545] kworker/u10:3/1152 [HC0[0]:SC0[0]:HE0:SE1] takes:
-> [  414.349245] ffff88810edd1098 (&sbq->ws[i].wait){+.?.}-{2:2}, at: blk_mq_dispatch_rq_list+0x131c/0x1ee0
-> [  414.351204] {IN-SOFTIRQ-W} state was registered at:
-> [  414.351751]   lock_acquire+0x18d/0x460
-> [  414.352218]   _raw_spin_lock_irqsave+0x39/0x60
-> [  414.352769]   __wake_up_common_lock+0x22/0x60
-> [  414.353289]   sbitmap_queue_wake_up+0x375/0x4f0
-> [  414.353829]   sbitmap_queue_clear+0xdd/0x270
-> [  414.354338]   blk_mq_put_tag+0xdf/0x170
-> [  414.354807]   __blk_mq_free_request+0x381/0x4d0
-> [  414.355335]   blk_mq_free_request+0x28b/0x3e0
-> [  414.355847]   __blk_mq_end_request+0x242/0xc30
-> [  414.356367]   scsi_end_request+0x2c1/0x830
-> [  414.356863]   scsi_io_completion+0x177/0x1610
-> [  414.357379]   scsi_complete+0x12f/0x260
-> [  414.357856]   blk_complete_reqs+0xba/0xf0
-> [  414.358338]   __do_softirq+0x1b0/0x7a2
-> [  414.358796]   irq_exit_rcu+0x14b/0x1a0
-> [  414.359262]   sysvec_call_function_single+0xaf/0xc0
-> [  414.359828]   asm_sysvec_call_function_single+0x1a/0x20
-> [  414.360426]   default_idle+0x1e/0x30
-> [  414.360873]   default_idle_call+0x9b/0x1f0
-> [  414.361390]   do_idle+0x2d2/0x3e0
-> [  414.361819]   cpu_startup_entry+0x55/0x60
-> [  414.362314]   start_secondary+0x235/0x2b0
-> [  414.362809]   secondary_startup_64_no_verify+0x18f/0x19b
-> [  414.363413] irq event stamp: 428794
-> [  414.363825] hardirqs last  enabled at (428793): [<ffffffff816bfd1c>] ktime_get+0x1dc/0x200
-> [  414.364694] hardirqs last disabled at (428794): [<ffffffff85470177>] _raw_spin_lock_irq+0x47/0x50
-> [  414.365629] softirqs last  enabled at (428444): [<ffffffff85474780>] __do_softirq+0x540/0x7a2
-> [  414.366522] softirqs last disabled at (428419): [<ffffffff813f65ab>] irq_exit_rcu+0x14b/0x1a0
-> [  414.367425]
->                other info that might help us debug this:
-> [  414.368194]  Possible unsafe locking scenario:
-> [  414.368900]        CPU0
-> [  414.369225]        ----
-> [  414.369548]   lock(&sbq->ws[i].wait);
-> [  414.370000]   <Interrupt>
-> [  414.370342]     lock(&sbq->ws[i].wait);
-> [  414.370802]
->                 *** DEADLOCK ***
-> [  414.371569] 5 locks held by kworker/u10:3/1152:
-> [  414.372088]  #0: ffff88810130e938 ((wq_completion)writeback){+.+.}-{0:0}, at: process_scheduled_works+0x357/0x13f0
-> [  414.373180]  #1: ffff88810201fdb8 ((work_completion)(&(&wb->dwork)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x3a3/0x13f0
-> [  414.374384]  #2: ffffffff86ffbdc0 (rcu_read_lock){....}-{1:2}, at: blk_mq_run_hw_queue+0x637/0xa00
-> [  414.375342]  #3: ffff88810edd1098 (&sbq->ws[i].wait){+.?.}-{2:2}, at: blk_mq_dispatch_rq_list+0x131c/0x1ee0
-> [  414.376377]  #4: ffff888106205a08 (&hctx->dispatch_wait_lock){+.-.}-{2:2}, at: blk_mq_dispatch_rq_list+0x1337/0x1ee0
-> [  414.378607]
->                stack backtrace:
-> [  414.379177] CPU: 0 PID: 1152 Comm: kworker/u10:3 Not tainted 6.6.0-07439-gba2303cacfda #6
-> [  414.380032] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-> [  414.381177] Workqueue: writeback wb_workfn (flush-253:0)
-> [  414.381805] Call Trace:
-> [  414.382136]  <TASK>
-> [  414.382429]  dump_stack_lvl+0x91/0xf0
-> [  414.382884]  mark_lock_irq+0xb3b/0x1260
-> [  414.383367]  ? __pfx_mark_lock_irq+0x10/0x10
-> [  414.383889]  ? stack_trace_save+0x8e/0xc0
-> [  414.384373]  ? __pfx_stack_trace_save+0x10/0x10
-> [  414.384903]  ? graph_lock+0xcf/0x410
-> [  414.385350]  ? save_trace+0x3d/0xc70
-> [  414.385808]  mark_lock.part.20+0x56d/0xa90
-> [  414.386317]  mark_held_locks+0xb0/0x110
-> [  414.386791]  ? __pfx_do_raw_spin_lock+0x10/0x10
-> [  414.387320]  lockdep_hardirqs_on_prepare+0x297/0x3f0
-> [  414.387901]  ? _raw_spin_unlock_irq+0x28/0x50
-> [  414.388422]  trace_hardirqs_on+0x58/0x100
-> [  414.388917]  _raw_spin_unlock_irq+0x28/0x50
-> [  414.389422]  __blk_mq_tag_busy+0x1d6/0x2a0
-> [  414.389920]  __blk_mq_get_driver_tag+0x761/0x9f0
-> [  414.390899]  blk_mq_dispatch_rq_list+0x1780/0x1ee0
-> [  414.391473]  ? __pfx_blk_mq_dispatch_rq_list+0x10/0x10
-> [  414.392070]  ? sbitmap_get+0x2b8/0x450
-> [  414.392533]  ? __blk_mq_get_driver_tag+0x210/0x9f0
-> [  414.393095]  __blk_mq_sched_dispatch_requests+0xd99/0x1690
-> [  414.393730]  ? elv_attempt_insert_merge+0x1b1/0x420
-> [  414.394302]  ? __pfx___blk_mq_sched_dispatch_requests+0x10/0x10
-> [  414.394970]  ? lock_acquire+0x18d/0x460
-> [  414.395456]  ? blk_mq_run_hw_queue+0x637/0xa00
-> [  414.395986]  ? __pfx_lock_acquire+0x10/0x10
-> [  414.396499]  blk_mq_sched_dispatch_requests+0x109/0x190
-> [  414.397100]  blk_mq_run_hw_queue+0x66e/0xa00
-> [  414.397616]  blk_mq_flush_plug_list.part.17+0x614/0x2030
-> [  414.398244]  ? __pfx_blk_mq_flush_plug_list.part.17+0x10/0x10
-> [  414.398897]  ? writeback_sb_inodes+0x241/0xcc0
-> [  414.399429]  blk_mq_flush_plug_list+0x65/0x80
-> [  414.399957]  __blk_flush_plug+0x2f1/0x530
-> [  414.400458]  ? __pfx___blk_flush_plug+0x10/0x10
-> [  414.400999]  blk_finish_plug+0x59/0xa0
-> [  414.401467]  wb_writeback+0x7cc/0x920
-> [  414.401935]  ? __pfx_wb_writeback+0x10/0x10
-> [  414.402442]  ? mark_held_locks+0xb0/0x110
-> [  414.402931]  ? __pfx_do_raw_spin_lock+0x10/0x10
-> [  414.403462]  ? lockdep_hardirqs_on_prepare+0x297/0x3f0
-> [  414.404062]  wb_workfn+0x2b3/0xcf0
-> [  414.404500]  ? __pfx_wb_workfn+0x10/0x10
-> [  414.404989]  process_scheduled_works+0x432/0x13f0
-> [  414.405546]  ? __pfx_process_scheduled_works+0x10/0x10
-> [  414.406139]  ? do_raw_spin_lock+0x101/0x2a0
-> [  414.406641]  ? assign_work+0x19b/0x240
-> [  414.407106]  ? lock_is_held_type+0x9d/0x110
-> [  414.407604]  worker_thread+0x6f2/0x1160
-> [  414.408075]  ? __kthread_parkme+0x62/0x210
-> [  414.408572]  ? lockdep_hardirqs_on_prepare+0x297/0x3f0
-> [  414.409168]  ? __kthread_parkme+0x13c/0x210
-> [  414.409678]  ? __pfx_worker_thread+0x10/0x10
-> [  414.410191]  kthread+0x33c/0x440
-> [  414.410602]  ? __pfx_kthread+0x10/0x10
-> [  414.411068]  ret_from_fork+0x4d/0x80
-> [  414.411526]  ? __pfx_kthread+0x10/0x10
-> [  414.411993]  ret_from_fork_asm+0x1b/0x30
-> [  414.412489]  </TASK>
-> 
-> [...]
+> If you want to grab the lock, you can still opportunistically grab it.
+> For (by far) the common case, you'll get it, and you can still do it
+> inline.
 
-Applied, thanks!
+If the lock is grabbed in the whole cmd lifetime, it is basically one sync
+interface cause there is at most one async discard cmd in-flight for each
+device.
 
-[1/1] block: Fix lockdep warning in blk_mq_mark_tag_wait
-      commit: b313a8c835516bdda85025500be866ac8a74e022
-
-Best regards,
--- 
-Jens Axboe
+Meantime the handling has to move to io-wq for avoiding to block current
+context, the interface becomes same with IORING_OP_FALLOCATE?
 
 
+thanks,
+Ming
 
