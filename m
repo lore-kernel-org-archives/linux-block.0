@@ -1,163 +1,122 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CC913A250
-	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 09:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFC013AA41
+	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 09:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723799590; cv=none; b=LPK/aOPnsCaC4FrtGA9oBGLl4lCEpDngVSqXXiJKtvY8QRcLvizCPc/GTgkJwqU0x24ZiKcpsubzw1D1Zeha7E41x4k/FNeHoGXDzfXupeMTEyl1U2JmzKhTwEywrhAGXJSWLcThHs3HbTFahuMlsOXf/o6Yb0lpcWdNFqtq/H4=
+	t=1723799686; cv=none; b=J1s+PiP+cq620TlZdo7wYFkzpIJNN4R8Xi/isnhNiXFucdba7hWnR8CZnHlvPfH4flNoi7Gz1SSqCCHEb3Ys8KiBLAIA6jkj72Id46BLVKniqrh9l52Y48uhMeLLBwCE9UALOIhqnHdfvo1HnZBeJNoXV+IZBtTeenOJZzxTfAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723799590; c=relaxed/simple;
-	bh=UgI+o6JuDwi6oXBQGJIuuc/7gFzSZjzswCP0ndmjxyk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=LfwdTi8NeQHelFzUFosZTWGLwVPkPxEmURkvkBxh60jnRcD8Ug86CywuoX+FPwYG6Kx+Aoh5BiiaSPqoYiYKFctcakA4I3O8Bgfv3USE9ELAEy3ojdVGfxXgS3TLyAq7GYcNFMy/4IY+tcgwRp2HsV5wPeAuROC6Ozh1E3jSStM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=V+d6qGNW; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1723799686; c=relaxed/simple;
+	bh=tNq3Msi+yGcRXDegFEmrjnz059hC5TCb/lzLoe5WkYg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DhnWREAvB0C/PfQZ9QtwSPwrN/6lV7422qmPh56u3UsJ6qAEdNvapUn9GsRfzmjZvKr/S+bPJr60rDd7mNYVT/OtKhikhGSexiwEqpAq5cT9DvIzHDbh4rA5ZZDobHT7wzNgN+zvY/0a1Cv5gua7DF9QnHJ+ZyQ0jZ2IMJl/2Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AJgWmbIE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="V+d6qGNW"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240816091259epoutp02fd3fe885108f9fa3fc1148541f780fa6~sKpW5Ob2t2852928529epoutp02s
-	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 09:12:59 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240816091259epoutp02fd3fe885108f9fa3fc1148541f780fa6~sKpW5Ob2t2852928529epoutp02s
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1723799579;
-	bh=xzLghChNhTPe84RJP5JNjqjw7JP/94VMK437mG6+i2s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V+d6qGNW6xxmYUSUoAogK/au9/pKXYy9ChOllotAq4nYBDG3xF4lEcZcsMRk6F2fc
-	 dma1RQnlLWUYfBoYsUcDCaRUUoCoJqvf97z199vdalYqWfZe5/CYgca309sxKVmqia
-	 yMbpCmsRc1D47xJ3OqOiZ3f8dcJTNsMimr94cifs=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20240816091259epcas5p4fc14d293a46b10598d505578ea4523ef~sKpWdMAlf3035830358epcas5p42;
-	Fri, 16 Aug 2024 09:12:59 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.175]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4Wlbqs4dw0z4x9Ps; Fri, 16 Aug
-	2024 09:12:57 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	3F.7F.09642.9181FB66; Fri, 16 Aug 2024 18:12:57 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240816085315epcas5p225b85ace7e76e07ea8738d77d5fdd763~sKYHv_Jd_1708617086epcas5p2O;
-	Fri, 16 Aug 2024 08:53:15 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240816085315epsmtrp1b4cc8d9c4c573f2a9f811e424f080297~sKYHuQ5ZQ0323203232epsmtrp1U;
-	Fri, 16 Aug 2024 08:53:15 +0000 (GMT)
-X-AuditID: b6c32a4b-879fa700000025aa-07-66bf18199931
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	1A.01.07567.B731FB66; Fri, 16 Aug 2024 17:53:15 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20240816085313epsmtip229119ea4fbb7526565302a16b2487c99~sKYFwbztS2863028630epsmtip2U;
-	Fri, 16 Aug 2024 08:53:13 +0000 (GMT)
-Date: Fri, 16 Aug 2024 14:15:41 +0530
-From: Kundan Kumar <kundan.kumar@samsung.com>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Daniel Gomez <da.gomez@samsung.com>,
-	Pankaj Raghav <p.raghav@samsung.com>, kernel@pankajraghav.com,
-	axboe@kernel.dk, willy@infradead.org, kbusch@kernel.org,
-	linux-block@vger.kernel.org, joshi.k@samsung.com, anuj20.g@samsung.com,
-	nj.shetty@samsung.com, c.gameti@samsung.com, gost.dev@samsung.com
-Subject: Re: [PATCH v8 0/5] block: add larger order folio instead of pages
-Message-ID: <20240816084541.t7bn7qlklhynsglq@green245>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJgWmbIE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723799684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vycu3OS486oz1R2CUeEvlPsrB5GfdSWVCGoj7Glyhi8=;
+	b=AJgWmbIEjSqgyiHY3WEbWBqmjO5o7TdQBXQ8NoQka0HgwIsuVvfgOgqykClvcOAkRa3amT
+	fv+w1lniQTK4DyXC3ftv4ZgeTLgwEGgEMYQQduQprHvY4z+z8sCoXBJeSQIk4U1JL/O5jD
+	CSCwlC9MQTabQ3slwDoOcMOVaadOliQ=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-394-BJ7ttN6dOWe6cUpyg4Jeaw-1; Fri,
+ 16 Aug 2024 05:14:40 -0400
+X-MC-Unique: BJ7ttN6dOWe6cUpyg4Jeaw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B8051955F42;
+	Fri, 16 Aug 2024 09:14:39 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.121])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F3C76300019A;
+	Fri, 16 Aug 2024 09:14:34 +0000 (UTC)
+Date: Fri, 16 Aug 2024 17:14:28 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Muchun Song <songmuchun@bytedance.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] block: fix request starvation when queue is stopped
+ or quiesced
+Message-ID: <Zr8YdAhw6tDqImzF@fedora>
+References: <20240811101921.4031-1-songmuchun@bytedance.com>
+ <20240811101921.4031-2-songmuchun@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Zro5xJgcVlSaM4zP@bombadil.infradead.org>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMJsWRmVeSWpSXmKPExsWy7bCmuq6kxP40gylrVSyaJvxltlh9t5/N
-	4vv2PhaL95e3MVncPLCTyWLl6qNMFkf/v2WzmHToGqPFmZefWSz23tK2uDHhKaPFtt/zmS0+
-	L21ht/j9Yw6bA5/H5hVaHpfPlnpsWtXJ5rH7ZgObx9mVjh59W1YxenzeJBfAHpVtk5GamJJa
-	pJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQN0r5JCWWJOKVAoILG4
-	WEnfzqYov7QkVSEjv7jEVim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO+PS+mfsBY38
-	Fb/vz2JtYJzL08XIySEhYCJx/V03excjF4eQwG5GievfVzNCOJ8YJVbd6maCcL4xSkyefI8J
-	puXzj9esEIm9jBJX915iAUkICTxjlDh/TreLkYODRUBV4mVLLojJJqAr8aMpFKRCREBDYt+E
-	XrCZzAKXmCTety5kBEkIC3hJtG9qARvDK2AmceNSGyOELShxcuYTsDgnULxx4152EFtUQEZi
-	xtKvzCCDJAR2cEjsafzCBLJMQsBFYs85SYg7hSVeHd/CDmFLSbzsb4OysyUONW6A+qVEYueR
-	Bqi4vUTrqX5mEJtZIEPiw4t+qLisxNRT65gg4nwSvb+fQPXySuyYB2OrScx5N5UFwpaRWHhp
-	BlTcQ2Llvv/QEO1kkjj6ag/LBEb5WUh+m4VkH4RtJdH5oYl1FtA7zALSEsv/cUCYmhLrd+kv
-	YGRdxSiZWlCcm55abFpgnJdaDo/v5PzcTYzg1KzlvYPx0YMPeocYmTgYDzFKcDArifA+/bI3
-	TYg3JbGyKrUoP76oNCe1+BCjKTCqJjJLiSbnA7NDXkm8oYmlgYmZmZmJpbGZoZI47+vWuSlC
-	AumJJanZqakFqUUwfUwcnFINTFHP6xN36Pol/lMNUz7nWbjAr9Usrpa9Vmhu8U5rNVmFj7vS
-	9S8zd82/ePP0U9HvD7nYL/zwEv5lsnvTn9uF9jeOXlrwrj2mU+lb8jTF/UqGmvt51y1fpF12
-	Pu3xrJ4IbyeVY2uVjoozfJVnZ8lObDe6Zb77mvG7SXu5xO5++DTvdkh/zvFTK5p3Hn+w8k3e
-	gx1XE+2upU94VjJBhFd01U0pXe55nz2KVX4lL5v3XHzjeYHyRRLS73YavpNfOv1b3bS52rzn
-	HJfoBEn41P1RVXjpvL3nrNLy6g2rlN0+FHQfr9rx8+jM7s1nDJYtiOWbsqRws0HH4b71tw/+
-	1nGL1/Txfy174NfPSVmOB45ck3+vxFKckWioxVxUnAgAMQ5c3FYEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplkeLIzCtJLcpLzFFi42LZdlhJXrdaeH+aweFJfBZNE/4yW6y+289m
-	8X17H4vF+8vbmCxuHtjJZLFy9VEmi6P/37JZTDp0jdHizMvPLBZ7b2lb3JjwlNFi2+/5zBaf
-	l7awW/z+MYfNgc9j8wotj8tnSz02repk89h9s4HN4+xKR4++LasYPT5vkgtgj+KySUnNySxL
-	LdK3S+DKmPwhvWAzT8X2vysYGxhfcnYxcnJICJhIfP7xmrWLkYtDSGA3o0THtvnsEAkZid13
-	d7JC2MISK/89Z4coesIo8WgSSAcHB4uAqsTLllwQk01AV+JHUyhIuYiAhsS+Cb1MIOXMAleY
-	JG6se8gGkhAW8JJo39TCAmLzCphJ3LjUxggxs5tJYue5+UwQCUGJkzOfgBUxAxXN2/yQGWQB
-	s4C0xPJ/HCBhTqBw48a9YHeKAt05Y+lX5gmMgrOQdM9C0j0LoXsBI/MqRsnUguLc9NxkwwLD
-	vNRyveLE3OLSvHS95PzcTYzgmNLS2MF4b/4/vUOMTByMhxglOJiVRHifftmbJsSbklhZlVqU
-	H19UmpNafIhRmoNFSZzXcMbsFCGB9MSS1OzU1ILUIpgsEwenVAOTgveUXbsd3Vfzv+aazu55
-	+PFj28iz6RNvBz3717SCf+KrnN5H7zdrpgnl6M6Mncob+M1EJMx82rp3FRvSb/7ccezPNoW1
-	HQt5fn1MZVbhO3Fy/TfviP0qdW8ZpP7zcz0MFK9kn+a7SFshmu3G5GmXezQTjVf9Fz54ehvz
-	s69cdcoNhg4iTTc6/psntGVYWF69vnP+tdil1xemNB5fmOx/RET2kPAd26KZp93f7dC8dO3s
-	vyq2mVEzM394v1DWZ3t56MWNE1FdGp3zu2L5VEUDSqdG9md+vb5ISuOQa9+2NffPFDj+Snx5
-	8Oq0sGv3fmUv1tcQ8Gg9sjOprN87IZ5tUdk54WsZ8U1tNyesP12spsRSnJFoqMVcVJwIALil
-	G6EYAwAA
-X-CMS-MailID: 20240816085315epcas5p225b85ace7e76e07ea8738d77d5fdd763
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240711051521epcas5p348f2cd84a1a80577754929143255352b
-References: <CGME20240711051521epcas5p348f2cd84a1a80577754929143255352b@epcas5p3.samsung.com>
-	<20240711050750.17792-1-kundan.kumar@samsung.com>
-	<ZrVO45fvpn4uVmFH@bombadil.infradead.org> <20240812133843.GA24570@lst.de>
-	<Zro5xJgcVlSaM4zP@bombadil.infradead.org>
-
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240811101921.4031-2-songmuchun@bytedance.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 12/08/24 09:35AM, Luis Chamberlain wrote:
->On Mon, Aug 12, 2024 at 03:38:43PM +0200, Christoph Hellwig wrote:
->> On Thu, Aug 08, 2024 at 04:04:03PM -0700, Luis Chamberlain wrote:
->> > This is not just about mTHP uses though, this can also affect buffered IO and
->> > direct IO patterns as well and this needs to be considered and tested as well.
->>
->> Not sure what the above is supposed to mean.  Besides small tweaks
->> to very low-level helpers the changes are entirely in the direct I/O
->> path, and they optimize that path for folios larger than PAGE_SIZE.
->
->Which was my expectation as well.
->
->> > I've given this a spin on top of of the LBS patches [0] and used the LBS
->> > patches as a baseline. The good news is I see a considerable amount of
->> > larger IOs for buffered IO and direct IO, however for buffered IO there
->> > is an increase on unalignenment to the target filesystem block size and
->> > that can affect performance.
->>
->> Compared to what?  There is nothing in the series here changing buffered
->> I/O patterns.  What do you compare?  If this series changes buffered
->> I/O patterns that is very well hidden and accidental, so we need to
->> bisect which patch does it and figure out why, but it would surprise me
->> a lot.
->
->The comparison was the without the patches Vs with the patches on the
->same fio run with buffered IO. I'll re-test more times and bisect.
->
+On Sun, Aug 11, 2024 at 06:19:18PM +0800, Muchun Song wrote:
+> Supposing the following scenario with a virtio_blk driver.
+> 
+> CPU0                                    CPU1                                    CPU2
+> 
+> blk_mq_try_issue_directly()
+>     __blk_mq_issue_directly()
+>         q->mq_ops->queue_rq()
+>             virtio_queue_rq()
+>                 blk_mq_stop_hw_queue()
+>                                         blk_mq_try_issue_directly()             virtblk_done()
+>                                             if (blk_mq_hctx_stopped())
+>     blk_mq_request_bypass_insert()                                                  blk_mq_start_stopped_hw_queue()
+>     blk_mq_run_hw_queue()                                                               blk_mq_run_hw_queue()
+>                                                 blk_mq_insert_request()
+>                                                 return // Who is responsible for dispatching this IO request?
+> 
+> After CPU0 has marked the queue as stopped, CPU1 will see the queue is stopped.
+> But before CPU1 puts the request on the dispatch list, CPU2 receives the interrupt
+> of completion of request, so it will run the hardware queue and marks the queue
+> as non-stopped. Meanwhile, CPU1 also runs the same hardware queue. After both CPU1
+> and CPU2 complete blk_mq_run_hw_queue(), CPU1 just puts the request to the same
+> hardware queue and returns. Seems it misses dispatching a request. Fix it by
+> running the hardware queue explicitly. I think blk_mq_request_issue_directly()
+> should handle a similar problem.
+> 
+> Signed-off-by: Muchun Song <songmuchun@bytedance.com>
+> ---
+>  block/blk-mq.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e3c3c0c21b553..b2d0f22de0c7f 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2619,6 +2619,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  
+>  	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(rq->q)) {
+>  		blk_mq_insert_request(rq, 0);
+> +		blk_mq_run_hw_queue(hctx, false);
+>  		return;
+>  	}
+>  
+> @@ -2649,6 +2650,7 @@ static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
+>  
+>  	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(rq->q)) {
+>  		blk_mq_insert_request(rq, 0);
+> +		blk_mq_run_hw_queue(hctx, false);
+>  		return BLK_STS_OK;
+>  	}
 
-Did tests with LBS + block folio patches and couldn't observe alignment
-issue. Also, the changes in this series are not executed when we issue
-buffered I/O.
+Looks one real issue, and the fix is fine:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_
-Content-Type: text/plain; charset="utf-8"
+Thanks, 
+Ming
 
-
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_--
