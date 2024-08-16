@@ -1,85 +1,163 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E11412E1CA;
-	Fri, 16 Aug 2024 08:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CC913A250
+	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 09:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723798498; cv=none; b=ndYSpz+2Hzn7TvdXtSW9fSaRjt2SRgfCjfQVTO1gNw437hD2jDYPqbP6skYg6OVCzbPlDF65GWhfaQ+P90E+rXaxw3hd4DhXOteIEuHTXOoD+jhB1ZfcT1OETJ0WhdUMkqVEBlOrN/yKrl7g9wyEzHFNCRkjW/MRbfJXjljEqWM=
+	t=1723799590; cv=none; b=LPK/aOPnsCaC4FrtGA9oBGLl4lCEpDngVSqXXiJKtvY8QRcLvizCPc/GTgkJwqU0x24ZiKcpsubzw1D1Zeha7E41x4k/FNeHoGXDzfXupeMTEyl1U2JmzKhTwEywrhAGXJSWLcThHs3HbTFahuMlsOXf/o6Yb0lpcWdNFqtq/H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723798498; c=relaxed/simple;
-	bh=WvPNUZCEHPz9cJaVSTq2oelh/edt3sSSDWtHYvoDZ0c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YtE3xHfWhOPwLgwZSn1HIwW6EtY3QoZtfXIYa1oUo4I5CFaktZGGxGNQv/ULmZBU3C4zzgXJM0tN2WQaZF6F7c2Up8UHGFwH8FLNkfi1F6QZtuerUT6HABQUcsIYscF4w5gDf2qhua9Ovdi8yOxWharR3BmNZ2QYy/41qYG+i04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mPYfIWi5; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1723799590; c=relaxed/simple;
+	bh=UgI+o6JuDwi6oXBQGJIuuc/7gFzSZjzswCP0ndmjxyk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=LfwdTi8NeQHelFzUFosZTWGLwVPkPxEmURkvkBxh60jnRcD8Ug86CywuoX+FPwYG6Kx+Aoh5BiiaSPqoYiYKFctcakA4I3O8Bgfv3USE9ELAEy3ojdVGfxXgS3TLyAq7GYcNFMy/4IY+tcgwRp2HsV5wPeAuROC6Ozh1E3jSStM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=V+d6qGNW; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mPYfIWi5"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2d1fe3754f4so1337540a91.1;
-        Fri, 16 Aug 2024 01:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723798496; x=1724403296; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WvPNUZCEHPz9cJaVSTq2oelh/edt3sSSDWtHYvoDZ0c=;
-        b=mPYfIWi5LcgIEULDWuttMW6aBNVGCS0rSxwgV5TqMGIudnmrKILleiGFPrKMT4SABP
-         KnggxEr9dq1daZK9O4HTLH7YSJY/ftX5/L5YtysdKvaJGREIzxCZTvn4j6PYKfmC7lCS
-         THwQgO+BN0WwbKSrEg2o2PQhyl+8qUKy8ebFAHZr3wZXPXfwWvqJqqed2Wft5Lmh57xa
-         aO7xvJRBU2O9Em+6NqR151Lk+kofxs6A4KO+1Y6uT/y1YY4aG5NhIY4fjYO8OhTgfSKV
-         BW4NI/HKYWrnVTqq2dnoN3VkPf4tm4kVTxlOLr12TcmG5f+BSz3HBnuEht+tYPLNMhgH
-         iMAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723798496; x=1724403296;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WvPNUZCEHPz9cJaVSTq2oelh/edt3sSSDWtHYvoDZ0c=;
-        b=nwAvQ4kC1wiA5m+bKpDyQufgc3pNRZ5ZN+gsljproWD8guhTAeivGBBUcVWzoXIcbW
-         GrMT+ULSh1SS9cP92wQIIuMWRChck0R2C+nO5JcYvsoQh8npXP3CzHyZFPm+B43YNtz7
-         ILaXAwwQHGqo7DjVNSDvglnMT+d6dZv4cgmFUsWZaloGcLauNBrXpmKWZjJV/CIImvrg
-         zvJRS1B4Xf/EEHNonziT1+wPXTNmrxMrHTMN+q6Uvb/uPnVm+Q+xyMf7Ib+yCFgx+91c
-         uh+5WKRptyU4PI/1N5NSAY9g5ZDo7gCSD2rVJUXbl9PdeRMHh7H2vUYoJyo1LX2/2yzd
-         FyMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUefukM3cpqaUZZsYyuXkKDipa+zBccXRVobLXaoenewCRZzZfOeFFZClcpZei/a5O2L6KEWXObR+Jj0DsHyuQygcVmKVULpk3K6SmPuFIVisZWdFUPYgGmSvLvKSiz0UbflFfn0CcIOGoHvO+F1ZuITnqFCyI3DKIa1uRCuPp5bIK3BCRvr9e/+w==
-X-Gm-Message-State: AOJu0YwE0d2qPH0+tUiRbpK0HrYdOkP0wPEk7z+q16HLdkrEBKNJ5HKC
-	oPDYPYD16FZs/jWYWFimkJKOgr5jU5CbXkpiGpzRNU3PoNDXQeIWiBTEc+MPq6RXIShpLueOmos
-	noi4lxa3WurvCi/xdB8erJcwmFkPYjJ1Y1H289A==
-X-Google-Smtp-Source: AGHT+IE7yL6G6QasJpooel4RglmlOwxtA9DF7E3JRSEVNLtiI4zHZMP3L5AMXjAgpclhClTu8I2H7q5pVDI74BDsaS0=
-X-Received: by 2002:a17:90a:1f88:b0:2cf:2ab6:a157 with SMTP id
- 98e67ed59e1d1-2d3dfc682camr2429776a91.12.1723798496317; Fri, 16 Aug 2024
- 01:54:56 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="V+d6qGNW"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240816091259epoutp02fd3fe885108f9fa3fc1148541f780fa6~sKpW5Ob2t2852928529epoutp02s
+	for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 09:12:59 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240816091259epoutp02fd3fe885108f9fa3fc1148541f780fa6~sKpW5Ob2t2852928529epoutp02s
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1723799579;
+	bh=xzLghChNhTPe84RJP5JNjqjw7JP/94VMK437mG6+i2s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V+d6qGNW6xxmYUSUoAogK/au9/pKXYy9ChOllotAq4nYBDG3xF4lEcZcsMRk6F2fc
+	 dma1RQnlLWUYfBoYsUcDCaRUUoCoJqvf97z199vdalYqWfZe5/CYgca309sxKVmqia
+	 yMbpCmsRc1D47xJ3OqOiZ3f8dcJTNsMimr94cifs=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240816091259epcas5p4fc14d293a46b10598d505578ea4523ef~sKpWdMAlf3035830358epcas5p42;
+	Fri, 16 Aug 2024 09:12:59 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.175]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4Wlbqs4dw0z4x9Ps; Fri, 16 Aug
+	2024 09:12:57 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	3F.7F.09642.9181FB66; Fri, 16 Aug 2024 18:12:57 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240816085315epcas5p225b85ace7e76e07ea8738d77d5fdd763~sKYHv_Jd_1708617086epcas5p2O;
+	Fri, 16 Aug 2024 08:53:15 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240816085315epsmtrp1b4cc8d9c4c573f2a9f811e424f080297~sKYHuQ5ZQ0323203232epsmtrp1U;
+	Fri, 16 Aug 2024 08:53:15 +0000 (GMT)
+X-AuditID: b6c32a4b-879fa700000025aa-07-66bf18199931
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	1A.01.07567.B731FB66; Fri, 16 Aug 2024 17:53:15 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20240816085313epsmtip229119ea4fbb7526565302a16b2487c99~sKYFwbztS2863028630epsmtip2U;
+	Fri, 16 Aug 2024 08:53:13 +0000 (GMT)
+Date: Fri, 16 Aug 2024 14:15:41 +0530
+From: Kundan Kumar <kundan.kumar@samsung.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Daniel Gomez <da.gomez@samsung.com>,
+	Pankaj Raghav <p.raghav@samsung.com>, kernel@pankajraghav.com,
+	axboe@kernel.dk, willy@infradead.org, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com, anuj20.g@samsung.com,
+	nj.shetty@samsung.com, c.gameti@samsung.com, gost.dev@samsung.com
+Subject: Re: [PATCH v8 0/5] block: add larger order folio instead of pages
+Message-ID: <20240816084541.t7bn7qlklhynsglq@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815074519.2684107-1-nmi@metaspace.dk> <172373175849.6989.2668092199011403509.b4-ty@kernel.dk>
- <CANiq72kFXihVGDGmRyuc0LkODYOv2jX3shP-dEHjV3k1sqFEKg@mail.gmail.com> <622e155f-2ad0-4f62-a6a7-c9c88903db82@kernel.dk>
-In-Reply-To: <622e155f-2ad0-4f62-a6a7-c9c88903db82@kernel.dk>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 16 Aug 2024 10:54:43 +0200
-Message-ID: <CANiq72m-o=3FW2ve_GRHrT91go4OMt6tH3oQtOT6UBzwLutiqg@mail.gmail.com>
-Subject: Re: [PATCH 0/2] rust: fix erranous use of lock class key in rust
- block device bindings
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Andreas Hindborg <nmi@metaspace.dk>, 
-	Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
-	"Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <Zro5xJgcVlSaM4zP@bombadil.infradead.org>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMJsWRmVeSWpSXmKPExsWy7bCmuq6kxP40gylrVSyaJvxltlh9t5/N
+	4vv2PhaL95e3MVncPLCTyWLl6qNMFkf/v2WzmHToGqPFmZefWSz23tK2uDHhKaPFtt/zmS0+
+	L21ht/j9Yw6bA5/H5hVaHpfPlnpsWtXJ5rH7ZgObx9mVjh59W1YxenzeJBfAHpVtk5GamJJa
+	pJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQN0r5JCWWJOKVAoILG4
+	WEnfzqYov7QkVSEjv7jEVim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO+PS+mfsBY38
+	Fb/vz2JtYJzL08XIySEhYCJx/V03excjF4eQwG5GievfVzNCOJ8YJVbd6maCcL4xSkyefI8J
+	puXzj9esEIm9jBJX915iAUkICTxjlDh/TreLkYODRUBV4mVLLojJJqAr8aMpFKRCREBDYt+E
+	XrCZzAKXmCTety5kBEkIC3hJtG9qARvDK2AmceNSGyOELShxcuYTsDgnULxx4152EFtUQEZi
+	xtKvzCCDJAR2cEjsafzCBLJMQsBFYs85SYg7hSVeHd/CDmFLSbzsb4OysyUONW6A+qVEYueR
+	Bqi4vUTrqX5mEJtZIEPiw4t+qLisxNRT65gg4nwSvb+fQPXySuyYB2OrScx5N5UFwpaRWHhp
+	BlTcQ2Llvv/QEO1kkjj6ag/LBEb5WUh+m4VkH4RtJdH5oYl1FtA7zALSEsv/cUCYmhLrd+kv
+	YGRdxSiZWlCcm55abFpgnJdaDo/v5PzcTYzg1KzlvYPx0YMPeocYmTgYDzFKcDArifA+/bI3
+	TYg3JbGyKrUoP76oNCe1+BCjKTCqJjJLiSbnA7NDXkm8oYmlgYmZmZmJpbGZoZI47+vWuSlC
+	AumJJanZqakFqUUwfUwcnFINTFHP6xN36Pol/lMNUz7nWbjAr9Usrpa9Vmhu8U5rNVmFj7vS
+	9S8zd82/ePP0U9HvD7nYL/zwEv5lsnvTn9uF9jeOXlrwrj2mU+lb8jTF/UqGmvt51y1fpF12
+	Pu3xrJ4IbyeVY2uVjoozfJVnZ8lObDe6Zb77mvG7SXu5xO5++DTvdkh/zvFTK5p3Hn+w8k3e
+	gx1XE+2upU94VjJBhFd01U0pXe55nz2KVX4lL5v3XHzjeYHyRRLS73YavpNfOv1b3bS52rzn
+	HJfoBEn41P1RVXjpvL3nrNLy6g2rlN0+FHQfr9rx8+jM7s1nDJYtiOWbsqRws0HH4b71tw/+
+	1nGL1/Txfy174NfPSVmOB45ck3+vxFKckWioxVxUnAgAMQ5c3FYEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplkeLIzCtJLcpLzFFi42LZdlhJXrdaeH+aweFJfBZNE/4yW6y+289m
+	8X17H4vF+8vbmCxuHtjJZLFy9VEmi6P/37JZTDp0jdHizMvPLBZ7b2lb3JjwlNFi2+/5zBaf
+	l7awW/z+MYfNgc9j8wotj8tnSz02repk89h9s4HN4+xKR4++LasYPT5vkgtgj+KySUnNySxL
+	LdK3S+DKmPwhvWAzT8X2vysYGxhfcnYxcnJICJhIfP7xmrWLkYtDSGA3o0THtvnsEAkZid13
+	d7JC2MISK/89Z4coesIo8WgSSAcHB4uAqsTLllwQk01AV+JHUyhIuYiAhsS+Cb1MIOXMAleY
+	JG6se8gGkhAW8JJo39TCAmLzCphJ3LjUxggxs5tJYue5+UwQCUGJkzOfgBUxAxXN2/yQGWQB
+	s4C0xPJ/HCBhTqBw48a9YHeKAt05Y+lX5gmMgrOQdM9C0j0LoXsBI/MqRsnUguLc9NxkwwLD
+	vNRyveLE3OLSvHS95PzcTYzgmNLS2MF4b/4/vUOMTByMhxglOJiVRHifftmbJsSbklhZlVqU
+	H19UmpNafIhRmoNFSZzXcMbsFCGB9MSS1OzU1ILUIpgsEwenVAOTgveUXbsd3Vfzv+aazu55
+	+PFj28iz6RNvBz3717SCf+KrnN5H7zdrpgnl6M6Mncob+M1EJMx82rp3FRvSb/7ccezPNoW1
+	HQt5fn1MZVbhO3Fy/TfviP0qdW8ZpP7zcz0MFK9kn+a7SFshmu3G5GmXezQTjVf9Fz54ehvz
+	s69cdcoNhg4iTTc6/psntGVYWF69vnP+tdil1xemNB5fmOx/RET2kPAd26KZp93f7dC8dO3s
+	vyq2mVEzM394v1DWZ3t56MWNE1FdGp3zu2L5VEUDSqdG9md+vb5ISuOQa9+2NffPFDj+Snx5
+	8Oq0sGv3fmUv1tcQ8Gg9sjOprN87IZ5tUdk54WsZ8U1tNyesP12spsRSnJFoqMVcVJwIALil
+	G6EYAwAA
+X-CMS-MailID: 20240816085315epcas5p225b85ace7e76e07ea8738d77d5fdd763
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240711051521epcas5p348f2cd84a1a80577754929143255352b
+References: <CGME20240711051521epcas5p348f2cd84a1a80577754929143255352b@epcas5p3.samsung.com>
+	<20240711050750.17792-1-kundan.kumar@samsung.com>
+	<ZrVO45fvpn4uVmFH@bombadil.infradead.org> <20240812133843.GA24570@lst.de>
+	<Zro5xJgcVlSaM4zP@bombadil.infradead.org>
 
-On Thu, Aug 15, 2024 at 6:00=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote:
+------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+
+On 12/08/24 09:35AM, Luis Chamberlain wrote:
+>On Mon, Aug 12, 2024 at 03:38:43PM +0200, Christoph Hellwig wrote:
+>> On Thu, Aug 08, 2024 at 04:04:03PM -0700, Luis Chamberlain wrote:
+>> > This is not just about mTHP uses though, this can also affect buffered IO and
+>> > direct IO patterns as well and this needs to be considered and tested as well.
+>>
+>> Not sure what the above is supposed to mean.  Besides small tweaks
+>> to very low-level helpers the changes are entirely in the direct I/O
+>> path, and they optimize that path for folios larger than PAGE_SIZE.
 >
-> Go ahead and take them, I'll just kill the one I have. Thanks!
+>Which was my expectation as well.
+>
+>> > I've given this a spin on top of of the LBS patches [0] and used the LBS
+>> > patches as a baseline. The good news is I see a considerable amount of
+>> > larger IOs for buffered IO and direct IO, however for buffered IO there
+>> > is an increase on unalignenment to the target filesystem block size and
+>> > that can affect performance.
+>>
+>> Compared to what?  There is nothing in the series here changing buffered
+>> I/O patterns.  What do you compare?  If this series changes buffered
+>> I/O patterns that is very well hidden and accidental, so we need to
+>> bisect which patch does it and figure out why, but it would surprise me
+>> a lot.
+>
+>The comparison was the without the patches Vs with the patches on the
+>same fio run with buffered IO. I'll re-test more times and bisect.
+>
 
-Thanks, will do!
+Did tests with LBS + block folio patches and couldn't observe alignment
+issue. Also, the changes in this series are not executed when we issue
+buffered I/O.
 
-Cheers,
-Miguel
+
+------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_
+Content-Type: text/plain; charset="utf-8"
+
+
+------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_7e0ad_--
