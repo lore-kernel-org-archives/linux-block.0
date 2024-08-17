@@ -1,98 +1,162 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D3C440C;
-	Sat, 17 Aug 2024 01:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D6163D
+	for <linux-block@vger.kernel.org>; Sat, 17 Aug 2024 04:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723858585; cv=none; b=hhKsBdsMDDGPRPtFRgIkjIBqmcps36ivpiZ7rxw+H09zfhNKCJVc+xTbIwm0xjUlgXL1WDzMLql8uPPpPVXxupvH9xdGZTw6MD1B6F5eMFuY5QQfw9g0FF3x2Z/3S4FitgeWqs/5rDcAgTGoB8Ozk2Ty94LE+qlUSkLoABtNqTE=
+	t=1723868201; cv=none; b=is+xLq4ZWW2Qj4NrB688Q+/z91qg+FHA/Qt0hKgtevWhDpjVPF7OnH1pfz6t7hTjLWiZZXdCpsuXPmPOu2ShQCN/WLIou7Rkk0Mkc++NgsGEAVPpTcFAz3V6iAIl3l3GXT8Lu5pT1Sgx9TEIvl4URqnhjq3jludzr4bUEvfj0/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723858585; c=relaxed/simple;
-	bh=0O25Mm60bYKwOEosx4Bdj6CUTx7itBATQEbDySgKMYk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dzNVZen4YojZm2QrJrqdKROeZt8e6juDlz57y9hL/4x+ZLBqJoEMm7ZqIgoaIPs3Mfvqo+FJhcaabp4BRgdm2+tI2H+DXiaybIqLSTmi1H+3v3Xr6/0ED5qJI5SVvoGRZvpGo27jESQTwCuVPkVGwWoI0XlShXBPIPu5fbqcLsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DIfpCkpV; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1723868201; c=relaxed/simple;
+	bh=O9/l7v5MYEnlC0f5zH8ojBWCl7YKPKoB9f0eBBd92CA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=UXFA9U+NlAG+LXARBJMOnUTTy69Io1h+euBy0I4OQU8UekZYi2QSDhMRSCK1shGDxjc5lubj5VAvBLv6C4VtuKWa2KA+e0YtyJqP8KWnQRQrD7gj7DlIOExiNWbo9bDNLoj0OTqitkAfg5v3lGtlCACRARBhoXRJAHJ63j+zg1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QNg5VmM+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DIfpCkpV"
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47GLBvTm007647;
-	Sat, 17 Aug 2024 01:36:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=
-	corp-2023-11-20; bh=nJHU3XZ9N/yLVO8iZKjEAxNp8c+CiMSiSuBerZyTsh4=; b=
-	DIfpCkpV181Ku5XWqpW+79s3t46uCM/tUhmlXAjESJJkOOgBKan9zWD1b2IYy8eA
-	i1UoMLggo4SfvORlk5w9/z90u6gBxUP1UZb5zONR42f7YyxcxyXIYwtT31NLQ/Nx
-	vsKfGmzoEED5fn8pKsQWjf9+t0FAd6a2Y9m0PsinovB5PoYYXfIkUqBQH4RG5pkf
-	O0GCGOEnQa4tLfLPdJQz9FcW6MGzCg1ue9mzJ6zoCU0FMdTvqioqjY+LjZF/Iaat
-	YyDVgz5SnL7WO6epR8NPzS9YRIBDBfo2avx/DwM80CaNEjUEc0yl63OueLxeCE04
-	7FC6TuQ3hyFLSkWczNsBKA==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 40wy4bnux7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 17 Aug 2024 01:36:20 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 47H1XVPI023564;
-	Sat, 17 Aug 2024 01:36:20 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 412ja5r10t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 17 Aug 2024 01:36:20 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 47H1aJsf029132;
-	Sat, 17 Aug 2024 01:36:19 GMT
-Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 412ja5r0yx-1;
-	Sat, 17 Aug 2024 01:36:19 +0000
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-To: axboe@kernel.dk, James.Bottomley@HansenPartnership.com,
-        John Garry <john.g.garry@oracle.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 0/2] block atomic writes tidy-ups/fix
-Date: Fri, 16 Aug 2024 21:35:39 -0400
-Message-ID: <172385819627.3430749.3510957430404257870.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240805113315.1048591-1-john.g.garry@oracle.com>
-References: <20240805113315.1048591-1-john.g.garry@oracle.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QNg5VmM+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723868198;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LiqVRaoulk/mY0QB38YEzeF4KeY9i1TXrrsn3lGI4aU=;
+	b=QNg5VmM+lbLIg5je9lb/QTf6c52dnqmw05c+jUIPolnu8GT6EMDBLSUa5Yu0I74IZSSN8F
+	730RF0vFvnI5BPqxdnJy3Gp6vVvxHEOpXJ7tSjDIfzHtwV4lx/CVPhtGxTYSOyxbaRLTrB
+	bhKBvSERr2tjftTn6But/CH/BqvSRGk=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-670-wIpoyX1nO7CrtV-d-K_Xrg-1; Sat, 17 Aug 2024 00:16:36 -0400
+X-MC-Unique: wIpoyX1nO7CrtV-d-K_Xrg-1
+Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-842fd4f16e3so134311241.1
+        for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 21:16:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723868196; x=1724472996;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LiqVRaoulk/mY0QB38YEzeF4KeY9i1TXrrsn3lGI4aU=;
+        b=uINW3roSl0hJ2Hj9q8VaiJET8sQ2SqRbSZDTke+NsasRfbw4Fsjip7TAFgZrol9Wm6
+         osa99kY5mjpvFFuPeUi8off8TmilSRHY+4iUXwr7hhRmwfoUaRTe9ZKn3l5dOpe5UOfm
+         b4wVzvlkU6nm/Ik4uHI6NkaBa+MBQZRpOzuw06MoV8MmvCnYf94X3ZqShoSdf0yIuvHT
+         2WiLxK2dZQkN/uLSd2rL7dZP4ZZiX0fDzLTTO2mksi5KoPluTZ3wo4yJ+3MedyrLPBXb
+         M3mh4E5ZAZg6MIoMM+y2SvEo2H9ywOokfduuGxNHstmwlI1U2g/IxflQZHJXYMf3DvVp
+         Vgmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVuKgxHhKrEplxdsgTdcJojV6u1gwJUs+SEFARX7eUG+LdcL+YVppH2WfxLAxX21dn1uP/dPYc2+Z707dmhSL6L/SBHriaWj0lQlg4=
+X-Gm-Message-State: AOJu0YzwdIkrcjZfVWJS4kmU3UkTEmczgZKMT9JI/yHDK91Q3VKYpoii
+	O6C1IUe3fXacqOD8l1CkyMdWuATLBBtUg+Ii+vgxkEEtJoOKIQl84Az1HJ0BSD6KzLkNcOOkTiC
+	ibo1CfQxmTeyJO9ImsTKKjGYd69rhg70kGuMjdhw+6kB3VMpvB3G9zVyCfIuSGdiLCIY9Eeo/EG
+	ZqfiT4DimPfPUqja1aJhX9Cf+Sp4AKj1OzQtsEGrJPnxc/9BA2
+X-Received: by 2002:a05:6102:5127:b0:492:a4f3:34c2 with SMTP id ada2fe7eead31-49779a409b6mr3094146137.5.1723868195810;
+        Fri, 16 Aug 2024 21:16:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFsztqX8ZhdNatL778NuvEH/u9w9I5BJjMoYXfA03WqFWsKr785hzMGK4Fd6ZtrcZCRkVRd2QJnX7cr2X0NEw0=
+X-Received: by 2002:a05:6102:5127:b0:492:a4f3:34c2 with SMTP id
+ ada2fe7eead31-49779a409b6mr3094141137.5.1723868195494; Fri, 16 Aug 2024
+ 21:16:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-16_18,2024-08-16_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0
- suspectscore=0 phishscore=0 mlxlogscore=999 adultscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2407110000 definitions=main-2408170009
-X-Proofpoint-GUID: 0rRPNMD9u9Dc7t7KlC-HNvXy4YD_aUEu
-X-Proofpoint-ORIG-GUID: 0rRPNMD9u9Dc7t7KlC-HNvXy4YD_aUEu
+References: <20240808162503.345913-1-ming.lei@redhat.com>
+In-Reply-To: <20240808162503.345913-1-ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Sat, 17 Aug 2024 12:16:24 +0800
+Message-ID: <CAFj5m9L3FGhdFw61K9-iLWs=ak3OGmunEKC6Fs=SPYDVfcPAVg@mail.gmail.com>
+Subject: Re: [PATCH V5 0/8] io_uring: support sqe group and provide group kbuf
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org, linux-block@vger.kernel.org, 
+	Pavel Begunkov <asml.silence@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 05 Aug 2024 11:33:13 +0000, John Garry wrote:
+On Fri, Aug 9, 2024 at 12:25=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Hello,
+>
+> The 1st 3 patches are cleanup, and prepare for adding sqe group.
+>
+> The 4th patch supports generic sqe group which is like link chain, but
+> allows each sqe in group to be issued in parallel and the group shares
+> same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
+> sqe group & io link together. sqe group changes nothing on
+> IOSQE_IO_LINK.
+>
+> The 5th patch supports one variant of sqe group: allow members to depend
+> on group leader, so that kernel resource lifetime can be aligned with
+> group leader or group, then any kernel resource can be shared in this
+> sqe group, and can be used in generic device zero copy.
+>
+> The 6th & 7th patches supports providing sqe group buffer via the sqe
+> group variant.
+>
+> The 8th patch supports ublk zero copy based on io_uring providing sqe
+> group buffer.
+>
+> Tests:
+>
+> 1) pass liburing test
+> - make runtests
+>
+> 2) write/pass two sqe group test cases:
+>
+> https://github.com/axboe/liburing/compare/master...ming1:liburing:sqe_gro=
+up_v2
+>
+> - covers related sqe flags combination and linking groups, both nop and
+> one multi-destination file copy.
+>
+> - cover failure handling test: fail leader IO or member IO in both single
+>   group and linked groups, which is done in each sqe flags combination
+>   test
+>
+> 3) ublksrv zero copy:
+>
+> ublksrv userspace implements zero copy by sqe group & provide group
+> kbuf:
+>
+>         git clone https://github.com/ublk-org/ublksrv.git -b group-provid=
+e-buf_v2
+>         make test T=3Dloop/009:nbd/061    #ublk zc tests
+>
+> When running 64KB/512KB block size test on ublk-loop('ublk add -t loop --=
+buffered_io -f $backing'),
+> it is observed that perf is doubled.
+>
+> Any comments are welcome!
+>
+> V5:
+>         - follow Pavel's suggestion to minimize change on io_uring fast c=
+ode
+>           path: sqe group code is called in by single 'if (unlikely())' f=
+rom
+>           both issue & completion code path
+>
+>         - simplify & re-write group request completion
+>                 avoid to touch io-wq code by completing group leader via =
+tw
+>                 directly, just like ->task_complete
+>
+>                 re-write group member & leader completion handling, one
+>                 simplification is always to free leader via the last memb=
+er
+>
+>                 simplify queueing group members, not support issuing lead=
+er
+>                 and members in parallel
+>
+>         - fail the whole group if IO_*LINK & IO_DRAIN is set on group
+>           members, and test code to cover this change
+>
+>         - misc cleanup
 
-> These two minor patches are tidy-ups for atomic write support.
-> 
-> Both are related to ignoring that REQ_ATOMIC can only be set for writes.
-> 
-> The block change could be considered a fix, as we are needlessly
-> checking for REQ_ATOMIC in fastpath.
-> 
-> [...]
+Hi Pavel,
 
-Applied to 6.12/scsi-queue, thanks!
+V5 should address all your comments on V4, so care to take a look?
 
-[1/2] scsi: sd: Don't check if a write for REQ_ATOMIC
-      https://git.kernel.org/mkp/scsi/c/0c150b30d3d5
-[2/2] block: Don't check REQ_ATOMIC for reads
-      https://git.kernel.org/mkp/scsi/c/ea6787c695ab
+Thanks,
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
