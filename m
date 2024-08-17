@@ -1,162 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D6163D
-	for <linux-block@vger.kernel.org>; Sat, 17 Aug 2024 04:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C847E63D
+	for <linux-block@vger.kernel.org>; Sat, 17 Aug 2024 04:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723868201; cv=none; b=is+xLq4ZWW2Qj4NrB688Q+/z91qg+FHA/Qt0hKgtevWhDpjVPF7OnH1pfz6t7hTjLWiZZXdCpsuXPmPOu2ShQCN/WLIou7Rkk0Mkc++NgsGEAVPpTcFAz3V6iAIl3l3GXT8Lu5pT1Sgx9TEIvl4URqnhjq3jludzr4bUEvfj0/k=
+	t=1723868602; cv=none; b=k+oHYSztqy4utgp0O7mRY3t9D3euM6qYQ6NwXMFTXchkbDI/D4+Nr6nXZk/Lt4mfV4beNWwt0Fey/J8u7O7yG3Rb13V682s0d5Kvy2YhHLPPicn6DjCawWoAJmqXNEUTCCUQyDQ2y1ZrrnCVxYL9XF7I2VvQ98dcuKruDc1g2Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723868201; c=relaxed/simple;
-	bh=O9/l7v5MYEnlC0f5zH8ojBWCl7YKPKoB9f0eBBd92CA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=UXFA9U+NlAG+LXARBJMOnUTTy69Io1h+euBy0I4OQU8UekZYi2QSDhMRSCK1shGDxjc5lubj5VAvBLv6C4VtuKWa2KA+e0YtyJqP8KWnQRQrD7gj7DlIOExiNWbo9bDNLoj0OTqitkAfg5v3lGtlCACRARBhoXRJAHJ63j+zg1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QNg5VmM+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1723868602; c=relaxed/simple;
+	bh=pro5b5evHIHbIp1CwOnK0gkdnPJrXWqWtB68oNqffAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V8w9KM8z67N+LP5YYzgGpvSsabdF8r/4E0DQG3jxY5wap+P/OfL28ybKMGMrvDYEC+HKXP1N6GqyWcPrCJJmqKMqWYgZU1JIIuSC5UF8diN998KReVJ/koV5Hw+2XmR9+DjtLFgUY3aWr7mIbB0hx/dQ5FTGA/D5SQByqTT9JVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EMzyzSPn; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QNg5VmM+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723868198;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LiqVRaoulk/mY0QB38YEzeF4KeY9i1TXrrsn3lGI4aU=;
-	b=QNg5VmM+lbLIg5je9lb/QTf6c52dnqmw05c+jUIPolnu8GT6EMDBLSUa5Yu0I74IZSSN8F
-	730RF0vFvnI5BPqxdnJy3Gp6vVvxHEOpXJ7tSjDIfzHtwV4lx/CVPhtGxTYSOyxbaRLTrB
-	bhKBvSERr2tjftTn6But/CH/BqvSRGk=
-Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
- [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-670-wIpoyX1nO7CrtV-d-K_Xrg-1; Sat, 17 Aug 2024 00:16:36 -0400
-X-MC-Unique: wIpoyX1nO7CrtV-d-K_Xrg-1
-Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-842fd4f16e3so134311241.1
-        for <linux-block@vger.kernel.org>; Fri, 16 Aug 2024 21:16:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723868196; x=1724472996;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LiqVRaoulk/mY0QB38YEzeF4KeY9i1TXrrsn3lGI4aU=;
-        b=uINW3roSl0hJ2Hj9q8VaiJET8sQ2SqRbSZDTke+NsasRfbw4Fsjip7TAFgZrol9Wm6
-         osa99kY5mjpvFFuPeUi8off8TmilSRHY+4iUXwr7hhRmwfoUaRTe9ZKn3l5dOpe5UOfm
-         b4wVzvlkU6nm/Ik4uHI6NkaBa+MBQZRpOzuw06MoV8MmvCnYf94X3ZqShoSdf0yIuvHT
-         2WiLxK2dZQkN/uLSd2rL7dZP4ZZiX0fDzLTTO2mksi5KoPluTZ3wo4yJ+3MedyrLPBXb
-         M3mh4E5ZAZg6MIoMM+y2SvEo2H9ywOokfduuGxNHstmwlI1U2g/IxflQZHJXYMf3DvVp
-         Vgmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVuKgxHhKrEplxdsgTdcJojV6u1gwJUs+SEFARX7eUG+LdcL+YVppH2WfxLAxX21dn1uP/dPYc2+Z707dmhSL6L/SBHriaWj0lQlg4=
-X-Gm-Message-State: AOJu0YzwdIkrcjZfVWJS4kmU3UkTEmczgZKMT9JI/yHDK91Q3VKYpoii
-	O6C1IUe3fXacqOD8l1CkyMdWuATLBBtUg+Ii+vgxkEEtJoOKIQl84Az1HJ0BSD6KzLkNcOOkTiC
-	ibo1CfQxmTeyJO9ImsTKKjGYd69rhg70kGuMjdhw+6kB3VMpvB3G9zVyCfIuSGdiLCIY9Eeo/EG
-	ZqfiT4DimPfPUqja1aJhX9Cf+Sp4AKj1OzQtsEGrJPnxc/9BA2
-X-Received: by 2002:a05:6102:5127:b0:492:a4f3:34c2 with SMTP id ada2fe7eead31-49779a409b6mr3094146137.5.1723868195810;
-        Fri, 16 Aug 2024 21:16:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsztqX8ZhdNatL778NuvEH/u9w9I5BJjMoYXfA03WqFWsKr785hzMGK4Fd6ZtrcZCRkVRd2QJnX7cr2X0NEw0=
-X-Received: by 2002:a05:6102:5127:b0:492:a4f3:34c2 with SMTP id
- ada2fe7eead31-49779a409b6mr3094141137.5.1723868195494; Fri, 16 Aug 2024
- 21:16:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EMzyzSPn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=xWrN7vg31b7LfTSJaFZpAZiJcYO5xql6YZydvTJSxsw=; b=EMzyzSPnllTpRs9fp2lGHyGurn
+	NpmAjSHN4BAsfV+OvI7s7Sks6XTk0+/djsE6QQqjYFrrQ24Q8VVW4Ckn3TghWpZ4wmjPbg+LtYRKE
+	2ObXBkyqG5JO5p9othyrwLqRoIIz79QiodQ+VYWp6q0DA1D4rbZIbLD9o4Fj3gLy/kdXrYsSOykJn
+	ikCr5lfcLKS9xc5VgYxBeMJJYcMMUtgpiq9HwppNVQ4X37S56+4GY2JDftvNXmp6wR4AbsEcpEuNZ
+	5TPVJ/B95v6Xxrj7RZVgAPDAw15GFjWxOZvp0QIblYedI+WadDNbDYYZYjHp++aBaPNEh52+4H62g
+	Y98Yn/mQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sfAyA-00000004QhH-1gWE;
+	Sat, 17 Aug 2024 04:23:14 +0000
+Date: Sat, 17 Aug 2024 05:23:14 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v8 1/5] block: Added folio-ized version of
+ bvec_try_merge_hw_page()
+Message-ID: <ZsAlsjZeNmsBI6J0@casper.infradead.org>
+References: <20240711050750.17792-1-kundan.kumar@samsung.com>
+ <CGME20240711051529epcas5p1aaf694dfa65859b8a32bdffce5239bf6@epcas5p1.samsung.com>
+ <20240711050750.17792-2-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240808162503.345913-1-ming.lei@redhat.com>
-In-Reply-To: <20240808162503.345913-1-ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 17 Aug 2024 12:16:24 +0800
-Message-ID: <CAFj5m9L3FGhdFw61K9-iLWs=ak3OGmunEKC6Fs=SPYDVfcPAVg@mail.gmail.com>
-Subject: Re: [PATCH V5 0/8] io_uring: support sqe group and provide group kbuf
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org, linux-block@vger.kernel.org, 
-	Pavel Begunkov <asml.silence@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240711050750.17792-2-kundan.kumar@samsung.com>
 
-On Fri, Aug 9, 2024 at 12:25=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Hello,
->
-> The 1st 3 patches are cleanup, and prepare for adding sqe group.
->
-> The 4th patch supports generic sqe group which is like link chain, but
-> allows each sqe in group to be issued in parallel and the group shares
-> same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
-> sqe group & io link together. sqe group changes nothing on
-> IOSQE_IO_LINK.
->
-> The 5th patch supports one variant of sqe group: allow members to depend
-> on group leader, so that kernel resource lifetime can be aligned with
-> group leader or group, then any kernel resource can be shared in this
-> sqe group, and can be used in generic device zero copy.
->
-> The 6th & 7th patches supports providing sqe group buffer via the sqe
-> group variant.
->
-> The 8th patch supports ublk zero copy based on io_uring providing sqe
-> group buffer.
->
-> Tests:
->
-> 1) pass liburing test
-> - make runtests
->
-> 2) write/pass two sqe group test cases:
->
-> https://github.com/axboe/liburing/compare/master...ming1:liburing:sqe_gro=
-up_v2
->
-> - covers related sqe flags combination and linking groups, both nop and
-> one multi-destination file copy.
->
-> - cover failure handling test: fail leader IO or member IO in both single
->   group and linked groups, which is done in each sqe flags combination
->   test
->
-> 3) ublksrv zero copy:
->
-> ublksrv userspace implements zero copy by sqe group & provide group
-> kbuf:
->
->         git clone https://github.com/ublk-org/ublksrv.git -b group-provid=
-e-buf_v2
->         make test T=3Dloop/009:nbd/061    #ublk zc tests
->
-> When running 64KB/512KB block size test on ublk-loop('ublk add -t loop --=
-buffered_io -f $backing'),
-> it is observed that perf is doubled.
->
-> Any comments are welcome!
->
-> V5:
->         - follow Pavel's suggestion to minimize change on io_uring fast c=
-ode
->           path: sqe group code is called in by single 'if (unlikely())' f=
-rom
->           both issue & completion code path
->
->         - simplify & re-write group request completion
->                 avoid to touch io-wq code by completing group leader via =
-tw
->                 directly, just like ->task_complete
->
->                 re-write group member & leader completion handling, one
->                 simplification is always to free leader via the last memb=
-er
->
->                 simplify queueing group members, not support issuing lead=
-er
->                 and members in parallel
->
->         - fail the whole group if IO_*LINK & IO_DRAIN is set on group
->           members, and test code to cover this change
->
->         - misc cleanup
+On Thu, Jul 11, 2024 at 10:37:46AM +0530, Kundan Kumar wrote:
+> -bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
+> -		struct page *page, unsigned len, unsigned offset,
+> +bool bvec_try_merge_hw_folio(struct request_queue *q, struct bio_vec *bv,
+> +		struct folio *folio, size_t len, size_t offset,
+>  		bool *same_page)
+>  {
+> +	struct page *page = folio_page(folio, 0);
+>  	unsigned long mask = queue_segment_boundary(q);
+>  	phys_addr_t addr1 = bvec_phys(bv);
+>  	phys_addr_t addr2 = page_to_phys(page) + offset + len - 1;
+[...]
+> +bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
+> +		struct page *page, unsigned int len, unsigned int offset,
+> +		bool *same_page)
+> +{
+> +	struct folio *folio = page_folio(page);
+> +
+> +	return bvec_try_merge_hw_folio(q, bv, folio, len,
+> +			((size_t)folio_page_idx(folio, page) << PAGE_SHIFT) +
+> +			offset, same_page);
+> +}
 
-Hi Pavel,
+This is the wrong way to do it.  bio_add_folio() does it correctly
+by being a wrapper around bio_add_page().
 
-V5 should address all your comments on V4, so care to take a look?
-
-Thanks,
-
+The reason is that in the future, not all pages will belong to folios.
+For those pages, page_folio() will return NULL, and this will crash.
