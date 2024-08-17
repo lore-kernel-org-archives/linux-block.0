@@ -1,197 +1,223 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E97623
-	for <linux-block@vger.kernel.org>; Sat, 17 Aug 2024 01:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304D3256E
+	for <linux-block@vger.kernel.org>; Sat, 17 Aug 2024 01:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723856599; cv=none; b=DrxxmBo6002D2/hjMAdYF8hXEhVgQSIX4uc/XceM8+H8R6xpA11J4Q+PYxC0rKyqbJHlG9kBAKcQtUCzQfr27V4RxMdwYxlR/YBadB/t7Bim5hTxzmsJgW1PtQn0wQJTwP0e4LLFGzIQvU65o627II9MaJ2gVyQE0OAs/BbTDSg=
+	t=1723857769; cv=none; b=E6D+WH7n/vdiBWbQlsvL6iaJjr36DJUrDzzsi/9oUYo6VXfpVcejiMIGN3WpEBDkufbdCKnq1kbxHP8aAwh0GvXnec8clXcpmKoH1dga0j9DhdzBqA/wTHIyNn8kZZkVJUPh3xrlU0wKm25oWMP5ibKifhWoUV0pBRf7f6/BTdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723856599; c=relaxed/simple;
-	bh=IFXFmEQghC3eJN79jUx1uxEElicBlcP3RqZ6Cfu+jpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=INhWLp00mtV2EV9CICn0P1uCEec+1CUe3D+l7FTKpyY7/qc6QFzr6uvHLJItyzKJNaFWQR8r5cGByNIrQ16WCKB/FY6ClPiENCGRIkkww/PWZ0GBSanYOY5OLpCobkGn7gEfe/5C/DIoqb7Gz2q/k0e5uOTKxcHqjePOLTJvGr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=RIyP0tM0; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1723857769; c=relaxed/simple;
+	bh=iO6/x5Zd81gY7PD6d+FRDpJTzZcgjiHJyOptjx4w6JE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cqfxwXfRjVQ5m8813sVTbgY1ka9TGb9D313qfNzlN4Y+JjRBBCOEaPs+xdzUmTPY/t4ahfwLM4G9+SesrknSKBymE6sWq7Dvtpxe9qChLPQYybO6SaNIhtFfdB629OCBwbdyL+rdBpUx3kvPy6PCE0tUN3x3vbxRHAg77bHcAqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=l7GYdcFa; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="RIyP0tM0"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240817010313epoutp036dd27354769cd57e4bba5ea3a66b5f5c~sXnBV4nsz1273212732epoutp03O
-	for <linux-block@vger.kernel.org>; Sat, 17 Aug 2024 01:03:13 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240817010313epoutp036dd27354769cd57e4bba5ea3a66b5f5c~sXnBV4nsz1273212732epoutp03O
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1723856593;
-	bh=9rCl9mz325qPs6XDSzdyjCV7S4f7Q2K75LI6maGzTwU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RIyP0tM0dv0FxcpWorC/gpjhUdJePkT28CAmNHvXHveTem35xclfYrAF89BhQBcpY
-	 Ta33UXR0w/42fA2ZIDKhYXZI7VWy4yay0d7fOCJ2idQpt/Cm25cr7xwFswMYGXYjWN
-	 riB9WaHhe/+H3jfGeyaXWkFOHmwIvTtv2xzOPRIs=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240817010312epcas5p2e471b6e7fb982a0dccfbc587cc81254f~sXnAdYRnP2868928689epcas5p2Z;
-	Sat, 17 Aug 2024 01:03:12 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4Wm0wH2PXRz4x9Pr; Sat, 17 Aug
-	2024 01:03:11 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	21.0D.08855.FC6FFB66; Sat, 17 Aug 2024 10:03:11 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240816184134epcas5p3b673a0619a2e696f845ee09ab7f5a087~sSZyh0ve20030500305epcas5p37;
-	Fri, 16 Aug 2024 18:41:34 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240816184134epsmtrp2314d0bc5f353b59f1a985708532f6709~sSZyhKTcz1006110061epsmtrp2M;
-	Fri, 16 Aug 2024 18:41:34 +0000 (GMT)
-X-AuditID: b6c32a44-107ff70000002297-ca-66bff6cf353f
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	11.E4.08964.E5D9FB66; Sat, 17 Aug 2024 03:41:34 +0900 (KST)
-Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240816184133epsmtip1a7f99a59bd4aa8dd37b15838e0e0a501~sSZxhDF963096730967epsmtip1e;
-	Fri, 16 Aug 2024 18:41:33 +0000 (GMT)
-Date: Sat, 17 Aug 2024 00:04:13 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-	linux-block@vger.kernel.org, kbusch@kernel.org
-Subject: Re: [PATCH v2 1/2] block: Read max write zeroes once for
- __blkdev_issue_write_zeroes()
-Message-ID: <20240816183129.a2uwtlkbvddg5uxm@nj.shetty@samsung.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="l7GYdcFa"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=lMkG4PqoNawkDXMb2RAu7qjIisr1ejDLyYeo4v+s2Hg=; b=l7GYdcFaNyj+jHTSFPJ/euAniL
+	HIB99hMQD4kDZhQLvjafcYnK7GLF5IEhnPj5TUy7RgSqprrXjY6VN0/s9H4skH8LMRUyA0+fcTr5v
+	JwXInG6nLY33LS5bdMq/lez+P7fvdciZXya2pHIAk5OeAny4k2q2Va+KUvMdPzdlE1omAliHEcxqF
+	bH4xsJEjIwnsTFg2WjK7RcSjMDhM9KZy8X4ZcrWhzy8WxFJ4fL+a68+5cn3id6NrRUiv51Q6aQ2wA
+	VtwyGqpTXoiOt5ZhnO9m6vuyeLLJJ671exEFVXo16JFlovMy8cT2WruumZUaNg1AuLMVbg+RHQArL
+	rJlL4EeQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sf89Q-0000000ERYT-2bKb;
+	Sat, 17 Aug 2024 01:22:40 +0000
+Date: Fri, 16 Aug 2024 18:22:40 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, Daniel Gomez <da.gomez@samsung.com>,
+	Pankaj Raghav <p.raghav@samsung.com>, kernel@pankajraghav.com,
+	axboe@kernel.dk, willy@infradead.org, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v8 0/5] block: add larger order folio instead of pages
+Message-ID: <Zr_7YERr75vHbknA@bombadil.infradead.org>
+References: <CGME20240711051521epcas5p348f2cd84a1a80577754929143255352b@epcas5p3.samsung.com>
+ <20240711050750.17792-1-kundan.kumar@samsung.com>
+ <ZrVO45fvpn4uVmFH@bombadil.infradead.org>
+ <20240812133843.GA24570@lst.de>
+ <Zro5xJgcVlSaM4zP@bombadil.infradead.org>
+ <20240816084541.t7bn7qlklhynsglq@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240815163228.216051-2-john.g.garry@oracle.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplk+LIzCtJLcpLzFFi42LZdlhTS/f8t/1pBhP28FmsvtvPZrFy9VEm
-	iwu/djBaTDp0jdFi7y1ti+XH/zE5sHlcPlvqsWlVJ5vH7psNbB4fn95i8fi8SS6ANSrbJiM1
-	MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwdov5JCWWJOKVAo
-	ILG4WEnfzqYov7QkVSEjv7jEVim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO2P+r1ts
-	BY3iFesXtTA1ME4Q7mLk5JAQMJE43nqcpYuRi0NIYDejxJ7XkxkhnE+MEp0L5zCCVAkJfGOU
-	mH0tCabj4owuVoj4XkaJ42+0IRo+M0psbLjLDpJgEVCV+H57GlMXIwcHm4C2xOn/HCCmiICG
-	xJFD0iAVzAK5Eit3LwCrFhZIlPh2vpUNxOYVcJZY+WENI4QtKHFy5hMWEJtTwE6iZ8V9VpBV
-	EgIv2SUOrX7FBHGPi8SCxesZIWxhiVfHt7BD2FISn9/tZYOwyyVWTlnBBtHcwigx6/osqAZ7
-	idZT/cwgxzELZEj0/FeCCMtKTD21jgniUD6J3t9PoHbxSuyYB2MrS6xZvwBqvqTEte+NULaH
-	xInW/8yQMDnKKDFp/UbGCYxys5A8NAth3SywFVYSnR+aWCHC0hLL/3FAmJoS63fpL2BkXcUo
-	mVpQnJuemmxaYJiXWg6P4eT83E2M4PSo5bKD8cb8f3qHGJk4GA8xSnAwK4nwPv2yN02INyWx
-	siq1KD++qDQntfgQoykwdiYyS4km5wMTdF5JvKGJpYGJmZmZiaWxmaGSOO/r1rkpQgLpiSWp
-	2ampBalFMH1MHJxSDUw3fUR31/ncYLvgmX1mi4/kn5lF39/EPJLVNfkeFpPpq+JzRst7zsQc
-	Xsk5q32mf7gbJf/jT6Otaex34xs7bPkFjjb/trNeN0FBteB+6OIKiQk/J6ZV/1Nhnn9+b3/B
-	lFU+arvKm7nDlh+5YNnvt9DfgnMNr3yHqmlnD+9RL+ZJfsJ+F/Q/C7zZ37v6TUb6XEb/W5N0
-	eSZkdzUI3Vpu+mabY8kDsb0CMzi3ZSnNzupo+bTC5u3tvTMWLV92bS9XNMsE+bPFdgXe22zq
-	FXMdDBL6T6Yy/XQSuaspGqproW/4yXDBe7VJ7dd3Mx4X114krVb0YZv7i8RpvmdZLyzce79y
-	VrBP+JX5Lr3npr/7802JpTgj0VCLuag4EQBexyt1GAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrOLMWRmVeSWpSXmKPExsWy7bCSnG7c3P1pBu+WClusvtvPZrFy9VEm
-	iwu/djBaTDp0jdFi7y1ti+XH/zE5sHlcPlvqsWlVJ5vH7psNbB4fn95i8fi8SS6ANYrLJiU1
-	J7MstUjfLoEr4/rMXtaCzSIVT6a+ZWpgvCPQxcjJISFgInFxRhdrFyMXh5DAbkaJa3unsEIk
-	JCWW/T3CDGELS6z895wdxBYS+Mgo0fnAH8RmEVCV+H57GlMXIwcHm4C2xOn/HCCmiICGxJFD
-	0iAVzAK5Eit3LwDrFBZIlPh2vpUNxOYVcJZY+WENI8TEQomuN79YIeKCEidnPmGB6DWTmLf5
-	ITPISGYBaYnl/zhAwpwCdhI9K+6zTmAUmIWkYxaSjlkIHQsYmVcxSqYWFOem5xYbFhjmpZbr
-	FSfmFpfmpesl5+duYgSHtZbmDsbtqz7oHWJk4mA8xCjBwawkwvv0y940Id6UxMqq1KL8+KLS
-	nNTiQ4zSHCxK4rziL3pThATSE0tSs1NTC1KLYLJMHJxSDUwzd3pweb3V9N6663r6khqZX1P+
-	/GG3Vm+IuXNl4u88py1+x+45PdxXcmLT1+xXXrlRCiVzCxSPy202LQ+bILJhZo5A7QzhAMdt
-	xy3SZ604tmqPzNbTyyZsTG/ia6gs/P2JQdu5N+bnV+3GJVV3p9vucZpr+tr2+/ETG2/lGfdu
-	8rywm6/K3vRi5imbkydWqBj/E5LIszb6oJ79m99ysn5C/01Fy+ZUdm2T5waTOnz61mx0W/GT
-	84aAvMnZkjcHpb8uNLjX2moS+tt7ypX497NsI3Nj9HYuOvZDN3G2cv+JO/uvnn58kO379/c7
-	WUWc+5c3P3rzXjtpcXXXn5QjnEKzjsstzJNfZnM95vQ3484gJZbijERDLeai4kQA1SHxndoC
-	AAA=
-X-CMS-MailID: 20240816184134epcas5p3b673a0619a2e696f845ee09ab7f5a087
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----rEVyOeUC1-Pd4ykAKehEErIJv_6LE1Y2HSCt3w26tRlypI58=_7f8e3_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240816184134epcas5p3b673a0619a2e696f845ee09ab7f5a087
-References: <20240815163228.216051-1-john.g.garry@oracle.com>
-	<20240815163228.216051-2-john.g.garry@oracle.com>
-	<CGME20240816184134epcas5p3b673a0619a2e696f845ee09ab7f5a087@epcas5p3.samsung.com>
-
-------rEVyOeUC1-Pd4ykAKehEErIJv_6LE1Y2HSCt3w26tRlypI58=_7f8e3_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240816084541.t7bn7qlklhynsglq@green245>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-On 15/08/24 04:32PM, John Garry wrote:
->As reported in [0], we may get a hang when formatting a XFS FS on a RAID0
->drive.
->
->Commit 73a768d5f955 ("block: factor out a blk_write_zeroes_limit helper")
->changed __blkdev_issue_write_zeroes() to read the max write zeroes
->value in the loop. This is not safe as max write zeroes may change in
->value. Specifically for the case of [0], the value goes to 0, and we get
->an infinite loop.
->
->Lift the limit reading out of the loop.
->
->[0] https://lore.kernel.org/linux-xfs/4d31268f-310b-4220-88a2-e191c3932a82@oracle.com/T/#t
->
->Fixes: 73a768d5f955 ("block: factor out a blk_write_zeroes_limit helper")
->Reviewed-by: Christoph Hellwig <hch@lst.de>
->Signed-off-by: John Garry <john.g.garry@oracle.com>
->---
-> block/blk-lib.c | 25 ++++++++++++++++++-------
-> 1 file changed, 18 insertions(+), 7 deletions(-)
->
->diff --git a/block/blk-lib.c b/block/blk-lib.c
->index 9f735efa6c94..83eb7761c2bf 100644
->--- a/block/blk-lib.c
->+++ b/block/blk-lib.c
->@@ -111,13 +111,20 @@ static sector_t bio_write_zeroes_limit(struct block_device *bdev)
-> 		(UINT_MAX >> SECTOR_SHIFT) & ~bs_mask);
-> }
->
->+/*
->+ * There is no reliable way for the SCSI subsystem to determine whether a
->+ * device supports a WRITE SAME operation without actually performing a write
->+ * to media. As a result, write_zeroes is enabled by default and will be
->+ * disabled if a zeroing operation subsequently fails. This means that this
->+ * queue limit is likely to change at runtime.
->+ */
-> static void __blkdev_issue_write_zeroes(struct block_device *bdev,
-> 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
->-		struct bio **biop, unsigned flags)
->+		struct bio **biop, unsigned flags, sector_t limit)
-> {
->+
-> 	while (nr_sects) {
->-		unsigned int len = min_t(sector_t, nr_sects,
->-				bio_write_zeroes_limit(bdev));
->+		unsigned int len = min(nr_sects, limit);
+On Fri, Aug 16, 2024 at 02:15:41PM +0530, Kundan Kumar wrote:
+> On 12/08/24 09:35AM, Luis Chamberlain wrote:
+> > On Mon, Aug 12, 2024 at 03:38:43PM +0200, Christoph Hellwig wrote:
+> > > On Thu, Aug 08, 2024 at 04:04:03PM -0700, Luis Chamberlain wrote:
+> > > > This is not just about mTHP uses though, this can also affect buffered IO and
+> > > > direct IO patterns as well and this needs to be considered and tested as well.
+> > > 
+> > > Not sure what the above is supposed to mean.  Besides small tweaks
+> > > to very low-level helpers the changes are entirely in the direct I/O
+> > > path, and they optimize that path for folios larger than PAGE_SIZE.
+> > 
+> > Which was my expectation as well.
+> > 
+> > > > I've given this a spin on top of of the LBS patches [0] and used the LBS
+> > > > patches as a baseline. The good news is I see a considerable amount of
+> > > > larger IOs for buffered IO and direct IO, however for buffered IO there
+> > > > is an increase on unalignenment to the target filesystem block size and
+> > > > that can affect performance.
+> > > 
+> > > Compared to what?  There is nothing in the series here changing buffered
+> > > I/O patterns.  What do you compare?  If this series changes buffered
+> > > I/O patterns that is very well hidden and accidental, so we need to
+> > > bisect which patch does it and figure out why, but it would surprise me
+> > > a lot.
+> > 
+> > The comparison was the without the patches Vs with the patches on the
+> > same fio run with buffered IO. I'll re-test more times and bisect.
+> > 
+> 
+> Did tests with LBS + block folio patches and couldn't observe alignment
+> issue. Also, the changes in this series are not executed when we issue
+> buffered I/O.
 
-I feel changes something like below will simplify the whole patch.
+I can't quite understand yet either why buffered IO is implicated yet
+data does not lie. The good news is I re-tested twice and I get similar
+results **however** what I failed to notice is that we also get a lot
+more IOs and this ends up even helping in other ways.  So this is not
+bad, in the end only good. It is hard to visualize this, but an image
+says more than 1000 words so here you go:
 
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -115,9 +115,13 @@ static void __blkdev_issue_write_zeroes(struct block_device *bdev,
-  		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
-  		struct bio **biop, unsigned flags)
-  {
-+	sector_t limit = bio_write_zeroes_limit(bdev);
-+
-+	if (!limit)
-+		return;
-+
-  	while (nr_sects) {
--		unsigned int len = min_t(sector_t, nr_sects,
--				bio_write_zeroes_limit(bdev));
-+		unsigned int len = min_t(sector_t, nr_sects, limit);
-  		struct bio *bio;
-  
-  		if ((flags & BLKDEV_ZERO_KILLABLE) &&
+https://lh3.googleusercontent.com/pw/AP1GczML6LevSkZ8yHTF9zu0xtXkzy332kd98XBp7biDrxyGWG2IXfgyKNpy6YItUYaWnVeLQSABGJgpiJOANppix7lIYb82_pjl_ZtCCjXenvkDgHGV3KlvXlayG4mAFR762jLugrI4osH0uoKRA1WGZk50xA=w1389-h690-s-no-gm
 
+So the volume in the end is what counts too, so let's say we
+use a tool like the collowing which takes the blkalgn json file as
+input and outputs worst case workload WAF computation:
 
-Otherwise, this series looks good to me.
+#!/usr/bin/python3
+import json
+import argparse
+import math
 
--- Nitesh Shetty
+def order_to_kb(order):
+    return (2 ** order) / 1024
 
-------rEVyOeUC1-Pd4ykAKehEErIJv_6LE1Y2HSCt3w26tRlypI58=_7f8e3_
-Content-Type: text/plain; charset="utf-8"
+def calculate_waf(file_path, iu):
+    with open(file_path, 'r') as file:
+        data = json.load(file)
 
+    block_size_orders = data["Block size"]
+    algn_size_orders = data["Algn size"]
 
-------rEVyOeUC1-Pd4ykAKehEErIJv_6LE1Y2HSCt3w26tRlypI58=_7f8e3_--
+    # Calculate total host writes
+    total_host_writes_kb = sum(order_to_kb(int(order)) * count for order, count in block_size_orders.items())
+
+    # Calculate total internal writes based on the provided logic
+    total_internal_writes_kb = 0
+    for order, count in block_size_orders.items():
+        size_kb = order_to_kb(int(order))
+        if size_kb >= iu:
+            total_internal_writes_kb += size_kb * count
+        else:
+            total_internal_writes_kb += math.ceil(size_kb / iu) * iu * count
+
+    # Calculate WAF
+    waf = total_internal_writes_kb / total_host_writes_kb
+
+    return waf
+
+def main():
+    parser = argparse.ArgumentParser(description="Calculate the Worst-case Write Amplification Factor (WAF) from JSON data.")
+    parser.add_argument('file', type=str, help='Path to the JSON file containing the IO data.')
+    parser.add_argument('--iu', type=int, default=16, help='Indirection Unit (IU) size in KB (default: 16)')
+
+    args = parser.parse_args()
+    file_path = args.file
+    iu = args.iu
+    waf = calculate_waf(file_path, iu)
+    print(f"Worst-case WAF: {waf:.10f}")
+
+if __name__ == "__main__":
+    main()
+
+compute-waf.py lbs.json --iu 64 
+Worst-case WAF: 1.0000116423
+compute-waf.py lbs+block-folios.json --iu 64 
+Worst-case WAF: 1.0000095356
+
+On my second run I have:
+
+cat 01-next-20240723-LBS.json
+{
+    "Block size": {
+        "18": 6960,
+        "14": 302,
+        "16": 2339746,
+        "13": 165,
+        "12": 88,
+        "19": 117886,
+        "10": 49,
+        "9": 33,
+        "11": 31,
+        "17": 42707,
+        "15": 89393
+    },
+    "Algn size": {
+        "16": 2351238,
+        "19": 117886,
+        "18": 3353,
+        "17": 34823,
+        "15": 13067,
+        "12": 40060,
+        "14": 13583,
+        "13": 23351
+    }
+}
+
+cat 02-next-20240723-LBS+block-folios.json
+{
+    "Block size": {
+        "11": 38,
+        "10": 49,
+        "12": 88,
+        "15": 91949,
+        "18": 33858,
+        "17": 104329,
+        "19": 129301,
+        "9": 34,
+        "13": 199,
+        "16": 4912264,
+        "14": 344
+    },
+    "Algn size": {
+        "16": 4954494,
+        "14": 10166,
+        "13": 20527,
+        "17": 82125,
+        "19": 129301,
+        "15": 13111,
+        "12": 48897,
+        "18": 13820
+    }
+}
+
+compute-waf.py 01-next-20240723-LBS.json --iu 64
+Worst-case WAF: 1.0131538374
+compute-waf.py 02-next-20240723-LBS+block-folios.json --iu 64
+Worst-case WAF: 1.0073550532
+
+Things are even better for Direct IO :) and so I encourage you to
+test as this is all nice.
+
+Tested-by: Luis Chamberlain <mcgrof@kernel.org>
+
+  Luis
