@@ -1,155 +1,121 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14322646;
-	Sat, 17 Aug 2024 19:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1C21465AC
+	for <linux-block@vger.kernel.org>; Sun, 18 Aug 2024 17:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723924086; cv=none; b=jO2eaaxcfNWp/Q6Nl0rPDGdwWQSK/eDJUJfqsnrWg3kRw0wplQ163u2TeAoQTzEur0FNWeoykUc0fHDah2fU/qzv+r0f2G8eh4vzxL8RJPjjyv6/7sUncIgipDjT7U+1xCul2xkd4VK1BgTMaf3r2niTLI1c7C5ofoL4dV25tKA=
+	t=1724001782; cv=none; b=Y2bPRBmnyYlFVK72fhzKUHaj7OaaPFTHt/3GW7fFXdRn1kIvbkBhgYwE5hi9mNMZLXALGAoGi0zFCahjhOmr6F43ihqtTSFKTg6HtJrryrqJWEAA/NOczAvmKEQStT2LLWxPVTlNtj7MBXVHSZIRNDOuRkiNKAHYBCoh6xhcjOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723924086; c=relaxed/simple;
-	bh=vZO3mhvZ2ondZ9T7LnLDQSxF7nfyF7lXwL8YGftue30=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=YnYTJhCMmcjs6NlOmKNv55Ye0en1XN24G97LI3JBZwIFx5TdX0NNeKqDeE7KroqGDyhfzb8jA3udPyk4LCr94SKFQiPTEb52mGPVdV0uE/409Fd4M7+m7Tr5hWNJTnYdG+sOI4XhJWSVpQ00n1PnziR5b0kl2Usc9J6U79v8Mwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L89gamtj; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724001782; c=relaxed/simple;
+	bh=PRdiw6GJWM/P370VLjhMZ0dhU6tZKbF78aSZqYEGp5g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yuu49qrD4Zp07BYyPcy4O/royO6vRiRcNJaseZp9iYSLXOW74eUR0W3Po4L3Xp8nM2jvpLnSF6Nz89KNoi+bk+mhtdaOG7LuOofAi7cL65cfpen6OlkF6Dcx9DnohEwBB8Qu/0SB1r8mSPlNvTfrMdYx/rrVq+wFitnfxslF59U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=f3X054ET; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L89gamtj"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5bec7ee6f44so2429750a12.0;
-        Sat, 17 Aug 2024 12:48:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="f3X054ET"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e13cda45037so1682758276.3
+        for <linux-block@vger.kernel.org>; Sun, 18 Aug 2024 10:23:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723924083; x=1724528883; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=P7F1idPvQJ002gXpYyIsx4r7BGTTRszf/p+4knxZhCw=;
-        b=L89gamtjDGm28gu+3hZc0xw4AfuY+EZu+y4RioVMy27HgGmIjCkQqnyKigUkJMi3q3
-         Wfe6d9Rf+r4ekmL8YJSmYdT159zBp05Mhu7RiA9JtCdyhMYAv2fNilhsIV3FDhJNnfwG
-         kSYq7q3L/PUgSy17PJEpkYaoA3QJKe4LjHi1rIHorZLs2M/5gd/PbQMzR110tMnCFqJF
-         Rz1Phhw+EX+xNgGsRkOXW6HQUeTadP8EanPok7FbFztkg3rIqTXuksS/N5ScG2Ka5Slq
-         kK2wroVq5+/PWPaI3koCNQxWtVyP0m1esXhI7PXW2aVtBSBmPGE8fWPf6+a6o9HHiMRm
-         R9ow==
+        d=paul-moore.com; s=google; t=1724001779; x=1724606579; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rea1kNp4EkbAOzAU8f/a10Vwm+fxF1V1CIr9tWa1sDQ=;
+        b=f3X054ETV7yigtr0M5N3HUiRAAE+GS1VunwBvvTJL3GlmEqi97mnC9yoJnXb7Rojen
+         PMwtRmBw52jh/OPas2uIFSpi2wmLB60XDgnSq8lbzpzd3ICq5DpP7Zps52Y1owwUeylv
+         A5+MGFnRO/ZsKqkhEyfafUIVWSz7k1wC5HvuIbCjR1KzFOAkvmzuJDl1EqS4Wyg6+VF7
+         ao2VZPZQPP3er9vJC4duFXTTopdGJVPTFNX30xslqJI1WzdKebGIOt0pzdsWhDYUzsXy
+         hexKTjrJF7q1AJ3GLKTo3qtNNH/BGPqrpgO+QVMzR1XLbjHk843zxBth2qF4DACVkGUD
+         2aVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723924083; x=1724528883;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P7F1idPvQJ002gXpYyIsx4r7BGTTRszf/p+4knxZhCw=;
-        b=bEEql0ZLmT/mDWICG6U4RE7FuZdtEq2cjEeOl793NgJw4o9hw2WTDV3tiD0P5WR4yp
-         AK0Fv/gWxDVLJ/cbl6HN3nFObPH7RpBGH/CK9mZbJ7sO0PBXgUDhGCJgI+fSBp2gFz3j
-         5/ylDUOBp52qZPsoitmYD+T1KPgaqYXo+9BMrLDxngB3Zu129DvHuvxdCKaZjyGR1ke7
-         hClg2p5AgHWAi9wWpl890v/12TZ7xOFMO8k339Y9GXgINURJJOgqlwq8iyX9zliuEU6D
-         e69tBP4Xo+dGPvOrOYOhgkJjHK0LSxIMmiQuZvClvwVBszLvYad+gNM9FlnNqSuTEPwQ
-         aDxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVlFycUxcRkb+tUsyCacB/StD9Gpqz+XuGJGer8z5U2uMyuFC/XsVyiStxOh+TjrsE26k4pQR/z/CvYuNDiAosTrW4jjVrnyInj2skQVYttSOtv7URD3VUoCY6pQDff/IZ4RK0RlA==
-X-Gm-Message-State: AOJu0YzbqTOOv5JBrriXKJpT49EIeJW7PYHYAm6qyEoNQcpvzVhqjaHI
-	KjZ5aZJMDPRGUD/3n/MtNuAXT3nWy4KloCGbLiwzI5Vaq+BsswgB
-X-Google-Smtp-Source: AGHT+IFw5TRU8DXRxJ5NBkxZyX/iIK1apOTrkd5oKyOdp1pxmdF1/nuS4AkYfKPo2bD5SMNV1qrDPg==
-X-Received: by 2002:a17:907:86a7:b0:a7a:ab8a:384 with SMTP id a640c23a62f3a-a8392a4940bmr372925066b.64.1723924083000;
-        Sat, 17 Aug 2024 12:48:03 -0700 (PDT)
-Received: from [192.168.8.113] ([185.69.144.74])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83839356c9sm439835766b.120.2024.08.17.12.48.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 17 Aug 2024 12:48:02 -0700 (PDT)
-Message-ID: <80d4150e-a4fe-4c05-be23-4ceebd40d7fd@gmail.com>
-Date: Sat, 17 Aug 2024 20:48:37 +0100
+        d=1e100.net; s=20230601; t=1724001779; x=1724606579;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rea1kNp4EkbAOzAU8f/a10Vwm+fxF1V1CIr9tWa1sDQ=;
+        b=FVqtTQr+wm14BD94V01cmYGUv8JPM7OvZ7//yzXW3bms4Lt8BxEvirxFccE4mqNb1A
+         gdvgVX+zMEVp8JH0csrq9Mv3u86/hqWMXeEAypW265aFpzLl+IqKc/AYk2MzM5bNVzSm
+         UK8wg1WUV9yOGwDgLkmfyrWov8iu3+sqL6W5LDwz3ARMc/NXA9kJSf++tONhpz92w9ZA
+         A5SUllMEYprYa0xaEQHcI3Hw6kpfvnGPB0oIDOkEGMZXnsVrSSAgdbTLviwOCl3IgJgK
+         0cCTfZvuUCPmk9E1P82qF0fHnX/85CbUO/M0GsoBNQCW3rZKn5DQFd5HeFm+K5YURYw1
+         Geew==
+X-Forwarded-Encrypted: i=1; AJvYcCUdpizvyRcpTify3WL6pdOZcbq6T0pWrVhiLQWSuzgWLD3f4bmD/vlFVhqJKAt7tFLilL+PruASa74wFEYEPoZ4oQrsEcVMj45k2tY=
+X-Gm-Message-State: AOJu0YwTKy8qJ8/lrf7NlTg5YffboNOsiBLt38/7bewLUvCaS539xPoM
+	n4GKefct39oKVvCKa1ga5sOConGNAW9nZ1VWwVO3GWIPR9M5okhozMOO8rzSWQUC7RorJAlN+5M
+	5SgKaMvXyoXY3ztk6Re1Tj8pztim6sjeqIKey
+X-Google-Smtp-Source: AGHT+IFjiqllbtZbfh6H7hOfR01xf4G8PNDyn1RyHhO2ITzkhGOqhIPLS7VFIHAGqVDoJDMdk8WysOY4o+NEDwrxuHA=
+X-Received: by 2002:a05:690c:ec5:b0:64b:7500:2e9 with SMTP id
+ 00721157ae682-6b1b759714bmr105555907b3.9.1724001779618; Sun, 18 Aug 2024
+ 10:22:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 0/8] io_uring: support sqe group and provide group kbuf
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20240808162503.345913-1-ming.lei@redhat.com>
- <CAFj5m9L3FGhdFw61K9-iLWs=ak3OGmunEKC6Fs=SPYDVfcPAVg@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAFj5m9L3FGhdFw61K9-iLWs=ak3OGmunEKC6Fs=SPYDVfcPAVg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
+ <1722665314-21156-13-git-send-email-wufan@linux.microsoft.com>
+ <9dc30ca6-486c-4fa9-910d-ed1dc6da0e95@linux.microsoft.com>
+ <CAHC9VhQrnu8Sj=XnDvg=wGTBxacvMSW6OJyG3-tpwrsbGat6vA@mail.gmail.com>
+ <88695db-efc0-6cc6-13ee-fd7c2abe61c@redhat.com> <ac6e33b8-ec1f-494a-874f-9a16d3316fce@linux.microsoft.com>
+In-Reply-To: <ac6e33b8-ec1f-494a-874f-9a16d3316fce@linux.microsoft.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Sun, 18 Aug 2024 13:22:48 -0400
+Message-ID: <CAHC9VhSe0HkzX0gy5Oo+549wG9xqfeHmsveJqdR_xRcYtim+sA@mail.gmail.com>
+Subject: Re: [PATCH v20 12/20] dm verity: expose root hash digest and
+ signature data to LSMs
+To: Fan Wu <wufan@linux.microsoft.com>
+Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+	Alasdair Kergon <agk@redhat.com>, linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/17/24 05:16, Ming Lei wrote:
-> On Fri, Aug 9, 2024 at 12:25 AM Ming Lei <ming.lei@redhat.com> wrote:
->>
->> Hello,
->>
->> The 1st 3 patches are cleanup, and prepare for adding sqe group.
->>
->> The 4th patch supports generic sqe group which is like link chain, but
->> allows each sqe in group to be issued in parallel and the group shares
->> same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
->> sqe group & io link together. sqe group changes nothing on
->> IOSQE_IO_LINK.
->>
->> The 5th patch supports one variant of sqe group: allow members to depend
->> on group leader, so that kernel resource lifetime can be aligned with
->> group leader or group, then any kernel resource can be shared in this
->> sqe group, and can be used in generic device zero copy.
->>
->> The 6th & 7th patches supports providing sqe group buffer via the sqe
->> group variant.
->>
->> The 8th patch supports ublk zero copy based on io_uring providing sqe
->> group buffer.
->>
->> Tests:
->>
->> 1) pass liburing test
->> - make runtests
->>
->> 2) write/pass two sqe group test cases:
->>
->> https://github.com/axboe/liburing/compare/master...ming1:liburing:sqe_group_v2
->>
->> - covers related sqe flags combination and linking groups, both nop and
->> one multi-destination file copy.
->>
->> - cover failure handling test: fail leader IO or member IO in both single
->>    group and linked groups, which is done in each sqe flags combination
->>    test
->>
->> 3) ublksrv zero copy:
->>
->> ublksrv userspace implements zero copy by sqe group & provide group
->> kbuf:
->>
->>          git clone https://github.com/ublk-org/ublksrv.git -b group-provide-buf_v2
->>          make test T=loop/009:nbd/061    #ublk zc tests
->>
->> When running 64KB/512KB block size test on ublk-loop('ublk add -t loop --buffered_io -f $backing'),
->> it is observed that perf is doubled.
->>
->> Any comments are welcome!
->>
->> V5:
->>          - follow Pavel's suggestion to minimize change on io_uring fast code
->>            path: sqe group code is called in by single 'if (unlikely())' from
->>            both issue & completion code path
->>
->>          - simplify & re-write group request completion
->>                  avoid to touch io-wq code by completing group leader via tw
->>                  directly, just like ->task_complete
->>
->>                  re-write group member & leader completion handling, one
->>                  simplification is always to free leader via the last member
->>
->>                  simplify queueing group members, not support issuing leader
->>                  and members in parallel
->>
->>          - fail the whole group if IO_*LINK & IO_DRAIN is set on group
->>            members, and test code to cover this change
->>
->>          - misc cleanup
-> 
-> Hi Pavel,
-> 
-> V5 should address all your comments on V4, so care to take a look?
+On Fri, Aug 16, 2024 at 3:11=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
+wrote:
+> On 8/16/2024 6:35 AM, Mikulas Patocka wrote:
 
-I will, didn't forget about it, but thanks for the reminder.
+...
 
--- 
-Pavel Begunkov
+> >>>>
+> >>>> +#ifdef CONFIG_SECURITY
+> >>>> +     u8 *root_digest_sig;    /* signature of the root digest */
+> >>>> +#endif /* CONFIG_SECURITY */
+> >>>>        unsigned int salt_size;
+> >>>>        sector_t data_start;    /* data offset in 512-byte sectors */
+> >>>>        sector_t hash_start;    /* hash start in blocks */
+> >>>> @@ -58,6 +61,9 @@ struct dm_verity {
+> >>>>        bool hash_failed:1;     /* set if hash of any block failed */
+> >>>>        bool use_bh_wq:1;       /* try to verify in BH wq before norm=
+al work-queue */
+> >>>>        unsigned int digest_size;       /* digest size for the curren=
+t hash algorithm */
+> >>>> +#ifdef CONFIG_SECURITY
+> >>>> +     unsigned int sig_size;  /* root digest signature size */
+> >>>> +#endif /* CONFIG_SECURITY */
+> >>>>        unsigned int hash_reqsize; /* the size of temporary space for=
+ crypto */
+> >>>>        enum verity_mode mode;  /* mode for handling verification err=
+ors */
+> >>>>        unsigned int corrupted_errs;/* Number of errors for corrupted=
+ blocks */
+> >
+> > Just nit-picking: I would move "unsigned int sig_size" up, after "u8
+> > *root_digest_sig" entry.
+> >
+> > Mikulas
+>
+> Sure, I can make these two fields together.
+
+Fan, do you want me to move the @sig_size field when merging or are
+you planning to submit another revision?  I'm happy to do it during
+the merge, but I don't want to bother if you are going to post another
+patchset.
+
+--=20
+paul-moore.com
