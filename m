@@ -1,276 +1,314 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C191166F33;
-	Mon, 19 Aug 2024 13:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE4816C42C;
+	Mon, 19 Aug 2024 13:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724074556; cv=none; b=hR4u4MFdVRIfGgiXdYe7uBl+WaKUJu9pYDQzlNHOmUkPeuhQA7sxwpWlWrmoPtb1qhOWnXHz8mmrR22+1hamXDbp4WQrWsVCVwS87XtL1PT9bPtwk09Kci9tEddX+5kUsLz0f6vj7w8XYV9mQpuUAk99v1A6/ZJl/wg5EJtRohY=
+	t=1724074701; cv=none; b=pRP+BUfp0IWZ61hJ2quYU6gg18USTN/+u6Kd1CWfkutDaCLIy41yBW51TmmJ6qhtoBkZCViMrJ24295pjDFor4IIT0mKyVfTuU+/Eo65QUkkQ/4bhUWysFrOeo8kenv9QA0VDW6U+TCkYCGPUj3VFDz1dZfE2UCXz6IJTg9Gh8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724074556; c=relaxed/simple;
-	bh=py93gxjDqfbogfPAEshHHjpLYQ+vR0bwa4Y/63UFNL0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lC1cWAgWTaWEpnymgleUhDvaz16K05uHx+KyYL6KvRKWyWzlQz4pdA4RdLkeeJepo2PMDzNBfKlQXrpWmKAe5OCVLYKx0S9kypFBaAZR/iif6TDPLg3F/6J63zBkL3vub8v5deyYoLMxzyzJy2y+oxIrSYZgoTEUXqTwvAW8/FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GcMWYRhE; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GcMWYRhE"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JD9wX7007016;
-	Mon, 19 Aug 2024 13:35:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=y
-	GzMEPJqkAKEy2FBgLUaB84evIPM2OUJW/aQKNmxS/s=; b=GcMWYRhEzQWusLPMz
-	ZJhIfH8dYaRg2QJFhIfUCh6KorzzXn+q6BxcXt5/d2MReU3yiqTy498sq/J6/EtM
-	nQVpiksSJB8vtyrYDCDGlChgE0MFQDLjBTrD3pQXhLuprf9GsBog/GoQh7phpSXz
-	8rLSlLXpmzA0ageIXSx/gfLSk22oP7ry4slkOs1E7NVKeWb45uFtq164vtEQ5qwv
-	gPasB9EtIvocmz8mG6mErAB+jkmombtB9cIlWcQ1mFSPFbphFFIFAQ++VPhAdv5R
-	krAFUotM51kgnhazw25wzrZdlgsCSpXPrUibFnPIYzBNe+1Jnz2wDdZjfOrRnKRY
-	AdxSQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mb5gxcj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 13:35:41 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47JDXU1E031883;
-	Mon, 19 Aug 2024 13:35:40 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mb5gxcf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 13:35:40 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47JDC7Ta014245;
-	Mon, 19 Aug 2024 13:35:39 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4137pmp72t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 13:35:39 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47JDZawl31130162
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 19 Aug 2024 13:35:38 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2404B58059;
-	Mon, 19 Aug 2024 13:35:36 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 96D7C58055;
-	Mon, 19 Aug 2024 13:35:33 +0000 (GMT)
-Received: from [9.171.22.101] (unknown [9.171.22.101])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 19 Aug 2024 13:35:33 +0000 (GMT)
-Message-ID: <f2f9d5b4-3c50-41a9-bc53-49706f6f4e12@linux.ibm.com>
-Date: Mon, 19 Aug 2024 19:05:32 +0530
+	s=arc-20240116; t=1724074701; c=relaxed/simple;
+	bh=qIYbP9/x6N4LqlgHF2vHBae6xR7FPZiqGPgPnZCjA10=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=JiWzvyvgBUPJBZO+aKbe7b4PEjL9SAqTtB5/Y8bgjrC4LD02zxRXy/4d3HWZNJ6Zb4KgQW2AKEt6Yn33ssh7pKz25V6EP+HbaqIT8pNTaEd/im3kI6qewZy49wMjBpzCwT3b1qzG8cUAyJ0DC/w+n7o2Vi6Zydcqb/aUv/CnkRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WnYZF5MZCz4f3nbh;
+	Mon, 19 Aug 2024 21:37:57 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id B4EDB1A058E;
+	Mon, 19 Aug 2024 21:38:12 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgCXv4W+SsNmuz+ICA--.4058S3;
+	Mon, 19 Aug 2024 21:38:08 +0800 (CST)
+Subject: Re: jbd2: io throttle for metadata buffers
+To: Zhang Yi <yi.zhang@huaweicloud.com>, Haifeng Xu <haifeng.xu@shopee.com>
+Cc: tytso@mit.edu, jack@suse.com, linux-ext4@vger.kernel.org,
+ linux-kernel@vger.kernel.org, hanjinke.666@bytedance.com,
+ Tejun Heo <tj@kernel.org>, linux-block <linux-block@vger.kernel.org>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <9914a4b4-eb4d-44de-a48c-8ae08eedebe8@shopee.com>
+ <b85e49c6-588e-63c7-b153-a273183f810e@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <97fc38e6-a226-5e22-efc2-4405beb6d75b@huaweicloud.com>
+Date: Mon, 19 Aug 2024 21:38:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: blktests failures with v6.11-rc1 kernel
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Yi Zhang <yi.zhang@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "nbd@other.debian.org" <nbd@other.debian.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <5yal5unzvisrvfhhvsqrsqgu4tfbjp2fsrnbuyxioaxjgbojsi@o2arvhebzes3>
- <ab363932-ab3d-49b1-853d-7313f02cce9e@linux.ibm.com>
- <ljqlgkvhkojsmehqddmeo4dng6l3yaav6le2uslsumfxivluwu@m7lkx3j4mkkw>
- <79a7ec0d-c22d-44cf-a832-13da05a1fcbd@linux.ibm.com>
- <CAHj4cs-5DPDFuBzm3aymeAi6UWHhgXSYsgaCACKbjXp=i0SyTA@mail.gmail.com>
- <1f917bc1-8a6a-4c88-a619-cf8ddc4534a4@linux.ibm.com>
- <tczctp5tkr34o3k3f4dlyhuutgp2ycex6gdbjuqx4trn6ewm2i@qbkza3yr5wdd>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <tczctp5tkr34o3k3f4dlyhuutgp2ycex6gdbjuqx4trn6ewm2i@qbkza3yr5wdd>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <b85e49c6-588e-63c7-b153-a273183f810e@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4tIkaY5x4q2LKG2zWm7K19zKJ5S5eR52
-X-Proofpoint-GUID: GuWjpb6itoRoiNMSYiKg-Glfkr5JnBqZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-19_11,2024-08-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408190090
+X-CM-TRANSID:gCh0CgCXv4W+SsNmuz+ICA--.4058S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxtFW7AF4kZr4ktFy7WF4xtFb_yoWDJFW8pr
+	WxJFW7Wr4DAF1UWryfurW5Za40yw48Zas8Jw1rGr13J342gw1Yvr1DAry8Wr9FvFsxGF47
+	tr98trZ8KF1UArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
++CC Tejun
++CC block
 
-
-On 8/19/24 18:04, Shinichiro Kawasaki wrote:
-> On Aug 14, 2024 / 18:05, Nilay Shroff wrote:
->>
->>
->> On 8/13/24 12:36, Yi Zhang wrote:
->>> On Sat, Aug 3, 2024 at 12:49 AM Nilay Shroff <nilay@linux.ibm.com> wrote:
->>>
->>> There are no simultaneous tests during the CKI tests running.
->>> I reproduced the failure on that server and always can be reproduced
->>> within 5 times:
->>> # sh a.sh
->>> ==============================0
->>> nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [passed]
->>>     runtime  21.496s  ...  21.398s
->>> ==============================1
->>> nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [failed]
->>>     runtime  21.398s  ...  21.974s
->>>     --- tests/nvme/052.out 2024-08-10 00:30:06.989814226 -0400
->>>     +++ /root/blktests/results/nodev_tr_loop/nvme/052.out.bad
->>> 2024-08-13 02:53:51.635047928 -0400
->>>     @@ -1,2 +1,5 @@
->>>      Running nvme/052
->>>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
->>>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
->>>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
->>>      Test complete
->>> # uname -r
->>> 6.11.0-rc3
->>
->> We may need to debug this further. Is it possible to patch blktest and 
->> collect some details when this issue manifests? If yes then can you please
->> apply the below diff and re-run your test? This patch would capture output 
->> of "nvme list" and "sysfs attribute tree created under namespace head node"
->> and store those details in 052.full file. 
->>
->> diff --git a/common/nvme b/common/nvme
->> index 9e78f3e..780b5e3 100644
->> --- a/common/nvme
->> +++ b/common/nvme
->> @@ -589,8 +589,23 @@ _find_nvme_ns() {
->>                 if ! [[ "${ns}" =~ nvme[0-9]+n[0-9]+ ]]; then
->>                         continue
->>                 fi
->> +               echo -e "\nBefore ${ns}/uuid check:\n" >> ${FULL}
->> +               echo -e "\n`nvme list -v`\n" >> ${FULL}
->> +               echo -e "\n`tree ${ns}`\n" >> ${FULL}
->> +
->>                 [ -e "${ns}/uuid" ] || continue
->>                 uuid=$(cat "${ns}/uuid")
->> +
->> +               if [ "$?" = "1" ]; then
->> +                       echo -e "\nFailed to read $ns/uuid\n" >> ${FULL}
->> +                       echo "`nvme list -v`" >> ${FULL}
->> +                       if [ -d "${ns}" ]; then
->> +                               echo -e "\n`tree ${ns}`\n" >> ${FULL}
->> +                       else
->> +                               echo -e "\n${ns} doesn't exist!\n" >> ${FULL}
->> +                       fi
->> +               fi
->> +
->>                 if [[ "${subsys_uuid}" == "${uuid}" ]]; then
->>                         basename "${ns}"
->>                 fi
->>
->>
->> After applying the above diff, when this issue occurs on your system copy this 
->> file "</path/to/blktests>/results/nodev_tr_loop/nvme/052.full" and send it across. 
->> This may give us some clue about what might be going wrong. 
+在 2024/08/19 20:49, Zhang Yi 写道:
+> Hello, Haifeng.
 > 
-> Nilay, thank you for this suggestion. To follow it, I tried to recreate the
-> failure again, and managed to do it :) When I repeat the test case 20 or 40
-> times one of my test machines, the failure is observed in stable manner.
-
-Shinichiro, I am glad that you were able to recreate this issue.
-
-> I applied your debug patch above to blktests, then I repeated the test case.
-> Unfortunately, the failure disappeared. When I repeat the test case 100 times,
-> the failure was not observed. I guess the echos for debug changed the timing to
-> access the sysfs uuid file, then the failure disappeared.
-
-Yes this could be possible. BTW, Yi tried the same patch and with the patch applied,
-this issue could be still reproduced on Yi's testbed!! 
-> This helped me think about the cause. The test case repeats _create_nvmet_ns
-> and _remove_nvmet_ns. Then, it repeats creating and removing the sysfs uuid
-> file. I guess when _remove_nvmet_ns echos 0 to ${nvemt_ns_path}/enable to
-> remove the namespace, it does not wait for the completion of the removal work.
-> Then, when _find_nvme_ns() checks existence of the sysfs uuid file, it refers to
-> the sysfs uuid file that the previous _remove_nvmet_ns left. When it does cat
-> to the sysfs uuid file, it fails because the sysfs uuid file has got removed,
-> before recreating it for the next _create_nvmet_ns.
-
-I agree with your assessment about the plausible cause of this issue. I just reviewed
-the nvme target kernel code and it's now apparent to me that we need to wait for the 
-removal of the namespace before we re-create the next namespace. I think this is a miss.  
+> On 2024/8/19 18:19, Haifeng Xu wrote:
+>> Hi, matsers!
+>>
+>>
+>> We encountered high load issuses in our production environment recently. And the kernel version is stable-5.15.39
+>> the filesystem is ext4(ordered).
+>>
+>>
+>> After digging into it, we found the problem is due to io.max
+>>
+>>
+>> thread 1:
+>>
+>> PID: 189529  TASK: ffff92ab51e5c080  CPU: 34  COMMAND: "mc"
+>>   #0 [ffffa638db807800] __schedule at ffffffff83b19898
+>>   #1 [ffffa638db807888] schedule at ffffffff83b19e9e
+>>   #2 [ffffa638db8078a8] io_schedule at ffffffff83b1a316
+>>   #3 [ffffa638db8078c0] bit_wait_io at ffffffff83b1a751
+>>   #4 [ffffa638db8078d8] __wait_on_bit at ffffffff83b1a373
+>>   #5 [ffffa638db807918] out_of_line_wait_on_bit at ffffffff83b1a46d
+>>   #6 [ffffa638db807970] __wait_on_buffer at ffffffff831b9c64
+>>   #7 [ffffa638db807988] jbd2_log_do_checkpoint at ffffffff832b556e
+>>   #8 [ffffa638db8079e8] __jbd2_log_wait_for_space at ffffffff832b55dc
+>>   #9 [ffffa638db807a30] add_transaction_credits at ffffffff832af369
+>> #10 [ffffa638db807a98] start_this_handle at ffffffff832af50f
+>> #11 [ffffa638db807b20] jbd2__journal_start at ffffffff832afe1f
+>> #12 [ffffa638db807b60] __ext4_journal_start_sb at ffffffff83241af3
+>> #13 [ffffa638db807ba8] __ext4_new_inode at ffffffff83253be6
+>> #14 [ffffa638db807c80] ext4_mkdir at ffffffff8327ec9e
+>> #15 [ffffa638db807d10] vfs_mkdir at ffffffff83182a92
+>> #16 [ffffa638db807d50] ovl_mkdir_real at ffffffffc0965c9f [overlay]
+>> #17 [ffffa638db807d80] ovl_create_real at ffffffffc0965e8b [overlay]
+>> #18 [ffffa638db807db8] ovl_create_or_link at ffffffffc09677cc [overlay]
+>> #19 [ffffa638db807e10] ovl_create_object at ffffffffc0967a48 [overlay]
+>> #20 [ffffa638db807e60] ovl_mkdir at ffffffffc0967ad3 [overlay]
+>> #21 [ffffa638db807e70] vfs_mkdir at ffffffff83182a92
+>> #22 [ffffa638db807eb0] do_mkdirat at ffffffff83184305
+>> #23 [ffffa638db807f08] __x64_sys_mkdirat at ffffffff831843df
+>> #24 [ffffa638db807f28] do_syscall_64 at ffffffff83b0bf1c
+>> #25 [ffffa638db807f50] entry_SYSCALL_64_after_hwframe at ffffffff83c0007c
+>>
+>> other threads:
+>>
+>>
+>> PID: 21125  TASK: ffff929f5b9a0000  CPU: 44  COMMAND: "task_server"
+>>   #0 [ffffa638aff9b900] __schedule at ffffffff83b19898
+>>   #1 [ffffa638aff9b988] schedule at ffffffff83b19e9e
+>>   #2 [ffffa638aff9b9a8] schedule_preempt_disabled at ffffffff83b1a24e
+>>   #3 [ffffa638aff9b9b8] __mutex_lock at ffffffff83b1af28
+>>   #4 [ffffa638aff9ba38] __mutex_lock_slowpath at ffffffff83b1b1a3
+>>   #5 [ffffa638aff9ba48] mutex_lock at ffffffff83b1b1e2
+>>   #6 [ffffa638aff9ba60] mutex_lock_io at ffffffff83b1b210
+>>   #7 [ffffa638aff9ba80] __jbd2_log_wait_for_space at ffffffff832b563b
+>>   #8 [ffffa638aff9bac8] add_transaction_credits at ffffffff832af369
+>>   #9 [ffffa638aff9bb30] start_this_handle at ffffffff832af50f
+>> #10 [ffffa638aff9bbb8] jbd2__journal_start at ffffffff832afe1f
+>> #11 [ffffa638aff9bbf8] __ext4_journal_start_sb at ffffffff83241af3
+>> #12 [ffffa638aff9bc40] ext4_dirty_inode at ffffffff83266d0a
+>> #13 [ffffa638aff9bc60] __mark_inode_dirty at ffffffff831ab423
+>> #14 [ffffa638aff9bca0] generic_update_time at ffffffff8319169d
+>> #15 [ffffa638aff9bcb0] inode_update_time at ffffffff831916e5
+>> #16 [ffffa638aff9bcc0] file_update_time at ffffffff83191b01
+>> #17 [ffffa638aff9bd08] file_modified at ffffffff83191d47
+>> #18 [ffffa638aff9bd20] ext4_write_checks at ffffffff8324e6e4
+>> #19 [ffffa638aff9bd40] ext4_buffered_write_iter at ffffffff8324edfb
+>> #20 [ffffa638aff9bd78] ext4_file_write_iter at ffffffff8324f553
+>> #21 [ffffa638aff9bdf8] ext4_file_write_iter at ffffffff8324f505
+>> #22 [ffffa638aff9be00] new_sync_write at ffffffff8316dfca
+>> #23 [ffffa638aff9be90] vfs_write at ffffffff8316e975
+>> #24 [ffffa638aff9bec8] ksys_write at ffffffff83170a97
+>> #25 [ffffa638aff9bf08] __x64_sys_write at ffffffff83170b2a
+>> #26 [ffffa638aff9bf18] do_syscall_64 at ffffffff83b0bf1c
+>> #27 [ffffa638aff9bf38] asm_common_interrupt at ffffffff83c00cc8
+>> #28 [ffffa638aff9bf50] entry_SYSCALL_64_after_hwframe at ffffffff83c0007c
+>>
+>>
+>> The cgroup of thread1 has set io.max, so the j_checkpoint_mutex can't be released and many threads must wait for it.
+>> I have some questions about the throttle for the metadata buffers.
+>>
+>> 1) writeback
+>>
+>> jbd2 converts the buffer head from jbddirty to buffer_dirty and trigger the write back in __jbd2_journal_temp_unlink_buffer().
+>> By default, the blkcg in bdi_writeback attached to block device inode is blkcg_root which has no io throttle rules. But there may be other
+>> threads which invoke sync_filesystem, such as umount overlayfs. This operation will write out all dirty data associated with the block
+>> device. In this case, the bdi_writeback attached to block device inode may changed due to Boyer-Moore majority vote algorithm.
+>> And the blkcg in bdi_writeback attached to block device inode is the group where the thread allocate the buffer head and dev page.
+>>
+>> So the writeback process of metadata buffers can also be throttled, right?
+>>
+>>
+>> 2) checkpoint
+>>
+>> If the free log space is not suffcient, we will do checkpoint to update log tail. During the process, if the buffer head hasn't been
+>> written out by wirteback. we will lock the buffer head and submit bio in current context.
+>>
+>> So the throttle rules may be different from writeback?
+>>
+>>
+>> 3）j_checkpoint_mutex
+>> If we can't make any progress in checkpoint due to io throttle, the j_checkpoint_mutex can'be release and block many others threads.
+>>
+>> So can we cancel the throttle rules for metadata buffers and keep it in blkcg_root?
+>>
 > 
-> Based on this guess, I created a patch below. It modifies the test case to wait
-> for the namespace device disappears after calling _remove_nvmet_ns. (I assume
-> that the sysfs uuid file disappears when the device file disappears). With
-> this patch, the failure was not observed by repeating it 100 times. I also
-> reverted the kernel commit ff0ffe5b7c3c ("nvme: fix namespace removal list")
-> from v6.11-rc4, then confirmed that the test case with this change still can
-> detect the regression.
+> It seems that iocost have already act as blkcg_root if bios have
+> REQ_META set(ext4's metadata bh should've set this flag), but
+> blk-thottle doesn't, Jinke had submitted a patch to improve this
+> case, maybe it could help, please take a look at this patch. Or
+> maybe we could add some similar logic in blk-throttle like iocost
+> does for REQ_META.
 > 
-I am pretty sure that your patch would solve this issue.  
+> https://lore.kernel.org/linux-block/20230228085935.71465-1-hanjinke.666@bytedance.com/
 
-> I will do some more confirmation. If it goes well, will post this change as
-> a formal patch.
-> 
-> diff --git a/tests/nvme/052 b/tests/nvme/052
-> index cf6061a..469cefd 100755
-> --- a/tests/nvme/052
-> +++ b/tests/nvme/052
-> @@ -39,15 +39,32 @@ nvmf_wait_for_ns() {
->  		ns=$(_find_nvme_ns "${uuid}")
->  	done
->  
-> +	echo "$ns"
->  	return 0
->  }
->  
-> +nvmf_wait_for_ns_removal() {
-> +	local ns=$1 i
-> +
-> +	for ((i = 0; i < 10; i++)); do
-> +		if [[ ! -e /dev/$ns ]]; then
-> +			return
-> +		fi
-> +		sleep .1
-> +		echo "wait removal of $ns" >> "$FULL"
-> +	done
-> +
-> +	if [[ -e /dev/$ns ]]; then
-> +		echo "Failed to remove the namespace $"
-> +	fi
-> +}
-> +
->  test() {
->  	echo "Running ${TEST_NAME}"
->  
->  	_setup_nvmet
->  
-> -	local iterations=20
-> +	local iterations=20 ns
->  
->  	_nvmet_target_setup
->  
-> @@ -63,7 +80,7 @@ test() {
->  		_create_nvmet_ns "${def_subsysnqn}" "${i}" "$(_nvme_def_file_path).$i" "${uuid}"
->  
->  		# wait until async request is processed and ns is created
-> -		nvmf_wait_for_ns "${uuid}"
-> +		ns=$(nvmf_wait_for_ns "${uuid}")
->  		if [ $? -eq 1 ]; then
->  			echo "FAIL"
->  			rm "$(_nvme_def_file_path).$i"
-> @@ -71,6 +88,7 @@ test() {
->  		fi
->  
->  		_remove_nvmet_ns "${def_subsysnqn}" "${i}"
-> +		nvmf_wait_for_ns_removal "$ns"
->  		rm "$(_nvme_def_file_path).$i"
->  	}
->  	done
+Hi, Tejun
 
-I think there's some formatting issue in the above patch. I see some stray characters
-which you may cleanup/fix later when you send the formal patch.
+This patch can solve the priority inversion problem, however, I just
+come up with a new idea:
 
-Yi, I think you you may also try the above patch on your testbed and confirm the result.
+For meta IO, just issue the IO directly like iocost, and then try to
+pay debt. Fortunately, we already have 'carryover_bytes/ios' that
+already do this for the case that limit changes, and it'll be easy
+to do this for meta IO, just update 'carryover_bytes/ios' and dispatch
+directly.
+
+BTW, this is another reason that we should add a new module in iocost to
+replace blk-throtl.
 
 Thanks,
---Nilay
+Kuai
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index dc6140fa3de0..38ffe0f95682 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1595,6 +1595,32 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+         spin_unlock_irq(&q->queue_lock);
+  }
+
++static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, 
+bool rw)
++{
++       struct throtl_service_queue *sq = &tg->service_queue;
++
++       /* throtl is FIFO - if bios are already queued, should queue */
++       if (sq->nr_queued[rw])
++               return false;
++
++       /* within limits, let's charge and dispatch directly */
++       if (!tg_may_dispatch(tg, bio, NULL))
++               return false;
++
++       return true;
++}
++
++static void throtl_dispatch_bio_in_debt(struct throtl_grp *tg, struct 
+bio *bio,
++                                       bool rw)
++{
++       unsigned int bio_size = throtl_bio_data_size(bio);
++
++       if (!bio_flagged(bio, BIO_BPS_THROTTLED))
++               tg->carryover_bytes[rw] -= bio_size;
++
++       tg->carryover_ios[rw]--;
++}
++
+  bool __blk_throtl_bio(struct bio *bio)
+  {
+         struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+@@ -1611,34 +1637,28 @@ bool __blk_throtl_bio(struct bio *bio)
+         sq = &tg->service_queue;
+
+         while (true) {
+-               if (tg->last_low_overflow_time[rw] == 0)
+-                       tg->last_low_overflow_time[rw] = jiffies;
+-               /* throtl is FIFO - if bios are already queued, should 
+queue */
+-               if (sq->nr_queued[rw])
+-                       break;
+-
+-               /* if above limits, break to queue */
+-               if (!tg_may_dispatch(tg, bio, NULL)) {
+-                       tg->last_low_overflow_time[rw] = jiffies;
++               if (tg_within_limit(tg, bio, rw)) {
++                       /* within limits, let's charge and dispatch 
+directly */
++                       throtl_charge_bio(tg, bio);
++
++                       /*
++                        * We need to trim slice even when bios are not 
+being queued
++                        * otherwise it might happen that a bio is not 
+queued for
++                        * a long time and slice keeps on extending and 
+trim is not
++                        * called for a long time. Now if limits are 
+reduced suddenly
++                        * we take into account all the IO dispatched so 
+far at new
++                        * low rate and * newly queued IO gets a really 
+long dispatch
++                        * time.
++                        *
++                        * So keep on trimming slice even if bio is not 
+queued.
++                        */
++                       throtl_trim_slice(tg, rw);
++               } else if (bio_issue_as_root_blkg(bio)) {
++                       throtl_dispatch_bio_in_debt(tg, bio, rw);
++               } else {
+                         break;
+                 }
+
+-               /* within limits, let's charge and dispatch directly */
+-               throtl_charge_bio(tg, bio);
+-
+-               /*
+-                * We need to trim slice even when bios are not being queued
+-                * otherwise it might happen that a bio is not queued for
+-                * a long time and slice keeps on extending and trim is not
+-                * called for a long time. Now if limits are reduced 
+suddenly
+-                * we take into account all the IO dispatched so far at new
+-                * low rate and * newly queued IO gets a really long 
+dispatch
+-                * time.
+-                *
+-                * So keep on trimming slice even if bio is not queued.
+-                */
+-               throtl_trim_slice(tg, rw);
+-
+                 /*
+                  * @bio passed through this layer without being throttled.
+                  * Climb up the ladder.  If we're already at the top, it
+
+> 
+> Thanks,
+> Yi.
+> 
+> .
+> 
+
