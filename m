@@ -1,121 +1,102 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1C21465AC
-	for <linux-block@vger.kernel.org>; Sun, 18 Aug 2024 17:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842961B969;
+	Mon, 19 Aug 2024 00:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724001782; cv=none; b=Y2bPRBmnyYlFVK72fhzKUHaj7OaaPFTHt/3GW7fFXdRn1kIvbkBhgYwE5hi9mNMZLXALGAoGi0zFCahjhOmr6F43ihqtTSFKTg6HtJrryrqJWEAA/NOczAvmKEQStT2LLWxPVTlNtj7MBXVHSZIRNDOuRkiNKAHYBCoh6xhcjOU=
+	t=1724025912; cv=none; b=vCUNrHLG3hF8gERT4+5iBe6WrnnSmqTumN+1USlkTO86wCqVFuyMDzOCJBHmk56b3YauWZXqucH2qsz2ApyVDZISLOqx3rkEd3DzYCjARmoBjQMlmOpjIM0b+owupbC3feJS52or8g3oO5eCTor2Vz4cl5+I6H5PcKsFan2lu4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724001782; c=relaxed/simple;
-	bh=PRdiw6GJWM/P370VLjhMZ0dhU6tZKbF78aSZqYEGp5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yuu49qrD4Zp07BYyPcy4O/royO6vRiRcNJaseZp9iYSLXOW74eUR0W3Po4L3Xp8nM2jvpLnSF6Nz89KNoi+bk+mhtdaOG7LuOofAi7cL65cfpen6OlkF6Dcx9DnohEwBB8Qu/0SB1r8mSPlNvTfrMdYx/rrVq+wFitnfxslF59U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=f3X054ET; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1724025912; c=relaxed/simple;
+	bh=7Cs/GcWpyVhL5gYxVJ1vO9vBEGivY+MxkkfwkYOb7wo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UiAQ1pPW/wr5A6PwWFuPDMTmrWPpCAq9lDXTcsxP1QN2W5vULVVPgNkNiyrdz5q6IeAqf+QXCOVtH2ZtTiwHrvD1oz3y/n5QYY6gcP+roLOM7OyQMFgyeonHs91J/1nHSulrmh+ezqdUovGSzevH6Q/Mt2sXitEBLPzNnE+3TOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UHe2iiE9; arc=none smtp.client-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="f3X054ET"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e13cda45037so1682758276.3
-        for <linux-block@vger.kernel.org>; Sun, 18 Aug 2024 10:23:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHe2iiE9"
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-492a3fe7e72so1383820137.1;
+        Sun, 18 Aug 2024 17:05:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1724001779; x=1724606579; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rea1kNp4EkbAOzAU8f/a10Vwm+fxF1V1CIr9tWa1sDQ=;
-        b=f3X054ETV7yigtr0M5N3HUiRAAE+GS1VunwBvvTJL3GlmEqi97mnC9yoJnXb7Rojen
-         PMwtRmBw52jh/OPas2uIFSpi2wmLB60XDgnSq8lbzpzd3ICq5DpP7Zps52Y1owwUeylv
-         A5+MGFnRO/ZsKqkhEyfafUIVWSz7k1wC5HvuIbCjR1KzFOAkvmzuJDl1EqS4Wyg6+VF7
-         ao2VZPZQPP3er9vJC4duFXTTopdGJVPTFNX30xslqJI1WzdKebGIOt0pzdsWhDYUzsXy
-         hexKTjrJF7q1AJ3GLKTo3qtNNH/BGPqrpgO+QVMzR1XLbjHk843zxBth2qF4DACVkGUD
-         2aVA==
+        d=gmail.com; s=20230601; t=1724025908; x=1724630708; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1a+pMjVUiB38viAahm/133wZD8Rs6DT0b99OGjjUQtk=;
+        b=UHe2iiE9b70vdPuiU7UsNf9f3krFHevB6zZq+pklV0kZdrQNbsWVeTMqchdmsfvqBd
+         PG1fFeYy6xcGjmny+jhv3/I5Nz7EexJAyOybZD0EcCrIKkBANKBkPOb8h6LLhuFYN825
+         JNoCkgAV0dPHXtUlt5z1WSpdbP9wF6r/+uBByukjGK6A+YE3GBR/V/IVwVlkzE2WA3EB
+         W6icG1UUj92Y/zNtuLraTc+Fy0LB06VmjBIaXw1WvaPYx9rd8ac7oNwnI6rU5Q70ReQO
+         qmdeGcJwougC4Vasarzrb+s90EOvIodlC1crk4rf2PIOcmwiPyyVxz8+CeexZo1msNup
+         5T7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724001779; x=1724606579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rea1kNp4EkbAOzAU8f/a10Vwm+fxF1V1CIr9tWa1sDQ=;
-        b=FVqtTQr+wm14BD94V01cmYGUv8JPM7OvZ7//yzXW3bms4Lt8BxEvirxFccE4mqNb1A
-         gdvgVX+zMEVp8JH0csrq9Mv3u86/hqWMXeEAypW265aFpzLl+IqKc/AYk2MzM5bNVzSm
-         UK8wg1WUV9yOGwDgLkmfyrWov8iu3+sqL6W5LDwz3ARMc/NXA9kJSf++tONhpz92w9ZA
-         A5SUllMEYprYa0xaEQHcI3Hw6kpfvnGPB0oIDOkEGMZXnsVrSSAgdbTLviwOCl3IgJgK
-         0cCTfZvuUCPmk9E1P82qF0fHnX/85CbUO/M0GsoBNQCW3rZKn5DQFd5HeFm+K5YURYw1
-         Geew==
-X-Forwarded-Encrypted: i=1; AJvYcCUdpizvyRcpTify3WL6pdOZcbq6T0pWrVhiLQWSuzgWLD3f4bmD/vlFVhqJKAt7tFLilL+PruASa74wFEYEPoZ4oQrsEcVMj45k2tY=
-X-Gm-Message-State: AOJu0YwTKy8qJ8/lrf7NlTg5YffboNOsiBLt38/7bewLUvCaS539xPoM
-	n4GKefct39oKVvCKa1ga5sOConGNAW9nZ1VWwVO3GWIPR9M5okhozMOO8rzSWQUC7RorJAlN+5M
-	5SgKaMvXyoXY3ztk6Re1Tj8pztim6sjeqIKey
-X-Google-Smtp-Source: AGHT+IFjiqllbtZbfh6H7hOfR01xf4G8PNDyn1RyHhO2ITzkhGOqhIPLS7VFIHAGqVDoJDMdk8WysOY4o+NEDwrxuHA=
-X-Received: by 2002:a05:690c:ec5:b0:64b:7500:2e9 with SMTP id
- 00721157ae682-6b1b759714bmr105555907b3.9.1724001779618; Sun, 18 Aug 2024
- 10:22:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724025908; x=1724630708;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1a+pMjVUiB38viAahm/133wZD8Rs6DT0b99OGjjUQtk=;
+        b=gmaEf65p1/t0fVrFIcnkmORo9oqOlLCxaBvRRxfvki2VEo/+X/oYlOWq5y8gv7W9jk
+         B8AnLUQpaWJlky9O6UMlilvPVfRaYuI+DJcG/zSchr3YLq8DaL19iobN4EaDkw0Rr8se
+         wLOhBTy5r59l1JNp5jJ65ps5Stg1k5hAngaaMP/Ny5mUoEIixEWv6vS1SWHcM3eM3mIv
+         PAYOqivwGcHXVDztqj6wuzAxMujmL6afAUQD+QXXntSzcEtbvhHGP3sM+8xGol7/oOUx
+         AZuWWmWFQt850koGnGKs7yEoyG+XbhJg/NQ3ZMjjpgzM6HZ2BdV4w6JKZ8puniHTMtkA
+         CmNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXaDaN1X1KhLMmMhlQeO0mRik2DHSTb1U/naXTA16VhcsZW/nahNBeQiqTctO0/Ogc7hZ1Dr2Jaliuogey3h62O1afECr4QK5X71ZzbDNPTuMldepXTAxg0ei4NaWOU9c4Fquki5esp5wA=
+X-Gm-Message-State: AOJu0YxrL1AIh6OwoeO/R90objHKzuKq6BEvGWO1wA53GjTW7WHptnby
+	IpEZMR+IZRUBPYvY3aYBoT9EVmaDwZP4TeFwcEb4u7UqhknWGRqaZT4zputY
+X-Google-Smtp-Source: AGHT+IEpXUILlUPddmYo7W2CRKE66lODnIsWxAcAlmui5Shq2CFrvjGYn+cbD6SkpaKct9q2XPJ3kg==
+X-Received: by 2002:a05:6102:c03:b0:492:96b5:aa0b with SMTP id ada2fe7eead31-4977990ec64mr11539081137.2.1724025907733;
+        Sun, 18 Aug 2024 17:05:07 -0700 (PDT)
+Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4976ff72f15sm1100398137.25.2024.08.18.17.05.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Aug 2024 17:05:07 -0700 (PDT)
+From: David Hunter <david.hunter.linux@gmail.com>
+To: stable@vger.kernel.org
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	david.hunter.linux@gmail.com,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 5.15.y] block: use "unsigned long" for blk_validate_block_size().
+Date: Sun, 18 Aug 2024 20:05:02 -0400
+Message-ID: <20240819000502.2275929-1-david.hunter.linux@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
- <1722665314-21156-13-git-send-email-wufan@linux.microsoft.com>
- <9dc30ca6-486c-4fa9-910d-ed1dc6da0e95@linux.microsoft.com>
- <CAHC9VhQrnu8Sj=XnDvg=wGTBxacvMSW6OJyG3-tpwrsbGat6vA@mail.gmail.com>
- <88695db-efc0-6cc6-13ee-fd7c2abe61c@redhat.com> <ac6e33b8-ec1f-494a-874f-9a16d3316fce@linux.microsoft.com>
-In-Reply-To: <ac6e33b8-ec1f-494a-874f-9a16d3316fce@linux.microsoft.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Sun, 18 Aug 2024 13:22:48 -0400
-Message-ID: <CAHC9VhSe0HkzX0gy5Oo+549wG9xqfeHmsveJqdR_xRcYtim+sA@mail.gmail.com>
-Subject: Re: [PATCH v20 12/20] dm verity: expose root hash digest and
- signature data to LSMs
-To: Fan Wu <wufan@linux.microsoft.com>
-Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-	Alasdair Kergon <agk@redhat.com>, linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, fsverity@lists.linux.dev, 
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, audit@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 16, 2024 at 3:11=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
-wrote:
-> On 8/16/2024 6:35 AM, Mikulas Patocka wrote:
+Since lo_simple_ioctl(LOOP_SET_BLOCK_SIZE) and ioctl(NBD_SET_BLKSIZE) pass
+user-controlled "unsigned long arg" to blk_validate_block_size(),
+"unsigned long" should be used for validation.
 
-...
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/9ecbf057-4375-c2db-ab53-e4cc0dff953d@i-love.sakura.ne.jp
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+(cherry picked from commit 37ae5a0f5287a52cf51242e76ccf198d02ffe495)
+Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+---
+ include/linux/blkdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> >>>>
-> >>>> +#ifdef CONFIG_SECURITY
-> >>>> +     u8 *root_digest_sig;    /* signature of the root digest */
-> >>>> +#endif /* CONFIG_SECURITY */
-> >>>>        unsigned int salt_size;
-> >>>>        sector_t data_start;    /* data offset in 512-byte sectors */
-> >>>>        sector_t hash_start;    /* hash start in blocks */
-> >>>> @@ -58,6 +61,9 @@ struct dm_verity {
-> >>>>        bool hash_failed:1;     /* set if hash of any block failed */
-> >>>>        bool use_bh_wq:1;       /* try to verify in BH wq before norm=
-al work-queue */
-> >>>>        unsigned int digest_size;       /* digest size for the curren=
-t hash algorithm */
-> >>>> +#ifdef CONFIG_SECURITY
-> >>>> +     unsigned int sig_size;  /* root digest signature size */
-> >>>> +#endif /* CONFIG_SECURITY */
-> >>>>        unsigned int hash_reqsize; /* the size of temporary space for=
- crypto */
-> >>>>        enum verity_mode mode;  /* mode for handling verification err=
-ors */
-> >>>>        unsigned int corrupted_errs;/* Number of errors for corrupted=
- blocks */
-> >
-> > Just nit-picking: I would move "unsigned int sig_size" up, after "u8
-> > *root_digest_sig" entry.
-> >
-> > Mikulas
->
-> Sure, I can make these two fields together.
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 905844172cfd..c6d57814988d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -235,7 +235,7 @@ struct request {
+ 	void *end_io_data;
+ };
+ 
+-static inline int blk_validate_block_size(unsigned int bsize)
++static inline int blk_validate_block_size(unsigned long bsize)
+ {
+ 	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
+ 		return -EINVAL;
+-- 
+2.43.0
 
-Fan, do you want me to move the @sig_size field when merging or are
-you planning to submit another revision?  I'm happy to do it during
-the merge, but I don't want to bother if you are going to post another
-patchset.
-
---=20
-paul-moore.com
