@@ -1,100 +1,130 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEAB482EB;
-	Mon, 19 Aug 2024 17:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199D317C98C;
+	Mon, 19 Aug 2024 18:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724089623; cv=none; b=m2J2VG3SBl1t8bRL9i3ouqO3Cpj3loHFjQHIlynrmX8rFqMs0QWhTK2teXd8+B5H+t6sVgxx5jRDXmGtcGwljFSQKD4DuT9iUpVY41q1cgrosyjsC9o+JPdfi64m3RAGG4Z+kUly0CHIZSH5ZBwuITP2CqBGr//NJ2U0O6bDICo=
+	t=1724090699; cv=none; b=lDbA0Tp6Z1QaGYjRBTBWka/By3N5N3LbY6LwOKvBDS11cNd58x4k37IDH5zMmIawDJgPXOC+95v7NgBFIZCUcEMFxE620f/BddCUORxRJWn0+8UChf5OVGWck+a9NC3IwhBZM7aJa737Er43oTu6GLnFbmOuJ96ut3nal46Xj74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724089623; c=relaxed/simple;
-	bh=O/u/0h4UDWXzTlG+fyAEIwqdpcRuWTE+gYKDPyVqXGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UVUVV/sFbvDv3GbOLaViNMz2spWguXn3Xbiyp6Cje6aYUfBHGiSTLqIz/HWqsdGgf/2QSWEEfqGTkjqpLxjO2eMCw0WYg6TKC0afz+PbsqFRj0FEVqAYmJ+2N4M1NROylJUwPeG3MmsgJ2iPRSI3OrcrkqfmOFc7Rt5M1fbgp7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=fYyF7sjJ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="fYyF7sjJ"
-Received: from [10.137.106.151] (unknown [131.107.174.23])
-	by linux.microsoft.com (Postfix) with ESMTPSA id A692F20B7165;
-	Mon, 19 Aug 2024 10:47:01 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A692F20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1724089621;
-	bh=/Fg+0/px+hqNYUUfsmTiu8GgatTWcJCL0lwQFJVQ/tA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fYyF7sjJlyEoM0JAIp8iI+WSf7amJf7ETBZwTv6JAFSIU+FKmhSsw4HNzrhAYxlT4
-	 A5vyAPdyo2uFW5TfPI/HoeyeIVBWMk7SzosB2aa+PakJwYBTQzHf3wFXB4SYdLGd6N
-	 AUz5EsqW9VbFKhs/h6K9lmyUTJIROMLqTNlh8tQw=
-Message-ID: <8421b247-41d2-4bf5-ba80-f356a2b696fd@linux.microsoft.com>
-Date: Mon, 19 Aug 2024 10:47:01 -0700
+	s=arc-20240116; t=1724090699; c=relaxed/simple;
+	bh=uhcHWPb2xTrhdnPGHS3qLJd7wXvBdsT9BOPncAM9mUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fiZukWVtTfbcMPii5WtDPtyHgSdq2I9SZ/AidVR1XzPRnbswybQH4q4/wgjKnvd6/zM35xay4J/+msOdVF/Q5gSbWUAsaJBugmwwDw7nhFgAKv/m4csEhPJG92+o69jGUxFqWLow3tTB4VJAbR7UVMX8YwMBRfKrfznrmYGuWbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: pZ8XfnpBRge2m6Qh8H1BJA==
+X-CSE-MsgGUID: Km54+G1dQjuHHcanrzTuSQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="22533078"
+X-IronPort-AV: E=Sophos;i="6.10,159,1719903600"; 
+   d="scan'208";a="22533078"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 11:04:54 -0700
+X-CSE-ConnectionGUID: tSCzEHZcRx6b1ETz2cciBg==
+X-CSE-MsgGUID: kxzUu48nQpaoQdK3Fh2GyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,159,1719903600"; 
+   d="scan'208";a="91187343"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 11:04:46 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1sg6kC-0000000H1wA-3FW0;
+	Mon, 19 Aug 2024 21:04:40 +0300
+Date: Mon, 19 Aug 2024 21:04:40 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 4/9] block: mtip32xx: Replace deprecated PCI functions
+Message-ID: <ZsOJONEA2x93bSpO@smile.fi.intel.com>
+References: <20240819165148.58201-2-pstanner@redhat.com>
+ <20240819165148.58201-6-pstanner@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 12/20] dm verity: expose root hash digest and
- signature data to LSMs
-To: Paul Moore <paul@paul-moore.com>
-Cc: Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Alasdair Kergon <agk@redhat.com>, linux-doc@vger.kernel.org,
- linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
- fsverity@lists.linux.dev, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev, audit@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1722665314-21156-1-git-send-email-wufan@linux.microsoft.com>
- <1722665314-21156-13-git-send-email-wufan@linux.microsoft.com>
- <9dc30ca6-486c-4fa9-910d-ed1dc6da0e95@linux.microsoft.com>
- <CAHC9VhQrnu8Sj=XnDvg=wGTBxacvMSW6OJyG3-tpwrsbGat6vA@mail.gmail.com>
- <88695db-efc0-6cc6-13ee-fd7c2abe61c@redhat.com>
- <ac6e33b8-ec1f-494a-874f-9a16d3316fce@linux.microsoft.com>
- <CAHC9VhSe0HkzX0gy5Oo+549wG9xqfeHmsveJqdR_xRcYtim+sA@mail.gmail.com>
-Content-Language: en-US
-From: Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <CAHC9VhSe0HkzX0gy5Oo+549wG9xqfeHmsveJqdR_xRcYtim+sA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240819165148.58201-6-pstanner@redhat.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-
-
-On 8/18/2024 10:22 AM, Paul Moore wrote:
-> On Fri, Aug 16, 2024 at 3:11 PM Fan Wu <wufan@linux.microsoft.com> wrote:
->> On 8/16/2024 6:35 AM, Mikulas Patocka wrote:
+On Mon, Aug 19, 2024 at 06:51:44PM +0200, Philipp Stanner wrote:
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
+> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
 > 
-> ...
+> In mtip32xx, these functions can easily be replaced by their respective
+> successors, pcim_request_region() and pcim_iomap(). Moreover, the
+> driver's call to pcim_iounmap_regions() is not necessary, because it's
+> invoked in the remove() function. Cleanup can, hence, be performed by
+> PCI devres automatically.
 > 
->>>>>>
->>>>>> +#ifdef CONFIG_SECURITY
->>>>>> +     u8 *root_digest_sig;    /* signature of the root digest */
->>>>>> +#endif /* CONFIG_SECURITY */
->>>>>>         unsigned int salt_size;
->>>>>>         sector_t data_start;    /* data offset in 512-byte sectors */
->>>>>>         sector_t hash_start;    /* hash start in blocks */
->>>>>> @@ -58,6 +61,9 @@ struct dm_verity {
->>>>>>         bool hash_failed:1;     /* set if hash of any block failed */
->>>>>>         bool use_bh_wq:1;       /* try to verify in BH wq before normal work-queue */
->>>>>>         unsigned int digest_size;       /* digest size for the current hash algorithm */
->>>>>> +#ifdef CONFIG_SECURITY
->>>>>> +     unsigned int sig_size;  /* root digest signature size */
->>>>>> +#endif /* CONFIG_SECURITY */
->>>>>>         unsigned int hash_reqsize; /* the size of temporary space for crypto */
->>>>>>         enum verity_mode mode;  /* mode for handling verification errors */
->>>>>>         unsigned int corrupted_errs;/* Number of errors for corrupted blocks */
->>>
->>> Just nit-picking: I would move "unsigned int sig_size" up, after "u8
->>> *root_digest_sig" entry.
->>>
->>> Mikulas
->>
->> Sure, I can make these two fields together.
+> Replace pcim_iomap_regions() and pcim_iomap_table().
 > 
-> Fan, do you want me to move the @sig_size field when merging or are
-> you planning to submit another revision?  I'm happy to do it during
-> the merge, but I don't want to bother if you are going to post another
-> patchset.
-> 
+> Remove the call to pcim_iounmap_regions().
 
-Thanks, Paul. It seems moving the field during the merge can expedite 
-the process. Please go ahead with that. I appreciate your help with this!
+...
 
--Fan
+int mtip_pci_probe()
+
+>  setmask_err:
+> -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+> +	pcim_release_region(pdev, MTIP_ABAR);
+
+But why?
+
+...
+
+mtip_pci_remove()
+
+>  	pci_disable_msi(pdev);
+>  
+> -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+
+This is okay.
+
+...
+
+>  	pci_set_drvdata(pdev, NULL);
+
+Side note: This is done by driver core for the last 10+ years…
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
