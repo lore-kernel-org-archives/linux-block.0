@@ -1,314 +1,211 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE4816C42C;
-	Mon, 19 Aug 2024 13:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17BB4642D
+	for <linux-block@vger.kernel.org>; Mon, 19 Aug 2024 15:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724074701; cv=none; b=pRP+BUfp0IWZ61hJ2quYU6gg18USTN/+u6Kd1CWfkutDaCLIy41yBW51TmmJ6qhtoBkZCViMrJ24295pjDFor4IIT0mKyVfTuU+/Eo65QUkkQ/4bhUWysFrOeo8kenv9QA0VDW6U+TCkYCGPUj3VFDz1dZfE2UCXz6IJTg9Gh8E=
+	t=1724081089; cv=none; b=Uu00VMMbo0n5jWiHothoYpk4mrbIlBRCn8FwGI/54U7zZp4v6FqpL/YiYf3dKfHImFSVDtLszP7RamxxSLSZGwM8gRnqQ4lAOXCfoIRlaxpVGz6qYm3Si2nudQ4eZmedR3QxjBxKJbApbPyCkfmkKChbkbnhXgez1+kpI6ciIfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724074701; c=relaxed/simple;
-	bh=qIYbP9/x6N4LqlgHF2vHBae6xR7FPZiqGPgPnZCjA10=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=JiWzvyvgBUPJBZO+aKbe7b4PEjL9SAqTtB5/Y8bgjrC4LD02zxRXy/4d3HWZNJ6Zb4KgQW2AKEt6Yn33ssh7pKz25V6EP+HbaqIT8pNTaEd/im3kI6qewZy49wMjBpzCwT3b1qzG8cUAyJ0DC/w+n7o2Vi6Zydcqb/aUv/CnkRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WnYZF5MZCz4f3nbh;
-	Mon, 19 Aug 2024 21:37:57 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id B4EDB1A058E;
-	Mon, 19 Aug 2024 21:38:12 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgCXv4W+SsNmuz+ICA--.4058S3;
-	Mon, 19 Aug 2024 21:38:08 +0800 (CST)
-Subject: Re: jbd2: io throttle for metadata buffers
-To: Zhang Yi <yi.zhang@huaweicloud.com>, Haifeng Xu <haifeng.xu@shopee.com>
-Cc: tytso@mit.edu, jack@suse.com, linux-ext4@vger.kernel.org,
- linux-kernel@vger.kernel.org, hanjinke.666@bytedance.com,
- Tejun Heo <tj@kernel.org>, linux-block <linux-block@vger.kernel.org>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <9914a4b4-eb4d-44de-a48c-8ae08eedebe8@shopee.com>
- <b85e49c6-588e-63c7-b153-a273183f810e@huaweicloud.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <97fc38e6-a226-5e22-efc2-4405beb6d75b@huaweicloud.com>
-Date: Mon, 19 Aug 2024 21:38:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1724081089; c=relaxed/simple;
+	bh=8UCyATdmCf4Wg3lvWtWiZgV1zL8jxHXPssxnXLwqAw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=dKOoUAILcpphQv2HAg1GJVhQg29WDeKNyvAnrBL44ckHL3NxIaghY6lZqTiMy3JDWzUQaALtbhGqi4nYSdBWU35FLFTmHZGduxv0m/S831WbPWgK8h8qRL+ejHMM/WnOGqgEj7u7Wm7mIXITT3h/Cz0+gAcLu9t7KoZ8l9qg7JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=AyP/S/TD; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="AyP/S/TD"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240819152444epoutp041a3787f9f97a38897c6b67916e0e5934~tKpydB-1A1924519245epoutp04x
+	for <linux-block@vger.kernel.org>; Mon, 19 Aug 2024 15:24:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240819152444epoutp041a3787f9f97a38897c6b67916e0e5934~tKpydB-1A1924519245epoutp04x
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1724081084;
+	bh=VBSIUIS2dNnNU2iuJm2bZHuMNHTSpGTfXGsUCUAnCkw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AyP/S/TDNH6C+na6yGd49fT2zghNtnp5uuYbFvKk9SgA5zYGKTa1Yknkl8PaDOMks
+	 q5P1IfRmhNj4Zr3HOC9V0VTke9D2o3Bjo1h0zdJzxzsltFIzh2nZCcUBEwFAb37/o8
+	 uLg+UStCcMAkAY+FVtHFSnLZ4EupFZ+nzTmR1i40=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20240819152444epcas5p4bcd43c4e436a804b4bad698ce73bf989~tKpyGCBXn0281902819epcas5p48;
+	Mon, 19 Aug 2024 15:24:44 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.176]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4WnbxQ33lyz4x9Pq; Mon, 19 Aug
+	2024 15:24:42 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	04.48.09640.AB363C66; Tue, 20 Aug 2024 00:24:42 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240819152304epcas5p2a721edc9c03788203f104563bb8b5a52~tKoVZOzZX0348003480epcas5p2U;
+	Mon, 19 Aug 2024 15:23:04 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240819152304epsmtrp2330a89808dd4e56f646a91f326e080ef~tKoVYn_KD3274532745epsmtrp2B;
+	Mon, 19 Aug 2024 15:23:04 +0000 (GMT)
+X-AuditID: b6c32a49-a57ff700000025a8-52-66c363ba7503
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	8E.B3.07567.85363C66; Tue, 20 Aug 2024 00:23:04 +0900 (KST)
+Received: from nj.shetty?samsung.com (unknown [107.99.41.245]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240819152302epsmtip1328f45dbad889572ff037d24fe2345bf~tKoTneSCj1579315793epsmtip1p;
+	Mon, 19 Aug 2024 15:23:02 +0000 (GMT)
+Date: Mon, 19 Aug 2024 20:45:41 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
+	linux-block@vger.kernel.org, kbusch@kernel.org
+Subject: Re: [PATCH v2 1/2] block: Read max write zeroes once for
+ __blkdev_issue_write_zeroes()
+Message-ID: <20240819151541.7bhzx6fmoayuy6gu@nj.shetty@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b85e49c6-588e-63c7-b153-a273183f810e@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <5d2f21e4-1496-4d03-9c31-cfc57fc9c8c7@oracle.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprIJsWRmVeSWpSXmKPExsWy7bCmpu6u5MNpBpOahCxW3+1ns1i5+iiT
+	xYVfOxgtJh26xmix95a2xfLj/5gc2Dwuny312LSqk81j980GNo+PT2+xeHzeJBfAGpVtk5Ga
+	mJJapJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQO0X0mhLDGnFCgU
+	kFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYFKgV5yYW1yal66Xl1piZWhgYGQKVJiQnfH78GyW
+	gj0yFfOv/mFtYNwq0cXIySEhYCLxcvd6FhBbSGA3o8SMgzldjFxA9idGiUuzVrJCON8YJWZf
+	62WG6Vjc0sEOkdjLKHF8z0wWCOczo8Tm6f1gs1gEVCUmrt/N1sXIwcEmoC1x+j8HiCkioCFx
+	5JA0SAWzQK7Eyt0L2EFsYYFEiW/nW8GqeQWcJT789wUJ8woISpyc+QRsIKeAncTDrQ+ZQTZJ
+	CPxklzi7cgoTxD0uEkcn7IayhSVeHd/CDmFLSXx+t5cNwi6XWDllBRtEcwujxKzrsxghEvYS
+	raf6mUEWMwtkSDS+roIIy0pMPbWOCeJOPone30+g5vNK7JgHYytLrFm/AGq+pMS1741QtofE
+	idb/zJAg2cwksaiplWkCo9wsJA/NQlg3C2yFlUTnhyZWCFteonnrbGaIEmmJ5f84IExNifW7
+	9Bcwsq1ilEwtKM5NTy02LTDMSy2Hx3Zyfu4mRnDa1PLcwXj3wQe9Q4xMHIyHGCU4mJVEeLtf
+	HkwT4k1JrKxKLcqPLyrNSS0+xGgKjKiJzFKiyfnAxJ1XEm9oYmlgYmZmZmJpbGaoJM77unVu
+	ipBAemJJanZqakFqEUwfEwenVAMT3yfH63Gz9Jfq6zLcKYuK8efZtnWZhZ+ktcfBdclBcy9O
+	OBjypDWK81ij79k/fb1Gx/I3ONyNqP+vv53V4vD1hy8ce9SNDutvXS3Hu23v+9y2uTkTb+49
+	3VbvLlikO2uuntKUZwV1MkKBjIHPBDdf3xHUuuKVT0B+TvMqOf/0LLkuvxnOrYdbp3dX39ui
+	4XDsS5tc4P7KXxW1bWxcX27WWyoKPubiit7rLbA+kF3r1Q01BYaNlffENb9ckL1YPCd3k/vJ
+	Ve3231KEliVtvevmpyGkvGn566RJd1fLqLsci0j4dujC/sjj+3wFMtpqmNk/zdXsyfx6+HYi
+	U1+FLP+m6d9dhBvc+JeEcn7+mKjEUpyRaKjFXFScCAAud3EvJAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrPLMWRmVeSWpSXmKPExsWy7bCSnG5E8uE0g6Zd0har7/azWaxcfZTJ
+	4sKvHYwWkw5dY7TYe0vbYvnxf0wObB6Xz5Z6bFrVyeax+2YDm8fHp7dYPD5vkgtgjeKySUnN
+	ySxLLdK3S+DKuH51AWvBWcmKy2uPszYwPhbtYuTkkBAwkVjc0sHexcjFISSwm1HixdzT7BAJ
+	SYllf48wQ9jCEiv/PQeLCwl8ZJTYddsJxGYRUJWYuH43WxcjBwebgLbE6f8cIKaIgIbEkUPS
+	IBXMArkSK3cvAOsUFkiU+Ha+FayaV8BZ4sN/X4itm5kkVt9rYAWp4RUQlDg58wkLRK+ZxLzN
+	D5lB6pkFpCWW/+OACMtLNG+dDXYYp4CdxMOtD5knMArOQtI9C0n3LITuWUi6FzCyrGKUTC0o
+	zk3PTTYsMMxLLdcrTswtLs1L10vOz93ECI4DLY0djPfm/9M7xMjEwXiIUYKDWUmEt/vlwTQh
+	3pTEyqrUovz4otKc1OJDjNIcLErivIYzZqcICaQnlqRmp6YWpBbBZJk4OKUamA7yBquGXra1
+	qGc8ddLv+3OrV80Kc1epsTtX1z6bvXE782tekT55lU0Be2vmNLgennzQ4u9+VWW/PUbefyxr
+	3SXTJFa+uv9M/NOqy46TF9qXTu9YL8MqoxPhdsHifOXRU5+Yg/+zZ1bucGqbsyw1dXOs/2z3
+	k8XBSaotL4rXZ2hzfJ5llNnwSmNTMKOPpOG5b8cq20/xfosVZzlS+emi1BYz5dmKXC9PrX99
+	sfdT+rt57IdZjy36e73/I0PyrXg7i4Os86Y8eLlz1rmyXwb2YpmhBXKL9z6Yn2+8K30H33/D
+	fT4X99d1ChVcDvb18zqluGtNRojm8+nTOXz4Tr+4cypi65wv4m03JHezf1/gVqnEUpyRaKjF
+	XFScCAC7ub9/8gIAAA==
+X-CMS-MailID: 20240819152304epcas5p2a721edc9c03788203f104563bb8b5a52
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----TNlpQu-kfgoLB5GQfjX3R1ST3uXYbJH1t.riwqCLJ0wh797m=_b1333_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240816184134epcas5p3b673a0619a2e696f845ee09ab7f5a087
+References: <20240815163228.216051-1-john.g.garry@oracle.com>
+	<20240815163228.216051-2-john.g.garry@oracle.com>
+	<CGME20240816184134epcas5p3b673a0619a2e696f845ee09ab7f5a087@epcas5p3.samsung.com>
+	<20240816183129.a2uwtlkbvddg5uxm@nj.shetty@samsung.com>
+	<5d2f21e4-1496-4d03-9c31-cfc57fc9c8c7@oracle.com>
+
+------TNlpQu-kfgoLB5GQfjX3R1ST3uXYbJH1t.riwqCLJ0wh797m=_b1333_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCXv4W+SsNmuz+ICA--.4058S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxtFW7AF4kZr4ktFy7WF4xtFb_yoWDJFW8pr
-	WxJFW7Wr4DAF1UWryfurW5Za40yw48Zas8Jw1rGr13J342gw1Yvr1DAry8Wr9FvFsxGF47
-	tr98trZ8KF1UArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Disposition: inline
 
-+CC Tejun
-+CC block
+On 17/08/24 04:33PM, John Garry wrote:
+>On 16/08/2024 19:34, Nitesh Shetty wrote:
+>>On 15/08/24 04:32PM, John Garry wrote:
+>>>As reported in [0], we may get a hang when formatting a XFS FS on a RAID0
+>>>drive.
+>>>
+>>>Commit 73a768d5f955 ("block: factor out a blk_write_zeroes_limit helper")
+>>>changed __blkdev_issue_write_zeroes() to read the max write zeroes
+>>>value in the loop. This is not safe as max write zeroes may change in
+>>>value. Specifically for the case of [0], the value goes to 0, and we get
+>>>an infinite loop.
+>>>
+>>>Lift the limit reading out of the loop.
+>>>
+>>>[0] https://urldefense.com/v3/__https://lore.kernel.org/linux- 
+>>>xfs/4d31268f-310b-4220-88a2-e191c3932a82@oracle.com/T/*t__;Iw!! 
+>>>ACWV5N9M2RV99hQ! KNrgu0c216k_Y_2RLxTasjxizyhbN8eKD61JwIwDxT5OJJDamER6hw1nvf5biNMqQLaLl9PqC2qRUDdHlrGF7g$
+>>>Fixes: 73a768d5f955 ("block: factor out a blk_write_zeroes_limit helper")
+>>>Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>>Signed-off-by: John Garry <john.g.garry@oracle.com>
+>>>---
+>>>block/blk-lib.c | 25 ++++++++++++++++++-------
+>>>1 file changed, 18 insertions(+), 7 deletions(-)
+>>>
+>>>diff --git a/block/blk-lib.c b/block/blk-lib.c
+>>>index 9f735efa6c94..83eb7761c2bf 100644
+>>>--- a/block/blk-lib.c
+>>>+++ b/block/blk-lib.c
+>>>@@ -111,13 +111,20 @@ static sector_t 
+>>>bio_write_zeroes_limit(struct block_device *bdev)
+>>>        (UINT_MAX >> SECTOR_SHIFT) & ~bs_mask);
+>>>}
+>>>
+>>>+/*
+>>>+ * There is no reliable way for the SCSI subsystem to determine 
+>>>whether a
+>>>+ * device supports a WRITE SAME operation without actually 
+>>>performing a write
+>>>+ * to media. As a result, write_zeroes is enabled by default and will be
+>>>+ * disabled if a zeroing operation subsequently fails. This means 
+>>>that this
+>>>+ * queue limit is likely to change at runtime.
+>>>+ */
+>>>static void __blkdev_issue_write_zeroes(struct block_device *bdev,
+>>>        sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+>>>-        struct bio **biop, unsigned flags)
+>>>+        struct bio **biop, unsigned flags, sector_t limit)
+>>>{
+>>>+
+>>>    while (nr_sects) {
+>>>-        unsigned int len = min_t(sector_t, nr_sects,
+>>>-                bio_write_zeroes_limit(bdev));
+>>>+        unsigned int len = min(nr_sects, limit);
+>>
+>>I feel changes something like below will simplify the whole patch.
+>>
+>>--- a/block/blk-lib.c
+>>+++ b/block/blk-lib.c
+>>@@ -115,9 +115,13 @@ static void __blkdev_issue_write_zeroes(struct 
+>>block_device *bdev,
+>>          sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+>>          struct bio **biop, unsigned flags)
+>>  {
+>>+    sector_t limit = bio_write_zeroes_limit(bdev);
+>>+
+>>+    if (!limit)
+>>+        return;
+>
+>Just this?
+>
+>If yes, then __blkdev_issue_write_zeroes() does not return an error 
+>code, so can we tell whether the zeroes were actually issued?
+>
+I failed to see this.
 
-在 2024/08/19 20:49, Zhang Yi 写道:
-> Hello, Haifeng.
-> 
-> On 2024/8/19 18:19, Haifeng Xu wrote:
->> Hi, matsers!
->>
->>
->> We encountered high load issuses in our production environment recently. And the kernel version is stable-5.15.39
->> the filesystem is ext4(ordered).
->>
->>
->> After digging into it, we found the problem is due to io.max
->>
->>
->> thread 1:
->>
->> PID: 189529  TASK: ffff92ab51e5c080  CPU: 34  COMMAND: "mc"
->>   #0 [ffffa638db807800] __schedule at ffffffff83b19898
->>   #1 [ffffa638db807888] schedule at ffffffff83b19e9e
->>   #2 [ffffa638db8078a8] io_schedule at ffffffff83b1a316
->>   #3 [ffffa638db8078c0] bit_wait_io at ffffffff83b1a751
->>   #4 [ffffa638db8078d8] __wait_on_bit at ffffffff83b1a373
->>   #5 [ffffa638db807918] out_of_line_wait_on_bit at ffffffff83b1a46d
->>   #6 [ffffa638db807970] __wait_on_buffer at ffffffff831b9c64
->>   #7 [ffffa638db807988] jbd2_log_do_checkpoint at ffffffff832b556e
->>   #8 [ffffa638db8079e8] __jbd2_log_wait_for_space at ffffffff832b55dc
->>   #9 [ffffa638db807a30] add_transaction_credits at ffffffff832af369
->> #10 [ffffa638db807a98] start_this_handle at ffffffff832af50f
->> #11 [ffffa638db807b20] jbd2__journal_start at ffffffff832afe1f
->> #12 [ffffa638db807b60] __ext4_journal_start_sb at ffffffff83241af3
->> #13 [ffffa638db807ba8] __ext4_new_inode at ffffffff83253be6
->> #14 [ffffa638db807c80] ext4_mkdir at ffffffff8327ec9e
->> #15 [ffffa638db807d10] vfs_mkdir at ffffffff83182a92
->> #16 [ffffa638db807d50] ovl_mkdir_real at ffffffffc0965c9f [overlay]
->> #17 [ffffa638db807d80] ovl_create_real at ffffffffc0965e8b [overlay]
->> #18 [ffffa638db807db8] ovl_create_or_link at ffffffffc09677cc [overlay]
->> #19 [ffffa638db807e10] ovl_create_object at ffffffffc0967a48 [overlay]
->> #20 [ffffa638db807e60] ovl_mkdir at ffffffffc0967ad3 [overlay]
->> #21 [ffffa638db807e70] vfs_mkdir at ffffffff83182a92
->> #22 [ffffa638db807eb0] do_mkdirat at ffffffff83184305
->> #23 [ffffa638db807f08] __x64_sys_mkdirat at ffffffff831843df
->> #24 [ffffa638db807f28] do_syscall_64 at ffffffff83b0bf1c
->> #25 [ffffa638db807f50] entry_SYSCALL_64_after_hwframe at ffffffff83c0007c
->>
->> other threads:
->>
->>
->> PID: 21125  TASK: ffff929f5b9a0000  CPU: 44  COMMAND: "task_server"
->>   #0 [ffffa638aff9b900] __schedule at ffffffff83b19898
->>   #1 [ffffa638aff9b988] schedule at ffffffff83b19e9e
->>   #2 [ffffa638aff9b9a8] schedule_preempt_disabled at ffffffff83b1a24e
->>   #3 [ffffa638aff9b9b8] __mutex_lock at ffffffff83b1af28
->>   #4 [ffffa638aff9ba38] __mutex_lock_slowpath at ffffffff83b1b1a3
->>   #5 [ffffa638aff9ba48] mutex_lock at ffffffff83b1b1e2
->>   #6 [ffffa638aff9ba60] mutex_lock_io at ffffffff83b1b210
->>   #7 [ffffa638aff9ba80] __jbd2_log_wait_for_space at ffffffff832b563b
->>   #8 [ffffa638aff9bac8] add_transaction_credits at ffffffff832af369
->>   #9 [ffffa638aff9bb30] start_this_handle at ffffffff832af50f
->> #10 [ffffa638aff9bbb8] jbd2__journal_start at ffffffff832afe1f
->> #11 [ffffa638aff9bbf8] __ext4_journal_start_sb at ffffffff83241af3
->> #12 [ffffa638aff9bc40] ext4_dirty_inode at ffffffff83266d0a
->> #13 [ffffa638aff9bc60] __mark_inode_dirty at ffffffff831ab423
->> #14 [ffffa638aff9bca0] generic_update_time at ffffffff8319169d
->> #15 [ffffa638aff9bcb0] inode_update_time at ffffffff831916e5
->> #16 [ffffa638aff9bcc0] file_update_time at ffffffff83191b01
->> #17 [ffffa638aff9bd08] file_modified at ffffffff83191d47
->> #18 [ffffa638aff9bd20] ext4_write_checks at ffffffff8324e6e4
->> #19 [ffffa638aff9bd40] ext4_buffered_write_iter at ffffffff8324edfb
->> #20 [ffffa638aff9bd78] ext4_file_write_iter at ffffffff8324f553
->> #21 [ffffa638aff9bdf8] ext4_file_write_iter at ffffffff8324f505
->> #22 [ffffa638aff9be00] new_sync_write at ffffffff8316dfca
->> #23 [ffffa638aff9be90] vfs_write at ffffffff8316e975
->> #24 [ffffa638aff9bec8] ksys_write at ffffffff83170a97
->> #25 [ffffa638aff9bf08] __x64_sys_write at ffffffff83170b2a
->> #26 [ffffa638aff9bf18] do_syscall_64 at ffffffff83b0bf1c
->> #27 [ffffa638aff9bf38] asm_common_interrupt at ffffffff83c00cc8
->> #28 [ffffa638aff9bf50] entry_SYSCALL_64_after_hwframe at ffffffff83c0007c
->>
->>
->> The cgroup of thread1 has set io.max, so the j_checkpoint_mutex can't be released and many threads must wait for it.
->> I have some questions about the throttle for the metadata buffers.
->>
->> 1) writeback
->>
->> jbd2 converts the buffer head from jbddirty to buffer_dirty and trigger the write back in __jbd2_journal_temp_unlink_buffer().
->> By default, the blkcg in bdi_writeback attached to block device inode is blkcg_root which has no io throttle rules. But there may be other
->> threads which invoke sync_filesystem, such as umount overlayfs. This operation will write out all dirty data associated with the block
->> device. In this case, the bdi_writeback attached to block device inode may changed due to Boyer-Moore majority vote algorithm.
->> And the blkcg in bdi_writeback attached to block device inode is the group where the thread allocate the buffer head and dev page.
->>
->> So the writeback process of metadata buffers can also be throttled, right?
->>
->>
->> 2) checkpoint
->>
->> If the free log space is not suffcient, we will do checkpoint to update log tail. During the process, if the buffer head hasn't been
->> written out by wirteback. we will lock the buffer head and submit bio in current context.
->>
->> So the throttle rules may be different from writeback?
->>
->>
->> 3）j_checkpoint_mutex
->> If we can't make any progress in checkpoint due to io throttle, the j_checkpoint_mutex can'be release and block many others threads.
->>
->> So can we cancel the throttle rules for metadata buffers and keep it in blkcg_root?
->>
-> 
-> It seems that iocost have already act as blkcg_root if bios have
-> REQ_META set(ext4's metadata bh should've set this flag), but
-> blk-thottle doesn't, Jinke had submitted a patch to improve this
-> case, maybe it could help, please take a look at this patch. Or
-> maybe we could add some similar logic in blk-throttle like iocost
-> does for REQ_META.
-> 
-> https://lore.kernel.org/linux-block/20230228085935.71465-1-hanjinke.666@bytedance.com/
+>Furthermore, I would rather limit points at which we call 
+>bio_write_zeroes_limit()
+>
+>BTW, I am going on a short vacation now, so I can't quickly rework 
+>this (if that was actually required).
+>
 
-Hi, Tejun
+Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
 
-This patch can solve the priority inversion problem, however, I just
-come up with a new idea:
+------TNlpQu-kfgoLB5GQfjX3R1ST3uXYbJH1t.riwqCLJ0wh797m=_b1333_
+Content-Type: text/plain; charset="utf-8"
 
-For meta IO, just issue the IO directly like iocost, and then try to
-pay debt. Fortunately, we already have 'carryover_bytes/ios' that
-already do this for the case that limit changes, and it'll be easy
-to do this for meta IO, just update 'carryover_bytes/ios' and dispatch
-directly.
 
-BTW, this is another reason that we should add a new module in iocost to
-replace blk-throtl.
-
-Thanks,
-Kuai
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index dc6140fa3de0..38ffe0f95682 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1595,6 +1595,32 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
-         spin_unlock_irq(&q->queue_lock);
-  }
-
-+static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, 
-bool rw)
-+{
-+       struct throtl_service_queue *sq = &tg->service_queue;
-+
-+       /* throtl is FIFO - if bios are already queued, should queue */
-+       if (sq->nr_queued[rw])
-+               return false;
-+
-+       /* within limits, let's charge and dispatch directly */
-+       if (!tg_may_dispatch(tg, bio, NULL))
-+               return false;
-+
-+       return true;
-+}
-+
-+static void throtl_dispatch_bio_in_debt(struct throtl_grp *tg, struct 
-bio *bio,
-+                                       bool rw)
-+{
-+       unsigned int bio_size = throtl_bio_data_size(bio);
-+
-+       if (!bio_flagged(bio, BIO_BPS_THROTTLED))
-+               tg->carryover_bytes[rw] -= bio_size;
-+
-+       tg->carryover_ios[rw]--;
-+}
-+
-  bool __blk_throtl_bio(struct bio *bio)
-  {
-         struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-@@ -1611,34 +1637,28 @@ bool __blk_throtl_bio(struct bio *bio)
-         sq = &tg->service_queue;
-
-         while (true) {
--               if (tg->last_low_overflow_time[rw] == 0)
--                       tg->last_low_overflow_time[rw] = jiffies;
--               /* throtl is FIFO - if bios are already queued, should 
-queue */
--               if (sq->nr_queued[rw])
--                       break;
--
--               /* if above limits, break to queue */
--               if (!tg_may_dispatch(tg, bio, NULL)) {
--                       tg->last_low_overflow_time[rw] = jiffies;
-+               if (tg_within_limit(tg, bio, rw)) {
-+                       /* within limits, let's charge and dispatch 
-directly */
-+                       throtl_charge_bio(tg, bio);
-+
-+                       /*
-+                        * We need to trim slice even when bios are not 
-being queued
-+                        * otherwise it might happen that a bio is not 
-queued for
-+                        * a long time and slice keeps on extending and 
-trim is not
-+                        * called for a long time. Now if limits are 
-reduced suddenly
-+                        * we take into account all the IO dispatched so 
-far at new
-+                        * low rate and * newly queued IO gets a really 
-long dispatch
-+                        * time.
-+                        *
-+                        * So keep on trimming slice even if bio is not 
-queued.
-+                        */
-+                       throtl_trim_slice(tg, rw);
-+               } else if (bio_issue_as_root_blkg(bio)) {
-+                       throtl_dispatch_bio_in_debt(tg, bio, rw);
-+               } else {
-                         break;
-                 }
-
--               /* within limits, let's charge and dispatch directly */
--               throtl_charge_bio(tg, bio);
--
--               /*
--                * We need to trim slice even when bios are not being queued
--                * otherwise it might happen that a bio is not queued for
--                * a long time and slice keeps on extending and trim is not
--                * called for a long time. Now if limits are reduced 
-suddenly
--                * we take into account all the IO dispatched so far at new
--                * low rate and * newly queued IO gets a really long 
-dispatch
--                * time.
--                *
--                * So keep on trimming slice even if bio is not queued.
--                */
--               throtl_trim_slice(tg, rw);
--
-                 /*
-                  * @bio passed through this layer without being throttled.
-                  * Climb up the ladder.  If we're already at the top, it
-
-> 
-> Thanks,
-> Yi.
-> 
-> .
-> 
-
+------TNlpQu-kfgoLB5GQfjX3R1ST3uXYbJH1t.riwqCLJ0wh797m=_b1333_--
