@@ -1,164 +1,210 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82C31804E
-	for <linux-block@vger.kernel.org>; Mon, 19 Aug 2024 03:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B3C13BC1E
+	for <linux-block@vger.kernel.org>; Mon, 19 Aug 2024 07:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724039412; cv=none; b=uUzZ6ro+rh1yCcwmCnL0V79E+bL3AKyfhTt0sWm1U1wfJc8Ig3nkinlgczqdMRnM8ZG3Z9EjgjEqBD8BCx2DwAbYY1ZjuPZY1Svx3/CBYsfkdEBmKLTr19oADcCbkPI+UGrBa0ke2eZeYv5AXr4su2/NladDul8ASCPcV7qPjpI=
+	t=1724053785; cv=none; b=GB5qJ6cZUQx8FrpUgBhJUp02hL2I+X5FbjE/V1UkcCuKgqrMzHbzGRjzNTMfI/UcALfJW3/5ROf2Pq3j33OHab+HsIYf0rRvsXwdlAvribvNfrwOU3YCEgO5g1ysDCfFoM2TARez5AI4xne/x94isIE3AuZSndRqo/OsPOHnixk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724039412; c=relaxed/simple;
-	bh=vj/nCK/rrnT92avMqYHiiN0EBuWCrYe+FPk2q3HVSdo=;
+	s=arc-20240116; t=1724053785; c=relaxed/simple;
+	bh=sx6PmWH0A35LfzG2HSz3bstgdltXdA/Sva8mvjibDIo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=egoPI/om+eYOMUe8BXGAz/SZtvjGVQpW/5Zl7+qy7snP2hFyiq+9GrWVq1qn8TaTiVzoU1MKkAmU33L3I3/cmyMsda0Nkk6C/0FGwILXxROZE9ySsgW4bImnRrf8To9JzPmhR5A2VipEIBBBPwJS3fCgDoUx2etbFhrNHgYjlEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=gPMcoojd; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	 To:Cc:Content-Type; b=BjrgahneYIDOCGqqGoAMS4f4LFj/MKKMRwoIQKrGAryN4p+tGFXpiM5+7DwEwAXRTNLwUdPSuqKDIwJNWcsa5wAk8wc9Tfy7RkI2eAvZcawSN43cI2k9x8kxb1v8bRCARpDXTarBZ3A7C6XUwsuYtkYghUjAmdQbAtk6OEJman8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wydSXKg3; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="gPMcoojd"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-371b97cfd6fso599153f8f.2
-        for <linux-block@vger.kernel.org>; Sun, 18 Aug 2024 20:50:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wydSXKg3"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4f8dbdbba98so2272877e0c.0
+        for <linux-block@vger.kernel.org>; Mon, 19 Aug 2024 00:49:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1724039409; x=1724644209; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Akq/Bfulw+ZSro2Wdo4sH7ibDxXjrZD92qudwT0kTAQ=;
-        b=gPMcoojdD/UAuC6IfKLpWCMW18KXRygBSXWj8CJZPwkiGSZrvjOxU+qWrned3e8LTv
-         p+ihry9TpaaeHcK5IvFy51S7E94XEDCM+L8DUdD3y5pqCtbDMcO2Ji9yHTpf5Jq82Pa1
-         rpqQab28DotyuiaHluaktccXnaYn7hYRjkUq4bY/6SpIlCCKDA1BdedOyUqFMU2MDz5r
-         E7qiQVmG6CtAmMBsjNG9gj4CNaH4svHChGhkQ1XWlfJi19SStz+u8Fqz0Jzzwo0DCrn5
-         EG+xMAIujRMB9nfeCICug6Wr2nVyLhQCgFN414B6l5uBk1GRTf+ZQTZ5spiQe+D2sbxC
-         uxqg==
+        d=linaro.org; s=google; t=1724053782; x=1724658582; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=j/s5eSp55kJmjKTWCRvYRqFXs2anNEkZMyc6DD7OVTQ=;
+        b=wydSXKg321/s+bXnnlbK9Abdheh2IfzPJBaIGIZvii342FcuneRg5UHCTuK2mFZSjt
+         zJMxe1IYqEPVvm26gAwdvSOPfene91kcO80VjtG+z9kB1AZXceP4D4O9armvy0ReBgee
+         lhJIJ22eSl7gdVzpx5oMX9TzlEWeiSf9yaS8VuKCEHI7k1b/akVl0ttwod/ngznA0SJN
+         eLmyY4ycaxwOqfVXRDDPTzIDu0AGlYANZhSsnFJuCCqlsarrwPbWzyLQgb3Wcs8yzxrC
+         yXPMON1x0DyTuxU4Y3qxstYkH49mUeduP6C0y8q37NNn5VaSn/OKe/bSzAkAjL5dhwx2
+         ZMfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724039409; x=1724644209;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Akq/Bfulw+ZSro2Wdo4sH7ibDxXjrZD92qudwT0kTAQ=;
-        b=HCUQlR24j12HwqRp/F7jYT9GIG+JoFAn0IlAQEPhFtETUSsV4OwgS0swCnKkM1iEye
-         CY/Cd2Zsxyatfjm/RxsSjJwXUZAT/JqAi5R0Q9Jc4rWhr39Zhu8O0bKd+Fz0V8NnxlPD
-         Zx5kkeKUsB75hFX8FRbJHHHovONzCb9YgkKjCugYKhiZxN9e9QXVydMOb5zO4DotrNdU
-         DHIhDtNRPHQeUNhJZcx1qt3ZLBVVzrMpATRcuMxoe9zx/3G8nZLM+0ohp7Hxc6pTxBWz
-         Bk/e2YrM3bsEHeI8ngJheBMYu5oRNZ+Tbr1wGsCxv6K7X5sX5qwyYbNJebGs8zBEX9I3
-         9zhA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVZtOdZmoU7oPicSd7uFBUHWspayPnF2+GprZuYiC/AyR9t69+yFlG6ae/lMXde7ryEm7QHA/QfXTaufAB5RxZ6XbygGHmQiZLFM4=
-X-Gm-Message-State: AOJu0YzESjoGknMX09jlvOOr1hgGMi0PQBWK9z3K2u0NASA5yzpIeQUn
-	QbZD2p7w131SJL5AxXghLEdsL+YmnEsziEIiXwoTP6yaE/GiAjKuEuOnutPTIrS853UEXGup4GN
-	5JCacWjrbY8tOrpIGxL/oYjvyC1wKTMSl8zOFzA==
-X-Google-Smtp-Source: AGHT+IGP1r1vsd3FsMXgp+EG96vUOBK1F6/+3vOV0WXKU9/Rj0bDYdy6rXTS+Ytqvn2/2eeWwZC7z7VALGjKfXwS+lA=
-X-Received: by 2002:a5d:5e0f:0:b0:367:4d9d:56a5 with SMTP id
- ffacd0b85a97d-371983d5ea0mr4456524f8f.44.1724039408991; Sun, 18 Aug 2024
- 20:50:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724053782; x=1724658582;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j/s5eSp55kJmjKTWCRvYRqFXs2anNEkZMyc6DD7OVTQ=;
+        b=uCW07+FbT3g31wiX9HuKIZ3AbTCvOwVLoW7J8W/U6nypcsmvsYj3kEnquelbE2eyRy
+         4V4eTWpNxH9pFZovq4WuTw3R3y8UAiLER+0eyiEh+T2HOCeKls0W7XXwcQ/qv71EXq1k
+         eQcntC1fjV+VPie96uQkOscuXTgFCFH5pEr0Tr8p9gTOSfNK7TSP4TQSbqTK6uLz43+F
+         +IXQp7kXCmhTOMKugiXoc8SgAMnGkM6RZw1rzciSO+mcb260Q3k6NlvE1lBrGR28bhnp
+         qYpidp8EX2SMritkkYsSJxzs70d6iTDwPUfq5hS2NK8/kVNRvDYZof9PuVursfQkdMLz
+         3wSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9kzVkbktxBcgzWYj7gd0fBdKmrfQQzB+l6UjQELV8aRktqck5nQUf/yhmYLSwqiJC23Tnh5THfqyK6HusnatilRQYFOV38CVqqIo=
+X-Gm-Message-State: AOJu0Yzc9HTt0Vdqo5v3dmDKk6qgC8EFAV0YZMolKT3rxMxBWgfOf0Tr
+	24DHITky19ql09f49DYT2/RYynbustjMDdbtjv3dfZPKFwOXwB2wKq4D4cBd1cq+5mwedKCIhFz
+	xklcnosaxQ+L8wcHnj0TjVlTdDRfbGdhQzwwnFg==
+X-Google-Smtp-Source: AGHT+IEUUzi1hfxh9ntCtG/z4OgyGT9Fe7tMvLDI9rF6mfrANf/qH3M8lWtHLqsSgZQqcOGVrm6SPWleT8TqNoOZDIE=
+X-Received: by 2002:a05:6122:4789:b0:4f6:b320:d3ee with SMTP id
+ 71dfb90a1353d-4fc6f5fa004mr4276827e0c.2.1724053781953; Mon, 19 Aug 2024
+ 00:49:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240811101921.4031-1-songmuchun@bytedance.com>
- <20240811101921.4031-3-songmuchun@bytedance.com> <ZsKtllxojkTe3mpY@fedora>
-In-Reply-To: <ZsKtllxojkTe3mpY@fedora>
-From: Muchun Song <songmuchun@bytedance.com>
-Date: Mon, 19 Aug 2024 11:49:32 +0800
-Message-ID: <CAMZfGtWxE9z4GgmpEBXzwsy_HAyOOZ85+2HUyqE-9+n1f2aPJA@mail.gmail.com>
-Subject: Re: [PATCH 2/4] block: fix ordering between checking BLK_MQ_S_STOPPED
- and adding requests to hctx->dispatch
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, "open list:BLOCK LAYER" <linux-block@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, muchun.song@linux.dev
+References: <CA+G9fYuD4-qKAX9nDS-3cy+HwGbyJ6WoD7bZ_QL0J__A++P9aA@mail.gmail.com>
+ <CA+G9fYuYfNA7NZDHpq2K24CsUn21LAb8vn38=JTz=54bsdSd9g@mail.gmail.com>
+In-Reply-To: <CA+G9fYuYfNA7NZDHpq2K24CsUn21LAb8vn38=JTz=54bsdSd9g@mail.gmail.com>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Mon, 19 Aug 2024 13:19:30 +0530
+Message-ID: <CA+G9fYvRA=K=S7Vv0-gfypG2vFGYQqgvWVaPx6uGDjwZq3N_kg@mail.gmail.com>
+Subject: Re: next: x86_64: ahci 0000:00:1f.2: probe with driver ahci failed
+ with error -12
+To: open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Linux Regressions <regressions@lists.linux.dev>, linux-block <linux-block@vger.kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
+	Alexey Dobriyan <adobriyan@gmail.com>, Christoph Hellwig <hch@lst.de>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Anders Roxell <anders.roxell@linaro.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 19, 2024 at 10:28=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
-te:
+On Wed, 14 Aug 2024 at 15:56, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
 >
-> Hi Muchun,
->
-> On Sun, Aug 11, 2024 at 06:19:19PM +0800, Muchun Song wrote:
-> > Supposing the following scenario with a virtio_blk driver.
+> On Wed, 14 Aug 2024 at 15:15, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
 > >
-> > CPU0                                                                CPU=
-1
+> > The qemu-x86_64 boot failed with today's Linux next-20240814 tag due to
+> > following crash.
 > >
-> > blk_mq_try_issue_directly()
-> >     __blk_mq_issue_directly()
-> >         q->mq_ops->queue_rq()
-> >             virtio_queue_rq()
-> >                 blk_mq_stop_hw_queue()
-> >                                                                     vir=
-tblk_done()
-> >     blk_mq_request_bypass_insert()                                     =
- blk_mq_start_stopped_hw_queues()
-> >         /* Add IO request to dispatch list */   1) store               =
-     blk_mq_start_stopped_hw_queue()
-> >                                                                        =
-         clear_bit(BLK_MQ_S_STOPPED)                 3) store
-> >     blk_mq_run_hw_queue()                                              =
-         blk_mq_run_hw_queue()
-> >         if (!blk_mq_hctx_has_pending())                                =
-             if (!blk_mq_hctx_has_pending())         4) load
-> >             return                                                     =
-                 return
-> >         blk_mq_sched_dispatch_requests()                               =
-             blk_mq_sched_dispatch_requests()
-> >             if (blk_mq_hctx_stopped())          2) load                =
-                 if (blk_mq_hctx_stopped())
-> >                 return                                                 =
-                     return
-> >             __blk_mq_sched_dispatch_requests()                         =
-                 __blk_mq_sched_dispatch_requests()
+> > The catch here is the crash seen on both x86_64 device and qemu-x86_64
+> > but x86_64 device is able to boot successfully.
 > >
-> > The full memory barrier should be inserted between 1) and 2), as well a=
-s between
-> > 3) and 4) to make sure that either CPU0 sees BLK_MQ_S_STOPPED is cleare=
-d or CPU1
-> > sees dispatch list or setting of bitmap of software queue. Otherwise, e=
-ither CPU
-> > will not re-run the hardware queue causing starvation.
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> >
+> > Boot log:
+> > ---
+> > [    0.000000] Linux version 6.11.0-rc3-next-20240814
+> > (tuxmake@tuxmake) (x86_64-linux-gnu-gcc (Debian 13.3.0-1) 13.3.0, GNU
+> > ld (GNU Binutils for Debian) 2.42.50.20240625) #1 SMP PREEMPT_DYNAMIC
+> > @1723614704
+> > ...
+> > <6>[    2.479915] scsi host0: ahci
+> > <4>[    2.484371] sysfs: cannot create duplicate filename
+> > '/devices/virtual/workqueue/scsi_tmf_-1073661392'
 >
-> Yeah, it is one kind of race which is triggered when adding request into
-> ->dispatch list after returning STS_RESOURCE. We were troubled by lots of
-> such kind of race.
-
-Yes. I saw the similar fix for BLK_MQ_S_SCHED_RESTART.
-
+> Anders bisected to the following first commit and reverted this commit
+> and qemu-x86_64 boot successful now.
 >
-> stopping queue is used in very less drivers, and its only purpose should
-> be for throttling hw queue in case that low level queue is busy. There se=
-ems
-> more uses of blk_mq_stop_hw_queues(), but most of them should be replaced
-> with blk_mq_quiesce_queue().
->
-> IMO, fixing this kind of issue via memory barrier is too tricky to
-> maintain cause WRITE/READ dependency is very hard to follow. I'd suggest =
-to
-> make memory barrier solution as the last resort, and we can try to figure
-> out other easier & more reliable way first.
+> # first bad commit: [b188c57af2b5c17a1e8f71a0358f330446a4f788]
+>       workqueue: Split alloc_workqueue into internal function and lockdep init
 
-I do agree it is hard to maintain the dependencies in the future. We should
-propose an easy-maintainable solution. But I thought it is a long-term issu=
-e
-throughout different stable linux distros. Adding a mb is the easy way to f=
-ix
-the problem (the code footprint is really small), so it will be very
-easy for others
-to backport those bug fixes to different stable linux distros. Therefore, m=
-b
-should be an interim solution. Then, we could improve it based on the solut=
-ion
-you've proposed below. What do you think?
-
-Thanks,
-Muchun.
+This reported problem is still seen on today's Linux next-20240819 tag.
 
 >
-> One idea I thought of is to call blk_mq_request_bypass_insert()(or rename
-> & export it) before calling blk_mq_stop_hw_queue() in driver, then
-> return new status code STS_STOP_DISPATCH for notifying blk-mq to stop
-> dispatch simply.
+> original report link:
+> https://lore.kernel.org/all/CA+G9fYuD4-qKAX9nDS-3cy+HwGbyJ6WoD7bZ_QL0J__A++P9aA@mail.gmail.com/
 >
+> > <4>[    2.486170] CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted
+> > 6.11.0-rc3-next-20240814 #1
+> > <4>[    2.486709] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
+> > BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+> > <4>[    2.486709] Call Trace:
+> > <4>[    2.486709]  <TASK>
+> > <4>[    2.486709]  dump_stack_lvl+0x96/0xb0
+> > <4>[    2.486709]  dump_stack+0x14/0x20
+> > <4>[    2.486709]  sysfs_warn_dup+0x5f/0x80
+> > <4>[    2.486709]  sysfs_create_dir_ns+0xd0/0xf0
+> > <4>[    2.486709]  kobject_add_internal+0xa8/0x2e0
+> > <4>[    2.486709]  kobject_add+0x97/0x100
+> > <4>[    2.486709]  ? get_device_parent+0x109/0x1d0
+> > <4>[    2.486709]  device_add+0xe4/0x880
+> > <4>[    2.486709]  ? hrtimer_init+0x2b/0x80
+> > <4>[    2.486709]  device_register+0x1e/0x30
+> > <4>[    2.486709]  workqueue_sysfs_register+0x91/0x140
+> > <4>[    2.486709]  __alloc_workqueue+0x664/0x800
+> > <4>[    2.486709]  ? trace_preempt_on+0x1e/0x70
+> > <4>[    2.486709]  ? __kthread_create_on_node+0x108/0x170
+> > <4>[    2.486709]  alloc_workqueue+0x5a/0x80
+> > <4>[    2.486709]  ? __kthread_create_on_node+0x108/0x170
+> > <4>[    2.486709]  scsi_host_alloc+0x365/0x470
+> > <4>[    2.486709]  ata_scsi_add_hosts+0xc2/0x130
+> > <4>[    2.486709]  ata_host_register+0xb5/0x260
+> > <4>[    2.486709]  ata_host_activate+0xe9/0x140
+> > <4>[    2.486709]  ahci_host_activate+0x16a/0x190
+> > <4>[    2.486709]  ahci_init_one+0xe0f/0x1080
+> > <4>[    2.486709]  ? trace_preempt_on+0x1e/0x70
+> > <4>[    2.486709]  local_pci_probe+0x48/0xa0
+> > <4>[    2.486709]  pci_device_probe+0xc6/0x1f0
+> > <4>[    2.486709]  really_probe+0xcc/0x3b0
+> > <4>[    2.486709]  __driver_probe_device+0x7d/0x160
+> > <4>[    2.486709]  driver_probe_device+0x24/0xa0
+> > <4>[    2.486709]  __driver_attach+0xdd/0x1d0
+> > <4>[    2.486709]  ? __pfx___driver_attach+0x10/0x10
+> > <4>[    2.486709]  bus_for_each_dev+0x91/0xe0
+> > <4>[    2.486709]  driver_attach+0x22/0x30
+> > <4>[    2.486709]  bus_add_driver+0x118/0x240
+> > <4>[    2.486709]  driver_register+0x62/0x120
+> > <4>[    2.486709]  ? __pfx_ahci_pci_driver_init+0x10/0x10
+> > <4>[    2.486709]  __pci_register_driver+0x62/0x70
+> > <4>[    2.486709]  ahci_pci_driver_init+0x22/0x30
+> > <4>[    2.486709]  do_one_initcall+0x62/0x250
+> > <4>[    2.486709]  kernel_init_freeable+0x1ba/0x310
+> > <4>[    2.486709]  ? __pfx_kernel_init+0x10/0x10
+> > <4>[    2.486709]  kernel_init+0x1e/0x1d0
+> > <4>[    2.486709]  ret_from_fork+0x41/0x60
+> > <4>[    2.486709]  ? __pfx_kernel_init+0x10/0x10
+> > <4>[    2.486709]  ret_from_fork_asm+0x1a/0x30
+> > <4>[    2.486709]  </TASK>
+> > <3>[    2.508109] kobject: kobject_add_internal failed for
+> > scsi_tmf_-1073661392 with -EEXIST, don't try to register things with
+> > the same name in the same directory.
+> > <4>[    2.519098] scsi host1: failed to create tmf workq
+> > <6>[    2.524520] kworker/R-scsi_ (56) used greatest stack depth:
+> > 15464 bytes left
+> > <6>[    2.528402] scsi_eh_1 (55) used greatest stack depth: 14872 bytes left
+> > <3>[    2.540312] ahci 0000:00:1f.2: probe with driver ahci failed
+> > with error -12
+> >
+> > Full dmesg log:
+> > -----------
+> >   - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240814/testrun/24850492/suite/boot/test/gcc-13-lkftconfig-rcutorture/log
+> >
+> > Reproduce script:
+> > ---
+> >  - https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/2kdXPeyCZIUn4AYH0UrByWXzepD/reproducer
+> >  - Qemu version: 8.2.4
+> >
+> > Boot command: /usr/bin/qemu-system-x86_64 -cpu Nehalem -machine q35
+> > -nographic -nic none -m 4G -monitor none -no-reboot -smp 2 -kernel
+> > kernel/bzImage -append \"console=ttyS0,115200 rootwait root=/dev/sda
+> > debug verbose console_msg_format=syslog systemd.log_level=warning rw
+> > earlycon\" -drive file=rootfs.ext4,if=ide,format=raw"
+> >
+> > Build link:
+> > ------
+> >  - https://storage.tuxsuite.com/public/linaro/lkft/builds/2kdXMb8C1EcMoXxMdKTWd4TB8Ef/
+> >  - https://storage.tuxsuite.com/public/linaro/lkft/builds/2kdXMb8C1EcMoXxMdKTWd4TB8Ef/config
+> >
+> > metadata:
+> > ---
+> >   git_ref: master
+> >   git_describe: next-20240814
+> >   git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+> >   kernel_version: 6.11.0-rc3
+> >   arch: x86
+> >   device: qemu-x86_64
+> >
+> > Please let me know if you need more information.
+
+Latest crash log link,
+ -  https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240819/testrun/24919484/suite/boot/test/gcc-13-lkftconfig-no-kselftest-frag/log
+
+> > --
+> > Linaro LKFT
+> > https://lkft.linaro.org
 >
-> thanks,
-> Ming
->
+
+- Naresh
