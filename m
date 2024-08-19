@@ -1,92 +1,94 @@
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274B73C482;
-	Mon, 19 Aug 2024 22:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8B61DF696;
+	Mon, 19 Aug 2024 23:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724108266; cv=none; b=NS0pd0RLzAXwLoNPMwnN4tkFwALv+RTltyjKe0XsEBJdBja73KFmA2wGyzfxr0ESYt0HQQHDfZbJE+t0I1tOgwx35XnXqoc4+8f6dnVAF4GCXK0bmjVYMOfo23ckHaeSSQWEJQza4pUIwau4857QRggZAcVisTYsFLfWn4zXD7k=
+	t=1724108850; cv=none; b=j9Lp1TDy3FxgKuzhqdZVVG9mbfMHw1ir+mrttaTxKNhwqBck6FWUXdPtppvRrxLRPT2fTDN9vqteXsTsaos1eQ41PbnbO3Ughmo0si8NrNqrIwOfvXtSiu9lOotwhhYQRv1cpyAAkTwffMfWT/qezavwhYJZuBg3f0BYvxu1nmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724108266; c=relaxed/simple;
-	bh=3RYkj11lora+jk88iuLfmUrVXzlcGtIcbelB817NQv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rZYyxBJgEjVnLQ0qO/GR88tECafHV+hSMZvRcn8tfYoZ0m+q8kB/PaY9SOjGCuD/46wcm1pOTbUHNjswvWRm1rAZ2svwLjeqnUsmtNHcEaNFLU3PtCzoSwdFDz1ExKFlRR/B3tBA6txkTv7PL8qCLjjjMeQcHC7MNYM26T+2rS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=ot1hZGON; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1724108850; c=relaxed/simple;
+	bh=mJXaRxbMWM39dMzH9l5kYZ7g7ouNmwcruKXMK8gNkX8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CkPcn6iqTIizIvy/OjjDykZ849cq43lQJta2dtDOVgX4bGTI1mT3vy+UmmqANWwipwKKvOsDn9/Q2nBo3vHRc9hNZ5nKQUN+1BW7cKxiIqbgD3/9MlzO4LS7NjevATYRjjikLB775eDSFoBYgBVmCp//qFWqebBS1+2OemXgEOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gXYPoQAR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ot1hZGON"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=iGfyJmX1Qzz8nM0pIFZUr1CNLjNyXjnaY0/FtRYCuzY=; b=ot1hZGONVPSZvQBPNekSSZ6h1b
-	L1c1lvSHOZlXHoDhld0CaHi/GNxXUK7CHiKtcNEW1TFDHUrJbaGy4irle5OEGCQDHrXTSO+CK5gN2
-	a0xMyaH38iD/d2kKA+X7iO3HrCKfV8hhHC7/inMqtTvEcYt6H/zyMHaFNY5XUNWmtRquWVnK4ZYhp
-	KicX6G55EOvHCSEM9Rez9da2LN3jlllyp9JJpKuMbC9XewXOmSk8l0/5l6hVEZPK9xf76EY14sKCZ
-	wEacaWqalp/l59k5PlBpj3YnNzWtZJL+3bTlU6gxbV0Vuy79SD4k9JWnBkZ/RN7051LIAsW2d4SRj
-	+1NGjhlA==;
-Received: from [177.76.152.96] (helo=localhost)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1sgBJb-002OXu-UJ; Tue, 20 Aug 2024 00:57:31 +0200
-From: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
-To: linux-doc@vger.kernel.org
-Cc: corbet@lwn.net,
-	jack@suse.cz,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	kernel-dev@igalia.com,
-	kernel@gpiccoli.net,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>
-Subject: [PATCH] Documentation: Document the kernel flag bdev_allow_write_mounted
-Date: Mon, 19 Aug 2024 19:56:27 -0300
-Message-ID: <20240819225626.2000752-2-gpiccoli@igalia.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gXYPoQAR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 998EFC32782;
+	Mon, 19 Aug 2024 23:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724108849;
+	bh=mJXaRxbMWM39dMzH9l5kYZ7g7ouNmwcruKXMK8gNkX8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gXYPoQARvA+Pn4TQep5aX8uvhPU06HBEZC8s7nU3NeDTwzfpLC4/XPM6bcOXpcSMR
+	 j+IioWHWPS2jmBGAlBK1B9w6GJyxDfWblqCclt4caiicnCA4GBGM38I8o3Wblu0AP3
+	 dyxIzG3yJQASecBEF/gSzYD/687723usA4TQIOs+wgv5E29VuZVe0NMUe/oBuVzBWH
+	 xrzpEWN4Fm1cKpkkXgUIF9REemYttOrPNk7l+ICyrUhzfayvlwbNxHb00+Ex6nyLrn
+	 Ie4odNMEAbURIqwPUcl7Yv6kPnkV6S6rKmEzfrv1Zk+soK0dsfO56hb9jEPD/y50K/
+	 K5TiLUSIvFf4A==
+Message-ID: <0a51e728-8005-404f-b2f2-16fc31834d2f@kernel.org>
+Date: Tue, 20 Aug 2024 08:07:23 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] PCI: Make pcim_release_region() a public function
+To: Philipp Stanner <pstanner@redhat.com>, onathan Corbet <corbet@lwn.net>,
+ Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
+ Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+ Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Alvaro Karsz <alvaro.karsz@solid-run.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Mark Brown <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20240819165148.58201-2-pstanner@redhat.com>
+ <20240819165148.58201-3-pstanner@redhat.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20240819165148.58201-3-pstanner@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
-devices") added a Kconfig option along with a kernel command-line tuning to
-control writes to mounted block devices, as a means to deal with fuzzers like
-Syzkaller, that provokes kernel crashes by directly writing on block devices
-bypassing the filesystem (so the FS has no awareness and cannot cope with that).
+On 8/20/24 01:51, Philipp Stanner wrote:
+> pcim_release_region() is the managed counterpart of
+> pci_release_region(). It can be useful in some cases where drivers want
+> to manually release a requested region before the driver's remove()
+> callback is invoked.
+> 
+> Make pcim_release_region() a public function.
+> 
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-The patch just missed adding such kernel command-line option to the kernel
-documentation, so let's fix that.
+Looks fine to me. But I think this should be squashed with patch 2 (I do not see
+the point of having 2 patches to export 2 functions that are complementary).
+Either way:
 
-Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
----
- Documentation/admin-guide/kernel-parameters.txt | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 09126bb8cc9f..709d1ee342db 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -517,6 +517,16 @@
- 			Format: <io>,<irq>,<mode>
- 			See header of drivers/net/hamradio/baycom_ser_hdx.c.
- 
-+	bdev_allow_write_mounted=
-+			Format: <bool>
-+			Control the ability of directly writing to mounted block
-+			devices' page cache, i.e., allow / disallow writes that
-+			bypasses the FS. This was implemented as a means to
-+			prevent fuzzers to crash the kernel by breaking the
-+			filesystem without its awareness, through direct block
-+			device writes. Default is Y and can be changed through
-+			the Kconfig option CONFIG_BLK_DEV_WRITE_MOUNTED.
-+
- 	bert_disable	[ACPI]
- 			Disable BERT OS support on buggy BIOSes.
- 
 -- 
-2.45.2
+Damien Le Moal
+Western Digital Research
 
