@@ -1,166 +1,140 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBE618CC17
-	for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 10:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E0E7581F;
+	Tue, 20 Aug 2024 10:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724149286; cv=none; b=GqyD9lPuhfoqk0N1Lj6oWnZl2uTE2zJbU6HbhFq7spL2R1Zl3E7zZSXwLG0sJ6WD+VKvpBUZnd7s1W6vdPEbDTXf7YTJ+FaT9MA2Xa3+WZLmUBWWI5VCqmgjI4cCqouumumavmxZkPqU0ofMgKmn8rimy0gopXqG3LRtgWTy4LE=
+	t=1724149713; cv=none; b=qUwxUOO6YqmqE4zfVmiVrIfwl7sFLX5i4h/w+gWUuu8TuIo913vCVN+ArjS8LahKLkMYzsjNLKXoPC36n09FRUI1iGjLWISq4L+szMad3Zpy1n7XAy4ZGeTDZUWPTneHNzLsocPW5p4Li4336Zd/xY/Vf3SKjlnG1ziO7150m4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724149286; c=relaxed/simple;
-	bh=4o+DhSlo/OhU/pk4QGtJc7Pdkc2s297MR/AIhOIm2/8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D2aLyKuYpFFTAtFTTPRSQbnqvA6FO0JJpkeezyLgxtSkrOzsgPRpUKSyo2VFsE1r4CJgcG30pQ1wzdBfhpoPW0JxmyfbJiY6PEOTTREytUUlKKBULbPR9q29bqZ3pJrthHG3XgCkGw/836YaMloKTD/cZmQtAcRhTbOwzgqnpzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=jCZZs8Eg; arc=none smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jCZZs8Eg"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1724149283; x=1755685283;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4o+DhSlo/OhU/pk4QGtJc7Pdkc2s297MR/AIhOIm2/8=;
-  b=jCZZs8EgAv/ufrWu9AqQJxMyNt1+KPjuIYbDpSiwmdMxFshVQjOMvdXy
-   ugMgbXL2SBIXWSyEKm7AzGAOxJH8zLa/B/hX7X9VZPB/zUBOt8M2UnGxP
-   1QxGxAMoFsmK/QN5zNSISA6EBu8F1T5KUpFJOVyEPk82Jxh5RlZIzlwpQ
-   /TzJSt9mNZsBRLjdGk4hAo+AuP6jzSFOnuPEsEYZ7Sw9rnTv7GhULAke4
-   Ky5W/cY2cq/rMCbQLz82sHu2jDuPg0o61NMLJXlC7LJBWomPcq/1fK78P
-   qP/s2RHlcesR+/UMChtjgfaDm9TwvMs3jO3KD6z23SmP3oqE0vaPD8141
-   Q==;
-X-CSE-ConnectionGUID: PexZCQ+bQsiar0i7abjpNg==
-X-CSE-MsgGUID: x4s3opCtQEy7Vm+v7aqDjQ==
-X-IronPort-AV: E=Sophos;i="6.10,161,1719849600"; 
-   d="scan'208";a="25463055"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Aug 2024 18:20:14 +0800
-IronPort-SDR: 66c46128_IhCx+2lzXeT+53fZuO7Od+VDqLbSnF189yi/hgzMAQtsJY1
- uSH5HuAT6WB1u2JFQer5OxVrLPDIO2bwL0+JqEQ==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Aug 2024 02:26:01 -0700
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 20 Aug 2024 03:20:14 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] nvme/052: wait for namespace removal before recreating namespace
-Date: Tue, 20 Aug 2024 19:20:13 +0900
-Message-ID: <20240820102013.781794-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1724149713; c=relaxed/simple;
+	bh=O5k60SiozUItOe57/Mfcp/M4CbNdahVcbyT/Wm67rEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d9gDwZHGHVtGUPm/N0fKMwl7hnU+j24r5Gw4YaXnMV6KU/gEQ5xfC+caWQCH3xvJj9U2fDQffnw8iMofV4CbiAUuUoo4rN0eSGG/e2XRBb8tBs7rpBrY4U4l8oDVc9qD25/CzP4iE+eRZNAYIZ7g9Wo2+115J7VmMIDoA9fPmGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: SJHUM3mGQFGy0SMvf5/nCg==
+X-CSE-MsgGUID: kT+KZVUQR0W9gpqzwdmEBw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="26306108"
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="26306108"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:28:31 -0700
+X-CSE-ConnectionGUID: i2TeOzYIRg25kacmae/h/Q==
+X-CSE-MsgGUID: FG1tjdHOT4uS3xW62Fnj5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="60664479"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:28:23 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1sgM65-0000000HGOZ-3tRE;
+	Tue, 20 Aug 2024 13:28:17 +0300
+Date: Tue, 20 Aug 2024 13:28:17 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 4/9] block: mtip32xx: Replace deprecated PCI functions
+Message-ID: <ZsRvwVCzpLEQovmU@smile.fi.intel.com>
+References: <20240819165148.58201-2-pstanner@redhat.com>
+ <20240819165148.58201-6-pstanner@redhat.com>
+ <ZsOJONEA2x93bSpO@smile.fi.intel.com>
+ <e406ba06180571564b47872f090623b19e4ad87e.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <e406ba06180571564b47872f090623b19e4ad87e.camel@redhat.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-The CKI project reported that the test case nvme/052 fails occasionally
-with the errors below:
+On Tue, Aug 20, 2024 at 09:29:52AM +0200, Philipp Stanner wrote:
+> On Mon, 2024-08-19 at 21:04 +0300, Andy Shevchenko wrote:
+> > On Mon, Aug 19, 2024 at 06:51:44PM +0200, Philipp Stanner wrote:
 
-  nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [failed]
-      runtime    ...  22.209s
-      --- tests/nvme/052.out    2024-07-30 18:38:29.041716566 -0400
-      +++
-+/mnt/tests/gitlab.com/redhat/centos-stream/tests/kernel/kernel-tests/-/archive/production/kernel-t\
-ests-production.zip/storage/blktests/nvme/nvme-loop/blktests
-+/results/nodev_tr_loop/nvme/052.out.bad        2024-07-30 18:45:35.438067452 -0400
-      @@ -1,2 +1,4 @@
-       Running nvme/052
-      +cat: /sys/block/nvme1n2/uuid: No such file or directory
-      +cat: /sys/block/nvme1n2/uuid: No such file or directory
-       Test complete
+...
 
-The test case repeats creating and removing namespaces. When the test
-case removes the namespace by echoing 0 to the sysfs enable file, this
-echo write does not wait for the completion of the namespace removal.
-Before the removal completes, the test case recreates the namespace.
-At this point, the sysfs uuid file for the old namespace still exists.
-The test case misunderstands that the the sysfs uuid file would be for
-the recreated namespace, and tries to read it. However, the removal
-process for the old namespace deletes the sysfs uuid file at this point.
-Then the read attempt fails and results in the errors.
+> > int mtip_pci_probe()
+> > 
+> > >  setmask_err:
+> > > -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+> > > +	pcim_release_region(pdev, MTIP_ABAR);
+> > 
+> > But why?
+> 
+> EMOREINFOREQUIRED
+> Why I replace it or why I don't remove it completely?
 
-To avoid the failure, wait for the namespace removal before recreating
-the namespace. For this purpose, add the new helper function
-nvmf_wait_for_ns_removal(). To specify the namespace to wait for, get
-the name of the namespace from nvmf_wait_for_ns(), and pass it to
-nvmf_wait_for_ns_removal().
+The latter one: Why did you leave it and not remove?
 
-The test case intends to catch the regression fixed by the kernel commit
-ff0ffe5b7c3c ("nvme: fix namespace removal list"). I reverted the commit
-from the kernel v6.11-rc4, then confirmed that the test case still can
-catch the regression with this change.
+...
 
-Link: https://lore.kernel.org/linux-block/tczctp5tkr34o3k3f4dlyhuutgp2ycex6gdbjuqx4trn6ewm2i@qbkza3yr5wdd/
-Fixes: 077211a0e9ff ("nvme: add test for creating/deleting file-ns")
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
-Nelay, Yi, thank you for the feedbacks for the discussion
-thread at the Link. Here's the formal fix patch.
+> > mtip_pci_remove()
+> > 
+> > >  	pci_disable_msi(pdev);
+> > >  
+> > > -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+> > 
+> > This is okay.
+> 
+> Removing it is okay, you mean.
 
- tests/nvme/052 | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+Yes!
 
-diff --git a/tests/nvme/052 b/tests/nvme/052
-index cf6061a..e1ac823 100755
---- a/tests/nvme/052
-+++ b/tests/nvme/052
-@@ -39,15 +39,32 @@ nvmf_wait_for_ns() {
- 		ns=$(_find_nvme_ns "${uuid}")
- 	done
- 
-+	echo "$ns"
- 	return 0
- }
- 
-+nvmf_wait_for_ns_removal() {
-+	local ns=$1 i
-+
-+	for ((i = 0; i < 10; i++)); do
-+		if [[ ! -e /dev/$ns ]]; then
-+			return
-+		fi
-+		sleep .1
-+		echo "wait removal of $ns" >> "$FULL"
-+	done
-+
-+	if [[ -e /dev/$ns ]]; then
-+		echo "Failed to remove the namespace $ns"
-+	fi
-+}
-+
- test() {
- 	echo "Running ${TEST_NAME}"
- 
- 	_setup_nvmet
- 
--	local iterations=20
-+	local iterations=20 ns
- 
- 	_nvmet_target_setup
- 
-@@ -63,7 +80,7 @@ test() {
- 		_create_nvmet_ns "${def_subsysnqn}" "${i}" "$(_nvme_def_file_path).$i" "${uuid}"
- 
- 		# wait until async request is processed and ns is created
--		nvmf_wait_for_ns "${uuid}"
-+		ns=$(nvmf_wait_for_ns "${uuid}")
- 		if [ $? -eq 1 ]; then
- 			echo "FAIL"
- 			rm "$(_nvme_def_file_path).$i"
-@@ -71,6 +88,7 @@ test() {
- 		fi
- 
- 		_remove_nvmet_ns "${def_subsysnqn}" "${i}"
-+		nvmf_wait_for_ns_removal "$ns"
- 		rm "$(_nvme_def_file_path).$i"
- 	}
- 	done
+...
+
+> > >  	pci_set_drvdata(pdev, NULL);
+> > 
+> > Side note: This is done by driver core for the last 10+ years…
+> 
+> Ah you know Andy, kernel programmers be like: "When you're hunting you
+> better make sure the wild sow is really dead before you load it in your
+> trunk" ;p
+
+Indeed, I had been told many times myself to improve / cleanup things unrelated
+to the working area before actually considering my little work...
+
+But, I specifically mark it as a "Side note:", so it's up to you to address
+or not.
+
 -- 
-2.45.2
+With Best Regards,
+Andy Shevchenko
+
 
