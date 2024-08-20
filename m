@@ -1,165 +1,180 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E01A18E37F;
-	Tue, 20 Aug 2024 07:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6715188CA4
+	for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 07:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724138117; cv=none; b=rgiwiwcmz9iU6i0lWMpcacXoBQrp8j0PHqOjLHiqRTs0YqhpKHKFHqTdZEMSVFscc0D4lv30ZGqKWb7i2ydja01I7A/XFjtCo/V3wkyIWnlmaeloUFOgYSXKPFzgrO9BApf4DhuBNd1BkhXFeNFP+Wr4BWU40YDCIuKFjHRpIKQ=
+	t=1724138530; cv=none; b=rEJh5UVulHrQ7OhI6QgJgN+RqCAC2XQkq5f5/tkcXIPeGiF9HI8P2/yesGSXSXHGwfJL/ip5OZzRvJedstiUXbD8KFnOUffJ1aMHTbj/Cu9E8rILzKVTt2h8AdZd4cdiyFll1xKs7PV+YxQkoj/ym3WmniMJcgUuiBQmxWr1UtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724138117; c=relaxed/simple;
-	bh=L3pdmJ91dhND924Hc7k0yeVx7Sdn7wFJLytIERkF50w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IQMinqdXIxuaTloX/U9L5E6MBP1MM4eo06vDbIuO0Zdk8O5TXJMwSqUSYCMC7laoGBBVYo21Bi2hq8KRP6pr36arXNSF+aVvsBEbMWkw0lvY9I45gjEBro8GDsXuT6qWmjCDSvLTHqzH18LwXTzkMaBpHBUz7iINnootBD/blNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Wp11x5XTsz4f3jYx;
-	Tue, 20 Aug 2024 15:15:01 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 5EDF81A018D;
-	Tue, 20 Aug 2024 15:15:11 +0800 (CST)
-Received: from [10.174.179.155] (unknown [10.174.179.155])
-	by APP4 (Coremail) with SMTP id gCh0CgB3n4V+QsRmnCnNCA--.30389S3;
-	Tue, 20 Aug 2024 15:15:11 +0800 (CST)
-Message-ID: <9852111b-cbb2-bb39-652c-5e56f28bd991@huaweicloud.com>
-Date: Tue, 20 Aug 2024 15:15:10 +0800
+	s=arc-20240116; t=1724138530; c=relaxed/simple;
+	bh=CwAJcF6bJ+g48Ud2pzdceQkOvdF0s36dJmUP+WwsYDg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=K8xtk5LhhARy/t9aotzHOWhpzwSu7omO57uOK4IYUhByd7qmK9sxbmEys1E0oreQnBczlaAKIrircheEFV+4SXdaZMtD1+3xhoDbiF1Upd4hFl2PX4lTEgfBlXPhdMIeld6PYVXIKr02VLBDvbL5Fr+6Ix2Ryh9bU7nTswkEVn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WmoTNaD6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WmoTNaD6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724138526;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ASIEWrzHXogS2+yni6jFmR1o/WYm2ANcxSxU4DhoyQc=;
+	b=WmoTNaD6nf8DilMTLUEdSPmpZwcIuK/QYbOK/Qi6VNhhmcyfmfNc2e3JJL19iXO4hvyMWP
+	NcGks+osBWcHSw5Mfy435lvB7fUPatbdGJcoaPSb76e9YiETpq/qQX/OQXq+eHcDegBbSQ
+	ab0Iy0aPHGncelIAY+ng7LtHxBJVLC8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-213-Bj-svBJdMEeOQg0SL5kN2A-1; Tue, 20 Aug 2024 03:22:04 -0400
+X-MC-Unique: Bj-svBJdMEeOQg0SL5kN2A-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42808f5d32aso9509575e9.2
+        for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 00:22:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724138523; x=1724743323;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ASIEWrzHXogS2+yni6jFmR1o/WYm2ANcxSxU4DhoyQc=;
+        b=aWjHk7difnOBOIYWFZpKy6oPmveSvreAbhrn23aPMcqZCqGV+S211l5T//sBdrVh6M
+         kY9trdBcCFg3LY8exmS/9bIGuQhASCBc/sz5ASZGADxeiwykclgGrbw2tLjpG46DU5Rg
+         fTEOwPg3ESdUC9o0i1F/qaL0LQSbvuZfcbiU9s01hNTiI5Zl8B5Ty+me3ggwREc2isoD
+         dL7DJYuk7haTRUDVq7zKxr9M33/QA2QFAmv6lIU8/pucxkufGB/sxLInWPxTKr3juE4+
+         8yekS6/z9Va8wMTwTXDMAXjIT2onB8FxYNHzLprghkcEXQ+HW9yiU0BgXS+zrqO7tIcu
+         YnIA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1hscyAyPBspbkZo2YmcxSEyrbY/Ski45V20m42ZQpZmk+0af3JdKGP6zucegXyISgw+MUefLpES87+KoqfZvkoHIg7k3dLdhHGvQ=
+X-Gm-Message-State: AOJu0YwrAXY3OeGfK9MKaCyu/K/WOcrPOkA+wOY6Tcz3gKKqhDC8fzrb
+	eOIYOw+P7FnujuPMZ9FpoAB6p2HTQytQEN26YtwMYhyHYgJNLvcb1e7dz0WWGYD4LxkX2ofLt7O
+	F5dbzbyQJ7cELyP8RiwWJtC13e8hRdB1TBFDqiNdPh8BBEM27PfFyw+0MmAsR
+X-Received: by 2002:a05:600c:1ca9:b0:425:65b1:abb4 with SMTP id 5b1f17b1804b1-429ed62f54cmr55367855e9.0.1724138522940;
+        Tue, 20 Aug 2024 00:22:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGtu6sXluOG26PWy70qwsbDcaM81TTK+UTUTvyjs1U84scjqTgJELEGk3SrTeSIfdGLnjJpqA==
+X-Received: by 2002:a05:600c:1ca9:b0:425:65b1:abb4 with SMTP id 5b1f17b1804b1-429ed62f54cmr55367605e9.0.1724138522431;
+        Tue, 20 Aug 2024 00:22:02 -0700 (PDT)
+Received: from eisenberg.fritz.box ([2001:16b8:3dcc:1f00:bec1:681e:45eb:77e2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429eeadfafbsm130634445e9.47.2024.08.20.00.22.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 00:22:02 -0700 (PDT)
+Message-ID: <267a021781f59d6efe798dbca63f29dd25359f2d.camel@redhat.com>
+Subject: Re: [PATCH 4/9] block: mtip32xx: Replace deprecated PCI functions
+From: Philipp Stanner <pstanner@redhat.com>
+To: onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao
+ <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer
+ <mdf@kernel.org>,  Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko
+ <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
+ Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, Alvaro
+ Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Mark Brown <broonie@kernel.org>, David Lechner
+ <dlechner@baylibre.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+ <u.kleine-koenig@pengutronix.de>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>,  Hannes Reinecke <hare@suse.de>, Damien Le
+ Moal <dlemoal@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>, "Martin K.
+ Petersen" <martin.petersen@oracle.com>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-fpga@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+Date: Tue, 20 Aug 2024 09:22:00 +0200
+In-Reply-To: <20240819165148.58201-6-pstanner@redhat.com>
+References: <20240819165148.58201-2-pstanner@redhat.com>
+	 <20240819165148.58201-6-pstanner@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
-Subject: Re: [PATCH] blk-cgroup: don't clear stat in blkcg_reset_stats()
-To: Yu Kuai <yukuai1@huaweicloud.com>, Tejun Heo <tj@kernel.org>
-Cc: josef@toxicpanda.com, hch@lst.de, axboe@kernel.dk, longman@redhat.com,
- ming.lei@redhat.com, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangerkun@huawei.com, houtao1@huawei.com,
- yi.zhang@huawei.com, lilingfeng3@huawei.com, "yukuai (C)"
- <yukuai3@huawei.com>
-References: <20240627090856.2345018-1-lilingfeng@huaweicloud.com>
- <Zn3HHvcgZruLkMdn@slm.duckdns.org>
- <97e5374a-d083-2602-f632-3de546458ac0@huaweicloud.com>
-From: Li Lingfeng <lilingfeng@huaweicloud.com>
-In-Reply-To: <97e5374a-d083-2602-f632-3de546458ac0@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3n4V+QsRmnCnNCA--.30389S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWw1fZr4DZr1UtrWkCFy5XFb_yoW5urW7pF
-	Z5K3Wak3yktryvkr12gw1IgFyFkws5t345Jry5J3WfGr1UWr90qr4IvrZ09a4UCFWxKr1U
-	Xr4YyrZ5Zw4Yya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-Friendly ping ...
+On Mon, 2024-08-19 at 18:51 +0200, Philipp Stanner wrote:
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
+> the
+> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+>=20
+> In mtip32xx, these functions can easily be replaced by their
+> respective
+> successors, pcim_request_region() and pcim_iomap(). Moreover, the
+> driver's call to pcim_iounmap_regions() is not necessary, because
+> it's
+> invoked in the remove() function. Cleanup can, hence, be performed by
+> PCI devres automatically.
+>=20
+> Replace pcim_iomap_regions() and pcim_iomap_table().
+>=20
+> Remove the call to pcim_iounmap_regions().
+>=20
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> ---
+> =C2=A0drivers/block/mtip32xx/mtip32xx.c | 11 ++++++-----
+> =C2=A01 file changed, 6 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/drivers/block/mtip32xx/mtip32xx.c
+> b/drivers/block/mtip32xx/mtip32xx.c
+> index c6ef0546ffc9..c7da6090954e 100644
+> --- a/drivers/block/mtip32xx/mtip32xx.c
+> +++ b/drivers/block/mtip32xx/mtip32xx.c
+> @@ -2716,7 +2716,9 @@ static int mtip_hw_init(struct driver_data *dd)
+> =C2=A0	int rv;
+> =C2=A0	unsigned long timeout, timetaken;
+> =C2=A0
+> -	dd->mmio =3D pcim_iomap_table(dd->pdev)[MTIP_ABAR];
+> +	dd->mmio =3D pcim_iomap(dd->pdev, MTIP_ABAR, 0);
+> +	if (!dd->mmio)
+> +		return -ENOMEM;
+> =C2=A0
+> =C2=A0	mtip_detect_product(dd);
+> =C2=A0	if (dd->product_type =3D=3D MTIP_PRODUCT_UNKNOWN) {
+> @@ -3726,9 +3728,9 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	/* Map BAR5 to memory. */
+> -	rv =3D pcim_iomap_regions(pdev, 1 << MTIP_ABAR,
+> MTIP_DRV_NAME);
+> +	rv =3D pcim_request_region(pdev, 1, MTIP_DRV_NAME);
 
-Thank.
+That's a bug here, btw.
+Should be MTIP_ABAR instead of 1.
 
-在 2024/6/28 11:14, Yu Kuai 写道:
-> Hi,
->
-> 在 2024/06/28 4:10, Tejun Heo 写道:
->> Hello,
->>
->> On Thu, Jun 27, 2024 at 05:08:56PM +0800, Li Lingfeng wrote:
->>> The list corruption described in commit 6da668063279 ("blk-cgroup: fix
->>> list corruption from resetting io stat") has no effect. It's 
->>> unnecessary
->>> to fix it.
->>
->> I find this paragraph a bit confusing. At the time, it was broken, 
->> right?
->> And if we were to memset() now, it'd break again.
->>
->>> As for cgroup v1, it does not use iostat any more after commit
->>> ad7c3b41e86b("blk-throttle: Fix io statistics for cgroup v1"), so using
->>> memset to clear iostat has no real effect.
->>
->> Ah, okay, this is because we made the stats blk-throtl specific but 
->> didn't
->> implement ->pd_reset_stat_fn(), right?
->
-> I'm afraid not... Implement pd_reset_stat_fn() or not is another
-> problem, this patch should be just code cleanup, not fixing any real
-> problems.
->
->>
->>> As for cgroup v2, it will not call blkcg_reset_stats() to corrupt the
->>> list.
->>>
->>> The list of root cgroup can be used by both cgroup v1 and v2 while
->>> non-root cgroup can't since it must be removed before switch between
->>> cgroup v1 and v2.
->>> So it may has effect if the list of root used by cgroup v2 was 
->>> corrupted
->>> after switching to cgroup v1, and switch back to cgroup v2 to use the
->>> corrupted list again.
->>> However, the root cgroup will not use the list any more after commit
->>> ef45fe470e1e("blk-cgroup: show global disk stats in root cgroup 
->>> io.stat").
->>
->> Hmm... I'm still having a bit of trouble following this line of argument
->> given that all the patch does is dropping stat clearing.
->>
->>> @@ -668,7 +645,6 @@ static int blkcg_reset_stats(struct 
->>> cgroup_subsys_state *css,
->>>        * anyway.  If you get hit by a race, retry.
->>>        */
->>>       hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
->>> -        blkg_clear_stat(blkg);
->>>           for (i = 0; i < BLKCG_MAX_POLS; i++) {
->>>               struct blkcg_policy *pol = blkcg_policy[i];
->>
->> The patch looks fine to me although it'd be nice to follow up with a 
->> patch
->> to implement ->pd_reset_stat_fn() for blk-throtl. I'm not quite 
->> following
->> the list corruption part of argument.
->
-> The code deleted by this patch was claimed to fix a lsit corruption,
-> however, the list corruption does not exist now hence related code can
-> be removed:
->
-> 1) Take a look at blk_cgroup_bio_start, now there are two conditions
-> before this blkg can be added to the per_cpu list:
->
-> blk_cgroup_bio_start
->  if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
->  -> the list will always be empty for cgroup v1
->   return;
->  if (!cgroup_parent(blkcg->css.cgroup))
->  -> the list will always be empty for root blkg
->   return;
->  ...
->  llist_add()
->
-> 2) blkcg_reset_stats can only be called from cgroup v1 api, hence
-> there is nothing to be cleared for blkg_clear_stat();
->
-> 3) Noted that user can switch from cgroup v2 to v1, however, we found
-> that user must delete all the child cg to do that, hence only root blkg
-> can be kept after switching to v1. And root blkg is bypassed from
-> blk_cgroup_bio_start(), hence no problem.
->
-> Thanks,
-> Kuai
->>
->> Thanks.
->>
->
+Will fix in v2.
+
+P.
+
+> =C2=A0	if (rv < 0) {
+> -		dev_err(&pdev->dev, "Unable to map regions\n");
+> +		dev_err(&pdev->dev, "Unable to request regions\n");
+> =C2=A0		goto iomap_err;
+> =C2=A0	}
+> =C2=A0
+> @@ -3849,7 +3851,7 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+> =C2=A0		drop_cpu(dd->work[2].cpu_binding);
+> =C2=A0	}
+> =C2=A0setmask_err:
+> -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+> +	pcim_release_region(pdev, MTIP_ABAR);
+> =C2=A0
+> =C2=A0iomap_err:
+> =C2=A0	kfree(dd);
+> @@ -3925,7 +3927,6 @@ static void mtip_pci_remove(struct pci_dev
+> *pdev)
+> =C2=A0
+> =C2=A0	pci_disable_msi(pdev);
+> =C2=A0
+> -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+> =C2=A0	pci_set_drvdata(pdev, NULL);
+> =C2=A0
+> =C2=A0	put_disk(dd->disk);
 
