@@ -1,105 +1,141 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108231922D3;
-	Tue, 20 Aug 2024 17:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE961101C4;
+	Tue, 20 Aug 2024 17:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724173618; cv=none; b=oeq7sqI47lTm4IvWWD7g+/lZ+hWqpUFf0KDLPfmp/450yEoPcg3pZzwz/qGAWzTig6CDjDQ4uzN2pl/HHASlsP3h/kAjZL1OIXS7HrWRtps+LmAjW7JLO2VWhLSF9cnnqtTof5eQiihlAN3On1EOriViuAoICxCCIkhpAzo+SHA=
+	t=1724174315; cv=none; b=sNyZYGiXGdakos6z/VTC+PaeIA5Yn29WYbyJ7fotr0j33wXXimAFVfsYRL7EvRM21sA1/xW7BL7FDO58D33mGBAdjo1RuTnUaPuQ9wOpN6p+vBh12hUBT1k5tEv7LdBVMkje/AD3F6w3UGy/mADmGvVLpRNh+BcTPUicgUcBkB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724173618; c=relaxed/simple;
-	bh=54shCYsL8YfYX+WHefs2opAhdifYsoSBgiNhfTTnphg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b2yDz0yymf/x49vwMjRg1vqmLWMzXac9KJexp2eGqgPhCZRZUQNNJiPxahzbJZM7k3503A+nixtmWIoRSb62tBnHMXjOBcu1EqXsBfVgoNGXrnQp1UYCJgYPBL0B0SANAprCmAdVy/eXANbyZMxSDLtuTgCURUIDmZER7x9j7+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBxTDU83; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+	s=arc-20240116; t=1724174315; c=relaxed/simple;
+	bh=K7lKBEb5d2DKiZ0ThXJk7j7HC0pMqiZD9ZOgRxPZK/o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=quNeZ2HqbHK2aaQLHGAJQrxaODTHB6E9nF2gZmVs0I4vldKfUJSOBPQMCkX6BuY0WgvBYkaQBHUlvspAawpf8i1OqCx3BqHoXU+k/cOYIwA3UbD67mIyIFbZfD4wZnhzieRpHbKNMCKsXG4TdDIF+ZaqrCHTGNbusOD4EAXa6DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dB90G1hY; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBxTDU83"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20208830de8so34561515ad.1;
-        Tue, 20 Aug 2024 10:06:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dB90G1hY"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a7aa4ca9d72so745998266b.0;
+        Tue, 20 Aug 2024 10:18:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724173616; x=1724778416; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=alquEjzt3pV+GF2ki+CPGlhnJrvecsAgoJSLznrwbU8=;
-        b=UBxTDU83d5muAqIaKURFs92gsc531c0S4m/TOp5PwD4xD0ZCPfEUt8Skf4R0kcYuLH
-         Hw75Ig9W1VyGwHDaBwi7MIlFZE91R+cSS5KrpkkjDzNEIwL5f5FnBd5nJCK264M5HhtV
-         CraWuO17wy2/jFkRGIg8Z8jkNFYM3vNPbsrItoAk843yWZGvN2a8tEJwRfns8so0GwBI
-         0SxFIYXXN9YYd6CabtPwhZU5/eBjjeDPvuBDS7qcmfLWdOijGKM62xbSfzngnklzArdC
-         WOI2s5bYoLJl4zDENB5alK70beJK7pqQxrp6nhdGWqVxCZ+Oih6+tNl6zVwDsqQaLnyo
-         Gj/w==
+        d=gmail.com; s=20230601; t=1724174312; x=1724779112; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w+RXbpZ+OXyPsRrZFRrCFaRajdIpPUXoh7rfHKzntLs=;
+        b=dB90G1hYwKxByRmo5uMBUCMnUMOtshnIupyxb3Oqzt2WtMr/jUvjscZygLyb1NTvdt
+         0Qwswlzksre+DwpX8FewdOEYyDEsmvtNjol2CG1EGj0yJS4O7AaM5+3ryeEEKCZDKVpP
+         IdgSY+3CZf+a3Zf+dRqhR4B97t7Xj/FJxEDkIn9I2JFAgzAvspZtDKTymyGTDzAFzs6o
+         X68XCNyFDgzh+KWAMnzkTfLBL2cdFV/MWCbDJ8WntfiaMOpw9PavhdnkWDL0csIOzIDV
+         DqhsVfr9vYvtF5mP2L775uklR+sxa5WZWzjSbOJCJaFbC6mdr/z+T1jXo4B/bm4s+KMV
+         06jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724173616; x=1724778416;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=alquEjzt3pV+GF2ki+CPGlhnJrvecsAgoJSLznrwbU8=;
-        b=UOFadAbb6NEWVZGfOoWgkageP04bJS4sJGJ8chxScu5JYXDLTiQZWbduJ/P2DQOIs4
-         OXxE5DcHdoya/xSPG11AVp6AlUiFRpSehaxXj8QC5Jd69gwFazo2pbnW80KBHZIb4ypB
-         /5Q3C4aBrM3BJXGQOiM1vyeCkcReTGiWWC/NK5CNIfEVwYEJ17X7R1rC+acze9aNdeNj
-         kAezKkcrYjOx0oiUTLBN86hdekpPrIpfHXWFokQQsEv6BY0sfylXqe+Kg8T1yYvm7xhA
-         Blzd72zQmKAiCOJ8ln2gLjW6wbnY2gih8WOVOPGiB92umTz7QN9nXJdhLIaB4mQTdf9f
-         paKA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+wItVQa2xosAjocDG7qtWglc3GZkDZAwhWlNFMJzN1XWQe9lAoJ+t8nFY+2ph+9ZYpPE+09zB0s3YPfk84Tyx4ZvViSio+sXe7EEo7wV3debSUQLoF8q1E/2DAbmZL4d42jxudsPrrgttMaUP5DSQGHYY2Ox3fopy3HjMnKllQc53
-X-Gm-Message-State: AOJu0Yw4VpJ7hAhWuA8Rtp65S42gXUrDXVOuyJPpzQTHX/A9cm3qb5nf
-	k1kHZ3/h/O2JjkY2tWkkbH/AFXjlFSrQJnDEd1IYe4wpsbVKPozRVWKodw==
-X-Google-Smtp-Source: AGHT+IG0ZJ3QnQNSFMIEj2D5KZRJp7M8hlmcBNA0ELfAoeqxfCY3D5JUeqlYGGLA68f5YTVJI2Koiw==
-X-Received: by 2002:a17:902:dace:b0:1fd:93d2:fb67 with SMTP id d9443c01a7336-2031517e689mr34277165ad.52.1724173616231;
-        Tue, 20 Aug 2024 10:06:56 -0700 (PDT)
-Received: from localhost (dhcp-72-235-129-167.hawaiiantel.net. [72.235.129.167])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-202592bdf7fsm21652645ad.181.2024.08.20.10.06.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 10:06:55 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 20 Aug 2024 07:06:54 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: josef@toxicpanda.com, hch@lst.de, mkoutny@suse.com, axboe@kernel.dk,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-	houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-	yukuai3@huawei.com, lilingfeng3@huawei.com
-Subject: Re: [PATCH v3] block: flush all throttled bios when deleting the
- cgroup
-Message-ID: <ZsTNLor7XoJ9dOVx@slm.duckdns.org>
-References: <20240817071108.1919729-1-lilingfeng@huaweicloud.com>
+        d=1e100.net; s=20230601; t=1724174312; x=1724779112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w+RXbpZ+OXyPsRrZFRrCFaRajdIpPUXoh7rfHKzntLs=;
+        b=lWmqt3Z81XIZu6Og1btiPg5OLcJH1eVuFjaVVY+IQyVTJimnsPujoQjsIHprrDtCk8
+         xGEra1yOimu+XEfK95yW4HdHQWsrla3rVEVtlSO4VCcxAbh6On90x4WNQyaD+s0XQMXi
+         2z+noJ+A8ZILM1vxzP8hjo47eyLWcU8MjvCuk3v97rk4IRstaP4CGLiZ4/OiL7fr1o03
+         9EpZwT+AyzDVhqcQ0LJYrz6da06+BmEoPs/TBlIKOM7MOluYmucMiGUgyam2yrtvCSxN
+         W+bWkU0V1qb4/lt7osjT2RrRaoi4lvfkCDBHSMr5JwY6WidH7CNVSTwUEwKBEtyqzauW
+         M4Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCXw5mJk3dktf5NMt/b4GHCRbhEfBdEA6ve8BGeuH6vUWdeXfNS94hbXhQ7vrApOfoYdQKbkL9laK1UNTg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwO2Z09FnGlG8XUpqoh1MXh+4/ZdfrHmCfwDvc6saDbO2IKXqtH
+	9jBqZatpKgCYXj6qx3YTOOqjFyzFGW4IL5gRRnOUtG4cL+DzORmC
+X-Google-Smtp-Source: AGHT+IH3k+sZO9tU+W74giEEa69Bw48c6Vz0E0qFyPViLeM3L11zqSo6gMiaGiLsiwO4iLdVM/Jr1w==
+X-Received: by 2002:a17:907:1c08:b0:a86:672d:8436 with SMTP id a640c23a62f3a-a86672d874dmr37469166b.59.1724174311455;
+        Tue, 20 Aug 2024 10:18:31 -0700 (PDT)
+Received: from [192.168.42.136] ([148.252.128.6])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838eeeefsm787314866b.97.2024.08.20.10.18.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Aug 2024 10:18:31 -0700 (PDT)
+Message-ID: <c69d1769-ae86-4659-bbda-6f7760a8e83f@gmail.com>
+Date: Tue, 20 Aug 2024 18:19:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240817071108.1919729-1-lilingfeng@huaweicloud.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 5/5] block: implement io_uring discard cmd
+To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc: io-uring@vger.kernel.org, Conrad Meyer <conradmeyer@meta.com>,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, Jan Kara <jack@suse.cz>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <cover.1723601133.git.asml.silence@gmail.com>
+ <6ecd7ab3386f63f1656dc766c1b5b038ff5353c2.1723601134.git.asml.silence@gmail.com>
+ <CAFj5m9+CXS_b5kgFioFHTWivb6O+R9HytsSQEHcEzUM5SqHfgw@mail.gmail.com>
+ <fd357721-7ba7-4321-88da-28651754f8a4@kernel.dk>
+ <e06fd325-f20f-44d8-8f72-89b97cf4186f@gmail.com> <Zr6S4sHWtdlbl/dd@fedora>
+ <4d016a30-d258-4d0e-b3bc-18bf0bd48e32@kernel.dk> <Zr6vIt1uSe9/xguH@fedora>
+ <e9562cf8-9cf1-409e-8fbd-546d11fcba93@kernel.dk> <ZsQBMjaBrtcFLpIj@fedora>
+ <d8ef3e63-1a94-45a4-974a-01324d6ce310@kernel.dk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <d8ef3e63-1a94-45a4-974a-01324d6ce310@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Aug 17, 2024 at 03:11:08PM +0800, Li Lingfeng wrote:
-> From: Li Lingfeng <lilingfeng3@huawei.com>
+On 8/20/24 17:30, Jens Axboe wrote:
+> On 8/19/24 8:36 PM, Ming Lei wrote:
+>> On Mon, Aug 19, 2024 at 02:01:21PM -0600, Jens Axboe wrote:
+>>> On 8/15/24 7:45 PM, Ming Lei wrote:
+...
+>>>> Meantime the handling has to move to io-wq for avoiding to block current
+>>>> context, the interface becomes same with IORING_OP_FALLOCATE?
+>>>
+>>> I think the current truncate is overkill, we should be able to get by
+>>> without. And no, I will not entertain an option that's "oh just punt it
+>>> to io-wq".
+>>
+>> BTW, the truncate is added by 351499a172c0 ("block: Invalidate cache on discard v2"),
+>> and block/009 serves as regression test for covering page cache
+>> coherency and discard.
+>>
+>> Here the issue is actually related with the exclusive lock of
+>> filemap_invalidate_lock(). IMO, it is reasonable to prevent page read during
+>> discard for not polluting page cache. block/009 may fail too without the lock.
+>>
+>> It is just that concurrent discards can't be allowed any more by
+>> down_write() of rw_semaphore, and block device is really capable of doing
+>> that. It can be thought as one regression of 7607c44c157d ("block: Hold invalidate_lock in
+>> BLKDISCARD ioctl").
+>>
+>> Cc Jan Kara and Shin'ichiro Kawasaki.
 > 
-> When a process migrates to another cgroup and the original cgroup is deleted,
-> the restrictions of throttled bios cannot be removed. If the restrictions
-> are set too low, it will take a long time to complete these bios.
-> 
-> Refer to the process of deleting a disk to remove the restrictions and
-> issue bios when deleting the cgroup.
-> 
-> This makes difference on the behavior of throttled bios:
-> Before: the limit of the throttled bios can't be changed and the bios will
-> complete under this limit;
-> Now: the limit will be canceled and the throttled bios will be flushed
-> immediately.
-> 
-> References:
-> [1] https://lore.kernel.org/r/20220318130144.1066064-4-ming.lei@redhat.com
-> [2] https://lore.kernel.org/all/da861d63-58c6-3ca0-2535-9089993e9e28@huaweicloud.com/
-> 
-> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+> Honestly I just think that's nonsense. It's like mixing direct and
+> buffered writes. Can you get corruption? Yes you most certainly can.
+> There should be no reason why we can't run discards without providing
+> page cache coherency. The sync interface attempts to do that, but that
+> doesn't mean that an async (or a different sync one, if that made sense)
+> should.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+I don't see it as a problem either, it's a new interface, just need
+to be upfront on what guarantees it provides (one more reason why
+not fallocate), I'll elaborate on it in the commit message and so.
 
-Thanks.
+I think a reasonable thing to do is to have one rule for all write-like
+operations starting from plain writes, which is currently allowing races
+to happen and shift it to the user. Purely in theory we can get inventive
+with likes of range lock trees, but that's unwarranted for all sorts of
+reasons.
+
+> If you do discards to the same range as you're doing buffered IO, you
+> get to keep both potentially pieces. Fact is that most folks are doing
+> dio for performant IO exactly because buffered writes tend to be
+> horrible, and you could certainly use that with async discards and have
+> the application manage it just fine.
+> 
+> So I really think any attempts to provide page cache synchronization for
+> this is futile. And the existing sync one looks pretty abysmal, but it
+> doesn't really matter as it's a sync interfce. If one were to do
+
+It should be a pain for sync as well, you can't even spin another process
+and parallelise this way.
 
 -- 
-tejun
+Pavel Begunkov
