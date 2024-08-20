@@ -1,211 +1,310 @@
-Received: from smtp.smtpout.orange.fr (smtp-18.smtpout.orange.fr [80.12.242.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFE8B657;
-	Mon, 19 Aug 2024 23:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B12B1AAA5
+	for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 01:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724111982; cv=none; b=XOF8bEeSb6NicyNCeMncWwAAFrom7/3bUVfTeXF3WP8bWa2T1OOuPShDHNBdbRbuIbrkyZ4Z783Tacmd5+8V1L6hnCvWZ5f+0Ifum0+wMisSiDc51WkVEtWszka42Flo3Tnmwo7mancmy1rHMztXt6NUFwfPRVEWUf1qGmdKgn8=
+	t=1724118667; cv=none; b=UcDSijw4lP6dcfQpkQT8mwctw++2ZtLJXdpBSzU0bS7K46blIhZWNCP1RQ4T940si4couttQAYUYjoVEeB/qM2YyEnhQMcqq5Hj5vHKsQEc+/7OgIJGcbCU875xj3X7FtrmsvSEMyUSY3m+LgC/cSHLgwrGjL3vKyWgzH06Al6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724111982; c=relaxed/simple;
-	bh=yuIaNRdT2XsbRktrinM+nAtjGpiDnUSrUd78oiucAek=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N2J//nk2eWjb5f7nQxAiHogMm1Tjrszgf//tPAvrXPYmGJzRbLMHXGuGGxbvTMyDwiKyBN56bG0ptxneE2X+KeII/szBvp+XurEd3YI1jwYVz0ZUj1kIvhXQPtaowFWJuFMsb7JveSu8rJJt6gmLaUxq2y/F5+JOX5xYHpoEenY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=mERexwoy; arc=none smtp.client-ip=80.12.242.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	s=arc-20240116; t=1724118667; c=relaxed/simple;
+	bh=X7Tf/2sbMns8bMTKUFg1k31n585aRPKOnD1Dmxtvuwk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K3jJMrQCrclxGXJMcXFz/a2duRsbfebl5uVbOgErBbp47gZkVCgXUt07ljMWsD6nnyQqXx9rZZrPwp9l9C0m/nt7tz/cyrdpcObUWR8dNLp7iExBGrhfiPu0XajETmSjPza4uAkJ68ffRpuMcIvR4b6kyzNL3sXzX81I4m35UYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aWNPuZ0e; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="mERexwoy"
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id g6yfszJBlQRySg6yfszKrO; Mon, 19 Aug 2024 20:19:44 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1724091584;
-	bh=i2piStncb9aJgwDrvhVqFSwNM+FZr5qttsR8sW3kpiA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=mERexwoyPzlfOebBUEnIZsOtSDCyALgn06bAE0XuHJCOZf7MgURweOtCYf6D5ucvJ
-	 hMxqf1tym0+N1Yh1Kbtxnt/uiEN5D/QjnWk+qeYU1kf9fnNGIcOfFfUV8ildjug1Wj
-	 +AeJZMCJpizoL16BT/5H1yRsJWk4bK4mOJMcJ5w1C1DdkuK+LTxHCusEYR4OwF84Ku
-	 +LejUCxpLFrzVaYKQL35SlVlnRKXCLRCjGATL+8fj/YDf1K9GFn7lWZ/Qy8KDoyJRY
-	 4PIjpQAMLXkiwAulAoaPdD5hVIViRIDkDDoFS+N0BjfpoxS/HV8fdzvU2do0815ek2
-	 I0eIZaE9SrODA==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Mon, 19 Aug 2024 20:19:44 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr>
-Date: Mon, 19 Aug 2024 20:19:28 +0200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aWNPuZ0e"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724118662;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zemSLB7cpZj/xdAoHKekxRhjOKghwOYrL/smZ5zzA84=;
+	b=aWNPuZ0eWBKtH0Tj/D192waxu3mjg0TCEYZw18VTvvVmqUSVkOVlIFeknRXhw8bv4Ke41h
+	cIDEbpQbSeyDD6qdS2v+QyLatiUGUrVWqO8mciTVHbypFPSnB9tWkPJvurutBkhpvv54Nv
+	hKNVRS3Hwwe4mRLV+neeLo+hXP42AzI=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-661-Fq4FQim-PNC6_RVI7T7RGA-1; Mon, 19 Aug 2024 21:51:01 -0400
+X-MC-Unique: Fq4FQim-PNC6_RVI7T7RGA-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2d3c0088813so4489534a91.1
+        for <linux-block@vger.kernel.org>; Mon, 19 Aug 2024 18:51:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724118659; x=1724723459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zemSLB7cpZj/xdAoHKekxRhjOKghwOYrL/smZ5zzA84=;
+        b=jyEmsHXnV9is8bmpEl6nEmazR7GGTlnvVZmKBvpWPtmNpbiQMJD6mojh28IvJuv/9k
+         hgCvCWFtk0J4MGqTci9TyK4nUUWBoKQF5pGZr3XzPOcjG07XSvKgi5NRoIwyy2sCL0yE
+         yWpe35ReRNaUrV74BPsdf+VPF2LJeT2EHva2HsFfdnJMDzL4SSAfaq92Do/Rl1E/bO92
+         Fegssqa3mLCvbv4GxuZj2IVfkqCNJUAAcqi4aBYLrX9twDbq2WNVtnn0cVblXNmVknhb
+         2q1e+mNzFzZIVDj6cgmDSXBY0dEq+Hx3dS4NHlJLrHsAR17aDvFbbQzzPESCxrUwvM9v
+         LZaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVqJsa2ywVIuGzfcS3tSi+E5uKhaVADihj0DbhttO+OdjwmpEeNXUHq6xXAdHj2Q4jVCq3fWmTmgrLXQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywwo0PcJI6jiA84BjTCyaJwOx1ZHjc+huhlthKgGv9sYctdyVVU
+	fZToSAY9dmLB0XTZ2ZoZdGm3dsJRIpAmYdUnbX4pTOeucBLybZ83IFDF/mSg+WdEsejMGSAtfsE
+	+QbZsHObp83lY3/kJ20Ljpm68fd/hwJlqEnAHAqyxHVKo5N2YUNAu/UONkBfFzn3pz/X53NcOFw
+	PHKK+GidO9e525IoBJT452/XTKEJ3ooNDkaThXoY4Z5SCm7Q==
+X-Received: by 2002:a17:90a:8a02:b0:2c8:87e:c2d9 with SMTP id 98e67ed59e1d1-2d3e03e89dcmr12525653a91.39.1724118659444;
+        Mon, 19 Aug 2024 18:50:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF2xNwaA7efDn4iFU7NRQCn5zeIDhK2iOTMbDt+qvGPJ3lKC0GseK99B8PoX4eAcf/7EG7ilcLRq4e0JUPo6TI=
+X-Received: by 2002:a17:90a:8a02:b0:2c8:87e:c2d9 with SMTP id
+ 98e67ed59e1d1-2d3e03e89dcmr12525636a91.39.1724118659021; Mon, 19 Aug 2024
+ 18:50:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 8/9] vdap: solidrun: Replace deprecated PCI functions
-To: Philipp Stanner <pstanner@redhat.com>, onathan Corbet <corbet@lwn.net>,
- Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
- Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
- Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Alvaro Karsz <alvaro.karsz@solid-run.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
- linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240819165148.58201-2-pstanner@redhat.com>
- <20240819165148.58201-10-pstanner@redhat.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240819165148.58201-10-pstanner@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <5yal5unzvisrvfhhvsqrsqgu4tfbjp2fsrnbuyxioaxjgbojsi@o2arvhebzes3>
+ <ab363932-ab3d-49b1-853d-7313f02cce9e@linux.ibm.com> <ljqlgkvhkojsmehqddmeo4dng6l3yaav6le2uslsumfxivluwu@m7lkx3j4mkkw>
+ <79a7ec0d-c22d-44cf-a832-13da05a1fcbd@linux.ibm.com> <CAHj4cs-5DPDFuBzm3aymeAi6UWHhgXSYsgaCACKbjXp=i0SyTA@mail.gmail.com>
+ <1f917bc1-8a6a-4c88-a619-cf8ddc4534a4@linux.ibm.com> <tczctp5tkr34o3k3f4dlyhuutgp2ycex6gdbjuqx4trn6ewm2i@qbkza3yr5wdd>
+ <f2f9d5b4-3c50-41a9-bc53-49706f6f4e12@linux.ibm.com>
+In-Reply-To: <f2f9d5b4-3c50-41a9-bc53-49706f6f4e12@linux.ibm.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Tue, 20 Aug 2024 09:50:47 +0800
+Message-ID: <CAHj4cs8B-Md_WnPo0Z2o6dZ3n30QqL5D-YbW9wWbCMLjxDSrsg@mail.gmail.com>
+Subject: Re: blktests failures with v6.11-rc1 kernel
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "nbd@other.debian.org" <nbd@other.debian.org>, 
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 19/08/2024 à 18:51, Philipp Stanner a écrit :
-> solidrun utilizes pcim_iomap_regions(), which has been deprecated by the
-> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> pcim_iomap_table(), pcim_iomap_regions_request_all()"), among other
-> things because it forces usage of quite a complicated bitmask mechanism.
-> The bitmask handling code can entirely be removed by replacing
-> pcim_iomap_regions() and pcim_iomap_table().
-> 
-> Replace pcim_iomap_regions() and pcim_iomap_table() with
-> pci_iomap_region().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> ---
->   drivers/vdpa/solidrun/snet_main.c | 47 +++++++++++--------------------
->   1 file changed, 16 insertions(+), 31 deletions(-)
-> 
-> diff --git a/drivers/vdpa/solidrun/snet_main.c b/drivers/vdpa/solidrun/snet_main.c
-> index 99428a04068d..abf027ca35e1 100644
-> --- a/drivers/vdpa/solidrun/snet_main.c
-> +++ b/drivers/vdpa/solidrun/snet_main.c
-> @@ -556,33 +556,24 @@ static const struct vdpa_config_ops snet_config_ops = {
->   static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
->   {
->   	char name[50];
-> -	int ret, i, mask = 0;
-> +	int i;
-> +
-> +	snprintf(name, sizeof(name), "psnet[%s]-bars", pci_name(pdev));
-> +
->   	/* We don't know which BAR will be used to communicate..
->   	 * We will map every bar with len > 0.
->   	 *
->   	 * Later, we will discover the BAR and unmap all other BARs.
->   	 */
->   	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (pci_resource_len(pdev, i))
-> -			mask |= (1 << i);
-> -	}
-> -
-> -	/* No BAR can be used.. */
-> -	if (!mask) {
-> -		SNET_ERR(pdev, "Failed to find a PCI BAR\n");
-> -		return -ENODEV;
-> -	}
-> -
-> -	snprintf(name, sizeof(name), "psnet[%s]-bars", pci_name(pdev));
-> -	ret = pcim_iomap_regions(pdev, mask, name);
-> -	if (ret) {
-> -		SNET_ERR(pdev, "Failed to request and map PCI BARs\n");
-> -		return ret;
-> -	}
-> +		if (pci_resource_len(pdev, i)) {
-> +			psnet->bars[i] = pcim_iomap_region(pdev, i, name);
+On Mon, Aug 19, 2024 at 9:35=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> =
+wrote:
+>
+>
+>
+> On 8/19/24 18:04, Shinichiro Kawasaki wrote:
+> > On Aug 14, 2024 / 18:05, Nilay Shroff wrote:
+> >>
+> >>
+> >> On 8/13/24 12:36, Yi Zhang wrote:
+> >>> On Sat, Aug 3, 2024 at 12:49=E2=80=AFAM Nilay Shroff <nilay@linux.ibm=
+.com> wrote:
+> >>>
+> >>> There are no simultaneous tests during the CKI tests running.
+> >>> I reproduced the failure on that server and always can be reproduced
+> >>> within 5 times:
+> >>> # sh a.sh
+> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D0
+> >>> nvme/052 (tr=3Dloop) (Test file-ns creation/deletion under one subsys=
+tem) [passed]
+> >>>     runtime  21.496s  ...  21.398s
+> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D1
+> >>> nvme/052 (tr=3Dloop) (Test file-ns creation/deletion under one subsys=
+tem) [failed]
+> >>>     runtime  21.398s  ...  21.974s
+> >>>     --- tests/nvme/052.out 2024-08-10 00:30:06.989814226 -0400
+> >>>     +++ /root/blktests/results/nodev_tr_loop/nvme/052.out.bad
+> >>> 2024-08-13 02:53:51.635047928 -0400
+> >>>     @@ -1,2 +1,5 @@
+> >>>      Running nvme/052
+> >>>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
+> >>>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
+> >>>     +cat: /sys/block/nvme1n2/uuid: No such file or directory
+> >>>      Test complete
+> >>> # uname -r
+> >>> 6.11.0-rc3
+> >>
+> >> We may need to debug this further. Is it possible to patch blktest and
+> >> collect some details when this issue manifests? If yes then can you pl=
+ease
+> >> apply the below diff and re-run your test? This patch would capture ou=
+tput
+> >> of "nvme list" and "sysfs attribute tree created under namespace head =
+node"
+> >> and store those details in 052.full file.
+> >>
+> >> diff --git a/common/nvme b/common/nvme
+> >> index 9e78f3e..780b5e3 100644
+> >> --- a/common/nvme
+> >> +++ b/common/nvme
+> >> @@ -589,8 +589,23 @@ _find_nvme_ns() {
+> >>                 if ! [[ "${ns}" =3D~ nvme[0-9]+n[0-9]+ ]]; then
+> >>                         continue
+> >>                 fi
+> >> +               echo -e "\nBefore ${ns}/uuid check:\n" >> ${FULL}
+> >> +               echo -e "\n`nvme list -v`\n" >> ${FULL}
+> >> +               echo -e "\n`tree ${ns}`\n" >> ${FULL}
+> >> +
+> >>                 [ -e "${ns}/uuid" ] || continue
+> >>                 uuid=3D$(cat "${ns}/uuid")
+> >> +
+> >> +               if [ "$?" =3D "1" ]; then
+> >> +                       echo -e "\nFailed to read $ns/uuid\n" >> ${FUL=
+L}
+> >> +                       echo "`nvme list -v`" >> ${FULL}
+> >> +                       if [ -d "${ns}" ]; then
+> >> +                               echo -e "\n`tree ${ns}`\n" >> ${FULL}
+> >> +                       else
+> >> +                               echo -e "\n${ns} doesn't exist!\n" >> =
+${FULL}
+> >> +                       fi
+> >> +               fi
+> >> +
+> >>                 if [[ "${subsys_uuid}" =3D=3D "${uuid}" ]]; then
+> >>                         basename "${ns}"
+> >>                 fi
+> >>
+> >>
+> >> After applying the above diff, when this issue occurs on your system c=
+opy this
+> >> file "</path/to/blktests>/results/nodev_tr_loop/nvme/052.full" and sen=
+d it across.
+> >> This may give us some clue about what might be going wrong.
+> >
+> > Nilay, thank you for this suggestion. To follow it, I tried to recreate=
+ the
+> > failure again, and managed to do it :) When I repeat the test case 20 o=
+r 40
+> > times one of my test machines, the failure is observed in stable manner=
+.
+>
+> Shinichiro, I am glad that you were able to recreate this issue.
+>
+> > I applied your debug patch above to blktests, then I repeated the test =
+case.
+> > Unfortunately, the failure disappeared. When I repeat the test case 100=
+ times,
+> > the failure was not observed. I guess the echos for debug changed the t=
+iming to
+> > access the sysfs uuid file, then the failure disappeared.
+>
+> Yes this could be possible. BTW, Yi tried the same patch and with the pat=
+ch applied,
+> this issue could be still reproduced on Yi's testbed!!
+> > This helped me think about the cause. The test case repeats _create_nvm=
+et_ns
+> > and _remove_nvmet_ns. Then, it repeats creating and removing the sysfs =
+uuid
+> > file. I guess when _remove_nvmet_ns echos 0 to ${nvemt_ns_path}/enable =
+to
+> > remove the namespace, it does not wait for the completion of the remova=
+l work.
+> > Then, when _find_nvme_ns() checks existence of the sysfs uuid file, it =
+refers to
+> > the sysfs uuid file that the previous _remove_nvmet_ns left. When it do=
+es cat
+> > to the sysfs uuid file, it fails because the sysfs uuid file has got re=
+moved,
+> > before recreating it for the next _create_nvmet_ns.
+>
+> I agree with your assessment about the plausible cause of this issue. I j=
+ust reviewed
+> the nvme target kernel code and it's now apparent to me that we need to w=
+ait for the
+> removal of the namespace before we re-create the next namespace. I think =
+this is a miss.
+> >
+> > Based on this guess, I created a patch below. It modifies the test case=
+ to wait
+> > for the namespace device disappears after calling _remove_nvmet_ns. (I =
+assume
+> > that the sysfs uuid file disappears when the device file disappears). W=
+ith
+> > this patch, the failure was not observed by repeating it 100 times. I a=
+lso
+> > reverted the kernel commit ff0ffe5b7c3c ("nvme: fix namespace removal l=
+ist")
+> > from v6.11-rc4, then confirmed that the test case with this change stil=
+l can
+> > detect the regression.
+> >
+> I am pretty sure that your patch would solve this issue.
+>
+> > I will do some more confirmation. If it goes well, will post this chang=
+e as
+> > a formal patch.
+> >
+> > diff --git a/tests/nvme/052 b/tests/nvme/052
+> > index cf6061a..469cefd 100755
+> > --- a/tests/nvme/052
+> > +++ b/tests/nvme/052
+> > @@ -39,15 +39,32 @@ nvmf_wait_for_ns() {
+> >               ns=3D$(_find_nvme_ns "${uuid}")
+> >       done
+> >
+> > +     echo "$ns"
+> >       return 0
+> >  }
+> >
+> > +nvmf_wait_for_ns_removal() {
+> > +     local ns=3D$1 i
+> > +
+> > +     for ((i =3D 0; i < 10; i++)); do
+> > +             if [[ ! -e /dev/$ns ]]; then
+> > +                     return
+> > +             fi
+> > +             sleep .1
+> > +             echo "wait removal of $ns" >> "$FULL"
+> > +     done
+> > +
+> > +     if [[ -e /dev/$ns ]]; then
+> > +             echo "Failed to remove the namespace $"
+> > +     fi
+> > +}
+> > +
+> >  test() {
+> >       echo "Running ${TEST_NAME}"
+> >
+> >       _setup_nvmet
+> >
+> > -     local iterations=3D20
+> > +     local iterations=3D20 ns
+> >
+> >       _nvmet_target_setup
+> >
+> > @@ -63,7 +80,7 @@ test() {
+> >               _create_nvmet_ns "${def_subsysnqn}" "${i}" "$(_nvme_def_f=
+ile_path).$i" "${uuid}"
+> >
+> >               # wait until async request is processed and ns is created
+> > -             nvmf_wait_for_ns "${uuid}"
+> > +             ns=3D$(nvmf_wait_for_ns "${uuid}")
+> >               if [ $? -eq 1 ]; then
+> >                       echo "FAIL"
+> >                       rm "$(_nvme_def_file_path).$i"
+> > @@ -71,6 +88,7 @@ test() {
+> >               fi
+> >
+> >               _remove_nvmet_ns "${def_subsysnqn}" "${i}"
+> > +             nvmf_wait_for_ns_removal "$ns"
+> >               rm "$(_nvme_def_file_path).$i"
+> >       }
+> >       done
+>
+> I think there's some formatting issue in the above patch. I see some stra=
+y characters
+> which you may cleanup/fix later when you send the formal patch.
+>
+> Yi, I think you you may also try the above patch on your testbed and conf=
+irm the result.
 
-Hi,
+Nilay/Shinichiro
 
-Unrelated to the patch, but is is safe to have 'name' be on the stack?
+Confirmed the failure cannot be reproduced with this patch now.
 
-pcim_iomap_region()
---> __pcim_request_region()
---> __pcim_request_region_range()
---> request_region() or __request_mem_region()
---> __request_region()
---> __request_region_locked()
---> res->name = name;
-
-So an address on the stack ends in the 'name' field of a "struct resource".
-
-According to a few grep, it looks really unusual.
-
-I don't know if it is used, but it looks strange to me.
+>
+> Thanks,
+> --Nilay
+>
 
 
-If it is an issue, it was apparently already there before this patch.
-
-> +			if (IS_ERR(psnet->bars[i])) {
-> +				SNET_ERR(pdev, "Failed to request and map PCI BARs\n");
-> +				return PTR_ERR(psnet->bars[i]);
-> +			}
-> +		}
->   
-> -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (mask & (1 << i))
-> -			psnet->bars[i] = pcim_iomap_table(pdev)[i];
->   	}
->   
->   	return 0;
-> @@ -591,18 +582,15 @@ static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
->   static int snet_open_vf_bar(struct pci_dev *pdev, struct snet *snet)
->   {
->   	char name[50];
-> -	int ret;
->   
->   	snprintf(name, sizeof(name), "snet[%s]-bar", pci_name(pdev));
->   	/* Request and map BAR */
-> -	ret = pcim_iomap_regions(pdev, BIT(snet->psnet->cfg.vf_bar), name);
-> -	if (ret) {
-> +	snet->bar = pcim_iomap_region(pdev, snet->psnet->cfg.vf_bar, name);
-
-Same
-
-Just my 2c.
-
-CJ
-
-> +	if (IS_ERR(snet->bar)) {
->   		SNET_ERR(pdev, "Failed to request and map PCI BAR for a VF\n");
-> -		return ret;
-> +		return PTR_ERR(snet->bar);
->   	}
->   
-> -	snet->bar = pcim_iomap_table(pdev)[snet->psnet->cfg.vf_bar];
-> -
->   	return 0;
->   }
->   
-> @@ -650,15 +638,12 @@ static int psnet_detect_bar(struct psnet *psnet, u32 off)
->   
->   static void psnet_unmap_unused_bars(struct pci_dev *pdev, struct psnet *psnet)
->   {
-> -	int i, mask = 0;
-> +	int i;
->   
->   	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
->   		if (psnet->bars[i] && i != psnet->barno)
-> -			mask |= (1 << i);
-> +			pcim_iounmap_region(pdev, i);
->   	}
-> -
-> -	if (mask)
-> -		pcim_iounmap_regions(pdev, mask);
->   }
->   
->   /* Read SNET config from PCI BAR */
+--=20
+Best Regards,
+  Yi Zhang
 
