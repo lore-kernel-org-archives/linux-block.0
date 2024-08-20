@@ -1,171 +1,302 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F6518E34F
-	for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 07:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFE0189B99
+	for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 08:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724140698; cv=none; b=CXxiAnUsup1UoDak6rTOKDhZ1Fc2XeeDN80jrYKNVVKt1GSyryNwlRkN8/y4EO1lyhKyYXpMzktK1ZMNxq202+3OcvEI/MC9vYR1536uRSUp9yX0CX/buH2ibtt8nYI6HaDLMEZ+88cB2LwFiWWMfVAEh2fLaDvUPZSXbNFOWE4=
+	t=1724141387; cv=none; b=Y7c1cnY6RT/gjwq1pqzu1+C4xPdXqyOktKF9l3fcqIsHqU4I0LVrsi2A1lb8amGXwA5SyRi+dY1Z6k2Kv0id+zSu48MjgE/LsAFdNQ/kwkcyhHnOLXrVOJ7F/cnWobP6IeEsBZUBqBaLS27GU9t//NpX+GA4GADrGQLcGX34Tm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724140698; c=relaxed/simple;
-	bh=gpwtE6Bp1AiaIl5ZsIKRTj25WTSViH0Pce7tm1HMtDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=sgYAT3rnwuiMAMsUdmwAFjKpka8LA8PvfcdFFnghYaCmmWu0oixb+KJl9aP0bugbpc7t17snXz1GCQPpCHJqSN7i1h5FVTGsr4G7E4aa85O21Yw9NmZgO+YIGXq5AYJur53EJA1jgeitZgj019NC8j7oiKq1EIAr7FBI3HPVuTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=vBW+gI0I; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1724141387; c=relaxed/simple;
+	bh=DLZKg/oGENcvx3g7vLmJ6PWU9gpxjKwySy5I9EoT3Ow=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fYX8UlxdWLZUyCadVm4jsC5rH0QiMy+bakKiLpzkiN0YN9L0BbSQAHvHgSyLa3AAOdBH7VjEL5CxbaZqiAmD4DHKLusEs1MmbrCiztAFVY1uF/BZmwn1X9s7qlDexbehPJFC1qpaybN/tHjDELo6+sNiA1YQkmtknuopYFk72bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A2rU0y1S; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="vBW+gI0I"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240820075814epoutp03c0aa41ff6b46a7d48e361f48118dcbc5~tYNOQ9Qfd3131131311epoutp03R
-	for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 07:58:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240820075814epoutp03c0aa41ff6b46a7d48e361f48118dcbc5~tYNOQ9Qfd3131131311epoutp03R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1724140694;
-	bh=n1op7kAX1nG07G4nghX8cBHUl5wUBr1ZSxziuhLqLDw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vBW+gI0IGprGyJGxu3ptaOyJT4WJETn8KI5hnqNg2rGwRtTT8wJEnsh0LGkJqQacz
-	 ArYvsXL5Cu1gzKkLl2OL3tlbfCOSlpkQrY1XeFTzJirnJGOe6SADVFoDDPQsJq0JTG
-	 UBP1hyKHZpJWPo9uh9aSKkeajMwV5MVrdReR/HeQ=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20240820075813epcas5p4df09804ccc489a360a8e9bf10302515f~tYNNryvhr0688506885epcas5p4c;
-	Tue, 20 Aug 2024 07:58:13 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.179]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4Wp1zl4SMJz4x9Pt; Tue, 20 Aug
-	2024 07:58:11 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	A4.04.19863.39C44C66; Tue, 20 Aug 2024 16:58:11 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240820075104epcas5p4c54b3d4d81703cd1eb8209182026905a~tYG_J2DnS2271822718epcas5p4G;
-	Tue, 20 Aug 2024 07:51:04 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240820075104epsmtrp2380cb688a4f7e5b0c1a69156b13de175~tYG_IyMNo0902009020epsmtrp2k;
-	Tue, 20 Aug 2024 07:51:04 +0000 (GMT)
-X-AuditID: b6c32a50-c73ff70000004d97-34-66c44c936758
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	8A.75.07567.8EA44C66; Tue, 20 Aug 2024 16:51:04 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20240820075102epsmtip118e64ca0808443d851154d982ab59c78~tYG8m_NSQ1149211492epsmtip1b;
-	Tue, 20 Aug 2024 07:51:02 +0000 (GMT)
-Date: Tue, 20 Aug 2024 13:13:21 +0530
-From: Kundan Kumar <kundan.kumar@samsung.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
-	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
-	gost.dev@samsung.com
-Subject: Re: [PATCH v8 1/5] block: Added folio-ized version of
- bvec_try_merge_hw_page()
-Message-ID: <20240820074321.i5budzkt4efcqodd@green245>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A2rU0y1S"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724141384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pczNxSocdM26pcn5q5hEVOERw14zQBRp0K6rH/Gt/U8=;
+	b=A2rU0y1SdX1bWxMLlcdgZNnTzjNeH+7VRstlEdQWvwqfafZEFaUm6UxEK5O39EPKN8UKR2
+	Ds63jEXgQLcmMtH5UdDytYOjQf9Kq5No7MQky9R8GCdWaj5Iwp8F1c717wJHo1rC4sumdF
+	SYhw1ELSzHQu/2rhu32+xEqJ6v4+FdE=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-623-jVW4LJXFNVmuQaIoDaD9bQ-1; Tue, 20 Aug 2024 04:09:42 -0400
+X-MC-Unique: jVW4LJXFNVmuQaIoDaD9bQ-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2f3f157cd18so189101fa.0
+        for <linux-block@vger.kernel.org>; Tue, 20 Aug 2024 01:09:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724141381; x=1724746181;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pczNxSocdM26pcn5q5hEVOERw14zQBRp0K6rH/Gt/U8=;
+        b=lGLO9Imcea/9diHtQes7SVhI7L1pSs77eyXTYW11cfuRLbIswURGAEOUfK80zRpRG8
+         UG7mYsrPWXPyvHVVF/zxOAc+exjp4D/0EHKWx7CqN0jYqAToC7Al1vn9gTFbw9CepbFH
+         nMYmsazZlATmgYw45eQ76uZ7e2c0PDPcLP7GedR/La1LCvwyD1hjgW8I5B3Zn57n7Tt/
+         seJ6qNl5eZihc/3w/4so1H5546dtAmQtEN3Da2aGp547IR9sYZUfAy0AhSESysqMFaUq
+         46dZKAhiTQ404ldabEtPQ1DgDH/jvd9L1RiYJ557Ff4dT5Zy3ezCRD/XAFQjL0ODfoL/
+         ef3w==
+X-Forwarded-Encrypted: i=1; AJvYcCUx+jLD+vlshxPf7wKnewCRgmXVYX3GtWOKFo3AIDjsvLrEGao7UEwvK5TFljOkt4ZXH0OPuXeMNBHLxw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUi4xpoiWQutWd4Zp8SLIH4f5D79/sdUG1m2L0yU4p1ypQntkR
+	8Urj2xL5gTPTiLPnEj8esMNPPOODhDosGHGgLByApkGgzMVEgWp0f+DK/FjqTUmaYHeDb32/SDV
+	+RYQ+PLQ33cLHGF2ZmUeo2wgNYoEfnAdfojjXtVWnfp61cSmjuHVp/g1v6sb6
+X-Received: by 2002:a05:651c:2211:b0:2ef:24a9:6aa8 with SMTP id 38308e7fff4ca-2f3be3e14b8mr44110121fa.0.1724141380706;
+        Tue, 20 Aug 2024 01:09:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUKjHSOAziZ7PYgWrAVl4EdFwjiCRVXWWzixF1wxqW29HSPOlA0o0CuaPTeGWaikDKakA/tA==
+X-Received: by 2002:a05:651c:2211:b0:2ef:24a9:6aa8 with SMTP id 38308e7fff4ca-2f3be3e14b8mr44109861fa.0.1724141380001;
+        Tue, 20 Aug 2024 01:09:40 -0700 (PDT)
+Received: from eisenberg.fritz.box ([2001:16b8:3dcc:1f00:bec1:681e:45eb:77e2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8383935909sm728451466b.112.2024.08.20.01.09.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 01:09:39 -0700 (PDT)
+Message-ID: <3e4288bb7300f3fd0883ff07b75ae69d0532019b.camel@redhat.com>
+Subject: Re: [PATCH 8/9] vdap: solidrun: Replace deprecated PCI functions
+From: Philipp Stanner <pstanner@redhat.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, onathan Corbet
+ <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
+ Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
+ <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael
+ S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Eugenio =?ISO-8859-1?Q?P=E9rez?=
+ <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Mark
+ Brown <broonie@kernel.org>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-fpga@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+Date: Tue, 20 Aug 2024 10:09:37 +0200
+In-Reply-To: <74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr>
+References: <20240819165148.58201-2-pstanner@redhat.com>
+	 <20240819165148.58201-10-pstanner@redhat.com>
+	 <74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZsAlsjZeNmsBI6J0@casper.infradead.org>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHJsWRmVeSWpSXmKPExsWy7bCmlu5knyNpBou+yVs0TfjLbLH6bj+b
-	xfftfSwWNw/sZLJYufook8XR/2/ZLCYdusZosfeWtsWNCU8ZLbb9ns9s8fvHHDYHbo/NK7Q8
-	Lp8t9di0qpPNY/fNBjaPvi2rGD0+b5ILYIvKtslITUxJLVJIzUvOT8nMS7dV8g6Od443NTMw
-	1DW0tDBXUshLzE21VXLxCdB1y8wBOk5JoSwxpxQoFJBYXKykb2dTlF9akqqQkV9cYquUWpCS
-	U2BSoFecmFtcmpeul5daYmVoYGBkClSYkJ1x83EPU8FVgYpjS9qYGhhf8HYxcnJICJhIPF98
-	jbWLkYtDSGAPo8TWI3+ZIZxPjBL3txxhh3C+MUpcuH6MEaZl3qXVLBCJvYwS7+ZuhHKeMUpM
-	f9vKBFLFIqAqsfTMZqAEBwebgK7Ej6ZQEFNEQEPizRYjkHJmgWuMEifXH2cDiQsLREosOscI
-	YvIKmElsbQgGGcIrIChxcuYTFhCbE2jt1zUfmEFsUQEZiRlLv4IdKiEwl0Pi4imQFziAHBeJ
-	xlMqEGcKS7w6voUdwpaS+PxuLxuEnS1xqHEDE4RdIrHzSANUjb1E66l+ZpAxzAIZEtu3mkGE
-	ZSWmnloHVs4swCfR+/sJVCuvxI55MLaaxJx3U1kgbBmJhZdmQMU9JDafWgIN3PeMEodnXWac
-	wCg/C8lrsxDWzQJbYSXR+aGJFSIsLbH8HweEqSmxfpf+AkbWVYxSqQXFuempyaYFhrp5qeXw
-	2E7Oz93ECE64WgE7GFdv+Kt3iJGJg/EQowQHs5IIb/fLg2lCvCmJlVWpRfnxRaU5qcWHGE2B
-	8TSRWUo0OR+Y8vNK4g1NLA1MzMzMTCyNzQyVxHlft85NERJITyxJzU5NLUgtgulj4uCUamAK
-	zL6/XFZnravWM/aMl9vtpTzC1ycu73LTmj9ppf6vD6KTDK67bZ5UderN+QXZpscFbvb+/nVx
-	s4t4x5mrK3cJTS1eyHruyOrwWS9azP/F8NwteRxqPPvH8SpFmf/MEvdyfv7P3uza3Ggyd8J3
-	9rK4hvj/BU1Vt1PMPiQ8PaL+Y+7s/NkaX558qtrUuCYtwm+T65V6frbaC9I+4j5/gnVtstaL
-	mpguctzTuzKvR7Fwld6dfEsWwbpYu80/y7N/ra53VXPSPqeW/SzT8B1n8ukDRbf+51qeWBSo
-	pXN+jdZn7opa8xaufUuPhnj8lhKUj7QSfsbFuXhD1XXmqtr24nOm7DV7/s9zrqw+wXyU6aYS
-	S3FGoqEWc1FxIgBn9S9oQQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrILMWRmVeSWpSXmKPExsWy7bCSnO4LryNpBh/+Slk0TfjLbLH6bj+b
-	xfftfSwWNw/sZLJYufook8XR/2/ZLCYdusZosfeWtsWNCU8ZLbb9ns9s8fvHHDYHbo/NK7Q8
-	Lp8t9di0qpPNY/fNBjaPvi2rGD0+b5ILYIvisklJzcksSy3St0vgyjg8+yRjQTtfxcLTPSwN
-	jFu4uxg5OSQETCTmXVrN0sXIxSEksJtRYsPGe0wQCRmJ3Xd3skLYwhIr/z1nhyh6wiix7vVW
-	sASLgKrE0jObgbo5ONgEdCV+NIWCmCICGhJvthiBlDMLXGOUOLn+OBtIXFggUmLROUYQk1fA
-	TGJrQzDExPeMEgfnnmMBmcgrIChxcuYTMJsZqGbe5ofMIPXMAtISy/9xgIQ5gU7+uuYDM4gt
-	CnTljKVfmScwCs5C0j0LSfcshO4FjMyrGCVTC4pz03OTDQsM81LL9YoTc4tL89L1kvNzNzGC
-	Y0VLYwfjvfn/9A4xMnEwHmKU4GBWEuHtfnkwTYg3JbGyKrUoP76oNCe1+BCjNAeLkjiv4YzZ
-	KUIC6YklqdmpqQWpRTBZJg5OqQamvFPXPD5/d6tLipaYafjmxKuTqxblTrxdeffvwqpKwZ+8
-	rK8UzjzLCHq65PEerx5lZ3m5HR6HE1Yu95fqXm4UIHG6epfIvPyoPIYau627MrXm1K1Y5733
-	1bfDdsv39vz5XnZ7e83S56xtyRv97vTtmzvJYd4KFaPrzj8MM+o8vkgVhj6vFDucGBx43vbO
-	3LMxmv/2Zh64qxvHz1hzt+rH4QCjxBdff1iUbAu6Fz0lJX7iha/31rbMt5LqnsjVe25NxfvZ
-	ZoumJDEc+VZaPfFJ5Qm1Sdvms591mv3TSz54bqasI1c1q3OEuvXybcccHj/XXDL7j/Mndram
-	hUp7PTsdO4MnHtw5e/pq7UTpN1d9ipVYijMSDbWYi4oTAdE7aEAEAwAA
-X-CMS-MailID: 20240820075104epcas5p4c54b3d4d81703cd1eb8209182026905a
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_8c32d_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240711051529epcas5p1aaf694dfa65859b8a32bdffce5239bf6
-References: <20240711050750.17792-1-kundan.kumar@samsung.com>
-	<CGME20240711051529epcas5p1aaf694dfa65859b8a32bdffce5239bf6@epcas5p1.samsung.com>
-	<20240711050750.17792-2-kundan.kumar@samsung.com>
-	<ZsAlsjZeNmsBI6J0@casper.infradead.org>
 
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_8c32d_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Mon, 2024-08-19 at 20:19 +0200, Christophe JAILLET wrote:
+> Le 19/08/2024 =C3=A0 18:51, Philipp Stanner a =C3=A9crit=C2=A0:
+> > solidrun utilizes pcim_iomap_regions(), which has been deprecated
+> > by the
+> > PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> > pcim_iomap_table(), pcim_iomap_regions_request_all()"), among other
+> > things because it forces usage of quite a complicated bitmask
+> > mechanism.
+> > The bitmask handling code can entirely be removed by replacing
+> > pcim_iomap_regions() and pcim_iomap_table().
+> >=20
+> > Replace pcim_iomap_regions() and pcim_iomap_table() with
+> > pci_iomap_region().
+> >=20
+> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > ---
+> > =C2=A0 drivers/vdpa/solidrun/snet_main.c | 47 +++++++++++--------------=
+-
+> > -----
+> > =C2=A0 1 file changed, 16 insertions(+), 31 deletions(-)
+> >=20
+> > diff --git a/drivers/vdpa/solidrun/snet_main.c
+> > b/drivers/vdpa/solidrun/snet_main.c
+> > index 99428a04068d..abf027ca35e1 100644
+> > --- a/drivers/vdpa/solidrun/snet_main.c
+> > +++ b/drivers/vdpa/solidrun/snet_main.c
+> > @@ -556,33 +556,24 @@ static const struct vdpa_config_ops
+> > snet_config_ops =3D {
+> > =C2=A0 static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet
+> > *psnet)
+> > =C2=A0 {
+> > =C2=A0=C2=A0	char name[50];
+> > -	int ret, i, mask =3D 0;
+> > +	int i;
+> > +
+> > +	snprintf(name, sizeof(name), "psnet[%s]-bars",
+> > pci_name(pdev));
+> > +
+> > =C2=A0=C2=A0	/* We don't know which BAR will be used to communicate..
+> > =C2=A0=C2=A0	 * We will map every bar with len > 0.
+> > =C2=A0=C2=A0	 *
+> > =C2=A0=C2=A0	 * Later, we will discover the BAR and unmap all other
+> > BARs.
+> > =C2=A0=C2=A0	 */
+> > =C2=A0=C2=A0	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
+> > -		if (pci_resource_len(pdev, i))
+> > -			mask |=3D (1 << i);
+> > -	}
+> > -
+> > -	/* No BAR can be used.. */
+> > -	if (!mask) {
+> > -		SNET_ERR(pdev, "Failed to find a PCI BAR\n");
+> > -		return -ENODEV;
+> > -	}
+> > -
+> > -	snprintf(name, sizeof(name), "psnet[%s]-bars",
+> > pci_name(pdev));
+> > -	ret =3D pcim_iomap_regions(pdev, mask, name);
+> > -	if (ret) {
+> > -		SNET_ERR(pdev, "Failed to request and map PCI
+> > BARs\n");
+> > -		return ret;
+> > -	}
+> > +		if (pci_resource_len(pdev, i)) {
+> > +			psnet->bars[i] =3D pcim_iomap_region(pdev,
+> > i, name);
+>=20
+> Hi,
+>=20
+> Unrelated to the patch, but is is safe to have 'name' be on the
+> stack?
+>=20
+> pcim_iomap_region()
+> --> __pcim_request_region()
+> --> __pcim_request_region_range()
+> --> request_region() or __request_mem_region()
+> --> __request_region()
+> --> __request_region_locked()
+> --> res->name =3D name;
+>=20
+> So an address on the stack ends in the 'name' field of a "struct
+> resource".
 
-On 17/08/24 05:23AM, Matthew Wilcox wrote:
->On Thu, Jul 11, 2024 at 10:37:46AM +0530, Kundan Kumar wrote:
->> -bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
->> -		struct page *page, unsigned len, unsigned offset,
->> +bool bvec_try_merge_hw_folio(struct request_queue *q, struct bio_vec *bv,
->> +		struct folio *folio, size_t len, size_t offset,
->>  		bool *same_page)
->>  {
->> +	struct page *page = folio_page(folio, 0);
->>  	unsigned long mask = queue_segment_boundary(q);
->>  	phys_addr_t addr1 = bvec_phys(bv);
->>  	phys_addr_t addr2 = page_to_phys(page) + offset + len - 1;
->[...]
->> +bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
->> +		struct page *page, unsigned int len, unsigned int offset,
->> +		bool *same_page)
->> +{
->> +	struct folio *folio = page_folio(page);
->> +
->> +	return bvec_try_merge_hw_folio(q, bv, folio, len,
->> +			((size_t)folio_page_idx(folio, page) << PAGE_SHIFT) +
->> +			offset, same_page);
->> +}
->
->This is the wrong way to do it.  bio_add_folio() does it correctly
->by being a wrapper around bio_add_page().
->
->The reason is that in the future, not all pages will belong to folios.
->For those pages, page_folio() will return NULL, and this will crash.
->
+Oh oh...
 
-I can change in this fashion. page_folio is getting used at many other
-places in kernel and currently there are no NULL checks. Will every place
-need a change?
-In this series we use page_folio to fetch folio for pages returned by
-iov_iter_extract_pages. Then we iterate on the folios instead of pages.
-We were progressing to change all the page related functions to accept
-struct folio.
-If page_folio may return NULL in future, it will require us to maintain
-both page and folio versions. Do you see it differently ?
+>=20
+> According to a few grep, it looks really unusual.
+>=20
+> I don't know if it is used, but it looks strange to me.
 
 
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_8c32d_
-Content-Type: text/plain; charset="utf-8"
+I have seen it used in the kernel ringbuffer log when you try to
+request something that's already owned. I think it's here, right in
+__request_region_locked():
+
+/*
+ * mm/hmm.c reserves physical addresses which then
+ * become unavailable to other users.  Conflicts are
+ * not expected.  Warn to aid debugging if encountered.
+ */
+if (conflict->desc =3D=3D IORES_DESC_DEVICE_PRIVATE_MEMORY) {
+	pr_warn("Unaddressable device %s %pR conflicts with %pR",
+		conflict->name, conflict, res);
+}
 
 
-------K_xth5sKcUEfCV0X9aU-k.Br-XWllh-4huxyB_iNSY1rR3o.=_8c32d_--
+Assuming I interpret the code correctly:
+The conflicting resource is found when a new caller (e.g. another
+driver) tries to get the same region. So conflict->name on the original
+requester's stack is by now gone and you do get UB.
+
+Very unlikely UB, since only rarely drivers race for the same resource,
+but still UB.
+
+But there's also a few other places. Grep for "conflict->name".
+
+>=20
+>=20
+> If it is an issue, it was apparently already there before this patch.
+
+I think this has to be fixed.
+
+Question would just be whether one wants to fix it locally in this
+driver, or prevent it from happening globally by making the common
+infrastructure copy the string.
+
+
+P.
+
+
+>=20
+> > +			if (IS_ERR(psnet->bars[i])) {
+> > +				SNET_ERR(pdev, "Failed to request
+> > and map PCI BARs\n");
+> > +				return PTR_ERR(psnet->bars[i]);
+> > +			}
+> > +		}
+> > =C2=A0=20
+> > -	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
+> > -		if (mask & (1 << i))
+> > -			psnet->bars[i] =3D
+> > pcim_iomap_table(pdev)[i];
+> > =C2=A0=C2=A0	}
+> > =C2=A0=20
+> > =C2=A0=C2=A0	return 0;
+> > @@ -591,18 +582,15 @@ static int psnet_open_pf_bar(struct pci_dev
+> > *pdev, struct psnet *psnet)
+> > =C2=A0 static int snet_open_vf_bar(struct pci_dev *pdev, struct snet
+> > *snet)
+> > =C2=A0 {
+> > =C2=A0=C2=A0	char name[50];
+> > -	int ret;
+> > =C2=A0=20
+> > =C2=A0=C2=A0	snprintf(name, sizeof(name), "snet[%s]-bar",
+> > pci_name(pdev));
+> > =C2=A0=C2=A0	/* Request and map BAR */
+> > -	ret =3D pcim_iomap_regions(pdev, BIT(snet->psnet-
+> > >cfg.vf_bar), name);
+> > -	if (ret) {
+> > +	snet->bar =3D pcim_iomap_region(pdev, snet->psnet-
+> > >cfg.vf_bar, name);
+>=20
+> Same
+>=20
+> Just my 2c.
+>=20
+> CJ
+>=20
+> > +	if (IS_ERR(snet->bar)) {
+> > =C2=A0=C2=A0		SNET_ERR(pdev, "Failed to request and map PCI BAR
+> > for a VF\n");
+> > -		return ret;
+> > +		return PTR_ERR(snet->bar);
+> > =C2=A0=C2=A0	}
+> > =C2=A0=20
+> > -	snet->bar =3D pcim_iomap_table(pdev)[snet->psnet-
+> > >cfg.vf_bar];
+> > -
+> > =C2=A0=C2=A0	return 0;
+> > =C2=A0 }
+> > =C2=A0=20
+> > @@ -650,15 +638,12 @@ static int psnet_detect_bar(struct psnet
+> > *psnet, u32 off)
+> > =C2=A0=20
+> > =C2=A0 static void psnet_unmap_unused_bars(struct pci_dev *pdev, struct
+> > psnet *psnet)
+> > =C2=A0 {
+> > -	int i, mask =3D 0;
+> > +	int i;
+> > =C2=A0=20
+> > =C2=A0=C2=A0	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
+> > =C2=A0=C2=A0		if (psnet->bars[i] && i !=3D psnet->barno)
+> > -			mask |=3D (1 << i);
+> > +			pcim_iounmap_region(pdev, i);
+> > =C2=A0=C2=A0	}
+> > -
+> > -	if (mask)
+> > -		pcim_iounmap_regions(pdev, mask);
+> > =C2=A0 }
+> > =C2=A0=20
+> > =C2=A0 /* Read SNET config from PCI BAR */
+>=20
+>=20
+
