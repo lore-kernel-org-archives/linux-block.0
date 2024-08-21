@@ -1,347 +1,173 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2087.outbound.protection.outlook.com [40.107.255.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6DE188A3B
-	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 07:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617671B1D47;
+	Wed, 21 Aug 2024 07:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724224879; cv=fail; b=pFkomv4g+X4fr0aVn5FJIPVQf+uLlRcIRxUDucC+8qSdPFhEuJeyPJPN+APqOraqIWn6+7Foi+VSPANky9YkGuxxVY2+bCu+Kd2FNzdqxyFtsHcLjjun/JnbmFWeAy2IostBb1aGrVVDnqJ8ISXdL5QXj1q03A/TlqvOMGo2+go=
+	t=1724226526; cv=fail; b=r+v3gKF7StVpfyc9nZ1GoXnpU44eJglNehrhefquwN9Dw7yaWJe5JdSrKScLixu1WJ8p9jWmEtt6KeBTDGQvrtZkBfdA3Vw9SMARaq05APT7mKj3AEkALvwZh59QonYxceGFYo41PsjPuzr1OnkrzrsmJKlWKTxPpouiwmN5uvU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724224879; c=relaxed/simple;
-	bh=mxYNrMYQi97iixVCkUXiH+0DluiN9JeXhmEQ1zolNck=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SDi3mc9zSQNpubmSAIR+zf7BF0wHnPstsag6bQVn3TfgoCvKY296PCpDSywgf57XmaUt44iQDCjaWwgamGp+uVntG2z7B27IvkNlZJYzGotFShInSliX8JLAa7O9bBFn6lmBDiQkWGQwRn8IjbIegC0pPbDOYQmY95LolVPlAUA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=ZqOCBCpg; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=ncxKC1g2; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1724226526; c=relaxed/simple;
+	bh=v5CrtpFTF69Vt2fQ3Ql65yO2L1Ge/ArgsNHrHmc9unw=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=TPgwQ+UEAFLpX9hmElhZC8tA8BK7Itv7L2wFw99AnRAp71X/+8YDrT0JMpn3b8t4mMXOPpUxpso1UGchj2aQnMVhTpPV2+HM9xsPC53Pult+4369AVxECyBV8FE02bFdQ1WBDWE4LwtsZuYMrhsVYwF6nZ/WCGX75ykNEbCOVMw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=g3jnixOU; arc=fail smtp.client-ip=40.107.255.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZqOCBCpg";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ncxKC1g2"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1724224877; x=1755760877;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=mxYNrMYQi97iixVCkUXiH+0DluiN9JeXhmEQ1zolNck=;
-  b=ZqOCBCpgB/Gwuk3eh6Dm3so1g91QGbzXeLXceOjZZNt4cL/r20s7bBga
-   8EFoDkhHrZCg8XqX524onpyUVMvRAAU57uGLIVnGMkhvC1Hto6rfLan7U
-   UzdKK2alg8MYGFNPtDod7uCyol8M1k+bfisP722BVWwd8zFvTrzkvNXKH
-   211taRq4XHAONkDXfe7lNw3q/UjUC2Fux3wgXwvqewhPLjJczEPHycJOd
-   iF7P0Z19gT65cp2DcWMQi9uprZaXoC9OZ5u0JcUeUb4lMr2faA0vWWb40
-   0BfRecW/gN+jQNUr71U0rdYECr+sjX6HpArrh5f0gsBurykdhPYrPPYer
-   w==;
-X-CSE-ConnectionGUID: k0qdFBlIRsyK6DAqa4hXRA==
-X-CSE-MsgGUID: 4NPrC19kQZWnG0NIHzkQTg==
-X-IronPort-AV: E=Sophos;i="6.10,164,1719849600"; 
-   d="scan'208";a="24783318"
-Received: from mail-mw2nam12lp2045.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.45])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Aug 2024 15:21:15 +0800
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="g3jnixOU"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=C+jLHhrlE/kWmUcTsef4lsIo4l1qtUiSyrNKl6Qxi+K1GVkbiuFpexQcXrTdI1dKa+slR91YaA4IY2KgU29oVnyL3aVuVW4mMtjBOigs1GbsIJBBJn8um4O403TszrIxoKlcY8bRCOO9pz7VV2TsNaUG/U/9/lNVAczz7gR3kV02HAtnffhIsbtEdujaAXHpv+KE7G8jlYch2IzPCowwJBzlrwl9mX6KfO1ZhaggCRXttH+/wzvXTyfJb03ILBzY+1CUKA29RAvwhu92T95+hkedQrr5EdO+eAqPDoIQnlnZD4Z3T2S4PaW10L1QfTSOSdJFhalJ7P3ZDRtScW62ZQ==
+ b=FqTpJqpoRBo8Sy9lvE29rxdIKvKYfQ4WcIlURPCC5B0NtAi/CmDdPK3/rUTo3QOSmq5cUgQUmKp5RWIPtZNF0153c8riJDueCm0f7ND3K8YgihsIZGpJxty4BblBwQFo4qtO81/DSx8UvmNr5i6JQ50lUy+vxXzEWPTTospcMPllmWHjon6/dpRZs5v3GETqHCdhDE+FQdl7Gtqk9ZB3/lKloQL1IDkIBx+gM14hYKaFSefwVdBWAwIyKQgAveYEPEILYZqG4apPeEHwyjWtQO7NSlw2zVlyGLE+GfQ4btpeErWJtEcrAUJiKZqicVCTUqLjHsmROAHkKsRWMgY+vw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cmpPnuLTX614rB2ZsooLiE3BV52zkFNYIxHMjjkBTzA=;
- b=ZZ7ovjTw5eh/ObTY03/br9ceR9LFRoPilTYw8CtwNLETa7gCJ9sQSCzNnoNVNWfgrbbuorENDOa+5vkCFjHlb/jTDo+36/0JlwuA0Cvmnw3toCluiFyHnvyZAPwqPeDkIn6j/es0oCKmeCAuT750k46eiS00n2HgxdMU4ZoQ7iHdWnzIlroDTiPnolCIrnNIchYP8oDSY7/i+tXmKKaodAnxMdZXKNV/EI8YagpbAptMGHLaSG572OCxuOMPqJW0HbySyL33GbeDpnfcrgF9VFE+JQUVa9eD116bUJckJAz9ycmTOfO2iBlaOgb1UVSS4Zs2VcoKGjR7/+XgVooq7Q==
+ bh=Xcv46LbAtMXtLrGfMa4QG6Sf4EvGlsOq7eLg4KJy4mA=;
+ b=vAsONj3Zv1bQdTWE0++ZhyFctp7Sfl+wZI5T8JD1GZYGokf2+x+2OrV6BFXV1qSqyi2TwFN6HANdfgvMRMV2GwIP9CjCDRFQn1o1NGbcp6u1j5frEjJwhWdoXYpTP1HLg4LFbQsN/qd+USiIsmm555WAp8h5HQpmTpth3z2dDv3UWofQFyfv4PwWLbtKuhlL+C7LU6jAdDDoAGS1TeUonYWuTWC9MilofA0hDydCM+msoD2PcZTGMcm2lFxjjHp7ywLSaP6AZmOgSskzJRq0batu0cd9aaTdjrhKw/r04UymGueP9TEVe4NLeKVxQWx5A+D4nSXces482mah5rTeyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cmpPnuLTX614rB2ZsooLiE3BV52zkFNYIxHMjjkBTzA=;
- b=ncxKC1g2zxlv+SjK+5+50aj1NNndMyD3ky8WnEhjnsJzjmsM0bt9LjRX0kREG0+r1mU0dhdnHUXmKjjrnhR6z9R/lHw1db/+Cs7u1wEEJP2Ca+0SQfRqva0sFTRhdbFmPlpC8brMWgBGRH93ffgBqolytEkuUJN+GrCnCY/qot0=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- CO6PR04MB8331.namprd04.prod.outlook.com (2603:10b6:303:136::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.20; Wed, 21 Aug
- 2024 07:21:13 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a%4]) with mapi id 15.20.7875.019; Wed, 21 Aug 2024
- 07:21:13 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Yi Zhang
-	<yi.zhang@redhat.com>
-Subject: Re: [PATCH blktests] nvme/052: wait for namespace removal before
- recreating namespace
-Thread-Topic: [PATCH blktests] nvme/052: wait for namespace removal before
- recreating namespace
-Thread-Index: AQHa8uqR0Nq3uU3VMkila6SfAwK3vLIwXbgAgADx2QA=
-Date: Wed, 21 Aug 2024 07:21:13 +0000
-Message-ID: <zzodkioqxp6dcskfv6p5grncnvjdmakof3wemjemnralqhes4e@edr2n343oy62>
-References: <20240820102013.781794-1-shinichiro.kawasaki@wdc.com>
- <d22e0c6f-0451-4299-970f-602458b6556d@linux.ibm.com>
-In-Reply-To: <d22e0c6f-0451-4299-970f-602458b6556d@linux.ibm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|CO6PR04MB8331:EE_
-x-ms-office365-filtering-correlation-id: 7c7703eb-cdb9-49e9-ddc1-08dcc1b1d6b4
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?ZP/4lEOPebXQskauqEkmENYQNky6Xm3E2aa8um3XzlGE/uXcw2rpuuMZd7eY?=
- =?us-ascii?Q?+KAbii4HUYN1HzxzDaNHFMIXJO8H6CqDqFlOx7YTXVmEXkVLw9axM8pWyxgJ?=
- =?us-ascii?Q?tx/KYTUkdqcCUV50nrBjbCdow/3+B0ovJQOjm9SXRasPmZrTA3xsopkxo5zk?=
- =?us-ascii?Q?SpVVwPD8prLrVn9DiIeEUedUf11pWD7ZU/Rdjsvr3xRPfmIf5jNs2NiLJgnq?=
- =?us-ascii?Q?jfeO5QQPcuDiaMD3b03see9iZHW7ypEOu9AvUkBMfeqv81Dmr6YeYOOcNHNa?=
- =?us-ascii?Q?VdZS0WqiKxPquPr6J2JcbW0W+0RKZk+O57sTO6xqDoorb1TBDUy2DpkZxDjh?=
- =?us-ascii?Q?R95U5Zwcl5XemJ6RLtLKxy3VKvP8pftZBHzYa4V85vYtv5Ta22qs9stTxjS0?=
- =?us-ascii?Q?a1WrHwDND9LbGoFhFwCiUtbk6oNZWsHaqtvsJeBkEFeevDN33hFwRFUhh55f?=
- =?us-ascii?Q?hvAkYEKPmL9iDSQ7XGawI6HdrEZ0lfff42FFeocYDvQm5Zw49Aen8gygxSrV?=
- =?us-ascii?Q?cUY7RESv/PK7W7LczpwPI7l5a+hW61kVzmtQViqpjMWI1wyqKtb+VOLFKFtp?=
- =?us-ascii?Q?dtPy1ywtykdCRUk+a3N5CvV2I8hg85IKTPBpJHhUuT48UQFauJNcyVTVGj2j?=
- =?us-ascii?Q?kTTd83Cqt2lnrPksRQEXy0AetPueRyunybDE5qUPz6xl4oghEShToFb7iO3Y?=
- =?us-ascii?Q?3E5MfYOpuYlO7FGGU1exS88t+Zx0NT3bf3IeivNBvk2a0x/FfmJZeNbc843J?=
- =?us-ascii?Q?Dl2mtOw0Bqvtd5ez0KOIUt1ZzgKemkBSr44dxnDc9rXkMCPsKNQPrOJqSoEW?=
- =?us-ascii?Q?y5IKzi1L8PgZiuupCxp+y1VuhuLrkY6yKBwK5c4A7LuBp3MYiHp2NVQuyic0?=
- =?us-ascii?Q?NRJyrjMLFRh29qd2sLXlOxw8gxmKdFqPXZLuErbZUAuvB+5U8Y22fFWOLj2n?=
- =?us-ascii?Q?0kN47B3m3yD7q5GYxlk8N6M7FIdTh1YghY1t1paY2EoGjlf3hwQFZdoNxbKU?=
- =?us-ascii?Q?KkbGWK2ZSEOhWdvCUZEc5EoT+F1DJLtcNOrCobvowzUwY9iIrQ3STgVeUm7b?=
- =?us-ascii?Q?+/5aGQ8Equ8yA2ioPvXgBxux2WG6I6EevDe2zlh/GOLdmLblwI7gWKd8PgXu?=
- =?us-ascii?Q?gXaNAepq55sx7tgsQBfoTyNoQjBMmo/i7pN6FaSP+VokGiMuQUXvsrwT9zUp?=
- =?us-ascii?Q?zBQ6/zzAUoiJaVf4OrnYVe8AXaUJZ4DHgZ/lKpMS0ZEaeMXUxMk5Jzh1j9Kt?=
- =?us-ascii?Q?/wKazNZiQ7Ky6r0AdYccW0QK7q7MxH7cFxLPqLg3IagxXMo7fvhHcry53lt+?=
- =?us-ascii?Q?S0xOd17itKd6elIKrHg75QffIhoKttoPoikWMj/fTnq2x2aiaKv33oR81bwV?=
- =?us-ascii?Q?dfDxhSf87Vg5iWlKLytwW10ZrVOSPSx3osIKVVkGU0+I5rymsw=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?5JeZVnYw3/OSRlHZWRPizaQjAcT0q6aIMnlWDEm68Z2/xe36MKzzYZkcox9k?=
- =?us-ascii?Q?loSeT01mrSsmrVnlbynKcKmPfehNQoCWUMIwOObtWdVZs0trKLRuImAwNgY+?=
- =?us-ascii?Q?wWxtKHmW8PqwWqspT3CPXHbFyIf20Pqg6CHX9tV2gP8vPlpTulmhUpaUQ5JC?=
- =?us-ascii?Q?/k3pQS0dU4HozdIh4MMy7kVe8idWTVbD16PNXFyYYqsxqppIhPTvikRpBgl1?=
- =?us-ascii?Q?BWsXK49bBrreKjM0z3lZ4oTd4GsgocNzKx02lqIgO6s3mDy3sNcgpjBwRFz4?=
- =?us-ascii?Q?v8BBhJg926NQyhCziHDKQIHJI3/oMQG+Sxz2X0OS30SyDQ2m4/PtiujsMt6O?=
- =?us-ascii?Q?YAJ+ZK9mdtR9K+KdMVKKK5wJn1OYK5nt6/+J3MJ7e0pRzuEXEPCWVBXOjzSp?=
- =?us-ascii?Q?wtgkfFF0eH1xH+t/l/OJItY5NvQR5gMg/ywNEbRasI+gq7fFqhHBR9Ky99AW?=
- =?us-ascii?Q?MLfDOcfqClMyRjxj0P13810ewoWPiKPriqcpG+VSrxnAZVwODJsi2YBxb/Wj?=
- =?us-ascii?Q?5tzDEzoscKv3vD9oDcedFcWiA7S5V0DHwZuQ77qULJjSBdwGNyIr+q1uPRgz?=
- =?us-ascii?Q?/TERTUWPeOYYsCVi2pCzVLDvnckHRVBHLqaZtR9Uy8U63ZsDNN1QswT12rhr?=
- =?us-ascii?Q?U9reW6S7JEu9OBCJJTQu6yu/C1LzkMHAVcI7VFmJmmDj1anMUG1TIFSFl8Rr?=
- =?us-ascii?Q?WgtRP0Pd4dmnV8wBDFxtEXMgCYXzFvCx0SY4KBbWHfXX8G3MwQJY1v67OUyH?=
- =?us-ascii?Q?vjJg47ufyRz/rBGFsMSUUmrwCU7oryW9ehbpaFuOvaIyLpatlQ+nqE21Qq0K?=
- =?us-ascii?Q?8do03K3m33lR1N630Zm/HyWwMvU68adVwhnp3ynEFRWCDzP8mzOnES6tkRtB?=
- =?us-ascii?Q?A5TKz2rHolzJlBU9zlNqpwlFGfSy8PxvlJgezpcnfkBM6tUMAiu1/Lyi/UZw?=
- =?us-ascii?Q?6pSCMFDSGxwpHxc1sT/Kz2DOi4KTgov4EoJMSOTvyTlpmKNbM1/6OkBIys5R?=
- =?us-ascii?Q?pZF7vJvHFQvzd+j8ZwTC61BeZD7k9Ufwncyl0C2SxvieeSqA6+Ax9X5q3NSO?=
- =?us-ascii?Q?z+xr58kTuw50K7/MelW5bj/DpFyLKIU1DLw14ejr65PRF3jMbeVH1yWYNGfs?=
- =?us-ascii?Q?5RIKqu6shF6UjmpH/sG275XUF1JxbA4tovgeH5Ay/GO2TKIlutQuag/8b//e?=
- =?us-ascii?Q?q+MHCTaMF/3S192LavBKHiZffcKyKpv8pvDo8PIDY18iC5N0fihSFH08I93r?=
- =?us-ascii?Q?xqUTNuvm1QKjNO2kXNdCOvrJ2XqoA/UlKlLBgL+bxDuVQw4YVKOWxQmcUHkD?=
- =?us-ascii?Q?kSDfGSclvkv6Gfx3wEGcsh8Tu8YX5lWxO8DM4b0QzsFO7w69yz8ngdCQ7Uou?=
- =?us-ascii?Q?nVAIOLfymoZOgj9nH1C5uo0qRzQZ/VnKb1q3XloN/nmzWpQWfR+A1yrhtLyY?=
- =?us-ascii?Q?rlDtuTNQJhQf6r/kjt0qh0yDy2gIC59LfqIeJE8mPHPzcVq7K0yGEHPbWj8W?=
- =?us-ascii?Q?6DVPpzmAY+HN5VJZ3eNZ1xbMycR1XKWszLQXWoRQmU2enuUbdrOC5Nu39euV?=
- =?us-ascii?Q?LASqEvoknYC5PLvk4tFqFDl0x02sdRYqOThxAR4k4e20BonWp5yK53RVd2N3?=
- =?us-ascii?Q?YRyD2vsTt6GY/Wpw0yUA4z4=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <5F5D8834451D1041A5095FBC5301EC82@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ bh=Xcv46LbAtMXtLrGfMa4QG6Sf4EvGlsOq7eLg4KJy4mA=;
+ b=g3jnixOUEE/56zoSbDGlh+o3ptYtW9GfYJVxi/YJaCMlAdDRjyrT4lAPbLHMj5z6OwD4iZVdovsj+llL9NpOTRbxcvid5Q6ptCbRDAj5Wzw/cVyPAY518CYEjjrzWBBR1dH6sPESxU4By5IlWin0BUpzUlkCvluwrZq+Cg/3VjrxKAdqwl0nG22u/LgzVFAxZ7J3aWuNA8geVLoKLyP7md9DYclnZbywnvpqH92l/kOwLq8D5w6snU4n6qhIaDBh7Zr1nDZF/THbNAh/0B1KdyqyCfT94hJI4pWuSA3vk4JigL4KBJjasudqHI/i3YuqNdAcTkZTIP0f9Rf9dpuHTQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from KL1PR0601MB5487.apcprd06.prod.outlook.com
+ (2603:1096:820:bf::14) by SEZPR06MB7176.apcprd06.prod.outlook.com
+ (2603:1096:101:225::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.17; Wed, 21 Aug
+ 2024 07:48:38 +0000
+Received: from KL1PR0601MB5487.apcprd06.prod.outlook.com
+ ([fe80::2129:59e5:6c67:311f]) by KL1PR0601MB5487.apcprd06.prod.outlook.com
+ ([fe80::2129:59e5:6c67:311f%7]) with mapi id 15.20.7875.019; Wed, 21 Aug 2024
+ 07:48:38 +0000
+From: Chen Yufan <chenyufan@vivo.com>
+To: =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	Chen Yufan <chenyufan@vivo.com>
+Subject: [PATCH v1] xen/blkback: Convert to use time_after_eq macro
+Date: Wed, 21 Aug 2024 15:47:29 +0800
+Message-Id: <20240821074730.13411-1-chenyufan@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYCP286CA0344.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:38e::16) To KL1PR0601MB5487.apcprd06.prod.outlook.com
+ (2603:1096:820:bf::14)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	2nkcqZ/4PkdDXwe976vVLWlFOVc6/QMAtNC3fSW8AnYoos2WB5wWrLrRo9yz/99/w3r+YEMc2lpR8ojk5DInyvmhU5r1Kf3axqUdyAXI3zyWQM7PpwOgXuYtX4P1H7K1TbfCzDMfRD2s88cw6ycrCHqxU0jvZSao94Cc7G6qDebO26bHHqez+zsJg33i+g78LCVBDgoOSYV4ZVjZ7JcDr0xrJ5RSqtuVatKDR2nohWmMrgBRIRLSJQ2Ftkgc9yexLB1h/iSBYMslHRyM55n9nSoFaz4GoT/DoKwh2PFJOYAXAqCKD3ktfHyr+HJi9hkKSt+GcM7vHlATkoJ389ZCEp1y1i3WOm9+mkMRViphTYHKjy5pG/UjSPhdULBiagQ9DzqWHlZiv4FlgS3B+A+oExlKMJr7AUo9arxky4/iUqI0BjTLcPbDWH/jtoxiu4wnF48ymG3rEC3dXB9fiBwW6MIi8ql+IszDr5iQ9fIBJet43IJC4XRJVOd9NTXRqo6IlrXrzkmxq2JEkZ63byFkkovtXASuZ5xNtS+UbuXJ/D9BhdeBgCjlns02ItsGlynxHE4NTDnbHTzCDK0C33XNADkjAenS67SPyjZiP5QT3QPzktKI0MBqq6Kx9VHsoJ+j
-X-OriginatorOrg: wdc.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: KL1PR0601MB5487:EE_|SEZPR06MB7176:EE_
+X-MS-Office365-Filtering-Correlation-Id: bdb7f01b-a6b4-40c6-3e5e-08dcc1b5aad7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?BpYS8GyY/WYZ50dMpfB6yjrZr63j1c1SK2Ep4ExC8V8GsMp4InmP/XLKQ5sB?=
+ =?us-ascii?Q?lqSVQFocNgABymcrrkSejnLHSqskNTsSoWCnMyKVnbUYNapBx0MJqA7dahcb?=
+ =?us-ascii?Q?cFX3+Qvt2lO9MX4OW/QK6/Oc/pM5YYnbOyBfhgvG+5lFhJCHWVKaiFMSWtM9?=
+ =?us-ascii?Q?tGs7FlXbDR9QsukmTl5WOrwC/VE0JpDckhFZFo7yo50tzuj9oQhK1Ci1/Pif?=
+ =?us-ascii?Q?96EMptSNJPp7DutHN179p3ClHw152V7ByqhnBNGhQaqrsDiNy2+09MRjOtjq?=
+ =?us-ascii?Q?OggGyrGBUWlP4FhjtCgTsr6q1HtW7oMiVU7KHYIBVAWOwQcwkXakc02wPhCd?=
+ =?us-ascii?Q?8aSlr4gz22/+IXhDCoqEWvEQt+xJlzDsLpTLMDuL9wA8utV76BpmFfy8wo7q?=
+ =?us-ascii?Q?Z9Z43c/FnTPdcBb17UTk6v0HfhjlzRFckjPE9TaZ1O3ixqMdN5Jv7LRGH7af?=
+ =?us-ascii?Q?ASXcfMmoy8NJ50H9zhdur6G6r2AhKTqoa8rR1AdYvg02tm3FQpY8qjyYyDtB?=
+ =?us-ascii?Q?xBbBe1ZmKvHDd1I1SlfBuzG36TTGL9x2KZZrKmVv7qQ3yqUQai61kGZHqEvS?=
+ =?us-ascii?Q?El5vVYnEpYI+vQH0H+OxBwwXsVHl2PCaF/hv8OjD1EOlEfPy37awJQp8ZBsj?=
+ =?us-ascii?Q?uKAVaNs/3qLf5aZRfkblRUVK1deYWNAbq+Mye3yslexdtVb1YTKiHPJabBYu?=
+ =?us-ascii?Q?7X8Knx0QpK1lq+DNgwfn0nrVy5EUmUzNCSErEEShlfSHCYQumV2fTrqM/T6d?=
+ =?us-ascii?Q?DTLzZNUDKhgfXjksubVEUhiSv4Y0xcvrDFHvCr3/Knxf7qI2Jwm7Rrynutea?=
+ =?us-ascii?Q?nEo/GQgfGKfZCZdt3ulYwSo5ukTsXMdcCVf/wYvmDrtGl4z439fONNnAzxTc?=
+ =?us-ascii?Q?RyCTDrkzEkNveSDklz5C1h4x/nRsaMmuQ6YjARKKGpROWwyJjUa7iZEha3uX?=
+ =?us-ascii?Q?J3n6TB0TLVWrjUkMvic2bYPAz01s2QuVDGqWSdIMUCT4jUDh52uFHcp+A/ck?=
+ =?us-ascii?Q?6taIwGfVuY8w2i6gsAscZr9R49MyuZPwo6uAy7/imDSzBg+HIckXMWNy3SAu?=
+ =?us-ascii?Q?YYjwixNMh8CWjvVKvLuqavoQlG0Xn/xt6m6RxoHZAw8BSj3HM/6CR91VAHKL?=
+ =?us-ascii?Q?qvSUWQE1DNkKIvpGqTXgMo+yjrlfcxXyjYesfxf6jCrqbjmQW4KtlMFsvPUU?=
+ =?us-ascii?Q?PGRpu2SzQhLwDXrKrFlnTXh+CloeJ33mVTMA3YQ7DVIjbPr1yVlJMgREv87o?=
+ =?us-ascii?Q?JLy8INhPsH3d+QPBJev6J/9XGBCG5zlqxk8BcsIzL2iwQB9GHwuJPNiKFT7O?=
+ =?us-ascii?Q?5YMfS8dP+HdUV2J6mjRe7jktMCMlC651fkeQ31FgJbDrGSkdPJDDGFx+XkZR?=
+ =?us-ascii?Q?qk2JrMGxhJ0i8mLEiokzns0x3u6W6n57JrOZ617hNjA/DhpGZQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR0601MB5487.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?jNmyPD49RtN4YBauS5oCl6OcSRRb6bWAqB2Jz3FmEE4S+a1on13WOrj4XgTT?=
+ =?us-ascii?Q?9FanqsHUhvz/0ZEej08qI+rd8tLrMbC/BaeQYu+UmpFc2+/UCFjcxrtlMt2J?=
+ =?us-ascii?Q?nPFDPFK6oX/sLkfi9MHtU3fVNMmJC0M8qrQ2JpbJdbpOALcbU6uEL5uTu2jO?=
+ =?us-ascii?Q?Tbn+ue786bu7S+ZFM91IRX8a1d7H1ikYrvDo1Q5FBnjUUe6Zt+jA5ccdNhGm?=
+ =?us-ascii?Q?REY3+D48IpNeg+a2srYSwAOT8JZ9HcX4fl5TjdcP4xvp5Vg1z8efxMXnjLBj?=
+ =?us-ascii?Q?BCQSl7eDgbCuTPfk7AQSMCfngHa/7t34yzOepNMQeH4g8dGP94y2tUlaAvca?=
+ =?us-ascii?Q?zICqpV0a4rT83N1fD5sH1wzzCfwMC8t2YGHfb/LLvkj1bT7rkG2GIP3J5fcK?=
+ =?us-ascii?Q?iRo1pzYyi6FlPscCM7BaYO20gwbatYp+wLtdDOPRaCBXX6qsiHmdHf+3dHwe?=
+ =?us-ascii?Q?KiA3GqVnTY1EE2+BRz5D9XFrwU4YPoGdKKd80Ty84HNZaozW7miQCNiaX2+E?=
+ =?us-ascii?Q?lwVCbBQunn8lW2AUmLA/3W740JNDBRCiqqoSYZMPZU0VrnfoJ3iMmxaamHGR?=
+ =?us-ascii?Q?W+biwLTmtdd+5ZDN8PzDQfb0ApXpjp6NVdD79z4DHYGAlhpQpxgTFMu5jjpT?=
+ =?us-ascii?Q?dtgtWgt6cEkcw442Zou25QjWwdIE9PNJohP5RzFDK4hh5/PTN6yyCm1RF1FC?=
+ =?us-ascii?Q?uI3lRZImIhJBaozeDu0VdK/kdJH5MvoYrpcgkE9OZu2kVo9mf3f2ZmRHLPb5?=
+ =?us-ascii?Q?kWh/OuXg8CNj44sV/q+pVMoNs61H//6rvoRR9FPiWKMMZnC5t/Oie6gj2OTV?=
+ =?us-ascii?Q?JLQwSHv7kXZgMRGNpQjPLhxBAFPbEsrziaP2hnOs7RxZMELCjEueRoWRPDXH?=
+ =?us-ascii?Q?xKRekgbymMPGkZ0wj5uar/+XcBbyKFr2Tyz8UdTyunA580lYo8iLZV0YprFY?=
+ =?us-ascii?Q?Vk3U+mTmfL/GNUh2G0b5JibdGpA6fm4+UvVoJnZFxgtXJ3OnUmALni2udmgb?=
+ =?us-ascii?Q?/9IWaN5asKsipKElQrmc5iBDF542zZ3O4FSARuhEwP2VJOUg01Ral4a8WNFU?=
+ =?us-ascii?Q?LWHecJgYYcJyI5IwpApUzIog/ue39TaXjKrwBuOoTqgq0hnvCVFEP+J1W/3L?=
+ =?us-ascii?Q?IUOx4ihNY2r8uqnygozvVSw/OC6w/8OPCd1HFE5NEYkeplqYxZfjUDXlyRPi?=
+ =?us-ascii?Q?RTtXiSZeA7OFABRACuCl+ERBfaxT77buS+ETvh9Oqe22+tZCkwI9NmIBoLWJ?=
+ =?us-ascii?Q?jkawVQmbb0c5rzq00naz7ZHfTRt5Y1fxbQfzRV06B++FXGx9SVOYzWl1QH9b?=
+ =?us-ascii?Q?DorDymolXmLO8iaIMotaq879XFikO+yb98DkEQBdCONkBoh0JPFnXHa169iv?=
+ =?us-ascii?Q?Jzw9jZlanScFdraS5S6aIhf1QDjVrK5e2K1EcuKtm7qeMU2bUJT6RNEnhCHy?=
+ =?us-ascii?Q?ZrBK5vv75+yo63RW0V0z17FcKuzF1wqQo253kDl0MgRZHxIVJYskhIr2OLj+?=
+ =?us-ascii?Q?Kd4caEKSUELR2grjZIjw70bre1E/6STFSAjNzXk0LDubu+8+N11GFq9tyI2c?=
+ =?us-ascii?Q?5Tlulq2VKGtCzp5n/ceTRlxTBmajVBf5rMb5hq4e?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdb7f01b-a6b4-40c6-3e5e-08dcc1b5aad7
+X-MS-Exchange-CrossTenant-AuthSource: KL1PR0601MB5487.apcprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c7703eb-cdb9-49e9-ddc1-08dcc1b1d6b4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Aug 2024 07:21:13.4983
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 07:48:38.1441
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KE3B6Q/w5fzMr0/VqVOPzQf/lVusCUMWn7TRzTkgqvYTObt24gOrePb9+6lpB68/rPs5wcFqNDm4MBAH4MtoN3JvJ+0d6iSYyrXBVSEs7OY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB8331
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lpBNEWl2af4bEn9VSCNY9JS1bbVy6s4Y+1Jc1HOXQmKanRsR+8zLObKb9r9eo6YWvL42tTsAWQ1pk2jCNvtBeQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB7176
 
-On Aug 20, 2024 / 22:25, Nilay Shroff wrote:
->=20
->=20
-> On 8/20/24 15:50, Shin'ichiro Kawasaki wrote:
-[...]
-> > diff --git a/tests/nvme/052 b/tests/nvme/052
-> > index cf6061a..e1ac823 100755
-> > --- a/tests/nvme/052
-> > +++ b/tests/nvme/052
-> > @@ -39,15 +39,32 @@ nvmf_wait_for_ns() {
-> >  		ns=3D$(_find_nvme_ns "${uuid}")
-> >  	done
-> > =20
-> > +	echo "$ns"
-> >  	return 0
-> >  }
-> > =20
-> > +nvmf_wait_for_ns_removal() {
-> > +	local ns=3D$1 i
-> > +
-> > +	for ((i =3D 0; i < 10; i++)); do
-> > +		if [[ ! -e /dev/$ns ]]; then
-> > +			return
-> > +		fi
-> > +		sleep .1
-> > +		echo "wait removal of $ns" >> "$FULL"
-> > +	done
-> > +
-> > +	if [[ -e /dev/$ns ]]; then
-> > +		echo "Failed to remove the namespace $ns"
-> > +	fi
-> > +}
-> > +
-> Under nvmf_wait_for_ns_removal(), instead of checking the existence of "/=
-dev/$ns",=20
-> how about checking the existence of file "/sys/block/$ns"? As we know, wh=
-en this issue=20
-> manifests, we have a stale entry "/sys/block/$ns/$uuid" lurking around fr=
-om the=20
-> previous iteration for sometime causing the observed symptom. So I think,=
- we may reuse the=20
-> _find_nvme_ns() function to wait until the stale "/sys/block/$ns/$uuid" f=
-ile=20
-> exists.
+Use time_after_eq macro instead of opening it for readability.
 
-It sounds a good idea to reuse _find_nvme_ns().
+Signed-off-by: Chen Yufan <chenyufan@vivo.com>
+---
+ drivers/block/xen-blkback/blkback.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> Maybe something like below:
->=20
-> nvmf_wait_for_ns_removal() {
->         local ns
->         local timeout=3D"5"
->         local uuid=3D"$1"
->=20
->         ns=3D$(_find_nvme_ns "${uuid}")
-
-I tried this, and found that the _find_nvme_ns call spits out the failure
-"cat: /sys/block/nvme1n2/uuid: No such file or directory", because the
-delayed namespace removal can happen here. To suppress the error message,
-this line should be,
-
-         ns=3D$(_find_nvme_ns "${uuid}" 2> /dev/null)
-
->=20
->         start_time=3D$(date +%s)
->         while [[ ! -z "$ns" ]]; do
->                 sleep 1
->                 end_time=3D$(date +%s)
->                 if (( end_time - start_time > timeout )); then
->                         echo "namespace with uuid \"${uuid}\" still " \
->                                 "not deleted within ${timeout} seconds"
->                         return 1
->                 fi
-> 		echo "Waiting for $ns removal" >> ${FULL}
->                 ns=3D$(_find_nvme_ns "${uuid}")
-
-Same comment as above.
-
-> 			=09
->         done
->=20
->         return 0
-> }
-
-I found that your nvmf_wait_for_ns_removal() above has certain amount of
-duplication with the existing nvmf_wait_for_ns(). To avoid the duplication,
-I suggest to reuse nvmf_wait_for_ns() and add a new argument to control wai=
-t
-target event: namespace 'created' or 'removed'. With this idea, I created t=
-he
-patch below. I confirmed the patch avoids the failure.
-
-One drawback of this new patch based on your suggestion is that it extends
-execution time of the test case from 20+ seconds to 40+ seconds. In most ca=
-ses,
-the while loop condition check in nvmf_wait_for_ns() is true at the first t=
-ime,
-and false at the the second time. So, nvmf_wait_for_ns() takes 1 second for=
- one
-time "sleep 1". Before applying this patch, it took 20+ seconds for 20 time=
-s
-iteration. After applying the patch, it takes 40+ seconds, since one iterat=
-ion
-calls nvmf_wait_for_ns() twice. So how about to reduce the sleep time from =
-1 to
-0.1? I tried it and observed that it reduced the runtime from 40+ seconds t=
-o 10+
-seconds.
-
-diff --git a/tests/nvme/052 b/tests/nvme/052
-index cf6061a..22e0bf5 100755
---- a/tests/nvme/052
-+++ b/tests/nvme/052
-@@ -20,23 +20,35 @@ set_conditions() {
- 	_set_nvme_trtype "$@"
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index 838064593..f6da0b74d 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -42,6 +42,7 @@
+ #include <linux/delay.h>
+ #include <linux/freezer.h>
+ #include <linux/bitmap.h>
++#include <linux/jiffies.h>
+ 
+ #include <xen/events.h>
+ #include <xen/page.h>
+@@ -134,8 +135,8 @@ module_param(log_stats, int, 0644);
+ 
+ static inline bool persistent_gnt_timeout(struct persistent_gnt *persistent_gnt)
+ {
+-	return pgrant_timeout && (jiffies - persistent_gnt->last_used >=
+-			HZ * pgrant_timeout);
++	return pgrant_timeout && (time_after_eq(jiffies,
++			persistent_gnt->last_used + HZ * pgrant_timeout));
  }
-=20
-+find_nvme_ns() {
-+	if [[ "$2" =3D=3D removed ]]; then
-+		_find_nvme_ns "$1" 2> /dev/null
-+	else
-+		_find_nvme_ns "$1"
-+	fi
-+}
-+
-+# Wait for the namespace with specified uuid to fulfill the specified cond=
-tion,
-+# "created" or "removed".
- nvmf_wait_for_ns() {
- 	local ns
- 	local timeout=3D"5"
- 	local uuid=3D"$1"
-+	local condition=3D"$2"
-=20
--	ns=3D$(_find_nvme_ns "${uuid}")
-+	ns=3D$(find_nvme_ns "${uuid}" "${condition}")
-=20
- 	start_time=3D$(date +%s)
--	while [[ -z "$ns" ]]; do
-+	while [[ -z "$ns" && "$condition" =3D=3D created  ]] ||
-+		      [[ -n "$ns" && "$condition" =3D=3D removed ]]; do
- 		sleep 1
- 		end_time=3D$(date +%s)
- 		if (( end_time - start_time > timeout )); then
- 			echo "namespace with uuid \"${uuid}\" not " \
--				"found within ${timeout} seconds"
-+				"${condition} within ${timeout} seconds"
- 			return 1
- 		fi
--		ns=3D$(_find_nvme_ns "${uuid}")
-+		ns=3D$(find_nvme_ns "${uuid}" "${condition}")
- 	done
-=20
- 	return 0
-@@ -63,7 +75,7 @@ test() {
- 		_create_nvmet_ns "${def_subsysnqn}" "${i}" "$(_nvme_def_file_path).$i" "=
-${uuid}"
-=20
- 		# wait until async request is processed and ns is created
--		nvmf_wait_for_ns "${uuid}"
-+		nvmf_wait_for_ns "${uuid}" created
- 		if [ $? -eq 1 ]; then
- 			echo "FAIL"
- 			rm "$(_nvme_def_file_path).$i"
-@@ -71,6 +83,10 @@ test() {
- 		fi
-=20
- 		_remove_nvmet_ns "${def_subsysnqn}" "${i}"
-+
-+		# wait until async request is processed and ns is removed
-+		nvmf_wait_for_ns "${uuid}" removed
-+
- 		rm "$(_nvme_def_file_path).$i"
- 	}
- 	done=
+ 
+ #define vaddr(page) ((unsigned long)pfn_to_kaddr(page_to_pfn(page)))
+-- 
+2.39.0
+
