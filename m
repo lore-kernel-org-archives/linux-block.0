@@ -1,251 +1,157 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C691EB117
-	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 09:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024AD1F2FC7
+	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 09:36:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724232514; cv=none; b=ZGIr3/klwXRNi9O84rrcAlDj+13NjiexCUY2bzJHXUDKA2ghs0HPFKh30ByifSx9JKCm1lSH+XYIgntpPHuEy4sLZKQKUDouPRSWQFyzjuuOa5ea1Np3SvP7CobYRX8jfSBsNO5oQ5Pp0y67Pf+a3ceVT1Ieaev9ad3smSv8i24=
+	t=1724233006; cv=none; b=qUr9z9DUL+HtsdHj43ZbsRIiaw17vNbM5iIj0xz0JH9V32wObQO0cGtTfNt9q6B9xrOt+cj9B/lFYKLOqe3fsUTXKRvnZDYbm2VxxcI73YmEA4Ai/ma/53p3KRI41JIrm6ogu0v05EL0mHxKp8nrcpnHw+f60AYhz9DlckRxuOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724232514; c=relaxed/simple;
-	bh=JTkhytIZ4gwrzDdMINKL2VUpEh7FEqTGAkk6jxwZlhE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tAbYgGSN0hEd+K/JU4qcVgHXnXdIsR2PlandWYZTPN2Yz8lmJ1/vNYxZtYHdEQw5OxH6afkm2qToMrgjQpcObh9uCp/GuoOn5tjL/d9jZaPIudQX9H6HSgLb8zQ1UAaYsZq9Xmd78++DH+WRLp4azH4G4zPdTpG6txf5LUZxyDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I8Dbj5bc; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1724233006; c=relaxed/simple;
+	bh=Jj5eIkUkWg3KtRXn0z2L0PWnJAu5W4Pyl+E7wKNe/xw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TQG+WdT3mVFlxb/Wqmvg1TQJbgryTLUzJVuTVVn5GjWxlyBHk9QUu8sLZxRxS5qjNqUsGnj0X9TLtTeAsSav1EqNWtgQsbjz96DYfdna9r5wCTX1jE37xn0fC8ejoMRMgHQaP9uGAoBtodMHGSmhv+Xs1oKVKEfO7Ues019+XD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gP+fEckE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I8Dbj5bc"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47L3nFOQ005315;
-	Wed, 21 Aug 2024 09:28:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=X
-	rAEh0ZtkvZoukS3TumB8LQejqAS1w9eI82HB9Hi1LA=; b=I8Dbj5bc3ct0S7aWS
-	uW0s6jhccXdNV6oU4V9Ha6YP/hpZHE4WGLmr5AQ6cOT1/xK+nz36nxt/230R0oLL
-	iTVIKskRyAh/WUIWfnkv/iSkC8HvI1tnI3bbGn4kw90+rq/ddl+QSx2gMhfdNH85
-	pyroj+DYEKAFsj1m6QA8M1Fy2xY4/H8bF18PO3VAJZnzs2JVzHb1qkJmN9PWeBdL
-	63VoKcTCVpWST7Z0yV/Nm8xXOuwEzIU033R+GvmCAJX3KJIa37VDdJ8OE/YKFqLL
-	aTfcJ8VRZQyWrnhWHk6Nh5/4OgkD8nsZaIbWPDnxYTDN90qkgSHZ02wkx0dZydLJ
-	sSd/A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mb5sy6m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 09:28:27 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47L9SR2f011498;
-	Wed, 21 Aug 2024 09:28:27 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mb5sy68-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 09:28:26 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47L8c4qd002215;
-	Wed, 21 Aug 2024 09:28:22 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4136k0q6e8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 09:28:22 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47L9SJ1635717462
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Aug 2024 09:28:21 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D28B25805D;
-	Wed, 21 Aug 2024 09:28:17 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3644258054;
-	Wed, 21 Aug 2024 09:28:16 +0000 (GMT)
-Received: from [9.109.198.144] (unknown [9.109.198.144])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 21 Aug 2024 09:28:15 +0000 (GMT)
-Message-ID: <0750187c-24ad-4073-9ba1-d47b0ee95062@linux.ibm.com>
-Date: Wed, 21 Aug 2024 14:58:14 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gP+fEckE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724233003;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jj5eIkUkWg3KtRXn0z2L0PWnJAu5W4Pyl+E7wKNe/xw=;
+	b=gP+fEckErQQ9mO1Us3sQ5jONRu7AQSJJ+gHqBEwxnc4HrP//RDK9rZeQjddCaHL8ZVVePM
+	YpAs5yThu2f40uAZoL3ZY0nqWldKL0h0U2EMHkB2BpKh7LD1BuE9biYGs7X1vA1Uh3IlmO
+	zth+VRgG940nLYfvL48dCPWalKwNfW8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-41-X8LNNe3yOD-GpMAcMymTRw-1; Wed, 21 Aug 2024 05:36:40 -0400
+X-MC-Unique: X8LNNe3yOD-GpMAcMymTRw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4282164fcbcso56161925e9.2
+        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 02:36:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724232999; x=1724837799;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Jj5eIkUkWg3KtRXn0z2L0PWnJAu5W4Pyl+E7wKNe/xw=;
+        b=oVQAWH5ie1SOy/hHQNGM6yg3sE4HsEq/vWrj1TasxwFtysRSVTZnVS89rzNmVvcskt
+         CR7NzqQNaOofY+OkXN2smVWv1RBZaokt7C3vVNWyq/T8Eqo1k7pUOzJHfxLTunT8Ez6J
+         kZ9m37uhsUHOkgbEXITPBa0QmYnbGtkXxGR0EbHSwYgRq+ukWc+9No/w4udsfQsB1c2j
+         4pd/3705J1vD79wVvxPs5sreHp+xZN75VjFggcAHADaDJtEwkbRPTq15AmRiJ7eLe+U1
+         VoXJNZXUuJATjReJYSuFq4SYsQQIkPrW6Ez9JahRbKNDa2q/oe1/k/lnLS33+pMMrXYE
+         5HkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXy05rvRWAx4hVKJdS98tWqmuyUMllw8rXLDF2iRFzonWGp9Pvs5TYpzE0gKekwtSUjshe9i1pdt8IKIA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBNB4vt9CX5mL2TPwJNuVCaPmdhIfYZp9VTJnMcRUObQuGTBln
+	iZ268RwoS5+jnJ+ZPKRKpkbwSVp34xUu9nyLD4f1CnM2zlIzJbkKi33gu++I5B6i85c3yu5T/Rn
+	Aq1JbsY+hlnHtLPEX4y57n+GWlx3PtHOckwj61J4o97CDBVRjMpimbZa0g7Po
+X-Received: by 2002:a05:600c:3ba2:b0:426:6ed5:fd5 with SMTP id 5b1f17b1804b1-42abd112115mr13371905e9.6.1724232999150;
+        Wed, 21 Aug 2024 02:36:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE5uFdtqh3Nnxq7uvkwhVWuYvEqJNhXSjOOFCdMvyLVN5q9k/xJob4MdVvdN0iwQqkOmix49g==
+X-Received: by 2002:a05:600c:3ba2:b0:426:6ed5:fd5 with SMTP id 5b1f17b1804b1-42abd112115mr13371545e9.6.1724232998634;
+        Wed, 21 Aug 2024 02:36:38 -0700 (PDT)
+Received: from dhcp-64-164.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abee8bcecsm19203885e9.17.2024.08.21.02.36.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 02:36:38 -0700 (PDT)
+Message-ID: <be1c2f6fb63542ccdcb599956145575293625c37.camel@redhat.com>
+Subject: Re: [PATCH v2 6/9] ethernet: stmicro: Simplify PCI devres usage
+From: Philipp Stanner <pstanner@redhat.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao
+ <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer
+ <mdf@kernel.org>,  Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko
+ <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
+ Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, Alvaro
+ Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Mark Brown <broonie@kernel.org>, David Lechner
+ <dlechner@baylibre.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+ <u.kleine-koenig@pengutronix.de>, Damien Le Moal <dlemoal@kernel.org>, 
+ Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>,
+ linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org,  linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+Date: Wed, 21 Aug 2024 11:36:36 +0200
+In-Reply-To: <CAHp75VduuT=VLtXS+zha4ZNe3ZvBV-jgZpn2oP4WkzDdt6Pnog@mail.gmail.com>
+References: <20240821071842.8591-2-pstanner@redhat.com>
+	 <20240821071842.8591-8-pstanner@redhat.com>
+	 <CAHp75VduuT=VLtXS+zha4ZNe3ZvBV-jgZpn2oP4WkzDdt6Pnog@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] nvme/052: wait for namespace removal before
- recreating namespace
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Yi Zhang <yi.zhang@redhat.com>
-References: <20240820102013.781794-1-shinichiro.kawasaki@wdc.com>
- <d22e0c6f-0451-4299-970f-602458b6556d@linux.ibm.com>
- <zzodkioqxp6dcskfv6p5grncnvjdmakof3wemjemnralqhes4e@edr2n343oy62>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <zzodkioqxp6dcskfv6p5grncnvjdmakof3wemjemnralqhes4e@edr2n343oy62>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qYZBf5hWhrESmD1YrzT9WddZsQ9EzYRr
-X-Proofpoint-GUID: dc6ifAUSO-6ycMPpvGeXQIfJMS-I4SS0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-21_07,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408210065
+
+On Wed, 2024-08-21 at 11:14 +0300, Andy Shevchenko wrote:
+> On Wed, Aug 21, 2024 at 10:19=E2=80=AFAM Philipp Stanner
+> <pstanner@redhat.com> wrote:
+> >=20
+> > stmicro uses PCI devres in the wrong way. Resources requested
+> > through pcim_* functions don't need to be cleaned up manually in
+> > the
+> > remove() callback or in the error unwind path of a probe()
+> > function.
+>=20
+> > Moreover, there is an unnecessary loop which only requests and
+> > ioremaps
+> > BAR 0, but iterates over all BARs nevertheless.
+>=20
+> Seems like loongson was cargo-culted a lot without a clear
+> understanding of this code in the main driver...
+>=20
+> > Furthermore, pcim_iomap_regions() and pcim_iomap_table() have been
+> > deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI:
+> > Deprecate
+> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> >=20
+> > Replace these functions with pcim_iomap_region().
+> >=20
+> > Remove the unnecessary manual pcim_* cleanup calls.
+> >=20
+> > Remove the unnecessary loop over all BARs.
+>=20
+> ...
+>=20
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < PCI_STD_NUM_BAR=
+S; i++) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 if (pci_resource_len(pdev, i) =3D=3D 0)
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 continue;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 pcim_iounmap_regions(pdev, BIT(i));
+>=20
+> Here is the BARx, which contradicts the probe :-)
+
+I'm not sure what should be done about it. The only interesting
+question is whether the other code with pcim_iomap_regions(... BIT(i)
+does also only grap BAR 0.
+In that case the driver wouldn't even be knowing what its own hardware
+is / does, though.
 
 
+P.
 
-On 8/21/24 12:51, Shinichiro Kawasaki wrote:
->> Under nvmf_wait_for_ns_removal(), instead of checking the existence of "/dev/$ns", 
->> how about checking the existence of file "/sys/block/$ns"? As we know, when this issue 
->> manifests, we have a stale entry "/sys/block/$ns/$uuid" lurking around from the 
->> previous iteration for sometime causing the observed symptom. So I think, we may reuse the 
->> _find_nvme_ns() function to wait until the stale "/sys/block/$ns/$uuid" file 
->> exists.
-> 
-> It sounds a good idea to reuse _find_nvme_ns().
-> 
->> Maybe something like below:
->>
->> nvmf_wait_for_ns_removal() {
->>         local ns
->>         local timeout="5"
->>         local uuid="$1"
->>
->>         ns=$(_find_nvme_ns "${uuid}")
-> 
-> I tried this, and found that the _find_nvme_ns call spits out the failure
-> "cat: /sys/block/nvme1n2/uuid: No such file or directory", because the
-> delayed namespace removal can happen here. To suppress the error message,
-> this line should be,
-> 
->          ns=$(_find_nvme_ns "${uuid}" 2> /dev/null)
-> 
-yeah I agree here. We need to suppress this error.
->>
->>         start_time=$(date +%s)
->>         while [[ ! -z "$ns" ]]; do
->>                 sleep 1
->>                 end_time=$(date +%s)
->>                 if (( end_time - start_time > timeout )); then
->>                         echo "namespace with uuid \"${uuid}\" still " \
->>                                 "not deleted within ${timeout} seconds"
->>                         return 1
->>                 fi
->> 		echo "Waiting for $ns removal" >> ${FULL}
->>                 ns=$(_find_nvme_ns "${uuid}")
-> 
-> Same comment as above.
-> 
->> 				
->>         done
->>
->>         return 0
->> }
-> 
-> I found that your nvmf_wait_for_ns_removal() above has certain amount of
-> duplication with the existing nvmf_wait_for_ns(). To avoid the duplication,
-> I suggest to reuse nvmf_wait_for_ns() and add a new argument to control wait
-> target event: namespace 'created' or 'removed'. With this idea, I created the
-> patch below. I confirmed the patch avoids the failure.
-> 
-Sounds good!
+>=20
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 break;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>=20
 
-> One drawback of this new patch based on your suggestion is that it extends
-> execution time of the test case from 20+ seconds to 40+ seconds. In most cases,
-> the while loop condition check in nvmf_wait_for_ns() is true at the first time,
-> and false at the the second time. So, nvmf_wait_for_ns() takes 1 second for one
-> time "sleep 1". Before applying this patch, it took 20+ seconds for 20 times
-> iteration. After applying the patch, it takes 40+ seconds, since one iteration
-> calls nvmf_wait_for_ns() twice. So how about to reduce the sleep time from 1 to
-> 0.1? I tried it and observed that it reduced the runtime from 40+ seconds to 10+
-> seconds.
-> 
-If using sleep of 0.1 second saves execution time then yes this makes sense.
-
-> diff --git a/tests/nvme/052 b/tests/nvme/052
-> index cf6061a..22e0bf5 100755
-> --- a/tests/nvme/052
-> +++ b/tests/nvme/052
-> @@ -20,23 +20,35 @@ set_conditions() {
->  	_set_nvme_trtype "$@"
->  }
->  
-> +find_nvme_ns() {
-> +	if [[ "$2" == removed ]]; then
-> +		_find_nvme_ns "$1" 2> /dev/null
-> +	else
-> +		_find_nvme_ns "$1"
-> +	fi
-> +}
-> +
-> +# Wait for the namespace with specified uuid to fulfill the specified condtion,
-> +# "created" or "removed".
->  nvmf_wait_for_ns() {
->  	local ns
->  	local timeout="5"
->  	local uuid="$1"
-> +	local condition="$2"
->  
-> -	ns=$(_find_nvme_ns "${uuid}")
-> +	ns=$(find_nvme_ns "${uuid}" "${condition}")
->  
->  	start_time=$(date +%s)
-> -	while [[ -z "$ns" ]]; do
-> +	while [[ -z "$ns" && "$condition" == created  ]] ||
-> +		      [[ -n "$ns" && "$condition" == removed ]]; do
->  		sleep 1
->  		end_time=$(date +%s)
->  		if (( end_time - start_time > timeout )); then
->  			echo "namespace with uuid \"${uuid}\" not " \
-> -				"found within ${timeout} seconds"
-> +				"${condition} within ${timeout} seconds"
->  			return 1
->  		fi
-> -		ns=$(_find_nvme_ns "${uuid}")
-> +		ns=$(find_nvme_ns "${uuid}" "${condition}")
->  	done
->  
->  	return 0
-> @@ -63,7 +75,7 @@ test() {
->  		_create_nvmet_ns "${def_subsysnqn}" "${i}" "$(_nvme_def_file_path).$i" "${uuid}"
->  
->  		# wait until async request is processed and ns is created
-> -		nvmf_wait_for_ns "${uuid}"
-> +		nvmf_wait_for_ns "${uuid}" created
->  		if [ $? -eq 1 ]; then
->  			echo "FAIL"
->  			rm "$(_nvme_def_file_path).$i"
-> @@ -71,6 +83,10 @@ test() {
->  		fi
->  
->  		_remove_nvmet_ns "${def_subsysnqn}" "${i}"
-> +
-> +		# wait until async request is processed and ns is removed
-> +		nvmf_wait_for_ns "${uuid}" removed
-> +
-As nvme_wait_for_ns() returns either 0 (success) or 1 (failure), I think we 
-should check the return status of nvme_wait_for_ns() here and bail out in case 
-it returns failure same as what we do above while creating namespace. 
-
-Another point: I think, we may always suppress error from _find_nvme_ns() irrespective
-of it's being called while "creating" or "removing" the namespace assuming we always 
-check the return status of nvme_wait_for_ns() in the main loop. So ideally we shall 
-invoke _find_nvme_ns() from nvme_wait_for_ns() as below:
-
-ns=$(_find_nvme_ns "${uuid}" 2>/dev/null)
-
-On a cosmetic note: Maybe we can use readonly constants to make "created" and "removed"
-parameters looks more elegant/readable. 
-
-# Define constants
-readonly NS_ADD="added"
-readonly NS_DEL="deleted" 
- 
-Now we may reuse above constants instead of "created" and "removed". You may rename 
-constant name if you don't like the name I used above :)
-
-Thanks,
---Nilay
