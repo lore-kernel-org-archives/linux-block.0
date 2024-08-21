@@ -1,182 +1,217 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A003516C86B
-	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 12:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9639D1531D2;
+	Wed, 21 Aug 2024 12:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724243168; cv=none; b=qGqRou7WaVGLYwpeGSxPFLc0nsMmgCVp8l/MPKkYYL9yiSiNVc+DeTiiV5sPDdVWKesrAktfTDqNlCNpQbBfTik8Sk6m/BC9TfEFveRIbdDMSLxFGk1Aewmy8HYsEOzYcKTn8NqRanfJKQd2uGkCr6nO/3s//uGjBn3oiEwdu18=
+	t=1724243389; cv=none; b=LKnD9g+OUkRSr+/Angr4qtP39JtMAz1fyPrY6+jDiIDHiJC8TyMr12bVUwINP/z22kdDoBDl3SA+ElM62jGVQ/BNBJqijybJDEulr/D54KsF8gqzmksRbmS8plPawlH17dEgnLytfyht0cxg74diwLi//TTX5j8+zWsH7IDFqQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724243168; c=relaxed/simple;
-	bh=uuRCWDxDb6ZlmmrDflEcqKb34QjG6BdOf9n0HKg89DY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NLKyf/hfTi4g02zPJWDtuR5vkXw2AEh1RV03aVHhffYnlvHoDvoN6fzrSSyfi00hpERtzD2xICDGjlwl/ZgrV/FYBCkBbMMfJ4dcDf68pQsmokYPL467fp7COR5+Usd39Y5sh3Y7OVpy7PwDpEy/nLgZK57eL6cYFGqar7WSCQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jCwK6FmL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1724243389; c=relaxed/simple;
+	bh=D/AGG2kt2yzqivGXnvaNJ9VicDMyuX0Bw8P0G94eFKY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=BAPCpNLJ0WOXChK7l3MzZB7m9DlcpF94NstODW7NQDhoqG4IM/FAdroAHn5fajcfuO49FbspQaWSfmpIeHdkZLgggD7Kf2Jf9ypXRms5AU6QV31h5ppqpiiF0N5056ru3xkgRoGLGXpzRJEVNl6thg6QtJAV+P59qKCbn/N9XBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mx5CF9uK; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jCwK6FmL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724243165;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F+8Zd9p9xEaFFxq9bSwT6CVTjqvDBBcELEezra/NBmQ=;
-	b=jCwK6FmLFbchFIo6pYAoaDlK2NYeGNMLwRyRjGg9Bx4wUjfRaR88vmH6sRH2B/pTkxKPLc
-	InCKTW5ZTfcy2mXpqgR2oX3QpxPVhcA6i+VQpC3bI84zPOL3/IoAn6infnrCMJaoFvDukn
-	wpzrhu4BZg8xhJP2s1WjU0CH0XlM2C4=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-487-qb26iynSP-GxFL1p0yAx_Q-1; Wed, 21 Aug 2024 08:26:04 -0400
-X-MC-Unique: qb26iynSP-GxFL1p0yAx_Q-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6bf6d3e210eso72348576d6.3
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 05:26:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724243164; x=1724847964;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F+8Zd9p9xEaFFxq9bSwT6CVTjqvDBBcELEezra/NBmQ=;
-        b=bc/tAyTOapJQHk2Z5sAsFIjS2cXjcI4xNraCqHZe4rI/Wl4tiSdLp9PPPCDyYuHV9c
-         Y4BLqP0rIxnywmpoqmPJCmbJ+0ZO+ACWCoJUWc0MpLLtR9y3OjNgxPW30E+sH9enKBeB
-         SwuFnG/5ZdgQUOdOhuzFvkJMg45yM0YXgzNvDdhAg39kBGBBwBKzTv4ps5IKbQqJRtNT
-         4W2ulPODk1U5Z/FsFApa2htudqCThSWxTK+PZ34Mu1+EqVYwfjb1fG9XBbmw8STtdX1b
-         KoNv3vQIOU2CrqqUBHALq4rRWPQ6UVo9CatDUcZLJ5gKJahYv4NPV2geyMsDgHlz5pzT
-         Dw3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWU0L9Lr0ewNIQS+Y1q3fJImFYI41JBbPA4UlsO9eeKQZMzsmpvY6k9b+aULNNo28mEVuByZC+1K4OdYQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7JA+AqylMpBjZPpfJk9x8/M3CPSyElyOdlS3NEYRQeoyjYt1q
-	ABwEiLNLIGhVDm+NNhlLfGwt6ZI6NKuNIR6CfpheruRys4qBq4OMU+AMjBYy1K9vC1/qPl5FAat
-	VSh+PxPOgJ+KabqDXz9pPTLVb2C3RkkLHZBG23EhNMpEyaE5K2QiYRVOCJLeo
-X-Received: by 2002:a05:6214:4881:b0:6bf:a721:9945 with SMTP id 6a1803df08f44-6c1567fabf5mr30555046d6.24.1724243163973;
-        Wed, 21 Aug 2024 05:26:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG0sBOMGGLa2XcF/yRLMaOTYNrH07fkAWiC1e2c/uh8oASqBZoK+O1goCyf57ZnaX9oaF0YiA==
-X-Received: by 2002:a05:6214:4881:b0:6bf:a721:9945 with SMTP id 6a1803df08f44-6c1567fabf5mr30554416d6.24.1724243163535;
-        Wed, 21 Aug 2024 05:26:03 -0700 (PDT)
-Received: from dhcp-64-164.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6ff0dcdasm60220946d6.140.2024.08.21.05.25.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 05:26:03 -0700 (PDT)
-Message-ID: <cf9591d720c9b25dafd46b627ff8b6ed9f417745.camel@redhat.com>
-Subject: Re: [PATCH v2 7/9] vdpa: solidrun: Fix potential UB bug with devres
-From: Philipp Stanner <pstanner@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao
- <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer
- <mdf@kernel.org>,  Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko
- <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, Alvaro
- Karsz <alvaro.karsz@solid-run.com>, Jason Wang <jasowang@redhat.com>, Xuan
- Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?ISO-8859-1?Q?P=E9rez?=
- <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Mark
- Brown <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>, Uwe
- =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Damien Le
- Moal <dlemoal@kernel.org>,  Hannes Reinecke <hare@suse.de>, Keith Busch
- <kbusch@kernel.org>, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org,  linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
- virtualization@lists.linux.dev,  stable@vger.kernel.org, Christophe JAILLET
- <christophe.jaillet@wanadoo.fr>
-Date: Wed, 21 Aug 2024 14:25:57 +0200
-In-Reply-To: <20240821081213-mutt-send-email-mst@kernel.org>
-References: <20240821071842.8591-2-pstanner@redhat.com>
-	 <20240821071842.8591-9-pstanner@redhat.com>
-	 <20240821081213-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mx5CF9uK"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47LCGTTg028888;
+	Wed, 21 Aug 2024 12:29:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	GPaDfzzQ3JVIUlNdkkkRjL2d47hz3wFDbfKsX7Pz7KM=; b=mx5CF9uKURPTjVwA
+	hVJQIcpQ9e8fHmz9vd1Z1DeqypQvi6qY0Wp/gAHJwyI+RositSZP8LhyaIXhf3s+
+	22X+SU4Ha9dxcWha7/7PNKQzeQn0K4KCBXcoK6vBdjUilgxBhWqcqJtnCEU1DLqg
+	x0JIWNj+5nFFmrOserfA6s7q+UbzjlNWvxP0xxE76kApyZkV9yWrQ/soUasWTluY
+	vIwOyY4wLxj+J4OgpF2f2SRN6Wae1KH9aKvtUqc1ZMvDw+iVBaWDXioBK6Yjmjr2
+	l+yZfF9gaR5y52T8ZD0akCBH1ql55T0iMO9Q0+Gbe9p22LsXC71XGMgBdM04X108
+	TcKS0g==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4159yj9m3w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 12:29:18 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47LCTHco013057
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 12:29:17 GMT
+Received: from [10.216.57.153] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 21 Aug
+ 2024 05:29:10 -0700
+Message-ID: <ca78ada8-d68b-4759-a068-ac8f66c51b72@quicinc.com>
+Date: Wed, 21 Aug 2024 17:59:06 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
+ capacities are different"
+To: Sandeep Dhavale <dhavale@google.com>,
+        Dietmar Eggemann
+	<dietmar.eggemann@arm.com>
+CC: Bart Van Assche <bvanassche@acm.org>, Qais Yousef <qyousef@layalina.io>,
+        Christian Loehle <christian.loehle@arm.com>, <axboe@kernel.dk>,
+        <mingo@kernel.org>, <peterz@infradead.org>,
+        <vincent.guittot@linaro.org>, <linux-block@vger.kernel.org>,
+        <sudeep.holla@arm.com>, Jaegeuk Kim
+	<jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, <kailash@google.com>,
+        <tkjos@google.com>, <bvanassche@google.com>,
+        <quic_nitirawa@quicinc.com>, <quic_cang@quicinc.com>,
+        <quic_rampraka@quicinc.com>, <quic_narepall@quicinc.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
+ <3feb5226-7872-432b-9781-29903979d34a@arm.com>
+ <20240805020748.d2tvt7c757hi24na@airbuntu>
+ <25909f08-12a5-4625-839d-9e31df4c9c72@acm.org>
+ <1d9c27b2-77c7-462f-bde9-1207f931ea9f@quicinc.com>
+ <17bf99ad-d64d-40ef-864f-ce266d3024c7@acm.org>
+ <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
+ <c151b6d5-7e02-48ee-951f-c23594f6be6f@arm.com>
+ <CAB=BE-RHwqmSRt-RbmuJ4j1bOFqv1DrYD9m-E1H99hYRnTiXLw@mail.gmail.com>
+Content-Language: en-US
+From: MANISH PANDEY <quic_mapa@quicinc.com>
+In-Reply-To: <CAB=BE-RHwqmSRt-RbmuJ4j1bOFqv1DrYD9m-E1H99hYRnTiXLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: a-iliqz0atMkAHetXJiV3AQZhsufcLec
+X-Proofpoint-GUID: a-iliqz0atMkAHetXJiV3AQZhsufcLec
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-21_09,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 phishscore=0 mlxscore=0
+ lowpriorityscore=0 mlxlogscore=999 adultscore=0 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408210091
 
-On Wed, 2024-08-21 at 08:12 -0400, Michael S. Tsirkin wrote:
-> On Wed, Aug 21, 2024 at 09:18:40AM +0200, Philipp Stanner wrote:
-> > In psnet_open_pf_bar() a string later passed to
-> > pcim_iomap_regions() is
-> > placed on the stack. Neither pcim_iomap_regions() nor the functions
-> > it
-> > calls copy that string.
-> >=20
-> > Should the string later ever be used, this, consequently, causes
-> > undefined behavior since the stack frame will by then have
-> > disappeared.
-> >=20
-> > Fix the bug by allocating the string on the heap through
-> > devm_kasprintf().
-> >=20
-> > Cc: stable@vger.kernel.org	# v6.3
-> > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
-> > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > Closes:
-> > https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanado=
-o.fr/
-> > Suggested-by: Andy Shevchenko <andy@kernel.org>
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
->=20
-> I don't get why is this a part of a cleanup series -
-> looks like an unrelated bugfix?
+Hi all,
 
-It was discovered in the discussion of v1 of this series.
+We agree with the points like rq_affinity can vary from target to target.
 
-It indeed is an unrelated bugfix and could be merged separately. But my
-patch #8 depends on it.
+But also please consider below use cases
 
-So it would be convenient to merge it into mainline through this
-series, and have stable just pick patch #7.
+1. Storage devices with single hardware queue (like UFS 2.x/ 3.x)
+in a HMP system with shared LLC, not all the CPUs will be active and 
+online. Hence for large amount (say ~1GB) of random IO transactions , if 
+requester CPU is from
+smaller cpu group, then due to capacity based grouping, Large cluster 
+CPUs would be mostly unused /idle, as the completion would also happen 
+on same capacity CPU. Again due to this, the smaller / mid capacity CPUs 
+only would have to submit and complete the request. Actually we could 
+have completed the requested on large capacity CPUs and could have 
+better utilized the power of Large capacity CPUs.
 
-Or should it be done differently, in your opinion?
+But to move IO requests from S/M cluster CPUs to L cluster, scheduler 
+would need to wait until a threshold IO hits, and by that time 
+Performance application would spent some runtime and would report low 
+performance as overall results.
 
-P.
 
->=20
->=20
-> > ---
-> > =C2=A0drivers/vdpa/solidrun/snet_main.c | 7 +++++--
-> > =C2=A01 file changed, 5 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/drivers/vdpa/solidrun/snet_main.c
-> > b/drivers/vdpa/solidrun/snet_main.c
-> > index 99428a04068d..4d42a05d70fc 100644
-> > --- a/drivers/vdpa/solidrun/snet_main.c
-> > +++ b/drivers/vdpa/solidrun/snet_main.c
-> > @@ -555,7 +555,7 @@ static const struct vdpa_config_ops
-> > snet_config_ops =3D {
-> > =C2=A0
-> > =C2=A0static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet
-> > *psnet)
-> > =C2=A0{
-> > -	char name[50];
-> > +	char *name;
-> > =C2=A0	int ret, i, mask =3D 0;
-> > =C2=A0	/* We don't know which BAR will be used to communicate..
-> > =C2=A0	 * We will map every bar with len > 0.
-> > @@ -573,7 +573,10 @@ static int psnet_open_pf_bar(struct pci_dev
-> > *pdev, struct psnet *psnet)
-> > =C2=A0		return -ENODEV;
-> > =C2=A0	}
-> > =C2=A0
-> > -	snprintf(name, sizeof(name), "psnet[%s]-bars",
-> > pci_name(pdev));
-> > +	name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-
-> > bars", pci_name(pdev));
-> > +	if (!name)
-> > +		return -ENOMEM;
-> > +
-> > =C2=A0	ret =3D pcim_iomap_regions(pdev, mask, name);
-> > =C2=A0	if (ret) {
-> > =C2=A0		SNET_ERR(pdev, "Failed to request and map PCI
-> > BARs\n");
-> > --=20
-> > 2.46.0
->=20
+On 08/02/24 10:03, Christian Loehle wrote:
+ > So I'm assuming you're seeing something like the following:
+ > Some CPU(s) (call them S) are submitting IO, hardirq triggers on
+ > S.
+ > Before the patch the completion softirq could run on a !S CPU,
+ > now it runs on S. Am I then correct in assuming your workload
+ > is CPU-bound on S? Would you share some details about the
+ > workload, too?
+ >
+ > What's the capacity of CPU(s) S then?
 
+
+Yes.. for few SoCs we follow the same.
+Say an SoC with 3 clusters ( S/M/L), if M CPU(s) are submitting IO 
+requests ( which is a large data transfer), then in this case since LLC 
+is shared, we can allow L CPU(s) to complete the request via softirq / 
+hardirq. This will make sure to avoid contention in submission and 
+completion path.
+
+
+Again consider an SoC with 2 clusters ( 4 cpus of small capacity  / 2 
+CPUs of Mid capacity).
+In such case, if M CPUs are used for IO submersion and completions, then 
+these CPU would face heavy work load and hence Performance will be 
+impacted.  Now if the new patch was not there, we could have moved few 
+IO completions to S cluster CPUs.
+
+ > If no matching is required, it makes sense to set rq_affinity to 0.
+
+ > I don't get why irq_affinity=1 is compatible with this case? Isn't
+ > this custom
+ >setup is a fully managed system by you and means you want 
+ >rq_affinity=0? What
+ >do you lose if you move to rq_affinity=0?
+
+actually rq_affinity=0 would help for few SoC's having MCQ like UFS 4.x, 
+but even this won't be generic solution for us. As this won't considers 
+an SoC which doesn't shares LLC, and thus would have significant 
+performance issue. Also since the change is picked up in all the kernel 
+branches, so it would be very difficult to experiment on older Socs and 
+get the best solution for each target.
+
+This won't work for many SoCs like above example of 2 clusters, as
+rq_affinity to 0 would then complete the request on hardIRQ context, 
+which may not be suited for all the SoCs.
+Also not all SoCs are arm based and shares LLC.
+
+
+
+2. Storage devices with MCQ (Like UFS 4.x / NVME), usages ESI/MSI 
+interrupts, hence we would have opportunity to bind ESI IRQ associated 
+with an CQ.
+
+
+On 08/05/24 10:17, Bart Van Assche wrote:
+ > On 8/4/24 7:07 PM, Qais Yousef wrote:
+ > > irqbalancers usually move the interrupts, and I'm not sure we can
+ > > make an assumption about the reason an interrupt is triggering on
+ > > different capacity CPU.
+ > User space software can't modify the affinity of managed interrupts.
+ > From include/linux/irq.h:
+
+ > > >True. But this is special case and was introduced for isolated
+ > > > CPUs. I don't think drivers can request this themselves
+
+There are drivers, which can manage the cpu affinty for IRQs
+using irq_set_affinity_hint() based on the use case.
+Since in the SoC's the LLC is shared ( M and L clusters). So if IO is 
+submitted from M capacity CPU(s), and request is completed on L capacity 
+cpu(s). Though the capacity of M and L is different, but since the LLC 
+is shared, so completion can be done on L cluster without the need of 
+IPI. With the new change, we may not get advantage of shared LLC.
+
+Proposed solution:
+We can have a solution which is backward compatible and a new control 
+flag (QUEUE_FLAG_SAME_CAPACITY_FORCE) could be provided for this new 
+change to maintain backward compatibly.
+
+How about introducing a new rq_affinity ( may be rq_affinity = 3) for 
+using cpus_equal_capacity() using new flag QUEUE_FLAG_SAME_CAPACITY.
+
+
+if (cpu == rq->mq_ctx->cpu ||
+	(!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
+	  cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
++	  (test_bit(QUEUE_FLAG_CPU_CAPACITY, &rq->q->queue_flags))
+	   && cpus_equal_capacity(cpu, rq->mq_ctx->cpu)))
+		return false;
+
+
+
+Could you please consider raising similar change, if this seems fine for 
+all.
+
+
+Regards
+Manish
