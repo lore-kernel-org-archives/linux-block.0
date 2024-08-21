@@ -1,95 +1,130 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357A41AD5E1
-	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 13:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D52A364D6
+	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 15:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724247802; cv=none; b=CEJ5UAEnvrEgjMPQxfUwBpqjZq4Hh154HCKEasDPKC7YGU3iW2xz/x0EPKBHzuVqP2xJhRu0XLxCftkvOhEtMN+UFqs/YNPLRRHaPz5kFZHOZ2rIo/oca2WkUXe2NYeWlxBAh+Knn/pSvlNzRU5mzRYJxP2xOMo52kQwS69UDiA=
+	t=1724255505; cv=none; b=rKNzQN1ldgFZo56iJrYmTibq8d0VBdeep0Pp7TySbZ/Et2IHnpdm1tya1F+/XDwjGZhAmKSy1KNYJGdyE3vlUeG44GHwEoTw+M/XSyh/o8pjLi2Xg1N5QNnX+j0tpyXrsh4QJZxKgOw1nWWGdUpKyVNOFxzPgbEcYI8KVvvoNoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724247802; c=relaxed/simple;
-	bh=c93I54raOSbs0VRQIoGu5KAoP5RS/AuhuCp4Xi1YKXQ=;
+	s=arc-20240116; t=1724255505; c=relaxed/simple;
+	bh=cfh3VaxFY12L6b9joBjAiMhKraXefyPDD9m7bT9Dn2c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0Rfv6FgCIXQYJ+re9MBW3cwHIoPiyNB/NvJjrjqVQOF/NIebB5zDYD/lDahD8xZNwQjtovhsI39eLZekvlzgdJEZq/SiPBpsjYp8sTK5SBK5p6c4WCqAt2gRxCbVNTYWEuX0s28uJyebsBFDQGy0SVNvp7JDynmtyVtW1Qm+KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lGB4OOyO; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=d6y0tlgr7GYJ/gXnwWUhEXkPGDnzWrbn6aWLgYa9+OfuiY2FCL82ph/2gXu1cFVYTsSkWiWV+sYAkpp08XE6X8a5dWWiRe5HwV6ZeCScKARuLyXRaoiRluc9mLHsR2CvkPR15fesGKdX2iDXCkKln7JAFVPXO8ANTXfVq7I7nz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=G40paiaX; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lGB4OOyO"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2f3f163e379so26185311fa.3
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 06:43:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="G40paiaX"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5bf006f37daso1718218a12.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 08:51:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724247799; x=1724852599; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1724255502; x=1724860302; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vq7tOAAcz6ewTIYXkiPmAfOTq4iDQRtjoPIe2wulO0E=;
-        b=lGB4OOyOmhZ1K3q65RHndOFz3e0v/jvqCnC37nxznC9uhZB6uA+HygmyDywRITsKXk
-         FctXHtEAOCb2IQVVTr3b23lMp8iLRNxqI7aQeFZjkL5qoDOHf0N3k3EUd5dMx6N+zlv/
-         5ykdxYzAn33h7ihsr3TGv+kv+1SSjMAqTzV2d/EVZtkffpLBvQCFrplp+pXEoTQg/DV2
-         +2qelBQ4Ewx37p0HTPEBwIJDZH0LyLWRNFnyg5/uuTSur5mu/n8O0wyGNa1fxHFCekbz
-         lYX4ULvNl4SYhyFAnlbXSau9GC2iGc4RQ2QP/VUyli464C+7PPmQgC57iXnR7n5Jwm//
-         yNxw==
+        bh=cfh3VaxFY12L6b9joBjAiMhKraXefyPDD9m7bT9Dn2c=;
+        b=G40paiaX4UWMZUwDMVjAbts3FUyXdWZdRSDEvqqLqhHtcvIpuIIUykA3X3FZjUlN7+
+         D+qYRp1uT8jPDXzcOLVu4py+t9D9XX4SPfZnbD+INDrViaVJ2bNQsqsJKhuqkyz9tTPg
+         hdmJi0v0Z5IUUM/tllDJkhQc2WDykOkdLyM3n+Myjv4onkFNI4FJCkBeb3WrEU4QEtPH
+         fWKltE00kBLF12i3qdSbnNK6BiVINnrqAwnnW5u9fn8766vZvJ3qRdqScvGUa1xTVSpe
+         OmdsacLLI3XpsV94F2+DM4YJ6KUqDeFUAwvhaukOH/uix++ZjvoBfz6LL0IUEcV53x48
+         L8aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724247799; x=1724852599;
+        d=1e100.net; s=20230601; t=1724255502; x=1724860302;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Vq7tOAAcz6ewTIYXkiPmAfOTq4iDQRtjoPIe2wulO0E=;
-        b=uUR82UVVhq0lMXf5yf5uSeRsVTiUXIsoyVUQGCLO9i9jp7hxwIBKurcvJv+QaITTb4
-         urcveycVejNZxj3dcxeqYJlmYuSDPIsV1EHA0BO6qQMoU0pCiUZ25g6iG1sm9eCl3k+Y
-         fW/Q81e6GOrdZYEXCQGlwcu5QIroieGEsyOXLUqZtOrMrUdqnaOYABdkQlmhZWgy+CD6
-         FJtoZyu4/HS9i/4zLaLGSV/M7x67BZsALRK2GVbBwXAFexSnnrvw3oxV2ONG4WohNdfR
-         9J0X9yjscUjDrMD6eNcYZo3LOY4M3oWCH0HwTg7HFEM1Rvkg771Jqaj9v07GFXX2hOjj
-         E0jA==
-X-Forwarded-Encrypted: i=1; AJvYcCUum8tQwgVBzK8RG4RQSSGoJN/J8R0drDE70S520siqRQ2hmACZSYNIJMk1jqYLRfsB/wzM/sVfF2+fCA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8Cy7804d/G5C6tiQvEoC+XfrOe6VtLQlvL4taNxwEg5vwMu8B
-	i+04sBby/Dinl74qM/AKe4Jy74cn5ceVkfb0X2i9ISfTae8xTHZ9TX0By2+8N84=
-X-Google-Smtp-Source: AGHT+IHQbdHH8LzMKMml3FZkZHmsIF0qxWUa69l3XY4StmtQ7T+OKiiLyZ1IaFB9tC0TLHlDr4Jl1Q==
-X-Received: by 2002:a2e:b8cb:0:b0:2ef:1b1b:7f42 with SMTP id 38308e7fff4ca-2f3f89489a5mr23557941fa.36.1724247799207;
-        Wed, 21 Aug 2024 06:43:19 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbe7f17bsm8234877a12.59.2024.08.21.06.43.18
+        bh=cfh3VaxFY12L6b9joBjAiMhKraXefyPDD9m7bT9Dn2c=;
+        b=WyKB0C+D8Kv+LxnVnzOAcCmHQw4KmZSfZewNyzmnwZ7BlQp9+WOW7kti4EEtR8+9EE
+         7azorOlUD9B8RAybn54Qm9up/l92YHXsmsWcoBBrD2q3gGsVSVSplqoelC5kTNSGnJot
+         P1aesQ9TB318JJZCy34LTNCLWdLHyG/Snj/gbX3nlykgrqeFcuMx7KdT2qaE1CM7Nxvl
+         6J4ZC6SGhFXpwosQM/aGHsQAXtLGmd0htHfn8uX9foh/CYsKAiYqK5+kIJcddDWoTNwk
+         ePKNbgcShjo9SXWi9qgBuTarA5nSObSMA0xdIZPK/SicyL9TPp1yS8Ffi9bOeOp3b5nL
+         SX1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWfrju40AvRyOiAT8xm7oLCfXr+9QHICnt07CL89AWXLWUfGO1CvVAwdUH73fUIVT1CxOzSQOiyH9+N1g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFn8GGFfLI1cZn0gAfKE63feaE9h1IRnCR3O97mW2cudBh2I8B
+	zUK/qbHrJWrABN/ooeTR+ucmiY6dM8xTcUzE/Vu1hnzc6e+oUAz4iM9V1dkHqOU=
+X-Google-Smtp-Source: AGHT+IHRKfOJRBIX00yACT9S6yJfNIRBD216Xy8o/dC87m9xqH+xwqjdfV16ljYKmJn/kNtjrDyw8w==
+X-Received: by 2002:a05:6402:909:b0:5be:ecd9:c73e with SMTP id 4fb4d7f45d1cf-5bf2bfcb322mr101221a12.2.1724255501446;
+        Wed, 21 Aug 2024 08:51:41 -0700 (PDT)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbbe26fcsm8247046a12.5.2024.08.21.08.51.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 06:43:18 -0700 (PDT)
-Date: Wed, 21 Aug 2024 16:43:15 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Matthew Brost <matthew.brost@intel.com>, Tejun Heo <tj@kernel.org>,
-	Anders Roxell <anders.roxell@linaro.org>
-Cc: open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org,
-	Linux Regressions <regressions@lists.linux.dev>,
-	linux-block <linux-block@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
-	Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: next: x86_64: ahci 0000:00:1f.2: probe with driver ahci failed
- with error -12
-Message-ID: <af7dea7d-446c-4b25-a1e9-bd1f3753f589@stanley.mountain>
-References: <CA+G9fYuD4-qKAX9nDS-3cy+HwGbyJ6WoD7bZ_QL0J__A++P9aA@mail.gmail.com>
- <CA+G9fYuYfNA7NZDHpq2K24CsUn21LAb8vn38=JTz=54bsdSd9g@mail.gmail.com>
- <43be498f-5a25-4ee2-8c5d-1ef75c4d1ff3@stanley.mountain>
- <eb78af03-b407-49d9-b605-af9632eda08e@stanley.mountain>
+        Wed, 21 Aug 2024 08:51:40 -0700 (PDT)
+Date: Wed, 21 Aug 2024 17:51:39 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc: tj@kernel.org, josef@toxicpanda.com, hch@lst.de, axboe@kernel.dk, 
+	longman@redhat.com, ming.lei@redhat.com, cgroups@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com, 
+	houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com, 
+	lilingfeng3@huawei.com
+Subject: Re: [PATCH v2] blk-cgroup: don't clear stat in blkcg_reset_stats()
+Message-ID: <migrlemuqjqff6y64o6ukfkuil6uwuarwvyg3xymfphnicznna@sy5dwhovytuz>
+References: <20240821020756.786000-1-lilingfeng@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="u64mvz7adyyl3xft"
+Content-Disposition: inline
+In-Reply-To: <20240821020756.786000-1-lilingfeng@huaweicloud.com>
+
+
+--u64mvz7adyyl3xft
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eb78af03-b407-49d9-b605-af9632eda08e@stanley.mountain>
 
-On Wed, Aug 21, 2024 at 02:54:28PM +0300, Dan Carpenter wrote:
-> Give this patch a shot and I'll resend if it fixes the bug.
-> 
-> Fixes: b188c57af2b5 ("workqueue: Split alloc_workqueue into internal function and lockdep init")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Hello.
 
-Actually never mind.  Matthew sent this same patch today so this bug is fixed
-on today's linux-next.
+On Wed, Aug 21, 2024 at 10:07:56AM GMT, Li Lingfeng <lilingfeng@huaweicloud.com> wrote:
+> The list of root cgroup can be used by both cgroup v1 and v2 while
+> non-root cgroup can't since it must be removed before switch between
+> cgroup v1 and v2.
+> So it may has effect if the list of root used by cgroup v2 was corrupted
+> after switching to cgroup v1, and switch back to cgroup v2 to use the
+> corrupted list again.
 
-regards,
-dan carpenter
+> However, the root cgroup will not use the list any more after commit
+> ef45fe470e1e("blk-cgroup: show global disk stats in root cgroup io.stat").
 
+How come? Before that patch the root file was excluded with
+CFTYPE_NOT_ON_ROOT. IOW how has that patch an effect on llist traversal?
+
+(It doesn't matter, your patch doesn't restore memset anyway.)
+
+This is the reasoning how I understand it:
+
+| The removed function clears blkg.iostat structures that is only used on
+| v2 whereas the function can only be called with v1 hierarchy attached.
+| Zeroing effect could potentially be visible root blkcg "shared" between
+| v1 and v2 but v2 actually synthesizes stats differently for root.
+
+> Although this has no negative effect, it is not necessary. Remove the
+> related code for cleanup. No function change.
+
+I'm impressed by the amount of analysis you did to potentially remove
+the unused function. If you feel like cleaning up more or sectioning,
+see also [1] or [2] for inspiration.
+
+Thanks,
+Michal
+
+[1] https://lore.kernel.org/all/20240625005906.106920-14-roman.gushchin@linux.dev/
+[2] https://lore.kernel.org/all/20240628210317.272856-1-roman.gushchin@linux.dev/
+
+--u64mvz7adyyl3xft
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZsYNCAAKCRAt3Wney77B
+STQRAP964BvPrWyhD3E2FATcSU9VzePaYOlzM2RkLQ1ceB9lVQEA6kUkdWtBIY0V
+S39zAIVDUBJ2oJfcZCF3K0zwdtLkbA8=
+=rh/X
+-----END PGP SIGNATURE-----
+
+--u64mvz7adyyl3xft--
