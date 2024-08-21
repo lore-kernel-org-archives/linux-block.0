@@ -1,63 +1,63 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0085E19ABC6
-	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 07:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16BA1B653D
+	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 07:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724224786; cv=none; b=RCSBjPrHc3p7HX+OC3zOCFvs0M/S5DGc+YEnCthevq5h3EKec/wRbTXkK2hP0XuGN6YIKjlw0uv5NZuCg9V4XqEaZgpRIQkZ8DDGGGW+Z+TuY9W0ECt0zuSC6By7TwxlP9WsvZypqe6N9649FbTATFvoZe/tTZA6ZzF8pWMmoyg=
+	t=1724224793; cv=none; b=J/DouHp6ZKKl0zkgqQ90BrPXTj3H05zFFSNyBhOn0lmWqlnkRshd0fG1XI+iY/GlqWU73Yg98QakTezIKNP3iFeK76bNrVLQ/9Ot7cAahL8B0atoiWMkIaKgxnvRQLacnfrJ27m7yR+qJD39arhT7HXCshfMPFuDOs+JxFcorrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724224786; c=relaxed/simple;
-	bh=zz4g00AyrOlGbCFQ8xrM/DS+BcOL9w71mmIBYnsZsuY=;
+	s=arc-20240116; t=1724224793; c=relaxed/simple;
+	bh=xzKTSbBUCxwnUpKs8six5ekb8eTkm5n7sI9qBsfTSxA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oRuWrapHAxB1ZHod2iQyRkGnjHCoess2zw/X3zcTJYuUXAOFvYG+sBqyPpt8ePAWS0nWVTzMC2D0kZUkdvQc/9xrCZOUfz4UYaNsS4tcqqy65SznMGnKuct5jfEfBSSUB1fLA9T7UUUE2wjhVYx7GCvNolBFF0Y0Rpgz6nbDz0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NLOl/nX/; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=vD8SWspYVHKeBNh962LOVQv7+TUk6uadr9Odz9Y2VMULSfQ3Dg0Aw8StX5edrQseH2FCUW+J3+rdG1ujIqQe4xQzf8sYiLdCX7OLO8u59tXnw/33+OAkLtk46Fpy1O8glm9bm7Ec9QeUzaoHAfdw8U6elTdbosYxaJIIp28jFaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XmraETh4; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NLOl/nX/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmraETh4"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724224784;
+	s=mimecast20190719; t=1724224790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2jtoMc9tojKKL8iwWeM5ToAOyUwxh+I3f+1WrHk/fN0=;
-	b=NLOl/nX/ElgXyVElrf0w0feJUkRZ90e71eQH1Zh+k1joxBUY0jD1LILOXXt5jBpN7L+wFR
-	TW42B6RH5OZyoqA5Vob5oa4MxLvr9eKoTPiTZZ/HB327mmifd45CaofyiuJqXW/gMUYRV4
-	bR7RfKyb/Jp1b2afP62PscIOaZ6YKNE=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=stErXlsn4bG59ZiuP1S49NzWKfcbkIn79Ht3IKYskFI=;
+	b=XmraETh4x3xAdX4PDbfhaXxgfcLzttGz90OasGhW3/qcOAF47Cjs2ihXV+Kh6Ijp/bivBA
+	tT9cR/3bzmv5ywrD/QxCCFUbgaYvKLF7VLOARvmleKi8gXMkDncJX8JHn4WLlc0uuQBhEe
+	36EQjc69ieSIcfTZooCqC7FH4F9tsQA=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-179-IR3y-h5FMEqI-RZeBwL-nw-1; Wed, 21 Aug 2024 03:19:42 -0400
-X-MC-Unique: IR3y-h5FMEqI-RZeBwL-nw-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7a1d0b29198so637701985a.2
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 00:19:42 -0700 (PDT)
+ us-mta-221-yI9y3i9xO8ifU8Q5vJn9HQ-1; Wed, 21 Aug 2024 03:19:48 -0400
+X-MC-Unique: yI9y3i9xO8ifU8Q5vJn9HQ-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7a66b52c944so134588885a.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 00:19:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724224782; x=1724829582;
+        d=1e100.net; s=20230601; t=1724224788; x=1724829588;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2jtoMc9tojKKL8iwWeM5ToAOyUwxh+I3f+1WrHk/fN0=;
-        b=Y0+sujWTe83Sl9V90NZ16OXFVb3DYXAlTOi5UkAI427deTec9l6QeGIIoUfmIACw0t
-         1C0cBiZAqo1MK13eCZ9jUIG32O+/6+UMsY/SGlU0P69D4+q/nkbG3ZoGhtyTSCTqZOtP
-         o4xkbctIUN+IzRHFMWK8BqX3R4Ylfof81D6ynPOAa9jghTM8UvLGNsfTbwCp7foyBMe6
-         woFHMGMMWWZ2gxlii173USW6szYJVhdVZRDNGN+wahWP1RevD+hrTq7ys0mWBlqIEabn
-         83V7OORTJID5/TB4+O0BneU9iN9ZE4iE3ufLYPsqExB9L2vYJrgEB1kv3EHm6Se2ZGF9
-         4Agg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgQT2bf9iVp0iWPH5rx7eew3stjPtZSdreuHeOb+ruqQ78pj62yGv2731KJerNqv5JDto+XHRU6q2bJQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbgtydLTtJKv+fMaFeonZBboFxhC0d8aI1JmGju1kN10X7T9m8
-	4sWE9Wk38m7ELgP+k1fJMcYLEfQP36IiH41KWfXQoCjGSGgh1q4C9KGE62fRC0QZUHOF+kWYz2R
-	/gVrDiOTgmXNNCxdGdmcoMdeAY/sWQIX10Qu2f+WFYMDaSikTGohdG9nYVmBd
-X-Received: by 2002:a05:620a:3953:b0:79e:e302:7392 with SMTP id af79cd13be357-7a674047d68mr175950785a.32.1724224781979;
-        Wed, 21 Aug 2024 00:19:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEujbivdy0X82ZZM2IZtk3pa0uY+R6FAaLiHcgNfg5GEA0wo0Jm6V+lDWsOUg8+jqkxdP5bpA==
-X-Received: by 2002:a05:620a:3953:b0:79e:e302:7392 with SMTP id af79cd13be357-7a674047d68mr175949285a.32.1724224781630;
-        Wed, 21 Aug 2024 00:19:41 -0700 (PDT)
+        bh=stErXlsn4bG59ZiuP1S49NzWKfcbkIn79Ht3IKYskFI=;
+        b=lGyoadLSD/4pvnLXgsv2t4Udr/nZ50gLVLT31BS9nKY9GhWAiEFelZs7S+9mQdJSTo
+         hoxbCMT45P9/3uRAZ1VaPaXqSBPcr1RHzsuWs7gGDBGkgi7mqKWcVraDbXhIZ2k+toNd
+         QR4UD5zpad9dOh84Bx80o3XmfMGZT2eM9kqmapx24HKVRrO7oB+trZ+cLeg+xMOGF0eK
+         zGrAbGELg1t9b42G01XnJz9pNyCRHoPBnUrrIiyCVcxhOv92W52ZnQPudaLRWiTzh1Yu
+         2QViT12dmJTXFEjjQYHfM8rJywbbbLnceLVERWH9NYIwtTnXb+Ld1B+RONCZwZXEa+Nt
+         Uavg==
+X-Forwarded-Encrypted: i=1; AJvYcCWKRazHSsw62uYwR6IffLOyeuf1aqHUDSH4dMl3wfuy75OBt6N5OpM8CrOXa67BUOfBXrcZmYrc3lXG0A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNtpQWB9Et/bkBFeebJBA12NNMBmpoUEoDEfpBnt8U/dg7tsTb
+	9Kq0z39eSh8Immz4SAktjlVo+2WCRBSAWNraAGkIqwTkcOLthdtxQIfXTXQDVb9Q4zFxR1PY+FR
+	mLUbzD+JCscp1YXWqTt6nybVKqzwDmD1Py4ClZCQ3/kDDHRg6DIy1drhMnR8o
+X-Received: by 2002:a05:620a:17a1:b0:7a1:ccfb:faf with SMTP id af79cd13be357-7a674048908mr211361385a.38.1724224788359;
+        Wed, 21 Aug 2024 00:19:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUvUNVPoVPY0IqYI+9FyKN/j3iG1JNGhE8e2W6Pqxb+HWSkXXSyWApzCMJK3GHPcsNkvlKfQ==
+X-Received: by 2002:a05:620a:17a1:b0:7a1:ccfb:faf with SMTP id af79cd13be357-7a674048908mr211356885a.38.1724224787793;
+        Wed, 21 Aug 2024 00:19:47 -0700 (PDT)
 Received: from eisenberg.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff013ef2sm596207885a.11.2024.08.21.00.19.36
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff013ef2sm596207885a.11.2024.08.21.00.19.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 00:19:41 -0700 (PDT)
+        Wed, 21 Aug 2024 00:19:46 -0700 (PDT)
 From: Philipp Stanner <pstanner@redhat.com>
 To: Jonathan Corbet <corbet@lwn.net>,
 	Jens Axboe <axboe@kernel.dk>,
@@ -99,9 +99,9 @@ Cc: linux-doc@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-pci@vger.kernel.org,
 	virtualization@lists.linux.dev
-Subject: [PATCH v2 8/9] vdap: solidrun: Replace deprecated PCI functions
-Date: Wed, 21 Aug 2024 09:18:41 +0200
-Message-ID: <20240821071842.8591-10-pstanner@redhat.com>
+Subject: [PATCH v2 9/9] PCI: Remove pcim_iounmap_regions()
+Date: Wed, 21 Aug 2024 09:18:42 +0200
+Message-ID: <20240821071842.8591-11-pstanner@redhat.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240821071842.8591-2-pstanner@redhat.com>
 References: <20240821071842.8591-2-pstanner@redhat.com>
@@ -113,115 +113,75 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-solidrun utilizes pcim_iomap_regions(), which has been deprecated by the
-PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-pcim_iomap_table(), pcim_iomap_regions_request_all()"), among other
-things because it forces usage of quite a complicated bitmask mechanism.
-The bitmask handling code can entirely be removed by replacing
-pcim_iomap_regions() and pcim_iomap_table().
+All users of pcim_iounmap_regions() have been removed by now.
 
-Replace pcim_iomap_regions() and pcim_iomap_table() with
-pci_iomap_region().
+Remove pcim_iounmap_regions().
 
 Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+Reviewed-by: Andy Shevchenko <andy@kernel.org>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- drivers/vdpa/solidrun/snet_main.c | 53 +++++++++++--------------------
- 1 file changed, 18 insertions(+), 35 deletions(-)
+ .../driver-api/driver-model/devres.rst        |  1 -
+ drivers/pci/devres.c                          | 21 -------------------
+ include/linux/pci.h                           |  1 -
+ 3 files changed, 23 deletions(-)
 
-diff --git a/drivers/vdpa/solidrun/snet_main.c b/drivers/vdpa/solidrun/snet_main.c
-index 4d42a05d70fc..ce336f261649 100644
---- a/drivers/vdpa/solidrun/snet_main.c
-+++ b/drivers/vdpa/solidrun/snet_main.c
-@@ -556,36 +556,25 @@ static const struct vdpa_config_ops snet_config_ops = {
- static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
- {
- 	char *name;
--	int ret, i, mask = 0;
--	/* We don't know which BAR will be used to communicate..
--	 * We will map every bar with len > 0.
--	 *
--	 * Later, we will discover the BAR and unmap all other BARs.
--	 */
+diff --git a/Documentation/driver-api/driver-model/devres.rst b/Documentation/driver-api/driver-model/devres.rst
+index ac9ee7441887..525f08694984 100644
+--- a/Documentation/driver-api/driver-model/devres.rst
++++ b/Documentation/driver-api/driver-model/devres.rst
+@@ -397,7 +397,6 @@ PCI
+   pcim_iomap_regions_request_all() : do request_region() on all and iomap() on multiple BARs
+   pcim_iomap_table()		: array of mapped addresses indexed by BAR
+   pcim_iounmap()		: do iounmap() on a single BAR
+-  pcim_iounmap_regions()	: do iounmap() and release_region() on multiple BARs
+   pcim_pin_device()		: keep PCI device enabled after release
+   pcim_set_mwi()		: enable Memory-Write-Invalidate PCI transaction
+ 
+diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
+index 4dbba385e6b4..022c0bb243ad 100644
+--- a/drivers/pci/devres.c
++++ b/drivers/pci/devres.c
+@@ -1013,27 +1013,6 @@ int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
+ }
+ EXPORT_SYMBOL(pcim_iomap_regions_request_all);
+ 
+-/**
+- * pcim_iounmap_regions - Unmap and release PCI BARs
+- * @pdev: PCI device to map IO resources for
+- * @mask: Mask of BARs to unmap and release
+- *
+- * Unmap and release regions specified by @mask.
+- */
+-void pcim_iounmap_regions(struct pci_dev *pdev, int mask)
+-{
+-	int i;
+-
 -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (pci_resource_len(pdev, i))
--			mask |= (1 << i);
+-		if (!mask_contains_bar(mask, i))
+-			continue;
+-
+-		pcim_iounmap_region(pdev, i);
+-		pcim_remove_bar_from_legacy_table(pdev, i);
 -	}
+-}
+-EXPORT_SYMBOL(pcim_iounmap_regions);
 -
--	/* No BAR can be used.. */
--	if (!mask) {
--		SNET_ERR(pdev, "Failed to find a PCI BAR\n");
--		return -ENODEV;
--	}
-+	unsigned short i;
+ /**
+  * pcim_iomap_range - Create a ranged __iomap mapping within a PCI BAR
+  * @pdev: PCI device to map IO resources for
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 9625d8a7b655..6c60f063c672 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -2301,7 +2301,6 @@ void pcim_iounmap_region(struct pci_dev *pdev, int bar);
+ int pcim_iomap_regions(struct pci_dev *pdev, int mask, const char *name);
+ int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
+ 				   const char *name);
+-void pcim_iounmap_regions(struct pci_dev *pdev, int mask);
+ void __iomem *pcim_iomap_range(struct pci_dev *pdev, int bar,
+ 				unsigned long offset, unsigned long len);
  
- 	name = devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-bars", pci_name(pdev));
- 	if (!name)
- 		return -ENOMEM;
- 
--	ret = pcim_iomap_regions(pdev, mask, name);
--	if (ret) {
--		SNET_ERR(pdev, "Failed to request and map PCI BARs\n");
--		return ret;
--	}
--
-+	/* We don't know which BAR will be used to communicate..
-+	 * We will map every bar with len > 0.
-+	 *
-+	 * Later, we will discover the BAR and unmap all other BARs.
-+	 */
- 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (mask & (1 << i))
--			psnet->bars[i] = pcim_iomap_table(pdev)[i];
-+		if (!pci_resource_len(pdev, i))
-+			continue;
-+		psnet->bars[i] = pcim_iomap_region(pdev, i, name);
-+		if (IS_ERR(psnet->bars[i])) {
-+			SNET_ERR(pdev, "Failed to request and map PCI BARs\n");
-+			return PTR_ERR(psnet->bars[i]);
-+		}
- 	}
- 
- 	return 0;
-@@ -594,18 +583,15 @@ static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
- static int snet_open_vf_bar(struct pci_dev *pdev, struct snet *snet)
- {
- 	char name[50];
--	int ret;
- 
- 	snprintf(name, sizeof(name), "snet[%s]-bar", pci_name(pdev));
- 	/* Request and map BAR */
--	ret = pcim_iomap_regions(pdev, BIT(snet->psnet->cfg.vf_bar), name);
--	if (ret) {
-+	snet->bar = pcim_iomap_region(pdev, snet->psnet->cfg.vf_bar, name);
-+	if (IS_ERR(snet->bar)) {
- 		SNET_ERR(pdev, "Failed to request and map PCI BAR for a VF\n");
--		return ret;
-+		return PTR_ERR(snet->bar);
- 	}
- 
--	snet->bar = pcim_iomap_table(pdev)[snet->psnet->cfg.vf_bar];
--
- 	return 0;
- }
- 
-@@ -653,15 +639,12 @@ static int psnet_detect_bar(struct psnet *psnet, u32 off)
- 
- static void psnet_unmap_unused_bars(struct pci_dev *pdev, struct psnet *psnet)
- {
--	int i, mask = 0;
-+	int i;
- 
- 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
- 		if (psnet->bars[i] && i != psnet->barno)
--			mask |= (1 << i);
-+			pcim_iounmap_region(pdev, i);
- 	}
--
--	if (mask)
--		pcim_iounmap_regions(pdev, mask);
- }
- 
- /* Read SNET config from PCI BAR */
 -- 
 2.46.0
 
