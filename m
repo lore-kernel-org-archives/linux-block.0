@@ -1,121 +1,99 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A27A49659
-	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 11:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F6A192D66;
+	Wed, 21 Aug 2024 11:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724241277; cv=none; b=a01lZZkiCQJPfE/kv5DyFAXtBtSLe72nsuSF3ZhcU70uimG+DxjhZ2nlrt2VbDvOB1e7QMep021qb67H/akTuFDv6htyXSzQ1WCOCbSjRuWi8pxb4OqB6tRhFHR/MvhbrxMnGHuzFeD+FzrfXwnq/ICNrCenx3jiLOT8O1LYcFY=
+	t=1724241291; cv=none; b=H2DDxmM8xbzu6v8EQ8MfmPVq0o5tJa8ZllC5zDn3J2ZFmw/DATPCiM+SFzWp41eMSuG9XEEI0uBGNO1TRqYNfAevBs6q2o9sRUrnM1v1F+BL/HKodRVfgHR1lzHXjhG/Ie5OQWkxFwRgxX5QsFgOh9bJ3Xsuz0aO3ngTA5Lbl9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724241277; c=relaxed/simple;
-	bh=WSFE00FeDtnofDWlCWa6o9enLw2V0Q9YYDGI3XrXwx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a6jx2egC8AHF9b3y+69cVwTm8DAStYkIeNbl9PsVPzx6SWXqR999sPRCyIej/G6rQOwE3oTxIN9KzNRY/pHxHeMxJ4s66EdwJCUfd7roLqAbpm0zzWSBk2W/viIi3D7T5aS/hVWcimh+HhwwbdqxH8L99LG1yTsLFDTPmrOcEq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BJY+CbV8; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1724241291; c=relaxed/simple;
+	bh=JBtWbazJKUA6/dJ6r9f034nEMDUsTMqHc2oC7nYIFtY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JYKHS3v8TQKa4llle4mm5014r7VBJmHyxYCFYqO+qwj0JzpSA5jf5t4eoC8a363J1TQ03MUAk+N6oWOMa02GbQCPpMNUPCAfYplMtMFyFRsdaz2d7mGU2flUC/yafCegeLrL7fFw31jUTXAu6RgZ9kt2AwwLJNovitmrpXHfO8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BpeJivBb; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BJY+CbV8"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a7aa086b077so686062866b.0
-        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 04:54:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpeJivBb"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2d3ba497224so88682a91.0;
+        Wed, 21 Aug 2024 04:54:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724241273; x=1724846073; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O1cKOhqUF3zu7vgZsan9VYbVtQKA6jU1ocQV29bWQbE=;
-        b=BJY+CbV8RDd+/YOsQEzpiiRqI+zX6EaRnuQCb91rQUAaFIuDNyreWrNbuyyvqkepWw
-         0J4MCz3D1GOJ2vQHZcRwB2UeMr+TyuiPNmfHsYZDuctzym3pdFqlScexijBA6ylSGhkn
-         QskNJYyCndrEVYYZpmtgxPrVkYoxX/w55SdckE2S7BhnWFr3WLJCb9jbn1zMs+/VJ6wd
-         Gy0RYIPacFntwCV0YudzvXXONL5/mFdv9ULSCB3Cwx2rI6qJ1pHvky1gfhW2C1F8OJBy
-         YNDbAkGlrN4ue2KT8fz1HH9yvFGC3vr0eSAb/OxX+VBR2lR2p+KZ7CYSYfa1SasdKTK8
-         /B9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724241273; x=1724846073;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724241289; x=1724846089; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=O1cKOhqUF3zu7vgZsan9VYbVtQKA6jU1ocQV29bWQbE=;
-        b=Cke6CFB4m3mbMdbEJ/AyI4rFTMVTuRF8iyr99Fdi2xdTEHM9YHXxwYpJ9K+BLUVvQQ
-         7HhBgLd9hBw6Y9fRuwDnAnSUeZGOGWWnvu/RSWfBjeooXKKe7xdgH3vQg4WX9FIjUy+Q
-         8hIqhrmDS5st4YNVjYJ1LfXNKQ8qZ/6FJWt/BgQXiza+pNSvUcbu0EMT/KcBhHaXZAW9
-         m+sWH7s2jFOImNLLlq9A6pBiHBHvcTxhE84NK86fodAyziKNNCZjKtXFYSOhgdR+sidz
-         yqW+/xWKIpds18F7Wr+sw24w6t9+FPHley8BdozwVkMoUqP6cG4p3zws9vC7o8NmnRDq
-         tsDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlyTwjGnF4hyiwtfwEtorizpTH7atn0dCVrlDUc51V2Gj+FOSX4+T46fPK+aKesEY8ZwUMhqbGrokbRQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCD2oDdNZMTHsjXMDGBRBeC0R3+v4veLiqPr5mIuqh9ANXhGEq
-	KS0APZ22rdHopzDXpyV/uXyyEjoONAVAbndgA7EJ3i1bcVuwq5vPB7MEHMyMe+0=
-X-Google-Smtp-Source: AGHT+IFotKgao7c3MvbC51pbdgpWNBmepUxyxxfJglrrTLVTS0I2aFuu4fTaeblDXOtgwgBDsM118Q==
-X-Received: by 2002:a17:906:f585:b0:a7a:a30b:7b92 with SMTP id a640c23a62f3a-a866f11dcbemr111996166b.1.1724241272808;
-        Wed, 21 Aug 2024 04:54:32 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a838396c682sm885673166b.196.2024.08.21.04.54.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 04:54:32 -0700 (PDT)
-Date: Wed, 21 Aug 2024 14:54:28 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Matthew Brost <matthew.brost@intel.com>, Tejun Heo <tj@kernel.org>,
-	Anders Roxell <anders.roxell@linaro.org>
-Cc: open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org,
-	Linux Regressions <regressions@lists.linux.dev>,
-	linux-block <linux-block@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
-	Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: next: x86_64: ahci 0000:00:1f.2: probe with driver ahci failed
- with error -12
-Message-ID: <eb78af03-b407-49d9-b605-af9632eda08e@stanley.mountain>
-References: <CA+G9fYuD4-qKAX9nDS-3cy+HwGbyJ6WoD7bZ_QL0J__A++P9aA@mail.gmail.com>
- <CA+G9fYuYfNA7NZDHpq2K24CsUn21LAb8vn38=JTz=54bsdSd9g@mail.gmail.com>
- <43be498f-5a25-4ee2-8c5d-1ef75c4d1ff3@stanley.mountain>
+        bh=A1YX2miHAUi0+/dGV7pb1+2w+ezV83KYwxdEEwMmR18=;
+        b=BpeJivBbt9W7dcFlaHjEGwOzJnLBRz9HI2ZQMS0fwWAlo4ZyzUvAvDXXOjjH4YQNtU
+         ug9tNWmRm7qp7QICQG/NNESfmJPEI9J+Mna/36wxmoadc8fP7syCjvlBARGfvvi/T53g
+         vhwv3xGUOhr3wDBqlLN+LxQGGN4s6uB+BT84R0gTFM2bOkkutowrwAqjIY+WckFeWfQY
+         jdJG7aefb98GaXOIbPlUFGDQtTBHx0BWwjnYWGClsoVCiRV38OROTNVjyM0lAosWQa2Q
+         T9Yfge9QVQiIP5ZwjOS2fozkKrjMO7hzBWZGZ0KwvcNtnm0sala7qCeODRkM6AisC2dF
+         oUzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724241289; x=1724846089;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A1YX2miHAUi0+/dGV7pb1+2w+ezV83KYwxdEEwMmR18=;
+        b=i8peSddl1E4an0b3BmhuNF/iRq9DOgdbRJbzMQ7bhNYE4RiBUVhyGolPKw7KT1uI8J
+         lgE4Z8yJkrx3C26F11gWa5HDCVhuM4fAFNJRfCEyYHcelbtTpnsu4aZv+fVOKcVF3kzo
+         4u3HhUVdikB0Kn894yFz4Jym23FkYnaL/G8JFwnrGgQDX7kV8HB3RF5pQD7tq3Fg0uxe
+         mOodArpvUer+RWWtzgkym4+SARhfvTCiW/WLXGvszkrTxBQpSWMrfUWCv/BeKYg+AUKo
+         yb3leMoB2dGwCVu9AgQ6Wz2sqyAVq8jstODpJuG5dvPSCUieLxwzmCFmnZZlJd2C+zYc
+         5UGA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNL3FaDyYRxRIEYnhMzU21EeeUdr+kbsUfoS4UILZDgjHQlRn0yjn12lRRVmC6iyXrIQv9inqgvFafxTgQ@vger.kernel.org, AJvYcCWxh8imdEBhkidyyojED98PzhdNHjzq0kYegL6si3DL09A8TyLS8UTKm1f0XXsMAAzWnAEpBkNai1RMgQ==@vger.kernel.org, AJvYcCXs2GYqD8ZLGHAYMq9WP9s4Ki0s0HwCPQdUsugADX8OOWGK5W+mGQZPtWEqihxauYrA5Ba02DlHnteLjbOuJ8U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaV+9hrmuqeMRdGWljL3ks//VeTcZ0qCByv6OHBYFy15C5tjhw
+	Ggf8gTOAxA/3h54FXc5iHWvw7sjgijYYDQV/IhP5imm3lBo8XO50Jt8y1nNOQS9klG3EF71PHg+
+	8qFPp5tkrXaibmVkiwjkIaQbgLFk=
+X-Google-Smtp-Source: AGHT+IFHrNgx7Mk0k6i86ljxev3co52Px3UGqMq0OFJcxXsGwjnWhDqw7fIp0dTObjIm3aRC6xk0+3wBT5j4CIvDW70=
+X-Received: by 2002:a17:90b:2d4f:b0:2c2:d11b:14dd with SMTP id
+ 98e67ed59e1d1-2d5e98c2845mr1267711a91.0.1724241289195; Wed, 21 Aug 2024
+ 04:54:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <43be498f-5a25-4ee2-8c5d-1ef75c4d1ff3@stanley.mountain>
+References: <20240815074519.2684107-1-nmi@metaspace.dk> <CANiq72mCsBO01FHbf4D0h0yvTV=TbpgO-jeTHLL39ae-JpMLZg@mail.gmail.com>
+ <CANiq72mrwBs_YTcBvge4ME5bwSLKbNaoFU+KZw3EfCTyGjiJ9w@mail.gmail.com>
+In-Reply-To: <CANiq72mrwBs_YTcBvge4ME5bwSLKbNaoFU+KZw3EfCTyGjiJ9w@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 21 Aug 2024 13:54:36 +0200
+Message-ID: <CANiq72mBonwX43d4y5VpZH+1ZWTnJxMfX889Aa3HHmY0_m5Mvg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] rust: fix erranous use of lock class key in rust
+ block device bindings
+To: Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>, 
+	Andreas Hindborg <nmi@metaspace.dk>
+Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
+	Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	"Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Give this patch a shot and I'll resend if it fixes the bug.
+On Wed, Aug 21, 2024 at 1:36=E2=80=AFPM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> Dirk noticed the Zulip link was broken due to a rename of the topic.
+> Normally I try to remember to convert them into message links (which
+> are permalinks) and to shorten them when they are too long too -- done
+> now.
+>
+> For context, Zulip is gaining the ability to get topic permalinks (see
+> https://github.com/zulip/zulip/issues/21505 -- we gave them feedback a
+> year ago that it would be useful for kernel commits), though I think
+> it is not exposed through the UI yet.
 
-Fixes: b188c57af2b5 ("workqueue: Split alloc_workqueue into internal function and lockdep init")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- kernel/workqueue.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+It could be a good idea to warn about non-permalinks to Zulip in
+`checkpatch.pl` -- Cc'ing Andy and Joe and created an issue:
 
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index bfeeefeee332..2fb93f3088f9 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -5623,12 +5623,10 @@ static void wq_adjust_max_active(struct workqueue_struct *wq)
- 	} while (activated);
- }
- 
--__printf(1, 4)
- static struct workqueue_struct *__alloc_workqueue(const char *fmt,
- 						  unsigned int flags,
--						  int max_active, ...)
-+						  int max_active, va_list args)
- {
--	va_list args;
- 	struct workqueue_struct *wq;
- 	size_t wq_size;
- 	int name_len;
-@@ -5660,10 +5658,7 @@ static struct workqueue_struct *__alloc_workqueue(const char *fmt,
- 			goto err_free_wq;
- 	}
- 
--	va_start(args, max_active);
- 	name_len = vsnprintf(wq->name, sizeof(wq->name), fmt, args);
--	va_end(args);
--
- 	if (name_len >= WQ_NAME_LEN)
- 		pr_warn_once("workqueue: name exceeds WQ_NAME_LEN. Truncating to: %s\n",
- 			     wq->name);
--- 
-2.43.0
+    https://github.com/Rust-for-Linux/linux/issues/1104
+
+Cheers,
+Miguel
