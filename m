@@ -1,67 +1,68 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BB41649C6;
-	Wed, 21 Aug 2024 10:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CC0166F05;
+	Wed, 21 Aug 2024 10:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724237420; cv=none; b=dIkNnYQ0GkVk/fOuCC99gIHI1Iyiw4TF8nS9L75T2ly/gognMHPMzYNXDSgsJtkt9fcrfGa0n7jiwREbE+W1fJ+cARsqYn5uW67Zt/llsFdKePC6cptDF2006a3nYAsy3+fan2P2t1yRG59LIg04064GG1mQOC5+X/CdzCS8p3o=
+	t=1724237458; cv=none; b=u9C9mQOXVEt30et0YZViUcTN0j4bQ3IILVUaTyB6Fsh+3UotNReFxDXSLtD97QU/ACOiT33/o70p+LGWu+WgwhX/MbrBbYSxpZaZ2GOYUmDNL5WS/r8WAYQTBn0e9tv1B9ZI0WrUZhQ0Fth3KTe/1Q9gw3SuzZHNLlHAjL8OD+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724237420; c=relaxed/simple;
-	bh=JXDxYM3WmdtyuoT6cF8661y7zZfPtQ9LFgGpjPO8Te4=;
+	s=arc-20240116; t=1724237458; c=relaxed/simple;
+	bh=RgKVB5rp8NIujsP5fR6Quizw2XisCYrGl/GvPSA7ZMI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QeF/CDiEULZHKqSsy6XW6FBio94H/Zi2SMuW2yOnQZvgAsI8YA1Uon07T4Oy6ssQbkDykz1yDxNRQy86dS9dPv4s4Q2gn7em8N2tFMF354AqEjiwzIwo0GZxtA/ZtYz3wSpa3shBpldyzq26PI+1c2G466qsY5h0zkD3ANwF60Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QsO1ABO5; arc=none smtp.client-ip=209.85.216.48
+	 To:Cc:Content-Type; b=N9zIpH7+GPfUHT92bWr6Oxx6QgMi7bu5BM6J6kZktmnw2121yiEOru5jAoUBkCpW1YhzQalBVEuLTB13pkRxVV7H4boSZ0bfzCB/oy+B5FsM9qBviaWYD1bZddFNx+c8MmHGJBdh5hwEO6DiGk4En6JLNZaw0+r7ywg9J/C6+AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yd9SzYrE; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QsO1ABO5"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2d42c59df79so115367a91.1;
-        Wed, 21 Aug 2024 03:50:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yd9SzYrE"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2d3badec49eso79854a91.1;
+        Wed, 21 Aug 2024 03:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724237415; x=1724842215; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724237456; x=1724842256; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qmF4fnNQO06v6glKq1+P4ngcb0gtyYmsdANRi5vGz5E=;
-        b=QsO1ABO5pnd9Sb+Kez7FE89ozgGDRxr1nJ1mRQeuqS+r0GHc1pRVZ0CGf/GG8a1b6l
-         Ng9pYC/i35JFRAJflbKRo/B2RZq+NiPbQSibsgYU/BQ/jegk8sLki3bJU7ahqt+sGM4+
-         1Zu+c+Q6Jn8Bj11Hec8eKAk9QoKlc5JppKqKjfDy1sWfhE6CgLf4qRtzmfyPh3eHzcAC
-         f3t5ICbEFuL7IR4RPiAKwBIwtzwZRvTfUS0uoiFM4woDmbgHKq8dEjRHSFDhZnYk8Vmd
-         aFR4GDk9xZjdLOixvzt5Pkd7MOMOVQy/6RyZ03ENB3uU0qcusanvvPjwkAXs1rCNtJVE
-         v0GQ==
+        bh=zU8yVhJ74aNvIHdH35b58Gtu2Vbl1e8wdXOY/YRC5do=;
+        b=Yd9SzYrE0PvwLWNXAscH3O7avXnpERDl5aJ0TXoFfvqVTk7EVNQ6zMEDxp7LObGcMx
+         aJ7Iz4z0M3wLNPkVF3R6tKDClBCWPMBKCt38l5EK82wtOVqtIlpJTOFgsB4BVNghOecL
+         iSLdS0wBPZBzIjzqWqfMRP5hfAIa3J0gw1AfgZHFLNxaAd0ZNwSf/bq2ELFAFOOKWkUp
+         WeA1r19caU97fq+8n8+w/wi+w5y/29GtSf+8GyzohpDM18+N/q4Dt1/1Wr1fbgEMlVtu
+         AJmBdUQgle6+u+eTrk1+vvlWhdiKd57ZBMDEvHsHFNA7KtOKCJxAqsFzKUBRbMCDOqi0
+         +qtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724237415; x=1724842215;
+        d=1e100.net; s=20230601; t=1724237457; x=1724842257;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qmF4fnNQO06v6glKq1+P4ngcb0gtyYmsdANRi5vGz5E=;
-        b=cnZD7TJ+zzJNgXosxb5vcjkuFcmOTdWZA+4mBkFkFfJc34WgkDvBH9Uk1eLOHly1vJ
-         wBVkilEsPQLUEMVamb3ry/KlM/khzSPhDqOHrM69tPsSjnWNQp3UtIyw37RlT30asMN2
-         OALEjYqWVHrX+nj1jbqwU+meq5PftPLVxy4d4hW69mHTX2seYwLDuYEiOYmJHQEh/YKG
-         3dV/DdjxS5J8Y0aAIy0+vv4OlzNZJlAZdtXD8oMF8QN9BKPfP62uKHMhY2A1RKULKlv2
-         yhXVTPhEv/pb/KYMLx7CLdW5cKX1ioMkyySVtqeSSYM/fm/CMwXqtje0hw/fMLga8C6T
-         bhIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIjbVOrA79i4BAefa6SaT8zbTO2ikxNLwLXchh/8SgFdW/gL+W/l/nkE6uHhVaLh5CQwius1lDI80FWhZ3@vger.kernel.org, AJvYcCUbdLHOcLYT9UNzyKrC1duNE5R9KfGSEiKUPOpA6ePC3vADrvFul/lO9dk9W6DPczCiKigc7E2OXmYPKUB+C3o=@vger.kernel.org, AJvYcCVoziu6ojXe14gwoOmEgPuHEwoi18FuT1X9/uWgkK3RbrmJIGl45VvkUAp3m6nZU4XFtPW0FzJMzVXOIA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YysnmVmdPkpj16Mgqyzu8Vz8pLUFLdjRw4y3yCAejwxFsSrQtHP
-	c+1OattqxoLKgOScXIGvHb6mYuWFQjp4fanKN0FoZN3hijf5e/1PTg9912HD3vBZFvUiF9iBR9e
-	/vx4i1nodeOZ0HACKABKpDEHL4F0n0A==
-X-Google-Smtp-Source: AGHT+IFREzv1+qeMvAZLqHsdIGcPJkHZSWdtoUsO7gZARHtF1qJ77Zpp82brKZTWwq1l1xUs2ssU13KhcBvDg5Ho+fM=
-X-Received: by 2002:a17:90b:4c04:b0:2c2:f501:20f8 with SMTP id
- 98e67ed59e1d1-2d5e98bd64fmr1170817a91.0.1724237415444; Wed, 21 Aug 2024
- 03:50:15 -0700 (PDT)
+        bh=zU8yVhJ74aNvIHdH35b58Gtu2Vbl1e8wdXOY/YRC5do=;
+        b=e7P1z21vDzcOBVtBPzrLWkNzJkX0aHrGs/Nqe/k2n/8jXzqfH5Qw2MMMwQguXoxD0x
+         R3s5AzlLDaiKX61jFbsBL6BN3zZUkaiuzC2TUn3Cody6RJldntRjaKFudKcYa1CfTkM9
+         rPrlSY3znMLbmao+3f0PRi+z9SQniz6/Esprw3/Slt+DolM6rR0N/Ugxope8kKDtMigt
+         hjk1E/xBbO6hp9/sPclQ6jN1XLJPXQ1sSAqDJX1vcnF7gmzK6Mc6P8M6QFZBRvLDnMFm
+         DTkzQLq4wBPML4fqQGrWmAZI2p+NCaOY2fbWZytpQD4hvhHOlUF9RZNAMDUab1iRHBHO
+         3A5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUdOp4u1tzbCPo2Cz40U4liDbVlDN75fqI/RV6J0RyNshWGQ6Ov5stgSl+TV57q9qP7Ny/Y/K7KnktSW2eZ@vger.kernel.org, AJvYcCVZwsBLAUfDviJxK3HOsXoO+KwwdWFa61bWxL0/ozn3NOQRqfR43EA2V4M5sAu8yIIEQP+mB2i5/M3P7w==@vger.kernel.org, AJvYcCXIq9aXlWtvnIwzO1URvA8Lw6oZcsBgJa8bSiPzuQOXBgBpRfe108gEOkodqm5iY0+/p+3LlUVnUYAPZPuYoxU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVsHUOoANiQ1LJXXNu/UHIEsWJN0xTepeKdeAICPSQ2Hsm97/a
+	xC5d8O7jtqpd4Tt1lYm3lGr0UefDNmzoH34Db36aXCVjNWyzaSAej8eH9wrPcm3PmMR7phl3D46
+	h70OcPNIxVsFPVNK2H4Q2Rjy/9LU=
+X-Google-Smtp-Source: AGHT+IEpWod4fG0oxHGsWmHP/tvvSmMY0WXDOtfKiEuLt7vRaQ5nBNHKl1judWb9bXyUnwl5GDEm0GuQ8Vpjq9AANCQ=
+X-Received: by 2002:a17:90b:4f89:b0:2d3:c488:fa6b with SMTP id
+ 98e67ed59e1d1-2d5eacbdc22mr1143769a91.5.1724237456565; Wed, 21 Aug 2024
+ 03:50:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815074519.2684107-2-nmi@metaspace.dk>
-In-Reply-To: <20240815074519.2684107-2-nmi@metaspace.dk>
+References: <20240815074519.2684107-1-nmi@metaspace.dk>
+In-Reply-To: <20240815074519.2684107-1-nmi@metaspace.dk>
 From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 21 Aug 2024 12:50:03 +0200
-Message-ID: <CANiq72ncqgRU-DNYqGEZezkNQ-VGU4pYP7XZzKAHkLye_YWbUQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] rust: fix export of bss symbols
+Date: Wed, 21 Aug 2024 12:50:43 +0200
+Message-ID: <CANiq72mCsBO01FHbf4D0h0yvTV=TbpgO-jeTHLL39ae-JpMLZg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] rust: fix erranous use of lock class key in rust
+ block device bindings
 To: Andreas Hindborg <nmi@metaspace.dk>
 Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
 	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
@@ -79,20 +80,23 @@ On Thu, Aug 15, 2024 at 9:49=E2=80=AFAM Andreas Hindborg <nmi@metaspace.dk>=
 >
 > From: Andreas Hindborg <a.hindborg@samsung.com>
 >
-> Symbols in the bss segment are not currently exported. This is a problem
-> for rust modules that link against statics, that are resident in the kern=
-el
-> image. This patch enables export of symbols in the bss segment.
+> The rust block device bindings include a wrong use of lock class key. Thi=
+s
+> causes a WARN trace when lockdep is enabled and a `GenDisk` is constructe=
+d.
 >
-> Fixes: 2f7ab1267dc9 ("Kbuild: add Rust support")
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> This series fixes the issue by using a static lock class key. To do this,=
+ the
+> series first fixes the rust build system to correctly export rust statics=
+ from
+> the bss segment.
 
 Applied to `rust-fixes` -- thanks everyone!
 
 (I am sending the notice twice for this series, since somehow the
 email threads got split into two in Lore, which also broke `b4`)
 
-    [ Reworded slightly. - Miguel ]
+    [ Applied `rustfmt` and reworded slightly. - Miguel ]
 
 Cheers,
 Miguel
