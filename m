@@ -1,102 +1,124 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CC0166F05;
-	Wed, 21 Aug 2024 10:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECA01B5ECE
+	for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 11:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724237458; cv=none; b=u9C9mQOXVEt30et0YZViUcTN0j4bQ3IILVUaTyB6Fsh+3UotNReFxDXSLtD97QU/ACOiT33/o70p+LGWu+WgwhX/MbrBbYSxpZaZ2GOYUmDNL5WS/r8WAYQTBn0e9tv1B9ZI0WrUZhQ0Fth3KTe/1Q9gw3SuzZHNLlHAjL8OD+E=
+	t=1724239576; cv=none; b=Btr+mNOMOwhZR/83bZ8+tjUFYZpqbnVsicpQ2agwatotablgqdatrvYebUCJPTV+v9t0eQZviXlq76gYF+GvBGqTQ/if5p4zyalWZI4751vKWvv7HjLT+4CndoFaDH1+skY7etLqWee3YNI6oCXEhUsmF9Ugjl7GycgQC+uMrH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724237458; c=relaxed/simple;
-	bh=RgKVB5rp8NIujsP5fR6Quizw2XisCYrGl/GvPSA7ZMI=;
+	s=arc-20240116; t=1724239576; c=relaxed/simple;
+	bh=yElWb9ZZhW2yCbab1ezlmyNGh8hmgcZwBzhzsCJlNjE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N9zIpH7+GPfUHT92bWr6Oxx6QgMi7bu5BM6J6kZktmnw2121yiEOru5jAoUBkCpW1YhzQalBVEuLTB13pkRxVV7H4boSZ0bfzCB/oy+B5FsM9qBviaWYD1bZddFNx+c8MmHGJBdh5hwEO6DiGk4En6JLNZaw0+r7ywg9J/C6+AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yd9SzYrE; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=XpXwOzjD1XqMGuWsJqrxo9zt0LTA5w/iDq4hyY7GVS56hfb7jipzFi8LLac52usIAC9C1aFDdx27pxe8QrnPVVLP8PwNgcnmbw6WiDhSHAqFCHf9VNswVo0RZfaD80eOQXjPIB04woE+YvDR4sfPLEpGsUlUYsNeXYOnWx0i3Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=RXjuQnwY; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yd9SzYrE"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2d3badec49eso79854a91.1;
-        Wed, 21 Aug 2024 03:50:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="RXjuQnwY"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f3ce5bc6adso42883241fa.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Aug 2024 04:26:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724237456; x=1724842256; darn=vger.kernel.org;
+        d=ionos.com; s=google; t=1724239571; x=1724844371; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zU8yVhJ74aNvIHdH35b58Gtu2Vbl1e8wdXOY/YRC5do=;
-        b=Yd9SzYrE0PvwLWNXAscH3O7avXnpERDl5aJ0TXoFfvqVTk7EVNQ6zMEDxp7LObGcMx
-         aJ7Iz4z0M3wLNPkVF3R6tKDClBCWPMBKCt38l5EK82wtOVqtIlpJTOFgsB4BVNghOecL
-         iSLdS0wBPZBzIjzqWqfMRP5hfAIa3J0gw1AfgZHFLNxaAd0ZNwSf/bq2ELFAFOOKWkUp
-         WeA1r19caU97fq+8n8+w/wi+w5y/29GtSf+8GyzohpDM18+N/q4Dt1/1Wr1fbgEMlVtu
-         AJmBdUQgle6+u+eTrk1+vvlWhdiKd57ZBMDEvHsHFNA7KtOKCJxAqsFzKUBRbMCDOqi0
-         +qtw==
+        bh=8q/R7X9tHOf4FIWUm9tl55XuJIWX21G4imgxVA6lmzc=;
+        b=RXjuQnwYZZp/sxLeELkeg49IO1K1afBS3KD3OuPHubsBmfPmSopTRoYPa3m4Z57MKJ
+         UMowmoW0kWdqQzN4uQ16r3yy2vSqDmhmy6IWGy7XjRKo0jJaSHQT5lF5zQrEyhua8/wr
+         HzjG9T44cC/fiQgJB2YUzOrRlPLDY/URnPfNafCpBgWorvxqNr5XcSQ08iV6R5nkX37M
+         uL+zEbprnPB7SFmwXnwqbbiih+IAUu6ZqvpJvHMPmqaOdXqp0AbXA2KS0QEXONWdVJD4
+         sQVOWeWq5o5YSdI7tOigMCy2DCqLxbXr8kcAzhVYIqMG7vX4XCHnQugVN6HlV27vgFFQ
+         W2VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724237457; x=1724842257;
+        d=1e100.net; s=20230601; t=1724239571; x=1724844371;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zU8yVhJ74aNvIHdH35b58Gtu2Vbl1e8wdXOY/YRC5do=;
-        b=e7P1z21vDzcOBVtBPzrLWkNzJkX0aHrGs/Nqe/k2n/8jXzqfH5Qw2MMMwQguXoxD0x
-         R3s5AzlLDaiKX61jFbsBL6BN3zZUkaiuzC2TUn3Cody6RJldntRjaKFudKcYa1CfTkM9
-         rPrlSY3znMLbmao+3f0PRi+z9SQniz6/Esprw3/Slt+DolM6rR0N/Ugxope8kKDtMigt
-         hjk1E/xBbO6hp9/sPclQ6jN1XLJPXQ1sSAqDJX1vcnF7gmzK6Mc6P8M6QFZBRvLDnMFm
-         DTkzQLq4wBPML4fqQGrWmAZI2p+NCaOY2fbWZytpQD4hvhHOlUF9RZNAMDUab1iRHBHO
-         3A5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUdOp4u1tzbCPo2Cz40U4liDbVlDN75fqI/RV6J0RyNshWGQ6Ov5stgSl+TV57q9qP7Ny/Y/K7KnktSW2eZ@vger.kernel.org, AJvYcCVZwsBLAUfDviJxK3HOsXoO+KwwdWFa61bWxL0/ozn3NOQRqfR43EA2V4M5sAu8yIIEQP+mB2i5/M3P7w==@vger.kernel.org, AJvYcCXIq9aXlWtvnIwzO1URvA8Lw6oZcsBgJa8bSiPzuQOXBgBpRfe108gEOkodqm5iY0+/p+3LlUVnUYAPZPuYoxU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVsHUOoANiQ1LJXXNu/UHIEsWJN0xTepeKdeAICPSQ2Hsm97/a
-	xC5d8O7jtqpd4Tt1lYm3lGr0UefDNmzoH34Db36aXCVjNWyzaSAej8eH9wrPcm3PmMR7phl3D46
-	h70OcPNIxVsFPVNK2H4Q2Rjy/9LU=
-X-Google-Smtp-Source: AGHT+IEpWod4fG0oxHGsWmHP/tvvSmMY0WXDOtfKiEuLt7vRaQ5nBNHKl1judWb9bXyUnwl5GDEm0GuQ8Vpjq9AANCQ=
-X-Received: by 2002:a17:90b:4f89:b0:2d3:c488:fa6b with SMTP id
- 98e67ed59e1d1-2d5eacbdc22mr1143769a91.5.1724237456565; Wed, 21 Aug 2024
- 03:50:56 -0700 (PDT)
+        bh=8q/R7X9tHOf4FIWUm9tl55XuJIWX21G4imgxVA6lmzc=;
+        b=Mi/ErfLlsmd8R9LrUyBaTqLVMvQ57fDeuUCNZv9TdBB0RoigM4exAS6N9zEmQ5MTyK
+         QUiqsXTLg6qBxNHdhPm31+3LDSMA6VJpyXdYYVOpTy4euXUbx2NRfXjbJLTjOGKR1O/l
+         Ek3oz41OBqO0BKZKxwHIlwh0LR/8891oa+pjzVS4qKdIX58E3Wvaj3MjZgnhzycEp/g0
+         MeAFUPWCRPbJKriw2Pj9kAo4+3n3JUnL3RaM+rBGmZC8FePLJxtUY0Kjm5VL1Bw8Q5KN
+         e3Q8nXVacYgQZGxo7wrwF81uC+XoZvichAOr/Qyc1P+ZiVZMJpaOi/K4YaYY5L4dmcDj
+         qclA==
+X-Gm-Message-State: AOJu0YzyIbLLXTPWPP/fiLF/m7gU/JsRK9UPV9Bcw6oAmSKaqMVmmJtV
+	BDd2uhDI+4uFbreYS5VCym5WGHtslY4LNfsadVI4AisxO/Vcd+LVMK3GhZjCpx5nspzeXFS6DZA
+	XWXSu8ep+Ewd4yikB97+jLggDEnCHA07hc1HZCeY4xfpkPF9tGVk=
+X-Google-Smtp-Source: AGHT+IFl0FXoAR1VtaeKTmF5DiYk75eaCRh1y239UkB5caEytNvlxpOKX+ZjVnuLfKz9sZbVtBemaCDHBTv9X+5DaIU=
+X-Received: by 2002:a05:651c:1063:b0:2f3:cd4d:5b90 with SMTP id
+ 38308e7fff4ca-2f3f891586cmr13750911fa.28.1724239570907; Wed, 21 Aug 2024
+ 04:26:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815074519.2684107-1-nmi@metaspace.dk>
-In-Reply-To: <20240815074519.2684107-1-nmi@metaspace.dk>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 21 Aug 2024 12:50:43 +0200
-Message-ID: <CANiq72mCsBO01FHbf4D0h0yvTV=TbpgO-jeTHLL39ae-JpMLZg@mail.gmail.com>
-Subject: Re: [PATCH 0/2] rust: fix erranous use of lock class key in rust
- block device bindings
-To: Andreas Hindborg <nmi@metaspace.dk>
-Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
-	Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
-	"Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20240809135346.978320-1-haris.iqbal@ionos.com>
+In-Reply-To: <20240809135346.978320-1-haris.iqbal@ionos.com>
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Wed, 21 Aug 2024 13:25:59 +0200
+Message-ID: <CAJpMwyhLMNJYbuLT4h7g5PM9iWQV072qc6fWUSP3F+s4-ypO0Q@mail.gmail.com>
+Subject: Re: [PATCH for-next] block/rnbd-srv: Add sanity check and remove
+ redundant assignment
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org, 
+	jinpu.wang@ionos.com, Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 15, 2024 at 9:49=E2=80=AFAM Andreas Hindborg <nmi@metaspace.dk>=
- wrote:
+On Fri, Aug 9, 2024 at 3:54=E2=80=AFPM Md Haris Iqbal <haris.iqbal@ionos.co=
+m> wrote:
 >
-> From: Andreas Hindborg <a.hindborg@samsung.com>
+> The bio->bi_iter.bi_size is updated when bio_add_page() is called. So we
+> do not need to assign msg->bi_size again to it, since its redudant and
+> can also be harmful. Instead we can use it to add a sanity check, which
+> checks the locally calculated bi_size, with the one sent in msg.
 >
-> The rust block device bindings include a wrong use of lock class key. Thi=
-s
-> causes a WARN trace when lockdep is enabled and a `GenDisk` is constructe=
-d.
+> Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
+> Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+> Signed-off-by: Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
+> ---
+>  drivers/block/rnbd/rnbd-srv.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 >
-> This series fixes the issue by using a static lock class key. To do this,=
- the
-> series first fixes the rust build system to correctly export rust statics=
- from
-> the bss segment.
+> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.=
+c
+> index f6e3a3c4b76c..08ce6d96d04c 100644
+> --- a/drivers/block/rnbd/rnbd-srv.c
+> +++ b/drivers/block/rnbd/rnbd-srv.c
+> @@ -149,15 +149,22 @@ static int process_rdma(struct rnbd_srv_session *sr=
+v_sess,
+>                         rnbd_to_bio_flags(le32_to_cpu(msg->rw)), GFP_KERN=
+EL);
+>         if (bio_add_page(bio, virt_to_page(data), datalen,
+>                         offset_in_page(data)) !=3D datalen) {
+> -               rnbd_srv_err(sess_dev, "Failed to map data to bio\n");
+> +               rnbd_srv_err_rl(sess_dev, "Failed to map data to bio\n");
+>                 err =3D -EINVAL;
+>                 goto bio_put;
+>         }
+>
+> +       bio->bi_opf =3D rnbd_to_bio_flags(le32_to_cpu(msg->rw));
+> +       if (bio_has_data(bio) &&
+> +           bio->bi_iter.bi_size !=3D le32_to_cpu(msg->bi_size)) {
+> +               rnbd_srv_err_rl(sess_dev, "Datalen mismatch:  bio bi_size=
+ (%u), bi_size (%u)\n",
+> +                               bio->bi_iter.bi_size, msg->bi_size);
+> +               err =3D -EINVAL;
+> +               goto bio_put;
+> +       }
+>         bio->bi_end_io =3D rnbd_dev_bi_end_io;
+>         bio->bi_private =3D priv;
+>         bio->bi_iter.bi_sector =3D le64_to_cpu(msg->sector);
+> -       bio->bi_iter.bi_size =3D le32_to_cpu(msg->bi_size);
+>         prio =3D srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
+>                usrlen < sizeof(*msg) ? 0 : le16_to_cpu(msg->prio);
+>         bio_set_prio(bio, prio);
+> --
+> 2.25.1
 
-Applied to `rust-fixes` -- thanks everyone!
+Gentle ping.
 
-(I am sending the notice twice for this series, since somehow the
-email threads got split into two in Lore, which also broke `b4`)
-
-    [ Applied `rustfmt` and reworded slightly. - Miguel ]
-
-Cheers,
-Miguel
+>
