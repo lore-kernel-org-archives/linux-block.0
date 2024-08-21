@@ -1,123 +1,98 @@
-Received: from smtp.smtpout.orange.fr (smtp-26.smtpout.orange.fr [80.12.242.26])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8EF20ABE8;
-	Wed, 21 Aug 2024 10:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BB41649C6;
+	Wed, 21 Aug 2024 10:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724234445; cv=none; b=YFt/3rzVUbaNSK8CMsbKfuPHLzl9jlVA4IHgcn/d5jF9E3GAXgYVkVko7TH2TIj3HvSI3TCIvUJaxw0kPnuPnr/N4r2khvcgR7SKPP/7mUT/md013qljIoAZYXkdVblch21ao0B+fVTUrHgSTctIF3uOsb8tImpFa8H5dyWReiM=
+	t=1724237420; cv=none; b=dIkNnYQ0GkVk/fOuCC99gIHI1Iyiw4TF8nS9L75T2ly/gognMHPMzYNXDSgsJtkt9fcrfGa0n7jiwREbE+W1fJ+cARsqYn5uW67Zt/llsFdKePC6cptDF2006a3nYAsy3+fan2P2t1yRG59LIg04064GG1mQOC5+X/CdzCS8p3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724234445; c=relaxed/simple;
-	bh=xNUZvZ/XGFquQ7bcR8kjzWBjJpgTgvtWAUsduWt4sgQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QQA9wCScfYLOzSa/CG+l1UPWMWKn+ebNR9/yC4cR/iQSkfV2VYqSGjCM7y4XHnQXhlE7pZ3jGqx+5SGCSy+22XLxQWwj9QWLJwnbgOIIJ4UibqU3JXf3v8M5J5WWNHvga5mDoV2AHRTAohAULoX12lhdIaII/tMauafuO9Im760=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=QxT2yLCS; arc=none smtp.client-ip=80.12.242.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	s=arc-20240116; t=1724237420; c=relaxed/simple;
+	bh=JXDxYM3WmdtyuoT6cF8661y7zZfPtQ9LFgGpjPO8Te4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QeF/CDiEULZHKqSsy6XW6FBio94H/Zi2SMuW2yOnQZvgAsI8YA1Uon07T4Oy6ssQbkDykz1yDxNRQy86dS9dPv4s4Q2gn7em8N2tFMF354AqEjiwzIwo0GZxtA/ZtYz3wSpa3shBpldyzq26PI+1c2G466qsY5h0zkD3ANwF60Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QsO1ABO5; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="QxT2yLCS"
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id gi8bsVe5vQYYugi8bs0j4Z; Wed, 21 Aug 2024 12:00:35 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1724234435;
-	bh=w6AIYrBySrGuhkddExNCWqzXmH7gBMeTgtXfKwkDmGI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=QxT2yLCSf3emNohfH/QMtChqPSQqqWCz+jg4/sJ1vsmTOCfCHpgaAvyqx/WbsPUgZ
-	 j0w3Ifi/pO/A9j3NexJSl4xUQGdgAwPSojkhWMogfJYjmNkm75D5FBLvWvzBfsoLnx
-	 RtgE/n5BJ2UFiEIPD8sFOVl2YVWvD1WoFHghd/fnChM3vrdlWGJ60YZx+cSO1POKe/
-	 UrZjsxDAjN7K04ZUGLvQezWqRv7RkY5CN3xSXxVmxM1ACtkvF+GMWCeH8yp3vLp82I
-	 DfoFXgyExAGvtjtoSmSR/NevfVwszwgh3H/mUaKphifhnf+W+FZJJpCz9TpFGY61l8
-	 ZEZ3P0e9kIg0Q==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Wed, 21 Aug 2024 12:00:35 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <40db668d-8e8b-4782-8a0b-4a0e9965f086@wanadoo.fr>
-Date: Wed, 21 Aug 2024 12:00:20 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QsO1ABO5"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2d42c59df79so115367a91.1;
+        Wed, 21 Aug 2024 03:50:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724237415; x=1724842215; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qmF4fnNQO06v6glKq1+P4ngcb0gtyYmsdANRi5vGz5E=;
+        b=QsO1ABO5pnd9Sb+Kez7FE89ozgGDRxr1nJ1mRQeuqS+r0GHc1pRVZ0CGf/GG8a1b6l
+         Ng9pYC/i35JFRAJflbKRo/B2RZq+NiPbQSibsgYU/BQ/jegk8sLki3bJU7ahqt+sGM4+
+         1Zu+c+Q6Jn8Bj11Hec8eKAk9QoKlc5JppKqKjfDy1sWfhE6CgLf4qRtzmfyPh3eHzcAC
+         f3t5ICbEFuL7IR4RPiAKwBIwtzwZRvTfUS0uoiFM4woDmbgHKq8dEjRHSFDhZnYk8Vmd
+         aFR4GDk9xZjdLOixvzt5Pkd7MOMOVQy/6RyZ03ENB3uU0qcusanvvPjwkAXs1rCNtJVE
+         v0GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724237415; x=1724842215;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qmF4fnNQO06v6glKq1+P4ngcb0gtyYmsdANRi5vGz5E=;
+        b=cnZD7TJ+zzJNgXosxb5vcjkuFcmOTdWZA+4mBkFkFfJc34WgkDvBH9Uk1eLOHly1vJ
+         wBVkilEsPQLUEMVamb3ry/KlM/khzSPhDqOHrM69tPsSjnWNQp3UtIyw37RlT30asMN2
+         OALEjYqWVHrX+nj1jbqwU+meq5PftPLVxy4d4hW69mHTX2seYwLDuYEiOYmJHQEh/YKG
+         3dV/DdjxS5J8Y0aAIy0+vv4OlzNZJlAZdtXD8oMF8QN9BKPfP62uKHMhY2A1RKULKlv2
+         yhXVTPhEv/pb/KYMLx7CLdW5cKX1ioMkyySVtqeSSYM/fm/CMwXqtje0hw/fMLga8C6T
+         bhIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIjbVOrA79i4BAefa6SaT8zbTO2ikxNLwLXchh/8SgFdW/gL+W/l/nkE6uHhVaLh5CQwius1lDI80FWhZ3@vger.kernel.org, AJvYcCUbdLHOcLYT9UNzyKrC1duNE5R9KfGSEiKUPOpA6ePC3vADrvFul/lO9dk9W6DPczCiKigc7E2OXmYPKUB+C3o=@vger.kernel.org, AJvYcCVoziu6ojXe14gwoOmEgPuHEwoi18FuT1X9/uWgkK3RbrmJIGl45VvkUAp3m6nZU4XFtPW0FzJMzVXOIA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YysnmVmdPkpj16Mgqyzu8Vz8pLUFLdjRw4y3yCAejwxFsSrQtHP
+	c+1OattqxoLKgOScXIGvHb6mYuWFQjp4fanKN0FoZN3hijf5e/1PTg9912HD3vBZFvUiF9iBR9e
+	/vx4i1nodeOZ0HACKABKpDEHL4F0n0A==
+X-Google-Smtp-Source: AGHT+IFREzv1+qeMvAZLqHsdIGcPJkHZSWdtoUsO7gZARHtF1qJ77Zpp82brKZTWwq1l1xUs2ssU13KhcBvDg5Ho+fM=
+X-Received: by 2002:a17:90b:4c04:b0:2c2:f501:20f8 with SMTP id
+ 98e67ed59e1d1-2d5e98bd64fmr1170817a91.0.1724237415444; Wed, 21 Aug 2024
+ 03:50:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 7/9] vdpa: solidrun: Fix potential UB bug with devres
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: alexandre.torgue@foss.st.com, alvaro.karsz@solid-run.com,
- andy@kernel.org, axboe@kernel.dk, bhelgaas@google.com, brgl@bgdev.pl,
- broonie@kernel.org, christophe.jaillet@wanadoo.fr, corbet@lwn.net,
- davem@davemloft.net, dlechner@baylibre.com, dlemoal@kernel.org,
- edumazet@google.com, eperezma@redhat.com, hao.wu@intel.com, hare@suse.de,
- jasowang@redhat.com, joabreu@synopsys.com, kbusch@kernel.org,
- kuba@kernel.org, linus.walleij@linaro.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-fpga@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- mcoquelin.stm32@gmail.com, mdf@kernel.org, mst@redhat.com,
- netdev@vger.kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- stable@vger.kernel.org, trix@redhat.com, u.kleine-koenig@pengutronix.de,
- virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
- yilun.xu@intel.com
-References: <20240821071842.8591-2-pstanner@redhat.com>
- <20240821071842.8591-9-pstanner@redhat.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240821071842.8591-9-pstanner@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240815074519.2684107-2-nmi@metaspace.dk>
+In-Reply-To: <20240815074519.2684107-2-nmi@metaspace.dk>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 21 Aug 2024 12:50:03 +0200
+Message-ID: <CANiq72ncqgRU-DNYqGEZezkNQ-VGU4pYP7XZzKAHkLye_YWbUQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] rust: fix export of bss symbols
+To: Andreas Hindborg <nmi@metaspace.dk>
+Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
+	Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	"Behme Dirk (XC-CP/ESB5)" <Dirk.Behme@de.bosch.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 21/08/2024 à 09:18, Philipp Stanner a écrit :
-> In psnet_open_pf_bar() a string later passed to pcim_iomap_regions() is
-> placed on the stack. Neither pcim_iomap_regions() nor the functions it
-> calls copy that string.
-> 
-> Should the string later ever be used, this, consequently, causes
-> undefined behavior since the stack frame will by then have disappeared.
-> 
-> Fix the bug by allocating the string on the heap through
-> devm_kasprintf().
-> 
-> Cc: stable@vger.kernel.org	# v6.3
-> Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
-> Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> Closes: https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr/
-> Suggested-by: Andy Shevchenko <andy@kernel.org>
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> ---
->   drivers/vdpa/solidrun/snet_main.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vdpa/solidrun/snet_main.c b/drivers/vdpa/solidrun/snet_main.c
-> index 99428a04068d..4d42a05d70fc 100644
-> --- a/drivers/vdpa/solidrun/snet_main.c
-> +++ b/drivers/vdpa/solidrun/snet_main.c
-> @@ -555,7 +555,7 @@ static const struct vdpa_config_ops snet_config_ops = {
->   
->   static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
+On Thu, Aug 15, 2024 at 9:49=E2=80=AFAM Andreas Hindborg <nmi@metaspace.dk>=
+ wrote:
+>
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+>
+> Symbols in the bss segment are not currently exported. This is a problem
+> for rust modules that link against statics, that are resident in the kern=
+el
+> image. This patch enables export of symbols in the bss segment.
+>
+> Fixes: 2f7ab1267dc9 ("Kbuild: add Rust support")
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 
-snet_open_vf_bar() also needs the same modification (see Andy's comment 
-on patch 8/9)
+Applied to `rust-fixes` -- thanks everyone!
 
-CJ
+(I am sending the notice twice for this series, since somehow the
+email threads got split into two in Lore, which also broke `b4`)
 
->   {
-> -	char name[50];
-> +	char *name;
->   	int ret, i, mask = 0;
->   	/* We don't know which BAR will be used to communicate..
->   	 * We will map every bar with len > 0.
-> @@ -573,7 +573,10 @@ static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
->   		return -ENODEV;
->   	}
->   
-> -	snprintf(name, sizeof(name), "psnet[%s]-bars", pci_name(pdev));
-> +	name = devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-bars", pci_name(pdev));
-> +	if (!name)
-> +		return -ENOMEM;
-> +
->   	ret = pcim_iomap_regions(pdev, mask, name);
->   	if (ret) {
->   		SNET_ERR(pdev, "Failed to request and map PCI BARs\n");
+    [ Reworded slightly. - Miguel ]
 
+Cheers,
+Miguel
