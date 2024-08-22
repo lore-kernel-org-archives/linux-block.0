@@ -1,92 +1,93 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E97379D1;
-	Wed, 21 Aug 2024 22:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2951B1BC39;
+	Thu, 22 Aug 2024 03:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724278391; cv=none; b=qCMcH6SG+lKkm3uIe6HW2Li339r1sRUc02bYiQxFOoMRIEjINAJFHGz2Qkt6kx6TcWp4hVzzeqfQyTGuz1oEWwBvo2CyLKEnCGMXD+vZvud+Sc1c4g8c+xr73zhXdTcUBy+U8Hr7Jlonq5wginFbeTu2IfCvVoblQg6ipxxL8GA=
+	t=1724297427; cv=none; b=TCVfll9rGWb15ZxjioqrfOSzAro1lh03D2hh0YaBrSx23r3ljARV47iwPkEl85ET7PWemoMRMkNVvBdLlqe9JMk8yVKaonnaxlnBdL6GAtLOycmICtjShGDTuSxlE6jMbE2O3PTNSmQwUpSiECBCRCmyjn5ykgMpPbnrp15TsUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724278391; c=relaxed/simple;
-	bh=gy3kLIaleiVIHByaXjXNu2tCJzHMdUmyUeCRezl9d40=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GQioDGYP/2GhLFgPLStfv5qnu0YrcACRUl5nshuoTS8i+xQN0pSPyu7TCDFF5kMzIRigq1MEuQopign1il7tzsm/sFUSVNuG5ICrOh4n4OliV5gzJt0JqT8rM2YVWFWV0HuMQtoPIKZ80ks6nR/w0jL85EF5ruWiMqZ3hHvt7RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gghBrVpR; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1724297427; c=relaxed/simple;
+	bh=RhNYw7mAdhZfgeamA68hm+Y7EGtxUNCyPl9DsESkuk0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rouWCqpBm5aF+lh+esTNQPMjFI2zGMMkBjbhN8qNcpf4WmB4TYN8tgEu+m5ZF9DCnHjVc8N4yAwfi2kUXDxX9TKU5unD3Ae+l/ftrFBFtzQ4zDaBjVNDaXhaVjP0gasMPKI6P+KfbZ01BiRRe+M8xylGyzvbupiAZ43v6LfXPzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wh0PJVYn; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gghBrVpR"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2d3c99c5d69so17852a91.1;
-        Wed, 21 Aug 2024 15:13:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wh0PJVYn"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3719753d365so132940f8f.2;
+        Wed, 21 Aug 2024 20:30:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724278389; x=1724883189; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gy3kLIaleiVIHByaXjXNu2tCJzHMdUmyUeCRezl9d40=;
-        b=gghBrVpReUryarcOnFHuzzuH14EQoByk0W9C9s++zpU7vOVi2ezituIqf8E1o4RDrt
-         obfNwk9I7ugnkqhwc55DKJZUSaiZ+E3S9guBm9TvdnZqi8nEmDzo5v2/jD0QocjMCz4P
-         IEPotMMqHFcpgt3X3tHtzbZCRYX/GLfn+ql7TW0iCaCrEfHevNhusFieg0gPH/jPBC7w
-         t8b1+OR+FSeXwV4ksdMvGX+ei7K3vo84neiScnGvtF8C6OJK6U+YDOUolzVpi/s/M/G3
-         75x/SE3dsvzC1KSbAExjRMmZ8Cq7bTHUXM1utLPtK+nLvA3MS96gR2pZwtCP9bD02lV+
-         XkNA==
+        d=gmail.com; s=20230601; t=1724297424; x=1724902224; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zPiuOc0Ds4TXOsTSymRy71QH64OUPsa/XwqfFqjnNV8=;
+        b=Wh0PJVYnpIRIB8buwD8PWeXmEP4tt6ku/3FA9LE3me6gVgFisT+6Zp1zzsoiRYLNlj
+         cUC+6/IChyXj+CkKi734jWpuZ8uGpSKu0RMyGtVHFdEpT/ivqxgZZISgD7qKpAY04353
+         cJYdKSAmsQW1FELkjCmm85KOhuyBJ8LENoJGaqVma4XL6CF4/bARn+a0M8Ssh/YuODNA
+         MSz8ikCIcFAfWAOX90G5e+oZ2HrOsG3ORbQITxRNrSHITuNXGj+echoCZ+u/xCMInXf1
+         ZG8Q6X7QB9XYzJ5BvT9VYZG4BbLsZD5bChSASWyzRyj9w3UZ02LlHwH6O3K8BhXKt5U3
+         O9RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724278389; x=1724883189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gy3kLIaleiVIHByaXjXNu2tCJzHMdUmyUeCRezl9d40=;
-        b=UU0jVuuUvzQFcP8sFbASIreemDM6qC+9j9U0Z8d6fIDArv3EOBCQyJ0uLViL5SDCyf
-         97Xzs2ZjiTJHFjud0uqRRSj1s3kS4bW5RnQJSOcQWEKWwkssJkW5gLyzBUW9qH29u5O8
-         VvuPoG7eF1a0OCVlOYo6FoBq8sEGRvSG+eIVSBN1f7rDyttHH/qR+3D2GVMjaVhtYrSm
-         caS4gwK5NMClebVT4Pozs9oa95rLipR4HBuQP5DPHmjBO/BV2fRhHcTgEzbMagC1GTYG
-         HTidV8z+GKhIYlaccloso7DVaThPJkyeiDgZntEDb+fQEhaWEyL37GZQ2Oj2EqCkSn8u
-         7pBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUx9KZ7lWf0wSYr+BlwW9eLmHZSoQnNQ/WorX0zZJeDnWj8DFtovDFmMppekqKWNSy0f+YmgRHr5EW5yQ==@vger.kernel.org, AJvYcCWYPHiBgVjULVu1uqhzafUJM6ZF7sp9+Jq4aqECpzN3f5kWGRr5it/sV36wftcOgUlIJhjDPGkzOE52iY2l@vger.kernel.org, AJvYcCXoq/tQV6LsEuw2RlU2n75J/gp/AxV2IcUTrkN+f0eNCZMalGpBigMqvZ0FK58WbkOrngzV2Icd67WsCuFpNEU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ7aYSWo03RMdCnxfZIhNtbMPcGYDWoh/AJ0pJcqYSGrzlpOas
-	6r0pd48uVMMQhYbSjDJvmknfHDkhK4nUEKOUqWTwyhy6QGJj2Ji3uO39xBpK3O3xfwZRwpZSiv5
-	EPhhTAiArGWwkzJIGFfK8lXpdPCs=
-X-Google-Smtp-Source: AGHT+IEyO/v91YT8hlltO4AIZ6dJNYaFf77ZtQnzqKrJkXJggP6AKu8AaggFXEnVRMRzrCMNGRwq9zlJyndgHxbbjAA=
-X-Received: by 2002:a17:90b:3ccd:b0:2cb:4382:99f1 with SMTP id
- 98e67ed59e1d1-2d5eacea29amr2406449a91.6.1724278389415; Wed, 21 Aug 2024
- 15:13:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724297424; x=1724902224;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zPiuOc0Ds4TXOsTSymRy71QH64OUPsa/XwqfFqjnNV8=;
+        b=cu578m5JpccXNv4Gc5MwGzf0lx9vRlpr8UZUwG4ldV/oeJAl1JOLz5HnHHinsoNSq/
+         BbTyBYeF8qYJv3rjPZWNX5oM4e3iw02RGMWMI9t6KqAWFy5O3nQkswjd3l7xIonzYr2P
+         fSHow8Y02G+6eVYOuvsT++svMqf+q881RTRNuCpZ2p9OjyUNg5nuytnPU75ZvoJDjntV
+         hZy4ac42zgyT3mpxRvbNTk+ba6XPai2ZAhSBgE7evkiqnyDTQTwIaBMVxGDh8E7Y6MIW
+         zCcVn2Q55pi1MCOAcOZ/JKek022cLHmO3Uo2rws4NwEPhYsLmySFlybuRj8dEIXi9nDV
+         KuMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxZ/AwbUTuu4VsBEhIVTpRXh5fKl8j29Jq2Wy1l0+gbg7Vpg+wq/h9KA54gNGNRAXjy7ijstryV/GbkA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2SSVU1btfDnUODchwpzHNjzXrozoG1JyvR9Z68KFth1bx7WE5
+	R3ndk/bbTw6Xlx7T7XvrLio/i9v0UVNOoM5j8L0wZDxR6aYrAvuQvy49oQ==
+X-Google-Smtp-Source: AGHT+IHenptdiG4MQzOA4NtwZariaK0Ofl1Vk5xeSTGIEmQVw2fxOjF32uiu08JG3g/Y5jztts0gaA==
+X-Received: by 2002:a05:6000:246:b0:371:8cb7:5d6b with SMTP id ffacd0b85a97d-372fd728d5cmr2311120f8f.53.1724297423651;
+        Wed, 21 Aug 2024 20:30:23 -0700 (PDT)
+Received: from 127.0.0.1localhost ([148.252.128.6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abef81777sm44690655e9.27.2024.08.21.20.30.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 20:30:23 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	asml.silence@gmail.com,
+	Conrad Meyer <conradmeyer@meta.com>,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [PATCH liburing 1/1] test/send-zerocopy: test fix datagrams over UDP limit
+Date: Thu, 22 Aug 2024 04:30:36 +0100
+Message-ID: <285eca872bd46640ed209c0b09628f53744cb3ab.1724110909.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240809132835.274603-1-aliceryhl@google.com>
-In-Reply-To: <20240809132835.274603-1-aliceryhl@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 22 Aug 2024 00:12:57 +0200
-Message-ID: <CANiq72nFOYA6oZ4rECBsq3U9CGzMoN8zUz+4PrVWHetzNcAXiA@mail.gmail.com>
-Subject: Re: [PATCH v2] rust: sort blk includes in bindings_helper.h
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
-	Andreas Hindborg <a.hindborg@samsung.com>, Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 9, 2024 at 3:28=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> wr=
-ote:
->
-> The headers in this file are sorted alphabetically, which makes it
-> easy to quickly resolve conflicts by selecting all of the headers and
-> invoking :'<,'>sort to sort them. To keep this technique to resolve
-> conflicts working, also apply sorting to symbols that are not letters.
->
-> This file is very prone to merge conflicts, so I think keeping conflict
-> resolution really easy is more important than not messing with git blame
-> history.
->
-> These includes were originally introduced in commit 3253aba3408a ("rust:
-> block: introduce `kernel::block::mq` module").
->
-> Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ test/send-zerocopy.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Applied to `rust-next` -- thanks everyone!
+diff --git a/test/send-zerocopy.c b/test/send-zerocopy.c
+index 8796974..597ecf1 100644
+--- a/test/send-zerocopy.c
++++ b/test/send-zerocopy.c
+@@ -646,7 +646,8 @@ static int test_inet_send(struct io_uring *ring)
+ 
+ 				if (!buffers_iov[buf_index].iov_base)
+ 					continue;
+-				if (!tcp && len > 4 * page_sz)
++				/* UDP IPv4 max datagram size is under 64K */
++				if (!tcp && len > (1U << 15))
+ 					continue;
+ 
+ 				conf.buf_index = buf_index;
+-- 
+2.45.2
 
-Cheers,
-Miguel
