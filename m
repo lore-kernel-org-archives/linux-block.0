@@ -1,91 +1,72 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838581E50B
-	for <linux-block@vger.kernel.org>; Thu, 22 Aug 2024 14:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEDD1CB330;
+	Thu, 22 Aug 2024 14:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724338175; cv=none; b=IDdb0WnlUOSvUtvtzqLevtjImFD2mZzK9smsz0/Vqv1s0kmpsZkwLq0/UYpk65qaNTZnRewHu5QRqOi90yUi531WV+zHDb4lDO57TytdbjGCiFRQepCPkosbqXvYTTkXf9n8Y4P9NuZqlGsqpsi6apPx2LvFOpCRAcFo/bc6VCk=
+	t=1724338196; cv=none; b=e7QHc/D7KZeiF4u8q4Tmexv9Q5Mp743BDi4EF7lJtTG26pSFhtHiDl7QxS60IYW1Y3azHKdIcAzub9kFgrjlMc29m4/3MFqvCK4RbAqNEa46bsWsvWE/gQpenJMdOTC1W/QYOFUgXFDOa88zlwLy7u8cS8/hleCRtIIrKGTaOl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724338175; c=relaxed/simple;
-	bh=f2iyRKBKKaX3JFIDpuapadQ+ukMVRp0JzXMMZ90raes=;
+	s=arc-20240116; t=1724338196; c=relaxed/simple;
+	bh=yCgKpkfnhk4y7/fJ0zqFdzcBZCs/lTfZEG6IYNfdqgk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bSmC+32qqp7Z3Jvo32tjjSI49Q0EQXj7U+sJSfyt794W/er34XTRX/EEAJPvaQEhkwiQ0Q34OgJjS0TxFVC9AfCJUPbusZUbSYas4Q1bfevkFDxko2lXFG0fujjwGTbKGKrr7eVaI/PqZw2wYirovAJE1z0vqiQ+LKnMRIMLs6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wBb7pi+N; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CFB4b2/R; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wBb7pi+N; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CFB4b2/R; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wBb7pi+N";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CFB4b2/R";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wBb7pi+N";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CFB4b2/R"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D0DA8201E9;
-	Thu, 22 Aug 2024 14:49:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724338165; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ggKtqnZNjeL9zT8SsU2lZV98oyuVdbTKR0ok42C3gN8=;
-	b=wBb7pi+NPQO9/T4tAZZKPIJqZAKGy/idqNt116VWPYyJn1PjU4cINHEjrhoG6+CqFyJ+PP
-	nfr6knDEbj8kozWZyAdtYnWlYcBtui0P/bfWhr3DRktf1RDZJYzQ7qhl0UzOaxw1qCNqQM
-	oWFw0KO7LATSg4OpLZwPE+OtZjK+RjI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724338165;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ggKtqnZNjeL9zT8SsU2lZV98oyuVdbTKR0ok42C3gN8=;
-	b=CFB4b2/RhtB0yMQk67zu4DOURhUb5u9ILnNiWC9Q/IRuz0ajAvigy0+vd82QgCPNx1RDWo
-	ja8vHbcPRaX/sHDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wBb7pi+N;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="CFB4b2/R"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724338165; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ggKtqnZNjeL9zT8SsU2lZV98oyuVdbTKR0ok42C3gN8=;
-	b=wBb7pi+NPQO9/T4tAZZKPIJqZAKGy/idqNt116VWPYyJn1PjU4cINHEjrhoG6+CqFyJ+PP
-	nfr6knDEbj8kozWZyAdtYnWlYcBtui0P/bfWhr3DRktf1RDZJYzQ7qhl0UzOaxw1qCNqQM
-	oWFw0KO7LATSg4OpLZwPE+OtZjK+RjI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724338165;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ggKtqnZNjeL9zT8SsU2lZV98oyuVdbTKR0ok42C3gN8=;
-	b=CFB4b2/RhtB0yMQk67zu4DOURhUb5u9ILnNiWC9Q/IRuz0ajAvigy0+vd82QgCPNx1RDWo
-	ja8vHbcPRaX/sHDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B7635139D3;
-	Thu, 22 Aug 2024 14:49:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id L71/KvVPx2YJaAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Thu, 22 Aug 2024 14:49:25 +0000
-Date: Thu, 22 Aug 2024 16:49:24 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Nilay Shroff <nilay@linux.ibm.com>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH blktests] nvme/052: wait for namespace removal before
- recreating namespace
-Message-ID: <a9a79fc9-6c0b-4a35-afea-85f34e9889bf@flourine.local>
-References: <20240820102013.781794-1-shinichiro.kawasaki@wdc.com>
- <d22e0c6f-0451-4299-970f-602458b6556d@linux.ibm.com>
- <zzodkioqxp6dcskfv6p5grncnvjdmakof3wemjemnralqhes4e@edr2n343oy62>
- <0750187c-24ad-4073-9ba1-d47b0ee95062@linux.ibm.com>
- <wf32ec6ug34nxuqjxrls5uaxkvhtsdi4yp2obf5rbxfviwlqzt@7joov5mngfed>
- <12fa9b5b-8a8b-42a6-9430-94661bfbdd21@linux.ibm.com>
- <wpapwfrmpkwxdqahiwvp5y6l53z2xuidc2qyloolzfundec3p6@vsuen2jtxot2>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgA5Lpt1iff6tu5ChMn5XucDfEuT5iWXe4bJXMGP9ko9w/jEQwD2RJ+9cGfqPNQlkAnXqlMLw2HQkTHj2GNt7etz+a8pokF2P8fYcWD7jd2M022dDIoOwcjwYmydlclkjNJOa+3AgNPZBKjBQWSXXdZDPXVZ8ad5wWgcK3X7/rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: JtyZWNNeQZuD3/gXcsFKaQ==
+X-CSE-MsgGUID: +LVTpM9/R6yTIpHsbW7Oxg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="22941194"
+X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
+   d="scan'208";a="22941194"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 07:49:54 -0700
+X-CSE-ConnectionGUID: y0FDeu5LQeO4Qzbust16qg==
+X-CSE-MsgGUID: YMGGdoIlTGS26ZTcm+ckPg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
+   d="scan'208";a="66149796"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 07:49:43 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1sh97e-00000000U8h-0kBa;
+	Thu, 22 Aug 2024 17:49:10 +0300
+Date: Thu, 22 Aug 2024 17:49:09 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+	Chaitanya Kulkarni <kch@nvidia.com>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH v3 8/9] vdap: solidrun: Replace deprecated PCI functions
+Message-ID: <ZsdP5ejfb2AH3nRW@smile.fi.intel.com>
+References: <20240822134744.44919-1-pstanner@redhat.com>
+ <20240822134744.44919-9-pstanner@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -94,49 +75,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <wpapwfrmpkwxdqahiwvp5y6l53z2xuidc2qyloolzfundec3p6@vsuen2jtxot2>
-X-Rspamd-Queue-Id: D0DA8201E9
-X-Spam-Level: 
-X-Spamd-Result: default: False [-6.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -6.51
-X-Spam-Flag: NO
+In-Reply-To: <20240822134744.44919-9-pstanner@redhat.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Thu, Aug 22, 2024 at 11:59:35AM GMT, Shinichiro Kawasaki wrote:
-> I can agree with this point: it is odd to suppress errors only for the namespace
-> removal case. I did so to catch other potential errors that _find_nvme_ns() may
-> return in the future for the namespace creation case. But still this way misses
-> other potential errors for the namespace removal case. Maybe I was overthinking.
-> Let's simplify the test with just doing
+On Thu, Aug 22, 2024 at 03:47:40PM +0200, Philipp Stanner wrote:
+> solidrun utilizes pcim_iomap_regions(), which has been deprecated by the
+> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()"), among other
+> things because it forces usage of quite a complicated bitmask mechanism.
+> The bitmask handling code can entirely be removed by replacing
+> pcim_iomap_regions() and pcim_iomap_table().
 > 
->    ns=$(_find_nvme_ns "${uuid}" 2>/dev/null)
-> 
-> as you suggest. Still the test case can detect the kernel regression, and I
-> think it's good enough. Will reflect this to v2.
+> Replace pcim_iomap_regions() and pcim_iomap_table() with
+> pcim_iomap_region().
 
-Not sure if this is relevant, but I'd like to see that we return error
-codes so that the caller can actually decide to ignore the failure or
-not.
+...
+
+>  	/* Request and map BAR */
+> -	ret = pcim_iomap_regions(pdev, BIT(snet->psnet->cfg.vf_bar), name);
+> -	if (ret) {
+> +	snet->bar = pcim_iomap_region(pdev, snet->psnet->cfg.vf_bar, name);
+
+PTR_ERR_OR_ZERO() ?
+
+> +	if (IS_ERR(snet->bar)) {
+>  		SNET_ERR(pdev, "Failed to request and map PCI BAR for a VF\n");
+> -		return ret;
+> +		return PTR_ERR(snet->bar);
+>  	}
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
