@@ -1,122 +1,146 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E22518786D;
-	Fri, 23 Aug 2024 11:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C58E184527;
+	Fri, 23 Aug 2024 12:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724414355; cv=none; b=PIJQdhhsn1BF06UMSv/X4lRsCZSY4P/mm8SiAY0CythgXkdFiUfZQwb/8e/jIUe09BD3mdjfpklzLZe3+BxQ9KYDMPYK1G1ZUWcV8x+UF7S2KTf0I0tsbOgAgYfBHyAvx51+lnVzUFiwUlmduH16Og7QALihPSTZK1PW14aFrsk=
+	t=1724414589; cv=none; b=LvPucH1SpGvWi3zs0+HbYsCiSLQssjQT7w4dAVcQtWHoK+zbLnnUUJsYG6ZKyx3fmiSGsfPYGfbGEC5DVLYl0Kk2nD3FB94iIxlzXmAPzYk81l+hAy9pzwVgraCWTSkEvFfDzHNC+PcjhX5qrp2Ue/SJGnPh9TDaWInweosZF0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724414355; c=relaxed/simple;
-	bh=c7waOoxEFxmNPp+X81D26VXenfNb5EykaZFHkHib2c4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HTDfggXFk1iwTi6Ez5bkyIXxvyZIzrLD/TnJSYpH4OWCYdkKzC7tjH2tU6srMyeXGxy6hOjQU5kHJ3FNukf44ytNBG7qG1G2EGjAcxRIE1PsTqAmhNiV3NkwV28jjPK8HtIy0MBOKdrY8/l9zuKMrbzYpsloTQt95/j0GTQeCNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=zIqhtD1w; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="zIqhtD1w"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=MXxJTuEfTmUxd6qScc9KjmTA55na5LtJXZN9+i18IuU=; b=zIqhtD1whjn1MefVjKeXFaIJ9C
-	DYkAQQrts0+YUEXxY7CtCXDicxh3HJFiSNw9O8g4enC89obYJhEKIuf8gKiuL1q7SIdsklbpbKe+q
-	eMmU86bfUk0nJ6oUhQZvLrapCPhcZZvimd0+34tCqHcULnsdiAIC6iSYo6NC6EY3ldnfHFkZDdMff
-	On9SGDsZRg8NLMmwKRUAOHZ5eyO6k1XRI1RAYkh6oqaJq86WJ32pCAy4mQVjwHOiOrKapcn23p/nT
-	oQBrPj+8hsD01KYhjM0FOYeoqsEPJ5L0UcHigFglOIWqgW7DibNFeR/fi2UA0Je4bey+QGz6qfKGs
-	8mxvzfSw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1shSwj-0000000GbyR-0QHj;
-	Fri, 23 Aug 2024 11:59:13 +0000
-Date: Fri, 23 Aug 2024 04:59:13 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, io-uring@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Conrad Meyer <conradmeyer@meta.com>,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	dchinner@redhat.com
-Subject: Re: [PATCH v2 5/7] block: implement async discard as io_uring cmd
-Message-ID: <Zsh5kZrcL-D7sjyB@infradead.org>
-References: <cover.1724297388.git.asml.silence@gmail.com>
- <e39a9aabe503bbd7f2b7454327d3e6a6620deccf.1724297388.git.asml.silence@gmail.com>
- <Zsbe1mIYMd9uf8cq@infradead.org>
- <c39469f3-2b9c-493b-9cd6-94ae9a4994b8@gmail.com>
+	s=arc-20240116; t=1724414589; c=relaxed/simple;
+	bh=hdHVAvPt7f0rZ3mUsNU7oNL1zeQ26mFD/AaIfLTMBu8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ebHyaDhv4luvSZQF56+gcq8paVQhEwYewv8QK35PgcFxTvnCtA12b3ZvFmu04DfXvDyG3yCIdqnej56u0bUtUbA5TLF/CnxxKNY8KdJ76nRiOmdQZxs1CpikBBJR+T7a7nVHnkRk0ttXrorYllnSN96Lbiiqv5iWFDfDrTM44e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A9ABEDA7;
+	Fri, 23 Aug 2024 05:03:32 -0700 (PDT)
+Received: from [10.57.47.154] (unknown [10.57.47.154])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9042A3F66E;
+	Fri, 23 Aug 2024 05:03:02 -0700 (PDT)
+Message-ID: <3d37e8ba-25a8-45c2-93a3-02888dad2c9e@arm.com>
+Date: Fri, 23 Aug 2024 13:03:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
+ capacities are different"
+To: MANISH PANDEY <quic_mapa@quicinc.com>,
+ Bart Van Assche <bvanassche@acm.org>, Sandeep Dhavale <dhavale@google.com>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>
+Cc: Qais Yousef <qyousef@layalina.io>, axboe@kernel.dk, mingo@kernel.org,
+ peterz@infradead.org, vincent.guittot@linaro.org,
+ linux-block@vger.kernel.org, sudeep.holla@arm.com,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Christoph Hellwig <hch@infradead.org>,
+ kailash@google.com, tkjos@google.com, bvanassche@google.com,
+ quic_nitirawa@quicinc.com, quic_cang@quicinc.com, quic_rampraka@quicinc.com,
+ quic_narepall@quicinc.com,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
+ <3feb5226-7872-432b-9781-29903979d34a@arm.com>
+ <20240805020748.d2tvt7c757hi24na@airbuntu>
+ <25909f08-12a5-4625-839d-9e31df4c9c72@acm.org>
+ <1d9c27b2-77c7-462f-bde9-1207f931ea9f@quicinc.com>
+ <17bf99ad-d64d-40ef-864f-ce266d3024c7@acm.org>
+ <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
+ <c151b6d5-7e02-48ee-951f-c23594f6be6f@arm.com>
+ <CAB=BE-RHwqmSRt-RbmuJ4j1bOFqv1DrYD9m-E1H99hYRnTiXLw@mail.gmail.com>
+ <ca78ada8-d68b-4759-a068-ac8f66c51b72@quicinc.com>
+ <12a6f001-813e-4bc4-90c2-9f9ef7dc72e6@acm.org>
+ <688ead11-c1c0-48b2-b4d1-feeb1278c692@quicinc.com>
+ <1a95a60c-730a-4bb7-80c9-98b8a70f6521@acm.org>
+ <66912a22-540d-4b9a-bd06-cce55b9ad304@quicinc.com>
+Content-Language: en-US
+From: Christian Loehle <christian.loehle@arm.com>
+In-Reply-To: <66912a22-540d-4b9a-bd06-cce55b9ad304@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <c39469f3-2b9c-493b-9cd6-94ae9a4994b8@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Aug 22, 2024 at 02:07:16PM +0100, Pavel Begunkov wrote:
-> > > Note, unlike ioctl(BLKDISCARD) with stronger guarantees against races,
-> > > we only do a best effort attempt to invalidate page cache, and it can
-> > > race with any writes and reads and leave page cache stale. It's the
-> > > same kind of races we allow to direct writes.
-> > 
-> > Can you please write up a man page for this that clear documents the
-> > expecvted semantics?
+On 8/23/24 08:57, MANISH PANDEY wrote:
 > 
-> Do we have it documented anywhere how O_DIRECT writes interact
-> with page cache, so I can refer to it?
-
-I can't find a good writeup.  Adding Dave as he tends to do long
-emails on topic like this so he might have one hiding somewhere.
-
-> > GFP_KERNEL can often will block.  You'll probably want a GFP_NOWAIT
-> > allocation here for the nowait case.
 > 
-> I can change it for clarity, but I don't think it's much of a concern
-> since the read/write path and pretty sure a bunch of other places never
-> cared about it. It does the main thing, propagating it down e.g. for
-> tag allocation.
-
-True, we're only doing the nowait allocation for larger data
-structures.  Which is a bit odd indeed.
-
-> I'd rather avoid calling bio_discard_limit() an extra time, it does
-> too much stuff inside, when the expected case is a single bio and
-> for multi-bio that overhead would really matter.
-
-Compared to a memory allocation it's not really doing all the much.
-In the long run we really should move splitting discard bios down
-the stack like we do for normal I/O anyway.
-
-> Maybe I should uniline blk_alloc_discard_bio() and dedup it with
-
-uniline?  I read that as unіnline, but as it's not inline I don't
-understand what you mean either.
-
-> > > +#define BLOCK_URING_CMD_DISCARD			0
-> > 
-> > Is fs.h the reight place for this?
+> On 8/22/2024 7:54 PM, Bart Van Assche wrote:
+>> On 8/22/24 3:46 AM, MANISH PANDEY wrote:
+>>> On 8/21/2024 10:52 PM, Bart Van Assche wrote:
+>>> > What is the performance impact of the above change?
+>>  >
+>>> No impact at all
+>> Is this a good summary of this email thread?
+>> * The first email in this thread reports an important performance
+>>    regression.
+>> * In your previous email there is a candidate fix for the performance
+>>    regression.
+>> * Above I read that the proposed fix has no performance impact at all
+>>    on any setup.
+>>
+>> Is this a good summary of this email thread? If so, do you agree that
+>> this must be confusing everyone who is following this email thread?
+>>
+>> Thanks,
+>>
+>> Bart.
 > 
-> Arguable, but I can move it to io_uring, makes things simpler
-> for me.
+> Hi Bart,
+> 
+> Performance impact due to addition of cpu capacity check (https://lore.kernel.org/all/20240223155749.2958009-3-qyousef@layalina.io/) ...[1]
+> is already mentioned in the first email.
+> 
+> But let me summarize it again:
+> 
+> We are not able to get advantage of affining the IRQ in different capacity CPU(s)/clusters and complete the request in higher cluster cpu(s), even though the LLC is shared between these clusters as it is causing the block completion to happen on SOFTIRQ context, if requester and completion clusters are different.
+> 
+> Below is the performance impact with the current patch [1]
+> 
+> 1. For MCQ capable UFS host (paired with UFS 4.x), we are observing ~20% random R/W performance drop.
+> 
+> 2. For single doorbell ufs hosts (paired with UFS 2.x/ UFS 3.x), we are observing ~7-10% random R/W performance drop.
+> 
 
-I would have expected a uapi/linux/blkdev.h for it (and I'm kinda
-surprised we don't have that yet).
+If you do decide to write your proposal up as a patch, a description of the
+topology would be helpful as well.
 
 > 
-> > Curious:  how to we deal with conflicting uring cmds on different
-> > device and how do we probe for them?  The NVMe uring_cmds
-> > use the ioctl-style _IO* encoding which at least helps a bit with
-> > that and which seem like a good idea.  Maybe someone needs to write
-> > up a few lose rules on uring commands?
+> Also in previous emails on this thread, below were few suggestions to add check for equal or greater capacity cpus by @Christian Loehle
+> https://lore.kernel.org/all/3feb5226-7872-432b-9781-29903979d34a@arm.com/
 > 
-> My concern is that we're sacrificing compiler optimisations
-> (well, jump tables are disabled IIRC) for something that doesn't even
-> guarantee uniqueness. I'd like to see some degree of reflection,
-> like user querying a file class in terms of what operations it
-> supports, but that's beyond the scope of the series.
+>> From: Christian Loehle @ 2024-08-02  9:03 UTC (permalink / raw)
+>> [......]
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index e3c3c0c21b55..a4a2500c4ef6 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -1164,7 +1164,7 @@ static inline bool
+>> blk_mq_complete_need_ipi(struct request *rq)
+>>        if (cpu == rq->mq_ctx->cpu ||
+>>            (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
+>>             cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
+>> -            cpus_equal_capacity(cpu, rq->mq_ctx->cpu)))
+>> +            arch_scale_cpu_capacity(cpu) >=
+>>              arch_scale_cpu_capacity(rq->mq_ctx->cpu)))
+>>                return false;
+>>
+>>       /* don't try to IPI to an offline CPU */
+> 
+> 
+> There can be SoCs with different CPU cluster configurations and to have optimal IO load balancing or to avoid contention b/w submission path and completion path, we may need to complete IO request of large capacity CPU(s) on small cluster cpus. So the above propose solution may not be suffice to all the use cases.
+> 
+> Hence with below proposed solution, we are trying to propose a new rq flag QUEUE_FLAG_CPU_CAPACITY. The proposed solution will provide us a way such that users who are benefited with CPU capacity check [1] would be able to use the fix as it is, and if a user (including us) want to bypass cpu capacity fix [1], they can set rq_affinity to 3 and would be able to retain performance drop as mentioned in first email. This would give flexibility to user to choose what's the best for their system.
+>
 
-We can't guaranteed uniqueness, but between the class, the direction,
-and the argument size we get a pretty good one.  There is a reason
-pretty much all ioctls added in the last 25 years are using this scheme.
+FWIW I'd agree with introducing a new queue_flag that behaves like
+QUEUE_FLAG_SAME_COMP before commit af550e4c9682 ("block/blk-mq: Don't complete locally if capacities are different").
+Equal capacity makes sense as the default behavior for
+QUEUE_FLAG_SAME_COMP, but is limiting, there might be just one
+CPU of that capacity and that might be fully utilized by submission
+(and related work), so completing locally makes sense.
+
+So QUEUE_FLAG_SAME_COMP I'd leave as-is and introduce
+QUEUE_FLAG_SAME_LLC that actually just checks LLC.
+
+Regards,
+Christian
 
