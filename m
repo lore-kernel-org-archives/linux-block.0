@@ -1,55 +1,57 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83FE19ABC3
-	for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 20:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE4919AD78
+	for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 20:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724443739; cv=none; b=AuK/KMYaw8ukPztrIDyikCm2fv/+/jAx2HH8/vtg08scbW6w4S7hXjDeJruFvfh8qhnBMX/8lNGWEZbJZQwtqc7bZajJJTF9EW9eF3O5XvZZXLfXycrNtQmMhOqvCR1P+b/g4INSbWOKA9kn0FEPljVhFuffoosLsgSaDcKbM7g=
+	t=1724443740; cv=none; b=ijnoD4g2P5N3Xcp8PwZo0dkRLnOyRVigKh+lmtMfTAfk9W0bd+sj7fVeSacIt6bbmgEh/DQ2U87aNCZdBgHNGNddX9BzeJR8g9PtDPjnVOkivGzccpBZsrWrq4ZbkjQFAgOIoW0uN6Fd1DxNx36efRwKDkl+06lGpkwpg2dv3o8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724443739; c=relaxed/simple;
-	bh=45XeCPqSyhha1d4LtUIwkcsRgdvQToqkr6aacoN15h4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S++AFyRtvh+3yI7QRSGEeWvuN8it+h9oNxR0+mY4m2+MVKvid1BoBvBhc+ynYhQee6XlOMOZ6w+lWbIY7YQYDPDIdLMWvU5NXkIsNbRL2j+awiKs+mngy1qENqENkqNBHUY9CxlYmSfKQa5dzE/Ly857uI1YPFIvz02l9DEXKdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fpRce9aa; arc=none smtp.client-ip=209.85.208.50
+	s=arc-20240116; t=1724443740; c=relaxed/simple;
+	bh=pIR3vM/y29oNJ445O02kZeRZAQ3oVk6XvfNJdo5dza8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OhPxWY7ar0dP27x3+TR7cXPBynvTnWE+MAaoJYU9bDMainINzLB32eQkSNVONSi+U3/THtzyAi0VKi2F2p8yb7lkPdLSoJbHvlHWxVedII1mhUqEdl9P16xlpcVtKnGe9TNelJHjK407zBBuV7lVYNKank3yhZYn/kMKRXKyrVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WqLk5cIy; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fpRce9aa"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5bed68129a2so1504228a12.1
-        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 13:08:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WqLk5cIy"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a83562f9be9so261008966b.0
+        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 13:08:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724443735; x=1725048535; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a3Vv04OoDmGvCyY5JEu/XjI0RpiXwnV7QLorDDNwgdQ=;
-        b=fpRce9aa3KsGyH/1s08kM7lr9PGYeZe2RID6YEQL1ydCh/DdhBtskMPv6Dj+K0vQCv
-         GzWJrMSH0t4I2a9bt0wM7zGluGZA+Qm1UFwjjwjVRyy9ymyB+M54EkPUva0k49GWuEae
-         OV3ZtJhEJV6tlBGBTp5qme0B2ljleKRPPLEaN+YsoxICOB6RNGlxhkJqu42HW7qMS+zL
-         zkLH22U4R0M/FpbJeutfDuxvK2RJrTZob+QlEZCpkcIeZ8veT2GaX5ect4IDIPcOQdxR
-         knJNfx2XW3gx+5aG1uyrshz4bezqG8BTr2cuDWR3FgUVLOBhC35e2rQFL9+PG5RA9Y+g
-         Uylw==
+        d=suse.com; s=google; t=1724443736; x=1725048536; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qSE07mevysGs4hIlAiWiKLrTdVKJ6Yd2deEW2FZkz/M=;
+        b=WqLk5cIyJM75U3MvT26Wa0AhE//dJij3PFrUv0EWuxuyQAw97fH7MkwnL8OBqvpLSf
+         G9PTj93RcEae2hfLkh9B8msaXUB97LdRVsyt2BR/ZUzFWiBTHKm9mIdrai3rtMxxDs6j
+         JEL0Nob/3WcQ8q5RURlqSGhLq/UE1OeNkMtHBHGQHS3Nhh8veE0yaA7nB8PBbmuohNou
+         XC2vrgYIFMrdzPS6rBOg0iM7EJNV8dEk9jYwsgi7SwhQ1fje0iNEf2l5OllMiLoKa1Xy
+         z7MlAqLkaEkfhYUVt8gMebBeInmI+KTZsOoD+/NdWvHCLfQPJefCR1CAInwGChOdH360
+         CYig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724443735; x=1725048535;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a3Vv04OoDmGvCyY5JEu/XjI0RpiXwnV7QLorDDNwgdQ=;
-        b=PXwE+HgEsyaWRe3dWKd75YF8O7BV1AzIdya/C1XDlh1wMR++t7jfR21dHEOM5iSemV
-         BpgZuPn4ZMRJUgD2lh/ZOBAVBLiDVIc2I8aHsNoK/+bzt+11GgHp7dv7InkyxPYHLAWV
-         Xcx0Atjtdz4brp/5RUCVmq8B8VjjXhMzmDhoxvAbY3VM2XVk9PbUhr5fM0GS42GUScR5
-         5NAj+BdK5V00u+fFMQb9zvnJ9zx5cGt/cWyEygRdZ6am96s2QkDg5JrszW7z3USKBpg9
-         fa4PyiVH4x4DUaT61VqwToWvcxqCySGKDueE5wpUBN9iFBh27YNvz4TGg7OrRS1N8s6Z
-         68dg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ508tUaJZNkrG7X/M7M293BC9x5PKSh+gf+HpqEDKKiy2zQggeCq6Qtm1AbchpQrLsr0qS4SaOV+v4A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe2ldRUC1O+eBeonQ+SbnpdjefnEam0k1nd7XR36QF/0HDwiw2
-	yuxUv6WZEOy7ZqF4+/sDdByO1QLLgUeaiNMhOu5i9JeITTEMSK1Yf5TjgL/IF+w=
-X-Google-Smtp-Source: AGHT+IGClPfTCHc7n+m5CdeWaJky+vTETP0m9NfS+oQScewpdaxHfr5SPi59VdpVqXT26F9sE1p9uw==
-X-Received: by 2002:a05:6402:4312:b0:5a2:c1b1:4d3 with SMTP id 4fb4d7f45d1cf-5c0891a8227mr3088448a12.28.1724443734496;
-        Fri, 23 Aug 2024 13:08:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724443736; x=1725048536;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qSE07mevysGs4hIlAiWiKLrTdVKJ6Yd2deEW2FZkz/M=;
+        b=F/rBaJf/Uyl0AR5Asb6D0lNk8bw0dMW4dYafb1oicHCHIugztsfjsOHCHQsJeaJK/s
+         gcNF/HfPZBkqvYJKKszAay86AhhyXmJ7bM7o255fpVcrE4wOvtJ7apsWkf50mzhX9SrA
+         hYkmd3XF7wZIF7q4Feg81jBz5UsNVO7KYqcdSreeqMPdqdeGOqr4xBDcMGzCr8guq+IU
+         GjxrEy81/7yN0OcdsjX7F5cs0tpo4jdcwT9v7DQklcnOYnSS+0Robhe9M79lpZsNYjHX
+         SglzT9Y93oK37stCRf2cjFoSnL7Cz3rb7rLhZrMCmA4IM4+Dcld8eq0pvJVbc19NcJjp
+         DO0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWMDUoj9B/WkV6DuoZ3qkj4LRcQzRi9fuF+CAoRUorJfxvY/KLE/pySijxWQxpslCpXtifAlfEsSykang==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwplluZqZexjHUAcBMbM6WbQv2OCchJLtwBOK9qRGKfFsXpbAch
+	f+EVTnlqWfqpiVcVkUM3fvERfT9dy51Ez0Hn6INn6MyLaAYRP4MP+EF4c1IjQSA=
+X-Google-Smtp-Source: AGHT+IGADpIP4DvJCkCm1/Xu7gk2/E9mDpWF9e4TUjiERBdiNyPX75m2yIkqc4OIg2WNUrh5OfKQew==
+X-Received: by 2002:a17:907:e92:b0:a86:8917:fcd6 with SMTP id a640c23a62f3a-a86a54cf719mr207090766b.60.1724443735545;
+        Fri, 23 Aug 2024 13:08:55 -0700 (PDT)
 Received: from localhost (p200300de37360a00d7e56139e90929dd.dip0.t-ipconnect.de. [2003:de:3736:a00:d7e5:6139:e909:29dd])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-5c04a3c8615sm2520618a12.23.2024.08.23.13.08.53
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-a868f43367fsm304014866b.115.2024.08.23.13.08.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 13:08:54 -0700 (PDT)
+        Fri, 23 Aug 2024 13:08:55 -0700 (PDT)
 From: Martin Wilck <martin.wilck@suse.com>
 X-Google-Original-From: Martin Wilck <mwilck@suse.com>
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
@@ -60,10 +62,12 @@ Cc: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v2 1/3] blktests: nvme: skip passthru tests on multipath devices
-Date: Fri, 23 Aug 2024 22:08:19 +0200
-Message-ID: <20240823200822.129867-1-mwilck@suse.com>
+Subject: [PATCH v2 2/3] blktests: nvme/032: skip on non-PCI devices
+Date: Fri, 23 Aug 2024 22:08:20 +0200
+Message-ID: <20240823200822.129867-2-mwilck@suse.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240823200822.129867-1-mwilck@suse.com>
+References: <20240823200822.129867-1-mwilck@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,129 +76,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-NVMe multipath devices have no associated character device that
-can be used for NVMe passtrhu. Skip them.
+nvme/032 is a PCI-specific test.
 
 Signed-off-by: Martin Wilck <mwilck@suse.com>
 ---
-v2: used more expressive function name for non-multipath test (Daniel Wagner)
-
----
- tests/nvme/033 | 4 ++++
- tests/nvme/034 | 4 ++++
- tests/nvme/035 | 1 +
- tests/nvme/036 | 4 ++++
- tests/nvme/037 | 4 ++++
- tests/nvme/039 | 4 ++++
+ tests/nvme/032 | 2 +-
  tests/nvme/rc  | 8 ++++++++
- 7 files changed, 29 insertions(+)
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/tests/nvme/033 b/tests/nvme/033
-index 7a69b94..5e05175 100755
---- a/tests/nvme/033
-+++ b/tests/nvme/033
-@@ -13,6 +13,10 @@ requires() {
- 	_have_kernel_option NVME_TARGET_PASSTHRU
- }
- 
-+device_requires() {
-+	_require_test_dev_is_not_nvme_multipath
-+}
-+
- set_conditions() {
- 	_set_nvme_trtype "$@"
- }
-diff --git a/tests/nvme/034 b/tests/nvme/034
-index 239757c..154fc91 100755
---- a/tests/nvme/034
-+++ b/tests/nvme/034
-@@ -14,6 +14,10 @@ requires() {
- 	_have_fio
- }
- 
-+device_requires() {
-+	_require_test_dev_is_not_nvme_multipath
-+}
-+
- set_conditions() {
- 	_set_nvme_trtype "$@"
- }
-diff --git a/tests/nvme/035 b/tests/nvme/035
-index 8286178..ff217d6 100755
---- a/tests/nvme/035
-+++ b/tests/nvme/035
-@@ -17,6 +17,7 @@ requires() {
+diff --git a/tests/nvme/032 b/tests/nvme/032
+index 5353e96..512d7ea 100755
+--- a/tests/nvme/032
++++ b/tests/nvme/032
+@@ -24,7 +24,7 @@ requires() {
  }
  
  device_requires() {
-+	_require_test_dev_is_not_nvme_multipath
- 	_require_test_dev_size "${NVME_IMG_SIZE}"
+-	_require_test_dev_is_nvme
++	_require_test_dev_is_nvme_pci
  }
  
-diff --git a/tests/nvme/036 b/tests/nvme/036
-index ef6c29d..442ffe7 100755
---- a/tests/nvme/036
-+++ b/tests/nvme/036
-@@ -13,6 +13,10 @@ requires() {
- 	_have_kernel_option NVME_TARGET_PASSTHRU
- }
- 
-+device_requires() {
-+	_require_test_dev_is_not_nvme_multipath
-+}
-+
- set_conditions() {
- 	_set_nvme_trtype "$@"
- }
-diff --git a/tests/nvme/037 b/tests/nvme/037
-index ef7ac59..f7ddc2d 100755
---- a/tests/nvme/037
-+++ b/tests/nvme/037
-@@ -12,6 +12,10 @@ requires() {
- 	_have_kernel_option NVME_TARGET_PASSTHRU
- }
- 
-+device_requires() {
-+	_require_test_dev_is_not_nvme_multipath
-+}
-+
- set_conditions() {
- 	_set_nvme_trtype "$@"
- }
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index a0f135c..e8020a7 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -18,6 +18,10 @@ requires() {
- 	    _have_kernel_option FAULT_INJECTION_DEBUG_FS
- }
- 
-+device_requires() {
-+	_require_test_dev_is_not_nvme_multipath
-+}
-+
- # Get the last dmesg lines as many as specified. Exclude the lines to indicate
- # suppression by rate limit.
- last_dmesg()
+ test_device() {
 diff --git a/tests/nvme/rc b/tests/nvme/rc
-index dedc412..5c554b6 100644
+index 5c554b6..b702a57 100644
 --- a/tests/nvme/rc
 +++ b/tests/nvme/rc
 @@ -130,6 +130,14 @@ _require_test_dev_is_nvme() {
  	return 0
  }
  
-+_require_test_dev_is_not_nvme_multipath() {
-+	if [[ "$(readlink -f "$TEST_DEV_SYSFS/device")" =~ /nvme-subsystem/ ]]; then
-+		SKIP_REASONS+=("$TEST_DEV is a NVMe multipath device")
++_require_test_dev_is_nvme_pci() {
++	if [[ ! "$(readlink -f "$TEST_DEV_SYSFS/device")" =~ devices/pci ]]; then
++		SKIP_REASONS+=("$TEST_DEV is not a PCI NVMe device")
 +		return 1
 +	fi
 +	return 0
 +}
 +
- _require_nvme_test_img_size() {
- 	local require_sz_mb
- 	local nvme_img_size_mb
+ _require_test_dev_is_not_nvme_multipath() {
+ 	if [[ "$(readlink -f "$TEST_DEV_SYSFS/device")" =~ /nvme-subsystem/ ]]; then
+ 		SKIP_REASONS+=("$TEST_DEV is a NVMe multipath device")
 -- 
 2.46.0
 
