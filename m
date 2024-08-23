@@ -1,123 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F60A1D1728;
-	Thu, 22 Aug 2024 20:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9DB125AC;
+	Fri, 23 Aug 2024 01:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724359449; cv=none; b=H0cIgCiSleHjfl9FYBaXDrnu+6HXjZu8Pdq9bYxBJWSuz51P2CKiwitlY9+GXLJyGWUB6wZvMVzCfWaCyj0P+YnESxY6EzxFMXEfvKGnPu+pA+xqIO6r8BNhO9Oi3fskULrKiFVBdzhAo8IY1+N43pR6hQpHCJEfCjwsxRhhq3s=
+	t=1724376431; cv=none; b=OhN9fLCqUiZoaCR3l4FHhzWcDFm+lHiTk2aoIcOrHMN0R9NljzlbviAs/VwQK3nCvgeGP1LanayGckttG5FjEPyEaMiDo11z9Mqt9v1YpGvLxnKD9mO1euYLEWedEgrsTdu1NWc8B9qAuxlsA3sdfWZnGBqzQc79iIsAI2i5oXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724359449; c=relaxed/simple;
-	bh=CWY8to166mK7WMYgXiUyeMviy3nbwLD4WUFLbxKhleM=;
+	s=arc-20240116; t=1724376431; c=relaxed/simple;
+	bh=Nf2wPTVgwfnfO4wozJbawzPg7tqsI7NIDsI0AfWVapU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eUwIiuldaxFiXPPOqazcW7Myzn9gpCjULqgI3Sq70FcVhoLsZ8FA3buA1Ml+MOD1f/D8wvoCPf1ZmF7bLBJ4XlR6r9RiXi/TElPkPyAWdUMU+2WT2RFVUgh4O+B89hD5beYwAb2+SXQBZ/simMOFI75WkauLcQlzCq58XoJBj78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnoZFWQN; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=pJcjUuv9ODHZ20It6FIpPlvoKAYatLzDoVmKwEZWZMggddPgH74gFdTH17xTgU8ggKv+jr3GyVCXVjaeH3LocJRw/nD9ZEjKVtfD3/L1A9u4MfFtLoZiJQfGNnZzUhPU67wCxZ/Qcjeqn+ZYmd+7s4QvlywyJt7p1xMhaj1OANA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1e/wpXi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnoZFWQN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDB7FC32782;
-	Thu, 22 Aug 2024 20:44:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1e/wpXi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D07E3C32782;
+	Fri, 23 Aug 2024 01:27:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724359448;
-	bh=CWY8to166mK7WMYgXiUyeMviy3nbwLD4WUFLbxKhleM=;
+	s=k20201202; t=1724376430;
+	bh=Nf2wPTVgwfnfO4wozJbawzPg7tqsI7NIDsI0AfWVapU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZnoZFWQN/17hHKS9tlzz6Tkey7xKbs5izv63sI6fXZGcznsH7PVVREZZ5Ca2kb+vD
-	 GF8L6UuaaUyFbeLAvQwrJa85KtmzjJ0nRQ+eMiZV832rEXz09x3mDComtYgI21oTih
-	 puSP1283+263x97O1wmFiMPuToAp+68AQd9Yid5CzVPmYaWLcVNVHuAK/IyMZno153
-	 5aUeQNEkS13q/TmVhN0zcvJ/3UvkHQmpaD6nzBZPsRwSr4cQP/qj5PsUB+XVNmOflR
-	 zfB4ovrloEIujf2mU10CECp3KnJfIPZVa4FLJGSlL1UTfoXhU2R3mh/TdWqI25/p1p
-	 1TjAVMz6fDcdw==
-Date: Thu, 22 Aug 2024 13:44:07 -0700
+	b=Y1e/wpXirDNkn3eK7AMUEuOd/yiilMZj5Qiy43h17fD3qXrfAK8rg8H4vKD4x0+L3
+	 tIWNy0aa61rQGYVBxjurWcSTXTmMy7zJQq8I+uGKg22bC5BWhQymnKOfQTt7HZzyRK
+	 muY7J3ACs4u5HKVN7W7FaTL579agaEALb3PyUDKEPHEBHS6OtsBcxISwyXF8PSeGiq
+	 tDuJ+rsOdag9qCF8Q/uBcyxronyeuZqoZKHqn4WYp7WHSil2NJqt32Q/A9m4ezsjmh
+	 2CHeLBvMph8Dw0uRsUvyd0zSz7swMqU+VR7zyJUmUVX5lQaMi6bWeIuPcm4VseS0g1
+	 Foby2pF4Rqzrg==
+Date: Thu, 22 Aug 2024 18:27:10 -0700
 From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, brauner@kernel.org, viro@zeniv.linux.org.uk,
-	jack@suse.cz, chandan.babu@oracle.com, dchinner@redhat.com,
-	hch@lst.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, hare@suse.de,
-	martin.petersen@oracle.com, catherine.hoang@oracle.com,
-	kbusch@kernel.org
-Subject: Re: [PATCH v5 7/7] xfs: Support setting FMODE_CAN_ATOMIC_WRITE
-Message-ID: <20240822204407.GU865349@frogsfrogsfrogs>
-References: <20240817094800.776408-1-john.g.garry@oracle.com>
- <20240817094800.776408-8-john.g.garry@oracle.com>
- <20240821171142.GM865349@frogsfrogsfrogs>
- <7c5fdd14-5c59-4292-b4b5-b0d49ba1bce6@oracle.com>
+To: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+Cc: linux-doc@vger.kernel.org, corbet@lwn.net, jack@suse.cz,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	kernel-dev@igalia.com, kernel@gpiccoli.net
+Subject: Re: [PATCH] Documentation: Document the kernel flag
+ bdev_allow_write_mounted
+Message-ID: <20240823012710.GY6082@frogsfrogsfrogs>
+References: <20240819225626.2000752-2-gpiccoli@igalia.com>
+ <20240820162359.GI6043@frogsfrogsfrogs>
+ <170545d7-3fa5-f52a-1250-dfe0a0fff93c@igalia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <7c5fdd14-5c59-4292-b4b5-b0d49ba1bce6@oracle.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <170545d7-3fa5-f52a-1250-dfe0a0fff93c@igalia.com>
 
-On Thu, Aug 22, 2024 at 07:04:02PM +0100, John Garry wrote:
-> On 21/08/2024 18:11, Darrick J. Wong wrote:
-> > On Sat, Aug 17, 2024 at 09:48:00AM +0000, John Garry wrote:
-> > > For when an inode is enabled for atomic writes, set FMODE_CAN_ATOMIC_WRITE
-> > > flag. Only direct IO is currently supported, so check for that also.
-> > > 
-> > > We rely on the block layer to reject atomic writes which exceed the bdev
-> > > request_queue limits, so don't bother checking any such thing here.
-> > > 
-> > > Signed-off-by: John Garry <john.g.garry@oracle.com>
-> > > ---
-> > >   fs/xfs/xfs_file.c | 14 ++++++++++++++
-> > >   1 file changed, 14 insertions(+)
-> > > 
-> > > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> > > index 9b6530a4eb4a..3489d478809e 100644
-> > > --- a/fs/xfs/xfs_file.c
-> > > +++ b/fs/xfs/xfs_file.c
-> > > @@ -1149,6 +1149,18 @@ xfs_file_remap_range(
-> > >   	return remapped > 0 ? remapped : ret;
-> > >   }
-> > > +static bool xfs_file_open_can_atomicwrite(
-> > > +	struct inode		*inode,
-> > > +	struct file		*file)
-> > > +{
-> > > +	struct xfs_inode	*ip = XFS_I(inode);
-> > > +
-> > > +	if (!(file->f_flags & O_DIRECT))
-> > > +		return false;
-> > > +
-> > > +	return xfs_inode_has_atomicwrites(ip);
+On Tue, Aug 20, 2024 at 03:42:53PM -0300, Guilherme G. Piccoli wrote:
+> On 20/08/2024 13:23, Darrick J. Wong wrote:
+> > [...]
+> >> +	bdev_allow_write_mounted=
+> >> +			Format: <bool>
+> >> +			Control the ability of directly writing to mounted block
+> >> +			devices' page cache, i.e., allow / disallow writes that
+> >> +			bypasses the FS. This was implemented as a means to
+> >> +			prevent fuzzers to crash the kernel by breaking the
+> >> +			filesystem without its awareness, through direct block
+> >> +			device writes. Default is Y and can be changed through
+> >> +			the Kconfig option CONFIG_BLK_DEV_WRITE_MOUNTED.
 > > 
-> > ...and here too.  I do like the shift to having an incore flag that
-> > controls whether you get untorn write support or not.
+> > Can we mention that this also solves the problem of naïve storage
+> > management tools (aka the ones that don't use O_EXCL) writing over a
+> > mounted filesystem and trashing it?
+> > 
+> > --D
 > 
-> Do you mean that add a new member to xfs_inode to record this? If yes, it
-> sounds ok, but we need to maintain consistency (of that member) whenever
-> anything which can affect it changes, which is always a bit painful.
+> 
+> Sure! At least from my side, fine with that.
+> How about the following string ?
+> 
+> + Control the ability of directly writing to mounted block
+> + devices' page cache, i.e., allow / disallow writes that
+> + bypasses the FS. This was implemented as a means to
+> + prevent fuzzers to crash the kernel by breaking the
 
-I actually meant something more like:
+                "...from crashing the kernel by overwriting
+the metadata underneath a mounted filesystem without its awareness."
 
-static bool
-xfs_file_open_can_atomicwrite(
-	struct file		*file,
-	struct inode		*inode)
-{
-	struct xfs_inode	*ip = XFS_I(inode);
-	struct xfs_mount	*mp = ip->i_mount;
-	struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
+> + filesystem without its awareness, through direct block
+> + device writes. Also prevents issues from direct writes
 
-	if (!(file->f_flags & O_DIRECT))
-		return false;
-	if (!xfs_inode_has_atomicwrites(ip))
-		return false;
-	if (mp->m_dalign && (mp->m_dalign % ip->i_extsize))
-		return false;
-	if (mp->m_swidth && (mp->m_swidth % ip->i_extsize))
-		return false;
-	if (mp->m_sb.sb_blocksize < target->bt_bdev_awu_min)
-		return false;
-	if (xfs_inode_alloc_unitsize(ip) > target->bt_bdev_awu_max)
-		return false;
-	return true;
-}
+You can do it with buffered writes to the block device pagecache too.
+
+"This also prevents destructive formatting of mounted filesystems by
+naïve storage tooling that don't use O_EXCL."
 
 --D
 
-> John
+> + of silly storage tooling (that doesn't use O_EXCL). The
+> + default is Y and can be changed through the Kconfig
+> + option CONFIG_BLK_DEV_WRITE_MOUNTED.
 > 
+> 
+> But feel free to improve / change it. I'll wait more feedback and
+> resubmit with a refined text.
+> Cheers,
+> 
+> 
+> Guilherme
