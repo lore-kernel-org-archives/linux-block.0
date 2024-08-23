@@ -1,123 +1,200 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC5618DF81;
-	Fri, 23 Aug 2024 18:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83FE19ABC3
+	for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 20:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724438546; cv=none; b=nirTEEjbTy/T4waIFFdRcRrLejg7Unq0e75DlR76GF1zidAgYzNXBSE9JK0Oky3shtfq2yLFZSFBDUIfEcKcmAvytL5ricBoi9bSHs2XHs4CJPl4FXGKtltnlw5ta1cCG+AptjqAQYVzk8RDeGKqRrSCLJPuf5yl1mDrgvbqm80=
+	t=1724443739; cv=none; b=AuK/KMYaw8ukPztrIDyikCm2fv/+/jAx2HH8/vtg08scbW6w4S7hXjDeJruFvfh8qhnBMX/8lNGWEZbJZQwtqc7bZajJJTF9EW9eF3O5XvZZXLfXycrNtQmMhOqvCR1P+b/g4INSbWOKA9kn0FEPljVhFuffoosLsgSaDcKbM7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724438546; c=relaxed/simple;
-	bh=vzDS1xGJWi/pkNolZLO+6HNfn4L3U7xg210csJvwYds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OuORKF9NdOLkJLCiHL6wZGKmPPqPoTawTj3T+nab7If3vluhzb5s1YbKCELw6SxgvpsoKiSJqQePjA0SGQAJ1ne7I7lsYy9r4ti2wNa2MOBNO9zNYbCqV3WEgC4D8SmjBiVxo2Oq9ogOjkjSTUEdJJQJ6Kl9frwLW7d03ot+iBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nEZcaNwW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724443739; c=relaxed/simple;
+	bh=45XeCPqSyhha1d4LtUIwkcsRgdvQToqkr6aacoN15h4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S++AFyRtvh+3yI7QRSGEeWvuN8it+h9oNxR0+mY4m2+MVKvid1BoBvBhc+ynYhQee6XlOMOZ6w+lWbIY7YQYDPDIdLMWvU5NXkIsNbRL2j+awiKs+mngy1qENqENkqNBHUY9CxlYmSfKQa5dzE/Ly857uI1YPFIvz02l9DEXKdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fpRce9aa; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nEZcaNwW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95AF7C32786;
-	Fri, 23 Aug 2024 18:42:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724438545;
-	bh=vzDS1xGJWi/pkNolZLO+6HNfn4L3U7xg210csJvwYds=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nEZcaNwWhZR8SbZY5Ob+ylg+PP4VV7BgaZKa/Tq75Q0g5T7UafB3wupXf4TEiU2/U
-	 Lv1SwicfYKZ630JfKWDQFz8gq52EWH42m7c1fgYUDd6a2t47BNJGb+otIn5B/F8b3v
-	 ps+l8eGSkPI4xpEVPKrdTXT4mu9qPRcs4qqwnQKJYq4E8Z0g3jCyx0yU6p4ahlhNES
-	 AjO9IaYtCfPkrmqeBjf1jd7aMGFEI3GNvPWYyy1/zvrWifaRhpjT8P91be1jNtLQ8f
-	 DhuGKpzu1X/bkPMXHxaLBUwKLUAIYUOiFm8zTmFMffxmw4jrJCnhjGL4GjBfDusW9R
-	 H+enBAvwwpKhA==
-Date: Fri, 23 Aug 2024 11:42:25 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>, linux-doc@vger.kernel.org,
-	corbet@lwn.net, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, kernel-dev@igalia.com,
-	kernel@gpiccoli.net, Bart Van Assche <bvanassche@acm.org>,
-	Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH V3] Documentation: Document the kernel flag
- bdev_allow_write_mounted
-Message-ID: <20240823184225.GA6082@frogsfrogsfrogs>
-References: <20240823180635.86163-1-gpiccoli@igalia.com>
- <6f303c9f-7180-45ef-961e-6f235ed57553@kernel.dk>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fpRce9aa"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5bed68129a2so1504228a12.1
+        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 13:08:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1724443735; x=1725048535; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a3Vv04OoDmGvCyY5JEu/XjI0RpiXwnV7QLorDDNwgdQ=;
+        b=fpRce9aa3KsGyH/1s08kM7lr9PGYeZe2RID6YEQL1ydCh/DdhBtskMPv6Dj+K0vQCv
+         GzWJrMSH0t4I2a9bt0wM7zGluGZA+Qm1UFwjjwjVRyy9ymyB+M54EkPUva0k49GWuEae
+         OV3ZtJhEJV6tlBGBTp5qme0B2ljleKRPPLEaN+YsoxICOB6RNGlxhkJqu42HW7qMS+zL
+         zkLH22U4R0M/FpbJeutfDuxvK2RJrTZob+QlEZCpkcIeZ8veT2GaX5ect4IDIPcOQdxR
+         knJNfx2XW3gx+5aG1uyrshz4bezqG8BTr2cuDWR3FgUVLOBhC35e2rQFL9+PG5RA9Y+g
+         Uylw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724443735; x=1725048535;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a3Vv04OoDmGvCyY5JEu/XjI0RpiXwnV7QLorDDNwgdQ=;
+        b=PXwE+HgEsyaWRe3dWKd75YF8O7BV1AzIdya/C1XDlh1wMR++t7jfR21dHEOM5iSemV
+         BpgZuPn4ZMRJUgD2lh/ZOBAVBLiDVIc2I8aHsNoK/+bzt+11GgHp7dv7InkyxPYHLAWV
+         Xcx0Atjtdz4brp/5RUCVmq8B8VjjXhMzmDhoxvAbY3VM2XVk9PbUhr5fM0GS42GUScR5
+         5NAj+BdK5V00u+fFMQb9zvnJ9zx5cGt/cWyEygRdZ6am96s2QkDg5JrszW7z3USKBpg9
+         fa4PyiVH4x4DUaT61VqwToWvcxqCySGKDueE5wpUBN9iFBh27YNvz4TGg7OrRS1N8s6Z
+         68dg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ508tUaJZNkrG7X/M7M293BC9x5PKSh+gf+HpqEDKKiy2zQggeCq6Qtm1AbchpQrLsr0qS4SaOV+v4A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxe2ldRUC1O+eBeonQ+SbnpdjefnEam0k1nd7XR36QF/0HDwiw2
+	yuxUv6WZEOy7ZqF4+/sDdByO1QLLgUeaiNMhOu5i9JeITTEMSK1Yf5TjgL/IF+w=
+X-Google-Smtp-Source: AGHT+IGClPfTCHc7n+m5CdeWaJky+vTETP0m9NfS+oQScewpdaxHfr5SPi59VdpVqXT26F9sE1p9uw==
+X-Received: by 2002:a05:6402:4312:b0:5a2:c1b1:4d3 with SMTP id 4fb4d7f45d1cf-5c0891a8227mr3088448a12.28.1724443734496;
+        Fri, 23 Aug 2024 13:08:54 -0700 (PDT)
+Received: from localhost (p200300de37360a00d7e56139e90929dd.dip0.t-ipconnect.de. [2003:de:3736:a00:d7e5:6139:e909:29dd])
+        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-5c04a3c8615sm2520618a12.23.2024.08.23.13.08.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Aug 2024 13:08:54 -0700 (PDT)
+From: Martin Wilck <martin.wilck@suse.com>
+X-Google-Original-From: Martin Wilck <mwilck@suse.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Daniel Wagner <dwagner@suse.de>
+Cc: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v2 1/3] blktests: nvme: skip passthru tests on multipath devices
+Date: Fri, 23 Aug 2024 22:08:19 +0200
+Message-ID: <20240823200822.129867-1-mwilck@suse.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6f303c9f-7180-45ef-961e-6f235ed57553@kernel.dk>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 23, 2024 at 12:17:54PM -0600, Jens Axboe wrote:
-> On 8/23/24 12:05 PM, Guilherme G. Piccoli wrote:
-> > Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
-> > devices") added a Kconfig option along with a kernel command-line tuning to
-> > control writes to mounted block devices, as a means to deal with fuzzers like
-> > Syzkaller, that provokes kernel crashes by directly writing on block devices
-> > bypassing the filesystem (so the FS has no awareness and cannot cope with that).
-> > 
-> > The patch just missed adding such kernel command-line option to the kernel
-> > documentation, so let's fix that.
-> > 
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Darrick J. Wong <djwong@kernel.org>
-> > Cc: Jan Kara <jack@suse.cz>
-> > Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
-> > ---
-> > 
-> > V3: Dropped reference to page cache (thanks Bart!).
-> > 
-> > V2 link: https://lore.kernel.org/r/20240823142840.63234-1-gpiccoli@igalia.com
-> > 
-> > 
-> >  Documentation/admin-guide/kernel-parameters.txt | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> > index 09126bb8cc9f..58b9455baf4a 100644
-> > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > @@ -517,6 +517,18 @@
-> >  			Format: <io>,<irq>,<mode>
-> >  			See header of drivers/net/hamradio/baycom_ser_hdx.c.
-> >  
-> > +	bdev_allow_write_mounted=
-> > +			Format: <bool>
-> > +			Control the ability of directly writing to mounted block
-> 
-> Since we're nit picking...
-> 
-> Control the ability to directly write [...]
-> 
-> The directly may be a bit confusing ("does it mean O_DIRECT?"), so maybe
-> just
-> 
-> Control the ability to write [...]
-> 
-> would be better and more clear.
+NVMe multipath devices have no associated character device that
+can be used for NVMe passtrhu. Skip them.
 
-"Control the ability to open a block device for writing."
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+---
+v2: used more expressive function name for non-multipath test (Daniel Wagner)
 
-Since that's what it actually does, right?
+---
+ tests/nvme/033 | 4 ++++
+ tests/nvme/034 | 4 ++++
+ tests/nvme/035 | 1 +
+ tests/nvme/036 | 4 ++++
+ tests/nvme/037 | 4 ++++
+ tests/nvme/039 | 4 ++++
+ tests/nvme/rc  | 8 ++++++++
+ 7 files changed, 29 insertions(+)
 
---D
+diff --git a/tests/nvme/033 b/tests/nvme/033
+index 7a69b94..5e05175 100755
+--- a/tests/nvme/033
++++ b/tests/nvme/033
+@@ -13,6 +13,10 @@ requires() {
+ 	_have_kernel_option NVME_TARGET_PASSTHRU
+ }
+ 
++device_requires() {
++	_require_test_dev_is_not_nvme_multipath
++}
++
+ set_conditions() {
+ 	_set_nvme_trtype "$@"
+ }
+diff --git a/tests/nvme/034 b/tests/nvme/034
+index 239757c..154fc91 100755
+--- a/tests/nvme/034
++++ b/tests/nvme/034
+@@ -14,6 +14,10 @@ requires() {
+ 	_have_fio
+ }
+ 
++device_requires() {
++	_require_test_dev_is_not_nvme_multipath
++}
++
+ set_conditions() {
+ 	_set_nvme_trtype "$@"
+ }
+diff --git a/tests/nvme/035 b/tests/nvme/035
+index 8286178..ff217d6 100755
+--- a/tests/nvme/035
++++ b/tests/nvme/035
+@@ -17,6 +17,7 @@ requires() {
+ }
+ 
+ device_requires() {
++	_require_test_dev_is_not_nvme_multipath
+ 	_require_test_dev_size "${NVME_IMG_SIZE}"
+ }
+ 
+diff --git a/tests/nvme/036 b/tests/nvme/036
+index ef6c29d..442ffe7 100755
+--- a/tests/nvme/036
++++ b/tests/nvme/036
+@@ -13,6 +13,10 @@ requires() {
+ 	_have_kernel_option NVME_TARGET_PASSTHRU
+ }
+ 
++device_requires() {
++	_require_test_dev_is_not_nvme_multipath
++}
++
+ set_conditions() {
+ 	_set_nvme_trtype "$@"
+ }
+diff --git a/tests/nvme/037 b/tests/nvme/037
+index ef7ac59..f7ddc2d 100755
+--- a/tests/nvme/037
++++ b/tests/nvme/037
+@@ -12,6 +12,10 @@ requires() {
+ 	_have_kernel_option NVME_TARGET_PASSTHRU
+ }
+ 
++device_requires() {
++	_require_test_dev_is_not_nvme_multipath
++}
++
+ set_conditions() {
+ 	_set_nvme_trtype "$@"
+ }
+diff --git a/tests/nvme/039 b/tests/nvme/039
+index a0f135c..e8020a7 100755
+--- a/tests/nvme/039
++++ b/tests/nvme/039
+@@ -18,6 +18,10 @@ requires() {
+ 	    _have_kernel_option FAULT_INJECTION_DEBUG_FS
+ }
+ 
++device_requires() {
++	_require_test_dev_is_not_nvme_multipath
++}
++
+ # Get the last dmesg lines as many as specified. Exclude the lines to indicate
+ # suppression by rate limit.
+ last_dmesg()
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index dedc412..5c554b6 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -130,6 +130,14 @@ _require_test_dev_is_nvme() {
+ 	return 0
+ }
+ 
++_require_test_dev_is_not_nvme_multipath() {
++	if [[ "$(readlink -f "$TEST_DEV_SYSFS/device")" =~ /nvme-subsystem/ ]]; then
++		SKIP_REASONS+=("$TEST_DEV is a NVMe multipath device")
++		return 1
++	fi
++	return 0
++}
++
+ _require_nvme_test_img_size() {
+ 	local require_sz_mb
+ 	local nvme_img_size_mb
+-- 
+2.46.0
 
-> > +			devices, i.e., allow / disallow writes that bypasses the
-> 
-> Since we're nit picking, s/bypasses/bypass
-> 
-> > +			FS. This was implemented as a means to prevent fuzzers
-> > +			from crashing the kernel by overwriting the metadata
-> > +			underneath a mounted FS without its awareness. This
-> > +			also prevents destructive formatting of mounted
-> > +			filesystems by naive storage tooling that don't use
-> > +			O_EXCL. Default is Y and can be changed through the
-> > +			Kconfig option CONFIG_BLK_DEV_WRITE_MOUNTED.
-> > +
-> >  	bert_disable	[ACPI]
-> >  			Disable BERT OS support on buggy BIOSes.
-> 
-> -- 
-> Jens Axboe
-> 
