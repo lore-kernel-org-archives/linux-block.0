@@ -1,120 +1,153 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13AB188A22
-	for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 15:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538771885AF;
+	Fri, 23 Aug 2024 15:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724425908; cv=none; b=qvlEj9nU1IQqsNraBwbqCKXpmabPMkieEzSZzN3hdLTTNF8F2zlXy0Hxkzty798GaIdo2gp016ITFc2tVPPDL3e/GfBmXGeERrAntDLVScGKSwlCiv10K676rEzpunCtNYAjDvUT7whdxG82IDSggkZgSIvvPblaZTnR/gMCWFA=
+	t=1724428322; cv=none; b=OFHpjKoeO6BxREJ6rU9yupKpGFsDV+vjhyx6zDxpS+Wib0MJV4O3ks6OnLKjwANKExKL6m2j0rDdK2M7obFdSXa21PfqLo5fUG9nSH/AExv1JzK40P1gONjtelPbzp82oRke3+2klnZGex0p5llpZ+cXoP+H8NywasAeNZAaIFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724425908; c=relaxed/simple;
-	bh=/5UoJ7a51NKn/Gy/v6AXTJgYThVdCEQims3fVopnUPk=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=T3OaoTgWxwhCTfG6iyhF8ahFeLUblxChoIcPd84dbuGBvDzsLkjvVBiSEOxmoqidy6VW18m0z2tJ8XR72doxTpM696a8Seo0mcdJModG5JOCYVcyQu/u8pmbCSXOSOPK/N/HnrCDTuKJ5cvHGgpI+JyE3yTCqbCMeNC+B2SU2xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=P1BGUcKL; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1724428322; c=relaxed/simple;
+	bh=rE1uTKpErbUu5iBsz4kkqwehDvpJ536HFW1GxF/MV4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PVUICn3qBggoqNcInhPNW56XpNF/4Ae+ljb2tJubjmVbdKnBPXcsGtzMOwJXN4U1qrXFDOvcd5qz4GPhvt2Foc/y1BzIMBPwU9TKVSoF7CT1bYB/THlC4uzZ20nrx4L4JRp2L9UvLMhAe7rEJbjf6wQLT5CgtbwluDrnNdNyQC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGl+vgph; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="P1BGUcKL"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-81f96eaa02aso117059939f.2
-        for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 08:11:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1724425906; x=1725030706; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aKVn2JpymVfeZzhR9ZvEns4Pd0QYr9G0LckoRQfu6dw=;
-        b=P1BGUcKLgaDoKaMnWeFKvWIH2p4XVbngJH9TKFTIBRMKpZOf5YUwjiXRP4SFplRLU5
-         KMTQXM9epieUyhkyKGotOOJ7h5BxlI1hrGi0PyBSyLY7HWDIru/i108yE9BeFK6axHuG
-         XbUPicxvek81tu/xRO4qVAMlpv4QWju9I0101S6Ca9xotwMiHjf8cvMkZPk7r3nkx7fw
-         9zPp1AkuB4dXjZCJNPwE5BobRpju0ohiqQPz0A6xBwbj8OpX4PJijxo9mez2oW3RCQt+
-         1fqVAL3mu02EMQ6fP4aVVp9i2Xvf6VbT12HN/kn2PRCjrLPim7ZrpCF8G4jjUO/qVM//
-         n9AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724425906; x=1725030706;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aKVn2JpymVfeZzhR9ZvEns4Pd0QYr9G0LckoRQfu6dw=;
-        b=niQ18FEoq760hLAA9H0IOfyCWydqUOqRwVhfvomerUMx+iCzgESJ/Lsng1hY/h/U5Q
-         t3Yuuc8/deQJrW08FkWJTAFRT2LfKHvVR69FMRRSPsaOYzI5MjNjlrqGBCKwlTApYGhc
-         7M/2jhzNz7YmgPnwkcVt8UwSznT+pEfAkNLZjTlSXl7UZEr6KcyGdZnlEYMHakE1SVAo
-         fpIsay2y8hUN7yV6mVLESXJ6dtNxvf0DfGwl7lpDiby5LqHFn+tK3RUK5eKxPKjWF8gj
-         X6W4wgXYHkhNgGgysamuHfJAfy8LvkNfHLJUKl386Hd8kLfSK6TGa08NGOgnKQckSI43
-         KiBw==
-X-Gm-Message-State: AOJu0Yza6y9mkDiI4kuozxIT2bz5axAkvbRIxQLZfuPkKEleZTPu+bIV
-	2lb7TM3uTkg50DK1zQeHuZvZHoF31t0Ij291P7/rWm3JbC6r8eL2sUXcs1knmfE=
-X-Google-Smtp-Source: AGHT+IHUzLOWFh1SVC/wI3WqUR6S7TP5xo9DKXWtd6lWiMfJP2pRW2Q2hd/HPVwOZ2B7dsuH9Vfh2g==
-X-Received: by 2002:a6b:d206:0:b0:825:2c2c:bd8f with SMTP id ca18e2360f4ac-8278736184cmr291775939f.14.1724425905692;
-        Fri, 23 Aug 2024 08:11:45 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ce70f5caccsm970873173.67.2024.08.23.08.11.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 08:11:45 -0700 (PDT)
-Message-ID: <05edba4c-e219-46b9-8bb9-c4d71f859869@kernel.dk>
-Date: Fri, 23 Aug 2024 09:11:45 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGl+vgph"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE1ABC32786;
+	Fri, 23 Aug 2024 15:52:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724428321;
+	bh=rE1uTKpErbUu5iBsz4kkqwehDvpJ536HFW1GxF/MV4Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jGl+vgphux+x+jwS02M7ATO5nNsnM+DaMtpFiv+GsHIr6s73yTK/QeM5OGg8vgHIA
+	 EVAE/2+Fdy9jn3R3g8R/is8A8PDS54MvOd7+psyP0zq22WfGKuGxzDjPspgw6c2FSf
+	 eSaUO0eu8mi06nWaJISx7mM272Pnn3SfmNpdFOLPnLyTWzX9pZ5c5hma7mubC56z0y
+	 +JD8O95GfgLa+S3x+PBd9U3ARNs43C2Zz89YaGOHijiz/zVnvJJf/QzPmlbePs6Zkx
+	 T6thkW1OfYhybkmsQ3Gie8HMG1aIOHTBY4QJbHcQVWWY5V894/v9NH8rwsVZuoFf9z
+	 nx9h85RYTWCSA==
+Date: Fri, 23 Aug 2024 08:52:01 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, brauner@kernel.org, viro@zeniv.linux.org.uk,
+	jack@suse.cz, chandan.babu@oracle.com, dchinner@redhat.com,
+	hch@lst.de, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, hare@suse.de,
+	martin.petersen@oracle.com, catherine.hoang@oracle.com,
+	kbusch@kernel.org
+Subject: Re: [PATCH v5 7/7] xfs: Support setting FMODE_CAN_ATOMIC_WRITE
+Message-ID: <20240823155201.GZ865349@frogsfrogsfrogs>
+References: <20240817094800.776408-1-john.g.garry@oracle.com>
+ <20240817094800.776408-8-john.g.garry@oracle.com>
+ <20240821171142.GM865349@frogsfrogsfrogs>
+ <7c5fdd14-5c59-4292-b4b5-b0d49ba1bce6@oracle.com>
+ <20240822204407.GU865349@frogsfrogsfrogs>
+ <e0a93440-8f38-46e1-a77f-6a0125ab8cb5@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.11-rc5
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0a93440-8f38-46e1-a77f-6a0125ab8cb5@oracle.com>
 
-Hi Linus,
+On Fri, Aug 23, 2024 at 11:41:07AM +0100, John Garry wrote:
+> On 22/08/2024 21:44, Darrick J. Wong wrote:
+> > > Do you mean that add a new member to xfs_inode to record this? If yes, it
+> > > sounds ok, but we need to maintain consistency (of that member) whenever
+> > > anything which can affect it changes, which is always a bit painful.
+> > I actually meant something more like:
+> > 
+> > static bool
+> > xfs_file_open_can_atomicwrite(
+> > 	struct file		*file,
+> > 	struct inode		*inode)
+> > {
+> > 	struct xfs_inode	*ip = XFS_I(inode);
+> > 	struct xfs_mount	*mp = ip->i_mount;
+> > 	struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
+> > 
+> > 	if (!(file->f_flags & O_DIRECT))
+> > 		return false;
+> > 	if (!xfs_inode_has_atomicwrites(ip))
+> > 		return false;
+> > 	if (mp->m_dalign && (mp->m_dalign % ip->i_extsize))
+> > 		return false;
+> > 	if (mp->m_swidth && (mp->m_swidth % ip->i_extsize))
+> > 		return false;
+> > 	if (mp->m_sb.sb_blocksize < target->bt_bdev_awu_min)
+> > 		return false;
+> > 	if (xfs_inode_alloc_unitsize(ip) > target->bt_bdev_awu_max)
+> > 		return false;
+> > 	return true;
+> > }
+> 
+> ok, but we should probably factor out some duplicated code with helpers,
+> like:
+> 
+> bool xfs_validate_atomicwrites_extsize(struct xfs_mount *mp, uint32_t
+> extsize)
 
-Some block fixes that should go into the 6.11 kernel release:
+xfs_agblock_t extsize, but other than that this looks right to me.
 
-- NVMe pull request via Keith
-	- Remove unused struct field (Nilay)
-	- Fix fabrics keep-alive teardown order (Ming)
+> {
+> 	if (!is_power_of_2(extsize))
+> 		return false;
+> 
+> 	/* Required to guarantee data block alignment */
+> 	if (mp->m_sb.sb_agblocks % extsize)
+> 		return false;
+> 
+> 	/* Requires stripe unit+width be a multiple of extsize */
+> 	if (mp->m_dalign && (mp->m_dalign % extsize))
+> 		return false;
+> 
+> 	if (mp->m_swidth && (mp->m_swidth % extsize))
+> 		return false;
+> 
+> 	return true;
+> }
+> 
+> 
+> bool xfs_inode_has_atomicwrites(struct xfs_inode *ip)
+> {
+> 	struct xfs_mount	*mp = ip->i_mount;
+> 	struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
+> 
+> 	if (!(ip->i_diflags2 & XFS_DIFLAG2_ATOMICWRITES))
+> 		return false;
+> 	if (!xfs_validate_atomicwrites_extsize(mp, ip->i_extsize))
+> 		return false;
+> 	if (mp->m_sb.sb_blocksize < target->bt_bdev_awu_min)
+> 		return false;
+> 	if (xfs_inode_alloc_unitsize(ip) > target->bt_bdev_awu_max)
+> 		return false;
+> 	return true;
+> }
+> 
+> 
+> static bool xfs_file_open_can_atomicwrite(
+> 	struct inode		*inode,
+> 	struct file		*file)
+> {
+> 	struct xfs_inode	*ip = XFS_I(inode);
+> 
+> 	if (!(file->f_flags & O_DIRECT))
+> 		return false;
+> 	return xfs_inode_has_atomicwrites(ip);
+> }
+> 
+> Those helpers can be re-used in xfs_inode_validate_atomicwrites() and
+> xfs_ioctl_setattr_atomicwrites().
 
-- Write zeroes fixes (John)
+Looks good to me.
 
-Please pull!
+--D
 
-
-The following changes since commit b313a8c835516bdda85025500be866ac8a74e022:
-
-  block: Fix lockdep warning in blk_mq_mark_tag_wait (2024-08-15 19:25:03 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.11-20240823
-
-for you to fetch changes up to e6b09a173870720e4d4c6fd755803970015ac043:
-
-  Merge tag 'nvme-6.11-2024-08-22' of git://git.infradead.org/nvme into block-6.11 (2024-08-22 16:20:24 -0600)
-
-----------------------------------------------------------------
-block-6.11-20240823
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      Merge tag 'nvme-6.11-2024-08-22' of git://git.infradead.org/nvme into block-6.11
-
-John Garry (2):
-      block: Read max write zeroes once for __blkdev_issue_write_zeroes()
-      block: Drop NULL check in bdev_write_zeroes_sectors()
-
-Ming Lei (1):
-      nvme: move stopping keep-alive into nvme_uninit_ctrl()
-
-Nilay Shroff (1):
-      nvme: Remove unused field
-
- block/blk-lib.c          | 25 ++++++++++++++++++-------
- drivers/nvme/host/core.c |  2 +-
- drivers/nvme/host/nvme.h |  1 -
- include/linux/blkdev.h   |  7 +------
- 4 files changed, 20 insertions(+), 15 deletions(-)
-
--- 
-Jens Axboe
-
+> 
+> John
+> 
+> 
