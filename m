@@ -1,120 +1,137 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798FC1384B3
-	for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 06:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D538485
+	for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 06:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724395324; cv=none; b=u2fhqKaQnh3Pj1/RzLUxTbE+EcfzW0wj0BIm53OMuYNxUsBXiVc9PmGfTBbZWYuHMQUvT7ep/GSVA8nJfY/XAjUHAvjFKFaWT/lQTp+ADl91E5u8x08lEJDDsfAXoQ5FuOsIhTjkvYqev9FKYpYXCfYOyLo5IYQxbaKU865wNyM=
+	t=1724395521; cv=none; b=S9ZyPG8xC6n5oKQKPx4uhWS8kWIBHAinBhCbHToDG8ucPPfmR/QznD8+l3Mfa0H3catfZtHGm3drueTiQJgLa3WBK6MdyaXy7Fbn6YkTMmAdCovo0AisVQ78fopGsXlGcIYba53aG2tUlvFABsRuDEC9Tbyral2vzbzhIbzpHRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724395324; c=relaxed/simple;
-	bh=0Q6iC8AAEM6x8U5QUheuyg/0emm3wJXxHcffJBGTlUY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=McUjqEG6ScwQ2EnM9Y5I5FhooJ9fl/EtOIWurGWPAGxF6YdC1V9xHT6Smkq0jFUToY44AndKG/q85rqHjoElcottcJ5gmKMGXe/5Xff5SEmKi1K8Asr7lz+0r8WknRV4NkmMfL3/4ZM5T+5Res0CCX5FTVZe9iO9uykvpjeUKrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ghtvD1RC; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ghtvD1RC; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1724395521; c=relaxed/simple;
+	bh=QpPA2xePRIQqaUBXQsMd6MiuiLe+ZBV13Z0jPB7LrAY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HUPV77ZOMlC0Kk3miO6r5udtl+W7Hy5wOVtgx+0dpEHJCNlVY5SEV4IR4XkZbVlr7yvjLBAucaldRHPZzil92Y/Ih645q4xFNtVKSbaAmSqdx17PDfuaMvJX3KjfuIShfUgVaWt+8BT9IGPwRBpu2Hp17I6F1xbiJN1nkQ2YAxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=toCawps5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Q6HwEErB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=toCawps5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Q6HwEErB; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ghtvD1RC";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ghtvD1RC"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="toCawps5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Q6HwEErB";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="toCawps5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Q6HwEErB"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A3B6422604;
-	Fri, 23 Aug 2024 06:42:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1724395320; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 88C66202D4;
+	Fri, 23 Aug 2024 06:45:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1724395518; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=O76gv6Qm5vxd2udzUhSMYLJpK7PFfsoQ6kT5Sis+XBY=;
-	b=ghtvD1RCQxUMGQ+XwwMoWWbzcjbyagAY1AIYWJgjgLsjG9VGM2A24gHDxlu93zFSYsfGTz
-	ZiYjZBClNKO45U35oDtzn62XP12fUad0y1iD76dzrSueLYRpv8QD7rlOqyDCWB6zjPyX56
-	bd8IbkccP7Hl+vAkLR6I6RHv9ddhQSE=
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1724395320; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	bh=QpPA2xePRIQqaUBXQsMd6MiuiLe+ZBV13Z0jPB7LrAY=;
+	b=toCawps5T7X1J3ShBAi2gpA3ksJuU9YwNUfx8Te+TaRFZIc/BN643FljTbQrfEX+a2kh1L
+	k4ZD3I+AHBlNWcZHdGMdF7kQ7A1MBTu8K50rcKEHLZaiynVzhU17QU5yxDfxpx1bJy9+ML
+	f7fwCl2QeaKL5fVZoYqCDPvjUtVEMJk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1724395518;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=O76gv6Qm5vxd2udzUhSMYLJpK7PFfsoQ6kT5Sis+XBY=;
-	b=ghtvD1RCQxUMGQ+XwwMoWWbzcjbyagAY1AIYWJgjgLsjG9VGM2A24gHDxlu93zFSYsfGTz
-	ZiYjZBClNKO45U35oDtzn62XP12fUad0y1iD76dzrSueLYRpv8QD7rlOqyDCWB6zjPyX56
-	bd8IbkccP7Hl+vAkLR6I6RHv9ddhQSE=
+	bh=QpPA2xePRIQqaUBXQsMd6MiuiLe+ZBV13Z0jPB7LrAY=;
+	b=Q6HwEErBNG7CDEFcfvSKYFDrgwsOpucKAS2QLKUewB6fabMtMfKeQskr9042dbQz6jJLL9
+	ZPirK3avRt3VNmCA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=toCawps5;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Q6HwEErB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1724395518; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QpPA2xePRIQqaUBXQsMd6MiuiLe+ZBV13Z0jPB7LrAY=;
+	b=toCawps5T7X1J3ShBAi2gpA3ksJuU9YwNUfx8Te+TaRFZIc/BN643FljTbQrfEX+a2kh1L
+	k4ZD3I+AHBlNWcZHdGMdF7kQ7A1MBTu8K50rcKEHLZaiynVzhU17QU5yxDfxpx1bJy9+ML
+	f7fwCl2QeaKL5fVZoYqCDPvjUtVEMJk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1724395518;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QpPA2xePRIQqaUBXQsMd6MiuiLe+ZBV13Z0jPB7LrAY=;
+	b=Q6HwEErBNG7CDEFcfvSKYFDrgwsOpucKAS2QLKUewB6fabMtMfKeQskr9042dbQz6jJLL9
+	ZPirK3avRt3VNmCA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 67ABF1333E;
-	Fri, 23 Aug 2024 06:42:00 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6EC441333E;
+	Fri, 23 Aug 2024 06:45:18 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wHxaFzgvyGZWagAAD6G6ig
-	(envelope-from <mwilck@suse.com>); Fri, 23 Aug 2024 06:42:00 +0000
-Message-ID: <1106fb07918468cb8cacb35ef0448573ec7be156.camel@suse.com>
-Subject: Re: [PATCH 1/3] blktests: nvme: skip passthru tests on multipath
- devices
-From: Martin Wilck <mwilck@suse.com>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, Chaitanya Kulkarni
-	 <Chaitanya.Kulkarni@wdc.com>, Hannes Reinecke <hare@suse.de>, 
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Date: Fri, 23 Aug 2024 08:41:59 +0200
-In-Reply-To: <d1282549-f037-4556-93f7-adb3d890db82@flourine.local>
+	id qT2lGP4vyGY5awAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Fri, 23 Aug 2024 06:45:18 +0000
+Date: Fri, 23 Aug 2024 08:45:17 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Martin Wilck <martin.wilck@suse.com>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+	Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>, Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, Martin Wilck <mwilck@suse.com>
+Subject: Re: [PATCH 3/3] nvme: add test for controller rescan under I/O load
+Message-ID: <9e199fd0-5767-4a63-930a-b08e89e4e354@flourine.local>
 References: <20240822193814.106111-1-mwilck@suse.com>
-	 <d1282549-f037-4556-93f7-adb3d890db82@flourine.local>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 
+ <20240822193814.106111-3-mwilck@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Score: -8.30
-X-Spamd-Result: default: False [-8.30 / 50.00];
-	REPLY(-4.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822193814.106111-3-mwilck@suse.com>
+X-Rspamd-Queue-Id: 88C66202D4
+X-Spam-Score: -6.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-6.51 / 50.00];
 	BAYES_HAM(-3.00)[99.99%];
+	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
 	MIME_GOOD(-0.10)[text/plain];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:dkim]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 X-Spam-Flag: NO
 X-Spam-Level: 
 
-On Fri, 2024-08-23 at 08:35 +0200, Daniel Wagner wrote:
-> On Thu, Aug 22, 2024 at 09:38:12PM GMT, Martin Wilck wrote:
-> > +_require_test_dev_is_nvme_no_mpath() {
-> > +	if [[ "$(readlink -f "$TEST_DEV_SYSFS/device")" =3D~ /nvme-
-> > subsystem/ ]]; then
-> > +		SKIP_REASONS+=3D("$TEST_DEV is a NVMe multipath
-> > device")
-> > +		return 1
-> > +	fi
-> > +	return 0
-> > +}
->=20
-> Just a nit: what about _require_test_dev_is_native_multipath?
+On Thu, Aug 22, 2024 at 09:38:14PM GMT, Martin Wilck wrote:
+> Add a test that repeatedly rescans nvme controllers while doing IO
+> on an nvme namespace connected to these controllers. The purpose
+> of the test is to make sure that no I/O errors or data corruption
+> occurs because of the rescan operations.
 
-The intention was to require a device that is _not_ a native multipath
-device. Change it to "_require_test_dev_is_not_native_multipath"?
+Could you elaborate why this tests is added? Does it test for a
+regression, are there any patches for this? Or is it more let's ensure
+this actually works?
 
-Thanks,
-Martin
+The code looks good.
 
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
