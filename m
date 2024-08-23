@@ -1,82 +1,146 @@
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715A81891B2;
-	Fri, 23 Aug 2024 14:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B319188585
+	for <linux-block@vger.kernel.org>; Fri, 23 Aug 2024 14:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724423389; cv=none; b=kzf3vOflNxUe6Ws39gIHI8smtmI9a2NzoKcah5iwfJ84TeMeEpjxgt5eriN07xeOIwdwmqhP87MVp8yPNnlOj22uKDHEAtVhRBf0OMlgLOfYHCI70YQrBnAt51haQAT+KbRq0OuNYYKZEyenI70do79iBdr6Fz8rlvQit59QTS0=
+	t=1724424600; cv=none; b=FHk3aJD1/4qbJuaNo2QQ5Z9+vLDlMADTQn1TUwbdtkVPiBVhDbDpZ9u5YLX2irk9MRAtmbqsehvAHX6JWFr6MEhfDJZhqs2nfCDr/eSnwUx3iEGk1WaQJGBfzYkBzQs3ht+U5YOUHQS0wVuqv8Hd0jRalzDfZ/3RbV63IgbZ5Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724423389; c=relaxed/simple;
-	bh=JSd5s7LYZr0ql/S80VXn66iP7Y1KXH7m/YrLDCfDu+A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eU4gddFMrZoQIflmovqViHMY+mM4x2H01MUFwcQga/wUvhchkPgSz0VeNCTdQnPr4vYGKUAzWmYCaNDR/Tw2exNIuFJGVy8FAZzqyEFEqSRR8wxKqOV6sXxyV1mjObOT9p3WkZfZ6YFky2XLBIqimbu2AsPydg5FA7jmhVbGkZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=sJDoujMd; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1724424600; c=relaxed/simple;
+	bh=hZrrNY16Bo8j/J2x+PrPGlVUimFjgWNMUmkg9hdtiHA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WUjTfWRp7MJFCo08StVAUiZZjNTqSx8zNjN0+Op6SKBUIUt/m5beQG3s3+oklyRENuOdx65r3GXC+xu7wjv2ML+/ou1DoEnQw0J1T8UxAw71Sh9k0j4uhgvV8Vv7g6rjTrNeJv9CkHvjuFfiCR+e+hSGRQ79Ru6JD2H7nVmEBfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ZJ5Sggyf; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ZJ5Sggyf; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="sJDoujMd"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=V6/MxKATzyOOmRfgy5jl1cCAM7hvAHmUzrh8d3M3N94=; b=sJDoujMdqdCzjbdtMH4ztfRj1+
-	txdxCbSdDBH/LexPtFcSVI9HSgo8UX40XCHPqmniTQCqWByhpD89LMVbavXwaj5LAhpUNktNPWYiK
-	NTpEadLd2Tc2crKyHIN4GakQl2Mj6aa1nigm45Ca1N8tk7MhBhL+BsBtG7uOtAGiA/NoCvrHT3S95
-	kMLRO9B/XRw0d56orBKf9opsuxFtnfpenF+bHlwvqiZ8CenYU/TeDEZKY3UN8dBCFqx/cdy5uJeU2
-	OHP+P11jXffDTNggeXSSh3X/31zgW3JG5CpRrHQMW8QIdYcUl++CokVNM08hinDVpaUNERtqiYKhz
-	vkQPG0FA==;
-Received: from [177.76.152.96] (helo=[192.168.1.60])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1shVIN-004597-Oz; Fri, 23 Aug 2024 16:29:43 +0200
-Message-ID: <0db4644c-c113-1473-3a73-6d1a8a1d3b5f@igalia.com>
-Date: Fri, 23 Aug 2024 11:29:30 -0300
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ZJ5Sggyf";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ZJ5Sggyf"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6F5182032A;
+	Fri, 23 Aug 2024 14:49:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1724424590; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P8gF0VRc9Y7rNBPRo/VdLr5wb4xFr5AtxCkwB+zyjs0=;
+	b=ZJ5SggyfHyMVH4mBqAVtEuFAVR+60VKvNCDblLPKQGIa1nozRRxUQyRcbaPa+wmeXiyDeE
+	aMRqwZZCByXG0RWCbY+gQM1X/R/eZ7gOfmDsOgAWYtERysfBySrKzL+2O4U/x/Fh/oZu2D
+	xMaeSjmu9Tz6bfR60E577FlJcpptwSo=
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1724424590; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P8gF0VRc9Y7rNBPRo/VdLr5wb4xFr5AtxCkwB+zyjs0=;
+	b=ZJ5SggyfHyMVH4mBqAVtEuFAVR+60VKvNCDblLPKQGIa1nozRRxUQyRcbaPa+wmeXiyDeE
+	aMRqwZZCByXG0RWCbY+gQM1X/R/eZ7gOfmDsOgAWYtERysfBySrKzL+2O4U/x/Fh/oZu2D
+	xMaeSjmu9Tz6bfR60E577FlJcpptwSo=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2EC021333E;
+	Fri, 23 Aug 2024 14:49:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id qEbKCY6hyGZ7fQAAD6G6ig
+	(envelope-from <mwilck@suse.com>); Fri, 23 Aug 2024 14:49:50 +0000
+Message-ID: <2cb6f86256803af00557f07e9573331c51111953.camel@suse.com>
+Subject: Re: [PATCH 3/3] nvme: add test for controller rescan under I/O load
+From: Martin Wilck <mwilck@suse.com>
+To: Nilay Shroff <nilay@linux.ibm.com>, Shin'ichiro Kawasaki
+	 <shinichiro.kawasaki@wdc.com>
+Cc: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>, Hannes Reinecke
+ <hare@suse.de>, Daniel Wagner <dwagner@suse.de>,
+ linux-block@vger.kernel.org,  linux-nvme@lists.infradead.org
+Date: Fri, 23 Aug 2024 16:49:49 +0200
+In-Reply-To: <9c260acf-48c1-4b4e-8e02-594bff222af3@linux.ibm.com>
+References: <20240822193814.106111-1-mwilck@suse.com>
+	 <20240822193814.106111-3-mwilck@suse.com>
+	 <9c260acf-48c1-4b4e-8e02-594bff222af3@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] Documentation: Document the kernel flag
- bdev_allow_write_mounted
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: linux-doc@vger.kernel.org, corbet@lwn.net, jack@suse.cz,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- kernel-dev@igalia.com, kernel@gpiccoli.net
-References: <20240819225626.2000752-2-gpiccoli@igalia.com>
- <20240820162359.GI6043@frogsfrogsfrogs>
- <170545d7-3fa5-f52a-1250-dfe0a0fff93c@igalia.com>
- <20240823012710.GY6082@frogsfrogsfrogs>
-Content-Language: en-US
-From: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
-In-Reply-To: <20240823012710.GY6082@frogsfrogsfrogs>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On 22/08/2024 22:27, Darrick J. Wong wrote:
-> [...]
->>
->> + Control the ability of directly writing to mounted block
->> + devices' page cache, i.e., allow / disallow writes that
->> + bypasses the FS. This was implemented as a means to
->> + prevent fuzzers to crash the kernel by breaking the
-> 
->                 "...from crashing the kernel by overwriting
-> the metadata underneath a mounted filesystem without its awareness."
-> 
->> + filesystem without its awareness, through direct block
->> + device writes. Also prevents issues from direct writes
-> 
-> You can do it with buffered writes to the block device pagecache too.
-> 
-> "This also prevents destructive formatting of mounted filesystems by
-> naïve storage tooling that don't use O_EXCL."
-> 
-> --D
+On Fri, 2024-08-23 at 15:48 +0530, Nilay Shroff wrote:
+>=20
+> On 8/23/24 01:08, Martin Wilck wrote:
+> >=20
+> > +	finish=3D$(($(date +%s) + TIMEOUT))
+> > +	while [[ $(date +%s) -le $finish ]]; do
+> > +		# sleep interval between 0.1 and 5s
+> > +		usleep "$(((RANDOM%50 + 1)*100000))"
+> > +		echo 1 >"$1/rescan_controller"
+> > +	done
+> > +}
+> I think here usleep may not be available by default on all systems.
+> For instance, on fedora/rhel I don't have usleep installed in the=20
+> defualt configuration and so I have to first install it. So you may
+> want to add "usleep" as per-requisite for this test. Moreover, after=20
+> I installed usleep on fedora and ran the above test I see this
+> warning:
+>=20
+> warning: usleep is deprecated, and will be removed in near future!
+>=20
+> Due to above warning the test fails. So is it possible to replace=20
+> usleep with sleep?
 
-Thanks! Just sent the V2.
+The README states that blktests requires GNU coreutils, so yes, that
+would be feasible - in principle.
+
+The problem is that bash can't do floating point math, and I want to
+be able to sleep for fractions of a second. So I'd need to do something
+like this:
+
+usleep() {
+    sleep "$(awk "BEGIN { print $1 / 1.e6; }" </dev/null)"
+}
+
+But the fork-and-exec to "awk" is slow. millisecond sleep times can't
+be realized this way.=C2=A0Anyway, I realize that calling "usleep" also
+carries a lot of overhead, and thus "usleep 1000" doesn't do what one
+would na=C3=AFvely expect, either.
+
+The only way I can see to make this work as originally intended is to
+implement is as an awk script. The README says that GNU awk is
+required, so sleep() with floating point argument is available.
+
+Thanks
+Martin
+
