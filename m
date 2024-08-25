@@ -1,209 +1,124 @@
-Received: from mx-lax3-2.ucr.edu (mx-lax3-2.ucr.edu [169.235.156.37])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B53E2F3E
-	for <linux-block@vger.kernel.org>; Sun, 25 Aug 2024 05:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=169.235.156.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD9029408
+	for <linux-block@vger.kernel.org>; Sun, 25 Aug 2024 07:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724562672; cv=none; b=UHi5bHA4gqVZpH4tCyBzxDAp7+RJrfdS0UcplCXtJ2GKlrD/KYLpG3RJmuVJdoc42SmZ4IRAJvW5Y9eNjL932w45KfYLv7CEpN297stAbnBMJ9PwCZ5sFXOSvPekQXQ00e6m4E11QTU2JH3P//FeAMijbqwdX+m0cK6WN9s2hn4=
+	t=1724569929; cv=none; b=Wy+BVXQOCIol1aNul11drhD/TgyhvYJ7gUaF5GyiDaoY0QBOu+AYUA0Ga9KLkb0GtQsKMY+dc13Kmezwrm/jJfoq+QmD5in5cOnF10DEurt8W4g4FAax8vtO1Egaa4AwhlUi/qVeVh3KAAOn/zVakLUPMiahaTfi82WBT9ynw1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724562672; c=relaxed/simple;
-	bh=r8fSZZAkztvwgMS1RQkgMWFwRxP1fwiNkSnvFeTAVD4=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=j901gqEaXyTw10+gvmaByGtuwQZVSOXZ5YsNwX+7iru3pGil1f6TiFLMLNZLRVPjPyAhAY8YhGY6FHHF6rp9pSDmqWwGGoogwbAF/09MbWVka13/bweIVusKK1ankBTo0fH2qVZz0cuVhwyib92iE/2YGSLPufrdeOl8ZKJz2Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu; spf=pass smtp.mailfrom=ucr.edu; dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=dHCviQG4; dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=kw2ExnXp; arc=none smtp.client-ip=169.235.156.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucr.edu
+	s=arc-20240116; t=1724569929; c=relaxed/simple;
+	bh=UQ+pSrTwI+f9/fLRwaofXkYNi8zObLzhsh5e1npU0vk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=RQRckeO8y5LFGgAF7paRk4sE5/7T1ew3fkGdxQjStBkWwcCu/1DM2raQ9zznOo9hdB9Jf4BS6s4EKRje+1vJ7wL+Gq0i2LR32FyH41ABO/7hEbMqmO2WhSPy0xWvgMuaDKYut5YAYx00J13KYS9MaqVsU4wCtUWxNnE8izhKGCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bupt.moe; spf=pass smtp.mailfrom=bupt.moe; dkim=pass (1024-bit key) header.d=bupt.moe header.i=@bupt.moe header.b=eMkTWgVE; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bupt.moe
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bupt.moe
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="dHCviQG4";
-	dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="kw2ExnXp"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
-  t=1724562671; x=1756098671;
-  h=dkim-signature:x-google-dkim-signature:
-   x-forwarded-encrypted:x-gm-message-state:
-   x-google-smtp-source:mime-version:from:date:message-id:
-   subject:to:content-type:content-transfer-encoding:
-   x-cse-connectionguid:x-cse-msgguid;
-  bh=r8fSZZAkztvwgMS1RQkgMWFwRxP1fwiNkSnvFeTAVD4=;
-  b=dHCviQG4uVLptoIbLamNqx51hrxDzZ5D28Uqs5QA7+BwNYXtFDMlIsXV
-   rh1iJiDYzPZwzl35/872/iAyhzzeWybkysEcRUUAsFc0d3dRJD7HLr1T3
-   W8eEo2YGrUGfSXrWK5X98T9yavhnb8TAZ0Wfjk0ZNcs8RmUceNrtuUWmm
-   OaFyVj18E5doQhknPQ7GNKPARkWYCHYkgKoKT+davrtQoLqMZt5fCeuAD
-   aWZzo08zCsBhYv3ZiRkq5BVFM6aIILcB8kM4plWsmIXJhCjRGa6mIRU7h
-   qmQY8qhy37yMPOiGkJ+OMIs1lXuGOQOZ4plE4hi+3asFtkLBuc7HCogGZ
-   g==;
-X-CSE-ConnectionGUID: Dhl1zKAhRuexI2qNO9qgvw==
-X-CSE-MsgGUID: zw0u9nIYS1SwP6zPCJ+HcA==
-Received: from mail-pg1-f199.google.com ([209.85.215.199])
-  by smtp-lax3-2.ucr.edu with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 24 Aug 2024 22:11:10 -0700
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-7ad78c1a019so3184858a12.2
-        for <linux-block@vger.kernel.org>; Sat, 24 Aug 2024 22:11:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucr.edu; s=rmail; t=1724562669; x=1725167469; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=p7huxQOEChvdaykUFKGm0QTI9D846dJ8HoKnVfcJIa4=;
-        b=kw2ExnXpdlUQP09ttmT0ceOnR7mSxNdXShuqB/68jUKUh2wFLjBiWf3BoaJIDb14sm
-         vesPkWVAiMRgoIJ/is+33HR8ZDpP7qrxtKYIRLAVDYeCEk22acCJIL7xDA2jT1KY0efh
-         /1+Q2SU96Fsy8dCUpCN4tpba6CDmiN32/P45c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724562669; x=1725167469;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p7huxQOEChvdaykUFKGm0QTI9D846dJ8HoKnVfcJIa4=;
-        b=Zrbs+rdLfWEa8/JQ+7pCwJfKI0czD0JjbAtTeSp6MwnG6Vw1K+xXJE3mcVc+GgOjQt
-         KGKOV4WHznpTCYnCt7mEnwMZ/A2NjAwWWRGEY4bLL2mwrSanxu5C0XVUpgLKD1DhnRiT
-         G1HYs3ndVlQI5Ip+XKZvSTpWEdTLhrYTXzxQXbFBKomZFjgUPuCF0Zv7J5Lw6Hz+K8KZ
-         Ba2JbzFxF0YHt2jDoLk2m4aN2hHDfiLX0V3OALtwXeaqeMzK9kl9kdZitHx55pl9eY8R
-         CuCtqMsl0Dg0Cy81Oex4L43dVM6Y43LjuMBX9xF/PJXeVXIphIEkY6FbNAw3dp0t/nEd
-         QlNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXHUe2YPP39vXS8H3ERhW3COUcgBHlVJaDBxDpw7Ed+uV8E9intHwnI9mQp4EA8LBp/potOGDfsW8zHHA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKE8cYJsv7GqD/oOafA/plvcf+cP/pBIjQx2u8Kwfhc2qjFnRm
-	ns/mKKQrEUi14AXvovfCHiDf8BqVNldmcUapdL4Oc4gSFcXTvm4rl+2FHlDx+Rzb4GS198ym6F3
-	fc5ib4a4YDB+9xNtw7qtpxPsbrXhLBsKjOcGH/NFfmv2LRrU6X3QR9Z0qggDHRV83aIlVP2LvOJ
-	sDIT9YOY3FgTwLDHD9PudWFoPwcRUhdR4pbcPG
-X-Received: by 2002:a05:6a20:c78e:b0:1c8:d4d4:4139 with SMTP id adf61e73a8af0-1cc89ee9760mr7128026637.43.1724562668889;
-        Sat, 24 Aug 2024 22:11:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHMx+3/jZdACx242VZMz16w96+QtHP69PBKO3MDWyzAQk+gOxzbDpBjWTxSNCAsJyamiZqedVQCaEf+xbuOsTE=
-X-Received: by 2002:a05:6a20:c78e:b0:1c8:d4d4:4139 with SMTP id
- adf61e73a8af0-1cc89ee9760mr7128020637.43.1724562668543; Sat, 24 Aug 2024
- 22:11:08 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=bupt.moe header.i=@bupt.moe header.b="eMkTWgVE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bupt.moe;
+	s=qqmb2301; t=1724569919;
+	bh=WPRjRA3ccqX/v2CyxXpeJv8LPSQsGqeqlW5QXQJWAI4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To;
+	b=eMkTWgVEY77+P0FwAmzWTX647z7b3gLrJ6VzezOl8vM0A180Rk+LHIMBe/ZAAi+cn
+	 TWtJ5+Wk70PzBiCxJUSjlY33vo0Hx/E8zYhs+lYjXVfw+drzArNEQsC0Du0lGJutEx
+	 +dgPBQhLgnGuMO56H1lWDewoy/xYHvO9FoFz3ZaU=
+X-QQ-mid: bizesmtpip2t1724569917tvr3mde
+X-QQ-Originating-IP: Fjd+UnGuhz7iUpls2ocI9N+au7E2D96HxTBQ/FFpeP8=
+Received: from [IPV6:2409:8a3c:5937:7b50:aeeb: ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with SMTP id 0
+	for <linux-block@vger.kernel.org>; Sun, 25 Aug 2024 15:11:55 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 16210401571042695670
+Message-ID: <33EB068C1F9F98B4+1d4bc70a-a36d-4bf7-94ef-f2ec12166ac4@bupt.moe>
+Date: Sun, 25 Aug 2024 15:11:55 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Xingyu Li <xli399@ucr.edu>
-Date: Sat, 24 Aug 2024 22:10:58 -0700
-Message-ID: <CALAgD-6gJ4W1rPj=CWG7bFUPpEJnUjEhQd3uvH=7C=aGKb=CUQ@mail.gmail.com>
-Subject: BUG: general protection fault in update_io_ticks
-To: "axboe@kernel.dk" <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: Yuwei Han <hrx@bupt.moe>
+Subject: Can't set RAID10 on zoned device using experimental build
+To: linux-block@vger.kernel.org
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:bupt.moe:qybglogicsvrgz:qybglogicsvrgz5a-1
 
 Hi,
+I am using btrfs-progs experimental build to create RAID10 volume on 
+zoned device. But it didn't succeed.
 
-We found a bug in Linux 6.10. It is probably a null pointer dereference bug=
-.
-The bug report and syzkaller reproducer are as follows:
+Have consulted btrfs guys, he think it is related to block devices. So I 
+forwarded to here.
 
-Bug report:
+# uname -a
+Linux aosc3a6 6.11.0-rc4 #2 SMP PREEMPT_DYNAMIC Sun Aug 25 10:44:46 CST 
+2024 loongarch64 GNU/Linux
 
-Oops: general protection fault, probably for non-canonical address
-0xdffffc0000000005: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
-CPU: 0 PID: 45 Comm: kworker/u4:3 Not tainted 6.10.0 #13
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/=
-2014
-Workqueue: writeback wb_workfn (flush-8:0)
-RIP: 0010:update_io_ticks+0x94/0x2c0 block/blk-core.c:992
-Code: f3 f3 f3 48 89 54 24 18 4a 89 04 32 e8 75 77 59 fd 48 c1 eb 03
-48 89 5c 24 08 eb 03 4c 8b 2b 49 8d 5d 28 48 89 d8 48 c1 e8 03 <42> 80
-3c 30 00 74 08 48 89 df e8 6d 82 bc fd 4c 8b 3b 48 8b 44 24
-RSP: 0018:ffffc9000090e620 EFLAGS: 00010206
-RAX: 0000000000000005 RBX: 0000000000000028 RCX: ffff888015330000
-RDX: 0000000000000000 RSI: 0000000100000845 RDI: 0000000000000000
-RBP: ffffc9000090e6d8 R08: ffffffff843a8b4a R09: 1ffffffff1e48be5
-R10: dffffc0000000000 R11: fffffbfff1e48be6 R12: 0000000100000845
-R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88801d4f2058
-FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd0a027408 CR3: 00000000232cc000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- blk_account_io_start+0x189/0x2d0 block/blk-mq.c:1022
- blk_mq_bio_to_request block/blk-mq.c:2559 [inline]
- blk_mq_submit_bio+0x1043/0x1f40 block/blk-mq.c:2996
- __submit_bio+0x1bc/0x550 block/blk-core.c:627
- __submit_bio_noacct_mq block/blk-core.c:708 [inline]
- submit_bio_noacct_nocheck+0x3ed/0xc20 block/blk-core.c:737
- ext4_io_submit+0xd4/0x130 fs/ext4/page-io.c:377
- ext4_do_writepages+0x293b/0x38e0 fs/ext4/inode.c:2699
- ext4_writepages+0x20c/0x3b0 fs/ext4/inode.c:2768
- do_writepages+0x36f/0x880 mm/page-writeback.c:2656
- __writeback_single_inode+0xe2/0x660 fs/fs-writeback.c:1651
- writeback_sb_inodes+0x8ee/0x1140 fs/fs-writeback.c:1947
- __writeback_inodes_wb+0x11b/0x260 fs/fs-writeback.c:2018
- wb_writeback+0x3e7/0x750 fs/fs-writeback.c:2129
- wb_check_old_data_flush fs/fs-writeback.c:2233 [inline]
- wb_do_writeback fs/fs-writeback.c:2286 [inline]
- wb_workfn+0xa29/0xf00 fs/fs-writeback.c:2314
- process_one_work kernel/workqueue.c:3248 [inline]
- process_scheduled_works+0x977/0x1410 kernel/workqueue.c:3329
- worker_thread+0xaa0/0x1020 kernel/workqueue.c:3409
- kthread+0x2eb/0x380 kernel/kthread.c:389
- ret_from_fork+0x49/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:244
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:update_io_ticks+0x94/0x2c0 block/blk-core.c:992
-Code: f3 f3 f3 48 89 54 24 18 4a 89 04 32 e8 75 77 59 fd 48 c1 eb 03
-48 89 5c 24 08 eb 03 4c 8b 2b 49 8d 5d 28 48 89 d8 48 c1 e8 03 <42> 80
-3c 30 00 74 08 48 89 df e8 6d 82 bc fd 4c 8b 3b 48 8b 44 24
-RSP: 0018:ffffc9000090e620 EFLAGS: 00010206
-RAX: 0000000000000005 RBX: 0000000000000028 RCX: ffff888015330000
-RDX: 0000000000000000 RSI: 0000000100000845 RDI: 0000000000000000
-RBP: ffffc9000090e6d8 R08: ffffffff843a8b4a R09: 1ffffffff1e48be5
-R10: dffffc0000000000 R11: fffffbfff1e48be6 R12: 0000000100000845
-R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88801d4f2058
-FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd0a027408 CR3: 00000000232cc000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0: f3 f3 f3 48 89 54 24 repz repz xrelease mov %rdx,0x18(%rsp)
-   7: 18
-   8: 4a 89 04 32           mov    %rax,(%rdx,%r14,1)
-   c: e8 75 77 59 fd       call   0xfd597786
-  11: 48 c1 eb 03           shr    $0x3,%rbx
-  15: 48 89 5c 24 08       mov    %rbx,0x8(%rsp)
-  1a: eb 03                 jmp    0x1f
-  1c: 4c 8b 2b             mov    (%rbx),%r13
-  1f: 49 8d 5d 28           lea    0x28(%r13),%rbx
-  23: 48 89 d8             mov    %rbx,%rax
-  26: 48 c1 e8 03           shr    $0x3,%rax
-* 2a: 42 80 3c 30 00       cmpb   $0x0,(%rax,%r14,1) <-- trapping instructi=
-on
-  2f: 74 08                 je     0x39
-  31: 48 89 df             mov    %rbx,%rdi
-  34: e8 6d 82 bc fd       call   0xfdbc82a6
-  39: 4c 8b 3b             mov    (%rbx),%r15
-  3c: 48                   rex.W
-  3d: 8b                   .byte 0x8b
-  3e: 44                   rex.R
-  3f: 24                   .byte 0x24
+# ./btrfs version
+btrfs-progs v6.10.1
++EXPERIMENTAL -INJECT -STATIC +LZO +ZSTD +UDEV +FSVERITY +ZONED 
+CRYPTO=builtin
+
+# ./mkfs.btrfs -f -O bgt,rst -mraid10 -draid10 /dev/sda /dev/sdb 
+/dev/sdc /dev/sdd
+btrfs-progs v6.10.1
+See https://btrfs.readthedocs.io for more information.
+
+Zoned: /dev/sda: host-managed device detected, setting zoned feature
+Resetting device zones /dev/sda (52156 zones) ...
+Resetting device zones /dev/sdb (52156 zones) ...
+Resetting device zones /dev/sdc (52156 zones) ...
+Resetting device zones /dev/sdd (52156 zones) ...
+ERROR: zoned: failed to reset device '/dev/sdd' zones: Remote I/O error
+ERROR: zoned: failed to reset device '/dev/sdb' zones: Remote I/O error
+ERROR: zoned: failed to reset device '/dev/sdc' zones: Remote I/O error
+ERROR: zoned: failed to reset device '/dev/sda' zones: Remote I/O error
+ERROR: unable prepare device: /dev/sda
+
+related dmesg:
+[ 479.729281] sd 0:0:2:0: [sdc] tag#953 FAILED Result: hostbyte=DID_OK 
+driverbyte=DRIVER_OK cmd_age=0s
+[  479.729930] sd 0:0:1:0: [sdb] tag#184 FAILED Result: hostbyte=DID_OK 
+driverbyte=DRIVER_OK cmd_age=0s
+[  479.729944] sd 0:0:3:0: [sdd] tag#12 FAILED Result: hostbyte=DID_OK 
+driverbyte=DRIVER_OK cmd_age=0s
+[  479.729949] sd 0:0:3:0: [sdd] tag#12 Sense Key : Illegal Request 
+[current]
+[  479.729951] sd 0:0:3:0: [sdd] tag#12 Add. Sense: Invalid field in cdb
+[  479.729954] sd 0:0:3:0: [sdd] tag#12 CDB: Write same(16) 93 08 00 00 
+00 00 00 00 00 00 00 01 00 00 00 00
+[  479.729956] critical target error, dev sdd, sector 0 op 0x3:(DISCARD) 
+flags 0x800 phys_seg 1 prio class 0
+[  479.729960] sd 0:0:0:0: [sda] tag#597 FAILED Result: hostbyte=DID_OK 
+driverbyte=DRIVER_OK cmd_age=0s
+[  479.729963] sd 0:0:0:0: [sda] tag#597 Sense Key : Illegal Request 
+[current]
+[  479.729966] sd 0:0:0:0: [sda] tag#597 Add. Sense: Invalid field in cdb
+[  479.729968] sd 0:0:0:0: [sda] tag#597 CDB: Write same(16) 93 08 00 00 
+00 00 00 00 00 00 00 01 00 00 00 00
+[  479.729970] critical target error, dev sda, sector 0 op 0x3:(DISCARD) 
+flags 0x800 phys_seg 1 prio class 0
+[  479.738363] sd 0:0:2:0: [sdc] tag#953 Sense Key : Illegal Request 
+[current]
+[  479.747438] sd 0:0:1:0: [sdb] tag#184 Sense Key : Illegal Request 
+[current]
+[  479.756425] sd 0:0:2:0: [sdc] tag#953 Add. Sense: Invalid field in cdb
+[  479.763338] sd 0:0:1:0: [sdb] tag#184 Add. Sense: Invalid field in cdb
+[  479.769733] sd 0:0:2:0: [sdc] tag#953 CDB: Write same(16) 93 08 00 00 
+00 00 00 00 00 00 00 01 00 00 00 00
+[  479.779152] sd 0:0:1:0: [sdb] tag#184 CDB: Write same(16) 93 08 00 00 
+00 00 00 00 00 00 00 01 00 00 00 00
+[  479.788656] critical target error, dev sdc, sector 0 op 0x3:(DISCARD) 
+flags 0x800 phys_seg 1 prio class 0
+[  479.797730] critical target error, dev sdb, sector 0 op 0x3:(DISCARD) 
+flags 0x800 phys_seg 1 prio class 0
+
+drive info: WDC HC620 (HSH721414ALN6M0)
 
 
-Syzkaller reproducer:
-# {Threaded:false Repeat:true RepeatTimes:0 Procs:1 Slowdown:1
-Sandbox: SandboxArg:0 Leak:false NetInjection:false NetDevices:false
-NetReset:false Cgroups:false BinfmtMisc:false CloseFDs:false
-KCSAN:false DevlinkPCI:false NicVF:false USB:false VhciInjection:false
-Wifi:false IEEE802154:false Sysctl:false Swap:false UseTmpDir:false
-HandleSegv:false Trace:false LegacyOptions:{Collide:false Fault:false
-FaultCall:0 FaultNth:0}}
-write$syz_spec_18446744072532934322_80(0xffffffffffffffff,
-&(0x7f0000000000)=3D"2b952480c7ca55097d1707935ba64b20f3026c03d658026b81bf26=
-4340512b3cb4e01afda2de754299ea7a113343ab7b9bda2fc0a2e2cdbfecbca0233a0772b12=
-ebde5d98a1203cb871672dff7e4c86ec1dccef0a76312fbe8d45dc2bd0f8fc2ebeb2a6be6a3=
-00916c5281da2c1ef64d66267091b82429976c019da3645557ed1d439c5a637f6bf58c53bc4=
-14539dd87c69098d671402586b631f9ac5c2fe9cedc281a6f005b5c4d1dd5ed9be400",
-0xb4)
-r0 =3D syz_open_dev$sg(&(0x7f00000000c0), 0x0, 0x181040)
-ioctl$syz_spec_1724254976_2866(r0, 0x1, &(0x7f0000000080)=3D{0x0, 0x2,
-[0x85, 0x8, 0x15, 0xd]})
 
-
---=20
-Yours sincerely,
-Xingyu
