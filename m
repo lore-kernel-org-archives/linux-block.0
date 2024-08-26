@@ -1,101 +1,79 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E63B1990A7;
-	Mon, 26 Aug 2024 17:38:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89015198E96;
+	Mon, 26 Aug 2024 17:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724693922; cv=none; b=MJPxcyVMXXZD396c21yXneLQX1uFqTQdF/WP0qDTAeMHqQjU1mut98DMjk4i5aKGVl6yapWDjc0gywZPMbS2h8mi3DTO8lxiERd+S0YLTkByEJUgv2WjsBkm6Ec9DrgxxrU1hKg7Wyi5CLaAADCgMkbtX0M5brjwA+5k3QY+nmI=
+	t=1724694257; cv=none; b=j53AmNwdZxdaDOFWZok581rxVhdhKLp/jdiPhGI/ux4D4g9kT5fNL8TueHRgxe4EosJG0f+avgiPTLrGPybfKd8OMJJug/4xFN4So7N93M7I2TSESWFkOG7mDJfY7zZFK4CAqbH4MSLgFMLUwMNjPyqiMR8XnTlNclsgnGjZOKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724693922; c=relaxed/simple;
-	bh=gjNxz+WDCrVaxGkqjYBwgIQ4LI1H7AXowSfzH9I5l+w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y4JweveQiUBhQWVp5yuBIWypQM1M5oR46PZR8vChzxEA7ZdIuATcOnS0no6YnU4p53CrillS4zFEvH0cohnxWXTluXcalO69WryeK8nvs67XCm03KoX0w/Obr0RrT5WObBrdnLJ86jDgizeLg1jXjul0vXy+dw9/jSwuRYzov6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qwNKv9mC; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1724694257; c=relaxed/simple;
+	bh=Ky1WtZTB1vAFitwSZSr9oE2Lkfv8g9tc5SCDtUd5Igw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SNP17xEU/LDu5nqMIpLB/rxXXF6w2CxTiT7RYS54kLhWwQXSmIaSip/SyqCCh+in/K5dhc9FwvcVw841n5iw3whfq+aSobqb4rtkTvFEDqPGhsRv/gYUQxtv/hFDNhjCKmRP6qvMAbwLq4V3ONOcqigaTOuPkGH3aq2kdGNxWcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=h8BmHZmw; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qwNKv9mC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=RNzlZ0CBEGyo8XBfqzn6UuJuFRRrpKYSdfqJczIxzVs=; b=qwNKv9mCFefSmzqRiDImlO/pz5
-	H1hzErGuOE/HDfc5jrSnYigUurd2yoKDePfKzEgd2hTVCvOfj/6h7P+SsUdw0JmO23LQUv2+ReHr0
-	Ttlie3vNTni1BlD19zpthVIexQ/2Y0ZYgxrAk95u5ZXIB1X5OFRJG/jPDNuQfVFKLvcEnOd/bjOP7
-	sNJ+tONcwKrkRJSJn6vMcuVZXQoSFM5KSPqW3uGDqzPa3zEuGE2qoLLSqI1iKVdmuik6bB8bfRWq5
-	6w2S8keiCTmYJkU8m1v1E3LeYqD4k+mun8MrikcW9xkYt8cT+Ks25WruJgYUej3k8ZQ3TKkH8W1az
-	rshnD5iQ==;
-Received: from 2a02-8389-2341-5b80-a8a7-5c16-efec-d7f9.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:a8a7:5c16:efec:d7f9] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sidfq-00000008Fyz-44Cw;
-	Mon, 26 Aug 2024 17:38:39 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>,
-	Hans Holmberg <Hans.Holmberg@wdc.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 4/4] block: don't use bio_split_rw on misc operations
-Date: Mon, 26 Aug 2024 19:37:57 +0200
-Message-ID: <20240826173820.1690925-5-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240826173820.1690925-1-hch@lst.de>
-References: <20240826173820.1690925-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="h8BmHZmw"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4Wsyj54Rwmz6ClY9F;
+	Mon, 26 Aug 2024 17:44:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1724694244; x=1727286245; bh=Ky1WtZTB1vAFitwSZSr9oE2L
+	kfv8g9tc5SCDtUd5Igw=; b=h8BmHZmwBPtHY/5huyweT7LC/hAMCyRbF8I/nDUc
+	eInWFOIaDBLKsf8lBA747JuClgmy4aunEUTem/G+Zb1CBh1IASDyPUTvkMLdO9+X
+	qf9Im9LfJJDOPEtLBbARVpojuH0XyhSxuH+s1pxtSSbzb0ndrXh6q9dJydWXuOEf
+	9bkLSmmHa0O14/T+VRXR3GRbmD3jhZEV7dDoa8tyenLHf80v0Pa1BDJnwxoLR7YF
+	vRgyjI5dlCOoXvve3MUZyzxLD0S6dzNucYTg+phQSn2J5HNK6zgcaHT7GQr3m8oI
+	ZBY8H2kdtb4aZJ1oadDKSG/M5XNQpbawLnms14gmqV/TJw==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id TfuIq-julCUO; Mon, 26 Aug 2024 17:44:04 +0000 (UTC)
+Received: from [172.31.110.201] (unknown [216.9.110.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4Wsyhx6Vmgz6ClY98;
+	Mon, 26 Aug 2024 17:44:01 +0000 (UTC)
+Message-ID: <d0e017ac-8367-4bb8-9b7f-d72dd068fdb1@acm.org>
+Date: Mon, 26 Aug 2024 10:44:00 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/5] fs, block: refactor enum rw_hint
+To: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, sagi@grimberg.me, martin.petersen@oracle.com,
+ James.Bottomley@HansenPartnership.com, brauner@kernel.org, jack@suse.cz,
+ jaegeuk@kernel.org, jlayton@kernel.org, chuck.lever@oracle.com
+Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, gost.dev@samsung.com, vishak.g@samsung.com,
+ javier.gonz@samsung.com
+References: <20240826170606.255718-1-joshi.k@samsung.com>
+ <CGME20240826171413epcas5p3f62c2cc57b50d6df8fa66af5fe5996c5@epcas5p3.samsung.com>
+ <20240826170606.255718-2-joshi.k@samsung.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240826170606.255718-2-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-bio_split_rw is designed to split read and write bios with a payload.
-Currently it is called by __bio_split_to_limits for all operations not
-explicitly list, which works because bio_may_need_split explicitly checks
-for bi_vcnt == 1 and thus skips the bypass if there is no payload and
-bio_for_each_bvec loop will never execute it's body if bi_size is 0.
+On 8/26/24 10:06 AM, Kanchan Joshi wrote:
+> Change i_write_hint (in inode), bi_write_hint (in bio) and write_hint
+> (in request) to use u8 data-type rather than this enum.
 
-But all this is hard to understand, fragile and wasted pointless cycles.
-Switch __bio_split_to_limits to only call bio_split_rw for READ and
-WRITE command and don't attempt any kind split for operation that do not
-require splitting.
+That sounds fishy to me. Why to increase the size of this enum? Why to
+reduce the ability of the compiler to perform type checking? I think
+this needs to be motivated clearly in the patch description.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk.h | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk.h b/block/blk.h
-index 61c2afa67daabb..32f4e9f630a3ac 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -372,7 +372,8 @@ static inline struct bio *__bio_split_to_limits(struct bio *bio,
- 		const struct queue_limits *lim, unsigned int *nr_segs)
- {
- 	switch (bio_op(bio)) {
--	default:
-+	case REQ_OP_READ:
-+	case REQ_OP_WRITE:
- 		if (bio_may_need_split(bio, lim))
- 			return bio_split_rw(bio, lim, nr_segs);
- 		*nr_segs = 1;
-@@ -384,6 +385,10 @@ static inline struct bio *__bio_split_to_limits(struct bio *bio,
- 		return bio_split_discard(bio, lim, nr_segs);
- 	case REQ_OP_WRITE_ZEROES:
- 		return bio_split_write_zeroes(bio, lim, nr_segs);
-+	default:
-+		/* other operations can't be split */
-+		*nr_segs = 0;
-+		return bio;
- 	}
- }
- 
--- 
-2.43.0
-
+Bart.
