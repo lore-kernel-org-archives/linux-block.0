@@ -1,147 +1,132 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBB912E1C7
-	for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 07:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E637A13A250
+	for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 07:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724657642; cv=none; b=fN/eg0HZvI2jEzOk219kl/v2CR+EabPR+DJqVocvukRkqaX3TbEpnGQSuh7W6N1zSQqdykvyDOh/zv5WFyQ5nSGqVmfeuS2zKzlW0bPYeH99qM1WaEbMmLdaW3JuAx6pauwfBIuC2RnRXmWCCQF/tVdHeVgbPACW++lBOvSi+6E=
+	t=1724659142; cv=none; b=kGDWaD05PhR++xWFI8ldlHrhF8RachP9fBMpA6ZGjOhqHTIwrnvsnjvGfgYCis0kIp3cW4xdEY59bNVDJAkry+lmAKXEkXiPKP5Ev6fOFUTkKcbzUrgQmpDo7xsDnKFcN4o0Nc32M9f9LWZAjjLYkf8x0Nc6fVCE1D53Ic8ZvZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724657642; c=relaxed/simple;
-	bh=nDmwfZb3zAoHaIov3BpMiaPHaRy3b1QEPWCy5Od8fvk=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=qzk+F06jOvRFQxaU5TpzV7/xA7M+hnF3qa9yt+Bi7BFkwRv5yoVBzrdVIjFiykDw34AQU0By9zlVFlcSrWWOmVAQTUeo5WhQEUro1VN95fCM5fmAw2QRl/uSbzzpQ3RTNpf5Q4t0qN0DEp7NmDcbzsd0MsIzMUhZBlmzTzTmidQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RcZ8QGe4; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1724659142; c=relaxed/simple;
+	bh=mpl+4dk1lTIMG1sUQ9PCAlKzWtVwLt3AQ/wWblfdjUo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=F/PapVDWmSL2mVKn9wUvUEkq6wXmCu8pQlCxP6SPtcUuWRXNuhEZI25PZPlzErB0jhBqSHSNWlXNZcJCIgr8zCb1NY02q0ej0rEBZxexRFqlgtyNO3/1uJAGJGInwXU03AMq48BYxF05N6N6J5/bM2NHRPY6SPCirTYk5oMRRXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=YRBXdrIc; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=YRBXdrIc; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RcZ8QGe4"
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724657637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="YRBXdrIc";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="YRBXdrIc"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 136521F842;
+	Mon, 26 Aug 2024 07:58:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1724659139; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=C9v9WEqDip3i21pJBqBZAVyHYygHv4sd7F9tl+2YhKg=;
-	b=RcZ8QGe4gpLFLi/AQ6FlHq/y8+D/aII/F31LemP17YUySU51i03x0tmyJZG3XnamaoetRi
-	Eo1BOh49ANslw/M2ZSJGt6MhKr0rO1d5CT4p8Xf65dVDNC9gOYvJ/EZbbvpYiRmeHonHRn
-	3+x+l+fVRGpBNAJXJ+edXY1V2HbLM2U=
+	bh=mpl+4dk1lTIMG1sUQ9PCAlKzWtVwLt3AQ/wWblfdjUo=;
+	b=YRBXdrIcgiGQUV7IV/Spqygo9MS0w1xp1sh9UpfkC1Sww12hNwu8vY5gWVHFSxHKd0jQX+
+	/YyMJ5FqfWmNhpQPhfhiYKI2EDdxRNHe76RqgllPl81uUHQjITeBIrxQ8muPD/39Tuq9Gg
+	NnHl35j3p+NrPqrPByJqhIoErSrZnng=
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=YRBXdrIc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1724659139; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mpl+4dk1lTIMG1sUQ9PCAlKzWtVwLt3AQ/wWblfdjUo=;
+	b=YRBXdrIcgiGQUV7IV/Spqygo9MS0w1xp1sh9UpfkC1Sww12hNwu8vY5gWVHFSxHKd0jQX+
+	/YyMJ5FqfWmNhpQPhfhiYKI2EDdxRNHe76RqgllPl81uUHQjITeBIrxQ8muPD/39Tuq9Gg
+	NnHl35j3p+NrPqrPByJqhIoErSrZnng=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C71341398D;
+	Mon, 26 Aug 2024 07:58:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id P6EFL8I1zGajUgAAD6G6ig
+	(envelope-from <mwilck@suse.com>); Mon, 26 Aug 2024 07:58:58 +0000
+Message-ID: <3be250bbaede895861092d055d9f49a71566a78f.camel@suse.com>
+Subject: Re: [PATCH v2 3/3] nvme: add test for controller rescan under I/O
+ load
+From: Martin Wilck <mwilck@suse.com>
+To: Nilay Shroff <nilay@linux.ibm.com>, Shin'ichiro Kawasaki
+	 <shinichiro.kawasaki@wdc.com>, Daniel Wagner <dwagner@suse.de>
+Cc: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>, Hannes Reinecke
+ <hare@suse.de>, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Date: Mon, 26 Aug 2024 09:58:58 +0200
+In-Reply-To: <2a550653-89b4-4c3c-840a-a905152adb5f@linux.ibm.com>
+References: <20240823200822.129867-1-mwilck@suse.com>
+	 <20240823200822.129867-3-mwilck@suse.com>
+	 <2a550653-89b4-4c3c-840a-a905152adb5f@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Re: [PATCH 4/4] block: fix fix ordering between checking
- QUEUE_FLAG_QUIESCED and adding requests to hctx->dispatch
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <CAMZfGtW-AG9gBD2f=FwNAZqxoFZwoEECbS0+4eurnSoxN5AhRg@mail.gmail.com>
-Date: Mon, 26 Aug 2024 15:33:18 +0800
-Cc: Ming Lei <ming.lei@redhat.com>,
- Jens Axboe <axboe@kernel.dk>,
- "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <45A22FCE-10FA-485C-8624-F1F22086B5E9@linux.dev>
-References: <20240811101921.4031-1-songmuchun@bytedance.com>
- <20240811101921.4031-5-songmuchun@bytedance.com> <ZshyPVEc9w4sqXJy@fedora>
- <CAMZfGtW-AG9gBD2f=FwNAZqxoFZwoEECbS0+4eurnSoxN5AhRg@mail.gmail.com>
-To: Muchun Song <songmuchun@bytedance.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+X-Rspamd-Queue-Id: 136521F842
+X-Spam-Level: 
+X-Spamd-Result: default: False [-6.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	DWL_DNSWL_MED(-2.00)[suse.com:dkim];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:dkim,suse.com:mid]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -6.51
+X-Spam-Flag: NO
 
-
-
-> On Aug 26, 2024, at 15:06, Muchun Song <songmuchun@bytedance.com> =
-wrote:
+On Mon, 2024-08-26 at 11:07 +0530, Nilay Shroff wrote:
+> >=20
+> The "rand()" function in 'awk' returns a floating point value between
+> 0 and 1 (i.e. [0, 1]). So it's possible to have sleep for some cases
+> go
+> upto ~5.1 seconds. So if the intention is to sleep between 0.1 and 5=20
+> seconds precisely then we may want to use,
+> =C2=A0
+> sleep(0.1 + 4.9 * rand());
 >=20
-> On Fri, Aug 23, 2024 at 7:28=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
-wrote:
->>=20
->> On Sun, Aug 11, 2024 at 06:19:21 PM +0800, Muchun Song wrote:
->>> Supposing the following scenario.
->>>=20
->>> CPU0                                                                =
-CPU1
->>>=20
->>> blk_mq_request_issue_directly()                                     =
-blk_mq_unquiesce_queue()
->>>    if (blk_queue_quiesced())                                         =
-  blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)   3) store
->>>        blk_mq_insert_request()                                       =
-  blk_mq_run_hw_queues()
->>>            /*                                                        =
-      blk_mq_run_hw_queue()
->>>             * Add request to dispatch list or set bitmap of          =
-          if (!blk_mq_hctx_has_pending())     4) load
->>>             * software queue.                  1) store              =
-              return
->>>             */
->>>        blk_mq_run_hw_queue()
->>>            if (blk_queue_quiesced())           2) load
->>>                return
->>>            blk_mq_sched_dispatch_requests()
->>>=20
->>> The full memory barrier should be inserted between 1) and 2), as =
-well as
->>> between 3) and 4) to make sure that either CPU0 sees =
-QUEUE_FLAG_QUIESCED is
->>> cleared or CPU1 sees dispatch list or setting of bitmap of software =
-queue.
->>> Otherwise, either CPU will not re-run the hardware queue causing =
-starvation.
->>=20
->> Memory barrier shouldn't serve as bug fix for two slow code paths.
->>=20
->> One simple fix is to add helper of blk_queue_quiesced_lock(), and
->> call the following check on CPU0:
->>=20
->>        if (blk_queue_quiesced_lock())
->>         blk_mq_run_hw_queue();
->=20
-> This only fixes blk_mq_request_issue_directly(), I think anywhere that
-> matching this
-> pattern (inserting a request to dispatch list and then running the
-> hardware queue)
-> should be fixed. And I think there are many places which match this
-> pattern (E.g.
-> blk_mq_submit_bio()). The above graph should be adjusted to the =
-following.
->=20
-> CPU0                                        CPU1
->=20
-> blk_mq_insert_request()         1) store    blk_mq_unquiesce_queue()
-> blk_mq_run_hw_queue()
-> blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)       3) store
->    if (blk_queue_quiesced())   2) load         blk_mq_run_hw_queues()
->        return                                      =
-blk_mq_run_hw_queue()
->    blk_mq_sched_dispatch_requests()                    if
-> (!blk_mq_hctx_has_pending())     4) load
->                                                            return
 
-Sorry. There is something wrong with my email client. Resend the graph.
+Yes, I know. I thought it didn't really matter as the 5s limit was
+arbitrary anyway.
 
-CPU0                                        CPU1
-
-blk_mq_insert_request()         1) store    blk_mq_unquiesce_queue()
-blk_mq_run_hw_queue()                       =
-blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)       3) store
-    if (blk_queue_quiesced())   2) load         blk_mq_run_hw_queues()
-        return                                      =
-blk_mq_run_hw_queue()
-    blk_mq_sched_dispatch_requests()                    if =
-(!blk_mq_hctx_has_pending())     4) load
-                                                            return
-
+> However this is not a major problem and we may ignore.=20
+> Otherwise, code looks good to me.
+> =C2=A0=C2=A0=C2=A0=20
+> Reviewed-by: Nilay Shroff (nilay@linux.ibm.com)
 >=20
-> So I think fixing blk_mq_run_hw_queue() could cover all of the =
-situations.
-> Maybe I thought wrongly. Please correct me.
->=20
-> Muchun,
-> Thanks.
 
+Thanks!
+Martin
 
