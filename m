@@ -1,183 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE83083CA0
-	for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 06:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8E0770E5
+	for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 07:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724655332; cv=none; b=fSjODYi/waD0v5o2yrLGwOfxl6NFrhmUekXiJQf99HYBligC3HcNZuYFELLu+BHu6MIYKeVrmWVXBwgvZ01fF7oGpjo5Nm/an7JymkQ8e5KZMKfdUwaZXgCEvePwXyafYaMIeCLuy8O51v5wSekECBA+L3XJbBMRX/8qmStIEcE=
+	t=1724656019; cv=none; b=FjPp97V612oWcFFbR3jhyNhg3WcaCHou8CjtCzs63p2R3RDQc50ciVLbm0dScqArbwPpT0qZvl8oATUMJadGrGe6KZzfxkDe8C2uQDehk0k0P5tOJsXhcfxT5Cla3JUybQ/ToaFnq+TlU+u5sURtMcRM7jT6oQ4c1tpC/1K5g3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724655332; c=relaxed/simple;
-	bh=QYLmQ33xF9IhHkHlckYjtaDgAb8yn61cdSbD9bi4KjQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HRp7+vE5K58irSIHmIoC4uWUS+l6JJBG4Xa1NyORksdH1RDW6wjfmG7O/p4PMbTc+dP9Add9D0FvQWzXr3qk2UZopkuH/LNJlHiiNIUwokxF4/jC0uHv131pbuhAz0PJlg0kxCpmomk+mPADy1hwsUEE1AOeTeWFp+FevDxdhiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VRVsNonU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1724656019; c=relaxed/simple;
+	bh=SNFRIgBjVGxWaU8ivtlCUq9fNoElyookR1hHqJENiVo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iIaYs94AB3xjTwWCwsO7dHLx3howeNHMtvB4JqJGvk28KvWjCOFIQB/l+EOouh2NC4vxL6oONg5We3lqMX6jS8vdBPkRR0ArexXxLjBGna+PHmixtueq4iKsFZO3vPfSmEwCY4zXlllKh7UZoDSgzN9cPxtx7faWS95ir4koFdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=lJe1qhzj; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRVsNonU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724655330;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O2z2TGSU/AHVRPl6zHGllpDM2MIUry+mfdVEnD5XzqM=;
-	b=VRVsNonUPf69gF9USxt58NZ7PWjxfnXLzRkIKtJZ71Ne8E6JRbfdZrtBFEQyVeUljX0pe+
-	zIphCoMpeynUbCvC1vcd0G0BRmrnDge0+yuHCq5NWNTsXhUNLlsa0XJR/YRdTbgE9mvSxe
-	9tK1YH4To5BVfpB2KNeB0xzEewFGoZM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-WX7fpqQVNBizdEtlGu7CMA-1; Mon, 26 Aug 2024 02:55:27 -0400
-X-MC-Unique: WX7fpqQVNBizdEtlGu7CMA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280f233115so37743655e9.2
-        for <linux-block@vger.kernel.org>; Sun, 25 Aug 2024 23:55:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="lJe1qhzj"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3719896b7c8so2055864f8f.3
+        for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 00:06:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1724656015; x=1725260815; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cou5hke/PmBsaGSWYmEtI+A/77Tv+wsmqhvz0fRoOco=;
+        b=lJe1qhzjlRugjNqoEn3AlnIhUpOYbBqPrdJEKubcFYASZ7LBhT52O7KsBUmbuLaCIt
+         BaYoCP1mKasBm2KOT1qtQ6eTkuM8Q6LpLTG16Yoj6Xk7jSLru6a/K+u/Gp5Zb/dbEHE/
+         B+i6jLI5c7r4Jcpn3MJ6eT42wUc34ZY1fSQ1WQlhE6YboIE/HZGm3FU1CZgbYZoqbrwd
+         YuYBL+sJolGnIKiYwrdUaxSf5RwbA/nbP/H1hs8DEDL4InyFX1oYY3oDv34dHL9yGTbX
+         mR4p0c+BX6GzHXuKm3rricfEM6bDH7U+W9004s2QgYm/QvfgCaXdYS7F3bxJFUlaokI7
+         uKyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724655326; x=1725260126;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O2z2TGSU/AHVRPl6zHGllpDM2MIUry+mfdVEnD5XzqM=;
-        b=FLT6elzH65a6WI4xgRvmsv+fep20gHe9SHOlWIPcFii3D0D/32qtyG3H+ZdKwGFc/O
-         Q72izbhfyaDoZnovePwaCpx0yh9KaXwEJKaZEuUTjl/BqHEp6dmZuCSaNDbD/NgTFNo1
-         /v7h0FMKz1IlhT1tm9r5XR3mX+eJBzG54HNEq2gBtRTuaRzCQJWhInrrL5qu6zxKGXOB
-         YM2dsLjei73Je+YkafO5s+0JE+j//mNCsv954pXLOl+ZSw4fpYfW+BlxEFRNeWgPF5Qf
-         GQ2E2G1hXTNmsiZxHWrqmmPxL0Fzp6lYLj3NjRw9hnXcRxlRZfQJsttR9CVl8MjHhfIY
-         rJbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAxF/HFc4RsaM5OkqfiF+SdmOnU1dMJY000li9gmpbqKGLYtdIb0oU8Lm4NKNz+pFxkcBcI3W4OVSnig==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb3StHX02oxfpkt0uYLgyirFlqzLgePQyXvplso5hA4P6HKY4s
-	3Bx9XlBaCtBF2cGf3TAv2Bx0PIuehkR4o7oZk8ERy+9ANWL5ttnk5g18KAr+ITsGE7fc79xd8R4
-	zR+Fwh6iCxI2p032Jcc1C+gjwAbLlbbvuNwHoiyXl2JxNEMAvkakQ9ZStE3BN
-X-Received: by 2002:a05:600c:3b05:b0:428:1d27:f3db with SMTP id 5b1f17b1804b1-42b8925903bmr48419335e9.35.1724655326193;
-        Sun, 25 Aug 2024 23:55:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHDbFRllMEQMy18KUHdwX+H4HgEvRwxNEXxmAF22JEUYmhjpbjXAt/FXNy3VJHqD5ffhjLW9Q==
-X-Received: by 2002:a05:600c:3b05:b0:428:1d27:f3db with SMTP id 5b1f17b1804b1-42b8925903bmr48419155e9.35.1724655325664;
-        Sun, 25 Aug 2024 23:55:25 -0700 (PDT)
-Received: from dhcp-64-164.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abef81777sm178404725e9.27.2024.08.25.23.55.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Aug 2024 23:55:25 -0700 (PDT)
-Message-ID: <23f1b79be57f1a4d6ce0806fa149d687c2c6d275.camel@redhat.com>
-Subject: Re: [PATCH v3 7/9] vdpa: solidrun: Fix UB bug with devres
-From: Philipp Stanner <pstanner@redhat.com>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: alexandre.torgue@foss.st.com, alvaro.karsz@solid-run.com,
- andy@kernel.org,  axboe@kernel.dk, bhelgaas@google.com, brgl@bgdev.pl,
- broonie@kernel.org,  corbet@lwn.net, davem@davemloft.net,
- dlechner@baylibre.com, dlemoal@kernel.org,  edumazet@google.com,
- eperezma@redhat.com, hao.wu@intel.com, hare@suse.de,  jasowang@redhat.com,
- joabreu@synopsys.com, kch@nvidia.com, kuba@kernel.org, 
- linus.walleij@linaro.org, linux-arm-kernel@lists.infradead.org, 
- linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com, 
- mdf@kernel.org, mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, 
- richardcochran@gmail.com, stable@vger.kernel.org, trix@redhat.com, 
- u.kleine-koenig@pengutronix.de, virtualization@lists.linux.dev, 
- xuanzhuo@linux.alibaba.com, yilun.xu@intel.com
-Date: Mon, 26 Aug 2024 08:55:22 +0200
-In-Reply-To: <81de3898-9af7-4ad1-80ef-68d1f60d4c28@wanadoo.fr>
-References: <20240822134744.44919-1-pstanner@redhat.com>
-	 <20240822134744.44919-8-pstanner@redhat.com>
-	 <81de3898-9af7-4ad1-80ef-68d1f60d4c28@wanadoo.fr>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+        d=1e100.net; s=20230601; t=1724656015; x=1725260815;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cou5hke/PmBsaGSWYmEtI+A/77Tv+wsmqhvz0fRoOco=;
+        b=k9HrPH7h95veTbKw/OJGUe8l6KAiRT6zBAmJGnp8/BBawzrR3ZEzfNuPDSL2xs0qx3
+         6GwLdXHZS0fAq40jXGluIMTDws7g9s1rVZclqLO6Q+7QO0N59iMfumYv7U+NAuRC/Wjp
+         Mzt6Tei7TbOqsADG44hkxtTw3R5sI9/gKA3yGiin/MjpwgXRhHB2B8pPzaWhz5LRXeuy
+         YkJ8mDxoWGWCyAfunzycfoNiLlClj16WD6DwRBqCmpR9c5O6Xl+JyndbFs4R3Sl2QoDa
+         XjrMSzjbk+YnO/iH+yFf1rTt5cSQqux3q3AGd5/fSqHJ09sd53AQWYQ1AW2EZyTpvtLu
+         iyiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYhlJk663GVmnRb+gsHh8C1gAnEtu7j4/3EQQy4tL5m4hfAwqechmvl4RUpn8QN6Ws23tZMVkFAjH8pA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjUdUf47vbFSS9F4s+hmq7prdPcfZrMS5YBRknRRbnYDc6IJOk
+	FImFaHqU5UOnyyYoERTbIDyZTDQ3KtgJ+220uG1baf4Zr581NN5XQBd4spiJZqbGEXoxaAJgyQf
+	l36BK69hxEOFemlF7jgN31zTzJTVn02XfqU299pl/bPVmt7GDO6GKog==
+X-Google-Smtp-Source: AGHT+IH0yjPV9DOuSzxG5nR7SIxFbQUEOfD/AQ3YPBP4CCB95G07H3GrdBQdq+CphyFDEtYdwCNVbzC3/qRbcDo9HGE=
+X-Received: by 2002:a5d:66c1:0:b0:371:882d:ce9d with SMTP id
+ ffacd0b85a97d-373118643dbmr5639415f8f.36.1724656015242; Mon, 26 Aug 2024
+ 00:06:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240811101921.4031-1-songmuchun@bytedance.com>
+ <20240811101921.4031-5-songmuchun@bytedance.com> <ZshyPVEc9w4sqXJy@fedora>
+In-Reply-To: <ZshyPVEc9w4sqXJy@fedora>
+From: Muchun Song <songmuchun@bytedance.com>
+Date: Mon, 26 Aug 2024 15:06:18 +0800
+Message-ID: <CAMZfGtW-AG9gBD2f=FwNAZqxoFZwoEECbS0+4eurnSoxN5AhRg@mail.gmail.com>
+Subject: Re: Re: [PATCH 4/4] block: fix fix ordering between checking
+ QUEUE_FLAG_QUIESCED and adding requests to hctx->dispatch
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, "open list:BLOCK LAYER" <linux-block@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, muchun.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2024-08-22 at 16:34 +0200, Christophe JAILLET wrote:
-> Le 22/08/2024 =C3=A0 15:47, Philipp Stanner a =C3=A9crit=C2=A0:
-> > In psnet_open_pf_bar() and snet_open_vf_bar() a string later passed
-> > to
-> > pcim_iomap_regions() is placed on the stack. Neither
-> > pcim_iomap_regions() nor the functions it calls copy that string.
-> >=20
-> > Should the string later ever be used, this, consequently, causes
-> > undefined behavior since the stack frame will by then have
-> > disappeared.
-> >=20
-> > Fix the bug by allocating the strings on the heap through
-> > devm_kasprintf().
-> >=20
-> > Cc: stable@vger.kernel.org	# v6.3
-> > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
-> > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > Closes:
-> > https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanado=
-o.fr/
-> > Suggested-by: Andy Shevchenko <andy@kernel.org>
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > ---
-> > =C2=A0 drivers/vdpa/solidrun/snet_main.c | 13 +++++++++----
-> > =C2=A0 1 file changed, 9 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/drivers/vdpa/solidrun/snet_main.c
-> > b/drivers/vdpa/solidrun/snet_main.c
-> > index 99428a04068d..67235f6190ef 100644
-> > --- a/drivers/vdpa/solidrun/snet_main.c
-> > +++ b/drivers/vdpa/solidrun/snet_main.c
-> > @@ -555,7 +555,7 @@ static const struct vdpa_config_ops
-> > snet_config_ops =3D {
-> > =C2=A0=20
-> > =C2=A0 static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet
-> > *psnet)
-> > =C2=A0 {
-> > -	char name[50];
-> > +	char *name;
-> > =C2=A0=C2=A0	int ret, i, mask =3D 0;
-> > =C2=A0=C2=A0	/* We don't know which BAR will be used to communicate..
-> > =C2=A0=C2=A0	 * We will map every bar with len > 0.
-> > @@ -573,7 +573,10 @@ static int psnet_open_pf_bar(struct pci_dev
-> > *pdev, struct psnet *psnet)
-> > =C2=A0=C2=A0		return -ENODEV;
-> > =C2=A0=C2=A0	}
-> > =C2=A0=20
-> > -	snprintf(name, sizeof(name), "psnet[%s]-bars",
-> > pci_name(pdev));
-> > +	name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-
-> > bars", pci_name(pdev));
-> > +	if (!name)
-> > +		return -ENOMEM;
-> > +
-> > =C2=A0=C2=A0	ret =3D pcim_iomap_regions(pdev, mask, name);
-> > =C2=A0=C2=A0	if (ret) {
-> > =C2=A0=C2=A0		SNET_ERR(pdev, "Failed to request and map PCI
-> > BARs\n");
-> > @@ -590,10 +593,12 @@ static int psnet_open_pf_bar(struct pci_dev
-> > *pdev, struct psnet *psnet)
-> > =C2=A0=20
-> > =C2=A0 static int snet_open_vf_bar(struct pci_dev *pdev, struct snet
-> > *snet)
-> > =C2=A0 {
-> > -	char name[50];
-> > +	char *name;
-> > =C2=A0=C2=A0	int ret;
-> > =C2=A0=20
-> > -	snprintf(name, sizeof(name), "snet[%s]-bar",
-> > pci_name(pdev));
-> > +	name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-
-> > bars", pci_name(pdev));
->=20
-> s/psnet/snet/
+On Fri, Aug 23, 2024 at 7:28=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> On Sun, Aug 11, 2024 at 06:19:21 PM +0800, Muchun Song wrote:
+> > Supposing the following scenario.
+> >
+> > CPU0                                                                CPU=
+1
+> >
+> > blk_mq_request_issue_directly()                                     blk=
+_mq_unquiesce_queue()
+> >     if (blk_queue_quiesced())                                          =
+ blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)   3) store
+> >         blk_mq_insert_request()                                        =
+ blk_mq_run_hw_queues()
+> >             /*                                                         =
+     blk_mq_run_hw_queue()
+> >              * Add request to dispatch list or set bitmap of           =
+         if (!blk_mq_hctx_has_pending())     4) load
+> >              * software queue.                  1) store               =
+             return
+> >              */
+> >         blk_mq_run_hw_queue()
+> >             if (blk_queue_quiesced())           2) load
+> >                 return
+> >             blk_mq_sched_dispatch_requests()
+> >
+> > The full memory barrier should be inserted between 1) and 2), as well a=
+s
+> > between 3) and 4) to make sure that either CPU0 sees QUEUE_FLAG_QUIESCE=
+D is
+> > cleared or CPU1 sees dispatch list or setting of bitmap of software que=
+ue.
+> > Otherwise, either CPU will not re-run the hardware queue causing starva=
+tion.
+>
+> Memory barrier shouldn't serve as bug fix for two slow code paths.
+>
+> One simple fix is to add helper of blk_queue_quiesced_lock(), and
+> call the following check on CPU0:
+>
+>         if (blk_queue_quiesced_lock())
+>          blk_mq_run_hw_queue();
 
-sharp eyes ;)
+This only fixes blk_mq_request_issue_directly(), I think anywhere that
+matching this
+pattern (inserting a request to dispatch list and then running the
+hardware queue)
+should be fixed. And I think there are many places which match this
+pattern (E.g.
+blk_mq_submit_bio()). The above graph should be adjusted to the following.
 
-Thx,
-P.
+CPU0                                        CPU1
 
->=20
-> > +	if (!name)
-> > +		return -ENOMEM;
-> > =C2=A0=C2=A0	/* Request and map BAR */
-> > =C2=A0=C2=A0	ret =3D pcim_iomap_regions(pdev, BIT(snet->psnet-
-> > >cfg.vf_bar), name);
-> > =C2=A0=C2=A0	if (ret) {
->=20
+blk_mq_insert_request()         1) store    blk_mq_unquiesce_queue()
+blk_mq_run_hw_queue()
+blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)       3) store
+    if (blk_queue_quiesced())   2) load         blk_mq_run_hw_queues()
+        return                                      blk_mq_run_hw_queue()
+    blk_mq_sched_dispatch_requests()                    if
+(!blk_mq_hctx_has_pending())     4) load
+                                                            return
 
+So I think fixing blk_mq_run_hw_queue() could cover all of the situations.
+Maybe I thought wrongly. Please correct me.
+
+Muchun,
+Thanks.
