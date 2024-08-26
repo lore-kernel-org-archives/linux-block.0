@@ -1,79 +1,86 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89015198E96;
-	Mon, 26 Aug 2024 17:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923232C1AC;
+	Mon, 26 Aug 2024 18:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724694257; cv=none; b=j53AmNwdZxdaDOFWZok581rxVhdhKLp/jdiPhGI/ux4D4g9kT5fNL8TueHRgxe4EosJG0f+avgiPTLrGPybfKd8OMJJug/4xFN4So7N93M7I2TSESWFkOG7mDJfY7zZFK4CAqbH4MSLgFMLUwMNjPyqiMR8XnTlNclsgnGjZOKo=
+	t=1724697357; cv=none; b=mCy1thEKp5lRuJaZi7DPogIwNdKU0nwPSj0kErpvgHVnug/mZ+owEe/WKfVCJ1LnHickUpi8RJfDMbt540GRfTtSg/6sUOwAsOR4td0PMy0qq8BLLh1IP7DqxyJEFqWiG0RoEY0fWTopuUOcPO3haEzrDAL52y0ViUGgHOgXiAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724694257; c=relaxed/simple;
-	bh=Ky1WtZTB1vAFitwSZSr9oE2Lkfv8g9tc5SCDtUd5Igw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SNP17xEU/LDu5nqMIpLB/rxXXF6w2CxTiT7RYS54kLhWwQXSmIaSip/SyqCCh+in/K5dhc9FwvcVw841n5iw3whfq+aSobqb4rtkTvFEDqPGhsRv/gYUQxtv/hFDNhjCKmRP6qvMAbwLq4V3ONOcqigaTOuPkGH3aq2kdGNxWcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=h8BmHZmw; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1724697357; c=relaxed/simple;
+	bh=41OWzCeR717jbdyTy5lfbsmYoBvRHigvaotbcJ+AcAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GPWs1bOskkQ6xFxHZ+Evun9O2bpcxJLDHDE8ibpYiEYiPJczi5NMShGMSruIMqwxX68lM9vA/+C+HolaSt6oUsToAogGBquCrF5VWQTU/jEyJCD+RtXupTV5CA5hAhCm3FWuX9kGCRrhIeY09hXfakvI6GyS3GjPFGwP9KXuRKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DWsCZYVb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="h8BmHZmw"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4Wsyj54Rwmz6ClY9F;
-	Mon, 26 Aug 2024 17:44:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1724694244; x=1727286245; bh=Ky1WtZTB1vAFitwSZSr9oE2L
-	kfv8g9tc5SCDtUd5Igw=; b=h8BmHZmwBPtHY/5huyweT7LC/hAMCyRbF8I/nDUc
-	eInWFOIaDBLKsf8lBA747JuClgmy4aunEUTem/G+Zb1CBh1IASDyPUTvkMLdO9+X
-	qf9Im9LfJJDOPEtLBbARVpojuH0XyhSxuH+s1pxtSSbzb0ndrXh6q9dJydWXuOEf
-	9bkLSmmHa0O14/T+VRXR3GRbmD3jhZEV7dDoa8tyenLHf80v0Pa1BDJnwxoLR7YF
-	vRgyjI5dlCOoXvve3MUZyzxLD0S6dzNucYTg+phQSn2J5HNK6zgcaHT7GQr3m8oI
-	ZBY8H2kdtb4aZJ1oadDKSG/M5XNQpbawLnms14gmqV/TJw==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id TfuIq-julCUO; Mon, 26 Aug 2024 17:44:04 +0000 (UTC)
-Received: from [172.31.110.201] (unknown [216.9.110.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4Wsyhx6Vmgz6ClY98;
-	Mon, 26 Aug 2024 17:44:01 +0000 (UTC)
-Message-ID: <d0e017ac-8367-4bb8-9b7f-d72dd068fdb1@acm.org>
-Date: Mon, 26 Aug 2024 10:44:00 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DWsCZYVb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 533BCC4FEA2;
+	Mon, 26 Aug 2024 18:35:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724697357;
+	bh=41OWzCeR717jbdyTy5lfbsmYoBvRHigvaotbcJ+AcAI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DWsCZYVbTvpTbiWR8zNBWtHhYKp9jv7lmXpAq0Ve4WBwkg5UEweHGCqroHSdbzJBp
+	 +22hgLR2M8eQNGewc4vs215HcyxZ0bBfAYBEZb/QAY0VAkFbFBMh8pPSPtKYlGGexE
+	 0qtGp3j1mHl+OGBWMD9JSpyFAbH/aMB3leoezrxeNO9P+VnN04nH9abTTZbRbv/b2k
+	 aHa32etdRPFtOHvMcWcERGqVrK1jpAO3JnM3tUXps6pzEoXFt+0/OOpyOBkA5wcu9g
+	 RaIYOQONHXN74u8vPRixzyB6ZEU9z4dah7Jw7SDUQBhqjrRNqr5r+j0R3mJCm0A3qt
+	 6AJCKXLFuB8Aw==
+Date: Mon, 26 Aug 2024 08:35:56 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Konstantin Ovsepian <ovs@ovs.to>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, leitao@debian.org, ovs@meta.com
+Subject: Re: [PATCH] blk_iocost: fix more out of bound shifts
+Message-ID: <ZszLDKNSPsSAEXxr@slm.duckdns.org>
+References: <20240822154137.2627818-1-ovs@ovs.to>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/5] fs, block: refactor enum rw_hint
-To: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, kbusch@kernel.org,
- hch@lst.de, sagi@grimberg.me, martin.petersen@oracle.com,
- James.Bottomley@HansenPartnership.com, brauner@kernel.org, jack@suse.cz,
- jaegeuk@kernel.org, jlayton@kernel.org, chuck.lever@oracle.com
-Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, gost.dev@samsung.com, vishak.g@samsung.com,
- javier.gonz@samsung.com
-References: <20240826170606.255718-1-joshi.k@samsung.com>
- <CGME20240826171413epcas5p3f62c2cc57b50d6df8fa66af5fe5996c5@epcas5p3.samsung.com>
- <20240826170606.255718-2-joshi.k@samsung.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240826170606.255718-2-joshi.k@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822154137.2627818-1-ovs@ovs.to>
 
-On 8/26/24 10:06 AM, Kanchan Joshi wrote:
-> Change i_write_hint (in inode), bi_write_hint (in bio) and write_hint
-> (in request) to use u8 data-type rather than this enum.
+On Thu, Aug 22, 2024 at 08:41:36AM -0700, Konstantin Ovsepian wrote:
+> Recently running UBSAN caught few out of bound shifts in the
+> ioc_forgive_debts() function:
+> 
+> UBSAN: shift-out-of-bounds in block/blk-iocost.c:2142:38
+> shift exponent 80 is too large for 64-bit type 'u64' (aka 'unsigned long
+> long')
+> ...
+> UBSAN: shift-out-of-bounds in block/blk-iocost.c:2144:30
+> shift exponent 80 is too large for 64-bit type 'u64' (aka 'unsigned long
+> long')
+> ...
+> Call Trace:
+> <IRQ>
+> dump_stack_lvl+0xca/0x130
+> __ubsan_handle_shift_out_of_bounds+0x22c/0x280
+> ? __lock_acquire+0x6441/0x7c10
+> ioc_timer_fn+0x6cec/0x7750
+> ? blk_iocost_init+0x720/0x720
+> ? call_timer_fn+0x5d/0x470
+> call_timer_fn+0xfa/0x470
+> ? blk_iocost_init+0x720/0x720
+> __run_timer_base+0x519/0x700
+> ...
+> 
+> Actual impact of this issue was not identified but I propose to fix the
+> undefined behaviour.
+> The proposed fix to prevent those out of bound shifts consist of
+> precalculating exponent before using it the shift operations by taking
+> min value from the actual exponent and maximum possible number of bits.
+> 
+> Reported-by: Breno Leitao <leitao@debian.org>
+> Signed-off-by: Konstantin Ovsepian <ovs@ovs.to>
 
-That sounds fishy to me. Why to increase the size of this enum? Why to
-reduce the ability of the compiler to perform type checking? I think
-this needs to be motivated clearly in the patch description.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Bart.
+Thanks.
+
+-- 
+tejun
