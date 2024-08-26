@@ -1,231 +1,183 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA23E13BC35;
-	Mon, 26 Aug 2024 06:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE83083CA0
+	for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 06:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724654281; cv=none; b=i7WHJ81wECCLUZJXcpUj14c/gq/zhsmSHsg9WDzs0VnJqonzTo4szmwDJmpm8vyu1Z7tmr8aQ2IC/Z9yJRq2X79ZCB6LmBOdVIUvdCVhzOKyDkWztQO74AujxO4GLwIuPmBZBVQfcoR4A2+dFDj/1+iGIquMojL1lucwCoj1vjc=
+	t=1724655332; cv=none; b=fSjODYi/waD0v5o2yrLGwOfxl6NFrhmUekXiJQf99HYBligC3HcNZuYFELLu+BHu6MIYKeVrmWVXBwgvZ01fF7oGpjo5Nm/an7JymkQ8e5KZMKfdUwaZXgCEvePwXyafYaMIeCLuy8O51v5wSekECBA+L3XJbBMRX/8qmStIEcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724654281; c=relaxed/simple;
-	bh=8YiS0NVbpntah7NlxqDrvjOjb4m/yskhqzU/Dcc31JQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nrF4mLB3MYkarSGyu4PeR8P+fUCxuaBZQmGZjSUtAcKAHBVBVx++2q3lbIg4zwB9f5Qlr78itbbOGXcUSoj8y0dUlIM/JleLn8EzLJxMPTj0Y8I/7M90zPQtq5oFqkfjL6aPMyw12eIZfs+Zk5VuDwN6sm0bP5lR+dBGYmlUvxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=RntaQXJB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7Fq6KpsS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=RntaQXJB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7Fq6KpsS; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1724655332; c=relaxed/simple;
+	bh=QYLmQ33xF9IhHkHlckYjtaDgAb8yn61cdSbD9bi4KjQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HRp7+vE5K58irSIHmIoC4uWUS+l6JJBG4Xa1NyORksdH1RDW6wjfmG7O/p4PMbTc+dP9Add9D0FvQWzXr3qk2UZopkuH/LNJlHiiNIUwokxF4/jC0uHv131pbuhAz0PJlg0kxCpmomk+mPADy1hwsUEE1AOeTeWFp+FevDxdhiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VRVsNonU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="RntaQXJB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7Fq6KpsS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="RntaQXJB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7Fq6KpsS"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CDA2721A9F;
-	Mon, 26 Aug 2024 06:37:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724654277; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRVsNonU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724655330;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+ZDV6v6nuwIxH+xFPpK0scrQAAGNBkk5VdIq6lbCH+0=;
-	b=RntaQXJBBX+DVQyQCKn2+wVpQEsk0ZAhNxWvGhqKFtKbLcyef+dqrhyHuPXWs1zmfZ8M+x
-	zIk3J+uXZ6orS/q8t51eSuQ74i6Rd0+GWfhImaiJCQXApQrnCewgbSxr8ArmrXI7m+cfb4
-	V8hbX2usSoGSWzkor+WMknP/1i3GFso=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724654277;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+ZDV6v6nuwIxH+xFPpK0scrQAAGNBkk5VdIq6lbCH+0=;
-	b=7Fq6KpsSIq2jqNgoz+Zg7JBheXbHo97zLZHuoRHzxz4/L1VSHLccsc8C3AFgf5OTZCUK6M
-	MO3IThti+bZ34KBQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724654277; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+ZDV6v6nuwIxH+xFPpK0scrQAAGNBkk5VdIq6lbCH+0=;
-	b=RntaQXJBBX+DVQyQCKn2+wVpQEsk0ZAhNxWvGhqKFtKbLcyef+dqrhyHuPXWs1zmfZ8M+x
-	zIk3J+uXZ6orS/q8t51eSuQ74i6Rd0+GWfhImaiJCQXApQrnCewgbSxr8ArmrXI7m+cfb4
-	V8hbX2usSoGSWzkor+WMknP/1i3GFso=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724654277;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+ZDV6v6nuwIxH+xFPpK0scrQAAGNBkk5VdIq6lbCH+0=;
-	b=7Fq6KpsSIq2jqNgoz+Zg7JBheXbHo97zLZHuoRHzxz4/L1VSHLccsc8C3AFgf5OTZCUK6M
-	MO3IThti+bZ34KBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6EE8713724;
-	Mon, 26 Aug 2024 06:37:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +pZxCcMizGZkOAAAD6G6ig
-	(envelope-from <neilb@suse.de>); Mon, 26 Aug 2024 06:37:55 +0000
-From: NeilBrown <neilb@suse.de>
-To: Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 7/7] Block: switch bd_prepare_to_claim to use wait_var_event_mutex()
-Date: Mon, 26 Aug 2024 16:31:04 +1000
-Message-ID: <20240826063659.15327-8-neilb@suse.de>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240826063659.15327-1-neilb@suse.de>
-References: <20240826063659.15327-1-neilb@suse.de>
+	bh=O2z2TGSU/AHVRPl6zHGllpDM2MIUry+mfdVEnD5XzqM=;
+	b=VRVsNonUPf69gF9USxt58NZ7PWjxfnXLzRkIKtJZ71Ne8E6JRbfdZrtBFEQyVeUljX0pe+
+	zIphCoMpeynUbCvC1vcd0G0BRmrnDge0+yuHCq5NWNTsXhUNLlsa0XJR/YRdTbgE9mvSxe
+	9tK1YH4To5BVfpB2KNeB0xzEewFGoZM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-WX7fpqQVNBizdEtlGu7CMA-1; Mon, 26 Aug 2024 02:55:27 -0400
+X-MC-Unique: WX7fpqQVNBizdEtlGu7CMA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280f233115so37743655e9.2
+        for <linux-block@vger.kernel.org>; Sun, 25 Aug 2024 23:55:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724655326; x=1725260126;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O2z2TGSU/AHVRPl6zHGllpDM2MIUry+mfdVEnD5XzqM=;
+        b=FLT6elzH65a6WI4xgRvmsv+fep20gHe9SHOlWIPcFii3D0D/32qtyG3H+ZdKwGFc/O
+         Q72izbhfyaDoZnovePwaCpx0yh9KaXwEJKaZEuUTjl/BqHEp6dmZuCSaNDbD/NgTFNo1
+         /v7h0FMKz1IlhT1tm9r5XR3mX+eJBzG54HNEq2gBtRTuaRzCQJWhInrrL5qu6zxKGXOB
+         YM2dsLjei73Je+YkafO5s+0JE+j//mNCsv954pXLOl+ZSw4fpYfW+BlxEFRNeWgPF5Qf
+         GQ2E2G1hXTNmsiZxHWrqmmPxL0Fzp6lYLj3NjRw9hnXcRxlRZfQJsttR9CVl8MjHhfIY
+         rJbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAxF/HFc4RsaM5OkqfiF+SdmOnU1dMJY000li9gmpbqKGLYtdIb0oU8Lm4NKNz+pFxkcBcI3W4OVSnig==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb3StHX02oxfpkt0uYLgyirFlqzLgePQyXvplso5hA4P6HKY4s
+	3Bx9XlBaCtBF2cGf3TAv2Bx0PIuehkR4o7oZk8ERy+9ANWL5ttnk5g18KAr+ITsGE7fc79xd8R4
+	zR+Fwh6iCxI2p032Jcc1C+gjwAbLlbbvuNwHoiyXl2JxNEMAvkakQ9ZStE3BN
+X-Received: by 2002:a05:600c:3b05:b0:428:1d27:f3db with SMTP id 5b1f17b1804b1-42b8925903bmr48419335e9.35.1724655326193;
+        Sun, 25 Aug 2024 23:55:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHDbFRllMEQMy18KUHdwX+H4HgEvRwxNEXxmAF22JEUYmhjpbjXAt/FXNy3VJHqD5ffhjLW9Q==
+X-Received: by 2002:a05:600c:3b05:b0:428:1d27:f3db with SMTP id 5b1f17b1804b1-42b8925903bmr48419155e9.35.1724655325664;
+        Sun, 25 Aug 2024 23:55:25 -0700 (PDT)
+Received: from dhcp-64-164.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abef81777sm178404725e9.27.2024.08.25.23.55.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Aug 2024 23:55:25 -0700 (PDT)
+Message-ID: <23f1b79be57f1a4d6ce0806fa149d687c2c6d275.camel@redhat.com>
+Subject: Re: [PATCH v3 7/9] vdpa: solidrun: Fix UB bug with devres
+From: Philipp Stanner <pstanner@redhat.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: alexandre.torgue@foss.st.com, alvaro.karsz@solid-run.com,
+ andy@kernel.org,  axboe@kernel.dk, bhelgaas@google.com, brgl@bgdev.pl,
+ broonie@kernel.org,  corbet@lwn.net, davem@davemloft.net,
+ dlechner@baylibre.com, dlemoal@kernel.org,  edumazet@google.com,
+ eperezma@redhat.com, hao.wu@intel.com, hare@suse.de,  jasowang@redhat.com,
+ joabreu@synopsys.com, kch@nvidia.com, kuba@kernel.org, 
+ linus.walleij@linaro.org, linux-arm-kernel@lists.infradead.org, 
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com, 
+ mdf@kernel.org, mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+ richardcochran@gmail.com, stable@vger.kernel.org, trix@redhat.com, 
+ u.kleine-koenig@pengutronix.de, virtualization@lists.linux.dev, 
+ xuanzhuo@linux.alibaba.com, yilun.xu@intel.com
+Date: Mon, 26 Aug 2024 08:55:22 +0200
+In-Reply-To: <81de3898-9af7-4ad1-80ef-68d1f60d4c28@wanadoo.fr>
+References: <20240822134744.44919-1-pstanner@redhat.com>
+	 <20240822134744.44919-8-pstanner@redhat.com>
+	 <81de3898-9af7-4ad1-80ef-68d1f60d4c28@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
 
-bd_prepare_to_claim() contains an open-coded version of the new
-wait_var_event_mutex().
-Change it to use that function and re-organise the code to benefit from
-this change.
+On Thu, 2024-08-22 at 16:34 +0200, Christophe JAILLET wrote:
+> Le 22/08/2024 =C3=A0 15:47, Philipp Stanner a =C3=A9crit=C2=A0:
+> > In psnet_open_pf_bar() and snet_open_vf_bar() a string later passed
+> > to
+> > pcim_iomap_regions() is placed on the stack. Neither
+> > pcim_iomap_regions() nor the functions it calls copy that string.
+> >=20
+> > Should the string later ever be used, this, consequently, causes
+> > undefined behavior since the stack frame will by then have
+> > disappeared.
+> >=20
+> > Fix the bug by allocating the strings on the heap through
+> > devm_kasprintf().
+> >=20
+> > Cc: stable@vger.kernel.org	# v6.3
+> > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
+> > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> > Closes:
+> > https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanado=
+o.fr/
+> > Suggested-by: Andy Shevchenko <andy@kernel.org>
+> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > ---
+> > =C2=A0 drivers/vdpa/solidrun/snet_main.c | 13 +++++++++----
+> > =C2=A0 1 file changed, 9 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/drivers/vdpa/solidrun/snet_main.c
+> > b/drivers/vdpa/solidrun/snet_main.c
+> > index 99428a04068d..67235f6190ef 100644
+> > --- a/drivers/vdpa/solidrun/snet_main.c
+> > +++ b/drivers/vdpa/solidrun/snet_main.c
+> > @@ -555,7 +555,7 @@ static const struct vdpa_config_ops
+> > snet_config_ops =3D {
+> > =C2=A0=20
+> > =C2=A0 static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet
+> > *psnet)
+> > =C2=A0 {
+> > -	char name[50];
+> > +	char *name;
+> > =C2=A0=C2=A0	int ret, i, mask =3D 0;
+> > =C2=A0=C2=A0	/* We don't know which BAR will be used to communicate..
+> > =C2=A0=C2=A0	 * We will map every bar with len > 0.
+> > @@ -573,7 +573,10 @@ static int psnet_open_pf_bar(struct pci_dev
+> > *pdev, struct psnet *psnet)
+> > =C2=A0=C2=A0		return -ENODEV;
+> > =C2=A0=C2=A0	}
+> > =C2=A0=20
+> > -	snprintf(name, sizeof(name), "psnet[%s]-bars",
+> > pci_name(pdev));
+> > +	name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-
+> > bars", pci_name(pdev));
+> > +	if (!name)
+> > +		return -ENOMEM;
+> > +
+> > =C2=A0=C2=A0	ret =3D pcim_iomap_regions(pdev, mask, name);
+> > =C2=A0=C2=A0	if (ret) {
+> > =C2=A0=C2=A0		SNET_ERR(pdev, "Failed to request and map PCI
+> > BARs\n");
+> > @@ -590,10 +593,12 @@ static int psnet_open_pf_bar(struct pci_dev
+> > *pdev, struct psnet *psnet)
+> > =C2=A0=20
+> > =C2=A0 static int snet_open_vf_bar(struct pci_dev *pdev, struct snet
+> > *snet)
+> > =C2=A0 {
+> > -	char name[50];
+> > +	char *name;
+> > =C2=A0=C2=A0	int ret;
+> > =C2=A0=20
+> > -	snprintf(name, sizeof(name), "snet[%s]-bar",
+> > pci_name(pdev));
+> > +	name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-
+> > bars", pci_name(pdev));
+>=20
+> s/psnet/snet/
 
-Signed-off-by: NeilBrown <neilb@suse.de>
----
- block/bdev.c | 49 +++++++++++++++++++------------------------------
- 1 file changed, 19 insertions(+), 30 deletions(-)
+sharp eyes ;)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 21e688fb6449..6e827ee02e7d 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -487,10 +487,10 @@ long nr_blockdev_pages(void)
-  * Test whether @bdev can be claimed by @holder.
-  *
-  * RETURNS:
-- * %true if @bdev can be claimed, %false otherwise.
-+ * %0 if @bdev can be claimed, %-EBUSY otherwise.
-  */
--static bool bd_may_claim(struct block_device *bdev, void *holder,
--		const struct blk_holder_ops *hops)
-+static int bd_may_claim(struct block_device *bdev, void *holder,
-+			const struct blk_holder_ops *hops)
- {
- 	struct block_device *whole = bdev_whole(bdev);
- 
-@@ -503,9 +503,9 @@ static bool bd_may_claim(struct block_device *bdev, void *holder,
- 		if (bdev->bd_holder == holder) {
- 			if (WARN_ON_ONCE(bdev->bd_holder_ops != hops))
- 				return false;
--			return true;
-+			return 0;
- 		}
--		return false;
-+		return -EBUSY;
- 	}
- 
- 	/*
-@@ -514,8 +514,8 @@ static bool bd_may_claim(struct block_device *bdev, void *holder,
- 	 */
- 	if (whole != bdev &&
- 	    whole->bd_holder && whole->bd_holder != bd_may_claim)
--		return false;
--	return true;
-+		return -EBUSY;
-+	return 0;
- }
- 
- /**
-@@ -535,43 +535,32 @@ int bd_prepare_to_claim(struct block_device *bdev, void *holder,
- 		const struct blk_holder_ops *hops)
- {
- 	struct block_device *whole = bdev_whole(bdev);
-+	int err = 0;
- 
- 	if (WARN_ON_ONCE(!holder))
- 		return -EINVAL;
--retry:
--	mutex_lock(&bdev_lock);
--	/* if someone else claimed, fail */
--	if (!bd_may_claim(bdev, holder, hops)) {
--		mutex_unlock(&bdev_lock);
--		return -EBUSY;
--	}
- 
--	/* if claiming is already in progress, wait for it to finish */
--	if (whole->bd_claiming) {
--		wait_queue_head_t *wq = __var_waitqueue(&whole->bd_claiming);
--		DEFINE_WAIT(wait);
--
--		prepare_to_wait(wq, &wait, TASK_UNINTERRUPTIBLE);
--		mutex_unlock(&bdev_lock);
--		schedule();
--		finish_wait(wq, &wait);
--		goto retry;
--	}
-+	mutex_lock(&bdev_lock);
-+	wait_var_event_mutex(&whole->bd_claiming,
-+			     (err = bd_may_claim(bdev, holder, hops)) != 0 ||
-+			     whole->bd_claiming == NULL,
-+			     &bdev_lock);
- 
--	/* yay, all mine */
--	whole->bd_claiming = holder;
-+	/* if someone else claimed, fail */
-+	if (!err)
-+		/* yay, all mine */
-+		whole->bd_claiming = holder;
- 	mutex_unlock(&bdev_lock);
--	return 0;
-+	return err;
- }
- EXPORT_SYMBOL_GPL(bd_prepare_to_claim); /* only for the loop driver */
- 
- static void bd_clear_claiming(struct block_device *whole, void *holder)
- {
--	lockdep_assert_held(&bdev_lock);
- 	/* tell others that we're done */
- 	BUG_ON(whole->bd_claiming != holder);
- 	whole->bd_claiming = NULL;
--	wake_up_var(&whole->bd_claiming);
-+	wake_up_var_locked(&whole->bd_claiming, &bdev_lock);
- }
- 
- /**
--- 
-2.44.0
+Thx,
+P.
+
+>=20
+> > +	if (!name)
+> > +		return -ENOMEM;
+> > =C2=A0=C2=A0	/* Request and map BAR */
+> > =C2=A0=C2=A0	ret =3D pcim_iomap_regions(pdev, BIT(snet->psnet-
+> > >cfg.vf_bar), name);
+> > =C2=A0=C2=A0	if (ret) {
+>=20
 
