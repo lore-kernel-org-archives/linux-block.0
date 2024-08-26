@@ -1,294 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559FC131E4B
-	for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 06:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20717320C;
+	Mon, 26 Aug 2024 06:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724653836; cv=none; b=Atfp2fFx2uifF7eow7ilYnfCvyMcKNXGWZknUX004a/NswGyXMgn8GZP7kgFFqbJzNRQ0OS9rBjNkMiF9MyRE3SHNVyFXVgVt9eaQwaN/vLYJfjZD7bQBnHvDfOAcHoQAQZpuW3MvaUCnafDBzN99GwuYtCCOjZizz8VeaygG0M=
+	t=1724654242; cv=none; b=BV1crSRJinDr7VwnGxsMktQgx498AQy0y9mLoRNzI/xO9bBBsh0Mpf+jEH4DosNjNXm0j8FrhH2AIbPPRhrkUonwC7bb9mS8vug9vDQL0RTneUy85hUJrH0HoJynJapCZhU/o692be75fB/rMmeCQRs2hoDYqcAjFIaaU0Sz5Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724653836; c=relaxed/simple;
-	bh=h5ZFt0JePyZg+K4l+Qy3R/qbSbgG77yDQBvoSy7r1Rk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tXuGROWPRSm6DvhlozSjs+YuJQJieOAznPBcZS5j+schekYp/9T0pwKGjIdqH02LiYCZMuxN0EES3DTQr5oOAo6ql6xZ95jpmh6o77tn96/uBcH6DqZRdhU8lyhwA3hllQEgJnyJczHYX25FC6Zb/xosfYEOK9Qi04fLGQF+m5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B3XthIrX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1724654242; c=relaxed/simple;
+	bh=pWe+zLd8bouok+C/3pYo9dtAB8ZYRkwE9UAJ3vJHbIQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PNfg1Cqoxnm3z5oQF34sDxtYMdd+bo5xpN/jTPmo4JWl/TXg0XZzdCl1cr0clmc9np+ThyKwWj0eiDlELufU4oaaA1GWYPWsiJlaSViJBVneQXsv4XoMyYIOxkzxPq9VARjqbuY/7S/5GMzy2Fd0JZZjgwZor1SB4eiFF95gLf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BbYOj/po; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Ya1R84qI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ks0fxGgI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6/OTanlM; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B3XthIrX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724653833;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jJFTNQ6Wct6NFpa/rz2wXYP7UMNXrnzBHL4pGlquRbc=;
-	b=B3XthIrXX1GqK/vxDzBi2amzpf7Ya9ThtR3lBiakB2WkXGAilU+jrjHxNzV3vd8XHN3Zl4
-	cALlBRJmr3jAubNMjuSTSzu1ZVIVuOMGb9LlUc7k2tOVcQkJkWpYcrT0E6Uu3G3AzQOLoc
-	Z30mr2yPSYpU4RQjimM1vXw1ofsHKtc=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-438-hLHnQnGhO46MTC1gCZ5qCw-1; Mon, 26 Aug 2024 02:30:31 -0400
-X-MC-Unique: hLHnQnGhO46MTC1gCZ5qCw-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6bf9926ba79so59984506d6.3
-        for <linux-block@vger.kernel.org>; Sun, 25 Aug 2024 23:30:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724653831; x=1725258631;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jJFTNQ6Wct6NFpa/rz2wXYP7UMNXrnzBHL4pGlquRbc=;
-        b=I8SWOCiU/fPjScmNDknNrxqU0VQWIv1CQst55397kKAIm2lPL9/20ZgzHpPDh6K1Db
-         +HadB7JfgFhwpC5GoaK3XjXs89GlX6TThg4wJADSsZEAUv05dQFUkfVhVNL+RhQE/wab
-         gsnHuoy+n8U5DIraVtiKAzIZefpz6/w6H6t70OV9FwaHZNWakiN1BgH9v4Q2+X55IIP4
-         dnMQqSrbY6pf+F4YncdnuZNvEUR4d7wAjgvpMJSMd/AneURGwDD+N2Jq7B6S9co0bOf9
-         I8VJvMnTtIRJyWm/twd4awsHPz5Tsk4sbj6zd53PI2COmMCelIgp0lhN8h20WfFx5hjH
-         u1YA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJlPmyeaX+HHEXd5+sfieH81o0UGVN4UiEFbBdiORxaqpy01S75QCLsTFZsOIwrbuTHlsXG2Jq4ikPmA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/e59fgwZuUwF1qo2IQBGp6O+jOxGEImEwsQkku6u+Rb4uTKn9
-	oBvU//l82aY9yHrG6vFHElx32TC+1v948lGnK790A31KTvEPSlIkjOTNfwxOLnvOCIAt8EGCEhB
-	iPSYFph0GwV4ntg8QMLJSrh8O1HCE+4CwmlC3dC1q2QHOvDbODU0Tq3nBWO9m
-X-Received: by 2002:a05:6214:3a87:b0:6c1:6b38:2fa4 with SMTP id 6a1803df08f44-6c16dc7ae95mr108606416d6.24.1724653831059;
-        Sun, 25 Aug 2024 23:30:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjcrM+de6Fn6cHOIaSi480as1GF3hlSLum1vFYi4hcws7Awk5SxCY7Nx45ugpgCSJ72TftWg==
-X-Received: by 2002:a05:6214:3a87:b0:6c1:6b38:2fa4 with SMTP id 6a1803df08f44-6c16dc7ae95mr108605926d6.24.1724653830595;
-        Sun, 25 Aug 2024 23:30:30 -0700 (PDT)
-Received: from dhcp-64-164.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162db0685sm43302446d6.101.2024.08.25.23.30.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Aug 2024 23:30:30 -0700 (PDT)
-Message-ID: <6e93c43e6e513559f0306085211245578c2c9d3f.camel@redhat.com>
-Subject: Re: [PATCH v3 6/9] ethernet: stmicro: Simplify PCI devres usage
-From: Philipp Stanner <pstanner@redhat.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao
- <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer
- <mdf@kernel.org>,  Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko
- <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, Alvaro
- Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Mark Brown <broonie@kernel.org>, David Lechner
- <dlechner@baylibre.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
- <u.kleine-koenig@pengutronix.de>, Damien Le Moal <dlemoal@kernel.org>, 
- Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>,
- linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org,  linux-fpga@vger.kernel.org,
- linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
- virtualization@lists.linux.dev
-Date: Mon, 26 Aug 2024 08:30:23 +0200
-In-Reply-To: <6q4pcpyqqt6mhj422pfkgggvwu7jhweu5446y6prcjgjql6xeq@jztt7z4fr6rg>
-References: <20240822134744.44919-1-pstanner@redhat.com>
-	 <20240822134744.44919-7-pstanner@redhat.com>
-	 <6q4pcpyqqt6mhj422pfkgggvwu7jhweu5446y6prcjgjql6xeq@jztt7z4fr6rg>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BbYOj/po";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Ya1R84qI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ks0fxGgI";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6/OTanlM"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E09B42199A;
+	Mon, 26 Aug 2024 06:37:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1724654238; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=eV8Y/2VLA2lSVqpyogE9r8ZLPHghATHJHnVNOyNUgXU=;
+	b=BbYOj/pob4z9pxrPYh8Up3P3+T4ZY/v1pbnMiK6zdOEkEgmCmDoiyYUJXbQZjXffsE7pMw
+	/GjXJKqwSWiMyCiDlMvm7F8p+hoQKVN2HrXxwLyVlA+RUvDaLP9lDHO6m/B6SL9+YrtmVs
+	Diza7tmd9YobZg/oyt8BQqUzZ6B6mSI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1724654238;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=eV8Y/2VLA2lSVqpyogE9r8ZLPHghATHJHnVNOyNUgXU=;
+	b=Ya1R84qI2Sdrbr+BpBuSmhvA+trVCBuAqXggQ9G/ej9Z0zLbpGRJB4cyHqHIiuGwkDO8J7
+	dcy+HEuRN9VwxKCg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ks0fxGgI;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="6/OTanlM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1724654236; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=eV8Y/2VLA2lSVqpyogE9r8ZLPHghATHJHnVNOyNUgXU=;
+	b=ks0fxGgIKQPoLNpZmKUXmGWTWQb9rs4jJRQLvUCLZszn/hiv9XNQ77xoBzfYcRnDKMB681
+	I5g72gTnIRlnSzrsb+S8liVTYm7cCFv+C1mkkDU6CgBW9I9oQy+pMx9bJHOQ47LGZhALHy
+	zfjS7j1d0n96q2BMCOEzjWKp3ewIIJY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1724654236;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=eV8Y/2VLA2lSVqpyogE9r8ZLPHghATHJHnVNOyNUgXU=;
+	b=6/OTanlM6aMDR/crNzVX2i5ONGM2qCvUl6jhpSUL3uy1s47zcOadiGE4hLUcOKBlROBY0j
+	FNS6pa79DpJ4TUCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7C55913724;
+	Mon, 26 Aug 2024 06:37:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 402WDJoizGYbOAAAD6G6ig
+	(envelope-from <neilb@suse.de>); Mon, 26 Aug 2024 06:37:14 +0000
+From: NeilBrown <neilb@suse.de>
+To: Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 0/7 v2 RFC] Make wake_up_{bit,var} less fragile
+Date: Mon, 26 Aug 2024 16:30:57 +1000
+Message-ID: <20240826063659.15327-1-neilb@suse.de>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: E09B42199A
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_COUNT_TWO(0.00)[2];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_TLS_ALL(0.00)[];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
+X-Spam-Flag: NO
 
-On Fri, 2024-08-23 at 12:29 +0300, Serge Semin wrote:
-> Hi Philipp
->=20
-> On Thu, Aug 22, 2024 at 03:47:38PM +0200, Philipp Stanner wrote:
-> > stmicro uses PCI devres in the wrong way. Resources requested
-> > through pcim_* functions don't need to be cleaned up manually in
-> > the
-> > remove() callback or in the error unwind path of a probe()
-> > function.
-> >=20
-> > Moreover, there is an unnecessary loop which only requests and
-> > ioremaps
-> > BAR 0, but iterates over all BARs nevertheless.
-> >=20
-> > Furthermore, pcim_iomap_regions() and pcim_iomap_table() have been
-> > deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI:
-> > Deprecate
-> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> >=20
-> > Replace these functions with pcim_iomap_region().
-> >=20
-> > Remove the unnecessary manual pcim_* cleanup calls.
-> >=20
-> > Remove the unnecessary loop over all BARs.
-> >=20
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
->=20
-> Thanks for the series. But please note the network subsystem
-> dev-process requires to submit the cleanup/feature changes on top of
-> the net-next tree:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/
+This is a second attempt to make wake_up_{bit,var} less fragile.
+This version doesn't change those functions much, but instead
+improves the documentation and provides some helpers which
+both serve as patterns to follow and alternates so that use of the
+fragile functions can be limited or eliminated.
 
-That seems a policy I haven't seen so far; usually the assumption is
-that you branch out from Linus's master.
+The only change to either function is that wake_up_bit() is changed to
+take an unsigned long * rather than a void *.  This necessitates the
+first patch which changes the one place where something other then
+unsigned long * is passed to wake_up bit - it is in block/.
 
-Anyways, I of course am going to help with setting up something
-mergeable
+The final patch modifies the same bit of code as a demonstration of one
+of the new APIs that has been added.
 
->=20
-> Just recently a Yanteng' (+cc) series
-> https://lore.kernel.org/netdev/cover.1723014611.git.siyanteng@loongson.cn=
-/
-> was merged in which significantly refactored the Loongson MAC driver.
-> Seeing your patch isn't based on these changes, there is a high
-> probability that the patch won't get cleanly applied onto the
-> net-next tree. So please either rebase your patch onto the net-next
-> tree, or at least merge in the Yanteng' series in your tree and
-> rebase the patch onto it and let's hope there have been no other
-> conflicting patches merged in into the net-next tree.
-
-I'll take a look into that, thx
+Thanks,
+NeilBrown
 
 
-P.
-
->=20
-> -Serge(y)
->=20
->=20
-> > ---
-> > =C2=A0.../ethernet/stmicro/stmmac/dwmac-loongson.c=C2=A0 | 25 +++++----=
-------
-> > ----
-> > =C2=A0.../net/ethernet/stmicro/stmmac/stmmac_pci.c=C2=A0 | 18 +++++----=
-----
-> > =C2=A02 files changed, 12 insertions(+), 31 deletions(-)
-> >=20
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > index 9e40c28d453a..5d42a9fad672 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > @@ -50,7 +50,7 @@ static int loongson_dwmac_probe(struct pci_dev
-> > *pdev, const struct pci_device_id
-> > =C2=A0	struct plat_stmmacenet_data *plat;
-> > =C2=A0	struct stmmac_resources res;
-> > =C2=A0	struct device_node *np;
-> > -	int ret, i, phy_mode;
-> > +	int ret, phy_mode;
-> > =C2=A0
-> > =C2=A0	np =3D dev_of_node(&pdev->dev);
-> > =C2=A0
-> > @@ -88,14 +88,11 @@ static int loongson_dwmac_probe(struct pci_dev
-> > *pdev, const struct pci_device_id
-> > =C2=A0		goto err_put_node;
-> > =C2=A0	}
-> > =C2=A0
-> > -	/* Get the base address of device */
-> > -	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
-> > -		if (pci_resource_len(pdev, i) =3D=3D 0)
-> > -			continue;
-> > -		ret =3D pcim_iomap_regions(pdev, BIT(0),
-> > pci_name(pdev));
-> > -		if (ret)
-> > -			goto err_disable_device;
-> > -		break;
-> > +	memset(&res, 0, sizeof(res));
-> > +	res.addr =3D pcim_iomap_region(pdev, 0, pci_name(pdev));
-> > +	if (IS_ERR(res.addr)) {
-> > +		ret =3D PTR_ERR(res.addr);
-> > +		goto err_disable_device;
-> > =C2=A0	}
-> > =C2=A0
-> > =C2=A0	plat->bus_id =3D of_alias_get_id(np, "ethernet");
-> > @@ -116,8 +113,6 @@ static int loongson_dwmac_probe(struct pci_dev
-> > *pdev, const struct pci_device_id
-> > =C2=A0
-> > =C2=A0	loongson_default_data(plat);
-> > =C2=A0	pci_enable_msi(pdev);
-> > -	memset(&res, 0, sizeof(res));
-> > -	res.addr =3D pcim_iomap_table(pdev)[0];
-> > =C2=A0
-> > =C2=A0	res.irq =3D of_irq_get_byname(np, "macirq");
-> > =C2=A0	if (res.irq < 0) {
-> > @@ -158,18 +153,10 @@ static void loongson_dwmac_remove(struct
-> > pci_dev *pdev)
-> > =C2=A0{
-> > =C2=A0	struct net_device *ndev =3D dev_get_drvdata(&pdev->dev);
-> > =C2=A0	struct stmmac_priv *priv =3D netdev_priv(ndev);
-> > -	int i;
-> > =C2=A0
-> > =C2=A0	of_node_put(priv->plat->mdio_node);
-> > =C2=A0	stmmac_dvr_remove(&pdev->dev);
-> > =C2=A0
-> > -	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
-> > -		if (pci_resource_len(pdev, i) =3D=3D 0)
-> > -			continue;
-> > -		pcim_iounmap_regions(pdev, BIT(i));
-> > -		break;
-> > -	}
-> > -
-> > =C2=A0	pci_disable_msi(pdev);
-> > =C2=A0	pci_disable_device(pdev);
-> > =C2=A0}
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> > b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> > index 352b01678c22..f89a8a54c4e8 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> > @@ -188,11 +188,11 @@ static int stmmac_pci_probe(struct pci_dev
-> > *pdev,
-> > =C2=A0		return ret;
-> > =C2=A0	}
-> > =C2=A0
-> > -	/* Get the base address of device */
-> > +	/* Request the base address BAR of device */
-> > =C2=A0	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
-> > =C2=A0		if (pci_resource_len(pdev, i) =3D=3D 0)
-> > =C2=A0			continue;
-> > -		ret =3D pcim_iomap_regions(pdev, BIT(i),
-> > pci_name(pdev));
-> > +		ret =3D pcim_request_region(pdev, i,
-> > pci_name(pdev));
-> > =C2=A0		if (ret)
-> > =C2=A0			return ret;
-> > =C2=A0		break;
-> > @@ -205,7 +205,10 @@ static int stmmac_pci_probe(struct pci_dev
-> > *pdev,
-> > =C2=A0		return ret;
-> > =C2=A0
-> > =C2=A0	memset(&res, 0, sizeof(res));
-> > -	res.addr =3D pcim_iomap_table(pdev)[i];
-> > +	/* Get the base address of device */
-> > +	res.addr =3D pcim_iomap(pdev, i, 0);
-> > +	if (!res.addr)
-> > +		return -ENOMEM;
-> > =C2=A0	res.wol_irq =3D pdev->irq;
-> > =C2=A0	res.irq =3D pdev->irq;
-> > =C2=A0
-> > @@ -231,16 +234,7 @@ static int stmmac_pci_probe(struct pci_dev
-> > *pdev,
-> > =C2=A0 */
-> > =C2=A0static void stmmac_pci_remove(struct pci_dev *pdev)
-> > =C2=A0{
-> > -	int i;
-> > -
-> > =C2=A0	stmmac_dvr_remove(&pdev->dev);
-> > -
-> > -	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
-> > -		if (pci_resource_len(pdev, i) =3D=3D 0)
-> > -			continue;
-> > -		pcim_iounmap_regions(pdev, BIT(i));
-> > -		break;
-> > -	}
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0static int __maybe_unused stmmac_pci_suspend(struct device *dev)
-> > --=20
-> > 2.46.0
-> >=20
-> >=20
->=20
-
+ [PATCH 1/7] block: change wait on bd_claiming to use a var_waitqueue,
+ [PATCH 2/7] sched: change wake_up_bit() and related function to
+ [PATCH 3/7] sched: Improve documentation for wake_up_bit/wait_on_bit
+ [PATCH 4/7] sched: Document wait_var_event() family of functions and
+ [PATCH 5/7] sched: Add test_and_clear_wake_up_bit() and
+ [PATCH 6/7] sched: Add wait/wake interface for variable updated under
+ [PATCH 7/7] Block: switch bd_prepare_to_claim to use
