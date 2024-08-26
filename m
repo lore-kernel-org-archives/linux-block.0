@@ -1,97 +1,74 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E284D8BB;
-	Mon, 26 Aug 2024 17:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160334D8BB;
+	Mon, 26 Aug 2024 17:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724693539; cv=none; b=LP141YcqvMozxQ3jRdLXNip53/whThx4ymsJyKVtEXymKcSAYnym0zdv3SZBDZ0nD6zTUMlma6xkCy888znHmAxRRVdsPCI9T1ssSaufdTiiu25L5uM1gclQ+pAPG3r5x29km5NS8OfZm/ce3n6WbEOfcnyBFjXv30lfurGq3ZM=
+	t=1724693909; cv=none; b=jNW8+790cFtSVi5uszfU+tMog+PnBr/wsZ3GWbDV/ffJYSfk9jSbeNDPR3Rmyb+PBKsufIMRMm6GFRmuwyKgfJjSCUB5XPI8Z5rZvw2mhBfMi4mDKv8YxFe/U3pmR0lut6fNsgiYdf9jXSrL4T21taUI4yBTI/Rh2vHKNXI+h4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724693539; c=relaxed/simple;
-	bh=oSMsu/JL7mgDWCxRlDA/vsIQF1ic1KWhYBBfR69F1mE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ki+FRcdd9BVLg6whxNQ2ILoiIHMNRRp5ybKS0rDzTmEwr8T0KwLLCc7Ntuh1I++NWE55Qn6Ptsx44xZlUsh0ILnj7wLrO5BxzRgOdrQ7b5K0GhojO37snt4r0j3HGD7A/4TZUWIYRTi0d1z1+BNA8zG7ad/OX1YyaaRaTwMZig0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3536DA7;
-	Mon, 26 Aug 2024 10:32:42 -0700 (PDT)
-Received: from [10.57.48.129] (unknown [10.57.48.129])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 212DC3F66E;
-	Mon, 26 Aug 2024 10:32:11 -0700 (PDT)
-Message-ID: <a93c34a9-7fcf-4bb9-9c67-20202e2f6e59@arm.com>
-Date: Mon, 26 Aug 2024 18:32:10 +0100
+	s=arc-20240116; t=1724693909; c=relaxed/simple;
+	bh=GXMt/y4VhRvgHBnL3dEzVGhWuTEGKE0/B97uItfaIVM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pG4SUYGl6nSSn8wqk5rKbXI96l2uE2Aph8JeSGSpm/mpgH5dTMPCrmjn3N28wdWvW1kI3LXT/LI9CQG84RLsUA2SN8Av8oltixff80OA/d34iY26DF86cRF40DoH5Hehqxm2yfqN1uEEPItqo9ndet++V0w08KT2nzz+oxgrgf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jiJVXq1+; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jiJVXq1+"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=gqoW+iGUYB4hizD/QVZ/oFJyQw57sCqGaKoaykSjMdw=; b=jiJVXq1+65fJhLhgfs6qJ089hl
+	uKSpON1SjWfnbaVudTF4MDkxDTIBfCUeejnuBxgIp+rYju7u+OSpMwqSmG6I6qQAaIquLHQZlnHJ3
+	YUgmiGXvCztVzFUbqnnB8oN/cAJ+vTjnKrpJWfyiGMLLQ2GjKeB17qS/ex5Lh4bshmMy1Hq56bQW+
+	7pJwuUG14CpVDn+ko1QFp2NjkH3nbs00RW5nN1ChtuIOYjUV8PNLmSkIyWBEAK0EIFSJHsB0Ny4tc
+	TLni8gS13rTQkmksQMIAxlS9ws2djS6pGtE7VZ0Cpr9qA6X1KQniA+0ABEs4RiPhdEY0F8+QZSKkm
+	RyQUD5ww==;
+Received: from 2a02-8389-2341-5b80-a8a7-5c16-efec-d7f9.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:a8a7:5c16:efec:d7f9] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sidfc-00000008Fu6-2g6J;
+	Mon, 26 Aug 2024 17:38:26 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Chris Mason <clm@fb.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	David Sterba <dsterba@suse.com>,
+	Hans Holmberg <Hans.Holmberg@wdc.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org
+Subject: fix unintentional splitting of zone append bios
+Date: Mon, 26 Aug 2024 19:37:53 +0200
+Message-ID: <20240826173820.1690925-1-hch@lst.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
- capacities are different"
-To: Bart Van Assche <bvanassche@acm.org>,
- MANISH PANDEY <quic_mapa@quicinc.com>, Sandeep Dhavale <dhavale@google.com>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>
-Cc: Qais Yousef <qyousef@layalina.io>, axboe@kernel.dk, mingo@kernel.org,
- peterz@infradead.org, vincent.guittot@linaro.org,
- linux-block@vger.kernel.org, sudeep.holla@arm.com,
- Jaegeuk Kim <jaegeuk@kernel.org>, Christoph Hellwig <hch@infradead.org>,
- kailash@google.com, tkjos@google.com, bvanassche@google.com,
- quic_nitirawa@quicinc.com, quic_cang@quicinc.com, quic_rampraka@quicinc.com,
- quic_narepall@quicinc.com,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
- <3feb5226-7872-432b-9781-29903979d34a@arm.com>
- <20240805020748.d2tvt7c757hi24na@airbuntu>
- <25909f08-12a5-4625-839d-9e31df4c9c72@acm.org>
- <1d9c27b2-77c7-462f-bde9-1207f931ea9f@quicinc.com>
- <17bf99ad-d64d-40ef-864f-ce266d3024c7@acm.org>
- <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
- <c151b6d5-7e02-48ee-951f-c23594f6be6f@arm.com>
- <CAB=BE-RHwqmSRt-RbmuJ4j1bOFqv1DrYD9m-E1H99hYRnTiXLw@mail.gmail.com>
- <ca78ada8-d68b-4759-a068-ac8f66c51b72@quicinc.com>
- <12a6f001-813e-4bc4-90c2-9f9ef7dc72e6@acm.org>
- <688ead11-c1c0-48b2-b4d1-feeb1278c692@quicinc.com>
- <1a95a60c-730a-4bb7-80c9-98b8a70f6521@acm.org>
- <66912a22-540d-4b9a-bd06-cce55b9ad304@quicinc.com>
- <3d37e8ba-25a8-45c2-93a3-02888dad2c9e@arm.com>
- <22d1bd64-934f-49f1-bb82-1367f4a43f40@quicinc.com>
- <340f156b-0dbb-45d2-a6dd-31e468ead846@acm.org>
-Content-Language: en-US
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <340f156b-0dbb-45d2-a6dd-31e468ead846@acm.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 8/23/24 15:12, Bart Van Assche wrote:
-> On 8/23/24 6:49 AM, MANISH PANDEY wrote:
->> while making the patch, i figured out that queue_flags is unsigned long type and we already reached up to 32 flags as of now.
-> 
-> Really? In Linus' master branch I see 13 queue flags. This is less than
-> half of 32. From include/linux/blkdev.h:
+Hi Jens,
 
-@Manish:
-See recent (6.11) cleanup
-https://lore.kernel.org/linux-block/20240719112912.3830443-1-john.g.garry@oracle.com/
+this series fixes code that incorrectly splits of zoned append bios due
+to checking for a wrong max_sectors limit.  A big part of the cause is
+that the bio splitting code is a bit of a mess and full of landmines, so
+I fixed this as well.
 
-> 
-> enum {
->     QUEUE_FLAG_DYING,        /* queue being torn down */
->     QUEUE_FLAG_NOMERGES,        /* disable merge attempts */
->     QUEUE_FLAG_SAME_COMP,        /* complete on same CPU-group */
->     QUEUE_FLAG_FAIL_IO,        /* fake timeout */
->     QUEUE_FLAG_NOXMERGES,        /* No extended merges */
->     QUEUE_FLAG_SAME_FORCE,        /* force complete on same CPU */
->     QUEUE_FLAG_INIT_DONE,        /* queue is initialized */
->     QUEUE_FLAG_STATS,        /* track IO start and completion times */
->     QUEUE_FLAG_REGISTERED,        /* queue has been registered to a disk */
->     QUEUE_FLAG_QUIESCED,        /* queue has been quiesced */
->     QUEUE_FLAG_RQ_ALLOC_TIME,    /* record rq->alloc_time_ns */
->     QUEUE_FLAG_HCTX_ACTIVE,        /* at least one blk-mq hctx is active */
->     QUEUE_FLAG_SQ_SCHED,        /* single queue style io dispatch */
->     QUEUE_FLAG_MAX
-> };
-> 
-> Bart.
-> 
+To hit this bug a submitter needs to submit a bio larger than max_sectors
+of device, but smaller than max_hw_sectors.  So far the only thing that
+reproduces it is my not yet upstream zoned XFS code, but in theory this
+could affect every submitter of zone append bios.
 
+Diffstat:
+ block/blk-merge.c      |  162 ++++++++++++++++++++++---------------------------
+ block/blk-mq.c         |   11 +--
+ block/blk.h            |   70 +++++++++++++++------
+ fs/btrfs/bio.c         |   30 +++++----
+ include/linux/bio.h    |    4 -
+ include/linux/blkdev.h |    3 
+ 6 files changed, 153 insertions(+), 127 deletions(-)
