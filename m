@@ -1,158 +1,76 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753FE194AEF;
-	Mon, 26 Aug 2024 20:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15404199EA2;
+	Mon, 26 Aug 2024 21:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724704147; cv=none; b=AyEUPkE9hjP22AUM9rB5y9/WTqBA9INLvvOsaEnH8d0JTWABqttdpgL2sieurMaLx6Armlsp7HT7PqFuFUgyuTZqeGkcGFl3a15hTmImxdTJcMU8SzamquvVBd/Pb7B1KZnowIHT9S1WX+nYI6puLkJ76P4YfIOht775L0iiGrY=
+	t=1724708069; cv=none; b=I++pn4GUIHEEhiD4up71YESJKj75OIFu6gLXHKecypKME+55keCtW1Wyd3IGa4/xKluoJ4qGgdBvZKTGU7ioyK1+HFakN+/VLUpno1Q97hcURwTJqNZlmZsJwKlsFX4sqNrxgwmayCHH0PH0cJeaRlbYUDPh/iTResQ89btOxNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724704147; c=relaxed/simple;
-	bh=3Pos2gCIu4d3aIvUSQnRgym+E3vKTifQLzv9/hX9ohM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rgdIdNFAygBr6r0YvcLAt+jJSHR7UYl+U/pE5A3HzxiwkFTjxYeyCra/Xxrqi5+9AUGSzwv0UTVz7b9a2Ee3o/Fs/iF1LcLTr4DJgw+4WCRN/Jz662/bVhS0Zpfbx7iUYYzxKfbb5YhqNocmNmNmYP5ryF0MHIVqETb5W3Sbc1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Ar6tyGy+; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=JlVS8Utm; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Ar6tyGy+; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=JlVS8Utm; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1724708069; c=relaxed/simple;
+	bh=UzLwthq55feRRfqVqft+krrc68RgU3jX8QAxGa9eDGA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=s2P+zxMubmxMq8ZhxduvVHiiMHw47mmJUwpD9vdUaxx3Hcc4TGFBC5RzmaV/VY2yaUS7vrfl1ua9av0JlPMFrLgtiBGJQH1HMd4fypPQ0lfGNF56DAhGVv4k/BRr68CDTbdmPOUWgVjQifeYJ2rCboCg+e8MprTZ+Lq4L/bC78w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=J88AOzg5; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ar6tyGy+";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="JlVS8Utm";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ar6tyGy+";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="JlVS8Utm"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="J88AOzg5"
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 34B1641AB9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1724708067; bh=kQdVjhEgW36oG2YSr9XWxNlwc0D1J7E/TbKSSVi1YII=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=J88AOzg5d2mrcRi/shhsfd+JF5jkLodxaOB2vkA+6fKsn7rnRwK8f1Wi+iA+d7XFA
+	 pyFqqG2eOwkoWgxI3wFl1epMPX3sIHzGciu+5TqNHN73o8mim6qGyTCFnXJV3vtvD8
+	 +HxC+InqxddPjB8hwUgQTI7kBMensi7SeNX88YKnJ4FkBO0kE+ySnwYP+S9GgUFHm1
+	 yOEiyDpaF0zFAbERVPyu2uD4KxeGNcik/0mHKkmks3jW3KR4XQhhEkhI50Y15tZBSi
+	 6APgG3NsE96i3J/3yrPGmDcvmwmOYsoIlkHFY4WwAlJs9Wm1rixGvcCOrJdl+OFJpF
+	 walHLGWD7ya2g==
+Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6D1D01F8AE;
-	Mon, 26 Aug 2024 20:29:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724704143;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GKprshE6/SfW5GPE+D6oU7opiS2N/PVqHSDOoPYmLgU=;
-	b=Ar6tyGy+7E4Lvslr65th561vQGmkwdcr5UBOitOXWD4Y7UEp7XP7wdoiZZi+NLEYY+AUsw
-	0MneuqHfsIsOgvcYRGbEK6GH5/m2Vpcg+gQpnDDz3bSpXjUaDhj3b1bk5reimaohpoivDD
-	ch+KhDsNdg4DHiVfuoF8/qpwXzJKtUw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724704143;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GKprshE6/SfW5GPE+D6oU7opiS2N/PVqHSDOoPYmLgU=;
-	b=JlVS8UtmFY2JNWQ9JsmaaMKgvu/yEG4U9dkjUIoafuBZRxtjYKrZn2yfL3aQlVoPorSDV9
-	FAC6hjcIGYxBVWCw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Ar6tyGy+;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=JlVS8Utm
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724704143;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GKprshE6/SfW5GPE+D6oU7opiS2N/PVqHSDOoPYmLgU=;
-	b=Ar6tyGy+7E4Lvslr65th561vQGmkwdcr5UBOitOXWD4Y7UEp7XP7wdoiZZi+NLEYY+AUsw
-	0MneuqHfsIsOgvcYRGbEK6GH5/m2Vpcg+gQpnDDz3bSpXjUaDhj3b1bk5reimaohpoivDD
-	ch+KhDsNdg4DHiVfuoF8/qpwXzJKtUw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724704143;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GKprshE6/SfW5GPE+D6oU7opiS2N/PVqHSDOoPYmLgU=;
-	b=JlVS8UtmFY2JNWQ9JsmaaMKgvu/yEG4U9dkjUIoafuBZRxtjYKrZn2yfL3aQlVoPorSDV9
-	FAC6hjcIGYxBVWCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4AADE13724;
-	Mon, 26 Aug 2024 20:29:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id H/HlEY/lzGbjRwAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Mon, 26 Aug 2024 20:29:03 +0000
-Date: Mon, 26 Aug 2024 22:29:01 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
-	Hans Holmberg <Hans.Holmberg@wdc.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH 1/4] block: rework bio splitting
-Message-ID: <20240826202901.GS25962@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20240826173820.1690925-1-hch@lst.de>
- <20240826173820.1690925-2-hch@lst.de>
+	by ms.lwn.net (Postfix) with ESMTPSA id 34B1641AB9;
+	Mon, 26 Aug 2024 21:34:27 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Ming Lei <ming.lei@redhat.com>, linux-doc@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH] Documentation: add ublk driver ioctl numbers
+In-Reply-To: <20240823134339.1496916-1-ming.lei@redhat.com>
+References: <20240823134339.1496916-1-ming.lei@redhat.com>
+Date: Mon, 26 Aug 2024 15:34:26 -0600
+Message-ID: <875xrn6k9p.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240826173820.1690925-2-hch@lst.de>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Rspamd-Queue-Id: 6D1D01F8AE
-X-Spam-Score: -4.21
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.21 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:replyto,suse.cz:mid,suse.cz:dkim]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Type: text/plain
 
-On Mon, Aug 26, 2024 at 07:37:54PM +0200, Christoph Hellwig wrote:
-> The current setup with bio_may_exceed_limit and __bio_split_to_limits
-> is a bit of a mess.
-> 
-> Change it so that __bio_split_to_limits does all the work and is just
-> a variant of bio_split_to_limits that returns nr_segs.  This is done
-> by inlining it and instead have the various bio_split_* helpers directly
-> submit the potentially split bios.
-> 
-> To support btrfs, the rw version has a lower level helper split out
-> that just returns the offset to split.  This turns out to nicely clean
-> up the btrfs flow as well.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Ming Lei <ming.lei@redhat.com> writes:
+
+> ublk driver takes the following ioctl numbers:
+>
+> 	'u'   00-2F  linux/ublk_cmd.h
+>
+> So document it in ioctl-number.rst
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-merge.c   | 146 +++++++++++++++++---------------------------
->  block/blk-mq.c      |  11 ++--
->  block/blk.h         |  63 +++++++++++++------
+>  Documentation/userspace-api/ioctl/ioctl-number.rst | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
+> index e91c0376ee59..5baae6de2861 100644
+> --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
+> +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+> @@ -292,6 +292,7 @@ Code  Seq#    Include File                                           Comments
+>  't'   80-8F  linux/isdn_ppp.h
+>  't'   90-91  linux/toshiba.h                                         toshiba and toshiba_acpi SMM
+>  'u'   00-1F  linux/smb_fs.h                                          gone
+> +'u'   00-2F  linux/ublk_cmd.h                                        conflict!
 
-For
+Applied, thanks.
 
->  fs/btrfs/bio.c      |  30 +++++----
-
-Acked-by: David Sterba <dsterba@suse.com>
+jon
