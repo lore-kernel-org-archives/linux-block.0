@@ -1,215 +1,107 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4066D15746E
-	for <linux-block@vger.kernel.org>; Tue, 27 Aug 2024 07:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4809D1714BE
+	for <linux-block@vger.kernel.org>; Tue, 27 Aug 2024 07:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724743932; cv=none; b=VCv5s4cZbrFJhoGQiuNDqmWZZyWJ1cU1DAo822pje6HmbODHPVzykXVVi0V50jqmP70tbWMCQ5w+pR5DeCn1VPD/iHzO6NspDmoPUhFt6s3+etizxiZrNbtCEGhrwLU2wRddB7sKsfo+1f3qRbY/sOY9Vk9VmmnN47rtk+fyVmg=
+	t=1724744151; cv=none; b=KAERdKITwDaTOLfrjbBFJctyolEcyeWrT6+rEE2WNea++TtTJiV7603aefGkIKCy5ziTu+f68Zrunsc/geqS3Wksc2VLeRqaTbuFAWBWi8Kzmhl2+Y8trgUYfxGtq1Wz+jCwXhFWV8GUu+HfXRkFeSXEhVcCgq+GajjZeQuO/l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724743932; c=relaxed/simple;
-	bh=htgvHkO/sM6vb0evXT+a5RKrtwD+zZv4TeIAKiJAUAg=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=tNdwflzjEd8ow05e9omIOI7M146nEgjlj5SYRRZOzQs102nF77bU8AFPG+LL9J1bizTQ+4epEMDoMC0vanrjlSFzvU+D9zDiuG/73ZVq4dsPBZShPqW2BVR7FQ/B16FF7XscbriKkIuulskzuaWAw1oEC3TalE8s+DZxYfDYVoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U5OROc7A; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1724744151; c=relaxed/simple;
+	bh=rB0ckiBv1RX+5vNc+Mtr6fHkNRXErazAw2m5iMS+Nv8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aSqxT74q8lHF3x8Eg+L2nuaazl/GDPdDHiGSDYCIY4ITCJCFdTDTexflFKLtTS2eoOTIq2G6l/cm9WLW+odDMGST9nb0VxMOLphQffv2MsrwX5V3TsNbOUCYEkflL+f07N2eSkSU+e2zUGkYgf3Bf2NBs4anIWTuXD38+mXKv5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z6WFgnsE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U5OROc7A"
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724743928;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6WFgnsE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724744149;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NXV4/htXT29RV8EpSV8BYHk1NDt7bT21YYLHpiqyNBU=;
-	b=U5OROc7AZdw/P6L+wELiD2y8Bs+ngIjvJaorDTbVKhfG18IZ9KEmRzqLIj1zNcgw7AhsBE
-	hyAdTpgJILg0s8QeSe9lYDCOBKZIDETiUmN/QBpbSPdiY4tyVXETri4rAyOtc1atWTPajB
-	Pk7j5gkdByEzNtehlHbaNAGiek9XaDA=
+	bh=02dk6NMMcpkIDMHf2jaQRB/DcSut0WzixTzX5tb12v0=;
+	b=Z6WFgnsEC/EJhAg4m549N6R3vZlfCZ5ymNa8QhbiF2lilbhi1T28VQyROLGggkgrEddsDS
+	5Cm0LWl5aV7yCz5B1jt/n+HKkLFlAG3I1T/rShepqOjDNaf/K6YqY/jU0mtAttxLa8jgMC
+	LWEaui5ZeTDFgktCINDPhy6+UX7qVrk=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-54-5ln4qJHtPWW1290E7BmEJQ-1; Tue, 27 Aug 2024 03:35:46 -0400
+X-MC-Unique: 5ln4qJHtPWW1290E7BmEJQ-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2d3baf38457so5514200a91.0
+        for <linux-block@vger.kernel.org>; Tue, 27 Aug 2024 00:35:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724744145; x=1725348945;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=02dk6NMMcpkIDMHf2jaQRB/DcSut0WzixTzX5tb12v0=;
+        b=lb8iVEPHbBRw+dNXIskqiAkNjvgNfGqNALqj/hUDaP66cl+1xbcCD/pQ41dFZqfh6C
+         NeBhrk4IeQz5aDn550ZDt++DO6oFU+MyOE4ulUpwcbTo1kAjPzZtXKDq7+hoE5PpomSb
+         QrmCUEyqQrAEIYEimDd4mGjQgCQ3rI0UsP0sf5pjCUV2vCJJhNQ3ph1mvfCZpiBwQ8ar
+         Srrp2CQ/OGv7pEMroARWpGYG2Bu64wCokaDn/SG3JKQhuX+7qILjZK22S6xd39N23PdF
+         ++KxRQ+JeJL3bVMD5vI4pPd+Wyyp0mqgaEgV3SubxDyhbqha7E28DKLwo7eWi3RheNeM
+         BKag==
+X-Forwarded-Encrypted: i=1; AJvYcCUeLBLmiPI4bSV/zqEuezk7uHqsFvmIhUAQjDOgVa+1+bl1WdXNvTp118DjRMhOK4i/A9KHZLqnAxc7Ng==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiJ3aK/KV8Xtjt8leTiQf7wf8cYsnf0xLSXts4iE7QOfWqZPPI
+	iG4JfNznNKT6PIzdjvik2Cw0K/YKkewAWT8vVTMDS/VhQ6oL0CY1ou7GTGw3I1P9U39nL/EP0BG
+	GhBiQN7fTtjXdQgB+MnQ9yehU7xGmoi0TSJM2uYvbST6CAYFTE19gxCQ/FFPR/RrBDd9oVwk7vn
+	7fuOCp64gd/LFvWX0vYU2zw41tJKDHOvjZIBw=
+X-Received: by 2002:a17:90a:d347:b0:2d4:902e:ca3f with SMTP id 98e67ed59e1d1-2d824d0288dmr3096349a91.19.1724744145342;
+        Tue, 27 Aug 2024 00:35:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0OSblcWUdxuv087XjvF/81nCSFwqkvcum8/J4kLvynjY/Hbxh1qtdxhnJbYOqU0yqhBuXNtqzORD896PQFj8=
+X-Received: by 2002:a17:90a:d347:b0:2d4:902e:ca3f with SMTP id
+ 98e67ed59e1d1-2d824d0288dmr3096327a91.19.1724744144979; Tue, 27 Aug 2024
+ 00:35:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Re: [PATCH 2/4] block: fix ordering between checking BLK_MQ_S_STOPPED
- and adding requests to hctx->dispatch
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <d044b53b-4917-778d-0f77-c99da8f03769@huaweicloud.com>
-Date: Tue, 27 Aug 2024 15:31:27 +0800
-Cc: Muchun Song <songmuchun@bytedance.com>,
- Ming Lei <ming.lei@redhat.com>,
- Jens Axboe <axboe@kernel.dk>,
- "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- "yukuai (C)" <yukuai3@huawei.com>
+MIME-Version: 1.0
+References: <20240827032218.34744-1-liwang@redhat.com> <8694fd51-67a2-45e2-bda4-f6816e1d612c@oracle.com>
+In-Reply-To: <8694fd51-67a2-45e2-bda4-f6816e1d612c@oracle.com>
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 27 Aug 2024 15:35:32 +0800
+Message-ID: <CAEemH2djkWMtuTN2=Y5MXZVOACeCm32_Hh0zAJxH7X4Ss1MSuQ@mail.gmail.com>
+Subject: Re: [PATCH] loop: Increase bsize variable from unsigned short to
+ unsigned int
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-kernel@vger.kernel.org, ltp@lists.linux.it, 
+	Jan Stancek <jstancek@redhat.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org, axboe@kernel.dk
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <0AC85BFB-F887-4512-887D-A2E7D36D9C52@linux.dev>
-References: <20240811101921.4031-1-songmuchun@bytedance.com>
- <20240811101921.4031-3-songmuchun@bytedance.com> <ZsKtllxojkTe3mpY@fedora>
- <CAMZfGtWxE9z4GgmpEBXzwsy_HAyOOZ85+2HUyqE-9+n1f2aPJA@mail.gmail.com>
- <786a8d94-884c-8a31-151d-fdc82e1a0a63@huaweicloud.com>
- <3AC15539-1B9B-4996-A150-8CAB214159E5@linux.dev>
- <d044b53b-4917-778d-0f77-c99da8f03769@huaweicloud.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-X-Migadu-Flow: FLOW_OUT
+
+On Tue, Aug 27, 2024 at 3:20=E2=80=AFPM John Garry <john.g.garry@oracle.com=
+> wrote:
+>
+> On 27/08/2024 04:22, Li Wang wrote:
+>
+> +linux-block, Jens
+>
+> > This change allows the loopback driver to handle larger block sizes
+>
+> larger than what? PAGE_SIZE?
+
+Yes, system should return EINVAL when the tested bsize is larger than PAGE_=
+SIZE.
+But due to the loop_reconfigure_limits() cast it to 'unsined short' that
+never gets an expected error when testing invalid logical block size.
+
+That's why LTP/ioctl_loop06 failed on a system with 64k (ppc64le) pagesize
+(since kernel-v6.11-rc1 with patches):
+
+  9423c653fe6110 ("loop: Don't bother validating blocksize")
+  fe3d508ba95bc6 ("block: Validate logical block size in blk_validate_limit=
+s()")
 
 
 
-> On Aug 26, 2024, at 16:53, Yu Kuai <yukuai1@huaweicloud.com> wrote:
->=20
-> Hi,
->=20
-> =E5=9C=A8 2024/08/26 16:35, Muchun Song =E5=86=99=E9=81=93:
->>> On Aug 22, 2024, at 11:54, Yu Kuai <yukuai1@huaweicloud.com> wrote:
->>>=20
->>> Hi,
->>>=20
->>> =E5=9C=A8 2024/08/19 11:49, Muchun Song =E5=86=99=E9=81=93:
->>>> On Mon, Aug 19, 2024 at 10:28=E2=80=AFAM Ming Lei =
-<ming.lei@redhat.com> wrote:
->>>>>=20
->>>>> Hi Muchun,
->>>>>=20
->>>>> On Sun, Aug 11, 2024 at 06:19:19PM +0800, Muchun Song wrote:
->>>>>> Supposing the following scenario with a virtio_blk driver.
->>>>>>=20
->>>>>> CPU0                                                              =
-  CPU1
->>>>>>=20
->>>>>> blk_mq_try_issue_directly()
->>>>>>     __blk_mq_issue_directly()
->>>>>>         q->mq_ops->queue_rq()
->>>>>>             virtio_queue_rq()
->>>>>>                 blk_mq_stop_hw_queue()
->>>>>>                                                                   =
-  virtblk_done()
->>>>>>     blk_mq_request_bypass_insert()                                =
-      blk_mq_start_stopped_hw_queues()
->>>>>>         /* Add IO request to dispatch list */   1) store          =
-          blk_mq_start_stopped_hw_queue()
->>>>>>                                                                   =
-              clear_bit(BLK_MQ_S_STOPPED)                 3) store
->>>>>>     blk_mq_run_hw_queue()                                         =
-              blk_mq_run_hw_queue()
->>>>>>         if (!blk_mq_hctx_has_pending())                           =
-                  if (!blk_mq_hctx_has_pending())         4) load
->>>>>>             return                                                =
-                      return
->>>>>>         blk_mq_sched_dispatch_requests()                          =
-                  blk_mq_sched_dispatch_requests()
->>>>>>             if (blk_mq_hctx_stopped())          2) load           =
-                      if (blk_mq_hctx_stopped())
->>>>>>                 return                                            =
-                          return
->>>>>>             __blk_mq_sched_dispatch_requests()                    =
-                      __blk_mq_sched_dispatch_requests()
->>>>>>=20
->>>>>> The full memory barrier should be inserted between 1) and 2), as =
-well as between
->>>>>> 3) and 4) to make sure that either CPU0 sees BLK_MQ_S_STOPPED is =
-cleared or CPU1
->>>>>> sees dispatch list or setting of bitmap of software queue. =
-Otherwise, either CPU
->>>>>> will not re-run the hardware queue causing starvation.
->>>>>=20
->>>>> Yeah, it is one kind of race which is triggered when adding =
-request into
->>>>> ->dispatch list after returning STS_RESOURCE. We were troubled by =
-lots of
->>>>> such kind of race.
->>>> Yes. I saw the similar fix for BLK_MQ_S_SCHED_RESTART.
->>>>>=20
->>>>> stopping queue is used in very less drivers, and its only purpose =
-should
->>>>> be for throttling hw queue in case that low level queue is busy. =
-There seems
->>>>> more uses of blk_mq_stop_hw_queues(), but most of them should be =
-replaced
->>>>> with blk_mq_quiesce_queue().
->>>>>=20
->>>>> IMO, fixing this kind of issue via memory barrier is too tricky to
->>>>> maintain cause WRITE/READ dependency is very hard to follow. I'd =
-suggest to
->>>>> make memory barrier solution as the last resort, and we can try to =
-figure
->>>>> out other easier & more reliable way first.
->>>> I do agree it is hard to maintain the dependencies in the future. =
-We should
->>>> propose an easy-maintainable solution. But I thought it is a =
-long-term issue
->>>> throughout different stable linux distros. Adding a mb is the easy =
-way to fix
->>>> the problem (the code footprint is really small), so it will be =
-very
->>>> easy for others
->>>> to backport those bug fixes to different stable linux distros. =
-Therefore, mb
->>>> should be an interim solution. Then, we could improve it based on =
-the solution
->>>> you've proposed below. What do you think?
->>>=20
->>> I'll agree with Ming, let's figure out a better fix first. Easy to =
-backport to stables is not first consideration.
->> Hi Kuai,
->> All right. I usually focus on MM, it seems there is a gap between MM =
-and BLock.
->> Anyway, let's figure out if there is any good solution.
->>>> Thanks,
->>>> Muchun.
->>>>>=20
->>>>> One idea I thought of is to call blk_mq_request_bypass_insert()(or =
-rename
->>>>> & export it) before calling blk_mq_stop_hw_queue() in driver, then
->>>>> return new status code STS_STOP_DISPATCH for notifying blk-mq to =
-stop
->>>>> dispatch simply.
->>>=20
->>> New status code look good to me, however, I wonder can we just =
-remove
->>> the problematic blk_mq_stop_hw_queue(), and replace it by handling =
-the
->>> new status from block layer?
->>>=20
->>> - Passing the new status to blk_mq_run_dispatch_ops, and quiesce =
-with
->> I didn't fully understand your suggestion. Let me ask some questions.
->> blk_mq_stop_hw_queue() is usually called in blk_mq_ops->queue_rq =
-path,
->> it'll be easy for this case to pass the new status to =
-blk_mq_run_dispatch_ops.
->> Should we remove blk_mq_stop_hw_queues() as well? How to pass the new
->> status to blk_mq_run_dispatch_ops in this case?
->=20
-> For queue_rq from dispatch path, it can be removed. However, it is
-> called from remove path as well, I don't check yet if it can be =
-removed
-> there, that's another story.
-
-The reason why I asked this question is that blk_mq_stop_hw_queues() =
-also needs
-to be fixed. See my patch 3.
-
->=20
-> And just add a return value for dispatch_ops to pass status.
->=20
-> Thanks,
-> Kuai
->=20
->>> the new status, if no request is inflight, unquiesce immediately;
->> Actually, I didn't understand how to avoid the above race. May you =
-elaborate
->> the scenario?
-
-Sorry for repeating, I didn't get your point here. May you elaborate
-your suggestion? Thanks very much.
-
->> Muhcun,
->> Thanks.
->>> - unquiesce is any IO is done afterwards;
->> .
-
+--
+Regards,
+Li Wang
 
