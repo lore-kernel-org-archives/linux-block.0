@@ -1,250 +1,126 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D9217BEA4
-	for <linux-block@vger.kernel.org>; Tue, 27 Aug 2024 08:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255E41487F4
+	for <linux-block@vger.kernel.org>; Tue, 27 Aug 2024 08:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724746618; cv=none; b=RxLVstoY2aosGn3YcEPceADQU/MfmatQ5Rz8pauE5juG1+rqs9LoDUJZHvaTlrtpydwS0/azo3veS6atRBmd2ca36BIB+UKDfm32DTugBTl5vSBE7zASLkpSdrA0PuqiU/Tifu8ueYOM466NX6MDe1f/RnQV4go/DlZR1jLODI4=
+	t=1724746695; cv=none; b=h0o0dg7adLogur21VWya+Z3mTyT4GsO7Gu8xME31qw2pw4XLz4EBcbgtaEttyq/T6keCrDsgl4Sh8tRpJ7gv9SnCuCZXc6C1ssqsyPl5XbrPrlxLhVwwOgHNl+lBI/xwBq/MG3XwnITdZh/99XtfWdEURpbL0CYxWn5HpTKzvX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724746618; c=relaxed/simple;
-	bh=MKkm9qMsRUpF3pd9pJZ/la8EY11iBqcRAJwn8afn+uY=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=NRZ36tJoipZHdDDYJSYiKIohJdByxSGEO7fTX3gr2DCJPJ8I+6hRlH/H/poQBJx77VgUqTxj5SWn9KQTPYdUKUYi/4q9zmAuUVJZ275GSm6rF0CRdQxMy4hpU3YnDH1vDB0DcvzzIzO7tsimyx+YDmLpSdPSXY+1zFfqAfYDoQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qr/uXIe/; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1724746695; c=relaxed/simple;
+	bh=ueQ+aPpDc0TK9bCs4HiiYBkaW0h8zdVvh8h6Spr+UTM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lO+n8cbgksAsppftbbqyHQ0sxDGCAVZHL8kt0hFJyeqfWUFsRKDY93y9nGHt6SBxIe9gVGoOAg0SdI1Neos0oCN/rXfGp4QSd9tKsNC88NVq4tSuyZtlR/NL62M+xw7i9fdEpflGbYUaR1BdCmepgYMIhtBBZyAhIs+h8bkxFfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZRYDNnt5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qr/uXIe/"
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724746614;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRYDNnt5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724746693;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cxt+VGDRBTaPSFOGZMDocY40CDrItRmbO7MUtHbwBV0=;
-	b=Qr/uXIe/iLQniybPLcv9BZdRIi008MYoe96+XAqWTckItAZCtpRe3gDHZgg4Chtzb2x+Aw
-	MRsw+MzW2lgUJ/9UAdLjR7OE8kFv249H6pdtTe4wKVVBmR0iKOh84C04uMeL6N0h6HIfwE
-	VVakBlz5wtVKp9eGKsKEiJu6QAqz8LA=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2POjXLS4suf26/CFlDwrLvuDWCdNgPkqz+C0kWqYtjM=;
+	b=ZRYDNnt5WgJzvW6wnIsIQPqE6LZ+21ttftwGq+9xo8Ykq+3DQhUJeimVkFacjNQs1/oiB1
+	dIjsDsdlcdycgykJjgbWxyvxkEIW9KM3fvZuMsMOkYUwsHkq7cnXkp466T6m1774PVZrPO
+	vWyxK+G21P0PfjESsckglATwBy0MPLU=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-549-yPgESvXbOlO8WyU5Ii5kDQ-1; Tue,
+ 27 Aug 2024 04:18:09 -0400
+X-MC-Unique: yPgESvXbOlO8WyU5Ii5kDQ-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A315A1955F42;
+	Tue, 27 Aug 2024 08:18:07 +0000 (UTC)
+Received: from dell-per7425-02.rhts.eng.pek2.redhat.com (dell-per7425-02.rhts.eng.pek2.redhat.com [10.73.116.18])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AC8BF30001A1;
+	Tue, 27 Aug 2024 08:18:02 +0000 (UTC)
+From: Li Wang <liwang@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk,
+	john.g.garry@oracle.com,
+	ltp@lists.linux.it
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>
+Subject: [PATCh v2] loop: Increase bsize variable from unsigned short to unsigned int
+Date: Tue, 27 Aug 2024 16:17:57 +0800
+Message-ID: <20240827081757.37646-1-liwang@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Re: [PATCH 4/4] block: fix fix ordering between checking
- QUEUE_FLAG_QUIESCED and adding requests to hctx->dispatch
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <1929CA74-3770-4B5D-B0A5-759911E97815@linux.dev>
-Date: Tue, 27 Aug 2024 16:16:15 +0800
-Cc: Muchun Song <songmuchun@bytedance.com>,
- Jens Axboe <axboe@kernel.dk>,
- "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D53C1E55-80A4-4F71-B93D-D357F424D2FF@linux.dev>
-References: <20240811101921.4031-1-songmuchun@bytedance.com>
- <20240811101921.4031-5-songmuchun@bytedance.com> <ZshyPVEc9w4sqXJy@fedora>
- <CAMZfGtW-AG9gBD2f=FwNAZqxoFZwoEECbS0+4eurnSoxN5AhRg@mail.gmail.com>
- <45A22FCE-10FA-485C-8624-F1F22086B5E9@linux.dev> <ZsxI6uCbGpQh1XrF@fedora>
- <1929CA74-3770-4B5D-B0A5-759911E97815@linux.dev>
-To: Ming Lei <ming.lei@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
+This change allows the loopback driver to handle block size larger than
+PAGE_SIZE and increases the consistency of data types used within the driver.
+Especially to match the struct queue_limits.logical_block_size type.
 
+Also, this is to get rid of the LTP/ioctl_loop06 test failure:
 
-> On Aug 27, 2024, at 15:24, Muchun Song <muchun.song@linux.dev> wrote:
->=20
->=20
->=20
->> On Aug 26, 2024, at 17:20, Ming Lei <ming.lei@redhat.com> wrote:
->>=20
->> On Mon, Aug 26, 2024 at 03:33:18PM +0800, Muchun Song wrote:
->>>=20
->>>=20
->>>> On Aug 26, 2024, at 15:06, Muchun Song <songmuchun@bytedance.com> =
-wrote:
->>>>=20
->>>> On Fri, Aug 23, 2024 at 7:28=E2=80=AFPM Ming Lei =
-<ming.lei@redhat.com> wrote:
->>>>>=20
->>>>> On Sun, Aug 11, 2024 at 06:19:21 PM +0800, Muchun Song wrote:
->>>>>> Supposing the following scenario.
->>>>>>=20
->>>>>> CPU0                                                              =
-  CPU1
->>>>>>=20
->>>>>> blk_mq_request_issue_directly()                                   =
-  blk_mq_unquiesce_queue()
->>>>>>  if (blk_queue_quiesced())                                        =
-   blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)   3) store
->>>>>>      blk_mq_insert_request()                                      =
-   blk_mq_run_hw_queues()
->>>>>>          /*                                                       =
-       blk_mq_run_hw_queue()
->>>>>>           * Add request to dispatch list or set bitmap of         =
-           if (!blk_mq_hctx_has_pending())     4) load
->>>>>>           * software queue.                  1) store             =
-               return
->>>>>>           */
->>>>>>      blk_mq_run_hw_queue()
->>>>>>          if (blk_queue_quiesced())           2) load
->>>>>>              return
->>>>>>          blk_mq_sched_dispatch_requests()
->>>>>>=20
->>>>>> The full memory barrier should be inserted between 1) and 2), as =
-well as
->>>>>> between 3) and 4) to make sure that either CPU0 sees =
-QUEUE_FLAG_QUIESCED is
->>>>>> cleared or CPU1 sees dispatch list or setting of bitmap of =
-software queue.
->>>>>> Otherwise, either CPU will not re-run the hardware queue causing =
-starvation.
->>>>>=20
->>>>> Memory barrier shouldn't serve as bug fix for two slow code paths.
->>>>>=20
->>>>> One simple fix is to add helper of blk_queue_quiesced_lock(), and
->>>>> call the following check on CPU0:
->>>>>=20
->>>>>      if (blk_queue_quiesced_lock())
->>>>>       blk_mq_run_hw_queue();
->>>>=20
->>>> This only fixes blk_mq_request_issue_directly(), I think anywhere =
-that
->>>> matching this
->>>> pattern (inserting a request to dispatch list and then running the
->>>> hardware queue)
->>>> should be fixed. And I think there are many places which match this
->>>> pattern (E.g.
->>>> blk_mq_submit_bio()). The above graph should be adjusted to the =
-following.
->>>>=20
->>>> CPU0                                        CPU1
->>>>=20
->>>> blk_mq_insert_request()         1) store    =
-blk_mq_unquiesce_queue()
->>>> blk_mq_run_hw_queue()
->>>> blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)       3) store
->>>>  if (blk_queue_quiesced())   2) load         blk_mq_run_hw_queues()
->>>>      return                                      =
-blk_mq_run_hw_queue()
->>>>  blk_mq_sched_dispatch_requests()                    if
->>>> (!blk_mq_hctx_has_pending())     4) load
->>>>                                                          return
->>>=20
->>> Sorry. There is something wrong with my email client. Resend the =
-graph.
->>>=20
->>> CPU0                                        CPU1
->>>=20
->>> blk_mq_insert_request()         1) store    blk_mq_unquiesce_queue()
->>> blk_mq_run_hw_queue()                       =
-blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)       3) store
->>>   if (blk_queue_quiesced())   2) load         blk_mq_run_hw_queues()
->>>       return                                      =
-blk_mq_run_hw_queue()
->>>   blk_mq_sched_dispatch_requests()                    if =
-(!blk_mq_hctx_has_pending())     4) load
->>>                                                           return
->>=20
->> OK.
->>=20
->> The issue shouldn't exist if blk_queue_quiesced() return false in
->> blk_mq_run_hw_queue(), so it is still one race in two slow paths?
->>=20
->> I guess the barrier-less approach should work too, such as:
->>=20
->=20
-> If we prefer barrier-less approach, I think the following solution
-> will work as well, I'll use it in v2. Thanks.
->=20
->>=20
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index e3c3c0c21b55..632261982a77 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -2202,6 +2202,12 @@ void blk_mq_delay_run_hw_queue(struct =
-blk_mq_hw_ctx *hctx, unsigned long msecs)
->> }
->> EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
->>=20
->> +static inline bool blk_mq_hw_queue_need_run(struct blk_mq_hw_ctx =
-*hctx)
->> +{
->> + 	return !blk_queue_quiesced(hctx->queue) &&
->> + 		blk_mq_hctx_has_pending(hctx);
->> +}
->> +
->> /**
->> * blk_mq_run_hw_queue - Start to run a hardware queue.
->> * @hctx: Pointer to the hardware queue to run.
->> @@ -2231,11 +2237,19 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx =
-*hctx, bool async)
->> * quiesced.
->> */
->> 	__blk_mq_run_dispatch_ops(hctx->queue, false,
->> - 		need_run =3D !blk_queue_quiesced(hctx->queue) &&
->> - 		blk_mq_hctx_has_pending(hctx));
->> + 		need_run =3D blk_mq_hw_queue_need_run(hctx));
->>=20
->> - 	if (!need_run)
->> - 		return;
->> + 	if (!need_run) {
->> + 		unsigned long flags;
->> +
->> + 		/* sync with unquiesce */
->> + 		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
+  12 ioctl_loop06.c:76: TINFO: Using LOOP_SET_BLOCK_SIZE with arg > PAGE_SIZE
+  13 ioctl_loop06.c:59: TFAIL: Set block size succeed unexpectedly
+  ...
+  18 ioctl_loop06.c:76: TINFO: Using LOOP_CONFIGURE with block_size > PAGE_SIZE
+  19 ioctl_loop06.c:59: TFAIL: Set block size succeed unexpectedly
 
-After some time thought, I think here we need a big comment to explain
-why we need to sync. Because there are other caller of =
-blk_queue_quiesced()
-which do not need to hold ->queue_lock to sync. Then, I am thinking
-is ->queue_lock really easier to be maintained than mb? For developers,
-we still need to care about this, right? I don't see any obvious =
-benefit.
-And the mb approach seems more efficient than spinlock. Something like:
+Thoese fail due to the loop_reconfigure_limits() cast bsize to 'unsined short'
+that never gets an expected error when testing invalid logical block size,
+which was just exposed since 6.11-rc1 introduced patches:
 
-	if (!need_run) {
-		/* Add a comment here to explain what's going on here. =
-*/
-		smp_mb();
-		need_run =3D blk_mq_hw_queue_need_run(hctx);
-		if (!need_run)
-			return;
-	}
+  commit 9423c653fe61 ("loop: Don't bother validating blocksize")
+  commit fe3d508ba95b ("block: Validate logical block size in blk_validate_limits()")
 
-I am not objecting to your approach, I want to know if you insist on
-barrier-less approach here. If yes, I'm fine with this approach. I can
-use it in v2.
+Link: https://lists.linux.it/pipermail/ltp/2024-August/039912.html
+Signed-off-by: Li Wang <liwang@redhat.com>
+Cc: John Garry <john.g.garry@oracle.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Jan Stancek <jstancek@redhat.com>
+---
+ drivers/block/loop.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Muhcun,
-Thanks.
-
->> + 		need_run =3D blk_mq_hw_queue_need_run(hctx);
->=20
-> One question here: should we use __blk_mq_run_dispatch_ops()? I saw a =
-comment above.
-> It seems it is safe to call blk_mq_hw_queue_need_run under [s]rcu =
-lock.
->=20
-> Thanks.
->=20
->> + 		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
->> +
->> + 		if (!need_run)
->> + 			return;
->> + 	}
->>=20
->> 	if (async || !cpumask_test_cpu(raw_smp_processor_id(), =
-hctx->cpumask)) {
->> 		blk_mq_delay_run_hw_queue(hctx, 0);
->>=20
->>=20
->> thanks,
->> Ming
->=20
->=20
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 78a7bb28defe..86cc3b19faae 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -173,7 +173,7 @@ static loff_t get_loop_size(struct loop_device *lo, struct file *file)
+ static bool lo_bdev_can_use_dio(struct loop_device *lo,
+ 		struct block_device *backing_bdev)
+ {
+-	unsigned short sb_bsize = bdev_logical_block_size(backing_bdev);
++	unsigned int sb_bsize = bdev_logical_block_size(backing_bdev);
+ 
+ 	if (queue_logical_block_size(lo->lo_queue) < sb_bsize)
+ 		return false;
+@@ -977,7 +977,7 @@ loop_set_status_from_info(struct loop_device *lo,
+ 	return 0;
+ }
+ 
+-static unsigned short loop_default_blocksize(struct loop_device *lo,
++static unsigned int loop_default_blocksize(struct loop_device *lo,
+ 		struct block_device *backing_bdev)
+ {
+ 	/* In case of direct I/O, match underlying block size */
+@@ -986,7 +986,7 @@ static unsigned short loop_default_blocksize(struct loop_device *lo,
+ 	return SECTOR_SIZE;
+ }
+ 
+-static int loop_reconfigure_limits(struct loop_device *lo, unsigned short bsize)
++static int loop_reconfigure_limits(struct loop_device *lo, unsigned int bsize)
+ {
+ 	struct file *file = lo->lo_backing_file;
+ 	struct inode *inode = file->f_mapping->host;
+-- 
+2.46.0
 
