@@ -1,120 +1,189 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3F119CD0B;
-	Mon, 26 Aug 2024 22:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B17B4C83
+	for <linux-block@vger.kernel.org>; Tue, 27 Aug 2024 01:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724711860; cv=none; b=ooiQPp0268WV6zT5/3uRvTRQ71gbSx/V1pcG85S2poAqIPtTQvA0/q1wV2m52lLsUiurLoo0vAff6TGoxfRVB8H8TaAwoKpZpAAZimhr6mAqjgQUJE6wLTizxrElnTgy9mVqAqaRKMS+HnGGAgxNvaA6gmOwdvaeYt3IkU8AZUA=
+	t=1724722141; cv=none; b=FmkykHN/1t2QQjTa+mSy+69exw/QNN8ZcuoGcuNOyAhKoiWh1qiMqEBT0l0lS7BwWArQI01a/OXOr8/o+JrEIDD7NUBTiRp5j5bszzzvKgKPwVEzWcRC0LqT14QK5FXsmzOTQtD3oBTI5rWAY9Yh8NpgzfvUIDU447OEBmF4sd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724711860; c=relaxed/simple;
-	bh=Oouq4cH0zqJeEJMbFJlnLLmoyhkHLvjJPAdomYbsrho=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=BQyd7pD7pQlQDYbaqREVY4On1VFy7Rg7L0iEOwul2rA+btCruhRYSswYUPBZ8g9jH2DADhYeaz4F2hnOF9th/3YydKCL9W10zinLy/FU25UwEK2yNEKb4aXuF+vcuCYwwJ1hRelMn8MsVtq4B2M7h2MD2tHLMGQjbUX5amvj3gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qb09TzyV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724722141; c=relaxed/simple;
+	bh=LWSsos9brGGFBVHUqBKo8WsLZqg2S2/k2MicY1l1GFA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kQbnjo6qhLRKZfJZaB8EBfETUPg8vggtf5OVrfeyRlB8zBE+1mf+7xYWhcvPBV7gvHqfR+AbDvQDv+eUFmrFHkkKQpOowoBfTKC2/D/c8UperyHRMPMcsnXyDRrkM1mc0l22QkddKIbm8NVAlskTN4k4k52FkatXsjz0TBM9maM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rlo/tnLl; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qb09TzyV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E9E7C4DDF5;
-	Mon, 26 Aug 2024 22:37:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724711859;
-	bh=Oouq4cH0zqJeEJMbFJlnLLmoyhkHLvjJPAdomYbsrho=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=Qb09TzyVc2l4aw3RBI9o82wnxLWEiNEzfGCk4UIhyL3hZpBlOTJ9d3PDuG7L3lTn4
-	 z+SuSa5wiedDwB7LHBOBudcJTFUvjTf2hkF8PDKPAkXApE4y+Cmm4WVESRX8doB/sh
-	 cenMFNtCryIU8ZfTceOclp6BJ1Er54Fcv4FO74ca0Okc48+9BBUwN7ahWvuDIN4TB9
-	 Nx928/ZCZz3gH52p3wbt1qEtUKK7/nxmuJHewXNnLZnIunD12QqJT2cqRQY9l0Q12+
-	 Hiu7Z+WdKb/yxF+kr7tZx1gIBTDUMWHKcMiAdDQvNfa8bYTos40KkOsnDzp7GQBOGK
-	 0fq4/WSB4Fj0Q==
-Message-ID: <9a25857d-21ca-46c8-82bb-bb642d9328bf@kernel.org>
-Date: Tue, 27 Aug 2024 07:37:37 +0900
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rlo/tnLl"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-690ad83d4d7so45279497b3.3
+        for <linux-block@vger.kernel.org>; Mon, 26 Aug 2024 18:28:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1724722138; x=1725326938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=um0Ld/DK1dALC+xuyiImRq2CVo2mp6q3KWIX/uQM1TA=;
+        b=rlo/tnLlXogSPYUun73ZU5s9pXgFCBqIEFIiMRksC30EfDSbUuKt5C2tDLo5lsXQgw
+         lZ3Sr1X1NoCVpNpJp/4OU5bxq4Hw1J/RSI7qLTCrYRe3xE5TrXrzYE139pYBSbxaPcph
+         357V+4w2dmRMgrd/KOpeTGzm+oyL4j5RgEhTLTmkSjiT5cClHedbsRbzMWt392OYpTva
+         iF7zJ5eUbsDaPn7fOVEzltx1X2Oc+rjmnirPUhwyrtJFZh6ExdNgDVlAQayvQROKWfFQ
+         r0d40e3fkpu5YluZAYIb1PBnVw+DMV0lngmTk15dXypCRApcVCTK7T7Su+AGs8RszLr6
+         kwVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724722138; x=1725326938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=um0Ld/DK1dALC+xuyiImRq2CVo2mp6q3KWIX/uQM1TA=;
+        b=R1gzLt35rxVkk6noYTxyV9FY0JDoZsjdKkPT+9/5xWqqZauqmJg7LghhPGvgNom5wk
+         Q7j8ZOq6w/mCiw7ViIKAenyDVZO5AXDUydMDM85YxMRcNIwFTf04HxgjznVwYqSWzUod
+         apzQRilYXuAVGy0WsVvTkbfYJgfT+gPoZmHkIfGSOTDWiLPRLDCSqf82qs+z58BU9IhF
+         jjMz7GAt8V+QB06XSNkw6fOeYSXUiG0z5PZctjsEYQcr1Jl8Na3ZrWudYZbQLB9Ri5/M
+         f39Hh96NfE0ja+sNaUGaTn40TDDY9Akb5CwfY9cilIgO62A30dWireEoVg/Ry59Gor1T
+         58vg==
+X-Forwarded-Encrypted: i=1; AJvYcCVaohEudwv0apbrJlR5fA0puzQlZ2Iv9++v+Z4leXo+VA1GOG5nLDLCIXPrxq5J2IYXi7Wpo/VQBVaZiw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+JS6yY/YMxOpBN/9r3M1PvBljEvDXzsJVSwspntbDhIMxx+jk
+	G07KPyNdbTF5feg5S4e9m3x6K4aaSP8be+xOM87COkTK36ozc4xO+tHqTbwyOGU4tsPaO4//Dgx
+	8WO/HhXIkn6WZ+RpKzR+FgzIBClcFYeBcVQcuMQ==
+X-Google-Smtp-Source: AGHT+IGivGnoM4u2PoEm3bwmD9C+DJbRzW3XIbEOxQ4Kz5QGN0k1ua5tksm0F2Od/7aSiugFThK2DFcpLfbYMP01jJU=
+X-Received: by 2002:a05:690c:fce:b0:65f:77c3:63a0 with SMTP id
+ 00721157ae682-6c624320c13mr150269467b3.7.1724722137887; Mon, 26 Aug 2024
+ 18:28:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] block: rework bio splitting
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
- David Sterba <dsterba@suse.com>, Hans Holmberg <Hans.Holmberg@wdc.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-References: <20240826173820.1690925-1-hch@lst.de>
- <20240826173820.1690925-2-hch@lst.de>
- <e59de073-c608-4206-8f98-9f46b1750931@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <e59de073-c608-4206-8f98-9f46b1750931@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240306232052.21317-1-semen.protsenko@linaro.org> <8896bcc5-09b1-4886-9081-c8ce0afc1c40@app.fastmail.com>
+In-Reply-To: <8896bcc5-09b1-4886-9081-c8ce0afc1c40@app.fastmail.com>
+From: Sam Protsenko <semen.protsenko@linaro.org>
+Date: Mon, 26 Aug 2024 20:28:47 -0500
+Message-ID: <CAPLW+4=NcjOFRd14ecYd8sMsiJXH9c+ZXse7BVMCWe5ZbMmKMQ@mail.gmail.com>
+Subject: Re: [PATCH] mmc: dw_mmc: Fix IDMAC operation with pages bigger than 4K
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
+	Christoph Hellwig <hch@lst.de>, Chris Ball <cjb@laptop.org>, Will Newton <will.newton@gmail.com>, 
+	Matt Fleming <matt@console-pimps.org>, Christian Brauner <brauner@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
+	Naresh Kamboju <naresh.kamboju@linaro.org>, 
+	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/27/24 07:26, Damien Le Moal wrote:
-> On 8/27/24 02:37, Christoph Hellwig wrote:
->> The current setup with bio_may_exceed_limit and __bio_split_to_limits
->> is a bit of a mess.
->>
->> Change it so that __bio_split_to_limits does all the work and is just
->> a variant of bio_split_to_limits that returns nr_segs.  This is done
->> by inlining it and instead have the various bio_split_* helpers directly
->> submit the potentially split bios.
->>
->> To support btrfs, the rw version has a lower level helper split out
->> that just returns the offset to split.  This turns out to nicely clean
->> up the btrfs flow as well.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> ---
->>  block/blk-merge.c   | 146 +++++++++++++++++---------------------------
->>  block/blk-mq.c      |  11 ++--
->>  block/blk.h         |  63 +++++++++++++------
->>  fs/btrfs/bio.c      |  30 +++++----
->>  include/linux/bio.h |   4 +-
->>  5 files changed, 125 insertions(+), 129 deletions(-)
->>
->> diff --git a/block/blk-merge.c b/block/blk-merge.c
->> index de5281bcadc538..c7222c4685e060 100644
->> --- a/block/blk-merge.c
->> +++ b/block/blk-merge.c
->> @@ -105,9 +105,33 @@ static unsigned int bio_allowed_max_sectors(const struct queue_limits *lim)
->>  	return round_down(UINT_MAX, lim->logical_block_size) >> SECTOR_SHIFT;
->>  }
->>  
->> -static struct bio *bio_split_discard(struct bio *bio,
->> -				     const struct queue_limits *lim,
->> -				     unsigned *nsegs, struct bio_set *bs)
->> +static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
-> 
-> Why not "unsigned int" for split_sectors ? That would avoid the need for the
-> first "if" of the function. Note that bio_split() also takes an int for the
-> sector count and also checks for < 0 count with a BUG_ON(). We can clean that up
-> too. BIOs sector count is unsigned int...
-> 
->> +{
->> +	if (unlikely(split_sectors < 0)) {
->> +		bio->bi_status = errno_to_blk_status(split_sectors);
->> +		bio_endio(bio);
->> +		return NULL;
->> +	}
->> +
->> +	if (split_sectors) {
-> 
-> May be the simple case should come first ? E.g.:
-> 
-> 	if (!split_sectors)
-> 		return bio;
-> 
-> But shouldn't this check be:
-> 
-> 	if (split_sectors >= bio_sectors(bio))
-> 		return bio;
+On Thu, Mar 7, 2024 at 1:52=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> wrote:
 
-Please ignore this one. The passed sector count is a limit, which can be 0, so
-checking  "if (!split_sectors)" is correct.
+[snip]
 
--- 
-Damien Le Moal
-Western Digital Research
+>
+> > This change is not only fixing the boot with 16K/64K pages, but also
+> > leads to a better MMC performance. The linear write performance was
+> > tested on E850-96 board (eMMC only), before commit [1] (where it's
+> > possible to boot with 16K/64K pages without this fix, to be able to do
+> > a comparison). It was tested with this command:
+> >
+> >     # dd if=3D/dev/zero of=3Dsomefile bs=3D1M count=3D500 oflag=3Dsync
+> >
+> > Test results are as follows:
+> >
+> >   - 4K pages,  .max_seg_size =3D 4 KiB:                   94.2 MB/s
+> >   - 4K pages,  .max_seg_size =3D .max_req_size =3D 512 KiB: 96.9 MB/s
+> >   - 16K pages, .max_seg_size =3D 4 KiB:                   126 MB/s
+> >   - 16K pages, .max_seg_size =3D .max_req_size =3D 2 MiB:   128 MB/s
+> >   - 64K pages, .max_seg_size =3D 4 KiB:                   138 MB/s
+> >   - 64K pages, .max_seg_size =3D .max_req_size =3D 8 MiB:   138 MB/s
+>
+> Thanks for sharing these results. From what I can see here, the
+> performance changes significantly with the page size, but barely
+> with the max_seg_size, so this does not have the effect I was
+> hoping for. On a more positive note this likely means that we
+> don't have to urgently backport your fix.
+>
+> This could mean that either there is not much coalescing across
+> pages after all, or that the bottleneck is somewhere else.
+>
+> > diff --git a/drivers/mmc/host/dw_mmc.c b/drivers/mmc/host/dw_mmc.c
+> > index 8e2d676b9239..cccd5633ff40 100644
+> > --- a/drivers/mmc/host/dw_mmc.c
+> > +++ b/drivers/mmc/host/dw_mmc.c
+> > @@ -2951,8 +2951,8 @@ static int dw_mci_init_slot(struct dw_mci *host)
+> >       if (host->use_dma =3D=3D TRANS_MODE_IDMAC) {
+> >               mmc->max_segs =3D host->ring_size;
+> >               mmc->max_blk_size =3D 65535;
+> > -             mmc->max_seg_size =3D 0x1000;
+> > -             mmc->max_req_size =3D mmc->max_seg_size * host->ring_size=
+;
+> > +             mmc->max_req_size =3D DW_MCI_DESC_DATA_LENGTH * host->rin=
+g_size;
+> > +             mmc->max_seg_size =3D mmc->max_req_size;
+>
+> The change looks good to me.
+>
+> I see that the host->ring_size depends on PAGE_SIZE as well:
+>
+> #define DESC_RING_BUF_SZ        PAGE_SIZE
+> host->ring_size =3D DESC_RING_BUF_SZ / sizeof(struct idmac_desc_64addr);
+> host->sg_cpu =3D dmam_alloc_coherent(host->dev,
+>                DESC_RING_BUF_SZ, &host->sg_dma, GFP_KERNEL);
+>
+> I don't see any reason for the ring buffer size to be tied to
+> PAGE_SIZE at all, it was probably picked as a reasonable
+> default in the initial driver but isn't necessarily ideal.
+>
+> From what I can see, the number of 4KB elements in the
+> ring can be as small as 128 (4KB pages, 64-bit addresses)
+> or as big as 4096 (64KB pages, 32-bit addresses), which is
+> quite a difference. If you are still motivated to drill
+> down into this, could you try changing DESC_RING_BUF_SZ
+> to a fixed size of either 4KB or 64KB and test again
+> with the opposite page size, to see if that changes the
+> throughput?
+>
 
+Sorry for the huge delay. Just ran the tests:
+
+- 4K pages, DESC_RING_BUF_SZ =3D 4K: 97 MB/s
+- 4K pages, DESC_RING_BUF_SZ =3D 16K: 98 MB/s
+- 4K pages, DESC_RING_BUF_SZ =3D 64K: 97 MB/s
+- 16K pages, DESC_RING_BUF_SZ =3D 4K: 123 MB/s
+- 16K pages, DESC_RING_BUF_SZ =3D 16K: 125 MB/s
+- 16K pages, DESC_RING_BUF_SZ =3D 64K: 124 MB/s
+- 64K pages, DESC_RING_BUF_SZ =3D 4K: 137 MB/s
+- 64K pages, DESC_RING_BUF_SZ =3D 16K: 135 MB/s
+- 64K pages, DESC_RING_BUF_SZE =3D 64K: 138 MB/s
+
+As you can see, changing the DESC_RING_BUF_SZ value doesn't change MMC
+throughput much; the fluctuations are just a measurement/statistical
+error. Not that it matters much, but my measurement method was running
+the same dd command I mentioned earlier:
+
+    # dd if=3D/dev/zero of=3Dsomefile bs=3D1M count=3D500 oflag=3Dsync
+
+For each combination, I ran it 10 times, with different wait time
+between runs (as it affects the throughput), then taking top 10%
+percentile value -- it just felt right. The dispersion wasn't too big
+either. I used the same method in my previous mail as well, so it's
+safe to compare these values with those.
+
+Not sure if my test procedure and results cover everything you wanted
+to see, so please let me know if you want me to run more tests (e.g.
+by changing dd params, or running multiple dd commands with shorter
+wait in between, etc).
+
+> If a larger ring buffer gives us significantly better
+> throughput, we may want to always use a higher number
+> independent of page size. On the other hand, if the
+> 64KB number (the 138MB/s) does not change with a smaller
+> ring, we may as well reduce that in order to limit the
+> maximum latency that is caused by a single I/O operation.
+>
+
+From what you said, it looks like it may make a sense to reduce
+DESC_RING_BUF_SZ down to 4 KiB? If so, I'd suggest we do that in a
+separate patch, as this one actually fixes kernel panic when 16k/64k
+pages are enabled. Please let me know what you think.
+
+Thanks!
