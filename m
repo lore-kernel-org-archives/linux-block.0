@@ -1,105 +1,73 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DC9199BC;
-	Tue, 27 Aug 2024 03:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B7A210E9;
+	Tue, 27 Aug 2024 04:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724729495; cv=none; b=pTRiacEWFCOzwwcjg2sonbdunYoyx8cb86rTcuuRFZ07derQtxr3FqG5g9S9wMT7Ns1k81FTLvHHQkoeKoPiVYd678vfFZ2SLzQG2a/OfIP8Gc3/rLmUKP+cEdJmnO8fKut1kLzWwGkqbG9lYOGhrl5lja6dzn/EGJEwvRPPgeA=
+	t=1724731722; cv=none; b=XzaGS6vYZ9n15wbC/EXNEGnyDllGAWtMTfJCZJDdPycxlrgimz+yO6MBv52PY1HfVGKqQB695vCivh4sehK6wW2xB7FvufUXkp8Cs1s4oHkYLDH4AxWUx9bszLiX9vRlp98CIrev0msY9zxHIk3XTqgAIVZvhSoD9Wi0OEv0W4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724729495; c=relaxed/simple;
-	bh=ZsAX6fYNBN8s4cM6prV7+Nw4KR6G6zRcui+vpWCXiiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y8KwqSUTeDlG+sKSDBnVKCOjj9tPDr6vNiEuvIYximkZjNp3Ob4nCZOVxw4TOgMMoHl9d2zAzfbRg9o0OjWUfR0Oi42GDYIBDskuWqDjRipxQvnImc7pAQUPmhUAzF+qGzvBk1t6qTCOy16qNq5R2ZqZ/yxl4LIAErb5wGNLLFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FXJl1j/A; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1724731722; c=relaxed/simple;
+	bh=4k1Cqj8b4wr9XU9TIRB4ufdLXcPkYzakEKmtnc0SMs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ckewpo2KvtN495O3JYvv9PWo99iSZTCDENEca/iyRANgOAvOm7Nb4IJ8hWEkGqKYe3CWhrC5wfEF6Fp0GlqlfzJUAQS5NzOD3jEo0Skx2osFjV3ISvJHU1W7IJ9ydTv/BfbiGTxo7V3Z8QP3D4LcunogJQ1NBjpm2j8JlsapyFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJOtGmpg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FXJl1j/A"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724729492; x=1756265492;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZsAX6fYNBN8s4cM6prV7+Nw4KR6G6zRcui+vpWCXiiM=;
-  b=FXJl1j/AyNRlQ0Km+tpPSaeXKtVgDT3lDNvXqNlbwOQdHImGWzHSyKke
-   bqz17w95kcG1tC0Af6f67Dlm8yMfHIdILGlrTX3ovKVa5pQ+66zPo+Hj5
-   gjNlqzGc9ZvTuDfDs+VGIPURzrWGByAq1N2Kq0IXCMK7rpn4JRghg8aRG
-   Rth7SNULAidyorGbn2sHqXGYlAuvlib4TnhW8Ogo0JLuwL7ijqB3ouX0k
-   dWRIergQTl41uO5gL3h5f0GQRSl46/JcuM3FaDBGsIAk/LJOuSU3t9td1
-   MAsLUiCfwg/EmJQQFKls+ertCa5P+Cr0tdpq7MsPZN2Jrs4VT1Kh6gYvu
-   w==;
-X-CSE-ConnectionGUID: U0VsYO+CQ5mT+4pCIfODow==
-X-CSE-MsgGUID: UI3+y8WLQ4i8nk9v/4WsOw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="23154137"
-X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="23154137"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 20:31:30 -0700
-X-CSE-ConnectionGUID: QDU5QLH3TqucnA37kaonFw==
-X-CSE-MsgGUID: w9+02ioqSw6jKQ/o9ovjaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="62698679"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa008.fm.intel.com with ESMTP; 26 Aug 2024 20:31:22 -0700
-Date: Tue, 27 Aug 2024 11:28:59 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH v3 2/9] fpga/dfl-pci.c: Replace deprecated PCI functions
-Message-ID: <Zs1H+zgzZAuLUnza@yilunxu-OptiPlex-7050>
-References: <20240822134744.44919-1-pstanner@redhat.com>
- <20240822134744.44919-3-pstanner@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJOtGmpg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59789C8B7DB;
+	Tue, 27 Aug 2024 04:08:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724731722;
+	bh=4k1Cqj8b4wr9XU9TIRB4ufdLXcPkYzakEKmtnc0SMs0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aJOtGmpgXxIpxfXVUblfa1E8AlLPLvV3StT1cG3VBtEEhXLc/xRM/POSsa318QMQC
+	 t09Y6RSk+dODiVKxyaobCI3V59bKDwVSCxLnnSbUa3i8StHp1fSjGIo08Z8I/YYoCD
+	 x6BxwqsZm3BKDnjD9lzYf348Ppg1GtIBfJ29DAdhTL9Ou83juVacTCW9zZGsW0jeNP
+	 E3WEPKrcnvyCHZeGzl4ehxoQ56H1mbLhxYQpqOGprrQ8O+LWmqpb+Gvd9CQgwk60yz
+	 fKo8duKzTiDeexta9aplSweqimvZhRplxg5tzohmKSD9dMuSjk2xf9Mf9QXBYpX9Bl
+	 W+KUUoXDTUyEQ==
+Message-ID: <74581e8f-2eec-4cde-b828-4fc7d2925399@kernel.org>
+Date: Tue, 27 Aug 2024 13:08:40 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822134744.44919-3-pstanner@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] block: rework bio splitting
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+ David Sterba <dsterba@suse.com>, Hans Holmberg <Hans.Holmberg@wdc.com>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20240826173820.1690925-1-hch@lst.de>
+ <20240826173820.1690925-2-hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20240826173820.1690925-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 22, 2024 at 03:47:34PM +0200, Philipp Stanner wrote:
-> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
-> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+On 8/27/24 02:37, Christoph Hellwig wrote:
+> The current setup with bio_may_exceed_limit and __bio_split_to_limits
+> is a bit of a mess.
 > 
-> Port dfl-pci.c to the successor, pcim_iomap_region().
+> Change it so that __bio_split_to_limits does all the work and is just
+> a variant of bio_split_to_limits that returns nr_segs.  This is done
+> by inlining it and instead have the various bio_split_* helpers directly
+> submit the potentially split bios.
 > 
-> Consistently, replace pcim_iounmap_regions() with pcim_iounmap_region().
+> To support btrfs, the rw version has a lower level helper split out
+> that just returns the offset to split.  This turns out to nicely clean
+> up the btrfs flow as well.
 > 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Acked-by: Xu Yilun <yilun.xu@intel.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Thanks.
+-- 
+Damien Le Moal
+Western Digital Research
+
