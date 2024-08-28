@@ -1,134 +1,189 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFC618030
-	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 13:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554A616BE30;
+	Wed, 28 Aug 2024 13:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724851165; cv=none; b=DIXSWzHCPoG4OuLoymyErbTmCa7bhlLGlcf5UxCR/WRdIUsY2qnfCMnvac2bbpJohE8yiIIlWx0Mz1iSRw/3Pz3mNT2gr2qBZtFm4VoKhydpDsc/Xhf6zbm56uUiS1fWBcuJZrLikMr+57Pjsr0YFpVFG8zGsUaVBnFzP5qvFaw=
+	t=1724851609; cv=none; b=om+yRYy6Jdc/MNpJbvTWu/XRHWpZOj+pbav7jZUVdP4V3eT4acElBdjyNzil6dK4IifPCt23+ZJJ2Q3jNCOzDW55J6yXFDF7ZCtqcHazPN4OHTcy3ZYnPTMTiTpIBFLUa/eevSK4turgiSJXO6PtwtaB+7rxLXxp0YlGuqRLB04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724851165; c=relaxed/simple;
-	bh=CU5Qhhpvx7cFRmdTALiWh/VuoMb8wsVyhSKuEd5oixY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SN1rL9CH0uSae55/iY4s5oSIkxidBQoYlUi4gowNJttNNgCL9HQEV7n1eHL/PF40qNt/XwivJBd5pduMTvQPDhgOEGFLZtWrj3oH4noEjax62tLGt3rAC7Uo8/jOq79SyWQSUrqokg8eHfrnzNppm92z6ELqmDM99/b/2zrm1ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=Slu0+Zxk; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	s=arc-20240116; t=1724851609; c=relaxed/simple;
+	bh=7BbU5dLovWDFORgSLFgRyj4fzAjLCu/oXgappiGEN7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NiozCog0REfwoizK6dSWdYmU1gNC8yDLnu9boayivQWvKBDaEVh6DxZCT+3sdmvJm8ozMjTSyT3RrYTq1dqa9+WIaqKA3CU8SHsnKWQr0Myf/kJLKCZXvUVQ1rHzBotRAFLT/qglPrBdSweJG2jjtnUm+1y2cOwS92eJ8ynTf4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=gGFZAlaI; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=uyOpuk+j; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=gGFZAlaI; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=uyOpuk+j; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="Slu0+Zxk"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f50966c478so36495551fa.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 06:19:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1724851161; x=1725455961; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rfRcpJQkRR03CtIHNNEqO/lgAvHGNDAjw4dNJiA09aA=;
-        b=Slu0+ZxkUGiaup6BQBFEgBsH1t1VPH30WI9jdY21TsIlSLTp/GNXIK0CnpIXdnKZcf
-         LV3EugCiTp9Fe536MmXAHFAq45Tje4CMNoyxptdTOx/hS69avcnJUKvXuI8T8uUsM8/V
-         zx5StmHNgkKAtQjdWQU7fqyhpj9ujaUsAFPphkCvj/xTQ6Vy2gU1Gqlr7KhBU5T4ca4y
-         lmNwOlF1NoVxDachbfQPUX0hIXcDJa/fbsywZ6C/3t8nHVh4vfwaG4/WpIp21vow4wnX
-         dmiKyKPxRswh+8iA7g3KxffKmemW0QSijViCT52xJ1ffd+QVrmKHUh2Q5+Io2QrydtSn
-         7cSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724851161; x=1725455961;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rfRcpJQkRR03CtIHNNEqO/lgAvHGNDAjw4dNJiA09aA=;
-        b=bli/x08Dw65R3blAHlBX17Bo4JsSEPJ1uSZPDK71vpwr0RDIpLknqNoL1HyKC0oHYF
-         Ds5V7XYQvKnkNDgkmTuELUM3Jy4//QoI0tPQiDaR8PrWoqiuRQ+kto1wJGUQojBB6bYe
-         mbaZ2rn1XMKcSQQbeYWMFxTV4ySyWOGqf4+TDWKLTi1/hN+Lr1b8W3VB3wnu8lqxBbyX
-         apIcNYIzf0U66+XemL+X4mm/dtj8YUScE3v6ld0o2szdFR3hlfC008vZd/QoAQnKmWsm
-         eoeBVLqYrgR9clNUgxUABfwDDrmLijet/jIlxy/PeuPcWWO7pCj96PDX03kCmNaqfAxb
-         rHhQ==
-X-Gm-Message-State: AOJu0Yw+Dd/0GOaCbfvqSF7qe0TxPyP4G47gFcKPyfzL8WwnUZ/si6dq
-	ptcTOaIIH5PUCfZgfLpW2FRwOhmI6rkk3PAcz+wz1wVSV6npw8kqbHJAM5IY1/855Hcq+k4Cmt4
-	1oRiXT6DD6QDGFp6nnVS0h1wuzGPV5o+harYJqPjzFFLuq2WdvAg=
-X-Google-Smtp-Source: AGHT+IGdThGtPCbXl/LZCZkfl9ZU5WugqJ14vZzK1KybEESOr8lglphQeJOs+kYJEDqR1WNxn4ST/h1llq4GH0+M9IU=
-X-Received: by 2002:a2e:a552:0:b0:2ef:2ce0:6ac with SMTP id
- 38308e7fff4ca-2f55b6be0f5mr16324461fa.22.1724851160299; Wed, 28 Aug 2024
- 06:19:20 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="gGFZAlaI";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="uyOpuk+j";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="gGFZAlaI";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="uyOpuk+j"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 589331FBBF;
+	Wed, 28 Aug 2024 13:26:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724851605; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LyUIc0iZ+ZifEEA8zobhhlH2+HprB79+jaE7STT3510=;
+	b=gGFZAlaIfmh4x7eegJ3pSAbPn1at4ndXZyXRO1e46NXX1Wsl2zHBv0eSak+JHJyaqRw/CX
+	0RV27RwFNhem2n/lDWNa1RSyvK3QzbkEmz3Yn7k9N8nY0EQK5LznRqX+EmUKY5tCdl2u+T
+	0kONASN0lfBTSmYCnKZUW3SfxnGZnbw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724851605;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LyUIc0iZ+ZifEEA8zobhhlH2+HprB79+jaE7STT3510=;
+	b=uyOpuk+jgh3b7bSMpIsDhZzaSt5GQHdG87HIN4O2Ra6f7eXPtFFfMLh8iJ10ULdvLfrffv
+	61m6HzM5Xsyo/tBg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=gGFZAlaI;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=uyOpuk+j
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724851605; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LyUIc0iZ+ZifEEA8zobhhlH2+HprB79+jaE7STT3510=;
+	b=gGFZAlaIfmh4x7eegJ3pSAbPn1at4ndXZyXRO1e46NXX1Wsl2zHBv0eSak+JHJyaqRw/CX
+	0RV27RwFNhem2n/lDWNa1RSyvK3QzbkEmz3Yn7k9N8nY0EQK5LznRqX+EmUKY5tCdl2u+T
+	0kONASN0lfBTSmYCnKZUW3SfxnGZnbw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724851605;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LyUIc0iZ+ZifEEA8zobhhlH2+HprB79+jaE7STT3510=;
+	b=uyOpuk+jgh3b7bSMpIsDhZzaSt5GQHdG87HIN4O2Ra6f7eXPtFFfMLh8iJ10ULdvLfrffv
+	61m6HzM5Xsyo/tBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4273D138D2;
+	Wed, 28 Aug 2024 13:26:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id O14zEJUlz2a+JgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 28 Aug 2024 13:26:45 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id B4B33A0968; Wed, 28 Aug 2024 15:26:40 +0200 (CEST)
+Date: Wed, 28 Aug 2024 15:26:40 +0200
+From: Jan Kara <jack@suse.cz>
+To: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+Cc: linux-doc@vger.kernel.org, corbet@lwn.net,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	kernel-dev@igalia.com, kernel@gpiccoli.net,
+	Bart Van Assche <bvanassche@acm.org>,
+	"Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH V4] Documentation: Document the kernel flag
+ bdev_allow_write_mounted
+Message-ID: <20240828132640.baglvrg3vkybjkys@quack3>
+References: <20240826001624.188581-1-gpiccoli@igalia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240809135346.978320-1-haris.iqbal@ionos.com> <CAJpMwyhLMNJYbuLT4h7g5PM9iWQV072qc6fWUSP3F+s4-ypO0Q@mail.gmail.com>
-In-Reply-To: <CAJpMwyhLMNJYbuLT4h7g5PM9iWQV072qc6fWUSP3F+s4-ypO0Q@mail.gmail.com>
-From: Haris Iqbal <haris.iqbal@ionos.com>
-Date: Wed, 28 Aug 2024 15:19:09 +0200
-Message-ID: <CAJpMwygij1UJMP7zvoYmGduHJK7DfgLfMTLjmYz=FsFwux2M1g@mail.gmail.com>
-Subject: Re: [PATCH for-next] block/rnbd-srv: Add sanity check and remove
- redundant assignment
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org, 
-	jinpu.wang@ionos.com, Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240826001624.188581-1-gpiccoli@igalia.com>
+X-Rspamd-Queue-Id: 589331FBBF
+X-Spam-Score: -4.01
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email,suse.cz:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Wed, Aug 21, 2024 at 1:25=E2=80=AFPM Haris Iqbal <haris.iqbal@ionos.com>=
- wrote:
->
-> On Fri, Aug 9, 2024 at 3:54=E2=80=AFPM Md Haris Iqbal <haris.iqbal@ionos.=
-com> wrote:
-> >
-> > The bio->bi_iter.bi_size is updated when bio_add_page() is called. So w=
-e
-> > do not need to assign msg->bi_size again to it, since its redudant and
-> > can also be harmful. Instead we can use it to add a sanity check, which
-> > checks the locally calculated bi_size, with the one sent in msg.
-> >
-> > Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
-> > Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
-> > Signed-off-by: Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
-> > ---
-> >  drivers/block/rnbd/rnbd-srv.c | 11 +++++++++--
-> >  1 file changed, 9 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-sr=
-v.c
-> > index f6e3a3c4b76c..08ce6d96d04c 100644
-> > --- a/drivers/block/rnbd/rnbd-srv.c
-> > +++ b/drivers/block/rnbd/rnbd-srv.c
-> > @@ -149,15 +149,22 @@ static int process_rdma(struct rnbd_srv_session *=
-srv_sess,
-> >                         rnbd_to_bio_flags(le32_to_cpu(msg->rw)), GFP_KE=
-RNEL);
-> >         if (bio_add_page(bio, virt_to_page(data), datalen,
-> >                         offset_in_page(data)) !=3D datalen) {
-> > -               rnbd_srv_err(sess_dev, "Failed to map data to bio\n");
-> > +               rnbd_srv_err_rl(sess_dev, "Failed to map data to bio\n"=
-);
-> >                 err =3D -EINVAL;
-> >                 goto bio_put;
-> >         }
-> >
-> > +       bio->bi_opf =3D rnbd_to_bio_flags(le32_to_cpu(msg->rw));
-> > +       if (bio_has_data(bio) &&
-> > +           bio->bi_iter.bi_size !=3D le32_to_cpu(msg->bi_size)) {
-> > +               rnbd_srv_err_rl(sess_dev, "Datalen mismatch:  bio bi_si=
-ze (%u), bi_size (%u)\n",
-> > +                               bio->bi_iter.bi_size, msg->bi_size);
-> > +               err =3D -EINVAL;
-> > +               goto bio_put;
-> > +       }
-> >         bio->bi_end_io =3D rnbd_dev_bi_end_io;
-> >         bio->bi_private =3D priv;
-> >         bio->bi_iter.bi_sector =3D le64_to_cpu(msg->sector);
-> > -       bio->bi_iter.bi_size =3D le32_to_cpu(msg->bi_size);
-> >         prio =3D srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
-> >                usrlen < sizeof(*msg) ? 0 : le16_to_cpu(msg->prio);
-> >         bio_set_prio(bio, prio);
-> > --
-> > 2.25.1
->
-> Gentle ping.
+On Sun 25-08-24 21:15:11, Guilherme G. Piccoli wrote:
+> Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
+> devices") added a Kconfig option along with a kernel command-line tuning to
+> control writes to mounted block devices, as a means to deal with fuzzers like
+> Syzkaller, that provokes kernel crashes by directly writing on block devices
+> bypassing the filesystem (so the FS has no awareness and cannot cope with that).
+> 
+> The patch just missed adding such kernel command-line option to the kernel
+> documentation, so let's fix that.
+> 
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Darrick J. Wong <djwong@kernel.org>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
+> ---
+> 
+> V4: More improvements in the wording (thanks Jens and Darrick!)
+> 
+> V3 link: https://lore.kernel.org/r/20240823180635.86163-1-gpiccoli@igalia.com
+> 
+> 
+>  Documentation/admin-guide/kernel-parameters.txt | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 09126bb8cc9f..d521d444a35c 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -517,6 +517,18 @@
+>  			Format: <io>,<irq>,<mode>
+>  			See header of drivers/net/hamradio/baycom_ser_hdx.c.
+>  
+> +	bdev_allow_write_mounted=
+> +			Format: <bool>
+> +			Control the ability to open a block device for
+						    ^^ a mounted block device
 
-Hi Jens,
-Could you please pink up this patch if there are no comments.
-Thanks
+Otherwise looks good so feel free to add:
 
->
-> >
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+									Honza
+
+> +			writing, i.e., allow / disallow writes that bypass
+> +			the FS. This was implemented as a means to prevent
+> +			fuzzers from crashing the kernel by overwriting the
+> +			metadata underneath a mounted FS without its awareness.
+> +			This also prevents destructive formatting of mounted
+> +			filesystems by naive storage tooling that don't use
+> +			O_EXCL. Default is Y and can be changed through the
+> +			Kconfig option CONFIG_BLK_DEV_WRITE_MOUNTED.
+> +
+>  	bert_disable	[ACPI]
+>  			Disable BERT OS support on buggy BIOSes.
+>  
+> -- 
+> 2.46.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
