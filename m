@@ -1,94 +1,78 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015561A0B04
-	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 14:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311031898F6;
+	Wed, 28 Aug 2024 14:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724856686; cv=none; b=mluzNHCWSokEciOYzAgAhnGjujZ85LEwqyi7y7x6KJO1fXPYq0N1We1gUUMaA23nTyyq83h6KoUAFFg29P4mivmgqLRyBjPb9Pu2YHia6Opg79palgzq2RJMhI6xdrgN9AoMcb91YrGx+IzNqeMkT83eHVDDgL2a6JVr7cwFXH8=
+	t=1724856706; cv=none; b=I3yFZM5EbMNoWs8ZMImz8684HDXpqpj7bssApng3wStMNK++BqVGPd2oaME4fXyt95tvt+8xsPlYsHnZ3al477pt6KKlei6xPYpig78e4VL+GJQQ1DVuOk/a4s/KgAmzBYLM7Eq4pu+OXaZGeCWgg7cuA31dM8LXHlun7XCPWZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724856686; c=relaxed/simple;
-	bh=fvisZexUf4VvnutqYhdxmRerwQon/w2cB6Zl0MbQYlU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=WujP83+g5RDVhBEyL98XxDHUZbGH2kAvlmKQNaCE5VYyozHYat1U3Tum/dMZdOwUWt3XUSYT5ZyvsHtqt7uDuLPvgp1RdfWoScQ/72qu+I27yTjKjHs6MAOsqt50+au1RrFmNMqsQHqNfenufqx82+uCVvDcbEtpPYp2+RNSSoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WpXbLGgv; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1724856706; c=relaxed/simple;
+	bh=8JtQ18OLVzFWX8geqNYZeN7Vh4PMTNF9RG2ZtCetbXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cBPdy4sfpUo2ViQZPi7SLbhACMIk+9kXUlwBHC2vLToz3OVFwChEegj3S1S7kZvxql+ukclik8fGlDyxmv6uh3vdvWSD8Vn1idEt/HSar+lu0GB+OGHPFXVxpj5wsxth8oRuBlUe9tj1K1V3lPBbLQBxCgpwK8PMm7DtxI9l348=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=XTDen7sQ; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WpXbLGgv"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-81fb419f77bso373692239f.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 07:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1724856684; x=1725461484; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WyEUV1xYu+pXzys5LhYG+utdaA9ZxHIg1uBDsn9tZgM=;
-        b=WpXbLGgvQi269Oj5tE2+z7T+aYzuL+oh9bXXjw6NumQhwVkvZsZG1K4/3NCwSMboEh
-         qWZY+z/M6MDIfzk4W62DsAFcrw0Cg6UskFvOOA1FDqcav5xjo123DYZoAi/PMIsJZQDe
-         Lt3ktUkHSafDaTEclctm0ojTGLrEPIEhZpb5DNIcCwten98iBFmsgbZTPZIJLrCuOMmQ
-         PmggzrKSU2sJRsTgG5eYBOzdNCm9sTxpcld5g10XmPk3Ig6v01Z4pDkABrgTcUvVmhCy
-         GUHjgCyWcKW7D4bcqqGFWeW/oFoqd00j50wF/ZDKzC+g/RizRCCbsfqB5J6JI2dg30Do
-         GkMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724856684; x=1725461484;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WyEUV1xYu+pXzys5LhYG+utdaA9ZxHIg1uBDsn9tZgM=;
-        b=XKl9S0eP//pgiJFjrs3Vs3Ie39mcN2s+km+uRhZRSpdM0LCCVh9Ct/vpuwpjTKk2bg
-         H5FGSfNLuR5BuVVM9GSeHqlijzrhJQilDiYHWQP/7iSwtchgbcwWCJsQQ8EQTTAbmC+z
-         nJGxVKWBtcLzMH9BsUR97/ovq85FBE8F/yNumkVy6KEtnZ5OisSY7oFkpG10F1luUUJu
-         h0eDZbhg1q0RDwA1nKl0mpR4jZcoyP9eqrBWQrBija2svvxVzZW1/TDeTOCY+bhvw3K+
-         M4dBUwQpVhufVBpzOdGZoYeYJzTXuo5e+7yn75wA+/LY7OnysR0Yp4D3hpHnbH0W5A8F
-         6a7w==
-X-Gm-Message-State: AOJu0YyUmlNhb8FaLkezitfSEpKgDhv9yemr1V7FKVRVAsKJVhpnUb7V
-	cf5Ge8KsWdXY1SvdrMF4+i9zdOLndhKUzO3Ala32Y5vCk8YHuteRjmGorTl9+Z8j6GPkHPez2CY
-	3
-X-Google-Smtp-Source: AGHT+IEGZ5Vp5T+rPisQ66cmsf0Xa/De3sGPs/AT0I32TE+m8OHmQkLyWghpBozFV++zVfxon2ONcQ==
-X-Received: by 2002:a05:6602:148d:b0:825:2d48:91c7 with SMTP id ca18e2360f4ac-82787311582mr2215340139f.4.1724856683619;
-        Wed, 28 Aug 2024 07:51:23 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ce70f84e20sm3092887173.84.2024.08.28.07.51.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 07:51:22 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Md Haris Iqbal <haris.iqbal@ionos.com>
-Cc: hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org, 
- jinpu.wang@ionos.com, Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
-In-Reply-To: <20240809135346.978320-1-haris.iqbal@ionos.com>
-References: <20240809135346.978320-1-haris.iqbal@ionos.com>
-Subject: Re: [PATCH for-next] block/rnbd-srv: Add sanity check and remove
- redundant assignment
-Message-Id: <172485668231.410120.2205193926439632652.b4-ty@kernel.dk>
-Date: Wed, 28 Aug 2024 08:51:22 -0600
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="XTDen7sQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VP+hqOelGa5pKflE0DRQN+uFVvubKK/EENoZvYaD5BU=; b=XTDen7sQx9agssYn8MkhNRiZRd
+	5VRTH1xLhBVR3UdCS72CEyCqNOtGTiAHghk2hU5yHITlgFLzXy0oDXuLYRBUF9iuGLMlRO/AGhH09
+	FavBkDsi8fFccpamyxqphV0pT/iU1nZBwzjU/OIqkC6T1jzjzuFCexTGUpkAdu6GRfMejyLG22IVh
+	qQUGstn6WeGqgXv/ciRNZO0TfcTouuViW9pJhJb2DjrWMOEY0PRi7mlRLIrfa7MNfV8Oz97o/iQZV
+	vFieUPfTXP5Wd2rs44DBBlHfZP/LFZGUEVLF0qxG2h+AF7IafcomvXsw3H3L8458xX9WccBR1LrjX
+	YNrpQDyg==;
+Received: from [177.76.152.96] (helo=[192.168.1.60])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1sjK1O-006N4P-G9; Wed, 28 Aug 2024 16:51:42 +0200
+Message-ID: <fe4e1363-250a-f5ed-82fa-9996f6c9b67a@igalia.com>
+Date: Wed, 28 Aug 2024 11:51:34 -0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH V4] Documentation: Document the kernel flag
+ bdev_allow_write_mounted
+Content-Language: en-US
+To: Jan Kara <jack@suse.cz>
+Cc: linux-doc@vger.kernel.org, corbet@lwn.net, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, kernel-dev@igalia.com, kernel@gpiccoli.net,
+ Bart Van Assche <bvanassche@acm.org>, "Darrick J. Wong" <djwong@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>
+References: <20240826001624.188581-1-gpiccoli@igalia.com>
+ <20240828132640.baglvrg3vkybjkys@quack3>
+From: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+In-Reply-To: <20240828132640.baglvrg3vkybjkys@quack3>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.1
 
-
-On Fri, 09 Aug 2024 15:53:46 +0200, Md Haris Iqbal wrote:
-> The bio->bi_iter.bi_size is updated when bio_add_page() is called. So we
-> do not need to assign msg->bi_size again to it, since its redudant and
-> can also be harmful. Instead we can use it to add a sanity check, which
-> checks the locally calculated bi_size, with the one sent in msg.
+On 28/08/2024 10:26, Jan Kara wrote:
+> [...]
+>> --- a/Documentation/admin-guide/kernel-parameters.txt
+>> +++ b/Documentation/admin-guide/kernel-parameters.txt
+>> @@ -517,6 +517,18 @@
+>>  			Format: <io>,<irq>,<mode>
+>>  			See header of drivers/net/hamradio/baycom_ser_hdx.c.
+>>  
+>> +	bdev_allow_write_mounted=
+>> +			Format: <bool>
+>> +			Control the ability to open a block device for
+> 						    ^^ a mounted block device
 > 
+> Otherwise looks good so feel free to add:
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
 > 
 
-Applied, thanks!
-
-[1/1] block/rnbd-srv: Add sanity check and remove redundant assignment
-      commit: f6f84be089c9d6f5e3e1228c389e51c7ae7bad1a
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Thanks! Just sent the v5.
