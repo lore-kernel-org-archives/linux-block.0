@@ -1,264 +1,209 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678DC13D889;
-	Wed, 28 Aug 2024 15:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8AE1A2C38
+	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 16:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724859274; cv=none; b=a+dZnGSgmQO1EM5UFKMPw1OFhzc9beVs+xST+ti/ks5tFGqPxda3yB0KqnR5NHOJTs9H/QaXjLRqJ5/sdYc+ZPLvkVsv5+n7ihMUm7vGwZ/DVEg5YS/tRCx1IQYU9AYixKiw+d+HQufXdkLQNdhNuAVl5DpBNo4NZiVQh+CsxV4=
+	t=1724861629; cv=none; b=S+A6fKc4MQU8INrV7CqDKpwHLlc7BkWRSh9hNeDSzLSWBo+RQRH6Rp3JTjGKt+TKRNCubEthFNvFdv3dZBEKV6Lkmb1e2DacsM0Ki3FT/z5QY7APCauporWZ+ZNbHQ02OSgAJKre9p/PktpivqUQLqjOKcDlEY71HlKqzcyHMZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724859274; c=relaxed/simple;
-	bh=0MrHZwsCW0Y57nuox4lGSlndzkqpr7aXr7jJnEOkGb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HyIjQeNlR8uo1vS8zy52wKSCeuyda32pyw0f4+3+4974qd5fzXPlrspVCAvc07h3FMBuJy478z+uIew6sIVqBYTlramla1OERJ9MHkK2IATYsa2RDEE2CI90hJaGCbTdl0iJz/lHGq3Vzyu3Aohn4Npg9lEzw4zwRW7RPKqRPeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=C7KT8q2q; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=IDDARMRi; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=B5qnEANe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ZnUx22B/; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1724861629; c=relaxed/simple;
+	bh=rUj4e7X9XFiwm6eArKv4Fq5QEX9Ryc8j4twis9QdIKk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=ea3n5DIRBOXGzjvriIlFI5qXtvz0WbWYaMEyvMWOlBJH9AmxNhL2lhjtQkhsnpmA8OaIh2rljdrMFNYsUCi8eHICnsPVnLzs7zcwKs2wYID1xABY6unJZsDXeowU/UI8WHt40QTaZjHZPr5Nk2C63+k2In6jjxGMYdT/ZWveT1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=PS2jtbkX; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="C7KT8q2q";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IDDARMRi";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="B5qnEANe";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ZnUx22B/"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A6B871FC86;
-	Wed, 28 Aug 2024 15:34:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724859270; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9O0Vci8+b4q68G1caoGSF7w6opascpZiikpZjFP/dws=;
-	b=C7KT8q2qDGqR1u9oNyBhQ/hB78uMIU6/M9/PWy5ALFxWbK2kfqJ/JoNpykYicWEsgD8B7F
-	GGBh0kR/TQsy290MAVPox+Zp/mtHmJPTzQDnCbUtM3ilM01elaAxCR/XRuCELiY5m/qT45
-	yAD8687VvNU3P7xLXn8sbTFjOCav8/0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724859270;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9O0Vci8+b4q68G1caoGSF7w6opascpZiikpZjFP/dws=;
-	b=IDDARMRid5PxQwYtyCDQNRwHUUeSdvEuUdWZbt2RBQAJ8t+rJVOZaIa+B9Z67WkH5p6vKT
-	XFMfIrhAnmjLaqBQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724859267; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9O0Vci8+b4q68G1caoGSF7w6opascpZiikpZjFP/dws=;
-	b=B5qnEANeVKXFIGM4wBUQN+RS2R0os77bJKi1uaU64QbSfC45aQxgTeTu32Z0amJBHS0gha
-	jni1bYtByeXEyN1r3chuykid/X+J3j3iJlh8b7HF3HMkViw8ncPwhOUt5e9V/jasfqUiMp
-	ayr4yUFDzcE5v+M9jzi7Y0+A7bCP1aU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724859267;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9O0Vci8+b4q68G1caoGSF7w6opascpZiikpZjFP/dws=;
-	b=ZnUx22B/FJKxla0jIH+VKSDQbj2OgNOT6rjjehHDmjTgjrJ+ceODF1hVt5ukX2lzHbldM2
-	6HKI4LAizAOoK/BQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8FA8C138D2;
-	Wed, 28 Aug 2024 15:34:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id L3XLIoNDz2bnUgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 28 Aug 2024 15:34:27 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 304CFA0965; Wed, 28 Aug 2024 17:34:27 +0200 (CEST)
-Date: Wed, 28 Aug 2024 17:34:27 +0200
-From: Jan Kara <jack@suse.cz>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="PS2jtbkX"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240828161343epoutp04dd2f21ed4d55e7123d5576d9c28b8be5~v8IHnkiki2205122051epoutp04F
+	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 16:13:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240828161343epoutp04dd2f21ed4d55e7123d5576d9c28b8be5~v8IHnkiki2205122051epoutp04F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1724861623;
+	bh=HnL33aP4E10mX6zcM/z2UMMF0nMT5SuYS3j5XhT324w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PS2jtbkXa9B0rY5FO+5CpB3xxcVXNM79sh497IU45XvHDGlDUaVVHQP6W2xyVcEX2
+	 ebhmso/ZMUx/AOLnOTiFDBi1JAu2wy1M0tvn5vpt2aGbEKsHIFHcgWaJPl3txM4tHl
+	 K27bR1uPlvE+Ryw+y68gjkXrRJ3o1TVXGfImw24k=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20240828161342epcas5p2e27a44f3e80c49f9d0f999331dd9fdf0~v8IHCQ1nM2989929899epcas5p2T;
+	Wed, 28 Aug 2024 16:13:42 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.175]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4Wv8bm4Wpbz4x9Pt; Wed, 28 Aug
+	2024 16:13:40 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F6.DD.08855.4BC4FC66; Thu, 29 Aug 2024 01:13:40 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240828112543epcas5p1109ce4ce7237ea38e339111b5bf8c63a~v4MrEDHAK2402224022epcas5p1d;
+	Wed, 28 Aug 2024 11:25:43 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240828112543epsmtrp2d173a3e59b5ea6e24e83a65f3c737eb6~v4MrDSBPf1058610586epsmtrp2G;
+	Wed, 28 Aug 2024 11:25:43 +0000 (GMT)
+X-AuditID: b6c32a44-107ff70000002297-82-66cf4cb44878
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	35.F3.07567.7390FC66; Wed, 28 Aug 2024 20:25:43 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20240828112540epsmtip12cff0499d082d60701d087b37e368c0a~v4MoUcwNx2866928669epsmtip1N;
+	Wed, 28 Aug 2024 11:25:40 +0000 (GMT)
+Date: Wed, 28 Aug 2024 16:48:06 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Chandan Babu R <chandan.babu@oracle.com>,
-	Brian Foster <bfoster@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.cz>, "Darrick J. Wong" <djwong@kernel.org>,
-	Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org
-Subject: Re: [PATCH 3/6] fs: sort out the fallocate mode vs flag mess
-Message-ID: <20240828153427.tbuzninrbj6wtam4@quack3>
-References: <20240827065123.1762168-1-hch@lst.de>
- <20240827065123.1762168-4-hch@lst.de>
+Cc: axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
+	asml.silence@gmail.com, krisman@suse.de, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v3 03/10] block: handle split correctly for user meta
+ bounce buffer
+Message-ID: <20240828111806.GA3301@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20240824083116.GC8805@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrAJsWRmVeSWpSXmKPExsWy7bCmuu4Wn/NpBoceSFvMWbWN0WL13X42
+	i5sHdjJZrFx9lMniXes5FotJh64xWmw/s5TZYu8tbYv5y56yW3Rf38Fmsfz4PyYHbo+ds+6y
+	e1w+W+qxaVUnm8fmJfUeu282sHl8fHqLxaNvyypGj82nqz0+b5IL4IzKtslITUxJLVJIzUvO
+	T8nMS7dV8g6Od443NTMw1DW0tDBXUshLzE21VXLxCdB1y8wBOlVJoSwxpxQoFJBYXKykb2dT
+	lF9akqqQkV9cYquUWpCSU2BSoFecmFtcmpeul5daYmVoYGBkClSYkJ1x4PNUpoL9khULWi+z
+	NDDOEO1i5OSQEDCR6D23jr2LkYtDSGA3o8TOiWtYQBJCAp8YJU5PUodIfGOUuLRtDxtcx7XT
+	TBCJvYwSbe9+MkM4zxglFk/fzwpSxSKgKnHt6FawDjYBdYkjz1sZQWwRASWJp6/OMoI0MAv8
+	YpRYNr2PGSQhLBApsbH5EJjNK6AjseXXMzYIW1Di5MwnYDdxCmhLzFl7EcwWFVCWOLDtONgZ
+	EgJbOCQ2LtnMDHGfi8SDeUehbhWWeHV8CzuELSXx+d1eqHi6xI/LT5kg7AKJ5mP7GCFse4nW
+	U/1gc5gFMiT+TpsOVS8rMfXUOiaIOJ9E7+8nUL28EjvmwdhKEu0r50DZEhJ7zzVA2R4Su/6t
+	Z4YE6i1GidVvoyYwys9C8tssJOsgbB2JBbs/AdkcQLa0xPJ/HBCmpsT6XfoLGFlXMUqmFhTn
+	pqcmmxYY5qWWw2M8OT93EyM4KWu57GC8Mf+f3iFGJg7GQ4wSHMxKIrwnjp9NE+JNSaysSi3K
+	jy8qzUktPsRoCoysicxSosn5wLyQVxJvaGJpYGJmZmZiaWxmqCTO+7p1boqQQHpiSWp2ampB
+	ahFMHxMHp1QDU0LP44sXIm6L18qnVhTVXOt4dCFqj++7L68LnnClP5muwaUesu8V31P+a/0V
+	F8+32ORfWndryp15Ny88toszPnKhWFFzstPxonrXnMijJ2Sc/RX32P9Z1P+9bOvBuiKGb3/u
+	f/2/qeaUhQMjE7PaW13tEKPVjs7pZpXKqZcf+z1hLpEUNb6+dxH/mnO+YSmm7HOaD1mc7Jy6
+	7YXx1QTZPhP3/x2Kk/4d49pwk3X7hJZJuYtTjy3VeKx5b9rFKxE7xf0nHL+fufnPq6Wpihwb
+	pbwfzGef9EC0K6yl+VPZY562Rz+MF2eE7jx7Tu9gpSN7rdmH1kULelZu4bt6eLq96cuDeZMe
+	TWfoWlS27NSa471KLMUZiYZazEXFiQAOGPp+UwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpikeLIzCtJLcpLzFFi42LZdlhJTtec83yaQf98dYs5q7YxWqy+289m
+	cfPATiaLlauPMlm8az3HYjHp0DVGi+1nljJb7L2lbTF/2VN2i+7rO9gslh//x+TA7bFz1l12
+	j8tnSz02repk89i8pN5j980GNo+PT2+xePRtWcXosfl0tcfnTXIBnFFcNimpOZllqUX6dglc
+	GZ9PT2Iv+C9W0TlDt4Hxo1AXIyeHhICJRO+100xdjFwcQgK7GSXurHjOBpGQkDj1chkjhC0s
+	sfLfc3aIoieMEqfOvmEBSbAIqEpcO7oVrIFNQF3iyPNWsAYRASWJp6/OMoI0MAv8YpRYNr2P
+	GSQhLBApsbH5EJjNK6AjseXXMzaIqXcYJdbcfMMKkRCUODnzCdgGZgEtiRv/XgLdxwFkS0ss
+	/8cBEuYU0JaYs/YiWImogLLEgW3HmSYwCs5C0j0LSfcshO4FjMyrGCVTC4pz03OTDQsM81LL
+	9YoTc4tL89L1kvNzNzGCo0lLYwfjvfn/9A4xMnEwHmKU4GBWEuE9cfxsmhBvSmJlVWpRfnxR
+	aU5q8SFGaQ4WJXFewxmzU4QE0hNLUrNTUwtSi2CyTBycUg1MVZ+dpFJXf3Xw+3SL/95T25u8
+	224c8Ul9KGd188W0Fx5666Z2Xku15/BcE3x7ja5cfXahT/PXkLjZCRvSpZViGo6+X2BuF1iy
+	0GlL6xH7M2aHtPn33w3ROZER+2Fp6M5dKm981+xa7vB9c5DblDavWwnnNblc25c9ZxTuSNi1
+	8Lf5hiknhG3WXuF9ar/bMkb5r697WIDw9v9buu5yCxq5S18JyTkSs/lHzJn5Fa+dTs8Jnra9
+	XvTXZHPl4wv0Xe8f3v3bMdRs2k8BFpPsO+sFcgXNhJ6faqk43RbVYBx3qUgzt2WbkVDpb7UA
+	1rbMLZMyM6sX2N5YkaX2dPJ79YO28f5TdlyxqJRiXOvS8t9DiaU4I9FQi7moOBEAZBB4DRUD
+	AAA=
+X-CMS-MailID: 20240828112543epcas5p1109ce4ce7237ea38e339111b5bf8c63a
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----bx0Hnhhrn7x.JlxYXzjBkilvv7KFXT55p7POp3cMcMNV4hS0=_dd2c9_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240823104620epcas5p2118c152963d6cadfbc9968790ac0e536
+References: <20240823103811.2421-1-anuj20.g@samsung.com>
+	<CGME20240823104620epcas5p2118c152963d6cadfbc9968790ac0e536@epcas5p2.samsung.com>
+	<20240823103811.2421-4-anuj20.g@samsung.com> <20240824083116.GC8805@lst.de>
+
+------bx0Hnhhrn7x.JlxYXzjBkilvv7KFXT55p7POp3cMcMNV4hS0=_dd2c9_
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240827065123.1762168-4-hch@lst.de>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email,imap1.dmz-prg2.suse.org:helo,lst.de:email]
-X-Spam-Score: -3.80
-X-Spam-Flag: NO
 
-On Tue 27-08-24 08:50:47, Christoph Hellwig wrote:
-> The fallocate system call takes a mode argument, but that argument
-> contains a wild mix of exclusive modes and an optional flags.
+On Sat, Aug 24, 2024 at 10:31:16AM +0200, Christoph Hellwig wrote:
+> On Fri, Aug 23, 2024 at 04:08:03PM +0530, Anuj Gupta wrote:
+> > Copy back the bounce buffer to user-space in entirety when the parent
+> > bio completes.
 > 
-> Replace FALLOC_FL_SUPPORTED_MASK with FALLOC_FL_MODE_MASK, which excludes
-> the optional flag bit, so that we can use switch statement on the value
-> to easily enumerate the cases while getting the check for duplicate modes
-> for free.
-> 
-> To make this (and in the future the file system implementations) more
-> readable also add a symbolic name for the 0 mode used to allocate blocks.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> This looks odd to me.  The usual way to handle iterating the entire
+> submitter controlled data is to just iterate over the bvec array, as
+> done by bio_for_each_segment_all/bio_for_each_bvec_all for the bio
+> data.  I think you want to do the same here, probably with a
+> similar bip_for_each_bvec_all or similar helper.  That way you don't
+> need to stash away the iter.  Currently we have the field for that,
+> but I really want to split up struct bio_integrity_payload into
+> what is actually needed for the payload and stuff only needed for
+> the block layer autogenerated PI (bip_bio/bio_iter/bip_work).
+ 
+I can add it [*], to iterate over the entire bvec array. But the original
+bio_iter still needs to be stored during submission, to calculate the
+number of bytes in the original integrity/metadata iter (as it could have
+gotten split, and I don't have original integrity iter stored anywhere).
+Do you have a different opinion?
 
-Looks good. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/open.c                   | 51 ++++++++++++++++++-------------------
->  include/linux/falloc.h      | 18 ++++++++-----
->  include/uapi/linux/falloc.h |  1 +
->  3 files changed, 38 insertions(+), 32 deletions(-)
-> 
-> diff --git a/fs/open.c b/fs/open.c
-> index 22adbef7ecc2a6..daf1b55ca8180b 100644
-> --- a/fs/open.c
-> +++ b/fs/open.c
-> @@ -252,40 +252,39 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
->  	if (offset < 0 || len <= 0)
->  		return -EINVAL;
->  
-> -	/* Return error if mode is not supported */
-> -	if (mode & ~FALLOC_FL_SUPPORTED_MASK)
-> +	if (mode & ~(FALLOC_FL_MODE_MASK | FALLOC_FL_KEEP_SIZE))
->  		return -EOPNOTSUPP;
->  
-> -	/* Punch hole and zero range are mutually exclusive */
-> -	if ((mode & (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE)) ==
-> -	    (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE))
-> -		return -EOPNOTSUPP;
-> -
-> -	/* Punch hole must have keep size set */
-> -	if ((mode & FALLOC_FL_PUNCH_HOLE) &&
-> -	    !(mode & FALLOC_FL_KEEP_SIZE))
-> +	/*
-> +	 * Modes are exclusive, even if that is not obvious from the encoding
-> +	 * as bit masks and the mix with the flag in the same namespace.
-> +	 *
-> +	 * To make things even more complicated, FALLOC_FL_ALLOCATE_RANGE is
-> +	 * encoded as no bit set.
-> +	 */
-> +	switch (mode & FALLOC_FL_MODE_MASK) {
-> +	case FALLOC_FL_ALLOCATE_RANGE:
-> +	case FALLOC_FL_UNSHARE_RANGE:
-> +	case FALLOC_FL_ZERO_RANGE:
-> +		break;
-> +	case FALLOC_FL_PUNCH_HOLE:
-> +		if (!(mode & FALLOC_FL_KEEP_SIZE))
-> +			return -EOPNOTSUPP;
-> +		break;
-> +	case FALLOC_FL_COLLAPSE_RANGE:
-> +	case FALLOC_FL_INSERT_RANGE:
-> +		if (mode & FALLOC_FL_KEEP_SIZE)
-> +			return -EOPNOTSUPP;
-> +		break;
-> +	default:
->  		return -EOPNOTSUPP;
-> -
-> -	/* Collapse range should only be used exclusively. */
-> -	if ((mode & FALLOC_FL_COLLAPSE_RANGE) &&
-> -	    (mode & ~FALLOC_FL_COLLAPSE_RANGE))
-> -		return -EINVAL;
-> -
-> -	/* Insert range should only be used exclusively. */
-> -	if ((mode & FALLOC_FL_INSERT_RANGE) &&
-> -	    (mode & ~FALLOC_FL_INSERT_RANGE))
-> -		return -EINVAL;
-> -
-> -	/* Unshare range should only be used with allocate mode. */
-> -	if ((mode & FALLOC_FL_UNSHARE_RANGE) &&
-> -	    (mode & ~(FALLOC_FL_UNSHARE_RANGE | FALLOC_FL_KEEP_SIZE)))
-> -		return -EINVAL;
-> +	}
->  
->  	if (!(file->f_mode & FMODE_WRITE))
->  		return -EBADF;
->  
->  	/*
-> -	 * We can only allow pure fallocate on append only files
-> +	 * On append-only files only space preallocation is supported.
->  	 */
->  	if ((mode & ~FALLOC_FL_KEEP_SIZE) && IS_APPEND(inode))
->  		return -EPERM;
-> diff --git a/include/linux/falloc.h b/include/linux/falloc.h
-> index f3f0b97b167579..3f49f3df6af5fb 100644
-> --- a/include/linux/falloc.h
-> +++ b/include/linux/falloc.h
-> @@ -25,12 +25,18 @@ struct space_resv {
->  #define FS_IOC_UNRESVSP64	_IOW('X', 43, struct space_resv)
->  #define FS_IOC_ZERO_RANGE	_IOW('X', 57, struct space_resv)
->  
-> -#define	FALLOC_FL_SUPPORTED_MASK	(FALLOC_FL_KEEP_SIZE |		\
-> -					 FALLOC_FL_PUNCH_HOLE |		\
-> -					 FALLOC_FL_COLLAPSE_RANGE |	\
-> -					 FALLOC_FL_ZERO_RANGE |		\
-> -					 FALLOC_FL_INSERT_RANGE |	\
-> -					 FALLOC_FL_UNSHARE_RANGE)
-> +/*
-> + * Mask of all supported fallocate modes.  Only one can be set at a time.
-> + *
-> + * In addition to the mode bit, the mode argument can also encode flags.
-> + * FALLOC_FL_KEEP_SIZE is the only supported flag so far.
-> + */
-> +#define FALLOC_FL_MODE_MASK	(FALLOC_FL_ALLOCATE_RANGE |	\
-> +				 FALLOC_FL_PUNCH_HOLE |		\
-> +				 FALLOC_FL_COLLAPSE_RANGE |	\
-> +				 FALLOC_FL_ZERO_RANGE |		\
-> +				 FALLOC_FL_INSERT_RANGE |	\
-> +				 FALLOC_FL_UNSHARE_RANGE)
->  
->  /* on ia32 l_start is on a 32-bit boundary */
->  #if defined(CONFIG_X86_64)
-> diff --git a/include/uapi/linux/falloc.h b/include/uapi/linux/falloc.h
-> index 51398fa57f6cdf..5810371ed72bbd 100644
-> --- a/include/uapi/linux/falloc.h
-> +++ b/include/uapi/linux/falloc.h
-> @@ -2,6 +2,7 @@
->  #ifndef _UAPI_FALLOC_H_
->  #define _UAPI_FALLOC_H_
->  
-> +#define FALLOC_FL_ALLOCATE_RANGE 0x00 /* allocate range */
->  #define FALLOC_FL_KEEP_SIZE	0x01 /* default is extend size */
->  #define FALLOC_FL_PUNCH_HOLE	0x02 /* de-allocates range */
->  #define FALLOC_FL_NO_HIDE_STALE	0x04 /* reserved codepoint */
-> -- 
-> 2.43.0
-> 
+[*]
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index ff7de4fe74c4..f1690c644e70 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -125,11 +125,23 @@ static void bio_integrity_uncopy_user(struct bio_integrity_payload *bip)
+ 	struct bio_vec *copy = &bip->bip_vec[1];
+ 	size_t bytes = bio_iter_integrity_bytes(bi, bip->bio_iter);
+ 	struct iov_iter iter;
+-	int ret;
++	struct bio_vec *bvec;
++	struct bvec_iter_all iter_all;
+ 
+ 	iov_iter_bvec(&iter, ITER_DEST, copy, nr_vecs, bytes);
+-	ret = copy_to_iter(bvec_virt(bip->bip_vec), bytes, &iter);
+-	WARN_ON_ONCE(ret != bytes);
++	bip_for_each_segment_all(bvec, bip, iter_all) {
++		ssize_t ret;
++
++		ret = copy_page_to_iter(bvec->bv_page,
++					bvec->bv_offset,
++					bvec->bv_len,
++					&iter);
++
++		if (!iov_iter_count(&iter))
++			break;
++
++		WARN_ON_ONCE(ret < bvec->bv_len);
++	}
+ 
+ 	bio_integrity_unpin_bvec(copy, nr_vecs, true);
+ }
+diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
+index 22ff2ae16444..3132ef6f27e0 100644
+--- a/include/linux/bio-integrity.h
++++ b/include/linux/bio-integrity.h
+@@ -46,6 +46,19 @@ struct uio_meta {
+ 	struct		iov_iter iter;
+ };
+ 
++static inline bool bip_next_segment(const struct bio_integrity_payload *bip,
++				    struct bvec_iter_all *iter)
++{
++	if (iter->idx >= bip->bip_vcnt)
++		return false;
++
++	bvec_advance(&bip->bip_vec[iter->idx], iter);
++	return true;
++}
++
++#define bip_for_each_segment_all(bvl, bip, iter) \
++	for (bvl = bvec_init_iter_all(&iter); bip_next_segment((bip), &iter); )
++
+ #define BIP_CLONE_FLAGS (BIP_MAPPED_INTEGRITY | BIP_CTRL_NOCHECK | \
+ 			 BIP_DISK_NOCHECK | BIP_IP_CHECKSUM | \
+ 			 BIP_CHECK_GUARD | BIP_CHECK_REFTAG | \
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.25.1
+
+------bx0Hnhhrn7x.JlxYXzjBkilvv7KFXT55p7POp3cMcMNV4hS0=_dd2c9_
+Content-Type: text/plain; charset="utf-8"
+
+
+------bx0Hnhhrn7x.JlxYXzjBkilvv7KFXT55p7POp3cMcMNV4hS0=_dd2c9_--
