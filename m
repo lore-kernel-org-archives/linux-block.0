@@ -1,109 +1,101 @@
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AE0189B91;
-	Wed, 28 Aug 2024 14:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0030218990D
+	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 14:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724856671; cv=none; b=gdevBxRoc9V/cEB7tpjrYmyDP3uH3Aed49/DeJaxnQkDog6qHHwEbIT9KEK3l17NKhmLgko00Y7kiPkietKRUUuAoKy7NlYqlpIL50ET9wEFva+uqpVVIGHDVu/Ld2WIoYMv33xS08Hcd/erH0KtZd92DzHljrInRD7FhxaJl9I=
+	t=1724856684; cv=none; b=NtuOVJiuGodSG/HKXjjqARTMbzaZhM2FerLW/GydLlRCIuiVfjf/5afjfFtGqOhjD4v/Ld2Ec53KRpt+4MOUlCBEPPhTbpRorBzSDQ85wqlO63lNZ281F4G7XNBwwMn1WsZlq1OKBCs7zcxWrZKn7IF4ocKeNAakBrucLkae15k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724856671; c=relaxed/simple;
-	bh=Yx/xWH7sRQ0bUoCuj+xNJqLUe1vsbZ+IZWTvoqAWuGs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YHoDLRFYEN6Tl4PgdJV5UyvzssneHXgaZ6MRoPm403sC4sSyfqruCvWQOw8ndB6jYkM5cwniTlHBPOPGug1S8d38qTPIi1JxRlE2CcMtfDSOhtNZCgaRqA0SzcQQt9e+OktSWRM7wpBOCK/6oXJiYbHZLFjJP+UmO8st3pD+z2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=P0YHczkk; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1724856684; c=relaxed/simple;
+	bh=rbYF9EQE6+2l/S8qLuOSkRSe2U+4urx63JdRyvn3Tq8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Q34njC8vCsPKjUzjVtVoMShZFsSjh8FlTLFg5C4xW73QGzdEPFJMbsvH/whgBHGA1UQ/nVdkrYkAwyEM7/WRVhbdwN7UeX2VOH1UHD81+TASrS0PC1qPj3HQZrSVg5578RM/TTUX9i1zWkfoPt/ixeiaBCnvo2ToQ6RX/3J/sSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sOcWWwTu; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="P0YHczkk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=kktE0sKtiI/wFdgKRtUfY1cxi+R6IyXPcJRTWtxZiag=; b=P0YHczkky21tDEptzoJ5oKMwwD
-	JaPNpeZYkuScmkHxvH99HM5r+FWHH0Z8kz0a3jlvir16AVO6Q6ruNa+TGTuZigDieepjS+INvrBh1
-	sgEIxQixEC5n5TaiEG6YpRRH7fIiBRbiVJAGDw5ia/Gxu82RXeEmIrt14TSEA8LcTDsIw6Gy6e20N
-	tWk/2QQUkHNFIZxU3cott1otTBgff215iSDARpBAYV2vYeOdDMvZnoDV7331kCCRx4bUZw14ZH37c
-	c2hTKf2EZoBDcRsIpA3JY4R8wLf7iBHUUqKFtDdRp1RMpiMXShOjAhahFVG+6AREaEo+mjz52KLIw
-	QkoYNv7g==;
-Received: from [177.76.152.96] (helo=localhost)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1sjK0e-006N2z-1X; Wed, 28 Aug 2024 16:50:56 +0200
-From: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
-To: linux-doc@vger.kernel.org
-Cc: corbet@lwn.net,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	kernel-dev@igalia.com,
-	kernel@gpiccoli.net,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH V5] Documentation: Document the kernel flag bdev_allow_write_mounted
-Date: Wed, 28 Aug 2024 11:48:58 -0300
-Message-ID: <20240828145045.309835-1-gpiccoli@igalia.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sOcWWwTu"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-82a0f237a68so8615239f.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 07:51:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1724856682; x=1725461482; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PkBMJ6J7tx70rz6zmOA31ER4Q+skEgbVfFZ8HyWSogA=;
+        b=sOcWWwTu66gx9nBISRms8YlVMHBwqLYqwrIRtkz0p/fFg5TIgNSLV/E6qlazZZvkFJ
+         3g9UrAaQKqqghTbx/pTGcy+TGSCgBTXDgnxSXTvr69SgDljLZk2nvDdDhsar5BAl62xO
+         OsPvhhMxmf5NFnK2nhMXKaPAy8QIvOXalqGaL74PmW/fctcQIZ8b2AgHzVWlZz1CrSG8
+         I+msLL8ImwLNcgbNn2QcQQFZe/CNjPp3qL83xPpIIyOrP4xJvM2sq99Bk16+ppxbg1Us
+         /S3hW7LKOylLzrwEOdGO0YpT+RIL1UmJqDiyTHTqIQAtkvypv1a5mNJsrePCtwH2Tujr
+         9GTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724856682; x=1725461482;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PkBMJ6J7tx70rz6zmOA31ER4Q+skEgbVfFZ8HyWSogA=;
+        b=Z97JXLB7Cv+U8+OOHqGfayXNIpxaLJxh/qhNxn0cURjTH2sB9EXDYTrwWAHASYmz3q
+         PKpjsXrWK7XQQbPdiXiqODFemaR6bZZ30xj4w/F5lCBGIW2aRB6sGm+GXTydzkH6DRHA
+         SpVmYHsFGlt+zVLAWWE3F3PD0KLwhVz5rV4Mt6Zy+6HLKkFLgjOOtEwQCJutGZK0Hl1y
+         lckRS5Y+P0EEPypXN6W/FPcaAk8vxlek0tMIyKHqxZQRelpG8tiWmh6tNKr9W7MCudUj
+         3hOBvf4nUzlo4m4ONW7yumBtVZZFJUDFLu8ws3U3MNlBl+/xllYXMbJ/7C1jgvVOI2lc
+         mFEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYvtbBjfhxisbBNyILPt8Ite4ZcSQhr3ahF91Co4FMoojplvb+nGxoXeMvJfCK1FOZ8clE/YiwqUaGmQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzjs2cQX672gtPhObWaQLSP17gR6998Dwxz2XZVs59/u7Qo9Ydk
+	rlyj7YW6KsodhkzOCzf6khdCsX9Ywhr+T4dVdeweV4djqDgO0by1Wp29Powqu/k=
+X-Google-Smtp-Source: AGHT+IGH/sM51D0GQjar03mWbJeEot9AqwANMQY365pltcRA1L8eRTcfI+pPccqJjQxvsPbCCa2OWg==
+X-Received: by 2002:a05:6602:341a:b0:7eb:7f2e:5b3a with SMTP id ca18e2360f4ac-827873116d3mr2276078039f.2.1724856682153;
+        Wed, 28 Aug 2024 07:51:22 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ce70f84e20sm3092887173.84.2024.08.28.07.51.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Aug 2024 07:51:21 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>, 
+ linux-block <linux-block@vger.kernel.org>, linux-scsi@vger.kernel.org, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ fstests <fstests@vger.kernel.org>, xfs <linux-xfs@vger.kernel.org>, 
+ John Garry <john.g.garry@oracle.com>
+In-Reply-To: <20240827175340.GB1977952@frogsfrogsfrogs>
+References: <20240827175340.GB1977952@frogsfrogsfrogs>
+Subject: Re: [PATCH] block: fix detection of unsupported WRITE SAME in
+ blkdev_issue_write_zeroes
+Message-Id: <172485668128.410120.18023172929961192707.b4-ty@kernel.dk>
+Date: Wed, 28 Aug 2024 08:51:21 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
-Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
-devices") added a Kconfig option along with a kernel command-line tuning to
-control writes to mounted block devices, as a means to deal with fuzzers like
-Syzkaller, that provokes kernel crashes by directly writing on block devices
-bypassing the filesystem (so the FS has no awareness and cannot cope with that).
-
-The patch just missed adding such kernel command-line option to the kernel
-documentation, so let's fix that.
-
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Darrick J. Wong <djwong@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
----
-
-V5:
-- s/open a block device/open a mounted block device (thanks Jan!).
-- Added the Review tag from Jan.
-
-V4 link: https://lore.kernel.org/r/20240826001624.188581-1-gpiccoli@igalia.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
 
- Documentation/admin-guide/kernel-parameters.txt | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+On Tue, 27 Aug 2024 10:53:40 -0700, Darrick J. Wong wrote:
+> On error, blkdev_issue_write_zeroes used to recheck the block device's
+> WRITE SAME queue limits after submitting WRITE SAME bios.  As stated in
+> the comment, the purpose of this was to collapse all IO errors to
+> EOPNOTSUPP if the effect of issuing bios was that WRITE SAME got turned
+> off in the queue limits.  Therefore, it does not make sense to reuse the
+> zeroes limit that was read earlier in the function because we only care
+> about the queue limit *now*, not what it was at the start of the
+> function.
+> 
+> [...]
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 09126bb8cc9f..efc52ddc6864 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -517,6 +517,18 @@
- 			Format: <io>,<irq>,<mode>
- 			See header of drivers/net/hamradio/baycom_ser_hdx.c.
- 
-+	bdev_allow_write_mounted=
-+			Format: <bool>
-+			Control the ability to open a mounted block device
-+			for writing, i.e., allow / disallow writes that bypass
-+			the FS. This was implemented as a means to prevent
-+			fuzzers from crashing the kernel by overwriting the
-+			metadata underneath a mounted FS without its awareness.
-+			This also prevents destructive formatting of mounted
-+			filesystems by naive storage tooling that don't use
-+			O_EXCL. Default is Y and can be changed through the
-+			Kconfig option CONFIG_BLK_DEV_WRITE_MOUNTED.
-+
- 	bert_disable	[ACPI]
- 			Disable BERT OS support on buggy BIOSes.
- 
+Applied, thanks!
+
+[1/1] block: fix detection of unsupported WRITE SAME in blkdev_issue_write_zeroes
+      (no commit info)
+
+Best regards,
 -- 
-2.46.0
+Jens Axboe
+
+
 
