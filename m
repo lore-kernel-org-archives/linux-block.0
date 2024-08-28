@@ -1,133 +1,109 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF73199FB9
-	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 14:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AE0189B91;
+	Wed, 28 Aug 2024 14:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724856605; cv=none; b=GxZhPTs43ns2vz+YfKBFBRxUgzNiLs7SvKN4/Ws3oBXfcS2sd7JvrEglLu9CVXBQZsKvDAlMLzjFbSequ6YnLrh7cw47MGU76eCD7jlKQUVNj01RKGSovoOtwJOgEY5GW8jRxK4M8/UxWe6yZfFF3ZJM7kfA4h6Xq1xwhW4sX84=
+	t=1724856671; cv=none; b=gdevBxRoc9V/cEB7tpjrYmyDP3uH3Aed49/DeJaxnQkDog6qHHwEbIT9KEK3l17NKhmLgko00Y7kiPkietKRUUuAoKy7NlYqlpIL50ET9wEFva+uqpVVIGHDVu/Ld2WIoYMv33xS08Hcd/erH0KtZd92DzHljrInRD7FhxaJl9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724856605; c=relaxed/simple;
-	bh=J/jwHT4zbJgGObXt+D2j/0zzLiAWfKkvbdM+Ta6bS7Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eJuzrnrT1G0RTBQLlsWSPp5OgV/4RztzdT1HcjxzpdlZw0I3+ONcI3r3tntwIWsFVDOlUCtkpA14Yp5jkobmMlxDfvlTyaXva/bOD2QjpPB8UmkyJQrT3kB54bcQMxP8Jp1T+5RS1sLWhK1JPhbii3TOHJQ6h9V9q8mEHTSM9rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TjpLr7zm; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1724856671; c=relaxed/simple;
+	bh=Yx/xWH7sRQ0bUoCuj+xNJqLUe1vsbZ+IZWTvoqAWuGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YHoDLRFYEN6Tl4PgdJV5UyvzssneHXgaZ6MRoPm403sC4sSyfqruCvWQOw8ndB6jYkM5cwniTlHBPOPGug1S8d38qTPIi1JxRlE2CcMtfDSOhtNZCgaRqA0SzcQQt9e+OktSWRM7wpBOCK/6oXJiYbHZLFjJP+UmO8st3pD+z2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=P0YHczkk; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TjpLr7zm"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-39d21fdc11bso24032055ab.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 07:50:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1724856601; x=1725461401; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mkLMtpGIw3Y/dhXXuYhIUT4xTca0Ie89HWp40We3Xeg=;
-        b=TjpLr7zmxDKYik9nmetyJQTPQ9slqpYnCX+aBlaLqojZBLk7IRhTLRpbZEP3Q/pTZ1
-         ebGzhjX07IssLxwUhGJ8Kl13VjMprmSiPuZV+sf1UTpkn3Vn8BGewden42zQkJJFVLuk
-         0jOr4VgnEQnr2nLyhDhKB8DwLq53k9VxkNlo1mO4Sshpr9BRe7a1fFT9jOX17l4beRKV
-         g/Lwhcc+uCFPAXq5o/i+uK7tih8uZTtFTW1aMNZs6RXkC+5g40SBWlPr9PlBEAOGgV2n
-         M448MMMOd7lvgdpHrdNJv5UcLLZkiLEorqY/Jj349ybOM0uL8I/cQSmto3/GpoMdbfyS
-         qoXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724856601; x=1725461401;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mkLMtpGIw3Y/dhXXuYhIUT4xTca0Ie89HWp40We3Xeg=;
-        b=jDhvfQwzgbbWYTjPy+QO03LlzkQsg4c1nYt2kGmJPwHBgP2g5HWSiGYLPXNHaD5lY9
-         1bAOJcQycCViwAV/w+qQmzIN+1Fmfcawhm0K8n89FFYczqYC9EI0SqSMKRw4SCi6EJjO
-         0wxRGHBwwjYJYeU1F12TPtAiNr7BrevqZPpuMfvA1URz96+BbXM0yFAZXy3rhA/CUnzj
-         wlx3T4XrmCDHkF//4EJa/oOLibmHimmUX8peUzmuOkrD3ziK1e4gHuQoIe0SqkJ8a5qI
-         BpkhyJ/qo2XmmOiMuqxUv+pfQdxvnqBArJUNlacswTaIUgvOFk5EjEtTU7nBjpNFiDPy
-         wM4Q==
-X-Gm-Message-State: AOJu0Yx3rf2rVBz5oSxjp2uDP7ywzM9MK8i1FthsU8WWE6a8wpCf0qKq
-	8K/VJGlmKvauA/aXhjwqnnLic7wnWjbzrCrhcMOp8ePYTVbwfJW1zwOnD/JZ6KU=
-X-Google-Smtp-Source: AGHT+IFBscc8IYAxjJLTBWjrXmkHgdjkc3wJmP/EHCRSuAoFvcdmRkkoVZFsL6zQmmMKLOgkxkhFgQ==
-X-Received: by 2002:a05:6e02:12cf:b0:39a:e9ec:9462 with SMTP id e9e14a558f8ab-39e3c976ba5mr195862795ab.5.1724856601103;
-        Wed, 28 Aug 2024 07:50:01 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39f376ff875sm34085ab.42.2024.08.28.07.49.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 07:49:59 -0700 (PDT)
-Message-ID: <bc192dc5-5db3-4cbb-90a7-91b13ea7d0c7@kernel.dk>
-Date: Wed, 28 Aug 2024 08:49:54 -0600
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="P0YHczkk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=kktE0sKtiI/wFdgKRtUfY1cxi+R6IyXPcJRTWtxZiag=; b=P0YHczkky21tDEptzoJ5oKMwwD
+	JaPNpeZYkuScmkHxvH99HM5r+FWHH0Z8kz0a3jlvir16AVO6Q6ruNa+TGTuZigDieepjS+INvrBh1
+	sgEIxQixEC5n5TaiEG6YpRRH7fIiBRbiVJAGDw5ia/Gxu82RXeEmIrt14TSEA8LcTDsIw6Gy6e20N
+	tWk/2QQUkHNFIZxU3cott1otTBgff215iSDARpBAYV2vYeOdDMvZnoDV7331kCCRx4bUZw14ZH37c
+	c2hTKf2EZoBDcRsIpA3JY4R8wLf7iBHUUqKFtDdRp1RMpiMXShOjAhahFVG+6AREaEo+mjz52KLIw
+	QkoYNv7g==;
+Received: from [177.76.152.96] (helo=localhost)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1sjK0e-006N2z-1X; Wed, 28 Aug 2024 16:50:56 +0200
+From: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+To: linux-doc@vger.kernel.org
+Cc: corbet@lwn.net,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	kernel-dev@igalia.com,
+	kernel@gpiccoli.net,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH V5] Documentation: Document the kernel flag bdev_allow_write_mounted
+Date: Wed, 28 Aug 2024 11:48:58 -0300
+Message-ID: <20240828145045.309835-1-gpiccoli@igalia.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/7] block: mtip32xx: Replace deprecated PCI functions
-To: Philipp Stanner <pstanner@redhat.com>, Wu Hao <hao.wu@intel.com>,
- Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
- Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Alvaro Karsz <alvaro.karsz@solid-run.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
- Keith Busch <kbusch@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240827185616.45094-1-pstanner@redhat.com>
- <20240827185616.45094-4-pstanner@redhat.com>
- <c7acca0d-586f-41c0-a542-6b698305f17a@kernel.dk>
- <189ab84e8af230092ff94cc3f3addb499b1a581d.camel@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <189ab84e8af230092ff94cc3f3addb499b1a581d.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/28/24 1:10 AM, Philipp Stanner wrote:
-> On Tue, 2024-08-27 at 13:05 -0600, Jens Axboe wrote:
->> On 8/27/24 12:56 PM, Philipp Stanner wrote:
->>> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
->>> the
->>> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
->>> pcim_iomap_table(), pcim_iomap_regions_request_all()").
->>>
->>> In mtip32xx, these functions can easily be replaced by their
->>> respective
->>> successors, pcim_request_region() and pcim_iomap(). Moreover, the
->>> driver's calls to pcim_iounmap_regions() in probe()'s error path
->>> and in
->>> remove() are not necessary. Cleanup can be performed by PCI devres
->>> automatically.
->>>
->>> Replace pcim_iomap_regions() and pcim_iomap_table().
->>>
->>> Remove the calls to pcim_iounmap_regions().
->>
->> Looks fine to me - since it depends on other trees, feel free to take
->> it
->> through those:
->>
->> Reviewed-by: Jens Axboe <axboe@kernel.dk>
-> 
-> Thank you for the review.
-> 
-> I have to provide a v5 because of an issue in another patch. While I'm
-> at it, I'd modify this patch here so that the comment above
-> pcim_request_region() is descriptive of the actual events:
-> 
-> -	/* Map BAR5 to memory. */
-> +	/* Request BAR5. */
-> 
-> 
-> I'd keep your Reviewed-by if that's OK. It's the only change I'd do.
+Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
+devices") added a Kconfig option along with a kernel command-line tuning to
+control writes to mounted block devices, as a means to deal with fuzzers like
+Syzkaller, that provokes kernel crashes by directly writing on block devices
+bypassing the filesystem (so the FS has no awareness and cannot cope with that).
 
-That's fine.
+The patch just missed adding such kernel command-line option to the kernel
+documentation, so let's fix that.
 
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Darrick J. Wong <djwong@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
+---
+
+V5:
+- s/open a block device/open a mounted block device (thanks Jan!).
+- Added the Review tag from Jan.
+
+V4 link: https://lore.kernel.org/r/20240826001624.188581-1-gpiccoli@igalia.com
+
+
+ Documentation/admin-guide/kernel-parameters.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 09126bb8cc9f..efc52ddc6864 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -517,6 +517,18 @@
+ 			Format: <io>,<irq>,<mode>
+ 			See header of drivers/net/hamradio/baycom_ser_hdx.c.
+ 
++	bdev_allow_write_mounted=
++			Format: <bool>
++			Control the ability to open a mounted block device
++			for writing, i.e., allow / disallow writes that bypass
++			the FS. This was implemented as a means to prevent
++			fuzzers from crashing the kernel by overwriting the
++			metadata underneath a mounted FS without its awareness.
++			This also prevents destructive formatting of mounted
++			filesystems by naive storage tooling that don't use
++			O_EXCL. Default is Y and can be changed through the
++			Kconfig option CONFIG_BLK_DEV_WRITE_MOUNTED.
++
+ 	bert_disable	[ACPI]
+ 			Disable BERT OS support on buggy BIOSes.
+ 
 -- 
-Jens Axboe
+2.46.0
 
