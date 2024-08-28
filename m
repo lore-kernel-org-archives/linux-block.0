@@ -1,48 +1,58 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBB315B0E4;
-	Wed, 28 Aug 2024 13:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF73199FB9
+	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 14:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724852848; cv=none; b=CRio66S2/rOF9qG8bRBKSW862g+frdJMw98tbfFVKzvVPZYqAfa8nqPM5u0ztN8n+gEsidZ5u9NPWt3mX4Gmss6kW5Ke17FwMAOS3a5+HK+SsZ5V6YQL9mtZFjWb3mUDDVxstZDq4t2nuQGsMVlx+JkY9a42J30RutkRYk0WNOk=
+	t=1724856605; cv=none; b=GxZhPTs43ns2vz+YfKBFBRxUgzNiLs7SvKN4/Ws3oBXfcS2sd7JvrEglLu9CVXBQZsKvDAlMLzjFbSequ6YnLrh7cw47MGU76eCD7jlKQUVNj01RKGSovoOtwJOgEY5GW8jRxK4M8/UxWe6yZfFF3ZJM7kfA4h6Xq1xwhW4sX84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724852848; c=relaxed/simple;
-	bh=PhyhFSq2ssqfE87Z8rulgW9y6ISQIaoU1dXRLUiK4to=;
+	s=arc-20240116; t=1724856605; c=relaxed/simple;
+	bh=J/jwHT4zbJgGObXt+D2j/0zzLiAWfKkvbdM+Ta6bS7Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bHKh+0YYTluEegdGJsc7qpsl4Kkdvn3eBEhkGrArsptwZLzpRE0YGPdGRMcGAGJVSOc4ybIaZeF3vuqe4eJZo8ShTnQpadLK6hPfrzhyYgxPVKFHan0DEBK5AX7JrgFfFVPz8SkVH4Z4xde/+IEbhJeY60GHAcXwn/OhnCoHV2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RGvYF1st; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=eJuzrnrT1G0RTBQLlsWSPp5OgV/4RztzdT1HcjxzpdlZw0I3+ONcI3r3tntwIWsFVDOlUCtkpA14Yp5jkobmMlxDfvlTyaXva/bOD2QjpPB8UmkyJQrT3kB54bcQMxP8Jp1T+5RS1sLWhK1JPhbii3TOHJQ6h9V9q8mEHTSM9rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TjpLr7zm; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RGvYF1st"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4Wv5M226tWz6ClY92;
-	Wed, 28 Aug 2024 13:47:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1724852842; x=1727444843; bh=8HL0xEOnM68xTrIbWEcNqu71
-	FrJVlvPt0DHaEvk1u08=; b=RGvYF1stSw9zMiJSUwLphKJmx5HVqKxc8/3gdeW5
-	3Y2WlnuQRHHW0w4ZLY6GxmsBzuHHm6rTxq3ZI/tnxD16IHdf86/NOUm/AcAqpKcw
-	Yi31YZGYrNC3CDB4BkT8TYytetvEOqYh6pspsX0hIgAxVczqSxbdh500jXu1aDWR
-	IbOcGDRM2Y4NfedqIkML08daEezbJr3YECGiLh4HuCLEFHSGYl1/hxwdBUxiIgRJ
-	SX9focuhDzdNASpuuy/yffcDd/It6cn1VpiFZOLVyxLOc6t21fW7pTr/Vn60sers
-	rv5pUl5LR82bpdnlgOlG50Guv+OSDtdqxxw03lYhAquHZQ==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id u71Aahn4zS-I; Wed, 28 Aug 2024 13:47:22 +0000 (UTC)
-Received: from [172.16.58.82] (modemcable170.180-37-24.static.videotron.ca [24.37.180.170])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4Wv5Lt5znwz6ClbJB;
-	Wed, 28 Aug 2024 13:47:18 +0000 (UTC)
-Message-ID: <03e92755-2011-4c43-8a1c-f1ad9a1382eb@acm.org>
-Date: Wed, 28 Aug 2024 09:47:17 -0400
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TjpLr7zm"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-39d21fdc11bso24032055ab.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 07:50:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1724856601; x=1725461401; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mkLMtpGIw3Y/dhXXuYhIUT4xTca0Ie89HWp40We3Xeg=;
+        b=TjpLr7zmxDKYik9nmetyJQTPQ9slqpYnCX+aBlaLqojZBLk7IRhTLRpbZEP3Q/pTZ1
+         ebGzhjX07IssLxwUhGJ8Kl13VjMprmSiPuZV+sf1UTpkn3Vn8BGewden42zQkJJFVLuk
+         0jOr4VgnEQnr2nLyhDhKB8DwLq53k9VxkNlo1mO4Sshpr9BRe7a1fFT9jOX17l4beRKV
+         g/Lwhcc+uCFPAXq5o/i+uK7tih8uZTtFTW1aMNZs6RXkC+5g40SBWlPr9PlBEAOGgV2n
+         M448MMMOd7lvgdpHrdNJv5UcLLZkiLEorqY/Jj349ybOM0uL8I/cQSmto3/GpoMdbfyS
+         qoXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724856601; x=1725461401;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mkLMtpGIw3Y/dhXXuYhIUT4xTca0Ie89HWp40We3Xeg=;
+        b=jDhvfQwzgbbWYTjPy+QO03LlzkQsg4c1nYt2kGmJPwHBgP2g5HWSiGYLPXNHaD5lY9
+         1bAOJcQycCViwAV/w+qQmzIN+1Fmfcawhm0K8n89FFYczqYC9EI0SqSMKRw4SCi6EJjO
+         0wxRGHBwwjYJYeU1F12TPtAiNr7BrevqZPpuMfvA1URz96+BbXM0yFAZXy3rhA/CUnzj
+         wlx3T4XrmCDHkF//4EJa/oOLibmHimmUX8peUzmuOkrD3ziK1e4gHuQoIe0SqkJ8a5qI
+         BpkhyJ/qo2XmmOiMuqxUv+pfQdxvnqBArJUNlacswTaIUgvOFk5EjEtTU7nBjpNFiDPy
+         wM4Q==
+X-Gm-Message-State: AOJu0Yx3rf2rVBz5oSxjp2uDP7ywzM9MK8i1FthsU8WWE6a8wpCf0qKq
+	8K/VJGlmKvauA/aXhjwqnnLic7wnWjbzrCrhcMOp8ePYTVbwfJW1zwOnD/JZ6KU=
+X-Google-Smtp-Source: AGHT+IFBscc8IYAxjJLTBWjrXmkHgdjkc3wJmP/EHCRSuAoFvcdmRkkoVZFsL6zQmmMKLOgkxkhFgQ==
+X-Received: by 2002:a05:6e02:12cf:b0:39a:e9ec:9462 with SMTP id e9e14a558f8ab-39e3c976ba5mr195862795ab.5.1724856601103;
+        Wed, 28 Aug 2024 07:50:01 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39f376ff875sm34085ab.42.2024.08.28.07.49.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Aug 2024 07:49:59 -0700 (PDT)
+Message-ID: <bc192dc5-5db3-4cbb-90a7-91b13ea7d0c7@kernel.dk>
+Date: Wed, 28 Aug 2024 08:49:54 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,39 +60,74 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: Allow complete locally if capacities are
- different
-To: Christian Loehle <christian.loehle@arm.com>,
- Manish Pandey <quic_mapa@quicinc.com>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v4 3/7] block: mtip32xx: Replace deprecated PCI functions
+To: Philipp Stanner <pstanner@redhat.com>, Wu Hao <hao.wu@intel.com>,
+ Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+ Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Alvaro Karsz <alvaro.karsz@solid-run.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+ Keith Busch <kbusch@kernel.org>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_nitirawa@quicinc.com, quic_bhaskarv@quicinc.com,
- quic_narepall@quicinc.com, quic_rampraka@quicinc.com, quic_cang@quicinc.com,
- quic_nguyenb@quicinc.com, Qais Yousef <qyousef@layalina.io>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>
-References: <20240828114958.29422-1-quic_mapa@quicinc.com>
- <c5d0966b-7de3-4eff-9310-d9a31d822dad@acm.org>
- <7661afec-168d-406e-903b-a2dc9adf6408@arm.com>
+ linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20240827185616.45094-1-pstanner@redhat.com>
+ <20240827185616.45094-4-pstanner@redhat.com>
+ <c7acca0d-586f-41c0-a542-6b698305f17a@kernel.dk>
+ <189ab84e8af230092ff94cc3f3addb499b1a581d.camel@redhat.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <7661afec-168d-406e-903b-a2dc9adf6408@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <189ab84e8af230092ff94cc3f3addb499b1a581d.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 8/28/24 8:26 AM, Christian Loehle wrote:
-> On 8/28/24 13:13, Bart Van Assche wrote:
->> I think that the following is missing from the above description:
->> - Mentioning that this is for an unusual interrupt routing technology
->>  =C2=A0 (SoC sends the interrupt to another CPU core than what has bee=
-n
->>  =C2=A0=C2=A0 specified in the smp_affinity mask).
->=20
-> FWIW on !mcq that doesn't have to be the case.
+On 8/28/24 1:10 AM, Philipp Stanner wrote:
+> On Tue, 2024-08-27 at 13:05 -0600, Jens Axboe wrote:
+>> On 8/27/24 12:56 PM, Philipp Stanner wrote:
+>>> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
+>>> the
+>>> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+>>> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+>>>
+>>> In mtip32xx, these functions can easily be replaced by their
+>>> respective
+>>> successors, pcim_request_region() and pcim_iomap(). Moreover, the
+>>> driver's calls to pcim_iounmap_regions() in probe()'s error path
+>>> and in
+>>> remove() are not necessary. Cleanup can be performed by PCI devres
+>>> automatically.
+>>>
+>>> Replace pcim_iomap_regions() and pcim_iomap_table().
+>>>
+>>> Remove the calls to pcim_iounmap_regions().
+>>
+>> Looks fine to me - since it depends on other trees, feel free to take
+>> it
+>> through those:
+>>
+>> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+> 
+> Thank you for the review.
+> 
+> I have to provide a v5 because of an issue in another patch. While I'm
+> at it, I'd modify this patch here so that the comment above
+> pcim_request_region() is descriptive of the actual events:
+> 
+> -	/* Map BAR5 to memory. */
+> +	/* Request BAR5. */
+> 
+> 
+> I'd keep your Reviewed-by if that's OK. It's the only change I'd do.
 
-Hmm ... is there any x86 architecture that ignores the smp_affinity
-mask? I have not yet encountered an x86 system that does not respect
-the smp_affinity mask.
+That's fine.
 
-Thanks,
-
-Bart.
+-- 
+Jens Axboe
 
