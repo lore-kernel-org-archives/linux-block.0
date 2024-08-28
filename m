@@ -1,170 +1,164 @@
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF2A1A2C2D
-	for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 15:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED58913D8B4;
+	Wed, 28 Aug 2024 15:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724858646; cv=none; b=c/+tZl4hpeRjuY3abGot8k3zORnODp0ztw99sHOZftQbl2WAld9AJcUGlLxPLVEhzrhWUr+YY21LqsC2jWWg94qTWeUBw0RqkRXsmFTC/VFwhWXvW5EWTcxMvzraomcoC6Pfa2+yX45Qlu6zUOjosMjAlkI1kklAkELKvZvbI0w=
+	t=1724859069; cv=none; b=GbCtdNBkWg7uVLQbkeZ7X+U/dj7fBJqiLFBUMNb+6kkX7gE74mkccvx72ZhiAJ9Km8gs1nj+ce4fVufXzX5D73ozoVtbLT1hmnF6KEW7XffycisPYbEPtZbqEAQLwCCCwppS2cR+8lZdcBooeycMnx/EFIzB4ZOMef6tiosiCTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724858646; c=relaxed/simple;
-	bh=6lTLmMep23Gq5QDy6ixw4lnYp4CtXa4Ieur1dYyWCo8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fihika9uGDJ3/2r+JvY5M+eJSeDra0htDVuqM4IKt6OrN5g2QIfusR6mGzRD8gL5oPFvWrRunMCvjOFT8H0mv8yv8e5XkfwkchHdW4Jx0u92x6WjqvMyJ2EtBG2HrgDv3wgnaKGG8aOdwzHAy5KSOHRrUmvLYfdh6niLvfqHgn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gccSKr4s; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1724859069; c=relaxed/simple;
+	bh=b+k29GysQ7R3bruZV4HT9pMcZKn6eKuFi5vbwqLjxyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i1d5Wb3oSsOGCVqyZN49hMjMv09YoHGkeCuMo6Qs7jRgduELQIiR0YpCJs4Ym2WM0RCWOSeV3jLhXeHBXuv/AL6m+fcks3EEXeENI8T4x7zQbb3EEAbPJxumJns0iDIId6Ro5LBwvBIaWe8vdOtHtTN8v+p8mOCVJo+dEP5fqaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eQSIr+9y; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=McydTb1b; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=qafg0vVc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=D3mwNydd; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gccSKr4s"
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e16518785c2so5831497276.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 08:24:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724858644; x=1725463444; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=72MBiybvQQGr50cURl2SciPMebMKvOrZROMVK8UusrA=;
-        b=gccSKr4s21mz2NQe+Qdn99WAo3HasqNLC9SPNDguR6GDG+tPDS96WqyKwqsDBnZWfm
-         6xcSQ8W6Z/JjEru3IOmB2CUr/VyIJuccopJ9oTNVY6oBaFsCbOzRjkgteN4WhASlx2W0
-         hYn2OLbRS/CnNNQdN469FR2NHjWW3wArMuxTSinCpNWci05PbbZ4ryoBJEZiPuc1m3K4
-         4jwYV5MqHk8EV9h1xOPkmULR5xVc8un2ENPUb2dnQ+hdx95QeE/ys8+HEUzoq7162GeD
-         +vdH5xBIbEJOkVuOq65OgMqrTZzxev/ltENwFe+frU+ieQdbo3eAoIu1BANHNG2SHMDE
-         MMUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724858644; x=1725463444;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=72MBiybvQQGr50cURl2SciPMebMKvOrZROMVK8UusrA=;
-        b=dkLreToV4zfOcnfOaGiuoGKBT+ZJ7VAfWfj0J1SoiGmtZby7Iyz4iYC2VTEWg16eOF
-         SwEfY2N5kX/t3h5A+U4DgXAWYsEl3ZcA1HQkEMKD3AMucCSGd/7LbUcTNcf/DoMsgtDf
-         v05J5JG0iAMzhx1vjRuWg0JafUFCmSht9pF4VPk9BaN8fi+fDEvgPHpDmVYJH/rHTwbj
-         EAiGvoxjXkkIz2IucrsNXcIXnhWAsh2EiYKOG3NEhjG7a3Bmh2JLS67MMtO/9Znr4NHn
-         mfuAXZctpnBwoWoUt1oEpfSzzuybFEd/oQm2H6mkDqPvJhCs8rYGXzPPdiipNKpSqxkw
-         8L6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXjSJxGxSzbb5D9qSrHnLd6nQA2yzfgGI7G+FHJdhz+Gz+4T+nfWNCCDtO2Jx9M5isN79qojB/j2k6x2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAm6aYtrJEqf+Wg9cOb4+tmbg4oY6YAKC1o1EErEsM0KSxARg5
-	QCBlPDjQsv17pnvLlpLvW8lbCzUc8q3CQ7pB8XjGJVMvj1ePVMsKMwGe5KDLVyrdGDLgq+AprVU
-	ilyV7HTTm2lLSOSwUfjlMdeVTb7EwJmTDwXuXeA==
-X-Google-Smtp-Source: AGHT+IEw1gwe9loKd33j5BnDay0Z4DWKG87t3uM+kiZ9PMG5kVY3N6xYGb1nm3Gus4eDR9IPgRMJdqjCoZ65T21zh3o=
-X-Received: by 2002:a05:6902:1791:b0:e08:7607:bbf3 with SMTP id
- 3f1490d57ef6-e17a8b0fccemr17946173276.34.1724858644032; Wed, 28 Aug 2024
- 08:24:04 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eQSIr+9y";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="McydTb1b";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qafg0vVc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="D3mwNydd"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id EDE921FC31;
+	Wed, 28 Aug 2024 15:31:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724859066; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8GllTruHW3XoQ0H3fzpZDxViaLpqzGacRC6r1YXyznc=;
+	b=eQSIr+9yRwKF/L1QWf9YwxWbDj7H4NAbo7ZfMaCMaKJV56uOmXxSSDPJuGyUh1+hgxK+4o
+	TXgeAeBTcc80bO6nBkdM3R54PLXU5KSqWICikz+vgvL+d0G63YdVVqmdJSs9eGewNT0Ew+
+	95GBsVCJ6SmEkKUHgZOmT2XP2fUEq0o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724859066;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8GllTruHW3XoQ0H3fzpZDxViaLpqzGacRC6r1YXyznc=;
+	b=McydTb1bSyyIVr1158BSJOoylK6SPD+pilFZteRTR/Icx0VAlunDKdyDMnUtdNud/v86nA
+	MG922/QJIO25hIDg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=qafg0vVc;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=D3mwNydd
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724859065; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8GllTruHW3XoQ0H3fzpZDxViaLpqzGacRC6r1YXyznc=;
+	b=qafg0vVcekSAf7iJlLFNknjS4SejN5uv7eJA8jLdyq3YD31zFgY+Ry5n8k7eLdrMxBO10P
+	MwHoLj3olsP+ofnQejgrSTSu2xwvL57kCKhrsDF08y//pcMLBZEhK4V60lnAblzSJ9eNSB
+	j7mZcdG3WZb0x72y2wV57KIIObU/9uY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724859065;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8GllTruHW3XoQ0H3fzpZDxViaLpqzGacRC6r1YXyznc=;
+	b=D3mwNyddM6osPBA5WP/7nl7dvRAWJ2NQNNb3QnIXJ5KsJ5sX83BjNsy5j/thFrj07NIgKz
+	7QgnpAzd4NvmMUBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E24DA138D2;
+	Wed, 28 Aug 2024 15:31:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id cO83N7lCz2a9UQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 28 Aug 2024 15:31:05 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 78644A0965; Wed, 28 Aug 2024 17:31:05 +0200 (CEST)
+Date: Wed, 28 Aug 2024 17:31:05 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Chandan Babu R <chandan.babu@oracle.com>,
+	Brian Foster <bfoster@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Jan Kara <jack@suse.cz>, "Darrick J. Wong" <djwong@kernel.org>,
+	Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org
+Subject: Re: [PATCH 2/6] ext4: remove tracing for FALLOC_FL_NO_HIDE_STALE
+Message-ID: <20240828153105.ccvfoppoljdyowry@quack3>
+References: <20240827065123.1762168-1-hch@lst.de>
+ <20240827065123.1762168-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240306232052.21317-1-semen.protsenko@linaro.org>
-In-Reply-To: <20240306232052.21317-1-semen.protsenko@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Wed, 28 Aug 2024 17:23:28 +0200
-Message-ID: <CAPDyKFrviGd6ECV-8LOENgepUZZ1OV2j+d+H5NPCjnHYfrijWQ@mail.gmail.com>
-Subject: Re: [PATCH] mmc: dw_mmc: Fix IDMAC operation with pages bigger than 4K
-To: Sam Protsenko <semen.protsenko@linaro.org>
-Cc: Jaehoon Chung <jh80.chung@samsung.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Christoph Hellwig <hch@lst.de>, Chris Ball <cjb@laptop.org>, Will Newton <will.newton@gmail.com>, 
-	Matt Fleming <matt@console-pimps.org>, Christian Brauner <brauner@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Naresh Kamboju <naresh.kamboju@linaro.org>, linux-mmc@vger.kernel.org, 
-	linux-block <linux-block@vger.kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827065123.1762168-3-hch@lst.de>
+X-Rspamd-Queue-Id: EDE921FC31
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.01
+X-Spam-Flag: NO
 
-On Thu, 7 Mar 2024 at 00:20, Sam Protsenko <semen.protsenko@linaro.org> wrote:
->
-> Commit 616f87661792 ("mmc: pass queue_limits to blk_mq_alloc_disk") [1]
-> revealed the long living issue in dw_mmc.c driver, existing since the
-> time when it was first introduced in commit f95f3850f7a9 ("mmc: dw_mmc:
-> Add Synopsys DesignWare mmc host driver."), also making kernel boot
-> broken on platforms using dw_mmc driver with 16K or 64K pages enabled,
-> with this message in dmesg:
->
->     mmcblk: probe of mmc0:0001 failed with error -22
->
-> That's happening because mmc_blk_probe() fails when it calls
-> blk_validate_limits() consequently, which returns the error due to
-> failed max_segment_size check in this code:
->
->     /*
->      * The maximum segment size has an odd historic 64k default that
->      * drivers probably should override.  Just like the I/O size we
->      * require drivers to at least handle a full page per segment.
->      */
->     ...
->     if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
->         return -EINVAL;
->
-> In case when IDMAC (Internal DMA Controller) is used, dw_mmc.c always
-> sets .max_seg_size to 4 KiB:
->
->     mmc->max_seg_size = 0x1000;
->
-> The comment in the code above explains why it's incorrect. Arnd
-> suggested setting .max_seg_size to .max_req_size to fix it, which is
-> also what some other drivers are doing:
->
->    $ grep -rl 'max_seg_size.*=.*max_req_size' drivers/mmc/host/ | \
->      wc -l
->    18
->
-> This change is not only fixing the boot with 16K/64K pages, but also
-> leads to a better MMC performance. The linear write performance was
-> tested on E850-96 board (eMMC only), before commit [1] (where it's
-> possible to boot with 16K/64K pages without this fix, to be able to do
-> a comparison). It was tested with this command:
->
->     # dd if=/dev/zero of=somefile bs=1M count=500 oflag=sync
->
-> Test results are as follows:
->
->   - 4K pages,  .max_seg_size = 4 KiB:                   94.2 MB/s
->   - 4K pages,  .max_seg_size = .max_req_size = 512 KiB: 96.9 MB/s
->   - 16K pages, .max_seg_size = 4 KiB:                   126 MB/s
->   - 16K pages, .max_seg_size = .max_req_size = 2 MiB:   128 MB/s
->   - 64K pages, .max_seg_size = 4 KiB:                   138 MB/s
->   - 64K pages, .max_seg_size = .max_req_size = 8 MiB:   138 MB/s
->
-> Unfortunately, SD card controller is not enabled in E850-96 yet, so it
-> wasn't possible for me to run the test on some cheap SD cards to check
-> this patch's impact on those. But it's possible that this change might
-> also reduce the writes count, thus improving SD/eMMC longevity.
->
-> All credit for the analysis and the suggested solution goes to Arnd.
->
-> [1] https://lore.kernel.org/all/20240215070300.2200308-18-hch@lst.de/
->
-> Fixes: f95f3850f7a9 ("mmc: dw_mmc: Add Synopsys DesignWare mmc host driver.")
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> Closes: https://lore.kernel.org/all/CA+G9fYtddf2Fd3be+YShHP6CmSDNcn0ptW8qg+stUKW+Cn0rjQ@mail.gmail.com/
-> Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
+On Tue 27-08-24 08:50:46, Christoph Hellwig wrote:
+> FALLOC_FL_NO_HIDE_STALE can't make it past vfs_fallocate (and if the
+> flag does what the name implies that's a good thing as it would be
+> highly dangerous).  Remove the dead tracing code for it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Applied for fixes and by adding a stable-tag, thanks!
+Looks good. Feel free to add:
 
-Kind regards
-Uffe
+Reviewed-by: Jan Kara <jack@suse.cz>
 
+								Honza
 
 > ---
->  drivers/mmc/host/dw_mmc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/mmc/host/dw_mmc.c b/drivers/mmc/host/dw_mmc.c
-> index 8e2d676b9239..cccd5633ff40 100644
-> --- a/drivers/mmc/host/dw_mmc.c
-> +++ b/drivers/mmc/host/dw_mmc.c
-> @@ -2951,8 +2951,8 @@ static int dw_mci_init_slot(struct dw_mci *host)
->         if (host->use_dma == TRANS_MODE_IDMAC) {
->                 mmc->max_segs = host->ring_size;
->                 mmc->max_blk_size = 65535;
-> -               mmc->max_seg_size = 0x1000;
-> -               mmc->max_req_size = mmc->max_seg_size * host->ring_size;
-> +               mmc->max_req_size = DW_MCI_DESC_DATA_LENGTH * host->ring_size;
-> +               mmc->max_seg_size = mmc->max_req_size;
->                 mmc->max_blk_count = mmc->max_req_size / 512;
->         } else if (host->use_dma == TRANS_MODE_EDMAC) {
->                 mmc->max_segs = 64;
-> --
-> 2.39.2
->
+>  include/trace/events/ext4.h | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/include/trace/events/ext4.h b/include/trace/events/ext4.h
+> index cc5e9b7b2b44e7..156908641e68f1 100644
+> --- a/include/trace/events/ext4.h
+> +++ b/include/trace/events/ext4.h
+> @@ -91,7 +91,6 @@ TRACE_DEFINE_ENUM(ES_REFERENCED_B);
+>  #define show_falloc_mode(mode) __print_flags(mode, "|",		\
+>  	{ FALLOC_FL_KEEP_SIZE,		"KEEP_SIZE"},		\
+>  	{ FALLOC_FL_PUNCH_HOLE,		"PUNCH_HOLE"},		\
+> -	{ FALLOC_FL_NO_HIDE_STALE,	"NO_HIDE_STALE"},	\
+>  	{ FALLOC_FL_COLLAPSE_RANGE,	"COLLAPSE_RANGE"},	\
+>  	{ FALLOC_FL_ZERO_RANGE,		"ZERO_RANGE"})
+>  
+> -- 
+> 2.43.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
