@@ -1,98 +1,76 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCE8191F86
-	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 11:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BAB193096;
+	Thu, 29 Aug 2024 12:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724931473; cv=none; b=Tm4X77MBZyNi328P3C8oCxY+W0QL6wIIb76uUJELSbRxMikSOUuPFPqUpWmwmUOaT8I6Hp/gOyqLUs33Vec/YnDOIJUx/jMYd3u+bYKruIVBfsjeYy0FViutll7Ug47RiA8bpzLrlYz8JXXYfLljNohfztbQgzWbuSkui885hLk=
+	t=1724933460; cv=none; b=BM9ZBw3LkHOoGdQ6gWTlfJn/Nvn0PLNiPnE4WJx+yZpwyaQ1PRqqgs2zoLZCzjs1XrW6LPO2Hl4FQoReB/nbSzqFXJ5g9l6vj2/JuyTvD8/3Ssa42SUu2VX3ZDkWXzVu7eWiKVJRB4C9zDTn6PgRFFLpW4VBvCq5FhcnWaszZqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724931473; c=relaxed/simple;
-	bh=cNzbsA+TbK++Ak183JvAbBvIZCIt69jGcDVpJSPxpEk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=adr4ygL/zLnX7PwK2iczxEdPYVEv67uEre7Dh/VY27M6zOuw1zC4sXV9uuEHKXZVBkUa98J73sDCnLa38uiwSKRFYJqfrte7hPZCRFuyDKKMNWmMpla1g8UqeLFwBpTJDYx8I0f1QlJMvx8H857dxPuVjrgm70r9wBvY0VUp1K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dCMAb7hQ; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1724933460; c=relaxed/simple;
+	bh=mw/x5gkzjiaE2Bw8RBvLT+WfmzG8tj/WG4ujtc6GP8s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewcUl1idh0BDHENkXXtGF4u9c8JPdZJU+5b8J8x8Sf5VHyVXgo3nqMWNT0wBmGD94tUhY4j99YFMS9LKdRdy2h8JgPs+6mZI/rsgEuInCn4Wa9AGLUU+b8JOpqkvNXxyOm5iDbTZeg4VF1sA11rpqeOCBKLKjKmNZJ5RMl8dnQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CqwrnsR5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dCMAb7hQ"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2021537a8e6so3901185ad.2
-        for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 04:37:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1724931469; x=1725536269; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3uwnGCH/YIzPLaHUb/2waUJ87bIA5++OGLa9jaJO7I8=;
-        b=dCMAb7hQ5kGZLBBW5BJup3+L4zEz2hiCjVacfHWmJslYHpeGLp6nhbOsgHFm5Ak6u+
-         Mp03g30F8H/uHSXuXLvQmzt+lkrro6xkFE6VnFXg6/I2/5g2qjJ15r9o0PxDdAfJpZpB
-         OyM0Lk02J22rA4+EMfALbLXmjLaNKNKZjSIzMm1B997Txf1SpqmAGj4w95NR8HcWhyM5
-         6q9Y0vV+pSA8kfVRXe07KNo1aDHHtPfowVkvCqUjEmWuXukMkgtRRKTmLvcGRoCWu17i
-         NstFa8aniz3kpZHUDEjgXizqbYSBHARPFCyt2hn6u3WDXL+hFhsxXd8RbRVdyp/dxNop
-         esqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724931469; x=1725536269;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3uwnGCH/YIzPLaHUb/2waUJ87bIA5++OGLa9jaJO7I8=;
-        b=nsyNobvm/jgkfsd40R0K3zulVS9pg/IZ2hZVkGgz5iJZ32rcze6m1YXUoUGxUPnOf9
-         izrekQpISpJ0KgakZIj6GxuBVxzrR7/mvplIinVNDLsNd0Nv8RB5sE0sS5LDTaP3sVSx
-         DdliQuXjLS7HBCCsgPfo9cvRVmHuygNcZOegJvCFimECejn3Pe3mQ0tRazdZeRKUEWYC
-         Cc4pg25Q2gpzFV2/ZkVDXJ+RxFG/wamO4nwkRkCnsuedwsOykEXFXKl0KwhL0jzgQwXv
-         0uvlcCJ1kjr7/xAR39m73znXN2361CZbZcTnezCB60MUu8kIqsInNgg4I5/MMgxY87XS
-         TKXw==
-X-Gm-Message-State: AOJu0YzPJ/xwk/MmFw6/7zIqmCBu4p4z1TwJ9+oclb5R68PTxzJl1RXw
-	I5ZbNuwTa81kA9oqRMdpaPqSbV9lxAovmFhwYRgg+2mX84XYfksqy8rl6DP7Hjsvx1Y1Cdg0wP7
-	k
-X-Google-Smtp-Source: AGHT+IFCzL8y6Y0fPNCJTLQKLePeR4IrAq+Gu1W+X4VnQGS0d3COJICgpMgUCJOuCGUPlJhD/q5ZmQ==
-X-Received: by 2002:a17:903:40c6:b0:202:35a8:42 with SMTP id d9443c01a7336-2050c46ca2bmr26184035ad.49.1724931468980;
-        Thu, 29 Aug 2024 04:37:48 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152d6a82sm9666505ad.73.2024.08.29.04.37.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Aug 2024 04:37:48 -0700 (PDT)
-Message-ID: <e5e97bad-075a-4d78-af78-3bbc124c06b1@kernel.dk>
-Date: Thu, 29 Aug 2024 05:37:47 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CqwrnsR5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E558C4CEC1;
+	Thu, 29 Aug 2024 12:10:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724933459;
+	bh=mw/x5gkzjiaE2Bw8RBvLT+WfmzG8tj/WG4ujtc6GP8s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CqwrnsR537t1sPvKTzSMSc5IFE3VKwmqv+BZi4Rq40hQiM9TandikvQDZ32qbiBf0
+	 qzdyKKv7AJ1pyaxYfKGyGZuwJnPHpGu5QvmfPWWEX9ISUjKSuC8x8klr+4NgxPYFSB
+	 jjvSz+riUCay9XArVdXvCmrtjA/OLbYsxNalzdQY7rGmYQqaMhuy7Tpbgg56wjfKuK
+	 RZqle4CSCBO4260jG2waEjyAq6cXxaWfJJNUs51N3A7p9Zs7IsTt/1vOHRmsnr+rxQ
+	 C6yInIDaQ2an4ophiY20nb86dvKwh3zUjqTnWmZlQcz68p7U4ydaFLjHYK0eWZ9Ypu
+	 FdF/q4DaZYt7A==
+Date: Thu, 29 Aug 2024 14:10:54 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>, 
+	linux-doc@vger.kernel.org, corbet@lwn.net, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, kernel-dev@igalia.com, kernel@gpiccoli.net, 
+	Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH V5] Documentation: Document the kernel flag
+ bdev_allow_write_mounted
+Message-ID: <20240829-galaktisch-zugegangen-77735bd59fae@brauner>
+References: <20240828145045.309835-1-gpiccoli@igalia.com>
+ <20240828162753.GO6043@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/2] bdev: add support for CPU latency PM QoS tuning
-To: Tero Kristo <tero.kristo@linux.intel.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240829075423.1345042-1-tero.kristo@linux.intel.com>
- <20240829075423.1345042-2-tero.kristo@linux.intel.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240829075423.1345042-2-tero.kristo@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240828162753.GO6043@frogsfrogsfrogs>
 
-On 8/29/24 1:18 AM, Tero Kristo wrote:
-> diff --git a/block/bio.c b/block/bio.c
-> index e9e809a63c59..6c46d75345d7 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -282,6 +282,8 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
->  	bio->bi_max_vecs = max_vecs;
->  	bio->bi_io_vec = table;
->  	bio->bi_pool = NULL;
-> +
-> +	bdev_update_cpu_latency_pm_qos(bio->bi_bdev);
->  }
->  EXPORT_SYMBOL(bio_init);
+On Wed, Aug 28, 2024 at 09:27:53AM GMT, Darrick J. Wong wrote:
+> On Wed, Aug 28, 2024 at 11:48:58AM -0300, Guilherme G. Piccoli wrote:
+> > Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
+> > devices") added a Kconfig option along with a kernel command-line tuning to
+> > control writes to mounted block devices, as a means to deal with fuzzers like
+> > Syzkaller, that provokes kernel crashes by directly writing on block devices
+> > bypassing the filesystem (so the FS has no awareness and cannot cope with that).
+> > 
+> > The patch just missed adding such kernel command-line option to the kernel
+> > documentation, so let's fix that.
+> > 
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Cc: Darrick J. Wong <djwong@kernel.org>
+> > Cc: Jens Axboe <axboe@kernel.dk>
+> > Reviewed-by: Jan Kara <jack@suse.cz>
+> > Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
+> 
+> Looks good to me now,
+> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+> 
+> Fun unrelated question: do we want to turn on bdev_allow_write_mounted
+> if lockdown is enabled?  In that kind of environment, we don't want to
+> allow random people to scribble, given how many weird ext4 bugs we've
+> had to fix due to syzbot.
 
-This is entirely the wrong place to do this, presumably it should be
-done at IO dispatch time, not when something initializes a bio.
-
-And also feels like entirely the wrong way to go about this, adding
-overhead to potentially each IO dispatch, of which there can be millions
-per second.
-
--- 
-Jens Axboe
-
+I would say yes, we absolutely do.
