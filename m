@@ -1,139 +1,156 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C761B0127
-	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 14:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A861AED38
+	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 14:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724942533; cv=none; b=sgYXjqsmj3r7kN7twqctInXkdzNgEQS6eDtt+RoHd/RaLVbX1UK4Z1Wpsei7ypVh4bizAdsEdXICmFfheS71FD5bCOWItTlUdiA4mFuvGr6YkJUZ/rfUYKt96fuWFIX2EJ9IiFn47c+5eCbGt+++gGICCdmLnY62+tnqdKQYpbM=
+	t=1724942999; cv=none; b=DmmlVI/o56yazXe/oMjHLIYkbd0D9D9ti5dY1uhwip/cfUzbc5j+Axz+oL5tHkIwlPXt7pSk5gUtQY/cbCop6Ef3yaeU1MqVKuaI/lkEhAK8EdKFlk8aEZZIfDnXVbrlGd1k++4atMVbPgU7AM8zXlD3fftGhdNZNCjXpFktBqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724942533; c=relaxed/simple;
-	bh=FAL3Wk1GJKv1jtOh0SKb2Eaa3RAQlRHvFE9FQ3MaL28=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=heitlL6GbB0kgsf0ZUnObDBmpRKfBKOPac/hXuepNfL3SHKKnI25sEFbw81UnjoT/I9aiTaKgs3ih3UfXsYk0Lu97CJfaSE7slJfojJB2Jq6WNwKz5pIXeVb1nKqqzdDGrnOvB562O0Q27F5+JVO5LQmi+7378UPzAhZt6j9bUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gtrRqnwM; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1724942999; c=relaxed/simple;
+	bh=S2sT6L9UUzta00cejZJS50RWMrLlQc0scK9J+l0UXXw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=LIPzIHdqMeqEh4qecjBKfnLe0nyekShsjmPE6/vX8b1VaSqzeQFySIqVPech0jL7Ie0lLastr5npVe44pe340juC3XELWjq5dmDAIttQVXgEvolM5JC3MwmnXAu6r+j97XwTz4RAEQLBk2pIg843a2CtGnQxKU+VddGxI/PC9P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eA2/LinP; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtrRqnwM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eA2/LinP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724942529;
+	s=mimecast20190719; t=1724942996;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8zMnahuLuC6i0N7ypZMSGEalm8mu6MNOeiFUlojCltE=;
-	b=gtrRqnwMk99AT9UsVOr22hffuowNyK4fPGkrkl5GyBKfWI5xappvIhI7wXtuEbU1Sl6YyL
-	RUmny2YAKZ8G8ZQDZ2W7CHyYDAcxPZoNNBC+iBUnfh65EBJGsA0sikz8+AMagFsu0uIDTD
-	Tnio+PW3toFFNLw0xHlCxHtZtVatHkk=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=S2sT6L9UUzta00cejZJS50RWMrLlQc0scK9J+l0UXXw=;
+	b=eA2/LinP/DXAdWp+P/u5Ma1iSWB3zM3SKuUcSPq6R+hyWbO+LVRNljFejIH5j35ixTDoze
+	haUmP/l6sKRDgRivHydLTpeMxsB9HBxUa10H2erl/q+ofJJ9iQhYccWKwcQpVvofH5IXiM
+	ZgM1FBzuAzGjgo+dFkIFiZb/FxMWZGs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-292-jsXM4FRcN8iVsB0e9UdJuw-1; Thu, 29 Aug 2024 10:42:08 -0400
-X-MC-Unique: jsXM4FRcN8iVsB0e9UdJuw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5c085b4f665so744127a12.3
-        for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 07:42:07 -0700 (PDT)
+ us-mta-385-0Pa21gOpNPqLsBkQJ0MvBQ-1; Thu, 29 Aug 2024 10:49:55 -0400
+X-MC-Unique: 0Pa21gOpNPqLsBkQJ0MvBQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37193ed09b2so1103993f8f.1
+        for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 07:49:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724942527; x=1725547327;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8zMnahuLuC6i0N7ypZMSGEalm8mu6MNOeiFUlojCltE=;
-        b=iOXF3izi3x3d9LQjwgwVR99fonWJsQ4mXx9U+5fPBatIchavCT4huA4oTOSSkdCJzm
-         +sAXP0ZIEvxPeNgale5AgnX3rh1BxMD3Dcqi12CRxmJmyn0bV77YW6+JZiY8SvQbmvn/
-         sIy2Dq4hfaxm9OKO/ztcOMBT9AFhJH9R/EN0slCdBlbEKf/o+3QbWWIB4wrm//UXEEtm
-         dvkLsf7MBsV1TnHktkIYM+5sqxcd2V8VggFgMVvmo4OEAvbWs9JMTEjwScWJtYBDGHnr
-         TH5t+VShlvxJwkv50/N0YFWZ1BhrobDHjli3pvpHavVnZcZGp3rR2vx0YQOEyNcEEHtp
-         11uw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXscKDQIiyj82FCAdS5ew44YV87b0Seh9ziJqlCu+ObG1gM959MeS0PV/eUgkAgpXTaOYRjVRtqD5IGQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7Uc9OOpWDSltnMQEPot4iphd5WZZ1btQDSbBcz5Ap0JcRruXB
-	XnRgGnOKgyGobn4QA3wXcslYeaRxpmFjK+4XsYgxPVLJVDjsM2ajHj+dFOfZZygCulRQqc78/IN
-	/vK5cPQ6ENpNJ8aEO+ZCfAHWZ1WSqc8Y76un/fsEeM3kqqdBpyjYVEOEEoKc7
-X-Received: by 2002:a05:6402:278c:b0:5c0:a8c0:3960 with SMTP id 4fb4d7f45d1cf-5c21ed31e90mr2671877a12.4.1724942526552;
-        Thu, 29 Aug 2024 07:42:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH3Qxba/RJ3kvosiIqlnL9lYOS9AAEMC71M0lm83PE0iqKT0MhcHZDjA9fDLzTLomsiWqg1kg==
-X-Received: by 2002:a05:6402:278c:b0:5c0:a8c0:3960 with SMTP id 4fb4d7f45d1cf-5c21ed31e90mr2671689a12.4.1724942525532;
-        Thu, 29 Aug 2024 07:42:05 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:17c:f3dd:4b1c:bb80:a038:2df3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989195e6bsm86599066b.99.2024.08.29.07.41.59
+        d=1e100.net; s=20230601; t=1724942994; x=1725547794;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S2sT6L9UUzta00cejZJS50RWMrLlQc0scK9J+l0UXXw=;
+        b=KOPv8QnI6KrpIz0LfJRJh6Jz4QUYkUFjwxkdoF1rFoI+lTo0aL1tKdro3+i8JqVneY
+         UlQFh5VqndXROLDUKCBq83+Y/4kFxlT0d+rPnLEaJUlC7orYq9I1k1fz71WxYsZsWQbk
+         GhuQJNjRNEm1kmRHVzGbgjxVIWpon1CDLRc/t+dJQpoPeI8AKSXAfBj6E5gl4z3w/dU6
+         UA3vRLPiKHm6uZ37rDaSfAyWIlJkx3W7mMTAbC4iVsuW00J/RIs8PQD8FjMhDSoXmUBe
+         O6wGz/1CJ0EWNIRGzj1FTWUMtP7TlkTcbRIH7075UCotzy88SNPmLK6eEJ3D4oPZYAgf
+         ygUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWE9qzdlOJIANmyz8cNqEF50TZ587FlN9d2peQCVXFGONWmlXwtpECGN95/KKmtLza62WWckySBjXRVuQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+7ElfeaCmlfTVfwmcJHgRsNEhiQwbTamhc/v4ULNsG9aX5fvb
+	tnlDeiikbQUQgZxuEMEfsH73BgdoIHBA+9oivTPj+xAaYY85bZOfESlMbesFr3/oRdvhLCWcf22
+	qzg+30UPiqr+66edxOACgjPTi0ntT8CFeojpc3i1Djbk784yp2W61ggp6P8eS
+X-Received: by 2002:a05:6000:d90:b0:362:69b3:8e4d with SMTP id ffacd0b85a97d-374a02323eemr1808466f8f.25.1724942993928;
+        Thu, 29 Aug 2024 07:49:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHrfaIGeH0p8et8OYjnOCquSTWs4QXgyhcRTReJhUV0MD6wVymReUMbJDmaEmmHD/MIBOPsJA==
+X-Received: by 2002:a05:6000:d90:b0:362:69b3:8e4d with SMTP id ffacd0b85a97d-374a02323eemr1808372f8f.25.1724942993389;
+        Thu, 29 Aug 2024 07:49:53 -0700 (PDT)
+Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42baf7fa745sm33827915e9.31.2024.08.29.07.49.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 07:42:05 -0700 (PDT)
-Date: Thu, 29 Aug 2024 10:41:57 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Philipp Stanner <pstanner@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, virtualization@lists.linux.dev,
-	stable@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+        Thu, 29 Aug 2024 07:49:52 -0700 (PDT)
+Message-ID: <2cc5984b65beb6805f8d60ffd9627897b65b7700.camel@redhat.com>
 Subject: Re: [PATCH v5 6/7] vdpa: solidrun: Fix UB bug with devres
-Message-ID: <20240829104124-mutt-send-email-mst@kernel.org>
+From: Philipp Stanner <pstanner@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Andy Shevchenko
+	 <andy.shevchenko@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
+ <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
+ <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alvaro Karsz <alvaro.karsz@solid-run.com>, Jason
+ Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Damien Le Moal <dlemoal@kernel.org>, Hannes
+ Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-fpga@vger.kernel.org,  linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+ virtualization@lists.linux.dev, stable@vger.kernel.org, Christophe JAILLET
+ <christophe.jaillet@wanadoo.fr>
+Date: Thu, 29 Aug 2024 16:49:50 +0200
+In-Reply-To: <20240829104124-mutt-send-email-mst@kernel.org>
 References: <20240829141844.39064-1-pstanner@redhat.com>
- <20240829141844.39064-7-pstanner@redhat.com>
- <20240829102320-mutt-send-email-mst@kernel.org>
- <CAHp75Ve7O6eAiNx0+v_SNR2vuYgnkeWrPD1Umb1afS3pf7m8MQ@mail.gmail.com>
+	 <20240829141844.39064-7-pstanner@redhat.com>
+	 <20240829102320-mutt-send-email-mst@kernel.org>
+	 <CAHp75Ve7O6eAiNx0+v_SNR2vuYgnkeWrPD1Umb1afS3pf7m8MQ@mail.gmail.com>
+	 <20240829104124-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHp75Ve7O6eAiNx0+v_SNR2vuYgnkeWrPD1Umb1afS3pf7m8MQ@mail.gmail.com>
 
-On Thu, Aug 29, 2024 at 05:26:39PM +0300, Andy Shevchenko wrote:
-> On Thu, Aug 29, 2024 at 5:23 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Thu, Aug 29, 2024 at 04:16:25PM +0200, Philipp Stanner wrote:
-> > > In psnet_open_pf_bar() and snet_open_vf_bar() a string later passed to
-> > > pcim_iomap_regions() is placed on the stack. Neither
-> > > pcim_iomap_regions() nor the functions it calls copy that string.
-> > >
-> > > Should the string later ever be used, this, consequently, causes
-> > > undefined behavior since the stack frame will by then have disappeared.
-> > >
-> > > Fix the bug by allocating the strings on the heap through
-> > > devm_kasprintf().
-> > >
-> > > Cc: stable@vger.kernel.org    # v6.3
-> > > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
-> > > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > > Closes: https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr/
-> > > Suggested-by: Andy Shevchenko <andy@kernel.org>
-> > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> >
-> > Post this separately, so I can apply?
-> 
-> Don't you use `b4`? With it it as simple as
-> 
->   b4 am -P 6 $MSG_ID_OF_THIS_SERIES
-> 
-> -- 
-> With Best Regards,
-> Andy Shevchenko
+On Thu, 2024-08-29 at 10:41 -0400, Michael S. Tsirkin wrote:
+> On Thu, Aug 29, 2024 at 05:26:39PM +0300, Andy Shevchenko wrote:
+> > On Thu, Aug 29, 2024 at 5:23=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com>
+> > wrote:
+> > >=20
+> > > On Thu, Aug 29, 2024 at 04:16:25PM +0200, Philipp Stanner wrote:
+> > > > In psnet_open_pf_bar() and snet_open_vf_bar() a string later
+> > > > passed to
+> > > > pcim_iomap_regions() is placed on the stack. Neither
+> > > > pcim_iomap_regions() nor the functions it calls copy that
+> > > > string.
+> > > >=20
+> > > > Should the string later ever be used, this, consequently,
+> > > > causes
+> > > > undefined behavior since the stack frame will by then have
+> > > > disappeared.
+> > > >=20
+> > > > Fix the bug by allocating the strings on the heap through
+> > > > devm_kasprintf().
+> > > >=20
+> > > > Cc: stable@vger.kernel.org=C2=A0=C2=A0=C2=A0 # v6.3
+> > > > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
+> > > > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> > > > Closes:
+> > > > https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wa=
+nadoo.fr/
+> > > > Suggested-by: Andy Shevchenko <andy@kernel.org>
+> > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > >=20
+> > > Post this separately, so I can apply?
+> >=20
+> > Don't you use `b4`? With it it as simple as
+> >=20
+> > =C2=A0 b4 am -P 6 $MSG_ID_OF_THIS_SERIES
+> >=20
+> > --=20
+> > With Best Regards,
+> > Andy Shevchenko
+>=20
+> I can do all kind of things, but if it's posted as part of a
+> patchset,
+> it is not clear to me this has been tested outside of the patchset.
+>=20
 
-I can do all kind of things, but if it's posted as part of a patchset,
-it is not clear to me this has been tested outside of the patchset.
+Separating it from the series would lead to merge conflicts, because
+patch 7 depends on it.
 
--- 
-MST
+If you're responsible for vdpa in general I could send patches 6 and 7
+separately to you.
+
+But number 7 depends on number 1, because pcim_iounmap_region() needs
+to be public. So if patches 1-5 enter through a different tree than
+yours, that could be a problem.
+
+
+P.
 
