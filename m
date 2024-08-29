@@ -1,490 +1,226 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx5.ucr.edu (mx5.ucr.edu [138.23.62.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4786A40BE5
-	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 04:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CE31487E9
+	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 04:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=138.23.62.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724905776; cv=none; b=oPpqv4lGsNjjxm7sP41G+F7Wb8BwfQABM84EkAhRjIdKEfNRBKSMI4xWvEZVVw5+Gyj6xj5PgbO3NskhfKkb1FlIkCnVOa/TzEoqJBYmURfeEkOxJSY2hn85wn5qOvaZpnkfXh8VbvNQl5ODIp9ILXr73LYH1JFGLOHyU1WWOj0=
+	t=1724905991; cv=none; b=PIRzKsJ0pipyOej1BlvRrDd9My9Cw5icCdTKHTb0hImvJjQIWSSwQoTPQPzU+SXqNxtgOHbHMK5TbfsF7GplgB3haWe2RicapUeb/PUt75yM0yoSjh4rz1Rj9EZrUn7x2bIEpvscWK6xmOA5XkAZHk6zNanZGIRhpSQ1GrHfBdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724905776; c=relaxed/simple;
-	bh=iZgS4MD+UwuzBInqL7u93lglCD9tNMqToEAb21wKI8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FMNexTHBKkr8CItgSXSmvugiNs2RyrwBm795pUYnvITBi2U3ym+Kh0uve8Y+RdnH65AJ1SEkaw61gjvi7icPPkbilWkAWrWRT1RTb4liavuaYmBQLHRVidwhfSaqetEQPgr6rml0xgk3QLMqIeRt3au9mbt1Kby32dkyMcdL+6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dW3UCzKv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1724905991; c=relaxed/simple;
+	bh=YmcfNsyprOkjvzfrqi5ctVS0XMlpOpf8JOWiJUkfNIg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=oAmA0tNJtzZ1nYC2O0Im0EvMieY5c0Z1dULFB77QneIWjUw6nVrfJJvTn/V/M7lJTQh3SLt3Ae2dTRRzPnMLhUSJewxfY0V7rP1C7cPfcLSQnTg//Zf6EmNZuIx8ZlOrutAGsI18gfFlkvJoRH7esFM1xJjLm022eaxHlfdSTuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu; spf=pass smtp.mailfrom=ucr.edu; dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=NOgnVF6O; dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=osttyEmb; arc=none smtp.client-ip=138.23.62.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucr.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dW3UCzKv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724905773;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RW181n7zULJ+bTk4v7nsXdSFYPZYTQvKDPcxoOwouv8=;
-	b=dW3UCzKvdDEPEbg5KQ5YdenYTGlOd3JEMwLae4g797xZeMtgK7PGVfNxMNPNDCo69C/UQH
-	P1XL5x5huIczIbzgdiBvrbhE39f5cYnUkAQ9byHc4U8Vp5bTFJtpp0eNanblOSUIAbyg4w
-	1o0QHQznDlfTDjymoG14Q8yz6Wr6uvU=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-197-wtX5YgNPOOOBLz_oRMD4dA-1; Thu,
- 29 Aug 2024 00:29:29 -0400
-X-MC-Unique: wtX5YgNPOOOBLz_oRMD4dA-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 664771955D57;
-	Thu, 29 Aug 2024 04:29:28 +0000 (UTC)
-Received: from fedora (unknown [10.72.112.119])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 433BE19560A3;
-	Thu, 29 Aug 2024 04:29:22 +0000 (UTC)
-Date: Thu, 29 Aug 2024 12:29:18 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
-	ming.lei@redhat.com
-Subject: Re: [PATCH V5 4/8] io_uring: support SQE group
-Message-ID: <Zs/5Hpi16aQKlHFw@fedora>
-References: <20240808162503.345913-1-ming.lei@redhat.com>
- <20240808162503.345913-5-ming.lei@redhat.com>
- <3c819871-7ca3-47ea-b752-c4a8a49f8304@gmail.com>
+	dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="NOgnVF6O";
+	dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="osttyEmb"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
+  t=1724905990; x=1756441990;
+  h=dkim-signature:x-google-dkim-signature:
+   x-forwarded-encrypted:x-gm-message-state:
+   x-google-smtp-source:mime-version:references:in-reply-to:
+   from:date:message-id:subject:to:content-type:
+   content-transfer-encoding:x-cse-connectionguid:
+   x-cse-msgguid;
+  bh=YmcfNsyprOkjvzfrqi5ctVS0XMlpOpf8JOWiJUkfNIg=;
+  b=NOgnVF6OxRVtxcO1cw/7Z/QJwPro5lB/bXwwdXbdLq6X5oBJqn4EXNfO
+   9SavQZJhFteu29qJa7IuH4QiL46BBx3X2JsB1qWQMsZpW5Byw8GntzuBP
+   5ZdVp9neTdP9m85EG2ON8WY7UZNOwXwWn5c3Pfuvc5wQSkzSH17jmNX3y
+   tz5L00PfzdlhfetD5wavvET5wnehdp7mQ5Zi7C4PPYpObgTkaNEvnBMWw
+   ufrJ0D0s7ahL26DRWUXXWljAmbO4NlR/hvsuwtsqZwkfO/GyPo5WzELws
+   N7RTFzIGqZjtOgCVllriM1Vs64KBLNdlTArktlj0nGfSz6c25TspJFmRE
+   w==;
+X-CSE-ConnectionGUID: SANlD5FsTLqfdhb0vNldBg==
+X-CSE-MsgGUID: mPK0WErEQjax6f2TixMuDA==
+Received: from mail-il1-f199.google.com ([209.85.166.199])
+  by smtpmx5.ucr.edu with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 28 Aug 2024 21:33:03 -0700
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39d244820edso2003275ab.3
+        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 21:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucr.edu; s=rmail; t=1724905982; x=1725510782; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=19ZCMa6kbTGd7rUOHNxgUi7pF9KSa2RZc9b0v82EY34=;
+        b=osttyEmbVpvVPiAckNp0Xrcj/3tDCClUaXV6/28UoQFNteKKgQPOpIKDn6QX/EgqU7
+         AXnClTKekIxSdWIzzqcYVirT+R7NOpN78VqXy5Gf1DHvXcCfp6FejBg2cGRgNziLGJYU
+         JaqsYAoT0ZEmBd5xao/lA1BUojQXcBoDf8FeU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724905982; x=1725510782;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=19ZCMa6kbTGd7rUOHNxgUi7pF9KSa2RZc9b0v82EY34=;
+        b=nUnH/u8xv8k0NGFqCl0GHPXf0u/N4O4iMsNBJErhKHEG0A9v7gMq9LRx8fyhpHHGF3
+         o19rNuuoq6Dp/MPOhegYYqAtGI44X4KqWFUY+/7OX8zSnGF1xYzyIcwsSlDvpChd68tv
+         K5o1K9DP0Budwz9b9iG/5ttx9GIa0nnfSAgMuxlrvkjHNHzKNR0JVymzLyNvepYmnnY5
+         6eIFZgMsjBzL6KPBxgSd6lU4SSgr6R9LlKVYH57QkGRER/bFsEdGHQWYiz0rYI2VOP2G
+         AWv8U959hHVJTQ58yl1Bn3Txwy8O5YfidG9Unw8UPxKvrn0yamVefbiLAMM4ynkQUsjW
+         NLnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNztxn9DECB0NYD6WmMPH0msfme55NFZeaJ7bR6DpU02671JAvBzHP2dNK8R+Npim3ZsHAI+CP6sOtOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzyjjb6zi0YaZ8h+iheBWhbyH70Vc9O6A6wvs2wch/jWkdey5zv
+	uRP54xJWSvms5fOeSI9E0L9Mh5BcLrVbjm4YEd2NaLUf1XG/2IpVpU8eYFahzJK2ny2nt8x8O8/
+	lOEkGVPeBqvNN0CuJ8B7cSqMx/Tr3WTFDe922weRg7LWGd36ULqG/GxAdkTrXRhrpwXsz5lgliD
+	QqFOBV2Ja/meUXWaLDvrysuY1d+Y9m7oZFHhoP
+X-Received: by 2002:a05:6e02:1e07:b0:397:351b:2c0c with SMTP id e9e14a558f8ab-39f37846838mr22492675ab.17.1724905982257;
+        Wed, 28 Aug 2024 21:33:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQVvAyP6uQc13zE5AKpikYrGN/JfwFBhDWh/m5FRX7/FYivQ5DKTJW0iyqyzmuzBDE3y6mKqZt1nLBo8UXZZE=
+X-Received: by 2002:a05:6e02:1e07:b0:397:351b:2c0c with SMTP id
+ e9e14a558f8ab-39f37846838mr22492565ab.17.1724905981844; Wed, 28 Aug 2024
+ 21:33:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3c819871-7ca3-47ea-b752-c4a8a49f8304@gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <CALAgD-6gJ4W1rPj=CWG7bFUPpEJnUjEhQd3uvH=7C=aGKb=CUQ@mail.gmail.com>
+In-Reply-To: <CALAgD-6gJ4W1rPj=CWG7bFUPpEJnUjEhQd3uvH=7C=aGKb=CUQ@mail.gmail.com>
+From: Xingyu Li <xli399@ucr.edu>
+Date: Wed, 28 Aug 2024 21:32:51 -0700
+Message-ID: <CALAgD-6_=C6Cmau94Aoj8NKTeX37y17HYUvwgsJVhs5-ATTYdQ@mail.gmail.com>
+Subject: Re: BUG: general protection fault in update_io_ticks
+To: "axboe@kernel.dk" <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Yu Hao <yhao016@ucr.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Pavel,
+The above reproducer needs the additional support to run it. And here
+is the C reproducer:
+https://gist.github.com/freexxxyyy/8d77167be200ccd7e198cab2222ff9e6
 
-Thanks for review!
-
-On Tue, Aug 27, 2024 at 04:18:26PM +0100, Pavel Begunkov wrote:
-> On 8/8/24 17:24, Ming Lei wrote:
-> > SQE group is defined as one chain of SQEs starting with the first SQE that
-> > has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
-> > doesn't have it set, and it is similar with chain of linked SQEs.
-> > 
-> > Not like linked SQEs, each sqe is issued after the previous one is
-> > completed. All SQEs in one group can be submitted in parallel. To simplify
-> > the implementation from beginning, all members are queued after the leader
-> > is completed, however, this way may be changed and leader and members may
-> > be issued concurrently in future.
-> > 
-> > The 1st SQE is group leader, and the other SQEs are group member. The whole
-> > group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
-> > the two flags can't be set for group members.
-> > 
-> > When the group is in one link chain, this group isn't submitted until the
-> > previous SQE or group is completed. And the following SQE or group can't
-> > be started if this group isn't completed. Failure from any group member will
-> > fail the group leader, then the link chain can be terminated.
-> > 
-> > When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
-> > previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
-> > group leader only, we respect IO_DRAIN by always completing group leader as
-> > the last one in the group. Meantime it is natural to post leader's CQE
-> > as the last one from application viewpoint.
-> > 
-> > Working together with IOSQE_IO_LINK, SQE group provides flexible way to
-> > support N:M dependency, such as:
-> > 
-> > - group A is chained with group B together
-> > - group A has N SQEs
-> > - group B has M SQEs
-> > 
-> > then M SQEs in group B depend on N SQEs in group A.
-> > 
-> > N:M dependency can support some interesting use cases in efficient way:
-> > 
-> > 1) read from multiple files, then write the read data into single file
-> > 
-> > 2) read from single file, and write the read data into multiple files
-> > 
-> > 3) write same data into multiple files, and read data from multiple files and
-> > compare if correct data is written
-> > 
-> > Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
-> > extend sqe->flags with one uring context flag, such as use __pad3 for
-> > non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
-> > 
-> > Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   include/linux/io_uring_types.h |  18 +++
-> ...
-> > diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-> > index f112e9fa90d8..45a292445b18 100644
-> > --- a/io_uring/io_uring.c
-> > +++ b/io_uring/io_uring.c
-> ...
-> > @@ -875,6 +877,116 @@ static __always_inline void io_req_commit_cqe(struct io_ring_ctx *ctx,
-> >   	}
-> >   }
-> ...
-> > +static void io_queue_group_members(struct io_kiocb *req)
-> > +{
-> > +	struct io_kiocb *member = req->grp_link;
-> > +
-> > +	if (!member)
-> > +		return;
-> > +
-> > +	req->grp_link = NULL;
-> > +	while (member) {
-> > +		struct io_kiocb *next = member->grp_link;
-> > +
-> > +		member->grp_leader = req;
-> > +		if (unlikely(member->flags & REQ_F_FAIL)) {
-> > +			io_req_task_queue_fail(member, member->cqe.res);
-> > +		} else if (unlikely(req->flags & REQ_F_FAIL)) {
-> > +			io_req_task_queue_fail(member, -ECANCELED);
-> > +		} else {
-> > +			io_req_task_queue(member);
-> > +		}
-> > +		member = next;
-> > +	}
-> > +}
-> > +
-> > +static inline bool __io_complete_group_member(struct io_kiocb *req,
-> > +			     struct io_kiocb *lead)
-> > +{
-> 
-> I think it'd be better if you inline this function, it only
-> obfuscates things.
-
-OK.
-
-> 
-> > +	if (WARN_ON_ONCE(lead->grp_refs <= 0))
-> > +		return false;
-> > +
-> > +	req->flags &= ~REQ_F_SQE_GROUP;
-> 
-> I'm getting completely lost when and why it clears and sets
-> back REQ_F_SQE_GROUP and REQ_F_SQE_GROUP_LEADER. Is there any
-> rule?
-
-My fault, it should have been documented somewhere.
-
-REQ_F_SQE_GROUP is cleared when the request is completed, but it is
-reused as flag for marking the last request in this group, so we can
-free the group leader when observing the 'last' member request.
-
-The only other difference about the two flags is that both are cleared
-when the group leader becomes the last one in the group, then
-this leader degenerates as normal request, which way can simplify
-group leader freeing.
-
-> 
-> > +	/*
-> > +	 * Set linked leader as failed if any member is failed, so
-> > +	 * the remained link chain can be terminated
-> > +	 */
-> > +	if (unlikely((req->flags & REQ_F_FAIL) &&
-> > +		     ((lead->flags & IO_REQ_LINK_FLAGS) && lead->link)))
-> > +		req_set_fail(lead);
-> 
-> if (req->flags & REQ_F_FAIL)
-> 	req_set_fail(lead);
-> 
-> REQ_F_FAIL is not specific to links, if a request fails we need
-> to mark it as such.
-
-It is for handling group failure.
-
-The following condition
-
-	((lead->flags & IO_REQ_LINK_FLAGS) && lead->link))
-
-means that this group is in one link-chain.
-
-If any member in this group is failed, we need to fail this group(lead),
-then the remained requests in this chain can be failed.
-
-Otherwise, it isn't necessary to fail group leader in case of any member
-io failure.
-
-> 
-> 
-> > +	return !--lead->grp_refs;
-> > +}
-> > +
-> > +static inline bool leader_is_the_last(struct io_kiocb *lead)
-> > +{
-> > +	return lead->grp_refs == 1 && (lead->flags & REQ_F_SQE_GROUP);
-> > +}
-> > +
-> > +static void io_complete_group_member(struct io_kiocb *req)
-> > +{
-> > +	struct io_kiocb *lead = get_group_leader(req);
-> > +
-> > +	if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP)))
-> > +		return;
-> > +
-> > +	/* member CQE needs to be posted first */
-> > +	if (!(req->flags & REQ_F_CQE_SKIP))
-> > +		io_req_commit_cqe(req->ctx, req);
-> > +
-> > +	if (__io_complete_group_member(req, lead)) {
-> > +		/*
-> > +		 * SQE_GROUP flag is kept for the last member, so the leader
-> > +		 * can be retrieved & freed from this last member
-> > +		 */
-> > +		req->flags |= REQ_F_SQE_GROUP;
-
-'req' is the last completed request, so mark it as the last one
-by reusing REQ_F_SQE_GROUP, so we can free group leader in
-io_free_batch_list() when observing the last flag.
-
-But it should have been documented.
-
-> > +		if (!(lead->flags & REQ_F_CQE_SKIP))
-> > +			io_req_commit_cqe(lead->ctx, lead);
-> > +	} else if (leader_is_the_last(lead)) {
-> > +		/* leader will degenerate to plain req if it is the last */
-> > +		lead->flags &= ~(REQ_F_SQE_GROUP | REQ_F_SQE_GROUP_LEADER);
-> 
-> What's this chunk is about?
-
-The leader becomes the only request not completed in group, so it is
-degenerated as normal one by clearing the two flags. This way simplifies
-logic for completing group leader.
-
-> 
-> > +	}
-> > +}
-> > +
-> > +static void io_complete_group_leader(struct io_kiocb *req)
-> > +{
-> > +	WARN_ON_ONCE(req->grp_refs <= 0);
-> > +	req->flags &= ~REQ_F_SQE_GROUP;
-> > +	req->grp_refs -= 1;
-> > +	WARN_ON_ONCE(req->grp_refs == 0);
-> 
-> Why not combine these WARN_ON_ONCE into one?
-
-OK.
-
-> 
-> > +
-> > +	/* TODO: queue members with leader in parallel */
-> 
-> no todos, please
-
-Fine, will remove the todos.
-
-> 
-> > +	if (req->grp_link)
-> > +		io_queue_group_members(req);
-> > +}
-> 
-> It's spinlock'ed, we really don't want to do too much here
-> like potentially queueing a ton of task works.
-> io_queue_group_members() can move into io_free_batch_list().
-
-Fair enough, will do it in V6.
-
-> 
-> > +
-> >   static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
-> >   {
-> >   	struct io_ring_ctx *ctx = req->ctx;
-> > @@ -890,7 +1002,8 @@ static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
-> >   	 * Handle special CQ sync cases via task_work. DEFER_TASKRUN requires
-> >   	 * the submitter task context, IOPOLL protects with uring_lock.
-> >   	 */
-> > -	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL)) {
-> > +	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL) ||
-> > +	    req_is_group_leader(req)) {
-> >   		req->io_task_work.func = io_req_task_complete;
-> >   		io_req_task_work_add(req);
-> >   		return;
-> > @@ -1388,11 +1501,33 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
-> >   						    comp_list);
-> >   		if (unlikely(req->flags & IO_REQ_CLEAN_SLOW_FLAGS)) {
-> > +			if (req->flags & (REQ_F_SQE_GROUP |
-> > +					  REQ_F_SQE_GROUP_LEADER)) {
-> > +				struct io_kiocb *leader;
-> > +
-> > +				/* Leader is freed via the last member */
-> > +				if (req_is_group_leader(req)) {
-> > +					node = req->comp_list.next;
-> > +					continue;
-> > +				}
-> > +
-> > +				/*
-> > +				 * Only the last member keeps GROUP flag,
-> > +				 * free leader and this member together
-> > +				 */
-> > +				leader = get_group_leader(req);
-> > +				leader->flags &= ~REQ_F_SQE_GROUP_LEADER;
-> > +				req->flags &= ~REQ_F_SQE_GROUP;
-> > +				wq_stack_add_head(&leader->comp_list,
-> > +						  &req->comp_list);
-> 
-> That's quite hacky, but at least we can replace it with
-> task work if it gets in the way later on.
-
-io_free_batch_list() is already called in task context, and it isn't
-necessary to schedule one extra tw, which hurts perf more or less.
-
-Another way is to store these leaders into one temp list, and
-call io_free_batch_list() for this temp list one more time.
-
-> 
-> > +			}
-> > +
-> >   			if (req->flags & REQ_F_REFCOUNT) {
-> >   				node = req->comp_list.next;
-> >   				if (!req_ref_put_and_test(req))
-> >   					continue;
-> >   			}
-> > +
-> >   			if ((req->flags & REQ_F_POLLED) && req->apoll) {
-> >   				struct async_poll *apoll = req->apoll;
-> > @@ -1427,8 +1562,19 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
-> >   		struct io_kiocb *req = container_of(node, struct io_kiocb,
-> >   					    comp_list);
-> > -		if (!(req->flags & REQ_F_CQE_SKIP))
-> > -			io_req_commit_cqe(ctx, req);
-> > +		if (unlikely(req->flags & (REQ_F_CQE_SKIP | REQ_F_SQE_GROUP))) {
-> > +			if (req->flags & REQ_F_SQE_GROUP) {
-> > +				if (req_is_group_leader(req))
-> > +					io_complete_group_leader(req);
-> > +				else
-> > +					io_complete_group_member(req);
-> > +				continue;
-> > +			}
-> > +
-> > +			if (req->flags & REQ_F_CQE_SKIP)
-> > +				continue;
-> > +		}
-> > +		io_req_commit_cqe(ctx, req);
-> >   	}
-> >   	__io_cq_unlock_post(ctx);
-> ...
-> > @@ -2101,6 +2251,62 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
-> >   	return def->prep(req, sqe);
-> >   }
-> > +static struct io_kiocb *io_group_sqe(struct io_submit_link *group,
-> > +				     struct io_kiocb *req)
-> > +{
-> > +	/*
-> > +	 * Group chain is similar with link chain: starts with 1st sqe with
-> > +	 * REQ_F_SQE_GROUP, and ends with the 1st sqe without REQ_F_SQE_GROUP
-> > +	 */
-> > +	if (group->head) {
-> > +		struct io_kiocb *lead = group->head;
-> > +
-> > +		/* members can't be in link chain, can't be drained */
-> > +		if (req->flags & (IO_REQ_LINK_FLAGS | REQ_F_IO_DRAIN))
-> > +			req_fail_link_node(lead, -EINVAL);
-> 
-> That should fail the entire link (if any) as well.
-
-Good catch, here we should fail link head by following the logic
-in io_submit_fail_init().
-
-> 
-> I have even more doubts we even want to mix links and groups. Apart
-
-Wrt. ublk, group provides zero copy, and the ublk io(group) is generic
-IO, sometime IO_LINK is really needed & helpful, such as in ublk-nbd,
-send(tcp) requests need to be linked & zc. And we shouldn't limit IO_LINK
-for generic io_uring IO.
-
-> from nuances as such, which would be quite hard to track, the semantics
-> of IOSQE_CQE_SKIP_SUCCESS is unclear.
-
-IO group just follows every normal request.
-
-1) fail in linked chain
-- follows IO_LINK's behavior since io_fail_links() covers io group
-
-2) otherwise
-- just respect IOSQE_CQE_SKIP_SUCCESS
-
-> And also it doen't work with IORING_OP_LINK_TIMEOUT.
-
-REQ_F_LINK_TIMEOUT can work on whole group(or group leader) only, and I
-will document it in V6.
-
-> 
-> > +
-> > +		lead->grp_refs += 1;
-> > +		group->last->grp_link = req;
-> > +		group->last = req;
-> > +
-> > +		if (req->flags & REQ_F_SQE_GROUP)
-> > +			return NULL;
-> > +
-> > +		req->grp_link = NULL;
-> > +		req->flags |= REQ_F_SQE_GROUP;
-> > +		group->head = NULL;
-> > +		if (lead->flags & REQ_F_FAIL) {
-> > +			io_queue_sqe_fallback(lead);
-> 
-> Let's say the group was in the middle of a link, it'll
-> complete that group and continue with assembling / executing
-> the link when it should've failed it and honoured the
-> request order.
-
-OK, here we can simply remove the above two lines, and link submit
-state can handle this failure in link chain.
-
-> 
-> 
-> > +			return NULL;
-> > +		}
-> > +		return lead;
-> > +	} else if (req->flags & REQ_F_SQE_GROUP) {
-> > +		group->head = req;
-> > +		group->last = req;
-> > +		req->grp_refs = 1;
-> > +		req->flags |= REQ_F_SQE_GROUP_LEADER;
-> > +		return NULL;
-> > +	} else {
-> 
-> We shouldn't be able to get here.
-> 
-> if (WARN_ONCE(!(req->flags & GROUP)))
-> 	...
-> group->head = req;
-> ...
-
-OK.
-
-> 
-> > +		return req;
-> > +	}
-> > +}
-> > +
-> > +static __cold struct io_kiocb *io_submit_fail_group(
-> > +		struct io_submit_link *link, struct io_kiocb *req)
-> > +{
-> > +	struct io_kiocb *lead = link->head;
-> > +
-> > +	/*
-> > +	 * Instead of failing eagerly, continue assembling the group link
-> > +	 * if applicable and mark the leader with REQ_F_FAIL. The group
-> > +	 * flushing code should find the flag and handle the rest
-> > +	 */
-> > +	if (lead && (lead->flags & IO_REQ_LINK_FLAGS) && !(lead->flags & REQ_F_FAIL))
-> > +		req_fail_link_node(lead, -ECANCELED);
-> 
-> Same as above, you don't need to check for IO_REQ_LINK_FLAGS.
-> io_queue_sqe_fallback()
-
-OK.
+On Sat, Aug 24, 2024 at 10:10=E2=80=AFPM Xingyu Li <xli399@ucr.edu> wrote:
+>
+> Hi,
+>
+> We found a bug in Linux 6.10. It is probably a null pointer dereference b=
+ug.
+> The bug report and syzkaller reproducer are as follows:
+>
+> Bug report:
+>
+> Oops: general protection fault, probably for non-canonical address
+> 0xdffffc0000000005: 0000 [#1] PREEMPT SMP KASAN PTI
+> KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
+> CPU: 0 PID: 45 Comm: kworker/u4:3 Not tainted 6.10.0 #13
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
+1/2014
+> Workqueue: writeback wb_workfn (flush-8:0)
+> RIP: 0010:update_io_ticks+0x94/0x2c0 block/blk-core.c:992
+> Code: f3 f3 f3 48 89 54 24 18 4a 89 04 32 e8 75 77 59 fd 48 c1 eb 03
+> 48 89 5c 24 08 eb 03 4c 8b 2b 49 8d 5d 28 48 89 d8 48 c1 e8 03 <42> 80
+> 3c 30 00 74 08 48 89 df e8 6d 82 bc fd 4c 8b 3b 48 8b 44 24
+> RSP: 0018:ffffc9000090e620 EFLAGS: 00010206
+> RAX: 0000000000000005 RBX: 0000000000000028 RCX: ffff888015330000
+> RDX: 0000000000000000 RSI: 0000000100000845 RDI: 0000000000000000
+> RBP: ffffc9000090e6d8 R08: ffffffff843a8b4a R09: 1ffffffff1e48be5
+> R10: dffffc0000000000 R11: fffffbfff1e48be6 R12: 0000000100000845
+> R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88801d4f2058
+> FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007ffd0a027408 CR3: 00000000232cc000 CR4: 0000000000350ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  blk_account_io_start+0x189/0x2d0 block/blk-mq.c:1022
+>  blk_mq_bio_to_request block/blk-mq.c:2559 [inline]
+>  blk_mq_submit_bio+0x1043/0x1f40 block/blk-mq.c:2996
+>  __submit_bio+0x1bc/0x550 block/blk-core.c:627
+>  __submit_bio_noacct_mq block/blk-core.c:708 [inline]
+>  submit_bio_noacct_nocheck+0x3ed/0xc20 block/blk-core.c:737
+>  ext4_io_submit+0xd4/0x130 fs/ext4/page-io.c:377
+>  ext4_do_writepages+0x293b/0x38e0 fs/ext4/inode.c:2699
+>  ext4_writepages+0x20c/0x3b0 fs/ext4/inode.c:2768
+>  do_writepages+0x36f/0x880 mm/page-writeback.c:2656
+>  __writeback_single_inode+0xe2/0x660 fs/fs-writeback.c:1651
+>  writeback_sb_inodes+0x8ee/0x1140 fs/fs-writeback.c:1947
+>  __writeback_inodes_wb+0x11b/0x260 fs/fs-writeback.c:2018
+>  wb_writeback+0x3e7/0x750 fs/fs-writeback.c:2129
+>  wb_check_old_data_flush fs/fs-writeback.c:2233 [inline]
+>  wb_do_writeback fs/fs-writeback.c:2286 [inline]
+>  wb_workfn+0xa29/0xf00 fs/fs-writeback.c:2314
+>  process_one_work kernel/workqueue.c:3248 [inline]
+>  process_scheduled_works+0x977/0x1410 kernel/workqueue.c:3329
+>  worker_thread+0xaa0/0x1020 kernel/workqueue.c:3409
+>  kthread+0x2eb/0x380 kernel/kthread.c:389
+>  ret_from_fork+0x49/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:244
+>  </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:update_io_ticks+0x94/0x2c0 block/blk-core.c:992
+> Code: f3 f3 f3 48 89 54 24 18 4a 89 04 32 e8 75 77 59 fd 48 c1 eb 03
+> 48 89 5c 24 08 eb 03 4c 8b 2b 49 8d 5d 28 48 89 d8 48 c1 e8 03 <42> 80
+> 3c 30 00 74 08 48 89 df e8 6d 82 bc fd 4c 8b 3b 48 8b 44 24
+> RSP: 0018:ffffc9000090e620 EFLAGS: 00010206
+> RAX: 0000000000000005 RBX: 0000000000000028 RCX: ffff888015330000
+> RDX: 0000000000000000 RSI: 0000000100000845 RDI: 0000000000000000
+> RBP: ffffc9000090e6d8 R08: ffffffff843a8b4a R09: 1ffffffff1e48be5
+> R10: dffffc0000000000 R11: fffffbfff1e48be6 R12: 0000000100000845
+> R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88801d4f2058
+> FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007ffd0a027408 CR3: 00000000232cc000 CR4: 0000000000350ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> ----------------
+> Code disassembly (best guess):
+>    0: f3 f3 f3 48 89 54 24 repz repz xrelease mov %rdx,0x18(%rsp)
+>    7: 18
+>    8: 4a 89 04 32           mov    %rax,(%rdx,%r14,1)
+>    c: e8 75 77 59 fd       call   0xfd597786
+>   11: 48 c1 eb 03           shr    $0x3,%rbx
+>   15: 48 89 5c 24 08       mov    %rbx,0x8(%rsp)
+>   1a: eb 03                 jmp    0x1f
+>   1c: 4c 8b 2b             mov    (%rbx),%r13
+>   1f: 49 8d 5d 28           lea    0x28(%r13),%rbx
+>   23: 48 89 d8             mov    %rbx,%rax
+>   26: 48 c1 e8 03           shr    $0x3,%rax
+> * 2a: 42 80 3c 30 00       cmpb   $0x0,(%rax,%r14,1) <-- trapping instruc=
+tion
+>   2f: 74 08                 je     0x39
+>   31: 48 89 df             mov    %rbx,%rdi
+>   34: e8 6d 82 bc fd       call   0xfdbc82a6
+>   39: 4c 8b 3b             mov    (%rbx),%r15
+>   3c: 48                   rex.W
+>   3d: 8b                   .byte 0x8b
+>   3e: 44                   rex.R
+>   3f: 24                   .byte 0x24
+>
+>
+> Syzkaller reproducer:
+> # {Threaded:false Repeat:true RepeatTimes:0 Procs:1 Slowdown:1
+> Sandbox: SandboxArg:0 Leak:false NetInjection:false NetDevices:false
+> NetReset:false Cgroups:false BinfmtMisc:false CloseFDs:false
+> KCSAN:false DevlinkPCI:false NicVF:false USB:false VhciInjection:false
+> Wifi:false IEEE802154:false Sysctl:false Swap:false UseTmpDir:false
+> HandleSegv:false Trace:false LegacyOptions:{Collide:false Fault:false
+> FaultCall:0 FaultNth:0}}
+> write$syz_spec_18446744072532934322_80(0xffffffffffffffff,
+> &(0x7f0000000000)=3D"2b952480c7ca55097d1707935ba64b20f3026c03d658026b81bf=
+264340512b3cb4e01afda2de754299ea7a113343ab7b9bda2fc0a2e2cdbfecbca0233a0772b=
+12ebde5d98a1203cb871672dff7e4c86ec1dccef0a76312fbe8d45dc2bd0f8fc2ebeb2a6be6=
+a300916c5281da2c1ef64d66267091b82429976c019da3645557ed1d439c5a637f6bf58c53b=
+c414539dd87c69098d671402586b631f9ac5c2fe9cedc281a6f005b5c4d1dd5ed9be400",
+> 0xb4)
+> r0 =3D syz_open_dev$sg(&(0x7f00000000c0), 0x0, 0x181040)
+> ioctl$syz_spec_1724254976_2866(r0, 0x1, &(0x7f0000000080)=3D{0x0, 0x2,
+> [0x85, 0x8, 0x15, 0xd]})
+>
+>
+> --
+> Yours sincerely,
+> Xingyu
 
 
-Thanks,
-Ming
 
+--=20
+Yours sincerely,
+Xingyu
