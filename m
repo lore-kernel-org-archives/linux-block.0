@@ -1,167 +1,188 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F281B1D41
-	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 15:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DAF1B5325;
+	Thu, 29 Aug 2024 16:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724944236; cv=none; b=tVXa4af4aaCghbR4UVXumbGAA9ciEFqY1GgTEYmh7eIx1HUbF7xD53CEXtlRs/FNg5fkExuy7AteV/4BxZ+JQQCoJriNhz3+7u9nGoXrgb8EpZD2SfSkoi6ukslxHsXdR6pNvHGSnm62/+qGgfgvjYEbiQHQOSIGiz66E2VtJ88=
+	t=1724948495; cv=none; b=BLye7u37lMJ1Fhs5Zjg6/lnotqpXJm2PX2E/KdNYW2+SP+lhKEN+fIa6Lz1yrhKUdW7sjp4zXSu2xqgRgcraXYVWQ6H9n601UMQSE6M6nPfN3kd6TaN3nG0pMkMW0u0lF80LrdJo9RR/ypGHpCVb87PAn27d/617bi2e5014Ip8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724944236; c=relaxed/simple;
-	bh=3wueJtwqZPDY8uUIPY+rtKEAp2/GgrA6iAsAi6G04ns=;
+	s=arc-20240116; t=1724948495; c=relaxed/simple;
+	bh=QSD0KfHL5nBVjCs5CyKPuF0Hu/LItF1ebis/Y0+ARtE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IT+jFBo53YDegDqEzXvLDwDZB4ZNwX74bUCE+Dktc4+w4yFnd4EpR+y/3OExazgDOcv1GFWZc0zfTgjxB553f7djwdtYK97nD4vFZEhFYA2FsZaVXCHrjsKJlbVVuedCKaxrL4+ivhtjtyqLjoMm670nnzFgFIGZeGa2aT9ZGpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YrH9KMaJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=HREtMqugwx1znK7376Rs0BY5cDsNHw3BXgKCGUxExXPdc75QnU0MvL9coYezjgOr7aaYVwLdR6PXZX+jDWiYoatO69JF2MsNt70OmFM5hEkezSvFtGL/WzQXEYYzFzeLscSCM6sbHREqlWBuFq+UB4M5YY+nxS9laqP+P/F9fbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CoARXOaD; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YrH9KMaJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724944234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=412DWhH/oriLI6hvWD5rHCU4OUHfqjU0rcZX3wNeFQE=;
-	b=YrH9KMaJWVI7uah/CPqAhCRz8QhWtspHaUN4GmjjOCUKJBqfsvF6kZYU/PgVA2COpISh2X
-	mhE4bTlhuqCqxYefx46YvrY96r6SpuP6+Aw3/CGFgaQsbbDeYe+dsZ+BXo1eMULzAqO+Pf
-	8PLJqWQGVE7dKHWbP7g408NQM59jZk0=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-fecKMsm1MSGCOrMAxfg2hg-1; Thu, 29 Aug 2024 11:10:32 -0400
-X-MC-Unique: fecKMsm1MSGCOrMAxfg2hg-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5bec23ba156so629869a12.1
-        for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 08:10:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724944232; x=1725549032;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=412DWhH/oriLI6hvWD5rHCU4OUHfqjU0rcZX3wNeFQE=;
-        b=HUlAYfQKpWMaC/Jwcng+OOFNOOSChplSFloLOtpzxa/ilEOC+4wRqYGiiJwy5CQktV
-         UqHm0CnWQfzISqOtrxce1+G/I8/Gxh0kCFMHP/kJKoL5txNmsmN8xsOlxpVIuMkJFZwX
-         kBalxNuETr2QpphBA7/7EeELe82qVpTfFHgmRkr6zB4RonOdQ6G3XdB1NMhB30J5QDfT
-         EhHqpwO01NfsOLthHdEWGJEC8NAB6S+XX7n82t2gWlovyxoK3DCL9hgqdjeEEx9oqqoz
-         IIjPvr7rGkHnlZLvTMI/uUrmtUThUoQHdZlMt+6cF+oB8ZhwXAJ/umQyUcmM+WV+q8f9
-         kT4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU4U5CWTOrAQeb5o/XjCqp9HzE28aqAfpxfDrkslUTlJBFM/H1v7u/y5Kcp73tOUD13rNAETM6l5oJwZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLjhnitvUeMCPNL9gLENuDumr5bTwPeTCNgAY0HLZP5lRw4DqD
-	61LJr1ioJJFNQ3tH2VByRxun73UWUd98s7/ml0w9Me90GpZd3GLa+3vvT+Udztczob0WtpHpWf5
-	k5fJmjdKAUR5xwTKoZ+mDkEhtPOoZQpMeGjFUjH9bUtg0Mo1sCR75gDWMAdf7
-X-Received: by 2002:a05:6402:3506:b0:5c2:17f7:a3cc with SMTP id 4fb4d7f45d1cf-5c21ed311dfmr3269587a12.7.1724944231564;
-        Thu, 29 Aug 2024 08:10:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEsjAXjjJGNgtKMvoMzJYd+NwWHB3eXVAslR4/vzHPWb7ReUjNyaxjfmmOTF5ScXOWLN7Kriw==
-X-Received: by 2002:a05:6402:3506:b0:5c2:17f7:a3cc with SMTP id 4fb4d7f45d1cf-5c21ed311dfmr3269546a12.7.1724944230707;
-        Thu, 29 Aug 2024 08:10:30 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:17c:f3dd:4b1c:bb80:a038:2df3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891d80fcsm89031566b.181.2024.08.29.08.10.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 08:10:30 -0700 (PDT)
-Date: Thu, 29 Aug 2024 11:10:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, virtualization@lists.linux.dev,
-	stable@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH v5 6/7] vdpa: solidrun: Fix UB bug with devres
-Message-ID: <20240829110902-mutt-send-email-mst@kernel.org>
-References: <20240829141844.39064-1-pstanner@redhat.com>
- <20240829141844.39064-7-pstanner@redhat.com>
- <20240829102320-mutt-send-email-mst@kernel.org>
- <CAHp75Ve7O6eAiNx0+v_SNR2vuYgnkeWrPD1Umb1afS3pf7m8MQ@mail.gmail.com>
- <20240829104124-mutt-send-email-mst@kernel.org>
- <2cc5984b65beb6805f8d60ffd9627897b65b7700.camel@redhat.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CoARXOaD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724948493; x=1756484493;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QSD0KfHL5nBVjCs5CyKPuF0Hu/LItF1ebis/Y0+ARtE=;
+  b=CoARXOaDXvSxzo5PFlyYg6jyW5xR47lo+6Da/LT7bPo8kyF+dc1vAnHR
+   m8RauvLq0C0Owqo210V3hw948HykysylRgRdUc8/8fPxoCn3pcmlGkuKF
+   NU+wDpJxynLnEFzjhpzQhACjdKdiKWiit80loWmE010eXip9DM8jw8Mbj
+   35W1W2g7TVj7btBBWowhYakfLwkE7lMYibkgAgEuLFk82lD4AfgjGB66S
+   rcoGE49Z92WBBw4aCcuofvp1XHo/BwM9jRL3e2G4Vj5cngxyWebv7Q/ZG
+   E2kDzUtmvmMOqHSpOwQZujzILKSNwfjPnqunQSxXw2Fh/wqN4bDyX+Mim
+   g==;
+X-CSE-ConnectionGUID: KeyKL/QhQbaVHwapqPTZ+A==
+X-CSE-MsgGUID: a5J9g5BGTgOJguCRlRoaIg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="23725567"
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="23725567"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 09:21:32 -0700
+X-CSE-ConnectionGUID: baVme5SvQhCgxvjuylVrYg==
+X-CSE-MsgGUID: SRL9VVpyRRKKuQttzYY6tg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="94368725"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 29 Aug 2024 09:21:30 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sjhtm-0000So-29;
+	Thu, 29 Aug 2024 16:21:26 +0000
+Date: Fri, 30 Aug 2024 00:20:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Haifeng Xu <haifeng.xu@shopee.com>, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, jack@suse.cz
+Cc: oe-kbuild-all@lists.linux.dev, tytso@mit.edu, yi.zhang@huaweicloud.com,
+	yukuai1@huaweicloud.com, tj@kernel.org, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Haifeng Xu <haifeng.xu@shopee.com>
+Subject: Re: [PATCH] buffer: Associate the meta bio with blkg from buffer page
+Message-ID: <202408300007.m9sHEOXo-lkp@intel.com>
+References: <20240828033224.146584-1-haifeng.xu@shopee.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2cc5984b65beb6805f8d60ffd9627897b65b7700.camel@redhat.com>
+In-Reply-To: <20240828033224.146584-1-haifeng.xu@shopee.com>
 
-On Thu, Aug 29, 2024 at 04:49:50PM +0200, Philipp Stanner wrote:
-> On Thu, 2024-08-29 at 10:41 -0400, Michael S. Tsirkin wrote:
-> > On Thu, Aug 29, 2024 at 05:26:39PM +0300, Andy Shevchenko wrote:
-> > > On Thu, Aug 29, 2024 at 5:23 PM Michael S. Tsirkin <mst@redhat.com>
-> > > wrote:
-> > > > 
-> > > > On Thu, Aug 29, 2024 at 04:16:25PM +0200, Philipp Stanner wrote:
-> > > > > In psnet_open_pf_bar() and snet_open_vf_bar() a string later
-> > > > > passed to
-> > > > > pcim_iomap_regions() is placed on the stack. Neither
-> > > > > pcim_iomap_regions() nor the functions it calls copy that
-> > > > > string.
-> > > > > 
-> > > > > Should the string later ever be used, this, consequently,
-> > > > > causes
-> > > > > undefined behavior since the stack frame will by then have
-> > > > > disappeared.
-> > > > > 
-> > > > > Fix the bug by allocating the strings on the heap through
-> > > > > devm_kasprintf().
-> > > > > 
-> > > > > Cc: stable@vger.kernel.org    # v6.3
-> > > > > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
-> > > > > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > > > > Closes:
-> > > > > https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr/
-> > > > > Suggested-by: Andy Shevchenko <andy@kernel.org>
-> > > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > > > 
-> > > > Post this separately, so I can apply?
-> > > 
-> > > Don't you use `b4`? With it it as simple as
-> > > 
-> > >   b4 am -P 6 $MSG_ID_OF_THIS_SERIES
-> > > 
-> > > -- 
-> > > With Best Regards,
-> > > Andy Shevchenko
-> > 
-> > I can do all kind of things, but if it's posted as part of a
-> > patchset,
-> > it is not clear to me this has been tested outside of the patchset.
-> > 
-> 
-> Separating it from the series would lead to merge conflicts, because
-> patch 7 depends on it.
-> 
-> If you're responsible for vdpa in general I could send patches 6 and 7
-> separately to you.
-> 
-> But number 7 depends on number 1, because pcim_iounmap_region() needs
-> to be public. So if patches 1-5 enter through a different tree than
-> yours, that could be a problem.
-> 
-> 
-> P.
+Hi Haifeng,
 
-Defer 1/7 until after the merge window, this is what is normally done.
-Adding new warnings is not nice, anyway.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on brauner-vfs/vfs.all]
+[also build test ERROR on linus/master v6.11-rc5 next-20240829]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Haifeng-Xu/buffer-Associate-the-meta-bio-with-blkg-from-buffer-page/20240828-113409
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
+patch link:    https://lore.kernel.org/r/20240828033224.146584-1-haifeng.xu%40shopee.com
+patch subject: [PATCH] buffer: Associate the meta bio with blkg from buffer page
+config: alpha-defconfig (https://download.01.org/0day-ci/archive/20240830/202408300007.m9sHEOXo-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240830/202408300007.m9sHEOXo-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408300007.m9sHEOXo-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   fs/buffer.c: In function 'submit_bh_wbc':
+   fs/buffer.c:2826:29: error: implicit declaration of function 'mem_cgroup_css_from_folio'; did you mean 'mem_cgroup_from_obj'? [-Werror=implicit-function-declaration]
+    2826 |                 memcg_css = mem_cgroup_css_from_folio(folio);
+         |                             ^~~~~~~~~~~~~~~~~~~~~~~~~
+         |                             mem_cgroup_from_obj
+   fs/buffer.c:2826:27: warning: assignment to 'struct cgroup_subsys_state *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+    2826 |                 memcg_css = mem_cgroup_css_from_folio(folio);
+         |                           ^
+>> fs/buffer.c:2827:21: error: implicit declaration of function 'cgroup_subsys_on_dfl' [-Werror=implicit-function-declaration]
+    2827 |                 if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
+         |                     ^~~~~~~~~~~~~~~~~~~~
+>> fs/buffer.c:2827:42: error: 'memory_cgrp_subsys' undeclared (first use in this function)
+    2827 |                 if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
+         |                                          ^~~~~~~~~~~~~~~~~~
+   fs/buffer.c:2827:42: note: each undeclared identifier is reported only once for each function it appears in
+   fs/buffer.c:2828:42: error: 'io_cgrp_subsys' undeclared (first use in this function)
+    2828 |                     cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+         |                                          ^~~~~~~~~~~~~~
+>> fs/buffer.c:2829:37: error: implicit declaration of function 'cgroup_e_css'; did you mean 'cgroup_exit'? [-Werror=implicit-function-declaration]
+    2829 |                         blkcg_css = cgroup_e_css(memcg_css->cgroup, &io_cgrp_subsys);
+         |                                     ^~~~~~~~~~~~
+         |                                     cgroup_exit
+>> fs/buffer.c:2829:59: error: invalid use of undefined type 'struct cgroup_subsys_state'
+    2829 |                         blkcg_css = cgroup_e_css(memcg_css->cgroup, &io_cgrp_subsys);
+         |                                                           ^~
+   cc1: some warnings being treated as errors
+
+
+vim +/cgroup_subsys_on_dfl +2827 fs/buffer.c
+
+  2778	
+  2779	static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
+  2780				  enum rw_hint write_hint,
+  2781				  struct writeback_control *wbc)
+  2782	{
+  2783		const enum req_op op = opf & REQ_OP_MASK;
+  2784		struct bio *bio;
+  2785	
+  2786		BUG_ON(!buffer_locked(bh));
+  2787		BUG_ON(!buffer_mapped(bh));
+  2788		BUG_ON(!bh->b_end_io);
+  2789		BUG_ON(buffer_delay(bh));
+  2790		BUG_ON(buffer_unwritten(bh));
+  2791	
+  2792		/*
+  2793		 * Only clear out a write error when rewriting
+  2794		 */
+  2795		if (test_set_buffer_req(bh) && (op == REQ_OP_WRITE))
+  2796			clear_buffer_write_io_error(bh);
+  2797	
+  2798		if (buffer_meta(bh))
+  2799			opf |= REQ_META;
+  2800		if (buffer_prio(bh))
+  2801			opf |= REQ_PRIO;
+  2802	
+  2803		bio = bio_alloc(bh->b_bdev, 1, opf, GFP_NOIO);
+  2804	
+  2805		fscrypt_set_bio_crypt_ctx_bh(bio, bh, GFP_NOIO);
+  2806	
+  2807		bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+  2808		bio->bi_write_hint = write_hint;
+  2809	
+  2810		__bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh));
+  2811	
+  2812		bio->bi_end_io = end_bio_bh_io_sync;
+  2813		bio->bi_private = bh;
+  2814	
+  2815		/* Take care of bh's that straddle the end of the device */
+  2816		guard_bio_eod(bio);
+  2817	
+  2818		if (wbc) {
+  2819			wbc_init_bio(wbc, bio);
+  2820			wbc_account_cgroup_owner(wbc, bh->b_page, bh->b_size);
+  2821		} else if (buffer_meta(bh)) {
+  2822			struct folio *folio;
+  2823			struct cgroup_subsys_state *memcg_css, *blkcg_css;
+  2824	
+  2825			folio = page_folio(bh->b_page);
+  2826			memcg_css = mem_cgroup_css_from_folio(folio);
+> 2827			if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
+  2828			    cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+> 2829				blkcg_css = cgroup_e_css(memcg_css->cgroup, &io_cgrp_subsys);
+  2830				bio_associate_blkg_from_css(bio, blkcg_css);
+  2831			}
+  2832		}
+  2833	
+  2834		submit_bio(bio);
+  2835	}
+  2836	
 
 -- 
-MST
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
