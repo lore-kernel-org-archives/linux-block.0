@@ -1,156 +1,140 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE418D649;
-	Thu, 29 Aug 2024 09:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EC418E778
+	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 10:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724922615; cv=none; b=TD2fyeM+HLCHoTUEbnevR+4Y1RDBM+sn0DL59bX6/ShQy2w9y5XV2qZeW4x73raWEz0FT4bbB5PWYuo46ago4/3mKVct6M7ABFBBUn1mROoEKETN4kIP1PB0OjdPUURu3Tsj2CsVWrKu/U/sIgIQGP/nPfqmr2/6qo+V3647tLw=
+	t=1724926735; cv=none; b=m091nRjx+/FmSU7UwfV+p+9gJFfMyT1GUZF8/PRCyIRICtrMEP2MHp8zo1oc9RwO7YlcLaBAIE2F4LBGJL5/kT3qRFCDPBIV/zQa2YrHEGw22nWopjCN49aleQS4ckSGTQgxWSUtScTUEFkqiIuhtHwiM29y6gLagH8xlMEG1NI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724922615; c=relaxed/simple;
-	bh=MEcRl9ZhNrQZozxSU0zQS8bPAunwYULwwQ6bqjpUt/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wg9mv73Q8AYQi5WvCT+LCNZQQ7m4pQ2fZal2lr50bqX1ETC8zKqt2x3CNh96cWbvbAEGCrFf8PyNNPV0ISLre6Zoez9UfhYqZeMH/hSWkCiWjJmDRIbmTWedSssIZ+XDLqlcMFZtykHIU5MwRiqOJ2GNHhky4FBYAk8CkD35Tt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=m1LRORsd; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=XwUj/2C7; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=m1LRORsd; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=XwUj/2C7; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1724926735; c=relaxed/simple;
+	bh=uVn9xh5ed7sIutzt3gisZrKdxjbUWePB7MHJXjJMF78=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=M4brWq+n0kgeB6S129srgfaxX3++PQLPGDYArM6MIEOBGxIsMHfKIBp8IGzISH3y3uqNinu55XttwjFCbGqNQ4Y64u0asW1X1gbvnIU3Ut1uotbDpri7puz31QaF0BI0hp25lS/zTOGvpR9ZSeurFPVJ966ieQvc/de5eKo7zsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=syqWtkHI; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="m1LRORsd";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="XwUj/2C7";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="m1LRORsd";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="XwUj/2C7"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6A21021290;
-	Thu, 29 Aug 2024 09:10:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724922611; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+wRzqzeOftsxEeIDfwEbJpnsPlpLcci829W2RncfvI=;
-	b=m1LRORsd19qLzzaTDDXVLREufeiv1QdcYDUD3SA5zUtAN0bQ1Y7TP4WjRYcaBULtDM7afu
-	Q0tJW3QmNR2jDugns/HY24spVRTY84LfqKhNw7GeTm05gelxkGFjubSYodmBuegBFIVY3l
-	C8tjn+a24U9eQtb/h+W2ai8YhNBm0+U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724922611;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+wRzqzeOftsxEeIDfwEbJpnsPlpLcci829W2RncfvI=;
-	b=XwUj/2C7kyOcEsuiDQakj61nXJ+UyPoYZqgx3ToFVB/TACmFXItLs6VevBP+we1LuWFrHu
-	7Z8EfMGOUfAUZ9CQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724922611; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+wRzqzeOftsxEeIDfwEbJpnsPlpLcci829W2RncfvI=;
-	b=m1LRORsd19qLzzaTDDXVLREufeiv1QdcYDUD3SA5zUtAN0bQ1Y7TP4WjRYcaBULtDM7afu
-	Q0tJW3QmNR2jDugns/HY24spVRTY84LfqKhNw7GeTm05gelxkGFjubSYodmBuegBFIVY3l
-	C8tjn+a24U9eQtb/h+W2ai8YhNBm0+U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724922611;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+wRzqzeOftsxEeIDfwEbJpnsPlpLcci829W2RncfvI=;
-	b=XwUj/2C7kyOcEsuiDQakj61nXJ+UyPoYZqgx3ToFVB/TACmFXItLs6VevBP+we1LuWFrHu
-	7Z8EfMGOUfAUZ9CQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5D4C613408;
-	Thu, 29 Aug 2024 09:10:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id MmTBFvM60Ga7bAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 29 Aug 2024 09:10:11 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 0D2A3A0965; Thu, 29 Aug 2024 11:10:07 +0200 (CEST)
-Date: Thu, 29 Aug 2024 11:10:07 +0200
-From: Jan Kara <jack@suse.cz>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>, linux-doc@vger.kernel.org,
-	corbet@lwn.net, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, kernel-dev@igalia.com,
-	kernel@gpiccoli.net, Bart Van Assche <bvanassche@acm.org>,
-	Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH V5] Documentation: Document the kernel flag
- bdev_allow_write_mounted
-Message-ID: <20240829091007.swglkuf2ybpexgs6@quack3>
-References: <20240828145045.309835-1-gpiccoli@igalia.com>
- <20240828162753.GO6043@frogsfrogsfrogs>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="syqWtkHI"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20240829101850epoutp015d29e5c88e1e1fee274afac2950a4376~wK7j68-Yb1427314273epoutp01E
+	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 10:18:50 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20240829101850epoutp015d29e5c88e1e1fee274afac2950a4376~wK7j68-Yb1427314273epoutp01E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1724926730;
+	bh=hSzswj1NNsgnJo6oCya0ujyGaZeNMIhhqc23NKTmwJk=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=syqWtkHIefmjlpjo4k0oVuZM6bmrnitTv+blDCxurASIavzvuO73xT1HZUs3VV73A
+	 GZ1svIuyi/bJU5mZxmucatYSpjGN0L51lfAXX9rJbOvULPoMbbndmh9SmIp04CE2lm
+	 yrpJj8PLBSNCqjiqtz6E8rG20Y65YJvGihYQ7a/s=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240829101850epcas5p37173ce4ff9649c3c3eb6126b19dd3aba~wK7jZb_8T0999309993epcas5p3V;
+	Thu, 29 Aug 2024 10:18:50 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.176]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4Wvcgr3LPTz4x9Pv; Thu, 29 Aug
+	2024 10:18:48 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	9C.45.09743.80B40D66; Thu, 29 Aug 2024 19:18:48 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240829101847epcas5p134da1e20a99136599a6c6f9000b1ed56~wK7hV62-_0719907199epcas5p1q;
+	Thu, 29 Aug 2024 10:18:47 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240829101847epsmtrp26ed6682a8130a00ada0c2bb700f9b842~wK7hVOniN1264412644epsmtrp2T;
+	Thu, 29 Aug 2024 10:18:47 +0000 (GMT)
+X-AuditID: b6c32a4a-14fff7000000260f-4a-66d04b08e0c5
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	9F.04.07567.70B40D66; Thu, 29 Aug 2024 19:18:47 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240829101845epsmtip11c65f782df2f666bbea63fd929e0a1ec~wK7fKRtui2260422604epsmtip1S;
+	Thu, 29 Aug 2024 10:18:45 +0000 (GMT)
+Message-ID: <efe8215a-9b02-9dfe-db84-988e15d4abcf@samsung.com>
+Date: Thu, 29 Aug 2024 15:48:44 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240828162753.GO6043@frogsfrogsfrogs>
-X-Spam-Score: -3.80
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.com:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v3 09/10] nvme: add handling for app_tag
+Content-Language: en-US
+To: "Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta
+	<anuj20.g@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+	krisman@suse.de, io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	linux-scsi@vger.kernel.org
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <yq1cylsc9w2.fsf@ca-mkp.ca.oracle.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrIJsWRmVeSWpSXmKPExsWy7bCmhi6H94U0g0UtYhZNE/4yW8xZtY3R
+	YvXdfjaLmwd2MlmsXH2UyeJd6zkWi0mHrjFabD+zlNli7y1ti/nLnrJbdF/fwWax/Pg/Jgce
+	j52z7rJ7XD5b6rFpVSebx+Yl9R67bzaweXx8eovFo2/LKkaPzaerPT5vkgvgjMq2yUhNTEkt
+	UkjNS85PycxLt1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAG6V0mhLDGnFCgUkFhc
+	rKRvZ1OUX1qSqpCRX1xiq5RakJJTYFKgV5yYW1yal66Xl1piZWhgYGQKVJiQndH4ZjljQS9b
+	xexHt9gaGJ+xdDFyckgImEjc7t7G2sXIxSEksJtR4tqx+cwQzidGiUnnmqAy3xglpr15ANdy
+	feIjJojEXkaJF/e2sUA4b4GqFq8CauHg4BWwk3izwBCkgUVAVeL29qtsIDavgKDEyZlPwAaJ
+	CiRJ/Lo6hxHEFhawkTg7exs7iM0sIC5x68l8JhBbRCBKom3RVDaQ+cwCrxglPvW1sIPMZxPQ
+	lLgwuRTE5BQwltj+mAmiVV5i+9s5YB9ICJzhkJizbgoLSI2EgIvEwrteEPcLS7w6voUdwpaS
+	+PxuLxuEnS3x4BHMjzUSOzb3sULY9hINf26AfcUMtHX9Ln2IVXwSvb+fMEFM55XoaBOCqFaU
+	uDfpKVSnuMTDGUugbA+Jqyvugm0SEnjKKLH2lfMERoVZSGEyC8nvs5A8Mwth8QJGllWMkqkF
+	xbnpqcWmBUZ5qeXw2E7Oz93ECE7LWl47GB8++KB3iJGJg/EQowQHs5II74njZ9OEeFMSK6tS
+	i/Lji0pzUosPMZoCI2cis5Rocj4wM+SVxBuaWBqYmJmZmVgamxkqifO+bp2bIiSQnliSmp2a
+	WpBaBNPHxMEp1cA0u1Hdy+66E4/8Od/63EMTpks6mVtp5rX6bDzF+Mja3fGl8aGPgXcX7b22
+	9NvZF20iS5gmymk+fC278HTDCaW/NzXyzD6eeH8kJ/+vi4jV9CKl+RvXGi4K83V+6aks97Vi
+	q7b2jn8Xp4n4vefXifsSEtXYPTGHPdeL/8TW5dWdX2ZF2ui8Lzl9fMPc5C+TmL0OXjmxcEbr
+	h7dvl7zV0ajtet+uJvoq25RldkvDujcMS3Yo5a8r+lwiXcW8hVfaI/aoc5Gbgam0bLaozXLh
+	U/umr+aa73Sv807p/Unm32p2z45nnf6YI2Jpx+Krz79pLLCsdFs10zq5Srha7sFXE853+eYX
+	LfccDJwqt6V/17SLSizFGYmGWsxFxYkA8c0BgVQEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHIsWRmVeSWpSXmKPExsWy7bCSnC6794U0g8XnzS2aJvxltpizahuj
+	xeq7/WwWNw/sZLJYufook8W71nMsFpMOXWO02H5mKbPF3lvaFvOXPWW36L6+g81i+fF/TA48
+	Hjtn3WX3uHy21GPTqk42j81L6j1232xg8/j49BaLR9+WVYwem09Xe3zeJBfAGcVlk5Kak1mW
+	WqRvl8CV0fhmOWNBL1vF7Ee32BoYn7F0MXJySAiYSFyf+IgJxBYS2M0o8fe0PERcXKL52g92
+	CFtYYuW/50A2F1DNa0aJBTf/snYxcnDwCthJvFlgCFLDIqAqcXv7VTYQm1dAUOLkzCdg80UF
+	kiT23G8Emy8sYCNxdvY2sJnMQPNvPZkPFhcRiJJ4sKSTDWQ+s8ALRol5ez8wQSx7yigx69kE
+	RpBlbAKaEhcml4KYnALGEtsfM0HMMZPo2trFCGHLS2x/O4d5AqPQLCRnzEKybhaSlllIWhYw
+	sqxilEwtKM5Nz002LDDMSy3XK07MLS7NS9dLzs/dxAiOQi2NHYz35v/TO8TIxMF4iFGCg1lJ
+	hPfE8bNpQrwpiZVVqUX58UWlOanFhxilOViUxHkNZ8xOERJITyxJzU5NLUgtgskycXBKNTBN
+	nyfvt1n55OLV3HrZvTevPJBZN1//xqvw/jv625wq8rfaFqXn5p/X6Dnuabf0u2Jie+bsK4su
+	XPASfHLb7rab9eNXK3+bnFY+aXYlOUJSamXdqidiy9L5uGNrZLcxemXNCP3vsS80md26fsmc
+	2MqnixydJxvO9XrGET9F2ubt0b8H+09edtssIqdX8/xi+aGb63b4rtFN/nzH65khw5XVkzew
+	nrP4lqug8floycdjrq5X5p9yP36kbj+7wpHI+/m212++uM13as4uvdDtubtYmUpCF+yL9576
+	XWn7JRPL9Bguf7/fE5K3XfuaEPI75JR9bznPw0MybUsu8P7fcMKe6ScbN78pK48472sJ5a/y
+	SizFGYmGWsxFxYkA4XW2aDEDAAA=
+X-CMS-MailID: 20240829101847epcas5p134da1e20a99136599a6c6f9000b1ed56
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240823104636epcas5p4825a6d2dd9e45cfbcc97895264662d30
+References: <20240823103811.2421-1-anuj20.g@samsung.com>
+	<CGME20240823104636epcas5p4825a6d2dd9e45cfbcc97895264662d30@epcas5p4.samsung.com>
+	<20240823103811.2421-11-anuj20.g@samsung.com>
+	<yq1cylsc9w2.fsf@ca-mkp.ca.oracle.com>
 
-On Wed 28-08-24 09:27:53, Darrick J. Wong wrote:
-> On Wed, Aug 28, 2024 at 11:48:58AM -0300, Guilherme G. Piccoli wrote:
-> > Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
-> > devices") added a Kconfig option along with a kernel command-line tuning to
-> > control writes to mounted block devices, as a means to deal with fuzzers like
-> > Syzkaller, that provokes kernel crashes by directly writing on block devices
-> > bypassing the filesystem (so the FS has no awareness and cannot cope with that).
-> > 
-> > The patch just missed adding such kernel command-line option to the kernel
-> > documentation, so let's fix that.
-> > 
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Darrick J. Wong <djwong@kernel.org>
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Reviewed-by: Jan Kara <jack@suse.cz>
-> > Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
+On 8/29/2024 8:30 AM, Martin K. Petersen wrote:
 > 
-> Looks good to me now,
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+> Anuj,
 > 
-> Fun unrelated question: do we want to turn on bdev_allow_write_mounted
-> if lockdown is enabled?  In that kind of environment, we don't want to
-> allow random people to scribble, given how many weird ext4 bugs we've
-> had to fix due to syzbot.
+>> With user integrity buffer, there is a way to specify the app_tag. Set
+>> the corresponding protocol specific flags and send the app_tag down.
+> 
+> This assumes the app tag is the same for every block in the I/O? That's
+> not how it's typically used (to the extent that it is used at all due to
+> the value 0xffff acting as escape).
+> 
 
-It would be desirable. But it will break some administrative tasks
-currently so I'm not sure users are really prepared for that? But with
-recent util-linux those should be mostly limited to filesystem-specific
-tooling issues (tune2fs is definitely broken and needs new kernel
-interfaces to be able to work, I think resize2fs is also broken but that
-should be fixable within e2fsprogs though it requires larger refactoring
-AFAIR).
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+NVMe spec allows only one value to be passed in each read/write command 
+(LBAT for write, and ELBAT for read). And that's what controller checks 
+for the entire block range covered by one command.
+So per-io tag rather than per-block tag. The integrity buffer creator is 
+supposed to put the same application-tag for each block if it is sending 
+multi-block IO.
