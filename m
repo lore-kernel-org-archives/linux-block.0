@@ -1,226 +1,283 @@
-Received: from mx5.ucr.edu (mx5.ucr.edu [138.23.62.67])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CE31487E9
-	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 04:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=138.23.62.67
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724905991; cv=none; b=PIRzKsJ0pipyOej1BlvRrDd9My9Cw5icCdTKHTb0hImvJjQIWSSwQoTPQPzU+SXqNxtgOHbHMK5TbfsF7GplgB3haWe2RicapUeb/PUt75yM0yoSjh4rz1Rj9EZrUn7x2bIEpvscWK6xmOA5XkAZHk6zNanZGIRhpSQ1GrHfBdg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724905991; c=relaxed/simple;
-	bh=YmcfNsyprOkjvzfrqi5ctVS0XMlpOpf8JOWiJUkfNIg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=oAmA0tNJtzZ1nYC2O0Im0EvMieY5c0Z1dULFB77QneIWjUw6nVrfJJvTn/V/M7lJTQh3SLt3Ae2dTRRzPnMLhUSJewxfY0V7rP1C7cPfcLSQnTg//Zf6EmNZuIx8ZlOrutAGsI18gfFlkvJoRH7esFM1xJjLm022eaxHlfdSTuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu; spf=pass smtp.mailfrom=ucr.edu; dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=NOgnVF6O; dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=osttyEmb; arc=none smtp.client-ip=138.23.62.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucr.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD89446D1
+	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 07:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724916992; cv=fail; b=n9CP9FwIosgzG7Q/OURpmWJr/i6UjszKx3EiHdSeDEEevb27GGaoiSNQC86vJDfznB6WWtN89wnjfHwBtKOzQaUbI9NNP5AvDH/umo0Hv4suyTV/ocuBTxon5ePIHlJ9YaNF333rAWb/E92TXIYBN4IhKBTaoJ0DXDWWi5g0TnY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724916992; c=relaxed/simple;
+	bh=+rNCKRJWUH/gKXqYud3VtNjMrjtTYCn5en5YMhmQYyg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Yx0W+GkwOxd6kOYuQWLOhoVlvlw9Zn6KdJeQhRw3zqtYKDX/ei9b12wArgLX/updQRSg3YbkvG1j/BwmGjFfOd4Ai274VVkIdb/aCVMkHcFjF7lEbXRo8UdrAr5eWSziWvFTvW7xabc2Pod6BLnkkQ9hPaG7Kq0h61ycaooKY4o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=eXMCc8dO; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=xzYcZ9gF; arc=fail smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="NOgnVF6O";
-	dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="osttyEmb"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eXMCc8dO";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="xzYcZ9gF"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
-  t=1724905990; x=1756441990;
-  h=dkim-signature:x-google-dkim-signature:
-   x-forwarded-encrypted:x-gm-message-state:
-   x-google-smtp-source:mime-version:references:in-reply-to:
-   from:date:message-id:subject:to:content-type:
-   content-transfer-encoding:x-cse-connectionguid:
-   x-cse-msgguid;
-  bh=YmcfNsyprOkjvzfrqi5ctVS0XMlpOpf8JOWiJUkfNIg=;
-  b=NOgnVF6OxRVtxcO1cw/7Z/QJwPro5lB/bXwwdXbdLq6X5oBJqn4EXNfO
-   9SavQZJhFteu29qJa7IuH4QiL46BBx3X2JsB1qWQMsZpW5Byw8GntzuBP
-   5ZdVp9neTdP9m85EG2ON8WY7UZNOwXwWn5c3Pfuvc5wQSkzSH17jmNX3y
-   tz5L00PfzdlhfetD5wavvET5wnehdp7mQ5Zi7C4PPYpObgTkaNEvnBMWw
-   ufrJ0D0s7ahL26DRWUXXWljAmbO4NlR/hvsuwtsqZwkfO/GyPo5WzELws
-   N7RTFzIGqZjtOgCVllriM1Vs64KBLNdlTArktlj0nGfSz6c25TspJFmRE
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1724916989; x=1756452989;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=+rNCKRJWUH/gKXqYud3VtNjMrjtTYCn5en5YMhmQYyg=;
+  b=eXMCc8dOfo0xEE89d5jZ/p4+BOyWBYaLIrtbeG8NewaBCKckumblNTbv
+   xm8L0pcfkgfwvn0D3kSorrJi5oPReTR73ky57W0KFRYlreTeOS9w4unOZ
+   nq/KU2JYyYWtnrij6LTz/k/yuSHq3i5uaR3Bc7ER5O7j9VbShDiAXmvv8
+   Hb1H5osKdBDP2O6OYJQbshxsw1qxuac0IpMVqYINadc6aOoUe/HULt8sJ
+   TkgW6O2AhFxVE6VOKJ0pEKxfSjUAfhgh/O2y6a64h9ObFLuCNrQZWMytU
+   KWpoGriI0LZ6XUaCTrmdp0EZGWsOnUhnCJe99C8wsVeAvCUVWTaMW7j+w
    w==;
-X-CSE-ConnectionGUID: SANlD5FsTLqfdhb0vNldBg==
-X-CSE-MsgGUID: mPK0WErEQjax6f2TixMuDA==
-Received: from mail-il1-f199.google.com ([209.85.166.199])
-  by smtpmx5.ucr.edu with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 28 Aug 2024 21:33:03 -0700
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39d244820edso2003275ab.3
-        for <linux-block@vger.kernel.org>; Wed, 28 Aug 2024 21:33:03 -0700 (PDT)
+X-CSE-ConnectionGUID: il6jh3yKS7CGbLe7QHfQsQ==
+X-CSE-MsgGUID: Ja2RrgQcQwe+tQU41pFo1w==
+X-IronPort-AV: E=Sophos;i="6.10,185,1719849600"; 
+   d="scan'208";a="25484541"
+Received: from mail-dm6nam11lp2171.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.171])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Aug 2024 15:36:22 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZkUcvx0ri4zl5Te6xKy05fT1ZDOuzI5oGhThnX9vkCLijJBazjRzMzH6sdpuQ3q4EsBZGnjQSJccYeXZvK2YgZzCsqPYGdZcP/WbUjhUjWmc+z79UeHTnDmceJpKWVsm3VzgvIdxg9o7bFXk+SflBKh5zL+tp/8QhVOQXngvxtaxx7XYhI3OEqQOFwnWUeMAu2Bel7v6uSo4MnKEmiLAWpT2nKgrjYSfJ7r2LABGT+8Ts06v1BNtESjywTtZpUtEzt8sEJ76AWk2sygx5Omcet+o7PBUnu+h31S5ADJiG8GKSCIqt0JNDcXwRx7iPjrYPvjxcw1IsXuGv36kE973OA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B9rqFZYI3TedwX/CVTjQmh+2om+Ds9AhbvgXqQGAZ6o=;
+ b=jglSvcTQNTRIBfn1aW2+ZK+Z36qZzPujFRHJiDAhx5pXze/lyVDS0P6SfaHnd6dROlJ5d0FUDe1nOv6AQLu0FYVdfvb7hJ1MUoJxdbeYiJNPpQj7vssBXLdnyUn6pEjm2w7q82mhmJLMT23B0tiUOfzworIFVY/CwwW18BQGMbqitdPNkhS931YZhfBgmJ7cQqOg4kdQmS891c3S1gpOw+3vtkOhL0VITJ/xXdxgf3VRMPMTT8RSUoJd91MUeVEXdOl5vdy7q+J9GaY8qiuFLvdkHyFSeA2G4xJpwjRVBSHG2FSn+E9tcSOwLII8tZaqS2LiabwqJjTChI21OEyWXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucr.edu; s=rmail; t=1724905982; x=1725510782; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=19ZCMa6kbTGd7rUOHNxgUi7pF9KSa2RZc9b0v82EY34=;
-        b=osttyEmbVpvVPiAckNp0Xrcj/3tDCClUaXV6/28UoQFNteKKgQPOpIKDn6QX/EgqU7
-         AXnClTKekIxSdWIzzqcYVirT+R7NOpN78VqXy5Gf1DHvXcCfp6FejBg2cGRgNziLGJYU
-         JaqsYAoT0ZEmBd5xao/lA1BUojQXcBoDf8FeU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724905982; x=1725510782;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=19ZCMa6kbTGd7rUOHNxgUi7pF9KSa2RZc9b0v82EY34=;
-        b=nUnH/u8xv8k0NGFqCl0GHPXf0u/N4O4iMsNBJErhKHEG0A9v7gMq9LRx8fyhpHHGF3
-         o19rNuuoq6Dp/MPOhegYYqAtGI44X4KqWFUY+/7OX8zSnGF1xYzyIcwsSlDvpChd68tv
-         K5o1K9DP0Budwz9b9iG/5ttx9GIa0nnfSAgMuxlrvkjHNHzKNR0JVymzLyNvepYmnnY5
-         6eIFZgMsjBzL6KPBxgSd6lU4SSgr6R9LlKVYH57QkGRER/bFsEdGHQWYiz0rYI2VOP2G
-         AWv8U959hHVJTQ58yl1Bn3Txwy8O5YfidG9Unw8UPxKvrn0yamVefbiLAMM4ynkQUsjW
-         NLnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXNztxn9DECB0NYD6WmMPH0msfme55NFZeaJ7bR6DpU02671JAvBzHP2dNK8R+Npim3ZsHAI+CP6sOtOw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzyjjb6zi0YaZ8h+iheBWhbyH70Vc9O6A6wvs2wch/jWkdey5zv
-	uRP54xJWSvms5fOeSI9E0L9Mh5BcLrVbjm4YEd2NaLUf1XG/2IpVpU8eYFahzJK2ny2nt8x8O8/
-	lOEkGVPeBqvNN0CuJ8B7cSqMx/Tr3WTFDe922weRg7LWGd36ULqG/GxAdkTrXRhrpwXsz5lgliD
-	QqFOBV2Ja/meUXWaLDvrysuY1d+Y9m7oZFHhoP
-X-Received: by 2002:a05:6e02:1e07:b0:397:351b:2c0c with SMTP id e9e14a558f8ab-39f37846838mr22492675ab.17.1724905982257;
-        Wed, 28 Aug 2024 21:33:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQVvAyP6uQc13zE5AKpikYrGN/JfwFBhDWh/m5FRX7/FYivQ5DKTJW0iyqyzmuzBDE3y6mKqZt1nLBo8UXZZE=
-X-Received: by 2002:a05:6e02:1e07:b0:397:351b:2c0c with SMTP id
- e9e14a558f8ab-39f37846838mr22492565ab.17.1724905981844; Wed, 28 Aug 2024
- 21:33:01 -0700 (PDT)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B9rqFZYI3TedwX/CVTjQmh+2om+Ds9AhbvgXqQGAZ6o=;
+ b=xzYcZ9gFo90xYGYcjkgFqWX7i9BK/Hj+pOi2VP3A6meZ4HGCO2AHFUN2PQh9FJlvTyg2EAJCLxyY5xGDSad3FsQVzahOWcjagedHZiuN2HsxbzXRyECWA4sXkCns7QZPg5qzF74C2HC3OlQlPF85Sy7axmYASPYmGcvf0VhQcp0=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SJ0PR04MB7869.namprd04.prod.outlook.com (2603:10b6:a03:305::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.20; Thu, 29 Aug
+ 2024 07:36:14 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%4]) with mapi id 15.20.7897.021; Thu, 29 Aug 2024
+ 07:36:14 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Martin Wilck <martin.wilck@suse.com>
+CC: Nilay Shroff <nilay@linux.ibm.com>, Daniel Wagner <dwagner@suse.de>,
+	Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>, Hannes Reinecke
+	<hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Martin
+ Wilck <mwilck@suse.com>
+Subject: Re: [PATCH v2 3/3] nvme: add test for controller rescan under I/O
+ load
+Thread-Topic: [PATCH v2 3/3] nvme: add test for controller rescan under I/O
+ load
+Thread-Index: AQHa9ZhNW/vrdcNHu0GOnXkEesSR3bI94Q6A
+Date: Thu, 29 Aug 2024 07:36:14 +0000
+Message-ID: <57yxf7o7zcp4j34cfgk3glhmfag4ukvedzqgtr7fbqdmy2gvsq@t573offeg3kg>
+References: <20240823200822.129867-1-mwilck@suse.com>
+ <20240823200822.129867-3-mwilck@suse.com>
+In-Reply-To: <20240823200822.129867-3-mwilck@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB7869:EE_
+x-ms-office365-filtering-correlation-id: b36892cc-72b5-4685-75a1-08dcc7fd42f3
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?BpohAbmVLjZ3WscEtZCt/6TRzqutV7AStkowsmtl+oCODP54DD7zWwJonglh?=
+ =?us-ascii?Q?O2RgV/Skd8uSYD4ggRR3VhDHzpLYDeY5VtyKHiUxzZmjzKNOs5CiuS+wXJN8?=
+ =?us-ascii?Q?yWpAgGdpKJspfHlG7GvsoOf0N6qv3LqJDhj9OJPIO08l9/yfy22ymgJo6v82?=
+ =?us-ascii?Q?HZu2CNWULnkkKF/2NlMQqVEAAL9g47ai6rkmHRaWm+Xpd9HQBh7qDXsp7k0v?=
+ =?us-ascii?Q?R2Hhwj6Ab0B5IiC6dZGL6KZBWKmIqx3DWyMeCr2LgYY+tDeEpyLg9kPIy16V?=
+ =?us-ascii?Q?do09jghhX8+CsveGg58UVEpis6VGnTZIBr9Zcbj0fsGn57b9D4x7UY5R8AP5?=
+ =?us-ascii?Q?7xQtMYeIdcLWd7LJ6l6zM1LyKjdPfFCebrHXdeE+P4vNRAkENFAgVSabAC23?=
+ =?us-ascii?Q?xZP2k614KIqPg012wV4KSY1DRrvgb/sz67L8+SxIrBAtIfuI9BqOFt7HRPKg?=
+ =?us-ascii?Q?yi8CWXmPT2pBaZnyKuETRM8jGopQZLhDY5QXXiUmr/ithjzx6K1avmj9USCO?=
+ =?us-ascii?Q?aknSgJyPefpxwfeUIp+8LBdwN+4rIhGZ738JfsJH/xMsK2NSkgdz8Fr6DEWU?=
+ =?us-ascii?Q?Cn3xk5XE3BFLzvtZQO87mvbLuYdete0G3NJdvIuyI/NRbIt5UaeGjEomAXxZ?=
+ =?us-ascii?Q?5IEr6npsx+YwQfqT8Ods4w6VEep6YrVw0aughGj/fQmpsu1XJewaqz7PLIWY?=
+ =?us-ascii?Q?r8FVhC3byygEpFHRESXQI5ExYMxVyuOBrXvC51p4KONFtvDBgerk/wnVXC8f?=
+ =?us-ascii?Q?6AJMCb3to3WeWo8zchQPRPZbDZEWwzOgBCxaOFKthm4aSk938IOluZbAryXb?=
+ =?us-ascii?Q?pnVqZHa81S0b2bS9LwgYoELsiuIi022Td9PkhGeQ7a8fS66vE+DD8vODtXnV?=
+ =?us-ascii?Q?3syywW6MEJerjm3LWa9X1aGzkbgOmaw3zruDCJq4GBRv6KvpwOt0SLJSxYYP?=
+ =?us-ascii?Q?UmAsLNs9NRCw0J7dVEcamsWd00WoAhHFaT/WOQgLkGiCSIHAvd2vT5aAaZJf?=
+ =?us-ascii?Q?YB4Ob8ot17encSWcRGrJOj3W4q387iYWxfn3Mf7g9zHAY+3t31Nl4stakmQ6?=
+ =?us-ascii?Q?9gi4pMMFkH8gTxTHbXVZdbL+QxQ5J1SrLtrZbcE7ogyA0LBfTnA40lGM08AZ?=
+ =?us-ascii?Q?UINKBHLkcdno+sGht0q6lXiOxfh0VgwaHVc8z+bhd2zjaTMyLCA8qRkzHzkD?=
+ =?us-ascii?Q?401WKLIk6XtLtpurYKkNIzuenKfeFWBYidm7RokHSRCG2EMODGi5Mq9nAHC3?=
+ =?us-ascii?Q?gOGP5SmWCg6kDb3cgplnq5HMltk/S8Wvs+9z/gqmeqlURJ5R1lZhI5OXlvO3?=
+ =?us-ascii?Q?FQleB1zozPkU83p+8djWRFBZ8zQ54KKvDld8/biGDLUgn8WSlr8S+8hGalD2?=
+ =?us-ascii?Q?dtjKPIw=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?7w2Y4QJU+2iYF80/S97TR75RHa+5LPUm4cxgZ2zZWNlZ1FNa8BYPdjDC5W4k?=
+ =?us-ascii?Q?z3cqoR1mdwr1rwdOv00TMu+crPEYBa3aoNrG95+mxw2wNd+m6gERreH+BIg3?=
+ =?us-ascii?Q?xA+Lrn8r3cAbUFy3bqBPEx8O62s08/6/La68YH13PR28p3qB149X19fIldgm?=
+ =?us-ascii?Q?lAUHTQOyMtpDxpoIRbkKT+OZa+qcEvdOAshX3AU3k6txvfrVIwtHBDZ/iJ1w?=
+ =?us-ascii?Q?pKuht1kiukNrXF0stsHBByLIz4z9OOXCJ+pKRu5FLzIPZboRBgfO0FcPgfKg?=
+ =?us-ascii?Q?Qbh9X5o0PJwtuuI8+fMC0OkxXwdHspdUPZ+XbSgsSiWwm4Dap4FuSMtMwgvj?=
+ =?us-ascii?Q?S5el4eJBgDzdZHeG7AOh+9eGAs5xyaLF/t7gH1ed5VgspPseOzSuIWnDpeZg?=
+ =?us-ascii?Q?uhlfTH/ravc3XchZiEQavQuQY/7igAEjn1jXbQ7dq6YjQKNX/qg8RF5DIjee?=
+ =?us-ascii?Q?HmKFzh7qzLsGdFRaQJaYRlMOwZXy6SqZ9eWJtm9r1QqvaAsfCgP69DcWcazV?=
+ =?us-ascii?Q?ws7f3eXpYD0j+ciMc8EgAPPjBJEQFqEhSvII1hls2OJv8zlvXWsNyOritFNM?=
+ =?us-ascii?Q?SIKXzHIDxe2GaZmSPMvoDDCstd9+KeipHp9sTEekNFk8pvOCGgx5rqmdbaRh?=
+ =?us-ascii?Q?U0VPkDzquKN9JR6JvCTzr7IpI0hf9PnPnN6mUDz2S2VNfKN8OQysUVLDUq6p?=
+ =?us-ascii?Q?l5iB9OwGCHxjp/ZbZw6PznyzMvu/kFHUin5Tsp1nD/+jBNO5pLoCiqnLspF4?=
+ =?us-ascii?Q?0MFM/bEui7aUS+qyYvn3VqDj9khnPDNpFdgOsfdHKz1BLB0nwJWv1czJlfMf?=
+ =?us-ascii?Q?uI+5rTwtdpGlXVRbMWwLq292ZjSrHONpozJ7HMz+kUYkQb1NlotKjqPvqRkW?=
+ =?us-ascii?Q?b0YIW464esMCFY8tXKE5oqfjBF++u4dt9GvI/vEi5XYPufwoOg1KOVHIJdkn?=
+ =?us-ascii?Q?KMNylV+QFMD6b715u27scOrbSAEn4n+QV9BehzTC4lbkWLCSlZpnhULo6vq5?=
+ =?us-ascii?Q?Lb+n+AZBWlb7xz3ZQGTNJPVbdZ9QjosjdaTKOtOVNq9dFRwroQ8+aQb9GagF?=
+ =?us-ascii?Q?/nmTRtP6urC7Ih/NT37HFge8Ip0EL06MWQC/SvFxzhHwlhGCxYtmQuKHXaPZ?=
+ =?us-ascii?Q?fNOtcvbkHsa0ze5sqna3Xy0BqppYWOkhAXSL2GfYMjZDuBJy2HWPN7z7OXHt?=
+ =?us-ascii?Q?65M+ipqj2wWZZAOXaas9P11IEr0YhM3j5dS+tWjFLgqipaOi86c+WB1EnCAx?=
+ =?us-ascii?Q?1XZT/Fzfwo2alfbjX4KmjJQD05V1Cd2acdE87aAF7FRHXDWadBeZhyZwuzJm?=
+ =?us-ascii?Q?oHGu/qXhJ+v01jRUUTRUn8oNnutgau/GAFVd3VAK6bDpWxVVhaEqx+zxYWbc?=
+ =?us-ascii?Q?yNoS4g0QKVU+jK/jt9xf8Ce0/iH4BPkOepKMbDQzNYWqf5U+4DTa2tfOaDdZ?=
+ =?us-ascii?Q?SXPDBeNz/HX7ilqg+RTlVVyYmAIgxkMiXf+omgvmaBA9Em/OsKKf/x9OPsi1?=
+ =?us-ascii?Q?wTc98LupMubdyJUJb6P2+ZIvwHIvVTk2byNMgiuFfsfdgdoI6+Z7W0ELOEhV?=
+ =?us-ascii?Q?G08NdvcqTQe7j1Pr8fieQxmPLo5gvyK1qagvfXImSy0PSAKL5sKCKLnvUA0N?=
+ =?us-ascii?Q?hNcpWHZmLuYQFnZXMr12oRg=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <393A6D84CFFE1D4186D6D9D84F07DCCE@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALAgD-6gJ4W1rPj=CWG7bFUPpEJnUjEhQd3uvH=7C=aGKb=CUQ@mail.gmail.com>
-In-Reply-To: <CALAgD-6gJ4W1rPj=CWG7bFUPpEJnUjEhQd3uvH=7C=aGKb=CUQ@mail.gmail.com>
-From: Xingyu Li <xli399@ucr.edu>
-Date: Wed, 28 Aug 2024 21:32:51 -0700
-Message-ID: <CALAgD-6_=C6Cmau94Aoj8NKTeX37y17HYUvwgsJVhs5-ATTYdQ@mail.gmail.com>
-Subject: Re: BUG: general protection fault in update_io_ticks
-To: "axboe@kernel.dk" <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Yu Hao <yhao016@ucr.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	eMIjFVlJjiuEicmspitV4K9/ijnNGPLkwU9Xzi3pe3iXHGqFvUF9Onqv6oZYBoYZfTtvgIaheIOEYJ4F2hOPBTB0Q8FzKGHeJyvzwxtnOq8wuw47HFIhHbfwuUWi+C6fRO855CErVeyFDxhDNltkDFiYT7YZXpGiQ+8sucWoNO/UrfY6o/rzmcYP/jgaPDXc3VQcI5Sh7pS9rrUJY1X0iD48ocH3ICsaB2jtvxO+TSxbssZFSreKgPQbgbYbDtbqo72dwMlpf3kbdLPhx7ZvwVoCRMk6lhsokzvzHvelroroNbfPjlBponi61IYCrvM7CRqeg+yADxYD3uzoliXgkR7UJ3ivWMg8DqQqYS/EzzqVWxRMkwDt1gMfBED2kxshD8kSJ/8hpoevo8LgUqbrjsW3nb2HCkt/n9PTlAMk8eb1uEaekHVrxsM2yqHrZhdhzwjUAoqLcdSoZq+tWx5S0oQOOF9Aircn4PQ/AmJ7s9HIpBo3bZnSO8xMdVCHxQALN1s0tzs3sAyb55EN3bjJkSOL50yexfQ1iH1oDZ7cHmRe1sgw2A1YZATWa8KbSwa9AHgXCepov7EEh8tR1oGLz/lrNX5d7wZvh/v9BCUH31KtUp3dwrLvUA+0LbPMYPLU
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b36892cc-72b5-4685-75a1-08dcc7fd42f3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2024 07:36:14.3654
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zT7xfEM+1jZgaaxvzQnQNU49xB1Acuz1bBANQ1JWWy9AgyRjaatt6h3UhcSMXLfvAha3FQ6zjjU0YTCZlz5nRVhlCEN4C+dCdE1ckPkX24g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7869
 
-The above reproducer needs the additional support to run it. And here
-is the C reproducer:
-https://gist.github.com/freexxxyyy/8d77167be200ccd7e198cab2222ff9e6
+On Aug 23, 2024 / 22:08, Martin Wilck wrote:
+> Add a test that repeatedly rescans nvme controllers while doing IO
+> on an nvme namespace connected to these controllers. The purpose
+> of the test is to make sure that no I/O errors or data corruption
+> occurs because of the rescan operations. The test uses sub-second
+> sleeps, which can't be easily accomplished in bash because of
+> missing floating-point arithmetic (and because usleep(1) isn't
+> portable). Therefore an awk program is used to trigger the
+> device rescans.
 
-On Sat, Aug 24, 2024 at 10:10=E2=80=AFPM Xingyu Li <xli399@ucr.edu> wrote:
->
-> Hi,
->
-> We found a bug in Linux 6.10. It is probably a null pointer dereference b=
-ug.
-> The bug report and syzkaller reproducer are as follows:
->
-> Bug report:
->
-> Oops: general protection fault, probably for non-canonical address
-> 0xdffffc0000000005: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
-> CPU: 0 PID: 45 Comm: kworker/u4:3 Not tainted 6.10.0 #13
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
-1/2014
-> Workqueue: writeback wb_workfn (flush-8:0)
-> RIP: 0010:update_io_ticks+0x94/0x2c0 block/blk-core.c:992
-> Code: f3 f3 f3 48 89 54 24 18 4a 89 04 32 e8 75 77 59 fd 48 c1 eb 03
-> 48 89 5c 24 08 eb 03 4c 8b 2b 49 8d 5d 28 48 89 d8 48 c1 e8 03 <42> 80
-> 3c 30 00 74 08 48 89 df e8 6d 82 bc fd 4c 8b 3b 48 8b 44 24
-> RSP: 0018:ffffc9000090e620 EFLAGS: 00010206
-> RAX: 0000000000000005 RBX: 0000000000000028 RCX: ffff888015330000
-> RDX: 0000000000000000 RSI: 0000000100000845 RDI: 0000000000000000
-> RBP: ffffc9000090e6d8 R08: ffffffff843a8b4a R09: 1ffffffff1e48be5
-> R10: dffffc0000000000 R11: fffffbfff1e48be6 R12: 0000000100000845
-> R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88801d4f2058
-> FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ffd0a027408 CR3: 00000000232cc000 CR4: 0000000000350ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  blk_account_io_start+0x189/0x2d0 block/blk-mq.c:1022
->  blk_mq_bio_to_request block/blk-mq.c:2559 [inline]
->  blk_mq_submit_bio+0x1043/0x1f40 block/blk-mq.c:2996
->  __submit_bio+0x1bc/0x550 block/blk-core.c:627
->  __submit_bio_noacct_mq block/blk-core.c:708 [inline]
->  submit_bio_noacct_nocheck+0x3ed/0xc20 block/blk-core.c:737
->  ext4_io_submit+0xd4/0x130 fs/ext4/page-io.c:377
->  ext4_do_writepages+0x293b/0x38e0 fs/ext4/inode.c:2699
->  ext4_writepages+0x20c/0x3b0 fs/ext4/inode.c:2768
->  do_writepages+0x36f/0x880 mm/page-writeback.c:2656
->  __writeback_single_inode+0xe2/0x660 fs/fs-writeback.c:1651
->  writeback_sb_inodes+0x8ee/0x1140 fs/fs-writeback.c:1947
->  __writeback_inodes_wb+0x11b/0x260 fs/fs-writeback.c:2018
->  wb_writeback+0x3e7/0x750 fs/fs-writeback.c:2129
->  wb_check_old_data_flush fs/fs-writeback.c:2233 [inline]
->  wb_do_writeback fs/fs-writeback.c:2286 [inline]
->  wb_workfn+0xa29/0xf00 fs/fs-writeback.c:2314
->  process_one_work kernel/workqueue.c:3248 [inline]
->  process_scheduled_works+0x977/0x1410 kernel/workqueue.c:3329
->  worker_thread+0xaa0/0x1020 kernel/workqueue.c:3409
->  kthread+0x2eb/0x380 kernel/kthread.c:389
->  ret_from_fork+0x49/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:244
->  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:update_io_ticks+0x94/0x2c0 block/blk-core.c:992
-> Code: f3 f3 f3 48 89 54 24 18 4a 89 04 32 e8 75 77 59 fd 48 c1 eb 03
-> 48 89 5c 24 08 eb 03 4c 8b 2b 49 8d 5d 28 48 89 d8 48 c1 e8 03 <42> 80
-> 3c 30 00 74 08 48 89 df e8 6d 82 bc fd 4c 8b 3b 48 8b 44 24
-> RSP: 0018:ffffc9000090e620 EFLAGS: 00010206
-> RAX: 0000000000000005 RBX: 0000000000000028 RCX: ffff888015330000
-> RDX: 0000000000000000 RSI: 0000000100000845 RDI: 0000000000000000
-> RBP: ffffc9000090e6d8 R08: ffffffff843a8b4a R09: 1ffffffff1e48be5
-> R10: dffffc0000000000 R11: fffffbfff1e48be6 R12: 0000000100000845
-> R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88801d4f2058
-> FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ffd0a027408 CR3: 00000000232cc000 CR4: 0000000000350ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> ----------------
-> Code disassembly (best guess):
->    0: f3 f3 f3 48 89 54 24 repz repz xrelease mov %rdx,0x18(%rsp)
->    7: 18
->    8: 4a 89 04 32           mov    %rax,(%rdx,%r14,1)
->    c: e8 75 77 59 fd       call   0xfd597786
->   11: 48 c1 eb 03           shr    $0x3,%rbx
->   15: 48 89 5c 24 08       mov    %rbx,0x8(%rsp)
->   1a: eb 03                 jmp    0x1f
->   1c: 4c 8b 2b             mov    (%rbx),%r13
->   1f: 49 8d 5d 28           lea    0x28(%r13),%rbx
->   23: 48 89 d8             mov    %rbx,%rax
->   26: 48 c1 e8 03           shr    $0x3,%rax
-> * 2a: 42 80 3c 30 00       cmpb   $0x0,(%rax,%r14,1) <-- trapping instruc=
-tion
->   2f: 74 08                 je     0x39
->   31: 48 89 df             mov    %rbx,%rdi
->   34: e8 6d 82 bc fd       call   0xfdbc82a6
->   39: 4c 8b 3b             mov    (%rbx),%r15
->   3c: 48                   rex.W
->   3d: 8b                   .byte 0x8b
->   3e: 44                   rex.R
->   3f: 24                   .byte 0x24
->
->
-> Syzkaller reproducer:
-> # {Threaded:false Repeat:true RepeatTimes:0 Procs:1 Slowdown:1
-> Sandbox: SandboxArg:0 Leak:false NetInjection:false NetDevices:false
-> NetReset:false Cgroups:false BinfmtMisc:false CloseFDs:false
-> KCSAN:false DevlinkPCI:false NicVF:false USB:false VhciInjection:false
-> Wifi:false IEEE802154:false Sysctl:false Swap:false UseTmpDir:false
-> HandleSegv:false Trace:false LegacyOptions:{Collide:false Fault:false
-> FaultCall:0 FaultNth:0}}
-> write$syz_spec_18446744072532934322_80(0xffffffffffffffff,
-> &(0x7f0000000000)=3D"2b952480c7ca55097d1707935ba64b20f3026c03d658026b81bf=
-264340512b3cb4e01afda2de754299ea7a113343ab7b9bda2fc0a2e2cdbfecbca0233a0772b=
-12ebde5d98a1203cb871672dff7e4c86ec1dccef0a76312fbe8d45dc2bd0f8fc2ebeb2a6be6=
-a300916c5281da2c1ef64d66267091b82429976c019da3645557ed1d439c5a637f6bf58c53b=
-c414539dd87c69098d671402586b631f9ac5c2fe9cedc281a6f005b5c4d1dd5ed9be400",
-> 0xb4)
-> r0 =3D syz_open_dev$sg(&(0x7f00000000c0), 0x0, 0x181040)
-> ioctl$syz_spec_1724254976_2866(r0, 0x1, &(0x7f0000000080)=3D{0x0, 0x2,
-> [0x85, 0x8, 0x15, 0xd]})
->
->
-> --
-> Yours sincerely,
-> Xingyu
+Hello Martin, thanks for the series. I think this test case is good since i=
+t
+looks extending the code coverage. As for the rationale discussion for the =
+v1
+series, I suggest to add a "Link:" tag here:
 
+Link: https://lore.kernel.org/linux-nvme/20240822201413.112268-1-mwilck@sus=
+e.com/
 
+>=20
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
+> ---
+> v2: - don't use usleep (Nilay Shroff). Use an awk program to do floating
+>       point arithmetic and achieve more accurate sub-second sleep times.
+>     - add 053.out (Nilay Shroff).
+> ---
+>  tests/nvme/053     | 70 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/nvme/053.out |  2 ++
+>  tests/nvme/rc      | 18 ++++++++++++
+>  3 files changed, 90 insertions(+)
+>  create mode 100755 tests/nvme/053
+>  create mode 100644 tests/nvme/053.out
+>=20
+> diff --git a/tests/nvme/053 b/tests/nvme/053
+> new file mode 100755
+> index 0000000..d32484c
+> --- /dev/null
+> +++ b/tests/nvme/053
+> @@ -0,0 +1,70 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2024 Martin Wilck, SUSE LLC
 
---=20
-Yours sincerely,
-Xingyu
+I suggest to describe the test content here, something like,
+
+#
+# Repeatedly rescans nvme controllers while doing IO on an nvme namespace
+# connected to these controllers, and make sure that no I/O errors or data
+# corruption occurs.
+
+> +
+> +. tests/nvme/rc
+> +
+> +DESCRIPTION=3D"test controller rescan under I/O load"
+> +TIMED=3D1
+> +: "${TIMEOUT:=3D60}"
+> +
+> +rescan_controller() {
+> +	local path
+> +	path=3D"$1/rescan_controller"
+> +
+> +	[[ -f "$path" ]] || {
+> +		echo "cannot rescan $1"
+> +		return 1
+> +	}
+> +
+> +	awk -f "$TMPDIR/rescan.awk" \
+> +	    -v path=3D"$path" -v timeout=3D"$TIMEOUT" -v seed=3D"$2" &
+> +}
+> +
+> +create_rescan_script() {
+> +	cat >"$TMPDIR/rescan.awk" <<EOF
+> +@load "time"
+> +
+> +BEGIN {
+> +    srand(seed);
+> +    finish =3D gettimeofday() + strtonum(timeout);
+> +    while (gettimeofday() < finish) {
+> +	sleep(0.1 + 5 * rand());
+> +	printf("1\n") > path;
+> +	close(path);
+> +    }
+> +}
+> +EOF
+> +}
+> +
+> +test_device() {
+> +	local -a ctrls
+> +	local i
+
+Nit: 'st' can be decalread as the local variable too. I suggest to add anot=
+her
+new local variable 'line' below, so I suggset "local i line st" here.
+
+> +
+> +	echo "Running ${TEST_NAME}"
+> +	create_rescan_script
+> +
+> +	ctrls=3D($(_nvme_get_ctrl_list))
+
+Shellcheck reports a warning here:
+
+  tests/nvme/053:47:9: warning: Prefer mapfile or read -a to split command =
+output (or quote to avoid splitting). [SC2207]
+
+It is a bit lengthy, but let's replace the line above with this:
+
+        while read -r line ; do ctrls+=3D("$line"); done < <(_nvme_get_ctrl=
+_list)=
