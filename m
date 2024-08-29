@@ -1,35 +1,33 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F8D8BE0;
-	Thu, 29 Aug 2024 03:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F83C1870;
+	Thu, 29 Aug 2024 04:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724903793; cv=none; b=DZMQ/mVs0UX+iUTSfu7PpzYAh0UCeINwZqW1ZhfxeBJ6vNj6sPgWXLvG/XB2jkEvrMmgcq7TI0C1WkA6xQOToH1TQVCYKpS135p7/sn9DhNGXeLOkP46cFJqp0rEvaxNkkZ3s5nq/Prf/r9yN0HyyTPM4Jub7+HbocTIS8Z4TT4=
+	t=1724904267; cv=none; b=SWHJ0Mnq4+cIuN9j2/AnZRE51SKhX49KoNtizjxXipvAuP9WTJkU/xZj/wPZxKlkIZ/IIR6h6PgFEjHgPiWHWa7xPpCta/dZU4oSpKk+02HJ9Bflc//Vi5YaZAOKH6imzHQgbyTeHQqXs+Sc9OR1iEVWg0+G3W8UXxat8Es0mrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724903793; c=relaxed/simple;
-	bh=dZ25Vu5Hqd04Jii1Sws+QHe2wmoP+MbYjGN7CrTqR5Y=;
+	s=arc-20240116; t=1724904267; c=relaxed/simple;
+	bh=+V+cwZCvafZYuugf6KiSaK31SNJRSwnBXfqZybnRO1g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k4ClHuTnLCRlz2YjFDTxIICKJxeqlCQ7ODAwhe3sVQe4K3z8cmIXU8bjc9bMRGMoNR4yFtBedbYWM8qhpKOCWeE2bRjKYx3zJ7mzhayd0vUlRGtR4VxlONRnrdyvBbD/L5n2rgvCWghYVpFVYKs8TCZuZSx5UQ8sx6SXteURqTE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=pjo1S3oyUaEwwisGPl81kPmZfXWAGQzJ/PwKsms+Yt2Ffpou42KLaJwp0uuqtCrc8hFQqqo6xlEX0ebssrq4AMtePM1nRLD0iR2H+hC7njpNjUb3d0kNkwQ1KPPaZy4oMsthkkN5FEHHDqoH/5qyE8XJrAM+DQyb3paVyRfa/hM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 97EBA68AA6; Thu, 29 Aug 2024 05:56:27 +0200 (CEST)
-Date: Thu, 29 Aug 2024 05:56:27 +0200
+	id AAEF568AA6; Thu, 29 Aug 2024 06:04:21 +0200 (CEST)
+Date: Thu, 29 Aug 2024 06:04:21 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Chandan Babu R <chandan.babu@oracle.com>,
-	Brian Foster <bfoster@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.cz>, "Darrick J. Wong" <djwong@kernel.org>,
-	Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org
-Subject: Re: [PATCH 6/6] xfs: refactor xfs_file_fallocate
-Message-ID: <20240829035627.GC4023@lst.de>
-References: <20240827065123.1762168-1-hch@lst.de> <20240827065123.1762168-7-hch@lst.de> <Zs/mz4Gve+znep2M@dread.disaster.area>
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
+	martin.petersen@oracle.com, asml.silence@gmail.com, krisman@suse.de,
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v3 03/10] block: handle split correctly for user meta
+ bounce buffer
+Message-ID: <20240829040421.GA4211@lst.de>
+References: <20240823103811.2421-1-anuj20.g@samsung.com> <CGME20240823104620epcas5p2118c152963d6cadfbc9968790ac0e536@epcas5p2.samsung.com> <20240823103811.2421-4-anuj20.g@samsung.com> <20240824083116.GC8805@lst.de> <20240828111806.GA3301@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,40 +36,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zs/mz4Gve+znep2M@dread.disaster.area>
+In-Reply-To: <20240828111806.GA3301@green245>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Aug 29, 2024 at 01:11:11PM +1000, Dave Chinner wrote:
-> > +xfs_falloc_allocate_range(
-> > +	struct file		*file,
-> > +	int			mode,
-> > +	loff_t			offset,
-> > +	loff_t			len)
-> > +{
-> > +	struct inode		*inode = file_inode(file);
-> > +	loff_t			new_size = 0;
-> > +	int			error;
-> > +
-> > +	/*
-> > +	 * If always_cow mode we can't use preallocations and thus should not
-> > +	 * create them.
-> > +	 */
-> > +	if (xfs_is_always_cow_inode(XFS_I(inode)))
-> > +		return -EOPNOTSUPP;
-> 
-> ... our preallocation operation always returns -EOPNOTSUPP for
-> COW mode.
-> 
-> Should the zeroing code also have this COW mode check in it after
-> the hole punch has run so we don't do unnecessary prealloc there?
+On Wed, Aug 28, 2024 at 04:48:06PM +0530, Anuj Gupta wrote:
+> I can add it [*], to iterate over the entire bvec array. But the original
+> bio_iter still needs to be stored during submission, to calculate the
+> number of bytes in the original integrity/metadata iter (as it could have
+> gotten split, and I don't have original integrity iter stored anywhere).
+> Do you have a different opinion?
 
-The low-level block allocation helper just returns early without
-doing work (move a bit, but not changed in behavior earlier in the
-series).  So it won't actually do the prealloc.
+Just like for the bio data, the original submitter should never use the
+iter, but the _all iter. 
 
-> 
-> -Dave.
-> -- 
-> Dave Chinner
-> david@fromorbit.com
----end quoted text---
