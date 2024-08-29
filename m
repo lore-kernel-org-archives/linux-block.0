@@ -1,223 +1,119 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661BE1B5EA1;
-	Thu, 29 Aug 2024 17:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982821B6541
+	for <linux-block@vger.kernel.org>; Thu, 29 Aug 2024 17:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724953479; cv=none; b=RkHz/Flp2Czd/2oveq835W2xDM9JVusKouhJ3XB0+xjYSDE7S83obHR3mlozEWwVHaJTdQRcjuTzS769oiZM0iukW+qi7bgycQ7Mj835zKLcIVwJVLiXQIoLeVVfAFNt9qar9P3wYHTLF1jj3RJkeTeXHkOSiXubBTDCgWpfG6k=
+	t=1724954217; cv=none; b=sCEChAEOkp2ze095SrqcX7Vm4uVICAEjSCVpK1jIZaV21tjsLVPbvBhMcrtxV+1utOTuVombKcyiYVRBHyWsABrDE3ReK1rEgeCCnbdUVjfPvDQVASyzVvOqt8Sp+X1VBA74nUUjGUxnWuh/EJeSilcqoJ1GyBilEWjlqkKyCcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724953479; c=relaxed/simple;
-	bh=OeICkt69Q7l7jMzcCZkaAIW3lOqEG7Hp8jq5sAQ3Q0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kCzoCQNLJyD7i4oX+Nb3XEm4/iaiW0hCmYjexJDlkaw5NP0t8cjQWzsFSPsRiomsmegc77MssTn287de9JXf8xKGhEyXIEW4AqrCVuVy1co9e20S0X8Y+dLvsO9fpHUtDK4ny6TgpvXVnhg72diFaD+WrHV3sAeVxm2n9//6iog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aIJKuEHl; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1724954217; c=relaxed/simple;
+	bh=T5beP7U4pwqXl7rreG0I6Q3uN0h5/Dj1lgMrcIAhiuw=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=iY/qG/HqFixC7L6vVfTfMAEbBG4AzwcrGzxtAkTcEYBoG/BagaZ38SfdtufDfojGtHymSno+rB/ltkk1Br5SKoanvMiOhWFtEUmxqOD1+i6GMCjA6Z8o4TtfyCn6VHimdsaGmoYZr2OAudGlhczAkrFJzU3iewOrdzAchIJjNBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EVh/i7rl; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aIJKuEHl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724953478; x=1756489478;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OeICkt69Q7l7jMzcCZkaAIW3lOqEG7Hp8jq5sAQ3Q0g=;
-  b=aIJKuEHlGePEh/WUPVpKR1z8IW+QdFC86WhgSinMfPC5BiFcVGrfWDgc
-   1vAlR7RzFZnD75zz4SquKveED7XSC+9aRasJ/KgLPILZRoIMEpCaTcKVK
-   0n9oEQOYXaKXaMFtqjzcxht4JeNfyBPEj85lhJSmOpauMWu/5Pd9KPeuZ
-   /pqqVg/xmlGsUWOzNaw7PLmps0biV7PTLF/ceCA81URMEw9fWNz00hlF6
-   qk6MtT9WpCplG+bZuO5cMjkFNzwblAkRP1YN93K4KUMsg7Co9dfAFQKI5
-   EOtcQF+RVKX0BjVE8tZtwRgp8gGC2xE52v7HTc4Dxlzq3caUqdR0MadDO
-   g==;
-X-CSE-ConnectionGUID: 2WNe8LJJQRiDzTyQqAa9Ww==
-X-CSE-MsgGUID: mwllGqfYQDy8bjB+Cp92Xg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34232538"
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="34232538"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 10:44:36 -0700
-X-CSE-ConnectionGUID: FxpRN4OETXa62Xjcxo95RA==
-X-CSE-MsgGUID: 1G6AMos7TaKBcxMKjbSvHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="63844429"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 29 Aug 2024 10:44:34 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sjjCB-0000ZO-0k;
-	Thu, 29 Aug 2024 17:44:31 +0000
-Date: Fri, 30 Aug 2024 01:43:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Haifeng Xu <haifeng.xu@shopee.com>, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, jack@suse.cz
-Cc: oe-kbuild-all@lists.linux.dev, tytso@mit.edu, yi.zhang@huaweicloud.com,
-	yukuai1@huaweicloud.com, tj@kernel.org, linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Haifeng Xu <haifeng.xu@shopee.com>
-Subject: Re: [PATCH] buffer: Associate the meta bio with blkg from buffer page
-Message-ID: <202408300119.UQ0zNU1f-lkp@intel.com>
-References: <20240828033224.146584-1-haifeng.xu@shopee.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EVh/i7rl"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47THePox010352;
+	Thu, 29 Aug 2024 17:56:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:content-type
+	:content-transfer-encoding:mime-version; s=pp1; bh=BwsQUv1/9EtCG
+	1XQtQ15dhTykImrHC/iXRGwyrsNkPM=; b=EVh/i7rlzIwrkMIH10ddPQNAzfe0F
+	nQNRwV673IBOIL2CdzjbXUUF+L82JXhYPdBhAF9Mz2vW5O9CUc8wZz5fKi0aAJAa
+	tcODHmYwibpLPk8eCdAhnNfdqdcIaffirAVCWsU76TG3c22q967DUAItxPTRFflg
+	2ztn3J9Pstc9l0sMlpobQoH/DtdkrYAsive6WWWQe7kg3PX6gIO3MSmlX8TvqDkH
+	YVFo582O8PrFaC6ug09FIj9IQuT4I4HN26TXWOrQpO4QXAa65FbDpKb9cdD707wE
+	OOrw9mhkJR2vMGnoYMmQzKQ1f7Wkh3GXZiZZRpuMMzEolbN1fyMc1EdJA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 419q8u99hu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 17:56:42 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47THYHkR021748;
+	Thu, 29 Aug 2024 17:56:41 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 417suup61s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 17:56:41 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47THue9l28836386
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 29 Aug 2024 17:56:40 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D00A858088;
+	Thu, 29 Aug 2024 17:56:39 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A21B5808A;
+	Thu, 29 Aug 2024 17:56:39 +0000 (GMT)
+Received: from ltcever58-lp2.aus.stglabs.ibm.com (unknown [9.40.195.162])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 29 Aug 2024 17:56:39 +0000 (GMT)
+From: gjoyce@linux.ibm.com
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, msuchanek@suse.de, jonathan.derrick@linux.dev,
+        gjoyce@linux.ibm.com, dwagner@suse.de
+Subject: [PATCH v2 0/1] add ioctl IOC_OPAL_SET_SID_PW
+Date: Thu, 29 Aug 2024 12:56:10 -0500
+Message-ID: <20240829175639.6478-1-gjoyce@linux.ibm.com>
+X-Mailer: git-send-email 2.43.5
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DA0--q4723FGkZIUe5DpPByhxzWflmY1
+X-Proofpoint-ORIG-GUID: DA0--q4723FGkZIUe5DpPByhxzWflmY1
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240828033224.146584-1-haifeng.xu@shopee.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-29_06,2024-08-29_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1011 bulkscore=0 phishscore=0 mlxscore=0
+ malwarescore=0 mlxlogscore=999 spamscore=0 priorityscore=1501 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408290125
 
-Hi Haifeng,
+From: Greg Joyce <gjoyce@linux.ibm.com>
 
-kernel test robot noticed the following build errors:
+This version does not reflect any code changes since there have
+been no comments on the patchset since the original submission
+on 13 Aug 2024.
 
-[auto build test ERROR on brauner-vfs/vfs.all]
-[also build test ERROR on linus/master v6.11-rc5 next-20240829]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+As requersted, it does contain an expanded description of the
+patchset and a pointer to the CLI change. Thanks
+to Daniel Wagner and Michal Suchánek for the feedback.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Haifeng-Xu/buffer-Associate-the-meta-bio-with-blkg-from-buffer-page/20240828-113409
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
-patch link:    https://lore.kernel.org/r/20240828033224.146584-1-haifeng.xu%40shopee.com
-patch subject: [PATCH] buffer: Associate the meta bio with blkg from buffer page
-config: x86_64-buildonly-randconfig-002-20240829 (https://download.01.org/0day-ci/archive/20240830/202408300119.UQ0zNU1f-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240830/202408300119.UQ0zNU1f-lkp@intel.com/reproduce)
+SED Opal allows a password for the SID user as well as the Admin1
+user. If a CLI wishes to change the password of both users there
+is currently no way to accomplish that using the SED Opal block
+driver ioctls. The Admin1 password can be changes using the 
+IOC_OPAL_SET_PW ioctl but the SID password remains the password
+that was set when the SED drive was provisioned (ownership).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408300119.UQ0zNU1f-lkp@intel.com/
+To allow a CLI to change the SID password, a new ioctl
+IOC_OPAL_SET_SID_PW has been created. The valid current password is
+required to change the SID password.
 
-All error/warnings (new ones prefixed by >>):
+The nvme-cli has been changed to use this ioctl such that the
+"sed password" can change both the Admin1 and SID passwords.
+The pull request can be found here:
+	https://github.com/linux-nvme/nvme-cli/pull/2467
 
-   fs/buffer.c: In function 'submit_bh_wbc':
->> fs/buffer.c:2826:29: error: implicit declaration of function 'mem_cgroup_css_from_folio'; did you mean 'mem_cgroup_from_obj'? [-Werror=implicit-function-declaration]
-    2826 |                 memcg_css = mem_cgroup_css_from_folio(folio);
-         |                             ^~~~~~~~~~~~~~~~~~~~~~~~~
-         |                             mem_cgroup_from_obj
->> fs/buffer.c:2826:27: warning: assignment to 'struct cgroup_subsys_state *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-    2826 |                 memcg_css = mem_cgroup_css_from_folio(folio);
-         |                           ^
-   In file included from include/linux/array_size.h:5,
-                    from include/linux/kernel.h:16,
-                    from fs/buffer.c:22:
->> fs/buffer.c:2827:42: error: 'memory_cgrp_subsys_on_dfl_key' undeclared (first use in this function); did you mean 'misc_cgrp_subsys_on_dfl_key'?
-    2827 |                 if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
-         |                                          ^~~~~~~~~~~~~~~~~~
-   include/linux/compiler.h:19:53: note: in definition of macro 'likely_notrace'
-      19 | #define likely_notrace(x)       __builtin_expect(!!(x), 1)
-         |                                                     ^
-   include/linux/jump_label.h:511:56: note: in expansion of macro 'static_key_enabled'
-     511 | #define static_branch_likely(x)         likely_notrace(static_key_enabled(&(x)->key))
-         |                                                        ^~~~~~~~~~~~~~~~~~
-   include/linux/cgroup.h:95:9: note: in expansion of macro 'static_branch_likely'
-      95 |         static_branch_likely(&ss ## _on_dfl_key)
-         |         ^~~~~~~~~~~~~~~~~~~~
-   fs/buffer.c:2827:21: note: in expansion of macro 'cgroup_subsys_on_dfl'
-    2827 |                 if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
-         |                     ^~~~~~~~~~~~~~~~~~~~
-   fs/buffer.c:2827:42: note: each undeclared identifier is reported only once for each function it appears in
-    2827 |                 if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
-         |                                          ^~~~~~~~~~~~~~~~~~
-   include/linux/compiler.h:19:53: note: in definition of macro 'likely_notrace'
-      19 | #define likely_notrace(x)       __builtin_expect(!!(x), 1)
-         |                                                     ^
-   include/linux/jump_label.h:511:56: note: in expansion of macro 'static_key_enabled'
-     511 | #define static_branch_likely(x)         likely_notrace(static_key_enabled(&(x)->key))
-         |                                                        ^~~~~~~~~~~~~~~~~~
-   include/linux/cgroup.h:95:9: note: in expansion of macro 'static_branch_likely'
-      95 |         static_branch_likely(&ss ## _on_dfl_key)
-         |         ^~~~~~~~~~~~~~~~~~~~
-   fs/buffer.c:2827:21: note: in expansion of macro 'cgroup_subsys_on_dfl'
-    2827 |                 if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
-         |                     ^~~~~~~~~~~~~~~~~~~~
->> fs/buffer.c:2828:42: error: 'io_cgrp_subsys_on_dfl_key' undeclared (first use in this function); did you mean 'misc_cgrp_subsys_on_dfl_key'?
-    2828 |                     cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-         |                                          ^~~~~~~~~~~~~~
-   include/linux/compiler.h:19:53: note: in definition of macro 'likely_notrace'
-      19 | #define likely_notrace(x)       __builtin_expect(!!(x), 1)
-         |                                                     ^
-   include/linux/jump_label.h:511:56: note: in expansion of macro 'static_key_enabled'
-     511 | #define static_branch_likely(x)         likely_notrace(static_key_enabled(&(x)->key))
-         |                                                        ^~~~~~~~~~~~~~~~~~
-   include/linux/cgroup.h:95:9: note: in expansion of macro 'static_branch_likely'
-      95 |         static_branch_likely(&ss ## _on_dfl_key)
-         |         ^~~~~~~~~~~~~~~~~~~~
-   fs/buffer.c:2828:21: note: in expansion of macro 'cgroup_subsys_on_dfl'
-    2828 |                     cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-         |                     ^~~~~~~~~~~~~~~~~~~~
->> fs/buffer.c:2829:70: error: 'io_cgrp_subsys' undeclared (first use in this function); did you mean 'misc_cgrp_subsys'?
-    2829 |                         blkcg_css = cgroup_e_css(memcg_css->cgroup, &io_cgrp_subsys);
-         |                                                                      ^~~~~~~~~~~~~~
-         |                                                                      misc_cgrp_subsys
-   cc1: some warnings being treated as errors
+Greg Joyce (1):
+  block: sed-opal: add ioctl IOC_OPAL_SET_SID_PW
 
-
-vim +2826 fs/buffer.c
-
-  2778	
-  2779	static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
-  2780				  enum rw_hint write_hint,
-  2781				  struct writeback_control *wbc)
-  2782	{
-  2783		const enum req_op op = opf & REQ_OP_MASK;
-  2784		struct bio *bio;
-  2785	
-  2786		BUG_ON(!buffer_locked(bh));
-  2787		BUG_ON(!buffer_mapped(bh));
-  2788		BUG_ON(!bh->b_end_io);
-  2789		BUG_ON(buffer_delay(bh));
-  2790		BUG_ON(buffer_unwritten(bh));
-  2791	
-  2792		/*
-  2793		 * Only clear out a write error when rewriting
-  2794		 */
-  2795		if (test_set_buffer_req(bh) && (op == REQ_OP_WRITE))
-  2796			clear_buffer_write_io_error(bh);
-  2797	
-  2798		if (buffer_meta(bh))
-  2799			opf |= REQ_META;
-  2800		if (buffer_prio(bh))
-  2801			opf |= REQ_PRIO;
-  2802	
-  2803		bio = bio_alloc(bh->b_bdev, 1, opf, GFP_NOIO);
-  2804	
-  2805		fscrypt_set_bio_crypt_ctx_bh(bio, bh, GFP_NOIO);
-  2806	
-  2807		bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
-  2808		bio->bi_write_hint = write_hint;
-  2809	
-  2810		__bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh));
-  2811	
-  2812		bio->bi_end_io = end_bio_bh_io_sync;
-  2813		bio->bi_private = bh;
-  2814	
-  2815		/* Take care of bh's that straddle the end of the device */
-  2816		guard_bio_eod(bio);
-  2817	
-  2818		if (wbc) {
-  2819			wbc_init_bio(wbc, bio);
-  2820			wbc_account_cgroup_owner(wbc, bh->b_page, bh->b_size);
-  2821		} else if (buffer_meta(bh)) {
-  2822			struct folio *folio;
-  2823			struct cgroup_subsys_state *memcg_css, *blkcg_css;
-  2824	
-  2825			folio = page_folio(bh->b_page);
-> 2826			memcg_css = mem_cgroup_css_from_folio(folio);
-> 2827			if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
-> 2828			    cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-> 2829				blkcg_css = cgroup_e_css(memcg_css->cgroup, &io_cgrp_subsys);
-  2830				bio_associate_blkg_from_css(bio, blkcg_css);
-  2831			}
-  2832		}
-  2833	
-  2834		submit_bio(bio);
-  2835	}
-  2836	
+ block/sed-opal.c              | 26 ++++++++++++++++++++++++++
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h |  1 +
+ 3 files changed, 28 insertions(+)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+gjoyce@linux.ibm.com
+
