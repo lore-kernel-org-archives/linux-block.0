@@ -1,76 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BAB193096;
-	Thu, 29 Aug 2024 12:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679BA1B143B;
+	Thu, 29 Aug 2024 13:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724933460; cv=none; b=BM9ZBw3LkHOoGdQ6gWTlfJn/Nvn0PLNiPnE4WJx+yZpwyaQ1PRqqgs2zoLZCzjs1XrW6LPO2Hl4FQoReB/nbSzqFXJ5g9l6vj2/JuyTvD8/3Ssa42SUu2VX3ZDkWXzVu7eWiKVJRB4C9zDTn6PgRFFLpW4VBvCq5FhcnWaszZqs=
+	t=1724938186; cv=none; b=h2SSiWWBVz2AiAOjODcSVnNmse+CK39+qaU6j5SMEYWdtRjSLVC5ve/v8HehCUJ8DzuAVEAIKuK83vE5rhp6b88RbKMCh8XztwlInGyQVCOAKIixJKnDRKisB06P047j/cD09qyNgSuVzIIpWGm/vdx0hHD0TLOVLiaLjy2MCWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724933460; c=relaxed/simple;
-	bh=mw/x5gkzjiaE2Bw8RBvLT+WfmzG8tj/WG4ujtc6GP8s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ewcUl1idh0BDHENkXXtGF4u9c8JPdZJU+5b8J8x8Sf5VHyVXgo3nqMWNT0wBmGD94tUhY4j99YFMS9LKdRdy2h8JgPs+6mZI/rsgEuInCn4Wa9AGLUU+b8JOpqkvNXxyOm5iDbTZeg4VF1sA11rpqeOCBKLKjKmNZJ5RMl8dnQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CqwrnsR5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724938186; c=relaxed/simple;
+	bh=pZvP4akX1FNW4jsFlwLLkJZAHk1+SP6pnWAd6+58RhM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RgRwrvXnGbTKc1/pOpaY09hQ9QOBXnOJWJOUEylKZDpBQMq2hFow9tKiRIyBKdwoxEWdq+i1rdT+3INeGeqt7BKUYfvCDg0Mkx1an7BCQyJcl85mnvw4NMOgNG55uq7D8gu5QXzyeh+hF30gxQ5mi+X0j646v81c9Ti0sl3z+e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yk2CnSiD; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CqwrnsR5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E558C4CEC1;
-	Thu, 29 Aug 2024 12:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724933459;
-	bh=mw/x5gkzjiaE2Bw8RBvLT+WfmzG8tj/WG4ujtc6GP8s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CqwrnsR537t1sPvKTzSMSc5IFE3VKwmqv+BZi4Rq40hQiM9TandikvQDZ32qbiBf0
-	 qzdyKKv7AJ1pyaxYfKGyGZuwJnPHpGu5QvmfPWWEX9ISUjKSuC8x8klr+4NgxPYFSB
-	 jjvSz+riUCay9XArVdXvCmrtjA/OLbYsxNalzdQY7rGmYQqaMhuy7Tpbgg56wjfKuK
-	 RZqle4CSCBO4260jG2waEjyAq6cXxaWfJJNUs51N3A7p9Zs7IsTt/1vOHRmsnr+rxQ
-	 C6yInIDaQ2an4ophiY20nb86dvKwh3zUjqTnWmZlQcz68p7U4ydaFLjHYK0eWZ9Ypu
-	 FdF/q4DaZYt7A==
-Date: Thu, 29 Aug 2024 14:10:54 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>, 
-	linux-doc@vger.kernel.org, corbet@lwn.net, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, kernel-dev@igalia.com, kernel@gpiccoli.net, 
-	Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH V5] Documentation: Document the kernel flag
- bdev_allow_write_mounted
-Message-ID: <20240829-galaktisch-zugegangen-77735bd59fae@brauner>
-References: <20240828145045.309835-1-gpiccoli@igalia.com>
- <20240828162753.GO6043@frogsfrogsfrogs>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yk2CnSiD"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-2702ed1056bso387007fac.3;
+        Thu, 29 Aug 2024 06:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724938184; x=1725542984; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pZvP4akX1FNW4jsFlwLLkJZAHk1+SP6pnWAd6+58RhM=;
+        b=Yk2CnSiDx0hjsvt6ozDIk8rcMkS2ZvpTGnCnKyUjOapyT1ISWAuvhBjoQj1dWHyLNR
+         vVZG+UsBVWRRHXj1tz+ihQhlH1UsPyLEilm6id2H4+F2PVXGyUR1Kiksh2XjmOEeG9TN
+         2mIuK+0jhiSzLDQZbO/McAa2F4Gjb5fNS5p6mVWWgkCu6+aTGT394zxAy2V9Q7OlrJCA
+         CZgFvvt7YIxRIJn3XmoHCy6KLeRvWlym1sEBiVap3mxAywX5fPyBLFklt4qEDnuut8hk
+         dG15CEISIweE2TGSqXoVrcFKtlxwMtCFsq+i4rl2wc02+vZVObQKX4OpW3AjmpgG5TaB
+         iouw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724938184; x=1725542984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pZvP4akX1FNW4jsFlwLLkJZAHk1+SP6pnWAd6+58RhM=;
+        b=Sb+wBcmrtLhvxNPPiE6CFpw+Ad06N7fwnLzH9E3vdTOhteGUd65iSmp6VTReABMgH8
+         cW8G2AVoutKK91YBcEQ43s/KkIZDv4M6MtbHKs9Ra9W5DwTHM7lWI6qFoMMoZWLn2QDc
+         SmIg0KwuclOdqj7Tey2Ckj5ke/OBYMT+bhfiT5kV9Vb3zgeXIouTKLG409MG3OCwlrS+
+         kjDKW/bbpT3rkRGVU/C2zT1WAuweR9F+fHgBuMc9IJquZFehLfxRALBNYC0R0QHdFA1g
+         H3uxe/5hc4Si0fEc20gD6FSIjszgjWJDabbP2XB0NphdR0jJWWuqSaZOCt9EUT3mN4Kw
+         9Yzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtspTdtv3bJLeSU623yUnjBTHxmc820bkSdU0Gz6D2DjxNMSShJgkzqT2AyVIvTHwayFbFQlbfUg==@vger.kernel.org, AJvYcCWEDsEn7mhwATRpmdtuUiCjmJGFn3ag+c3pP9VRswf0xKYiNbNB/f4YLNF++zZ98pKft8jh0IZ5eQGpcg==@vger.kernel.org, AJvYcCX4KDvsXE+42j3OcbXH9IStBnT+0yHcz3qVx/sA2WT+mQBq3vYzdyP0oYdIwFt5oy0FwgU4yZ1JhFWvCGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywh7ANsM31sFLh8wo8Iy0fDgAMLA4+Z1yilkOH6ojpmKJ17kzYO
+	pk7M1vmov4xXzsdz6Q4v0lfs+5B5Uiv2wrq1bw3ghcJNYXO67rFoH1CUEneUnKjTx7oMAk+XsTy
+	t+WsXpHJuwxnmpw5Aasxc63/2Bg==
+X-Google-Smtp-Source: AGHT+IEB9AghDWmQTaWbGpeIraxIQPqERplZzNtYk9DNetcO5Rt7NpJPuYrDDGDj8FK1DdGZ/2QbinPEhl0Lrhh+j2M=
+X-Received: by 2002:a05:6870:f153:b0:229:f022:ef83 with SMTP id
+ 586e51a60fabf-2779035fabdmr3133038fac.43.1724938184280; Thu, 29 Aug 2024
+ 06:29:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240828162753.GO6043@frogsfrogsfrogs>
+References: <20240823103811.2421-1-anuj20.g@samsung.com> <CGME20240823104629epcas5p3fea0cb7e66b0446ddacf7648c08c3ba8@epcas5p3.samsung.com>
+ <20240823103811.2421-8-anuj20.g@samsung.com> <20240824083553.GF8805@lst.de>
+ <fe85a641-c974-3fa7-43f1-eacbb7834210@samsung.com> <yq1plpsauu5.fsf@ca-mkp.ca.oracle.com>
+In-Reply-To: <yq1plpsauu5.fsf@ca-mkp.ca.oracle.com>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Thu, 29 Aug 2024 18:59:05 +0530
+Message-ID: <CACzX3AuX9FkxPoBRLmy_HEmu6Ex63jHLyz9Z8fhUd_Y5_MdJyw@mail.gmail.com>
+Subject: Re: [PATCH v3 07/10] block: introduce BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>, 
+	axboe@kernel.dk, kbusch@kernel.org, asml.silence@gmail.com, krisman@suse.de, 
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-block@vger.kernel.org, gost.dev@samsung.com, linux-scsi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 28, 2024 at 09:27:53AM GMT, Darrick J. Wong wrote:
-> On Wed, Aug 28, 2024 at 11:48:58AM -0300, Guilherme G. Piccoli wrote:
-> > Commit ed5cc702d311 ("block: Add config option to not allow writing to mounted
-> > devices") added a Kconfig option along with a kernel command-line tuning to
-> > control writes to mounted block devices, as a means to deal with fuzzers like
-> > Syzkaller, that provokes kernel crashes by directly writing on block devices
-> > bypassing the filesystem (so the FS has no awareness and cannot cope with that).
-> > 
-> > The patch just missed adding such kernel command-line option to the kernel
-> > documentation, so let's fix that.
-> > 
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Darrick J. Wong <djwong@kernel.org>
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Reviewed-by: Jan Kara <jack@suse.cz>
-> > Signed-off-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
-> 
-> Looks good to me now,
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-> 
-> Fun unrelated question: do we want to turn on bdev_allow_write_mounted
-> if lockdown is enabled?  In that kind of environment, we don't want to
-> allow random people to scribble, given how many weird ext4 bugs we've
-> had to fix due to syzbot.
-
-I would say yes, we absolutely do.
+On Thu, Aug 29, 2024 at 8:47=E2=80=AFAM Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>
+>
+> Kanchan,
+>
+> > With Guard/Reftag/Apptag, we get 6 combinations. For NVMe, all can be
+> > valid. For SCSI, maximum 4 can be valid. And we factor the pi-type in
+> > while listing what all is valid. For example: 010 or 001 is not valid
+> > for SCSI and should not be shown by this.
+>
+> I thought we had tentatively agreed to let the block layer integrity
+> flags only describe what the controller should do? And then let sd.c
+> decide what to do about RDPROTECT/WRPROTECT (since host-to-target is a
+> different protection envelope anyway). That is kind of how it works
+> already.
+>
+Do you see that this patch (and this set of flags) are fine?
+If not, which specific flags do you suggest should be introduced?
