@@ -1,108 +1,195 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A76614EC41;
-	Fri, 30 Aug 2024 11:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF58819992D
+	for <linux-block@vger.kernel.org>; Fri, 30 Aug 2024 11:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725018967; cv=none; b=hwJYw3wd5rEeBTfDo+gf3LA31BHqWCL/5meBVRqpjo3oaP7N1QvAUPVPQWiHBJlsAlNdI6AqBkJJMX4yO0jAGuUQDQ35XqzFU9mNwmBL/1Tcf/4+hn+3OiAeJYZGwfgELBPxuDYztQH66uZS3Nu0twE7puxwamTmeiEd+yb/9fk=
+	t=1725019160; cv=none; b=Qbleu4yKnbuTRdMwUB4of7zc5jYGD952Thk/v+y76GH9auFhHCuj7HObkSB+wpL6JYJLDwhkXSnuHTS96EOGoeb2ysX51D/ZSBRRfzXpQdmfKcHJud6x8cV3E/ZnYWRxvVai0TtU81k4eehliVSBMPNpYAEn8D4mB+azNwAkcw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725018967; c=relaxed/simple;
-	bh=N4EnbV+vH2+NmjnRoAsap91PvDS0Eur6swEdvFRdWpM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KH5Own2azTZF0iOQRPZeUiSzQR6loUCwYHJOofiHZ2ZGgrpIMny0rR6BC7QwySeT8BiQ3Z1GECkc89eUez9RyZNrq4GIHRNEnKmdMwXbXZWW67jYiW56V8o//uvK3FCFNtwRPD2znaqxR63D0z/WDzZDJ5dmokFGe1cCDczqBis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m53Qcfe5; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1725019160; c=relaxed/simple;
+	bh=6OgZ8ZtxXt7quQNbv+3H6Meh4CQOGZxgszGMT+sAe0w=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:References; b=luUWQ24ejeHAWifhQctQYjbI+M5Y4/lHqYdjfbr3U0jLyubgSqG4D156C8AzHhG1zlSbdt1Qglev8V2qYoL2/oDREvNw+X7J4iXf1GCbnTMEHN8N3fu1sBT0RFl0FFTr740IKJngD1EQk73q2sOzHY9ibgWDBR+eS1bIUUwezXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=gbYUKLEu; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m53Qcfe5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725018962; x=1756554962;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=N4EnbV+vH2+NmjnRoAsap91PvDS0Eur6swEdvFRdWpM=;
-  b=m53Qcfe53wyOtK39OsoNrUV/JNKFykFxC8YK0X/jf/GXm88sKK92qus+
-   E7D9gDFxEE5ViPkRHUU5cjev2i0W2CaATnZIwOmXZ8kBODvxRAQWf+0CS
-   Bd3Eb2s4pIdlltF9Nye6nKOC2VB2/6KFauzVrVNvY1UTuXKNmuxQb9lck
-   u1Pmmx+d4RqsJfcynSi7FCPtaQ75Ote0uXuHGanU45nBH7kLa4eFnT+Ac
-   B0YucA01mKMOYUNBzYSkvlxwUJWAHLUCb5xMlNRIsbtYBvApbH4CdvqVF
-   wErPWzwdRwePIwTyG95xM8jlaLEfMtP6QcuUMHeXTL19w6Z2rhX+7ZbB5
-   Q==;
-X-CSE-ConnectionGUID: ndQJbe42S2mrLJWhJ5I7eg==
-X-CSE-MsgGUID: X+pN3g0aS5qq8qq2QWAsqw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34226843"
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="34226843"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 04:56:01 -0700
-X-CSE-ConnectionGUID: vlZ38EGxRHK0ideqvjH64A==
-X-CSE-MsgGUID: l1RMm7HPS/Gem9BmMfDdaw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="64064486"
-Received: from mwiniars-desk2.ger.corp.intel.com ([10.245.246.70])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 04:55:59 -0700
-Message-ID: <e38630e41353d083f7c0f4d726218aa5f3b36827.camel@linux.intel.com>
-Subject: Re: [RFC PATCH 1/2] bdev: add support for CPU latency PM QoS tuning
-From: Tero Kristo <tero.kristo@linux.intel.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Fri, 30 Aug 2024 14:55:56 +0300
-In-Reply-To: <e5e97bad-075a-4d78-af78-3bbc124c06b1@kernel.dk>
-References: <20240829075423.1345042-1-tero.kristo@linux.intel.com>
-	 <20240829075423.1345042-2-tero.kristo@linux.intel.com>
-	 <e5e97bad-075a-4d78-af78-3bbc124c06b1@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="gbYUKLEu"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240830115916euoutp01ffae69ec0318296221f11922b6964f4f~wf8hzMtUx2720227202euoutp01h
+	for <linux-block@vger.kernel.org>; Fri, 30 Aug 2024 11:59:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240830115916euoutp01ffae69ec0318296221f11922b6964f4f~wf8hzMtUx2720227202euoutp01h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1725019156;
+	bh=DHfHERZ6en3013iCiK+PboFb1SXkYatz5nFnB7G0GlY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=gbYUKLEuEwKPI68ulqU/oAR4XTO9SPNEkHPy+P2ywlsjfpkAsGn/NOSwG6vv6E+5S
+	 fNASe1qmB/Y5wYMQZQhUjIQDaXrDJyxdSgON44sS5dJW6Dg7L93dKioAx6i79uIFEs
+	 qY/n5ZTa0YeeoVjAxhcq+NCleVZf5lL4ynjng54Y=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20240830115915eucas1p1ec9aa5512061fffdee90f1cdc93ec447~wf8hdiS0U2675426754eucas1p1o;
+	Fri, 30 Aug 2024 11:59:15 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id 1D.45.09624.314B1D66; Fri, 30
+	Aug 2024 12:59:15 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240830115915eucas1p122027e15f14938de31489f75c174b1fd~wf8g84L7A1990419904eucas1p1Y;
+	Fri, 30 Aug 2024 11:59:15 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240830115915eusmtrp22562364f0592658a6eaf77b9fcae9cad~wf8g6O6Qc3191831918eusmtrp2T;
+	Fri, 30 Aug 2024 11:59:15 +0000 (GMT)
+X-AuditID: cbfec7f2-bfbff70000002598-02-66d1b41327b7
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 45.87.14621.314B1D66; Fri, 30
+	Aug 2024 12:59:15 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240830115914eusmtip2c32ae4bfe73d445aa2fd37cd74966ac0~wf8gp-A_b0276402764eusmtip2F;
+	Fri, 30 Aug 2024 11:59:14 +0000 (GMT)
+Received: from localhost (106.110.32.122) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Fri, 30 Aug 2024 12:59:14 +0100
+Date: Fri, 30 Aug 2024 13:59:13 +0200
+From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+To: Kanchan Joshi <joshi.k@samsung.com>
+CC: <axboe@kernel.dk>, <kbusch@kernel.org>, <hch@lst.de>,
+	<sagi@grimberg.me>, <martin.petersen@oracle.com>,
+	<James.Bottomley@HansenPartnership.com>, <brauner@kernel.org>,
+	<jack@suse.cz>, <jaegeuk@kernel.org>, <jlayton@kernel.org>,
+	<chuck.lever@oracle.com>, <bvanassche@acm.org>,
+	<linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-f2fs-devel@lists.sourceforge.net>, <linux-block@vger.kernel.org>,
+	<linux-scsi@vger.kernel.org>, <gost.dev@samsung.com>, <vishak.g@samsung.com>
+Subject: Re: [PATCH v4 0/5] Write-placement hints and FDP
+Message-ID: <20240830115913.b5pcs7bo26wkj2it@ArmHalley.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+In-Reply-To: <20240826170606.255718-1-joshi.k@samsung.com>
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrDKsWRmVeSWpSXmKPExsWy7djP87rCWy6mGcz4qGOx+m4/m8Xrw58Y
+	LaZ9+Mls8f/ucyaLlauPMlnMnt7MZPFk/Sxmi439HBY/l61it5h06Bqjxd5b2haXFrlb7Nl7
+	ksVi/rKn7Bbd13ewWSw//o/JYt3r9ywOgh6Xr3h7nL+3kcVj2qRTbB6Xz5Z6bFrVyeaxeUm9
+	x+4Fn5k8dt9sYPP4+PQWi8eZBUfYPT5vkgvgjuKySUnNySxLLdK3S+DKeLrkA2PBD+GK1nst
+	TA2MZ/i7GDk5JARMJJ62/mHrYuTiEBJYwSjx7ehlVgjnC6PE8hsTmSCcz4wSby5OYYFpOXV+
+	AlRiOaPE0Ts/WeCqll7ZCzVsC6PE3r71QBkODhYBVYknu7NButkE7CUuLbvFDGKLCKhLdEw/
+	BzaJWeAvs0TL9DPsIAlhAUuJQ2ffsoLYvAK2EtMnbGCGsAUlTs58AnYGs4CVROeHJlaQ+cwC
+	0hLL/3GAhDmBwv8/vGeHuFRJ4vGLt4wQdq3EqS23wHZJCNzilFh29wYbRMJF4tzU98wQtrDE
+	q+NboJplJP7vnM8EYVdLNJw8AdXcwijR2rEVbLGEgLVE35kciBpHiYlLD0OF+SRuvBWEOJNP
+	YtK26cwQYV6JjjYhiGo1idX33rBMYFSeheSxWUgem4Xw2AJG5lWM4qmlxbnpqcWGeanlesWJ
+	ucWleel6yfm5mxiBCfD0v+OfdjDOffVR7xAjEwfjIUYJDmYlEd4Tx8+mCfGmJFZWpRblxxeV
+	5qQWH2KU5mBREudVTZFPFRJITyxJzU5NLUgtgskycXBKNTD57XcxmrmxRlF3Cm/bdym9K5xx
+	uyZczfgV9ccp+eL9x+bby0zf75Gp12M1DN4+O8zgo2Ng+qNP9XU7ZztL/HP5fv6zXtLPRXNN
+	3ypUOgpsvnl/p7Z5s5h/2ZQDfj9SN07UVCjfsTFn0tLTPVNzS/lFvaw6cu2dz6d/Z3Q9e83t
+	qOfnVWt1Gxyl/h3/EyQ1vYPli3x7bNRTlciyt4nz3EyMg5YrKX7317jKKKJ2oDe8QnjPqXiD
+	o+ma2zi5849aJTo4+5/7riei+Wb6iymKjT940hPfxD9tOn1O999y8xWyIg0PJt3aUMvXr2M9
+	5XD9B/sf+6tSC5MEfur2l5UUiqc789i+vdDILXwtRVtHVImlOCPRUIu5qDgRAOixgofvAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrFIsWRmVeSWpSXmKPExsVy+t/xe7rCWy6mGbSvZrNYfbefzeL14U+M
+	FtM+/GS2+H/3OZPFytVHmSxmT29msniyfhazxcZ+Doufy1axW0w6dI3RYu8tbYtLi9wt9uw9
+	yWIxf9lTdovu6zvYLJYf/8dkse71exYHQY/LV7w9zt/byOIxbdIpNo/LZ0s9Nq3qZPPYvKTe
+	Y/eCz0weu282sHl8fHqLxePMgiPsHp83yQVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY
+	6hkam8daGZkq6dvZpKTmZJalFunbJehlPF3ygbHgh3BF670WpgbGM/xdjJwcEgImEqfOT2Dq
+	YuTiEBJYyigx4cY0doiEjMTGL1dZIWxhiT/Xutggij4ySryfdI0FwtnCKPF2/lqgKg4OFgFV
+	iSe7s0Ea2ATsJS4tu8UMYosIqEt0TD8HtoFZ4DezxO7pa1lAEsIClhKHzr4F28ArYCsxfcIG
+	ZoihvYwSq4/3s0EkBCVOznwC1sAsYCExc/55RpBlzALSEsv/cYCEOQWsJP5/eA91tZLE4xdv
+	GSHsWonPf58xTmAUnoVk0iwkk2YhTFrAyLyKUSS1tDg3PbfYUK84Mbe4NC9dLzk/dxMjMBFs
+	O/Zz8w7Gea8+6h1iZOJgPMQowcGsJMJ74vjZNCHelMTKqtSi/Pii0pzU4kOMpsCgmMgsJZqc
+	D0xFeSXxhmYGpoYmZpYGppZmxkrivG6Xz6cJCaQnlqRmp6YWpBbB9DFxcEo1MB1ab56TYjb3
+	p9L1OboiyyKulM9afpV97sojyRqSmy8HbrEyfy1pHK/5+Itk7enID9uaWgr8VZdf3KT703S6
+	snSV6Zk7Bw/UzZwhIzDP9uc85vXXvm/Xy1z2+k/axeXd/32VV1zkO6/P+tltbmLK0VMt21IL
+	FFjk/SJOV0hUclknNC7u/mGmsGCS+RuO3s0+rAt0hHnXX2WzyZl/f7dc56oND3dPUK6Q+jpx
+	rvKlNxEqx63ys9a9Kjjnv2OSYK+OVpOWW18QV3UIU4ELb4eDiubMafu+JoofXtHtqLLuaoKZ
+	hqWSRf2v/qatHY1iz+cLPH33uHD25/LDyyr1fxVvZ6+r2rx+65l/P3Pm+HxcFqTEUpyRaKjF
+	XFScCAAvKmsHjQMAAA==
+X-CMS-MailID: 20240830115915eucas1p122027e15f14938de31489f75c174b1fd
+X-Msg-Generator: CA
+X-RootMTR: 20240826171409epcas5p306ba210a9815e202556778a4c105b440
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240826171409epcas5p306ba210a9815e202556778a4c105b440
+References: <CGME20240826171409epcas5p306ba210a9815e202556778a4c105b440@epcas5p3.samsung.com>
+	<20240826170606.255718-1-joshi.k@samsung.com>
 
-On Thu, 2024-08-29 at 05:37 -0600, Jens Axboe wrote:
-> On 8/29/24 1:18 AM, Tero Kristo wrote:
-> > diff --git a/block/bio.c b/block/bio.c
-> > index e9e809a63c59..6c46d75345d7 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -282,6 +282,8 @@ void bio_init(struct bio *bio, struct
-> > block_device *bdev, struct bio_vec *table,
-> > =C2=A0	bio->bi_max_vecs =3D max_vecs;
-> > =C2=A0	bio->bi_io_vec =3D table;
-> > =C2=A0	bio->bi_pool =3D NULL;
-> > +
-> > +	bdev_update_cpu_latency_pm_qos(bio->bi_bdev);
-> > =C2=A0}
-> > =C2=A0EXPORT_SYMBOL(bio_init);
->=20
-> This is entirely the wrong place to do this, presumably it should be
-> done at IO dispatch time, not when something initializes a bio.
->=20
-> And also feels like entirely the wrong way to go about this, adding
-> overhead to potentially each IO dispatch, of which there can be
-> millions
-> per second.
+On 26.08.2024 22:36, Kanchan Joshi wrote:
+>Current write-hint infrastructure supports 6 temperature-based data life
+>hints.
+>The series extends the infrastructure with a new temperature-agnostic
+>placement-type hint. New fcntl codes F_{SET/GET}_RW_HINT_EX allow to
+>send the hint type/value on file. See patch #3 commit description for
+>the details.
+>
+>Overall this creates 128 placement hint values [*] that users can pass.
+>Patch #5 adds the ability to map these new hint values to nvme-specific
+>placement-identifiers.
+>Patch #4 restricts SCSI to use only life hint values.
+>Patch #1 and #2 are simple prep patches.
+>
+>[*] While the user-interface can support more, this limit is due to the
+>in-kernel plumbing consideration of the inode size. Pahole showed 32-bit
+>hole in the inode, but the code had this comment too:
+>
+>/* 32-bit hole reserved for expanding i_fsnotify_mask */
+>
+>Not must, but it will be good to know if a byte (or two) can be used
+>here.
+>
+>Changes since v3:
+>- 4 new patches to introduce write-placement hints
+>- Make nvme patch use the placement hints rather than write-life hints
+>
+>Changes since v2:
+>- Base it on nvme-6.11 and resolve a merge conflict
+>
+>Changes since v1:
+>- Reduce the fetched plids from 128 to 6 (Keith)
+>- Use struct_size for a calculation (Keith)
+>- Handle robot/sparse warning
+>
+>Kanchan Joshi (4):
+>  fs, block: refactor enum rw_hint
+>  fcntl: rename rw_hint_* to rw_life_hint_*
+>  fcntl: add F_{SET/GET}_RW_HINT_EX
+>  nvme: enable FDP support
+>
+>Nitesh Shetty (1):
+>  sd: limit to use write life hints
+>
+> drivers/nvme/host/core.c   | 81 ++++++++++++++++++++++++++++++++++++++
+> drivers/nvme/host/nvme.h   |  4 ++
+> drivers/scsi/sd.c          |  7 ++--
+> fs/buffer.c                |  4 +-
+> fs/f2fs/f2fs.h             |  4 +-
+> fs/f2fs/segment.c          |  4 +-
+> fs/fcntl.c                 | 79 ++++++++++++++++++++++++++++++++++---
+> include/linux/blk-mq.h     |  2 +-
+> include/linux/blk_types.h  |  2 +-
+> include/linux/fs.h         |  2 +-
+> include/linux/nvme.h       | 19 +++++++++
+> include/linux/rw_hint.h    | 20 +++++++---
+> include/uapi/linux/fcntl.h | 14 +++++++
+> 13 files changed, 218 insertions(+), 24 deletions(-)
+>
+>-- 
+>2.25.1
+>
 
-Any thoughts where it could/should be added?
+Keith, Christoph, Martin
 
-I moved the bdev_* callback from bio_init to the below location and it
-seems to work also:
+Does this approach align with the offline conversation we had arund FMS?
+Comments on the list would help us move forward with this series.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3b4df8e5ac9e..d97a3a4252de 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2706,6 +2706,7 @@ static void __blk_mq_flush_plug_list(struct
-request_queue *q,
- {
-        if (blk_queue_quiesced(q))
-                return;
-+       bdev_update_cpu_latency_pm_qos(q->disk->part0);
-        q->mq_ops->queue_rqs(&plug->mq_list);
- }
-=20
+We would like to move the folks that are using off-tree patches for FDP
+to mainline support.
 
+Thanks,
+Javier
