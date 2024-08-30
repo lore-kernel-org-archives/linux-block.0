@@ -1,173 +1,218 @@
-Received: from HK2PR02CU002.outbound.protection.outlook.com (mail-eastasiaazon11010068.outbound.protection.outlook.com [52.101.128.68])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1E81531C3
-	for <linux-block@vger.kernel.org>; Fri, 30 Aug 2024 08:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.128.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725005964; cv=fail; b=BaD0pJ5PZiTrsBNhrpsYLQDAb0cKAxhsLlnkF1gQT+8iHpGXcxkTbHsmoz/j9FFhoYyiUTcoqmNziXsHplARtDqfTID1DJLPRTmXtTA8GUStv8pl3gEcbkq6KmHjXtQbtgNH3oRvLrH1Y9y2QqSJF5dLzJVQ5m1VEjcAODcvO14=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725005964; c=relaxed/simple;
-	bh=2BM6V3Re7VVbWERWNsJp3+pVooqoIfUswe/rSBVjxUg=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=piElveH/2yBqD93C95IgY9V9Db57f4clRD9BMXd/KBRGzB6/tS7NtEGQysEUZl63rqhAeRS61FG7JUUNjgX0jnWPIi39sIiX4CjpwrgcjhcMCSBBx3zrUrJpW8sFfnh8iKhvCMywGQAtHnzdiJ0/Q3cLPDAyEcJ291YShBLUcHU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oppo.com; spf=pass smtp.mailfrom=oppo.com; dkim=pass (1024-bit key) header.d=oppo.com header.i=@oppo.com header.b=DyKsr0Fe; arc=fail smtp.client-ip=52.101.128.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oppo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oppo.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B889F16E873
+	for <linux-block@vger.kernel.org>; Fri, 30 Aug 2024 08:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725007157; cv=none; b=pUjQpWUYoy/OqDFWA6XQo1Es11kngXEcPhHJmVjnPGCtQj0QnGk7gkj2j3cdzgck2sddILdYjlR+X0vebiWz28tUMlLG4RTswYEBUtMFXStKOJ47dg8nPgNJxIHh4n4uD5WSmKXOhujzijsleYje8dikfkJQFL7BunwR/dodARY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725007157; c=relaxed/simple;
+	bh=FzDebbn3A0SU+NwcQ/pyPp9+tHchP7XUmK6E90SNY+k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=ixSlOLhmVTGCk11al8TFRkGQvl/+G1I1r5gD3SYQHT7cRZg55ansk2kL6dpjh/E7ZxoxDmqS4cJPcMNZ2wnOGiUiZGrmN2V8INmUQUUwJ6PXOZZJbjaBd++HDrwU4wBunmMNt2wmj/UuqDANOWEdbLRnWvr6NIvsJe7m+75uEus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=R1CEZ9ym; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=oppo.com header.i=@oppo.com header.b="DyKsr0Fe"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LECj7XttqwuU6nITwg3pjMhpzV1NdXZIUT1Bg5527fSLy3ti712TU2zUmQPd+SyS6avuP2uMS9szRf3/rrzpu8kWL1x+BbBxBmMYNmRRuXC4mSemqmkvt9Xv/B2l7wJiQrYl6dlX7TfvlFh6xOUuET43jSWAtI8o+XnxSSLsRjPczFqXpsgFxD35hbztMwpau/yk1q6sQ9jucrFClHY4urWnW3sTq/5BbQa7dd1YrR2LmNio2+lElRK4ssc2gUzPjnIK6vC9uaN5ImTpDvFQnSYzXKwkVo2xYR2pahtR2vabDZZJa9AqD+VDTDFFB0IdARW8I98vvWLoaVnudqlOOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OmCRlCE15wEQQnA+xdePGI7BQ4SMimrsiDyyD+cF2bM=;
- b=IUp3sQbQPQB28DrDKQXJQl11nnzX1+mUOZDANMFJCo/+w6WxjSUl/gYE4HkgCqJGlGXCVgSc3c7D63Sfdhe4GeU+oslYygeXvlRh9LIny5ut4tpJCFhrRKpqV4QLGVMK7XBDin6QLKg1fuCIgAKNtJoyT+qtnzwPFi6pEDX3eFOOkGwtTK5+16DTXHma1ORwBtyczC47e2ksU3g7CloAoi35u8T82DWSPlWpCWM3+Ugkri7Oi1JFQMDu/AJJw1+kpUfWod3v10e2KPs57/wr0/ctz8qMHcaWCgUwkirziLP76ZUt3uv3Utrtu7CToVjLnDDXBHESeIrLWIDHZr6xkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oppo.com; dmarc=pass action=none header.from=oppo.com;
- dkim=pass header.d=oppo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oppo.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OmCRlCE15wEQQnA+xdePGI7BQ4SMimrsiDyyD+cF2bM=;
- b=DyKsr0Fe3D+RIXxsFacr8pAyEEAtkRBcke+yEj19BDJxr2RtblEy7JwDZRY+c+A8MeySn0kwCi/4ZvOwTHCkouV4AOMWarlCbQVJ1ePVPyKOclMPDrhomaTaU9x01PU5mkywxvhT21fUb1BHRzDWp0B1QvCxfMpl+RsNSVZtt/g=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oppo.com;
-Received: from PSAPR02MB4727.apcprd02.prod.outlook.com (2603:1096:301:90::7)
- by SEZPR02MB7037.apcprd02.prod.outlook.com (2603:1096:101:19b::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.20; Fri, 30 Aug
- 2024 08:19:18 +0000
-Received: from PSAPR02MB4727.apcprd02.prod.outlook.com
- ([fe80::a138:e48f:965e:36f9]) by PSAPR02MB4727.apcprd02.prod.outlook.com
- ([fe80::a138:e48f:965e:36f9%6]) with mapi id 15.20.7897.027; Fri, 30 Aug 2024
- 08:19:18 +0000
-From: Yongpeng Yang <yangyongpeng1@oppo.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Chao Yu <chao@kernel.org>,
-	Yongpeng Yang <yangyongpeng1@oppo.com>
-Subject: [PATCH] block: eliminate unnecessary flush requests for bio with flush&fua
-Date: Fri, 30 Aug 2024 16:18:54 +0800
-Message-Id: <20240830081854.487023-1-yangyongpeng1@oppo.com>
-X-Mailer: git-send-email 2.40.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR06CA0247.apcprd06.prod.outlook.com
- (2603:1096:4:ac::31) To PSAPR02MB4727.apcprd02.prod.outlook.com
- (2603:1096:301:90::7)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="R1CEZ9ym"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240830083906epoutp02ba2484fc6cc624d64c2fc39f87cca651~wdNw75A7M2607026070epoutp02b
+	for <linux-block@vger.kernel.org>; Fri, 30 Aug 2024 08:39:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240830083906epoutp02ba2484fc6cc624d64c2fc39f87cca651~wdNw75A7M2607026070epoutp02b
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1725007146;
+	bh=CbHVLyS+sezflNoPRRub2lX2SRyfNJdla8/W5sNyvw4=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=R1CEZ9ymMD/CHXhazZGdAsJYQJOzPUhciSDUZFamE4PuSp0njuE0eRW+o/7M56l1S
+	 3Cz+mTpjuVGDe4on9CRCko0rrTRSbKaH1je51HiwYHs088Ng/Ofcru1al6vBLHagpa
+	 LA7f6+2Cw6IMyYAW0SmvfXj0eCGc0gb6382zPA00=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240830083906epcas5p146378fef3c446ca5300eb635ab9a5b67~wdNwhiLLI1546615466epcas5p1s;
+	Fri, 30 Aug 2024 08:39:06 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.183]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4WwBQH2WnYz4x9Q1; Fri, 30 Aug
+	2024 08:39:03 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	30.F8.19863.52581D66; Fri, 30 Aug 2024 17:39:01 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240830080040epcas5p18bb4d0b9cf6896d806ea45db71814045~wcsNXvvSZ2687626876epcas5p1u;
+	Fri, 30 Aug 2024 08:00:40 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240830080040epsmtrp2683836a66f4a52bb042448e7ab34468f~wcsNW0nbZ0971409714epsmtrp2H;
+	Fri, 30 Aug 2024 08:00:40 +0000 (GMT)
+X-AuditID: b6c32a50-ef5fe70000004d97-27-66d18525dac1
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	3B.33.08964.82C71D66; Fri, 30 Aug 2024 17:00:40 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240830080037epsmtip271d1a17615917afc1391d6f1ffcf9ed7~wcsK6s_qz2504325043epsmtip2d;
+	Fri, 30 Aug 2024 08:00:37 +0000 (GMT)
+From: Kundan Kumar <kundan.kumar@samsung.com>
+To: axboe@kernel.dk, hch@lst.de, willy@infradead.org, kbusch@kernel.org
+Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	vishak.g@samsung.com, gost.dev@samsung.com, Kundan Kumar
+	<kundan.kumar@samsung.com>
+Subject: [PATCH v9 0/4] block: add larger order folio instead of pages
+Date: Fri, 30 Aug 2024 13:22:53 +0530
+Message-Id: <20240830075257.186834-1-kundan.kumar@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PSAPR02MB4727:EE_|SEZPR02MB7037:EE_
-X-MS-Office365-Filtering-Correlation-Id: fffb6a66-bef1-4c8c-5aac-08dcc8cc713b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|52116014|376014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?WsU/iV/Tei2lyY9swqKM259zacl6LLs8QvU5nf2Vm67mGjp+Q2DSPmncoCLv?=
- =?us-ascii?Q?YZ9jbJg+vNUo/UM2nCFp9Zi02rGYTa3hNUDF/eYfN1oAm7eZVS9uSyMDey15?=
- =?us-ascii?Q?I+nnX2Aer+ktoqpdT+g3fQkMh2rUYnac7z8ie+ZpOlravBszweOTLj97vRRp?=
- =?us-ascii?Q?+Iz6bCigPW8+aGsyAeNuXy2vrvnoOUbu6/8782XTrTyztvOXCiUH+FhAV9ho?=
- =?us-ascii?Q?mqnnFUjFyi0/LgOR2CfSsmLlJE4iIR1D2IHsPPMWKT3uZLS2IvHWt5HDyjy3?=
- =?us-ascii?Q?6BRCWB9fXs7+n/mKrORNGFjwaMB0DhjKTmXwTOODHWl5PKDB7QISoKspFNrP?=
- =?us-ascii?Q?kJCOXYi2EQCgbb5wBLd9pILZXkqV9+63/lWE7UWB7ZJWcqloQXv+aWB17toC?=
- =?us-ascii?Q?cCe4OwI+GM8iX4iRgNB1gF62JrRi3lBiHzP7UqEFZnWmF3BUt+aTWsUcblxp?=
- =?us-ascii?Q?+6fI0h5rzcVvJ1g/b2scp75lKGeFeTAyJN+a7CpLMZAxs0R+qK+JkZSz4ys5?=
- =?us-ascii?Q?VldBfMb2XgFPsBC17Zd5QXRbiwh2n6r6ozVtfX4YnToTMPeDpXy7CXOXReBz?=
- =?us-ascii?Q?Q3aJi1eNjyfWWbtgDmzy4G7Vn+I0fg3Dx130NgSFHz5FFVokD8DvbFwkUdx9?=
- =?us-ascii?Q?V37MPE7w9+TlRbv0JMxTkEga9a15Bmp5Y0aYdM7vYK9dWqTc8NScaG1eiPZc?=
- =?us-ascii?Q?kvhrpTIKqGZrHvgEPSPkFSMBYeDZCqcDCbQwbn6slhiDlUsyQAGyA5ugOzO0?=
- =?us-ascii?Q?9W5U4jwxvIQ8gFOQN03qGyB1pPq1ff3xYt0fCAfXeqJ1SsJQdaZ1wE6OHu5T?=
- =?us-ascii?Q?dtBLXmqJJDfKrPvNdVYCICJYVhckzfo5HBJZqeLYDreZPTI3srmC0YJeiZug?=
- =?us-ascii?Q?nsly1SZHFoxSj9wUNlf9rc33fzUyDurkx7XfgAB9+RIoTEMNugDI/ip1vyI2?=
- =?us-ascii?Q?ksZBr4Wd8h1jmhyK3bcQgRozuJKaFjiIa8hLBniXgBBq1HK++cFVMIgM06zD?=
- =?us-ascii?Q?JbmXLgeElNm3KpYD67Xyhdgz/DsFwFyqLfzhn5uiPBm1OKZzp8XOoa3VRMpt?=
- =?us-ascii?Q?K4i38mhHwJnMjxs+xMve5Vpp7b/tFZiYKy/AEjRe+QBLB/img91hZtsMhYot?=
- =?us-ascii?Q?AIK+22/+jds+en2Sih7gmbwbdChrffiyn/gzU0KJFpoxfZ0CUcTUTlhIWija?=
- =?us-ascii?Q?vNcCNaKqLGU6RhLVknskAYhHuYyk0/riam8qwWzuMj2zaXJ99RrxwhwzSj/T?=
- =?us-ascii?Q?vtJiPnjuudrueLzUXizW5cAigN1nv/Uk/n4qmdy6jXngk6b6Hq+onJ3mlXcu?=
- =?us-ascii?Q?8wT9hjq+nezMXNyD64pAgVJXspS9dDCR15iGO8v1B9cpbnETFzDtDoM2rOdq?=
- =?us-ascii?Q?zrYaEJ38TLibuQo+L5feomu04L/Un6MXcH67dU82fB6pKFA54A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR02MB4727.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1cVIyyQtqTadf3DHOPVqmHHRmJJIrujnzRacFi1vbn8QgEHCl6c+SDyvAPkP?=
- =?us-ascii?Q?Mg5VzkuqIDAbrHzOa7pxFZlRAoDu4vrPuP5fWQJVvdJv2Bnt9CTXLg9T03kH?=
- =?us-ascii?Q?MGHLTMeqXB//aOe8lCoCopvxH5RJrnPwVrOS08IkjskQIN4NiVYe+gd0xi4V?=
- =?us-ascii?Q?vjd0mqFS9MAB/3jiRF0zRZU8D5a3QTIignKCNQqhDXzY3wMj485Veb+vRHwF?=
- =?us-ascii?Q?MBa4VCqhx8S8sccKBrfmavCCUws2VlaU3FTPxb5FmqW+Q34hpChfU4yhXmsQ?=
- =?us-ascii?Q?mfo6HsbjsXj1rDxfTxck/q7Q3NMpANejvJvSz5EsvMa7MrtzHtjDkv+1ZBZT?=
- =?us-ascii?Q?dChUJl4CaDQm5Bhm2u9L99BQHMTMmNnvms8w/JOkVBKBdVcoTD3iQYyYS4TT?=
- =?us-ascii?Q?9BQKU2/2ncO7lE7zjLfZGUtjiCnuzLFPFnhQRESLlhFH2I0nFqR21fPUWe20?=
- =?us-ascii?Q?InGHYq4zy+rZam6uTjYlFNHWczY7T/huPsUs2AzDPI+E+F549DvPmi/yYhEe?=
- =?us-ascii?Q?HoQnfK3noeIfcJFapV1xyyllFN51+Z/5h0CBJ16lCaR9WLT0czS4PN40pqqE?=
- =?us-ascii?Q?Tyy/XYEgi/zgfpweXHzVbKUbABKwBI1A350oEiFMDt0QLzNtPK5hKtBvbnen?=
- =?us-ascii?Q?kt+GjX+DUMFhcosKDaNFSNsOYe2mbdNRDZBH84Pl9Pot5aqGuviPZX0UNCz/?=
- =?us-ascii?Q?t9tddHs+ZHhVQuG/4Pf9AE3MfIv0ByY4UeHptmZo0jOay2fQunjFPtqBm0Jb?=
- =?us-ascii?Q?fcOlb4gSbb9OXwvq0E2/y8WmEdnDL1NnCUMxC/ey1fBq+KjxAmA9Avl8+KKV?=
- =?us-ascii?Q?zvyA5TqePhe1BA7FGyiFd4wlZ8VEkpOBAnE989s29ixv4d8EwyaH7AVGHRnr?=
- =?us-ascii?Q?JgzK1HLVSPb1uOSftZAe5qrQwWInSno+MSTzh7mK2BA2dEYr08gKWGAA/yTV?=
- =?us-ascii?Q?bfJtbkcL84cdMpNOakbxbHVZy99rvdtkflag9aWl1kNh2FZAtJ3MXVd8DAC4?=
- =?us-ascii?Q?9UfLatKGFU99SVYFGezSg0P+gNsx//Yc6r2qwkf1yvJFe3sUUBqKf7bmsLQu?=
- =?us-ascii?Q?7uUAVXhTr3/U7CJYjN+WyryS3cEr4zHRyLr+RTb3VeQgjDfeQsz5NI5UUefq?=
- =?us-ascii?Q?DugBxz1tCr5HoKZ7W9z3TBExf55ktj8D00sMOKyWvY7zYNoxf9Khx+ikCHQz?=
- =?us-ascii?Q?O3VGMGUkOg/+eijnqtRkxgMIe/4p7T5uFTzefHCcgqOFzpEokdShCLSYvhGb?=
- =?us-ascii?Q?lQFhLBasSdlUaLBsEU44qQ7HEpDiJHkuCfB7WtcwVnNvjDcbxn2MJA+6DoV+?=
- =?us-ascii?Q?zIQtmrZFRqbWqC19O6w1WNXkJuV9bElgmYzIofzEHfUSEdFYt4UHYK0EtLfY?=
- =?us-ascii?Q?8FEqNWfVqxZUVc/mDqjpOcy2lezF3dHWsUTF8/pPMihAIXMlZFMMjevupMoE?=
- =?us-ascii?Q?awWudJzPUkRgfNB+6afQxFHfRDkCIemM6hld8Nr5kMNeaCdz/XmY3LqOKCPY?=
- =?us-ascii?Q?khgANLWGUEp4NuGVEw9ghk042Y9lht/FsbqKvRN4qvW5wWkU7LAVcgVZmDk6?=
- =?us-ascii?Q?jKswTTxl4Qj8kI/Yj5I0UHgkLCacV+Ms8wAoHqD7ya8UdFxWT4qXfLO4/TXW?=
- =?us-ascii?Q?/w=3D=3D?=
-X-OriginatorOrg: oppo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fffb6a66-bef1-4c8c-5aac-08dcc8cc713b
-X-MS-Exchange-CrossTenant-AuthSource: PSAPR02MB4727.apcprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2024 08:19:18.0625
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f1905eb1-c353-41c5-9516-62b4a54b5ee6
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: luhRJbaOW89iK314auXWexsmnDNGoJtz/hxe2L5RPPEugVFTXy8oHYgYbbLqxbMiSNbyQAV7+N/snKaw8wZqtQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR02MB7037
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEJsWRmVeSWpSXmKPExsWy7bCmpq5q68U0g1//pSyaJvxltlh9t5/N
+	4vv2PhaLmwd2MlmsXH2UyeLo/7dsFpMOXWO02PrlK6vF3lvaFjcmPGW02PZ7PrPF+Vlz2C1+
+	/5jD5sDrsXmFlsfls6Uem1Z1snnsvtnA5tG3ZRWjx+dNcgFsUdk2GamJKalFCql5yfkpmXnp
+	tkrewfHO8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6ZOUBnKimUJeaUAoUCEouLlfTtbIryS0tS
+	FTLyi0tslVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM9bPdymYo1jR+LiggfGIVBcj
+	J4eEgIlEV8McZhBbSGAPo8T3g75djFxA9idGiSdHn7BAON8YJTY33GWH6ejeMIUVIrGXUWLC
+	vj3MEM5nRom9DZMZuxg5ONgEdCV+NIWCNIgIuEtMffmIEaSGWeApo8SVLz9ZQRLCAm4Sm491
+	gU1lEVCVeHO4ESzOK2An8aJrOhPENnmJmZe+s0PEBSVOzgQ5iRNokLxE89bZYIslBP6ySyzY
+	PoMNosFFYsmH5SwQtrDEq+NboM6Wkvj8bi9UTbbEocYNUAtKJHYeaYCqsZdoPdXPDPIAs4Cm
+	xPpd+hBhWYmpp9YxQezlk+j9/QSqlVdixzwYW01izrupUGtlJBZemgEV95DoOQhhCwnESjTd
+	/8s8gVF+FpJ3ZiF5ZxbC5gWMzKsYpVILinPTU5NNCwx181LL4fGanJ+7iRGcWLUCdjCu3vBX
+	7xAjEwfjIUYJDmYlEd4Tx8+mCfGmJFZWpRblxxeV5qQWH2I0BQbyRGYp0eR8YGrPK4k3NLE0
+	MDEzMzOxNDYzVBLnfd06N0VIID2xJDU7NbUgtQimj4mDU6qBKUW8K21ihWhJvukx8QcTDvY9
+	LeqqUNrw99+lXT9vHt/sm3s8RVFj4vfX8RFtv678OsOxgLFtYjcLK/eUjT4/TN27G891dcY0
+	zRcMkns8q6i7zfRI1YlJiz0+NS61KRf6LXd78aP7ZzkW8+1LW/hB9qm5iZ7m8Rz+JalbhLYf
+	+brgE+ckJv36Gfait3c8KeOW5QldevbL/r9xnBIHbba13f+cuOULi0hq6U2X8pOcl7wsQ/NX
+	CK75lrHo0JZjdzuf/CtavH79uXebpmnfvltxJODsjBPiLGsf1Bx/eupNb4n0dI1m503V4dq3
+	BCcc3PE8/76tj36uw9TVf4S+JLR1TW5esditkbdvz9rCg0+iF/ApsRRnJBpqMRcVJwIActCb
+	yzUEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNLMWRmVeSWpSXmKPExsWy7bCSvK5GzcU0g4c3ZSyaJvxltlh9t5/N
+	4vv2PhaLmwd2MlmsXH2UyeLo/7dsFpMOXWO02PrlK6vF3lvaFjcmPGW02PZ7PrPF+Vlz2C1+
+	/5jD5sDrsXmFlsfls6Uem1Z1snnsvtnA5tG3ZRWjx+dNcgFsUVw2Kak5mWWpRfp2CVwZ6+e7
+	FMxRrGh8XNDAeESqi5GTQ0LARKJ7wxTWLkYuDiGB3YwS8980skMkZCR2393JCmELS6z89xws
+	LiTwkVFi/2ezLkYODjYBXYkfTaEgYREBX4kFG54zgtjMAu8ZJW4vkQaxhQXcJDYf6wJrZRFQ
+	lXhzuBFsJK+AncSLrulMEOPlJWZe+s4OEReUODnzCQvEHHmJ5q2zmScw8s1CkpqFJLWAkWkV
+	o2RqQXFuem6xYYFhXmq5XnFibnFpXrpecn7uJkZweGtp7mDcvuqD3iFGJg7GQ4wSHMxKIrwn
+	jp9NE+JNSaysSi3Kjy8qzUktPsQozcGiJM4r/qI3RUggPbEkNTs1tSC1CCbLxMEp1cA0rXP2
+	G2vBGQXtGbk7Iiec45V+afbAWXNz4KUyyYu2i5+9yni67oi4bJjjlWUlp/kifygHSwYGZCTs
+	VVkhziX9/9zzdR6Ncg2/nSTurXy4Zpp9yIXPsixSnwOMXf+ZfN9ivd/sITtLD0dw7JNih/lG
+	8vKTXRM4/FsOzNNVTVSMEX9y6OS8jgfb2A17OaYof9zhqFyv/FHw9rzQTmenndoLAoqkyx7u
+	+vXOZfmi+AeR8/bK71/mffz+5b2HHkWo1+RnMkgtl9K7dfvzwqD5k3b3i4iqcLa31n1yteLV
+	SFm4buJSx5UGK993p286nDz7f8yL7eu/rFxgfzonwMuws15vn9Lv0x2T1zWyHzBkjPqjxFKc
+	kWioxVxUnAgAgywlk94CAAA=
+X-CMS-MailID: 20240830080040epcas5p18bb4d0b9cf6896d806ea45db71814045
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240830080040epcas5p18bb4d0b9cf6896d806ea45db71814045
+References: <CGME20240830080040epcas5p18bb4d0b9cf6896d806ea45db71814045@epcas5p1.samsung.com>
 
-The write bio is configured as follows:
-	bio->bi_iter.bi_size = 4096,
-	bio->bi_opf |= (REQ_SYNC | REQ_PREFLUSH | REQ_FUA),
-	bio->bi_bdev: dm-0(dm-linear) with 1 slave device /dev/sda.
-submit_bio(bio), device-mapper will:
-	Step 1. submit empty bio with (REQ_SYNC | REQ_PREFLUSH
-		| REQ_FUA) flag to /dev/sda.
-	Step 2. submit bio with (REQ_SYNC | REQ_FUA) flag to
-		/dev/sda.
-The blk_insert_flush function will trigger sending a flush request
-to /dev/sda twice if the request queue does not support FUA. The
-second flush request is unnecessary.
+User space memory is mapped in kernel in form of pages array. These pages
+are iterated and added to BIO. In process, pages are also checked for
+contiguity and merged.
 
-Signed-off-by: Yongpeng Yang <yangyongpeng1@oppo.com>
----
- block/blk-flush.c | 3 +++
- 1 file changed, 3 insertions(+)
+When mTHP is enabled the pages generally belong to larger order folio. This
+patch series enables adding large folio to bio. It fetches folio for
+page in the page array. The page might start from an offset in the folio
+which could be multiples of PAGE_SIZE. Subsequent pages in page array
+might belong to same folio. Using the length of folio, folio_offset and
+remaining size, determine length in folio which can be added to the bio.
+Check if pages are contiguous and belong to same folio. If yes then skip
+further processing for the contiguous pages.
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index a72e2a83d075..606a6a5ae089 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -445,6 +445,9 @@ bool blk_insert_flush(struct request *rq)
- 		fq->flush_data_in_flight++;
- 		spin_unlock_irq(&fq->mq_flush_lock);
- 		return false;
-+	case REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH:
-+		policy &= ~REQ_FSEQ_POSTFLUSH;
-+		fallthrough;
- 	default:
- 		/*
- 		 * Mark the request as part of a flush sequence and submit it
+This complete scheme reduces the overhead of iterating through pages.
+
+perf diff before and after this change(with mTHP enabled):
+
+Perf diff for write I/O with 128K block size:
+    4.29%     -2.51%  [kernel.kallsyms]     [k] bio_iov_iter_get_pages
+    1.99%             [kernel.kallsyms]     [k] bvec_try_merge_page
+Perf diff for read I/O with 128K block size:
+    4.99%     -2.90%  [kernel.kallsyms]     [k] bio_iov_iter_get_pages
+    2.31%             [kernel.kallsyms]     [k] bvec_try_merge_page
+
+Without mTHP, these patches when tested with Large block sizes(LBS),
+provided WAF and alignment benefits.
+
+Patch 1: Adds folio-ized version of bio_add_hw_page()
+Patch 2: Adds bigger size from folio to BIO
+Patch 3: Adds mm function to release n pages of folio
+Patch 4: Unpin user pages belonging to folio at once using the mm
+function
+
+Changes since v8:
+- moved i+=num_pages to beginning of loop
+- reversed the wrapper and made bio_add_hw_folio() a wrapper around
+  bio_add_hw_page()
+- removed bvec_try_merge_hw_folio() change from this series
+- explained removal of BIO_PAGE_PINNED check in commit description
+- removed function bio_release_folio() and calling unpin_user_folio()
+  function directly
+- corrected same_page logic to accept bigger folio offset
+
+Changes since v7:
+- changed folio-lise to folio-ize
+- corrected order with wrapper definition after the guts
+- removed check for BIO_PAGE_PINNED
+- separated mm related implementation in different patch
+- corrected issue found by kernel robot
+
+Changes since v6:
+- folio-lize bvec_try_merge_hw_page() to bvec_try_merge_hw_folio()
+- restructured the code as per comments
+- typecast with size_t while calculating the offset in folio.
+
+Changes since v5:
+- Made offset and len as size_t in function bio_add_hw_folio()
+- Avoid unpinning skipped pages at submission, rather unpin all pages at
+  once on IO completion
+
+Changes since v4:
+- folio-lize bio_add_hw_page() to bio_add_hw_folio()
+- make bio_add_hw_page() as a wrapper around bio_add_hw_folio()
+- make new functions bio_release_folio() and unpin_user_folio()
+- made a helper function to check for contiguous pages of folio
+- changed &folio->page to folio_page(folio, 0)
+- reworded comments
+
+Changes since v3:
+- Added change to see if pages are contiguous and belong to same folio.
+  If not then avoid skipping of pages.(Suggested by Matthew Wilcox)
+
+Changes since v2:
+- Made separate patches
+- Corrected code as per kernel coding style
+- Removed size_folio variable
+
+Changes since v1:
+- Changed functions bio_iov_add_page() and bio_iov_add_zone_append_page()
+  to accept a folio
+- Removed branch and calculate folio_offset and len in same fashion for
+  both 0 order and larger folios
+- Added change in NVMe driver to use nvme_setup_prp_simple() by
+  ignoring multiples of PAGE_SIZE in offset
+- Added a change to unpin_user_pages which were added as folios. Also
+  stopped the unpin of pages one by one from __bio_release_pages()
+  (Suggested by Keith)
+
+Kundan Kumar (4):
+  block: Added folio-ized version of bio_add_hw_page()
+  block: introduce folio awareness and add a bigger size from folio
+  mm: release number of pages of a folio
+  block: unpin user pages belonging to a folio at once
+
+ block/bio.c        | 108 +++++++++++++++++++++++++++++++++++----------
+ block/blk.h        |   4 ++
+ include/linux/mm.h |   1 +
+ mm/gup.c           |  13 ++++++
+ 4 files changed, 103 insertions(+), 23 deletions(-)
+
 -- 
-2.40.1
+2.25.1
 
