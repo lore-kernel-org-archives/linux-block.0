@@ -1,96 +1,121 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103DC193;
-	Sat, 31 Aug 2024 09:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C630441A92;
+	Sat, 31 Aug 2024 18:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725097747; cv=none; b=HYy+9KDOcSiaB1MLb86FUAUw5neHkR3EI5toEQI/VkMrGrhIuieoUTbVkaJJhQHefn8ABY+/HAhgijsHY0tBzKAT9AYuNgAj0/mPhQwTbIHnffNAQ4OoPh6l5FxDrUC8M+ISJuKx4jPNO/KDLgJ+dwKVrDgwAX9TI6zZx8Pbgjc=
+	t=1725130339; cv=none; b=Yy5xlaqLeyD43YxdaiXKGgDxl62rlUpAXj7HW5/2vXjdE15ujH4n+SYMUC0Si61KjVhrHBkWaKeg3uhRey+EAqAs7bBmy8ngWNz8od4skVl7gXolO5aDJaqIhOHHSX538nPPuCtlnnHllAVqsuPFWRNSXHnRsVxpzll/pHEd6AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725097747; c=relaxed/simple;
-	bh=6sUFkB0Ok0x06XvwFC30pbHHuqpTWoIbsyF3CR8TNjA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=LD8+udpoMuBgfeFErdIBMS/JqOcpu+vGF7DlqSsIleK2b5NtalHRqi5EVrom5HvYcixZnLZ3P1dkMUR/j9Ru2Gtlqr8bQmFT2iVXz1NolU5YH56ka6QyGoSlYlllWLdIL9EoQpfHrnSMM9iXTH2M0JXddrefmCAM0EXPyJlM/z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WwqwM4BG7z4f3jkJ;
-	Sat, 31 Aug 2024 17:48:51 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id A88F61A058E;
-	Sat, 31 Aug 2024 17:49:01 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgAHL4UJ59JmmU_mDA--.25745S3;
-	Sat, 31 Aug 2024 17:48:59 +0800 (CST)
-Subject: Re: [PATCH] buffer: Associate the meta bio with blkg from buffer page
-To: Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Haifeng Xu <haifeng.xu@shopee.com>, viro@zeniv.linux.org.uk,
- brauner@kernel.org, jack@suse.cz, tytso@mit.edu, yi.zhang@huaweicloud.com,
- linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240828033224.146584-1-haifeng.xu@shopee.com>
- <ZtIfgc1CcG9XOu0-@slm.duckdns.org>
- <9cae20f9-aa6a-77da-8978-b4cfb7b0cb73@huaweicloud.com>
- <ZtLOUuoxnobhYgrm@slm.duckdns.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5c6c1aa7-eae9-fe0f-aaf4-626a5f273234@huaweicloud.com>
-Date: Sat, 31 Aug 2024 17:48:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1725130339; c=relaxed/simple;
+	bh=oZcXvUXXckXFe3Fulh/2isJwgVUVzsEf2bKp94fUVrQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Oynz9c6Wn8HdW0D/P4SzM9rfpPAnCyv+dDUyODchyIP+Jc4ROSINdnXVYDPyGl310q/65yV8kHXYsnXRop3jYIJ7d+wXPkisegXjVmh4MX6+uNGWkpj8Nb2IcWyZ+jtFE+oH8RsVzkAVcYq96kqJQsRp8wL1gdAv0YJyurCdrPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FjFDsbZy; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FjFDsbZy"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c09fd20eddso2969284a12.3;
+        Sat, 31 Aug 2024 11:52:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725130336; x=1725735136; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oY9lQXO2YJxWYzwah9ZcohmjD5W5SmMFOyh2JPrD/aI=;
+        b=FjFDsbZy8ihTWyEZrycprNiFzQs9Z13/JYTS8P5zaEbJ1N7tl9hrDsuSFNaHdLWqnn
+         GA7ECij4mBt4/Wb6wDCLldERthqmn2wdde5AEEMo/b7IFIJzxF6T///cv3qcm0QwKIBf
+         mHc+aEPFKGZTFdRLZF0pnTBI3s/zaMYcXRsGACKUZpEaqtIcoLYqY9PqdSbQf2VQQupm
+         1Z6x1sM4NDXpvKwKM4IMcGiJMZFhqB14kbwff8XAN4r3NjPMeGpT7zu9+LRWiWwz4AfO
+         OOHweV6OW6aDruuwLviRUWkO112nkXovz7gDbACCgfKrhhSg0Y7uMimySIAbQzdzotaP
+         C4pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725130336; x=1725735136;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oY9lQXO2YJxWYzwah9ZcohmjD5W5SmMFOyh2JPrD/aI=;
+        b=rH6MyZmROS/WnDvw+2cmSZMUQ2RySVDIU1jXpMhTGtkCdTzJCQXKXP05ZSHXoOvXpx
+         kiGhD4ErJZv249DenUtPESDtzGZI4iQjPS5C/ae8LfwtYBHh78iQr/dS9BZnv4+cnLCf
+         MsyaWsdn0G/8MA0B0vwz630Yrt0GeXYUBaQ8HTvwixFwL9n6r14LMtytifQyTzm788d1
+         TKm2HdqiQTvAWJhfwMYVVeigsEOv5+G4hm74Tfg7LYPPQS7EiuYO855FpA+3TdySMgHY
+         Bv4l461747pwCuBgVJg1ivCKg+UZiNRIlzEGSoJOLod+6Xn3j2Du+Xa12U3j3sFu/Sxk
+         3N3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUlA6FIulpZClE9AhyK6CeqjaZ0I4uUz84aUqlZOUILj1DxORmAKpFh8SAAVKNcsjkQxOa53WlJYqAVAQ19qS8=@vger.kernel.org, AJvYcCV9YshS+0Tr+ZU1Edfd3zr0qsm7UBBgqi5JtUDtAgnfQJZy2aoMLERgKpLsV+9eFNkksoP/h3uUCvWXaw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/Q8WHCtPlMwQESKZyoElehX3eKAM66JqmnxHM26UcTpPxiPIT
+	vf0D/LN+OVOAfj/4YyUmjgr7eVwu4PBesNg8ywP85zhguZ5t6YQvs4yKOJwUgn95lFW/4mn6iwL
+	p1jMaCUQtyGPmRI/1PeczcH+row==
+X-Google-Smtp-Source: AGHT+IGpRClRk4den7Saed+QN9LkG/nihHd6RHD1rD6FH9ArtieggtwhNJHFa+yWTkq/LH2hMyaRFit3baDrj5xDSjE=
+X-Received: by 2002:a05:6402:234f:b0:5a1:1b3f:fbf5 with SMTP id
+ 4fb4d7f45d1cf-5c21ed3e07cmr7855333a12.12.1725130335600; Sat, 31 Aug 2024
+ 11:52:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZtLOUuoxnobhYgrm@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHL4UJ59JmmU_mDA--.25745S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrWw1fXF4fJF4DCr4fWr13twb_yoWxXFg_u3
-	9Ivr17Gw4UZan3uFs8tF18JFZ7GF4UuayIq3yjqr97Ww1fZr1UGFZ5G34xA3Z5AFZ7AF9x
-	GF1DZw15JrWUGjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbfAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Date: Sat, 31 Aug 2024 21:52:04 +0300
+Message-ID: <CACVxJT-Hj6jdE0vwNrfGpKs73+ScTyxxxL8w_VXfoLAx79mr8w@mail.gmail.com>
+Subject: [PATCH] block, rust: simplify validate_block_size() function
+To: Jens Axboe <axboe@kernel.dk>, Andreas Hindborg <a.hindborg@samsung.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Using range and contains() method is just fancy shmancy way of writing
+two comparisons which IMO is less readable.
 
-ÔÚ 2024/08/31 16:03, Tejun Heo Ð´µÀ:
-> Hello,
-> 
-> On Sat, Aug 31, 2024 at 02:11:08PM +0800, Yu Kuai wrote:
-> ...
->>> I think the right way to do it is marking the bio with REQ_META and
->>> implement forced charging in blk-throtl similar to blk-iocost.
->>
->> This is the exact thing I did in the code I attached in the other
->> thread, do you take a look?
->>
->> https://lore.kernel.org/all/97fc38e6-a226-5e22-efc2-4405beb6d75b@huaweicloud.com/
-> 
-> Sorry about missing it but yeah that *looks* like the right direction to be
-> headed. Would you mind testing it and turning it into a proper patch?
+Using range doesn't prevent any bugs because "=" in range can forgotten
+just as easily in "<=" operator.
 
-Of course.
+Also delete few comments of "increment i by 1" variety.
 
-Thanks!
-Kuai
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
 
-> 
-> Thanks.
-> 
+ rust/kernel/block/mq/gen_disk.rs |   14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -43,21 +43,16 @@ pub fn rotational(mut self, rotational: bool) -> Self {
+         self
+     }
+
+-    /// Validate block size by verifying that it is between 512 and
+`PAGE_SIZE`,
+-    /// and that it is a power of two.
+     fn validate_block_size(size: u32) -> Result<()> {
+-        if !(512..=bindings::PAGE_SIZE as u32).contains(&size) ||
+!size.is_power_of_two() {
+-            Err(error::code::EINVAL)
+-        } else {
++        if 512 <= size && size <= bindings::PAGE_SIZE as u32 &&
+size.is_power_of_two() {
+             Ok(())
++        } else {
++            Err(error::code::EINVAL)
+         }
+     }
+
+     /// Set the logical block size of the device to be built.
+     ///
+-    /// This method will check that block size is a power of two and
+between 512
+-    /// and 4096. If not, an error is returned and the block size is not set.
+-    ///
+     /// This is the smallest unit the storage device can address. It is
+     /// typically 4096 bytes.
+     pub fn logical_block_size(mut self, block_size: u32) -> Result<Self> {
+@@ -68,9 +63,6 @@ pub fn logical_block_size(mut self, block_size: u32)
+-> Result<Self> {
+
+     /// Set the physical block size of the device to be built.
+     ///
+-    /// This method will check that block size is a power of two and
+between 512
+-    /// and 4096. If not, an error is returned and the block size is not set.
+-    ///
+     /// This is the smallest unit a physical storage device can write
+     /// atomically. It is usually the same as the logical block size but may be
+     /// bigger. One example is SATA drives with 4096 byte physical block size
