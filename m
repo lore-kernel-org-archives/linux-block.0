@@ -1,175 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB92114AD38;
-	Fri, 30 Aug 2024 23:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12CE2E630
+	for <linux-block@vger.kernel.org>; Sat, 31 Aug 2024 04:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725062183; cv=none; b=mMJFeTT7H9djF2nqUDWeLRYQFf8a25Re7X2trenC2ENYs+QYv6uhXIpXjrB/V5i50NeZnMFJjVgpbTGMZ3qfrmKrSvTXGstHznJcMk4rcxdsXsVTannW5Yl6moJ9Si6vyhjytPrAxOPJe0Qa7ZKaMJnC3tJ8HVQ02+9FFcagL6U=
+	t=1725077510; cv=none; b=XAwHiFFB2lDn5z6YplBmywVR3EM3URHU8PQ+bsLqzKahR32c4menKA1DKF03dRscYEKgkEBQ7XSqUMuTxUhAtgRAD52p61EBWfdt5S6Zvoua0FY9QiPqG7lGrvSPRl63DPcjT7MUHVosOtIQsMUPL+El9KZfREHmMMMgq5IGXlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725062183; c=relaxed/simple;
-	bh=pbFRQTG3rbv8AkxuMR0tvTGJyrk4wg2skLcT7z9reuU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dxaGzNCZKC2j8U/q4gd4goTuxrNCVF+TwOx0JsxZIVsVkhSVzfjmJSqoux1PWCKU6PqP9KP83QUtSByQgK5bOzyoU72/G90eZ4nyp9tWmdvcPcRWMJFVf/TB0H0Dh8mUZLlGo1Fp/UtvKxpGurOXRbuWXgB010kXL4srhmfMJC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CNxqSu4R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725077510; c=relaxed/simple;
+	bh=i0DkENfCUD8O/aTlhCIMwQl1h1XxgWqsixMTi2S1Dw4=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=mCt7Cf6EjmbtPuDlk2dTBpsHz/6n+Eog29YDLsWKAYUckXvo7+vwc1tcRAcmR2widJY3PL2gqrGvsDgqZW7D60iU0DHAXlxCjZ3eggXODyy+Tv2HHDBxJ2PGqCQWe5IbGhGb18mQNj9urDSHfXXzfYDDJ5ceoegoat70860fBFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tFx+zeD+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNxqSu4R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 649E4C4CEC2;
-	Fri, 30 Aug 2024 23:56:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tFx+zeD+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFF97C4CEC0;
+	Sat, 31 Aug 2024 04:11:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725062182;
-	bh=pbFRQTG3rbv8AkxuMR0tvTGJyrk4wg2skLcT7z9reuU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CNxqSu4R2RXwfm3i1v+v0kcHeNf2XDM39kZJuuYNTOFXW5TNbH1tlB56L288jy9e/
-	 4J323pD8XvKLSsepz7ImyShHz08EM6SOzXu3avEMeV/vaFDgJ5akE2UZErUrG+TzZN
-	 DTgt7XFgixSvvf9coIcf/sZujl6WZI7nUy/P+hw0tOP3fRob/aDXqyA/d4cE4MPb4i
-	 F2MI5hVzFNAYCeG4G1r/3y9+LHWTVTfLJT0gP0qqUGM7ecc8lo+W9rrvpB42vLMHRB
-	 g2sLQ80L0/+aUD7iF4RrhMhJax8r4faYX2e5oTPTpu1CA6u+VJjOLCyPVMZAQTMPwE
-	 WZCGWWRZpChiw==
-Date: Fri, 30 Aug 2024 16:56:21 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, brauner@kernel.org, viro@zeniv.linux.org.uk,
-	jack@suse.cz, chandan.babu@oracle.com, dchinner@redhat.com,
-	hch@lst.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, hare@suse.de,
-	martin.petersen@oracle.com, catherine.hoang@oracle.com,
-	kbusch@kernel.org
-Subject: Re: [PATCH v5 3/7] fs: iomap: Atomic write support
-Message-ID: <20240830235621.GS6216@frogsfrogsfrogs>
-References: <20240817094800.776408-1-john.g.garry@oracle.com>
- <20240817094800.776408-4-john.g.garry@oracle.com>
- <20240821165803.GI865349@frogsfrogsfrogs>
- <a91557d2-95d4-4e73-9936-72fc1fbe100f@oracle.com>
- <20240822203058.GR865349@frogsfrogsfrogs>
- <112ec3a6-48b3-4596-9c20-e23288581ffd@oracle.com>
+	s=k20201202; t=1725077509;
+	bh=i0DkENfCUD8O/aTlhCIMwQl1h1XxgWqsixMTi2S1Dw4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=tFx+zeD+vT3kityYxPSYMmXt9ZHInZxIYg9OUbaCdkBaY2pitrR7E3Y7kMk4xm14z
+	 i+MDNbXtQqFEFt3iV5PiEnSQADkMnQWCyBKHZ5jcm92jg6YKH+BQKb6rDwUtJJ0QOF
+	 sMV9D+hOLetESe2SYw4y+kmAiOKiTv72Xk/eVprpTRlR0bFyUswYq30Vw4Vat/bl+u
+	 D0si3IJuHcQwBIsZup/p3rfcddJlK0ci7+jg/Rm2VNzqV+vaLuI6dIXjKGEI7O7zZM
+	 t7HWo/NA1WZRKXUM2g8BK3noPG/Xb3/IXBU4bnR3oSWFYhAM9hG92ZnBXUYYWI5mNJ
+	 5xpZfG/rceAbA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71AE83809A80;
+	Sat, 31 Aug 2024 04:11:51 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fix for 6.11-rc6
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <8b25d5f6-6235-44d0-843e-e954729a105b@kernel.dk>
+References: <8b25d5f6-6235-44d0-843e-e954729a105b@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <8b25d5f6-6235-44d0-843e-e954729a105b@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.11-20240830
+X-PR-Tracked-Commit-Id: e33a97a830b230b79a98dbbb4121d4741a2be619
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 216d163165a937ee9c1d0e9c26fe7a6f7d27ac4c
+Message-Id: <172507751002.2790816.3639216203064050834.pr-tracker-bot@kernel.org>
+Date: Sat, 31 Aug 2024 04:11:50 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <112ec3a6-48b3-4596-9c20-e23288581ffd@oracle.com>
 
-On Fri, Aug 30, 2024 at 04:48:36PM +0100, John Garry wrote:
-> On 22/08/2024 21:30, Darrick J. Wong wrote:
-> > > Then, the iomap->type/flag is either IOMAP_UNWRITTEN/IOMAP_F_DIRTY or
-> > > IOMAP_MAPPED/IOMAP_F_DIRTY per iter. So the type is not consistent. However
-> > > we will set IOMAP_DIO_UNWRITTEN in dio->flags, so call xfs_dio_write_endio()
-> > > -> xfs_iomap_write_unwritten() for the complete FSB range.
-> > > 
-> > > Do you see a problem with this?
-> 
-> Sorry again for the slow response.
-> 
-> > > 
-> > > Please see this also for some more background:
-> > > https://urldefense.com/v3/__https://lore.kernel.org/linux-
-> > > xfs/20240726171358.GA27612@lst.de/__;!!ACWV5N9M2RV99hQ! P5jeP96F8wAtRAblbm8NvRo8nlpil03vA26UMMX8qrYa4IzKecAAk7x1l1M45bBshC3Czxn1CkDXypNSAg$
-> > Yes -- if you have a mix of written and unwritten blocks for the same
-> > chunk of physical space:
-> > 
-> > 0      7
-> > WUWUWUWU
-> > 
-> > the directio ioend function will start four separate transactions to
-> > convert blocks 1, 3, 5, and 7 to written status.  If the system crashes
-> > midway through, they will see this afterwards:
-> > 
-> > WWWWW0W0
-> > 
-> > IOWs, although the*disk write* was completed successfully, the mapping
-> > updates were torn, and the user program sees a torn write.
-> > > The most performant/painful way to fix this would be to make the whole
-> > ioend completion a logged operation so that we could commit to updating
-> > all the unwritten mappings and restart it after a crash.
-> 
-> could we make it logged for those special cases which we are interested in
-> only?
+The pull request you sent on Fri, 30 Aug 2024 14:33:11 -0600:
 
-Yes, though this is the long route -- you get to define a new ondisk log
-item, build all the incore structures to process them, and then define a
-new high level operation that uses the state encoded in that new log
-item to run all the ioend completion transactions within that framework.
-Also you get to add a new log incompat feature bit for this.
+> git://git.kernel.dk/linux.git tags/block-6.11-20240830
 
-Perhaps we should analyze the cost of writing and QA'ing all that vs.
-the amount of time saved in the handling of this corner case using one
-of the less exciting options.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/216d163165a937ee9c1d0e9c26fe7a6f7d27ac4c
 
-> > The least performant of course is to write zeroes at allocation time,
-> > like we do for fsdax.
-> 
-> That idea was already proposed:
-> https://lore.kernel.org/linux-xfs/ZcGIPlNCkL6EDx3Z@dread.disaster.area/
+Thank you!
 
-Yes, I'm aware.
-
-> > A possible middle ground would be to detect IOMAP_ATOMIC in the
-> > ->iomap_begin method, notice that there are mixed mappings under the
-> > proposed untorn IO, and pre-convert the unwritten blocks by writing
-> > zeroes to disk and updating the mappings
-> 
-> Won't that have the same issue as using XFS_BMAPI_ZERO, above i.e. zeroing
-> during allocation?
-
-Only if you set the forcealign size to > 1fsb and fail to write new
-file data in forcealign units, even for non-untorn writes.  If all
-writes to the file are aligned to the forcealign size then there's only
-one extent conversion to be done, and that cannot be torn.
-
-> > before handing the one single
-> > mapping back to iomap_dio_rw to stage the untorn writes bio.  At least
-> > you'd only be suffering that penalty for the (probable) corner case of
-> > someone creating mixed mappings.
-> 
-> BTW, one issue I have with the sub-extent(or -alloc unit) zeroing from v4
-> series is how the unwritten conversion has changed, like:
-> 
-> xfs_iomap_write_unwritten()
-> {
-> 	unsigned int rounding;
-> 
-> 	/* when converting anything unwritten, we must be spanning an alloc unit,
-> so round up/down */
-> 	if (rounding > 1) {
-> 		offset_fsb = rounddown(rounding);
-> 		count_fsb = roundup(rounding);
-> 	}
-> 
-> 	...
-> 	do {
-> 		xfs_bmapi_write();
-> 		...
-> 		xfs_trans_commit();
-> 	} while ();
-> }
-> 
-> I'm not too happy with it and it seems a bit of a bodge, as I would rather
-> we report the complete size written (user data and zeroes); then
-> xfs_iomap_write_unwritten() would do proper individual block conversion.
-> However, we do something similar for zeroing for sub-FSB writes. I am not
-> sure if that is the same thing really, as we only round up to FSB size.
-> Opinion?
-
-xfs_iomap_write_unwritten is in the ioend path; that's not what I was
-talking about.
-
-I'm talking about a separate change to the xfs_direct_write_iomap_begin
-function that would detect the case where the bmapi_read returns an
-@imap that doesn't span the whole forcealign region, then repeatedly
-calls bmapi_write(BMAPI_ZERO | BMAPI_CONVERT) on any unwritten mappings
-within that file range until the original bmapi_read would return a
-single written mapping.
-
---D
-
-> 
-> Thanks,
-> John
-> 
-> 
-> 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
