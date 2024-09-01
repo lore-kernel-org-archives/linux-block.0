@@ -1,169 +1,269 @@
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B8C180A76
-	for <linux-block@vger.kernel.org>; Sun,  1 Sep 2024 14:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9C82C190
+	for <linux-block@vger.kernel.org>; Sun,  1 Sep 2024 17:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725199769; cv=none; b=QobFfZGrLK6Sv+grRY2ctdNbMCmavtNlDCUWkGZ1A/0YITKnag6w9SYZ4u7S1L4wR8OP7YDci09OT9Cwe0QYR6v3lzS/Damt4tQEIyEnJQnuWE1RmI9jAXkW2GpjBBpQNjUC2ISdH0iWUoSJqvdlnW1x4MQqJUhVWfhX8AJ5dss=
+	t=1725210805; cv=none; b=DtuYS4+tSf6vR1mrqHMY8F2gO2Ao5FmNvIKHmpk61mGkL23gWeL2ScQt56U5mq9BsJohjR73cPMJ3nq3Bzp2XxW7VDSJ1v3Thj4dMFezyLboAqF5S/zG/aIaw8gpWy3MLsqQ50yeUjHaCTIjvBDARZ69X0VgzrT9LLFXtKFdKOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725199769; c=relaxed/simple;
-	bh=+SIyGEShH8BRP2gWJRs4V3I8yNOKFRowwYk09N0T1N8=;
+	s=arc-20240116; t=1725210805; c=relaxed/simple;
+	bh=D2xP5sPbEfhk6ooGCuMPDFx0sK3E5gxzsS4ge7C4Y1A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/EDzj5bpexBBEoAQ3UMLajIf+QBiEsAJjXm824sWGoUFaTI9V47AAX6VNQIypvpccbJ8kCv8a7H/nSgYHoCKha6Pex0P0UQsB6IFm6LQPkkoRMmqEKNXxnA7O3e22OVyAxOoyvidN/7b7uJ6AZKvSgLlJMHYgxow5tOZ53wraM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gYlJJ3Dp; arc=none smtp.client-ip=91.218.175.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=JCs+P8a1V2ebtEPZtYalZgbxrqVA9jgI3uAgiIHQ/PNboGJ/+a0kJCpxFBLAW7+pWLuyEUOLkypo8OJcia/0TwYxGoMBj45iVbFAnLpcMt+4DMtw2DVkZuA59OhJo5KQonweaJcQGfX60rKtUl48E+jl3WZ+9PXAi8IvYemNNwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=I3vatQ1M; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gYlJJ3Dp"
-Date: Sun, 1 Sep 2024 10:09:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725199765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=57DN4AShLkWRHL/01oHU0s+irklAPcT1E9JTZnZ9MF8=;
-	b=gYlJJ3Dp5OWIGNhMxSNoWjd5V5jN/lsC3tvktDVp7lrGSNEm1oG/v1d+FiNwxmzrcDcCuM
-	hBrF0mFZj/ACD2MLeesBIGbiAsCF+PqneTEth/ulLe71z2EZwLbu4NfI803STRjFE0KNk9
-	53VJydsWyiop1SdhG3SFTI9ck3aDC+A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Hui Guo <guohui.study@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-bcachefs@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: general protection fault in bioset_exit
-Message-ID: <nm2qm77haolpraz3ta3pxh5mv52yfbxe6qzix5j7h3jmq4zljl@4qfjzp3dfadd>
-References: <CAHOo4gJxTt2HrnN8s9zM0spSV385R=ykNd8Mp_zvPS8tGP3Nfw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="I3vatQ1M"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-533488ffaebso4188835e87.0
+        for <linux-block@vger.kernel.org>; Sun, 01 Sep 2024 10:13:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1725210801; x=1725815601; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4HKrxv3KIpmabIk5jknl0F48ntVRU+xbxnN9/Uz86xc=;
+        b=I3vatQ1MBkAgO3n/bB11TgsCL6OXTRQ3QG1AEduadeLiY4PBdxjsJ5nxyYgL/CnH02
+         4rgqONsuvshlW4aZvmZ54m+5m5pIguH6UpyXEHQFi1yfYcaeAXVu+mYRAy54zo6H88aP
+         OSa7VHz5AhlylLePebqZfezfCGz+BCfSCQUcFqY5zsvsXYhfueUD4q8VRa/xjUVxkL4M
+         RgF8Obr8oMtOw7u2f8tsjGFvl0peA1q700k1cgDUdSGL7EHY78PZJWQF7KBxVFUX6eVm
+         +FLU77OxFf9gKzx87P9G2qJVTJ1KdJbgfs0DnJXpnBeDZiZ9OKK2PChhijxFXXl/Q8cN
+         8h8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725210801; x=1725815601;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4HKrxv3KIpmabIk5jknl0F48ntVRU+xbxnN9/Uz86xc=;
+        b=hMO/FRWPppCec4F5gooatR20kSoVMGcfWKZdSFBY5n597CJ+UDQyn8cPIktbQJZrWs
+         2msQctNlv/zyU87SZ2Bykx0e3aS1aUHKLEicYfYjlrI1oVCh3QwX/gcH2l8sgMWgIg62
+         7DoWHJOpKl5BKIDSqMNUOOm69n6Q+v0GZSeeRwFIwIXHPNBwfqL9Unqsd75iYWEQ0rDd
+         zNxeEP/ChVO6wvNdx7X/2IGzUNaP12K4mgIfRwdmz93gBmjCc60UnvhETTaGvwsHBRcT
+         VlQOsL/MoT5dGkXYbz4Hk99mP5u6yXGqFXwCyTB7DC1XECvGI1lsTwhAb8Ax9N8rBdPl
+         SMhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWuZqycU17CNaKi76+VKEOX7ChbWtB4gPhmcaJZXlf4jcd7qDpxEIiBOOkeab7mzEYGrtStfHj7KWsk6g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfP4GqxW7elcak7C6Zxi3pey6/qazRliyCVfA4T+qaaKwEsjWT
+	NrPd2YdgLMnLbZLHUXFYSMUC5V3LZ5hsgscggCHm3PC8HvxuR0k+8WwBhuB/tYo=
+X-Google-Smtp-Source: AGHT+IG4kLq+xE3MfEJSf+bXeWg5GqIFJLHpQLKPtQtYKnVhTwLp/H2tCZIfJOOuT0o1ETcwiYoAqQ==
+X-Received: by 2002:a05:6512:ea1:b0:52e:9c69:b25b with SMTP id 2adb3069b0e04-53546b2a85fmr4925343e87.28.1725210800841;
+        Sun, 01 Sep 2024 10:13:20 -0700 (PDT)
+Received: from airbuntu ([176.29.222.46])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891dbf2csm448622866b.186.2024.09.01.10.13.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Sep 2024 10:13:20 -0700 (PDT)
+Date: Sun, 1 Sep 2024 18:13:17 +0100
+From: Qais Yousef <qyousef@layalina.io>
+To: MANISH PANDEY <quic_mapa@quicinc.com>
+Cc: Sandeep Dhavale <dhavale@google.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christian Loehle <christian.loehle@arm.com>, axboe@kernel.dk,
+	mingo@kernel.org, peterz@infradead.org, vincent.guittot@linaro.org,
+	linux-block@vger.kernel.org, sudeep.holla@arm.com,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, kailash@google.com,
+	tkjos@google.com, bvanassche@google.com, quic_nitirawa@quicinc.com,
+	quic_cang@quicinc.com, quic_rampraka@quicinc.com,
+	quic_narepall@quicinc.com,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
+ capacities are different"
+Message-ID: <20240901171317.bm5z3vplqgdwp4bc@airbuntu>
+References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
+ <3feb5226-7872-432b-9781-29903979d34a@arm.com>
+ <20240805020748.d2tvt7c757hi24na@airbuntu>
+ <25909f08-12a5-4625-839d-9e31df4c9c72@acm.org>
+ <1d9c27b2-77c7-462f-bde9-1207f931ea9f@quicinc.com>
+ <17bf99ad-d64d-40ef-864f-ce266d3024c7@acm.org>
+ <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
+ <c151b6d5-7e02-48ee-951f-c23594f6be6f@arm.com>
+ <CAB=BE-RHwqmSRt-RbmuJ4j1bOFqv1DrYD9m-E1H99hYRnTiXLw@mail.gmail.com>
+ <ca78ada8-d68b-4759-a068-ac8f66c51b72@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAHOo4gJxTt2HrnN8s9zM0spSV385R=ykNd8Mp_zvPS8tGP3Nfw@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <ca78ada8-d68b-4759-a068-ac8f66c51b72@quicinc.com>
 
-On Sun, Sep 01, 2024 at 09:09:19PM GMT, Hui Guo wrote:
-> Hi Kernel Maintainers,
-> we found a bug "general protection fault in bioset_exit" in upstream,
-> and reproduced it successfully:
-> HEAD Commit: d5d547aa7b51467b15d9caa86b116f8c2507c72a(Merge tag
-> 'random-6.11-rc6-for-linus')
-> kernel config: https://github.com/androidAppGuard/KernelBugs/blob/main/6.11.config
-> console output:
-> https://github.com/androidAppGuard/KernelBugs/blob/main/d5d547aa7b51467b15d9caa86b116f8c2507c72a/5e472bcde03516824974868fc1dd30ab00bd2cd1/log0
-> syz reproducer:
-> https://github.com/androidAppGuard/KernelBugs/blob/main/d5d547aa7b51467b15d9caa86b116f8c2507c72a/5e472bcde03516824974868fc1dd30ab00bd2cd1/repro.prog
-> C reproducer: https://github.com/androidAppGuard/KernelBugs/blob/main/d5d547aa7b51467b15d9caa86b116f8c2507c72a/5e472bcde03516824974868fc1dd30ab00bd2cd1/repro.cprog
+On 08/21/24 17:59, MANISH PANDEY wrote:
+> Hi all,
 > 
-> Please let me know if there is anything I can help.
-> Best,
-> Hui Guo
+> We agree with the points like rq_affinity can vary from target to target.
+> 
+> But also please consider below use cases
+> 
+> 1. Storage devices with single hardware queue (like UFS 2.x/ 3.x)
+> in a HMP system with shared LLC, not all the CPUs will be active and online.
 
-Can you repro with kasan?
+Is this a mainline behavior? Hotplug is not considered a normal operation . And
+a CPU not being active is not something I am aware of in mainline behavior
+aside from hotplug.
+
+I think you're referring to a platform specific out-of-tree feature that is not
+part of mainline linux.
+
+> Hence for large amount (say ~1GB) of random IO transactions , if requester
+> CPU is from
+> smaller cpu group, then due to capacity based grouping, Large cluster CPUs
+> would be mostly unused /idle, as the completion would also happen on same
+> capacity CPU. Again due to this, the smaller / mid capacity CPUs only would
+> have to submit and complete the request. Actually we could have completed
+> the requested on large capacity CPUs and could have better utilized the
+> power of Large capacity CPUs.
+
+Sorry if I missed your reply elsewhere. But if you don't want the
+rq_affinity=1 and do your custom routing, why rq_affinity=0 isn't the right
+solution for custom routing behavior?
 
 > 
-> The following context is the crash report.
-> ================================================================================
-> bcachefs (loop2): bch2_fs_recovery(): error fsck_errors_not_fixed
-> bcachefs (loop2): bch2_fs_start(): error starting filesystem
-> fsck_errors_not_fixed
-> bcachefs (loop2): shutting down
-> bcachefs (loop2): shutdown complete
-> Oops: general protection fault, probably for non-canonical address
-> 0x2feaecb40264aa05: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> CPU: 0 UID: 0 PID: 40510 Comm: syz.2.2252 Not tainted
-> 6.11.0-rc5-00081-gd5d547aa7b51 #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> RIP: 0010:qlist_move_cache+0x6b/0x120
-> data/linux_kernel/linux/mm/kasan/quarantine.c:302
-> Code: 26 49 83 3e 00 0f 84 bb 00 00 00 49 8b 46 08 4c 89 28 4d 89 6e
-> 08 49 c7 45 00 00 00 00 00 49 01 56 10 4d 85 ff 74 6a 4d 89 fd <4d> 8b
-> 3f 4c 89 ef e8 5a 53 58 ff 48 c1 e8 0c 48 c1 e0 06 4c 01 e0
-> RSP: 0018:ffffc900024f7990 EFLAGS: 00010006
-> RAX: ffff88805ba22200 RBX: ffffc900024f79c8 RCX: ffffffff813d99ef
-> RDX: 0000000000001100 RSI: ffffffff813d99f9 RDI: 0000000000000007
-> RBP: ffff88804bcb2500 R08: 0000000000000001 R09: fffff5200049ef27
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffffea0000000000
-> R13: 2feaecb40264aa05 R14: ffffffff94c417c0 R15: 2feaecb40264aa05
-> FS: 00007f30de39e640(0000) GS:ffff88802c400000(0000) knlGS:0000000000000000
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f7fd3cf0090 CR3: 00000000291d2000 CR4: 0000000000750ef0
-> PKRU: 80000000
-> Call Trace:
-> <TASK>
-> kasan_quarantine_remove_cache+0x102/0x190
-> data/linux_kernel/linux/mm/kasan/quarantine.c:370
-> shutdown_cache data/linux_kernel/linux/mm/slab_common.c:546 [inline]
-> kmem_cache_destroy data/linux_kernel/linux/mm/slab_common.c:588 [inline]
-> kmem_cache_destroy+0x58/0x1b0 data/linux_kernel/linux/mm/slab_common.c:571
-> bio_put_slab data/linux_kernel/linux/block/bio.c:155 [inline]
-> bioset_exit+0x2ff/0x5b0 data/linux_kernel/linux/block/bio.c:1750
-> bch2_fs_fs_io_direct_exit+0x19/0x30
-> data/linux_kernel/linux/fs/bcachefs/fs-io-direct.c:670
-> __bch2_fs_free data/linux_kernel/linux/fs/bcachefs/super.c:543 [inline]
-> bch2_fs_release+0xad/0x8e0 data/linux_kernel/linux/fs/bcachefs/super.c:608
-> kobject_cleanup data/linux_kernel/linux/lib/kobject.c:689 [inline]
-> kobject_release data/linux_kernel/linux/lib/kobject.c:720 [inline]
-> kref_put data/linux_kernel/linux/include/linux/kref.h:65 [inline]
-> kobject_put+0x1af/0x4c0 data/linux_kernel/linux/lib/kobject.c:737
-> bch2_fs_get_tree+0x1002/0x1330 data/linux_kernel/linux/fs/bcachefs/fs.c:2041
-> vfs_get_tree+0x94/0x380 data/linux_kernel/linux/fs/super.c:1800
-> do_new_mount data/linux_kernel/linux/fs/namespace.c:3472 [inline]
-> path_mount+0x6b2/0x1ea0 data/linux_kernel/linux/fs/namespace.c:3799
-> do_mount data/linux_kernel/linux/fs/namespace.c:3812 [inline]
-> __do_sys_mount data/linux_kernel/linux/fs/namespace.c:4020 [inline]
-> __se_sys_mount data/linux_kernel/linux/fs/namespace.c:3997 [inline]
-> __x64_sys_mount+0x284/0x310 data/linux_kernel/linux/fs/namespace.c:3997
-> do_syscall_x64 data/linux_kernel/linux/arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0xcb/0x250 data/linux_kernel/linux/arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f30dd59b45e
-> Code: 48 c7 c0 ff ff ff ff eb aa e8 5e 20 00 00 66 2e 0f 1f 84 00 00
-> 00 00 00 0f 1f 40 00 f3 0f 1e fa 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d
-> 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f30de39dda8 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-> RAX: ffffffffffffffda RBX: 000000000000f61f RCX: 00007f30dd59b45e
-> RDX: 000000002000f640 RSI: 000000002000f680 RDI: 00007f30de39de00
-> RBP: 00007f30de39de40 R08: 00007f30de39de40 R09: 0000000000000000
-> R10: 0000000001200040 R11: 0000000000000246 R12: 000000002000f640
-> R13: 000000002000f680 R14: 00007f30de39de00 R15: 0000000020000040
-> </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:qlist_move_cache+0x6b/0x120
-> data/linux_kernel/linux/mm/kasan/quarantine.c:302
-> Code: 26 49 83 3e 00 0f 84 bb 00 00 00 49 8b 46 08 4c 89 28 4d 89 6e
-> 08 49 c7 45 00 00 00 00 00 49 01 56 10 4d 85 ff 74 6a 4d 89 fd <4d> 8b
-> 3f 4c 89 ef e8 5a 53 58 ff 48 c1 e8 0c 48 c1 e0 06 4c 01 e0
-> RSP: 0018:ffffc900024f7990 EFLAGS: 00010006
-> RAX: ffff88805ba22200 RBX: ffffc900024f79c8 RCX: ffffffff813d99ef
-> RDX: 0000000000001100 RSI: ffffffff813d99f9 RDI: 0000000000000007
-> RBP: ffff88804bcb2500 R08: 0000000000000001 R09: fffff5200049ef27
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffffea0000000000
-> R13: 2feaecb40264aa05 R14: ffffffff94c417c0 R15: 2feaecb40264aa05
-> FS: 00007f30de39e640(0000) GS:ffff88802c400000(0000) knlGS:0000000000000000
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f7fd3cf0090 CR3: 00000000291d2000 CR4: 0000000000750ef0
-> PKRU: 80000000
-> ----------------
-> Code disassembly (best guess):
-> 0: 26 49 83 3e 00 es cmpq $0x0,(%r14)
-> 5: 0f 84 bb 00 00 00 je 0xc6
-> b: 49 8b 46 08 mov 0x8(%r14),%rax
-> f: 4c 89 28 mov %r13,(%rax)
-> 12: 4d 89 6e 08 mov %r13,0x8(%r14)
-> 16: 49 c7 45 00 00 00 00 movq $0x0,0x0(%r13)
-> 1d: 00
-> 1e: 49 01 56 10 add %rdx,0x10(%r14)
-> 22: 4d 85 ff test %r15,%r15
-> 25: 74 6a je 0x91
-> 27: 4d 89 fd mov %r15,%r13
-> * 2a: 4d 8b 3f mov (%r15),%r15 <-- trapping instruction
-> 2d: 4c 89 ef mov %r13,%rdi
-> 30: e8 5a 53 58 ff call 0xff58538f
-> 35: 48 c1 e8 0c shr $0xc,%rax
-> 39: 48 c1 e0 06 shl $0x6,%rax
-> 3d: 4c 01 e0 add %r12,%rax
+> But to move IO requests from S/M cluster CPUs to L cluster, scheduler would
+> need to wait until a threshold IO hits, and by that time Performance
+> application would spent some runtime and would report low performance as
+> overall results.
+
+This is not an IO specific problem. Tasks that need more performance will have
+to wait for utilization to grow quickly. I don't see this is a problem related
+to rq_affinity=1 behavior but a generic scheduler behavior issues that is
+outside of block layer.
+
+> 
+> 
+> On 08/02/24 10:03, Christian Loehle wrote:
+> > So I'm assuming you're seeing something like the following:
+> > Some CPU(s) (call them S) are submitting IO, hardirq triggers on
+> > S.
+> > Before the patch the completion softirq could run on a !S CPU,
+> > now it runs on S. Am I then correct in assuming your workload
+> > is CPU-bound on S? Would you share some details about the
+> > workload, too?
+> >
+> > What's the capacity of CPU(s) S then?
+> 
+> 
+> Yes.. for few SoCs we follow the same.
+> Say an SoC with 3 clusters ( S/M/L), if M CPU(s) are submitting IO requests
+> ( which is a large data transfer), then in this case since LLC is shared, we
+> can allow L CPU(s) to complete the request via softirq / hardirq. This will
+> make sure to avoid contention in submission and completion path.
+
+So in this case you want rq_affinity=0?
+
+> 
+> 
+> Again consider an SoC with 2 clusters ( 4 cpus of small capacity  / 2 CPUs
+> of Mid capacity).
+> In such case, if M CPUs are used for IO submersion and completions, then
+> these CPU would face heavy work load and hence Performance will be impacted.
+> Now if the new patch was not there, we could have moved few IO completions
+> to S cluster CPUs.
+
+And on this different system you want rq_affinity=1?
+
+I still don't see why you must use rq_affinity=1 for your custom routing which
+AFAICT is outside of the supported realm. We have no clue this is contention or
+not. It seems you have other larger logic that does custom software in many
+layers and I don't think what you're doing is part of what's supported.
+
+Could you help contributing patches to help detect contention problems and how
+we can differentiate between the two scenarios instead of hacking rq_affinity=1
+?
+
+> 
+> > If no matching is required, it makes sense to set rq_affinity to 0.
+> 
+> > I don't get why irq_affinity=1 is compatible with this case? Isn't
+> > this custom
+> >setup is a fully managed system by you and means you want >rq_affinity=0?
+> What
+> >do you lose if you move to rq_affinity=0?
+> 
+> actually rq_affinity=0 would help for few SoC's having MCQ like UFS 4.x, but
+> even this won't be generic solution for us. As this won't considers an SoC
+> which doesn't shares LLC, and thus would have significant performance issue.
+> Also since the change is picked up in all the kernel branches, so it would
+> be very difficult to experiment on older Socs and get the best solution for
+> each target.
+
+This is a userspace knob. I don't think the expectation to ship one
+configuration for all SoCs...
+
+> 
+> This won't work for many SoCs like above example of 2 clusters, as
+> rq_affinity to 0 would then complete the request on hardIRQ context, which
+> may not be suited for all the SoCs.
+> Also not all SoCs are arm based and shares LLC.
+
+Why you can't modify the value based on the SoC? The only thing I am gathering
+from your arguments is that you can't modify rq_affinity to suit the setup the
+SoC requires, but I don't get why.
+
+> 
+> 
+> 
+> 2. Storage devices with MCQ (Like UFS 4.x / NVME), usages ESI/MSI
+> interrupts, hence we would have opportunity to bind ESI IRQ associated with
+> an CQ.
+> 
+> 
+> On 08/05/24 10:17, Bart Van Assche wrote:
+> > On 8/4/24 7:07 PM, Qais Yousef wrote:
+> > > irqbalancers usually move the interrupts, and I'm not sure we can
+> > > make an assumption about the reason an interrupt is triggering on
+> > > different capacity CPU.
+> > User space software can't modify the affinity of managed interrupts.
+> > From include/linux/irq.h:
+> 
+> > > >True. But this is special case and was introduced for isolated
+> > > > CPUs. I don't think drivers can request this themselves
+> 
+> There are drivers, which can manage the cpu affinty for IRQs
+> using irq_set_affinity_hint() based on the use case.
+
+Are these in tree drivers? I'd love to learn how the use case is detected
+generically if this is in tree.
+
+> Since in the SoC's the LLC is shared ( M and L clusters). So if IO is
+> submitted from M capacity CPU(s), and request is completed on L capacity
+> cpu(s). Though the capacity of M and L is different, but since the LLC is
+> shared, so completion can be done on L cluster without the need of IPI. With
+> the new change, we may not get advantage of shared LLC.
+
+How come? The LLC is shared on mid and little. It wouldn't make a difference
+which CPU handles it to take advantage of LLC. What did I miss?
+
+> 
+> Proposed solution:
+> We can have a solution which is backward compatible and a new control flag
+> (QUEUE_FLAG_SAME_CAPACITY_FORCE) could be provided for this new change to
+> maintain backward compatibly.
+> 
+> How about introducing a new rq_affinity ( may be rq_affinity = 3) for using
+> cpus_equal_capacity() using new flag QUEUE_FLAG_SAME_CAPACITY.
+> 
+> 
+> if (cpu == rq->mq_ctx->cpu ||
+> 	(!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
+> 	  cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
+> +	  (test_bit(QUEUE_FLAG_CPU_CAPACITY, &rq->q->queue_flags))
+> 	   && cpus_equal_capacity(cpu, rq->mq_ctx->cpu)))
+> 		return false;
+> 
+> 
+> 
+> Could you please consider raising similar change, if this seems fine for
+> all.
+
+This is a hack to workaround the fact that you seem to not want or for some
+reason I am unable to get yet can't change rq_affinity setup to suit the need
+of the platform.
+
+AFAICT we don't have any knowledge about contentions to automatically decide
+the best way to route handling completion. It'd be a welcome addition if you
+have a solution that can teach the system to handle this automatically. But in
+your case it seems you have a lot of custom setup that is not part of usual
+upstream handling and would like just to keep backward compatibility for
+reasons I am unable to make sense of yet :(
