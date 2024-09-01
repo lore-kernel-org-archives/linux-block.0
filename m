@@ -1,84 +1,78 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9C82C190
-	for <linux-block@vger.kernel.org>; Sun,  1 Sep 2024 17:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7241326AE8
+	for <linux-block@vger.kernel.org>; Sun,  1 Sep 2024 17:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725210805; cv=none; b=DtuYS4+tSf6vR1mrqHMY8F2gO2Ao5FmNvIKHmpk61mGkL23gWeL2ScQt56U5mq9BsJohjR73cPMJ3nq3Bzp2XxW7VDSJ1v3Thj4dMFezyLboAqF5S/zG/aIaw8gpWy3MLsqQ50yeUjHaCTIjvBDARZ69X0VgzrT9LLFXtKFdKOw=
+	t=1725211536; cv=none; b=mFVO3ATEDaWyclX7DLTYLlL+GSmx0i4Y7AxLFPOMyQwMa2beFp/f9hdp4aTLCfTvZEIuIEImv+/HvtREh99oQFTLMGgn9sGLztwbrh04Gy2mxp+2PLC7oSHYRYQ3c9bapIdgOngjLhPIglCPMUPE1pfcd1ivSyRAGB/5EJK4Yto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725210805; c=relaxed/simple;
-	bh=D2xP5sPbEfhk6ooGCuMPDFx0sK3E5gxzsS4ge7C4Y1A=;
+	s=arc-20240116; t=1725211536; c=relaxed/simple;
+	bh=0PGB+WH5uh80lPMAZnLiMQ/5N8+gF2anJLQq8QDJIxE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JCs+P8a1V2ebtEPZtYalZgbxrqVA9jgI3uAgiIHQ/PNboGJ/+a0kJCpxFBLAW7+pWLuyEUOLkypo8OJcia/0TwYxGoMBj45iVbFAnLpcMt+4DMtw2DVkZuA59OhJo5KQonweaJcQGfX60rKtUl48E+jl3WZ+9PXAi8IvYemNNwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=I3vatQ1M; arc=none smtp.client-ip=209.85.167.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=XZpC1CDFFm3zleQM+yAFsgXHlitXpvbuJ2yy6ONBlnOB48JggqJVW5oKhNYIjDveAl9hYhpELn8OJBWe1GYGWFWdhO3xyQIqSUhF6rXAwkWUWlmGRUPqRVdRA6TkZ3EJ97rpVnekEvvb01qyAGeWkSvnWToRL8D3qLIV/96a08k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=u0/cUNPg; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="I3vatQ1M"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-533488ffaebso4188835e87.0
-        for <linux-block@vger.kernel.org>; Sun, 01 Sep 2024 10:13:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="u0/cUNPg"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a86b46c4831so374101566b.1
+        for <linux-block@vger.kernel.org>; Sun, 01 Sep 2024 10:25:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1725210801; x=1725815601; darn=vger.kernel.org;
+        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1725211533; x=1725816333; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4HKrxv3KIpmabIk5jknl0F48ntVRU+xbxnN9/Uz86xc=;
-        b=I3vatQ1MBkAgO3n/bB11TgsCL6OXTRQ3QG1AEduadeLiY4PBdxjsJ5nxyYgL/CnH02
-         4rgqONsuvshlW4aZvmZ54m+5m5pIguH6UpyXEHQFi1yfYcaeAXVu+mYRAy54zo6H88aP
-         OSa7VHz5AhlylLePebqZfezfCGz+BCfSCQUcFqY5zsvsXYhfueUD4q8VRa/xjUVxkL4M
-         RgF8Obr8oMtOw7u2f8tsjGFvl0peA1q700k1cgDUdSGL7EHY78PZJWQF7KBxVFUX6eVm
-         +FLU77OxFf9gKzx87P9G2qJVTJ1KdJbgfs0DnJXpnBeDZiZ9OKK2PChhijxFXXl/Q8cN
-         8h8g==
+        bh=6swxwBAIVtqp8OLyRprRpd+2EVyaZpcS0JvCJqnS+X8=;
+        b=u0/cUNPg1rwWUMoXW2MrQc/7z6O8rAf7kNnXR0sWJWR7Z8L9r4ujkv5zdPC5gWBYfY
+         rxhSI0Gp3T8Me0s3j/rev7ElGJygLvUMHtES7dYD2yxH2oAy5+H639pdsftNGW/aMQvx
+         f6AklbIWVtJBHIB+Yxj9I1cKvn7S7UMN1OT11L+VhigLvfhps7eWlNdV3AQ4VI+6nNta
+         xgQzxdYIjrmxc8n9lSpfxrrKewso0W3AWgrNsaFhJhxmIx5jrpLNHi9P7ztDHyZrTMsG
+         Pc2Pc4RT40LR1p/0RqDb8SFkDfb5NmbLLjHh+hFJhCe/8oreRLN2Q+wE7rhlES9vsM3U
+         Eosw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725210801; x=1725815601;
+        d=1e100.net; s=20230601; t=1725211533; x=1725816333;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4HKrxv3KIpmabIk5jknl0F48ntVRU+xbxnN9/Uz86xc=;
-        b=hMO/FRWPppCec4F5gooatR20kSoVMGcfWKZdSFBY5n597CJ+UDQyn8cPIktbQJZrWs
-         2msQctNlv/zyU87SZ2Bykx0e3aS1aUHKLEicYfYjlrI1oVCh3QwX/gcH2l8sgMWgIg62
-         7DoWHJOpKl5BKIDSqMNUOOm69n6Q+v0GZSeeRwFIwIXHPNBwfqL9Unqsd75iYWEQ0rDd
-         zNxeEP/ChVO6wvNdx7X/2IGzUNaP12K4mgIfRwdmz93gBmjCc60UnvhETTaGvwsHBRcT
-         VlQOsL/MoT5dGkXYbz4Hk99mP5u6yXGqFXwCyTB7DC1XECvGI1lsTwhAb8Ax9N8rBdPl
-         SMhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuZqycU17CNaKi76+VKEOX7ChbWtB4gPhmcaJZXlf4jcd7qDpxEIiBOOkeab7mzEYGrtStfHj7KWsk6g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfP4GqxW7elcak7C6Zxi3pey6/qazRliyCVfA4T+qaaKwEsjWT
-	NrPd2YdgLMnLbZLHUXFYSMUC5V3LZ5hsgscggCHm3PC8HvxuR0k+8WwBhuB/tYo=
-X-Google-Smtp-Source: AGHT+IG4kLq+xE3MfEJSf+bXeWg5GqIFJLHpQLKPtQtYKnVhTwLp/H2tCZIfJOOuT0o1ETcwiYoAqQ==
-X-Received: by 2002:a05:6512:ea1:b0:52e:9c69:b25b with SMTP id 2adb3069b0e04-53546b2a85fmr4925343e87.28.1725210800841;
-        Sun, 01 Sep 2024 10:13:20 -0700 (PDT)
+        bh=6swxwBAIVtqp8OLyRprRpd+2EVyaZpcS0JvCJqnS+X8=;
+        b=cJAxiYtrXBO2gPG9u7ugUPAvpdJB69lXQJVXI9Ji7c39sItmBE9erZZrDbvPg6sV5o
+         ABy6L5fkO17EeYQkd+QTH80hCeuFcnkBbCOVQxDYe0ovYf/KitMg/asbOzDqvvpXTOTb
+         LeZGaCmNbJ8eZfy32slcE4scb7hMwKbTEocDfzO6SOPg2fv/6EMDMrcYkTrrKw4aAr/o
+         qkxssRj8LmhXBbPGAXOU0pdkn32SeYQjnSiHs3mfYUN/ny20dS0IYAM/OXEo+4uE40wJ
+         WPcwn8eg43B/0BMoN9iPupqB5umN1CaTfhVq3aA4fzQffZfEOLX+XOIFe/xXLR5t+uqa
+         Zq0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWochukKvhDILYf8cV0OueMOHKuZ/3Me48xJw2Rqnu5HBQDWWwHGKIDHoV8ZDZ56Uf6R6i8/3BecuEyoQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YysSI5zbBpKC6DLwQAs9+VmBWKThKttLRiccN4GUpvC5balJcvj
+	GI5KBA7ZFU3NR/2gnoup2lfmJYSGwmAwuFuVssLv7HUMKfNkBiW2Dnwrwj1omdA=
+X-Google-Smtp-Source: AGHT+IErkXEZytp4CJ4TWeGE3ba+YJc9CoZRTU+x//ajwTFgINBp0o96c9++n/vuCL/hX0RjaYywHA==
+X-Received: by 2002:a17:907:1c20:b0:a86:8059:58a8 with SMTP id a640c23a62f3a-a89d879c672mr244627966b.38.1725211532478;
+        Sun, 01 Sep 2024 10:25:32 -0700 (PDT)
 Received: from airbuntu ([176.29.222.46])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891dbf2csm448622866b.186.2024.09.01.10.13.18
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891dc6a1sm463223866b.175.2024.09.01.10.25.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Sep 2024 10:13:20 -0700 (PDT)
-Date: Sun, 1 Sep 2024 18:13:17 +0100
+        Sun, 01 Sep 2024 10:25:32 -0700 (PDT)
+Date: Sun, 1 Sep 2024 18:25:28 +0100
 From: Qais Yousef <qyousef@layalina.io>
-To: MANISH PANDEY <quic_mapa@quicinc.com>
-Cc: Sandeep Dhavale <dhavale@google.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Christian Loehle <christian.loehle@arm.com>, axboe@kernel.dk,
+To: Christian Loehle <christian.loehle@arm.com>
+Cc: MANISH PANDEY <quic_mapa@quicinc.com>, axboe@kernel.dk,
 	mingo@kernel.org, peterz@infradead.org, vincent.guittot@linaro.org,
-	linux-block@vger.kernel.org, sudeep.holla@arm.com,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
+	dietmar.eggemann@arm.com, linux-block@vger.kernel.org,
+	sudeep.holla@arm.com, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
 	Christoph Hellwig <hch@infradead.org>, kailash@google.com,
-	tkjos@google.com, bvanassche@google.com, quic_nitirawa@quicinc.com,
-	quic_cang@quicinc.com, quic_rampraka@quicinc.com,
-	quic_narepall@quicinc.com,
+	tkjos@google.com, dhavale@google.com, bvanassche@google.com,
+	quic_nitirawa@quicinc.com, quic_cang@quicinc.com,
+	quic_rampraka@quicinc.com, quic_narepall@quicinc.com,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: Regarding patch "block/blk-mq: Don't complete locally if
  capacities are different"
-Message-ID: <20240901171317.bm5z3vplqgdwp4bc@airbuntu>
+Message-ID: <20240901172528.2ab6yatjmfvlrfjt@airbuntu>
 References: <10c7f773-7afd-4409-b392-5d987a4024e4@quicinc.com>
  <3feb5226-7872-432b-9781-29903979d34a@arm.com>
  <20240805020748.d2tvt7c757hi24na@airbuntu>
- <25909f08-12a5-4625-839d-9e31df4c9c72@acm.org>
- <1d9c27b2-77c7-462f-bde9-1207f931ea9f@quicinc.com>
- <17bf99ad-d64d-40ef-864f-ce266d3024c7@acm.org>
- <e2c19f3a-13b0-4e88-ba44-7674f3a1ea87@quicinc.com>
- <c151b6d5-7e02-48ee-951f-c23594f6be6f@arm.com>
- <CAB=BE-RHwqmSRt-RbmuJ4j1bOFqv1DrYD9m-E1H99hYRnTiXLw@mail.gmail.com>
- <ca78ada8-d68b-4759-a068-ac8f66c51b72@quicinc.com>
+ <e5f0349e-6c72-4847-bf0c-4afb57404907@arm.com>
+ <20240809002321.3k5g2isqmiuflrmd@airbuntu>
+ <a225f9e0-5335-4c58-8e94-960c2557f9c0@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -87,183 +81,125 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ca78ada8-d68b-4759-a068-ac8f66c51b72@quicinc.com>
+In-Reply-To: <a225f9e0-5335-4c58-8e94-960c2557f9c0@arm.com>
 
-On 08/21/24 17:59, MANISH PANDEY wrote:
-> Hi all,
+On 08/13/24 17:20, Christian Loehle wrote:
+> On 8/9/24 01:23, Qais Yousef wrote:
+> > On 08/05/24 11:18, Christian Loehle wrote:
+> > 
+> >>> My understanding of rq_affinity=1 is to match the perf of requester. Given that
+> >>> the characteristic of HMP system is that power has an equal importance to perf
+> >>> (I think this now has become true for all systems by the way), saying that the
+> >>> match in one direction is better than the other is sort of forcing a policy of
+> >>> perf first which I don't think is a good thing to enforce. We don't have enough
+> >>> info to decide at this level. And our users care about both.
+> >>
+> >> I would argue rq_affinity=1 matches the perf, so that flag should already bias
+> >> perf in favor of power slightly?
+> > 
+> > Not on this type of systems. If perf was the only thing important, just use
+> > equally big cpus. Balancing perf and power is important on those systems, and
+> > I don't think we have enough info to decide which decision is best when
+> > capacities are not the same. Matching the perf level the requesting on makes
+> > sense when irq_affinity=1.
 > 
-> We agree with the points like rq_affinity can vary from target to target.
-> 
-> But also please consider below use cases
-> 
-> 1. Storage devices with single hardware queue (like UFS 2.x/ 3.x)
-> in a HMP system with shared LLC, not all the CPUs will be active and online.
+> Well you could still want a
+> "IO performance always beats power considerations" and still go HMP because
+> sometimes for non-IO you prefer power, but I agree that we don't have enough
+> information about what the user wants from the system/kernel.
 
-Is this a mainline behavior? Hotplug is not considered a normal operation . And
-a CPU not being active is not something I am aware of in mainline behavior
-aside from hotplug.
+The flag was to keep requester and completion on the same LLC. Note the keyword
+same. Assume L3 don't exist and L2 is LLC which means capacity level and LLC
+mapping to cluster is the same.
 
-I think you're referring to a platform specific out-of-tree feature that is not
-part of mainline linux.
+Then note that the capability of the LLC is different since the big clusters
+tend to have larger L2. I think modern SoCs for servers can end up with complex
+LLC not all of which have the same performance.
 
-> Hence for large amount (say ~1GB) of random IO transactions , if requester
-> CPU is from
-> smaller cpu group, then due to capacity based grouping, Large cluster CPUs
-> would be mostly unused /idle, as the completion would also happen on same
-> capacity CPU. Again due to this, the smaller / mid capacity CPUs only would
-> have to submit and complete the request. Actually we could have completed
-> the requested on large capacity CPUs and could have better utilized the
-> power of Large capacity CPUs.
-
-Sorry if I missed your reply elsewhere. But if you don't want the
-rq_affinity=1 and do your custom routing, why rq_affinity=0 isn't the right
-solution for custom routing behavior?
-
-> 
-> But to move IO requests from S/M cluster CPUs to L cluster, scheduler would
-> need to wait until a threshold IO hits, and by that time Performance
-> application would spent some runtime and would report low performance as
-> overall results.
-
-This is not an IO specific problem. Tasks that need more performance will have
-to wait for utilization to grow quickly. I don't see this is a problem related
-to rq_affinity=1 behavior but a generic scheduler behavior issues that is
-outside of block layer.
+Keeping requester/completion on the same capacity keeps the old behavior. To
+teach it to do more then we need sensible extensions based on sensible use
+cases. And not hack rq_affinity=1 to do complex things.
 
 > 
+> > 
+> >> Although the actual effect on power probably isn't that significant, given
+> >> that the (e.g. big) CPU has submitted the IO, is woken up soon, so you could
+> >> almost ignore a potential idle wakeup and the actual CPU time spent in the block
+> >> completion is pretty short of course.
+> >>
+> >>> If no matching is required, it makes sense to set rq_affinity to 0. When
+> >>> matching is enabled, we need to rely on per-task iowait boost to help the
+> >>> requester to run at a bigger CPU, and naturally the completion will follow when
+> >>> rq_affinity=1. If the requester doesn't need the big perf, but the irq
+> >>> triggered on a bigger core, I struggle to understand why it is good for
+> >>> completion to run on bigger core without the requester also being on a similar
+> >>> bigger core to truly maximize perf.
+> >>
+> >> So first of all, per-task iowait boosting has nothing to do with it IMO.
+> > 
+> > It has. If the perf is not good because the requester is running on little
+> > core, the requester need to move up to ensure the overall IO perf is better.
 > 
-> On 08/02/24 10:03, Christian Loehle wrote:
-> > So I'm assuming you're seeing something like the following:
-> > Some CPU(s) (call them S) are submitting IO, hardirq triggers on
-> > S.
-> > Before the patch the completion softirq could run on a !S CPU,
-> > now it runs on S. Am I then correct in assuming your workload
-> > is CPU-bound on S? Would you share some details about the
-> > workload, too?
+> See below but also
+> "the requester need to move up to ensure the overall IO perf is better" is
+> just not true, with asynchronous IO submission done right, the submission
+
+I think it is true for rq_affinity=1, which is the context of the discussion
+and the patch.
+
+> runtime isn't critical to the IO throughput, therefore it should run the
+> most power-efficient way.
+> This can be observed e.g. with any io_uring fio workload with significant
+> iodepth (and possibly multi-threading).
+> Completion may be a different story, depending on the device stack, if we're
+> dealing with !MCQ then the completion path (irq + block layer completion)
+> is absolutely critical.
+> For any mmc / ufs<4.0 system the performance difference between
+> fio --name=little --filename=/dev/sda --runtime=10 --rw=randread --bs=4k --ioengine=io_uring --numjobs=4 --iodepth=32 --group_reporting --cpus_allowed=$LITTLE_CPUS
+> and
+> fio --name=big --filename=/dev/sda --runtime=10 --rw=randread --bs=4k --ioengine=io_uring --numjobs=4 --iodepth=32 --group_reporting --cpus_allowed=$BIG_CPUS
+> is (usually) only because of the completion path and setting irq affinity of
+> /dev/sda to $BIG_CPUS will make the difference disappear (rq_affinity=0 and
+> implying LLC is the same).
+> Running the submission on little CPUs will usually be the most power-efficient
+> way then.
+
+From rq_affinity=1 context, how it is supposed to discern all of that? If
+there's a good answer to this, then this is the direction that should be taken
+to handle it transparently. AFAICT we don't have this info.
+
+> 
+> > 
+> >> Plenty of IO workloads build up utilization perfectly fine.
+> > 
+> > These ones have no problems, no? They should migrate to big core and the
+> > completion will follow them when they move.
+> 
+> So if I understood Manish correctly the only reason they want the completion
+> to run on a bigger CPU than the submission is because the submission is already
+> saturating the CPU, therefore utilization of submission is no issue whatsoever.
+> They don't want to run (submission) on big though because of power
+> considerations.
+
+Is this what rq_affinity=1 means? This use case is rq_affinity=0. IOW, custom
+affinity management.
+
+> 
+> > 
+> >> I wouldn't consider the setup: requester little perf, irq+completion big perf
+> >> invalid necessarily, it does decrease IO latency for the application.
+> > 
+> > I didn't say invalid. But it is not something we can guess automatically when
+> > irq_affinity=1. We don't have enough info to judge. The only info we have the
+> > requester that originated the request is running at different perf level
+> > (whther higher or lower), so we follow it.
 > >
-> > What's the capacity of CPU(s) S then?
+> Anyway, Manish's problem should be solved by rq_affinity=0 in that case (with
+> irq affinities set to big CPU then the completion will be run on the irq CPU)
+> and "rq_affinity=1 <=> equal capacity CPU" is the correct interpretation, is that
+> more or less agreed upon now?
 > 
-> 
-> Yes.. for few SoCs we follow the same.
-> Say an SoC with 3 clusters ( S/M/L), if M CPU(s) are submitting IO requests
-> ( which is a large data transfer), then in this case since LLC is shared, we
-> can allow L CPU(s) to complete the request via softirq / hardirq. This will
-> make sure to avoid contention in submission and completion path.
 
-So in this case you want rq_affinity=0?
-
-> 
-> 
-> Again consider an SoC with 2 clusters ( 4 cpus of small capacity  / 2 CPUs
-> of Mid capacity).
-> In such case, if M CPUs are used for IO submersion and completions, then
-> these CPU would face heavy work load and hence Performance will be impacted.
-> Now if the new patch was not there, we could have moved few IO completions
-> to S cluster CPUs.
-
-And on this different system you want rq_affinity=1?
-
-I still don't see why you must use rq_affinity=1 for your custom routing which
-AFAICT is outside of the supported realm. We have no clue this is contention or
-not. It seems you have other larger logic that does custom software in many
-layers and I don't think what you're doing is part of what's supported.
-
-Could you help contributing patches to help detect contention problems and how
-we can differentiate between the two scenarios instead of hacking rq_affinity=1
-?
-
-> 
-> > If no matching is required, it makes sense to set rq_affinity to 0.
-> 
-> > I don't get why irq_affinity=1 is compatible with this case? Isn't
-> > this custom
-> >setup is a fully managed system by you and means you want >rq_affinity=0?
-> What
-> >do you lose if you move to rq_affinity=0?
-> 
-> actually rq_affinity=0 would help for few SoC's having MCQ like UFS 4.x, but
-> even this won't be generic solution for us. As this won't considers an SoC
-> which doesn't shares LLC, and thus would have significant performance issue.
-> Also since the change is picked up in all the kernel branches, so it would
-> be very difficult to experiment on older Socs and get the best solution for
-> each target.
-
-This is a userspace knob. I don't think the expectation to ship one
-configuration for all SoCs...
-
-> 
-> This won't work for many SoCs like above example of 2 clusters, as
-> rq_affinity to 0 would then complete the request on hardIRQ context, which
-> may not be suited for all the SoCs.
-> Also not all SoCs are arm based and shares LLC.
-
-Why you can't modify the value based on the SoC? The only thing I am gathering
-from your arguments is that you can't modify rq_affinity to suit the setup the
-SoC requires, but I don't get why.
-
-> 
-> 
-> 
-> 2. Storage devices with MCQ (Like UFS 4.x / NVME), usages ESI/MSI
-> interrupts, hence we would have opportunity to bind ESI IRQ associated with
-> an CQ.
-> 
-> 
-> On 08/05/24 10:17, Bart Van Assche wrote:
-> > On 8/4/24 7:07 PM, Qais Yousef wrote:
-> > > irqbalancers usually move the interrupts, and I'm not sure we can
-> > > make an assumption about the reason an interrupt is triggering on
-> > > different capacity CPU.
-> > User space software can't modify the affinity of managed interrupts.
-> > From include/linux/irq.h:
-> 
-> > > >True. But this is special case and was introduced for isolated
-> > > > CPUs. I don't think drivers can request this themselves
-> 
-> There are drivers, which can manage the cpu affinty for IRQs
-> using irq_set_affinity_hint() based on the use case.
-
-Are these in tree drivers? I'd love to learn how the use case is detected
-generically if this is in tree.
-
-> Since in the SoC's the LLC is shared ( M and L clusters). So if IO is
-> submitted from M capacity CPU(s), and request is completed on L capacity
-> cpu(s). Though the capacity of M and L is different, but since the LLC is
-> shared, so completion can be done on L cluster without the need of IPI. With
-> the new change, we may not get advantage of shared LLC.
-
-How come? The LLC is shared on mid and little. It wouldn't make a difference
-which CPU handles it to take advantage of LLC. What did I miss?
-
-> 
-> Proposed solution:
-> We can have a solution which is backward compatible and a new control flag
-> (QUEUE_FLAG_SAME_CAPACITY_FORCE) could be provided for this new change to
-> maintain backward compatibly.
-> 
-> How about introducing a new rq_affinity ( may be rq_affinity = 3) for using
-> cpus_equal_capacity() using new flag QUEUE_FLAG_SAME_CAPACITY.
-> 
-> 
-> if (cpu == rq->mq_ctx->cpu ||
-> 	(!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
-> 	  cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
-> +	  (test_bit(QUEUE_FLAG_CPU_CAPACITY, &rq->q->queue_flags))
-> 	   && cpus_equal_capacity(cpu, rq->mq_ctx->cpu)))
-> 		return false;
-> 
-> 
-> 
-> Could you please consider raising similar change, if this seems fine for
-> all.
-
-This is a hack to workaround the fact that you seem to not want or for some
-reason I am unable to get yet can't change rq_affinity setup to suit the need
-of the platform.
-
-AFAICT we don't have any knowledge about contentions to automatically decide
-the best way to route handling completion. It'd be a welcome addition if you
-have a solution that can teach the system to handle this automatically. But in
-your case it seems you have a lot of custom setup that is not part of usual
-upstream handling and would like just to keep backward compatibility for
-reasons I am unable to make sense of yet :(
+I think this is the sensible route. The sensible extensions I foresee is
+teaching how to discern different cases rather than add a hacky flag to confuse
+what rq_affinity=1 means.
