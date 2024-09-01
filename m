@@ -1,69 +1,67 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF3228387
-	for <linux-block@vger.kernel.org>; Sun,  1 Sep 2024 17:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD80B1CF92;
+	Sun,  1 Sep 2024 19:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725211956; cv=none; b=Pqjs9gFznKCo+mg9PL8Pi66/q9DKRkk7hZUmAdg5FNYjvLyvlOaQh0O+ZNZLjEcmOegI6i1TsbXC+3PdvnMSOzb4pRSODrAJ/ZVizX7cbaFoULdNt46BWazoKLPLOecZHBg/jYNcYBKBSNNkFdT2BPwnSORXEvz+tfTzvj8s1JQ=
+	t=1725220605; cv=none; b=NGNCbGbbHXqAhFmebOpjCo+yTDlE6RtuaTDCsyqJIlmPBBpCod3tdZ/oU3hAiYC5Uka+llhPYX++n+Fv8urFbz02ZlJyeea/gbQlrmN8JHFT4Y19ebtak/5WrPCuiPq1nGImjs9XcLK666R8CIZJThBVMg12mJJZTAHtJA7hrHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725211956; c=relaxed/simple;
-	bh=EkWT1jF7poYKL1Z6hU8sc4dRjedKR4GLFHZcsyyeOLI=;
+	s=arc-20240116; t=1725220605; c=relaxed/simple;
+	bh=opwScwAzJ4SuYz7lXpODvSBUniB0vjMLmCBqGmtDU1U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mipG0qW0S5uHqVgPalrIPOVkRjuV8o0xnqC78E0mYs58mcnV7NHRyL7yFsOePPZ/Xnrexlc55BlHspul7/NSMQj8iPpph59RHlbATtNr0xta+CZFnKzKllCeGonKyjNlWzWVUCndCV6/xLd4IQkGgwlyzcLhAGLuBY5zjd5iU9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b=dySyYQ8y; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
+	 Content-Type:Content-Disposition:In-Reply-To; b=l4TDD88gpGXSHvUsTSMVpjPuHm56UjcrqUMdylpu1oOtk5Vf0y6nc94f7WCsJT3SvsAb3yG3PhkClNNkfc+XWjuxLJe5bRrAam1EtAW8UFsVf3XNgaQaWf/6QjcDisgHMzOJQ43e3PjpJdi975xexC5QDDetuhl6Y5/Cw8Qs32E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLZtiOtT; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=layalina-io.20230601.gappssmtp.com header.i=@layalina-io.20230601.gappssmtp.com header.b="dySyYQ8y"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-374ba78f192so1279226f8f.3
-        for <linux-block@vger.kernel.org>; Sun, 01 Sep 2024 10:32:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLZtiOtT"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42bbc70caa4so19608315e9.0;
+        Sun, 01 Sep 2024 12:56:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=layalina-io.20230601.gappssmtp.com; s=20230601; t=1725211953; x=1725816753; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725220602; x=1725825402; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S4D4sJrLrrIZ7iVSCd2I4lMCj60uPYottSCrMVDrHb0=;
-        b=dySyYQ8yRHA+K+OnhGUK+zN8GIKkdjjhWturWHFp1fay5dObVHqzSnvjZIpb3ujSJ4
-         aj07Gw4krOtJnQYposqjnq+SberWJ6LCrfnHGjuCWGuhUHErBiJPYtQJ+rgvuKB7BK5y
-         dWnTVGLdBO7diKCyM7qHbAtG3wGhVlJA914Id5ASex9a7LakRCR0P8DwRThlB/th5C1I
-         rZbWdFdn84Iqco996aew21t8WMFqi+DzSS1dmzhlD+49LmqK5TbRzBzcGvIlZnnfNYSI
-         J3xf7YVOpuMlcesXYL6dZUgcdV86S8lWk7391EkV4WWpitq7mua3bBx+HhjHThNJxVMU
-         5eHg==
+        bh=QBvhvcZpJuppNvV5eqoolAx3Z1GIRJtw881QgGEbaFc=;
+        b=XLZtiOtTjDF9G7sctp1QLu62AW6k6aomMjPI0Bt6WovOnB/aUe2DMVU/hmObcEiykd
+         E0mKbMjxUg7BAA/R6ZHSgaoFm/sb6bLzf78t/YqI5F5gaIax5bv+J8PAJvvlnVNdXlcL
+         ouw2ZwFYN2p/gFGWj5ukJx4YAj6pEuUknwbZkghJnDgmB6u7/Md72ZwzsqAmiaIGnAzk
+         v7WKhSsn8GVCfNWRyADdOsWorNhD+3dHJg1aBC13OE/4JdA0M55HwldBHazEDYM4gKQT
+         imjbkqMwKFm6pxy2Q+jWSYIudIknNQTGVPlwOXYzFprD1ruh+Hn0PhgMlwQ64qCxT1cw
+         K2cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725211953; x=1725816753;
+        d=1e100.net; s=20230601; t=1725220602; x=1725825402;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S4D4sJrLrrIZ7iVSCd2I4lMCj60uPYottSCrMVDrHb0=;
-        b=GtL19fbO9VNsuPTX6GP+iU15MDh+reItX8lwoRRZkPRjveYiQcAVnB/fMt4nFNi98c
-         l/L/CHRnET5weQJVtPtT5ZgiGyQEXwitKJmwcQiSA9tqxKo912C/kZXkws6Bbw0+iThb
-         0MVN3BOSDAUlelJGVQ2f8LdFLSzqJltIIun1n8IgDGpdKP796/R5YuLv/plRX827HZZT
-         OIde6GpcKdhnLETeZy9lfG+g3Wet3E0xu1eWnVHuXuEE8dVRDx5M40yJCrdsewbbkpQV
-         SEQCzX6n/7uyDNKqRUwx6wHWrEl/o/DQCHJy2P+JE+3WXCc2yPROfU1FJzwEOMaCDSa/
-         OyEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRjd8Gy5m852YtqA9Nz+ohzAXz7sNxZguK7E+IqvRgGzQ0JyVzrRzvAbIM7MgXEyR6MqCvZvnAXi97ZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwV8f11+O0H5cDPkWD0yKRrNVbijLjckWhlzwBlMyajXw/Thefn
-	t0xwxSGRM4+SbLFrgAJxBHhDSE/HWz8V9JQpNF+puDzvN8sxFFNIS+Tf6+Mzl4g=
-X-Google-Smtp-Source: AGHT+IF90MOG01YVgBOrF3b0ODo3ETDvTIlN2Kg7QhpNwD6cuuJL5fr1+FoCN4ZU3ILfdx3HxUhC5A==
-X-Received: by 2002:a5d:51cd:0:b0:374:c515:4441 with SMTP id ffacd0b85a97d-374c5154570mr1799939f8f.56.1725211953126;
-        Sun, 01 Sep 2024 10:32:33 -0700 (PDT)
-Received: from airbuntu ([176.29.222.46])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c255d3da3fsm836309a12.79.2024.09.01.10.32.31
+        bh=QBvhvcZpJuppNvV5eqoolAx3Z1GIRJtw881QgGEbaFc=;
+        b=J0gzQJRW/x2IAMzYa4VEG3Nt4CnXSfRjJT2fYkk5Ljl5jPgZEbUBKOWBeS9cunWf1m
+         BamqD4ODuerpKX+8V/J6fJP54rAoqCaTEJISpH+OBVB59M0wOpwusgz1QqbfdunJwVzB
+         IvZncgiZKcpZB6OfgwUzJbi4lO5ZG+mvSQ43mdjEMLJcsU2jNCdudZY/6y8tMiMFBEHG
+         0aTK/gtWmbCwC4Zi5MQSSUmHuqQvbwoFe2Keml1o2dfjAfAq8GCfhJB1v5RpvAnzGXit
+         EUQc6hYZ5l9iwfYmjsymL7RAOyhnO6iavC+og85V6Ks7KuqPBpg+18P94PlyuAh+Kf8M
+         NlbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUl7t8+nYN/lXJIJmjA/AJY82MT3U7bNFon/jFDp+onek65fegKabe7DVYFrNSADxbqyASshZ898h88ew==@vger.kernel.org, AJvYcCWh+dKXsJb4twEi+olITgUouU5wI+VPg+3c8fYCgQTJ1KFrOo0zaP1+Oou9yfFz6fUq9sbrnEQMceHhcFUxlw4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4Tqv9cy+BnDdz7k2mGqN9lAtAyYpsZEF5KMsKQSH5m+zQdReE
+	GD0S1Z7b24iNmtFKMSIQmsgZ3fOb+x/b+qXanNQuCBQ8eAlhZCo=
+X-Google-Smtp-Source: AGHT+IEJt1pkn1XOJEc7YetNVV+lHgO6WI5kl1l/CPsAAkz6YqicaqM2cjer+XMf1/MPVW4QiFucQg==
+X-Received: by 2002:a05:600c:354b:b0:42b:afa7:804e with SMTP id 5b1f17b1804b1-42bb01ae418mr89079705e9.3.1725220601628;
+        Sun, 01 Sep 2024 12:56:41 -0700 (PDT)
+Received: from p183 ([46.53.249.196])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6e273e3sm114163855e9.30.2024.09.01.12.56.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Sep 2024 10:32:32 -0700 (PDT)
-Date: Sun, 1 Sep 2024 18:32:30 +0100
-From: Qais Yousef <qyousef@layalina.io>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Manish Pandey <quic_mapa@quicinc.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_nitirawa@quicinc.com, quic_bhaskarv@quicinc.com,
-	quic_narepall@quicinc.com, quic_rampraka@quicinc.com,
-	quic_cang@quicinc.com, quic_nguyenb@quicinc.com
-Subject: Re: [PATCH] blk-mq: Allow complete locally if capacities are
- different
-Message-ID: <20240901173230.lgyvfkx5eq5sr7ss@airbuntu>
-References: <20240828114958.29422-1-quic_mapa@quicinc.com>
- <c5d0966b-7de3-4eff-9310-d9a31d822dad@acm.org>
+        Sun, 01 Sep 2024 12:56:41 -0700 (PDT)
+Date: Sun, 1 Sep 2024 22:56:39 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Andreas Hindborg <a.hindborg@samsung.com>,
+	Boqun Feng <boqun.feng@gmail.com>, linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH RESEND] block, rust: simplify validate_block_size()
+ function
+Message-ID: <4386823d-d611-44ef-9017-88ddd5e7ba57@p183>
+References: <005b6680-da19-495a-bc99-9ec3f66a5e74@p183>
+ <309bd39a-0c58-472a-9fc8-6fa33d14925a@proton.me>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,75 +70,84 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c5d0966b-7de3-4eff-9310-d9a31d822dad@acm.org>
+In-Reply-To: <309bd39a-0c58-472a-9fc8-6fa33d14925a@proton.me>
 
-Thanks for the CC Bart.
-
-Manish, if you're going to send a patch to address an issue from another merged
-patch, the etiquet is to keep the CC list of the original patch the same and
-include the author of that patch in the loop.
-
-On 08/28/24 08:13, Bart Van Assche wrote:
-> On 8/28/24 7:49 AM, Manish Pandey wrote:
-> > 'Commit af550e4c9682 ("block/blk-mq: Don't complete locally if
-> > capacities are different")' enforces to complete the request locally
-> > only if the submission and completion CPUs have same capacity.
-> > 
-> > To have optimal IO load balancing or to avoid contention b/w submission
-> > path and completion path, user may need to complete IO request of large
-> > capacity CPU(s) on Small Capacity CPU(s) or vice versa.
-> > 
-> > Hence introduce a QUEUE_FLAG_ALLOW_DIFF_CAPACITY blk queue flag to let
-> > user decide if it wants to complete the request locally or need an IPI
-
-I answered you here
-
-	https://lore.kernel.org/lkml/20240901171317.bm5z3vplqgdwp4bc@airbuntu/
-
-This approach is not acceptable. I think you need to better explain why
-rq_affinity=0 is not usable instead of confusing rq_affinity=1 needs to be
-hacked in this manner.
-
-The right extension would be to teach the system how to detect cases where it
-is better not to keep them on the same LLC/capacity because of scenario XYZ
-that is known (genericaly and scalably) to break and requires an exception.
-
-rq_affinity=0 would give you what you want AFAICT and don't see a reason for
-this hack.
-
-> > even if the capacity of the requesting and completion queue is different.
-> > This gives flexibility to user to choose best CPU for their completion
-> > to give best performance for their system.
+On Sat, Aug 31, 2024 at 08:39:45PM +0000, Benno Lossin wrote:
+> On 31.08.24 22:15, Alexey Dobriyan wrote:
+> > Using range and contains() method is just fancy shmancy way of writing
 > 
-> I think that the following is missing from the above description:
-> - Mentioning that this is for an unusual interrupt routing technology
->   (SoC sends the interrupt to another CPU core than what has been
->    specified in the smp_affinity mask).
-> - An explanation why the desired effect cannot be achieved by changing
->   rq_affinity into 0.
+> This language doesn't fit into a commit message. Please give a technical
+> reason to change this.
 
-It fails to mention a lot of things from the discussion from the previous
-thread sadly... Including the fact that there's a strange argument about
-regression on a platform that is easily fixed by using rq_affinity=0, but the
-argument of not using this is because some other platforms don't need to use
-rq_affinity=0.
+Oh come on!
 
-I'm not sure if rq_affinity=1 is supposed to work for all cases especially with
-the specific and custom setup Manish has.
+> > two comparisons. Using range doesn't prevent any bugs here because
+> > typing "=" in range can be forgotten just as easily as in "<=" operator.
+> 
+> I don't think that using traditional comparisons is an improvement.
 
-Anyway. The submission has a broken CC list that omits a lot of folks from the
-discussion.
+They are an improvement, or rather contains() on integers is of dubious
+value.
 
+First, coding style mandates that there are no whitespace on both sides
+of "..". This merges all characters into one Perl-like line noise.
+
+Second, when writing C I've a habit of writing comparisons like numeric
+line in school which goes from left to right:
+
+	512 ... size .. PAGE_SIZE   ------> infinity
+
+See?
+Now it is easy to insert comparisons:
+
+	512 <= size <= PAGE_SIZE
+
+Of course in C the middle variable must be duplicated but so what?
+
+How hard is to parse this?
+
+	512 <= size && size <= PAGE_SIZE
+
+
+And thirdly, to a C/C++ dev, passing u32 by reference instead of by
+value to a function which obviously doesn't mutate it screams WHAT???
+
+> When
+> using `contains`, both of the bounds are visible with one look.
+
+Yes, they are within 4 characters of each other 2 of which are
+whitespace.
+
+This is what this patch is all about: contains() for integers?
+I can understand contains() instead of strstr() but for integers?
+
+> When
+> using two comparisons, you have to first parse that they compare the
+> same variable and then look at the bounds.
+
+Yes but now you have to parse () and .. and &.
+
+> > Also delete few comments of "increment i by 1" variety.
 > 
-> >   block/blk-mq-debugfs.c |  1 +
-> >   block/blk-mq.c         |  3 ++-
-> >   block/blk-sysfs.c      | 12 ++++++++++--
-> >   include/linux/blkdev.h |  1 +
-> >   4 files changed, 14 insertions(+), 3 deletions(-)
-> 
-> Since the semantics of a sysfs attribute are modified,
-> Documentation/ABI/stable/sysfs-block should be updated.
-> 
-> Thanks,
-> 
-> Bart.
+> As Miguel already said, these are part of the documentation. Do not
+> remove them.
+
+Kernel has its fair share of 1:1 kernel-doc comments which contain
+exactly zero useful information because everything is in function
+signature already.
+
+This is the original function:
+
+	/* blk_validate_limits() validates bsize, so drivers don't usually need to */
+	static inline int blk_validate_block_size(unsigned long bsize)
+	{
+	        if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
+	                return -EINVAL;
+	        return 0;
+	}
+
+I have to say this is useful comment because it refers to another more
+complex function and hints that it should be used instead. It doesn't
+reiterate what the function does internally.
+
+Something was lost in translation.
