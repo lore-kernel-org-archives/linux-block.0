@@ -1,73 +1,74 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6C52139C7;
-	Mon,  2 Sep 2024 21:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F002F1A4E7A;
+	Mon,  2 Sep 2024 21:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725310806; cv=none; b=kHwVNyBqg4sDICbLS5LgBD6SvntcE579aTcudck1bcA4wZ3GM6+moefabRFuf710Vjy+ojHgACag1PZ4KmPIOi6LeXTZv+q1ZOa9o0yUXGjoIGifkfp9JQXvOfsG3ZIPkMoLQP/Y6ZEdcQHi+kg8LTljFRRVs+FA1CWFjD0kpp0=
+	t=1725311768; cv=none; b=CcL3P6Ih4XFmoF72vKjQrrakGzgG1FrBWxo8F8DpQVWGAloEn/Ym4dn45Kc0jjk/iAEgcvfJREzLCRb4Cx9hngqu2UmNQu4+kvOEADJMOjDPAbqyaYelEHEUTIcJzHx6nWiRbJFVINBuk7B88h4wElNyjUT/kR4J+fA+IvTYjhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725310806; c=relaxed/simple;
-	bh=pkpET/uZFHN7xCawNWO7nY5MStK547dU2c9KvFYWEv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fCBk1/OGRSJVXE1IvL8hRqOvM3g1RnYzvNeemSpvq8XD6yymGLlU2Zthrq0OJrpa92sy8XyRLsagMcxxj2iQ5IJ8b0+DmvaLnwN3NOxF0FZoQFcAjLLDM2oIJ2G597LBkDohOlqshfSeZUFaqs82XuvL0oyY9+x+97M7vBg8Hdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kblt3aUK; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1725311768; c=relaxed/simple;
+	bh=xHIradCTOWxs111sVGsTWXNDob8KaHxOSBLFE3nj+qw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n6ox90d1/0eVZBJy993HZDJbSq9B1xBPDQiyFfNNllA8pAY/OFM6kt9Zzf05uVCLPIquEfwzYqzKtiQgsVUMLnZRqLHhWYHcTtOWbqx155FFfDk6IlvGDuqOXylWX6L7V2kd/97kf+2dTiOIqCjAy27YLLrO3sVtqJNJqLzmEz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BpT094S2; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kblt3aUK"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42bc19e94bdso23015685e9.3;
-        Mon, 02 Sep 2024 14:00:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpT094S2"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42bac9469e8so38430775e9.3;
+        Mon, 02 Sep 2024 14:16:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725310803; x=1725915603; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HlxzsdvXEzZryfS+C92F0IMet4pQ2CFegtQZuGlbV9A=;
-        b=Kblt3aUKM+p919M32cTyx1PKmBJZEbpcfGU6UhDrWbMc39LEZ7NyonSv5hy9jK8Ogn
-         NHZz5NwmESy2USVWrPr6eDki7570uDDMv6PO51qX9O+70htEbOpQZVIvj2JXCj1TmF7O
-         YCbUWfxt3c6ieyc6rI+vEvxShDXzflB7H9VoFIUlV8U9JXqbkOiB5dHHsnyJw/fwpB9n
-         IFe2TDFNQi58Wm0u+/sf9lIi5v5O+jDz/mQoUZZzLEPCV/SO8BCYVjBUMieF04H1JyfT
-         tYvzmSXQaHWs57pZXIiNbVBj87hk0PaMkiQwgZovvYFrbuKr37RjQtRwLDPYLXlvV4Ld
-         5A4g==
+        d=gmail.com; s=20230601; t=1725311764; x=1725916564; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nPtPsF6UAM9E686vehQDB5d6aPxb9xK3nFtvVgTfqY4=;
+        b=BpT094S2ElIE1+Yhk27R7fuK4ofoL8+00C6ji7QkYvZ+3vFFgZv3R3zKySzoI606Ek
+         ig/Yv+7Szs9uDjXlgnQgprHU0IB8ojFKVKOpxNP/8v936FBVmZItQ6oRZRGUr0D4S7Yl
+         o9n4H8ChIq45HJU0Zbo7aQesH6fT9OcePJPe8yG/apvovX5J2yc+5oq9WghFc268WzQ7
+         tOk42tTOhH54X07kP+i+/cVnoe8GAHZybXp9HCIH5nKqRg1WOe6BSRsydqSkhAtZTLdQ
+         tTbstfhLmtcyaVUIwOJNuw+94n7hBOZ6qsne//y6wS9/eASFgcMm0MVnuhrKEu3wQch2
+         VY2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725310803; x=1725915603;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HlxzsdvXEzZryfS+C92F0IMet4pQ2CFegtQZuGlbV9A=;
-        b=p5A1YbTfjibi6mCTUyj1aIu2ZTiQek6nRWpQaG6dOg97EkP19ZgFI/+vZLVW+RCHTd
-         QV5hKli8Lloq4WrMtv1zXlzmzoUvBr93xvOUFCHuy+HtIIuVAuuNyDJ3jJkCrxoEtVod
-         v9J/FCKVCYI0iV2cQ3+j6klj7RlUgsLXaXBff5NEaadHWkxEjwCJxhNixmCCmOcJ6iJz
-         kZWorQy2rG86vkNiQAUrKSqz6++aK0q9j3sWQw6vFZ1c7IyACSe8NM4pz1J3VRsYFoBw
-         z5hUSsK8oxRcO2QftQ9KGkmy1bBWLizqdB0kXPQkiVZV32PXZISw6/iy2WWpHU6D8NgF
-         XC8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWH813CcuGQj0ydKEBbYHF8IOpKIUHA5uPs1J7CBk9ysj+xyWj68pKWdEAfZ+hQZHX3FxRJzfhf+fRiOA==@vger.kernel.org, AJvYcCXkRd5yjJt39ISDpaPV+fpLzauxayG3sfAHJzJzE7FLb+JsmENlnrhGteu7ZTvfVDgX4drE7mUh9vhAkQQ=@vger.kernel.org, AJvYcCXnnLLsancRzpAPY3EroCaSlufBij/GpEhsdbijZ9vftC0HjkvJumoSlj3avFZrRf8kZiQket47I8zUEcfD@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrOlMGMNURBP7PmejX0PSU5m/0DOMVI0b2/ohE6lXr9oUazBkU
-	XnhAwYkqbKuPTDOZZ+HP1skurzxl4knA5wWSDnEbzosNzxcBHzwm
-X-Google-Smtp-Source: AGHT+IFtjjxmX/D2XNy5vajIk5D1o0OYAnOsZdshyL6WHLN4dfHZLBBUQb5XzmYRI6QBDtrgfHcG5A==
-X-Received: by 2002:a05:600c:1e15:b0:426:5dde:627a with SMTP id 5b1f17b1804b1-42bb01e5b62mr112014445e9.23.1725310802534;
-        Mon, 02 Sep 2024 14:00:02 -0700 (PDT)
-Received: from fedora-thinkpad.lan (net-109-116-17-225.cust.vodafonedsl.it. [109.116.17.225])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42c89dca8absm2913705e9.27.2024.09.02.14.00.01
+        d=1e100.net; s=20230601; t=1725311764; x=1725916564;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nPtPsF6UAM9E686vehQDB5d6aPxb9xK3nFtvVgTfqY4=;
+        b=Iz1njgNOewFwFgtxDf4eBzCV3jOzjXt+jngVzjy4O1P3vfR0hn9jul6SkcAfg+/wTy
+         lnGhK6EgpleMwjwW2lnoBaNlRsKHMcENePCCex6LiO0cKeyfVg/rdzei0EbGpjXlO1mw
+         OAGkmUTAM6eFmnJaTunFE6v8eE3mrdGcANhbltPCwVinHP2401j2nUi4g/rFrpYInyGw
+         bJrga7OrLXzXPOa+v3CvXBP59UlW8diNsD0bIjMXfwxddYCLxz059p219a/acO0L5nfz
+         lz4dS4IAmwUl+W+5K4ShBZP5Z9UaX19TZvY/U+XZnNiquRq7HaItaD+GDrFVlLz2+rSS
+         4rnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW+5sy77OM3R8DkBBp4mQVRw0x8mbwNj10G9awBvxRWCTqkgzlcnUeLmpuIOUDprDENtiIsg0s7N2jbfg==@vger.kernel.org, AJvYcCXjOT5eUCNmbCkv9vCTAIRh3DdPS14/Qpcsemt112SHyfUgiGq9ocCsHUE+5xVr6eKyZtIbbr3wuxKySUnn@vger.kernel.org, AJvYcCXpVbtLzSlToObN00+OsyTlinOBSGz/z7VqLOI4EeZ95XBmCtvuuxWEkjpqF+pLfH++FkfpUul0DgyWYGaU+Cg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIrhmQXXl7XYrdbBfoG5VzDASAhSYcEZUgQJFSfuPuFvC+61bX
+	Z/trcX0lySLhNsGUmw4xtmkzOimOxZ5JQwloaGD8uzcm6sJuXah7
+X-Google-Smtp-Source: AGHT+IE6UBN+imp8de3hPh0orb3455J/7ReQ7aN3NqyMW39i8in3Loh8Ndyo9/Tph97GgffcPulGhQ==
+X-Received: by 2002:a05:600c:3ca9:b0:426:6220:cb57 with SMTP id 5b1f17b1804b1-42c82f67431mr34638755e9.25.1725311763513;
+        Mon, 02 Sep 2024 14:16:03 -0700 (PDT)
+Received: from localhost ([2001:9e8:baf9:8300:afb3:538c:3255:5bc7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bbc87773fsm113061675e9.0.2024.09.02.14.16.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Sep 2024 14:00:02 -0700 (PDT)
-From: Luca Stefani <luca.stefani.ge1@gmail.com>
-To: 
-Cc: Luca Stefani <luca.stefani.ge1@gmail.com>,
+        Mon, 02 Sep 2024 14:16:03 -0700 (PDT)
+From: Francesco Zardi <frazar00@gmail.com>
+To: Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Alice Ryhl <aliceryhl@google.com>,
 	Jens Axboe <axboe@kernel.dk>,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>,
+	rust-for-linux@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH v2 3/3] btrfs: Don't block system suspend during fstrim
-Date: Mon,  2 Sep 2024 22:56:12 +0200
-Message-ID: <20240902205828.943155-4-luca.stefani.ge1@gmail.com>
+	Francesco Zardi <frazar00@gmail.com>
+Subject: [PATCH] docs: rust: fix formatting for kernel::block::mq::Request
+Date: Mon,  2 Sep 2024 23:15:53 +0200
+Message-ID: <20240902211553.103807-1-frazar00@gmail.com>
 X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240902205828.943155-1-luca.stefani.ge1@gmail.com>
-References: <20240902205828.943155-1-luca.stefani.ge1@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,86 +77,183 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sometimes the system isn't able to suspend because the task
-responsible for trimming the device isn't able to finish in
-time, especially since we have a free extent discarding phase,
-which can trim a lot of unallocated space, and there is no
-limits on the trim size (unlike the block group part).
+Fix several issues with rustdoc formatting for the
+`kernel::block::mq::Request` module, in particular:
 
-Since discard isn't a critical call it can be interrupted
-at any time, in such cases we stop the trim, report the amount
-of discarded bytes and return failure.
+- An ordered list not rendering correctly, fixed by using numbers prefixes
+  instead of letters
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=219180
-Link: https://bugzilla.suse.com/show_bug.cgi?id=1229737
-Signed-off-by: Luca Stefani <luca.stefani.ge1@gmail.com>
+- Code snippets formatted as regular text, fixed by wrapping the code with
+  `back-ticks`
+
+- References to types missing intra-doc links, fixed by wrapping the
+  types with [square brackets]
+
+Closes: https://github.com/Rust-for-Linux/linux/issues/1108
+
+Signed-off-by: Francesco Zardi <frazar00@gmail.com>
+Suggested-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- fs/btrfs/extent-tree.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ rust/kernel/block/mq/request.rs | 61 +++++++++++++++++++--------------
+ 1 file changed, 35 insertions(+), 26 deletions(-)
 
-diff --git a/fs/btrfs/extent-tree.c b/fs/btrfs/extent-tree.c
-index 894684f4f497..7c78ed4044db 100644
---- a/fs/btrfs/extent-tree.c
-+++ b/fs/btrfs/extent-tree.c
-@@ -16,6 +16,7 @@
- #include <linux/percpu_counter.h>
- #include <linux/lockdep.h>
- #include <linux/crc32c.h>
-+#include <linux/freezer.h>
- #include "ctree.h"
- #include "extent-tree.h"
- #include "transaction.h"
-@@ -1235,6 +1236,11 @@ static int remove_extent_backref(struct btrfs_trans_handle *trans,
- 	return ret;
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index a0e22827f3f4..a5c1edb4602e 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -16,50 +16,55 @@
+     sync::atomic::{AtomicU64, Ordering},
+ };
+ 
+-/// A wrapper around a blk-mq `struct request`. This represents an IO request.
++/// A wrapper around a blk-mq [`struct request`]. This represents an IO request.
+ ///
+ /// # Implementation details
+ ///
+ /// There are four states for a request that the Rust bindings care about:
+ ///
+-/// A) Request is owned by block layer (refcount 0)
+-/// B) Request is owned by driver but with zero `ARef`s in existence
++/// 1. Request is owned by block layer (refcount 0)
++/// 2. Request is owned by driver but with zero [`ARef`]s in existence
+ ///    (refcount 1)
+-/// C) Request is owned by driver with exactly one `ARef` in existence
++/// 3. Request is owned by driver with exactly one [`ARef`] in existence
+ ///    (refcount 2)
+-/// D) Request is owned by driver with more than one `ARef` in existence
++/// 4. Request is owned by driver with more than one [`ARef`] in existence
+ ///    (refcount > 2)
+ ///
+ ///
+-/// We need to track A and B to ensure we fail tag to request conversions for
++/// We need to track 1 and 2 to ensure we fail tag to request conversions for
+ /// requests that are not owned by the driver.
+ ///
+-/// We need to track C and D to ensure that it is safe to end the request and hand
++/// We need to track 3 and 4 to ensure that it is safe to end the request and hand
+ /// back ownership to the block layer.
+ ///
+ /// The states are tracked through the private `refcount` field of
+ /// `RequestDataWrapper`. This structure lives in the private data area of the C
+-/// `struct request`.
++/// [`struct request`].
+ ///
+ /// # Invariants
+ ///
+-/// * `self.0` is a valid `struct request` created by the C portion of the kernel.
++/// * `self.0` is a valid [`struct request`] created by the C portion of the
++///   kernel.
+ /// * The private data area associated with this request must be an initialized
+ ///   and valid `RequestDataWrapper<T>`.
+ /// * `self` is reference counted by atomic modification of
+-///   self.wrapper_ref().refcount().
++///   `self.wrapper_ref().refcount()`.
++///
++/// [`struct request`]: srctree/include/linux/blk-mq.h
+ ///
+ #[repr(transparent)]
+ pub struct Request<T: Operations>(Opaque<bindings::request>, PhantomData<T>);
+ 
+ impl<T: Operations> Request<T> {
+-    /// Create an `ARef<Request>` from a `struct request` pointer.
++    /// Create an [`ARef<Request>`] from a [`struct request`] pointer.
+     ///
+     /// # Safety
+     ///
+     /// * The caller must own a refcount on `ptr` that is transferred to the
+-    ///   returned `ARef`.
+-    /// * The type invariants for `Request` must hold for the pointee of `ptr`.
++    ///   returned [`ARef`].
++    /// * The type invariants for [`Request`] must hold for the pointee of `ptr`.
++    ///
++    /// [`struct request`]: srctree/include/linux/blk-mq.h
+     pub(crate) unsafe fn aref_from_raw(ptr: *mut bindings::request) -> ARef<Self> {
+         // INVARIANT: By the safety requirements of this function, invariants are upheld.
+         // SAFETY: By the safety requirement of this function, we own a
+@@ -84,12 +89,14 @@ pub(crate) unsafe fn start_unchecked(this: &ARef<Self>) {
+     }
+ 
+     /// Try to take exclusive ownership of `this` by dropping the refcount to 0.
+-    /// This fails if `this` is not the only `ARef` pointing to the underlying
+-    /// `Request`.
++    /// This fails if `this` is not the only [`ARef`] pointing to the underlying
++    /// [`Request`].
+     ///
+-    /// If the operation is successful, `Ok` is returned with a pointer to the
+-    /// C `struct request`. If the operation fails, `this` is returned in the
+-    /// `Err` variant.
++    /// If the operation is successful, [`Ok`] is returned with a pointer to the
++    /// C [`struct request`]. If the operation fails, `this` is returned in the
++    /// [`Err`] variant.
++    ///
++    /// [`struct request`]: srctree/include/linux/blk-mq.h
+     fn try_set_end(this: ARef<Self>) -> Result<*mut bindings::request, ARef<Self>> {
+         // We can race with `TagSet::tag_to_rq`
+         if let Err(_old) = this.wrapper_ref().refcount().compare_exchange(
+@@ -109,7 +116,7 @@ fn try_set_end(this: ARef<Self>) -> Result<*mut bindings::request, ARef<Self>> {
+ 
+     /// Notify the block layer that the request has been completed without errors.
+     ///
+-    /// This function will return `Err` if `this` is not the only `ARef`
++    /// This function will return [`Err`] if `this` is not the only [`ARef`]
+     /// referencing the request.
+     pub fn end_ok(this: ARef<Self>) -> Result<(), ARef<Self>> {
+         let request_ptr = Self::try_set_end(this)?;
+@@ -123,13 +130,13 @@ pub fn end_ok(this: ARef<Self>) -> Result<(), ARef<Self>> {
+         Ok(())
+     }
+ 
+-    /// Return a pointer to the `RequestDataWrapper` stored in the private area
++    /// Return a pointer to the [`RequestDataWrapper`] stored in the private area
+     /// of the request structure.
+     ///
+     /// # Safety
+     ///
+     /// - `this` must point to a valid allocation of size at least size of
+-    ///   `Self` plus size of `RequestDataWrapper`.
++    ///   [`Self`] plus size of [`RequestDataWrapper`].
+     pub(crate) unsafe fn wrapper_ptr(this: *mut Self) -> NonNull<RequestDataWrapper> {
+         let request_ptr = this.cast::<bindings::request>();
+         // SAFETY: By safety requirements for this function, `this` is a
+@@ -141,7 +148,7 @@ pub(crate) unsafe fn wrapper_ptr(this: *mut Self) -> NonNull<RequestDataWrapper>
+         unsafe { NonNull::new_unchecked(wrapper_ptr) }
+     }
+ 
+-    /// Return a reference to the `RequestDataWrapper` stored in the private
++    /// Return a reference to the [`RequestDataWrapper`] stored in the private
+     /// area of the request structure.
+     pub(crate) fn wrapper_ref(&self) -> &RequestDataWrapper {
+         // SAFETY: By type invariant, `self.0` is a valid allocation. Further,
+@@ -152,13 +159,15 @@ pub(crate) fn wrapper_ref(&self) -> &RequestDataWrapper {
+     }
  }
  
-+static bool btrfs_trim_interrupted(void)
-+{
-+	return fatal_signal_pending(current) || freezing(current);
-+}
-+
- static int btrfs_issue_discard(struct block_device *bdev, u64 start, u64 len,
- 			       u64 *discarded_bytes)
- {
-@@ -1302,6 +1308,9 @@ static int btrfs_issue_discard(struct block_device *bdev, u64 start, u64 len,
- 	}
+-/// A wrapper around data stored in the private area of the C `struct request`.
++/// A wrapper around data stored in the private area of the C [`struct request`].
++///
++/// [`struct request`]: srctree/include/linux/blk-mq.h
+ pub(crate) struct RequestDataWrapper {
+     /// The Rust request refcount has the following states:
+     ///
+     /// - 0: The request is owned by C block layer.
+-    /// - 1: The request is owned by Rust abstractions but there are no ARef references to it.
+-    /// - 2+: There are `ARef` references to the request.
++    /// - 1: The request is owned by Rust abstractions but there are no [`ARef`] references to it.
++    /// - 2+: There are [`ARef`] references to the request.
+     refcount: AtomicU64,
+ }
  
- 	while (bytes_left) {
-+		if (btrfs_trim_interrupted())
-+			break;
-+
- 		sector = start >> SECTOR_SHIFT;
- 		nr_sects = bytes_left >> SECTOR_SHIFT;
- 		bio_sects = min(nr_sects, bio_discard_limit(bdev, sector));
-@@ -6470,7 +6479,7 @@ static int btrfs_trim_free_extents(struct btrfs_device *device, u64 *trimmed)
- 		start += len;
- 		*trimmed += bytes;
+@@ -204,7 +213,7 @@ fn atomic_relaxed_op_return(target: &AtomicU64, op: impl Fn(u64) -> u64) -> u64
+ }
  
--		if (fatal_signal_pending(current)) {
-+		if (btrfs_trim_interrupted()) {
- 			ret = -ERESTARTSYS;
- 			break;
- 		}
-@@ -6519,6 +6528,9 @@ int btrfs_trim_fs(struct btrfs_fs_info *fs_info, struct fstrim_range *range)
- 
- 	cache = btrfs_lookup_first_block_group(fs_info, range->start);
- 	for (; cache; cache = btrfs_next_block_group(cache)) {
-+		if (btrfs_trim_interrupted())
-+			break;
-+
- 		if (cache->start >= range_end) {
- 			btrfs_put_block_group(cache);
- 			break;
-@@ -6558,6 +6570,9 @@ int btrfs_trim_fs(struct btrfs_fs_info *fs_info, struct fstrim_range *range)
- 
- 	mutex_lock(&fs_devices->device_list_mutex);
- 	list_for_each_entry(device, &fs_devices->devices, dev_list) {
-+		if (btrfs_trim_interrupted())
-+			break;
-+
- 		if (test_bit(BTRFS_DEV_STATE_MISSING, &device->dev_state))
- 			continue;
- 
+ /// Store the result of `op(target.load)` in `target` if `target.load() !=
+-/// pred`, returning true if the target was updated.
++/// pred`, returning `true` if the target was updated.
+ fn atomic_relaxed_op_unless(target: &AtomicU64, op: impl Fn(u64) -> u64, pred: u64) -> bool {
+     target
+         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
+
+base-commit: a335e95914046c6bed45c0d17cabcd483682cf5e
 -- 
 2.46.0
 
