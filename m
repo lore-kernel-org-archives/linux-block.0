@@ -1,228 +1,95 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC2819E977
-	for <linux-block@vger.kernel.org>; Mon,  2 Sep 2024 14:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032E41CB51D
+	for <linux-block@vger.kernel.org>; Mon,  2 Sep 2024 15:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725287286; cv=none; b=ZITJF46xZ/LcyKYEEweZZh8oRXBlL0wedoTNgguYODbGzSge+R5CbBuv/5Aq5HAlKSI9qEWH/SMEuorB4hlw8cTCz0IASW33jG+NXfx68VhD6oayU+oPqIJEBJ78IrkluE8AiOitx91nBcGJGyHAxm4/rr4Zq+Bw9XjUXwnmQZI=
+	t=1725291624; cv=none; b=cXbbUtENLW/3l/MHIUl1WvvhedM6fD2kVGT67xPsFg92JOut98odwmTuYKv/GvMg521uCk2SmTEaenATu4VlSrM+adH/6fFy52NynrniqKs7DfUkC5Pw53GHT/XsPdl5+hEeZANVYTwLCWiuctxcvwJ1BYUfQxWcRsFzY6ltnPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725287286; c=relaxed/simple;
-	bh=KDplJl/RrUBdZt2PBYnQbFIAOQzTNLGE+ZD3JCo4kSs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XRrdVmTafK49GG3t0RnXweEs5iDYAlQEtOL3ufm6ehOrX4WU6RgupsFxF/ZfQGtQAUV3+fQ7txjlnIPwnF3DvacLTItcUW/z4CUvAd0pq/cTuosl/tt2bZMmpScg8kQmASRfKeOsUV1cOVqIy7IHftxuugjSmAeBEYPWxyoFG/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Vpq+LbFL; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1725291624; c=relaxed/simple;
+	bh=dXzIVlW1iE5kL52BvkJf61CB5Dqr8BAtaeEzn6vZyq8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=ey/I/YBZbTsB7GpurMSV9lf1PO2iaD4bJ73tchi1WvRoEXgFq+29OXF+1i3rg5sLXgMsT4T0Y8Px89nE/9oiN5DqmGlkVVo6NbisIxPP5E2kHa9PpqgIgcr9aQPM8qYgrGeEJbzfM46ooL3LAIxtVTKl7Xp0U2ve3Ls7cMPTv/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MdLGjMi3; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Vpq+LbFL"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a8692bbec79so486479366b.3
-        for <linux-block@vger.kernel.org>; Mon, 02 Sep 2024 07:28:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MdLGjMi3"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2d679b094ffso3137175a91.1
+        for <linux-block@vger.kernel.org>; Mon, 02 Sep 2024 08:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725287281; x=1725892081; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725291619; x=1725896419; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oQ9LsPTxm+VbQGotIboa4weytFmVBj0/VPIq2l60SY0=;
-        b=Vpq+LbFLbTGKOyeVT5B4Ko2lpNhxFy7wDKqIi0WBTkTh0bnhlFr3P9Uu6ic34p9kCy
-         d9II/Qpj0ORYdOjlhM5/3F7z1ilS+rqv+8WXg3Xl7fDMdwqdvh8Xf0OVQwsyUmMR6TmQ
-         u+6jQQv2MPKOWnvVvCSZ1OKM9GxYZKuHhdbE8V8u+QKR1tOmFIUWKh638U2O3lrBTUsm
-         Ws3nBqjVmd776HBVrOBii4nRtYBx1/HIANnn3Uc64WPAgghS8BEZf2jvf94RKwGEMvkv
-         Hua2ix1uDDGIBfTuwWcqnt098XJKU/vnBYN68M5fKpeMFzNz3FRjtgY6lkhMXuXUsFLd
-         ydww==
+        bh=QhqUFwlMLIHt6BkcfEhvdfh4DWFHk5bzhcaQ7ExZGGU=;
+        b=MdLGjMi3Aozmdo8o9AXNs/iJzDh+/d0YfJ3ja2aCimO4W3W2CymDoEo6QQQb7wRUZg
+         vSU95/2pcamZzDR2ehJMpS27IIRWLhqkMwzymoaYS/97CT/p0+8vqNUfjQNXPOCO4bPu
+         45xA6zM7TGi4bHzOgsMeO/wAyQG6xl4y0DoHBOk4HtZsKKtaUAUUFB7v0JSJ7/iBAdik
+         AXdmOliLAkuPhU2LjhoVJrYxi8l96h4WG9F2kEFt9nyAa2/UTxfhhpj/zUGvxwrbZANl
+         p9yzKEUnh6xyFoDZwd665ROYwU0oRiJ8I/1dTvK+9f9PLCAXYmpTSWjKEVxat7HCVy8X
+         UJbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725287281; x=1725892081;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1725291619; x=1725896419;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oQ9LsPTxm+VbQGotIboa4weytFmVBj0/VPIq2l60SY0=;
-        b=bJb87o+lu7YBrluezL0yf85YYK1hUi/ZuMA9qiqEq6WUzgWKk7pI/ypo9n29Ry6XfM
-         y01uvojUv/KsljqZmiPBXCA0e7ZwCbHeTo248qIk5t7wp+yr5ZzrbypS6GAMGLfUXUWY
-         1LnVjhOMFPZ6tBB+V9/nlUyIrsqrFuAL4XIM/12arMMXjaD2J2y5JjZPn98GY3ZOzVSI
-         9paZWfZGCg86C922DfXJu8YnWm9K5kNITS1kkd8mo4sjZ2mQ8MFAvVwv8+Nf/RKYf5io
-         QxrX6oGZaOTsXZwyS7XMsWi0te7V5H/gEzJxUPdo/ZhRcBCF6G6RNlMs7/5xxyY7C5QB
-         6qbw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+pIPoG4+Qs/qUM91TkAxhmtqgpZdVoUEat3jOyI4fy8anZ8syacf6PiByzWm9V1JZRWfmRt+sFOdt4w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywnyhxe8vL8vlG0yyftdvaCewnRmwmtoehjSIzvBxuwda5YYxiI
-	AyfACWRK7dyk+Bbv4M5wjNwatdI9cjamZHzUsIZpgPk2cg4NVDSOWur1lm30KyOPMoP7yedleBK
-	R
-X-Google-Smtp-Source: AGHT+IFNo+U6H0njqtK5FYf7X4oDFyjmGEpzlRSMX+ycejfBh12MlSOr41SNUtIdm7WPwSAjc412zg==
-X-Received: by 2002:a17:907:d8f:b0:a7a:b781:60ed with SMTP id a640c23a62f3a-a89a35a1159mr655497466b.17.1725287280917;
-        Mon, 02 Sep 2024 07:28:00 -0700 (PDT)
-Received: from localhost (p200300de37360a00d7e56139e90929dd.dip0.t-ipconnect.de. [2003:de:3736:a00:d7e5:6139:e909:29dd])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-a8989222fa8sm565950366b.213.2024.09.02.07.28.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Sep 2024 07:28:00 -0700 (PDT)
-From: Martin Wilck <martin.wilck@suse.com>
-X-Google-Original-From: Martin Wilck <mwilck@suse.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Daniel Wagner <dwagner@suse.de>
-Cc: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v3 3/3] nvme: add test for controller rescan under I/O load
-Date: Mon,  2 Sep 2024 16:27:47 +0200
-Message-ID: <20240902142748.65779-3-mwilck@suse.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240902142748.65779-1-mwilck@suse.com>
-References: <20240902142748.65779-1-mwilck@suse.com>
+        bh=QhqUFwlMLIHt6BkcfEhvdfh4DWFHk5bzhcaQ7ExZGGU=;
+        b=o4Xe5mf6eB9iNWyeVKZJAcrBOn9YJng/ZpMhRIuUohLiBv/o6NIaiqA9pH/sx1V3nv
+         SKrtB1GUkIaF3yx/FeyunhJnEjJvLTlDxKiX/fAbGB6MVqZzQFnFZHk/ZhNCDBKfGc6z
+         6yVEG4gZeCcvUji7bw9gJSpeSz3uaVz4MDRVLrevcn7f12u+rwoTv+4jM4b60KAAED7I
+         C7gJpOpsHHPNrypvyRGbOs2EbruZ3kLj+Iapytgv0VzWB5JObNDadi5xNPgN0Y1SLBqt
+         M0dvxU+kVtgC3vkggP4pFWxF9flxPwtYkR7iKkTlooBcqqHAw2ROWYkfVlP+BMIIrnfo
+         tDYA==
+X-Gm-Message-State: AOJu0YzI9XORyPKiaej9OdlIq4Vg/mKHgBXVGNl2riGBF1vXSfKYZAHK
+	ekysAyh669WoPC4P36CmRCwEFvOcchixWAfLnbBHOplrrPTBwbE0w+8rdwTrPLoyoqk7wB1VBKB
+	x
+X-Google-Smtp-Source: AGHT+IGjynHfbafG1Omc2xlm9BLr57YCDac3wUMwPdI3+8mM0dfbPLF1K8oW97h3N94WJOy8h4/tug==
+X-Received: by 2002:a17:90b:4ac4:b0:2d8:ea11:1c68 with SMTP id 98e67ed59e1d1-2d8ea111cbfmr2351692a91.31.1725291619453;
+        Mon, 02 Sep 2024 08:40:19 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d8e77590c7sm1899850a91.6.2024.09.02.08.40.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Sep 2024 08:40:18 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Yu Kuai <yukuai3@huawei.com>
+In-Reply-To: <20240830034145.1827742-1-ming.lei@redhat.com>
+References: <20240830034145.1827742-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] nbd: fix race between timeout and normal completion
+Message-Id: <172529161819.4471.16974485070803844903.b4-ty@kernel.dk>
+Date: Mon, 02 Sep 2024 09:40:18 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
-Add a test that repeatedly rescans nvme controllers while doing IO
-on an nvme namespace connected to these controllers. The purpose
-of the test is to make sure that no I/O errors or data corruption
-occurs because of the rescan operations. The test uses sub-second
-sleeps, which can't be easily accomplished in bash because of
-missing floating-point arithmetic (and because usleep(1) isn't
-portable). Therefore an awk program is used to trigger the
-device rescans.
 
-Link: https://lore.kernel.org/linux-nvme/20240822201413.112268-1-mwilck@suse.com/
-Signed-off-by: Martin Wilck <mwilck@suse.com>
-Reviewed-by: Nilay Shroff (nilay@linux.ibm.com)
----
-v3: (all changes suggested by Shinichiro Kawasaki)
-    - add "Link:" tag
-    - add comment with patch description
-    - declare variable "st" local
-    - use "mapfile -t" for array assignment
-v2: - don't use usleep (Nilay Shroff). Use an awk program to do floating
-      point arithmetic and achieve more accurate sub-second sleep times.
-    - add 053.out (Nilay Shroff).
----
- tests/nvme/053     | 74 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/053.out |  2 ++
- tests/nvme/rc      | 18 +++++++++++
- 3 files changed, 94 insertions(+)
- create mode 100755 tests/nvme/053
- create mode 100644 tests/nvme/053.out
+On Fri, 30 Aug 2024 11:41:45 +0800, Ming Lei wrote:
+> If request timetout is handled by nbd_requeue_cmd(), normal completion
+> has to be stopped for avoiding to complete this requeued request, other
+> use-after-free can be triggered.
+> 
+> Fix the race by clearing NBD_CMD_INFLIGHT in nbd_requeue_cmd(), meantime
+> make sure that cmd->lock is grabbed for clearing the flag and the
+> requeue.
+> 
+> [...]
 
-diff --git a/tests/nvme/053 b/tests/nvme/053
-new file mode 100755
-index 0000000..df643ec
---- /dev/null
-+++ b/tests/nvme/053
-@@ -0,0 +1,74 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Martin Wilck, SUSE LLC
-+#
-+# Repeatedly rescans nvme controllers while doing IO on an nvme namespace
-+# connected to these controllers, and make sure that no I/O errors or data
-+# corruption occurs.
-+
-+. tests/nvme/rc
-+
-+DESCRIPTION="test controller rescan under I/O load"
-+TIMED=1
-+: "${TIMEOUT:=60}"
-+
-+rescan_controller() {
-+	local path
-+	path="$1/rescan_controller"
-+
-+	[[ -f "$path" ]] || {
-+		echo "cannot rescan $1"
-+		return 1
-+	}
-+
-+	awk -f "$TMPDIR/rescan.awk" \
-+	    -v path="$path" -v timeout="$TIMEOUT" -v seed="$2" &
-+}
-+
-+create_rescan_script() {
-+	cat >"$TMPDIR/rescan.awk" <<EOF
-+@load "time"
-+
-+BEGIN {
-+    srand(seed);
-+    finish = gettimeofday() + strtonum(timeout);
-+    while (gettimeofday() < finish) {
-+	sleep(0.1 + 5 * rand());
-+	printf("1\n") > path;
-+	close(path);
-+    }
-+}
-+EOF
-+}
-+
-+test_device() {
-+	local -a ctrls
-+	local i st
-+
-+	echo "Running ${TEST_NAME}"
-+	create_rescan_script
-+
-+	mapfile -t ctrls < <(_nvme_get_ctrl_list)
-+	_run_fio_verify_io --filename="$TEST_DEV" --time_based &> "$FULL" &
-+
-+	for i in "${!ctrls[@]}"; do
-+		rescan_controller "${ctrls[$i]}" "$i"
-+	done
-+
-+	while true; do
-+		wait -n &>/dev/null
-+		st=$?
-+		case $st in
-+			127)
-+				break
-+				;;
-+			0)
-+				;;
-+			*)
-+				echo "child process exited with $st!"
-+				;;
-+		esac
-+	done
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/053.out b/tests/nvme/053.out
-new file mode 100644
-index 0000000..e8086ce
---- /dev/null
-+++ b/tests/nvme/053.out
-@@ -0,0 +1,2 @@
-+Running nvme/053
-+Test complete
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index b702a57..a877de3 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -192,6 +192,24 @@ _test_dev_nvme_nsid() {
- 	cat "${TEST_DEV_SYSFS}/nsid"
- }
- 
-+_nvme_get_ctrl_list() {
-+	local subsys
-+	local c
-+
-+	subsys=$(readlink  "${TEST_DEV_SYSFS}/device/subsystem")
-+	case $subsys in
-+		*/nvme)
-+			readlink -f "${TEST_DEV_SYSFS}/device"
-+			;;
-+		*/nvme-subsystem)
-+			for c in "${TEST_DEV_SYSFS}"/device/nvme*; do
-+				[[ -L "$c" ]] || continue
-+				[[ -f "$c/dev" ]] && readlink -f "$c"
-+			done
-+			;;
-+	esac
-+}
-+
- _nvme_calc_rand_io_size() {
- 	local img_size_mb
- 	local io_size_kb
+Applied, thanks!
+
+[1/1] nbd: fix race between timeout and normal completion
+      commit: c9ea57c91f03bcad415e1a20113bdb2077bcf990
+
+Best regards,
 -- 
-2.46.0
+Jens Axboe
+
+
 
