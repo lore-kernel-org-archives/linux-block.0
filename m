@@ -1,86 +1,104 @@
-Received: from outboundhk.mxmail.xiaomi.com (outboundhk.mxmail.xiaomi.com [207.226.244.122])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B31A1A0BC0;
-	Tue,  3 Sep 2024 09:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.226.244.122
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533861A4E7C;
+	Tue,  3 Sep 2024 10:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725356173; cv=none; b=Fb4PoF5GiNF4uK+Bmk4/+eqRkcJdL8m/MyWpRFwDrozrxidjqveUxWLZUJtx52MGYZ4DXgeYRYcYKYdZvP2izdtj3jbZ9tSZqVU5hL2Mkum5mM72xueZT30cJouHnzvO+dz62TBNX8hGHfpebtCXW+Qie/MrkIXxsDQkF5dz3Ik=
+	t=1725359941; cv=none; b=faudUuy5hEPEbKBmYM6gmf7NpA44W+R4PcjMtazGy0rL5X02W+89ufXIrKvfnO+IBk2BxbxJOmedrNhpus7AsIe4dQXRljJxXDMfopuoWQInbxXNy1XIEiUr2mPmzVXh4wANWklGCX0GQ1sKTwuDZH/mSsLmyohYh9xF1a5ry2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725356173; c=relaxed/simple;
-	bh=qyOBWzSA9PMTyI2ZdLp/3LZZLqjxeycKS2UtMNIUvdI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G7tBtTna2I+r49L9sLxwuahIGiMFToUFypZczhHFIiEnMrbmX5+5S0BFbKDOrV3yZzArMlETVZ3zPUpM66cLHTiK2BzaRc4DBVM6zAxFW3f4M85+V7prQ6Sp812ANi5/+P3sopV8Dir4IedCTPcLTsJD4F7vb2k1vPJFhKKMpSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com; spf=pass smtp.mailfrom=xiaomi.com; arc=none smtp.client-ip=207.226.244.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xiaomi.com
-X-CSE-ConnectionGUID: H0UdeGf+S2CthT+NhrvNXA==
-X-CSE-MsgGUID: oGc/Nm4wSimkmohUrdLHNA==
-X-IronPort-AV: E=Sophos;i="6.10,198,1719849600"; 
-   d="scan'208";a="121006317"
-From: ZhangHui <zhanghui31@xiaomi.com>
-To: <axboe@kernel.dk>, <bvanassche@acm.org>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<zhanghui31@xiaomi.com>
-Subject: [PATCH v2] block: move non sync requests complete flow to softirq
-Date: Tue, 3 Sep 2024 17:34:57 +0800
-Message-ID: <20240903093457.35752-1-zhanghui31@xiaomi.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1725359941; c=relaxed/simple;
+	bh=QsB9ytTgaYVg/jbAlllbbzbJruHNK7+AM8/jWK6QZqY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rgne7EcmmpjNkwYvX9ThzVl1Y6fBYRcheJnPAk+Lt08SsugFaRG+3CucqBzLFz3W0Ws9OaAkmCAfJm2J9K3lOgCpPEgZ2+RvwlRbIk6HJVpRJm6BXL9ACDTGp7Gh6B9kiJwKQ/rRFGV06xT1yF/4WlJt+Up+xjassvkjc2iGfr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gFRLK9oV; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFRLK9oV"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71446767885so662220b3a.1;
+        Tue, 03 Sep 2024 03:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725359938; x=1725964738; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iBup1UfPYH+jBIe3t6bYSH/YuGGit6nmS2KxsQ9yvQE=;
+        b=gFRLK9oV56iUKX1M46fGOJ6aTHj/CdusgmsDfYbD7Ggj2AIqh5Pwk/f0N79P4YsGOQ
+         H+OnwAdhszgZgtn+lvkp1pmR09dh3cDSoTLV5WBwwQddofvEvSSz7c/eIuG0ocMyDQVt
+         QI0bVIMzNBIiJb5AEm81RWVl/7RtPdXr4qumo2USVP8Pe31GuK3zVZNxApsBxVLxujBT
+         vOW7ymW+PC4KOXjIYQfh5ImuJ5UoEJyP1LPyvpq5hAd1P29Fl9UnFecvKEc9Qw0ZSryp
+         PjN5crbyd6DMgchEJK9jODA5ajVP4ixYK9vakWjUJMfOC2DDQRWf6szzBDDSB7plXBFW
+         y1Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725359938; x=1725964738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iBup1UfPYH+jBIe3t6bYSH/YuGGit6nmS2KxsQ9yvQE=;
+        b=jcxqnuAyCvAfrM8TPEtkYpG1SjGIcmUxfgHta2NNVnRubv/NwFVKhe9/+kfCOxyLnk
+         C0J608XK4sePjLM+ocmK0yLXU0nq/uth3YZEhdB7LhTCXrblc7EUIyfBX30T9jugQy8s
+         /2w82BPhwUaHsTz08TbtoCJSPpyIRp506bcs0U2EvDerwQ6MzEh4KL+lvTHRYbF8eF1E
+         3AGVfYewsOIfZUMWv5Un+h2mrmLoF0iK0LF32H7KUJhu5H0rwB9vRQ7+KF00KKLbkWn/
+         mFjOq/EmfmErcOEjZq5BjFk61yYSF93dtqGfPesYS/6MTDXtEDjkCjnJDvigXK7g+ozE
+         8Y+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVwaCBGwJ9CnR4eJM8fC2gxCIqePw+Zjrxh11q3M5GFPgnZDMKp3nmTfhDyfVvkpUY38m3TnBH5IgXk7nc96C8=@vger.kernel.org, AJvYcCWjVgYb+0RAIONQxdIFMyxDV4SEPPxeSRi9wyb6Xph+2IePSujAKaBYMRSxlMJSgM1+yrNZq1SDT67uhw==@vger.kernel.org, AJvYcCXg2Aa26fKmpjmrrr7Ffii4to4I5QE8iQv6WUF8dpXhR7KWAb5bnfB5QSxbGxkQRyEK9fwuZzS+YHPTeWJ9@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyruVfvRHxTg2sZEHiENF9TezV3lCw88eOEdZL2Zz6B78ODk0t
+	8eSkLN+gdRa249tyJ+QuzUfOlqyFe06xnIYoFcirfOu7OMQ0IkYJRhEt31wQlShrcx86s9ctSjx
+	Pidk03KE6TbtvSehKp/319XFJdJU=
+X-Google-Smtp-Source: AGHT+IGJh9PB9LY+D4XML3Q1TRSkEKR3shqWi/yNYLbCnuZNYDMh4hnKUJGX/kIVREqL/OIQ2aA3uUgtgScUrvRnQds=
+X-Received: by 2002:a05:6a20:7f86:b0:1c4:c4cc:fa49 with SMTP id
+ adf61e73a8af0-1ccee5179b7mr8048831637.7.1725359938563; Tue, 03 Sep 2024
+ 03:38:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BJ-MBX05.mioffice.cn (10.237.8.125) To YZ-MBX07.mioffice.cn
- (10.237.88.127)
+References: <20240902211553.103807-1-frazar00@gmail.com>
+In-Reply-To: <20240902211553.103807-1-frazar00@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 3 Sep 2024 12:38:46 +0200
+Message-ID: <CANiq72naAHm81thntNdaEoq8rMVH0gVNAKB_Fd5dy2Eu1pk5mA@mail.gmail.com>
+Subject: Re: [PATCH] docs: rust: fix formatting for kernel::block::mq::Request
+To: Francesco Zardi <frazar00@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Alice Ryhl <aliceryhl@google.com>, Jens Axboe <axboe@kernel.dk>, rust-for-linux@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: zhanghui <zhanghui31@xiaomi.com>
+On Mon, Sep 2, 2024 at 11:16=E2=80=AFPM Francesco Zardi <frazar00@gmail.com=
+> wrote:
+>
+> Fix several issues with rustdoc formatting for the
+> `kernel::block::mq::Request` module, in particular:
 
-Currently, for a controller that supports multiple queues, like UFS4.0,
-the mq_ops->complete is executed in the interrupt top-half. Therefore, 
-the file system's end io is executed during the request completion process,
-such as f2fs_write_end_io on smartphone.
+Thanks for the patch, Francesco! These look good (I didn't render it though=
+).
 
-However, we found that the execution time of the file system end io
-is strongly related to the size of the bio and the processing speed
-of the CPU. Because the file system's end io will traverse every page
-in bio, this is a very time-consuming operation.
+> Closes: https://github.com/Rust-for-Linux/linux/issues/1108
+>
+> Signed-off-by: Francesco Zardi <frazar00@gmail.com>
+> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
 
-We measured that the 80M bio write operation on the little CPU will
-cause the execution time of the top-half to be greater than 100ms.
-The CPU tick on a smartphone is only 4ms, which will undoubtedly affect
-scheduling efficiency.
+If we considered these a fix (I think at least for the first bullet
+point it makes sense to do so), these should probably be (in this
+order, and without blank newlines):
 
-Let's fixed this issue by moved non sync request completion flow to
-softirq, and keep the sync request completion in the top-half.
+    Reported-by:
+    Closes:
+    Signed-off-by:
 
-Signed-off-by: zhanghui <zhanghui31@xiaomi.com>
----
- block/blk-mq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+But depending on the maintainer they may do this without a v2 when
+picking it up -- it depends on what Andreas wants to do (it could go
+through Block or Rust).
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e3c3c0c21b55..06b232edff11 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1193,6 +1193,8 @@ static void blk_mq_raise_softirq(struct request *rq)
- 
- bool blk_mq_complete_request_remote(struct request *rq)
- {
-+	blk_opf_t is_sync = op_is_sync(rq->cmd_flags);
-+
- 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
- 
- 	/*
-@@ -1210,7 +1212,7 @@ bool blk_mq_complete_request_remote(struct request *rq)
- 		return true;
- 	}
- 
--	if (rq->q->nr_hw_queues == 1) {
-+	if ((rq->q->nr_hw_queues == 1) || !is_sync) {
- 		blk_mq_raise_softirq(rq);
- 		return true;
- 	}
--- 
-2.43.0
+Thanks!
 
+Cheers,
+Miguel
