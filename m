@@ -1,117 +1,125 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A475C1DC720
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 19:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A721DC729
+	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 19:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725392894; cv=none; b=arLhZ8hTvWbUSC4/ir+Nlpy4ekS2DfeDUYfQcNGHRxhuLca7bqCNwPXwUeBMCRONKF0W01v3ATwIUqiNebI25nycgV3T2552qkIgVaKdGGN09kVETHHfmxo67NLOIthSJhWW4c9ND8cKEzUEidcAIZqQVpAj5rMWqwBzu71nGQg=
+	t=1725392905; cv=none; b=BQQEmURyvqIaWHM+9W8AvMP2+DgP8OHK+4MCUtqflWawI1lBktrgSyKtt/x3Rlfq0e/cs/B4EKe2o/4Xid0pUGemLOOcfXTAjSrNUwkZTavSeKt7Qxb45ImKtzvLIs4/IW4ryky1q4FcbbCwHy90ss//e50SphUcIE3BKMTTi0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725392894; c=relaxed/simple;
-	bh=5w1MdU87kfmFhemU47nWHUKj584aIGRPwOl3SBx1hrE=;
-	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=no9Ahn2M/bk5PYhEo9oGbty5ZRSa4vO3CTbkEQ2OGw9HiLum5fi8gAcg+iGeQLO4tmSmrxq7cjDZoG6XPrmV/WUbg9faA8AE3KAG8td2pfzCg6d8RYoqXz+RPChRvu9b4FZ7bqeGITR12z/o48BT+sVrgvly4tiHbzm9QDj1LCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B0Yb+LDL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1725392905; c=relaxed/simple;
+	bh=XninZ81pnKnsdesUdChjgW+lqNMdx2/p2eTsWHc4Bqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ox2eSKYhAyutsaQfD5i1GsVKAtqWieF408KiRbeDXjsQdGCPu2Q2RdwPLHxuRWHkTYlhDRctkI4oyJ1mE/ziUeX4l/O39yczb/EGvohZUVWFIjsg5ooFSKX8E1mwi/HT8IIhogyWI5LnauCsWUhWbIBFSBITDRjSaA8gaftuuFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HgHylQ/+; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0Yb+LDL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725392891;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=bSTLusuXmFQd65kQGYZ1qnrT0q7wEzKGyedDbsG7eqw=;
-	b=B0Yb+LDLwD2fClhBXXTq1glTABv6zupyVW044RtYiTyGdUYlssmAr00YJJFukkFRs+fnJV
-	5K8ninRzUxwh1nljJRtptj0Y1cVEgbCrCqezMbXgWT+cOsxShagUArEbKA0FakuEds8tTK
-	EmF0/x8QsrfBbrR9YqhYrr4icnRfUWk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-620-1UR2zS6-OKybRe2ml9oEdw-1; Tue,
- 03 Sep 2024 15:48:08 -0400
-X-MC-Unique: 1UR2zS6-OKybRe2ml9oEdw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6FDE71978F64;
-	Tue,  3 Sep 2024 19:48:06 +0000 (UTC)
-Received: from [10.45.224.222] (unknown [10.45.224.222])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F419219560A3;
-	Tue,  3 Sep 2024 19:48:03 +0000 (UTC)
-Date: Tue, 3 Sep 2024 21:47:59 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HgHylQ/+"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42bb7298bdeso64494635e9.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2024 12:48:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725392902; x=1725997702; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3YNa2pV8ipqWd5RFbagHFYqKbz6ZSzLBF1M2VT4HJcY=;
+        b=HgHylQ/+E0YcNEcJQM3KlWzRLCLJixE2rZvy1AddS0IUk49LpuatUzIswH9JRWAFWD
+         RPjrRe9wmlo9l18/3x7Pz47UretMX+lv7doL7t+j+8m3EPnOf5XQKsaWY0EUOeM2+Q/l
+         ypKBvvGzfDTqBjuVWwkrmonlLVQ68pDAaQzj+uLqMm4B+ts+J0dgQ6iz4My2L4CHxqnj
+         xjzv0R3Lo0LOF9xcCnifWM2Rcs8EghuG2afWjQQWwSrAK0MOwFJPFzx5FDSnAV4NpGT2
+         BRB2IeVdGrMBTNe3C7mTvBtDCg5h1yGWQvdopksYJfXeJxvIdGjOIKGrbQKD6KKaVmwR
+         Ym3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725392902; x=1725997702;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3YNa2pV8ipqWd5RFbagHFYqKbz6ZSzLBF1M2VT4HJcY=;
+        b=C1w69orLhrvKpzJyHD1QTG3gDFaRvez68YvRF68AJz16z6WOPukETqp0tuvN6xw4gT
+         qPRWv1l78u6i3PMr8Q8WaRCiRDXEQeDlj5sQMFBiF/SubjMoa3WfXOUsq8WwjohBXCSt
+         K/NnvwtfKE2RuwO3iyiDQ6yZcAjJ8IxJ8LR4ujL9czEtd2oXf7dLbAG2ySn6JAFiVVHe
+         3jO2bc4Kmf5BPBHr8Yn0tCVBnYfA13G04lht8u7LEWXl06PagnWhI+Mp35/Dw+Pt9paK
+         7W9zljorU6XMcJM8I1ysk8Il7nz0G96v9G9B4tnQpyKlKolHFOz5zLKExJYj0hVBtbU+
+         8kag==
+X-Gm-Message-State: AOJu0Yw34/Gu/1WOi9KtbRu71bL6RGngVxw8wr0Dle6x9kIAnnpdWhNr
+	Pj6h6L7hv1Z74vi8I/0ccoWXiQV0j2f2HbDeEwdky9E/E6zr2U78z9+9
+X-Google-Smtp-Source: AGHT+IEFNOa7CGDITn5YcwwvJ9xuml0dalGvoRal/6YYNTaXAipQRELsFVpEN+0H7ts9OOEF8vFQvQ==
+X-Received: by 2002:a05:600c:4f42:b0:426:6b14:1839 with SMTP id 5b1f17b1804b1-42bb0136dadmr174552885e9.0.1725392901604;
+        Tue, 03 Sep 2024 12:48:21 -0700 (PDT)
+Received: from p183 ([46.53.249.196])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb87f7fccsm174408135e9.46.2024.09.03.12.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 12:48:21 -0700 (PDT)
+Date: Tue, 3 Sep 2024 22:48:19 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>
-cc: Jinyoung Choi <j-young.choi@samsung.com>, Christoph Hellwig <hch@lst.de>, 
-    "Martin K. Petersen" <martin.petersen@oracle.com>, 
-    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-    linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: [PATCH] bio-integrity: don't restrict the size of integrity
- metadata
-Message-ID: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH] block: fix integer overflow in BLKSECDISCARD
+Message-ID: <9e64057f-650a-46d1-b9f7-34af391536ef@p183>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Hi Jens
+I independently rediscovered
 
-I added dm-integrity inline mode in the 6.11 merge window. I've found out
-that it doesn't work with large bios - the reason is that the function
-bio_integrity_add_page refuses to add more metadata than
-queue_max_hw_sectors(q). This restriction is no longer needed, because
-big bios are split automatically. I'd like to ask you if you could send
-this commit to Linus before 6.11 comes out, so that the bug is fixed
-before the final release.
+	commit 22d24a544b0d49bbcbd61c8c0eaf77d3c9297155
+	block: fix overflow in blk_ioctl_discard()
 
-Mikulas
+but for secure erase.
 
+Same problem:
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+	uint64_t r[2] = {512, 18446744073709551104ULL};
+	ioctl(fd, BLKSECDISCARD, r);
 
-bio_integrity_add_page restricts the size of the integrity metadata to
-queue_max_hw_sectors(q). This restriction is not needed because oversized
-bios are split automatically. This restriction causes problems with
-dm-integrity 'inline' mode - if we send a large bio to dm-integrity and
-the bio's metadata are larger than queue_max_hw_sectors(q),
-bio_integrity_add_page fails and the bio is ended with BLK_STS_RESOURCE
-error.
+will enter near infinite loop inside blkdev_issue_secure_erase():
 
-An example that triggers it:
+	a.out: attempt to access beyond end of device
+	loop0: rw=5, sector=3399043073, nr_sectors = 1024 limit=2048
+	bio_check_eod: 3286214 callbacks suppressed
 
-# modprobe brd rd_size=1048576
-# dmsetup create in1 --table '0 1847320 integrity /dev/ram0 0 64 D 1 fix_padding'
-# dmsetup create in2 --table '0 1847312 integrity /dev/mapper/in1 0 64 I 1 internal_hash:sha512'
-# dd if=/dev/zero of=/dev/mapper/in2 bs=1M oflag=direct status=progress
-dd: error writing '/dev/mapper/in2': Cannot allocate memory
-1+0 records in
-0+0 records out
-0 bytes copied, 0.00169291 s, 0.0 kB/s
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Fixes: fb0987682c62 ("dm-integrity: introduce the Inline mode")
-Fixes: 0ece1d649b6d ("bio-integrity: create multi-page bvecs in bio_integrity_add_page()")
-
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
 ---
- block/bio-integrity.c |    4 ----
- 1 file changed, 4 deletions(-)
 
-Index: linux-2.6/block/bio-integrity.c
-===================================================================
---- linux-2.6.orig/block/bio-integrity.c	2024-07-30 14:06:55.000000000 +0200
-+++ linux-2.6/block/bio-integrity.c	2024-09-03 15:49:49.000000000 +0200
-@@ -167,10 +167,6 @@ int bio_integrity_add_page(struct bio *b
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ block/ioctl.c |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -126,7 +126,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 		return -EINVAL;
  
--	if (((bip->bip_iter.bi_size + len) >> SECTOR_SHIFT) >
--	    queue_max_hw_sectors(q))
--		return 0;
--
- 	if (bip->bip_vcnt > 0) {
- 		struct bio_vec *bv = &bip->bip_vec[bip->bip_vcnt - 1];
- 		bool same_page = false;
-
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+-	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
++	err = truncate_bdev_range(bdev, mode, start, end - 1);
+ 	if (err)
+ 		goto fail;
+ 
+@@ -163,7 +163,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 		void __user *argp)
+ {
+-	uint64_t start, len;
++	uint64_t start, len, end;
+ 	uint64_t range[2];
+ 	int err;
+ 
+@@ -178,11 +178,12 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 	len = range[1];
+ 	if ((start & 511) || (len & 511))
+ 		return -EINVAL;
+-	if (start + len > bdev_nr_bytes(bdev))
++	if (check_add_overflow(start, len, &end) ||
++	    end > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
+ 
+ 	filemap_invalidate_lock(bdev->bd_mapping);
+-	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
++	err = truncate_bdev_range(bdev, mode, start, end - 1);
+ 	if (!err)
+ 		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+ 						GFP_KERNEL);
