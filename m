@@ -1,78 +1,91 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10781F937
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 14:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26711AACA
+	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 14:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725374126; cv=none; b=UmuGa5ikcamZs4/4q5hipO6oph3g+y/2XIO6B/Defa6XGFd1v0FJRXD9lIR8AubQW04oJW6m9WPQwBem6pLa5t8bPpRlKo8NIn+VvTyrAAfEcO5jyFMUexT8DflJZ4P38mdxT3QLdXxcZ1ZIkr6d4lyLO4ap/71tvUsOz3OMoqI=
+	t=1725374837; cv=none; b=AdP4ugvB/gJ0Jkm94/MWBskGN+tjBwIs9dQNqVgiDKrdul7tECsDSSt5ouP6U0Of9sel89kQfvXqbxAvmAvMaK9sXnXhV+F2gVhDShSO3cWOmWbDrfsT6g814e494ZYTM2EdyM7kjVd4ZbNO0tIBm6GeQBKuH1QbYqX9JeuUsLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725374126; c=relaxed/simple;
-	bh=8jMOZAZDfcRpmvHeIERkLHeruFjM1ee9CG7CGcYIDNk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=StRHLLSor7pBfdckTl+gdPP2Ns9mga7t/L1ZKO+tn3+sDeJuhr1/5JmJAMbBVUF1GgLrW+6gbpQDRrzJbAHiRR5A7/ZqBn0MEXeXHJHxMRnsjoSrms1lSOMIn+QoI71bTNVoJ8b4gS1LCNACjpN0CL7iysfNzAIxA0oeDZNYNkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wyp5606gJzgYd3;
-	Tue,  3 Sep 2024 22:33:14 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id CE0D71800A7;
-	Tue,  3 Sep 2024 22:35:20 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
- (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Tue, 3 Sep
- 2024 22:35:20 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <axboe@kernel.dk>, <hare@suse.de>, <dlemoal@kernel.org>,
-	<john.g.garry@oracle.com>, <martin.petersen@oracle.com>
-CC: <lizetao1@huawei.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH 01/21] mtip32xx: Remove redundant null pointer checks in mtip_hw_debugfs_init()
-Date: Tue, 3 Sep 2024 22:43:54 +0800
-Message-ID: <20240903144354.2005690-1-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1725374837; c=relaxed/simple;
+	bh=xSz8B53rf+QzRPU3cuEAjx1UneTEcNz2pfUv/oMORxA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n8da96RPvq9i7a0pXI7zRsqtbjJrUWA1tIdEAJiFeir2jeqwnTTCk8AMpeO4GJZs/+gYinn16HWj2S3yI3fJtbkeoRuu+BmkOB8UYzSWb8jjV4K6x1ez/FjfpnNazFFmSJ6g1Ze0VRSDz8o1L69lRpV5AL9vd52Kuhr2RO33lhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UdjfcTS4; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UdjfcTS4"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-715c160e231so4534609b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2024 07:47:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725374834; x=1725979634; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ajeI2Xr7CqyaAqgfiHTgHpuagcScqdiRqWE+LOfyYIU=;
+        b=UdjfcTS4gRWD+PV9LjJEkNPNcooFE8bCvp6U+K5nHJ97LcNn4hUTuP0l4LQnMOQJ+f
+         Kg01Lo9Su/VAYJv+EBXp7yfyguM6IOr0wZ/b2aO+Rg2MVx0ktOJxpgJ30azw0CeFkLFU
+         DguE0kYPpnC+XbfjZ0tvoiigMTFGqn2iJW6wMXGWgFTZgeepS8HQk/uT45aTq2U/HAuM
+         HKzaxFKa3K6Ig8d8gxG7LSzaxDCUXzTon6C7JlN9tila6KF7KvCxBbyaMFRA85jjilvV
+         IX4xXS5+f7JEBDnfWP80GRgid/m83Q7cWeWHgX3ALQDR2dN4yqHrHezWizzzl4hljEE/
+         W+JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725374834; x=1725979634;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ajeI2Xr7CqyaAqgfiHTgHpuagcScqdiRqWE+LOfyYIU=;
+        b=ZXdUdA7NiwHKvhN/E9x/E6S+KXA1Wl/wA7yeCABqhCBxLPr8b3Mgi4VtXKNQptOwZo
+         9AFNY8zvzfkb2NnzWwMcLSoYyw5S6m/oOxVoPRuz3oCyIBdLaxihgj1SCy61RKJkGDwd
+         65Mp62FQA6dHUjRAXt3VgIvOLgjIMpsaxswso5NVJh8ckmm389N/TxWJkpU5r5jIEFWf
+         oLl1C689f2Wv+RWATbnkOv32XoYCD99azh05g+dKl4PSP35MsyfgTr9HBeVSsknL9uNA
+         oIRDZPrfGshdQeqTAt1p+aNtrXPNFN2GcS2DcI/YHT6q4blBNneoOOHWOoGurgMfYFqb
+         ao4g==
+X-Gm-Message-State: AOJu0Yxy+hl4PIov4+Bpb4z+aQI/ym+ryA0Rx2WhuZ4bfbEOTUqV8kTK
+	KDUyHKX6HCCAKpynubIl1IEXtdUn3GLdJkP+JlvTvPBt1WJSxWoYoEO+jc/4OwI=
+X-Google-Smtp-Source: AGHT+IEVpTVZQxX8y95gWtwI56jNBbybBFM609xPsyFu6tH5jpeVhChWUZ0lpZKbMNRhzjQ+ab73Rg==
+X-Received: by 2002:a05:6a21:9103:b0:1c4:a7a0:a7d4 with SMTP id adf61e73a8af0-1cce100384emr16737901637.7.1725374833759;
+        Tue, 03 Sep 2024 07:47:13 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d22e743252sm9245597a12.15.2024.09.03.07.47.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Sep 2024 07:47:13 -0700 (PDT)
+Message-ID: <3abb351b-64b5-4a11-a2c6-5dbb43ee98b9@kernel.dk>
+Date: Tue, 3 Sep 2024 08:47:11 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd500012.china.huawei.com (7.221.188.25)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/21] mtip32xx: Remove redundant null pointer checks in
+ mtip_hw_debugfs_init()
+To: Li Zetao <lizetao1@huawei.com>, hare@suse.de, dlemoal@kernel.org,
+ john.g.garry@oracle.com, martin.petersen@oracle.com
+Cc: linux-block@vger.kernel.org
+References: <20240903144354.2005690-1-lizetao1@huawei.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240903144354.2005690-1-lizetao1@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Since the debugfs_create_dir() never returns a null pointer, checking
-the return value for a null pointer is redundant, and using IS_ERR is
-safe enough.
+On 9/3/24 8:43 AM, Li Zetao wrote:
+> Since the debugfs_create_dir() never returns a null pointer, checking
+> the return value for a null pointer is redundant, and using IS_ERR is
+> safe enough.
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Sigh, why are we seeing so many odd variants of this recently. If you'd
+do a bit of searching upfront, you'd find that these should not be
+checked at all rather than changing it from err+null to just an error
+pointer check.
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index c6ef0546ffc9..56f3bb30165e 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -2275,7 +2275,7 @@ static int mtip_hw_debugfs_init(struct driver_data *dd)
- 		return -1;
- 
- 	dd->dfs_node = debugfs_create_dir(dd->disk->disk_name, dfs_parent);
--	if (IS_ERR_OR_NULL(dd->dfs_node)) {
-+	if (IS_ERR(dd->dfs_node)) {
- 		dev_warn(&dd->pdev->dev,
- 			"Error creating node %s under debugfs\n",
- 						dd->disk->disk_name);
-@@ -4043,7 +4043,7 @@ static int __init mtip_init(void)
- 	mtip_major = error;
- 
- 	dfs_parent = debugfs_create_dir("rssd", NULL);
--	if (IS_ERR_OR_NULL(dfs_parent)) {
-+	if (IS_ERR(dfs_parent)) {
- 		pr_warn("Error creating debugfs parent\n");
- 		dfs_parent = NULL;
- 	}
+So no to this one, please do at least a tiny bit of research first
+before blindly making a change based on what some static analyzer told
+you.
+
 -- 
-2.34.1
+Jens Axboe
 
