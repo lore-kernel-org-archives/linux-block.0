@@ -1,101 +1,97 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF84B1DC725
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 20:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A611D5891;
+	Tue,  3 Sep 2024 20:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725393979; cv=none; b=d5PE6DoMC+JywS7PCgCEfraaeGGWPvF189mhIaKub6ryUxXPXoc9dPwQq9foP7FaKpXrPXaSjJ7820cHFtk6vRPGhnwrtIz9eyDbXMJrG8ivdkUK89j0XX4gzshmR6vbUWVG/G6da9yapdURX1aKuKqj0nPRmDzXN9kzWAKvbDI=
+	t=1725394232; cv=none; b=jH0+a6K33d/xs/X55vPjljGyQWOxTnHTqo9SW8kFyq5318x4TWV+bH4ZD7W3lwjGyFG3ljWEcsGCGx6eVPHFC46TWjjK01ocKZRoUB15oyZNpmRdNvdaQQvypww3Om5Dy0en3p25k+3MWuyTC82WqyL1xWcpdmVluiM55rdqlXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725393979; c=relaxed/simple;
-	bh=fN7oBdjMCDvU886VDHTreZxV7hCNiaOQdF26Ay4yjlM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=tZsN75XV+mfnsOwmL/k7sbujQZ10cIBh/I+inZu+D9iBUQgJ/+WVcchcVPPdfh692s1dxuAkKsNnxDDjzNOPqeviNcGuJjTUoPG0j3vnw9WcmTXeu7moNVoH20TETAi45Y94i5OxmSJcr1uOEHHgv/UjFBfVoxWI96Rpk/75cQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=o6I2iaFM; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1725394232; c=relaxed/simple;
+	bh=vpwZJNPO0XrbJLguy28wBPuADqR/WcUHSbWi9p0uZDY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BjG8VfzVCvgnX50m4399RBWn55rPjNJCcVEpY4/s+NqdshO6VaI5MSTW88vrn1RFLO2/nPhfXMg8Oj47kKJhvL1wVIPqnpVvBKhAdQuyczr5dH1/ctVt6It4oriR7rhgponPfnYwwBDNJtrwK7kQQ/OL2g9vuCYSnv6HMClc6Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qRAcwvVd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="o6I2iaFM"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4WyxTP2211z6ClY96;
-	Tue,  3 Sep 2024 20:06:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1725393974; x=1727985975; bh=gX1B3Rqeq7y3ChvN6XKIGFN6
-	LAanwH5pKe/T9z9pf4A=; b=o6I2iaFMB/ydaMmX9gb6+3OvXtJTbIxb3QCMwU9B
-	PP9ZJAjqPOsYxzV/sl9Zk52eVSTetpoXGivc12YBBG4WacscKzKhVryYR5VR2SWp
-	zjf6ijCfhr5fNMwzh17WoBTfiQwrMavUEHGEOBMFdd0IEnn2L2rPX4S5fWacVJLn
-	P9oDYJgGLpBkahlQ6dKi1TWrVfEO/c44JYYV+UbvV1kpM1CL8mmY95O7plhGhrWl
-	gf5ZVoUkd+6fqS3L3/rf0peFgzk/Xs3c3wVyvu/gzC3zz+Ms6/ME+57MpghSpj2V
-	k5ZoteqXA347NkyqdYqmb+GuXYt+aPb9/G0t7kHNL7TQkw==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id fWcNkMWlNiXV; Tue,  3 Sep 2024 20:06:14 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4WyxTL2cttz6ClY95;
-	Tue,  3 Sep 2024 20:06:14 +0000 (UTC)
-Message-ID: <e2121f0f-c215-4c46-8ac5-df693771a5b7@acm.org>
-Date: Tue, 3 Sep 2024 13:06:12 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qRAcwvVd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF10C4CEC4;
+	Tue,  3 Sep 2024 20:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725394232;
+	bh=vpwZJNPO0XrbJLguy28wBPuADqR/WcUHSbWi9p0uZDY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qRAcwvVd2eHpjA3jqDUsvYtdam6X8bME6gg5HXXUOHKZ+buSHVCOcMmKkf6zSFvtH
+	 bc0WLzmSNFI+A96qAImSwLa6SEOI3qy02fBAo4qQn/kDUy4qXzpC7WOwAh52iZhZYj
+	 MRvbvsUJjNNkcXImZdxkv5l5hiidyPLSBkVSR/5iRZ/zHd/9i3gWuWKkQl+kuu0fpi
+	 RILQc+ttytzz/sRz4+/osg27juptkcZH8oq/bG1EtcgAI2O8QBzqN4UB3AyzpPPd0F
+	 zrv6+UGNg6ncZSBphgOeZPhJdjp66/wREu2SSYU/OTit7APZ5rhtoB+AcZ9ySXjuBF
+	 0wppFT6T/T8Kg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	rust-for-linux@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>
+Subject: [PATCH] MAINTAINERS: mailmap: Update Andreas Hindborg's email address
+Date: Tue,  3 Sep 2024 22:09:48 +0200
+Message-ID: <20240903200956.68231-1-a.hindborg@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: move the BFQ io scheduler to orphan state
-To: Jens Axboe <axboe@kernel.dk>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <6fe53222-876c-4deb-b4e1-453eb689a9f3@kernel.dk>
-Content-Language: en-US
-Cc: Maxim Levitsky <maximlevitsky@gmail.com>, Alex Dubov <oakad@yahoo.com>,
- Ulf Hansson <ulf.hansson@linaro.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <6fe53222-876c-4deb-b4e1-453eb689a9f3@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1622; i=a.hindborg@kernel.org; h=from:subject; bh=fioxQcbG3apiE4VFtEFZfVL7qHBv3evTsbReL36QZSQ=; b=LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgpvd0o0bkFGdEFwTDlrQTBEQUFvQjRiZ2FQb mtvWTNjQnl5WmlBR2JYYTV3NzlQRmpZVW1maEdRR0RQejdYVEpXCjhPVWc1YkkwZnVJeFVRMDRz ejh1ZDRrQ013UUFBUW9BSFJZaEJCTEIrVWRXdjN3cUZkYkFFdUc0R2o1NUtHTjMKQlFKbTEydWN BQW9KRU9HNEdqNTVLR04zbG1jUCtnSU5kRWZ3YkR2QVAweHBvOE1LdTlIMjMzeS83MmNVa2JudA oyNFl0QVdlMmswVVFXYW05QXkvVkwxZDVVYVFWYTBwMW8venFVMXltOGR5OVZ5eHNMUGhTZ1Erc mdIVWVtR1RqCk81S3BRVjMyZE8ySkFydGVwMGw4Y3FuQTczOHloSXdLSkpxRFlNSGphajRVWVg3 SXdHOXdxUHBaM2tsOFE3c1AKZEV2eXljclhMSDViYzFiN0FNbGtzWlpNNmFjeU1Cdmp6TjI0SGt zMC9qeVVETmM5VkFoRWI5TWZqN1RjSUpGUgpESFNLcG5Bb1laNlZUYVRyTkJ5N0s5S1ZDN2g5dl huWUg3UDVtcnVLQjkwUTVpMUNrMFUyQjhkRTZPU0VLODFFCko0M3o4MVNPakRZTEJKK3BWV0tqQ kY4SlNnY2FteHR2K0xxcm9ENVZRMUE5WXRRMExFZDNjNzU1cHhCMjJZVlcKS2VCVDFaNC9acHph UEtxRFI5Yk1hNzluUi9sWEE1R2JxQXlpcEZrTjVhM2tBUUZvVi93d1dhM0pBc2l1bDNEMQpOVkR xOWtMZUlnYlJrWG9yNVB4aHYyMzRDemNQVGJlbExGWmVaK2duOVdWSWJTYmhFRHBPVllhRE1UUW d6UEFvCmFCRkhBUkxxaU5qUFVFMWxiMlpRMC9tQ0Vaa1RCbEFJSlpEdzJDS01vOXlzb2RhNnFiN GE2UW9FeWp3YndrUjYKbU9XRk03Y2pvKytPeFpGTWhFRTgxNHJRbklHbkQ4T3pUK2FOcTZMY0M4 NkN0Yk5YbG5VdG5kR28rbk1ON29obgo5ejA5TmxwQk5XOTZHNm1EaHVhL2gxR1NRa1JyNTNIMTV mNTRNSzlZTlpMK0xrenRWOGFNM3hJN1duSFpVMDlDClAyOE9pQ3RKTFV3aENnPT0KPVRiYzEKLS 0tLS1FTkQgUEdQIE1FU1NBR0UtLS0tLQo=
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp; fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 9/3/24 8:53 AM, Jens Axboe wrote:
-> Nobody is maintaining this code, and it just falls under the umbrella
-> of block layer code. But at least mark it as such, in case anyone wants
-> to care more deeply about it and assume the responsibility of doing so.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 42decde38320..4a857a125d6e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3781,10 +3781,8 @@ F:	Documentation/filesystems/befs.rst
->   F:	fs/befs/
->   
->   BFQ I/O SCHEDULER
-> -M:	Paolo Valente <paolo.valente@unimore.it>
-> -M:	Jens Axboe <axboe@kernel.dk>
->   L:	linux-block@vger.kernel.org
-> -S:	Maintained
-> +S:	Orphan
->   F:	Documentation/block/bfq-iosched.rst
->   F:	block/bfq-*
+Move away from corporate infrastructure for upstream work. Also update
+mailmap.
 
-To the memstick and mmc maintainers, should the Kconfig files for these
-drivers perhaps be updated? This is what I found by searching for
-IOSCHED_BFQ:
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+---
+ .mailmap    | 1 +
+ MAINTAINERS | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-$ git grep -nH 'imply.*BFQ'
-drivers/memstick/core/Kconfig:23:	imply IOSCHED_BFQ
-drivers/memstick/core/Kconfig:33:	imply IOSCHED_BFQ
-drivers/mmc/core/Kconfig:40:	imply IOSCHED_BFQ
+diff --git a/.mailmap b/.mailmap
+index caf46a652f15..c0e3de93a481 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -60,6 +60,7 @@ Amit Nischal <quic_anischal@quicinc.com> <anischal@codeaurora.org>
+ Andi Kleen <ak@linux.intel.com> <ak@suse.de>
+ Andi Shyti <andi@etezian.org> <andi.shyti@samsung.com>
+ Andreas Herrmann <aherrman@de.ibm.com>
++Andreas Hindborg <a.hindborg@kernel.org> <a.hindborg@samsung.com>
+ Andrej Shadura <andrew.shadura@collabora.co.uk>
+ Andrej Shadura <andrew@shadura.me> <andrew@beldisplaytech.com>
+ Andrew Morton <akpm@linux-foundation.org>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fe83ba7194ea..3f932a631420 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3868,7 +3868,7 @@ F:	kernel/trace/blktrace.c
+ F:	lib/sbitmap.c
+ 
+ BLOCK LAYER DEVICE DRIVER API [RUST]
+-M:	Andreas Hindborg <a.hindborg@samsung.com>
++M:	Andreas Hindborg <a.hindborg@kernel.org>
+ R:	Boqun Feng <boqun.feng@gmail.com>
+ L:	linux-block@vger.kernel.org
+ L:	rust-for-linux@vger.kernel.org
+@@ -19937,7 +19937,7 @@ R:	Boqun Feng <boqun.feng@gmail.com>
+ R:	Gary Guo <gary@garyguo.net>
+ R:	Björn Roy Baron <bjorn3_gh@protonmail.com>
+ R:	Benno Lossin <benno.lossin@proton.me>
+-R:	Andreas Hindborg <a.hindborg@samsung.com>
++R:	Andreas Hindborg <a.hindborg@kernel.org>
+ R:	Alice Ryhl <aliceryhl@google.com>
+ L:	rust-for-linux@vger.kernel.org
+ S:	Supported
+-- 
+2.46.0
 
-Thanks,
 
-Bart.
