@@ -1,85 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5365BAF0;
-	Tue,  3 Sep 2024 14:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10781F937
+	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 14:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725374121; cv=none; b=MpL5LTVjSWB8VrXMAc/X8OsmEKyepDVAqqMFeyy3pj5ejkdCnO5BTgRZpHxfp4Jdwzse/cn5kEWteM0DmvzEb7JRfh+vQQ3cCJtz/3O3fOYj1lG04sNo4Nt+ZU7kOiPl7CGeDkmKtlvQkEUxou2WlxcK75wJ3lDn85HAntTWjLw=
+	t=1725374126; cv=none; b=UmuGa5ikcamZs4/4q5hipO6oph3g+y/2XIO6B/Defa6XGFd1v0FJRXD9lIR8AubQW04oJW6m9WPQwBem6pLa5t8bPpRlKo8NIn+VvTyrAAfEcO5jyFMUexT8DflJZ4P38mdxT3QLdXxcZ1ZIkr6d4lyLO4ap/71tvUsOz3OMoqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725374121; c=relaxed/simple;
-	bh=SXW9Lb7ZYF60TtJNxa2tzxDrQEAQyWEpctMJfc6+Lnw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZxNk/1WDgRWUYgRnlxk1hdtbvrZeAx3gkn8YLEFBpU37nzwlv/B8eKeypFjP6zauoAja12bN+cvRuxZTfrDc5b/Z6BADy9RWgK3DZJpknrudYULNaJwMaKdT/0wNnNy7Ykpsej4Zzgl/xONrKoITkKRXWR0l4wGL7grudrTrUco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eI2Ty3YG; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eI2Ty3YG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0B35C4CEC7;
-	Tue,  3 Sep 2024 14:35:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725374121;
-	bh=SXW9Lb7ZYF60TtJNxa2tzxDrQEAQyWEpctMJfc6+Lnw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eI2Ty3YGWuQvGA9egzniLii9YQG8AfW76NMVfcefuZrmPyHF4bE1yl47co3r94xpr
-	 lNhNFIBfd7Y0gztaRlvnjUyXb19Ngt5hz/WgwYyYjoo9lfHoSQKPf3wWH65zGJMKi2
-	 Arx90hFQceXXoDMQtcWokmLo9jzFEWRZ4rbh/iLoGd87XjmjfDpuSvH++Lr66wZg82
-	 +zkUu/rWYqR291y8VeN48DA80+O0xdnW9HQFM+n8h6Tg+pInvmX70OxcqbV8yJi/V7
-	 I8xz7TmjCusWsM7jIh9ivWozgayqxQXB9TjsCfQpdOeXT9BWK58O0HMtvrXSJ4s4ao
-	 yaUovB82siFIQ==
-Date: Tue, 3 Sep 2024 16:35:14 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: amir73il@gmail.com, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, 
-	martin.petersen@oracle.com, James.Bottomley@hansenpartnership.com, jack@suse.cz, 
-	jaegeuk@kernel.org, jlayton@kernel.org, chuck.lever@oracle.com, bvanassche@acm.org, 
-	"axboe@kernel.dk" <axboe@kernel.dk>, linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com
-Subject: Re: [PATCH v4 0/5] Write-placement hints and FDP
-Message-ID: <20240903-erfassen-bandmitglieder-32dfaeee66b2@brauner>
-References: <CGME20240826171409epcas5p306ba210a9815e202556778a4c105b440@epcas5p3.samsung.com>
- <20240826170606.255718-1-joshi.k@samsung.com>
- <20a9df07-f49e-ee58-3d0b-b0209e29c6af@samsung.com>
+	s=arc-20240116; t=1725374126; c=relaxed/simple;
+	bh=8jMOZAZDfcRpmvHeIERkLHeruFjM1ee9CG7CGcYIDNk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=StRHLLSor7pBfdckTl+gdPP2Ns9mga7t/L1ZKO+tn3+sDeJuhr1/5JmJAMbBVUF1GgLrW+6gbpQDRrzJbAHiRR5A7/ZqBn0MEXeXHJHxMRnsjoSrms1lSOMIn+QoI71bTNVoJ8b4gS1LCNACjpN0CL7iysfNzAIxA0oeDZNYNkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wyp5606gJzgYd3;
+	Tue,  3 Sep 2024 22:33:14 +0800 (CST)
+Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id CE0D71800A7;
+	Tue,  3 Sep 2024 22:35:20 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
+ (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Tue, 3 Sep
+ 2024 22:35:20 +0800
+From: Li Zetao <lizetao1@huawei.com>
+To: <axboe@kernel.dk>, <hare@suse.de>, <dlemoal@kernel.org>,
+	<john.g.garry@oracle.com>, <martin.petersen@oracle.com>
+CC: <lizetao1@huawei.com>, <linux-block@vger.kernel.org>
+Subject: [PATCH 01/21] mtip32xx: Remove redundant null pointer checks in mtip_hw_debugfs_init()
+Date: Tue, 3 Sep 2024 22:43:54 +0800
+Message-ID: <20240903144354.2005690-1-lizetao1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20a9df07-f49e-ee58-3d0b-b0209e29c6af@samsung.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemd500012.china.huawei.com (7.221.188.25)
 
-On Tue, Sep 03, 2024 at 07:58:46PM GMT, Kanchan Joshi wrote:
-> Hi Amir,
-> 
-> 
-> On 8/26/2024 10:36 PM, Kanchan Joshi wrote:
-> > Current write-hint infrastructure supports 6 temperature-based data life
-> > hints.
-> > The series extends the infrastructure with a new temperature-agnostic
-> > placement-type hint. New fcntl codes F_{SET/GET}_RW_HINT_EX allow to
-> > send the hint type/value on file. See patch #3 commit description for
-> > the details.
-> > 
-> > Overall this creates 128 placement hint values [*] that users can pass.
-> > Patch #5 adds the ability to map these new hint values to nvme-specific
-> > placement-identifiers.
-> > Patch #4 restricts SCSI to use only life hint values.
-> > Patch #1 and #2 are simple prep patches.
-> > 
-> > [*] While the user-interface can support more, this limit is due to the
-> > in-kernel plumbing consideration of the inode size. Pahole showed 32-bit
-> > hole in the inode, but the code had this comment too:
-> > 
-> > /* 32-bit hole reserved for expanding i_fsnotify_mask */
-> > 
-> > Not must, but it will be good to know if a byte (or two) can be used
-> > here.
-> 
-> Since having one extra byte will simplify things, I can't help but ask - 
-> do you still have the plans to use this space (in entirety) within inode?
+Since the debugfs_create_dir() never returns a null pointer, checking
+the return value for a null pointer is redundant, and using IS_ERR is
+safe enough.
 
-I just freed up 8 bytes in struct inode with what's currently in -next.
-There will be no using up those 8 bytes unless it's for a good reason 
-and something that is very widely useful.
+Signed-off-by: Li Zetao <lizetao1@huawei.com>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index c6ef0546ffc9..56f3bb30165e 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -2275,7 +2275,7 @@ static int mtip_hw_debugfs_init(struct driver_data *dd)
+ 		return -1;
+ 
+ 	dd->dfs_node = debugfs_create_dir(dd->disk->disk_name, dfs_parent);
+-	if (IS_ERR_OR_NULL(dd->dfs_node)) {
++	if (IS_ERR(dd->dfs_node)) {
+ 		dev_warn(&dd->pdev->dev,
+ 			"Error creating node %s under debugfs\n",
+ 						dd->disk->disk_name);
+@@ -4043,7 +4043,7 @@ static int __init mtip_init(void)
+ 	mtip_major = error;
+ 
+ 	dfs_parent = debugfs_create_dir("rssd", NULL);
+-	if (IS_ERR_OR_NULL(dfs_parent)) {
++	if (IS_ERR(dfs_parent)) {
+ 		pr_warn("Error creating debugfs parent\n");
+ 		dfs_parent = NULL;
+ 	}
+-- 
+2.34.1
+
