@@ -1,149 +1,213 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6EC13CFB7;
-	Mon,  2 Sep 2024 23:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725320482; cv=none; b=ozcAECQN2AVdlSH97L+Dot0osxd+iNECJdDRMPfrOBVFy8XkYWQB1UZRNDnn7JapQXwNdBela/09OrqLHAtGsCFdrrhcgNFb5CqCt1U+dkhJYc2zZI9dexx8s4ntN152PsEYINqdLd9gdgC0J77hVUOdXb1ad1rJD650fSijszs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725320482; c=relaxed/simple;
-	bh=3uoFZbAJTCfBfq1Ms59IG9WOj4qBaDng3/DkkHYFVfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DekJWF4sdPsH3VJ+eytO55MyjwCCornKtkNv8qwCEjjBYwDKHL7cGKBvHa7RfvtyMpBMGoIYBxsWzYEb9c+67F/a4YzxjO9lLg6naMp4J0mEVr5QqOe4JfpG0vjeeHuT0PLz+GH9KX7bve5VCNzRWiTbZZmVneexGPcNi3GUtcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ybCCz7Ct; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=SKJdZyeK; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ybCCz7Ct; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=SKJdZyeK; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1090FA32
+	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 00:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725322586; cv=fail; b=kZCGsykRQIXkK3iHjx2IySGj9w+xR6tBZ2XA5liWj5JjUD5CWIPjdInfZXo33nIISteo6fF7/uljWEUViaDKosZKD6zJOTEfva4xH4hgFr9u4T4tWMMyQQRKeC6J87BQmTxmee+rB8+YuE4PMnXjU4zzauKEGJ3aZXBuB6ogahU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725322586; c=relaxed/simple;
+	bh=fOGqkyX6qEzbvutOJJtol823dsCSmz/V9+5ORD2bk9s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NPsCVi2akfgteBOcDtIo8knHmm+cB8/JXKwX0ilFLI5VkNYKBNIVvd0vqQoMpPdPFXs+DN5b8eZ/9H64kbJt5xuzdF5lIxm2fddY2oI7bir/AgvCLzZ/Q5/rC6q0PPp7k8BmqJT1+3fgQ37VUq+/owkmMGo9glT6XIRibcOgCS8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=ic8bhhXs; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Z5OonRUX; arc=fail smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ybCCz7Ct";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="SKJdZyeK";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ybCCz7Ct";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="SKJdZyeK"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 9CCCB21B62;
-	Mon,  2 Sep 2024 23:41:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725320478;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dRtcEr/ZYAAw8oGtsiw6gfQw3k8Ez8e/JP4IYOSwvvo=;
-	b=ybCCz7CtTxwozjTq73zhI9CT+3kCbvbvaW0VxsaH4f6iDOxZs/hTND5vxawgCuqmJOoLLW
-	U/QTFNAu7BUooUaYkFpU5aIe++Ia8OwLHEkh5Ql3jT93OB+0GRj8O1eOlkV0GQaUlrEscq
-	o8u5yN1kEeL9T0uyeOx6xVPCqb/LNKU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725320478;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dRtcEr/ZYAAw8oGtsiw6gfQw3k8Ez8e/JP4IYOSwvvo=;
-	b=SKJdZyeKkVxC/cycoCuFbAWoWYW/m6UMEIl2Sshi5zS5FqrVhQM1vS9FgWVFjoVBiFXkdN
-	JUj93/tmVo88hCAA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725320478;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dRtcEr/ZYAAw8oGtsiw6gfQw3k8Ez8e/JP4IYOSwvvo=;
-	b=ybCCz7CtTxwozjTq73zhI9CT+3kCbvbvaW0VxsaH4f6iDOxZs/hTND5vxawgCuqmJOoLLW
-	U/QTFNAu7BUooUaYkFpU5aIe++Ia8OwLHEkh5Ql3jT93OB+0GRj8O1eOlkV0GQaUlrEscq
-	o8u5yN1kEeL9T0uyeOx6xVPCqb/LNKU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725320478;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dRtcEr/ZYAAw8oGtsiw6gfQw3k8Ez8e/JP4IYOSwvvo=;
-	b=SKJdZyeKkVxC/cycoCuFbAWoWYW/m6UMEIl2Sshi5zS5FqrVhQM1vS9FgWVFjoVBiFXkdN
-	JUj93/tmVo88hCAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6E6B01398F;
-	Mon,  2 Sep 2024 23:41:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IcqtGh5N1mbMSgAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Mon, 02 Sep 2024 23:41:18 +0000
-Date: Tue, 3 Sep 2024 01:41:17 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Qu Wenruo <wqu@suse.com>
-Cc: Luca Stefani <luca.stefani.ge1@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] btrfs: Split remaining space to discard in chunks
-Message-ID: <20240902234117.GG26776@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20240902205828.943155-1-luca.stefani.ge1@gmail.com>
- <20240902205828.943155-3-luca.stefani.ge1@gmail.com>
- <c5aa26ad-4ae7-4498-8a27-118876181890@suse.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ic8bhhXs";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Z5OonRUX"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1725322584; x=1756858584;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=fOGqkyX6qEzbvutOJJtol823dsCSmz/V9+5ORD2bk9s=;
+  b=ic8bhhXsdsGHsrOHx24KS1j2GI9CjoreBHyX/9+8DrZpb5XDwtTNEfLZ
+   O4QDeMiXaRIq3aJaff5cVImMnYwBvVqUdyrOy7mO0VmK4qILAWNCYg1lG
+   t1V5sOVxT2/VYm27oV0Y7V72Vp2VIs6gEes65So8AFmqJLRBwLzzFtdPu
+   sgygbt04Ako8IDGs8oYSnWDpVvMlrLOlmCp5VF5nPOhi5NRkrEvIA0GMf
+   vON14z2r2GtSHqwanD/SNSQpIncRkoK6gIxVKEzNP3nlfwTKnbHHpSrL1
+   0AZXKL2LUQnvmRXunuv1grpf/A7jgTKX4n9qucG+bCgVuMmc2PP7NO8Am
+   A==;
+X-CSE-ConnectionGUID: 7PWWPAKOR6mLr0ii82/4Rw==
+X-CSE-MsgGUID: pxXbIGv9TQq8Xl+98J9+pA==
+X-IronPort-AV: E=Sophos;i="6.10,197,1719849600"; 
+   d="scan'208";a="25754961"
+Received: from mail-southcentralusazlp17012048.outbound.protection.outlook.com (HELO SN4PR2101CU001.outbound.protection.outlook.com) ([40.93.14.48])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Sep 2024 08:16:16 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Skw0Ie/pUPkfuNA5BDM7sjUhTESeNolcXolAF53giIoe1XvZgM1LkIgBQir+oxDab50OTAC1pzcwi1pd5PxFkl+4jiAGJmq4ccHmyjvaBicRpARY3KETl4LtUG4DiFd9bVA7C++YJvxVdEMTTHVUM+Xj46WGyGcM4UaAj9W/7CUvbwStn3s1ek3RlYNNmp4LYAKq2NyuuWgJfCClOsl9YwbYCh1HHRvjHhLqiteldmf9SMlZTykIq1KCrEU+NT8VT5MW2R+VnifDJg9Lzb0ug67Rizs3sZPdJLyQUqhlOJzGJSCh1Z0DqEArsySeVCF9mwZKQIGOugmHf4XWGsN2Hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fOGqkyX6qEzbvutOJJtol823dsCSmz/V9+5ORD2bk9s=;
+ b=dTu+65sUfJOHFss0SmQGekKFFXp6pi6hdGQ740MLDLouniJvLxcXl8G50BZRrRvenW92ERrB/p9oZ+QxBs8J1dXF9Z7lHamRWjpaZWk3n99pJgnRwwFqB969Ag/OGB9HyaXXa+8i5E0rVjdVr5Ew3jNyxHBoY82RX7UrfDsbCPKECabXs8/CL8cPfFQVB8AZjm4tjhhwyUSC75oqmHxf94XFK6OAuQgRSHxzZjT2gWHWY1vVatWRy1I1h/SMFF34IJcFJZLJz51zSjLoJ6Lb7iS3qT7CK3+UaXEnGOcVovkqUqAdoqBqhTjBIGBkKYfEW5TUVkgSJ8gbsnJLeFRvUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fOGqkyX6qEzbvutOJJtol823dsCSmz/V9+5ORD2bk9s=;
+ b=Z5OonRUXkXSZZtkrBy7j6qoTEEQENwp9rvIv3LsuXrj9zFFnL9BIaAtJcRep5MQiQnDLGebaWIOcXH6vMbN+N+11nyaEDgkE+ahrvKlo1G0v0slP5lvJCORThaDQVvjS0p9e8mJYSRijNS3dRFOtcJU6tGkWnp8NVLhgyJdSzTU=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SJ2PR04MB8583.namprd04.prod.outlook.com (2603:10b6:a03:4f4::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.23; Tue, 3 Sep
+ 2024 00:16:15 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%4]) with mapi id 15.20.7918.024; Tue, 3 Sep 2024
+ 00:16:14 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Martin Wilck <mwilck@suse.com>
+CC: Nilay Shroff <nilay@linux.ibm.com>, Daniel Wagner <dwagner@suse.de>,
+	Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>, Hannes Reinecke
+	<hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH v2 3/3] nvme: add test for controller rescan under I/O
+ load
+Thread-Topic: [PATCH v2 3/3] nvme: add test for controller rescan under I/O
+ load
+Thread-Index: AQHa9ZhNW/vrdcNHu0GOnXkEesSR3bI94Q6AgAaymQCAAK4hAA==
+Date: Tue, 3 Sep 2024 00:16:14 +0000
+Message-ID: <vq34kiz6wkjmea6z2p2amqcypixattafudkjmiqh63atmsh2e7@tgz7tjdcvlbu>
+References: <20240823200822.129867-1-mwilck@suse.com>
+ <20240823200822.129867-3-mwilck@suse.com>
+ <57yxf7o7zcp4j34cfgk3glhmfag4ukvedzqgtr7fbqdmy2gvsq@t573offeg3kg>
+ <fa79e577a8883548d12a8932b7769af1db80c8b8.camel@suse.com>
+In-Reply-To: <fa79e577a8883548d12a8932b7769af1db80c8b8.camel@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ2PR04MB8583:EE_
+x-ms-office365-filtering-correlation-id: 9b8ceb49-7043-45cf-ae9e-08dccbad9fa6
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?elGLVGvDOoRq48dr9+gh4s/x/y6/dmSFPl9wL3+YfBRsWbHj9xCB32ToSN?=
+ =?iso-8859-1?Q?RKEPyn7qw54bgPdM/ULWQqwI1vlm9xnsvMbY9pNYlsiQVvb7xH9oBIlBv0?=
+ =?iso-8859-1?Q?q8KSHN2GHW0fDCxiT09HsXkgnhRfWQ4aCCR16J9wxno8jdwYmuDjibKxWM?=
+ =?iso-8859-1?Q?odbn37gta+8tna23sCslrSOYll4qk1UA4PUvVrttCGMobFgqhFdQu+FPk1?=
+ =?iso-8859-1?Q?M6+JcSACbJsxByw9UbojZ8kM9o0uA2jvzXoccJBj/YsaXWe5XuhzLIlmhh?=
+ =?iso-8859-1?Q?Xo6OUja6pC7kXBHr0cTsNBhnSns3EaVdeBSCezauJSjh2r89mMa9yebsWD?=
+ =?iso-8859-1?Q?BI4ufvq7VK3ibzfqQide2cJ4MQMJHd9U8a+B6LueeMlMhEdxWgl/QlRc3L?=
+ =?iso-8859-1?Q?8vjrEm4zwYuBDL/+l1HPr68mN1kpZTa4V758Ieql+hAuu/kxWS8ubwW2jv?=
+ =?iso-8859-1?Q?SDjZaeAv3RSNCyn+g2TzgXO8bg0yKQrC6BonceqdTUhzDJHRLNTuPESR+k?=
+ =?iso-8859-1?Q?n7eSiwtkgw+c9Ccmu5jXc2WNh3xxCUdjKuQo6RmRt8phOES3k1zWe43DT8?=
+ =?iso-8859-1?Q?GNsgjJL4ANe3yGId0ruic/Fx/sxksSeOAkqkq+8UeWnGjUzsX8vlYfwBtU?=
+ =?iso-8859-1?Q?MsbXQHMTlZWA60bdrAjkltFWiqwRTfV4PQwlbhwZZsqpz2k+terXEhaF6A?=
+ =?iso-8859-1?Q?/uJQmFF4QVAsP3Bq9661lmTMaRvwbWLqHB45E53M02plScDCPlhu4pWSyZ?=
+ =?iso-8859-1?Q?H6orsgnHSolBBNCH6Gunm3CuckzYF7wrwfsvF8W/BrcwvI3mAnutkS/RgM?=
+ =?iso-8859-1?Q?qDaF1j/nDQteOMZdkzBMKekHRI/i1bWgKjuUK6KavIX8UFagL6xwvyX8j4?=
+ =?iso-8859-1?Q?VVV9PnGkJ1Wx4HgIIuLzY/CIGkPSsvjfkV9Ai0f2Dcyb8rgxfNQy2NxdJt?=
+ =?iso-8859-1?Q?lmZv0hgfjoZcSXK+i12aWh648/GKsDF7vc5vKXWNyp2NBrA7oOCOg/BrQM?=
+ =?iso-8859-1?Q?6HRofI4noYF5ZmuHJIV57CBmfphJe0f+JP/T7O19Ur117KJa4yznKFGL4o?=
+ =?iso-8859-1?Q?5h5NidOGxla6d2bbDNJYxXsXESt2PW1TEAzqBAK7qmSF4nb7+5nxhPbqy7?=
+ =?iso-8859-1?Q?bA8tzc8m7DkQktmbGB6GCGShRBlXH17g5yzm0ejB3VyZki/zDGur2/nN0O?=
+ =?iso-8859-1?Q?5YeuZPMduKd/O8lsvE1/6dRmLpTOp8KosNCx/bIPSM0sJud2N5gkaiaMm5?=
+ =?iso-8859-1?Q?8hbAKLHsxjuhHFug4C34CagkkDsBEFUKVO64XlUeJfnfbqjFvvK7T0umzZ?=
+ =?iso-8859-1?Q?c6fuRljSWcGU2/5J9InXUcev1Dwtds3ibAdIIe+QjbHtS/ezIIYiJvLNoS?=
+ =?iso-8859-1?Q?JG2iESm+XrFJ/wCbBXXmKqbN1/ZohvEDdqZCzW9JxjmhXOEGaCEXw=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?1CcWDEUAtFSKiaea0R0YWWcDsvvncIC7lHC2yO2cgBC2slY/tISdFYKGi6?=
+ =?iso-8859-1?Q?9OrvBfL4SOdlOE3HHSnVjTGsABZ+uB1X5s9lPsLiZ2I9zn+o20j4pYmiJ0?=
+ =?iso-8859-1?Q?oDOELlUGYaPUyJ0k7Wo3d5W8SipW/8tQgWjz7XE1Ow513LVCEmpwg54K0v?=
+ =?iso-8859-1?Q?hzEt62z3SL7xLnbxE8t3/aiZi5+8J4khy4Bw/cGNPUVW5qA/wd64MGQhps?=
+ =?iso-8859-1?Q?U6YG75kAUdwMbHnpDd3U9+D4plZ071LbmfRthawAzihUggZKRP8+sa+7aV?=
+ =?iso-8859-1?Q?thmqQR2AOSnBXvfxeG3rF/RfWPDgRRhBiEFqOdFiXnd0o/RsVcVkEZSjx7?=
+ =?iso-8859-1?Q?7UJLcemrJp6xr0NPN9GOsU6w63C41aV/DoFc3COJlr/3WxhKEsNeDza6+s?=
+ =?iso-8859-1?Q?o1xe9QayGA/jJ6HUJ+emcCqARoU2mByEz4Lt7yBvmZNWcsP+s+SIoOOA67?=
+ =?iso-8859-1?Q?YS8STpMpQafLnmCguMMa2AzschBzS9di3vN5wfCctfWzgtI6zOYTKa+jzJ?=
+ =?iso-8859-1?Q?bfaTprGRSnCLp9eedHP0gbAYJpSaBWjZRl11aM9pzJLmoo1bukwzQyUSLI?=
+ =?iso-8859-1?Q?RJlDiGEnWZRcCleY6p9ibethNGFuxttqvrZv4LKe+jBc6KhKtJqiM7SsXR?=
+ =?iso-8859-1?Q?K9OgBsOihKqgWUVV7sPKQXnEIGnLz0tSEAo91skt31o6zU8FF7lZ8tlR5H?=
+ =?iso-8859-1?Q?oYxSCWCY1JB8A5SxZWznaDky9On25xlq7KREMk9uh7LqZYa5fFIsrpzyET?=
+ =?iso-8859-1?Q?l2G1sDBMjgp5uMi7JEFikGV3KcEXO5hSARi6Om0o4zmf8bigZSph5Pfibn?=
+ =?iso-8859-1?Q?VCwcm/KJiMfUmlm5RLvPSpZmeDVGC/DHcwSoKwt5RCb8SpWw62TSuabM9g?=
+ =?iso-8859-1?Q?yRmXvcKnEiTMMh2DBtvl3loLpmb7Z3Y76ROcrmowpd+G930ZI/e99NsGxC?=
+ =?iso-8859-1?Q?DuKO1UK4OMqx8jdcWTEb3TFEI++B+YIKXc2+vUXv1ZdP3BI57M4RK9Zg31?=
+ =?iso-8859-1?Q?tWka3jlHcM8nQ3wtSRb+WLcCYbk33MK0rCizex15XNfpxNcX/gKJtWjTrW?=
+ =?iso-8859-1?Q?DRgQffYY2vkEonBCO0gy5H9hCRMcOSHg6EKFTHE9bkrxpYMvP8Zt1P4r2T?=
+ =?iso-8859-1?Q?J6ydd+jxA8WbUTHBqAMtgMiW6nCoE3lVds2oTRy7pn5aNvardXyMwzWMA1?=
+ =?iso-8859-1?Q?ZAqv2y0JBa5aK1WwR06TV6cv0/dck00pAn4J+rPFo7pNtNX3ooqSe59u34?=
+ =?iso-8859-1?Q?oTN3LIbP6qkkk9g+xFUFcRSHmnWn0kLZVDbtSXpp/sW8oxVFWnYkBFEBn7?=
+ =?iso-8859-1?Q?kBCoAvw1VowNuLulEE/aVKGDzEtTJESU9gTJr+XXaE+A9O6ZBNCPyLJ8Si?=
+ =?iso-8859-1?Q?qZvHz93ChqxfvbIrrYLp60glputMafw5PusJXiIYAl19xVxAfeih1Rj4Ix?=
+ =?iso-8859-1?Q?iRkGJ5SGyp1Obp+5rH75bkd3vjz6ZN8VEHi1SPrgbOZjrj3IDv8m2MDRJX?=
+ =?iso-8859-1?Q?fz9fouVI6Gx4p2/rAANNEnlzUT3XaqGpB1m37Od5oKTcz0RDsHBJWFXsvg?=
+ =?iso-8859-1?Q?KWVqg0IiX24cTh9D7sNHIuJkycQALuipleEiorzLgMk1CNnNbHpPD9a/3b?=
+ =?iso-8859-1?Q?YZlkxSUeQp69ZFW2OQYKaJ1uU1ToXFmnglSmxVb5S/bHeSMX6gu+iMNcr0?=
+ =?iso-8859-1?Q?oXRaQS1NXe2XoCjRdu4=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <ED846D1336C5094F885BA8CBE5E19C79@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c5aa26ad-4ae7-4498-8a27-118876181890@suse.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Score: -2.50
-X-Spamd-Result: default: False [-2.50 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,fb.com,toxicpanda.com,suse.com,vger.kernel.org];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	RGj56xEjK3f30ezrCEsnRIO243M7J6NS6IY0G2VeA3dbD2qzaW6mVw3nmCO/tDCTF+9RJkfLxS9Ij97nrUM7CIfTG68AnMBnzaqYB7HX12VZIky/QVdSNBemPe1gt94eJ1kPdKvwJo2RvwpAx+cWKBQxofyGFlR+feOqjR8olxeM9d+5y0Z7GFGV5ka+5NGK7C7Je821XfqKHPrwYyfmYv0zYD7I8J+QkmHcVhP2793kK5qq6havWHVtHa9l3TjsVtqKbnL4g+jbodxJnfvxR2KPfr0V8b21IWH9j+dBW0LJNZXTM1U5B6LgHhuaW4C5VQWd0sF1Sqi+Z4HovMNOFKfdQA/RGToDcATjRMsHSAdO4y3YFwpVEMVccrmbEOCwWeQ0Owd9BjOCctbXCMVBr3bGVm35n3IM1voKdNiJPc3e/xrBGggBeQAXiYr4S/ic3ZnDv8nC/t5Rt2CjVR3/r03B6+Qo0Ug4slL58bsRF/olr2Vk1MZa6lSyveQy+J8kna3+FZ0kN0peuUlv7mYeLA983SxqMz3rCrzlUa7m3w3h2E56HWD36tzYgZ67xVy3sHYJuHCCkalLSdTazEophY1yuYDRK+dldkO6kDjlgXqhh3b+gPGjDL/1zmJiF8+P
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b8ceb49-7043-45cf-ae9e-08dccbad9fa6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Sep 2024 00:16:14.7809
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fCZnfuKUnr8JQsCD1+YZSB0jEXfE4jICUkdHRlHALt0X5hI1s5CiW3ee8aKvagKczAnaHgFvE0tk17Vwls6PBs895+vNCkuK4D9+86ETq3w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR04MB8583
 
-On Tue, Sep 03, 2024 at 08:01:16AM +0930, Qu Wenruo wrote:
-> 
-> 
-> 在 2024/9/3 06:26, Luca Stefani 写道:
-> > Per Qu Wenruo in case we have a very large disk, e.g. 8TiB device,
-> > mostly empty although we will do the split according to our super block
-> > locations, the last super block ends at 256G, we can submit a huge
-> > discard for the range [256G, 8T), causing a super large delay.
-> > 
-> > We now split the space left to discard based the block discard limit
-> > in preparation of introduction of cancellation signals handling.
-> > 
-> > Reported-by: Qu Wenruo <wqu@suse.com>
-> 
-> Well, I'd say who ever reported the original fstrim and suspension 
-> failure should be the reporter, not me.
+On Sep 02, 2024 / 15:53, Martin Wilck wrote:
+> On Thu, 2024-08-29 at 07:36 +0000, Shinichiro Kawasaki wrote:
+>=20
+>=20
+> > Shellcheck reports a warning here:
+> >=20
+> > =A0 tests/nvme/053:47:9: warning: Prefer mapfile or read -a to split
+> > command output (or quote to avoid splitting). [SC2207]
+> >=20
+> > It is a bit lengthy, but let's replace the line above with this:
+> >=20
+> > =A0=A0=A0=A0=A0=A0=A0 while read -r line ; do ctrls+=3D("$line"); done =
+<
+> > <(_nvme_get_ctrl_list)
+>=20
+> Thanks for the review. If you don't mind, I'll just use "mapfile -t",
+> as suggested by shellcheck.
 
-Once the patch is finalized I'll add the links to reports but yeah if
-they're added when the patches are submitted it's helpful.
+The reason I did not suggest the "mapfile -t" solution was that SC2207
+recommends it for bash versions 4.4+ [1]. On the other hand, blktests READM=
+E.md
+requires bash version >=3D 4.2. So I assume that some blktests users use ba=
+sh
+version 4.2 or 4.3. I took a glance in the bash change history [2], and the=
+re
+are some mpafile related bug fixes between bash version v4.2 an v4.4. So I =
+think
+it's the better to not use "mpafile -t" in blktests.
+
+Do you have any specific reason to use "mapfile -t"?
+
+[1] https://www.shellcheck.net/wiki/SC2207
+[2] https://git.savannah.gnu.org/cgit/bash.git/tree/CHANGES
+
+>=20
+> Martin
+> =
