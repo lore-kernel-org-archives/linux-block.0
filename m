@@ -1,97 +1,109 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC9A1AACA
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 15:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C803188A03
+	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 15:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725378842; cv=none; b=VhXP3g1JMSr2Zy3S/9kJnUFEQR+CBjhvP+ZvPGIs7sCV3wRPksxfFvSJkwWjITjSvT+dyJ/PGU0YR2wORf2C8Wjvz1cVCVH3JD94+jYWfvjrtgw7B77qnD9zM6Dg7VxsyHX3PXTlmuiR4lrAlVse0ixcbA3cXptBubrM0W4ZIT8=
+	t=1725378999; cv=none; b=M/PoTVyDw9MMamskCP1jj6RVJPZyTlHCByUf/dska7G+eD46Uk7CRD5LUfCzW2cUooWlZYZ/hhm7n2rwquGpNy6J1uU98Wj/KIYR/F6q+UczKHohN5au/B37X7zBU5Zwu+fWJLqZCv12FH9R83l579QqXk867yWRAGj/1HeHvYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725378842; c=relaxed/simple;
-	bh=xXZgcYaTlUdbAaSip8H2m78mAT2+F/b9oJmzJ3y9juk=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=GP/N3Kl1//XO+AL0lwbb76uI9BdyKDgjPrLQx/Y4WlFid0jk09ZkKAPLoNcQRrImw6pRW/j/Qvu41twcQ96I5epncLkKOQPHpYbcv86SC5vQuB1lwRbA1YlbMCVVeetHpHPIK6lzwkvNGzCCwIYq1m/ASFFr4/1d6u+OqBJ47p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yTMCAZfP; arc=none smtp.client-ip=209.85.215.169
+	s=arc-20240116; t=1725378999; c=relaxed/simple;
+	bh=x9eBFNYcmSA+F605zh4BXbC0+qNWOIIN1Ef2O343EAE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=tYfk50DkLktBybiszt6L26lJx+5QLb/fkV0H9c4jUlGvFr5OzpM0dn5aBF1XAGMUsIj+Co7BB+yf5G9q8j3ZpChEB9v2UwRpDvQSGdo3DRQtnqbK22VO7i0mccQ8nclM4zMAtrItp4+wqTls99TJZs0AUCon3PebCWiywwa0d/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WXrR46r5; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yTMCAZfP"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-656d8b346d2so3289609a12.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2024 08:54:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WXrR46r5"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2059112f0a7so16343265ad.3
+        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2024 08:56:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725378839; x=1725983639; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725378997; x=1725983797; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=knMRs2X2wxIU+51PWJvKuJzOA3ogy5J9ExYIsIXe4Gk=;
-        b=yTMCAZfPYbBMJyDUJZcQORDmiJfl5SmZJAb//y7b7/kBPF5CaeyLnVHSoHbjN5YsuP
-         UKrB7uQ+gt75eiUnLD8yaPu/f2h+slDQUicazH1+1wteE+g32MIc6V8IhDrCggO0sso9
-         Z5uEoMTsbla1Z3Wb+6ZYsSNyh2iV1U2Hg0cNpuNeVaR7SVJSXjimfkXUqEBYMyEyg8mJ
-         vNqZvgcMGAdScRvXnMdiPmdW6NRZyqR8WALpQ+qyaEDBqNJuCcc24vtuobhkptrJ+Y7k
-         vplpibj0/EIDk5JAHDcoPm+XPvYcq9f/7WPAmI5GVXMh7E7sQNCNRYCRY5vvYikTYGEk
-         MWzA==
+        bh=6/vwR2rDKW/EcPbbGEGYrWhFAP7Mg7TTorU2MbfDU1U=;
+        b=WXrR46r5XGUsb2QnruCO9Agquo1AISPlw+yEdvS6E2swbJAUAbOYkiHDVqJSMYa0Fe
+         u2jjA/YtOP5YWX65sh3ZjFhqxAoZVFD7f7teKcnsaTgKCGdPWFb/USmN7YKsqbO79LZe
+         dqE/2vOEpTq52MGwJxFzP+nOfsb/K7FplIjElCILxBYBhx6SlLw2QYLfIFGvTPy39h3A
+         p14txsCCT8uQFCmravaOxieijWRhFFh6JPYwh8duHTDBvqVT8xrOvK3hmMgr+KqLNJlf
+         XSqE/HXf22SNbYD7Q2QkrE+5XCCdmfRHIz1I0RbBDMFDG+dFagQFyiZ0aK/UfFf1QZhb
+         Tc+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725378839; x=1725983639;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=knMRs2X2wxIU+51PWJvKuJzOA3ogy5J9ExYIsIXe4Gk=;
-        b=w/PAbO5FLczuxhGynsIN7u0cvVZ2JRYRaJLaUlLWWlLQx6hdYQ/Eq21iZmClgCrlV4
-         hsyvGPiCAvCspMlm+fr+sZl+Yiq7zKByBUzI4kOyCImls0Yvxy9bbSJ21A6X7lkdKbSR
-         jtUEx4TjgTrHmVvLXZ71w1MMTIchXNRGxRLx2/sSySOffBr5r3W7ZhyfN9w5joiAQeNN
-         S/XI3f8p6gBkx7eI4rJIj/qsuxWcXHuZOuXdhAwCzkJ5IkwMsCCzQ8G3/1HpjfvzEp+a
-         v43MGG5nWGTQBZavXgapXv1kN5YQP+eu12BD9559If/HQaZOHXlQOL1ZYI8P9358PN/W
-         OX0g==
-X-Gm-Message-State: AOJu0YyLgoLO8OZ/WuBUMWMWnNS5EQ+NQilnTSZhu+xTHJppjfe0ocTw
-	hBYx4hB5tUd3W26x45HX9diKmUuYHaGFajvlUADz56HW/wXdRJ3/qig7DnGefBFbc1Bi+h37c53
-	C
-X-Google-Smtp-Source: AGHT+IHxV4hWa1J2rld1YEyejuLvHiRSTnUcf2goenSQ7goBD0WWsUTmCQquxoLuRvE7aXVE7XszsQ==
-X-Received: by 2002:a17:902:c947:b0:1f9:f906:9088 with SMTP id d9443c01a7336-2054bcde069mr111126705ad.22.1725378839502;
-        Tue, 03 Sep 2024 08:53:59 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea39368sm155805ad.152.2024.09.03.08.53.58
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Sep 2024 08:53:59 -0700 (PDT)
-Message-ID: <6fe53222-876c-4deb-b4e1-453eb689a9f3@kernel.dk>
-Date: Tue, 3 Sep 2024 09:53:58 -0600
+        d=1e100.net; s=20230601; t=1725378997; x=1725983797;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6/vwR2rDKW/EcPbbGEGYrWhFAP7Mg7TTorU2MbfDU1U=;
+        b=ECk759BGioi/RuO7MP67FmMk2E/tud0JZ/IqC2IwLkzyp411QsGoE8cUlaQzVhuLiI
+         kLI1N9xlQ3OI6rV3yDIdiiwcZzpQxufNmHZWhc0ps15PAOSte7uRfTDub+3sk7r0ZB8n
+         iXGZp2THNJBYFRyVXGcmTvcFVaUmJiR8VmFFVPE6l2b5+RHyqJP1P7Y88WKeSqHtmJOu
+         6DEGvIB0kfoTr1yvZulWzpUD3/6tLoPpxs/hVp/bUL2tOVEkXK6mfEqk2rbYGCuCVUJJ
+         t/78VVCzuPegHh5B862G2jcN00JqMEjwKDAjhqxCKRSm/V32VU6G6Ra+JlJKl5TJXpsM
+         FDUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ9dHlXzSE58NkTCjtE/Y6Zto12kPIME6gdiS6bYn20OXQXHfE1juU7b92HRxs3YFgy6NRJnJGUpVoSw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvJmh0ISLvxFt5g8qzZ5YA+xwR4IhWZteNL/NneEohCYCu7dJN
+	FYY/zZ1gdG9v7XhA1f6mVJYI6T932ecdw2bvZnroHRhWhEJ7CbnzZtU9mLBXbCU=
+X-Google-Smtp-Source: AGHT+IF7kSJ+TJ/wY2n9i+uShTgLH1ufLH8yQgQU0p1Oius38tmTwi2VRPtkqZ1g4h2IW07ttzBsjA==
+X-Received: by 2002:a17:902:e552:b0:202:2f0:3bb2 with SMTP id d9443c01a7336-2050c496431mr184803755ad.60.1725378997293;
+        Tue, 03 Sep 2024 08:56:37 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea68a91sm142255ad.288.2024.09.03.08.56.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 08:56:36 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, 
+ paolo.valente@unimore.it, mauro.andreolini@unimore.it, 
+ avanzini.arianna@gmail.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
+ yangerkun@huawei.com
+In-Reply-To: <20240902130329.3787024-1-yukuai1@huaweicloud.com>
+References: <20240902130329.3787024-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH for-6.12 0/4] block, bfq: fix corner cases related to
+ bfqq merging
+Message-Id: <172537899519.20156.7615001741383878457.b4-ty@kernel.dk>
+Date: Tue, 03 Sep 2024 09:56:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] MAINTAINERS: move the BFQ io scheduler to orphan state
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
-Nobody is maintaining this code, and it just falls under the umbrella
-of block layer code. But at least mark it as such, in case anyone wants
-to care more deeply about it and assume the responsibility of doing so.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+On Mon, 02 Sep 2024 21:03:25 +0800, Yu Kuai wrote:
+> Our syzkaller report a UAF problem(details in patch 1), however it can't
+> be reporduced. And this set are some corner cases fix that might be
+> related, and they are found by code review.
+> 
+> Yu Kuai (4):
+>   block, bfq: fix possible UAF for bfqq->bic with merge chain
+>   block, bfq: choose the last bfqq from merge chain in
+>     bfq_setup_cooperator()
+>   block, bfq: don't break merge chain in bfq_split_bfqq()
+>   block, bfq: use bfq_reassign_last_bfqq() in bfq_bfqq_move()
+> 
+> [...]
 
----
+Applied, thanks!
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 42decde38320..4a857a125d6e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3781,10 +3781,8 @@ F:	Documentation/filesystems/befs.rst
- F:	fs/befs/
- 
- BFQ I/O SCHEDULER
--M:	Paolo Valente <paolo.valente@unimore.it>
--M:	Jens Axboe <axboe@kernel.dk>
- L:	linux-block@vger.kernel.org
--S:	Maintained
-+S:	Orphan
- F:	Documentation/block/bfq-iosched.rst
- F:	block/bfq-*
- 
+[1/4] block, bfq: fix possible UAF for bfqq->bic with merge chain
+      commit: 18ad4df091dd5d067d2faa8fce1180b79f7041a7
+[2/4] block, bfq: choose the last bfqq from merge chain in bfq_setup_cooperator()
+      commit: 0e456dba86c7f9a19792204a044835f1ca2c8dbb
+[3/4] block, bfq: don't break merge chain in bfq_split_bfqq()
+      commit: 42c306ed723321af4003b2a41bb73728cab54f85
+[4/4] block, bfq: use bfq_reassign_last_bfqq() in bfq_bfqq_move()
+      commit: f45916ae60eb60e7c9c3ac60cf07e66fe1a7faad
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
