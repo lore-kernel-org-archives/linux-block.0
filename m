@@ -1,175 +1,146 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229C021C176
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 08:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE74210186;
+	Tue,  3 Sep 2024 08:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725351442; cv=none; b=IejYYrUgYw2vTMiUe06g+VPjy+xXHCjEYfybqxVCjzxAL6r2l1Hsk9MCpIZEQptySHWY+3T17rTXfMeAZQzHSvyIf+/VX/QMJDRIqfKC7mr/zB4yMLgMjn+5pp3wF+wk2g5LiyoLPLswOT4PPjdLrDmUL8RB1MtTq514yWo/3Q8=
+	t=1725352495; cv=none; b=B6FOek62X6TI7me1kKmAGPFv3sv4Jv0Zx7uiLzmz8+zx0SH1aPHjS683/Vx6wvPDwVJrTsAmcPe2ZxHph3r26l4tqsGjHoDrxHcMF99zd9/GuEqtSfYcgxfO3Iv2EUDyVrvRne2uHDOOHl1B6V6qMY1CWqgNlzVCvk3qj7FDSLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725351442; c=relaxed/simple;
-	bh=2nS7H6L6WID7zbgTfR3cXsYRR840ppC8iAY3XsHIAg0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pIVhetcdvJ5Pvphg2fIl8M3EcbLvJHuMO/1kKZ5JdEsYrOiysMhJ1U2fpHYOtxXi/w/s96kF7YVzSgskZOfaQA6K7h4ey1rJU73mo8pdNnBtmoWYTrm7a0CqOWUOJu95fMdzsOdCnBC5bfou5SaPnwIE3Mm//VsvBh/e1iUdlmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=eR1ma8vP; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1725352495; c=relaxed/simple;
+	bh=93ogvXYCPWXi4B+wZugd1x2KMKT6reNeZI7rhPacqVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wneu36+tObTCdZR175Pj50neQl71C+uc+Y2x4dQJzHfVBoU8fwD0QnZikodDwWwBcT5e+gVZCcDO6sK8IzbeO8YA0Yp5oxRM1fMO9hx4rJHkci3pSJqQ9wpuLtDgQNvxPHIu3jC0Xv2jDIi7BfsKw15yacbtlw4TzVUHAQRgsco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HGYOwN9/; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="eR1ma8vP"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fee6435a34so34903575ad.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2024 01:17:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1725351440; x=1725956240; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zDpBNlTp4IAb2nYSzA4S5C3FeNDLg/TiXjgWPP/Ofy0=;
-        b=eR1ma8vP1rVo2mTTdEb7mmcigU/DSrA3KFc1Tano8EYDkLPVUG2vguMd6M3o61aaUd
-         zGUUv0JzlEQLNTQu3rIsFF3+ER1OscK1lRxPtcWtbmnfwrTyl4uVEnryl2qxSnSOTIKO
-         kSbNuWgU14s7AgajBYideY69lEMcARo54QaeNv9KmQ7gcK2XKEB+1Xn3nXtHJ6X75lhK
-         Yb9HFl8gafzsGH5BQDQaV9Uub1dqjn8fx/RorIkcAytnoPbeoCzLTVUIHIL6QvuVMe/g
-         8Pg+MlhNbZ93OJlPLsHcjKMiceZC8E5VnEvxVcsigBKaqULh/oeHtpjsHQOavcqrAL19
-         phyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725351440; x=1725956240;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zDpBNlTp4IAb2nYSzA4S5C3FeNDLg/TiXjgWPP/Ofy0=;
-        b=nZrDzkxu/t2Gk+v7l6lu5KxMkQMK5Cd5sfhQiXGz2IHe3+FA+y1P62LrdLog4ScKpu
-         07UtboVJ0Gz9Z8w++PLI20eSAe0XOq8RZLKGbLOuGVAUXXMSX+4vfsIzfxS+nOdDwOfX
-         lriwUVSReeL1FHHVwzQ/X6W4d4BCHQ3eyOm2VBIEut790ZiVaiMhruvLmtfOgNEh90Qq
-         K2f76hVgZGuLpwnxZfbdx5crdiWxpb08A2p2JmTcLTzxNPjLvGjxjusvPxRdnhBR3fwo
-         WAF0677LoDVoXZCDR8UMUvFRXgieeAGou0RBcuaAgCF2O6VGyN9tBc0I82QKBSZAPBFL
-         /rbQ==
-X-Gm-Message-State: AOJu0YxsRklNFhGP/YiJzJj6ylqjLTcFF5pubpnPUfT+W2Oa72dA5Y/r
-	t+ciprnF+7ZkxdYhk1qrWoseU2ZRQzCp8O1CQrFuTcb8MQd1elBWL9VQvPbRmqA=
-X-Google-Smtp-Source: AGHT+IGlXjkmm4wRivHlKxkzFWkFVKdYxcu00qrJi9p0aoh/oPB1y4lwMJCCvMAwLqQVPKWe0Wg4uw==
-X-Received: by 2002:a17:903:230a:b0:203:a13a:c49e with SMTP id d9443c01a7336-20699acb7bfmr12843815ad.1.1725351440502;
-        Tue, 03 Sep 2024 01:17:20 -0700 (PDT)
-Received: from PXLDJ45XCM.bytedance.net ([139.177.225.235])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20559cae667sm38155435ad.95.2024.09.03.01.17.16
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 03 Sep 2024 01:17:19 -0700 (PDT)
-From: Muchun Song <songmuchun@bytedance.com>
-To: axboe@kernel.dk,
-	ming.lei@redhat.com,
-	yukuai1@huaweicloud.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	muchun.song@linux.dev,
-	Muchun Song <songmuchun@bytedance.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 3/3] block: fix ordering between checking BLK_MQ_S_STOPPED and adding requests
-Date: Tue,  3 Sep 2024 16:16:53 +0800
-Message-Id: <20240903081653.65613-4-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20240903081653.65613-1-songmuchun@bytedance.com>
-References: <20240903081653.65613-1-songmuchun@bytedance.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HGYOwN9/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725352493; x=1756888493;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=93ogvXYCPWXi4B+wZugd1x2KMKT6reNeZI7rhPacqVM=;
+  b=HGYOwN9/eOTzzLcsUUDOcSrRx3p/b959HZPYiiXdVI+fbD4IyYHyPcHS
+   pAnOsVfmW0T2rsP082EHDpzJLKIJESuR+/rCdHYIJV2dIYAu/MEaPo9LK
+   uuAJWpW9PvQ5rg3/I5WMCGx71aIsc7xmAyy0e4bqLsRmm5H0QXYJdAKkS
+   qn1KC8ciDyrEsolAjFIxZUFjvoAz4Q955Krum+Tlw2TLKO6uaUsL5Xvv8
+   Oef7prnrrdzEX/NAMsyx0rnaQkvQyuxFwvzcSvuVelorVS5zO+abWnfqo
+   L7bJr591phr0D2oDcFug3bEogu20sYvh18udkr9OZUFwSWzjQcn0EoyAh
+   A==;
+X-CSE-ConnectionGUID: yNTH1vrWTayT7+sN1BhAqQ==
+X-CSE-MsgGUID: dI8nZm1ERQKjrzMTBi252Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11183"; a="24092371"
+X-IronPort-AV: E=Sophos;i="6.10,198,1719903600"; 
+   d="scan'208";a="24092371"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 01:34:52 -0700
+X-CSE-ConnectionGUID: gL+DaA9yS3q7sZACReu1/g==
+X-CSE-MsgGUID: obJYgvG7Tz2JxAbOjV1zYA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,198,1719903600"; 
+   d="scan'208";a="102274617"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 03 Sep 2024 01:34:51 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1slOzw-0006Pm-2f;
+	Tue, 03 Sep 2024 08:34:48 +0000
+Date: Tue, 3 Sep 2024 16:33:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: ZhangHui <zhanghui31@xiaomi.com>, axboe@kernel.dk
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, zhanghui31@xiaomi.com
+Subject: Re: [PATCH] block: move non sync requests complete flow to softirq
+Message-ID: <202409031507.wUCw4k8n-lkp@intel.com>
+References: <20240902064409.25637-1-zhanghui31@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240902064409.25637-1-zhanghui31@xiaomi.com>
 
-Supposing first scenario with a virtio_blk driver.
+Hi ZhangHui,
 
-CPU0                                                                CPU1
+kernel test robot noticed the following build warnings:
 
-blk_mq_try_issue_directly()
-    __blk_mq_issue_directly()
-        q->mq_ops->queue_rq()
-            virtio_queue_rq()
-                blk_mq_stop_hw_queue()
-                                                                    virtblk_done()
-    blk_mq_request_bypass_insert()                                      blk_mq_start_stopped_hw_queues()
-        /* Add IO request to dispatch list */   1) store                    blk_mq_start_stopped_hw_queue()
-                                                                                clear_bit(BLK_MQ_S_STOPPED)                 3) store
-    blk_mq_run_hw_queue()                                                       blk_mq_run_hw_queue()
-        if (!blk_mq_hctx_has_pending())                                             if (!blk_mq_hctx_has_pending())         4) load
-            return                                                                      return
-        blk_mq_sched_dispatch_requests()                                            blk_mq_sched_dispatch_requests()
-            if (blk_mq_hctx_stopped())          2) load                                 if (blk_mq_hctx_stopped())
-                return                                                                      return
-            __blk_mq_sched_dispatch_requests()                                          __blk_mq_sched_dispatch_requests()
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.11-rc6 next-20240902]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Supposing another scenario.
+url:    https://github.com/intel-lab-lkp/linux/commits/ZhangHui/block-move-non-sync-requests-complete-flow-to-softirq/20240902-144744
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20240902064409.25637-1-zhanghui31%40xiaomi.com
+patch subject: [PATCH] block: move non sync requests complete flow to softirq
+config: x86_64-randconfig-122-20240903 (https://download.01.org/0day-ci/archive/20240903/202409031507.wUCw4k8n-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240903/202409031507.wUCw4k8n-lkp@intel.com/reproduce)
 
-CPU0                                                                CPU1
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409031507.wUCw4k8n-lkp@intel.com/
 
-blk_mq_requeue_work()
-    /* Add IO request to dispatch list */       1) store            virtblk_done()
-    blk_mq_run_hw_queues()/blk_mq_delay_run_hw_queues()                 blk_mq_start_stopped_hw_queues()
-        if (blk_mq_hctx_stopped())              2) load                     blk_mq_start_stopped_hw_queue()
-            continue                                                            clear_bit(BLK_MQ_S_STOPPED)                 3) store
-        blk_mq_run_hw_queue()/blk_mq_delay_run_hw_queue()                       blk_mq_run_hw_queue()
-                                                                                    if (!blk_mq_hctx_has_pending())         4) load
-                                                                                        return
-                                                                                    blk_mq_sched_dispatch_requests()
+sparse warnings: (new ones prefixed by >>)
+>> block/blk-mq.c:1196:45: sparse: sparse: incorrect type in initializer (different base types) @@     expected restricted blk_opf_t const [usertype] is_sync @@     got bool @@
+   block/blk-mq.c:1196:45: sparse:     expected restricted blk_opf_t const [usertype] is_sync
+   block/blk-mq.c:1196:45: sparse:     got bool
+   block/blk-mq.c: note: in included file (through include/linux/module.h):
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
 
-Both scenarios are similar, the full memory barrier should be inserted between
-1) and 2), as well as between 3) and 4) to make sure that either CPU0 sees
-BLK_MQ_S_STOPPED is cleared or CPU1 sees dispatch list. Otherwise, either CPU
-will not rerun the hardware queue causing starvation of the request.
+vim +1196 block/blk-mq.c
 
-The easy way to fix it is to add the essential full memory barrier into helper
-of blk_mq_hctx_stopped(). In order to not affect the fast path (hardware queue
-is not stopped most of the time), we only insert the barrier into the slow path.
-Actually, only slow path needs to care about missing of dispatching the request
-to the low-level device driver.
+  1193	
+  1194	bool blk_mq_complete_request_remote(struct request *rq)
+  1195	{
+> 1196		const blk_opf_t is_sync = op_is_sync(rq->cmd_flags);
+  1197	
+  1198		WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+  1199	
+  1200		/*
+  1201		 * For request which hctx has only one ctx mapping,
+  1202		 * or a polled request, always complete locally,
+  1203		 * it's pointless to redirect the completion.
+  1204		 */
+  1205		if ((rq->mq_hctx->nr_ctx == 1 &&
+  1206		     rq->mq_ctx->cpu == raw_smp_processor_id()) ||
+  1207		     rq->cmd_flags & REQ_POLLED)
+  1208			return false;
+  1209	
+  1210		if (blk_mq_complete_need_ipi(rq)) {
+  1211			blk_mq_complete_send_ipi(rq);
+  1212			return true;
+  1213		}
+  1214	
+  1215		if ((rq->q->nr_hw_queues == 1) || !is_sync) {
+  1216			blk_mq_raise_softirq(rq);
+  1217			return true;
+  1218		}
+  1219		return false;
+  1220	}
+  1221	EXPORT_SYMBOL_GPL(blk_mq_complete_request_remote);
+  1222	
 
-Fixes: 320ae51feed5c ("blk-mq: new multi-queue block IO queueing mechanism")
-Cc: stable@vger.kernel.org
-Cc: Muchun Song <muchun.song@linux.dev>
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
----
- block/blk-mq.c |  6 ++++++
- block/blk-mq.h | 13 +++++++++++++
- 2 files changed, 19 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ac39f2a346a52..48a6a437fba5e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2413,6 +2413,12 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 		return;
- 
- 	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+	/*
-+	 * Pairs with the smp_mb() in blk_mq_hctx_stopped() to order the
-+	 * clearing of BLK_MQ_S_STOPPED above and the checking of dispatch
-+	 * list in the subsequent routine.
-+	 */
-+	smp_mb__after_atomic();
- 	blk_mq_run_hw_queue(hctx, async);
- }
- EXPORT_SYMBOL_GPL(blk_mq_start_stopped_hw_queue);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 260beea8e332c..f36f3bff70d86 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -228,6 +228,19 @@ static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data
- 
- static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
- {
-+	/* Fast path: hardware queue is not stopped most of the time. */
-+	if (likely(!test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
-+		return false;
-+
-+	/*
-+	 * This barrier is used to order adding of dispatch list before and
-+	 * the test of BLK_MQ_S_STOPPED below. Pairs with the memory barrier
-+	 * in blk_mq_start_stopped_hw_queue() so that dispatch code could
-+	 * either see BLK_MQ_S_STOPPED is cleared or dispatch list is not
-+	 * empty to avoid missing dispatching requests.
-+	 */
-+	smp_mb();
-+
- 	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
- }
- 
 -- 
-2.20.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
