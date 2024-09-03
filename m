@@ -1,136 +1,117 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2051DC720;
-	Tue,  3 Sep 2024 19:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A475C1DC720
+	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 19:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725392829; cv=none; b=I1+6Q2xZEQYiFl5Z3otcqgynhtSTBKfG+n31MFv/5B8d1p7z3eQ+eVz/mhhR0tMjMOZP/Jlg3MIRV6otALZh7q/ZM1XOdw+H2jGGqkdE8++3gDU9uiqsaomz6piKMMQo1uPr2p8ovC0CKdnDz3sEYgcpiRhgg7S94lrN28ZRKuA=
+	t=1725392894; cv=none; b=arLhZ8hTvWbUSC4/ir+Nlpy4ekS2DfeDUYfQcNGHRxhuLca7bqCNwPXwUeBMCRONKF0W01v3ATwIUqiNebI25nycgV3T2552qkIgVaKdGGN09kVETHHfmxo67NLOIthSJhWW4c9ND8cKEzUEidcAIZqQVpAj5rMWqwBzu71nGQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725392829; c=relaxed/simple;
-	bh=AW5O3fYmGL289gmg2dbXstbvmyw9Js/B5YLfw07ifLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pFUU/dWhA7GWTVZJB+X2xbRtC4u3Si92vRegKNdwXq4kF0Rgi2TQ9sqUcUnkvG8h8lXXiV8aLw3yedyhMi7u2uF1g3aJ9Y6kni9qvWsKLEMAMda1QSaIz1QjZ/G/h5V68fpw5HR2KsnrnzCxlhLImMyFjvWBYzybXHtZW4mjZVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UQZwXfJV; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1725392894; c=relaxed/simple;
+	bh=5w1MdU87kfmFhemU47nWHUKj584aIGRPwOl3SBx1hrE=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=no9Ahn2M/bk5PYhEo9oGbty5ZRSa4vO3CTbkEQ2OGw9HiLum5fi8gAcg+iGeQLO4tmSmrxq7cjDZoG6XPrmV/WUbg9faA8AE3KAG8td2pfzCg6d8RYoqXz+RPChRvu9b4FZ7bqeGITR12z/o48BT+sVrgvly4tiHbzm9QDj1LCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B0Yb+LDL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQZwXfJV"
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7cb3db0932cso4324984a12.1;
-        Tue, 03 Sep 2024 12:47:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725392828; x=1725997628; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=sQE4RGf00KcJD0pcpR6cGZr6q6lFBV5A5RGUfUHfC2A=;
-        b=UQZwXfJVlhl+wGkE6duOaV9F6tYPH4AxH8Wemmdos2cmdzVGndxn7avzQ1bSEltGRB
-         S7t/nioiSb4uBT6aC2OXfae3W1fdphVvs/uxYkSRJ0FnZ7FhowLleWqsmvYy8uOKR5eC
-         d59UzovYbDuJl2QfjUVXyrDPC7bAVWMiLw6vIGWpG1nZrV5naJD+jisWUum5/dW9rHAj
-         q7Hncj2S6m0VZOWxadHsGkd8M8orxOivdQAArrrULUv10W3FZAPgI5AOfRGJHgqYRxsT
-         eBUK7v2+Z+KouTqfXU9Q0hKV6RSA76AphjCKeh413BzKGyO9j16L+z6hX70fHHyMMFtT
-         yjHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725392828; x=1725997628;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sQE4RGf00KcJD0pcpR6cGZr6q6lFBV5A5RGUfUHfC2A=;
-        b=bYrQsFewynLMf4F4OnNR/TEHYw01Yty8D5ptpmuhgyStzw0U6RyocI+PvzXtardbMn
-         R6Ohw/T3JWowCuByt+UaIEXAEPFEUR+sBSM5mTavOSboCJMrK8P31/VJBNnFVias3lmw
-         bKN3SIkjn13Y/zSmVJyoSKXPgIG472GtFvaqUU9wPlm0SSjOZgl9J8dDgpn9zIls9Ks0
-         lWITb0+gWOZBRu/saziNwxr72s1oLtxWdWnuIdQvu65xkNRPid0I2woTOulpujatDSYy
-         f/5npXd5UiV0NlW8drJPb/4xbWs3b3aoMxwvw489MzRrh9ZJtSad89rjqAoqrX8RPm6L
-         E4vA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPOuyW4JQjgeVvdpCr4qwUTdMyT4D6/7+Az6ypAXoYWXvXmmy7Qt+2Go/E+MGWu9NjGWh7VpZ5sv0j6Vmk4iA=@vger.kernel.org, AJvYcCW42aWCMFu71PEh026x0aj2DfD6+0YNaKSo59Frs0pqdnvU+iE6bD143pzhJKDGYcFaxo20ChAVyDvqbA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyqtwlhRc8LGxyN/tv+tJQQulQBnqGHFDA7MI8AWZgbtf/CNyR
-	2GmX1ZhjKD/2ELrTXjHfwmBuoGBLnzmDRc/gQkolslwIN3Qo9qm2
-X-Google-Smtp-Source: AGHT+IEdvgz/igkRwCVTF1iTKBYnEie+4ECXFulIAHBmC2FHNBpY/Ut/3YcO/5TBs5f58FRsaBMm9g==
-X-Received: by 2002:a17:903:40cf:b0:205:9112:efea with SMTP id d9443c01a7336-2059112f137mr73932235ad.35.1725392827404;
-        Tue, 03 Sep 2024 12:47:07 -0700 (PDT)
-Received: from google.com ([2620:15c:9d:2:e682:e3dc:908:eef0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae913ad2sm2128605ad.39.2024.09.03.12.47.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 12:47:07 -0700 (PDT)
-Date: Tue, 3 Sep 2024 12:47:04 -0700
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Andreas Hindborg <nmi@metaspace.dk>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	Benno Lossin <benno.lossin@proton.me>, Jens Axboe <axboe@kernel.dk>,
-	Andreas Hindborg <a.hindborg@samsung.com>,
-	Boqun Feng <boqun.feng@gmail.com>, linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH RESEND] block, rust: simplify validate_block_size()
- function
-Message-ID: <ZtdnuH9lWtsPCg-X@google.com>
-References: <878qwaxtsd.fsf@metaspace.dk>
- <Ztdctd0mbsJOBtJV@google.com>
- <CANiq72=GRbxY=3-NP6RutcJjCqRxRftafVZqDD73tureOh20Ew@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0Yb+LDL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725392891;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=bSTLusuXmFQd65kQGYZ1qnrT0q7wEzKGyedDbsG7eqw=;
+	b=B0Yb+LDLwD2fClhBXXTq1glTABv6zupyVW044RtYiTyGdUYlssmAr00YJJFukkFRs+fnJV
+	5K8ninRzUxwh1nljJRtptj0Y1cVEgbCrCqezMbXgWT+cOsxShagUArEbKA0FakuEds8tTK
+	EmF0/x8QsrfBbrR9YqhYrr4icnRfUWk=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-620-1UR2zS6-OKybRe2ml9oEdw-1; Tue,
+ 03 Sep 2024 15:48:08 -0400
+X-MC-Unique: 1UR2zS6-OKybRe2ml9oEdw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6FDE71978F64;
+	Tue,  3 Sep 2024 19:48:06 +0000 (UTC)
+Received: from [10.45.224.222] (unknown [10.45.224.222])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F419219560A3;
+	Tue,  3 Sep 2024 19:48:03 +0000 (UTC)
+Date: Tue, 3 Sep 2024 21:47:59 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+cc: Jinyoung Choi <j-young.choi@samsung.com>, Christoph Hellwig <hch@lst.de>, 
+    "Martin K. Petersen" <martin.petersen@oracle.com>, 
+    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+    linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: [PATCH] bio-integrity: don't restrict the size of integrity
+ metadata
+Message-ID: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72=GRbxY=3-NP6RutcJjCqRxRftafVZqDD73tureOh20Ew@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Tue, Sep 03, 2024 at 09:30:53PM +0200, Miguel Ojeda wrote:
-> On Tue, Sep 3, 2024 at 9:00 PM Dmitry Torokhov
-> <dmitry.torokhov@gmail.com> wrote:
-> >
-> > If you want to keep dividing into Rust-land and C-land I'm afraid you
-> > will have 2 islands that do not talk to each other. I really want to be
-> 
-> We are not trying to divide the Rust and C side, quite the opposite.
-> That should be obvious since dividing both sides only hurts the
-> project to begin with.
-> 
-> > able to parse the things quickly and not constantly think if my Rust is
-> > idiomatic enough or I could write the code in a more idiomatic way with
-> > something brand new that just got off the nightly list and moved into
-> > stable.
-> 
-> If a feature is in the minimum support version we have for Rust in the
-> kernel, and it improves the way we write code, then we should consider
-> taking advantage of it.
-> 
-> Now, that particular function call would have compiled since Rust 1.35
-> and ranges were already a concept back in Rust 1.0. So I am not sure
-> why you mention recently stabilized features here.
+Hi Jens
 
-I was talking in general, not about this exact case, sorry if I was
-unclear. But in general I personally have this issue with Rust and to
-extent also with C++ where I constantly wonder if my code is "idiomatic
-enough" or if it looks obsolete because it is "only" C++14 and not 17
-or 20.
+I added dm-integrity inline mode in the 6.11 merge window. I've found out
+that it doesn't work with large bios - the reason is that the function
+bio_integrity_add_page refuses to add more metadata than
+queue_max_hw_sectors(q). This restriction is no longer needed, because
+big bios are split automatically. I'd like to ask you if you could send
+this commit to Linus before 6.11 comes out, so that the bug is fixed
+before the final release.
 
-With C usually have no such concerns which allows me to concentrate on
-different things.
+Mikulas
 
-> 
-> For this particular case, I don't think it matters too much, and I can
-> see arguments both ways (and we could introduce other ways to avoid
-> the reference or swap the order, e.g. `n.within(a..b)`).
-> 
-> > This is a private function and an implementation detail. Why does it
-> > need to be exposed in documentation at all?
-> 
-> That is a different question -- but even if it should be a private
-> function, it does not mean documentation should be removed (even if
-> currently we do not require documentation for private items).
 
-I think exposing documentation for private function that can change at
-any time and is not callable from outside has little value. That does
-not mean that comments annotating such function have no value. But they
-need to be taken together with the function code, and in this case
-Alexey's concern about comments like "this increments that by 1"
-becomes quite valid.
+From: Mikulas Patocka <mpatocka@redhat.com>
 
-Thanks.
+bio_integrity_add_page restricts the size of the integrity metadata to
+queue_max_hw_sectors(q). This restriction is not needed because oversized
+bios are split automatically. This restriction causes problems with
+dm-integrity 'inline' mode - if we send a large bio to dm-integrity and
+the bio's metadata are larger than queue_max_hw_sectors(q),
+bio_integrity_add_page fails and the bio is ended with BLK_STS_RESOURCE
+error.
 
--- 
-Dmitry
+An example that triggers it:
+
+# modprobe brd rd_size=1048576
+# dmsetup create in1 --table '0 1847320 integrity /dev/ram0 0 64 D 1 fix_padding'
+# dmsetup create in2 --table '0 1847312 integrity /dev/mapper/in1 0 64 I 1 internal_hash:sha512'
+# dd if=/dev/zero of=/dev/mapper/in2 bs=1M oflag=direct status=progress
+dd: error writing '/dev/mapper/in2': Cannot allocate memory
+1+0 records in
+0+0 records out
+0 bytes copied, 0.00169291 s, 0.0 kB/s
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Fixes: fb0987682c62 ("dm-integrity: introduce the Inline mode")
+Fixes: 0ece1d649b6d ("bio-integrity: create multi-page bvecs in bio_integrity_add_page()")
+
+---
+ block/bio-integrity.c |    4 ----
+ 1 file changed, 4 deletions(-)
+
+Index: linux-2.6/block/bio-integrity.c
+===================================================================
+--- linux-2.6.orig/block/bio-integrity.c	2024-07-30 14:06:55.000000000 +0200
++++ linux-2.6/block/bio-integrity.c	2024-09-03 15:49:49.000000000 +0200
+@@ -167,10 +167,6 @@ int bio_integrity_add_page(struct bio *b
+ 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 
+-	if (((bip->bip_iter.bi_size + len) >> SECTOR_SHIFT) >
+-	    queue_max_hw_sectors(q))
+-		return 0;
+-
+ 	if (bip->bip_vcnt > 0) {
+ 		struct bio_vec *bv = &bip->bip_vec[bip->bip_vcnt - 1];
+ 		bool same_page = false;
+
