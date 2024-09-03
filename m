@@ -1,195 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0906E1B984C
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 10:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from outboundhk.mxmail.xiaomi.com (outboundhk.mxmail.xiaomi.com [118.143.206.90])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD11619F41F;
+	Tue,  3 Sep 2024 11:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.143.206.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725360123; cv=none; b=Shj+vdrogDB75SlnWKOcooLZFmFTXohXuABJP2wfXb6BnZeuslR1zef6f6XDIRynlVn1T6lKlcffMaZzUS2dcvWfjFu9NtR9TXjIa5g09a9S0d5vnri3gaDkH/MEWw6E9HTJJrGMJpic1BV93AlPbKutOGFz/OyVkP/hhl3GjPk=
+	t=1725364485; cv=none; b=QEoU/dQ3ZNz/DHSew7e/9tz4+0+SVxsVU4tqO52bvZSVJ0WTlCEavvnIkHBGhVgUjV5NwYaQuNP5eXtCOv2gegRNEeRHWrD/zCwwc6aJ94L48j2i/xCWccVDOzzg9JpnvaliVYJxBaq1aEpwUQwZ3so4JXq8xbUBSaVdou/8B2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725360123; c=relaxed/simple;
-	bh=qbizLx7wTCAOjESO9AyVt8wu2rYiD1MB9P9cW5S88ys=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rA7/wPBEAGQ2uGgU7+9hFU5+vvLuQQr5HIy2mWtZqwGhRO8Qp9x6QZAEkm72WqQMc7x1p36KwYloTEhgOTpFQhPMZb7krAnQzo3G27A7DOd2kiYzIE7tUTWuOk9QG0iZG1k90D12Os/Lp8DSVtm49G2OoA/UKiCaZ4gGvwE/5Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=StHQuN1Q; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StHQuN1Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725360121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qbizLx7wTCAOjESO9AyVt8wu2rYiD1MB9P9cW5S88ys=;
-	b=StHQuN1Q4Lpr2+32/uyt+Fy8NtfKpK0LQeXMBTWYxpLA379ekHaVK3zeyzgj1XiH9r9gAB
-	o0cGomtufNc6WLbrTa+N5JG8eHYpOfgS/PxcK9AH5DQEaSwOyze2ML/FwKwrqwBA4x7P52
-	VzZagYTuRjkuN3xSj0gvEG8lkQ+lF6o=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-_nuUwE7DM8qExSXkbiE6IQ-1; Tue, 03 Sep 2024 06:41:59 -0400
-X-MC-Unique: _nuUwE7DM8qExSXkbiE6IQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42bb68e16b0so58728435e9.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2024 03:41:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725360118; x=1725964918;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qbizLx7wTCAOjESO9AyVt8wu2rYiD1MB9P9cW5S88ys=;
-        b=lEQ9VXeSPPo4ZeuptQz1XQIVUmx4Aq5mWct+1YN01yunoDKhpC6nVihXgeGemC8x4X
-         2v9WfvwkGlFPxA39ki0ssKdZxWndb7qih/Fl8+fYrs2Inyn8kvGhczDhUyJ2EsyYisL4
-         QU2MC6tCt8aexYb+jwGJNIF022Yx9foz3HIpva/am4lJY4auTJi2tehV+mGF0hIIPS1O
-         dIP3tGAUOuY7dpCRQM1ynL5mNNCxKcx7f4AWqRTHXX15cvPszk97nDLFynqleEAZ0oHY
-         14sqWz5DQLVrP4ocKRR7Fx8IEwIDuie6GNpP3q9N7Q3jpf8U/nTdTAPKtm9UHJKjPImk
-         Wj8w==
-X-Gm-Message-State: AOJu0YwLnC1+CicAuKvRKNqe1RxWQ8LplV2etMPo9XHPB601wfQl2GC8
-	gHXYqn2TlaMXhSJ4gur4hfUp2eEoZrU0Wad9J/4G/27lt/HJQSzhMSiy0RWtgC5WPW/t8ceNDzn
-	2egqkBDNkYSsZNeYQlC0qK6OYi/tgYWDI838pQfGuxUWbssJDlE5JvzTwiHVb
-X-Received: by 2002:a05:600c:354b:b0:426:545b:ec00 with SMTP id 5b1f17b1804b1-42bb01c1c17mr144185985e9.19.1725360118337;
-        Tue, 03 Sep 2024 03:41:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHnJ+QTA8ZKsd8rfiT6e8FYacEzmTRgtvYSZ2cF3fvYtWB375xRT2pTBy4x3T4AFjvx4VWFiw==
-X-Received: by 2002:a05:600c:354b:b0:426:545b:ec00 with SMTP id 5b1f17b1804b1-42bb01c1c17mr144185575e9.19.1725360117728;
-        Tue, 03 Sep 2024 03:41:57 -0700 (PDT)
-Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6f9b584sm165397125e9.16.2024.09.03.03.41.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 03:41:57 -0700 (PDT)
-Message-ID: <5c5c2970fa4b23b348663873771e65a2cd78fcaf.camel@redhat.com>
-Subject: Re: [PATCH v6 0/5] PCI: Remove most pcim_iounmap_regions() users
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
- <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Richard Cochran <richardcochran@gmail.com>, Damien
- Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, John Garry
- <john.g.garry@oracle.com>, Chaitanya Kulkarni <kch@nvidia.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org,  linux-pci@vger.kernel.org
-Date: Tue, 03 Sep 2024 12:41:55 +0200
-In-Reply-To: <20240902062342.10446-2-pstanner@redhat.com>
-References: <20240902062342.10446-2-pstanner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1725364485; c=relaxed/simple;
+	bh=CRGA5PPTM23DCJnXshXb/hofycYBMNRXVXaHxSf97zI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Yi2sdtAeNKuhYfrgp0hidq+OYpzlzQ2b17vUZkD9B9RmAGseY/vYjmwVcli2OhJVGzaeRxAQrgCS/VzdwQkkH+W1VtalHswRaQlXTu6xgfqZpsHiZNj0tT3K79WWojWND3I+ioyNIctFFBTnJwqUJ4QK+WjRUC/bRLDedJ0RqRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com; spf=pass smtp.mailfrom=xiaomi.com; arc=none smtp.client-ip=118.143.206.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xiaomi.com
+X-CSE-ConnectionGUID: fQnLtxpPT2esNAeAloMwFg==
+X-CSE-MsgGUID: 5aoV9IiqToCgFuju6KHxDw==
+X-IronPort-AV: E=Sophos;i="6.10,198,1719849600"; 
+   d="scan'208";a="95319094"
+From: ZhangHui <zhanghui31@xiaomi.com>
+To: <axboe@kernel.dk>, <bvanassche@acm.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<zhanghui31@xiaomi.com>
+Subject: [PATCH v3] block: move non sync requests complete flow to softirq
+Date: Tue, 3 Sep 2024 19:54:37 +0800
+Message-ID: <20240903115437.42307-1-zhanghui31@xiaomi.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BJ-MBX15.mioffice.cn (10.237.8.135) To YZ-MBX07.mioffice.cn
+ (10.237.88.127)
 
-Because someone asked:
-The proposed merge plan for this series would be to take it through the
-PCI tree, as was done with similar cleanups during the last months.
+From: zhanghui <zhanghui31@xiaomi.com>
 
-Cheers,
-P.
+Currently, for a controller that supports multiple queues, like UFS4.0,
+the mq_ops->complete is executed in the interrupt top-half. Therefore, 
+the file system's end io is executed during the request completion process,
+such as f2fs_write_end_io on smartphone.
 
+However, we found that the execution time of the file system end io
+is strongly related to the size of the bio and the processing speed
+of the CPU. Because the file system's end io will traverse every page
+in bio, this is a very time-consuming operation.
 
-On Mon, 2024-09-02 at 08:23 +0200, Philipp Stanner wrote:
-> Changes in v6:
-> =C2=A0 - Remove the patches for "vdpa: solidrun" since the maintainer
-> seems
-> =C2=A0=C2=A0=C2=A0 unwilling to review and discuss, not to mention approv=
-e, anything
-> =C2=A0=C2=A0=C2=A0 that is part of a wider patch series across other subs=
-ystems.
-> =C2=A0 - Change series's name to highlight that not all callers are
-> removed
-> =C2=A0=C2=A0=C2=A0 by it.
->=20
-> Changes in v5:
-> =C2=A0 - Patch "ethernet: cavium": Re-add accidentally removed
-> =C2=A0=C2=A0=C2=A0 pcim_iounmap_region(). (Me)
-> =C2=A0 - Add Jens's Reviewed-by to patch "block: mtip32xx". (Jens)
->=20
-> Changes in v4:
-> =C2=A0 - Drop the "ethernet: stmicro: [...] patch since it doesn't apply
-> to
-> =C2=A0=C2=A0=C2=A0 net-next, and making it apply to that prevents it from=
- being
-> =C2=A0=C2=A0=C2=A0 applyable to PCI ._. (Serge, me)
-> =C2=A0 - Instead, deprecate pcim_iounmap_regions() and keep "ethernet:
-> =C2=A0=C2=A0=C2=A0 stimicro" as the last user for now.
-> =C2=A0 - ethernet: cavium: Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - vdpa: solidrun (Bugfix) Correct wrong printf string (was "psnet"
-> instead of
-> =C2=A0=C2=A0=C2=A0 "snet"). (Christophe)
-> =C2=A0 - vdpa: solidrun (Bugfix): Add missing blank line. (Andy)
-> =C2=A0 - vdpa: solidrun (Portation): Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - Apply Reviewed-by's from Andy and Xu Yilun.
->=20
-> Changes in v3:
-> =C2=A0 - fpga/dfl-pci.c: remove now surplus wrapper around
-> =C2=A0=C2=A0=C2=A0 pcim_iomap_region(). (Andy)
-> =C2=A0 - block: mtip32xx: remove now surplus label. (Andy)
-> =C2=A0 - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
-> =C2=A0=C2=A0=C2=A0 occurs. (Andy, Christophe)
-> =C2=A0 - Some minor wording improvements in commit messages. (Me)
->=20
-> Changes in v2:
-> =C2=A0 - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
-> =C2=A0=C2=A0=C2=A0 patch, put stable kernel on CC. (Christophe, Andy).
-> =C2=A0 - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
-> =C2=A0 - Consequently, drop patch "PCI: Make pcim_release_region() a
-> public
-> =C2=A0=C2=A0=C2=A0 function", since there's no user anymore. (obsoletes t=
-he squash
-> =C2=A0=C2=A0=C2=A0 requested by Damien).
-> =C2=A0 - vdap/solidrun:
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 make 'i' an 'unsigned short' (Andy, me)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Use 'continue' to simplify loop (Andy)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Remove leftover blank line
-> =C2=A0 - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
->=20
->=20
-> Important things first:
-> This series is based on [1] and [2] which Bjorn Helgaas has currently
-> queued for v6.12 in the PCI tree.
->=20
-> This series shall remove pcim_iounmap_regions() in order to make way
-> to
-> remove its brother, pcim_iomap_regions().
->=20
-> Regards,
-> P.
->=20
-> [1]
-> https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
-> [2]
-> https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
->=20
-> Philipp Stanner (5):
-> =C2=A0 PCI: Deprecate pcim_iounmap_regions()
-> =C2=A0 fpga/dfl-pci.c: Replace deprecated PCI functions
-> =C2=A0 block: mtip32xx: Replace deprecated PCI functions
-> =C2=A0 gpio: Replace deprecated PCI functions
-> =C2=A0 ethernet: cavium: Replace deprecated PCI functions
->=20
-> =C2=A0drivers/block/mtip32xx/mtip32xx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 18 ++++++++--------
-> --
-> =C2=A0drivers/fpga/dfl-pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++------------
-> =C2=A0drivers/gpio/gpio-merrifield.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 14 +++++++--=
------
-> =C2=A0.../net/ethernet/cavium/common/cavium_ptp.c=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 7 +++----
-> =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 8 ++++++--
-> =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> =C2=A06 files changed, 29 insertions(+), 35 deletions(-)
->=20
+We measured that the 80M bio write operation on the little CPU will
+cause the execution time of the top-half to be greater than 100ms.
+The CPU tick on a smartphone is only 4ms, which will undoubtedly affect
+scheduling efficiency.
+
+Let's fixed this issue by moved non sync request completion flow to
+softirq, and keep the sync request completion in the top-half.
+
+Signed-off-by: zhanghui <zhanghui31@xiaomi.com>
+---
+ block/blk-mq.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e3c3c0c21b55..06b232edff11 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1193,6 +1193,8 @@ static void blk_mq_raise_softirq(struct request *rq)
+ 
+ bool blk_mq_complete_request_remote(struct request *rq)
+ {
++	const bool is_sync = rq_is_sync(rq);
++
+ 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+ 
+ 	/*
+@@ -1210,7 +1212,7 @@ bool blk_mq_complete_request_remote(struct request *rq)
+ 		return true;
+ 	}
+ 
+-	if (rq->q->nr_hw_queues == 1) {
++	if ((rq->q->nr_hw_queues == 1) || !is_sync) {
+ 		blk_mq_raise_softirq(rq);
+ 		return true;
+ 	}
+-- 
+2.43.0
 
