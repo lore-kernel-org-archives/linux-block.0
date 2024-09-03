@@ -1,89 +1,95 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com [209.85.167.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A1B1C14
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 17:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C15F1C14;
+	Tue,  3 Sep 2024 17:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725384016; cv=none; b=EF0Kjm+G7Lr4RasIJnEuB5NZ+0eJB0Bf4or5PE5SOv+E7EzBlUDo7b8lgtq7aWtYDPzxPO6CEk2KDVtca0f2XiAIHVekItFoDJUqNePUh3ITheTwrO+ddJPSxcJjHeMzCH0ylbrATNMlTyuGmCd2MnEhysom0JGSxwpoQG45q8o=
+	t=1725384140; cv=none; b=UwsnyEzzdsZqCjzvAepMju9TLdEHGSJA3FiM22Ihkp69dEHCPJxSOoTC4VsGPk6m74Zhg1BPiZNb7JpbAL9kdQLWi2m5ZtBMlw0N2RUUm7UoeEHEMK9DkPYbKVdQUbXGEGMrDGf1feCXtrNVVASPmU/j7P0wR4hk0OFa6sZ3NX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725384016; c=relaxed/simple;
-	bh=Ph0Wh1kaxUYm3GVdX+Lr+roLE/+5OiIqeoyzxf+Oqq0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Er7JEssPasaXlqBHPoEtvJgTMFcv83+BjhCSmbgbnIo1yjScfW3e9GXyd4a/cvuAMauq8WDAKbhGBCqCpXXovNLVx7ScFxipZfWxmWHdkgOYP1X0/mOwnls460tSFbTQvqXLZCSZmtZ8wRqNHh47Fl9sHYWKZvVeluZjEbx20t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=vLeUTSxB; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1725384140; c=relaxed/simple;
+	bh=JtchMB6ysO7d7aYpaMR9SNpKvbkunLZLXZmiNXb5bfQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PI+iS+/YKWEcz+Pr16L5DVE8/j1E/CxTktK3ZJBPn1tLFydeVe69YmBjxbJ0kYBzS6JqYMyQV47uKA6GREVdbAvgQ6ZgBJc8TQp57ijZTf0DsAakCtjFIkNunsRL80QRjO4ikOmGp2gewPGgEGckMOkAyoCbm9Rg/a0q4OlgnlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jiXUiXi5; arc=none smtp.client-ip=209.85.167.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="vLeUTSxB"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Wysng1fqVzlgTWR;
-	Tue,  3 Sep 2024 17:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1725384006; x=1727976007; bh=W3C6raIpgFwAvG3RpaJ9xZoF
-	k9a3BMudX1Jo7ciAZR4=; b=vLeUTSxB4QURTPgzK7gqo1cTeh9AyazGRXvBePyt
-	teDxI9u4hTcTe8cKpO5o0qi7hwD45qQGX09Zs3BObX2Rqnk8EvP4G1opPmgLP6hC
-	Q61KMnJJ9Tj/YB15xg9AOQpRRDjbkscw8gK0cABGN0WpvnhTSQPmv06guCPL6NGK
-	6nXxq87soRRTlHpjB2wWXpmaYXV9Hz8AtzPuB/vTfsmFivWcwxoKV0Z+Hg4NZACd
-	iBkjwD++YqwpT08T13/3pby6oO8qZU8cdzg3uteAD4H+Dm044jTh8TAkhMFxz5Iq
-	NFuBQrcNmiEUvujr9gR8BSvV8toMpC/fOj+tqpRoRrGoYg==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ekx2ICgIA1TA; Tue,  3 Sep 2024 17:20:06 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Wysnf1YznzlgTWP;
-	Tue,  3 Sep 2024 17:20:06 +0000 (UTC)
-Message-ID: <de423681-8fee-4864-b916-c9178298673d@acm.org>
-Date: Tue, 3 Sep 2024 10:20:05 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jiXUiXi5"
+Received: by mail-oi1-f193.google.com with SMTP id 5614622812f47-3df0c4a65baso3366227b6e.2;
+        Tue, 03 Sep 2024 10:22:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725384138; x=1725988938; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=plRf9YzuYN1gjw1i5Gh/kOX9C6eGORzUHoTA0sJ55PE=;
+        b=jiXUiXi5W9bXSpzjEYUWwsMOuArUfWVrCSl1cJveWJCyMnjkBGLGET33qY1/ybZd3g
+         YFhyolJX6WEh04+L42UP1skx0CPjIc+U3kcBwTFMUzkdl4T/h5UZa2/D5MimgbkN8My+
+         6Z7m5eAEceWcB7PkI2dpPKzoo+p6VL7ITiUSL/z8OO19fM340gKYNMdDfLNc8NJQyoot
+         GshYV9vDENq8Bmb14f/4fFXT0oPkQrVH3X8ggd33WAa/KkuyxgvQZ4XNpRXgL5WvXO6n
+         RdMG2hyyNixXXYPGEab2CjdpF/z715PiqB6jw8L5GQ1BXh88OPsAfOa/2EOlxvXqnbjX
+         Y/Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725384138; x=1725988938;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=plRf9YzuYN1gjw1i5Gh/kOX9C6eGORzUHoTA0sJ55PE=;
+        b=xGVfKXg5kXdsjVsRFSYwGUD3vwS8F7cG/akfKfe1hcq1XRFLxhcppWsKxbsZFsz0BS
+         d4Zyd3TuDNJjC/m7XAfjBsTXHj/pgT4IJVNdtW82CoAIz8ynZ1Tw7JMBycSVetVStyId
+         UkSjzj8/enw9X0Np6ATN/m7szeDssu7oJHW03d9U9aGcX8VPSqZ5JnrpHm+v92GBXx6i
+         1LN5C0g+ppFMIHxf9v0qmPxcG1W43rTxujb1xEsBmWXIusMtY/Og97PqPnw8ch4C2HtF
+         kGkJ8ZM/lVuJpAmj0+WDg0Yjh9qUbkpWyJUOzdKz6L88fHd4OA1++zTYlzozcpllT8FX
+         4kyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWiPEYJQpO3Mm+ShYbu+2+z0AF2BsNmzZlhwfcEc87oCUii18xiJrSyyUOjOYSpUHEwOS6cYcQ6kqr4Fq1@vger.kernel.org, AJvYcCWfVACjFRnw+sjqAv3UVJz08POPYttXKPJFivbMDihG8Fv/eyVKZEgYawT3MxiqjPTdz+vpvvzlacgtvw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxACaOSNA0XnBqynDS9qSd3/Qqwm7jeBWBEn/F50xmyLoHH9Hbw
+	281KJaWf064pAmWHL9yyIgAkQA8vvL7bMnNwT/in06Lt57/kLBCI
+X-Google-Smtp-Source: AGHT+IFxGMsvQbGaIYEjb7iI0WRWlXdSuqrfyoTpqQTmc8f2VZKTZ7rIlB/x1qp7MIojafV8hhn7Rw==
+X-Received: by 2002:a05:6808:10d2:b0:3dd:cc7:959a with SMTP id 5614622812f47-3df05e8a24bmr21582020b6e.47.1725384138082;
+        Tue, 03 Sep 2024 10:22:18 -0700 (PDT)
+Received: from localhost.localdomain ([102.38.199.6])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-846be3f60efsm1400886241.18.2024.09.03.10.22.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 10:22:17 -0700 (PDT)
+From: alparkerdf@gmail.com
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Alvaro Parker <alparkerdf@gmail.com>
+Subject: [PATCH] block: fix comment to use set_current_state
+Date: Tue,  3 Sep 2024 13:22:14 -0400
+Message-ID: <20240903172214.520086-1-alparkerdf@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: move the BFQ io scheduler to orphan state
-To: Jens Axboe <axboe@kernel.dk>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <6fe53222-876c-4deb-b4e1-453eb689a9f3@kernel.dk>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <6fe53222-876c-4deb-b4e1-453eb689a9f3@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/3/24 8:53 AM, Jens Axboe wrote:
-> Nobody is maintaining this code, and it just falls under the umbrella
-> of block layer code. But at least mark it as such, in case anyone wants
-> to care more deeply about it and assume the responsibility of doing so.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 42decde38320..4a857a125d6e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3781,10 +3781,8 @@ F:	Documentation/filesystems/befs.rst
->   F:	fs/befs/
->   
->   BFQ I/O SCHEDULER
-> -M:	Paolo Valente <paolo.valente@unimore.it>
-> -M:	Jens Axboe <axboe@kernel.dk>
->   L:	linux-block@vger.kernel.org
-> -S:	Maintained
-> +S:	Orphan
->   F:	Documentation/block/bfq-iosched.rst
->   F:	block/bfq-*
->   
+From: Alvaro Parker <alparkerdf@gmail.com>
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+The explanatory comment used `set_task_state` instead of
+`set_current_state` which is the function actually used in the code.
+
+Signed-off-by: Alvaro Parker <alparkerdf@gmail.com>
+---
+ block/blk-rq-qos.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index dd7310c94713..2cfb297d9a62 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -263,7 +263,7 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 	has_sleeper = !prepare_to_wait_exclusive(&rqw->wait, &data.wq,
+ 						 TASK_UNINTERRUPTIBLE);
+ 	do {
+-		/* The memory barrier in set_task_state saves us here. */
++		/* The memory barrier in set_current_state saves us here. */
+ 		if (data.got_token)
+ 			break;
+ 		if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
+-- 
+2.46.0
+
