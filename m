@@ -1,97 +1,100 @@
-Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643BC18EFDB
-	for <linux-block@vger.kernel.org>; Tue,  3 Sep 2024 20:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4321DC744;
+	Tue,  3 Sep 2024 20:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725395098; cv=none; b=rdIQ/fgqJwM2I9I8NC+0kzBMqje5SIBGTT1YJxAsirVKPy3iQDucZZeaoeB9CZWVLRFbEDlK399Fb0tPzHtayvAo0G7rCkjiwkscnUcKysGe2Q3GlIX+KpZWQ0bMHHel9hu1lghbDzelZr6oGydzOonn3PNH4WAza97+yfPXIdM=
+	t=1725395489; cv=none; b=lunR1GFplovDrPUiBjs2SfIbRzwsNJB5I1SKV5afV40T9OqpJ1+v/M4klSm1EkQnmYY6AlVtbTGGX92g8e+mlX4SYdsPCLuOaQT1O2t5ICjGhI89IweyBHUQlg47UUQ1N6S1+Kw4zSvjJrdsBakneLdMADhhcMN8oT/lUkTnevk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725395098; c=relaxed/simple;
-	bh=VNHzcWuYQK0bAEMKUb8JAk2vL03Ybu2yBC14t6W6Hno=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jxqnP6f20kziFmg906E3X8StHojVNbjRTfRb0ycSkyys/3emxaEsaMigpnHlcJpemj0TGgwD1UH66J8xGxUkTqF7JxZZ+OU2Bc90NhekR/lk6AN72TdeHioLEaL4Ma5iWwQGzXWyKsCQol8MpfxotHZsipARxR+XD9pSVTJRVLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ERrsBTHa; arc=none smtp.client-ip=185.70.40.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1725395489; c=relaxed/simple;
+	bh=GnnY1kSjgK2j0YgiooDhM3c2rc+AIMjI09O9p4swkYY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e01KXTKMTMXnDxip7zUAWVf3XFqkoMvr6/GLMYgOGF32T/JcRwAL4nTFw1wUNBv9H89uXZljDDJ6KlAZX4wO+fp/ZKfTXvI4DRUJKsJzrEsZnlrrcFIkqs6SagS0ut/WvPG9O7t+uN18mUAF2CsH9C/KSLKRKmrtmCDMuMliJSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e03q5/UR; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ERrsBTHa"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1725395088; x=1725654288;
-	bh=VNHzcWuYQK0bAEMKUb8JAk2vL03Ybu2yBC14t6W6Hno=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=ERrsBTHaumDOkGjC/8RI6f03pzjnXc5Ao/m+OozZqrtASW2tNIKk7v5DXRNKkqPue
-	 kKEDQmbNwhP41pxqBVl8mKYgAlSnzyJ2AXXuw1K1YLeOP/QgLZYnqYOEW2OM+5cgkR
-	 jcK3pTDhXwutYLS4j0GoUu0MZlCmGRjYIEUn9fInKBlu2UuFCB/4KwcLmlTb2PTIfP
-	 Nhm7H8L6wiWwDVGv3cdiE/11FEbpPvB+fYycjYV0/x3K1nrb7Rm4n6u8wDFAIQW8gk
-	 FORwrvL2IQo4HnR6aGYVRN3yUJNsj3AWs5CTeIHfCxddK7gM9UL6gFAXxF6odZGBPC
-	 Bdk/kkaLbo3XQ==
-Date: Tue, 03 Sep 2024 20:24:42 +0000
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Andreas Hindborg <nmi@metaspace.dk>, Alexey Dobriyan <adobriyan@gmail.com>, Jens Axboe <axboe@kernel.dk>, Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH RESEND] block, rust: simplify validate_block_size() function
-Message-ID: <1ecef86a-0528-4027-904b-401af790c54f@proton.me>
-In-Reply-To: <ZtdnuH9lWtsPCg-X@google.com>
-References: <878qwaxtsd.fsf@metaspace.dk> <Ztdctd0mbsJOBtJV@google.com> <CANiq72=GRbxY=3-NP6RutcJjCqRxRftafVZqDD73tureOh20Ew@mail.gmail.com> <ZtdnuH9lWtsPCg-X@google.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: f3cba3123ea0b0560f1aefd2112bae488ff3a378
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e03q5/UR"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-715e8d7b998so337346b3a.3;
+        Tue, 03 Sep 2024 13:31:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725395488; x=1726000288; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GnnY1kSjgK2j0YgiooDhM3c2rc+AIMjI09O9p4swkYY=;
+        b=e03q5/URDayji91CBQjUcxyDrUUou0H4AaKOmpfG9rg55K/lQrPys35g78qK3Ag5hT
+         OQ98mbceptB+Ll2qYfTTUhXt87nCkrMDDZUeGqwxHmrdyYRATRLJXPBGDuCUQysWApu9
+         89u+vL4n7vj86GqVSBrZf4Fui19MUysFhky24inxYJDUFzfEcwhTw6JJ+KruV+JpVLlb
+         vL+tPkai/EzT/rnSMFjNrh+mk1LldU8UDGMR2gRQrCJizqO4g4MOSGTLkljJ8LymsYSS
+         gN/qGWgL1FNH9UWd7wyVu4k/BoVmHd+c9jAtJG7qNPVpXsKFMa6yvFPwrj/e4VPO2+UL
+         bF9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725395488; x=1726000288;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GnnY1kSjgK2j0YgiooDhM3c2rc+AIMjI09O9p4swkYY=;
+        b=B0I/Ht315o552I2XHfOldokM9r1YE7wkfonxwWurD/k8D+i6dhQU26Y6Tq221Wy+xm
+         QVOg6c27SfRPDHQMLesObgh5Yb9WitQ5ngRukK2XSGTGcpXx4Iagt6i0W7S93s8adH2S
+         4GWl+qKd2Nkheq1BoQGo80XSrhE8jFOfKdknZqslbqpCCi+ty/El89J+KcUcY6c3tSPn
+         o0/gRu2tFo07WMsafKcba6/x3wlfmMAPNyBYQYqIIzWljF9qQKnJg694FkNbzZJQBFM5
+         3fRCIqOPIVrJgpSQQQDyLly9YaJGaW59QGH5YrxGjRi2n2uW8UONvK6Zl8uTBEW/4FGz
+         pPaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVA2puKPLvS2BfhWhWtBcaJYbmqOdppa0pEVtWjcxtBW41PECKayDy1unRHEZsNeRDtZwP+C1z8DAx0UQ==@vger.kernel.org, AJvYcCXXbdWq3U8Cj7v3CaqkcM8Uo7ff8ioLRWwBD9VIQMGMiKe3hbsJaz+0BAp4CLzWfD4hnrCL+yNYmx5JLaUzyUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6VWh9ApNypg14nF3Dis4Tm5mgapQyF5uwANIpQi9raT+Wrrvo
+	DaZMo/2ylCr+/iYnotR58fomRSEEnX5D9kk980mIPa5DyrIEwxF0Jbitwr9tD95qhghgGGyzQP0
+	DDUlqW5W0u8O3QRN87/voK9X/z1c=
+X-Google-Smtp-Source: AGHT+IEIbxFPf0SLExVqwnqKemHBfSlGnFP8DbH5+OFVd4WZYC3NOwLLgkaTIhlALkUnZt0Pjfa/6KuwWAAe6tMNbYQ=
+X-Received: by 2002:a05:6a00:1a8e:b0:714:21c2:efb5 with SMTP id
+ d2e1a72fcca58-717305d65acmr8908273b3a.1.1725395487724; Tue, 03 Sep 2024
+ 13:31:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <878qwaxtsd.fsf@metaspace.dk> <Ztdctd0mbsJOBtJV@google.com>
+ <CANiq72=GRbxY=3-NP6RutcJjCqRxRftafVZqDD73tureOh20Ew@mail.gmail.com> <ZtdnuH9lWtsPCg-X@google.com>
+In-Reply-To: <ZtdnuH9lWtsPCg-X@google.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 3 Sep 2024 22:31:15 +0200
+Message-ID: <CANiq72n8-Q04P69uLCan_zuNVy9pib-GXBbQt8d+NWBoPjacyQ@mail.gmail.com>
+Subject: Re: [PATCH RESEND] block, rust: simplify validate_block_size() function
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Andreas Hindborg <nmi@metaspace.dk>, Alexey Dobriyan <adobriyan@gmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Jens Axboe <axboe@kernel.dk>, 
+	Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 03.09.24 21:47, Dmitry Torokhov wrote:
-> On Tue, Sep 03, 2024 at 09:30:53PM +0200, Miguel Ojeda wrote:
->> On Tue, Sep 3, 2024 at 9:00=E2=80=AFPM Dmitry Torokhov
->> <dmitry.torokhov@gmail.com> wrote:
->>> able to parse the things quickly and not constantly think if my Rust is
->>> idiomatic enough or I could write the code in a more idiomatic way with
->>> something brand new that just got off the nightly list and moved into
->>> stable.
->>
->> If a feature is in the minimum support version we have for Rust in the
->> kernel, and it improves the way we write code, then we should consider
->> taking advantage of it.
->>
->> Now, that particular function call would have compiled since Rust 1.35
->> and ranges were already a concept back in Rust 1.0. So I am not sure
->> why you mention recently stabilized features here.
->=20
+On Tue, Sep 3, 2024 at 9:47=E2=80=AFPM Dmitry Torokhov
+<dmitry.torokhov@gmail.com> wrote:
+>
 > I was talking in general, not about this exact case, sorry if I was
 > unclear. But in general I personally have this issue with Rust and to
 > extent also with C++ where I constantly wonder if my code is "idiomatic
 > enough" or if it looks obsolete because it is "only" C++14 and not 17
 > or 20.
->=20
+>
 > With C usually have no such concerns which allows me to concentrate on
 > different things.
 
-I personally don't worry about whether my code is idiomatic. I just code
-and when others give suggestions that sound good, I apply them. There is
-nobody requiring all Rust code to be as idiomatic as possible. In the
-review process you might be nudged to write in a more idiomatic style,
-but that should also be true for C. The kernel is constantly adding new
-ways of doing things and while the language itself doesn't evolve, the
-codebase surely does.
+Yeah, I see the concern, and I agree that C++ later standards can be
+quite daunting to keep up with (and especially to learn new pitfalls
+around UB in new features, e.g. C++ ranges).
 
->> For this particular case, I don't think it matters too much, and I can
->> see arguments both ways (and we could introduce other ways to avoid
->> the reference or swap the order, e.g. `n.within(a..b)`).
->>
->>> This is a private function and an implementation detail. Why does it
->>> need to be exposed in documentation at all?
->>
->> That is a different question -- but even if it should be a private
->> function, it does not mean documentation should be removed (even if
->> currently we do not require documentation for private items).
->=20
+With Rust, I think it is not that bad, at least so far and especially
+for minor features -- generally they are well thought-out and fairly
+regular, and at least for safe code the UB worry is not there, so it
+is easier to feel confident in using them.
+
+There are some major features, like `async`, that we may need to
+carefully consider indeed though.
+
 > I think exposing documentation for private function that can change at
 > any time and is not callable from outside has little value. That does
 > not mean that comments annotating such function have no value. But they
@@ -99,11 +102,18 @@ codebase surely does.
 > Alexey's concern about comments like "this increments that by 1"
 > becomes quite valid.
 
-For the private `validate_block_size` function, I can see your argument.
-However, I don't think that the function will change any time soon, so I
-don't think it's a huge issue.
+To be clear, we are not exposing the documentation in the rendered
+form for private items. It is possible to do so though, but we don't
+enable that at the time being. Although I think it would be valuable
+to have a "toggle" to show it.
 
----
+I mean, sure, for private trivial functions, it may make not much
+sense to add due to the burden of writing and maintaining it. That is
+why we don't require documentation on private items so far, but we may
+want to nevertheless in the future for particular core APIs (so we
+could enable it in certain crates, for instance).
+
+Thanks for taking a look, by the way.
+
 Cheers,
-Benno
-
+Miguel
