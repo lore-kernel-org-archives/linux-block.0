@@ -1,71 +1,64 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB071D79B2
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 13:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F441DA102
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 13:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725455853; cv=none; b=bZ1lC7oFGWxbRPl04TkTpU5mAzhFCaRqa6lXZScGClBRmp6H5LGlNw3+e/t1bqOev3E7xBSMtaBeuBTbU2Xt5r6NCG+ENGeRVkJUEWYHKNzpmkPuBGESUUZpdUJkhJS8PPdiUAMjRzMZp8CZs5+wnkOZAqEKGdRtqFxRDq3bZoc=
+	t=1725456467; cv=none; b=mwR73R7jFiNGyuk85gHvrGy8tW2LqG+ZhIg3hJEfmncOpdomxKyxgSbCaK/9TZRtShALIPQP2kDRbw9g0iyTqSUsLGhqF2SDwNA30iJyl9IksLYEnqU7m1JiqCGU6vXlP1agQ0pksk/5yecQNzq4abCSmTDa80+HSCyAdfrL3A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725455853; c=relaxed/simple;
-	bh=bRAtStrpjHf7s8fhqahQ4zdFVQ1e2mbdCQKy3TGj624=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SNiDmoPV8amC586MLc2O4LU+IOqRE7yOLdxkbvHJXuP7vh+jKmrSFCPqwa5HO7I1AvLo1PsGvFqd8BElcWvMy0PVnFA/634i/yj7FmfIjNSNgUzzCmGeFbJVwm/YvpE4dfgcPZr7a6qqV54u0VAt3WFqfmU9vPaD9bEtuB3cT3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=u7jonnLA; arc=none smtp.client-ip=209.85.166.42
+	s=arc-20240116; t=1725456467; c=relaxed/simple;
+	bh=BVMRdXyj1cRpwUWp5z6Fz+MM7zJjfxCHqxsE9JWod1s=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=VJfSPLOeuLe/fGIAjMvWi5C+YZ1FMO+rsh27VJk5nIJPAOss2ivmOncin1/iBahEX/xPpGtK3z3oGX4KlJEkNnHo9H2zb6Bcan5AArkzorhF7s0q/heF/HRsf3yjRg5f2jGWI8Q7VEFDu5CN3in1Qka+rEmuQrxV06qXKWQyDHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3ALdq4t6; arc=none smtp.client-ip=209.85.166.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="u7jonnLA"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-82a1af43502so334636739f.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 06:17:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3ALdq4t6"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-824ee14f7bfso266084939f.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 06:27:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725455849; x=1726060649; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725456465; x=1726061265; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mz/+r1kYYto6vaE1HN5Lr4ygnqrDF3yK2sRAOefUGM0=;
-        b=u7jonnLAeccs4MdbNXWYOyuDH8KcUw7HBmUiy6UXqk3cE1IW310d82RtmqlpcMw+5S
-         bOxSAe8c5K5fPg7RdMfY2BTAn1ytuQ70zni2BW5WZjJN42YE6OrTJj0aw4amU3aiIhYC
-         ttZ4y+A9LPHSijeREbu15sA8uHnqFY4nJwNNHqmfN5tzEB4XyUej9RLuwzlSu8eyCh3K
-         R9MBN5Rp7cI0wG4CCjOR1VBEJ48j8MX1ce6KkeiNx70jBC9/eWbQxUKGqeNHq4YDByTf
-         7G5CXV80sLI9xukuGeA0969P9Cas4CVyXmKsVFWDYpwFX42T7h0t6wh0DotYPi3DWyqY
-         IfFw==
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9IYowvNjql4zJbhoh4ZcY29TxBGPRSlIL7lgnM7qrnQ=;
+        b=3ALdq4t62VdhsW54tdNKk02kG4X0HPOePCTNLCLprvU7MSTFGKZMsFvB9gN7lLcwVQ
+         TMSufoqfYX2dKX9wBnWnGO9HTEhtgdzzzcZKfs/MpwtMO3abIcyhxdSDiSxXYxuOAFhm
+         6bNZhEXQ5UcLzZrQdWYRLxYaw5F+PiLrhZDyZiRvk82/Kk8y2CAlXPj1wlPlUdxJw3Of
+         /Z1Y76eai9tzBKaG9lkklnfRMDA2bz8LUQikdh+d7Oe1VNsqATgvs9ZYQ3QoNEn3kR6g
+         m8s9/4LQ3Xn6w/aVZX6UVeyIlDgp/mXuKITYy/oFjamTQ4b+f/NME2G1yEWYQXqJ/yE4
+         Xv7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725455849; x=1726060649;
+        d=1e100.net; s=20230601; t=1725456465; x=1726061265;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Mz/+r1kYYto6vaE1HN5Lr4ygnqrDF3yK2sRAOefUGM0=;
-        b=Zd71bY0P7XlREe6X/AIzL0XWCEBYNdaeTjGnsfKcLEMOSDT3J4EMVHcqrst96K/myj
-         3nbBW5+Efdo/CD9KPrsfSsITnncOf7apKQochD3YqsohdLyCfWA7oyUCswdfpgggWGbX
-         TaHZc1GYTUeYntA3DCmx/ZZFHDt3TvoV05ZO6WPAog1Ylmrc1f2807TyK9vTa84CMUvx
-         oIE8sWr0qx32MyI9dVcLMPd7InXx96br2Q6p3xAkwsBYlK8eEmPh1ptyqfyWpFgYVoa7
-         hIcqVUQ6SIWX7j4wvYjnfVjaq/wt9F44nS65I4JvnokWwVWQOtZh8v5wncM62iVsfd3C
-         e1LA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzKqAdPYa03JspbaKhSxTS1KWoHx5prUBDXG5cWLsh72I5XANJCgAqa6ThcnXh93ZS/H3x30LT8oQr8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe4hYc1uB2TCc8mMx/8eTSqFoW40xVYKQcVeZLzJeJ2D0tGz9X
-	mp2VgP2ynU8RT7xuU67b+U+6b3eAEsNgZ2EEMNOXETfUPR0iCGON+s24H9vJP/KiMG6bgIeLqRj
-	6
-X-Google-Smtp-Source: AGHT+IG1USYy7tqF1IkbtzHH4ZPJtKLMXIpGPGIRPp4DSTusYeKv+BCRJq3Gax192M3qUxFdzSbxgg==
-X-Received: by 2002:a05:6602:6b07:b0:82a:23b4:4c90 with SMTP id ca18e2360f4ac-82a23b44d62mr1864522239f.1.1725455849127;
-        Wed, 04 Sep 2024 06:17:29 -0700 (PDT)
+        bh=9IYowvNjql4zJbhoh4ZcY29TxBGPRSlIL7lgnM7qrnQ=;
+        b=iBjYgCMXE2J4sLBiCIfKgvOwcv+r7TooR469+XUIjbmjtypquqCkRiN9zQcUOtRltz
+         6jH4pkKOmNKDxRHanYFANg4anddevGGA6eJ17+lwQyweQ+H/Lt4IhtXvSQSl8qCAHN1o
+         XYDe/xCMzBlhP/KuTC9lWBPbt5NrEjGrxCAoXNUESYpnKxGM85CMWjqrAM7y++LQY/i/
+         CKpkeBNP7DdcdMMkKFeMkUUv6i/PwTQd8ttcM3hJ97wGmsOdxV8u/Kf1/9HziTSmGwK9
+         9pr5wJHk9C8u31TFvaKxgfJg5BhlEraN7o/bc0zJy+SW/IVj2FGOyTutwcpnYxp3+sEG
+         i/pQ==
+X-Gm-Message-State: AOJu0YzC8Gr6vpMfb6WCG09bs9OutxFEYMCrNgq0ZIoGCdhkAKnMMBwX
+	XW4LDpLu8g9g8wr/MxPAJ1QE00NJSkDUGBTfi/yJjbHbIhNOsLyI56XdVYW8f5o=
+X-Google-Smtp-Source: AGHT+IFxDPTV/O+EWfP8die3Jl0rbV3IF1OVASAkbDSwBK2/+ZLW3mUZMt88QQZBHokKPiAhbu9qsQ==
+X-Received: by 2002:a05:6602:6d09:b0:82a:2bc5:40c5 with SMTP id ca18e2360f4ac-82a2bc54633mr1851819839f.11.1725456465333;
+        Wed, 04 Sep 2024 06:27:45 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ced2dcdf02sm3128987173.26.2024.09.04.06.17.27
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ced2eab9f7sm3111295173.125.2024.09.04.06.27.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 06:17:27 -0700 (PDT)
+        Wed, 04 Sep 2024 06:27:44 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Jinyoung Choi <j-young.choi@samsung.com>, 
- Christoph Hellwig <hch@lst.de>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-In-Reply-To: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
-References: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
-Subject: Re: [PATCH] bio-integrity: don't restrict the size of integrity
- metadata
-Message-Id: <172545584759.61712.16420606261657015873.b4-ty@kernel.dk>
-Date: Wed, 04 Sep 2024 07:17:27 -0600
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ alparkerdf@gmail.com
+In-Reply-To: <20240903172214.520086-1-alparkerdf@gmail.com>
+References: <20240903172214.520086-1-alparkerdf@gmail.com>
+Subject: Re: [PATCH] block: fix comment to use set_current_state
+Message-Id: <172545646459.62562.4174140551617726555.b4-ty@kernel.dk>
+Date: Wed, 04 Sep 2024 07:27:44 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,21 +70,16 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.1
 
 
-On Tue, 03 Sep 2024 21:47:59 +0200, Mikulas Patocka wrote:
-> I added dm-integrity inline mode in the 6.11 merge window. I've found out
-> that it doesn't work with large bios - the reason is that the function
-> bio_integrity_add_page refuses to add more metadata than
-> queue_max_hw_sectors(q). This restriction is no longer needed, because
-> big bios are split automatically. I'd like to ask you if you could send
-> this commit to Linus before 6.11 comes out, so that the bug is fixed
-> before the final release.
+On Tue, 03 Sep 2024 13:22:14 -0400, alparkerdf@gmail.com wrote:
+> The explanatory comment used `set_task_state` instead of
+> `set_current_state` which is the function actually used in the code.
 > 
-> [...]
+> 
 
 Applied, thanks!
 
-[1/1] bio-integrity: don't restrict the size of integrity metadata
-      commit: b858a36fe9a1261dfd097aec855161ad135bed60
+[1/1] block: fix comment to use set_current_state
+      commit: 2be6190cd75cd2029ced5ccef057e15939f48c4a
 
 Best regards,
 -- 
