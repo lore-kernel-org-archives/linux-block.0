@@ -1,52 +1,52 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E421EC017
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 15:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD67B1DC754
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 15:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725463605; cv=none; b=H8qk6rSD3bBYWZcSJDuRMPSsDri1WnAn7oAXuOV6HZHgAEfWBwVXulVQglIOPFtmmiiCzGl6BkqXuAg0fmkeUbfGIDHBYAsisYU0nRDjGzGXr17yVU5VN383hzEWmXIt6TQTkdabYtHRK8rcCeS3BZzg9N6eFQ4IkAMLLy5TZ3M=
+	t=1725463606; cv=none; b=soYN1lJ1GRHtU0LXrPO/LYALfxX0vj43uMbPERPCKvBZlCiJ8E2PhiQdwfV/wDivNCxUabrjZInh2kH4y5/KVJLsPE9C3eN0/u4tco29i6FcA2aRHK7gAr49a0pKOZdLIX4lotaWnx7Ffvj3BuLxIOV0XoqQ2+da14EJgfoL83A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725463605; c=relaxed/simple;
-	bh=tbelIYErMOsag2MIJL4MBYUSOAYcOXInrX7qRvcyW5w=;
+	s=arc-20240116; t=1725463606; c=relaxed/simple;
+	bh=wgCiCeySyO0FcFxrr+YSd3x8cxBMpFU7my8lcR2bZro=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cyfQfTiRSQLuh291FpGWYNxrnO9LAYUgaav+oLtJjcCFV5T4CLl7YRdp7pTDLl8n+nuLaHQCKtEgBmxA4hrz/t+0lyF3uBdqAWZHoUR4ApEngX8t9AevQvo+FVnuduaaRlfjSeVdSfvIe1ngSJ8Txd+ydOavYSkWDzudCnlEwOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=WcZ8iVmH; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=HBCJ/N2bVfpHc53enAmVDxcdzcmwkURivV0VT4MXPTzbBkfpV88DMcA6FB3tpsFZyfZH+O8yIRw5QFQR43lVtaucjRS8B8mzypq7VIsOrfZrB0M89O4wk8PsQcfLV1B0VE5pzRgBlKAXrPunKTmxpyujSDiAUa32NWZ7rD31eK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=NZ46nCG8; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="WcZ8iVmH"
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 484F7NrO018169
-	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:43 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="NZ46nCG8"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4849U2Nm022336
+	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:44 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=/PAGpf/UPAc9rFDLEQebGE5/D0j//o/WEEpf7l0XZ+M=; b=
-	WcZ8iVmHX9iXjyHoQrIn7V6wfWSmW8wfICQcMbWYb8nv2nMiEr/9JiGopqAio7r0
-	NRhQYm5SUQarsIiM8qcC11WrSAhxQ2WedjIs9uZGJcPYGyjdydQpRv4s3tEImtIX
-	Jky/3qOqyLss7LTdgh8mVM7Gg8m6r3T6uCirDD0pXJYb/Gb3gxdgbVgp2nAMpH6n
-	TH6Nw4TzIKJTScciuvC/Vm8nLDtrd+ci4DC6Jc1Hiiaw0S5BkxHa8Ep0Bd1ALgJC
-	rRpAEtojrzfOZ2ltWP6Y4qFbpbFNTcDvhL8231fRzKiI/eUtUDifE1zrplDQ8hEZ
-	8jvvnJBmZbBPW+rn5L4x+g==
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41eejbkfeg-1
+	s2048-2021-q4; bh=egTi6ZnQ87q4SMqOIPKOssZGP60h07A6RuSO4eqy0Ec=; b=
+	NZ46nCG8ND7KWwYTthaKR3mFkW2WvO4AGdAU8J4YDryDRHRbmqJq+xsAAdCtIsrO
+	1hNhT/RqHv7eY9a+Fm61GZu3hxF5wE00/FJT6uK5LTaAnXUIs8nIrB7y6uUMQZ4s
+	ZuTBC9To3V+F2qrGbaRwgnT+L26aKcQHZoFWCwIR2Uk7oiWBeGimsAK1ErlpQG3e
+	ssaC2YGlGKyKm28nh9WDyBYj0HjNoCuvEhhKxna5+E4SraaOosoQ+JQJzz0x/jKz
+	sZoyTD2Cm0VDUcs3V9xINzRKXXOhCn0O1rBA9/8Tt0Ehchaaoy8txzHqKVebXl2V
+	ThhXLRqGt8LF/jT8w5XaEQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41emyp1w8k-4
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 08:26:42 -0700 (PDT)
-Received: from twshared4923.09.ash9.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 08:26:43 -0700 (PDT)
+Received: from twshared34253.17.frc2.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Wed, 4 Sep 2024 15:26:11 +0000
+ 15.2.1544.11; Wed, 4 Sep 2024 15:26:12 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id B7C9312A036E7; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
+	id BFEAA12A036E9; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <martin.petersen@oracle.com>,
         <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <linux-scsi@vger.kernel.org>, <sagi@grimberg.me>
 CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 03/10] scsi: use request helper to get integrity segments
-Date: Wed, 4 Sep 2024 08:25:58 -0700
-Message-ID: <20240904152605.4055570-4-kbusch@meta.com>
+Subject: [PATCHv3 04/10] nvme-rdma: use request helper to get integrity segments
+Date: Wed, 4 Sep 2024 08:25:59 -0700
+Message-ID: <20240904152605.4055570-5-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240904152605.4055570-1-kbusch@meta.com>
 References: <20240904152605.4055570-1-kbusch@meta.com>
@@ -59,37 +59,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: snj6xqTk2P1XCvomcD50yfyvjxMKd0pv
-X-Proofpoint-GUID: snj6xqTk2P1XCvomcD50yfyvjxMKd0pv
+X-Proofpoint-GUID: sLUVUJzuqaBcMg944PJ1k171ZHLjhUM-
+X-Proofpoint-ORIG-GUID: sLUVUJzuqaBcMg944PJ1k171ZHLjhUM-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-04_13,2024-09-04_01,2024-09-02_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-The request tracks the integrity segments already, so no need to recount
-the segements again.
+The request tracks the integrity segments already, so no need to
+recount the segements again.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/scsi/scsi_lib.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/nvme/host/rdma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 3958a6d14bf45..dc1a1644cbc0c 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1175,8 +1175,7 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *=
-cmd)
- 			goto out_free_sgtables;
- 		}
-=20
--		ivecs =3D blk_rq_count_integrity_sg(rq->q, rq->bio);
--
-+		ivecs =3D blk_rq_integrity_segments(rq);
- 		if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
- 				prot_sdb->table.sgl,
- 				SCSI_INLINE_PROT_SG_CNT)) {
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 2eb33842f9711..dc0987d42c6b2 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -1496,7 +1496,7 @@ static int nvme_rdma_dma_map_req(struct ib_device *=
+ibdev, struct request *rq,
+ 		req->metadata_sgl->sg_table.sgl =3D
+ 			(struct scatterlist *)(req->metadata_sgl + 1);
+ 		ret =3D sg_alloc_table_chained(&req->metadata_sgl->sg_table,
+-				blk_rq_count_integrity_sg(rq->q, rq->bio),
++				blk_rq_integrity_segments(rq),
+ 				req->metadata_sgl->sg_table.sgl,
+ 				NVME_INLINE_METADATA_SG_CNT);
+ 		if (unlikely(ret)) {
 --=20
 2.43.5
 
