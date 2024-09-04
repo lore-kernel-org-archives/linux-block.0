@@ -1,112 +1,61 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BC980C0C
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 04:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A1058ABC
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 05:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725424743; cv=none; b=OSD9Dw3Oq6yjJub21ic2+TplJvX38ntG0QvQTIvsgccYJ1bKRAMin6n7MuJSbfJpj4nDhyLYnVEZILLMqSA1OUCHfOZW5hZPtB8fKKWwrN45wXROJZvfqG4JkqLaQoiyzlfrkdS6TdA1/okknwB9B+zU9WiWly+KvbtTvuy+r3M=
+	t=1725427167; cv=none; b=CTFuMLqtzpyRGo1cpUW/a7LB9uygHv5nkaTW8w3TqqRhrRLV8YoerGigywT8mm6zqsftqD2YNx6sZWwNjntrTqNPxZS7M8SQnwKx40eCFGyhhFurI1Gtegm7RBOfMxTQSTJQjQV3fjmVpbHfajXir1YqBT9NhhqJdW+83FmWW18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725424743; c=relaxed/simple;
-	bh=x9qDFWxMO96K95WfPtNrQiI5WrN0j5yTvSTJ5hJKH7Y=;
+	s=arc-20240116; t=1725427167; c=relaxed/simple;
+	bh=k0w+8MjX9gmCSRlueN4R9IhVAtdMye+chfLj3TRmxVo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IqZgGbA2Rv+DUBic+ryLV51NaXQZkPgzKp5MawedgoZPuykEiKtrc6ag+Tu7HZxJqdoCEzkf120HklSS3yITUBXaMUALqJqsrM0GCG5jODLd69FQfxe5i7bGhoqTSkEelgdyeal4z5BqhkYd+CaUMKnk6X75dSzbDkfr5wFkUb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hPdJhdxR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hPdJhdxR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725424740;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3zsKB3WdrmMbEpvlPWbs3HIFo2lGSqwqj8i5jKNJQ5U=;
-	b=hPdJhdxR6Xi50pgPxbaQjkVO84S6A+6vfYkFyVrbWU9+WXBzM4Wu8qlP9VqgBAJGk+khO0
-	9Vtzf/1c2lGJk9Ex41fXOCehzIgDwEwwWWs30+Mj0Zz7yy7w+spSgF1IJ/vlTzuy6UoFlY
-	ZeEeW9PqEaROjoVHQqcQlTF5NRVYAfo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-npusVDDyNsWTrMLS-6XdPA-1; Wed,
- 04 Sep 2024 00:38:57 -0400
-X-MC-Unique: npusVDDyNsWTrMLS-6XdPA-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DCBDA19560A3;
-	Wed,  4 Sep 2024 04:38:53 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.130])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 537E6195605A;
-	Wed,  4 Sep 2024 04:38:44 +0000 (UTC)
-Date: Wed, 4 Sep 2024 12:38:39 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Jens Axboe <axboe@kernel.dk>, jack@suse.cz, tj@kernel.org,
-	josef@toxicpanda.com, paolo.valente@unimore.it,
-	mauro.andreolini@unimore.it, avanzini.arianna@gmail.com,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH for-6.12 0/4] block, bfq: fix corner cases related to
- bfqq merging
-Message-ID: <ZtfkTyxvwTzRTnG5@fedora>
-References: <20240902130329.3787024-1-yukuai1@huaweicloud.com>
- <2ee05037-fb4f-4697-958b-46f0ae7d9cdd@kernel.dk>
- <c2a6d239-aa96-f767-9767-9e9ea929b014@huaweicloud.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fAJw1KExJHXt4fyzggzBl+OGSUOBBP1TGBUb8ZptG0Btj6OnJuhZRe97reCHItdBkMKcnGxowm842YFjzaX9GsfjQnbepZ2tLZ8ia/4IJpZHINSOghV9ckUYSEO6QU5oIVTb3nbeju0baDY0e7Rlq7iJa6sKn80+bUSo1ozDsXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id CDF1668AA6; Wed,  4 Sep 2024 07:19:14 +0200 (CEST)
+Date: Wed, 4 Sep 2024 07:19:14 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Jinyoung Choi <j-young.choi@samsung.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: [PATCH] bio-integrity: don't restrict the size of integrity
+ metadata
+Message-ID: <20240904051914.GA13967@lst.de>
+References: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c2a6d239-aa96-f767-9767-9e9ea929b014@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Sep 04, 2024 at 09:32:26AM +0800, Yu Kuai wrote:
-> Hi,
+On Tue, Sep 03, 2024 at 09:47:59PM +0200, Mikulas Patocka wrote:
+> Hi Jens
 > 
-> 在 2024/09/03 23:51, Jens Axboe 写道:
-> > On 9/2/24 7:03 AM, Yu Kuai wrote:
-> > > From: Yu Kuai <yukuai3@huawei.com>
-> > > 
-> > > Our syzkaller report a UAF problem(details in patch 1), however it can't
-> > > be reporduced. And this set are some corner cases fix that might be
-> > > related, and they are found by code review.
-> > > 
-> > > Yu Kuai (4):
-> > >    block, bfq: fix possible UAF for bfqq->bic with merge chain
-> > >    block, bfq: choose the last bfqq from merge chain in
-> > >      bfq_setup_cooperator()
-> > >    block, bfq: don't break merge chain in bfq_split_bfqq()
-> > >    block, bfq: use bfq_reassign_last_bfqq() in bfq_bfqq_move()
-> > > 
-> > >   block/bfq-cgroup.c  |  7 +------
-> > >   block/bfq-iosched.c | 17 +++++++++++------
-> > >   block/bfq-iosched.h |  2 ++
-> > >   3 files changed, 14 insertions(+), 12 deletions(-)
-> > 
-> > BFQ is effectively unmaintained, and has been for quite a while at
-> > this point. I'll apply these, thanks for looking into it, but I think we
-> > should move BFQ to an unmaintained state at this point.
-> 
-> Sorry to hear that, we would be willing to take on the responsibility of
-> maintaining this code, please let me know if there are any specific
-> guidelines or processes we should follow. We do have customers are using
-> bfq in downstream kernels, and we are still running lots of test for
-> bfq.
+> I added dm-integrity inline mode in the 6.11 merge window. I've found out
+> that it doesn't work with large bios - the reason is that the function
+> bio_integrity_add_page refuses to add more metadata than
+> queue_max_hw_sectors(q). This restriction is no longer needed, because
+> big bios are split automatically. I'd like to ask you if you could send
+> this commit to Linus before 6.11 comes out, so that the bug is fixed
+> before the final release.
 
-Hi Yukuai,
- 
-BTW, BFQ is default IO scheduler for SCSI/MMC in Fedora. That is great if you'd
-like to volunteer to take over maintaining it.
+This looks good:
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-thanks,
-Ming
+Although between the patches from Keith and the prep patch for the
+io_uring metadata series I'm not sure that splitting of bios with
+integrity actually fully works.  Although until we get the io_uring
+passthrough code in we also won't have an easy way to exercise it either.
 
