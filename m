@@ -1,111 +1,108 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A891DA608
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 13:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C2B1DA0FD
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 14:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725458105; cv=none; b=gNbTlbmE4oMaVLs5ueBsWBvGeXEjmDX+S7ewU4+yG3Zbjj4RDT9oTRiPB174ozGg0yT/xEoQgRdzHV0jfdCdDW2w684NAfKipQNqW78lSS6O4ZwZSsuy3lq8kFcv/o+q9boUzaW03cEbytN9t/q+JkNIpqFBeCuh7o3A6cfAyqc=
+	t=1725458420; cv=none; b=ElVtgmN8zhLlP+Sx7x0VO3PkAzb29OlrU21TXr2T+Bfm9hEZFLlCRg7xu4EmXX2DixKSPsEhQkuVDG1iWtdigPWToh6ujOHqU3Y5eXDLXCnjMeX6y+khpib95PXvi2DyR2Tb5fdE6+5fklFJbeNQwG0Iyox70XVPytZnodt2+2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725458105; c=relaxed/simple;
-	bh=G9TWLJ5Qcqe5/+6+DCHM88NkcdYLAIpLajkqunioBH0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RPFHH6mM6YgOSNiaxpmRxYCiSsK8e4p7j/k+uAqkOu2W256F8Ku96Yq0UroWxG/7wM1DpGXwLvSEkz5IqJOQCg2LGd8+jpxPZgw4RdBj3n90Wsc+MbWxd52ctm2MMn3AthRtXLkJLonBDKniQUJybUmiGrikiik4oljS7J7wih8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AfVP21Ef; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1725458420; c=relaxed/simple;
+	bh=/0AkdYUv5XBmaFze86qGFhmV+GizWa3kalOfnAxUW1Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mvi3V540WCbhPkTLEMXGL0oljVL1fps2uHB9L/diQdGxS4goy+okPbka1fPurU2e/xBaX9kU00ne5XceULQ7lt51gM+MAdqaemusbxqJsZFBDd7bWbv2EA0mXKbz4pvPT9f4MfkbABe3t+qTIbjqJIq8UQK/PUmRW/pdFq0QEWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=P7taTWwf; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AfVP21Ef"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-39d47a9ffb9so24063305ab.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 06:55:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P7taTWwf"
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e1a989bd17aso4199554276.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 07:00:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725458103; x=1726062903; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oF5PiVstO1bSVn0uGppYTW7lTYTwkYc95VjzklZhkF4=;
-        b=AfVP21EfCIFzF2+MqebsBlbguMO84/+jrsaAQUfJ9/LXcqG9rf418ORU6711RPQHDS
-         knCveCZTKuJCaueIFO1XzzY9OWNZvGD6eXiAs0DF0Ye9DmatQO8+H71JA31vCUKQuh25
-         L39jpTUr257HfCyb6S5w67CLCYRJwvL0kpCx7q9yTm5ejuE0Fe2FucDSDs79k+ImBx2u
-         992U5rjqW2EKskgcBLxA3ICShhPVSR9QIkGsteoi8qZXJiHhxOETErJ0OVkS8C3YNI5k
-         OyFo0Rjq7BNKsV6G450dbOf+dMaUyJD7mnbphNMfulj5Q5tSGZtLLFxLWVtAwmfYN6k8
-         X2Nw==
+        d=linaro.org; s=google; t=1725458418; x=1726063218; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/0AkdYUv5XBmaFze86qGFhmV+GizWa3kalOfnAxUW1Y=;
+        b=P7taTWwfoQKZIop58nW+DblvpIovxPuDwxlCaiu8/+60BfTUanb9lPU0/sZ9SwqpT5
+         F1jxjQUeazokNc2nwbf2uCir9cR2dEd27aLy0J4AxXwQzV0zHeVdeH4gC6fKxgN3C/ZD
+         V50QKqubfmS/LhSOsDspE9/ZHEk4ccK+7f7TEhdThRJleB7R9lhVL8nl6ObRIolE8gzN
+         mc01rF38NCfGw8G6XgbRlP+7KU3dsruhSWB2BuV18oS4tQsTnh4/63/tIyAOPpLPWIkL
+         SATyusCdcVgkEeM4iW+d9YVkfkm+c29uwUVJHcbYeENF9CcQNGUA3hj5Jt0Ebo5bhNle
+         oSpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725458103; x=1726062903;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oF5PiVstO1bSVn0uGppYTW7lTYTwkYc95VjzklZhkF4=;
-        b=gs3tpWwxR06HRZEOKxddGBaqqFlhigEPFnxLxaTv8d111gcbXSChey2eTRT6TqjRym
-         hmETYGDnM/LLfpjV6XXpXmdzFs7mXqgO5hoW3es5odWXDi+kxG8MHYm5e61B/SDh0GGG
-         w5RCZVdAAuDrVIJTIhNtmT/S1YSjuknMZbyhwNp4XElW/W5wBfxG+bf03+0oa7G/x2gT
-         BO0XFXgoOrwtT7ad5oCMTXA5PnOLV3eZYks0/BW0OTCi4Fv1p9eN1AyxJZlMsekI4SdL
-         y1g25etG3SSqi5Ek2+erDaMnPRDRKemsiHbUJfzpkx3fd2Bxd1eO8rDpn5gK0p304dSR
-         a7NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXkGgDwcn8iO0+iC/hGt8W6kCsZuJkhnNwWEsZ1EdIR1UEeBOJZWhGMl5o9AVHCrhYCyM8quxnXZTiv9w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpE3x+DqSMCAH9ezHZpeXYNdkv6riXzRwGHp14rPHdGp54b6YA
-	eqXOkF3fOYR06CQJ2LMG6vVg6rZYfLHpprJqS7DbiF/UT9piNQMg7FS7+n12vEh8sckMolsSEUN
-	j
-X-Google-Smtp-Source: AGHT+IEh4dvLQ3fPzZIYoRvC2kmG6Tqk81n0JWgsiNRAqvk43xqMT4zgjhYnO9n1kzwMTRb76YKEbQ==
-X-Received: by 2002:a05:6e02:1569:b0:3a0:1828:31d9 with SMTP id e9e14a558f8ab-3a018283360mr15675225ab.24.1725458103506;
-        Wed, 04 Sep 2024 06:55:03 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39f3af97220sm36719625ab.11.2024.09.04.06.55.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Sep 2024 06:55:02 -0700 (PDT)
-Message-ID: <edfe3c80-c359-44a0-889c-1a879532175a@kernel.dk>
-Date: Wed, 4 Sep 2024 07:55:01 -0600
+        d=1e100.net; s=20230601; t=1725458418; x=1726063218;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/0AkdYUv5XBmaFze86qGFhmV+GizWa3kalOfnAxUW1Y=;
+        b=fToz8CzKoD3WNDIBJxkLUcEztb8AuijGhwK5tYtdITks9FlAdtK01nxrdIioq+L5Z4
+         5GuwMQBo9X5FU08LAGpIvyVD7Wj1qV+WewTc47SF1BeqJZaxnJJnlp7NYkdb2GmKF4tO
+         3MO/36jzx2BbZgpjlOtGI1mcpWXKAm2bvvTITDhOmpHnI7aVUDRZBEZ+zsLBJOdIaL5/
+         CipZ7gykkpul5lsemww99y5/bzoMBQ2S3tJcgYkusgl5PFRw/a18y77ZIAHN7pnhfnRO
+         d9sPXeqV4XRZr73WBuG0Q81mIByrZURVSGzKRl7DCWxFzliZfHuihC4yhmB09TyHyfuw
+         BJbQ==
+X-Gm-Message-State: AOJu0YwlunHCpjq9Qli3uqRj6ZkHRs9EiAKbxOJAW+j1qcSLPDhLE2G4
+	eUKizQNfBvzOZeCW5VcY86zBZYw/gNmm8hFMjMLuvHqzsqQIi2SuPInSVFGSivB3U2816Rkl3U6
+	MgvdTDRmicYxtbpXRkJzJFoFrHYAO6aQATBj97Q==
+X-Google-Smtp-Source: AGHT+IG2Ay/b0HmrTxLJjB4igZgccnpa/ELXz+Rm5lcyqDINOa7uHksSBxS/emSU1waSi2zYuT3BkKo+44xklwVGx5k=
+X-Received: by 2002:a05:6902:1687:b0:e1a:92e6:e063 with SMTP id
+ 3f1490d57ef6-e1a92e6e48amr15270484276.54.1725458417728; Wed, 04 Sep 2024
+ 07:00:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-6.12 0/4] block, bfq: fix corner cases related to bfqq
- merging
-To: Yu Kuai <yukuai1@huaweicloud.com>, Bart Van Assche <bvanassche@acm.org>,
- jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, paolo.valente@unimore.it,
- mauro.andreolini@unimore.it, avanzini.arianna@gmail.com
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240902130329.3787024-1-yukuai1@huaweicloud.com>
- <2ee05037-fb4f-4697-958b-46f0ae7d9cdd@kernel.dk>
- <c2a6d239-aa96-f767-9767-9e9ea929b014@huaweicloud.com>
- <b5b0e655-fb17-4967-9104-4386710ee8db@acm.org>
- <80732d0d-e1a6-8b5e-791d-7c8a8091159a@huaweicloud.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <80732d0d-e1a6-8b5e-791d-7c8a8091159a@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <6fe53222-876c-4deb-b4e1-453eb689a9f3@kernel.dk>
+ <CAPDyKFoo1m5VXd529cGbAHY24w8hXpA6C9zYh-WU2m2RYXjyYw@mail.gmail.com> <d8d1758d-b653-41e3-9d98-d3e6619a85e9@kernel.dk>
+In-Reply-To: <d8d1758d-b653-41e3-9d98-d3e6619a85e9@kernel.dk>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Wed, 4 Sep 2024 15:59:41 +0200
+Message-ID: <CAPDyKFp4aPXF6xuuQf6EhGgndv_=91wsT33DgCDZzG6tyqG9ow@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: move the BFQ io scheduler to orphan state
+To: Jens Axboe <axboe@kernel.dk>, Paolo Valente <paolo.valente@unimore.it>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/3/24 8:45 PM, Yu Kuai wrote:
-> Hi,
-> 
-> ? 2024/09/04 10:28, Bart Van Assche ??:
->> On 9/3/24 6:32 PM, Yu Kuai wrote:
->>> We do have customers are using bfq in downstream kernels, and we are
->>> still running lots of test for bfq.
->>
->> It may take less time to add any missing functionality to another I/O
->> scheduler rather than to keep maintaining BFQ.
->>
->> If Android device vendors would stop using BFQ, my job would become
->> easier.
-> 
-> I'm confused now, I think keep maintaining BFQ won't stop you from
-> adding new functionality to another scheduler, right? Is this something
-> that all scheduler have to support?
++ Paolo
 
-With fear of putting words into Bart's mouth, perhaps he's saying that
-the BFQ is a bit of a mess and it'd be nice if we had a cleaner version
-of some of the features it brings. But having someone actually maintain
-it and perhaps clean it up a bit and reduce the complexity would be a
-good thing. Really it's the authors choice on where to best spend his or
-her time.
+On Wed, 4 Sept 2024 at 15:47, Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 9/4/24 7:27 AM, Ulf Hansson wrote:
+> > On Tue, 3 Sept 2024 at 17:54, Jens Axboe <axboe@kernel.dk> wrote:
+> >>
+> >> Nobody is maintaining this code, and it just falls under the umbrella
+> >> of block layer code. But at least mark it as such, in case anyone wants
+> >> to care more deeply about it and assume the responsibility of doing so.
+> >>
+> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >
+> > I haven't spoken to Paolo recently (just dropped him an email), but I
+> > was under the impression that he intended to keep an eye on the BFQ
+> > scheduler.
+>
+> But he hasn't, it's been a long time since he was involved. I've been
+> applying patches on an as-needed basis, but effectively nobody has
+> been maintaining it for probably 2 years at this point.
 
--- 
-Jens Axboe
+I don't think we should expect him to do active development, but
+rather just to keep an eye on it from maintenance point of view.
 
+Let me try to get in contact with him for an update.
+
+>
+> > BTW, why didn't you cc him?
+>
+> That was an oversight, I think because I haven't seen anything from
+> him in a long time to assumed he was awol.
+
+I looked at the last year or so at the linux-block mailing-list and it
+seems most patches for bfq aren't being sent to his email. :-(
+
+Ohh well, let's see what we can do about this. Surely BFQ is being
+used out there, so it would really be a pity if nobody takes good care
+of it.
+
+Kind regards
+Uffe
