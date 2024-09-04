@@ -1,116 +1,120 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270B442AB0
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 02:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D36A4A15
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 03:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725418664; cv=none; b=TEUY8WGli84O3L16A4GcRT+Up7758AOh/6kTxxFGthFjjvEyKUSJvTFFSVADFml34K00KQbkCq0Rc27WbHPSWZBQ9YuVgQU/254yO/xBWRHys2ZyZzCYSfZEOkbv5BRnDyZQz/4v/i4BV6KFDZms7DP+uQSLIqBtyvIbo9epCnA=
+	t=1725419641; cv=none; b=JYFoHlRJq/o0lkfNNJdcw5NWHnf7ncERq8RvcS3X/iwL0VCAlJ4+wm/+bmTMQPRoBQz4aOh118bTYJToeAW0KXmnBRRJCY9t3Xwk47bOYHio8R0LoDzaZh0p+an3tMYbWJRXMChV54WKL1iZrfNy5tW/TTazazpB3FJd0o6/XBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725418664; c=relaxed/simple;
-	bh=foqF30mnXx1GcKY7zbYXFFy3NBR51yPMKQzsrC74LuE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gCs1qvu7GgS4jLJ4GNYpkypAGxGJKZQe2+rSWSfUbbkmJyk236NcvI6Nlo+JXoI9p9aBmmme4of6pULS8GzboJKH9FnFnwATEpgxq8aBFJjhge77vo1yy5XP0db17gmAe20ZN3K3a729bFkqVV3m9cLihmonOaqH6hfB7lI11Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E/CqsaLe; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1725419641; c=relaxed/simple;
+	bh=9XGUj6XGwLzz4DJsyrnwN5Lg5WbRgSYtiY2pVsIYnmU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SbMkJA0VhoUVoeILwjY+vFh/191Oox4Yx6NWM4kCUNOYSfv3Xb0z0ZlNV6L9IVz4EF4uWFy+oD2J7V5vDr5enqKMNEYruuaEjtbIf53srXRpvOUbnLID/khLqAgC38/X6ao6d9iADsu/j7HGyTCVYUv+nYHj/7NbH+ggC1YG1GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X4i8oU5u; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E/CqsaLe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X4i8oU5u"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725418661;
+	s=mimecast20190719; t=1725419637;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iZg1+Cu2DLlxPh/lu/2PGq1H6RdumTvMLcval/dS4I4=;
-	b=E/CqsaLetxTDwswiPp44GE4edFIMjwz9QHontQuvaTCFB5gA+vGLr6UALyv765Inzk2jts
-	2yZFDwRgxUYR+gnlwfaA+jwrmrKiIE2Oszaed0tTKHIe59jHRe12vBHbLsvoouQl4YeW43
-	wKjDTIMopAPflZDCe4B9OSaQHRmzoQ4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=orF6jzXZFAW69kH2X2PTjqIfJ0wYuCpRt1ksXC7XMuQ=;
+	b=X4i8oU5uLa8VbbKtWpI6ibatvFP8+OD8UlFjNk3R9X2LByBccEvzVmScBdVI9Eht9YXbdw
+	DkIvnmTvWcqCmQ7fCxGrz9acXGfPopZc4wX2165IKJ4H2f0BCcXmkb0fny1d36UfmkkFBh
+	fY5YPmH7af23C0gNg5qH5gb3e4EFQTU=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-574-PAA9kXFiOxaza9zn4QhoQg-1; Tue,
- 03 Sep 2024 22:57:38 -0400
-X-MC-Unique: PAA9kXFiOxaza9zn4QhoQg-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-505-ivcZ92TNNuWLn9lD2fEyzw-1; Tue,
+ 03 Sep 2024 23:13:56 -0400
+X-MC-Unique: ivcZ92TNNuWLn9lD2fEyzw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D5D2E1955BEE;
-	Wed,  4 Sep 2024 02:57:35 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.130])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 147E330001A4;
-	Wed,  4 Sep 2024 02:57:28 +0000 (UTC)
-Date: Wed, 4 Sep 2024 10:57:23 +0800
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AC72A19373D7;
+	Wed,  4 Sep 2024 03:13:54 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.130])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 133DA19560AA;
+	Wed,  4 Sep 2024 03:13:52 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jinyoung Choi <j-young.choi@samsung.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	ming.lei@redhat.com
-Subject: Re: [PATCH] bio-integrity: don't restrict the size of integrity
- metadata
-Message-ID: <ZtfMkzqP3ONMCZL0@fedora>
-References: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Li Nan <linan122@huawei.com>,
+	Changhui Zhong <czhong@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 RESEND] ublk_drv: fix NULL pointer dereference in ublk_ctrl_start_recovery()
+Date: Wed,  4 Sep 2024 11:13:48 +0800
+Message-ID: <20240904031348.4139545-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e41b3b8e-16c2-70cb-97cb-881234bb200d@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Sep 03, 2024 at 09:47:59PM +0200, Mikulas Patocka wrote:
-> Hi Jens
-> 
-> I added dm-integrity inline mode in the 6.11 merge window. I've found out
-> that it doesn't work with large bios - the reason is that the function
-> bio_integrity_add_page refuses to add more metadata than
-> queue_max_hw_sectors(q). This restriction is no longer needed, because
-> big bios are split automatically. I'd like to ask you if you could send
-> this commit to Linus before 6.11 comes out, so that the bug is fixed
-> before the final release.
-> 
-> Mikulas
-> 
-> 
-> From: Mikulas Patocka <mpatocka@redhat.com>
-> 
-> bio_integrity_add_page restricts the size of the integrity metadata to
-> queue_max_hw_sectors(q). This restriction is not needed because oversized
-> bios are split automatically. This restriction causes problems with
-> dm-integrity 'inline' mode - if we send a large bio to dm-integrity and
-> the bio's metadata are larger than queue_max_hw_sectors(q),
-> bio_integrity_add_page fails and the bio is ended with BLK_STS_RESOURCE
-> error.
-> 
-> An example that triggers it:
-> 
-> # modprobe brd rd_size=1048576
-> # dmsetup create in1 --table '0 1847320 integrity /dev/ram0 0 64 D 1 fix_padding'
-> # dmsetup create in2 --table '0 1847312 integrity /dev/mapper/in1 0 64 I 1 internal_hash:sha512'
-> # dd if=/dev/zero of=/dev/mapper/in2 bs=1M oflag=direct status=progress
-> dd: error writing '/dev/mapper/in2': Cannot allocate memory
-> 1+0 records in
-> 0+0 records out
-> 0 bytes copied, 0.00169291 s, 0.0 kB/s
-> 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Fixes: fb0987682c62 ("dm-integrity: introduce the Inline mode")
-> Fixes: 0ece1d649b6d ("bio-integrity: create multi-page bvecs in bio_integrity_add_page()")
+From: Li Nan <linan122@huawei.com>
 
-Firstly meta size is always < bio size.
+When two UBLK_CMD_START_USER_RECOVERY commands are submitted, the
+first one sets 'ubq->ubq_daemon' to NULL, and the second one triggers
+WARN in ublk_queue_reinit() and subsequently a NULL pointer dereference
+issue.
 
-Secondly the check isn't needed either bio_integrity_add_page() is called on
-to-be-splited bio(DM), or splited bio(blk-mq).
+Fix it by adding the check in ublk_ctrl_start_recovery() and return
+immediately in case of zero 'ub->nr_queues_ready'.
 
+  BUG: kernel NULL pointer dereference, address: 0000000000000028
+  RIP: 0010:ublk_ctrl_start_recovery.constprop.0+0x82/0x180
+  Call Trace:
+   <TASK>
+   ? __die+0x20/0x70
+   ? page_fault_oops+0x75/0x170
+   ? exc_page_fault+0x64/0x140
+   ? asm_exc_page_fault+0x22/0x30
+   ? ublk_ctrl_start_recovery.constprop.0+0x82/0x180
+   ublk_ctrl_uring_cmd+0x4f7/0x6c0
+   ? pick_next_task_idle+0x26/0x40
+   io_uring_cmd+0x9a/0x1b0
+   io_issue_sqe+0x193/0x3f0
+   io_wq_submit_work+0x9b/0x390
+   io_worker_handle_work+0x165/0x360
+   io_wq_worker+0xcb/0x2f0
+   ? finish_task_switch.isra.0+0x203/0x290
+   ? finish_task_switch.isra.0+0x203/0x290
+   ? __pfx_io_wq_worker+0x10/0x10
+   ret_from_fork+0x2d/0x50
+   ? __pfx_io_wq_worker+0x10/0x10
+   ret_from_fork_asm+0x1a/0x30
+   </TASK>
+
+Fixes: c732a852b419 ("ublk_drv: add START_USER_RECOVERY and END_USER_RECOVERY support")
+Reported-and-tested-by: Changhui Zhong <czhong@redhat.com>
+Closes: https://lore.kernel.org/all/CAGVVp+UvLiS+bhNXV-h2icwX1dyybbYHeQUuH7RYqUvMQf6N3w@mail.gmail.com
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+v2: add the check to ublk_ctrl_start_recovery().
 
+ drivers/block/ublk_drv.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Thanks,
-Ming
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 890c08792ba8..1d53a3f48a0e 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -2663,6 +2663,8 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
+ 	mutex_lock(&ub->mutex);
+ 	if (!ublk_can_use_recovery(ub))
+ 		goto out_unlock;
++	if (!ub->nr_queues_ready)
++		goto out_unlock;
+ 	/*
+ 	 * START_RECOVERY is only allowd after:
+ 	 *
+-- 
+2.42.0
 
