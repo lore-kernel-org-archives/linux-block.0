@@ -1,52 +1,52 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174CE1DEFEF
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 15:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E1A1DC754
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 15:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725463612; cv=none; b=PZEtNK9zzpC8vBmOPXxMsIBpXcBhODcx29uXYmQGwBnwLvORrhxWl5XpXMDcZS50GLwdim6lsBNkyG7SYSsOAm+m/eZead41z2iWGIkK4cYQMM5LYwjIXD08Rf9js2Q7yqur55CvZjv85RtHJAHPQ4jWNWZOPX3jjuL7enSNNFo=
+	t=1725463619; cv=none; b=SBeaFB1AAE60Y0tOy1NthjLmMDwQ35Ro4D/AVjhUbcW835VwcMYqIRVLwQ5SE99vldm/m1pGINk6ShOGKcILZdaOLJj0rguqXHRmGzuIACCJdAAsCSSqU/HiT9MqQTxcAlP4Il8ZU9cmI+kPEDjZsA3dKBrQPW2XYlJ1ibKwOOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725463612; c=relaxed/simple;
-	bh=tX/zarXxO7puhxjx/jrVhqBehAaFTn8xlf2Qid+DYjo=;
+	s=arc-20240116; t=1725463619; c=relaxed/simple;
+	bh=mIMzDYPipEZCzvoJEZhl1TTa2Z2biQRbEVba7c6Ips0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lYEgXD3GaLUoslaggh0jWhv/tXpOW1htfxRB8DOef//WClDievhRYXA70iUGIAwXlN9xywlnbXuRYUzwwhCWdLMo6krrO/c30mzOK0cm6jsoIghWbPpzHkHOhmOyHXzJlkZlPdgb9xUwEHTUyioIhUcmWhLTYWVy9EdOz/GSzcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=CzsZeyu+; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=XiZ5hU42SRo1G3UXwmxoFh/GsTh6+VxFI/A0V9d6iwtOqhggKxgEJC9j+KDvvbvPTbnmYuRC0ZySxWCJFAPVaFwqf5AJAvZKaJAgga3ZeNlYycEL/FgwULpDxqqn2zsWqzBTGYfSSi/I5yPjZgCFcC/roytaDkeupWOCV453Urs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=F8RfilbV; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="CzsZeyu+"
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 484DoYWV030424
-	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:50 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="F8RfilbV"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4849UfQB022985
+	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:57 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=vtkxDOQrx1Rg5NzxikIzXHuhR2yFcTtLhhIWMA6/swA=; b=
-	CzsZeyu+NICK0kL6N+7EH6c+Q2ef0hYEvS4+uyv6H+z2M4z1PRNqUcRTy/jtjmzx
-	DvUOPc5SyoGrDuTFop/iebQfl3cJv85LExffkOiM1iuGSrsGvVTOd9Xk6ic2wdlW
-	9tk5OpXDX16eRDgwauwVyHcXo7VTUG4b4t1GbZ5oaHoNxa7JIaNa6Vie1lH8Hdo4
-	9qyDdJkzBWQhSJwyFyJEnBco/I3PmMffLxrlEbX7/6a9mjeHzeEG7M1bMNrrbfRN
-	pMBt5UI+ls9t3QF3e2pNt8VJPRLm9OtCF2uWzPc51qGAaA+sPa60qiJBr/VU1hfR
-	46GKo83b1Hsxv/qT961xew==
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41e5y5xxc7-6
+	s2048-2021-q4; bh=nYakPJ9rnveCc/VvRR9I1ztb2OG9ggJMLK0vhtAOxDs=; b=
+	F8RfilbVxSMoFlVK8z/wsOmEiHTmIjzfYzFKHUGW8uOTfYDkPhl/6EjFBqTC2hgB
+	5Es2V3DiEGOIDjVa8DjWzUofi+I0OFyTqQCt0FGOwD7wiy0HJaCUDPwLln1iTlXy
+	O5Q6s97aWzHjfVYr/B6+9VXxlgHmHQ+avoT9LfP77j5CMVWl68o2kVzOrsanallK
+	OCLkp1/fbEtOvjXzrVEh8myYeT8kXn2ZbtumDNr9TM5eIQY6lIaV8DAa83MgZZRQ
+	8u73FAjmRYF3DTiq3VcG7LF4JnIC+grFabeaL9r8orp6KFaMGq/pUxueXkPqucRM
+	8TyZ9DWVMI62HhU5m2vVIA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41emyp1wcm-6
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 08:26:49 -0700 (PDT)
-Received: from twshared4923.09.ash9.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 08:26:56 -0700 (PDT)
+Received: from twshared34253.17.frc2.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Wed, 4 Sep 2024 15:26:11 +0000
+ 15.2.1544.11; Wed, 4 Sep 2024 15:26:13 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id ADC0912A036E5; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
+	id C80ED12A036EB; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <martin.petersen@oracle.com>,
         <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <linux-scsi@vger.kernel.org>, <sagi@grimberg.me>
 CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 02/10] block: provide helper for nr_integrity_segments
-Date: Wed, 4 Sep 2024 08:25:57 -0700
-Message-ID: <20240904152605.4055570-3-kbusch@meta.com>
+Subject: [PATCHv3 05/10] block: unexport blk_rq_count_integrity_sg
+Date: Wed, 4 Sep 2024 08:26:00 -0700
+Message-ID: <20240904152605.4055570-6-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240904152605.4055570-1-kbusch@meta.com>
 References: <20240904152605.4055570-1-kbusch@meta.com>
@@ -59,48 +59,34 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: A7bsxPLav5VXEt7gpqXwrhPHz5m1guNM
-X-Proofpoint-GUID: A7bsxPLav5VXEt7gpqXwrhPHz5m1guNM
+X-Proofpoint-GUID: -HiehyxzMLq6vhHc_pHGPrUEi7ajhCyu
+X-Proofpoint-ORIG-GUID: -HiehyxzMLq6vhHc_pHGPrUEi7ajhCyu
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-04_13,2024-09-04_01,2024-09-02_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-This way drivers that want this value don't need to concern themselves
-with the CONFIG_BLK_DEV_INTEGRITY setting.
+There are no external users of this.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- include/linux/blk-mq.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ block/blk-integrity.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8d304b1d16b15..3984aad9bf64a 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -228,6 +228,18 @@ static inline unsigned short req_get_ioprio(struct r=
-equest *req)
- 	return req->ioprio;
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 010decc892eaa..4365960153b91 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -53,7 +53,6 @@ int blk_rq_count_integrity_sg(struct request_queue *q, =
+struct bio *bio)
+=20
+ 	return segments;
  }
+-EXPORT_SYMBOL(blk_rq_count_integrity_sg);
 =20
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
-+static inline unsigned short blk_rq_integrity_segments(struct request *r=
-q)
-+{
-+	return rq->nr_integrity_segments;
-+}
-+#else
-+static inline unsigned short blk_rq_integrity_segments(struct request *r=
-q)
-+{
-+	return 0;
-+}
-+#endif
-+
- #define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
-=20
- #define rq_dma_dir(rq) \
+ /**
+  * blk_rq_map_integrity_sg - Map integrity metadata into a scatterlist
 --=20
 2.43.5
 
