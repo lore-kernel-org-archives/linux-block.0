@@ -1,52 +1,52 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4E51DEFE2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BA31DEFEE
 	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 15:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725463611; cv=none; b=WhIW0ahYzi5mNTiMtQTGSVwIuqRy6Dan/epoDD1PTqlm3SXE+15NyCDBe3SN26CumUSJNbS4BQvFES/MQscg+6rdb41/XP31CIJpm8WKM3d8/8j3Qha6e5YauDIkH3UIrGQ92eoQgiza4x0+5A7LB7cMSy4U+STLLCGKwOqop4w=
+	t=1725463611; cv=none; b=dapEZ2Du3r+ce30a9glykMc/EQejMxeS2c8Waoo2hN2qbrDJtv8cP+h2Ixh3cgzzp96/spgHcC4JOeNbM16jahi4et2pdJkbBkrOw0hIcoraKkNVqq05g2QloGYTiHJddCplcW6Dulo5FFZ0ou4lwIBOY7oq9tU4h4agc0M11hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725463611; c=relaxed/simple;
-	bh=ofC0ovGscBqX1aIm7wKKCbfSgkopWKpd6aY9RZvnHlY=;
+	bh=3IVzbpR/rJR6wU1RUBfwFsTfYvzBRNjtgQJN0hgzS+s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IMyoyq7Enigan3ZnyAR6YybEszs9wJvZ4IQaJpy1zdZfW1dzy6JwgM6FW0zt8Yapp9miYJAWOSUrbnvLl7k+8snUG5ZAy3wap0jzvKTIZC0vLtrwcQ3aQVx36TxB4bJCOMj8GhBXEno2lqx1ziaw9WBC1SV/ZuXn7FSuEsQ9T9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Vvcjkg5A; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=Lz/xyZDkuSL+Gge1R/qHKQcfiUtzQrVV4waBgMFo5Q69UZu9XBbuRmK5wswu0T5R072ifdUJz/6pANz0cVyO05d5zQZslFxtdVPEZ+LWX3lp62nDME4ebvbVIa2BmShracPDAMOgZ1wA0LnHKvBbfZ/O6p7wnrju2r9evJGu7lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=e9HKErPF; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Vvcjkg5A"
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4849U2O0022336
-	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:48 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="e9HKErPF"
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 484DJKxU023016
+	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:49 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=+//qAOpLt4ftix8+c0vKQWrZh5psXGJmgTeFdUI7xuY=; b=
-	Vvcjkg5AWfp6o2vD/rovTbpYGk1no5V3qyj7A5L6tRi3oOL8Fmto4yigitIhAlXy
-	yH0fjMbIOfMBvELMf5v+m8GbFk4n2OBnN+bOgWYnYffmUexkzpdJ/AYx+Qjh3YSN
-	+vjpkfx3XeMF5f0ELRkCBXuwBpUv02Lp6sNe8foxDtKzsjm2btVbPPl36GWNYeSi
-	K1hv+HOvnlXCvnQ/ggVpZGk9StsjLIAZDwaj+YVDg8nq1osKQjfa0TbW95OA27Xq
-	/O6ptYw3MVo26j5fxhvtpXpcqUHMmsj2yIVkbKMjF70C8opk+dVIwKvGFDeVabY+
-	r7n810lu/dsy/6HkU1onTg==
+	s2048-2021-q4; bh=mx/X2bX0pns4vleyJjY1s7PAjZcF77tvDOIJw1tvmqU=; b=
+	e9HKErPFSEqRS6SYxYEtI9ugoHRs6t3oU4pALUyW1xJlmj2BHRKFcBP4qm5fXSY3
+	/737uAIkHJe+jJ5o6SCUfX/EPUP8ijUUSWv81aP0f1NS+XaioTE7nzqDgkY7jLIl
+	Pee8NK65RncXXy2zrxyREMIniI9jnoLrIWOc3jfpOFeiAcm6V/xg5gX1qJan1QiX
+	G0Ekw7fA3yJgvGciJWta+RMmBzvwEmRDwHwfDV6igqFxTK8m0V/3HzeimXxKuWZM
+	Vmsbe2GL1TymKRc0JSnfSuNRyGNZ9irYYLAmLSqMHJi3kJocZkWbqhPULHMZc3Bq
+	NHbwF5ttjON97JYNPjfS6A==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41emyp1w8k-16
+	by m0089730.ppops.net (PPS) with ESMTPS id 41e5r4q3vq-6
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
 	for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 08:26:48 -0700 (PDT)
-Received: from twshared34253.17.frc2.facebook.com (2620:10d:c085:208::7cb7) by
+Received: from twshared17102.15.frc2.facebook.com (2620:10d:c085:208::11) by
  mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Wed, 4 Sep 2024 15:26:13 +0000
+ 15.2.1544.11; Wed, 4 Sep 2024 15:26:17 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id E8A6012A036F1; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
+	id E07A612A036EF; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <martin.petersen@oracle.com>,
         <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <linux-scsi@vger.kernel.org>, <sagi@grimberg.me>
 CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 08/10] blk-integrity: remove inappropriate limit checks
-Date: Wed, 4 Sep 2024 08:26:03 -0700
-Message-ID: <20240904152605.4055570-9-kbusch@meta.com>
+Subject: [PATCHv3 07/10] blk-integrity: simplify mapping sg
+Date: Wed, 4 Sep 2024 08:26:02 -0700
+Message-ID: <20240904152605.4055570-8-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240904152605.4055570-1-kbusch@meta.com>
 References: <20240904152605.4055570-1-kbusch@meta.com>
@@ -59,139 +59,145 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: wp2i9s12_Z6ax5tm3WipU9w8Ib6_SeYT
-X-Proofpoint-ORIG-GUID: wp2i9s12_Z6ax5tm3WipU9w8Ib6_SeYT
+X-Proofpoint-ORIG-GUID: 77kyH_SJrinDh0P4QvCpoHoIPJunKu1h
+X-Proofpoint-GUID: 77kyH_SJrinDh0P4QvCpoHoIPJunKu1h
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-04_13,2024-09-04_01,2024-09-02_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-The queue limits for block access are not the same as metadata access.
-Delete these.
+The segments are already packed to the queue limits when adding them to
+the bio, so each vector is already its own segment. No need to attempt
+compacting them even more.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/bio-integrity.c |  7 -------
- block/blk-integrity.c |  3 ---
- block/blk-merge.c     |  6 ------
- block/blk.h           | 34 ----------------------------------
- 4 files changed, 50 deletions(-)
+ block/blk-integrity.c         | 35 +++++++++--------------------------
+ drivers/nvme/host/rdma.c      |  4 ++--
+ drivers/scsi/scsi_lib.c       |  3 +--
+ include/linux/blk-integrity.h |  6 ++----
+ 4 files changed, 14 insertions(+), 34 deletions(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 8d1fb38f745f9..ddd85eb46fbfb 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -184,13 +184,6 @@ int bio_integrity_add_page(struct bio *bio, struct p=
-age *page,
- 		if (bip->bip_vcnt >=3D
- 		    min(bip->bip_max_vcnt, queue_max_integrity_segments(q)))
- 			return 0;
--
--		/*
--		 * If the queue doesn't support SG gaps and adding this segment
--		 * would create a gap, disallow it.
--		 */
--		if (bvec_gap_to_prev(&q->limits, bv, offset))
--			return 0;
- 	}
-=20
- 	bvec_set_page(&bip->bip_vec[bip->bip_vcnt], page, len, offset);
 diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index cfb394eff35c8..f9367f3a04208 100644
+index c180141b7871c..cfb394eff35c8 100644
 --- a/block/blk-integrity.c
 +++ b/block/blk-integrity.c
-@@ -85,9 +85,6 @@ bool blk_integrity_merge_rq(struct request_queue *q, st=
-ruct request *req,
- 	    q->limits.max_integrity_segments)
- 		return false;
+@@ -35,7 +35,6 @@ int blk_rq_count_integrity_segs(struct bio *bio)
 =20
--	if (integrity_req_gap_back_merge(req, next->bio))
--		return false;
+ /**
+  * blk_rq_map_integrity_sg - Map integrity metadata into a scatterlist
+- * @q:		request queue
+  * @bio:	bio with integrity metadata attached
+  * @sglist:	target scatterlist
+  *
+@@ -43,39 +42,23 @@ int blk_rq_count_integrity_segs(struct bio *bio)
+  * scatterlist.  The scatterlist must be big enough to hold all
+  * elements.  I.e. sized using blk_rq_count_integrity_segs().
+  */
+-int blk_rq_map_integrity_sg(struct request_queue *q, struct bio *bio,
+-			    struct scatterlist *sglist)
++int blk_rq_map_integrity_sg(struct bio *bio, struct scatterlist *sglist)
+ {
+-	struct bio_vec iv, ivprv =3D { NULL };
+ 	struct scatterlist *sg =3D NULL;
+ 	unsigned int segments =3D 0;
+ 	struct bvec_iter iter;
+-	int prev =3D 0;
++	struct bio_vec iv;
+=20
+ 	bio_for_each_integrity_vec(iv, bio, iter) {
 -
- 	return true;
+-		if (prev) {
+-			if (!biovec_phys_mergeable(q, &ivprv, &iv))
+-				goto new_segment;
+-			if (sg->length + iv.bv_len > queue_max_segment_size(q))
+-				goto new_segment;
+-
+-			sg->length +=3D iv.bv_len;
+-		} else {
+-new_segment:
+-			if (!sg)
+-				sg =3D sglist;
+-			else {
+-				sg_unmark_end(sg);
+-				sg =3D sg_next(sg);
+-			}
+-
+-			sg_set_page(sg, iv.bv_page, iv.bv_len, iv.bv_offset);
+-			segments++;
++		if (!sg)
++			sg =3D sglist;
++		else {
++			sg_unmark_end(sg);
++			sg =3D sg_next(sg);
+ 		}
+=20
+-		prev =3D 1;
+-		ivprv =3D iv;
++		sg_set_page(sg, iv.bv_page, iv.bv_len, iv.bv_offset);
++		segments++;
+ 	}
+=20
+ 	if (sg)
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index dc0987d42c6b2..fab205bb4f3ed 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -1504,8 +1504,8 @@ static int nvme_rdma_dma_map_req(struct ib_device *=
+ibdev, struct request *rq,
+ 			goto out_unmap_sg;
+ 		}
+=20
+-		req->metadata_sgl->nents =3D blk_rq_map_integrity_sg(rq->q,
+-				rq->bio, req->metadata_sgl->sg_table.sgl);
++		req->metadata_sgl->nents =3D blk_rq_map_integrity_sg(rq->bio,
++					req->metadata_sgl->sg_table.sgl);
+ 		*pi_count =3D ib_dma_map_sg(ibdev,
+ 					  req->metadata_sgl->sg_table.sgl,
+ 					  req->metadata_sgl->nents,
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index dc1a1644cbc0c..33a7d07dcbe26 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1183,8 +1183,7 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *=
+cmd)
+ 			goto out_free_sgtables;
+ 		}
+=20
+-		count =3D blk_rq_map_integrity_sg(rq->q, rq->bio,
+-						prot_sdb->table.sgl);
++		count =3D blk_rq_map_integrity_sg(rq->bio, prot_sdb->table.sgl);
+ 		BUG_ON(count > ivecs);
+ 		BUG_ON(count > queue_max_integrity_segments(rq->q));
+=20
+diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.=
+h
+index 0de05278ac824..38b43d6c797df 100644
+--- a/include/linux/blk-integrity.h
++++ b/include/linux/blk-integrity.h
+@@ -25,8 +25,7 @@ static inline bool queue_limits_stack_integrity_bdev(st=
+ruct queue_limits *t,
  }
 =20
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 56769c4bcd799..43ab1ce09de65 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -650,9 +650,6 @@ int ll_back_merge_fn(struct request *req, struct bio =
-*bio, unsigned int nr_segs)
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+-int blk_rq_map_integrity_sg(struct request_queue *, struct bio *,
+-				   struct scatterlist *);
++int blk_rq_map_integrity_sg(struct bio *, struct scatterlist *);
+ int blk_rq_count_integrity_segs(struct bio *);
+=20
+ static inline bool
+@@ -95,8 +94,7 @@ static inline int blk_rq_count_integrity_segs(struct bi=
+o *b)
  {
- 	if (req_gap_back_merge(req, bio))
- 		return 0;
--	if (blk_integrity_rq(req) &&
--	    integrity_req_gap_back_merge(req, bio))
--		return 0;
- 	if (!bio_crypt_ctx_back_mergeable(req, bio))
- 		return 0;
- 	if (blk_rq_sectors(req) + bio_sectors(bio) >
-@@ -669,9 +666,6 @@ static int ll_front_merge_fn(struct request *req, str=
-uct bio *bio,
- {
- 	if (req_gap_front_merge(req, bio))
- 		return 0;
--	if (blk_integrity_rq(req) &&
--	    integrity_req_gap_front_merge(req, bio))
--		return 0;
- 	if (!bio_crypt_ctx_front_mergeable(req, bio))
- 		return 0;
- 	if (blk_rq_sectors(req) + bio_sectors(bio) >
-diff --git a/block/blk.h b/block/blk.h
-index 32f4e9f630a3a..3f6198824b258 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -224,29 +224,6 @@ bool blk_integrity_merge_rq(struct request_queue *, =
-struct request *,
- 		struct request *);
- bool blk_integrity_merge_bio(struct request_queue *, struct request *,
- 		struct bio *);
--
--static inline bool integrity_req_gap_back_merge(struct request *req,
--		struct bio *next)
--{
--	struct bio_integrity_payload *bip =3D bio_integrity(req->bio);
--	struct bio_integrity_payload *bip_next =3D bio_integrity(next);
--
--	return bvec_gap_to_prev(&req->q->limits,
--				&bip->bip_vec[bip->bip_vcnt - 1],
--				bip_next->bip_vec[0].bv_offset);
--}
--
--static inline bool integrity_req_gap_front_merge(struct request *req,
--		struct bio *bio)
--{
--	struct bio_integrity_payload *bip =3D bio_integrity(bio);
--	struct bio_integrity_payload *bip_next =3D bio_integrity(req->bio);
--
--	return bvec_gap_to_prev(&req->q->limits,
--				&bip->bip_vec[bip->bip_vcnt - 1],
--				bip_next->bip_vec[0].bv_offset);
--}
--
- extern const struct attribute_group blk_integrity_attr_group;
- #else /* CONFIG_BLK_DEV_INTEGRITY */
- static inline bool blk_integrity_merge_rq(struct request_queue *rq,
-@@ -259,17 +236,6 @@ static inline bool blk_integrity_merge_bio(struct re=
-quest_queue *rq,
- {
- 	return true;
+ 	return 0;
  }
--static inline bool integrity_req_gap_back_merge(struct request *req,
--		struct bio *next)
--{
--	return false;
--}
--static inline bool integrity_req_gap_front_merge(struct request *req,
--		struct bio *bio)
--{
--	return false;
--}
--
- static inline void blk_flush_integrity(void)
+-static inline int blk_rq_map_integrity_sg(struct request_queue *q,
+-					  struct bio *b,
++static inline int blk_rq_map_integrity_sg(struct bio *b,
+ 					  struct scatterlist *s)
  {
- }
+ 	return 0;
 --=20
 2.43.5
 
