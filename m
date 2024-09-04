@@ -1,159 +1,70 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C995E1DB53C;
-	Wed,  4 Sep 2024 14:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C33626AED
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 14:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725459477; cv=none; b=F/K0Yk7ugL6uWhWEVNSFzpBTIA7nKcF2dJbwvry2ubcXLxdWCNYMRNw0Mh32Vju1xRNRlrcFWtyk4hTYxP7RP1YrOTHY7b5W6AsDMQ/irp3ZneoQgzRl42cyBRt0agZm1E1U7XGoJFayLgSecBHEhQkZ1rsqgBbiCUVbPtD5IJ0=
+	t=1725461274; cv=none; b=XVHvAVjhPM+R7EC1VMtF8VtpOAapEfmpFXuwyMRGR4DrzUWabVTEY0XSBC0grgCdWjNvvzDuYBdTTtemrx4PI0flE27ZVOyvZKQtq92e5fkql4PMPITg7GiiLabczs2Cf3TDS/5GAswhHA1Ri3DFgyFprtU299kfsxaSe+Rrha0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725459477; c=relaxed/simple;
-	bh=fX6prqf2VFD2UV5gx7IfCiSBWUdjjihLSk5KGUumqJA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=osx0UOhwv5rPHNeM8pvQsU9wqphewXK9EwV20Xk6UMnV2gVFW9pfLDVUpzme59mA8sf/cSuqVD67H9pydD/S0z5KzHhpPKiUriNDCjplFucAtoXHNATj63jAVGPlUWfQWb2kUiInwgADUfk7mq31V46YqjC4ZO4imsAKDFXjrpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XKVNNA1R; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1725461274; c=relaxed/simple;
+	bh=yE98xFtsc3hjjGmDDq6gNwXjcN3RiEAtz9k/dCUgp2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WHwJsnzZCQvvsIdcESTx0OEMtmKAp0UDaPnLId9dvVRjGphb0YKYsuwqrUfoq/acbb3WWGgqWHisT8M4bjOK5EYYRYdZDOSKQtP0PkuMawYu6n2Ad7GmfCqsmq+fqk3EsC+hIbbpZp9RbTJAbBTy/3+V42MHAEdncaftW4g79hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1SBXJ86; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKVNNA1R"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a869332c2c2so142217066b.0;
-        Wed, 04 Sep 2024 07:17:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725459474; x=1726064274; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=llWa+KY1CsE699NO6/Qz9OdhajA1Gh72FplwVQHN8Os=;
-        b=XKVNNA1RzFuo0sRqQ/LxORPRf8ZexVEYz3YWZxM8WnchHpAXsspC14TUDtegrHCqMG
-         7wky26m5O7ZGKgOWmYUZykJgJq6DLVXGbVSU0YII+rXmvNyaGMb6KmkYe+Hoew8sgzt8
-         x2Y5KtW05NZIvXyWBqdoA26i+MhVVHQJ+ZMQ4duGpdmerqOzmht/B0CDNtUtdNd79ZWq
-         +ETJ9Vp/qRY/fdA7rYWx4U/jhbWfTm8l6jEhBU3bNpa6e5hpkZPL4M031Yly2O8KTsfG
-         QKLbN54xVNW7vK5MhMvDD9v4nRlRUE/MEs/E4FGF5jzXIwncqMMHAnqpg7UJeFVuENoW
-         Uovg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725459474; x=1726064274;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=llWa+KY1CsE699NO6/Qz9OdhajA1Gh72FplwVQHN8Os=;
-        b=mF4P4hoW5kx8LPBoSxY2zjb7wqgPI9/iDCi5Oxo43lAtXSmwK7qhm76uPBTtnKyoz8
-         tsQlCwpP0db8kGOrBxLNv4klRq4Snm1TYeFO1Tv+fWg4u2r8vtvwQN0GJ93wV5i9VYf7
-         2tyXF+5vS2gHk6nJDgx6Pg/73x8zreBM11Cs9FuglKsIufO5AcipIxLIqrhmS5EiTCn6
-         uKCq4u7Te0DEI6oySJW/h4Dnn3TNMJcj3ROKyDxv+MpljNol9YOPn8lQTuu9bYJrfz6x
-         +utIqtVqXidzipczLzfuBneeMQeFTlrTkdYwwCNL5vzbrTe2ixtvQ0ZJeMmBBqji8yBs
-         dfGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEo6x6jOfZWzM8cXGJM0IKplnZKL4M9mrmTejf1OYZhcFF/0uNVwHDJgf9gigvAUOcH7SPeQCONmI3QQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp36G2nyYYpJmMj6XwdhCGQBe6f8E3mzfOK3sYNqCnyusoTz/E
-	cU3O3p/5SDF0RzhlwVggFs9UM5iv8fyyTe5eFhtyykry2fD3o4/3SZeB3F7h
-X-Google-Smtp-Source: AGHT+IFWD5NeSx4L5OBZcmDku0R0EHp0Mplv+v0QTrmPwvlzQ40tRMtryzZM6Z0h0n/l6uV8EPBdaQ==
-X-Received: by 2002:a17:907:3fa4:b0:a7a:8dcd:ffb4 with SMTP id a640c23a62f3a-a8a430913f9mr290483266b.17.1725459473656;
-        Wed, 04 Sep 2024 07:17:53 -0700 (PDT)
-Received: from 127.0.0.1localhost ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989196c88sm811160766b.102.2024.09.04.07.17.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 07:17:52 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com,
-	Conrad Meyer <conradmeyer@meta.com>,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH v3 8/8] block: implement async write zero pages command
-Date: Wed,  4 Sep 2024 15:18:07 +0100
-Message-ID: <b4d59a6bdc1cf0f058398a1ab8189fab150f8cfa.1725459175.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1725459175.git.asml.silence@gmail.com>
-References: <cover.1725459175.git.asml.silence@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1SBXJ86"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC383C4CEC2;
+	Wed,  4 Sep 2024 14:47:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725461274;
+	bh=yE98xFtsc3hjjGmDDq6gNwXjcN3RiEAtz9k/dCUgp2E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K1SBXJ86TFbXhUHtdZNAe3/DwkdJzzp19mFxvKaO2hjl4k28lPX6oe56gJcncR41T
+	 wnXrJealEDoO++Q/sdUkjlLCuNZ227QiVAsVoGdwWrGcRsG2G10qyRppS1ThKSv93T
+	 ZRTLgqBiP/zckYGiBe9VDRnicTUelCqK0QY7WSQ5LFLRejeKiKYuJuOxI94LkMBMaK
+	 kwMiAnu9lamYw3SQXOr0ppaDIEd43ComqMNJezerSxYmt8s7XazsLOCxMStfq5wSop
+	 HJ7+B1QR32QhKHZWddiNqudp+dH8yRwWIFljSvA57XF4LJWePiizD8lJYTenzxWWf6
+	 m/qipqRyVqJQg==
+Date: Wed, 4 Sep 2024 08:47:51 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Subject: Re: [PATCHv2] blk-mq: set the nr_integrity_segments from bio
+Message-ID: <ZthzF5Go69cdzeoM@kbusch-mbp>
+References: <20240903191325.3642403-1-kbusch@meta.com>
+ <Ztfjb8UlOfHYtMTT@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ztfjb8UlOfHYtMTT@infradead.org>
 
-Add a command that writes the zero page to the drive. Apart from passing
-the zero page instead of actual data it uses the normal write path and
-doesn't do any further acceleration, nor it requires any special
-hardware support. The indended use is to have a fallback when
-BLOCK_URING_CMD_WRITE_ZEROES is not supported.
+On Tue, Sep 03, 2024 at 09:34:55PM -0700, Christoph Hellwig wrote:
+> On Tue, Sep 03, 2024 at 12:13:25PM -0700, Keith Busch wrote:
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2546,6 +2546,10 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
+> >  	rq->__sector = bio->bi_iter.bi_sector;
+> >  	rq->write_hint = bio->bi_write_hint;
+> >  	blk_rq_bio_prep(rq, bio, nr_segs);
+> > +#if defined(CONFIG_BLK_DEV_INTEGRITY)
+> > +	if (bio->bi_opf & REQ_INTEGRITY)
+> > +		rq->nr_integrity_segments = blk_rq_count_integrity_sg(rq->q, bio);
+> 
+> Hmm.  The current model is that drivers are supposed to
+> clal this, which they should stop doing now that the block layer
+> maintains this count.  So I think this needs a bit more work, after
+> which blk_rq_count_integrity_sg is also unexported, nad preferably
+> also has a name that drops the incorrect _sg.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/ioctl.c           | 24 +++++++++++++++++++++---
- include/uapi/linux/fs.h |  1 +
- 2 files changed, 22 insertions(+), 3 deletions(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ef4b2a90ad79..3cb479192023 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -774,7 +774,8 @@ static void bio_cmd_bio_end_io(struct bio *bio)
- 
- static int blkdev_cmd_write_zeroes(struct io_uring_cmd *cmd,
- 				   struct block_device *bdev,
--				   uint64_t start, uint64_t len, bool nowait)
-+				   uint64_t start, uint64_t len,
-+				   bool nowait, bool zero_pages)
- {
- 
- 	sector_t bs_mask = (bdev_logical_block_size(bdev) >> SECTOR_SHIFT) - 1;
-@@ -793,6 +794,20 @@ static int blkdev_cmd_write_zeroes(struct io_uring_cmd *cmd,
- 	if (err)
- 		return err;
- 
-+	if (zero_pages) {
-+		struct blk_iou_cmd *bic = io_uring_cmd_to_pdu(cmd,
-+						struct blk_iou_cmd);
-+
-+		err = blkdev_issue_zero_pages_bio(bdev, sector, nr_sects,
-+						  gfp, &prev,
-+						  BLKDEV_ZERO_PAGES_NOWAIT);
-+		if (!prev)
-+			return -EAGAIN;
-+		if (err)
-+			bic->res = err;
-+		goto out_submit;
-+	}
-+
- 	if (!limit)
- 		return -EOPNOTSUPP;
- 	/*
-@@ -826,7 +841,7 @@ static int blkdev_cmd_write_zeroes(struct io_uring_cmd *cmd,
- 	}
- 	if (!prev)
- 		return -EAGAIN;
--
-+out_submit:
- 	prev->bi_private = cmd;
- 	prev->bi_end_io = bio_cmd_bio_end_io;
- 	submit_bio(prev);
-@@ -904,7 +919,10 @@ int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		return blkdev_cmd_discard(cmd, bdev, start, len, bic->nowait);
- 	case BLOCK_URING_CMD_WRITE_ZEROES:
- 		return blkdev_cmd_write_zeroes(cmd, bdev, start, len,
--					       bic->nowait);
-+					       bic->nowait, false);
-+	case BLOCK_URING_CMD_WRITE_ZERO_PAGE:
-+		return blkdev_cmd_write_zeroes(cmd, bdev, start, len,
-+					       bic->nowait, true);
- 	}
- 	return -EINVAL;
- }
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 68b0fccebf92..f4337b87d846 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -210,6 +210,7 @@ struct fsxattr {
- 
- #define BLOCK_URING_CMD_DISCARD			_IO(0x12,137)
- #define BLOCK_URING_CMD_WRITE_ZEROES		_IO(0x12,138)
-+#define BLOCK_URING_CMD_WRITE_ZERO_PAGE		_IO(0x12,139)
- 
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
--- 
-2.45.2
-
+Sure, I have a larger patch set in the works doing pretty much that.
+I wanted the request's existing field to be accurate first because
+inaccurate values break merging. But I can post the rest of series if
+you prefer to see drivers rely on the existing field instead of
+recounting the segments.
