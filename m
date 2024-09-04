@@ -1,52 +1,52 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6C41DC754
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 15:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E421EC017
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 15:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725463583; cv=none; b=V+E2YRWQonVwC/5nUJCd95a4vqaxThfIHVlR4GIYh6tulpIP4En5KEriIVk0MfowYPnS9tLTQt9d8TytEd1on2vORo0LEJ2SWCa8b2UKC/IHWQ+ONc17pZD6h+FaG5bvf6C/rzUyVVBakICIKk13df3VcVgOabOBkEtevu+CEKY=
+	t=1725463605; cv=none; b=H8qk6rSD3bBYWZcSJDuRMPSsDri1WnAn7oAXuOV6HZHgAEfWBwVXulVQglIOPFtmmiiCzGl6BkqXuAg0fmkeUbfGIDHBYAsisYU0nRDjGzGXr17yVU5VN383hzEWmXIt6TQTkdabYtHRK8rcCeS3BZzg9N6eFQ4IkAMLLy5TZ3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725463583; c=relaxed/simple;
-	bh=9vS7WtpRyiE+BLkhEWwb5KsvA1A51Cz9iROIwAJDUsY=;
+	s=arc-20240116; t=1725463605; c=relaxed/simple;
+	bh=tbelIYErMOsag2MIJL4MBYUSOAYcOXInrX7qRvcyW5w=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lBBWU/hKrmae0p+khIbYbj8WthDFb7mhM07NOZTArJLctjEwDnY2yG1ptnb8Iv37weq+wYtrl0nG7Zlsth2iafheJoKdkfsihrxNRHaT2Bc8F+fo/41eKIpGxbWUYNyfILbcN2qvvLdGzaY7eumhVVvSaMomAvojvBYtIvmRj5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Hi8kP2nY; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=cyfQfTiRSQLuh291FpGWYNxrnO9LAYUgaav+oLtJjcCFV5T4CLl7YRdp7pTDLl8n+nuLaHQCKtEgBmxA4hrz/t+0lyF3uBdqAWZHoUR4ApEngX8t9AevQvo+FVnuduaaRlfjSeVdSfvIe1ngSJ8Txd+ydOavYSkWDzudCnlEwOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=WcZ8iVmH; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Hi8kP2nY"
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4845F7Wd022818
-	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:21 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="WcZ8iVmH"
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 484F7NrO018169
+	for <linux-block@vger.kernel.org>; Wed, 4 Sep 2024 08:26:43 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=rd7a/k5fb4q3A2ywz24VKgaB3Pwg9YzXlvjTsg1C6HY=; b=
-	Hi8kP2nYf0wRpYjozES0Sosfu/EGIo6kVR9uDPeUa5Xt+sWTKXii+m1+4myIO4TM
-	OZQDic7hNdeGNzd3dFBEsaCMq2hOmN4RG9bQtWju7JTHWhe1REUMMbtgP859sCam
-	WxjlCernoQTGslwKD2RwQqHkjlqS6zdT3oNhwQSf4VzYIEHafhmR7GoAzU2GRNQ5
-	T5NAUygpwUs82YEhJVOZfeQjRJI2Ap8cO+CBe55ZX04Gcd0KBAZiQnf5Or8ATkJp
-	eMYvriATFnxqP41EWtvYbyv2VlxdY6ymsOArUVSoqBbCxOe1A5OWiR6yCfNUiyJN
-	cOHoyyDnxm3Sdk4XqryLsA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41eh7v2vxw-10
+	s2048-2021-q4; bh=/PAGpf/UPAc9rFDLEQebGE5/D0j//o/WEEpf7l0XZ+M=; b=
+	WcZ8iVmHX9iXjyHoQrIn7V6wfWSmW8wfICQcMbWYb8nv2nMiEr/9JiGopqAio7r0
+	NRhQYm5SUQarsIiM8qcC11WrSAhxQ2WedjIs9uZGJcPYGyjdydQpRv4s3tEImtIX
+	Jky/3qOqyLss7LTdgh8mVM7Gg8m6r3T6uCirDD0pXJYb/Gb3gxdgbVgp2nAMpH6n
+	TH6Nw4TzIKJTScciuvC/Vm8nLDtrd+ci4DC6Jc1Hiiaw0S5BkxHa8Ep0Bd1ALgJC
+	rRpAEtojrzfOZ2ltWP6Y4qFbpbFNTcDvhL8231fRzKiI/eUtUDifE1zrplDQ8hEZ
+	8jvvnJBmZbBPW+rn5L4x+g==
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41eejbkfeg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 08:26:21 -0700 (PDT)
-Received: from twshared34253.17.frc2.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 08:26:42 -0700 (PDT)
+Received: from twshared4923.09.ash9.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Wed, 4 Sep 2024 15:26:12 +0000
+ 15.2.1544.11; Wed, 4 Sep 2024 15:26:11 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id A784612A036E3; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
+	id B7C9312A036E7; Wed,  4 Sep 2024 08:26:07 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <martin.petersen@oracle.com>,
         <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <linux-scsi@vger.kernel.org>, <sagi@grimberg.me>
 CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 01/10] blk-mq: set the nr_integrity_segments from bio
-Date: Wed, 4 Sep 2024 08:25:56 -0700
-Message-ID: <20240904152605.4055570-2-kbusch@meta.com>
+Subject: [PATCHv3 03/10] scsi: use request helper to get integrity segments
+Date: Wed, 4 Sep 2024 08:25:58 -0700
+Message-ID: <20240904152605.4055570-4-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240904152605.4055570-1-kbusch@meta.com>
 References: <20240904152605.4055570-1-kbusch@meta.com>
@@ -59,37 +59,37 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: wALK_SlgrX-UWvmDnxSW9DaHh2QzGGgm
-X-Proofpoint-GUID: wALK_SlgrX-UWvmDnxSW9DaHh2QzGGgm
+X-Proofpoint-ORIG-GUID: snj6xqTk2P1XCvomcD50yfyvjxMKd0pv
+X-Proofpoint-GUID: snj6xqTk2P1XCvomcD50yfyvjxMKd0pv
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-04_13,2024-09-04_01,2024-09-02_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-This value is used for potential merging later.
+The request tracks the integrity segments already, so no need to recount
+the segements again.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/blk-mq.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/scsi/scsi_lib.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 36abbaefe3874..3ed5181c75610 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2546,6 +2546,10 @@ static void blk_mq_bio_to_request(struct request *=
-rq, struct bio *bio,
- 	rq->__sector =3D bio->bi_iter.bi_sector;
- 	rq->write_hint =3D bio->bi_write_hint;
- 	blk_rq_bio_prep(rq, bio, nr_segs);
-+#if defined(CONFIG_BLK_DEV_INTEGRITY)
-+	if (bio->bi_opf & REQ_INTEGRITY)
-+		rq->nr_integrity_segments =3D blk_rq_count_integrity_sg(rq->q, bio);
-+#endif
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 3958a6d14bf45..dc1a1644cbc0c 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1175,8 +1175,7 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *=
+cmd)
+ 			goto out_free_sgtables;
+ 		}
 =20
- 	/* This can't fail, since GFP_NOIO includes __GFP_DIRECT_RECLAIM. */
- 	err =3D blk_crypto_rq_bio_prep(rq, bio, GFP_NOIO);
+-		ivecs =3D blk_rq_count_integrity_sg(rq->q, rq->bio);
+-
++		ivecs =3D blk_rq_integrity_segments(rq);
+ 		if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
+ 				prot_sdb->table.sgl,
+ 				SCSI_INLINE_PROT_SG_CNT)) {
 --=20
 2.43.5
 
