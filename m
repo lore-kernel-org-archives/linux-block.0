@@ -1,102 +1,80 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FDC170A11
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 08:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D882F18660E
+	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 11:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725436914; cv=none; b=OiAWJXk9U2e/Vq0kQkTbrGXtz+t17c0EBfonIppoZosk/rvJ112NsL2nlVP0goK9/xoDCNxD5sBiaQSQGzRkmeaZ/BLmjFddtCCm8KxbRfY+yIkiUpRuCqgRvCuVcYboO86oyrXTFaCSrCr4N7ghQxIP3rAdgE8YpInqZyBs6vw=
+	t=1725449038; cv=none; b=ingWcjF6EWe6uRXyIfr37APng44ty2MPMgBf2ZpxJ+dulltAXKRzjPDWGbndRZ/NrDSnLdAnq8UAgk+SEKCBIfR6tNhCbK06qzFsgB+dCsjdSTzVO6miba/ADHPumSjaxWf0dTrZBixRa+CkTNx3o0rmDRl/qMuDbNMfcgLBJZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725436914; c=relaxed/simple;
-	bh=uqOMba/The6pJSKp+CbA/Iwap7Vm6sY76UDDUe8L3Mo=;
+	s=arc-20240116; t=1725449038; c=relaxed/simple;
+	bh=OVjpEg0vvOiohK1e4x/AtP0hb9SZEpZIKsoyCVyGPhI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PiDcbB2h7JFB/6WJko+XjmOo4zEi6OleBYT4gOcIg2Mdk7evpfPnjktNqe4M4yTL321ZJ3Jn2llR/N/h8HqTrpZAu4CJsDdhULsxIC5uiBXaP1uvx8f6HMxj8LK5VNu/e2fjxK/XqJmiNNELpsEY7IYhF03d+FhYjzHL/HvK5pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cxiFJTqV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=DHgDgrK/NR7A5ucikII5hf80hmmgf/1AuQLHFIhE57Gx/1It90lr+R859F92ZBQ5w3vck7NlmgzjVZzeraypOYdXBPmrZi+W5Gd6OEe+vG7YavAz/RDVDdwYKmJcoZxPh7/yQ+w7a48FgdTlE16fWe1vHgYFBOTn89ja5OMHLrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z5i8XSjK; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cxiFJTqV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725436911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b1hrffS5UHJg7kzezTrDoIdBib7K1M8RXAnPgDpUGMI=;
-	b=cxiFJTqV0d62ckD2WmIzTgjOzbJfTjuGXpvZjhdS6jlcsjPjPWa3Gxky6SpUo6X9WInDZV
-	VRI0Pa3NPDB4fpI6w9Ez+FaurIIAaLBoRXDQnJMX5Ppyp12c5dWxz4BGgph9WYNmTWytQo
-	Ii8C8qRzQU6ew5h5qnPOyyMWtdyViD8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-362-Omr3cNLRMdagnJLOcCK1Dw-1; Wed,
- 04 Sep 2024 04:01:48 -0400
-X-MC-Unique: Omr3cNLRMdagnJLOcCK1Dw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DD8F01956089;
-	Wed,  4 Sep 2024 08:01:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.141])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A2A283000239;
-	Wed,  4 Sep 2024 08:01:42 +0000 (UTC)
-Date: Wed, 4 Sep 2024 16:01:36 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: ZhangHui <zhanghui31@xiaomi.com>
-Cc: axboe@kernel.dk, bvanassche@acm.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH v3] block: move non sync requests complete flow to softirq
-Message-ID: <ZtgT4HhEsyRJMoQH@fedora>
-References: <20240903115437.42307-1-zhanghui31@xiaomi.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z5i8XSjK"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-427fc97a88cso5874965e9.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 04:23:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725449035; x=1726053835; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OVjpEg0vvOiohK1e4x/AtP0hb9SZEpZIKsoyCVyGPhI=;
+        b=Z5i8XSjK5Iq3LHHPvwULmKoz5c/97VMF3f4u7hdu4cqu+5vkaOPWUoFrCEDifOBroH
+         v8H1NRRxHXj5nG1xsahOpKNNgC8O36raGrVUj0VkEzrTwjc5zYx6J5xo3ufvvtiffOw7
+         +icX26rhcCIRdpf5HpFhyzPcGIxvb39pNRwD2iMThMYisFo3M82VuRiF/4VDy0ElK1ZB
+         tx5EYgYX4bdhMahdwkKtprkB30fsr+Zjn8qdT3UcrvJSa8AKKfA+c2wkoYx3o2yGU53o
+         IuluhDK6ohgbX18tfaRKhSHWKj2J65Mszb+0mbhelxaHn2qBl8zArp/Td9VEtJU/aNCh
+         kc2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725449035; x=1726053835;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OVjpEg0vvOiohK1e4x/AtP0hb9SZEpZIKsoyCVyGPhI=;
+        b=s3kbtZidN4PWS2j08JsVCV19DP+uUZzmFXpbuoo2RbM1cf5McehMy7ct0wof9dAnHC
+         fJn7uRmuw7lRlB53ikrNBXtHmtFTcN0yYb0MwFPouaozX6vjOXvnbvAwM8kesBwBSgU3
+         MlLsvNtJDJzMYTO+E+fdBleR2yfQS6VdsrnTrlF7ad8cRpMIX9svy7hhDMeFqS7+bEoi
+         6ue9YNQuJh63ydmhkj9K/X1bbbnmsmp3w2qr2+jmR5egskQ0ftPR3+RHT3W1vLl4/B2D
+         gOFJnbLzzk2GW7XU6B5i7uXZoVMw/jpExrvGBWCyqxoyQ+95+1lSZp91uHA4MssE3rDh
+         Fr+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXQasBoT6JcDYQeWixLmKZh9jlcQg70HYvrGkxFEgvCdeyoT5uuXZE8sdIcC0ktr+1EYbBnC+HniOJEMw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+IuZoMuegwNunVRIhpsDMuX337gKiS15insKH28dtM7QSjxtM
+	MlJ88RQuItz8S23EatnMPn1oIrHWqIfZS3IaiVqhmyFoKyiGn+g=
+X-Google-Smtp-Source: AGHT+IHL9SrZmv+xtX5qZOpK4gl6E1/PjO80Mnj9EOcKO7BU8z9tUuiRewHl8axe7ZL1y/7s2pRdvA==
+X-Received: by 2002:adf:e3c9:0:b0:374:b71f:72c9 with SMTP id ffacd0b85a97d-3776f452fd1mr1504037f8f.16.1725449034860;
+        Wed, 04 Sep 2024 04:23:54 -0700 (PDT)
+Received: from p183 ([46.53.253.228])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bba57bb20sm178590285e9.4.2024.09.04.04.23.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2024 04:23:54 -0700 (PDT)
+Date: Wed, 4 Sep 2024 14:23:52 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix integer overflow in BLKSECDISCARD
+Message-ID: <af9fff6d-3efc-485f-841c-25eee750ec8e@p183>
+References: <9e64057f-650a-46d1-b9f7-34af391536ef@p183>
+ <Ztfij7dEOBotfOtt@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240903115437.42307-1-zhanghui31@xiaomi.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <Ztfij7dEOBotfOtt@infradead.org>
 
-On Tue, Sep 03, 2024 at 07:54:37PM +0800, ZhangHui wrote:
-> From: zhanghui <zhanghui31@xiaomi.com>
-> 
-> Currently, for a controller that supports multiple queues, like UFS4.0,
-> the mq_ops->complete is executed in the interrupt top-half. Therefore, 
-> the file system's end io is executed during the request completion process,
-> such as f2fs_write_end_io on smartphone.
-> 
-> However, we found that the execution time of the file system end io
-> is strongly related to the size of the bio and the processing speed
-> of the CPU. Because the file system's end io will traverse every page
-> in bio, this is a very time-consuming operation.
-> 
-> We measured that the 80M bio write operation on the little CPU will
+On Tue, Sep 03, 2024 at 09:31:11PM -0700, Christoph Hellwig wrote:
+> Do you actually have a test setup for BLKSECDISCARD?
 
-What is 80M bio?
+No, of course not. It was "delete every -EOPNOTSUPP" until bug
+reproduces.
 
-It is one known issue that soft lockup may be triggered in case of N:M
-blk-mq mapping, but not sure if that is the case.
-
-What is nr_hw_queues(blk_mq) and nr_cpus in your system?
-
-> cause the execution time of the top-half to be greater than 100ms.
-> The CPU tick on a smartphone is only 4ms, which will undoubtedly affect
-> scheduling efficiency.
-
-schedule is off too in softirq(bottom-half).
-
-> 
-> Let's fixed this issue by moved non sync request completion flow to
-> softirq, and keep the sync request completion in the top-half.
-
-If you do care interrupt-off or schedule-off latency, you may have to move
-the IO handling into thread context in the driver.
-
-BTW, threaded irq can't help you too.
-
-
-Thanks, 
-Ming
-
+> Given that
+> I've been ubable to get anyone to actually help with teting it
+> we might be better off just removing it..
