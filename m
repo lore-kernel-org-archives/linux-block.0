@@ -1,58 +1,59 @@
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DE91D47D1
-	for <linux-block@vger.kernel.org>; Wed,  4 Sep 2024 14:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541C11DA317;
+	Wed,  4 Sep 2024 14:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725458735; cv=none; b=t3mW8DXiqqJ9Uj8VtAs387xGW3j/UtKQ2enCV+wPQhcUgXrHRJcTriGO5CfuVcQKAxsFCbQ/iST7y00kgvxGqYZifIi/+8QQfFV8dUY6I1uO3IPZxgTTm7hJ54nGQzojBo4t6D0axHn0ASkHD2YCDIsgqyhrSZ2wfHeS+X4W+6o=
+	t=1725458899; cv=none; b=cJbfBahlUX0hyhBZQmvJ7UhLwu2IFeOduTylOLKfrEhfUjpd8oJjJtq+qb3lgWv5G8ZrXwREZd3hyEss8ynXk+71A1lEUOyxNxOWn/vtMZ4JotX/YaoiVqSx6xBOlv9HAfGLyhM+ZYGu9mPccLUyXbDwCqPFIKxFVyCEfF+zhoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725458735; c=relaxed/simple;
-	bh=A0kTi4k4bUyrtrFXRsgvXgLx2hhA8lbn3TJegRj9D8U=;
+	s=arc-20240116; t=1725458899; c=relaxed/simple;
+	bh=TuFfSFXB3mOeMRu83p18mWmGeEZpEzUTyyyUn2eZFso=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RcH4hOpBoMMiKet3nZy1I70yY2WDJC+/yWCkcecG1AtRMPZXmE70KtFDYcMVbdgJkLN9V0vHfpceIbAlLCyioOnUzCP4huTPTYbsOo5cp9CLHctO6QtQh4Z/1zSiDpejkng3rRnQ+jmczCpEpQqmIZfCdXlkcMGtFkY3U4g6n1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ayZH4Jx7; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=aPNvZ6ETNLfpmmSVGSs4GHxPmgZhQiszOAiNo7pvGcdCjQyT8Ky1fU0Yk37/eC9D51OuZwi0AJUF3u2EBDfg7TKhomuMqGLy1YYKWHUA/Os3BFn5WNc/CUddcxKvLN5spr1jfX5nPGyuTiHbNsr9Sx/EBa/6KHIq7gpmIr5OFyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdps6SmO; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ayZH4Jx7"
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-39f49600297so16854845ab.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 07:05:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdps6SmO"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a86859e2fc0so753284166b.3;
+        Wed, 04 Sep 2024 07:08:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725458730; x=1726063530; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725458895; x=1726063695; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=B0r8nJJDH09LCl698U9W4TMqb46etw7giO9fbZgwWYE=;
-        b=ayZH4Jx7yrEfFC+/9ZQ3F9d3MJWAE1aLHs93bKvpn+b4KJVqh0ddSY1ZdEwOrtyeeG
-         Q+7kj3QaHqFduPfLeSRkJ2UK6ZX7wM6B5dqwugK/5qVH9Vmraye07b+yYNWsvyIoKUn4
-         2jb7Ct3OuCP60AKl8XifFg645hdN5onltgxaA5PjdKaD8mlAR8hbcLr+NACB6w2GePjg
-         h2qDwgq129MfPQSQGMMVWrPbXihkTu4dusa0T9yLLEZ2sKh3uKFJBfw5QyKXQPSuBawc
-         KjsoMIZnHEBClp2BXaZ91CmZyhsKVZAyYJ2ytHJDPybLI8kgcaZWWLSZlNn666R8yrpc
-         b+OA==
+        bh=9Vzg9NTfvw0pq61GqdD+2MdU5ejBvO4DrvV5LujxZ60=;
+        b=bdps6SmOzHGF4jMo47b7xIB6lI4ZzFdR8XlvO9jEFW2lSgXhnNRqMQGINpiGnAfsCl
+         lPYBWv5HukJT5YAhB3gETb5IHGm4bSVN45Z+QvaYsML6S73N1SMQdvS2bQnIHPOzg1y7
+         BlOU52JgFz/ms9kKtyjUxYRYLssw4qHW3nAVangZuZzojl1jky2xNZeEYtuY9gsZeV3c
+         bshLFTA/MCbcHBMPwo1IMsORDhp4eya2+iCYEE4WouMGKqSUO/Uxaf33OQcpVJlRo5Qf
+         iQ1WxJ/HKHJteeBAiE5BmQPgdlyYcnIB4sW4PVSoXv4W9c0trmpUk5MtYEtvHT0IIfv/
+         sh/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725458730; x=1726063530;
+        d=1e100.net; s=20230601; t=1725458895; x=1726063695;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0r8nJJDH09LCl698U9W4TMqb46etw7giO9fbZgwWYE=;
-        b=r4weH/90sjWpeCrMvrSRXMG+ZV6vNh7ziFlSPiuBGaD0CyJOf4oAujMnS5dLguIniX
-         H1aZyPez4ORmIYJIHpbcneCkX9bAbVV4LxqQgxIJQKAD6i7lQvlvIH7yvCU8lYKwJzZg
-         93vFxU7z/W34RbyqqRLSjnEpENovpAIVrRTNyrovDk3tlZEnkhlv3N24A9AA9Uwud7Wg
-         tPqvPzC4hiP1thT7rFdNQt6VfJMByCjl1a1b1iyqVhyRFEmQai/u1a8lWqdAAaAwILpA
-         5xmW/JGXj6BZO+4ANEGAESY1+wjw807Ya2hVX5rHFC+8NXDocwG1hHFbLWvKRIQrxiHR
-         GuWg==
-X-Gm-Message-State: AOJu0YyJfznluBYznd0I1Lyzch7vFWDZggtO9qWNwVXicKhTxLChuecg
-	mkpgmns4LM79bjyG0c81xr2V/aLNfBMq9OfWSoLTDGqsWSurLpjbZOZ6WdyOPlU=
-X-Google-Smtp-Source: AGHT+IG32oDStmB81VpxQ3wF+YzRTmz/4eOfUw1tbarF0Noog+ICx63m7hLHvtUzIXL5PYjYtS7QuA==
-X-Received: by 2002:a92:c24d:0:b0:3a0:4447:c941 with SMTP id e9e14a558f8ab-3a04447d23bmr9074915ab.21.1725458730158;
-        Wed, 04 Sep 2024 07:05:30 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a04331fceesm1521955ab.60.2024.09.04.07.05.29
+        bh=9Vzg9NTfvw0pq61GqdD+2MdU5ejBvO4DrvV5LujxZ60=;
+        b=L76efUXAPxzcTyGamDzSw0+OPO4rBOwYb7R1/4R3epFGbYD2TPS2D2AqSLJ1iUgHWi
+         jTQuB734bylRDbFyiCvHTPzb1OGLAQilY5WIKTqhfAIsHX70+YQZFncTvxR7+sMditKK
+         kT43r8igDyVY4F7Za03KzCygJeS8aSRZJPEYyRA2liEUvmATJryGHXHUj/DHgw6ius76
+         +4KM0Y6RwBF8fnZ/Pp6m8G+TZ5+ZIt25nqWw/lfRXT48teuzC2WwM1KXvdvRcDWCJoSX
+         kmXGguJGAZ2w3+WQb5qmBojpAXjTotsgMt3HgTvQbapmeyMJ5bjThyJtRc7Qgr2RNGJX
+         Dhkg==
+X-Forwarded-Encrypted: i=1; AJvYcCW6zBNa8zLoYGb2sLW+t16Aq1HS+HAAhplCfnWHO8l58sFmSUiag9ODAydnCe2tGW979WZZl+++zC+KRQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF+Ij8We2J0xU0Sklw+n0a45U/uNQTM8BYI1ZDsTOEBbEoFhqj
+	S16eJdlmCv0tgYIHi95I5tsMqnWhlDLOb6FjjjW36jHDMR/oc5bn
+X-Google-Smtp-Source: AGHT+IFHkxzA8+V6mMLDPA0dFW/6czPw92cnzbP7aNN0xEnuG0VygH5QgI54NmEhOeZFBBZ5S5U4Ng==
+X-Received: by 2002:a17:907:2da5:b0:a86:9cff:6798 with SMTP id a640c23a62f3a-a8a32ed4b43mr369763366b.30.1725458894425;
+        Wed, 04 Sep 2024 07:08:14 -0700 (PDT)
+Received: from [192.168.42.8] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988feb61fsm828174566b.10.2024.09.04.07.08.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Sep 2024 07:05:29 -0700 (PDT)
-Message-ID: <dea642a2-85f8-445b-ab84-a07d41acf2e2@kernel.dk>
-Date: Wed, 4 Sep 2024 08:05:28 -0600
+        Wed, 04 Sep 2024 07:08:13 -0700 (PDT)
+Message-ID: <574578e0-ed5c-488e-b4f7-71da59651fc9@gmail.com>
+Date: Wed, 4 Sep 2024 15:08:41 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,67 +61,105 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: move the BFQ io scheduler to orphan state
-To: Ulf Hansson <ulf.hansson@linaro.org>,
- Paolo Valente <paolo.valente@unimore.it>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <6fe53222-876c-4deb-b4e1-453eb689a9f3@kernel.dk>
- <CAPDyKFoo1m5VXd529cGbAHY24w8hXpA6C9zYh-WU2m2RYXjyYw@mail.gmail.com>
- <d8d1758d-b653-41e3-9d98-d3e6619a85e9@kernel.dk>
- <CAPDyKFp4aPXF6xuuQf6EhGgndv_=91wsT33DgCDZzG6tyqG9ow@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] block: implement async discard as io_uring cmd
+To: Christoph Hellwig <hch@infradead.org>
+Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, dchinner@redhat.com
+References: <cover.1724297388.git.asml.silence@gmail.com>
+ <e39a9aabe503bbd7f2b7454327d3e6a6620deccf.1724297388.git.asml.silence@gmail.com>
+ <Zsbe1mIYMd9uf8cq@infradead.org>
+ <c39469f3-2b9c-493b-9cd6-94ae9a4994b8@gmail.com>
+ <Zsh5kZrcL-D7sjyB@infradead.org>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAPDyKFp4aPXF6xuuQf6EhGgndv_=91wsT33DgCDZzG6tyqG9ow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <Zsh5kZrcL-D7sjyB@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 9/4/24 7:59 AM, Ulf Hansson wrote:
-> + Paolo
-> 
-> On Wed, 4 Sept 2024 at 15:47, Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 9/4/24 7:27 AM, Ulf Hansson wrote:
->>> On Tue, 3 Sept 2024 at 17:54, Jens Axboe <axboe@kernel.dk> wrote:
->>>>
->>>> Nobody is maintaining this code, and it just falls under the umbrella
->>>> of block layer code. But at least mark it as such, in case anyone wants
->>>> to care more deeply about it and assume the responsibility of doing so.
->>>>
->>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+On 8/23/24 12:59, Christoph Hellwig wrote:
+> On Thu, Aug 22, 2024 at 02:07:16PM +0100, Pavel Begunkov wrote:
+>>>> Note, unlike ioctl(BLKDISCARD) with stronger guarantees against races,
+>>>> we only do a best effort attempt to invalidate page cache, and it can
+>>>> race with any writes and reads and leave page cache stale. It's the
+>>>> same kind of races we allow to direct writes.
 >>>
->>> I haven't spoken to Paolo recently (just dropped him an email), but I
->>> was under the impression that he intended to keep an eye on the BFQ
->>> scheduler.
+>>> Can you please write up a man page for this that clear documents the
+>>> expecvted semantics?
 >>
->> But he hasn't, it's been a long time since he was involved. I've been
->> applying patches on an as-needed basis, but effectively nobody has
->> been maintaining it for probably 2 years at this point.
+>> Do we have it documented anywhere how O_DIRECT writes interact
+>> with page cache, so I can refer to it?
 > 
-> I don't think we should expect him to do active development, but
-> rather just to keep an eye on it from maintenance point of view.
-
-I never expect active development, there may not be a need for it. But
-basic maintenance is definitely the maintainers role. As that hasn't
-been happening for quite a while, I'd consider it orphaned.
-
->>> BTW, why didn't you cc him?
+> I can't find a good writeup.  Adding Dave as he tends to do long
+> emails on topic like this so he might have one hiding somewhere.
+> 
+>>> GFP_KERNEL can often will block.  You'll probably want a GFP_NOWAIT
+>>> allocation here for the nowait case.
 >>
->> That was an oversight, I think because I haven't seen anything from
->> him in a long time to assumed he was awol.
+>> I can change it for clarity, but I don't think it's much of a concern
+>> since the read/write path and pretty sure a bunch of other places never
+>> cared about it. It does the main thing, propagating it down e.g. for
+>> tag allocation.
 > 
-> I looked at the last year or so at the linux-block mailing-list and it
-> seems most patches for bfq aren't being sent to his email. :-(
-> 
-> Ohh well, let's see what we can do about this. Surely BFQ is being
-> used out there, so it would really be a pity if nobody takes good care
-> of it.
+> True, we're only doing the nowait allocation for larger data
+> structures.  Which is a bit odd indeed.
 
-Probably not a whole lot I think, at least on the prod side experiences
-with BFQ haven't been good. So there's definitely fixes to do, and I was
-happy to see fixes being sent in recently to address some concerns.
-Someone with actual customers using it and finding issues, or someone
-actually using it.
+That's widespread, last time I looked into it no amount of patching
+saved io_uring and tasks being killed by the oom reaper under memory
+pressure.
+
+>> I'd rather avoid calling bio_discard_limit() an extra time, it does
+>> too much stuff inside, when the expected case is a single bio and
+>> for multi-bio that overhead would really matter.
+> 
+> Compared to a memory allocation it's not really doing all the much.
+> In the long run we really should move splitting discard bios down
+> the stack like we do for normal I/O anyway.
+> 
+>> Maybe I should uniline blk_alloc_discard_bio() and dedup it with
+> 
+> uniline?  I read that as unіnline, but as it's not inline I don't
+> understand what you mean either.
+
+"Hand code" if you wish, but you can just ignore it
+
+
+>>>> +#define BLOCK_URING_CMD_DISCARD			0
+>>>
+>>> Is fs.h the reight place for this?
+>>
+>> Arguable, but I can move it to io_uring, makes things simpler
+>> for me.
+> 
+> I would have expected a uapi/linux/blkdev.h for it (and I'm kinda
+> surprised we don't have that yet).
+
+I think that would be overkill, we don't need it for just these
+commands, and it's only adds pain with probing the header with
+autotools or so. If there is a future vision for it I'd say we
+can drop a patch on top.
+
+>>> Curious:  how to we deal with conflicting uring cmds on different
+>>> device and how do we probe for them?  The NVMe uring_cmds
+>>> use the ioctl-style _IO* encoding which at least helps a bit with
+>>> that and which seem like a good idea.  Maybe someone needs to write
+>>> up a few lose rules on uring commands?
+>>
+>> My concern is that we're sacrificing compiler optimisations
+>> (well, jump tables are disabled IIRC) for something that doesn't even
+>> guarantee uniqueness. I'd like to see some degree of reflection,
+>> like user querying a file class in terms of what operations it
+>> supports, but that's beyond the scope of the series.
+> 
+> We can't guaranteed uniqueness, but between the class, the direction,
+> and the argument size we get a pretty good one.  There is a reason
+> pretty much all ioctls added in the last 25 years are using this scheme.
+
+which is likely because some people insisted on it and not because
+the scheme is so great that everyone became acolytes. Not to mention
+only 256 possible "types" and the endless mess of sharing them and
+trying to find a range to use. I'll convert to have less headache,
+but either way we're just propagating the problem into the future.
 
 -- 
-Jens Axboe
-
+Pavel Begunkov
