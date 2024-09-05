@@ -1,182 +1,105 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3804F155392
-	for <linux-block@vger.kernel.org>; Thu,  5 Sep 2024 06:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+Received: from outboundhk.mxmail.xiaomi.com (outboundhk.mxmail.xiaomi.com [207.226.244.122])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B426E158D9C;
+	Thu,  5 Sep 2024 07:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.226.244.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725516753; cv=none; b=r/uTyiNHsh2skYdvqFU3N3Qekhm18uC4QJ/xUCFjPzTfJae3KWquITj5EG8cwrY1UYvqPWqUZPmLwB3w+ExAL/kDNgRTBzd2WZu1JXeA/5wJl6PmnyxxcJg0kJkAbulk9OdYcVvRwzNYdXa69u0IEYdVqVkQ+110PTA5KblW0FY=
+	t=1725521617; cv=none; b=NuDBwuVxWZzft3PXs6I2hVBUGk3MspPYSQLLcruP5Lp40Gb6eRtXnVTEplcTh3aMsOaQjJ5W6/Ji/55SI6D0HQBVB6TauW3I8laLxYjFYwTAD0dSE371RO7IKfKODfd9Fw2QPyAqpw/afhAdIc+TQVpVerfoglg91RZ/1w6yP7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725516753; c=relaxed/simple;
-	bh=2q/az6HaCPchXtkkz92LD2DZLCM0KCj/UmgVvpuf8jk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TRRWRLOhpoCJ7GlGF0xPVC+HxS/JPzpNjwGKX6TOAqEuzoYZojDiJIDNjwYIusBwvXCR97jlZ/6078w1TXR+gR2pDQ3HyeSXnN4/JiBhdXgL4K70Bnnu0SEVla5rvlYsOo0pCxZW7Eqou47NRQLWzbPYJ7dLS3tsEYTdsx7GzxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q9Y9YTY4; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q9Y9YTY4"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6d9e31e66eeso9787237b3.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 23:12:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725516751; x=1726121551; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8FxsTOqdqzOkyw6TDf9xiFqZbYhyqbcaHGo9ObkAUmg=;
-        b=Q9Y9YTY4KCQH6/W4Qgpfv2zqvb8i+7OPL+fkJ8X2wZbXNZVCZy46Abjce+L2EC+FBF
-         BJ4R6gNlVTXN+FFqNXpJvkG0M9K/ekQeKPUzn9qsOgBv84Hxyrngcj5Lc+O952Iqtm3O
-         HN0zkJoet8VSP2/fQUUMHeknI8yn/0o8KvyDof23chiE/9GDA3o9Jad2niQg07FPCInq
-         xH5kZ1g9pRSPsEzcGDLSmJOkEzGi2EIO/Kpp8Hi+8hTAOK0e0FMIkHCEPf9Lkt+rI3q4
-         09fdyxMFoMuwhfWgYnMKSNWHwV1LblvRk6RVE9SWrR6J8pNI6qkSPi3KKzYQN3F1wDbF
-         c40Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725516751; x=1726121551;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8FxsTOqdqzOkyw6TDf9xiFqZbYhyqbcaHGo9ObkAUmg=;
-        b=ZzVrPiR5ih0cKTr3++0sma458Mhvkp7Fr5vCuVOsrp/LTw0Dxh5mtD6odtdW6OwB8A
-         evSLm2a6zNzGTZVdwGz1pMz2fQTrkN4EXYoiIG5hIjZbDa1s2IfbPcuvnSW1mQ8ja0z7
-         38EJ5Lrqr7yqy+zV35EMVTtVCqv/fMo+bkHI5mGKEKn2ucGGs0ABJr1+eWlK9qa9amVx
-         VTZMiYLFOS/nBpQ7AiZnN8uS8X2+YOGbTIUwMNehnJjaSK6kx0ro/k6jJonG//AocvPM
-         n57oZneeWYTmysipusd05nK8BY/nuBdWFBdywAhsV7xsfzkuYX/p/pCLTs/Q7FdTuTzE
-         s5eA==
-X-Forwarded-Encrypted: i=1; AJvYcCUd9Qgsak8Tx9PYVGysaT9aLZcbxV22JvyFC3HllrXKbGCXi8E56HWUaOJJfihnewn4Xn9nxB3jcakW3w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAXFGSN3tSJZMsEiBOygHJPMxrXksEFYHDGMsPLzQ3hDZ46+ez
-	OqxW8Io6qXfr2C6wx0BEH/FL9wInIkm9mLdR+k8tlGRApV0lZkcQlxthOac1H/OAlsT03VqftyC
-	f1+JgwlcwWw==
-X-Google-Smtp-Source: AGHT+IFb1uyLverYDvkTYTYyFuU6LY97S1fxJcQ5+perARjw81iOZxVvfKHhENGCOXBybmboZGZK6CqTqt35rg==
-X-Received: from slicestar.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:20a1])
- (user=davidgow job=sendgmr) by 2002:a25:ae56:0:b0:e05:6532:166 with SMTP id
- 3f1490d57ef6-e1a79faf683mr114011276.1.1725516751120; Wed, 04 Sep 2024
- 23:12:31 -0700 (PDT)
-Date: Thu,  5 Sep 2024 14:12:14 +0800
+	s=arc-20240116; t=1725521617; c=relaxed/simple;
+	bh=97jQbhASEYG0hRESEWRHpQrm7iMLYDbkF9AgdD7u4ds=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=c/SxzVwv5rQUu3WlXbUoiVl6rnYuINkiYgsd3Cn/xB++wgitF9xOUXWBUmPgKM+gh23+beMOPXE5pauCrTkqjSJaMFDgE2uEaM+pVU7bK5DWU1AxCZUw0rM/UHdABC+Qys2HcualCbuZkZQNHW8uFGk2xHXwqed6l5wl2H8hlWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com; spf=pass smtp.mailfrom=xiaomi.com; arc=none smtp.client-ip=207.226.244.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xiaomi.com
+X-CSE-ConnectionGUID: HFlxwGecRk6pP0k3uVyLyw==
+X-CSE-MsgGUID: ZT7nvTLrQvmXQ1+mUCnY3A==
+X-IronPort-AV: E=Sophos;i="6.10,204,1719849600"; 
+   d="scan'208";a="121203028"
+From: =?utf-8?B?56ug6L6J?= <zhanghui31@xiaomi.com>
+To: Ming Lei <ming.lei@redhat.com>
+CC: "axboe@kernel.dk" <axboe@kernel.dk>, "bvanassche@acm.org"
+	<bvanassche@acm.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, =?utf-8?B?5pa557+U?= <fangxiang@xiaomi.com>,
+	=?utf-8?B?546L6L6J?= <wanghui33@xiaomi.com>
+Subject: Re: [External Mail]Re: [PATCH v3] block: move non sync requests
+ complete flow to softirq
+Thread-Topic: [External Mail]Re: [PATCH v3] block: move non sync requests
+ complete flow to softirq
+Thread-Index: AQHa/fgOh/cV01vbcESyzBPikRppQrJGv0cAgAE6VwCAABGBgIAAPqMA
+Date: Thu, 5 Sep 2024 07:33:29 +0000
+Message-ID: <a257ff06-ed02-46a2-81fc-caa351a379fd@xiaomi.com>
+References: <20240903115437.42307-1-zhanghui31@xiaomi.com>
+ <ZtgT4HhEsyRJMoQH@fedora> <1641f51b-34f1-47c9-bd69-e56b036fc0f4@xiaomi.com>
+ <ZtkqPxgC3tsRdDcz@fedora>
+In-Reply-To: <ZtkqPxgC3tsRdDcz@fedora>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A990E78F5636E643885B37D21C4E81D9@xiaomi.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240905061214.3954271-1-davidgow@google.com>
-Subject: [RFC PATCH] rust: block: Use 32-bit atomics
-From: David Gow <davidgow@google.com>
-To: Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: David Gow <davidgow@google.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-Not all architectures have core::sync::atomic::AtomicU64 available. In
-particular, 32-bit x86 doesn't support it. AtomicU32 is available
-everywhere, so use that instead.
-
-Hopefully we can add AtomicU64 to Rust-for-Linux more broadly, so this
-won't be an issue, but it's not supported in core from upstream Rust:
-https://doc.rust-lang.org/std/sync/atomic/#portability
-
-This can be tested on 32-bit x86 UML via:
-./tools/testing/kunit/kunit.py run --make_options LLVM=1 --kconfig_add CONFIG_RUST=y --kconfig_add CONFIG_64BIT=n --kconfig_add CONFIG_FORTIFY_SOURCE=n
-
-Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
-Signed-off-by: David Gow <davidgow@google.com>
----
-
-Hi all,
-
-I encountered this build error with Rust/UML since the kernel::block::mq
-stuff landed. I'm not 100% sure just swapping AtomicU64 with AtomicU32
-is correct -- please correct me if not -- but this does at least get the
-Rust/UML/x86-32 builds here compiling and running again.
-
-(And gives me more encouragement to go to the Rust atomics talk at
-Plumbers.)
-
-Cheers,
--- David
-
----
- rust/kernel/block/mq/operations.rs |  4 ++--
- rust/kernel/block/mq/request.rs    | 12 ++++++------
- 2 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 9ba7fdfeb4b2..c31c36af6bc4 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -11,7 +11,7 @@
-     error::{from_result, Result},
-     types::ARef,
- };
--use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic::Ordering};
-+use core::{marker::PhantomData, sync::atomic::AtomicU32, sync::atomic::Ordering};
- 
- /// Implement this trait to interface blk-mq as block devices.
- ///
-@@ -186,7 +186,7 @@ impl<T: Operations> OperationsVTable<T> {
- 
-             // SAFETY: The refcount field is allocated but not initialized, so
-             // it is valid for writes.
--            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(AtomicU64::new(0)) };
-+            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(AtomicU32::new(0)) };
- 
-             Ok(0)
-         })
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index a0e22827f3f4..418256dcd45b 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -13,7 +13,7 @@
- use core::{
-     marker::PhantomData,
-     ptr::{addr_of_mut, NonNull},
--    sync::atomic::{AtomicU64, Ordering},
-+    sync::atomic::{AtomicU32, Ordering},
- };
- 
- /// A wrapper around a blk-mq `struct request`. This represents an IO request.
-@@ -159,13 +159,13 @@ pub(crate) struct RequestDataWrapper {
-     /// - 0: The request is owned by C block layer.
-     /// - 1: The request is owned by Rust abstractions but there are no ARef references to it.
-     /// - 2+: There are `ARef` references to the request.
--    refcount: AtomicU64,
-+    refcount: AtomicU32,
- }
- 
- impl RequestDataWrapper {
-     /// Return a reference to the refcount of the request that is embedding
-     /// `self`.
--    pub(crate) fn refcount(&self) -> &AtomicU64 {
-+    pub(crate) fn refcount(&self) -> &AtomicU32 {
-         &self.refcount
-     }
- 
-@@ -175,7 +175,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
-     /// # Safety
-     ///
-     /// - `this` must point to a live allocation of at least the size of `Self`.
--    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
-+    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU32 {
-         // SAFETY: Because of the safety requirements of this function, the
-         // field projection is safe.
-         unsafe { addr_of_mut!((*this).refcount) }
-@@ -193,7 +193,7 @@ unsafe impl<T: Operations> Sync for Request<T> {}
- 
- /// Store the result of `op(target.load())` in target, returning new value of
- /// target.
--fn atomic_relaxed_op_return(target: &AtomicU64, op: impl Fn(u64) -> u64) -> u64 {
-+fn atomic_relaxed_op_return(target: &AtomicU32, op: impl Fn(u32) -> u32) -> u32 {
-     let old = target.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| Some(op(x)));
- 
-     // SAFETY: Because the operation passed to `fetch_update` above always
-@@ -205,7 +205,7 @@ fn atomic_relaxed_op_return(target: &AtomicU64, op: impl Fn(u64) -> u64) -> u64
- 
- /// Store the result of `op(target.load)` in `target` if `target.load() !=
- /// pred`, returning true if the target was updated.
--fn atomic_relaxed_op_unless(target: &AtomicU64, op: impl Fn(u64) -> u64, pred: u64) -> bool {
-+fn atomic_relaxed_op_unless(target: &AtomicU32, op: impl Fn(u32) -> u32, pred: u32) -> bool {
-     target
-         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
-             if x == pred {
--- 
-2.46.0.469.g59c65b2a67-goog
-
+T24gMjAyNC85LzUgMTE6NDksIE1pbmcgTGVpIHdyb3RlOg0KPiBPbiBUaHUsIFNlcCAwNSwgMjAy
+NCBhdCAwMjo0NjozOUFNICswMDAwLCDnq6Dovokgd3JvdGU6DQo+PiBPbiAyMDI0LzkvNCAxNjow
+MSwgTWluZyBMZWkgd3JvdGU6DQo+Pj4gT24gVHVlLCBTZXAgMDMsIDIwMjQgYXQgMDc6NTQ6MzdQ
+TSArMDgwMCwgWmhhbmdIdWkgd3JvdGU6DQo+Pj4+IEZyb206IHpoYW5naHVpIDx6aGFuZ2h1aTMx
+QHhpYW9taS5jb20+DQo+Pj4+DQo+Pj4+IEN1cnJlbnRseSwgZm9yIGEgY29udHJvbGxlciB0aGF0
+IHN1cHBvcnRzIG11bHRpcGxlIHF1ZXVlcywgbGlrZSBVRlM0LjAsDQo+Pj4+IHRoZSBtcV9vcHMt
+PmNvbXBsZXRlIGlzIGV4ZWN1dGVkIGluIHRoZSBpbnRlcnJ1cHQgdG9wLWhhbGYuIFRoZXJlZm9y
+ZSwNCj4+Pj4gdGhlIGZpbGUgc3lzdGVtJ3MgZW5kIGlvIGlzIGV4ZWN1dGVkIGR1cmluZyB0aGUg
+cmVxdWVzdCBjb21wbGV0aW9uIHByb2Nlc3MsDQo+Pj4+IHN1Y2ggYXMgZjJmc193cml0ZV9lbmRf
+aW8gb24gc21hcnRwaG9uZS4NCj4+Pj4NCj4+Pj4gSG93ZXZlciwgd2UgZm91bmQgdGhhdCB0aGUg
+ZXhlY3V0aW9uIHRpbWUgb2YgdGhlIGZpbGUgc3lzdGVtIGVuZCBpbw0KPj4+PiBpcyBzdHJvbmds
+eSByZWxhdGVkIHRvIHRoZSBzaXplIG9mIHRoZSBiaW8gYW5kIHRoZSBwcm9jZXNzaW5nIHNwZWVk
+DQo+Pj4+IG9mIHRoZSBDUFUuIEJlY2F1c2UgdGhlIGZpbGUgc3lzdGVtJ3MgZW5kIGlvIHdpbGwg
+dHJhdmVyc2UgZXZlcnkgcGFnZQ0KPj4+PiBpbiBiaW8sIHRoaXMgaXMgYSB2ZXJ5IHRpbWUtY29u
+c3VtaW5nIG9wZXJhdGlvbi4NCj4+Pj4NCj4+Pj4gV2UgbWVhc3VyZWQgdGhhdCB0aGUgODBNIGJp
+byB3cml0ZSBvcGVyYXRpb24gb24gdGhlIGxpdHRsZSBDUFUgd2lsbA0KPj4+IFdoYXQgaXMgODBN
+IGJpbz8NCj4+Pg0KPj4+IEl0IGlzIG9uZSBrbm93biBpc3N1ZSB0aGF0IHNvZnQgbG9ja3VwIG1h
+eSBiZSB0cmlnZ2VyZWQgaW4gY2FzZSBvZiBOOk0NCj4+PiBibGstbXEgbWFwcGluZywgYnV0IG5v
+dCBzdXJlIGlmIHRoYXQgaXMgdGhlIGNhc2UuDQo+Pj4NCj4+PiBXaGF0IGlzIG5yX2h3X3F1ZXVl
+cyhibGtfbXEpIGFuZCBucl9jcHVzIGluIHlvdXIgc3lzdGVtPw0KPj4+DQo+Pj4+IGNhdXNlIHRo
+ZSBleGVjdXRpb24gdGltZSBvZiB0aGUgdG9wLWhhbGYgdG8gYmUgZ3JlYXRlciB0aGFuIDEwMG1z
+Lg0KPj4+PiBUaGUgQ1BVIHRpY2sgb24gYSBzbWFydHBob25lIGlzIG9ubHkgNG1zLCB3aGljaCB3
+aWxsIHVuZG91YnRlZGx5IGFmZmVjdA0KPj4+PiBzY2hlZHVsaW5nIGVmZmljaWVuY3kuDQo+Pj4g
+c2NoZWR1bGUgaXMgb2ZmIHRvbyBpbiBzb2Z0aXJxKGJvdHRvbS1oYWxmKS4NCj4+Pg0KPj4+PiBM
+ZXQncyBmaXhlZCB0aGlzIGlzc3VlIGJ5IG1vdmVkIG5vbiBzeW5jIHJlcXVlc3QgY29tcGxldGlv
+biBmbG93IHRvDQo+Pj4+IHNvZnRpcnEsIGFuZCBrZWVwIHRoZSBzeW5jIHJlcXVlc3QgY29tcGxl
+dGlvbiBpbiB0aGUgdG9wLWhhbGYuDQo+Pj4gSWYgeW91IGRvIGNhcmUgaW50ZXJydXB0LW9mZiBv
+ciBzY2hlZHVsZS1vZmYgbGF0ZW5jeSwgeW91IG1heSBoYXZlIHRvIG1vdmUNCj4+PiB0aGUgSU8g
+aGFuZGxpbmcgaW50byB0aHJlYWQgY29udGV4dCBpbiB0aGUgZHJpdmVyLg0KPj4+DQo+Pj4gQlRX
+LCB0aHJlYWRlZCBpcnEgY2FuJ3QgaGVscCB5b3UgdG9vLg0KPj4+DQo+Pj4NCj4+PiBUaGFua3Ms
+DQo+Pj4gTWluZw0KPj4+DQo+PiBoaSBNaW5nLA0KPj4NCj4+IFZlcnkgZ29vZCByZW1pbmRlciwg
+dGhhbmsgeW91Lg0KPj4NCj4+IE9uIHNtYXJ0cGhvbmVzLCBucl9od19xdWV1ZXMgYW5kIG5yX2Nw
+dXMgYXJlIDE6MSwgSSBhbSBtb3JlIGNvbmNlcm5lZA0KPj4gYWJvdXQgdGhlIGludGVycnVwdC1v
+ZmYgbGF0ZW5jeSwgd2hpY2ggaXMgbW9yZSBvYnZpb3VzIG9uIGxpdHRsZSBjb3Jlcy4NCj4gU28g
+eW91IHN1Ym1pdHMgODBNIGJ5dGVzIGZyb20gb25lIENQVSwgYW5kIGFsbW9zdCBhbGwgdGhlc2Ug
+YmlvcyBhcmUgY29tcGxldGVkDQo+IGluIHNpbmdsZSBpbnRlcnJ1cHQsIHdoaWNoIGxvb2tzIHZl
+cnkgaW1wb3NzaWJsZSwgZXhjZXB0IHRoYXQgeW91cg0KPiBVRlMgY29udHJvbGxlciBpcyBmYXIg
+ZmFzdGVyIHRoYW4gdGhlIENQVS4NCg0KVGhlIDgwTSBiaW8gYmlvIHJlZmVycyB0byB0aGUgYmlv
+IHNlbnQgYnkgdGhlIGZpbGUgc3lzdGVtLiBBdCB0aGUgYmxvY2sNCmxheWVyLCBpdCB3aWxsIGJl
+IHNwbGl0IGludG8gbWFueSBiaW9zIGFuZCBmb3JtIGEgYmlvIGNoYWluLiBUaGUNCnRpbWUtY29u
+c3VtaW5nIHBhcnQgaXMgZW5kX2lvIG9mIGZpbGVzeXN0ZW0gcHJvY2Vzc2luZyBhbGwgcGFnZSBz
+dGF0ZS4NCkl0IHdpbGwgb25seSBiZSBhY3R1YWxseSBjYWxsZWQgYWZ0ZXIgYWxsIHRoZSA4ME0g
+QklPcyBpbiB0aGUgYmlvIGNoYWluDQphcmUgY29tcGxldGVkLg0KDQo+PiBNb3ZpbmcgdGltZS1j
+b25zdW1pbmcgd29yayB0byB0aGUgYm90dG9tIGhhbGYgbWF5IG5vdCBoZWxwIHdpdGggc2NoZWR1
+bGUNCj4+IGxhdGVuY3ksIGJ1dCBpdCBpcyBtYXkgaGVscGZ1bCBmb3IgaW50ZXJydXB0IHJlc3Bv
+bnNlIGxhdGVuY3kgb2Ygb3RoZXINCj4+IG1vZHVsZXMgaW4gdGhlIHN5c3RlbT8NCj4gc2NoZWR1
+bGluZyByZXNwb25zZSBsYXRlbmN5IGlzIHN5c3RlbS13aWRlIHRvby4NCj4NCj4gVGhlbiBwbGVh
+c2UgZG9jdW1lbnQgdGhlIGludGVycnVwdCBsYXRlbmN5IGltcHJvdmVtZW50IGluc3RlYWQgb2YN
+Cj4gc2NoZWR1bGluZyBpbiB5b3VyIGNvbW1pdCBsb2csIG90aGVyd2lzZSBpdCBpcyBqdXN0IG1p
+c2xlYWRpbmcuDQo+DQo+IGBgYA0KPiBUaGUgQ1BVIHRpY2sgb24gYSBzbWFydHBob25lIGlzIG9u
+bHkgNG1zLCB3aGljaCB3aWxsIHVuZG91YnRlZGx5IGFmZmVjdA0KPiBzY2hlZHVsaW5nIGVmZmlj
+aWVuY3kuDQo+IGBgYA0KPg0KPiBUaGFua3MsDQo+IE1pbmcNCg0KaGkgTWluZywNCg0KT0ssIEkg
+d2lsbCB1cGRhdGUgcGF0Y2ggVjQgbGF0ZXIgZm9yIGNvbW1lbnQgdXBkYXRlLg0KVGhhbmsgeW91
+IGZvciB5b3VyIHN1Z2dlc3Rpb24hDQpCZXNpZGVzIHRoaXMsZG8geW91IGhhdmUgYW55IG90aGVy
+IGNvbmNlcm4/DQoNClRoYW5rcw0KWmhhbmcNCg0K
