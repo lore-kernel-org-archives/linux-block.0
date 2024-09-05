@@ -1,139 +1,182 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53387149C51
-	for <linux-block@vger.kernel.org>; Thu,  5 Sep 2024 03:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3804F155392
+	for <linux-block@vger.kernel.org>; Thu,  5 Sep 2024 06:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725508181; cv=none; b=Ip8LbX63W0NRSQ1GZqlxiJfOy2oHga3sJNRyfiHRZF+Z3s/7k48CsNoXU+0o2u/HnSDtRWEPnEYAtm/nyJ9csFH/qiT4W2B8vylzrUkfhNwUz7kJfTJVJ7fZnUcqzFS3KxQx1bebrG6Fjstel0joNVoknmgkjexUAAP3b+4xx7I=
+	t=1725516753; cv=none; b=r/uTyiNHsh2skYdvqFU3N3Qekhm18uC4QJ/xUCFjPzTfJae3KWquITj5EG8cwrY1UYvqPWqUZPmLwB3w+ExAL/kDNgRTBzd2WZu1JXeA/5wJl6PmnyxxcJg0kJkAbulk9OdYcVvRwzNYdXa69u0IEYdVqVkQ+110PTA5KblW0FY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725508181; c=relaxed/simple;
-	bh=Gz3VSqSsT06o5tY54H4HaqFIbT5TGYwyyqU0Y/L5U0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sg211JTSzhvQxQEIrBD1I2qYnMSQvlzac0ZTYE0KwHapwOQJuoHdNM8cJln6mViJIGDOhbfW+XDoumWTw1J3YMBPT7z3Qd+L4blIK8b10072sNju84Dd2dklYAPYY58HMfXkDIe2orjxi6+15nPd4Rq8qBR+zyWR7SFTKORLLt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dOeHHPp2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1725516753; c=relaxed/simple;
+	bh=2q/az6HaCPchXtkkz92LD2DZLCM0KCj/UmgVvpuf8jk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TRRWRLOhpoCJ7GlGF0xPVC+HxS/JPzpNjwGKX6TOAqEuzoYZojDiJIDNjwYIusBwvXCR97jlZ/6078w1TXR+gR2pDQ3HyeSXnN4/JiBhdXgL4K70Bnnu0SEVla5rvlYsOo0pCxZW7Eqou47NRQLWzbPYJ7dLS3tsEYTdsx7GzxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q9Y9YTY4; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dOeHHPp2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725508178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g+OtgIy/BJMXLC4HkMF7qZ6LVOdsNKLpuOpjRAQZMR0=;
-	b=dOeHHPp2JSEW6EkUWS9HTSI/FCfPraFR85h5YlRLCiMXWJAyaFCymASu+sZxO185sK8yfo
-	uJz50fnUZmzuBm5A6g1PcqzQrUAsrLzY3i9xNQTIJcLjxOIb+iO0f48WQyO94qCirqu/HE
-	Buuab9Hoyq0DSZGyKc25SskjDwKOX3I=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-64-UUpzQNCFM--xsxsgz3kyxw-1; Wed,
- 04 Sep 2024 23:49:33 -0400
-X-MC-Unique: UUpzQNCFM--xsxsgz3kyxw-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 33DCA19560B5;
-	Thu,  5 Sep 2024 03:49:31 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.49])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 664A51956086;
-	Thu,  5 Sep 2024 03:49:24 +0000 (UTC)
-Date: Thu, 5 Sep 2024 11:49:19 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: =?utf-8?B?56ug6L6J?= <zhanghui31@xiaomi.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"bvanassche@acm.org" <bvanassche@acm.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	=?utf-8?B?5pa557+U?= <fangxiang@xiaomi.com>,
-	Hui117 Wang =?utf-8?B?546L6L6J?= <wanghui117@xiaomi.com>,
-	ming.lei@redhat.com
-Subject: Re: [External Mail]Re: [PATCH v3] block: move non sync requests
- complete flow to softirq
-Message-ID: <ZtkqPxgC3tsRdDcz@fedora>
-References: <20240903115437.42307-1-zhanghui31@xiaomi.com>
- <ZtgT4HhEsyRJMoQH@fedora>
- <1641f51b-34f1-47c9-bd69-e56b036fc0f4@xiaomi.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q9Y9YTY4"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6d9e31e66eeso9787237b3.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2024 23:12:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725516751; x=1726121551; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8FxsTOqdqzOkyw6TDf9xiFqZbYhyqbcaHGo9ObkAUmg=;
+        b=Q9Y9YTY4KCQH6/W4Qgpfv2zqvb8i+7OPL+fkJ8X2wZbXNZVCZy46Abjce+L2EC+FBF
+         BJ4R6gNlVTXN+FFqNXpJvkG0M9K/ekQeKPUzn9qsOgBv84Hxyrngcj5Lc+O952Iqtm3O
+         HN0zkJoet8VSP2/fQUUMHeknI8yn/0o8KvyDof23chiE/9GDA3o9Jad2niQg07FPCInq
+         xH5kZ1g9pRSPsEzcGDLSmJOkEzGi2EIO/Kpp8Hi+8hTAOK0e0FMIkHCEPf9Lkt+rI3q4
+         09fdyxMFoMuwhfWgYnMKSNWHwV1LblvRk6RVE9SWrR6J8pNI6qkSPi3KKzYQN3F1wDbF
+         c40Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725516751; x=1726121551;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8FxsTOqdqzOkyw6TDf9xiFqZbYhyqbcaHGo9ObkAUmg=;
+        b=ZzVrPiR5ih0cKTr3++0sma458Mhvkp7Fr5vCuVOsrp/LTw0Dxh5mtD6odtdW6OwB8A
+         evSLm2a6zNzGTZVdwGz1pMz2fQTrkN4EXYoiIG5hIjZbDa1s2IfbPcuvnSW1mQ8ja0z7
+         38EJ5Lrqr7yqy+zV35EMVTtVCqv/fMo+bkHI5mGKEKn2ucGGs0ABJr1+eWlK9qa9amVx
+         VTZMiYLFOS/nBpQ7AiZnN8uS8X2+YOGbTIUwMNehnJjaSK6kx0ro/k6jJonG//AocvPM
+         n57oZneeWYTmysipusd05nK8BY/nuBdWFBdywAhsV7xsfzkuYX/p/pCLTs/Q7FdTuTzE
+         s5eA==
+X-Forwarded-Encrypted: i=1; AJvYcCUd9Qgsak8Tx9PYVGysaT9aLZcbxV22JvyFC3HllrXKbGCXi8E56HWUaOJJfihnewn4Xn9nxB3jcakW3w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAXFGSN3tSJZMsEiBOygHJPMxrXksEFYHDGMsPLzQ3hDZ46+ez
+	OqxW8Io6qXfr2C6wx0BEH/FL9wInIkm9mLdR+k8tlGRApV0lZkcQlxthOac1H/OAlsT03VqftyC
+	f1+JgwlcwWw==
+X-Google-Smtp-Source: AGHT+IFb1uyLverYDvkTYTYyFuU6LY97S1fxJcQ5+perARjw81iOZxVvfKHhENGCOXBybmboZGZK6CqTqt35rg==
+X-Received: from slicestar.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:20a1])
+ (user=davidgow job=sendgmr) by 2002:a25:ae56:0:b0:e05:6532:166 with SMTP id
+ 3f1490d57ef6-e1a79faf683mr114011276.1.1725516751120; Wed, 04 Sep 2024
+ 23:12:31 -0700 (PDT)
+Date: Thu,  5 Sep 2024 14:12:14 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1641f51b-34f1-47c9-bd69-e56b036fc0f4@xiaomi.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
+Message-ID: <20240905061214.3954271-1-davidgow@google.com>
+Subject: [RFC PATCH] rust: block: Use 32-bit atomics
+From: David Gow <davidgow@google.com>
+To: Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: David Gow <davidgow@google.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-um@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 05, 2024 at 02:46:39AM +0000, 章辉 wrote:
-> On 2024/9/4 16:01, Ming Lei wrote:
-> > On Tue, Sep 03, 2024 at 07:54:37PM +0800, ZhangHui wrote:
-> >> From: zhanghui <zhanghui31@xiaomi.com>
-> >>
-> >> Currently, for a controller that supports multiple queues, like UFS4.0,
-> >> the mq_ops->complete is executed in the interrupt top-half. Therefore,
-> >> the file system's end io is executed during the request completion process,
-> >> such as f2fs_write_end_io on smartphone.
-> >>
-> >> However, we found that the execution time of the file system end io
-> >> is strongly related to the size of the bio and the processing speed
-> >> of the CPU. Because the file system's end io will traverse every page
-> >> in bio, this is a very time-consuming operation.
-> >>
-> >> We measured that the 80M bio write operation on the little CPU will
-> > What is 80M bio?
-> >
-> > It is one known issue that soft lockup may be triggered in case of N:M
-> > blk-mq mapping, but not sure if that is the case.
-> >
-> > What is nr_hw_queues(blk_mq) and nr_cpus in your system?
-> >
-> >> cause the execution time of the top-half to be greater than 100ms.
-> >> The CPU tick on a smartphone is only 4ms, which will undoubtedly affect
-> >> scheduling efficiency.
-> > schedule is off too in softirq(bottom-half).
-> >
-> >> Let's fixed this issue by moved non sync request completion flow to
-> >> softirq, and keep the sync request completion in the top-half.
-> > If you do care interrupt-off or schedule-off latency, you may have to move
-> > the IO handling into thread context in the driver.
-> >
-> > BTW, threaded irq can't help you too.
-> >
-> >
-> > Thanks,
-> > Ming
-> >
-> hi Ming,
-> 
-> Very good reminder, thank you.
-> 
-> On smartphones, nr_hw_queues and nr_cpus are 1:1, I am more concerned
-> about the interrupt-off latency, which is more obvious on little cores.
+Not all architectures have core::sync::atomic::AtomicU64 available. In
+particular, 32-bit x86 doesn't support it. AtomicU32 is available
+everywhere, so use that instead.
 
-So you submits 80M bytes from one CPU, and almost all these bios are completed
-in single interrupt, which looks very impossible, except that your
-UFS controller is far faster than the CPU.
+Hopefully we can add AtomicU64 to Rust-for-Linux more broadly, so this
+won't be an issue, but it's not supported in core from upstream Rust:
+https://doc.rust-lang.org/std/sync/atomic/#portability
 
-> 
-> Moving time-consuming work to the bottom half may not help with schedule
-> latency, but it is may helpful for interrupt response latency of other
-> modules in the system?
+This can be tested on 32-bit x86 UML via:
+./tools/testing/kunit/kunit.py run --make_options LLVM=1 --kconfig_add CONFIG_RUST=y --kconfig_add CONFIG_64BIT=n --kconfig_add CONFIG_FORTIFY_SOURCE=n
 
-scheduling response latency is system-wide too.
+Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
+Signed-off-by: David Gow <davidgow@google.com>
+---
 
-Then please document the interrupt latency improvement instead of
-scheduling in your commit log, otherwise it is just misleading.
+Hi all,
 
-```
-The CPU tick on a smartphone is only 4ms, which will undoubtedly affect
-scheduling efficiency.
-```
+I encountered this build error with Rust/UML since the kernel::block::mq
+stuff landed. I'm not 100% sure just swapping AtomicU64 with AtomicU32
+is correct -- please correct me if not -- but this does at least get the
+Rust/UML/x86-32 builds here compiling and running again.
 
-Thanks,
-Ming
+(And gives me more encouragement to go to the Rust atomics talk at
+Plumbers.)
+
+Cheers,
+-- David
+
+---
+ rust/kernel/block/mq/operations.rs |  4 ++--
+ rust/kernel/block/mq/request.rs    | 12 ++++++------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index 9ba7fdfeb4b2..c31c36af6bc4 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -11,7 +11,7 @@
+     error::{from_result, Result},
+     types::ARef,
+ };
+-use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic::Ordering};
++use core::{marker::PhantomData, sync::atomic::AtomicU32, sync::atomic::Ordering};
+ 
+ /// Implement this trait to interface blk-mq as block devices.
+ ///
+@@ -186,7 +186,7 @@ impl<T: Operations> OperationsVTable<T> {
+ 
+             // SAFETY: The refcount field is allocated but not initialized, so
+             // it is valid for writes.
+-            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(AtomicU64::new(0)) };
++            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(AtomicU32::new(0)) };
+ 
+             Ok(0)
+         })
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index a0e22827f3f4..418256dcd45b 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -13,7 +13,7 @@
+ use core::{
+     marker::PhantomData,
+     ptr::{addr_of_mut, NonNull},
+-    sync::atomic::{AtomicU64, Ordering},
++    sync::atomic::{AtomicU32, Ordering},
+ };
+ 
+ /// A wrapper around a blk-mq `struct request`. This represents an IO request.
+@@ -159,13 +159,13 @@ pub(crate) struct RequestDataWrapper {
+     /// - 0: The request is owned by C block layer.
+     /// - 1: The request is owned by Rust abstractions but there are no ARef references to it.
+     /// - 2+: There are `ARef` references to the request.
+-    refcount: AtomicU64,
++    refcount: AtomicU32,
+ }
+ 
+ impl RequestDataWrapper {
+     /// Return a reference to the refcount of the request that is embedding
+     /// `self`.
+-    pub(crate) fn refcount(&self) -> &AtomicU64 {
++    pub(crate) fn refcount(&self) -> &AtomicU32 {
+         &self.refcount
+     }
+ 
+@@ -175,7 +175,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
+     /// # Safety
+     ///
+     /// - `this` must point to a live allocation of at least the size of `Self`.
+-    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
++    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU32 {
+         // SAFETY: Because of the safety requirements of this function, the
+         // field projection is safe.
+         unsafe { addr_of_mut!((*this).refcount) }
+@@ -193,7 +193,7 @@ unsafe impl<T: Operations> Sync for Request<T> {}
+ 
+ /// Store the result of `op(target.load())` in target, returning new value of
+ /// target.
+-fn atomic_relaxed_op_return(target: &AtomicU64, op: impl Fn(u64) -> u64) -> u64 {
++fn atomic_relaxed_op_return(target: &AtomicU32, op: impl Fn(u32) -> u32) -> u32 {
+     let old = target.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| Some(op(x)));
+ 
+     // SAFETY: Because the operation passed to `fetch_update` above always
+@@ -205,7 +205,7 @@ fn atomic_relaxed_op_return(target: &AtomicU64, op: impl Fn(u64) -> u64) -> u64
+ 
+ /// Store the result of `op(target.load)` in `target` if `target.load() !=
+ /// pred`, returning true if the target was updated.
+-fn atomic_relaxed_op_unless(target: &AtomicU64, op: impl Fn(u64) -> u64, pred: u64) -> bool {
++fn atomic_relaxed_op_unless(target: &AtomicU32, op: impl Fn(u32) -> u32, pred: u32) -> bool {
+     target
+         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
+             if x == pred {
+-- 
+2.46.0.469.g59c65b2a67-goog
 
