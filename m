@@ -1,92 +1,90 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA5DC2FD
-	for <linux-block@vger.kernel.org>; Thu,  5 Sep 2024 16:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ACF1A072C
+	for <linux-block@vger.kernel.org>; Thu,  5 Sep 2024 16:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725555000; cv=none; b=bjKVtutPfL91ATAWV10qXRuTGIPTR9KDQDU9u1P8pbg330PYZkAHTzeqZZpaPHxWcE53kh2ecRSTSWtIGB/LniEwuONO3nYajTZnBXlbiPUv9nn5t9pA0jUSMIf+/hI0KJyvVMxRjl88wANQpRfePFMF1ArNnACkYyZz/4XTb/8=
+	t=1725555404; cv=none; b=af5mCW4aQbJzLN4wEQu9YbWoSiJFQBW74jiFrU80vMp3nGzjUolqqXk8ES4H8q8bZvy4drueDmlhYmxcwFflQRlkcsz31KMNVxUM7bXAA9XnF+V0nggbGlklIt7Dz3eSy0NP86uXhaGSxorJTV/pgNk2GCpy6HK+3r5qCX43zgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725555000; c=relaxed/simple;
-	bh=6ppMJTCUMDHEIy2+XrldZ7rp1llWL3mtq6EatVCi7i0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oDego82wtko1z08sTj3KHjGgVIZvO4P/91Xo6Gl8qFZ6zfMO0lkRSCbB9L0l60Ac55MO2PLr6waaYA77SHEWyb20N0rrbumUDeKfqRLcCzK4PYO/2xgMN+sUSUNg0njzEJ4qIISz2uFIKKvjSN1/DMHEC4CEaDYicOr0dXf9OWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZACdSF07; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1725555404; c=relaxed/simple;
+	bh=uHqjy36mJjB7Y8neUhjFWgQCh0SpDtSG4PiN3ASD/xI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lshyuYiwfF/uZK8E+Jhd6x7rF5nSnwlJr337zanYqzL5DoS0IWgc1QNnearexITm8X/DEIjTn1hIE6dP6W/jbzmi3F1QhRRxQGgMO1RY3U54dcZfH7XalJuzGYHRYoPGWjvSPVaxuoGb3hcszPlsGF3CZWVZSeK8U9cwJBN0tO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GdEcEXAA; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZACdSF07"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-824ee14f7bfso38498639f.1
-        for <linux-block@vger.kernel.org>; Thu, 05 Sep 2024 09:49:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GdEcEXAA"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e1a74ee4c0cso1217599276.2
+        for <linux-block@vger.kernel.org>; Thu, 05 Sep 2024 09:56:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725554997; x=1726159797; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gzYI42De5EJ7Y+DuQYyo+Knog6etwcYVpNZv0Merlic=;
-        b=ZACdSF07KpFc8wDzzIEB2ciTOZTTsK0Dvb1n/fh6pbCI5iPL78SYHsC3bwdbj0+ynn
-         IB/7Rppj3lKJS03oGbcJRlzAZvhQ7i4PgG3vXpINZYtB8+lGv8wHdd9lJ/Roz8D8iwJi
-         fIPMGorRHM7hjRSB9rw6DTLVG6LjQU4eDuh8JPo/CbgkyiQmEcmMscxJ5uCQZnzJiQIq
-         KTEpuDOqF4EXCsFf3tc9vewcIzg6LESvOalZoprVYSflDIcxxfwpHiPSYYpc13sQrkSV
-         anpNyuhc7FiQAai1Idb8R2DtolqBsAqUZ6y1VBy97wf3RabBrnAuY6t0lM9g7Ynklkev
-         PYKQ==
+        d=linaro.org; s=google; t=1725555401; x=1726160201; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uHqjy36mJjB7Y8neUhjFWgQCh0SpDtSG4PiN3ASD/xI=;
+        b=GdEcEXAAOyBCOCqUKERNIvQKW0wtu/qnou6xttaUgYSIHMaHuKkZvjEAVOm04KQf14
+         hOXvGIwWkHcsLr4230mCgGRqM0G+h8lflFJbGijmeXzKBPb82g66VtSOytaizr9x4E3D
+         38Pcr/xvoFlkF8KzrbxLEzppt0HHTioKRnaDs5Ge5boV+zegi8NRf+vgQfvKuuDzP0kv
+         Dk4+YawDz+x8buPJ3Vc2ZkPsEH//4gpGJU5U/OZ+lc3OrKJDIKyrPcNSsiBCMPRrV4Qp
+         ROfI4MAqa/CuX5jbKgLMKUo5Qw3Wzwy+JyXuB1rDm8/zvo5cfgSv5IKWq1qodMBo4efM
+         Dmyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725554997; x=1726159797;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gzYI42De5EJ7Y+DuQYyo+Knog6etwcYVpNZv0Merlic=;
-        b=Y5jXnYTmAYlexyDwo4aKQ7r6f5Bz1KiVVUm7GuIDvY1ZrSDTVUgaB1U3H2fMy9WWw0
-         pqdSKIubEGps51aJYHejsqmdE3yPQ6WTKXYhngTBeigUVMSLf+K7B8gCiAK/mXanTTM/
-         9qlYfmeIY2Wuh/m6nTn4T4tEu93Nn6lKL1P9K3UBHbesQC/ITv3KEaaF92J0xr8sUYM/
-         akZExv4gwzYYppK/8cGJWcBMHFnheI0A7xa5r2ojM6uhRNVaHzgOvhBYEBNBdM7tT3iN
-         GpX2CX42LVzXpFNNQWD598h4W+jqWwlmtoJIm/5Kkl2rCx79Gjk2vNHjCQxp6OZBCByQ
-         uYBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXpGZtpsBsW5UJeYqivq9cg/5gBR4V/N1GO2FmH+JiLzBe4g6RH9RU4jMTkpy3gIhLqXz+6A3mUtzaL0A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOCOfIqflAIQUE00fzVzeAEipkbklOsXwegDG4Hf78DCJmoEVl
-	4w4DCxgIbpR4QfdHELKRXib8slSzi3T+YQb4xGzrYWVKko12G+1IZrgUpiOVUOs=
-X-Google-Smtp-Source: AGHT+IGTnYovPt2hYcnHubtDxpOg5gYI1JO9bdw1XAH4HP10BdiydNOPRjVz5S6Ysw5b9Yj2djDYQw==
-X-Received: by 2002:a05:6602:6307:b0:82a:4419:6156 with SMTP id ca18e2360f4ac-82a44196334mr1747748239f.14.1725554997543;
-        Thu, 05 Sep 2024 09:49:57 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ced2de78aesm3713121173.65.2024.09.05.09.49.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2024 09:49:56 -0700 (PDT)
-Message-ID: <b748a4aa-504b-4e58-9988-170e462401eb@kernel.dk>
-Date: Thu, 5 Sep 2024 10:49:55 -0600
+        d=1e100.net; s=20230601; t=1725555401; x=1726160201;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uHqjy36mJjB7Y8neUhjFWgQCh0SpDtSG4PiN3ASD/xI=;
+        b=csWfUAZYPGf11zmHtcvUvjA3qI1JQS4P8tMdzJoaVK13SLwqYbfi2TnRSlbvGnlXYe
+         +7r/PDg5+UkfkugKAmcecCykuzlyWDp7JXhqEwoBXxsIvyraPL6N1hUpU588LO+nC9Fo
+         I9iE5/eOW5mbmmt+oIvtIYq/VwIr7tsn9vFMTyYOC3LUx++uXz3tXDFXKOLLC+DIUQVi
+         0MgbTplpAPsILTMQunq+BVlHLXp2QBxaCLNrMp3j9kigw+0O8lFSlgZJ0C8AFcG7GbUm
+         nc8cziqE7EVwhl5tcPVryV9J5/Nyj2mcIqKjV4yvHK9bwWS0K7uM7e3IpRNVFQwfAlxs
+         S5DA==
+X-Gm-Message-State: AOJu0YwmGsBGBEs+mQGTxGKWxBw3TMSKfIW9RGlghKOH2o8PiTIFn0+5
+	ifjzmlFyNIeJXs0veA2/RnARWLnUWHfXL4Y3kwKMBOfNP1EIN7IoKY82eLeS5htJSncpWuoW+KF
+	UXuXo1jhFTCXKTIptaT10X2rI32qNc/obJwEV9Q==
+X-Google-Smtp-Source: AGHT+IHPSPP0a6x2pBeZdQ7cFMRpN5ue1U3qASJhoc2najQme0uesewUZpAlVDhvGq+pLja9rBnS0H5rCqWhKwKBoO4=
+X-Received: by 2002:a05:6902:708:b0:e1a:5870:6380 with SMTP id
+ 3f1490d57ef6-e1a79fd8be7mr26837229276.17.1725555401330; Thu, 05 Sep 2024
+ 09:56:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20240905164344.186880-1-ulf.hansson@linaro.org> <b748a4aa-504b-4e58-9988-170e462401eb@kernel.dk>
+In-Reply-To: <b748a4aa-504b-4e58-9988-170e462401eb@kernel.dk>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Thu, 5 Sep 2024 18:56:04 +0200
+Message-ID: <CAPDyKFrgzuuDBMWjBDVFAzwTP30JeD+zP2mVo+E=P0MZwUepHA@mail.gmail.com>
 Subject: Re: [PATCH] MAINTAINERS: Move the BFQ io scheduler to Odd Fixes state
-To: Ulf Hansson <ulf.hansson@linaro.org>, linux-block@vger.kernel.org
-Cc: Linus Walleij <linus.walleij@linaro.org>,
- Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai3@huawei.com>,
- Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
- Paolo Valente <paolo.valente@unimore.it>
-References: <20240905164344.186880-1-ulf.hansson@linaro.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240905164344.186880-1-ulf.hansson@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
+	Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>, 
+	linux-kernel@vger.kernel.org, Paolo Valente <paolo.valente@unimore.it>
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/5/24 10:43 AM, Ulf Hansson wrote:
-> To not give up entirely on maintenance of BFQ, add myself and Linus Walleij
-> as maintainers for BFQ. Although, as both of us has limited bandwidth for
-> this, let's reflect that by changing the state to Odd Fixes. If there are
-> anybody else that would be interested to help with maintenance of BFQ,
-> please let us know.
+On Thu, 5 Sept 2024 at 18:49, Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 9/5/24 10:43 AM, Ulf Hansson wrote:
+> > To not give up entirely on maintenance of BFQ, add myself and Linus Walleij
+> > as maintainers for BFQ. Although, as both of us has limited bandwidth for
+> > this, let's reflect that by changing the state to Odd Fixes. If there are
+> > anybody else that would be interested to help with maintenance of BFQ,
+> > please let us know.
+>
+> We don't add maintainers that haven't actually worked on the code. As it
+> so happens, we already have a good candidate for this, who knows the
+> block layer code and does many fixes there, Yu Kuai. And they recently
+> sent in real fixes too. So that's likely the way the needle will swing.
 
-We don't add maintainers that haven't actually worked on the code. As it
-so happens, we already have a good candidate for this, who knows the
-block layer code and does many fixes there, Yu Kuai. And they recently
-sent in real fixes too. So that's likely the way the needle will swing.
+I would certainly appreciate it if Yu Kuai could step in and help,
+that's why I cced him too.
 
--- 
-Jens Axboe
+Although, me and Linus were thinking that helping with "Odd Fixes" is
+better than nothing. Ohh, well, let's see what Yu Kuai thinks, then.
 
-
+Kind regards
+Uffe
