@@ -1,104 +1,76 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C891D1F7B
-	for <linux-block@vger.kernel.org>; Fri,  6 Sep 2024 14:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB56F156880;
+	Fri,  6 Sep 2024 16:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725634286; cv=none; b=kaArAxAyMgFnxYUwDOsmblZ4psDGPN4w9Kn0Xhb9FN3nZom/EKh80RULyqIu5NdSm7Heq3Gn33emf5Bn6gabqdI7kihv03jOhZnMGaPf7UKQQxJENCZRzH/wjlYh8cw8FrWrsf7Ebr81uLhPTr1+bGFWw5CjnCZm5f3ELCVZFiY=
+	t=1725638685; cv=none; b=YM1KXi8BjxrW+/I6FY1tok8sO3NukV4sUttzCIqQOkjqkEt09qyQGAfsdp1NHdv+PABgHk13PHQeZ72WdTaLPNb57KtQmNuiqqPinZwwb+Y2MQmvDYzBJY7WlOykk9mRgcsUqYh2Ik5vBYYT2I0mE7pssNuBrVkH+jJuJd3fmqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725634286; c=relaxed/simple;
-	bh=Z1OrjkMwic7snAUvdTaPphz5FQmZCu4Txatz2tUbX8k=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=sge/+ZHcSSNKQR7FDq8dQh3PqMC8q3fxPaXBcxWqsBCaQ8bK0ylPnKhJZmlSswd8KIOdywOd59Wy6zWicNTf1AUVHyDv5XdVq0m+BLogbpTFGyjNmLogYvI2uHisLSPyQI0LTVLYNcfVelxToQdxxEbMWYYkfRQDo05bbb4FcdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YpWuXAlj; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1725638685; c=relaxed/simple;
+	bh=BZenlBD2N8AAYL+2OT/3WcZoQCY+AVCkF1sXui4p35Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WR/LrRMAziuLsqCpyYhfbt5YJP4iBdQB+/KblgYPzp6C82Y9YlFHPdFj2fmuJTm7l/tYoSxwySGSXHTtKuXV+yAb00p4Gnb813Dy99XN/J+lgJNhVXWrh82G1ygf/ySy6c0aODZ9hKVVtAF4DTwibNkSJtv8uJtjd8wEUCe9+d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F44be4vD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YpWuXAlj"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-71798661a52so1062383b3a.0
-        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2024 07:51:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725634283; x=1726239083; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ujc1/E9XRouz6Q28fqHYHFY+Z2eibCZnVzKCOJW3+VY=;
-        b=YpWuXAljVsaw70s4BruaWsdBu4e2q30FhY2V/7BW49rWWuY6YA5ansXCOcEnjDs/27
-         lUJx17AMcff0oRTim05P88GZCLHzyHVDAu86U8N+3fTEgLY3sYFHEsVtpwujSXc3ULO0
-         26L5oIebZECbZvo9zlM4Pd/Hof0aHyjAd11ymII0+wc7h2Je7fYdswWCkhhnnDDW9hno
-         6xmStoX9yPl132AQzZ6tsXVWlpWhit8Wf4t1W6VK/OMO+jAPyg1O4oeiEw/6GyIpnEVa
-         XXCUgiff+kapcNirNbY1z+PuSXGfuAtm6Yz4YlHjSmySD4teaEXcee3YGaEQTFd4jWHt
-         XE6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725634283; x=1726239083;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ujc1/E9XRouz6Q28fqHYHFY+Z2eibCZnVzKCOJW3+VY=;
-        b=b5yKY6sOG20I0k0aMtKdEDET4hobiXnnXFPnc5iVHFqWCqKykmNmBkISryb7rr6d97
-         e2oOydWZ8skevLrv+kCgbnd81Sxg1KJ8hqdawvyYZpOsm2AUexkpcWpxOr8XlzrqWIyQ
-         SRcmK16K52tpheVQ1NOBnR1t2UwRt3ANyPcWCOV7t+YHqadev8wYHT0a+sE+vtrjoSNK
-         CEouVsZ6Va/5lrvWpDV1OR0Qq+nUzJZbevvyV0kaqFPAe6m15T3F0yLuHBBHlUqlxglt
-         cWsw0vvU1zAlbhGhAB7ysW8IRMPAdM9viL8/XZAHxpMQY9ddbOCtx1gC3lcV3sTwWjqB
-         cfCQ==
-X-Gm-Message-State: AOJu0YwQOhWkVCzl4EHOU/4pYXQvBTnkafTIRZwj+5arNfkvffkJdlNT
-	VPs4AMzSiaaAl5EXPR6gCvXLan+nYDBltieWGMLP6AEqjTRdS52aGEV3qGyWsRE=
-X-Google-Smtp-Source: AGHT+IEUC5rtrsXtYDv/fRA/pAXy/E3nqDxKOGFW1U0rayUzPiaOSWvN4+jeEb2iNdqY8C1bzUGvRQ==
-X-Received: by 2002:a05:6a00:1303:b0:712:7195:265d with SMTP id d2e1a72fcca58-718d517c2eemr5043514b3a.0.1725634283225;
-        Fri, 06 Sep 2024 07:51:23 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-717785331fbsm4930487b3a.68.2024.09.06.07.51.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 07:51:22 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Mike Galbraith <umgwanakikbuti@gmail.com>, 
- Minchan Kim <minchan@kernel.org>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, 
- Thomas Gleixner <tglx@linutronix.de>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20240906141520.730009-1-bigeasy@linutronix.de>
-References: <20240906141520.730009-1-bigeasy@linutronix.de>
-Subject: Re: [PATCH v4 0/3] zram: Replace bit spinlocks with a spinlock_t.
-Message-Id: <172563428176.173362.6692138069455842459.b4-ty@kernel.dk>
-Date: Fri, 06 Sep 2024 08:51:21 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F44be4vD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE2BC4CEC4;
+	Fri,  6 Sep 2024 16:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725638684;
+	bh=BZenlBD2N8AAYL+2OT/3WcZoQCY+AVCkF1sXui4p35Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F44be4vDFLCx4ewpp8POzx1WytGmpAJBWrkhnXMOdWZdPJlVz2kRfiKwhdznK2HDH
+	 opmZNx1MGv+Ot9ffc1C52s2VRqmwR1+Of+AjJCAtAsF+gcLYZb+hD3RDiO0gqApc2n
+	 2JpJCk/LkxV87d0eg/d63pqJaqhdDEIoFol1Z3x6rv1c+GMZVnl/XYM3RYvUcgFctx
+	 IvltQxB3DnHjdi0hAXGlcKUCrn2he5m85TiQGBZlJG0mzCOc5NB1zzf6swc/B8xPHQ
+	 bY+Xs9ZajwrORdx1JJQ1VQ2A+66EAIwjagZueN9BKO2sRMv6zySdjZ6i6wCYCU99LP
+	 59fLRfoE1AW3w==
+Date: Fri, 6 Sep 2024 10:04:41 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+	martin.petersen@oracle.com, James.Bottomley@hansenpartnership.com,
+	brauner@kernel.org, jack@suse.cz, jaegeuk@kernel.org,
+	jlayton@kernel.org, chuck.lever@oracle.com, bvanassche@acm.org,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, gost.dev@samsung.com,
+	vishak.g@samsung.com, javier.gonz@samsung.com,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Hui Qi <hui81.qi@samsung.com>
+Subject: Re: [PATCH v4 5/5] nvme: enable FDP support
+Message-ID: <ZtsoGX2QY-TjBolb@kbusch-mbp.mynextlight.net>
+References: <20240826170606.255718-1-joshi.k@samsung.com>
+ <CGME20240826171430epcas5p3d8e34a266ced7b3ea0df2a11b83292ae@epcas5p3.samsung.com>
+ <20240826170606.255718-6-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.14.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240826170606.255718-6-joshi.k@samsung.com>
 
-
-On Fri, 06 Sep 2024 16:14:42 +0200, Sebastian Andrzej Siewior wrote:
-> this is follow up to the previous posting, making the lock
-> unconditionally. The original problem with bit spinlock is that it
-> disabled preemption and the following operations (within the atomic
-> section) perform operations that may sleep on PREEMPT_RT. Mike expressed
-> that he would like to keep using zram on PREEMPT_RT.
+On Mon, Aug 26, 2024 at 10:36:06PM +0530, Kanchan Joshi wrote:
+> Flexible Data Placement (FDP), as ratified in TP 4146a, allows the host
+> to control the placement of logical blocks so as to reduce the SSD WAF.
 > 
-> v3…v4: https://lore.kernel.org/linux-block/20240705125058.1564001-1-bigeasy@linutronix.de
->   - Inline lock init into zram_meta_alloc().
+> Userspace can send the data placement information using the write hints.
+> Fetch the placement-identifiers if the device supports FDP.
 > 
-> [...]
+> The incoming placement hint is mapped to a placement-identifier, which
+> in turn is set in the DSPEC field of the write command.
+> 
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> Signed-off-by: Hui Qi <hui81.qi@samsung.com>
 
-Applied, thanks!
+I'm still fine with this nvme implementation.
 
-[1/3] zram: Replace bit spinlocks with a spinlock_t.
-      commit: 9518e5bfaae19447d657983d0628062ab6712610
-[2/3] zram: Remove ZRAM_LOCK
-      commit: 6086aeb49e3d9e25165769b2a0a13ff67f98a1a2
-[3/3] zram: Shrink zram_table_entry::flags.
-      commit: 68d20eb60efbdc80662efedeb088353e9c4aa17f
+Acked-by: Keith Busch <kbusch@kernel.org>
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+The reporting via fcntl looks okay to me, but I've never added anything
+to that interface, so not sure if there's any problem using it for this.
