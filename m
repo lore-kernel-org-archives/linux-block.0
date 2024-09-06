@@ -1,111 +1,199 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E591B85E5
-	for <linux-block@vger.kernel.org>; Fri,  6 Sep 2024 19:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E4214883B
+	for <linux-block@vger.kernel.org>; Fri,  6 Sep 2024 22:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725651948; cv=none; b=rdfyWa3u0Cs0IxdMROW8++wIBF0Gf2qSAl6TpdJphQQraXrSj3C+GcmseSI0TMz4KggkdqFJfqkQX37opBuryz64nZ+lwzLbbBnCVQfGjPAxvUzO4t52d+eu6J0XYtrA31R5qBSO3L3trNSuoRQCU+uG8upgRIOaKWULv/txpSw=
+	t=1725660443; cv=none; b=YXRcmqLxS5s0aG7JWo0rKu6RLJJ8tUPALOX9/24Uy0lo/bq3bjb2qjG62geSAec1ZKdpa1nGsxukOQBv5CIVDsrq3FJCgIaNACqpvPMFzTjj3/5WGcG7cO/X/639H6IoW/8NfSCK2Wl8kLYdnvCnO+6IA7suvymh1GCJ0RRAlpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725651948; c=relaxed/simple;
-	bh=l/jNdiXpLDG0SNsdrXr555BI7x2oH5i/+/iwxmWY6rk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KvmRQiBDvdUO14b8Iju0p2G9kyr0AVjB0FPqfxtgVZU5od4Ufz+JQYQiQuei/o6bi/G+HS6+XYfsg0JmVU2vHrWC07CMab8WHhTS6A1zEHgrYxv9htL0BUXYpPlyX5nyrsYBM2WAs3fl6mqwFauufXITByBgSyl/Kv+TfXw7VMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ixpI7toT; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1725660443; c=relaxed/simple;
+	bh=DMDXUtr2tKydRZROnQMaVv9GRGluLW3xfbvWKrH84YM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MNOTl/KwXNpx2Vn20T23VIUusccbtUvEd5oIKAiWIkyZbECuKGf8h83zLhdidPSzvefA+j8UlCdZn/TemdIKtxJWqU1Y6YjXtk5nEC3+vuh2CfLYKnqW6WeJ1mceP9cTxUkIGKl4lzBDh7iTmAnGea+RpwQwFlbgoqKSouLPzpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kaQN6uA+; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ixpI7toT"
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 486HRVBa011786
-	for <linux-block@vger.kernel.org>; Fri, 6 Sep 2024 12:45:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=8rI
-	6CMTj2J3FpDGqCnJP8sUIE2/1c2C05xB4E0tqk+w=; b=ixpI7toT6/4Ju4adUhM
-	xuSULpdKahVPHtQdeSfNuAKjmQPWqX8WfdQbagqcw4U9cIkVeJxk2A/ZbwT6CCz6
-	EfeVqOW5AikIkPTbmazoozag63av/uENpD9EhbCnptVyKWU3lC6T5N6tUFMd0ZuG
-	bfA1DcakeVmxFx/AlXZs63Q0az5bITdSsphVEHBuW8EJbb5kLqfIzdc5t9RVu6lX
-	vHnGv1AuXVT2KTpMNt7GhOLvkikcLWTbpPX7LK0R3kWJnHNom4Ce88uPX1q+CZw+
-	gh0LE/6KwT63IJTFbr1xq+cG4ic5fq0e43n5jn+vxdRKkHOSK/nhrA+zD/WaOgQn
-	s3w==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41fhy1ymd9-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 06 Sep 2024 12:45:45 -0700 (PDT)
-Received: from twshared8196.02.ash9.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Fri, 6 Sep 2024 19:45:43 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 7C18B12B5B59A; Fri,  6 Sep 2024 12:45:41 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] blk-mq: add missing unplug trace event
-Date: Fri, 6 Sep 2024 12:45:40 -0700
-Message-ID: <20240906194540.3719642-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kaQN6uA+"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5356bb55224so3123829e87.0
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2024 15:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725660439; x=1726265239; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6HOhtyEYYt7rA6jCBX+L1mlm8hngGJHlfFCxxooVTC4=;
+        b=kaQN6uA+5cYL38uaZLKBGyobZmQgr12YaaCLn80DRzBTFtLrZuxB9OfNnowN+YWS0/
+         EZ0gQ3vWXINxF5r6dptQxWlxL/HsAJSIa84VDdlUnGPTF5YbPo+W6DfbkDoaMcVR15/x
+         wFYLJhsb3PRYorSk0ZQaKryX5jPKwfekTUBAabltz/SA2X/sfyn5OaZMVJMgh/Apcdek
+         61nJUyQ2IXVMaSJKQdyr/p+3t8Q8WSzxqpGCL6dBAsHVzmADYQ/vBUUrEnRy0xC9jOc6
+         5SFk5FiKfO6nWnqqYh04CF4UcyB1vemf2TMzQb4F5yBJ+klIumSK8vzj0NAZAjlnccDI
+         J2dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725660439; x=1726265239;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6HOhtyEYYt7rA6jCBX+L1mlm8hngGJHlfFCxxooVTC4=;
+        b=c5tmWVspLhzhFw2PMfj5LRdI+SutifJC4Sjy8tD16gJnMSVswhrGhK1wICOEAb4Xqh
+         8lDNCoitbzMRCPHiMyArZrTR86Nfo+xzkjDxwbzihJPYUrjkPB/KNbwWpCsdPgIZZB2l
+         /VfFq/zEkMn1FBWWBb61nLKNBAz7D20S2Zwtns3VdRAVDeu8ZYgrEqwrsqVk0MGQ9HXS
+         DW+Y/rTPJIscmtBkbf4cbLot5FhHHzUihyFv8BFqu0z8+CFF1CUAaBgtFpREucIAu2JH
+         J18StuXlU10K/RjQYw4VXz7tCTK872snlQg2D1eluuwZwVk24gBVVNlZ5k0SK3rgPHEm
+         C3tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVakhFnPIxudo5Dv4cE/k1WnZ+YRHgbm/MGF7IUPMAs7Q+wT1LSSDH1KGXpz0yQGF3Bwx9gJQ1rGea2PA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyj84eVEe55OWuj8RIa1NsCyOxUZbxxGmZzG/bF1JVWAw7nZ472
+	S8ircO4nk/ux0iJalo6tA28hP2Yrb+nG58EMkadLcJVaew26yEHyYiQr4r8BK6M=
+X-Google-Smtp-Source: AGHT+IGo5Rf50EbBmOUBUAeWLcQnh0sLqD8vtwGBMm3Zld7y3VkY79ttTtwoqkfdSYGppGMy/IXnlA==
+X-Received: by 2002:a05:6512:280d:b0:530:ba4b:f65d with SMTP id 2adb3069b0e04-536587b4b74mr2903071e87.28.1725660438133;
+        Fri, 06 Sep 2024 15:07:18 -0700 (PDT)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--7a1.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::7a1])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-536536a12f4sm529135e87.230.2024.09.06.15.07.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 15:07:17 -0700 (PDT)
+Date: Sat, 7 Sep 2024 01:07:16 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, 
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Asutosh Das <quic_asutoshd@quicinc.com>, Ritesh Harjani <ritesh.list@gmail.com>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
+	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dm-devel@lists.linux.dev, linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v6 09/17] soc: qcom: ice: add HWKM support to the ICE
+ driver
+Message-ID: <7uoq72bpiqmo2olwpnudpv3gtcowpnd6jrifff34ubmfpijgc6@k6rmnalu5z4o>
+References: <20240906-wrapped-keys-v6-0-d59e61bc0cb4@linaro.org>
+ <20240906-wrapped-keys-v6-9-d59e61bc0cb4@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: 44Kq-8kIlukLeQgOJ-8lLt4wk87oMb5f
-X-Proofpoint-ORIG-GUID: 44Kq-8kIlukLeQgOJ-8lLt4wk87oMb5f
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_05,2024-09-06_01,2024-09-02_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240906-wrapped-keys-v6-9-d59e61bc0cb4@linaro.org>
 
-From: Keith Busch <kbusch@kernel.org>
+On Fri, Sep 06, 2024 at 08:07:12PM GMT, Bartosz Golaszewski wrote:
+> From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> 
+> Qualcomm's ICE (Inline Crypto Engine) contains a proprietary key
+> management hardware called Hardware Key Manager (HWKM). Add HWKM support
+> to the ICE driver if it is available on the platform. HWKM primarily
+> provides hardware wrapped key support where the ICE (storage) keys are
+> not available in software and instead protected in hardware.
+> 
+> When HWKM software support is not fully available (from Trustzone), there
+> can be a scenario where the ICE hardware supports HWKM, but it cannot be
+> used for wrapped keys. In this case, raw keys have to be used without
+> using the HWKM. We query the TZ at run-time to find out whether wrapped
+> keys support is available.
+> 
+> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
+> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  drivers/soc/qcom/ice.c | 152 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  include/soc/qcom/ice.h |   1 +
+>  2 files changed, 149 insertions(+), 4 deletions(-)
+> 
+>  int qcom_ice_enable(struct qcom_ice *ice)
+>  {
+> +	int err;
+> +
+>  	qcom_ice_low_power_mode_enable(ice);
+>  	qcom_ice_optimization_enable(ice);
+>  
+> -	return qcom_ice_wait_bist_status(ice);
+> +	if (ice->use_hwkm)
+> +		qcom_ice_enable_standard_mode(ice);
+> +
+> +	err = qcom_ice_wait_bist_status(ice);
+> +	if (err)
+> +		return err;
+> +
+> +	if (ice->use_hwkm)
+> +		qcom_ice_hwkm_init(ice);
+> +
+> +	return err;
+>  }
+>  EXPORT_SYMBOL_GPL(qcom_ice_enable);
+>  
+> @@ -150,6 +282,10 @@ int qcom_ice_resume(struct qcom_ice *ice)
+>  		return err;
+>  	}
+>  
+> +	if (ice->use_hwkm) {
+> +		qcom_ice_enable_standard_mode(ice);
+> +		qcom_ice_hwkm_init(ice);
+> +	}
+>  	return qcom_ice_wait_bist_status(ice);
+>  }
+>  EXPORT_SYMBOL_GPL(qcom_ice_resume);
+> @@ -157,6 +293,7 @@ EXPORT_SYMBOL_GPL(qcom_ice_resume);
+>  int qcom_ice_suspend(struct qcom_ice *ice)
+>  {
+>  	clk_disable_unprepare(ice->core_clk);
+> +	ice->hwkm_init_complete = false;
+>  
+>  	return 0;
+>  }
+> @@ -206,6 +343,12 @@ int qcom_ice_evict_key(struct qcom_ice *ice, int slot)
+>  }
+>  EXPORT_SYMBOL_GPL(qcom_ice_evict_key);
+>  
+> +bool qcom_ice_hwkm_supported(struct qcom_ice *ice)
+> +{
+> +	return ice->use_hwkm;
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_ice_hwkm_supported);
+> +
+>  static struct qcom_ice *qcom_ice_create(struct device *dev,
+>  					void __iomem *base)
+>  {
+> @@ -240,6 +383,7 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
+>  		engine->core_clk = devm_clk_get_enabled(dev, NULL);
+>  	if (IS_ERR(engine->core_clk))
+>  		return ERR_CAST(engine->core_clk);
+> +	engine->use_hwkm = qcom_scm_has_wrapped_key_support();
 
-The single-queue optimized list flush doesn't have an unplug trace event
-to pair with the plug event. Add one.
+This still makes the decision on whether to use HW-wrapped keys on
+behalf of a user. I suppose this is incorrect. The user must be able to
+use raw keys even if HW-wrapped keys are available on the platform. One
+of the examples for such use-cases is if a user prefers to be able to
+recover stored information in case of a device failure (such recovery
+will be impossible if SoC is damaged and HW-wrapped keys are used).
 
-In the unlikely event an error occurs and falls back to the less
-optimized plug flush path, it's possible a 2nd unplug trace event will
-be logged, but it will show the remainig count that weren't previously
-handled.
+>  
+>  	if (!qcom_ice_check_supported(engine))
+>  		return ERR_PTR(-EOPNOTSUPP);
+> diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
+> index 9dd835dba2a7..1f52e82e3e1c 100644
+> --- a/include/soc/qcom/ice.h
+> +++ b/include/soc/qcom/ice.h
+> @@ -34,5 +34,6 @@ int qcom_ice_program_key(struct qcom_ice *ice,
+>  			 const struct blk_crypto_key *bkey,
+>  			 u8 data_unit_size, int slot);
+>  int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
+> +bool qcom_ice_hwkm_supported(struct qcom_ice *ice);
+>  struct qcom_ice *of_qcom_ice_get(struct device *dev);
+>  #endif /* __QCOM_ICE_H__ */
+> 
+> -- 
+> 2.43.0
+> 
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-mq.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 79cc66275f1cd..3076019a9e0a7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2757,6 +2757,7 @@ static void blk_mq_dispatch_plug_list(struct blk_pl=
-ug *plug, bool from_sched)
- void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- {
- 	struct request *rq;
-+	unsigned int depth;
-=20
- 	/*
- 	 * We may have been called recursively midway through handling
-@@ -2767,6 +2768,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, =
-bool from_schedule)
- 	 */
- 	if (plug->rq_count =3D=3D 0)
- 		return;
-+	depth =3D plug->rq_count;
- 	plug->rq_count =3D 0;
-=20
- 	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
-@@ -2774,6 +2776,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, =
-bool from_schedule)
-=20
- 		rq =3D rq_list_peek(&plug->mq_list);
- 		q =3D rq->q;
-+		trace_block_unplug(q, depth, true);
-=20
- 		/*
- 		 * Peek first request and see if we have a ->queue_rqs() hook.
---=20
-2.43.5
-
+-- 
+With best wishes
+Dmitry
