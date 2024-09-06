@@ -1,350 +1,246 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B79F1D54FC;
-	Fri,  6 Sep 2024 17:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBBD1D5CFD
+	for <linux-block@vger.kernel.org>; Fri,  6 Sep 2024 18:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725642904; cv=none; b=iTYeW/szRjR6HjAXunoDqXm/7ffZwIXn+kGkYvzwwFUF60RnoCe669hrj8CywkNxaWNhTpFRvpO9Q5FSofiTl+9iB3DYrfSa2MgSudJfgkFEI6Dbubc4crzdd3/exWBzvyX7Wq8Iy7j4Jgc6lqkN1C8UmRPSaEMYbCpw+GlGqco=
+	t=1725646049; cv=none; b=i8ckbSLwHMlLkKQJCthF3Pq4DMTo2S2zp5SOCaGWanlBlHKEDmE+s+atTE1CGbs63koFcHtIcxgtQQaWyevdCLmmtoNcWuEgbT3iaeFGuWESDTnX4p3VxjTcj1jBrJGNKr5UL9fm3pIB4yhA0Aw9TM/ixuONXjZqnuqVDdx35Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725642904; c=relaxed/simple;
-	bh=hJd5D5cuQ3+OaiTp7RG2WH00nfbNJzZF8oCmgLThVn0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c/+AUiYrFw9u93CTEX0bV++hjoN4hwBuFVoM5k+On9uQmq3PbMEVQKkMUrhxNbHE1Y7QgyCngJarYZr6Qpxb/ZM/4LP1EQkwJE/IBNEBRAkkiMrCh4TPm+IFVHbdYPLAibLnrCRfLJVZ5FSJq5Qs/HrvCsV42gyQ9uKRkRmoa9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1onWIwI; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1725646049; c=relaxed/simple;
+	bh=aVAgf6Jw06Lql3bDOfE6zVcTVmPhHzcmNDJscnSeSew=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=e5qWgbBVFSHYkYfxEa2/fgHm3iNTGq3/6DBWIMJtIiF7ioIu/r1glPVrtTX9bSHvXrN/b0IL5Z9RZctY1mqc/FkbOhPeNvF5wS1vlrIYyoKFOeGMaaxsDVf3+rwySpJB4+xROWCpgQmmWAIhzzDSJmJ7XL7D9aOl5j8cQqJzwqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=dNnKs/3j; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1onWIwI"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5becfd14353so2201981a12.1;
-        Fri, 06 Sep 2024 10:15:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="dNnKs/3j"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-374bd0da617so1336136f8f.3
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2024 11:07:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725642901; x=1726247701; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=286e4IecGgr8POuqiAFx6v5NK8AZ8gj4bnNOx6ufcZQ=;
-        b=K1onWIwIuPI4lAuYZNNvnsGfUoIl1aB0DmaalsdYm4JhPJ8DbtQH+5XwRb6UXNfMS9
-         fawLPixWNTG16zUryLjdWBKqw3uQCDlGuFBUpyERvHdslpbqBSFIrdh6ARGHDWu0mrmQ
-         oRjI0tQHbGLnJPjSvJVfwD0f+Yv1sMoqdxJvXAbikqaf00mV9eQDfJ7ctUWuCpGeKR50
-         RcBYFRHagTR6KHg0w8E3LXf41vlEzSA8vLDKy/E4pq7EYcPpjByXkozbMiI2VAcl3eif
-         vW4k0A7xvm6+Sa+3rH6uNQetzXyBlyYNCy4jDM4hid0c3g0CRar9xnn7pXJlErq8Fd/g
-         F72w==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1725646045; x=1726250845; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+CkJo3Bz1wCo8cghBLvNHn5F/2d1ljMEB+CBPgFMiOM=;
+        b=dNnKs/3jgyvO+A6mXjyT7eFiuJije9f1o6pKnEkiUiDkVKYDYpLm84U/T7zp3WR4Qo
+         3sGVUHueJACIsD7IXa6ca7+reSi+BmgijvPbV5DByfMVibDD3UwALwB5BHDJsuzSa54T
+         ZvKlEKAuUZylowgZvhA7evaUoYYI/vt4SLP3EtBTvCJViDrIQUsAti01U+TyFvsOinKk
+         pU+WY8+x1khKstuzzirgsdKTBkO5hduI/rgOR41b3YfnXNo6ITdHo70YgEhVwNzWSuh8
+         7pygZrs+0WG9uxzsUgOHAztASfMVF6yruH7tCdjTQgJmlhB2FimR0FcmPwrwllYwHkfR
+         o1FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725642901; x=1726247701;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=286e4IecGgr8POuqiAFx6v5NK8AZ8gj4bnNOx6ufcZQ=;
-        b=mF5CqYaKh6acanUZP2O8cGsUh5iQ+C0haFwsD12sOfrslBHKbgDpe6xYy3p9IF4zUq
-         tB3NO75ZI1NKrPYb7sA4rEvbO4D+pdpszeXEp6COPCkZBGkGBoXpAKn3bXXy5b822eLx
-         B/PbY8Y9YMXeKUL1zm4/sM50HkcZH2MqZEVwGncJ7jC26gP3DGebm9IPEAhivnRZImpy
-         P3xqkAlVlS5VIB1qvA2/BoIW9xTt7/BkHu7EkxgJC2sqO7dqoNkEWpqUiTzVDeMOI7Ng
-         2Wat5w+jMAT33gOfCQRIIg2M5uuqJrEwYpYoNf3N5bjU+o4k0JijAuysVoV7GPNOwkNE
-         Lmwg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+0mxXGFz1cH4GS92jHH+1XQ+zY9QNyRa/2UEHTJDK7nUmryzCcN19EMwj24lkTVQeooeF3j4pmw==@vger.kernel.org, AJvYcCV37xcg/36dL9aXEuKgQNieIKlMupB3udBa3nafT1aqrGSPqyCuM3k4fG4TFM0NzWTZhMQFFGQl0hJogp8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU+cmdAjL8GUwzQDkgN7G+7j3VKxi5wOxZFGsMYUwTcBSJtPoK
-	ZiUhTIeli0NQA0pjClS55IcLqodDAx+Ya/yFHsrOoBGXibk8szsO3VasAiwx
-X-Google-Smtp-Source: AGHT+IHwgQBb0JCyIo7xjY62TLND6bg2zEpb9vC3Isan2Xd8cue6/onzyWu1vzyiEjdwH9jG+PDLmw==
-X-Received: by 2002:a05:6402:1d56:b0:5c3:cc6d:19df with SMTP id 4fb4d7f45d1cf-5c3cc6d1b12mr4621345a12.28.1725642900024;
-        Fri, 06 Sep 2024 10:15:00 -0700 (PDT)
-Received: from [192.168.42.34] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc56a876sm2617413a12.51.2024.09.06.10.14.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Sep 2024 10:14:59 -0700 (PDT)
-Message-ID: <36ae357b-bebe-4276-a8db-d6dccf227b61@gmail.com>
-Date: Fri, 6 Sep 2024 18:15:32 +0100
+        d=1e100.net; s=20230601; t=1725646045; x=1726250845;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+CkJo3Bz1wCo8cghBLvNHn5F/2d1ljMEB+CBPgFMiOM=;
+        b=kBuBR2EuEQCgwkJHvNyavHvUVlZxcjlw833VQ7ygWvFE6y91LpiOMFnMW1YIRvQfze
+         Bx827f9iTwcLCacNwTYi1SgJeK3aoyl8b++y3OUr6wDdZGW+1aR6QOsQBzanoj6BKw1j
+         LdepEC849KaSd0GrqDqN2VlAC+I8xisvKpFknq9wf7hCWjHMdqcoDiQaCzOIF0+rl3pZ
+         nEPoyr/hqnXvTq98zLRe7n+lnJkDvcij4YGWXR6TFjRaVwT1s+rivooouv6mtBGohxry
+         tkTTiOgK/iCFg8buGLiifm+kESBCiYjbOmlrOl0W6zFEAqqljE7oHHb1KCJLBJoxjmMP
+         fk6w==
+X-Gm-Message-State: AOJu0YziJ95tUbvDuJtGIgMdipmU0/MlZ8s3Bsz2c2Cxl3pA3WfZqAMF
+	XnoCYDtQyLii2+BRQodDgpgD1ujwQh7+glSzG18E8jtxCMfCQ7FTWLuau92x2hc=
+X-Google-Smtp-Source: AGHT+IHy1pIX6vPFN+GTLpQP7Rpewt0HZvI8JhY+ZgzCgA6fBvnlWfM8eNUCakcjVl0vKiyxCZY3pw==
+X-Received: by 2002:adf:f14a:0:b0:377:2ce0:a760 with SMTP id ffacd0b85a97d-378896a47eamr2289788f8f.49.1725646044865;
+        Fri, 06 Sep 2024 11:07:24 -0700 (PDT)
+Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:b9fc:a1e7:588c:1e37])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42cac8543dbsm5880485e9.42.2024.09.06.11.07.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 11:07:24 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: [PATCH v6 00/17] Hardware wrapped key support for QCom ICE and UFS
+ core
+Date: Fri, 06 Sep 2024 20:07:03 +0200
+Message-Id: <20240906-wrapped-keys-v6-0-d59e61bc0cb4@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 4/8] io_uring: support SQE group
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-References: <20240808162503.345913-1-ming.lei@redhat.com>
- <20240808162503.345913-5-ming.lei@redhat.com>
- <3c819871-7ca3-47ea-b752-c4a8a49f8304@gmail.com> <Zs/5Hpi16aQKlHFw@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <Zs/5Hpi16aQKlHFw@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMdE22YC/x3MSwqAIBRG4a3EHSdcLCLaSjSw/K1LYKLQA2nvS
+ cNvcE6mhChINFSZIk5JcviCrq5o2YxfocQWk2bdcs9aXdGEAKt2PEkBhrnRbnawVJIQ4eT+d+P
+ 0vh8aHOmmXgAAAA==
+To: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, 
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+ Mikulas Patocka <mpatocka@redhat.com>, 
+ Adrian Hunter <adrian.hunter@intel.com>, 
+ Asutosh Das <quic_asutoshd@quicinc.com>, 
+ Ritesh Harjani <ritesh.list@gmail.com>, 
+ Ulf Hansson <ulf.hansson@linaro.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
+ Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
+ Jaegeuk Kim <jaegeuk@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+ Gaurav Kashyap <quic_gaurkash@quicinc.com>, 
+ Neil Armstrong <neil.armstrong@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, 
+ linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+ Eric Biggers <ebiggers@google.com>, 
+ Om Prakash Singh <quic_omprsing@quicinc.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6577;
+ i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
+ bh=aVAgf6Jw06Lql3bDOfE6zVcTVmPhHzcmNDJscnSeSew=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBm20TRVUK7s5AluIXTTb9EEpQr0K8OAnyTVliLo
+ nGHj15AhL6JAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZttE0QAKCRARpy6gFHHX
+ cgslEAC8zF47axKM4eyrLbxAT7zfi+OlAXxoW7fVp6nbh2i+ikstA+dRIKyyAkw+09gVD629cnv
+ PPxeehFUKgVaHZshBdiP8ekuFLijPWDFySoOK8WrNHLAGcnyMYeKeEk/tGAuzVIQv5VUjSQvHXl
+ jfMYj/lxFMbIOGUdCkc8wMxYQTwwK6xD3PAUKEcjhGGEgDRgWYoH/OA5iYsnqKCQ0aaddlcyTYc
+ IDTedf3x5Xi4rM+caiUpdRwf5Q5zwHQJzGugfh5H0xba2vidjV3mlOu75lYHqnbKBJHjnfqt2zZ
+ Hmuv/PzCMq2gQZAhfpUTyFyqQYBxJtNeYGnlV1d2HRhHBkrbEt1Bgj1PJ/i8rw9yDvPWIA3NE4c
+ vttukKfAwu9UGl+szEG3nGdUuHn56GRJaS8xAfq5GjpALf1krP+HGkH0G/GNd/g9XijKVADUTyx
+ o2x0pHeMt7FoQqtpiiqzsK7G7KyNr3QHxziDtA/fhfEwBARI6lvGDX3EkFcIMx97RdI3PugB8SC
+ nOb/xe2w4qBxuHUSW5CGovmHNE7OUyl+37XuGY+odYSRw2viBjr2anYSHsJJIdF3vnZsfuMrm2H
+ bYhyu4zX5jsiygksTPOInurmIbq8XAjgyz7ddVW2tOlyDcdbk/Kg0tSLXpOGMrNIZmnlaoqQnHc
+ 53ysG6tzB32F0fw==
+X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
+ fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
-On 8/29/24 05:29, Ming Lei wrote:
-...
->>> +	if (WARN_ON_ONCE(lead->grp_refs <= 0))
->>> +		return false;
->>> +
->>> +	req->flags &= ~REQ_F_SQE_GROUP;
->>
->> I'm getting completely lost when and why it clears and sets
->> back REQ_F_SQE_GROUP and REQ_F_SQE_GROUP_LEADER. Is there any
->> rule?
-> 
-> My fault, it should have been documented somewhere.
-> 
-> REQ_F_SQE_GROUP is cleared when the request is completed, but it is
-> reused as flag for marking the last request in this group, so we can
-> free the group leader when observing the 'last' member request.
+I took this work over from Gaurav Kashyap and integrated Eric's series
+into it for an easier discussion on the actual API to be used for
+wrapped keys as well as if and how to enable users to indicate whether
+wrapped keys should be used at all.
 
-Maybe it'd be cleaner to use a second flag?
+I know Dmitry's opinion on that and expect this to be more of an RFC
+rather than a real patch series. That being said, what is here, works
+fine on sm8650.
 
-> The only other difference about the two flags is that both are cleared
-> when the group leader becomes the last one in the group, then
-> this leader degenerates as normal request, which way can simplify
-> group leader freeing.
-> 
->>
->>> +	/*
->>> +	 * Set linked leader as failed if any member is failed, so
->>> +	 * the remained link chain can be terminated
->>> +	 */
->>> +	if (unlikely((req->flags & REQ_F_FAIL) &&
->>> +		     ((lead->flags & IO_REQ_LINK_FLAGS) && lead->link)))
->>> +		req_set_fail(lead);
->>
->> if (req->flags & REQ_F_FAIL)
->> 	req_set_fail(lead);
->>
->> REQ_F_FAIL is not specific to links, if a request fails we need
->> to mark it as such.
-> 
-> It is for handling group failure.
-> 
-> The following condition
-> 
-> 	((lead->flags & IO_REQ_LINK_FLAGS) && lead->link))
-> 
-> means that this group is in one link-chain.
-> 
-> If any member in this group is failed, we need to fail this group(lead),
-> then the remained requests in this chain can be failed.
-> 
-> Otherwise, it isn't necessary to fail group leader in case of any member
-> io failure.
+Hardware-wrapped keys are encrypted keys that can only be unwrapped
+(decrypted) and used by hardware - either by the inline encryption
+hardware itself, or by a dedicated hardware block that can directly
+provision keys to the inline encryption hardware. For more details,
+please see patches 1-3 in this series which extend the inline encryption
+docs with more information.
 
-What bad would happen if you do it like this?
+This series adds support for wrapped keys to the block layer, fscrypt
+and then build upwards from there by implementing relevant callbacks in
+QCom SCM driver, then the ICE driver and finally in UFS core and QCom
+layer.
 
-if (req->flags & REQ_F_FAIL)
-	req_set_fail(lead);
+Tested on sm8650-qrd.
 
-I'm asking because if you rely on some particular combination
-of F_FAIL and F_LINK somewhere, it's likely wrong, but otherwise
-we F_FAIL a larger set of requests, which should never be an
-issue.
+How to test:
 
->>> +	return !--lead->grp_refs;
->>> +}
->>> +
->>> +static inline bool leader_is_the_last(struct io_kiocb *lead)
->>> +{
->>> +	return lead->grp_refs == 1 && (lead->flags & REQ_F_SQE_GROUP);
->>> +}
->>> +
->>> +static void io_complete_group_member(struct io_kiocb *req)
->>> +{
->>> +	struct io_kiocb *lead = get_group_leader(req);
->>> +
->>> +	if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP)))
->>> +		return;
->>> +
->>> +	/* member CQE needs to be posted first */
->>> +	if (!(req->flags & REQ_F_CQE_SKIP))
->>> +		io_req_commit_cqe(req->ctx, req);
->>> +
->>> +	if (__io_complete_group_member(req, lead)) {
->>> +		/*
->>> +		 * SQE_GROUP flag is kept for the last member, so the leader
->>> +		 * can be retrieved & freed from this last member
->>> +		 */
->>> +		req->flags |= REQ_F_SQE_GROUP;
-> 
-> 'req' is the last completed request, so mark it as the last one
-> by reusing REQ_F_SQE_GROUP, so we can free group leader in
-> io_free_batch_list() when observing the last flag.
-> 
-> But it should have been documented.
-> 
->>> +		if (!(lead->flags & REQ_F_CQE_SKIP))
->>> +			io_req_commit_cqe(lead->ctx, lead);
->>> +	} else if (leader_is_the_last(lead)) {
->>> +		/* leader will degenerate to plain req if it is the last */
->>> +		lead->flags &= ~(REQ_F_SQE_GROUP | REQ_F_SQE_GROUP_LEADER);
->>
->> What's this chunk is about?
-> 
-> The leader becomes the only request not completed in group, so it is
-> degenerated as normal one by clearing the two flags. This way simplifies
-> logic for completing group leader.
-> 
-...
->>> @@ -1388,11 +1501,33 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
->>>    						    comp_list);
->>>    		if (unlikely(req->flags & IO_REQ_CLEAN_SLOW_FLAGS)) {
->>> +			if (req->flags & (REQ_F_SQE_GROUP |
->>> +					  REQ_F_SQE_GROUP_LEADER)) {
->>> +				struct io_kiocb *leader;
->>> +
->>> +				/* Leader is freed via the last member */
->>> +				if (req_is_group_leader(req)) {
->>> +					node = req->comp_list.next;
->>> +					continue;
->>> +				}
->>> +
->>> +				/*
->>> +				 * Only the last member keeps GROUP flag,
->>> +				 * free leader and this member together
->>> +				 */
->>> +				leader = get_group_leader(req);
->>> +				leader->flags &= ~REQ_F_SQE_GROUP_LEADER;
->>> +				req->flags &= ~REQ_F_SQE_GROUP;
->>> +				wq_stack_add_head(&leader->comp_list,
->>> +						  &req->comp_list);
->>
->> That's quite hacky, but at least we can replace it with
->> task work if it gets in the way later on.
-> 
-> io_free_batch_list() is already called in task context, and it isn't
-> necessary to schedule one extra tw, which hurts perf more or less.
-> 
-> Another way is to store these leaders into one temp list, and
-> call io_free_batch_list() for this temp list one more time.
+Use the wip-wrapped-keys branch from https://github.com/ebiggers/fscryptctl
+to build a custom fscryptctl that supports generating wrapped keys.
 
-What I'm saying, it's fine to leave it as is for now. In the
-future if it becomes a problem for ome reason or another, we can
-do it the task_work like way.
+Enable the following config options:
+CONFIG_BLK_INLINE_ENCRYPTION=y
+CONFIG_QCOM_INLINE_CRYPTO_ENGINE=m
+CONFIG_FS_ENCRYPTION_INLINE_CRYPT=y
+CONFIG_SCSI_UFS_CRYPTO=y
 
-...
->>> @@ -2101,6 +2251,62 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
->>>    	return def->prep(req, sqe);
->>>    }
->>> +static struct io_kiocb *io_group_sqe(struct io_submit_link *group,
->>> +				     struct io_kiocb *req)
->>> +{
->>> +	/*
->>> +	 * Group chain is similar with link chain: starts with 1st sqe with
->>> +	 * REQ_F_SQE_GROUP, and ends with the 1st sqe without REQ_F_SQE_GROUP
->>> +	 */
->>> +	if (group->head) {
->>> +		struct io_kiocb *lead = group->head;
->>> +
->>> +		/* members can't be in link chain, can't be drained */
->>> +		if (req->flags & (IO_REQ_LINK_FLAGS | REQ_F_IO_DRAIN))
->>> +			req_fail_link_node(lead, -EINVAL);
->>
->> That should fail the entire link (if any) as well.
-> 
-> Good catch, here we should fail link head by following the logic
-> in io_submit_fail_init().
-> 
->>
->> I have even more doubts we even want to mix links and groups. Apart
-> 
-> Wrt. ublk, group provides zero copy, and the ublk io(group) is generic
-> IO, sometime IO_LINK is really needed & helpful, such as in ublk-nbd,
-> send(tcp) requests need to be linked & zc. And we shouldn't limit IO_LINK
-> for generic io_uring IO.
-> 
->> from nuances as such, which would be quite hard to track, the semantics
->> of IOSQE_CQE_SKIP_SUCCESS is unclear.
-> 
-> IO group just follows every normal request.
+$ mkfs.ext4 -F -O encrypt,stable_inodes /dev/disk/by-partlabel/userdata
+$ mount /dev/disk/by-partlabel/userdata -o inlinecrypt /mnt
+$ fscryptctl generate_hw_wrapped_key /dev/disk/by-partlabel/userdata > /mnt/key.longterm
+$ fscryptctl prepare_hw_wrapped_key /dev/disk/by-partlabel/userdata < /mnt/key.longterm > /tmp/key.ephemeral
+$ KEYID=$(fscryptctl add_key --hw-wrapped-key < /tmp/key.ephemeral /mnt)
+$ rm -rf /mnt/dir
+$ mkdir /mnt/dir
+$ fscryptctl set_policy --hw-wrapped-key --iv-ino-lblk-64 "$KEYID" /mnt/dir
+$ dmesg > /mnt/dir/test.txt
+$ sync
 
-It tries to mimic but groups don't and essentially can't do it the
-same way, at least in some aspects. E.g. IOSQE_CQE_SKIP_SUCCESS
-usually means that all following will be silenced. What if a
-member is CQE_SKIP, should it stop the leader from posting a CQE?
-And whatever the answer is, it'll be different from the link's
-behaviour.
+Reboot the board
 
-Regardless, let's forbid IOSQE_CQE_SKIP_SUCCESS and linked timeouts
-for groups, that can be discussed afterwards.
+$ mount /dev/disk/by-partlabel/userdata -o inlinecrypt /mnt
+$ ls /mnt/dir
+$ fscryptctl prepare_hw_wrapped_key /dev/disk/by-partlabel/userdata < /mnt/key.longterm > /tmp/key.ephemeral
+$ KEYID=$(fscryptctl add_key --hw-wrapped-key < /tmp/key.ephemeral /mnt)
+$ fscryptctl set_policy --hw-wrapped-key --iv-ino-lblk-64 "$KEYID" /mnt/dir
+$ cat /mnt/dir/test.txt # File should now be decrypted
 
-> 1) fail in linked chain
-> - follows IO_LINK's behavior since io_fail_links() covers io group
-> 
-> 2) otherwise
-> - just respect IOSQE_CQE_SKIP_SUCCESS
-> 
->> And also it doen't work with IORING_OP_LINK_TIMEOUT.
-> 
-> REQ_F_LINK_TIMEOUT can work on whole group(or group leader) only, and I
-> will document it in V6.
+Changes since v5:
+- add the wrapped key support from Eric Biggers to the series
+- remove the new DT property from the series and instead query the
+  at run-time rustZone to find out if wrapped keys are supported
+- make the wrapped key support into a UFS capability, not a quirk
+- improve kerneldocs
+- improve and rework coding style in most patches
+- improve and reformat commit messages
+- simplify the offset calculation for CRYPTOCFG
+- split out the DTS changes into a separate series
 
-It would still be troublesome. When a linked timeout fires it searches
-for the request it's attached to and cancels it, however, group leaders
-that queued up their members are discoverable. But let's say you can find
-them in some way, then the only sensbile thing to do is cancel members,
-which should be doable by checking req->grp_leader, but might be easier
-to leave it to follow up patches.
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+---
+Bartosz Golaszewski (1):
+      firmware: qcom: scm: add a call for checking wrapped key support
 
+Eric Biggers (4):
+      blk-crypto: add basic hardware-wrapped key support
+      blk-crypto: show supported key types in sysfs
+      blk-crypto: add ioctls to create and prepare hardware-wrapped keys
+      fscrypt: add support for hardware-wrapped keys
 
->>> +
->>> +		lead->grp_refs += 1;
->>> +		group->last->grp_link = req;
->>> +		group->last = req;
->>> +
->>> +		if (req->flags & REQ_F_SQE_GROUP)
->>> +			return NULL;
->>> +
->>> +		req->grp_link = NULL;
->>> +		req->flags |= REQ_F_SQE_GROUP;
->>> +		group->head = NULL;
->>> +		if (lead->flags & REQ_F_FAIL) {
->>> +			io_queue_sqe_fallback(lead);
->>
->> Let's say the group was in the middle of a link, it'll
->> complete that group and continue with assembling / executing
->> the link when it should've failed it and honoured the
->> request order.
-> 
-> OK, here we can simply remove the above two lines, and link submit
-> state can handle this failure in link chain.
+Gaurav Kashyap (12):
+      ice, ufs, mmc: use the blk_crypto_key struct when programming the key
+      firmware: qcom: scm: add a call for deriving the software secret
+      firmware: qcom: scm: add calls for creating, preparing and importing keys
+      soc: qcom: ice: add HWKM support to the ICE driver
+      soc: qcom: ice: add support for hardware wrapped keys
+      soc: qcom: ice: add support for generating, importing and preparing keys
+      ufs: core: add support for wrapped keys to UFS core
+      ufs: core: add support for deriving the software secret
+      ufs: core: add support for generating, importing and preparing keys
+      ufs: host: add support for wrapped keys in QCom UFS
+      ufs: host: add a callback for deriving software secrets and use it
+      ufs: host: add support for generating, importing and preparing wrapped keys
 
-If you just delete then nobody would check for REQ_F_FAIL and
-fail the request. Assuming you'd also set the fail flag to the
-link head when appropriate, how about deleting these two line
-and do like below? (can be further prettified)
+ Documentation/ABI/stable/sysfs-block               |  18 ++
+ Documentation/block/inline-encryption.rst          | 245 +++++++++++++-
+ Documentation/filesystems/fscrypt.rst              | 154 ++++++++-
+ Documentation/userspace-api/ioctl/ioctl-number.rst |   2 +
+ block/blk-crypto-fallback.c                        |   5 +-
+ block/blk-crypto-internal.h                        |  10 +
+ block/blk-crypto-profile.c                         | 103 ++++++
+ block/blk-crypto-sysfs.c                           |  35 ++
+ block/blk-crypto.c                                 | 194 ++++++++++-
+ block/ioctl.c                                      |   5 +
+ drivers/firmware/qcom/qcom_scm.c                   | 233 ++++++++++++++
+ drivers/firmware/qcom/qcom_scm.h                   |   4 +
+ drivers/md/dm-table.c                              |   1 +
+ drivers/mmc/host/cqhci-crypto.c                    |   9 +-
+ drivers/mmc/host/cqhci.h                           |   2 +
+ drivers/mmc/host/sdhci-msm.c                       |   6 +-
+ drivers/soc/qcom/ice.c                             | 355 ++++++++++++++++++++-
+ drivers/ufs/core/ufshcd-crypto.c                   |  86 ++++-
+ drivers/ufs/host/ufs-qcom.c                        |  61 +++-
+ fs/crypto/fscrypt_private.h                        |  71 ++++-
+ fs/crypto/hkdf.c                                   |   4 +-
+ fs/crypto/inline_crypt.c                           |  44 ++-
+ fs/crypto/keyring.c                                | 124 +++++--
+ fs/crypto/keysetup.c                               |  54 +++-
+ fs/crypto/keysetup_v1.c                            |   5 +-
+ fs/crypto/policy.c                                 |  11 +-
+ include/linux/blk-crypto-profile.h                 |  73 +++++
+ include/linux/blk-crypto.h                         |  75 ++++-
+ include/linux/firmware/qcom/qcom_scm.h             |   8 +
+ include/soc/qcom/ice.h                             |  18 +-
+ include/uapi/linux/blk-crypto.h                    |  44 +++
+ include/uapi/linux/fs.h                            |   6 +-
+ include/uapi/linux/fscrypt.h                       |   7 +-
+ include/ufs/ufshcd.h                               |  21 ++
+ 34 files changed, 1958 insertions(+), 135 deletions(-)
+---
+base-commit: ad40aff1edffeccc412cde93894196dca7bc739e
+change-id: 20240802-wrapped-keys-eea0032fbfed
 
-
-bool io_group_assembling()
-{
-	return state->group.head || (req->flags & REQ_F_SQE_GROUP);
-}
-bool io_link_assembling()
-{
-	return state->link.head || (req->flags & IO_REQ_LINK_FLAGS);
-}
-
-static inline int io_submit_sqe()
-{
-	...
-	if (unlikely(io_link_assembling(state, req) ||
-				 io_group_assembling(state, req) ||
-				 req->flags & REQ_F_FAIL)) {
-		if (io_group_assembling(state, req)) {
-			req = io_group_sqe(&state->group, req);
-			if (!req)
-				return 0;
-		}
-		if (io_link_assembling(state, req)) {
-			req = io_link_sqe(&state->link, req);
-			if (!req)
-				return 0;
-		}
-		if (req->flags & REQ_F_FAIL) {
-			io_queue_sqe_fallback(req);
-			return 0;
-		}
-	}
-	io_queue_sqe(req);
-	return 0;
-}
-
-
+Best regards,
 -- 
-Pavel Begunkov
+Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
