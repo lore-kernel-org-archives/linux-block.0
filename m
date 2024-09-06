@@ -1,136 +1,133 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2891CB32C
-	for <linux-block@vger.kernel.org>; Fri,  6 Sep 2024 11:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DB71C9ED9
+	for <linux-block@vger.kernel.org>; Fri,  6 Sep 2024 13:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725622985; cv=none; b=TJy/khZKMhNBl8jxQNmg6X4dEG5oJ2ipLjsZDxP+3GTQhnux71mFSYDFnapVz687wpT+d8PxGdZwl07VLMoarq/pL8syaGrVTmA72DIPx730vGtUBKg16xYJp4APEUmjGYiAUUJkeE2L92pn3hzdpR/8Rjm8uC8Mi+yUERbKLkU=
+	t=1725629463; cv=none; b=Y1qYU+ngsEdVUwMAhqrJslnPAzrINdzzt/xRIA9yZ8WLWhvUeS5yhfke2KdFNBUctxFdc9qArodkOMJ1iSiYHxcpn21WNEsebuTLNlWEueXilxxaMYS+JXxQCjIDZmG7heRtMa0fREEhZTceYC43b6Jk0pzh69SKMYv91Xa3MzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725622985; c=relaxed/simple;
-	bh=JViiijbWVb4g87RGAEJMC4FllLRTP244oYzrs0FmBsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=b/nAVqeNsf0OM3FGqKnUVDW1vWzwQBiEyz+c6hAHH0YTJuw2mSq679jQYlKXS/H3Z6DyUs0qCSrupvERlzNU2cEZAslNu6fne3HJfGN2oE72l9XDx5AAkT+QqH+f8L/lWBa14IQp8fuY/i3uEN5+xPAu3kUKxsrxXTHcieEAWwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=W4AzyR2H; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1725629463; c=relaxed/simple;
+	bh=ISShPFdbWdnbbODRfOAk9mEWgE1TWDKP5qxBL+fjn4k=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=O5vRRbswmMGbN8rv67Y3Ff1ISbD6EcQfDfsbfDbkLKx70OU0Q3RKsGRswqu5eSyMwKZKcw3sJ/HNov9A8hT+NwHSK46avBCv1abwwPHr3O0k3XvjHLYM+SxeNpYLSMWNZ0YUQnlVshI2TyUDVI+7AMiQIjRsnnujPgehtDGpMH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Se/FUBXZ; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="W4AzyR2H"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240906114255epoutp035f642fc7a08f0e0eb8343a8522fb29aa~ypPQiHr-M2914629146epoutp03L
-	for <linux-block@vger.kernel.org>; Fri,  6 Sep 2024 11:42:55 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240906114255epoutp035f642fc7a08f0e0eb8343a8522fb29aa~ypPQiHr-M2914629146epoutp03L
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1725622975;
-	bh=JViiijbWVb4g87RGAEJMC4FllLRTP244oYzrs0FmBsU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W4AzyR2Hy8M70yPCLrMKqEGcvdfCyl6Vk/bZCepC2rvAVmlIww45lU6IwD4lBZc0y
-	 omjY/6CE8ADaGXROac1I5usWZsP4xPSuAj9AUiNDP7pEhEOnWRQ6vfFRQv2E7x6SNj
-	 R1XxSOiqxNHX771iaio8jE6hkEJUP1oefIagIpx8=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240906114254epcas5p1075ccb25a4fc445a8d598e7dfb0db38b~ypPP5BnHB2100421004epcas5p1w;
-	Fri,  6 Sep 2024 11:42:54 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.175]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4X0Z993mDPz4x9Pp; Fri,  6 Sep
-	2024 11:42:53 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	71.CC.19863.DBAEAD66; Fri,  6 Sep 2024 20:42:53 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240906113547epcas5p1f2b6f478a1804a2b1ad04b1e64b05d92~ypJBYwqDk2192021920epcas5p1F;
-	Fri,  6 Sep 2024 11:35:47 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240906113547epsmtrp2c46527f2f85e1f4a907fee008346576e~ypJBXarVJ1860918609epsmtrp20;
-	Fri,  6 Sep 2024 11:35:47 +0000 (GMT)
-X-AuditID: b6c32a50-ef5fe70000004d97-b8-66daeabd070a
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	4B.E6.08456.219EAD66; Fri,  6 Sep 2024 20:35:46 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20240906113545epsmtip20c270e21efb4bf1568fdf5e81b839430~ypI-o2OgC2799027990epsmtip2r;
-	Fri,  6 Sep 2024 11:35:45 +0000 (GMT)
-Date: Fri, 6 Sep 2024 16:58:19 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, sagi@grimberg.me, Keith Busch
-	<kbusch@kernel.org>
-Subject: Re: [PATCHv3 10/10] blk-merge: properly account for integrity
- segments
-Message-ID: <20240906112819.y6faem7p6gyf24zw@green245>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Se/FUBXZ"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7cf5e179b68so1505562a12.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2024 06:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725629458; x=1726234258; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P9ZOsfShkSTEJgmu7wPAO+Yvcxucqv3wdpdP/jZ9lsY=;
+        b=Se/FUBXZCCoT67CYas9SgJzwlX/jVr21MwfcmEGMONpr4XEiGgbZFKP7fQbCUqj8ci
+         NV7QvquRLvfYnrddMn8SDpI/37zxfMs8mSIaRrSTdjhhMuBu5g4zE4+JQlCEHAljpFVX
+         4agRbObgUFFH7dCbAZWKMUAHpL7HAVH/6jX3/8afK9HBvV4dHQttJJtv7UWUKBJqdOtd
+         M9aaeIRQee+BpDlE5aTBjRbIUTU45yyesQBvWKCYx3lDsUFwKUN89zVvGf4YyWbwJ40Z
+         0ppvQsHNXKhwjouUXBVaJ3KWJT4ojcCMRLL7hc7+WS1WvrUko/C8jsK+OcUv8w0glMte
+         foUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725629458; x=1726234258;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=P9ZOsfShkSTEJgmu7wPAO+Yvcxucqv3wdpdP/jZ9lsY=;
+        b=egYeDcTgPavvg3v4PNWyzy7dml5inmzY/1mKYdK+wWJnx0Wy5pk1CBdp8bD04NfXCL
+         KI+h11X62+dNJW1QNu7TBCKzixaQEx35kTbFwHvhHAtCy3E87ky9FVGbPbF51ZiJERVb
+         uij9v+SF9YvtOKkcc8QBEyalhdQAhdz64ptqyVudU3YSmISH/oOIxtaYmR/dUGIs1fBC
+         NhfVB+kFjIxL0u9UrkpzykorVAq3tnCGGKv/Okx1BNC9AAAEcuFERKHnjfsZeZJSdOEo
+         B7zqJcGgsUDkqiXfwUluErqi0SC07758dPq69K8+lj39FfF78mVrUWY3KGuwQHVNH4h8
+         XDzg==
+X-Gm-Message-State: AOJu0YwnurHV4BBpHQC5y19GNbn064LcAkSal52VGl7xv/SDw1KhhWsc
+	bPOsEAcKYgsN7WiT2mLSVsl8nUe+ItMjUqW6ImzpK54572RqJ5C+RWQOxDqlNqT+glTCq4n55Ja
+	y
+X-Google-Smtp-Source: AGHT+IGvFLj9tHZtMQvoYb9pxKz3m70Ab4i2Ricrk8djZwiv4VqMOXwFd7TX06wax8WvpJZngzZhqg==
+X-Received: by 2002:a17:903:192:b0:206:8d6e:d003 with SMTP id d9443c01a7336-206ee9255b4mr41492555ad.4.1725629457817;
+        Fri, 06 Sep 2024 06:30:57 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea5ee23sm43138055ad.241.2024.09.06.06.30.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Sep 2024 06:30:57 -0700 (PDT)
+Message-ID: <e49dcbce-3af6-47b1-96ee-a1046324b152@kernel.dk>
+Date: Fri, 6 Sep 2024 07:30:56 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240904152605.4055570-11-kbusch@meta.com>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrIJsWRmVeSWpSXmKPExsWy7bCmlu7eV7fSDOY9lLRYfbefzWLl6qNM
-	FpMOXWO0OHN1IYvF3lvaFvOXPWW36L6+g81i+fF/TBbrXr9nceD0OH9vI4vH5bOlHptWdbJ5
-	bF5S77H7ZgObx7mLFR4fn95i8fi8SS6AIyrbJiM1MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ
-	19DSwlxJIS8xN9VWycUnQNctMwfoNiWFssScUqBQQGJxsZK+nU1RfmlJqkJGfnGJrVJqQUpO
-	gUmBXnFibnFpXrpeXmqJlaGBgZEpUGFCdsa7TweYCo6yVHQ3H2JvYPzP3MXIwSEhYCLxapZT
-	FyMXh5DAHkaJ7U+7GSGcT4wS75buYINwvjFK3HvQwtrFyAnWcWTlGnaIxF5GiZ6W91DOM0aJ
-	KV+PMoJUsQioSHz9uogdxGYTUJc48rwVLC4ioChxHhgUIA3MAmcZJX7962ACSQgLBEq8vPYY
-	zOYVMJN4PvEAO4QtKHFy5hMWEJtTwELixLT7zCC2qICMxIylX5lBBkkITOWQ2Lr/LTPEfS4S
-	j5ffYoOwhSVeHd/CDmFLSXx+txcqni7x4/JTJgi7QKL52D5GCNteovVUPzhkmIFqPq/igwjL
-	Skw9tQ6snFmAT6L39xOoVl6JHfNgbCWJ9pVzoGwJib3nGqBsD4lXZ75Aw3EHo8SPRzOZJjDK
-	z0Ly2yyEdbPAVlhJdH5oYoUIS0ss/8cBYWpKrN+lv4CRdRWjVGpBcW56arJpgaFuXmo5PMaT
-	83M3MYLTrlbADsbVG/7qHWJk4mA8xCjBwawkwvvU81aaEG9KYmVValF+fFFpTmrxIUZTYGRN
-	ZJYSTc4HJv68knhDE0sDEzMzMxNLYzNDJXHe161zU4QE0hNLUrNTUwtSi2D6mDg4pRqYOpI6
-	Dtcvzjtg8elCZ5/yHPmcyc8r7XJ2HolZqf/6911+0Z0dws+EPk7ddcThntFUSR+PHV8L126a
-	8D1Jpbdq4b37k4oe9D9v/r3L0kN06auMkGObw7ftkl68szAncZmiO6NW3RfTJH45h/fy9+ct
-	2u1cGWByY32ev81XPZN+FRaWU1Pb9P0rmFISMjfEdt0J/WIT+r3B7pC7wP8557d2z1xSm3Nw
-	yn7zkp27zAx3WRg93SclVew4K78lV2Plgsp9ie8rfaZsNXk/fS5/mXb74qlPhLQPuO1b9p53
-	9v7pl7aI/ypI9pHZwWMl49h9imGGAHvR5WDzDZqpIc3Ss6+9qphf2+0q3nK4vu9h+IFuJZbi
-	jERDLeai4kQAyhtlb0QEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrELMWRmVeSWpSXmKPExsWy7bCSvK7Qy1tpBgt3WlmsvtvPZrFy9VEm
-	i0mHrjFanLm6kMVi7y1ti/nLnrJbdF/fwWax/Pg/Jot1r9+zOHB6nL+3kcXj8tlSj02rOtk8
-	Ni+p99h9s4HN49zFCo+PT2+xeHzeJBfAEcVlk5Kak1mWWqRvl8CVMb2Tv+AXY8WKL4dZGxjP
-	MXYxcnJICJhIHFm5hr2LkYtDSGA3o8Tthk0sEAkJiVMvl0EVCUus/PccqugJo8T8tmfsIAkW
-	ARWJr18XgdlsAuoSR563gjWICChKnAc6B6SBWeAso8SCne/AEsICgRIvrz1mArF5Bcwknk88
-	ANYsJJAi8eHqBxaIuKDEyZlPwGxmoJp5mx8ydzFyANnSEsv/cYCEOQUsJE5Mu88MYosKyEjM
-	WPqVeQKj4Cwk3bOQdM9C6F7AyLyKUTK1oDg3PbfYsMAoL7Vcrzgxt7g0L10vOT93EyM4WrS0
-	djDuWfVB7xAjEwfjIUYJDmYlEd6nnrfShHhTEiurUovy44tKc1KLDzFKc7AoifN+e92bIiSQ
-	nliSmp2aWpBaBJNl4uCUamAy2vKbrVNmmd2maoE9kjKlPXozX1uG338ddMHOxeXa1Yh2HVM2
-	FXnpd0tTphfwODLa7bl15my0rcJCnYOxn7+6fty1aK/ktHVVc76WT/sbW7f76Jl1JsFq6398
-	WDJx+/1WrVCfkCTdN0pMIeuc/rv2iq9rZd5UK37jg09Cc2ZuRH/1rWTr7k8Pmack9Txa+ri8
-	aEKtCP/KzVM7AqXzbn+zFb0bVCugeaa3e8/VOOMNryoPGVTOfjZReFkdbwGz8vct0bPTRLla
-	EzaoxXJ/DKpIL27MSLh7+N2sElmFOp6mVmXd/d03WdMSmlkrbuy+LHFWRi7n324NzYDE186T
-	tbJeTZ0i05nyWbj/QfGvW0osxRmJhlrMRcWJAL9ZNBQFAwAA
-X-CMS-MailID: 20240906113547epcas5p1f2b6f478a1804a2b1ad04b1e64b05d92
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----HRSYnzKNO8ONjxL1FThol40IlJ6VfYrZPjW9SDYGLJs4fc5X=_5b08_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240906113547epcas5p1f2b6f478a1804a2b1ad04b1e64b05d92
-References: <20240904152605.4055570-1-kbusch@meta.com>
-	<20240904152605.4055570-11-kbusch@meta.com>
-	<CGME20240906113547epcas5p1f2b6f478a1804a2b1ad04b1e64b05d92@epcas5p1.samsung.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.11-rc7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-------HRSYnzKNO8ONjxL1FThol40IlJ6VfYrZPjW9SDYGLJs4fc5X=_5b08_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+Hi Linus,
 
-On 04/09/24 08:26AM, Keith Busch wrote:
->From: Keith Busch <kbusch@kernel.org>
->
->Merging two requests wasn't accounting for the new segment count, so add
->the "next" segement count to the first on a successful merge.
+Mostly just some fixlets for NVMe, but also a bug fix for the ublk
+driver and an integrity fix.
 
-Nit: s/segement/segment
-
-------HRSYnzKNO8ONjxL1FThol40IlJ6VfYrZPjW9SDYGLJs4fc5X=_5b08_
-Content-Type: text/plain; charset="utf-8"
+Please pull!
 
 
-------HRSYnzKNO8ONjxL1FThol40IlJ6VfYrZPjW9SDYGLJs4fc5X=_5b08_--
+The following changes since commit e33a97a830b230b79a98dbbb4121d4741a2be619:
+
+  block: fix detection of unsupported WRITE SAME in blkdev_issue_write_zeroes (2024-08-28 08:49:25 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.11-20240906
+
+for you to fetch changes up to 4ba032bc71dad8d604d308afffaa16b81816c751:
+
+  Merge tag 'nvme-6.11-2024-09-05' of git://git.infradead.org/nvme into block-6.11 (2024-09-05 08:45:54 -0600)
+
+----------------------------------------------------------------
+block-6.11-20240906
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme: set BLK_FEAT_ZONED for ZNS multipath disks
+
+Georg Gottleuber (1):
+      nvme-pci: Add sleep quirk for Samsung 990 Evo
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.11-2024-09-05' of git://git.infradead.org/nvme into block-6.11
+
+Jinjie Ruan (1):
+      nvmet: Make nvmet_debugfs static
+
+Keith Busch (2):
+      nvme: use better description for async reset reason
+      nvme-pci: allocate tagset on reset if necessary
+
+Li Nan (1):
+      ublk_drv: fix NULL pointer dereference in ublk_ctrl_start_recovery()
+
+Maurizio Lombardi (2):
+      nvmet-tcp: fix kernel crash if commands allocation fails
+      nvmet: Identify-Active Namespace ID List command should reject invalid nsid
+
+Mikulas Patocka (1):
+      bio-integrity: don't restrict the size of integrity metadata
+
+ block/bio-integrity.c           |  4 ----
+ drivers/block/ublk_drv.c        |  2 ++
+ drivers/nvme/host/core.c        |  3 ++-
+ drivers/nvme/host/multipath.c   |  4 +++-
+ drivers/nvme/host/pci.c         | 17 +++++++++++++++++
+ drivers/nvme/target/admin-cmd.c | 10 ++++++++++
+ drivers/nvme/target/debugfs.c   |  2 +-
+ drivers/nvme/target/tcp.c       |  4 +++-
+ 8 files changed, 38 insertions(+), 8 deletions(-)
+
+-- 
+Jens Axboe
+
