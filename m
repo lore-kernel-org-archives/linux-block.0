@@ -1,154 +1,125 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791BD1773A;
-	Fri,  6 Sep 2024 03:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BA52F4A;
+	Fri,  6 Sep 2024 06:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725593045; cv=none; b=eZieF4OVi8XC4wimMfW9iRraLtBb85eunF24qISxlXGHVEffA+VXCTpBVMqgwgD9rbr5Ti8hZuHKebgsS9JrE5s2YgxWHSnkaKZMTgc8sPBxvr6k6V2wgSIfnHTh9OmYIQacwvySYmqDkz2EJOVPew6EJILqMRpRzhe/hUucJ50=
+	t=1725603512; cv=none; b=B4rSOApNcMAMvrkupRuopmwb1gEt/Vd65o75aadfg7mP/+ffFgXX6/FSqziaFaxjN5pBwXsxL/nb+SuJeV3GnFC4Duih8LAummgJQtzwtEjXbVeBl+wvQ7m69KxphoowQzmg9ahOiZJnLDEINXvaLv1+6+Y3kjpPcjLWEHHFpgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725593045; c=relaxed/simple;
-	bh=RH6TZLZQD54kymWTWzrD/ChEmeUBlBEentXZxNOU++s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g+c4ZfOIC8dg5MKUU4FpRYMSheDV1ckaSFiXoGhr0wELqDCy8ZkMVQ1UZh0Qg5Bjr6W5HTzNwCp6i894qbTNUt/IrIXmW97PggjC9SgV3laSpiHRHrHA3FkCxwn4t0Fww/g1rfXxOb4LdZbpO70098gMUjfz4Fp/FOgRKJxpKtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bwURKxXy; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1725603512; c=relaxed/simple;
+	bh=pWynbT4Bo6x+Mpc5PslWstyrB67capCi++OODjFq6H8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jtpJhAoS5z2vRbKkdyEDVFXOYthQWHeIXyCtys2A6nMbrFhygsM+CC66fqbrS8Gcbw/TUsVNxjejG1U+Cy3tGp3dd+oaT/bR/fcdUn9zUfiG3QsDU6YwC+h277xa0p1rkZUiWeUiACbNweOz/Xuy2dhMB64OsrhDO02p/mVZlIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CK+Z2e2P; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bwURKxXy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725593044; x=1757129044;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RH6TZLZQD54kymWTWzrD/ChEmeUBlBEentXZxNOU++s=;
-  b=bwURKxXydBE4loQEEqtNEvNP8OAskbUs9mt+9IAeylh49wJUY5OCq5i8
-   EpajR+RHvjMIMKdRhfmvkYIbwG3/Lu8Qg9rX1qQmC152Fsqm32S5iBPEL
-   OdprMq/7Q2rqPRfU8YPCXGCC5RixOChviqJ1izovFutWJ89Qj7O4Ss4iI
-   eWPT8x15MT2IUJGuask14yhFclAMglxwdgl7on0CFx/aD+GtK4GaYrV/9
-   n4QEBEUrbq8Viz8SehtJ323BWwx9XixtfgycoyViuWsnMJGX65rL+abMi
-   zjrKAeocnDvYArUgkt15sB86f6wBgG/v6VJH+h9R+Vadk6ZnwDGQZB4gH
-   w==;
-X-CSE-ConnectionGUID: Jt3qzRa7SVKOijCPggK74Q==
-X-CSE-MsgGUID: n/eVVuMwRL+3m0v6SxUeVA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11186"; a="35012714"
-X-IronPort-AV: E=Sophos;i="6.10,206,1719903600"; 
-   d="scan'208";a="35012714"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 20:24:03 -0700
-X-CSE-ConnectionGUID: cA6JjpjfQZqIGy6c+qY9hA==
-X-CSE-MsgGUID: fFkCuXrFRICuRwwqMHvuJw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,206,1719903600"; 
-   d="scan'208";a="70393846"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 05 Sep 2024 20:24:01 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1smPZm-000AZ2-21;
-	Fri, 06 Sep 2024 03:23:58 +0000
-Date: Fri, 6 Sep 2024 11:23:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com, Conrad Meyer <conradmeyer@meta.com>,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v3 7/8] block: add nowait flag for
- __blkdev_issue_zero_pages
-Message-ID: <202409061126.hKdAymJK-lkp@intel.com>
-References: <292fa1c611adb064efe16ab741aad65c2128ada8.1725459175.git.asml.silence@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CK+Z2e2P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF326C4CEC4;
+	Fri,  6 Sep 2024 06:18:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725603511;
+	bh=pWynbT4Bo6x+Mpc5PslWstyrB67capCi++OODjFq6H8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CK+Z2e2P5EfK2ZDK86PGh9QayZggVJdvZxxsMZ7RsamBZAFGqzenwyXDpJYnj9X81
+	 nbPZv2a3PEEJm4mZ96Uav/V1IP1vbcAUR8RSWqvTan3ca5uhfHKwlqIOxCGDx3g+2w
+	 Wg/vkdnMjatToqrD67CRk76B0IjiGKnmcwKS/b8K75uMvHU252Fx7SHYfSo6sbncNt
+	 86nwGIQunlRIJ4h2MUFbu8HRPM6G4iwGQn6Xzs5nn0D2wKLokKxsAjHsvf60TYWaw7
+	 8bap/Vbt0+WPg/yyYr5OKv1LoKoHxj98AFgslgrXrboEfnrxstOnkuzyo0bMlPThcR
+	 UeCU6DgmpWBmw==
+Message-ID: <4ce112ca-9c2d-4091-9e98-f2d08e5db299@kernel.org>
+Date: Fri, 6 Sep 2024 15:18:29 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <292fa1c611adb064efe16ab741aad65c2128ada8.1725459175.git.asml.silence@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] block: move non sync requests complete flow to softirq
+To: ZhangHui <zhanghui31@xiaomi.com>, axboe@kernel.dk, bvanassche@acm.org,
+ ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240906031431.366806-1-zhanghui31@xiaomi.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20240906031431.366806-1-zhanghui31@xiaomi.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Pavel,
+On 9/6/24 12:14, ZhangHui wrote:
+> From: zhanghui <zhanghui31@xiaomi.com>
+> 
+> Currently, for a controller that supports multiple queues, like UFS4.0,
+> the mq_ops->complete is executed in the interrupt top-half. Therefore, 
+> the file system's end io is executed during the request completion process,
+> such as f2fs_write_end_io on smartphone.
+> 
+> However, we found that the execution time of the file system end io
+> is strongly related to the size of the bio and the processing speed
+> of the CPU. Because the file system's end io will traverse every page
+> in bio, this is a very time-consuming operation.
+> 
+> We measured that the 80M bio write operation on the little CPU will
+> cause the execution time of the top-half to be greater than 100ms,
+> which will undoubtedly affect interrupt response latency.
+> 
+> Let's fixed this issue by moved non sync request completion flow to
+> softirq, and keep the sync request completion in the top-half.
 
-kernel test robot noticed the following build warnings:
+Typos/grammar:
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on akpm-mm/mm-everything linus/master v6.11-rc6 next-20240905]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Let's fix this issue by moving non sync requests completion to softirq context,
+and keeping sync requests completion in the irq top-half context.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pavel-Begunkov/io_uring-cmd-expose-iowq-to-cmds/20240904-222012
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/292fa1c611adb064efe16ab741aad65c2128ada8.1725459175.git.asml.silence%40gmail.com
-patch subject: [PATCH v3 7/8] block: add nowait flag for __blkdev_issue_zero_pages
-config: i386-randconfig-141-20240906 (https://download.01.org/0day-ci/archive/20240906/202409061126.hKdAymJK-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240906/202409061126.hKdAymJK-lkp@intel.com/reproduce)
+> 
+> Signed-off-by: zhanghui <zhanghui31@xiaomi.com>
+> ---
+> Changes in v4:
+> - fix commit log from "scheduling efficiency" to "interrupt response latency"
+> 
+> Changes in v3:
+> - modify op_is_sync to rq_is_sync
+> 
+> Changes in v2:
+> - fix build warning
+> ---
+>  block/blk-mq.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e3c3c0c21b55..06b232edff11 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1193,6 +1193,8 @@ static void blk_mq_raise_softirq(struct request *rq)
+>  
+>  bool blk_mq_complete_request_remote(struct request *rq)
+>  {
+> +	const bool is_sync = rq_is_sync(rq);
+> +
+>  	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+>  
+>  	/*
+> @@ -1210,7 +1212,7 @@ bool blk_mq_complete_request_remote(struct request *rq)
+>  		return true;
+>  	}
+>  
+> -	if (rq->q->nr_hw_queues == 1) {
+> +	if ((rq->q->nr_hw_queues == 1) || !is_sync) {
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409061126.hKdAymJK-lkp@intel.com/
+I do not see the point of the is_sync variable, and you do not need the inner
+parenthesis either. Why not:
 
-All warnings (new ones prefixed by >>):
+	if (rq->q->nr_hw_queues == 1 || !rq_is_sync(rq)) {
 
->> block/blk-lib.c:200:12: warning: variable 'opf' set but not used [-Wunused-but-set-variable]
-     200 |         blk_opf_t opf = REQ_OP_WRITE;
-         |                   ^
-   1 warning generated.
+And a comment before the "if" explaining why soft-irq is raised for non-sync
+requests would be nice too.
 
-
-vim +/opf +200 block/blk-lib.c
-
-   195	
-   196	int blkdev_issue_zero_pages_bio(struct block_device *bdev,
-   197			sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
-   198			struct bio **biop, unsigned int flags)
-   199	{
- > 200		blk_opf_t opf = REQ_OP_WRITE;
-   201	
-   202		if (flags & BLKDEV_ZERO_PAGES_NOWAIT) {
-   203			sector_t max_bio_sectors = BIO_MAX_VECS << PAGE_SECTORS_SHIFT;
-   204	
-   205			if (nr_sects > max_bio_sectors)
-   206				return -EAGAIN;
-   207			opf |= REQ_NOWAIT;
-   208		}
-   209	
-   210		while (nr_sects) {
-   211			unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
-   212			struct bio *bio;
-   213	
-   214			bio = bio_alloc(bdev, nr_vecs, REQ_OP_WRITE, gfp_mask);
-   215			if (!bio)
-   216				return -ENOMEM;
-   217			bio->bi_iter.bi_sector = sector;
-   218	
-   219			if ((flags & BLKDEV_ZERO_KILLABLE) &&
-   220			    fatal_signal_pending(current))
-   221				return -EINTR;
-   222	
-   223			do {
-   224				unsigned int len, added;
-   225	
-   226				len = min_t(sector_t,
-   227					PAGE_SIZE, nr_sects << SECTOR_SHIFT);
-   228				added = bio_add_page(bio, ZERO_PAGE(0), len, 0);
-   229				if (added < len)
-   230					break;
-   231				nr_sects -= added >> SECTOR_SHIFT;
-   232				sector += added >> SECTOR_SHIFT;
-   233			} while (nr_sects);
-   234	
-   235			*biop = bio_chain_and_submit(*biop, bio);
-   236			cond_resched();
-   237		}
-   238	
-   239		return 0;
-   240	}
-   241	
+>  		blk_mq_raise_softirq(rq);
+>  		return true;
+>  	}
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Damien Le Moal
+Western Digital Research
+
