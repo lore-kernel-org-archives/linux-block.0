@@ -1,29 +1,36 @@
-Received: from outboundhk.mxmail.xiaomi.com (outboundhk.mxmail.xiaomi.com [118.143.206.90])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE8912B73;
-	Sat,  7 Sep 2024 02:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.143.206.90
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780751CAAC
+	for <linux-block@vger.kernel.org>; Sat,  7 Sep 2024 03:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725677353; cv=none; b=gtwbDEd4nYQSwW8RBABd0ARIGOm1VmsMpom7NWnEV2XybpojND3TL8kEyaR3fj5GXiK2v2teCepTuEzbipLiROrIfQ/Ewo8WXm7x4mU0nBr1PzDGbU5m7ePFhQowCZ9rMdh9Z0UOSVuoMUD9fIqhF7aODpEr2qktWPDkPysuzI0=
+	t=1725679923; cv=none; b=cINQ8M0gH+scpivq4Vgx7dTIp/CD+8kCBc0Y30up0lVPi5LoRv8vUo7apZGJEHjS0rqiEkcx/d39ZDsP/Fl1U2tR1GhVHvU4WtH1aUq3jt0zW3XtZoygPC0o47OiShRyIO92/O3DT1fuDn5offGQCCLq7MGqn9Va+Hv1E1TXI7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725677353; c=relaxed/simple;
-	bh=oVznIj7eRvWK/+KNA9U9aIBb3pNYcA+DKLQ7kQ7F/UY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fLFco6LOPS9O7sqUtEhospyYjTziTR+dWLqrwuee7Kn1rqDGhZiQ2Sxf5OjNbBpE/ryB65NNWAukGDh9eRklWnwnX+Y8V1u4/WjcbeuqoUp2pTE4YgvNSY/o5WtdJK2/4KmV9LI+mjY7wusLZhyP6f2vwNVX9yO/S7T6zKIOc54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com; spf=pass smtp.mailfrom=xiaomi.com; arc=none smtp.client-ip=118.143.206.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xiaomi.com
-X-CSE-ConnectionGUID: cFzu5RXERpG8C0m1mR8yTQ==
-X-CSE-MsgGUID: dMu9Av/YQRe8yi7eNITGww==
-X-IronPort-AV: E=Sophos;i="6.10,209,1719849600"; 
-   d="scan'208";a="95662598"
-From: ZhangHui <zhanghui31@xiaomi.com>
-To: <axboe@kernel.dk>, <bvanassche@acm.org>, <ming.lei@redhat.com>,
-	<dlemoal@kernel.org>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<zhanghui31@xiaomi.com>
-Subject: [PATCH v6] block: move non sync requests complete flow to softirq
-Date: Sat, 7 Sep 2024 10:49:01 +0800
-Message-ID: <20240907024901.405881-1-zhanghui31@xiaomi.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1725679923; c=relaxed/simple;
+	bh=Gg9VBC+GJoMpo+Qwp6egDfeOVXw+fa5iSdUVKZ8DjCA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UTYpGgjlshN3QywJhbbnBU43fNTPVr6+gxgLOZV9bRUiQ6ySJ/EX+mugfXCOWAX1CF2exIZsI/R8Fr0F2Efg5MBK6egACKFK7C6RIUdndeDzKHis51oGnhClErbzEBYmRI/VvuVcgG2/AT4BEra0tpU/5cB3hJW2jN+AVXD7pV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X0z8B2MMMz1HJ7T;
+	Sat,  7 Sep 2024 11:28:26 +0800 (CST)
+Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id BF5B31A0188;
+	Sat,  7 Sep 2024 11:31:56 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
+ (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Sat, 7 Sep
+ 2024 11:31:56 +0800
+From: Li Zetao <lizetao1@huawei.com>
+To: <axboe@kernel.dk>, <hare@suse.de>, <dlemoal@kernel.org>,
+	<ming.lei@redhat.com>, <john.g.garry@oracle.com>
+CC: <lizetao1@huawei.com>, <linux-block@vger.kernel.org>
+Subject: [PATCH -next v2] mtip32xx: Remove redundant null pointer checks in mtip_hw_debugfs_init()
+Date: Sat, 7 Sep 2024 11:40:46 +0800
+Message-ID: <20240907034046.3595268-1-lizetao1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,66 +39,67 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BJ-MBX13.mioffice.cn (10.237.8.133) To YZ-MBX07.mioffice.cn
- (10.237.88.127)
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemd500012.china.huawei.com (7.221.188.25)
 
-From: zhanghui <zhanghui31@xiaomi.com>
+Since the debugfs_create_dir() never returns a null pointer, checking
+the return value for a null pointer is redundant. Since
+debugfs_create_file() can deal with a ERR_PTR() style pointer, drop
+the check.  Since mtip_hw_debugfs_init does not pay attention to the
+return value, its return type can be changed to void.
 
-Currently, for a controller that supports multiple queues, like UFS4.0,
-the mq_ops->complete is executed in the interrupt top-half. Therefore, 
-the file system's end io is executed during the request completion process,
-such as f2fs_write_end_io on smartphone.
-
-However, we found that the execution time of the file system end io
-is strongly related to the size of the bio and the processing speed
-of the CPU. Because the file system's end io will traverse every page
-in bio, this is a very time-consuming operation.
-
-We measured that the 80M bio write operation on the little CPU will
-cause the execution time of the top-half to be greater than 100ms,
-which will undoubtedly affect interrupt response latency.
-
-Let's fix this issue by moving non sync requests completion to softirq
-context, and keeping sync requests completion in the IRQ top-half context.
-
-Signed-off-by: zhanghui <zhanghui31@xiaomi.com>
+Signed-off-by: Li Zetao <lizetao1@huawei.com>
 ---
-Changes in v6:
-- remove unnecessary inner parenthesis
+v1 -> v2: Directly delete the check on the return value of
+debugfs_create_dir
+v1:
+https://lore.kernel.org/all/20240903144354.2005690-1-lizetao1@huawei.com/
 
-Changes in v5:
-- modify the commit log
-- remove unnecessary variable and add comment
+ drivers/block/mtip32xx/mtip32xx.c | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
 
-Changes in v4:
-- fix commit log from "scheduling efficiency" to "interrupt response latency"
-
-Changes in v3:
-- modify op_is_sync to rq_is_sync
-
-Changes in v2:
-- fix build warning
----
- block/blk-mq.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e3c3c0c21b55..45e4d255ea3b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1210,7 +1210,11 @@ bool blk_mq_complete_request_remote(struct request *rq)
- 		return true;
- 	}
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index c6ef0546ffc9..11901f2812ad 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -2269,25 +2269,12 @@ static const struct file_operations mtip_flags_fops = {
+ 	.llseek = no_llseek,
+ };
  
--	if (rq->q->nr_hw_queues == 1) {
-+	/*
-+	 * To reduce the execution time in the IRQ top-half,
-+	 * move non-sync request completions to softirq context.
-+	 */
-+	if (rq->q->nr_hw_queues == 1 || !rq_is_sync(rq)) {
- 		blk_mq_raise_softirq(rq);
- 		return true;
- 	}
+-static int mtip_hw_debugfs_init(struct driver_data *dd)
++static void mtip_hw_debugfs_init(struct driver_data *dd)
+ {
+-	if (!dfs_parent)
+-		return -1;
+-
+ 	dd->dfs_node = debugfs_create_dir(dd->disk->disk_name, dfs_parent);
+-	if (IS_ERR_OR_NULL(dd->dfs_node)) {
+-		dev_warn(&dd->pdev->dev,
+-			"Error creating node %s under debugfs\n",
+-						dd->disk->disk_name);
+-		dd->dfs_node = NULL;
+-		return -1;
+-	}
+-
+ 	debugfs_create_file("flags", 0444, dd->dfs_node, dd, &mtip_flags_fops);
+ 	debugfs_create_file("registers", 0444, dd->dfs_node, dd,
+ 			    &mtip_regs_fops);
+-
+-	return 0;
+ }
+ 
+ static void mtip_hw_debugfs_exit(struct driver_data *dd)
+@@ -4043,10 +4030,6 @@ static int __init mtip_init(void)
+ 	mtip_major = error;
+ 
+ 	dfs_parent = debugfs_create_dir("rssd", NULL);
+-	if (IS_ERR_OR_NULL(dfs_parent)) {
+-		pr_warn("Error creating debugfs parent\n");
+-		dfs_parent = NULL;
+-	}
+ 
+ 	/* Register our PCI operations. */
+ 	error = pci_register_driver(&mtip_pci_driver);
 -- 
-2.43.0
+2.34.1
 
