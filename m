@@ -1,237 +1,383 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3DB156220
-	for <linux-block@vger.kernel.org>; Sat,  7 Sep 2024 09:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FCA1B85DC
+	for <linux-block@vger.kernel.org>; Sat,  7 Sep 2024 09:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725699903; cv=none; b=XKvIdxrAOD3kj+0t3JzRVNRCt0AmU9l9l6WHSaNKYgqIFn2Sa+1AOK2HHl2aAcLP5+8DizW9KUqZKWeEtgwmQ+bHB75qVJdwae20KHwvJUCvvkziHcblZefaM45RoJinmZg8/X/wkiS5KtXiQt0S0Pzf8FJt6b4J9NmC/lGw+w8=
+	t=1725701787; cv=none; b=Hsj29Nvyrepmw+h9Jm1GSelQzWSYWdm/WpC3e3nuH6SyuEUU1BKD74ylEuezqSu9j0gpoFAnxjKTMP6YRTnqbhOv4CE0AF9aMqodXy7Aj1N54A22W5GQuXU7x/p0wvIobn6HHaBKlhUth+8g4ZLjrNmUdlC3XrafaVorTUAjix8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725699903; c=relaxed/simple;
-	bh=ioQFOcOnwe9CUzCuISpdLAk18XEVipggmqO5qmCrdjQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NWqMx3ZHAFZ1oB4+XN93N0zyYYdRgC4BXtgSiioAP26MWS4ltWwCJNw1ojUKelPJTw0iVFEgCYJvvuTNKG7FHnPlLOc8elnx456pLCYQDmX528PU+2fNQqG+s0/W5PKcMLNpkBQRLRAEM0KictYqX8JIs5fTUwrD9W8ROF1J6PA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaPjxbxM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725701787; c=relaxed/simple;
+	bh=pm3x5AU41FUZDDYq5D+zv9pedtwyTqzxF5wWf0S12yY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eKyTWld1IJwnrIDdBbSPzTRSjmiA7er7YVVYwEIXeW6aSehEB38nAqBq5XqZ0m+U/lWhqeV9JDgdaTiITRgb6MC+vExCk3jLx0rAgBHI/FLC1dqjkNN1+xCR6uT9fJC5MfQBfBzOViKfZxKxZ0cEXvpmvyZRZNIvy6E6pH/JL6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UrN1aD0y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaPjxbxM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46EBEC4CEC5;
-	Sat,  7 Sep 2024 09:05:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725699902;
-	bh=ioQFOcOnwe9CUzCuISpdLAk18XEVipggmqO5qmCrdjQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UaPjxbxMi+wtTsjFRS3/MoI1RhYHJMLJfC1chCY7S1AtgVcGVqC0dVlzaSc3Doloh
-	 eBU3CYJvX3BWo5oNEarJwmFoILKUPN0jOI+R6LwX/JwRhcuvqNfcm7s/DWzojPMaRK
-	 1ZT92vDlLzE8n2zcgPGSkw6X+qK0z0JF6jRlX0OTzTqYBLfq4ycc3HVZx9lkCd1S70
-	 /iTazb41WqQ49PFP8NMqKEX66R3xEjxej7hOkkv8BIsY/uIMyI5v+A0ZNtfvkeORG+
-	 5CnC5dUry8DWA0DeY9LTBGfEQw92zY6eH9dapByqxu038kWFtjsnmPPrPpQGe6syRa
-	 hhQtIe/PU309w==
-Message-ID: <4d7280eb-7f26-4652-a1d4-4f82c4d99a4c@kernel.org>
-Date: Sat, 7 Sep 2024 18:04:59 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrN1aD0y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725701783;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PT+pYIPSjDF8A2b5NMf2iS6ujBdIfCuDCgcJg0vuM/I=;
+	b=UrN1aD0yMzavkBlWYh8G4NQN0SJQxMJ2/CA5aQQEcV8wNqWQ4IUWNHYk76KW8AKdOupOuk
+	MA/+epMJ4kO2DI5W+ikWr5GN7/MesjaceGBKSQwcVdFqYiEy4lVNonfBfWoRyc519sHMx4
+	88QkLx6ot2Ehh2qughFCGUQgwJ8hcIk=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-31-0Y85Rd7hMKWj9RPg6RSfEA-1; Sat,
+ 07 Sep 2024 05:36:21 -0400
+X-MC-Unique: 0Y85Rd7hMKWj9RPg6RSfEA-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 63F451956096;
+	Sat,  7 Sep 2024 09:36:19 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.7])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 89DDC1956086;
+	Sat,  7 Sep 2024 09:36:14 +0000 (UTC)
+Date: Sat, 7 Sep 2024 17:36:08 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
+	ming.lei@redhat.com
+Subject: Re: [PATCH V5 4/8] io_uring: support SQE group
+Message-ID: <ZtweiCfLOJmdeY0Z@fedora>
+References: <20240808162503.345913-1-ming.lei@redhat.com>
+ <20240808162503.345913-5-ming.lei@redhat.com>
+ <3c819871-7ca3-47ea-b752-c4a8a49f8304@gmail.com>
+ <Zs/5Hpi16aQKlHFw@fedora>
+ <36ae357b-bebe-4276-a8db-d6dccf227b61@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: elevator: avoid to load iosched module from this
- disk
-To: Ming Lei <ming.lei@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Jeff Moyer <jmoyer@redhat.com>, Jiri Jaburek <jjaburek@redhat.com>,
- Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>,
- Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>
-References: <20240907014331.176152-1-ming.lei@redhat.com>
- <20240907073522.GW1450@redhat.com> <ZtwHwTh6FYn+WnGD@fedora>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <ZtwHwTh6FYn+WnGD@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <36ae357b-bebe-4276-a8db-d6dccf227b61@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 9/7/24 16:58, Ming Lei wrote:
-> On Sat, Sep 07, 2024 at 08:35:22AM +0100, Richard W.M. Jones wrote:
->> On Sat, Sep 07, 2024 at 09:43:31AM +0800, Ming Lei wrote:
->>> When switching io scheduler via sysfs, 'request_module' may be called
->>> if the specified scheduler doesn't exist.
->>>
->>> This was has deadlock risk because the module may be stored on FS behind
->>> our disk since request queue is frozen before switching its elevator.
->>>
->>> Fix it by returning -EDEADLK in case that the disk is claimed, which
->>> can be thought as one signal that the disk is mounted.
->>>
->>> Some distributions(Fedora) simulates the original kernel command line of
->>> 'elevator=foo' via 'echo foo > /sys/block/$DISK/queue/scheduler', and boot
->>> hang is triggered.
->>>
->>> Cc: Richard Jones <rjones@redhat.com>
->>> Cc: Jeff Moyer <jmoyer@redhat.com>
->>> Cc: Jiri Jaburek <jjaburek@redhat.com>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>
->> I'd suggest also:
->>
->> Bug: https://bugzilla.kernel.org/show_bug.cgi?id=219166
->> Reported-by: Richard W.M. Jones <rjones@redhat.com>
->> Reported-by: Jiri Jaburek <jjaburek@redhat.com>
->> Tested-by: Richard W.M. Jones <rjones@redhat.com>
->>
->> So I have tested this patch and it does fix the issue, at the possible
->> cost that now setting the scheduler can fail:
->>
->>   + for f in /sys/block/{h,s,ub,v}d*/queue/scheduler
->>   + echo noop
->>   /init: line 109: echo: write error: Resource deadlock avoided
->>
->> (I know I'm setting it to an impossible value here, but this could
->> also happen when setting it to a valid one.)
+On Fri, Sep 06, 2024 at 06:15:32PM +0100, Pavel Begunkov wrote:
+> On 8/29/24 05:29, Ming Lei wrote:
+> ...
+> > > > +	if (WARN_ON_ONCE(lead->grp_refs <= 0))
+> > > > +		return false;
+> > > > +
+> > > > +	req->flags &= ~REQ_F_SQE_GROUP;
+> > > 
+> > > I'm getting completely lost when and why it clears and sets
+> > > back REQ_F_SQE_GROUP and REQ_F_SQE_GROUP_LEADER. Is there any
+> > > rule?
+> > 
+> > My fault, it should have been documented somewhere.
+> > 
+> > REQ_F_SQE_GROUP is cleared when the request is completed, but it is
+> > reused as flag for marking the last request in this group, so we can
+> > free the group leader when observing the 'last' member request.
 > 
-> Actually in most of dist, io-schedulers are built-in, so request_module
-> is just a nop, but meta IO must be started.
+> Maybe it'd be cleaner to use a second flag?
+
+I will add one new flag with same value, since the two's lifetime
+is non-overlapping.
+
 > 
->>
->> Since almost no one checks the result of 'echo foo > /sys/...'  that
->> would probably mean that sometimes a desired setting is silently not
->> set.
+> > The only other difference about the two flags is that both are cleared
+> > when the group leader becomes the last one in the group, then
+> > this leader degenerates as normal request, which way can simplify
+> > group leader freeing.
+> > 
+> > > 
+> > > > +	/*
+> > > > +	 * Set linked leader as failed if any member is failed, so
+> > > > +	 * the remained link chain can be terminated
+> > > > +	 */
+> > > > +	if (unlikely((req->flags & REQ_F_FAIL) &&
+> > > > +		     ((lead->flags & IO_REQ_LINK_FLAGS) && lead->link)))
+> > > > +		req_set_fail(lead);
+> > > 
+> > > if (req->flags & REQ_F_FAIL)
+> > > 	req_set_fail(lead);
+> > > 
+> > > REQ_F_FAIL is not specific to links, if a request fails we need
+> > > to mark it as such.
+> > 
+> > It is for handling group failure.
+> > 
+> > The following condition
+> > 
+> > 	((lead->flags & IO_REQ_LINK_FLAGS) && lead->link))
+> > 
+> > means that this group is in one link-chain.
+> > 
+> > If any member in this group is failed, we need to fail this group(lead),
+> > then the remained requests in this chain can be failed.
+> > 
+> > Otherwise, it isn't necessary to fail group leader in case of any member
+> > io failure.
 > 
-> As I mentioned, io-schedulers are built-in for most of dist, so
-> request_module isn't called in case of one valid io-sched.
+> What bad would happen if you do it like this?
 > 
->>
->> Also I bisected this bug yesterday and found it was caused by (or,
->> more likely, exposed by):
->>
->>   commit af2814149883e2c1851866ea2afcd8eadc040f79
->>   Author: Christoph Hellwig <hch@lst.de>
->>   Date:   Mon Jun 17 08:04:38 2024 +0200
->>
->>     block: freeze the queue in queue_attr_store
->>     
->>     queue_attr_store updates attributes used to control generating I/O, and
->>     can cause malformed bios if changed with I/O in flight.  Freeze the queue
->>     in common code instead of adding it to almost every attribute.
->>
->> Reverting this commit on top of git head also fixes the problem.
->>
->> Why did this commit expose the problem?
+> if (req->flags & REQ_F_FAIL)
+> 	req_set_fail(lead);
 > 
-> That is really the 1st bad commit which moves queue freezing before
-> calling request_module(), originally we won't freeze queue until
-> we have to do it.
+> I'm asking because if you rely on some particular combination
+> of F_FAIL and F_LINK somewhere, it's likely wrong, but otherwise
+> we F_FAIL a larger set of requests, which should never be an
+> issue.
+
+From dependency relation viewpoint it is not necessary to fail all, but it
+makes us easier to start with this more determinate behavior, will
+change to this way in V6.
+
 > 
-> Another candidate fix is to revert it, or at least not do it
-> for storing elevator attribute.
+> > > > +	return !--lead->grp_refs;
+> > > > +}
+> > > > +
+> > > > +static inline bool leader_is_the_last(struct io_kiocb *lead)
+> > > > +{
+> > > > +	return lead->grp_refs == 1 && (lead->flags & REQ_F_SQE_GROUP);
+> > > > +}
+> > > > +
+> > > > +static void io_complete_group_member(struct io_kiocb *req)
+> > > > +{
+> > > > +	struct io_kiocb *lead = get_group_leader(req);
+> > > > +
+> > > > +	if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP)))
+> > > > +		return;
+> > > > +
+> > > > +	/* member CQE needs to be posted first */
+> > > > +	if (!(req->flags & REQ_F_CQE_SKIP))
+> > > > +		io_req_commit_cqe(req->ctx, req);
+> > > > +
+> > > > +	if (__io_complete_group_member(req, lead)) {
+> > > > +		/*
+> > > > +		 * SQE_GROUP flag is kept for the last member, so the leader
+> > > > +		 * can be retrieved & freed from this last member
+> > > > +		 */
+> > > > +		req->flags |= REQ_F_SQE_GROUP;
+> > 
+> > 'req' is the last completed request, so mark it as the last one
+> > by reusing REQ_F_SQE_GROUP, so we can free group leader in
+> > io_free_batch_list() when observing the last flag.
+> > 
+> > But it should have been documented.
+> > 
+> > > > +		if (!(lead->flags & REQ_F_CQE_SKIP))
+> > > > +			io_req_commit_cqe(lead->ctx, lead);
+> > > > +	} else if (leader_is_the_last(lead)) {
+> > > > +		/* leader will degenerate to plain req if it is the last */
+> > > > +		lead->flags &= ~(REQ_F_SQE_GROUP | REQ_F_SQE_GROUP_LEADER);
+> > > 
+> > > What's this chunk is about?
+> > 
+> > The leader becomes the only request not completed in group, so it is
+> > degenerated as normal one by clearing the two flags. This way simplifies
+> > logic for completing group leader.
+> > 
+> ...
+> > > > @@ -1388,11 +1501,33 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
+> > > >    						    comp_list);
+> > > >    		if (unlikely(req->flags & IO_REQ_CLEAN_SLOW_FLAGS)) {
+> > > > +			if (req->flags & (REQ_F_SQE_GROUP |
+> > > > +					  REQ_F_SQE_GROUP_LEADER)) {
+> > > > +				struct io_kiocb *leader;
+> > > > +
+> > > > +				/* Leader is freed via the last member */
+> > > > +				if (req_is_group_leader(req)) {
+> > > > +					node = req->comp_list.next;
+> > > > +					continue;
+> > > > +				}
+> > > > +
+> > > > +				/*
+> > > > +				 * Only the last member keeps GROUP flag,
+> > > > +				 * free leader and this member together
+> > > > +				 */
+> > > > +				leader = get_group_leader(req);
+> > > > +				leader->flags &= ~REQ_F_SQE_GROUP_LEADER;
+> > > > +				req->flags &= ~REQ_F_SQE_GROUP;
+> > > > +				wq_stack_add_head(&leader->comp_list,
+> > > > +						  &req->comp_list);
+> > > 
+> > > That's quite hacky, but at least we can replace it with
+> > > task work if it gets in the way later on.
+> > 
+> > io_free_batch_list() is already called in task context, and it isn't
+> > necessary to schedule one extra tw, which hurts perf more or less.
+> > 
+> > Another way is to store these leaders into one temp list, and
+> > call io_free_batch_list() for this temp list one more time.
+> 
+> What I'm saying, it's fine to leave it as is for now. In the
+> future if it becomes a problem for ome reason or another, we can
+> do it the task_work like way.
 
-I do not think that reverting is acceptable. Rather, a proper fix would simply
-be to do the request_module() before freezing the queue.
-Something like below should work (totally untested and that may be overkill).
+OK, got it, I will leave it as is, and document the potential risk
+with future changes.
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 60116d13cb80..aef87f6b4a8a 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -23,6 +23,7 @@
- struct queue_sysfs_entry {
-        struct attribute attr;
-        ssize_t (*show)(struct gendisk *disk, char *page);
-+       int (*pre_store)(struct gendisk *disk, const char *page, size_t count);
-        ssize_t (*store)(struct gendisk *disk, const char *page, size_t count);
- };
+> 
+> ...
+> > > > @@ -2101,6 +2251,62 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
+> > > >    	return def->prep(req, sqe);
+> > > >    }
+> > > > +static struct io_kiocb *io_group_sqe(struct io_submit_link *group,
+> > > > +				     struct io_kiocb *req)
+> > > > +{
+> > > > +	/*
+> > > > +	 * Group chain is similar with link chain: starts with 1st sqe with
+> > > > +	 * REQ_F_SQE_GROUP, and ends with the 1st sqe without REQ_F_SQE_GROUP
+> > > > +	 */
+> > > > +	if (group->head) {
+> > > > +		struct io_kiocb *lead = group->head;
+> > > > +
+> > > > +		/* members can't be in link chain, can't be drained */
+> > > > +		if (req->flags & (IO_REQ_LINK_FLAGS | REQ_F_IO_DRAIN))
+> > > > +			req_fail_link_node(lead, -EINVAL);
+> > > 
+> > > That should fail the entire link (if any) as well.
+> > 
+> > Good catch, here we should fail link head by following the logic
+> > in io_submit_fail_init().
+> > 
+> > > 
+> > > I have even more doubts we even want to mix links and groups. Apart
+> > 
+> > Wrt. ublk, group provides zero copy, and the ublk io(group) is generic
+> > IO, sometime IO_LINK is really needed & helpful, such as in ublk-nbd,
+> > send(tcp) requests need to be linked & zc. And we shouldn't limit IO_LINK
+> > for generic io_uring IO.
+> > 
+> > > from nuances as such, which would be quite hard to track, the semantics
+> > > of IOSQE_CQE_SKIP_SUCCESS is unclear.
+> > 
+> > IO group just follows every normal request.
+> 
+> It tries to mimic but groups don't and essentially can't do it the
+> same way, at least in some aspects. E.g. IOSQE_CQE_SKIP_SUCCESS
+> usually means that all following will be silenced. What if a
+> member is CQE_SKIP, should it stop the leader from posting a CQE?
+> And whatever the answer is, it'll be different from the link's
+> behaviour.
 
-@@ -413,6 +414,14 @@ static struct queue_sysfs_entry _prefix##_entry = {        \
-        .store  = _prefix##_store,                      \
- };
+Here it looks easier than link's:
 
-+#define QUEUE_RPW_ENTRY(_prefix, _name)                        \
-+static struct queue_sysfs_entry _prefix##_entry = {    \
-+       .attr   = { .name = _name, .mode = 0644 },      \
-+       .show   = _prefix##_show,                       \
-+       .pre_store = _prefix##_pre_store,               \
-+       .store  = _prefix##_store,                      \
-+};
-+
- QUEUE_RW_ENTRY(queue_requests, "nr_requests");
- QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
- QUEUE_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
-@@ -420,7 +429,7 @@ QUEUE_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
- QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
- QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
- QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
--QUEUE_RW_ENTRY(elv_iosched, "scheduler");
-+QUEUE_RPW_ENTRY(elv_iosched, "scheduler");
+- only leader's IOSQE_CQE_SKIP_SUCCESS follows linked request's rule
+- all members just respects the flag for its own, and not related with
+leader's
 
- QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
- QUEUE_RO_ENTRY(queue_physical_block_size, "physical_block_size");
-@@ -670,6 +679,12 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
-        if (!entry->store)
-                return -EIO;
+> 
+> Regardless, let's forbid IOSQE_CQE_SKIP_SUCCESS and linked timeouts
+> for groups, that can be discussed afterwards.
 
-+       if (entry->pre_store) {
-+               res = entry->pre_store(disk, page, length);
-+               if (res)
-+                       return res;
-+       }
-+
-        blk_mq_freeze_queue(q);
-        mutex_lock(&q->sysfs_lock);
-        res = entry->store(disk, page, length);
-diff --git a/block/elevator.c b/block/elevator.c
-index f13d552a32c8..c338282d5148 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -698,17 +698,26 @@ static int elevator_change(struct request_queue *q, const
-char *elevator_name)
-                return 0;
+It should easy to forbid IOSQE_CQE_SKIP_SUCCESS which is per-sqe, will do
+it in V6.
 
-        e = elevator_find_get(q, elevator_name);
--       if (!e) {
--               request_module("%s-iosched", elevator_name);
--               e = elevator_find_get(q, elevator_name);
--               if (!e)
--                       return -EINVAL;
--       }
-+       if (!e)
-+               return -EINVAL;
-        ret = elevator_switch(q, e);
-        elevator_put(e);
-        return ret;
- }
+I am not sure if it is easy to disallow IORING_OP_LINK_TIMEOUT, which
+covers all linked sqes, and group leader could be just one of them.
+Can you share any idea about the implementation to forbid LINK_TIMEOUT
+for sqe group?
 
-+int elv_iosched_pre_store(struct gendisk *disk, const char *buf,
-+                          size_t count)
-+{
-+       char elevator_name[ELV_NAME_MAX];
-+
-+       if (!elv_support_iosched(disk->queue))
-+               return -ENOTSUPP;
-+
-+       strscpy(elevator_name, buf, sizeof(elevator_name));
-+
-+       return request_module("%s-iosched", elevator_name);
-+}
-+
- ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
-                          size_t count)
- {
-diff --git a/block/elevator.h b/block/elevator.h
-index 3fe18e1a8692..059172c0f93c 100644
---- a/block/elevator.h
-+++ b/block/elevator.h
-@@ -148,6 +148,7 @@ extern void elv_unregister(struct elevator_type *);
-  * io scheduler sysfs switching
-  */
- ssize_t elv_iosched_show(struct gendisk *disk, char *page);
-+int elv_iosched_pre_store(struct gendisk *disk, const char *page, size_t count);
- ssize_t elv_iosched_store(struct gendisk *disk, const char *page, size_t count);
+> 
+> > 1) fail in linked chain
+> > - follows IO_LINK's behavior since io_fail_links() covers io group
+> > 
+> > 2) otherwise
+> > - just respect IOSQE_CQE_SKIP_SUCCESS
+> > 
+> > > And also it doen't work with IORING_OP_LINK_TIMEOUT.
+> > 
+> > REQ_F_LINK_TIMEOUT can work on whole group(or group leader) only, and I
+> > will document it in V6.
+> 
+> It would still be troublesome. When a linked timeout fires it searches
+> for the request it's attached to and cancels it, however, group leaders
+> that queued up their members are discoverable. But let's say you can find
+> them in some way, then the only sensbile thing to do is cancel members,
+> which should be doable by checking req->grp_leader, but might be easier
+> to leave it to follow up patches.
 
- extern bool elv_bio_merge_ok(struct request *, struct bio *);
+We have changed sqe group to start queuing members after leader is
+completed. link timeout will cancel leader with all its members via
+leader->grp_link, this behavior should respect IORING_OP_LINK_TIMEOUT
+completely.
+
+Please see io_fail_links() and io_cancel_group_members().
+
+> 
+> 
+> > > > +
+> > > > +		lead->grp_refs += 1;
+> > > > +		group->last->grp_link = req;
+> > > > +		group->last = req;
+> > > > +
+> > > > +		if (req->flags & REQ_F_SQE_GROUP)
+> > > > +			return NULL;
+> > > > +
+> > > > +		req->grp_link = NULL;
+> > > > +		req->flags |= REQ_F_SQE_GROUP;
+> > > > +		group->head = NULL;
+> > > > +		if (lead->flags & REQ_F_FAIL) {
+> > > > +			io_queue_sqe_fallback(lead);
+> > > 
+> > > Let's say the group was in the middle of a link, it'll
+> > > complete that group and continue with assembling / executing
+> > > the link when it should've failed it and honoured the
+> > > request order.
+> > 
+> > OK, here we can simply remove the above two lines, and link submit
+> > state can handle this failure in link chain.
+> 
+> If you just delete then nobody would check for REQ_F_FAIL and
+> fail the request.
+
+io_link_assembling() & io_link_sqe() checks for REQ_F_FAIL and call
+io_queue_sqe_fallback() either if it is in link chain or
+not.
+
+> Assuming you'd also set the fail flag to the
+> link head when appropriate, how about deleting these two line
+> and do like below? (can be further prettified)
+> 
+> 
+> bool io_group_assembling()
+> {
+> 	return state->group.head || (req->flags & REQ_F_SQE_GROUP);
+> }
+> bool io_link_assembling()
+> {
+> 	return state->link.head || (req->flags & IO_REQ_LINK_FLAGS);
+> }
+> 
+> static inline int io_submit_sqe()
+> {
+> 	...
+> 	if (unlikely(io_link_assembling(state, req) ||
+> 				 io_group_assembling(state, req) ||
+> 				 req->flags & REQ_F_FAIL)) {
+> 		if (io_group_assembling(state, req)) {
+> 			req = io_group_sqe(&state->group, req);
+> 			if (!req)
+> 				return 0;
+> 		}
+> 		if (io_link_assembling(state, req)) {
+> 			req = io_link_sqe(&state->link, req);
+> 			if (!req)
+> 				return 0;
+> 		}
+> 		if (req->flags & REQ_F_FAIL) {
+> 			io_queue_sqe_fallback(req);
+> 			return 0;
+
+As I mentioned above, io_link_assembling() & io_link_sqe() covers
+the failure handling.
 
 
-
--- 
-Damien Le Moal
-Western Digital Research
+thanks, 
+Ming
 
