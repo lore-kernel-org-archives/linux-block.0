@@ -1,104 +1,81 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B0A171E4F
-	for <linux-block@vger.kernel.org>; Sun,  8 Sep 2024 14:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E21C1E4AB
+	for <linux-block@vger.kernel.org>; Sun,  8 Sep 2024 17:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725807412; cv=none; b=I2OVAkxzbJgpyouxW1OfUH01xBt+kTkG8hd71IrGYLFUs+yTLoaAsio9Bosqg89kN0BNGDoiTf6ZxIrnYLpMV8lZMuGR2mT+SaCBsoZTj5Byfd+NEIrWZreHX2wzHGxEBVqZ0pa9c37LpBTIzMOw8tTFTEcS3pKT1MNYPRJl7vs=
+	t=1725814993; cv=none; b=NhliycO0PBn70L/sJVOZy6m8a7Ozun/GZhP/V80bzTXBqir7gSnWNqFpeNYEDBg7FXzjXkkom7yPlLDKn8LzBNxMWh1LvhBS2v3Vl5qXVdOTN9o6/rN4j1THP+/nccWgekLgFBkP0FqUf7/ZLh12gwb0dzs/A5Z+VbhkLNK4sRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725807412; c=relaxed/simple;
-	bh=GuOFUIUxIVsBZquM0yJY39VnaN21FhKOUMf1KDcwxi0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SeozR9qY2hj8XemAxsiZxByeehBlyKR8JztbVnZxC9K4hj4vddKUbVafZqnxvpbpZUrhjpI3y78SXqbvQyd6DjEixNJBr6mvCocV9QunvD/QN3d45YbtiA5rcIdPGW64yDrZ91vRhd4lImS3qU59YHU4/bawiclsXPKPdChIQbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fOffD5UZ; arc=none smtp.client-ip=209.85.215.174
+	s=arc-20240116; t=1725814993; c=relaxed/simple;
+	bh=M6hOX6d67g/sHrbUEKNZOlyXGlA5MldEKz/S1CCvNOI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EY5waUmbNiqC6KRjuUyWr/V5FRVMKGvHL+Gg1vYoc8d6/tLsgQduxzo85tm+yGoR4ORdZd/oxF+8b2MhF4oEsZNKzTwLfRgEZHKDQv+uObQjyLxkaNMTSlfpH6LIuNSzpiSf4Uwmp8A2lPHScTs3s3XtUp4UX5+NfT8oszkMEQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=RSeJHGM4; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fOffD5UZ"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so3001596a12.3
-        for <linux-block@vger.kernel.org>; Sun, 08 Sep 2024 07:56:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RSeJHGM4"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-718e5edf270so807107b3a.1
+        for <linux-block@vger.kernel.org>; Sun, 08 Sep 2024 10:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725807410; x=1726412210; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J34rS7e5bbxObx2vMisny7xK0MvUIBdu8vnPBGO1Xj0=;
-        b=fOffD5UZggyR5oPdJxdcUe2Wxu81f1VzsIcLtZOzaTchQeueM6bfzwvb6NZa1W3v9G
-         D28JlGhmwILV0wLIyFhB//VbRM+pEGz3HMxtWKMV3/SrQMf7oYhChaVhvZuaByzYmEuL
-         oJvTLhx3lQzsiINZ0Id60T75SYtP2aVtSvpLglSQB5ouPsEve+dI1Lxgb9qIaVlKMXIE
-         VKglmd+Y24aDPDWdao1GoH8Bx/7LRqsgRVqSO7W2DEnR/cj1mkdSbFhJFGRB1azu5syh
-         EKX2S8ckkJb3YqqH3uKlBDOb1baVLceDyTdLcwE0v3c6vl7QS2WdH65qbXoZAoYqb7EJ
-         DypQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725814990; x=1726419790; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YfYf9qgMs/s/Cf29/MVQd3LQ6tknsxRcEwEDS7AwwRE=;
+        b=RSeJHGM4VQttQCzEtYoOZ+PxnycBpCobU63tLfQZ6tDDj9Fju0LAWJaoXIR8mG0f0k
+         xqYCcrAMiWuetW5hPtUJNdJTLaZ9OJFsZwiYN933cEkVQdFdW4Ho8kin7i2F5Mzpk7BQ
+         zvpJbvtMIVQughZqU+bo+cjCAuZJC7eUiqQT9e6LcfYhmj5CC7JcRHR4sCoLyxSQ3Aav
+         HhjWcyja5/wKBA9fFlSkltoazPXaINk5Qserl3EQfA8ee54WyvM+KDR3V1lIqnRWfXZ8
+         We9TEaPprF6jWLRE/xjDqNEFq1lz1NbtYwjs0WMUQyqy9k3b5VJnh+BSqmSG4xSVzWDe
+         67oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725807410; x=1726412210;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J34rS7e5bbxObx2vMisny7xK0MvUIBdu8vnPBGO1Xj0=;
-        b=xMt1MJQUFRGJF+66o8Pj08pWURNQb47vjCr7ggEtUT0VJBGuUpi1emqK+wm0K3VD7A
-         V81C00s1vAkSpj5i9bCdLLpoFkE6pjNcitsLXPsQBnBkiPqh6I/DQK5bq+dpK5cWs9KK
-         MyPafjQHK/qxota1K5wniTp+0ZpqvyfXiIdjWWHIHc5O/SxMwIkwa3JV6n9HNImmFcWv
-         +KgFi3UpvEq9dT386Bs9AgjzHQeLgrWbXI1eOjtyyY9NrCBMC9m/cIag/xxX/ruX9yWp
-         vuhdi2ElXV4d4lZPbAoXZ6gKwqToazlyhtZnR/oklL7xaJouV/ta6i4d6FVtZvbMuXbh
-         64dQ==
-X-Gm-Message-State: AOJu0YxWiFJ80srVTs+XrC2QZBN+TCD8E491bX/55AeU+w8IXWyxUi7s
-	H7AMdmRkU/C8VLS+X2sYfxIghD2v/7UdNMohmyqEh0tFnkUwiGKg9kK0yZR1AeoNGxj8/Rcc7P4
-	t
-X-Google-Smtp-Source: AGHT+IGJha8j9cAZKXhvB1LlYpa9/ruXnw9dOUaanEgUw4NivvzMUPafOhhFAaA3p1MMjLnuqFfSyA==
-X-Received: by 2002:a17:903:22c4:b0:206:adc8:2dcb with SMTP id d9443c01a7336-2070a537840mr66447745ad.25.1725807409844;
-        Sun, 08 Sep 2024 07:56:49 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710e0f6f5sm20951925ad.11.2024.09.08.07.56.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Sep 2024 07:56:48 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-Cc: "Richard W . M . Jones" <rjones@redhat.com>, 
- Ming Lei <ming.lei@redhat.com>, Jeff Moyer <jmoyer@redhat.com>, 
- Jiri Jaburek <jjaburek@redhat.com>, Christoph Hellwig <hch@lst.de>, 
- Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, 
- Chaitanya Kulkarni <kch@nvidia.com>
-In-Reply-To: <20240908000704.414538-1-dlemoal@kernel.org>
-References: <20240908000704.414538-1-dlemoal@kernel.org>
-Subject: Re: [PATCH] block: Prevent deadlocks when switching elevators
-Message-Id: <172580740775.254205.14911870002112819350.b4-ty@kernel.dk>
-Date: Sun, 08 Sep 2024 08:56:47 -0600
+        d=1e100.net; s=20230601; t=1725814990; x=1726419790;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YfYf9qgMs/s/Cf29/MVQd3LQ6tknsxRcEwEDS7AwwRE=;
+        b=P/TlXpwBS7QZ2aAUu/euGRXdtN+NxBzu5qMlfqd8FKlK071/HjHMvlIX4mkAV6seqq
+         rj401JwHn3Ia/XZdaDUWN+yyGw3BYJ/DHXUzClcCyZ59zv5bLy/q7rxzhUxNv3m3AXcn
+         v9yxNFDpedYqJa0gYO0ox18GJ3PQHk0uR6vHYkMDedmhGgcmn70cU/5wr6zQRVZs+yZz
+         wySuyXIR57P1Jnj0AbPtVDDT6nmoD5k3FA8NzCt0TgL+PdgAeI3qnali50VS5IoPxHAq
+         aqaiBhX/7GTuVaYM97bLMLZXKnr5mXOQnSHo4CD9SYL+6jFxQetgCXDIm8FnaCd3aB5U
+         1bYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVe3cLIPtrB+WXNSEyNry8eInpcECCfXMmU9xmG7399KC+tGWL5RQfszkO4G53teH+ROMHOGDoD063Dpw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyprHXwFEVhTaQKZC75sgMLNihDJLchkd13WCFsg3z+VvHvpv+
+	9oWo+Ge2Ix+lyE0EaNk95dzVBMTh8lalCJu1/DxkN9cWoiH8V82igbrB6+R2va0=
+X-Google-Smtp-Source: AGHT+IEboSXi6Gg5AQgJ6R2dG81rS4lvAyKMHkl5m3fSbPs9p/sQnX3Y4+or6QEHsu48LyxGweVUzQ==
+X-Received: by 2002:a05:6a00:a29:b0:717:85d4:939c with SMTP id d2e1a72fcca58-718d5f52c04mr12201175b3a.23.1725814990529;
+        Sun, 08 Sep 2024 10:03:10 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-718e58c1f15sm2240605b3a.76.2024.09.08.10.03.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Sep 2024 10:03:09 -0700 (PDT)
+Message-ID: <fa31473a-39ab-4605-9966-90800ddd84a9@kernel.dk>
+Date: Sun, 8 Sep 2024 11:03:08 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block and io_uring: typo fixes
+To: CPestka <constantin.pestka@c-pestka.de>
+Cc: asml.silence@gmail.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+References: <20240908164723.36468-1-constantin.pestka@c-pestka.de>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240908164723.36468-1-constantin.pestka@c-pestka.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.1
 
+1) Don't combine patches for separate trees into one patch
+2) Both cancellation and cancelation are correct spellings, io_uring has
+used the latter since the start.
 
-On Sun, 08 Sep 2024 09:07:04 +0900, Damien Le Moal wrote:
-> Commit af2814149883 ("block: freeze the queue in queue_attr_store")
-> changed queue_attr_store() to always freeze a sysfs attribute queue
-> before calling the attribute store() method, to ensure that no IOs are
-> in-flight when an attribute value is being updated.
-> 
-> However, this change created a potential deadlock situation for the
-> scheduler queue attribute as changing the queue elevator with
-> elv_iosched_store() can result in a call to request_module() if the user
-> requested module is not already registered. If the file of the requested
-> module is stored on the block device of the frozen queue, a deadlock
-> will happen as the read operations triggered by request_module() will
-> wait for the queue freeze to end.
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] block: Prevent deadlocks when switching elevators
-      commit: 3c031b721c0ee1d6237719a6a9d7487ef757487b
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
