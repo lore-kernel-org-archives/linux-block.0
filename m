@@ -1,226 +1,96 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A157B14EC40
-	for <linux-block@vger.kernel.org>; Sun,  8 Sep 2024 10:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D49C14D2B1
+	for <linux-block@vger.kernel.org>; Sun,  8 Sep 2024 14:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725790841; cv=none; b=P5o8hk2eYCXSFqQNvt3sH1NgWvTI8YdbFhYJLK5PzQmDfoZSUR/Jm+8zETDepx/wWdhCjxrOefLC7N4RgW8MtoCie1xKdyzGuONmNvrDJd+OMlXBPmDkHpLphiVvAuNEddgsxlxsg9ciVn8PUiidYRxeoaOa6SRfPSyOTVbTESE=
+	t=1725807410; cv=none; b=DsFn9VIpjiw/GYvKuf9WPkzVS9TkWnSxWLr4WIvEz5laVRsO8hPFfiy5LCpo1Fb2HFQnyXJ5pPAtVJvHTqrMfkId4meFj/37Cw6+eqp1GwLymcUR6JvwaSE4aaQS0APMn1KT17b8ozHIDnAt+H3sHKOAvL0hjnyWOtq2jo8QOiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725790841; c=relaxed/simple;
-	bh=qqZBGvygySUIwebPHaOgukAGvIx/tYeM1appMNO+SoA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SytGdO5gH3gqYL4DZFllamHQiGKH078XCu8dzSmLgd3EOXZddtHiAZbYz4nPeA090ebBzctQIs8hS1vWmSb6ptrYtkE9Jv0kgtmKKMsDnXgrbDPEQrrvADkVAIRVovUWrIiLz3RwAK3beG+mB8h7UPo587zEcfuOObtLBqsTqg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NtCdGaAq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1725807410; c=relaxed/simple;
+	bh=h+XZpRMYPsysTD0CNc/vQ35wL7alHsPvEK7IN22K+0M=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=oYlteeC/WXK4WG4WwbJcMD6DZ6F/w3EbN8vU8p1Ly0DWrUaMxUzvb+qJ1AVnIeqh3+nH7pJM2+OrGq8ebrHy7TBzr6nzyze0X6rWZAhHsp/2Shlhh7yHncLlJQWV5hEzgmSV+TzY+HMSrWjXPkTKrx2EodJAIh1rt4UH8CjU50U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KFcnLBlY; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NtCdGaAq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725790838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CsNr34yyilaT0nKMT7zaED+o4bAb68gHZzJKXlx6lBU=;
-	b=NtCdGaAqvkTlRrNAe2PBbrGzoUMV6rSy+G3XJyguPvYjFLPUCk6E3Ci7k02gFcF3TtG7PG
-	GU81vSQ/vQcEE5JDodje2qqQOO3nYJ4879ip9DEFse3EGG+GSUNbzy6m2eMYc1r/ODcI/2
-	BwFBxbfmjQJ3DZi+Fd7xkkGD8Gnc5DI=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-658-YG5_nSWgONOQYypgPY2j7A-1; Sun,
- 08 Sep 2024 06:20:33 -0400
-X-MC-Unique: YG5_nSWgONOQYypgPY2j7A-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CC28019560B4;
-	Sun,  8 Sep 2024 10:20:31 +0000 (UTC)
-Received: from localhost (unknown [10.42.28.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1BE083000239;
-	Sun,  8 Sep 2024 10:20:29 +0000 (UTC)
-Date: Sun, 8 Sep 2024 11:20:29 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>, Jeff Moyer <jmoyer@redhat.com>,
-	Jiri Jaburek <jjaburek@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH] block: Prevent deadlocks when switching elevators
-Message-ID: <20240908102029.GB1450@redhat.com>
-References: <20240908000704.414538-1-dlemoal@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KFcnLBlY"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2068bee21d8so34699775ad.2
+        for <linux-block@vger.kernel.org>; Sun, 08 Sep 2024 07:56:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725807406; x=1726412206; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cw732y6mcg84drG6YMPb5eVJP3NzKw3RL/2ng9RKfso=;
+        b=KFcnLBlYCgwGls8YHmVElQrQ5WqozyqjW0O7we5hqG7md1CqbnGhdTs+ZjY+bypVMM
+         JvSD8KCtVngpNfCZMMCTpLKHq0d2u/lbLWvEYK/+SBbM7r0b9uBcQ+oOf015VBN5BPgZ
+         XhqZP7NmwoRlfmnkYggPPeD9iuOXTYOsdKGXyPNjiT0v0HNA334sfotbpwVuw0ZEQx7W
+         dM3znMWDomJGVZhwl+LJv5jboMG3kU/AUA++mSgQNFpO30gsuavceRlLmaclSxBn7KLK
+         d/4QOP9OJiCPN/uNMNzyQC+3FBFLVgN3r/MbD6wZ1bH7GyPNSA4FDc8nMJMav9K5678d
+         gIMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725807406; x=1726412206;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cw732y6mcg84drG6YMPb5eVJP3NzKw3RL/2ng9RKfso=;
+        b=L5sRtc8RqAelrwiGoaZFnmHO7f8Asy9dxczTk/96cBNRWE6mqb4UOjqDfZYQ5XixQq
+         WIAt08wbpfLZU9UHVeFKCFpvYGcoq3DhBijdDgWH8QO0VyqwgO4D+Gi64gisYvh2SjvY
+         PMkcCoQE+teVU5vsHKqa7lZ6rLXt1gQED0HwbEBuMGpeaEii0HgObyfWVloVa/R2cjAw
+         A0ICCva4lLXrLKwKdKCWEWW0cHS95KGslAusir7ZoHvGzYOM9J/Jeyen9vrSdp5qoFNu
+         9505/vQpeHROXe/Vz/e2JgUqM96TleQPYW4S0iuVo0r3gFMG3taz2wITAN2m3M8uYOLv
+         yqfQ==
+X-Gm-Message-State: AOJu0Yz2MQs1ou0/vsGRtADaBuj77SRxDFpg4/V074BQpaY6cmBtqgWH
+	pqmi3rfNpMqJIj47c9ivYtK/54RsWH0df1XGUozUX/x/wPfWl+b1MntZvLcAjPjYO0qmTbMJT2p
+	W
+X-Google-Smtp-Source: AGHT+IEBtP9PCbcGxIXupfRgdyTO1QncL5RvYz0E+YeiSsXcKjhQNv1TVkqBRmwrk18A4iSX9sz5cw==
+X-Received: by 2002:a17:903:2b05:b0:207:232f:36dc with SMTP id d9443c01a7336-207232f3760mr34218435ad.50.1725807405558;
+        Sun, 08 Sep 2024 07:56:45 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710e0f6f5sm20951925ad.11.2024.09.08.07.56.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Sep 2024 07:56:44 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: hare@suse.de, dlemoal@kernel.org, ming.lei@redhat.com, 
+ john.g.garry@oracle.com, Li Zetao <lizetao1@huawei.com>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20240907034046.3595268-1-lizetao1@huawei.com>
+References: <20240907034046.3595268-1-lizetao1@huawei.com>
+Subject: Re: [PATCH -next v2] mtip32xx: Remove redundant null pointer
+ checks in mtip_hw_debugfs_init()
+Message-Id: <172580740407.254205.3190774834093585611.b4-ty@kernel.dk>
+Date: Sun, 08 Sep 2024 08:56:44 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240908000704.414538-1-dlemoal@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
-On Sun, Sep 08, 2024 at 09:07:04AM +0900, Damien Le Moal wrote:
-> Commit af2814149883 ("block: freeze the queue in queue_attr_store")
-> changed queue_attr_store() to always freeze a sysfs attribute queue
-> before calling the attribute store() method, to ensure that no IOs are
-> in-flight when an attribute value is being updated.
+
+On Sat, 07 Sep 2024 11:40:46 +0800, Li Zetao wrote:
+> Since the debugfs_create_dir() never returns a null pointer, checking
+> the return value for a null pointer is redundant. Since
+> debugfs_create_file() can deal with a ERR_PTR() style pointer, drop
+> the check.  Since mtip_hw_debugfs_init does not pay attention to the
+> return value, its return type can be changed to void.
 > 
-> However, this change created a potential deadlock situation for the
-> scheduler queue attribute as changing the queue elevator with
-> elv_iosched_store() can result in a call to request_module() if the user
-> requested module is not already registered. If the file of the requested
-> module is stored on the block device of the frozen queue, a deadlock
-> will happen as the read operations triggered by request_module() will
-> wait for the queue freeze to end.
 > 
-> Solve this issue by introducing the load_module method in struct
-> queue_sysfs_entry, and to calling this method function in
-> queue_attr_store() before freezing the attribute queue.
-> The macro definition QUEUE_RW_LOAD_MODULE_ENTRY() is added to define a
-> queue sysfs attribute that needs loading a module.
-> 
-> The definition of the scheduler atrribute is changed to using
-> QUEUE_RW_LOAD_MODULE_ENTRY(), with the function
-> elv_iosched_load_module() defined as the load_module method.
-> elv_iosched_store() can then be simplified to remove the call to
-> request_module().
-> 
-> Reported-by: Richard W.M. Jones <rjones@redhat.com>
-> Reported-by: Jiri Jaburek <jjaburek@redhat.com>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=219166
-> Fixes: af2814149883 ("block: freeze the queue in queue_attr_store")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> [...]
 
-I tested this (using my "unreliable" test!), and it passed 5,000
-iterations, so:
+Applied, thanks!
 
-Tested-by: Richard W.M. Jones <rjones@redhat.com>
+[1/1] mtip32xx: Remove redundant null pointer checks in mtip_hw_debugfs_init()
+      commit: a02e98bebc15f1d973c2a62005be9456a657e2b6
 
-Thanks,
-
-Rich.
-
-> ---
->  block/blk-sysfs.c | 22 +++++++++++++++++++++-
->  block/elevator.c  | 21 +++++++++++++++------
->  block/elevator.h  |  2 ++
->  3 files changed, 38 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 60116d13cb80..e85941bec857 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -23,6 +23,7 @@
->  struct queue_sysfs_entry {
->  	struct attribute attr;
->  	ssize_t (*show)(struct gendisk *disk, char *page);
-> +	int (*load_module)(struct gendisk *disk, const char *page, size_t count);
->  	ssize_t (*store)(struct gendisk *disk, const char *page, size_t count);
->  };
->  
-> @@ -413,6 +414,14 @@ static struct queue_sysfs_entry _prefix##_entry = {	\
->  	.store	= _prefix##_store,			\
->  };
->  
-> +#define QUEUE_RW_LOAD_MODULE_ENTRY(_prefix, _name)		\
-> +static struct queue_sysfs_entry _prefix##_entry = {		\
-> +	.attr		= { .name = _name, .mode = 0644 },	\
-> +	.show		= _prefix##_show,			\
-> +	.load_module	= _prefix##_load_module,		\
-> +	.store		= _prefix##_store,			\
-> +}
-> +
->  QUEUE_RW_ENTRY(queue_requests, "nr_requests");
->  QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
->  QUEUE_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
-> @@ -420,7 +429,7 @@ QUEUE_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
->  QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
->  QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
->  QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
-> -QUEUE_RW_ENTRY(elv_iosched, "scheduler");
-> +QUEUE_RW_LOAD_MODULE_ENTRY(elv_iosched, "scheduler");
->  
->  QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
->  QUEUE_RO_ENTRY(queue_physical_block_size, "physical_block_size");
-> @@ -670,6 +679,17 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
->  	if (!entry->store)
->  		return -EIO;
->  
-> +	/*
-> +	 * If the attribute needs to load a module, do it before freezing the
-> +	 * queue to ensure that the module file can be read when the request
-> +	 * queue is the one for the device storing the module file.
-> +	 */
-> +	if (entry->load_module) {
-> +		res = entry->load_module(disk, page, length);
-> +		if (res)
-> +			return res;
-> +	}
-> +
->  	blk_mq_freeze_queue(q);
->  	mutex_lock(&q->sysfs_lock);
->  	res = entry->store(disk, page, length);
-> diff --git a/block/elevator.c b/block/elevator.c
-> index f13d552a32c8..c355b55d0107 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -698,17 +698,26 @@ static int elevator_change(struct request_queue *q, const char *elevator_name)
->  		return 0;
->  
->  	e = elevator_find_get(q, elevator_name);
-> -	if (!e) {
-> -		request_module("%s-iosched", elevator_name);
-> -		e = elevator_find_get(q, elevator_name);
-> -		if (!e)
-> -			return -EINVAL;
-> -	}
-> +	if (!e)
-> +		return -EINVAL;
->  	ret = elevator_switch(q, e);
->  	elevator_put(e);
->  	return ret;
->  }
->  
-> +int elv_iosched_load_module(struct gendisk *disk, const char *buf,
-> +			    size_t count)
-> +{
-> +	char elevator_name[ELV_NAME_MAX];
-> +
-> +	if (!elv_support_iosched(disk->queue))
-> +		return -EOPNOTSUPP;
-> +
-> +	strscpy(elevator_name, buf, sizeof(elevator_name));
-> +
-> +	return request_module("%s-iosched", strstrip(elevator_name));
-> +}
-> +
->  ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
->  			  size_t count)
->  {
-> diff --git a/block/elevator.h b/block/elevator.h
-> index 3fe18e1a8692..2a78544bf201 100644
-> --- a/block/elevator.h
-> +++ b/block/elevator.h
-> @@ -148,6 +148,8 @@ extern void elv_unregister(struct elevator_type *);
->   * io scheduler sysfs switching
->   */
->  ssize_t elv_iosched_show(struct gendisk *disk, char *page);
-> +int elv_iosched_load_module(struct gendisk *disk, const char *page,
-> +			    size_t count);
->  ssize_t elv_iosched_store(struct gendisk *disk, const char *page, size_t count);
->  
->  extern bool elv_bio_merge_ok(struct request *, struct bio *);
-> -- 
-> 2.46.0
-
+Best regards,
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-nbdkit - Flexible, fast NBD server with plugins
-https://gitlab.com/nbdkit/nbdkit
+Jens Axboe
+
+
 
