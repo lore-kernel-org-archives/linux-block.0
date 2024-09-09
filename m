@@ -1,165 +1,213 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432311B2507
-	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 08:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F318A161916
+	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 09:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725872382; cv=none; b=m6X4FLHr7AjYeXE2Qzxa2UaKZ5Y7ekAkZXsHDIEzmw2uKbFSZfA41mEktw+B5hYRnMiJVmmBKFmvrgczUF9q0cvfTAx4u6UBQPlHTONkyLbhX3fgodWO8Nk7BLRQGpjrNhTT9MoKfX8GJckZmfAwDvWHpnhVKlXCMj703Lr7qrU=
+	t=1725875050; cv=none; b=USTxnp1sCRjY7MUatuqjfkgUdS1yH5UJOrC/5Kgds77SB5mEHD+5cNb176aoIXRUrPeZA1AgCIDeVa/Jw6eG5Wk6AXYDPxHhpp/jyM0qtHlWHr91Wg07P3c3QR7TXe28NOI9e30mRri/0Dp/DV9Xa/lw3m0sHuDD+ZZTLJ5vpQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725872382; c=relaxed/simple;
-	bh=kYwMWMOUYoJZKPWDz0p/NGGwuUGLl3O/po+hhV/ySR0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zva8EafcsL9nBB2M5e+iZEEl3ctAR06dO3i/FR2Rufx5yJclz339n7hcdJGKlZVy480qWDOZI3VyqAdvlou1ZLri6YagLaXrnhkGZ8RlKElyCa3fXKegxkGld3M+CsJeEojHunwW48sC3QEPDH1ebdvK2VhazV0e9eOpMTvNhps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OX0nj0dG; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+	s=arc-20240116; t=1725875050; c=relaxed/simple;
+	bh=bX5jM3kyQKkVdtMEpnz0qCHRxu0QYubOxMm9Z4e9e5I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AkveDxG1a0LA05pplLTDuPrr01GmqDhgBt7+9ywLBCbw1kKb/7gyUcQWNV5O1LXBHQ3WxBb61818TaeK0/srOjAaCNHlBN4EBqt+bKo319yjaSUbgfQ28I7irGSpNkBnpyrpu5oEBLF1fwsSD5pyNL6o9jZY8bcKmo6tkjAPpG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=erF4b8WV; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OX0nj0dG"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5365a9574b6so3864982e87.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Sep 2024 01:59:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="erF4b8WV"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2f75aa08a96so26031281fa.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Sep 2024 02:44:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725872377; x=1726477177; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6S2UE6lFQFIaK4OtJMbVxXJXe1O9tXNFiR7Twawdri0=;
-        b=OX0nj0dGgRdvSkuZQ5TjOckTvUotgw3dbzW5U2/jndT7AirIr++Fdd96ED4OfWDrNy
-         WUoeckGeo9efcgyrsx/UlCw63zi4fHQG/xR0piYRKX7BfCiEAmyE2RAM8FVwTmyihDBo
-         eSyDR/NVNj9epuYiqN6JC6W88VP/BJlw0YPA8=
+        d=linaro.org; s=google; t=1725875045; x=1726479845; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ayxt9tW30pARsBtY4uNjtVx6woJrfLpJGoVganqLqLs=;
+        b=erF4b8WVYYjPBBInFSA5pdPTCmm8ktqbUjqKsGrppLo+LC/gX4YB7cVT4dQW2zbSEF
+         DJOPr4Ckb++NmzuVVxl68oxyc/taBSqCauZCybvuWvTWOXye+G1jDEkGV91kse94tmFm
+         1lX1V4F78W789A4wMYkQjlnji0+hQd6E6UgzqPZO9DXTLhBAU73OFA1JwyJtBR8GTahL
+         Lw5Y7XjgZNses3QmN47MGQwHcQa0rqLOvbU7MwF0QVhuw7Rmu+UCS7/+kpsZLGkklWH7
+         2/wSiLvpXI4WdvIXhtBPeWMO7EZDAiH8TsD24RbVyl8wq6uvQzoyenekgvRmY/D9uG2/
+         8bXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725872377; x=1726477177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6S2UE6lFQFIaK4OtJMbVxXJXe1O9tXNFiR7Twawdri0=;
-        b=PwTCPL1d8A97WiV61HWRVs4gbgtlChtqCTHAKmKHLFuxoVHFedSjlssbfeJLRrwyAR
-         KZnViEgVwBoT9D1ShJ622qNyBXvrrq34glUMEwAG2nGgvNKGskJ3dGz+RoeGK++w6tMg
-         o5zZw7IHHypvIKLCRc/CeIaN4rWoQk4G2D9zAOk5E+UJl88lLkwFSU8grG7ZhN5T8fxu
-         5v8tDrQQaygHxlU/nb2/8iM2k/fP2U5/2Oxoogmk2z7Aw8NEiR8es8Ftkev5zwTKjYcp
-         M0Xq3e/ZsLt15yQigqZrYTWQyKiKUW0biysz7aW3tea90ud+pKQijdfjbZIGpDlT8/Np
-         gFIA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1Wcs/oIfOJdv4w3PP6Cd2UUcVH+coaQURQqgucR3imxXiwO7EXTbyGVn+k6LdpDk61OR5tNss634wVQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEE0LtaGFHA5RVQ6fMFho1Xbx90EpwyQ6loHpuwyjqpkB0Kuuz
-	j/lBWZCpphCICcgqetUru0OgxJsM6ayCIpHoVeUwkI/7tHMpqQW6+5ronGJD6zBQ2ZpBAzqr8rO
-	1xuiOQiNdQoMjOOkpjKdjbJSoNkjZZVHqmu+e
-X-Google-Smtp-Source: AGHT+IEV5KHTyM42uPsdDXbjleRs4adAC8RAMwKOrUjz4iDm20YabVneezv8rJGiE6wMjCx8MJoPuYEUF0lSIgN32s0=
-X-Received: by 2002:a05:6512:3d89:b0:52e:933f:f1fa with SMTP id
- 2adb3069b0e04-53658818d02mr6743959e87.61.1725872377196; Mon, 09 Sep 2024
- 01:59:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725875045; x=1726479845;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ayxt9tW30pARsBtY4uNjtVx6woJrfLpJGoVganqLqLs=;
+        b=CjiVaw10wg1H5kSrJT2KGMHPiu5KZ2J+U7ygML9AVhd10GJB7uL2AaADQFpAZDYnS/
+         I6nRgNKaM/5HSzM9gGTthAFAcayocJTXzEUk167kxxhQu27UiIAiCGF+/txpuYKABYAc
+         oV5zmF8jvMnwdV0m/7sFaRlarxEKqrDMNofygp5R57KU9mpOUHm4Z+blgHBmEnVZKWtg
+         bW3VsO1Zlzg4eYAyCL+S8zugvGuTytdoiz7T/JCSlAiKCs+5SG3sP9Yl6TYJ0W9TthTo
+         HE/+2x7JQDURJlUo+ugZzcE/44PuSP41kaUqiLE4MHu6FmdqE39jdzOIB9qW63cK/0Wh
+         TQCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWuvUfiCHwAfwzTWMaHZ73PxPSR2CGMNgB+Rtg8pKxqzm/1Yvyq20U4IlwZO+dU14CFHr0xeVpLS8WAcA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOIdN0dUnd+Cjk7aqS8b6pw/8nnBpvTxfya7/p+69hRQxwrECy
+	ugvXZ3LVTUg3Y7ajSrgPovDWXuf95ko9pH6yKripevspy+3L2sq7K1JEcBmrqlI=
+X-Google-Smtp-Source: AGHT+IFfJZf4aCicpleqZE+fxLlnGBGZEfKHivmNdx0kcBfFkbzhf0hjKD5P+CTHE0X5P4PgDl4WVQ==
+X-Received: by 2002:a05:651c:211e:b0:2ef:251f:785 with SMTP id 38308e7fff4ca-2f751eb30d8mr74440981fa.1.1725875044071;
+        Mon, 09 Sep 2024 02:44:04 -0700 (PDT)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--7a1.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::7a1])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f75c098cd3sm7416661fa.113.2024.09.09.02.44.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 02:44:03 -0700 (PDT)
+Date: Mon, 9 Sep 2024 12:44:02 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Neil Armstrong <neil.armstrong@linaro.org>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Jens Axboe <axboe@kernel.dk>, 
+	Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Asutosh Das <quic_asutoshd@quicinc.com>, 
+	Ritesh Harjani <ritesh.list@gmail.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>, 
+	Bart Van Assche <bvanassche@acm.org>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Gaurav Kashyap <quic_gaurkash@quicinc.com>, 
+	linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dm-devel@lists.linux.dev, linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v6 09/17] soc: qcom: ice: add HWKM support to the ICE
+ driver
+Message-ID: <ivibs6qqxhbikaevys3iga7s73xq6dzq3u43gwjri3lozkrblx@jxlmwe5wiq7e>
+References: <20240906-wrapped-keys-v6-0-d59e61bc0cb4@linaro.org>
+ <20240906-wrapped-keys-v6-9-d59e61bc0cb4@linaro.org>
+ <7uoq72bpiqmo2olwpnudpv3gtcowpnd6jrifff34ubmfpijgc6@k6rmnalu5z4o>
+ <66953e65-2468-43b8-9ccf-54671613c4ab@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1724833695-22194-1-git-send-email-ajay.kaher@broadcom.com> <a5609ba3-cc35-41c5-98f1-52063f8a6eec@kernel.org>
-In-Reply-To: <a5609ba3-cc35-41c5-98f1-52063f8a6eec@kernel.org>
-From: Ajay Kaher <ajay.kaher@broadcom.com>
-Date: Mon, 9 Sep 2024 14:29:25 +0530
-Message-ID: <CAD2QZ9Z_rpDAyeJGBDxx8vqq7nSAuiktTTCxYHUu1QtA42afew@mail.gmail.com>
-Subject: Re: [PATCH] block: Fix validation of ioprio level
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: axboe@kernel.dk, niklas.cassel@wdc.com, hare@suse.de, 
-	martin.petersen@oracle.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, alexey.makhalov@broadcom.com, 
-	vasavi.sirnapalli@broadcom.com, vamsi-krishna.brahmajosyula@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66953e65-2468-43b8-9ccf-54671613c4ab@linaro.org>
 
-On Wed, Aug 28, 2024 at 2:15=E2=80=AFPM Damien Le Moal <dlemoal@kernel.org>=
- wrote:
->
-> On 8/28/24 17:28, Ajay Kaher wrote:
-> > The commit eca2040972b4 introduced a backward compatibility issue in
-> > the function ioprio_check_cap.
-> >
-> > Before the change, if ioprio contains a level greater than 0x7, it was
-> > treated as -EINVAL:
-> >
-> >     data =3D ioprio & 0x1FFF
-> >     if data >=3D 0x7, return -EINVAL
-> >
-> > Since the change, if ioprio contains a level greater than 0x7 say 0x8
-> > it is calculated as 0x0:
-> >
-> >     level =3D ioprio & 0x7
-> >
-> > To maintain backward compatibility the kernel should return -EINVAL in
-> > the above case as well.
-> >
-> > Fixes: eca2040972b4 ("scsi: block: ioprio: Clean up interface definitio=
-n")
-> > Signed-off-by: Ajay Kaher <ajay.kaher@broadcom.com>
-> > ---
-> >  block/ioprio.c | 11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/block/ioprio.c b/block/ioprio.c
-> > index 73301a2..f08e76b 100644
-> > --- a/block/ioprio.c
-> > +++ b/block/ioprio.c
-> > @@ -30,6 +30,15 @@
-> >  #include <linux/security.h>
-> >  #include <linux/pid_namespace.h>
-> >
-> > +static inline int ioprio_check_level(int ioprio, int max_level)
-> > +{
-> > +     int data =3D IOPRIO_PRIO_DATA(ioprio);
-> > +
-> > +     if (IOPRIO_BAD_VALUE(data, max_level))
-> > +             return -EINVAL;
->
-> No, this cannot possibly work correctly because the prio level part of th=
-e prio
-> data is only 3 bits, so 0 to 7. The remaining 10 bits of the prio data ar=
-e used
-> for priority hints (IOPRIO_HINT_XXX).
->
-> Your change will thus return an error for cases where the prio data has a=
- level
-> AND also a hint (e.g. for command duration limits). This change would bre=
-ak
-> command duration limits. So NACK.
->
-> The userspace header file has the ioprio_value() that a user should use t=
-o
-> construct an ioprio. Bad values are checked in that function and errors w=
-ill be
-> returned if an invalid level is passed.
->
+On Mon, Sep 09, 2024 at 10:58:30AM GMT, Neil Armstrong wrote:
+> On 07/09/2024 00:07, Dmitry Baryshkov wrote:
+> > On Fri, Sep 06, 2024 at 08:07:12PM GMT, Bartosz Golaszewski wrote:
+> > > From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> > > 
+> > > Qualcomm's ICE (Inline Crypto Engine) contains a proprietary key
+> > > management hardware called Hardware Key Manager (HWKM). Add HWKM support
+> > > to the ICE driver if it is available on the platform. HWKM primarily
+> > > provides hardware wrapped key support where the ICE (storage) keys are
+> > > not available in software and instead protected in hardware.
+> > > 
+> > > When HWKM software support is not fully available (from Trustzone), there
+> > > can be a scenario where the ICE hardware supports HWKM, but it cannot be
+> > > used for wrapped keys. In this case, raw keys have to be used without
+> > > using the HWKM. We query the TZ at run-time to find out whether wrapped
+> > > keys support is available.
+> > > 
+> > > Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
+> > > Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > ---
+> > >   drivers/soc/qcom/ice.c | 152 +++++++++++++++++++++++++++++++++++++++++++++++--
+> > >   include/soc/qcom/ice.h |   1 +
+> > >   2 files changed, 149 insertions(+), 4 deletions(-)
+> > > 
+> > >   int qcom_ice_enable(struct qcom_ice *ice)
+> > >   {
+> > > +	int err;
+> > > +
+> > >   	qcom_ice_low_power_mode_enable(ice);
+> > >   	qcom_ice_optimization_enable(ice);
+> > > -	return qcom_ice_wait_bist_status(ice);
+> > > +	if (ice->use_hwkm)
+> > > +		qcom_ice_enable_standard_mode(ice);
+> > > +
+> > > +	err = qcom_ice_wait_bist_status(ice);
+> > > +	if (err)
+> > > +		return err;
+> > > +
+> > > +	if (ice->use_hwkm)
+> > > +		qcom_ice_hwkm_init(ice);
+> > > +
+> > > +	return err;
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(qcom_ice_enable);
+> > > @@ -150,6 +282,10 @@ int qcom_ice_resume(struct qcom_ice *ice)
+> > >   		return err;
+> > >   	}
+> > > +	if (ice->use_hwkm) {
+> > > +		qcom_ice_enable_standard_mode(ice);
+> > > +		qcom_ice_hwkm_init(ice);
+> > > +	}
+> > >   	return qcom_ice_wait_bist_status(ice);
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(qcom_ice_resume);
+> > > @@ -157,6 +293,7 @@ EXPORT_SYMBOL_GPL(qcom_ice_resume);
+> > >   int qcom_ice_suspend(struct qcom_ice *ice)
+> > >   {
+> > >   	clk_disable_unprepare(ice->core_clk);
+> > > +	ice->hwkm_init_complete = false;
+> > >   	return 0;
+> > >   }
+> > > @@ -206,6 +343,12 @@ int qcom_ice_evict_key(struct qcom_ice *ice, int slot)
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(qcom_ice_evict_key);
+> > > +bool qcom_ice_hwkm_supported(struct qcom_ice *ice)
+> > > +{
+> > > +	return ice->use_hwkm;
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(qcom_ice_hwkm_supported);
+> > > +
+> > >   static struct qcom_ice *qcom_ice_create(struct device *dev,
+> > >   					void __iomem *base)
+> > >   {
+> > > @@ -240,6 +383,7 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
+> > >   		engine->core_clk = devm_clk_get_enabled(dev, NULL);
+> > >   	if (IS_ERR(engine->core_clk))
+> > >   		return ERR_CAST(engine->core_clk);
+> > > +	engine->use_hwkm = qcom_scm_has_wrapped_key_support();
+> > 
+> > This still makes the decision on whether to use HW-wrapped keys on
+> > behalf of a user. I suppose this is incorrect. The user must be able to
+> > use raw keys even if HW-wrapped keys are available on the platform. One
+> > of the examples for such use-cases is if a user prefers to be able to
+> > recover stored information in case of a device failure (such recovery
+> > will be impossible if SoC is damaged and HW-wrapped keys are used).
+> 
+> Isn't that already the case ? the BLK_CRYPTO_KEY_TYPE_HW_WRAPPED size is
+> here to select HW-wrapped key, otherwise the ol' raw key is passed.
+> Just look the next patch.
+> 
+> Or did I miss something ?
 
-OK. Thanks for the detailed explanation.
+That's a good question. If use_hwkm is set, ICE gets programmed to use
+hwkm (see qcom_ice_hwkm_init() call above). I'm not sure if it is
+expected to work properly if after such a call we pass raw key.
 
-I agree, to use unused bits, functionality (return value in this case)
-will be changed. If applications are built using Kernel headers of
-v6.1 (doesn't include eca2040972b4) and later only upgrading Kernel to
-v6.6, because of the changes in return values applications may have
-some sort of regression.
+> 
+> Neil
+> 
+> > 
+> > >   	if (!qcom_ice_check_supported(engine))
+> > >   		return ERR_PTR(-EOPNOTSUPP);
+> > > diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
+> > > index 9dd835dba2a7..1f52e82e3e1c 100644
+> > > --- a/include/soc/qcom/ice.h
+> > > +++ b/include/soc/qcom/ice.h
+> > > @@ -34,5 +34,6 @@ int qcom_ice_program_key(struct qcom_ice *ice,
+> > >   			 const struct blk_crypto_key *bkey,
+> > >   			 u8 data_unit_size, int slot);
+> > >   int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
+> > > +bool qcom_ice_hwkm_supported(struct qcom_ice *ice);
+> > >   struct qcom_ice *of_qcom_ice_get(struct device *dev);
+> > >   #endif /* __QCOM_ICE_H__ */
+> > > 
+> > > -- 
+> > > 2.43.0
+> > > 
+> > 
+> 
 
-To make the software backward compatible I believe, unused bits should
-always be ignored. So that if in future someone uses it, it should not
-change the behaviour (return values) of existing software.
-
-- Ajay
-
-> > +     return 0;
-> > +}
-> > +
-> >  int ioprio_check_cap(int ioprio)
-> >  {
-> >       int class =3D IOPRIO_PRIO_CLASS(ioprio);
-> > @@ -49,7 +58,7 @@ int ioprio_check_cap(int ioprio)
-> >                       fallthrough;
-> >                       /* rt has prio field too */
-> >               case IOPRIO_CLASS_BE:
-> > -                     if (level >=3D IOPRIO_NR_LEVELS)
-> > +                     if (ioprio_check_level(ioprio, IOPRIO_NR_LEVELS))
-> >                               return -EINVAL;
-> >                       break;
-> >               case IOPRIO_CLASS_IDLE:
->
-> --
-> Damien Le Moal
-> Western Digital Research
->
+-- 
+With best wishes
+Dmitry
