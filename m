@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86BA193
-	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 01:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99D4DDBB
+	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 01:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725847012; cv=none; b=ujKlXw/YnJwh9J4EOWcpkas+snNJuB6jZYmNiFlPaNHFaloPV/1lpioEHFFGcLoHmqDZlMn+0MUR6ntVLUnHErNQENJstRRk7FdqvH2J+dJxMcFCXv3VGvUuDPV3HHf3EhSpacPY18l44Oa+uwWJdx2RRLBp1Pcql7ZAlAnt3hE=
+	t=1725847143; cv=none; b=p7xg4FNYcl/214jsphrnwatUun6dZ6HMFaIEpJWSyVUKYMdGk4lfTKolY+t7eNJH2A5EXke9L3cOFwNJ/O/sQerhh4qKIqU/8uyZRKK3x3lzg5ou9v1DUBtSrvrxffobfYsm6G+cfZlu+BYe1237IHe/KAkVL6dGwse5JEwSdic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725847012; c=relaxed/simple;
-	bh=D2jk+6RJ4ARoiWSwO5zNzdViMCvGO6AEnBmhXrgAPmY=;
+	s=arc-20240116; t=1725847143; c=relaxed/simple;
+	bh=bpA3fWxFGAdGTQcdZopL662kVw7qEKG4LMnY/WbjfEE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DzCIGzrK3SU1X327q158jS0klW7M1SfIqqyQXxS8B9MkoespCee7/cvAiAqX2Xaug9hKuRqlDYjaTut4CupteT4qX6C9pC/tWVlNZMVTCxaNCOacZDKWNtLjUnLZPW2GeEZFsa3kFvapHebqZfbtPXAaMPOb2Dtu7fefkndxSLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PzPWr9kz; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=YeDtyfCoXEXz9nduKQxCk3DzY0SKzP42SylZbt1Rc1GZq86QIKO6+w5hEZmHXCaPw8u2PwP5qC/fzM5oPnm6fB6vb3k0esXmnRoqwQCRXT5FgnOOV3Aa/lU8ajwdS1fZrvAHYvurnPUbuJ/l7T37hgi1KcM6CVZ4vqGOVJKuI8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSxyOOhF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PzPWr9kz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EDF2C4CEC3;
-	Mon,  9 Sep 2024 01:56:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSxyOOhF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BAFAC4CEC3;
+	Mon,  9 Sep 2024 01:59:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725847012;
-	bh=D2jk+6RJ4ARoiWSwO5zNzdViMCvGO6AEnBmhXrgAPmY=;
+	s=k20201202; t=1725847142;
+	bh=bpA3fWxFGAdGTQcdZopL662kVw7qEKG4LMnY/WbjfEE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PzPWr9kzZfHiQ+rSqbBPpWJpWCfh/H1kmkRE3NiqJedR0PVpYGFvwbwNU3Ld8enL2
-	 9HAodFauQRol51K3r8AdD0reDvdSb718qw1FmWAl2HfhdBySArRTNINwSRN5+SkEMI
-	 L/Dvnh6ukLD0r3khByEuyV7E4uGwzQkKlWJUarqUMbTe1gqQ6uY22ztCPaYZOSFGc6
-	 OLafw46xJ5Sb3uf/Nb1DZkeynsXgX49sBJ3WSKsnfCdIccjJSoiDn1DVh3KiQcsc6M
-	 f9phs08kxRKMNsSPUNVa4jWYglT1E3hRKlszQWtrJBLbllxy67p1A0yo1QkgIzPSS0
-	 QKYke5jeqk3ew==
-Message-ID: <7ab499df-f888-4d17-8a29-3f64f17ff71c@kernel.org>
-Date: Mon, 9 Sep 2024 10:56:49 +0900
+	b=XSxyOOhFCX1I9DxWvqCXxRSIlUp45sZeXCRW2LNMhK39RWYEM4Ez++N8pSIkOfGmT
+	 NW5L00Rqr4rK86Q41WEH+aQ6T62E/erTh/dODIQsEIKVqmxhlDjyMFFhp5/WIKtXB4
+	 O/Z9CL4IH6Bm25FbcrS1copUqMnUC+g2vtCeNRdvA/JICpqkkrC9wRWNsPI1Hu+U55
+	 pC7ooz0y6MESrnO8QMeZKIsSOGsfHHPDjbseSY7JGky+ssOwWx3fHNam4LtYvouKIg
+	 lXbfwF0pivG8ICQk7lTZji2bGFWKIGunLghyEuM+XP3dVpC2DHvpBJgNIpPrjpOidw
+	 maWQD+66ioF1A==
+Message-ID: <013397bc-1c1c-40ba-a505-40d60d547caa@kernel.org>
+Date: Mon, 9 Sep 2024 10:59:00 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -139,12 +139,14 @@ On 9/9/24 10:24, Ming Lei wrote:
 > 
 > But 'load_module' is too specific as interface, and we just only have
 > one case which need to load module exactly.
+
+If another attr needs to do some prep work before freezing the queue and calling
+attr->store(), we can rename the load_module attribute method to something like
+"prepare_store" to be more generic.
+
 > 
 > I guess there may be same risk in queue_wb_lat_store() which calls into
 > GFP_KERNEL allocation which implies direct reclaim & IO.
-
-That needs to be changed to GFP_NOIO.
-
 > 
 > Thanks,
 > Ming
