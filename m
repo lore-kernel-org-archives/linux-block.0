@@ -1,61 +1,61 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9146B28EF
-	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 01:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8978E574
+	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 01:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725843626; cv=none; b=DevK91UfY9GTtWkU2ZvGbjkUR1e+XTwxbjV9t6WRaMna3RZjSmOuw6zpwsJka5pqM06XKuR1VXz9Vr+Zy9Wkuf3evqhwHk5v1CsmiUiK4tmUmSS5Wfd9yyKXTfJwxBcXgB954JKot5WNDVcyQryuWJlV7YmZNP+BtKEiDjAppHE=
+	t=1725843712; cv=none; b=BOkBzT7Hj5TYefkcO9jDyNPStjFKgQmiLi4bcG9Urd/OMu6DhG/0r/LKH8vmtsyMglzmGSsiKT5HKrXoxnq5JQjOHkhHpLlrgSe6i+hVwx0k8KQ9A4Bz0UArWfGVsz73fwxIt1gxMLkLOYoMFSmI3x3fusgVS1h6WVm86B3Y4ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725843626; c=relaxed/simple;
-	bh=LENb559i3gtdmxRorJ/+T5bygb13Nhm7BQayvUjmpWE=;
+	s=arc-20240116; t=1725843712; c=relaxed/simple;
+	bh=3komCaadvlEn9oo20c2Z7ozyg3n3M6lU2JZJ1iU0t0E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZpO2pvQ0n5Z7tJ4HJohVJaWxdvfLJO5xcn50bgF2rlxOHx4VrShCTkomU7h/Pta9p6eZoVsjhOUf0tHO8ZqQixAjqvGOoQd+v4FGO4xB3GWtL2LgobFvm28MO8pnXXXvzLnvQjXr3ydSA2AIQ4iM75QLr12hux3mWffU0vnBsG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FlbGUL/p; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=nUuIgGTFXLGPZAHWs3yo1Zr7fh89QszbazVuMKI57hPd3GCjVeE65b+WUe2m4+Zd+oqRCF6lSL7WuHsTHMGcu1HJaQg29l3LrfVfrXJ6+B959GoZCPLD4GsY8pPD3X9CL+IOgBjHheoUp0fUBWddejrcHzF66Di3cJkAGvt983A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fhaG9YaX; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FlbGUL/p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhaG9YaX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725843623;
+	s=mimecast20190719; t=1725843709;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tzfWvFNCLsuZfCjReptvrPBIP7wuqPxZYgfoKlq9KI8=;
-	b=FlbGUL/p7dZG2sN0uB+frnrrc9pUR/BF5g5MdNFDN7jCbR5NlbRT8Krj4F6pFdJsv4t58U
-	zcV+818wl3GdpNRvzlpU48tOhYR2kLsBSHId8fgOsv0V3usnfetAtuEhQAZGIOQp01Mfb7
-	Y0fbPkcAscm36uVEDvV8fa+owD1K9uk=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3komCaadvlEn9oo20c2Z7ozyg3n3M6lU2JZJ1iU0t0E=;
+	b=fhaG9YaXPqjCq0eU22Mr+7wc6an/KMGdioW0JIqWVZ9kBuh509zS8ZKyQ6ev4C8+AcQ7gO
+	XIK57hgQot7kL32PZqtaALbNC5uoaHYLe4GiwK4qD2wJddRsPxtkmk9ngNJ2Du6WLH2Md+
+	G/pLFL6QJpXcJ5j/ufi1hHGx8DG5INY=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-8RPQKU5mMnKIN0WsfU6QPw-1; Sun, 08 Sep 2024 21:00:22 -0400
-X-MC-Unique: 8RPQKU5mMnKIN0WsfU6QPw-1
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-49bc2df862aso1243358137.1
-        for <linux-block@vger.kernel.org>; Sun, 08 Sep 2024 18:00:22 -0700 (PDT)
+ us-mta-553-jLmmX7u-P2Sbmv2vDbB2ug-1; Sun, 08 Sep 2024 21:01:48 -0400
+X-MC-Unique: jLmmX7u-P2Sbmv2vDbB2ug-1
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-846d766440bso1125745241.2
+        for <linux-block@vger.kernel.org>; Sun, 08 Sep 2024 18:01:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725843621; x=1726448421;
+        d=1e100.net; s=20230601; t=1725843708; x=1726448508;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tzfWvFNCLsuZfCjReptvrPBIP7wuqPxZYgfoKlq9KI8=;
-        b=cauk4xVuef+Nq+CVn3STi/+ZiIjkKdsPEfW+i1BSdngFxV6RGLue5+ODXNaoGAiGrf
-         95BrCiZ7krIuTH8t0HSDs2+uBCDSGp4CdZZ0GeN1PBl4zG6vWipWKGwUVFyxsM2yW1C4
-         tm4wg33ejRf4LobN+ZDElmzcUwfHrukZTTZ9GEjis7LvMtMObVjKEBVZgZzHLZd8A2KB
-         L7WGIQiscyXLW5DBhENpynzd1E36FY0jlKjbilo/WdbHVab17/VmppeZzu1dnWZpvPQs
-         EM6SZcFH1tjpEuOQda/a9azb2ON6L2hpCpQ13y0VaVgQCG0MjcqPNWqJntiPJyAGoN/q
-         yW9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVpHy9bMD7XkJevMIdz/6VFXy6Glbp5WU9DMHC5lU44+i0X9uPP8dA9CJQwtKWyH3RNLppahd5t0PabIQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgTRNUvWg2zDX1MVUCIZC4IOSVyWEdbIPmKdRBVkSdpcmUtgI3
-	+J31Od52JVih9Of25CvZb58fWlkVmvtXEBxg0F6cgWZE4ZlJsIvSopfPJxN0gAecBOSy+0zEfA/
-	OaCO2RYepYCLdTqCZEO7GKSyF1ky60lMsCWxqQS/o7EgD2MUyyuOkFAqGaxNr7ywiM5Cit42PXv
-	RJfEry0aSPBZE04a3TlC9R0KM9CsWZHy2o9qc=
-X-Received: by 2002:a05:6102:3230:b0:492:9f6a:e980 with SMTP id ada2fe7eead31-49bece53fb4mr2415618137.27.1725843621573;
-        Sun, 08 Sep 2024 18:00:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwmi/j3scNS+oVUs06dKJmTo/v/SoYg6g2RWxfVUIYfqU1ahQ2BwX1AgrlqyRcJCWb/0Lo09CeXZUXSwJjCmA=
-X-Received: by 2002:a05:6102:3230:b0:492:9f6a:e980 with SMTP id
- ada2fe7eead31-49bece53fb4mr2415587137.27.1725843620998; Sun, 08 Sep 2024
- 18:00:20 -0700 (PDT)
+        bh=3komCaadvlEn9oo20c2Z7ozyg3n3M6lU2JZJ1iU0t0E=;
+        b=hX/AhtTRccXnL1qTabeRpBNMQbjOsM27iLr5FSu+daWnw90r7x/UzSs0jDz2IYmgg4
+         EJ/U+ZTYtwq/l+CicBcrmY8BihT9JUE4sPARx9KSA7/R2AMd3IRkAaQbruqJVgAZm8Su
+         EQNdq62mO2sdvrP/xMRRx+6nLVvi9l7dGlxTwWm/BkaQMb0ueH9KZVSQVe2+yZvnOFwS
+         x/iUiU5zuulMzJcOjJU3z2YEJTfrxSrKU4nz9sjR/A0DWwXUzSmvvZQww9T8XJTbWXkG
+         HQIdYp15nBzb+I56qi9ol37jWy/ZPmmshBA+W+nQpEdfGVffVr+kqOQ9vWiUTUdBfqU3
+         kjbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtyhz3JXSLd11j0kzaM+OrmL+qc7JBLMhGIIZtGQxcdsmbN8miOqavqxhKhCkBi1k9s07G8uQa9HeoUg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE+jO590hnwGBI8SfAuqc0MIBuTdX/3OsmmRcAkFknDupa59I+
+	FZ8SWI6G0sLAJ9vMfoS6Zff/PcN7AqlEdMNHocymDJU11FnNLwMhdMiqjmSDTkfSPrqm8bTdj0K
+	bAymbjteWKmyho4rsvjl/GldjUVc0ucy8spXOBaEioL+ZQtLcf31LDoMK5ibd2MJ3MHvjnhpuin
+	8CflZXYdKKBWbIFAKC88l240FP6hS1MNC/oDE=
+X-Received: by 2002:a05:6102:2821:b0:492:9c55:aec5 with SMTP id ada2fe7eead31-49bde1c413dmr9034050137.15.1725843707714;
+        Sun, 08 Sep 2024 18:01:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEaQRLIUP1xngdGbx405YNFVCf6bA3MV+iOZQT4bK7rc/kGq1AYgxU5LPyIuZ4+D/V9c6o+3nL/XdqW7o1hNxM=
+X-Received: by 2002:a05:6102:2821:b0:492:9c55:aec5 with SMTP id
+ ada2fe7eead31-49bde1c413dmr9034035137.15.1725843707307; Sun, 08 Sep 2024
+ 18:01:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,8 +69,8 @@ References: <20240907014331.176152-1-ming.lei@redhat.com> <20240907073522.GW1450
  <ZtwyxukuaXAscXsz@fedora> <20240907111453.GA1450@redhat.com> <2d50513f-bdcb-4af1-b365-e080be43d420@kernel.org>
 In-Reply-To: <2d50513f-bdcb-4af1-b365-e080be43d420@kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
-Date: Mon, 9 Sep 2024 09:00:09 +0800
-Message-ID: <CAFj5m9LeQy2sCbzxFHTmemskf5X2+tueG9NGHD1X7wHzWGLcvQ@mail.gmail.com>
+Date: Mon, 9 Sep 2024 09:01:35 +0800
+Message-ID: <CAFj5m9KMhg8YLOLEX9tjSfA5T=vEx_vOhkhcucy-AU2UQy0V_g@mail.gmail.com>
 Subject: Re: [PATCH] block: elevator: avoid to load iosched module from this disk
 To: Damien Le Moal <dlemoal@kernel.org>
 Cc: "Richard W.M. Jones" <rjones@redhat.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
@@ -91,39 +91,10 @@ wrote:
 > This probably should be:
 >
 > echo "mq-deadline" > /sys/block/$ROOT_DISK/queue/scheduler
->
-> and make sure that:
-> 1) mq-deadline is compiled as a module
-> 2) mq-deadline is not already used by a device (so not loaded already)
-> 3) The mq-deadline module file is stored on the target device of the sche=
-duler
-> change
-> 4) The mq-deadline module file is not already cahced in the page cache.
->
-> For (4), you may want to do a "echo 3 > /proc/sys/vm/drop_caches" before =
-trying
-> to switch the scheduler.
->
-> >
-> > That doesn't reproduce it for me (reliably).  Although I'm not
-> > surprised as this bug has been _very_ tricky to reproduce!  Sometimes
-> > I think I have a definite reproducer, only for it to go away when some
-> > tiny detail changes.
-> >
-> >>> This seems like the neatest (or shortest) fix so far, but doesn't it
-> >>> "mix up layers" by checking elv_iosched_store?
-> >>
-> >> It is just one exception for 'scheduler' sysfs attribute wrt. freezing
-> >> queue for storing, and the check can be done via the attribute
-> >> name("scheduler") too.
-> >
-> > Fair enough.
-> >
-> > Rich.
-> >
->
-> --
-> Damien Le Moal
-> Western Digital Research
->
+
+No, it is deliberately something not existing.
+
+If it can't work, dropping cache can be added before the switching.
+
+Thanks,
 
