@@ -1,145 +1,61 @@
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A860F3B791;
-	Mon,  9 Sep 2024 19:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43476AB8
+	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 21:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725909728; cv=none; b=ohgYmsmDzCSlyDZqnJDCAVDQxdEFNpGTUGJ6q8dqzj/88+wa4pKm4f7txdXtgY2Z6TW88aD+gXNKc1Wznk3LMpsFyfL2eou0MYH60vhBuZh3qSN8gpgnVDT/SP1pa3hjXBtGQiBag4/w38tfDbo17+FsVVmeV1whDgIhj/aXjck=
+	t=1725915774; cv=none; b=EqVs2YT+hPJm7rWadOaTg5AlBM+z6V4/OmAq8qdTtjLCMWz/6ycmaoDRiRctijijSDBswjuGSwYOlimSVx4XJ1x91p+vwem7Hv4A+yeXxxjTS04iKTs9mR/F8XsKBbHwUyc4upwoHYpeX5NefjmpE1yW3sDQj4UtSH/j4ZYp8ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725909728; c=relaxed/simple;
-	bh=iAYIIHRt18lg9w7vLJijk467AYA5AqKTOUwAyqj4X70=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aUTY0Ecnn0ZhY+ikG/RQ95OjQvdt58vlU8o9ZFCiEorlYktse8pQ8h+56ize8XuVpWk+ogkOYTn46jC6Dg034nCUGd8dmQsVAPtdzXcznKcdlljrROeR6pEZiQ1uVor1LBdnjEU6WEEMZ91aAr/PLFZvf+CWNu3NJQdC4MeWGsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=NTUjHPgI; arc=none smtp.client-ip=185.70.40.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1725915774; c=relaxed/simple;
+	bh=wMrdorjr1Q8nyYGSuYLc5ze13EJ9sdiO4DDYiUK9s8E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WIGbsuiQzX+fUnlQ/S/fCTmtyB2j1pC2lGQIOEs9AxSSKtX2mMiBcG/4+C912Bm3dseEoFxX82fxMCyhwHJ0AW3MzbsfZmOzNn+XPzEGKcuai2e/rKh3UvfxqYDEjHor8H6u7RpLet2yymsN5+wn5dIGsxy3zFmhzGZnNdwXzkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=AL2DNb6x; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="NTUjHPgI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1725909718; x=1726168918;
-	bh=BbaACj++wGC+vRsUotK63/Ncake27cvpWE5Gb9nDHk4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=NTUjHPgIQPf5vTU4Jngyz3XAXuh17LUo/R0KnLULVTgb2YxCtJG32rMQ4QfFln4hc
-	 kulE6IxIgZnAt8I+RdgKxknS3yz5CcGtGrwmJ3IDWhHQl4wCP56ICT1jqHJrq0rMPE
-	 x8+o6jizpZ4FJWtO/qy+Q5VXjnhjrcgk7jqAQh8+katU0Ys3MAaivkSCodup2AxdFM
-	 x+vtAfyiw2ZWjavr6tWZHL6EATN6pEuAZgticrqxvcDPeeZDDqr3pJO58wlMUXBRCa
-	 fHF4T0jlfRhl/RzMSa4CFdyT/kEtr9MqZMKbxo3IX4hzcXPLdPkZlKYXEjTYSKURsn
-	 f3R2207MBx1Pg==
-Date: Mon, 09 Sep 2024 19:21:54 +0000
-To: hridesh <hridesh699@gmail.com>, linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?=27Bj=C3=B6rn_Roy_Baron=27?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, Matt Gilbride <mattgilbride@google.com>, Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH] docs: rust: clean up empty `\\\` lines and improve rustdoc formatting
-Message-ID: <7b98dbcc-318d-49e7-b71a-f64cc611c2ad@proton.me>
-In-Reply-To: <20240909161749.147076-1-hridesh699@gmail.com>
-References: <20240909161749.147076-1-hridesh699@gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: dc0c0f0bf0835221911e1df6237157ff7ae24ed3
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AL2DNb6x"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=VV0/FP6vB4wY53ba8SCzegOfGrOzdE8J0p2BTAzIeDw=; b=AL2DNb6xDzmOldXR4beVacHuPi
+	6Kdt8tqCL5wx583Zk1l51WcRmP+SpdrtDsJ2ucbYRYUBmEar1OVWwdgbxzBtCIqDIaDZXr2popE0H
+	cFHs4A9aCjn3yR2OQyrKXNUCXhlxZUkO3KCu13qju6xJ4JuB3WljEQvFK1hu5mlKXfmD6eqXeF+U8
+	Fb78ocvWxiA7T5FA5Q0xuZAr+VICvA+78S7LvGjVRjBbJEKCm4G4wn+eghzQuzeBUlStV/XRTHTBX
+	0VcDnM03WoLQYZ7csPjnkxKOPKO+yR3Pnnbzk25N/R6o7s9bdAwWXdWgzBxPA0Z3ySuLWRm8Wd0Bj
+	sdfRV5Ow==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1snlX6-0000000HTg3-2Kuj;
+	Mon, 09 Sep 2024 21:02:48 +0000
+Date: Mon, 9 Sep 2024 22:02:48 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Kundan Kumar <kundan.kumar@samsung.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+	linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
+	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
+	vishak.g@samsung.com, gost.dev@samsung.com
+Subject: Re: [PATCH v9 1/4] block: Added folio-ized version of
+ bio_add_hw_page()
+Message-ID: <Zt9iePAZs57s1H7m@casper.infradead.org>
+References: <20240830075257.186834-1-kundan.kumar@samsung.com>
+ <CGME20240830080048epcas5p24013512a19c099ed51930f4ab0736ff0@epcas5p2.samsung.com>
+ <20240830075257.186834-2-kundan.kumar@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240830075257.186834-2-kundan.kumar@samsung.com>
 
-Hi,
+On Fri, Aug 30, 2024 at 01:22:54PM +0530, Kundan Kumar wrote:
+> Added new bio_add_hw_folio() function as a wrapper around
+> bio_add_hw_page(). This is a prep patch.
+> 
+> Signed-off-by: Kundan Kumar <kundan.kumar@samsung.com>
 
-I see that this is your first kernel contribution, welcome!
-I have left a couple comments below; before you send a new version,
-please wait a couple days for other people to also leave their feedback.
-You then create a new version (add `-v2` to `git format-patch`) and send
-it to the list. You can put a changelog underneath the `---`, it will
-not be included int the commit message, but for people reading the mail
-it is rather helpful.
-
-On 09.09.24 18:17, hridesh wrote:
-> Remove unnecessary empty `\\\` lines in the rust docs. Also add linebreak=
-s
-
-You wrote backslashes here, but it should be forward slashes instead.
-Please also fix it in the title.
-
-I don't know if the commit title should start with `docs`, maybe we want
-to do `rust: docs` when changing rustdocs? (This is a question to the
-other Rust reviewers)
-
-I think the title doesn't need to mention the exact cleanup, just
-something along the lines "clean up docs" should suffice.
-
-> in kernel::block::mq::Request to fix formatting
->=20
-> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> Link: https://github.com/Rust-for-Linux/linux/issues/1109
-
-The issue also mentions that you should implement a `checkpatch.pl`
-check in an additional patch:
-
-> Clean up consecutive empty `///` lines and implement a checkpatch.pl
-> check for it. These should be two different patches.
-
-Please include that patch in your series.
-
-> Signed-off-by: hridesh <hridesh699@gmail.com>
-> ---
->  rust/kernel/block/mq/request.rs | 7 +++----
->  rust/kernel/rbtree.rs           | 1 -
->  2 files changed, 3 insertions(+), 5 deletions(-)
->=20
-> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/reque=
-st.rs
-> index a0e22827f3f4..3ab2917c9d25 100644
-> --- a/rust/kernel/block/mq/request.rs
-> +++ b/rust/kernel/block/mq/request.rs
-> @@ -22,15 +22,14 @@
->  ///
->  /// There are four states for a request that the Rust bindings care abou=
-t:
->  ///
-> -/// A) Request is owned by block layer (refcount 0)
-> +/// A) Request is owned by block layer (refcount 0)\
-
-Instead of adding these backslashes, I personally would prefer if we
-make this a normal markdown list using `1.`, `2.` etc.
-Of course only if Andreas is OK with that though.
-
----
-Cheers,
-Benno
-
->  /// B) Request is owned by driver but with zero `ARef`s in existence
-> -///    (refcount 1)
-> +///    (refcount 1)\
->  /// C) Request is owned by driver with exactly one `ARef` in existence
-> -///    (refcount 2)
-> +///    (refcount 2)\
->  /// D) Request is owned by driver with more than one `ARef` in existence
->  ///    (refcount > 2)
->  ///
-> -///
->  /// We need to track A and B to ensure we fail tag to request conversion=
-s for
->  /// requests that are not owned by the driver.
->  ///
-> diff --git a/rust/kernel/rbtree.rs b/rust/kernel/rbtree.rs
-> index 25eb36fd1cdc..006f6e03aba5 100644
-> --- a/rust/kernel/rbtree.rs
-> +++ b/rust/kernel/rbtree.rs
-> @@ -1031,7 +1031,6 @@ fn next(&mut self) -> Option<Self::Item> {
->=20
->  /// A memory reservation for a red-black tree node.
->  ///
-> -///
->  /// It contains the memory needed to hold a node that can be inserted in=
-to a red-black tree. One
->  /// can be obtained by directly allocating it ([`RBTreeNodeReservation::=
-new`]).
->  pub struct RBTreeNodeReservation<K, V> {
-> --
-> 2.46.0
->=20
-
+Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
