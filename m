@@ -1,100 +1,162 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8978E574
-	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 01:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E09A17999
+	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 01:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725843712; cv=none; b=BOkBzT7Hj5TYefkcO9jDyNPStjFKgQmiLi4bcG9Urd/OMu6DhG/0r/LKH8vmtsyMglzmGSsiKT5HKrXoxnq5JQjOHkhHpLlrgSe6i+hVwx0k8KQ9A4Bz0UArWfGVsz73fwxIt1gxMLkLOYoMFSmI3x3fusgVS1h6WVm86B3Y4ZA=
+	t=1725845118; cv=none; b=epn/1cigsQDqvH2V5UIUgmEsgm1z+rikBzNqLN5baLYO3+0lJEbASgrEGfs4Z0futMAS0gm4hZR+7LXv/2Him30szVgqQCa6epdOUwszZiKRfQhNo4EKkqjnhg2RgDK8JOgXhiENzmfowTBUh5nNdnSYnIEGJpya9TaPIViciN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725843712; c=relaxed/simple;
-	bh=3komCaadvlEn9oo20c2Z7ozyg3n3M6lU2JZJ1iU0t0E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nUuIgGTFXLGPZAHWs3yo1Zr7fh89QszbazVuMKI57hPd3GCjVeE65b+WUe2m4+Zd+oqRCF6lSL7WuHsTHMGcu1HJaQg29l3LrfVfrXJ6+B959GoZCPLD4GsY8pPD3X9CL+IOgBjHheoUp0fUBWddejrcHzF66Di3cJkAGvt983A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fhaG9YaX; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1725845118; c=relaxed/simple;
+	bh=cnMLX1PZIWy291Sx8cqAhW0XGfFmFDjyKUfeMZicaGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hw/43bURqwvKSOZOILVWdG/qRiRVisIM9UN0TjjYPctTizVoRj31vXDdOHWJOX0mUpWuwFmomycnij270250qfJMMCS69HBg9Wv5dikAtyeazUgmuB6oBYk8stVjX6Gr3i2p+l3bTLhAo+99TElh+mrSpz3TuhSOv+jyA6nx6xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qzz/T4m0; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhaG9YaX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qzz/T4m0"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725843709;
+	s=mimecast20190719; t=1725845115;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3komCaadvlEn9oo20c2Z7ozyg3n3M6lU2JZJ1iU0t0E=;
-	b=fhaG9YaXPqjCq0eU22Mr+7wc6an/KMGdioW0JIqWVZ9kBuh509zS8ZKyQ6ev4C8+AcQ7gO
-	XIK57hgQot7kL32PZqtaALbNC5uoaHYLe4GiwK4qD2wJddRsPxtkmk9ngNJ2Du6WLH2Md+
-	G/pLFL6QJpXcJ5j/ufi1hHGx8DG5INY=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-jLmmX7u-P2Sbmv2vDbB2ug-1; Sun, 08 Sep 2024 21:01:48 -0400
-X-MC-Unique: jLmmX7u-P2Sbmv2vDbB2ug-1
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-846d766440bso1125745241.2
-        for <linux-block@vger.kernel.org>; Sun, 08 Sep 2024 18:01:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725843708; x=1726448508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3komCaadvlEn9oo20c2Z7ozyg3n3M6lU2JZJ1iU0t0E=;
-        b=hX/AhtTRccXnL1qTabeRpBNMQbjOsM27iLr5FSu+daWnw90r7x/UzSs0jDz2IYmgg4
-         EJ/U+ZTYtwq/l+CicBcrmY8BihT9JUE4sPARx9KSA7/R2AMd3IRkAaQbruqJVgAZm8Su
-         EQNdq62mO2sdvrP/xMRRx+6nLVvi9l7dGlxTwWm/BkaQMb0ueH9KZVSQVe2+yZvnOFwS
-         x/iUiU5zuulMzJcOjJU3z2YEJTfrxSrKU4nz9sjR/A0DWwXUzSmvvZQww9T8XJTbWXkG
-         HQIdYp15nBzb+I56qi9ol37jWy/ZPmmshBA+W+nQpEdfGVffVr+kqOQ9vWiUTUdBfqU3
-         kjbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtyhz3JXSLd11j0kzaM+OrmL+qc7JBLMhGIIZtGQxcdsmbN8miOqavqxhKhCkBi1k9s07G8uQa9HeoUg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE+jO590hnwGBI8SfAuqc0MIBuTdX/3OsmmRcAkFknDupa59I+
-	FZ8SWI6G0sLAJ9vMfoS6Zff/PcN7AqlEdMNHocymDJU11FnNLwMhdMiqjmSDTkfSPrqm8bTdj0K
-	bAymbjteWKmyho4rsvjl/GldjUVc0ucy8spXOBaEioL+ZQtLcf31LDoMK5ibd2MJ3MHvjnhpuin
-	8CflZXYdKKBWbIFAKC88l240FP6hS1MNC/oDE=
-X-Received: by 2002:a05:6102:2821:b0:492:9c55:aec5 with SMTP id ada2fe7eead31-49bde1c413dmr9034050137.15.1725843707714;
-        Sun, 08 Sep 2024 18:01:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEaQRLIUP1xngdGbx405YNFVCf6bA3MV+iOZQT4bK7rc/kGq1AYgxU5LPyIuZ4+D/V9c6o+3nL/XdqW7o1hNxM=
-X-Received: by 2002:a05:6102:2821:b0:492:9c55:aec5 with SMTP id
- ada2fe7eead31-49bde1c413dmr9034035137.15.1725843707307; Sun, 08 Sep 2024
- 18:01:47 -0700 (PDT)
+	bh=TWEupgvvQQLWwChF11q57v4KE5ViSvmDAEl87QUms50=;
+	b=Qzz/T4m094p1Mwu9Id5/he/rg8HWQfQuMrVLTYVTIKcOqmMxn0w38IKCUt6tKly2SMjWCn
+	ztkfB4vmd2eHtaJACEwnGMi1cvLkAxNgHPGpU/iECSYNi3NeUlZbSKCXehwPltz5FmCgzT
+	Dzll46kUtGw4SVdlMIhYan6+6MjGXDs=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-318--s-VMgZAO_u__uhZjd5vBA-1; Sun,
+ 08 Sep 2024 21:25:12 -0400
+X-MC-Unique: -s-VMgZAO_u__uhZjd5vBA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA1321956096;
+	Mon,  9 Sep 2024 01:25:09 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.72])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 967C719560AA;
+	Mon,  9 Sep 2024 01:25:01 +0000 (UTC)
+Date: Mon, 9 Sep 2024 09:24:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	"Richard W.M. Jones" <rjones@redhat.com>,
+	linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
+	Jiri Jaburek <jjaburek@redhat.com>, Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH] block: elevator: avoid to load iosched module from this
+ disk
+Message-ID: <Zt5OaPCvM5XC44vc@fedora>
+References: <20240907014331.176152-1-ming.lei@redhat.com>
+ <20240907073522.GW1450@redhat.com>
+ <ZtwHwTh6FYn+WnGD@fedora>
+ <4d7280eb-7f26-4652-a1d4-4f82c4d99a4c@kernel.org>
+ <c8fd6c9b-67a7-4cc5-b4e5-c615c37f6b4e@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240907014331.176152-1-ming.lei@redhat.com> <20240907073522.GW1450@redhat.com>
- <ZtwHwTh6FYn+WnGD@fedora> <4d7280eb-7f26-4652-a1d4-4f82c4d99a4c@kernel.org>
- <ZtwhfCtDpTrBUFY+@fedora> <20240907100213.GY1450@redhat.com>
- <Ztwl2RvR0DGbNuex@fedora> <20240907103632.GZ1450@redhat.com>
- <ZtwyxukuaXAscXsz@fedora> <20240907111453.GA1450@redhat.com> <2d50513f-bdcb-4af1-b365-e080be43d420@kernel.org>
-In-Reply-To: <2d50513f-bdcb-4af1-b365-e080be43d420@kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Mon, 9 Sep 2024 09:01:35 +0800
-Message-ID: <CAFj5m9KMhg8YLOLEX9tjSfA5T=vEx_vOhkhcucy-AU2UQy0V_g@mail.gmail.com>
-Subject: Re: [PATCH] block: elevator: avoid to load iosched module from this disk
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Jeff Moyer <jmoyer@redhat.com>, Jiri Jaburek <jjaburek@redhat.com>, Christoph Hellwig <hch@lst.de>, 
-	Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c8fd6c9b-67a7-4cc5-b4e5-c615c37f6b4e@kernel.dk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Sun, Sep 8, 2024 at 8:03=E2=80=AFAM Damien Le Moal <dlemoal@kernel.org> =
-wrote:
->
-> On 9/7/24 20:14, Richard W.M. Jones wrote:
-> > On Sat, Sep 07, 2024 at 07:02:30PM +0800, Ming Lei wrote:
-> >> BTW, the issue can be reproduced 100% by:
+On Sat, Sep 07, 2024 at 07:50:32AM -0600, Jens Axboe wrote:
+> On 9/7/24 3:04 AM, Damien Le Moal wrote:
+> > On 9/7/24 16:58, Ming Lei wrote:
+> >> On Sat, Sep 07, 2024 at 08:35:22AM +0100, Richard W.M. Jones wrote:
+> >>> On Sat, Sep 07, 2024 at 09:43:31AM +0800, Ming Lei wrote:
+> >>>> When switching io scheduler via sysfs, 'request_module' may be called
+> >>>> if the specified scheduler doesn't exist.
+> >>>>
+> >>>> This was has deadlock risk because the module may be stored on FS behind
+> >>>> our disk since request queue is frozen before switching its elevator.
+> >>>>
+> >>>> Fix it by returning -EDEADLK in case that the disk is claimed, which
+> >>>> can be thought as one signal that the disk is mounted.
+> >>>>
+> >>>> Some distributions(Fedora) simulates the original kernel command line of
+> >>>> 'elevator=foo' via 'echo foo > /sys/block/$DISK/queue/scheduler', and boot
+> >>>> hang is triggered.
+> >>>>
+> >>>> Cc: Richard Jones <rjones@redhat.com>
+> >>>> Cc: Jeff Moyer <jmoyer@redhat.com>
+> >>>> Cc: Jiri Jaburek <jjaburek@redhat.com>
+> >>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> >>>
+> >>> I'd suggest also:
+> >>>
+> >>> Bug: https://bugzilla.kernel.org/show_bug.cgi?id=219166
+> >>> Reported-by: Richard W.M. Jones <rjones@redhat.com>
+> >>> Reported-by: Jiri Jaburek <jjaburek@redhat.com>
+> >>> Tested-by: Richard W.M. Jones <rjones@redhat.com>
+> >>>
+> >>> So I have tested this patch and it does fix the issue, at the possible
+> >>> cost that now setting the scheduler can fail:
+> >>>
+> >>>   + for f in /sys/block/{h,s,ub,v}d*/queue/scheduler
+> >>>   + echo noop
+> >>>   /init: line 109: echo: write error: Resource deadlock avoided
+> >>>
+> >>> (I know I'm setting it to an impossible value here, but this could
+> >>> also happen when setting it to a valid one.)
 > >>
-> >> echo "deadlock" > /sys/block/$ROOT_DISK/queue/scheduler
->
-> This probably should be:
->
-> echo "mq-deadline" > /sys/block/$ROOT_DISK/queue/scheduler
+> >> Actually in most of dist, io-schedulers are built-in, so request_module
+> >> is just a nop, but meta IO must be started.
+> >>
+> >>>
+> >>> Since almost no one checks the result of 'echo foo > /sys/...'  that
+> >>> would probably mean that sometimes a desired setting is silently not
+> >>> set.
+> >>
+> >> As I mentioned, io-schedulers are built-in for most of dist, so
+> >> request_module isn't called in case of one valid io-sched.
+> >>
+> >>>
+> >>> Also I bisected this bug yesterday and found it was caused by (or,
+> >>> more likely, exposed by):
+> >>>
+> >>>   commit af2814149883e2c1851866ea2afcd8eadc040f79
+> >>>   Author: Christoph Hellwig <hch@lst.de>
+> >>>   Date:   Mon Jun 17 08:04:38 2024 +0200
+> >>>
+> >>>     block: freeze the queue in queue_attr_store
+> >>>     
+> >>>     queue_attr_store updates attributes used to control generating I/O, and
+> >>>     can cause malformed bios if changed with I/O in flight.  Freeze the queue
+> >>>     in common code instead of adding it to almost every attribute.
+> >>>
+> >>> Reverting this commit on top of git head also fixes the problem.
+> >>>
+> >>> Why did this commit expose the problem?
+> >>
+> >> That is really the 1st bad commit which moves queue freezing before
+> >> calling request_module(), originally we won't freeze queue until
+> >> we have to do it.
+> >>
+> >> Another candidate fix is to revert it, or at least not do it
+> >> for storing elevator attribute.
+> > 
+> > I do not think that reverting is acceptable. Rather, a proper fix would simply
+> > be to do the request_module() before freezing the queue.
+> > Something like below should work (totally untested and that may be overkill).
+> 
+> I like this approach, but let's please call it something descriptive
+> like "load_module" or something like that.
 
-No, it is deliberately something not existing.
+But 'load_module' is too specific as interface, and we just only have
+one case which need to load module exactly.
 
-If it can't work, dropping cache can be added before the switching.
+I guess there may be same risk in queue_wb_lat_store() which calls into
+GFP_KERNEL allocation which implies direct reclaim & IO.
 
 Thanks,
+Ming
 
