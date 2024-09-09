@@ -1,127 +1,99 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mail.rosalinux.ru (mail.rosalinux.ru [195.19.76.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F1C1B9B28;
-	Mon,  9 Sep 2024 13:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA2E1B86E4;
+	Mon,  9 Sep 2024 13:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.19.76.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725889434; cv=none; b=XeadWlKhMClZUfQGDLDIWKpEJVT23yD8yLj4nfJ9yT8xzrvqr9qOAgyLGBdW6H7K0s4yoD0cSXwyhQ9Bx/o1L7fv2JrcYDWekH7suiSLBYvOGFWn3Cbygs1Ou+aXVlH9OyZAdJqC4Mb2JFTRf1hRkenVJBUZEVYbQzNcAEo0a7g=
+	t=1725889841; cv=none; b=u1x+tJMvPzOaw69KcGXnCv2saYKcGGHjXLDfUauF7STar1EP04bnmXoTuCCxt9QeitMCe4qxOMaOzl4JPRz7sprhwtRyujsTT2mViFGAWwY/TD6g9yz2H83YhUuDb03iXbQMB8wQtymqpIxB2e00ToupWjvZHdtvKtj1Zzj7lRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725889434; c=relaxed/simple;
-	bh=n9hQlGWaEXWjn+plniNZuHsgtaHGbGyA+9xgiuq2yuA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cqLE3IQhzUnc/NmaCW8ALLsL76GvSjgNBmmuNxqu9EqsloKwk8OhQAzl8K81q9q8uiE8Vqi4aIr/kvJo5UbSFCNQ3pzJ0bujgEas55rw+N7XhGcs670B3exs6+IyJk4FtGbsbOlTayp5owHpxX3x952kpGe2LiGDsz/qr4XA+Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4X2Sj50Flkz4f3jtC;
-	Mon,  9 Sep 2024 21:43:37 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 8BC861A0359;
-	Mon,  9 Sep 2024 21:43:47 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCn28eQ+95mhC1hAw--.55605S7;
-	Mon, 09 Sep 2024 21:43:47 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: jack@suse.cz,
-	tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	yukuai3@huawei.com
-Cc: cgroups@vger.kernel.org,
+	s=arc-20240116; t=1725889841; c=relaxed/simple;
+	bh=2D7C10L9qGR1xYUVuRaUwP/lQVaj8GW63TvL3cfW5lw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jPJaymFPa1TkkUZBJLn9EAgwjMuw2a//B/TTQBAnrA7575IshHwHbjNSbUHZ/HaJOaA/JXSfUzoEVk0l/hK1xxLqJyo1a3YPS+tnsRsHVD7L2hbqdwVWs7Sd/OwLmVItxcDjdti7vU6Vdflefooqpavmul05cHV9nhSgbfTtvaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru; spf=pass smtp.mailfrom=rosalinux.ru; dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b=IMmCe9UO; arc=none smtp.client-ip=195.19.76.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosalinux.ru
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b="IMmCe9UO"
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rosalinux.ru (Postfix) with ESMTP id 8F129F90A07EC;
+	Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
+Received: from mail.rosalinux.ru ([127.0.0.1])
+	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id UKXrqmmBMBf4; Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rosalinux.ru (Postfix) with ESMTP id 65003F90A07ED;
+	Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rosalinux.ru 65003F90A07ED
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosalinux.ru;
+	s=1D4BB666-A0F1-11EB-A1A2-F53579C7F503; t=1725889241;
+	bh=j0w10pqKqsCrw9p4jGmOYSKGwJAYnt8q1qKqtK5tU14=;
+	h=From:To:Date:Message-ID:MIME-Version;
+	b=IMmCe9UOVK5OEKqqUmeRavJNTsDhR3XSBn+T95wfSCkAxcIEbX1Qxz8IrqscPG1QW
+	 UBjvN4VeQ3Rp2xMIa0EO7LVnxxjDc5+yh2tgu+brpqpe6Du4bg/94KvgyBtFpFxXBY
+	 OHrFn9bNsqrrarPwPtO6S/qBzFtMYJMB/AOhMd8RvCSYVfzb2uH1/t9zgL/L9U/2ZX
+	 OCuic9PS9C+SWviPQqWBWN5Szhg5bf2F1Kbcv3+Yua3HFG6eEtLV495RynplbYh1o/
+	 WujCae8+G0v39cGT9ey43xxd4U+aDa6Rz9nLeDHgvF01ejZ3MlW+iHalYSEZ7p7VLt
+	 0f3mbo8+yYfjw==
+X-Virus-Scanned: amavisd-new at rosalinux.ru
+Received: from mail.rosalinux.ru ([127.0.0.1])
+	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id DBj-TN5343t1; Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
+Received: from localhost.localdomain (unknown [89.169.48.235])
+	by mail.rosalinux.ru (Postfix) with ESMTPSA id 27DCEF90A07EC;
+	Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
+From: Mikhail Lobanov <m.lobanov@rosalinux.ru>
+To: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Mikhail Lobanov <m.lobanov@rosalinux.ru>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	drbd-dev@lists.linbit.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH for-6.12 3/7] block, bfq: merge bfq_release_process_ref() into bfq_put_cooperator()
-Date: Mon,  9 Sep 2024 21:41:50 +0800
-Message-Id: <20240909134154.954924-4-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240909134154.954924-1-yukuai1@huaweicloud.com>
-References: <20240909134154.954924-1-yukuai1@huaweicloud.com>
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH] drbd: Add NULL check for net_conf to prevent dereference in state validation
+Date: Mon,  9 Sep 2024 09:37:36 -0400
+Message-ID: <20240909133740.84297-1-m.lobanov@rosalinux.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCn28eQ+95mhC1hAw--.55605S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFyDtr1kKr4fur1xGF45Jrb_yoW8WF4fpw
-	sFqw4qkF18GFn0qr4UAa1DX3WxJFn5G3srtry0q342vr9rAw12qFs0vw1FvF4Fqrs5Awsx
-	ZryvkrWvyr1xWrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUm014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
-	kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
-	6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
-	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
-	vjDU0xZFpf9x0JUHWlkUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Transfer-Encoding: quoted-printable
 
-From: Yu Kuai <yukuai3@huawei.com>
+If the net_conf pointer is NULL and the code attempts to access its=20
+fields without a check, it will lead to a null pointer dereference.
+Add a NULL check before dereferencing the pointer.
 
-Because bfq_put_cooperator() is always followed by
-bfq_release_process_ref().
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Fixes: 44ed167da748 ("drbd: rcu_read_lock() and rcu_dereference() for tco=
+nn->net_conf")
+Cc: stable@vger.kernel.org
+Signed-off-by: Mikhail Lobanov <m.lobanov@rosalinux.ru>
 ---
- block/bfq-cgroup.c  | 1 -
- block/bfq-iosched.c | 6 ++----
- 2 files changed, 2 insertions(+), 5 deletions(-)
+ drivers/block/drbd/drbd_state.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 9fb9f3533150..e831aedb4643 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -736,7 +736,6 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
- 		 */
- 		bfq_put_cooperator(sync_bfqq);
- 		bic_set_bfqq(bic, NULL, true, act_idx);
--		bfq_release_process_ref(bfqd, sync_bfqq);
- 	}
- }
- 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index f4192d5411d2..17b0bf6b56bb 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5434,6 +5434,8 @@ void bfq_put_cooperator(struct bfq_queue *bfqq)
- 		bfq_put_queue(__bfqq);
- 		__bfqq = next;
- 	}
-+
-+	bfq_release_process_ref(bfqq->bfqd, bfqq);
- }
- 
- static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
-@@ -5446,8 +5448,6 @@ static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 	bfq_log_bfqq(bfqd, bfqq, "exit_bfqq: %p, %d", bfqq, bfqq->ref);
- 
- 	bfq_put_cooperator(bfqq);
--
--	bfq_release_process_ref(bfqd, bfqq);
- }
- 
- static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync,
-@@ -6734,8 +6734,6 @@ bfq_split_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq)
- 	bic_set_bfqq(bic, NULL, true, bfqq->actuator_idx);
- 
- 	bfq_put_cooperator(bfqq);
--
--	bfq_release_process_ref(bfqq->bfqd, bfqq);
- 	return NULL;
- }
- 
--- 
-2.39.2
+diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_st=
+ate.c
+index 287a8d1d3f70..87cf5883078f 100644
+--- a/drivers/block/drbd/drbd_state.c
++++ b/drivers/block/drbd/drbd_state.c
+@@ -876,7 +876,7 @@ is_valid_state(struct drbd_device *device, union drbd=
+_state ns)
+ 		  ns.disk =3D=3D D_OUTDATED)
+ 		rv =3D SS_CONNECTED_OUTDATES;
+=20
+-	else if ((ns.conn =3D=3D C_VERIFY_S || ns.conn =3D=3D C_VERIFY_T) &&
++	else if (nc && (ns.conn =3D=3D C_VERIFY_S || ns.conn =3D=3D C_VERIFY_T)=
+ &&
+ 		 (nc->verify_alg[0] =3D=3D 0))
+ 		rv =3D SS_NO_VERIFY_ALG;
+=20
+--=20
+2.43.0
 
