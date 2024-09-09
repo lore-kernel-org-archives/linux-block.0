@@ -1,124 +1,90 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAAD1487E2
-	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 16:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C827494;
+	Mon,  9 Sep 2024 16:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725899840; cv=none; b=Z9YwKemnahMaEsmyXs3U6hHUHnG+IqmsQSSMOo6ny6Q24+Bb96+rcDPmiODvXXzpTuEWdRp+QfT5m8b6KhfzgT6t9f18cVE6VcP2gul3IuUNZO2zvRsO1Ql2Anct+zE3c/RDrgE+aHATCfCPJfKncUjZ8v+UFVclzqTrG3Onzo0=
+	t=1725900979; cv=none; b=e0ECcKXkYzKJgaiQUJ+mkZce3jnjylsvoq7vgK3GvOPoVgFjrFcCXAn8tjXVXeE930fK+/0YKjzE95Eo7AXTJKfl4ld23rm2LG4Wr45BEWFRzTFyEPUXLSDvwxzf00yNzwxD4dluicqBRFl545ktuZo2u2ZH8tZsjPtXZbDUaWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725899840; c=relaxed/simple;
-	bh=Vor9A51MY4LbHBQym1omjXXtWBlRMHBeYzCg0Ctn6GE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aMuYZSrp6h6HySUR1Ix02mKWx6rmH6pwDGIyBkyijBma6cR+x9kBgHVntO0EN16eHcQPd/DvVXJT72VPMkEs+/p5r/+iUAMtk1X9j1GqfSQxt3zJ1xYyqiSsEx82OI9XT+tYqulkMIv/hSgkPH8GotV5vrz9nh3Ee6MLZxT9MA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HyMk5ex8; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1725900979; c=relaxed/simple;
+	bh=hz+muhNlGzPTTXOmV3AgBKyXhVUGgQu1x3C0Pqi1hE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=on+P0bgW8qFz0IJLMb2iPrzVl1pi+663yT2xTGj1ucbwnmFBI0jla/7KnR3XQeAoQeyplGx1KziWLRGISFsBn3voMKmC9QwIvKpo/9s1byMNJGRUTxra6hOHHUUFlEUxeX68kfM8wFJ5FMnInlzsEyqYZuRKEEBaNTNRfH0/fVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Wg3F5LCf; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HyMk5ex8"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cb2191107so13031185e9.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Sep 2024 09:37:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725899836; x=1726504636; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IVb7FZalp+hymwW1x9wgZGuiq1blreq92SNrbnhzt/U=;
-        b=HyMk5ex8ajDB02NENOTjzqHs6Q87jKZQHT/TsJsGbjSjx+fcVy/wSoRv0pM0LzgoIe
-         Zftjt+EFR9hfpTHdxG23nM64LdlC166ccGN+XKoe5Ehlpgmux2CmYGqZf9bkAElx+u7h
-         OC+Fjo2Ki20yIMaOLZ8FwVB5OtH/ZwEJL7OOf7fI0SQECcTPyVljCaTNbCLgKHBB2wLT
-         jeYZxafML4M5ap1/99RmvoT+RaVHsEryZab00PjxhX+RbMbS9PVF8sm74NaTw5UPWAQG
-         coAmlAMmw70B7daoPIMCXubUbKKDOAr4PENt5yYDL7c7V29vskeGpcakMSQfUEkn1ex4
-         eOFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725899836; x=1726504636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IVb7FZalp+hymwW1x9wgZGuiq1blreq92SNrbnhzt/U=;
-        b=r9I5s8uaTf4TuVj0Fvfwfo1SY9PAFKCnPf/o5IhosnzhrlZjvJbzAZUGYYj8ZPyntM
-         rWTwecUrLBvJ46CIi4uqp9etMgmvndooToJtlGY/QSC4nXkGBQuoSpouf/M1DfOr0w64
-         I6GzL4ojsLc0msbq7tSCIqHQXAAK87gnWkpWR0NEmk/zDkM8Cd48dmNuQWtlK8OLCISN
-         lf0itbRLcpDmxYLZ4AaCgpdN6ewT1qRWt51YEYyvRbvzu4YOYPr5djmaD/C0y9KJxVEr
-         OAH3Q2keYHKTFg4QpZ09AJ4/5Pj2mM4Hwu4OMjYu1QiyzV9uWmjY3mv0/wHFW9Nfsyq7
-         VhOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUIaxpWB88fXBnR5JuTqwDDkIsyhiN097jjIV/uE/qsll7R8rnXCSLs/iQdWIwhERtlTD7+81AfR6Qofg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0GoE+bpEwQN2wjNsN404LoQSxPcmhnelzHWM7NZDy+fXlCq79
-	cTCGVNFNqqZ/JYfMyQyiSRkYHm8R5xzcSo6HWhvX9km5wDuHoO4z2H1bjq0QjLKz9fVn6SRUjtt
-	dkLotc4KA83G+zcBpTYXClynj+dgm++pkECRTQMLdFqztElcTpIyTjyQ=
-X-Google-Smtp-Source: AGHT+IFqGpX0VmbgWSC7nk1slW1l+OrKUWEzp/PMlH2GO3N0F90G8DHQsjE9OjeSQ5wBmNMyvA/uZ9VRq3o5WHdPitE=
-X-Received: by 2002:a05:6000:d8d:b0:374:c4e2:3ca7 with SMTP id
- ffacd0b85a97d-378926858a7mr5320757f8f.5.1725899836155; Mon, 09 Sep 2024
- 09:37:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Wg3F5LCf"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4X2XzH29GczlgTWQ;
+	Mon,  9 Sep 2024 16:56:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1725900969; x=1728492970; bh=uEzk+UVKk3DtYZ3RGwdE5l5N
+	lpjkh/MfDdrJSDrEB2o=; b=Wg3F5LCf6/+JLLss67hdFrwCYpiKYJcvPXWaMPb5
+	0UGd5jPmKNn3jnvfs9p3k8jYt/0lVwzZVbYRa/L0v3ac2kY7pFggydPH8IubdsRB
+	o9cK34OGXusVLu+POcglH8dUKGwfyQOlpy1BgsvYkkDziK7mWE19d7hNXHTiGCMv
+	HaN/oys8ko2XLinPrYyvZDwRMyjcARhEAIOqgylNEfxgeJ/bc1HQeu2+nPV/935c
+	VyeSX3+gJSAevSSKeuB0hgfdWvY4aa0BLqZ8cJMSH1NgTcdljq9++XNbUmTf79xW
+	n1mBav+j0iMDmsgYIm28V4Hxme1muZOnuzi5s1WN7KAi/A==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ojzRlORkKUAf; Mon,  9 Sep 2024 16:56:09 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4X2XzD1QNjzlgTWP;
+	Mon,  9 Sep 2024 16:56:07 +0000 (UTC)
+Message-ID: <2f13ac77-55e0-408d-96fe-b91d3c860106@acm.org>
+Date: Mon, 9 Sep 2024 09:56:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240905-rust-lockdep-v1-1-d2c9c21aa8b2@gmail.com>
-In-Reply-To: <20240905-rust-lockdep-v1-1-d2c9c21aa8b2@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 9 Sep 2024 18:37:04 +0200
-Message-ID: <CAH5fLgj6aCNxXfANt-0duhMfujQdOip9AjtX5yRraXQ5QaDReA@mail.gmail.com>
-Subject: Re: [PATCH RFC] rust: lockdep: Use Pin for all LockClassKey usages
-To: levymitchell0@gmail.com
-Cc: Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Trevor Gross <tmgross@umich.edu>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: fix potential invalid pointer dereference in
+ blk_add_partition
+To: Riyan Dhiman <riyandhiman14@gmail.com>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+References: <20240908171036.71874-1-riyandhiman14@gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20240908171036.71874-1-riyandhiman14@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 6, 2024 at 1:13=E2=80=AFAM Mitchell Levy via B4 Relay
-<devnull+levymitchell0.gmail.com@kernel.org> wrote:
->
-> From: Mitchell Levy <levymitchell0@gmail.com>
->
-> The current LockClassKey API has soundness issues related to the use of
-> dynamically allocated LockClassKeys. In particular, these keys can be
-> used without being registered and don't have address stability.
->
-> This fixes the issue by using Pin<&LockClassKey> and properly
-> registering/deregistering the keys on init/drop.
->
-> Link: https://lore.kernel.org/rust-for-linux/20240815074519.2684107-1-nmi=
-@metaspace.dk/
-> Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> Suggested-by: Boqun Feng <boqun.feng@gmail.com>
-> Signed-off-by: Mitchell Levy <levymitchell0@gmail.com>
-> ---
-> This change is based on applying the linked patch to the top of
-> rust-next.
->
-> I'm sending this as an RFC because I'm not sure that using
-> Pin<&'static LockClassKey> is appropriate as the parameter for, e.g.,
-> Work::new. This should preclude using dynamically allocated
-> LockClassKeys here, which might not be desirable. Unfortunately, using
-> Pin<&'a LockClassKey> creates other headaches as the compiler then
-> requires that T and PinImpl<Self> be bounded by 'a, which also seems
-> undesirable. I would be especially interested in feedback/ideas along
-> these lines.
+On 9/8/24 10:10 AM, Riyan Dhiman wrote:
+> The blk_add_partition() function initially used a single if-condition
+> (IS_ERR(part)) to check for errors when adding a partition. This was
+> modified to handle the specific case of -ENXIO separately, allowing the
+> function to proceed without logging the error in this case. However,
+> this change unintentionally left a path where md_autodetect_dev()
+> could be called without confirming that part is a valid pointer.
+> 
+> This commit separates the error handling logic by splitting the
+> initial if-condition, improving code readability and handling specific
+> error scenarios explicitly. The function now distinguishes the general
+> error case from -ENXIO without altering the existing behavior of
+> md_autodetect_dev() calls.
+> 
+> Fixes: b72053072c0b (block: allow partitions on host aware zone devices)
+> 
+> Signed-off-by: Riyan Dhiman <riyandhiman14@gmail.com>
 
-I think what should happen here is split this into two commits:
+No blank line between the Fixes: and Signed-off-by: tags please.
+Additionally, please Cc the author of a patch when posting a fix for a
+patch.
 
-1. Get rid of LockClassKey::new so that the only constructor is the
-`static_lock_class!` macro. Backport this change to stable kernels.
-2. Everything else you have as-is.
+Thanks,
 
-Everything that takes a lock class key right now takes it by &'static
-so they technically don't need to be wrapped in Pin (see
-Pin::static_ref), but I don't mind making this change to pave the way
-for LockClassKeys that don't live forever in the future.
+Bart.
 
-The patch *does* introduce the ability to create LockClassKeys, but
-they're only usable if they are leaked.
-
-Alice
-
-> -        T: WorkItem<ID>,
-> +        T: WorkItem<ID>
-
-Spurious change?
