@@ -1,99 +1,115 @@
-Received: from mail.rosalinux.ru (mail.rosalinux.ru [195.19.76.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA2E1B86E4;
-	Mon,  9 Sep 2024 13:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.19.76.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3099E1BAEDE
+	for <linux-block@vger.kernel.org>; Mon,  9 Sep 2024 14:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725889841; cv=none; b=u1x+tJMvPzOaw69KcGXnCv2saYKcGGHjXLDfUauF7STar1EP04bnmXoTuCCxt9QeitMCe4qxOMaOzl4JPRz7sprhwtRyujsTT2mViFGAWwY/TD6g9yz2H83YhUuDb03iXbQMB8wQtymqpIxB2e00ToupWjvZHdtvKtj1Zzj7lRs=
+	t=1725893508; cv=none; b=VuxkLSb2S7TDLnxNXjZ4bb1g44MPVbZeh29monhr8YgKnkW55y3QcqvI7GfrBK+CB5OkQEvNX281GRlBa1Y/V1N2ewGOsfE3UVuQaUKAGMLE/z/kOA+hSiHsaChJ6jeKEEc+W8rC929Ayj6YhW+G1aVSHAaiq5LpUzIupRRyb44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725889841; c=relaxed/simple;
-	bh=2D7C10L9qGR1xYUVuRaUwP/lQVaj8GW63TvL3cfW5lw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jPJaymFPa1TkkUZBJLn9EAgwjMuw2a//B/TTQBAnrA7575IshHwHbjNSbUHZ/HaJOaA/JXSfUzoEVk0l/hK1xxLqJyo1a3YPS+tnsRsHVD7L2hbqdwVWs7Sd/OwLmVItxcDjdti7vU6Vdflefooqpavmul05cHV9nhSgbfTtvaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru; spf=pass smtp.mailfrom=rosalinux.ru; dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b=IMmCe9UO; arc=none smtp.client-ip=195.19.76.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosalinux.ru
+	s=arc-20240116; t=1725893508; c=relaxed/simple;
+	bh=+cJBG1upvR+F3tYffdvhWbT1y7mKiym6WyRY+g0v8zE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tZijK85GZs30Ae1qZZ698T6/LXwY5iaivRkmKI2MhFyJ6k6mSmenB1iboQ+zWoFh9PM0cdnYYh98L8XhFIghUj2MzoXg8rSLc0+8agFQfLfMgqlFUUJw2sj11nQ3cZFocHiceK+QIEveQ+DXTlGCJ+BjzceDcgI4k/3qYV6yySQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=cnudllxz; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b="IMmCe9UO"
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rosalinux.ru (Postfix) with ESMTP id 8F129F90A07EC;
-	Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
-Received: from mail.rosalinux.ru ([127.0.0.1])
-	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id UKXrqmmBMBf4; Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rosalinux.ru (Postfix) with ESMTP id 65003F90A07ED;
-	Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rosalinux.ru 65003F90A07ED
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosalinux.ru;
-	s=1D4BB666-A0F1-11EB-A1A2-F53579C7F503; t=1725889241;
-	bh=j0w10pqKqsCrw9p4jGmOYSKGwJAYnt8q1qKqtK5tU14=;
-	h=From:To:Date:Message-ID:MIME-Version;
-	b=IMmCe9UOVK5OEKqqUmeRavJNTsDhR3XSBn+T95wfSCkAxcIEbX1Qxz8IrqscPG1QW
-	 UBjvN4VeQ3Rp2xMIa0EO7LVnxxjDc5+yh2tgu+brpqpe6Du4bg/94KvgyBtFpFxXBY
-	 OHrFn9bNsqrrarPwPtO6S/qBzFtMYJMB/AOhMd8RvCSYVfzb2uH1/t9zgL/L9U/2ZX
-	 OCuic9PS9C+SWviPQqWBWN5Szhg5bf2F1Kbcv3+Yua3HFG6eEtLV495RynplbYh1o/
-	 WujCae8+G0v39cGT9ey43xxd4U+aDa6Rz9nLeDHgvF01ejZ3MlW+iHalYSEZ7p7VLt
-	 0f3mbo8+yYfjw==
-X-Virus-Scanned: amavisd-new at rosalinux.ru
-Received: from mail.rosalinux.ru ([127.0.0.1])
-	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id DBj-TN5343t1; Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
-Received: from localhost.localdomain (unknown [89.169.48.235])
-	by mail.rosalinux.ru (Postfix) with ESMTPSA id 27DCEF90A07EC;
-	Mon,  9 Sep 2024 16:40:41 +0300 (MSK)
-From: Mikhail Lobanov <m.lobanov@rosalinux.ru>
-To: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Mikhail Lobanov <m.lobanov@rosalinux.ru>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: [PATCH] drbd: Add NULL check for net_conf to prevent dereference in state validation
-Date: Mon,  9 Sep 2024 09:37:36 -0400
-Message-ID: <20240909133740.84297-1-m.lobanov@rosalinux.ru>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="cnudllxz"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-6e7b121be30so2840932a12.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Sep 2024 07:51:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725893505; x=1726498305; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f9rWAsIGzZ6u/QYJf5tnAdUimUu+PCvUeW7OogHaSuI=;
+        b=cnudllxzOE8KL2lqOQmdQyS6HH8YpiuIX1rNf24tMN4nWHPT3h7UbwZNz1W+YbKdE7
+         0YGmn5r4pRfhz/B3Z/KrvZiNBNoI+VutLAZmg45zOcjO3hMlQ2sAYHGdp0ETItoxUD5E
+         HQAAu2XNTseXSGizMdTJygudXccn67OvyrSFaW3aon6yfHOfluU+vJDmpsUV1O8J96Ry
+         wWULQYbY1u3Oezm8SeoB7Bfltk4kEkyz3WoK4j/3p3JXqI62eZFr6YSg4rI7RXdmuZnb
+         5SZWZxcFVyxAA+mVy7kHw9lK+gJr/Dltfpr81AR5uzR0LK5wB8oaKuf+swArwDTR7r8P
+         gWBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725893505; x=1726498305;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f9rWAsIGzZ6u/QYJf5tnAdUimUu+PCvUeW7OogHaSuI=;
+        b=MqXCrcW1NUnMvFGNqGXmFnjcwWu+cP2EfpJBg7s6JiztllUHGUfEE0f1yImKOmZtau
+         2JtrOsRQnndTKyDpRUJ13xiPijKptMmOm0EdX5xOb/Lg3pMFpaKhMn4rPfvKJnYeJb7y
+         LCDK7QB+GZJFAL8AmLfwXM1XMfozKC53e2zJUc0SUd/Qyp6IRozh7Pz+SoCsQh0pu9pS
+         D394Xema28iOqCJu+XdHdBQG0UzF8RUawhs0zSjFwIPFN0IKQBcZzDNb9o41B9qZYRcT
+         tX21gdkRIIt8sFpPiK6fRteVMzMFPJf/UoihcQmTdA7cq9HYSKcTEq40D3jRMzIlhqeZ
+         anAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVleDSxrgmpfDBsUq/2jkGhpTYTf+pmcbf+HOqb3WRpzDyqNuOnnLNE0fLbZnzjGbyRe8+FMCbl6zHuTg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+gaDcw3ls807dx0DkvGvJu0Jg7jvVjLkoXdUVlZb8HCZxoDgB
+	4VPmpFDfZGSBY6ushzPI9Gzh/UOI6Yi4AzKHi7YdriXSokVVsVr+ltBGBJcmGyw=
+X-Google-Smtp-Source: AGHT+IGXmoYoNnbLnmlnvdjNnKtCotyC6KrIkej+yws/iMo0+HjJYgBJ0A65h3AE+feie3K02nBLtw==
+X-Received: by 2002:a05:6a20:891e:b0:1cf:2939:a0de with SMTP id adf61e73a8af0-1cf2939a1e8mr5746386637.14.1725893505231;
+        Mon, 09 Sep 2024 07:51:45 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710f31235sm34960025ad.253.2024.09.09.07.51.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Sep 2024 07:51:44 -0700 (PDT)
+Message-ID: <29245c2e-d536-4a98-88ed-d1757795b3cd@kernel.dk>
+Date: Mon, 9 Sep 2024 08:51:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/8] implement async block discards and other ops via
+ io_uring
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, Christoph Hellwig <hch@infradead.org>
+References: <cover.1725621577.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <cover.1725621577.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-If the net_conf pointer is NULL and the code attempts to access its=20
-fields without a check, it will lead to a null pointer dereference.
-Add a NULL check before dereferencing the pointer.
+On 9/6/24 4:57 PM, Pavel Begunkov wrote:
+> There is an interest in having asynchronous block operations like
+> discard and write zeroes. The series implements that as io_uring commands,
+> which is an io_uring request type allowing to implement custom file
+> specific operations.
+> 
+> First 4 are preparation patches. Patch 5 introduces the main chunk of
+> cmd infrastructure and discard commands. Patches 6-8 implement
+> write zeroes variants.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Sitting in for-6.12/io_uring-discard for now, as there's a hidden
+dependency with the end/len patch in for-6.12/block.
 
-Fixes: 44ed167da748 ("drbd: rcu_read_lock() and rcu_dereference() for tco=
-nn->net_conf")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mikhail Lobanov <m.lobanov@rosalinux.ru>
----
- drivers/block/drbd/drbd_state.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ran a quick test - have 64 4k discards inflight. Here's the current
+performance, with 64 threads with sync discard:
 
-diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_st=
-ate.c
-index 287a8d1d3f70..87cf5883078f 100644
---- a/drivers/block/drbd/drbd_state.c
-+++ b/drivers/block/drbd/drbd_state.c
-@@ -876,7 +876,7 @@ is_valid_state(struct drbd_device *device, union drbd=
-_state ns)
- 		  ns.disk =3D=3D D_OUTDATED)
- 		rv =3D SS_CONNECTED_OUTDATES;
-=20
--	else if ((ns.conn =3D=3D C_VERIFY_S || ns.conn =3D=3D C_VERIFY_T) &&
-+	else if (nc && (ns.conn =3D=3D C_VERIFY_S || ns.conn =3D=3D C_VERIFY_T)=
- &&
- 		 (nc->verify_alg[0] =3D=3D 0))
- 		rv =3D SS_NO_VERIFY_ALG;
-=20
---=20
-2.43.0
+qd64 sync discard: 21K IOPS, lat avg 3 msec (max 21 msec)
+
+and using io_uring with async discard, otherwise same test case:
+
+qd64 async discard: 76K IOPS, lat avg 845 usec (max 2.2 msec)
+
+If we switch to doing 1M discards, then we get:
+
+qd64 sync discard: 14K IOPS, lat avg 5 msec (max 25 msec)
+
+and using io_uring with async discard, otherwise same test case:
+
+qd64 async discard: 56K IOPS, lat avg 1153 usec (max 3.6 msec)
+
+This is on a:
+
+Samsung Electronics Co Ltd NVMe SSD Controller PM174X
+
+nvme device. It doesn't have the fastest discard, but still nicely shows
+the improvement over a purely sync discard.
+
+-- 
+Jens Axboe
 
