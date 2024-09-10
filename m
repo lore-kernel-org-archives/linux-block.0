@@ -1,159 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8187D1A38EB;
-	Tue, 10 Sep 2024 22:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036AA1ABEB9
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 22:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726007888; cv=none; b=Dg+H2xu4aiswuNKzrxbTXAk/uPjW56nu7Ak2RCLcsz3wj5WhG8DOLSoElULHZoSNJxkhuD49LebWcPmVnVd0remngHpG5cweaEUc5a9s7HV0qCgMLtqCVAMmkU96oc2Zfzfj/AEmDTgXopSZvVnmZLMH8ObhZBzqejDNDf81F24=
+	t=1726007979; cv=none; b=p8UtqLtpkdbpIQ5NbSrpBUIXmQf3zURM6x3BcfvJYzZXvky+6P4GWY5wCRBNsECNkIpGbfSpULEAWL3yURgVrxefv4THoxx9ilASmVvLLbrsuVZgRkJMTz5byk8darX5mOVWmkQqwhjTRJcbACBChjnhwd4wNYGui44pwguMix8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726007888; c=relaxed/simple;
-	bh=Ff7PpZdGO9Fv+QWUyn4xNEoHuiQVRYRHAUpvn/dpU5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SKIk0gvgL3K67q1wZquHWHk2h9DrR0J9zb+T/kQF8m5Pe++WgiRkzcM7KnsasvVt/ckb3ecCSupzA9KaTnjmRsffMfyvRz1iZERxZqphG7N3szTlPdLM42DR0xLaVrGgchbWoCVx5jNG3tX9oq5LdHEwOq+thGiIK5KrOuw5SfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ja5l4yJ3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726007979; c=relaxed/simple;
+	bh=9lozWcbmWLbcepezHSOWbdICzaNXH073+Xycr1gGoPk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=hV0syCbwRevYQTnlT43M2Hwz5hfLHeCBJoZZS9lwgTVTBblsZ2okpWb/noY3qe0pvvRg2SYy38jNTEAekOsjzDFKKjV3adFtPHgLHvrYVm9Z8d8VZY4F2zEN27jx9Y8YRU7A7/u8mIuQfrcGYteMBRBsYeCnhSODmm1FoJaDfRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ft3wyKVk; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ja5l4yJ3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5967C4CEC3;
-	Tue, 10 Sep 2024 22:38:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726007888;
-	bh=Ff7PpZdGO9Fv+QWUyn4xNEoHuiQVRYRHAUpvn/dpU5s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ja5l4yJ3WiAvPQUH5fmCvNjvtQ0gBjgEnpLTiS294idkY66rb2unLRnYaTgCkwmcG
-	 xDsSZg+dBBdg9ejpU5w5yymx4I/eHdP5Fq9+YcuEOEn2PuheEqzyvp81PR1qT+cYXY
-	 JYnhgFHGyFAWmFGoalnhS+tlij7/yi7AIhZCb5ymqcJ3hR3LbTVcSKhIdu+2NkQoVh
-	 fLFx8GeuYfPIvKtKDlp+Fsa3+Ycg/oeHv5wpBVU3zXC/e/ESRVZ2iL1kTwQzYX5NR7
-	 hm7CSP2vnQBrE7e1hWL/MEs48/0M27Ec/PdGw5qYxbsNkz2If6q4MmeDTv4oOgVRjO
-	 XbUuBeDT9scUw==
-Message-ID: <7f179f49-a57b-45bf-92f0-f577aa0b8565@kernel.org>
-Date: Wed, 11 Sep 2024 07:38:05 +0900
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ft3wyKVk"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2d88c5d76eeso3949933a91.2
+        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 15:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726007977; x=1726612777; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bEgf48d3Npdbvo6EbFMiLCDqMwGMD0QaDq1MPdaUUIE=;
+        b=ft3wyKVk3aMT1GXHejUXbtmXvku6W/ZTXY/WOJH0UNfc+InzxSYO/BJDgdoepcnA8l
+         MnOzvKDJTali7k4VBrlQhLUiNGa1J0mRQ2CI1c1sI7L/9r2WHKcbYWU5C0EeBhpVH3Vx
+         VeyaoJ+PJRBVqKkizoOLKwKM3cKQwXtb2N9n/bZAcIw3zZLTeJdgypmhkbyS/O+8MMPX
+         rzhPHOrdKJFWQ3HGCSAYW+TUSjLtX+F7mEUQds6RTwQEnL8mGUWueBxpawJD9Ny37Cqo
+         MPVdtkuTWE9egvs7Mg0SiMgi/CA0yl1fH7rYXgZ0/IyqRItCfchsI8sZ5WpypJB2GcP/
+         l81w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726007977; x=1726612777;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bEgf48d3Npdbvo6EbFMiLCDqMwGMD0QaDq1MPdaUUIE=;
+        b=YXRaEA291sImQ4IATqal2RaGVNb05Wv6YB69NjUeopCAKqMxvUCXtoDQDW1veDR4m9
+         cxzXPGildXqIftl4BF6C0bjv+FHVDEoklM2Lu+NJ4DiPPrXad0ROC/FsZ87blzJ66Apm
+         py/5bUpGY66XShwPLpecSv4V4eh1CdOhL3b4v0DiZX0bGf/ge/NvYfnhCKGpRT845TT/
+         nnlRTJ4rwMTdY1uI0OplhgC1oX9RC2AcutvsQx/UD7apXiDFd0l8SopQVn+vtDWHskLb
+         0TUozfqknmhDIiSgJZfCZY3Qu5Hjsc+2ekd0ycDOhLUu1Vg+DnEK7/c/k+nIq9BR1lLJ
+         aFaA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5WdxRXAxFU3KsnG4dCcvD4tkv+GORJfUEt+3Qnu9CDVQb6Pu+yQQzfPOF67r4MxoJ0kVsuSb2Y7ccKg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq27zTiZ2LiUEt3xqzYHvjnJRIDLDN7y1PL61WoZXc6AXS6pe/
+	TBWYmr7Lkgk5Loo7ytiPlrDhHV5GAyK19dvEf5QepLq4uD6RHoWuCnGZ+MTkzUM=
+X-Google-Smtp-Source: AGHT+IHCH2U+Pd8pCtG0FiLuc/i8oC84BPGovGTV+RXsztdpQ8wULTsd+XipxuU/K/xfaYWjQ1mgAA==
+X-Received: by 2002:a17:90b:2248:b0:2d3:db91:ee82 with SMTP id 98e67ed59e1d1-2dad513a8d5mr12858061a91.40.1726007977323;
+        Tue, 10 Sep 2024 15:39:37 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadc127c5bsm9023783a91.52.2024.09.10.15.39.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 15:39:36 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, yukuai3@huawei.com, 
+ Yu Kuai <yukuai1@huaweicloud.com>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20240909134154.954924-1-yukuai1@huaweicloud.com>
+References: <20240909134154.954924-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH for-6.12 0/7] block, bfq: bfqq merge chain fixes and
+ cleanup
+Message-Id: <172600797599.158663.4657437776130763939.b4-ty@kernel.dk>
+Date: Tue, 10 Sep 2024 16:39:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] block: Non-NCQ commands will never be executed while
- fio is continuously running
-To: Niklas Cassel <cassel@kernel.org>, yangxingui <yangxingui@huawei.com>
-Cc: axboe@kernel.dk, John Garry <john.g.garry@oracle.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- James.Bottomley@hansenpartnership.com,
- "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
- <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
- <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
- <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
- <0e78cce0-3f4c-3ddf-4d5b-ee2b5c8d7e1a@huawei.com>
- <ZuAtLK5jIPEjhXmU@ryzen.lan>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <ZuAtLK5jIPEjhXmU@ryzen.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
-On 9/10/24 20:27, Niklas Cassel wrote:
-> On Tue, Sep 10, 2024 at 02:34:06PM +0800, yangxingui wrote:
->>
->>
->> On 2024/9/10 12:45, Damien Le Moal wrote:
->>> On 9/10/24 10:09 AM, yangxingui wrote:
->>>>
->>>>
->>>> On 2024/9/9 21:21, Damien Le Moal wrote:
->>>>> On 9/9/24 22:10, yangxingui wrote:
->>>>>> Hello axboe & John,
->>>>>>
->>>>>> After the driver exposes all HW queues to the block layer, non-NCQ
->>>>>> commands will never be executed while fio is continuously running, such
->>>>>> as a smartctl command.
->>>>>>
->>>>>> The cause of the problem is that other hctx used by the NCQ command is
->>>>>> still active and can continue to issue NCQ commands to the sata disk.
->>>>>> And the pio command keeps retrying in its corresponding hctx because
->>>>>> qc_defer() always returns true.
->>>>>>
->>>>>> hctx0: ncq, pio, ncq
->>>>>> hctx1：ncq, ncq, ...
->>>>>> ...
->>>>>> hctxn: ncq, ncq, ...
->>>>>>
->>>>>> Is there any good solution for this?
->>>>>
->>>>> SATA devices are single queue so how can you have multiple queues ?
->>>>> What adapter are you using ?
->>>>
->>>> In the following patch, we expose the host's 16 hardware queues to the block
->>>> layer. And when connecting to a sata disk, 16 hctx are used.
->>>>
->>>> 8d98416a55eb ("scsi: hisi_sas: Switch v3 hw to MQ")
->>>
->>> OK, so the HBA is a hisi one, using libsas...
->>> What is the device ? An SSD ? and HDD ?
->> Both SATA SSD and SATA HDD have this problem.
->>
->>>
->>> Do you set a block I/O scheduler for the drive, e.g. mq-deadline. If not, does
->>> setting a scheduler resolve the issue ?
->> Currently, the default configuration mq-deadline is used, and the same
->> phenomenon occurs when I try setting it to none. It seems to have nothing to
->> do with the scheduling strategy.
->>
->>>
->>> I do not have any hisi HBA. I use a lot of mpt3sas and mpi3mr HBAs which also
->>> have multiple queues with a shared tagset. Never seen the issue you are
->>> reporting though using HDDs with mq-deadline or bfq as the scheduler.
->> Unlike libsas, as these hosts don't use qc_defer()?
+
+On Mon, 09 Sep 2024 21:41:47 +0800, Yu Kuai wrote:
+> Patch 1 fixes a problem found by xfstests generic/323, tested on scsi
+> disk with bfq.
+> Patch 2 fixes a problem while digging the above problem, by a debug patch
+> to print procress reference.
+> Patch 3-7 are cleanups while reviewing code.
 > 
-> mpt3sas and mpi3mr do not use any libata code at all, the SCSI to ATA
-> Translation (SAT) is done completely by the HBA, so from a Linux
-> perspective, we are issuing SCSI commands to the HBA.
+> Yu Kuai (7):
+>   block, bfq: fix uaf for accessing waker_bfqq after splitting
+>   block, bfq: fix procress reference leakage for bfqq in merge chain
+>   block, bfq: merge bfq_release_process_ref() into bfq_put_cooperator()
+>   block, bfq: remove bfq_log_bfqg()
+>   block, bfq: remove local variable 'split' in bfq_init_rq()
+>   block, bfq: remove local variable 'bfqq_already_existing' in
+>     bfq_init_rq()
+>   block, bfq: factor out a helper to split bfqq in bfq_init_rq()
+> 
+> [...]
 
-Yes, but we still can get requeue happening. Though for a SATA drive, that is
-unlikely since the max queue depth is clearly defined, unlike for SAS drives
+Applied, thanks!
 
-> We can see that libsas uses ata_std_qc_defer() as its .qc_defer callback:
-> https://github.com/torvalds/linux/blob/v6.11-rc7/drivers/scsi/libsas/sas_ata.c#L566
+[1/7] block, bfq: fix uaf for accessing waker_bfqq after splitting
+      commit: 1ba0403ac6447f2d63914fb760c44a3b19c44eaf
+[2/7] block, bfq: fix procress reference leakage for bfqq in merge chain
+      commit: 73aeab373557fa6ee4ae0b742c6211ccd9859280
+[3/7] block, bfq: merge bfq_release_process_ref() into bfq_put_cooperator()
+      commit: bc3b1e9e7c50e1de0f573eea3871db61dd4787de
+[4/7] block, bfq: remove bfq_log_bfqg()
+      commit: 553a606c25f8ff5c518c7fcf488dd4dd5fbb4795
+[5/7] block, bfq: remove local variable 'split' in bfq_init_rq()
+      commit: e61e002a67da9ec36571af743c94a968cf1ce116
+[6/7] block, bfq: remove local variable 'bfqq_already_existing' in bfq_init_rq()
+      commit: 3c61429c297582e0da7231fb29fc5ec1d2c7d1b2
+[7/7] block, bfq: factor out a helper to split bfqq in bfq_init_rq()
+      commit: a7609d2aec67ec16220036a5b1b14610883cdbd3
 
-And that may be the issue. More on this below.
-
-> Without considering if it is a good idea or not, it should be possible to
-> translate some commands to instead use the "NCQ encapsulated" variant of
-> the ATA command that was used in the "ATA-16 passthrough" SCSI command.
-
-That would be way too much work on the user side, and likely open up a can of
-device bugs unseen until now.
-
-> To be able to send a non-queued command, there has to be no NCQ commands queued
-> on the device. I guess you could implement a scheduler that would be quiescing
-> the queue, processes the non-queued command, and then thaw the queue, but that
-> would essentially make non-queued commands high priority commands, and could
-> thus be used to seriously limit throughput by just sending some non-queued
-> commands every now and then :)
-
-Passthrough commands do not go through the scheduler and are submitted directly
-to the dispatch queue, generally at the head of it (see blk_mq_insert_request()).
-
-So for a single queue device, even if ata_qc_defer causes a requeue, the
-passthrough command ends up back at the top of the dispatch queue. After
-repeating this a few times, all in-flight NCQ commands complete and the
-passthrough command goes through.
-
-But I feel this is very fragile given that the block layer requeue is done
-through a work item, so in parallel to an application submitting IOs. So in
-theory, I think that the requeue for the passthrough command could happen forever...
-
-And for a multi-queue setup like with the hisi adapter, that is what is happening.
-
-I do not have any good idea how to fix that yet. We need to find something.
-scsi_queue_rq() and the budget/host or device blocked state management may help
-with that, or we have a bug there... In any case, I do not think it is a block
-layer issue as the block layer knows nothing about NCQ vs non-NCQ.
-
+Best regards,
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
+
+
 
