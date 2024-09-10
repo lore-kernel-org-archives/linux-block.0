@@ -1,294 +1,162 @@
-Received: from 189.cn (ptr.189.cn [183.61.185.103])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693AE339AC;
-	Tue, 10 Sep 2024 08:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.61.185.103
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD24018D651
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 09:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725958064; cv=none; b=ofN8RJPayNVpO00//R9tLlxpsYtvrqhpx3bRd4aVhr1994RtJgoSs/bEhx7DzirWTdvZyVmd3jk3jD+STWPPo7tsp9rpmIEvQHJis6rPJlQZzLUxHiNeejusjhWyW9WJe2LEUAEW2ksX6WhRbBr6skQ/QNt0NO0O7b4/x3NmwPk=
+	t=1725960370; cv=none; b=ClqQ2M+mcpWvE6pzZ9xSvV6wWbkWFntm6B3X5fCwNpYIFVTZ7efbEl0YzlcNB2zkd4eXFQCJI+7hChmOMxkaS9Gq2WrkN7MUza+jDYHbmyUlT1DljQRUpaNSH6sme+HVKgi5mPaDj9pWQu6jkud8qvXWWbhDp0oIBtyhxrQ6gSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725958064; c=relaxed/simple;
-	bh=1DaEvN+kL6q16ZIm6Z8fBX/5uac/UzkFsTq+CcEGgMY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rSrbuChi08z0C74/naiB6TUIb+nCOi2Tm7Jd9e9fLMjc8Lw75HgrMzxvC7jdyvpnK0whutLIgG6rJoDLD8UkRYXF+y1c4BZl35ehEOA2jdhgIQrujsItTY5xkZ8antSUysGm3jsE1IxaEojqoo1BAwhJP9Qkw8tl+hxHBjNe8us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn; spf=pass smtp.mailfrom=189.cn; arc=none smtp.client-ip=183.61.185.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=189.cn
-HMM_SOURCE_IP:10.158.242.145:3112.620420812
-HMM_ATTACHE_NUM:0000
-HMM_SOURCE_TYPE:SMTP
-Received: from clientip-123.150.8.42 (unknown [10.158.242.145])
-	by 189.cn (HERMES) with SMTP id 5D15D1002BE;
-	Tue, 10 Sep 2024 16:42:41 +0800 (CST)
-Received: from  ([123.150.8.42])
-	by gateway-153622-dep-68cfdf7599-zbmfg with ESMTP id d207631d2c03443aad32dabe2cbe8b5d for axboe@kernel.dk;
-	Tue, 10 Sep 2024 16:42:42 CST
-X-Transaction-ID: d207631d2c03443aad32dabe2cbe8b5d
-X-Real-From: chensong_2000@189.cn
-X-Receive-IP: 123.150.8.42
-X-MEDUSA-Status: 0
-Sender: chensong_2000@189.cn
-From: chensong_2000@189.cn
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Song Chen <chensong_2000@189.cn>
-Subject: [PATCH] block/blk-rq-qos: introduce macro RQ_QOS_FN for common behaviors in rq_qos*
-Date: Tue, 10 Sep 2024 16:42:38 +0800
-Message-Id: <20240910084238.3543971-1-chensong_2000@189.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1725960370; c=relaxed/simple;
+	bh=D/buzGYQkufERse75SSjj/vuDr0eYjohZXOoq1FQWj0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=Qmq75TOTK9hSF8Rzzhbc+UaWqrYZysE2YiI0OS+brvgYhpJ2wn/ckH9SxNGe9eNJJysLbjBpMjOM2cK1AKkOsPBmfULGJWR5YuuShQYH8XnbbbcfgdUnNal8VddCEFO6fXtZxmCvG1FBG8oe4frBELMbLYPwrdWLF86zOd8HKcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=qNQu/qqc; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qNQu/qqc"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240910092606epoutp0245b69d27549bb00224cd82a112fe47b5~z188XtLl81236312363epoutp02a
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 09:26:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240910092606epoutp0245b69d27549bb00224cd82a112fe47b5~z188XtLl81236312363epoutp02a
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1725960366;
+	bh=MtY5qZOPVIGordnCBFvzVrBfTMRjvMNrDfO7tPymv9k=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=qNQu/qqciECo7N+Qr5su9Pn5p1DrkHX7PcmkcbYMNwLTMna70vEU9XE3Oyqru/qv8
+	 wLGPiEhl3CbffRzyva8rLXOQdQBCjh5T2EpVpv24jVCnJfIltYRWDww1UnaakT6aPP
+	 zg+y+20EjuSJC5O9IGKGrQ++WIIIUh71iCixLdx0=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240910092606epcas5p1b482ec48592d08e606bf0c1ad7fb2ce6~z187_8Kmq2995129951epcas5p17;
+	Tue, 10 Sep 2024 09:26:06 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.176]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4X2yxS43Btz4x9Pp; Tue, 10 Sep
+	2024 09:26:04 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	7D.F0.09640.CA010E66; Tue, 10 Sep 2024 18:26:04 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240910092604epcas5p4d01dec7422c7990882f6453c52a78075~z185-cxiQ0887908879epcas5p42;
+	Tue, 10 Sep 2024 09:26:04 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240910092604epsmtrp2fa22a8c1a088d03d2222bc0993458c5d~z1859dXm12757627576epsmtrp2k;
+	Tue, 10 Sep 2024 09:26:04 +0000 (GMT)
+X-AuditID: b6c32a49-aabb8700000025a8-d8-66e010ac0e90
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	80.E9.19367.BA010E66; Tue, 10 Sep 2024 18:26:03 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240910092559epsmtip21e15ace98c8e2bda39a2dbad69522f80~z182IcM510197501975epsmtip2l;
+	Tue, 10 Sep 2024 09:25:59 +0000 (GMT)
+Message-ID: <c9289a2f-ecb3-7e3e-c5d9-336ce2bc09a7@samsung.com>
+Date: Tue, 10 Sep 2024 14:55:58 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v4 5/5] nvme: enable FDP support
+Content-Language: en-US
+To: Keith Busch <kbusch@kernel.org>
+Cc: axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+	martin.petersen@oracle.com, James.Bottomley@hansenpartnership.com,
+	brauner@kernel.org, jack@suse.cz, jaegeuk@kernel.org, jlayton@kernel.org,
+	chuck.lever@oracle.com, bvanassche@acm.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com, Nitesh
+	Shetty <nj.shetty@samsung.com>, Hui Qi <hui81.qi@samsung.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <ZtsoGX2QY-TjBolb@kbusch-mbp.mynextlight.net>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTdxTHdx+0hVFzLa8fZBtd2SNgoJSVekHp3GzYZS4Gh0BituAdvTwC
+	fdDbTpxLqKIyMcDEANIhrRQwgBuKhMeQBMsYMmCQIQM72+Eom0gcCFsmoLCWyxj/fc7J+Z5n
+	DgfhnWQHcDKVWkqjJLMFLA+0rTf4zdBr2FRa+JT1JbzJVsLC53oXIbx8YRnB121/wPi9nk4Y
+	b2jqg/HO+q/Z+FcV+TDuaDYg+I0SDj59f4mNL9c3svFSy88Q3m3dhf9U8x5+q3sAxY31M2z8
+	/EQHC7/avwbjbatGBP9mbh7FRwxV7H2+xNjdA8SI/QZKlJf+wCLGhnVES+M5FnGzNo/oMi3B
+	RNc9PYt4MmNFieLWRogYMn3HJpZaXon3PJK1N4Mi5ZSGTylTVfJMZXqM4EBCyv6USEm4KFQU
+	he8W8JWkgooRyD6ID43NzHaOK+B/SmbrnK54kqYFQulejUqnpfgZKlobI6DU8my1WB1Gkwpa
+	p0wPU1LaaFF4eESkM/BoVkb/chtL3eSZe350ma2HTnkUQu4cgIlBa8EcqxDy4PCwLghcrbmL
+	MMYiBEZbpt22jOqyGmcYZ0NSvw4z/k4IrDZc2VQ8hoDd2uTmysvFpOB5tx51CVDsdTDRe4hx
+	7wQDlQ7UxT7YJ2BlvApysZcz58SdecTFCOYHrA4j7GJvLAjYjJUbTSCYGQWPisxurpwsLBiM
+	XtS50B2LBhfOHGakgaD9cdVGOwAzu4PLD6/AzJgyUDfdjjLsBR71t7IZDgBLf3azGM4CU79N
+	bcZ8DjpuFrsx/DbQP5vcKIs4yzZ/K2Rq7QBFqw6YWQkXfHGWx0S/CuylM5tKP/DgUu0mE6C5
+	/nt4a1PdFxeQLyG+YdtWDNumN2wbx/B/ZROENkL+lJpWpFN0pFqkpI5tnTtVpWiBNn4hJK4D
+	sk0thFkgmANZIMBBBN7cEqk9jceVk8c/ozSqFI0um6ItUKTzOheQAJ9UlfOZlNoUkTgqXCyR
+	SMRRb0lEAj/u3JnLch6WTmqpLIpSU5r/dDDHPUAPF/FrM6JNtz3gyhz2eM2Hg++/VpFqNuV4
+	7RdGhvpOJyKZytv5J+IjZMWri4qQuOqRfcefNu9e6zPGkrRF+8vfpqDcPfNnf3VP9JUW+2PU
+	scDFAfmh5GdlUqHu3QTzuI+DJqnTuuv5wbs4CUkVEfOZt+pGhx5U+x+U3RmOO7ocBj/sseZO
+	KJJmV/4C92fLn58IMa69EHXYS2y+jj6VJmi8n9jqftyTY2jP66FnT5+C1Od2SB3J3KDYl6Vl
+	oncC7dcGFiryFtKEicO8Urde2ZEXbQ3W9TH9P5aCWnPL74OKjwomgyYLjXYVKyZp9WRJ8seI
+	4g3P/IMBK8I+yaXBnb1DApTOIEUhiIYm/wVws0vWlAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrJIsWRmVeSWpSXmKPExsWy7bCSvO5qgQdpBvcm2VisvtvPZvH68CdG
+	i2kffjJb/L/7nMni5oGdTBYrVx9lsti5bC27xezpzUwWT9bPYrbY2M9h8fjOZ3aLn8tWsVtM
+	OnSN0WLvLW2LS4vcLfbsPcliMX/ZU3aL7us72CyWH//HZLHt93xmi3Wv37NYnJ81h91BzOPy
+	FW+P8/c2snhMm3SKzePy2VKPTas62Tw2L6n32L3gM5PH7psNbB4fn95i8ejbsorR48yCI+we
+	nzfJBfBEcdmkpOZklqUW6dslcGUc/7mNrWA1T0X3hZ/sDYxNXF2MHBwSAiYSy/4zdTFycQgJ
+	bGeU+Dipn7GLkRMoLi7RfO0HO4QtLLHy33N2iKLXjBLTzv1iBknwCthJ/N3bwAIyiEVAVeL6
+	4UCIsKDEyZlPWEBsUYEkiT33G5lAbGGgXddPvAdrZQaaf+vJfLC4iICyxN35M1lB5jMLLGaR
+	2LRxGxvEsreMElM3XmADWcAmoClxYXIpiMkpYCUxsTUEYo6ZRNfWLkYIW15i+9s5zBMYhWYh
+	OWMWknWzkLTMQtKygJFlFaNoakFxbnpucoGhXnFibnFpXrpecn7uJkZw7GsF7WBctv6v3iFG
+	Jg7GQ4wSHMxKIrz9dvfShHhTEiurUovy44tKc1KLDzFKc7AoifMq53SmCAmkJ5akZqemFqQW
+	wWSZODilGph2m7ya35ot5KP/YYb6hKd5wsctNNOaz+lnb2Fry96Rd13xnb5VcnLw+wM/z7v5
+	3A1z3HYjc+pNA5eOJH/2Lf/+52hUT+BcU2vYlu/xzWyv+SPpcot/k9LZpIzW3dgUfWfbllXV
+	h7rkhSZe10q4duqRRJxgvS0nu9QnEcl7whOL5mpGvLyuUBRw0zzSXPl0RXffckP9/bebOL/e
+	rT6/wu7y7efzNPfkbFqTGCkrfP69UVVQ/svtn79VXG+5kS/Bl5D3RatH21yzzcomI3WOTYtX
+	Lc80q4NXXumcMO1dLn3yPI941ZwV7z+bO52333cieVOjY9+FBw1XHsg55LzT5Tq7YobzRu8X
+	LM6zVcz99iqxFGckGmoxFxUnAgBTa/iJbAMAAA==
+X-CMS-MailID: 20240910092604epcas5p4d01dec7422c7990882f6453c52a78075
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240826171430epcas5p3d8e34a266ced7b3ea0df2a11b83292ae
+References: <20240826170606.255718-1-joshi.k@samsung.com>
+	<CGME20240826171430epcas5p3d8e34a266ced7b3ea0df2a11b83292ae@epcas5p3.samsung.com>
+	<20240826170606.255718-6-joshi.k@samsung.com>
+	<ZtsoGX2QY-TjBolb@kbusch-mbp.mynextlight.net>
 
-From: Song Chen <chensong_2000@189.cn>
+On 9/6/2024 9:34 PM, Keith Busch wrote:
+> On Mon, Aug 26, 2024 at 10:36:06PM +0530, Kanchan Joshi wrote:
+>> Flexible Data Placement (FDP), as ratified in TP 4146a, allows the host
+>> to control the placement of logical blocks so as to reduce the SSD WAF.
+>>
+>> Userspace can send the data placement information using the write hints.
+>> Fetch the placement-identifiers if the device supports FDP.
+>>
+>> The incoming placement hint is mapped to a placement-identifier, which
+>> in turn is set in the DSPEC field of the write command.
+>>
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>> Signed-off-by: Hui Qi <hui81.qi@samsung.com>
+> 
+> I'm still fine with this nvme implementation.
+> 
+> Acked-by: Keith Busch <kbusch@kernel.org>
+> 
+> The reporting via fcntl looks okay to me, but I've never added anything
+> to that interface, so not sure if there's any problem using it for this.
+> 
 
-Below functions in blk-rq.qos.c have similar behaviors:
-	__rq_qos_cleanup
-	__rq_qos_done
-	__rq_qos_issue
-	__rq_qos_requeue
-	__rq_qos_throttle
-	__rq_qos_track
-	__rq_qos_merge
-	__rq_qos_done_bio
-	__rq_qos_queue_depth_changed
+The difference comes only in the fcntl interface (hint type/value pair 
+rather than just value), otherwise it piggybacks on the same kernel 
+infrastructure that ensures the hint is propagated fine. So I do not 
+foresee problems.
 
-Those functions traverse rq_qos in request_queue and call callback function
-in rq_qos_ops if it exists.
+And FWIW, we have had precedents when a revamped fcntl was introduced to 
+do what was not possible with the existing fcntl. Like: 
+F_{GET/SET}OWN_EX over F_{GET/SET}OWN.
 
-This patch removes those duplicated code and abstract it in a helper macro
-RQ_QOS_FN.
-
-Signed-off-by: Song Chen <chensong_2000@189.cn>
----
- block/blk-rq-qos.c | 88 ++--------------------------------------------
- block/blk-rq-qos.h | 39 ++++++++++----------
- 2 files changed, 23 insertions(+), 104 deletions(-)
-
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index dd7310c94713..c41f314ab024 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -23,87 +23,6 @@ bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
- 	return atomic_inc_below(&rq_wait->inflight, limit);
- }
- 
--void __rq_qos_cleanup(struct rq_qos *rqos, struct bio *bio)
--{
--	do {
--		if (rqos->ops->cleanup)
--			rqos->ops->cleanup(rqos, bio);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_done(struct rq_qos *rqos, struct request *rq)
--{
--	do {
--		if (rqos->ops->done)
--			rqos->ops->done(rqos, rq);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_issue(struct rq_qos *rqos, struct request *rq)
--{
--	do {
--		if (rqos->ops->issue)
--			rqos->ops->issue(rqos, rq);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq)
--{
--	do {
--		if (rqos->ops->requeue)
--			rqos->ops->requeue(rqos, rq);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio)
--{
--	do {
--		if (rqos->ops->throttle)
--			rqos->ops->throttle(rqos, bio);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio)
--{
--	do {
--		if (rqos->ops->track)
--			rqos->ops->track(rqos, rq, bio);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio)
--{
--	do {
--		if (rqos->ops->merge)
--			rqos->ops->merge(rqos, rq, bio);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio)
--{
--	do {
--		if (rqos->ops->done_bio)
--			rqos->ops->done_bio(rqos, bio);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
--void __rq_qos_queue_depth_changed(struct rq_qos *rqos)
--{
--	do {
--		if (rqos->ops->queue_depth_changed)
--			rqos->ops->queue_depth_changed(rqos);
--		rqos = rqos->next;
--	} while (rqos);
--}
--
- /*
-  * Return true, if we can't increase the depth further by scaling
-  */
-@@ -288,12 +207,11 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 
- void rq_qos_exit(struct request_queue *q)
- {
-+	struct rq_qos *rqos;
-+
- 	mutex_lock(&q->rq_qos_mutex);
--	while (q->rq_qos) {
--		struct rq_qos *rqos = q->rq_qos;
--		q->rq_qos = rqos->next;
-+	for_each_rqos(rqos, q)
- 		rqos->ops->exit(rqos);
--	}
- 	mutex_unlock(&q->rq_qos_mutex);
- }
- 
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 37245c97ee61..0f22669dce68 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -58,11 +58,14 @@ struct rq_depth {
- 	unsigned int default_depth;
- };
- 
-+#define for_each_rqos(rqos, q)	\
-+	for (rqos = q->rq_qos; rqos; rqos = rqos->next)
-+
- static inline struct rq_qos *rq_qos_id(struct request_queue *q,
- 				       enum rq_qos_id id)
- {
- 	struct rq_qos *rqos;
--	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	for_each_rqos(rqos, q) {
- 		if (rqos->id == id)
- 			break;
- 	}
-@@ -100,38 +103,36 @@ bool rq_depth_scale_up(struct rq_depth *rqd);
- bool rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle);
- bool rq_depth_calc_max_depth(struct rq_depth *rqd);
- 
--void __rq_qos_cleanup(struct rq_qos *rqos, struct bio *bio);
--void __rq_qos_done(struct rq_qos *rqos, struct request *rq);
--void __rq_qos_issue(struct rq_qos *rqos, struct request *rq);
--void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq);
--void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
--void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
--void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
--void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
--void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
-+#define RQ_QOS_FN(q, fn, ...)	\
-+	do {	\
-+		struct rq_qos *rqos;	\
-+		for_each_rqos(rqos, q)	\
-+			if (rqos->ops->fn)	\
-+				rqos->ops->fn(rqos, ##__VA_ARGS__);	\
-+	} while (0)
- 
- static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
- {
- 	if (q->rq_qos)
--		__rq_qos_cleanup(q->rq_qos, bio);
-+		RQ_QOS_FN(q, cleanup, bio);
- }
- 
- static inline void rq_qos_done(struct request_queue *q, struct request *rq)
- {
- 	if (q->rq_qos && !blk_rq_is_passthrough(rq))
--		__rq_qos_done(q->rq_qos, rq);
-+		RQ_QOS_FN(q, done, rq);
- }
- 
- static inline void rq_qos_issue(struct request_queue *q, struct request *rq)
- {
- 	if (q->rq_qos)
--		__rq_qos_issue(q->rq_qos, rq);
-+		RQ_QOS_FN(q, issue, rq);
- }
- 
- static inline void rq_qos_requeue(struct request_queue *q, struct request *rq)
- {
- 	if (q->rq_qos)
--		__rq_qos_requeue(q->rq_qos, rq);
-+		RQ_QOS_FN(q, requeue, rq);
- }
- 
- static inline void rq_qos_done_bio(struct bio *bio)
-@@ -140,7 +141,7 @@ static inline void rq_qos_done_bio(struct bio *bio)
- 			     bio_flagged(bio, BIO_QOS_MERGED))) {
- 		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 		if (q->rq_qos)
--			__rq_qos_done_bio(q->rq_qos, bio);
-+			RQ_QOS_FN(q, done_bio, bio);
- 	}
- }
- 
-@@ -148,7 +149,7 @@ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- {
- 	if (q->rq_qos) {
- 		bio_set_flag(bio, BIO_QOS_THROTTLED);
--		__rq_qos_throttle(q->rq_qos, bio);
-+		RQ_QOS_FN(q, throttle, bio);
- 	}
- }
- 
-@@ -156,7 +157,7 @@ static inline void rq_qos_track(struct request_queue *q, struct request *rq,
- 				struct bio *bio)
- {
- 	if (q->rq_qos)
--		__rq_qos_track(q->rq_qos, rq, bio);
-+		RQ_QOS_FN(q, track, rq, bio);
- }
- 
- static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
-@@ -164,14 +165,14 @@ static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
- {
- 	if (q->rq_qos) {
- 		bio_set_flag(bio, BIO_QOS_MERGED);
--		__rq_qos_merge(q->rq_qos, rq, bio);
-+		RQ_QOS_FN(q, merge, rq, bio);
- 	}
- }
- 
- static inline void rq_qos_queue_depth_changed(struct request_queue *q)
- {
- 	if (q->rq_qos)
--		__rq_qos_queue_depth_changed(q->rq_qos);
-+		RQ_QOS_FN(q, queue_depth_changed);
- }
- 
- void rq_qos_exit(struct request_queue *);
--- 
-2.34.1
-
+Per-file hinting has its uses, particularly for buffered IO. But the 
+current interface can only do data-lifetime hints. The revamped 
+interface may come handy for other things too (e.g., KPIO).
