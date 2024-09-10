@@ -1,59 +1,59 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E42524B4;
-	Tue, 10 Sep 2024 13:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C525757EB
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 13:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725973950; cv=none; b=oFs+9GnC5Zr59cqHfUYPE8VAs/YtqA4IEkj+S4xVJ+LbdAWA7KVaCAixzeReJfQk0A+AloDpKzYnnJF7GarcI18HrstYZFeVnDsS/3/caSmkM8q41BJz2pgwc8wfRUdzHZJWEtRey9U0M6jJfw8b/w2T6mEcmQLQ8/7Q05HCAyE=
+	t=1725974256; cv=none; b=TKHgpkq0wUUD7HSs3AC+/Wdqr0q1H5DoDdZW/J7GZY7yVWQqTfSTnSDTX+dlHDqSPSXPtdHvMjKIhyy/GP5B9OlEez3UETLT2Dedw4P0UEnkWEbOFdciwyRL0pa3q/YNRAvc2vZ8VNcp5+ZKV8CZJrO2Ae/Wq8JXXJyro5P3w2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725973950; c=relaxed/simple;
-	bh=6FZh9PrgZbdKU2iYVPACRsatwjq6CV5cbevBKcmsQBk=;
+	s=arc-20240116; t=1725974256; c=relaxed/simple;
+	bh=rElpwe74QCdlkppKx+/nrl9b08LTiSv9pKFzn9ku2nc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cSwoQidn4UOr/sjgxFHg6yQTB08QCz8cl1FYa9dZis6cyOMXNYeA+zMOKAXpQUmc5NaY4+Al/cioCp340EwiYKHVI2cpI94AfAYIb9+bSGI3vs7z+4sp9dJjZp5jBPUxIlMc+0v9oXRu8B75WKVmzAous+qJ3dhpMCoU7XCSpyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hjii7mt6; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=k792cRc6FeUXONKhSA3Kwf67BEIUwwSYKhNV44dYVLsSjMux5ue2aRQ6IZux4QLkPnGND4bVYzMf6yFVClPh99jTjXCwSF9z7MfcoyAhRqYqcbb72nV8UtlZ/bUdYbHWfbFBwwedsQFwcet5yzSPVwjF34m3Aa66QbkKer3qnjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xWBGKbdJ; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hjii7mt6"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5c275491c61so6858283a12.0;
-        Tue, 10 Sep 2024 06:12:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xWBGKbdJ"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-82cdadeeb2eso143645639f.2
+        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 06:17:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725973947; x=1726578747; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725974252; x=1726579052; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=11AIdOA7zCRdw1DcFC14ilrN+2IcxyqHRTjwx5zddCY=;
-        b=Hjii7mt6HCJrWUOe937X0chfWtd3Dipef/78wTfS/DVuFYBSCwh3Zf72MTZcoyRSuR
-         pJdWhldAHlIuw8oaNbSZzBMjydJUNpRucwm2+04YH0vQF9PT0ThzcI+EIjlaB5f0h7qI
-         uWaiqgYXTJfX18F1H+N2a01ZKBQGGTUS2W4WQTc8qrEeypLg5dTHuBLP0vieQ544puVq
-         UZZBdZYGm5iLfH8EWtXpvdpVLd3OofWWXEROLuZedRkwEU/7zgjw9FKSE5EfAaygGrpw
-         a4HEsyo1Oc5sN75/Vg1SE0cixQfueO2KU0PDvhiKoSUSOw6WDB4OAg/oag0wZNsMWb7E
-         rzRg==
+        bh=bpD4HVzD9Ke7dsGx30VPgTZhr78oR5oyb23tn64z8zE=;
+        b=xWBGKbdJ2J/1CDF+P/sXVYKNEJt3Q/70tGAkgOqs2Hyua1+QzZh7YmPpTa0oy6xZus
+         347j7c3HqIUsGL11OrQYC0rBXb1poSbi1eMj+YPQYgHhI3iogN9P9PS6eWIW0Yjky/oW
+         M9xb7EuJLhhML3WD3yba7iQM8PoA/TExvSLThLKoCzqIuxv28pHNlBTYs2Ukx4PYzxRv
+         sjLUKhekijddatC7hSOi6QEXjmHI9oaTChPLY2y/h77ue59zi3Z8Z1BmGZi0bTNJgFzb
+         +LpNnlmmQe/rJDUEwBJ6lknYYcZxSqpKkHYwV5dE+n96DZai0Sm7E8J6DVhmc3wGQruS
+         rhPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725973947; x=1726578747;
+        d=1e100.net; s=20230601; t=1725974252; x=1726579052;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=11AIdOA7zCRdw1DcFC14ilrN+2IcxyqHRTjwx5zddCY=;
-        b=k9iF9IioLqqBP9yDiQrg24WhrXbor5VtYfN074A8DqLuKy4y8HHFWW/KLrcsYiE4xT
-         soAWz208jWVXeSABOLNfLlR+QhazRZu5OzSZawyIPq2DhWz9kg/OHGJgspQAGU69v1Wq
-         RkcDqgps2lGueNzMFtzYRzv9cSCkUlD0Rw8HENO/qbE/1tKHaAiDChdCWFaHr3PUa/3v
-         wmcwztBGwzFzW5K7vUH4SIhtSszQNdMUF/1ynlrCJRVhk9+dU6IUbuKfz3HXAxfKjk2h
-         8JPyngCeZRLNoIy3j/XuxwhbBpmB08A7UllPhpIXxGBn7qAwB/vPS9eF8VQIFgLb8MfC
-         2DOw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6vWaZmW/xx2cNgFZSOFUpRy5fetEkKmeOgcnUjo271br1MxOK7qybXRvV0wkHxC7xjxcmYYZM9A==@vger.kernel.org, AJvYcCXc+vKjlp/APBvjgIgHLc69CCRc+ZvnENlL2SHw1QvwgqIFlP+TIuhNateMDoQEXfhW0uArW6H16DjRxog=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEvRkIOL9LoimgNo/jvY99v8MaMh+X0sLjA1MM/xXBu0qDTFWV
-	c7GuvvtScAxIvQBqqxv0ZPRdgUrPDfFJcoxx+uhpm+UPvsDE0MI/
-X-Google-Smtp-Source: AGHT+IFCgBUqWWH+b5W/+hc9i68lO9+yrKJlEhm8eXVvrLwvTDGcB/3ZpfK71dv2BK9pn3RnXAk/ZQ==
-X-Received: by 2002:a05:6402:1d4d:b0:5c4:95d:da34 with SMTP id 4fb4d7f45d1cf-5c4095ddb7cmr862617a12.26.1725973946632;
-        Tue, 10 Sep 2024 06:12:26 -0700 (PDT)
-Received: from [192.168.42.252] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd41ba7sm4280604a12.4.2024.09.10.06.12.26
+        bh=bpD4HVzD9Ke7dsGx30VPgTZhr78oR5oyb23tn64z8zE=;
+        b=s7vRkfCVCVLup1b5eYo1UsNf/x2hmw90uQxfOPbKTIccfueW2pxdQviAxUgnW/zk9v
+         uYpn6riX97CfQ9mStrHFCn2JWmYCa9/A/rv1Hp+pB4cDSvtN2X1xk/IRd959Asl8jaCz
+         5t8U/4VV69dT7bbTh/6QUK1SRRBhUkf4X7BWosRvQZFvdvun0ycOBwIsN/522I7rFHx5
+         iNplMUSrg0o9698TqikQWV2Ip/eIwkVdMs5JcKYlCBfm+QiHhWGikCz7X2ohYY+p/mZH
+         9L7jcitY1Pnv/oovHMq6fmp1ZlBpJwQIdfJvPdBmRXBpC+fPqFxiZ7gcOzXApa2/xceC
+         gtlw==
+X-Gm-Message-State: AOJu0YxvhR2DpJeSbO4nwOL82LjMwsIhPaqvl6okGRrTJlr+NppqaiKj
+	OwIq0U8kUpPW/UovMaHreOwPkoQwegE2OvLqPiZ1Zqisc1ZZhLb/1RnnHBs6Ok0QhMrDGlzb02c
+	o
+X-Google-Smtp-Source: AGHT+IGfyK24HYfbbx9rnx5YqzuHbqBuNQFAY7I1lFziboEeJC6YZXRSh2213qMBbZThLW4sVWXvqw==
+X-Received: by 2002:a05:6e02:194e:b0:3a0:4355:11f7 with SMTP id e9e14a558f8ab-3a0576adeddmr107270105ab.17.1725974252303;
+        Tue, 10 Sep 2024 06:17:32 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d1ff20867csm456359173.167.2024.09.10.06.17.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 06:12:26 -0700 (PDT)
-Message-ID: <7050796e-be88-4e01-abdb-976baba2f83b@gmail.com>
-Date: Tue, 10 Sep 2024 14:12:53 +0100
+        Tue, 10 Sep 2024 06:17:31 -0700 (PDT)
+Message-ID: <0e4e1f5a-30fd-430b-99ec-8b1004d8e3fd@kernel.dk>
+Date: Tue, 10 Sep 2024 07:17:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,208 +61,49 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 4/8] io_uring: support SQE group
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-References: <20240808162503.345913-1-ming.lei@redhat.com>
- <20240808162503.345913-5-ming.lei@redhat.com>
- <3c819871-7ca3-47ea-b752-c4a8a49f8304@gmail.com> <Zs/5Hpi16aQKlHFw@fedora>
- <36ae357b-bebe-4276-a8db-d6dccf227b61@gmail.com> <ZtweiCfLOJmdeY0Z@fedora>
+Subject: Re: [PATCH v2 1/3] block: fix missing dispatching request when queue
+ is started or unquiesced
+To: Muchun Song <songmuchun@bytedance.com>, ming.lei@redhat.com,
+ yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ muchun.song@linux.dev, stable@vger.kernel.org
+References: <20240903081653.65613-1-songmuchun@bytedance.com>
+ <20240903081653.65613-2-songmuchun@bytedance.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZtweiCfLOJmdeY0Z@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240903081653.65613-2-songmuchun@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 9/7/24 10:36, Ming Lei wrote:
-...
->>> Wrt. ublk, group provides zero copy, and the ublk io(group) is generic
->>> IO, sometime IO_LINK is really needed & helpful, such as in ublk-nbd,
->>> send(tcp) requests need to be linked & zc. And we shouldn't limit IO_LINK
->>> for generic io_uring IO.
->>>
->>>> from nuances as such, which would be quite hard to track, the semantics
->>>> of IOSQE_CQE_SKIP_SUCCESS is unclear.
->>>
->>> IO group just follows every normal request.
->>
->> It tries to mimic but groups don't and essentially can't do it the
->> same way, at least in some aspects. E.g. IOSQE_CQE_SKIP_SUCCESS
->> usually means that all following will be silenced. What if a
->> member is CQE_SKIP, should it stop the leader from posting a CQE?
->> And whatever the answer is, it'll be different from the link's
->> behaviour.
+On 9/3/24 2:16 AM, Muchun Song wrote:
+> Supposing the following scenario with a virtio_blk driver.
 > 
-> Here it looks easier than link's:
+> CPU0                                    CPU1                                    CPU2
 > 
-> - only leader's IOSQE_CQE_SKIP_SUCCESS follows linked request's rule
-> - all members just respects the flag for its own, and not related with
-> leader's
+> blk_mq_try_issue_directly()
+>     __blk_mq_issue_directly()
+>         q->mq_ops->queue_rq()
+>             virtio_queue_rq()
+>                 blk_mq_stop_hw_queue()
+>                                         blk_mq_try_issue_directly()             virtblk_done()
+>                                             if (blk_mq_hctx_stopped())
+>     blk_mq_request_bypass_insert()                                                  blk_mq_start_stopped_hw_queue()
+>     blk_mq_run_hw_queue()                                                               blk_mq_run_hw_queue()
+>                                                 blk_mq_insert_request()
+>                                                 return // Who is responsible for dispatching this IO request?
 > 
->>
->> Regardless, let's forbid IOSQE_CQE_SKIP_SUCCESS and linked timeouts
->> for groups, that can be discussed afterwards.
-> 
-> It should easy to forbid IOSQE_CQE_SKIP_SUCCESS which is per-sqe, will do
-> it in V6.
-> 
-> I am not sure if it is easy to disallow IORING_OP_LINK_TIMEOUT, which
-> covers all linked sqes, and group leader could be just one of them.
-> Can you share any idea about the implementation to forbid LINK_TIMEOUT
-> for sqe group?
+> After CPU0 has marked the queue as stopped, CPU1 will see the queue is stopped.
+> But before CPU1 puts the request on the dispatch list, CPU2 receives the interrupt
+> of completion of request, so it will run the hardware queue and marks the queue
+> as non-stopped. Meanwhile, CPU1 also runs the same hardware queue. After both CPU1
+> and CPU2 complete blk_mq_run_hw_queue(), CPU1 just puts the request to the same
+> hardware queue and returns. It misses dispatching a request. Fix it by running
+> the hardware queue explicitly. And blk_mq_request_issue_directly() should handle
+> a similar situation. Fix it as well.
 
-diff --git a/io_uring/timeout.c b/io_uring/timeout.c
-index 671d6093bf36..83b5fd64b4e9 100644
---- a/io_uring/timeout.c
-+++ b/io_uring/timeout.c
-@@ -542,6 +542,9 @@ static int __io_timeout_prep(struct io_kiocb *req,
-  	data->mode = io_translate_timeout_mode(flags);
-  	hrtimer_init(&data->timer, io_timeout_get_clock(data), data->mode);
-  
-+	if (is_timeout_link && req->ctx->submit_state.group.head)
-+		return -EINVAL;
-+
-  	if (is_timeout_link) {
-  		struct io_submit_link *link = &req->ctx->submit_state.link;
-  
-
-This should do, they already look into the ctx's link list. Just move
-it into the "if (is_timeout_link)" block.
-
-
->>> 1) fail in linked chain
->>> - follows IO_LINK's behavior since io_fail_links() covers io group
->>>
->>> 2) otherwise
->>> - just respect IOSQE_CQE_SKIP_SUCCESS
->>>
->>>> And also it doen't work with IORING_OP_LINK_TIMEOUT.
->>>
->>> REQ_F_LINK_TIMEOUT can work on whole group(or group leader) only, and I
->>> will document it in V6.
->>
->> It would still be troublesome. When a linked timeout fires it searches
->> for the request it's attached to and cancels it, however, group leaders
->> that queued up their members are discoverable. But let's say you can find
->> them in some way, then the only sensbile thing to do is cancel members,
->> which should be doable by checking req->grp_leader, but might be easier
->> to leave it to follow up patches.
-> 
-> We have changed sqe group to start queuing members after leader is
-> completed. link timeout will cancel leader with all its members via
-> leader->grp_link, this behavior should respect IORING_OP_LINK_TIMEOUT
-> completely.
-> 
-> Please see io_fail_links() and io_cancel_group_members().
-> 
->>
->>
->>>>> +
->>>>> +		lead->grp_refs += 1;
->>>>> +		group->last->grp_link = req;
->>>>> +		group->last = req;
->>>>> +
->>>>> +		if (req->flags & REQ_F_SQE_GROUP)
->>>>> +			return NULL;
->>>>> +
->>>>> +		req->grp_link = NULL;
->>>>> +		req->flags |= REQ_F_SQE_GROUP;
->>>>> +		group->head = NULL;
->>>>> +		if (lead->flags & REQ_F_FAIL) {
->>>>> +			io_queue_sqe_fallback(lead);
->>>>
->>>> Let's say the group was in the middle of a link, it'll
->>>> complete that group and continue with assembling / executing
->>>> the link when it should've failed it and honoured the
->>>> request order.
->>>
->>> OK, here we can simply remove the above two lines, and link submit
->>> state can handle this failure in link chain.
->>
->> If you just delete then nobody would check for REQ_F_FAIL and
->> fail the request.
-> 
-> io_link_assembling() & io_link_sqe() checks for REQ_F_FAIL and call
-> io_queue_sqe_fallback() either if it is in link chain or
-> not.
-
-The case we're talking about is failing a group, which is
-also in the middle of a link.
-
-LINK_HEAD -> {GROUP_LEAD, GROUP_MEMBER}
-
-Let's say GROUP_MEMBER fails and sets REQ_F_FAIL to the lead,
-then in v5 does:
-
-if (lead->flags & REQ_F_FAIL) {
-	io_queue_sqe_fallback(lead);
-	return NULL;
-}
-
-In which case it posts cqes for GROUP_LEAD and GROUP_MEMBER,
-and then try to execute LINK_HEAD (without failing it), which
-is wrong. So first we need:
-
-if (state.linked_link.head)
-	req_fail_link_node(state.linked_link.head);
-
-And then we can't just remove io_queue_sqe_fallback(), because
-when a group is not linked there would be no io_link_sqe()
-to fail it. You can do:
-
-
-io_group_sqe()
-{
-	if ((lead->flags & REQ_F_FAIL) && !ctx->state.link.head) {
-		io_queue_sqe_fallback(lead);
-		return NULL;
-	}
-	...
-}
-
-but it's much cleaner to move REQ_F_FAIL out of group assembling.
-We'd also want to move same REQ_F_FAIL / io_queue_sqe_fallback()
-out of io_link_sqe(), but I didn't mentioned because it's not
-strictly required for your set AFAIR.
-
-
->> Assuming you'd also set the fail flag to the
->> link head when appropriate, how about deleting these two line
->> and do like below? (can be further prettified)
->>
->>
->> bool io_group_assembling()
->> {
->> 	return state->group.head || (req->flags & REQ_F_SQE_GROUP);
->> }
->> bool io_link_assembling()
->> {
->> 	return state->link.head || (req->flags & IO_REQ_LINK_FLAGS);
->> }
->>
->> static inline int io_submit_sqe()
->> {
->> 	...
->> 	if (unlikely(io_link_assembling(state, req) ||
->> 				 io_group_assembling(state, req) ||
->> 				 req->flags & REQ_F_FAIL)) {
->> 		if (io_group_assembling(state, req)) {
->> 			req = io_group_sqe(&state->group, req);
->> 			if (!req)
->> 				return 0;
->> 		}
->> 		if (io_link_assembling(state, req)) {
->> 			req = io_link_sqe(&state->link, req);
->> 			if (!req)
->> 				return 0;
->> 		}
->> 		if (req->flags & REQ_F_FAIL) {
->> 			io_queue_sqe_fallback(req);
->> 			return 0;
-> 
-> As I mentioned above, io_link_assembling() & io_link_sqe() covers
-> the failure handling.
+Patch looks fine, but this commit message is waaaaay too wide. Please
+limit it to 72-74 chars. The above ordering is diagram is going to
+otherwise be unreadable in a git log viewing in a terminal.
 
 -- 
-Pavel Begunkov
+Jens Axboe
