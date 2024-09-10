@@ -1,58 +1,58 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBA218D640
-	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 13:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CB118CBE0
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 13:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725974540; cv=none; b=AqT7oElkqW7rG3oLZI3jg8U2y8ZInAQ5nklKaMLbOVyqLny3fZcfSFe2VkIR5hjQU5VcCnbbKsakyrY4nPUIdCiwYMk1RPj+JtVmT/ByvidY1IkMnzYfXTvs3Giq0yC2xHtLJYGmKNMaEpIRwAkX/vW7fy2uxDBn28FvOBlihKQ=
+	t=1725974576; cv=none; b=rRoL6J+tNuQgTuoFNcduMH4Xww6VEVr6Mv0c8e26lR8eRA8GqKOZV5JTWACGRALm4xdBgWo/n5PYHFJeqyZr4XeiPCaCUdPzasJkQMl2C6aCnGjNDN3SlpYn9o4sbm3gIr8+8mdAtShIiLyrf1vLkqrfC8fokDBZZ4uS8y7j3jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725974540; c=relaxed/simple;
-	bh=deRKyH3f6+NKtnRTdaKPmr3pYmPE5cboc2WOMy0EHUk=;
+	s=arc-20240116; t=1725974576; c=relaxed/simple;
+	bh=f3PKTxtggDOgToEGYYGgjQ0uDntcy+Y/oFBGor32rWA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fd8O0XM3S+TJlUlc60AGbsXVvYyaSEnQSMF0A6qUboLoRX1zY/ZBdNJ711lzFXwExLdxH7Go6ebnHSNg77xg7v1t+JL0gzEpAGz/Ncw/Zxxnz2giUx15GJIe0Jgf3VFY+Mx7IsqkzL9xtn/hbYSXQ2O2vEDYqzj7q10JjaM+XWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CQM5Gegt; arc=none smtp.client-ip=209.85.166.49
+	 In-Reply-To:Content-Type; b=IxFySB1grMTk9AWxATQAYb3I0pCdVH2zUpLlLFC6VOTRP35D5TeKeIGDfnwIoo+VUsQ5UQ+VgaZEIuv5ZxmGmqGu67ft/yH/FjKbUYkSLv7Ns2ZbiPTwJDZbxVzNyYme74lyGSF1kkCqCpAex2YuyXtLFT3UfghXh3ddIBs3pFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Wjqq6YcI; arc=none smtp.client-ip=209.85.166.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CQM5Gegt"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-82ce1cd202cso38358939f.0
-        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 06:22:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Wjqq6YcI"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-39d3cd4fa49so18592525ab.1
+        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 06:22:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725974538; x=1726579338; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725974574; x=1726579374; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=bj56BQt9ZSzV0CrSCRpKEAjflySC2ncoGghlooYLTWU=;
-        b=CQM5Gegt6FYiLtDD6/7i1b0GDgWgP034WLtT0SIJfqfJ7O3jn6nqn1NarLtIOYLLz0
-         ZS0or9c3G1/x3YWgeJFuIV++RvPLfeow6laHFlco8Qeg3kIe14Usp2pNm3+sXBhwzopP
-         MCSVPx6341ff5Elt00nBCVShxfb+vcREpHo18a7zMCmX5bZKYJ+c1dxHnYQwQPjOHWRj
-         AphkHfarSBq6hcwvyDNXeJnSLpx+1akqVyO8ncBqaucH8awpZNiCSlvh1l5tWb8tC9v7
-         09T6QLt/NerCNK3R62JlP2L0/y0PqB/n21X4qiEq2niqiFDLgFQQV927bBR1JCzOwicO
-         G2/A==
+        bh=Zsz2DawbKokjmCBHoMj/5IgWeYCvivyMxUGL8HZEg8Y=;
+        b=Wjqq6YcIwekcYIUP82qaSo5KJRNUo/vaoYe6mbB4Gu5qDpHtmn0ea0wKVoaxC2jrr2
+         CgTE9MRUyj0jkMbwTmFHAGpNwWZ75opRaDmCbdrzWhOIO8FxGLEPj0pZZEtJ3LZQ/RZb
+         77obYaHF8oEuyOQgTU3zgmlOENzKP74hYg9dxc0Pzrp4Mw2q/w+tN7RoC27wZcZBNqtf
+         brnMkgUH8kOZMvFp/BVyUt1RMCsQPeMGQNm1emjrSV68iOnsnWg4v6DNel9tt2YN4ZO2
+         QFeKvyNMoL/dPFNE8MgDuav213H/7XU3S0raD2dhPrkmLi+AfCfgnbeVgErtnLgSAiIk
+         a0fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725974538; x=1726579338;
+        d=1e100.net; s=20230601; t=1725974574; x=1726579374;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bj56BQt9ZSzV0CrSCRpKEAjflySC2ncoGghlooYLTWU=;
-        b=TP49/NwH/sqIZ2FkzEw4KbV5ifvMQpKpKOZUGits0OQh6LL4MMVjvD75CPIQAsuMda
-         OWTQiSq+33KmSQWIoUGdrpEJk6hUq+2LGA4Fk8A7QtJm/t6vwNg7Hw97XaICwHDxNYSl
-         0vh8Ti6lntvQ8gVqa4gV1ujCLOISY15bwEGt/WBhGzFm75yLpSP8ghroScYRvftRtdNE
-         +AybjzO8bOTJ7mLlCfLQ60eW9zyHmjnPKyGNzSazdBgM1NeHH88Unwkl5ouMKkHN+8NQ
-         YYonbHJTgLlfj0iKWNHEzxB7MR6HQW/7hdWhvqBfpqTt+1hHk7JOOa349wdG5/C/ZsTo
-         wjUw==
-X-Gm-Message-State: AOJu0YwDx0dzP+buxGX+5whIXmPEAiZOnv3fCQ/VjX/95HLnsO8i5S4K
-	tG/wKN4jBwRWb+Gov+kttMHLI8ZSJPwncmGhSHdRKzaYK3/Vm5u3na2DrL50z8Q=
-X-Google-Smtp-Source: AGHT+IE6MBNDyrVhEBsA4cssk0boKT8bpHfdlLhGwbiFavLD+EsZvuXgAzGuMVZ/V1JjVtUTIwc85A==
-X-Received: by 2002:a05:6602:6281:b0:82c:d966:6bf7 with SMTP id ca18e2360f4ac-82cd9666ce0mr999405339f.6.1725974537925;
-        Tue, 10 Sep 2024 06:22:17 -0700 (PDT)
+        bh=Zsz2DawbKokjmCBHoMj/5IgWeYCvivyMxUGL8HZEg8Y=;
+        b=Q2VNibmeH7nwZ8qzFRCMzJ7qocpuH/kx+umvhTs3ZtUVpHKHFTd9H5GKn6MYmdaPre
+         l6oW+Acdj4CFYqhbqc3ywyD53tuYPr0igSagdQgfzss1dX2EsDuuipTlxcSzz2d9FtpQ
+         dRLzfzLsICCrtmYH1ULo84ClqV55ZtK3X180j6YUUe3jlevkgH626LS3YXOQTlJxzC+9
+         HrQ1Hk+Nw0i85BmbHvuBFY7qSJA8O4q/46R1ShQqeEGWQ4S7HxLVAT58BXXa9o66Jrvu
+         iHptSA8/I6OcY5dk2aN9Elb0+/lu+jyiL57Ri+jEMRpx+stXzKqotg7B7Ra5RT1XALRZ
+         B6GA==
+X-Gm-Message-State: AOJu0Yw6vYBQ5EYJdxD/GjLP4kAEtTX5QvdTnEGL0WIfU/med0z9SGb2
+	9/rhTXuh73q9jpcrWEWhKFdcpHzZ010LZhbGok6a6ZGm9kdAApS20vV4ndL63IA=
+X-Google-Smtp-Source: AGHT+IHDvPZKRi5OPPT6Zxfq8GNcWYpeSOUaFFkDUjr74r3mQgiKPzPecXFzXvcX2Pd0XEIj7P7WGQ==
+X-Received: by 2002:a05:6e02:17c6:b0:39f:558a:e414 with SMTP id e9e14a558f8ab-3a06b15a49emr25341685ab.7.1725974574552;
+        Tue, 10 Sep 2024 06:22:54 -0700 (PDT)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-82aa77b2a97sm202153339f.50.2024.09.10.06.22.16
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a0590161cfsm20022565ab.77.2024.09.10.06.22.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 06:22:17 -0700 (PDT)
-Message-ID: <91ce06c7-6965-4d1d-8ed4-d0a6f01acecf@kernel.dk>
-Date: Tue, 10 Sep 2024 07:22:16 -0600
+        Tue, 10 Sep 2024 06:22:54 -0700 (PDT)
+Message-ID: <db5193e8-5b8e-46f9-bbfc-a1821217f5a6@kernel.dk>
+Date: Tue, 10 Sep 2024 07:22:53 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,115 +60,70 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] block: fix ordering between checking
- QUEUE_FLAG_QUIESCED and adding requests
+Subject: Re: [PATCH v2 3/3] block: fix ordering between checking
+ BLK_MQ_S_STOPPED and adding requests
 To: Muchun Song <songmuchun@bytedance.com>, ming.lei@redhat.com,
  yukuai1@huaweicloud.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  muchun.song@linux.dev, stable@vger.kernel.org
 References: <20240903081653.65613-1-songmuchun@bytedance.com>
- <20240903081653.65613-3-songmuchun@bytedance.com>
+ <20240903081653.65613-4-songmuchun@bytedance.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240903081653.65613-3-songmuchun@bytedance.com>
+In-Reply-To: <20240903081653.65613-4-songmuchun@bytedance.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 9/3/24 2:16 AM, Muchun Song wrote:
-> Supposing the following scenario.
+> Supposing first scenario with a virtio_blk driver.
 > 
-> CPU0                                        CPU1
+> CPU0                                                                CPU1
 > 
-> blk_mq_insert_request()         1) store    blk_mq_unquiesce_queue()
-> blk_mq_run_hw_queue()                       blk_queue_flag_clear(QUEUE_FLAG_QUIESCED)       3) store
->     if (blk_queue_quiesced())   2) load         blk_mq_run_hw_queues()
->         return                                      blk_mq_run_hw_queue()
->     blk_mq_sched_dispatch_requests()                    if (!blk_mq_hctx_has_pending())     4) load
->                                                            return
+> blk_mq_try_issue_directly()
+>     __blk_mq_issue_directly()
+>         q->mq_ops->queue_rq()
+>             virtio_queue_rq()
+>                 blk_mq_stop_hw_queue()
+>                                                                     virtblk_done()
+>     blk_mq_request_bypass_insert()                                      blk_mq_start_stopped_hw_queues()
+>         /* Add IO request to dispatch list */   1) store                    blk_mq_start_stopped_hw_queue()
+>                                                                                 clear_bit(BLK_MQ_S_STOPPED)                 3) store
+>     blk_mq_run_hw_queue()                                                       blk_mq_run_hw_queue()
+>         if (!blk_mq_hctx_has_pending())                                             if (!blk_mq_hctx_has_pending())         4) load
+>             return                                                                      return
+>         blk_mq_sched_dispatch_requests()                                            blk_mq_sched_dispatch_requests()
+>             if (blk_mq_hctx_stopped())          2) load                                 if (blk_mq_hctx_stopped())
+>                 return                                                                      return
+>             __blk_mq_sched_dispatch_requests()                                          __blk_mq_sched_dispatch_requests()
 > 
-> The full memory barrier should be inserted between 1) and 2), as well as
-> between 3) and 4) to make sure that either CPU0 sees QUEUE_FLAG_QUIESCED is
-> cleared or CPU1 sees dispatch list or setting of bitmap of software queue.
-> Otherwise, either CPU will not re-run the hardware queue causing starvation.
+> Supposing another scenario.
 > 
-> So the first solution is to 1) add a pair of memory barrier to fix the
-> problem, another solution is to 2) use hctx->queue->queue_lock to synchronize
-> QUEUE_FLAG_QUIESCED. Here, we chose 2) to fix it since memory barrier is not
-> easy to be maintained.
+> CPU0                                                                CPU1
+> 
+> blk_mq_requeue_work()
+>     /* Add IO request to dispatch list */       1) store            virtblk_done()
+>     blk_mq_run_hw_queues()/blk_mq_delay_run_hw_queues()                 blk_mq_start_stopped_hw_queues()
+>         if (blk_mq_hctx_stopped())              2) load                     blk_mq_start_stopped_hw_queue()
+>             continue                                                            clear_bit(BLK_MQ_S_STOPPED)                 3) store
+>         blk_mq_run_hw_queue()/blk_mq_delay_run_hw_queue()                       blk_mq_run_hw_queue()
+>                                                                                     if (!blk_mq_hctx_has_pending())         4) load
+>                                                                                         return
+>                                                                                     blk_mq_sched_dispatch_requests()
+> 
+> Both scenarios are similar, the full memory barrier should be inserted between
+> 1) and 2), as well as between 3) and 4) to make sure that either CPU0 sees
+> BLK_MQ_S_STOPPED is cleared or CPU1 sees dispatch list. Otherwise, either CPU
+> will not rerun the hardware queue causing starvation of the request.
+> 
+> The easy way to fix it is to add the essential full memory barrier into helper
+> of blk_mq_hctx_stopped(). In order to not affect the fast path (hardware queue
+> is not stopped most of the time), we only insert the barrier into the slow path.
+> Actually, only slow path needs to care about missing of dispatching the request
+> to the low-level device driver.
 
-Same comment here, 72-74 chars wide please.
+Again, this is way too wide, it's unreadable.
 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index b2d0f22de0c7f..ac39f2a346a52 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2202,6 +2202,24 @@ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
->  }
->  EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
->  
-> +static inline bool blk_mq_hw_queue_need_run(struct blk_mq_hw_ctx *hctx)
-> +{
-> +	bool need_run;
-> +
-> +	/*
-> +	 * When queue is quiesced, we may be switching io scheduler, or
-> +	 * updating nr_hw_queues, or other things, and we can't run queue
-> +	 * any more, even blk_mq_hctx_has_pending() can't be called safely.
-> +	 *
-> +	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
-> +	 * quiesced.
-> +	 */
-> +	__blk_mq_run_dispatch_ops(hctx->queue, false,
-> +				  need_run = !blk_queue_quiesced(hctx->queue) &&
-> +					      blk_mq_hctx_has_pending(hctx));
-> +	return need_run;
-> +}
-
-This __blk_mq_run_dispatch_ops() is also way too wide, why didn't you
-just break it like where you copied it from?
-
-> +
->  /**
->   * blk_mq_run_hw_queue - Start to run a hardware queue.
->   * @hctx: Pointer to the hardware queue to run.
-> @@ -2222,20 +2240,23 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
->  
->  	might_sleep_if(!async && hctx->flags & BLK_MQ_F_BLOCKING);
->  
-> -	/*
-> -	 * When queue is quiesced, we may be switching io scheduler, or
-> -	 * updating nr_hw_queues, or other things, and we can't run queue
-> -	 * any more, even __blk_mq_hctx_has_pending() can't be called safely.
-> -	 *
-> -	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
-> -	 * quiesced.
-> -	 */
-> -	__blk_mq_run_dispatch_ops(hctx->queue, false,
-> -		need_run = !blk_queue_quiesced(hctx->queue) &&
-> -		blk_mq_hctx_has_pending(hctx));
-> +	need_run = blk_mq_hw_queue_need_run(hctx);
-> +	if (!need_run) {
-> +		unsigned long flags;
->  
-> -	if (!need_run)
-> -		return;
-> +		/*
-> +		 * synchronize with blk_mq_unquiesce_queue(), becuase we check
-> +		 * if hw queue is quiesced locklessly above, we need the use
-> +		 * ->queue_lock to make sure we see the up-to-date status to
-> +		 * not miss rerunning the hw queue.
-> +		 */
-> +		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
-> +		need_run = blk_mq_hw_queue_need_run(hctx);
-> +		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
-> +
-> +		if (!need_run)
-> +			return;
-> +	}
-
-Is this not solvable on the unquiesce side instead? It's rather a shame
-to add overhead to the fast path to avoid a race with something that's
-super unlikely, like quisce.
+Patch looks fine, though.
 
 -- 
 Jens Axboe
