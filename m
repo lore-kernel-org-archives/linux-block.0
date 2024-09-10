@@ -1,99 +1,247 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDA4C156;
-	Tue, 10 Sep 2024 04:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565C51779BA
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 06:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725943545; cv=none; b=MwNJg/c7BXZnRFjIgWzQxnVp3gC9jS1adAYLjH/WKZV9ZmzuTO3Xm72DnqWXgbkS+ZQrdsw8TrFf3K6D2HS/6PvEFuZiWGRLSVkH3PEexMBXSe9n1G63AdFGlRloGmDgh0ulyD3acZNbcZuFk1K8yqGQynp0jKg7tVkGE+5CE4w=
+	t=1725949752; cv=none; b=KP0EfbpFI5Jwt/dRb96DB5pt2ypKlRE+JimxkIQyF3fK6chwG7iTdr17mpBVGQ16lXw5DebY3iAZLntIPBZBp+HQaPY4bN1wJnY4fOJ6lxjnk6PMnju+DVI0PGhzZgM3qemvLjf+i+SiaJ7Bnc7q7FsOoiafGNLjL+UwDmHdEwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725943545; c=relaxed/simple;
-	bh=DpO4SfTNR7cQazmETA0EG7veH6h4k339DJdZUuW/Chk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FlUkL2zZfHkJACHKNElUKphk9TYhkhiOVgJc9J3vBoCps7rHFTY4u9kjT+0ewwCxJVrP7IvneSIznbWJ7u0nPL5Kh7pq6zFRXbbENo4pTpLlg07KxYFnkCQJ8KMtVIGhYUIrIsmo2M3i6NMZ7Ccu69sLSjUhCmLYmAUT5orhPoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBjYzdfB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725949752; c=relaxed/simple;
+	bh=XaQZaTfk+la0ZZ6tSTFKn63D4zVyBwKjnuPD291hcIs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=drQhBLvmZzXop8rhAKDVfVtuWHeLMLN1QdvJ8opjX5tLVkLRM3dkwvgjjqjjTCfWTGWmyoMH9Cejsf5pqcih7lUP2ImoD4joUhaX9S+dHtYkL6EtVoCjee3MENK4+JkKcvgMKekMi/8n+pMsckl9Ukw+BEcOZITP2tQIkY7Wx2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dysA5KLm; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBjYzdfB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AE20C4CEC3;
-	Tue, 10 Sep 2024 04:45:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725943545;
-	bh=DpO4SfTNR7cQazmETA0EG7veH6h4k339DJdZUuW/Chk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lBjYzdfBZtL6pngUjaJ6z6MVf0Xs6MXzik1nHnDbqgSkyaLJ5PEkbpDt6mIEk3i8p
-	 9114mWKtmNP+UgeBRm1b46lcWqRc+0bPFRYo4RIzCRkC7TDMHz+nrrRRU8d0gGqOFt
-	 Wpmc9G/kGJsRhLc4drADC54QZBnDU6RIR3O9WTs8oon/f5e2uUhf4Y873AOnj8rsi8
-	 Yk5ac3KbJR0sh8yCDVnZrhsfSynZ+lI6bACpY6xGNMnkQIG6HLZpXvRu6OkpOY/lQz
-	 MJ6YkpdIItvijRuyRVfm0O1BBCHxk4280BU9kRz6ogEejIctsPnF+E78ByYuJzTKcx
-	 YzfXYU4Oq7b9g==
-Message-ID: <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
-Date: Tue, 10 Sep 2024 13:45:43 +0900
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dysA5KLm"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6d7073a39dcso55223927b3.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Sep 2024 23:29:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725949748; x=1726554548; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=nEFwTDycDGvgp9HATFRtFGrgCewYQik9kM4B0MY3fOI=;
+        b=dysA5KLmqAyBweRt2T4h621AV13N+MKncHObFdiWm1YdZi7+JmH5gnq2Blo3pA2DMI
+         39YEDpmchH9s67fiW7TC8U72jc7YwvZuwCEu+Yy0wmTYE2M1CgyvvA8mhrBrXwFwI8AK
+         ge7Imj1dMtpZE2G2MoTfvRpV+XaLadSOjT+o0p8qa8+a0QZa2vtzalps9b72G3zxJq7l
+         aB3WUWiraONMVkEDSkSf/6EqH58XMhjNixHnthWdGdov2Fu0fVZ+GUtf3OHbLvjfWiKb
+         4pVuXQwNosjE+Pl3qC0zPhToIJOUlixVcF+6uDEbDRprhxK1+/V5AE9Picv6YGRY062z
+         gqLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725949748; x=1726554548;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nEFwTDycDGvgp9HATFRtFGrgCewYQik9kM4B0MY3fOI=;
+        b=eXiRN8wyGKVg/5Ub5fchRhzaHkp6SISYaQkFEaeBc63mgVJFUvLsbDQCFi+lPzCaZm
+         FoZjUW2VKkDmtdJ/XI81ZZXRS44W/U3rrjnYlH72g2awujizdNnHXKKMuNKAZXD0fKQs
+         3Iejxtu1IyXdPKbLRWi2mHoMW7PBT3WfNdjVbN46HuxTgdL7O9qCN4YWmuYnWpSAOLak
+         mhXiaIOUdAY+up9kb6gza5NWKAB7Rb2pHvBuULcZvorI2x78r+8mlOv5kgyu5E4/JfIH
+         539yUctCCR1YEoch1YPFPjUzAl5CxsCJvah2OhOZ8NfnFA/b5AJNoxzkKQ9dQvIKzG+K
+         c4Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtXH6ty3Hlr7bxEPHBsfnPiQUnZ1ZRVAUzpEBaknKii2q+J6EEErPFFEu4xl3IZ0QCzbP+oVgJb5ZJMA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWKlL5VucaUxqLmAyfU4YGWcI08Ah96J0UP1ImaviZYno9Wrgc
+	+VtrJu0LWvuiEUFOQ1htq1ihSFJ1dXWeF9l21HvJUX32KRKOcSDgKT5984Qedf8BGsxkqViei3/
+	OlxDlaJMKO0Fbzuhq1oaSe7pPwcN3yBz476Uf/A==
+X-Google-Smtp-Source: AGHT+IEBZZt2cdxLKZyy+e7siGVV18SEl42Tj+Khn8l0KILxGsWjLsPof0c5bcFrSsgmQWetWJ2qfPyKs0QRrhKeqaY=
+X-Received: by 2002:a05:690c:48c8:b0:6ac:3043:168a with SMTP id
+ 00721157ae682-6db953817a1mr17208177b3.10.1725949748085; Mon, 09 Sep 2024
+ 23:29:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] block: Non-NCQ commands will never be executed while
- fio is continuously running
-To: yangxingui <yangxingui@huawei.com>, axboe@kernel.dk,
- John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- James.Bottomley@HansenPartnership.com,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- damien.lemoal@opensource.wdc.com
-References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
- <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
- <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240906-wrapped-keys-v6-0-d59e61bc0cb4@linaro.org>
+ <20240906-wrapped-keys-v6-9-d59e61bc0cb4@linaro.org> <7uoq72bpiqmo2olwpnudpv3gtcowpnd6jrifff34ubmfpijgc6@k6rmnalu5z4o>
+ <66953e65-2468-43b8-9ccf-54671613c4ab@linaro.org> <ivibs6qqxhbikaevys3iga7s73xq6dzq3u43gwjri3lozkrblx@jxlmwe5wiq7e>
+ <98cc8d71d5d9476297a54774c382030d@quicinc.com>
+In-Reply-To: <98cc8d71d5d9476297a54774c382030d@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 10 Sep 2024 09:28:57 +0300
+Message-ID: <CAA8EJpp_HY+YmMCRwdteeAHnSHtjuHb=nFar60O_PwLwjk0mNA@mail.gmail.com>
+Subject: Re: [PATCH v6 09/17] soc: qcom: ice: add HWKM support to the ICE driver
+To: "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>
+Cc: Neil Armstrong <neil.armstrong@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Asutosh Das <quic_asutoshd@quicinc.com>, 
+	Ritesh Harjani <ritesh.list@gmail.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>, 
+	Bart Van Assche <bvanassche@acm.org>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	"manivannan.sadhasivam@linaro.org" <manivannan.sadhasivam@linaro.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>, 
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, 
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>, 
+	"bartosz.golaszewski" <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/10/24 10:09 AM, yangxingui wrote:
-> 
-> 
-> On 2024/9/9 21:21, Damien Le Moal wrote:
->> On 9/9/24 22:10, yangxingui wrote:
->>> Hello axboe & John,
->>>
->>> After the driver exposes all HW queues to the block layer, non-NCQ
->>> commands will never be executed while fio is continuously running, such
->>> as a smartctl command.
->>>
->>> The cause of the problem is that other hctx used by the NCQ command is
->>> still active and can continue to issue NCQ commands to the sata disk.
->>> And the pio command keeps retrying in its corresponding hctx because
->>> qc_defer() always returns true.
->>>
->>> hctx0: ncq, pio, ncq
->>> hctx1：ncq, ncq, ...
->>> ...
->>> hctxn: ncq, ncq, ...
->>>
->>> Is there any good solution for this?
->>
->> SATA devices are single queue so how can you have multiple queues ?
->> What adapter are you using ?
-> 
-> In the following patch, we expose the host's 16 hardware queues to the block
-> layer. And when connecting to a sata disk, 16 hctx are used.
-> 
-> 8d98416a55eb ("scsi: hisi_sas: Switch v3 hw to MQ")
+On Tue, 10 Sept 2024 at 03:51, Gaurav Kashyap (QUIC)
+<quic_gaurkash@quicinc.com> wrote:
+>
+> Hello Dmitry and Neil
+>
+> On Monday, September 9, 2024 2:44 AM PDT, Dmitry Baryshkov wrote:
+> > On Mon, Sep 09, 2024 at 10:58:30AM GMT, Neil Armstrong wrote:
+> > > On 07/09/2024 00:07, Dmitry Baryshkov wrote:
+> > > > On Fri, Sep 06, 2024 at 08:07:12PM GMT, Bartosz Golaszewski wrote:
+> > > > > From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> > > > >
+> > > > > Qualcomm's ICE (Inline Crypto Engine) contains a proprietary key
+> > > > > management hardware called Hardware Key Manager (HWKM). Add
+> > HWKM
+> > > > > support to the ICE driver if it is available on the platform. HWKM
+> > > > > primarily provides hardware wrapped key support where the ICE
+> > > > > (storage) keys are not available in software and instead protected in
+> > hardware.
+> > > > >
+> > > > > When HWKM software support is not fully available (from
+> > > > > Trustzone), there can be a scenario where the ICE hardware
+> > > > > supports HWKM, but it cannot be used for wrapped keys. In this
+> > > > > case, raw keys have to be used without using the HWKM. We query
+> > > > > the TZ at run-time to find out whether wrapped keys support is
+> > available.
+> > > > >
+> > > > > Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
+> > > > > Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> > > > > Signed-off-by: Bartosz Golaszewski
+> > > > > <bartosz.golaszewski@linaro.org>
+> > > > > ---
+> > > > >   drivers/soc/qcom/ice.c | 152
+> > +++++++++++++++++++++++++++++++++++++++++++++++--
+> > > > >   include/soc/qcom/ice.h |   1 +
+> > > > >   2 files changed, 149 insertions(+), 4 deletions(-)
+> > > > >
+> > > > >   int qcom_ice_enable(struct qcom_ice *ice)
+> > > > >   {
+> > > > > + int err;
+> > > > > +
+> > > > >           qcom_ice_low_power_mode_enable(ice);
+> > > > >           qcom_ice_optimization_enable(ice);
+> > > > > - return qcom_ice_wait_bist_status(ice);
+> > > > > + if (ice->use_hwkm)
+> > > > > +         qcom_ice_enable_standard_mode(ice);
+> > > > > +
+> > > > > + err = qcom_ice_wait_bist_status(ice); if (err)
+> > > > > +         return err;
+> > > > > +
+> > > > > + if (ice->use_hwkm)
+> > > > > +         qcom_ice_hwkm_init(ice);
+> > > > > +
+> > > > > + return err;
+> > > > >   }
+> > > > >   EXPORT_SYMBOL_GPL(qcom_ice_enable);
+> > > > > @@ -150,6 +282,10 @@ int qcom_ice_resume(struct qcom_ice *ice)
+> > > > >                   return err;
+> > > > >           }
+> > > > > + if (ice->use_hwkm) {
+> > > > > +         qcom_ice_enable_standard_mode(ice);
+> > > > > +         qcom_ice_hwkm_init(ice); }
+> > > > >           return qcom_ice_wait_bist_status(ice);
+> > > > >   }
+> > > > >   EXPORT_SYMBOL_GPL(qcom_ice_resume);
+> > > > > @@ -157,6 +293,7 @@ EXPORT_SYMBOL_GPL(qcom_ice_resume);
+> > > > >   int qcom_ice_suspend(struct qcom_ice *ice)
+> > > > >   {
+> > > > >           clk_disable_unprepare(ice->core_clk);
+> > > > > + ice->hwkm_init_complete = false;
+> > > > >           return 0;
+> > > > >   }
+> > > > > @@ -206,6 +343,12 @@ int qcom_ice_evict_key(struct qcom_ice *ice,
+> > int slot)
+> > > > >   }
+> > > > >   EXPORT_SYMBOL_GPL(qcom_ice_evict_key);
+> > > > > +bool qcom_ice_hwkm_supported(struct qcom_ice *ice) {  return
+> > > > > +ice->use_hwkm; }
+> > EXPORT_SYMBOL_GPL(qcom_ice_hwkm_supported);
+> > > > > +
+> > > > >   static struct qcom_ice *qcom_ice_create(struct device *dev,
+> > > > >                                           void __iomem *base)
+> > > > >   {
+> > > > > @@ -240,6 +383,7 @@ static struct qcom_ice *qcom_ice_create(struct
+> > device *dev,
+> > > > >                   engine->core_clk = devm_clk_get_enabled(dev, NULL);
+> > > > >           if (IS_ERR(engine->core_clk))
+> > > > >                   return ERR_CAST(engine->core_clk);
+> > > > > + engine->use_hwkm = qcom_scm_has_wrapped_key_support();
+> > > >
+> > > > This still makes the decision on whether to use HW-wrapped keys on
+> > > > behalf of a user. I suppose this is incorrect. The user must be able
+> > > > to use raw keys even if HW-wrapped keys are available on the
+> > > > platform. One of the examples for such use-cases is if a user
+> > > > prefers to be able to recover stored information in case of a device
+> > > > failure (such recovery will be impossible if SoC is damaged and HW-
+> > wrapped keys are used).
+> > >
+> > > Isn't that already the case ? the BLK_CRYPTO_KEY_TYPE_HW_WRAPPED
+> > size
+> > > is here to select HW-wrapped key, otherwise the ol' raw key is passed.
+> > > Just look the next patch.
+> > >
+> > > Or did I miss something ?
+> >
+> > That's a good question. If use_hwkm is set, ICE gets programmed to use
+> > hwkm (see qcom_ice_hwkm_init() call above). I'm not sure if it is expected
+> > to work properly if after such a call we pass raw key.
+> >
+>
+> Once ICE has moved to a HWKM mode, the firmware key programming currently does not support raw keys.
+> This support is being added for the next Qualcomm chipset in Trustzone to support both at he same time, but that will take another year or two to hit the market.
+> Until that time, due to TZ (firmware) limitations , the driver can only support one or the other.
+>
+> We also cannot keep moving ICE modes, due to the HWKM enablement being a one-time configurable value at boot.
 
-OK, so the HBA is a hisi one, using libsas...
-What is the device ? An SSD ? and HDD ?
+So the init of HWKM should be delayed until the point where the user
+tells if HWKM or raw keys should be used.
 
-Do you set a block I/O scheduler for the drive, e.g. mq-deadline. If not, does
-setting a scheduler resolve the issue ?
+>
+> > >
+> > > Neil
+> > >
+> > > >
+> > > > >           if (!qcom_ice_check_supported(engine))
+> > > > >                   return ERR_PTR(-EOPNOTSUPP); diff --git
+> > > > > a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h index
+> > > > > 9dd835dba2a7..1f52e82e3e1c 100644
+> > > > > --- a/include/soc/qcom/ice.h
+> > > > > +++ b/include/soc/qcom/ice.h
+> > > > > @@ -34,5 +34,6 @@ int qcom_ice_program_key(struct qcom_ice *ice,
+> > > > >                            const struct blk_crypto_key *bkey,
+> > > > >                            u8 data_unit_size, int slot);
+> > > > >   int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
+> > > > > +bool qcom_ice_hwkm_supported(struct qcom_ice *ice);
+> > > > >   struct qcom_ice *of_qcom_ice_get(struct device *dev);
+> > > > >   #endif /* __QCOM_ICE_H__ */
+> > > > >
+> > > > > --
+> > > > > 2.43.0
+> > > > >
+> > > >
+> > >
+> >
+> > --
+> > With best wishes
+> > Dmitry
+>
+> Regards,
+> Gaurav
 
-I do not have any hisi HBA. I use a lot of mpt3sas and mpi3mr HBAs which also
-have multiple queues with a shared tagset. Never seen the issue you are
-reporting though using HDDs with mq-deadline or bfq as the scheduler.
+
 
 -- 
-Damien Le Moal
-Western Digital Research
+With best wishes
+Dmitry
