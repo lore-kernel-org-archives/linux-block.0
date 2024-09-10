@@ -1,87 +1,98 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045062AEF1;
-	Tue, 10 Sep 2024 01:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939616F2EA
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 01:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725930564; cv=none; b=Uk7BBovweC8YNeQ5Ur9AikIxYDhuc8q6FLCCIuNnFRBC/0rMofEZow7KoIIZ1tCZwkf934I4kyj4c9NBy7vbD4Uf8jhCQD9sOL+3AO+aHvFBYvU9aNUzIPhIZuaV2fNDZwWalddDq6Wif0Fks8xqxK8gQchgaSgPnk4mcKOa4HE=
+	t=1725931296; cv=none; b=oQ+aIEplYulySwLkSI0eVIwxABVMFW9v9INezLaefZwtrR4TjAPJytHtf+hPzTlZHO/TqhL5OMb2p16hEB3P8Bz+FRHExpw465Gp/VD7wod09zRzo2xNw6Cw4IeuwQNp2T60ASgMjZmaxN5fGFeOiMKwerOe1cqAZskMIhVgywE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725930564; c=relaxed/simple;
-	bh=CRVH9LF38aXpxzDBabvtFuZ02DaiE90+UuEHz/xd8XM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MfJlS6qsXXif0Y6XQE0phcGkv7b/FZi9LOFLS+sGXbwoC0nXVbRK2yydiph/YtgMxBli+F+j16aHvgqDjb3sPm24dZWcnnVlM5E4ZET57w3KY12TsG//ts2Leflacs1PTdWu4HfvR4/cTV1kPR5kSJSUesVm3a/WAQeFviGybGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4X2lv06crhzyRMs;
-	Tue, 10 Sep 2024 09:08:12 +0800 (CST)
-Received: from kwepemg100017.china.huawei.com (unknown [7.202.181.58])
-	by mail.maildlp.com (Postfix) with ESMTPS id EE95018010F;
-	Tue, 10 Sep 2024 09:09:17 +0800 (CST)
-Received: from [10.67.120.108] (10.67.120.108) by
- kwepemg100017.china.huawei.com (7.202.181.58) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 10 Sep 2024 09:09:17 +0800
-Message-ID: <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
-Date: Tue, 10 Sep 2024 09:09:16 +0800
+	s=arc-20240116; t=1725931296; c=relaxed/simple;
+	bh=LbvpkixmVT7St4fCI6yGGQAnAo0U7oJSCnjSVHAkbRs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Is/QhmsAV0cmNWNs4dBJMzTS+HXjgLKt+RxnlLP8X7sRyE6B3LQhTIv4KHfquSDoxmPOZqUSOM1jLUmBVztfmK5y+jSt14bpVyx5OIBUprekewSRVNU+K7ZlDClfZhh8NIHeH+YwYR5aJOb0OMC4ufmOoO0w4X4UCwW5jCQVSjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MRStBg3m; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MRStBg3m"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2053a0bd0a6so2071235ad.3
+        for <linux-block@vger.kernel.org>; Mon, 09 Sep 2024 18:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725931294; x=1726536094; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FbHezFl/yia2I+g8JEPGnuA0HdRe8qPShzuc/dAam7o=;
+        b=MRStBg3mHE36aEzGRUKgl8wKBv37glNrXIU46gxoq/+Fvh7cge7tY4OUm+oKtKW3jM
+         1zuv3TrP5UoK0kahd/gOeoVeNQ1/HJd1aQpyn+xOeI7mQP1ezPvCslufbMC16Gm7EaQi
+         AtuKz1HI4aZtz2oc11en9WHTvivGGxP6DZoDfL/nYHf8IuexyAVPnj+7DFZDFQropMLg
+         HQt/MoMZ/EYANvjaK69DZxObCp4vlZ7GzH0KYp8IT77QLt1wvR1jOwQ3EtIXEz1sTMzu
+         ewf0QQ6rmX+GyJFesmbfsQnOdT4JHX0hO2NZ/AHDI9dNRVcCzbz+Uj5yUZ9QrKjAg4Og
+         CXdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725931294; x=1726536094;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FbHezFl/yia2I+g8JEPGnuA0HdRe8qPShzuc/dAam7o=;
+        b=p09qQw3lYDJJrlkit3t3iYMFIuywTgevZCYlxtJ04k4++uYAYta7Eh6d5OUmcVOgvx
+         49BZSJ62qJy8oy0GoPRcpuUBQJb04QZWz3OSLpbVJtSf/9s6A/Ox5HW4EkoIL1ZW0g/f
+         GDQQ4A4Vubz+Ks65LV/rCNhTB1zFt4MPhlLjvGqMTbmDtbaGq0XxA7fYi33EC74zcH7t
+         tNxZVqxAdOt0S0qZYz4WYcLRLRMJ8Zm8496v5diTJyEVTUmejZjTRsf0wua6GF80gVF2
+         Fn1HnGaMiEJ7YDH1NxX+Yze6CvuVALT02ZAICrY8CKZL8+4WsddYmIf/GQo7PGAOz2rU
+         EXQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUK17aWoKtPcIKEr24m/duXwpobSXtI98Az/JZ20DFvkL3QunTJ5cHJjJv3MK7BKvLTQj7IiC+j21KLwQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz24teRvukT0KFKUo4V4JO2VByw9ipSrNjKPfFvDKQu6vfyL3qH
+	JfXLhyWCotP0fVt0t+dai9JLJYS5rfv+X03/EztoY02GFF6LzvalfMxk7oY11nw=
+X-Google-Smtp-Source: AGHT+IFa+VZ81ocWMaBa2mFn46xb84Mt6PsKyBjpAI0MI3gvqZzTycK0AEdo/AX/35uwZXb4OrHhvg==
+X-Received: by 2002:a17:902:dacc:b0:205:7c76:4b2c with SMTP id d9443c01a7336-206f05f6924mr132506985ad.48.1725931293861;
+        Mon, 09 Sep 2024 18:21:33 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710e1b09bsm39335845ad.56.2024.09.09.18.21.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 18:21:33 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Philipp Reisner <philipp.reisner@linbit.com>, 
+ Mikhail Lobanov <m.lobanov@rosalinux.ru>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>, drbd-dev@lists.linbit.com, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ lvc-project@linuxtesting.org, stable@vger.kernel.org
+In-Reply-To: <20240909133740.84297-1-m.lobanov@rosalinux.ru>
+References: <20240909133740.84297-1-m.lobanov@rosalinux.ru>
+Subject: Re: [PATCH] drbd: Add NULL check for net_conf to prevent
+ dereference in state validation
+Message-Id: <172593129267.13781.9847171739560045999.b4-ty@kernel.dk>
+Date: Mon, 09 Sep 2024 19:21:32 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Subject: Re: [bug report] block: Non-NCQ commands will never be executed while
- fio is continuously running
-Content-Language: en-CA
-To: Damien Le Moal <dlemoal@kernel.org>, <axboe@kernel.dk>, John Garry
-	<john.g.garry@oracle.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, <damien.lemoal@opensource.wdc.com>
-References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
- <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
-From: yangxingui <yangxingui@huawei.com>
-In-Reply-To: <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepemh100005.china.huawei.com (7.202.181.88) To
- kwepemg100017.china.huawei.com (7.202.181.58)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.1
 
 
-
-On 2024/9/9 21:21, Damien Le Moal wrote:
-> On 9/9/24 22:10, yangxingui wrote:
->> Hello axboe & John,
->>
->> After the driver exposes all HW queues to the block layer, non-NCQ
->> commands will never be executed while fio is continuously running, such
->> as a smartctl command.
->>
->> The cause of the problem is that other hctx used by the NCQ command is
->> still active and can continue to issue NCQ commands to the sata disk.
->> And the pio command keeps retrying in its corresponding hctx because
->> qc_defer() always returns true.
->>
->> hctx0: ncq, pio, ncq
->> hctx1：ncq, ncq, ...
->> ...
->> hctxn: ncq, ncq, ...
->>
->> Is there any good solution for this?
+On Mon, 09 Sep 2024 09:37:36 -0400, Mikhail Lobanov wrote:
+> If the net_conf pointer is NULL and the code attempts to access its
+> fields without a check, it will lead to a null pointer dereference.
+> Add a NULL check before dereferencing the pointer.
 > 
-> SATA devices are single queue so how can you have multiple queues ?
-> What adapter are you using ?
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> 
+> [...]
 
-In the following patch, we expose the host's 16 hardware queues to the 
-block layer. And when connecting to a sata disk, 16 hctx are used.
+Applied, thanks!
 
-8d98416a55eb ("scsi: hisi_sas: Switch v3 hw to MQ")
+[1/1] drbd: Add NULL check for net_conf to prevent dereference in state validation
+      commit: de068f4741781bbba0568b44b41d51da0feef6f9
 
-Thanks,
-Xingui
-.
+Best regards,
+-- 
+Jens Axboe
+
+
 
