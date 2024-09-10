@@ -1,162 +1,171 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD24018D651
-	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 09:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE04185B43;
+	Tue, 10 Sep 2024 10:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725960370; cv=none; b=ClqQ2M+mcpWvE6pzZ9xSvV6wWbkWFntm6B3X5fCwNpYIFVTZ7efbEl0YzlcNB2zkd4eXFQCJI+7hChmOMxkaS9Gq2WrkN7MUza+jDYHbmyUlT1DljQRUpaNSH6sme+HVKgi5mPaDj9pWQu6jkud8qvXWWbhDp0oIBtyhxrQ6gSU=
+	t=1725965880; cv=none; b=Des8TIhw4J7/PUnNzLUMlNpsLCFLYe49Z9N0VNyr5ss4ADDc3aoS9hY40nHmEnBaGUlKyfe9E6b2W+uyLJq4QwLTR5VdcJKz7x9ySB9ZtiY5oCEbIRDFiZFzIRIFKEvDtb3nrTVi8phAvVxCjjIrwSirmG7ftZFjSLBK5xi3uTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725960370; c=relaxed/simple;
-	bh=D/buzGYQkufERse75SSjj/vuDr0eYjohZXOoq1FQWj0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=Qmq75TOTK9hSF8Rzzhbc+UaWqrYZysE2YiI0OS+brvgYhpJ2wn/ckH9SxNGe9eNJJysLbjBpMjOM2cK1AKkOsPBmfULGJWR5YuuShQYH8XnbbbcfgdUnNal8VddCEFO6fXtZxmCvG1FBG8oe4frBELMbLYPwrdWLF86zOd8HKcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=qNQu/qqc; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1725965880; c=relaxed/simple;
+	bh=pF/tzfuszrq6RsRMAKS2cg91CVLkL87OAR07GZsdNrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IgHq83vPsxuE6EM/JM3+aFSM68gf/C4842TpRmXcAExmeb09lE1NK8ZY/ImoaG+nWS9aZMndcfBbFqdpJlCHJgnSZVduNFVXqQigkKQFbsFu8/DiMQmaJRQa8o4a0ta6MGQheL/tAWlhfyLCmX11nnUIEpxTVj3nt/8CXcWxRlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NBp0+qcY; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qNQu/qqc"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240910092606epoutp0245b69d27549bb00224cd82a112fe47b5~z188XtLl81236312363epoutp02a
-	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 09:26:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240910092606epoutp0245b69d27549bb00224cd82a112fe47b5~z188XtLl81236312363epoutp02a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1725960366;
-	bh=MtY5qZOPVIGordnCBFvzVrBfTMRjvMNrDfO7tPymv9k=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=qNQu/qqciECo7N+Qr5su9Pn5p1DrkHX7PcmkcbYMNwLTMna70vEU9XE3Oyqru/qv8
-	 wLGPiEhl3CbffRzyva8rLXOQdQBCjh5T2EpVpv24jVCnJfIltYRWDww1UnaakT6aPP
-	 zg+y+20EjuSJC5O9IGKGrQ++WIIIUh71iCixLdx0=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240910092606epcas5p1b482ec48592d08e606bf0c1ad7fb2ce6~z187_8Kmq2995129951epcas5p17;
-	Tue, 10 Sep 2024 09:26:06 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.176]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4X2yxS43Btz4x9Pp; Tue, 10 Sep
-	2024 09:26:04 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	7D.F0.09640.CA010E66; Tue, 10 Sep 2024 18:26:04 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240910092604epcas5p4d01dec7422c7990882f6453c52a78075~z185-cxiQ0887908879epcas5p42;
-	Tue, 10 Sep 2024 09:26:04 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240910092604epsmtrp2fa22a8c1a088d03d2222bc0993458c5d~z1859dXm12757627576epsmtrp2k;
-	Tue, 10 Sep 2024 09:26:04 +0000 (GMT)
-X-AuditID: b6c32a49-aabb8700000025a8-d8-66e010ac0e90
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	80.E9.19367.BA010E66; Tue, 10 Sep 2024 18:26:03 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240910092559epsmtip21e15ace98c8e2bda39a2dbad69522f80~z182IcM510197501975epsmtip2l;
-	Tue, 10 Sep 2024 09:25:59 +0000 (GMT)
-Message-ID: <c9289a2f-ecb3-7e3e-c5d9-336ce2bc09a7@samsung.com>
-Date: Tue, 10 Sep 2024 14:55:58 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NBp0+qcY"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a8d51a7d6f5so263767366b.2;
+        Tue, 10 Sep 2024 03:57:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725965877; x=1726570677; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SJslusrrfXDGSsSDYUzneHTVhmBl5GEMcjjDhX1iRYg=;
+        b=NBp0+qcYqc33xGV/1W3XalyY+FDwdw2lVfol30a4owrAIGXPdbbn7FYxneRkhXXUUq
+         xj2Sfr3aWgunKsrwYRvUYymtUEA5CnRbPNuOP3ZcA048REh1DiznKaVDnxcaMrqzI2cq
+         D+Fe2OWizQC0tNkKXW8ZkvafG+uQb/G2xkSyaHfguq4l2JhwJaXBV+d5nXj6USgdd8qp
+         7HR7t/SV+Ayhw3KumiOukVPF8FFdwJDSlRl7Ro6YCkYbBbiNDttYC0GkEHaHatyOa8+c
+         wo4Pn/SeCOU9FD4tUgw4TwLuqyjGYEBipNz6lHnXCRfJRixhHfw0JJhb98S8R7AnW+MG
+         ltJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725965877; x=1726570677;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SJslusrrfXDGSsSDYUzneHTVhmBl5GEMcjjDhX1iRYg=;
+        b=hVCtvcJRBWdT+y7ICO1aBCYkZWc96bRtdVhIRO2Cl9sQXfye1sxdTGX+lEiXu4RO68
+         0ci5XgyTgv/1ByrcjOWKoSy3mEmLh/iFPFnLvTgJ6R/kp/YL7dFLMyU7eM7akbgtptK0
+         mDCx856MyztNVOmX4cCtIbrQVBnpVgNRr5bJP+4kUVMEThjecmaupGnSJqq5WfubSCsM
+         qGt0jMreOqRaCwnke079XaCjD4se/K57I9f/M6ocGL8YseHFQanN1Xg4UcSNa4RCjZaM
+         z17Qs6aJLXvmwVif6HO9zd7zYsiPVqXhV1mb4UF1HaeoYTFUJUs637SiEcMGlCse7js0
+         QStw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzkZ9vjmGY24TZ5YLplUWrmZbbV2HgweQatxTEgXeSmiS1+3ZTivESIUgUzNAHdL5iYR/yUMQPqtLWwQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGo+IOfbiJsm7feORDIv5wAM89Yb0RZMS6o1ievmt9s4Tuj2nA
+	TTgTPF/nbF1l3SUR+M5IqgCpVUi/IUV9QUbMFFf8sS1W/fLAJ0gv
+X-Google-Smtp-Source: AGHT+IHJrz5lkl252drUfjQ7T3c25l0GDv7hN76cAIIs9WY19rUFlfCKvwm1+Pw85rtaKK0gycWHsw==
+X-Received: by 2002:a17:907:c29:b0:a8f:f799:e7d1 with SMTP id a640c23a62f3a-a8ffab7e36amr36896466b.38.1725965876614;
+        Tue, 10 Sep 2024 03:57:56 -0700 (PDT)
+Received: from [192.168.42.232] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d258354d1sm467851266b.13.2024.09.10.03.57.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Sep 2024 03:57:56 -0700 (PDT)
+Message-ID: <430ca5b3-6ee1-463b-9e4e-5d0b934578cc@gmail.com>
+Date: Tue, 10 Sep 2024 11:58:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH v4 5/5] nvme: enable FDP support
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 5/8] block: implement async discard as io_uring cmd
+To: Christoph Hellwig <hch@infradead.org>
+Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org,
+ linux-mm@kvack.org
+References: <cover.1725621577.git.asml.silence@gmail.com>
+ <7fc0a61ae29190a42e958eddfefd6d44cdf372ad.1725621577.git.asml.silence@gmail.com>
+ <Zt_8wlXTyS2E7Xbe@infradead.org>
 Content-Language: en-US
-To: Keith Busch <kbusch@kernel.org>
-Cc: axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
-	martin.petersen@oracle.com, James.Bottomley@hansenpartnership.com,
-	brauner@kernel.org, jack@suse.cz, jaegeuk@kernel.org, jlayton@kernel.org,
-	chuck.lever@oracle.com, bvanassche@acm.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com, Nitesh
-	Shetty <nj.shetty@samsung.com>, Hui Qi <hui81.qi@samsung.com>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <ZtsoGX2QY-TjBolb@kbusch-mbp.mynextlight.net>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <Zt_8wlXTyS2E7Xbe@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTdxTHdx+0hVFzLa8fZBtd2SNgoJSVekHp3GzYZS4Gh0BituAdvTwC
-	fdDbTpxLqKIyMcDEANIhrRQwgBuKhMeQBMsYMmCQIQM72+Eom0gcCFsmoLCWyxj/fc7J+Z5n
-	DgfhnWQHcDKVWkqjJLMFLA+0rTf4zdBr2FRa+JT1JbzJVsLC53oXIbx8YRnB121/wPi9nk4Y
-	b2jqg/HO+q/Z+FcV+TDuaDYg+I0SDj59f4mNL9c3svFSy88Q3m3dhf9U8x5+q3sAxY31M2z8
-	/EQHC7/avwbjbatGBP9mbh7FRwxV7H2+xNjdA8SI/QZKlJf+wCLGhnVES+M5FnGzNo/oMi3B
-	RNc9PYt4MmNFieLWRogYMn3HJpZaXon3PJK1N4Mi5ZSGTylTVfJMZXqM4EBCyv6USEm4KFQU
-	he8W8JWkgooRyD6ID43NzHaOK+B/SmbrnK54kqYFQulejUqnpfgZKlobI6DU8my1WB1Gkwpa
-	p0wPU1LaaFF4eESkM/BoVkb/chtL3eSZe350ma2HTnkUQu4cgIlBa8EcqxDy4PCwLghcrbmL
-	MMYiBEZbpt22jOqyGmcYZ0NSvw4z/k4IrDZc2VQ8hoDd2uTmysvFpOB5tx51CVDsdTDRe4hx
-	7wQDlQ7UxT7YJ2BlvApysZcz58SdecTFCOYHrA4j7GJvLAjYjJUbTSCYGQWPisxurpwsLBiM
-	XtS50B2LBhfOHGakgaD9cdVGOwAzu4PLD6/AzJgyUDfdjjLsBR71t7IZDgBLf3azGM4CU79N
-	bcZ8DjpuFrsx/DbQP5vcKIs4yzZ/K2Rq7QBFqw6YWQkXfHGWx0S/CuylM5tKP/DgUu0mE6C5
-	/nt4a1PdFxeQLyG+YdtWDNumN2wbx/B/ZROENkL+lJpWpFN0pFqkpI5tnTtVpWiBNn4hJK4D
-	sk0thFkgmANZIMBBBN7cEqk9jceVk8c/ozSqFI0um6ItUKTzOheQAJ9UlfOZlNoUkTgqXCyR
-	SMRRb0lEAj/u3JnLch6WTmqpLIpSU5r/dDDHPUAPF/FrM6JNtz3gyhz2eM2Hg++/VpFqNuV4
-	7RdGhvpOJyKZytv5J+IjZMWri4qQuOqRfcefNu9e6zPGkrRF+8vfpqDcPfNnf3VP9JUW+2PU
-	scDFAfmh5GdlUqHu3QTzuI+DJqnTuuv5wbs4CUkVEfOZt+pGhx5U+x+U3RmOO7ocBj/sseZO
-	KJJmV/4C92fLn58IMa69EHXYS2y+jj6VJmi8n9jqftyTY2jP66FnT5+C1Od2SB3J3KDYl6Vl
-	oncC7dcGFiryFtKEicO8Urde2ZEXbQ3W9TH9P5aCWnPL74OKjwomgyYLjXYVKyZp9WRJ8seI
-	4g3P/IMBK8I+yaXBnb1DApTOIEUhiIYm/wVws0vWlAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrJIsWRmVeSWpSXmKPExsWy7bCSvO5qgQdpBvcm2VisvtvPZvH68CdG
-	i2kffjJb/L/7nMni5oGdTBYrVx9lsti5bC27xezpzUwWT9bPYrbY2M9h8fjOZ3aLn8tWsVtM
-	OnSN0WLvLW2LS4vcLfbsPcliMX/ZU3aL7us72CyWH//HZLHt93xmi3Wv37NYnJ81h91BzOPy
-	FW+P8/c2snhMm3SKzePy2VKPTas62Tw2L6n32L3gM5PH7psNbB4fn95i8ejbsorR48yCI+we
-	nzfJBfBEcdmkpOZklqUW6dslcGUc/7mNrWA1T0X3hZ/sDYxNXF2MHBwSAiYSy/4zdTFycQgJ
-	bGeU+Dipn7GLkRMoLi7RfO0HO4QtLLHy33N2iKLXjBLTzv1iBknwCthJ/N3bwAIyiEVAVeL6
-	4UCIsKDEyZlPWEBsUYEkiT33G5lAbGGgXddPvAdrZQaaf+vJfLC4iICyxN35M1lB5jMLLGaR
-	2LRxGxvEsreMElM3XmADWcAmoClxYXIpiMkpYCUxsTUEYo6ZRNfWLkYIW15i+9s5zBMYhWYh
-	OWMWknWzkLTMQtKygJFlFaNoakFxbnpucoGhXnFibnFpXrpecn7uJkZw7GsF7WBctv6v3iFG
-	Jg7GQ4wSHMxKIrz9dvfShHhTEiurUovy44tKc1KLDzFKc7AoifMq53SmCAmkJ5akZqemFqQW
-	wWSZODilGph2m7ya35ot5KP/YYb6hKd5wsctNNOaz+lnb2Fry96Rd13xnb5VcnLw+wM/z7v5
-	3A1z3HYjc+pNA5eOJH/2Lf/+52hUT+BcU2vYlu/xzWyv+SPpcot/k9LZpIzW3dgUfWfbllXV
-	h7rkhSZe10q4duqRRJxgvS0nu9QnEcl7whOL5mpGvLyuUBRw0zzSXPl0RXffckP9/bebOL/e
-	rT6/wu7y7efzNPfkbFqTGCkrfP69UVVQ/svtn79VXG+5kS/Bl5D3RatH21yzzcomI3WOTYtX
-	Lc80q4NXXumcMO1dLn3yPI941ZwV7z+bO52333cieVOjY9+FBw1XHsg55LzT5Tq7YobzRu8X
-	LM6zVcz99iqxFGckGmoxFxUnAgBTa/iJbAMAAA==
-X-CMS-MailID: 20240910092604epcas5p4d01dec7422c7990882f6453c52a78075
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240826171430epcas5p3d8e34a266ced7b3ea0df2a11b83292ae
-References: <20240826170606.255718-1-joshi.k@samsung.com>
-	<CGME20240826171430epcas5p3d8e34a266ced7b3ea0df2a11b83292ae@epcas5p3.samsung.com>
-	<20240826170606.255718-6-joshi.k@samsung.com>
-	<ZtsoGX2QY-TjBolb@kbusch-mbp.mynextlight.net>
 
-On 9/6/2024 9:34 PM, Keith Busch wrote:
-> On Mon, Aug 26, 2024 at 10:36:06PM +0530, Kanchan Joshi wrote:
->> Flexible Data Placement (FDP), as ratified in TP 4146a, allows the host
->> to control the placement of logical blocks so as to reduce the SSD WAF.
->>
->> Userspace can send the data placement information using the write hints.
->> Fetch the placement-identifiers if the device supports FDP.
->>
->> The incoming placement hint is mapped to a placement-identifier, which
->> in turn is set in the DSPEC field of the write command.
->>
->> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
->> Signed-off-by: Hui Qi <hui81.qi@samsung.com>
+On 9/10/24 09:01, Christoph Hellwig wrote:
+>> +	sector_t sector = start >> SECTOR_SHIFT;
+>> +	sector_t nr_sects = len >> SECTOR_SHIFT;
+>> +	struct bio *prev = NULL, *bio;
+>> +	int err;
+>> +
+>> +	if (!bdev_max_discard_sectors(bdev))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	if (!(file_to_blk_mode(cmd->file) & BLK_OPEN_WRITE))
+>> +		return -EBADF;
+>> +	if (bdev_read_only(bdev))
+>> +		return -EPERM;
+>> +	err = blk_validate_byte_range(bdev, start, len);
+>> +	if (err)
+>> +		return err;
 > 
-> I'm still fine with this nvme implementation.
-> 
-> Acked-by: Keith Busch <kbusch@kernel.org>
-> 
-> The reporting via fcntl looks okay to me, but I've never added anything
-> to that interface, so not sure if there's any problem using it for this.
-> 
+> Based on the above this function is misnamed, as it validates sector_t
+> range and not a byte range.
 
-The difference comes only in the fcntl interface (hint type/value pair 
-rather than just value), otherwise it piggybacks on the same kernel 
-infrastructure that ensures the hint is propagated fine. So I do not 
-foresee problems.
+Start and len here are in bytes. What do you mean?
 
-And FWIW, we have had precedents when a revamped fcntl was introduced to 
-do what was not possible with the existing fcntl. Like: 
-F_{GET/SET}OWN_EX over F_{GET/SET}OWN.
 
-Per-file hinting has its uses, particularly for buffered IO. But the 
-current interface can only do data-lifetime hints. The revamped 
-interface may come handy for other things too (e.g., KPIO).
+>> +	if (nowait && nr_sects > bio_discard_limit(bdev, sector))
+>> +		return -EAGAIN;
+>> +
+>> +	err = filemap_invalidate_pages(bdev->bd_mapping, start,
+>> +					start + len - 1, nowait);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	while ((bio = blk_alloc_discard_bio(bdev, &sector, &nr_sects, gfp))) {
+>> +		if (nowait)
+>> +			bio->bi_opf |= REQ_NOWAIT;
+>> +		prev = bio_chain_and_submit(prev, bio);
+>> +	}
+>> +	if (!prev)
+>> +		return -EAGAIN;
+> 
+> If a user changes the max_discard value between the check above and
+> the loop here this is racy.
+
+If the driver randomly changes it, it's racy either way. What do
+you want to protect against?
+
+>> +sector_t bio_discard_limit(struct block_device *bdev, sector_t sector);
+> 
+> And to be honest, I'd really prefer to not have bio_discard_limit
+> exposed.  Certainly not outside a header private to block/.
+
+Which is the other reason why first versions were putting down
+a bio seeing that there is more to be done for nowait, which
+you didn't like. I can return back to it or narrow the scopre.
+
+>> +
+>>   #endif /* __LINUX_BIO_H */
+>> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+>> index 753971770733..7ea41ca97158 100644
+>> --- a/include/uapi/linux/fs.h
+>> +++ b/include/uapi/linux/fs.h
+>> @@ -208,6 +208,8 @@ struct fsxattr {
+>>    * (see uapi/linux/blkzoned.h)
+>>    */
+>>   
+>> +#define BLOCK_URING_CMD_DISCARD			_IO(0x12,137)
+> 
+> Whitespace after the comma please. 
+
+That appears to be the "code style" of all BLK ioctls.
+
+> Also why start at 137?  A comment
+> would generally be pretty useful as well.
+
+There is a comment, 2 lines above the new define.
+
+/*
+  * A jump here: 130-136 are reserved for zoned block devices
+  * (see uapi/linux/blkzoned.h)
+  */
+
+Is that your concern?
+
+> Also can we have a include/uapi/linux/blkdev.h for this instead of
+> bloating fs.h that gets included just about everywhere?
+I don't think it belongs to this series. Regardless, how do you
+see it? The new file can have just those several new definitions,
+in fs.h we'd have another comment why there is another empty range,
+but I don't think it's worth it at all.
+
+Another option is to move there everything block related, and make
+fs.h include blkdev.h, which can always be done on top.
+
+-- 
+Pavel Begunkov
