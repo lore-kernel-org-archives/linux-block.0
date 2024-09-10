@@ -1,68 +1,68 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036AA1ABEB9
-	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 22:39:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1C71ABEAB
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 22:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726007979; cv=none; b=p8UtqLtpkdbpIQ5NbSrpBUIXmQf3zURM6x3BcfvJYzZXvky+6P4GWY5wCRBNsECNkIpGbfSpULEAWL3yURgVrxefv4THoxx9ilASmVvLLbrsuVZgRkJMTz5byk8darX5mOVWmkQqwhjTRJcbACBChjnhwd4wNYGui44pwguMix8=
+	t=1726007979; cv=none; b=CeAoVd4B0pKBDLHQWGMvVlxOHzfxA4/rUZ0FSKW0n1/PFkJ5vHRnYvdJVg85eIoL+249q+N9M0SClbIyh+xJT3HXFR/DOrY7mlx4XDgZl2+umjXt1Uvqnp4/egNcgG1KazwbCdswP6uU51C4qj4YsZ4hvr9ZlaJmpVtH9Tmyeno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726007979; c=relaxed/simple;
-	bh=9lozWcbmWLbcepezHSOWbdICzaNXH073+Xycr1gGoPk=;
+	bh=pjZtiX3I24/dylwpsaxDdsLg57zYZcJN9pg9emc6ADk=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=hV0syCbwRevYQTnlT43M2Hwz5hfLHeCBJoZZS9lwgTVTBblsZ2okpWb/noY3qe0pvvRg2SYy38jNTEAekOsjzDFKKjV3adFtPHgLHvrYVm9Z8d8VZY4F2zEN27jx9Y8YRU7A7/u8mIuQfrcGYteMBRBsYeCnhSODmm1FoJaDfRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ft3wyKVk; arc=none smtp.client-ip=209.85.216.53
+	 MIME-Version:Content-Type; b=A1yVv7TrP/5D9LFwwKtODvftl2zZVn7GCGqoM6UxedkwKifwU6w5jlgzxzu1GSx4UdRLBfgVULMX+aKkSFdUA4YklcIMja8oG5kMYmj0A2/OJGHPK3BVu6jMd/V4zRZ/QuJ3ezaMwF4ikNwicfUe5/JsLY4JuKPoGC2H02lW8UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JrPRhMlj; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ft3wyKVk"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2d88c5d76eeso3949933a91.2
-        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 15:39:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JrPRhMlj"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2d8a744aa9bso3903778a91.3
+        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 15:39:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726007977; x=1726612777; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726007976; x=1726612776; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bEgf48d3Npdbvo6EbFMiLCDqMwGMD0QaDq1MPdaUUIE=;
-        b=ft3wyKVk3aMT1GXHejUXbtmXvku6W/ZTXY/WOJH0UNfc+InzxSYO/BJDgdoepcnA8l
-         MnOzvKDJTali7k4VBrlQhLUiNGa1J0mRQ2CI1c1sI7L/9r2WHKcbYWU5C0EeBhpVH3Vx
-         VeyaoJ+PJRBVqKkizoOLKwKM3cKQwXtb2N9n/bZAcIw3zZLTeJdgypmhkbyS/O+8MMPX
-         rzhPHOrdKJFWQ3HGCSAYW+TUSjLtX+F7mEUQds6RTwQEnL8mGUWueBxpawJD9Ny37Cqo
-         MPVdtkuTWE9egvs7Mg0SiMgi/CA0yl1fH7rYXgZ0/IyqRItCfchsI8sZ5WpypJB2GcP/
-         l81w==
+        bh=FigzNtvrWKZXxuePOe6tACCaPjx0X2YKNkQWmTB03Mg=;
+        b=JrPRhMljpOk+QH14/2bwp976jpU8RrjFhUmzL6BJMeAcC/y/2p8I/C8OzUh6VWoLaK
+         frOGbppGi8m4kT3yF3XCVIzZEKjnrv+DceePQ+GdNPYmfYwZPqoFrRmg/fF6V9BkOEA9
+         0Kdv9TT77fpVu0Jd2nsiSE0PVLT3AeB+mrgftohzqV4in5QAc6/D/nJNYRYNzw28el0I
+         sDgkl8Q1NhzFS34xqRuOrKfsZCuYORwQz6JqfcG+PTTFGn5NbFCu72CHSKm7hH3bDhCm
+         jeNRXuxBAv3SKJRKLalvA8cfwvXBssYjKKeJRfB+fIdMQ32f/h4+nzi6kOWJmVtkBrvo
+         ac5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726007977; x=1726612777;
+        d=1e100.net; s=20230601; t=1726007976; x=1726612776;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bEgf48d3Npdbvo6EbFMiLCDqMwGMD0QaDq1MPdaUUIE=;
-        b=YXRaEA291sImQ4IATqal2RaGVNb05Wv6YB69NjUeopCAKqMxvUCXtoDQDW1veDR4m9
-         cxzXPGildXqIftl4BF6C0bjv+FHVDEoklM2Lu+NJ4DiPPrXad0ROC/FsZ87blzJ66Apm
-         py/5bUpGY66XShwPLpecSv4V4eh1CdOhL3b4v0DiZX0bGf/ge/NvYfnhCKGpRT845TT/
-         nnlRTJ4rwMTdY1uI0OplhgC1oX9RC2AcutvsQx/UD7apXiDFd0l8SopQVn+vtDWHskLb
-         0TUozfqknmhDIiSgJZfCZY3Qu5Hjsc+2ekd0ycDOhLUu1Vg+DnEK7/c/k+nIq9BR1lLJ
-         aFaA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5WdxRXAxFU3KsnG4dCcvD4tkv+GORJfUEt+3Qnu9CDVQb6Pu+yQQzfPOF67r4MxoJ0kVsuSb2Y7ccKg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq27zTiZ2LiUEt3xqzYHvjnJRIDLDN7y1PL61WoZXc6AXS6pe/
-	TBWYmr7Lkgk5Loo7ytiPlrDhHV5GAyK19dvEf5QepLq4uD6RHoWuCnGZ+MTkzUM=
-X-Google-Smtp-Source: AGHT+IHCH2U+Pd8pCtG0FiLuc/i8oC84BPGovGTV+RXsztdpQ8wULTsd+XipxuU/K/xfaYWjQ1mgAA==
-X-Received: by 2002:a17:90b:2248:b0:2d3:db91:ee82 with SMTP id 98e67ed59e1d1-2dad513a8d5mr12858061a91.40.1726007977323;
-        Tue, 10 Sep 2024 15:39:37 -0700 (PDT)
+        bh=FigzNtvrWKZXxuePOe6tACCaPjx0X2YKNkQWmTB03Mg=;
+        b=GIbvzBDSw1Dpwx1Sb7PeDQlJnfFR9xRkoIFlUpObq+qBIP55HYCkxyufqkiZwsEKy3
+         nN/nX4SmqPkVQH6hNIzxcDie01ibIsJziwAKE6/E1+QPsUSDIV0JT6heMEv8XloJwak2
+         X+LJDVL21hWodQnIat/x03BHopZgexlbkRo0egmwiB4bJpai8aYH8KYIY11hQ1GGWDTs
+         oSXjyKHRA3hTaCKi7hZ8jdb1Etj9nzwPP0PFEIEqvjao45aqNWMju0Hl966ahrXN8gh/
+         FKLhoEFAIVSvoi7gtXZhwnBv4IVafstB/40XtY8re9AvTKNFrWQ7quf2kmBpuqc4yJWF
+         EbsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaRXLONWlvrEwGM2TXucon4+hLFcapMXQ5CPtRDyrOUbMoCFbtMKIgu5C0ObBgs4fZB2x4kGvlWOHv8Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHKgfoa+HKaFBVKNhEj0AxaoTcxMWL6f9xYk6W/PW8W9dzWTfn
+	NP9rfKPzs3HCex8h+VpnZFxAcAA55vewWYN9raKS81Ftk64wWTPvsVMtAB6o2qw=
+X-Google-Smtp-Source: AGHT+IF0GR1i0sQ5Ook6LfpBSmPCQc8y7EcbXQCHLNWwVcaj/n7ugGPsvdjl+SA0g3BIZABPUKDddg==
+X-Received: by 2002:a17:90b:1c03:b0:2c4:b0f0:8013 with SMTP id 98e67ed59e1d1-2dad4efdf95mr16206730a91.11.1726007975834;
+        Tue, 10 Sep 2024 15:39:35 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadc127c5bsm9023783a91.52.2024.09.10.15.39.36
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadc127c5bsm9023783a91.52.2024.09.10.15.39.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 15:39:36 -0700 (PDT)
+        Tue, 10 Sep 2024 15:39:35 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, yukuai3@huawei.com, 
- Yu Kuai <yukuai1@huaweicloud.com>
+To: tj@kernel.org, josef@toxicpanda.com, Yu Kuai <yukuai1@huaweicloud.com>
 Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20240909134154.954924-1-yukuai1@huaweicloud.com>
-References: <20240909134154.954924-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH for-6.12 0/7] block, bfq: bfqq merge chain fixes and
- cleanup
-Message-Id: <172600797599.158663.4657437776130763939.b4-ty@kernel.dk>
-Date: Tue, 10 Sep 2024 16:39:35 -0600
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
+ yangerkun@huawei.com
+In-Reply-To: <20240903135149.271857-1-yukuai1@huaweicloud.com>
+References: <20240903135149.271857-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH for-6.12 0/2] blk-throttle: support prioritized
+ processing of metadata
+Message-Id: <172600797465.158663.18224445908631477542.b4-ty@kernel.dk>
+Date: Tue, 10 Sep 2024 16:39:34 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,41 +74,23 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.1
 
 
-On Mon, 09 Sep 2024 21:41:47 +0800, Yu Kuai wrote:
-> Patch 1 fixes a problem found by xfstests generic/323, tested on scsi
-> disk with bfq.
-> Patch 2 fixes a problem while digging the above problem, by a debug patch
-> to print procress reference.
-> Patch 3-7 are cleanups while reviewing code.
+On Tue, 03 Sep 2024 21:51:47 +0800, Yu Kuai wrote:
+> Yu Kuai (2):
+>   blk-throttle: remove last_low_overflow_time
+>   blk-throttle: support prioritized processing of metadata
 > 
-> Yu Kuai (7):
->   block, bfq: fix uaf for accessing waker_bfqq after splitting
->   block, bfq: fix procress reference leakage for bfqq in merge chain
->   block, bfq: merge bfq_release_process_ref() into bfq_put_cooperator()
->   block, bfq: remove bfq_log_bfqg()
->   block, bfq: remove local variable 'split' in bfq_init_rq()
->   block, bfq: remove local variable 'bfqq_already_existing' in
->     bfq_init_rq()
->   block, bfq: factor out a helper to split bfqq in bfq_init_rq()
+> block/blk-throttle.c | 69 +++++++++++++++++++++++++++-----------------
+>  block/blk-throttle.h |  2 --
+>  2 files changed, 42 insertions(+), 29 deletions(-)
 > 
 > [...]
 
 Applied, thanks!
 
-[1/7] block, bfq: fix uaf for accessing waker_bfqq after splitting
-      commit: 1ba0403ac6447f2d63914fb760c44a3b19c44eaf
-[2/7] block, bfq: fix procress reference leakage for bfqq in merge chain
-      commit: 73aeab373557fa6ee4ae0b742c6211ccd9859280
-[3/7] block, bfq: merge bfq_release_process_ref() into bfq_put_cooperator()
-      commit: bc3b1e9e7c50e1de0f573eea3871db61dd4787de
-[4/7] block, bfq: remove bfq_log_bfqg()
-      commit: 553a606c25f8ff5c518c7fcf488dd4dd5fbb4795
-[5/7] block, bfq: remove local variable 'split' in bfq_init_rq()
-      commit: e61e002a67da9ec36571af743c94a968cf1ce116
-[6/7] block, bfq: remove local variable 'bfqq_already_existing' in bfq_init_rq()
-      commit: 3c61429c297582e0da7231fb29fc5ec1d2c7d1b2
-[7/7] block, bfq: factor out a helper to split bfqq in bfq_init_rq()
-      commit: a7609d2aec67ec16220036a5b1b14610883cdbd3
+[1/2] blk-throttle: remove last_low_overflow_time
+      commit: 3bf73e6283ef0bae4e27dad62309e50e3bf7ee88
+[2/2] blk-throttle: support prioritized processing of metadata
+      commit: 29390bb5661d49d10424ad8e915230de1f7074c9
 
 Best regards,
 -- 
