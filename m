@@ -1,89 +1,124 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4AA191F82;
-	Tue, 10 Sep 2024 13:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815131EB2F;
+	Tue, 10 Sep 2024 14:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725975067; cv=none; b=FPE76ADP6owOqfuOeAG7YPqpLzhjgq/k05JSaaD61IWMzi/Z/YCMYxyW9HxepvfO8JFTZX7ZhmMKNix/BqF99mL+wMf0MFt7eXQRrfdvCKAFB0G+BSknp7n3dNY/Jclu8Eq1Nq+Jd0cYY0qDNxdnxDXVwYjMGbDdDTmeWFF6mrk=
+	t=1725977839; cv=none; b=diOvQeTCk9Bl8lo7D8zm3DrOMKBnUFeAkd3xSHK++3ZEfOKEn6kjez0dM1g1OJqTSat4BA+bsz1Wl58UpOXIgnSP7esPKiNzrGcAMN1s68pQujHjXX4VsrjTvOXhhwcxb0x1j73DslsCcotUHo8WZHy1nG/zbpsB5kO7G7I4q7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725975067; c=relaxed/simple;
-	bh=8IM2BCYuDlqVMcITEL66ApomB9Uwz1TwgljKzkwZa6A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=outyBThT/VpfyaZxT8HUj8wRO/wUqF1ZCjZLKfkVC1iIDtq7KQoDqn6KnXWZp3NBaHnMv8OY2+XnrLACZn46rOLu8iALOcXYr8jg9tYGWO7D74t67THH7IfzxJ9DLnexOSLKa71wS7N3AHViDN4zgtEyASpkd1K91Iv+/1gLuGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hRTl8kps; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1725977839; c=relaxed/simple;
+	bh=ILoKlmcc9IlBjuY4J36z4xq3BtRyZ37EwBe1tM0lrnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o1zWPb7D7SptjDcH3kjrc5aH2rWFszlK7YLfHV1uekKBIitUWGl6wr/EWf/I7ajCFaAqUPIzMoIGS5c9UFXjt/cMVHpLE377/8NvVNSUjvnJqVpygEMjPQVYP7lO1mvZpd6tRL3rI8Z1Wgu9tOwlNh7y6u+ulGZzmYUbIwis8Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hnUz3AjZ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hRTl8kps"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70d19bfdabbso466742b3a.2;
-        Tue, 10 Sep 2024 06:31:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725975065; x=1726579865; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8IM2BCYuDlqVMcITEL66ApomB9Uwz1TwgljKzkwZa6A=;
-        b=hRTl8kpsiYHcdODuckoXrbq2rv2dC2H2P5Siea3qPfoBj0g7r3MNx4xd53cA3iEFNa
-         Q2Wn3GYdD4zAZdNT7csA1RVPu1vAcX09DLS51KfzYw78n5nJ11i79ZhrJQRqhGPua95o
-         pZARPAbqFzLV5U5w/iBa18n8bmISeKjnGlzSniLFxG13C6s6buYFc3j+4BXHVvF4enVf
-         t9wtrO5z3R1XoLLi8ftq/mVLdMUJAyEzxT3sgNSmLtVSchCZFLEUewIOLKESyPp7ajRd
-         cWujBl7ZA/TLyEIvLeidCNN+mscXdDv4T1GdOSPKwneMnkY4gkKkjVIwR3D1LXYPwzk+
-         YkxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725975065; x=1726579865;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8IM2BCYuDlqVMcITEL66ApomB9Uwz1TwgljKzkwZa6A=;
-        b=o4LlNGqKoOe6cfANVUmzhmbh+6Uyt+yXnYUsKW00Jwyg8a8K4cvblq/I5DH7YCMfp0
-         jqMy/0JBhhPBbH36E42R3Dr8jocYSVOJnOu35v1je2m2i1hK5ZM467GyEhP2acAfTz/q
-         yFed77iE7c92sUzDlYdd85/NwUJwJBHPyGTe/ihNsPb8X5dmN9Oz6KMOD1qFgHGXaBAd
-         B9cUVdDg2U+kcrxongDHMzF5RJHXgv4k2vxocjxwxnhSoDriD5e9rFdzMENaz4sgYQbh
-         EAS9m8dyng1JMTGIJJpIC4OwzNI8vWn3taP0XC+PUVybBxssqHXxcaq6UiPgCc1dLaxg
-         bCvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqRWRdDpshx0rpg3BrVqYjtbqzz1boDewnEnBZ4HwAsPV7v1e+iOwZaTsKEThLj/yNEDNg5xB6qW8WfJs=@vger.kernel.org, AJvYcCW7kl+2LXksBBzSXvBC0tHL/GX13hyl+LXsotzIKmGPlRlCl1i2hN/Sh/T3RPz6yvot6e85Ow97fd1kFGKWsKc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHNSACw7OTw0qxVOo5wzijYXEsU/l+j0Exj/L85xUcFdmHWgqv
-	gZbRyipUaUzgRS8stnILcwXchAsyeJ2WENU6owQCntuAfTb0Uzvpk+Vfo9+IptkvNgjlEAb39ck
-	2B7MjyQNl64y1geMfd2Xh6gJZYFo=
-X-Google-Smtp-Source: AGHT+IEbU5pdhaY5wWJd0ty0w7X1YM3B6QiTtxg7gWGkmskwR62fRuRjoIpcsk1GiEWvJ+WOfd/1vR/Sc5ctfx2dqOs=
-X-Received: by 2002:a05:6a20:12c8:b0:1cf:217b:46ce with SMTP id
- adf61e73a8af0-1cf5e19e26fmr474676637.7.1725975063957; Tue, 10 Sep 2024
- 06:31:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hnUz3AjZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=DkOrZ1Suf79nRPSASZN/zy8KeU8qA5QdhlPDiSeKVDE=; b=hnUz3AjZ8oQEKvbkyJ9wzk2EEY
+	nibfCyItU0Jxw+x8oUp8v+zTkmkSv+FSCms/YGS4Oxb3TmrbX6G1O2AD2JDs6G5dq0zle2ObC5N1Q
+	vl16jF51PffGlGNmWN4EkiJgAIAlw5jFpQvnXXFK7P872FNZv1d71/ygdSXDdlR+4eHjj+62l/qL2
+	6PrNaa6rFOHARsNyAclXgdAAIHfL1Su6JERU4L97IQ1vIPYfH+dWvlATUVfk/tnRAIMJfg+68vywC
+	iX5MYNmNjLcqkqhHB3UlMK69aQC1z4kEpR3c8aZW7eMTGzxpgKENYy9/wtQ3M/ccVnGW+u/RHPc9B
+	+zNySoBA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1so1g8-00000005qEM-0NM3;
+	Tue, 10 Sep 2024 14:17:12 +0000
+Date: Tue, 10 Sep 2024 07:17:12 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, io-uring@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Conrad Meyer <conradmeyer@meta.com>,
+	linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v4 5/8] block: implement async discard as io_uring cmd
+Message-ID: <ZuBU6Nn3lS21FN_Y@infradead.org>
+References: <cover.1725621577.git.asml.silence@gmail.com>
+ <7fc0a61ae29190a42e958eddfefd6d44cdf372ad.1725621577.git.asml.silence@gmail.com>
+ <Zt_8wlXTyS2E7Xbe@infradead.org>
+ <430ca5b3-6ee1-463b-9e4e-5d0b934578cc@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909161749.147076-1-hridesh699@gmail.com>
-In-Reply-To: <20240909161749.147076-1-hridesh699@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 10 Sep 2024 15:30:51 +0200
-Message-ID: <CANiq72ni=BZX4QxG+ouK-m-6C=D1J1xgYNdOMEUMAUUnzuZ3Kg@mail.gmail.com>
-Subject: Re: [PATCH] docs: rust: clean up empty `\\\` lines and improve
- rustdoc formatting
-To: hridesh <hridesh699@gmail.com>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, 
-	Matt Gilbride <mattgilbride@google.com>, Shuah Khan <skhan@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <430ca5b3-6ee1-463b-9e4e-5d0b934578cc@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Sep 9, 2024 at 6:19=E2=80=AFPM hridesh <hridesh699@gmail.com> wrote=
-:
->
-> Signed-off-by: hridesh <hridesh699@gmail.com>
+On Tue, Sep 10, 2024 at 11:58:23AM +0100, Pavel Begunkov wrote:
+> > Based on the above this function is misnamed, as it validates sector_t
+> > range and not a byte range.
+> 
+> Start and len here are in bytes. What do you mean?
 
-Is hridesh a "known identity"? If not, please use your full legal name
-(please see https://docs.kernel.org/process/submitting-patches.html#sign-yo=
-ur-work-the-developer-s-certificate-of-origin).
-Thanks!
+You are right, sorry.
 
-Cheers,
-Miguel
+> > > +
+> > > +	err = filemap_invalidate_pages(bdev->bd_mapping, start,
+> > > +					start + len - 1, nowait);
+> > > +	if (err)
+> > > +		return err;
+> > > +
+> > > +	while ((bio = blk_alloc_discard_bio(bdev, &sector, &nr_sects, gfp))) {
+> > > +		if (nowait)
+> > > +			bio->bi_opf |= REQ_NOWAIT;
+> > > +		prev = bio_chain_and_submit(prev, bio);
+> > > +	}
+> > > +	if (!prev)
+> > > +		return -EAGAIN;
+> > 
+> > If a user changes the max_discard value between the check above and
+> > the loop here this is racy.
+> 
+> If the driver randomly changes it, it's racy either way. What do
+> you want to protect against?
+
+The discard limit shrinking and now this successfully returning while
+not actually discarding the range.  The fix is pretty simple in that
+the nowait case should simply break out of the loop after the first bio.
+
+> > > +sector_t bio_discard_limit(struct block_device *bdev, sector_t sector);
+> > 
+> > And to be honest, I'd really prefer to not have bio_discard_limit
+> > exposed.  Certainly not outside a header private to block/.
+> 
+> Which is the other reason why first versions were putting down
+> a bio seeing that there is more to be done for nowait, which
+> you didn't like. I can return back to it or narrow the scopre.
+
+The above should also take care of that.
+
+> 
+> > Also why start at 137?  A comment
+> > would generally be pretty useful as well.
+> 
+> There is a comment, 2 lines above the new define.
+> 
+> /*
+>  * A jump here: 130-136 are reserved for zoned block devices
+>  * (see uapi/linux/blkzoned.h)
+>  */
+> 
+> Is that your concern?
+
+But those are ioctls, this is not an ioctl and uses a different
+number space.  Take a look at e.g. nvme uring cmds which also
+don't try to use the same number space as the ioctl.
+
+> > Also can we have a include/uapi/linux/blkdev.h for this instead of
+> > bloating fs.h that gets included just about everywhere?
+> I don't think it belongs to this series.
+
+How would adding a proper header instead of bloating fs.h not be
+part of the series adding the first ever block layer uring_cmds?
+Just in case I wasn't clear - this isn't asking you to move anything
+existing as we can't do that without breaking existing applications.
+It is about adding the new command to the proper place.
+
