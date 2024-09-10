@@ -1,171 +1,102 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE04185B43;
-	Tue, 10 Sep 2024 10:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F6F23A6;
+	Tue, 10 Sep 2024 11:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725965880; cv=none; b=Des8TIhw4J7/PUnNzLUMlNpsLCFLYe49Z9N0VNyr5ss4ADDc3aoS9hY40nHmEnBaGUlKyfe9E6b2W+uyLJq4QwLTR5VdcJKz7x9ySB9ZtiY5oCEbIRDFiZFzIRIFKEvDtb3nrTVi8phAvVxCjjIrwSirmG7ftZFjSLBK5xi3uTw=
+	t=1725966664; cv=none; b=uf3m3L+Qrh52Tzh67WJI9V9zlaZLlW+GlRcV1DjUS5eP8urEyc76Ca4auSx933fBlJBgYus4Wf2hMfN/z7ULxcc3AWl8peQYQTRNXM0ROodECL+cGPR/t6KVweqzO67qsxXhrNnEx+kGotLG8EvPBUDNNt2sw9KNFi+kp3KCCmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725965880; c=relaxed/simple;
-	bh=pF/tzfuszrq6RsRMAKS2cg91CVLkL87OAR07GZsdNrE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IgHq83vPsxuE6EM/JM3+aFSM68gf/C4842TpRmXcAExmeb09lE1NK8ZY/ImoaG+nWS9aZMndcfBbFqdpJlCHJgnSZVduNFVXqQigkKQFbsFu8/DiMQmaJRQa8o4a0ta6MGQheL/tAWlhfyLCmX11nnUIEpxTVj3nt/8CXcWxRlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NBp0+qcY; arc=none smtp.client-ip=209.85.218.45
+	s=arc-20240116; t=1725966664; c=relaxed/simple;
+	bh=mfiXV5VkycZzLh5WzQn4rnkI9+MIwHzFuvfRTNj7tMo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LnyoY54eDSVHtK7iKGH0vEklYBx1o0lZNzM5Xak1guIxoaAwXYbdNqT4eCESatonbUjCvps00lagMo/nnPrNiGS0XgdAGA+Msnodce8JUInBPJODqLaX3iPDhO13XuAVNgxoWVMXGFE1dI08D+LAMt4JD+YcBjNyZtSL5haMfKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWg0wCBk; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NBp0+qcY"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a8d51a7d6f5so263767366b.2;
-        Tue, 10 Sep 2024 03:57:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWg0wCBk"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2da5acb95d2so592495a91.0;
+        Tue, 10 Sep 2024 04:11:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725965877; x=1726570677; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SJslusrrfXDGSsSDYUzneHTVhmBl5GEMcjjDhX1iRYg=;
-        b=NBp0+qcYqc33xGV/1W3XalyY+FDwdw2lVfol30a4owrAIGXPdbbn7FYxneRkhXXUUq
-         xj2Sfr3aWgunKsrwYRvUYymtUEA5CnRbPNuOP3ZcA048REh1DiznKaVDnxcaMrqzI2cq
-         D+Fe2OWizQC0tNkKXW8ZkvafG+uQb/G2xkSyaHfguq4l2JhwJaXBV+d5nXj6USgdd8qp
-         7HR7t/SV+Ayhw3KumiOukVPF8FFdwJDSlRl7Ro6YCkYbBbiNDttYC0GkEHaHatyOa8+c
-         wo4Pn/SeCOU9FD4tUgw4TwLuqyjGYEBipNz6lHnXCRfJRixhHfw0JJhb98S8R7AnW+MG
-         ltJQ==
+        d=gmail.com; s=20230601; t=1725966662; x=1726571462; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XYKGK8TlpjrzAn8Qx07BmWTI1YCZDMMMQixpsjlqW1s=;
+        b=GWg0wCBkMYEKntwGO6BlL9VZZtXPSY6b7ftZPMiGJA52uR20vIzBCmJF00hhB9amA1
+         gkc86r0ThrtwrDlwI3KLr2WgVjDYOnwp9Az9aOrimLtSp0Po7WaLLjGG5P4mhqgGbgV0
+         6tM2DlsfSr+fGLcQpl3YIS/SdNv1Pg4EwWI4wAW6mTrxRqMCLlgOHBT8BTnjuw3zS5H8
+         R04KeRrS9fm+NlwzNPhfsy44YKCnPfptpDwpygoetdpSNFKvuzy9mhpBMb5nBM464SSB
+         sLciQE6mO6UGFKTFDWNBZSl6J38aTogHbUoPjYxapiGSbVZu03RWzvT75cCzI5Pum/VB
+         5MwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725965877; x=1726570677;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SJslusrrfXDGSsSDYUzneHTVhmBl5GEMcjjDhX1iRYg=;
-        b=hVCtvcJRBWdT+y7ICO1aBCYkZWc96bRtdVhIRO2Cl9sQXfye1sxdTGX+lEiXu4RO68
-         0ci5XgyTgv/1ByrcjOWKoSy3mEmLh/iFPFnLvTgJ6R/kp/YL7dFLMyU7eM7akbgtptK0
-         mDCx856MyztNVOmX4cCtIbrQVBnpVgNRr5bJP+4kUVMEThjecmaupGnSJqq5WfubSCsM
-         qGt0jMreOqRaCwnke079XaCjD4se/K57I9f/M6ocGL8YseHFQanN1Xg4UcSNa4RCjZaM
-         z17Qs6aJLXvmwVif6HO9zd7zYsiPVqXhV1mb4UF1HaeoYTFUJUs637SiEcMGlCse7js0
-         QStw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzkZ9vjmGY24TZ5YLplUWrmZbbV2HgweQatxTEgXeSmiS1+3ZTivESIUgUzNAHdL5iYR/yUMQPqtLWwQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGo+IOfbiJsm7feORDIv5wAM89Yb0RZMS6o1ievmt9s4Tuj2nA
-	TTgTPF/nbF1l3SUR+M5IqgCpVUi/IUV9QUbMFFf8sS1W/fLAJ0gv
-X-Google-Smtp-Source: AGHT+IHJrz5lkl252drUfjQ7T3c25l0GDv7hN76cAIIs9WY19rUFlfCKvwm1+Pw85rtaKK0gycWHsw==
-X-Received: by 2002:a17:907:c29:b0:a8f:f799:e7d1 with SMTP id a640c23a62f3a-a8ffab7e36amr36896466b.38.1725965876614;
-        Tue, 10 Sep 2024 03:57:56 -0700 (PDT)
-Received: from [192.168.42.232] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d258354d1sm467851266b.13.2024.09.10.03.57.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 03:57:56 -0700 (PDT)
-Message-ID: <430ca5b3-6ee1-463b-9e4e-5d0b934578cc@gmail.com>
-Date: Tue, 10 Sep 2024 11:58:23 +0100
+        d=1e100.net; s=20230601; t=1725966662; x=1726571462;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XYKGK8TlpjrzAn8Qx07BmWTI1YCZDMMMQixpsjlqW1s=;
+        b=niXX+5/r+7dpq1euPwb3i7IK3E0a7Wb9tvZ6hitvU2asKyUO6pperynDaQjCLil2YA
+         U9G/u+87Ootk5WqLSPRoD2wUqAcUb12pyHg0JM2CScsSfgmatTNQ28NWnmf8Cfy/bQof
+         7nkVz+ZWShfHEzB76F24wHsx+IO2YrlBNcsZBIVv8ySjMBc9JbD8QrAgK8EwsUntC3B3
+         buY8kJmR1Or6rO1yrFa79XaqThdz0z5Vnoyd1MpTNnADUJHHxQymf3EhCUHzoCF/Uz/w
+         LAtW69kDhmcI+k/uGn5z6TgDQ/D+aBCZi9r751lrcGZMgIlaUwQI/VMbsjN2Mip7JIFl
+         XUmA==
+X-Forwarded-Encrypted: i=1; AJvYcCX7QWdrGYOcE02TjkRX1GThLvSJT3OIE7D/SHUym+FSqw0H1f9qFJ+RP0UPC+JGK0iCu4EHbRfqgrqVGycK5xo=@vger.kernel.org, AJvYcCXak+goX9ue7oix5qPVPOH8U/r3OkAHQpbzgTk4fI0i+JRXqsNrmtOOX06QE7aJi5N3ROfraU0TCZQ5m8D6@vger.kernel.org, AJvYcCXtqa6qWx3XNRn/yVQL3rRLvNPny8pcCS/IJxemque8fc8jGb5BRg9sAiYUwc4Yxu5X8GLJLio9T6gJ+w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNCgRjbTkE7QgUZPpWXxKYK6mQGhqX+klp14UPBfaqLGOjUyyk
+	2lJx2wdCcPwq9yBMuizOQ7f2ZspBgP0PysOZ58Xf81eeRc5XEWtVPjZyV0t8Z4n7TqeZ+mwia8Y
+	OwuSFI3d4psGPqQWQV0LqUjo5ck8=
+X-Google-Smtp-Source: AGHT+IGTP7qFuht9HhfJ+QlqfAYIP5x3WmnewAO7zBOyxe4uOgNrc2C1vsv8OIIU/CXsqoYzPBg7fdhdiHhG1MKL4Fo=
+X-Received: by 2002:a17:90b:4d8c:b0:2db:60b:697f with SMTP id
+ 98e67ed59e1d1-2db060b69a2mr4561126a91.9.1725966662445; Tue, 10 Sep 2024
+ 04:11:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/8] block: implement async discard as io_uring cmd
-To: Christoph Hellwig <hch@infradead.org>
-Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Conrad Meyer <conradmeyer@meta.com>, linux-block@vger.kernel.org,
- linux-mm@kvack.org
-References: <cover.1725621577.git.asml.silence@gmail.com>
- <7fc0a61ae29190a42e958eddfefd6d44cdf372ad.1725621577.git.asml.silence@gmail.com>
- <Zt_8wlXTyS2E7Xbe@infradead.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <Zt_8wlXTyS2E7Xbe@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240909161749.147076-1-hridesh699@gmail.com> <7b98dbcc-318d-49e7-b71a-f64cc611c2ad@proton.me>
+In-Reply-To: <7b98dbcc-318d-49e7-b71a-f64cc611c2ad@proton.me>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 10 Sep 2024 13:10:50 +0200
+Message-ID: <CANiq72mS6_PCqfhTtKvAgE=S8gSj44_v9kG3AK_txxdsMo0PdQ@mail.gmail.com>
+Subject: Re: [PATCH] docs: rust: clean up empty `\\\` lines and improve
+ rustdoc formatting
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: hridesh <hridesh699@gmail.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, 
+	Matt Gilbride <mattgilbride@google.com>, Shuah Khan <skhan@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/10/24 09:01, Christoph Hellwig wrote:
->> +	sector_t sector = start >> SECTOR_SHIFT;
->> +	sector_t nr_sects = len >> SECTOR_SHIFT;
->> +	struct bio *prev = NULL, *bio;
->> +	int err;
->> +
->> +	if (!bdev_max_discard_sectors(bdev))
->> +		return -EOPNOTSUPP;
->> +
->> +	if (!(file_to_blk_mode(cmd->file) & BLK_OPEN_WRITE))
->> +		return -EBADF;
->> +	if (bdev_read_only(bdev))
->> +		return -EPERM;
->> +	err = blk_validate_byte_range(bdev, start, len);
->> +	if (err)
->> +		return err;
-> 
-> Based on the above this function is misnamed, as it validates sector_t
-> range and not a byte range.
+On Mon, Sep 9, 2024 at 9:22=E2=80=AFPM Benno Lossin <benno.lossin@proton.me=
+> wrote:
+>
+> I don't know if the commit title should start with `docs`, maybe we want
+> to do `rust: docs` when changing rustdocs? (This is a question to the
+> other Rust reviewers)
+>
+> I think the title doesn't need to mention the exact cleanup, just
+> something along the lines "clean up docs" should suffice.
 
-Start and len here are in bytes. What do you mean?
+Yeah, "docs" would be better for Documentation/ bits.
 
+I think something like this would be ideal:
 
->> +	if (nowait && nr_sects > bio_discard_limit(bdev, sector))
->> +		return -EAGAIN;
->> +
->> +	err = filemap_invalidate_pages(bdev->bd_mapping, start,
->> +					start + len - 1, nowait);
->> +	if (err)
->> +		return err;
->> +
->> +	while ((bio = blk_alloc_discard_bio(bdev, &sector, &nr_sects, gfp))) {
->> +		if (nowait)
->> +			bio->bi_opf |= REQ_NOWAIT;
->> +		prev = bio_chain_and_submit(prev, bio);
->> +	}
->> +	if (!prev)
->> +		return -EAGAIN;
-> 
-> If a user changes the max_discard value between the check above and
-> the loop here this is racy.
+   rust: kernel: clean up empty `\\\` lines
 
-If the driver randomly changes it, it's racy either way. What do
-you want to protect against?
+> Instead of adding these backslashes, I personally would prefer if we
 
->> +sector_t bio_discard_limit(struct block_device *bdev, sector_t sector);
-> 
-> And to be honest, I'd really prefer to not have bio_discard_limit
-> exposed.  Certainly not outside a header private to block/.
+Yeah, we have another patch on the list for that, so I would remove it
+from this one.
 
-Which is the other reason why first versions were putting down
-a bio seeing that there is more to be done for nowait, which
-you didn't like. I can return back to it or narrow the scopre.
+Thanks!
 
->> +
->>   #endif /* __LINUX_BIO_H */
->> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
->> index 753971770733..7ea41ca97158 100644
->> --- a/include/uapi/linux/fs.h
->> +++ b/include/uapi/linux/fs.h
->> @@ -208,6 +208,8 @@ struct fsxattr {
->>    * (see uapi/linux/blkzoned.h)
->>    */
->>   
->> +#define BLOCK_URING_CMD_DISCARD			_IO(0x12,137)
-> 
-> Whitespace after the comma please. 
-
-That appears to be the "code style" of all BLK ioctls.
-
-> Also why start at 137?  A comment
-> would generally be pretty useful as well.
-
-There is a comment, 2 lines above the new define.
-
-/*
-  * A jump here: 130-136 are reserved for zoned block devices
-  * (see uapi/linux/blkzoned.h)
-  */
-
-Is that your concern?
-
-> Also can we have a include/uapi/linux/blkdev.h for this instead of
-> bloating fs.h that gets included just about everywhere?
-I don't think it belongs to this series. Regardless, how do you
-see it? The new file can have just those several new definitions,
-in fs.h we'd have another comment why there is another empty range,
-but I don't think it's worth it at all.
-
-Another option is to move there everything block related, and make
-fs.h include blkdev.h, which can always be done on top.
-
--- 
-Pavel Begunkov
+Cheers,
+Miguel
