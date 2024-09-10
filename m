@@ -1,110 +1,88 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CBA136358;
-	Tue, 10 Sep 2024 06:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C6713A242
+	for <linux-block@vger.kernel.org>; Tue, 10 Sep 2024 07:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725950060; cv=none; b=MGLJkGEeIWVXEkFRUsgRDqrknIVwS+rnwCHozNUJemZFBTQSipRHXQbIGtvznfFzoXhzQEx2Qdu4XLLa/AhERD+ePdW1yePZtM+z3JC9fyJWyQcmRJ9WslRNg6D7G5ZlujE+OW7th67ilcHgIrXs4zTSPk+aLsRjrKUWbV3JWOw=
+	t=1725952071; cv=none; b=rLUmm4QlCkwesVUNuND3CycIaQVoLGkSEyPhxQGxdvkFoFt9/vc5yQRxXJ2a8RetSc62+lr/lUs0PoYOpzMo+bjPBdVLv7gdXXvw+TVKfgS3R6pGYo3WmxwHILFDnjdr7xYL+KAiJZJ0fsKBbxd5CGzCMhVuprQkmkCwNxyuc1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725950060; c=relaxed/simple;
-	bh=5Jxbv6JeXuC4PjVEMTYtdG6lZie32lIr5sye8UIQULA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=PtbF/gFKZqw6bHToY5ggdlEWOQEEBfjtdtwdsBTIQVotm2/r7bJWwgy1hc0HAVV2xK4j+mGRKF93hJzbh6yCUQhqF+7yHoK+4FvAKAI/2r4nf/F5Vw000B5sWA87AjtGxIbu12RfxkvKkYF4gtuA36ObDESScxdM98Q2xnbrJCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4X2v6z05xzz20ndx;
-	Tue, 10 Sep 2024 14:34:03 +0800 (CST)
-Received: from kwepemg100017.china.huawei.com (unknown [7.202.181.58])
-	by mail.maildlp.com (Postfix) with ESMTPS id AAF281401F4;
-	Tue, 10 Sep 2024 14:34:07 +0800 (CST)
-Received: from [10.67.120.108] (10.67.120.108) by
- kwepemg100017.china.huawei.com (7.202.181.58) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 10 Sep 2024 14:34:07 +0800
-Message-ID: <0e78cce0-3f4c-3ddf-4d5b-ee2b5c8d7e1a@huawei.com>
-Date: Tue, 10 Sep 2024 14:34:06 +0800
+	s=arc-20240116; t=1725952071; c=relaxed/simple;
+	bh=Tzupit/7jNP49QkdU+n8i+au8MHleKVz7I8yNFSGpyQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IHrpDZo1t1eZvJ+QAG+Y33QjhEGj+1hu6GooHhw+hXcuCWcbwvhJlLc1chhUF1uPu5H1DcLc3ROCKHhERtF5afR/DyAhugqZDQPixy0ufAt5bSemA3UrZQKehUy6IJgQybdGwtQLg9f/6Im+6FEbx3ellUMQSoSbNxzYtBzOQN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=fIRuZs94; arc=none smtp.client-ip=185.70.40.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="fIRuZs94"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1725952067; x=1726211267;
+	bh=Tzupit/7jNP49QkdU+n8i+au8MHleKVz7I8yNFSGpyQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=fIRuZs947rgsw2YJdY1DkPsT+rjYra71BQiefVgwdAx9RWaTfNdx0Z/DDJRJX9B/p
+	 hDBx0rO+nsmSQ0gmsF5uD07hbnMjK7HoR8EqCQnq3jVM5DMC4GxXsqGMpcpH4vy89c
+	 YPH9FcGFB65HovM52HgdP/v+x5EKhBAuJZ6Nuni+v1aV/P07WmTkhIQo8rNXtDfaHA
+	 sCfSjVFtebGEvryfAC3bZPWqe8ykB6Po6zSCWuxSjt7xKTasqikMp+bMX/wjzvvw3C
+	 aFwVEG1YlvKRAI7x97PUmwiAJzqtFQwDMdcHkSvlj+A4AcZbLziT/AYeKDzKhYdaY7
+	 9+wTnDJZgM2JQ==
+Date: Tue, 10 Sep 2024 07:07:42 +0000
+To: levymitchell0@gmail.com, Andreas Hindborg <a.hindborg@samsung.com>, Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC] rust: lockdep: Use Pin for all LockClassKey usages
+Message-ID: <f56dcef9-5dce-45e7-9de8-b12e2e723ef3@proton.me>
+In-Reply-To: <20240905-rust-lockdep-v1-1-d2c9c21aa8b2@gmail.com>
+References: <20240905-rust-lockdep-v1-1-d2c9c21aa8b2@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: ba27d37648ef86cf0db6638ab469fea20779d898
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Subject: Re: [bug report] block: Non-NCQ commands will never be executed while
- fio is continuously running
-Content-Language: en-CA
-To: Damien Le Moal <dlemoal@kernel.org>, <axboe@kernel.dk>, John Garry
-	<john.g.garry@oracle.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, <damien.lemoal@opensource.wdc.com>
-References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
- <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
- <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
- <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
-From: yangxingui <yangxingui@huawei.com>
-In-Reply-To: <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepemh200001.china.huawei.com (7.202.181.106) To
- kwepemg100017.china.huawei.com (7.202.181.58)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 06.09.24 01:13, Mitchell Levy via B4 Relay wrote:
+> From: Mitchell Levy <levymitchell0@gmail.com>
+>=20
+> The current LockClassKey API has soundness issues related to the use of
+> dynamically allocated LockClassKeys. In particular, these keys can be
+> used without being registered and don't have address stability.
+>=20
+> This fixes the issue by using Pin<&LockClassKey> and properly
+> registering/deregistering the keys on init/drop.
+>=20
+> Link: https://lore.kernel.org/rust-for-linux/20240815074519.2684107-1-nmi=
+@metaspace.dk/
+> Suggested-by: Benno Lossin <benno.lossin@proton.me>
+> Suggested-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: Mitchell Levy <levymitchell0@gmail.com>
+> ---
+> This change is based on applying the linked patch to the top of
+> rust-next.
+>=20
+> I'm sending this as an RFC because I'm not sure that using
+> Pin<&'static LockClassKey> is appropriate as the parameter for, e.g.,
+> Work::new. This should preclude using dynamically allocated
+> LockClassKeys here, which might not be desirable. Unfortunately, using
+> Pin<&'a LockClassKey> creates other headaches as the compiler then
+> requires that T and PinImpl<Self> be bounded by 'a, which also seems
+> undesirable. I would be especially interested in feedback/ideas along
+> these lines.
 
+I don't think that we can make this sound without also adding a lifetime
+to `Lock`. Because with only the changes you have outlined above, the
+key is at least valid for lifetime of the initializer, but might not be
+afterwards (while the lock still exists).
+So I think we should leave it as is now.
 
-On 2024/9/10 12:45, Damien Le Moal wrote:
-> On 9/10/24 10:09 AM, yangxingui wrote:
->>
->>
->> On 2024/9/9 21:21, Damien Le Moal wrote:
->>> On 9/9/24 22:10, yangxingui wrote:
->>>> Hello axboe & John,
->>>>
->>>> After the driver exposes all HW queues to the block layer, non-NCQ
->>>> commands will never be executed while fio is continuously running, such
->>>> as a smartctl command.
->>>>
->>>> The cause of the problem is that other hctx used by the NCQ command is
->>>> still active and can continue to issue NCQ commands to the sata disk.
->>>> And the pio command keeps retrying in its corresponding hctx because
->>>> qc_defer() always returns true.
->>>>
->>>> hctx0: ncq, pio, ncq
->>>> hctx1：ncq, ncq, ...
->>>> ...
->>>> hctxn: ncq, ncq, ...
->>>>
->>>> Is there any good solution for this?
->>>
->>> SATA devices are single queue so how can you have multiple queues ?
->>> What adapter are you using ?
->>
->> In the following patch, we expose the host's 16 hardware queues to the block
->> layer. And when connecting to a sata disk, 16 hctx are used.
->>
->> 8d98416a55eb ("scsi: hisi_sas: Switch v3 hw to MQ")
-> 
-> OK, so the HBA is a hisi one, using libsas...
-> What is the device ? An SSD ? and HDD ?
-Both SATA SSD and SATA HDD have this problem.
+---
+Cheers,
+Benno
 
-> 
-> Do you set a block I/O scheduler for the drive, e.g. mq-deadline. If not, does
-> setting a scheduler resolve the issue ?
-Currently, the default configuration mq-deadline is used, and the same 
-phenomenon occurs when I try setting it to none. It seems to have 
-nothing to do with the scheduling strategy.
-
-> 
-> I do not have any hisi HBA. I use a lot of mpt3sas and mpi3mr HBAs which also
-> have multiple queues with a shared tagset. Never seen the issue you are
-> reporting though using HDDs with mq-deadline or bfq as the scheduler.
-Unlike libsas, as these hosts don't use qc_defer()?
-
-Thanks,
-Xingui
-.
 
