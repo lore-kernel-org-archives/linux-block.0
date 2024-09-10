@@ -1,41 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9445183CA0;
-	Tue, 10 Sep 2024 21:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26A823774;
+	Tue, 10 Sep 2024 21:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726002173; cv=none; b=JhD+fpbXeR/yJVpYo9nwVH2Q2w1LXjwRLhXYsPXhdrARC2VxgYCq1tyAzWf2HT1zkGkvtsP04YCmZFdtCHqx5fI+eY8azEM7kKw/jI0Prf7f9eI+JKI3nVXdu5W8u7QZFnsVJpEcwPKi423+wFZMRzqgsjqZ+D9k2cnXPn8mZaY=
+	t=1726003159; cv=none; b=Lm+9Tad8aVIUBz1TrrWFSxPVitVmtzo3QTX7ZO3byWLj6kchtQ9pBtGWuuE9ewsMEp+WytyhUG7VRHNqgf1ASTKDQfEy9n6Elh18XG7bTnf9zUQIEzOzsH9nOeYy7LB34L9wvsaJCfbl4biGU5lpDLomhWTesNgP5rUdW7xu908=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726002173; c=relaxed/simple;
-	bh=Mdk9uocvCavX/AUVPG9mg9fDvdwM7XlTmIKbXB+pCvk=;
+	s=arc-20240116; t=1726003159; c=relaxed/simple;
+	bh=MPDj1SGwwOCMCVLZEATJhLlQx2eSypRL742ONHdEA9w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fWC58ly8ogZ/RTjLkSJC7DhhCcGSN2wC+u+jQz36fQLV5yjcoIYrturCe6M+G0hmEeY9Kc8l699zg2CLVGFNtBD2TwjKxC5WNfMY2w00heTxBmMGtYrTPNJU19oLYSsNcr5tDrSzs3scmmoBDr1JZ8TAjOk2+iYYdWIdYSWpwkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VO+C1LVy; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=tNu7qYB/GAZtr2G10taMxuiu2DQhHNqMU2g51/57tI57bPPz8jJF0Ybld1R7y2uHA4wMtYWJPx8bwLKa/Ad9VyVLLFzFYvyUM+EPx0nz5p/5PJreosHAglhJF9T/MsBhNvARYQS8ATp/WnMyTXGCkFTH9G3/j1tw93+hQb+rhPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J81oXUlp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VO+C1LVy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A094C4CEC3;
-	Tue, 10 Sep 2024 21:02:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J81oXUlp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CC8EC4CEC3;
+	Tue, 10 Sep 2024 21:19:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726002173;
-	bh=Mdk9uocvCavX/AUVPG9mg9fDvdwM7XlTmIKbXB+pCvk=;
+	s=k20201202; t=1726003159;
+	bh=MPDj1SGwwOCMCVLZEATJhLlQx2eSypRL742ONHdEA9w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VO+C1LVy7A0DGORAQUsPk4gImOQ67uVVYUr0UQffw2xQKOv6WFR/tG7/eY+bawknH
-	 36rKr16sLDLRpElUHQjkiKPYdcjHQ6IcpVIv6w/jMB44KOWzlfFAbjAlJSsNbXkSiE
-	 UCp3RpAAGm99oxXJo9cCnZmLAhsXWgc6gccwrxpSGcJUqWd4zjTO0dDsjon2tZHeUY
-	 NQ2VCCOO3Tz13BWkmWGrJen0vsY5H1cUHaQG5PLkddGlV8KAtSw2v/GNgy5ly1U0m3
-	 U4qkq1BCQXKraowMDxGTrKHrR5FQcei7dzu9BiW/pzQgVvu6Y3qIXCNqBYFddAFK8a
-	 y99IKe94aOc3w==
-Date: Tue, 10 Sep 2024 11:02:52 -1000
+	b=J81oXUlp4rb/gPRGW4izOxRdjVlQp3bOHkB3dcKqNO957k9Z3BCDe/Yh6x3c8roXh
+	 5wZnDE8UnoMDhlXxVgJUYWXCDKsOewChcLFzcjNbSKiLDATGLK33Z4zSTzfC1FFmRW
+	 K+EWsGyoOP6dqJbajljQSyelKKGlP9Xuwmoz/AE6R6cJnQQ8oLD8at1U6Us24sGrDO
+	 XC1NxKaRyUFis84fUDk7ylXlnzjTBlzizvQ6caS0Mqimw6pXoXjl8yW0Ed1mJ2ZrAV
+	 Pec5oJ9Dymsedw3pPwrmMhL2I2jxXapLVCGG+cpVHsuoajJJGSEVtZk6ZtBVQsLoiY
+	 dINUPvBxtge+Q==
+Date: Tue, 10 Sep 2024 11:19:18 -1000
 From: Tejun Heo <tj@kernel.org>
 To: Yu Kuai <yukuai1@huaweicloud.com>
 Cc: josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
 	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH for-6.12 1/2] blk-throttle: remove last_low_overflow_time
-Message-ID: <ZuCz_Gmot59hM-SZ@slm.duckdns.org>
+Subject: Re: [PATCH for-6.12 2/2] blk-throttle: support prioritized
+ processing of metadata
+Message-ID: <ZuC31sqB6qUd_Gut@slm.duckdns.org>
 References: <20240903135149.271857-1-yukuai1@huaweicloud.com>
- <20240903135149.271857-2-yukuai1@huaweicloud.com>
+ <20240903135149.271857-3-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,17 +45,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240903135149.271857-2-yukuai1@huaweicloud.com>
+In-Reply-To: <20240903135149.271857-3-yukuai1@huaweicloud.com>
 
-On Tue, Sep 03, 2024 at 09:51:48PM +0800, Yu Kuai wrote:
+On Tue, Sep 03, 2024 at 09:51:49PM +0800, Yu Kuai wrote:
 > From: Yu Kuai <yukuai3@huawei.com>
 > 
-> last_low_overflow_time is not used anymore after commit bf20ab538c81
-> ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW").
+> Currently, blk-throttle handle all IO fifo, hence if data IO is
+> throttled and then meta IO is dispatched, the meta IO will have to wait
+> for the data IO, causing priority inversion problems.
+> 
+> This patch support to handle metadata first and then pay debt while
+> throttling data.
+> 
+> Test script: use cgroup v1 to throttle root cgroup, then create new
+> dir and file while write back is throttled
+> 
+> test() {
+>   mkdir /mnt/test/xxx
+>   touch /mnt/test/xxx/1
+>   sync /mnt/test/xxx
+>   sync /mnt/test/xxx
+> }
+> 
+> mkfs.ext4 -F /dev/nvme0n1 -E lazy_itable_init=0,lazy_journal_init=0
+> mount /dev/nvme0n1 /mnt/test
+> 
+> echo "259:0 $((1024*1024))" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
+> dd if=/dev/zero of=/mnt/test/foo1 bs=16M count=1 conv=fdatasync status=none &
+> sleep 4
+> 
+> time test
+> echo "259:0 0" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
+> 
+> sleep 1
+> umount /dev/nvme0n1
+> 
+> Test result: time cost for creating new dir and file
+> before this patch:  14s
+> after this patch:   0.1s
 > 
 > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-Acked-by: Tejun Heo <tj@kernel.org>
+This is a lot simpler than I expected. Great.
+
+ Acked-by: Tejun Heo <tj@kernel.org>
 
 Thanks.
 
