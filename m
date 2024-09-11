@@ -1,104 +1,114 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52661A2554
-	for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 13:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC76F1A265A;
+	Wed, 11 Sep 2024 13:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726061302; cv=none; b=UpY6+BNMJRsKRoOHDcrhT6+Cd/USI39U7FqoQ1cDGywjg5KC+pYdYO1P7SUvEMtBcktC5SAHA99SKFto5lkgM1U7r5jqqh7QbmXnITCPB+JfYs9C7FgtEhcPjUlfyuGM6kbZXgLX0odBOXEUSUvsHeu4geVnFom/RYT4hdJcSD4=
+	t=1726061406; cv=none; b=BjcXarEbKzJJOiReDwrLcgtrHYDP2YWCo2vBkIRFsYD6B8h57E8UJGdZpev4/VVQtJyCmPOoCOWUwXZXzdNlV5KqmfaVlnwK5iWSV/y+t57m4B/aKE5eBKqtAG2SXcUFzWGPW4FwYHTHQKCv9f4Akq720PhIhhEUjXBTszOAOnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726061302; c=relaxed/simple;
-	bh=3DSFT/npJi9970T4o3KKbDacAKLL8mWYJ2s0dDKM60k=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=smzS5LxzFsSjzfdbnu4gn7Oa2JMR3XLVwXFdEZK1/oc8zXKbrd3wyzkHnUcOWQq5cWsDj28hcjwoLJSimpKaW2PRW3Y9bcfwwFYFpuHI9Zeg1Pn7iyvuMLCyf5fSL8cihjldqOtuNSyGBH50zkDoeGeGPaq7/gHd7wRkFrabq2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xcpShNGh; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1726061406; c=relaxed/simple;
+	bh=dMhEphHy+O8j39E5txrufUCudty2PVP4cqsdsV9+XAw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sPReWUxvVFBJjpex36u73c+1e6ZfD8tMPJ3uedNeHn1HXWF3T0WcxuvrKKyGe/oFZVEaKZkGXTiB3FNc2pNe3c0tGwzKUbVy7Sq7eOKh1MKVTBmpJZ6/+WZIUz8ewOI1qIixw04PU6JS0lPIxiZRJgcGwao94UIvdANpILy5phU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N72ZPXwu; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xcpShNGh"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-82a151a65b8so96810539f.2
-        for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 06:28:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N72ZPXwu"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so1596921a12.3;
+        Wed, 11 Sep 2024 06:30:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726061298; x=1726666098; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nDGxOFZ0RkjN508HAPF7AaCOCUvWSabWSjdbing3vss=;
-        b=xcpShNGhM+H2W8OwAoO1rVmqlPK6iDVrQoU0IYFS3L85NCX880+1ZL8aPbRcoEdoTZ
-         3uKe6sQl1tQliGYyb8kOBJ9yItG+l74BUJarnjiNJme79bS3n5J4kT3+zfFikGGFVCvn
-         HHAGHYOT+eGvol37jd5S8DvR8TcRwUGbyrp/ij74+0LWf48N3pKjnQb4HJ8y81R44Nyo
-         u4bHOB3j529eSicrhkpTNIw9nQzUWPKY+++codlgSTQA1Z5HfcpGutdB/lfhzQzm/8y3
-         vBLyJQ7gQmD48q54HmZk0aIPZDcDi1cczxISeCf0NQY1jr7ai7u5Z33fmoDYF1Vq6+oS
-         oE9w==
+        d=gmail.com; s=20230601; t=1726061404; x=1726666204; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wlcZXnZFv9I9uByKvWIO0FNVwpBbdTye0whj7Tlruj0=;
+        b=N72ZPXwucDkLphGrPu9NRxsTyXAVlW8XnKP/1/J3tHucEdEk6/1zsU7xjw7tn3QCW9
+         3WwQp5eMZ2peUJRtOXCZfubYheZZv2E3hXst/lzfaNG8PPaoHWRAyoezEKvGOHYIslDE
+         G+/wuwy5YPRkHwEUc/uesMQLCHPLFgbHuSK5FqZ3QKKPTpEswvD4hmnrbWTUO2bX8Iup
+         UZBztTMxe3E6tvoRlfYUluURc/j2wOgildwPl27QXQ6KXXUQQTlVYDvtNZ9Y7O0V6bVX
+         dL2aazX/AbrLPwZLqGqYaOyyPaEe+X4gGYad5NtGcCra+M6PMvBkMHI3ywu2jM33CWZZ
+         odlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726061298; x=1726666098;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nDGxOFZ0RkjN508HAPF7AaCOCUvWSabWSjdbing3vss=;
-        b=mDQV42kIwwvjR/Hv97/jOnNZHKiJuxCpf1K+vxTTyJeULMaQSdat0aYnn3vlJDTvMT
-         +XEyx0KLOaZK0bRkCZSLrvkFdfO4Pf/y7Mo3EZFBuXMA0A7Cz+EkEXssYr4mHCVw6DDh
-         6ZOrlszBUyyXiTo2EsHBYNJGMdMSNTkPEMfmvLGlNyuKw7t0Fg6hhGccX7famLUQacfm
-         34Q34MISCUv3nM7KIYYhnYZDYQi/pVsyE+hkpV8pCqPJ2B0zhOSrYwmNfQmLOLp7Kv0W
-         PQOjQAZc6qYazwTqHjZs6ijowBcJ15pj6wN9rEiIE5KOKe7bwUWFthK7JWH9YKAQBZJa
-         eorg==
-X-Gm-Message-State: AOJu0YyA0RwqOjpl4RiLxiaYEum7+MacLLqH+xOwv/iPgQFxo6g3xclP
-	Rq25L48PS4TRBHaKmCL6JHkcKldBh7O5zRUTCt0jcZVbqL4GRpWs1O2EuqEZ7jE=
-X-Google-Smtp-Source: AGHT+IGCrT/DmwJG4W9VpZB6ormapW/1oik7LNrpghuqb7IVUOXCEDP4c2dGY0YvQOif98NciO/0bw==
-X-Received: by 2002:a05:6602:158b:b0:82c:ed57:ebd9 with SMTP id ca18e2360f4ac-82d0a43a2a1mr320061939f.10.1726061298351;
-        Wed, 11 Sep 2024 06:28:18 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-82aa73536fasm263926739f.17.2024.09.11.06.28.17
+        d=1e100.net; s=20230601; t=1726061404; x=1726666204;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wlcZXnZFv9I9uByKvWIO0FNVwpBbdTye0whj7Tlruj0=;
+        b=KFQ7hCWSpCRMWti2k5LXJYvjcULrstTMqtRDoj8vE2WioUZyxjQwjL9sy8jbOYcAtV
+         9MB5l/PlBp/eDol9a34bSzO0ua2PKZDgMMJ/0OOKquTXJuaLdD25ZzA59J718onSMd5d
+         bTyqCiZvz01EPILOCkYxV004PQlIOb7x3/R7Fc/wqtsRbYJSL9G6wMCghVGCP+MyRdsK
+         QWavVJntkcDTdiCatBMg7fWMsRIc1nyBhFOGXZct7EYhomIzq+m0bnRQ3ebK5IAANRed
+         S6C7bsYn2/iqzwSVzfxHnq0ivw4eMJkdihRHTEEBWpInZHamnyTmhT5XypF8LpnTZDIU
+         ctvg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3T7aLWJYfCBaEmV9bu+Urixc2gIb47CAuV4DtcdDw73uvOVyfdedIFMtIVz5RE2I4yN2gM531lt05d6JB@vger.kernel.org, AJvYcCUCvqCgmHy8MY1O4SKIKzuFPReC/hBQd8gsbvV7eA6vWVd0BOkeff93JCAli1ToF29vHWGew+fMD1xO5g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvldFTQIw+jfOw8H4mS4cn7E77ZG8kH7T4kCWmOotv9SodNuSN
+	ZXDKUQto8IP3DV9Nak81l5Pak4teL6lWWKrzsdq488W8ZLklkqU8
+X-Google-Smtp-Source: AGHT+IGOv+OxMXBI2jZQjqzHkQqEgB82w8HnI3pTqrR6G/ldM1+rnr/L4pV1cx1RTVwseXp5Av8Pfw==
+X-Received: by 2002:a17:90b:1e4c:b0:2d8:d098:4f31 with SMTP id 98e67ed59e1d1-2db82fe9fd4mr3629539a91.17.1726061403557;
+        Wed, 11 Sep 2024 06:30:03 -0700 (PDT)
+Received: from fedora.. ([106.219.162.154])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadc110527sm10543906a91.36.2024.09.11.06.30.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 06:28:17 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: hch@lst.de, willy@infradead.org, kbusch@kernel.org, 
- Kundan Kumar <kundan.kumar@samsung.com>
-Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org, 
- anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com, 
- vishak.g@samsung.com, gost.dev@samsung.com
-In-Reply-To: <20240911064935.5630-1-kundan.kumar@samsung.com>
-References: <CGME20240911065712epcas5p3611d5bddac1828e54c5628a2536ef7dc@epcas5p3.samsung.com>
- <20240911064935.5630-1-kundan.kumar@samsung.com>
-Subject: Re: [PATCH v10 0/4] block: add larger order folio instead of pages
-Message-Id: <172606129719.167290.14045583678958786569.b4-ty@kernel.dk>
-Date: Wed, 11 Sep 2024 07:28:17 -0600
+        Wed, 11 Sep 2024 06:30:03 -0700 (PDT)
+From: Riyan Dhiman <riyandhiman14@gmail.com>
+To: axboe@kernel.dk
+Cc: hch@lst.de,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Riyan Dhiman <riyandhiman14@gmail.com>
+Subject: [PATCH v2] block: fix potential invalid pointer dereference in blk_add_partition
+Date: Wed, 11 Sep 2024 18:59:54 +0530
+Message-ID: <20240911132954.5874-1-riyandhiman14@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.1
+Content-Transfer-Encoding: 8bit
 
+The blk_add_partition() function initially used a single if-condition
+(IS_ERR(part)) to check for errors when adding a partition. This was
+modified to handle the specific case of -ENXIO separately, allowing the
+function to proceed without logging the error in this case. However,
+this change unintentionally left a path where md_autodetect_dev()
+could be called without confirming that part is a valid pointer.
 
-On Wed, 11 Sep 2024 12:19:31 +0530, Kundan Kumar wrote:
-> These patches have got the reviews and tested-by.
-> Please consider the series for inclusion.
-> 
-> -----
-> User space memory is mapped in kernel in form of pages array. These pages
-> are iterated and added to BIO. In process, pages are also checked for
-> contiguity and merged.
-> 
-> [...]
+This commit separates the error handling logic by splitting the
+initial if-condition, improving code readability and handling specific
+error scenarios explicitly. The function now distinguishes the general
+error case from -ENXIO without altering the existing behavior of
+md_autodetect_dev() calls.
 
-Applied, thanks!
+Fixes: b72053072c0b (block: allow partitions on host aware zone devices)
+Signed-off-by: Riyan Dhiman <riyandhiman14@gmail.com>
+---
+Compile tested only.
+V2 -> removed line between Fixes tag and Signed-off and cc commit author
 
-[1/4] block: Added folio-ized version of bio_add_hw_page()
-      commit: 7de98954687fe152c5f38afd719b3fdf9f34020a
-[2/4] block: introduce folio awareness and add a bigger size from folio
-      commit: ed9832bc08db29874600eb066b74918fe6fc2060
-[3/4] mm: release number of pages of a folio
-      commit: d3bfbfb1248498656cd25c51e41c1e31219bd0dd
-[4/4] block: unpin user pages belonging to a folio at once
-      commit: eb1d46fcd5d672c9da84925ec38f1aca35d40940
+ block/partitions/core.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Best regards,
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index ab76e64f0f6c..5bd7a603092e 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -555,9 +555,11 @@ static bool blk_add_partition(struct gendisk *disk,
+ 
+ 	part = add_partition(disk, p, from, size, state->parts[p].flags,
+ 			     &state->parts[p].info);
+-	if (IS_ERR(part) && PTR_ERR(part) != -ENXIO) {
+-		printk(KERN_ERR " %s: p%d could not be added: %pe\n",
+-		       disk->disk_name, p, part);
++	if (IS_ERR(part)) {
++		if (PTR_ERR(part) != -ENXIO) {
++			printk(KERN_ERR " %s: p%d could not be added: %pe\n",
++			       disk->disk_name, p, part);
++		}
+ 		return true;
+ 	}
+ 
 -- 
-Jens Axboe
-
-
+2.46.0
 
