@@ -1,124 +1,165 @@
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4423502B1;
-	Wed, 11 Sep 2024 09:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B67B45C18;
+	Wed, 11 Sep 2024 09:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726046197; cv=none; b=KAb1Hlhd7aLmmpDIgZrphZlEAjcwxvXDzqGELkHcVpsd6jR4Uw19LrLFDmyXiJGadTWqlhalw/a2NF/3LYblaa4+7uWQyyHQRh9F4cicuN7Wr5+7TKad5q4Zi8VnVzvCbnTRKSyAHFe3lP7tSegFhFhSmOml2a1k0ByHV40Glk4=
+	t=1726047696; cv=none; b=Ue89ftKa3/EDXYBPAJRkwpHbTzGrHAy3ufWnx5h1Ib6i3djTymRKjG2DQt+bomhubOvE999alNCVhEZfSWafPu4SNvs9kFKXoOY/cho4vaDe5WIpBcE/PMjc61NMah4bOBO2UXlTS7HdmZThg7kjA04j8rc49dNrZOG+6uuvqxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726046197; c=relaxed/simple;
-	bh=ggRdZpKolLVLfeZ9LqWO2n2H2xuH2z3GmtMjXhaw+hE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JvxqTtUcYAYLjashO3M19Qh3o2ydAEISP9cpdJQX5ldIZnFy1PJZ6nYhx0xEyAIWvZxhoeZrT0BA2ip9HECseDSKsCaloYHkvfMXMCfC1s0SiIljws2pg00fcjEdMCz+5Kl0HGB9xhOJOnD18QklbY61fOqyBRkuXXuxRAGqv0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SO/Gg0Oq; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO/Gg0Oq"
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2068a7c9286so60959035ad.1;
-        Wed, 11 Sep 2024 02:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726046195; x=1726650995; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WcDJb5QYEy4QSNbCqr1Ub2x3UYsUcQg9U2wYJLfZOgA=;
-        b=SO/Gg0OqJ8Ss1+9XhD2ve9HVm4dJ8pWBV1f4dI1ingK+4LnB3ZEKZ3S4+1Xab9XNMO
-         1LL0NOtJcYUUzKdX6yLCpMIt/LpfkAl6/xAZZEyZql7L5Audy+Az+iYn9NILAIPHBtDS
-         WvitmHZoEQuGUXjiHmnxSfm93693P+ktdxu1mKmF8oEvobOwH1wZ62QY5HS43Up7mEKS
-         M/j4FWvunGbtzMs17lduCreH4AVSB/NTtsxddf5txS/GI8vbNSV9sPej5XfJ4E+CbC0B
-         GmREnIAFtLqFUmAYxxiUBNVjeaiG6dfWTkQ8f5yjPZvHGNKFsnHO7SLPi1MM6ZkPlfYp
-         Ak/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726046195; x=1726650995;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WcDJb5QYEy4QSNbCqr1Ub2x3UYsUcQg9U2wYJLfZOgA=;
-        b=MSVPdbj0bLsify1cCiMSRx06+NvIsw34SEznmUl7950jJusR12Fr47aUSUY4lRE4Sv
-         IJMDu6hNGvi216qebHgnDflxM8inSFs2VpO3Ip29kQ+yneXisR9X3ZgB4g9ZUfd7tsnC
-         2Bwf6GRZHHjBECvtoxugnzbY8zvgiGOxhMpbrC+SCAnvW3qyYOsJtWnnU0LjfC1dE2k/
-         NhkGCmUrRhuScUsUHuD5vhg9dufpxzaNeG0myO+r0U2iqBW+P9+bgqUVu8yO6Q3iJ8gu
-         ZKM1qaRhH3Lc+pflK9cyAfEmFgIhzpCp+uOwdAuMG+JyKBWtA9YLC42uyAlOu0wfajb2
-         Xytw==
-X-Forwarded-Encrypted: i=1; AJvYcCV97J2yR+w4CN7r0tQtCHXn3rYXL4o3lJBKbIkvGO4HL0TMGl36mbpuY6HpXrEAPygUITRN4lx0eiqqldW7@vger.kernel.org, AJvYcCVTO+u/sxHW7sMd+Mfd6FWE6Zwvd5mpmA++AcpZUFA+SwCeBb2irSfupyo8QGJansjURlOVi8IR4p341A==@vger.kernel.org, AJvYcCXK4uO5O08tp+YIYNn5J4VeihZwRGBGR4ANQfP8cBNQA+fI6QbrentBa1/LTw268jsjwHoK/ALo@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT2+OkpXASn4wXfjEZKaqDRMwUltHjJVm+ZIUyHK61BNMSoZYJ
-	vg526dZXfSJtBu+XPDjYqZ9f4xstHzQhjwEbVbXWKAX9JuMMFgsg
-X-Google-Smtp-Source: AGHT+IEhYB+6J+0UCltGlnaoCjtSirBu3Qn2up1kXKerpnf9BCxeM5frLfc6fpa0E+C/vwJef/J/OA==
-X-Received: by 2002:a17:902:c946:b0:205:7f87:ba3e with SMTP id d9443c01a7336-2074c5e4cf2mr55804235ad.13.1726046194685;
-        Wed, 11 Sep 2024 02:16:34 -0700 (PDT)
-Received: from tom-QiTianM540-A739.. ([106.39.42.164])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710e32e2fsm59844995ad.101.2024.09.11.02.16.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 02:16:34 -0700 (PDT)
-From: Qiu-ji Chen <chenqiuji666@gmail.com>
-To: philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com,
-	axboe@kernel.dk
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	Qiu-ji Chen <chenqiuji666@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] brbd: Fix atomicity violation in drbd_uuid_set_bm()
-Date: Wed, 11 Sep 2024 17:16:19 +0800
-Message-Id: <20240911091619.4430-1-chenqiuji666@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1726047696; c=relaxed/simple;
+	bh=8m3dhEe0+qY5PdgSKzgOiislm4f1BflviWFlGZGg7Us=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=XmxN7s2swCq/8GIp3Zl188MInx4h5GLJNlH1476H1vwDITCP4LASBfevP3IBB3hedhj1gme9DE1DY9Og6HageYl34fQZdQcWyOchS9FRhbd55RWDSA42zufuLJ86dlyw0N1GvorhDB7Tf/wazEyR7CPQWtRiHt1Kx6s77FT+vP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4X3bCY0Xxdz1P9Wy;
+	Wed, 11 Sep 2024 17:40:25 +0800 (CST)
+Received: from kwepemg100017.china.huawei.com (unknown [7.202.181.58])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9267E1800D1;
+	Wed, 11 Sep 2024 17:41:31 +0800 (CST)
+Received: from [10.67.120.108] (10.67.120.108) by
+ kwepemg100017.china.huawei.com (7.202.181.58) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 11 Sep 2024 17:41:31 +0800
+Message-ID: <efab5585-655b-1e17-8714-803364ead5af@huawei.com>
+Date: Wed, 11 Sep 2024 17:41:30 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.1
+Subject: Re: [bug report] block: Non-NCQ commands will never be executed while
+ fio is continuously running
+Content-Language: en-CA
+To: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>
+CC: <axboe@kernel.dk>, John Garry <john.g.garry@oracle.com>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>
+References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
+ <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
+ <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
+ <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
+ <0e78cce0-3f4c-3ddf-4d5b-ee2b5c8d7e1a@huawei.com>
+ <ZuAtLK5jIPEjhXmU@ryzen.lan>
+ <7f179f49-a57b-45bf-92f0-f577aa0b8565@kernel.org>
+From: yangxingui <yangxingui@huawei.com>
+In-Reply-To: <7f179f49-a57b-45bf-92f0-f577aa0b8565@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepemh500014.china.huawei.com (7.202.181.147) To
+ kwepemg100017.china.huawei.com (7.202.181.58)
 
-The violation of atomicity occurs when the brbd_uuid_set_bm function is
-executed simultaneously with modifying the value of
-device->ldev->md.uuid[UI_BITMAP]. Consider a scenario where, while
-device->ldev->md.uuid[UI_BITMAP] passes the validity check when its value
-is not zero, the value of device->ldev->md.uuid[UI_BITMAP] is written to
-zero. In this case, the check in brbd_uuid_set_bm might refer to the old
-value of device->ldev->md.uuid[UI_BITMAP] (before locking), which allows
-an invalid value to pass the validity check, resulting in inconsistency.
 
-To address this issue, it is recommended to include the data validity check
-within the locked section of the function. This modification ensures that
-the value of device->ldev->md.uuid[UI_BITMAP] does not change during the
-validation process, thereby maintaining its integrity.
 
-This possible bug is found by an experimental static analysis tool
-developed by our team. This tool analyzes the locking APIs to extract
-function pairs that can be concurrently executed, and then analyzes the
-instructions in the paired functions to identify possible concurrency bugs
-including data races and atomicity violations.
+On 2024/9/11 6:38, Damien Le Moal wrote:
+> On 9/10/24 20:27, Niklas Cassel wrote:
+>> On Tue, Sep 10, 2024 at 02:34:06PM +0800, yangxingui wrote:
+>>>
+>>>
+>>> On 2024/9/10 12:45, Damien Le Moal wrote:
+>>>> On 9/10/24 10:09 AM, yangxingui wrote:
+>>>>>
+>>>>>
+>>>>> On 2024/9/9 21:21, Damien Le Moal wrote:
+>>>>>> On 9/9/24 22:10, yangxingui wrote:
+>>>>>>> Hello axboe & John,
+>>>>>>>
+>>>>>>> After the driver exposes all HW queues to the block layer, non-NCQ
+>>>>>>> commands will never be executed while fio is continuously running, such
+>>>>>>> as a smartctl command.
+>>>>>>>
+>>>>>>> The cause of the problem is that other hctx used by the NCQ command is
+>>>>>>> still active and can continue to issue NCQ commands to the sata disk.
+>>>>>>> And the pio command keeps retrying in its corresponding hctx because
+>>>>>>> qc_defer() always returns true.
+>>>>>>>
+>>>>>>> hctx0: ncq, pio, ncq
+>>>>>>> hctx1：ncq, ncq, ...
+>>>>>>> ...
+>>>>>>> hctxn: ncq, ncq, ...
+>>>>>>>
+>>>>>>> Is there any good solution for this?
+>>>>>>
+>>>>>> SATA devices are single queue so how can you have multiple queues ?
+>>>>>> What adapter are you using ?
+>>>>>
+>>>>> In the following patch, we expose the host's 16 hardware queues to the block
+>>>>> layer. And when connecting to a sata disk, 16 hctx are used.
+>>>>>
+>>>>> 8d98416a55eb ("scsi: hisi_sas: Switch v3 hw to MQ")
+>>>>
+>>>> OK, so the HBA is a hisi one, using libsas...
+>>>> What is the device ? An SSD ? and HDD ?
+>>> Both SATA SSD and SATA HDD have this problem.
+>>>
+>>>>
+>>>> Do you set a block I/O scheduler for the drive, e.g. mq-deadline. If not, does
+>>>> setting a scheduler resolve the issue ?
+>>> Currently, the default configuration mq-deadline is used, and the same
+>>> phenomenon occurs when I try setting it to none. It seems to have nothing to
+>>> do with the scheduling strategy.
+>>>
+>>>>
+>>>> I do not have any hisi HBA. I use a lot of mpt3sas and mpi3mr HBAs which also
+>>>> have multiple queues with a shared tagset. Never seen the issue you are
+>>>> reporting though using HDDs with mq-deadline or bfq as the scheduler.
+>>> Unlike libsas, as these hosts don't use qc_defer()?
+>>
+>> mpt3sas and mpi3mr do not use any libata code at all, the SCSI to ATA
+>> Translation (SAT) is done completely by the HBA, so from a Linux
+>> perspective, we are issuing SCSI commands to the HBA.
+> 
+> Yes, but we still can get requeue happening. Though for a SATA drive, that is
+> unlikely since the max queue depth is clearly defined, unlike for SAS drives
+> 
+>> We can see that libsas uses ata_std_qc_defer() as its .qc_defer callback:
+>> https://github.com/torvalds/linux/blob/v6.11-rc7/drivers/scsi/libsas/sas_ata.c#L566
+> 
+> And that may be the issue. More on this below.
+> 
+>> Without considering if it is a good idea or not, it should be possible to
+>> translate some commands to instead use the "NCQ encapsulated" variant of
+>> the ATA command that was used in the "ATA-16 passthrough" SCSI command.
+> 
+> That would be way too much work on the user side, and likely open up a can of
+> device bugs unseen until now.
+> 
+>> To be able to send a non-queued command, there has to be no NCQ commands queued
+>> on the device. I guess you could implement a scheduler that would be quiescing
+>> the queue, processes the non-queued command, and then thaw the queue, but that
+>> would essentially make non-queued commands high priority commands, and could
+>> thus be used to seriously limit throughput by just sending some non-queued
+>> commands every now and then :)
+> 
+> Passthrough commands do not go through the scheduler and are submitted directly
+> to the dispatch queue, generally at the head of it (see blk_mq_insert_request()).
+> 
+> So for a single queue device, even if ata_qc_defer causes a requeue, the
+> passthrough command ends up back at the top of the dispatch queue. After
+> repeating this a few times, all in-flight NCQ commands complete and the
+> passthrough command goes through.
+> 
+> But I feel this is very fragile given that the block layer requeue is done
+> through a work item, so in parallel to an application submitting IOs. So in
+> theory, I think that the requeue for the passthrough command could happen forever...
+> 
+> And for a multi-queue setup like with the hisi adapter, that is what is happening.
+> 
+> I do not have any good idea how to fix that yet. We need to find something.
+> scsi_queue_rq() and the budget/host or device blocked state management may help
+> with that, or we have a bug there... In any case, I do not think it is a block
+> layer issue as the block layer knows nothing about NCQ vs non-NCQ.
+> 
+Thanks for your reply, can we provide a module parameter to confirm 
+whether to expose multiple queues to the upper layer? And let users choose.
 
-Fixes: 9f2247bb9b75 ("drbd: Protect accesses to the uuid set with a spinlock")
-Cc: stable@vger.kernel.org
-Signed-off-by: Qiu-ji Chen <chenqiuji666@gmail.com>
----
- drivers/block/drbd/drbd_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index a9e49b212341..abafc4edf9ed 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -3399,10 +3399,12 @@ void drbd_uuid_new_current(struct drbd_device *device) __must_hold(local)
- void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(local)
- {
- 	unsigned long flags;
--	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0)
-+	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
-+	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0) {
-+		spin_unlock_irqrestore(&device->ldev->md.uuid_lock, flags);
- 		return;
-+	}
- 
--	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
- 	if (val == 0) {
- 		drbd_uuid_move_history(device);
- 		device->ldev->md.uuid[UI_HISTORY_START] = device->ldev->md.uuid[UI_BITMAP];
--- 
-2.34.1
-
+Thanks,
+Xingui
+.
