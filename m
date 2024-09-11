@@ -1,69 +1,70 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CF514D6EE
-	for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 08:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4423502B1;
+	Wed, 11 Sep 2024 09:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726043903; cv=none; b=QKP+uyYYMH9GTu25IstdtzUZ3d4aYAybI+mbINJrMllNkoH/ov7n5F2rkzYNrwxUJ0JDefipf5tgQRN8Zi8gsR6ht7IMcEWhCKJBiWXfeMI+N0R2+edC+WY49HSvb0cu8EEddAySpz2Hbuf9r3CNuNQUNJcaRpRHwWWCSsfUef0=
+	t=1726046197; cv=none; b=KAb1Hlhd7aLmmpDIgZrphZlEAjcwxvXDzqGELkHcVpsd6jR4Uw19LrLFDmyXiJGadTWqlhalw/a2NF/3LYblaa4+7uWQyyHQRh9F4cicuN7Wr5+7TKad5q4Zi8VnVzvCbnTRKSyAHFe3lP7tSegFhFhSmOml2a1k0ByHV40Glk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726043903; c=relaxed/simple;
-	bh=AOOXX/PpXpHShWSxYqscfUQ6a5aimIvfQ/8rvqPY/ZU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=mWJRHo8oHjQWbjmortfZ3QAIBs4zZ5xToccuuruimfL+ftBWLLfXSb8q3d/OrJfkkGkG3Bd1if66Oa1luFg/wzZi4M9py1jiOlbXFV9N6aDqN/SrQSmHrBWEGpGUjkSatSV1JfD/Gji1BQKuey5lOLO89MYepY/SJQpcNLxrgb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Rbl9SEIW; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1726046197; c=relaxed/simple;
+	bh=ggRdZpKolLVLfeZ9LqWO2n2H2xuH2z3GmtMjXhaw+hE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JvxqTtUcYAYLjashO3M19Qh3o2ydAEISP9cpdJQX5ldIZnFy1PJZ6nYhx0xEyAIWvZxhoeZrT0BA2ip9HECseDSKsCaloYHkvfMXMCfC1s0SiIljws2pg00fcjEdMCz+5Kl0HGB9xhOJOnD18QklbY61fOqyBRkuXXuxRAGqv0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SO/Gg0Oq; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Rbl9SEIW"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240911083814epoutp0221387b6bce43597c24b08ee66700e41d~0I8bYdb0H3006130061epoutp02d
-	for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 08:38:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240911083814epoutp0221387b6bce43597c24b08ee66700e41d~0I8bYdb0H3006130061epoutp02d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1726043894;
-	bh=uOnA/n2n1TxoIKZ93GC+m5sD2RuswlYMcSPB6a+VORU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Rbl9SEIWOafwG+Cm2DB9ZBDeLWE4zaOaRhK2SQwTx+zuL0LnjCU95Bl4HUmK4rPBN
-	 MFc/prSN5OxGSoYSFN7O9ZGkbOJq8jS0RiUQ7L3vknwX0mXIiiX4TNF5qi5E8G8QMQ
-	 SBVUuTv9GhRA+PFt5Yt4xoeaNBbb3LZYpNOExUlc=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20240911083813epcas5p4c130ed6eb77c979d16c01e1a9a90bec6~0I8a21VOV2676726767epcas5p4h;
-	Wed, 11 Sep 2024 08:38:13 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.176]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4X3Yql1Z13z4x9Py; Wed, 11 Sep
-	2024 08:38:11 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	8A.1C.09743.2F651E66; Wed, 11 Sep 2024 17:38:11 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240911065719epcas5p2c9312abec1eada7df3d08c883f1557bb~0HkUocEqy0581905819epcas5p2x;
-	Wed, 11 Sep 2024 06:57:19 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240911065719epsmtrp277700653aa42902d09727b95c5099461~0HkUnoNmc0673206732epsmtrp2l;
-	Wed, 11 Sep 2024 06:57:19 +0000 (GMT)
-X-AuditID: b6c32a4a-3b1fa7000000260f-96-66e156f295f3
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	05.D1.19367.F4F31E66; Wed, 11 Sep 2024 15:57:19 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240911065717epsmtip16623d3a9a4808b44c00f3a979fb525f6~0HkSnPV3l0661206612epsmtip1Z;
-	Wed, 11 Sep 2024 06:57:17 +0000 (GMT)
-From: Kundan Kumar <kundan.kumar@samsung.com>
-To: axboe@kernel.dk, hch@lst.de, willy@infradead.org, kbusch@kernel.org
-Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, mcgrof@kernel.org,
-	anuj20.g@samsung.com, nj.shetty@samsung.com, c.gameti@samsung.com,
-	vishak.g@samsung.com, gost.dev@samsung.com, Kundan Kumar
-	<kundan.kumar@samsung.com>
-Subject: [PATCH v10 3/4] mm: release number of pages of a folio
-Date: Wed, 11 Sep 2024 12:19:34 +0530
-Message-Id: <20240911064935.5630-4-kundan.kumar@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240911064935.5630-1-kundan.kumar@samsung.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO/Gg0Oq"
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2068a7c9286so60959035ad.1;
+        Wed, 11 Sep 2024 02:16:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726046195; x=1726650995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WcDJb5QYEy4QSNbCqr1Ub2x3UYsUcQg9U2wYJLfZOgA=;
+        b=SO/Gg0OqJ8Ss1+9XhD2ve9HVm4dJ8pWBV1f4dI1ingK+4LnB3ZEKZ3S4+1Xab9XNMO
+         1LL0NOtJcYUUzKdX6yLCpMIt/LpfkAl6/xAZZEyZql7L5Audy+Az+iYn9NILAIPHBtDS
+         WvitmHZoEQuGUXjiHmnxSfm93693P+ktdxu1mKmF8oEvobOwH1wZ62QY5HS43Up7mEKS
+         M/j4FWvunGbtzMs17lduCreH4AVSB/NTtsxddf5txS/GI8vbNSV9sPej5XfJ4E+CbC0B
+         GmREnIAFtLqFUmAYxxiUBNVjeaiG6dfWTkQ8f5yjPZvHGNKFsnHO7SLPi1MM6ZkPlfYp
+         Ak/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726046195; x=1726650995;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WcDJb5QYEy4QSNbCqr1Ub2x3UYsUcQg9U2wYJLfZOgA=;
+        b=MSVPdbj0bLsify1cCiMSRx06+NvIsw34SEznmUl7950jJusR12Fr47aUSUY4lRE4Sv
+         IJMDu6hNGvi216qebHgnDflxM8inSFs2VpO3Ip29kQ+yneXisR9X3ZgB4g9ZUfd7tsnC
+         2Bwf6GRZHHjBECvtoxugnzbY8zvgiGOxhMpbrC+SCAnvW3qyYOsJtWnnU0LjfC1dE2k/
+         NhkGCmUrRhuScUsUHuD5vhg9dufpxzaNeG0myO+r0U2iqBW+P9+bgqUVu8yO6Q3iJ8gu
+         ZKM1qaRhH3Lc+pflK9cyAfEmFgIhzpCp+uOwdAuMG+JyKBWtA9YLC42uyAlOu0wfajb2
+         Xytw==
+X-Forwarded-Encrypted: i=1; AJvYcCV97J2yR+w4CN7r0tQtCHXn3rYXL4o3lJBKbIkvGO4HL0TMGl36mbpuY6HpXrEAPygUITRN4lx0eiqqldW7@vger.kernel.org, AJvYcCVTO+u/sxHW7sMd+Mfd6FWE6Zwvd5mpmA++AcpZUFA+SwCeBb2irSfupyo8QGJansjURlOVi8IR4p341A==@vger.kernel.org, AJvYcCXK4uO5O08tp+YIYNn5J4VeihZwRGBGR4ANQfP8cBNQA+fI6QbrentBa1/LTw268jsjwHoK/ALo@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT2+OkpXASn4wXfjEZKaqDRMwUltHjJVm+ZIUyHK61BNMSoZYJ
+	vg526dZXfSJtBu+XPDjYqZ9f4xstHzQhjwEbVbXWKAX9JuMMFgsg
+X-Google-Smtp-Source: AGHT+IEhYB+6J+0UCltGlnaoCjtSirBu3Qn2up1kXKerpnf9BCxeM5frLfc6fpa0E+C/vwJef/J/OA==
+X-Received: by 2002:a17:902:c946:b0:205:7f87:ba3e with SMTP id d9443c01a7336-2074c5e4cf2mr55804235ad.13.1726046194685;
+        Wed, 11 Sep 2024 02:16:34 -0700 (PDT)
+Received: from tom-QiTianM540-A739.. ([106.39.42.164])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710e32e2fsm59844995ad.101.2024.09.11.02.16.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 02:16:34 -0700 (PDT)
+From: Qiu-ji Chen <chenqiuji666@gmail.com>
+To: philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	christoph.boehmwalder@linbit.com,
+	axboe@kernel.dk
+Cc: drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	Qiu-ji Chen <chenqiuji666@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] brbd: Fix atomicity violation in drbd_uuid_set_bm()
+Date: Wed, 11 Sep 2024 17:16:19 +0800
+Message-Id: <20240911091619.4430-1-chenqiuji666@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,100 +72,53 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrLJsWRmVeSWpSXmKPExsWy7bCmhu7nsIdpBusbmCyaJvxltlh9t5/N
-	4vv2PhaLmwd2MlmsXH2UyeLo/7dsFpMOXWO02PrlK6vF3lvaFjcmPGW02PZ7PrPF+Vlz2C1+
-	/5jD5sDrsXmFlsfls6Uem1Z1snnsvtnA5tG3ZRWjx+dNcgFsUdk2GamJKalFCql5yfkpmXnp
-	tkrewfHO8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6ZOUBnKimUJeaUAoUCEouLlfTtbIryS0tS
-	FTLyi0tslVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyMx4/bWUs6OermPrzBVsD41Xu
-	LkZODgkBE4mG/6eZQWwhgd2MEhfn1HYxcgHZnxgl/q6Yxgbn3OiaxAzT8XQRSAdIYiejxJ6P
-	81kgnM+MEg17zwO1cHCwCehK/GgKBWkQEXCXmPryESNIDbPAU0aJK19+soLUCAvYS1ybYAJS
-	wyKgKnHvxiGwMK+AjcTHP/UQu+QlZl76zg5icwrYShz+8ZgJxOYVEJQ4OfMJC4jNDFTTvHU2
-	2D0SAhM5JNZtv80G0ewi8WzCQnYIW1ji1fEtULaUxOd3e6FqsiUONW5ggrBLJHYeaYCqsZdo
-	PdXPDHIPs4CmxPpd+hBhWYmpp9YxQezlk+j9/QSqlVdixzwYW01izrupLBC2jMTCSzOg4h4S
-	r2cvY4eE9ARGiV93QiYwKsxC8s4sJO/MQti8gJF5FaNkakFxbnpqsWmBUV5qOTyKk/NzNzGC
-	062W1w7Ghw8+6B1iZOJgPMQowcGsJMLbb3cvTYg3JbGyKrUoP76oNCe1+BCjKTC4JzJLiSbn
-	AxN+Xkm8oYmlgYmZmZmJpbGZoZI47+vWuSlCAumJJanZqakFqUUwfUwcnFINTMJhN+SMZ216
-	fiKZUf127v3MkCTj4896S7eqLw6+fdfD+Hv/vu333p+2rrITOvly/lEBlw1PV30JSHY42yYX
-	YXvuoI5Gep2a9bMGI70f50oSdr+yCspiYZ3Pssoi1O3CCbVHteUeLgLCPEu/+q/93X5DY6/s
-	7ut6SV98N//XW7Lqg2XuTP3/rPynHq/hNmOXWpP8OdJK8ei7++mPj08Pvvqjy5ZDs88114/D
-	hLO7cMvPJ7dm/b92+s0Z6Uoj27Czhhp3PS5s+Vyie2VBoo1+PZtxTMvOn8YnnvhxcdeWNNxM
-	YenPVvmx794be4957MqfNwnbzru5LuVvzRrj9gPiGVnaxQ7XLgm+SFj29Uc6nxJLcUaioRZz
-	UXEiAHAYkC9ABAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrPLMWRmVeSWpSXmKPExsWy7bCSnK6//cM0gzdzZS2aJvxltlh9t5/N
-	4vv2PhaLmwd2MlmsXH2UyeLo/7dsFpMOXWO02PrlK6vF3lvaFjcmPGW02PZ7PrPF+Vlz2C1+
-	/5jD5sDrsXmFlsfls6Uem1Z1snnsvtnA5tG3ZRWjx+dNcgFsUVw2Kak5mWWpRfp2CVwZj5+2
-	Mhb081VM/fmCrYHxKncXIyeHhICJxNNFp5lBbCGB7YwSX1f6QsRlJHbf3ckKYQtLrPz3nL2L
-	kQuo5iOjxPeF31m6GDk42AR0JX40hYLUiAj4SizY8JwRxGYWeM8ocXuJNEiJsIC9xLUJJiBh
-	FgFViXs3DrGChHkFbCQ+/qmHmC4vMfPSd3YQm1PAVuLwj8dMENfYSPzZ0Ap2Aa+AoMTJmU9Y
-	IKbLSzRvnc08gVFgFpLULCSpBYxMqxhFUwuKc9NzkwsM9YoTc4tL89L1kvNzNzGC40AraAfj
-	svV/9Q4xMnEwHmKU4GBWEuHtt7uXJsSbklhZlVqUH19UmpNafIhRmoNFSZxXOaczRUggPbEk
-	NTs1tSC1CCbLxMEp1cCUbZSVym9o79gvuu/oXt0dF1asbckwznEqW7i5Uj7gKNP0nFcl/1Kr
-	T6snavz9Y7c1aOaXzz37ErOtNT9fUW9X+dZ76Y/R2TD+Z8WlLNla9SmaZyzOzRb8LPplbsnv
-	ax1thzX4gjdFHctYlqa3+oDBxUfJLQIPXFo4FPK9uY76/TfdsTnLNyfRcX6Kfa/7q5Zqrc7H
-	PG7lLdJWyc8vT7P6k3q/dV2q1ZkjrVH6nQU3PhoHbM+Z9GPWIm9ftrlnF8gveFTN4Db977aj
-	h6rVhNbs/f4/L7+N+xh7kSqr+7qVigfOW15zL+i0ferQUcGs8qFl4WH/rgNHZ3pJ5fI+N8uf
-	dsn8bnePFcMCpkrPNCWW4oxEQy3mouJEAKoZomDyAgAA
-X-CMS-MailID: 20240911065719epcas5p2c9312abec1eada7df3d08c883f1557bb
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240911065719epcas5p2c9312abec1eada7df3d08c883f1557bb
-References: <20240911064935.5630-1-kundan.kumar@samsung.com>
-	<CGME20240911065719epcas5p2c9312abec1eada7df3d08c883f1557bb@epcas5p2.samsung.com>
 
-Add a new function unpin_user_folio() to put the refs of a folio by
-npages count.
+The violation of atomicity occurs when the brbd_uuid_set_bm function is
+executed simultaneously with modifying the value of
+device->ldev->md.uuid[UI_BITMAP]. Consider a scenario where, while
+device->ldev->md.uuid[UI_BITMAP] passes the validity check when its value
+is not zero, the value of device->ldev->md.uuid[UI_BITMAP] is written to
+zero. In this case, the check in brbd_uuid_set_bm might refer to the old
+value of device->ldev->md.uuid[UI_BITMAP] (before locking), which allows
+an invalid value to pass the validity check, resulting in inconsistency.
 
-The check for BIO_PAGE_PINNED flag is removed as it is already checked
-in bio_release_pages().
+To address this issue, it is recommended to include the data validity check
+within the locked section of the function. This modification ensures that
+the value of device->ldev->md.uuid[UI_BITMAP] does not change during the
+validation process, thereby maintaining its integrity.
 
-Signed-off-by: Kundan Kumar <kundan.kumar@samsung.com>
-Tested-by: Luis Chamberlain <mcgrof@kernel.org>
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+This possible bug is found by an experimental static analysis tool
+developed by our team. This tool analyzes the locking APIs to extract
+function pairs that can be concurrently executed, and then analyzes the
+instructions in the paired functions to identify possible concurrency bugs
+including data races and atomicity violations.
+
+Fixes: 9f2247bb9b75 ("drbd: Protect accesses to the uuid set with a spinlock")
+Cc: stable@vger.kernel.org
+Signed-off-by: Qiu-ji Chen <chenqiuji666@gmail.com>
 ---
- include/linux/mm.h |  1 +
- mm/gup.c           | 13 +++++++++++++
- 2 files changed, 14 insertions(+)
+ drivers/block/drbd/drbd_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 6549d0979b28..3de55d295cb9 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1597,6 +1597,7 @@ void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages,
- void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
- 				      bool make_dirty);
- void unpin_user_pages(struct page **pages, unsigned long npages);
-+void unpin_user_folio(struct folio *folio, unsigned long npages);
- void unpin_folios(struct folio **folios, unsigned long nfolios);
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index a9e49b212341..abafc4edf9ed 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -3399,10 +3399,12 @@ void drbd_uuid_new_current(struct drbd_device *device) __must_hold(local)
+ void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(local)
+ {
+ 	unsigned long flags;
+-	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0)
++	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
++	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0) {
++		spin_unlock_irqrestore(&device->ldev->md.uuid_lock, flags);
+ 		return;
++	}
  
- static inline bool is_cow_mapping(vm_flags_t flags)
-diff --git a/mm/gup.c b/mm/gup.c
-index 54d0dc3831fb..02c46ae33028 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -415,6 +415,19 @@ void unpin_user_pages(struct page **pages, unsigned long npages)
- }
- EXPORT_SYMBOL(unpin_user_pages);
- 
-+/**
-+ * unpin_user_folio() - release pages of a folio
-+ * @folio:  pointer to folio to be released
-+ * @npages: number of pages of same folio
-+ *
-+ * Release npages of the folio
-+ */
-+void unpin_user_folio(struct folio *folio, unsigned long npages)
-+{
-+	gup_put_folio(folio, npages, FOLL_PIN);
-+}
-+EXPORT_SYMBOL(unpin_user_folio);
-+
- /**
-  * unpin_folios() - release an array of gup-pinned folios.
-  * @folios:  array of folios to be marked dirty and released.
+-	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
+ 	if (val == 0) {
+ 		drbd_uuid_move_history(device);
+ 		device->ldev->md.uuid[UI_HISTORY_START] = device->ldev->md.uuid[UI_BITMAP];
 -- 
-2.25.1
+2.34.1
 
