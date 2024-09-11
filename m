@@ -1,146 +1,133 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B421ABEB8
-	for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 15:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB551A3AB0;
+	Wed, 11 Sep 2024 16:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726069852; cv=none; b=T41NKeWJaXb+oUZY4M6zBfGoyOdRPkz4PiWeHq9ki+B+FwxHymzohTmes26t7L7ZpA+u7yZO4HxovvWiSkYeCV9xbrJ6/e5NSQWSF5AI73Y2EnX2PzaR8W/LJ8nk287V9TA7d6gong7Aisbhkce4jp50nXEDvQZAQlJTvqEWQ7w=
+	t=1726072465; cv=none; b=nyCXQgfOg+odOoZX0A/HJwuBgOvGvrB2OTC0v0O6Z3kjK6sP7NnO7ksBvZMajrdPFPn8Vhlj8amwpwbQNjX/WLiofQ2qm8KL7bFlvotHfTBwNHLk0c2w1LV/J3igVPOoCtXSyJg2nBzOyJn7Fuv4OQ92ScZdVU0xNOvqoIW57H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726069852; c=relaxed/simple;
-	bh=9Oc1sgUVy+/sO/vboDjXOGjR+QgVUOOR2UHjlaRJn6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=Iw7Z2ipx20ueau7Cz18Xq9AVHopO//1tuiTe7GAtNEi1rzR7gEyYdqDbWBMQ4TMMwctX2bXkLjGpIdhIz7qdJ3Q/kouy6a/bm5InonLL/9igNnH8l37zamVjR7jdASYFNNZMeSGaY6mFZLca416xRSfydTYgBTBNgJxvxZAZjuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=GAEmF16x; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1726072465; c=relaxed/simple;
+	bh=THxi2fdst1mrp9grDb0k3ERw8bEb5E1Jtp6pCASNW3U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ullD0Sja3mRmBDesQAyjsBDVOwbj/ZTNs/upfnHLfS9XDtAa4PQJFyAATR/+aFIFshHJK/jisjVvURHq+HGPsl1D+BD9dZ2n3pm6AULL+ct6KFqddtu+IN9gndr6KE9MDzrpd6QGfDzj8a8HkQsx3K3muxRJcv9xlejAS5NrwxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xbfs0hNG; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="GAEmF16x"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240911155042epoutp03b04e179972bfed5b9bf0a638181aa197~0O2CAjyec1131911319epoutp03i
-	for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 15:50:42 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240911155042epoutp03b04e179972bfed5b9bf0a638181aa197~0O2CAjyec1131911319epoutp03i
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1726069842;
-	bh=Y748A+ACGXxVtP9PeIAIgM9d3NhEmxDN0RDsrb/j5c4=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=GAEmF16xUoIvpGRG+HP8ovlNfuBgzqaF05BlwWi3sWQGL0saJeGG/auzv8ABlrQx+
-	 nUmSb4nIrUCUmj12gucdNHDspwqUSr476xKl6UMYJOBZTrJiyoAJ67a7vEL0RTT8Td
-	 EIBmT9j6Jb652OjKfpfqtPgvjBMMSbWCH3Ak8QDQ=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240911155041epcas5p18825dc12f21aab96cf959521dc5a2c74~0O2AYPXNe0166201662epcas5p1r;
-	Wed, 11 Sep 2024 15:50:41 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.182]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4X3lQm2vyvz4x9Pp; Wed, 11 Sep
-	2024 15:50:40 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B0.92.19863.05CB1E66; Thu, 12 Sep 2024 00:50:40 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240911155039epcas5p1fae0bda61cf3d7616240b18ba7009936~0O1-I5ATn2212422124epcas5p1G;
-	Wed, 11 Sep 2024 15:50:39 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240911155039epsmtrp2fb17711b9e5864d03758445ca4d10c4c~0O1-Hw4Hx2933629336epsmtrp2I;
-	Wed, 11 Sep 2024 15:50:39 +0000 (GMT)
-X-AuditID: b6c32a50-ef5fe70000004d97-48-66e1bc50d169
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B4.86.08456.F4CB1E66; Thu, 12 Sep 2024 00:50:39 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240911155036epsmtip1ecc3492e4996e9f66e59c7cbd7c278f4~0O175ZUb52806928069epsmtip1d;
-	Wed, 11 Sep 2024 15:50:36 +0000 (GMT)
-Message-ID: <0982e242-c7fe-1456-815b-2d5b40d17ba9@samsung.com>
-Date: Wed, 11 Sep 2024 21:20:30 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xbfs0hNG"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8d29b7edc2so4061166b.1;
+        Wed, 11 Sep 2024 09:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726072462; x=1726677262; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JMtXVHkqQbVZYjnenJKozcU9t1oo3mrhS0t1pBayqX0=;
+        b=Xbfs0hNGQYdiRn3EA/bD0E5QUqUFTdzmZZ6wn2YDauXPdh+Wirxp6qlfACTKI3u+a/
+         roQOR71l+5bUn900ZVF3iGUHq51I8GPNJpgjK8FcajtvKx42UBwdl1nHkXciVFUaiScO
+         uPqodcV0CatmAf3MepQv2dFgxRdLHkjSPHfDFEUw7gflL9X3A06jkNX55QcVRsES157K
+         RrQzYpzt/3qbf+Dclq32mr6jmwBwYMFIQiaIltMuNJklvSKKtFw+qqgzsajRfHWOXlUN
+         5PYe5ZmutHXUAGt4c85FQywUl7jH3ylFTsMMz/VsBOsBrorb4N06YzMgK7wfLuw3Q1zJ
+         V1Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726072462; x=1726677262;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JMtXVHkqQbVZYjnenJKozcU9t1oo3mrhS0t1pBayqX0=;
+        b=HS0/Wq/notfV3s9CAJvgDSYEBisblLYKdOSOymFLNmmp/T0ZCoT0e26EUEi3mQqkFO
+         q8aKD1QNaeF/H1Smy1Pt/vP+mApU+y50teYIZAzZLj9HeqtMUqO6eNFew3R98GKTIdAM
+         ic9YjrkE3ElYbr1ujpscwR0Oa4NZJo/eN/BluUX4sPvHta5HmmPE2QwFeCCFFfF6tOde
+         gIUwjOfSiZe7O/bnVCiyuHBbHnzhEEsh8slztJmZUPjsA1a7AjzyaO6WAO5k+sjsfMwH
+         jMAl2e+xVbkQ4+1epsQIFYEhMZJUUp5eEPquKCd5PA2O9C23qdgRquF4PLTluVkX5vBn
+         i57g==
+X-Forwarded-Encrypted: i=1; AJvYcCXKGxFHlrYnyyTtzswDM+zto2Vvv6OeVHPc3wFapDfk9U2NbYnz4097NORRRnbrJxfyZplRnomg1k+Khg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHXsqz1aY+4Z+tCKdYyEOhh2IUkG7Sq4MwwY3H0pTC+rs7gI1v
+	DQVCQEMWDIx5FvDXnPaM5ndN+EnHJtShzHxWxUYuoVLnM9hbQuUlWYj/xak7
+X-Google-Smtp-Source: AGHT+IGjuO6kXZBiH/YIXMFCm9Da9OqH+kOJ25he8cNe8qOZqvyK5g024tTbFGMJIxveiGd9EzI8/w==
+X-Received: by 2002:a17:906:d555:b0:a8d:5e1a:8d80 with SMTP id a640c23a62f3a-a902961ab79mr6013366b.40.1726072461451;
+        Wed, 11 Sep 2024 09:34:21 -0700 (PDT)
+Received: from 127.0.0.1localhost ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25c72ed3sm631820866b.135.2024.09.11.09.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 09:34:20 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	asml.silence@gmail.com,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH v5 0/8] implement async block discards and other ops via io_uring
+Date: Wed, 11 Sep 2024 17:34:36 +0100
+Message-ID: <cover.1726072086.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH v5 3/5] fcntl: add F_{SET/GET}_RW_HINT_EX
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, kbusch@kernel.org, hch@lst.de,
-	sagi@grimberg.me, martin.petersen@oracle.com,
-	James.Bottomley@HansenPartnership.com, brauner@kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
-	jlayton@kernel.org, chuck.lever@oracle.com, bvanassche@acm.org
-Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, gost.dev@samsung.com, vishak.g@samsung.com,
-	javier.gonz@samsung.com, Nitesh Shetty <nj.shetty@samsung.com>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <e6792bd5-1bd0-4a28-b0c9-7e49f74505f2@kernel.dk>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf1CTdRzHe55ne/ZAjXscI74uT9ZTeQrxY7TBFxPSy+jp6Addlld33hjj
-	ETj2q/1IsYgdhoLWQELAAUK4E2R3gMMDErgIME7I1gkU7mJhjEiRLDgJVLRtDxb/vT6f+7y/
-	78+P+xKYoJgnIrI1RkavUagoPJDTMbAtPDK15/r+mNulQdA+WYLDuYEFBFb8tYLBh5OzKLzW
-	9zUKz9kvobC68jAKPa1WDJ4vIeD0L4s8uHK2mQfL+n9CYK8rAl5teBX29F7mwLqzMzx4/Ocu
-	HDYOPUBhx706DLbM3eZA5+oQFzqtNbydT9KjYym0032eQ1eUDeP06BUT7Wguxul2Wz7dXb+I
-	0t3XzDj994yLQ1suNCP09/WDPHrRsZl2eObRVP4HOTuyGEUGoxczGqU2I1uTmUilvCN/WS6L
-	i5FEShJgPCXWKNRMIrX79dTI5GyVd2ZK/JFCZfKmUhUGAxWdtEOvNRkZcZbWYEykGF2GSifV
-	RRkUaoNJkxmlYYzbJTExsTJvYVpO1nDTQ1zXhx08bvFwzcgkegwJIAApBafvu7wcSAjIHgTM
-	dw1z2WABAUMlHRw2WEJAUcs3vEeS7spRzMcCshcBw1MfsjyPgOqLSh/zySTgGTP7LTjkc2Bk
-	xIWw+Q3g8ikPx8chZDq4O17jzweTieCr1Sb/+xgZClyeOn9LQtKOghq3zR9gZDkKlqv6vc4E
-	gZPbwI9fmnyCAK+4fPbMmjgMdM7XYL56QDYGgMqWzzG2693g5Im7axwMbg5dWJtGBBb/7MVZ
-	zgFTv01xWP4EdLVbuCy/BMz3J7g+X8zr23oxmvUKAl/c86C+NCD5oOiIgK1+GrjLZtaUoeB6
-	lW2NaeAqH8PZhd5CQJvrJl6KiK3r9mJdN7913TjW/53rEU4zImJ0BnUmo5TpJJEa5sB/F1dq
-	1Q7E/yfCU7sQe9tqVD+CEkg/AgiMEvJLktz7BfwMRe4hRq+V600qxtCPyLwXOoGJQpRa76fS
-	GOUSaUKMNC4uTprwQpyECuXPFdZmCMhMhZHJYRgdo3+kQ4kAkRl9bHMe82vgLipTyEP0dfse
-	Fx1685yDyv6hzBmsdoa84qKn1K3L422nbLMD8pDPhNzJiGdihW+PLxU1hIHoiAPpxyY3WYjc
-	o2/M1tROvLc3qENMlgbeIBqL8n+fuCXffuOK2bhvZG/FGWffp9yTJqmw7ak7l6JePKzcmNs5
-	mlZwuiHfsefb14KVuTL+YHpHU2TC0bD4QZsucWl5i3vl/eefdVUv3LnaslxVvWEiuXVp42rC
-	1vYjeQ6Lu8ITbTtoseelRb81W/CPjNqVJp0qsMebuwofbErZsvUJwwxM7ny3gW5tWpZOO+qn
-	9bHffdyJ11cm50cFpeTWFnY7whf3FP9B7eRRHEOWQhKO6Q2KfwHlKQmenAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA01SfUyMcRz3e56n557abh5X+HGGnSmudUT4GfIym6cyic3rRk/u6U2Xdtd5
-	yR+uuY1OhJrydLpeL12TuUqnK0tJ68UytawjxFEcQheaXejK1n+f7/fz9v3jS+Gi98RcKi4x
-	mVMmsgkS0ou42ySZHxBe1x+9XNvvh8r7MkjkaPoO0LWvozj60zeAod6GexgqK2/GUG72WQzZ
-	b/M4upNBobcvhgVo1GgSoKuNPQDV2/zR08JtqK6+lUAG4zsBuvDMQqLSljEM3f1twFGFY4hA
-	na4WD9TJ6wWbZjFd3WFM58s7BHPtahvJdD1WM2ZTGslUFp9hrPnDGGPt1ZDMt3c2grlUZQJM
-	R/5DATNsns+Y7Z+xncIDXuvlXELccU65LDjSK7bt5h8yqQE/eeGS3UMD+jAd8KQgHQSt2V24
-	DnhRItoKoDa1ZZKYDc/2/BJMYG9YNjYgmBA5ACx1utwiIR0M7d0aNyboxbC93QYm9jNg63U7
-	MY5n0lGw7lWqW+NNb4AFrpvuUPxfgc1uwMZDfehyDPI16WB8wOksDDq0Q5N1nwBsNn0gdYCi
-	SHopfJKpHnd7/kvKGiiaTFoNddU6MIEXwJrPevwyEPFTDuGnFPJTLPwUSz4gTGAOl6RSxChU
-	gUkrErkTMhWrUKkTY2RHjinMwP0KUqkF1Jm+yhoBRoFGAClc4iPMCH4ZLRLK2VMpnPLYYaU6
-	gVM1AjFFSGYLfzguykV0DJvMHeW4JE75n8Uoz7kaLOVbT3MaCozvPhhlyDzRUZ3+gxRrrzhD
-	nzulR9ZlT9NW3joIAhb5p7zev3ZM4xxa6P0zFxSZVZY98SCk1mNktJSvn/dBs2aVj+J0uBzV
-	/vxitMuNyLLjBnjouDXk11FwcYuzur4y9rKPyXdFtYiN1Of4L0nfGk3pg6Voe0V/STkrI6ue
-	7oq+0mQKWeJbGxa2qkBc6EBxzMjvQzWDm3r4kSxKErnx+xM/1lgyvXB3w7nkwgc5fml5nobM
-	rAcz1BFrgnwDHj3e55GWd3j1XmPm5uKyVwHWkFy+TTY66Eqt2FPQq88eJKs+vuHvi8+EnX5k
-	KYn5+CnKFXpPfH5lhE1CqGLZQCmuVLF/Acg4jlZ5AwAA
-X-CMS-MailID: 20240911155039epcas5p1fae0bda61cf3d7616240b18ba7009936
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240910151052epcas5p48b20962753b1e3171daf98f050d0b5af
-References: <20240910150200.6589-1-joshi.k@samsung.com>
-	<CGME20240910151052epcas5p48b20962753b1e3171daf98f050d0b5af@epcas5p4.samsung.com>
-	<20240910150200.6589-4-joshi.k@samsung.com>
-	<e6792bd5-1bd0-4a28-b0c9-7e49f74505f2@kernel.dk>
+Content-Transfer-Encoding: 8bit
 
-On 9/11/2024 12:18 AM, Jens Axboe wrote:
-> On 9/10/24 9:01 AM, Kanchan Joshi wrote:
->> +static inline bool rw_placement_hint_valid(u64 val)
->> +{
->> +	if (val <= MAX_PLACEMENT_HINT_VAL)
->> +		return true;
->> +
->> +	return false;
->> +}
-> Nit, why not just:
-> 
-> static inline bool rw_placement_hint_valid(u64 val)
-> {
-> 	return val <= MAX_PLACEMENT_HINT_VAL;
-> }
-> 
+There is an interest in having asynchronous block operations like
+discard and write zeroes. The series implements that as io_uring commands,
+which is an io_uring request type allowing to implement custom file
+specific operations.
 
-Right, concise.
-I can fold in both the changes in next respin.
+First 4 are preparation patches. Patch 5 introduces the main chunk of
+cmd infrastructure and discard commands. Patches 6-8 implement
+write zeroes variants.
+
+Branch with tests and docs:
+https://github.com/isilence/liburing.git discard-cmd
+
+The man page specifically (need to shuffle it to some cmd section):
+https://github.com/isilence/liburing/commit/a6fa2bc2400bf7fcb80496e322b5db4c8b3191f0
+
+v5: add uapi/linux/blkdev.h
+    number block cmd opcodes starting from IOC seq 0
+    don't export bio_discard_limit(), return to v2 and put bio if nowait
+      can't proceed
+    minor comment and stylistics changes
+
+v4: fix failing to pass nowait (unused opf) in patch 7
+
+v3: use GFP_NOWAIT for non-blocking allocation
+    fail oversized nowait discards in advance
+    drop secure erase and add zero page writes
+    renamed function name + other cosmetic changes
+    use IOC / ioctl encoding for cmd opcodes
+
+v2: move out of CONFIG_COMPAT
+    add write zeroes & secure erase
+    drop a note about interaction with page cache
+
+Pavel Begunkov (8):
+  io_uring/cmd: expose iowq to cmds
+  io_uring/cmd: give inline space in request to cmds
+  filemap: introduce filemap_invalidate_pages
+  block: introduce blk_validate_byte_range()
+  block: implement async io_uring discard cmd
+  block: implement write zeroes io_uring cmd
+  block: add nowait flag for __blkdev_issue_zero_pages
+  block: implement write zero pages cmd
+
+ block/blk-lib.c              |  22 +++-
+ block/blk.h                  |   1 +
+ block/fops.c                 |   2 +
+ block/ioctl.c                | 242 ++++++++++++++++++++++++++++++++---
+ include/linux/bio.h          |   4 +
+ include/linux/blkdev.h       |   1 +
+ include/linux/io_uring/cmd.h |  15 +++
+ include/linux/pagemap.h      |   2 +
+ include/uapi/linux/blkdev.h  |  16 +++
+ io_uring/io_uring.c          |  11 ++
+ io_uring/io_uring.h          |   1 +
+ io_uring/uring_cmd.c         |   7 +
+ mm/filemap.c                 |  17 ++-
+ 13 files changed, 314 insertions(+), 27 deletions(-)
+ create mode 100644 include/uapi/linux/blkdev.h
+
+-- 
+2.45.2
+
