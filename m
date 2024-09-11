@@ -1,93 +1,60 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C7515098F
-	for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 22:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FD4143C6C;
+	Wed, 11 Sep 2024 23:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726092358; cv=none; b=EkEBhRC3zKE8gw5LEddS47WtAhmyt1/oFyzGMgAXjJr8TsURJyvWyB6LK6hat2v4M3RwV6EiH38v0vym2SoEoXHRnEb9vShpl94pYPbE2BEfdiN4OaBOTFGJcjLevL0djsdqtwOSs3FOumRMhgIXRs3SCm5QnrxmbBbHFXWyXl4=
+	t=1726097009; cv=none; b=RJIvA6s5iqByfunlsOhuP1NoiP+2za6K0y2M1LB50qM7si+cwhmR0K5XmJp8ICLRIL1p3OqylvjU3iSTppfr/haqPL5o6hH6ZyeS5uO7Qwibkp16SV6htDw3qm6tKafgds0BIVUqBALWf/wVo6fQ2eV9545JJjx132JuIKzfN/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726092358; c=relaxed/simple;
-	bh=4eWae7FOAKdBlxcxq2mEpg0H5cK66+VncijT1wT9M+U=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=c7SzXV+5Zzqjo8q7mAUY031U7GWzgF3J4TodHWViB5i4DsKQ2egLhAIy7LjzZVGQfr3hIcZZKLLgHa6E7uXMx3uGYeoB28NkV7ZZ5zUQT89iHALb8JCXogKPqcBW5HFvJMqT6FKcgRb/JQQpxrNfhrohKDOBUjlq1RoHRKSeZ6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iRsCyLuu; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1726097009; c=relaxed/simple;
+	bh=fzeEecEtUpF8stRcCeg34tBgDLIrgkBerDWOvGLlTAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sHWymRotqdiHIbfPAnqQXLhhHZFc0i1AMTddGcCve1u6a3Zoo+XbdCxNWbxWFSEWifM7xqIJaWrSdja27tdzuYkXSrwJaTjmQ6w6fAPLILiziiZ/y1WTYUK3oJsLzXS0dVNTPYWqhMQwQL9l0k+0fTZ8LvsVkvrwNgaFRlQ5DXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OBp+8AGo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iRsCyLuu"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20696938f86so2866555ad.3
-        for <linux-block@vger.kernel.org>; Wed, 11 Sep 2024 15:05:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726092355; x=1726697155; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aT6C3xXVFHramxKhQNyUko7uCMTmKteekD3PIenNBQQ=;
-        b=iRsCyLuuQwGkgQdp1qapRKosAt5CPYIxqpf7pfpQI1tMkPOwWlBJ3uy1gTcpSo5tE2
-         COq/4lqUZ/nVJ1qZjaxpt8Aym+3ZpUn5ccwOw8eA1SGzsfyff0VSsbyd4SEgUVkMPYsa
-         7/Cp0gaprGFPnJDYRf8OG+l3xyTtn3oLgbte3C1oNDaJiIVDBjeA41JqHDvL4/BPpnnN
-         Le1KREJjl1beqFUoeA1/JTsL2UbdaFepwR+/6ESdEK+t6F6/sOzqS6trRr/WDVQHsd1D
-         IEcuRhIDghbqi38cuO00f709Chaa+NJesSj/cAAi6gMQWPXr9MQPLHo1FBf7Sx49soPZ
-         hrig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726092355; x=1726697155;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aT6C3xXVFHramxKhQNyUko7uCMTmKteekD3PIenNBQQ=;
-        b=JrAii5MtNMVlh54LvpMQSyLWeUL42Mc35Wo3AureHbxWG+KD/rED5E7p7t7TFSdp44
-         ox894BhptyNOZ3hwPqKrS00IiPd0pUKZcEyPcRXHJniUqs1ZRekl5nsVAFOesaZAhow7
-         mFKaqVN+40fcGXmoXqw2oDnkrDog/PNVcjtGspBzHRNwhiQBxtWuZYI9j6I2oJeJ/9rk
-         wGXGpDgC92PO8/ey3QA5XJ6iw80CAEsumouHKOlhQmPdkC4jHhly7vt+66obhbcocnG5
-         3aKmycGni3mqFLr/1ahHGpSgb16as3LGsGB3qh71AqC+PAjon0G6F6ObFoc5wtSxlqp2
-         59Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgnBwkJZsODwyRAQLdvipLjMMHJaUqHWpxOb5YLlElgkI0xKviD/dn3jB+SXBn8egLzJZC0Jmole1amQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3uC3qKTMg+sCY1gl8IP2VYssnvEeo4dWunKmaze+zXZl7IceZ
-	y4JattPnMfd2gfzSGgS8ncurSIsfRYMvw8ITsk28YgiXZxRy6bsAfOiENs1ZrWg=
-X-Google-Smtp-Source: AGHT+IEuqFEGAfJiOaQ4nh1MTrdynUjOWncE9qCeCiHOZ6JbwtAJ7RttrGToWUO/kBAcYF3XVN+a+w==
-X-Received: by 2002:a17:902:f68f:b0:206:88fa:54a6 with SMTP id d9443c01a7336-2076e361a14mr10671435ad.21.1726092355362;
-        Wed, 11 Sep 2024 15:05:55 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076afdd4easm3908905ad.148.2024.09.11.15.05.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 15:05:54 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
- cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- Colin Ian King <colin.i.king@gmail.com>
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20240911214124.197403-1-colin.i.king@gmail.com>
-References: <20240911214124.197403-1-colin.i.king@gmail.com>
-Subject: Re: [PATCH][next] blk_iocost: make read-only static array
- vrate_adj_pct const
-Message-Id: <172609235387.422440.3089154405009965533.b4-ty@kernel.dk>
-Date: Wed, 11 Sep 2024 16:05:53 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OBp+8AGo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3828C4CEC0;
+	Wed, 11 Sep 2024 23:23:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726097009;
+	bh=fzeEecEtUpF8stRcCeg34tBgDLIrgkBerDWOvGLlTAw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OBp+8AGoYbgHyz5jGnBrKs+2Ckxn4y4gmUkpdURkvV/lxEPM8hysSxVND8MA2vhZ1
+	 E6HxkFfKeF6dkQzXG7N4jVYmqZXJ+EdmM6inpuLc2NckAX9UBeH0Md73b/0NXfj4LB
+	 qEnN24Ih5tJ2R8uDzGhSzvpHN1juoN2l1hIRhNumLyrgnUf2zH1QqBLvJ2ULbky4If
+	 DWwhU/io570CA5Gj0zKSMlMj5N5KT5widyClG8rXLsTyLONfAL3aUvg0BIQdBLlK6v
+	 hVRRn2PJ3805hIBUAksczDuW8+EoGUSYyX1WeBD1IXzM54plBsRt15J3OiVWoSYTy/
+	 q47/6rrM++Akg==
+Date: Wed, 11 Sep 2024 17:23:26 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, sagi@grimberg.me
+Subject: Re: [PATCHv4 10/10] blk-integrity: improved sg segment mapping
+Message-ID: <ZuImbgYqqZzLZkho@kbusch-mbp.dhcp.thefacebook.com>
+References: <20240911201240.3982856-1-kbusch@meta.com>
+ <20240911201240.3982856-11-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911201240.3982856-11-kbusch@meta.com>
 
+On Wed, Sep 11, 2024 at 01:12:40PM -0700, Keith Busch wrote:
+> @@ -102,6 +103,12 @@ int blk_rq_map_integrity_sg(struct request_queue *q, struct bio *bio,
+> +	 */
+> +	BUG_ON(segments > blk_rq_nr_phys_segments(rq));
 
-On Wed, 11 Sep 2024 22:41:24 +0100, Colin Ian King wrote:
-> The static array vrate_adj_pct is read-only, so make it const as
-> well.
-> 
-> 
+Doh, this was mixed up with the copy from blk_rq_map_sg. It should say:
 
-Applied, thanks!
+	BUG_ON(segments > blk_rq_nr_integrity_segments(rq));
 
-[1/1] blk_iocost: make read-only static array vrate_adj_pct const
-      commit: cc089684664ebd379f1451aab65eb50f4008b381
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Question though, blk_rq_map_sg uses WARN and scsi used BUG for this
+check. But if the condition is true, a buffer overrun occured. So BUG,
+right?
