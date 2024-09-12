@@ -1,59 +1,48 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7751E1BE84B
-	for <linux-block@vger.kernel.org>; Thu, 12 Sep 2024 16:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648AC13CFB7;
+	Thu, 12 Sep 2024 20:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726160367; cv=none; b=JvzLrW7r+5qQpET4EMwoLCAXC9WkwapaOoTPdz3skOYmXvpW9p2jOywl0pLYw5KEEQGn07QY2olhshC5zPE/ul6bh7mM643AnqXRJm6ZeqG7U7h0NBM7RqUdo5jcRDIHhZPeIXAu64MubZXkt5DKZ3Bj+u4Ywk0ceqWGVkaQfAU=
+	t=1726173028; cv=none; b=lNgkw33PGhcN/DWr/+FuQLUWQX2Rg+4jT8jw6f0RKat0QcVmgnehYfDhGn7dg3livgaZ2fK7tvvDbAZrmBqnC4HB3uNoJ7wnXgc5w64LR0746Pz37IQ3BRkQI0getOwurO/8mUrio4M2oA9SVOpw3NXvMtLeRUTh3PjdOKd0hUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726160367; c=relaxed/simple;
-	bh=Ldi+zibZ/V2S4z3E7xRWlW+SCbd0ir+Qiyr40188ii8=;
+	s=arc-20240116; t=1726173028; c=relaxed/simple;
+	bh=JoPUxbKNemTOQj/Zcm/S7ujkVqb72FxciPCp7L8rpDU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HGn2H5dJZUhMxauO5qOcJniBLI0xxXp0bPbpYNJamC6Ks69ZRE7hmhlPTdomtsRfoSipubijLXUf83JA9qg5c0oKaCow+Qk60GHe9YPFlGaB9qOHhBA54vP5ACijgyC7RNu96QxBgJ0i7qLZ8/Npi31T47iQ/JM+irAseNcYKLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GYU4agDS; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=kbvfW0pj9AMMXuSmocpBgLbIxfe1PpYwoa+d4eHbrFJ48OtJrfptsoppMI0omNGYHdmk51sxQ+7V9Qr7xcpZ2qVbGEzkw14jCz9GL/XZzj19uiNhDfrv6qJE+4rXBLfyzT/CTk0GK5M1LO8BiMxcaUzTdcHeanPPHYOYOyt/u4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=hH6eRhNt; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GYU4agDS"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-82a626d73efso46076839f.1
-        for <linux-block@vger.kernel.org>; Thu, 12 Sep 2024 09:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726160363; x=1726765163; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ik/dQnu5jeslrWeWVW6FYf9oUqwHtJ5XqerEocsu/Sk=;
-        b=GYU4agDS4iEXZGoU5T+spxa4npgyuu3pn7xBkvYqrIHJ+/B8/I5cfmjT/KRcA8onaB
-         9D9Yi1gDoEt9qUgHVnnZMlS37iSiCLwHDIAfX2otvv59d6QIMkDi5+i+0TXWpRGEsEmK
-         Ivi5WiofRVwSOn9YxLMFb60aXfzF8aRADYRlExcArsggUbgta8dytDVUaaOhz8AHQWyu
-         JPu6j75bJJAyB4P6wdzPHWnla75/002esdiVobrzemLFFwkWP1nZQnXCugsARY3aUBDo
-         u0zAgsqyiiENM6PVtNGvdQ4ZsushInZ4YVtrfFA0F4FQ7EGbAPaerTOIiJxgi8B8McQk
-         jXtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726160363; x=1726765163;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ik/dQnu5jeslrWeWVW6FYf9oUqwHtJ5XqerEocsu/Sk=;
-        b=HFT9ajEzgQ6uTB70Y5kaq8VjthVORFS32hKitNVB+/hU3kkGf3UfGuDG8W2ExNMcqi
-         w/Lxamgj4JHEXDqdjEmwqI0MdRust9tda9QnHer9I8J9+/KOD3YpTJK+0//xQP9y63xv
-         kQKSPKZ3P+WDKAbRvOagxy7/dOszCLUr+W3JxxXaA5WXUN6JaA7pNxXAI85CKaZ69uIm
-         7JA8hlH3v8anvz3TSeDMaZ1LbnRt84ARX+3P3G88wJE2H5R/EHx8G4Y2R1y/Crk4VriK
-         55OlT0PXZ7GB2i315MUEk8SG5V6DKyR/IUvSjRsJ88HoybdjNryTOheWmZ9NNikHizdg
-         y7Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCU0ZZSq/Gb9rZLidxUS+/AdMz/3+GKUfb+t4cU3L3TNw8gTje6Xnki3tP14h0oz03jnFld/3bC1BoPJ9Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6+bvaQf7jm68SHiDkkiCgsSqoD777uDsPM1hK+JgTfeJz9F0m
-	+5eQ2bOkrR+6+hArINrIkg9vqNzgioIqOv1AAslxBfNsa2aJE88/q+GwYDBD+Qk=
-X-Google-Smtp-Source: AGHT+IG0/AkbaBfjjgY5RdNvez4Q8oJijXmJux9z3RJ6adhyGPQMc3fgvUyAsKJD5k8HozTbpJTZnQ==
-X-Received: by 2002:a05:6e02:1a8b:b0:375:c443:9883 with SMTP id e9e14a558f8ab-3a08494ab32mr34292555ab.21.1726160363430;
-        Thu, 12 Sep 2024 09:59:23 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d35f433cbcsm693841173.20.2024.09.12.09.59.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Sep 2024 09:59:22 -0700 (PDT)
-Message-ID: <7e6ab59d-2248-4dab-81e4-4de6343b2672@kernel.dk>
-Date: Thu, 12 Sep 2024 10:59:22 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="hH6eRhNt"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4X4Tb03tzXz6ClSpy;
+	Thu, 12 Sep 2024 20:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1726173015; x=1728765016; bh=JoPUxbKNemTOQj/Zcm/S7ujk
+	Vqb72FxciPCp7L8rpDU=; b=hH6eRhNtR22x34qVLVhBhAs9zKC5jX5xUull0HKd
+	cmgxk/UNnJpKcxNkOIS17H1Xfp7QcWx2voAJSOzuTvSJx0cgMJUC5tX1dK1gEy8z
+	OO778DUdPMTBViGFqSys0NpdDVtclnF1VD2ZjcqJ/sC+92pEzv8dNzsIIFFLdykd
+	+xsBSJnXpae75RDkwsn423y6Ahy4jNvODjnLhKsJElbcD9NhsXuH84irg2/gNejC
+	siDnbqIQQn/WkqYdUhuq6eP+mdkDv0OeISTR+4Y5SC0wGgqhUMLgcun2Yzv9kmuy
+	kzYxWZsFBAFm5IdevMHuC93m7imVwEcbPuTSBVuc/lFBvg==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id WSfMN2Lf5--p; Thu, 12 Sep 2024 20:30:15 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4X4TZq34P1z6ClY9y;
+	Thu, 12 Sep 2024 20:30:11 +0000 (UTC)
+Message-ID: <fe2ae1b7-7c77-49e1-ace0-50e937f2c32c@acm.org>
+Date: Thu, 12 Sep 2024 13:30:10 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,54 +50,32 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 6/8] block: implement write zeroes io_uring cmd
-To: Pavel Begunkov <asml.silence@gmail.com>,
- Christoph Hellwig <hch@infradead.org>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, Conrad Meyer <conradmeyer@meta.com>
-References: <cover.1726072086.git.asml.silence@gmail.com>
- <8e7975e44504d8371d716167face2bc8e248f7a4.1726072086.git.asml.silence@gmail.com>
- <ZuK1OlmycUeN3S7d@infradead.org>
- <707bc959-53f0-45c9-9898-59b0ccbf216a@gmail.com>
- <38a79cd5-2534-4614-bead-e77a087fefb2@kernel.dk>
- <6ecd3129-e039-4b86-9e67-03a7a519266e@gmail.com>
+Subject: Re: [PATCH v5 1/5] fs, block: refactor enum rw_hint
+To: Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
+ martin.petersen@oracle.com, James.Bottomley@HansenPartnership.com,
+ brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+ jaegeuk@kernel.org, jlayton@kernel.org, chuck.lever@oracle.com,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, gost.dev@samsung.com, vishak.g@samsung.com,
+ javier.gonz@samsung.com
+References: <20240910150200.6589-1-joshi.k@samsung.com>
+ <CGME20240910151044epcas5p37f61bb85ccf8b3eb875e77c3fc260c51@epcas5p3.samsung.com>
+ <20240910150200.6589-2-joshi.k@samsung.com> <20240912125347.GA28068@lst.de>
+ <0baddb91-b292-db90-8110-37fa5a19af01@samsung.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <6ecd3129-e039-4b86-9e67-03a7a519266e@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <0baddb91-b292-db90-8110-37fa5a19af01@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 9/12/24 10:53 AM, Pavel Begunkov wrote:
-> On 9/12/24 17:32, Jens Axboe wrote:
->> On 9/12/24 10:25 AM, Pavel Begunkov wrote:
->>>> an entirely different command leading to applications breaking when
->>>> just using the command and the hardware doesn't support it.
->>>>
->>>> Nacked-by: Christoph Hellwig <hch@lst.de>
->>>>
->>>> to this incomplete API that will just create incompatbilities.
->>>
->>> That's fine, I'd rather take your nack than humouring the idea
->>> of having a worse api than it could be.
->>
->> How about we just drop 6-8 for now, and just focus on getting the actual
->> main discard operation in? That's (by far) the most important anyway,
->> and we can always add the write-zeroes bit later.
-> 
-> That's surely an option, and it's naturally up to you.
+On 9/12/24 8:50 AM, Kanchan Joshi wrote:
+> Wherever hint is being used in generic way, u8 data type is being used.
 
-Just trying to make forward progress - and since the actual discard is
-the most interesting bit (imho), seems silly to gate it on the latter
-bits.
+Has it been considered to introduce a new union and to use that as the
+type of 'hint' instead of 'u8'?
 
-> But to be clear, unless there are some new good arguments, I don't
-> buy those requested changes for 6-8 and refuse to go with it, that's
-> just creating a mess of flags cancelling each other down the line.
+Thanks,
 
-That's something to hash out, might be easier to do in person at LPC
-next week.
-
-For now I'll just drop 6-8.
-
--- 
-Jens Axboe
+Bart.
