@@ -1,164 +1,205 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C04A18BBAF;
-	Thu, 12 Sep 2024 10:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595E915D5D9
+	for <linux-block@vger.kernel.org>; Thu, 12 Sep 2024 10:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726136982; cv=none; b=cGSXqjcFTd+AutfM+XJM2ZG6a7qi+vGQfE2VPoGyGS9z8LYnjZgB4Fn4WQ1Npbn4Snhardw7mieF0M97NobLO+YrU8r1E36YJ50xFl7qdSwM1t8f9JFdTix9y0Om18zm/s8yup3E2wohU3cMbHEMYyjvKg4yRPCQugR2EFr+zIc=
+	t=1726138188; cv=none; b=OCXi+jRkJAAkQKnxDmeTLH9k4v5//fSATuQDCKs7maCkXoIz6yHooJzAFhwr9h/EuA9yqUIIBarPAUTxVJLyjJnlf3mKzoVEWxlTKNI6DsSrbHH/Wek2MhB8E9V5+khTeuRs8W7BoIOhGiOLPsjFNuSzccdmgOdalo2CiVFjkx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726136982; c=relaxed/simple;
-	bh=dt/WYvtEBcI/9XUJ+2dYNtW7n1MtjR28hx4ZzaIMLKU=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Jwq2PneQVVJU7eGy9eaAooKtQb0I7Lf4waTsRw6/Rzayra5g02HMfg0wZMCuHpP7yD1y6ndIlRbFmcFzTzpp+AG2378fc8XxI1r1AAYJQJH09hX2i2wbtlrnqW02pqZCPUeGOHTAG/Efvb6JEdbUGjdN8sxZg+tdk4hIFJPYErQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BVGsKrA2; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726138188; c=relaxed/simple;
+	bh=tQvBKw04/nkyBK5qBAFq3uvl86EzrS7291cF20ua9RQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TpV+Jknf4qnP8xsSUN/uQM/of0zvc7WQDSispvqHqs7Mklo+3K0wIhF64Wh8hkwEfCvoH/+xX45J8zxcDx27KhOcOUC0o5IVywjIk7P4SAmkt6otkLuFYq+MEb2YIs3mNRZ12iM2u2IlEh0I65ryuk0p7KoVJiADjWrcVrZ21ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PGIIytZe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BVGsKrA2"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-206aee40676so7218075ad.0;
-        Thu, 12 Sep 2024 03:29:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726136980; x=1726741780; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=btx4yivix146TVd/SKshMhrh5VFqOrFOPHMbbJetuZk=;
-        b=BVGsKrA2elmlQWjvlQB2cscO1vrwMd5dkrfUnh3pz8HHXhyUWDKBjX1dUgYLKRhfps
-         QQBqpgWDIDVPxzhgrdmvin3a2WfyIe37ZUJoeBbjCnzU/1/teLLmaQcygGPPr27nDx9m
-         i3xPC6iab0vuyOgl+VAS2uydN4e4yO/F0q1HYjjwTxO8FX/JRHlF9rABXCy9KkLbyXOd
-         uG6aN19DDZo3291BPJZgVQVPQSSrB2XsNyJyaWLpJ/0iGmwzs5PMhUOxCP+9Xuec5+mY
-         gdQjxzxkcDaCHz2ibaVBm4Njuq+MCcliD8CLpZfaVNS3xRex7Xf8DYtArFcxX5Yw/9B+
-         4gvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726136980; x=1726741780;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=btx4yivix146TVd/SKshMhrh5VFqOrFOPHMbbJetuZk=;
-        b=veHNBHA5jXfOVepjM+O8gZAA1lV6yS+4fwxWvNBnldGsScW/xsh1ESCpx3F0Pvx6kb
-         3IQI1dwdvQyOuqbJxfW4Gq86iEdOet+OJJdvbXxIHWHLFB2HYoha/1Ap8GsgnomkgpJ9
-         tfcUkLq8KTukwj1byPJe1lIHliJr2Vq+vt6CDCRu79cyZEDESSmWT92Ly5xW8v1uItd2
-         /f2WJAHCxyGFsNgL7owA3PcQt6xDQ0bpYTIdk0O1gAtA4ulcsE8SCGwDGoHFsBXF1PIB
-         u+WxD/A96XzIhx61AfW/lu605Qc9KvgJDsZDstnefa/GyR12kcs3ULdCBiwt7WGqlvMF
-         IVcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXIFV9ZAVXmCoe79JD/IR+lrBtqZGtvEfaccgshBE3LM2c813XvKgVWV9aM0Y7X9R2Xtp5TITSlRSOac6p@vger.kernel.org, AJvYcCW1YqWba0TCcw+tmNmPRUC6geEtx41RSUVFIcdjPoS7AxmiIhq6tUe6S68Pkn60hMbDTYd4P3zrgMneNw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIq0SUPgWyi0bh3pcPHbQnequCy5YimPZmLWe4Xl7Uq6HjkrNU
-	w+UUklaNZQ+Sn3moRzxSFg0yw5yxqqG9g5H4U6EIfadggvpDNOaq1mNu+g==
-X-Google-Smtp-Source: AGHT+IHKW2SwbLT1hp0sJ6IDn5F7PTZKMfHlmsxABVnA0fJtbYIGyCpF0WB7Vo8Jq1W4my2llDk85A==
-X-Received: by 2002:a17:902:da86:b0:205:8b9e:965f with SMTP id d9443c01a7336-2076e370560mr31434095ad.31.1726136980366;
-        Thu, 12 Sep 2024 03:29:40 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076b00974esm11933415ad.253.2024.09.12.03.29.38
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 12 Sep 2024 03:29:40 -0700 (PDT)
-From: Chun-Yi Lee <joeyli.kernel@gmail.com>
-X-Google-Original-From: Chun-Yi Lee <jlee@suse.com>
-To: Justin Sanders <justin@coraid.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Pavel Emelianov <xemul@openvz.org>,
-	Kirill Korotaev <dev@openvz.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Nicolai Stange <nstange@suse.com>,
-	Greg KH <gregkh@linuxfoundation.org>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chun-Yi Lee <jlee@suse.com>
-Subject: [PATCH v2] aoe: fix the potential use-after-free problem in more places
-Date: Thu, 12 Sep 2024 18:29:35 +0800
-Message-Id: <20240912102935.31442-1-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PGIIytZe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726138185;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=WfDnloVL27js4DeKz4WRuLdIcS0vYQGz+8EzQxXGU6c=;
+	b=PGIIytZedKoo9Km3RGRAhgDtfWqiL9WYnlTDJ1fSBBOg26dhitsH1DuvEHi8c/MdLDIH/u
+	kW8fTvo0AgIHzsuj+/jcPRYC7MFC4Y+9PkAXLGGvE3ea+VWv3S2VPS0OTdbWFtBIq/Guva
+	4yXqf1Q7Gpw8iDtBlqSYH7La8pNb3Ug=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-608-bg3FrMVcNJ2VKPPrtu3IPQ-1; Thu,
+ 12 Sep 2024 06:49:44 -0400
+X-MC-Unique: bg3FrMVcNJ2VKPPrtu3IPQ-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B54051955DB2;
+	Thu, 12 Sep 2024 10:49:42 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.81])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5BB5C19560A3;
+	Thu, 12 Sep 2024 10:49:40 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 0/8] io_uring: support sqe group and provide group kbuf
+Date: Thu, 12 Sep 2024 18:49:20 +0800
+Message-ID: <20240912104933.1875409-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-For fixing CVE-2023-6270, f98364e92662 ("aoe: fix the potential
-use-after-free problem in aoecmd_cfg_pkts") makes tx() calling dev_put()
-instead of doing in aoecmd_cfg_pkts(). It avoids that the tx() runs
-into use-after-free.
+Hello,
 
-Then Nicolai Stange found more places in aoe have potential use-after-free
-problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
-and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
-packet to tx queue. So they should also use dev_hold() to increase the
-refcnt of skb->dev.
+The 1st 3 patches are cleanup, and prepare for adding sqe group.
 
-Link: https://nvd.nist.gov/vuln/detail/CVE-2023-6270
-Fixes: f98364e92662 ("aoe: fix the potential use-after-free problem in aoecmd_cfg_pkts")
-Reported-by: Nicolai Stange <nstange@suse.com>
-Signed-off-by: Chun-Yi Lee <jlee@suse.com>
----
+The 4th patch supports generic sqe group which is like link chain, but
+allows each sqe in group to be issued in parallel and the group shares
+same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
+sqe group & io link together. sqe group changes nothing on
+IOSQE_IO_LINK.
 
-v2:
-- Improve patch description
-    - Improved wording
-    - Add oneline summary of the commit f98364e92662
-- Used curly brackets in the if-else blocks.
+The 5th patch supports one variant of sqe group: allow members to depend
+on group leader, so that kernel resource lifetime can be aligned with
+group leader or group, then any kernel resource can be shared in this
+sqe group, and can be used in generic device zero copy.
 
- drivers/block/aoe/aoecmd.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+The 6th & 7th patches supports providing sqe group buffer via the sqe
+group variant.
 
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index cc9077b588d7..d1f4ddc57645 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -361,6 +361,7 @@ ata_rw_frameinit(struct frame *f)
- 	}
- 
- 	ah->cmdstat = ATA_CMD_PIO_READ | writebit | extbit;
-+	dev_hold(t->ifp->nd);
- 	skb->dev = t->ifp->nd;
- }
- 
-@@ -401,6 +402,8 @@ aoecmd_ata_rw(struct aoedev *d)
- 		__skb_queue_head_init(&queue);
- 		__skb_queue_tail(&queue, skb);
- 		aoenet_xmit(&queue);
-+	} else {
-+		dev_put(f->t->ifp->nd);
- 	}
- 	return 1;
- }
-@@ -483,10 +486,13 @@ resend(struct aoedev *d, struct frame *f)
- 	memcpy(h->dst, t->addr, sizeof h->dst);
- 	memcpy(h->src, t->ifp->nd->dev_addr, sizeof h->src);
- 
-+	dev_hold(t->ifp->nd);
- 	skb->dev = t->ifp->nd;
- 	skb = skb_clone(skb, GFP_ATOMIC);
--	if (skb == NULL)
-+	if (skb == NULL) {
-+		dev_put(t->ifp->nd);
- 		return;
-+	}
- 	f->sent = ktime_get();
- 	__skb_queue_head_init(&queue);
- 	__skb_queue_tail(&queue, skb);
-@@ -617,6 +623,8 @@ probe(struct aoetgt *t)
- 		__skb_queue_head_init(&queue);
- 		__skb_queue_tail(&queue, skb);
- 		aoenet_xmit(&queue);
-+	} else {
-+		dev_put(f->t->ifp->nd);
- 	}
- }
- 
-@@ -1395,6 +1403,7 @@ aoecmd_ata_id(struct aoedev *d)
- 	ah->cmdstat = ATA_CMD_ID_ATA;
- 	ah->lba3 = 0xa0;
- 
-+	dev_hold(t->ifp->nd);
- 	skb->dev = t->ifp->nd;
- 
- 	d->rttavg = RTTAVG_INIT;
-@@ -1404,6 +1413,8 @@ aoecmd_ata_id(struct aoedev *d)
- 	skb = skb_clone(skb, GFP_ATOMIC);
- 	if (skb)
- 		f->sent = ktime_get();
-+	else
-+		dev_put(t->ifp->nd);
- 
- 	return skb;
- }
+The 8th patch supports ublk zero copy based on io_uring providing sqe
+group buffer.
+
+Tests:
+
+1) pass liburing test
+- make runtests
+
+2) write/pass sqe group test case and sqe provide buffer case:
+
+https://github.com/axboe/liburing/compare/master...ming1:liburing:sqe_group_v3
+
+https://github.com/ming1/liburing/tree/sqe_group_v3
+
+- covers related sqe flags combination and linking groups, both nop and
+one multi-destination file copy.
+
+- cover failure handling test: fail leader IO or member IO in both single
+  group and linked groups, which is done in each sqe flags combination
+  test
+
+- covers IORING_PROVIDE_GROUP_KBUF by adding ublk-loop-zc
+
+3) ublksrv zero copy:
+
+ublksrv userspace implements zero copy by sqe group & provide group
+kbuf:
+
+	git clone https://github.com/ublk-org/ublksrv.git -b group-provide-buf_v3
+	make test T=loop/009:nbd/061	#ublk zc tests
+
+When running 64KB/512KB block size test on ublk-loop('ublk add -t loop --buffered_io -f $backing'),
+it is observed that perf is doubled.
+
+
+V6:
+	- follow Pavel's suggestion to disallow IOSQE_CQE_SKIP_SUCCESS &
+	  LINK_TIMEOUT
+	- kill __io_complete_group_member() (Pavel)
+	- simplify link failure handling (Pavel)
+	- move members' queuing out of completion lock (Pavel)
+	- cleanup group io complete handler
+	- add more comment
+	- add ublk zc into liburing test for covering
+	  IOSQE_SQE_GROUP & IORING_PROVIDE_GROUP_KBUF 
+
+V5:
+	- follow Pavel's suggestion to minimize change on io_uring fast code
+	  path: sqe group code is called in by single 'if (unlikely())' from
+	  both issue & completion code path
+
+	- simplify & re-write group request completion
+		avoid to touch io-wq code by completing group leader via tw
+		directly, just like ->task_complete
+
+		re-write group member & leader completion handling, one
+		simplification is always to free leader via the last member
+
+		simplify queueing group members, not support issuing leader
+		and members in parallel
+
+	- fail the whole group if IO_*LINK & IO_DRAIN is set on group
+	  members, and test code to cover this change
+
+	- misc cleanup
+
+V4:
+	- address most comments from Pavel
+	- fix request double free
+	- don't use io_req_commit_cqe() in io_req_complete_defer()
+	- make members' REQ_F_INFLIGHT discoverable
+	- use common assembling check in submission code path
+	- drop patch 3 and don't move REQ_F_CQE_SKIP out of io_free_req()
+	- don't set .accept_group_kbuf for net send zc, in which members
+	  need to be queued after buffer notification is got, and can be
+	  enabled in future
+	- add .grp_leader field via union, and share storage with .grp_link
+	- move .grp_refs into one hole of io_kiocb, so that one extra
+	cacheline isn't needed for io_kiocb
+	- cleanup & document improvement
+
+V3:
+	- add IORING_FEAT_SQE_GROUP
+	- simplify group completion, and minimize change on io_req_complete_defer()
+	- simplify & cleanup io_queue_group_members()
+	- fix many failure handling issues
+	- cover failure handling code in added liburing tests
+	- remove RFC
+
+V2:
+	- add generic sqe group, suggested by Kevin Wolf
+	- add REQ_F_SQE_GROUP_DEP which is based on IOSQE_SQE_GROUP, for sharing
+	  kernel resource in group wide, suggested by Kevin Wolf
+	- remove sqe ext flag, and use the last bit for IOSQE_SQE_GROUP(Pavel),
+	in future we still can extend sqe flags with one uring context flag
+	- initialize group requests via submit state pattern, suggested by Pavel
+	- all kinds of cleanup & bug fixes
+
+Ming Lei (8):
+  io_uring: add io_link_req() helper
+  io_uring: add io_submit_fail_link() helper
+  io_uring: add helper of io_req_commit_cqe()
+  io_uring: support SQE group
+  io_uring: support sqe group with members depending on leader
+  io_uring: support providing sqe group buffer
+  io_uring/uring_cmd: support provide group kernel buffer
+  ublk: support provide io buffer
+
+ drivers/block/ublk_drv.c       | 160 +++++++++++++-
+ include/linux/io_uring/cmd.h   |   7 +
+ include/linux/io_uring_types.h |  54 +++++
+ include/uapi/linux/io_uring.h  |  11 +-
+ include/uapi/linux/ublk_cmd.h  |   7 +-
+ io_uring/io_uring.c            | 370 ++++++++++++++++++++++++++++++---
+ io_uring/io_uring.h            |  16 ++
+ io_uring/kbuf.c                |  60 ++++++
+ io_uring/kbuf.h                |  13 ++
+ io_uring/net.c                 |  23 +-
+ io_uring/opdef.c               |   4 +
+ io_uring/opdef.h               |   2 +
+ io_uring/rw.c                  |  20 +-
+ io_uring/timeout.c             |   6 +
+ io_uring/uring_cmd.c           |  28 +++
+ 15 files changed, 735 insertions(+), 46 deletions(-)
+
 -- 
-2.35.3
+2.42.0
 
