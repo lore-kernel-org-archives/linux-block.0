@@ -1,25 +1,27 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033EE19F43A;
-	Thu, 12 Sep 2024 11:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from iris.vrvis.at (iris.vrvis.at [92.60.8.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B33A29CF6;
+	Thu, 12 Sep 2024 11:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.60.8.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726140149; cv=none; b=aVGhSO4VUKTNLQCqiHxa3mCExiEvPmH9RYwOMCJlQ8ns7l8oXTbYMmpBGtgtw0xFKrCd6MleBjWsf3wMIDMmATbRvYMQeFookszctFD3wREqUhwMNywOUMmgCbT9jCx9y6C1ujtF04zii56m7dOk8vK/ASOwpMSmfDSdv/TIFqU=
+	t=1726141021; cv=none; b=PhKGzLMeEb9e9coHdFwrF/V6ogyc+28JLqNDF73cf7rYOONUCYu9ZymBCrhT4r7HpDZPRvY5pI3qVpgKL+6fUHvNMmguyM91rRlypwEhg3Dsg67/LMiwT/GthHrPJ0kD6KVROkQb8rt4AP6mb18yIrf8CL1k1jURO9btWAX59sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726140149; c=relaxed/simple;
-	bh=WkMmrR2PMxTc+mNjIBBn0lHsWo61UePSvPPcS/l2WUI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SmQ1C3U490qc/gvri33hNVapn+5qUkxM5YvMgL8Npq2m5L8Q2Y/Vgh34mCXpP8J0iG/JxQ4/+WqBNo1yUrmFjULL9uLP1m6VdKLNLpeebJqySFqaJNMVtBS5XxNuxO05knXFcsl3VhwULbcMhLbIB/17VM+IasdPNcyBCH0Rx9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 53CC8DA7;
-	Thu, 12 Sep 2024 04:22:55 -0700 (PDT)
-Received: from [10.1.32.61] (e127648.arm.com [10.1.32.61])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 798AA3F64C;
-	Thu, 12 Sep 2024 04:22:23 -0700 (PDT)
-Message-ID: <7d755a55-31ab-4538-aee4-f88e04dfb6cb@arm.com>
-Date: Thu, 12 Sep 2024 12:22:21 +0100
+	s=arc-20240116; t=1726141021; c=relaxed/simple;
+	bh=yCWwqYowKJ2cQpeC8wSeYs2nASVcdeCpMVxGz7y9JtA=;
+	h=Message-ID:Date:MIME-Version:Cc:To:References:From:In-Reply-To:
+	 Content-Type:Subject; b=GcFvNLPNjNeNAr4HjxKDUf4ibTEtJr8avnrOzzjlCXzjQxYLMYCoaXHuz0LSfp4g79n5LNr5gip4uYfbVRu/VVME9nR3i1N6VzEXYrjflF6PK01ljZhBmt4QOLFG2MgLZ+xSzIs8F/5Wg6qndwH3ncny3FMdAvxKk4+94fNT924=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vrvis.at; spf=pass smtp.mailfrom=vrvis.at; arc=none smtp.client-ip=92.60.8.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vrvis.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vrvis.at
+Received: from whiskey.org.vrvis.lan ([10.42.2.171])
+	by iris.vrvis.at with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(ESMPT Server)
+	(envelope-from <valentin@vrvis.at>)
+	id 1sohXD-0007Us-2A;
+	Thu, 12 Sep 2024 12:58:52 +0200
+Message-ID: <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
+Date: Thu, 12 Sep 2024 12:58:46 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -27,131 +29,43 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [RFC PATCH] TEST: cpufreq: intel_pstate: sysfs iowait_boost_cap
-To: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
- rafael@kernel.org, peterz@infradead.org
-Cc: juri.lelli@redhat.com, mingo@redhat.com, dietmar.eggemann@arm.com,
- vschneid@redhat.com, vincent.guittot@linaro.org, Johannes.Thumshirn@wdc.com,
- adrian.hunter@intel.com, ulf.hansson@linaro.org, bvanassche@acm.org,
- andres@anarazel.de, asml.silence@gmail.com, linux-block@vger.kernel.org,
- io-uring@vger.kernel.org, qyousef@layalina.io, dsmythies@telus.net,
- axboe@kernel.dk
-References: <20240905092645.2885200-1-christian.loehle@arm.com>
- <20240905092645.2885200-7-christian.loehle@arm.com>
-Content-Language: en-US
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <20240905092645.2885200-7-christian.loehle@arm.com>
-Content-Type: text/plain; charset=UTF-8
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Emelianov <xemul@openvz.org>,
+ Kirill Korotaev <dev@openvz.org>, "David S . Miller" <davem@davemloft.net>,
+ Nicolai Stange <nstange@suse.com>, Greg KH <gregkh@linuxfoundation.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Chun-Yi Lee <jlee@suse.com>
+To: Chun-Yi Lee <joeyli.kernel@gmail.com>, Justin Sanders <justin@coraid.com>
+References: <20240912102935.31442-1-jlee@suse.com>
+Content-Language: en-US, de-AT-frami
+From: Valentin Kleibel <valentin@vrvis.at>
+In-Reply-To: <20240912102935.31442-1-jlee@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Report: 
+	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+	* -4.5 BAYES_00 BODY: Bayes spam probability is 0 to 1%
+	*      [score: 0.0000]
+Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
+ places
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
 
-For non-HWP systems, rework iowait boost to be linear and add
-the sysfs knob iowait_boost_cap to limit the maximum boost in
-8 steps.
+> Then Nicolai Stange found more places in aoe have potential use-after-free
+> problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
+> and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
+> packet to tx queue. So they should also use dev_hold() to increase the
+> refcnt of skb->dev.
 
-I don't see a good way to translate this to HWP, as the
-boost applied isn't as static as it is for non-HWP, but there
-is already the dynamic_hwp_boost sysfs to enable/disable
-completely.
+We've tested your patch on our servers and ran into an issue.
+With heavy I/O load the aoe device had stale I/Os (e.g. rsync waiting 
+indefinetly on one core) that can be "fixed" by running aoe-revalidate 
+on that device.
 
-Signed-off-by: Christian Loehle <christian.loehle@arm.com>
----
- drivers/cpufreq/intel_pstate.c | 39 ++++++++++++++++++++++++++++++++--
- 1 file changed, 37 insertions(+), 2 deletions(-)
+Additionally when trying to shut down the system we see the message:
+unregister_netdevice: waiting for XXX to become free. Usage Count = XXXXX
+on aoe devices with a usage count somewhere in the millions.
+This has been the same as without the patch, i assume the fix is still 
+incomplete.
 
-diff --git a/drivers/cpufreq/intel_pstate.c b/drivers/cpufreq/intel_pstate.c
-index c0278d023cfc..6882d8c74e61 100644
---- a/drivers/cpufreq/intel_pstate.c
-+++ b/drivers/cpufreq/intel_pstate.c
-@@ -183,6 +183,7 @@ struct global_params {
- 	bool turbo_disabled;
- 	int max_perf_pct;
- 	int min_perf_pct;
-+	unsigned int iowait_boost_cap;
- };
- 
- /**
-@@ -1444,6 +1445,30 @@ static ssize_t store_min_perf_pct(struct kobject *a, struct kobj_attribute *b,
- 	return count;
- }
- 
-+static ssize_t store_iowait_boost_cap(struct kobject *a, struct kobj_attribute *b,
-+				  const char *buf, size_t count)
-+{
-+	unsigned int input;
-+	int ret;
-+
-+	ret = sscanf(buf, "%u", &input);
-+	if (ret != 1)
-+		return -EINVAL;
-+
-+	mutex_lock(&intel_pstate_driver_lock);
-+
-+	if (!intel_pstate_driver) {
-+		mutex_unlock(&intel_pstate_driver_lock);
-+		return -EAGAIN;
-+	}
-+
-+	global.iowait_boost_cap = clamp_t(int, input, 0, 8);
-+
-+	mutex_unlock(&intel_pstate_driver_lock);
-+
-+	return count;
-+}
-+
- static ssize_t show_hwp_dynamic_boost(struct kobject *kobj,
- 				struct kobj_attribute *attr, char *buf)
- {
-@@ -1497,6 +1522,7 @@ static ssize_t store_energy_efficiency(struct kobject *a, struct kobj_attribute
- 
- show_one(max_perf_pct, max_perf_pct);
- show_one(min_perf_pct, min_perf_pct);
-+show_one(iowait_boost_cap, iowait_boost_cap);
- 
- define_one_global_rw(status);
- define_one_global_rw(no_turbo);
-@@ -1506,6 +1532,7 @@ define_one_global_ro(turbo_pct);
- define_one_global_ro(num_pstates);
- define_one_global_rw(hwp_dynamic_boost);
- define_one_global_rw(energy_efficiency);
-+define_one_global_rw(iowait_boost_cap);
- 
- static struct attribute *intel_pstate_attributes[] = {
- 	&status.attr,
-@@ -1562,6 +1589,9 @@ static void __init intel_pstate_sysfs_expose_params(void)
- 		rc = sysfs_create_file(intel_pstate_kobject, &energy_efficiency.attr);
- 		WARN_ON(rc);
- 	}
-+
-+	rc = sysfs_create_file(intel_pstate_kobject, &iowait_boost_cap.attr);
-+	WARN_ON(rc);
- }
- 
- static void __init intel_pstate_sysfs_remove(void)
-@@ -2322,18 +2352,23 @@ static void intel_pstate_update_util(struct update_util_data *data, u64 time,
- 		if (delta_ns > TICK_NSEC) {
- 			cpu->iowait_boost = ONE_EIGHTH_FP;
- 		} else if (cpu->iowait_boost >= ONE_EIGHTH_FP) {
--			cpu->iowait_boost <<= 1;
-+			cpu->iowait_boost += ONE_EIGHTH_FP;
- 			if (cpu->iowait_boost > int_tofp(1))
- 				cpu->iowait_boost = int_tofp(1);
- 		} else {
- 			cpu->iowait_boost = ONE_EIGHTH_FP;
- 		}
-+		if (cpu->iowait_boost > global.iowait_boost_cap * ONE_EIGHTH_FP)
-+			cpu->iowait_boost = global.iowait_boost_cap * ONE_EIGHTH_FP;
- 	} else if (cpu->iowait_boost) {
- 		/* Clear iowait_boost if the CPU may have been idle. */
- 		if (delta_ns > TICK_NSEC)
- 			cpu->iowait_boost = 0;
--		else
-+		else {
- 			cpu->iowait_boost >>= 1;
-+			if (cpu->iowait_boost < ONE_EIGHTH_FP)
-+				cpu->iowait_boost = 0;
-+		}
- 	}
- 	cpu->last_update = time;
- 	delta_ns = time - cpu->sample.time;
--- 
-2.25.1
+Thanks for your work,
+Valentin
