@@ -1,124 +1,157 @@
-Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD8F15381F;
-	Fri, 13 Sep 2024 08:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751691D5CC4;
+	Fri, 13 Sep 2024 08:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726216515; cv=none; b=UQ8IzHfXvBY59/Wzz+Vj3iRdLT0P5HObgrQEd5/Iem41mstDQpu0+/oxsPrlaLpZrmLBQJrWwHUFkM0zNXuk4vTMrpIACGDJ265xsimNlKl66DW5KLAUR0mYTwZCyjbfQdYmxijNMwMvrHfK63aITjNiFZdrmOPDXRiePqh6Ey4=
+	t=1726216600; cv=none; b=lzfnlJVKXI2Elay7tDZjSAqYPoMvRP3C5/01RLeU3ePCoMlynCgRou3kyXS3qCtCJ8iQLnf8MRijiVU80PknuLryhl4Qj1O/FcoTNiwyQ+FOv3p4gnbvb/wiNe8SecpGmifjO8XkCHZv/P5AvoeIO1k/Cyfr6edsjhRnWIp8ZEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726216515; c=relaxed/simple;
-	bh=ndTMI7Ta5mkzEp+G+rl2QJDEsX+BahwLi0B2IW6AhGQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Nzs5s6lFCc7NuVrD8CbOU2/rFbmmrtvYbORlmMZbCfVlfclWo38Us3FQKtOo3S1z2YzuJJ1ryKxnPvIFBaJqxvlHg4JvbMaLvjIblG9+qDxoz/1dsT8sqOs4vs0Q1Bj41FmtT70sj/WRZJev9N1A4xwqOXRA4e8S6qeSM/mOnQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mk6T0X1r; arc=none smtp.client-ip=209.85.215.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726216600; c=relaxed/simple;
+	bh=R58ELqG4dQhTb9hcZYONkquL3m27pEzO2iUo+HZctVk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YDhyhh5r7cZYwgv8vj/BsXXl7IyjaRF8PzFz2U8ACmJLOZ2V3gvL5eeA1speuu/hEmA+F4+oHrRGUlYTKpdrmD5tcxeq2i2Ah929A3MA5eLdgGYneDDKV7VAamAGH8BWqm5xKS6jJVICm4IPYdhPvTbEPCPBHMpahh5Www79cHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LsSWGwtY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zIYQwGmY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LsSWGwtY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=zIYQwGmY; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mk6T0X1r"
-Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-7d4fbe62bf5so387316a12.0;
-        Fri, 13 Sep 2024 01:35:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726216513; x=1726821313; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kC1E6rGRaMKkAAHcPV87FQ7r8LHjz2Mgn/xn2HhiS4I=;
-        b=Mk6T0X1reQai0sHUmCP1/CQVNMAHsPXNoPSiXZCYDZ/rs5wc7KzJ1kjpneX0Tbal5X
-         YsD3YE7oszcDpZIklVQsWPYS1KN+UaKulOMBpu0oRRokI2j8L1SpGLECricP6oACUHWo
-         Yk1QK8/Uv0C8+axlA9jytAV1qrG6umw6phrhcEWYqykkUOdhYlXxpTifCl9imIEvUZse
-         Xv18pHQOn94ABX1oQ5I457n8AP2Gw2XEVsdNA8aKxfbPolCsnkG7nZQAeednWB+bOLFH
-         yAjyIXlJpdGhBU384f1AQtqmWrbjvEwIHdolq316rpkj4jLSe67k38bfVEf8JFQZjxa+
-         u1jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726216513; x=1726821313;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kC1E6rGRaMKkAAHcPV87FQ7r8LHjz2Mgn/xn2HhiS4I=;
-        b=iZuE7/q2dYo6d3cjo3Fng5GmK3BFR7Qr+NDAWm4vioQ5yct+B0/QFE9pnSnDS5J+5u
-         jP/vt6Qaw9KV18QNoR1vHUBO4/2ICz1UfHkKGzd3QT9W21c68fVnvSC1pJtyMe0ODnSk
-         Ow2vyJ+eV38uJq0NFiwt4qNqkSnaAGGjNTq6ks5VMuVGMBbPjd42/om5rCxtMvwbAJYU
-         43xP6hDIOdfi+Q6d4MvQQP/cjPUM2vjex1vjTyiGDEzhYgdZVV06Lddt3HvbU4BNq+oz
-         ZsCxkn6EbBc2C2IE6M+QXcvLFj6/jtqVOKHgKyqxfxv9DwLvBp1CbeBz+RCAXDicfeUD
-         dKzw==
-X-Forwarded-Encrypted: i=1; AJvYcCVCxP60pOxTt/hZovghpvgoN2vSTsu9Vr2uwIVTXoHOyvbVudbZEkgfDpLhI76LYgW5hdLy3A+oMluOYQ==@vger.kernel.org, AJvYcCVOrJh29PzK1Ci3YAvrthx2W1mTmTG8pTNrdhzEEkqM+PDrusWE827cKnHrU7VMkJHDhYSQw1Bo@vger.kernel.org, AJvYcCWfOw7glNO77xsTItTCVVT3dgpYCWvt392m2ht2Cqy+6q36aLEj0oggeC6RbK5AT4cR7Cx5zQ+b99OXXBO2@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI7fdesHS0izKyk9ECFQjN4Q4/eF3tXeu1oCOJOXq42bF270wK
-	05czGp1+o9xUpXCizIPFkFajE5mJ+w5F2gSSIFof1tNWrV8H6Tz3
-X-Google-Smtp-Source: AGHT+IGhOiHOH2ZzR9kqH7H6Mz2LbLdj+bggZwXEzS9FbvIrM15f4iZFYOTdBo7HUQ+io4t6nMbhvw==
-X-Received: by 2002:a17:90a:d149:b0:2c6:ee50:5af4 with SMTP id 98e67ed59e1d1-2dbb9dc1163mr2394189a91.6.1726216513004;
-        Fri, 13 Sep 2024 01:35:13 -0700 (PDT)
-Received: from tom-QiTianM540-A739.. ([106.39.42.164])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbb9d37e01sm1123613a91.52.2024.09.13.01.35.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 01:35:12 -0700 (PDT)
-From: Qiu-ji Chen <chenqiuji666@gmail.com>
-To: philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com,
-	axboe@kernel.dk
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	Qiu-ji Chen <chenqiuji666@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] drbd: Fix atomicity violation in drbd_uuid_set_bm()
-Date: Fri, 13 Sep 2024 16:35:04 +0800
-Message-Id: <20240913083504.10549-1-chenqiuji666@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LsSWGwtY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zIYQwGmY";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LsSWGwtY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="zIYQwGmY"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4D11E1F7C3;
+	Fri, 13 Sep 2024 08:36:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1726216591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3vhSCZiL+9anxD5usYK8fOJ72G/jRJ53A6YdH+smGiw=;
+	b=LsSWGwtYxo7+sz0WTHBK7eeeM4yTUS7dRR+4vIwtsm+nSiMueTbZwopUwo7kxs/HSs1eFZ
+	v4Bb1SldhY0ca5nRj6GY5gA0u69WZjjJ4OlOfirjYPEdqnY3zISpf8UzFEnitOw5hg8TMR
+	qc2GmR4fQu26DQ+VS5T/CcUobxxosFc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1726216591;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3vhSCZiL+9anxD5usYK8fOJ72G/jRJ53A6YdH+smGiw=;
+	b=zIYQwGmYxNmqktGQ9Qnb0RfDvdJAfzxXPoXQZ1fD4rZj33+82yT17vrB8h4ujxZJq1GrIa
+	PyXxglbYxYVQiDDw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1726216591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3vhSCZiL+9anxD5usYK8fOJ72G/jRJ53A6YdH+smGiw=;
+	b=LsSWGwtYxo7+sz0WTHBK7eeeM4yTUS7dRR+4vIwtsm+nSiMueTbZwopUwo7kxs/HSs1eFZ
+	v4Bb1SldhY0ca5nRj6GY5gA0u69WZjjJ4OlOfirjYPEdqnY3zISpf8UzFEnitOw5hg8TMR
+	qc2GmR4fQu26DQ+VS5T/CcUobxxosFc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1726216591;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3vhSCZiL+9anxD5usYK8fOJ72G/jRJ53A6YdH+smGiw=;
+	b=zIYQwGmYxNmqktGQ9Qnb0RfDvdJAfzxXPoXQZ1fD4rZj33+82yT17vrB8h4ujxZJq1GrIa
+	PyXxglbYxYVQiDDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0417213A73;
+	Fri, 13 Sep 2024 08:36:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id CLoWO47542adQQAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 13 Sep 2024 08:36:30 +0000
+Message-ID: <a8e47dd4-26f4-49da-9ba8-aad2e8fcf9b1@suse.de>
+Date: Fri, 13 Sep 2024 10:36:30 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 1/4] block: Make bdev_can_atomic_write() robust
+ against mis-aligned bdev size
+To: John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, song@kernel.org, yukuai3@huawei.com, kbusch@kernel.org,
+ sagi@grimberg.me, James.Bottomley@HansenPartnership.com,
+ martin.petersen@oracle.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+References: <20240903150748.2179966-1-john.g.garry@oracle.com>
+ <20240903150748.2179966-2-john.g.garry@oracle.com>
+ <20240912131506.GA29641@lst.de>
+ <0f2652ce-63e1-4399-8414-0bd150521e1b@oracle.com>
+ <20240912150736.GA5534@lst.de>
+ <4a015015-ae7f-4eb5-ad00-420db5961d96@oracle.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <4a015015-ae7f-4eb5-ad00-420db5961d96@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.996];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-The violation of atomicity occurs when the drbd_uuid_set_bm function is
-executed simultaneously with modifying the value of
-device->ldev->md.uuid[UI_BITMAP]. Consider a scenario where, while
-device->ldev->md.uuid[UI_BITMAP] passes the validity check when its value
-is not zero, the value of device->ldev->md.uuid[UI_BITMAP] is written to
-zero. In this case, the check in drbd_uuid_set_bm might refer to the old
-value of device->ldev->md.uuid[UI_BITMAP] (before locking), which allows
-an invalid value to pass the validity check, resulting in inconsistency.
+On 9/12/24 17:22, John Garry wrote:
+> On 12/09/2024 16:07, Christoph Hellwig wrote:
+>>> We should do be able to, but with this patch we cannot. However, a
+>>> misaligned partition would be very much unexpected.
+>> Yes, misaligned partitions is very unexpected, but with large and
+>> potentially unlimited atomic boundaries I would not expect the size
+>> to always be aligned.  But then again at least in NVMe atomic writes
+>> don't need to match the max size anyway, so I'm not entirely sure
+>> what the problem actually is.
+> 
+> Actually it's not an alignment issue, but a size issue.
+> 
+> Consider a 3.5MB partition and atomic write max is 1MB. If we tried to 
+> atomic write 1MB at offset 3MB, then it would be truncated to a 0.5MB 
+> write.
+> 
+> So maybe it is an application bug.
+> 
+Hmm. Why don't we reject such an I/O? We cannot guarantee an atomic 
+write, so I think we should be perfectly fine to return an error to
+userspace.
 
-To address this issue, it is recommended to include the data validity check
-within the locked section of the function. This modification ensures that
-the value of device->ldev->md.uuid[UI_BITMAP] does not change during the
-validation process, thereby maintaining its integrity.
+Cheers,
 
-This possible bug is found by an experimental static analysis tool
-developed by our team. This tool analyzes the locking APIs to extract
-function pairs that can be concurrently executed, and then analyzes the
-instructions in the paired functions to identify possible concurrency bugs
-including data races and atomicity violations.
-
-Fixes: 9f2247bb9b75 ("drbd: Protect accesses to the uuid set with a spinlock")
-Cc: stable@vger.kernel.org
-Signed-off-by: Qiu-ji Chen <chenqiuji666@gmail.com>
----
- drivers/block/drbd/drbd_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index a9e49b212341..abafc4edf9ed 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -3399,10 +3399,12 @@ void drbd_uuid_new_current(struct drbd_device *device) __must_hold(local)
- void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(local)
- {
- 	unsigned long flags;
--	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0)
-+	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
-+	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0) {
-+		spin_unlock_irqrestore(&device->ldev->md.uuid_lock, flags);
- 		return;
-+	}
- 
--	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
- 	if (val == 0) {
- 		drbd_uuid_move_history(device);
- 		device->ldev->md.uuid[UI_HISTORY_START] = device->ldev->md.uuid[UI_BITMAP];
+Hannes
 -- 
-2.34.1
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
