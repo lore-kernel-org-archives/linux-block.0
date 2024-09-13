@@ -1,387 +1,378 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166961D7998;
-	Fri, 13 Sep 2024 09:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726221523; cv=fail; b=XcMYRy2BMBp1L0M0FF4ThSyhAyIn6ooq8/Hqgs2mNchHR1pFOyywQASMqExg2Xa/2752G2MiuUHMV9MxhKGMmRG2sS7xjIcMP4JC13xqNN+O9bt6o6+B3UuylVz+V3v3+90ftePp9IPrCM/MMXpWR3AWs1+/CwFv+KwY0GOKwGw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726221523; c=relaxed/simple;
-	bh=MmI9S73cbM1580QGcARQYD5L7b4zfrvfn4yJIlyKTMI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=B0xvQ7xCw3Mr5JJ+66CdzO5nY8ErobEfvU+f+yVIMsrydAi154n6e8lX0Py2O4r9bMTyI1mXW9WXIRxX31ygAIrTJSuDHGNmeb+FDRszd4VSGM0l54m7u/uYHLVk1da4wSYA6xwuLXsz3Lp+WAlkWG9CPOeKElmV9yC+ZF16+iY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=HXDbqDc0; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ROe/HfU1; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664111D86E0
+	for <linux-block@vger.kernel.org>; Fri, 13 Sep 2024 11:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726226800; cv=none; b=Hg5eIHFu8snLkp4J1dTOtDJO9nqYjGLKwZZoJxkGOw8bymKHZm3O8SYzumgKZJCgYnDLdmwVf5sL1xguXCgd3AVlXc/vOqYpFMIY+XmGBnn1sGrSUBRa0EhR2Hhd0aQ3WG0ga4w4znaAogZ/8TeoKzP7dOftxI6KSibZhG1KH+o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726226800; c=relaxed/simple;
+	bh=ZNUq125crCMNeyNW6G552SmIMwb+lpM4BHj5MVnWFRw=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:References; b=RMYLjka1+laVYY5YFSY6Iwulbx5ABxFTjyiDxQhL2YWZBnupgFLKHvETldGhrPjhJsD+HkH5ln3A46W8rMNcTWU5aQ2GzyMzMiRlPrCw5KT0orT1RmqfK5U0QlmUAebQPBXGQM6YmdhgZ4oIvuyUtB31xVFUUsARsknxFpxtceU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Q/Ny8uX3; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HXDbqDc0";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ROe/HfU1"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48D7BUvE027354;
-	Fri, 13 Sep 2024 08:59:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	corp-2023-11-20; bh=NeX59ki8261PfhytpWCrUXRXRvIaY1XEW3cmRRBrOT4=; b=
-	HXDbqDc05FxwReqVSdtmIRYUPfmazDLczmQQTeunDBw1+M3OCd/CCSxLwQ7+GuYo
-	52Iu0Vdxyv71MIlGuMIr9oUCbXkbQra4QXQs/XptQkKR3KzYZJhhp7rLB9nBx6BI
-	VJvG2aTuklyRpe4SlepicO4D/jyK288iR1qZPvxgptc4PXOxG3LwesFnPSOFWfLb
-	epCc+cPHbxFMubXHBGJdKUv63e5EcZVHA5yTiS5DFIjGejEFhzo2IC4zB4mPWtUL
-	yCakpKJRNDrL787Smv7Kb7Glwz+tZMUm7Eub431BgGNB2jc8eR803LQYgc6gjtnF
-	wMavbzsXVAM2RK1QaIvI0A==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41gfctn2t3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Sep 2024 08:59:17 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 48D6oI2Q004160;
-	Fri, 13 Sep 2024 08:59:16 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 41gd9cfjj3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Sep 2024 08:59:16 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TgRoSw6WnrI+xc2AGr0YNilFQo6Uxd3QMRjVaW/E814T5NdYzFCukY74yGb79Mej5vJrQed2p0z5Fod6yJAAhHVKWYaUxZUp9WB+d7njdWDqi69klPvcmqwu/8veQw2DoJYSLxptwr07lk7rW8bC2KKnYNAI8rtDPSGIVB3lh9+kK1QDCxgI9+pr61by4e3NVGsrHx8/G16ntBRsawPxlBmCp4PsrVsvd9DmohWBxAOeyMw0lETxqzEll+ddLknL0qp23ZB8lCTYqSFL6REPvq1yxOQtRx/G/dv8+elxZokThBIth1v3bfojCH8wEfY8NZGu3jmnsGKpStakl3Y6bQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NeX59ki8261PfhytpWCrUXRXRvIaY1XEW3cmRRBrOT4=;
- b=oUILd+AiXYLYN8qkyOan2jGsEa6L9P5FMMrtsxhj991OboGnM17D4wxdFRG1adJRfjzdywLHiINvSg4jo/3XCdwGZRuFiwEcAWSnY9uDRVQs7aqnjRhHQi57l0D3Toi+MxJOUhXWqUMPTNY4YtaLhLB6aVDClTTtK/rATnXSFBEWnu+xCI/NtcGGZ+RE3uw3WeWzTFY1tn/gpXKc6xQ8fLcIgsEvSAYNNxk7O3D9Wu7bsTQ+Rf7Ps9gvUfGGXqx/2/S30TEGK/J10XvHVjpD4vpwjzbhFVKwh30/v8ISa3DahbFDQqSzNj9F6dWYOub0Fq2H6Upb0XIp/xcDt+upAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NeX59ki8261PfhytpWCrUXRXRvIaY1XEW3cmRRBrOT4=;
- b=ROe/HfU12dvVXfDBic5dv3dJKDZwq4VG7HPhiTrsdikYWeL73iKPXDE7ePlWAO1x3QMSmG334ej0hmOtp2pRIkwZi2B9dZ6B/0PxPR9Zid2aNDjQyyAx7/uPlFIUYzdtTjvyaoMQrq+AHsbNTlVAfVUhB1J714jXqe77obwo2Gg=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by CO6PR10MB5587.namprd10.prod.outlook.com (2603:10b6:303:146::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.8; Fri, 13 Sep
- 2024 08:59:14 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%3]) with mapi id 15.20.7982.008; Fri, 13 Sep 2024
- 08:59:13 +0000
-Message-ID: <a7f9079f-6f47-4a47-a327-98497bd33dfe@oracle.com>
-Date: Fri, 13 Sep 2024 09:59:08 +0100
-User-Agent: Mozilla Thunderbird
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Q/Ny8uX3"
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240913112629euoutp0147cd026160b4609baf1e059fec3e1242~0yh53w2Ik3149931499euoutp017
+	for <linux-block@vger.kernel.org>; Fri, 13 Sep 2024 11:26:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240913112629euoutp0147cd026160b4609baf1e059fec3e1242~0yh53w2Ik3149931499euoutp017
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1726226789;
+	bh=ev+GuL1Brr/9bTlEi8r/+HobCwnCoUIh8W9KxJUcWuE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=Q/Ny8uX3xqBcLzAMKsptOI0tai2bRKetBLzc7ZxgyxzDIm5KfG6P9/OJ/kNTxhFy5
+	 NAekN+a2CcVL5R7VrU4JS6Pn/WabfZdWpw75RcmxtTQzUcZuJns4Jm69DYswNNFr+C
+	 ryNvrW0glPcnbk3SQClU32iyBBAWzDg/iE38nBDM=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20240913112629eucas1p22e155403dd322f4ea8f10764870eb9a4~0yh5oAdrf2743627436eucas1p2p;
+	Fri, 13 Sep 2024 11:26:29 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id 93.FE.09624.46124E66; Fri, 13
+	Sep 2024 12:26:28 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240913112628eucas1p2320f405babd81c85e87a0d7b41d7a5f3~0yh5CWDAu2206022060eucas1p2y;
+	Fri, 13 Sep 2024 11:26:28 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240913112628eusmtrp22653d7f7bae7e12d665ec500035490b3~0yh5BwSvB2051520515eusmtrp2R;
+	Fri, 13 Sep 2024 11:26:28 +0000 (GMT)
+X-AuditID: cbfec7f2-c11ff70000002598-98-66e42164b447
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 9F.80.14621.46124E66; Fri, 13
+	Sep 2024 12:26:28 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240913112628eusmtip187c6a8969b9b9e97dc3808ba2823efc1~0yh4u41_03162531625eusmtip1I;
+	Fri, 13 Sep 2024 11:26:28 +0000 (GMT)
+Received: from localhost (106.110.32.87) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Fri, 13 Sep 2024 12:26:26 +0100
+Date: Fri, 13 Sep 2024 13:26:26 +0200
+From: Daniel Gomez <da.gomez@samsung.com>
+To: John Garry <john.g.garry@oracle.com>
+CC: Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
+	"Masami Hiramatsu" <mhiramat@kernel.org>, Mathieu Desnoyers
+	<mathieu.desnoyers@efficios.com>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+	<gost.dev@samsung.com>, Luis Chamberlain <mcgrof@kernel.org>, Pankaj Raghav
+	<p.raghav@samsung.com>, Dave Chinner <dchinner@redhat.com>, Daniel Gomez
+	<d@kruces.com>
 Subject: Re: [PATCH RFC] block: trace: add block alignment information
-To: da.gomez@samsung.com, Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu
- <mhiramat@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, gost.dev@samsung.com,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Dave Chinner <dchinner@redhat.com>, Daniel Gomez <d@kruces.com>
-References: <20240912-add-blkalgn-block-trace-v1-1-335dd6eea557@samsung.com>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20240912-add-blkalgn-block-trace-v1-1-335dd6eea557@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO6P123CA0058.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:310::19) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+Message-ID: <20240913112626.mmr27xzxicyf37kh@AALNPWDAGOMEZ1.aal.scsc.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|CO6PR10MB5587:EE_
-X-MS-Office365-Filtering-Correlation-Id: cccecf4d-215c-4344-8ab7-08dcd3d256e9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cXRxZjdER0IrK25yblN1cllWUnNlcktCNXpzWXJnR0dkKzVwU1hlQW9VbDhj?=
- =?utf-8?B?SEFxNDRON2ZjSHQ2bXBEekNsczc5UHVEaXJLQnRLd3NmRlcxTjJHYXNaWmpq?=
- =?utf-8?B?dHgrUFA3KzlnWDF2YUJHUFFNekp3WElIcWhIMldSSUwxYTdWZTZzU1lhSmx0?=
- =?utf-8?B?TVhOWmJXT0tEclBCdHpFdHFEbnIyR2JWRlZOTHlsWGJaUWVMd0Y1YnErYjJ2?=
- =?utf-8?B?RHptR1lFeHZuQlVMcjFMU0RPK3grRVRMRElGNmFtc0lXRjl4UCtyaVJEank2?=
- =?utf-8?B?N0twWHFCMm15Q0FSdlRVS0tZZmYyclhJUzNabGpNMllTWHB4Q3NkN3pRNnVP?=
- =?utf-8?B?dnZwZlB0SU9EVnU4MzVwV3hhV05FOEZCcTd1SmQ3T1JXdVNHaHdrcFFPRVNF?=
- =?utf-8?B?SUdWNThZdGNFUm1IUDB0SEJ0aWJqYWtZOUVLb1R3c0c0dG5CZ0RLSzBoSytG?=
- =?utf-8?B?YXo0SkFhNVRMYWVTcC9PamZSWDM1Yk44cjhZN3l1dG1NSU9pYm1BNmJ5YjJv?=
- =?utf-8?B?aURiT2p1V2QzaGtvOFBGeHJBcWFJbmNuYkRrNGhHdStkekpZRE9KOVRoelpm?=
- =?utf-8?B?RnlmY2FNcFlmbnlGM0hsdGdmeHEvQ1NnV1dKS1NmeEVoWXRXaTJtWnMzQlRo?=
- =?utf-8?B?TFM5MENINkRyTWVucWxEem9WejBxaHk0RThJa3RmNzJUWWFWaXdGWUZSeGY4?=
- =?utf-8?B?bDg2MFozVVgyZzRXYXdsWHJaaWdGdnpRdnlmNHZtbmhLTnl1Wi82amQramZZ?=
- =?utf-8?B?U0VXcDhmcTRNem9EcTJXb2VMVmMxYXdlUVJnOFhtYVVSanZlQ24wQWVYbWVB?=
- =?utf-8?B?QytJR0N6TkZEdU9hZWtlYmZvT3RudGpoOFhVbGl1NWRtZEh6VGhIa0lwaGY0?=
- =?utf-8?B?TkMvcjZ3T1pLdVhJQ3g1ZXc1NWhFZzlCZE9OcjREZG1jdWdRcUpTSlhFZTdZ?=
- =?utf-8?B?L01mcHl2VjhaTjZhenUxUVRjSm10UGNCMWs3WElETGphbVRQaStzME51dnA2?=
- =?utf-8?B?aW1YQ1RJQ1pOU3RPdER5cWZtVlhHQjFPaURCV1JWN2g5VnNpdXhFTHJQN0Jk?=
- =?utf-8?B?VUpsaEp6NmJWZXFIUE9mWFNPRTBFK0ZCNTMwOFhiNmFkbGFlQUxkWGJwNHRt?=
- =?utf-8?B?QTRxY1NsK0hGc1ZadXY0R0VzZjNwZXZqL2gyc3BMN1U2cnJHNVVtenB4aHAv?=
- =?utf-8?B?bmZPRzVjbjlkTERicnpjSHl6bENPZEFwcmJVU2xJb3YxVnNpcjBiN21lODE2?=
- =?utf-8?B?MFdDSk1rRy9zQyt5bFE0Q3hyanYyMXZHVlNlbTNFRlUrN3ZZSWlPSGN3Z2FO?=
- =?utf-8?B?MTUvcVYvaTZCQVlEc0IyRHZST29BOWJXdFlxTWR3UE1weEVJOE8wUkNES3pl?=
- =?utf-8?B?dE5hQTdKekdaNTRNam1rUG15WkZGL3BUbG0rL2UyWHdKU0t2enZFSGxjbzc5?=
- =?utf-8?B?VFFoNDVKMnowTzE3R0hNVmQ0UlZocW83QWp0Y1JaaWY4cWg2a1BsRmtMTVhQ?=
- =?utf-8?B?OVpaRW1DZnJrcFF4eG9MNmJxMk9MWHMxdk93cjlYWEdwcm9xRGdOUzRkVU9I?=
- =?utf-8?B?bUVUK3lNaU5OWXgxOGMzUEpKMUFQRjBQUHlOeWRpODFyUC9PeXFnNkYyQTd4?=
- =?utf-8?B?YmhCeE0wd2tPWHVFbFJ0bUF6T1ljT3UyWDI2YndxTjY3TW4wZW56WHZaQkZI?=
- =?utf-8?B?TkVWWlFyQ3JPNjJPc2dIOFFkdWhDN213Nnlpdm56VWw4RkVOWStXMjRBTDV5?=
- =?utf-8?Q?Glbhdm24p1b8gFtMKg=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WWlSb3huV2RRRDAwOVZUNHlSUGdJekF1NVRqSk54Rlc1ZnhvQnNNNWFOWTdj?=
- =?utf-8?B?czVwRFpKYmNlYzR4SFdLNCsvME5OM3BPaHJqM09STUh4T1RQYlVrSEh2OEgr?=
- =?utf-8?B?bXdCUzJvUVM3VVZHb2NFSXp0RHNPQWNzTlZpeVI0OEV2RERZRjBncERnZnRy?=
- =?utf-8?B?elpZTmU2cGxkY1lhOG5vNmRrcmhHU3luL0M4K3RTK3NBNzF2WmhyeG9EN2F4?=
- =?utf-8?B?Ni8weEVrdFp3NFpFWkZiVHNPR1g3MVR6Syswblp1VExtVXZmZXg2QlAwK00r?=
- =?utf-8?B?WnpHRWtRZS9VUGorQWtHM0JrWkxzdm9kZjBCYTJhZ2N5Syt0dUFQRE9tRDZn?=
- =?utf-8?B?MDFXL1JYZWRQQTZSckRLT1NTZ0VIZXh4N2NGYVk0Qzdicm1KR2ZOYUlyL0lI?=
- =?utf-8?B?NlU3bFhZN2xBRWg1YVlpZVF0V1NDWVNLbERVSU9MV2JxSm5TTGdCZUFoUnNY?=
- =?utf-8?B?cGVmdTZITVhJdlhXYlpHNDNjUDh2enVONWhzTXlKc3NSMytGVmg2VUpnMnRi?=
- =?utf-8?B?TlJJQUtWbDFQckFJeEdEbjR0WXllSXBHZjVKOHIyM09ZTWo1V0pTcmlQc2Nn?=
- =?utf-8?B?azZmemUxNEFEODF3bVRteW03VkdabzdhQWRTVVNuK0ZNRVZ6dk5NRlNPL1py?=
- =?utf-8?B?OVJMdXhFdzRhVHRjbExEOVhiN1IyUDZWeVVmbGVaaDgrTk54RnU3N080cFcy?=
- =?utf-8?B?WEtacjkrUXFLaGxOVXhzTGg3aUFOcTE5L3QzUDJtS1ZxcmEwZ2lZejdUQkc1?=
- =?utf-8?B?eGk5aVROMHFJalB6ODk0TzErMFRjcklUbTBLdzV3dExyaHRUc0hBMnpTaW9a?=
- =?utf-8?B?SlU4K2FhREdBQVN3ZHVZUzd5K0NsV3hOUXhPRXRiL0FEeHBOb1RZaVdycW5W?=
- =?utf-8?B?S29FUC8wRUlleENQUTdJOGJNMlBvaU9kajZPWi8rNjRhTEdLeVhLQVBadFFX?=
- =?utf-8?B?RUdyZmpCa2RRcit5TVFMcVF0RkVPQ2xnL0d5dTY1eHhXUElibnY4ZEd6dkhm?=
- =?utf-8?B?RlNhc2JlU0dBaTNIZUQyZStsWHNSVURUdlJBWitaZ1dOZDZSNGJFaURnZC8x?=
- =?utf-8?B?N0VrY2JiWkNqaW00MTB3Vm52Z0I5S2pRUGd6VldCWlYzM2o2TCtITUcrTmdF?=
- =?utf-8?B?NVMxakxhMjdHUUpZdlBQbjlTeUQwT3A0L1E4eTlpazNqd3p2VE9YSHo2b25z?=
- =?utf-8?B?bmlBcmlyc0F5L2lOdzVreG9vck5MOWhISG5MNXEybFBsRmxjQnFyVmxlQVlN?=
- =?utf-8?B?emdxYjZ2Wm9WNTBwUTNydHdwQnVNYjlsYnJoVEZCZXNlUzZLZE5rNXo5RHdy?=
- =?utf-8?B?SXZZeU5ObGxhT3hMNFBNTXFndldrTDFOODdQRnF3OVdDZ2ZkZ0IzaVZrUzU1?=
- =?utf-8?B?a1RsamczYjlSb2hob25La281dXpPNDU2T0lFNzNzSE50OVhGMzF0NmNQZ0M2?=
- =?utf-8?B?R2ZNSVh0K3VmbkFMQnY1Y1hpeGVvME9wNEJSZXZXZ3NtbWp2S2V1MWtDQjNq?=
- =?utf-8?B?dklNSTBsaDBsaEcyNmZpWmUzVklTWGYvaWFUZ3hIUTRTQjUzNmxUVkNDUzJC?=
- =?utf-8?B?ZXpFSGR2VWNkWmFvQkdvcDBkb0QzUmF6VExOMW10M0tqZXY5QzQ3enJvditN?=
- =?utf-8?B?K2Y3bk5NQzB2QzFnRjVBdnMvYUJyVEQwMFpDMC95R1BDZUxJbVU5Z0xUMjRD?=
- =?utf-8?B?V3U1VEdCSEF3SlNuVi8ya2YvZld1cCtpMUlRcENEZVYzNVJrUkl5ZXZLWEd5?=
- =?utf-8?B?MjRoSUhsVjVKWjNKZWg5d0V4ZnVIUU5KbkxBclJ2dkZuTzFGK21xY2VqMXZV?=
- =?utf-8?B?NFB1NHFqdkY2WUxMLzdKck9Da1NHMS95TVpseXVPYjh1Y2hEWlpXeUxIRjhW?=
- =?utf-8?B?cGU4KzZMQXQrRHhwUllaYUNwa29RNTB6Ky9IQXRjeXBieFhGQUF6QVdoekto?=
- =?utf-8?B?elJSeWZiUXZkdEE1bFkrWGV3cWZWQjc1ald5SDYrVGRrVnF5S083Z2t3andX?=
- =?utf-8?B?MEJ4RmpzN0xaS3VxcnE0b053ZzJBZHZmMy9nK0lKUVhObXFPcmllMklVN25q?=
- =?utf-8?B?N05xSFVxYlRpMFQ2WVdTQmZGMXlkaFdkK0xNOEQ3b2pZTG1McUcvVFFiaUQz?=
- =?utf-8?Q?XLchWTCSkYIOCFdSN0wPWqyb6?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	28lpTOKS+4kn3dYy89YuBs0Acb3xyGstKeTLQ6XpIznuVV6mDdoUzTklfdNdRBudOPA8mWKZZ5IvnFofprBDWr40zI54nseNjEyf09JFsxIA5AHAT07LvrAFYObwBWEx9xa+GlXI1N3F8T6N+i+clHnyNaCsl6BNqKtmW76beaAAZbgnxXL5cJU2NPvrDcepNnqbMbcbbCttgIp6GoXsMm4R8ei7XhAnBbBhC68txksAeOXr/cw33LUBcKdqwh3je8on/iLGnynVmjBbciv+DE2Vbuw0PBYVdNjSL17e+KqjBErV4plm8h9PbYcstrCppEBnCm/0uYHleOBMG78rRCHGtf8WGD5pKSV/EUeCmPjPK7BpHWLDbZvLJrbiNX74+0u5tkJrCzD20P736j1vwI6oTY8PhKC96bFQUK4HDkF3JHYsGcLvVtSJvmtgjNKqjdeJMsTPiDa6MazewhNBcUVYkXSv2iZ/Lp/JnHQNajmFnrTcQQzpzHXX0XHoUU6bLYk/XWE42UqT+yyx77St9YD58AzsVQdQ8JNx30qL+D8XAYwgzwslMmGb8p/HwSLMzA8QopK0eNgqUmXXygKE73c9OVWBi+0V5REzVnaIkGk=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cccecf4d-215c-4344-8ab7-08dcd3d256e9
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 08:59:13.6787
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: znYdMyTK/mWjcobJKKHhJbv3UO5d1PS4vAqQZnUIlj6baDlGS+ui/Z57mpSvpgJmNUT1cHSSmHt0uYOxONjLaQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR10MB5587
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-13_04,2024-09-13_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 adultscore=0 phishscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2408220000 definitions=main-2409130061
-X-Proofpoint-GUID: 4fbGrgyWSylWxhMNbO5CS_JMvpCASzyR
-X-Proofpoint-ORIG-GUID: 4fbGrgyWSylWxhMNbO5CS_JMvpCASzyR
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a7f9079f-6f47-4a47-a327-98497bd33dfe@oracle.com>
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Se1BMURzHnXvv3r2tWXPbls7IiJJXLHnM3PGITLjGYxqGEQ0te1uxJbuW
+	FZnGIz2kRNPayiNSKmEraic7zbZqqGTksZZmiR3mDq0e41XCOh799/l9z/d8z/meORQuMQlG
+	UtGxuzl1rFzlR4qImw1fW6cqxr6Jmn6/mGFK2zNI5lPxZQHTwucLmQffqgFz2x7ItJnySMZ6
+	rYVgKlqaccaW6QTMxaLxjDn5JbZwKFvY9J5kj5jtQratRcsaS1JI9kf6SwHb5bQTrMv8mGR7
+	jKPDqA2ieQpOFb2HU08LjhRtMzSExjnX6FznBoSJQL8oFXhQkJ4Fa5KOEqlAREnoYgBrC18L
+	0dALYEpGM0BDD4CnOlKwVED93tKeFoj0IgCteiv2z2TvLiDRUAHgrY+1hPsQgg6AZ9OzBW4m
+	6UnQfNcodCdJ6YnQavFx+3HahMPbx3qB2+NFL4FfL/OYm8X0cni8/IMQsSe8e+bN70yclkFb
+	9mnSnYPTPrBogEKyLzxclYu72YMOhgXPeBL1HAv1J68QiBPgvUo7hrjUAyZ9X4c4FNbdSwSI
+	vSDfWClEPAr+qDn3x6+El8oNf3LiYO1zgwA9ylx4olmF5BDouGAjkDwM2j54opsNg1k3c3Ak
+	i2FykiQTjDMMqmUYVMvwv5ZhUK3zgCgB3pxWE6PkNEGx3F6ZRh6j0cYqZVt3xhjBr+/VNNDY
+	XQ3y+S6ZBWAUsABI4X5ScRbZESURK+T74jn1zs1qrYrTWIAPRfh5iwMUvpyEVsp3czs4Lo5T
+	/13FKI+Ridjep6GvI0rTJ1RtaTNterX6IR7vishvyptj8Q9x3sD6RRts1cvDCdUyfsfKWkey
+	o3hebkWIpz4wbNa61iFKh2v28Nb+nmUp/rOnbj0IyM/mjUFPG78kXHt70L6JLfPNO3Zo/Ysc
+	vtOpq5D2RQDLE61+6eJLAWP0OZWC6uxnDyPTdPNd7VnxE/uvJuTo6uwHuk8c/yhbY5Crws7P
+	6Xy1qqHpiWpKGSjZdd3KP+raSCic5kKvuLUdica09ozH75rrI+uzAn3mvniQJJixebv0jn/P
+	GO+6gqh0KR0fdKdKEs2Xz7y6q3yPcIKjzzlClFDgub+vV2oJ160INg0ZV7ZAH15f40dotsmD
+	JuNqjfwn2PKAFc0DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCIsWRmVeSWpSXmKPExsVy+t/xu7opik/SDFomClmsvtvPZvFtxTJW
+	i7Ov5rJbXPi1g9Fi7y1ti8u75rBZHFl/lsVi89kzzBY3JjxltFi8XM1iX8cDJgduj6Wn37B5
+	tOy7xe5x+Wypx6ZVnWwe/3sfsHp8fHqLxeP9vqtsHp83yQVwROnZFOWXlqQqZOQXl9gqRRta
+	GOkZWlroGZlY6hkam8daGZkq6dvZpKTmZJalFunbJehlzDrmUvA0uOL9/H/sDYwznLoYOTgk
+	BEwk7nZrdzFycQgJLGWUOHZmCmMXIydQXEZi45errBC2sMSfa11sILaQwEdGiT/X5SEaNjNK
+	zJvwiQUkwSKgKjGvdypYA5uApsS+k5vYQRaICGhIHDkkDVLPLLCLWWJv+xewBcICbhI/l71i
+	ArF5Bbwleta9ZYdYcIVRom2lJURcUOLkzCdg85kF9CRuTJ3CBjKTWUBaYvk/DoiwvETz1tnM
+	IDangJ3Eopuv2CBuVpSYMXElC4RdK/H57zPGCYwis5BMnYVk6iyEqbOQTF3AyLKKUSS1tDg3
+	PbfYUK84Mbe4NC9dLzk/dxMjMLq3Hfu5eQfjvFcf9Q4xMnEwHmKU4GBWEuGdxPYoTYg3JbGy
+	KrUoP76oNCe1+BCjKTCEJjJLiSbnA9NLXkm8oZmBqaGJmaWBqaWZsZI4r9vl82lCAumJJanZ
+	qakFqUUwfUwcnFINTHv54kWzBTdu28Fcezc2qFqbWyJP+2tbgddpn1PHlt2eIxapID3zf4+0
+	Vvu1xu6/fpoW38Slg0t3pWVLHty/1HWTVKHM2715Wo5SjBqPfwbumxZmOKU2gyV8CWPzns9n
+	9z/avVhY/RjjonbNrIIEsZfMVqc51u/32xx29lmwrs2et2lnlv32n/7+0qbfwltFYr9vnDL9
+	y5YNh31l7z4TuLBX89PGP6qTK9R+bXI+WPLqlfoLIfnEHWV8Xtc259sE7zd79SqqUG3XWrkG
+	gdXSzWvOsfioMa9bsPLoOqklIp93xN8WEvE+OVmUz+Psl/ssVyPDpH/u4Ypp9lb8LvFhusUU
+	tZSHt3llp5RYiTdv/qbEUpyRaKjFXFScCACKGTIBdwMAAA==
+X-CMS-MailID: 20240913112628eucas1p2320f405babd81c85e87a0d7b41d7a5f3
+X-Msg-Generator: CA
+X-RootMTR: 20240913085931eucas1p25bf5b7cb054cd5d9cc85b8b82097e997
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240913085931eucas1p25bf5b7cb054cd5d9cc85b8b82097e997
+References: <20240912-add-blkalgn-block-trace-v1-1-335dd6eea557@samsung.com>
+	<CGME20240913085931eucas1p25bf5b7cb054cd5d9cc85b8b82097e997@eucas1p2.samsung.com>
+	<a7f9079f-6f47-4a47-a327-98497bd33dfe@oracle.com>
 
-On 12/09/2024 21:48, Daniel Gomez via B4 Relay wrote:
-> From: Daniel Gomez <da.gomez@samsung.com>
+On Fri, Sep 13, 2024 at 09:59:08AM +0100, John Garry wrote:
+> On 12/09/2024 21:48, Daniel Gomez via B4 Relay wrote:
+> > From: Daniel Gomez <da.gomez@samsung.com>
+> > 
+> > Report block alignment in terms of LBA and size during block tracing for
+> > block_rq. Calculate alignment only for read/writes where the length is
+> > greater than 0. Otherwise, report 0 to indicate no alignment calculated.
+> > 
+> > Suggested-by: Dave Chinner <dchinner@redhat.com>
+> > Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+> > ---
+> > This patch introduces LBA and size alignment information for
+> > the block_rq tracepoints (block_rq{insert, issue, merge} and
+> > block_{io_start, io_done}).
 > 
-> Report block alignment in terms of LBA and size during block tracing for
-> block_rq. Calculate alignment only for read/writes where the length is
-> greater than 0. Otherwise, report 0 to indicate no alignment calculated.
-> 
-> Suggested-by: Dave Chinner <dchinner@redhat.com>
-> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
-> ---
-> This patch introduces LBA and size alignment information for
-> the block_rq tracepoints (block_rq{insert, issue, merge} and
-> block_{io_start, io_done}).
+> eh, shouldn't this belong in the description of the patch?
 
-eh, shouldn't this belong in the description of the patch?
-
-And I still don't know what we mean by alignment in this context.
-
- From looking at the code, it seems to be the max detected block size 
-granularity. For example, for a 64KB write at a 32KB offset, that would 
-give a 32KB "alignment". But a 64KB write at a 64KB offset would be 
-"64KB" alignment. While a 8KB write at 64KB offset would be 8KB 
-"alignment". And a 24KB write at offset 0 is a 8KB "alignment", as 8KB 
-is the lowest power-of-2 which is divisible into 24KB. Is this a correct 
-understanding?
+Yes. I'll move this to the commit message.
 
 > 
-> The idea of reporting alignment in a tracepoint was first suggested in
-> this thread [1] by Dave Chinner. Additionally, an eBPF-based equivalent
-> tracing tool [2] was developed and used during LBS development, as
-> mentioned in the patch series [3] and in [1].
+> And I still don't know what we mean by alignment in this context.
 > 
-> With this addition, users can check block alignment directly through the
-> block layer tracepoints without needing any additional tools.
+> From looking at the code, it seems to be the max detected block size
+> granularity. For example, for a 64KB write at a 32KB offset, that would give
+> a 32KB "alignment". But a 64KB write at a 64KB offset would be "64KB"
+> alignment. While a 8KB write at 64KB offset would be 8KB "alignment". And a
+> 24KB write at offset 0 is a 8KB "alignment", as 8KB is the lowest power-of-2
+> which is divisible into 24KB. Is this a correct understanding?
+
+That is correct. Do you think adding examples like yours can help to explain
+this better? Below the same examples using fio with the trace output:
+
+
+	sudo fio -bs=64k -size=64k -offset=32k -rw=write \
+	-direct=1 -filename=/dev/nvme0n1 -iodepth=1 -ioengine=sync -name=sync
+	
+	sudo fio -bs=64k -size=64k -offset=64k -rw=write \
+	-direct=1 -filename=/dev/nvme0n1 -iodepth=1 -ioengine=sync -name=sync
+	
+	sudo fio -bs=8k -size=8k -offset=64k -rw=write \
+	-direct=1 -filename=/dev/nvme0n1 -iodepth=1 -ioengine=sync -name=sync
+	
+	sudo fio -bs=24k -size=24k -offset=0k -rw=write \
+	-direct=1 -filename=/dev/nvme0n1 -iodepth=1 -ioengine=sync -name=sync
+
+	fio-789     [000] .....  4455.092003: block_rq_issue: 259,0 WS 65536 () 64 + 128 none,0,0 |32768| [fio]
+	fio-801     [000] .....  4455.474826: block_rq_issue: 259,0 WS 65536 () 128 + 128 none,0,0 |65536| [fio]
+	fio-813     [000] .....  4455.855143: block_rq_issue: 259,0 WS 8192 () 128 + 16 none,0,0 |8192| [fio]
+	fio-825     [000] .....  4456.235595: block_rq_issue: 259,0 WS 24576 () 0 + 48 none,0,0 |8192| [fio]
+
+
+Also, the motivation behind this is explained in the LBS RFC [1] and I should
+have included it here for context. I hope [1] and my description below helps to
+explain what alignment means and why is needed:
+
+[1] Subject: [RFC 00/23] Enable block size > page size in XFS
+https://lore.kernel.org/lkml/20230915183848.1018717-1-kernel@pankajraghav.com/
+
+Tracing alignment information is important for high-capacity and QLC SSDs with
+Indirection Units greater than 4 KiB. These devices are still 4 KiB in Logical
+Block Size (LBS) but because they work at higher IUs, unaligned writes to the IU
+boundaries can imply in a read-modify-write (RMW).
+
+The graph below is a representation of the device IU vs an I/O block aligned/
+unaligned.
+
+    |--- IU Boundaries ----|      |-PS-|
+a)  [====][====][====][====][····][····][····]--
+    |                      |
+b)  [····][====][====][====][====][····][····]--
+    |                      |
+c)  [====][====][====][====][····][====][====]--
+    |                      |
+d)  [····][····][====][====][····][····][····]--
+    |                      |
+LBA 0                      4
+  
+    Key:
+    [====] = I/O Block
+    [····] = Memory in Page Size (PS) chunks
+
+a) I/O matches IU boundaries (LBA and block size). I/O is aligned.
+b) The size of the I/O matches the IU size but the I/O is not aligned to the
+IU boundaries. I/O is unaligned.
+c) I/O does not match in either size or LBA. I/O is unaligned.
+
 > 
-> In case we have a use case, this can be extended to other tracepoints,
-> such as complete and error.
+> > 
+> > The idea of reporting alignment in a tracepoint was first suggested in
+> > this thread [1] by Dave Chinner. Additionally, an eBPF-based equivalent
+> > tracing tool [2] was developed and used during LBS development, as
+> > mentioned in the patch series [3] and in [1].
+> > 
+> > With this addition, users can check block alignment directly through the
+> > block layer tracepoints without needing any additional tools.
+> > 
+> > In case we have a use case, this can be extended to other tracepoints,
+> > such as complete and error.
+> > 
+> > Another potential enhancement could be the integration of this
+> > information into blktrace. Would that be a feasible option to consider?
+> > 
+> > [1] https://urldefense.com/v3/__https://lore.kernel.org/all/ZdvXAn1Q*2F*QX5sPQ@dread.disaster.area/__;JSs!!ACWV5N9M2RV99hQ!P1ZM_E9uBSDLzz6M0dLc_vgEGWEY2HPBXJvEJLWp7w0l_G_r9Gvkm2kQiN586NSIH-JMx_YiCFy_6qdklHFY3pXtYsRb3aY$
+> > [2] blkalgn tool written in eBPF/bcc:
+> > https://urldefense.com/v3/__https://github.com/dkruces/bcc/tree/lbs__;!!ACWV5N9M2RV99hQ!P1ZM_E9uBSDLzz6M0dLc_vgEGWEY2HPBXJvEJLWp7w0l_G_r9Gvkm2kQiN586NSIH-JMx_YiCFy_6qdklHFY3pXthE7cfng$
+> > [3] https://urldefense.com/v3/__https://lore.kernel.org/all/20240822135018.1931258-1-kernel@pankajraghav.com/__;!!ACWV5N9M2RV99hQ!P1ZM_E9uBSDLzz6M0dLc_vgEGWEY2HPBXJvEJLWp7w0l_G_r9Gvkm2kQiN586NSIH-JMx_YiCFy_6qdklHFY3pXtqQ5uwAE$
+> > ---
+> >   block/blk-mq.c               | 29 +++++++++++++++++++++++++++++
+> >   include/linux/blk-mq.h       | 11 +++++++++++
+> >   include/linux/blkdev.h       |  6 ++++++
+> >   include/trace/events/block.h |  7 +++++--
+> >   4 files changed, 51 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 831c5cf5d874..714452bc236b 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -4920,6 +4920,35 @@ int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
+> >   }
+> >   EXPORT_SYMBOL_GPL(blk_rq_poll);
+> > +u32 __blk_rq_lba_algn(struct request *req)
 > 
-> Another potential enhancement could be the integration of this
-> information into blktrace. Would that be a feasible option to consider?
+> why use "algn", and not "align"?
 > 
-> [1] https://urldefense.com/v3/__https://lore.kernel.org/all/ZdvXAn1Q*2F*QX5sPQ@dread.disaster.area/__;JSs!!ACWV5N9M2RV99hQ!P1ZM_E9uBSDLzz6M0dLc_vgEGWEY2HPBXJvEJLWp7w0l_G_r9Gvkm2kQiN586NSIH-JMx_YiCFy_6qdklHFY3pXtYsRb3aY$
-> [2] blkalgn tool written in eBPF/bcc:
-> https://urldefense.com/v3/__https://github.com/dkruces/bcc/tree/lbs__;!!ACWV5N9M2RV99hQ!P1ZM_E9uBSDLzz6M0dLc_vgEGWEY2HPBXJvEJLWp7w0l_G_r9Gvkm2kQiN586NSIH-JMx_YiCFy_6qdklHFY3pXthE7cfng$
-> [3] https://urldefense.com/v3/__https://lore.kernel.org/all/20240822135018.1931258-1-kernel@pankajraghav.com/__;!!ACWV5N9M2RV99hQ!P1ZM_E9uBSDLzz6M0dLc_vgEGWEY2HPBXJvEJLWp7w0l_G_r9Gvkm2kQiN586NSIH-JMx_YiCFy_6qdklHFY3pXtqQ5uwAE$
-> ---
->   block/blk-mq.c               | 29 +++++++++++++++++++++++++++++
->   include/linux/blk-mq.h       | 11 +++++++++++
->   include/linux/blkdev.h       |  6 ++++++
->   include/trace/events/block.h |  7 +++++--
->   4 files changed, 51 insertions(+), 2 deletions(-)
+> "algn" is not a natural abbreviation of "alignment".
+
+That's okay with me, changing the var name to a more natural abbreviation.
+
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 831c5cf5d874..714452bc236b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4920,6 +4920,35 @@ int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
->   }
->   EXPORT_SYMBOL_GPL(blk_rq_poll);
->   
-> +u32 __blk_rq_lba_algn(struct request *req)
+> And why can't userspace figure this out? All the info is available already,
+> right?
 
-why use "algn", and not "align"?
+We are interested in the block alignment (LBA and size) at block device driver
+level, not userspace level. That is, everything that is going out from the block
+layer. Using the block tracing points currently available makes it block-driver
+generic.
 
-"algn" is not a natural abbreviation of "alignment".
-
-And why can't userspace figure this out? All the info is available 
-already, right?
-
-> +{
-> +	u32 lbs = queue_logical_block_size(req->q);
-> +	u32 lba_shift = ilog2(lbs);
-> +	u32 lba = req->__sector >> (lba_shift - SECTOR_SHIFT);
-
-req->__sector is a u64 - is it safe to store the shifted value in a u32?
-
-> +	u32 len = req->__data_len;
-> +	u32 algn_len = len;
-> +	u32 algn_lba = len / lbs;
-> +	u32 alignment = lbs;
-> +
-> +	if (is_power_of_2(len) &&
-> +	    blk_rq_lba_aligned(len, algn_len, lba, algn_lba))
-> +		return len;
-> +
-> +	algn_len = lbs << 1U;
-> +	algn_lba = algn_len / lbs;
-> +
-> +	while (algn_len < len) {
-> +		if (!blk_rq_lba_aligned(len, algn_len, lba, algn_lba))
-> +			break;
-> +
-> +		alignment = algn_len;
-> +		algn_len = algn_len << 1U;
-> +		algn_lba = algn_len / lbs;
-> +	}
-> +
-> +	return alignment;
-> +}
-> +
->   unsigned int blk_mq_rq_cpu(struct request *rq)
->   {
->   	return rq->mq_ctx->cpu;
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 8d304b1d16b1..02959fbd5e28 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -740,6 +740,17 @@ void blk_mq_free_request(struct request *rq);
->   int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
->   		unsigned int poll_flags);
->   
-> +/* The alignment of the block in terms of LBA and size */
-> +u32 __blk_rq_lba_algn(struct request *req);
-> +static inline u32 blk_rq_lba_algn(struct request *req)
-> +{
-> +	if ((req_op(req) != REQ_OP_WRITE) && (req_op(req) != REQ_OP_READ) &&
-> +	    !(req->__data_len))
-> +		return 0;
-> +
-> +	return __blk_rq_lba_algn(req);
-> +}
-> +
->   bool blk_mq_queue_inflight(struct request_queue *q);
->   
->   enum {
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index bf1aa951fda2..28557987daa8 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1433,6 +1433,12 @@ static inline int blk_rq_aligned(struct request_queue *q, unsigned long addr,
->   	return !(addr & alignment) && !(len & alignment);
->   }
->   
-> +static inline bool blk_rq_lba_aligned(u32 len, u32 algn_len, u32 lba,
-> +				      u32 algn_lba)
-> +{
-> +	return !(len % algn_len) && !(lba % algn_lba);
-> +}
-
-why in blkdev.h? It is only used in block/blk-mq.c
-
-> +
->   /* assumes size > 256 */
->   static inline unsigned int blksize_bits(unsigned int size)
->   {
-> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-> index 1527d5d45e01..ba3764214dc7 100644
-> --- a/include/trace/events/block.h
-> +++ b/include/trace/events/block.h
-> @@ -202,6 +202,7 @@ DECLARE_EVENT_CLASS(block_rq,
->   		__array(  char,		rwbs,	RWBS_LEN	)
->   		__array(  char,         comm,   TASK_COMM_LEN   )
->   		__dynamic_array( char,	cmd,	1		)
-> +		__field(  unsigned int,	algn			)
->   	),
->   
->   	TP_fast_assign(
-> @@ -210,20 +211,22 @@ DECLARE_EVENT_CLASS(block_rq,
->   		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
->   		__entry->bytes     = blk_rq_bytes(rq);
->   		__entry->ioprio	   = rq->ioprio;
-> +		__entry->algn      = blk_rq_lba_algn(rq);
->   
->   		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
->   		__get_str(cmd)[0] = '\0';
->   		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
->   	),
->   
-> -	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u,%u [%s]",
-> +	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u,%u |%u| [%s]",
->   		  MAJOR(__entry->dev), MINOR(__entry->dev),
->   		  __entry->rwbs, __entry->bytes, __get_str(cmd),
->   		  (unsigned long long)__entry->sector, __entry->nr_sector,
->   		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
->   				   IOPRIO_CLASS_STRINGS),
->   		  IOPRIO_PRIO_HINT(__entry->ioprio),
-> -		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
-> +		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->algn,
-> +		  __entry->comm)
->   );
->   
->   /**
 > 
-> ---
-> base-commit: 57f962b956f1d116cd64d5c406776c4975de549d
-> change-id: 20240912-add-blkalgn-block-trace-71e8ab6708f1
+> > +{
+> > +	u32 lbs = queue_logical_block_size(req->q);
+> > +	u32 lba_shift = ilog2(lbs);
+> > +	u32 lba = req->__sector >> (lba_shift - SECTOR_SHIFT);
 > 
-> Best regards,
+> req->__sector is a u64 - is it safe to store the shifted value in a u32?
+> 
+> > +	u32 len = req->__data_len;
+> > +	u32 algn_len = len;
+> > +	u32 algn_lba = len / lbs;
+> > +	u32 alignment = lbs;
+> > +
+> > +	if (is_power_of_2(len) &&
+> > +	    blk_rq_lba_aligned(len, algn_len, lba, algn_lba))
+> > +		return len;
+> > +
+> > +	algn_len = lbs << 1U;
+> > +	algn_lba = algn_len / lbs;
+> > +
+> > +	while (algn_len < len) {
+> > +		if (!blk_rq_lba_aligned(len, algn_len, lba, algn_lba))
+> > +			break;
+> > +
+> > +		alignment = algn_len;
+> > +		algn_len = algn_len << 1U;
+> > +		algn_lba = algn_len / lbs;
+> > +	}
+> > +
+> > +	return alignment;
+> > +}
+> > +
+> >   unsigned int blk_mq_rq_cpu(struct request *rq)
+> >   {
+> >   	return rq->mq_ctx->cpu;
+> > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> > index 8d304b1d16b1..02959fbd5e28 100644
+> > --- a/include/linux/blk-mq.h
+> > +++ b/include/linux/blk-mq.h
+> > @@ -740,6 +740,17 @@ void blk_mq_free_request(struct request *rq);
+> >   int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
+> >   		unsigned int poll_flags);
+> > +/* The alignment of the block in terms of LBA and size */
+> > +u32 __blk_rq_lba_algn(struct request *req);
+> > +static inline u32 blk_rq_lba_algn(struct request *req)
+> > +{
+> > +	if ((req_op(req) != REQ_OP_WRITE) && (req_op(req) != REQ_OP_READ) &&
+> > +	    !(req->__data_len))
+> > +		return 0;
+> > +
+> > +	return __blk_rq_lba_algn(req);
+> > +}
+> > +
+> >   bool blk_mq_queue_inflight(struct request_queue *q);
+> >   enum {
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index bf1aa951fda2..28557987daa8 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -1433,6 +1433,12 @@ static inline int blk_rq_aligned(struct request_queue *q, unsigned long addr,
+> >   	return !(addr & alignment) && !(len & alignment);
+> >   }
+> > +static inline bool blk_rq_lba_aligned(u32 len, u32 algn_len, u32 lba,
+> > +				      u32 algn_lba)
+> > +{
+> > +	return !(len % algn_len) && !(lba % algn_lba);
+> > +}
+> 
+> why in blkdev.h? It is only used in block/blk-mq.c
 
+There's a blk_rq_aligned in blkdev.h already and used in blk-map.c that checks
+for dma and pad alignment. I can move it to blk-mq.h if that fits better.
+
+
+> 
+> > +
+> >   /* assumes size > 256 */
+> >   static inline unsigned int blksize_bits(unsigned int size)
+> >   {
+> > diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> > index 1527d5d45e01..ba3764214dc7 100644
+> > --- a/include/trace/events/block.h
+> > +++ b/include/trace/events/block.h
+> > @@ -202,6 +202,7 @@ DECLARE_EVENT_CLASS(block_rq,
+> >   		__array(  char,		rwbs,	RWBS_LEN	)
+> >   		__array(  char,         comm,   TASK_COMM_LEN   )
+> >   		__dynamic_array( char,	cmd,	1		)
+> > +		__field(  unsigned int,	algn			)
+> >   	),
+> >   	TP_fast_assign(
+> > @@ -210,20 +211,22 @@ DECLARE_EVENT_CLASS(block_rq,
+> >   		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
+> >   		__entry->bytes     = blk_rq_bytes(rq);
+> >   		__entry->ioprio	   = rq->ioprio;
+> > +		__entry->algn      = blk_rq_lba_algn(rq);
+> >   		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+> >   		__get_str(cmd)[0] = '\0';
+> >   		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+> >   	),
+> > -	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u,%u [%s]",
+> > +	TP_printk("%d,%d %s %u (%s) %llu + %u %s,%u,%u |%u| [%s]",
+> >   		  MAJOR(__entry->dev), MINOR(__entry->dev),
+> >   		  __entry->rwbs, __entry->bytes, __get_str(cmd),
+> >   		  (unsigned long long)__entry->sector, __entry->nr_sector,
+> >   		  __print_symbolic(IOPRIO_PRIO_CLASS(__entry->ioprio),
+> >   				   IOPRIO_CLASS_STRINGS),
+> >   		  IOPRIO_PRIO_HINT(__entry->ioprio),
+> > -		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
+> > +		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->algn,
+> > +		  __entry->comm)
+> >   );
+> >   /**
+> > 
+> > ---
+> > base-commit: 57f962b956f1d116cd64d5c406776c4975de549d
+> > change-id: 20240912-add-blkalgn-block-trace-71e8ab6708f1
+> > 
+> > Best regards,
+> 
