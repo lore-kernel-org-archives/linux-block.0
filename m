@@ -1,52 +1,55 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AD513790B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215251384B9
 	for <linux-block@vger.kernel.org>; Fri, 13 Sep 2024 18:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726252154; cv=none; b=Fc4L8l7CXg327GZHNxNi0cAr+ZgZhIFyLcmIe2eHrdOGYu7jLgfmCRCcViDcsUHmUOm0BGnvnzHnkOvto2Ccn7LgnFFO/duDlG0zAxzefBpTIGDSNs6k24N8NVRCvQwczkrHGjaU5fEmwPSyvuw8+jXsbFuIA0+Aqp60XCVw8DE=
+	t=1726252154; cv=none; b=HV0SVzL5V1kUtqi0KfeYsIG8nmAgnjpGh+fPoL0kJp9HujskPCWe2u/rI4ShrE8KTJWej30CWnibA74PdIKkj9yyLtAPBOjv6dIH2jtqgRaBKdBfWKcTjoYaGIC4FchueSCc2p5GVHBDnyLE7esur1tQFU4k4JEd70M/H1H8aP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726252154; c=relaxed/simple;
-	bh=eIXOszwJIaTt2ApvNGA+AQrdpcUa4ECXIJNPnsA5dwk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dHTknQ6A+1sv9xrAbbNmeAc+lW4lKTI5GqDoxGsZgRMnbv92wuzRdeWhVrXw5XcaVI9OwnXHNjTpK3Z1sxjW7rHMt3UTqAW1QORSg8Q32UPnG8ZhtckIKL1+tSWXTrRyoS7K0wgSaTk5EwAE+3R8hb/VA143QSnoDjXVzzAeHz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=R7owH2/Y; arc=none smtp.client-ip=67.231.145.42
+	bh=DVVKnOrWjiRoSCgaBNa//smYB0J1VdkCfgXVLidzJbQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CJT4l1J5JB5sRc4vJLxX1eH9s+DY7Jy/85NzJGAZ6QXjnZjc3VvfMGQdfSUpJnlZJ0KARH7aRcLqeUQu5w9/EUkMth0dNoFHptzjxJFaDyNLA1NGdd4J6iy8C3LxdviFjb68Z56eV6xVZeX5zsik+IAJq//UIi8b37GEaXm8wOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=bVysg4A6; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="R7owH2/Y"
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DIANFN018518
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="bVysg4A6"
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DI2DVX032589
 	for <linux-block@vger.kernel.org>; Fri, 13 Sep 2024 11:29:12 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=/V+
-	SQCa2TzW8MFzEkXVSlXsp7/37DTm/d7GB3FIFO3s=; b=R7owH2/YW1ioGYQXpUm
-	E6nWvgKbwyT+UR5+hMdzVUr1dXh/hr402fZifZUtcggoO0KKgd0howyrhb5wl5XR
-	GTq3fl5bWp9Hx0kQMsEA3n+CBvRQPe9pbzGXoNacgvP568JC1Twl6D6CgA19ig9d
-	nUM1yz0RrqcsxTTKEuPmp8zAIiJBVp/hyWkWSrMbDgNSwBHSVj5t7hlP+cCiS5mD
-	RycnwdMV6NhUuZpM4l++3mtRSJsNw3qXU85Ut/FAChqsYPcI3lx57PQ2D3ZfRecn
-	ndcMNZkEoiu1ptieZuyoNt3keAKw3l503sldbL+R6n2ED5fi3xzPGzK0Iy0dkVzx
-	pIA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41mte705nd-13
+	:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	s2048-2021-q4; bh=oUfSROr0FhSCtvL6UbszCRKrsV9riysj4gJgGG+83JA=; b=
+	bVysg4A6Z0dHj0+PmhLV8Fv/24JJKgX75zpqBCm4rw1XGrIsmNbHbP899aGx3k/p
+	FiR6gcC19dPSqqe2R1E9VSiuYFZrzcfmwKtfZQA4TFKt7oi9PXtq0/tik3rolCri
+	boS/0Vnnj0XCkqcL1iFPM0zVPObyQxeTSy+W5yOhUEBJzRldGLGJkEEWpibMPSaC
+	+tpN+Wy24Dd3bXtAuRu7mRrgRk0Dm0PsT+zQz8LpqDlSemrRatH3rei457+o0Ytf
+	aFC3KgiMMG2IOMwyDIzIJsZ0wmINfxF04AOMrnoXMRtOLynAtkBbVqYB1MLWi2vf
+	woLE+om6VClxVlKH2/aChg==
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41mqb2sp7a-9
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
 	for <linux-block@vger.kernel.org>; Fri, 13 Sep 2024 11:29:12 -0700 (PDT)
-Received: from twshared32638.07.ash9.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+Received: from twshared13976.17.frc2.facebook.com (2620:10d:c0a8:1b::8e35) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Fri, 13 Sep 2024 18:29:10 +0000
+ 15.2.1544.11; Fri, 13 Sep 2024 18:29:06 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 518A912F91041; Fri, 13 Sep 2024 11:29:03 -0700 (PDT)
+	id 6F30E12F91049; Fri, 13 Sep 2024 11:29:03 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <martin.petersen@oracle.com>,
         <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <linux-scsi@vger.kernel.org>
 CC: <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv5 0/9] block integrity merging and counting
-Date: Fri, 13 Sep 2024 11:28:45 -0700
-Message-ID: <20240913182854.2445457-1-kbusch@meta.com>
+Subject: [PATCHv5 4/9] blk-integrity: consider entire bio list for merging
+Date: Fri, 13 Sep 2024 11:28:49 -0700
+Message-ID: <20240913182854.2445457-5-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20240913182854.2445457-1-kbusch@meta.com>
+References: <20240913182854.2445457-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,49 +59,53 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: cqX4wAUv-tSbLLsi5fR8qZWcPmIKkhuh
-X-Proofpoint-GUID: cqX4wAUv-tSbLLsi5fR8qZWcPmIKkhuh
+X-Proofpoint-GUID: rWaNSGT9zSzv0C_u_HmXz2OhRelaV4Vh
+X-Proofpoint-ORIG-GUID: rWaNSGT9zSzv0C_u_HmXz2OhRelaV4Vh
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-13_11,2024-09-13_02,2024-09-02_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-Some fixes and cleanups to counting integrity segments when metadata is
-used. This addresses merging issues when integrity data is present.
+If a bio is merged to a request, the entire bio list is merged, so don't
+temporarily detach it from its list when counting segments. In most
+cases, bi_next will already be NULL, so detaching is usually a no-op.
+But if the bio does have a list, the current code is miscounting the
+segments for the resulting merge.
 
-Changes from v3:
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-integrity.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-  Dropped the trivial nr_integerity_segments helper
-
-  Fixed sg mapping sanity check
-
-  Added reviews
-
-  Fixed commit log typos
-
-Keith Busch (9):
-  blk-mq: unconditional nr_integrity_segments
-  blk-mq: set the nr_integrity_segments from bio
-  blk-integrity: properly account for segments
-  blk-integrity: consider entire bio list for merging
-  block: provide a request helper for user integrity segments
-  scsi: use request to get integrity segments
-  nvme-rdma: use request to get integrity segments
-  block: unexport blk_rq_count_integrity_sg
-  blk-integrity: improved sg segment mapping
-
- block/bio-integrity.c         |  1 -
- block/blk-integrity.c         | 36 ++++++++++++++++++++++++-----------
- block/blk-merge.c             |  4 ++++
- block/blk-mq.c                |  5 +++--
- drivers/nvme/host/ioctl.c     |  6 ++----
- drivers/nvme/host/rdma.c      |  6 +++---
- drivers/scsi/scsi_lib.c       | 12 +++---------
- include/linux/blk-integrity.h | 15 +++++++++++----
- include/linux/blk-mq.h        |  3 ---
- 9 files changed, 51 insertions(+), 37 deletions(-)
-
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index afd101555d3cb..84065691aaed0 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -134,7 +134,6 @@ bool blk_integrity_merge_bio(struct request_queue *q,=
+ struct request *req,
+ 			     struct bio *bio)
+ {
+ 	int nr_integrity_segs;
+-	struct bio *next =3D bio->bi_next;
+=20
+ 	if (blk_integrity_rq(req) =3D=3D 0 && bio_integrity(bio) =3D=3D NULL)
+ 		return true;
+@@ -145,10 +144,7 @@ bool blk_integrity_merge_bio(struct request_queue *q=
+, struct request *req,
+ 	if (bio_integrity(req->bio)->bip_flags !=3D bio_integrity(bio)->bip_fla=
+gs)
+ 		return false;
+=20
+-	bio->bi_next =3D NULL;
+ 	nr_integrity_segs =3D blk_rq_count_integrity_sg(q, bio);
+-	bio->bi_next =3D next;
+-
+ 	if (req->nr_integrity_segments + nr_integrity_segs >
+ 	    q->limits.max_integrity_segments)
+ 		return false;
 --=20
 2.43.5
 
