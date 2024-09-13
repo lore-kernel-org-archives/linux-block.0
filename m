@@ -1,48 +1,37 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFB24C96;
-	Fri, 13 Sep 2024 07:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5529C19F41A;
+	Fri, 13 Sep 2024 08:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726213524; cv=none; b=H3l/KAnpVCdJDpICYo9QGo7dB/FfjePWnDtgm4t/pZG1kRxveGYdTAI0gjX0t8lQ70gc6QbdkKuJ9L6VURvjxCg3q83kQPF6WlLR466ghP7d1F4hHluFpSP9hSaLcaq3WRrKHA8c+x7n9qziDxTZpSzO8XlNt28SR7l82pnOl5k=
+	t=1726214834; cv=none; b=j92zjUpkl2F35E1rH4tGo18chDYfPVZwCbaDmtwIO+3JFhiMTnAYdYySwXwrZsXpdsZ0f6yUqfEotMA5k90/L7meck7KnwKHU1zn9Pp5WbdW4pwgFlvjofaUY7fW/eAvNqPfNS7lLEcseQAqW8Ontr6hkL2do1hHaDxJMxlyXR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726213524; c=relaxed/simple;
-	bh=oAL4XSiPCdCxsFRJpP40OPeCmZ3h+2yPthNLW4wasU8=;
+	s=arc-20240116; t=1726214834; c=relaxed/simple;
+	bh=OoeooWScYrdT/7Ye2MT+bee9p/3N1jp3nqcoiu34Ji8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gz8P3VsEw43NbKOytQQ1cqTbAJIlZa2hpYOpqZtckhi2IQW12fueBs5wTG3f1LwifG6WSD11Xp5X4RGwHhXiI27C0PEp6YI7Kk/fagk9ysiwbGTFoUU5YRfYshViTsVJPAWzQLvDdWw5/2SlUSUadmfqYGCH0pi71U29HtaRxO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=24jJLMzh; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="24jJLMzh"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=oAL4XSiPCdCxsFRJpP40OPeCmZ3h+2yPthNLW4wasU8=; b=24jJLMzhlw7fsF4lRmyyaKTDTx
-	C6S+XfsZYT/9OiZCMj8PFnItGB1ZdWZtMRkqOkkDzJ87CeF59ewfAChpYpskYBGDDGOEMHHwdg9tX
-	W23GLz2Ba604H3O9k1YeJl4nkog9PnISEKvDbuGdcI6+L/iyaLv8TDiqxbwS9pJAqGzd6MqFKD93N
-	Krb27Y6ZMgEjUdDhQt6cbusxaFJjJjGT4WXzhkY+knKTNqvqyM/3cwvVvagwKhHy/DWSv89rUxowX
-	jlKo5qk5Nyxahny3AF0eTdjQmd2HBpInxzHoYsmfURSuOYpCuA9LLpsUzqvF6gUZRbAB7H2w+FqXT
-	bixtb8qg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sp0zR-0000000FD7N-1nHB;
-	Fri, 13 Sep 2024 07:45:13 +0000
-Date: Fri, 13 Sep 2024 00:45:13 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	Conrad Meyer <conradmeyer@meta.com>
-Subject: Re: [PATCH v5 6/8] block: implement write zeroes io_uring cmd
-Message-ID: <ZuPtiR9HEP9wMoIG@infradead.org>
-References: <cover.1726072086.git.asml.silence@gmail.com>
- <8e7975e44504d8371d716167face2bc8e248f7a4.1726072086.git.asml.silence@gmail.com>
- <ZuK1OlmycUeN3S7d@infradead.org>
- <707bc959-53f0-45c9-9898-59b0ccbf216a@gmail.com>
- <38a79cd5-2534-4614-bead-e77a087fefb2@kernel.dk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HtlVxidlP4mp5ZEThGSMLb8GtnL8tR5vk+bJH4Wcm7w9IioPPbMcWoFDrmf+7frGtPDmuz0VGCIful2jA60fssXu0KhsZCyfaymDbVHu05Wyg87aN0YZ/OrpstsMGRG7M/LR9ilqC/fG48GEwZMRiOHlsIoji4ycBB0MXMjN+GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 3DAE2227ABD; Fri, 13 Sep 2024 10:07:00 +0200 (CEST)
+Date: Fri, 13 Sep 2024 10:06:59 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
+	sagi@grimberg.me, martin.petersen@oracle.com,
+	James.Bottomley@HansenPartnership.com, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
+	jlayton@kernel.org, chuck.lever@oracle.com, bvanassche@acm.org,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, gost.dev@samsung.com,
+	vishak.g@samsung.com, javier.gonz@samsung.com,
+	Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCH v5 4/5] sd: limit to use write life hints
+Message-ID: <20240913080659.GA30525@lst.de>
+References: <20240910150200.6589-1-joshi.k@samsung.com> <CGME20240910151057epcas5p3369c6257a6f169b4caa6dd59548b538c@epcas5p3.samsung.com> <20240910150200.6589-5-joshi.k@samsung.com> <20240912130235.GB28535@lst.de> <e6ae5391-ae84-bae4-78ea-4983d04af69f@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,13 +40,64 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <38a79cd5-2534-4614-bead-e77a087fefb2@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <e6ae5391-ae84-bae4-78ea-4983d04af69f@samsung.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Sep 12, 2024 at 10:32:21AM -0600, Jens Axboe wrote:
-> How about we just drop 6-8 for now, and just focus on getting the actual
-> main discard operation in? That's (by far) the most important anyway,
-> and we can always add the write-zeroes bit later.
+On Thu, Sep 12, 2024 at 10:01:00PM +0530, Kanchan Joshi wrote:
+> Please see the response in patch #1. My worries were:
+> (a) adding a new field and propagating it across the stack will cause 
+> code duplication.
+> (b) to add a new field we need to carve space within inode, bio and 
+> request.
+> We had a hole in request, but it is set to vanish after ongoing 
+> integrity refactoring patch of Keith [1]. For inode also, there is no 
+> liberty at this point [2].
+> 
+> I think current multiplexing approach is similar to ioprio where 
+> multiple io priority classes/values are expressed within an int type. 
+> And few kernel components choose to interpret certain ioprio values at will.
+> 
+> And all this is still in-kernel details. Which can be changed if/when 
+> other factors start helping.
 
-Sounds fine to me.
+Maybe part of the problem is that the API is very confusing.  A smal
+part of that is of course that the existing temperature hints already
+have some issues, but this seems to be taking them make it significantly
+worse.
 
+Note: this tries to include highlevel comments from the discussion of
+the previous patches instead of splitting them over multiple threads.
+
+F_{S,G}ET_RW_HINT works on arbitrary file descriptors with absolutely no
+check for support by the device or file system and not check for the
+file type.  That's not exactly good API design, but not really a major
+because they are clearly designed as hints with a fixed number of
+values, allowing the implementation to map them if not enough are
+supported.
+
+But if we increase this to a variable number of hints that don't have
+any meaning (and even if that is just the rough order of the temperature
+hints assigned to them), that doesn't really work.  We'll need an API
+to check if these stream hints are supported and how many of them,
+otherwise the applications can't make any sensible use of them.
+
+If these aren't just stream hints of the file system but you actually
+want them as an abstract API for FDP you'll also need to actually
+expose even more information like the reclaim unit size, but let's
+ignore that for this part of the discssion.
+
+Back the the API: the existing lifetime hints have basically three
+layers:
+
+ 1) syscall ABI
+ 2) the hint stored in the inode
+ 3) the hint passed in the bio
+
+1) is very much fixed for the temperature API, we just need to think if
+   we want to support it at the same time as a more general hints API.
+   Or if we can map one into another.  Or if we can't support them at
+   the same time how that is communicated.
+
+For 2) and 3) we can use an actual union if we decide to not support
+both at the same time, keyed off a flag outside the field, but if not
+we simply need space for both.
