@@ -1,103 +1,124 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5529C19F41A;
-	Fri, 13 Sep 2024 08:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD8F15381F;
+	Fri, 13 Sep 2024 08:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726214834; cv=none; b=j92zjUpkl2F35E1rH4tGo18chDYfPVZwCbaDmtwIO+3JFhiMTnAYdYySwXwrZsXpdsZ0f6yUqfEotMA5k90/L7meck7KnwKHU1zn9Pp5WbdW4pwgFlvjofaUY7fW/eAvNqPfNS7lLEcseQAqW8Ontr6hkL2do1hHaDxJMxlyXR4=
+	t=1726216515; cv=none; b=UQ8IzHfXvBY59/Wzz+Vj3iRdLT0P5HObgrQEd5/Iem41mstDQpu0+/oxsPrlaLpZrmLBQJrWwHUFkM0zNXuk4vTMrpIACGDJ265xsimNlKl66DW5KLAUR0mYTwZCyjbfQdYmxijNMwMvrHfK63aITjNiFZdrmOPDXRiePqh6Ey4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726214834; c=relaxed/simple;
-	bh=OoeooWScYrdT/7Ye2MT+bee9p/3N1jp3nqcoiu34Ji8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HtlVxidlP4mp5ZEThGSMLb8GtnL8tR5vk+bJH4Wcm7w9IioPPbMcWoFDrmf+7frGtPDmuz0VGCIful2jA60fssXu0KhsZCyfaymDbVHu05Wyg87aN0YZ/OrpstsMGRG7M/LR9ilqC/fG48GEwZMRiOHlsIoji4ycBB0MXMjN+GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3DAE2227ABD; Fri, 13 Sep 2024 10:07:00 +0200 (CEST)
-Date: Fri, 13 Sep 2024 10:06:59 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
-	sagi@grimberg.me, martin.petersen@oracle.com,
-	James.Bottomley@HansenPartnership.com, brauner@kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
-	jlayton@kernel.org, chuck.lever@oracle.com, bvanassche@acm.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, gost.dev@samsung.com,
-	vishak.g@samsung.com, javier.gonz@samsung.com,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH v5 4/5] sd: limit to use write life hints
-Message-ID: <20240913080659.GA30525@lst.de>
-References: <20240910150200.6589-1-joshi.k@samsung.com> <CGME20240910151057epcas5p3369c6257a6f169b4caa6dd59548b538c@epcas5p3.samsung.com> <20240910150200.6589-5-joshi.k@samsung.com> <20240912130235.GB28535@lst.de> <e6ae5391-ae84-bae4-78ea-4983d04af69f@samsung.com>
+	s=arc-20240116; t=1726216515; c=relaxed/simple;
+	bh=ndTMI7Ta5mkzEp+G+rl2QJDEsX+BahwLi0B2IW6AhGQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Nzs5s6lFCc7NuVrD8CbOU2/rFbmmrtvYbORlmMZbCfVlfclWo38Us3FQKtOo3S1z2YzuJJ1ryKxnPvIFBaJqxvlHg4JvbMaLvjIblG9+qDxoz/1dsT8sqOs4vs0Q1Bj41FmtT70sj/WRZJev9N1A4xwqOXRA4e8S6qeSM/mOnQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mk6T0X1r; arc=none smtp.client-ip=209.85.215.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mk6T0X1r"
+Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-7d4fbe62bf5so387316a12.0;
+        Fri, 13 Sep 2024 01:35:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726216513; x=1726821313; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kC1E6rGRaMKkAAHcPV87FQ7r8LHjz2Mgn/xn2HhiS4I=;
+        b=Mk6T0X1reQai0sHUmCP1/CQVNMAHsPXNoPSiXZCYDZ/rs5wc7KzJ1kjpneX0Tbal5X
+         YsD3YE7oszcDpZIklVQsWPYS1KN+UaKulOMBpu0oRRokI2j8L1SpGLECricP6oACUHWo
+         Yk1QK8/Uv0C8+axlA9jytAV1qrG6umw6phrhcEWYqykkUOdhYlXxpTifCl9imIEvUZse
+         Xv18pHQOn94ABX1oQ5I457n8AP2Gw2XEVsdNA8aKxfbPolCsnkG7nZQAeednWB+bOLFH
+         yAjyIXlJpdGhBU384f1AQtqmWrbjvEwIHdolq316rpkj4jLSe67k38bfVEf8JFQZjxa+
+         u1jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726216513; x=1726821313;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kC1E6rGRaMKkAAHcPV87FQ7r8LHjz2Mgn/xn2HhiS4I=;
+        b=iZuE7/q2dYo6d3cjo3Fng5GmK3BFR7Qr+NDAWm4vioQ5yct+B0/QFE9pnSnDS5J+5u
+         jP/vt6Qaw9KV18QNoR1vHUBO4/2ICz1UfHkKGzd3QT9W21c68fVnvSC1pJtyMe0ODnSk
+         Ow2vyJ+eV38uJq0NFiwt4qNqkSnaAGGjNTq6ks5VMuVGMBbPjd42/om5rCxtMvwbAJYU
+         43xP6hDIOdfi+Q6d4MvQQP/cjPUM2vjex1vjTyiGDEzhYgdZVV06Lddt3HvbU4BNq+oz
+         ZsCxkn6EbBc2C2IE6M+QXcvLFj6/jtqVOKHgKyqxfxv9DwLvBp1CbeBz+RCAXDicfeUD
+         dKzw==
+X-Forwarded-Encrypted: i=1; AJvYcCVCxP60pOxTt/hZovghpvgoN2vSTsu9Vr2uwIVTXoHOyvbVudbZEkgfDpLhI76LYgW5hdLy3A+oMluOYQ==@vger.kernel.org, AJvYcCVOrJh29PzK1Ci3YAvrthx2W1mTmTG8pTNrdhzEEkqM+PDrusWE827cKnHrU7VMkJHDhYSQw1Bo@vger.kernel.org, AJvYcCWfOw7glNO77xsTItTCVVT3dgpYCWvt392m2ht2Cqy+6q36aLEj0oggeC6RbK5AT4cR7Cx5zQ+b99OXXBO2@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI7fdesHS0izKyk9ECFQjN4Q4/eF3tXeu1oCOJOXq42bF270wK
+	05czGp1+o9xUpXCizIPFkFajE5mJ+w5F2gSSIFof1tNWrV8H6Tz3
+X-Google-Smtp-Source: AGHT+IGhOiHOH2ZzR9kqH7H6Mz2LbLdj+bggZwXEzS9FbvIrM15f4iZFYOTdBo7HUQ+io4t6nMbhvw==
+X-Received: by 2002:a17:90a:d149:b0:2c6:ee50:5af4 with SMTP id 98e67ed59e1d1-2dbb9dc1163mr2394189a91.6.1726216513004;
+        Fri, 13 Sep 2024 01:35:13 -0700 (PDT)
+Received: from tom-QiTianM540-A739.. ([106.39.42.164])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbb9d37e01sm1123613a91.52.2024.09.13.01.35.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Sep 2024 01:35:12 -0700 (PDT)
+From: Qiu-ji Chen <chenqiuji666@gmail.com>
+To: philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	christoph.boehmwalder@linbit.com,
+	axboe@kernel.dk
+Cc: drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	Qiu-ji Chen <chenqiuji666@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] drbd: Fix atomicity violation in drbd_uuid_set_bm()
+Date: Fri, 13 Sep 2024 16:35:04 +0800
+Message-Id: <20240913083504.10549-1-chenqiuji666@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e6ae5391-ae84-bae4-78ea-4983d04af69f@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 12, 2024 at 10:01:00PM +0530, Kanchan Joshi wrote:
-> Please see the response in patch #1. My worries were:
-> (a) adding a new field and propagating it across the stack will cause 
-> code duplication.
-> (b) to add a new field we need to carve space within inode, bio and 
-> request.
-> We had a hole in request, but it is set to vanish after ongoing 
-> integrity refactoring patch of Keith [1]. For inode also, there is no 
-> liberty at this point [2].
-> 
-> I think current multiplexing approach is similar to ioprio where 
-> multiple io priority classes/values are expressed within an int type. 
-> And few kernel components choose to interpret certain ioprio values at will.
-> 
-> And all this is still in-kernel details. Which can be changed if/when 
-> other factors start helping.
+The violation of atomicity occurs when the drbd_uuid_set_bm function is
+executed simultaneously with modifying the value of
+device->ldev->md.uuid[UI_BITMAP]. Consider a scenario where, while
+device->ldev->md.uuid[UI_BITMAP] passes the validity check when its value
+is not zero, the value of device->ldev->md.uuid[UI_BITMAP] is written to
+zero. In this case, the check in drbd_uuid_set_bm might refer to the old
+value of device->ldev->md.uuid[UI_BITMAP] (before locking), which allows
+an invalid value to pass the validity check, resulting in inconsistency.
 
-Maybe part of the problem is that the API is very confusing.  A smal
-part of that is of course that the existing temperature hints already
-have some issues, but this seems to be taking them make it significantly
-worse.
+To address this issue, it is recommended to include the data validity check
+within the locked section of the function. This modification ensures that
+the value of device->ldev->md.uuid[UI_BITMAP] does not change during the
+validation process, thereby maintaining its integrity.
 
-Note: this tries to include highlevel comments from the discussion of
-the previous patches instead of splitting them over multiple threads.
+This possible bug is found by an experimental static analysis tool
+developed by our team. This tool analyzes the locking APIs to extract
+function pairs that can be concurrently executed, and then analyzes the
+instructions in the paired functions to identify possible concurrency bugs
+including data races and atomicity violations.
 
-F_{S,G}ET_RW_HINT works on arbitrary file descriptors with absolutely no
-check for support by the device or file system and not check for the
-file type.  That's not exactly good API design, but not really a major
-because they are clearly designed as hints with a fixed number of
-values, allowing the implementation to map them if not enough are
-supported.
+Fixes: 9f2247bb9b75 ("drbd: Protect accesses to the uuid set with a spinlock")
+Cc: stable@vger.kernel.org
+Signed-off-by: Qiu-ji Chen <chenqiuji666@gmail.com>
+---
+ drivers/block/drbd/drbd_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-But if we increase this to a variable number of hints that don't have
-any meaning (and even if that is just the rough order of the temperature
-hints assigned to them), that doesn't really work.  We'll need an API
-to check if these stream hints are supported and how many of them,
-otherwise the applications can't make any sensible use of them.
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index a9e49b212341..abafc4edf9ed 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -3399,10 +3399,12 @@ void drbd_uuid_new_current(struct drbd_device *device) __must_hold(local)
+ void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(local)
+ {
+ 	unsigned long flags;
+-	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0)
++	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
++	if (device->ldev->md.uuid[UI_BITMAP] == 0 && val == 0) {
++		spin_unlock_irqrestore(&device->ldev->md.uuid_lock, flags);
+ 		return;
++	}
+ 
+-	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
+ 	if (val == 0) {
+ 		drbd_uuid_move_history(device);
+ 		device->ldev->md.uuid[UI_HISTORY_START] = device->ldev->md.uuid[UI_BITMAP];
+-- 
+2.34.1
 
-If these aren't just stream hints of the file system but you actually
-want them as an abstract API for FDP you'll also need to actually
-expose even more information like the reclaim unit size, but let's
-ignore that for this part of the discssion.
-
-Back the the API: the existing lifetime hints have basically three
-layers:
-
- 1) syscall ABI
- 2) the hint stored in the inode
- 3) the hint passed in the bio
-
-1) is very much fixed for the temperature API, we just need to think if
-   we want to support it at the same time as a more general hints API.
-   Or if we can map one into another.  Or if we can't support them at
-   the same time how that is communicated.
-
-For 2) and 3) we can use an actual union if we decide to not support
-both at the same time, keyed off a flag outside the field, but if not
-we simply need space for both.
