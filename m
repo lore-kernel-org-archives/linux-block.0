@@ -1,183 +1,84 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8AD13CFBD
-	for <linux-block@vger.kernel.org>; Sat, 14 Sep 2024 07:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE76F1CF286
+	for <linux-block@vger.kernel.org>; Sat, 14 Sep 2024 10:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726299063; cv=none; b=IUg4pTynyHnkrUX3Bij2om113e/lUsaZuR3YHTZ4rNlAXd6aKqF5toO9Chrk1tc1QvPBbqVZHHn1TmwRKksf+PDJqB/hg7NdvtY6u7uarPiodJ2iKxfM6xeQCk+SwlndGOooQ/Biv1UnfAlNQPTexuj+TMqkTOoseuPLnZb6xPA=
+	t=1726311508; cv=none; b=Rqpz6LS6i9i7s059NnsMKBWK4jVwmzK6wDOY3f+Yot2mBj49hszsN0I7f0FO9WwGIPF79n/oKcnBodoY5NKErtGrxHddIcy/7DtlBRon7y4BppLOBvbGvs/wAVE/46fzS9kbc6iFhvxhxVFBET0vKhREQ/T1/vgm8e5n2hyV7bA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726299063; c=relaxed/simple;
-	bh=Nlu7sy6nlj6YleTyQBt/cJY6uYT2Pq2MXEk7kWoy/Mc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DqSRVbQ5E5y3UK63mO2ilJDB7CG4xImrkRJcmuSPEdHUD7Fy8ysCJMZ1fHvVVtpL0xWvX8GA6LqmcjtHn/ZkngdfrVul1YYJR1MvBTHvul45jO9fun2BuQy0Q7N8lXBdy8/4BJWjP7mSfA6L465LQspLd1otbl2pSQcZqP9TW/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=JF69Bhha; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="JF69Bhha"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71781f42f75so2455509b3a.1
-        for <linux-block@vger.kernel.org>; Sat, 14 Sep 2024 00:31:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1726299061; x=1726903861; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wEcd+IiEv1ro72y/n/abcXpVwZU0hZ5zkZIt5HG485g=;
-        b=JF69Bhhas/aaQMM/zk5S9sSa8XHiqpbOBP5yX16Rdhl8rAxwGrVqzw1Y8xNBrkc5E4
-         ZrPJ+AzghfrHWxSn/YuJEhNENPmbn3GIFha1hGzkJgej+ARh6YylWKgiMeqtXaS5ap+S
-         aqU9cIFUSh/1L2O8lAMYU0/LcLkHRFvGNDWq+rwq5fLOXTYbYwPQ3sVtLR2OUVQK5BA6
-         UsYnHP+ChzErO+P0pLypgF9GRsh6gHiDwLHPphV8xXDuFnaiLS2LJhE8g4nIOQsmmP5I
-         22hIKnMWkB00J6JVNBXXS/ioNE9TntE5rIEdwmcWV8BbeDhQsCpjrVNGZoLI0KwbhhHy
-         BYiQ==
+	s=arc-20240116; t=1726311508; c=relaxed/simple;
+	bh=8cPaGWVNvaiVsXGhl9BZ46sbtKEhwpT6r7AafzNYscU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Tndm/Z1gvzezh+gfNjPRNoZy4zj2EkOZbkphcoDyWqQgUnNSzwlDPXN5RtUesHwKbpYrlzqWubcsQ601P0N4tl9aMUR3VZBLeImSob1vLbat7GwH+dKRsnUbCOKXo66meuEM4IgziZcQzTlXTqmR7pjkew4qlJa6J121oXckscM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-82aad3fa5edso507404739f.2
+        for <linux-block@vger.kernel.org>; Sat, 14 Sep 2024 03:58:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726299061; x=1726903861;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wEcd+IiEv1ro72y/n/abcXpVwZU0hZ5zkZIt5HG485g=;
-        b=d/zV3p+3y53bXjCzV4sinFXMb8wOiJkPVam5MM496Jn30buIR5JwBEHv9yEBb5Hj+1
-         vI6azsFsJ/GsINX91xtcGZMby8vdnua5P51hkaP8xz7yjIwIz0hR1MW+CwVRqN7yz/YV
-         OFvw/dP+jspfTlLXLpKSIPFiukOpbcmJxgH4o5HPgmRhff9cMPyTw+OXjb2T8QTqNMKO
-         CCYn1/R2oLRb0G5EEVZdFuJOWIPHRuvcggnW22yhc2q++IY2OL0WNx++DvYvdaiBrjD2
-         rgm2eABWJO5Aj8BTsgJ9ZrWEpgbOpd/3pDw3HrI9GGpqjkiolDTuRfq9UerM3kt/s71z
-         Z66g==
-X-Gm-Message-State: AOJu0Yy3FcotKHKckT/ZvfDrER7kgzpsPO7B4y7VFEiN7D0gHw/KOzgm
-	2VrvTIuY+pFM0AlotGW8QVBToln1k97kgVXbi8pMYOcEPvYsUlS6NfywH/xNS/4=
-X-Google-Smtp-Source: AGHT+IHm8y07ns7Yps/Sk2jgRKzY5hcTv8FT68ZZZ+L+kPEqfVSn3egGBhElYkjQW1mZy3fYVyID4g==
-X-Received: by 2002:a05:6a20:c99a:b0:1cf:6ef0:c6b9 with SMTP id adf61e73a8af0-1cf7624b46cmr15117559637.32.1726299061341;
-        Sat, 14 Sep 2024 00:31:01 -0700 (PDT)
-Received: from PXLDJ45XCM.bytedance.net ([61.213.176.6])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944b9ac05sm555687b3a.155.2024.09.14.00.30.58
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 14 Sep 2024 00:31:00 -0700 (PDT)
-From: Muchun Song <songmuchun@bytedance.com>
-To: axboe@kernel.dk,
-	ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	muchun.song@linux.dev,
-	Muchun Song <songmuchun@bytedance.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v3 3/3] block: fix ordering between checking BLK_MQ_S_STOPPED and adding requests
-Date: Sat, 14 Sep 2024 15:28:44 +0800
-Message-Id: <20240914072844.18150-4-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20240914072844.18150-1-songmuchun@bytedance.com>
-References: <20240914072844.18150-1-songmuchun@bytedance.com>
+        d=1e100.net; s=20230601; t=1726311506; x=1726916306;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xSXhuj3zISCMZB3nnxahyL41R/wox4A+ugF2KROurmQ=;
+        b=VGkIJS6qktWvC5UsH/boGc8R7UDeKFmC9nT0hZHIxVX2I85xSPJngLMHMhUaRx++Xe
+         FbmdWt9qA9d4MmbYd1hryqoAadVmuLMOOQ9qh9CZGj0QxyaiV9zpASxqUEsj/Acw78q7
+         869+6HiwLhrLEIg/HXdpmC6MA43Ny5Xv8kx8GNjG1LQegAQ5AyxAukCMvlyOC28PXndF
+         m0ljyevfPkt7Le86H8iTY03ECDOCPWjZrYGu26GfDGvFOz6/qUOKl74p6Yn3O4QYpbd6
+         2HlUMHF/nxiXxAlaGDcqwdZoz7VlpjXsTNsVn/+/RohtLSgrft7YK7OIglB8VXcfGsnB
+         MA6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUOTtw7monUj2STs9bg4sXCXDLjrNQWX1ZkcLh58O1ce3Yn/5lIojB+RlGTWjh3PSvcCN8Co5IpSOu4kQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXyLCWmNs7ACfbMTXn8zXYXBeWej9+L7Kwj+uTrrB4/XfotssO
+	+ti8fJHTabm7OtVs3YV0oBCmUpbCV56WiwcYtwfhgsPMtikMcIRUmt+T9GK2ezWULzUM9ercrLW
+	Mn269YlVRhPG4y6bkVPy+7dAMY2541fH1gPCcWTINrf1HyOwU9z0O+u8=
+X-Google-Smtp-Source: AGHT+IEbp4K5Yuh/JujyoRFTiZfkIFNS7LT8IRlV7c50hWWYcE5sW6Kz1S9OHTVBkx3CynhKyyD9L0xgwQU1PGG6lWtwo0a3T57g
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:48e:b0:3a0:52f9:9170 with SMTP id
+ e9e14a558f8ab-3a0848e5d4emr79133095ab.1.1726311505762; Sat, 14 Sep 2024
+ 03:58:25 -0700 (PDT)
+Date: Sat, 14 Sep 2024 03:58:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66e56c51.050a0220.3a9b1.002f.GAE@google.com>
+Subject: [syzbot] Monthly nbd report (Sep 2024)
+From: syzbot <syzbot+list5448e58c688bab5fb496@syzkaller.appspotmail.com>
+To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Supposing first scenario with a virtio_blk driver.
+Hello nbd maintainers/developers,
 
-CPU0                        CPU1
+This is a 31-day syzbot report for the nbd subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nbd
 
-blk_mq_try_issue_directly()
-  __blk_mq_issue_directly()
-    q->mq_ops->queue_rq()
-      virtio_queue_rq()
-        blk_mq_stop_hw_queue()
-                            virtblk_done()
-  blk_mq_request_bypass_insert()  1) store
-                              blk_mq_start_stopped_hw_queue()
-                                clear_bit(BLK_MQ_S_STOPPED)       3) store
-                                blk_mq_run_hw_queue()
-                                  if (!blk_mq_hctx_has_pending()) 4) load
-                                    return
-                                  blk_mq_sched_dispatch_requests()
-  blk_mq_run_hw_queue()
-    if (!blk_mq_hctx_has_pending())
-      return
-    blk_mq_sched_dispatch_requests()
-      if (blk_mq_hctx_stopped())  2) load
-        return
-      __blk_mq_sched_dispatch_requests()
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 3 issues are still open and 6 have been fixed so far.
 
-Supposing another scenario.
+Some of the still happening issues:
 
-CPU0                        CPU1
+Ref Crashes Repro Title
+<1> 126     Yes   INFO: task hung in nbd_ioctl (3)
+                  https://syzkaller.appspot.com/bug?extid=fe03c50d25c0188f7487
+<2> 42      No    INFO: task hung in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
+<3> 7       Yes   INFO: task can't die in nbd_ioctl
+                  https://syzkaller.appspot.com/bug?extid=69a90a5e8f6b59086b2a
 
-blk_mq_requeue_work()
-  blk_mq_insert_request() 1) store
-                            virtblk_done()
-                              blk_mq_start_stopped_hw_queue()
-  blk_mq_run_hw_queues()        clear_bit(BLK_MQ_S_STOPPED)       3) store
-                                blk_mq_run_hw_queue()
-                                  if (!blk_mq_hctx_has_pending()) 4) load
-                                    return
-                                  blk_mq_sched_dispatch_requests()
-    if (blk_mq_hctx_stopped())  2) load
-      continue
-    blk_mq_run_hw_queue()
-
-Both scenarios are similar, the full memory barrier should be inserted
-between 1) and 2), as well as between 3) and 4) to make sure that either
-CPU0 sees BLK_MQ_S_STOPPED is cleared or CPU1 sees dispatch list.
-Otherwise, either CPU will not rerun the hardware queue causing starvation
-of the request.
-
-The easy way to fix it is to add the essential full memory barrier into
-helper of blk_mq_hctx_stopped(). In order to not affect the fast path
-(hardware queue is not stopped most of the time), we only insert the
-barrier into the slow path. Actually, only slow path needs to care about
-missing of dispatching the request to the low-level device driver.
-
-Fixes: 320ae51feed5 ("blk-mq: new multi-queue block IO queueing mechanism")
-Cc: stable@vger.kernel.org
-Cc: Muchun Song <muchun.song@linux.dev>
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c |  6 ++++++
- block/blk-mq.h | 13 +++++++++++++
- 2 files changed, 19 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ff6df6c7eeb25..b90c1680cb780 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2413,6 +2413,12 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 		return;
- 
- 	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+	/*
-+	 * Pairs with the smp_mb() in blk_mq_hctx_stopped() to order the
-+	 * clearing of BLK_MQ_S_STOPPED above and the checking of dispatch
-+	 * list in the subsequent routine.
-+	 */
-+	smp_mb__after_atomic();
- 	blk_mq_run_hw_queue(hctx, async);
- }
- EXPORT_SYMBOL_GPL(blk_mq_start_stopped_hw_queue);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 260beea8e332c..f36f3bff70d86 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -228,6 +228,19 @@ static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data
- 
- static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
- {
-+	/* Fast path: hardware queue is not stopped most of the time. */
-+	if (likely(!test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
-+		return false;
-+
-+	/*
-+	 * This barrier is used to order adding of dispatch list before and
-+	 * the test of BLK_MQ_S_STOPPED below. Pairs with the memory barrier
-+	 * in blk_mq_start_stopped_hw_queue() so that dispatch code could
-+	 * either see BLK_MQ_S_STOPPED is cleared or dispatch list is not
-+	 * empty to avoid missing dispatching requests.
-+	 */
-+	smp_mb();
-+
- 	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
- }
- 
--- 
-2.20.1
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
