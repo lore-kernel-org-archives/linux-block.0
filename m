@@ -1,73 +1,49 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC3B482EF
-	for <linux-block@vger.kernel.org>; Mon, 16 Sep 2024 09:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0123CA935;
+	Mon, 16 Sep 2024 11:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726478624; cv=none; b=R7ms8k0VjcNDfmbhIffZSljYBOPGEfYwVI4P47Mqryn6X9k9c8STZWrc61a8GzhSkvwyvFoAu2e9byXlASB+0HnDkqf4b1jJ1WR0vzR1w0YNyuzTmm1gT+8HWnyp/6UeDnlLwEVhr0T+r7Wka/5pE2p2ZHZ3v1HRrt6uAvy6/XQ=
+	t=1726486095; cv=none; b=t5Z9VuTOQgwElWvEZReqFG6MrXdZ7/QIw71EVCeNANDFIbnN1i42n9/A24cb7OSAxLqvQEIYfZkjN7smUq/5Q2BhpfI+W6b7wjxN0KE+LBJt334BmVl8Rb5xoiFDD54nE7rFl33ywL3/pfu/fU2sBQv0EGbi61jWFXdForBW5+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726478624; c=relaxed/simple;
-	bh=5FsEHtEj/NvtQYRLA0oR0Szlqlbhk2HL9IujoJ2r9E4=;
+	s=arc-20240116; t=1726486095; c=relaxed/simple;
+	bh=hEBEJKsYNCpkUWlqmAGqQuIzVBt1E+qYZss+7WvNPi4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iNmPOHn9bw85iFVU4hz8TmCgY3R7FqWJSd6QhOXN2QpIEHJhN3lmdsGMa2yNbt6SPAIW6RiF89iaiGFPNLYjY58mi5rWW15Q1iRTtae8pbp2xnyl4S3E5hWVgE+AvhysfYrA0r6uX7BjapvnuB0HSI1+xnivqKhZqzi3h8PaaNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VmzdLf7H; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=ecw5zi7Kutf8pq8i6Z6kmm2V5tvPZcu3hy5wl4JLdBFnvn/V60SNs5Z4SUggFkitxZkyXi4zSKARdxys7QczPHyboDpjycqGpNgS6CEn71TghYLGMaakmhhVWJY1uGHMdGxOCXmNU/N7BOPLwi4iZsJkSrecsPk81Ip1cgxkDWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WFfvFI/A; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VmzdLf7H"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f66423686bso37460871fa.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2024 02:23:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1726478619; x=1727083419; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hUaMYwgpZ2Ku5tNMW6Im6QjDbcaD3sCpWLaYf5Q5iVI=;
-        b=VmzdLf7HYzzt2QNbs0PoXYk7LxpCYulktAr3pEOL2AitOoSuDJPps99ooGxlNmaJ91
-         t2I1QlMjHefaK7VNMjRZIGDyfZljXKE7NE6914JzR1u3tKJuW2G4zxmWTerPZvePYiOx
-         VqZpB3wWmdKj9cPY0TGay40aklkIwBFEgC0ra5U+wJR5dsaHwDcAyEMTlx/YgqgdbLC6
-         AX2Mp2k77w79ANlDObNrAnGPg4ApG57j1MQBObiJaqFypJdaqJW1R+LAp+q023Rj/aZQ
-         TpHdIWLY5uqjX1bLp3C6e63G9MIkYI/zLn5ZAWiK6DAdR95smz/2F8Z56VdYmN3WJig+
-         SL/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726478619; x=1727083419;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hUaMYwgpZ2Ku5tNMW6Im6QjDbcaD3sCpWLaYf5Q5iVI=;
-        b=cuJYk7MGVIZKwhWSk10Lx3HTee8hJUdCNR3rR+KQQGMuc1LeseNvwlkkRGNvu0kpuw
-         7wfOpP60frEJ7x3Gsr2xKhTFrEpIFJ/WGmUuxV2oAJNUUAq+44F6WFy8Npw14LlsaCIW
-         n5zFfdPXnwR7XAw8W/QnJlBRVgZIgyK8MW+auCv2niphhxLF/7yViAG3J4Ix/715ACme
-         SbFvAxqLpeU89/gbPtfIqEHL3N13tz3WRpfHLiEovkTWvvwgugoSTNCpgwZEfz7GcuHx
-         Bhs3QrIFnfLgN31fxAyfXjCvmCUdm7vnGExrwKrsvVs4uBHvStSnPGkGn5z9jp9iGdQs
-         WFSg==
-X-Forwarded-Encrypted: i=1; AJvYcCXps747P4XhIkvXEDaLh8PFerow44bak0lxKKy9C0gLWTGY6wjBxhD66mE88/FCSkCxFsqXg9pQm5a5Qg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLIe2ef+FynKPdzrIRhwOGaJYOoZ1UsqIGScBLL3WyFfIe40qX
-	RrYG+NNQCbSWpFdkK0oHTT5mk3alIxLxRiuN9ZxZayYrWQcK4p2zRomkPWAmCVs=
-X-Google-Smtp-Source: AGHT+IH2cZxToR1Mm2fvGCS6avu+/Woqny9ILHMW+m489L3DnVmBj/IMWkXo2pwKbd0ZCc3idTj8qA==
-X-Received: by 2002:a2e:be22:0:b0:2f6:63d1:166e with SMTP id 38308e7fff4ca-2f787da0b93mr79504571fa.3.1726478618471;
-        Mon, 16 Sep 2024 02:23:38 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946fcb77sm32659395ad.209.2024.09.16.02.23.36
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Sep 2024 02:23:37 -0700 (PDT)
-Date: Mon, 16 Sep 2024 17:23:33 +0800
-From: joeyli <jlee@suse.com>
-To: Valentin Kleibel <valentin@vrvis.at>
-Cc: Chun-Yi Lee <joeyli.kernel@gmail.com>,
-	Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Emelianov <xemul@openvz.org>,
-	Kirill Korotaev <dev@openvz.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Nicolai Stange <nstange@suse.com>,
-	Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
- places
-Message-ID: <20240916092333.GF3296@linux-l9pv.suse>
-References: <20240912102935.31442-1-jlee@suse.com>
- <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WFfvFI/A"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=x2t+QTffd8xwVAMyv68RrUydCOmyp2i2VRu15j/HlVY=; b=WFfvFI/A/LYyyDi52N90GjOIwO
+	2RBMk9o6ppFqWnUdyZnipUtAd6fMga79Prqc1UhZ7AazCEL6F3TGx48NXCPA8/XFNy6l9EHvF/RYq
+	qLCEhlZibK8n91uieTzVHN92foe4UyVCVFv+8EKeWB9M+7x1A5VmbWlQfjyRV68Woe4mT0BxHonbI
+	cuzfacDmzR/TMJGEU0Q22KRJUv72oasvpne9ZAjFdduUnb6uRJjmhaoJnIxhC6y5wnIea5AUqLHlf
+	hGw78V3AZH35Jddg2FSZQek+8m5946rGrvEZSZwCT/PpaEuLt9TrIRAV0wj9uKuZ8DXW3EGsWNf39
+	8bsyWbSA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1sq9tq-00000000NcZ-3BeT;
+	Mon, 16 Sep 2024 11:28:11 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 6A4F030049D; Mon, 16 Sep 2024 13:28:10 +0200 (CEST)
+Date: Mon, 16 Sep 2024 13:28:10 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: NeilBrown <neilb@suse.de>
+Cc: Ingo Molnar <mingo@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/7] sched: change wake_up_bit() and related function to
+ expect unsigned long *
+Message-ID: <20240916112810.GY4723@noisy.programming.kicks-ass.net>
+References: <20240826063659.15327-1-neilb@suse.de>
+ <20240826063659.15327-3-neilb@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,31 +52,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20240826063659.15327-3-neilb@suse.de>
 
-Hi Valentin,
+On Mon, Aug 26, 2024 at 04:30:59PM +1000, NeilBrown wrote:
+> wake_up_bit() currently allows a "void *".  While this isn't strictly a
+> problem as the address is never dereferenced, it is inconsistent with
+> the corresponding wait_var_event() which requires "unsigned long *" and
+> does dereference the pointer.
 
-On Thu, Sep 12, 2024 at 12:58:46PM +0200, Valentin Kleibel wrote:
-> > Then Nicolai Stange found more places in aoe have potential use-after-free
-> > problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
-> > and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
-> > packet to tx queue. So they should also use dev_hold() to increase the
-> > refcnt of skb->dev.
-> 
-> We've tested your patch on our servers and ran into an issue.
-> With heavy I/O load the aoe device had stale I/Os (e.g. rsync waiting
-> indefinetly on one core) that can be "fixed" by running aoe-revalidate on
-> that device.
-> 
-> Additionally when trying to shut down the system we see the message:
-> unregister_netdevice: waiting for XXX to become free. Usage Count = XXXXX
-> on aoe devices with a usage count somewhere in the millions.
-> This has been the same as without the patch, i assume the fix is still
-> incomplete.
->
+I'm having trouble parsing this. The way I read it, you're contradicting
+yourself. Where does wait_var_event() require 'unsigned long *' ?
 
-Thanks for your testing! I will look into it and reproduce issue again for
-improvement. 
+> And code that needs to wait for a change in something other than an
+> unsigned long would be better served by wake_up_var().
 
-Joey Lee
+This, afaict the whole var thing is size invariant. It only cares about
+the address.
