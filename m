@@ -1,63 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC8A45957;
-	Mon, 16 Sep 2024 08:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC03B1459F6;
+	Mon, 16 Sep 2024 08:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726476057; cv=none; b=oKgRmNl3rRWF4+A/28opdInVvFhQuNPpD/Kcigcc/n37lkaLnTZ/iR8s+Xhnn+LZLqqQcTuf8IUbPuATML0LZbCFOSLthZz/r0EDUhOyAH2QRN1jrCqhddPpkp6DfvwaXIFGKGEHikWxnPvpF3C8DuYB+Sh23OyfIOwq32+BEms=
+	t=1726477105; cv=none; b=V57q+fcn9TFGotq4/oms0tiCRLphLzsM5J4549surwZDmz+AoH+69eeX7BryBt0xJ8HeSBI5X0sox3Z0IB/XivqJ95mGJ27Hci1SfeLo3oWEhrNlCeYXHMxGf/52EHCo8l7l59gtTJ77LwBLShFVc8SDz48I6fjTGVGxn+Oxe3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726476057; c=relaxed/simple;
-	bh=XQXfmHXYm8nPbHnm4cGGcfowXPNvc5CPB4QSkYiTM00=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DOjeC9EeVJvoFFIGgFG9hkNMBLkW0Ivgomt5oat7eFmxTyfRs/7riFArAGCYHtPGTW3KJ8XQs9gkFD0Aflm1wVtkuJnOOJa1vrM5VuNVOrz4aBMVkodi5MRgOCepYi6QM4dCZlyRpfmvS1QmHqa+A6FkvY1lZaPkfFflobFfGIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9rBmWll; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726477105; c=relaxed/simple;
+	bh=xBA+E4KTUuwEoEWvQDGK5J1hbYvnFYe3rBLV0t3JzyQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=In7n7FDvZSbCxE//TL7ARpkGxVpasLruXZgH2iHux6XONabcLQlJt1XTB2rY8JnA6kxjc5jvsgjsUnr9XWxA8YxWqlOFK+XZDfMPGnQ0g9cixaexhEhBbV02LZIZdquPyo+8J4MegVy+GEZd4wWUIEHpmXDBcHYQg4ol5SDRDTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hGsUr3Yg; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9rBmWll"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A2BC4CECC;
-	Mon, 16 Sep 2024 08:40:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726476056;
-	bh=XQXfmHXYm8nPbHnm4cGGcfowXPNvc5CPB4QSkYiTM00=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W9rBmWllFZJJ90mP9ftq7DHqmtMJIZX+gbnDVKqeSthnuBm+yXKJeEnb4uFVb48Gj
-	 IyZ7HnudXGA3uFdWbUjs9IfktXE1cwNee799w4lYvybnrMIQpK6HfPriESACBylkVk
-	 BOfTa3O6BaZLX2SL4qXdqJNpCUhfpzKk4P9BJSWvRCsUxuTaIfTmKdt37x5EPk8wmE
-	 I33QGpTfZTffHxtBZocGHRGqCikE5I59B+sxrGl6MrciDcMvwnVCr//KWmuLQjGOjz
-	 3ZWKDQI7VplHMHExM6H7hCuappaKMALOup7N32F3Io2436ps1QXqUgRHfdfjTqqswS
-	 1cH32ywDDGbBQ==
-Date: Mon, 16 Sep 2024 10:40:50 +0200
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, axboe@kernel.dk,
-	martin.petersen@oracle.com, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	sagi@grimberg.me
-Subject: Re: [PATCHv5 4/9] blk-integrity: consider entire bio list for merging
-Message-ID: <ZufvEhr-UO_BGm6_@kbusch-mbp>
-References: <20240913182854.2445457-1-kbusch@meta.com>
- <20240913182854.2445457-5-kbusch@meta.com>
- <20240914073011.GA30261@lst.de>
- <ZuW-_hu1-98SEjll@kbusch-mbp>
- <20240916064412.GA15929@lst.de>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hGsUr3Yg"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48FNARGM015144;
+	Mon, 16 Sep 2024 08:58:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=kb0B4norh/6bbwZZZg795m
+	MCaKhwSmMy8XzMHe3AEy0=; b=hGsUr3Yg1txBHSMSCILP4NEo623VFL9KmtskLh
+	MtEsaG+BsPOGuIG3rPrgETHWeE6yxbMley0mMfjnKpQuU2fU1urH7BmbeL6xiaOs
+	FNPBdO6F5k6XW4KzHQosZ+F3YlyPYlx0fvBB7P/e8BHxMET0+QujJFzLVqlTN0yI
+	mOkPuF/neJqhdKrv67sTadxfeoNJmOyOJXBwOD8bO84SXSJcVn95jQTpp7VoeB2H
+	flxGe8MsPDgbPJrAtwzY+/RPsQsvbRLzcj+EQw0iMIOpeDlyOmi1oCyue7PYvaLD
+	tMWUHDmJdU7EEnr2UO3ADsa0GidjQIqlt7jC8Z4j4vt8dfeQ==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41n4ge3cmh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Sep 2024 08:58:04 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48G8w3El004510
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Sep 2024 08:58:03 GMT
+Received: from hu-mdalam-blr.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 16 Sep 2024 01:57:56 -0700
+From: Md Sadre Alam <quic_mdalam@quicinc.com>
+To: <axboe@kernel.dk>, <song@kernel.org>, <yukuai3@huawei.com>,
+        <agk@redhat.com>, <snitzer@kernel.org>, <mpatocka@redhat.com>,
+        <adrian.hunter@intel.com>, <quic_asutoshd@quicinc.com>,
+        <ritesh.list@gmail.com>, <ulf.hansson@linaro.org>,
+        <andersson@kernel.org>, <konradybcio@kernel.org>, <kees@kernel.org>,
+        <gustavoars@kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-raid@vger.kernel.org>,
+        <dm-devel@lists.linux.dev>, <linux-mmc@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-hardening@vger.kernel.org>
+CC: <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>,
+        <quic_mdalam@quicinc.com>
+Subject: [PATCH v2 0/3] Add inline encryption support
+Date: Mon, 16 Sep 2024 14:27:38 +0530
+Message-ID: <20240916085741.1636554-1-quic_mdalam@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240916064412.GA15929@lst.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Ym74qACMiDUgz6EKJwdNdumFaOfWLRvb
+X-Proofpoint-ORIG-GUID: Ym74qACMiDUgz6EKJwdNdumFaOfWLRvb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 impostorscore=0 bulkscore=0 clxscore=1011
+ lowpriorityscore=0 adultscore=0 phishscore=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 spamscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2409160056
 
-On Mon, Sep 16, 2024 at 08:44:13AM +0200, Christoph Hellwig wrote:
-> The wrong thing primarily is the above commit log.  The code change
-> itself is correct, but we'd be better off killing the iteration over
-> the bio chain as well to make the code less confusing.
+QCOM SDCC controller having Inline Crypto Engine support
+Inline Crypto Engine do encryption/decryption on fly.
+dm-inlinecrypt driver will be use to do encryption/decryption
+with Inline Crypto Engine. 
 
-Okay, gotcha. I mentioned the existing code is a no op in "most cases"
-but it should just be "always". Maybe a sanity check with a WARN here is
-appropriate too.
+v2:
+ * Added new driver dm-inlinecrypt
+ * Dropped patch "md: dm-crypt: Set cc->iv_size to 4 bytes"
+ * squash patch "blk-crypto: Add additional algo modes for Inline"
+   encryption and patch "md: dm-crypt: Add additional algo modes for
+   inline encryption" to the dm-inlinecrypt driver.
+ * tested with dmsetup command as below
+   dmsetup create test-crypt --table '0 251904 inline-crypt aes128-xts-
+   plain a7f67ad520bd83b9725df6ebd76c3eeea7f67ad520bd83b9725df6ebd76c3eee 
+   0 /dev/mmcblk0p27 0 1'
 
-BTW, sorry for mislabeling the tags. The patch numbers changed a few
-times in this series, and I pasted reviews from the a different message.
+   dd if=/dev/urandom of=/tmp/data bs=1M count=1
+   dd if=/tmp/data of=/dev/mapper/test-crypt bs=1M count=1
+   dd of=/tmp/data1 if=/dev/mapper/test-crypt bs=1M count=1
+   dd of=/tmp/data2 if=/dev/mmcblk0p27 bs=1M count=1
+   md5sum /tmp/data*
+   b45d728bfb499b6de9b12c98fbb652dd  /tmp/data
+   b45d728bfb499b6de9b12c98fbb652dd  /tmp/data1
+   bc4107e19cf6fc012c5b997bdd3f0de4  /tmp/data2
+   dmsetup remove /dev/mapper/test-crypt
+
+v1:
+ * This series of patches add additional modes for inline encryption
+   This series of patches depends on [1] Add inline encryption support for
+   dm-crypt
+   [1]: https://lore.kernel.org/all/b45d3b40-2587-04dc-9601-a9251dacf806@opensource.wdc.com/T/#ma01f08a941107217c93680fa25e96e8d406df790
+
+ * These patches tested on IPQ9574 with eMMC ICE for raw partition
+   encryption/decryption.
+
+   e.g:
+
+   dmsetup create test-crypt --table '0 251904 crypt aes128-xts-plain64
+   a7f67ad520bd83b9725df6ebd76c3eeea7f67ad520bd83b9725df6ebd76c3eee 0
+   /dev/mmcblk0p27 0 1 inline_crypt'
+
+  dd if=/dev/urandom of=/tmp/data bs=1M count=1
+
+  dd if=/tmp/data of=/dev/mapper/test-crypt bs=1M count=1
+
+  dd of=/tmp/data1 if=/dev/mapper/test-crypt bs=1M count=1
+
+  dd of=/tmp/data2 if=/dev/mmcblk0p27 bs=1M count=1
+
+  md5sum /tmp/data*
+  b45d728bfb499b6de9b12c98fbb652dd  /tmp/data
+  b45d728bfb499b6de9b12c98fbb652dd  /tmp/data1
+  bc4107e19cf6fc012c5b997bdd3f0de4  /tmp/data2
+
+  dmsetup remove /dev/mapper/test-crypt
+
+
+Md Sadre Alam (3):
+  dm-inlinecrypt: Add inline encryption support
+  mmc: cqhci: Add additional algo mode for inline encryption
+  mmc: sdhci-msm: Add additional algo mode for inline encryption
+
+ block/blk-crypto.c              |  21 +++
+ drivers/md/Kconfig              |   8 +
+ drivers/md/Makefile             |   1 +
+ drivers/md/dm-inline-crypt.c    | 316 ++++++++++++++++++++++++++++++++
+ drivers/mmc/host/cqhci-crypto.c |  12 ++
+ drivers/mmc/host/sdhci-msm.c    |  10 +-
+ drivers/soc/qcom/ice.c          |  65 ++++++-
+ include/linux/blk-crypto.h      |   3 +
+ 8 files changed, 419 insertions(+), 17 deletions(-)
+ create mode 100644 drivers/md/dm-inline-crypt.c
+
+-- 
+2.34.1
+
