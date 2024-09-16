@@ -1,132 +1,106 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031AB149DF7;
-	Mon, 16 Sep 2024 09:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC3B482EF
+	for <linux-block@vger.kernel.org>; Mon, 16 Sep 2024 09:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726477418; cv=none; b=r1pDXRyp7bzTaL+kPz2COtKRm3t4N9lPY+YtBDtRgJpHI3SSktagI/AdaNZUkt9N3lspqjEL9vRImCKC0YSNytBBaN2S0nKffwlC2pOaQalRamVdk88fTziX9Anhfh73AbmVbeihp6a/7/RQO1dviDUptrZ4zXqppwq3lx28lRY=
+	t=1726478624; cv=none; b=R7ms8k0VjcNDfmbhIffZSljYBOPGEfYwVI4P47Mqryn6X9k9c8STZWrc61a8GzhSkvwyvFoAu2e9byXlASB+0HnDkqf4b1jJ1WR0vzR1w0YNyuzTmm1gT+8HWnyp/6UeDnlLwEVhr0T+r7Wka/5pE2p2ZHZ3v1HRrt6uAvy6/XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726477418; c=relaxed/simple;
-	bh=yJDaWyE+xctHez5TzRUkNngyP/Cv5T8JPeZ4t0s/EYE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n+Dm3GO1m+s2LWd+sD4HzctgoaBKLPs+wDdFsMKNnUqnKOwBCF1gqbaBceYQPTi9pj0rjAv3pQ3GKgw3XSCl/lfdG0jWDZHqOlkuRNxwQRt2AILPdAKCSr6oeapGs+B2Ao4dEws+6AgbiUgYOgNUuy/EnGblOWg9aWaWT/HjGNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=iCNePA7U; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1726478624; c=relaxed/simple;
+	bh=5FsEHtEj/NvtQYRLA0oR0Szlqlbhk2HL9IujoJ2r9E4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNmPOHn9bw85iFVU4hz8TmCgY3R7FqWJSd6QhOXN2QpIEHJhN3lmdsGMa2yNbt6SPAIW6RiF89iaiGFPNLYjY58mi5rWW15Q1iRTtae8pbp2xnyl4S3E5hWVgE+AvhysfYrA0r6uX7BjapvnuB0HSI1+xnivqKhZqzi3h8PaaNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VmzdLf7H; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="iCNePA7U"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48G0Qr2N022323;
-	Mon, 16 Sep 2024 08:58:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ucdUq9BZoE+qA79oygzpCCBfuQCsCjujEnF8FPE5/lE=; b=iCNePA7U5HBVUseO
-	wkNLCvKZXI67FN8f87SNBFe3ahZC30u5xLCoVuZhyF8d2NHDNRadOprjpJRWW+jc
-	nscl532E5xtuENTC1MnhyrZmdjVxFjoh18oHUOuPMZzWAKHoh5TzbSBX2Db6VXvx
-	p7fB++7Mm6fE2faBM1C9+YP/m37yrt5rM6urJqNGmwYv5WZ3gbGtzBwyrR6PKAsD
-	zeElla9acS6ReUi5BanifXmLpZPwnLrtS0Bsy+5WOLrAV1ztOt4b00aH00B3Y8Hc
-	diWHupRHEwpG3WizpSIGnSTeXbZZdg+8j08q1vA24pGOjGspjsipOq12H5B3uhRY
-	ymWOMg==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41n4gcudr5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Sep 2024 08:58:18 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48G8wHET005029
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Sep 2024 08:58:17 GMT
-Received: from hu-mdalam-blr.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 16 Sep 2024 01:58:10 -0700
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-To: <axboe@kernel.dk>, <song@kernel.org>, <yukuai3@huawei.com>,
-        <agk@redhat.com>, <snitzer@kernel.org>, <mpatocka@redhat.com>,
-        <adrian.hunter@intel.com>, <quic_asutoshd@quicinc.com>,
-        <ritesh.list@gmail.com>, <ulf.hansson@linaro.org>,
-        <andersson@kernel.org>, <konradybcio@kernel.org>, <kees@kernel.org>,
-        <gustavoars@kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-raid@vger.kernel.org>,
-        <dm-devel@lists.linux.dev>, <linux-mmc@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-hardening@vger.kernel.org>
-CC: <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>,
-        <quic_mdalam@quicinc.com>
-Subject: [PATCH v2 2/3] mmc: cqhci: Add additional algo mode for inline encryption
-Date: Mon, 16 Sep 2024 14:27:40 +0530
-Message-ID: <20240916085741.1636554-3-quic_mdalam@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240916085741.1636554-1-quic_mdalam@quicinc.com>
-References: <20240916085741.1636554-1-quic_mdalam@quicinc.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VmzdLf7H"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f66423686bso37460871fa.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2024 02:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1726478619; x=1727083419; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hUaMYwgpZ2Ku5tNMW6Im6QjDbcaD3sCpWLaYf5Q5iVI=;
+        b=VmzdLf7HYzzt2QNbs0PoXYk7LxpCYulktAr3pEOL2AitOoSuDJPps99ooGxlNmaJ91
+         t2I1QlMjHefaK7VNMjRZIGDyfZljXKE7NE6914JzR1u3tKJuW2G4zxmWTerPZvePYiOx
+         VqZpB3wWmdKj9cPY0TGay40aklkIwBFEgC0ra5U+wJR5dsaHwDcAyEMTlx/YgqgdbLC6
+         AX2Mp2k77w79ANlDObNrAnGPg4ApG57j1MQBObiJaqFypJdaqJW1R+LAp+q023Rj/aZQ
+         TpHdIWLY5uqjX1bLp3C6e63G9MIkYI/zLn5ZAWiK6DAdR95smz/2F8Z56VdYmN3WJig+
+         SL/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726478619; x=1727083419;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hUaMYwgpZ2Ku5tNMW6Im6QjDbcaD3sCpWLaYf5Q5iVI=;
+        b=cuJYk7MGVIZKwhWSk10Lx3HTee8hJUdCNR3rR+KQQGMuc1LeseNvwlkkRGNvu0kpuw
+         7wfOpP60frEJ7x3Gsr2xKhTFrEpIFJ/WGmUuxV2oAJNUUAq+44F6WFy8Npw14LlsaCIW
+         n5zFfdPXnwR7XAw8W/QnJlBRVgZIgyK8MW+auCv2niphhxLF/7yViAG3J4Ix/715ACme
+         SbFvAxqLpeU89/gbPtfIqEHL3N13tz3WRpfHLiEovkTWvvwgugoSTNCpgwZEfz7GcuHx
+         Bhs3QrIFnfLgN31fxAyfXjCvmCUdm7vnGExrwKrsvVs4uBHvStSnPGkGn5z9jp9iGdQs
+         WFSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXps747P4XhIkvXEDaLh8PFerow44bak0lxKKy9C0gLWTGY6wjBxhD66mE88/FCSkCxFsqXg9pQm5a5Qg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLIe2ef+FynKPdzrIRhwOGaJYOoZ1UsqIGScBLL3WyFfIe40qX
+	RrYG+NNQCbSWpFdkK0oHTT5mk3alIxLxRiuN9ZxZayYrWQcK4p2zRomkPWAmCVs=
+X-Google-Smtp-Source: AGHT+IH2cZxToR1Mm2fvGCS6avu+/Woqny9ILHMW+m489L3DnVmBj/IMWkXo2pwKbd0ZCc3idTj8qA==
+X-Received: by 2002:a2e:be22:0:b0:2f6:63d1:166e with SMTP id 38308e7fff4ca-2f787da0b93mr79504571fa.3.1726478618471;
+        Mon, 16 Sep 2024 02:23:38 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946fcb77sm32659395ad.209.2024.09.16.02.23.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 16 Sep 2024 02:23:37 -0700 (PDT)
+Date: Mon, 16 Sep 2024 17:23:33 +0800
+From: joeyli <jlee@suse.com>
+To: Valentin Kleibel <valentin@vrvis.at>
+Cc: Chun-Yi Lee <joeyli.kernel@gmail.com>,
+	Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Emelianov <xemul@openvz.org>,
+	Kirill Korotaev <dev@openvz.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Nicolai Stange <nstange@suse.com>,
+	Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
+ places
+Message-ID: <20240916092333.GF3296@linux-l9pv.suse>
+References: <20240912102935.31442-1-jlee@suse.com>
+ <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: FNt9voizb3GxUjTkHeCzJhGcvKywj3kB
-X-Proofpoint-GUID: FNt9voizb3GxUjTkHeCzJhGcvKywj3kB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- bulkscore=0 clxscore=1015 spamscore=0 adultscore=0 lowpriorityscore=0
- mlxlogscore=999 impostorscore=0 mlxscore=0 priorityscore=1501 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409160056
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 
-Add support for AES-XTS-256, AES-CBC-128 and AES-CBC-256 in
-cqhci_crypto_algs for inline encryption.
+Hi Valentin,
 
-Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
----
+On Thu, Sep 12, 2024 at 12:58:46PM +0200, Valentin Kleibel wrote:
+> > Then Nicolai Stange found more places in aoe have potential use-after-free
+> > problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
+> > and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
+> > packet to tx queue. So they should also use dev_hold() to increase the
+> > refcnt of skb->dev.
+> 
+> We've tested your patch on our servers and ran into an issue.
+> With heavy I/O load the aoe device had stale I/Os (e.g. rsync waiting
+> indefinetly on one core) that can be "fixed" by running aoe-revalidate on
+> that device.
+> 
+> Additionally when trying to shut down the system we see the message:
+> unregister_netdevice: waiting for XXX to become free. Usage Count = XXXXX
+> on aoe devices with a usage count somewhere in the millions.
+> This has been the same as without the patch, i assume the fix is still
+> incomplete.
+>
 
-Change in [v2]
+Thanks for your testing! I will look into it and reproduce issue again for
+improvement. 
 
-* No change
-
-Change in [v1]
-
-* Added alog mode AES-XTS-256, AES-CBC-128, AES-CBC-256 in 
-  cqhci
-
- drivers/mmc/host/cqhci-crypto.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/mmc/host/cqhci-crypto.c b/drivers/mmc/host/cqhci-crypto.c
-index d5f4b6972f63..85ab7bb87886 100644
---- a/drivers/mmc/host/cqhci-crypto.c
-+++ b/drivers/mmc/host/cqhci-crypto.c
-@@ -16,10 +16,22 @@ static const struct cqhci_crypto_alg_entry {
- 	enum cqhci_crypto_alg alg;
- 	enum cqhci_crypto_key_size key_size;
- } cqhci_crypto_algs[BLK_ENCRYPTION_MODE_MAX] = {
-+	[BLK_ENCRYPTION_MODE_AES_128_XTS] = {
-+		.alg = CQHCI_CRYPTO_ALG_AES_XTS,
-+		.key_size = CQHCI_CRYPTO_KEY_SIZE_128,
-+	},
- 	[BLK_ENCRYPTION_MODE_AES_256_XTS] = {
- 		.alg = CQHCI_CRYPTO_ALG_AES_XTS,
- 		.key_size = CQHCI_CRYPTO_KEY_SIZE_256,
- 	},
-+	[BLK_ENCRYPTION_MODE_AES_128_CBC] = {
-+		.alg = CQHCI_CRYPTO_ALG_BITLOCKER_AES_CBC,
-+		.key_size = CQHCI_CRYPTO_KEY_SIZE_128,
-+	},
-+	[BLK_ENCRYPTION_MODE_AES_256_CBC] = {
-+		.alg = CQHCI_CRYPTO_ALG_BITLOCKER_AES_CBC,
-+		.key_size = CQHCI_CRYPTO_KEY_SIZE_256,
-+	},
- };
- 
- static inline struct cqhci_host *
--- 
-2.34.1
-
+Joey Lee
